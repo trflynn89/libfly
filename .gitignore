@@ -1,0 +1,95 @@
+#### General
+
+*.db
+*.psd
+*.log
+release-*
+debug-*
+
+#### C++
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Dependency files
+*.d
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Gtags files
+GPATH
+GRTAGS
+GTAGS
+
+# Executables
+*.exe
+*.out
+*.app
+
+#### Visual Studio
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio 2015 cache/options directory
+.vs/
+
+*_i.c
+*_p.c
+*_i.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.idb
+*.pch
+*.ipch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.tlog
+*.scc
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile
+*.cache
+*.swp
+*.VC.db
+*.VC.VC.opendb
