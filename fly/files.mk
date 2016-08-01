@@ -9,7 +9,7 @@ SRC_DIRS_$(d) := \
     fly/task
 
 # Set the release configuration spec to use
-$(eval $(call SET_REL_CONF, $(SOURCE_ROOT)/libfly.spec))
+$(eval $(call SET_REL_CONF, $(d)/fly.spec))
 
 # Add libfly.so to RPM
 $(eval $(call ADD_REL_LIB, $(TARGET_NAME)))
