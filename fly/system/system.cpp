@@ -1,8 +1,8 @@
 #include "system.h"
 
-#if defined(BUILD_WINDOWS)
+#if defined(FLY_WINDOWS)
     #include "win_system.h"
-#elif defined(BUILD_LINUX)
+#elif defined(FLY_LINUX)
     #include "nix_system.h"
 #endif
 
