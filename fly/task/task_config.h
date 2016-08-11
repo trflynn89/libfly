@@ -21,22 +21,22 @@ public:
     /**
      * Constructor.
      */
-    TaskConfig();
+    FLY_API TaskConfig();
 
     /**
      * Destructor.
      */
-    virtual ~TaskConfig();
+    FLY_API virtual ~TaskConfig();
 
     /**
      * Get the name to associate with this configuration.
      */
-    static std::string GetName();
+    FLY_API static std::string GetName();
 
     /**
      * @return Number of worker threads, used if could not find number of cores.
      */
-    int DefaultWorkerCount() const;
+    FLY_API int DefaultWorkerCount() const;
 };
 
 }

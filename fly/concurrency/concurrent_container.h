@@ -4,6 +4,8 @@
 #include <condition_variable>
 #include <mutex>
 
+#include <fly/fly.h>
+
 namespace fly {
 
 /**
@@ -23,7 +25,7 @@ public:
      *
      * @param T Reference to an object of type T to push onto the container.
      */
-    void Push(const T &);
+    FLY_API void Push(const T &);
 
     /**
      * Pop an item from the container. If the container is empty, wait
@@ -31,7 +33,7 @@ public:
      *
      * @param T Reference to an object of type T where the item will be stored.
      */
-    void Pop(T &);
+    FLY_API void Pop(T &);
 
     /**
      * Pop an item from the container. If the container is empty, wait (at most)
@@ -43,7 +45,7 @@ public:
      * @return True if an object was popped in the given duration.
      */
     template <typename R, typename P>
-    bool Pop(T &, std::chrono::duration<R, P>);
+    FLY_API bool Pop(T &, std::chrono::duration<R, P>);
 
     /**
      * Pop an item from the container. If the container is empty, wait (at most)
@@ -56,17 +58,17 @@ public:
      * @return True if an object was popped in the given duration.
      */
     template <typename R, typename P>
-    bool Pop(T &, std::chrono::duration<R, P>, bool);
+    FLY_API bool Pop(T &, std::chrono::duration<R, P>, bool);
 
     /**
      * @return True if the container is empty, false otherwise.
      */
-    bool IsEmpty() const;
+    FLY_API bool IsEmpty() const;
 
     /**
      * @return The number of items in the container.
      */
-    size_type Size() const;
+    FLY_API size_type Size() const;
 
 protected:
     /**

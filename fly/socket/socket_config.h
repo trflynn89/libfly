@@ -22,32 +22,32 @@ public:
     /**
      * Constructor.
      */
-    SocketConfig();
+    FLY_API SocketConfig();
 
     /**
      * Destructor.
      */
-    virtual ~SocketConfig();
+    FLY_API virtual ~SocketConfig();
 
     /**
      * Get the name to associate with this configuration.
      */
-    static std::string GetName();
+    FLY_API static std::string GetName();
 
     /**
      * @return Sleep time for socket IO thread.
      */
-    std::chrono::microseconds IoWaitTime() const;
+    FLY_API std::chrono::microseconds IoWaitTime() const;
 
     /**
      * @return Character signifying the end of a message received over a socket.
      */
-    char EndOfMessage() const;
+    FLY_API char EndOfMessage() const;
 
     /**
      * Size of packet to use for send/receive operations.
      */
-    size_t PacketSize() const;
+    FLY_API size_t PacketSize() const;
 };
 
 }

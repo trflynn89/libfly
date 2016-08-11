@@ -4,6 +4,7 @@
 
 #include <Windows.h>
 
+#include <fly/fly.h>
 #include <fly/socket/socket_manager.h>
 
 namespace fly {
@@ -19,9 +20,9 @@ DEFINE_CLASS_PTRS(ConfigManager);
 class SocketManagerImpl : public SocketManager
 {
 public:
-    SocketManagerImpl();
-    SocketManagerImpl(ConfigManagerPtr &);
-    virtual ~SocketManagerImpl();
+    FLY_API SocketManagerImpl();
+    FLY_API SocketManagerImpl(ConfigManagerPtr &);
+    FLY_API virtual ~SocketManagerImpl();
 
 protected:
     virtual bool DoWork();

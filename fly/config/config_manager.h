@@ -45,7 +45,7 @@ public:
      * @param string Directory containing the configuration file.
      * @param string Name of the configuration file.
      */
-    ConfigManager(
+    FLY_API ConfigManager(
         ConfigFileType,
         const std::string &,
         const std::string &
@@ -54,7 +54,7 @@ public:
     /**
      * Destructor. Stop the configuration manager.
      */
-    virtual ~ConfigManager();
+    FLY_API virtual ~ConfigManager();
 
     /**
      * Create a configuration object, or if one with the given type's name
@@ -65,7 +65,7 @@ public:
      * @return A reference to the created/found configuration.
      */
     template <typename T>
-    std::shared_ptr<T> CreateConfig();
+    FLY_API std::shared_ptr<T> CreateConfig();
 
     /**
      * Get the number of configuration objects currently created. Erases any
@@ -73,7 +73,7 @@ public:
      *
      * @return The number of configurations.
      */
-    ConfigMap::size_type GetSize();
+    FLY_API ConfigMap::size_type GetSize();
 
 protected:
     /**

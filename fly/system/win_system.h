@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include <fly/fly.h>
 #include <fly/exit_codes.h>
 
 namespace fly {
@@ -15,16 +16,16 @@ namespace fly {
 class SystemImpl
 {
 public:
-    static bool MakeDirectory(const std::string &);
-    static char GetSeparator();
-    static std::string GetTempDirectory();
-    static void PrintBacktrace();
-    static std::string LocalTime(const std::string &);
-    static std::string GetLastError(int *);
-    static void SetupSignalHandler();
-    static void CleanExit(ExitCode);
-    static bool KeepRunning();
-    static ExitCode GetExitCode();
+    FLY_API static bool MakeDirectory(const std::string &);
+    FLY_API static char GetSeparator();
+    FLY_API static std::string GetTempDirectory();
+    FLY_API static void PrintBacktrace();
+    FLY_API static std::string LocalTime(const std::string &);
+    FLY_API static std::string GetLastError(int *);
+    FLY_API static void SetupSignalHandler();
+    FLY_API static void CleanExit(ExitCode);
+    FLY_API static bool KeepRunning();
+    FLY_API static ExitCode GetExitCode();
 };
 
 }

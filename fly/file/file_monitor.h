@@ -47,19 +47,19 @@ public:
      * @param string Directory containing the file to monitor.
      * @param string Name of the file to monitor.
      */
-    FileMonitor(FileEventCallback, const std::string &, const std::string &);
+    FLY_API FileMonitor(FileEventCallback, const std::string &, const std::string &);
 
     /**
      * Destructor. Stop the file monitor thread if necessary.
      */
-    virtual ~FileMonitor();
+    FLY_API virtual ~FileMonitor();
 
     /**
      * Check if the monitor implementation is in a good state.
      *
      * @return True if the monitor is healthy.
      */
-    virtual bool IsValid() const = 0;
+    FLY_API virtual bool IsValid() const = 0;
 
 protected:
     /**

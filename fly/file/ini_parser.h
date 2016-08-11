@@ -31,14 +31,14 @@ public:
      * @param string Directory containing the file to parse.
      * @param string Name of the file to parse.
      */
-    IniParser(const std::string &, const std::string &);
+    FLY_API IniParser(const std::string &, const std::string &);
 
     /**
      * Parse the configured file and store parsed values.
      *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    virtual void Parse();
+    FLY_API virtual void Parse();
 
     /**
      * Get a section's parsed values.
@@ -47,14 +47,14 @@ public:
      *
      * @return A list of parsed values.
      */
-    virtual Parser::ValueList GetValues(const std::string &) const;
+    FLY_API virtual Parser::ValueList GetValues(const std::string &) const;
 
     /**
      * Get the number of sections that have been parsed.
      *
      * @return The number of parsed sections.
      */
-    IniSection::size_type GetSize() const;
+    FLY_API IniSection::size_type GetSize() const;
 
     /**
      * Get the number of name/value pairs that have been parsed for a section.
@@ -63,7 +63,7 @@ public:
      *
      * @return The number of parsed values.
      */
-    Parser::ValueList::size_type GetSize(const std::string &) const;
+    FLY_API Parser::ValueList::size_type GetSize(const std::string &) const;
 
 private:
     /**

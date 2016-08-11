@@ -45,7 +45,7 @@ public:
     /**
      * Default constructor to initialize all values.
      */
-    Socket(int, const SocketConfigPtr &);
+    FLY_API Socket(int, const SocketConfigPtr &);
 
     /**
      * INADDR_ANY may be different depending on the OS. This function will
@@ -53,54 +53,54 @@ public:
      *
      * @return INADDR_ANY for the target system.
      */
-    static int InAddrAny();
+    FLY_API static int InAddrAny();
 
     /**
      *  A socket is valid if it's handle has been properly set.
      *
      * @return True if this is a valid socket, false otherwise.
      */
-    bool IsValid() const;
+    FLY_API bool IsValid() const;
 
-    bool IsTcp() const;
-    bool IsUdp() const;
+    FLY_API bool IsTcp() const;
+    FLY_API bool IsUdp() const;
 
     /**
      * Check if there is any errors on the socket.
      */
-    virtual bool IsErrorFree() = 0;
+    FLY_API virtual bool IsErrorFree() = 0;
 
     /**
      * Close this socket's handle.
      */
-    virtual void Close() = 0;
+    FLY_API virtual void Close() = 0;
 
     /**
      * Set the socket to be asynchronous.
      *
      * @return True if the operation was successful.
      */
-    virtual bool SetAsync() = 0;
+    FLY_API virtual bool SetAsync() = 0;
 
     /**
      * @return Return this socket's handle.
      */
-    size_t GetHandle() const;
+    FLY_API size_t GetHandle() const;
 
     /**
      * @return Return the client IP this socket is connected to.
      */
-    int GetClientIp() const;
+    FLY_API int GetClientIp() const;
 
     /**
      * @return Return the client port this socket is connected to.
      */
-    int GetClientPort() const;
+    FLY_API int GetClientPort() const;
 
     /**
      * @return This socket's ID.
      */
-    int GetSocketId() const;
+    FLY_API int GetSocketId() const;
 
     /**
      * Bind this socket to a server.
@@ -108,7 +108,7 @@ public:
      * @param int The server IP to bind to.
      * @param int The server port to bind to.
      */
-    virtual bool Bind(int, int) const = 0;
+    FLY_API virtual bool Bind(int, int) const = 0;
 
     /**
      * Bind this socket to a server, allowing port to be reused.
@@ -116,32 +116,32 @@ public:
      * @param int The server IP to bind to.
      * @param int The server port to bind to.
      */
-    virtual bool BindForReuse(int, int) const = 0;
+    FLY_API virtual bool BindForReuse(int, int) const = 0;
 
     /**
      * Allow socket to listen for incoming connections.
      */
-    virtual bool Listen() = 0;
+    FLY_API virtual bool Listen() = 0;
 
     /**
      * @return True if this is an asynchronous socking, false otherwise.
      */
-    bool IsAsync() const;
+    FLY_API bool IsAsync() const;
 
     /**
      * Return true if this socket is a listener socket.
      */
-    bool IsListening() const;
+    FLY_API bool IsListening() const;
 
     /**
      * Return true if this socket is connecting to a server.
      */
-    bool IsConnecting() const;
+    FLY_API bool IsConnecting() const;
 
     /**
      * Return true if this socket is connected to a server.
      */
-    bool IsConnected() const;
+    FLY_API bool IsConnected() const;
 
     /**
      * Connect to a listening socket.
@@ -151,7 +151,7 @@ public:
      *
      * @param bool True if the connection was successful, false otherwise.
      */
-    virtual bool Connect(const std::string &, int) = 0;
+    FLY_API virtual bool Connect(const std::string &, int) = 0;
 
     /**
      * Asynchronously connect to a listening socket. The connect may finish
@@ -163,14 +163,14 @@ public:
      *
      * @return The connection state (not connected, connecting, or connected).
      */
-    Socket::ConnectedState ConnectAsync(std::string, int);
+    FLY_API Socket::ConnectedState ConnectAsync(std::string, int);
 
     /**
      * Accept an incoming client connection.
      *
      * @return A Socket on which the actual connection is made.
      */
-    virtual SocketPtr Accept() const = 0;
+    FLY_API virtual SocketPtr Accept() const = 0;
 
     /**
      * Write data on the socket.
@@ -179,26 +179,7 @@ public:
      *
      * @return The number of bytes sent.
      */
-    virtual size_t Send(const std::string &) const = 0;
-
-    /**
-     * Write data on the socket.
-     *
-     * @param string The data to send.
-     * @param bool & Reference to a bool, set to true if the operation would block.
-     *
-     * @return The number of bytes sent.
-     */
-    virtual size_t Send(const std::string &, bool &) const = 0;
-
-    /**
-     * Write data on the socket.
-     *
-     * @param string The data to send.
-     *
-     * @return The number of bytes sent.
-     */
-    virtual size_t SendTo(const std::string &, const std::string &, int) const = 0;
+    FLY_API virtual size_t Send(const std::string &) const = 0;
 
     /**
      * Write data on the socket.
@@ -208,7 +189,26 @@ public:
      *
      * @return The number of bytes sent.
      */
-    virtual size_t SendTo(const std::string &, const std::string &, int, bool &) const = 0;
+    FLY_API virtual size_t Send(const std::string &, bool &) const = 0;
+
+    /**
+     * Write data on the socket.
+     *
+     * @param string The data to send.
+     *
+     * @return The number of bytes sent.
+     */
+    FLY_API virtual size_t SendTo(const std::string &, const std::string &, int) const = 0;
+
+    /**
+     * Write data on the socket.
+     *
+     * @param string The data to send.
+     * @param bool & Reference to a bool, set to true if the operation would block.
+     *
+     * @return The number of bytes sent.
+     */
+    FLY_API virtual size_t SendTo(const std::string &, const std::string &, int, bool &) const = 0;
 
     /**
      * Request data to be written on the socket asynchronously. If this is not
@@ -218,7 +218,7 @@ public:
      *
      * @return True if the request was made.
      */
-    bool SendAsync(const std::string &);
+    FLY_API bool SendAsync(const std::string &);
 
     /**
      * Request data to be written on the socket asynchronously. If this is not
@@ -228,31 +228,14 @@ public:
      *
      * @return True if the request was made.
      */
-    bool SendToAsync(const std::string &, const std::string &, int);
+    FLY_API bool SendToAsync(const std::string &, const std::string &, int);
 
     /**
      * Read data on this socket until '\n' is received.
      *
      * @return The data received.
      */
-    virtual std::string Recv() const = 0;
-
-    /**
-     * Read data on this socket until '\n' is received.
-     *
-     * @param bool & Reference to a bool, set to true if the operation would block.
-     * @param bool & Reference to a bool, set to true if the EoM char was received.
-     *
-     * @return The data received.
-     */
-    virtual std::string Recv(bool &, bool &) const = 0;
-
-    /**
-     * Read data on this socket until '\n' is received.
-     *
-     * @return The data received.
-     */
-    virtual std::string RecvFrom() const = 0;
+    FLY_API virtual std::string Recv() const = 0;
 
     /**
      * Read data on this socket until '\n' is received.
@@ -262,7 +245,24 @@ public:
      *
      * @return The data received.
      */
-    virtual std::string RecvFrom(bool &, bool &) const = 0;
+    FLY_API virtual std::string Recv(bool &, bool &) const = 0;
+
+    /**
+     * Read data on this socket until '\n' is received.
+     *
+     * @return The data received.
+     */
+    FLY_API virtual std::string RecvFrom() const = 0;
+
+    /**
+     * Read data on this socket until '\n' is received.
+     *
+     * @param bool & Reference to a bool, set to true if the operation would block.
+     * @param bool & Reference to a bool, set to true if the EoM char was received.
+     *
+     * @return The data received.
+     */
+    FLY_API virtual std::string RecvFrom(bool &, bool &) const = 0;
 
     /**
      * Iterate thru all pending asynchronous connects. Check if the socket is
@@ -271,7 +271,7 @@ public:
      *
      * @param ConnectQueue Queue of completed connects to post to on success.
      */
-    void ServiceConnectRequests(AsyncConnect::ConnectQueue &);
+    FLY_API void ServiceConnectRequests(AsyncConnect::ConnectQueue &);
 
     /**
      * Iterate thru all pending asynchronous sends. Service each request until
@@ -280,7 +280,7 @@ public:
      *
      * @param RequestQueue Queue of completed sends to post to on success.
      */
-    void ServiceSendRequests(AsyncRequest::RequestQueue &);
+    FLY_API void ServiceSendRequests(AsyncRequest::RequestQueue &);
 
     /**
      * Read on this socket until a read would block, or some other error occurs
@@ -288,7 +288,7 @@ public:
      *
      * @param RequestQueue Queue of completed received to post to on success.
      */
-    void ServiceRecvRequests(AsyncRequest::RequestQueue &);
+    FLY_API void ServiceRecvRequests(AsyncRequest::RequestQueue &);
 
 protected:
     // Socket type

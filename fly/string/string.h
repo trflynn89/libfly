@@ -27,7 +27,7 @@ public:
      *
      * @return A vector containing the split strings.
      */
-    static std::vector<std::string> Split(const std::string &, char);
+    FLY_API static std::vector<std::string> Split(const std::string &, char);
 
     /**
      * Split a string into a vector of strings, up to a maximum size. If the max
@@ -40,14 +40,14 @@ public:
      *
      * @return A vector containing the split strings.
      */
-    static std::vector<std::string> Split(const std::string &, char, size_t);
+    FLY_API static std::vector<std::string> Split(const std::string &, char, size_t);
 
     /**
      * Remove leading and trailing whitespace from a string.
      *
      * @param string The string to trim.
      */
-    static void Trim(std::string &);
+    FLY_API static void Trim(std::string &);
 
     /**
      * Replace all instances of a substring in a string with another substring.
@@ -56,7 +56,7 @@ public:
      * @param string The string to search for and replace.
      * @param string The replacement string.
      */
-    static void ReplaceAll(std::string &, const std::string &, const std::string &);
+    FLY_API static void ReplaceAll(std::string &, const std::string &, const std::string &);
 
     /**
      * Remove all instances of a substring in a string.
@@ -64,7 +64,7 @@ public:
      * @param string The string container which will be modified.
      * @param string The string to search for and remove.
      */
-    static void RemoveAll(std::string &, const std::string &);
+    FLY_API static void RemoveAll(std::string &, const std::string &);
 
     /**
      * Check if a string begins with a character.
@@ -74,7 +74,7 @@ public:
      *
      * @return True if the string begins with the search character.
      */
-    static bool StartsWith(const std::string &, const char &);
+    FLY_API static bool StartsWith(const std::string &, const char &);
 
     /**
      * Check if a string begins with another string.
@@ -84,7 +84,7 @@ public:
      *
      * @return True if the string begins with the search string.
      */
-    static bool StartsWith(const std::string &, const std::string &);
+    FLY_API static bool StartsWith(const std::string &, const std::string &);
 
     /**
      * Check if a string ends with a character.
@@ -94,7 +94,7 @@ public:
      *
      * @return True if the string ends with the search character.
      */
-    static bool EndsWith(const std::string &, const char &);
+    FLY_API static bool EndsWith(const std::string &, const char &);
 
     /**
      * Check if a string ends with another string.
@@ -104,7 +104,7 @@ public:
      *
      * @return True if the string ends with the search string.
      */
-    static bool EndsWith(const std::string &, const std::string &);
+    FLY_API static bool EndsWith(const std::string &, const std::string &);
 
     /**
      * Generate a random string of the given size.
@@ -113,7 +113,7 @@ public:
      *
      * @return The generated string.
      */
-    static std::string GenerateRandomString(const unsigned int);
+    FLY_API static std::string GenerateRandomString(const unsigned int);
 
     /**
      * Calculate the entropy of the given string. The larger the entropy, the
@@ -123,7 +123,7 @@ public:
      *
      * @return An entropy value in the range [0.0, inf).
      */
-    static float CalculateEntropy(const std::string &);
+    FLY_API static float CalculateEntropy(const std::string &);
 
     /**
      * Format a string with variadic template arguments. This is type safe in
@@ -146,7 +146,7 @@ public:
      * @return A string that has been formatted with the given arguments.
      */
     template <typename ... Args>
-    static std::string Format(const char *, const Args &...);
+    FLY_API static std::string Format(const char *, const Args &...);
 
     /**
      * Concatenate a list of objects with the given separator.
@@ -159,7 +159,7 @@ public:
      * @return The resulting join of the given arguments.
      */
     template <typename ... Args>
-    static std::string Join(const char &, const Args &...);
+    FLY_API static std::string Join(const char &, const Args &...);
 
     /**
      * Convert a string to a basic type, e.g. int or bool.
@@ -174,7 +174,7 @@ public:
      * @throws std::out_of_range Converted value is out of range of result type.
      */
     template <typename T>
-    static T Convert(const std::string &);
+    FLY_API static T Convert(const std::string &);
 
 private:
     /**

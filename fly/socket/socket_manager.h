@@ -35,19 +35,19 @@ public:
      * Default constructor. Constructs default socket configuration, meant for
      * unit tests.
      */
-    SocketManager();
+    FLY_API SocketManager();
 
     /**
      * Constructor.
      *
      * @param ConfigManagerPtr Reference to the configuration manager.
      */
-    SocketManager(ConfigManagerPtr &);
+    FLY_API SocketManager(ConfigManagerPtr &);
 
     /**
      * Default destructor.
      */
-    virtual ~SocketManager();
+    FLY_API virtual ~SocketManager();
 
     /**
      * Set callbacks for when a client connects or disconnects.
@@ -55,19 +55,19 @@ public:
      * @param NewClientCallback Callback for when a new client connects.
      * @param ClosedClientCallback Callback for when a client disconnects.
      */
-    void SetClientCallbacks(NewClientCallback, ClosedClientCallback);
+    FLY_API void SetClientCallbacks(NewClientCallback, ClosedClientCallback);
 
     /**
      * Remove the callbacks for when a client connects or disconnects.
      */
-    void ClearClientCallbacks();
+    FLY_API void ClearClientCallbacks();
 
     /**
      * Create and initialize a synchronous TCP socket.
      *
      * @return Shared pointer to the socket.
      */
-    SocketPtr CreateTcpSocket();
+    FLY_API SocketPtr CreateTcpSocket();
 
     /**
      * Create and initialize an asynchronous TCP socket. The socket manager
@@ -75,14 +75,14 @@ public:
      *
      * @return Weak pointer to the socket.
      */
-    SocketWPtr CreateAsyncTcpSocket();
+    FLY_API SocketWPtr CreateAsyncTcpSocket();
 
     /**
      * Create and initialize a synchronous UDP socket.
      *
      * @return Shared pointer to the socket.
      */
-    SocketPtr CreateUdpSocket();
+    FLY_API SocketPtr CreateUdpSocket();
 
     /**
      * Create and initialize an asynchronous UDP socket. The socket manager
@@ -90,7 +90,7 @@ public:
      *
      * @return Weak pointer to the socket.
      */
-    SocketWPtr CreateAsyncUdpSocket();
+    FLY_API SocketWPtr CreateAsyncUdpSocket();
 
     /**
      * Wait for an asynchronous connect to complete.
@@ -101,7 +101,7 @@ public:
      * @return True if a completed connect was found in the given duration.
      */
     template <typename R, typename P>
-    bool WaitForCompletedConnect(AsyncConnect &, std::chrono::duration<R, P>);
+    FLY_API bool WaitForCompletedConnect(AsyncConnect &, std::chrono::duration<R, P>);
 
     /**
      * Wait for an asynchronous read to complete.
@@ -112,7 +112,7 @@ public:
      * @return True if a completed receive was found in the given duration.
      */
     template <typename R, typename P>
-    bool WaitForCompletedReceive(AsyncRequest &, std::chrono::duration<R, P>);
+    FLY_API bool WaitForCompletedReceive(AsyncRequest &, std::chrono::duration<R, P>);
 
     /**
      * Wait for an asynchronous send to complete.
@@ -123,7 +123,7 @@ public:
      * @return True if a completed send was found in the given duration.
      */
     template <typename R, typename P>
-    bool WaitForCompletedSend(AsyncRequest &, std::chrono::duration<R, P>);
+    FLY_API bool WaitForCompletedSend(AsyncRequest &, std::chrono::duration<R, P>);
 
 protected:
     /**

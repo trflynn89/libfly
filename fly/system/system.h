@@ -3,8 +3,8 @@
 #include <sstream>
 #include <string>
 
-#include <fly/exit_codes.h>
 #include <fly/fly.h>
+#include <fly/exit_codes.h>
 
 namespace fly {
 
@@ -24,27 +24,27 @@ public:
      *
      * @return True if the directory could be created (or already exists).
      */
-    static bool MakeDirectory(const std::string &);
+    FLY_API static bool MakeDirectory(const std::string &);
 
     /**
      * @return The system's path separator.
      */
-    static char GetSeparator();
+    FLY_API static char GetSeparator();
 
     /**
      * @return The system's temporary directory path.
      */
-    static std::string GetTempDirectory();
+    FLY_API static std::string GetTempDirectory();
 
     /**
      * Print the backtrace to stderr.
      */
-    static void PrintBacktrace();
+    FLY_API static void PrintBacktrace();
 
     /**
      * @return The local time formatted as a string.
      */
-    static std::string LocalTime();
+    FLY_API static std::string LocalTime();
 
     /**
      * Get the last system error as a string, and optionally store the numeric
@@ -54,30 +54,30 @@ public:
      *
      * @return The last system error as a string.
      */
-    static std::string GetLastError(int *code = NULL);
+    FLY_API static std::string GetLastError(int *code = NULL);
 
     /**
      * Setup handlers for fatal and non-fatal exit codes, to allow the system
      * to cleanly exit;
      */
-    static void SetupSignalHandler();
+    FLY_API static void SetupSignalHandler();
 
     /**
      * Signal the main thread to exit with the given exit code.
      *
      * @param ExitCode Code to exit with.
      */
-    static void CleanExit(ExitCode);
+    FLY_API static void CleanExit(ExitCode);
 
     /**
      * @return Whether the system is in a state in which it should keep running.
      */
-    static bool KeepRunning();
+    FLY_API static bool KeepRunning();
 
     /**
      * @return The code the system should exit with.
      */
-    static ExitCode GetExitCode();
+    FLY_API static ExitCode GetExitCode();
 };
 
 }

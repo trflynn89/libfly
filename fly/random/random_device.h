@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <random>
 
+#include <fly/fly.h>
+
 namespace fly {
 
 /**
@@ -32,17 +34,17 @@ public:
      * Construct the random engine and seed it with a value based on the system
      * clock time.
      */
-    RandomDevice();
+    FLY_API RandomDevice();
 
     /**
      * Seed the random engine.
      */
-    void Seed(T);
+    FLY_API void Seed(T);
 
     /**
      * Generate a random number.
      */
-    virtual T operator()() = 0;
+    FLY_API virtual T operator()() = 0;
 
 protected:
     E m_engine;
@@ -70,9 +72,9 @@ template <typename T, typename E = std::default_random_engine>
 class NormalDevice : public RandomDevice<T, E>
 {
 public:
-    NormalDevice();
-    NormalDevice(T, T);
-    T operator()();
+    FLY_API NormalDevice();
+    FLY_API NormalDevice(T, T);
+    FLY_API T operator()();
 
 private:
     std::normal_distribution<T> m_distribution;
@@ -101,9 +103,9 @@ template <typename T, typename E = std::default_random_engine>
 class UniformIntegerDevice : public RandomDevice<T, E>
 {
 public:
-    UniformIntegerDevice();
-    UniformIntegerDevice(T, T);
-    T operator()();
+    FLY_API UniformIntegerDevice();
+    FLY_API UniformIntegerDevice(T, T);
+    FLY_API T operator()();
 
 private:
     std::uniform_int_distribution<T> m_distribution;
@@ -132,9 +134,9 @@ template <typename T, typename E = std::default_random_engine>
 class UniformRealDevice : public RandomDevice<T, E>
 {
 public:
-    UniformRealDevice();
-    UniformRealDevice(T, T);
-    T operator()();
+    FLY_API UniformRealDevice();
+    FLY_API UniformRealDevice(T, T);
+    FLY_API T operator()();
 
 private:
     std::uniform_real_distribution<T> m_distribution;
@@ -163,9 +165,9 @@ template <typename E = std::default_random_engine>
 class BernoulliDevice : public RandomDevice<bool, E>
 {
 public:
-    BernoulliDevice();
-    BernoulliDevice(double);
-    bool operator()();
+    FLY_API BernoulliDevice();
+    FLY_API BernoulliDevice(double);
+    FLY_API bool operator()();
 
 private:
     std::bernoulli_distribution m_distribution;
@@ -194,9 +196,9 @@ template <typename T, typename E = std::default_random_engine>
 class BinomialDevice : public RandomDevice<T, E>
 {
 public:
-    BinomialDevice();
-    BinomialDevice(T, double);
-    T operator()();
+    FLY_API BinomialDevice();
+    FLY_API BinomialDevice(T, double);
+    FLY_API T operator()();
 
 private:
     std::binomial_distribution<T> m_distribution;
@@ -225,9 +227,9 @@ template <typename T, typename E = std::default_random_engine>
 class GeometricDevice : public RandomDevice<T, E>
 {
 public:
-    GeometricDevice();
-    GeometricDevice(double);
-    T operator()();
+    FLY_API GeometricDevice();
+    FLY_API GeometricDevice(double);
+    FLY_API T operator()();
 
 private:
     std::geometric_distribution<T> m_distribution;
@@ -256,9 +258,9 @@ template <typename T, typename E = std::default_random_engine>
 class ExponentialDevice : public RandomDevice<T, E>
 {
 public:
-    ExponentialDevice();
-    ExponentialDevice(T);
-    T operator()();
+    FLY_API ExponentialDevice();
+    FLY_API ExponentialDevice(T);
+    FLY_API T operator()();
 
 private:
     std::exponential_distribution<T> m_distribution;

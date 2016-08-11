@@ -37,14 +37,14 @@ public:
      * @param string Directory containing the file to parse.
      * @param string Name of the file to parse.
      */
-    Parser(const std::string &, const std::string &);
+    FLY_API Parser(const std::string &, const std::string &);
 
     /**
      * Parse the configured file and store parsed values.
      *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    virtual void Parse() = 0;
+    FLY_API virtual void Parse() = 0;
 
     /**
      * Get a section's parsed values.
@@ -53,7 +53,7 @@ public:
      *
      * @return A list of parsed values.
      */
-    virtual ValueList GetValues(const std::string &) const = 0;
+    FLY_API virtual ValueList GetValues(const std::string &) const = 0;
 
 protected:
     const std::string m_path;

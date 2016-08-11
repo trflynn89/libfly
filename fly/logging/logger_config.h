@@ -22,32 +22,32 @@ public:
     /**
      * Constructor.
      */
-    LoggerConfig();
+    FLY_API LoggerConfig();
 
     /**
      * Destructor.
      */
-    virtual ~LoggerConfig();
+    FLY_API virtual ~LoggerConfig();
 
     /**
      * Get the name to associate with this configuration.
      */
-    static std::string GetName();
+    FLY_API static std::string GetName();
 
     /**
      * @return Max log file size (in bytes) before rotating the log file.
      */
-    size_t MaxLogFileSize() const;
+    FLY_API size_t MaxLogFileSize() const;
 
     /**
      * @return Max message size (in bytes) per log.
      */
-    size_t MaxMessageSize() const;
+    FLY_API size_t MaxMessageSize() const;
 
     /**
      * @return Sleep time for logger IO thread.
      */
-    std::chrono::seconds QueueWaitTime() const;
+    FLY_API std::chrono::seconds QueueWaitTime() const;
 };
 
 }

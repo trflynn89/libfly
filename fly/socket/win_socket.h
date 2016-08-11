@@ -18,34 +18,34 @@ DEFINE_CLASS_PTRS(SocketImpl);
 class SocketImpl : public Socket
 {
 public:
-    SocketImpl(int, const SocketConfigPtr &);
-    ~SocketImpl();
+    FLY_API SocketImpl(int, const SocketConfigPtr &);
+    FLY_API ~SocketImpl();
 
-    static int InAddrAny();
+    FLY_API static int InAddrAny();
 
-    void Close();
+    FLY_API void Close();
 
-    bool IsErrorFree();
+    FLY_API bool IsErrorFree();
 
-    bool SetAsync();
+    FLY_API bool SetAsync();
 
-    bool Bind(int, int) const;
-    bool BindForReuse(int, int) const;
-    bool Listen();
-    bool Connect(const std::string &, int);
-    SocketPtr Accept() const;
+    FLY_API bool Bind(int, int) const;
+    FLY_API bool BindForReuse(int, int) const;
+    FLY_API bool Listen();
+    FLY_API bool Connect(const std::string &, int);
+    FLY_API SocketPtr Accept() const;
 
-    size_t Send(const std::string &) const;
-    size_t Send(const std::string &, bool &) const;
+    FLY_API size_t Send(const std::string &) const;
+    FLY_API size_t Send(const std::string &, bool &) const;
 
-    size_t SendTo(const std::string &, const std::string &, int) const;
-    size_t SendTo(const std::string &, const std::string &, int, bool &) const;
+    FLY_API size_t SendTo(const std::string &, const std::string &, int) const;
+    FLY_API size_t SendTo(const std::string &, const std::string &, int, bool &) const;
 
-    std::string Recv() const;
-    std::string Recv(bool &, bool &) const;
+    FLY_API std::string Recv() const;
+    FLY_API std::string Recv(bool &, bool &) const;
 
-    std::string RecvFrom() const;
-    std::string RecvFrom(bool &, bool &) const;
+    FLY_API std::string RecvFrom() const;
+    FLY_API std::string RecvFrom(bool &, bool &) const;
 };
 
 }

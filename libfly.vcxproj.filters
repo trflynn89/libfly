@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="concurrency">
+      <UniqueIdentifier>{40bfec4f-872f-4644-855a-b175a165c108}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{7bfc9b93-2ef1-48fd-9eb8-ccb630757af9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="file">
+      <UniqueIdentifier>{7e00e5db-2667-4fb1-ab52-071772a04b6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="logging">
+      <UniqueIdentifier>{2b39b732-ea13-4003-8f0b-a98682d27bfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="random">
+      <UniqueIdentifier>{5c6aa4c5-fe2f-4e8d-a6a5-be89a547ca25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="socket">
+      <UniqueIdentifier>{c64c6e9a-2b73-4e4c-af81-bebf6171d91c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="string">
+      <UniqueIdentifier>{ac7cebd9-5c91-4041-9924-7271cca03d27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="system">
+      <UniqueIdentifier>{43fcbaca-3ea1-4886-bc2e-699655d936a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="task">
+      <UniqueIdentifier>{b3dd9d0d-ca98-41db-a85b-5754423eb2eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="traits">
+      <UniqueIdentifier>{f5cf0d32-8583-4428-9fd7-a6c9852235c2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fly\exit_codes.h" />
+    <ClInclude Include="fly\fly.h" />
+    <ClInclude Include="fly\concurrency\concurrent_container.h">
+      <Filter>concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\concurrency\concurrent_queue.h">
+      <Filter>concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\concurrency\concurrent_stack.h">
+      <Filter>concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\config\config.h">
+      <Filter>config</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\config\config_manager.h">
+      <Filter>config</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\file\file_monitor.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\file\file_monitor_impl.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\file\ini_parser.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\file\parser.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\file\win_file_monitor.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\logging\log.h">
+      <Filter>logging</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\logging\logger.h">
+      <Filter>logging</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\logging\logger_config.h">
+      <Filter>logging</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\traits\type_traits.h">
+      <Filter>traits</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\task\runner.h">
+      <Filter>task</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\task\task_config.h">
+      <Filter>task</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\system\system.h">
+      <Filter>system</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\system\win_system.h">
+      <Filter>system</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\string\string.h">
+      <Filter>string</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\socket\async_structs.h">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\socket\socket.h">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\socket\socket_config.h">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\socket\socket_impl.h">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\socket\socket_manager.h">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\socket\socket_manager_impl.h">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\socket\win_socket.h">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\socket\win_socket_manager.h">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="fly\random\random_device.h">
+      <Filter>random</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="fly\config\config.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\config\config_manager.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\file\file_monitor.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\file\ini_parser.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\file\parser.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\file\win_file_monitor.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\logging\log.cpp">
+      <Filter>logging</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\logging\logger.cpp">
+      <Filter>logging</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\logging\logger_config.cpp">
+      <Filter>logging</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\task\runner.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\task\task_config.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\system\system.cpp">
+      <Filter>system</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\system\win_system.cpp">
+      <Filter>system</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\string\string.cpp">
+      <Filter>string</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\socket\async_structs.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\socket\socket.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\socket\socket_config.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\socket\socket_manager.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\socket\win_socket.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+    <ClCompile Include="fly\socket\win_socket_manager.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
