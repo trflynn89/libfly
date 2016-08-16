@@ -19,9 +19,9 @@ namespace fly {
 class FileMonitorImpl : public FileMonitor
 {
 public:
-    FLY_API FileMonitorImpl(FileEventCallback, const std::string &, const std::string &);
-    FLY_API virtual ~FileMonitorImpl();
-    FLY_API bool IsValid() const;
+    FileMonitorImpl(FileEventCallback, const std::string &, const std::string &);
+    virtual ~FileMonitorImpl();
+    bool IsValid() const;
 
 protected:
     void Poll(const std::chrono::milliseconds &);

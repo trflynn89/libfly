@@ -25,7 +25,7 @@ public:
      *
      * @param T Reference to an object of type T to push onto the container.
      */
-    FLY_API void Push(const T &);
+    void Push(const T &);
 
     /**
      * Pop an item from the container. If the container is empty, wait
@@ -33,7 +33,7 @@ public:
      *
      * @param T Reference to an object of type T where the item will be stored.
      */
-    FLY_API void Pop(T &);
+    void Pop(T &);
 
     /**
      * Pop an item from the container. If the container is empty, wait (at most)
@@ -45,7 +45,7 @@ public:
      * @return True if an object was popped in the given duration.
      */
     template <typename R, typename P>
-    FLY_API bool Pop(T &, std::chrono::duration<R, P>);
+    bool Pop(T &, std::chrono::duration<R, P>);
 
     /**
      * Pop an item from the container. If the container is empty, wait (at most)
@@ -58,17 +58,17 @@ public:
      * @return True if an object was popped in the given duration.
      */
     template <typename R, typename P>
-    FLY_API bool Pop(T &, std::chrono::duration<R, P>, bool);
+    bool Pop(T &, std::chrono::duration<R, P>, bool);
 
     /**
      * @return True if the container is empty, false otherwise.
      */
-    FLY_API bool IsEmpty() const;
+    bool IsEmpty() const;
 
     /**
      * @return The number of items in the container.
      */
-    FLY_API size_type Size() const;
+    size_type Size() const;
 
 protected:
     /**

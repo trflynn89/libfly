@@ -19,9 +19,9 @@ DEFINE_CLASS_PTRS(ConfigManager);
 class SocketManagerImpl : public SocketManager
 {
 public:
-    FLY_API SocketManagerImpl();
-    FLY_API SocketManagerImpl(ConfigManagerPtr &);
-    FLY_API virtual ~SocketManagerImpl();
+    SocketManagerImpl();
+    SocketManagerImpl(ConfigManagerPtr &);
+    virtual ~SocketManagerImpl();
 
 protected:
     virtual bool DoWork();

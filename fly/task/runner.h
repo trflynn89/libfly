@@ -32,7 +32,7 @@ public:
      * @param string Name to use for this task runner.
      * @param int Number of worker threads to start (less than 0 starts one per core).
      */
-    FLY_API Runner(const std::string &, int);
+    Runner(const std::string &, int);
 
     /**
      * Constructor. Create one worker per core (or default to the config value
@@ -41,22 +41,22 @@ public:
      * @param ConfigManagerPtr Reference to the configuration manager.
      * @param string Name to use for this task runner.
      */
-    FLY_API Runner(ConfigManagerPtr &, const std::string &);
+    Runner(ConfigManagerPtr &, const std::string &);
 
     /**
      * Destructor. Stop the running tasks if necessary.
      */
-    FLY_API virtual ~Runner();
+    virtual ~Runner();
 
     /**
      * Initialize the task and start the configured number of worker threads.
      */
-    FLY_API bool Start();
+    bool Start();
 
     /**
      * Deinitialize the task and stop the worker threads.
      */
-    FLY_API void Stop();
+    void Stop();
 
 protected:
     /**

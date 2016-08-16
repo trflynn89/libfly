@@ -24,17 +24,6 @@
     #define U64(n) __UINT64_C(n)
 #endif
 
-// Define macro to export classes
-#if defined(FLY_WINDOWS)
-    #if defined(FLY_EXPORT)
-        #define FLY_API __declspec(dllexport)
-    #endif
-#endif
-
-#ifndef FLY_API
-    #define FLY_API
-#endif
-
 // Typedefs for class name and smart pointers
 #define DEFINE_CLASS_PTRS(classname)                    \
     class classname;                                    \

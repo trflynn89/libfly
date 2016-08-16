@@ -35,17 +35,17 @@ public:
     /**
      * Constructor.
      */
-    FLY_API Config();
+    Config();
 
     /**
      * Destructor.
      */
-    FLY_API virtual ~Config();
+    virtual ~Config();
 
     /**
      * Get the name to associate with this configuration.
      */
-    FLY_API static std::string GetName();
+    static std::string GetName();
 
     /**
      * Get a value converted to a basic type, e.g. int or bool. If the value
@@ -60,12 +60,12 @@ public:
      * @return The converted value or the default value.
      */
     template <typename T>
-    FLY_API T GetValue(const std::string &, T) const;
+    T GetValue(const std::string &, T) const;
 
     /**
      * Update this configuration with a new set of parsed values.
      */
-    FLY_API void Update(const Parser::ValueList &);
+    void Update(const Parser::ValueList &);
 
 private:
     mutable std::shared_timed_mutex m_valuesMutex;

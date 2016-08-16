@@ -46,7 +46,7 @@ struct Log
     /**
      * Default constructor.
      */
-    FLY_API Log()
+    Log()
     {
     }
 
@@ -56,7 +56,7 @@ struct Log
      * @param LoggerConfigPtr Reference to the logger config.
      * @param string Message to store.
      */
-    FLY_API Log(const LoggerConfigPtr &spConfig, const std::string &message) :
+    Log(const LoggerConfigPtr &spConfig, const std::string &message) :
         m_message(message, 0, spConfig->MaxMessageSize())
     {
     }
@@ -69,7 +69,7 @@ struct Log
     unsigned int m_line = -1;
     std::string m_message;
 
-    FLY_API friend std::ostream &operator << (std::ostream &stream, const Log &log);
+    friend std::ostream &operator << (std::ostream &stream, const Log &log);
 };
 
 }

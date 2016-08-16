@@ -91,24 +91,24 @@ public:
      * @param ConfigManagerPtr Reference to the configuration manager.
      * @param string Path to store the log file.
      */
-    FLY_API Logger(ConfigManagerPtr &, const std::string &);
+    Logger(ConfigManagerPtr &, const std::string &);
 
     /**
      * Destructor.
      */
-    FLY_API virtual ~Logger();
+    virtual ~Logger();
 
     /**
      * Set the logger instance so that the LOG* macros function.
      *
      * @param LoggerPtr The logger instance.
      */
-    FLY_API static void SetInstance(const LoggerPtr &);
+    static void SetInstance(const LoggerPtr &);
 
     /**
      * @return The logger instance.
      */
-    FLY_API static LoggerPtr GetInstance();
+    static LoggerPtr GetInstance();
 
     /**
      * Log to the console in a thread-safe manner.
@@ -116,7 +116,7 @@ public:
      * @param bool Whether to acquire lock before logging.
      * @param string The message to log.
      */
-    FLY_API static void ConsoleLog(bool, const std::string &);
+    static void ConsoleLog(bool, const std::string &);
 
     /**
      * Add a log to the static logger instance.
@@ -128,7 +128,7 @@ public:
      * @param unsigned int The line number this log point occurs.
      * @param string The message to log.
      */
-    FLY_API static void AddLog(LogLevel, ssize_t, const char *, const char *, unsigned int, const std::string &);
+    static void AddLog(LogLevel, ssize_t, const char *, const char *, unsigned int, const std::string &);
 
 protected:
     /**

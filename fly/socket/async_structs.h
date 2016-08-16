@@ -23,12 +23,12 @@ public:
     /**
      * @return True if the socket ID is valid (i.e. has been explicitly set).
      */
-    FLY_API bool IsValid() const;
+    bool IsValid() const;
 
     /**
      * @return The ID of the socket who owns this structure.
      */
-    FLY_API int GetSocketId() const;
+    int GetSocketId() const;
 
 protected:
     /**
@@ -59,38 +59,38 @@ public:
      * Default constructor to set the socket ID to an invalid value and the
      * request message to an empty string.
      */
-    FLY_API AsyncRequest();
+    AsyncRequest();
 
     /**
      * Constructor to set the ID of the owning socket, while setting the
      * request message to an empty string.
      */
-    FLY_API AsyncRequest(int);
+    AsyncRequest(int);
 
     /**
      * Constructor to set the ID of the owning socket and the request message.
      */
-    FLY_API AsyncRequest(int, const std::string &);
+    AsyncRequest(int, const std::string &);
 
     /**
      * Constructor to set the ID of the owning socket and the request message.
      */
-    FLY_API AsyncRequest(int, const std::string &, const std::string &, int);
+    AsyncRequest(int, const std::string &, const std::string &, int);
 
     /**
      * @return The request message - the message to be sent or received.
      */
-    FLY_API std::string GetRequest() const;
+    std::string GetRequest() const;
 
     /**
      * @return The request hostname (for UDP sockets).
      */
-    FLY_API std::string GetHostname() const;
+    std::string GetHostname() const;
 
     /**
      * @return The request port (for UDP sockets).
      */
-    FLY_API int GetPort() const;
+    int GetPort() const;
 
 private:
     std::string m_request;
@@ -113,23 +113,23 @@ public:
      * Default constructor to set the socket ID to an invalid value and the
      * hostname/port to invalid values.
      */
-    FLY_API AsyncConnect();
+    AsyncConnect();
 
     /**
      * Constructor to set the ID of the owning socket and the hostname/port to
      * connect to.
      */
-    FLY_API AsyncConnect(int, std::string, int);
+    AsyncConnect(int, std::string, int);
 
     /**
      * @return The hostname to connect to.
      */
-    FLY_API std::string GetHostname() const;
+    std::string GetHostname() const;
 
     /**
      * @return The port to connect to.
      */
-    FLY_API int GetPort() const;
+    int GetPort() const;
 
 private:
     std::string m_hostname;
