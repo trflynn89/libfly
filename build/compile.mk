@@ -101,10 +101,8 @@ ifeq ($(release),1)
 	$(SHARED_CXX)
 	$(STRIP)
 
-ifneq ($(REL_CONF),)
-	@echo "[Release $$(notdir $(REL_CONF))]"
+	@echo "[Release $$(notdir $$@)]"
 	$(Q)$$(BUILD_REL)
-endif
 else
 	@echo "[Static $$(notdir $$@)]"
 	$(STATIC)

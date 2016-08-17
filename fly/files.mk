@@ -8,15 +8,12 @@ SRC_DIRS_$(d) := \
     fly/system \
     fly/task
 
-# Set the release configuration spec to use
-$(eval $(call SET_REL_CONF, $(d)/fly.spec))
-
-# Add libfly.so to RPM
+# Add libfly.so to release package
 $(eval $(call ADD_REL_LIB, $(TARGET_NAME)))
 
-# Add all header files to RPM
-$(eval $(call ADD_REL_INC, $(SOURCE_ROOT)/fly, *.h))
+# Add all header files to release package
+$(eval $(call ADD_REL_INC, $(d), *.h))
 
-# Add make system file to RPM
+# Add make system files to release package
 $(eval $(call ADD_REL_SRC, $(BUILD_ROOT), *.mk))
 $(eval $(call ADD_REL_CMD, mv $(REL_SRC_DIR)/$(notdir $(BUILD_ROOT)) $(REL_SRC_DIR)/fly))

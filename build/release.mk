@@ -1,49 +1,39 @@
 # Define steps for making a release target.
 
-REL_ROOT_DIR := $(ETC_DIR)/root
-
-REL_BIN_DIR := $(REL_ROOT_DIR)$(INSTALL_BIN_DIR)
-REL_LIB_DIR := $(REL_ROOT_DIR)$(INSTALL_LIB_DIR)
-REL_INC_DIR := $(REL_ROOT_DIR)$(INSTALL_INC_DIR)
-REL_SRC_DIR := $(REL_ROOT_DIR)$(INSTALL_SRC_DIR)
-
-REL_CONF :=
+REL_BIN_DIR := $(ETC_DIR)$(INSTALL_BIN_DIR)
+REL_LIB_DIR := $(ETC_DIR)$(INSTALL_LIB_DIR)
+REL_INC_DIR := $(ETC_DIR)$(INSTALL_INC_DIR)
+REL_SRC_DIR := $(ETC_DIR)$(INSTALL_SRC_DIR)
 
 COMMA := ,
 
-# Build the OS-specific release package
-ifeq ($(OS), redhat)
-    define BUILD_REL
-        $(REL_CMDS)
+# Build the release package
+define BUILD_REL
 
-        rpmbuild -bb --quiet \
-            --define "_topdir $(ETC_DIR)/rpm" \
-            --define "version $(VERSION)" \
-            --buildroot $(REL_ROOT_DIR) \
-            --target $(arch) \
-            $(REL_CONF)
-
-        mv -f $(ETC_DIR)/rpm/RPMS/$(arch)/* $(ETC_DIR)
-
-        $(RM) -r $(ETC_DIR)/rpm $(REL_ROOT_DIR)
-    endef
-else ifeq ($(OS), debian)
-    define BUILD_REL
-        echo "Debian release packaging not yet supported"
-        exit 1
-    endef
-endif
-
-# Variable to store the list of files to be added to the release package
-REL_CMDS := $(RM) -r $(ETC_DIR) && mkdir -p $(REL_BIN_DIR) $(REL_LIB_DIR) $(REL_INC_DIR)
-
-# Define the release config file to use.
-# $(1) = The path to the release config spec.
-define SET_REL_CONF
-
-REL_CONF := $(1)
+    $(REL_CMDS) && \
+    cd $(ETC_DIR) && \
+    \
+    for f in `find .$(INSTALL_LIB_DIR) -type f -name "*\.so\.*\.*\.*"` ; do \
+        src=$${f:1}; \
+        dst=$${src%.*}; \
+        ext=$${src##*.}; \
+        \
+        while [ "$$ext" != "so" ] ; do \
+            ln -sf $$src .$$dst; \
+            \
+            src=$$dst; \
+            dst=$${dst%.*}; \
+            ext=$${src##*.}; \
+        done; \
+    done; \
+    \
+    tar --remove-files -cjf $(target)-$(VERSION).$(arch).tar.bz2 *
 
 endef
+
+# Variable to store the list of files to be added to the release package
+REL_CMDS := $(RM) -r $(ETC_DIR) && \
+    mkdir -p $(REL_BIN_DIR) $(REL_LIB_DIR) $(REL_INC_DIR) $(REL_SRC_DIR)
 
 # Add a command to be run before building the release package.
 # $(1) = The command to run.

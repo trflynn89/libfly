@@ -4,6 +4,9 @@
 MAKEFLAGS += --no-builtin-rules --no-print-directory
 .SUFFIXES:
 
+# Use bash instead of sh
+SHELL := /bin/bash
+
 # Compiler flags for both C and C++ files
 CF_ALL := -MMD -MP
 CF_ALL += -Wall -Wextra
