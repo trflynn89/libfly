@@ -4,9 +4,10 @@
 # VERSION, a version number of the form "X.Y.C".
 
 .PHONY: all
-.PHONY: targets
 .PHONY: clean
 .PHONY: tests
+.PHONY: run
+.PHONY: install
 
 # Verify expected variables
 ifeq ($(SOURCE_ROOT),)
@@ -36,7 +37,7 @@ include $(BUILD_ROOT)/compile.mk
 include $(BUILD_ROOT)/release.mk
 
 # Define 'all' target before including source directory
-all: $(TARGET_NAME)
+all: $(TARGET_PACKAGE)
 
 # Include top-level source directory's files.mk file
 ifeq ($(TARGET_TYPE), BIN)
@@ -68,7 +69,17 @@ tests:
 	exit $$numFail
 
 # Build and run the target
-run: $(TARGET_NAME)
+run: $(TARGET_PACKAGE)
 ifeq ($(TARGET_TYPE), BIN)
-	@$(TARGET_NAME)
+	$(Q)$(TARGET_NAME)
 endif
+
+# Install the target
+ifeq ($(verbose),1)
+install: TAR_FLAGS := -xjvf
+else
+install: TAR_FLAGS := -xjf
+endif
+
+install: $(TARGET_PACKAGE)
+	$(Q)sudo tar -C / $(TAR_FLAGS) $(TARGET_PACKAGE)

@@ -17,24 +17,11 @@ ifneq ($(arch), $(filter $(SUPPORTED_ARCH), $(arch)))
     $(error Architecture $(arch) not supported, check system.mk)
 endif
 
-# Determine operating system
-SUPPORTED_OS := redhat debian
-
-ifneq ($(wildcard /etc/redhat-release),)
-    OS := redhat
-else ifneq ($(wildcard /etc/debian_version),)
-    OS := debian
-endif
-
-ifneq ($(OS), $(filter $(SUPPORTED_OS), $(OS)))
-    $(error OS $(OS) not supported, check system.mk)
-endif
-
 # Determine number of cores
 NUM_CORES := $(shell grep -c ^processor /proc/cpuinfo)
 
 # Determine installation directories
-INSTALL_BIN_DIR := /usr/local/bin
+INSTALL_BIN_DIR := /usr/bin
 INSTALL_INC_DIR := /usr/include
 INSTALL_SRC_DIR := /usr/src
 

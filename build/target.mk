@@ -27,3 +27,6 @@ else ifeq ($(TARGET_TYPE), LIB)
         TARGET_NAME := $(LIB_DIR)/$(target).a
     endif
 endif
+
+# Target release package
+TARGET_PACKAGE := $(ETC_DIR)/$(target)-$(VERSION).$(arch).tar.bz2

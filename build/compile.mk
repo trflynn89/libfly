@@ -83,8 +83,6 @@ ifeq ($(release),1)
 	$(STRIP)
 endif
 
-	@echo "[Finished $$(notdir $$@)]"
-
 endef
 
 # Link a library file from a set of object files.
@@ -100,15 +98,21 @@ ifeq ($(release),1)
 	@echo "[Shared $$(notdir $$@)]"
 	$(SHARED_CXX)
 	$(STRIP)
-
-	@echo "[Release $$(notdir $$@)]"
-	$(Q)$$(BUILD_REL)
 else
 	@echo "[Static $$(notdir $$@)]"
 	$(STATIC)
 endif
 
-	@echo "[Finished $$(notdir $$@)]"
+endef
+
+# Build a release package.
+define PKG_RULES
+
+$(TARGET_PACKAGE): $(TARGET_NAME)
+ifneq ($(REL_CMDS),)
+	@echo "[Package $$(notdir $$@)]"
+	$(Q)$$(BUILD_REL)
+endif
 
 endef
 
@@ -131,6 +135,7 @@ $$(eval $$(call INCLUDE_SRC_DIRS, $$(SRC_DIRS_$$(d))))
 # Define the compile rules
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 $$(eval $$(call BIN_RULES, $$(LDLIBS_$$(d))))
+$$(eval $$(call PKG_RULES))
 
 # Include dependency files
 -include $$(DEP_$$(d))
@@ -158,6 +163,7 @@ $$(eval $$(call INCLUDE_SRC_DIRS, $$(SRC_DIRS_$$(d))))
 # Define the compile rules
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 $$(eval $$(call LIB_RULES))
+$$(eval $$(call PKG_RULES))
 
 # Include dependency files
 -include $$(DEP_$$(d))

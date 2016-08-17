@@ -10,6 +10,9 @@ COMMA := ,
 # Build the release package
 define BUILD_REL
 
+    $(RM) -r $(ETC_DIR) && \
+    mkdir -p $(REL_BIN_DIR) $(REL_LIB_DIR) $(REL_INC_DIR) $(REL_SRC_DIR) \
+    \
     $(REL_CMDS) && \
     cd $(ETC_DIR) && \
     \
@@ -27,13 +30,19 @@ define BUILD_REL
         done; \
     done; \
     \
-    tar --remove-files -cjf $(target)-$(VERSION).$(arch).tar.bz2 *
+    echo "#!/usr/bin/env bash" > $(REL_BIN_DIR)/uninstall_$(target); \
+    chmod 755 $(REL_BIN_DIR)/uninstall_$(target); \
+    \
+    for f in `find . ! -type d` ; do \
+        echo $(RM) $${f:1} >> $(REL_BIN_DIR)/uninstall_$(target); \
+    done; \
+    \
+    tar --remove-files -cjf $(TARGET_PACKAGE) *
 
 endef
 
 # Variable to store the list of files to be added to the release package
-REL_CMDS := $(RM) -r $(ETC_DIR) && \
-    mkdir -p $(REL_BIN_DIR) $(REL_LIB_DIR) $(REL_INC_DIR) $(REL_SRC_DIR)
+REL_CMDS :=
 
 # Add a command to be run before building the release package.
 # $(1) = The command to run.
