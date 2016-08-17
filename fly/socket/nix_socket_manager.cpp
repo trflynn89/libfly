@@ -35,7 +35,9 @@ SocketManagerImpl::~SocketManagerImpl()
 bool SocketManagerImpl::DoWork()
 {
     fd_set readFd, writeFd;
-    struct timeval tv { 0, m_spConfig->IoWaitTime().count() };
+
+    suseconds_t usec = static_cast<suseconds_t>(m_spConfig->IoWaitTime().count());
+    struct timeval tv { 0, usec };
 
     ssize_t maxFd = -1;
     {
