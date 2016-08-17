@@ -108,7 +108,10 @@ endef
 # Build a release package.
 define PKG_RULES
 
-$(TARGET_PACKAGE): $(TARGET_NAME)
+# Force repackaging if any release rules change
+MAKEFILES_$(d) := $(BUILD_ROOT)/release.mk
+
+$(TARGET_PACKAGE): $(TARGET_NAME) $$(MAKEFILES_$(d))
 ifneq ($(REL_CMDS),)
 	@echo "[Package $$(notdir $$@)]"
 	$(Q)$$(BUILD_REL)
