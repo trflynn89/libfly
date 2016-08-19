@@ -2,7 +2,7 @@
 SOURCE_ROOT := $(CURDIR)
 
 # Define the library version
-VERSION = 1.0.0
+VERSION = $(shell cat $(SOURCE_ROOT)/VERSION.md)
 
 # Import the build API
 include $(SOURCE_ROOT)/build/api.mk
