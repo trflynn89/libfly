@@ -7,7 +7,7 @@ NPROC=`nproc`
 # $2 = Build configuration.
 do_build()
 {
-    conf="-j $NPROC -C $DIR/.. $2"
+    conf="-j $NPROC -C $DIR $2"
 
     make $conf clean && make $conf all && ( $1 || make $conf tests )
 
