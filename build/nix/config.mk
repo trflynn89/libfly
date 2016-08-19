@@ -15,9 +15,9 @@ verbose := 0
 
 # Define the output directories
 ifeq ($(release), 1)
-    OUT_DIR := $(BUILD_ROOT)/release-$(arch)
+    OUT_DIR := $(CURDIR)/release-$(arch)
 else
-    OUT_DIR := $(BUILD_ROOT)/debug-$(arch)
+    OUT_DIR := $(CURDIR)/debug-$(arch)
 endif
 
 BIN_DIR := $(OUT_DIR)/bin
