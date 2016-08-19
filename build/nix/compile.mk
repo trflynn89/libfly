@@ -108,8 +108,8 @@ endef
 # Build a release package.
 define PKG_RULES
 
-# Force repackaging if any release rules change
-MAKEFILES_$(d) := $(BUILD_ROOT)/release.mk
+# Force repackaging if any build files change
+MAKEFILES_$(d) := $(BUILD_ROOT)/*.mk
 
 $(TARGET_PACKAGE): $(TARGET_NAME) $$(MAKEFILES_$(d))
 ifneq ($(REL_CMDS),)
