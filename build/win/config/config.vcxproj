@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{793d56c6-453e-43a9-ae87-a06ac90009ff}</ProjectGuid>
+    <ProjectGuid>{c725dca0-5ec0-49ad-b0b8-52caaa2ae387}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>file</RootNamespace>
+    <RootNamespace>config</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -73,25 +73,25 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)test\googletest\include;$(SolutionDir)test\googletest;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\googletest\include;$(SolutionDir)..\..\test\googletest;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)test\googletest\include;$(SolutionDir)test\googletest;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\googletest\include;$(SolutionDir)..\..\test\googletest;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)test\googletest\include;$(SolutionDir)test\googletest;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\googletest\include;$(SolutionDir)..\..\test\googletest;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)test\googletest\include;$(SolutionDir)test\googletest;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\googletest\include;$(SolutionDir)..\..\test\googletest;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -170,7 +170,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libfly.vcxproj">
+    <ProjectReference Include="..\libfly\libfly.vcxproj">
       <Project>{448893a1-77da-46f1-b951-7eda72d49fe9}</Project>
     </ProjectReference>
     <ProjectReference Include="..\googletest\googletest.vcxproj">
@@ -178,8 +178,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="file_monitor_test.cpp" />
-    <ClCompile Include="ini_parser_test.cpp" />
+    <ClCompile Include="..\..\..\test\config\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
