@@ -24,9 +24,4 @@ NUM_CORES := $(shell grep -c ^processor /proc/cpuinfo)
 INSTALL_BIN_DIR := /usr/bin
 INSTALL_INC_DIR := /usr/include
 INSTALL_SRC_DIR := /usr/src
-
-ifeq ($(arch), x86_64)
-    INSTALL_LIB_DIR := /usr/lib64
-else ifeq ($(arch), i386)
-    INSTALL_LIB_DIR := /usr/lib
-endif
+INSTALL_LIB_DIR := /usr/lib
