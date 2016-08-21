@@ -40,3 +40,12 @@ CXXFLAGS := -std=c++14 $(CF_ALL)
 # Linker flags
 LDFLAGS := -L$(LIB_DIR)
 LDLIBS :=
+
+# Tar flags
+ifeq ($(verbose), 1)
+    TAR_EXTRACT_FLAGS := -xjvf
+    TAR_CREATE_FLAGS := -cjvf
+else
+    TAR_EXTRACT_FLAGS := -xjf
+    TAR_CREATE_FLAGS := -cjf
+endif

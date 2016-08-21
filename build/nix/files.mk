@@ -1,15 +1,15 @@
 # Define functions which will declare object, dependency, and executable files.
 
-# A list of all generated files to be removed during clean
-CLEAN :=
-
 # A list of all object files that have been compiled
 OBJS :=
 
 # Set a source directory's source files to all C/C++ files.
 define WILDCARD_SOURCES
 
-SRC_$(d) := $(wildcard $(d)/*.c) $(wildcard $(d)/*.cc) $(wildcard $(d)/*.cpp)
+SRC_$(d) := \
+    $(wildcard $(d)/*.c) \
+    $(wildcard $(d)/*.cc) \
+    $(wildcard $(d)/*.cpp)
 
 endef
 
@@ -26,7 +26,6 @@ OBJS += $$(OBJ_$(d))
 DEP_$(d) := $$(OBJ_$(d):%.o=%.d)
 
 CLEAN_$(d) := $$(OBJ_$(d)) $$(DEP_$(d))
-CLEAN += $$(CLEAN_$(d))
 
 endef
 
@@ -35,7 +34,6 @@ endef
 define BIN_OUT_FILES
 
 $(call OBJ_OUT_FILES, $(1))
-CLEAN += $(TARGET_NAME)
 
 endef
 
@@ -44,6 +42,5 @@ endef
 define LIB_OUT_FILES
 
 $(call OBJ_OUT_FILES, $(1))
-CLEAN += $(TARGET_NAME)
 
 endef

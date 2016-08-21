@@ -21,7 +21,6 @@ STRIP := $(Q)strip $$@
 # $(1) = Path to directory where object files should be placed.
 define OBJ_RULES
 
-# Force recompile if any compile flags change
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
 $$(strip $(1))/%.o: CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
@@ -67,7 +66,6 @@ endef
 # $(1) = All external libraries to link into the binary file.
 define BIN_RULES
 
-# Force recompile if any compile flags change
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
 $(TARGET_NAME): LDLIBS := $(1)
@@ -88,7 +86,6 @@ endef
 # Link a library file from a set of object files.
 define LIB_RULES
 
-# Force recompile if any compile flags change
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
 $(TARGET_NAME): $$(OBJS) $$(MAKEFILES_$(d))

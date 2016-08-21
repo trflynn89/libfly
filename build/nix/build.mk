@@ -49,7 +49,7 @@ endif
 # Clean up output files
 clean:
 	@echo "[Clean $(OUT_DIR)]"
-	$(Q)$(RM) $(CLEAN)
+	$(Q)$(RM) -r $(OUT_DIR)
 
 # Run all unit tests
 tests:
@@ -75,11 +75,5 @@ ifeq ($(TARGET_TYPE), BIN)
 endif
 
 # Install the target
-ifeq ($(verbose),1)
-install: TAR_FLAGS := -xjvf
-else
-install: TAR_FLAGS := -xjf
-endif
-
 install: $(TARGET_PACKAGE)
-	$(Q)sudo tar -C / $(TAR_FLAGS) $(TARGET_PACKAGE)
+	$(Q)sudo tar -C / $(TAR_EXTRACT_FLAGS) $(TARGET_PACKAGE)

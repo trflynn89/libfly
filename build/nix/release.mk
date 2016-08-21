@@ -37,7 +37,7 @@ define BUILD_REL
         echo $(RM) $${f:1} >> $(REL_BIN_DIR)/uninstall_$(target); \
     done; \
     \
-    tar --remove-files -cjf $(TARGET_PACKAGE) *
+    tar --remove-files $(TAR_CREATE_FLAGS) $(TARGET_PACKAGE) *
 
 endef
 
