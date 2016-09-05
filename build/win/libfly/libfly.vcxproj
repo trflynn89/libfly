@@ -78,7 +78,7 @@
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <TargetName>$(ProjectName).$(PlatformTarget)</TargetName>
+    <TargetName>$(ProjectName)d.$(PlatformTarget)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
@@ -90,7 +90,7 @@
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <TargetName>$(ProjectName).$(PlatformTarget)</TargetName>
+    <TargetName>$(ProjectName)d.$(PlatformTarget)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -98,26 +98,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
-    <PostBuildEvent>
-      <Command>set /p fly_version= &lt; $(SolutionDir)..\..\VERSION.md
-set fly_src_dir=$(SolutionDir)..\..\fly
-set fly_rel_dir=$(IntDir)$(ProjectName)
-set fly_rel_zip=$(IntDir)$(ProjectName)-%fly_version%.$(PlatformTarget).zip
-set fly_exclude=$(IntDir)exclude.txt
-
-del /Q %fly_rel_zip%
-rmdir /S /Q %fly_rel_dir%
-mkdir %fly_rel_dir%\fly
-
-echo .mk &gt; %fly_exclude%
-echo .cpp &gt;&gt; %fly_exclude%
-
-copy /V /Y $(TargetPath) %fly_rel_dir%
-xcopy /S /V /Y /Q /EXCLUDE:%fly_exclude% %fly_src_dir% %fly_rel_dir%\fly
-
-powershell -nologo -noprofile -command "&amp; { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('%fly_rel_dir%', '%fly_rel_zip%'); }"
-rmdir /S /Q %fly_rel_dir%</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -125,26 +106,7 @@ rmdir /S /Q %fly_rel_dir%</Command>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
-    <PostBuildEvent>
-      <Command>set /p fly_version= &lt; $(SolutionDir)..\..\VERSION.md
-set fly_src_dir=$(SolutionDir)..\..\fly
-set fly_rel_dir=$(IntDir)$(ProjectName)
-set fly_rel_zip=$(IntDir)$(ProjectName)-%fly_version%.$(PlatformTarget).zip
-set fly_exclude=$(IntDir)exclude.txt
-
-del /Q %fly_rel_zip%
-rmdir /S /Q %fly_rel_dir%
-mkdir %fly_rel_dir%\fly
-
-echo .mk &gt; %fly_exclude%
-echo .cpp &gt;&gt; %fly_exclude%
-
-copy /V /Y $(TargetPath) %fly_rel_dir%
-xcopy /S /V /Y /Q /EXCLUDE:%fly_exclude% %fly_src_dir% %fly_rel_dir%\fly
-
-powershell -nologo -noprofile -command "&amp; { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('%fly_rel_dir%', '%fly_rel_zip%'); }"
-rmdir /S /Q %fly_rel_dir%</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -159,26 +121,7 @@ rmdir /S /Q %fly_rel_dir%</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>set /p fly_version= &lt; $(SolutionDir)..\..\VERSION.md
-set fly_src_dir=$(SolutionDir)..\..\fly
-set fly_rel_dir=$(IntDir)$(ProjectName)
-set fly_rel_zip=$(IntDir)$(ProjectName)-%fly_version%.$(PlatformTarget).zip
-set fly_exclude=$(IntDir)exclude.txt
-
-del /Q %fly_rel_zip%
-rmdir /S /Q %fly_rel_dir%
-mkdir %fly_rel_dir%\fly
-
-echo .mk &gt; %fly_exclude%
-echo .cpp &gt;&gt; %fly_exclude%
-
-copy /V /Y $(TargetPath) %fly_rel_dir%
-xcopy /S /V /Y /Q /EXCLUDE:%fly_exclude% %fly_src_dir% %fly_rel_dir%\fly
-
-powershell -nologo -noprofile -command "&amp; { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('%fly_rel_dir%', '%fly_rel_zip%'); }"
-rmdir /S /Q %fly_rel_dir%</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -193,26 +136,7 @@ rmdir /S /Q %fly_rel_dir%</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>set /p fly_version= &lt; $(SolutionDir)..\..\VERSION.md
-set fly_src_dir=$(SolutionDir)..\..\fly
-set fly_rel_dir=$(IntDir)$(ProjectName)
-set fly_rel_zip=$(IntDir)$(ProjectName)-%fly_version%.$(PlatformTarget).zip
-set fly_exclude=$(IntDir)exclude.txt
-
-del /Q %fly_rel_zip%
-rmdir /S /Q %fly_rel_dir%
-mkdir %fly_rel_dir%\fly
-
-echo .mk &gt; %fly_exclude%
-echo .cpp &gt;&gt; %fly_exclude%
-
-copy /V /Y $(TargetPath) %fly_rel_dir%
-xcopy /S /V /Y /Q /EXCLUDE:%fly_exclude% %fly_src_dir% %fly_rel_dir%\fly
-
-powershell -nologo -noprofile -command "&amp; { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('%fly_rel_dir%', '%fly_rel_zip%'); }"
-rmdir /S /Q %fly_rel_dir%</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\concurrency\concurrent_container.h" />

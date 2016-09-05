@@ -5,6 +5,8 @@
 *.log
 release-*
 debug-*
+libfly-*x86.zip
+libfly-*x64.zip
 
 #### C++
 
