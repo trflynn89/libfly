@@ -5,6 +5,7 @@
 
 #include <fly/fly.h>
 #include <fly/exit_codes.h>
+#include <fly/string/string.h>
 
 namespace fly {
 
@@ -30,6 +31,18 @@ public:
      * @return The system's path separator.
      */
     static char GetSeparator();
+
+    /**
+     * Concatenate a list of objects with the system's path separator.
+     *
+     * @tparam Args Variadic template arguments.
+     *
+     * @param Args The variadic list of arguments to be joined.
+     *
+     * @return The resulting join of the given arguments.
+     */
+    template <typename ... Args>
+    static std::string Join(const Args &...);
 
     /**
      * @return The system's temporary directory path.
@@ -79,5 +92,13 @@ public:
      */
     static ExitCode GetExitCode();
 };
+
+//==============================================================================
+template <typename ... Args>
+std::string System::Join(const Args &...args)
+{
+    static const char separator = GetSeparator();
+    return String::Join(separator, args...);
+}
 
 }

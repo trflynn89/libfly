@@ -17,7 +17,7 @@ IniParser::IniParser(const std::string &path, const std::string &file) :
 //==============================================================================
 void IniParser::Parse()
 {
-    std::string fullPath = String::Join(System::GetSeparator(), m_path, m_file);
+    std::string fullPath = System::Join(m_path, m_file);
     std::ifstream stream(fullPath.c_str(), std::ios::in);
 
     std::string line, section;

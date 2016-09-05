@@ -147,7 +147,7 @@ bool Logger::createLogFile()
     String::ReplaceAll(timeStr, " ", "_");
 
     std::string fileName = String::Format("Log_%s_%s.log", timeStr, randStr);
-    fileName = String::Join(System::GetSeparator(), m_filePath, fileName);
+    fileName = System::Join(m_filePath, fileName);
 
     if (m_logFile.is_open())
     {
