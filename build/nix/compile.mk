@@ -5,13 +5,17 @@
 
 # Build tools
 COMP_CC := $(Q)$(CC) $$(CFLAGS) -o $$@ -c $$<
-LINK_CC := $(Q)$(CC) $(CFLAGS) -o $$@ $$(OBJS) $(LDFLAGS) $$(LDLIBS)
+LINK_CC := $(Q)$(CC) $$(CFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 
 COMP_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ -c $$<
-LINK_CXX := $(Q)$(CXX) $(CXXFLAGS) -o $$@ $$(OBJS) $(LDFLAGS) $$(LDLIBS)
+LINK_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 
-SHARED_CC := $(Q)$(CC) $(CFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $(LDFLAGS) $$(LDLIBS)
-SHARED_CXX := $(Q)$(CXX) $(CXXFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $(LDFLAGS) $$(LDLIBS)
+SHARED_CC := $(Q)$(CC) $$(CFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
+SHARED_CXX := $(Q)$(CXX) $$(CXXFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
+
+UIC := $(Q)$(QT5_UIC) $$< -o $$@
+MOC := $(Q)$(QT5_MOC) $$< -o $$@
+RCC := $(Q)$(QT5_RCC) $$< -o $$@
 
 STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
 
@@ -46,6 +50,43 @@ $$(strip $(1))/%.o: $(d)/%.cpp $$(MAKEFILES_$(d))
 
 endef
 
+# Compile source files to QT5 files.
+# $(1) = Path to directory where object files should be placed.
+# $(2) = Path to directory where generated files should be placed.
+define QT5_RULES
+
+.PRECIOUS: $(GEN_DIR)/%.uic.h $(GEN_DIR)/%.moc.cpp $(GEN_DIR)/%.rcc.cpp
+
+# UIC files
+$(GEN_DIR)/%.uic.h: $(d)/%.ui $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
+	@echo "[UIC $$(notdir $$<)]"
+	$(UIC)
+
+# MOC files
+$$(strip $(1))/%.moc.o: $(GEN_DIR)/%.moc.cpp
+	@mkdir -p $$(@D)
+	@echo "[Compile $$(notdir $$<)]"
+	$(COMP_CXX)
+
+$(GEN_DIR)/%.moc.cpp: $(d)/%.h $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
+	@echo "[MOC $$(notdir $$<)]"
+	$(MOC)
+
+# RCC files
+$$(strip $(1))/%.rcc.o: $(GEN_DIR)/%.rcc.cpp
+	@mkdir -p $$(@D)
+	@echo "[Compile $$(notdir $$<)]"
+	$(COMP_CXX)
+
+$(GEN_DIR)/%.rcc.cpp: $(d)/%.qrc $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
+	@echo "[RCC $$(notdir $$<)]"
+	$(RCC)
+
+endef
+
 # Compile a set of C/C++ files for a source directory. These rules aren't used
 # by the make system, but are defined for convenience. These targets may be
 # invoked by calling "make The/Directory/To/Build".
@@ -62,15 +103,18 @@ $(td)_clean:
 
 endef
 
-# Link a binary file from a set of object files.
-# $(1) = All external libraries to link into the binary file.
+# Link a binary target from a set of object files.
+# $(1) = Extra dependencies to add to binary target recipe.
 define BIN_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
-$(TARGET_NAME): LDLIBS := $(1)
+$(TARGET_NAME): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
+$(TARGET_NAME): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
+$(TARGET_NAME): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
+$(TARGET_NAME): LDLIBS := $(LDLIBS_$(d)) $(LDLIBS)
 
-$(TARGET_NAME): $$(OBJS) $$(MAKEFILES_$(d))
+$(TARGET_NAME): $(1) $$(OBJS) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 	@echo "[Link $$(notdir $$@)]"
@@ -83,10 +127,14 @@ endif
 
 endef
 
-# Link a library file from a set of object files.
+# Link a library target from a set of object files.
 define LIB_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
+
+$(TARGET_NAME): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
+$(TARGET_NAME): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
+$(TARGET_NAME): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 
 $(TARGET_NAME): $$(OBJS) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
@@ -134,7 +182,38 @@ $$(eval $$(call INCLUDE_SRC_DIRS, $$(SRC_DIRS_$$(d))))
 
 # Define the compile rules
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
-$$(eval $$(call BIN_RULES, $$(LDLIBS_$$(d))))
+$$(eval $$(call BIN_RULES))
+$$(eval $$(call PKG_RULES))
+
+# Include dependency files
+-include $$(DEP_$$(d))
+
+# Pop current dir from stack
+$$(eval $$(call POP_DIR))
+
+endef
+
+# Define the rules to build a QT5 target. The files.mk should define:
+# 1. SRC_DIRS_$(d) = The source directories to include in the build.
+# 2. LDLIBS_$(d) = The libraries to be linked in the target binary.
+# 3. SRC_$(d) = The sources to be built in the target binary.
+# 4. QT5_$(d) = The QT5 UIC/MOC/RCC source file.
+define DEFINE_QT5_RULES
+
+# Push current dir to stack
+$$(eval $$(call PUSH_DIR))
+
+# Define source, object, dependency, and binary files
+include $$(d)/files.mk
+$$(eval $$(call QT5_OUT_FILES, $$(SRC_$$(d)), $$(QT5_$$(d))))
+
+# Include the source directories
+$$(eval $$(call INCLUDE_SRC_DIRS, $$(SRC_DIRS_$$(d))))
+
+# Define the compile rules
+$$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
+$$(eval $$(call QT5_RULES, $$(OBJ_DIR_$$(d))))
+$$(eval $$(call BIN_RULES, $$(QT5_UIC_$$(d)) $$(QT5_MOC_$$(d)) $$(QT5_RCC_$$(d))))
 $$(eval $$(call PKG_RULES))
 
 # Include dependency files

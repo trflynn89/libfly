@@ -1,6 +1,6 @@
 # Verify targets added via api.mk, and verify current target.
 
-SUPPORTED_TARGET_TYPES := BIN LIB
+SUPPORTED_TARGET_TYPES := BIN QT5 LIB
 
 # Make sure target is defined
 ifeq ($(target),)
@@ -19,6 +19,8 @@ endif
 
 # Target binary / library
 ifeq ($(TARGET_TYPE), BIN)
+    TARGET_NAME := $(BIN_DIR)/$(target)
+else ifeq ($(TARGET_TYPE), QT5)
     TARGET_NAME := $(BIN_DIR)/$(target)
 else ifeq ($(TARGET_TYPE), LIB)
     ifeq ($(release), 1)

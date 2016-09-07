@@ -28,6 +28,7 @@ SocketManager::SocketManager(ConfigManagerPtr &spConfigManager) :
 //==============================================================================
 SocketManager::~SocketManager()
 {
+    Stop();
 }
 
 //==============================================================================

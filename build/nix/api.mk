@@ -12,7 +12,7 @@ endef
 # Function to define a target.
 # $(1) = The target's name.
 # $(2) = The target's source directory.
-# $(3) = The target's type, BIN or LIB.
+# $(3) = The target's type (BIN, QT5, or LIB).
 define ADD_TARGET
 
 ifeq ($(target),$$(strip $(1)))

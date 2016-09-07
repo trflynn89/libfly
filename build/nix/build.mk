@@ -42,6 +42,8 @@ all: $(TARGET_PACKAGE)
 # Include top-level source directory's files.mk file
 ifeq ($(TARGET_TYPE), BIN)
     $(eval $(call INCLUDE_BIN_DIR, $(SOURCE_ROOT), $(TARGET_PATH)))
+else ifeq ($(TARGET_TYPE), QT5)
+    $(eval $(call INCLUDE_QT5_DIR, $(SOURCE_ROOT), $(TARGET_PATH)))
 else ifeq ($(TARGET_TYPE), LIB)
     $(eval $(call INCLUDE_LIB_DIR, $(SOURCE_ROOT), $(TARGET_PATH)))
 endif

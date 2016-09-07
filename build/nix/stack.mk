@@ -26,6 +26,16 @@ $(call DEFINE_BIN_RULES)
 
 endef
 
+# Include the build rules for the given QT5 target directory.
+# $(1) = The path to the directory to include.
+# $(2) = The directory to include.
+define INCLUDE_QT5_DIR
+
+curr_dir := $$(strip $(1))/$$(strip $(2))
+$(call DEFINE_QT5_RULES)
+
+endef
+
 # Include the build rules for the given library target directory.
 # $(1) = The path to the directory to include.
 # $(2) = The directory to include.
