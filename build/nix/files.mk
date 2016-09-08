@@ -3,6 +3,11 @@
 # A list of all object files that have been compiled
 OBJS :=
 
+# A list of all UIC/MOC/QT5 files
+QT5_UICS :=
+QT5_MOCS :=
+QT5_RCCS :=
+
 # Set a source directory's source files to all C/C++ files.
 define WILDCARD_SOURCES
 
@@ -39,14 +44,21 @@ endef
 
 # Define output files for QT5 targets.
 # $(1) = The C/C++ files to be compiled.
-# $(2) = The QT5 UIC/MOC/RCC source file.
+# $(2) = The QT5 UIC source files.
+# $(3) = The QT5 MOC source files.
+# $(4) = The QT5 RCC source files.
 define QT5_OUT_FILES
 
 $(call OBJ_OUT_FILES, $(1))
 
-QT5_UIC_$(d) := $(GEN_DIR)/$$(strip $(2)).uic.h
-QT5_MOC_$(d) := $$(OBJ_DIR_$(d))/$$(strip $(2)).moc.o
-QT5_RCC_$(d) := $$(OBJ_DIR_$(d))/$$(strip $(2)).rcc.o
+QT5_UIC_$(d) := $$(addprefix $(GEN_DIR)/, $$(addsuffix .uic.h, $$(strip $(2))))
+QT5_UICS += $$(QT5_UIC_$(d))
+
+QT5_MOC_$(d) := $$(addprefix $$(OBJ_DIR_$(d))/, $$(addsuffix .moc.o, $$(strip $(3))))
+QT5_MOCS += $$(QT5_MOC_$(d))
+
+QT5_RCC_$(d) := $$(addprefix $$(OBJ_DIR_$(d))/, $$(addsuffix .rcc.o, $$(strip $(4))))
+QT5_RCCS += $$(QT5_RCC_$(d))
 
 CLEAN_$(d) += $$(QT5_UIC_$(d)) $$(QT5_MOC_$(d)) $$(QT5_RCC_$(d))
 OBJ_$(d) += $$(QT5_MOC_$(d)) $$(QT5_RCC_$(d))
