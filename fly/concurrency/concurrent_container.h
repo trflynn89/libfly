@@ -164,7 +164,7 @@ bool ConcurrentContainer<T, Container>::IsEmpty() const
 
 //==============================================================================
 template <typename T, typename Container>
-typename Container::size_type ConcurrentContainer<T, Container>::Size() const
+auto ConcurrentContainer<T, Container>::Size() const -> size_type
 {
     std::unique_lock<std::mutex> lock(m_containerMutex);
     return m_container.size();
