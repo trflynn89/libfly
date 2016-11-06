@@ -131,7 +131,10 @@ public:
 
         int item = 0;
         std::chrono::seconds waitTime(120);
-        m_eventQueue.Pop(item, waitTime);
+        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+
+        fly::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
+        m_spClientSocketManager->SetClientCallbacks(callback, nullptr);
 
         if (doAsync)
         {
@@ -140,9 +143,8 @@ public:
 
             if (state == fly::Socket::CONNECTING)
             {
-                fly::AsyncConnect connect;
-                std::chrono::seconds waitTime(1);
-                ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedConnect(connect, waitTime));
+                ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+                ASSERT_TRUE(spSendSocket->IsConnected());
             }
 
             fly::AsyncRequest request;
@@ -157,6 +159,8 @@ public:
             ASSERT_TRUE(spSendSocket->Connect(m_host, m_port));
             ASSERT_EQ(spSendSocket->Send(m_message), m_message.length());
         }
+
+        m_spClientSocketManager->ClearClientCallbacks();
     }
 };
 

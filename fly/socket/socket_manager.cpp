@@ -10,18 +10,18 @@ namespace fly {
 //==============================================================================
 SocketManager::SocketManager() :
     Runner("SocketManager", 1),
+    m_spConfig(std::make_shared<SocketConfig>()),
     m_newClientCallback(nullptr),
-    m_closedClientCallback(nullptr),
-    m_spConfig(std::make_shared<SocketConfig>())
+    m_closedClientCallback(nullptr)
 {
 }
 
 //==============================================================================
 SocketManager::SocketManager(ConfigManagerPtr &spConfigManager) :
     Runner("SocketManager", 1),
+    m_spConfig(spConfigManager->CreateConfig<SocketConfig>()),
     m_newClientCallback(nullptr),
-    m_closedClientCallback(nullptr),
-    m_spConfig(spConfigManager->CreateConfig<SocketConfig>())
+    m_closedClientCallback(nullptr)
 {
 }
 
@@ -32,8 +32,10 @@ SocketManager::~SocketManager()
 }
 
 //==============================================================================
-void SocketManager::SetClientCallbacks(NewClientCallback newClient,
-    ClosedClientCallback closedClient)
+void SocketManager::SetClientCallbacks(
+    SocketCallback newClient,
+    SocketCallback closedClient
+)
 {
     std::lock_guard<std::mutex> lock(m_callbackMutex);
 
@@ -134,6 +136,34 @@ void SocketManager::StopRunner()
 
     std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
     m_aioSockets.clear();
+}
+
+//==============================================================================
+void SocketManager::TriggerCallbacks(
+    const SocketList &connectedClients,
+    const SocketList &closedClients
+)
+{
+    if (!connectedClients.empty() || !closedClients.empty())
+    {
+        std::lock_guard<std::mutex> lock(m_callbackMutex);
+
+        if (m_newClientCallback != nullptr)
+        {
+            for (const SocketPtr &spSocket : connectedClients)
+            {
+                m_newClientCallback(spSocket);
+            }
+        }
+
+        if (m_closedClientCallback != nullptr)
+        {
+            for (const SocketPtr &spSocket : closedClients)
+            {
+                m_closedClientCallback(spSocket);
+            }
+        }
+    }
 }
 
 }

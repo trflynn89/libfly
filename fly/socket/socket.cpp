@@ -112,10 +112,6 @@ Socket::ConnectedState Socket::ConnectAsync(std::string hostname, int port)
         else if (IsConnecting())
         {
             LOGD(m_socketId, "Connect to %s:%d in progress", hostname, port);
-
-            AsyncConnect connect(m_socketId, hostname, port);
-            m_pendingConnects.Push(connect);
-
             state = CONNECTING;
         }
         else
@@ -128,6 +124,24 @@ Socket::ConnectedState Socket::ConnectAsync(std::string hostname, int port)
     }
 
     return state;
+}
+
+//==============================================================================
+bool Socket::FinishConnect()
+{
+    if (IsValid() & IsConnecting() && IsErrorFree())
+    {
+        LOGD(m_socketId, "Connection completed");
+        m_aConnectedState.store(Socket::CONNECTED);
+    }
+    else
+    {
+        LOGW(m_socketId, "Could not connect, closing socket");
+        m_aConnectedState.store(Socket::NOT_CONNECTED);
+        Close();
+    }
+
+    return (IsValid() && IsConnected());
 }
 
 //==============================================================================
@@ -160,40 +174,6 @@ bool Socket::SendToAsync(
     }
 
     return false;
-}
-
-//==============================================================================
-void Socket::ServiceConnectRequests(AsyncConnect::ConnectQueue &completedConnects)
-{
-    bool wouldBlock = false;
-
-    while (IsValid() && !m_pendingConnects.IsEmpty() && !wouldBlock)
-    {
-        AsyncConnect connect;
-        m_pendingConnects.Pop(connect);
-
-        if (connect.IsValid())
-        {
-            const std::string hostname = connect.GetHostname();
-            const int port = connect.GetPort();
-
-            if (IsErrorFree())
-            {
-                LOGD(m_socketId, "Connected to %s:%d", hostname, port);
-                m_aConnectedState.store(Socket::CONNECTED);
-
-                completedConnects.Push(connect);
-            }
-            else
-            {
-                LOGW(m_socketId, "Could not connect to %s:%d, closing socket",
-                    hostname, port);
-                m_aConnectedState.store(Socket::NOT_CONNECTED);
-
-                Close();
-            }
-        }
-    }
 }
 
 //==============================================================================

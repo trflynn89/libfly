@@ -166,6 +166,14 @@ public:
     Socket::ConnectedState ConnectAsync(std::string, int);
 
     /**
+     * After an asynchronous socket in a connecting state becomes available for
+     * writing, verify the socket is healthy and store its state as connected.
+     *
+     * @return True if the socket is healthy and connected.
+     */
+    bool FinishConnect();
+
+    /**
      * Accept an incoming client connection.
      *
      * @return A Socket on which the actual connection is made.
@@ -265,15 +273,6 @@ public:
     virtual std::string RecvFrom(bool &, bool &) const = 0;
 
     /**
-     * Iterate thru all pending asynchronous connects. Check if the socket is
-     * error free - if so, the connection was successful. If not, close the
-     * socket.
-     *
-     * @param ConnectQueue Queue of completed connects to post to on success.
-     */
-    void ServiceConnectRequests(AsyncConnect::ConnectQueue &);
-
-    /**
      * Iterate thru all pending asynchronous sends. Service each request until
      * one would block, or if some other error occurred (in which case, this
      * socket will be closed).
@@ -323,7 +322,6 @@ private:
     static std::atomic_int s_aNumSockets;
     int m_socketId;
 
-    AsyncConnect::ConnectQueue m_pendingConnects;
     AsyncRequest::RequestQueue m_pendingSends;
 
     std::string m_receiveBuffer;
