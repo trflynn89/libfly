@@ -98,17 +98,6 @@ bool SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
             anyMasksSet = true;
             ++it;
         }
-        else
-        {
-            it = m_aioSockets.erase(it);
-
-            std::lock_guard<std::mutex> lock(m_callbackMutex);
-
-            if (m_closedClientCallback != nullptr)
-            {
-                m_closedClientCallback(spSocket->GetSocketId());
-            }
-        }
     }
 
     return anyMasksSet;
@@ -117,7 +106,7 @@ bool SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
 //==============================================================================
 void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
 {
-    std::vector<SocketPtr> newClients;
+    SocketList newClients, connectedClients, closedClients;
 
     for (auto it = m_aioSockets.begin(); it != m_aioSockets.end(); )
     {
@@ -132,10 +121,11 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
             {
                 if (spSocket->IsListening())
                 {
-                    SocketPtr spNewClient = acceptNewClient(spSocket);
+                    SocketPtr spNewClient = spSocket->Accept();
 
-                    if (spNewClient && spNewClient->IsValid())
+                    if (spNewClient && spNewClient->SetAsync())
                     {
+                        connectedClients.push_back(spNewClient);
                         newClients.push_back(spNewClient);
                     }
                 }
@@ -150,7 +140,15 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
             {
                 if (spSocket->IsConnecting())
                 {
-                    spSocket->ServiceConnectRequests(m_completedConnects);
+                    if (spSocket->FinishConnect())
+                    {
+                        connectedClients.push_back(spSocket);
+                    }
+                    else
+                    {
+                        closedClients.push_back(spSocket);
+                        it = m_aioSockets.erase(it);
+                    }
                 }
                 else if (spSocket->IsConnected() || spSocket->IsUdp())
                 {
@@ -162,49 +160,13 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
         }
         else
         {
+            closedClients.push_back(spSocket);
             it = m_aioSockets.erase(it);
-
-            std::lock_guard<std::mutex> lock(m_callbackMutex);
-
-            if (m_closedClientCallback != nullptr)
-            {
-                m_closedClientCallback(spSocket->GetSocketId());
-            }
         }
     }
 
-    // Add new clients to the list of asynchronous sockets
-    for (auto it = newClients.begin(); it != newClients.end(); ++it)
-    {
-        m_aioSockets.push_back(std::move(*it));
-    }
-}
-
-//==============================================================================
-SocketPtr SocketManagerImpl::acceptNewClient(const SocketPtr &spSocket)
-{
-    SocketPtr spNewClientSocket = spSocket->Accept();
-
-    if (spNewClientSocket->SetAsync())
-    {
-        std::lock_guard<std::mutex> lock(m_callbackMutex);
-
-        if (m_newClientCallback != nullptr)
-        {
-            m_newClientCallback(spNewClientSocket);
-        }
-    }
-    else
-    {
-        LOGW(-1, "Could not make new client socket asynchronous, closing");
-
-        if (spNewClientSocket)
-        {
-            spNewClientSocket->Close();
-        }
-    }
-
-    return spNewClientSocket;
+    m_aioSockets.insert(m_aioSockets.end(), newClients.begin(), newClients.end());
+    TriggerCallbacks(connectedClients, closedClients);
 }
 
 }
