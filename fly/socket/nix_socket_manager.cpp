@@ -77,7 +77,7 @@ ssize_t SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
 //==============================================================================
 void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
 {
-    SocketList connectedClients, closedClients;
+    SocketList newClients, connectedClients, closedClients;
 
     for (auto it = m_aioSockets.begin(); it != m_aioSockets.end(); )
     {
@@ -97,7 +97,7 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
                     if (spNewClient && spNewClient->SetAsync())
                     {
                         connectedClients.push_back(spNewClient);
-                        m_aioSockets.push_back(spNewClient); // wrong
+                        newClients.push_back(spNewClient);
                     }
                 }
                 else if (spSocket->IsConnected() || spSocket->IsUdp())
@@ -136,6 +136,7 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
         }
     }
 
+    m_aioSockets.insert(m_aioSockets.end(), newClients.begin(), newClients.end());
     TriggerCallbacks(connectedClients, closedClients);
 }
 

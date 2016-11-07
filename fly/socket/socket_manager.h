@@ -131,6 +131,12 @@ protected:
      */
     virtual bool DoWork() = 0;
 
+    /**
+     * Trigger the connected and closed client callbacks.
+     *
+     * @param SocketList Newly connected clients.
+     * @param SocketList Newly closed clients.
+     */
     void TriggerCallbacks(const SocketList &, const SocketList &);
 
     std::mutex m_aioSocketsMutex;
