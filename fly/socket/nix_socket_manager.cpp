@@ -59,7 +59,7 @@ ssize_t SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
     FD_ZERO(readFd);
     FD_ZERO(writeFd);
 
-    for (SocketPtr &spSocket : m_aioSockets)
+    for (const SocketPtr &spSocket : m_aioSockets)
     {
         if (spSocket->IsValid())
         {

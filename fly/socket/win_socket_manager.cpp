@@ -86,17 +86,14 @@ bool SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
     FD_ZERO(readFd);
     FD_ZERO(writeFd);
 
-    for (auto it = m_aioSockets.begin(); it != m_aioSockets.end(); )
+    for (const SocketPtr &spSocket : m_aioSockets)
     {
-        SocketPtr &spSocket = *it;
-
         if (spSocket->IsValid())
         {
             FD_SET(spSocket->GetHandle(), readFd);
             FD_SET(spSocket->GetHandle(), writeFd);
 
             anyMasksSet = true;
-            ++it;
         }
     }
 
