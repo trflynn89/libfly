@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <fly/fly.h>
-#include <fly/socket/async_structs.h>
+#include <fly/socket/async_request.h>
 #include <fly/socket/socket_config.h>
 
 namespace fly {
@@ -61,9 +61,6 @@ public:
      * @return True if this is a valid socket, false otherwise.
      */
     bool IsValid() const;
-
-    bool IsTcp() const;
-    bool IsUdp() const;
 
     /**
      * Check if there is any errors on the socket.
@@ -124,22 +121,32 @@ public:
     virtual bool Listen() = 0;
 
     /**
-     * @return True if this is an asynchronous socking, false otherwise.
+     * @return True if this is a TCP socket, false otherwise.
+     */
+    bool IsTcp() const;
+
+    /**
+     * @return True if this is a UDP socket, false otherwise.
+     */
+    bool IsUdp() const;
+
+    /**
+     * @return True if this is an asynchronous socket, false otherwise.
      */
     bool IsAsync() const;
 
     /**
-     * Return true if this socket is a listener socket.
+     * @return True if this socket is a listener socket.
      */
     bool IsListening() const;
 
     /**
-     * Return true if this socket is connecting to a server.
+     * @return True if this socket is connecting to a server.
      */
     bool IsConnecting() const;
 
     /**
-     * Return true if this socket is connected to a server.
+     * @return True if this socket is connected to a server.
      */
     bool IsConnected() const;
 
@@ -164,6 +171,14 @@ public:
      * @return The connection state (not connected, connecting, or connected).
      */
     Socket::ConnectedState ConnectAsync(std::string, int);
+
+    /**
+     * After an asynchronous socket in a connecting state becomes available for
+     * writing, verify the socket is healthy and store its state as connected.
+     *
+     * @return True if the socket is healthy and connected.
+     */
+    bool FinishConnect();
 
     /**
      * Accept an incoming client connection.
@@ -231,14 +246,14 @@ public:
     bool SendToAsync(const std::string &, const std::string &, int);
 
     /**
-     * Read data on this socket until '\n' is received.
+     * Read data on this socket until the end-of-message character is received.
      *
      * @return The data received.
      */
     virtual std::string Recv() const = 0;
 
     /**
-     * Read data on this socket until '\n' is received.
+     * Read data on this socket until the end-of-message character is received.
      *
      * @param bool & Reference to a bool, set to true if the operation would block.
      * @param bool & Reference to a bool, set to true if the EoM char was received.
@@ -248,14 +263,14 @@ public:
     virtual std::string Recv(bool &, bool &) const = 0;
 
     /**
-     * Read data on this socket until '\n' is received.
+     * Read data on this socket until the end-of-message character is received.
      *
      * @return The data received.
      */
     virtual std::string RecvFrom() const = 0;
 
     /**
-     * Read data on this socket until '\n' is received.
+     * Read data on this socket until the end-of-message character is received.
      *
      * @param bool & Reference to a bool, set to true if the operation would block.
      * @param bool & Reference to a bool, set to true if the EoM char was received.
@@ -263,15 +278,6 @@ public:
      * @return The data received.
      */
     virtual std::string RecvFrom(bool &, bool &) const = 0;
-
-    /**
-     * Iterate thru all pending asynchronous connects. Check if the socket is
-     * error free - if so, the connection was successful. If not, close the
-     * socket.
-     *
-     * @param ConnectQueue Queue of completed connects to post to on success.
-     */
-    void ServiceConnectRequests(AsyncConnect::ConnectQueue &);
 
     /**
      * Iterate thru all pending asynchronous sends. Service each request until
@@ -323,7 +329,6 @@ private:
     static std::atomic_int s_aNumSockets;
     int m_socketId;
 
-    AsyncConnect::ConnectQueue m_pendingConnects;
     AsyncRequest::RequestQueue m_pendingSends;
 
     std::string m_receiveBuffer;

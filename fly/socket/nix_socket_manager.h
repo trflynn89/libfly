@@ -29,9 +29,6 @@ protected:
 private:
     ssize_t setReadAndWriteMasks(fd_set *, fd_set *);
     void handleSocketIO(fd_set *, fd_set *);
-    SocketPtr acceptNewClient(const SocketPtr &);
-
-    static std::atomic_int s_socketManagerCount;
 };
 
 }

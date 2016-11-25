@@ -1,4 +1,4 @@
-#include "async_structs.h"
+#include "async_request.h"
 
 namespace fly {
 
@@ -9,30 +9,8 @@ namespace
 }
 
 //==============================================================================
-AsyncBase::AsyncBase() : m_socketId(s_invalidId)
-{
-}
-
-//==============================================================================
-AsyncBase::AsyncBase(int socketId) : m_socketId(socketId)
-{
-}
-
-//==============================================================================
-bool AsyncBase::IsValid() const
-{
-    return (m_socketId != s_invalidId);
-}
-
-//==============================================================================
-int AsyncBase::GetSocketId() const
-{
-    return m_socketId;
-}
-
-//==============================================================================
 AsyncRequest::AsyncRequest() :
-    AsyncBase(s_invalidId),
+    m_socketId(s_invalidId),
     m_request(),
     m_hostname(),
     m_port()
@@ -41,7 +19,7 @@ AsyncRequest::AsyncRequest() :
 
 //==============================================================================
 AsyncRequest::AsyncRequest(int socketId) :
-    AsyncBase(socketId),
+    m_socketId(socketId),
     m_request(),
     m_hostname(),
     m_port()
@@ -50,7 +28,7 @@ AsyncRequest::AsyncRequest(int socketId) :
 
 //==============================================================================
 AsyncRequest::AsyncRequest(int socketId, const std::string &request) :
-    AsyncBase(socketId),
+    m_socketId(socketId),
     m_request(request),
     m_hostname(),
     m_port()
@@ -64,11 +42,23 @@ AsyncRequest::AsyncRequest(
     const std::string &hostname,
     int port
 ) :
-    AsyncBase(socketId),
+    m_socketId(socketId),
     m_request(request),
     m_hostname(hostname),
     m_port(port)
 {
+}
+
+//==============================================================================
+bool AsyncRequest::IsValid() const
+{
+    return (m_socketId != s_invalidId);
+}
+
+//==============================================================================
+int AsyncRequest::GetSocketId() const
+{
+    return m_socketId;
 }
 
 //==============================================================================
@@ -85,34 +75,6 @@ std::string AsyncRequest::GetHostname() const
 
 //==============================================================================
 int AsyncRequest::GetPort() const
-{
-    return m_port;
-}
-
-//==============================================================================
-AsyncConnect::AsyncConnect() :
-    AsyncBase(s_invalidId),
-    m_hostname(),
-    m_port(0)
-{
-}
-
-//==============================================================================
-AsyncConnect::AsyncConnect(int socketId, std::string host, int port) :
-    AsyncBase(socketId),
-    m_hostname(host),
-    m_port(port)
-{
-}
-
-//==============================================================================
-std::string AsyncConnect::GetHostname() const
-{
-    return m_hostname;
-}
-
-//==============================================================================
-int AsyncConnect::GetPort() const
 {
     return m_port;
 }

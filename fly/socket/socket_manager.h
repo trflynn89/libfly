@@ -7,7 +7,7 @@
 #include <vector>
 
 #include <fly/fly.h>
-#include <fly/socket/async_structs.h>
+#include <fly/socket/async_request.h>
 #include <fly/task/runner.h>
 
 namespace fly {
@@ -17,8 +17,7 @@ DEFINE_CLASS_PTRS(Socket);
 DEFINE_CLASS_PTRS(SocketConfig);
 DEFINE_CLASS_PTRS(SocketManager);
 
-typedef std::function<void(SocketPtr)> NewClientCallback;
-typedef std::function<void(int)> ClosedClientCallback;
+typedef std::function<void(SocketPtr)> SocketCallback;
 
 /**
  * Class to manage the creation of sockets and IO operations over asynchronous
@@ -31,6 +30,8 @@ typedef std::function<void(int)> ClosedClientCallback;
 class SocketManager : public Runner
 {
 public:
+    typedef std::vector<SocketPtr> SocketList;
+
     /**
      * Default constructor. Constructs default socket configuration, meant for
      * unit tests.
@@ -52,10 +53,10 @@ public:
     /**
      * Set callbacks for when a client connects or disconnects.
      *
-     * @param NewClientCallback Callback for when a new client connects.
-     * @param ClosedClientCallback Callback for when a client disconnects.
+     * @param SocketCallback Callback for when a new client connects.
+     * @param SocketCallback Callback for when a client disconnects.
      */
-    void SetClientCallbacks(NewClientCallback, ClosedClientCallback);
+    void SetClientCallbacks(SocketCallback, SocketCallback);
 
     /**
      * Remove the callbacks for when a client connects or disconnects.
@@ -93,20 +94,9 @@ public:
     SocketWPtr CreateAsyncUdpSocket();
 
     /**
-     * Wait for an asynchronous connect to complete.
-     *
-     * @param AsyncConnect Structure to store the completion.
-     * @param duration Time to wait for a completion.
-     *
-     * @return True if a completed connect was found in the given duration.
-     */
-    template <typename R, typename P>
-    bool WaitForCompletedConnect(AsyncConnect &, std::chrono::duration<R, P>);
-
-    /**
      * Wait for an asynchronous read to complete.
      *
-     * @param AsyncConnect Structure to store the completion.
+     * @param AsyncRequest Structure to store the completion.
      * @param duration Time to wait for a completion.
      *
      * @return True if a completed receive was found in the given duration.
@@ -117,7 +107,7 @@ public:
     /**
      * Wait for an asynchronous send to complete.
      *
-     * @param AsyncConnect Structure to store the completion.
+     * @param AsyncRequest Structure to store the completion.
      * @param duration Time to wait for a completion.
      *
      * @return True if a completed send was found in the given duration.
@@ -141,29 +131,27 @@ protected:
      */
     virtual bool DoWork() = 0;
 
-    std::mutex m_callbackMutex;
-    NewClientCallback m_newClientCallback;
-    ClosedClientCallback m_closedClientCallback;
+    /**
+     * Trigger the connected and closed client callbacks.
+     *
+     * @param SocketList Newly connected clients.
+     * @param SocketList Newly closed clients.
+     */
+    void TriggerCallbacks(const SocketList &, const SocketList &);
 
-    std::vector<SocketPtr> m_aioSockets;
     std::mutex m_aioSocketsMutex;
+    SocketList m_aioSockets;
 
-    AsyncConnect::ConnectQueue m_completedConnects;
     AsyncRequest::RequestQueue m_completedReceives;
     AsyncRequest::RequestQueue m_completedSends;
 
     SocketConfigPtr m_spConfig;
-};
 
-//==============================================================================
-template <typename R, typename P>
-bool SocketManager::WaitForCompletedConnect(
-    AsyncConnect &connect,
-    std::chrono::duration<R, P> waitTime
-)
-{
-    return m_completedConnects.Pop(connect, waitTime);
-}
+private:
+    std::mutex m_callbackMutex;
+    SocketCallback m_newClientCallback;
+    SocketCallback m_closedClientCallback;
+};
 
 //==============================================================================
 template <typename R, typename P>
