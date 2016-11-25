@@ -38,18 +38,6 @@ bool Socket::IsValid() const
 }
 
 //==============================================================================
-bool Socket::IsTcp() const
-{
-    return (m_socketType == Socket::SOCKET_TCP);
-}
-
-//==============================================================================
-bool Socket::IsUdp() const
-{
-    return (m_socketType == Socket::SOCKET_UDP);
-}
-
-//==============================================================================
 size_t Socket::GetHandle() const
 {
     return m_socketHandle;
@@ -71,6 +59,18 @@ int Socket::GetClientPort() const
 int Socket::GetSocketId() const
 {
     return m_socketId;
+}
+
+//==============================================================================
+bool Socket::IsTcp() const
+{
+    return (m_socketType == Socket::SOCKET_TCP);
+}
+
+//==============================================================================
+bool Socket::IsUdp() const
+{
+    return (m_socketType == Socket::SOCKET_UDP);
 }
 
 //==============================================================================

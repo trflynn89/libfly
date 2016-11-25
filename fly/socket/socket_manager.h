@@ -7,7 +7,7 @@
 #include <vector>
 
 #include <fly/fly.h>
-#include <fly/socket/async_structs.h>
+#include <fly/socket/async_request.h>
 #include <fly/task/runner.h>
 
 namespace fly {
