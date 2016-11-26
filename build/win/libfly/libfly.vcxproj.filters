@@ -92,9 +92,6 @@
     <ClInclude Include="..\..\..\fly\string\string.h">
       <Filter>string</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\async_structs.h">
-      <Filter>socket</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\socket\socket.h">
       <Filter>socket</Filter>
     </ClInclude>
@@ -118,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\random\random_device.h">
       <Filter>random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\socket\async_request.h">
+      <Filter>socket</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -163,9 +163,6 @@
     <ClCompile Include="..\..\..\fly\string\string.cpp">
       <Filter>string</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\socket\async_structs.cpp">
-      <Filter>socket</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\fly\socket\socket.cpp">
       <Filter>socket</Filter>
     </ClCompile>
@@ -179,6 +176,9 @@
       <Filter>socket</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\socket\win_socket_manager.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\socket\async_request.cpp">
       <Filter>socket</Filter>
     </ClCompile>
   </ItemGroup>

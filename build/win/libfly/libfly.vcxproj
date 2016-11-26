@@ -155,7 +155,7 @@
     <ClInclude Include="..\..\..\fly\logging\logger.h" />
     <ClInclude Include="..\..\..\fly\logging\logger_config.h" />
     <ClInclude Include="..\..\..\fly\random\random_device.h" />
-    <ClInclude Include="..\..\..\fly\socket\async_structs.h" />
+    <ClInclude Include="..\..\..\fly\socket\async_request.h" />
     <ClInclude Include="..\..\..\fly\socket\socket.h" />
     <ClInclude Include="..\..\..\fly\socket\socket_config.h" />
     <ClInclude Include="..\..\..\fly\socket\socket_impl.h" />
@@ -180,7 +180,7 @@
     <ClCompile Include="..\..\..\fly\logging\log.cpp" />
     <ClCompile Include="..\..\..\fly\logging\logger.cpp" />
     <ClCompile Include="..\..\..\fly\logging\logger_config.cpp" />
-    <ClCompile Include="..\..\..\fly\socket\async_structs.cpp" />
+    <ClCompile Include="..\..\..\fly\socket\async_request.cpp" />
     <ClCompile Include="..\..\..\fly\socket\socket.cpp" />
     <ClCompile Include="..\..\..\fly\socket\socket_config.cpp" />
     <ClCompile Include="..\..\..\fly\socket\socket_manager.cpp" />
