@@ -1,0 +1,15 @@
+language: cpp
+
+sudo: required
+dist: trusty
+
+os:
+    - linux
+
+compiler:
+    - gcc
+
+script: make -C build/nix && make -C build/nix tests
+
+notifications:
+    email: trflynn89@gmail.com
