@@ -3,7 +3,6 @@ language: generic
 matrix:
   include:
     - os: linux
-
       compiler: gcc
 
       sudo: required
@@ -17,6 +16,8 @@ matrix:
           packages:
             - gcc-5
             - g++-5
+            - gcc-5-multilib
+            - g++-5-multilib
 
       env:
         - COMPILER_NAME=gcc
