@@ -3,13 +3,21 @@ language: cpp
 sudo: required
 dist: trusty
 
-os:
-    - linux
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env: COMPILER=g++-5
 
-compiler:
-    - gcc
-
-script: make -C build/nix && make -C build/nix tests
+script:
+  - cd build/nix
+  - make
+  - make tests
 
 notifications:
-    email: trflynn89@gmail.com
+  email: trflynn89@gmail.com
