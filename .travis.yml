@@ -1,11 +1,13 @@
 language: generic
 
-sudo: required
-dist: trusty
-
 matrix:
   include:
-    - compiler: gcc
+    - os: linux
+
+      compiler: gcc
+
+      sudo: required
+      dist: trusty
 
       addons:
         apt:
@@ -21,9 +23,9 @@ matrix:
         - CC=gcc-5
         - CXX=g++-5
 
-script:
-  - cd build/nix
-  - make && make tests
+      script:
+        - cd build/nix
+        - make && make tests
 
 notifications:
   email: trflynn89@gmail.com
