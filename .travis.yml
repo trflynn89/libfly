@@ -24,8 +24,12 @@ matrix:
         - CXX=g++-5
 
       script:
-        - cd build/nix
-        - make && make tests
+        - ./build/nix/release.sh
+
+    - os: windows
+
+      script:
+        - echo 1
 
 notifications:
   email: trflynn89@gmail.com
