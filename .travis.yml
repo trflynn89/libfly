@@ -18,7 +18,7 @@ matrix:
             - g++-5
             - gcc-5-multilib
             - g++-5-multilib
-
+            - linux-libc-dev:i386
       env:
         - COMPILER_NAME=gcc
         - CC=gcc-5
@@ -26,11 +26,6 @@ matrix:
 
       script:
         - ./build/nix/release.sh
-
-    - os: windows
-
-      script:
-        - echo 1
 
 notifications:
   email: trflynn89@gmail.com
