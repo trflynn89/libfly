@@ -77,7 +77,7 @@ gcov:
 		file=$$(basename "$$obj") ; \
 		\
 		pushd $$path > /dev/null ; \
-		gcov -l -m $$file ; \
+		gcov -l $$file ; \
 		\
 		popd > /dev/null ; \
 	done ; \
