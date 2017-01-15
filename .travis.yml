@@ -24,7 +24,7 @@ matrix:
         - CXX=g++-5
 
       before_script:
-        - ln -s /usr/include/asm-generic /usr/include/asm
+        - sudo ln -s /usr/include/asm-generic /usr/include/asm
 
       script:
         - ./build/nix/release.sh
