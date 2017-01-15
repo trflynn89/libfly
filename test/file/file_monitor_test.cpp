@@ -99,14 +99,12 @@ protected:
     {
         {
             std::ofstream stream(file, std::ios::out);
-
-            if (!contents.empty())
-            {
-                stream << contents;
-            }
+            ASSERT_TRUE(stream.good());
+            stream << contents << std::flush << std::flush;
         }
         {
             std::ifstream stream(file, std::ios::in);
+            ASSERT_TRUE(stream.good());
 
             std::stringstream sstream;
             sstream << stream.rdbuf();
