@@ -66,7 +66,17 @@ namespace
 //==============================================================================
 bool SystemImpl::MakeDirectory(const std::string &path)
 {
-    int ret = SHCreateDirectoryEx(NULL, path.c_str(), NULL);
+    TCHAR buffer[4096];
+    int ret = 0;
+
+    if (GetFullPathName(path.c_str(), sizeof(buffer), buffer, NULL) > 0)
+    {
+        ret = SHCreateDirectoryEx(NULL, buffer, NULL);
+    }
+    else
+    {
+        ret = ERROR_BAD_PATHNAME;
+    }
 
     return (
         (ret == ERROR_SUCCESS) ||
