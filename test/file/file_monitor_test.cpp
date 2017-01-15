@@ -127,7 +127,7 @@ TEST_F(FileMonitorTest, NoChangeTest)
     EXPECT_EQ(m_numChangedFiles, 0);
     EXPECT_EQ(m_numOtherEvents, 0);
 
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    std::this_thread::sleep_for(std::chrono::seconds(30));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
@@ -148,7 +148,7 @@ TEST_F(FileMonitorTest, NullCallbackTest)
     EXPECT_EQ(m_numOtherEvents, 0);
 
     CreateFile(std::string());
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    std::this_thread::sleep_for(std::chrono::seconds(30));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
@@ -165,14 +165,12 @@ TEST_F(FileMonitorTest, CreateTest)
     EXPECT_EQ(m_numOtherEvents, 0);
 
     CreateFile(std::string());
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    std::this_thread::sleep_for(std::chrono::seconds(30));
 
     EXPECT_EQ(m_numCreatedFiles, 1);
     EXPECT_EQ(m_numDeletedFiles, 0);
     EXPECT_EQ(m_numChangedFiles, 0);
     EXPECT_EQ(m_numOtherEvents, 0);
-
-    std::this_thread::sleep_for(std::chrono::seconds(20));
 }
 
 //==============================================================================
@@ -186,14 +184,12 @@ TEST_F(FileMonitorTest, DeleteTest)
     CreateFile(std::string());
     std::remove(GetFullPath().c_str());
 
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    std::this_thread::sleep_for(std::chrono::seconds(30));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 1);
     EXPECT_EQ(m_numChangedFiles, 0);
     EXPECT_EQ(m_numOtherEvents, 0);
-
-    std::this_thread::sleep_for(std::chrono::seconds(20));
 }
 
 //==============================================================================
@@ -205,31 +201,12 @@ TEST_F(FileMonitorTest, ChangeTest)
     EXPECT_EQ(m_numOtherEvents, 0);
 
     CreateFile("abcdefghi");
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    std::this_thread::sleep_for(std::chrono::seconds(30));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
     EXPECT_EQ(m_numChangedFiles, 1);
     EXPECT_EQ(m_numOtherEvents, 0);
-
-    std::ifstream stream(GetFullPath(), std::ios::in);
-    std::string line;
-
-    if (stream.is_open())
-    {
-        while (getline(stream, line))
-        {
-            std::cout << line << std::endl;
-        }
-
-        stream.close();
-    }
-    else
-    {
-        std::cout << "could not open" << std::endl;
-    }
-
-    std::this_thread::sleep_for(std::chrono::seconds(20));
 }
 
 //==============================================================================
@@ -247,7 +224,7 @@ TEST_F(FileMonitorTest, OtherFileTest)
     stream.close();
     std::remove(file.c_str());
 
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    std::this_thread::sleep_for(std::chrono::seconds(30));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
@@ -261,7 +238,7 @@ TEST_F(FileMonitorTest, OtherFileTest)
     stream.close();
     std::remove(file.c_str());
 
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    std::this_thread::sleep_for(std::chrono::seconds(30));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
