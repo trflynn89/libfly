@@ -31,7 +31,7 @@ script:
   - ./build/nix/release.sh
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -X gcov
 
 before_deploy:
   - export RELEASE_32=$(ls build/nix/release-i386/etc/libfly-*.tar.bz2)
