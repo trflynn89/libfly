@@ -1,4 +1,5 @@
 #include <fstream>
+#include <sstream>
 
 #include <gtest/gtest.h>
 
@@ -116,9 +117,18 @@ protected:
      */
     void CreateFile(const std::string &contents)
     {
-        std::ofstream stream(GetFullPath(), std::ios::out);
-        stream << contents << std::endl;;
-        stream.flush();
+        {
+            std::ofstream stream(GetFullPath(), std::ios::out);
+            stream << contents;
+        }
+        {
+            std::ifstream stream(GetFullPath(), std::ios::in);
+
+            std::stringstream sstream;
+            sstream << stream.rdbuf();
+
+            ASSERT_EQ(contents, sstream.str());
+        }
     }
 
     /**

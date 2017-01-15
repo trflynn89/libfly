@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <fstream>
 #include <functional>
+#include <sstream>
 
 #include <gtest/gtest.h>
 
@@ -85,14 +86,33 @@ protected:
      */
     void CreateFile(const std::string &contents)
     {
-        std::ofstream stream(GetFullPath(), std::ios::out);
+        CreateFile(GetFullPath(), contents);
+    }
 
-        if (!contents.empty())
+    /**
+     * Create a file with the given contents.
+     *
+     * @param file Name of the file to create.
+     * @param string Contents of the file to create.
+     */
+    void CreateFile(const std::string &file, const std::string &contents)
+    {
         {
-            stream << contents << std::endl;
-        }
+            std::ofstream stream(file, std::ios::out);
 
-        stream.flush();
+            if (!contents.empty())
+            {
+                stream << contents;
+            }
+        }
+        {
+            std::ifstream stream(file, std::ios::in);
+
+            std::stringstream sstream;
+            sstream << stream.rdbuf();
+
+            ASSERT_EQ(contents, sstream.str());
+        }
     }
 
     /**
@@ -216,16 +236,14 @@ TEST_F(FileMonitorTest, ChangeTest)
 //==============================================================================
 TEST_F(FileMonitorTest, OtherFileTest)
 {
+
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
     EXPECT_EQ(m_numChangedFiles, 0);
     EXPECT_EQ(m_numOtherEvents, 0);
 
     std::string file = GetFullPath() + ".diff";
-    std::ofstream stream(file, std::ios::out);
-    stream << "abcdefghi";
-    stream.flush();
-    stream.close();
+    CreateFile(file, "abcdefghi");
     std::remove(file.c_str());
 
     std::this_thread::sleep_for(std::chrono::seconds(8));
@@ -235,11 +253,8 @@ TEST_F(FileMonitorTest, OtherFileTest)
     EXPECT_EQ(m_numChangedFiles, 0);
     EXPECT_EQ(m_numOtherEvents, 0);
 
-    file = file.substr(0, file.length() - 6);
-    stream.open(file, std::ios::out);
-    stream << "abcdefghi";
-    stream.flush();
-    stream.close();
+    file = file.substr(0, file.length() - 8);
+    CreateFile(file, "abcdefghi");
     std::remove(file.c_str());
 
     std::this_thread::sleep_for(std::chrono::seconds(8));
