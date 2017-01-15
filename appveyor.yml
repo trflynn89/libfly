@@ -1,0 +1,25 @@
+version: 1.0.0.{build}
+
+branches:
+  only:
+    - master
+
+build_script:
+  - cmd: build\win\release.bat
+
+artifacts:
+  - path: build\win\libfly-*.zip
+    name: libfly-zips
+
+deploy:
+  - provider: GitHub
+
+    force_update: true
+
+    auth_token:
+      secure: f6ku4Ps7AVm/2XvrZKSoRsFfZ6dmBRNZEzN47bbvvYtSP2oG4CxJTgAfH7GJa5ls
+
+    artifact: libfly-zips
+
+    on:
+      appveyor_repo_tag: true
