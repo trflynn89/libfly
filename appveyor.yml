@@ -1,8 +1,14 @@
-version: 1.0.0.{build}
+version: {build}
 
 branches:
   only:
     - master
+
+image: Visual Studio 2015
+
+install:
+  - ps: $env:libfly_version = (Get-Content -Raw -Path VERSION.md)
+  - ps: Update-AppveyorBuild -Version "$env:libfly_version"
 
 build_script:
   - cmd: build\win\release.bat
