@@ -1,3 +1,3 @@
 # libfly
 ##fly, a C++ utility library for Linux and Windows.
-[![Build Status](https://travis-ci.org/trflynn89/libfly.svg?branch=master)](https://travis-ci.org/trflynn89/libfly)
+[![Build Status](https://travis-ci.org/trflynn89/libfly.svg?branch=master)](https://travis-ci.org/trflynn89/libfly) [![Build status](https://ci.appveyor.com/api/projects/status/t38krr2o7gf1i1pk?svg=true)](https://ci.appveyor.com/project/trflynn89/libfly)
