@@ -50,7 +50,7 @@ protected:
         {
             std::ofstream stream(GetFullPath(), std::ios::out);
             ASSERT_TRUE(stream.good());
-            stream << contents << std::flush << std::flush;
+            stream << contents;
         }
         {
             std::ifstream stream(GetFullPath(), std::ios::in);

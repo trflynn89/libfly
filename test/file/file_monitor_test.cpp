@@ -100,7 +100,7 @@ protected:
         {
             std::ofstream stream(file, std::ios::out);
             ASSERT_TRUE(stream.good());
-            stream << contents << std::flush << std::flush;
+            stream << contents;
         }
         {
             std::ifstream stream(file, std::ios::in);
