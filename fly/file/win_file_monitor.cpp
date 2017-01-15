@@ -126,7 +126,7 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
     {
         handleEvents(buff);
     }
-    else {//if ((error != WAIT_TIMEOUT) && (error != ERROR_OPERATION_ABORTED))
+    else //if ((error != WAIT_TIMEOUT) && (error != ERROR_OPERATION_ABORTED))
     {
         LOGW(-1, "Could not check events for \"%s\": %s", m_path, errorStr);
         close();
