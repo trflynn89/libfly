@@ -1,33 +1,49 @@
 language: generic
 
-matrix:
-  include:
-    - os: linux
-      compiler: gcc
+os: linux
+compiler: gcc
 
-      sudo: required
-      dist: trusty
+sudo: required
+dist: trusty
 
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
+apt:
+  sources:
+    - ubuntu-toolchain-r-test
 
-          packages:
-            - gcc-5
-            - g++-5
-            - gcc-5-multilib
-            - g++-5-multilib
-      env:
-        - COMPILER_NAME=gcc
-        - CC=gcc-5
-        - CXX=g++-5
+  packages:
+    - gcc-5
+    - g++-5
+    - gcc-5-multilib
+    - g++-5-multilib
+env:
+  - COMPILER_NAME=gcc
+  - CC=gcc-5
+  - CXX=g++-5
 
-      before_script:
-        - sudo ln -s /usr/include/asm-generic /usr/include/asm
+before_script:
+  - sudo ln -s /usr/include/asm-generic /usr/include/asm
 
-      script:
-        - ./build/nix/release.sh
+script:
+  - ./build/nix/release.sh
+
+before_deploy:
+  - export RELEASE_32_FILE=$(ls build/nix/release-i386/etc/libfly-*.tar.gz)
+  - export RELEASE_64_FILE=$(ls build/nix/release-x86_64/etc/libfly-*.tar.gz)
+
+deploy:
+  provider: releases
+
+  api_key:
+    secure: gfwV05CN8wxqzaObGh9W1wcDag8FWt6fADYtBS/BRYRPekO1GJh+4R190vt30PlAxO8bCFA/zyyMuEH+GC2RBDs/cehimQWL9N+OYbTY07hpSbZNP0rV4QSI9sqKcoeC6lwIT9iN6cSYvDaT1puwXoJlsriLy1ukfKvXBIp6AFdnP+KNPD62rE6fddYQ2uTohmPzXI90lug8WhPrgv/u4MQOO8KMh+zWEMMnUshSPrN8T1+xR7d+gPZ40rxc6C37IJft3Ov603CcsDj9W6CMj8B0vRzWoTiWTeYkxboE8J9BemEtGkXkIjJ4rZXJeBh9WOzTBCqD43PBg5mvtonh7jKuUXFKcsYWZptMEsSM9HBJ5VOSN/Q4vtfW12srfjr1xQt/1RLBaGLdngG5fLDAeAHQlvRsux+SWI/PKXU3RSC1fDCyzu5nifXYEBG7uhEWnH50wqMV7YlxzgwNXdEbBtMfqIi9yXjWg141pgA50wc2aogJem4P/eMW0ZUdU9VvOt9dhY/adMeyGTxEOEetxwXgjhbiGSTOiStQRPfYBlHqd5AtM7a22uMxpfGxVbYC1CvHdRAzFzYyV+1lLO+OkrHvVTzMOiPlDK7WT9SgJn9tb81PT1CQsCIEO13OrkK+3yxeuErbeZToT5DUNRIJ9/jUfiP7QpGfSAWzBbMSTwI=
+
+  file_glob: true
+
+  file:
+    - "${RELEASE_32_FILE}"
+    - "${RELEASE_64_FILE}"
+
+  on:
+    repo: trflynn89/libfly
 
 notifications:
   email: trflynn89@gmail.com
