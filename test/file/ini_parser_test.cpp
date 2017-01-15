@@ -11,7 +11,7 @@ class IniParserTest : public ::testing::Test
 {
 public:
     IniParserTest() :
-        m_path(fly::System::GetTempDirectory()),
+        m_path("."),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
         m_spParser(std::make_shared<fly::IniParser>(m_path, m_file))
     {

@@ -14,7 +14,7 @@ class FileMonitorTest : public ::testing::Test
 public:
     FileMonitorTest() :
         m_spMonitor(),
-        m_path(fly::System::GetTempDirectory()),
+        m_path("."),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
         m_numCreatedFiles(0),
         m_numDeletedFiles(0),
@@ -109,7 +109,7 @@ TEST_F(FileMonitorTest, NoChangeTest)
     EXPECT_EQ(m_numChangedFiles, 0);
     EXPECT_EQ(m_numOtherEvents, 0);
 
-    std::this_thread::sleep_for(std::chrono::seconds(12));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
@@ -132,7 +132,7 @@ TEST_F(FileMonitorTest, NullCallbackTest)
     std::ofstream stream(GetFullPath(), std::ios::out);
     stream.close();
 
-    std::this_thread::sleep_for(std::chrono::seconds(12));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
@@ -151,7 +151,7 @@ TEST_F(FileMonitorTest, CreateTest)
     std::ofstream stream(GetFullPath(), std::ios::out);
     stream.close();
 
-    std::this_thread::sleep_for(std::chrono::seconds(12));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(m_numCreatedFiles, 1);
     EXPECT_EQ(m_numDeletedFiles, 0);
@@ -171,7 +171,7 @@ TEST_F(FileMonitorTest, DeleteTest)
     stream.close();
     std::remove(GetFullPath().c_str());
 
-    std::this_thread::sleep_for(std::chrono::seconds(12));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 1);
@@ -191,7 +191,7 @@ TEST_F(FileMonitorTest, ChangeTest)
     stream << "abcdefghi";
     stream.close();
 
-    std::this_thread::sleep_for(std::chrono::seconds(12));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
@@ -213,7 +213,7 @@ TEST_F(FileMonitorTest, OtherFileTest)
     stream.close();
     std::remove(file.c_str());
 
-    std::this_thread::sleep_for(std::chrono::seconds(12));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
@@ -226,7 +226,7 @@ TEST_F(FileMonitorTest, OtherFileTest)
     stream.close();
     std::remove(file.c_str());
 
-    std::this_thread::sleep_for(std::chrono::seconds(12));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
