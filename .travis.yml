@@ -30,6 +30,9 @@ before_script:
 script:
   - ./build/nix/release.sh
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 before_deploy:
   - export RELEASE_32=$(ls build/nix/release-i386/etc/libfly-*.tar.bz2)
   - export RELEASE_64=$(ls build/nix/release-x86_64/etc/libfly-*.tar.bz2)
