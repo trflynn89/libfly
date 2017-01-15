@@ -5,6 +5,7 @@
 #include <fly/config/config.h>
 #include <fly/config/config_manager.h>
 #include <fly/file/parser.h>
+#include <fly/logging/logger.h>
 #include <fly/string/string.h>
 #include <fly/system/system.h>
 
@@ -76,12 +77,15 @@ class ConfigManagerTest : public ::testing::Test
 {
 public:
     ConfigManagerTest() :
-        m_path(fly::System::GetTempDirectory()),
+        m_path(fly::System::Join(
+            fly::System::GetTempDirectory(), fly::String::GenerateRandomString(10)
+        )),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
             fly::ConfigManager::CONFIG_TYPE_INI, m_path, m_file
         ))
     {
+        LOGC("Using path '%s' : '%s'", m_path, m_file);
     }
 
     /**
@@ -96,12 +100,12 @@ public:
     }
 
     /**
-     * Delete the created file.
+     * Delete the created directory.
      */
     virtual void TearDown()
     {
         m_spConfigManager->Stop();
-        std::remove(GetFullPath().c_str());
+        std::remove(m_path.c_str());
     }
 
 protected:

@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <fly/file/file_monitor_impl.h>
+#include <fly/logging/logger.h>
 #include <fly/string/string.h>
 #include <fly/system/system.h>
 
@@ -14,13 +15,16 @@ class FileMonitorTest : public ::testing::Test
 public:
     FileMonitorTest() :
         m_spMonitor(),
-        m_path(fly::System::GetTempDirectory()),
+        m_path(fly::System::Join(
+            fly::System::GetTempDirectory(), fly::String::GenerateRandomString(10)
+        )),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
         m_numCreatedFiles(0),
         m_numDeletedFiles(0),
         m_numChangedFiles(0),
         m_numOtherEvents(0)
     {
+        LOGC("Using path '%s' : '%s'", m_path, m_file);
     }
 
     /**
@@ -38,12 +42,12 @@ public:
     }
 
     /**
-     * Stop the file monitor and delete the created file.
+     * Stop the file monitor and delete the created directory.
      */
     virtual void TearDown()
     {
         m_spMonitor->Stop();
-        std::remove(GetFullPath().c_str());
+        std::remove(m_path.c_str());
     }
 
 protected:

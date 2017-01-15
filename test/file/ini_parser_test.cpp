@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <fly/file/ini_parser.h>
+#include <fly/logging/logger.h>
 #include <fly/string/string.h>
 #include <fly/system/system.h>
 
@@ -11,10 +12,13 @@ class IniParserTest : public ::testing::Test
 {
 public:
     IniParserTest() :
-        m_path(fly::System::GetTempDirectory()),
+        m_path(fly::System::Join(
+            fly::System::GetTempDirectory(), fly::String::GenerateRandomString(10)
+        )),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
         m_spParser(std::make_shared<fly::IniParser>(m_path, m_file))
     {
+        LOGC("Using path '%s' : '%s'", m_path, m_file);
     }
 
     /**
@@ -27,11 +31,11 @@ public:
     }
 
     /**
-     * Delete the created file.
+     * Delete the created directory.
      */
     virtual void TearDown()
     {
-        std::remove(GetFullPath().c_str());
+        std::remove(m_path.c_str());
     }
 
 protected:
