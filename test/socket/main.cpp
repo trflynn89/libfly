@@ -20,7 +20,7 @@ public:
     SocketTest() :
         m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>()),
         m_spClientSocketManager(std::make_shared<fly::SocketManagerImpl>()),
-        m_message(fly::String::GenerateRandomString(64 << 10)),
+        m_message(fly::String::GenerateRandomString(64 << 10 - 1)),
         m_host("localhost"),
         m_port(12390)
     {
