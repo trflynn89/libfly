@@ -15,10 +15,9 @@ apt:
     - g++-5
     - gcc-5-multilib
     - g++-5-multilib
+
 env:
-  - COMPILER_NAME=gcc
-  - CC=gcc-5
-  - CXX=g++-5
+  - COMPILER_NAME=gcc CC=gcc-5 CXX=g++-5
 
 before_script:
   - sudo ln -s /usr/include/asm-generic /usr/include/asm
