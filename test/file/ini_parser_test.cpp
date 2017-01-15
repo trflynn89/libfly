@@ -23,6 +23,7 @@ public:
     virtual void SetUp()
     {
         ASSERT_TRUE(fly::System::MakeDirectory(m_path));
+        std::remove(GetFullPath().c_str());
     }
 
     /**

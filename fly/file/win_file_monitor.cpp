@@ -29,7 +29,8 @@ namespace
     static const DWORD s_changeFlags = (
         FILE_NOTIFY_CHANGE_FILE_NAME |
         FILE_NOTIFY_CHANGE_DIR_NAME |
-        FILE_NOTIFY_CHANGE_LAST_WRITE
+        FILE_NOTIFY_CHANGE_LAST_WRITE |
+        FILE_NOTIFY_CHANGE_CREATION
     );
 }
 

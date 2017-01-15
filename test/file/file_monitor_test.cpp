@@ -29,6 +29,7 @@ public:
     virtual void SetUp()
     {
         ASSERT_TRUE(fly::System::MakeDirectory(m_path));
+        std::remove(GetFullPath().c_str());
 
         auto callback = std::bind(&FileMonitorTest::HandleEvent, this, std::placeholders::_1);
         m_spMonitor = std::make_shared<fly::FileMonitorImpl>(callback, m_path, m_file);
