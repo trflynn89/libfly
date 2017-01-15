@@ -131,6 +131,7 @@ TEST_F(FileMonitorTest, NullCallbackTest)
     EXPECT_EQ(m_numOtherEvents, 0);
 
     std::ofstream stream(GetFullPath(), std::ios::out);
+    stream.flush();
     stream.close();
 
     std::this_thread::sleep_for(std::chrono::seconds(8));
@@ -192,6 +193,7 @@ TEST_F(FileMonitorTest, ChangeTest)
 
     std::ofstream stream(GetFullPath(), std::ios::out);
     stream << "abcdefghi";
+    stream.flush();
     stream.close();
 
     std::this_thread::sleep_for(std::chrono::seconds(8));
@@ -213,6 +215,7 @@ TEST_F(FileMonitorTest, OtherFileTest)
     std::string file = GetFullPath() + ".diff";
     std::ofstream stream(file, std::ios::out);
     stream << "abcdefghi";
+    stream.flush();
     stream.close();
     std::remove(file.c_str());
 
@@ -226,6 +229,7 @@ TEST_F(FileMonitorTest, OtherFileTest)
     file = file.substr(0, file.length() - 6);
     stream.open(file, std::ios::out);
     stream << "abcdefghi";
+    stream.flush();
     stream.close();
     std::remove(file.c_str());
 
