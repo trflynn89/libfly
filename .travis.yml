@@ -27,8 +27,8 @@ script:
   - ./build/nix/release.sh
 
 before_deploy:
-  - export RELEASE_32_FILE=$(ls build/nix/release-i386/etc/libfly-*.tar.gz)
-  - export RELEASE_64_FILE=$(ls build/nix/release-x86_64/etc/libfly-*.tar.gz)
+  - export RELEASE_32=$(ls build/nix/release-i386/etc/libfly-*.tar.bz2)
+  - export RELEASE_64=$(ls build/nix/release-x86_64/etc/libfly-*.tar.bz2)
 
 deploy:
   provider: releases
@@ -39,8 +39,8 @@ deploy:
   file_glob: true
 
   file:
-    - "${RELEASE_32_FILE}"
-    - "${RELEASE_64_FILE}"
+    - "${RELEASE_32}"
+    - "${RELEASE_64}"
 
   on:
     repo: trflynn89/libfly
