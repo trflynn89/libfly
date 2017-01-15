@@ -45,7 +45,7 @@ deploy:
     - "${RELEASE_64}"
 
   on:
-    repo: trflynn89/libfly
+    tags: true
 
 notifications:
   email: trflynn89@gmail.com
