@@ -117,7 +117,7 @@ protected:
         LOGC("Creating file: %s", path);
 
         std::ofstream stream(path.c_str(), std::ios::out);
-        stream << contents;
+        stream << contents << std::endl;;
         stream.flush();
     }
 

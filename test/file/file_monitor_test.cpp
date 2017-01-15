@@ -192,7 +192,7 @@ TEST_F(FileMonitorTest, ChangeTest)
     EXPECT_EQ(m_numOtherEvents, 0);
 
     std::ofstream stream(GetFullPath(), std::ios::out);
-    stream << "abcdefghi";
+    stream << "abcdefghi" << std::endl;
     stream.flush();
     stream.close();
 

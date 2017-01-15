@@ -97,8 +97,6 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
         &m_overlapped, NULL
     );
 
-    LOGI(-1, "ReadDirectoryChangesW: %d", success);
-
     if (success == TRUE)
     {
         DWORD millis = static_cast<DWORD>(timeout.count());
@@ -108,13 +106,11 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
         );
 
         errorStr = fly::System::GetLastError(&error);
-        LOGI(-1, "GetOverlappedResultEx: %d: %s", success, errorStr);
 
         if ((success == FALSE) && (error == WAIT_TIMEOUT))
         {
             success = ::CancelIoEx(m_monitorHandle, &m_overlapped);
             errorStr = fly::System::GetLastError(&error);
-            LOGI(-1, "CancelIoEx: %d: %s", success, errorStr);
 
             if ((success == TRUE) || (error != ERROR_NOT_FOUND))
             {
@@ -123,7 +119,6 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
                 );
 
                 errorStr = fly::System::GetLastError(&error);
-                LOGI(-1, "GetOverlappedResult: %d: %s", success, errorStr);
             }
         }
     }
@@ -132,14 +127,10 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
     {
         handleEvents(buff);
     }
-    else //if ((error != WAIT_TIMEOUT) && (error != ERROR_OPERATION_ABORTED))
+    else if ((error != WAIT_TIMEOUT) && (error != ERROR_OPERATION_ABORTED))
     {
         LOGW(-1, "Could not check events for \"%s\": %s", m_path, errorStr);
-
-        if ((error != WAIT_TIMEOUT) && (error != ERROR_OPERATION_ABORTED))
-        {
-            close();
-        }
+        close();
     }
 
     delete[] buff;

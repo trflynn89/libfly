@@ -43,7 +43,7 @@ protected:
     void CreateFile(const std::string &contents)
     {
         std::ofstream stream(GetFullPath().c_str(), std::ios::out);
-        stream << contents;
+        stream << contents << std::endl;
         stream.flush();
     }
 

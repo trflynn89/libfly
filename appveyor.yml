@@ -8,7 +8,7 @@ image: Visual Studio 2015
 
 install:
   - ps: $env:libfly_version = (Get-Content -Raw -Path VERSION.md)
-  - ps: Update-AppveyorBuild -Version "$env:libfly_version"
+  - ps: Update-AppveyorBuild -Version "$env:libfly_version-$env:APPVEYOR_BUILD_NUMBER"
 
 build_script:
   - cmd: build\win\release.bat
