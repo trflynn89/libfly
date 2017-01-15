@@ -70,6 +70,20 @@ tests:
 	printf -- "----------- [Pass $$numPass, Fail $$numFail] -----------\n\n"; \
 	exit $$numFail
 
+# Create coverage reports
+gcov:
+	$(Q)for obj in $(OBJS) ; do \
+		path=$$(dirname "$$obj") ; \
+		file=$$(basename "$$obj") ; \
+		\
+		pushd $$path > /dev/null ; \
+		gcov -l -m $$file ; \
+		\
+		popd > /dev/null ; \
+	done ; \
+	\
+	find . -name "*\#\#*.gcov" | xargs grep -l "/usr/include" | xargs -I {} rm -f {}
+
 # Build and run the target
 run: $(TARGET_PACKAGE)
 ifeq ($(TARGET_TYPE), BIN)

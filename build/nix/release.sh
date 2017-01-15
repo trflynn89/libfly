@@ -9,7 +9,7 @@ do_build()
 {
     conf="-j $NPROC -C $DIR $2"
 
-    make $conf clean && make $conf all && ( $1 || make $conf tests )
+    make $conf clean && make $conf all && ( $1 || (make $conf tests && make $conf gcov))
 
     if [ $? != 0 ] ; then
         echo "error: Failed build $1"

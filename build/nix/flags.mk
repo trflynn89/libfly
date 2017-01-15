@@ -34,7 +34,7 @@ ifeq ($(release), 1)
         CF_ALL += -fPIC
     endif
 else
-    CF_ALL += -g
+    CF_ALL += -O0 -g -coverage
 endif
 
 # Qt5 flags

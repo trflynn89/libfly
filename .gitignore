@@ -19,6 +19,11 @@ libfly-*x64.zip
 # Dependency files
 *.d
 
+# Coverage files
+*.gcov
+*.gcda
+*.gcno
+
 # Precompiled Headers
 *.gch
 *.pch
