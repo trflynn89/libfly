@@ -18,11 +18,13 @@ matrix:
             - g++-5
             - gcc-5-multilib
             - g++-5-multilib
-            - linux-libc-dev:i386
       env:
         - COMPILER_NAME=gcc
         - CC=gcc-5
         - CXX=g++-5
+
+      before_script:
+        - ln -s /usr/include/asm-generic /usr/include/asm
 
       script:
         - ./build/nix/release.sh
