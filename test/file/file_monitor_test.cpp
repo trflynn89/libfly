@@ -150,6 +150,7 @@ TEST_F(FileMonitorTest, CreateTest)
     EXPECT_EQ(m_numOtherEvents, 0);
 
     std::ofstream stream(GetFullPath(), std::ios::out);
+    stream.flush();
     stream.close();
 
     std::this_thread::sleep_for(std::chrono::seconds(8));
@@ -169,6 +170,7 @@ TEST_F(FileMonitorTest, DeleteTest)
     EXPECT_EQ(m_numOtherEvents, 0);
 
     std::ofstream stream(GetFullPath(), std::ios::out);
+    stream.flush();
     stream.close();
     std::remove(GetFullPath().c_str());
 
