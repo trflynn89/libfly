@@ -75,6 +75,23 @@ protected:
     }
 
     /**
+     * Create a file with the given contents.
+     *
+     * @param string Contents of the file to create.
+     */
+    void CreateFile(const std::string &contents)
+    {
+        std::ofstream stream(GetFullPath(), std::ios::out);
+
+        if (!contents.empty())
+        {
+            stream << contents << std::endl;
+        }
+
+        stream.flush();
+    }
+
+    /**
      * @return The full path to the file being monitored.
      */
     std::string GetFullPath() const
@@ -130,10 +147,7 @@ TEST_F(FileMonitorTest, NullCallbackTest)
     EXPECT_EQ(m_numChangedFiles, 0);
     EXPECT_EQ(m_numOtherEvents, 0);
 
-    std::ofstream stream(GetFullPath(), std::ios::out);
-    stream.flush();
-    stream.close();
-
+    CreateFile(std::string());
     std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
@@ -150,10 +164,7 @@ TEST_F(FileMonitorTest, CreateTest)
     EXPECT_EQ(m_numChangedFiles, 0);
     EXPECT_EQ(m_numOtherEvents, 0);
 
-    std::ofstream stream(GetFullPath(), std::ios::out);
-    stream.flush();
-    stream.close();
-
+    CreateFile(std::string());
     std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(m_numCreatedFiles, 1);
@@ -170,9 +181,7 @@ TEST_F(FileMonitorTest, DeleteTest)
     EXPECT_EQ(m_numChangedFiles, 0);
     EXPECT_EQ(m_numOtherEvents, 0);
 
-    std::ofstream stream(GetFullPath(), std::ios::out);
-    stream.flush();
-    stream.close();
+    CreateFile(std::string());
     std::remove(GetFullPath().c_str());
 
     std::this_thread::sleep_for(std::chrono::seconds(8));
@@ -191,17 +200,32 @@ TEST_F(FileMonitorTest, ChangeTest)
     EXPECT_EQ(m_numChangedFiles, 0);
     EXPECT_EQ(m_numOtherEvents, 0);
 
-    std::ofstream stream(GetFullPath(), std::ios::out);
-    stream << "abcdefghi" << std::endl;
-    stream.flush();
-    stream.close();
-
+    CreateFile("abcdefghi");
     std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(m_numCreatedFiles, 0);
     EXPECT_EQ(m_numDeletedFiles, 0);
     EXPECT_EQ(m_numChangedFiles, 1);
     EXPECT_EQ(m_numOtherEvents, 0);
+
+    std::ifstream stream(GetFullPath(), std::ios::in);
+    std::string line;
+
+    if (stream.is_open())
+    {
+        while (getline(stream, line))
+        {
+            std::cout << line << std::endl;
+        }
+
+        stream.close();
+    }
+    else
+    {
+        std::cout << "could not open" << std::endl;
+    }
+
+    std::this_thread::sleep_for(std::chrono::seconds(20));
 }
 
 //==============================================================================

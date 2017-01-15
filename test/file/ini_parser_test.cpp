@@ -42,7 +42,7 @@ protected:
      */
     void CreateFile(const std::string &contents)
     {
-        std::ofstream stream(GetFullPath().c_str(), std::ios::out);
+        std::ofstream stream(GetFullPath(), std::ios::out);
         stream << contents << std::endl;
         stream.flush();
     }

@@ -5,7 +5,6 @@
 #include <fly/config/config.h>
 #include <fly/config/config_manager.h>
 #include <fly/file/parser.h>
-#include <fly/logging/logger.h>
 #include <fly/string/string.h>
 #include <fly/system/system.h>
 
@@ -113,10 +112,7 @@ protected:
      */
     void CreateFile(const std::string &contents)
     {
-        const std::string path(GetFullPath());
-        LOGC("Creating file: %s", path);
-
-        std::ofstream stream(path.c_str(), std::ios::out);
+        std::ofstream stream(GetFullPath(), std::ios::out);
         stream << contents << std::endl;;
         stream.flush();
     }

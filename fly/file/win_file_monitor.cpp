@@ -8,7 +8,8 @@ namespace fly {
 namespace
 {
     static const DWORD s_accessFlags = (
-        FILE_LIST_DIRECTORY
+        FILE_LIST_DIRECTORY |
+        FILE_READ_ATTRIBUTES
     );
 
     static const DWORD s_shareFlags = (
@@ -29,6 +30,7 @@ namespace
     static const DWORD s_changeFlags = (
         FILE_NOTIFY_CHANGE_FILE_NAME |
         FILE_NOTIFY_CHANGE_DIR_NAME |
+        FILE_NOTIFY_CHANGE_SIZE |
         FILE_NOTIFY_CHANGE_LAST_WRITE |
         FILE_NOTIFY_CHANGE_CREATION
     );
