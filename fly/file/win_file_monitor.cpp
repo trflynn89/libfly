@@ -30,7 +30,6 @@ namespace
     static const DWORD s_changeFlags = (
         FILE_NOTIFY_CHANGE_FILE_NAME |
         FILE_NOTIFY_CHANGE_DIR_NAME |
-        FILE_NOTIFY_CHANGE_SIZE |
         FILE_NOTIFY_CHANGE_LAST_WRITE |
         FILE_NOTIFY_CHANGE_CREATION
     );
@@ -58,17 +57,6 @@ FileMonitorImpl::FileMonitorImpl(
             m_path, fly::System::GetLastError()
         );
     }
-    else
-    {
-        m_overlapped.hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-
-        if (m_overlapped.hEvent == INVALID_HANDLE_VALUE)
-        {
-            LOGW(-1, "Could not create overlapped for \"%s\": %s",
-                m_path, fly::System::GetLastError()
-            );
-        }
-    }
 }
 
 //==============================================================================
@@ -80,7 +68,7 @@ FileMonitorImpl::~FileMonitorImpl()
 //==============================================================================
 bool FileMonitorImpl::IsValid() const
 {
-    return (m_overlapped.hEvent != INVALID_HANDLE_VALUE);
+    return (m_monitorHandle != INVALID_HANDLE_VALUE);
 }
 
 //==============================================================================
@@ -94,47 +82,61 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
     std::string errorStr;
     int error = 0;
 
-    BOOL success = ::ReadDirectoryChangesW(
-        m_monitorHandle, buff, buffSize, FALSE, s_changeFlags, &bytes,
-        &m_overlapped, NULL
-    );
+    m_overlapped.hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+    errorStr = fly::System::GetLastError(&error);
 
-    if (success == TRUE)
+    if (m_overlapped.hEvent != INVALID_HANDLE_VALUE)
     {
-        DWORD millis = static_cast<DWORD>(timeout.count());
-
-        success = ::GetOverlappedResultEx(
-            m_monitorHandle, &m_overlapped, &bytes, millis, FALSE
+        BOOL success = ::ReadDirectoryChangesW(
+            m_monitorHandle, buff, buffSize, FALSE, s_changeFlags, &bytes,
+            &m_overlapped, NULL
         );
 
-        errorStr = fly::System::GetLastError(&error);
-
-        if ((success == FALSE) && (error == WAIT_TIMEOUT))
+        if (success == TRUE)
         {
-            success = ::CancelIoEx(m_monitorHandle, &m_overlapped);
+            DWORD millis = static_cast<DWORD>(timeout.count());
+
+            success = ::GetOverlappedResultEx(
+                m_monitorHandle, &m_overlapped, &bytes, millis, FALSE
+            );
+
             errorStr = fly::System::GetLastError(&error);
 
-            if ((success == TRUE) || (error != ERROR_NOT_FOUND))
+            if ((success == FALSE) && (error == WAIT_TIMEOUT))
             {
-                success = ::GetOverlappedResult(
-                    m_monitorHandle, &m_overlapped, &bytes, TRUE
-                );
-
+                success = ::CancelIoEx(m_monitorHandle, &m_overlapped);
                 errorStr = fly::System::GetLastError(&error);
+
+                if ((success == TRUE) || (error != ERROR_NOT_FOUND))
+                {
+                    success = ::GetOverlappedResult(
+                        m_monitorHandle, &m_overlapped, &bytes, TRUE
+                    );
+
+                    errorStr = fly::System::GetLastError(&error);
+                }
             }
         }
-    }
 
-    if (success == TRUE)
-    {
-        handleEvents(buff);
+        if (success == TRUE)
+        {
+            handleEvents(buff);
+        }
+        else if ((error != WAIT_TIMEOUT) && (error != ERROR_OPERATION_ABORTED))
+        {
+            LOGW(-1, "Could not check events for \"%s\": %s", m_path, errorStr);
+            close();
+        }
+
+        ::CloseHandle(m_overlapped.hEvent);
     }
-    else if ((error != WAIT_TIMEOUT) && (error != ERROR_OPERATION_ABORTED))
+    else
     {
-        LOGW(-1, "Could not check events for \"%s\": %s", m_path, errorStr);
+        LOGW(-1, "Could not create event for \"%s\": %s", m_path, errorStr);
         close();
     }
 
+    m_overlapped.hEvent = INVALID_HANDLE_VALUE;
     delete[] buff;
 }
 
@@ -188,11 +190,6 @@ void FileMonitorImpl::close()
 {
     if (m_monitorHandle != INVALID_HANDLE_VALUE)
     {
-        if (m_overlapped.hEvent != INVALID_HANDLE_VALUE)
-        {
-            ::CloseHandle(m_overlapped.hEvent);
-            m_overlapped.hEvent = INVALID_HANDLE_VALUE;
-        }
 
         ::CloseHandle(m_monitorHandle);
         m_monitorHandle = INVALID_HANDLE_VALUE;
