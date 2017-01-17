@@ -17,6 +17,7 @@ class SystemImpl
 {
 public:
     static bool MakeDirectory(const std::string &);
+    static bool RemoveDirectory(const std::string &);
     static char GetSeparator();
     static std::string GetTempDirectory();
     static void PrintBacktrace();

@@ -28,6 +28,15 @@ public:
     static bool MakeDirectory(const std::string &);
 
     /**
+     * Remove a directory.
+     *
+     * @param std::string Path to the directory to remove.
+     *
+     * @return True if the directory could be removed.
+     */
+    static bool RemoveDirectory(const std::string &);
+
+    /**
      * @return The system's path separator.
      */
     static char GetSeparator();

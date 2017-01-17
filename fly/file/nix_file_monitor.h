@@ -1,8 +1,12 @@
 #pragma once
 
 #include <chrono>
+#include <map>
+#include <mutex>
 #include <poll.h>
 #include <string>
+#include <sys/inotify.h>
+#include <vector>
 
 #include <fly/file/file_monitor.h>
 
@@ -16,21 +20,64 @@ namespace fly {
  */
 class FileMonitorImpl : public FileMonitor
 {
+    /**
+     * Information pertaining to a monitored path.
+     */
+    struct PathMonitor
+    {
+        PathMonitor() : m_watchDescriptor(-1)
+        {
+        }
+
+        std::map<std::string, FileEventCallback> m_handlers;
+        int m_watchDescriptor;
+    };
+
+    /**
+     * Map of monitored path names to their monitor information.
+     */
+    typedef std::map<std::string, PathMonitor> PathMap;
+
 public:
-    FileMonitorImpl(FileEventCallback, const std::string &, const std::string &);
+    FileMonitorImpl();
     virtual ~FileMonitorImpl();
-    bool IsValid() const;
+
+    virtual bool IsValid() const;
+
+    virtual bool AddFile(const std::string &, const std::string &, FileEventCallback);
+    virtual bool RemoveFile(const std::string &, const std::string &);
 
 protected:
-    void Poll(const std::chrono::milliseconds &);
+    virtual void Poll(const std::chrono::milliseconds &);
+    virtual void Close();
 
 private:
-    bool handleEvents();
-    FileMonitor::FileEvent convertToEvent(int);
-    void close();
+    /**
+     * Read the inotify file monitor handle for any events.
+     *
+     * @return bool True if any events were read.
+     */
+    bool readEvents();
 
+    /**
+     * Handle a single inotify event. Find a monitored file that corresponds
+     * to the event and trigger its callback. If no file was found, drop the
+     * event.
+     */
+    void handleEvent(const struct inotify_event *);
+
+    /**
+     * Convert an inotify event mask to a FileEvent.
+     *
+     * @param int The inotify event mask.
+     *
+     * @return FileEvent A FileEvent that matches the event mask.
+     */
+    FileMonitor::FileEvent convertToEvent(int);
+
+    mutable std::mutex m_mutex;
     int m_monitorDescriptor;
-    int m_watchDescriptor;
+    PathMap m_monitoredPaths;
 };
 
 }

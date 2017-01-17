@@ -7,7 +7,7 @@
 #include <string>
 
 #include <fly/fly.h>
-#include <fly/concurrency/concurrent_stack.h>
+#include <fly/concurrency/concurrent_queue.h>
 #include <fly/task/runner.h>
 
 namespace fly {
@@ -38,16 +38,12 @@ public:
     /**
      * Callback definition for function to be triggered on a file change.
      */
-    typedef std::function<void(FileEvent)> FileEventCallback;
+    typedef std::function<void(const std::string &, const std::string &, FileEvent)> FileEventCallback;
 
     /**
      * Constructor.
-     *
-     * @param FileEventCallback Callback to trigger when the file changes.
-     * @param string Directory containing the file to monitor.
-     * @param string Name of the file to monitor.
      */
-    FileMonitor(FileEventCallback, const std::string &, const std::string &);
+    FileMonitor();
 
     /**
      * Destructor. Stop the file monitor thread if necessary.
@@ -60,6 +56,23 @@ public:
      * @return True if the monitor is healthy.
      */
     virtual bool IsValid() const = 0;
+
+    /**
+     * Add a file to be monitored.
+     *
+     * @param string Directory containing the file to start monitoring.
+     * @param string Name of the file to start monitoring.
+     * @param FileEventCallback Callback to trigger when the file changes.
+     */
+    virtual bool AddFile(const std::string &, const std::string &, FileEventCallback) = 0;
+
+    /**
+     * Stop monitoring a file.
+     *
+     * @param string Directory containing the file to stop monitoring.
+     * @param string Name of the file to stop monitoring.
+     */
+    virtual bool RemoveFile(const std::string &, const std::string &) = 0;
 
 protected:
     /**
@@ -87,22 +100,9 @@ protected:
     virtual void Poll(const std::chrono::milliseconds &) = 0;
 
     /**
-     * Trigger the registered callback for a file change.
-     *
-     * @param FileEvent The file change event.
+     * Close any open file handles.
      */
-    void HandleEvent(FileEvent);
-
-    const std::string m_path;
-    const std::string m_file;
-
-private:
-    mutable std::mutex m_callbackMutex;
-    FileEventCallback m_handler;
-
-    ConcurrentStack<FileEvent> m_eventStack;
-
-    size_t m_interval;
+    virtual void Close() = 0;
 };
 
 }

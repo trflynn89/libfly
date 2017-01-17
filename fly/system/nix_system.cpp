@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <execinfo.h>
+#include <fts.h>
 #include <signal.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -96,6 +97,65 @@ bool SystemImpl::MakeDirectory(const std::string &path)
     }
 
     return ((::mkdir(path.c_str(), mode) == 0) || (errno == EEXIST));
+}
+
+//==============================================================================
+bool SystemImpl::RemoveDirectory(const std::string &path)
+{
+    static const int mode = FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV;
+    struct stat st;
+
+    bool ret = ((::stat(path.c_str(), &st) == 0) && S_ISDIR(st.st_mode));
+
+    if (ret)
+    {
+        char *files[] = { (char *)path.c_str(), NULL };
+
+        FTS *pFts = fts_open(files, mode, NULL);
+        FTSENT *pCurr = NULL;
+
+        while (ret && (pFts != NULL) && ((pCurr = fts_read(pFts)) != NULL))
+        {
+            std::string file(pCurr->fts_path, pCurr->fts_pathlen);
+
+            switch(pCurr->fts_info)
+            {
+            case FTS_NS:
+            case FTS_DNR:
+            case FTS_ERR:
+                LOGW(-1, "Could not read \"%s\": %s", file, strerror(pCurr->fts_errno));
+                ret = false;
+                break;
+
+            case FTS_DP:
+            case FTS_F:
+            case FTS_SL:
+            case FTS_SLNONE:
+            case FTS_DEFAULT:
+                if (::remove(pCurr->fts_accpath) == 0)
+                {
+                    LOGD(-1, "Removed \"%s\"", file);
+                }
+                else
+                {
+                    LOGW(-1, "Could not remove \"%s\": %s", file, GetLastError(NULL));
+                    ret = false;
+                }
+
+                break;
+
+            default:
+                break;
+            }
+        }
+
+        if (pFts != NULL)
+        {
+            fts_close(pFts);
+        }
+    }
+
+    return ret;
 }
 
 //==============================================================================

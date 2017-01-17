@@ -28,7 +28,6 @@ public:
     virtual void SetUp()
     {
         ASSERT_TRUE(fly::System::MakeDirectory(m_path));
-        std::remove(GetFullPath().c_str());
     }
 
     /**
@@ -36,7 +35,7 @@ public:
      */
     virtual void TearDown()
     {
-        std::remove(m_path.c_str());
+        ASSERT_TRUE(fly::System::RemoveDirectory(m_path));
     }
 
 protected:

@@ -1,5 +1,6 @@
 #include "config_manager.h"
 
+#include <chrono>
 #include <functional>
 #include <memory>
 
@@ -8,15 +9,23 @@
 
 namespace fly {
 
+namespace
+{
+    // TODO make configurable
+    static const std::chrono::milliseconds s_delay(5000);
+}
+
 //==============================================================================
 ConfigManager::ConfigManager(
     ConfigFileType fileType,
     const std::string &path,
     const std::string &file
 ) :
-    Runner("ConfigManager", 0),
+    Runner("ConfigManager", 1),
+    m_spMonitor(std::make_shared<FileMonitorImpl>()),
     m_path(path),
-    m_file(file)
+    m_file(file),
+    m_aFileChanged(true)
 {
     switch (fileType)
     {
@@ -61,22 +70,17 @@ ConfigManager::ConfigMap::size_type ConfigManager::GetSize()
 //==============================================================================
 bool ConfigManager::StartRunner()
 {
-    if (m_spParser)
+    if (m_spParser && m_spMonitor->Start())
     {
-        ConfigManagerPtr spThis = SharedFromThis<ConfigManager>();
-
-        static const auto onChange = &ConfigManager::onConfigChange;
-        auto callback = std::bind(onChange, spThis, std::placeholders::_1);
-
-        m_spMonitor = std::make_shared<FileMonitorImpl>(callback, m_path, m_file);
-
-        if (m_spMonitor->Start())
+        auto callback = [&aFileChanged = this->m_aFileChanged](...)
         {
-            onConfigChange(FileMonitor::FILE_NO_CHANGE);
-        }
+            aFileChanged.store(true);
+        };
+
+        return m_spMonitor->AddFile(m_path, m_file, callback);
     }
 
-    return (m_spMonitor && m_spMonitor->IsValid());
+    return false;
 }
 
 //==============================================================================
@@ -91,40 +95,41 @@ void ConfigManager::StopRunner()
 //==============================================================================
 bool ConfigManager::DoWork()
 {
-    return false;
-}
+    static bool expected = true;
 
-//==============================================================================
-void ConfigManager::onConfigChange(FileMonitor::FileEvent)
-{
-    try
+    if (m_aFileChanged.compare_exchange_strong(expected, false))
     {
-        m_spParser->Parse();
-    }
-    catch (const ParserException &)
-    {
-        LOGW(-1, "Could not parse file, ignoring update");
-        return;
-    }
-
-    std::lock_guard<std::mutex> lock(m_configsMutex);
-
-    for (auto it = m_configs.begin(); it != m_configs.end(); )
-    {
-        ConfigPtr spConfig = it->second.lock();
-
-        if (spConfig)
+        try
         {
-            Parser::ValueList values = m_spParser->GetValues(it->first);
-            spConfig->Update(values);
+            m_spParser->Parse();
 
-            ++it;
+            std::lock_guard<std::mutex> lock(m_configsMutex);
+
+            for (auto it = m_configs.begin(); it != m_configs.end(); )
+            {
+                ConfigPtr spConfig = it->second.lock();
+
+                if (spConfig)
+                {
+                    Parser::ValueList values = m_spParser->GetValues(it->first);
+                    spConfig->Update(values);
+
+                    ++it;
+                }
+                else
+                {
+                    it = m_configs.erase(it);
+                }
+            }
         }
-        else
+        catch (const ParserException &)
         {
-            it = m_configs.erase(it);
+            LOGW(-1, "Could not parse file, ignoring update");
         }
     }
+
+    std::this_thread::sleep_for(s_delay);
+    return true;
 }
 
 }

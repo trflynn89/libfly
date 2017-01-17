@@ -15,6 +15,12 @@ bool System::MakeDirectory(const std::string &path)
 }
 
 //==============================================================================
+bool System::RemoveDirectory(const std::string &path)
+{
+    return SystemImpl::RemoveDirectory(path);
+}
+
+//==============================================================================
 char System::GetSeparator()
 {
     return SystemImpl::GetSeparator();

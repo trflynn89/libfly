@@ -1,9 +1,5 @@
 version: "{build}"
 
-branches:
-  only:
-    - master
-
 os: Visual Studio 2015
 
 init:
