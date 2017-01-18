@@ -124,7 +124,6 @@ bool FileMonitorImpl::RemoveFile(const std::string &path, const std::string &fil
 //==============================================================================
 void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
     struct pollfd pollFd;
 
     pollFd.fd = m_monitorDescriptor;
@@ -138,6 +137,8 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
     }
     else if ((numEvents > 0) && (pollFd.revents & POLLIN))
     {
+        std::lock_guard<std::mutex> lock(m_mutex);
+
         while (readEvents())
         {
         }
