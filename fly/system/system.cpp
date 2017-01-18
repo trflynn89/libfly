@@ -9,15 +9,15 @@
 namespace fly {
 
 //==============================================================================
-bool System::MakeDirectory(const std::string &path)
+bool System::MakePath(const std::string &path)
 {
-    return SystemImpl::MakeDirectory(path);
+    return SystemImpl::MakePath(path);
 }
 
 //==============================================================================
-bool System::RemoveDirectory(const std::string &path)
+bool System::RemovePath(const std::string &path)
 {
-    return SystemImpl::RemoveDirectory(path);
+    return SystemImpl::RemovePath(path);
 }
 
 //==============================================================================

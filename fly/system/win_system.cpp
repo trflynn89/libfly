@@ -6,6 +6,7 @@
 #include <chrono>
 #include <shlobj.h>
 #include <signal.h>
+#include <tchar.h>
 
 #include <fly/logging/logger.h>
 
@@ -64,7 +65,7 @@ namespace
 }
 
 //==============================================================================
-bool SystemImpl::MakeDirectory(const std::string &path)
+bool SystemImpl::MakePath(const std::string &path)
 {
     TCHAR buffer[4096];
     int ret = 0;
@@ -83,6 +84,44 @@ bool SystemImpl::MakeDirectory(const std::string &path)
         (ret == ERROR_FILE_EXISTS) ||
         (ret == ERROR_ALREADY_EXISTS)
     );
+}
+
+//==============================================================================
+bool SystemImpl::RemovePath(const std::string &path)
+{
+    TCHAR buffer[4096];
+    DWORD len = GetFullPathName(path.c_str(), sizeof(buffer), buffer, NULL);
+
+    bool ret = ((len > 0) && (len < (sizeof(buffer) - 2)));
+
+    if (ret)
+    {
+        // SHFILEOPSTRUCT requires the path to be double-NULL-terminated
+        buffer[len + 1] = '\0';
+
+        SHFILEOPSTRUCT operation = {
+            NULL,
+            FO_DELETE,
+            buffer,
+            NULL,
+            FOF_NO_UI,
+            FALSE,
+            NULL,
+            NULL
+        };
+
+        if (SHFileOperation(&operation) == 0)
+        {
+            LOGD(-1, "Removed \"%s\"", path);
+        }
+        else
+        {
+            LOGW(-1, "Could not remove \"%s\"", path);
+            ret = false;
+        }
+    }
+
+    return ret;
 }
 
 //==============================================================================

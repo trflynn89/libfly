@@ -1,6 +1,8 @@
 #pragma once
 
 #include <chrono>
+#include <map>
+#include <mutex>
 #include <string>
 
 #include <Windows.h>
@@ -18,21 +20,77 @@ namespace fly {
  */
 class FileMonitorImpl : public FileMonitor
 {
+    /**
+     * Information pertaining to a monitored path.
+     */
+    struct PathMonitor
+    {
+        PathMonitor() : m_handle(INVALID_HANDLE_VALUE), m_pInfo(NULL)
+        {
+            ::memset(&m_overlapped, 0, sizeof(m_overlapped));
+        }
+
+        virtual ~PathMonitor()
+        {
+            if (m_pInfo != NULL)
+            {
+                delete[] m_pInfo;
+                m_pInfo = NULL;
+            }
+
+            if (m_handle != INVALID_HANDLE_VALUE)
+            {
+                CancelIo(m_handle);
+                CloseHandle(m_handle);
+                m_handle = INVALID_HANDLE_VALUE;
+            }
+        }
+
+        std::map<std::string, FileEventCallback> m_handlers;
+
+        HANDLE m_handle;
+        OVERLAPPED m_overlapped;
+        PFILE_NOTIFY_INFORMATION m_pInfo;
+    };
+
+    /**
+     * Map of monitored path names to their monitor information.
+     */
+    typedef std::map<std::string, PathMonitor> PathMap;
+
 public:
-    FileMonitorImpl(FileEventCallback, const std::string &, const std::string &);
+    FileMonitorImpl();
     virtual ~FileMonitorImpl();
-    bool IsValid() const;
+
+    virtual bool IsValid() const;
+
+    virtual bool AddFile(const std::string &, const std::string &, FileEventCallback);
+    virtual bool RemoveFile(const std::string &, const std::string &);
 
 protected:
-    void Poll(const std::chrono::milliseconds &);
+    virtual void Poll(const std::chrono::milliseconds &);
+    virtual void Close();
 
 private:
-    void handleEvents(PBYTE);
-    FileMonitor::FileEvent convertToEvent(DWORD);
-    void close();
+    /**
+     * Handle a FILE_NOTIFY_INFORMATION event for a path.
+     *
+     * @param PathMap::value_type The path's entry in the PathMap.
+     */
+    void handleEvents(PathMap::value_type &);
 
-    OVERLAPPED m_overlapped;
-    HANDLE m_monitorHandle;
+    /**
+     * Convert a FILE_NOTIFY_INFORMATION event to a FileEvent.
+     *
+     * @param int The FILE_NOTIFY_INFORMATION event.
+     *
+     * @return FileEvent A FileEvent that matches the given.
+     */
+    FileMonitor::FileEvent convertToEvent(DWORD);
+
+    mutable std::mutex m_mutex;
+    PathMap m_monitoredPaths;
+    HANDLE m_iocp;
 };
 
 }

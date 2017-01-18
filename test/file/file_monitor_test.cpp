@@ -40,8 +40,8 @@ public:
      */
     virtual void SetUp()
     {
-        ASSERT_TRUE(fly::System::MakeDirectory(m_path1));
-        ASSERT_TRUE(fly::System::MakeDirectory(m_path2));
+        ASSERT_TRUE(fly::System::MakePath(m_path1));
+        ASSERT_TRUE(fly::System::MakePath(m_path2));
 
         auto callback = std::bind(&FileMonitorTest::HandleEvent, this,
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
@@ -58,8 +58,8 @@ public:
     virtual void TearDown()
     {
         m_spMonitor->Stop();
-        ASSERT_TRUE(fly::System::RemoveDirectory(m_path1));
-        ASSERT_TRUE(fly::System::RemoveDirectory(m_path2));
+        ASSERT_TRUE(fly::System::RemovePath(m_path1));
+        ASSERT_TRUE(fly::System::RemovePath(m_path2));
     }
 
 protected:

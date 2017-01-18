@@ -70,7 +70,7 @@ namespace
 }
 
 //==============================================================================
-bool SystemImpl::MakeDirectory(const std::string &path)
+bool SystemImpl::MakePath(const std::string &path)
 {
     static const mode_t mode = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
     struct stat st;
@@ -90,7 +90,7 @@ bool SystemImpl::MakeDirectory(const std::string &path)
 
     if (pos != std::string::npos)
     {
-        if (!MakeDirectory(path.substr(0, pos)))
+        if (!MakePath(path.substr(0, pos)))
         {
             return false;
         }
@@ -100,7 +100,7 @@ bool SystemImpl::MakeDirectory(const std::string &path)
 }
 
 //==============================================================================
-bool SystemImpl::RemoveDirectory(const std::string &path)
+bool SystemImpl::RemovePath(const std::string &path)
 {
     static const int mode = FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV;
     struct stat st;

@@ -28,10 +28,8 @@ namespace
 //==============================================================================
 FileMonitorImpl::FileMonitorImpl() :
     FileMonitor(),
-    m_monitorDescriptor(-1)
+    m_monitorDescriptor(::inotify_init1(s_initFlags))
 {
-    m_monitorDescriptor = ::inotify_init1(s_initFlags);
-
     if (m_monitorDescriptor == -1)
     {
         LOGW(-1, "Could not initialize monitor: %s", fly::System::GetLastError());
@@ -235,7 +233,7 @@ void FileMonitorImpl::handleEvent(const struct inotify_event *pEvent)
         if ((callback != nullptr) && (event != FileMonitor::FILE_NO_CHANGE))
         {
             LOGI(-1, "Handling event %d for \"%s\" in \"%s\"",
-                event, it->first, pEvent->name);
+                event, pEvent->name, it->first);
 
             callback(it->first, pEvent->name, event);
         }

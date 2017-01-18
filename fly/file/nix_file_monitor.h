@@ -6,7 +6,6 @@
 #include <poll.h>
 #include <string>
 #include <sys/inotify.h>
-#include <vector>
 
 #include <fly/file/file_monitor.h>
 
@@ -76,8 +75,8 @@ private:
     FileMonitor::FileEvent convertToEvent(int);
 
     mutable std::mutex m_mutex;
-    int m_monitorDescriptor;
     PathMap m_monitoredPaths;
+    int m_monitorDescriptor;
 };
 
 }

@@ -25,7 +25,7 @@ public:
      *
      * @return True if the directory could be created (or already exists).
      */
-    static bool MakeDirectory(const std::string &);
+    static bool MakePath(const std::string &);
 
     /**
      * Remove a directory.
@@ -34,7 +34,7 @@ public:
      *
      * @return True if the directory could be removed.
      */
-    static bool RemoveDirectory(const std::string &);
+    static bool RemovePath(const std::string &);
 
     /**
      * @return The system's path separator.
