@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <map>
-#include <mutex>
 #include <string>
 
 #include <Windows.h>
@@ -12,84 +11,90 @@
 
 namespace fly {
 
+DEFINE_CLASS_PTRS(FileMonitorImpl);
+
 /**
- * Windows implementation of the FileMonitor interface.
+ * Windows implementation of the FileMonitor interface. Uses an IOCP with the
+ * ReadDirectoryChangesW API to detect path changes.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
- * @version July 21, 2016
+ * @version January 19, 2017
  */
 class FileMonitorImpl : public FileMonitor
 {
-    /**
-     * Information pertaining to a monitored path.
-     */
-    struct PathMonitor
-    {
-        PathMonitor() : m_handle(INVALID_HANDLE_VALUE), m_pInfo(NULL)
-        {
-            ::memset(&m_overlapped, 0, sizeof(m_overlapped));
-        }
-
-        virtual ~PathMonitor()
-        {
-            if (m_pInfo != NULL)
-            {
-                delete[] m_pInfo;
-                m_pInfo = NULL;
-            }
-
-            if (m_handle != INVALID_HANDLE_VALUE)
-            {
-                CancelIo(m_handle);
-                CloseHandle(m_handle);
-                m_handle = INVALID_HANDLE_VALUE;
-            }
-        }
-
-        std::map<std::string, FileEventCallback> m_handlers;
-
-        HANDLE m_handle;
-        OVERLAPPED m_overlapped;
-        PFILE_NOTIFY_INFORMATION m_pInfo;
-    };
-
-    /**
-     * Map of monitored path names to their monitor information.
-     */
-    typedef std::map<std::string, PathMonitor> PathMap;
+    friend class FileMonitor;
 
 public:
     FileMonitorImpl();
     virtual ~FileMonitorImpl();
 
+    /**
+     * Check if the file monitor's IOCP was successfully created.
+     *
+     * @return bool True if the IOCP is valid.
+     */
     virtual bool IsValid() const;
 
-    virtual bool AddFile(const std::string &, const std::string &, FileEventCallback);
-    virtual bool RemoveFile(const std::string &, const std::string &);
+    /**
+     * Get the file monitor's IOCP handle.
+     *
+     * @return HANDLE The IOCP handle.
+     */
+    HANDLE GetIocpHandle() const;
 
 protected:
     virtual void Poll(const std::chrono::milliseconds &);
     virtual void Close();
 
 private:
+    DEFINE_STRUCT_PTRS(PathInfoImpl);
+
+    /**
+     * Windows implementation of the PathInfo interface. Stores a file handle
+     * to the monitored path, as well as an array to store changes found by
+     * the ReadDirectoryChangesW API for the monitored path.
+     */
+    struct PathInfoImpl : public FileMonitor::PathInfo
+    {
+        PathInfoImpl(const FileMonitorPtr &, const std::string &);
+        virtual ~PathInfoImpl();
+
+        /**
+         * @return bool True if initialization was sucessful.
+         */
+        virtual bool IsValid() const;
+
+        /**
+         * Call the ReadDirectoryChangesW API for this path. Should be called
+         * after initialization and each time an IOCP completion is occurs for
+         * this path.
+         *
+         * @param string Name of the monitored path.
+         */
+        bool Refresh(const std::string &);
+
+        bool m_valid;
+        HANDLE m_handle;
+        OVERLAPPED m_overlapped;
+        PFILE_NOTIFY_INFORMATION m_pInfo;
+    };
+
     /**
      * Handle a FILE_NOTIFY_INFORMATION event for a path.
      *
-     * @param PathMap::value_type The path's entry in the PathMap.
+     * @param PathInfoMap::value_type The path's entry in the PathInfoMap.
      */
-    void handleEvents(PathMap::value_type &);
+    void handleEvents(const PathInfoImplPtr &, const std::string &) const;
 
     /**
      * Convert a FILE_NOTIFY_INFORMATION event to a FileEvent.
      *
      * @param int The FILE_NOTIFY_INFORMATION event.
      *
-     * @return FileEvent A FileEvent that matches the given.
+     * @return FileEvent A FileEvent that matches the given event.
      */
-    FileMonitor::FileEvent convertToEvent(DWORD);
+    FileMonitor::FileEvent convertToEvent(DWORD) const;
 
-    mutable std::mutex m_mutex;
-    PathMap m_monitoredPaths;
     HANDLE m_iocp;
 };
 

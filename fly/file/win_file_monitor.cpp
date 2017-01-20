@@ -34,13 +34,12 @@ namespace
     );
 
     static const DWORD s_buffSize = 100;
-    static const DWORD s_totalSize = (s_buffSize * sizeof(FILE_NOTIFY_INFORMATION));
 }
 
 //==============================================================================
 FileMonitorImpl::FileMonitorImpl() :
     FileMonitor(),
-    m_iocp(CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
+    m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
 {
     if (m_iocp == NULL)
     {
@@ -57,127 +56,13 @@ FileMonitorImpl::~FileMonitorImpl()
 //==============================================================================
 bool FileMonitorImpl::IsValid() const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
     return (m_iocp != NULL);
 }
 
 //==============================================================================
-bool FileMonitorImpl::AddFile(
-    const std::string &path,
-    const std::string &file,
-    FileEventCallback callback
-)
+HANDLE FileMonitorImpl::GetIocpHandle() const
 {
-    if (callback == nullptr)
-    {
-        LOGW(-1, "Ignoring NULL callback for \"%s\"", path);
-        return false;
-    }
-
-    DWORD attributes = GetFileAttributes(path.c_str());
-
-    if ((attributes == INVALID_FILE_ATTRIBUTES) ||
-        ((attributes & FILE_ATTRIBUTE_DIRECTORY) == 0))
-    {
-        LOGW(-1, "Could not find directory for \"%s\"", path);
-        return false;
-    }
-
-    std::lock_guard<std::mutex> lock(m_mutex);
-    PathMonitor &monitor = m_monitoredPaths[path];
-
-    if (monitor.m_handle == INVALID_HANDLE_VALUE)
-    {
-        monitor.m_handle = ::CreateFile(
-            path.c_str(), s_accessFlags, s_shareFlags, NULL, s_dispositionFlags,
-            s_attributeFlags, NULL
-        );
-
-        if (monitor.m_handle == INVALID_HANDLE_VALUE)
-        {
-            LOGW(-1, "Could not create file for \"%s\": %s",
-                path, fly::System::GetLastError()
-            );
-
-            return false;
-        }
-
-        monitor.m_pInfo = new FILE_NOTIFY_INFORMATION[s_buffSize];
-
-        if (monitor.m_pInfo == NULL)
-        {
-            LOGW(-1, "Could not create notification info for \"%s\": %s",
-                path, fly::System::GetLastError()
-            );
-
-            return false;
-        }
-
-        HANDLE iocp = CreateIoCompletionPort(
-            monitor.m_handle, m_iocp, (ULONG_PTR)monitor.m_handle, 0
-        );
-
-        if (iocp == NULL)
-        {
-            LOGW(-1, "Could not create IOCP info for \"%s\": %s",
-                path, fly::System::GetLastError()
-            );
-
-            return false;
-        }
-
-        DWORD bytes = 0;
-        BOOL success = ::ReadDirectoryChangesW(
-            monitor.m_handle, monitor.m_pInfo, s_totalSize, FALSE, s_changeFlags,
-            &bytes, &monitor.m_overlapped, NULL
-        );
-
-        if (!success)
-        {
-            LOGW(-1, "Could not check events for \"%s\": %s",
-                path, fly::System::GetLastError()
-            );
-
-            return false;
-        }
-    }
-
-    LOGD(-1, "Watching for changes to \"%s\" in \"%s\"", file, path);
-    monitor.m_handlers[file] = callback;
-
-    return true;
-}
-
-//==============================================================================
-bool FileMonitorImpl::RemoveFile(const std::string &path, const std::string &file)
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-
-    auto it = m_monitoredPaths.find(path);
-
-    if (it != m_monitoredPaths.end())
-    {
-        PathMonitor &monitor = it->second;
-
-        auto it2 = monitor.m_handlers.find(file);
-
-        if (it2 != monitor.m_handlers.end())
-        {
-            LOGD(-1, "Stopped watching for changes to \"%s\" in \"%s\"", file, path);
-            monitor.m_handlers.erase(it2);
-
-            if (monitor.m_handlers.empty())
-            {
-                LOGI(-1, "Removed watcher for \"%s\"", path);
-                m_monitoredPaths.erase(it);
-            }
-
-            return true;
-        }
-    }
-
-    LOGW(-1, "Not watching for changes to \"%s\" in \"%s\"", file, path);
-    return false;
+    return m_iocp;
 }
 
 //==============================================================================
@@ -192,28 +77,23 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        auto it = std::find_if(m_monitoredPaths.begin(), m_monitoredPaths.end(),
-            [&pKey](const PathMap::value_type &value) -> bool
+        auto it = std::find_if(m_pathInfo.begin(), m_pathInfo.end(),
+            [&pKey](const PathInfoMap::value_type &value) -> bool
             {
-                return ((ULONG_PTR)value.second.m_handle == pKey);
+                PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(value.second));
+                return ((ULONG_PTR)(spInfo->m_handle) == pKey);
             }
         );
 
-        if (it != m_monitoredPaths.end())
+        if (it != m_pathInfo.end())
         {
-            handleEvents(*it);
-        }
+            PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(it->second));
+            handleEvents(spInfo, it->first);
 
-        BOOL success = ::ReadDirectoryChangesW(
-            it->second.m_handle, it->second.m_pInfo, s_totalSize, FALSE,
-            s_changeFlags, &bytes, &it->second.m_overlapped, NULL
-        );
-
-        if (!success)
-        {
-            LOGW(-1, "Could not check events for \"%s\": %s",
-                it->first, fly::System::GetLastError()
-            );
+            if (!spInfo->Refresh(it->first))
+            {
+                m_pathInfo.erase(it);
+            }
         }
     }
 }
@@ -221,8 +101,6 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 //==============================================================================
 void FileMonitorImpl::Close()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-
     if (m_iocp != NULL)
     {
         ::CloseHandle(m_iocp);
@@ -231,25 +109,27 @@ void FileMonitorImpl::Close()
 }
 
 //==============================================================================
-void FileMonitorImpl::handleEvents(PathMap::value_type &value)
+void FileMonitorImpl::handleEvents(
+    const PathInfoImplPtr &spInfo,
+    const std::string &path
+) const
 {
-    PathMonitor &monitor = value.second;
-    PFILE_NOTIFY_INFORMATION pInfo = monitor.m_pInfo;
+    PFILE_NOTIFY_INFORMATION pInfo = spInfo->m_pInfo;
 
     while (pInfo != NULL)
     {
         std::wstring wFile(pInfo->FileName, pInfo->FileNameLength / sizeof(wchar_t));
         std::string file(wFile.begin(), wFile.end());
 
-        FileEventCallback callback = monitor.m_handlers[file];
+        FileMonitor::FileEventCallback &callback = spInfo->m_handlers[file];
         FileMonitor::FileEvent event = convertToEvent(pInfo->Action);
 
         if ((callback != nullptr) && (event != FileMonitor::FILE_NO_CHANGE))
         {
             LOGI(-1, "Handling event %d for \"%s\" in \"%s\"",
-                event, file, value.first);
+                event, file, path);
 
-            callback(value.first, file, event);
+            callback(path, file, event);
         }
 
         if (pInfo->NextEntryOffset == U64(0))
@@ -266,7 +146,7 @@ void FileMonitorImpl::handleEvents(PathMap::value_type &value)
 }
 
 //==============================================================================
-FileMonitor::FileEvent FileMonitorImpl::convertToEvent(DWORD action)
+FileMonitor::FileEvent FileMonitorImpl::convertToEvent(DWORD action) const
 {
     FileMonitor::FileEvent event = FileMonitor::FILE_NO_CHANGE;
 
@@ -285,9 +165,114 @@ FileMonitor::FileEvent FileMonitorImpl::convertToEvent(DWORD action)
     case FILE_ACTION_MODIFIED:
         event = FileMonitor::FILE_CHANGED;
         break;
+
+    default:
+        break;
     }
 
     return event;
+}
+
+//==============================================================================
+FileMonitorImpl::PathInfoImpl::PathInfoImpl(
+    const FileMonitorPtr &spMonitor,
+    const std::string &path
+) :
+    FileMonitorImpl::PathInfo(),
+    m_valid(false),
+    m_handle(INVALID_HANDLE_VALUE),
+    m_pInfo(NULL)
+{
+    ::memset(&m_overlapped, 0, sizeof(m_overlapped));
+
+    FileMonitorImplPtr spMonitorImpl(DownCast<FileMonitorImpl>(spMonitor));
+    HANDLE iocp = spMonitorImpl->GetIocpHandle();
+
+    if (iocp == NULL)
+    {
+        LOGW(-1, "File monitor's IOCP is NULL");
+        return;
+    }
+
+    DWORD attributes = ::GetFileAttributes(path.c_str());
+
+    if ((attributes == INVALID_FILE_ATTRIBUTES) ||
+        ((attributes & FILE_ATTRIBUTE_DIRECTORY) == 0))
+    {
+        LOGW(-1, "Could not find directory for \"%s\"", path);
+        return;
+    }
+
+    m_handle = ::CreateFile(
+        path.c_str(), s_accessFlags, s_shareFlags, NULL, s_dispositionFlags,
+        s_attributeFlags, NULL
+    );
+
+    if (m_handle == INVALID_HANDLE_VALUE)
+    {
+        LOGW(-1, "Could not create file for \"%s\": %s",
+            path, fly::System::GetLastError()
+        );
+    }
+    else if ((m_pInfo = new FILE_NOTIFY_INFORMATION[s_buffSize]) == NULL)
+    {
+        LOGW(-1, "Could not create notification info for \"%s\": %s",
+            path, fly::System::GetLastError()
+        );
+    }
+    else if (::CreateIoCompletionPort(m_handle, iocp, (ULONG_PTR)m_handle, 0) == NULL)
+    {
+        LOGW(-1, "Could not create IOCP info for \"%s\": %s",
+            path, fly::System::GetLastError()
+        );
+    }
+    else
+    {
+        m_valid = Refresh(path);
+    }
+}
+
+//==============================================================================
+FileMonitorImpl::PathInfoImpl::~PathInfoImpl()
+{
+    if (m_pInfo != NULL)
+    {
+        delete[] m_pInfo;
+        m_pInfo = NULL;
+    }
+
+    if (m_handle != INVALID_HANDLE_VALUE)
+    {
+        ::CancelIo(m_handle);
+        ::CloseHandle(m_handle);
+        m_handle = INVALID_HANDLE_VALUE;
+    }
+}
+
+//==============================================================================
+bool FileMonitorImpl::PathInfoImpl::IsValid() const
+{
+    return (m_valid && (m_handle != INVALID_HANDLE_VALUE) && (m_pInfo != NULL));
+}
+
+//==============================================================================
+bool FileMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
+{
+    static const DWORD size = (s_buffSize * sizeof(FILE_NOTIFY_INFORMATION));
+    DWORD bytes = 0;
+
+    BOOL success = ::ReadDirectoryChangesW(
+        m_handle, m_pInfo, size, FALSE, s_changeFlags, &bytes, &m_overlapped, NULL
+    );
+
+    if (success == FALSE)
+    {
+        LOGW(-1, "Could not check events for \"%s\": %s",
+            path, fly::System::GetLastError()
+        );
+    }
+
+    return (success == TRUE);
 }
 
 }

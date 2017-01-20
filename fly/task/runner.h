@@ -114,10 +114,7 @@ private:
 template <typename T>
 std::shared_ptr<T> Runner::SharedFromThis()
 {
-    static_assert(std::is_base_of<Runner, T>::value,
-        "Given type is not a runnable type");
-
-    return std::static_pointer_cast<T>(shared_from_this());
+    return DownCast<T>(shared_from_this());
 }
 
 }

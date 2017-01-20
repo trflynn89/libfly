@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <functional>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -19,7 +20,7 @@ DEFINE_CLASS_PTRS(FileMonitor);
  * independent - OS dependent implementations should inherit from this class.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
- * @version July 21, 2016
+ * @version January 19, 2017
  */
 class FileMonitor : public Runner
 {
@@ -64,7 +65,7 @@ public:
      * @param string Name of the file to start monitoring.
      * @param FileEventCallback Callback to trigger when the file changes.
      */
-    virtual bool AddFile(const std::string &, const std::string &, FileEventCallback) = 0;
+    bool AddFile(const std::string &, const std::string &, FileEventCallback);
 
     /**
      * Stop monitoring a file.
@@ -72,9 +73,33 @@ public:
      * @param string Directory containing the file to stop monitoring.
      * @param string Name of the file to stop monitoring.
      */
-    virtual bool RemoveFile(const std::string &, const std::string &) = 0;
+    bool RemoveFile(const std::string &, const std::string &);
 
 protected:
+    DEFINE_STRUCT_PTRS(PathInfo);
+
+    /**
+     * Struct to store information about a monitored path. OS dependent
+     * implementations of FileMonitor should also have a concrete defintion
+     * of this struct.
+     */
+    struct PathInfo
+    {
+        /**
+         * Check if the monitored path is in a good state.
+         *
+         * @return bool True if the monitored path is healthy.
+         */
+        virtual bool IsValid() const = 0;
+
+        std::map<std::string, FileEventCallback> m_handlers;
+    };
+
+    /**
+     * Map of monitored path names to their path information.
+     */
+    typedef std::map<std::string, PathInfoPtr> PathInfoMap;
+
     /**
      * @return True if the monitor is in a good state.
      */
@@ -103,6 +128,9 @@ protected:
      * Close any open file handles.
      */
     virtual void Close() = 0;
+
+    mutable std::mutex m_mutex;
+    PathInfoMap m_pathInfo;
 };
 
 }

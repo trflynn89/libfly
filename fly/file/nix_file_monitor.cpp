@@ -228,7 +228,7 @@ void FileMonitorImpl::handleEvent(const struct inotify_event *pEvent)
 
     if (it != m_monitoredPaths.end())
     {
-        FileEventCallback callback = it->second.m_handlers[pEvent->name];
+        FileEventCallback &callback = it->second.m_handlers[pEvent->name];
         FileMonitor::FileEvent event = convertToEvent(pEvent->mask);
 
         if ((callback != nullptr) && (event != FileMonitor::FILE_NO_CHANGE))
