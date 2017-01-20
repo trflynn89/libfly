@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
+#include <poll.h>
 #include <unistd.h>
 
 #include <fly/logging/logger.h>
@@ -45,81 +46,15 @@ FileMonitorImpl::~FileMonitorImpl()
 //==============================================================================
 bool FileMonitorImpl::IsValid() const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
     return (m_monitorDescriptor != -1);
 }
 
 //==============================================================================
-bool FileMonitorImpl::AddFile(
-    const std::string &path,
-    const std::string &file,
-    FileEventCallback callback
-)
+int FileMonitorImpl::GetMonitorHandle() const
 {
-    if (callback == nullptr)
-    {
-        LOGW(-1, "Ignoring NULL callback for \"%s\"", path);
-        return false;
-    }
-
-    std::lock_guard<std::mutex> lock(m_mutex);
-    PathMonitor &monitor = m_monitoredPaths[path];
-
-    if (monitor.m_watchDescriptor == -1)
-    {
-        monitor.m_watchDescriptor = ::inotify_add_watch(
-            m_monitorDescriptor, path.c_str(), s_changeFlags
-        );
-
-        if (monitor.m_watchDescriptor == -1)
-        {
-            LOGW(-1, "Could not add watcher for \"%s\": %s",
-                path, fly::System::GetLastError()
-            );
-
-            return false;
-        }
-    }
-
-    LOGD(-1, "Watching for changes to \"%s\" in \"%s\"", file, path);
-    monitor.m_handlers[file] = callback;
-
-    return true;
+    return m_monitorDescriptor;
 }
 
-//==============================================================================
-bool FileMonitorImpl::RemoveFile(const std::string &path, const std::string &file)
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-
-    auto it = m_monitoredPaths.find(path);
-
-    if (it != m_monitoredPaths.end())
-    {
-        PathMonitor &monitor = it->second;
-
-        auto it2 = monitor.m_handlers.find(file);
-
-        if (it2 != monitor.m_handlers.end())
-        {
-            LOGD(-1, "Stopped watching for changes to \"%s\" in \"%s\"", file, path);
-            monitor.m_handlers.erase(it2);
-
-            if (monitor.m_handlers.empty())
-            {
-                ::inotify_rm_watch(m_monitorDescriptor, monitor.m_watchDescriptor);
-
-                LOGI(-1, "Removed watcher for \"%s\"", path);
-                m_monitoredPaths.erase(it);
-            }
-
-            return true;
-        }
-    }
-
-    LOGW(-1, "Not watching for changes to \"%s\" in \"%s\"", file, path);
-    return false;
-}
 
 //==============================================================================
 void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
@@ -148,32 +83,15 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 //==============================================================================
 void FileMonitorImpl::Close()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-
     if (m_monitorDescriptor != -1)
     {
-        for (auto &value : m_monitoredPaths)
-        {
-            PathMonitor &monitor = value.second;
-
-            if (monitor.m_watchDescriptor != -1)
-            {
-                ::inotify_rm_watch(m_monitorDescriptor, monitor.m_watchDescriptor);
-
-                LOGI(-1, "Removed watcher for \"%s\"", value.first);
-                monitor.m_watchDescriptor = -1;
-            }
-
-            monitor.m_handlers.clear();
-        }
-
         ::close(m_monitorDescriptor);
         m_monitorDescriptor = -1;
     }
 }
 
 //==============================================================================
-bool FileMonitorImpl::readEvents()
+bool FileMonitorImpl::readEvents() const
 {
     static const size_t eventSize = sizeof(struct inotify_event);
 
@@ -217,18 +135,21 @@ bool FileMonitorImpl::readEvents()
 }
 
 //==============================================================================
-void FileMonitorImpl::handleEvent(const struct inotify_event *pEvent)
+void FileMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
 {
-    auto it = std::find_if(m_monitoredPaths.begin(), m_monitoredPaths.end(),
-        [&pEvent](const PathMap::value_type &value) -> bool
+    auto it = std::find_if(m_pathInfo.begin(), m_pathInfo.end(),
+        [&pEvent](const PathInfoMap::value_type &value) -> bool
         {
-            return (value.second.m_watchDescriptor == pEvent->wd);
+            PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(value.second));
+            return (spInfo->m_watchDescriptor == pEvent->wd);
         }
     );
 
-    if (it != m_monitoredPaths.end())
+    if (it != m_pathInfo.end())
     {
-        FileEventCallback &callback = it->second.m_handlers[pEvent->name];
+        PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(it->second));
+
+        FileEventCallback &callback = spInfo->m_handlers[pEvent->name];
         FileMonitor::FileEvent event = convertToEvent(pEvent->mask);
 
         if ((callback != nullptr) && (event != FileMonitor::FILE_NO_CHANGE))
@@ -242,7 +163,7 @@ void FileMonitorImpl::handleEvent(const struct inotify_event *pEvent)
 }
 
 //==============================================================================
-FileMonitor::FileEvent FileMonitorImpl::convertToEvent(int mask)
+FileMonitor::FileEvent FileMonitorImpl::convertToEvent(int mask) const
 {
     FileMonitor::FileEvent event = FileMonitor::FILE_NO_CHANGE;
 
@@ -260,6 +181,52 @@ FileMonitor::FileEvent FileMonitorImpl::convertToEvent(int mask)
     }
 
     return event;
+}
+
+//==============================================================================
+FileMonitorImpl::PathInfoImpl::PathInfoImpl(
+    const FileMonitorPtr &spMonitor,
+    const std::string &path
+) :
+    FileMonitorImpl::PathInfo(),
+    m_monitorDescriptor(-1),
+    m_watchDescriptor(-1)
+{
+    FileMonitorImplPtr spMonitorImpl(DownCast<FileMonitorImpl>(spMonitor));
+    m_monitorDescriptor = spMonitorImpl->GetMonitorHandle();
+
+    if (m_monitorDescriptor == -1)
+    {
+        LOGW(-1, "File monitor's handle is invalid");
+        return;
+    }
+
+    m_watchDescriptor = ::inotify_add_watch(
+        m_monitorDescriptor, path.c_str(), s_changeFlags
+    );
+
+    if (m_watchDescriptor == -1)
+    {
+        LOGW(-1, "Could not add watcher for \"%s\": %s",
+            path, fly::System::GetLastError()
+        );
+    }
+}
+
+//==============================================================================
+FileMonitorImpl::PathInfoImpl::~PathInfoImpl()
+{
+    if (m_watchDescriptor != -1)
+    {
+        ::inotify_rm_watch(m_monitorDescriptor, m_watchDescriptor);
+        m_watchDescriptor = -1;
+    }
+}
+
+//==============================================================================
+bool FileMonitorImpl::PathInfoImpl::IsValid() const
+{
+    return (m_watchDescriptor != -1);
 }
 
 }
