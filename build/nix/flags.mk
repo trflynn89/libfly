@@ -16,7 +16,7 @@ CF_ALL := -MMD -MP
 CF_ALL += -Wall -Wextra
 CF_ALL += -I$(SOURCE_ROOT) -I$(GEN_DIR)
 
-ifeq ($(arch), i386)
+ifeq ($(arch), x86)
     CF_ALL += -m32
 endif
 

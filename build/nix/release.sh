@@ -9,7 +9,7 @@ do_build()
 {
     conf="-j $NPROC -C $DIR $2"
 
-    make $conf clean && make $conf all && ( $1 || (make $conf tests && make $conf gcov))
+    make $conf clean && make $conf all && ( $1 || (make $conf tests && make $conf gcov) )
 
     if [ $? != 0 ] ; then
         echo "error: Failed build $1"
@@ -17,7 +17,7 @@ do_build()
     fi
 }
 
-do_build false "release=0 arch=i386"
-do_build false "release=0 arch=x86_64"
-do_build true "release=1 arch=i386"
-do_build true "release=1 arch=x86_64"
+do_build false "release=0 arch=x86"
+do_build false "release=0 arch=x64"
+do_build true "release=1 arch=x86"
+do_build true "release=1 arch=x64"

@@ -10,7 +10,7 @@ build_script:
   - cmd: build\win\release.bat
 
 artifacts:
-  - path: build\win\libfly-*.zip
+  - path: build\win\libfly-win*.zip
     name: libfly-zips
 
 deploy:

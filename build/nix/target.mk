@@ -31,4 +31,4 @@ else ifeq ($(TARGET_TYPE), LIB)
 endif
 
 # Target release package
-TARGET_PACKAGE := $(ETC_DIR)/$(target)-$(VERSION).$(arch).tar.bz2
+TARGET_PACKAGE := $(ETC_DIR)/$(target)-nix-$(VERSION).$(arch).tar.bz2

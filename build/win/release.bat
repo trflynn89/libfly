@@ -32,7 +32,7 @@ exit /B 0
 
     set /p fly_version= < %root_dir%..\..\VERSION.md
     set fly_src_dir=%root_dir%..\..\fly
-    set fly_rel_dir=%root_dir%libfly-%fly_version%.%1
+    set fly_rel_dir=%root_dir%libfly-win-%fly_version%.%1
     set fly_rel_zip=%fly_rel_dir%.zip
     set fly_exclude=%root_dir%exclude.txt
 

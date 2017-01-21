@@ -3,14 +3,14 @@
 SYSTEM := $(shell gcc -dumpmachine)
 
 # Determine default architecture
-SUPPORTED_ARCH := x86_64 i386
+SUPPORTED_ARCH := x64 x86
 
 ifneq ($(findstring x86_64, $(SYSTEM)),)
-    arch := x86_64
-else ifeq ($(arch),x86_64)
+    arch := x64
+else ifeq ($(arch),x64)
     $(error Cannot build 64-bit architecture on 32-bit machine)
 else
-    arch := i386
+    arch := x86
 endif
 
 ifneq ($(arch), $(filter $(SUPPORTED_ARCH), $(arch)))
