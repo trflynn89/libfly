@@ -2,12 +2,13 @@
 
 #include <chrono>
 #include <functional>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 
 #include <fly/fly.h>
-#include <fly/concurrency/concurrent_stack.h>
+#include <fly/concurrency/concurrent_queue.h>
 #include <fly/task/runner.h>
 
 namespace fly {
@@ -19,7 +20,7 @@ DEFINE_CLASS_PTRS(FileMonitor);
  * independent - OS dependent implementations should inherit from this class.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
- * @version July 21, 2016
+ * @version January 19, 2017
  */
 class FileMonitor : public Runner
 {
@@ -38,16 +39,12 @@ public:
     /**
      * Callback definition for function to be triggered on a file change.
      */
-    typedef std::function<void(FileEvent)> FileEventCallback;
+    typedef std::function<void(const std::string &, const std::string &, FileEvent)> FileEventCallback;
 
     /**
      * Constructor.
-     *
-     * @param FileEventCallback Callback to trigger when the file changes.
-     * @param string Directory containing the file to monitor.
-     * @param string Name of the file to monitor.
      */
-    FileMonitor(FileEventCallback, const std::string &, const std::string &);
+    FileMonitor();
 
     /**
      * Destructor. Stop the file monitor thread if necessary.
@@ -61,7 +58,66 @@ public:
      */
     virtual bool IsValid() const = 0;
 
+    /**
+     * Add a file to be monitored.
+     *
+     * @param string Directory containing the file to start monitoring.
+     * @param string Name of the file to start monitoring.
+     * @param FileEventCallback Callback to trigger when the file changes.
+     *
+     * @return bool True if the file could be added.
+     */
+    bool AddFile(const std::string &, const std::string &, FileEventCallback);
+
+    /**
+     * Stop monitoring a file.
+     *
+     * @param string Directory containing the file to stop monitoring.
+     * @param string Name of the file to stop monitoring.
+     *
+     * @return bool True if the file was removed.
+     */
+    bool RemoveFile(const std::string &, const std::string &);
+
+    /**
+     * Stop monitoring all files under the given path.
+     *
+     * @param string Directory containing the files to stop monitoring.
+     *
+     * @return bool True if the path was removed.
+     */
+    bool RemovePath(const std::string &);
+
+    /**
+     * Stop monitoring all files.
+     */
+    void RemoveAllPaths();
+
 protected:
+    DEFINE_STRUCT_PTRS(PathInfo);
+
+    /**
+     * Struct to store information about a monitored path. OS dependent
+     * implementations of FileMonitor should also have a concrete defintion
+     * of this struct.
+     */
+    struct PathInfo
+    {
+        /**
+         * Check if the monitored path is in a good state.
+         *
+         * @return bool True if the monitored path is healthy.
+         */
+        virtual bool IsValid() const = 0;
+
+        std::map<std::string, FileEventCallback> m_handlers;
+    };
+
+    /**
+     * Map of monitored path names to their path information.
+     */
+    typedef std::map<std::string, PathInfoPtr> PathInfoMap;
+
     /**
      * @return True if the monitor is in a good state.
      */
@@ -87,22 +143,12 @@ protected:
     virtual void Poll(const std::chrono::milliseconds &) = 0;
 
     /**
-     * Trigger the registered callback for a file change.
-     *
-     * @param FileEvent The file change event.
+     * Close any open file handles.
      */
-    void HandleEvent(FileEvent);
+    virtual void Close() = 0;
 
-    const std::string m_path;
-    const std::string m_file;
-
-private:
-    mutable std::mutex m_callbackMutex;
-    FileEventCallback m_handler;
-
-    ConcurrentStack<FileEvent> m_eventStack;
-
-    size_t m_interval;
+    mutable std::mutex m_mutex;
+    PathInfoMap m_pathInfo;
 };
 
 }

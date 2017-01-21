@@ -48,19 +48,6 @@ public:
     bool Pop(T &, std::chrono::duration<R, P>);
 
     /**
-     * Pop an item from the container. If the container is empty, wait (at most)
-     * for the specified amount of time for an item to be available.
-     *
-     * @param T Reference to an object of type T where the item will be stored.
-     * @param duration The amount of time to wait.
-     * @param bool True if the container should be cleared after popping.
-     *
-     * @return True if an object was popped in the given duration.
-     */
-    template <typename R, typename P>
-    bool Pop(T &, std::chrono::duration<R, P>, bool);
-
-    /**
      * @return True if the container is empty, false otherwise.
      */
     bool IsEmpty() const;
@@ -125,17 +112,6 @@ bool ConcurrentContainer<T, Container>::Pop(
     std::chrono::duration<R, P> waitTime
 )
 {
-    return Pop(item, waitTime, false);
-}
-
-//==============================================================================
-template <typename T, typename Container> template <typename R, typename P>
-bool ConcurrentContainer<T, Container>::Pop(
-    T &item,
-    std::chrono::duration<R, P> waitTime,
-    bool clear
-)
-{
     std::unique_lock<std::mutex> lock(m_containerMutex);
 
     auto emptyTest = [&] { return !m_container.empty(); };
@@ -144,11 +120,6 @@ bool ConcurrentContainer<T, Container>::Pop(
     if (itemPopped)
     {
         pop(item);
-
-        if (clear)
-        {
-            Container().swap(m_container);
-        }
     }
 
     return itemPopped;

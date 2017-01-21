@@ -1,8 +1,9 @@
 #include "nix_file_monitor.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
-#include <sys/inotify.h>
+#include <poll.h>
 #include <unistd.h>
 
 #include <fly/logging/logger.h>
@@ -26,44 +27,20 @@ namespace
 }
 
 //==============================================================================
-FileMonitorImpl::FileMonitorImpl(
-    FileEventCallback handler,
-    const std::string &path,
-    const std::string &file
-) :
-    FileMonitor(handler, path, file),
-    m_monitorDescriptor(-1),
-    m_watchDescriptor(-1)
+FileMonitorImpl::FileMonitorImpl() :
+    FileMonitor(),
+    m_monitorDescriptor(::inotify_init1(s_initFlags))
 {
-    m_monitorDescriptor = ::inotify_init1(s_initFlags);
-
     if (m_monitorDescriptor == -1)
     {
-        LOGW(-1, "Could not initialize monitor for \"%s\": %s",
-            m_path, fly::System::GetLastError()
-        );
-    }
-    else
-    {
-        m_watchDescriptor = ::inotify_add_watch(
-            m_monitorDescriptor, m_path.c_str(), s_changeFlags
-        );
-
-        if (m_watchDescriptor == -1)
-        {
-            LOGW(-1, "Could not add watcher for \"%s\": %s",
-                m_path, fly::System::GetLastError()
-            );
-
-            close();
-        }
+        LOGW(-1, "Could not initialize monitor: %s", fly::System::GetLastError());
     }
 }
 
 //==============================================================================
 FileMonitorImpl::~FileMonitorImpl()
 {
-    close();
+    Close();
 }
 
 //==============================================================================
@@ -71,6 +48,13 @@ bool FileMonitorImpl::IsValid() const
 {
     return (m_monitorDescriptor != -1);
 }
+
+//==============================================================================
+int FileMonitorImpl::GetMonitorHandle() const
+{
+    return m_monitorDescriptor;
+}
+
 
 //==============================================================================
 void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
@@ -84,32 +68,38 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 
     if (numEvents == -1)
     {
-        LOGW(-1, "Could not create poller for \"%s\": %s",
-            m_path, fly::System::GetLastError()
-        );
-
-        close();
+        LOGW(-1, "Could not create poller: %s", fly::System::GetLastError());
     }
     else if ((numEvents > 0) && (pollFd.revents & POLLIN))
     {
-        while (handleEvents())
+        std::lock_guard<std::mutex> lock(m_mutex);
+
+        while (readEvents())
         {
         }
     }
 }
 
 //==============================================================================
-bool FileMonitorImpl::handleEvents()
+void FileMonitorImpl::Close()
 {
-    const struct inotify_event *event;
-    size_t eventSize = sizeof(struct inotify_event);
+    if (m_monitorDescriptor != -1)
+    {
+        ::close(m_monitorDescriptor);
+        m_monitorDescriptor = -1;
+    }
+}
+
+//==============================================================================
+bool FileMonitorImpl::readEvents() const
+{
+    static const size_t eventSize = sizeof(struct inotify_event);
 
     // Some systems cannot read integer variables if they are not properly
     // aligned. On other systems, incorrect alignment may decrease performance.
     // Hence, the buffer used for reading from the inotify file descriptor
     // should have the same alignment as struct inotify_event.
     char buff[8 << 10] __attribute__ ((aligned(__alignof__(struct inotify_event))));
-    char *ptr;
 
     ssize_t len = ::read(m_monitorDescriptor, buff, sizeof(buff));
 
@@ -122,29 +112,58 @@ bool FileMonitorImpl::handleEvents()
 
             if (error != EAGAIN)
             {
-                LOGW(-1, "Could not read polled event for \"%s\": %s", m_path, errorStr);
-                close();
+                LOGW(-1, "Could not read polled event: %s", errorStr);
             }
         }
-
-        return false;
     }
-
-    for (ptr = buff; ptr < buff + len; ptr += eventSize + event->len)
+    else
     {
-        event = (const struct inotify_event *)ptr;
+        const struct inotify_event *pEvent;
 
-        if ((event->len > 0) && (std::string(event->name).compare(m_file) == 0))
+        for (char *ptr = buff; ptr < buff + len; ptr += eventSize + pEvent->len)
         {
-            HandleEvent(convertToEvent(event->mask));
+            pEvent = (struct inotify_event *)ptr;
+
+            if (pEvent->len > 0)
+            {
+                handleEvent(pEvent);
+            }
         }
     }
 
-    return true;
+    return (len > 0);
 }
 
 //==============================================================================
-FileMonitor::FileEvent FileMonitorImpl::convertToEvent(int mask)
+void FileMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
+{
+    auto it = std::find_if(m_pathInfo.begin(), m_pathInfo.end(),
+        [&pEvent](const PathInfoMap::value_type &value) -> bool
+        {
+            PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(value.second));
+            return (spInfo->m_watchDescriptor == pEvent->wd);
+        }
+    );
+
+    if (it != m_pathInfo.end())
+    {
+        PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(it->second));
+
+        FileMonitor::FileEventCallback &callback = spInfo->m_handlers[pEvent->name];
+        FileMonitor::FileEvent event = convertToEvent(pEvent->mask);
+
+        if ((callback != nullptr) && (event != FileMonitor::FILE_NO_CHANGE))
+        {
+            LOGI(-1, "Handling event %d for \"%s\" in \"%s\"",
+                event, pEvent->name, it->first);
+
+            callback(it->first, pEvent->name, event);
+        }
+    }
+}
+
+//==============================================================================
+FileMonitor::FileEvent FileMonitorImpl::convertToEvent(int mask) const
 {
     FileMonitor::FileEvent event = FileMonitor::FILE_NO_CHANGE;
 
@@ -165,19 +184,49 @@ FileMonitor::FileEvent FileMonitorImpl::convertToEvent(int mask)
 }
 
 //==============================================================================
-void FileMonitorImpl::close()
+FileMonitorImpl::PathInfoImpl::PathInfoImpl(
+    const FileMonitorPtr &spMonitor,
+    const std::string &path
+) :
+    FileMonitorImpl::PathInfo(),
+    m_monitorDescriptor(-1),
+    m_watchDescriptor(-1)
 {
-    if (m_monitorDescriptor != -1)
-    {
-        if (m_watchDescriptor != -1)
-        {
-            ::inotify_rm_watch(m_monitorDescriptor, m_watchDescriptor);
-            m_watchDescriptor = -1;
-        }
+    FileMonitorImplPtr spMonitorImpl(DownCast<FileMonitorImpl>(spMonitor));
+    m_monitorDescriptor = spMonitorImpl->GetMonitorHandle();
 
-        ::close(m_monitorDescriptor);
-        m_monitorDescriptor = -1;
+    if (m_monitorDescriptor == -1)
+    {
+        LOGW(-1, "File monitor's handle is invalid");
+        return;
     }
+
+    m_watchDescriptor = ::inotify_add_watch(
+        m_monitorDescriptor, path.c_str(), s_changeFlags
+    );
+
+    if (m_watchDescriptor == -1)
+    {
+        LOGW(-1, "Could not add watcher for \"%s\": %s",
+            path, fly::System::GetLastError()
+        );
+    }
+}
+
+//==============================================================================
+FileMonitorImpl::PathInfoImpl::~PathInfoImpl()
+{
+    if (m_watchDescriptor != -1)
+    {
+        ::inotify_rm_watch(m_monitorDescriptor, m_watchDescriptor);
+        m_watchDescriptor = -1;
+    }
+}
+
+//==============================================================================
+bool FileMonitorImpl::PathInfoImpl::IsValid() const
+{
+    return (m_watchDescriptor != -1);
 }
 
 }

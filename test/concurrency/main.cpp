@@ -41,19 +41,6 @@ namespace
     }
 
     //==========================================================================
-    void DoQueuePopAndClear(
-        ObjectQueue &objectQueue,
-        const Object &expectedObject
-    )
-    {
-        Object object;
-
-        ASSERT_TRUE(objectQueue.Pop(object, std::chrono::milliseconds(0), true));
-        ASSERT_EQ(objectQueue.Size(), 0);
-        ASSERT_EQ(object, expectedObject);
-    }
-
-    //==========================================================================
     unsigned int WriterThread(ObjectQueue &objectQueue)
     {
         unsigned int numWrites = 100;
@@ -181,11 +168,6 @@ TEST(ConcurrencyTest, SingleThreadedTest)
     DoQueuePop(objectQueue, obj1, --size);
     DoQueuePop(objectQueue, obj2, --size);
     DoQueuePop(objectQueue, obj3, --size);
-
-    DoQueuePush(objectQueue, obj1, ++size);
-    DoQueuePush(objectQueue, obj2, ++size);
-    DoQueuePush(objectQueue, obj1, ++size);
-    DoQueuePopAndClear(objectQueue, obj1);
 }
 
 //==============================================================================

@@ -25,7 +25,16 @@ public:
      *
      * @return True if the directory could be created (or already exists).
      */
-    static bool MakeDirectory(const std::string &);
+    static bool MakePath(const std::string &);
+
+    /**
+     * Remove a directory.
+     *
+     * @param std::string Path to the directory to remove.
+     *
+     * @return True if the directory could be removed.
+     */
+    static bool RemovePath(const std::string &);
 
     /**
      * @return The system's path separator.

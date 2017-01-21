@@ -30,3 +30,25 @@
     typedef std::shared_ptr<classname> classname##Ptr;  \
     typedef std::unique_ptr<classname> classname##UPtr; \
     typedef std::weak_ptr<classname> classname##WPtr;
+
+// Typedefs for struct name and smart pointers
+#define DEFINE_STRUCT_PTRS(structname)                    \
+    struct structname;                                    \
+    typedef std::shared_ptr<structname> structname##Ptr;  \
+    typedef std::unique_ptr<structname> structname##UPtr; \
+    typedef std::weak_ptr<structname> structname##WPtr;
+
+/**
+ * Wrapper around static_pointer_cast to create a compile error if type of the
+ * given shared_ptr is not a parent of the desired type.
+ *
+ * @param shared_ptr The shared pointer to down cast.
+ *
+ * @return shared_ptr The casted shared pointer.
+ */
+template <typename T, typename U>
+static std::shared_ptr<T> DownCast(const std::shared_ptr<U> &spObject)
+{
+    static_assert(std::is_base_of<U, T>::value, "Type T is not derived from type U");
+    return std::static_pointer_cast<T>(spObject);
+}

@@ -94,9 +94,7 @@ public:
      */
     virtual void SetUp()
     {
-        ASSERT_TRUE(fly::System::MakeDirectory(m_path));
-        std::remove(GetFullPath().c_str());
-
+        ASSERT_TRUE(fly::System::MakePath(m_path));
         ASSERT_TRUE(m_spConfigManager->Start());
     }
 
@@ -106,7 +104,7 @@ public:
     virtual void TearDown()
     {
         m_spConfigManager->Stop();
-        std::remove(m_path.c_str());
+        ASSERT_TRUE(fly::System::RemovePath(m_path));
     }
 
 protected:

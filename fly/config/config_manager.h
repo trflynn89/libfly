@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -94,16 +95,13 @@ protected:
     bool DoWork();
 
 private:
-    /**
-     * Handle an update to the configuration file on disk.
-     */
-    void onConfigChange(FileMonitor::FileEvent);
-
     FileMonitorPtr m_spMonitor;
     ParserPtr m_spParser;
 
     const std::string m_path;
     const std::string m_file;
+
+    std::atomic_bool m_aFileChanged;
 
     mutable std::mutex m_configsMutex;
     ConfigMap m_configs;
