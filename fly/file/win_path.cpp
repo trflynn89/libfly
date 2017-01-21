@@ -55,13 +55,15 @@ bool PathImpl::RemovePath(const std::string &path)
             NULL
         };
 
-        if (::SHFileOperation(&operation) == 0)
+        int error = ::SHFileOperation(&operation);
+
+        if (error == 0)
         {
             LOGD(-1, "Removed \"%s\"", path);
         }
         else
         {
-            LOGW(-1, "Could not remove \"%s\"", path);
+            LOGW(-1, "Could not remove \"%s\": %d (%x)", path, error, error);
             ret = false;
         }
     }

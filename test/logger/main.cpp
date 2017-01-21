@@ -1,3 +1,4 @@
+#include <cstring>
 #include <fstream>
 #include <limits>
 #include <sstream>
@@ -44,6 +45,48 @@ public:
     }
 
 protected:
+    /**
+     * Measure the size, in bytes, of a file.
+     *
+     * @param string Path to the file.
+     *
+     * @return ssize_t Size of the file, or -1 if the file couldn't be opened.
+     */
+    ssize_t FileSize(const std::string &path)
+    {
+        std::ifstream stream(path, std::ios::in);
+        ssize_t size = -1;
+
+        if (stream.good())
+        {
+            stream.ignore(std::numeric_limits<std::streamsize>::max());
+            size = static_cast<size_t>(stream.gcount());
+        }
+
+        return size;
+    }
+
+    /**
+     * Measure the size, in bytes, of a log point.
+     *
+     * @param string Message to store in the log.
+     *
+     * @return ssize_t Size of the log point.
+     */
+    ssize_t LogSize(const std::string &message)
+    {
+        fly::Log log;
+
+        log.m_message = message;
+        log.m_level = LOG_DEBUG;
+        log.m_line = __LINE__;
+
+        ::snprintf(log.m_file, sizeof(log.m_file), "%s", __FILE__);
+        ::snprintf(log.m_function, sizeof(log.m_function), "%s", __FUNCTION__);
+
+        return fly::String::Format("%d\t%s", 1, log).length();
+    }
+
     std::string m_path;
 
     fly::LoggerPtr m_spLogger;
@@ -103,22 +146,24 @@ TEST_F(LoggerTest, MacroTest)
 //==============================================================================
 TEST_F(LoggerTest, RolloverTest)
 {
-    std::string random = fly::String::GenerateRandomString(1 << 10);
+    std::string random = fly::String::GenerateRandomString(256);
     std::string path = m_spLogger->GetLogFilePath();
-    std::streamsize expectedSize = 0;
+    size_t count = 0;
 
     while (path == m_spLogger->GetLogFilePath())
     {
-        expectedSize += random.length();
         LOGD(-1, "%s", random);
+        ++count;
     }
 
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     EXPECT_NE(path, m_spLogger->GetLogFilePath());
 
-    std::ifstream stream(path, std::ios::in);
-    EXPECT_TRUE(stream.good());
+    ssize_t actualSize = FileSize(path) + FileSize(m_spLogger->GetLogFilePath());
+    EXPECT_GT(actualSize, 0);
 
-    stream.ignore(std::numeric_limits<std::streamsize>::max());
-    std::streamsize actualSize = stream.gcount();
-    EXPECT_GE(actualSize, expectedSize  / 8);
+    ssize_t expectedSize = LogSize(random) * count;
+    EXPECT_GT(expectedSize, 0);
+
+    EXPECT_GE(actualSize, expectedSize);
 }
