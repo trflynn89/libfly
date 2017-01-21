@@ -7,7 +7,7 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include <fly/logging/logger.h>
+#include <fly/logger/logger.h>
 
 namespace fly {
 

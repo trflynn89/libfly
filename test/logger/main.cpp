@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <fly/file/path.h>
-#include <fly/logging/logger.h>
+#include <fly/logger/logger.h>
 #include <fly/string/string.h>
 
 //==============================================================================
@@ -50,12 +50,12 @@ protected:
      *
      * @param string Path to the file.
      *
-     * @return ssize_t Size of the file, or -1 if the file couldn't be opened.
+     * @return ssize_t Size of the file.
      */
-    ssize_t FileSize(const std::string &path)
+    size_t FileSize(const std::string &path)
     {
         std::ifstream stream(path, std::ios::in);
-        ssize_t size = -1;
+        size_t size = 0;
 
         if (stream.good())
         {
@@ -71,9 +71,9 @@ protected:
      *
      * @param string Message to store in the log.
      *
-     * @return ssize_t Size of the log point.
+     * @return size_t Size of the log point.
      */
-    ssize_t LogSize(const std::string &message)
+    size_t LogSize(const std::string &message)
     {
         fly::Log log;
 
@@ -152,7 +152,7 @@ TEST_F(LoggerTest, RolloverTest)
     size_t maxMessageSize = spConfig->MaxMessageSize();
     size_t maxFileSize = spConfig->MaxLogFileSize();
 
-    std::string random = fly::String::GenerateRandomString(maxMessageSize);
+    std::string random = fly::String::GenerateRandomString((unsigned int)maxMessageSize);
 
     ssize_t expectedSize = LogSize(random);
     size_t count = 0;
@@ -167,6 +167,6 @@ TEST_F(LoggerTest, RolloverTest)
     std::this_thread::sleep_for(std::chrono::seconds(10));
     EXPECT_NE(path, m_spLogger->GetLogFilePath());
 
-    ssize_t actualSize = FileSize(path) + FileSize(m_spLogger->GetLogFilePath());
+    size_t actualSize = FileSize(path) + FileSize(m_spLogger->GetLogFilePath());
     EXPECT_GE(actualSize, expectedSize * count);
 }

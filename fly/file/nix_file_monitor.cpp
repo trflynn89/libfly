@@ -6,7 +6,7 @@
 #include <poll.h>
 #include <unistd.h>
 
-#include <fly/logging/logger.h>
+#include <fly/logger/logger.h>
 #include <fly/system/system.h>
 
 namespace fly {

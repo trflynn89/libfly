@@ -2,7 +2,7 @@
 SRC_DIRS_$(d) := \
     fly/config \
     fly/file \
-    fly/logging \
+    fly/logger \
     fly/parser \
     fly/socket \
     fly/string \

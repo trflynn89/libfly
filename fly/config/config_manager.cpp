@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include <fly/logging/logger.h>
+#include <fly/logger/logger.h>
 #include <fly/parser/ini_parser.h>
 
 namespace fly {

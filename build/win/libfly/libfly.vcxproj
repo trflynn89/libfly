@@ -151,9 +151,9 @@
     <ClInclude Include="..\..\..\fly\file\win_file_monitor.h" />
     <ClInclude Include="..\..\..\fly\file\win_path.h" />
     <ClInclude Include="..\..\..\fly\fly.h" />
-    <ClInclude Include="..\..\..\fly\logging\log.h" />
-    <ClInclude Include="..\..\..\fly\logging\logger.h" />
-    <ClInclude Include="..\..\..\fly\logging\logger_config.h" />
+    <ClInclude Include="..\..\..\fly\logger\log.h" />
+    <ClInclude Include="..\..\..\fly\logger\logger.h" />
+    <ClInclude Include="..\..\..\fly\logger\logger_config.h" />
     <ClInclude Include="..\..\..\fly\parser\ini_parser.h" />
     <ClInclude Include="..\..\..\fly\parser\parser.h" />
     <ClInclude Include="..\..\..\fly\random\random_device.h" />
@@ -179,9 +179,9 @@
     <ClCompile Include="..\..\..\fly\file\path.cpp" />
     <ClCompile Include="..\..\..\fly\file\win_file_monitor.cpp" />
     <ClCompile Include="..\..\..\fly\file\win_path.cpp" />
-    <ClCompile Include="..\..\..\fly\logging\log.cpp" />
-    <ClCompile Include="..\..\..\fly\logging\logger.cpp" />
-    <ClCompile Include="..\..\..\fly\logging\logger_config.cpp" />
+    <ClCompile Include="..\..\..\fly\logger\log.cpp" />
+    <ClCompile Include="..\..\..\fly\logger\logger.cpp" />
+    <ClCompile Include="..\..\..\fly\logger\logger_config.cpp" />
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\parser.cpp" />
     <ClCompile Include="..\..\..\fly\socket\async_request.cpp" />

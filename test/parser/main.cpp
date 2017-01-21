@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 #include <fly/file/path.h>
-#include <fly/logging/logger.h>
+#include <fly/logger/logger.h>
 #include <fly/parser/ini_parser.h>
 #include <fly/string/string.h>
 

@@ -4,7 +4,7 @@
 #include <thread>
 
 #include <fly/config/config_manager.h>
-#include <fly/logging/logger.h>
+#include <fly/logger/logger.h>
 #include <fly/task/task_config.h>
 
 namespace fly {

@@ -10,9 +10,6 @@
     <Filter Include="file">
       <UniqueIdentifier>{7e00e5db-2667-4fb1-ab52-071772a04b6c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="logging">
-      <UniqueIdentifier>{2b39b732-ea13-4003-8f0b-a98682d27bfc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="random">
       <UniqueIdentifier>{5c6aa4c5-fe2f-4e8d-a6a5-be89a547ca25}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,9 @@
     </Filter>
     <Filter Include="parser">
       <UniqueIdentifier>{e39571b7-e6c1-48ea-917e-08c233c64755}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="logger">
+      <UniqueIdentifier>{2b39b732-ea13-4003-8f0b-a98682d27bfc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -61,15 +61,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\file\win_file_monitor.h">
       <Filter>file</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\logging\log.h">
-      <Filter>logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\logging\logger.h">
-      <Filter>logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\logging\logger_config.h">
-      <Filter>logging</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\traits\type_traits.h">
       <Filter>traits</Filter>
@@ -128,6 +119,15 @@
     <ClInclude Include="..\..\..\fly\parser\parser.h">
       <Filter>parser</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\log.h">
+      <Filter>logger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\logger.h">
+      <Filter>logger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\logger_config.h">
+      <Filter>logger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp">
@@ -141,15 +141,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\file\win_file_monitor.cpp">
       <Filter>file</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\logging\log.cpp">
-      <Filter>logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\logging\logger.cpp">
-      <Filter>logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\logging\logger_config.cpp">
-      <Filter>logging</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\task\runner.cpp">
       <Filter>task</Filter>
@@ -195,6 +186,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\parser.cpp">
       <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\logger\log.cpp">
+      <Filter>logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\logger\logger.cpp">
+      <Filter>logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\logger\logger_config.cpp">
+      <Filter>logger</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

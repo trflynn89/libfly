@@ -6,7 +6,7 @@
 #include <chrono>
 #include <signal.h>
 
-#include <fly/logging/logger.h>
+#include <fly/logger/logger.h>
 
 namespace fly {
 

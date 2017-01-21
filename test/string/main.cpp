@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include <fly/logging/logger.h>
+#include <fly/logger/logger.h>
 #include <fly/string/string.h>
 
 namespace
