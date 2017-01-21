@@ -88,3 +88,5 @@ std::string PathImpl::GetTempDirectory()
 
     return ret;
 }
+
+}
