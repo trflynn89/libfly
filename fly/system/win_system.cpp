@@ -4,9 +4,7 @@
 
 #include <atomic>
 #include <chrono>
-#include <shlobj.h>
 #include <signal.h>
-#include <tchar.h>
 
 #include <fly/logging/logger.h>
 
@@ -22,8 +20,6 @@ namespace
     {
         LOGC_NO_LOCK("Received signal %d", sig);
         LOGI(-1, "Received signal %d", sig);
-
-        LoggerPtr spLogger = Logger::GetInstance();
 
         bool fatalSignal = false;
         bool cleanExit = false;
@@ -65,90 +61,10 @@ namespace
 }
 
 //==============================================================================
-bool SystemImpl::MakePath(const std::string &path)
-{
-    TCHAR buffer[4096];
-    int ret = 0;
-
-    if (GetFullPathName(path.c_str(), sizeof(buffer), buffer, NULL) > 0)
-    {
-        ret = SHCreateDirectoryEx(NULL, buffer, NULL);
-    }
-    else
-    {
-        ret = ERROR_BAD_PATHNAME;
-    }
-
-    return (
-        (ret == ERROR_SUCCESS) ||
-        (ret == ERROR_FILE_EXISTS) ||
-        (ret == ERROR_ALREADY_EXISTS)
-    );
-}
-
-//==============================================================================
-bool SystemImpl::RemovePath(const std::string &path)
-{
-    TCHAR buffer[4096];
-    DWORD len = GetFullPathName(path.c_str(), sizeof(buffer), buffer, NULL);
-
-    bool ret = ((len > 0) && (len < (sizeof(buffer) - 2)));
-
-    if (ret)
-    {
-        // SHFILEOPSTRUCT requires the path to be double-NULL-terminated
-        buffer[len + 1] = '\0';
-
-        SHFILEOPSTRUCT operation = {
-            NULL,
-            FO_DELETE,
-            buffer,
-            NULL,
-            FOF_NO_UI,
-            FALSE,
-            NULL,
-            NULL
-        };
-
-        if (SHFileOperation(&operation) == 0)
-        {
-            LOGD(-1, "Removed \"%s\"", path);
-        }
-        else
-        {
-            LOGW(-1, "Could not remove \"%s\"", path);
-            ret = false;
-        }
-    }
-
-    return ret;
-}
-
-//==============================================================================
-char SystemImpl::GetSeparator()
-{
-    return '\\';
-}
-
-//==============================================================================
-std::string SystemImpl::GetTempDirectory()
-{
-    TCHAR buff[MAX_PATH];
-    std::string ret;
-
-    if (GetTempPath(MAX_PATH, buff) > 0)
-    {
-        ret = std::string(buff);
-    }
-
-    return ret;
-}
-
-//==============================================================================
 void SystemImpl::PrintBacktrace()
 {
     void *trace[10];
-    const USHORT traceSize = CaptureStackBackTrace(0, 10, trace, NULL);
+    const USHORT traceSize = ::CaptureStackBackTrace(0, 10, trace, NULL);
 
     for (USHORT i = 0; i < traceSize; ++i)
     {
@@ -164,11 +80,11 @@ std::string SystemImpl::LocalTime(const std::string &fmt)
 
     struct tm timeVal;
 
-    if (localtime_s(&timeVal, &now) == 0)
+    if (::localtime_s(&timeVal, &now) == 0)
     {
         char timeStr[32];
 
-        if (strftime(timeStr, sizeof(timeStr), fmt.c_str(), &timeVal) != 0)
+        if (::strftime(timeStr, sizeof(timeStr), fmt.c_str(), &timeVal) != 0)
         {
             return std::string(timeStr);
         }
@@ -180,11 +96,11 @@ std::string SystemImpl::LocalTime(const std::string &fmt)
 //==============================================================================
 std::string SystemImpl::GetLastError(int *pCode)
 {
-    int error = WSAGetLastError();
+    int error = ::WSAGetLastError();
     LPTSTR str = NULL;
     std::string ret;
 
-    FormatMessage(
+    ::FormatMessage(
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&str, 0, NULL
     );
@@ -196,7 +112,7 @@ std::string SystemImpl::GetLastError(int *pCode)
     else
     {
         ret = "(" + std::to_string(error) + ") " + str;
-        LocalFree(str);
+        ::LocalFree(str);
     }
 
     if (pCode != NULL)
@@ -210,12 +126,12 @@ std::string SystemImpl::GetLastError(int *pCode)
 //==============================================================================
 void SystemImpl::SetupSignalHandler()
 {
-    signal(SIGINT, handleSignal);
-    signal(SIGTERM, handleSignal);
-    signal(SIGILL, handleSignal);
-    signal(SIGFPE, handleSignal);
-    signal(SIGABRT, handleSignal);
-    signal(SIGSEGV, handleSignal);
+    ::signal(SIGINT, handleSignal);
+    ::signal(SIGTERM, handleSignal);
+    ::signal(SIGILL, handleSignal);
+    ::signal(SIGFPE, handleSignal);
+    ::signal(SIGABRT, handleSignal);
+    ::signal(SIGSEGV, handleSignal);
 }
 
 //==============================================================================

@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{dcab15ff-9009-4a4a-93ea-998d69889398}</ProjectGuid>
+    <ProjectGuid>{db5f0ee6-2360-4090-8247-3d675c0a0061}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>file</RootNamespace>
+    <RootNamespace>parser</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -178,7 +178,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\file\main.cpp" />
+    <ClCompile Include="..\..\..\test\parser\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
