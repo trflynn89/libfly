@@ -86,6 +86,14 @@ class Logger : public Runner
 {
 public:
     /**
+     * Default constructor. Constructs default loger configuration, meant for
+     * unit tests.
+     *
+     * @param string Path to store the log file.
+     */
+    Logger(const std::string &);
+
+    /**
      * Constructor.
      *
      * @param ConfigManagerPtr Reference to the configuration manager.
@@ -129,6 +137,11 @@ public:
      * @param string The message to log.
      */
     static void AddLog(LogLevel, ssize_t, const char *, const char *, unsigned int, const std::string &);
+
+    /**
+     * @return string Path to the current log file.
+     */
+    std::string GetLogFilePath() const;
 
 protected:
     /**
@@ -179,6 +192,7 @@ private:
     LoggerConfigPtr m_spConfig;
 
     const std::string m_filePath;
+    std::string m_fileName;
     size_t m_fileSize;
 
     size_t m_index;

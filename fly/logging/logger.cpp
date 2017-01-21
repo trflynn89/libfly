@@ -20,10 +20,18 @@ LoggerWPtr Logger::s_wpInstance;
 std::mutex Logger::s_consoleMutex;
 
 //==============================================================================
-Logger::Logger(
-    ConfigManagerPtr &spConfigManager,
-    const std::string &filePath
-) :
+Logger::Logger(const std::string &filePath) :
+    Runner("Logger", 1),
+    m_spConfig(std::make_shared<LoggerConfig>()),
+    m_filePath(filePath),
+    m_fileSize(0),
+    m_index(0),
+    m_startTime(std::chrono::high_resolution_clock::now())
+{
+}
+
+//==============================================================================
+Logger::Logger(ConfigManagerPtr &spConfigManager, const std::string &filePath) :
     Runner("Logger", 1),
     m_spConfig(spConfigManager->CreateConfig<LoggerConfig>()),
     m_filePath(filePath),
@@ -82,6 +90,12 @@ void Logger::AddLog(LogLevel level, ssize_t gameId, const char *file,
 
         ConsoleLog(true, console);
     }
+}
+
+//==============================================================================
+std::string Logger::GetLogFilePath() const
+{
+    return m_fileName;
 }
 
 //==============================================================================
@@ -149,15 +163,15 @@ bool Logger::createLogFile()
     String::ReplaceAll(timeStr, " ", "_");
 
     std::string fileName = String::Format("Log_%s_%s.log", timeStr, randStr);
-    fileName = Path::Join(m_filePath, fileName);
+    m_fileName = Path::Join(m_filePath, fileName);
 
     if (m_logFile.is_open())
     {
         m_logFile.close();
     }
 
-    LOGC("Creating logger file: %s", fileName);
-    m_logFile.open(fileName, std::ios::out);
+    LOGC("Creating logger file: %s", m_fileName);
+    m_logFile.open(m_fileName, std::ios::out);
     m_fileSize = 0;
 
     return m_logFile.good();
