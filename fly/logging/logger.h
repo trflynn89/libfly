@@ -143,6 +143,11 @@ public:
      */
     std::string GetLogFilePath() const;
 
+    /**
+     * @return LoggerConfigPtr Shared pointer to the log config.
+     */
+    LoggerConfigPtr GetLogConfig() const;
+
 protected:
     /**
      * Start the logger. Create the logger's log file on disk.

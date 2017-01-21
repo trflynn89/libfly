@@ -146,24 +146,27 @@ TEST_F(LoggerTest, MacroTest)
 //==============================================================================
 TEST_F(LoggerTest, RolloverTest)
 {
-    std::string random = fly::String::GenerateRandomString(256);
+    fly::LoggerConfigPtr spConfig = m_spLogger->GetLogConfig();
     std::string path = m_spLogger->GetLogFilePath();
+
+    size_t maxMessageSize = spConfig->MaxMessageSize();
+    size_t maxFileSize = spConfig->MaxLogFileSize();
+
+    std::string random = fly::String::GenerateRandomString(maxMessageSize);
+
+    ssize_t expectedSize = LogSize(random);
     size_t count = 0;
 
-    while (path == m_spLogger->GetLogFilePath())
+    // Create enough log points to fill the log file, plus some extra to start
+    // filling a second log file
+    while (++count < ((maxFileSize / expectedSize) + maxMessageSize))
     {
         LOGD(-1, "%s", random);
-        ++count;
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(10));
     EXPECT_NE(path, m_spLogger->GetLogFilePath());
 
     ssize_t actualSize = FileSize(path) + FileSize(m_spLogger->GetLogFilePath());
-    EXPECT_GT(actualSize, 0);
-
-    ssize_t expectedSize = LogSize(random) * count;
-    EXPECT_GT(expectedSize, 0);
-
-    EXPECT_GE(actualSize, expectedSize);
+    EXPECT_GE(actualSize, expectedSize * count);
 }

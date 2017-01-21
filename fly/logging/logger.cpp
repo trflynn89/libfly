@@ -99,6 +99,12 @@ std::string Logger::GetLogFilePath() const
 }
 
 //==============================================================================
+LoggerConfigPtr Logger::GetLogConfig() const
+{
+    return m_spConfig;
+}
+
+//==============================================================================
 bool Logger::StartRunner()
 {
     return createLogFile();
