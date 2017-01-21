@@ -4,17 +4,17 @@
 #include <gtest/gtest.h>
 
 #include <fly/file/ini_parser.h>
+#include <fly/file/path.h>
 #include <fly/logging/logger.h>
 #include <fly/string/string.h>
-#include <fly/system/system.h>
 
 //==============================================================================
 class IniParserTest : public ::testing::Test
 {
 public:
     IniParserTest() :
-        m_path(fly::System::Join(
-            fly::System::GetTempDirectory(), fly::String::GenerateRandomString(10)
+        m_path(fly::Path::Join(
+            fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
         )),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
         m_spParser(std::make_shared<fly::IniParser>(m_path, m_file))
@@ -27,7 +27,7 @@ public:
      */
     virtual void SetUp()
     {
-        ASSERT_TRUE(fly::System::MakePath(m_path));
+        ASSERT_TRUE(fly::Path::MakePath(m_path));
     }
 
     /**
@@ -35,7 +35,7 @@ public:
      */
     virtual void TearDown()
     {
-        ASSERT_TRUE(fly::System::RemovePath(m_path));
+        ASSERT_TRUE(fly::Path::RemovePath(m_path));
     }
 
 protected:
@@ -67,7 +67,7 @@ protected:
      */
     std::string GetFullPath() const
     {
-        static const char sep = fly::System::GetSeparator();
+        static const char sep = fly::Path::GetSeparator();
         return fly::String::Join(sep, m_path, m_file);
     }
 

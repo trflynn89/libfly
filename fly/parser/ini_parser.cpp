@@ -3,8 +3,8 @@
 #include <cstring>
 #include <fstream>
 
+#include <fly/file/path.h>
 #include <fly/string/string.h>
-#include <fly/system/system.h>
 
 namespace fly {
 
@@ -17,7 +17,7 @@ IniParser::IniParser(const std::string &path, const std::string &file) :
 //==============================================================================
 void IniParser::Parse()
 {
-    std::string fullPath = System::Join(m_path, m_file);
+    std::string fullPath = Path::Join(m_path, m_file);
     std::ifstream stream(fullPath.c_str(), std::ios::in);
 
     std::string line, section;

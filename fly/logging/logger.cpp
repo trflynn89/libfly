@@ -8,6 +8,7 @@
 
 #include <fly/concurrency/concurrent_queue.h>
 #include <fly/config/config_manager.h>
+#include <fly/file/path.h>
 #include <fly/logging/logger_config.h>
 #include <fly/string/string.h>
 #include <fly/system/system.h>
@@ -148,7 +149,7 @@ bool Logger::createLogFile()
     String::ReplaceAll(timeStr, " ", "_");
 
     std::string fileName = String::Format("Log_%s_%s.log", timeStr, randStr);
-    fileName = System::Join(m_filePath, fileName);
+    fileName = Path::Join(m_filePath, fileName);
 
     if (m_logFile.is_open())
     {

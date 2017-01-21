@@ -6,9 +6,9 @@
 #include <fly/config/config.h>
 #include <fly/config/config_manager.h>
 #include <fly/file/parser.h>
+#include <fly/file/path.h>
 #include <fly/logging/logger.h>
 #include <fly/string/string.h>
-#include <fly/system/system.h>
 
 //==============================================================================
 class ConfigTest : public ::testing::Test
@@ -78,8 +78,8 @@ class ConfigManagerTest : public ::testing::Test
 {
 public:
     ConfigManagerTest() :
-        m_path(fly::System::Join(
-            fly::System::GetTempDirectory(), fly::String::GenerateRandomString(10)
+        m_path(fly::Path::Join(
+            fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
         )),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
@@ -94,7 +94,7 @@ public:
      */
     virtual void SetUp()
     {
-        ASSERT_TRUE(fly::System::MakePath(m_path));
+        ASSERT_TRUE(fly::Path::MakePath(m_path));
         ASSERT_TRUE(m_spConfigManager->Start());
     }
 
@@ -104,7 +104,7 @@ public:
     virtual void TearDown()
     {
         m_spConfigManager->Stop();
-        ASSERT_TRUE(fly::System::RemovePath(m_path));
+        ASSERT_TRUE(fly::Path::RemovePath(m_path));
     }
 
 protected:
@@ -136,7 +136,7 @@ protected:
      */
     std::string GetFullPath() const
     {
-        static const char sep = fly::System::GetSeparator();
+        static const char sep = fly::Path::GetSeparator();
         return fly::String::Join(sep, m_path, m_file);
     }
 
