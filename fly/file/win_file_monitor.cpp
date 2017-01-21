@@ -73,6 +73,8 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
     LPOVERLAPPED pOverlapped = NULL;
     DWORD millis = static_cast<DWORD>(timeout.count());
 
+    std::string pathToRemove;
+
     if (::GetQueuedCompletionStatus(m_iocp, &bytes, &pKey, &pOverlapped, millis))
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -92,9 +94,14 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 
             if (!spInfo->Refresh(it->first))
             {
-                m_pathInfo.erase(it);
+                pathToRemove = it->first;
             }
         }
+    }
+
+    if (!pathToRemove.empty())
+    {
+        RemovePath(pathToRemove);
     }
 }
 

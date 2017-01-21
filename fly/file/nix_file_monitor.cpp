@@ -149,7 +149,7 @@ void FileMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
     {
         PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(it->second));
 
-        FileEventCallback &callback = spInfo->m_handlers[pEvent->name];
+        FileMonitor::FileEventCallback &callback = spInfo->m_handlers[pEvent->name];
         FileMonitor::FileEvent event = convertToEvent(pEvent->mask);
 
         if ((callback != nullptr) && (event != FileMonitor::FILE_NO_CHANGE))

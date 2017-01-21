@@ -66,7 +66,7 @@ private:
 
         /**
          * Call the ReadDirectoryChangesW API for this path. Should be called
-         * after initialization and each time an IOCP completion is occurs for
+         * after initialization and each time an IOCP completion occurs for
          * this path.
          *
          * @param string Name of the monitored path.
@@ -83,6 +83,7 @@ private:
      * Handle a FILE_NOTIFY_INFORMATION event for a path.
      *
      * @param PathInfoMap::value_type The path's entry in the PathInfoMap.
+     * @param string Name of the path.
      */
     void handleEvents(const PathInfoImplPtr &, const std::string &) const;
 

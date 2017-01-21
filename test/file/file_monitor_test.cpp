@@ -58,6 +58,7 @@ public:
     virtual void TearDown()
     {
         m_spMonitor->Stop();
+
         ASSERT_TRUE(fly::System::RemovePath(m_path1));
         ASSERT_TRUE(fly::System::RemovePath(m_path2));
     }
@@ -225,7 +226,6 @@ TEST_F(FileMonitorTest, ChangeTest)
 //==============================================================================
 TEST_F(FileMonitorTest, OtherFileTest)
 {
-
     EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
     EXPECT_EQ(m_numDeletedFiles[m_fullPath1], 0);
     EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
@@ -294,4 +294,30 @@ TEST_F(FileMonitorTest, MultipleFileTest)
     EXPECT_EQ(m_numDeletedFiles[m_fullPath3], 1);
     EXPECT_EQ(m_numChangedFiles[m_fullPath3], 1);
     EXPECT_EQ(m_numOtherEvents[m_fullPath3], 0);
+}
+
+//==============================================================================
+TEST_F(FileMonitorTest, RemoveTest)
+{
+    // Test removing files and paths that were not being monitored
+    EXPECT_FALSE(m_spMonitor->RemoveFile("was not", m_file1));
+    EXPECT_FALSE(m_spMonitor->RemoveFile(m_path1, "monitoring"));
+    EXPECT_FALSE(m_spMonitor->RemovePath("any of this"));
+
+    // For the path with two monitored files:
+    // 1. Remove one of the files - should succeed
+    // 2. Remove the whole path - should succeed
+    // 3. Remove the second file - should fail, wasn't being monitored any more
+    // 4. Remove the whole path - should fail
+    EXPECT_TRUE(m_spMonitor->RemoveFile(m_path1, m_file1));
+    EXPECT_TRUE(m_spMonitor->RemovePath(m_path1));
+    EXPECT_FALSE(m_spMonitor->RemoveFile(m_path1, m_file2));
+    EXPECT_FALSE(m_spMonitor->RemovePath(m_path1));
+
+    // For the path with one monitored file:
+    // 1. Remove the monitored file - should succeed
+    // 2. Remove the whole path - should fail, path will gets removed when the
+    //    last monitored file is removed
+    EXPECT_TRUE(m_spMonitor->RemoveFile(m_path2, m_file3));
+    EXPECT_FALSE(m_spMonitor->RemovePath(m_path2));
 }

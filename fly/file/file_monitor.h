@@ -64,6 +64,8 @@ public:
      * @param string Directory containing the file to start monitoring.
      * @param string Name of the file to start monitoring.
      * @param FileEventCallback Callback to trigger when the file changes.
+     *
+     * @return bool True if the file could be added.
      */
     bool AddFile(const std::string &, const std::string &, FileEventCallback);
 
@@ -72,8 +74,24 @@ public:
      *
      * @param string Directory containing the file to stop monitoring.
      * @param string Name of the file to stop monitoring.
+     *
+     * @return bool True if the file was removed.
      */
     bool RemoveFile(const std::string &, const std::string &);
+
+    /**
+     * Stop monitoring all files under the given path.
+     *
+     * @param string Directory containing the files to stop monitoring.
+     *
+     * @return bool True if the path was removed.
+     */
+    bool RemovePath(const std::string &);
+
+    /**
+     * Stop monitoring all files.
+     */
+    void RemoveAllPaths();
 
 protected:
     DEFINE_STRUCT_PTRS(PathInfo);

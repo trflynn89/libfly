@@ -19,6 +19,7 @@ FileMonitor::FileMonitor() : Runner("FileMonitor", 1)
 //==============================================================================
 FileMonitor::~FileMonitor()
 {
+    RemoveAllPaths();
     Stop();
 }
 
@@ -59,7 +60,7 @@ bool FileMonitor::AddFile(
         spInfo = it->second;
     }
 
-    LOGD(-1, "Watching for changes to \"%s\" in \"%s\"", file, path);
+    LOGD(-1, "Monitoring \"%s\" in \"%s\"", file, path);
     spInfo->m_handlers[file] = callback;
 
     return true;
@@ -68,33 +69,60 @@ bool FileMonitor::AddFile(
 //==============================================================================
 bool FileMonitor::RemoveFile(const std::string &path, const std::string &file)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-
-    auto it = m_pathInfo.find(path);
-
-    if (it != m_pathInfo.end())
+    bool removePath = false;
     {
-        PathInfoPtr spInfo(it->second);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        auto it = m_pathInfo.find(path);
 
+        if (it == m_pathInfo.end())
+        {
+            LOGW(-1, "Wasn't monitoring \"%s\"", path);
+            return false;
+        }
+
+        PathInfoPtr spInfo(it->second);
         auto it2 = spInfo->m_handlers.find(file);
 
-        if (it2 != spInfo->m_handlers.end())
+        if (it2 == spInfo->m_handlers.end())
         {
-            LOGD(-1, "Stopped watching for changes to \"%s\" in \"%s\"", file, path);
-            spInfo->m_handlers.erase(it2);
-
-            if (spInfo->m_handlers.empty())
-            {
-                LOGI(-1, "Removed watcher for \"%s\"", path);
-                m_pathInfo.erase(it);
-            }
-
-            return true;
+            LOGW(-1, "Wasn't monitoring \"%s\" in \"%s\"", file, path);
+            return false;
         }
+
+        LOGD(-1, "Stopped monitoring \"%s\" in \"%s\"", file, path);
+        spInfo->m_handlers.erase(it2);
+
+        removePath = spInfo->m_handlers.empty();
     }
 
-    LOGW(-1, "Not watching for changes to \"%s\" in \"%s\"", file, path);
-    return false;
+    return (removePath ? RemovePath(path) : true);
+}
+
+//==============================================================================
+bool FileMonitor::RemovePath(const std::string &path)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = m_pathInfo.find(path);
+
+    if (it == m_pathInfo.end())
+    {
+        LOGW(-1, "Wasn't monitoring \"%s\"", path);
+        return false;
+    }
+
+    LOGI(-1, "Removed monitor for \"%s\"", path);
+    m_pathInfo.erase(it);
+
+    return true;
+}
+
+//==============================================================================
+void FileMonitor::RemoveAllPaths()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    LOGI(-1, "Removed all monitors");
+    m_pathInfo.clear();
 }
 
 //==============================================================================
