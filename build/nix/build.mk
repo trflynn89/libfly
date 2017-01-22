@@ -77,12 +77,12 @@ gcov:
 		file=$$(basename "$$obj") ; \
 		\
 		pushd $$path > /dev/null ; \
-		gcov -l $$file ; \
+		gcov $(GCOV_FLAGS) $$file ; \
 		\
 		popd > /dev/null ; \
 	done ; \
 	\
-	find . -name "*\#\#*.gcov" | xargs grep -l "/usr/include" | xargs -I {} rm -f {}
+	find . -name "*\#\#*.gcov" | xargs grep -l "/usr/include" | xargs -I {} $(RM) {}
 
 # Build and run the target
 run: $(TARGET_PACKAGE)

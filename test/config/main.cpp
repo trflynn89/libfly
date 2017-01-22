@@ -186,6 +186,18 @@ TEST_F(ConfigManagerTest, DeletedConfigTest)
     }
 
     EXPECT_EQ(m_spConfigManager->GetSize(), 0);
+
+    {
+        auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
+        EXPECT_EQ(m_spConfigManager->GetSize(), 1);
+    }
+
+    auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
+    EXPECT_FALSE(spConfig.get() == NULL);
+    spConfig.reset();
+
+    spConfig = m_spConfigManager->CreateConfig<fly::Config>();
+    EXPECT_FALSE(spConfig.get() == NULL);
 }
 
 //==============================================================================

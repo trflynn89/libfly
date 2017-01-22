@@ -22,6 +22,7 @@ $(eval $(call ADD_TEST_TARGET, parser_test, test/parser))
 $(eval $(call ADD_TEST_TARGET, socket_test, test/socket))
 $(eval $(call ADD_TEST_TARGET, string_test, test/string))
 $(eval $(call ADD_TEST_TARGET, system_test, test/system))
+$(eval $(call ADD_TEST_TARGET, task_test, test/task))
 $(eval $(call ADD_TEST_TARGET, traits_test, test/traits))
 
 # Import the build system

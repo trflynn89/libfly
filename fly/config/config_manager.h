@@ -131,7 +131,7 @@ std::shared_ptr<T> ConfigManager::CreateConfig()
 
         if (spBaseConfig)
         {
-            spConfig = std::static_pointer_cast<T>(spBaseConfig);
+            spConfig = DownCast<T>(spBaseConfig);
         }
         else
         {

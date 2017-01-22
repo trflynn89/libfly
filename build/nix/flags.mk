@@ -34,7 +34,7 @@ ifeq ($(release), 1)
         CF_ALL += -fPIC
     endif
 else
-    CF_ALL += -O0 -g -coverage
+    CF_ALL += -O0 -g --coverage
 endif
 
 # Qt5 flags
@@ -57,7 +57,10 @@ endif
 CFLAGS := -std=c14 $(CF_ALL)
 CXXFLAGS := -std=c++14 $(CF_ALL)
 
-# Tar flags
+# gcov flags
+GCOV_FLAGS := -l
+
+# tar flags
 ifeq ($(verbose), 1)
     TAR_EXTRACT_FLAGS := -xjvf
     TAR_CREATE_FLAGS := -cjvf
