@@ -94,6 +94,12 @@ TEST_F(RunnerTest, DoWorkTest)
 }
 
 //==============================================================================
+TEST_F(RunnerTest, FailedStartTest)
+{
+    EXPECT_FALSE(m_spTask2->Start());
+}
+
+//==============================================================================
 TEST_F(RunnerTest, NeverStartedTest)
 {
     unsigned int count1 = m_spTask2->GetCallCount();
