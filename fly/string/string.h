@@ -107,6 +107,16 @@ public:
     static bool EndsWith(const std::string &, const std::string &);
 
     /**
+     * Check if a string matches another string with wildcard expansion.
+     *
+     * @param string The source string to match against.
+     * @param string The wildcard string to search with.
+     *
+     * @return True if the wildcard string matches the source string.
+     */
+    static bool WildcardMatch(const std::string &, const std::string &);
+
+    /**
      * Generate a random string of the given size.
      *
      * @param unsigned int The length of the string to generate.

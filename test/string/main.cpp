@@ -296,6 +296,33 @@ TEST(StringTest, EndsWithTest)
 }
 
 //==============================================================================
+TEST(StringTest, WildcardTest)
+{
+    EXPECT_TRUE(fly::String::WildcardMatch("", "*"));
+    EXPECT_TRUE(fly::String::WildcardMatch("", "**"));
+
+    EXPECT_TRUE(fly::String::WildcardMatch("a", "a"));
+    EXPECT_TRUE(fly::String::WildcardMatch("b", "*"));
+    EXPECT_TRUE(fly::String::WildcardMatch("c", "**"));
+
+    EXPECT_TRUE(fly::String::WildcardMatch("abc", "a*"));
+    EXPECT_TRUE(fly::String::WildcardMatch("abc", "ab*"));
+    EXPECT_TRUE(fly::String::WildcardMatch("abc", "a*c"));
+    EXPECT_TRUE(fly::String::WildcardMatch("abc", "*b*"));
+    EXPECT_TRUE(fly::String::WildcardMatch("abc", "*bc"));
+    EXPECT_TRUE(fly::String::WildcardMatch("abc", "*c"));
+
+    EXPECT_FALSE(fly::String::WildcardMatch("", ""));
+    EXPECT_FALSE(fly::String::WildcardMatch("a", ""));
+    EXPECT_FALSE(fly::String::WildcardMatch("a", "b"));
+    EXPECT_FALSE(fly::String::WildcardMatch("a", "b*"));
+    EXPECT_FALSE(fly::String::WildcardMatch("a", "*b"));
+    EXPECT_FALSE(fly::String::WildcardMatch("abc", "a"));
+    EXPECT_FALSE(fly::String::WildcardMatch("abc", "b*"));
+    EXPECT_FALSE(fly::String::WildcardMatch("abc", "*b"));
+}
+
+//==============================================================================
 TEST(StringTest, GenerateRandomStringTest)
 {
     static const int length = (1 << 20);

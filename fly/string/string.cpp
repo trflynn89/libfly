@@ -158,6 +158,40 @@ bool String::EndsWith(const std::string &source, const std::string &search)
 }
 
 //==============================================================================
+bool String::WildcardMatch(const std::string &source, const std::string &search)
+{
+    static const char wildcard = '*';
+    bool ret = !search.empty();
+
+    const std::vector<std::string> segments = Split(search, wildcard);
+    std::string::size_type pos = 0;
+
+    if (!segments.empty())
+    {
+        if (ret && (search.front() != wildcard))
+        {
+            ret = StartsWith(source, segments.front());
+        }
+        if (ret && (search.back() != wildcard))
+        {
+            ret = EndsWith(source, segments.back());
+        }
+
+        for (auto it = segments.begin(); ret && (it != segments.end()); ++it)
+        {
+            pos = source.find(*it, pos);
+
+            if (pos == std::string::npos)
+            {
+                ret = false;
+            }
+        }
+    }
+
+    return ret;
+}
+
+//==============================================================================
 float String::CalculateEntropy(const std::string &source)
 {
     long charCount[s_asciiSize] = { 0 };
