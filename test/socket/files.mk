@@ -8,7 +8,7 @@ SRC_DIRS_$(d) := \
     fly/string \
     fly/system \
     fly/task \
-    test/googletest
+    test
 
 # Define libraries to link
 LDLIBS_$(d) := -lpthread
