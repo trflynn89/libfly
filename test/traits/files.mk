@@ -3,7 +3,7 @@ SRC_DIRS_$(d) := \
     test/googletest
 
 # Define libraries to link
-LDLIBS_$(d) := -lfly -lpthread
+LDLIBS_$(d) := -lpthread
 
 # Define source files
 $(eval $(call WILDCARD_SOURCES))

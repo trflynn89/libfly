@@ -6,7 +6,6 @@
 #include <gtest/gtest.h>
 
 #include <fly/concurrency/concurrent_queue.h>
-#include <fly/logger/logger.h>
 
 namespace
 {

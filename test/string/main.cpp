@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include <fly/logger/logger.h>
 #include <fly/string/string.h>
 
 namespace
@@ -343,8 +342,6 @@ TEST(StringTest, EntropyTest)
     float ent2 = fly::String::CalculateEntropy(str2);
     float ent3 = fly::String::CalculateEntropy(str3);
     float ent4 = fly::String::CalculateEntropy(str4);
-
-    LOGC("E1=%f, E2=%f, E3=%f, E4=%f", ent1, ent2, ent3, ent4);
 
     // Expect entropy to decrease for less random strings
     EXPECT_GT(ent1, ent2);
