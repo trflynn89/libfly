@@ -1,6 +1,5 @@
 # Define the directories to include and compile
-SRC_DIRS_$(d) := \
-    test
+SRC_DIRS_$(d) :=
 
 # Define libraries to link
 LDLIBS_$(d) := -lpthread

@@ -1,7 +1,6 @@
 # Define the directories to include and compile
 SRC_DIRS_$(d) := \
-    fly/string \
-    test
+    fly/string
 
 # Define libraries to link
 LDLIBS_$(d) := -lpthread
