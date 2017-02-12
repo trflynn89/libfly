@@ -71,20 +71,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\test\googletest;$(SolutionDir)..\..\test\googletest\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\googletest\googletest;$(SolutionDir)..\..\test\googletest\googletest\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\test\googletest;$(SolutionDir)..\..\test\googletest\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\googletest\googletest;$(SolutionDir)..\..\test\googletest\googletest\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)..\..\test\googletest;$(SolutionDir)..\..\test\googletest\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\googletest\googletest;$(SolutionDir)..\..\test\googletest\googletest\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..\..\test\googletest;$(SolutionDir)..\..\test\googletest\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\googletest\googletest;$(SolutionDir)..\..\test\googletest\googletest\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
   </PropertyGroup>
@@ -129,8 +129,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\googletest\src\gtest-all.cc" />
-    <ClCompile Include="..\..\..\test\googletest\src\gtest_main.cc" />
+    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest-all.cc" />
+    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest_main.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

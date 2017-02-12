@@ -22,8 +22,8 @@ endif
 
 # Unit tests include Google test
 ifneq ($(findstring $(target),$(TEST_TARGETS)),)
-    CF_ALL += -isystem $(SOURCE_ROOT)/test/googletest/include
-    CF_ALL += -I$(SOURCE_ROOT)/test/googletest
+    CF_ALL += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
+    CF_ALL += -I$(SOURCE_ROOT)/test/googletest/googletest
 endif
 
 # Optimize release builds and add GDB symbols to debug builds
