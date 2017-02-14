@@ -19,8 +19,6 @@ DEFINE_CLASS_PTRS(FileMonitorImpl);
  */
 class FileMonitorImpl : public FileMonitor
 {
-    friend class FileMonitor;
-
 public:
     FileMonitorImpl();
     virtual ~FileMonitorImpl();
@@ -32,14 +30,8 @@ public:
      */
     virtual bool IsValid() const;
 
-    /**
-     * Get the file monitor's inotify handle.
-     *
-     * @return int The inotify handle.
-     */
-    int GetMonitorHandle() const;
-
 protected:
+    virtual FileMonitor::PathInfoPtr CreatePathInfo(const std::string &);
     virtual void Poll(const std::chrono::milliseconds &);
     virtual void Close();
 
@@ -53,7 +45,7 @@ private:
      */
     struct PathInfoImpl : FileMonitor::PathInfo
     {
-        PathInfoImpl(const FileMonitorPtr &, const std::string &);
+        PathInfoImpl(int, const std::string &);
         virtual ~PathInfoImpl();
 
         /**

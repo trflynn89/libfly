@@ -50,11 +50,17 @@ bool FileMonitorImpl::IsValid() const
 }
 
 //==============================================================================
-int FileMonitorImpl::GetMonitorHandle() const
+FileMonitor::PathInfoPtr FileMonitorImpl::CreatePathInfo(const std::string &path)
 {
-    return m_monitorDescriptor;
-}
+    FileMonitor::PathInfoPtr spInfo;
 
+    if (IsValid())
+    {
+        spInfo = std::make_shared<PathInfoImpl>(m_monitorDescriptor, path);
+    }
+
+    return spInfo;
+}
 
 //==============================================================================
 void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
@@ -185,22 +191,13 @@ FileMonitor::FileEvent FileMonitorImpl::convertToEvent(int mask) const
 
 //==============================================================================
 FileMonitorImpl::PathInfoImpl::PathInfoImpl(
-    const FileMonitorPtr &spMonitor,
+    int monitorDescriptor,
     const std::string &path
 ) :
     FileMonitorImpl::PathInfo(),
-    m_monitorDescriptor(-1),
+    m_monitorDescriptor(monitorDescriptor),
     m_watchDescriptor(-1)
 {
-    FileMonitorImplPtr spMonitorImpl(DownCast<FileMonitorImpl>(spMonitor));
-    m_monitorDescriptor = spMonitorImpl->GetMonitorHandle();
-
-    if (m_monitorDescriptor == -1)
-    {
-        LOGW(-1, "File monitor's handle is invalid");
-        return;
-    }
-
     m_watchDescriptor = ::inotify_add_watch(
         m_monitorDescriptor, path.c_str(), s_changeFlags
     );

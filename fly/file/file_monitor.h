@@ -136,6 +136,15 @@ protected:
     virtual bool DoWork();
 
     /**
+     * Create an instance of the OS dependent PathInfo struct.
+     *
+     * @param string Directory containing the file to be monitored.
+     *
+     * @return PathInfoPtr Up-casted shared pointer to the PathInfo struct.
+     */
+    virtual PathInfoPtr CreatePathInfo(const std::string &) = 0;
+
+    /**
      * Poll for any file changes.
      *
      * @param milliseconds Max time to poll for file changes.

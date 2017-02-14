@@ -22,8 +22,6 @@ DEFINE_CLASS_PTRS(FileMonitorImpl);
  */
 class FileMonitorImpl : public FileMonitor
 {
-    friend class FileMonitor;
-
 public:
     FileMonitorImpl();
     virtual ~FileMonitorImpl();
@@ -35,14 +33,8 @@ public:
      */
     virtual bool IsValid() const;
 
-    /**
-     * Get the file monitor's IOCP handle.
-     *
-     * @return HANDLE The IOCP handle.
-     */
-    HANDLE GetIocpHandle() const;
-
 protected:
+    virtual FileMonitor::PathInfoPtr CreatePathInfo(const std::string &);
     virtual void Poll(const std::chrono::milliseconds &);
     virtual void Close();
 
@@ -56,7 +48,7 @@ private:
      */
     struct PathInfoImpl : public FileMonitor::PathInfo
     {
-        PathInfoImpl(const FileMonitorPtr &, const std::string &);
+        PathInfoImpl(HANDLE, const std::string &);
         virtual ~PathInfoImpl();
 
         /**

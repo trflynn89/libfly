@@ -1,6 +1,5 @@
 #include "file_monitor.h"
 
-#include <fly/file/file_monitor_impl.h>
 #include <fly/logger/logger.h>
 
 namespace fly {
@@ -43,10 +42,9 @@ bool FileMonitor::AddFile(
 
     if (it == m_pathInfo.end())
     {
-        FileMonitorPtr spMonitor = SharedFromThis<FileMonitor>();
-        spInfo = std::make_shared<FileMonitorImpl::PathInfoImpl>(spMonitor, path);
+        spInfo = CreatePathInfo(path);
 
-        if (spInfo->IsValid())
+        if (spInfo && spInfo->IsValid())
         {
             m_pathInfo[path] = spInfo;
         }

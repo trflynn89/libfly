@@ -60,9 +60,16 @@ bool FileMonitorImpl::IsValid() const
 }
 
 //==============================================================================
-HANDLE FileMonitorImpl::GetIocpHandle() const
+FileMonitor::PathInfoPtr FileMonitorImpl::CreatePathInfo(const std::string &path)
 {
-    return m_iocp;
+    FileMonitor::PathInfoPtr spInfo;
+
+    if (IsValid())
+    {
+        spInfo = std::make_shared<PathInfoImpl>(m_iocp, path);
+    }
+
+    return spInfo;
 }
 
 //==============================================================================
@@ -181,25 +188,13 @@ FileMonitor::FileEvent FileMonitorImpl::convertToEvent(DWORD action) const
 }
 
 //==============================================================================
-FileMonitorImpl::PathInfoImpl::PathInfoImpl(
-    const FileMonitorPtr &spMonitor,
-    const std::string &path
-) :
+FileMonitorImpl::PathInfoImpl::PathInfoImpl(HANDLE iocp, const std::string &path) :
     FileMonitorImpl::PathInfo(),
     m_valid(false),
     m_handle(INVALID_HANDLE_VALUE),
     m_pInfo(NULL)
 {
     ::memset(&m_overlapped, 0, sizeof(m_overlapped));
-
-    FileMonitorImplPtr spMonitorImpl(DownCast<FileMonitorImpl>(spMonitor));
-    HANDLE iocp = spMonitorImpl->GetIocpHandle();
-
-    if (iocp == NULL)
-    {
-        LOGW(-1, "File monitor's IOCP is NULL");
-        return;
-    }
 
     DWORD attributes = ::GetFileAttributes(path.c_str());
 
