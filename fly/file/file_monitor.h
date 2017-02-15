@@ -142,7 +142,7 @@ protected:
      *
      * @return PathInfoPtr Up-casted shared pointer to the PathInfo struct.
      */
-    virtual PathInfoPtr CreatePathInfo(const std::string &) = 0;
+    virtual PathInfoPtr CreatePathInfo(const std::string &) const = 0;
 
     /**
      * Poll for any file changes.

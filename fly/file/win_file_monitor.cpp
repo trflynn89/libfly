@@ -60,7 +60,7 @@ bool FileMonitorImpl::IsValid() const
 }
 
 //==============================================================================
-FileMonitor::PathInfoPtr FileMonitorImpl::CreatePathInfo(const std::string &path)
+FileMonitor::PathInfoPtr FileMonitorImpl::CreatePathInfo(const std::string &path) const
 {
     FileMonitor::PathInfoPtr spInfo;
 

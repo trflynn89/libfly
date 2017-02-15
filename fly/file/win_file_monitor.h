@@ -34,7 +34,7 @@ public:
     virtual bool IsValid() const;
 
 protected:
-    virtual FileMonitor::PathInfoPtr CreatePathInfo(const std::string &);
+    virtual FileMonitor::PathInfoPtr CreatePathInfo(const std::string &) const;
     virtual void Poll(const std::chrono::milliseconds &);
     virtual void Close();
 
