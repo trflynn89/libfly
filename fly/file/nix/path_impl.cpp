@@ -1,4 +1,4 @@
-#include "nix_path.h"
+#include "path_impl.h"
 
 #include <cstring>
 #include <fts.h>

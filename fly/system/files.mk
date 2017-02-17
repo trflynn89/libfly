@@ -1,4 +1,4 @@
 # Define source files
 SRC_$(d) := \
     $(d)/system.cpp \
-    $(d)/nix_system.cpp
+    $(d)/nix/system_impl.cpp

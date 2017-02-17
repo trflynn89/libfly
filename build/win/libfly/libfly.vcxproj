@@ -148,8 +148,8 @@
     <ClInclude Include="..\..\..\fly\file\file_monitor.h" />
     <ClInclude Include="..\..\..\fly\file\file_monitor_impl.h" />
     <ClInclude Include="..\..\..\fly\file\path.h" />
-    <ClInclude Include="..\..\..\fly\file\win_file_monitor.h" />
-    <ClInclude Include="..\..\..\fly\file\win_path.h" />
+    <ClInclude Include="..\..\..\fly\file\win\file_monitor_impl.h" />
+    <ClInclude Include="..\..\..\fly\file\win\path_impl.h" />
     <ClInclude Include="..\..\..\fly\fly.h" />
     <ClInclude Include="..\..\..\fly\logger\log.h" />
     <ClInclude Include="..\..\..\fly\logger\logger.h" />
@@ -163,11 +163,11 @@
     <ClInclude Include="..\..\..\fly\socket\socket_impl.h" />
     <ClInclude Include="..\..\..\fly\socket\socket_manager.h" />
     <ClInclude Include="..\..\..\fly\socket\socket_manager_impl.h" />
-    <ClInclude Include="..\..\..\fly\socket\win_socket.h" />
-    <ClInclude Include="..\..\..\fly\socket\win_socket_manager.h" />
+    <ClInclude Include="..\..\..\fly\socket\win\socket_impl.h" />
+    <ClInclude Include="..\..\..\fly\socket\win\socket_manager_impl.h" />
     <ClInclude Include="..\..\..\fly\string\string.h" />
     <ClInclude Include="..\..\..\fly\system\system.h" />
-    <ClInclude Include="..\..\..\fly\system\win_system.h" />
+    <ClInclude Include="..\..\..\fly\system\win\system_impl.h" />
     <ClInclude Include="..\..\..\fly\task\runner.h" />
     <ClInclude Include="..\..\..\fly\task\task_config.h" />
     <ClInclude Include="..\..\..\fly\traits\type_traits.h" />
@@ -177,8 +177,8 @@
     <ClCompile Include="..\..\..\fly\config\config_manager.cpp" />
     <ClCompile Include="..\..\..\fly\file\file_monitor.cpp" />
     <ClCompile Include="..\..\..\fly\file\path.cpp" />
-    <ClCompile Include="..\..\..\fly\file\win_file_monitor.cpp" />
-    <ClCompile Include="..\..\..\fly\file\win_path.cpp" />
+    <ClCompile Include="..\..\..\fly\file\win\file_monitor_impl.cpp" />
+    <ClCompile Include="..\..\..\fly\file\win\path_impl.cpp" />
     <ClCompile Include="..\..\..\fly\logger\log.cpp" />
     <ClCompile Include="..\..\..\fly\logger\logger.cpp" />
     <ClCompile Include="..\..\..\fly\logger\logger_config.cpp" />
@@ -188,11 +188,11 @@
     <ClCompile Include="..\..\..\fly\socket\socket.cpp" />
     <ClCompile Include="..\..\..\fly\socket\socket_config.cpp" />
     <ClCompile Include="..\..\..\fly\socket\socket_manager.cpp" />
-    <ClCompile Include="..\..\..\fly\socket\win_socket.cpp" />
-    <ClCompile Include="..\..\..\fly\socket\win_socket_manager.cpp" />
+    <ClCompile Include="..\..\..\fly\socket\win\socket_impl.cpp" />
+    <ClCompile Include="..\..\..\fly\socket\win\socket_manager_impl.cpp" />
     <ClCompile Include="..\..\..\fly\string\string.cpp" />
     <ClCompile Include="..\..\..\fly\system\system.cpp" />
-    <ClCompile Include="..\..\..\fly\system\win_system.cpp" />
+    <ClCompile Include="..\..\..\fly\system\win\system_impl.cpp" />
     <ClCompile Include="..\..\..\fly\task\runner.cpp" />
     <ClCompile Include="..\..\..\fly\task\task_config.cpp" />
   </ItemGroup>

@@ -1,11 +1,10 @@
-#include "nix_system.h"
+#include "system_impl.h"
+
+#include <Windows.h>
 
 #include <atomic>
 #include <chrono>
-#include <cstring>
-#include <execinfo.h>
 #include <signal.h>
-#include <unistd.h>
 
 #include <fly/logger/logger.h>
 
@@ -33,8 +32,6 @@ namespace
             cleanExit = true;
             break;
 
-        case SIGSYS:
-        case SIGBUS:
         case SIGILL:
         case SIGFPE:
         case SIGABRT:
@@ -67,8 +64,12 @@ namespace
 void SystemImpl::PrintBacktrace()
 {
     void *trace[10];
-    int traceSize = ::backtrace(trace, 10);
-    ::backtrace_symbols_fd(trace, traceSize, STDERR_FILENO);
+    const USHORT traceSize = ::CaptureStackBackTrace(0, 10, trace, NULL);
+
+    for (USHORT i = 0; i < traceSize; ++i)
+    {
+        LOGC_NO_LOCK("[%3u] %x", i, trace[i]);
+    }
 }
 
 //==============================================================================
@@ -79,7 +80,7 @@ std::string SystemImpl::LocalTime(const std::string &fmt)
 
     struct tm timeVal;
 
-    if (::localtime_r(&now, &timeVal) != NULL)
+    if (::localtime_s(&timeVal, &now) == 0)
     {
         char timeStr[32];
 
@@ -95,14 +96,31 @@ std::string SystemImpl::LocalTime(const std::string &fmt)
 //==============================================================================
 std::string SystemImpl::GetLastError(int *pCode)
 {
-    int error = errno;
+    int error = ::WSAGetLastError();
+    LPTSTR str = NULL;
+    std::string ret;
+
+    ::FormatMessage(
+        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&str, 0, NULL
+    );
+
+    if (str == NULL)
+    {
+        ret = std::to_string(error);
+    }
+    else
+    {
+        ret = "(" + std::to_string(error) + ") " + str;
+        ::LocalFree(str);
+    }
 
     if (pCode != NULL)
     {
         *pCode = error;
     }
 
-    return "(" + std::to_string(error) + ") " + ::strerror(error);
+    return ret;
 }
 
 //==============================================================================
@@ -110,8 +128,6 @@ void SystemImpl::SetupSignalHandler()
 {
     ::signal(SIGINT, handleSignal);
     ::signal(SIGTERM, handleSignal);
-    ::signal(SIGSYS, handleSignal);
-    ::signal(SIGBUS, handleSignal);
     ::signal(SIGILL, handleSignal);
     ::signal(SIGFPE, handleSignal);
     ::signal(SIGABRT, handleSignal);

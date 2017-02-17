@@ -34,6 +34,15 @@
     <Filter Include="logger">
       <UniqueIdentifier>{2b39b732-ea13-4003-8f0b-a98682d27bfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="file\win">
+      <UniqueIdentifier>{2acbf296-ac30-40d1-a973-8fa44f8ee6c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="socket\win">
+      <UniqueIdentifier>{56d585bc-1634-443f-af16-495a33bcc3fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="system\win">
+      <UniqueIdentifier>{777ac67a-f671-4f7e-b160-badc79076b55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\exit_codes.h" />
@@ -59,9 +68,6 @@
     <ClInclude Include="..\..\..\fly\file\file_monitor_impl.h">
       <Filter>file</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\file\win_file_monitor.h">
-      <Filter>file</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\traits\type_traits.h">
       <Filter>traits</Filter>
     </ClInclude>
@@ -72,9 +78,6 @@
       <Filter>task</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\system\system.h">
-      <Filter>system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\system\win_system.h">
       <Filter>system</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\string\string.h">
@@ -95,12 +98,6 @@
     <ClInclude Include="..\..\..\fly\socket\socket_manager_impl.h">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\win_socket.h">
-      <Filter>socket</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\win_socket_manager.h">
-      <Filter>socket</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\random\random_device.h">
       <Filter>random</Filter>
     </ClInclude>
@@ -108,9 +105,6 @@
       <Filter>socket</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\file\path.h">
-      <Filter>file</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\file\win_path.h">
       <Filter>file</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\ini_parser.h">
@@ -128,6 +122,21 @@
     <ClInclude Include="..\..\..\fly\logger\logger_config.h">
       <Filter>logger</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\file\win\file_monitor_impl.h">
+      <Filter>file\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\file\win\path_impl.h">
+      <Filter>file\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\socket\win\socket_impl.h">
+      <Filter>socket\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\socket\win\socket_manager_impl.h">
+      <Filter>socket\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\system\win\system_impl.h">
+      <Filter>system\win</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp">
@@ -139,9 +148,6 @@
     <ClCompile Include="..\..\..\fly\file\file_monitor.cpp">
       <Filter>file</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\file\win_file_monitor.cpp">
-      <Filter>file</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\fly\task\runner.cpp">
       <Filter>task</Filter>
     </ClCompile>
@@ -149,9 +155,6 @@
       <Filter>task</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\system\system.cpp">
-      <Filter>system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\system\win_system.cpp">
       <Filter>system</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\string\string.cpp">
@@ -166,19 +169,10 @@
     <ClCompile Include="..\..\..\fly\socket\socket_manager.cpp">
       <Filter>socket</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\socket\win_socket.cpp">
-      <Filter>socket</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\socket\win_socket_manager.cpp">
-      <Filter>socket</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\fly\socket\async_request.cpp">
       <Filter>socket</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\file\path.cpp">
-      <Filter>file</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\file\win_path.cpp">
       <Filter>file</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp">
@@ -195,6 +189,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\logger\logger_config.cpp">
       <Filter>logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\file\win\file_monitor_impl.cpp">
+      <Filter>file\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\file\win\path_impl.cpp">
+      <Filter>file\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\socket\win\socket_impl.cpp">
+      <Filter>socket\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\socket\win\socket_manager_impl.cpp">
+      <Filter>socket\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\system\win\system_impl.cpp">
+      <Filter>system\win</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
