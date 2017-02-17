@@ -20,11 +20,6 @@ enum LogLevel
     NUM_LEVELS
 };
 
-// Max allowed message length (bytes) per log. Default 256B.
-#ifndef MAX_MESSAGE_SIZE
-    #define MAX_MESSAGE_SIZE 256
-#endif
-
 namespace fly {
 
 /**
