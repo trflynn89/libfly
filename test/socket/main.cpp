@@ -6,12 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include <fly/concurrency/concurrent_queue.h>
-#include <fly/logger/logger.h>
-#include <fly/socket/async_request.h>
-#include <fly/socket/socket_impl.h>
-#include <fly/socket/socket_manager_impl.h>
-#include <fly/string/string.h>
+#include "fly/concurrency/concurrent_queue.h"
+#include "fly/logger/logger.h"
+#include "fly/socket/async_request.h"
+#include "fly/socket/socket_impl.h"
+#include "fly/socket/socket_manager_impl.h"
+#include "fly/string/string.h"
 
 //==============================================================================
 class SocketTest : public ::testing::Test

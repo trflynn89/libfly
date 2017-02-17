@@ -6,8 +6,8 @@
 
 #include <Windows.h>
 
-#include <fly/fly.h>
-#include <fly/file/file_monitor.h>
+#include "fly/fly.h"
+#include "fly/file/file_monitor.h"
 
 namespace fly {
 

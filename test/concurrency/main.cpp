@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include <fly/concurrency/concurrent_queue.h>
+#include "fly/concurrency/concurrent_queue.h"
 
 namespace
 {

@@ -4,8 +4,8 @@
 
 #include <Windows.h>
 
-#include <fly/fly.h>
-#include <fly/socket/socket_manager.h>
+#include "fly/fly.h"
+#include "fly/socket/socket_manager.h"
 
 namespace fly {
 

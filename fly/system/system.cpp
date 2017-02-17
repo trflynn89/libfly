@@ -1,9 +1,9 @@
-#include "system.h"
+#include "fly/system/system.h"
 
 #if defined(FLY_WINDOWS)
-    #include "win/system_impl.h"
+    #include "fly/system/win/system_impl.h"
 #elif defined(FLY_LINUX)
-    #include "nix/system_impl.h"
+    #include "fly/system/nix/system_impl.h"
 #endif
 
 namespace fly {

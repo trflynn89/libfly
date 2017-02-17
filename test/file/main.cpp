@@ -6,11 +6,11 @@
 
 #include <gtest/gtest.h>
 
-#include <fly/fly.h>
-#include <fly/file/file_monitor_impl.h>
-#include <fly/file/path.h>
-#include <fly/logger/logger.h>
-#include <fly/string/string.h>
+#include "fly/fly.h"
+#include "fly/file/file_monitor_impl.h"
+#include "fly/file/path.h"
+#include "fly/logger/logger.h"
+#include "fly/string/string.h"
 
 //==============================================================================
 class FileMonitorTest : public ::testing::Test

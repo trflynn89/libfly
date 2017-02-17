@@ -5,9 +5,9 @@
 
 #include <gtest/gtest.h>
 
-#include <fly/file/path.h>
-#include <fly/logger/logger.h>
-#include <fly/string/string.h>
+#include "fly/file/path.h"
+#include "fly/logger/logger.h"
+#include "fly/string/string.h"
 
 //==============================================================================
 class LoggerTest : public ::testing::Test

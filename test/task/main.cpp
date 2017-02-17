@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 
-#include <fly/fly.h>
-#include <fly/config/config_manager.h>
-#include <fly/task/runner.h>
+#include "fly/fly.h"
+#include "fly/config/config_manager.h"
+#include "fly/task/runner.h"
 
 DEFINE_CLASS_PTRS(CountTask);
 

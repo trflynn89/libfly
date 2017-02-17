@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 
-#include <fly/exit_codes.h>
-#include <fly/system/system.h>
+#include "fly/exit_codes.h"
+#include "fly/system/system.h"
 
 //==============================================================================
 TEST(SystemTest, LocalTimeTest)

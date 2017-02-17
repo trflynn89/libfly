@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 
-#include <fly/fly.h>
-#include <fly/logger/logger_config.h>
+#include "fly/fly.h"
+#include "fly/logger/logger_config.h"
 
 /**
  * Enumeration to define the level of a log.

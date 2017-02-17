@@ -1,12 +1,10 @@
-#define NOMINMAX
-
 #include <regex>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include <fly/string/string.h>
+#include "fly/string/string.h"
 
 namespace
 {
