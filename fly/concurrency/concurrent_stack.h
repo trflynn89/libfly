@@ -1,8 +1,8 @@
 #pragma once
 
-#include "fly/concurrency/concurrent_container.h"
-
 #include <stack>
+
+#include "fly/concurrency/concurrent_container.h"
 
 namespace fly {
 
