@@ -1,7 +1,7 @@
 @echo off
 
 :: Set msbuild
-set msbuild=%ProgramFiles(x86)%"\MSBuild\14.0\Bin\MSBuild.exe"
+set msbuild=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe
 if not exist "%msbuild%" echo error: "%msbuild%": not found & goto :eof
 
 :: Set the build directory
