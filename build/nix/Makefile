@@ -1,7 +1,7 @@
 # Define the path to the source directory
 SOURCE_ROOT := $(CURDIR)/../..
 
-# Define the library version
+# Define the project version
 VERSION = $(shell cat $(SOURCE_ROOT)/VERSION.md)
 
 # Import the build API

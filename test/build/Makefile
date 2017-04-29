@@ -3,6 +3,9 @@
 # Define the path to the source directory
 SOURCE_ROOT := $(CURDIR)
 
+# Define the project version
+VERSION = 1.0.0
+
 # Import the build API
 include /usr/src/fly/api.mk
 
@@ -10,7 +13,7 @@ include /usr/src/fly/api.mk
 $(eval $(call SET_DEFAULT_TARGET, libflytest))
 
 # Main targets
-$(eval $(call ADD_TARGET, libflytest, $(SOURCE_ROOT), BIN))
+$(eval $(call ADD_TARGET, libflytest, ., BIN))
 
 # Import the build system
 include /usr/src/fly/build.mk
