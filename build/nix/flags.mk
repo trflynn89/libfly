@@ -34,7 +34,7 @@ ifeq ($(release), 1)
         CF_ALL += -fPIC
     endif
 else
-    CF_ALL += -O0 -g --coverage
+    CF_ALL += -O0 -g --coverage -fsanitize=address -fno-omit-frame-pointer
 endif
 
 # Qt5 flags
@@ -59,6 +59,13 @@ CXXFLAGS := -std=c++14 $(CF_ALL)
 
 # gcov flags
 GCOV_FLAGS := -l
+
+# Address Sanitizer flags
+ASAN_FLAGS :=
+
+ifeq ($(release), 0)
+    ASAN_FLAGS += ASAN_OPTIONS=allow_user_segv_handler=true
+endif
 
 # tar flags
 ifeq ($(verbose), 1)
