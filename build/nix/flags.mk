@@ -8,7 +8,7 @@ MAKEFLAGS += --no-builtin-rules --no-print-directory
 SHELL := /bin/bash
 
 # Linker flags
-LDFLAGS := -L$(LIB_DIR)
+LDFLAGS := -L$(LIB_DIR) -fuse-ld=gold
 LDLIBS :=
 
 # Compiler flags for both C and C++ files
