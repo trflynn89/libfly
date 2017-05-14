@@ -139,7 +139,7 @@ void PathMonitorImpl::handleEvents(
 
         if (event != PathMonitor::NO_CHANGE)
         {
-            PathMonitor::PathEventCallback callback = spInfo->m_handlers[file];
+            PathMonitor::PathEventCallback callback = spInfo->m_fileHandlers[file];
 
             if (callback == nullptr)
             {
@@ -171,7 +171,7 @@ void PathMonitorImpl::handleEvents(
 //==============================================================================
 PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
 {
-    PathMonitor::PathEvent event = PathMonitor::FILE_NO_CHANGE;
+    PathMonitor::PathEvent event = PathMonitor::NO_CHANGE;
 
     switch (action)
     {
