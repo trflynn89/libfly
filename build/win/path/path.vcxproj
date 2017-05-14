@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{dcab15ff-9009-4a4a-93ea-998d69889398}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>file</RootNamespace>
+    <RootNamespace>path</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -178,7 +178,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\file\main.cpp" />
+    <ClCompile Include="..\..\..\test\path\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

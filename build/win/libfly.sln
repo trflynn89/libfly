@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "concurrency", "concurrency\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "config", "config\config.vcxproj", "{C725DCA0-5EC0-49AD-B0B8-52CAAA2AE387}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "file", "file\file.vcxproj", "{DCAB15FF-9009-4A4A-93EA-998D69889398}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "path", "path\path.vcxproj", "{DCAB15FF-9009-4A4A-93EA-998D69889398}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "string", "string\string.vcxproj", "{BE0E0DCE-2C64-4DB0-BD3A-EEF097A1E843}"
 EndProject

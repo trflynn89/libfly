@@ -1,4 +1,4 @@
-#include "fly/file/win/file_monitor_impl.h"
+#include "fly/path/win/path_monitor_impl.h"
 
 #include "fly/logger/logger.h"
 #include "fly/system/system.h"
@@ -37,32 +37,32 @@ namespace
 }
 
 //==============================================================================
-FileMonitorImpl::FileMonitorImpl() :
-    FileMonitor(),
+PathMonitorImpl::PathMonitorImpl() :
+    PathMonitor(),
     m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
 {
     if (m_iocp == NULL)
     {
-        LOGW(-1, "Could not initialize IOCP: %s", fly::System::GetLastError());
+        LOGW(-1, "Could not initialize IOCP: %s", System::GetLastError());
     }
 }
 
 //==============================================================================
-FileMonitorImpl::~FileMonitorImpl()
+PathMonitorImpl::~PathMonitorImpl()
 {
     Close();
 }
 
 //==============================================================================
-bool FileMonitorImpl::IsValid() const
+bool PathMonitorImpl::IsValid() const
 {
     return (m_iocp != NULL);
 }
 
 //==============================================================================
-FileMonitor::PathInfoPtr FileMonitorImpl::CreatePathInfo(const std::string &path) const
+PathMonitor::PathInfoPtr PathMonitorImpl::CreatePathInfo(const std::string &path) const
 {
-    FileMonitor::PathInfoPtr spInfo;
+    PathMonitor::PathInfoPtr spInfo;
 
     if (IsValid())
     {
@@ -73,7 +73,7 @@ FileMonitor::PathInfoPtr FileMonitorImpl::CreatePathInfo(const std::string &path
 }
 
 //==============================================================================
-void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
+void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 {
     DWORD bytes = 0;
     ULONG_PTR pKey = NULL;
@@ -113,7 +113,7 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 }
 
 //==============================================================================
-void FileMonitorImpl::Close()
+void PathMonitorImpl::Close()
 {
     if (m_iocp != NULL)
     {
@@ -123,7 +123,7 @@ void FileMonitorImpl::Close()
 }
 
 //==============================================================================
-void FileMonitorImpl::handleEvents(
+void PathMonitorImpl::handleEvents(
     const PathInfoImplPtr &spInfo,
     const std::string &path
 ) const
@@ -135,15 +135,24 @@ void FileMonitorImpl::handleEvents(
         std::wstring wFile(pInfo->FileName, pInfo->FileNameLength / sizeof(wchar_t));
         std::string file(wFile.begin(), wFile.end());
 
-        FileMonitor::FileEventCallback &callback = spInfo->m_handlers[file];
-        FileMonitor::FileEvent event = convertToEvent(pInfo->Action);
+        PathMonitor::PathEvent event = convertToEvent(pInfo->Action);
 
-        if ((callback != nullptr) && (event != FileMonitor::FILE_NO_CHANGE))
+        if (event != PathMonitor::NO_CHANGE)
         {
-            LOGI(-1, "Handling event %d for \"%s\" in \"%s\"",
-                event, file, path);
+            PathMonitor::PathEventCallback callback = spInfo->m_handlers[file];
 
-            callback(path, file, event);
+            if (callback == nullptr)
+            {
+                callback = spInfo->m_pathHandler;
+            }
+
+            if (callback != nullptr)
+            {
+                LOGI(-1, "Handling event %d for \"%s\" in \"%s\"",
+                    event, file, path);
+
+                callback(path, file, event);
+            }
         }
 
         if (pInfo->NextEntryOffset == U64(0))
@@ -160,24 +169,24 @@ void FileMonitorImpl::handleEvents(
 }
 
 //==============================================================================
-FileMonitor::FileEvent FileMonitorImpl::convertToEvent(DWORD action) const
+PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
 {
-    FileMonitor::FileEvent event = FileMonitor::FILE_NO_CHANGE;
+    PathMonitor::PathEvent event = PathMonitor::FILE_NO_CHANGE;
 
     switch (action)
     {
     case FILE_ACTION_ADDED:
     case FILE_ACTION_RENAMED_NEW_NAME:
-        event = FileMonitor::FILE_CREATED;
+        event = PathMonitor::FILE_CREATED;
         break;
 
     case FILE_ACTION_REMOVED:
     case FILE_ACTION_RENAMED_OLD_NAME:
-        event = FileMonitor::FILE_DELETED;
+        event = PathMonitor::FILE_DELETED;
         break;
 
     case FILE_ACTION_MODIFIED:
-        event = FileMonitor::FILE_CHANGED;
+        event = PathMonitor::FILE_CHANGED;
         break;
 
     default:
@@ -188,8 +197,8 @@ FileMonitor::FileEvent FileMonitorImpl::convertToEvent(DWORD action) const
 }
 
 //==============================================================================
-FileMonitorImpl::PathInfoImpl::PathInfoImpl(HANDLE iocp, const std::string &path) :
-    FileMonitorImpl::PathInfo(),
+PathMonitorImpl::PathInfoImpl::PathInfoImpl(HANDLE iocp, const std::string &path) :
+    PathMonitorImpl::PathInfo(),
     m_valid(false),
     m_handle(INVALID_HANDLE_VALUE),
     m_pInfo(NULL)
@@ -212,21 +221,15 @@ FileMonitorImpl::PathInfoImpl::PathInfoImpl(HANDLE iocp, const std::string &path
 
     if (m_handle == INVALID_HANDLE_VALUE)
     {
-        LOGW(-1, "Could not create file for \"%s\": %s",
-            path, fly::System::GetLastError()
-        );
+        LOGW(-1, "Could not create file for \"%s\": %s", path, System::GetLastError());
     }
     else if ((m_pInfo = new FILE_NOTIFY_INFORMATION[s_buffSize]) == NULL)
     {
-        LOGW(-1, "Could not create notification info for \"%s\": %s",
-            path, fly::System::GetLastError()
-        );
+        LOGW(-1, "Could not create notify info for \"%s\": %s", path, System::GetLastError());
     }
     else if (::CreateIoCompletionPort(m_handle, iocp, (ULONG_PTR)m_handle, 0) == NULL)
     {
-        LOGW(-1, "Could not create IOCP info for \"%s\": %s",
-            path, fly::System::GetLastError()
-        );
+        LOGW(-1, "Could not create IOCP info for \"%s\": %s", path, System::GetLastError());
     }
     else
     {
@@ -235,7 +238,7 @@ FileMonitorImpl::PathInfoImpl::PathInfoImpl(HANDLE iocp, const std::string &path
 }
 
 //==============================================================================
-FileMonitorImpl::PathInfoImpl::~PathInfoImpl()
+PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 {
     if (m_pInfo != NULL)
     {
@@ -252,13 +255,13 @@ FileMonitorImpl::PathInfoImpl::~PathInfoImpl()
 }
 
 //==============================================================================
-bool FileMonitorImpl::PathInfoImpl::IsValid() const
+bool PathMonitorImpl::PathInfoImpl::IsValid() const
 {
     return (m_valid && (m_handle != INVALID_HANDLE_VALUE) && (m_pInfo != NULL));
 }
 
 //==============================================================================
-bool FileMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
+bool PathMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
 {
     static const DWORD size = (s_buffSize * sizeof(FILE_NOTIFY_INFORMATION));
     DWORD bytes = 0;
@@ -269,9 +272,7 @@ bool FileMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
 
     if (success == FALSE)
     {
-        LOGW(-1, "Could not check events for \"%s\": %s",
-            path, fly::System::GetLastError()
-        );
+        LOGW(-1, "Could not check events for \"%s\": %s", path, System::GetLastError());
     }
 
     return (success == TRUE);

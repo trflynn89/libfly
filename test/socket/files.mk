@@ -1,9 +1,9 @@
 # Define the directories to include and compile
 SRC_DIRS_$(d) := \
     fly/config \
-    fly/file \
     fly/logger \
     fly/parser \
+    fly/path \
     fly/socket \
     fly/string \
     fly/system \

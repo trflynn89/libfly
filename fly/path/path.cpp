@@ -1,9 +1,9 @@
-#include "fly/file/path.h"
+#include "fly/path/path.h"
 
 #if defined(FLY_WINDOWS)
-    #include "fly/file/win/path_impl.h"
+    #include "fly/path/win/path_impl.h"
 #elif defined(FLY_LINUX)
-    #include "fly/file/nix/path_impl.h"
+    #include "fly/path/nix/path_impl.h"
 #endif
 
 namespace fly {

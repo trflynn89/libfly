@@ -1,4 +1,4 @@
-#include "fly/file/nix/file_monitor_impl.h"
+#include "fly/path/nix/path_monitor_impl.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -28,32 +28,32 @@ namespace
 }
 
 //==============================================================================
-FileMonitorImpl::FileMonitorImpl() :
-    FileMonitor(),
+PathMonitorImpl::PathMonitorImpl() :
+    PathMonitor(),
     m_monitorDescriptor(::inotify_init1(s_initFlags))
 {
     if (m_monitorDescriptor == -1)
     {
-        LOGW(-1, "Could not initialize monitor: %s", fly::System::GetLastError());
+        LOGW(-1, "Could not initialize monitor: %s", System::GetLastError());
     }
 }
 
 //==============================================================================
-FileMonitorImpl::~FileMonitorImpl()
+PathMonitorImpl::~PathMonitorImpl()
 {
     Close();
 }
 
 //==============================================================================
-bool FileMonitorImpl::IsValid() const
+bool PathMonitorImpl::IsValid() const
 {
     return (m_monitorDescriptor != -1);
 }
 
 //==============================================================================
-FileMonitor::PathInfoPtr FileMonitorImpl::CreatePathInfo(const std::string &path) const
+PathMonitor::PathInfoPtr PathMonitorImpl::CreatePathInfo(const std::string &path) const
 {
-    FileMonitor::PathInfoPtr spInfo;
+    PathMonitor::PathInfoPtr spInfo;
 
     if (IsValid())
     {
@@ -64,7 +64,7 @@ FileMonitor::PathInfoPtr FileMonitorImpl::CreatePathInfo(const std::string &path
 }
 
 //==============================================================================
-void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
+void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 {
     struct pollfd pollFd;
 
@@ -75,7 +75,7 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 
     if (numEvents == -1)
     {
-        LOGW(-1, "Could not create poller: %s", fly::System::GetLastError());
+        LOGW(-1, "Could not create poller: %s", System::GetLastError());
     }
     else if ((numEvents > 0) && (pollFd.revents & POLLIN))
     {
@@ -88,7 +88,7 @@ void FileMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 }
 
 //==============================================================================
-void FileMonitorImpl::Close()
+void PathMonitorImpl::Close()
 {
     if (m_monitorDescriptor != -1)
     {
@@ -98,7 +98,7 @@ void FileMonitorImpl::Close()
 }
 
 //==============================================================================
-bool FileMonitorImpl::readEvents() const
+bool PathMonitorImpl::readEvents() const
 {
     static const size_t eventSize = sizeof(struct inotify_event);
 
@@ -115,7 +115,7 @@ bool FileMonitorImpl::readEvents() const
         if (len == -1)
         {
             int error = 0;
-            std::string errorStr = fly::System::GetLastError(&error);
+            std::string errorStr = System::GetLastError(&error);
 
             if (error != EAGAIN)
             {
@@ -142,7 +142,7 @@ bool FileMonitorImpl::readEvents() const
 }
 
 //==============================================================================
-void FileMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
+void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
 {
     auto it = std::find_if(m_pathInfo.begin(), m_pathInfo.end(),
         [&pEvent](const PathInfoMap::value_type &value) -> bool
@@ -155,47 +155,55 @@ void FileMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
     if (it != m_pathInfo.end())
     {
         PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(it->second));
+        PathMonitor::PathEvent event = convertToEvent(pEvent->mask);
 
-        FileMonitor::FileEventCallback &callback = spInfo->m_handlers[pEvent->name];
-        FileMonitor::FileEvent event = convertToEvent(pEvent->mask);
-
-        if ((callback != nullptr) && (event != FileMonitor::FILE_NO_CHANGE))
+        if (event != PathMonitor::NO_CHANGE)
         {
-            LOGI(-1, "Handling event %d for \"%s\" in \"%s\"",
-                event, pEvent->name, it->first);
+            PathMonitor::PathEventCallback callback = spInfo->m_fileHandlers[pEvent->name];
 
-            callback(it->first, pEvent->name, event);
+            if (callback == nullptr)
+            {
+                callback = spInfo->m_pathHandler;
+            }
+
+            if (callback != nullptr)
+            {
+                LOGI(-1, "Handling event %d for \"%s\" in \"%s\"",
+                    event, pEvent->name, it->first);
+
+                callback(it->first, pEvent->name, event);
+            }
         }
     }
 }
 
 //==============================================================================
-FileMonitor::FileEvent FileMonitorImpl::convertToEvent(int mask) const
+PathMonitor::PathEvent PathMonitorImpl::convertToEvent(int mask) const
 {
-    FileMonitor::FileEvent event = FileMonitor::FILE_NO_CHANGE;
+    PathMonitor::PathEvent event = PathMonitor::NO_CHANGE;
 
     if ((mask & IN_CREATE) || (mask & IN_MOVED_TO))
     {
-        event = FileMonitor::FILE_CREATED;
+        event = PathMonitor::FILE_CREATED;
     }
     else if ((mask & IN_DELETE) || (mask & IN_MOVED_FROM))
     {
-        event = FileMonitor::FILE_DELETED;
+        event = PathMonitor::FILE_DELETED;
     }
     else if (mask & IN_MODIFY)
     {
-        event = FileMonitor::FILE_CHANGED;
+        event = PathMonitor::FILE_CHANGED;
     }
 
     return event;
 }
 
 //==============================================================================
-FileMonitorImpl::PathInfoImpl::PathInfoImpl(
+PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     int monitorDescriptor,
     const std::string &path
 ) :
-    FileMonitorImpl::PathInfo(),
+    PathMonitorImpl::PathInfo(),
     m_monitorDescriptor(monitorDescriptor),
     m_watchDescriptor(-1)
 {
@@ -205,14 +213,12 @@ FileMonitorImpl::PathInfoImpl::PathInfoImpl(
 
     if (m_watchDescriptor == -1)
     {
-        LOGW(-1, "Could not add watcher for \"%s\": %s",
-            path, fly::System::GetLastError()
-        );
+        LOGW(-1, "Could not add watcher for \"%s\": %s", path, System::GetLastError());
     }
 }
 
 //==============================================================================
-FileMonitorImpl::PathInfoImpl::~PathInfoImpl()
+PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 {
     if (m_watchDescriptor != -1)
     {
@@ -222,7 +228,7 @@ FileMonitorImpl::PathInfoImpl::~PathInfoImpl()
 }
 
 //==============================================================================
-bool FileMonitorImpl::PathInfoImpl::IsValid() const
+bool PathMonitorImpl::PathInfoImpl::IsValid() const
 {
     return (m_watchDescriptor != -1);
 }

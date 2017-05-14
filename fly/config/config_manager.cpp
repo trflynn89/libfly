@@ -22,7 +22,7 @@ ConfigManager::ConfigManager(
     const std::string &file
 ) :
     Runner("ConfigManager", 1),
-    m_spMonitor(std::make_shared<FileMonitorImpl>()),
+    m_spMonitor(std::make_shared<PathMonitorImpl>()),
     m_path(path),
     m_file(file),
     m_aFileChanged(true)

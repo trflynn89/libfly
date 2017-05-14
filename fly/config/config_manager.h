@@ -9,8 +9,8 @@
 
 #include "fly/fly.h"
 #include "fly/config/config.h"
-#include "fly/file/file_monitor_impl.h"
 #include "fly/parser/parser.h"
+#include "fly/path/path_monitor_impl.h"
 #include "fly/task/runner.h"
 
 namespace fly {
@@ -95,7 +95,7 @@ protected:
     bool DoWork();
 
 private:
-    FileMonitorPtr m_spMonitor;
+    PathMonitorPtr m_spMonitor;
     ParserPtr m_spParser;
 
     const std::string m_path;
