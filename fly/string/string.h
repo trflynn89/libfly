@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "fly/fly.h"
-#include "fly/random/random_device.h"
 #include "fly/traits/type_traits.h"
 
 namespace fly {
@@ -119,21 +118,11 @@ public:
     /**
      * Generate a random string of the given size.
      *
-     * @param unsigned int The length of the string to generate.
+     * @param size_t The length of the string to generate.
      *
      * @return The generated string.
      */
-    static std::string GenerateRandomString(const unsigned int);
-
-    /**
-     * Calculate the entropy of the given string. The larger the entropy, the
-     * more random the string. An entropy of 0.0 implies completely non-random.
-     *
-     * @param string The string to examine.
-     *
-     * @return An entropy value in the range [0.0, inf).
-     */
-    static float CalculateEntropy(const std::string &);
+    static std::string GenerateRandomString(const size_t);
 
     /**
      * Format a string with variadic template arguments. This is type safe in
@@ -244,22 +233,6 @@ private:
     static void getValue(std::ostream &, const T &);
 
 #endif // FLY_WINDOWS
-
-    /**
-     * String to contain all alphanumeric characters with both capitalizations.
-     */
-    static const std::string s_alphaNum;
-
-    /**
-     * Number of ASCII characters.
-     */
-    static const unsigned int s_asciiSize;
-
-    /**
-     * A RNG for uniform integers.
-     */
-    static UniformIntegerDevice<size_t, std::mt19937> s_randomDevice;
-
 };
 
 //==============================================================================

@@ -322,29 +322,10 @@ TEST(StringTest, WildcardTest)
 //==============================================================================
 TEST(StringTest, GenerateRandomStringTest)
 {
-    static const int length = (1 << 20);
+    static const size_t length = (1 << 20);
 
     std::string random = fly::String::GenerateRandomString(length);
     ASSERT_EQ(length, random.length());
-}
-
-//==============================================================================
-TEST(StringTest, EntropyTest)
-{
-    std::string str1 = fly::String::GenerateRandomString(1 << 10);
-    std::string str2("A quick brown fox jumped over the lazy dog");
-    std::string str3("repeatrepeatrepeatrepeatrepeatrepeatrepeat");
-    std::string str4("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
-
-    float ent1 = fly::String::CalculateEntropy(str1);
-    float ent2 = fly::String::CalculateEntropy(str2);
-    float ent3 = fly::String::CalculateEntropy(str3);
-    float ent4 = fly::String::CalculateEntropy(str4);
-
-    // Expect entropy to decrease for less random strings
-    EXPECT_GT(ent1, ent2);
-    EXPECT_GT(ent2, ent3);
-    EXPECT_GT(ent3, ent4);
 }
 
 //==============================================================================

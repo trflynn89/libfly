@@ -152,7 +152,7 @@ TEST_F(LoggerTest, RolloverTest)
     size_t maxMessageSize = spConfig->MaxMessageSize();
     size_t maxFileSize = spConfig->MaxLogFileSize();
 
-    std::string random = fly::String::GenerateRandomString((unsigned int)maxMessageSize);
+    std::string random = fly::String::GenerateRandomString(maxMessageSize);
 
     ssize_t expectedSize = LogSize(random);
     size_t count = 0;

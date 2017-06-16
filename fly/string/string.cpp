@@ -2,21 +2,21 @@
 
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <functional>
+#include <random>
 
 namespace fly {
 
-//==============================================================================
-const std::string String::s_alphaNum =
-    "0123456789"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "abcdefghijklmnopqrstuvwxyz";
-
-const unsigned int String::s_asciiSize = 256;
-
-UniformIntegerDevice<size_t, std::mt19937> String::s_randomDevice(0, String::s_alphaNum.size() - 1);
+namespace
+{
+    static const std::string s_alphaNum =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+}
 
 //==============================================================================
 std::vector<std::string> String::Split(const std::string &input, char delim)
@@ -83,14 +83,20 @@ void String::RemoveAll(std::string &target, const std::string &search)
 }
 
 //==============================================================================
-std::string String::GenerateRandomString(const unsigned int len)
+std::string String::GenerateRandomString(const size_t len)
 {
+    static auto now = std::chrono::system_clock::now();
+    static auto seed = now.time_since_epoch().count();
+
+    static std::uniform_int_distribution<size_t> distribution(0, s_alphaNum.size() - 1);
+    static std::mt19937 engine(seed);
+
     std::string ret;
     ret.reserve(len);
 
-    for (unsigned int i = 0; i < len; ++i)
+    for (size_t i = 0; i < len; ++i)
     {
-        ret += s_alphaNum[s_randomDevice()];
+        ret += s_alphaNum[distribution(engine)];
     }
 
     return ret;
@@ -188,40 +194,6 @@ bool String::WildcardMatch(const std::string &source, const std::string &search)
     }
 
     return ret;
-}
-
-//==============================================================================
-float String::CalculateEntropy(const std::string &source)
-{
-    long charCount[s_asciiSize] = { 0 };
-
-    // Count the number of occurences of each ASCII character in the string
-    for (auto it = source.begin(); it != source.end(); ++it)
-    {
-        unsigned int ascii = static_cast<unsigned int>(*it);
-
-        if (ascii < s_asciiSize)
-        {
-            ++charCount[ascii];
-        }
-    }
-
-    float entropy = 0.0;
-    float length = static_cast<float>(source.length());
-
-    // Calculate the entropy
-    for (unsigned int i = 0; i < s_asciiSize; ++i)
-    {
-        long count = charCount[i];
-
-        if (count > 0)
-        {
-            float pct = static_cast<float>(count) / length;
-            entropy -= (pct * log2(pct));
-        }
-    }
-
-    return entropy;
 }
 
 //==============================================================================
