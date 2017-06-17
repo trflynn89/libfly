@@ -10,56 +10,6 @@
 
 namespace fly {
 
-namespace
-{
-    static std::atomic<ExitCode> g_aExitCode(Normal);
-    static std::atomic_bool g_aKeepRunning(true);
-
-    //==========================================================================
-    void handleSignal(int sig)
-    {
-        LOGC_NO_LOCK("Received signal %d", sig);
-        LOGI(-1, "Received signal %d", sig);
-
-        bool fatalSignal = false;
-        bool cleanExit = false;
-
-        switch (sig)
-        {
-        case SIGINT:
-        case SIGTERM:
-            LOGC_NO_LOCK("Non-fatal exit signal caught");
-            cleanExit = true;
-            break;
-
-        case SIGILL:
-        case SIGFPE:
-        case SIGABRT:
-        case SIGSEGV:
-            LOGC_NO_LOCK("Fatal exit signal caught");
-            fatalSignal = true;
-            cleanExit = true;
-            break;
-
-        default:
-            break;
-        }
-
-        if (cleanExit)
-        {
-            ExitCode exitCode = Normal;
-
-            if (fatalSignal)
-            {
-                SystemImpl::PrintBacktrace();
-                exitCode = FatalSignal;
-            }
-
-            SystemImpl::CleanExit(exitCode);
-        }
-    }
-}
-
 //==============================================================================
 void SystemImpl::PrintBacktrace()
 {
@@ -124,33 +74,20 @@ std::string SystemImpl::GetLastError(int *pCode)
 }
 
 //==============================================================================
-void SystemImpl::SetupSignalHandler()
+void SystemImpl::SetSignalHandler(System::SignalHandler handler)
 {
-    ::signal(SIGINT, handleSignal);
-    ::signal(SIGTERM, handleSignal);
-    ::signal(SIGILL, handleSignal);
-    ::signal(SIGFPE, handleSignal);
-    ::signal(SIGABRT, handleSignal);
-    ::signal(SIGSEGV, handleSignal);
-}
+    static const int signals[] =
+    {
+        SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV
+    };
 
-//==============================================================================
-void SystemImpl::CleanExit(ExitCode exitCode)
-{
-    g_aExitCode.store(exitCode);
-    g_aKeepRunning.store(false);
-}
+    auto ppHandler = handler.target<void (*)(int)>();
+    auto pHandler = (ppHandler == NULL) ? SIG_DFL : *ppHandler;
 
-//==============================================================================
-bool SystemImpl::KeepRunning()
-{
-    return g_aKeepRunning.load();
-}
-
-//==============================================================================
-ExitCode SystemImpl::GetExitCode()
-{
-    return g_aExitCode.load();
+    for (size_t i = 0; i < (sizeof(signals) / sizeof(int)); ++i)
+    {
+        ::signal(signals[i], pHandler);
+    }
 }
 
 }

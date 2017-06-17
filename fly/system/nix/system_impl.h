@@ -3,7 +3,7 @@
 #include <string>
 
 #include "fly/fly.h"
-#include "fly/exit_codes.h"
+#include "fly/system/system.h"
 
 namespace fly {
 
@@ -19,10 +19,7 @@ public:
     static void PrintBacktrace();
     static std::string LocalTime(const std::string &);
     static std::string GetLastError(int *);
-    static void SetupSignalHandler();
-    static void CleanExit(ExitCode);
-    static bool KeepRunning();
-    static ExitCode GetExitCode();
+    static void SetSignalHandler(System::SignalHandler);
 };
 
 }

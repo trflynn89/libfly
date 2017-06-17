@@ -1,9 +1,9 @@
 #pragma once
 
+#include <functional>
 #include <string>
 
 #include "fly/fly.h"
-#include "fly/exit_codes.h"
 #include "fly/string/string.h"
 
 namespace fly {
@@ -17,6 +17,8 @@ namespace fly {
 class System
 {
 public:
+    typedef std::function<void(int)> SignalHandler;
+
     /**
      * Print the backtrace to stderr.
      */
@@ -38,27 +40,11 @@ public:
     static std::string GetLastError(int *code = NULL);
 
     /**
-     * Setup handlers for fatal and non-fatal exit codes, to allow the system
-     * to cleanly exit;
-     */
-    static void SetupSignalHandler();
-
-    /**
-     * Signal the main thread to exit with the given exit code.
+     * Set a signal handler for all terminal signals.
      *
-     * @param ExitCode Code to exit with.
+     * @param SignalHandler The signal handler function to set.
      */
-    static void CleanExit(ExitCode);
-
-    /**
-     * @return Whether the system is in a state in which it should keep running.
-     */
-    static bool KeepRunning();
-
-    /**
-     * @return The code the system should exit with.
-     */
-    static ExitCode GetExitCode();
+    static void SetSignalHandler(SignalHandler);
 };
 
 }

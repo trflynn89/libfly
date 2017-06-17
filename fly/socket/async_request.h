@@ -1,7 +1,5 @@
 #pragma once
 
-#include <functional>
-#include <memory>
 #include <string>
 
 #include "fly/concurrency/concurrent_queue.h"

@@ -27,27 +27,9 @@ std::string System::GetLastError(int *code)
 }
 
 //==============================================================================
-void System::SetupSignalHandler()
+void System::SetSignalHandler(SignalHandler handler)
 {
-    return SystemImpl::SetupSignalHandler();
-}
-
-//==============================================================================
-void System::CleanExit(ExitCode exitCode)
-{
-    return SystemImpl::CleanExit(exitCode);
-}
-
-//==============================================================================
-bool System::KeepRunning()
-{
-    return SystemImpl::KeepRunning();
-}
-
-//==============================================================================
-ExitCode System::GetExitCode()
-{
-    return SystemImpl::GetExitCode();
+    return SystemImpl::SetSignalHandler(handler);
 }
 
 }

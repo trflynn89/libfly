@@ -1,10 +1,27 @@
 #include <csignal>
+#include <functional>
 #include <string>
 
 #include <gtest/gtest.h>
 
 #include "fly/exit_codes.h"
 #include "fly/system/system.h"
+
+namespace
+{
+    static int s_lastSignal = 0;
+
+    void handleSignal(int signal)
+    {
+        s_lastSignal = signal;
+    }
+}
+
+//==============================================================================
+TEST(SystemTest, PrintBacktrace)
+{
+    fly::System::PrintBacktrace();
+}
 
 //==============================================================================
 TEST(SystemTest, LocalTimeTest)
@@ -25,31 +42,14 @@ TEST(SystemTest, LastErrorTest)
 //==============================================================================
 TEST(SystemTest, SignalTest)
 {
-    fly::System::PrintBacktrace();
-
-    fly::System::SetupSignalHandler();
-    EXPECT_TRUE(fly::System::KeepRunning());
+    fly::System::SignalHandler handler(&handleSignal);
+    fly::System::SetSignalHandler(handler);
 
     std::raise(SIGINT);
-
-    EXPECT_EQ(fly::System::GetExitCode(), fly::Normal);
-    EXPECT_FALSE(fly::System::KeepRunning());
+    EXPECT_EQ(s_lastSignal, SIGINT);
 
     std::raise(SIGSEGV);
+    EXPECT_EQ(s_lastSignal, SIGSEGV);
 
-    EXPECT_EQ(fly::System::GetExitCode(), fly::FatalSignal);
-    EXPECT_FALSE(fly::System::KeepRunning());
-}
-
-//==============================================================================
-TEST(SystemTest, ExitCodeTest)
-{
-    for (int val = fly::Normal; val < fly::NumCodes; ++val)
-    {
-        fly::ExitCode code = static_cast<fly::ExitCode>(val);
-        fly::System::CleanExit(code);
-
-        EXPECT_EQ(fly::System::GetExitCode(), code);
-        EXPECT_FALSE(fly::System::KeepRunning());
-    }
+    fly::System::SetSignalHandler(nullptr);
 }
