@@ -74,20 +74,12 @@ std::string SystemImpl::GetLastError(int *pCode)
 }
 
 //==============================================================================
-void SystemImpl::SetSignalHandler(System::SignalHandler handler)
+std::vector<int> SystemImpl::GetSignals()
 {
-    static const int signals[] =
+    return std::vector<int>
     {
         SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV
     };
-
-    auto ppHandler = handler.target<void (*)(int)>();
-    auto pHandler = (ppHandler == NULL) ? SIG_DFL : *ppHandler;
-
-    for (size_t i = 0; i < (sizeof(signals) / sizeof(int)); ++i)
-    {
-        ::signal(signals[i], pHandler);
-    }
 }
 
 }

@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include "fly/exit_codes.h"
 #include "fly/system/system.h"
 
 namespace
@@ -18,7 +17,7 @@ namespace
 }
 
 //==============================================================================
-TEST(SystemTest, PrintBacktrace)
+TEST(SystemTest, PrintBacktraceTest)
 {
     fly::System::PrintBacktrace();
 }

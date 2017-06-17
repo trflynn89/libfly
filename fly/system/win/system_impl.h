@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "fly/fly.h"
-#include "fly/system/system.h"
 
 namespace fly {
 
@@ -19,7 +19,7 @@ public:
     static void PrintBacktrace();
     static std::string LocalTime(const std::string &);
     static std::string GetLastError(int *);
-    static void SetSignalHandler(System::SignalHandler);
+    static std::vector<int> GetSignals();
 };
 
 }

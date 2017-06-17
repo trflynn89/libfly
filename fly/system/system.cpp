@@ -1,5 +1,8 @@
 #include "fly/system/system.h"
 
+#include <csignal>
+#include <vector>
+
 #if defined(FLY_WINDOWS)
     #include "fly/system/win/system_impl.h"
 #elif defined(FLY_LINUX)
@@ -29,7 +32,15 @@ std::string System::GetLastError(int *code)
 //==============================================================================
 void System::SetSignalHandler(SignalHandler handler)
 {
-    return SystemImpl::SetSignalHandler(handler);
+    static std::vector<int> signals = SystemImpl::GetSignals();
+
+    auto ppHandler = handler.target<void (*)(int)>();
+    auto pHandler = (ppHandler == NULL) ? SIG_DFL : *ppHandler;
+
+    for (auto it = signals.begin(); it != signals.end(); ++it)
+    {
+        std::signal(*it, pHandler);
+    }
 }
 
 }
