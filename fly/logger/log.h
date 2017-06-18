@@ -5,7 +5,6 @@
 #include <string>
 
 #include "fly/fly.h"
-#include "fly/logger/logger_config.h"
 
 /**
  * Enumeration to define the level of a log.
@@ -21,6 +20,8 @@ enum LogLevel
 };
 
 namespace fly {
+
+DEFINE_CLASS_PTRS(LoggerConfig);
 
 /**
  * Struct to store data about single log. A log contains:
@@ -51,10 +52,7 @@ struct Log
      * @param LoggerConfigPtr Reference to the logger config.
      * @param string Message to store.
      */
-    Log(const LoggerConfigPtr &spConfig, const std::string &message) :
-        m_message(message, 0, spConfig->MaxMessageSize())
-    {
-    }
+    Log(const LoggerConfigPtr &, const std::string &);
 
     LogLevel m_level = NUM_LEVELS;
     double m_time = -1.0;
@@ -64,7 +62,7 @@ struct Log
     unsigned int m_line = -1;
     std::string m_message;
 
-    friend std::ostream &operator << (std::ostream &stream, const Log &log);
+    friend std::ostream &operator << (std::ostream &, const Log &);
 };
 
 }

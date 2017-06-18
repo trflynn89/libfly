@@ -4,6 +4,7 @@
 
 #include <sys/select.h>
 
+#include "fly/fly.h"
 #include "fly/socket/socket_manager.h"
 
 namespace fly {

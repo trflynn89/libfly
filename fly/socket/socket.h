@@ -7,11 +7,11 @@
 
 #include "fly/fly.h"
 #include "fly/socket/async_request.h"
-#include "fly/socket/socket_config.h"
 
 namespace fly {
 
 DEFINE_CLASS_PTRS(Socket);
+DEFINE_CLASS_PTRS(SocketConfig);
 
 /**
  * Virtual interface to represent a network socket. This interface is platform

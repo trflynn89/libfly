@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include "fly/logger/logger.h"
+#include "fly/logger/logger_config.h"
 #include "fly/path/path.h"
 #include "fly/string/string.h"
 

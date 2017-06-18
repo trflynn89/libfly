@@ -1,6 +1,14 @@
 #include "fly/logger/log.h"
 
+#include "fly/logger/logger_config.h"
+
 namespace fly {
+
+//==============================================================================
+Log::Log(const LoggerConfigPtr &spConfig, const std::string &message) :
+    m_message(message, 0, spConfig->MaxMessageSize())
+{
+}
 
 //==============================================================================
 std::ostream &operator << (std::ostream &stream, const Log &log)

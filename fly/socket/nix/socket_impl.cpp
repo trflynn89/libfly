@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "fly/logger/logger.h"
+#include "fly/socket/socket_config.h"
 #include "fly/system/system.h"
 
 namespace fly {

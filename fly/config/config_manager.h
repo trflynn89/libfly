@@ -10,12 +10,12 @@
 #include "fly/fly.h"
 #include "fly/config/config.h"
 #include "fly/parser/parser.h"
-#include "fly/path/path_monitor_impl.h"
 #include "fly/task/runner.h"
 
 namespace fly {
 
 DEFINE_CLASS_PTRS(ConfigManager);
+DEFINE_CLASS_PTRS(PathMonitor);
 
 /**
  * Class to create and manage a set of configurations.

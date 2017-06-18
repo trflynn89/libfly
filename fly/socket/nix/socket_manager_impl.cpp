@@ -5,6 +5,7 @@
 
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
+#include "fly/socket/socket_config.h"
 #include "fly/socket/socket_impl.h"
 
 namespace fly {
