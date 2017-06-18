@@ -1,17 +1,22 @@
 #include "fly/path/path_monitor.h"
 
+#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
+#include "fly/path/path_config.h"
 
 namespace fly {
 
-namespace
+//==============================================================================
+PathMonitor::PathMonitor() :
+    Runner("PathMonitor", 1),
+    m_spConfig(std::make_shared<PathConfig>())
 {
-    // TODO make configurable
-    static const std::chrono::milliseconds s_pollTimeout(1000);
 }
 
 //==============================================================================
-PathMonitor::PathMonitor() : Runner("PathMonitor", 1)
+PathMonitor::PathMonitor(ConfigManagerPtr &spConfigManager) :
+    Runner("PathMonitor", 1),
+    m_spConfig(spConfigManager->CreateConfig<PathConfig>())
 {
 }
 
@@ -150,7 +155,7 @@ bool PathMonitor::DoWork()
 {
     if (IsValid())
     {
-        Poll(s_pollTimeout);
+        Poll(m_spConfig->PollTimeout());
     }
 
     return IsValid();

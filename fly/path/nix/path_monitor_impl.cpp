@@ -7,6 +7,7 @@
 #include <poll.h>
 #include <unistd.h>
 
+#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/system/system.h"
 
@@ -30,6 +31,17 @@ namespace
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl() :
     PathMonitor(),
+    m_monitorDescriptor(::inotify_init1(s_initFlags))
+{
+    if (m_monitorDescriptor == -1)
+    {
+        LOGW(-1, "Could not initialize monitor: %s", System::GetLastError());
+    }
+}
+
+//==============================================================================
+PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
+    PathMonitor(spConfigManager),
     m_monitorDescriptor(::inotify_init1(s_initFlags))
 {
     if (m_monitorDescriptor == -1)

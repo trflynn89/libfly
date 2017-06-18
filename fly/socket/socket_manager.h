@@ -34,8 +34,8 @@ public:
     typedef std::vector<SocketPtr> SocketList;
 
     /**
-     * Default constructor. Constructs default socket configuration, meant for
-     * unit tests.
+     * Default constructor. Constructs a socket manager with default
+     * configuration.
      */
     SocketManager();
 

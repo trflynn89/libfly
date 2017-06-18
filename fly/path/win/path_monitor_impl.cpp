@@ -1,5 +1,6 @@
 #include "fly/path/win/path_monitor_impl.h"
 
+#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/system/system.h"
 
@@ -39,6 +40,17 @@ namespace
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl() :
     PathMonitor(),
+    m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
+{
+    if (m_iocp == NULL)
+    {
+        LOGW(-1, "Could not initialize IOCP: %s", System::GetLastError());
+    }
+}
+
+//==============================================================================
+PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
+    PathMonitor(spConfigManager),
     m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
 {
     if (m_iocp == NULL)

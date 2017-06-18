@@ -22,7 +22,6 @@ ConfigManager::ConfigManager(
     const std::string &file
 ) :
     Runner("ConfigManager", 1),
-    m_spMonitor(std::make_shared<PathMonitorImpl>()),
     m_path(path),
     m_file(file),
     m_aFileChanged(true)
@@ -70,14 +69,20 @@ ConfigManager::ConfigMap::size_type ConfigManager::GetSize()
 //==============================================================================
 bool ConfigManager::StartRunner()
 {
-    if (m_spParser && m_spMonitor->Start())
+    if (m_spParser)
     {
-        auto callback = [&aFileChanged = this->m_aFileChanged](...)
-        {
-            aFileChanged.store(true);
-        };
+        ConfigManagerPtr spThis = SharedFromThis<ConfigManager>();
+        m_spMonitor = std::make_shared<PathMonitorImpl>(spThis);
 
-        return m_spMonitor->AddFile(m_path, m_file, callback);
+        if (m_spMonitor && m_spMonitor->Start())
+        {
+            auto callback = [&aFileChanged = spThis->m_aFileChanged](...)
+            {
+                aFileChanged.store(true);
+            };
+
+            return m_spMonitor->AddFile(m_path, m_file, callback);
+        }
     }
 
     return false;

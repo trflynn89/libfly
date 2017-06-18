@@ -12,6 +12,8 @@
 
 namespace fly {
 
+DEFINE_CLASS_PTRS(ConfigManager);
+DEFINE_CLASS_PTRS(PathConfig);
 DEFINE_CLASS_PTRS(PathMonitor);
 
 /**
@@ -43,9 +45,17 @@ public:
     typedef std::function<void(const std::string &, const std::string &, PathEvent)> PathEventCallback;
 
     /**
-     * Constructor.
+     * Default constructor. Constructs a path monitor with default
+     * configuration.
      */
     PathMonitor();
+
+    /**
+     * Constructor.
+     *
+     * @param ConfigManagerPtr Reference to the configuration manager.
+     */
+    PathMonitor(ConfigManagerPtr &);
 
     /**
      * Destructor. Stop the path monitor thread if necessary.
@@ -183,6 +193,8 @@ private:
      * @return PathInfoPtr Shared pointer to the PathInfo struct.
      */
     PathInfoPtr getOrCreatePathInfo(const std::string &);
+
+    PathConfigPtr m_spConfig;
 };
 
 }

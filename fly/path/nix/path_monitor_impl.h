@@ -10,6 +10,7 @@
 
 namespace fly {
 
+DEFINE_CLASS_PTRS(ConfigManager);
 DEFINE_CLASS_PTRS(PathMonitorImpl);
 
 /**
@@ -23,6 +24,7 @@ class PathMonitorImpl : public PathMonitor
 {
 public:
     PathMonitorImpl();
+    PathMonitorImpl(ConfigManagerPtr &);
     virtual ~PathMonitorImpl();
 
     /**

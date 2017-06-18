@@ -96,6 +96,8 @@ public:
     {
         ASSERT_TRUE(fly::Path::MakePath(m_path));
         ASSERT_TRUE(m_spConfigManager->Start());
+
+        m_initialSize = m_spConfigManager->GetSize();
     }
 
     /**
@@ -144,6 +146,8 @@ protected:
     std::string m_file;
 
     fly::ConfigManagerPtr m_spConfigManager;
+
+    size_t m_initialSize;
 };
 
 //==============================================================================
@@ -162,34 +166,34 @@ TEST_F(ConfigManagerTest, BadFileTypeTest)
 TEST_F(ConfigManagerTest, CreateConfigTest)
 {
     auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
-    EXPECT_EQ(m_spConfigManager->GetSize(), 1);
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize + 1);
 }
 
 //==============================================================================
 TEST_F(ConfigManagerTest, DuplicateConfigTest)
 {
     auto spConfig1 = m_spConfigManager->CreateConfig<fly::Config>();
-    EXPECT_EQ(m_spConfigManager->GetSize(), 1);
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize + 1);
 
     auto spConfig2 = m_spConfigManager->CreateConfig<fly::Config>();
-    EXPECT_EQ(m_spConfigManager->GetSize(), 1);
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize + 1);
 }
 
 //==============================================================================
 TEST_F(ConfigManagerTest, DeletedConfigTest)
 {
-    EXPECT_EQ(m_spConfigManager->GetSize(), 0);
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
 
     {
         auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
-        EXPECT_EQ(m_spConfigManager->GetSize(), 1);
+        EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize + 1);
     }
 
-    EXPECT_EQ(m_spConfigManager->GetSize(), 0);
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
 
     {
         auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
-        EXPECT_EQ(m_spConfigManager->GetSize(), 1);
+        EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize + 1);
     }
 
     auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
