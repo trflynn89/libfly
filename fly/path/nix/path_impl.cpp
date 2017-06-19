@@ -60,12 +60,12 @@ bool PathImpl::RemovePath(const std::string &path)
         {
             std::string file(pCurr->fts_path, pCurr->fts_pathlen);
 
-            switch(pCurr->fts_info)
+            switch (pCurr->fts_info)
             {
             case FTS_NS:
             case FTS_DNR:
             case FTS_ERR:
-                LOGW(-1, "Could not read \"%s\": %s", file, ::strerror(pCurr->fts_errno));
+                LOGW(-1, "Could not read \"%s\": %s", file, System::GetErrorString(pCurr->fts_errno));
                 ret = false;
                 break;
 
@@ -80,7 +80,7 @@ bool PathImpl::RemovePath(const std::string &path)
                 }
                 else
                 {
-                    LOGW(-1, "Could not remove \"%s\": %s", file, System::GetLastError());
+                    LOGW(-1, "Could not remove \"%s\": %s", file, System::GetErrorString());
                     ret = false;
                 }
 

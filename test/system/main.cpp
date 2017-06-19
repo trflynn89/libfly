@@ -30,12 +30,16 @@ TEST(SystemTest, LocalTimeTest)
 }
 
 //==============================================================================
-TEST(SystemTest, LastErrorTest)
+TEST(SystemTest, ErrorCodeTest)
 {
-    int code = 0;
+    int code = fly::System::GetErrorCode();
 
-    std::string error = fly::System::GetLastError(&code);
-    EXPECT_FALSE(error.empty());
+    std::string error1 = fly::System::GetErrorString();
+    std::string error2 = fly::System::GetErrorString(code);
+
+    EXPECT_FALSE(error1.empty());
+    EXPECT_FALSE(error2.empty());
+    EXPECT_EQ(error1, error2);
 }
 
 //==============================================================================

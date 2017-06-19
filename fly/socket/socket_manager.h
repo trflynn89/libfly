@@ -18,8 +18,6 @@ DEFINE_CLASS_PTRS(Socket);
 DEFINE_CLASS_PTRS(SocketConfig);
 DEFINE_CLASS_PTRS(SocketManager);
 
-typedef std::function<void(SocketPtr)> SocketCallback;
-
 /**
  * Class to manage the creation of sockets and IO operations over asynchronous
  * sockets. A single thread is created to perform all IO. Completed IO is
@@ -31,6 +29,8 @@ typedef std::function<void(SocketPtr)> SocketCallback;
 class SocketManager : public Runner
 {
 public:
+    typedef std::function<void(SocketPtr)> SocketCallback;
+
     typedef std::vector<SocketPtr> SocketList;
 
     /**

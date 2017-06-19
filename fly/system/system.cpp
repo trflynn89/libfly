@@ -24,9 +24,21 @@ std::string System::LocalTime()
 }
 
 //==============================================================================
-std::string System::GetLastError(int *code)
+int System::GetErrorCode()
 {
-    return SystemImpl::GetLastError(code);
+    return SystemImpl::GetErrorCode();
+}
+
+//==============================================================================
+std::string System::GetErrorString()
+{
+    return GetErrorString(GetErrorCode());
+}
+
+//==============================================================================
+std::string System::GetErrorString(int code)
+{
+    return SystemImpl::GetErrorString(code);
 }
 
 //==============================================================================

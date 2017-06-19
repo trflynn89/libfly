@@ -29,14 +29,23 @@ public:
     static std::string LocalTime();
 
     /**
-     * Get the last system error as a string, and optionally store the numeric
-     * error code.
-     *
-     * @param int* Pointer to store the numeric error code, or NULL.
-     *
-     * @return The last system error as a string.
+     * @return The last system error code.
      */
-    static std::string GetLastError(int *code = NULL);
+    static int GetErrorCode();
+
+    /**
+     * @return The last system error code as a string.
+     */
+    static std::string GetErrorString();
+
+    /**
+     * Convert a system error code to a string.
+     *
+     * @param int The system error code to convert.
+     *
+     * @return The given system error code as a string.
+     */
+    static std::string GetErrorString(int);
 
     /**
      * Set a signal handler for all terminal signals.

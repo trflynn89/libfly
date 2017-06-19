@@ -35,7 +35,7 @@ PathMonitorImpl::PathMonitorImpl() :
 {
     if (m_monitorDescriptor == -1)
     {
-        LOGW(-1, "Could not initialize monitor: %s", System::GetLastError());
+        LOGW(-1, "Could not initialize monitor: %s", System::GetErrorString());
     }
 }
 
@@ -46,7 +46,7 @@ PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
 {
     if (m_monitorDescriptor == -1)
     {
-        LOGW(-1, "Could not initialize monitor: %s", System::GetLastError());
+        LOGW(-1, "Could not initialize monitor: %s", System::GetErrorString());
     }
 }
 
@@ -87,7 +87,7 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 
     if (numEvents == -1)
     {
-        LOGW(-1, "Could not create poller: %s", System::GetLastError());
+        LOGW(-1, "Could not create poller: %s", System::GetErrorString());
     }
     else if ((numEvents > 0) && (pollFd.revents & POLLIN))
     {
@@ -126,12 +126,11 @@ bool PathMonitorImpl::readEvents() const
     {
         if (len == -1)
         {
-            int error = 0;
-            std::string errorStr = System::GetLastError(&error);
+            int error = System::GetErrorCode();
 
             if (error != EAGAIN)
             {
-                LOGW(-1, "Could not read polled event: %s", errorStr);
+                LOGW(-1, "Could not read polled event: %s", System::GetErrorString(error));
             }
         }
     }
@@ -225,7 +224,7 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
 
     if (m_watchDescriptor == -1)
     {
-        LOGW(-1, "Could not add watcher for \"%s\": %s", path, System::GetLastError());
+        LOGW(-1, "Could not add watcher for \"%s\": %s", path, System::GetErrorString());
     }
 }
 

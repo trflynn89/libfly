@@ -29,6 +29,7 @@ std::string SystemImpl::LocalTime(const std::string &fmt)
     time_t now = std::chrono::system_clock::to_time_t(sys);
 
     struct tm timeVal;
+    std::string ret;
 
     if (::localtime_s(&timeVal, &now) == 0)
     {
@@ -36,38 +37,38 @@ std::string SystemImpl::LocalTime(const std::string &fmt)
 
         if (::strftime(timeStr, sizeof(timeStr), fmt.c_str(), &timeVal) != 0)
         {
-            return std::string(timeStr);
+            ret = std::string(timeStr);
         }
     }
 
-    return std::string();
+    return ret;
 }
 
 //==============================================================================
-std::string SystemImpl::GetLastError(int *pCode)
+int SystemImpl::GetErrorCode()
 {
-    int error = ::WSAGetLastError();
+    return ::WSAGetLastError();
+}
+
+//==============================================================================
+std::string SystemImpl::GetErrorString(int code)
+{
     LPTSTR str = NULL;
     std::string ret;
 
     ::FormatMessage(
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&str, 0, NULL
+        NULL, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&str, 0, NULL
     );
 
     if (str == NULL)
     {
-        ret = std::to_string(error);
+        ret = std::to_string(code);
     }
     else
     {
-        ret = "(" + std::to_string(error) + ") " + str;
+        ret = "(" + std::to_string(code) + ") " + str;
         ::LocalFree(str);
-    }
-
-    if (pCode != NULL)
-    {
-        *pCode = error;
     }
 
     return ret;

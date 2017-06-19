@@ -133,7 +133,7 @@ public:
         std::chrono::seconds waitTime(120);
         ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
 
-        fly::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
+        fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
         m_spClientSocketManager->SetClientCallbacks(callback, nullptr);
 
         if (doAsync)

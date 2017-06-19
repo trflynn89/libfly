@@ -44,7 +44,7 @@ PathMonitorImpl::PathMonitorImpl() :
 {
     if (m_iocp == NULL)
     {
-        LOGW(-1, "Could not initialize IOCP: %s", System::GetLastError());
+        LOGW(-1, "Could not initialize IOCP: %s", System::GetErrorString());
     }
 }
 
@@ -55,7 +55,7 @@ PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
 {
     if (m_iocp == NULL)
     {
-        LOGW(-1, "Could not initialize IOCP: %s", System::GetLastError());
+        LOGW(-1, "Could not initialize IOCP: %s", System::GetErrorString());
     }
 }
 
@@ -233,15 +233,15 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(HANDLE iocp, const std::string &path
 
     if (m_handle == INVALID_HANDLE_VALUE)
     {
-        LOGW(-1, "Could not create file for \"%s\": %s", path, System::GetLastError());
+        LOGW(-1, "Could not create file for \"%s\": %s", path, System::GetErrorString());
     }
     else if ((m_pInfo = new FILE_NOTIFY_INFORMATION[s_buffSize]) == NULL)
     {
-        LOGW(-1, "Could not create notify info for \"%s\": %s", path, System::GetLastError());
+        LOGW(-1, "Could not create notify info for \"%s\": %s", path, System::GetErrorString());
     }
     else if (::CreateIoCompletionPort(m_handle, iocp, (ULONG_PTR)m_handle, 0) == NULL)
     {
-        LOGW(-1, "Could not create IOCP info for \"%s\": %s", path, System::GetLastError());
+        LOGW(-1, "Could not create IOCP info for \"%s\": %s", path, System::GetErrorString());
     }
     else
     {
@@ -284,7 +284,7 @@ bool PathMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
 
     if (success == FALSE)
     {
-        LOGW(-1, "Could not check events for \"%s\": %s", path, System::GetLastError());
+        LOGW(-1, "Could not check events for \"%s\": %s", path, System::GetErrorString());
     }
 
     return (success == TRUE);

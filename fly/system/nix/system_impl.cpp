@@ -27,6 +27,7 @@ std::string SystemImpl::LocalTime(const std::string &fmt)
     time_t now = std::chrono::system_clock::to_time_t(sys);
 
     struct tm timeVal;
+    std::string ret;
 
     if (::localtime_r(&now, &timeVal) != NULL)
     {
@@ -34,24 +35,23 @@ std::string SystemImpl::LocalTime(const std::string &fmt)
 
         if (::strftime(timeStr, sizeof(timeStr), fmt.c_str(), &timeVal) != 0)
         {
-            return std::string(timeStr);
+            ret = std::string(timeStr);
         }
     }
 
-    return std::string();
+    return ret;
 }
 
 //==============================================================================
-std::string SystemImpl::GetLastError(int *pCode)
+int SystemImpl::GetErrorCode()
 {
-    int error = errno;
+    return errno;
+}
 
-    if (pCode != NULL)
-    {
-        *pCode = error;
-    }
-
-    return "(" + std::to_string(error) + ") " + ::strerror(error);
+//==============================================================================
+std::string SystemImpl::GetErrorString(int code)
+{
+    return "(" + std::to_string(code) + ") " + ::strerror(code);
 }
 
 //==============================================================================

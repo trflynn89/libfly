@@ -18,7 +18,8 @@ class SystemImpl
 public:
     static void PrintBacktrace();
     static std::string LocalTime(const std::string &);
-    static std::string GetLastError(int *);
+    static int GetErrorCode();
+    static std::string GetErrorString(int);
     static std::vector<int> GetSignals();
 };
 
