@@ -7,7 +7,6 @@
 #include <unistd.h>
 
 #include "fly/logger/logger.h"
-#include "fly/system/system.h"
 
 namespace fly {
 
@@ -65,7 +64,8 @@ bool PathImpl::RemovePath(const std::string &path)
             case FTS_NS:
             case FTS_DNR:
             case FTS_ERR:
-                LOGW(-1, "Could not read \"%s\": %s", file, System::GetErrorString(pCurr->fts_errno));
+                errno = pCurr->fts_errno; // man page shows errno may not be set
+                LOGS(-1, "Could not read \"%s\"", file);
                 ret = false;
                 break;
 
@@ -80,7 +80,7 @@ bool PathImpl::RemovePath(const std::string &path)
                 }
                 else
                 {
-                    LOGW(-1, "Could not remove \"%s\": %s", file, System::GetErrorString());
+                    LOGS(-1, "Could not remove \"%s\"", file);
                     ret = false;
                 }
 

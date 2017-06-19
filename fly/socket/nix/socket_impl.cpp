@@ -28,7 +28,7 @@ namespace
 
         if (ipaddr == NULL)
         {
-            LOGW(socketId, "Error resolving %s: %s", hostname, System::GetErrorString());
+            LOGS(socketId, "Error resolving %s", hostname);
         }
         else
         {
@@ -92,7 +92,7 @@ bool SocketImpl::IsErrorFree()
 
     if (::getsockopt(m_socketHandle, SOL_SOCKET, SO_ERROR, &opt, &len) == -1)
     {
-        LOGW(m_socketHandle, "Error getting error flag: %s", System::GetErrorString());
+        LOGS(m_socketHandle, "Error getting error flag");
     }
 
     return (opt == 0);
@@ -105,12 +105,12 @@ bool SocketImpl::SetAsync()
 
     if (flags == -1)
     {
-        LOGW(m_socketHandle, "Error getting socket flags: %s", System::GetErrorString());
+        LOGS(m_socketHandle, "Error getting socket flags");
         return false;
     }
     else if (fcntl(m_socketHandle, F_SETFL, flags | O_NONBLOCK) == -1)
     {
-        LOGW(m_socketHandle, "Error setting async flag: %s", System::GetErrorString());
+        LOGS(m_socketHandle, "Error setting async flag");
         return false;
     }
 
@@ -132,7 +132,7 @@ bool SocketImpl::Bind(int addr, int port) const
 
     if (::bind(m_socketHandle, sockAddr, sizeof(servAddr)) == -1)
     {
-        LOGW(m_socketHandle, "Error binding to %d: %s", port, System::GetErrorString());
+        LOGS(m_socketHandle, "Error binding to %d", port);
         return false;
     }
 
@@ -147,7 +147,7 @@ bool SocketImpl::BindForReuse(int addr, int port) const
 
     if (::setsockopt(m_socketHandle, SOL_SOCKET, SO_REUSEADDR, &opt, len) == -1)
     {
-        LOGW(m_socketHandle, "Error setting reuse flag: %s", System::GetErrorString());
+        LOGS(m_socketHandle, "Error setting reuse flag");
         return false;
     }
 
@@ -159,7 +159,7 @@ bool SocketImpl::Listen()
 {
     if (::listen(m_socketHandle, 100) == -1)
     {
-        LOGW(m_socketHandle, "Error listening: %s", System::GetErrorString());
+        LOGS(m_socketHandle, "Error listening");
         return false;
     }
 
@@ -174,8 +174,8 @@ bool SocketImpl::Connect(const std::string &hostname, int port)
 
     if (::connect(m_socketHandle, (struct sockaddr *)&server, sizeof(server)) == -1)
     {
+        LOGS(m_socketHandle, "Error connecting");
         int error = System::GetErrorCode();
-        LOGW(m_socketHandle, "Error connecting: %s", System::GetErrorString(error));
 
         if ((error == EINTR) || (error == EINPROGRESS))
         {
@@ -203,7 +203,7 @@ SocketPtr SocketImpl::Accept() const
 
     if (skt == -1)
     {
-        LOGW(m_socketHandle, "Error accepting: %s", System::GetErrorString());
+        LOGS(m_socketHandle, "Error accepting");
         ret.reset();
     }
     else
@@ -258,10 +258,8 @@ size_t SocketImpl::Send(const std::string &msg, bool &wouldBlock) const
 
             if (currSent == -1)
             {
-                int error = System::GetErrorCode();
-
-                LOGW(m_socketHandle, "Error sending: %s", System::GetErrorString(error));
-                wouldBlock = (error == EWOULDBLOCK);
+                wouldBlock = (System::GetErrorCode() == EWOULDBLOCK);
+                LOGS(m_socketHandle, "Error sending");
             }
         }
     }
@@ -323,10 +321,8 @@ size_t SocketImpl::SendTo(
 
             if (currSent == -1)
             {
-                int error = System::GetErrorCode();
-
-                LOGW(m_socketHandle, "Error sending: %s", System::GetErrorString(error));
-                wouldBlock = (error == EWOULDBLOCK);
+                wouldBlock = (System::GetErrorCode() == EWOULDBLOCK);
+                LOGS(m_socketHandle, "Error sending");
             }
         }
     }
@@ -372,10 +368,8 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const
 
             if (bytesRead == -1)
             {
-                int error = System::GetErrorCode();
-
-                LOGW(m_socketHandle, "Error receiving: %s", System::GetErrorString(error));
-                wouldBlock = (error == EWOULDBLOCK);
+                wouldBlock = (System::GetErrorCode() == EWOULDBLOCK);
+                LOGS(m_socketHandle, "Error receiving");
             }
         }
 
@@ -429,10 +423,8 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
 
             if (bytesRead == -1)
             {
-                int error = System::GetErrorCode();
-
-                LOGW(m_socketHandle, "Error receiving: %s", System::GetErrorString(error));
-                wouldBlock = (error == EWOULDBLOCK);
+                wouldBlock = (System::GetErrorCode() == EWOULDBLOCK);
+                LOGS(m_socketHandle, "Error receiving");
             }
         }
 

@@ -2,7 +2,6 @@
 
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
-#include "fly/system/system.h"
 
 namespace fly {
 
@@ -44,7 +43,7 @@ PathMonitorImpl::PathMonitorImpl() :
 {
     if (m_iocp == NULL)
     {
-        LOGW(-1, "Could not initialize IOCP: %s", System::GetErrorString());
+        LOGS(-1, "Could not initialize IOCP");
     }
 }
 
@@ -55,7 +54,7 @@ PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
 {
     if (m_iocp == NULL)
     {
-        LOGW(-1, "Could not initialize IOCP: %s", System::GetErrorString());
+        LOGS(-1, "Could not initialize IOCP");
     }
 }
 
@@ -233,15 +232,15 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(HANDLE iocp, const std::string &path
 
     if (m_handle == INVALID_HANDLE_VALUE)
     {
-        LOGW(-1, "Could not create file for \"%s\": %s", path, System::GetErrorString());
+        LOGS(-1, "Could not create file for \"%s\"", path);
     }
     else if ((m_pInfo = new FILE_NOTIFY_INFORMATION[s_buffSize]) == NULL)
     {
-        LOGW(-1, "Could not create notify info for \"%s\": %s", path, System::GetErrorString());
+        LOGS(-1, "Could not create notify info for \"%s\"", path);
     }
     else if (::CreateIoCompletionPort(m_handle, iocp, (ULONG_PTR)m_handle, 0) == NULL)
     {
-        LOGW(-1, "Could not create IOCP info for \"%s\": %s", path, System::GetErrorString());
+        LOGS(-1, "Could not create IOCP info for \"%s\"", path);
     }
     else
     {
@@ -284,7 +283,7 @@ bool PathMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
 
     if (success == FALSE)
     {
-        LOGW(-1, "Could not check events for \"%s\": %s", path, System::GetErrorString());
+        LOGS(-1, "Could not check events for \"%s\"", path);
     }
 
     return (success == TRUE);

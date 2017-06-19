@@ -12,48 +12,56 @@
 #include "fly/concurrency/concurrent_queue.h"
 #include "fly/logger/log.h"
 #include "fly/string/string.h"
+#include "fly/system/system.h"
 #include "fly/task/runner.h"
 
 //==============================================================================
-#define LOG(lvl, gameId, fmt)                                                 \
-(                                                                             \
-    fly::Logger::AddLog(lvl, gameId, __FILE__, __FUNCTION__, __LINE__, fmt)  \
+#define LOG(lvl, gameId, fmt)                                                  \
+(                                                                              \
+    fly::Logger::AddLog(lvl, gameId, __FILE__, __FUNCTION__, __LINE__, fmt)    \
 )
 
 //==============================================================================
-#define LOGD(gameId, fmt, ...)                                                \
-(                                                                             \
-    LOG(LOG_DEBUG, gameId, fly::String::Format(fmt, ##__VA_ARGS__))          \
+#define LOGD(gameId, fmt, ...)                                                 \
+(                                                                              \
+    LOG(LOG_DEBUG, gameId, fly::String::Format(fmt, ##__VA_ARGS__))            \
 )
 
 //==============================================================================
-#define LOGI(gameId, fmt, ...)                                                \
-(                                                                             \
-    LOG(LOG_INFO, gameId, fly::String::Format(fmt, ##__VA_ARGS__))           \
+#define LOGI(gameId, fmt, ...)                                                 \
+(                                                                              \
+    LOG(LOG_INFO, gameId, fly::String::Format(fmt, ##__VA_ARGS__))             \
 )
 
 //==============================================================================
-#define LOGW(gameId, fmt, ...)                                                \
-(                                                                             \
-    LOG(LOG_WARN, gameId, fly::String::Format(fmt, ##__VA_ARGS__))           \
+#define LOGW(gameId, fmt, ...)                                                 \
+(                                                                              \
+    LOG(LOG_WARN, gameId, fly::String::Format(fmt, ##__VA_ARGS__))             \
 )
 
 //==============================================================================
-#define LOGE(gameId, fmt, ...)                                                \
-(                                                                             \
-    LOG(LOG_ERROR, gameId, fly::String::Format(fmt, ##__VA_ARGS__))          \
+#define LOGS(gameId, fmt, ...)                                                 \
+(                                                                              \
+    LOG(LOG_WARN, gameId, fly::String::Format(fmt ": ", ##__VA_ARGS__) +       \
+        fly::System::GetErrorString())                                         \
 )
 
 //==============================================================================
-#define LOGC(fmt, ...)                                                        \
-(                                                                             \
-    fly::Logger::ConsoleLog(true, fly::String::Format(fmt, ##__VA_ARGS__))  \
+#define LOGE(gameId, fmt, ...)                                                 \
+(                                                                              \
+    LOG(LOG_ERROR, gameId, fly::String::Format(fmt, ##__VA_ARGS__))            \
 )
 
 //==============================================================================
-#define LOGC_NO_LOCK(fmt, ...)                                                \
-(                                                                             \
-    fly::Logger::ConsoleLog(false, fly::String::Format(fmt, ##__VA_ARGS__)) \
+#define LOGC(fmt, ...)                                                         \
+(                                                                              \
+    fly::Logger::ConsoleLog(true, fly::String::Format(fmt, ##__VA_ARGS__))     \
+)
+
+//==============================================================================
+#define LOGC_NO_LOCK(fmt, ...)                                                 \
+(                                                                              \
+    fly::Logger::ConsoleLog(false, fly::String::Format(fmt, ##__VA_ARGS__))    \
 )
 
 namespace fly {
