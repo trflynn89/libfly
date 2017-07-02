@@ -465,8 +465,17 @@ TEST(PathTest, JoinTest)
 {
     std::string path1(fly::Path::GetTempDirectory());
     std::string path2(fly::String::GenerateRandomString(10));
+    std::string path;
 
-    std::string path(fly::Path::Join(path1, path2));
+    std::string separator2x(2, fly::Path::GetSeparator());
+    std::string separator3x(3, fly::Path::GetSeparator());
+
+    path = fly::Path::Join(path1, path2);
     EXPECT_TRUE(fly::String::StartsWith(path, path1));
     EXPECT_TRUE(fly::String::EndsWith(path, path2));
+
+    path = fly::Path::Join(path1, separator3x + path2);
+    EXPECT_TRUE(fly::String::StartsWith(path, path1));
+    EXPECT_TRUE(fly::String::EndsWith(path, path2));
+    EXPECT_EQ(path.find(separator2x), std::string::npos);
 }

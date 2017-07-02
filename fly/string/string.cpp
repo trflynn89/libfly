@@ -64,6 +64,18 @@ void String::Trim(std::string &str)
 }
 
 //==============================================================================
+void String::ReplaceAll(std::string &target, const std::string &search, const char &replace)
+{
+    size_t pos = target.find(search);
+
+    while (!search.empty() && (pos != std::string::npos))
+    {
+        target.replace(pos, search.length(), 1, replace);
+        pos = target.find(search);
+    }
+}
+
+//==============================================================================
 void String::ReplaceAll(std::string &target, const std::string &search, const std::string &replace)
 {
     size_t pos = target.find(search);

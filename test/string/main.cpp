@@ -224,6 +224,18 @@ TEST(StringTest, ReplaceAllTest)
 }
 
 //==============================================================================
+TEST(StringTest, ReplaceAllWithCharTest)
+{
+    std::string source("To Be Replaced! To Be Replaced!");
+    std::string search("Be Replaced");
+    char replace('x');
+    std::string result("To x! To x!");
+
+    fly::String::ReplaceAll(source, search, replace);
+    ASSERT_EQ(source, result);
+}
+
+//==============================================================================
 TEST(StringTest, ReplaceAllWithEmptyTest)
 {
     std::string source("To Be Replaced! To Be Replaced!");

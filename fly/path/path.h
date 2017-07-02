@@ -61,8 +61,13 @@ public:
 template <typename ... Args>
 std::string Path::Join(const Args &...args)
 {
-    static const char separator = GetSeparator();
-    return String::Join(separator, args...);
+    static const char separator(GetSeparator());
+    static const std::string separator2x(2, separator);
+
+    std::string path = String::Join(separator, args...);
+    String::ReplaceAll(path, separator2x, separator);
+
+    return path;
 }
 
 }

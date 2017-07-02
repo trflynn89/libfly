@@ -49,7 +49,16 @@ public:
     static void Trim(std::string &);
 
     /**
-     * Replace all instances of a substring in a string with another substring.
+     * Replace all instances of a substring in a string with a character.
+     *
+     * @param string The string container which will be modified.
+     * @param string The string to search for and replace.
+     * @param char The replacement character.
+     */
+    static void ReplaceAll(std::string &, const std::string &, const char &);
+
+    /**
+     * Replace all instances of a substring in a string with another string.
      *
      * @param string The string container which will be modified.
      * @param string The string to search for and replace.
