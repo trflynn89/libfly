@@ -42,9 +42,7 @@ struct Log
     /**
      * Default constructor.
      */
-    Log()
-    {
-    }
+    Log();
 
     /**
      * Constructor. Initialize with a message.
@@ -54,12 +52,12 @@ struct Log
      */
     Log(const LoggerConfigPtr &, const std::string &);
 
-    LogLevel m_level = NUM_LEVELS;
-    double m_time = -1.0;
-    ssize_t m_gameId = -1;
+    LogLevel m_level;
+    double m_time;
+    ssize_t m_gameId;
     char m_file[100];
     char m_function[100];
-    unsigned int m_line = -1;
+    unsigned int m_line;
     std::string m_message;
 
     friend std::ostream &operator << (std::ostream &, const Log &);
