@@ -1,5 +1,7 @@
 #include "fly/logger/log.h"
 
+#include <cstring>
+
 #include "fly/logger/logger_config.h"
 
 namespace fly {
