@@ -1,12 +1,10 @@
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
-#include "fly/traits/type_traits.h"
+#include "fly/traits/traits.h"
 
-namespace fly
-{
-    DECL_TESTS(foo, T, std::declval<const T &>().Foo());
-}
+//==============================================================================
+DECLARATION_TESTS(foo, T, std::declval<const T &>().Foo());
 
 namespace
 {
@@ -32,13 +30,13 @@ namespace
     }
 
     //==========================================================================
-    template <typename T, fly::if_foo::enabled<T> = 0>
+    template <typename T, if_foo::enabled<T> = 0>
     bool callFoo(const T &arg)
     {
         return arg.Foo();
     }
 
-    template <typename T, fly::if_foo::disabled<T> = 0>
+    template <typename T, if_foo::disabled<T> = 0>
     bool callFoo(const T &)
     {
         return false;

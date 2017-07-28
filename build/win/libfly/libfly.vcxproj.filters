@@ -68,9 +68,6 @@
     <ClInclude Include="..\..\..\fly\path\path_monitor_impl.h">
       <Filter>path</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\traits\type_traits.h">
-      <Filter>traits</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\task\runner.h">
       <Filter>task</Filter>
     </ClInclude>
@@ -136,6 +133,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\system\win\system_impl.h">
       <Filter>system\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\traits\traits.h">
+      <Filter>traits</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

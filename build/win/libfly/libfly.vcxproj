@@ -170,7 +170,7 @@
     <ClInclude Include="..\..\..\fly\system\win\system_impl.h" />
     <ClInclude Include="..\..\..\fly\task\runner.h" />
     <ClInclude Include="..\..\..\fly\task\task_config.h" />
-    <ClInclude Include="..\..\..\fly\traits\type_traits.h" />
+    <ClInclude Include="..\..\..\fly\traits\traits.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp" />

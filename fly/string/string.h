@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "fly/fly.h"
-#include "fly/traits/type_traits.h"
+#include "fly/traits/traits.h"
 
 namespace fly {
 
