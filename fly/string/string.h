@@ -211,26 +211,16 @@ private:
     template <typename T>
     static void join(std::ostream &, const char &, const T &);
 
-#ifdef FLY_WINDOWS
-
     /**
      * Stream the given value into the given stream.
      */
-    template <typename T>
-    static void getValue(std::ostream &, const T &);
-
-#else // FLY_WINDOWS
-
-    /**
-     * Stream the given value into the given stream.
-     */
-    template <typename T, enable_if_all<if_ostream::enabled<T>>...>
+    template <typename T, if_ostream::enabled<T> = 0>
     static void getValue(std::ostream &, const T &);
 
     /**
      * Stream the hash of the given value into the given stream.
      */
-    template <typename T, enable_if_all<if_ostream::disabled<T>, if_hash::enabled<T>>...>
+    template <typename T, if_ostream::disabled<T> = 0, if_hash::enabled<T> = 0>
     static void getValue(std::ostream &, const T &);
 
     /**
@@ -238,10 +228,8 @@ private:
      * This override could be left undefined, but this compile error is much
      * easier to read.
      */
-    template <typename T, enable_if_all<if_ostream::disabled<T>, if_hash::disabled<T>>...>
+    template <typename T, if_ostream::disabled<T> = 0, if_hash::disabled<T> = 0>
     static void getValue(std::ostream &, const T &);
-
-#endif // FLY_WINDOWS
 };
 
 //==============================================================================
@@ -348,26 +336,15 @@ void String::join(std::ostream &stream, const char &, const T &value)
     getValue(stream, value);
 }
 
-#ifdef FLY_WINDOWS
-
 //==============================================================================
-template <typename T>
-void String::getValue(std::ostream &stream, const T &value)
-{
-    stream << std::boolalpha << value;
-}
-
-#else // FLY_WINDOWS
-
-//==============================================================================
-template <typename T, enable_if_all<if_ostream::enabled<T>>...>
+template <typename T, if_ostream::enabled<T>>
 void String::getValue(std::ostream &stream, const T &value)
 {
     stream << std::boolalpha << value;
 }
 
 //==============================================================================
-template <typename T, enable_if_all<if_ostream::disabled<T>, if_hash::enabled<T>>...>
+template <typename T, if_ostream::disabled<T>, if_hash::enabled<T>>
 void String::getValue(std::ostream &stream, const T &value)
 {
     static std::hash<T> hasher;
@@ -375,13 +352,11 @@ void String::getValue(std::ostream &stream, const T &value)
 }
 
 //==============================================================================
-template <typename T, enable_if_all<if_ostream::disabled<T>, if_hash::disabled<T>>...>
+template <typename T, if_ostream::disabled<T>, if_hash::disabled<T>>
 void String::getValue(std::ostream &, const T &)
 {
-    static_assert(if_ostream::enabled<T>::value || if_hash::enabled<T>::value,
+    static_assert(if_ostream::value<T> || if_hash::value<T>,
         "Given type is neither streamable nor hashable");
 }
-
-#endif // FLY_WINDOWS
 
 }

@@ -391,12 +391,8 @@ TEST(StringTest, JoinTest)
     EXPECT_EQ("a:[goodbye beef]:c:d", fly::String::Join(':', str, obj2, arr, chr));
     EXPECT_EQ("a:c:d", fly::String::Join(':', str, arr, chr));
 
-#ifndef FLY_WINDOWS
-
     std::regex test("(\\[0x[0-9a-fA-F]+\\]:2:\\[goodbye beef\\]:\\[world f00d\\])");
     ASSERT_TRUE(std::regex_match(fly::String::Join(':', obj1, 2, obj2, obj3), test));
-
-#endif // FLY_WINDOWS
 }
 
 //==============================================================================
