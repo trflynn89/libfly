@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
@@ -21,12 +23,19 @@ namespace
     {
     public:
         BarClass() { }
+
+        std::string operator()() const
+        {
+            return "BarClass";
+        }
+
+    private:
         friend std::ostream &operator << (std::ostream &, const BarClass &);
     };
 
-    std::ostream &operator << (std::ostream &stream, const BarClass &)
+    std::ostream &operator << (std::ostream &stream, const BarClass &bar)
     {
-        return stream;
+        return (stream << bar());
     }
 
     //==========================================================================
@@ -57,13 +66,14 @@ namespace
 
     //==========================================================================
     template <typename T, fly::if_ostream::enabled<T> = 0>
-    bool isStreamable(const T &)
+    bool isStreamable(std::ostream &stream, const T &arg)
     {
+        stream << arg;
         return true;
     }
 
     template <typename T, fly::if_ostream::disabled<T> = 0>
-    bool isStreamable(const T &)
+    bool isStreamable(std::ostream &, const T &)
     {
         return false;
     }
@@ -115,14 +125,26 @@ TEST(TraitsTest, StringTest)
 //==============================================================================
 TEST(TraitsTest, StreamTest)
 {
+    std::stringstream stream;
+
     const FooClass fc;
     const BarClass bc;
 
     const std::string str("a");
 
-    ASSERT_TRUE(isStreamable(bc));
-    ASSERT_TRUE(isStreamable(str));
-    ASSERT_TRUE(isStreamable(1));
+    ASSERT_TRUE(isStreamable(stream, bc));
+    ASSERT_EQ(stream.str(), bc());
+    stream.str(std::string());
 
-    ASSERT_FALSE(isStreamable(fc));
+    ASSERT_TRUE(isStreamable(stream, str));
+    ASSERT_EQ(stream.str(), str);
+    stream.str(std::string());
+
+    ASSERT_TRUE(isStreamable(stream, 1));
+    ASSERT_EQ(stream.str(), "1");
+    stream.str(std::string());
+
+    ASSERT_FALSE(isStreamable(stream, fc));
+    ASSERT_EQ(stream.str(), std::string());
+    stream.str(std::string());
 }
