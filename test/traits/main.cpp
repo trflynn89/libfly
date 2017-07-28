@@ -3,11 +3,11 @@
 #include "fly/fly.h"
 #include "fly/traits/traits.h"
 
-//==============================================================================
-DECLARATION_TESTS(foo, T, std::declval<const T &>().Foo());
-
 namespace
 {
+    //==========================================================================
+    DECLARATION_TESTS(foo, T, std::declval<const T &>().Foo());
+
     //==========================================================================
     class FooClass
     {
