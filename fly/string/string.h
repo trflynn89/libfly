@@ -355,7 +355,7 @@ void String::getValue(std::ostream &stream, const T &value)
 template <typename T, if_ostream::disabled<T>, if_hash::disabled<T>>
 void String::getValue(std::ostream &, const T &)
 {
-    static_assert(if_ostream::value<T> || if_hash::value<T>,
+    static_assert(if_ostream::value<T>::value || if_hash::value<T>::value,
         "Given type is neither streamable nor hashable");
 }
 
