@@ -220,15 +220,7 @@ private:
     /**
      * Stream the hash of the given value into the given stream.
      */
-    template <typename T, if_ostream::disabled<T> = 0, if_hash::enabled<T> = 0>
-    static void getValue(std::ostream &, const T &);
-
-    /**
-     * Streaming/hashing is not enabled for this type, raise compile error.
-     * This override could be left undefined, but this compile error is much
-     * easier to read.
-     */
-    template <typename T, if_ostream::disabled<T> = 0, if_hash::disabled<T> = 0>
+    template <typename T, if_ostream::disabled<T> = 0>
     static void getValue(std::ostream &, const T &);
 };
 
@@ -344,19 +336,11 @@ void String::getValue(std::ostream &stream, const T &value)
 }
 
 //==============================================================================
-template <typename T, if_ostream::disabled<T>, if_hash::enabled<T>>
+template <typename T, if_ostream::disabled<T>>
 void String::getValue(std::ostream &stream, const T &value)
 {
-    static std::hash<T> hasher;
-    stream << "[0x" << std::hex << hasher(value) << std::dec << ']';
-}
-
-//==============================================================================
-template <typename T, if_ostream::disabled<T>, if_hash::disabled<T>>
-void String::getValue(std::ostream &, const T &)
-{
-    static_assert(if_ostream::value<T>::value || if_hash::value<T>::value,
-        "Given type is neither streamable nor hashable");
+    static std::hash<T *> hasher;
+    stream << "[0x" << std::hex << hasher(&value) << std::dec << ']';
 }
 
 }

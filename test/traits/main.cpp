@@ -69,32 +69,6 @@ namespace
     {
         return false;
     }
-
-    //==========================================================================
-    template <typename T, fly::if_hash::enabled<T> = 0>
-    bool isHashable(const T &)
-    {
-        return true;
-    }
-
-    template <typename T, fly::if_hash::disabled<T> = 0>
-    bool isHashable(const T &)
-    {
-        return false;
-    }
-}
-
-//==============================================================================
-namespace std
-{
-    template <>
-    struct hash<FooClass>
-    {
-        size_t operator()(const FooClass &) const
-        {
-            return 0;
-        }
-    };
 }
 
 //==============================================================================
@@ -153,21 +127,4 @@ TEST(TraitsTest, StreamTest)
     ASSERT_TRUE(isStreamable(1));
 
     ASSERT_FALSE(isStreamable(fc));
-}
-
-//==============================================================================
-TEST(TraitsTest, HashTest)
-{
-    const FooClass fc;
-    const BarClass bc;
-
-    const std::string str("a");
-
-    ASSERT_TRUE(isHashable(fc));
-    ASSERT_TRUE(isHashable(str));
-    ASSERT_TRUE(isHashable(1));
-
-#ifndef FLY_WINDOWS
-    ASSERT_FALSE(isHashable(bc));
-#endif
 }

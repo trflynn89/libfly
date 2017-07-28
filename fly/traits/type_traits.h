@@ -63,9 +63,6 @@ struct if_##label \
     \
     template <typename Type> \
     using disabled = std::enable_if_t<__##label::is_undefined<Type>::value, bool>; \
-    \
-    template <typename Type> \
-    using value = bool_constant<!__##label::is_undefined<Type>::value>; \
 };
  
 /**
@@ -94,10 +91,5 @@ struct if_string
  * Tests for whether a type defines operator<<.
  */
 DECL_TESTS(ostream, T, std::declval<std::ostream &>() << std::declval<const T &>());
-
-/**
- * Tests for whether a type is hashable with std::hash.
- */
-DECL_TESTS(hash, T, std::declval<const std::hash<T> &>() (std::declval<const T &>()));
 
 }

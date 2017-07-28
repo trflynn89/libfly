@@ -65,7 +65,6 @@ namespace
         return stream;
     }
 
-    //==========================================================================
     class HashableAndStreamable : public Base
     {
     public:
@@ -103,20 +102,20 @@ namespace
 namespace std
 {
     template <>
-    struct hash<Hashable>
+    struct hash<Hashable *>
     {
-        size_t operator()(const Hashable &value) const
+        size_t operator()(const Hashable *value) const
         {
-            return value.Hash();
+            return value->Hash();
         }
     };
 
     template <>
-    struct hash<HashableAndStreamable>
+    struct hash<HashableAndStreamable *>
     {
-        size_t operator()(const HashableAndStreamable &value) const
+        size_t operator()(const HashableAndStreamable *value) const
         {
-            return value.Hash();
+            return value->Hash();
         }
     };
 }
