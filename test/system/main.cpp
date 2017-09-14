@@ -1,10 +1,13 @@
 #include <csignal>
 #include <functional>
+#include <future>
 #include <string>
+#include <thread>
 
 #include <gtest/gtest.h>
 
 #include "fly/system/system.h"
+#include "fly/system/system_monitor_impl.h"
 
 namespace
 {
@@ -55,4 +58,61 @@ TEST(SystemTest, SignalTest)
     EXPECT_EQ(s_lastSignal, SIGSEGV);
 
     fly::System::SetSignalHandler(nullptr);
+}
+
+//==============================================================================
+class SystemMonitorTest : public ::testing::Test
+{
+public:
+    SystemMonitorTest() :
+        m_spMonitor(std::make_shared<fly::SystemMonitorImpl>()),
+        m_aKeepRunning(true)
+    {
+    }
+
+    /**
+     * Create and start the system monitor.
+     */
+    virtual void SetUp()
+    {
+        ASSERT_TRUE(m_spMonitor && m_spMonitor->Start());
+    }
+
+    /**
+     * Stop the system monitor.
+     */
+    virtual void TearDown()
+    {
+        m_spMonitor->Stop();
+    }
+
+    /**
+     * Thread to spin infinitely until signaled to stop.
+     */
+    void SpinThread()
+    {
+        while (m_aKeepRunning.load())
+        {
+        }
+    }
+
+protected:
+    fly::SystemMonitorPtr m_spMonitor;
+    std::atomic_bool m_aKeepRunning;
+};
+
+//==============================================================================
+TEST_F(SystemMonitorTest, CpuUsageTest)
+{
+    std::future<void> result = std::async(
+        std::launch::async, &SystemMonitorTest::SpinThread, this
+    );
+
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    m_aKeepRunning.store(false);
+
+    ASSERT_GT(m_spMonitor->GetCpuUsage(), 0.0);
+
+    ASSERT_TRUE(result.valid());
+    result.get();
 }
