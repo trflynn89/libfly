@@ -5,6 +5,7 @@
 
 #include "fly/logger/logger.h"
 #include "fly/parser/ini_parser.h"
+#include "fly/parser/json_parser.h"
 #include "fly/path/path.h"
 #include "fly/string/string.h"
 
@@ -477,4 +478,55 @@ TEST_F(IniParserTest, MultipleParseTest)
         EXPECT_EQ(m_spParser->GetSize(), 1);
         EXPECT_EQ(m_spParser->GetSize("section"), 2);
     }
+}
+
+
+
+
+
+
+TEST(JsonParserTest, Test)
+{
+    const fly::Json array = { '7', 8, "nine", 10 };
+
+    const fly::Json map = {
+        { "name1", "value1" },
+        { "name2", 2 },
+        { "name3", 3.14159 },
+    };
+
+    fly::Json value = {
+        true,
+        false,
+        1,
+        "string",
+        nullptr,
+        array,
+        map,
+        { 11, "twelve", 13.0, 14 },
+        { { "name4", "value4" }, { "name5", 1.23456f } }
+    };
+
+    std::cout << value << std::endl;
+    std::cout << std::endl;
+
+    std::cout << value[0] << std::endl;
+    std::cout << value[1] << std::endl;
+    std::cout << value[2] << std::endl;
+    std::cout << value[3] << std::endl;
+    std::cout << value[4] << std::endl;
+    std::cout << value[5] << std::endl;
+    std::cout << value[6] << std::endl;
+    std::cout << value[7] << std::endl;
+    std::cout << value[8] << std::endl;
+    std::cout << std::endl;
+
+    EXPECT_THROW(array[4], fly::JsonException);
+    EXPECT_THROW(array["a"], fly::JsonException);
+
+    EXPECT_THROW(map[3], fly::JsonException);
+    EXPECT_THROW(map["a"], fly::JsonException);
+
+    auto spParser = std::make_shared<fly::JsonParser>("/tmp", "test.json");
+    spParser->Parse();
 }

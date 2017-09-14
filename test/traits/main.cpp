@@ -77,6 +77,58 @@ namespace
     {
         return false;
     }
+
+    //==========================================================================
+    template <typename T, fly::if_signed_integer::enabled<T> = 0>
+    bool isSignedInteger(const T &)
+    {
+        return true;
+    }
+
+    template <typename T, fly::if_signed_integer::disabled<T> = 0>
+    bool isSignedInteger(const T &)
+    {
+        return false;
+    }
+
+    //==========================================================================
+    template <typename T, fly::if_unsigned_integer::enabled<T> = 0>
+    bool isUnsignedInteger(const T &)
+    {
+        return true;
+    }
+
+    template <typename T, fly::if_unsigned_integer::disabled<T> = 0>
+    bool isUnsignedInteger(const T &)
+    {
+        return false;
+    }
+
+    //==========================================================================
+    template <typename T, fly::if_floating_point::enabled<T> = 0>
+    bool isFloat(const T &)
+    {
+        return true;
+    }
+
+    template <typename T, fly::if_floating_point::disabled<T> = 0>
+    bool isFloat(const T &)
+    {
+        return false;
+    }
+
+    //==========================================================================
+    template <typename T, fly::if_boolean::enabled<T> = 0>
+    bool isBool(const T &)
+    {
+        return true;
+    }
+
+    template <typename T, fly::if_boolean::disabled<T> = 0>
+    bool isBool(const T &)
+    {
+        return false;
+    }
 }
 
 //==============================================================================
@@ -110,8 +162,6 @@ TEST(TraitsTest, StringTest)
     ASSERT_TRUE(isString(str1));
     ASSERT_TRUE(isString(cstr1));
     ASSERT_TRUE(isString(cstr2));
-    ASSERT_TRUE(isString(chr1));
-    ASSERT_TRUE(isString(chr2));
     ASSERT_TRUE(isString(arr1));
     ASSERT_TRUE(isString(arr2));
 
@@ -120,6 +170,8 @@ TEST(TraitsTest, StringTest)
     ASSERT_FALSE(isString(3.14159f));
     ASSERT_FALSE(isString(3.14159f));
     ASSERT_FALSE(isString(fc));
+    ASSERT_FALSE(isString(chr1));
+    ASSERT_FALSE(isString(chr2));
 }
 
 //==============================================================================
@@ -147,4 +199,54 @@ TEST(TraitsTest, StreamTest)
     ASSERT_FALSE(isStreamable(stream, fc));
     ASSERT_EQ(stream.str(), std::string());
     stream.str(std::string());
+}
+
+//==============================================================================
+TEST(TraitsTest, SignedIntegerTest)
+{
+    ASSERT_TRUE(isSignedInteger(1));
+    ASSERT_TRUE(isSignedInteger(-1));
+
+    ASSERT_FALSE(isSignedInteger("foo"));
+    ASSERT_FALSE(isSignedInteger(3.14));
+    ASSERT_FALSE(isSignedInteger(true));
+    ASSERT_FALSE(isSignedInteger(static_cast<unsigned int>(1)));
+}
+
+//==============================================================================
+TEST(TraitsTest, UnsignedIntegerTest)
+{
+    ASSERT_TRUE(isUnsignedInteger(static_cast<unsigned int>(1)));
+    ASSERT_TRUE(isUnsignedInteger(static_cast<unsigned int>(-1)));
+
+    ASSERT_FALSE(isUnsignedInteger(1));
+    ASSERT_FALSE(isUnsignedInteger(-1));
+    ASSERT_FALSE(isUnsignedInteger("foo"));
+    ASSERT_FALSE(isUnsignedInteger(3.14));
+    ASSERT_FALSE(isUnsignedInteger(true));
+}
+
+//==============================================================================
+TEST(TraitsTest, FloatTest)
+{
+    ASSERT_TRUE(isFloat(3.14f));
+    ASSERT_TRUE(isFloat(3.14));
+    ASSERT_TRUE(isFloat(static_cast<long double>(3.14)));
+
+    ASSERT_FALSE(isFloat(1));
+    ASSERT_FALSE(isFloat(-1));
+    ASSERT_FALSE(isFloat("foo"));
+    ASSERT_FALSE(isFloat(true));
+}
+
+//==============================================================================
+TEST(TraitsTest, BoolTest)
+{
+    ASSERT_TRUE(isBool(true));
+    ASSERT_TRUE(isBool(false));
+
+    ASSERT_FALSE(isFloat(1));
+    ASSERT_FALSE(isFloat(-1));
+    ASSERT_FALSE(isFloat("foo"));
+    ASSERT_FALSE(isUnsignedInteger(3.14));
 }

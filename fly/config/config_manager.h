@@ -36,7 +36,8 @@ public:
      */
     enum ConfigFileType
     {
-        CONFIG_TYPE_INI
+        CONFIG_TYPE_INI,
+        CONFIG_TYPE_JSON,
     };
 
     /**

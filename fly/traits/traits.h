@@ -64,11 +64,10 @@ namespace fly {
  */
 struct if_string
 {
-    struct __string
+    struct __
     {
         template <typename T>
         using is_string = std::integral_constant<bool,
-            std::is_same<char,         std::decay_t<T>>::value ||
             std::is_same<char *,       std::decay_t<T>>::value ||
             std::is_same<char const *, std::decay_t<T>>::value ||
             std::is_same<std::string,  std::decay_t<T>>::value
@@ -76,10 +75,94 @@ struct if_string
     };
 
     template <typename T>
-    using enabled = std::enable_if_t<__string::is_string<T>::value, bool>;
+    using enabled = std::enable_if_t<__::is_string<T>::value, bool>;
 
     template <typename T>
-    using disabled = std::enable_if_t<!__string::is_string<T>::value, bool>;
+    using disabled = std::enable_if_t<!__::is_string<T>::value, bool>;
+};
+
+/**
+ * Tests for whether a given type is a signed integer.
+ */
+struct if_signed_integer
+{
+    struct __
+    {
+        template <typename T>
+        using is_signed_integer = std::integral_constant<bool,
+            std::is_integral<std::decay_t<T>>::value &&
+            std::is_signed<std::decay_t<T>>::value &&
+            !std::is_same<bool, std::decay_t<T>>::value
+        >;
+    };
+
+    template <typename T>
+    using enabled = std::enable_if_t<__::is_signed_integer<T>::value, bool>;
+
+    template <typename T>
+    using disabled = std::enable_if_t<!__::is_signed_integer<T>::value, bool>;
+};
+
+/**
+ * Tests for whether a given type is an unsigned integer.
+ */
+struct if_unsigned_integer
+{
+    struct __
+    {
+        template <typename T>
+        using is_unsigned_integer = std::integral_constant<bool,
+            std::is_integral<std::decay_t<T>>::value &&
+            std::is_unsigned<std::decay_t<T>>::value &&
+            !std::is_same<bool, std::decay_t<T>>::value
+        >;
+    };
+
+    template <typename T>
+    using enabled = std::enable_if_t<__::is_unsigned_integer<T>::value, bool>;
+
+    template <typename T>
+    using disabled = std::enable_if_t<!__::is_unsigned_integer<T>::value, bool>;
+};
+
+/**
+ * Tests for whether a given type is a float.
+ */
+struct if_floating_point
+{
+    struct __
+    {
+        template <typename T>
+        using is_floating_point = std::integral_constant<bool,
+            std::is_floating_point<std::decay_t<T>>::value
+        >;
+    };
+
+    template <typename T>
+    using enabled = std::enable_if_t<__::is_floating_point<T>::value, bool>;
+
+    template <typename T>
+    using disabled = std::enable_if_t<!__::is_floating_point<T>::value, bool>;
+};
+
+/**
+ * Tests for whether a given type is a boolean.
+ */
+struct if_boolean
+{
+    struct __
+    {
+        template <typename T>
+        using is_boolean = std::integral_constant<bool,
+            std::is_same<bool, std::decay_t<T>>::value
+        >;
+    };
+
+    template <typename T>
+    using enabled = std::enable_if_t<__::is_boolean<T>::value, bool>;
+
+    template <typename T>
+    using disabled = std::enable_if_t<!__::is_boolean<T>::value, bool>;
 };
 
 /**

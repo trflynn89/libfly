@@ -6,6 +6,7 @@
 
 #include "fly/logger/logger.h"
 #include "fly/parser/ini_parser.h"
+#include "fly/parser/json_parser.h"
 #include "fly/path/path_monitor_impl.h"
 
 namespace fly {
@@ -31,6 +32,10 @@ ConfigManager::ConfigManager(
     {
     case CONFIG_TYPE_INI:
         m_spParser = std::make_shared<IniParser>(path, file);
+        break;
+
+    case CONFIG_TYPE_JSON:
+        m_spParser = std::make_shared<JsonParser>(path, file);
         break;
 
     default:
