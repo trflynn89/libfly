@@ -40,6 +40,27 @@ public:
      */
     float GetCpuUsage() const;
 
+    /**
+     * Get the total system physical memory available in bytes.
+     *
+     * @return Total system memory.
+     */
+    uint64_t GetTotalMemory() const;
+
+    /**
+     * Get the free system physical memory available in bytes.
+     *
+     * @return Free system memory.
+     */
+    uint64_t GetFreeMemory() const;
+
+    /**
+     * Get the amount of physical memory used by the calling process in bytes.
+     *
+     * @return Memory used by process.
+     */
+    uint64_t GetProcessMemory() const;
+
 protected:
     /**
      * Start the system monitor.

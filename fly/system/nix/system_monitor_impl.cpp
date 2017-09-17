@@ -2,12 +2,15 @@
 
 #include <cinttypes>
 #include <cmath>
+#include <cstring>
 #include <fstream>
 #include <string>
 #include <vector>
 
+#include <sys/sysinfo.h>
 #include <unistd.h>
 
+#include "fly/logger/logger.h"
 #include "fly/string/string.h"
 
 namespace fly {
@@ -17,6 +20,9 @@ namespace
     static const char *s_selfStatFile = "/proc/self/stat";
     static const char *s_selfStatFormat =
         "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %" SCNu64 " %" SCNu64;
+
+    static const char *s_selfStatusFile = "/proc/self/status";
+    static const char *s_selfStatusFormat = "%s %d kB";
 
     static const char *s_procStatFile = "/proc/stat";
 }
@@ -80,7 +86,36 @@ void SystemMonitorImpl::UpdateCpuUsage()
 //==============================================================================
 void SystemMonitorImpl::UpdateMemoryUsage()
 {
+    struct sysinfo info;
 
+    if (sysinfo(&info) == 0)
+    {
+        m_totalMemory = (static_cast<uint64_t>(info.totalram) * info.mem_unit);
+        m_freeMemory = (static_cast<uint64_t>(info.freeram) * info.mem_unit);
+    }
+    else
+    {
+        LOGS(-1, "Could not read system information");
+    }
+
+    std::ifstream stream(s_selfStatusFile, std::ios::in);
+    std::string line;
+
+    while (stream.good() && std::getline(stream, line))
+    {
+        char name[64];
+        int32_t value = 0;
+
+        if (sscanf(line.c_str(), s_selfStatusFormat, name, &value) == 2)
+        {
+            if (strncmp("VmRSS:", name, strlen("VmRSS:")) == 0)
+            {
+                // Value stored in status file is in KB
+                m_processMemory = (static_cast<uint64_t>(value) << 10);
+                break;
+            }
+        }
+    }
 }
 
 //==============================================================================

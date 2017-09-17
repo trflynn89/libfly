@@ -116,3 +116,24 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
     ASSERT_TRUE(result.valid());
     result.get();
 }
+
+//==============================================================================
+TEST_F(SystemMonitorTest, MemoryUsageTest)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    uint64_t totalBefore = m_spMonitor->GetTotalMemory();
+    uint64_t freeBefore = m_spMonitor->GetFreeMemory();
+    uint64_t processBefore = m_spMonitor->GetProcessMemory();
+
+    std::string consumed(freeBefore / 10, '\0');
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    uint64_t totalAfter = m_spMonitor->GetTotalMemory();
+    uint64_t freeAfter = m_spMonitor->GetFreeMemory();
+    uint64_t processAfter = m_spMonitor->GetProcessMemory();
+
+    ASSERT_EQ(totalBefore, totalAfter);
+    ASSERT_GT(freeBefore, freeAfter);
+    ASSERT_LT(processBefore, processAfter);
+}

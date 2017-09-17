@@ -33,6 +33,24 @@ float SystemMonitor::GetCpuUsage() const
 }
 
 //==============================================================================
+uint64_t SystemMonitor::GetTotalMemory() const
+{
+    return m_totalMemory;
+}
+
+//==============================================================================
+uint64_t SystemMonitor::GetFreeMemory() const
+{
+    return m_freeMemory;
+}
+
+//==============================================================================
+uint64_t SystemMonitor::GetProcessMemory() const
+{
+    return m_processMemory;
+}
+
+//==============================================================================
 bool SystemMonitor::StartRunner()
 {
     return true;
