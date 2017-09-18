@@ -13,7 +13,7 @@ namespace fly {
 //==============================================================================
 SystemMonitor::SystemMonitor() :
     Runner("SystemMonitor", 1),
-    m_cpuUsage(0.0f),
+    m_cpuUsage(0),
     m_totalMemory(0),
     m_freeMemory(0),
     m_processMemory(0)
@@ -35,40 +35,45 @@ float SystemMonitor::GetCpuUsage() const
 //==============================================================================
 uint64_t SystemMonitor::GetTotalMemory() const
 {
-    return m_totalMemory;
+    return m_totalMemory.load();
 }
 
 //==============================================================================
 uint64_t SystemMonitor::GetFreeMemory() const
 {
-    return m_freeMemory;
+    return m_freeMemory.load();
 }
 
 //==============================================================================
 uint64_t SystemMonitor::GetProcessMemory() const
 {
-    return m_processMemory;
+    return m_processMemory.load();
 }
 
 //==============================================================================
 bool SystemMonitor::StartRunner()
 {
-    return true;
+    return IsValid();
 }
 
 //==============================================================================
 void SystemMonitor::StopRunner()
 {
+    Close();
 }
 
 //==============================================================================
 bool SystemMonitor::DoWork()
 {
-    UpdateCpuUsage();
-    UpdateMemoryUsage();
+    if (IsValid())
+    {
+        UpdateCpuUsage();
+        UpdateMemoryUsage();
 
-    std::this_thread::sleep_for(s_delay);
-    return true;
+        std::this_thread::sleep_for(s_delay);
+    }
+
+    return IsValid();
 }
 
 }

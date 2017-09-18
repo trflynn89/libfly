@@ -137,6 +137,15 @@
     <ClInclude Include="..\..\..\fly\traits\traits.h">
       <Filter>traits</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\system\system_monitor.h">
+      <Filter>system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\system\system_monitor_impl.h">
+      <Filter>system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.h">
+      <Filter>system\win</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp">
@@ -206,6 +215,12 @@
       <Filter>socket\win</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\system\win\system_impl.cpp">
+      <Filter>system\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\system\system_monitor.cpp">
+      <Filter>system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\system\win\system_monitor_impl.cpp">
       <Filter>system\win</Filter>
     </ClCompile>
   </ItemGroup>

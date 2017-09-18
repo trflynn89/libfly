@@ -36,28 +36,28 @@ public:
      * Get the CPU usage percentage (from 0-100%) over the last second. Scaled
      * by the number of CPUs on the system.
      *
-     * @return Current CPU usage percentage.
+     * @return float Current CPU usage percentage.
      */
     float GetCpuUsage() const;
 
     /**
      * Get the total system physical memory available in bytes.
      *
-     * @return Total system memory.
+     * @return uint64_t Total system memory.
      */
     uint64_t GetTotalMemory() const;
 
     /**
      * Get the free system physical memory available in bytes.
      *
-     * @return Free system memory.
+     * @return uint64_t Free system memory.
      */
     uint64_t GetFreeMemory() const;
 
     /**
      * Get the amount of physical memory used by the calling process in bytes.
      *
-     * @return Memory used by process.
+     * @return uint64_t Memory used by process.
      */
     uint64_t GetProcessMemory() const;
 
@@ -65,7 +65,7 @@ protected:
     /**
      * Start the system monitor.
      *
-     * @return True.
+     * @return bool True.
      */
     virtual bool StartRunner();
 
@@ -77,9 +77,16 @@ protected:
     /**
      * Update the monitored system resources.
      *
-     * @return True.
+     * @return bool True.
      */
     virtual bool DoWork();
+
+    /**
+     * Check if the monitor implementation is in a good state.
+     *
+     * @return bool True if the monitor is healthy.
+     */
+    virtual bool IsValid() const = 0;
 
     /**
      * Update the system's current CPU usage.
@@ -90,6 +97,11 @@ protected:
      * Update the system's current memory usage.
      */
     virtual void UpdateMemoryUsage() = 0;
+
+    /**
+     * Close any open handles.
+     */
+    virtual void Close() = 0;
 
     // atomic<float> may not be fully implemented, so instead store CPU as
     // percentage * 100.0; the getter will convert back to normal percentage

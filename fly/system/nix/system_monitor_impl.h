@@ -24,8 +24,16 @@ public:
     virtual ~SystemMonitorImpl();
 
 protected:
+    /**
+     * Check if the system monitor's CPU scaling factor was successfully set.
+     *
+     * @return bool True if the CPU scaling factor is valid.
+     */
+    virtual bool IsValid() const;
+
     virtual void UpdateCpuUsage();
     virtual void UpdateMemoryUsage();
+    virtual void Close();
 
 private:
     /**

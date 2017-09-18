@@ -47,6 +47,13 @@ SystemMonitorImpl::SystemMonitorImpl() :
 //==============================================================================
 SystemMonitorImpl::~SystemMonitorImpl()
 {
+    Close();
+}
+
+//==============================================================================
+bool SystemMonitorImpl::IsValid() const
+{
+    return (m_scale != 0);
 }
 
 //==============================================================================
@@ -71,12 +78,12 @@ void SystemMonitorImpl::UpdateCpuUsage()
     }
 
     // Calculation for CPU percentage derived from top's source
-    if ((m_scale > 0) && (m_currCpuTicks > m_prevCpuTicks) && (m_currTime > m_prevTime))
+    if ((m_currCpuTicks > m_prevCpuTicks) && (m_currTime > m_prevTime))
     {
         uint64_t ticks = m_currCpuTicks - m_prevCpuTicks;
         auto time = m_currTime - m_prevTime;
 
-        m_cpuUsage.store(std::round(m_scale * ticks / time.count()));
+        m_cpuUsage.store(static_cast<uint64_t>(std::round(m_scale * ticks / time.count())));
     }
 
     m_prevCpuTicks = m_currCpuTicks;
@@ -90,8 +97,8 @@ void SystemMonitorImpl::UpdateMemoryUsage()
 
     if (sysinfo(&info) == 0)
     {
-        m_totalMemory = (static_cast<uint64_t>(info.totalram) * info.mem_unit);
-        m_freeMemory = (static_cast<uint64_t>(info.freeram) * info.mem_unit);
+        m_totalMemory.store(static_cast<uint64_t>(info.totalram) * info.mem_unit);
+        m_freeMemory.store(static_cast<uint64_t>(info.freeram) * info.mem_unit);
     }
     else
     {
@@ -111,11 +118,16 @@ void SystemMonitorImpl::UpdateMemoryUsage()
             if (strncmp("VmRSS:", name, strlen("VmRSS:")) == 0)
             {
                 // Value stored in status file is in KB
-                m_processMemory = (static_cast<uint64_t>(value) << 10);
+                m_processMemory.store(static_cast<uint64_t>(value) << 10);
                 break;
             }
         }
     }
+}
+
+//==============================================================================
+void SystemMonitorImpl::Close()
+{
 }
 
 //==============================================================================
