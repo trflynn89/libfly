@@ -8,6 +8,7 @@
 #include <sys/sysinfo.h>
 #include <sys/times.h>
 
+#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/string/string.h"
 
@@ -34,13 +35,36 @@ SystemMonitorImpl::SystemMonitorImpl() :
     m_prevProcessUserTime(0),
     m_prevTime(0)
 {
-    UpdateSystemCpuCount();
+}
+
+//==============================================================================
+SystemMonitorImpl::SystemMonitorImpl(ConfigManagerPtr &spConfigManager) :
+    SystemMonitor(spConfigManager),
+    m_prevSystemUserTime(0),
+    m_prevSystemNiceTime(0),
+    m_prevSystemSystemTime(0),
+    m_prevSystemIdleTime(0),
+    m_prevProcessSystemTime(0),
+    m_prevProcessUserTime(0),
+    m_prevTime(0)
+{
 }
 
 //==============================================================================
 SystemMonitorImpl::~SystemMonitorImpl()
 {
-    Close();
+    Stop();
+}
+
+//==============================================================================
+void SystemMonitorImpl::StartMonitor()
+{
+    UpdateSystemCpuCount();
+}
+
+//==============================================================================
+void SystemMonitorImpl::StopMonitor()
+{
 }
 
 //==============================================================================
@@ -186,11 +210,6 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage()
         // Value stored in status file is in KB
         m_processMemoryUsage.store(processMemoryUsage << 10);
     }
-}
-
-//==============================================================================
-void SystemMonitorImpl::Close()
-{
 }
 
 }

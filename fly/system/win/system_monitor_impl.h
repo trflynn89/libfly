@@ -27,7 +27,7 @@ public:
 
 protected:
     /**
-     * Open the system monitor's CPU query.
+     * Open the system monitor's CPU query and set the system CPU count.
      */
     virtual void StartMonitor();
 
@@ -52,11 +52,6 @@ protected:
     virtual void UpdateProcessMemoryUsage();
 
 private:
-    /**
-     * @return DWORD Number of CPUs on the system.
-     */
-    DWORD getCpuCount() const;
-
     HANDLE m_process;
 
     PDH_HQUERY m_cpuQuery;

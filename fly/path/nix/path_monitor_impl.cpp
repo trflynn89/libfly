@@ -31,19 +31,28 @@ namespace
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl() :
     PathMonitor(),
-    m_monitorDescriptor(::inotify_init1(s_initFlags))
+    m_monitorDescriptor(-1)
 {
-    if (m_monitorDescriptor == -1)
-    {
-        LOGS(-1, "Could not initialize monitor");
-    }
 }
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
     PathMonitor(spConfigManager),
-    m_monitorDescriptor(::inotify_init1(s_initFlags))
+    m_monitorDescriptor(-1)
 {
+}
+
+//==============================================================================
+PathMonitorImpl::~PathMonitorImpl()
+{
+    Stop();
+}
+
+//==============================================================================
+void PathMonitorImpl::StartMonitor()
+{
+    m_monitorDescriptor = ::inotify_init1(s_initFlags);
+
     if (m_monitorDescriptor == -1)
     {
         LOGS(-1, "Could not initialize monitor");
@@ -51,28 +60,19 @@ PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
 }
 
 //==============================================================================
-PathMonitorImpl::~PathMonitorImpl()
+void PathMonitorImpl::StopMonitor()
 {
-    Close();
+    if (m_monitorDescriptor != -1)
+    {
+        ::close(m_monitorDescriptor);
+        m_monitorDescriptor = -1;
+    }
 }
 
 //==============================================================================
 bool PathMonitorImpl::IsValid() const
 {
     return (m_monitorDescriptor != -1);
-}
-
-//==============================================================================
-PathMonitor::PathInfoPtr PathMonitorImpl::CreatePathInfo(const std::string &path) const
-{
-    PathMonitor::PathInfoPtr spInfo;
-
-    if (IsValid())
-    {
-        spInfo = std::make_shared<PathInfoImpl>(m_monitorDescriptor, path);
-    }
-
-    return spInfo;
 }
 
 //==============================================================================
@@ -100,13 +100,16 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 }
 
 //==============================================================================
-void PathMonitorImpl::Close()
+PathMonitor::PathInfoPtr PathMonitorImpl::CreatePathInfo(const std::string &path) const
 {
-    if (m_monitorDescriptor != -1)
+    PathMonitor::PathInfoPtr spInfo;
+
+    if (IsValid())
     {
-        ::close(m_monitorDescriptor);
-        m_monitorDescriptor = -1;
+        spInfo = std::make_shared<PathInfoImpl>(m_monitorDescriptor, path);
     }
+
+    return spInfo;
 }
 
 //==============================================================================
