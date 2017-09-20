@@ -77,12 +77,14 @@ bool SystemMonitorImpl::IsValid() const
 void SystemMonitorImpl::UpdateSystemCpuCount()
 {
     std::ifstream stream(s_procStatFile, std::ios::in);
-    std::string line;
+    std::string contents, line;
 
     uint32_t cpuCount = 0;
 
     while (stream.good() && std::getline(stream, line))
     {
+        contents += line + "\\n";
+
         if (String::StartsWith(line, "cpu"))
         {
             if ((line.size() > 3) && (line[3] != ' '))
@@ -94,7 +96,7 @@ void SystemMonitorImpl::UpdateSystemCpuCount()
 
     if (cpuCount == 0)
     {
-        LOGS(-1, "Could not poll system CPU count");
+        LOGS(-1, "Could not poll system CPU count (%s)", contents);
     }
     else
     {
@@ -115,7 +117,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
         ::sscanf(line.c_str(), s_procStatFormat, &user, &nice, &system, &idle);
     }
 
-    if ((user == 0) || (nice == 0) || (system == 0) || (idle == 0))
+    if ((user == 0) && (nice == 0) && (system == 0) && (idle == 0))
     {
         LOGS(-1, "Could not poll system CPU (%s)", line);
     }
@@ -189,12 +191,14 @@ void SystemMonitorImpl::UpdateSystemMemoryUsage()
 void SystemMonitorImpl::UpdateProcessMemoryUsage()
 {
     std::ifstream stream(s_selfStatusFile, std::ios::in);
-    std::string line;
+    std::string contents, line;
 
     uint64_t processMemoryUsage = 0;
 
     while (stream.good() && std::getline(stream, line))
     {
+        contents += line + "\\n";
+
         if (::sscanf(line.c_str(), s_selfStatusFormat, &processMemoryUsage) == 1)
         {
             break;
@@ -203,7 +207,7 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage()
 
     if (processMemoryUsage == 0)
     {
-        LOGS(-1, "Could not poll process memory");
+        LOGS(-1, "Could not poll process memory (%s)", contents);
     }
     else
     {
