@@ -13,10 +13,11 @@ namespace fly {
 //==============================================================================
 SystemMonitor::SystemMonitor() :
     Runner("SystemMonitor", 1),
-    m_cpuUsage(0.0),
-    m_totalMemory(0),
-    m_freeMemory(0),
-    m_processMemory(0)
+    m_systemCpuUsage(0.0),
+    m_processCpuUsage(0.0),
+    m_totalSystemMemory(0),
+    m_systemMemoryUsage(0),
+    m_processMemoryUsage(0)
 {
 }
 
@@ -27,27 +28,33 @@ SystemMonitor::~SystemMonitor()
 }
 
 //==============================================================================
-double SystemMonitor::GetCpuUsage() const
+double SystemMonitor::GetSystemCpuUsage() const
 {
-    return m_cpuUsage.load();
+    return m_systemCpuUsage.load();
 }
 
 //==============================================================================
-uint64_t SystemMonitor::GetTotalMemory() const
+double SystemMonitor::GetProcessCpuUsage() const
 {
-    return m_totalMemory.load();
+    return m_processCpuUsage.load();
 }
 
 //==============================================================================
-uint64_t SystemMonitor::GetFreeMemory() const
+uint64_t SystemMonitor::GetTotalSystemMemory() const
 {
-    return m_freeMemory.load();
+    return m_totalSystemMemory.load();
 }
 
 //==============================================================================
-uint64_t SystemMonitor::GetProcessMemory() const
+uint64_t SystemMonitor::GetSystemMemoryUsage() const
 {
-    return m_processMemory.load();
+    return m_systemMemoryUsage.load();
+}
+
+//==============================================================================
+uint64_t SystemMonitor::GetProcessMemoryUsage() const
+{
+    return m_processMemoryUsage.load();
 }
 
 //==============================================================================
@@ -67,8 +74,11 @@ bool SystemMonitor::DoWork()
 {
     if (IsValid())
     {
-        UpdateCpuUsage();
-        UpdateMemoryUsage();
+        UpdateSystemCpuUsage();
+        UpdateProcessCpuUsage();
+
+        UpdateSystemMemoryUsage();
+        UpdateProcessMemoryUsage();
 
         std::this_thread::sleep_for(s_delay);
     }

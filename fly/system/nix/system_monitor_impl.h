@@ -37,7 +37,7 @@ protected:
 
 private:
     /**
-     * @return Number of CPUs on the system.
+     * @return int Number of CPUs on the system.
      */
     int getCpuCount() const;
 

@@ -76,6 +76,9 @@ public:
     virtual void SetUp()
     {
         ASSERT_TRUE(m_spMonitor && m_spMonitor->Start());
+
+        // Give the monitor a bit of time to acquire initial system values
+        std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
     /**
@@ -104,36 +107,41 @@ protected:
 //==============================================================================
 TEST_F(SystemMonitorTest, CpuUsageTest)
 {
+    double systemBefore = m_spMonitor->GetSystemCpuUsage();
+    double processBefore = m_spMonitor->GetProcessCpuUsage();
+
     std::future<void> result = std::async(
         std::launch::async, &SystemMonitorTest::SpinThread, this
     );
 
     std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    double systemAfter = m_spMonitor->GetSystemCpuUsage();
+    double processAfter = m_spMonitor->GetProcessCpuUsage();
+
     m_aKeepRunning.store(false);
-
-    ASSERT_GT(m_spMonitor->GetCpuUsage(), 0.0);
-
     ASSERT_TRUE(result.valid());
     result.get();
+
+    ASSERT_LT(systemBefore, systemAfter);
+    ASSERT_LT(processBefore, processAfter);
 }
 
 //==============================================================================
 TEST_F(SystemMonitorTest, MemoryUsageTest)
 {
+    uint64_t totalBefore = m_spMonitor->GetTotalSystemMemory();
+    uint64_t systemBefore = m_spMonitor->GetSystemMemoryUsage();
+    uint64_t processBefore = m_spMonitor->GetProcessMemoryUsage();
+
+    std::string consumed((totalBefore - systemBefore) / 10, '\0');
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
-    uint64_t totalBefore = m_spMonitor->GetTotalMemory();
-    uint64_t freeBefore = m_spMonitor->GetFreeMemory();
-    uint64_t processBefore = m_spMonitor->GetProcessMemory();
-
-    std::string consumed(freeBefore / 10, '\0');
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-
-    uint64_t totalAfter = m_spMonitor->GetTotalMemory();
-    uint64_t freeAfter = m_spMonitor->GetFreeMemory();
-    uint64_t processAfter = m_spMonitor->GetProcessMemory();
+    uint64_t totalAfter = m_spMonitor->GetTotalSystemMemory();
+    uint64_t systemAfter = m_spMonitor->GetSystemMemoryUsage();
+    uint64_t processAfter = m_spMonitor->GetProcessMemoryUsage();
 
     ASSERT_EQ(totalBefore, totalAfter);
-    ASSERT_GT(freeBefore, freeAfter);
+    ASSERT_LT(systemBefore, systemAfter);
     ASSERT_LT(processBefore, processAfter);
 }

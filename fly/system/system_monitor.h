@@ -33,33 +33,39 @@ public:
     virtual ~SystemMonitor();
 
     /**
-     * Get the CPU usage percentage (from 0-100%) over the last second. Scaled
-     * by the number of CPUs on the system.
+     * Get the system's CPU usage percentage (0-100%) over the last second.
      *
-     * @return double Current CPU usage percentage.
+     * @return double Current system CPU usage.
      */
-    double GetCpuUsage() const;
+    double GetSystemCpuUsage() const;
 
     /**
-     * Get the total system physical memory available in bytes.
+     * Get the process's CPU usage percentage (0-100%) over the last second.
+     *
+     * @return double Current process CPU usage.
+     */
+    double GetProcessCpuUsage() const;
+
+    /**
+     * Get the system's total physical memory available in bytes.
      *
      * @return uint64_t Total system memory.
      */
-    uint64_t GetTotalMemory() const;
+    uint64_t GetTotalSystemMemory() const;
 
     /**
-     * Get the free system physical memory available in bytes.
+     * Get the system's physical memory usage in bytes.
      *
-     * @return uint64_t Free system memory.
+     * @return uint64_t Current system memory usage.
      */
-    uint64_t GetFreeMemory() const;
+    uint64_t GetSystemMemoryUsage() const;
 
     /**
-     * Get the amount of physical memory used by the calling process in bytes.
+     * Get the process's physical memory usage in bytes.
      *
-     * @return uint64_t Memory used by process.
+     * @return uint64_t Current process memory usage.
      */
-    uint64_t GetProcessMemory() const;
+    uint64_t GetProcessMemoryUsage() const;
 
 protected:
     /**
@@ -91,23 +97,34 @@ protected:
     /**
      * Update the system's current CPU usage.
      */
-    virtual void UpdateCpuUsage() = 0;
+    virtual void UpdateSystemCpuUsage() = 0;
+
+    /**
+     * Update the process's current CPU usage.
+     */
+    virtual void UpdateProcessCpuUsage() = 0;
 
     /**
      * Update the system's current memory usage.
      */
-    virtual void UpdateMemoryUsage() = 0;
+    virtual void UpdateSystemMemoryUsage() = 0;
+
+    /**
+     * Update the process's current memory usage.
+     */
+    virtual void UpdateProcessMemoryUsage() = 0;
 
     /**
      * Close any open handles.
      */
     virtual void Close() = 0;
 
-    std::atomic<double> m_cpuUsage;
+    std::atomic<double> m_systemCpuUsage;
+    std::atomic<double> m_processCpuUsage;
 
-    std::atomic<uint64_t> m_totalMemory;
-    std::atomic<uint64_t> m_freeMemory;
-    std::atomic<uint64_t> m_processMemory;
+    std::atomic<uint64_t> m_totalSystemMemory;
+    std::atomic<uint64_t> m_systemMemoryUsage;
+    std::atomic<uint64_t> m_processMemoryUsage;
 };
 
 }
