@@ -47,7 +47,7 @@ private:
     std::chrono::seconds m_currTime;
     std::chrono::seconds m_prevTime;
 
-    float m_scale;
+    double m_scale;
 };
 
 }

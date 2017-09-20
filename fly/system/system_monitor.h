@@ -36,9 +36,9 @@ public:
      * Get the CPU usage percentage (from 0-100%) over the last second. Scaled
      * by the number of CPUs on the system.
      *
-     * @return float Current CPU usage percentage.
+     * @return double Current CPU usage percentage.
      */
-    float GetCpuUsage() const;
+    double GetCpuUsage() const;
 
     /**
      * Get the total system physical memory available in bytes.
@@ -103,9 +103,7 @@ protected:
      */
     virtual void Close() = 0;
 
-    // atomic<float> may not be fully implemented, so instead store CPU as
-    // percentage * 100.0; the getter will convert back to normal percentage
-    std::atomic<uint64_t> m_cpuUsage;
+    std::atomic<double> m_cpuUsage;
 
     std::atomic<uint64_t> m_totalMemory;
     std::atomic<uint64_t> m_freeMemory;

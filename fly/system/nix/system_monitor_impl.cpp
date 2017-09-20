@@ -1,7 +1,6 @@
 #include "fly/system/nix/system_monitor_impl.h"
 
 #include <cinttypes>
-#include <cmath>
 #include <cstring>
 #include <fstream>
 #include <string>
@@ -33,14 +32,15 @@ SystemMonitorImpl::SystemMonitorImpl() :
     m_currCpuTicks(0),
     m_prevCpuTicks(0),
     m_currTime(0),
-    m_prevTime(0)
+    m_prevTime(0),
+    m_scale(0.0)
 {
     int cpuCount = getCpuCount();
     int cpuFreq = ::sysconf(_SC_CLK_TCK);
 
     if ((cpuCount > 0) && (cpuFreq > 0))
     {
-        m_scale = ((100.0f * 100.0f) / (cpuCount * cpuFreq));
+        m_scale = (100.0 / (cpuCount * cpuFreq));
     }
 }
 
@@ -53,7 +53,7 @@ SystemMonitorImpl::~SystemMonitorImpl()
 //==============================================================================
 bool SystemMonitorImpl::IsValid() const
 {
-    return (m_scale != 0);
+    return (m_scale > 0.0);
 }
 
 //==============================================================================
@@ -83,7 +83,7 @@ void SystemMonitorImpl::UpdateCpuUsage()
         uint64_t ticks = m_currCpuTicks - m_prevCpuTicks;
         auto time = m_currTime - m_prevTime;
 
-        m_cpuUsage.store(static_cast<uint64_t>(std::round(m_scale * ticks / time.count())));
+        m_cpuUsage.store(m_scale * ticks / time.count());
     }
 
     m_prevCpuTicks = m_currCpuTicks;

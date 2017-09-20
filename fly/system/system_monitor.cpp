@@ -13,7 +13,7 @@ namespace fly {
 //==============================================================================
 SystemMonitor::SystemMonitor() :
     Runner("SystemMonitor", 1),
-    m_cpuUsage(0),
+    m_cpuUsage(0.0),
     m_totalMemory(0),
     m_freeMemory(0),
     m_processMemory(0)
@@ -27,9 +27,9 @@ SystemMonitor::~SystemMonitor()
 }
 
 //==============================================================================
-float SystemMonitor::GetCpuUsage() const
+double SystemMonitor::GetCpuUsage() const
 {
-    return (static_cast<float>(m_cpuUsage.load()) / 100.0f);
+    return m_cpuUsage.load();
 }
 
 //==============================================================================

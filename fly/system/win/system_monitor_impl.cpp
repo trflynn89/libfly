@@ -1,7 +1,5 @@
 #include "fly/system/win/system_monitor_impl.h"
 
-#include <cmath>
-
 #include <Psapi.h>
 
 #include "fly/logger/logger.h"
@@ -67,7 +65,7 @@ void SystemMonitorImpl::UpdateCpuUsage()
     }
     else
     {
-        m_cpuUsage.store(static_cast<uint64_t>(std::round(100.0f * value.doubleValue)));
+        m_cpuUsage.store(value.doubleValue);
     }
 }
 
