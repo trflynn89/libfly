@@ -109,7 +109,6 @@ protected:
 TEST_F(SystemMonitorTest, CpuUsageTest)
 {
     uint32_t countBefore = m_spMonitor->GetSystemCpuCount();
-    double systemBefore = m_spMonitor->GetSystemCpuUsage();
     double processBefore = m_spMonitor->GetProcessCpuUsage();
 
     std::future<void> result = std::async(
@@ -127,7 +126,6 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
     result.get();
 
     ASSERT_EQ(countBefore, countAfter);
-    ASSERT_GT(systemBefore, U64(0));
     ASSERT_GT(systemAfter, U64(0));
     ASSERT_LT(processBefore, processAfter);
 }
