@@ -8,10 +8,7 @@
 namespace fly {
 
 //==============================================================================
-Runner::Runner(
-    const std::string &name,
-    int numWorkers
-) :
+Runner::Runner(const std::string &name, int numWorkers) :
     m_aKeepRunning(false),
     m_name(name),
     m_numWorkers(numWorkers)

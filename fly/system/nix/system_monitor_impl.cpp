@@ -117,7 +117,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
 
     if ((user == 0) || (nice == 0) || (system == 0) || (idle == 0))
     {
-        LOGS(-1, "Could not poll system CPU");
+        LOGS(-1, "Could not poll system CPU (%s)", line);
     }
     else if ((user >= m_prevSystemUserTime) && (nice >= m_prevSystemNiceTime) &&
         (system >= m_prevSystemSystemTime) && (idle >= m_prevSystemIdleTime))
