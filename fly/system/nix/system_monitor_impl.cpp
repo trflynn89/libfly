@@ -4,10 +4,9 @@
 #include <cstring>
 #include <fstream>
 #include <string>
-#include <vector>
 
 #include <sys/sysinfo.h>
-#include <unistd.h>
+#include <sys/times.h>
 
 #include "fly/logger/logger.h"
 #include "fly/string/string.h"
@@ -16,32 +15,26 @@ namespace fly {
 
 namespace
 {
-    static const char *s_selfStatFile = "/proc/self/stat";
-    static const char *s_selfStatFormat =
-        "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %" SCNu64 " %" SCNu64;
+    static const char *s_procStatFile = "/proc/stat";
+    static const char *s_procStatFormat =
+        "cpu %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64;
 
     static const char *s_selfStatusFile = "/proc/self/status";
-    static const char *s_selfStatusFormat = "%s %d kB";
-
-    static const char *s_procStatFile = "/proc/stat";
+    static const char *s_selfStatusFormat = "VmRSS: %" SCNu64 " kB";
 }
 
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl() :
     SystemMonitor(),
-    m_currCpuTicks(0),
-    m_prevCpuTicks(0),
-    m_currTime(0),
-    m_prevTime(0),
-    m_scale(0.0)
+    m_prevSystemUserTime(0),
+    m_prevSystemNiceTime(0),
+    m_prevSystemSystemTime(0),
+    m_prevSystemIdleTime(0),
+    m_prevProcessUserTime(0),
+    m_prevProcessSystemTime(0),
+    m_prevTime(0)
 {
-    int cpuCount = getCpuCount();
-    int cpuFreq = ::sysconf(_SC_CLK_TCK);
-
-    if ((cpuCount > 0) && (cpuFreq > 0))
-    {
-        m_scale = (100.0 / (cpuCount * cpuFreq));
-    }
+    UpdateSystemCpuCount();
 }
 
 //==============================================================================
@@ -53,89 +46,16 @@ SystemMonitorImpl::~SystemMonitorImpl()
 //==============================================================================
 bool SystemMonitorImpl::IsValid() const
 {
-    return (m_scale > 0.0);
+    return (m_systemCpuCount.load() > 0);
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateCpuUsage()
-{
-    std::ifstream stream(s_selfStatFile, std::ios::in);
-    std::string line;
-
-    m_currTime = std::chrono::duration_cast<decltype(m_currTime)>(
-        std::chrono::system_clock::now().time_since_epoch()
-    );
-
-    if (stream.good() && std::getline(stream, line))
-    {
-        uint64_t utime = 0;
-        uint64_t stime = 0;
-
-        if (sscanf(line.c_str(), s_selfStatFormat, &utime, &stime) == 2)
-        {
-            m_currCpuTicks = utime + stime;
-        }
-    }
-
-    // Calculation for CPU percentage derived from top's source
-    if ((m_currCpuTicks > m_prevCpuTicks) && (m_currTime > m_prevTime))
-    {
-        uint64_t ticks = m_currCpuTicks - m_prevCpuTicks;
-        auto time = m_currTime - m_prevTime;
-
-        m_cpuUsage.store(m_scale * ticks / time.count());
-    }
-
-    m_prevCpuTicks = m_currCpuTicks;
-    m_prevTime = m_currTime;
-}
-
-//==============================================================================
-void SystemMonitorImpl::UpdateMemoryUsage()
-{
-    struct sysinfo info;
-
-    if (sysinfo(&info) == 0)
-    {
-        m_totalMemory.store(static_cast<uint64_t>(info.totalram) * info.mem_unit);
-        m_freeMemory.store(static_cast<uint64_t>(info.freeram) * info.mem_unit);
-    }
-    else
-    {
-        LOGS(-1, "Could not read system information");
-    }
-
-    std::ifstream stream(s_selfStatusFile, std::ios::in);
-    std::string line;
-
-    while (stream.good() && std::getline(stream, line))
-    {
-        char name[64];
-        int32_t value = 0;
-
-        if (sscanf(line.c_str(), s_selfStatusFormat, name, &value) == 2)
-        {
-            if (strncmp("VmRSS:", name, strlen("VmRSS:")) == 0)
-            {
-                // Value stored in status file is in KB
-                m_processMemory.store(static_cast<uint64_t>(value) << 10);
-                break;
-            }
-        }
-    }
-}
-
-//==============================================================================
-void SystemMonitorImpl::Close()
-{
-}
-
-//==============================================================================
-int SystemMonitorImpl::getCpuCount() const
+void SystemMonitorImpl::UpdateSystemCpuCount()
 {
     std::ifstream stream(s_procStatFile, std::ios::in);
     std::string line;
-    int cpuCount = 0;
+
+    uint32_t cpuCount = 0;
 
     while (stream.good() && std::getline(stream, line))
     {
@@ -148,7 +68,129 @@ int SystemMonitorImpl::getCpuCount() const
         }
     }
 
-    return cpuCount;
+    if (cpuCount == 0)
+    {
+        LOGS(-1, "Could not poll system CPU count");
+    }
+    else
+    {
+        m_systemCpuCount.store(cpuCount);
+    }
+}
+
+//==============================================================================
+void SystemMonitorImpl::UpdateSystemCpuUsage()
+{
+    std::ifstream stream(s_procStatFile, std::ios::in);
+    std::string line;
+
+    uint64_t user = 0, nice = 0, system = 0, idle = 0;
+
+    if (stream.good() && std::getline(stream, line))
+    {
+        ::sscanf(line.c_str(), s_procStatFormat, &user, &nice, &system, &idle);
+    }
+
+    if ((user == 0) || (nice == 0) || (system == 0) || (idle == 0))
+    {
+        LOGS(-1, "Could not poll system CPU");
+    }
+    else if ((user >= m_prevSystemUserTime) && (nice >= m_prevSystemNiceTime) &&
+        (system >= m_prevSystemSystemTime) && (idle >= m_prevSystemIdleTime))
+    {
+        uint64_t active =
+            (user - m_prevSystemUserTime) +
+            (nice - m_prevSystemNiceTime) +
+            (system - m_prevSystemSystemTime);
+
+        uint64_t total = active + (idle - m_prevSystemIdleTime);
+
+        m_systemCpuUsage.store(100.0 * active / total);
+    }
+
+    m_prevSystemUserTime = user;
+    m_prevSystemNiceTime = nice;
+    m_prevSystemSystemTime = system;
+    m_prevSystemIdleTime = idle;
+}
+
+//==============================================================================
+void SystemMonitorImpl::UpdateProcessCpuUsage()
+{
+    struct tms sample;
+    clock_t now = ::times(&sample);
+
+    if (now == static_cast<clock_t>(-1))
+    {
+        LOGS(-1, "Could not poll process CPU");
+    }
+    else if ((now > m_prevTime) &&
+        (sample.tms_stime >= m_prevProcessSystemTime) &&
+        (sample.tms_utime >= m_prevProcessUserTime))
+    {
+        double cpu =
+            (sample.tms_stime - m_prevProcessSystemTime) +
+            (sample.tms_utime - m_prevProcessUserTime);
+
+        clock_t time = now - m_prevTime;
+
+        m_processCpuUsage.store(100.0 * cpu / time / m_systemCpuCount.load());
+    }
+
+    m_prevProcessSystemTime = sample.tms_stime;
+    m_prevProcessUserTime = sample.tms_utime;
+    m_prevTime = now;
+}
+
+//==============================================================================
+void SystemMonitorImpl::UpdateSystemMemoryUsage()
+{
+    struct sysinfo info;
+
+    if (::sysinfo(&info) == 0)
+    {
+        uint64_t totalMemory = static_cast<uint64_t>(info.totalram) * info.mem_unit;
+        uint64_t freeMemory = static_cast<uint64_t>(info.freeram) * info.mem_unit;
+
+        m_totalSystemMemory.store(totalMemory);
+        m_systemMemoryUsage.store(totalMemory - freeMemory);
+    }
+    else
+    {
+        LOGS(-1, "Could not poll system memory");
+    }
+}
+
+//==============================================================================
+void SystemMonitorImpl::UpdateProcessMemoryUsage()
+{
+    std::ifstream stream(s_selfStatusFile, std::ios::in);
+    std::string line;
+
+    uint64_t processMemoryUsage = 0;
+
+    while (stream.good() && std::getline(stream, line))
+    {
+        if (::sscanf(line.c_str(), s_selfStatusFormat, &processMemoryUsage) == 1)
+        {
+            break;
+        }
+    }
+
+    if (processMemoryUsage == 0)
+    {
+        LOGS(-1, "Could not poll process memory");
+    }
+    else
+    {
+        // Value stored in status file is in KB
+        m_processMemoryUsage.store(processMemoryUsage << 10);
+    }
+}
+
+//==============================================================================
+void SystemMonitorImpl::Close()
+{
 }
 
 }

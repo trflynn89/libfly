@@ -13,6 +13,7 @@ namespace fly {
 //==============================================================================
 SystemMonitor::SystemMonitor() :
     Runner("SystemMonitor", 1),
+    m_systemCpuCount(0),
     m_systemCpuUsage(0.0),
     m_processCpuUsage(0.0),
     m_totalSystemMemory(0),
@@ -25,6 +26,12 @@ SystemMonitor::SystemMonitor() :
 SystemMonitor::~SystemMonitor()
 {
     Stop();
+}
+
+//==============================================================================
+uint32_t SystemMonitor::GetSystemCpuCount() const
+{
+    return m_systemCpuCount.load();
 }
 
 //==============================================================================
@@ -74,6 +81,8 @@ bool SystemMonitor::DoWork()
 {
     if (IsValid())
     {
+        UpdateSystemCpuCount();
+
         UpdateSystemCpuUsage();
         UpdateProcessCpuUsage();
 

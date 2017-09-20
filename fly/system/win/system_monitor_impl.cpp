@@ -105,7 +105,7 @@ void SystemMonitorImpl::UpdateProcessCpuUsage()
     }
     else
     {
-        LOGS(-1, "Could not retrieve current process CPU");
+        LOGS(-1, "Could not poll process CPU");
     }
 
     if ((m_currCpuTicks > m_prevCpuTicks) && (m_currTime > m_prevTime))

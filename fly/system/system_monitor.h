@@ -33,6 +33,13 @@ public:
     virtual ~SystemMonitor();
 
     /**
+     * Get the system's CPU count.
+     *
+     * @return uint32_t System CPU count.
+     */
+    uint32_t GetSystemCpuCount() const;
+
+    /**
      * Get the system's CPU usage percentage (0-100%) over the last second.
      *
      * @return double Current system CPU usage.
@@ -95,6 +102,11 @@ protected:
     virtual bool IsValid() const = 0;
 
     /**
+     * Update the system's current CPU count.
+     */
+    virtual void UpdateSystemCpuCount() = 0;
+
+    /**
      * Update the system's current CPU usage.
      */
     virtual void UpdateSystemCpuUsage() = 0;
@@ -119,6 +131,7 @@ protected:
      */
     virtual void Close() = 0;
 
+    std::atomic<uint32_t> m_systemCpuCount;
     std::atomic<double> m_systemCpuUsage;
     std::atomic<double> m_processCpuUsage;
 

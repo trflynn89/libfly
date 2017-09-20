@@ -107,6 +107,8 @@ protected:
 //==============================================================================
 TEST_F(SystemMonitorTest, CpuUsageTest)
 {
+    ASSERT_GT(m_spMonitor->GetSystemCpuCount(), 0);
+
     double systemBefore = m_spMonitor->GetSystemCpuUsage();
     double processBefore = m_spMonitor->GetProcessCpuUsage();
 

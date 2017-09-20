@@ -104,6 +104,8 @@ void Runner::workerThread()
             break;
         }
     }
+
+    LOGI(-1, "%s: Finished running task", m_name);
 }
 
 }

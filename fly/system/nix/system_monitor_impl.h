@@ -1,7 +1,7 @@
 #pragma once
 
-#include <chrono>
 #include <cstdint>
+#include <ctime>
 
 #include "fly/fly.h"
 #include "fly/system/system_monitor.h"
@@ -25,29 +25,30 @@ public:
 
 protected:
     /**
-     * Check if the system monitor's CPU scaling factor was successfully set.
+     * Check if the system CPU count was successfully set.
      *
-     * @return bool True if the CPU scaling factor is valid.
+     * @return bool True if the CPU count is valid.
      */
     virtual bool IsValid() const;
 
-    virtual void UpdateCpuUsage();
-    virtual void UpdateMemoryUsage();
+    virtual void UpdateSystemCpuCount();
+    virtual void UpdateSystemCpuUsage();
+    virtual void UpdateProcessCpuUsage();
+
+    virtual void UpdateSystemMemoryUsage();
+    virtual void UpdateProcessMemoryUsage();
+
     virtual void Close();
 
 private:
-    /**
-     * @return int Number of CPUs on the system.
-     */
-    int getCpuCount() const;
+    uint64_t m_prevSystemUserTime;
+    uint64_t m_prevSystemNiceTime;
+    uint64_t m_prevSystemSystemTime;
+    uint64_t m_prevSystemIdleTime;
 
-    uint64_t m_currCpuTicks;
-    uint64_t m_prevCpuTicks;
-
-    std::chrono::seconds m_currTime;
-    std::chrono::seconds m_prevTime;
-
-    double m_scale;
+    clock_t m_prevProcessUserTime;
+    clock_t m_prevProcessSystemTime;
+    clock_t m_prevTime;
 };
 
 }
