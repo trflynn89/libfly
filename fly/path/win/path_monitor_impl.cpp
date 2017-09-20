@@ -39,19 +39,28 @@ namespace
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl() :
     PathMonitor(),
-    m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
+    m_iocp(NULL)
 {
-    if (m_iocp == NULL)
-    {
-        LOGS(-1, "Could not initialize IOCP");
-    }
 }
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
     PathMonitor(spConfigManager),
-    m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
+    m_iocp(NULL)
 {
+}
+
+//==============================================================================
+PathMonitorImpl::~PathMonitorImpl()
+{
+    Stop();
+}
+
+//==============================================================================
+void PathMonitorImpl::StartMonitor()
+{
+    m_iocp = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
+
     if (m_iocp == NULL)
     {
         LOGS(-1, "Could not initialize IOCP");
@@ -59,28 +68,19 @@ PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
 }
 
 //==============================================================================
-PathMonitorImpl::~PathMonitorImpl()
+void PathMonitorImpl::StopMonitor()
 {
-    Close();
+    if (m_iocp != NULL)
+    {
+        ::CloseHandle(m_iocp);
+        m_iocp = NULL;
+    }
 }
 
 //==============================================================================
 bool PathMonitorImpl::IsValid() const
 {
     return (m_iocp != NULL);
-}
-
-//==============================================================================
-PathMonitor::PathInfoPtr PathMonitorImpl::CreatePathInfo(const std::string &path) const
-{
-    PathMonitor::PathInfoPtr spInfo;
-
-    if (IsValid())
-    {
-        spInfo = std::make_shared<PathInfoImpl>(m_iocp, path);
-    }
-
-    return spInfo;
 }
 
 //==============================================================================
@@ -124,13 +124,16 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 }
 
 //==============================================================================
-void PathMonitorImpl::Close()
+PathMonitor::PathInfoPtr PathMonitorImpl::CreatePathInfo(const std::string &path) const
 {
-    if (m_iocp != NULL)
+    PathMonitor::PathInfoPtr spInfo;
+
+    if (IsValid())
     {
-        ::CloseHandle(m_iocp);
-        m_iocp = NULL;
+        spInfo = std::make_shared<PathInfoImpl>(m_iocp, path);
     }
+
+    return spInfo;
 }
 
 //==============================================================================

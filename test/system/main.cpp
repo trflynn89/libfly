@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 
+#include "fly/fly.h"
 #include "fly/system/system.h"
 #include "fly/system/system_monitor_impl.h"
 
@@ -107,8 +108,7 @@ protected:
 //==============================================================================
 TEST_F(SystemMonitorTest, CpuUsageTest)
 {
-    ASSERT_GT(m_spMonitor->GetSystemCpuCount(), 0);
-
+    uint32_t countBefore = m_spMonitor->GetSystemCpuCount();
     double systemBefore = m_spMonitor->GetSystemCpuUsage();
     double processBefore = m_spMonitor->GetProcessCpuUsage();
 
@@ -116,8 +116,9 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
         std::launch::async, &SystemMonitorTest::SpinThread, this
     );
 
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
+    uint32_t countAfter = m_spMonitor->GetSystemCpuCount();
     double systemAfter = m_spMonitor->GetSystemCpuUsage();
     double processAfter = m_spMonitor->GetProcessCpuUsage();
 
@@ -125,7 +126,9 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
     ASSERT_TRUE(result.valid());
     result.get();
 
-    ASSERT_LT(systemBefore, systemAfter);
+    ASSERT_EQ(countBefore, countAfter);
+    ASSERT_GT(systemBefore, U64(0));
+    ASSERT_GT(systemAfter, U64(0));
     ASSERT_LT(processBefore, processAfter);
 }
 
@@ -144,6 +147,7 @@ TEST_F(SystemMonitorTest, MemoryUsageTest)
     uint64_t processAfter = m_spMonitor->GetProcessMemoryUsage();
 
     ASSERT_EQ(totalBefore, totalAfter);
-    ASSERT_LT(systemBefore, systemAfter);
+    ASSERT_GT(systemBefore, U64(0));
+    ASSERT_GT(systemAfter, U64(0));
     ASSERT_LT(processBefore, processAfter);
 }

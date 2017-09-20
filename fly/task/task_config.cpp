@@ -19,9 +19,11 @@ std::string TaskConfig::GetName()
 }
 
 //==============================================================================
-int TaskConfig::DefaultWorkerCount() const
+std::chrono::milliseconds TaskConfig::PollInterval() const
 {
-    return GetValue<int>("default_worker_count", 1);
+    return std::chrono::milliseconds(
+        GetValue<std::chrono::milliseconds::rep>("poll_interval", I64(1000))
+    );
 }
 
 }

@@ -8,12 +8,11 @@
 #include <string>
 
 #include "fly/fly.h"
-#include "fly/task/runner.h"
+#include "fly/task/monitor.h"
 
 namespace fly {
 
 DEFINE_CLASS_PTRS(ConfigManager);
-DEFINE_CLASS_PTRS(PathConfig);
 DEFINE_CLASS_PTRS(PathMonitor);
 
 /**
@@ -25,7 +24,7 @@ DEFINE_CLASS_PTRS(PathMonitor);
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version May 14, 2017
  */
-class PathMonitor : public Runner
+class PathMonitor : public Monitor
 {
 public:
     /**
@@ -58,16 +57,9 @@ public:
     PathMonitor(ConfigManagerPtr &);
 
     /**
-     * Destructor. Stop the path monitor thread if necessary.
+     * Destructor. Remove all paths from the path monitor.
      */
     virtual ~PathMonitor();
-
-    /**
-     * Check if the monitor implementation is in a good state.
-     *
-     * @return True if the monitor is healthy.
-     */
-    virtual bool IsValid() const = 0;
 
     /**
      * Monitor for changes to all files under a path. Callbacks registered with
@@ -143,21 +135,28 @@ protected:
     typedef std::map<std::string, PathInfoPtr> PathInfoMap;
 
     /**
-     * @return True if the monitor is in a good state.
+     * Start the path monitor.
      */
-    virtual bool StartRunner();
+    virtual void StartMonitor() = 0;
 
     /**
-     * Stop monitoring all paths and close any open handles.
+     * Stop the path monitor.
      */
-    virtual void StopRunner();
+    virtual void StopMonitor() = 0;
+
+    /**
+     * Check if the monitor implementation is in a good state.
+     *
+     * @return True if the monitor is healthy.
+     */
+    virtual bool IsValid() const = 0;
 
     /**
      * Poll the monitored paths for changes.
      *
-     * @return True if the monitor is in a good state.
+     * @param milliseconds Time to sleep between poll intervals.
      */
-    virtual bool DoWork();
+    virtual void Poll(const std::chrono::milliseconds &) = 0;
 
     /**
      * Create an instance of the OS dependent PathInfo struct.
@@ -167,18 +166,6 @@ protected:
      * @return PathInfoPtr Up-casted shared pointer to the PathInfo struct.
      */
     virtual PathInfoPtr CreatePathInfo(const std::string &) const = 0;
-
-    /**
-     * Poll for any changes.
-     *
-     * @param milliseconds Max time to poll for changes.
-     */
-    virtual void Poll(const std::chrono::milliseconds &) = 0;
-
-    /**
-     * Close any open handles.
-     */
-    virtual void Close() = 0;
 
     mutable std::mutex m_mutex;
     PathInfoMap m_pathInfo;
@@ -193,8 +180,6 @@ private:
      * @return PathInfoPtr Shared pointer to the PathInfo struct.
      */
     PathInfoPtr getOrCreatePathInfo(const std::string &);
-
-    PathConfigPtr m_spConfig;
 };
 
 }

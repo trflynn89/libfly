@@ -3,9 +3,7 @@
 #include <functional>
 #include <thread>
 
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
-#include "fly/task/task_config.h"
 
 namespace fly {
 
@@ -14,27 +12,10 @@ Runner::Runner(
     const std::string &name,
     int numWorkers
 ) :
-    m_spConfig(),
     m_aKeepRunning(false),
     m_name(name),
     m_numWorkers(numWorkers)
 {
-}
-
-//==============================================================================
-Runner::Runner(
-    ConfigManagerPtr &spConfigManager,
-    const std::string &name
-) :
-    m_spConfig(spConfigManager->CreateConfig<TaskConfig>()),
-    m_aKeepRunning(false),
-    m_name(name),
-    m_numWorkers(std::thread::hardware_concurrency())
-{
-    if (m_numWorkers == 0)
-    {
-        m_numWorkers = m_spConfig->DefaultWorkerCount();
-    }
 }
 
 //==============================================================================

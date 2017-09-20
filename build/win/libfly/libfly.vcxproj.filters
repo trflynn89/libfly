@@ -146,6 +146,9 @@
     <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.h">
       <Filter>system\win</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\task\monitor.h">
+      <Filter>task</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp">
@@ -153,9 +156,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\config\config_manager.cpp">
       <Filter>config</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\path\path_config.cpp">
-      <Filter>path</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\path\path_monitor.cpp">
       <Filter>path</Filter>
@@ -222,6 +222,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\system\win\system_monitor_impl.cpp">
       <Filter>system\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\task\monitor.cpp">
+      <Filter>task</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

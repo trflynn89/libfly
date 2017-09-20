@@ -1,13 +1,15 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 
 #include "fly/fly.h"
-#include "fly/task/runner.h"
+#include "fly/task/monitor.h"
 
 namespace fly {
 
+DEFINE_CLASS_PTRS(ConfigManager);
 DEFINE_CLASS_PTRS(SystemMonitor);
 
 /**
@@ -18,7 +20,7 @@ DEFINE_CLASS_PTRS(SystemMonitor);
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version September 15, 2017
  */
-class SystemMonitor : public Runner
+class SystemMonitor : public Monitor
 {
 public:
     /**
@@ -28,7 +30,14 @@ public:
     SystemMonitor();
 
     /**
-     * Destructor
+     * Constructor.
+     *
+     * @param ConfigManagerPtr Reference to the configuration manager.
+     */
+    SystemMonitor(ConfigManagerPtr &);
+
+    /**
+     * Destructor.
      */
     virtual ~SystemMonitor();
 
@@ -77,22 +86,13 @@ public:
 protected:
     /**
      * Start the system monitor.
-     *
-     * @return bool True.
      */
-    virtual bool StartRunner();
+    virtual void StartMonitor() = 0;
 
     /**
      * Stop the system monitor.
      */
-    virtual void StopRunner();
-
-    /**
-     * Update the monitored system resources.
-     *
-     * @return bool True.
-     */
-    virtual bool DoWork();
+    virtual void StopMonitor() = 0;
 
     /**
      * Check if the monitor implementation is in a good state.
@@ -100,6 +100,13 @@ protected:
      * @return bool True if the monitor is healthy.
      */
     virtual bool IsValid() const = 0;
+
+    /**
+     * Update the system's resources.
+     *
+     * @param milliseconds Time to sleep between poll intervals.
+     */
+    virtual void Poll(const std::chrono::milliseconds &);
 
     /**
      * Update the system's current CPU count.
@@ -125,11 +132,6 @@ protected:
      * Update the process's current memory usage.
      */
     virtual void UpdateProcessMemoryUsage() = 0;
-
-    /**
-     * Close any open handles.
-     */
-    virtual void Close() = 0;
 
     std::atomic<uint32_t> m_systemCpuCount;
     std::atomic<double> m_systemCpuUsage;

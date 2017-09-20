@@ -4,6 +4,7 @@
 
 #include <Psapi.h>
 
+#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 
 namespace fly {
@@ -23,6 +24,29 @@ SystemMonitorImpl::SystemMonitorImpl() :
     m_prevProcessUserTime(0),
     m_prevTime(0)
 {
+}
+
+//==============================================================================
+SystemMonitorImpl::SystemMonitorImpl(ConfigManagerPtr &spConfigManager) :
+    SystemMonitor(spConfigManager),
+    m_process(::GetCurrentProcess()),
+    m_cpuQuery(NULL),
+    m_cpuCounter(NULL),
+    m_prevProcessSystemTime(0),
+    m_prevProcessUserTime(0),
+    m_prevTime(0)
+{
+}
+
+//==============================================================================
+SystemMonitorImpl::~SystemMonitorImpl()
+{
+    Stop();
+}
+
+//==============================================================================
+void SystemMonitorImpl::StartMonitor()
+{
     PDH_STATUS status = ERROR_SUCCESS;
 
     if ((status = ::PdhOpenQuery(NULL, NULL, &m_cpuQuery)) != ERROR_SUCCESS)
@@ -32,21 +56,25 @@ SystemMonitorImpl::SystemMonitorImpl() :
     else if ((status = ::PdhAddCounter(m_cpuQuery, s_cpuPath, NULL, &m_cpuCounter)) != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not add CPU counter (0x%x)", status);
-        Close();
+        StopMonitor();
     }
     else if ((status = ::PdhCollectQueryData(m_cpuQuery)) != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not poll CPU counter (0x%x)", status);
-        Close();
+        StopMonitor();
     }
 
     UpdateSystemCpuCount();
 }
 
 //==============================================================================
-SystemMonitorImpl::~SystemMonitorImpl()
+void SystemMonitorImpl::StopMonitor()
 {
-    Close();
+    if (m_cpuQuery != NULL)
+    {
+        ::PdhCloseQuery(m_cpuQuery);
+        m_cpuQuery = NULL;
+    }
 }
 
 //==============================================================================
@@ -80,12 +108,12 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
     if ((status = ::PdhCollectQueryData(m_cpuQuery)) != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not poll CPU counter (0x%x)", status);
-        Close();
+        StopMonitor();
     }
     else if ((status = ::PdhGetFormattedCounterValue(m_cpuCounter, PDH_FMT_DOUBLE, NULL, &value)) != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not format CPU counter (0x%x)", status);
-        Close();
+        StopMonitor();
     }
     else
     {
@@ -154,16 +182,6 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage()
     else
     {
         LOGS(-1, "Could not poll process memory");
-    }
-}
-
-//==============================================================================
-void SystemMonitorImpl::Close()
-{
-    if (m_cpuQuery != NULL)
-    {
-        ::PdhCloseQuery(m_cpuQuery);
-        m_cpuQuery = NULL;
     }
 }
 

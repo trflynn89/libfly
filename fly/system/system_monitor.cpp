@@ -1,18 +1,23 @@
+#include "fly/config/config_manager.h"
 #include "fly/system/system_monitor.h"
-
-#include <chrono>
-
-namespace
-{
-    // TODO make configurable
-    static const std::chrono::seconds s_delay(1);
-}
 
 namespace fly {
 
 //==============================================================================
 SystemMonitor::SystemMonitor() :
-    Runner("SystemMonitor", 1),
+    Monitor("SystemMonitor"),
+    m_systemCpuCount(0),
+    m_systemCpuUsage(0.0),
+    m_processCpuUsage(0.0),
+    m_totalSystemMemory(0),
+    m_systemMemoryUsage(0),
+    m_processMemoryUsage(0)
+{
+}
+
+//==============================================================================
+SystemMonitor::SystemMonitor(ConfigManagerPtr &spConfigManager) :
+    Monitor("SystemMonitor", spConfigManager),
     m_systemCpuCount(0),
     m_systemCpuUsage(0.0),
     m_processCpuUsage(0.0),
@@ -25,7 +30,6 @@ SystemMonitor::SystemMonitor() :
 //==============================================================================
 SystemMonitor::~SystemMonitor()
 {
-    Stop();
 }
 
 //==============================================================================
@@ -65,34 +69,16 @@ uint64_t SystemMonitor::GetProcessMemoryUsage() const
 }
 
 //==============================================================================
-bool SystemMonitor::StartRunner()
+void SystemMonitor::Poll(const std::chrono::milliseconds &delay)
 {
-    return IsValid();
-}
+    UpdateSystemCpuCount();
+    UpdateSystemCpuUsage();
+    UpdateProcessCpuUsage();
 
-//==============================================================================
-void SystemMonitor::StopRunner()
-{
-    Close();
-}
+    UpdateSystemMemoryUsage();
+    UpdateProcessMemoryUsage();
 
-//==============================================================================
-bool SystemMonitor::DoWork()
-{
-    if (IsValid())
-    {
-        UpdateSystemCpuCount();
-
-        UpdateSystemCpuUsage();
-        UpdateProcessCpuUsage();
-
-        UpdateSystemMemoryUsage();
-        UpdateProcessMemoryUsage();
-
-        std::this_thread::sleep_for(s_delay);
-    }
-
-    return IsValid();
+    std::this_thread::sleep_for(delay);
 }
 
 }

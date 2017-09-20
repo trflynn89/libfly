@@ -8,6 +8,7 @@
 
 namespace fly {
 
+DEFINE_CLASS_PTRS(ConfigManager);
 DEFINE_CLASS_PTRS(SystemMonitorImpl);
 
 /**
@@ -21,9 +22,20 @@ class SystemMonitorImpl : public SystemMonitor
 {
 public:
     SystemMonitorImpl();
+    SystemMonitorImpl(ConfigManagerPtr &);
     virtual ~SystemMonitorImpl();
 
 protected:
+    /**
+     * Open the system monitor's CPU query.
+     */
+    virtual void StartMonitor();
+
+    /**
+     * Close the system monitor's CPU query.
+     */
+    virtual void StopMonitor();
+
     /**
      * Check if the system monitor's CPU query was successfully created, and if
      * the system CPU count was successfully set.
@@ -38,8 +50,6 @@ protected:
 
     virtual void UpdateSystemMemoryUsage();
     virtual void UpdateProcessMemoryUsage();
-
-    virtual void Close();
 
 private:
     /**
