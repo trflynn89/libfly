@@ -8,8 +8,6 @@
 #include <execinfo.h>
 #include <unistd.h>
 
-#include "fly/logger/logger.h"
-
 namespace fly {
 
 //==============================================================================

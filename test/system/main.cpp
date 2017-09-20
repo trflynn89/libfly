@@ -1,10 +1,14 @@
 #include <csignal>
 #include <functional>
+#include <future>
 #include <string>
+#include <thread>
 
 #include <gtest/gtest.h>
 
+#include "fly/fly.h"
 #include "fly/system/system.h"
+#include "fly/system/system_monitor_impl.h"
 
 namespace
 {
@@ -55,4 +59,93 @@ TEST(SystemTest, SignalTest)
     EXPECT_EQ(s_lastSignal, SIGSEGV);
 
     fly::System::SetSignalHandler(nullptr);
+}
+
+//==============================================================================
+class SystemMonitorTest : public ::testing::Test
+{
+public:
+    SystemMonitorTest() :
+        m_spMonitor(std::make_shared<fly::SystemMonitorImpl>()),
+        m_aKeepRunning(true)
+    {
+    }
+
+    /**
+     * Create and start the system monitor.
+     */
+    virtual void SetUp()
+    {
+        ASSERT_TRUE(m_spMonitor && m_spMonitor->Start());
+
+        // Give the monitor a bit of time to acquire initial system values
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
+
+    /**
+     * Stop the system monitor.
+     */
+    virtual void TearDown()
+    {
+        m_spMonitor->Stop();
+    }
+
+    /**
+     * Thread to spin infinitely until signaled to stop.
+     */
+    void SpinThread()
+    {
+        while (m_aKeepRunning.load())
+        {
+        }
+    }
+
+protected:
+    fly::SystemMonitorPtr m_spMonitor;
+    std::atomic_bool m_aKeepRunning;
+};
+
+//==============================================================================
+TEST_F(SystemMonitorTest, CpuUsageTest)
+{
+    uint32_t countBefore = m_spMonitor->GetSystemCpuCount();
+    double processBefore = m_spMonitor->GetProcessCpuUsage();
+
+    std::future<void> result = std::async(
+        std::launch::async, &SystemMonitorTest::SpinThread, this
+    );
+
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    uint32_t countAfter = m_spMonitor->GetSystemCpuCount();
+    double systemAfter = m_spMonitor->GetSystemCpuUsage();
+    double processAfter = m_spMonitor->GetProcessCpuUsage();
+
+    m_aKeepRunning.store(false);
+    ASSERT_TRUE(result.valid());
+    result.get();
+
+    ASSERT_EQ(countBefore, countAfter);
+    ASSERT_GT(systemAfter, U64(0));
+    ASSERT_LT(processBefore, processAfter);
+}
+
+//==============================================================================
+TEST_F(SystemMonitorTest, MemoryUsageTest)
+{
+    uint64_t totalBefore = m_spMonitor->GetTotalSystemMemory();
+    uint64_t systemBefore = m_spMonitor->GetSystemMemoryUsage();
+    uint64_t processBefore = m_spMonitor->GetProcessMemoryUsage();
+
+    std::string consumed((totalBefore - systemBefore) / 10, '\0');
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    uint64_t totalAfter = m_spMonitor->GetTotalSystemMemory();
+    uint64_t systemAfter = m_spMonitor->GetSystemMemoryUsage();
+    uint64_t processAfter = m_spMonitor->GetProcessMemoryUsage();
+
+    ASSERT_EQ(totalBefore, totalAfter);
+    ASSERT_GT(systemBefore, U64(0));
+    ASSERT_GT(systemAfter, U64(0));
+    ASSERT_LT(processBefore, processAfter);
 }

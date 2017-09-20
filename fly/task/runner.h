@@ -11,9 +11,7 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
 DEFINE_CLASS_PTRS(Runner);
-DEFINE_CLASS_PTRS(TaskConfig);
 
 /**
  * Class to simplify running tasks. Other classes may inherit from this class
@@ -30,18 +28,9 @@ public:
      * Constructor.
      *
      * @param string Name to use for this task runner.
-     * @param int Number of worker threads to start (less than 0 starts one per core).
+     * @param int Number of worker threads to start.
      */
     Runner(const std::string &, int);
-
-    /**
-     * Constructor. Create one worker per core (or default to the config value
-     * if number of cores could not be determined).
-     *
-     * @param ConfigManagerPtr Reference to the configuration manager.
-     * @param string Name to use for this task runner.
-     */
-    Runner(ConfigManagerPtr &, const std::string &);
 
     /**
      * Destructor. Stop the running tasks if necessary.
@@ -98,8 +87,6 @@ private:
      * Thread to perform the work requried for this task.
      */
     void workerThread();
-
-    TaskConfigPtr m_spConfig;
 
     std::atomic_bool m_aKeepRunning;
 

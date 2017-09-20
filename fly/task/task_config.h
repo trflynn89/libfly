@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <string>
 
 #include "fly/fly.h"
@@ -34,9 +35,9 @@ public:
     static std::string GetName();
 
     /**
-     * @return Number of worker threads, used if could not find number of cores.
+     * @return Delay between monitor poll intervals.
      */
-    int DefaultWorkerCount() const;
+    std::chrono::milliseconds PollInterval() const;
 };
 
 }

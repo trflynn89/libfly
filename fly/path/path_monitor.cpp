@@ -2,21 +2,18 @@
 
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
-#include "fly/path/path_config.h"
 
 namespace fly {
 
 //==============================================================================
 PathMonitor::PathMonitor() :
-    Runner("PathMonitor", 1),
-    m_spConfig(std::make_shared<PathConfig>())
+    Monitor("PathMonitor")
 {
 }
 
 //==============================================================================
 PathMonitor::PathMonitor(ConfigManagerPtr &spConfigManager) :
-    Runner("PathMonitor", 1),
-    m_spConfig(spConfigManager->CreateConfig<PathConfig>())
+    Monitor("PathMonitor", spConfigManager)
 {
 }
 
@@ -24,7 +21,6 @@ PathMonitor::PathMonitor(ConfigManagerPtr &spConfigManager) :
 PathMonitor::~PathMonitor()
 {
     RemoveAllPaths();
-    Stop();
 }
 
 //==============================================================================
@@ -136,29 +132,6 @@ bool PathMonitor::RemoveFile(const std::string &path, const std::string &file)
     }
 
     return (removePath ? RemovePath(path) : true);
-}
-
-//==============================================================================
-bool PathMonitor::StartRunner()
-{
-    return IsValid();
-}
-
-//==============================================================================
-void PathMonitor::StopRunner()
-{
-    Close();
-}
-
-//==============================================================================
-bool PathMonitor::DoWork()
-{
-    if (IsValid())
-    {
-        Poll(m_spConfig->PollTimeout());
-    }
-
-    return IsValid();
 }
 
 //==============================================================================

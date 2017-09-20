@@ -27,6 +27,17 @@ public:
     PathMonitorImpl(ConfigManagerPtr &);
     virtual ~PathMonitorImpl();
 
+protected:
+    /**
+     * Create the path monitor's IOCP.
+     */
+    virtual void StartMonitor();
+
+    /**
+     * Close the path monitor's IOCP.
+     */
+    virtual void StopMonitor();
+
     /**
      * Check if the path monitor's IOCP was successfully created.
      *
@@ -34,10 +45,15 @@ public:
      */
     virtual bool IsValid() const;
 
-protected:
-    virtual PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const;
+    /**
+     * Check if the path monitor's IOCP has any posted completions, and handle
+     * any that have been posted.
+     *
+     * @param milliseconds Max time allow for a completion to be posted.
+     */
     virtual void Poll(const std::chrono::milliseconds &);
-    virtual void Close();
+
+    virtual PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const;
 
 private:
     DEFINE_STRUCT_PTRS(PathInfoImpl);

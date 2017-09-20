@@ -27,17 +27,33 @@ public:
     PathMonitorImpl(ConfigManagerPtr &);
     virtual ~PathMonitorImpl();
 
+protected:
+    /**
+     * Create the path monitor's inotify handle.
+     */
+    virtual void StartMonitor();
+
+    /**
+     * Close the path monitor's inotify handle.
+     */
+    virtual void StopMonitor();
+
     /**
      * Check if the path monitor's inotify handle was successfully created.
      *
-     * @return bool True if the handle is valid.
+     * @return bool True if the inotify handle is valid.
      */
     virtual bool IsValid() const;
 
-protected:
-    virtual PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const;
+    /**
+     * Check if the path monitor's inotify handle has any events to be read,
+     * and handle any that are readable.
+     *
+     * @param milliseconds Max time allow for an event to be readable.
+     */
     virtual void Poll(const std::chrono::milliseconds &);
-    virtual void Close();
+
+    virtual PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const;
 
 private:
     DEFINE_STRUCT_PTRS(PathInfoImpl);

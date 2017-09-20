@@ -1,10 +1,10 @@
 #include <atomic>
 #include <chrono>
+#include <thread>
 
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
-#include "fly/config/config_manager.h"
 #include "fly/task/runner.h"
 
 DEFINE_CLASS_PTRS(CountTask);
@@ -13,8 +13,8 @@ DEFINE_CLASS_PTRS(CountTask);
 class CountTask : public fly::Runner
 {
 public:
-    CountTask(fly::ConfigManagerPtr &spConfigManager, bool run) :
-        Runner(spConfigManager, "CountTask"),
+    CountTask(bool run) :
+        Runner("CountTask", std::thread::hardware_concurrency()),
         m_callCount(0),
         m_run(run)
     {
@@ -53,11 +53,8 @@ class RunnerTest : public ::testing::Test
 {
 public:
     RunnerTest() :
-        m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::CONFIG_TYPE_INI, "", ""
-        )),
-        m_spTask1(std::make_shared<CountTask>(m_spConfigManager, true)),
-        m_spTask2(std::make_shared<CountTask>(m_spConfigManager, false))
+        m_spTask1(std::make_shared<CountTask>(true)),
+        m_spTask2(std::make_shared<CountTask>(false))
     {
     }
 
@@ -78,7 +75,6 @@ public:
     }
 
 protected:
-    fly::ConfigManagerPtr m_spConfigManager;
     CountTaskPtr m_spTask1;
     CountTaskPtr m_spTask2;
 };
