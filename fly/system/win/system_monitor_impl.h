@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 #include <Windows.h>
 #include <Pdh.h>
 
@@ -28,12 +26,13 @@ public:
 protected:
     /**
      * Check if the system monitor's CPU query was successfully created, and if
-     * the CPU scaling factor was successfully set.
+     * the system CPU count was successfully set.
      *
-     * @return bool True if the CPU query and scaling factor are valid.
+     * @return bool True if the CPU query and count are valid.
      */
     virtual bool IsValid() const;
 
+    virtual void UpdateSystemCpuCount();
     virtual void UpdateSystemCpuUsage();
     virtual void UpdateProcessCpuUsage();
 
@@ -53,13 +52,9 @@ private:
     PDH_HQUERY m_cpuQuery;
     PDH_HCOUNTER m_cpuCounter;
 
-    uint64_t m_currCpuTicks;
-    uint64_t m_prevCpuTicks;
-
-    uint64_t m_currTime;
-    uint64_t m_prevTime;
-
-    double m_scale;
+    ULONGLONG m_prevProcessSystemTime;
+    ULONGLONG m_prevProcessUserTime;
+    ULONGLONG m_prevTime;
 };
 
 }

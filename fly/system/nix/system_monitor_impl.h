@@ -46,8 +46,8 @@ private:
     uint64_t m_prevSystemSystemTime;
     uint64_t m_prevSystemIdleTime;
 
-    clock_t m_prevProcessUserTime;
     clock_t m_prevProcessSystemTime;
+    clock_t m_prevProcessUserTime;
     clock_t m_prevTime;
 };
 

@@ -30,8 +30,8 @@ SystemMonitorImpl::SystemMonitorImpl() :
     m_prevSystemNiceTime(0),
     m_prevSystemSystemTime(0),
     m_prevSystemIdleTime(0),
-    m_prevProcessUserTime(0),
     m_prevProcessSystemTime(0),
+    m_prevProcessUserTime(0),
     m_prevTime(0)
 {
     UpdateSystemCpuCount();
@@ -128,7 +128,7 @@ void SystemMonitorImpl::UpdateProcessCpuUsage()
         (sample.tms_stime >= m_prevProcessSystemTime) &&
         (sample.tms_utime >= m_prevProcessUserTime))
     {
-        double cpu =
+        uint64_t cpu =
             (sample.tms_stime - m_prevProcessSystemTime) +
             (sample.tms_utime - m_prevProcessUserTime);
 

@@ -16,38 +16,31 @@ namespace
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl() :
     SystemMonitor(),
-    m_process(GetCurrentProcess()),
+    m_process(::GetCurrentProcess()),
     m_cpuQuery(NULL),
     m_cpuCounter(NULL),
-    m_currCpuTicks(0),
-    m_prevCpuTicks(0),
-    m_currTime(0),
-    m_prevTime(0),
-    m_scale(0.0)
+    m_prevProcessSystemTime(0),
+    m_prevProcessUserTime(0),
+    m_prevTime(0)
 {
     PDH_STATUS status = ERROR_SUCCESS;
 
-    if ((status = PdhOpenQuery(NULL, NULL, &m_cpuQuery)) != ERROR_SUCCESS)
+    if ((status = ::PdhOpenQuery(NULL, NULL, &m_cpuQuery)) != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not open CPU query (0x%x)", status);
     }
-    else if ((status = PdhAddCounter(m_cpuQuery, s_cpuPath, NULL, &m_cpuCounter)) != ERROR_SUCCESS)
+    else if ((status = ::PdhAddCounter(m_cpuQuery, s_cpuPath, NULL, &m_cpuCounter)) != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not add CPU counter (0x%x)", status);
         Close();
     }
-    else if ((status = PdhCollectQueryData(m_cpuQuery)) != ERROR_SUCCESS)
+    else if ((status = ::PdhCollectQueryData(m_cpuQuery)) != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not poll CPU counter (0x%x)", status);
         Close();
     }
 
-    DWORD cpuCount = getCpuCount();
-
-    if (cpuCount > 0)
-    {
-        m_scale = (100.0 / cpuCount);
-    }
+    UpdateSystemCpuCount();
 }
 
 //==============================================================================
@@ -59,7 +52,23 @@ SystemMonitorImpl::~SystemMonitorImpl()
 //==============================================================================
 bool SystemMonitorImpl::IsValid() const
 {
-    return ((m_cpuQuery != NULL) && (m_scale > 0.0));
+    return ((m_cpuQuery != NULL) && (m_systemCpuCount.load() > 0));
+}
+
+//==============================================================================
+void SystemMonitorImpl::UpdateSystemCpuCount()
+{
+    SYSTEM_INFO info;
+    ::GetSystemInfo(&info);
+
+    if (info.dwNumberOfProcessors == 0)
+    {
+        LOGS(-1, "Could not poll system CPU count");
+    }
+    else
+    {
+        m_systemCpuCount.store(info.dwNumberOfProcessors);
+    }
 }
 
 //==============================================================================
@@ -68,12 +77,12 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
     PDH_STATUS status = ERROR_SUCCESS;
     PDH_FMT_COUNTERVALUE value;
 
-    if ((status = PdhCollectQueryData(m_cpuQuery)) != ERROR_SUCCESS)
+    if ((status = ::PdhCollectQueryData(m_cpuQuery)) != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not poll CPU counter (0x%x)", status);
         Close();
     }
-    else if ((status = PdhGetFormattedCounterValue(m_cpuCounter, PDH_FMT_DOUBLE, NULL, &value)) != ERROR_SUCCESS)
+    else if ((status = ::PdhGetFormattedCounterValue(m_cpuCounter, PDH_FMT_DOUBLE, NULL, &value)) != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not format CPU counter (0x%x)", status);
         Close();
@@ -87,37 +96,33 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
 //==============================================================================
 void SystemMonitorImpl::UpdateProcessCpuUsage()
 {
-    FILETIME ftime, fsys, fuser;
-    ULARGE_INTEGER now;
+    ULARGE_INTEGER now, system, user;
+    FILETIME fnow, fsystem, fuser;
 
-    GetSystemTimeAsFileTime(&ftime);
-    memcpy(&now, &ftime, sizeof(FILETIME));
-    m_currTime = now.QuadPart;
+    ::GetSystemTimeAsFileTime(&fnow);
+    ::memcpy(&now, &fnow, sizeof(FILETIME));
 
-    if (GetProcessTimes(m_process, &ftime, &ftime, &fsys, &fuser))
+    if (::GetProcessTimes(m_process, &fnow, &fnow, &fsystem, &fuser))
     {
-        ULARGE_INTEGER stime, utime;
+        ::memcpy(&system, &fsystem, sizeof(FILETIME));
+        ::memcpy(&user, &fuser, sizeof(FILETIME));
 
-        memcpy(&stime, &fsys, sizeof(FILETIME));
-        memcpy(&utime, &fuser, sizeof(FILETIME));
+        ULONGLONG cpu =
+            (system.QuadPart - m_prevProcessSystemTime) +
+            (user.QuadPart - m_prevProcessUserTime);
 
-        m_currCpuTicks = stime.QuadPart + utime.QuadPart;
+        ULONGLONG time = now.QuadPart - m_prevTime;
+
+        m_processCpuUsage.store(100.0 * cpu / time / m_systemCpuCount.load());
+
+        m_prevProcessSystemTime = system.QuadPart;
+        m_prevProcessUserTime = user.QuadPart;
+        m_prevTime = now.QuadPart;
     }
     else
     {
         LOGS(-1, "Could not poll process CPU");
     }
-
-    if ((m_currCpuTicks > m_prevCpuTicks) && (m_currTime > m_prevTime))
-    {
-        uint64_t ticks = m_currCpuTicks - m_prevCpuTicks;
-        uint64_t time = m_currTime - m_prevTime;
-
-        m_processCpuUsage.store(m_scale * ticks / time);
-    }
-
-    m_prevCpuTicks = m_currCpuTicks;
-    m_prevTime = m_currTime;
 }
 
 //==============================================================================
@@ -126,7 +131,7 @@ void SystemMonitorImpl::UpdateSystemMemoryUsage()
     MEMORYSTATUSEX info;
     info.dwLength = sizeof(MEMORYSTATUSEX);
 
-    if (GlobalMemoryStatusEx(&info))
+    if (::GlobalMemoryStatusEx(&info))
     {
         m_totalSystemMemory.store(info.ullTotalPhys);
         m_systemMemoryUsage.store(info.ullTotalPhys - info.ullAvailPhys);
@@ -142,7 +147,7 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage()
 {
     PROCESS_MEMORY_COUNTERS pmc;
 
-    if (GetProcessMemoryInfo(m_process, &pmc, sizeof(pmc)))
+    if (::GetProcessMemoryInfo(m_process, &pmc, sizeof(pmc)))
     {
         m_processMemoryUsage.store(pmc.WorkingSetSize);
     }
@@ -157,18 +162,9 @@ void SystemMonitorImpl::Close()
 {
     if (m_cpuQuery != NULL)
     {
-        PdhCloseQuery(m_cpuQuery);
+        ::PdhCloseQuery(m_cpuQuery);
         m_cpuQuery = NULL;
     }
-}
-
-//==============================================================================
-DWORD SystemMonitorImpl::getCpuCount() const
-{
-    SYSTEM_INFO sysInfo;
-    GetSystemInfo(&sysInfo);
-
-    return sysInfo.dwNumberOfProcessors;
 }
 
 }
