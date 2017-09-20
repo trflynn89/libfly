@@ -97,10 +97,14 @@ void String::RemoveAll(std::string &target, const std::string &search)
 //==============================================================================
 std::string String::GenerateRandomString(const size_t len)
 {
-    static auto now = std::chrono::system_clock::now();
-    static auto seed = now.time_since_epoch().count();
+    typedef std::uniform_int_distribution<short> short_distribution;
 
-    static std::uniform_int_distribution<size_t> distribution(0, s_alphaNum.size() - 1);
+    static auto now = std::chrono::system_clock::now().time_since_epoch();
+
+    static auto limit = static_cast<short_distribution::result_type>(s_alphaNum.size() - 1);
+    static auto seed = static_cast<std::mt19937::result_type>(now.count());
+
+    static short_distribution distribution(0, limit);
     static std::mt19937 engine(seed);
 
     std::string ret;
