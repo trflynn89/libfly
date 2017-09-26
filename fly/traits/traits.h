@@ -1,8 +1,17 @@
 #pragma once
 
+#include <array>
+#include <deque>
+#include <forward_list>
 #include <iostream>
+#include <list>
+#include <map>
+#include <set>
 #include <type_traits>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
+#include <vector>
 
 /**
 * Define SFINAE tests for whether a function is declared for a type.
@@ -163,6 +172,111 @@ struct if_boolean
 
     template <typename T>
     using disabled = std::enable_if_t<!__::is_boolean<T>::value, bool>;
+};
+
+/**
+ * Tests for whether a given type is map-like (i.e. holds key-value pairs).
+ */
+struct if_map
+{
+    struct __
+    {
+        template <typename>
+        struct is_map : std::false_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_map<std::map<Args...>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_map<std::multimap<Args...>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_map<std::unordered_map<Args...>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_map<std::unordered_multimap<Args...>> : std::true_type
+        {
+        };
+    };
+
+    template <typename T>
+    using enabled = std::enable_if_t<__::is_map<T>::value, bool>;
+
+    template <typename T>
+    using disabled = std::enable_if_t<!__::is_map<T>::value, bool>;
+};
+
+/**
+ * Tests for whether a given type is array-like (i.e. holds value sequences).
+ */
+struct if_array
+{
+    struct __
+    {
+        template <typename>
+        struct is_array : std::false_type
+        {
+        };
+
+        template <typename T, std::size_t N>
+        struct is_array<std::array<T, N>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_array<std::deque<Args...>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_array<std::forward_list<Args...>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_array<std::list<Args...>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_array<std::multiset<Args...>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_array<std::set<Args...>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_array<std::unordered_multiset<Args...>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_array<std::unordered_set<Args...>> : std::true_type
+        {
+        };
+
+        template <typename ... Args>
+        struct is_array<std::vector<Args...>> : std::true_type
+        {
+        };
+    };
+
+    template <typename T>
+    using enabled = std::enable_if_t<__::is_array<T>::value, bool>;
+
+    template <typename T>
+    using disabled = std::enable_if_t<!__::is_array<T>::value, bool>;
 };
 
 /**

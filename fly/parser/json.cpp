@@ -18,22 +18,6 @@ Json::Json() :
 }
 
 //==============================================================================
-Json::Json(const object_type &value) :
-    m_type(TYPE_OBJECT),
-    m_value(value),
-    m_pParent(NULL)
-{
-}
-
-//==============================================================================
-Json::Json(const array_type &value) :
-    m_type(TYPE_ARRAY),
-    m_value(value),
-    m_pParent(NULL)
-{
-}
-
-//==============================================================================
 Json::Json(const null_type &value) :
     m_type(TYPE_NULL),
     m_value(value),
@@ -83,7 +67,7 @@ Json::Json(const Json &json) :
 }
 
 //==============================================================================
-Json::Json(const initializer_t &initializer) :
+Json::Json(const initializer_type &initializer) :
     m_type(TYPE_NULL),
     m_value(TYPE_NULL),
     m_pParent(NULL)
@@ -408,18 +392,6 @@ Json::Value::Value(const Json::Type &type)
         m_null = nullptr;
         break;
     }
-}
-
-//==============================================================================
-Json::Value::Value(const object_type &value) :
-    m_pObject(new object_type(value))
-{
-}
-
-//==============================================================================
-Json::Value::Value(const array_type &value) :
-    m_pArray(new array_type(value))
-{
 }
 
 //==============================================================================

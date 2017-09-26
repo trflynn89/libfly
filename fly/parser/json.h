@@ -28,9 +28,10 @@ DEFINE_CLASS_PTRS(JsonException);
 class Json
 {
     /**
-     * Aliases for JSON types. These should be specified as template parameters
-     * to the Json class eventually, to allow callers to override the types. But
-     * these stand as reasonable default types for now.
+     * Aliases for JSON types. These could be specified as template parameters
+     * to the Json class, to allow callers to override the types. But these are
+     * reasonable default types for now, and the Json class constructors allow
+     * for type flexibility.
      */
     using string_type = std::string;
     using object_type = std::map<string_type, Json>;
@@ -44,7 +45,7 @@ class Json
     /**
      * Alias for constructing a Json instance from an initializer list.
      */
-    using initializer_t = std::initializer_list<Json>;
+    using initializer_type = std::initializer_list<Json>;
 
 public:
     /**
@@ -66,17 +67,27 @@ public:
 
     /**
      * Object constructor. Intializes the Json instance to an object's values.
+     * The SFINAE declaration allows construction of an object value from any
+     * object-like type (e.g. std::map, std::multimap).
      *
-     * @param object_type The object value.
+     * @tparam T The object-like type.
+     *
+     * @param T The object-like value.
      */
-    Json(const object_type &);
+    template <typename T, fly::if_map::enabled<T> = 0>
+    Json(const T &);
 
     /**
-     * Array constructor. Intializes the Json instance to an array's values.
+     * Array constructor. Intializes the Json instance to an array's values. The
+     * SFINAE declaration allows construction of an array value from any
+     * array-like type (e.g. std::list, std::vector).
      *
-     * @param array_type The array value.
+     * @tparam T The array-like type.
+     *
+     * @param T The array-like value.
      */
-    Json(const array_type &);
+    template <typename T, fly::if_array::enabled<T> = 0>
+    Json(const T &);
 
     /**
      * Boolean constructor. Intializes the Json instance to a boolean value. The
@@ -151,9 +162,9 @@ public:
      * then the Json instance is created as an object. Otherwise, it is created
      * as an array.
      *
-     * @param initializer_t The initializer list.
+     * @param initializer_type The initializer list.
      */
-    Json(const initializer_t &);
+    Json(const initializer_type &);
 
     /**
      * Destructor. Delete any memory allocated for the JSON value.
@@ -336,18 +347,27 @@ private:
 
         /**
          * Object constructor. Intializes the Value instance to an object's
-         * values.
+         * values. The SFINAE declaration allows construction of an object value
+         * from any object-like type (e.g. std::map, std::multimap).
          *
-         * @param object_type The object value.
+         * @tparam T The object-like type.
+         *
+         * @param T The object-like value.
          */
-        Value(const object_type &);
+        template <typename T, fly::if_map::enabled<T> = 0>
+        Value(const T &);
 
         /**
-         * Array constructor. Intializes the Value instance to an array's values.
+         * Array constructor. Intializes the Value instance to an array's
+         * values. The SFINAE declaration allows construction of an array value
+         * from any array-like type (e.g. std::list, std::vector).
          *
-         * @param array_type The array value.
+         * @tparam T The array-like type.
+         *
+         * @param T The array value.
          */
-        Value(const array_type &);
+        template <typename T, fly::if_array::enabled<T> = 0>
+        Value(const T &);
 
         /**
          * Boolean constructor. Intializes the Value instance to a boolean
@@ -461,6 +481,24 @@ Json::Json(const T &value) :
 }
 
 //==============================================================================
+template <typename T, fly::if_map::enabled<T>>
+Json::Json(const T &value) :
+    m_type(TYPE_OBJECT),
+    m_value(value),
+    m_pParent(NULL)
+{
+}
+
+//==============================================================================
+template <typename T, fly::if_array::enabled<T>>
+Json::Json(const T &value) :
+    m_type(TYPE_ARRAY),
+    m_value(value),
+    m_pParent(NULL)
+{
+}
+
+//==============================================================================
 template <typename T, fly::if_boolean::enabled<T>>
 Json::Json(const T &value) :
     m_type(TYPE_BOOLEAN),
@@ -500,6 +538,20 @@ Json::Json(const T &value) :
 template <typename T, fly::if_string::enabled<T>>
 Json::Value::Value(const T &value) :
     m_pString(new string_type(value))
+{
+}
+
+//==============================================================================
+template <typename T, fly::if_map::enabled<T>>
+Json::Value::Value(const T &value) :
+    m_pObject(new object_type(value.begin(), value.end()))
+{
+}
+
+//==============================================================================
+template <typename T, fly::if_array::enabled<T>>
+Json::Value::Value(const T &value) :
+    m_pArray(new array_type(value.begin(), value.end()))
 {
 }
 

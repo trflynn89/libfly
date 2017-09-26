@@ -1,4 +1,13 @@
+#include <array>
+#include <deque>
+#include <forward_list>
+#include <list>
+#include <map>
+#include <set>
 #include <sstream>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -129,6 +138,32 @@ namespace
     {
         return false;
     }
+
+    //==========================================================================
+    template <typename T, fly::if_map::enabled<T> = 0>
+    bool isMap(const T &)
+    {
+        return true;
+    }
+
+    template <typename T, fly::if_map::disabled<T> = 0>
+    bool isMap(const T &)
+    {
+        return false;
+    }
+
+    //==========================================================================
+    template <typename T, fly::if_array::enabled<T> = 0>
+    bool isArray(const T &)
+    {
+        return true;
+    }
+
+    template <typename T, fly::if_array::disabled<T> = 0>
+    bool isArray(const T &)
+    {
+        return false;
+    }
 }
 
 //==============================================================================
@@ -207,6 +242,20 @@ TEST(TraitsTest, SignedIntegerTest)
     ASSERT_TRUE(isSignedInteger(1));
     ASSERT_TRUE(isSignedInteger(-1));
 
+    ASSERT_FALSE(isSignedInteger(std::array<int, 4>()));
+    ASSERT_FALSE(isSignedInteger(std::deque<int>()));
+    ASSERT_FALSE(isSignedInteger(std::forward_list<int>()));
+    ASSERT_FALSE(isSignedInteger(std::list<int>()));
+    ASSERT_FALSE(isSignedInteger(std::map<std::string, int>()));
+    ASSERT_FALSE(isSignedInteger(std::multimap<std::string, int>()));
+    ASSERT_FALSE(isSignedInteger(std::multiset<int>()));
+    ASSERT_FALSE(isSignedInteger(std::set<int>()));
+    ASSERT_FALSE(isSignedInteger(std::unordered_map<std::string, int>()));
+    ASSERT_FALSE(isSignedInteger(std::unordered_multimap<std::string, int>()));
+    ASSERT_FALSE(isSignedInteger(std::unordered_multiset<int>()));
+    ASSERT_FALSE(isSignedInteger(std::unordered_set<int>()));
+    ASSERT_FALSE(isSignedInteger(std::vector<int>()));
+
     ASSERT_FALSE(isSignedInteger("foo"));
     ASSERT_FALSE(isSignedInteger(3.14));
     ASSERT_FALSE(isSignedInteger(true));
@@ -218,6 +267,20 @@ TEST(TraitsTest, UnsignedIntegerTest)
 {
     ASSERT_TRUE(isUnsignedInteger(static_cast<unsigned int>(1)));
     ASSERT_TRUE(isUnsignedInteger(static_cast<unsigned int>(-1)));
+
+    ASSERT_FALSE(isUnsignedInteger(std::array<int, 4>()));
+    ASSERT_FALSE(isUnsignedInteger(std::deque<int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::forward_list<int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::list<int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::map<std::string, int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::multimap<std::string, int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::multiset<int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::set<int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::unordered_map<std::string, int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::unordered_multimap<std::string, int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::unordered_multiset<int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::unordered_set<int>()));
+    ASSERT_FALSE(isUnsignedInteger(std::vector<int>()));
 
     ASSERT_FALSE(isUnsignedInteger(1));
     ASSERT_FALSE(isUnsignedInteger(-1));
@@ -233,6 +296,20 @@ TEST(TraitsTest, FloatTest)
     ASSERT_TRUE(isFloat(3.14));
     ASSERT_TRUE(isFloat(static_cast<long double>(3.14)));
 
+    ASSERT_FALSE(isFloat(std::array<int, 4>()));
+    ASSERT_FALSE(isFloat(std::deque<int>()));
+    ASSERT_FALSE(isFloat(std::forward_list<int>()));
+    ASSERT_FALSE(isFloat(std::list<int>()));
+    ASSERT_FALSE(isFloat(std::map<std::string, int>()));
+    ASSERT_FALSE(isFloat(std::multimap<std::string, int>()));
+    ASSERT_FALSE(isFloat(std::multiset<int>()));
+    ASSERT_FALSE(isFloat(std::set<int>()));
+    ASSERT_FALSE(isFloat(std::unordered_map<std::string, int>()));
+    ASSERT_FALSE(isFloat(std::unordered_multimap<std::string, int>()));
+    ASSERT_FALSE(isFloat(std::unordered_multiset<int>()));
+    ASSERT_FALSE(isFloat(std::unordered_set<int>()));
+    ASSERT_FALSE(isFloat(std::vector<int>()));
+
     ASSERT_FALSE(isFloat(1));
     ASSERT_FALSE(isFloat(-1));
     ASSERT_FALSE(isFloat("foo"));
@@ -245,8 +322,72 @@ TEST(TraitsTest, BoolTest)
     ASSERT_TRUE(isBool(true));
     ASSERT_TRUE(isBool(false));
 
-    ASSERT_FALSE(isFloat(1));
-    ASSERT_FALSE(isFloat(-1));
-    ASSERT_FALSE(isFloat("foo"));
-    ASSERT_FALSE(isUnsignedInteger(3.14));
+    ASSERT_FALSE(isBool(std::array<int, 4>()));
+    ASSERT_FALSE(isBool(std::deque<int>()));
+    ASSERT_FALSE(isBool(std::forward_list<int>()));
+    ASSERT_FALSE(isBool(std::list<int>()));
+    ASSERT_FALSE(isBool(std::map<std::string, int>()));
+    ASSERT_FALSE(isBool(std::multimap<std::string, int>()));
+    ASSERT_FALSE(isBool(std::multiset<int>()));
+    ASSERT_FALSE(isBool(std::set<int>()));
+    ASSERT_FALSE(isBool(std::unordered_map<std::string, int>()));
+    ASSERT_FALSE(isBool(std::unordered_multimap<std::string, int>()));
+    ASSERT_FALSE(isBool(std::unordered_multiset<int>()));
+    ASSERT_FALSE(isBool(std::unordered_set<int>()));
+    ASSERT_FALSE(isBool(std::vector<int>()));
+
+    ASSERT_FALSE(isBool(1));
+    ASSERT_FALSE(isBool(-1));
+    ASSERT_FALSE(isBool("foo"));
+    ASSERT_FALSE(isBool(3.14));
+}
+
+//==============================================================================
+TEST(TraitsTest, MapTest)
+{
+    ASSERT_TRUE(isMap(std::map<std::string, int>()));
+    ASSERT_TRUE(isMap(std::multimap<std::string, int>()));
+    ASSERT_TRUE(isMap(std::unordered_map<std::string, int>()));
+    ASSERT_TRUE(isMap(std::unordered_multimap<std::string, int>()));
+
+    ASSERT_FALSE(isMap(std::array<int, 4>()));
+    ASSERT_FALSE(isMap(std::deque<int>()));
+    ASSERT_FALSE(isMap(std::forward_list<int>()));
+    ASSERT_FALSE(isMap(std::list<int>()));
+    ASSERT_FALSE(isMap(std::multiset<int>()));
+    ASSERT_FALSE(isMap(std::set<int>()));
+    ASSERT_FALSE(isMap(std::unordered_multiset<int>()));
+    ASSERT_FALSE(isMap(std::unordered_set<int>()));
+    ASSERT_FALSE(isMap(std::vector<int>()));
+
+    ASSERT_FALSE(isMap(1));
+    ASSERT_FALSE(isMap(-1));
+    ASSERT_FALSE(isMap("foo"));
+    ASSERT_FALSE(isMap(3.14));
+    ASSERT_FALSE(isMap(true));
+}
+
+//==============================================================================
+TEST(TraitsTest, ArrayTest)
+{
+    ASSERT_TRUE(isArray(std::array<int, 4>()));
+    ASSERT_TRUE(isArray(std::deque<int>()));
+    ASSERT_TRUE(isArray(std::forward_list<int>()));
+    ASSERT_TRUE(isArray(std::list<int>()));
+    ASSERT_TRUE(isArray(std::multiset<int>()));
+    ASSERT_TRUE(isArray(std::set<int>()));
+    ASSERT_TRUE(isArray(std::unordered_multiset<int>()));
+    ASSERT_TRUE(isArray(std::unordered_set<int>()));
+    ASSERT_TRUE(isArray(std::vector<int>()));
+
+    ASSERT_FALSE(isArray(std::map<std::string, int>()));
+    ASSERT_FALSE(isArray(std::multimap<std::string, int>()));
+    ASSERT_FALSE(isArray(std::unordered_map<std::string, int>()));
+    ASSERT_FALSE(isArray(std::unordered_multimap<std::string, int>()));
+
+    ASSERT_FALSE(isArray(1));
+    ASSERT_FALSE(isArray(-1));
+    ASSERT_FALSE(isArray("foo"));
+    ASSERT_FALSE(isArray(3.14));
+    ASSERT_FALSE(isArray(true));
 }

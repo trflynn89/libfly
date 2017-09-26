@@ -1,5 +1,14 @@
+#include <array>
+#include <deque>
+#include <forward_list>
 #include <fstream>
+#include <list>
+#include <map>
+#include <set>
 #include <sstream>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -487,9 +496,9 @@ TEST_F(IniParserTest, MultipleParseTest)
 
 TEST(JsonParserTest, Test)
 {
-    const fly::Json array = { '7', 8, "nine", 10 };
+    const fly::Json value0 = { '7', 8, "nine", 10 };
 
-    const fly::Json map = {
+    const fly::Json value1 = {
         { "name1", "value1" },
         { "name2", 2 },
         { "name3", 3.14159 },
@@ -501,8 +510,8 @@ TEST(JsonParserTest, Test)
         1,
         "string",
         nullptr,
-        array,
-        map,
+        value0,
+        value1,
         { 11, "twelve", 13.0, 14 },
         { { "name4", "value4" }, { "name5", 1.23456f } }
     };
@@ -521,12 +530,60 @@ TEST(JsonParserTest, Test)
     std::cout << value[8] << std::endl;
     std::cout << std::endl;
 
-    EXPECT_THROW(array[4], fly::JsonException);
-    EXPECT_THROW(array["a"], fly::JsonException);
+    EXPECT_THROW(value0[4], fly::JsonException);
+    EXPECT_THROW(value0["a"], fly::JsonException);
 
-    EXPECT_THROW(map[3], fly::JsonException);
-    EXPECT_THROW(map["a"], fly::JsonException);
+    EXPECT_THROW(value1[3], fly::JsonException);
+    EXPECT_THROW(value1["a"], fly::JsonException);
 
+    std::cout << std::endl;
+
+    // Test construction of all object-like types
+    std::map<std::string, int> map = { { "a", 1 }, { "b", 2 }, { "c", 3 } };
+    std::cout << fly::Json(map) << std::endl;
+
+    std::multimap<std::string, int> multimap = { { "d", 4 }, { "e", 5 }, { "f", 6 } };
+    std::cout << fly::Json(multimap) << std::endl;
+
+    std::unordered_map<std::string, int> unordered_map = { { "h", 1 }, { "i", 2 }, { "j", 3 } };
+    std::cout << fly::Json(unordered_map) << std::endl;
+
+    std::unordered_multimap<std::string, int> unordered_multimap = { { "k", 4 }, { "l", 5 }, { "m", 6 } };
+    std::cout << fly::Json(unordered_multimap) << std::endl;
+
+    std::cout << std::endl;
+
+    // Test construction of all array-like types
+    std::array<int, 4> array = { 10, 20, 30, 40 };
+    std::cout << fly::Json(array) << std::endl;
+
+    std::deque<int> deque = { 50, 60, 70, 80 };
+    std::cout << fly::Json(deque) << std::endl;
+
+    std::forward_list<int> forward_list = { 90, 100, 110, 120 };
+    std::cout << fly::Json(forward_list) << std::endl;
+
+    std::list<int> list = { 130, 140, 150, 160 };
+    std::cout << fly::Json(list) << std::endl;
+
+    std::multiset<std::string> multiset = { "aa", "bb", "cc" };
+    std::cout << fly::Json(multiset) << std::endl;
+
+    std::set<std::string> set = { "dd", "ee", "ff" };
+    std::cout << fly::Json(set) << std::endl;
+
+    std::unordered_multiset<std::string> unordered_multiset = { "gg", "hh", "ii" };
+    std::cout << fly::Json(unordered_multiset) << std::endl;
+
+    std::unordered_set<std::string> unordered_set = { "jj", "kk", "ll" };
+    std::cout << fly::Json(unordered_set) << std::endl;
+
+    std::vector<int> vector = { 170, 180, 190, 200 };
+    std::cout << fly::Json(vector) << std::endl;
+
+    std::cout << std::endl;
+
+    // Test parser
     auto spParser = std::make_shared<fly::JsonParser>("/tmp", "test.json");
     spParser->Parse();
 }
