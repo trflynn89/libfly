@@ -197,6 +197,26 @@ public:
     bool IsArray() const;
 
     /**
+     * @return bool True if the Json instance is a boolean.
+     */
+    bool IsBoolean() const;
+
+    /**
+     * @return bool True if the Json instance is a signed integer.
+     */
+    bool IsSignedInteger() const;
+
+    /**
+     * @return bool True if the Json instance is an unsigned integer.
+     */
+    bool IsUnsignedInteger() const;
+
+    /**
+     * @return bool True if the Json instance is a float.
+     */
+    bool IsFloat() const;
+
+    /**
      * @return bool True if the Json instance is null.
      */
     bool IsNull() const;
@@ -281,6 +301,26 @@ public:
     const Json &operator [] (const typename array_type::size_type &) const;
 
     /**
+     * Equality operator. Compares two Json instances for equality. They are
+     * equal if one of the following is true:
+     *
+     * 1. The two Json instances are of the same type and have the same value.
+     * 2. The two Json instances are of a numeric type (signed, unsigned, or
+     *    float) and have the same value after converting to the same type.
+     *
+     * @return bool True if the two Json instances are equal.
+     */
+    friend bool operator == (const Json &, const Json &);
+
+    /**
+     * Unequality operator. Compares two Json instances for unequality. They are
+     * unequal if none of the conditions of the equality operator are met.
+     *
+     * @return bool True if the two Json instances are unequal.
+     */
+    friend bool operator != (const Json &, const Json &);
+
+    /**
      * Stream operator. Stream the Json instance into an output stream.
      *
      * @param ostream A reference to the output stream.
@@ -326,12 +366,9 @@ private:
         null_type m_null;
 
         /**
-         * Pseudo-default constructor. Intializes the Value instance to the
-         * default value for a JSON type.
-         *
-         * @param Type The JSON type to initialize with.
+         * Default constructor. Intializes the Value instance to a null value.
          */
-        Value(const Type &);
+        Value();
 
         /**
          * String constructor. Intializes the Value instance to a string value.
