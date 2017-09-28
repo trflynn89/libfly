@@ -710,6 +710,327 @@ TEST(JsonTest, AssignmentTest)
 }
 
 //==============================================================================
+TEST(JsonTest, StringConversionTest)
+{
+    fly::Json json;
+
+    std::string string = "abc";
+    json = string;
+    EXPECT_EQ(std::string(json), string);
+
+    json = { { "a", 1 }, { "b", 2 } };
+    EXPECT_EQ(std::string(json), "{ \"a\" : 1, \"b\" : 2 }");
+
+    json = { '7', 8 };
+    EXPECT_EQ(std::string(json), "[ 55, 8 ]");
+
+    json = true;
+    EXPECT_EQ(std::string(json), "true");
+
+    json = 1;
+    EXPECT_EQ(std::string(json), "1");
+
+    json = static_cast<unsigned int>(1);
+    EXPECT_EQ(std::string(json), "1");
+
+    json = 1.0f;
+    EXPECT_EQ(std::string(json), "1");
+
+    json = nullptr;
+    EXPECT_EQ(std::string(json), "null");
+}
+
+//==============================================================================
+TEST(JsonTest, ObjectConversionTest)
+{
+    fly::Json json;
+
+    json = "abc";
+    EXPECT_THROW((std::map<std::string, fly::Json>(json)), fly::JsonException);
+
+    std::map<std::string, int> map = { { "a", 1 }, { "b", 2 } };
+    std::multimap<std::string, int> multimap(map.begin(), map.end());
+    json = map;
+    EXPECT_EQ((std::map<std::string, int>(json)), map);
+    EXPECT_EQ((std::multimap<std::string, int>(json)), multimap);
+
+    std::map<std::string, int> empty = { };
+    std::multimap<std::string, int> multiempty(empty.begin(), empty.end());
+    json = empty;
+    EXPECT_EQ((std::map<std::string, int>(json)), empty);
+    EXPECT_EQ((std::multimap<std::string, int>(json)), multiempty);
+
+    json = { '7', 8 };
+    EXPECT_THROW((std::map<std::string, fly::Json>(json)), fly::JsonException);
+
+    json = true;
+    EXPECT_THROW((std::map<std::string, fly::Json>(json)), fly::JsonException);
+
+    json = 1;
+    EXPECT_THROW((std::map<std::string, fly::Json>(json)), fly::JsonException);
+
+    json = static_cast<unsigned int>(1);
+    EXPECT_THROW((std::map<std::string, fly::Json>(json)), fly::JsonException);
+
+    json = 1.0f;
+    EXPECT_THROW((std::map<std::string, fly::Json>(json)), fly::JsonException);
+
+    json = nullptr;
+    EXPECT_THROW((std::map<std::string, fly::Json>(json)), fly::JsonException);
+}
+
+//==============================================================================
+TEST(JsonTest, ArrayConversionTest)
+{
+    fly::Json json;
+
+    json = "abc";
+    EXPECT_THROW((std::vector<int>(json)), fly::JsonException);
+    EXPECT_THROW((std::array<int, 1>(json)), fly::JsonException);
+
+    json = { { "a", 1 }, { "b", 2 } };
+    EXPECT_THROW((std::vector<int>(json)), fly::JsonException);
+    EXPECT_THROW((std::array<int, 1>(json)), fly::JsonException);
+
+    std::vector<int> vector = { 7, 8 };
+    std::array<int, 1> array1 = { 7 };
+    std::array<int, 2> array2 = { 7, 8 };
+    std::array<int, 3> array3 = { 7, 8, 0 };
+    json = vector;
+    EXPECT_EQ((std::vector<int>(json)), vector);
+    EXPECT_EQ((std::array<int, 1>(json)), array1);
+    EXPECT_EQ((std::array<int, 2>(json)), array2);
+    EXPECT_EQ((std::array<int, 3>(json)), array3);
+
+    std::vector<int> empty = { };
+    std::array<int, 1> empty1 = { };
+    std::array<int, 2> empty2 = { };
+    std::array<int, 3> empty3 = { };
+    json = empty;
+    EXPECT_EQ((std::vector<int>(json)), empty);
+    EXPECT_EQ((std::array<int, 1>(json)), empty1);
+    EXPECT_EQ((std::array<int, 2>(json)), empty2);
+    EXPECT_EQ((std::array<int, 3>(json)), empty3);
+
+    json = true;
+    EXPECT_THROW((std::vector<int>(json)), fly::JsonException);
+    EXPECT_THROW((std::array<int, 1>(json)), fly::JsonException);
+
+    json = 1;
+    EXPECT_THROW((std::vector<int>(json)), fly::JsonException);
+    EXPECT_THROW((std::array<int, 1>(json)), fly::JsonException);
+
+    json = static_cast<unsigned int>(1);
+    EXPECT_THROW((std::vector<int>(json)), fly::JsonException);
+    EXPECT_THROW((std::array<int, 1>(json)), fly::JsonException);
+
+    json = 1.0f;
+    EXPECT_THROW((std::vector<int>(json)), fly::JsonException);
+    EXPECT_THROW((std::array<int, 1>(json)), fly::JsonException);
+
+    json = nullptr;
+    EXPECT_THROW((std::vector<int>(json)), fly::JsonException);
+    EXPECT_THROW((std::array<int, 1>(json)), fly::JsonException);
+}
+
+//==============================================================================
+TEST(JsonTest, BooleanConversionTest)
+{
+    fly::Json json;
+
+    json = "";
+    EXPECT_FALSE(bool(json));
+    json = "abc";
+    EXPECT_TRUE(bool(json));
+
+    json = std::map<std::string, int>();
+    EXPECT_FALSE(bool(json));
+    json = { { "a", 1 }, { "b", 2 } };
+    EXPECT_TRUE(bool(json));
+
+    json = std::vector<int>();
+    EXPECT_FALSE(bool(json));
+    json = { 7, 8 };
+    EXPECT_TRUE(bool(json));
+
+    json = true;
+    EXPECT_TRUE(bool(json));
+    json = false;
+    EXPECT_FALSE(bool(json));
+
+    json = 1;
+    EXPECT_TRUE(bool(json));
+    json = 0;
+    EXPECT_FALSE(bool(json));
+
+    json = static_cast<unsigned int>(1);
+    EXPECT_TRUE(bool(json));
+    json = static_cast<unsigned int>(0);
+    EXPECT_FALSE(bool(json));
+
+    json = 1.0f;
+    EXPECT_TRUE(bool(json));
+    json = 0.0f;
+    EXPECT_FALSE(bool(json));
+
+    json = nullptr;
+    EXPECT_FALSE(bool(json));
+}
+
+//==============================================================================
+TEST(JsonTest, SignedIntegerConversionTest)
+{
+    fly::Json json;
+
+    json = "abc";
+    EXPECT_THROW((int(json)), fly::JsonException);
+
+    json = "123";
+    EXPECT_EQ(int(json), 123);
+
+    json = { { "a", 1 }, { "b", 2 } };
+    EXPECT_THROW((int(json)), fly::JsonException);
+
+    json = { 7, 8 };
+    EXPECT_THROW((int(json)), fly::JsonException);
+
+    json = true;
+    EXPECT_THROW((int(json)), fly::JsonException);
+
+    char ch = 'a';
+    json = ch;
+    EXPECT_EQ(char(json), ch);
+
+    int sign = 12;
+    json = sign;
+    EXPECT_EQ(int(json), sign);
+
+    unsigned int unsign = static_cast<unsigned int>(12);
+    json = unsign;
+    EXPECT_EQ(int(json), int(unsign));
+
+    float floating = 3.14f;
+    json = floating;
+    EXPECT_EQ(int(json), int(floating));
+
+    json = nullptr;
+    EXPECT_THROW((int(json)), fly::JsonException);
+}
+
+//==============================================================================
+TEST(JsonTest, UnsignedIntegerConversionTest)
+{
+    fly::Json json;
+
+    json = "abc";
+    EXPECT_THROW((unsigned(json)), fly::JsonException);
+
+    json = "123";
+    EXPECT_EQ(unsigned(json), unsigned(123));
+
+    json = { { "a", 1 }, { "b", 2 } };
+    EXPECT_THROW((unsigned(json)), fly::JsonException);
+
+    json = { 7, 8 };
+    EXPECT_THROW((unsigned(json)), fly::JsonException);
+
+    json = true;
+    EXPECT_THROW((unsigned(json)), fly::JsonException);
+
+    char ch = 'a';
+    json = ch;
+    EXPECT_EQ(static_cast<unsigned char>(json), static_cast<unsigned char>(ch));
+
+    int sign = 12;
+    json = sign;
+    EXPECT_EQ(unsigned(json), unsigned(sign));
+
+    unsigned int unsign = static_cast<unsigned int>(12);
+    json = unsign;
+    EXPECT_EQ(unsigned(json), unsign);
+
+    float floating = 3.14f;
+    json = floating;
+    EXPECT_EQ(unsigned(json), unsigned(floating));
+
+    json = nullptr;
+    EXPECT_THROW((unsigned(json)), fly::JsonException);
+}
+
+//==============================================================================
+TEST(JsonTest, FloatConversionTest)
+{
+    fly::Json json;
+
+    json = "abc";
+    EXPECT_THROW((float(json)), fly::JsonException);
+
+    json = "123.5";
+    EXPECT_EQ(float(json), 123.5f);
+
+    json = { { "a", 1 }, { "b", 2 } };
+    EXPECT_THROW((float(json)), fly::JsonException);
+
+    json = { 7, 8 };
+    EXPECT_THROW((float(json)), fly::JsonException);
+
+    json = true;
+    EXPECT_THROW((float(json)), fly::JsonException);
+
+    char ch = 'a';
+    json = ch;
+    EXPECT_EQ(float(json), float(ch));
+
+    int sign = 12;
+    json = sign;
+    EXPECT_EQ(float(json), float(sign));
+
+    unsigned int unsign = static_cast<unsigned int>(12);
+    json = unsign;
+    EXPECT_EQ(float(json), float(unsign));
+
+    float floating = 3.14f;
+    json = floating;
+    EXPECT_EQ(float(json), floating);
+
+    json = nullptr;
+    EXPECT_THROW((float(json)), fly::JsonException);
+}
+
+//==============================================================================
+TEST(JsonTest, NullConversionTest)
+{
+    fly::Json json;
+
+    json = "abc";
+    EXPECT_THROW((std::nullptr_t(json)), fly::JsonException);
+
+    json = { { "a", 1 }, { "b", 2 } };
+    EXPECT_THROW((std::nullptr_t(json)), fly::JsonException);
+
+    json = { 7, 8 };
+    EXPECT_THROW((std::nullptr_t(json)), fly::JsonException);
+
+    json = true;
+    EXPECT_THROW((std::nullptr_t(json)), fly::JsonException);
+
+    json = 'a';
+    EXPECT_THROW((std::nullptr_t(json)), fly::JsonException);
+
+    json = 12;
+    EXPECT_THROW((std::nullptr_t(json)), fly::JsonException);
+
+    json = static_cast<unsigned int>(12);
+    EXPECT_THROW((std::nullptr_t(json)), fly::JsonException);
+
+    json = 3.14f;
+    EXPECT_THROW((std::nullptr_t(json)), fly::JsonException);
+
+    json = nullptr;
+    EXPECT_EQ((std::nullptr_t(json)), nullptr);
+}
+
+//==============================================================================
 TEST(JsonTest, ObjectAccessTest)
 {
     fly::Json string1 = "abc";

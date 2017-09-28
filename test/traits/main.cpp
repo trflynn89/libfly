@@ -127,6 +127,19 @@ namespace
     }
 
     //==========================================================================
+    template <typename T, fly::if_numeric::enabled<T> = 0>
+    bool isNumeric(const T &)
+    {
+        return true;
+    }
+
+    template <typename T, fly::if_numeric::disabled<T> = 0>
+    bool isNumeric(const T &)
+    {
+        return false;
+    }
+
+    //==========================================================================
     template <typename T, fly::if_boolean::enabled<T> = 0>
     bool isBool(const T &)
     {
@@ -314,6 +327,34 @@ TEST(TraitsTest, FloatTest)
     ASSERT_FALSE(isFloat(-1));
     ASSERT_FALSE(isFloat("foo"));
     ASSERT_FALSE(isFloat(true));
+}
+
+//==============================================================================
+TEST(TraitsTest, NumericTest)
+{
+    ASSERT_TRUE(isNumeric(1));
+    ASSERT_TRUE(isNumeric(-1));
+    ASSERT_TRUE(isNumeric(static_cast<unsigned int>(1)));
+    ASSERT_TRUE(isNumeric(3.14f));
+    ASSERT_TRUE(isNumeric(3.14));
+    ASSERT_TRUE(isNumeric(static_cast<long double>(3.14)));
+
+    ASSERT_FALSE(isNumeric(std::array<int, 4>()));
+    ASSERT_FALSE(isNumeric(std::deque<int>()));
+    ASSERT_FALSE(isNumeric(std::forward_list<int>()));
+    ASSERT_FALSE(isNumeric(std::list<int>()));
+    ASSERT_FALSE(isNumeric(std::map<std::string, int>()));
+    ASSERT_FALSE(isNumeric(std::multimap<std::string, int>()));
+    ASSERT_FALSE(isNumeric(std::multiset<int>()));
+    ASSERT_FALSE(isNumeric(std::set<int>()));
+    ASSERT_FALSE(isNumeric(std::unordered_map<std::string, int>()));
+    ASSERT_FALSE(isNumeric(std::unordered_multimap<std::string, int>()));
+    ASSERT_FALSE(isNumeric(std::unordered_multiset<int>()));
+    ASSERT_FALSE(isNumeric(std::unordered_set<int>()));
+    ASSERT_FALSE(isNumeric(std::vector<int>()));
+
+    ASSERT_FALSE(isNumeric("foo"));
+    ASSERT_FALSE(isNumeric(true));
 }
 
 //==============================================================================

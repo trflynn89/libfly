@@ -155,6 +155,27 @@ struct if_floating_point
 };
 
 /**
+ * Tests for whether a given type is numeric.
+ */
+struct if_numeric
+{
+    struct __
+    {
+        template <typename T>
+        using is_numeric = std::integral_constant<bool,
+            std::is_arithmetic<std::decay_t<T>>::value &&
+            !std::is_same<bool, std::decay_t<T>>::value
+        >;
+    };
+
+    template <typename T>
+    using enabled = std::enable_if_t<__::is_numeric<T>::value, bool>;
+
+    template <typename T>
+    using disabled = std::enable_if_t<!__::is_numeric<T>::value, bool>;
+};
+
+/**
  * Tests for whether a given type is a boolean.
  */
 struct if_boolean

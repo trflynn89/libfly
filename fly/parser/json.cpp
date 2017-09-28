@@ -2,10 +2,10 @@
 
 #include <algorithm>
 #include <ios>
+#include <sstream>
 #include <utility>
 
 #include "fly/logger/logger.h"
-#include "fly/string/string.h"
 
 namespace fly {
 
@@ -126,7 +126,7 @@ bool Json::IsObjectLike() const
     return (
         IsArray() &&
         (m_value.m_pArray->size() == 2) &&
-        (*m_value.m_pArray)[0].IsString()
+        (*(m_value.m_pArray))[0].IsString()
     );
 }
 
@@ -178,6 +178,35 @@ Json &Json::operator = (Json json)
     std::swap(m_type, json.m_type);
     std::swap(m_value, json.m_value);
     return *this;
+}
+
+//==============================================================================
+Json::operator string_type () const
+{
+    if (IsString())
+    {
+        return *(m_value.m_pString);
+    }
+    else
+    {
+        std::stringstream stream;
+        stream << *this;
+
+        return stream.str();
+    }
+}
+
+//==============================================================================
+Json::operator null_type () const
+{
+    if (IsNull())
+    {
+        return m_value.m_null;
+    }
+
+    throw JsonException(
+        *this, String::Format("Type %s is not null", type())
+    );
 }
 
 //==============================================================================

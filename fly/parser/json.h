@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "fly/fly.h"
+#include "fly/string/string.h"
 #include "fly/traits/traits.h"
 
 namespace fly {
@@ -20,7 +21,36 @@ DEFINE_CLASS_PTRS(JsonException);
 /**
  * Class to represent JSON values defined by http://www.json.org. The class
  * provides various user-friendly accessors and initializers to create a JSON
- * value.
+ * value, and to convert the JSON value back its underlying type.
+ *
+ * However, there are some restrictions converting a JSON value back to its
+ * underlying type:
+ *
+ * 1. While creating a JSON value from a char array is allowed, converting a
+ *    JSON value back to a char array is not allowed. There is no straight-
+ *    forward way to do the following without dynamically allocating memory
+ *    that the caller must remember to free:
+ *
+ *        fly::Json json = "string";
+ *        char *string = json;
+ *
+ * 2. Conversions back to the underlying type must be explicit. To define the
+ *    conversion operators implicitly could introduce ambiguity in which
+ *    operator should be called. For example:
+ *
+ *        fly::Json json = { 1, 2, 3, 4 };
+ *        std::vector<int> vector(json);
+ *
+ *    Which JSON conversion operator should be called in the vector constructor?
+ *    Conversions to std::vector and std::size_t are defined, creating ambiguity
+ *    in which std::vector constructor would be called (copy constructor or
+ *    count constructor), even though the std::size_t converter would actually
+ *    throw an exception. Making the conversion operators explicit removes this
+ *    ambiguity, at the cost of not being able to do something like:
+ *
+ *        fly::Json json = { 1, 2, 3, 4 };
+ *        std::vector<int> vector;
+ *        vector = json; // You could do "vector = decltype(vector)(json);"
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version September 24, 2017
@@ -235,6 +265,102 @@ public:
      * @return Json A reference to this Json instance.
      */
     Json &operator = (Json);
+
+    /**
+     * String conversion operator. Converts the Json instance to a string. Note
+     * that although a Json instance can be constructed from a char array, it is
+     * not allowed to directly convert a Json instance into a char array. If
+     * this is needed, first convert to a string, then into a char array.
+     *
+     * @return string_type The Json instance as a string.
+     */
+    explicit operator string_type () const;
+
+    /**
+     * Object conversion operator. Converts the Json instance to an object. The
+     * SFINAE declaration allows construction of any object-like type (e.g.
+     * std::map, std::multimap) from the Json instance.
+     *
+     * @tparam T The object-like type.
+     *
+     * @throws JsonException If the Json instance is not an object.
+     *
+     * @return T The Json instance as the object-like type.
+     */
+    template <typename T, fly::if_map::enabled<T> = 0>
+    explicit operator T () const;
+
+    /**
+     * Array conversion operator. Converts the Json instance to an array. The
+     * SFINAE declaration allows construction of any array-like type (e.g.
+     * std::list, std::vector) from the Json instance, except for std::array,
+     * which due to being an aggregate type, has its own explicit conversion
+     * operator.
+     *
+     * @tparam T The array-like type.
+     *
+     * @throws JsonException If the Json instance is not an array.
+     *
+     * @return T The Json instance as the array-like type.
+     */
+    template <typename T, fly::if_array::enabled<T> = 0>
+    explicit operator T () const;
+
+    /**
+     * Array conversion operator. Converts the Json instance to a std::array. If
+     * the Json instance has more values than the std::array can hold, the
+     * values are dropped. If the Json instance has less values than the
+     * std::array can hold, the remainder is value-initialized.
+     *
+     * @tparam T The std::array value type.
+     * @tparam N The std::array size.
+     *
+     * @throws JsonException If the Json instance is not an array.
+     *
+     * @return T The Json instance as a std::array.
+     */
+    template <typename T, std::size_t N>
+    explicit operator std::array<T, N> () const;
+
+    /**
+     * Boolean conversion operator. Converts the Json instance to a boolean. For
+     * strings, objects, and arrays, returns true if the value is non-empty. For
+     * signed integers, unsigned integers, and floats, returns true if the value
+     * is non-zero. For booleans, returns the boolean value. For null, returns
+     * false.
+     *
+     * @tparam T The boolean type.
+     *
+     * @param T The Json instance as a boolean.
+     */
+    template <typename T, fly::if_boolean::enabled<T> = 0>
+    explicit operator T () const;
+
+    /**
+     * Numeric conversion operator. Converts the Json instance to a numeric
+     * type. The SFINAE declaration allows construction of any numeric type
+     * type (e.g. char, uint64_t, float) from the Json instance. Allows for
+     * converting between signed integers, unsigned integers, and floats. Also
+     * allows for converting from a numeric-like string (e.g. "123") to a
+     * numeric type.
+     *
+     * @tparam T The numeric type.
+     *
+     * @throws JsonException If the Json instance is not numeric.
+     *
+     * @return T The Json instance as the numeric type.
+     */
+    template <typename T, fly::if_numeric::enabled<T> = 0>
+    explicit operator T () const;
+
+    /**
+     * Null conversion operator. Converts the Json instance to a null type.
+     *
+     * @throws JsonException If the Json instance is not null.
+     *
+     * @return null_type The Json instance as a number.
+     */
+    explicit operator null_type () const;
 
     /**
      * Object access operator.
@@ -569,6 +695,133 @@ Json::Json(const T &value) :
     m_value(value),
     m_pParent(NULL)
 {
+}
+
+//==============================================================================
+template <typename T, fly::if_map::enabled<T>>
+Json::operator T () const
+{
+    if (IsObject())
+    {
+        T t { };
+
+        for (auto it = m_value.m_pObject->begin(); it != m_value.m_pObject->end(); ++it)
+        {
+            t.insert({
+                typename T::key_type(it->first),
+                typename T::mapped_type(it->second)
+            });
+        }
+
+        return t;
+    }
+
+    throw JsonException(
+        *this, String::Format("Type %s is not an object", type())
+    );
+}
+
+//==============================================================================
+template <typename T, fly::if_array::enabled<T>>
+Json::operator T () const
+{
+    if (IsArray())
+    {
+        return T(m_value.m_pArray->begin(), m_value.m_pArray->end());
+    }
+
+    throw JsonException(
+        *this, String::Format("Type %s is not an array", type())
+    );
+}
+
+//==============================================================================
+template <typename T, std::size_t N>
+Json::operator std::array<T, N> () const
+{
+    if (IsArray())
+    {
+        std::array<T, N> array { };
+        const std::size_t size = std::min(N, m_value.m_pArray->size());
+
+        for (std::size_t i = 0; i < size; ++i)
+        {
+            array[i] = T(m_value.m_pArray->at(i));
+        }
+
+        return array;
+    }
+
+    throw JsonException(
+        *this, String::Format("Type %s is not an array", type())
+    );
+}
+
+//==============================================================================
+template <typename T, fly::if_boolean::enabled<T>>
+Json::operator T () const
+{
+    switch (m_type)
+    {
+    case TYPE_STRING:
+        return !(m_value.m_pString->empty());
+
+    case TYPE_OBJECT:
+        return !(m_value.m_pObject->empty());
+
+    case TYPE_ARRAY:
+        return !(m_value.m_pArray->empty());
+
+    case TYPE_BOOLEAN:
+        return m_value.m_boolean;
+
+    case TYPE_SIGNED:
+        return (m_value.m_signed != 0);
+
+    case TYPE_UNSIGNED:
+        return (m_value.m_unsigned != 0);
+
+    case TYPE_FLOAT:
+        return (m_value.m_float != 0.0);
+
+    default:
+        return false;
+    }
+}
+
+//==============================================================================
+template <typename T, fly::if_numeric::enabled<T>>
+Json::operator T () const
+{
+    switch (m_type)
+    {
+    case TYPE_STRING:
+        try
+        {
+            return String::Convert<T>(*(m_value.m_pString));
+        }
+        catch (...)
+        {
+        }
+
+        break;
+
+    case TYPE_SIGNED:
+        return static_cast<T>(m_value.m_signed);
+
+    case TYPE_UNSIGNED:
+        return static_cast<T>(m_value.m_unsigned);
+
+    case TYPE_FLOAT:
+        return static_cast<T>(m_value.m_float);
+
+    default:
+        break;
+    }
+
+    throw JsonException(
+        *this, String::Format("Type %s is not numeric", type())
+    );
 }
 
 //==============================================================================
