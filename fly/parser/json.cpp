@@ -12,24 +12,21 @@ namespace fly {
 //==============================================================================
 Json::Json() :
     m_type(TYPE_NULL),
-    m_value(),
-    m_pParent(NULL)
+    m_value()
 {
 }
 
 //==============================================================================
 Json::Json(const null_type &value) :
     m_type(TYPE_NULL),
-    m_value(value),
-    m_pParent(NULL)
+    m_value(value)
 {
 }
 
 //==============================================================================
 Json::Json(const Json &json) :
     m_type(json.m_type),
-    m_value(),
-    m_pParent(NULL)
+    m_value()
 {
     switch (m_type)
     {
@@ -67,10 +64,9 @@ Json::Json(const Json &json) :
 }
 
 //==============================================================================
-Json::Json(const initializer_type &initializer) :
+Json::Json(const std::initializer_list<Json> &initializer) :
     m_type(TYPE_NULL),
-    m_value(),
-    m_pParent(NULL)
+    m_value()
 {
     auto isObjectLike = [](const Json &json)
     {
@@ -126,7 +122,7 @@ bool Json::IsObjectLike() const
     return (
         IsArray() &&
         (m_value.m_pArray->size() == 2) &&
-        (*(m_value.m_pArray))[0].IsString()
+        m_value.m_pArray->at(0).IsString()
     );
 }
 
@@ -164,12 +160,6 @@ bool Json::IsFloat() const
 bool Json::IsNull() const
 {
     return (m_type == TYPE_NULL);
-}
-
-//==============================================================================
-Json *Json::GetParent() const
-{
-    return m_pParent;
 }
 
 //==============================================================================
@@ -266,7 +256,7 @@ Json &Json::operator [] (const typename array_type::size_type &index)
             m_value.m_pArray->resize(index + 1);
         }
 
-        return (*(m_value.m_pArray))[index];
+        return m_value.m_pArray->at(index);
     }
 
     throw JsonException(
@@ -286,12 +276,34 @@ const Json &Json::operator [] (const typename array_type::size_type &index) cons
             );
         }
 
-        return (*(m_value.m_pArray))[index];
+        return m_value.m_pArray->at(index);
     }
 
     throw JsonException(
         *this, String::Format("Type %s invalid for operator[index]", type())
     );
+}
+
+//==============================================================================
+std::size_t Json::Size() const
+{
+    switch (m_type)
+    {
+    case TYPE_STRING:
+        return m_value.m_pString->size();
+
+    case TYPE_OBJECT:
+        return m_value.m_pObject->size();
+
+    case TYPE_ARRAY:
+        return m_value.m_pArray->size();
+
+    case TYPE_NULL:
+        return 0;
+
+    default:
+        return 1;
+    }
 }
 
 //==============================================================================
@@ -331,6 +343,18 @@ bool operator == (const Json &json1, const Json &json2)
         }
     }
 
+    // One instance is a signed integer, other instance is an unsigned integer
+    else if ((json1.m_type == Json::TYPE_SIGNED) && (json2.m_type == Json::TYPE_UNSIGNED))
+    {
+        Json::signed_type value2 = static_cast<Json::signed_type>(json2.m_value.m_unsigned);
+        return (json1.m_value.m_signed == value2);
+    }
+    else if ((json1.m_type == Json::TYPE_UNSIGNED) && (json2.m_type == Json::TYPE_SIGNED))
+    {
+        Json::signed_type value1 = static_cast<Json::signed_type>(json1.m_value.m_unsigned);
+        return (value1 == json2.m_value.m_signed);
+    }
+
     // One instance is a signed integer, other instance is a float
     else if ((json1.m_type == Json::TYPE_SIGNED) && (json2.m_type == Json::TYPE_FLOAT))
     {
@@ -353,18 +377,6 @@ bool operator == (const Json &json1, const Json &json2)
     {
         Json::float_type value2 = static_cast<Json::float_type>(json2.m_value.m_unsigned);
         return (json1.m_value.m_float == value2);
-    }
-
-    // One instance is an unsigned integer, other instance is a signed integer
-    else if ((json1.m_type == Json::TYPE_UNSIGNED) && (json2.m_type == Json::TYPE_SIGNED))
-    {
-        Json::signed_type value1 = static_cast<Json::signed_type>(json1.m_value.m_unsigned);
-        return (value1 == json2.m_value.m_signed);
-    }
-    else if ((json1.m_type == Json::TYPE_SIGNED) && (json2.m_type == Json::TYPE_UNSIGNED))
-    {
-        Json::signed_type value2 = static_cast<Json::signed_type>(json2.m_value.m_unsigned);
-        return (json1.m_value.m_signed == value2);
     }
 
     return false;

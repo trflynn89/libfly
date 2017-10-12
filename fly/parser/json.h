@@ -57,6 +57,7 @@ DEFINE_CLASS_PTRS(JsonException);
  */
 class Json
 {
+public:
     /**
      * Aliases for JSON types. These could be specified as template parameters
      * to the Json class, to allow callers to override the types. But these are
@@ -72,12 +73,6 @@ class Json
     using float_type = double;
     using null_type = std::nullptr_t;
 
-    /**
-     * Alias for constructing a Json instance from an initializer list.
-     */
-    using initializer_type = std::initializer_list<Json>;
-
-public:
     /**
      * Default constructor. Intializes the Json instance to a NULL value.
      */
@@ -192,9 +187,9 @@ public:
      * then the Json instance is created as an object. Otherwise, it is created
      * as an array.
      *
-     * @param initializer_type The initializer list.
+     * @param std::initializer_list The initializer list.
      */
-    Json(const initializer_type &);
+    Json(const std::initializer_list<Json> &);
 
     /**
      * Destructor. Delete any memory allocated for the JSON value.
@@ -250,11 +245,6 @@ public:
      * @return bool True if the Json instance is null.
      */
     bool IsNull() const;
-
-    /**
-     * @return Json* A pointer to the Json instance's parent instance, if any.
-     */
-    Json *GetParent() const;
 
     /**
      * Assignment operator. Intializes the Json instance with the type and value
@@ -425,6 +415,22 @@ public:
      * @return Json A reference to the Json instance at the index.
      */
     const Json &operator [] (const typename array_type::size_type &) const;
+
+    /**
+     * Get the size of the Json instance.
+     *
+     * If the Json instance is an object or array, return the number of elements
+     * stored in the object or array.
+     *
+     * If the Json instance is a string, return the length of the string.
+     *
+     * If the Json instance is a boolean or numeric, return 1.
+     *
+     * If the Json instance is null, return 0.
+     *
+     * @return size_t The size of the Json instance.
+     */
+    std::size_t Size() const;
 
     /**
      * Equality operator. Compares two Json instances for equality. They are
@@ -604,7 +610,6 @@ private:
 
     Type m_type;
     Value m_value;
-    Json *m_pParent;
 };
 
 /**
@@ -638,8 +643,7 @@ private:
 template <typename T, fly::if_string::enabled<T>>
 Json::Json(const T &value) :
     m_type(TYPE_STRING),
-    m_value(value),
-    m_pParent(NULL)
+    m_value(value)
 {
 }
 
@@ -647,8 +651,7 @@ Json::Json(const T &value) :
 template <typename T, fly::if_map::enabled<T>>
 Json::Json(const T &value) :
     m_type(TYPE_OBJECT),
-    m_value(value),
-    m_pParent(NULL)
+    m_value(value)
 {
 }
 
@@ -656,8 +659,7 @@ Json::Json(const T &value) :
 template <typename T, fly::if_array::enabled<T>>
 Json::Json(const T &value) :
     m_type(TYPE_ARRAY),
-    m_value(value),
-    m_pParent(NULL)
+    m_value(value)
 {
 }
 
@@ -665,8 +667,7 @@ Json::Json(const T &value) :
 template <typename T, fly::if_boolean::enabled<T>>
 Json::Json(const T &value) :
     m_type(TYPE_BOOLEAN),
-    m_value(value),
-    m_pParent(NULL)
+    m_value(value)
 {
 }
 
@@ -674,8 +675,7 @@ Json::Json(const T &value) :
 template <typename T, fly::if_signed_integer::enabled<T>>
 Json::Json(const T &value) :
     m_type(TYPE_SIGNED),
-    m_value(value),
-    m_pParent(NULL)
+    m_value(value)
 {
 }
 
@@ -683,8 +683,7 @@ Json::Json(const T &value) :
 template <typename T, fly::if_unsigned_integer::enabled<T>>
 Json::Json(const T &value) :
     m_type(TYPE_UNSIGNED),
-    m_value(value),
-    m_pParent(NULL)
+    m_value(value)
 {
 }
 
@@ -692,8 +691,7 @@ Json::Json(const T &value) :
 template <typename T, fly::if_floating_point::enabled<T>>
 Json::Json(const T &value) :
     m_type(TYPE_FLOAT),
-    m_value(value),
-    m_pParent(NULL)
+    m_value(value)
 {
 }
 

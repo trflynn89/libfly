@@ -12,294 +12,423 @@ namespace fly {
 //==============================================================================
 JsonParser::JsonParser(const std::string &path, const std::string &file) :
     Parser(path, file),
-    m_state(JSON_NO_STATE),
+    m_states(),
     m_root(),
-    m_pValue(&m_root),
-    m_objectDepth(0)
+    m_pValue(),
+    m_pParents(),
+    m_parsingString(false),
+    m_parsedString(false),
+    m_expectingValue(false)
 {
 }
 
 //==============================================================================
 void JsonParser::Parse()
 {
+    std::unique_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
+
     std::string fullPath = Path::Join(m_path, m_file);
     std::ifstream stream(fullPath.c_str(), std::ios::in);
 
-    std::string line, section;
-    m_line = 0;
+    m_parsing.str(std::string());
+    m_parsingString = false;
+    m_parsedString = false;
+    m_expectingValue = false;
+    m_line = 1;
 
-    std::unique_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
-    m_sections.clear();
+    m_pValue = &m_root;
+    *m_pValue = nullptr;
+
+    m_pParents = decltype(m_pParents)();
+    m_pParents.push(m_pValue);
+
+    m_states = decltype(m_states)();
+    m_states.push(JSON_NO_STATE);
 
     JsonToken token;
     char c;
 
-    while (stream.get(c))
+    try
     {
-        if ((m_state == JSON_NO_STATE) && std::isspace(c))
+        while (stream.get(c))
         {
-            // Ignore whitepsace
-            continue;
+            token = static_cast<JsonToken>(c);
+
+            switch (token)
+            {
+            case JSON_START_BRACE:
+                onStartBrace();
+                break;
+
+            case JSON_CLOSE_BRACE:
+                onCloseBrace(c);
+                break;
+
+            case JSON_START_BRACKET:
+                onStartBracket();
+                break;
+
+            case JSON_CLOSE_BRACKET:
+                onCloseBracket(c);
+                break;
+
+            case JSON_QUOTE:
+                onQuotation(c);
+                break;
+
+            case JSON_NEW_LINE:
+                ++m_line;
+                break;
+
+            case JSON_COMMA:
+                onComma(c);
+                break;
+
+            case JSON_COLON:
+                onColon(c);
+                break;
+
+            default:
+                onCharacter(c);
+            }
+        }
+    }
+    catch (const JsonException &ex)
+    {
+        throw ParserException(m_file, m_line, ex.what());
+    }
+
+    std::cout << "Finished Parsing:" << std::endl;
+    std::cout << m_root << std::endl;
+}
+
+//==============================================================================
+void JsonParser::onStartBrace()
+{
+    if (m_states.top() == JSON_PARSING_ARRAY)
+    {
+        m_states.push(JSON_PARSING_VALUE);
+
+        m_pValue = &((*m_pValue)[m_pValue->Size()]);
+        m_pParents.push(m_pValue);
+    }
+
+    *m_pValue = Json::object_type();
+    m_states.push(JSON_PARSING_OBJECT);
+
+    m_expectingValue = false;
+}
+
+//==============================================================================
+void JsonParser::onCloseBrace(const char &c)
+{
+    if (!storeValue() && m_expectingValue)
+    {
+        throw ParserException(m_file, m_line, String::Format(
+            "Expected name or value before character '%c'", c
+        ));
+    }
+
+    m_pParents.pop();
+    m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
+
+    while (m_states.top() != JSON_PARSING_OBJECT)
+    {
+        m_states.pop();
+    }
+
+    m_states.pop();
+    m_states.push(JSON_PARSING_COMMA);
+}
+
+//==============================================================================
+void JsonParser::onStartBracket()
+{
+    if (m_states.top() == JSON_PARSING_ARRAY)
+    {
+        m_states.push(JSON_PARSING_VALUE);
+
+        m_pValue = &((*m_pValue)[m_pValue->Size()]);
+        m_pParents.push(m_pValue);
+    }
+
+    *m_pValue = Json::array_type();
+    m_states.push(JSON_PARSING_ARRAY);
+
+    m_expectingValue = false;
+}
+
+//==============================================================================
+void JsonParser::onCloseBracket(const char &c)
+{
+    if (!storeValue() && m_expectingValue)
+    {
+        throw ParserException(m_file, m_line, String::Format(
+            "Expected name or value before character '%c'", c
+        ));
+    }
+
+    m_pParents.pop();
+    m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
+
+    while (m_states.top() != JSON_PARSING_ARRAY)
+    {
+        m_states.pop();
+    }
+
+    m_states.pop();
+    m_states.push(JSON_PARSING_COMMA);
+}
+
+//==============================================================================
+void JsonParser::onQuotation(const char &c)
+{
+    m_parsingString = !m_parsingString;
+
+    switch (m_states.top())
+    {
+    case JSON_PARSING_OBJECT:
+        m_states.push(JSON_PARSING_NAME);
+        break;
+
+    case JSON_PARSING_ARRAY:
+        m_states.push(JSON_PARSING_VALUE);
+
+        m_pValue = &((*m_pValue)[m_pValue->Size()]);
+        m_pParents.push(m_pValue);
+
+        break;
+
+    case JSON_PARSING_NAME:
+        m_states.pop();
+        m_states.push(JSON_PARSING_COLON);
+
+        m_pValue = &((*m_pValue)[m_parsing.str()]);
+        m_pParents.push(m_pValue);
+
+        m_parsing.str(std::string());
+
+        m_expectingValue = false;
+
+        break;
+
+    case JSON_PARSING_VALUE:
+        if (!m_parsingString)
+        {
+            m_parsedString = true;
+
+            m_states.pop();
+            m_states.push(JSON_PARSING_COMMA);
         }
 
-        token = static_cast<JsonToken>(c);
+        break;
 
-        switch (token)
+    default:
+        throw ParserException(m_file, m_line, String::Format(
+            "Expected comma before character '%c'", c
+        ));
+    }
+}
+
+//==============================================================================
+void JsonParser::onColon(const char &c)
+{
+    switch (m_states.top())
+    {
+    case JSON_PARSING_COLON:
+        m_states.pop();
+        m_states.push(JSON_PARSING_VALUE);
+
+        m_expectingValue = true;
+
+        break;
+
+    default:
+        m_parsing << c;
+        break;
+    }
+}
+
+//==============================================================================
+void JsonParser::onComma(const char &c)
+{
+    switch (m_states.top())
+    {
+    case JSON_PARSING_COMMA:
+        m_states.pop();
+
+        switch (m_states.top())
         {
-        case JSON_START_BRACE:
-            onStartBrace();
+        case JSON_PARSING_OBJECT:
+        case JSON_PARSING_ARRAY:
+            storeValue();
             break;
 
-        case JSON_CLOSE_BRACE:
-            onCloseBrace();
-            break;
-
-        case JSON_QUOTE:
-            onQuotation();
-            break;
-
-        case JSON_COMMA:
-            break;
-
-        case JSON_COLON:
-            break;
-
-        case JSON_START_BRACKET:
-            break;
-
-        case JSON_CLOSE_BRACKET:
+        case JSON_PARSING_VALUE:
+            m_states.pop();
             break;
 
         default:
-            onCharacter(c);
+            break;
         }
-    }
 
-/*
-    while (stream.good() && std::getline(stream, line))
-    {
-        String::Trim(line);
-        ++m_line;
-
-        if (line.empty())
-        {
-            // Ignore blank lines
-        }
-        else if (trimValue(line, '[', ']'))
-        {
-            section = onSection(line);
-        }
-        else if (!section.empty())
-        {
-            onValue(section, line);
-        }
-        else
-        {
-            throw ParserException(m_file, m_line,
-                "A section must be defined before name=value pairs"
-            );
-        }
-    }
-*/
-}
-
-void JsonParser::onStartBrace()
-{
-    if (m_pValue)
-    {
-
-    }
-    else
-    {
-        m_pValue = &m_root;
-    }
-
-    ++m_objectDepth;
-}
-
-void JsonParser::onCloseBrace()
-{
-    if (m_pValue)
-    {
-        m_pValue = m_pValue->GetParent();
-    }
-
-    --m_objectDepth;
-}
-
-void JsonParser::onQuotation()
-{
-    switch (m_state)
-    {
-    case JSON_NO_STATE:
-        m_state = JSON_PARSING_NAME;
         break;
 
-    case JSON_PARSING_NAME:
-        std::cout << m_parsing.str() << std::endl;
-
-        m_parsing.str(std::string());
-        m_state = JSON_NO_STATE;
-        break;
-
-    default:
-        break;
-    }
-}
-
-void JsonParser::onCharacter(const char &c)
-{
-    switch (m_state)
-    {
-    case JSON_PARSING_NAME:
-        m_parsing << c;
-        break;
-    case JSON_PARSING_OBJECT:
-        break;
     case JSON_PARSING_VALUE:
-        break;
-    case JSON_PARSING_ARRAY:
+        if (m_parsingString)
+        {
+            m_parsing << c;
+        }
+        else if (storeValue())
+        {
+            m_states.pop();
+        }
+
         break;
 
     default:
-        break;
-    }
-}
-
-//==============================================================================
-Parser::ValueList JsonParser::GetValues(const std::string &section) const
-{
-    Parser::ValueList values;
-
-    std::shared_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
-    IniSection::const_iterator it = m_sections.find(section);
-
-    if (it != m_sections.end())
-    {
-        values = it->second;
-    }
-
-    return values;
-}
-
-//==============================================================================
-JsonParser::IniSection::size_type JsonParser::GetSize() const
-{
-    std::shared_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
-    return m_sections.size();
-}
-
-//==============================================================================
-Parser::ValueList::size_type JsonParser::GetSize(const std::string &section) const
-{
-    Parser::ValueList::size_type size = 0;
-
-    std::shared_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
-    IniSection::const_iterator it = m_sections.find(section);
-
-    if (it != m_sections.end())
-    {
-        size = it->second.size();
-    }
-
-    return size;
-}
-
-//==============================================================================
-std::string JsonParser::onSection(const std::string &line)
-{
-    std::string section = line;
-    String::Trim(section);
-
-    if (m_sections.find(section) != m_sections.end())
-    {
-        throw ParserException(m_file, m_line,
-            "Section names must be unique"
-        );
-    }
-    else if (trimValue(section, '\'') || trimValue(section, '\"'))
-    {
-        throw ParserException(m_file, m_line,
-            "Section names must not be quoted"
-        );
-    }
-
-    return section;
-}
-
-//==============================================================================
-void JsonParser::onValue(const std::string &section, const std::string &line)
-{
-    static const size_t size = 2;
-
-    std::vector<std::string> nameValue = String::Split(line, '=', size);
-
-    if (nameValue.size() == size)
-    {
-        std::string name(nameValue[0]), value(nameValue[1]);
-
-        String::Trim(name);
-        String::Trim(value);
-
-        if (trimValue(name, '\'') || trimValue(name, '\"'))
-        {
-            throw ParserException(m_file, m_line,
-                "Value names must not be quoted"
-            );
-        }
-
-        trimValue(value, '\'');
-        trimValue(value, '\"');
-
-        Parser::ValueList &list = m_sections[section];
-
-        for (const Parser::Value &value : list)
-        {
-            if (name.compare(value.first) == 0)
-            {
-                throw ParserException(m_file, m_line,
-                    "Value names must be unique within a section"
-                );
-            }
-        }
-
-        list.push_back(Parser::Value(name, value));
-    }
-    else
-    {
-        throw ParserException(m_file, m_line,
-            "Require name/value pairs of the form name=value"
-        );
-    }
-}
-
-//==============================================================================
-bool JsonParser::trimValue(std::string &str, char ch) const
-{
-    return trimValue(str, ch, ch);
-}
-
-//==============================================================================
-bool JsonParser::trimValue(std::string &str, char start, char end) const
-{
-    bool startsWithChar = String::StartsWith(str, start);
-    bool endsWithChar = String::EndsWith(str, end);
-
-    if (startsWithChar || endsWithChar)
-    {
-        if (startsWithChar && endsWithChar)
-        {
-            str = str.substr(1, str.size() - 2);
-        }
-        else
+        if (m_expectingValue)
         {
             throw ParserException(m_file, m_line, String::Format(
-                "Imbalanced characters: \"%c\" and \"%c\"", start, end
+                "Expected name or value before character '%c'", c
+            ));
+        }
+
+        break;
+    }
+
+    m_expectingValue = !m_parsingString;
+}
+
+//==============================================================================
+void JsonParser::onCharacter(const char &c)
+{
+    switch (m_states.top())
+    {
+    case JSON_PARSING_ARRAY:
+        if (!std::isspace(c))
+        {
+            m_states.push(JSON_PARSING_VALUE);
+
+            m_pValue = &((*m_pValue)[m_pValue->Size()]);
+            m_pParents.push(m_pValue);
+
+            m_parsing << c;
+        }
+
+        break;
+
+    case JSON_PARSING_VALUE:
+    case JSON_PARSING_NAME:
+        if (m_parsingString || !std::isspace(c))
+        {
+            m_parsing << c;
+        }
+
+        break;
+
+    default:
+        if (!std::isspace(c))
+        {
+            throw ParserException(m_file, m_line, String::Format(
+                "Unexpected character '%c'", c
+            ));
+        }
+    }
+}
+
+//==============================================================================
+bool JsonParser::storeValue()
+{
+    const std::string value = m_parsing.str();
+
+    if (value.empty())
+    {
+        return false;
+    }
+
+    // Parsed a string value
+    if (m_parsedString)
+    {
+        m_parsedString = false;
+        *m_pValue = value;
+    }
+
+    // Parsed a boolean value
+    else if (value == "true")
+    {
+        *m_pValue = true;
+    }
+    else if (value == "false")
+    {
+        *m_pValue = false;
+    }
+
+    // Parsed a null value
+    else if (value == "null")
+    {
+        *m_pValue = nullptr;
+    }
+
+    // Parsed a float
+    else if (value.find('.') != std::string::npos)
+    {
+        try
+        {
+            *m_pValue = String::Convert<Json::float_type>(value);
+        }
+        catch (...)
+        {
+            throw ParserException(m_file, m_line, String::Format(
+                "Could not convert '%s' to a float type", value
             ));
         }
     }
 
-    return (startsWithChar && endsWithChar);
+    // Parsed a signed integer
+    else if ((value[0] == '-') || (value[0] == '+'))
+    {
+        try
+        {
+            *m_pValue = String::Convert<Json::signed_type>(value);
+        }
+        catch (...)
+        {
+            throw ParserException(m_file, m_line, String::Format(
+                "Could not convert '%s' to an signed type", value
+            ));
+        }
+    }
+
+    // Parsed an unsigned integer
+    else
+    {
+        try
+        {
+            *m_pValue = String::Convert<Json::unsigned_type>(value);
+        }
+        catch (...)
+        {
+            throw ParserException(m_file, m_line, String::Format(
+                "Could not convert '%s' to an unsigned type", value
+            ));
+        }
+    }
+
+    m_pParents.pop();
+    m_pValue = m_pParents.top();
+
+    m_parsing.str(std::string());
+
+    m_expectingValue = false;
+
+    return true;
+}
+
+//==============================================================================
+Parser::ValueList JsonParser::GetValues(const std::string &) const
+{
+    return Parser::ValueList();
 }
 
 }

@@ -17,13 +17,14 @@ IniParser::IniParser(const std::string &path, const std::string &file) :
 //==============================================================================
 void IniParser::Parse()
 {
+    std::unique_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
+
     std::string fullPath = Path::Join(m_path, m_file);
     std::ifstream stream(fullPath.c_str(), std::ios::in);
 
     std::string line, section;
     m_line = 0;
 
-    std::unique_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
     m_sections.clear();
 
     while (stream.good() && std::getline(stream, line))

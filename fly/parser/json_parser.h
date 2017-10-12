@@ -3,6 +3,7 @@
 #include <map>
 #include <shared_mutex>
 #include <sstream>
+#include <stack>
 #include <string>
 
 #include "fly/fly.h"
@@ -21,13 +22,10 @@ DEFINE_CLASS_PTRS(JsonParser);
  */
 class JsonParser : public Parser
 {
-    /**
-     * A map of parsed section names to that section's list of name-value pairs.
-     */
-    typedef std::map<std::string, Parser::ValueList> IniSection;
-
+public:
     enum JsonToken
     {
+        JSON_NEW_LINE = 0x0A, // \n
         JSON_QUOTE = 0x22, // "
         JSON_COMMA = 0x2c, // ,
         JSON_COLON = 0x3a, // :
@@ -42,10 +40,12 @@ class JsonParser : public Parser
     enum JsonState
     {
         JSON_NO_STATE,
-        JSON_PARSING_NAME,
         JSON_PARSING_OBJECT,
+        JSON_PARSING_ARRAY,
+        JSON_PARSING_NAME,
         JSON_PARSING_VALUE,
-        JSON_PARSING_ARRAY
+        JSON_PARSING_COLON,
+        JSON_PARSING_COMMA
     };
 
 public:
@@ -73,86 +73,31 @@ public:
      */
     virtual Parser::ValueList GetValues(const std::string &) const;
 
-    /**
-     * Get the number of sections that have been parsed.
-     *
-     * @return The number of parsed sections.
-     */
-    IniSection::size_type GetSize() const;
-
-    /**
-     * Get the number of name/value pairs that have been parsed for a section.
-     *
-     * @param string The name of the section to count.
-     *
-     * @return The number of parsed values.
-     */
-    Parser::ValueList::size_type GetSize(const std::string &) const;
-
 private:
     void onStartBrace();
-    void onCloseBrace();
-    void onQuotation();
+    void onCloseBrace(const char &);
+    void onStartBracket();
+    void onCloseBracket(const char &);
+    void onQuotation(const char &);
+    void onComma(const char &);
+    void onColon(const char &);
 
     void onCharacter(const char &);
 
-    JsonState m_state;
+    bool storeValue();
+
+    std::stack<JsonState> m_states;
 
     Json m_root;
     Json *m_pValue;
+    std::stack<Json *> m_pParents;
 
     std::stringstream m_parsing;
-    size_t m_objectDepth;
-
-    /**
-     * Parse a line containing a section name.
-     *
-     * @param string Line containing the section.
-     *
-     * @return The parsed section name.
-     */
-    std::string onSection(const std::string &);
-
-    /**
-     * Parse a line containing a name/value pair.
-     *
-     * @param string Section containing the pair.
-     * @param string Line containing the pair.
-     */
-    void onValue(const std::string &, const std::string &);
-
-    /**
-     * If the given string begins and ends with the given character, remove that
-     * character from each end of the string.
-     *
-     * @param string The string the trim.
-     * @param char The character to look for.
-     *
-     * @return True if the string was trimmed.
-     *
-     * @throws ParserException Thrown if the character was found at one end of
-     *     the string, but not the other.
-     */
-    bool trimValue(std::string &, char) const;
-
-    /**
-     * If the given string begins with the first given character and ends with
-     * the second given character, remove those characters from each end of the
-     * string.
-     *
-     * @param string The string the trim.
-     * @param char The character to look for at the beginning of the string.
-     * @param char The character to look for at the end of the string.
-     *
-     * @return True if the string was trimmed.
-     *
-     * @throws ParserException Thrown if the one of the start/end characters
-     *     was found, but not the other.
-     */
-    bool trimValue(std::string &, char, char) const;
+    bool m_parsingString;
+    bool m_parsedString;
+    bool m_expectingValue;
 
     mutable std::shared_timed_mutex m_sectionsMutex;
-    IniSection m_sections;
 };
 
 }

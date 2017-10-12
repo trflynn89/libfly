@@ -225,9 +225,15 @@ bool String::Convert(const std::string &value)
 {
     static const long long min = std::numeric_limits<bool>::min();
     static const long long max = std::numeric_limits<bool>::max();
-    long long result = std::stoll(value);
 
-    if ((result < min) || (result > max))
+    std::size_t index = 0;
+    long long result = std::stoll(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("bool");
+    }
+    else if ((result < min) || (result > max))
     {
         throw std::out_of_range("bool");
     }
@@ -241,9 +247,15 @@ char String::Convert(const std::string &value)
 {
     static const long long min = std::numeric_limits<char>::min();
     static const long long max = std::numeric_limits<char>::max();
-    long long result = std::stoll(value);
 
-    if ((result < min) || (result > max))
+    std::size_t index = 0;
+    long long result = std::stoll(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("char");
+    }
+    else if ((result < min) || (result > max))
     {
         throw std::out_of_range("char");
     }
@@ -257,9 +269,15 @@ unsigned char String::Convert(const std::string &value)
 {
     static const long long min = std::numeric_limits<unsigned char>::min();
     static const long long max = std::numeric_limits<unsigned char>::max();
-    long long result = std::stoll(value);
 
-    if ((result < min) || (result > max))
+    std::size_t index = 0;
+    long long result = std::stoll(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("uchar");
+    }
+    else if ((result < min) || (result > max))
     {
         throw std::out_of_range("uchar");
     }
@@ -273,9 +291,15 @@ short String::Convert(const std::string &value)
 {
     static const long long min = std::numeric_limits<short>::min();
     static const long long max = std::numeric_limits<short>::max();
-    long long result = std::stoll(value);
 
-    if ((result < min) || (result > max))
+    std::size_t index = 0;
+    long long result = std::stoll(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("short");
+    }
+    else if ((result < min) || (result > max))
     {
         throw std::out_of_range("short");
     }
@@ -289,9 +313,15 @@ unsigned short String::Convert(const std::string &value)
 {
     static const long long min = std::numeric_limits<unsigned short>::min();
     static const long long max = std::numeric_limits<unsigned short>::max();
-    long long result = std::stoll(value);
 
-    if ((result < min) || (result > max))
+    std::size_t index = 0;
+    long long result = std::stoll(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("ushort");
+    }
+    else if ((result < min) || (result > max))
     {
         throw std::out_of_range("ushort");
     }
@@ -303,7 +333,15 @@ unsigned short String::Convert(const std::string &value)
 template <>
 int String::Convert(const std::string &value)
 {
-    return std::stoi(value);
+    std::size_t index = 0;
+    int result = std::stoi(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("int");
+    }
+
+    return result;
 }
 
 //==============================================================================
@@ -312,9 +350,15 @@ unsigned int String::Convert(const std::string &value)
 {
     static const long long min = std::numeric_limits<unsigned int>::min();
     static const long long max = std::numeric_limits<unsigned int>::max();
-    long long result = std::stoll(value);
 
-    if ((result < min) || (result > max))
+    std::size_t index = 0;
+    long long result = std::stoll(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("uint");
+    }
+    else if ((result < min) || (result > max))
     {
         throw std::out_of_range("uint");
     }
@@ -326,49 +370,105 @@ unsigned int String::Convert(const std::string &value)
 template <>
 long String::Convert(const std::string &value)
 {
-    return std::stol(value);
+    std::size_t index = 0;
+    long result = std::stol(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("long");
+    }
+
+    return result;
 }
 
 //==============================================================================
 template <>
 unsigned long String::Convert(const std::string &value)
 {
-    return std::stoul(value);
+    std::size_t index = 0;
+    unsigned long result = std::stoul(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("ulong");
+    }
+
+    return result;
 }
 
 //==============================================================================
 template <>
 long long String::Convert(const std::string &value)
 {
-    return std::stoll(value);
+    std::size_t index = 0;
+    long long result = std::stoll(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("llong");
+    }
+
+    return result;
 }
 
 //==============================================================================
 template <>
 unsigned long long String::Convert(const std::string &value)
 {
-    return std::stoull(value);
+    std::size_t index = 0;
+    unsigned long long result = std::stoull(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("ullong");
+    }
+
+    return result;
 }
 
 //==============================================================================
 template <>
 float String::Convert(const std::string &value)
 {
-    return std::stof(value);
+    std::size_t index = 0;
+    float result = std::stof(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("float");
+    }
+
+    return result;
 }
 
 //==============================================================================
 template <>
 double String::Convert(const std::string &value)
 {
-    return std::stod(value);
+    std::size_t index = 0;
+    double result = std::stod(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("double");
+    }
+
+    return result;
 }
 
 //==============================================================================
 template <>
 long double String::Convert(const std::string &value)
 {
-    return std::stold(value);
+    std::size_t index = 0;
+    long double result = std::stold(value, &index);
+
+    if (index != value.length())
+    {
+        throw std::invalid_argument("ldouble");
+    }
+
+    return result;
 }
 
 //==============================================================================

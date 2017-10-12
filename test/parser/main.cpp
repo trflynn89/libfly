@@ -1149,6 +1149,36 @@ TEST(JsonTest, ArrayAccessTest)
 }
 
 //==============================================================================
+TEST(JsonTest, SizeTest)
+{
+    fly::Json json;
+
+    json = "abcdef";
+    EXPECT_EQ(json.Size(), 6);
+
+    json = { { "a", 1 }, { "b", 2 } };
+    EXPECT_EQ(json.Size(), 2);
+
+    json = { '7', 8, 9, 10 };
+    EXPECT_EQ(json.Size(), 4);
+
+    json = true;
+    EXPECT_EQ(json.Size(), 1);
+
+    json = 1;
+    EXPECT_EQ(json.Size(), 1);
+
+    json = static_cast<unsigned int>(1);
+    EXPECT_EQ(json.Size(), 1);
+
+    json = 1.0f;
+    EXPECT_EQ(json.Size(), 1);
+
+    json = nullptr;
+    EXPECT_EQ(json.Size(), 0);
+}
+
+//==============================================================================
 TEST(JsonTest, EqualityTest)
 {
     fly::Json string1 = "abc";
