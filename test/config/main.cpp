@@ -43,7 +43,7 @@ TEST_F(ConfigTest, NonCovertibleTest)
 }
 
 //==============================================================================
-TEST_F(ConfigTest, MutlipleValueTypeTest)
+TEST_F(ConfigTest, MultipleValueTypeTest)
 {
     const fly::Parser::ValueList values = {
         { "name", "John Doe" },

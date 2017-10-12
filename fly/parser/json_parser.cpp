@@ -375,7 +375,7 @@ bool JsonParser::storeValue()
     {
         try
         {
-            *m_pValue = String::Convert<Json::float_type>(value);
+            *m_pValue = String::Convert<Json::float_type>(value, true);
         }
         catch (...)
         {
@@ -390,7 +390,7 @@ bool JsonParser::storeValue()
     {
         try
         {
-            *m_pValue = String::Convert<Json::signed_type>(value);
+            *m_pValue = String::Convert<Json::signed_type>(value, true);
         }
         catch (...)
         {
@@ -405,7 +405,7 @@ bool JsonParser::storeValue()
     {
         try
         {
-            *m_pValue = String::Convert<Json::unsigned_type>(value);
+            *m_pValue = String::Convert<Json::unsigned_type>(value, true);
         }
         catch (...)
         {

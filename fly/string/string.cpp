@@ -214,14 +214,14 @@ bool String::WildcardMatch(const std::string &source, const std::string &search)
 
 //==============================================================================
 template <>
-std::string String::Convert(const std::string &value)
+std::string String::Convert(const std::string &value, bool)
 {
     return value;
 }
 
 //==============================================================================
 template <>
-bool String::Convert(const std::string &value)
+bool String::Convert(const std::string &value, bool strict)
 {
     static const long long min = std::numeric_limits<bool>::min();
     static const long long max = std::numeric_limits<bool>::max();
@@ -229,7 +229,7 @@ bool String::Convert(const std::string &value)
     std::size_t index = 0;
     long long result = std::stoll(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("bool");
     }
@@ -243,7 +243,7 @@ bool String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-char String::Convert(const std::string &value)
+char String::Convert(const std::string &value, bool strict)
 {
     static const long long min = std::numeric_limits<char>::min();
     static const long long max = std::numeric_limits<char>::max();
@@ -251,7 +251,7 @@ char String::Convert(const std::string &value)
     std::size_t index = 0;
     long long result = std::stoll(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("char");
     }
@@ -265,7 +265,7 @@ char String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-unsigned char String::Convert(const std::string &value)
+unsigned char String::Convert(const std::string &value, bool strict)
 {
     static const long long min = std::numeric_limits<unsigned char>::min();
     static const long long max = std::numeric_limits<unsigned char>::max();
@@ -273,7 +273,7 @@ unsigned char String::Convert(const std::string &value)
     std::size_t index = 0;
     long long result = std::stoll(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("uchar");
     }
@@ -287,7 +287,7 @@ unsigned char String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-short String::Convert(const std::string &value)
+short String::Convert(const std::string &value, bool strict)
 {
     static const long long min = std::numeric_limits<short>::min();
     static const long long max = std::numeric_limits<short>::max();
@@ -295,7 +295,7 @@ short String::Convert(const std::string &value)
     std::size_t index = 0;
     long long result = std::stoll(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("short");
     }
@@ -309,7 +309,7 @@ short String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-unsigned short String::Convert(const std::string &value)
+unsigned short String::Convert(const std::string &value, bool strict)
 {
     static const long long min = std::numeric_limits<unsigned short>::min();
     static const long long max = std::numeric_limits<unsigned short>::max();
@@ -317,7 +317,7 @@ unsigned short String::Convert(const std::string &value)
     std::size_t index = 0;
     long long result = std::stoll(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("ushort");
     }
@@ -331,12 +331,12 @@ unsigned short String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-int String::Convert(const std::string &value)
+int String::Convert(const std::string &value, bool strict)
 {
     std::size_t index = 0;
     int result = std::stoi(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("int");
     }
@@ -346,7 +346,7 @@ int String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-unsigned int String::Convert(const std::string &value)
+unsigned int String::Convert(const std::string &value, bool strict)
 {
     static const long long min = std::numeric_limits<unsigned int>::min();
     static const long long max = std::numeric_limits<unsigned int>::max();
@@ -354,7 +354,7 @@ unsigned int String::Convert(const std::string &value)
     std::size_t index = 0;
     long long result = std::stoll(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("uint");
     }
@@ -368,12 +368,12 @@ unsigned int String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-long String::Convert(const std::string &value)
+long String::Convert(const std::string &value, bool strict)
 {
     std::size_t index = 0;
     long result = std::stol(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("long");
     }
@@ -383,12 +383,12 @@ long String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-unsigned long String::Convert(const std::string &value)
+unsigned long String::Convert(const std::string &value, bool strict)
 {
     std::size_t index = 0;
     unsigned long result = std::stoul(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("ulong");
     }
@@ -398,12 +398,12 @@ unsigned long String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-long long String::Convert(const std::string &value)
+long long String::Convert(const std::string &value, bool strict)
 {
     std::size_t index = 0;
     long long result = std::stoll(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("llong");
     }
@@ -413,12 +413,12 @@ long long String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-unsigned long long String::Convert(const std::string &value)
+unsigned long long String::Convert(const std::string &value, bool strict)
 {
     std::size_t index = 0;
     unsigned long long result = std::stoull(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("ullong");
     }
@@ -428,12 +428,12 @@ unsigned long long String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-float String::Convert(const std::string &value)
+float String::Convert(const std::string &value, bool strict)
 {
     std::size_t index = 0;
     float result = std::stof(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("float");
     }
@@ -443,12 +443,12 @@ float String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-double String::Convert(const std::string &value)
+double String::Convert(const std::string &value, bool strict)
 {
     std::size_t index = 0;
     double result = std::stod(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("double");
     }
@@ -458,12 +458,12 @@ double String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-long double String::Convert(const std::string &value)
+long double String::Convert(const std::string &value, bool strict)
 {
     std::size_t index = 0;
     long double result = std::stold(value, &index);
 
-    if (index != value.length())
+    if (strict && (index != value.length()))
     {
         throw std::invalid_argument("ldouble");
     }

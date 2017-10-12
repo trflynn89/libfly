@@ -406,7 +406,7 @@ TEST(StringTest, ConvertTest)
     EXPECT_THROW(fly::String::Convert<bool>("-1"), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<bool>("2"), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<bool>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<bool>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<bool>("2a", true), std::invalid_argument);
 
     // CHAR
     EXPECT_EQ(fly::String::Convert<char>("0"), '\0');
@@ -414,14 +414,14 @@ TEST(StringTest, ConvertTest)
     EXPECT_THROW(fly::String::Convert<char>(min_to_string<char>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<char>(max_to_string<char>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<char>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<char>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<char>("2a", true), std::invalid_argument);
 
     EXPECT_EQ(fly::String::Convert<unsigned char>("0"), '\0');
     EXPECT_EQ(fly::String::Convert<unsigned char>("200"), (unsigned char)200);
     EXPECT_THROW(fly::String::Convert<unsigned char>(min_to_string<unsigned char>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<unsigned char>(max_to_string<unsigned char>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<unsigned char>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<unsigned char>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<unsigned char>("2a", true), std::invalid_argument);
 
     // SHORT
     EXPECT_EQ(fly::String::Convert<short>("-4000"), (short)-4000);
@@ -429,14 +429,14 @@ TEST(StringTest, ConvertTest)
     EXPECT_THROW(fly::String::Convert<short>(min_to_string<short>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<short>(max_to_string<short>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<short>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<short>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<short>("2a", true), std::invalid_argument);
 
     EXPECT_EQ(fly::String::Convert<unsigned short>("0"), (unsigned short)0);
     EXPECT_EQ(fly::String::Convert<unsigned short>("4000"), (unsigned short)4000);
     EXPECT_THROW(fly::String::Convert<unsigned short>(min_to_string<unsigned short>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<unsigned short>(max_to_string<unsigned short>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<unsigned short>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<unsigned short>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<unsigned short>("2a", true), std::invalid_argument);
 
     // INT
     EXPECT_EQ(fly::String::Convert<int>("-4000"), (int)-4000);
@@ -444,52 +444,52 @@ TEST(StringTest, ConvertTest)
     EXPECT_THROW(fly::String::Convert<int>(min_to_string<int>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<int>(max_to_string<int>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<int>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<int>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<int>("2a", true), std::invalid_argument);
 
     EXPECT_EQ(fly::String::Convert<unsigned int>("0"), (unsigned int)0);
     EXPECT_EQ(fly::String::Convert<unsigned int>("4000"), (unsigned int)4000);
     EXPECT_THROW(fly::String::Convert<unsigned int>(min_to_string<unsigned int>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<unsigned int>(max_to_string<unsigned int>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<unsigned int>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<unsigned int>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<unsigned int>("2a", true), std::invalid_argument);
 
     // LONG
     EXPECT_EQ(fly::String::Convert<long>("-4000"), (long)-4000);
     EXPECT_EQ(fly::String::Convert<long>("4000"), (long)4000);
     EXPECT_THROW(fly::String::Convert<long>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<long>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<long>("2a", true), std::invalid_argument);
 
     EXPECT_EQ(fly::String::Convert<unsigned long>("0"), (unsigned long)0);
     EXPECT_EQ(fly::String::Convert<unsigned long>("4000"), (unsigned long)4000);
     EXPECT_THROW(fly::String::Convert<unsigned long>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<unsigned long>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<unsigned long>("2a", true), std::invalid_argument);
 
     // LONG LONG
     EXPECT_EQ(fly::String::Convert<long long>("-4000"), (long long)-4000);
     EXPECT_EQ(fly::String::Convert<long long>("4000"), (long long)4000);
     EXPECT_THROW(fly::String::Convert<long long>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<long long>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<long long>("2a", true), std::invalid_argument);
 
     EXPECT_EQ(fly::String::Convert<unsigned long long>("0"), (unsigned long long)0);
     EXPECT_EQ(fly::String::Convert<unsigned long long>("4000"), (unsigned long long)4000);
     EXPECT_THROW(fly::String::Convert<unsigned long long>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<unsigned long long>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<unsigned long long>("2a", true), std::invalid_argument);
 
     // FLOAT
     EXPECT_EQ(fly::String::Convert<float>("-4000.123"), -4000.123f);
     EXPECT_EQ(fly::String::Convert<float>("4000.456"), 4000.456f);
     EXPECT_THROW(fly::String::Convert<float>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<float>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<float>("2a", true), std::invalid_argument);
 
     // DOUBLE
     EXPECT_EQ(fly::String::Convert<double>("-4000.123"), -4000.123);
     EXPECT_EQ(fly::String::Convert<double>("4000.456"), 4000.456);
     EXPECT_THROW(fly::String::Convert<double>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<double>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<double>("2a", true), std::invalid_argument);
 
     // LONG DOUBLE
     EXPECT_EQ(fly::String::Convert<long double>("-4000.123"), -4000.123L);
     EXPECT_EQ(fly::String::Convert<long double>("4000.456"), 4000.456L);
     EXPECT_THROW(fly::String::Convert<long double>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<long double>("2a"), std::invalid_argument);
+    EXPECT_THROW(fly::String::Convert<long double>("2a", true), std::invalid_argument);
 }

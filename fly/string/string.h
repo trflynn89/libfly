@@ -170,7 +170,8 @@ public:
     static std::string Join(const char &, const Args &...);
 
     /**
-     * Convert a string to a basic type, e.g. int or bool.
+     * Convert a string to a basic type, e.g. int or bool, without enforcing
+     * that the whole string must be consumed.
      *
      * @tparam T The desired basic type.
      *
@@ -183,6 +184,22 @@ public:
      */
     template <typename T>
     static T Convert(const std::string &);
+
+    /**
+     * Convert a string to a basic type, e.g. int or bool.
+     *
+     * @tparam T The desired basic type.
+     *
+     * @param string The string to convert.
+     * @param bool Whether to enforce that the whole string must be consumed.
+     *
+     * @return The string coverted to the specified type.
+     *
+     * @throws std::invalid_argument Conversion could not be performed.
+     * @throws std::out_of_range Converted value is out of range of result type.
+     */
+    template <typename T>
+    static T Convert(const std::string &, bool);
 
 private:
     /**
@@ -237,6 +254,13 @@ std::string String::Format(const char *fmt, const Args &...args)
     }
 
     return stream.str();
+}
+
+//==============================================================================
+template <typename T>
+T String::Convert(const std::string &value)
+{
+    return Convert<T>(value, false);
 }
 
 //==============================================================================
