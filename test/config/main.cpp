@@ -63,8 +63,8 @@ TEST_F(ConfigTest, MultipleValueTypeTest)
     EXPECT_EQ(m_spConfig->GetValue<double>("address", 0.0), 123.0);
 
     EXPECT_EQ(m_spConfig->GetValue<std::string>("age", ""), "26.2");
-    EXPECT_EQ(m_spConfig->GetValue<int>("age", 0), 26);
-    EXPECT_EQ(m_spConfig->GetValue<unsigned int>("age", 0), 26);
+    EXPECT_EQ(m_spConfig->GetValue<int>("age", 0), 0);
+    EXPECT_EQ(m_spConfig->GetValue<unsigned int>("age", 0), 0);
     EXPECT_EQ(m_spConfig->GetValue<float>("age", 0.0f), 26.2f);
     EXPECT_EQ(m_spConfig->GetValue<double>("age", 0.0), 26.2);
 
