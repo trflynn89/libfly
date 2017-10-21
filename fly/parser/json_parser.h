@@ -65,6 +65,13 @@ public:
     virtual void Parse();
 
     /**
+     * Get a copy of the parsed JSON object.
+     *
+     * @return Json The parsed JSON object.
+     */
+    Json GetJson() const;
+
+    /**
      * Get a section's parsed values.
      *
      * @param string The name of the section containing the values.
@@ -74,10 +81,8 @@ public:
     virtual Parser::ValueList GetValues(const std::string &) const;
 
 private:
-    void onStartBrace();
-    void onCloseBrace(const char &);
-    void onStartBracket();
-    void onCloseBracket(const char &);
+    void onStartBraceOrBracket(const char &, const JsonToken &);
+    void onCloseBraceOrBracket(const char &, const JsonToken &);
     void onQuotation(const char &);
     void onComma(const char &);
     void onColon(const char &);

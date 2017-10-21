@@ -19,15 +19,14 @@
 #include "fly/string/string.h"
 
 //==============================================================================
-class IniParserTest : public ::testing::Test
+class ParserTest : public ::testing::Test
 {
 public:
-    IniParserTest() :
+    ParserTest() :
         m_path(fly::Path::Join(
             fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
         )),
-        m_file(fly::String::GenerateRandomString(10) + ".txt"),
-        m_spParser(std::make_shared<fly::IniParser>(m_path, m_file))
+        m_file(fly::String::GenerateRandomString(10) + ".txt")
     {
         LOGC("Using path '%s' : '%s'", m_path, m_file);
     }
@@ -56,13 +55,14 @@ protected:
      */
     void CreateFile(const std::string &contents)
     {
+        const std::string path = fly::Path::Join(m_path, m_file);
         {
-            std::ofstream stream(GetFullPath(), std::ios::out);
+            std::ofstream stream(path, std::ios::out);
             ASSERT_TRUE(stream.good());
             stream << contents;
         }
         {
-            std::ifstream stream(GetFullPath(), std::ios::in);
+            std::ifstream stream(path, std::ios::in);
             ASSERT_TRUE(stream.good());
 
             std::stringstream sstream;
@@ -72,19 +72,36 @@ protected:
         }
     }
 
-    /**
-     * @return The full path to the file being monitored.
-     */
-    std::string GetFullPath() const
-    {
-        static const char sep = fly::Path::GetSeparator();
-        return fly::String::Join(sep, m_path, m_file);
-    }
-
     std::string m_path;
     std::string m_file;
+};
 
+//==============================================================================
+class IniParserTest : public ParserTest
+{
+public:
+    IniParserTest() :
+        ParserTest(),
+        m_spParser(std::make_shared<fly::IniParser>(m_path, m_file))
+    {
+    }
+
+protected:
     fly::IniParserPtr m_spParser;
+};
+
+//==============================================================================
+class JsonParserTest : public ParserTest
+{
+public:
+    JsonParserTest() :
+        ParserTest(),
+        m_spParser(std::make_shared<fly::JsonParser>(m_path, m_file))
+    {
+    }
+
+protected:
+    fly::JsonParserPtr m_spParser;
 };
 
 //==============================================================================
@@ -1360,7 +1377,48 @@ TEST(JsonExceptionTest, ExceptionTest)
 }
 
 //==============================================================================
-TEST(JsonParserTest, Test)
+TEST_F(JsonParserTest, NonExistingPathTest)
+{
+    m_spParser = std::make_shared<fly::JsonParser>(m_path + "foo", m_file);
+
+    ASSERT_NO_THROW(m_spParser->Parse());
+    EXPECT_TRUE(m_spParser->GetJson().IsNull());
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, NonExistingFileTest)
+{
+    m_spParser = std::make_shared<fly::JsonParser>(m_path, m_file + "foo");
+
+    ASSERT_NO_THROW(m_spParser->Parse());
+    EXPECT_TRUE(m_spParser->GetJson().IsNull());
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, EmptyFileTest)
+{
+    const std::string contents;
+    CreateFile(contents);
+
+    ASSERT_NO_THROW(m_spParser->Parse());
+    EXPECT_TRUE(m_spParser->GetJson().IsNull());
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, EmptyObjectTest)
+{
+    const std::string contents("{}");
+    CreateFile(contents);
+
+    ASSERT_NO_THROW(m_spParser->Parse());
+
+    fly::Json json = m_spParser->GetJson();
+    EXPECT_TRUE(json.IsObject());
+    EXPECT_TRUE(json.Size() == 0);
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, Test)
 {
     auto spParser = std::make_shared<fly::JsonParser>("/tmp", "test.json");
     spParser->Parse();

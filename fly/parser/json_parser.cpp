@@ -57,19 +57,13 @@ void JsonParser::Parse()
             switch (token)
             {
             case JSON_START_BRACE:
-                onStartBrace();
+            case JSON_START_BRACKET:
+                onStartBraceOrBracket(c, token);
                 break;
 
             case JSON_CLOSE_BRACE:
-                onCloseBrace(c);
-                break;
-
-            case JSON_START_BRACKET:
-                onStartBracket();
-                break;
-
             case JSON_CLOSE_BRACKET:
-                onCloseBracket(c);
+                onCloseBraceOrBracket(c, token);
                 break;
 
             case JSON_QUOTE:
@@ -98,30 +92,104 @@ void JsonParser::Parse()
         throw ParserException(m_file, m_line, ex.what());
     }
 
+    if (m_states.top() != JSON_NO_STATE)
+    {
+        throw ParserException(m_file, m_line,
+            "Finished parsing file with incomplete JSON object"
+        );
+    }
+
     std::cout << "Finished Parsing:" << std::endl;
     std::cout << m_root << std::endl;
 }
 
 //==============================================================================
-void JsonParser::onStartBrace()
+void JsonParser::onStartBraceOrBracket(const char &c, const JsonToken &token)
 {
-    if (m_states.top() == JSON_PARSING_ARRAY)
+    switch (m_states.top())
     {
+    case JSON_NO_STATE:
+        if (token == JSON_START_BRACKET)
+        {
+            throw ParserException(m_file, m_line, String::Format(
+                "Unexpected character '%c'", c
+            ));
+        }
+
+        break;
+
+    case JSON_PARSING_ARRAY:
         m_states.push(JSON_PARSING_VALUE);
 
         m_pValue = &((*m_pValue)[m_pValue->Size()]);
         m_pParents.push(m_pValue);
+
+        break;
+
+    case JSON_PARSING_COLON:
+        throw ParserException(m_file, m_line, String::Format(
+            "Unexpected character '%c'", c
+        ));
+
+    case JSON_PARSING_NAME:
+    case JSON_PARSING_VALUE:
+        if (m_parsingString)
+        {
+            m_parsing << c;
+            return;
+        }
+        else if (!m_expectingValue)
+        {
+            throw ParserException(m_file, m_line, String::Format(
+                "Unexpected character '%c'", c
+            ));
+        }
+
+        break;
+
+    default:
+        break;
     }
 
-    *m_pValue = Json::object_type();
-    m_states.push(JSON_PARSING_OBJECT);
+    if (token == JSON_START_BRACE)
+    {
+        *m_pValue = Json::object_type();
+        m_states.push(JSON_PARSING_OBJECT);
+    }
+    else
+    {
+        *m_pValue = Json::array_type();
+        m_states.push(JSON_PARSING_ARRAY);
+    }
 
     m_expectingValue = false;
 }
 
 //==============================================================================
-void JsonParser::onCloseBrace(const char &c)
+void JsonParser::onCloseBraceOrBracket(const char &c, const JsonToken &token)
 {
+    switch (m_states.top())
+    {
+    case JSON_NO_STATE:
+    case JSON_PARSING_COLON:
+        throw ParserException(m_file, m_line, String::Format(
+            "Unexpected character '%c'", c
+        ));
+
+    case JSON_PARSING_NAME:
+    case JSON_PARSING_VALUE:
+        if (m_parsingString)
+        {
+            m_parsing << c;
+            return;
+        }
+
+        break;
+
+    default:
+        break;
+    }
+
     if (!storeValue() && m_expectingValue)
     {
         throw ParserException(m_file, m_line, String::Format(
@@ -132,52 +200,32 @@ void JsonParser::onCloseBrace(const char &c)
     m_pParents.pop();
     m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
 
-    while (m_states.top() != JSON_PARSING_OBJECT)
+    const JsonState expected = (
+        (token == JSON_CLOSE_BRACE) ? JSON_PARSING_OBJECT : JSON_PARSING_ARRAY
+    );
+
+    const JsonState unexpected = (
+        (token == JSON_CLOSE_BRACE) ? JSON_PARSING_ARRAY : JSON_PARSING_OBJECT
+    );
+
+    while (m_states.top() != expected)
     {
+        if (m_states.top() == unexpected)
+        {
+            throw ParserException(m_file, m_line, String::Format(
+                "Unexpected character '%c'", c
+            ));
+        }
+
         m_states.pop();
     }
 
     m_states.pop();
-    m_states.push(JSON_PARSING_COMMA);
-}
 
-//==============================================================================
-void JsonParser::onStartBracket()
-{
-    if (m_states.top() == JSON_PARSING_ARRAY)
+    if (m_states.top() != JSON_NO_STATE)
     {
-        m_states.push(JSON_PARSING_VALUE);
-
-        m_pValue = &((*m_pValue)[m_pValue->Size()]);
-        m_pParents.push(m_pValue);
+        m_states.push(JSON_PARSING_COMMA);
     }
-
-    *m_pValue = Json::array_type();
-    m_states.push(JSON_PARSING_ARRAY);
-
-    m_expectingValue = false;
-}
-
-//==============================================================================
-void JsonParser::onCloseBracket(const char &c)
-{
-    if (!storeValue() && m_expectingValue)
-    {
-        throw ParserException(m_file, m_line, String::Format(
-            "Expected name or value before character '%c'", c
-        ));
-    }
-
-    m_pParents.pop();
-    m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
-
-    while (m_states.top() != JSON_PARSING_ARRAY)
-    {
-        m_states.pop();
-    }
-
-    m_states.pop();
-    m_states.push(JSON_PARSING_COMMA);
 }
 
 //==============================================================================
@@ -225,7 +273,7 @@ void JsonParser::onQuotation(const char &c)
 
     default:
         throw ParserException(m_file, m_line, String::Format(
-            "Expected comma before character '%c'", c
+            "Unexpected character '%c'", c
         ));
     }
 }
@@ -235,6 +283,11 @@ void JsonParser::onColon(const char &c)
 {
     switch (m_states.top())
     {
+    case JSON_NO_STATE:
+        throw ParserException(m_file, m_line, String::Format(
+            "Unexpected character '%c'", c
+        ));
+
     case JSON_PARSING_COLON:
         m_states.pop();
         m_states.push(JSON_PARSING_VALUE);
@@ -254,6 +307,11 @@ void JsonParser::onComma(const char &c)
 {
     switch (m_states.top())
     {
+    case JSON_NO_STATE:
+        throw ParserException(m_file, m_line, String::Format(
+            "Unexpected character '%c'", c
+        ));
+
     case JSON_PARSING_COMMA:
         m_states.pop();
 
@@ -423,6 +481,12 @@ bool JsonParser::storeValue()
     m_expectingValue = false;
 
     return true;
+}
+
+//==============================================================================
+Json JsonParser::GetJson() const
+{
+    return m_root;
 }
 
 //==============================================================================
