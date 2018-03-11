@@ -25,3 +25,10 @@ INSTALL_BIN_DIR := /usr/bin
 INSTALL_INC_DIR := /usr/include
 INSTALL_SRC_DIR := /usr/src
 INSTALL_LIB_DIR := /usr/lib
+
+# Determine host operating system
+ifneq ($(wildcard /etc/debian_version),)
+    HOST := DEBIAN
+else
+    $(error Could not determine host operating system, check system.mk)
+endif
