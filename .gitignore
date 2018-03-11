@@ -100,3 +100,7 @@ GTAGS
 *.swp
 *.VC.db
 *.VC.VC.opendb
+
+#### Visual Studio Code
+
+.vscode/
