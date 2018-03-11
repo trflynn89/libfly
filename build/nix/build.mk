@@ -8,6 +8,7 @@
 .PHONY: tests
 .PHONY: run
 .PHONY: install
+.PHONY: setup
 
 # Verify expected variables
 ifeq ($(SOURCE_ROOT),)
@@ -93,3 +94,12 @@ endif
 # Install the target
 install: $(TARGET_PACKAGE)
 	$(Q)sudo tar -C / $(TAR_EXTRACT_FLAGS) $(TARGET_PACKAGE)
+
+# Install dependencies
+setup:
+ifeq ($(HOST), DEBIAN)
+	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib
+else
+	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"
+	$(Q)exit 1
+endif

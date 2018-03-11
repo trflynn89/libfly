@@ -1,5 +1,6 @@
 #include <atomic>
 #include <chrono>
+#include <functional>
 #include <future>
 #include <vector>
 

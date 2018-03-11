@@ -1,24 +1,29 @@
-language: generic
-
-os: linux
-compiler: gcc
+language: cpp
 
 sudo: required
 dist: trusty
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
+matrix:
+  include:
+    - os: linux
 
-    packages:
-      - gcc-5
-      - g++-5
-      - gcc-5-multilib
-      - g++-5-multilib
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
 
-env:
-  - COMPILER_NAME=gcc CC=gcc-5 CXX=g++-5
+          packages:
+            - gcc-7
+            - g++-7
+            - gcc-7-multilib
+            - g++-7-multilib
+
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
+before_install:
+  - eval "$MATRIX_EVAL"
+  - $CXX --version
 
 before_script:
   - sudo ln -s /usr/include/asm-generic /usr/include/asm
