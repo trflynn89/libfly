@@ -110,24 +110,27 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
     std::ifstream stream(s_procStatFile, std::ios::in);
     std::string line;
 
-    uint64_t user = 0, nice = 0, system = 0, idle = 0;
+    uint64_t user = 0, nice = 0, sys = 0, idle = 0;
+    int scanned = 0;
 
     if (stream.good() && std::getline(stream, line))
     {
-        ::sscanf(line.c_str(), s_procStatFormat, &user, &nice, &system, &idle);
+        scanned = ::sscanf(line.c_str(), s_procStatFormat, &user, &nice, &sys, &idle);
     }
 
-    if ((user == 0) && (nice == 0) && (system == 0) && (idle == 0))
+    if (scanned != 4)
     {
         LOGS(-1, "Could not poll system CPU (%s)", line);
+        return;
     }
-    else if ((user >= m_prevSystemUserTime) && (nice >= m_prevSystemNiceTime) &&
-        (system >= m_prevSystemSystemTime) && (idle >= m_prevSystemIdleTime))
+
+    if ((user >= m_prevSystemUserTime) && (nice >= m_prevSystemNiceTime) &&
+        (sys >= m_prevSystemSystemTime) && (idle >= m_prevSystemIdleTime))
     {
         uint64_t active =
             (user - m_prevSystemUserTime) +
             (nice - m_prevSystemNiceTime) +
-            (system - m_prevSystemSystemTime);
+            (sys - m_prevSystemSystemTime);
 
         uint64_t total = active + (idle - m_prevSystemIdleTime);
 
@@ -136,7 +139,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
 
     m_prevSystemUserTime = user;
     m_prevSystemNiceTime = nice;
-    m_prevSystemSystemTime = system;
+    m_prevSystemSystemTime = sys;
     m_prevSystemIdleTime = idle;
 }
 
@@ -149,8 +152,10 @@ void SystemMonitorImpl::UpdateProcessCpuUsage()
     if (now == static_cast<clock_t>(-1))
     {
         LOGS(-1, "Could not poll process CPU");
+        return;
     }
-    else if ((now > m_prevTime) &&
+
+    if ((now > m_prevTime) &&
         (sample.tms_stime >= m_prevProcessSystemTime) &&
         (sample.tms_utime >= m_prevProcessUserTime))
     {
