@@ -10,8 +10,8 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
-DEFINE_CLASS_PTRS(PathMonitorImpl);
+FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(PathMonitorImpl);
 
 /**
  * Linux implementation of the PathMonitor interface. Uses the inotify API to
@@ -56,7 +56,7 @@ protected:
     virtual PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const;
 
 private:
-    DEFINE_STRUCT_PTRS(PathInfoImpl);
+    FLY_STRUCT_PTRS(PathInfoImpl);
 
     /**
      * Linux implementation of the PathInfo interface. Stores the path monitor's

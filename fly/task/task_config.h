@@ -8,7 +8,7 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(TaskConfig);
+FLY_CLASS_PTRS(TaskConfig);
 
 /**
  * Class to hold configuration values related to runnable tasks.

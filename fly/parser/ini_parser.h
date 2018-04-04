@@ -9,7 +9,7 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(IniParser);
+FLY_CLASS_PTRS(IniParser);
 
 /**
  * Implementation of the Parser interface for .ini files.

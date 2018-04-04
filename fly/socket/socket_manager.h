@@ -13,10 +13,10 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
-DEFINE_CLASS_PTRS(Socket);
-DEFINE_CLASS_PTRS(SocketConfig);
-DEFINE_CLASS_PTRS(SocketManager);
+FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(Socket);
+FLY_CLASS_PTRS(SocketConfig);
+FLY_CLASS_PTRS(SocketManager);
 
 /**
  * Class to manage the creation of sockets and IO operations over asynchronous

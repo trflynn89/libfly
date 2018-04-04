@@ -8,8 +8,8 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
-DEFINE_CLASS_PTRS(SystemMonitorImpl);
+FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(SystemMonitorImpl);
 
 /**
  * Windows implementation of the SystemMonitor interface. Uses the Windows, PDH,

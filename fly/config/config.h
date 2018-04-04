@@ -9,7 +9,7 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(Config);
+FLY_CLASS_PTRS(Config);
 
 /**
  * Class to hold a set of related configuration values.

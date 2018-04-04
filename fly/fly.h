@@ -25,14 +25,14 @@
 #endif
 
 // Typedefs for class name and smart pointers
-#define DEFINE_CLASS_PTRS(classname)                    \
+#define FLY_CLASS_PTRS(classname)                    \
     class classname;                                    \
     typedef std::shared_ptr<classname> classname##Ptr;  \
     typedef std::unique_ptr<classname> classname##UPtr; \
     typedef std::weak_ptr<classname> classname##WPtr;
 
 // Typedefs for struct name and smart pointers
-#define DEFINE_STRUCT_PTRS(structname)                    \
+#define FLY_STRUCT_PTRS(structname)                    \
     struct structname;                                    \
     typedef std::shared_ptr<structname> structname##Ptr;  \
     typedef std::unique_ptr<structname> structname##UPtr; \

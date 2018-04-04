@@ -10,8 +10,8 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
-DEFINE_CLASS_PTRS(PathMonitorImpl);
+FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(PathMonitorImpl);
 
 /**
  * Windows implementation of the PathMonitor interface. Uses an IOCP with the
@@ -56,7 +56,7 @@ protected:
     virtual PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const;
 
 private:
-    DEFINE_STRUCT_PTRS(PathInfoImpl);
+    FLY_STRUCT_PTRS(PathInfoImpl);
 
     /**
      * Windows implementation of the PathInfo interface. Stores a handle to the

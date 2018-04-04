@@ -8,7 +8,7 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(SocketConfig);
+FLY_CLASS_PTRS(SocketConfig);
 
 /**
  * Class to hold networking-related configuration values.

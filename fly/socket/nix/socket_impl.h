@@ -7,8 +7,8 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(SocketConfig);
-DEFINE_CLASS_PTRS(SocketImpl);
+FLY_CLASS_PTRS(SocketConfig);
+FLY_CLASS_PTRS(SocketImpl);
 
 /**
  * Linux implementation of the Socket interface.

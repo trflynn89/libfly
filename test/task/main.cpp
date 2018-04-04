@@ -7,7 +7,7 @@
 #include "fly/fly.h"
 #include "fly/task/runner.h"
 
-DEFINE_CLASS_PTRS(CountTask);
+FLY_CLASS_PTRS(CountTask);
 
 //==============================================================================
 class CountTask : public fly::Runner

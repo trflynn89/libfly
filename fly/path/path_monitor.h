@@ -12,8 +12,8 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
-DEFINE_CLASS_PTRS(PathMonitor);
+FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(PathMonitor);
 
 /**
  * Virtual interface to monitor a local path. Provides monitoring of either all
@@ -109,7 +109,7 @@ public:
     bool RemoveFile(const std::string &, const std::string &);
 
 protected:
-    DEFINE_STRUCT_PTRS(PathInfo);
+    FLY_STRUCT_PTRS(PathInfo);
 
     /**
      * Struct to store information about a monitored path. OS dependent
