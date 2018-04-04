@@ -1,10 +1,6 @@
 #include "fly/path/path.h"
 
-#if defined(FLY_WINDOWS)
-    #include "fly/path/win/path_impl.h"
-#elif defined(FLY_LINUX)
-    #include "fly/path/nix/path_impl.h"
-#endif
+#include FLY_OS_IMPL_PATH(path, path)
 
 namespace fly {
 
