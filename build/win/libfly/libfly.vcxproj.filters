@@ -65,9 +65,6 @@
     <ClInclude Include="..\..\..\fly\path\path_monitor.h">
       <Filter>path</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\path\path_monitor_impl.h">
-      <Filter>path</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\task\runner.h">
       <Filter>task</Filter>
     </ClInclude>
@@ -86,13 +83,7 @@
     <ClInclude Include="..\..\..\fly\socket\socket_config.h">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket_impl.h">
-      <Filter>socket</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\socket\socket_manager.h">
-      <Filter>socket</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket_manager_impl.h">
       <Filter>socket</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\random\random_device.h">
@@ -138,9 +129,6 @@
       <Filter>traits</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\system\system_monitor.h">
-      <Filter>system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\system\system_monitor_impl.h">
       <Filter>system</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.h">

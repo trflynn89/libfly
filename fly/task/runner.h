@@ -11,7 +11,7 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(Runner);
+FLY_CLASS_PTRS(Runner);
 
 /**
  * Class to simplify running tasks. Other classes may inherit from this class

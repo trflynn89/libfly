@@ -9,7 +9,7 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(ConfigManager);
 
 /**
  * Windows implementation of the SocketManager interface.

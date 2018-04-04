@@ -10,8 +10,8 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(Socket);
-DEFINE_CLASS_PTRS(SocketConfig);
+FLY_CLASS_PTRS(Socket);
+FLY_CLASS_PTRS(SocketConfig);
 
 /**
  * Virtual interface to represent a network socket. This interface is platform
@@ -335,3 +335,5 @@ private:
 };
 
 }
+
+#include FLY_OS_IMPL_PATH(socket, socket)

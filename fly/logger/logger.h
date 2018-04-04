@@ -66,9 +66,9 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
-DEFINE_CLASS_PTRS(Logger);
-DEFINE_CLASS_PTRS(LoggerConfig);
+FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(Logger);
+FLY_CLASS_PTRS(LoggerConfig);
 
 /**
  * Provides thread safe instrumentation. There are 4 levels of instrumentation:

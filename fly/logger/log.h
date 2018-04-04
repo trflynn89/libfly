@@ -21,7 +21,7 @@ enum LogLevel
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(LoggerConfig);
+FLY_CLASS_PTRS(LoggerConfig);
 
 /**
  * Struct to store data about single log. A log contains:

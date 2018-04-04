@@ -9,8 +9,8 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
-DEFINE_CLASS_PTRS(SystemMonitor);
+FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(SystemMonitor);
 
 /**
  * Virtual interface for monitoring system-level resources. Provides CPU and
@@ -143,3 +143,5 @@ protected:
 };
 
 }
+
+#include FLY_OS_IMPL_PATH(system, system_monitor)

@@ -9,7 +9,7 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(Parser);
+FLY_CLASS_PTRS(Parser);
 
 /**
  * Virtual interface to parse a file. Parsers for specific file formats should

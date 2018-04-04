@@ -3,11 +3,7 @@
 #include <csignal>
 #include <vector>
 
-#if defined(FLY_WINDOWS)
-    #include "fly/system/win/system_impl.h"
-#elif defined(FLY_LINUX)
-    #include "fly/system/nix/system_impl.h"
-#endif
+#include FLY_OS_IMPL_PATH(system, system)
 
 namespace fly {
 

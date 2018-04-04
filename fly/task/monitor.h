@@ -7,9 +7,9 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
-DEFINE_CLASS_PTRS(Monitor);
-DEFINE_CLASS_PTRS(TaskConfig);
+FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(Monitor);
+FLY_CLASS_PTRS(TaskConfig);
 
 /**
  * Helper class to simplify creating a task to do some poll-based monitoring.

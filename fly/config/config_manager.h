@@ -14,8 +14,8 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(ConfigManager);
-DEFINE_CLASS_PTRS(PathMonitor);
+FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(PathMonitor);
 
 /**
  * Class to create and manage a set of configurations.
