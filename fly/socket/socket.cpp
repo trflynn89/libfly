@@ -2,7 +2,6 @@
 
 #include "fly/logger/logger.h"
 #include "fly/socket/socket_config.h"
-#include "fly/socket/socket_impl.h"
 #include "fly/string/string.h"
 
 namespace fly {

@@ -175,3 +175,5 @@ bool SocketManager::WaitForCompletedSend(
 }
 
 }
+
+#include FLY_OS_IMPL_PATH(socket, socket_manager)
