@@ -12,7 +12,7 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(JsonParser);
+FLY_CLASS_PTRS(JsonParser);
 
 /**
  * Implementation of the Parser interface for .json files.

@@ -15,8 +15,8 @@
 
 namespace fly {
 
-DEFINE_CLASS_PTRS(Json);
-DEFINE_CLASS_PTRS(JsonException);
+FLY_CLASS_PTRS(Json);
+FLY_CLASS_PTRS(JsonException);
 
 /**
  * Class to represent JSON values defined by http://www.json.org. The class

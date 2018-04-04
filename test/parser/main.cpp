@@ -1418,6 +1418,31 @@ TEST_F(JsonParserTest, EmptyObjectTest)
 }
 
 //==============================================================================
+TEST_F(JsonParserTest, NonObjectTest)
+{
+    CreateFile("\"\"");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("[]");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("true");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("1");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("-1");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("3.14");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("null");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+}
+
+//==============================================================================
 TEST_F(JsonParserTest, Test)
 {
     auto spParser = std::make_shared<fly::JsonParser>("/tmp", "test.json");
