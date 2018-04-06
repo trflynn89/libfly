@@ -151,6 +151,13 @@ protected:
 };
 
 //==============================================================================
+class BadConfig : public fly::Config
+{
+    // Badly written config class which does not override the GetName() method.
+    // It will have the same name as the base Config class.
+};
+
+//==============================================================================
 TEST_F(ConfigManagerTest, BadFileTypeTest)
 {
     m_spConfigManager->Stop();
@@ -202,6 +209,19 @@ TEST_F(ConfigManagerTest, DeletedConfigTest)
 
     spConfig = m_spConfigManager->CreateConfig<fly::Config>();
     EXPECT_FALSE(spConfig.get() == NULL);
+}
+
+//==============================================================================
+TEST_F(ConfigManagerTest, BadConfigTypeTest)
+{
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
+
+    auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize + 1);
+
+    auto spConfig2 = m_spConfigManager->CreateConfig<BadConfig>();
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize + 1);
+    EXPECT_FALSE(spConfig2);
 }
 
 //==============================================================================

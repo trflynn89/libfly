@@ -4,7 +4,6 @@
 #include <functional>
 #include <memory>
 
-#include "fly/logger/logger.h"
 #include "fly/parser/ini_parser.h"
 #include "fly/parser/json_parser.h"
 #include "fly/path/path_monitor.h"
@@ -78,7 +77,11 @@ bool ConfigManager::StartRunner()
     if (m_spParser)
     {
         ConfigManagerPtr spThis = SharedFromThis<ConfigManager>();
-        m_spMonitor = std::make_shared<PathMonitorImpl>(spThis);
+
+        if (spThis)
+        {
+            m_spMonitor = std::make_shared<PathMonitorImpl>(spThis);
+        }
 
         if (m_spMonitor && m_spMonitor->Start())
         {

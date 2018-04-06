@@ -49,18 +49,3 @@
 #elif defined (FLY_LINUX)
     #define FLY_OS_IMPL_PATH(module, clss) _FLY_OS_IMPL_PATH(module, nix, clss)
 #endif
-
-/**
- * Wrapper around static_pointer_cast to create a compile error if the type of
- * the given shared_ptr is not a parent of the desired type.
- *
- * @param shared_ptr The shared pointer to down cast.
- *
- * @return shared_ptr The casted shared pointer.
- */
-template <typename T, typename U>
-static std::shared_ptr<T> DownCast(const std::shared_ptr<U> &spObject)
-{
-    static_assert(std::is_base_of<U, T>::value, "Type T is not derived from type U");
-    return std::static_pointer_cast<T>(spObject);
-}
