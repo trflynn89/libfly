@@ -156,14 +156,14 @@ void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
     auto it = std::find_if(m_pathInfo.begin(), m_pathInfo.end(),
         [&pEvent](const PathInfoMap::value_type &value) -> bool
         {
-            PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(value.second));
+            PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(value.second));
             return (spInfo->m_watchDescriptor == pEvent->wd);
         }
     );
 
     if (it != m_pathInfo.end())
     {
-        PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(it->second));
+        PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
         PathMonitor::PathEvent event = convertToEvent(pEvent->mask);
 
         if (event != PathMonitor::NO_CHANGE)

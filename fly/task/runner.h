@@ -101,7 +101,7 @@ private:
 template <typename T>
 std::shared_ptr<T> Runner::SharedFromThis()
 {
-    return DownCast<T>(shared_from_this());
+    return std::dynamic_pointer_cast<T>(shared_from_this());
 }
 
 }

@@ -100,14 +100,14 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
         auto it = std::find_if(m_pathInfo.begin(), m_pathInfo.end(),
             [&pKey](const PathInfoMap::value_type &value) -> bool
             {
-                PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(value.second));
+                PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(value.second));
                 return ((ULONG_PTR)(spInfo->m_handle) == pKey);
             }
         );
 
         if (it != m_pathInfo.end())
         {
-            PathInfoImplPtr spInfo(DownCast<PathInfoImpl>(it->second));
+            PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
             handleEvents(spInfo, it->first);
 
             if (!spInfo->Refresh(it->first))

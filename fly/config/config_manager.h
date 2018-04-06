@@ -9,6 +9,7 @@
 
 #include "fly/fly.h"
 #include "fly/config/config.h"
+#include "fly/logger/logger.h"
 #include "fly/parser/parser.h"
 #include "fly/task/runner.h"
 
@@ -131,7 +132,7 @@ std::shared_ptr<T> ConfigManager::CreateConfig()
 
         if (spBaseConfig)
         {
-            spConfig = DownCast<T>(spBaseConfig);
+            spConfig = std::dynamic_pointer_cast<T>(spBaseConfig);
         }
         else
         {
@@ -140,7 +141,15 @@ std::shared_ptr<T> ConfigManager::CreateConfig()
         }
     }
 
-    spConfig->Update(m_spParser->GetValues(name));
+    if (spConfig)
+    {
+        spConfig->Update(m_spParser->GetValues(name));
+    }
+    else
+    {
+        LOGW(-1, "Could not create configuration for type %s", name);
+    }
+
     return spConfig;
 }
 
