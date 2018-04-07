@@ -12,6 +12,10 @@
 #include "fly/path/path_monitor.h"
 #include "fly/string/string.h"
 
+#ifdef FLY_LINUX
+    #include "test/mock/mock_system.h"
+#endif
+
 //==============================================================================
 class PathMonitorTest : public ::testing::Test
 {
@@ -169,6 +173,35 @@ TEST_F(PathMonitorTest, NullCallbackTest)
     ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, nullptr));
 }
 
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST_F(PathMonitorTest, MockFailedStartMonitorTest)
+{
+    m_spMonitor->RemoveAllPaths();
+    m_spMonitor->Stop();
+
+    fly::MockSystem mock(fly::MockCall::INOTIFY_INIT1);
+
+    ASSERT_FALSE(m_spMonitor->Start());
+
+    ASSERT_FALSE(m_spMonitor->AddPath(m_path0, [](...) { }));
+    ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, [](...) { }));
+}
+
+//==============================================================================
+TEST_F(PathMonitorTest, MockFailedAddPathTest)
+{
+    m_spMonitor->RemoveAllPaths();
+
+    fly::MockSystem mock(fly::MockCall::INOTIFY_ADD_WATCH);
+
+    ASSERT_FALSE(m_spMonitor->AddPath(m_path0, [](...) { }));
+    ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, [](...) { }));
+}
+
+#endif
+
 //==============================================================================
 TEST_F(PathMonitorTest, NoChangeTest_PathLevel)
 {
@@ -306,6 +339,50 @@ TEST_F(PathMonitorTest, ChangeTest_FileLevel)
     EXPECT_EQ(m_numChangedFiles[m_fullPath1], 1);
     EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
 }
+
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST_F(PathMonitorTest, MockFailedPollTest)
+{
+    fly::MockSystem mock(fly::MockCall::POLL);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numDeletedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
+
+    CreateFile(m_fullPath1, "abcdefghi");
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numDeletedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
+}
+
+//==============================================================================
+TEST_F(PathMonitorTest, MockFailedReadTest)
+{
+    fly::MockSystem mock(fly::MockCall::READ);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numDeletedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
+
+    CreateFile(m_fullPath1, "abcdefghi");
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numDeletedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
+}
+
+#endif
 
 //==============================================================================
 TEST_F(PathMonitorTest, OtherFileTest)
