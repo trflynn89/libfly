@@ -2,7 +2,6 @@
 
 #include <shlobj.h>
 #include <tchar.h>
-#include <Windows.h>
 
 #include "fly/logger/logger.h"
 
@@ -16,7 +15,14 @@ bool PathImpl::MakePath(const std::string &path)
 
     if (::GetFullPathName(path.c_str(), sizeof(buffer), buffer, NULL) > 0)
     {
-        ret = ::SHCreateDirectoryEx(NULL, buffer, NULL);
+        if (PathIsFile(buffer))
+        {
+            ret = ERROR_BAD_FILE_TYPE;
+        }
+        else
+        {
+            ret = ::SHCreateDirectoryEx(NULL, buffer, NULL);
+        }
     }
     else
     {
@@ -36,7 +42,7 @@ bool PathImpl::RemovePath(const std::string &path)
     TCHAR buffer[4096];
     DWORD len = ::GetFullPathName(path.c_str(), sizeof(buffer), buffer, NULL);
 
-    bool ret = ((len > 0) && (len < (sizeof(buffer) - 2)));
+    bool ret = ((len > 0) && (len < (sizeof(buffer) - 2)) && !PathIsFile(buffer));
 
     if (ret)
     {
@@ -88,6 +94,17 @@ std::string PathImpl::GetTempDirectory()
     }
 
     return ret;
+}
+
+//==============================================================================
+bool PathImpl::PathIsFile(LPCSTR path)
+{
+    DWORD attributes = ::GetFileAttributes(path);
+
+    return (
+        (attributes != INVALID_FILE_ATTRIBUTES) &&
+        ((attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+    );
 }
 
 }

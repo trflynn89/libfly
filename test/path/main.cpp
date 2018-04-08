@@ -503,6 +503,10 @@ TEST(PathTest, MakeAndRemovePathTest)
         fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
     ));
 
+    std::string path2(fly::Path::Join(
+        path, fly::String::GenerateRandomString(10)
+    ));
+
     // Should not be able to remove a non-existing path
     EXPECT_FALSE(fly::Path::RemovePath(path));
 
@@ -519,13 +523,15 @@ TEST(PathTest, MakeAndRemovePathTest)
     std::ofstream(path, std::ios::out);
 
     EXPECT_FALSE(fly::Path::MakePath(path));
-    EXPECT_FALSE(fly::Path::MakePath(
-        fly::Path::Join(path, fly::String::GenerateRandomString(10))
-    ));
+    EXPECT_FALSE(fly::Path::MakePath(path2));
 
     // Should not be able to remove a file
     EXPECT_FALSE(fly::Path::RemovePath(path));
     EXPECT_EQ(::remove(path.c_str()), 0);
+
+    // Should be able to recursively make and remove a directory
+    EXPECT_TRUE(fly::Path::MakePath(path2));
+    EXPECT_TRUE(fly::Path::RemovePath(path));
 }
 
 #ifdef FLY_LINUX
