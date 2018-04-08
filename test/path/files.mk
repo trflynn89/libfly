@@ -17,5 +17,6 @@ $(eval $(call WILDCARD_SOURCES))
 # Define mocked system calls
 $(eval $(call MOCK_SYSTEM_CALL, inotify_add_watch))
 $(eval $(call MOCK_SYSTEM_CALL, inotify_init1))
+$(eval $(call MOCK_SYSTEM_CALL, getenv))
 $(eval $(call MOCK_SYSTEM_CALL, poll))
 $(eval $(call MOCK_SYSTEM_CALL, read))

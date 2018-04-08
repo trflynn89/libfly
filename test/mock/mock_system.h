@@ -4,12 +4,18 @@
 
 #include "fly/fly.h"
 
+#if defined(FLY_WINDOWS)
+
+#elif defined(FLY_LINUX)
+    #include "test/mock/nix/mock_list.h"
+#endif
+
 namespace fly {
 
 /**
- * Enumerated list of mocked system calls.
+ * Alias for mapping a MockCall to its enabled flag.
  */
-enum class MockCall: unsigned int;
+using MockCalls = std::map<MockCall, bool>;
 
 /**
  * Class to control whether mocked or real system calls should be invoked for
@@ -46,15 +52,10 @@ public:
     static bool MockEnabled(MockCall);
 
 private:
-    static std::map<MockCall, bool> s_mockedCalls;
+    static bool s_mockSystemEnabled;
+    static MockCalls s_mockedCalls;
 
     const MockCall m_mock;
 };
 
 }
-
-#if defined(FLY_WINDOWS)
-
-#elif defined(FLY_LINUX)
-    #include "test/mock/nix/mock_list.h"
-#endif

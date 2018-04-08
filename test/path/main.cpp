@@ -537,6 +537,19 @@ TEST(PathTest, TempDirectoryTest)
     EXPECT_FALSE(temp.empty());
 }
 
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST(PathTest, MockTempDirectoryTest)
+{
+    fly::MockSystem mock(fly::MockCall::GETENV);
+
+    std::string temp(fly::Path::GetTempDirectory());
+    EXPECT_FALSE(temp.empty());
+}
+
+#endif
+
 //==============================================================================
 TEST(PathTest, JoinTest)
 {
