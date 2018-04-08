@@ -7,6 +7,8 @@ std::string MockCallName(MockCall call)
 {
     switch (call)
     {
+    case MockCall::FTS_READ:
+        return "fts_read";
     case MockCall::INOTIFY_ADD_WATCH:
         return "inotify_add_watch";
     case MockCall::INOTIFY_INIT1:
@@ -17,6 +19,8 @@ std::string MockCallName(MockCall call)
         return "poll";
     case MockCall::READ:
         return "read";
+    case MockCall::REMOVE:
+        return "remove";
     }
 
     return std::string();

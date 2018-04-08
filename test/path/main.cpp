@@ -514,7 +514,45 @@ TEST(PathTest, MakeAndRemovePathTest)
     // Should be able to remove path once
     EXPECT_TRUE(fly::Path::RemovePath(path));
     EXPECT_FALSE(fly::Path::RemovePath(path));
+
+    // Should not be able to make a path if it already exists as a file
+    std::ofstream(path, std::ios::out);
+
+    EXPECT_FALSE(fly::Path::MakePath(path));
+    EXPECT_FALSE(fly::Path::MakePath(
+        fly::Path::Join(path, fly::String::GenerateRandomString(10))
+    ));
+
+    // Should not be able to remove a file
+    EXPECT_FALSE(fly::Path::RemovePath(path));
+    EXPECT_EQ(::remove(path.c_str()), 0);
 }
+
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST(PathTest, MockRemovePathTest)
+{
+    std::string path(fly::Path::Join(
+        fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
+    ));
+
+    EXPECT_TRUE(fly::Path::MakePath(path));
+
+    {
+        fly::MockSystem mock(fly::MockCall::FTS_READ);
+        EXPECT_FALSE(fly::Path::RemovePath(path));
+    }
+
+    {
+        fly::MockSystem mock(fly::MockCall::REMOVE);
+        EXPECT_FALSE(fly::Path::RemovePath(path));
+    }
+
+    EXPECT_TRUE(fly::Path::RemovePath(path));
+}
+
+#endif
 
 //==============================================================================
 TEST(PathTest, SeparatorTest)

@@ -9,11 +9,13 @@ namespace fly {
  */
 enum class MockCall : unsigned int
 {
+    FTS_READ,
     INOTIFY_ADD_WATCH,
     INOTIFY_INIT1,
     GETENV,
     POLL,
     READ,
+    REMOVE,
 };
 
 /**
