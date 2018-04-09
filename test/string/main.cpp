@@ -328,6 +328,7 @@ TEST(StringTest, WildcardTest)
     EXPECT_FALSE(fly::String::WildcardMatch("abc", "a"));
     EXPECT_FALSE(fly::String::WildcardMatch("abc", "b*"));
     EXPECT_FALSE(fly::String::WildcardMatch("abc", "*b"));
+    EXPECT_FALSE(fly::String::WildcardMatch("abc", "*d*"));
 }
 
 //==============================================================================
@@ -344,6 +345,7 @@ TEST(StringTest, FormatTest)
 {
     EXPECT_EQ("", fly::String::Format(""));
     EXPECT_EQ("%", fly::String::Format("%"));
+    EXPECT_EQ("%", fly::String::Format("%", 1));
     EXPECT_EQ("%%", fly::String::Format("%%"));
     EXPECT_EQ("%d", fly::String::Format("%d"));
     EXPECT_EQ("This is a test", fly::String::Format("This is a test"));

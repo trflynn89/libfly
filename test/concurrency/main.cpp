@@ -78,6 +78,15 @@ namespace
     }
 
     //==========================================================================
+    Object InfiniteWaitReaderThread(ObjectQueue &objectQueue)
+    {
+        Object object;
+        objectQueue.Pop(object);
+
+        return object;
+    }
+
+    //==========================================================================
     void RunMultiThreadedTest(unsigned int numWriters, unsigned int numReaders)
     {
         ObjectQueue objectQueue;
@@ -177,4 +186,22 @@ TEST(ConcurrencyTest, MultiThreadedTest)
     RunMultiThreadedTest(1, 100);
     RunMultiThreadedTest(100, 1);
     RunMultiThreadedTest(100, 100);
+}
+
+//==============================================================================
+TEST(ConcurrencyTest, InfiniteWaitReaderTest)
+{
+    ObjectQueue objectQueue;
+    Object obj(123);
+
+    auto func = std::bind(&InfiniteWaitReaderThread, std::ref(objectQueue));
+    std::future<Object> future = std::async(std::launch::async, func);
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    objectQueue.Push(obj);
+
+    std::future_status status = future.wait_for(std::chrono::seconds(1));
+    ASSERT_EQ(status, std::future_status::ready);
+    ASSERT_EQ(future.get(), obj);
 }
