@@ -8,8 +8,16 @@ SRC_DIRS_$(d) := \
     fly/system \
     fly/task
 
+# Define linker flags
+LDFLAGS_$(d) += -static-libstdc++
+
 # Define libraries to link
 LDLIBS_$(d) := -lpthread
 
 # Define source files
 $(eval $(call WILDCARD_SOURCES))
+
+# Define mocked system calls
+$(eval $(call MOCK_SYSTEM_CALL, read))
+$(eval $(call MOCK_SYSTEM_CALL, sysinfo))
+$(eval $(call MOCK_SYSTEM_CALL, times))

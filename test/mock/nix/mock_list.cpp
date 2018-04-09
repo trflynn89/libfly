@@ -21,6 +21,10 @@ std::string MockCallName(MockCall call)
         return "read";
     case MockCall::REMOVE:
         return "remove";
+    case MockCall::SYSINFO:
+        return "sysinfo";
+    case MockCall::TIMES:
+        return "times";
     }
 
     return std::string();

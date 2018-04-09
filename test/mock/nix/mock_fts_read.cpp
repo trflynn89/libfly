@@ -1,7 +1,3 @@
-#include <cstring>
-
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <fts.h>
 
 #include "test/mock/mock_system.h"

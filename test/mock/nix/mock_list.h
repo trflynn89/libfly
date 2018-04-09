@@ -16,6 +16,8 @@ enum class MockCall : unsigned int
     POLL,
     READ,
     REMOVE,
+    SYSINFO,
+    TIMES,
 };
 
 /**

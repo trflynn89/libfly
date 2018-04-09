@@ -21,7 +21,6 @@ FLY_CLASS_PTRS(SystemMonitorImpl);
 class SystemMonitorImpl : public SystemMonitor
 {
 public:
-    SystemMonitorImpl();
     SystemMonitorImpl(ConfigManagerPtr &);
     virtual ~SystemMonitorImpl();
 

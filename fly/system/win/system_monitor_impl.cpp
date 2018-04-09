@@ -15,18 +15,6 @@ namespace
 }
 
 //==============================================================================
-SystemMonitorImpl::SystemMonitorImpl() :
-    SystemMonitor(),
-    m_process(::GetCurrentProcess()),
-    m_cpuQuery(NULL),
-    m_cpuCounter(NULL),
-    m_prevProcessSystemTime(0),
-    m_prevProcessUserTime(0),
-    m_prevTime(0)
-{
-}
-
-//==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(ConfigManagerPtr &spConfigManager) :
     SystemMonitor(spConfigManager),
     m_process(::GetCurrentProcess()),
