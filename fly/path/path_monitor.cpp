@@ -6,12 +6,6 @@
 namespace fly {
 
 //==============================================================================
-PathMonitor::PathMonitor() :
-    Monitor("PathMonitor")
-{
-}
-
-//==============================================================================
 PathMonitor::PathMonitor(ConfigManagerPtr &spConfigManager) :
     Monitor("PathMonitor", spConfigManager)
 {

@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
+#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/path/path.h"
 #include "fly/path/path_monitor.h"
@@ -21,7 +22,11 @@ class PathMonitorTest : public ::testing::Test
 {
 public:
     PathMonitorTest() :
-        m_spMonitor(std::make_shared<fly::PathMonitorImpl>()),
+        m_spConfigManager(std::make_shared<fly::ConfigManager>(
+            fly::ConfigManager::CONFIG_TYPE_INI, std::string(), std::string()
+        )),
+
+        m_spMonitor(std::make_shared<fly::PathMonitorImpl>(m_spConfigManager)),
 
         m_path0(fly::Path::Join(
             fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
@@ -136,6 +141,8 @@ protected:
             ASSERT_EQ(contents, sstream.str());
         }
     }
+
+    fly::ConfigManagerPtr m_spConfigManager;
 
     fly::PathMonitorPtr m_spMonitor;
 

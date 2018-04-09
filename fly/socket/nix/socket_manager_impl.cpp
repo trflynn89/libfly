@@ -11,11 +11,6 @@
 namespace fly {
 
 //==============================================================================
-SocketManagerImpl::SocketManagerImpl() : SocketManager()
-{
-}
-
-//==============================================================================
 SocketManagerImpl::SocketManagerImpl(ConfigManagerPtr &spConfigManager) :
     SocketManager(spConfigManager)
 {

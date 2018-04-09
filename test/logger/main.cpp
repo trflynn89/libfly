@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 
+#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/logger/logger_config.h"
 #include "fly/path/path.h"
@@ -15,10 +16,15 @@ class LoggerTest : public ::testing::Test
 {
 public:
     LoggerTest() :
+        m_spConfigManager(std::make_shared<fly::ConfigManager>(
+            fly::ConfigManager::CONFIG_TYPE_INI, std::string(), std::string()
+        )),
+
         m_path(fly::Path::Join(
             fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
         )),
-        m_spLogger(std::make_shared<fly::Logger>(m_path))
+
+        m_spLogger(std::make_shared<fly::Logger>(m_spConfigManager, m_path))
     {
         LOGC("Using path '%s'", m_path);
     }
@@ -89,6 +95,8 @@ protected:
     }
 
     std::string m_path;
+
+    fly::ConfigManagerPtr m_spConfigManager;
 
     fly::LoggerPtr m_spLogger;
 };

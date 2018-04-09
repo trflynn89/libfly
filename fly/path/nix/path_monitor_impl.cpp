@@ -29,13 +29,6 @@ namespace
 }
 
 //==============================================================================
-PathMonitorImpl::PathMonitorImpl() :
-    PathMonitor(),
-    m_monitorDescriptor(-1)
-{
-}
-
-//==============================================================================
 PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
     PathMonitor(spConfigManager),
     m_monitorDescriptor(-1)

@@ -21,13 +21,6 @@ class Monitor : public Runner
 {
 public:
     /**
-     * Constructor. Constructs a monitor with the default configuration.
-     *
-     * @param string Name to use for this monitor.
-     */
-    Monitor(const std::string &);
-
-    /**
      * Constructor.
      *
      * @param string Name to use for this monitor.

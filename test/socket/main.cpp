@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 #include "fly/concurrency/concurrent_queue.h"
+#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/async_request.h"
 #include "fly/socket/socket.h"
@@ -18,8 +19,13 @@ class SocketTest : public ::testing::Test
 {
 public:
     SocketTest() :
-        m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>()),
-        m_spClientSocketManager(std::make_shared<fly::SocketManagerImpl>()),
+        m_spConfigManager(std::make_shared<fly::ConfigManager>(
+            fly::ConfigManager::CONFIG_TYPE_INI, std::string(), std::string()
+        )),
+
+        m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>(m_spConfigManager)),
+        m_spClientSocketManager(std::make_shared<fly::SocketManagerImpl>(m_spConfigManager)),
+
         m_message(fly::String::GenerateRandomString((64 << 10) - 1)),
         m_host("localhost"),
         m_port(12390)
@@ -71,6 +77,8 @@ protected:
 
         return spSocket;
     }
+
+    fly::ConfigManagerPtr m_spConfigManager;
 
     fly::SocketManagerPtr m_spServerSocketManager;
     fly::SocketManagerPtr m_spClientSocketManager;

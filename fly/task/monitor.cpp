@@ -8,13 +8,6 @@
 namespace fly {
 
 //==============================================================================
-Monitor::Monitor(const std::string &name) :
-    Runner(name, 1),
-    m_spConfig(std::make_shared<TaskConfig>())
-{
-}
-
-//==============================================================================
 Monitor::Monitor(
     const std::string &name,
     ConfigManagerPtr &spConfigManager

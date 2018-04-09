@@ -34,12 +34,6 @@ public:
     typedef std::vector<SocketPtr> SocketList;
 
     /**
-     * Default constructor. Constructs a socket manager with default
-     * configuration.
-     */
-    SocketManager();
-
-    /**
      * Constructor.
      *
      * @param ConfigManagerPtr Reference to the configuration manager.

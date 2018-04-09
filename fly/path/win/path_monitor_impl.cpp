@@ -37,13 +37,6 @@ namespace
 }
 
 //==============================================================================
-PathMonitorImpl::PathMonitorImpl() :
-    PathMonitor(),
-    m_iocp(NULL)
-{
-}
-
-//==============================================================================
 PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
     PathMonitor(spConfigManager),
     m_iocp(NULL)

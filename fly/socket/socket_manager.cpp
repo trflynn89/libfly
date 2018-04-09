@@ -8,15 +8,6 @@
 namespace fly {
 
 //==============================================================================
-SocketManager::SocketManager() :
-    Runner("SocketManager", 1),
-    m_spConfig(std::make_shared<SocketConfig>()),
-    m_newClientCallback(nullptr),
-    m_closedClientCallback(nullptr)
-{
-}
-
-//==============================================================================
 SocketManager::SocketManager(ConfigManagerPtr &spConfigManager) :
     Runner("SocketManager", 1),
     m_spConfig(spConfigManager->CreateConfig<SocketConfig>()),

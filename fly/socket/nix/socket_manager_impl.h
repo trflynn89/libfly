@@ -20,7 +20,6 @@ FLY_CLASS_PTRS(ConfigManager);
 class SocketManagerImpl : public SocketManager
 {
 public:
-    SocketManagerImpl();
     SocketManagerImpl(ConfigManagerPtr &);
     virtual ~SocketManagerImpl();
 

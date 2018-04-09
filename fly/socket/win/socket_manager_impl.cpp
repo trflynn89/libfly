@@ -14,21 +14,6 @@ namespace fly {
 std::atomic_int SocketManagerImpl::s_socketManagerCount(0);
 
 //==============================================================================
-SocketManagerImpl::SocketManagerImpl() : SocketManager()
-{
-    if (s_socketManagerCount.fetch_add(1) == 0)
-    {
-        WORD version = MAKEWORD(2, 2);
-        WSADATA wsadata;
-
-        if (WSAStartup(version, &wsadata) != 0)
-        {
-            WSACleanup();
-        }
-    }
-}
-
-//==============================================================================
 SocketManagerImpl::SocketManagerImpl(ConfigManagerPtr &spConfigManager) :
     SocketManager(spConfigManager)
 {

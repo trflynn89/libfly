@@ -17,17 +17,6 @@ LoggerWPtr Logger::s_wpInstance;
 std::mutex Logger::s_consoleMutex;
 
 //==============================================================================
-Logger::Logger(const std::string &filePath) :
-    Runner("Logger", 1),
-    m_spConfig(std::make_shared<LoggerConfig>()),
-    m_filePath(filePath),
-    m_fileSize(0),
-    m_index(0),
-    m_startTime(std::chrono::high_resolution_clock::now())
-{
-}
-
-//==============================================================================
 Logger::Logger(ConfigManagerPtr &spConfigManager, const std::string &filePath) :
     Runner("Logger", 1),
     m_spConfig(spConfigManager->CreateConfig<LoggerConfig>()),
