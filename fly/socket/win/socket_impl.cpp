@@ -38,22 +38,16 @@ namespace
 }
 
 //==============================================================================
-SocketImpl::SocketImpl(int socketType, const SocketConfigPtr &spConfig) :
+SocketImpl::SocketImpl(Socket::SocketType socketType, const SocketConfigPtr &spConfig) :
     Socket(socketType, spConfig)
 {
-    switch (socketType)
+    if (IsTcp())
     {
-    case Socket::SOCKET_TCP:
         m_socketHandle = ::socket(AF_INET, SOCK_STREAM, 0);
-        break;
-
-    case Socket::SOCKET_UDP:
+    }
+    else if (IsUdp())
+    {
         m_socketHandle = ::socket(AF_INET, SOCK_DGRAM, 0);
-        break;
-
-    default:
-        LOGW(-1, "Unrecognized socket type: %d", socketType);
-        break;
     }
 }
 
@@ -168,13 +162,13 @@ bool SocketImpl::Connect(const std::string &hostname, int port)
 
         if ((error == WSAEWOULDBLOCK) || (error == WSAEINPROGRESS))
         {
-            m_aConnectedState.store(Socket::CONNECTING);
+            m_aConnectedState.store(Socket::ConnectedState::CONNECTING);
         }
 
         return false;
     }
 
-    m_aConnectedState.store(Socket::CONNECTED);
+    m_aConnectedState.store(Socket::ConnectedState::CONNECTED);
     return true;
 }
 
@@ -182,7 +176,7 @@ bool SocketImpl::Connect(const std::string &hostname, int port)
 SocketPtr SocketImpl::Accept() const
 {
     SocketImplPtr ret = std::make_shared<SocketImpl>(
-        Socket::SOCKET_TCP, m_spConfig
+        Socket::SocketType::SOCKET_TCP, m_spConfig
     );
 
     struct sockaddr_in client;
@@ -199,8 +193,8 @@ SocketPtr SocketImpl::Accept() const
     {
         ret->m_socketHandle = skt;
         ret->m_clientIp = ntohl(client.sin_addr.s_addr);
-        ret->m_clientPort = ntohl(client.sin_port);
-        ret->m_aConnectedState.store(Socket::CONNECTED);
+        ret->m_clientPort = ntohs(client.sin_port);
+        ret->m_aConnectedState.store(Socket::ConnectedState::CONNECTED);
     }
 
     return std::dynamic_pointer_cast<Socket>(ret);

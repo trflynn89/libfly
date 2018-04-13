@@ -18,15 +18,6 @@ AsyncRequest::AsyncRequest() :
 }
 
 //==============================================================================
-AsyncRequest::AsyncRequest(int socketId) :
-    m_socketId(socketId),
-    m_request(),
-    m_hostname(),
-    m_port()
-{
-}
-
-//==============================================================================
 AsyncRequest::AsyncRequest(int socketId, const std::string &request) :
     m_socketId(socketId),
     m_request(request),

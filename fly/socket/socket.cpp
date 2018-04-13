@@ -10,7 +10,7 @@ namespace fly {
 std::atomic_int Socket::s_aNumSockets(0);
 
 //==============================================================================
-Socket::Socket(int socketType, const SocketConfigPtr &spConfig) :
+Socket::Socket(SocketType socketType, const SocketConfigPtr &spConfig) :
     m_socketType(socketType),
     m_spConfig(spConfig),
     m_socketEoM(spConfig->EndOfMessage()),
@@ -20,7 +20,7 @@ Socket::Socket(int socketType, const SocketConfigPtr &spConfig) :
     m_clientPort(-1),
     m_isAsync(false),
     m_isListening(false),
-    m_aConnectedState(Socket::NOT_CONNECTED),
+    m_aConnectedState(Socket::ConnectedState::NOT_CONNECTED),
     m_socketId(s_aNumSockets.fetch_add(1))
 {
 }
@@ -64,13 +64,13 @@ int Socket::GetSocketId() const
 //==============================================================================
 bool Socket::IsTcp() const
 {
-    return (m_socketType == Socket::SOCKET_TCP);
+    return (m_socketType == Socket::SocketType::SOCKET_TCP);
 }
 
 //==============================================================================
 bool Socket::IsUdp() const
 {
-    return (m_socketType == Socket::SOCKET_UDP);
+    return (m_socketType == Socket::SocketType::SOCKET_UDP);
 }
 
 //==============================================================================
@@ -88,31 +88,31 @@ bool Socket::IsListening() const
 //==============================================================================
 bool Socket::IsConnecting() const
 {
-    return (m_aConnectedState.load() == Socket::CONNECTING);
+    return (m_aConnectedState.load() == Socket::ConnectedState::CONNECTING);
 }
 
 //==============================================================================
 bool Socket::IsConnected() const
 {
-    return (m_aConnectedState.load() == Socket::CONNECTED);
+    return (m_aConnectedState.load() == Socket::ConnectedState::CONNECTED);
 }
 
 //==============================================================================
 Socket::ConnectedState Socket::ConnectAsync(std::string hostname, int port)
 {
-    Socket::ConnectedState state = NOT_CONNECTED;
+    Socket::ConnectedState state = Socket::ConnectedState::NOT_CONNECTED;
 
-    if ((m_socketType == Socket::SOCKET_TCP) && IsAsync())
+    if (IsTcp() && IsAsync())
     {
         if (Connect(hostname, port))
         {
             LOGD(m_socketId, "Connected to %s:%d", hostname, port);
-            state = CONNECTED;
+            state = Socket::ConnectedState::CONNECTED;
         }
         else if (IsConnecting())
         {
             LOGD(m_socketId, "Connect to %s:%d in progress", hostname, port);
-            state = CONNECTING;
+            state = Socket::ConnectedState::CONNECTING;
         }
         else
         {
@@ -132,12 +132,12 @@ bool Socket::FinishConnect()
     if (IsValid() & IsConnecting() && IsErrorFree())
     {
         LOGD(m_socketId, "Connection completed");
-        m_aConnectedState.store(Socket::CONNECTED);
+        m_aConnectedState.store(Socket::ConnectedState::CONNECTED);
     }
     else
     {
         LOGW(m_socketId, "Could not connect, closing socket");
-        m_aConnectedState.store(Socket::NOT_CONNECTED);
+        m_aConnectedState.store(Socket::ConnectedState::NOT_CONNECTED);
         Close();
     }
 
@@ -147,7 +147,7 @@ bool Socket::FinishConnect()
 //==============================================================================
 bool Socket::SendAsync(const std::string &msg)
 {
-    if ((m_socketType == Socket::SOCKET_TCP) && IsAsync())
+    if (IsTcp() && IsAsync())
     {
         AsyncRequest request(m_socketId, msg);
         m_pendingSends.Push(request);
@@ -165,7 +165,7 @@ bool Socket::SendToAsync(
     int port
 )
 {
-    if ((m_socketType == Socket::SOCKET_UDP) && IsAsync())
+    if (IsUdp() && IsAsync())
     {
         AsyncRequest request(m_socketId, msg, hostname, port);
         m_pendingSends.Push(request);
@@ -191,11 +191,11 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
             const std::string &msg = request.GetRequest();
             size_t bytesSent = 0;
 
-            if (m_socketType == Socket::SOCKET_TCP)
+            if (IsTcp())
             {
                 bytesSent = Send(msg, wouldBlock);
             }
-            else
+            else if (IsUdp())
             {
                 const std::string &hostname = request.GetHostname();
                 int port = request.GetPort();
@@ -234,11 +234,11 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
     {
         std::string received;
 
-        if (m_socketType == Socket::SOCKET_TCP)
+        if (IsTcp())
         {
             received = Recv(wouldBlock, isComplete);
         }
-        else
+        else if (IsUdp())
         {
             received = RecvFrom(wouldBlock, isComplete);
         }

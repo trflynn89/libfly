@@ -24,12 +24,6 @@ public:
     AsyncRequest();
 
     /**
-     * Constructor to set the ID of the owning socket, while setting the
-     * request message to an empty string.
-     */
-    AsyncRequest(int);
-
-    /**
      * Constructor to set the ID of the owning socket and the request message.
      */
     AsyncRequest(int, const std::string &);

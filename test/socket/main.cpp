@@ -105,8 +105,12 @@ public:
     void ServerThread(bool doAsync)
     {
         fly::SocketPtr spAcceptSocket = CreateSocket(m_spServerSocketManager, doAsync, true);
+
         ASSERT_TRUE(spAcceptSocket && spAcceptSocket->IsValid());
         ASSERT_EQ(spAcceptSocket->IsAsync(), doAsync);
+        ASSERT_GE(spAcceptSocket->GetSocketId(), 0);
+        ASSERT_TRUE(spAcceptSocket->IsTcp());
+        ASSERT_FALSE(spAcceptSocket->IsUdp());
 
         ASSERT_TRUE(spAcceptSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
         ASSERT_TRUE(spAcceptSocket->Listen());
@@ -119,11 +123,19 @@ public:
 
             ASSERT_TRUE(m_spServerSocketManager->WaitForCompletedReceive(request, waitTime));
             ASSERT_EQ(m_message, request.GetRequest());
+
+            ASSERT_GE(request.GetSocketId(), 0);
         }
         else
         {
             fly::SocketPtr spRecvSocket = spAcceptSocket->Accept();
             ASSERT_EQ(spRecvSocket->Recv(), m_message);
+
+            ASSERT_GT(spRecvSocket->GetClientIp(), 0);
+            ASSERT_GT(spRecvSocket->GetClientPort(), 0);
+            ASSERT_GE(spRecvSocket->GetSocketId(), 0);
+            ASSERT_TRUE(spRecvSocket->IsTcp());
+            ASSERT_FALSE(spRecvSocket->IsUdp());
         }
     }
 
@@ -134,8 +146,12 @@ public:
     void ClientThread(bool doAsync)
     {
         fly::SocketPtr spSendSocket = CreateSocket(m_spClientSocketManager, doAsync, true);
+
         ASSERT_TRUE(spSendSocket && spSendSocket->IsValid());
         ASSERT_EQ(spSendSocket->IsAsync(), doAsync);
+        ASSERT_GE(spSendSocket->GetSocketId(), 0);
+        ASSERT_TRUE(spSendSocket->IsTcp());
+        ASSERT_FALSE(spSendSocket->IsUdp());
 
         int item = 0;
         std::chrono::seconds waitTime(120);
@@ -147,20 +163,23 @@ public:
         if (doAsync)
         {
             fly::Socket::ConnectedState state = spSendSocket->ConnectAsync(m_host, m_port);
-            ASSERT_NE(state, fly::Socket::NOT_CONNECTED);
+            ASSERT_NE(state, fly::Socket::ConnectedState::NOT_CONNECTED);
 
-            if (state == fly::Socket::CONNECTING)
+            if (state == fly::Socket::ConnectedState::CONNECTING)
             {
                 ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
                 ASSERT_TRUE(spSendSocket->IsConnected());
             }
 
+            ASSERT_TRUE(spSendSocket->SendAsync(m_message));
+
             fly::AsyncRequest request;
             std::chrono::seconds waitTime(120);
 
-            ASSERT_TRUE(spSendSocket->SendAsync(m_message));
             ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
             ASSERT_EQ(m_message, request.GetRequest());
+
+            ASSERT_EQ(request.GetSocketId(), spSendSocket->GetSocketId());
         }
         else
         {
@@ -187,8 +206,12 @@ public:
     void ServerThread(bool doAsync)
     {
         fly::SocketPtr spRecvSocket = CreateSocket(m_spServerSocketManager, doAsync, false);
+
         ASSERT_TRUE(spRecvSocket && spRecvSocket->IsValid());
         ASSERT_EQ(spRecvSocket->IsAsync(), doAsync);
+        ASSERT_GE(spRecvSocket->GetSocketId(), 0);
+        ASSERT_FALSE(spRecvSocket->IsTcp());
+        ASSERT_TRUE(spRecvSocket->IsUdp());
 
         ASSERT_TRUE(spRecvSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
         m_eventQueue.Push(1);
@@ -200,6 +223,8 @@ public:
 
             ASSERT_TRUE(m_spServerSocketManager->WaitForCompletedReceive(request, waitTime));
             ASSERT_EQ(m_message, request.GetRequest());
+
+            ASSERT_EQ(request.GetSocketId(), spRecvSocket->GetSocketId());
         }
         else
         {
@@ -214,8 +239,12 @@ public:
     void ClientThread(bool doAsync)
     {
         fly::SocketPtr spSendSocket = CreateSocket(m_spClientSocketManager, doAsync, false);
+
         ASSERT_TRUE(spSendSocket && spSendSocket->IsValid());
         ASSERT_EQ(spSendSocket->IsAsync(), doAsync);
+        ASSERT_GE(spSendSocket->GetSocketId(), 0);
+        ASSERT_FALSE(spSendSocket->IsTcp());
+        ASSERT_TRUE(spSendSocket->IsUdp());
 
         int item = 0;
         std::chrono::seconds waitTime(120);
@@ -223,12 +252,15 @@ public:
 
         if (doAsync)
         {
+            ASSERT_TRUE(spSendSocket->SendToAsync(m_message, m_host, m_port));
+
             fly::AsyncRequest request;
             std::chrono::seconds waitTime(120);
 
-            ASSERT_TRUE(spSendSocket->SendToAsync(m_message, m_host, m_port));
             ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
             ASSERT_EQ(m_message, request.GetRequest());
+
+            ASSERT_EQ(request.GetSocketId(), spSendSocket->GetSocketId());
         }
         else
         {

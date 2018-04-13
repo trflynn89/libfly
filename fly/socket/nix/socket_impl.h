@@ -19,7 +19,7 @@ FLY_CLASS_PTRS(SocketImpl);
 class SocketImpl : public Socket
 {
 public:
-    SocketImpl(int, const SocketConfigPtr &);
+    SocketImpl(Socket::SocketType, const SocketConfigPtr &);
     ~SocketImpl();
 
     static int InAddrAny();

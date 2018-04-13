@@ -26,7 +26,7 @@ public:
     /**
      * Types of supported sockets.
      */
-    enum SocketType
+    enum class SocketType
     {
         SOCKET_TCP,
         SOCKET_UDP
@@ -35,7 +35,7 @@ public:
     /**
      * Enumerated connection state values.
      */
-    enum ConnectedState
+    enum class ConnectedState
     {
         NOT_CONNECTED,
         CONNECTING,
@@ -45,7 +45,7 @@ public:
     /**
      * Default constructor to initialize all values.
      */
-    Socket(int, const SocketConfigPtr &);
+    Socket(SocketType, const SocketConfigPtr &);
 
     /**
      * INADDR_ANY may be different depending on the OS. This function will
@@ -298,7 +298,7 @@ public:
 
 protected:
     // Socket type
-    int m_socketType;
+    SocketType m_socketType;
 
     // Socket config
     const SocketConfigPtr &m_spConfig;
