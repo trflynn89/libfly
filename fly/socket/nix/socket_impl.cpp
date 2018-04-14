@@ -43,8 +43,8 @@ namespace
 }
 
 //==============================================================================
-SocketImpl::SocketImpl(Socket::SocketType socketType, const SocketConfigPtr &spConfig) :
-    Socket(socketType, spConfig)
+SocketImpl::SocketImpl(Socket::Protocol protocol, const SocketConfigPtr &spConfig) :
+    Socket(protocol, spConfig)
 {
     if (IsTcp())
     {
@@ -69,12 +69,18 @@ int SocketImpl::InAddrAny()
 }
 
 //==============================================================================
+socket_type SocketImpl::InvalidSocket()
+{
+    return -1;
+}
+
+//==============================================================================
 void SocketImpl::Close()
 {
     if (IsValid())
     {
         ::close(m_socketHandle);
-        m_socketHandle = 0;
+        m_socketHandle = InvalidSocket();
     }
 }
 
@@ -102,7 +108,7 @@ bool SocketImpl::SetAsync()
         LOGS(m_socketHandle, "Error getting socket flags");
         return false;
     }
-    else if (fcntl(m_socketHandle, F_SETFL, flags | O_NONBLOCK) == -1)
+    else if (::fcntl(m_socketHandle, F_SETFL, flags | O_NONBLOCK) == -1)
     {
         LOGS(m_socketHandle, "Error setting async flag");
         return false;
@@ -187,7 +193,7 @@ bool SocketImpl::Connect(const std::string &hostname, int port)
 SocketPtr SocketImpl::Accept() const
 {
     SocketImplPtr ret = std::make_shared<SocketImpl>(
-        Socket::SocketType::SOCKET_TCP, m_spConfig
+        Socket::Protocol::TCP, m_spConfig
     );
 
     struct sockaddr_in client;
@@ -195,7 +201,7 @@ SocketPtr SocketImpl::Accept() const
 
     int skt = ::accept(m_socketHandle, (struct sockaddr *)&client, &clientLen);
 
-    if (skt == -1)
+    if (skt == InvalidSocket())
     {
         LOGS(m_socketHandle, "Error accepting");
         ret.reset();

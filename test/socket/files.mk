@@ -14,3 +14,7 @@ LDLIBS_$(d) := -lpthread
 
 # Define source files
 $(eval $(call WILDCARD_SOURCES))
+
+# Define mocked system calls
+$(eval $(call MOCK_SYSTEM_CALL, fcntl))
+$(eval $(call MOCK_SYSTEM_CALL, socket))

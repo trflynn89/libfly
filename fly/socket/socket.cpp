@@ -10,12 +10,12 @@ namespace fly {
 std::atomic_int Socket::s_aNumSockets(0);
 
 //==============================================================================
-Socket::Socket(SocketType socketType, const SocketConfigPtr &spConfig) :
-    m_socketType(socketType),
+Socket::Socket(Protocol protocol, const SocketConfigPtr &spConfig) :
+    m_protocol(protocol),
     m_spConfig(spConfig),
     m_socketEoM(spConfig->EndOfMessage()),
     m_packetSize(spConfig->PacketSize()),
-    m_socketHandle(0),
+    m_socketHandle(InvalidSocket()),
     m_clientIp(-1),
     m_clientPort(-1),
     m_isAsync(false),
@@ -32,13 +32,19 @@ int Socket::InAddrAny()
 }
 
 //==============================================================================
-bool Socket::IsValid() const
+socket_type Socket::InvalidSocket()
 {
-    return (m_socketHandle > 0);
+    return SocketImpl::InvalidSocket();
 }
 
 //==============================================================================
-size_t Socket::GetHandle() const
+bool Socket::IsValid() const
+{
+    return (m_socketHandle != InvalidSocket());
+}
+
+//==============================================================================
+socket_type Socket::GetHandle() const
 {
     return m_socketHandle;
 }
@@ -64,13 +70,13 @@ int Socket::GetSocketId() const
 //==============================================================================
 bool Socket::IsTcp() const
 {
-    return (m_socketType == Socket::SocketType::SOCKET_TCP);
+    return (m_protocol == Socket::Protocol::TCP);
 }
 
 //==============================================================================
 bool Socket::IsUdp() const
 {
-    return (m_socketType == Socket::SocketType::SOCKET_UDP);
+    return (m_protocol == Socket::Protocol::UDP);
 }
 
 //==============================================================================

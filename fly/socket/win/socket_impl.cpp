@@ -38,8 +38,8 @@ namespace
 }
 
 //==============================================================================
-SocketImpl::SocketImpl(Socket::SocketType socketType, const SocketConfigPtr &spConfig) :
-    Socket(socketType, spConfig)
+SocketImpl::SocketImpl(Socket::Protocol protocol, const SocketConfigPtr &spConfig) :
+    Socket(protocol, spConfig)
 {
     if (IsTcp())
     {
@@ -64,12 +64,18 @@ int SocketImpl::InAddrAny()
 }
 
 //==============================================================================
+socket_type SocketImpl::InvalidSocket()
+{
+    return INVALID_SOCKET;
+}
+
+//==============================================================================
 void SocketImpl::Close()
 {
     if (IsValid())
     {
         ::closesocket(m_socketHandle);
-        m_socketHandle = 0;
+        m_socketHandle = InvalidSocket();
     }
 }
 
@@ -176,7 +182,7 @@ bool SocketImpl::Connect(const std::string &hostname, int port)
 SocketPtr SocketImpl::Accept() const
 {
     SocketImplPtr ret = std::make_shared<SocketImpl>(
-        Socket::SocketType::SOCKET_TCP, m_spConfig
+        Socket::Protocol::TCP, m_spConfig
     );
 
     struct sockaddr_in client;
@@ -184,7 +190,7 @@ SocketPtr SocketImpl::Accept() const
 
     SOCKET skt = ::accept(m_socketHandle, (struct sockaddr *)&client, &clientLen);
 
-    if (skt == INVALID_SOCKET)
+    if (skt == InvalidSocket())
     {
         LOGS(m_socketHandle, "Error accepting");
         ret.reset();

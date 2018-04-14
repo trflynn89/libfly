@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 
+#include "fly/fly.h"
 #include "fly/concurrency/concurrent_queue.h"
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
@@ -13,6 +14,10 @@
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_manager.h"
 #include "fly/string/string.h"
+
+#ifdef FLY_LINUX
+    #include "test/mock/mock_system.h"
+#endif
 
 //==============================================================================
 class SocketTest : public ::testing::Test
@@ -32,8 +37,15 @@ public:
     {
     }
 
-    virtual void ServerThread(bool doAsync) = 0;
-    virtual void ClientThread(bool doAsync) = 0;
+    virtual void ServerThread(bool)
+    {
+        ASSERT_TRUE(false);
+    };
+
+    virtual void ClientThread(bool)
+    {
+        ASSERT_TRUE(false);
+    };
 
 protected:
     /**
@@ -89,6 +101,35 @@ protected:
     std::string m_host;
     int m_port;
 };
+
+#ifdef FLY_LINUX
+
+/**
+ * Test handling for when socket creation fails.
+ */
+TEST_F(SocketTest, MockCreateSocketTest)
+{
+    {
+        fly::MockSystem mock(fly::MockCall::SOCKET);
+
+        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, false, true));
+        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, false, false));
+
+        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, true));
+        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, false));
+    }
+    {
+        fly::MockSystem mock(fly::MockCall::FCNTL);
+
+        ASSERT_TRUE(CreateSocket(m_spServerSocketManager, false, true));
+        ASSERT_TRUE(CreateSocket(m_spServerSocketManager, false, false));
+
+        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, true));
+        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, false));
+    }
+}
+
+#endif
 
 //==============================================================================
 class TcpSocketTest : public SocketTest

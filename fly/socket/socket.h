@@ -7,6 +7,7 @@
 
 #include "fly/fly.h"
 #include "fly/socket/async_request.h"
+#include "fly/socket/socket_type.h"
 
 namespace fly {
 
@@ -26,10 +27,10 @@ public:
     /**
      * Types of supported sockets.
      */
-    enum class SocketType
+    enum class Protocol
     {
-        SOCKET_TCP,
-        SOCKET_UDP
+        TCP,
+        UDP
     };
 
     /**
@@ -45,7 +46,7 @@ public:
     /**
      * Default constructor to initialize all values.
      */
-    Socket(SocketType, const SocketConfigPtr &);
+    Socket(Protocol, const SocketConfigPtr &);
 
     /**
      * INADDR_ANY may be different depending on the OS. This function will
@@ -54,6 +55,14 @@ public:
      * @return INADDR_ANY for the target system.
      */
     static int InAddrAny();
+
+    /**
+     * Invalid socket handles may be different depending on the OS. This
+     * function will return the value for the compiled target's OS.
+     *
+     * @return Invalid socket handle for the target system.
+     */
+    static socket_type InvalidSocket();
 
     /**
      *  A socket is valid if it's handle has been properly set.
@@ -82,7 +91,7 @@ public:
     /**
      * @return Return this socket's handle.
      */
-    size_t GetHandle() const;
+    socket_type GetHandle() const;
 
     /**
      * @return Return the client IP this socket is connected to.
@@ -297,8 +306,8 @@ public:
     void ServiceRecvRequests(AsyncRequest::RequestQueue &);
 
 protected:
-    // Socket type
-    SocketType m_socketType;
+    // Socket protocol
+    Protocol m_protocol;
 
     // Socket config
     const SocketConfigPtr &m_spConfig;
@@ -310,7 +319,7 @@ protected:
     const size_t m_packetSize;
 
     // File descriptor for this socket.
-    size_t m_socketHandle;
+    socket_type m_socketHandle;
 
     // Client IP and port this socket is connected to.
     int m_clientIp;
