@@ -7,6 +7,8 @@ std::string MockCallName(MockCall call)
 {
     switch (call)
     {
+    case MockCall::BIND:
+        return "bind";
     case MockCall::FCNTL:
         return "fcntl";
     case MockCall::FTS_READ:
@@ -23,6 +25,8 @@ std::string MockCallName(MockCall call)
         return "read";
     case MockCall::REMOVE:
         return "remove";
+    case MockCall::SETSOCKOPT:
+        return "setsockopt";
     case MockCall::SOCKET:
         return "socket";
     case MockCall::SYSINFO:

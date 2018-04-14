@@ -65,7 +65,7 @@ public:
     static socket_type InvalidSocket();
 
     /**
-     *  A socket is valid if it's handle has been properly set.
+     * A socket is valid if it's handle has been properly set.
      *
      * @return True if this is a valid socket, false otherwise.
      */
@@ -109,18 +109,22 @@ public:
     int GetSocketId() const;
 
     /**
-     * Bind this socket to a server.
+     * Bind this socket to an address.
      *
      * @param int The server IP to bind to.
      * @param int The server port to bind to.
+     *
+     * @return True if the binding was successful.
      */
     virtual bool Bind(int, int) const = 0;
 
     /**
-     * Bind this socket to a server, allowing port to be reused.
+     * Bind this socket to an address, allowing the port to be reused.
      *
      * @param int The server IP to bind to.
      * @param int The server port to bind to.
+     *
+     * @return True if the binding was successful.
      */
     virtual bool BindForReuse(int, int) const = 0;
 
