@@ -127,6 +127,14 @@ protected:
     virtual bool DoWork() = 0;
 
     /**
+     * Add new sockets to and remove closed sockets from the socket system.
+     *
+     * @param SocketList Newly added sockets.
+     * @param SocketList Newly closed sockets.
+     */
+    void HandleNewAndClosedSockets(const SocketList &, const SocketList &);
+
+    /**
      * Trigger the connected and closed client callbacks.
      *
      * @param SocketList Newly connected clients.

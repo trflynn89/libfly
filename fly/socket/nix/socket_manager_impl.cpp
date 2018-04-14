@@ -129,23 +129,7 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
         }
     }
 
-    m_aioSockets.insert(m_aioSockets.end(), newClients.begin(), newClients.end());
-
-    for (auto it = closedClients.begin(); it != closedClients.end(); ++it)
-    {
-        SocketPtr &spSocket = *it;
-
-        auto isSameSocket = [&](SocketPtr spClosed)
-        {
-            return (spSocket->GetSocketId() == spClosed->GetSocketId());
-        };
-
-        m_aioSockets.erase(
-            std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), isSameSocket),
-            m_aioSockets.end()
-        );
-    }
-
+    HandleNewAndClosedSockets(newClients, closedClients);
     TriggerCallbacks(connectedClients, closedClients);
 }
 

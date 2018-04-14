@@ -130,6 +130,32 @@ void SocketManager::StopRunner()
 }
 
 //==============================================================================
+void SocketManager::HandleNewAndClosedSockets(
+    const SocketList &newSockets,
+    const SocketList &closedSockets
+)
+{
+    // Add new sockets to the socket system
+    m_aioSockets.insert(m_aioSockets.end(), newSockets.begin(), newSockets.end());
+
+    // Remove closed sockets from the socket system
+    for (auto it = closedSockets.begin(); it != closedSockets.end(); ++it)
+    {
+        const SocketPtr &spSocket = *it;
+
+        auto isSameSocket = [&spSocket](SocketPtr spClosed)
+        {
+            return (spSocket->GetSocketId() == spClosed->GetSocketId());
+        };
+
+        m_aioSockets.erase(
+            std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), isSameSocket),
+            m_aioSockets.end()
+        );
+    }
+}
+
+//==============================================================================
 void SocketManager::TriggerCallbacks(
     const SocketList &connectedClients,
     const SocketList &closedClients
