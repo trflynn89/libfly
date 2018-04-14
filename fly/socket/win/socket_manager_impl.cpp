@@ -138,7 +138,8 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
                 }
             }
         }
-        else
+
+        if (!spSocket->IsValid())
         {
             closedClients.push_back(spSocket);
         }

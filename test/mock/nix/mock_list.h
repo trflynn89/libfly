@@ -23,6 +23,8 @@ enum class MockCall : unsigned int
     POLL,
     READ,
     REMOVE,
+    SEND,
+    SENDTO,
     SETSOCKOPT,
     SOCKET,
     SYSINFO,

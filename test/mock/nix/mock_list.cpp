@@ -35,6 +35,10 @@ std::string MockCallName(MockCall call)
         return "read";
     case MockCall::REMOVE:
         return "remove";
+    case MockCall::SEND:
+        return "send";
+    case MockCall::SENDTO:
+        return "sendto";
     case MockCall::SETSOCKOPT:
         return "setsockopt";
     case MockCall::SOCKET:
