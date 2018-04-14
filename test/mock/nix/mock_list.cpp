@@ -7,6 +7,8 @@ std::string MockCallName(MockCall call)
 {
     switch (call)
     {
+    case MockCall::ACCEPT:
+        return "accept";
     case MockCall::BIND:
         return "bind";
     case MockCall::CONNECT:

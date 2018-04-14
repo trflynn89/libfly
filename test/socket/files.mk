@@ -16,6 +16,7 @@ LDLIBS_$(d) := -lpthread
 $(eval $(call WILDCARD_SOURCES))
 
 # Define mocked system calls
+$(eval $(call MOCK_SYSTEM_CALL, accept))
 $(eval $(call MOCK_SYSTEM_CALL, bind))
 $(eval $(call MOCK_SYSTEM_CALL, connect))
 $(eval $(call MOCK_SYSTEM_CALL, fcntl))

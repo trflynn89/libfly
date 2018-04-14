@@ -221,6 +221,20 @@ TEST_F(SocketTest, MockConnectTest)
     }
 }
 
+/**
+ * Test handling for when socket accepting fails.
+ */
+TEST_F(SocketTest, MockAcceptTest)
+{
+    fly::MockSystem mock(fly::MockCall::ACCEPT);
+
+    fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
+
+    ASSERT_TRUE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spSocket->Listen());
+    ASSERT_FALSE(spSocket->Accept());
+}
+
 #endif
 
 //==============================================================================

@@ -9,6 +9,7 @@ namespace fly {
  */
 enum class MockCall : unsigned int
 {
+    ACCEPT,
     BIND,
     CONNECT,
     FCNTL,
