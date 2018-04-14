@@ -148,7 +148,6 @@ TEST_F(SocketTest, MockBindTest)
         fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
 
         ASSERT_FALSE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
-        ASSERT_TRUE(spSocket->Bind(fly::Socket::InAddrAny(), m_port));
     }
 }
 
@@ -163,6 +162,63 @@ TEST_F(SocketTest, MockListenTest)
 
     ASSERT_TRUE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
     ASSERT_FALSE(spSocket->Listen());
+}
+
+/**
+ * Test handling for when socket connecting fails.
+ */
+TEST_F(SocketTest, MockConnectTest)
+{
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Listen());
+
+    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr spSocket)
+    {
+        m_eventQueue.Push(spSocket->GetSocketId());
+    });
+
+    m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
+
+    {
+        fly::MockSystem mock(fly::MockCall::CONNECT);
+
+        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
+        ASSERT_FALSE(spClientSocket->Connect(m_host, m_port));
+    }
+
+    {
+        fly::MockSystem mock(fly::MockCall::CONNECT);
+
+        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
+
+        fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
+        ASSERT_EQ(state, fly::Socket::ConnectedState::NOT_CONNECTED);
+    }
+
+    {
+        fly::MockSystem mock(fly::MockCall::GETSOCKOPT);
+
+        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
+
+        fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
+        ASSERT_NE(state, fly::Socket::ConnectedState::NOT_CONNECTED);
+
+        if (state == fly::Socket::ConnectedState::CONNECTING)
+        {
+            int item = 0;
+            std::chrono::seconds waitTime(120);
+
+            while (item != spClientSocket->GetSocketId())
+            {
+                ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+            }
+        }
+
+        ASSERT_FALSE(spClientSocket->IsConnected());
+        ASSERT_FALSE(spClientSocket->IsValid());
+    }
 }
 
 #endif

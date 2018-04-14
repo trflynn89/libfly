@@ -10,8 +10,10 @@ namespace fly {
 enum class MockCall : unsigned int
 {
     BIND,
+    CONNECT,
     FCNTL,
     FTS_READ,
+    GETSOCKOPT,
     INOTIFY_ADD_WATCH,
     INOTIFY_INIT1,
     GETENV,

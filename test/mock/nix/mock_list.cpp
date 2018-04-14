@@ -9,10 +9,14 @@ std::string MockCallName(MockCall call)
     {
     case MockCall::BIND:
         return "bind";
+    case MockCall::CONNECT:
+        return "connect";
     case MockCall::FCNTL:
         return "fcntl";
     case MockCall::FTS_READ:
         return "fts_read";
+    case MockCall::GETSOCKOPT:
+        return "getsockopt";
     case MockCall::INOTIFY_ADD_WATCH:
         return "inotify_add_watch";
     case MockCall::INOTIFY_INIT1:

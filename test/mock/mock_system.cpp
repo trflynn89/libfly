@@ -5,12 +5,15 @@
 namespace fly {
 
 //==============================================================================
+std::mutex MockSystem::s_mockSystemMutex;
 bool MockSystem::s_mockSystemEnabled = false;
 MockCalls MockSystem::s_mockedCalls;
 
 //==============================================================================
 MockSystem::MockSystem(MockCall mock) : m_mock(mock)
 {
+    std::lock_guard<std::mutex> lock(s_mockSystemMutex);
+
     s_mockedCalls[m_mock] = true;
     s_mockSystemEnabled = true;
 }
@@ -18,6 +21,8 @@ MockSystem::MockSystem(MockCall mock) : m_mock(mock)
 //==============================================================================
 MockSystem::~MockSystem()
 {
+    std::lock_guard<std::mutex> lock(s_mockSystemMutex);
+
     auto it = s_mockedCalls.find(m_mock);
 
     if (it != s_mockedCalls.end())
@@ -31,6 +36,8 @@ MockSystem::~MockSystem()
 //==============================================================================
 bool MockSystem::MockEnabled(MockCall mock)
 {
+    std::lock_guard<std::mutex> lock(s_mockSystemMutex);
+
     if (s_mockSystemEnabled)
     {
         auto it = s_mockedCalls.find(mock);

@@ -29,7 +29,7 @@ bool SocketManagerImpl::DoWork()
     suseconds_t usec = static_cast<suseconds_t>(m_spConfig->IoWaitTime().count());
     struct timeval tv { 0, usec };
 
-    ssize_t maxFd = -1;
+    socket_type maxFd = -1;
     {
         std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
         maxFd = setReadAndWriteMasks(&readFd, &writeFd);
@@ -48,9 +48,9 @@ bool SocketManagerImpl::DoWork()
 }
 
 //==============================================================================
-ssize_t SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
+socket_type SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
 {
-    ssize_t maxFd = -1;
+    socket_type maxFd = -1;
 
     FD_ZERO(readFd);
     FD_ZERO(writeFd);
@@ -59,10 +59,11 @@ ssize_t SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
     {
         if (spSocket->IsValid())
         {
-            FD_SET(spSocket->GetHandle(), readFd);
-            FD_SET(spSocket->GetHandle(), writeFd);
+            socket_type fd = spSocket->GetHandle();
 
-            ssize_t fd = static_cast<ssize_t>(spSocket->GetHandle());
+            FD_SET(fd, readFd);
+            FD_SET(fd, writeFd);
+
             maxFd = std::max(maxFd, fd);
         }
     }
@@ -75,13 +76,13 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
 {
     SocketList newClients, connectedClients, closedClients;
 
-    for (auto it = m_aioSockets.begin(); it != m_aioSockets.end(); )
+    for (auto it = m_aioSockets.begin(); it != m_aioSockets.end(); ++it)
     {
         SocketPtr &spSocket = *it;
 
         if (spSocket->IsValid())
         {
-            size_t handle = spSocket->GetHandle();
+            socket_type handle = spSocket->GetHandle();
 
             // Handle socket accepts and reads
             if (FD_ISSET(handle, readFd))
@@ -114,7 +115,6 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
                     else
                     {
                         closedClients.push_back(spSocket);
-                        it = m_aioSockets.erase(it);
                     }
                 }
                 else if (spSocket->IsConnected() || spSocket->IsUdp())
@@ -122,17 +122,30 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
                     spSocket->ServiceSendRequests(m_completedSends);
                 }
             }
-
-            ++it;
         }
         else
         {
             closedClients.push_back(spSocket);
-            it = m_aioSockets.erase(it);
         }
     }
 
     m_aioSockets.insert(m_aioSockets.end(), newClients.begin(), newClients.end());
+
+    for (auto it = closedClients.begin(); it != closedClients.end(); ++it)
+    {
+        SocketPtr &spSocket = *it;
+
+        auto isSameSocket = [&](SocketPtr spClosed)
+        {
+            return (spSocket->GetSocketId() == spClosed->GetSocketId());
+        };
+
+        m_aioSockets.erase(
+            std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), isSameSocket),
+            m_aioSockets.end()
+        );
+    }
+
     TriggerCallbacks(connectedClients, closedClients);
 }
 

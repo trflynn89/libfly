@@ -6,6 +6,7 @@
 
 #include "fly/fly.h"
 #include "fly/socket/socket_manager.h"
+#include "fly/socket/socket_type.h"
 
 namespace fly {
 
@@ -27,7 +28,7 @@ protected:
     virtual bool DoWork();
 
 private:
-    ssize_t setReadAndWriteMasks(fd_set *, fd_set *);
+    socket_type setReadAndWriteMasks(fd_set *, fd_set *);
     void handleSocketIO(fd_set *, fd_set *);
 };
 
