@@ -17,6 +17,8 @@ std::string MockCallName(MockCall call)
         return "fcntl";
     case MockCall::FTS_READ:
         return "fts_read";
+    case MockCall::GETHOSTBYNAME:
+        return "gethostbyname";
     case MockCall::GETSOCKOPT:
         return "getsockopt";
     case MockCall::INOTIFY_ADD_WATCH:

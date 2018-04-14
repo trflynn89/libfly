@@ -201,6 +201,13 @@ TEST_F(SocketTest, MockConnectTest)
     }
 
     {
+        fly::MockSystem mock(fly::MockCall::GETHOSTBYNAME);
+
+        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
+        ASSERT_FALSE(spClientSocket->Connect(m_host, m_port));
+    }
+
+    {
         fly::MockSystem mock(fly::MockCall::CONNECT);
 
         fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);

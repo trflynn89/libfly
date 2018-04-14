@@ -18,7 +18,7 @@ namespace
         int port
     )
     {
-        struct hostent *ipaddr = gethostbyname(hostname.c_str());
+        struct hostent *ipaddr = ::gethostbyname(hostname.c_str());
         struct sockaddr_in addr;
 
         if (ipaddr == NULL)

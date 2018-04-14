@@ -14,6 +14,7 @@ enum class MockCall : unsigned int
     CONNECT,
     FCNTL,
     FTS_READ,
+    GETHOSTBYNAME,
     GETSOCKOPT,
     INOTIFY_ADD_WATCH,
     INOTIFY_INIT1,
