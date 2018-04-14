@@ -44,9 +44,22 @@ public:
     int GetSocketId() const;
 
     /**
+     * Increase the current offset into the request message to mark how much
+     * data has been sent.
+     *
+     * @param string::size_type The offset to set.
+     */
+    void IncrementRequestOffset(std::string::size_type);
+
+    /**
      * @return The request message - the message to be sent or received.
      */
     std::string GetRequest() const;
+
+    /**
+     * @return The request message starting at its current offset.
+     */
+    std::string GetRequestRemaining() const;
 
     /**
      * @return The request hostname (for UDP sockets).
@@ -60,7 +73,10 @@ public:
 
 private:
     int m_socketId;
+
+    std::string::size_type m_requestOffset;
     std::string m_request;
+
     std::string m_hostname;
     int m_port;
 };

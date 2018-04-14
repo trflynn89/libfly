@@ -194,7 +194,7 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
 
         if (request.IsValid())
         {
-            const std::string &msg = request.GetRequest();
+            const std::string &msg = request.GetRequestRemaining();
             size_t bytesSent = 0;
 
             if (IsTcp())
@@ -219,7 +219,8 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
                 LOGI(m_socketId, "Send would block - sent %zu of %zu bytes, "
                     "will finish later", bytesSent, msg.length());
 
-                SendAsync(msg.substr(bytesSent, std::string::npos));
+                request.IncrementRequestOffset(bytesSent);
+                m_pendingSends.Push(request);
             }
             else
             {

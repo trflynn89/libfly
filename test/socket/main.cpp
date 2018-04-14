@@ -19,6 +19,12 @@
     #include "test/mock/mock_system.h"
 #endif
 
+namespace
+{
+    static std::string s_largeMessage;
+    static std::string s_smallMessage;
+}
+
 //==============================================================================
 class SocketTest : public ::testing::Test
 {
@@ -31,10 +37,17 @@ public:
         m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>(m_spConfigManager)),
         m_spClientSocketManager(std::make_shared<fly::SocketManagerImpl>(m_spConfigManager)),
 
-        m_message(fly::String::GenerateRandomString((64 << 10) - 1)),
         m_host("localhost"),
         m_port(12390)
     {
+        if (s_largeMessage.empty())
+        {
+            s_largeMessage = fly::String::GenerateRandomString((128 << 20) - 1);
+        }
+        if (s_smallMessage.empty())
+        {
+            s_smallMessage = fly::String::GenerateRandomString((64 << 10) - 1);
+        }
     }
 
     virtual void ServerThread(bool)
@@ -97,7 +110,6 @@ protected:
 
     fly::ConcurrentQueue<int> m_eventQueue;
 
-    std::string m_message;
     std::string m_host;
     int m_port;
 };
@@ -269,14 +281,15 @@ public:
             std::chrono::seconds waitTime(120);
 
             ASSERT_TRUE(m_spServerSocketManager->WaitForCompletedReceive(request, waitTime));
-            ASSERT_EQ(m_message, request.GetRequest());
+            ASSERT_EQ(s_largeMessage.length(), request.GetRequest().length());
+            ASSERT_EQ(s_largeMessage, request.GetRequest());
 
             ASSERT_GE(request.GetSocketId(), 0);
         }
         else
         {
             fly::SocketPtr spRecvSocket = spAcceptSocket->Accept();
-            ASSERT_EQ(spRecvSocket->Recv(), m_message);
+            ASSERT_EQ(spRecvSocket->Recv(), s_largeMessage);
 
             ASSERT_GT(spRecvSocket->GetClientIp(), 0);
             ASSERT_GT(spRecvSocket->GetClientPort(), 0);
@@ -318,20 +331,21 @@ public:
                 ASSERT_TRUE(spSendSocket->IsConnected());
             }
 
-            ASSERT_TRUE(spSendSocket->SendAsync(m_message));
+            ASSERT_TRUE(spSendSocket->SendAsync(s_largeMessage));
 
             fly::AsyncRequest request;
             std::chrono::seconds waitTime(120);
 
             ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
-            ASSERT_EQ(m_message, request.GetRequest());
+            ASSERT_EQ(s_largeMessage.length(), request.GetRequest().length());
+            ASSERT_EQ(s_largeMessage, request.GetRequest());
 
             ASSERT_EQ(request.GetSocketId(), spSendSocket->GetSocketId());
         }
         else
         {
             ASSERT_TRUE(spSendSocket->Connect(m_host, m_port));
-            ASSERT_EQ(spSendSocket->Send(m_message), m_message.length());
+            ASSERT_EQ(spSendSocket->Send(s_largeMessage), s_largeMessage.length());
         }
 
         m_spClientSocketManager->ClearClientCallbacks();
@@ -369,13 +383,13 @@ public:
             std::chrono::seconds waitTime(120);
 
             ASSERT_TRUE(m_spServerSocketManager->WaitForCompletedReceive(request, waitTime));
-            ASSERT_EQ(m_message, request.GetRequest());
+            ASSERT_EQ(s_smallMessage, request.GetRequest());
 
             ASSERT_EQ(request.GetSocketId(), spRecvSocket->GetSocketId());
         }
         else
         {
-            ASSERT_EQ(spRecvSocket->RecvFrom(), m_message);
+            ASSERT_EQ(spRecvSocket->RecvFrom(), s_smallMessage);
         }
     }
 
@@ -399,19 +413,19 @@ public:
 
         if (doAsync)
         {
-            ASSERT_TRUE(spSendSocket->SendToAsync(m_message, m_host, m_port));
+            ASSERT_TRUE(spSendSocket->SendToAsync(s_smallMessage, m_host, m_port));
 
             fly::AsyncRequest request;
             std::chrono::seconds waitTime(120);
 
             ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
-            ASSERT_EQ(m_message, request.GetRequest());
+            ASSERT_EQ(s_smallMessage, request.GetRequest());
 
             ASSERT_EQ(request.GetSocketId(), spSendSocket->GetSocketId());
         }
         else
         {
-            ASSERT_EQ(spSendSocket->SendTo(m_message, m_host, m_port), m_message.length());
+            ASSERT_EQ(spSendSocket->SendTo(s_smallMessage, m_host, m_port), s_smallMessage.length());
         }
     }
 };
