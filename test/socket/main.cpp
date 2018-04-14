@@ -152,6 +152,19 @@ TEST_F(SocketTest, MockBindTest)
     }
 }
 
+/**
+ * Test handling for when socket listening fails.
+ */
+TEST_F(SocketTest, MockListenTest)
+{
+    fly::MockSystem mock(fly::MockCall::LISTEN);
+
+    fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
+
+    ASSERT_TRUE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_FALSE(spSocket->Listen());
+}
+
 #endif
 
 //==============================================================================

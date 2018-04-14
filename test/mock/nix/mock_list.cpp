@@ -19,6 +19,8 @@ std::string MockCallName(MockCall call)
         return "inotify_init1";
     case MockCall::GETENV:
         return "getenv";
+    case MockCall::LISTEN:
+        return "listen";
     case MockCall::POLL:
         return "poll";
     case MockCall::READ:

@@ -15,6 +15,7 @@ enum class MockCall : unsigned int
     INOTIFY_ADD_WATCH,
     INOTIFY_INIT1,
     GETENV,
+    LISTEN,
     POLL,
     READ,
     REMOVE,

@@ -18,5 +18,6 @@ $(eval $(call WILDCARD_SOURCES))
 # Define mocked system calls
 $(eval $(call MOCK_SYSTEM_CALL, bind))
 $(eval $(call MOCK_SYSTEM_CALL, fcntl))
+$(eval $(call MOCK_SYSTEM_CALL, listen))
 $(eval $(call MOCK_SYSTEM_CALL, setsockopt))
 $(eval $(call MOCK_SYSTEM_CALL, socket))
