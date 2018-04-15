@@ -186,12 +186,8 @@ TEST_F(SocketTest, MockConnectTest)
     ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
     ASSERT_TRUE(spServerSocket->Listen());
 
-    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr spSocket)
-    {
-        m_eventQueue.Push(spSocket->GetSocketId());
-    });
-
-    m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
+    fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
+    m_spClientSocketManager->SetClientCallbacks(callback, callback);
 
     {
         fly::MockSystem mock(fly::MockCall::CONNECT);
@@ -229,12 +225,10 @@ TEST_F(SocketTest, MockConnectTest)
 
         if (state == fly::Socket::ConnectedState::CONNECTING)
         {
-            do
-            {
-                ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-            } while (item != spClientSocket->GetSocketId());
+            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
         }
 
+        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
         ASSERT_FALSE(spClientSocket->IsConnected());
         ASSERT_FALSE(spClientSocket->IsValid());
     }
@@ -264,11 +258,7 @@ TEST_F(SocketTest, MockSendTest)
     ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
     ASSERT_TRUE(spServerSocket->Listen());
 
-    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr spSocket)
-    {
-        m_eventQueue.Push(spSocket->GetSocketId());
-    });
-
+    fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
     m_spClientSocketManager->SetClientCallbacks(callback, callback);
 
     {
@@ -293,20 +283,13 @@ TEST_F(SocketTest, MockSendTest)
 
         if (state == fly::Socket::ConnectedState::CONNECTING)
         {
-            do
-            {
-                ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-            } while (item != spClientSocket->GetSocketId());
+            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
         }
 
         ASSERT_TRUE(spClientSocket->IsConnected());
         ASSERT_TRUE(spClientSocket->SendAsync(s_smallMessage));
 
-        do
-        {
-            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        } while (item != spClientSocket->GetSocketId());
-
+        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
         ASSERT_FALSE(spClientSocket->IsValid());
     }
 }
@@ -320,11 +303,7 @@ TEST_F(SocketTest, MockSendToTest)
 
     ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
 
-    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr spSocket)
-    {
-        m_eventQueue.Push(spSocket->GetSocketId());
-    });
-
+    fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
     m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
     {
@@ -346,11 +325,7 @@ TEST_F(SocketTest, MockSendToTest)
 
         ASSERT_TRUE(spClientSocket->SendToAsync(s_smallMessage, m_host, m_port));
 
-        do
-        {
-            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        } while (item != spClientSocket->GetSocketId());
-
+        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
         ASSERT_FALSE(spClientSocket->IsValid());
     }
 }
@@ -369,14 +344,10 @@ TEST_F(SocketTest, MockRecvTest)
     fly::SocketManager::SocketCallback connectCallback([&](fly::SocketPtr spSocket)
     {
         spRecvSocket = spSocket;
-        m_eventQueue.Push(spSocket->GetSocketId());
+        m_eventQueue.Push(1);
     });
 
-    fly::SocketManager::SocketCallback disconnectCallback([&](fly::SocketPtr spSocket)
-    {
-        m_eventQueue.Push(spSocket->GetSocketId());
-    });
-
+    fly::SocketManager::SocketCallback disconnectCallback([&](...) { m_eventQueue.Push(1); } );
     m_spServerSocketManager->SetClientCallbacks(connectCallback, disconnectCallback);
 
     {
@@ -394,19 +365,11 @@ TEST_F(SocketTest, MockRecvTest)
 
         fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
         ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
-
-        do
-        {
-            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        } while (!spRecvSocket || (item != spRecvSocket->GetSocketId()));
+        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
 
         ASSERT_EQ(spClientSocket->Send(s_smallMessage), s_smallMessage.size());
 
-        do
-        {
-            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        } while (item != spRecvSocket->GetSocketId());
-
+        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
         ASSERT_FALSE(spRecvSocket->IsValid());
     }
 }
@@ -420,11 +383,7 @@ TEST_F(SocketTest, MockRecvFromTest)
 
     ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
 
-    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr spSocket)
-    {
-        m_eventQueue.Push(spSocket->GetSocketId());
-    });
-
+    fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
     m_spServerSocketManager->SetClientCallbacks(nullptr, callback);
 
     {
@@ -444,11 +403,7 @@ TEST_F(SocketTest, MockRecvFromTest)
 
         ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), s_smallMessage.size());
 
-        do
-        {
-            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        } while (item != spServerSocket->GetSocketId());
-
+        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
         ASSERT_FALSE(spServerSocket->IsValid());
     }
 }

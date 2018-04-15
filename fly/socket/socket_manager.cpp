@@ -54,7 +54,7 @@ SocketPtr SocketManager::CreateTcpSocket()
         spSocket.reset();
     }
 
-    return std::dynamic_pointer_cast<Socket>(spSocket);
+    return spSocket;
 }
 
 //==============================================================================
@@ -90,7 +90,7 @@ SocketPtr SocketManager::CreateUdpSocket()
         spSocket.reset();
     }
 
-    return std::dynamic_pointer_cast<Socket>(spSocket);
+    return spSocket;
 }
 
 //==============================================================================

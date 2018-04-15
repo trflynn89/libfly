@@ -216,7 +216,7 @@ SocketPtr SocketImpl::Accept() const
         ret->m_aConnectedState.store(Socket::ConnectedState::CONNECTED);
     }
 
-    return std::dynamic_pointer_cast<Socket>(ret);
+    return ret;
 }
 
 //==============================================================================

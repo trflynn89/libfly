@@ -1,3 +1,5 @@
+#include <cerrno>
+
 #include <netdb.h>
 
 #include "test/mock/mock_system.h"
@@ -13,6 +15,7 @@ extern "C"
     {
         if (fly::MockSystem::MockEnabled(fly::MockCall::GETHOSTBYNAME))
         {
+            errno = 0;
             return NULL;
         }
 

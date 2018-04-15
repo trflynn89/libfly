@@ -197,13 +197,15 @@ SocketPtr SocketImpl::Accept() const
     }
     else
     {
+        LOGD(m_socketHandle, "Accepted new socket: %d (%d)", ret->GetSocketId(), skt);
+
         ret->m_socketHandle = skt;
         ret->m_clientIp = ntohl(client.sin_addr.s_addr);
         ret->m_clientPort = ntohs(client.sin_port);
         ret->m_aConnectedState.store(Socket::ConnectedState::CONNECTED);
     }
 
-    return std::dynamic_pointer_cast<Socket>(ret);
+    return ret;
 }
 
 //==============================================================================

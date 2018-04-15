@@ -1,8 +1,16 @@
 #include <algorithm>
+#include <cerrno>
 #include <string>
 #include <vector>
 
 #include "test/mock/mock_system.h"
+
+namespace
+{
+    static const std::vector<std::string> s_tmpEnvs = {
+        "TMPDIR", "TMP", "TEMP", "TEMPDIR"
+    };
+}
 
 #ifdef __cplusplus
 extern "C"
@@ -15,11 +23,9 @@ extern "C"
     {
         if (fly::MockSystem::MockEnabled(fly::MockCall::GETENV))
         {
-            static const std::vector<std::string> tmpEnvs = {
-                "TMPDIR", "TMP", "TEMP", "TEMPDIR"
-            };
+            errno = 0;
 
-            if (std::find(tmpEnvs.begin(), tmpEnvs.end(), name) != tmpEnvs.end())
+            if (std::find(s_tmpEnvs.begin(), s_tmpEnvs.end(), name) != s_tmpEnvs.end())
             {
                 return (char *)("/tmp/");
             }

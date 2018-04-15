@@ -1,3 +1,5 @@
+#include <cerrno>
+
 #include <sys/times.h>
 
 #include "test/mock/mock_system.h"
@@ -13,6 +15,7 @@ extern "C"
     {
         if (fly::MockSystem::MockEnabled(fly::MockCall::TIMES))
         {
+            errno = 0;
             return static_cast<clock_t>(-1);
         }
 

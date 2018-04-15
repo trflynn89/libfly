@@ -1,3 +1,5 @@
+#include <cerrno>
+
 #include "test/mock/mock_system.h"
 
 namespace
@@ -28,6 +30,7 @@ extern "C"
                 s_callCount = 0;
                 ++s_nextCall;
 
+                errno = 0;
                 return -1;
             }
         }

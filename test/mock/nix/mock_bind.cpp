@@ -1,3 +1,5 @@
+#include <cerrno>
+
 #include <sys/socket.h>
 #include <sys/types.h>
 
@@ -14,6 +16,7 @@ extern "C"
     {
         if (fly::MockSystem::MockEnabled(fly::MockCall::BIND))
         {
+            errno = 0;
             return -1;
         }
 

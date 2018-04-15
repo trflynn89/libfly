@@ -1,3 +1,5 @@
+#include <cerrno>
+
 #include <fts.h>
 
 #include "test/mock/mock_system.h"
@@ -16,6 +18,7 @@ extern "C"
         if (fly::MockSystem::MockEnabled(fly::MockCall::FTS_READ))
         {
             pFtsent->fts_info = FTS_ERR;
+            errno = 0;
         }
 
         return pFtsent;

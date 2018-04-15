@@ -1,3 +1,5 @@
+#include <cerrno>
+
 #include "test/mock/mock_system.h"
 
 #ifdef __cplusplus
@@ -11,6 +13,7 @@ extern "C"
     {
         if (fly::MockSystem::MockEnabled(fly::MockCall::INOTIFY_INIT1))
         {
+            errno = 0;
             return -1;
         }
 

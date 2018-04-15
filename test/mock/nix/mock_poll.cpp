@@ -1,3 +1,4 @@
+#include <cerrno>
 #include <chrono>
 #include <thread>
 
@@ -17,6 +18,7 @@ extern "C"
         if (fly::MockSystem::MockEnabled(fly::MockCall::POLL))
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+            errno = 0;
             return -1;
         }
 

@@ -1,3 +1,5 @@
+#include <cerrno>
+
 #include <sys/sysinfo.h>
 
 #include "test/mock/mock_system.h"
@@ -13,6 +15,7 @@ extern "C"
     {
         if (fly::MockSystem::MockEnabled(fly::MockCall::SYSINFO))
         {
+            errno = 0;
             return -1;
         }
 
