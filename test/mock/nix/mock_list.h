@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 
 namespace fly {
@@ -34,12 +35,8 @@ enum class MockCall : unsigned int
 };
 
 /**
- * Get the name of a mocked system.
- *
- * @param MockCall Mocked system call to get.
- *
- * @return string The name of the mocked system call.
+ * Stream the name of a mocked system.
  */
-std::string MockCallName(MockCall);
+std::ostream &operator << (std::ostream &, MockCall);
 
 }

@@ -213,6 +213,15 @@ TEST_F(SocketTest, MockConnectTest)
     }
 
     {
+        fly::MockSystem mock(fly::MockCall::CONNECT, false);
+
+        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
+
+        fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
+        ASSERT_EQ(state, fly::Socket::ConnectedState::CONNECTED);
+    }
+
+    {
         int item = 0;
         std::chrono::seconds waitTime(10);
 

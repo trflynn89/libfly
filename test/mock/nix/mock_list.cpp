@@ -3,57 +3,79 @@
 namespace fly {
 
 //==============================================================================
-std::string MockCallName(MockCall call)
+std::ostream &operator << (std::ostream &stream, MockCall call)
 {
     switch (call)
     {
     case MockCall::ACCEPT:
-        return "accept";
+        stream << "accept";
+        break;
     case MockCall::BIND:
-        return "bind";
+        stream << "bind";
+        break;
     case MockCall::CONNECT:
-        return "connect";
+        stream << "connect";
+        break;
     case MockCall::FCNTL:
-        return "fcntl";
+        stream << "fcntl";
+        break;
     case MockCall::FTS_READ:
-        return "fts_read";
+        stream << "fts_read";
+        break;
     case MockCall::GETHOSTBYNAME:
-        return "gethostbyname";
+        stream << "gethostbyname";
+        break;
     case MockCall::GETSOCKOPT:
-        return "getsockopt";
+        stream << "getsockopt";
+        break;
     case MockCall::INOTIFY_ADD_WATCH:
-        return "inotify_add_watch";
+        stream << "inotify_add_watch";
+        break;
     case MockCall::INOTIFY_INIT1:
-        return "inotify_init1";
+        stream << "inotify_init1";
+        break;
     case MockCall::GETENV:
-        return "getenv";
+        stream << "getenv";
+        break;
     case MockCall::LISTEN:
-        return "listen";
+        stream << "listen";
+        break;
     case MockCall::POLL:
-        return "poll";
+        stream << "poll";
+        break;
     case MockCall::READ:
-        return "read";
+        stream << "read";
+        break;
     case MockCall::RECV:
-        return "recv";
+        stream << "recv";
+        break;
     case MockCall::RECVFROM:
-        return "recvfrom";
+        stream << "recvfrom";
+        break;
     case MockCall::REMOVE:
-        return "remove";
+        stream << "remove";
+        break;
     case MockCall::SEND:
-        return "send";
+        stream << "send";
+        break;
     case MockCall::SENDTO:
-        return "sendto";
+        stream << "sendto";
+        break;
     case MockCall::SETSOCKOPT:
-        return "setsockopt";
+        stream << "setsockopt";
+        break;
     case MockCall::SOCKET:
-        return "socket";
+        stream << "socket";
+        break;
     case MockCall::SYSINFO:
-        return "sysinfo";
+        stream << "sysinfo";
+        break;
     case MockCall::TIMES:
-        return "times";
+        stream << "times";
+        break;
     }
 
-    return std::string();
+    return stream;
 }
 
 }

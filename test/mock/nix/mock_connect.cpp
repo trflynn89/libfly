@@ -14,10 +14,12 @@ extern "C"
 
     int __wrap_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::CONNECT))
+        bool fail;
+
+        if (fly::MockSystem::MockEnabled(fly::MockCall::CONNECT, fail))
         {
             errno = 0;
-            return -1;
+            return (fail ? -1 : 0);
         }
 
         return __real_connect(sockfd, addr, addrlen);

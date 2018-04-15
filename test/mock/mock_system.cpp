@@ -17,6 +17,14 @@ MockSystem::MockSystem(MockCall mock) : m_mock(mock)
     s_mockedCalls[m_mock] = true;
     s_mockSystemEnabled = true;
 }
+//==============================================================================
+MockSystem::MockSystem(MockCall mock, bool fail) : m_mock(mock)
+{
+    std::lock_guard<std::mutex> lock(s_mockSystemMutex);
+
+    s_mockedCalls[m_mock] = fail;
+    s_mockSystemEnabled = true;
+}
 
 //==============================================================================
 MockSystem::~MockSystem()
@@ -36,6 +44,13 @@ MockSystem::~MockSystem()
 //==============================================================================
 bool MockSystem::MockEnabled(MockCall mock)
 {
+    bool fail;
+    return MockEnabled(mock, fail);
+}
+
+//==============================================================================
+bool MockSystem::MockEnabled(MockCall mock, bool &fail)
+{
     std::lock_guard<std::mutex> lock(s_mockSystemMutex);
 
     if (s_mockSystemEnabled)
@@ -44,12 +59,9 @@ bool MockSystem::MockEnabled(MockCall mock)
 
         if (it != s_mockedCalls.end())
         {
-            if (it->second)
-            {
-                LOGC_NO_LOCK("Using mock for %s()", MockCallName(mock));
-            }
-
-            return it->second;
+            LOGC_NO_LOCK("Using mock for %s()", mock);
+            fail = it->second;
+            return true;
         }
     }
 

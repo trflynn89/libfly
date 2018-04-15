@@ -32,11 +32,19 @@ class MockSystem
 {
 public:
     /**
-     * Enable a mocked system call.
+     * Enable a mocked system call, indicating the call should fail.
      *
      * @param MockCall Mocked system call to enable.
      */
     MockSystem(MockCall);
+
+    /**
+     * Enable a mocked system call, specifying whether the call should fail.
+     *
+     * @param MockCall Mocked system call to enable.
+     * @param bool Whether the system call should fail.
+     */
+    MockSystem(MockCall, bool);
 
     /**
      * Disable the mocked system call.
@@ -51,6 +59,16 @@ public:
      * @return bool True if the mocked system call is enabled.
      */
     static bool MockEnabled(MockCall);
+
+    /**
+     * Check if a mocked system call is enabled.
+     *
+     * @param MockCall Mocked system call to check.
+     * @param bool Reference to store whether the system call should fail.
+     *
+     * @return bool True if the mocked system call is enabled.
+     */
+    static bool MockEnabled(MockCall, bool &);
 
 private:
     static std::mutex s_mockSystemMutex;
