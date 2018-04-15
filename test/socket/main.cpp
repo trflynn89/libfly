@@ -368,8 +368,8 @@ TEST_F(SocketTest, MockRecvTest)
 
     fly::SocketManager::SocketCallback connectCallback([&](fly::SocketPtr spSocket)
     {
-        m_eventQueue.Push(spSocket->GetSocketId());
         spRecvSocket = spSocket;
+        m_eventQueue.Push(spSocket->GetSocketId());
     });
 
     fly::SocketManager::SocketCallback disconnectCallback([&](fly::SocketPtr spSocket)
