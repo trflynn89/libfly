@@ -513,6 +513,66 @@ public:
     }
 };
 
+/**
+ * Test that using asynchronous operations on a synchronous socket fails.
+ */
+TEST_F(TcpSocketTest, AsyncOperationsOnSyncSocketTest)
+{
+    fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
+
+    ASSERT_EQ(spSocket->ConnectAsync(m_host, m_port), fly::Socket::ConnectedState::NOT_CONNECTED);
+    ASSERT_FALSE(spSocket->SendAsync(s_smallMessage));
+    ASSERT_FALSE(spSocket->SendToAsync(s_smallMessage, m_host, m_port));
+}
+
+/**
+ * Test a synchronous server with a synchronous client.
+ */
+TEST_F(TcpSocketTest, SyncServer_SyncClient_Test)
+{
+    auto server = std::async(std::launch::async, &TcpSocketTest::ServerThread, this, false);
+    auto client = std::async(std::launch::async, &TcpSocketTest::ClientThread, this, false);
+
+    ASSERT_TRUE(server.valid() && client.valid());
+    client.get(); server.get();
+}
+
+/**
+ * Test an asynchronous server with a synchronous client.
+ */
+TEST_F(TcpSocketTest, AsyncServer_SyncClient_Test)
+{
+    auto server = std::async(std::launch::async, &TcpSocketTest::ServerThread, this, true);
+    auto client = std::async(std::launch::async, &TcpSocketTest::ClientThread, this, false);
+
+    ASSERT_TRUE(server.valid() && client.valid());
+    client.get(); server.get();
+}
+
+/**
+ * Test a synchronous server with an asynchronous client.
+ */
+TEST_F(TcpSocketTest, SyncServer_AsyncClient_Test)
+{
+    auto server = std::async(std::launch::async, &TcpSocketTest::ServerThread, this, false);
+    auto client = std::async(std::launch::async, &TcpSocketTest::ClientThread, this, true);
+
+    ASSERT_TRUE(server.valid() && client.valid());
+    client.get(); server.get();
+}
+
+/**
+ * Test an asynchronous server with an asynchronous client.
+ */
+TEST_F(TcpSocketTest, AsyncServer_AsyncClient_Test)
+{
+    auto server = std::async(std::launch::async, &TcpSocketTest::ServerThread, this, true);
+    auto client = std::async(std::launch::async, &TcpSocketTest::ClientThread, this, true);
+
+    ASSERT_TRUE(server.valid() && client.valid());
+    client.get(); server.get();
+}
+
 //==============================================================================
 class UdpSocketTest : public SocketTest
 {
@@ -592,51 +652,15 @@ public:
 };
 
 /**
- * Test a synchronous server with a synchronous client.
+ * Test that using asynchronous operations on a synchronous socket fails.
  */
-TEST_F(TcpSocketTest, SyncServer_SyncClient_Test)
+TEST_F(UdpSocketTest, AsyncOperationsOnSyncSocketTest)
 {
-    auto server = std::async(std::launch::async, &TcpSocketTest::ServerThread, this, false);
-    auto client = std::async(std::launch::async, &TcpSocketTest::ClientThread, this, false);
+    fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, false);
 
-    ASSERT_TRUE(server.valid() && client.valid());
-    client.get(); server.get();
-}
-
-/**
- * Test an asynchronous server with a synchronous client.
- */
-TEST_F(TcpSocketTest, AsyncServer_SyncClient_Test)
-{
-    auto server = std::async(std::launch::async, &TcpSocketTest::ServerThread, this, true);
-    auto client = std::async(std::launch::async, &TcpSocketTest::ClientThread, this, false);
-
-    ASSERT_TRUE(server.valid() && client.valid());
-    client.get(); server.get();
-}
-
-/**
- * Test a synchronous server with an asynchronous client.
- */
-TEST_F(TcpSocketTest, SyncServer_AsyncClient_Test)
-{
-    auto server = std::async(std::launch::async, &TcpSocketTest::ServerThread, this, false);
-    auto client = std::async(std::launch::async, &TcpSocketTest::ClientThread, this, true);
-
-    ASSERT_TRUE(server.valid() && client.valid());
-    client.get(); server.get();
-}
-
-/**
- * Test an asynchronous server with an asynchronous client.
- */
-TEST_F(TcpSocketTest, AsyncServer_AsyncClient_Test)
-{
-    auto server = std::async(std::launch::async, &TcpSocketTest::ServerThread, this, true);
-    auto client = std::async(std::launch::async, &TcpSocketTest::ClientThread, this, true);
-
-    ASSERT_TRUE(server.valid() && client.valid());
-    client.get(); server.get();
+    ASSERT_EQ(spSocket->ConnectAsync(m_host, m_port), fly::Socket::ConnectedState::NOT_CONNECTED);
+    ASSERT_FALSE(spSocket->SendAsync(s_smallMessage));
+    ASSERT_FALSE(spSocket->SendToAsync(s_smallMessage, m_host, m_port));
 }
 
 /**
