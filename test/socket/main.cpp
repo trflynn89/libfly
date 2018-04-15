@@ -117,238 +117,295 @@ protected:
 #ifdef FLY_LINUX
 
 /**
- * Test handling for when socket creation fails.
+ * Test handling for when socket creation fails due to ::socket() system call.
  */
-TEST_F(SocketTest, MockCreateSocketTest)
+TEST_F(SocketTest, Create_MockSocketFail)
 {
-    {
-        fly::MockSystem mock(fly::MockCall::SOCKET);
+    fly::MockSystem mock(fly::MockCall::SOCKET);
 
-        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, false, true));
-        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, false, false));
+    ASSERT_FALSE(CreateSocket(m_spServerSocketManager, false, true));
+    ASSERT_FALSE(CreateSocket(m_spServerSocketManager, false, false));
 
-        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, true));
-        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, false));
-    }
-    {
-        fly::MockSystem mock(fly::MockCall::FCNTL);
-
-        ASSERT_TRUE(CreateSocket(m_spServerSocketManager, false, true));
-        ASSERT_TRUE(CreateSocket(m_spServerSocketManager, false, false));
-
-        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, true));
-        ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, false));
-    }
+    ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, true));
+    ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, false));
 }
 
 /**
- * Test handling for when socket binding fails.
+ * Test handling for when socket creation fails due to ::fcntl() system call.
  */
-TEST_F(SocketTest, MockBindTest)
+TEST_F(SocketTest, Create_MockFcntlFail)
 {
-    {
-        fly::MockSystem mock(fly::MockCall::BIND);
+    fly::MockSystem mock(fly::MockCall::FCNTL);
 
-        fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
+    ASSERT_TRUE(CreateSocket(m_spServerSocketManager, false, true));
+    ASSERT_TRUE(CreateSocket(m_spServerSocketManager, false, false));
 
-        ASSERT_FALSE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
-        ASSERT_FALSE(spSocket->Bind(fly::Socket::InAddrAny(), m_port));
-    }
-    {
-        fly::MockSystem mock(fly::MockCall::SETSOCKOPT);
-
-        fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
-
-        ASSERT_FALSE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
-    }
+    ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, true));
+    ASSERT_FALSE(CreateSocket(m_spServerSocketManager, true, false));
 }
 
 /**
- * Test handling for when socket listening fails.
+ * Test handling for when socket binding fails due to ::bind() system call.
  */
-TEST_F(SocketTest, MockListenTest)
+TEST_F(SocketTest, Bind_MockBindFail)
+{
+    fly::MockSystem mock(fly::MockCall::BIND);
+
+    fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
+
+    ASSERT_FALSE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_FALSE(spSocket->Bind(fly::Socket::InAddrAny(), m_port));
+}
+
+/**
+ * Test handling for when socket binding fails due to ::setsockopt() system call.
+ */
+TEST_F(SocketTest, Bind_MockSetsockoptFail)
+{
+    fly::MockSystem mock(fly::MockCall::BIND);
+
+    fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
+    ASSERT_FALSE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_FALSE(spSocket->Bind(fly::Socket::InAddrAny(), m_port));
+}
+
+/**
+ * Test handling for when socket listening fails due to ::listen() system call.
+ */
+TEST_F(SocketTest, Listen_MockListenFail)
 {
     fly::MockSystem mock(fly::MockCall::LISTEN);
 
     fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
-
     ASSERT_TRUE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
     ASSERT_FALSE(spSocket->Listen());
 }
 
 /**
- * Test handling for when socket connecting fails.
+ * Test handling for when socket connecting fails due to ::connect() system call.
  */
-TEST_F(SocketTest, MockConnectTest)
+TEST_F(SocketTest, Connect_Sync_MockConnectFail)
 {
-    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+    fly::MockSystem mock(fly::MockCall::CONNECT);
 
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Listen());
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
+    ASSERT_FALSE(spClientSocket->Connect(m_host, m_port));
+}
+
+/**
+ * Test handling for when socket connecting fails due to ::gethostbyname() system call.
+ */
+TEST_F(SocketTest, Connect_Sync_MockGethostbynameFail)
+{
+    fly::MockSystem mock(fly::MockCall::GETHOSTBYNAME);
+
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Listen());
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
+    ASSERT_FALSE(spClientSocket->Connect(m_host, m_port));
+}
+
+/**
+ * Test handling for when socket connecting fails due to ::connect() system call.
+ */
+TEST_F(SocketTest, Connect_Async_MockConnectFail)
+{
+    fly::MockSystem mock(fly::MockCall::CONNECT);
+
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Listen());
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
+
+    fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
+    ASSERT_EQ(state, fly::Socket::ConnectedState::NOT_CONNECTED);
+}
+
+/**
+ * Test handling for when socket connecting succeeds immediately.
+ */
+TEST_F(SocketTest, Connect_Async_MockConnectImmediateSuccess)
+{
+    fly::MockSystem mock(fly::MockCall::CONNECT, false);
+
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Listen());
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
+
+    fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
+    ASSERT_EQ(state, fly::Socket::ConnectedState::CONNECTED);
+}
+
+/**
+ * Test handling for when socket connecting fails due to ::getsockopt() system call.
+ */
+TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
+{
+    fly::MockSystem mock(fly::MockCall::GETSOCKOPT);
+
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
     ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
     m_spClientSocketManager->SetClientCallbacks(callback, callback);
 
+    int item = 0;
+    std::chrono::seconds waitTime(10);
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
+
+    fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
+    ASSERT_NE(state, fly::Socket::ConnectedState::NOT_CONNECTED);
+
+    if (state == fly::Socket::ConnectedState::CONNECTING)
     {
-        fly::MockSystem mock(fly::MockCall::CONNECT);
-
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
-        ASSERT_FALSE(spClientSocket->Connect(m_host, m_port));
-    }
-
-    {
-        fly::MockSystem mock(fly::MockCall::GETHOSTBYNAME);
-
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
-        ASSERT_FALSE(spClientSocket->Connect(m_host, m_port));
-    }
-
-    {
-        fly::MockSystem mock(fly::MockCall::CONNECT);
-
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
-
-        fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
-        ASSERT_EQ(state, fly::Socket::ConnectedState::NOT_CONNECTED);
-    }
-
-    {
-        fly::MockSystem mock(fly::MockCall::CONNECT, false);
-
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
-
-        fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
-        ASSERT_EQ(state, fly::Socket::ConnectedState::CONNECTED);
-    }
-
-    {
-        int item = 0;
-        std::chrono::seconds waitTime(10);
-
-        fly::MockSystem mock(fly::MockCall::GETSOCKOPT);
-
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
-
-        fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
-        ASSERT_NE(state, fly::Socket::ConnectedState::NOT_CONNECTED);
-
-        if (state == fly::Socket::ConnectedState::CONNECTING)
-        {
-            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        }
-
         ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        ASSERT_FALSE(spClientSocket->IsConnected());
-        ASSERT_FALSE(spClientSocket->IsValid());
     }
+
+    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_FALSE(spClientSocket->IsConnected());
+    ASSERT_FALSE(spClientSocket->IsValid());
 }
 
 /**
- * Test handling for when socket accepting fails.
+ * Test handling for when socket accepting fails due to ::accept() system call.
  */
-TEST_F(SocketTest, MockAcceptTest)
+TEST_F(SocketTest, Accept_MockAcceptFail)
 {
     fly::MockSystem mock(fly::MockCall::ACCEPT);
 
     fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
-
     ASSERT_TRUE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
     ASSERT_TRUE(spSocket->Listen());
+
     ASSERT_FALSE(spSocket->Accept());
 }
 
 /**
- * Test handling for when socket sending (TCP) fails.
+ * Test handling for when socket sending (TCP) fails due to ::send() system call.
  */
-TEST_F(SocketTest, MockSendTest)
+TEST_F(SocketTest, Send_Sync_MockSendFail)
 {
-    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+    fly::MockSystem mock(fly::MockCall::SEND);
 
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Listen());
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
+    ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
+
+    ASSERT_EQ(spClientSocket->Send(s_smallMessage), 0);
+}
+
+/**
+ * Test handling for when socket sending (TCP) fails due to ::send() system call.
+ */
+TEST_F(SocketTest, Send_Async_MockSendFail)
+{
+    fly::MockSystem mock(fly::MockCall::SEND);
+
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
     ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
     m_spClientSocketManager->SetClientCallbacks(callback, callback);
 
+    int item = 0;
+    std::chrono::seconds waitTime(10);
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
+
+    fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
+    ASSERT_NE(state, fly::Socket::ConnectedState::NOT_CONNECTED);
+
+    if (state == fly::Socket::ConnectedState::CONNECTING)
     {
-        fly::MockSystem mock(fly::MockCall::SEND);
-
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
-        ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
-
-        ASSERT_EQ(spClientSocket->Send(s_smallMessage), 0);
-    }
-
-    {
-        int item = 0;
-        std::chrono::seconds waitTime(10);
-
-        fly::MockSystem mock(fly::MockCall::SEND);
-
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
-
-        fly::Socket::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
-        ASSERT_NE(state, fly::Socket::ConnectedState::NOT_CONNECTED);
-
-        if (state == fly::Socket::ConnectedState::CONNECTING)
-        {
-            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        }
-
-        ASSERT_TRUE(spClientSocket->IsConnected());
-        ASSERT_TRUE(spClientSocket->SendAsync(s_smallMessage));
-
         ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        ASSERT_FALSE(spClientSocket->IsValid());
     }
+
+    ASSERT_TRUE(spClientSocket->IsConnected());
+    ASSERT_TRUE(spClientSocket->SendAsync(s_smallMessage));
+
+    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_FALSE(spClientSocket->IsValid());
 }
 
 /**
- * Test handling for when socket sending (UDP) fails.
+ * Test handling for when socket sending (UDP) fails due to ::sendto() system call.
  */
-TEST_F(SocketTest, MockSendToTest)
+TEST_F(SocketTest, Send_Sync_MockSendtoFail)
 {
-    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, false);
+    fly::MockSystem mock(fly::MockCall::SENDTO);
 
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, false);
+    ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), 0);
+}
+
+/**
+ * Test handling for when socket sending (UDP) fails due to ::sendto() system call.
+ */
+TEST_F(SocketTest, Send_Async_MockSendtoFail)
+{
+    fly::MockSystem mock(fly::MockCall::SENDTO);
+
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
     ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
 
     fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
     m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
-    {
-        fly::MockSystem mock(fly::MockCall::SENDTO);
+    int item = 0;
+    std::chrono::seconds waitTime(10);
 
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, false);
-        ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, false);
+    ASSERT_TRUE(spClientSocket->SendToAsync(s_smallMessage, m_host, m_port));
 
-        ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), 0);
-    }
-
-    {
-        int item = 0;
-        std::chrono::seconds waitTime(10);
-
-        fly::MockSystem mock(fly::MockCall::SENDTO);
-
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, false);
-
-        ASSERT_TRUE(spClientSocket->SendToAsync(s_smallMessage, m_host, m_port));
-
-        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        ASSERT_FALSE(spClientSocket->IsValid());
-    }
+    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_FALSE(spClientSocket->IsValid());
 }
 
 /**
- * Test handling for when socket receiving (TCP) fails.
+ * Test handling for when socket receiving (TCP) fails due to ::recv() system call.
  */
-TEST_F(SocketTest, MockRecvTest)
+TEST_F(SocketTest, Recv_Sync_MockRecvFail)
 {
-    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
-    fly::SocketPtr spRecvSocket;
+    fly::MockSystem mock(fly::MockCall::RECV);
 
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
     ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
     ASSERT_TRUE(spServerSocket->Listen());
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
+    ASSERT_EQ(spClientSocket->Recv(), std::string());
+}
+
+/**
+ * Test handling for when socket receiving (TCP) fails due to ::recv() system call.
+ */
+TEST_F(SocketTest, Recv_Async_MockRecvFail)
+{
+    fly::MockSystem mock(fly::MockCall::RECV);
+
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Listen());
+
+    fly::SocketPtr spRecvSocket;
 
     fly::SocketManager::SocketCallback connectCallback([&](fly::SocketPtr spSocket)
     {
@@ -359,62 +416,54 @@ TEST_F(SocketTest, MockRecvTest)
     fly::SocketManager::SocketCallback disconnectCallback([&](...) { m_eventQueue.Push(1); } );
     m_spServerSocketManager->SetClientCallbacks(connectCallback, disconnectCallback);
 
-    {
-        fly::MockSystem mock(fly::MockCall::RECV);
+    int item = 0;
+    std::chrono::seconds waitTime(10);
 
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
-        ASSERT_EQ(spClientSocket->Recv(), std::string());
-    }
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
+    ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
+    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
 
-    {
-        int item = 0;
-        std::chrono::seconds waitTime(10);
+    ASSERT_EQ(spClientSocket->Send(s_smallMessage), s_smallMessage.size());
 
-        fly::MockSystem mock(fly::MockCall::RECV);
-
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
-        ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
-        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-
-        ASSERT_EQ(spClientSocket->Send(s_smallMessage), s_smallMessage.size());
-
-        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        ASSERT_FALSE(spRecvSocket->IsValid());
-    }
+    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_FALSE(spRecvSocket->IsValid());
 }
 
 /**
- * Test handling for when socket receiving (UDP) fails.
+ * Test handling for when socket receiving (UDP) fails due to ::recvfrom() system call.
  */
-TEST_F(SocketTest, MockRecvFromTest)
+TEST_F(SocketTest, Recv_Sync_MockRecvfromFail)
 {
-    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, false);
+    fly::MockSystem mock(fly::MockCall::RECVFROM);
 
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, false);
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, false);
+    ASSERT_EQ(spClientSocket->RecvFrom(), std::string());
+}
+
+/**
+ * Test handling for when socket receiving (UDP) fails due to ::recvfrom() system call.
+ */
+TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
+{
+    fly::MockSystem mock(fly::MockCall::RECVFROM);
+
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, false);
     ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
 
     fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
     m_spServerSocketManager->SetClientCallbacks(nullptr, callback);
 
-    {
-        fly::MockSystem mock(fly::MockCall::RECVFROM);
+    int item = 0;
+    std::chrono::seconds waitTime(10);
 
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, false);
-        ASSERT_EQ(spClientSocket->RecvFrom(), std::string());
-    }
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, false);
+    ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), s_smallMessage.size());
 
-    {
-        int item = 0;
-        std::chrono::seconds waitTime(10);
-
-        fly::MockSystem mock(fly::MockCall::RECVFROM);
-
-        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, false);
-
-        ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), s_smallMessage.size());
-
-        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        ASSERT_FALSE(spServerSocket->IsValid());
-    }
+    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_FALSE(spServerSocket->IsValid());
 }
 
 #endif
