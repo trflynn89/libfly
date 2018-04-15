@@ -94,9 +94,9 @@ protected:
         return fly::String::Format("%d\t%s", 1, log).length();
     }
 
-    std::string m_path;
-
     fly::ConfigManagerPtr m_spConfigManager;
+
+    std::string m_path;
 
     fly::LoggerPtr m_spLogger;
 };

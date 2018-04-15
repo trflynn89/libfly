@@ -218,7 +218,7 @@ TEST_F(SocketTest, MockConnectTest)
 
     {
         int item = 0;
-        std::chrono::seconds waitTime(10);
+        std::chrono::seconds waitTime(120);
 
         fly::MockSystem mock(fly::MockCall::GETSOCKOPT);
 
@@ -282,7 +282,7 @@ TEST_F(SocketTest, MockSendTest)
 
     {
         int item = 0;
-        std::chrono::seconds waitTime(10);
+        std::chrono::seconds waitTime(120);
 
         fly::MockSystem mock(fly::MockCall::SEND);
 
@@ -338,7 +338,7 @@ TEST_F(SocketTest, MockSendToTest)
 
     {
         int item = 0;
-        std::chrono::seconds waitTime(10);
+        std::chrono::seconds waitTime(120);
 
         fly::MockSystem mock(fly::MockCall::SENDTO);
 
@@ -388,7 +388,7 @@ TEST_F(SocketTest, MockRecvTest)
 
     {
         int item = 0;
-        std::chrono::seconds waitTime(10);
+        std::chrono::seconds waitTime(120);
 
         fly::MockSystem mock(fly::MockCall::RECV);
 
@@ -436,7 +436,7 @@ TEST_F(SocketTest, MockRecvFromTest)
 
     {
         int item = 0;
-        std::chrono::seconds waitTime(10);
+        std::chrono::seconds waitTime(120);
 
         fly::MockSystem mock(fly::MockCall::RECVFROM);
 
