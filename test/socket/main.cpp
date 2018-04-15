@@ -152,7 +152,6 @@ TEST_F(SocketTest, Bind_MockBindFail)
     fly::MockSystem mock(fly::MockCall::BIND);
 
     fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
-
     ASSERT_FALSE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
     ASSERT_FALSE(spSocket->Bind(fly::Socket::InAddrAny(), m_port));
 }
@@ -162,11 +161,10 @@ TEST_F(SocketTest, Bind_MockBindFail)
  */
 TEST_F(SocketTest, Bind_MockSetsockoptFail)
 {
-    fly::MockSystem mock(fly::MockCall::BIND);
+    fly::MockSystem mock(fly::MockCall::SETSOCKOPT);
 
     fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, false, true);
     ASSERT_FALSE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
-    ASSERT_FALSE(spSocket->Bind(fly::Socket::InAddrAny(), m_port));
 }
 
 /**
