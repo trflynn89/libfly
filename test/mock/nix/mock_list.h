@@ -22,6 +22,8 @@ enum class MockCall : unsigned int
     LISTEN,
     POLL,
     READ,
+    RECV,
+    RECVFROM,
     REMOVE,
     SEND,
     SENDTO,

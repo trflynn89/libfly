@@ -33,6 +33,10 @@ std::string MockCallName(MockCall call)
         return "poll";
     case MockCall::READ:
         return "read";
+    case MockCall::RECV:
+        return "recv";
+    case MockCall::RECVFROM:
+        return "recvfrom";
     case MockCall::REMOVE:
         return "remove";
     case MockCall::SEND:

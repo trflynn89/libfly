@@ -217,6 +217,9 @@ TEST_F(SocketTest, MockConnectTest)
     }
 
     {
+        int item = 0;
+        std::chrono::seconds waitTime(10);
+
         fly::MockSystem mock(fly::MockCall::GETSOCKOPT);
 
         fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, true, true);
@@ -226,13 +229,10 @@ TEST_F(SocketTest, MockConnectTest)
 
         if (state == fly::Socket::ConnectedState::CONNECTING)
         {
-            int item = 0;
-            std::chrono::seconds waitTime(120);
-
-            while (item != spClientSocket->GetSocketId())
+            do
             {
                 ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-            }
+            } while (item != spClientSocket->GetSocketId());
         }
 
         ASSERT_FALSE(spClientSocket->IsConnected());
@@ -282,7 +282,7 @@ TEST_F(SocketTest, MockSendTest)
 
     {
         int item = 0;
-        std::chrono::seconds waitTime(120);
+        std::chrono::seconds waitTime(10);
 
         fly::MockSystem mock(fly::MockCall::SEND);
 
@@ -293,20 +293,19 @@ TEST_F(SocketTest, MockSendTest)
 
         if (state == fly::Socket::ConnectedState::CONNECTING)
         {
-            while (item != spClientSocket->GetSocketId())
+            do
             {
                 ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-            }
+            } while (item != spClientSocket->GetSocketId());
         }
 
         ASSERT_TRUE(spClientSocket->IsConnected());
         ASSERT_TRUE(spClientSocket->SendAsync(s_smallMessage));
-        item = 0;
 
-        while (item != spClientSocket->GetSocketId())
+        do
         {
             ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        }
+        } while (item != spClientSocket->GetSocketId());
 
         ASSERT_FALSE(spClientSocket->IsValid());
     }
@@ -326,7 +325,7 @@ TEST_F(SocketTest, MockSendToTest)
         m_eventQueue.Push(spSocket->GetSocketId());
     });
 
-    m_spClientSocketManager->SetClientCallbacks(callback, callback);
+    m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
     {
         fly::MockSystem mock(fly::MockCall::SENDTO);
@@ -339,7 +338,7 @@ TEST_F(SocketTest, MockSendToTest)
 
     {
         int item = 0;
-        std::chrono::seconds waitTime(120);
+        std::chrono::seconds waitTime(10);
 
         fly::MockSystem mock(fly::MockCall::SENDTO);
 
@@ -347,12 +346,110 @@ TEST_F(SocketTest, MockSendToTest)
 
         ASSERT_TRUE(spClientSocket->SendToAsync(s_smallMessage, m_host, m_port));
 
-        while (item != spClientSocket->GetSocketId())
+        do
         {
             ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-        }
+        } while (item != spClientSocket->GetSocketId());
 
         ASSERT_FALSE(spClientSocket->IsValid());
+    }
+}
+
+/**
+ * Test handling for when socket receiving (TCP) fails.
+ */
+TEST_F(SocketTest, MockRecvTest)
+{
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, true);
+    fly::SocketPtr spRecvSocket;
+
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Listen());
+
+    fly::SocketManager::SocketCallback connectCallback([&](fly::SocketPtr spSocket)
+    {
+        m_eventQueue.Push(spSocket->GetSocketId());
+        spRecvSocket = spSocket;
+    });
+
+    fly::SocketManager::SocketCallback disconnectCallback([&](fly::SocketPtr spSocket)
+    {
+        m_eventQueue.Push(spSocket->GetSocketId());
+    });
+
+    m_spServerSocketManager->SetClientCallbacks(connectCallback, disconnectCallback);
+
+    {
+        fly::MockSystem mock(fly::MockCall::RECV);
+
+        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
+        ASSERT_EQ(spClientSocket->Recv(), std::string());
+    }
+
+    {
+        int item = 0;
+        std::chrono::seconds waitTime(10);
+
+        fly::MockSystem mock(fly::MockCall::RECV);
+
+        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, true);
+        ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
+
+        do
+        {
+            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+        } while (!spRecvSocket || (item != spRecvSocket->GetSocketId()));
+
+        ASSERT_EQ(spClientSocket->Send(s_smallMessage), s_smallMessage.size());
+
+        do
+        {
+            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+        } while (item != spRecvSocket->GetSocketId());
+
+        ASSERT_FALSE(spRecvSocket->IsValid());
+    }
+}
+
+/**
+ * Test handling for when socket receiving (UDP) fails.
+ */
+TEST_F(SocketTest, MockRecvFromTest)
+{
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, true, false);
+
+    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+
+    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr spSocket)
+    {
+        m_eventQueue.Push(spSocket->GetSocketId());
+    });
+
+    m_spServerSocketManager->SetClientCallbacks(nullptr, callback);
+
+    {
+        fly::MockSystem mock(fly::MockCall::RECVFROM);
+
+        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, false);
+        ASSERT_EQ(spClientSocket->RecvFrom(), std::string());
+    }
+
+    {
+        int item = 0;
+        std::chrono::seconds waitTime(10);
+
+        fly::MockSystem mock(fly::MockCall::RECVFROM);
+
+        fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, false, false);
+
+        ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), s_smallMessage.size());
+
+        do
+        {
+            ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+        } while (item != spServerSocket->GetSocketId());
+
+        ASSERT_FALSE(spServerSocket->IsValid());
     }
 }
 
