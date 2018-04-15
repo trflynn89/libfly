@@ -25,19 +25,6 @@ namespace
 }
 
 //==============================================================================
-SystemMonitorImpl::SystemMonitorImpl() :
-    SystemMonitor(),
-    m_prevSystemUserTime(0),
-    m_prevSystemNiceTime(0),
-    m_prevSystemSystemTime(0),
-    m_prevSystemIdleTime(0),
-    m_prevProcessSystemTime(0),
-    m_prevProcessUserTime(0),
-    m_prevTime(0)
-{
-}
-
-//==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(ConfigManagerPtr &spConfigManager) :
     SystemMonitor(spConfigManager),
     m_prevSystemUserTime(0),

@@ -7,8 +7,13 @@
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
+#include "fly/config/config_manager.h"
 #include "fly/system/system.h"
 #include "fly/system/system_monitor.h"
+
+#ifdef FLY_LINUX
+    #include "test/mock/mock_system.h"
+#endif
 
 namespace
 {
@@ -66,7 +71,11 @@ class SystemMonitorTest : public ::testing::Test
 {
 public:
     SystemMonitorTest() :
-        m_spMonitor(std::make_shared<fly::SystemMonitorImpl>()),
+        m_spConfigManager(std::make_shared<fly::ConfigManager>(
+            fly::ConfigManager::CONFIG_TYPE_INI, std::string(), std::string()
+        )),
+
+        m_spMonitor(std::make_shared<fly::SystemMonitorImpl>(m_spConfigManager)),
         m_aKeepRunning(true)
     {
     }
@@ -101,6 +110,8 @@ public:
     }
 
 protected:
+    fly::ConfigManagerPtr m_spConfigManager;
+
     fly::SystemMonitorPtr m_spMonitor;
     std::atomic_bool m_aKeepRunning;
 };
@@ -130,6 +141,52 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
     ASSERT_LT(processBefore, processAfter);
 }
 
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST_F(SystemMonitorTest, MockCpuUsageTest)
+{
+    {
+        fly::MockSystem mock(fly::MockCall::READ);
+        m_spMonitor->Stop();
+
+        m_spMonitor = std::make_shared<fly::SystemMonitorImpl>(m_spConfigManager);
+
+        ASSERT_FALSE(m_spMonitor->Start());
+        ASSERT_EQ(m_spMonitor->GetSystemCpuCount(), 0);
+    }
+
+    {
+        TearDown();
+        SetUp();
+
+        fly::MockSystem mock1(fly::MockCall::READ);
+        fly::MockSystem mock2(fly::MockCall::TIMES);
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+
+        double systemBefore = m_spMonitor->GetSystemCpuUsage();
+        double processBefore = m_spMonitor->GetProcessCpuUsage();
+
+        std::future<void> result = std::async(
+            std::launch::async, &SystemMonitorTest::SpinThread, this
+        );
+
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+
+        double systemAfter = m_spMonitor->GetSystemCpuUsage();
+        double processAfter = m_spMonitor->GetProcessCpuUsage();
+
+        m_aKeepRunning.store(false);
+        ASSERT_TRUE(result.valid());
+        result.get();
+
+        ASSERT_EQ(systemBefore, systemAfter);
+        ASSERT_EQ(processBefore, processAfter);
+    }
+}
+
+#endif
+
 //==============================================================================
 TEST_F(SystemMonitorTest, MemoryUsageTest)
 {
@@ -149,3 +206,29 @@ TEST_F(SystemMonitorTest, MemoryUsageTest)
     ASSERT_GT(systemAfter, U64(0));
     ASSERT_LT(processBefore, processAfter);
 }
+
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST_F(SystemMonitorTest, MockMemoryUsageTest)
+{
+    fly::MockSystem mock1(fly::MockCall::SYSINFO);
+    fly::MockSystem mock2(fly::MockCall::READ);
+
+    uint64_t totalBefore = m_spMonitor->GetTotalSystemMemory();
+    uint64_t systemBefore = m_spMonitor->GetSystemMemoryUsage();
+    uint64_t processBefore = m_spMonitor->GetProcessMemoryUsage();
+
+    std::string consumed((totalBefore - systemBefore) / 10, '\0');
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    uint64_t totalAfter = m_spMonitor->GetTotalSystemMemory();
+    uint64_t systemAfter = m_spMonitor->GetSystemMemoryUsage();
+    uint64_t processAfter = m_spMonitor->GetProcessMemoryUsage();
+
+    ASSERT_EQ(totalBefore, totalAfter);
+    ASSERT_EQ(systemBefore, systemAfter);
+    ASSERT_EQ(processBefore, processAfter);
+}
+
+#endif

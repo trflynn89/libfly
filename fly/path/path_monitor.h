@@ -44,12 +44,6 @@ public:
     typedef std::function<void(const std::string &, const std::string &, PathEvent)> PathEventCallback;
 
     /**
-     * Default constructor. Constructs a path monitor with default
-     * configuration.
-     */
-    PathMonitor();
-
-    /**
      * Constructor.
      *
      * @param ConfigManagerPtr Reference to the configuration manager.

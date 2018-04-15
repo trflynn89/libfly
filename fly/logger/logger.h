@@ -94,14 +94,6 @@ class Logger : public Runner
 {
 public:
     /**
-     * Default constructor. Constructs default loger configuration, meant for
-     * unit tests.
-     *
-     * @param string Path to store the log file.
-     */
-    Logger(const std::string &);
-
-    /**
      * Constructor.
      *
      * @param ConfigManagerPtr Reference to the configuration manager.

@@ -46,6 +46,6 @@
 
 #if defined(FLY_WINDOWS)
     #define FLY_OS_IMPL_PATH(module, clss) _FLY_OS_IMPL_PATH(module, win, clss)
-#elif defined (FLY_LINUX)
+#elif defined(FLY_LINUX)
     #define FLY_OS_IMPL_PATH(module, clss) _FLY_OS_IMPL_PATH(module, nix, clss)
 #endif

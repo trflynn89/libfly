@@ -24,12 +24,6 @@ class SystemMonitor : public Monitor
 {
 public:
     /**
-     * Default constructor. Constructs a system monitor with default
-     * configuration.
-     */
-    SystemMonitor();
-
-    /**
      * Constructor.
      *
      * @param ConfigManagerPtr Reference to the configuration manager.

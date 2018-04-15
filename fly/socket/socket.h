@@ -7,6 +7,7 @@
 
 #include "fly/fly.h"
 #include "fly/socket/async_request.h"
+#include "fly/socket/socket_type.h"
 
 namespace fly {
 
@@ -26,16 +27,16 @@ public:
     /**
      * Types of supported sockets.
      */
-    enum SocketType
+    enum class Protocol
     {
-        SOCKET_TCP,
-        SOCKET_UDP
+        TCP,
+        UDP
     };
 
     /**
      * Enumerated connection state values.
      */
-    enum ConnectedState
+    enum class ConnectedState
     {
         NOT_CONNECTED,
         CONNECTING,
@@ -45,7 +46,7 @@ public:
     /**
      * Default constructor to initialize all values.
      */
-    Socket(int, const SocketConfigPtr &);
+    Socket(Protocol, const SocketConfigPtr &);
 
     /**
      * INADDR_ANY may be different depending on the OS. This function will
@@ -56,7 +57,15 @@ public:
     static int InAddrAny();
 
     /**
-     *  A socket is valid if it's handle has been properly set.
+     * Invalid socket handles may be different depending on the OS. This
+     * function will return the value for the compiled target's OS.
+     *
+     * @return Invalid socket handle for the target system.
+     */
+    static socket_type InvalidSocket();
+
+    /**
+     * A socket is valid if it's handle has been properly set.
      *
      * @return True if this is a valid socket, false otherwise.
      */
@@ -82,7 +91,7 @@ public:
     /**
      * @return Return this socket's handle.
      */
-    size_t GetHandle() const;
+    socket_type GetHandle() const;
 
     /**
      * @return Return the client IP this socket is connected to.
@@ -100,18 +109,22 @@ public:
     int GetSocketId() const;
 
     /**
-     * Bind this socket to a server.
+     * Bind this socket to an address.
      *
      * @param int The server IP to bind to.
      * @param int The server port to bind to.
+     *
+     * @return True if the binding was successful.
      */
     virtual bool Bind(int, int) const = 0;
 
     /**
-     * Bind this socket to a server, allowing port to be reused.
+     * Bind this socket to an address, allowing the port to be reused.
      *
      * @param int The server IP to bind to.
      * @param int The server port to bind to.
+     *
+     * @return True if the binding was successful.
      */
     virtual bool BindForReuse(int, int) const = 0;
 
@@ -297,8 +310,8 @@ public:
     void ServiceRecvRequests(AsyncRequest::RequestQueue &);
 
 protected:
-    // Socket type
-    int m_socketType;
+    // Socket protocol
+    Protocol m_protocol;
 
     // Socket config
     const SocketConfigPtr &m_spConfig;
@@ -310,7 +323,7 @@ protected:
     const size_t m_packetSize;
 
     // File descriptor for this socket.
-    size_t m_socketHandle;
+    socket_type m_socketHandle;
 
     // Client IP and port this socket is connected to.
     int m_clientIp;

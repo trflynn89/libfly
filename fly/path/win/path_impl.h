@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <Windows.h>
+
 #include "fly/fly.h"
 
 namespace fly {
@@ -19,6 +21,9 @@ public:
     static bool RemovePath(const std::string &);
     static char GetSeparator();
     static std::string GetTempDirectory();
+
+private:
+    static bool PathIsFile(LPCTSTR);
 };
 
 }

@@ -1,32 +1,15 @@
 #include "fly/socket/win/socket_manager_impl.h"
 
-#include <algorithm>
-#include <vector>
-
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_config.h"
+#include "fly/socket/socket_type.h"
 
 namespace fly {
 
 //==============================================================================
 std::atomic_int SocketManagerImpl::s_socketManagerCount(0);
-
-//==============================================================================
-SocketManagerImpl::SocketManagerImpl() : SocketManager()
-{
-    if (s_socketManagerCount.fetch_add(1) == 0)
-    {
-        WORD version = MAKEWORD(2, 2);
-        WSADATA wsadata;
-
-        if (WSAStartup(version, &wsadata) != 0)
-        {
-            WSACleanup();
-        }
-    }
-}
 
 //==============================================================================
 SocketManagerImpl::SocketManagerImpl(ConfigManagerPtr &spConfigManager) :
@@ -91,8 +74,10 @@ bool SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
     {
         if (spSocket->IsValid())
         {
-            FD_SET(spSocket->GetHandle(), readFd);
-            FD_SET(spSocket->GetHandle(), writeFd);
+            socket_type fd = spSocket->GetHandle();
+
+            FD_SET(fd, readFd);
+            FD_SET(fd, writeFd);
 
             anyMasksSet = true;
         }
@@ -106,13 +91,13 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
 {
     SocketList newClients, connectedClients, closedClients;
 
-    for (auto it = m_aioSockets.begin(); it != m_aioSockets.end(); )
+    for (auto it = m_aioSockets.begin(); it != m_aioSockets.end(); ++it)
     {
         SocketPtr &spSocket = *it;
 
         if (spSocket->IsValid())
         {
-            size_t handle = spSocket->GetHandle();
+            socket_type handle = spSocket->GetHandle();
 
             // Handle socket accepts and reads
             if (FD_ISSET(handle, readFd))
@@ -145,7 +130,6 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
                     else
                     {
                         closedClients.push_back(spSocket);
-                        it = m_aioSockets.erase(it);
                     }
                 }
                 else if (spSocket->IsConnected() || spSocket->IsUdp())
@@ -153,17 +137,15 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
                     spSocket->ServiceSendRequests(m_completedSends);
                 }
             }
-
-            ++it;
         }
-        else
+
+        if (!spSocket->IsValid())
         {
             closedClients.push_back(spSocket);
-            it = m_aioSockets.erase(it);
         }
     }
 
-    m_aioSockets.insert(m_aioSockets.end(), newClients.begin(), newClients.end());
+    HandleNewAndClosedSockets(newClients, closedClients);
     TriggerCallbacks(connectedClients, closedClients);
 }
 

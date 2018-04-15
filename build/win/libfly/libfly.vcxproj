@@ -162,6 +162,7 @@
     <ClInclude Include="..\..\..\fly\socket\socket.h" />
     <ClInclude Include="..\..\..\fly\socket\socket_config.h" />
     <ClInclude Include="..\..\..\fly\socket\socket_manager.h" />
+    <ClInclude Include="..\..\..\fly\socket\socket_type.h" />
     <ClInclude Include="..\..\..\fly\socket\win\socket_impl.h" />
     <ClInclude Include="..\..\..\fly\socket\win\socket_manager_impl.h" />
     <ClInclude Include="..\..\..\fly\string\string.h" />

@@ -23,7 +23,7 @@ namespace
         int port
     )
     {
-        struct hostent *ipaddr = gethostbyname(hostname.c_str());
+        struct hostent *ipaddr = ::gethostbyname(hostname.c_str());
         struct sockaddr_in addr;
 
         if (ipaddr == NULL)
@@ -43,22 +43,16 @@ namespace
 }
 
 //==============================================================================
-SocketImpl::SocketImpl(int socketType, const SocketConfigPtr &spConfig) :
-    Socket(socketType, spConfig)
+SocketImpl::SocketImpl(Socket::Protocol protocol, const SocketConfigPtr &spConfig) :
+    Socket(protocol, spConfig)
 {
-    switch (socketType)
+    if (IsTcp())
     {
-    case Socket::SOCKET_TCP:
         m_socketHandle = ::socket(AF_INET, SOCK_STREAM, 0);
-        break;
-
-    case Socket::SOCKET_UDP:
+    }
+    else if (IsUdp())
+    {
         m_socketHandle = ::socket(AF_INET, SOCK_DGRAM, 0);
-        break;
-
-    default:
-        LOGW(-1, "Unrecognized socket type: %d", socketType);
-        break;
     }
 }
 
@@ -75,12 +69,18 @@ int SocketImpl::InAddrAny()
 }
 
 //==============================================================================
+socket_type SocketImpl::InvalidSocket()
+{
+    return -1;
+}
+
+//==============================================================================
 void SocketImpl::Close()
 {
     if (IsValid())
     {
         ::close(m_socketHandle);
-        m_socketHandle = 0;
+        m_socketHandle = InvalidSocket();
     }
 }
 
@@ -108,7 +108,7 @@ bool SocketImpl::SetAsync()
         LOGS(m_socketHandle, "Error getting socket flags");
         return false;
     }
-    else if (fcntl(m_socketHandle, F_SETFL, flags | O_NONBLOCK) == -1)
+    else if (::fcntl(m_socketHandle, F_SETFL, flags | O_NONBLOCK) == -1)
     {
         LOGS(m_socketHandle, "Error setting async flag");
         return false;
@@ -179,13 +179,13 @@ bool SocketImpl::Connect(const std::string &hostname, int port)
 
         if ((error == EINTR) || (error == EINPROGRESS))
         {
-            m_aConnectedState.store(Socket::CONNECTING);
+            m_aConnectedState.store(Socket::ConnectedState::CONNECTING);
         }
 
         return false;
     }
 
-    m_aConnectedState.store(Socket::CONNECTED);
+    m_aConnectedState.store(Socket::ConnectedState::CONNECTED);
     return true;
 }
 
@@ -193,7 +193,7 @@ bool SocketImpl::Connect(const std::string &hostname, int port)
 SocketPtr SocketImpl::Accept() const
 {
     SocketImplPtr ret = std::make_shared<SocketImpl>(
-        Socket::SOCKET_TCP, m_spConfig
+        Socket::Protocol::TCP, m_spConfig
     );
 
     struct sockaddr_in client;
@@ -201,20 +201,22 @@ SocketPtr SocketImpl::Accept() const
 
     int skt = ::accept(m_socketHandle, (struct sockaddr *)&client, &clientLen);
 
-    if (skt == -1)
+    if (skt == InvalidSocket())
     {
         LOGS(m_socketHandle, "Error accepting");
         ret.reset();
     }
     else
     {
+        LOGD(m_socketHandle, "Accepted new socket: %d (%d)", ret->GetSocketId(), skt);
+
         ret->m_socketHandle = skt;
         ret->m_clientIp = ntohl(client.sin_addr.s_addr);
-        ret->m_clientPort = ntohl(client.sin_port);
-        ret->m_aConnectedState.store(Socket::CONNECTED);
+        ret->m_clientPort = ntohs(client.sin_port);
+        ret->m_aConnectedState.store(Socket::ConnectedState::CONNECTED);
     }
 
-    return std::dynamic_pointer_cast<Socket>(ret);
+    return ret;
 }
 
 //==============================================================================

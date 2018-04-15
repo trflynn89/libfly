@@ -5,18 +5,6 @@
 namespace fly {
 
 //==============================================================================
-SystemMonitor::SystemMonitor() :
-    Monitor("SystemMonitor"),
-    m_systemCpuCount(0),
-    m_systemCpuUsage(0.0),
-    m_processCpuUsage(0.0),
-    m_totalSystemMemory(0),
-    m_systemMemoryUsage(0),
-    m_processMemoryUsage(0)
-{
-}
-
-//==============================================================================
 SystemMonitor::SystemMonitor(ConfigManagerPtr &spConfigManager) :
     Monitor("SystemMonitor", spConfigManager),
     m_systemCpuCount(0),

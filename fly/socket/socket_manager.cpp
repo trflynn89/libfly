@@ -1,20 +1,13 @@
 #include "fly/socket/socket_manager.h"
 
+#include <algorithm>
+
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_config.h"
 
 namespace fly {
-
-//==============================================================================
-SocketManager::SocketManager() :
-    Runner("SocketManager", 1),
-    m_spConfig(std::make_shared<SocketConfig>()),
-    m_newClientCallback(nullptr),
-    m_closedClientCallback(nullptr)
-{
-}
 
 //==============================================================================
 SocketManager::SocketManager(ConfigManagerPtr &spConfigManager) :
@@ -53,7 +46,7 @@ void SocketManager::ClearClientCallbacks()
 SocketPtr SocketManager::CreateTcpSocket()
 {
     SocketImplPtr spSocket = std::make_shared<SocketImpl>(
-        Socket::SOCKET_TCP, m_spConfig
+        Socket::Protocol::TCP, m_spConfig
     );
 
     if (!spSocket->IsValid())
@@ -61,7 +54,7 @@ SocketPtr SocketManager::CreateTcpSocket()
         spSocket.reset();
     }
 
-    return std::dynamic_pointer_cast<Socket>(spSocket);
+    return spSocket;
 }
 
 //==============================================================================
@@ -89,7 +82,7 @@ SocketWPtr SocketManager::CreateAsyncTcpSocket()
 SocketPtr SocketManager::CreateUdpSocket()
 {
     SocketImplPtr spSocket = std::make_shared<SocketImpl>(
-        Socket::SOCKET_UDP, m_spConfig
+        Socket::Protocol::UDP, m_spConfig
     );
 
     if (!spSocket->IsValid())
@@ -97,7 +90,7 @@ SocketPtr SocketManager::CreateUdpSocket()
         spSocket.reset();
     }
 
-    return std::dynamic_pointer_cast<Socket>(spSocket);
+    return spSocket;
 }
 
 //==============================================================================
@@ -136,6 +129,32 @@ void SocketManager::StopRunner()
 
     std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
     m_aioSockets.clear();
+}
+
+//==============================================================================
+void SocketManager::HandleNewAndClosedSockets(
+    const SocketList &newSockets,
+    const SocketList &closedSockets
+)
+{
+    // Add new sockets to the socket system
+    m_aioSockets.insert(m_aioSockets.end(), newSockets.begin(), newSockets.end());
+
+    // Remove closed sockets from the socket system
+    for (auto it = closedSockets.begin(); it != closedSockets.end(); ++it)
+    {
+        const SocketPtr &spSocket = *it;
+
+        auto isSameSocket = [&spSocket](SocketPtr spClosed)
+        {
+            return (spSocket->GetSocketId() == spClosed->GetSocketId());
+        };
+
+        m_aioSockets.erase(
+            std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), isSameSocket),
+            m_aioSockets.end()
+        );
+    }
 }
 
 //==============================================================================

@@ -19,6 +19,27 @@
 #include "fly/string/string.h"
 
 //==============================================================================
+TEST(ParserExceptionTest, WhatTest)
+{
+    std::string file("test_file");
+    int line = 123;
+    std::string message("Bad file!");
+
+    try
+    {
+        throw fly::ParserException(file, line, message);
+    }
+    catch (const fly::ParserException &ex)
+    {
+        std::string what(ex.what());
+
+        EXPECT_NE(what.find(file), std::string::npos);
+        EXPECT_NE(what.find(std::to_string(line)), std::string::npos);
+        EXPECT_NE(what.find(message), std::string::npos);
+    }
+}
+
+//==============================================================================
 class ParserTest : public ::testing::Test
 {
 public:

@@ -7,17 +7,26 @@
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
+#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/path/path.h"
 #include "fly/path/path_monitor.h"
 #include "fly/string/string.h"
+
+#ifdef FLY_LINUX
+    #include "test/mock/mock_system.h"
+#endif
 
 //==============================================================================
 class PathMonitorTest : public ::testing::Test
 {
 public:
     PathMonitorTest() :
-        m_spMonitor(std::make_shared<fly::PathMonitorImpl>()),
+        m_spConfigManager(std::make_shared<fly::ConfigManager>(
+            fly::ConfigManager::CONFIG_TYPE_INI, std::string(), std::string()
+        )),
+
+        m_spMonitor(std::make_shared<fly::PathMonitorImpl>(m_spConfigManager)),
 
         m_path0(fly::Path::Join(
             fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
@@ -133,6 +142,8 @@ protected:
         }
     }
 
+    fly::ConfigManagerPtr m_spConfigManager;
+
     fly::PathMonitorPtr m_spMonitor;
 
     std::string m_path0;
@@ -168,6 +179,35 @@ TEST_F(PathMonitorTest, NullCallbackTest)
     ASSERT_FALSE(m_spMonitor->AddPath(m_path0, nullptr));
     ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, nullptr));
 }
+
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST_F(PathMonitorTest, MockFailedStartMonitorTest)
+{
+    m_spMonitor->RemoveAllPaths();
+    m_spMonitor->Stop();
+
+    fly::MockSystem mock(fly::MockCall::INOTIFY_INIT1);
+
+    ASSERT_FALSE(m_spMonitor->Start());
+
+    ASSERT_FALSE(m_spMonitor->AddPath(m_path0, [](...) { }));
+    ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, [](...) { }));
+}
+
+//==============================================================================
+TEST_F(PathMonitorTest, MockFailedAddPathTest)
+{
+    m_spMonitor->RemoveAllPaths();
+
+    fly::MockSystem mock(fly::MockCall::INOTIFY_ADD_WATCH);
+
+    ASSERT_FALSE(m_spMonitor->AddPath(m_path0, [](...) { }));
+    ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, [](...) { }));
+}
+
+#endif
 
 //==============================================================================
 TEST_F(PathMonitorTest, NoChangeTest_PathLevel)
@@ -307,6 +347,50 @@ TEST_F(PathMonitorTest, ChangeTest_FileLevel)
     EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
 }
 
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST_F(PathMonitorTest, MockFailedPollTest)
+{
+    fly::MockSystem mock(fly::MockCall::POLL);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numDeletedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
+
+    CreateFile(m_fullPath1, "abcdefghi");
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numDeletedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
+}
+
+//==============================================================================
+TEST_F(PathMonitorTest, MockFailedReadTest)
+{
+    fly::MockSystem mock(fly::MockCall::READ);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numDeletedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
+
+    CreateFile(m_fullPath1, "abcdefghi");
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numDeletedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
+    EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
+}
+
+#endif
+
 //==============================================================================
 TEST_F(PathMonitorTest, OtherFileTest)
 {
@@ -426,6 +510,10 @@ TEST(PathTest, MakeAndRemovePathTest)
         fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
     ));
 
+    std::string path2(fly::Path::Join(
+        path, fly::String::GenerateRandomString(10)
+    ));
+
     // Should not be able to remove a non-existing path
     EXPECT_FALSE(fly::Path::RemovePath(path));
 
@@ -437,7 +525,47 @@ TEST(PathTest, MakeAndRemovePathTest)
     // Should be able to remove path once
     EXPECT_TRUE(fly::Path::RemovePath(path));
     EXPECT_FALSE(fly::Path::RemovePath(path));
+
+    // Should not be able to make a path if it already exists as a file
+    std::ofstream(path, std::ios::out);
+
+    EXPECT_FALSE(fly::Path::MakePath(path));
+    EXPECT_FALSE(fly::Path::MakePath(path2));
+
+    // Should not be able to remove a file
+    EXPECT_FALSE(fly::Path::RemovePath(path));
+    EXPECT_EQ(::remove(path.c_str()), 0);
+
+    // Should be able to recursively make and remove a directory
+    EXPECT_TRUE(fly::Path::MakePath(path2));
+    EXPECT_TRUE(fly::Path::RemovePath(path));
 }
+
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST(PathTest, MockRemovePathTest)
+{
+    std::string path(fly::Path::Join(
+        fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
+    ));
+
+    EXPECT_TRUE(fly::Path::MakePath(path));
+
+    {
+        fly::MockSystem mock(fly::MockCall::FTS_READ);
+        EXPECT_FALSE(fly::Path::RemovePath(path));
+    }
+
+    {
+        fly::MockSystem mock(fly::MockCall::REMOVE);
+        EXPECT_FALSE(fly::Path::RemovePath(path));
+    }
+
+    EXPECT_TRUE(fly::Path::RemovePath(path));
+}
+
+#endif
 
 //==============================================================================
 TEST(PathTest, SeparatorTest)
@@ -459,6 +587,19 @@ TEST(PathTest, TempDirectoryTest)
     std::string temp(fly::Path::GetTempDirectory());
     EXPECT_FALSE(temp.empty());
 }
+
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST(PathTest, MockTempDirectoryTest)
+{
+    fly::MockSystem mock(fly::MockCall::GETENV);
+
+    std::string temp(fly::Path::GetTempDirectory());
+    EXPECT_FALSE(temp.empty());
+}
+
+#endif
 
 //==============================================================================
 TEST(PathTest, JoinTest)
