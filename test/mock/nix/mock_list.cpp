@@ -46,6 +46,9 @@ std::ostream &operator << (std::ostream &stream, MockCall call)
     case MockCall::READ:
         stream << "read";
         break;
+    case MockCall::READDIR:
+        stream << "readdir";
+        break;
     case MockCall::RECV:
         stream << "recv";
         break;

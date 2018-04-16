@@ -1476,6 +1476,52 @@ TEST_F(JsonParserTest, EmptyObjectTest)
 }
 
 //==============================================================================
+TEST_F(JsonParserTest, EmptyArrayTest)
+{
+    const std::string contents("[]");
+    CreateFile(contents);
+
+    ASSERT_NO_THROW(m_spParser->Parse());
+
+    fly::Json json = m_spParser->GetJson();
+    EXPECT_TRUE(json.IsArray());
+    EXPECT_TRUE(json.Size() == 0);
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, EmptyNestedObjectArrayTest)
+{
+    {
+        const std::string contents("[{}]");
+        CreateFile(contents);
+
+        ASSERT_NO_THROW(m_spParser->Parse());
+
+        fly::Json json = m_spParser->GetJson();
+        EXPECT_TRUE(json.IsArray());
+        EXPECT_TRUE(json.Size() == 1);
+
+        json = json[0];
+        EXPECT_TRUE(json.IsObject());
+        EXPECT_TRUE(json.Size() == 0);
+    }
+    {
+        const std::string contents("[[]]");
+        CreateFile(contents);
+
+        ASSERT_NO_THROW(m_spParser->Parse());
+
+        fly::Json json = m_spParser->GetJson();
+        EXPECT_TRUE(json.IsArray());
+        EXPECT_TRUE(json.Size() == 1);
+
+        json = json[0];
+        EXPECT_TRUE(json.IsArray());
+        EXPECT_TRUE(json.Size() == 0);
+    }
+}
+
+//==============================================================================
 TEST_F(JsonParserTest, NonObjectOrArrayTest)
 {
     CreateFile("\"\"");
@@ -1500,10 +1546,28 @@ TEST_F(JsonParserTest, NonObjectOrArrayTest)
 //==============================================================================
 TEST_F(JsonParserTest, BadlyFormedObjectTest)
 {
+    CreateFile(":");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile(",");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("a");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("\"a\"");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
     CreateFile("{");
     EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
 
     CreateFile("}");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ { } }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ [ ] }");
     EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
 
     CreateFile("{ \"a }");
@@ -1522,6 +1586,9 @@ TEST_F(JsonParserTest, BadlyFormedObjectTest)
     EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
 
     CreateFile("{ a\" : 1 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1 ");
     EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
 
     CreateFile("{ \"a\" { }");
@@ -1560,7 +1627,19 @@ TEST_F(JsonParserTest, BadlyFormedObjectTest)
     CreateFile("{ \"a\" : 1");
     EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
 
+    CreateFile("{ \"a\" : ,");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
     CreateFile("{ \"a\" : 1, }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1 { }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1 { } }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1, { }");
     EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
 }
 
@@ -1593,8 +1672,105 @@ TEST_F(JsonParserTest, WhiteSpaceTest)
 }
 
 //==============================================================================
-TEST_F(JsonParserTest, Test)
+TEST_F(JsonParserTest, NumericConversionTest)
 {
-    auto spParser = std::make_shared<fly::JsonParser>("/tmp", "test.json");
-    spParser->Parse();
+    fly::Json json;
+
+    CreateFile("{ \"a\" : 1 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+    json = m_spParser->GetJson();
+    EXPECT_EQ(json["a"], 1);
+
+    CreateFile("{ \"a\" : -1 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+    json = m_spParser->GetJson();
+    EXPECT_EQ(json["a"], -1);
+
+    CreateFile("{ \"a\" : +1 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 01 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1.2 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+    json = m_spParser->GetJson();
+    EXPECT_DOUBLE_EQ(double(json["a"]), 1.2);
+
+    CreateFile("{ \"a\" : -1.2 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+    json = m_spParser->GetJson();
+    EXPECT_DOUBLE_EQ(double(json["a"]), -1.2);
+
+    CreateFile("{ \"a\" : +1.2 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1.2.1 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1.2e1 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+    json = m_spParser->GetJson();
+    EXPECT_DOUBLE_EQ(double(json["a"]), 12);
+
+    CreateFile("{ \"a\" : 1.2E1 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+    json = m_spParser->GetJson();
+    EXPECT_DOUBLE_EQ(double(json["a"]), 12);
+
+    CreateFile("{ \"a\" : 1.2e+1 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+    json = m_spParser->GetJson();
+    EXPECT_DOUBLE_EQ(double(json["a"]), 12);
+
+    CreateFile("{ \"a\" : 1.2E+1 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+    json = m_spParser->GetJson();
+    EXPECT_DOUBLE_EQ(double(json["a"]), 12);
+
+    CreateFile("{ \"a\" : 1.2e-1 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+    json = m_spParser->GetJson();
+    EXPECT_DOUBLE_EQ(double(json["a"]), 0.12);
+
+    CreateFile("{ \"a\" : 1.2E-1 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+    json = m_spParser->GetJson();
+    EXPECT_DOUBLE_EQ(double(json["a"]), 0.12);
+
+    CreateFile("{ \"a\" : 1.2+e2 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1.2+E2 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1.2-e2 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1.2-E2 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1.2e2E2 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1.2e2e2 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1.2E2e2 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1.2E2E2 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 01.1 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : .1 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : e5 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : E5 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
 }

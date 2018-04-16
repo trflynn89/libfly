@@ -658,6 +658,37 @@ TEST(PathTest, ListPathTest)
     EXPECT_TRUE(fly::Path::RemovePath(path1Full));
 }
 
+#ifdef FLY_LINUX
+
+//==============================================================================
+TEST(PathTest, MockListPathTest)
+{
+    fly::MockSystem mock(fly::MockCall::READDIR);
+
+    std::vector<std::string> directories;
+    std::vector<std::string> files;
+
+    std::string path1(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path1Full(fly::Path::Join(fly::Path::GetTempDirectory(), path1));
+    EXPECT_TRUE(fly::Path::MakePath(path1Full));
+
+    std::string path2(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path2Full(fly::Path::Join(path1Full, path2));
+    EXPECT_TRUE(fly::Path::MakePath(path2Full));
+
+    std::string file1(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string file1Full(fly::Path::Join(path1Full, file1));
+    std::ofstream(file1Full, std::ios::out);
+
+    EXPECT_TRUE(fly::Path::ListPath(path1Full, directories, files));
+    EXPECT_TRUE(directories.empty());
+    EXPECT_TRUE(files.empty());
+
+    EXPECT_TRUE(fly::Path::RemovePath(path1Full));
+}
+
+#endif
+
 //==============================================================================
 TEST(PathTest, SeparatorTest)
 {
@@ -715,6 +746,10 @@ TEST(PathTest, JoinTest)
 //==============================================================================
 TEST(PathTest, SplitTest)
 {
+    std::string path0(fly::Path::Join(
+        fly::String::GenerateRandomString(10)
+    ));
+
     std::string path1(fly::Path::Join(
         fly::Path::GetTempDirectory()
     ));
@@ -732,9 +767,15 @@ TEST(PathTest, SplitTest)
         fly::String::GenerateRandomString(10)
     ));
 
+    std::vector<std::string> segments0 = fly::Path::Split(path0);
     std::vector<std::string> segments1 = fly::Path::Split(path1);
     std::vector<std::string> segments2 = fly::Path::Split(path2);
     std::vector<std::string> segments3 = fly::Path::Split(path3);
+
+    EXPECT_EQ(segments0.size(), 2);
+    EXPECT_NE(path0.find(segments0[0]), std::string::npos);
+    EXPECT_NE(path0.find(segments0[1]), std::string::npos);
+    EXPECT_EQ(path0.find(segments0[0]), path0.find(segments0[1]));
 
     EXPECT_EQ(segments1.size(), 2);
     EXPECT_NE(path1.find(segments1[0]), std::string::npos);

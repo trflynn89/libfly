@@ -110,7 +110,7 @@ void JsonParser::Parse()
             }
         }
     }
-    catch (const JsonException &ex)
+    catch (const std::exception &ex)
     {
         throw ParserException(m_file, m_line, ex.what());
     }
@@ -128,6 +128,11 @@ void JsonParser::onStartBraceOrBracket(const char &c, const JsonToken &token)
 {
     switch (m_states.top())
     {
+    case JSON_PARSING_OBJECT:
+        throw ParserException(m_file, m_line, String::Format(
+            "Unexpected character '%c'", c
+        ));
+
     case JSON_PARSING_ARRAY:
         m_states.push(JSON_PARSING_VALUE);
 
@@ -147,12 +152,6 @@ void JsonParser::onStartBraceOrBracket(const char &c, const JsonToken &token)
         {
             m_parsing << c;
             return;
-        }
-        else if (!m_expectingValue)
-        {
-            throw ParserException(m_file, m_line, String::Format(
-                "Unexpected character '%c'", c
-            ));
         }
 
         break;
@@ -206,6 +205,12 @@ void JsonParser::onCloseBraceOrBracket(const char &c, const JsonToken &token)
             "Expected name or value before character '%c'", c
         ));
     }
+    else if (m_pParents.empty())
+    {
+        throw ParserException(m_file, m_line, String::Format(
+            "Unexpected character '%c'", c
+        ));
+    }
 
     m_pParents.pop();
     m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
@@ -241,8 +246,6 @@ void JsonParser::onCloseBraceOrBracket(const char &c, const JsonToken &token)
 //==============================================================================
 void JsonParser::onQuotation(const char &c)
 {
-    m_parsingString = !m_parsingString;
-
     switch (m_states.top())
     {
     case JSON_PARSING_OBJECT:
@@ -271,7 +274,7 @@ void JsonParser::onQuotation(const char &c)
         break;
 
     case JSON_PARSING_VALUE:
-        if (!m_parsingString)
+        if (m_parsingString)
         {
             m_parsedString = true;
 
@@ -286,6 +289,8 @@ void JsonParser::onQuotation(const char &c)
             "Unexpected character '%c'", c
         ));
     }
+
+    m_parsingString = !m_parsingString;
 }
 
 //==============================================================================
@@ -334,11 +339,8 @@ void JsonParser::onComma(const char &c)
             storeValue();
             break;
 
-        case JSON_PARSING_VALUE:
-            m_states.pop();
-            break;
-
         default:
+            m_states.pop();
             break;
         }
 
@@ -357,17 +359,16 @@ void JsonParser::onComma(const char &c)
         {
             m_states.pop();
         }
-
-        break;
-
-    default:
-        if (m_expectingValue)
+        else if (m_expectingValue)
         {
             throw ParserException(m_file, m_line, String::Format(
                 "Expected name or value before character '%c'", c
             ));
         }
 
+        break;
+
+    default:
         break;
     }
 
@@ -486,95 +487,55 @@ bool JsonParser::storeValue()
         *m_pValue = nullptr;
     }
 
-    // Parsed a float
-    else if (value.find('.') != std::string::npos)
-    {
-        try
-        {
-            *m_pValue = String::Convert<Json::float_type>(value);
-        }
-        catch (...)
-        {
-            throw ParserException(m_file, m_line, String::Format(
-                "Could not convert '%s' to a float type", value
-            ));
-        }
-    }
-
-    // Parsed an integer - validate non-octal
-    else if ((value.length() > 1) && (value[0] == '0'))
+    // Parsed a number - validate non-octal
+    else if (
+        (value.length() > 1) && (value[0] == '0') &&
+        (
+            ((value.find('.') == std::string::npos)) ||
+            ((value.find('.') != 1))
+        )
+    )
     {
         throw ParserException(m_file, m_line, String::Format(
-            "Octal type '%s' not allowed", value
+            "Octal value '%s' not allowed", value
         ));
     }
 
-    // Parsed a signed integer
-    else if ((value[0] == '-') || (value[0] == '+'))
+    // Parsed a number - validate no postive sign given
+    else if ((value.length() > 1) && (value[0] == '+'))
     {
-        // Integer converters like std::stoi() do not support exponentials;
-        // convert to a floating point number first, then convert to an integer
-        if ((value.find('e') != std::string::npos) || (value.find('E') != std::string::npos))
+        throw ParserException(m_file, m_line, String::Format(
+            "Specifying +integer '%s' not allowed", value
+        ));
+    }
+
+    // Parsed a float
+    else if (
+        (value.find('.') != std::string::npos) ||
+        (value.find('e') != std::string::npos) ||
+        (value.find('E') != std::string::npos)
+    )
+    {
+        if ((value[0] == '.') || (value[0] == 'e') || (value[0] == 'E'))
         {
-            try
-            {
-                Json::float_type ft = String::Convert<Json::float_type>(value);
-                *m_pValue = static_cast<Json::signed_type>(ft);
-            }
-            catch (...)
-            {
-                throw ParserException(m_file, m_line, String::Format(
-                    "Could not convert '%s' to a float type", value
-                ));
-            }
+            throw ParserException(m_file, m_line, String::Format(
+                "Expected starting digit for '%s'", value
+            ));
         }
-        else
-        {
-            try
-            {
-                *m_pValue = String::Convert<Json::signed_type>(value);
-            }
-            catch (...)
-            {
-                throw ParserException(m_file, m_line, String::Format(
-                    "Could not convert '%s' to an signed type", value
-                ));
-            }
-        }
+
+        *m_pValue = String::Convert<Json::float_type>(value);
+    }
+
+    // Parsed a signed integer
+    else if (value[0] == '-')
+    {
+        *m_pValue = String::Convert<Json::signed_type>(value);
     }
 
     // Parsed an unsigned integer
     else
     {
-        // Integer converters like std::stoi() do not support exponentials;
-        // convert to a floating point number first, then convert to an integer
-        if ((value.find('e') != std::string::npos) || (value.find('E') != std::string::npos))
-        {
-            try
-            {
-                Json::float_type ft = String::Convert<Json::float_type>(value);
-                *m_pValue = static_cast<Json::unsigned_type>(ft);
-            }
-            catch (...)
-            {
-                throw ParserException(m_file, m_line, String::Format(
-                    "Could not convert '%s' to a float type", value
-                ));
-            }
-        }
-        else
-        {
-            try
-            {
-                *m_pValue = String::Convert<Json::unsigned_type>(value);
-            }
-            catch (...)
-            {
-                throw ParserException(m_file, m_line, String::Format(
-                    "Could not convert '%s' to an unsigned type", value
-                ));
-            }
-        }
+        *m_pValue = String::Convert<Json::unsigned_type>(value);
     }
 
     m_pParents.pop();
