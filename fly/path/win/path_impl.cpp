@@ -1,6 +1,7 @@
 #include "fly/path/win/path_impl.h"
 
 #include <shlobj.h>
+#include <strsafe.h>
 #include <tchar.h>
 
 #include "fly/logger/logger.h"
@@ -74,6 +75,60 @@ bool PathImpl::RemovePath(const std::string &path)
     }
 
     return ret;
+}
+
+//==============================================================================
+bool PathImpl::ListPath(
+    const std::string &path,
+    std::vector<std::string> &directories,
+    std::vector<std::string> &files
+)
+{
+    // For FindFile(), need to append "\\*" - make sure there is enough space
+    if (path.length() > (MAX_PATH - 3))
+    {
+        LOGW(-1, "Path \"%s\" is too long", path);
+        return false;
+    }
+
+    TCHAR searchPath[MAX_PATH];
+    WIN32_FIND_DATA ffd;
+
+    ::StringCchCopy(searchPath, MAX_PATH, path.c_str());
+    ::StringCchCat(searchPath, MAX_PATH, TEXT("\\*"));
+
+    HANDLE handle = ::FindFirstFile(searchPath, &ffd);
+
+    if (handle == INVALID_HANDLE_VALUE)
+    {
+        LOGW(-1, "Could not open \"%s\"", path);
+        return false;
+    }
+
+    do
+    {
+        const std::string file(ffd.cFileName);
+
+        if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+        {
+            if ((file != ".") && (file != ".."))
+            {
+                directories.push_back(file);
+            }
+        }
+        else
+        {
+            files.push_back(file);
+        }
+    } while (::FindNextFile(handle, &ffd));
+
+    if (System::GetErrorCode() != ERROR_NO_MORE_FILES)
+    {
+        LOGS(-1, "Could not completely list \"%s\"", path);
+        return false;
+    }
+
+    return true;
 }
 
 //==============================================================================

@@ -1407,13 +1407,13 @@ TEST_F(JsonParserTest, JsonCheckerTest)
     // Get the path to this file
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
     ASSERT_FALSE(segments.empty());
+
+    std::string path = segments.front();
     segments.back() = "json_checker";
 
-    std::string path;
-
-    for (const std::string &segment : segments)
+    for (size_t i = 1; i < segments.size(); ++i)
     {
-        path = fly::Path::Join(path, segment);
+        path = fly::Path::Join(path, segments[i]);
     }
 
     // Validate each JSON file in the JSON checker directory

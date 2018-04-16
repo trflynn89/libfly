@@ -178,9 +178,6 @@ bool PathImpl::ListPath(
     DirWrapper dir(path.c_str());
     struct dirent *ent = NULL;
 
-    directories.clear();
-    files.clear();
-
     while (dir && (ent = ::readdir(dir())) != NULL)
     {
         const std::string file(ent->d_name);

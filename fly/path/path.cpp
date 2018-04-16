@@ -23,6 +23,9 @@ bool Path::ListPath(
     std::vector<std::string> &files
 )
 {
+    directories.clear();
+    files.clear();
+
     return PathImpl::ListPath(path, directories, files);
 }
 

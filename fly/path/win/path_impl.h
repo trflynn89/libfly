@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <Windows.h>
 
@@ -19,6 +20,11 @@ class PathImpl
 public:
     static bool MakePath(const std::string &);
     static bool RemovePath(const std::string &);
+    static bool ListPath(
+        const std::string &,
+        std::vector<std::string> &,
+        std::vector<std::string> &
+    );
     static char GetSeparator();
     static std::string GetTempDirectory();
 
