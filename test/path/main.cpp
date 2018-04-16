@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdio>
 #include <fstream>
 #include <functional>
@@ -568,6 +569,96 @@ TEST(PathTest, MockRemovePathTest)
 #endif
 
 //==============================================================================
+TEST(PathTest, ListPathTest)
+{
+    std::vector<std::string> directories;
+    std::vector<std::string> files;
+
+    std::string path1(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path1Full(fly::Path::Join(fly::Path::GetTempDirectory(), path1));
+    EXPECT_TRUE(fly::Path::MakePath(path1Full));
+
+    std::string path2(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path2Full(fly::Path::Join(path1Full, path2));
+    EXPECT_TRUE(fly::Path::MakePath(path2Full));
+
+    std::string path3(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path3Full(fly::Path::Join(path1Full, path3));
+    EXPECT_TRUE(fly::Path::MakePath(path3Full));
+
+    std::string path4(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path4Full(fly::Path::Join(path2Full, path4));
+    EXPECT_TRUE(fly::Path::MakePath(path4Full));
+
+    std::string file1(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string file1Full(fly::Path::Join(path1Full, file1));
+    std::ofstream(file1Full, std::ios::out);
+
+    std::string file2(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string file2Full(fly::Path::Join(path2Full, file2));
+    std::ofstream(file2Full, std::ios::out);
+
+    std::string file3(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string file3Full(fly::Path::Join(path3Full, file3));
+    std::ofstream(file3Full, std::ios::out);
+
+    EXPECT_TRUE(fly::Path::ListPath(path1Full, directories, files));
+    {
+        std::vector<std::string> expectedDirectories = { path2, path3 };
+        std::vector<std::string> expectedFiles = { file1 };
+
+        std::sort(directories.begin(), directories.end());
+        std::sort(files.begin(), files.end());
+
+        std::sort(expectedDirectories.begin(), expectedDirectories.end());
+        std::sort(expectedFiles.begin(), expectedFiles.end());
+
+        EXPECT_EQ(directories, expectedDirectories);
+        EXPECT_EQ(files, expectedFiles);
+    }
+
+    EXPECT_TRUE(fly::Path::ListPath(path2Full, directories, files));
+    {
+        std::vector<std::string> expectedDirectories = { path4 };
+        std::vector<std::string> expectedFiles = { file2 };
+
+        std::sort(directories.begin(), directories.end());
+        std::sort(files.begin(), files.end());
+
+        std::sort(expectedDirectories.begin(), expectedDirectories.end());
+        std::sort(expectedFiles.begin(), expectedFiles.end());
+
+        EXPECT_EQ(directories, expectedDirectories);
+        EXPECT_EQ(files, expectedFiles);
+    }
+
+    EXPECT_TRUE(fly::Path::ListPath(path3Full, directories, files));
+    {
+        std::vector<std::string> expectedFiles = { file3 };
+
+        std::sort(files.begin(), files.end());
+
+        std::sort(expectedFiles.begin(), expectedFiles.end());
+
+        EXPECT_TRUE(directories.empty());
+        EXPECT_EQ(files, expectedFiles);
+    }
+
+    EXPECT_TRUE(fly::Path::ListPath(path4Full, directories, files));
+    {
+        EXPECT_TRUE(directories.empty());
+        EXPECT_TRUE(files.empty());
+    }
+
+    EXPECT_FALSE(fly::Path::ListPath(file1Full, directories, files));
+    EXPECT_FALSE(fly::Path::ListPath(file2Full, directories, files));
+    EXPECT_FALSE(fly::Path::ListPath(file3Full, directories, files));
+    EXPECT_FALSE(fly::Path::ListPath(fly::String::GenerateRandomString(10), directories, files));
+
+    EXPECT_TRUE(fly::Path::RemovePath(path1Full));
+}
+
+//==============================================================================
 TEST(PathTest, SeparatorTest)
 {
     const char sep = fly::Path::GetSeparator();
@@ -619,4 +710,63 @@ TEST(PathTest, JoinTest)
     EXPECT_TRUE(fly::String::StartsWith(path, path1));
     EXPECT_TRUE(fly::String::EndsWith(path, path2));
     EXPECT_EQ(path.find(separator2x), std::string::npos);
+}
+
+//==============================================================================
+TEST(PathTest, SplitTest)
+{
+    static const int numSectors = 10;
+
+    std::vector<std::string> inputSplit(10);
+    std::string input;
+
+    for (int i = 0; i < numSectors; ++i)
+    {
+        std::string curr = fly::String::GenerateRandomString(10);
+
+        input = fly::Path::Join(input, curr);
+        inputSplit[i] = curr;
+    }
+
+    std::vector<std::string> outputSplit = fly::Path::Split(input);
+    ASSERT_EQ(inputSplit.size(), outputSplit.size());
+
+    for (int i = 0; i < numSectors; ++i)
+    {
+        ASSERT_EQ(inputSplit[i], outputSplit[i]);
+    }
+}
+
+//==============================================================================
+TEST(PathTest, SplitWithRepeatingSeparatorsTest)
+{
+    static const int numSectors = 10;
+
+    std::vector<std::string> inputSplit(10);
+    std::string input;
+
+    input += fly::Path::GetSeparator();
+    input += fly::Path::GetSeparator();
+
+    for (int i = 0; i < numSectors; ++i)
+    {
+        std::string curr = fly::String::GenerateRandomString(10);
+
+        input = fly::Path::Join(input, curr);
+        input += fly::Path::GetSeparator();
+        input += fly::Path::GetSeparator();
+
+        inputSplit[i] = curr;
+    }
+
+    input += fly::Path::GetSeparator();
+    input += fly::Path::GetSeparator();
+
+    std::vector<std::string> outputSplit = fly::Path::Split(input);
+    ASSERT_EQ(inputSplit.size(), outputSplit.size());
+
+    for (int i = 0; i < numSectors; ++i)
+    {
+        ASSERT_EQ(inputSplit[i], outputSplit[i]);
+    }
 }

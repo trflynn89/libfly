@@ -70,7 +70,7 @@ public:
     using boolean_type = bool;
     using signed_type = int64_t;
     using unsigned_type = uint64_t;
-    using float_type = double;
+    using float_type = long double;
     using null_type = std::nullptr_t;
 
     /**

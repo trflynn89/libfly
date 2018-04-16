@@ -19,7 +19,7 @@
 #include "fly/string/string.h"
 
 //==============================================================================
-TEST(ParserExceptionTest, WhatTest)
+TEST(ParserExceptionTest, ExceptionTest)
 {
     std::string file("test_file");
     int line = 123;
@@ -109,20 +109,6 @@ public:
 
 protected:
     fly::IniParserPtr m_spParser;
-};
-
-//==============================================================================
-class JsonParserTest : public ParserTest
-{
-public:
-    JsonParserTest() :
-        ParserTest(),
-        m_spParser(std::make_shared<fly::JsonParser>(m_path, m_file))
-    {
-    }
-
-protected:
-    fly::JsonParserPtr m_spParser;
 };
 
 //==============================================================================
@@ -1398,6 +1384,65 @@ TEST(JsonExceptionTest, ExceptionTest)
 }
 
 //==============================================================================
+class JsonParserTest : public ParserTest
+{
+public:
+    JsonParserTest() :
+        ParserTest(),
+        m_spParser(std::make_shared<fly::JsonParser>(m_path, m_file))
+    {
+    }
+
+protected:
+    fly::JsonParserPtr m_spParser;
+};
+
+//==============================================================================
+TEST_F(JsonParserTest, JsonCheckerTest)
+{
+    // Run the parser against test files from http://www.json.org/JSON_checker/
+    // The following files are excluded from this test:
+    //      - fail18.json: The parser has no max-depth
+
+    // Get the path to this file
+    std::vector<std::string> segments = fly::Path::Split(__FILE__);
+    ASSERT_FALSE(segments.empty());
+    segments.back() = "json_checker";
+
+    std::string path;
+
+    for (const std::string &segment : segments)
+    {
+        path = fly::Path::Join(path, segment);
+    }
+
+    // Validate each JSON file in the JSON checker directory
+    std::vector<std::string> directories;
+    std::vector<std::string> files;
+
+    ASSERT_TRUE(fly::Path::ListPath(path, directories, files));
+
+    for (const std::string &file : files)
+    {
+        m_spParser = std::make_shared<fly::JsonParser>(path, file);
+        SCOPED_TRACE(file);
+
+        if (fly::String::WildcardMatch(file, "pass*.json"))
+        {
+            EXPECT_NO_THROW(m_spParser->Parse());
+        }
+        else if (fly::String::WildcardMatch(file, "fail*.json"))
+        {
+            EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+        }
+        else
+        {
+            FAIL() << "Unrecognized JSON file: " << file;
+        }
+    }
+}
+
+//==============================================================================
 TEST_F(JsonParserTest, NonExistingPathTest)
 {
     m_spParser = std::make_shared<fly::JsonParser>(m_path + "foo", m_file);
@@ -1439,12 +1484,9 @@ TEST_F(JsonParserTest, EmptyObjectTest)
 }
 
 //==============================================================================
-TEST_F(JsonParserTest, NonObjectTest)
+TEST_F(JsonParserTest, NonObjectOrArrayTest)
 {
     CreateFile("\"\"");
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile("[]");
     EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
 
     CreateFile("true");
@@ -1460,6 +1502,101 @@ TEST_F(JsonParserTest, NonObjectTest)
     EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
 
     CreateFile("null");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, BadlyFormedObjectTest)
+{
+    CreateFile("{");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("}");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ a\" }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a : 1 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ a\" : 1 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" { }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : { }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" [");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : [");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" ]");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : ]");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" tru }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : tru }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" flse }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : flse }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" 1, }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : 1, }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, WhiteSpaceTest)
+{
+    CreateFile("{ \"a\" : 1 }");
+    EXPECT_NO_THROW(m_spParser->Parse());
+
+    CreateFile("\n{ \n \"a\" \n : \n \t\t 1 \r \n }\n");
+    EXPECT_NO_THROW(m_spParser->Parse());
+
+    CreateFile("{ \"a\t\" : 1 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\n\" : 1 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\r\" : 1 }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : \"b\n\" }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : \"b\r\" }");
+    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+
+    CreateFile("{ \"a\" : \"b\t\" }");
     EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
 }
 

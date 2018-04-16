@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "fly/fly.h"
 #include "fly/string/string.h"
@@ -19,7 +20,7 @@ public:
     /**
      * Create a directory and the path to that directory, if needed.
      *
-     * @param std::string Path to the directory to create.
+     * @param string Path to the directory to create.
      *
      * @return True if the directory could be created (or already exists).
      */
@@ -28,11 +29,26 @@ public:
     /**
      * Remove a directory.
      *
-     * @param std::string Path to the directory to remove.
+     * @param string Path to the directory to remove.
      *
      * @return True if the directory could be removed.
      */
     static bool RemovePath(const std::string &);
+
+    /**
+     * List the directories and files directly under a path.
+     *
+     * @param string The path to retrieve a listing for.
+     * @param vector A vector to store the directories under the path.
+     * @param vector A vector to store the files under the path.
+     *
+     * @return True if the directory could be listed.
+     */
+    static bool ListPath(
+        const std::string &,
+        std::vector<std::string> &,
+        std::vector<std::string> &
+    );
 
     /**
      * @return The system's path separator.
@@ -50,6 +66,15 @@ public:
      */
     template <typename ... Args>
     static std::string Join(const Args &...);
+
+    /**
+     * Split a path into a vector of strings on the system's path separator.
+     *
+     * @param string The string to split.
+     *
+     * @return A vector containing the split path segments.
+     */
+    static std::vector<std::string> Split(const std::string &);
 
     /**
      * @return The system's temporary directory path.

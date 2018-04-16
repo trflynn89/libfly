@@ -13,6 +13,9 @@ arch := $(arch)
 # Enable verbose builds
 verbose := 0
 
+# Arguments to give to target when run
+args :=
+
 # Define the output directories
 ifeq ($(release), 1)
     OUT_DIR := $(CURDIR)/release-$(arch)

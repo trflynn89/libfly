@@ -26,6 +26,8 @@ public:
     enum JsonToken
     {
         JSON_NEW_LINE = 0x0A, // \n
+        JSON_SPACE = 0x20, // <space>
+
         JSON_QUOTE = 0x22, // "
         JSON_COMMA = 0x2c, // ,
         JSON_COLON = 0x3a, // :
@@ -35,6 +37,15 @@ public:
 
         JSON_START_BRACE = 0x7b, // {
         JSON_CLOSE_BRACE = 0x7d, // }
+
+        JSON_REVERSE_SOLIDUS = 0x5C, /* \ */
+        JSON_SOLIDUS = 0x2F, // /
+        JSON_B = 0x62, // b (backspace)
+        JSON_F = 0x66, // f (formfeed)
+        JSON_N = 0x6E, // n (newline)
+        JSON_R = 0x72, // r (carriage return)
+        JSON_T = 0x74, // t (horizontal tab)
+        JSON_U = 0x75, // u (hexidecimal)
     };
 
     enum JsonState
@@ -88,6 +99,7 @@ private:
     void onColon(const char &);
 
     void onCharacter(const char &);
+    void onEscapedCharacter(const char &);
 
     bool storeValue();
 
@@ -100,6 +112,7 @@ private:
     std::stringstream m_parsing;
     bool m_parsingString;
     bool m_parsedString;
+    bool m_expectingEscape;
     bool m_expectingValue;
 
     mutable std::shared_timed_mutex m_sectionsMutex;
