@@ -1404,17 +1404,9 @@ TEST_F(JsonParserTest, JsonCheckerTest)
     // The following files are excluded from this test:
     //      - fail18.json: The parser has no max-depth
 
-    // Get the path to this file
+    // Get the path to the JSON checker directory
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
-    ASSERT_FALSE(segments.empty());
-
-    std::string path = segments.front();
-    segments.back() = "json_checker";
-
-    for (size_t i = 1; i < segments.size(); ++i)
-    {
-        path = fly::Path::Join(path, segments[i]);
-    }
+    std::string path = fly::Path::Join(segments[0], "json_checker");
 
     // Validate each JSON file in the JSON checker directory
     std::vector<std::string> directories;

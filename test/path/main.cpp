@@ -715,58 +715,61 @@ TEST(PathTest, JoinTest)
 //==============================================================================
 TEST(PathTest, SplitTest)
 {
-    static const int numSectors = 10;
+    std::string path1(fly::Path::Join(
+        fly::Path::GetTempDirectory()
+    ));
 
-    std::vector<std::string> inputSplit(10);
-    std::string input;
+    std::string path2(fly::Path::Join(
+        fly::Path::GetTempDirectory(),
+        fly::String::GenerateRandomString(10)
+    ));
 
-    for (int i = 0; i < numSectors; ++i)
-    {
-        std::string curr = fly::String::GenerateRandomString(10);
+    std::string path3(fly::Path::Join(
+        fly::Path::GetTempDirectory(),
+        fly::String::GenerateRandomString(10),
+        fly::String::GenerateRandomString(10),
+        fly::String::GenerateRandomString(10),
+        fly::String::GenerateRandomString(10)
+    ));
 
-        input = fly::Path::Join(input, curr);
-        inputSplit[i] = curr;
-    }
+    std::vector<std::string> segments1 = fly::Path::Split(path1);
+    std::vector<std::string> segments2 = fly::Path::Split(path2);
+    std::vector<std::string> segments3 = fly::Path::Split(path3);
 
-    std::vector<std::string> outputSplit = fly::Path::Split(input);
-    ASSERT_EQ(inputSplit.size(), outputSplit.size());
+    EXPECT_EQ(segments1.size(), 2);
+    EXPECT_NE(path1.find(segments1[0]), std::string::npos);
+    EXPECT_NE(path1.find(segments1[1]), std::string::npos);
+    EXPECT_LT(path1.find(segments1[0]), path1.find(segments1[1]));
 
-    for (int i = 0; i < numSectors; ++i)
-    {
-        ASSERT_EQ(inputSplit[i], outputSplit[i]);
-    }
+    EXPECT_EQ(segments2.size(), 2);
+    EXPECT_NE(path2.find(segments2[0]), std::string::npos);
+    EXPECT_NE(path2.find(segments2[1]), std::string::npos);
+    EXPECT_LT(path2.find(segments2[0]), path2.find(segments2[1]));
+
+    EXPECT_EQ(segments3.size(), 2);
+    EXPECT_NE(path3.find(segments3[0]), std::string::npos);
+    EXPECT_NE(path3.find(segments3[1]), std::string::npos);
+    EXPECT_LT(path3.find(segments3[0]), path3.find(segments3[1]));
 }
 
 //==============================================================================
-TEST(PathTest, SplitWithRepeatingSeparatorsTest)
+TEST(PathTest, SplitAndJoinTest)
 {
-    static const int numSectors = 10;
+    std::string path(fly::Path::Join(
+        fly::Path::GetTempDirectory(),
+        fly::String::GenerateRandomString(10),
+        fly::String::GenerateRandomString(10),
+        fly::String::GenerateRandomString(10),
+        fly::String::GenerateRandomString(10)
+    ));
 
-    std::vector<std::string> inputSplit(10);
-    std::string input;
+    std::vector<std::string> segments = fly::Path::Split(path);
+    std::string newPath = segments.front();
 
-    input += fly::Path::GetSeparator();
-    input += fly::Path::GetSeparator();
-
-    for (int i = 0; i < numSectors; ++i)
+    for (size_t i = 1; i < segments.size(); ++i)
     {
-        std::string curr = fly::String::GenerateRandomString(10);
-
-        input = fly::Path::Join(input, curr);
-        input += fly::Path::GetSeparator();
-        input += fly::Path::GetSeparator();
-
-        inputSplit[i] = curr;
+        newPath = fly::Path::Join(newPath, segments[i]);
     }
 
-    input += fly::Path::GetSeparator();
-    input += fly::Path::GetSeparator();
-
-    std::vector<std::string> outputSplit = fly::Path::Split(input);
-    ASSERT_EQ(inputSplit.size(), outputSplit.size());
-
-    for (int i = 0; i < numSectors; ++i)
-    {
-        ASSERT_EQ(inputSplit[i], outputSplit[i]);
-    }
+    EXPECT_EQ(path, newPath);
 }

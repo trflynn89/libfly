@@ -68,11 +68,12 @@ public:
     static std::string Join(const Args &...);
 
     /**
-     * Split a path into a vector of strings on the system's path separator.
+     * Split a path into a pair, (head, tail), where tail is the last pathname
+     * component and head is everything leading up to that.
      *
-     * @param string The string to split.
+     * @param string The path to split.
      *
-     * @return A vector containing the split path segments.
+     * @return A vector containing the head and tail of the path.
      */
     static std::vector<std::string> Split(const std::string &);
 
