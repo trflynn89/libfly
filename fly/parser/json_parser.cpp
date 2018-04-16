@@ -110,6 +110,10 @@ void JsonParser::Parse()
             }
         }
     }
+    catch (const ParserException &ex)
+    {
+        throw ex;
+    }
     catch (const std::exception &ex)
     {
         throw ParserException(m_file, m_line, ex.what());
