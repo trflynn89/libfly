@@ -117,7 +117,7 @@ TEST_F(IniParserTest, NonExistingPathTest)
     m_spParser = std::make_shared<fly::IniParser>(m_path + "foo", m_file);
 
     ASSERT_NO_THROW(m_spParser->Parse());
-    EXPECT_EQ(m_spParser->GetSize(), 0);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 0);
 }
 
 //==============================================================================
@@ -126,7 +126,7 @@ TEST_F(IniParserTest, NonExistingFileTest)
     m_spParser = std::make_shared<fly::IniParser>(m_path, m_file + "foo");
 
     ASSERT_NO_THROW(m_spParser->Parse());
-    EXPECT_EQ(m_spParser->GetSize(), 0);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 0);
 }
 
 //==============================================================================
@@ -136,7 +136,7 @@ TEST_F(IniParserTest, EmptyFileTest)
     CreateFile(contents);
 
     ASSERT_NO_THROW(m_spParser->Parse());
-    EXPECT_EQ(m_spParser->GetSize(), 0);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 0);
 }
 
 //==============================================================================
@@ -146,7 +146,7 @@ TEST_F(IniParserTest, EmptySectionTest)
     CreateFile(contents);
 
     ASSERT_NO_THROW(m_spParser->Parse());
-    EXPECT_EQ(m_spParser->GetSize(), 0);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 0);
 }
 
 //==============================================================================
@@ -162,8 +162,8 @@ TEST_F(IniParserTest, NonEmptySectionTest)
 
     ASSERT_NO_THROW(m_spParser->Parse());
 
-    EXPECT_EQ(m_spParser->GetSize(), 1);
-    EXPECT_EQ(m_spParser->GetSize("section"), 2);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
 }
 
 //==============================================================================
@@ -179,9 +179,9 @@ TEST_F(IniParserTest, NonExistingTest)
 
     ASSERT_NO_THROW(m_spParser->Parse());
 
-    EXPECT_EQ(m_spParser->GetSize("section"), 2);
-    EXPECT_EQ(m_spParser->GetSize("bad-section"), 0);
-    EXPECT_EQ(m_spParser->GetSize("section-bad"), 0);
+    EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
+    EXPECT_EQ(m_spParser->GetValues("bad-section").Size(), 0);
+    EXPECT_EQ(m_spParser->GetValues("section-bad").Size(), 0);
 }
 
 //==============================================================================
@@ -198,9 +198,9 @@ TEST_F(IniParserTest, CommentTest)
 
     ASSERT_NO_THROW(m_spParser->Parse());
 
-    EXPECT_EQ(m_spParser->GetSize(), 1);
-    EXPECT_EQ(m_spParser->GetSize("section"), 1);
-    EXPECT_EQ(m_spParser->GetSize("other-section"), 0);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("other-section").Size(), 0);
 }
 
 //==============================================================================
@@ -216,8 +216,8 @@ TEST_F(IniParserTest, ErrantSpacesTest)
 
     ASSERT_NO_THROW(m_spParser->Parse());
 
-    EXPECT_EQ(m_spParser->GetSize(), 1);
-    EXPECT_EQ(m_spParser->GetSize("section"), 2);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
 }
 
 //==============================================================================
@@ -233,8 +233,8 @@ TEST_F(IniParserTest, QuotedValueTest)
 
     ASSERT_NO_THROW(m_spParser->Parse());
 
-    EXPECT_EQ(m_spParser->GetSize(), 1);
-    EXPECT_EQ(m_spParser->GetSize("section"), 2);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
 }
 
 //==============================================================================
@@ -256,10 +256,10 @@ TEST_F(IniParserTest, MutlipleSectionTypeTest)
 
     ASSERT_NO_THROW(m_spParser->Parse());
 
-    EXPECT_EQ(m_spParser->GetSize(), 3);
-    EXPECT_EQ(m_spParser->GetSize("section1"), 2);
-    EXPECT_EQ(m_spParser->GetSize("section2"), 2);
-    EXPECT_EQ(m_spParser->GetSize("section3"), 2);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 3);
+    EXPECT_EQ(m_spParser->GetValues("section1").Size(), 2);
+    EXPECT_EQ(m_spParser->GetValues("section2").Size(), 2);
+    EXPECT_EQ(m_spParser->GetValues("section3").Size(), 2);
 }
 
 //==============================================================================
@@ -273,7 +273,10 @@ TEST_F(IniParserTest, DuplicateSectionTest)
     );
 
     CreateFile(contents1);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+    EXPECT_NO_THROW(m_spParser->Parse());
+    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section")["name"], "Jane Doe");
 
     const std::string contents2(
         "[  \tsection]\n"
@@ -283,7 +286,10 @@ TEST_F(IniParserTest, DuplicateSectionTest)
     );
 
     CreateFile(contents2);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+    EXPECT_NO_THROW(m_spParser->Parse());
+    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section")["name"], "Jane Doe");
 }
 
 //==============================================================================
@@ -296,7 +302,10 @@ TEST_F(IniParserTest, DuplicateValueTest)
     );
 
     CreateFile(contents);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+    EXPECT_NO_THROW(m_spParser->Parse());
+    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section")["name"], "Jane Doe");
 }
 
 //==============================================================================
@@ -436,13 +445,13 @@ TEST_F(IniParserTest, MultipleAssignmentTest)
 
     CreateFile(contents1);
     ASSERT_NO_THROW(m_spParser->Parse());
-    EXPECT_EQ(m_spParser->GetSize(), 1);
-    EXPECT_EQ(m_spParser->GetSize("section"), 1);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
 
     CreateFile(contents2);
     ASSERT_NO_THROW(m_spParser->Parse());
-    EXPECT_EQ(m_spParser->GetSize(), 1);
-    EXPECT_EQ(m_spParser->GetSize("section"), 1);
+    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
+    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
 }
 
 //==============================================================================
@@ -508,8 +517,8 @@ TEST_F(IniParserTest, MultipleParseTest)
     {
         ASSERT_NO_THROW(m_spParser->Parse());
 
-        EXPECT_EQ(m_spParser->GetSize(), 1);
-        EXPECT_EQ(m_spParser->GetSize("section"), 2);
+        EXPECT_EQ(m_spParser->GetValues().Size(), 1);
+        EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
     }
 }
 
@@ -1440,7 +1449,7 @@ TEST_F(JsonParserTest, NonExistingPathTest)
     m_spParser = std::make_shared<fly::JsonParser>(m_path + "foo", m_file);
 
     ASSERT_NO_THROW(m_spParser->Parse());
-    EXPECT_TRUE(m_spParser->GetJson().IsNull());
+    EXPECT_TRUE(m_spParser->GetValues().IsNull());
 }
 
 //==============================================================================
@@ -1449,7 +1458,7 @@ TEST_F(JsonParserTest, NonExistingFileTest)
     m_spParser = std::make_shared<fly::JsonParser>(m_path, m_file + "foo");
 
     ASSERT_NO_THROW(m_spParser->Parse());
-    EXPECT_TRUE(m_spParser->GetJson().IsNull());
+    EXPECT_TRUE(m_spParser->GetValues().IsNull());
 }
 
 //==============================================================================
@@ -1459,7 +1468,7 @@ TEST_F(JsonParserTest, EmptyFileTest)
     CreateFile(contents);
 
     ASSERT_NO_THROW(m_spParser->Parse());
-    EXPECT_TRUE(m_spParser->GetJson().IsNull());
+    EXPECT_TRUE(m_spParser->GetValues().IsNull());
 }
 
 //==============================================================================
@@ -1470,7 +1479,7 @@ TEST_F(JsonParserTest, EmptyObjectTest)
 
     ASSERT_NO_THROW(m_spParser->Parse());
 
-    fly::Json json = m_spParser->GetJson();
+    fly::Json json = m_spParser->GetValues();
     EXPECT_TRUE(json.IsObject());
     EXPECT_TRUE(json.Size() == 0);
 }
@@ -1483,7 +1492,7 @@ TEST_F(JsonParserTest, EmptyArrayTest)
 
     ASSERT_NO_THROW(m_spParser->Parse());
 
-    fly::Json json = m_spParser->GetJson();
+    fly::Json json = m_spParser->GetValues();
     EXPECT_TRUE(json.IsArray());
     EXPECT_TRUE(json.Size() == 0);
 }
@@ -1497,7 +1506,7 @@ TEST_F(JsonParserTest, EmptyNestedObjectArrayTest)
 
         ASSERT_NO_THROW(m_spParser->Parse());
 
-        fly::Json json = m_spParser->GetJson();
+        fly::Json json = m_spParser->GetValues();
         EXPECT_TRUE(json.IsArray());
         EXPECT_TRUE(json.Size() == 1);
 
@@ -1511,7 +1520,7 @@ TEST_F(JsonParserTest, EmptyNestedObjectArrayTest)
 
         ASSERT_NO_THROW(m_spParser->Parse());
 
-        fly::Json json = m_spParser->GetJson();
+        fly::Json json = m_spParser->GetValues();
         EXPECT_TRUE(json.IsArray());
         EXPECT_TRUE(json.Size() == 1);
 
@@ -1678,12 +1687,12 @@ TEST_F(JsonParserTest, NumericConversionTest)
 
     CreateFile("{ \"a\" : 1 }");
     EXPECT_NO_THROW(m_spParser->Parse());
-    json = m_spParser->GetJson();
+    json = m_spParser->GetValues();
     EXPECT_EQ(json["a"], 1);
 
     CreateFile("{ \"a\" : -1 }");
     EXPECT_NO_THROW(m_spParser->Parse());
-    json = m_spParser->GetJson();
+    json = m_spParser->GetValues();
     EXPECT_EQ(json["a"], -1);
 
     CreateFile("{ \"a\" : +1 }");
@@ -1694,12 +1703,12 @@ TEST_F(JsonParserTest, NumericConversionTest)
 
     CreateFile("{ \"a\" : 1.2 }");
     EXPECT_NO_THROW(m_spParser->Parse());
-    json = m_spParser->GetJson();
+    json = m_spParser->GetValues();
     EXPECT_DOUBLE_EQ(double(json["a"]), 1.2);
 
     CreateFile("{ \"a\" : -1.2 }");
     EXPECT_NO_THROW(m_spParser->Parse());
-    json = m_spParser->GetJson();
+    json = m_spParser->GetValues();
     EXPECT_DOUBLE_EQ(double(json["a"]), -1.2);
 
     CreateFile("{ \"a\" : +1.2 }");
@@ -1710,32 +1719,32 @@ TEST_F(JsonParserTest, NumericConversionTest)
 
     CreateFile("{ \"a\" : 1.2e1 }");
     EXPECT_NO_THROW(m_spParser->Parse());
-    json = m_spParser->GetJson();
+    json = m_spParser->GetValues();
     EXPECT_DOUBLE_EQ(double(json["a"]), 12);
 
     CreateFile("{ \"a\" : 1.2E1 }");
     EXPECT_NO_THROW(m_spParser->Parse());
-    json = m_spParser->GetJson();
+    json = m_spParser->GetValues();
     EXPECT_DOUBLE_EQ(double(json["a"]), 12);
 
     CreateFile("{ \"a\" : 1.2e+1 }");
     EXPECT_NO_THROW(m_spParser->Parse());
-    json = m_spParser->GetJson();
+    json = m_spParser->GetValues();
     EXPECT_DOUBLE_EQ(double(json["a"]), 12);
 
     CreateFile("{ \"a\" : 1.2E+1 }");
     EXPECT_NO_THROW(m_spParser->Parse());
-    json = m_spParser->GetJson();
+    json = m_spParser->GetValues();
     EXPECT_DOUBLE_EQ(double(json["a"]), 12);
 
     CreateFile("{ \"a\" : 1.2e-1 }");
     EXPECT_NO_THROW(m_spParser->Parse());
-    json = m_spParser->GetJson();
+    json = m_spParser->GetValues();
     EXPECT_DOUBLE_EQ(double(json["a"]), 0.12);
 
     CreateFile("{ \"a\" : 1.2E-1 }");
     EXPECT_NO_THROW(m_spParser->Parse());
-    json = m_spParser->GetJson();
+    json = m_spParser->GetValues();
     EXPECT_DOUBLE_EQ(double(json["a"]), 0.12);
 
     CreateFile("{ \"a\" : 1.2+e2 }");

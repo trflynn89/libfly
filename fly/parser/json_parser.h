@@ -1,8 +1,5 @@
 #pragma once
 
-#include <map>
-#include <shared_mutex>
-#include <sstream>
 #include <stack>
 #include <string>
 
@@ -75,22 +72,6 @@ public:
      */
     virtual void Parse();
 
-    /**
-     * Get a copy of the parsed JSON object.
-     *
-     * @return Json The parsed JSON object.
-     */
-    Json GetJson() const;
-
-    /**
-     * Get a section's parsed values.
-     *
-     * @param string The name of the section containing the values.
-     *
-     * @return A list of parsed values.
-     */
-    virtual Parser::ValueList GetValues(const std::string &) const;
-
 private:
     void onStartBraceOrBracket(const char &, const JsonToken &);
     void onCloseBraceOrBracket(const char &, const JsonToken &);
@@ -105,7 +86,6 @@ private:
 
     std::stack<JsonState> m_states;
 
-    Json m_root;
     Json *m_pValue;
     std::stack<Json *> m_pParents;
 
@@ -114,8 +94,6 @@ private:
     bool m_parsedString;
     bool m_expectingEscape;
     bool m_expectingValue;
-
-    mutable std::shared_timed_mutex m_sectionsMutex;
 };
 
 }

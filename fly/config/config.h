@@ -4,8 +4,8 @@
 #include <shared_mutex>
 
 #include "fly/fly.h"
+#include "fly/parser/json.h"
 #include "fly/parser/parser.h"
-#include "fly/string/string.h"
 
 namespace fly {
 
@@ -23,14 +23,6 @@ FLY_CLASS_PTRS(Config);
  */
 class Config
 {
-    /**
-     * Map of configuration names to their values. This is just an unfolding of
-     * Parser::ValueList.
-     */
-    typedef std::map<
-        Parser::Value::first_type,
-        Parser::Value::second_type> ValueMap;
-
 public:
     /**
      * Constructor.
@@ -65,11 +57,11 @@ public:
     /**
      * Update this configuration with a new set of parsed values.
      */
-    void Update(const Parser::ValueList &);
+    void Update(const Json &);
 
 private:
     mutable std::shared_timed_mutex m_valuesMutex;
-    ValueMap m_values;
+    Json m_values;
 };
 
 //==============================================================================
@@ -77,17 +69,13 @@ template <typename T>
 T Config::GetValue(const std::string &name, T def) const
 {
     std::shared_lock<std::shared_timed_mutex> lock(m_valuesMutex);
-    ValueMap::const_iterator it = m_values.find(name);
 
-    if (it != m_values.end())
+    try
     {
-        try
-        {
-            return String::Convert<T>(it->second);
-        }
-        catch (...)
-        {
-        }
+        return T(m_values[name]);
+    }
+    catch (const JsonException &)
+    {
     }
 
     return def;

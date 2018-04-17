@@ -13,7 +13,6 @@ namespace fly {
 JsonParser::JsonParser(const std::string &path, const std::string &file) :
     Parser(path, file),
     m_states(),
-    m_root(),
     m_pValue(),
     m_pParents(),
     m_parsingString(false),
@@ -26,7 +25,7 @@ JsonParser::JsonParser(const std::string &path, const std::string &file) :
 //==============================================================================
 void JsonParser::Parse()
 {
-    std::unique_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
+    std::unique_lock<std::shared_timed_mutex> lock(m_valuesMutex);
 
     std::string fullPath = Path::Join(m_path, m_file);
     std::ifstream stream(fullPath.c_str(), std::ios::in);
@@ -38,7 +37,7 @@ void JsonParser::Parse()
     m_expectingValue = false;
     m_line = 1;
 
-    m_pValue = &m_root;
+    m_pValue = &m_values;
     *m_pValue = nullptr;
 
     m_pParents = decltype(m_pParents)();
@@ -550,18 +549,6 @@ bool JsonParser::storeValue()
     m_expectingValue = false;
 
     return true;
-}
-
-//==============================================================================
-Json JsonParser::GetJson() const
-{
-    return m_root;
-}
-
-//==============================================================================
-Parser::ValueList JsonParser::GetValues(const std::string &) const
-{
-    return Parser::ValueList();
 }
 
 }

@@ -14,6 +14,30 @@ Parser::Parser(const std::string &path, const std::string &file) :
 }
 
 //==============================================================================
+Json Parser::GetValues() const
+{
+    std::shared_lock<std::shared_timed_mutex> lock(m_valuesMutex);
+    return m_values;
+}
+
+//==============================================================================
+Json Parser::GetValues(const std::string &section) const
+{
+    std::shared_lock<std::shared_timed_mutex> lock(m_valuesMutex);
+    Json values;
+
+    try
+    {
+        values = m_values[section];
+    }
+    catch (const JsonException &)
+    {
+    }
+
+    return values;
+}
+
+//==============================================================================
 ParserException::ParserException(
     const std::string &file,
     int line,

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <exception>
+#include <shared_mutex>
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "fly/fly.h"
+#include "fly/parser/json.h"
 
 namespace fly {
 
@@ -22,16 +22,6 @@ class Parser
 {
 public:
     /**
-     * A parsed name-value pair.
-     */
-    typedef std::pair<std::string, std::string> Value;
-
-    /**
-     * A list of parsed name-value pairs.
-     */
-    typedef std::vector<Value> ValueList;
-
-    /**
      * Constructor.
      *
      * @param string Directory containing the file to parse.
@@ -47,17 +37,28 @@ public:
     virtual void Parse() = 0;
 
     /**
-     * Get a section's parsed values.
+     * Get the entire set of parsed values, stored as a JSON object.
      *
-     * @param string The name of the section containing the values.
-     *
-     * @return A list of parsed values.
+     * @return Json The parsed values.
      */
-    virtual ValueList GetValues(const std::string &) const = 0;
+    Json GetValues() const;
+
+    /**
+     * Try to get a sub-object from the set of parsed values. If the given
+     * key doesn't exist, returns a NULL JSON object.
+     *
+     * @param string The key to retrieve.
+     *
+     * @return The parsed values.
+     */
+    Json GetValues(const std::string &) const;
 
 protected:
     const std::string m_path;
     const std::string m_file;
+
+    mutable std::shared_timed_mutex m_valuesMutex;
+    Json m_values;
 
     int m_line;
 };

@@ -19,15 +19,10 @@ std::string Config::GetName()
 }
 
 //==============================================================================
-void Config::Update(const Parser::ValueList &values)
+void Config::Update(const Json &values)
 {
     std::unique_lock<std::shared_timed_mutex> lock(m_valuesMutex);
-    m_values.clear();
-
-    for (const Parser::Value &value : values)
-    {
-        m_values[value.first] = value.second;
-    }
+    m_values = values;
 }
 
 }

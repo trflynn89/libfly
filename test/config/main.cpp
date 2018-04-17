@@ -6,7 +6,7 @@
 #include "fly/config/config.h"
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
-#include "fly/parser/parser.h"
+#include "fly/parser/json.h"
 #include "fly/path/path.h"
 #include "fly/string/string.h"
 
@@ -31,7 +31,7 @@ TEST_F(ConfigTest, NonExistingTest)
 //==============================================================================
 TEST_F(ConfigTest, NonCovertibleTest)
 {
-    const fly::Parser::ValueList values = {
+    const fly::Json values = {
         { "name", "John Doe" },
         { "address", "USA" }
     };
@@ -39,13 +39,13 @@ TEST_F(ConfigTest, NonCovertibleTest)
     m_spConfig->Update(values);
 
     EXPECT_EQ(m_spConfig->GetValue<int>("name", 12), 12);
-    EXPECT_EQ(m_spConfig->GetValue<bool>("address", false), false);
+    EXPECT_EQ(m_spConfig->GetValue<nullptr_t>("address", nullptr), nullptr);
 }
 
 //==============================================================================
 TEST_F(ConfigTest, MultipleValueTypeTest)
 {
-    const fly::Parser::ValueList values = {
+    const fly::Json values = {
         { "name", "John Doe" },
         { "address", "123" },
         { "employed", "1" },

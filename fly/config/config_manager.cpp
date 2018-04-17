@@ -125,9 +125,7 @@ bool ConfigManager::DoWork()
 
                 if (spConfig)
                 {
-                    Parser::ValueList values = m_spParser->GetValues(it->first);
-                    spConfig->Update(values);
-
+                    spConfig->Update(m_spParser->GetValues(it->first));
                     ++it;
                 }
                 else

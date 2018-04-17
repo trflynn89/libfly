@@ -17,7 +17,7 @@ IniParser::IniParser(const std::string &path, const std::string &file) :
 //==============================================================================
 void IniParser::Parse()
 {
-    std::unique_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
+    std::unique_lock<std::shared_timed_mutex> lock(m_valuesMutex);
 
     std::string fullPath = Path::Join(m_path, m_file);
     std::ifstream stream(fullPath.c_str(), std::ios::in);
@@ -25,7 +25,7 @@ void IniParser::Parse()
     std::string line, section;
     m_line = 0;
 
-    m_sections.clear();
+    m_values = nullptr;
 
     while (stream.good() && std::getline(stream, line))
     {
@@ -54,57 +54,12 @@ void IniParser::Parse()
 }
 
 //==============================================================================
-Parser::ValueList IniParser::GetValues(const std::string &section) const
-{
-    Parser::ValueList values;
-
-    std::shared_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
-    IniSection::const_iterator it = m_sections.find(section);
-
-    if (it != m_sections.end())
-    {
-        values = it->second;
-    }
-
-    return values;
-}
-
-//==============================================================================
-IniParser::IniSection::size_type IniParser::GetSize() const
-{
-    std::shared_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
-    return m_sections.size();
-}
-
-//==============================================================================
-Parser::ValueList::size_type IniParser::GetSize(const std::string &section) const
-{
-    Parser::ValueList::size_type size = 0;
-
-    std::shared_lock<std::shared_timed_mutex> lock(m_sectionsMutex);
-    IniSection::const_iterator it = m_sections.find(section);
-
-    if (it != m_sections.end())
-    {
-        size = it->second.size();
-    }
-
-    return size;
-}
-
-//==============================================================================
 std::string IniParser::onSection(const std::string &line)
 {
     std::string section = line;
     String::Trim(section);
 
-    if (m_sections.find(section) != m_sections.end())
-    {
-        throw ParserException(m_file, m_line,
-            "Section names must be unique"
-        );
-    }
-    else if (trimValue(section, '\'') || trimValue(section, '\"'))
+    if (trimValue(section, '\'') || trimValue(section, '\"'))
     {
         throw ParserException(m_file, m_line,
             "Section names must not be quoted"
@@ -138,19 +93,7 @@ void IniParser::onValue(const std::string &section, const std::string &line)
         trimValue(value, '\'');
         trimValue(value, '\"');
 
-        Parser::ValueList &list = m_sections[section];
-
-        for (const Parser::Value &value : list)
-        {
-            if (name.compare(value.first) == 0)
-            {
-                throw ParserException(m_file, m_line,
-                    "Value names must be unique within a section"
-                );
-            }
-        }
-
-        list.push_back(Parser::Value(name, value));
+        m_values[section][name] = value;
     }
     else
     {
