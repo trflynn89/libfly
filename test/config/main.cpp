@@ -6,9 +6,9 @@
 #include "fly/config/config.h"
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
-#include "fly/parser/json.h"
 #include "fly/path/path.h"
 #include "fly/string/string.h"
+#include "fly/types/json.h"
 
 //==============================================================================
 class ConfigTest : public ::testing::Test

@@ -6,6 +6,7 @@
 
 #include "fly/path/path.h"
 #include "fly/string/string.h"
+#include "fly/types/json.h"
 
 namespace fly {
 

@@ -4,11 +4,11 @@
 #include <string>
 
 #include "fly/fly.h"
-#include "fly/parser/json.h"
 #include "fly/parser/parser.h"
 
 namespace fly {
 
+FLY_CLASS_PTRS(Json);
 FLY_CLASS_PTRS(JsonParser);
 
 /**

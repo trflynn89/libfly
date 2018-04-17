@@ -24,6 +24,7 @@ $(eval $(call ADD_TEST_TARGET, string_test, test/string))
 $(eval $(call ADD_TEST_TARGET, system_test, test/system))
 $(eval $(call ADD_TEST_TARGET, task_test, test/task))
 $(eval $(call ADD_TEST_TARGET, traits_test, test/traits))
+$(eval $(call ADD_TEST_TARGET, types_test, test/types))
 
 # Import the build system
 include build.mk

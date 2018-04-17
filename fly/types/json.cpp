@@ -1,11 +1,9 @@
-#include "fly/parser/json.h"
+#include "fly/types/json.h"
 
 #include <algorithm>
 #include <ios>
 #include <sstream>
 #include <utility>
-
-#include "fly/logger/logger.h"
 
 namespace fly {
 
@@ -540,7 +538,6 @@ void Json::Value::Destroy(const Type &type)
 JsonException::JsonException(const Json &json, const std::string &message) :
     m_message(String::Format("JsonException: %s (%s)", message, json))
 {
-    LOGW(-1, "%s", m_message);
 }
 
 //==============================================================================

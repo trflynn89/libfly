@@ -5,7 +5,7 @@
 #include <string>
 
 #include "fly/fly.h"
-#include "fly/parser/json.h"
+#include "fly/types/json.h"
 
 namespace fly {
 
