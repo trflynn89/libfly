@@ -83,7 +83,7 @@ public:
         )),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::CONFIG_TYPE_INI, m_path, m_file
+            fly::ConfigManager::ConfigFileType::INI, m_path, m_file
         ))
     {
         LOGC("Using path '%s' : '%s'", m_path, m_file);
@@ -158,15 +158,26 @@ class BadConfig : public fly::Config
 };
 
 //==============================================================================
-TEST_F(ConfigManagerTest, BadFileTypeTest)
+TEST_F(ConfigManagerTest, AllFileTypesTest)
 {
-    m_spConfigManager->Stop();
+    {
+        m_spConfigManager->Stop();
 
-    m_spConfigManager = std::make_shared<fly::ConfigManager>(
-        (fly::ConfigManager::ConfigFileType)-1, m_path, m_file
-    );
+        m_spConfigManager = std::make_shared<fly::ConfigManager>(
+            fly::ConfigManager::ConfigFileType::INI, m_path, m_file
+        );
 
-    EXPECT_FALSE(m_spConfigManager->Start());
+        EXPECT_TRUE(m_spConfigManager->Start());
+    }
+    {
+        m_spConfigManager->Stop();
+
+        m_spConfigManager = std::make_shared<fly::ConfigManager>(
+            fly::ConfigManager::ConfigFileType::JSON, m_path, m_file
+        );
+
+        EXPECT_TRUE(m_spConfigManager->Start());
+    }
 }
 
 //==============================================================================

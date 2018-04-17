@@ -31,7 +31,7 @@ class SocketTest : public ::testing::Test
 public:
     SocketTest() :
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::CONFIG_TYPE_INI, std::string(), std::string()
+            fly::ConfigManager::ConfigFileType::INI, std::string(), std::string()
         )),
 
         m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>(m_spConfigManager)),

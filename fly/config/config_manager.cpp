@@ -29,16 +29,12 @@ ConfigManager::ConfigManager(
 {
     switch (fileType)
     {
-    case CONFIG_TYPE_INI:
+    case ConfigFileType::INI:
         m_spParser = std::make_shared<IniParser>(path, file);
         break;
 
-    case CONFIG_TYPE_JSON:
+    case ConfigFileType::JSON:
         m_spParser = std::make_shared<JsonParser>(path, file);
-        break;
-
-    default:
-        LOGE(-1, "Unrecognized configuration type: %d", fileType);
         break;
     }
 }

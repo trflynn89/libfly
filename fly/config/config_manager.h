@@ -35,10 +35,10 @@ public:
     /**
      * Enumerated list of supported configuration file formats.
      */
-    enum ConfigFileType
+    enum class ConfigFileType
     {
-        CONFIG_TYPE_INI,
-        CONFIG_TYPE_JSON,
+        INI,
+        JSON,
     };
 
     /**
