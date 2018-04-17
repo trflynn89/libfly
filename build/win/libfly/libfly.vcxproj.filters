@@ -43,6 +43,9 @@
     <Filter Include="system\win">
       <UniqueIdentifier>{777ac67a-f671-4f7e-b160-badc79076b55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="types">
+      <UniqueIdentifier>{2fe9b6ce-cbdc-485c-bd1c-37fe9ef648d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\exit_codes.h" />
@@ -140,11 +143,11 @@
     <ClInclude Include="..\..\..\fly\task\monitor.h">
       <Filter>task</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\parser\json.h">
-      <Filter>parser</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\json_parser.h">
       <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\json.h">
+      <Filter>types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -223,11 +226,11 @@
     <ClCompile Include="..\..\..\fly\task\monitor.cpp">
       <Filter>task</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\parser\json.cpp">
-      <Filter>parser</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\json_parser.cpp">
       <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\types\json.cpp">
+      <Filter>types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
