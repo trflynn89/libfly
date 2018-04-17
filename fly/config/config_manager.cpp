@@ -36,6 +36,11 @@ ConfigManager::ConfigManager(
     case ConfigFileType::JSON:
         m_spParser = std::make_shared<JsonParser>(path, file);
         break;
+
+    default:
+        LOGE(-1, "Unrecognized configuration type: %d",
+            static_cast<int>(fileType));
+        break;
     }
 }
 
