@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <stack>
 #include <string>
 
@@ -73,16 +74,21 @@ public:
     virtual void Parse();
 
 private:
-    void onStartBraceOrBracket(const char &, const JsonToken &);
-    void onCloseBraceOrBracket(const char &, const JsonToken &);
-    void onQuotation(const char &);
-    void onComma(const char &);
-    void onColon(const char &);
+    void onStartBraceOrBracket(int, const JsonToken &);
+    void onCloseBraceOrBracket(int, const JsonToken &);
+    void onQuotation(int);
+    void onComma(int);
+    void onColon(int);
 
-    void onCharacter(const char &);
-    void onEscapedCharacter(const char &);
+    void onCharacter(int, std::ifstream &);
+    void onEscapedCharacter(int, std::ifstream &);
+    void readUnicodeCharacter(std::ifstream &);
+    int readUnicodeCodepoint(std::ifstream &) const;
 
-    bool storeValue();
+    void pushValue(int);
+    bool popValue();
+
+    void validateCharacter(int, std::ifstream &);
 
     std::stack<JsonState> m_states;
 
