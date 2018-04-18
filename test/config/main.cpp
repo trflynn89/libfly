@@ -181,6 +181,18 @@ TEST_F(ConfigManagerTest, AllFileTypesTest)
 }
 
 //==============================================================================
+TEST_F(ConfigManagerTest, BadFileTypeTest)
+{
+    m_spConfigManager->Stop();
+
+    m_spConfigManager = std::make_shared<fly::ConfigManager>(
+        static_cast<fly::ConfigManager::ConfigFileType>(-1), m_path, m_file
+    );
+
+    EXPECT_FALSE(m_spConfigManager->Start());
+}
+
+//==============================================================================
 TEST_F(ConfigManagerTest, CreateConfigTest)
 {
     auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
