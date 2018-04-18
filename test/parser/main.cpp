@@ -4,12 +4,35 @@
 
 #include <gtest/gtest.h>
 
+#include "fly/fly.h"
 #include "fly/logger/logger.h"
 #include "fly/parser/ini_parser.h"
 #include "fly/parser/json_parser.h"
 #include "fly/path/path.h"
 #include "fly/string/string.h"
 #include "fly/types/json.h"
+
+#if defined(FLY_WINDOWS)
+
+#include <Windows.h>
+
+#define utf8(str) ConvertToUTF8(L##str)
+
+namespace
+{
+    const char *ConvertToUTF8(const wchar_t *str)
+    {
+        static char buff[1024];
+
+        ::WideCharToMultiByte(CP_UTF8, 0, str, -1, buff, sizeof(buff), NULL, NULL);
+        return buff;
+    }
+}
+#else
+
+#define utf8(str) str
+
+#endif
 
 //==============================================================================
 TEST(ParserExceptionTest, ExceptionTest)
@@ -820,13 +843,13 @@ TEST_F(JsonParserTest, UnicodeConversionTest)
     ValidateFailString("\\u000");
     ValidateFailString("\\u000z");
 
-    ValidatePassString("\\u0040", "\u0040");
-    ValidatePassString("\\u007A", "\u007A");
-    ValidatePassString("\\u007a", "\u007a");
-    ValidatePassString("\\u00c4", "\u00c4");
-    ValidatePassString("\\u00e4", "\u00e4");
-    ValidatePassString("\\u0298", "\u0298");
-    ValidatePassString("\\u0800", "\u0800");
+    ValidatePassString("\\u0040", utf8("\u0040"));
+    ValidatePassString("\\u007A", utf8("\u007A"));
+    ValidatePassString("\\u007a", utf8("\u007a"));
+    ValidatePassString("\\u00c4", utf8("\u00c4"));
+    ValidatePassString("\\u00e4", utf8("\u00e4"));
+    ValidatePassString("\\u0298", utf8("\u0298"));
+    ValidatePassString("\\u0800", utf8("\u0800"));
 }
 
 //==============================================================================
