@@ -61,6 +61,7 @@ protected:
     Json m_values;
 
     int m_line;
+    int m_column;
 };
 
 /**
@@ -80,6 +81,16 @@ public:
      * @param string Message indicating what error was encountered.
      */
     ParserException(const std::string &, int, const std::string &);
+
+    /**
+     * Constructor.
+     *
+     * @param string Name of the file failed to parse parse.
+     * @param int Line number in file where error was encountered.
+     * @param int Column number in line where error was encountered.
+     * @param string Message indicating what error was encountered.
+     */
+    ParserException(const std::string &, int, int, const std::string &);
 
     /**
      * @return A C-string representing this exception.

@@ -9,7 +9,8 @@ namespace fly {
 Parser::Parser(const std::string &path, const std::string &file) :
     m_path(path),
     m_file(file),
-    m_line(0)
+    m_line(0),
+    m_column(0)
 {
 }
 
@@ -43,8 +44,29 @@ ParserException::ParserException(
     int line,
     const std::string &message
 ) :
-    m_message(String::Format("ParserException: Error parsing %s on line %d: %s",
-        file, line, message))
+    m_message(
+        String::Format(
+            "ParserException: Error parsing %s at [line %d]: %s",
+            file, line, message
+        )
+    )
+{
+    LOGW(-1, "%s", m_message);
+}
+
+//==============================================================================
+ParserException::ParserException(
+    const std::string &file,
+    int line,
+    int column,
+    const std::string &message
+) :
+    m_message(
+        String::Format(
+            "ParserException: Error parsing %s at [line %d, column %d]: %s",
+            file, line, column, message
+        )
+    )
 {
     LOGW(-1, "%s", m_message);
 }

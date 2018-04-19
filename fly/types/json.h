@@ -6,6 +6,7 @@
 #include <initializer_list>
 #include <map>
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -468,14 +469,14 @@ private:
      */
     enum Type
     {
+        TYPE_NULL,
         TYPE_STRING,
         TYPE_OBJECT,
         TYPE_ARRAY,
         TYPE_BOOLEAN,
         TYPE_SIGNED,
         TYPE_UNSIGNED,
-        TYPE_FLOAT,
-        TYPE_NULL
+        TYPE_FLOAT
     };
 
     /**
@@ -510,9 +511,10 @@ private:
          * @tparam T The string-like type.
          *
          * @param T The string-like value.
+         * @param bool Whether the string should be validated for compliance.
          */
         template <typename T, fly::if_string::enabled<T> = 0>
-        Value(const T &);
+        Value(const T &, bool);
 
         /**
          * Object constructor. Intializes the Value instance to an object's
@@ -601,6 +603,85 @@ private:
          * instantiated value.
          */
         void Destroy(const Type &);
+
+        /**
+         * Validate the string for compliance according to http://www.json.org.
+         * Validation includes handling escaped and unicode characters.
+         *
+         * @param string_type The string value to validate.
+         *
+         * @throws JsonException If the string value is not valid.
+         *
+         * @return string_type The modified input string value, with escaped and
+         *                     unicode characters interpreted.
+         */
+        string_type ValidateString(const string_type &) const;
+
+        /**
+         * After reading a reverse solidus character, read the escaped character
+         * that follows. Replace the escaped character with its proper control
+         * or unicode character.
+         *
+         * @param stringstream Stream to pipe the interpreted character into.
+         * @param const_iterator Pointer to the escaped character.
+         * @param const_iterator Pointer to the end of the original string value.
+         *
+         * @throws JsonException If the interpreted escaped character is not
+         *                       valid or there weren't enough available bytes.
+         */
+        void ReadEscapedCharacter(
+            std::stringstream &,
+            string_type::const_iterator &,
+            const string_type::const_iterator &
+        ) const;
+
+        /**
+         * After determining the escaped character is a unicode encoding, read
+         * the characters that follow. Replace the entire sequence of characters
+         * with the unicode character. Accepts UTF-8 encodings and UTF-16 paired
+         * surrogate encodings.
+         *
+         * @param stringstream Stream to pipe the interpreted character into.
+         * @param const_iterator Pointer to the escaped character.
+         * @param const_iterator Pointer to the end of the original string value.
+         *
+         * @throws JsonException If the interpreted unicode character is not
+         *                       valid or there weren't enough available bytes.
+         */
+        void ReadUnicodeCharacter(
+            std::stringstream &,
+            string_type::const_iterator &,
+            const string_type::const_iterator &
+        ) const;
+
+        /**
+         * Read a single 4-byte unicode encoding.
+         *
+         * @param const_iterator Pointer to the escaped character.
+         * @param const_iterator Pointer to the end of the original string value.
+         *
+         * @throws JsonException If any of the 4 read bytes were non-hexadecimal
+         *                       or there weren't enough available bytes.
+         */
+        int ReadUnicodeCodepoint(
+            string_type::const_iterator &,
+            const string_type::const_iterator &
+        ) const;
+
+        /**
+         * Validate a single non-escaped character is compliant.
+         *
+         * @param stringstream Stream to pipe the interpreted character into.
+         * @param const_iterator Pointer to the escaped character.
+         * @param const_iterator Pointer to the end of the original string value.
+         *
+         * @throws JsonException If the character value is not valid.
+         */
+        void ValidateCharacter(
+            std::stringstream &,
+            string_type::const_iterator &,
+            const string_type::const_iterator &
+        ) const;
     };
 
     /**
@@ -643,7 +724,7 @@ private:
 template <typename T, fly::if_string::enabled<T>>
 Json::Json(const T &value) :
     m_type(TYPE_STRING),
-    m_value(value)
+    m_value(value, true)
 {
 }
 
@@ -824,9 +905,17 @@ Json::operator T () const
 
 //==============================================================================
 template <typename T, fly::if_string::enabled<T>>
-Json::Value::Value(const T &value) :
-    m_pString(new string_type(value))
+Json::Value::Value(const T &value, bool validate) :
+    m_pString(NULL)
 {
+    if (validate)
+    {
+        m_pString = new string_type(ValidateString(value));
+    }
+    else
+    {
+        m_pString = new string_type(value);
+    }
 }
 
 //==============================================================================
