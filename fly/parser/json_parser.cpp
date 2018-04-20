@@ -50,11 +50,11 @@ void JsonParser::Parse()
     m_states.push(JSON_NO_STATE);
 
     JsonToken token;
-    char c;
+    int c;
 
     try
     {
-        while (stream.get(c))
+        while ((c = stream.get()) != EOF)
         {
             token = static_cast<JsonToken>(c);
             ++m_column;
@@ -121,13 +121,13 @@ void JsonParser::Parse()
 }
 
 //==============================================================================
-void JsonParser::onStartBraceOrBracket(const char &c, const JsonToken &token)
+void JsonParser::onStartBraceOrBracket(int c, const JsonToken &token)
 {
     switch (m_states.top())
     {
     case JSON_PARSING_OBJECT:
         throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c'", c
+            "Unexpected character '%c' (%x)", char(c), c
         ));
 
     case JSON_PARSING_ARRAY:
@@ -140,14 +140,14 @@ void JsonParser::onStartBraceOrBracket(const char &c, const JsonToken &token)
 
     case JSON_PARSING_COLON:
         throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c'", c
+            "Unexpected character '%c' (%x)", char(c), c
         ));
 
     case JSON_PARSING_NAME:
     case JSON_PARSING_VALUE:
         if (m_parsingString)
         {
-            m_parsing << c;
+            pushValue(c);
             return;
         }
 
@@ -172,21 +172,21 @@ void JsonParser::onStartBraceOrBracket(const char &c, const JsonToken &token)
 }
 
 //==============================================================================
-void JsonParser::onCloseBraceOrBracket(const char &c, const JsonToken &token)
+void JsonParser::onCloseBraceOrBracket(int c, const JsonToken &token)
 {
     switch (m_states.top())
     {
     case JSON_NO_STATE:
     case JSON_PARSING_COLON:
         throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c'", c
+            "Unexpected character '%c' (%x)", char(c), c
         ));
 
     case JSON_PARSING_NAME:
     case JSON_PARSING_VALUE:
         if (m_parsingString)
         {
-            m_parsing << c;
+            pushValue(c);
             return;
         }
 
@@ -196,16 +196,16 @@ void JsonParser::onCloseBraceOrBracket(const char &c, const JsonToken &token)
         break;
     }
 
-    if (!storeValue() && m_expectingValue)
+    if (!popValue() && m_expectingValue)
     {
         throw ParserException(m_file, m_line, m_column, String::Format(
-            "Expected name or value before character '%c'", c
+            "Expected name or value before character '%c' (%x)", char(c), c
         ));
     }
     else if (m_pParents.empty())
     {
         throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c'", c
+            "Unexpected character '%c' (%x)", char(c), c
         ));
     }
 
@@ -225,7 +225,7 @@ void JsonParser::onCloseBraceOrBracket(const char &c, const JsonToken &token)
         if (m_states.top() == unexpected)
         {
             throw ParserException(m_file, m_line, m_column, String::Format(
-                "Unexpected character '%c'", c
+                "Unexpected character '%c' (%x)", char(c), c
             ));
         }
 
@@ -241,7 +241,7 @@ void JsonParser::onCloseBraceOrBracket(const char &c, const JsonToken &token)
 }
 
 //==============================================================================
-void JsonParser::onQuotation(const char &c)
+void JsonParser::onQuotation(int c)
 {
     switch (m_states.top())
     {
@@ -283,7 +283,7 @@ void JsonParser::onQuotation(const char &c)
 
     default:
         throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c'", c
+            "Unexpected character '%c' (%x)", char(c), c
         ));
     }
 
@@ -291,13 +291,13 @@ void JsonParser::onQuotation(const char &c)
 }
 
 //==============================================================================
-void JsonParser::onColon(const char &c)
+void JsonParser::onColon(int c)
 {
     switch (m_states.top())
     {
     case JSON_NO_STATE:
         throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c'", c
+            "Unexpected character '%c' (%x)", char(c), c
         ));
 
     case JSON_PARSING_COLON:
@@ -309,13 +309,13 @@ void JsonParser::onColon(const char &c)
         break;
 
     default:
-        m_parsing << c;
+        pushValue(c);
         break;
     }
 }
 
 //==============================================================================
-void JsonParser::onComma(const char &c)
+void JsonParser::onComma(int c)
 {
     switch (m_states.top())
     {
@@ -323,7 +323,7 @@ void JsonParser::onComma(const char &c)
     case JSON_PARSING_OBJECT:
     case JSON_PARSING_ARRAY:
         throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c'", c
+            "Unexpected character '%c' (%x)", char(c), c
         ));
 
     case JSON_PARSING_COMMA:
@@ -333,7 +333,7 @@ void JsonParser::onComma(const char &c)
         {
         case JSON_PARSING_OBJECT:
         case JSON_PARSING_ARRAY:
-            storeValue();
+            popValue();
             break;
 
         default:
@@ -344,22 +344,22 @@ void JsonParser::onComma(const char &c)
         break;
 
     case JSON_PARSING_NAME:
-        m_parsing << c;
+        pushValue(c);
         break;
 
     case JSON_PARSING_VALUE:
         if (m_parsingString)
         {
-            m_parsing << c;
+            pushValue(c);
         }
-        else if (storeValue())
+        else if (popValue())
         {
             m_states.pop();
         }
         else if (m_expectingValue)
         {
             throw ParserException(m_file, m_line, m_column, String::Format(
-                "Expected name or value before character '%c'", c
+                "Expected name or value before character '%c' (%x)", char(c), c
             ));
         }
 
@@ -373,7 +373,7 @@ void JsonParser::onComma(const char &c)
 }
 
 //==============================================================================
-void JsonParser::onCharacter(const char &c, std::ifstream &stream)
+void JsonParser::onCharacter(int c, std::ifstream &stream)
 {
     switch (m_states.top())
     {
@@ -385,7 +385,7 @@ void JsonParser::onCharacter(const char &c, std::ifstream &stream)
             m_pValue = &((*m_pValue)[m_pValue->Size()]);
             m_pParents.push(m_pValue);
 
-            m_parsing << c;
+            pushValue(c);
         }
 
         break;
@@ -394,29 +394,25 @@ void JsonParser::onCharacter(const char &c, std::ifstream &stream)
     case JSON_PARSING_NAME:
         if (m_parsingString)
         {
-            m_parsing << c;
+            pushValue(c);
 
             // Blindly ignore the escaped character, the Json class will check
             // whether it is valid
             if (c == JSON_REVERSE_SOLIDUS)
             {
-                char n = 0;
-
-                if (stream.get(n))
-                {
-                    m_parsing << n;
-                }
-                else
+                if ((c = stream.get()) == EOF)
                 {
                     throw ParserException(m_file, m_line, m_column, String::Format(
-                        "Expected escaped character after '%c'", n
+                        "Expected escaped character after '%c' (%x)", char(c), c
                     ));
                 }
+
+                pushValue(c);
             }
         }
         else if (!std::isspace(c))
         {
-            m_parsing << c;
+            pushValue(c);
         }
 
         break;
@@ -425,14 +421,20 @@ void JsonParser::onCharacter(const char &c, std::ifstream &stream)
         if (!std::isspace(c))
         {
             throw ParserException(m_file, m_line, m_column, String::Format(
-                "Unexpected character '%c'", c
+                "Unexpected character '%c' (%x)", char(c), c
             ));
         }
     }
 }
 
 //==============================================================================
-bool JsonParser::storeValue()
+void JsonParser::pushValue(int c)
+{
+    m_parsing << char(c);
+}
+
+//==============================================================================
+bool JsonParser::popValue()
 {
     const std::string value = m_parsing.str();
 

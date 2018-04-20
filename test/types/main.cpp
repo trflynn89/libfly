@@ -18,11 +18,9 @@
 #if defined(FLY_WINDOWS)
     #include <Windows.h>
 
-    #define utf8(str) ConvertToUTF(CP_UTF8, L##str)
-    #define utf16(str) ConvertToUTF(CP_UTF16, L##str)
+    #define utf8(str) ConvertToUTF8(L##str)
 #else
     #define utf8(str) str
-    #define utf16(str) str
 #endif
 
 //==============================================================================
@@ -30,11 +28,11 @@ namespace
 {
 #if defined(FLY_WINDOWS)
 
-    const char *ConvertToUTF(UINT code, const wchar_t *str)
+    const char *ConvertToUTF8(const wchar_t *str)
     {
         static char buff[1024];
 
-        ::WideCharToMultiByte(code, 0, str, -1, buff, sizeof(buff), NULL, NULL);
+        ::WideCharToMultiByte(CP_UTF8, 0, str, -1, buff, sizeof(buff), NULL, NULL);
         return buff;
     }
 
@@ -977,10 +975,10 @@ TEST(JsonTest, UnicodeConversionTest)
     ValidateFail("\\uD800\\uE000");
     ValidateFail("\\uD800\\uFFFF");
 
-    ValidatePass("\\uD800\\uDC00", utf16("\U00010000"));
-    ValidatePass("\\uD803\\uDE6D", utf16("\U00010E6D"));
-    ValidatePass("\\uD834\\uDD1E", utf16("\U0001D11E"));
-    ValidatePass("\\uDBFF\\uDFFF", utf16("\U0010FFFF"));
+    ValidatePass("\\uD800\\uDC00", utf8("\U00010000"));
+    ValidatePass("\\uD803\\uDE6D", utf8("\U00010E6D"));
+    ValidatePass("\\uD834\\uDD1E", utf8("\U0001D11E"));
+    ValidatePass("\\uDBFF\\uDFFF", utf8("\U0010FFFF"));
 }
 
 //==============================================================================

@@ -632,15 +632,15 @@ void Json::Value::ReadUnicodeCharacter(
         if ((++it == end) || (*it != '\\'))
         {
             throw JsonException(nullptr, String::Format(
-                "Expected low surrogate to follow high surrogate %x but found %x",
-                highSurrogateCodepoint, int(*it)
+                "Expected to find \\u after high surrogate %x",
+                highSurrogateCodepoint
             ));
         }
         else if ((++it == end) || (*it != 'u'))
         {
             throw JsonException(nullptr, String::Format(
-                "Expected low surrogate to follow high surrogate %x but found %x",
-                highSurrogateCodepoint, int(*it)
+                "Expected to find \\u after high surrogate %x",
+                highSurrogateCodepoint
             ));
         }
 

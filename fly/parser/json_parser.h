@@ -74,15 +74,16 @@ public:
     virtual void Parse();
 
 private:
-    void onStartBraceOrBracket(const char &, const JsonToken &);
-    void onCloseBraceOrBracket(const char &, const JsonToken &);
-    void onQuotation(const char &);
-    void onComma(const char &);
-    void onColon(const char &);
+    void onStartBraceOrBracket(int, const JsonToken &);
+    void onCloseBraceOrBracket(int, const JsonToken &);
+    void onQuotation(int);
+    void onComma(int);
+    void onColon(int);
 
-    void onCharacter(const char &, std::ifstream &);
+    void onCharacter(int, std::ifstream &);
 
-    bool storeValue();
+    void pushValue(int);
+    bool popValue();
 
     std::stack<JsonState> m_states;
 
