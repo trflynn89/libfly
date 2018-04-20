@@ -1,6 +1,7 @@
 #pragma once
 
 #include <exception>
+#include <fstream>
 #include <shared_mutex>
 #include <string>
 
@@ -34,7 +35,7 @@ public:
      *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    virtual void Parse() = 0;
+    void Parse();
 
     /**
      * Get the entire set of parsed values, stored as a JSON object.
@@ -54,14 +55,25 @@ public:
     Json GetValues(const std::string &) const;
 
 protected:
+    /**
+     * Parse the configured file and store parsed values.
+     *
+     * @param ifstream Stream holding the open file.
+     *
+     * @throws ParserException Thrown if an error occurs parsing the file.
+     */
+    virtual void ParseInternal(std::ifstream &) = 0;
+
     const std::string m_path;
     const std::string m_file;
 
-    mutable std::shared_timed_mutex m_valuesMutex;
     Json m_values;
 
     int m_line;
     int m_column;
+
+private:
+    mutable std::shared_timed_mutex m_valuesMutex;
 };
 
 /**

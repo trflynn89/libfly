@@ -3,7 +3,6 @@
 #include <cctype>
 #include <cstring>
 
-#include "fly/path/path.h"
 #include "fly/string/string.h"
 #include "fly/types/json.h"
 
@@ -15,6 +14,7 @@ JsonParser::JsonParser(const std::string &path, const std::string &file) :
     m_states(),
     m_pValue(),
     m_pParents(),
+    m_parsing(),
     m_parsingString(false),
     m_parsedString(false),
     m_expectingValue(false)
@@ -22,59 +22,49 @@ JsonParser::JsonParser(const std::string &path, const std::string &file) :
 }
 
 //==============================================================================
-void JsonParser::Parse()
+void JsonParser::ParseInternal(std::ifstream &stream)
 {
-    std::unique_lock<std::shared_timed_mutex> lock(m_valuesMutex);
+    m_states = decltype(m_states)();
+    m_states.push(JSON_NO_STATE);
 
-    std::string fullPath = Path::Join(m_path, m_file);
-    std::ifstream stream(fullPath.c_str(), std::ios::in);
+    m_pValue = &m_values;
+
+    m_pParents = decltype(m_pParents)();
+    m_pParents.push(m_pValue);
 
     m_parsing.str(std::string());
     m_parsingString = false;
     m_parsedString = false;
     m_expectingValue = false;
-    m_line = 1;
-    m_column = 0;
-
-    m_pValue = &m_values;
-    *m_pValue = nullptr;
-
-    m_pParents = decltype(m_pParents)();
-    m_pParents.push(m_pValue);
-
-    m_states = decltype(m_states)();
-    m_states.push(JSON_NO_STATE);
-
-    JsonToken token;
-    int c;
 
     try
     {
+        int c = 0;
+
         while ((c = stream.get()) != EOF)
         {
-            token = static_cast<JsonToken>(c);
             ++m_column;
 
             if (m_parsingString)
             {
-                if (std::isspace(c) && (token != JSON_SPACE))
+                if (std::isspace(c) && (c != JSON_SPACE))
                 {
                     throw ParserException(m_file, m_line, m_column, String::Format(
-                        "Unexpected character '%x'", token
+                        "Unexpected character '%c' (%x)", char(c), c
                     ));
                 }
             }
 
-            switch (token)
+            switch (c)
             {
             case JSON_START_BRACE:
             case JSON_START_BRACKET:
-                onStartBraceOrBracket(c, token);
+                onStartBraceOrBracket(c);
                 break;
 
             case JSON_CLOSE_BRACE:
             case JSON_CLOSE_BRACKET:
-                onCloseBraceOrBracket(c, token);
+                onCloseBraceOrBracket(c);
                 break;
 
             case JSON_QUOTE:
@@ -117,7 +107,7 @@ void JsonParser::Parse()
 }
 
 //==============================================================================
-void JsonParser::onStartBraceOrBracket(int c, const JsonToken &token)
+void JsonParser::onStartBraceOrBracket(int c)
 {
     switch (m_states.top())
     {
@@ -153,7 +143,7 @@ void JsonParser::onStartBraceOrBracket(int c, const JsonToken &token)
         break;
     }
 
-    if (token == JSON_START_BRACE)
+    if (c == JSON_START_BRACE)
     {
         *m_pValue = Json::object_type();
         m_states.push(JSON_PARSING_OBJECT);
@@ -168,7 +158,7 @@ void JsonParser::onStartBraceOrBracket(int c, const JsonToken &token)
 }
 
 //==============================================================================
-void JsonParser::onCloseBraceOrBracket(int c, const JsonToken &token)
+void JsonParser::onCloseBraceOrBracket(int c)
 {
     switch (m_states.top())
     {
@@ -209,11 +199,11 @@ void JsonParser::onCloseBraceOrBracket(int c, const JsonToken &token)
     m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
 
     const JsonState expected = (
-        (token == JSON_CLOSE_BRACE) ? JSON_PARSING_OBJECT : JSON_PARSING_ARRAY
+        (c == JSON_CLOSE_BRACE) ? JSON_PARSING_OBJECT : JSON_PARSING_ARRAY
     );
 
     const JsonState unexpected = (
-        (token == JSON_CLOSE_BRACE) ? JSON_PARSING_ARRAY : JSON_PARSING_OBJECT
+        (c == JSON_CLOSE_BRACE) ? JSON_PARSING_ARRAY : JSON_PARSING_OBJECT
     );
 
     while (m_states.top() != expected)

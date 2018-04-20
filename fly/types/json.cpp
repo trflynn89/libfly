@@ -32,7 +32,6 @@ Json::Json(const Json &json) :
     switch (m_type)
     {
     case TYPE_STRING:
-
         m_value = Value(*(json.m_value.m_pString), false);
         break;
 
@@ -644,16 +643,15 @@ void Json::Value::ReadUnicodeCharacter(
 
         if (IS_LOW_SURROGATE(lowSurrogateCodepoint))
         {
+            // The formula to convert a surrogate pair to a single codepoint is:
+            //
+            //      C = ((HS - 0xD800) * 0x400) + (LS - 0xDC00) + 0x10000
+            //
+            // Multiplying by 0x400 (1024) is the same as bit-shifting left by
+            // 10 bits. The formula then simplies to:
             codepoint =
-                // High surrogate occupies the most significant 22 bits
                 (highSurrogateCodepoint << 10)
-
-                // Low surrogate occupies the least significant 15 bits
                 + lowSurrogateCodepoint
-
-                // There is still the 0xD800, 0xDC00 and 0x10000 noise
-                // in the result so we have to subtract with:
-                // (0xD800 << 10) + DC00 - 0x10000 = 0x35FDC00
                 - 0x35FDC00;
         }
         else

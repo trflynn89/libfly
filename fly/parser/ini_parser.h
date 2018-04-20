@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <string>
 
 #include "fly/fly.h"
@@ -26,12 +27,15 @@ public:
      */
     IniParser(const std::string &, const std::string &);
 
+protected:
     /**
      * Parse the configured file and store parsed values.
      *
+     * @param ifstream Stream holding the open file.
+     *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    virtual void Parse();
+    virtual void ParseInternal(std::ifstream &);
 
 private:
     /**
@@ -61,7 +65,7 @@ private:
      * @return True if the string was trimmed.
      *
      * @throws ParserException Thrown if the character was found at one end of
-     *     the string, but not the other.
+     *                         the string, but not the other.
      */
     bool trimValue(std::string &, char) const;
 
@@ -77,7 +81,7 @@ private:
      * @return True if the string was trimmed.
      *
      * @throws ParserException Thrown if the one of the start/end characters
-     *     was found, but not the other.
+     *                         was found, but not the other.
      */
     bool trimValue(std::string &, char, char) const;
 };

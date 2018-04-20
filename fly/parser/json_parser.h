@@ -20,7 +20,6 @@ FLY_CLASS_PTRS(JsonParser);
  */
 class JsonParser : public Parser
 {
-public:
     enum JsonToken
     {
         JSON_NEW_LINE = 0x0A, // \n
@@ -59,33 +58,34 @@ public:
      */
     JsonParser(const std::string &, const std::string &);
 
+protected:
     /**
      * Parse the configured file and store parsed values.
      *
+     * @param ifstream Stream holding the open file.
+     *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    virtual void Parse();
+    virtual void ParseInternal(std::ifstream &);
 
 private:
     /**
      * Handle the start of an object or array.
      *
      * @param int The current parsed character ({ or [).
-     * @param JsonToken The current parsed character cast to a token.
      *
      * @throws ParserException Thrown if the parsed character was unexpected.
      */
-    void onStartBraceOrBracket(int, const JsonToken &);
+    void onStartBraceOrBracket(int);
 
     /**
      * Handle the end of an object or array.
      *
      * @param int The current parsed character (} or ]).
-     * @param JsonToken The current parsed character cast to a token.
      *
      * @throws ParserException Thrown if the parsed character was unexpected.
      */
-    void onCloseBraceOrBracket(int, const JsonToken &);
+    void onCloseBraceOrBracket(int);
 
     /**
      * Handle the start or end of a string, for either a name or value.

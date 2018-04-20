@@ -1,9 +1,7 @@
 #include "fly/parser/ini_parser.h"
 
 #include <cstring>
-#include <fstream>
 
-#include "fly/path/path.h"
 #include "fly/string/string.h"
 
 namespace fly {
@@ -15,17 +13,9 @@ IniParser::IniParser(const std::string &path, const std::string &file) :
 }
 
 //==============================================================================
-void IniParser::Parse()
+void IniParser::ParseInternal(std::ifstream &stream)
 {
-    std::unique_lock<std::shared_timed_mutex> lock(m_valuesMutex);
-
-    std::string fullPath = Path::Join(m_path, m_file);
-    std::ifstream stream(fullPath.c_str(), std::ios::in);
-
     std::string line, section;
-    m_line = 0;
-
-    m_values = nullptr;
 
     while (stream.good() && std::getline(stream, line))
     {
