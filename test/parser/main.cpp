@@ -613,7 +613,7 @@ TEST_F(JsonParserTest, JsonCheckerTest)
 }
 
 //==============================================================================
-/*TEST_F(JsonParserTest, AllUnicodeTest)
+TEST_F(JsonParserTest, AllUnicodeTest)
 {
     // Get the path to the unicode directory
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
@@ -622,7 +622,7 @@ TEST_F(JsonParserTest, JsonCheckerTest)
     m_spParser = std::make_shared<fly::JsonParser>(path, "all_unicode.json");
     EXPECT_NO_THROW(m_spParser->Parse());
     EXPECT_EQ(m_spParser->GetValues().Size(), 1112064);
-}*/
+}
 
 //==============================================================================
 TEST_F(JsonParserTest, NonExistingPathTest)
