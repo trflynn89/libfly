@@ -281,11 +281,6 @@ void JsonParser::onColon(int c)
 {
     switch (m_states.top())
     {
-    case JSON_NO_STATE:
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c' (%x)", char(c), c
-        ));
-
     case JSON_PARSING_COLON:
         m_states.pop();
         m_states.push(JSON_PARSING_VALUE);
@@ -294,9 +289,24 @@ void JsonParser::onColon(int c)
 
         break;
 
-    default:
-        pushValue(c);
+    case JSON_PARSING_NAME:
+    case JSON_PARSING_VALUE:
+        if (m_parsingString)
+        {
+            pushValue(c);
+        }
+        else
+        {
+            throw ParserException(m_file, m_line, m_column, String::Format(
+                "Unexpected character '%c' (%x)", char(c), c
+            ));
+        }
         break;
+
+    default:
+        throw ParserException(m_file, m_line, m_column, String::Format(
+            "Unexpected character '%c' (%x)", char(c), c
+        ));
     }
 }
 
@@ -305,30 +315,6 @@ void JsonParser::onComma(int c)
 {
     switch (m_states.top())
     {
-    case JSON_NO_STATE:
-    case JSON_PARSING_OBJECT:
-    case JSON_PARSING_ARRAY:
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c' (%x)", char(c), c
-        ));
-
-    case JSON_PARSING_COMMA:
-        m_states.pop();
-
-        switch (m_states.top())
-        {
-        case JSON_PARSING_OBJECT:
-        case JSON_PARSING_ARRAY:
-            popValue();
-            break;
-
-        default:
-            m_states.pop();
-            break;
-        }
-
-        break;
-
     case JSON_PARSING_NAME:
         pushValue(c);
         break;
@@ -351,8 +337,27 @@ void JsonParser::onComma(int c)
 
         break;
 
-    default:
+    case JSON_PARSING_COMMA:
+        m_states.pop();
+
+        switch (m_states.top())
+        {
+        case JSON_PARSING_OBJECT:
+        case JSON_PARSING_ARRAY:
+            popValue();
+            break;
+
+        default:
+            m_states.pop();
+            break;
+        }
+
         break;
+
+    default:
+        throw ParserException(m_file, m_line, m_column, String::Format(
+            "Unexpected character '%c' (%x)", char(c), c
+        ));
     }
 
     m_expectingValue = !m_parsingString;
