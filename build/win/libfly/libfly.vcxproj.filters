@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="concurrency">
-      <UniqueIdentifier>{40bfec4f-872f-4644-855a-b175a165c108}</UniqueIdentifier>
-    </Filter>
     <Filter Include="config">
       <UniqueIdentifier>{7bfc9b93-2ef1-48fd-9eb8-ccb630757af9}</UniqueIdentifier>
     </Filter>
@@ -50,15 +47,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\exit_codes.h" />
     <ClInclude Include="..\..\..\fly\fly.h" />
-    <ClInclude Include="..\..\..\fly\concurrency\concurrent_container.h">
-      <Filter>concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\concurrency\concurrent_queue.h">
-      <Filter>concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\concurrency\concurrent_stack.h">
-      <Filter>concurrency</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\config\config.h">
       <Filter>config</Filter>
     </ClInclude>
@@ -147,6 +135,15 @@
       <Filter>parser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\json.h">
+      <Filter>types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\concurrent_container.h">
+      <Filter>types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\concurrent_queue.h">
+      <Filter>types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\concurrent_stack.h">
       <Filter>types</Filter>
     </ClInclude>
   </ItemGroup>

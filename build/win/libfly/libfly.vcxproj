@@ -139,9 +139,6 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\fly\concurrency\concurrent_container.h" />
-    <ClInclude Include="..\..\..\fly\concurrency\concurrent_queue.h" />
-    <ClInclude Include="..\..\..\fly\concurrency\concurrent_stack.h" />
     <ClInclude Include="..\..\..\fly\config\config.h" />
     <ClInclude Include="..\..\..\fly\config\config_manager.h" />
     <ClInclude Include="..\..\..\fly\exit_codes.h" />
@@ -173,6 +170,9 @@
     <ClInclude Include="..\..\..\fly\task\runner.h" />
     <ClInclude Include="..\..\..\fly\task\task_config.h" />
     <ClInclude Include="..\..\..\fly\traits\traits.h" />
+    <ClInclude Include="..\..\..\fly\types\concurrent_container.h" />
+    <ClInclude Include="..\..\..\fly\types\concurrent_queue.h" />
+    <ClInclude Include="..\..\..\fly\types\concurrent_stack.h" />
     <ClInclude Include="..\..\..\fly\types\json.h" />
   </ItemGroup>
   <ItemGroup>

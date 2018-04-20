@@ -7,13 +7,13 @@
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
-#include "fly/concurrency/concurrent_queue.h"
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/async_request.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_manager.h"
 #include "fly/string/string.h"
+#include "fly/types/concurrent_queue.h"
 
 #ifdef FLY_LINUX
     #include "test/mock/mock_system.h"

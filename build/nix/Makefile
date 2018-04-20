@@ -14,7 +14,6 @@ $(eval $(call SET_DEFAULT_TARGET, libfly))
 $(eval $(call ADD_TARGET, libfly, fly, LIB))
 
 # Unit tests
-$(eval $(call ADD_TEST_TARGET, concurrency_test, test/concurrency))
 $(eval $(call ADD_TEST_TARGET, config_test, test/config))
 $(eval $(call ADD_TEST_TARGET, logger_test, test/logger))
 $(eval $(call ADD_TEST_TARGET, parser_test, test/parser))

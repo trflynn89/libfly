@@ -1,6 +1,10 @@
 #include <array>
+#include <atomic>
+#include <chrono>
 #include <deque>
 #include <forward_list>
+#include <functional>
+#include <future>
 #include <list>
 #include <map>
 #include <set>
@@ -13,10 +17,22 @@
 
 #include "fly/fly.h"
 #include "fly/string/string.h"
+#include "fly/types/concurrent_queue.h"
 #include "fly/types/json.h"
 
 #if defined(FLY_WINDOWS)
     #include <Windows.h>
+
+    namespace
+    {
+        const char *ConvertToUTF8(const wchar_t *str)
+        {
+            static char buff[1024];
+
+            ::WideCharToMultiByte(CP_UTF8, 0, str, -1, buff, sizeof(buff), NULL, NULL);
+            return buff;
+        }
+    }
 
     #define utf8(str) ConvertToUTF8(L##str)
 #else
@@ -24,20 +40,204 @@
 #endif
 
 //==============================================================================
-namespace
+class ConcurrencyTest : public ::testing::Test
 {
-#if defined(FLY_WINDOWS)
+public:
+    typedef int Object;
+    typedef fly::ConcurrentQueue<Object> ObjectQueue;
 
-    const char *ConvertToUTF8(const wchar_t *str)
+    unsigned int WriterThread(ObjectQueue &objectQueue)
     {
-        static char buff[1024];
+        unsigned int numWrites = 100;
 
-        ::WideCharToMultiByte(CP_UTF8, 0, str, -1, buff, sizeof(buff), NULL, NULL);
-        return buff;
+        for (unsigned int i = 0; i < numWrites; ++i)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+            Object object(i);
+            objectQueue.Push(object);
+        }
+
+        return numWrites;
     }
 
-#endif
+    unsigned int ReaderThread(
+        ObjectQueue &objectQueue,
+        std::atomic_bool &finishedWrites
+    )
+    {
+        unsigned int numReads = 0;
 
+        while (!finishedWrites.load() || !objectQueue.IsEmpty())
+        {
+            Object object;
+
+            if (objectQueue.Pop(object, std::chrono::seconds(1)))
+            {
+                ++numReads;
+            }
+        }
+
+        return numReads;
+    }
+
+    Object InfiniteWaitReaderThread(ObjectQueue &objectQueue)
+    {
+        Object object;
+        objectQueue.Pop(object);
+
+        return object;
+    }
+
+protected:
+    void RunMultiThreadedTest(unsigned int numWriters, unsigned int numReaders)
+    {
+        ObjectQueue objectQueue;
+
+        std::vector<std::future<unsigned int>> writerFutures;
+        std::vector<std::future<unsigned int>> readerFutures;
+
+        std::atomic_bool finishedWrites(false);
+
+        // Create numWriters writer threads
+        for (unsigned int i = 0; i < numWriters; ++i)
+        {
+            auto func = std::bind(&ConcurrencyTest::WriterThread, this, std::ref(objectQueue));
+            writerFutures.push_back(std::async(std::launch::async, func));
+        }
+
+        // Create numReaders reader threads
+        for (unsigned int i = 0; i < numReaders; ++i)
+        {
+            auto func = std::bind(&ConcurrencyTest::ReaderThread, this, std::ref(objectQueue), std::ref(finishedWrites));
+            readerFutures.push_back(std::async(std::launch::async, func));
+        }
+
+        unsigned int numWrites = 0;
+        unsigned int numReads = 0;
+
+        for (auto &future : writerFutures)
+        {
+            ASSERT_TRUE(future.valid());
+            numWrites += future.get();
+        }
+
+        finishedWrites.store(true);
+
+        for (auto &future : readerFutures)
+        {
+            ASSERT_TRUE(future.valid());
+            numReads += future.get();
+        }
+
+        ASSERT_EQ(numWrites, numReads);
+    }
+
+    void DoQueuePush(
+        ObjectQueue &objectQueue,
+        const Object &object,
+        ObjectQueue::size_type expectedSize
+    )
+    {
+        objectQueue.Push(object);
+
+        ASSERT_EQ(objectQueue.Size(), expectedSize);
+        ASSERT_FALSE(objectQueue.IsEmpty());
+    }
+
+    void DoQueuePop(
+        ObjectQueue &objectQueue,
+        const Object &expectedObject,
+        ObjectQueue::size_type expectedSize
+    )
+    {
+        Object object;
+
+        ASSERT_TRUE(objectQueue.Pop(object, std::chrono::milliseconds(0)));
+        ASSERT_EQ(objectQueue.Size(), expectedSize);
+        ASSERT_EQ(object, expectedObject);
+    }
+};
+
+//==============================================================================
+TEST_F(ConcurrencyTest, EmptyQueueUponCreationTest)
+{
+    ObjectQueue objectQueue;
+
+    ASSERT_TRUE(objectQueue.IsEmpty());
+    ASSERT_EQ(objectQueue.Size(), 0);
+}
+
+//==============================================================================
+TEST_F(ConcurrencyTest, PopFromEmptyQueueTest)
+{
+    ObjectQueue objectQueue;
+
+    Object obj1;
+    Object obj2(1);
+
+    // Make sure pop is initially invalid
+    ASSERT_FALSE(objectQueue.Pop(obj1, std::chrono::milliseconds(0)));
+
+    // Push an item onto the queue and immediately pop it
+    objectQueue.Push(obj2);
+    ASSERT_TRUE(objectQueue.Pop(obj1, std::chrono::milliseconds(0)));
+
+    // Make sure popping an item from the no-longer non-empty queue is invalid
+    ASSERT_FALSE(objectQueue.Pop(obj1, std::chrono::milliseconds(0)));
+}
+
+//==============================================================================
+TEST_F(ConcurrencyTest, SingleThreadedTest)
+{
+    ObjectQueue objectQueue;
+    ObjectQueue::size_type size = 0;
+
+    Object obj1(1);
+    Object obj2(2);
+    Object obj3(3);
+
+    DoQueuePush(objectQueue, obj1, ++size);
+    DoQueuePush(objectQueue, obj1, ++size);
+    DoQueuePop(objectQueue, obj1, --size);
+    DoQueuePush(objectQueue, obj2, ++size);
+    DoQueuePush(objectQueue, obj3, ++size);
+    DoQueuePop(objectQueue, obj1, --size);
+    DoQueuePop(objectQueue, obj2, --size);
+    DoQueuePop(objectQueue, obj3, --size);
+}
+
+//==============================================================================
+TEST_F(ConcurrencyTest, MultiThreadedTest)
+{
+    RunMultiThreadedTest(1, 1);
+    RunMultiThreadedTest(1, 100);
+    RunMultiThreadedTest(100, 1);
+    RunMultiThreadedTest(100, 100);
+}
+
+//==============================================================================
+TEST_F(ConcurrencyTest, InfiniteWaitReaderTest)
+{
+    ObjectQueue objectQueue;
+    Object obj(123);
+
+    auto func = std::bind(&ConcurrencyTest::InfiniteWaitReaderThread, this, std::ref(objectQueue));
+    std::future<Object> future = std::async(std::launch::async, func);
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    objectQueue.Push(obj);
+
+    std::future_status status = future.wait_for(std::chrono::seconds(1));
+    ASSERT_EQ(status, std::future_status::ready);
+    ASSERT_EQ(future.get(), obj);
+}
+
+//==============================================================================
+class JsonTest : public ::testing::Test
+{
+protected:
     void ValidateFail(const std::string &test)
     {
         SCOPED_TRACE(test);
@@ -45,6 +245,11 @@ namespace
         EXPECT_THROW({
             fly::Json actual = test;
         }, fly::JsonException);
+    }
+
+    void ValidatePass(const std::string &test)
+    {
+        ValidatePass(test, test);
     }
 
     void ValidatePass(const std::string &test, const std::string &expected)
@@ -65,12 +270,7 @@ namespace
         fly::Json repeat = actual;
         EXPECT_EQ(actual, repeat);
     }
-
-    void ValidatePass(const std::string &test)
-    {
-        ValidatePass(test, test);
-    }
-}
+};
 
 //==============================================================================
 TEST(JsonExceptionTest, ExceptionTest)
@@ -99,7 +299,7 @@ TEST(JsonExceptionTest, ExceptionTest)
 }
 
 //==============================================================================
-TEST(JsonTest, StringConstructorTest)
+TEST_F(JsonTest, StringConstructorTest)
 {
     const std::string str1("a");
     EXPECT_TRUE(fly::Json(str1).IsString());
@@ -121,7 +321,7 @@ TEST(JsonTest, StringConstructorTest)
 }
 
 //==============================================================================
-TEST(JsonTest, ObjectConstructorTest)
+TEST_F(JsonTest, ObjectConstructorTest)
 {
     std::map<std::string, int> map = { { "a", 1 }, { "b", 2 } };
     EXPECT_TRUE(fly::Json(map).IsObject());
@@ -137,7 +337,7 @@ TEST(JsonTest, ObjectConstructorTest)
 }
 
 //==============================================================================
-TEST(JsonTest, ArrayConstructorTest)
+TEST_F(JsonTest, ArrayConstructorTest)
 {
     std::array<int, 4> array = { 10, 20, 30, 40 };
     EXPECT_TRUE(fly::Json(array).IsArray());
@@ -181,14 +381,14 @@ TEST(JsonTest, ArrayConstructorTest)
 }
 
 //==============================================================================
-TEST(JsonTest, BooleanConstructorTest)
+TEST_F(JsonTest, BooleanConstructorTest)
 {
     EXPECT_TRUE(fly::Json(true).IsBoolean());
     EXPECT_TRUE(fly::Json(false).IsBoolean());
 }
 
 //==============================================================================
-TEST(JsonTest, SignedIntegerConstructorTest)
+TEST_F(JsonTest, SignedIntegerConstructorTest)
 {
     EXPECT_TRUE(fly::Json(static_cast<char>(1)).IsSignedInteger());
 
@@ -205,7 +405,7 @@ TEST(JsonTest, SignedIntegerConstructorTest)
 }
 
 //==============================================================================
-TEST(JsonTest, UnsignedIntegerConstructorTest)
+TEST_F(JsonTest, UnsignedIntegerConstructorTest)
 {
     EXPECT_TRUE(fly::Json(static_cast<unsigned char>(1)).IsUnsignedInteger());
 
@@ -222,7 +422,7 @@ TEST(JsonTest, UnsignedIntegerConstructorTest)
 }
 
 //==============================================================================
-TEST(JsonTest, FloatConstructorTest)
+TEST_F(JsonTest, FloatConstructorTest)
 {
     EXPECT_TRUE(fly::Json(static_cast<float>(1.0)).IsFloat());
     EXPECT_TRUE(fly::Json(static_cast<double>(1.0)).IsFloat());
@@ -230,14 +430,14 @@ TEST(JsonTest, FloatConstructorTest)
 }
 
 //==============================================================================
-TEST(JsonTest, NullConstructorTest)
+TEST_F(JsonTest, NullConstructorTest)
 {
     EXPECT_TRUE(fly::Json().IsNull());
     EXPECT_TRUE(fly::Json(nullptr).IsNull());
 }
 
 //==============================================================================
-TEST(JsonTest, InitializerListConstructorTest)
+TEST_F(JsonTest, InitializerListConstructorTest)
 {
     const fly::Json empty = { };
     EXPECT_TRUE(fly::Json(empty).IsNull());
@@ -253,7 +453,7 @@ TEST(JsonTest, InitializerListConstructorTest)
 }
 
 //==============================================================================
-TEST(JsonTest, CopyConstructorTest)
+TEST_F(JsonTest, CopyConstructorTest)
 {
     fly::Json string = "abc";
     EXPECT_EQ(fly::Json(string), string);
@@ -281,7 +481,7 @@ TEST(JsonTest, CopyConstructorTest)
 }
 
 //==============================================================================
-TEST(JsonTest, AssignmentTest)
+TEST_F(JsonTest, AssignmentTest)
 {
     fly::Json json;
 
@@ -319,7 +519,7 @@ TEST(JsonTest, AssignmentTest)
 }
 
 //==============================================================================
-TEST(JsonTest, StringConversionTest)
+TEST_F(JsonTest, StringConversionTest)
 {
     fly::Json json;
 
@@ -350,7 +550,7 @@ TEST(JsonTest, StringConversionTest)
 }
 
 //==============================================================================
-TEST(JsonTest, ObjectConversionTest)
+TEST_F(JsonTest, ObjectConversionTest)
 {
     fly::Json json;
 
@@ -389,7 +589,7 @@ TEST(JsonTest, ObjectConversionTest)
 }
 
 //==============================================================================
-TEST(JsonTest, ArrayConversionTest)
+TEST_F(JsonTest, ArrayConversionTest)
 {
     fly::Json json;
 
@@ -443,7 +643,7 @@ TEST(JsonTest, ArrayConversionTest)
 }
 
 //==============================================================================
-TEST(JsonTest, BooleanConversionTest)
+TEST_F(JsonTest, BooleanConversionTest)
 {
     fly::Json json;
 
@@ -487,7 +687,7 @@ TEST(JsonTest, BooleanConversionTest)
 }
 
 //==============================================================================
-TEST(JsonTest, SignedIntegerConversionTest)
+TEST_F(JsonTest, SignedIntegerConversionTest)
 {
     fly::Json json;
 
@@ -527,7 +727,7 @@ TEST(JsonTest, SignedIntegerConversionTest)
 }
 
 //==============================================================================
-TEST(JsonTest, UnsignedIntegerConversionTest)
+TEST_F(JsonTest, UnsignedIntegerConversionTest)
 {
     fly::Json json;
 
@@ -567,7 +767,7 @@ TEST(JsonTest, UnsignedIntegerConversionTest)
 }
 
 //==============================================================================
-TEST(JsonTest, FloatConversionTest)
+TEST_F(JsonTest, FloatConversionTest)
 {
     fly::Json json;
 
@@ -607,7 +807,7 @@ TEST(JsonTest, FloatConversionTest)
 }
 
 //==============================================================================
-TEST(JsonTest, NullConversionTest)
+TEST_F(JsonTest, NullConversionTest)
 {
     fly::Json json;
 
@@ -640,7 +840,7 @@ TEST(JsonTest, NullConversionTest)
 }
 
 //==============================================================================
-TEST(JsonTest, ObjectAccessTest)
+TEST_F(JsonTest, ObjectAccessTest)
 {
     fly::Json string1 = "abc";
     EXPECT_THROW(string1["a"], fly::JsonException);
@@ -699,7 +899,7 @@ TEST(JsonTest, ObjectAccessTest)
 }
 
 //==============================================================================
-TEST(JsonTest, ArrayAccessTest)
+TEST_F(JsonTest, ArrayAccessTest)
 {
     fly::Json string1 = "abc";
     EXPECT_THROW(string1[0], fly::JsonException);
@@ -758,7 +958,7 @@ TEST(JsonTest, ArrayAccessTest)
 }
 
 //==============================================================================
-TEST(JsonTest, SizeTest)
+TEST_F(JsonTest, SizeTest)
 {
     fly::Json json;
 
@@ -788,7 +988,7 @@ TEST(JsonTest, SizeTest)
 }
 
 //==============================================================================
-TEST(JsonTest, EqualityTest)
+TEST_F(JsonTest, EqualityTest)
 {
     fly::Json string1 = "abc";
     fly::Json string2 = "abc";
@@ -896,7 +1096,7 @@ TEST(JsonTest, EqualityTest)
 }
 
 //==============================================================================
-TEST(JsonTest, StreamTest)
+TEST_F(JsonTest, StreamTest)
 {
     std::stringstream stream;
 
@@ -943,7 +1143,7 @@ TEST(JsonTest, StreamTest)
 }
 
 //==============================================================================
-TEST(JsonTest, UnicodeConversionTest)
+TEST_F(JsonTest, UnicodeConversionTest)
 {
     ValidateFail("\\u");
     ValidateFail("\\u0");
@@ -982,7 +1182,7 @@ TEST(JsonTest, UnicodeConversionTest)
 }
 
 //==============================================================================
-TEST(JsonTest, MarkusKuhnStressTest)
+TEST_F(JsonTest, MarkusKuhnStressTest)
 {
     // http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
@@ -1391,7 +1591,7 @@ TEST(JsonTest, MarkusKuhnStressTest)
 }
 
 //==============================================================================
-TEST(JsonTest, MarkusKuhnExtendedTest)
+TEST_F(JsonTest, MarkusKuhnExtendedTest)
 {
     // Exceptions not caught by Markus Kuhn's stress test
     ValidateFail("\x22");
