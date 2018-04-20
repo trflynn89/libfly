@@ -757,6 +757,7 @@ TEST_F(JsonParserTest, BadlyFormedObjectTest)
     ValidateFailRaw("{ \"a\" : 1 { }");
     ValidateFailRaw("{ \"a\" : 1 { } }");
     ValidateFailRaw("{ \"a\" : 1, { }");
+    ValidateFailRaw("{ \"a\" : \"\\");
 }
 
 //==============================================================================

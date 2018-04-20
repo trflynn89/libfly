@@ -37,13 +37,6 @@ public:
         JSON_CLOSE_BRACE = 0x7d, // }
 
         JSON_REVERSE_SOLIDUS = 0x5C, /* \ */
-        JSON_SOLIDUS = 0x2F, // /
-        JSON_B = 0x62, // b (backspace)
-        JSON_F = 0x66, // f (formfeed)
-        JSON_N = 0x6E, // n (newline)
-        JSON_R = 0x72, // r (carriage return)
-        JSON_T = 0x74, // t (horizontal tab)
-        JSON_U = 0x75, // u (hexidecimal)
     };
 
     enum JsonState
@@ -74,15 +67,75 @@ public:
     virtual void Parse();
 
 private:
+    /**
+     * Handle the start of an object or array.
+     *
+     * @param int The current parsed character ({ or [).
+     * @param JsonToken The current parsed character cast to a token.
+     *
+     * @throws ParserException Thrown if the parsed character was unexpected.
+     */
     void onStartBraceOrBracket(int, const JsonToken &);
+
+    /**
+     * Handle the end of an object or array.
+     *
+     * @param int The current parsed character (} or ]).
+     * @param JsonToken The current parsed character cast to a token.
+     *
+     * @throws ParserException Thrown if the parsed character was unexpected.
+     */
     void onCloseBraceOrBracket(int, const JsonToken &);
+
+    /**
+     * Handle the start or end of a string, for either a name or value.
+     *
+     * @param int The current parsed character (").
+     *
+     * @throws ParserException Thrown if the parsed character was unexpected.
+     */
     void onQuotation(int);
-    void onComma(int);
+
+    /**
+     * Handle a colon between name-value pairs.
+     *
+     * @param int The current parsed character (:).
+     *
+     * @throws ParserException Thrown if the parsed character was unexpected.
+     */
     void onColon(int);
 
+    /**
+     * Handle a comma, either in an array or after an object.
+     *
+     * @param int The current parsed character (,).
+     *
+     * @throws ParserException Thrown if the parsed character was unexpected.
+     */
+    void onComma(int);
+
+    /**
+     * Handle the start or end of a string, for either a name or value.
+     *
+     * @param int The current parsed character.
+     *
+     * @throws ParserException Thrown if the parsed character was unexpected.
+     */
     void onCharacter(int, std::ifstream &);
 
+    /**
+     * Push a parsed character onto the parsing stream.
+     *
+     * @param int The current parsed character.
+     */
     void pushValue(int);
+
+    /**
+     * Store the current value of the parsing stream as a JSON object. Ensures
+     * that the syntax of the value is compliant with http://www.json.org.
+     *
+     * @throws ParserException Thrown if the parsed object was invalid.
+     */
     bool popValue();
 
     std::stack<JsonState> m_states;

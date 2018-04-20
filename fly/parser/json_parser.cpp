@@ -9,10 +9,6 @@
 
 namespace fly {
 
-#define IS_HIGH_SURROGATE(c) ((c >= 0xD800) && (c <= 0xDBFF))
-#define IS_LOW_SURROGATE(c) ((c >= 0xDC00) && (c <= 0xDFFF))
-#define IS_UNICODE(c) ((c >= 0x0) && (c <= 0x10FFFF))
-
 //==============================================================================
 JsonParser::JsonParser(const std::string &path, const std::string &file) :
     Parser(path, file),
@@ -397,13 +393,14 @@ void JsonParser::onCharacter(int c, std::ifstream &stream)
             pushValue(c);
 
             // Blindly ignore the escaped character, the Json class will check
-            // whether it is valid
+            // whether it is valid. Just read at least one more character to
+            // prevent the parser from failing if the next character is a quote.
             if (c == JSON_REVERSE_SOLIDUS)
             {
                 if ((c = stream.get()) == EOF)
                 {
                     throw ParserException(m_file, m_line, m_column, String::Format(
-                        "Expected escaped character after '%c' (%x)", char(c), c
+                        "Expected escaped character after reverse solidus"
                     ));
                 }
 

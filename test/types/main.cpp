@@ -1395,6 +1395,7 @@ TEST(JsonTest, MarkusKuhnExtendedTest)
 {
     // Exceptions not caught by Markus Kuhn's stress test
     ValidateFail("\x22");
+    ValidateFail("\x5c");
 
     ValidateFail("\xe0\xa0\x79");
     ValidateFail("\xe0\xa0\xff");
