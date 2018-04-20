@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "fly/parser/ini_parser.h"
+#include "fly/parser/json_parser.h"
 #include "fly/path/path_monitor.h"
 
 namespace fly {
@@ -28,12 +29,17 @@ ConfigManager::ConfigManager(
 {
     switch (fileType)
     {
-    case CONFIG_TYPE_INI:
+    case ConfigFileType::INI:
         m_spParser = std::make_shared<IniParser>(path, file);
         break;
 
+    case ConfigFileType::JSON:
+        m_spParser = std::make_shared<JsonParser>(path, file);
+        break;
+
     default:
-        LOGE(-1, "Unrecognized configuration type: %d", fileType);
+        LOGE(-1, "Unrecognized configuration type: %d",
+            static_cast<int>(fileType));
         break;
     }
 }
@@ -120,9 +126,7 @@ bool ConfigManager::DoWork()
 
                 if (spConfig)
                 {
-                    Parser::ValueList values = m_spParser->GetValues(it->first);
-                    spConfig->Update(values);
-
+                    spConfig->Update(m_spParser->GetValues(it->first));
                     ++it;
                 }
                 else

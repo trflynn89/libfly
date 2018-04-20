@@ -88,7 +88,7 @@ gcov:
 # Build and run the target
 run: $(TARGET_PACKAGE)
 ifeq ($(TARGET_TYPE), BIN)
-	$(Q)$(ASAN_FLAGS) $(TARGET_NAME)
+	$(Q)$(ASAN_FLAGS) $(TARGET_NAME) $(args)
 endif
 
 # Install the target

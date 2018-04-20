@@ -17,9 +17,43 @@ bool Path::RemovePath(const std::string &path)
 }
 
 //==============================================================================
+bool Path::ListPath(
+    const std::string &path,
+    std::vector<std::string> &directories,
+    std::vector<std::string> &files
+)
+{
+    directories.clear();
+    files.clear();
+
+    return PathImpl::ListPath(path, directories, files);
+}
+
+//==============================================================================
 char Path::GetSeparator()
 {
     return PathImpl::GetSeparator();
+}
+
+//==============================================================================
+std::vector<std::string> Path::Split(const std::string &path)
+{
+    static const char separator(GetSeparator());
+    std::vector<std::string> segments(2);
+
+    const std::string::size_type index = path.find_last_of(separator);
+
+    if (index == std::string::npos)
+    {
+        segments[1] = path;
+    }
+    else
+    {
+        segments[0] = path.substr(0, index);
+        segments[1] = path.substr(index + 1);
+    }
+
+    return segments;
 }
 
 //==============================================================================

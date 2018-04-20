@@ -7,13 +7,13 @@
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
-#include "fly/concurrency/concurrent_queue.h"
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/async_request.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_manager.h"
 #include "fly/string/string.h"
+#include "fly/types/concurrent_queue.h"
 
 #ifdef FLY_LINUX
     #include "test/mock/mock_system.h"
@@ -31,7 +31,7 @@ class SocketTest : public ::testing::Test
 public:
     SocketTest() :
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::CONFIG_TYPE_INI, std::string(), std::string()
+            fly::ConfigManager::ConfigFileType::INI, std::string(), std::string()
         )),
 
         m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>(m_spConfigManager)),

@@ -6,9 +6,9 @@
 #include "fly/config/config.h"
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
-#include "fly/parser/parser.h"
 #include "fly/path/path.h"
 #include "fly/string/string.h"
+#include "fly/types/json.h"
 
 //==============================================================================
 class ConfigTest : public ::testing::Test
@@ -31,7 +31,7 @@ TEST_F(ConfigTest, NonExistingTest)
 //==============================================================================
 TEST_F(ConfigTest, NonCovertibleTest)
 {
-    const fly::Parser::ValueList values = {
+    const fly::Json values = {
         { "name", "John Doe" },
         { "address", "USA" }
     };
@@ -39,13 +39,13 @@ TEST_F(ConfigTest, NonCovertibleTest)
     m_spConfig->Update(values);
 
     EXPECT_EQ(m_spConfig->GetValue<int>("name", 12), 12);
-    EXPECT_EQ(m_spConfig->GetValue<bool>("address", false), false);
+    EXPECT_EQ(m_spConfig->GetValue<nullptr_t>("address", nullptr), nullptr);
 }
 
 //==============================================================================
-TEST_F(ConfigTest, MutlipleValueTypeTest)
+TEST_F(ConfigTest, MultipleValueTypeTest)
 {
-    const fly::Parser::ValueList values = {
+    const fly::Json values = {
         { "name", "John Doe" },
         { "address", "123" },
         { "employed", "1" },
@@ -63,8 +63,8 @@ TEST_F(ConfigTest, MutlipleValueTypeTest)
     EXPECT_EQ(m_spConfig->GetValue<double>("address", 0.0), 123.0);
 
     EXPECT_EQ(m_spConfig->GetValue<std::string>("age", ""), "26.2");
-    EXPECT_EQ(m_spConfig->GetValue<int>("age", 0), 26);
-    EXPECT_EQ(m_spConfig->GetValue<unsigned int>("age", 0), 26);
+    EXPECT_EQ(m_spConfig->GetValue<int>("age", 0), 0);
+    EXPECT_EQ(m_spConfig->GetValue<unsigned int>("age", 0), 0);
     EXPECT_EQ(m_spConfig->GetValue<float>("age", 0.0f), 26.2f);
     EXPECT_EQ(m_spConfig->GetValue<double>("age", 0.0), 26.2);
 
@@ -83,7 +83,7 @@ public:
         )),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::CONFIG_TYPE_INI, m_path, m_file
+            fly::ConfigManager::ConfigFileType::INI, m_path, m_file
         ))
     {
         LOGC("Using path '%s' : '%s'", m_path, m_file);
@@ -158,12 +158,35 @@ class BadConfig : public fly::Config
 };
 
 //==============================================================================
+TEST_F(ConfigManagerTest, AllFileTypesTest)
+{
+    {
+        m_spConfigManager->Stop();
+
+        m_spConfigManager = std::make_shared<fly::ConfigManager>(
+            fly::ConfigManager::ConfigFileType::INI, m_path, m_file
+        );
+
+        EXPECT_TRUE(m_spConfigManager->Start());
+    }
+    {
+        m_spConfigManager->Stop();
+
+        m_spConfigManager = std::make_shared<fly::ConfigManager>(
+            fly::ConfigManager::ConfigFileType::JSON, m_path, m_file
+        );
+
+        EXPECT_TRUE(m_spConfigManager->Start());
+    }
+}
+
+//==============================================================================
 TEST_F(ConfigManagerTest, BadFileTypeTest)
 {
     m_spConfigManager->Stop();
 
     m_spConfigManager = std::make_shared<fly::ConfigManager>(
-        (fly::ConfigManager::ConfigFileType)-1, m_path, m_file
+        static_cast<fly::ConfigManager::ConfigFileType>(-1), m_path, m_file
     );
 
     EXPECT_FALSE(m_spConfigManager->Start());

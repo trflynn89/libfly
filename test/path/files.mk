@@ -6,7 +6,8 @@ SRC_DIRS_$(d) := \
     fly/path \
     fly/string \
     fly/system \
-    fly/task
+    fly/task \
+    fly/types
 
 # Define libraries to link
 LDLIBS_$(d) := -lpthread
@@ -21,4 +22,5 @@ $(eval $(call MOCK_SYSTEM_CALL, inotify_init1))
 $(eval $(call MOCK_SYSTEM_CALL, getenv))
 $(eval $(call MOCK_SYSTEM_CALL, poll))
 $(eval $(call MOCK_SYSTEM_CALL, read))
+$(eval $(call MOCK_SYSTEM_CALL, readdir))
 $(eval $(call MOCK_SYSTEM_CALL, remove))

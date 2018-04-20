@@ -6,7 +6,8 @@ SRC_DIRS_$(d) := \
     fly/path \
     fly/string \
     fly/system \
-    fly/task
+    fly/task \
+    fly/types
 
 # Define linker flags
 LDFLAGS_$(d) += -static-libstdc++

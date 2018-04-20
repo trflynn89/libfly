@@ -2,13 +2,88 @@
 
 #include <cstring>
 
+#include <dirent.h>
 #include <fts.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
 #include "fly/logger/logger.h"
+#include "fly/path/path.h"
 
 namespace fly {
+
+namespace
+{
+    static const int s_ftsMode = FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV;
+
+    /**
+     * RAII wrapper around ::fts_open().
+     */
+    class FtsWrapper
+    {
+    public:
+        FtsWrapper(char * const *files) : m_pFts(::fts_open(files, s_ftsMode, NULL))
+        {
+        }
+
+        ~FtsWrapper()
+        {
+            if (m_pFts != NULL)
+            {
+                ::fts_close(m_pFts);
+            }
+        }
+
+        FTS *operator () () const
+        {
+            return m_pFts;
+        }
+
+        operator bool() const
+        {
+            return (m_pFts != NULL);
+        }
+
+    private:
+        FTS *m_pFts;
+    };
+
+    /**
+     * RAII wrapper around ::opendir().
+     */
+    class DirWrapper
+    {
+    public:
+        DirWrapper(const char *path) : m_pDir(::opendir(path))
+        {
+            if (m_pDir == NULL)
+            {
+                LOGS(-1, "Could not open \"%s\"", path);
+            }
+        }
+
+        ~DirWrapper()
+        {
+            if (m_pDir != NULL)
+            {
+                ::closedir(m_pDir);
+            }
+        }
+
+        DIR *operator () () const
+        {
+            return m_pDir;
+        }
+
+        operator bool() const
+        {
+            return (m_pDir != NULL);
+        }
+
+    private:
+        DIR *m_pDir;
+    };
+}
 
 //==============================================================================
 bool PathImpl::MakePath(const std::string &path)
@@ -43,19 +118,17 @@ bool PathImpl::MakePath(const std::string &path)
 //==============================================================================
 bool PathImpl::RemovePath(const std::string &path)
 {
-    static const int mode = FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV;
     struct stat st;
-
     bool ret = ((::stat(path.c_str(), &st) == 0) && S_ISDIR(st.st_mode));
 
     if (ret)
     {
         char *files[] = { (char *)path.c_str(), NULL };
 
-        FTS *pFts = ::fts_open(files, mode, NULL);
+        FtsWrapper fts(files);
         FTSENT *pCurr = NULL;
 
-        while (ret && (pFts != NULL) && ((pCurr = ::fts_read(pFts)) != NULL))
+        while (ret && fts && ((pCurr = ::fts_read(fts())) != NULL))
         {
             std::string file(pCurr->fts_path, pCurr->fts_pathlen);
 
@@ -90,14 +163,45 @@ bool PathImpl::RemovePath(const std::string &path)
                 break;
             }
         }
-
-        if (pFts != NULL)
-        {
-            ::fts_close(pFts);
-        }
     }
 
     return ret;
+}
+
+//==============================================================================
+bool PathImpl::ListPath(
+    const std::string &path,
+    std::vector<std::string> &directories,
+    std::vector<std::string> &files
+)
+{
+    DirWrapper dir(path.c_str());
+    struct dirent *ent = NULL;
+
+    while (dir && (ent = ::readdir(dir())) != NULL)
+    {
+        const std::string file(ent->d_name);
+
+        switch (ent->d_type)
+        {
+        case DT_DIR:
+            if ((file != ".") && (file != ".."))
+            {
+                directories.push_back(file);
+            }
+            break;
+
+        case DT_LNK:
+        case DT_REG:
+            files.push_back(file);
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    return dir;
 }
 
 //==============================================================================

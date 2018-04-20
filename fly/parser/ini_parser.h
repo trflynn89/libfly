@@ -1,7 +1,6 @@
 #pragma once
 
-#include <map>
-#include <shared_mutex>
+#include <fstream>
 #include <string>
 
 #include "fly/fly.h"
@@ -19,11 +18,6 @@ FLY_CLASS_PTRS(IniParser);
  */
 class IniParser : public Parser
 {
-    /**
-     * A map of parsed section names to that section's list of name-value pairs.
-     */
-    typedef std::map<std::string, Parser::ValueList> IniSection;
-
 public:
     /**
      * Constructor.
@@ -33,37 +27,15 @@ public:
      */
     IniParser(const std::string &, const std::string &);
 
+protected:
     /**
      * Parse the configured file and store parsed values.
      *
+     * @param ifstream Stream holding the open file.
+     *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    virtual void Parse();
-
-    /**
-     * Get a section's parsed values.
-     *
-     * @param string The name of the section containing the values.
-     *
-     * @return A list of parsed values.
-     */
-    virtual Parser::ValueList GetValues(const std::string &) const;
-
-    /**
-     * Get the number of sections that have been parsed.
-     *
-     * @return The number of parsed sections.
-     */
-    IniSection::size_type GetSize() const;
-
-    /**
-     * Get the number of name/value pairs that have been parsed for a section.
-     *
-     * @param string The name of the section to count.
-     *
-     * @return The number of parsed values.
-     */
-    Parser::ValueList::size_type GetSize(const std::string &) const;
+    virtual void ParseInternal(std::ifstream &);
 
 private:
     /**
@@ -93,7 +65,7 @@ private:
      * @return True if the string was trimmed.
      *
      * @throws ParserException Thrown if the character was found at one end of
-     *     the string, but not the other.
+     *                         the string, but not the other.
      */
     bool trimValue(std::string &, char) const;
 
@@ -109,12 +81,9 @@ private:
      * @return True if the string was trimmed.
      *
      * @throws ParserException Thrown if the one of the start/end characters
-     *     was found, but not the other.
+     *                         was found, but not the other.
      */
     bool trimValue(std::string &, char, char) const;
-
-    mutable std::shared_timed_mutex m_sectionsMutex;
-    IniSection m_sections;
 };
 
 }
