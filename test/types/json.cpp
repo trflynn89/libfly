@@ -281,6 +281,15 @@ TEST_F(JsonTest, CopyConstructorTest)
 }
 
 //==============================================================================
+TEST_F(JsonTest, MoveConstructorTest)
+{
+    fly::Json string = "abc";
+    fly::Json stringCopy(string);
+    fly::Json stringMove(std::move(string));
+    EXPECT_EQ(stringMove, stringCopy);
+}
+
+//==============================================================================
 TEST_F(JsonTest, AssignmentTest)
 {
     fly::Json json;
@@ -323,9 +332,8 @@ TEST_F(JsonTest, StringConversionTest)
 {
     fly::Json json;
 
-    std::string string = "abc";
-    json = string;
-    EXPECT_EQ(std::string(json), string);
+    json = "abc";
+    EXPECT_EQ(std::string(json), "abc");
 
     json = { { "a", 1 }, { "b", 2 } };
     EXPECT_EQ(std::string(json), "{\"a\":1,\"b\":2}");

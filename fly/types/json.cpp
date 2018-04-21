@@ -11,21 +11,21 @@ namespace fly {
 #define IS_LOW_SURROGATE(c) ((c >= 0xDC00) && (c <= 0xDFFF))
 
 //==============================================================================
-Json::Json() :
+Json::Json() noexcept :
     m_type(TYPE_NULL),
     m_value()
 {
 }
 
 //==============================================================================
-Json::Json(const null_type &value) :
+Json::Json(const null_type &value) noexcept :
     m_type(TYPE_NULL),
     m_value(value)
 {
 }
 
 //==============================================================================
-Json::Json(const Json &json) :
+Json::Json(const Json &json) noexcept :
     m_type(json.m_type),
     m_value()
 {
@@ -65,7 +65,16 @@ Json::Json(const Json &json) :
 }
 
 //==============================================================================
-Json::Json(const std::initializer_list<Json> &initializer) :
+Json::Json(Json &&json) noexcept :
+    m_type(std::move(json.m_type)),
+    m_value(std::move(json.m_value))
+{
+    json.m_type = TYPE_NULL;
+    json.m_value = nullptr;
+}
+
+//==============================================================================
+Json::Json(const std::initializer_list<Json> &initializer) noexcept :
     m_type(TYPE_NULL),
     m_value()
 {
@@ -100,7 +109,7 @@ Json::Json(const std::initializer_list<Json> &initializer) :
 }
 
 //==============================================================================
-Json::~Json()
+Json::~Json() noexcept
 {
     m_value.Destroy(m_type);
 }
@@ -164,7 +173,7 @@ bool Json::IsNull() const
 }
 
 //==============================================================================
-Json &Json::operator = (Json json)
+Json &Json::operator = (Json json) noexcept
 {
     std::swap(m_type, json.m_type);
     std::swap(m_value, json.m_value);
@@ -504,19 +513,19 @@ std::string Json::type() const
 }
 
 //==============================================================================
-Json::Value::Value() :
+Json::Value::Value() noexcept :
     m_null(nullptr)
 {
 }
 
 //==============================================================================
-Json::Value::Value(const null_type &value) :
+Json::Value::Value(const null_type &value) noexcept :
     m_null(value)
 {
 }
 
 //==============================================================================
-void Json::Value::Destroy(const Type &type)
+void Json::Value::Destroy(const Type &type) noexcept
 {
     switch (type)
     {
