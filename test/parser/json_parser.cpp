@@ -109,6 +109,17 @@ TEST_F(JsonParserTest, JsonCheckerTest)
 }
 
 //==============================================================================
+TEST_F(JsonParserTest, JsonTestSuiteTest)
+{
+    // https://code.google.com/archive/p/json-test-suite/
+    std::vector<std::string> segments = fly::Path::Split(__FILE__);
+    std::string path = fly::Path::Join(segments[0], "json_test_suite");
+
+    m_spParser = std::make_shared<fly::JsonParser>(path, "sample.json");
+    EXPECT_NO_THROW(m_spParser->Parse());
+}
+
+//==============================================================================
 TEST_F(JsonParserTest, AllUnicodeTest)
 {
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
@@ -157,7 +168,7 @@ TEST_F(JsonParserTest, EmptyObjectTest)
 
     fly::Json json = m_spParser->GetValues();
     EXPECT_TRUE(json.IsObject());
-    EXPECT_TRUE(json.Size() == 0);
+    EXPECT_EQ(json.Size(), 0);
 }
 
 //==============================================================================
@@ -170,7 +181,7 @@ TEST_F(JsonParserTest, EmptyArrayTest)
 
     fly::Json json = m_spParser->GetValues();
     EXPECT_TRUE(json.IsArray());
-    EXPECT_TRUE(json.Size() == 0);
+    EXPECT_EQ(json.Size(), 0);
 }
 
 //==============================================================================
@@ -184,11 +195,11 @@ TEST_F(JsonParserTest, EmptyNestedObjectArrayTest)
 
         fly::Json json = m_spParser->GetValues();
         EXPECT_TRUE(json.IsArray());
-        EXPECT_TRUE(json.Size() == 1);
+        EXPECT_EQ(json.Size(), 1);
 
         json = json[0];
         EXPECT_TRUE(json.IsObject());
-        EXPECT_TRUE(json.Size() == 0);
+        EXPECT_EQ(json.Size(), 0);
     }
     {
         const std::string contents("[[]]");
@@ -198,11 +209,49 @@ TEST_F(JsonParserTest, EmptyNestedObjectArrayTest)
 
         fly::Json json = m_spParser->GetValues();
         EXPECT_TRUE(json.IsArray());
-        EXPECT_TRUE(json.Size() == 1);
+        EXPECT_EQ(json.Size(), 1);
 
         json = json[0];
         EXPECT_TRUE(json.IsArray());
-        EXPECT_TRUE(json.Size() == 0);
+        EXPECT_EQ(json.Size(), 0);
+    }
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, EmptyStringTest)
+{
+    {
+        const std::string contents("{\"a\" : \"\" }");
+        CreateFile(contents);
+
+        ASSERT_NO_THROW(m_spParser->Parse());
+
+        fly::Json json = m_spParser->GetValues("a");
+        EXPECT_TRUE(json.IsString());
+        EXPECT_EQ(json.Size(), 0);
+        EXPECT_EQ(json, "");
+    }
+    {
+        const std::string contents("{\"\" : \"a\" }");
+        CreateFile(contents);
+
+        ASSERT_NO_THROW(m_spParser->Parse());
+
+        fly::Json json = m_spParser->GetValues("");
+        EXPECT_TRUE(json.IsString());
+        EXPECT_EQ(json.Size(), 1);
+        EXPECT_EQ(json, "a");
+    }
+    {
+        const std::string contents("{\"\" : \"\" }");
+        CreateFile(contents);
+
+        ASSERT_NO_THROW(m_spParser->Parse());
+
+        fly::Json json = m_spParser->GetValues("");
+        EXPECT_TRUE(json.IsString());
+        EXPECT_EQ(json.Size(), 0);
+        EXPECT_EQ(json, "");
     }
 }
 

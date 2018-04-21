@@ -389,16 +389,17 @@ bool JsonParser::popValue()
 {
     const std::string value = m_parsing.str();
 
-    if (value.empty())
-    {
-        return false;
-    }
-
     // Parsed a string value
     if (m_parsedString)
     {
         m_parsedString = false;
         *m_pValue = value;
+    }
+
+    // No parsed value
+    else if (value.empty())
+    {
+        return false;
     }
 
     // Parsed a boolean value
