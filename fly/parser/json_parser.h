@@ -65,7 +65,9 @@ protected:
      *
      * @param ifstream Stream holding the open file.
      *
-     * @throws ParserException Thrown if an error occurs parsing the file.
+     * @throws ParserException If an error occurs parsing the file.
+     * @throws UnexpectedCharacterException If a parsed character was unexpected.
+     * @throws BadConversionException If a parsed object was invalid.
      */
     virtual void ParseInternal(std::ifstream &);
 
@@ -75,7 +77,7 @@ private:
      *
      * @param int The current parsed character ({ or [).
      *
-     * @throws ParserException Thrown if the parsed character was unexpected.
+     * @throws UnexpectedCharacterException If a parsed character was unexpected.
      */
     void onStartBraceOrBracket(int);
 
@@ -84,7 +86,8 @@ private:
      *
      * @param int The current parsed character (} or ]).
      *
-     * @throws ParserException Thrown if the parsed character was unexpected.
+     * @throws UnexpectedCharacterException If a parsed character was unexpected.
+     * @throws BadConversionException If a parsed object was invalid.
      */
     void onCloseBraceOrBracket(int);
 
@@ -93,16 +96,25 @@ private:
      *
      * @param int The current parsed character (").
      *
-     * @throws ParserException Thrown if the parsed character was unexpected.
+     * @throws UnexpectedCharacterException If a parsed character was unexpected.
      */
     void onQuotation(int);
+
+    /**
+     * Handle a new line character.
+     *
+     * @param int The current parsed character (\n).
+     *
+     * @throws UnexpectedCharacterException If a parsed character was unexpected.
+     */
+    void onNewLine(int);
 
     /**
      * Handle a colon between name-value pairs.
      *
      * @param int The current parsed character (:).
      *
-     * @throws ParserException Thrown if the parsed character was unexpected.
+     * @throws UnexpectedCharacterException If a parsed character was unexpected.
      */
     void onColon(int);
 
@@ -111,16 +123,19 @@ private:
      *
      * @param int The current parsed character (,).
      *
-     * @throws ParserException Thrown if the parsed character was unexpected.
+     * @throws UnexpectedCharacterException If a parsed character was unexpected.
+     * @throws BadConversionException If a parsed object was invalid.
      */
     void onComma(int);
 
     /**
-     * Handle the start or end of a string, for either a name or value.
+     * Handle any other character. If the character is a reverse solidus, accept
+     * the next character as well.
      *
      * @param int The current parsed character.
+     * @param int The next parsed character (or EOF).
      *
-     * @throws ParserException Thrown if the parsed character was unexpected.
+     * @throws UnexpectedCharacterException If a parsed character was unexpected.
      */
     void onCharacter(int, std::ifstream &);
 
@@ -135,7 +150,9 @@ private:
      * Store the current value of the parsing stream as a JSON object. Ensures
      * that the syntax of the value is compliant with http://www.json.org.
      *
-     * @throws ParserException Thrown if the parsed object was invalid.
+     * @return bool True if a value was stored.
+     *
+     * @throws BadConversionException If a parsed object was invalid.
      */
     bool popValue();
 

@@ -46,14 +46,6 @@ void JsonParser::ParseInternal(std::ifstream &stream)
         {
             ++m_column;
 
-            if (m_parsingString)
-            {
-                if (std::isspace(c) && (c != JSON_SPACE))
-                {
-                    throw UnexpectedCharacterException(m_file, m_line, m_column, c);
-                }
-            }
-
             switch (c)
             {
             case JSON_START_BRACE:
@@ -71,8 +63,7 @@ void JsonParser::ParseInternal(std::ifstream &stream)
                 break;
 
             case JSON_NEW_LINE:
-                ++m_line;
-                m_column = 0;
+                onNewLine(c);
                 break;
 
             case JSON_COMMA:
@@ -85,6 +76,7 @@ void JsonParser::ParseInternal(std::ifstream &stream)
 
             default:
                 onCharacter(c, stream);
+                break;
             }
         }
     }
@@ -254,6 +246,18 @@ void JsonParser::onQuotation(int c)
 }
 
 //==============================================================================
+void JsonParser::onNewLine(int c)
+{
+    if (m_parsingString)
+    {
+        throw UnexpectedCharacterException(m_file, m_line, m_column, c);
+    }
+
+    ++m_line;
+    m_column = 0;
+}
+
+//==============================================================================
 void JsonParser::onColon(int c)
 {
     switch (m_states.top())
@@ -348,6 +352,11 @@ void JsonParser::onCharacter(int c, std::ifstream &stream)
     case JSON_PARSING_NAME:
         if (m_parsingString)
         {
+            if (std::isspace(c) && (c != JSON_SPACE))
+            {
+                throw UnexpectedCharacterException(m_file, m_line, m_column, c);
+            }
+
             pushValue(c);
 
             // Blindly ignore the escaped character, the Json class will check

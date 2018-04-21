@@ -15,13 +15,6 @@ Parser::Parser(const std::string &path, const std::string &file) :
 }
 
 //==============================================================================
-Json Parser::GetValues() const
-{
-    std::shared_lock<std::shared_timed_mutex> lock(m_valuesMutex);
-    return m_values;
-}
-
-//==============================================================================
 void Parser::Parse()
 {
     std::unique_lock<std::shared_timed_mutex> lock(m_valuesMutex);
@@ -35,6 +28,13 @@ void Parser::Parse()
     m_column = 0;
 
     ParseInternal(stream);
+}
+
+//==============================================================================
+Json Parser::GetValues() const
+{
+    std::shared_lock<std::shared_timed_mutex> lock(m_valuesMutex);
+    return m_values;
 }
 
 //==============================================================================
