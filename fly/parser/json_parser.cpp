@@ -394,79 +394,93 @@ bool JsonParser::popValue()
         return false;
     }
 
-    try
+    // Parsed a string value
+    if (m_parsedString)
     {
-        // Parsed a string value
-        if (m_parsedString)
-        {
-            m_parsedString = false;
-            *m_pValue = value;
-        }
+        m_parsedString = false;
+        *m_pValue = value;
+    }
 
-        // Parsed a boolean value
-        else if (value == "true")
-        {
-            *m_pValue = true;
-        }
-        else if (value == "false")
-        {
-            *m_pValue = false;
-        }
+    // Parsed a boolean value
+    else if (value == "true")
+    {
+        *m_pValue = true;
+    }
+    else if (value == "false")
+    {
+        *m_pValue = false;
+    }
 
-        // Parsed a null value
-        else if (value == "null")
-        {
-            *m_pValue = nullptr;
-        }
+    // Parsed a null value
+    else if (value == "null")
+    {
+        *m_pValue = nullptr;
+    }
 
-        // Parsed a number - validate non-octal
-        else if (
-            (value.length() > 1) && (value[0] == '0') &&
-            (
-                ((value.find('.') == std::string::npos)) ||
-                ((value.find('.') != 1))
-            )
+    // Parsed a number - validate non-octal
+    else if (
+        (value.length() > 1) && (value[0] == '0') &&
+        (
+            ((value.find('.') == std::string::npos)) ||
+            ((value.find('.') != 1))
         )
+    )
+    {
+        throw BadConversionException(m_file, m_line, m_column, value);
+    }
+
+    // Parsed a number - validate no postive sign given
+    else if ((value.length() > 1) && (value[0] == '+'))
+    {
+        throw BadConversionException(m_file, m_line, m_column, value);
+    }
+
+    // Parsed a float
+    else if (
+        (value.find('.') != std::string::npos) ||
+        (value.find('e') != std::string::npos) ||
+        (value.find('E') != std::string::npos)
+    )
+    {
+        if ((value[0] == '.') || (value[0] == 'e') || (value[0] == 'E'))
         {
             throw BadConversionException(m_file, m_line, m_column, value);
         }
 
-        // Parsed a number - validate no postive sign given
-        else if ((value.length() > 1) && (value[0] == '+'))
+        try
         {
-            throw BadConversionException(m_file, m_line, m_column, value);
-        }
-
-        // Parsed a float
-        else if (
-            (value.find('.') != std::string::npos) ||
-            (value.find('e') != std::string::npos) ||
-            (value.find('E') != std::string::npos)
-        )
-        {
-            if ((value[0] == '.') || (value[0] == 'e') || (value[0] == 'E'))
-            {
-                throw BadConversionException(m_file, m_line, m_column, value);
-            }
-
             *m_pValue = String::Convert<Json::float_type>(value);
         }
+        catch (...)
+        {
+            throw BadConversionException(m_file, m_line, m_column, value);
+        }
+    }
 
-        // Parsed a signed integer
-        else if (value[0] == '-')
+    // Parsed a signed integer
+    else if (value[0] == '-')
+    {
+        try
         {
             *m_pValue = String::Convert<Json::signed_type>(value);
         }
+        catch (...)
+        {
+            throw BadConversionException(m_file, m_line, m_column, value);
+        }
+    }
 
-        // Parsed an unsigned integer
-        else
+    // Parsed an unsigned integer
+    else
+    {
+        try
         {
             *m_pValue = String::Convert<Json::unsigned_type>(value);
         }
-    }
-    catch (const std::exception &ex)
-    {
-        throw BadConversionException(m_file, m_line, m_column, value);
+        catch (...)
+        {
+            throw BadConversionException(m_file, m_line, m_column, value);
+        }
     }
 
     m_pParents.pop();

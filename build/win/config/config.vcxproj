@@ -178,7 +178,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\config\main.cpp" />
+    <ClCompile Include="..\..\..\test\config\config.cpp" />
+    <ClCompile Include="..\..\..\test\config\config_manager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

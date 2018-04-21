@@ -178,7 +178,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\path\main.cpp" />
+    <ClCompile Include="..\..\..\test\path\path.cpp" />
+    <ClCompile Include="..\..\..\test\path\path_monitor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

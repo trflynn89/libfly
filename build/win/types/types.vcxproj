@@ -178,7 +178,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\types\main.cpp" />
+    <ClCompile Include="..\..\..\test\types\concurrent_container.cpp" />
+    <ClCompile Include="..\..\..\test\types\json.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
