@@ -1,6 +1,5 @@
 #pragma once
 
-#include <exception>
 #include <fstream>
 #include <shared_mutex>
 #include <string>
@@ -74,43 +73,6 @@ protected:
 
 private:
     mutable std::shared_timed_mutex m_valuesMutex;
-};
-
-/**
- * Exception to be raised if an error was encountered parsing a file.
- *
- * @author Timothy Flynn (trflynn89@gmail.com)
- * @version July 16, 2016
- */
-class ParserException : public std::exception
-{
-public:
-    /**
-     * Constructor.
-     *
-     * @param string Name of the file failed to parse parse.
-     * @param int Line number in file where error was encountered.
-     * @param string Message indicating what error was encountered.
-     */
-    ParserException(const std::string &, int, const std::string &);
-
-    /**
-     * Constructor.
-     *
-     * @param string Name of the file failed to parse parse.
-     * @param int Line number in file where error was encountered.
-     * @param int Column number in line where error was encountered.
-     * @param string Message indicating what error was encountered.
-     */
-    ParserException(const std::string &, int, int, const std::string &);
-
-    /**
-     * @return A C-string representing this exception.
-     */
-    virtual const char *what() const noexcept;
-
-private:
-    const std::string m_message;
 };
 
 }

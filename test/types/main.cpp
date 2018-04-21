@@ -528,10 +528,10 @@ TEST_F(JsonTest, StringConversionTest)
     EXPECT_EQ(std::string(json), string);
 
     json = { { "a", 1 }, { "b", 2 } };
-    EXPECT_EQ(std::string(json), "{ \"a\" : 1, \"b\" : 2 }");
+    EXPECT_EQ(std::string(json), "{\"a\":1,\"b\":2}");
 
     json = { '7', 8 };
-    EXPECT_EQ(std::string(json), "[ 55, 8 ]");
+    EXPECT_EQ(std::string(json), "[55,8]");
 
     json = true;
     EXPECT_EQ(std::string(json), "true");
@@ -1114,11 +1114,11 @@ TEST_F(JsonTest, StreamTest)
     stream.str(std::string());
 
     stream << object;
-    EXPECT_EQ(stream.str(), "{ \"a\" : 1, \"b\" : 2 }");
+    EXPECT_EQ(stream.str(), "{\"a\":1,\"b\":2}");
     stream.str(std::string());
 
     stream << array;
-    EXPECT_EQ(stream.str(), "[ 55, 8 ]");
+    EXPECT_EQ(stream.str(), "[55,8]");
     stream.str(std::string());
 
     stream << boolean;

@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include "fly/parser/exceptions.h"
 #include "fly/string/string.h"
 
 namespace fly {

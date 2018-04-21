@@ -131,6 +131,9 @@
     <ClInclude Include="..\..\..\fly\task\monitor.h">
       <Filter>task</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\parser\exceptions.h">
+      <Filter>parser</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\json_parser.h">
       <Filter>parser</Filter>
     </ClInclude>
@@ -222,6 +225,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\task\monitor.cpp">
       <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\parser\exceptions.cpp">
+      <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\json_parser.cpp">
       <Filter>parser</Filter>

@@ -146,6 +146,7 @@
     <ClInclude Include="..\..\..\fly\logger\log.h" />
     <ClInclude Include="..\..\..\fly\logger\logger.h" />
     <ClInclude Include="..\..\..\fly\logger\logger_config.h" />
+    <ClInclude Include="..\..\..\fly\parser\exceptions.h" />
     <ClInclude Include="..\..\..\fly\parser\ini_parser.h" />
     <ClInclude Include="..\..\..\fly\parser\json_parser.h" />
     <ClInclude Include="..\..\..\fly\parser\parser.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="..\..\..\fly\logger\log.cpp" />
     <ClCompile Include="..\..\..\fly\logger\logger.cpp" />
     <ClCompile Include="..\..\..\fly\logger\logger_config.cpp" />
+    <ClCompile Include="..\..\..\fly\parser\exceptions.cpp" />
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\json_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\parser.cpp" />

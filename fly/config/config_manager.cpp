@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 
+#include "fly/parser/exceptions.h"
 #include "fly/parser/ini_parser.h"
 #include "fly/parser/json_parser.h"
 #include "fly/path/path_monitor.h"

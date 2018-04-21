@@ -401,26 +401,26 @@ std::ostream &operator << (std::ostream &stream, const Json &json)
     case Json::TYPE_OBJECT:
     {
         const Json::object_type *pObject = json.m_value.m_pObject;
-        stream << "{ ";
+        stream << '{';
 
         for (auto it = pObject->begin(); it != pObject->end(); )
         {
-            stream << '"' << it->first << '"' << " : " << it->second;
+            stream << '"' << it->first << '"' << ':' << it->second;
 
             if (++it != pObject->end())
             {
-                stream << ", ";
+                stream << ',';
             }
         }
 
-        stream << " }";
+        stream << '}';
         break;
     }
 
     case Json::TYPE_ARRAY:
     {
         const Json::array_type *pArray = json.m_value.m_pArray;
-        stream << "[ ";
+        stream << '[';
 
         for (auto it = pArray->begin(); it != pArray->end(); )
         {
@@ -428,11 +428,11 @@ std::ostream &operator << (std::ostream &stream, const Json &json)
 
             if (++it != pArray->end())
             {
-                stream << ", ";
+                stream << ',';
             }
         }
 
-        stream << " ]";
+        stream << ']';
         break;
     }
 

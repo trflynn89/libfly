@@ -1,8 +1,6 @@
 #include "fly/parser/parser.h"
 
 #include "fly/path/path.h"
-#include "fly/logger/logger.h"
-#include "fly/string/string.h"
 
 namespace fly {
 
@@ -54,45 +52,6 @@ Json Parser::GetValues(const std::string &section) const
     }
 
     return values;
-}
-
-//==============================================================================
-ParserException::ParserException(
-    const std::string &file,
-    int line,
-    const std::string &message
-) :
-    m_message(
-        String::Format(
-            "ParserException: Error parsing %s at [line %d]: %s",
-            file, line, message
-        )
-    )
-{
-    LOGW(-1, "%s", m_message);
-}
-
-//==============================================================================
-ParserException::ParserException(
-    const std::string &file,
-    int line,
-    int column,
-    const std::string &message
-) :
-    m_message(
-        String::Format(
-            "ParserException: Error parsing %s at [line %d, column %d]: %s",
-            file, line, column, message
-        )
-    )
-{
-    LOGW(-1, "%s", m_message);
-}
-
-//==============================================================================
-const char *ParserException::what() const noexcept
-{
-    return m_message.c_str();
 }
 
 }

@@ -3,6 +3,7 @@
 #include <cctype>
 #include <cstring>
 
+#include "fly/parser/exceptions.h"
 #include "fly/string/string.h"
 #include "fly/types/json.h"
 
@@ -49,9 +50,7 @@ void JsonParser::ParseInternal(std::ifstream &stream)
             {
                 if (std::isspace(c) && (c != JSON_SPACE))
                 {
-                    throw ParserException(m_file, m_line, m_column, String::Format(
-                        "Unexpected character '%c' (%x)", char(c), c
-                    ));
+                    throw UnexpectedCharacterException(m_file, m_line, m_column, c);
                 }
             }
 
@@ -89,11 +88,7 @@ void JsonParser::ParseInternal(std::ifstream &stream)
             }
         }
     }
-    catch (const ParserException &ex)
-    {
-        throw ex;
-    }
-    catch (const std::exception &ex)
+    catch (const JsonException &ex)
     {
         throw ParserException(m_file, m_line, m_column, ex.what());
     }
@@ -112,9 +107,7 @@ void JsonParser::onStartBraceOrBracket(int c)
     switch (m_states.top())
     {
     case JSON_PARSING_OBJECT:
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c' (%x)", char(c), c
-        ));
+        throw UnexpectedCharacterException(m_file, m_line, m_column, c);
 
     case JSON_PARSING_ARRAY:
         m_states.push(JSON_PARSING_VALUE);
@@ -125,9 +118,7 @@ void JsonParser::onStartBraceOrBracket(int c)
         break;
 
     case JSON_PARSING_COLON:
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c' (%x)", char(c), c
-        ));
+        throw UnexpectedCharacterException(m_file, m_line, m_column, c);
 
     case JSON_PARSING_NAME:
     case JSON_PARSING_VALUE:
@@ -164,9 +155,7 @@ void JsonParser::onCloseBraceOrBracket(int c)
     {
     case JSON_NO_STATE:
     case JSON_PARSING_COLON:
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c' (%x)", char(c), c
-        ));
+        throw UnexpectedCharacterException(m_file, m_line, m_column, c);
 
     case JSON_PARSING_NAME:
     case JSON_PARSING_VALUE:
@@ -182,17 +171,9 @@ void JsonParser::onCloseBraceOrBracket(int c)
         break;
     }
 
-    if (!popValue() && m_expectingValue)
+    if ((!popValue() && m_expectingValue) || m_pParents.empty())
     {
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Expected name or value before character '%c' (%x)", char(c), c
-        ));
-    }
-    else if (m_pParents.empty())
-    {
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c' (%x)", char(c), c
-        ));
+        throw UnexpectedCharacterException(m_file, m_line, m_column, c);
     }
 
     m_pParents.pop();
@@ -210,9 +191,7 @@ void JsonParser::onCloseBraceOrBracket(int c)
     {
         if (m_states.top() == unexpected)
         {
-            throw ParserException(m_file, m_line, m_column, String::Format(
-                "Unexpected character '%c' (%x)", char(c), c
-            ));
+            throw UnexpectedCharacterException(m_file, m_line, m_column, c);
         }
 
         m_states.pop();
@@ -268,9 +247,7 @@ void JsonParser::onQuotation(int c)
         break;
 
     default:
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c' (%x)", char(c), c
-        ));
+        throw UnexpectedCharacterException(m_file, m_line, m_column, c);
     }
 
     m_parsingString = !m_parsingString;
@@ -297,16 +274,12 @@ void JsonParser::onColon(int c)
         }
         else
         {
-            throw ParserException(m_file, m_line, m_column, String::Format(
-                "Unexpected character '%c' (%x)", char(c), c
-            ));
+            throw UnexpectedCharacterException(m_file, m_line, m_column, c);
         }
         break;
 
     default:
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c' (%x)", char(c), c
-        ));
+        throw UnexpectedCharacterException(m_file, m_line, m_column, c);
     }
 }
 
@@ -330,34 +303,24 @@ void JsonParser::onComma(int c)
         }
         else if (m_expectingValue)
         {
-            throw ParserException(m_file, m_line, m_column, String::Format(
-                "Expected name or value before character '%c' (%x)", char(c), c
-            ));
+            throw UnexpectedCharacterException(m_file, m_line, m_column, c);
         }
 
         break;
 
     case JSON_PARSING_COMMA:
+        popValue();
         m_states.pop();
 
-        switch (m_states.top())
+        if (m_states.top() == JSON_PARSING_VALUE)
         {
-        case JSON_PARSING_OBJECT:
-        case JSON_PARSING_ARRAY:
-            popValue();
-            break;
-
-        default:
             m_states.pop();
-            break;
         }
 
         break;
 
     default:
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Unexpected character '%c' (%x)", char(c), c
-        ));
+        throw UnexpectedCharacterException(m_file, m_line, m_column, c);
     }
 
     m_expectingValue = !m_parsingString;
@@ -394,9 +357,7 @@ void JsonParser::onCharacter(int c, std::ifstream &stream)
             {
                 if ((c = stream.get()) == EOF)
                 {
-                    throw ParserException(m_file, m_line, m_column, String::Format(
-                        "Expected escaped character after reverse solidus"
-                    ));
+                    throw UnexpectedCharacterException(m_file, m_line, m_column, c);
                 }
 
                 pushValue(c);
@@ -412,9 +373,7 @@ void JsonParser::onCharacter(int c, std::ifstream &stream)
     default:
         if (!std::isspace(c))
         {
-            throw ParserException(m_file, m_line, m_column, String::Format(
-                "Unexpected character '%c' (%x)", char(c), c
-            ));
+            throw UnexpectedCharacterException(m_file, m_line, m_column, c);
         }
     }
 }
@@ -435,78 +394,79 @@ bool JsonParser::popValue()
         return false;
     }
 
-    // Parsed a string value
-    if (m_parsedString)
+    try
     {
-        m_parsedString = false;
-        *m_pValue = value;
-    }
-
-    // Parsed a boolean value
-    else if (value == "true")
-    {
-        *m_pValue = true;
-    }
-    else if (value == "false")
-    {
-        *m_pValue = false;
-    }
-
-    // Parsed a null value
-    else if (value == "null")
-    {
-        *m_pValue = nullptr;
-    }
-
-    // Parsed a number - validate non-octal
-    else if (
-        (value.length() > 1) && (value[0] == '0') &&
-        (
-            ((value.find('.') == std::string::npos)) ||
-            ((value.find('.') != 1))
-        )
-    )
-    {
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Octal value '%s' not allowed", value
-        ));
-    }
-
-    // Parsed a number - validate no postive sign given
-    else if ((value.length() > 1) && (value[0] == '+'))
-    {
-        throw ParserException(m_file, m_line, m_column, String::Format(
-            "Specifying +integer '%s' not allowed", value
-        ));
-    }
-
-    // Parsed a float
-    else if (
-        (value.find('.') != std::string::npos) ||
-        (value.find('e') != std::string::npos) ||
-        (value.find('E') != std::string::npos)
-    )
-    {
-        if ((value[0] == '.') || (value[0] == 'e') || (value[0] == 'E'))
+        // Parsed a string value
+        if (m_parsedString)
         {
-            throw ParserException(m_file, m_line, m_column, String::Format(
-                "Expected starting digit for '%s'", value
-            ));
+            m_parsedString = false;
+            *m_pValue = value;
         }
 
-        *m_pValue = String::Convert<Json::float_type>(value);
-    }
+        // Parsed a boolean value
+        else if (value == "true")
+        {
+            *m_pValue = true;
+        }
+        else if (value == "false")
+        {
+            *m_pValue = false;
+        }
 
-    // Parsed a signed integer
-    else if (value[0] == '-')
-    {
-        *m_pValue = String::Convert<Json::signed_type>(value);
-    }
+        // Parsed a null value
+        else if (value == "null")
+        {
+            *m_pValue = nullptr;
+        }
 
-    // Parsed an unsigned integer
-    else
+        // Parsed a number - validate non-octal
+        else if (
+            (value.length() > 1) && (value[0] == '0') &&
+            (
+                ((value.find('.') == std::string::npos)) ||
+                ((value.find('.') != 1))
+            )
+        )
+        {
+            throw BadConversionException(m_file, m_line, m_column, value);
+        }
+
+        // Parsed a number - validate no postive sign given
+        else if ((value.length() > 1) && (value[0] == '+'))
+        {
+            throw BadConversionException(m_file, m_line, m_column, value);
+        }
+
+        // Parsed a float
+        else if (
+            (value.find('.') != std::string::npos) ||
+            (value.find('e') != std::string::npos) ||
+            (value.find('E') != std::string::npos)
+        )
+        {
+            if ((value[0] == '.') || (value[0] == 'e') || (value[0] == 'E'))
+            {
+                throw BadConversionException(m_file, m_line, m_column, value);
+            }
+
+            *m_pValue = String::Convert<Json::float_type>(value);
+        }
+
+        // Parsed a signed integer
+        else if (value[0] == '-')
+        {
+            *m_pValue = String::Convert<Json::signed_type>(value);
+        }
+
+        // Parsed an unsigned integer
+        else
+        {
+            *m_pValue = String::Convert<Json::unsigned_type>(value);
+        }
+    }
+    catch (const std::exception &ex)
     {
-        *m_pValue = String::Convert<Json::unsigned_type>(value);
+        throw BadConversionException(m_file, m_line, m_column, value);
     }
 
     m_pParents.pop();
