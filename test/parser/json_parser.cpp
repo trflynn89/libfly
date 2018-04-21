@@ -330,6 +330,8 @@ TEST_F(JsonParserTest, NumericConversionTest)
     ValidatePass("1.2e-1", 0.12);
     ValidatePass("1.2E-1", 0.12);
 
+    ValidateFail("1abc");
+    ValidateFail("-1abc");
     ValidateFail("1.2+e2");
     ValidateFail("1.2+E2");
     ValidateFail("1.2-e2");

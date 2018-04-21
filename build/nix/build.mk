@@ -51,7 +51,7 @@ endif
 
 # Clean up output files
 clean:
-	@echo "[Clean $(OUT_DIR)]"
+	@echo "[Clean $(subst $(CURDIR)/,,$(OUT_DIR))]"
 	$(Q)$(RM) -r $(OUT_DIR)
 
 # Run all unit tests

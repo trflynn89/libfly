@@ -33,19 +33,19 @@ $$(strip $(1))/%.o: CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
 # C files
 $$(strip $(1))/%.o: $(d)/%.c $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[Compile $$(notdir $$<)]"
+	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CC)
 
 # CC files
 $$(strip $(1))/%.o: $(d)/%.cc $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[Compile $$(notdir $$<)]"
+	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
 
 # C++ files
 $$(strip $(1))/%.o: $(d)/%.cpp $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[Compile $$(notdir $$<)]"
+	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
 
 endef
@@ -60,29 +60,29 @@ define QT5_RULES
 # UIC files
 $(GEN_DIR)/%.uic.h: $(d)/%.ui $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[UIC $$(notdir $$<)]"
+	@echo "[UIC $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(UIC)
 
 # MOC files
 $$(strip $(1))/%.moc.o: $(GEN_DIR)/%.moc.cpp
 	@mkdir -p $$(@D)
-	@echo "[Compile $$(notdir $$<)]"
+	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
 
 $(GEN_DIR)/%.moc.cpp: $(d)/%.h $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[MOC $$(notdir $$<)]"
+	@echo "[MOC $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(MOC)
 
 # RCC files
 $$(strip $(1))/%.rcc.o: $(GEN_DIR)/%.rcc.cpp
 	@mkdir -p $$(@D)
-	@echo "[Compile $$(notdir $$<)]"
+	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
 
 $(GEN_DIR)/%.rcc.cpp: $(d)/%.qrc $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[RCC $$(notdir $$<)]"
+	@echo "[RCC $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(RCC)
 
 endef
@@ -95,10 +95,10 @@ endef
 define SRC_RULES
 
 $(td): $(1)
-	@echo "[Finished $$(notdir $$@)]"
+	@echo "[Finished $$(subst $(SOURCE_ROOT)/,,$$@)]"
 
 $(td)_clean:
-	@echo "[Clean $$(notdir $(td))]"
+	@echo "[Clean $$(subst $(SOURCE_ROOT)/,,$(td))]"
 	$(Q)$(RM) $(2)
 
 endef
@@ -116,11 +116,11 @@ $(TARGET_NAME): LDLIBS := $(LDLIBS_$(d)) $(LDLIBS)
 $(TARGET_NAME): $$(QT5_UICS) $$(QT5_MOCS) $$(QT5_RCCS) $$(OBJS) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
-	@echo "[Link $$(notdir $$@)]"
+	@echo "[Link $$(subst $(CURDIR)/,,$$@)]"
 	$(LINK_CXX)
 
 ifeq ($(release),1)
-	@echo "[Strip $$(notdir $$@)]"
+	@echo "[Strip $$(subst $(CURDIR)/,,$$@)]"
 	$(STRIP)
 endif
 
@@ -139,11 +139,11 @@ $(TARGET_NAME): $$(OBJS) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 ifeq ($(release),1)
-	@echo "[Shared $$(notdir $$@)]"
+	@echo "[Shared $$(subst $(CURDIR)/,,$$@)]"
 	$(SHARED_CXX)
 	$(STRIP)
 else
-	@echo "[Static $$(notdir $$@)]"
+	@echo "[Static $$(subst $(CURDIR)/,,$$@)]"
 	$(STATIC)
 endif
 
@@ -157,7 +157,7 @@ MAKEFILES_$(d) := $(BUILD_ROOT)/*.mk
 
 $(TARGET_PACKAGE): $(TARGET_NAME) $$(MAKEFILES_$(d))
 ifneq ($(REL_CMDS),)
-	@echo "[Package $$(notdir $$@)]"
+	@echo "[Package $$(subst $(CURDIR)/,,$$@)]"
 	$(Q)$$(BUILD_REL)
 endif
 
