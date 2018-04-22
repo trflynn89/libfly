@@ -11,7 +11,7 @@ extern "C"
 
     int __wrap_inotify_init1(int flags)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::INOTIFY_INIT1))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::InotifyInit1))
         {
             errno = 0;
             return -1;

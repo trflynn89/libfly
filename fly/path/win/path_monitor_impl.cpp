@@ -144,7 +144,7 @@ void PathMonitorImpl::handleEvents(
 
         PathMonitor::PathEvent event = convertToEvent(pInfo->Action);
 
-        if (event != PathMonitor::NO_CHANGE)
+        if (event != PathMonitor::PathEvent::None)
         {
             PathMonitor::PathEventCallback callback = spInfo->m_fileHandlers[file];
 
@@ -178,22 +178,22 @@ void PathMonitorImpl::handleEvents(
 //==============================================================================
 PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
 {
-    PathMonitor::PathEvent event = PathMonitor::NO_CHANGE;
+    PathMonitor::PathEvent event = PathMonitor::PathEvent::None;
 
     switch (action)
     {
     case FILE_ACTION_ADDED:
     case FILE_ACTION_RENAMED_NEW_NAME:
-        event = PathMonitor::FILE_CREATED;
+        event = PathMonitor::PathEvent::Created;
         break;
 
     case FILE_ACTION_REMOVED:
     case FILE_ACTION_RENAMED_OLD_NAME:
-        event = PathMonitor::FILE_DELETED;
+        event = PathMonitor::PathEvent::Deleted;
         break;
 
     case FILE_ACTION_MODIFIED:
-        event = PathMonitor::FILE_CHANGED;
+        event = PathMonitor::PathEvent::Changed;
         break;
 
     default:

@@ -11,7 +11,7 @@ extern "C"
 
     int __wrap_socket(int domain, int type, int protocol)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::SOCKET))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Socket))
         {
             errno = 0;
             return -1;

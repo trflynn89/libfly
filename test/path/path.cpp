@@ -62,12 +62,12 @@ TEST(PathTest, MockRemovePathTest)
     EXPECT_TRUE(fly::Path::MakePath(path));
 
     {
-        fly::MockSystem mock(fly::MockCall::FTS_READ);
+        fly::MockSystem mock(fly::MockCall::FtsRead);
         EXPECT_FALSE(fly::Path::RemovePath(path));
     }
 
     {
-        fly::MockSystem mock(fly::MockCall::REMOVE);
+        fly::MockSystem mock(fly::MockCall::Remove);
         EXPECT_FALSE(fly::Path::RemovePath(path));
     }
 
@@ -171,7 +171,7 @@ TEST(PathTest, ListPathTest)
 //==============================================================================
 TEST(PathTest, MockListPathTest)
 {
-    fly::MockSystem mock(fly::MockCall::READDIR);
+    fly::MockSystem mock(fly::MockCall::Readdir);
 
     std::vector<std::string> directories;
     std::vector<std::string> files;
@@ -223,7 +223,7 @@ TEST(PathTest, TempDirectoryTest)
 //==============================================================================
 TEST(PathTest, MockTempDirectoryTest)
 {
-    fly::MockSystem mock(fly::MockCall::GETENV);
+    fly::MockSystem mock(fly::MockCall::Getenv);
 
     std::string temp(fly::Path::GetTempDirectory());
     EXPECT_FALSE(temp.empty());

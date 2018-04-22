@@ -14,7 +14,7 @@ extern "C"
 
     ssize_t  __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::SENDTO))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Sendto))
         {
             errno = 0;
             return -1;

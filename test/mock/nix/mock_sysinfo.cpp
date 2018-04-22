@@ -13,7 +13,7 @@ extern "C"
 
     int __wrap_sysinfo(struct sysinfo *info)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::SYSINFO))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Sysinfo))
         {
             errno = 0;
             return -1;

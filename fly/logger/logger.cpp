@@ -60,7 +60,7 @@ void Logger::ConsoleLog(bool acquireLock, const std::string &message)
 }
 
 //==============================================================================
-void Logger::AddLog(LogLevel level, ssize_t gameId, const char *file,
+void Logger::AddLog(Log::Level level, ssize_t gameId, const char *file,
     const char *func, unsigned int line, const std::string &message)
 {
     LoggerPtr spLogger = GetInstance();
@@ -127,13 +127,13 @@ bool Logger::DoWork()
 }
 
 //==============================================================================
-void Logger::addLog(LogLevel level, ssize_t gameId, const char *file,
+void Logger::addLog(Log::Level level, ssize_t gameId, const char *file,
     const char *func, unsigned int line, const std::string &message)
 {
     auto now = std::chrono::high_resolution_clock::now();
     auto logTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - m_startTime);
 
-    if ((level >= LOG_DEBUG) && (level < NUM_LEVELS))
+    if ((level >= Log::Level::Debug) && (level < Log::Level::NumLevels))
     {
         Log log(m_spConfig, message);
 

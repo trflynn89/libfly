@@ -14,7 +14,7 @@ extern "C"
 
     ssize_t  __wrap_recvfrom(int sockfd, void *buf, size_t len, int flags, struct sockaddr *src_addr, socklen_t *addrlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::RECVFROM))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Recvfrom))
         {
             errno = 0;
             return -1;

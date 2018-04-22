@@ -13,7 +13,7 @@ extern "C"
 
     struct hostent *__wrap_gethostbyname(const char *name)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::GETHOSTBYNAME))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Gethostbyname))
         {
             errno = 0;
             return NULL;

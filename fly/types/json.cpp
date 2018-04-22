@@ -11,7 +11,7 @@ namespace fly {
 
 //==============================================================================
 Json::Json() noexcept :
-    m_type(TYPE_NULL),
+    m_type(Type::Null),
     m_value(),
     m_validationError()
 {
@@ -19,7 +19,7 @@ Json::Json() noexcept :
 
 //==============================================================================
 Json::Json(const null_type &value) noexcept :
-    m_type(TYPE_NULL),
+    m_type(Type::Null),
     m_value(value),
     m_validationError()
 {
@@ -33,35 +33,35 @@ Json::Json(const Json &json) noexcept :
 {
     switch (m_type)
     {
-    case TYPE_STRING:
+    case Type::String:
         m_value = *(json.m_value.m_pString);
         break;
 
-    case TYPE_OBJECT:
+    case Type::Object:
         m_value = *(json.m_value.m_pObject);
         break;
 
-    case TYPE_ARRAY:
+    case Type::Array:
         m_value = *(json.m_value.m_pArray);
         break;
 
-    case TYPE_BOOLEAN:
+    case Type::Boolean:
         m_value = json.m_value.m_boolean;
         break;
 
-    case TYPE_SIGNED:
+    case Type::Signed:
         m_value = json.m_value.m_signed;
         break;
 
-    case TYPE_UNSIGNED:
+    case Type::Unsigned:
         m_value = json.m_value.m_unsigned;
         break;
 
-    case TYPE_FLOAT:
+    case Type::Float:
         m_value = json.m_value.m_float;
         break;
 
-    case TYPE_NULL:
+    case Type::Null:
         break;
     }
 }
@@ -72,14 +72,14 @@ Json::Json(Json &&json) noexcept :
     m_value(std::move(json.m_value)),
     m_validationError(std::move(json.m_validationError))
 {
-    json.m_type = TYPE_NULL;
+    json.m_type = Type::Null;
     json.m_value = nullptr;
     json.m_validationError.clear();
 }
 
 //==============================================================================
 Json::Json(const std::initializer_list<Json> &initializer) noexcept :
-    m_type(TYPE_NULL),
+    m_type(Type::Null),
     m_value(),
     m_validationError()
 {
@@ -90,7 +90,7 @@ Json::Json(const std::initializer_list<Json> &initializer) noexcept :
 
     if (std::all_of(initializer.begin(), initializer.end(), isObjectLike))
     {
-        m_type = TYPE_OBJECT;
+        m_type = Type::Object;
         m_value = object_type();
 
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
@@ -103,7 +103,7 @@ Json::Json(const std::initializer_list<Json> &initializer) noexcept :
     }
     else
     {
-        m_type = TYPE_ARRAY;
+        m_type = Type::Array;
         m_value = array_type();
 
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
@@ -134,13 +134,13 @@ std::string Json::GetValidationError() const
 //==============================================================================
 bool Json::IsString() const
 {
-    return (m_type == TYPE_STRING);
+    return (m_type == Type::String);
 }
 
 //==============================================================================
 bool Json::IsObject() const
 {
-    return (m_type == TYPE_OBJECT);
+    return (m_type == Type::Object);
 }
 
 //==============================================================================
@@ -156,37 +156,37 @@ bool Json::IsObjectLike() const
 //==============================================================================
 bool Json::IsArray() const
 {
-    return (m_type == TYPE_ARRAY);
+    return (m_type == Type::Array);
 }
 
 //==============================================================================
 bool Json::IsBoolean() const
 {
-    return (m_type == TYPE_BOOLEAN);
+    return (m_type == Type::Boolean);
 }
 
 //==============================================================================
 bool Json::IsSignedInteger() const
 {
-    return (m_type == TYPE_SIGNED);
+    return (m_type == Type::Signed);
 }
 
 //==============================================================================
 bool Json::IsUnsignedInteger() const
 {
-    return (m_type == TYPE_UNSIGNED);
+    return (m_type == Type::Unsigned);
 }
 
 //==============================================================================
 bool Json::IsFloat() const
 {
-    return (m_type == TYPE_FLOAT);
+    return (m_type == Type::Float);
 }
 
 //==============================================================================
 bool Json::IsNull() const
 {
-    return (m_type == TYPE_NULL);
+    return (m_type == Type::Null);
 }
 
 //==============================================================================
@@ -224,7 +224,7 @@ Json::operator null_type () const
     }
 
     throw JsonException(
-        *this, String::Format("Type %s is not null", type())
+        *this, String::Format("Type %s is not null", m_type)
     );
 }
 
@@ -233,7 +233,7 @@ Json &Json::operator [] (const typename object_type::key_type &key)
 {
     if (IsNull())
     {
-        m_type = TYPE_OBJECT;
+        m_type = Type::Object;
         m_value = object_type();
     }
 
@@ -252,7 +252,7 @@ Json &Json::operator [] (const typename object_type::key_type &key)
     }
 
     throw JsonException(
-        *this, String::Format("Type %s invalid for operator[key]", type())
+        *this, String::Format("Type %s invalid for operator[key]", m_type)
     );
 }
 
@@ -274,7 +274,7 @@ const Json &Json::operator [] (const typename object_type::key_type &key) const
     }
 
     throw JsonException(
-        *this, String::Format("Type %s invalid for operator[key]", type())
+        *this, String::Format("Type %s invalid for operator[key]", m_type)
     );
 }
 
@@ -283,7 +283,7 @@ Json &Json::operator [] (const typename array_type::size_type &index)
 {
     if (IsNull())
     {
-        m_type = TYPE_ARRAY;
+        m_type = Type::Array;
         m_value = array_type();
     }
 
@@ -298,7 +298,7 @@ Json &Json::operator [] (const typename array_type::size_type &index)
     }
 
     throw JsonException(
-        *this, String::Format("Type %s invalid for operator[index]", type())
+        *this, String::Format("Type %s invalid for operator[index]", m_type)
     );
 }
 
@@ -318,7 +318,7 @@ const Json &Json::operator [] (const typename array_type::size_type &index) cons
     }
 
     throw JsonException(
-        *this, String::Format("Type %s invalid for operator[index]", type())
+        *this, String::Format("Type %s invalid for operator[index]", m_type)
     );
 }
 
@@ -327,16 +327,16 @@ std::size_t Json::Size() const
 {
     switch (m_type)
     {
-    case TYPE_STRING:
+    case Type::String:
         return m_value.m_pString->size();
 
-    case TYPE_OBJECT:
+    case Type::Object:
         return m_value.m_pObject->size();
 
-    case TYPE_ARRAY:
+    case Type::Array:
         return m_value.m_pArray->size();
 
-    case TYPE_NULL:
+    case Type::Null:
         return 0;
 
     default:
@@ -355,63 +355,63 @@ bool operator == (const Json &json1, const Json &json2)
     {
         switch (type1)
         {
-        case Json::TYPE_STRING:
+        case Json::Type::String:
             return (*(json1.m_value.m_pString) == *(json2.m_value.m_pString));
 
-        case Json::TYPE_OBJECT:
+        case Json::Type::Object:
             return (*(json1.m_value.m_pObject) == *(json2.m_value.m_pObject));
 
-        case Json::TYPE_ARRAY:
+        case Json::Type::Array:
             return (*(json1.m_value.m_pArray) == *(json2.m_value.m_pArray));
 
-        case Json::TYPE_BOOLEAN:
+        case Json::Type::Boolean:
             return (json1.m_value.m_boolean == json2.m_value.m_boolean);
 
-        case Json::TYPE_SIGNED:
+        case Json::Type::Signed:
             return (json1.m_value.m_signed == json2.m_value.m_signed);
 
-        case Json::TYPE_UNSIGNED:
+        case Json::Type::Unsigned:
             return (json1.m_value.m_unsigned == json2.m_value.m_unsigned);
 
-        case Json::TYPE_FLOAT:
+        case Json::Type::Float:
             return (json1.m_value.m_float == json2.m_value.m_float);
 
-        case Json::TYPE_NULL:
+        case Json::Type::Null:
             return true;
         }
     }
 
     // One instance is a signed integer, other instance is an unsigned integer
-    else if ((json1.m_type == Json::TYPE_SIGNED) && (json2.m_type == Json::TYPE_UNSIGNED))
+    else if ((json1.m_type == Json::Type::Signed) && (json2.m_type == Json::Type::Unsigned))
     {
         Json::signed_type value2 = static_cast<Json::signed_type>(json2.m_value.m_unsigned);
         return (json1.m_value.m_signed == value2);
     }
-    else if ((json1.m_type == Json::TYPE_UNSIGNED) && (json2.m_type == Json::TYPE_SIGNED))
+    else if ((json1.m_type == Json::Type::Unsigned) && (json2.m_type == Json::Type::Signed))
     {
         Json::signed_type value1 = static_cast<Json::signed_type>(json1.m_value.m_unsigned);
         return (value1 == json2.m_value.m_signed);
     }
 
     // One instance is a signed integer, other instance is a float
-    else if ((json1.m_type == Json::TYPE_SIGNED) && (json2.m_type == Json::TYPE_FLOAT))
+    else if ((json1.m_type == Json::Type::Signed) && (json2.m_type == Json::Type::Float))
     {
         Json::float_type value1 = static_cast<Json::float_type>(json1.m_value.m_signed);
         return (value1 == json2.m_value.m_float);
     }
-    else if ((json1.m_type == Json::TYPE_FLOAT) && (json2.m_type == Json::TYPE_SIGNED))
+    else if ((json1.m_type == Json::Type::Float) && (json2.m_type == Json::Type::Signed))
     {
         Json::float_type value2 = static_cast<Json::float_type>(json2.m_value.m_signed);
         return (json1.m_value.m_float == value2);
     }
 
     // One instance is an unsigned integer, other instance is a float
-    else if ((json1.m_type == Json::TYPE_UNSIGNED) && (json2.m_type == Json::TYPE_FLOAT))
+    else if ((json1.m_type == Json::Type::Unsigned) && (json2.m_type == Json::Type::Float))
     {
         Json::float_type value1 = static_cast<Json::float_type>(json1.m_value.m_unsigned);
         return (value1 == json2.m_value.m_float);
     }
-    else if ((json1.m_type == Json::TYPE_FLOAT) && (json2.m_type == Json::TYPE_UNSIGNED))
+    else if ((json1.m_type == Json::Type::Float) && (json2.m_type == Json::Type::Unsigned))
     {
         Json::float_type value2 = static_cast<Json::float_type>(json2.m_value.m_unsigned);
         return (json1.m_value.m_float == value2);
@@ -431,11 +431,11 @@ std::ostream &operator << (std::ostream &stream, const Json &json)
 {
     switch (json.m_type)
     {
-    case Json::TYPE_STRING:
+    case Json::Type::String:
         stream << '"' << *(json.m_value.m_pString) << '"';
         break;
 
-    case Json::TYPE_OBJECT:
+    case Json::Type::Object:
     {
         const Json::object_type *pObject = json.m_value.m_pObject;
         stream << '{';
@@ -454,7 +454,7 @@ std::ostream &operator << (std::ostream &stream, const Json &json)
         break;
     }
 
-    case Json::TYPE_ARRAY:
+    case Json::Type::Array:
     {
         const Json::array_type *pArray = json.m_value.m_pArray;
         stream << '[';
@@ -473,23 +473,23 @@ std::ostream &operator << (std::ostream &stream, const Json &json)
         break;
     }
 
-    case Json::TYPE_BOOLEAN:
+    case Json::Type::Boolean:
         stream << std::boolalpha << json.m_value.m_boolean;
         break;
 
-    case Json::TYPE_SIGNED:
+    case Json::Type::Signed:
         stream << json.m_value.m_signed;
         break;
 
-    case Json::TYPE_UNSIGNED:
+    case Json::Type::Unsigned:
         stream << json.m_value.m_unsigned;
         break;
 
-    case Json::TYPE_FLOAT:
+    case Json::Type::Float:
         stream << json.m_value.m_float;
         break;
 
-    case Json::TYPE_NULL:
+    case Json::Type::Null:
         stream << "null";
         break;
     }
@@ -498,46 +498,44 @@ std::ostream &operator << (std::ostream &stream, const Json &json)
 }
 
 //==============================================================================
-std::string Json::type() const
+std::ostream &operator << (std::ostream &stream, Json::Type type)
 {
-    std::string type;
-
-    switch (m_type)
+    switch (type)
     {
-    case TYPE_STRING:
-        type = "string";
+    case Json::Type::String:
+        stream << "string";
         break;
 
-    case TYPE_OBJECT:
-        type = "object";
+    case Json::Type::Object:
+        stream << "object";
         break;
 
-    case TYPE_ARRAY:
-        type = "array";
+    case Json::Type::Array:
+        stream << "array";
         break;
 
-    case TYPE_BOOLEAN:
-        type = "boolean";
+    case Json::Type::Boolean:
+        stream << "boolean";
         break;
 
-    case TYPE_SIGNED:
-        type = "signed";
+    case Json::Type::Signed:
+        stream << "signed";
         break;
 
-    case TYPE_UNSIGNED:
-        type = "unsigned";
+    case Json::Type::Unsigned:
+        stream << "unsigned";
         break;
 
-    case TYPE_FLOAT:
-        type = "float";
+    case Json::Type::Float:
+        stream << "float";
         break;
 
-    case TYPE_NULL:
-        type = "null";
+    case Json::Type::Null:
+        stream << "null";
         break;
     }
 
-    return type;
+    return stream;
 }
 
 //==============================================================================
@@ -937,15 +935,15 @@ void Json::Value::Destroy(const Type &type) noexcept
 {
     switch (type)
     {
-    case TYPE_STRING:
+    case Type::String:
         delete m_pString;
         break;
 
-    case TYPE_OBJECT:
+    case Type::Object:
         delete m_pObject;
         break;
 
-    case TYPE_ARRAY:
+    case Type::Array:
         delete m_pArray;
         break;
 

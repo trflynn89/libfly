@@ -21,7 +21,7 @@ extern "C"
 
     char *__wrap_getenv(const char *name)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::GETENV))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Getenv))
         {
             errno = 0;
 

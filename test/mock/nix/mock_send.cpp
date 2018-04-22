@@ -14,7 +14,7 @@ extern "C"
 
     ssize_t  __wrap_send(int sockfd, const void *buf, size_t len, int flags)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::SEND))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Send))
         {
             errno = 0;
             return -1;

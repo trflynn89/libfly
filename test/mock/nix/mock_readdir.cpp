@@ -15,7 +15,7 @@ extern "C"
     {
         struct dirent *ent = __real_readdir(dirp);
 
-        if (fly::MockSystem::MockEnabled(fly::MockCall::READDIR))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Readdir))
         {
             if (ent != NULL)
             {

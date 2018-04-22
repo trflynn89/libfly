@@ -15,7 +15,7 @@ extern "C"
     {
         FTSENT *pFtsent = __real_fts_read(ftsp);
 
-        if (fly::MockSystem::MockEnabled(fly::MockCall::FTS_READ))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::FtsRead))
         {
             pFtsent->fts_info = FTS_ERR;
             errno = 0;

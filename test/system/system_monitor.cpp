@@ -19,7 +19,7 @@ class SystemMonitorTest : public ::testing::Test
 public:
     SystemMonitorTest() :
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::INI, std::string(), std::string()
+            fly::ConfigManager::ConfigFileType::Ini, std::string(), std::string()
         )),
 
         m_spMonitor(std::make_shared<fly::SystemMonitorImpl>(m_spConfigManager)),
@@ -94,7 +94,7 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
 TEST_F(SystemMonitorTest, MockCpuUsageTest)
 {
     {
-        fly::MockSystem mock(fly::MockCall::READ);
+        fly::MockSystem mock(fly::MockCall::Read);
         m_spMonitor->Stop();
 
         m_spMonitor = std::make_shared<fly::SystemMonitorImpl>(m_spConfigManager);
@@ -107,8 +107,8 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
         TearDown();
         SetUp();
 
-        fly::MockSystem mock1(fly::MockCall::READ);
-        fly::MockSystem mock2(fly::MockCall::TIMES);
+        fly::MockSystem mock1(fly::MockCall::Read);
+        fly::MockSystem mock2(fly::MockCall::Times);
         std::this_thread::sleep_for(std::chrono::seconds(3));
 
         double systemBefore = m_spMonitor->GetSystemCpuUsage();
@@ -163,8 +163,8 @@ TEST_F(SystemMonitorTest, MemoryUsageTest)
 //==============================================================================
 TEST_F(SystemMonitorTest, MockMemoryUsageTest)
 {
-    fly::MockSystem mock1(fly::MockCall::SYSINFO);
-    fly::MockSystem mock2(fly::MockCall::READ);
+    fly::MockSystem mock1(fly::MockCall::Sysinfo);
+    fly::MockSystem mock2(fly::MockCall::Read);
 
     uint64_t totalBefore = m_spMonitor->GetTotalSystemMemory();
     uint64_t systemBefore = m_spMonitor->GetSystemMemoryUsage();

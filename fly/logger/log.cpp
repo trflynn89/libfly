@@ -8,7 +8,7 @@ namespace fly {
 
 //==============================================================================
 Log::Log() :
-    m_level(NUM_LEVELS),
+    m_level(Level::NumLevels),
     m_time(-1.0),
     m_gameId(-1),
     m_line(-1),
@@ -20,7 +20,7 @@ Log::Log() :
 
 //==============================================================================
 Log::Log(const LoggerConfigPtr &spConfig, const std::string &message) :
-    m_level(NUM_LEVELS),
+    m_level(Level::NumLevels),
     m_time(-1.0),
     m_gameId(-1),
     m_line(-1),
@@ -41,6 +41,13 @@ std::ostream &operator << (std::ostream &stream, const Log &log)
     stream << log.m_line << "\t";
     stream << log.m_message << "\n";
 
+    return stream;
+}
+
+//==============================================================================
+std::ostream &operator << (std::ostream &stream, const Log::Level &level)
+{
+    stream << static_cast<int>(level);
     return stream;
 }
 

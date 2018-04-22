@@ -37,8 +37,8 @@ public:
      */
     enum class ConfigFileType
     {
-        INI,
-        JSON,
+        Ini,
+        Json,
     };
 
     /**

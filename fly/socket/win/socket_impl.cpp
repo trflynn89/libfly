@@ -168,13 +168,13 @@ bool SocketImpl::Connect(const std::string &hostname, int port)
 
         if ((error == WSAEWOULDBLOCK) || (error == WSAEINPROGRESS))
         {
-            m_aConnectedState.store(Socket::ConnectedState::CONNECTING);
+            m_aConnectedState.store(Socket::ConnectedState::Connecting);
         }
 
         return false;
     }
 
-    m_aConnectedState.store(Socket::ConnectedState::CONNECTED);
+    m_aConnectedState.store(Socket::ConnectedState::Connected);
     return true;
 }
 
@@ -202,7 +202,7 @@ SocketPtr SocketImpl::Accept() const
         ret->m_socketHandle = skt;
         ret->m_clientIp = ntohl(client.sin_addr.s_addr);
         ret->m_clientPort = ntohs(client.sin_port);
-        ret->m_aConnectedState.store(Socket::ConnectedState::CONNECTED);
+        ret->m_aConnectedState.store(Socket::ConnectedState::Connected);
     }
 
     return ret;

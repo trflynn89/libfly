@@ -490,16 +490,16 @@ private:
     /**
      * An enumerated list of possible JSON types.
      */
-    enum Type
+    enum class Type
     {
-        TYPE_NULL,
-        TYPE_STRING,
-        TYPE_OBJECT,
-        TYPE_ARRAY,
-        TYPE_BOOLEAN,
-        TYPE_SIGNED,
-        TYPE_UNSIGNED,
-        TYPE_FLOAT
+        Null,
+        String,
+        Object,
+        Array,
+        Boolean,
+        Signed,
+        Unsigned,
+        Float
     };
 
     /**
@@ -702,9 +702,9 @@ private:
     );
 
     /**
-     * @return The Json instance's type as a string.
+     * Stream the name of a Json instance's type.
      */
-    std::string type() const;
+    friend std::ostream &operator << (std::ostream &, Type);
 
     Type m_type;
     Value m_value;
@@ -750,12 +750,12 @@ Json::Json(const T &value) noexcept :
 
     if (HasValidationError())
     {
-        m_type = TYPE_NULL;
+        m_type = Type::Null;
         m_value = nullptr;
     }
     else
     {
-        m_type = TYPE_STRING;
+        m_type = Type::String;
         m_value = parsed.str();
     }
 }
@@ -763,7 +763,7 @@ Json::Json(const T &value) noexcept :
 //==============================================================================
 template <typename T, fly::if_map::enabled<T>>
 Json::Json(const T &value) noexcept :
-    m_type(TYPE_OBJECT),
+    m_type(Type::Object),
     m_value(value),
     m_validationError()
 {
@@ -772,7 +772,7 @@ Json::Json(const T &value) noexcept :
 //==============================================================================
 template <typename T, fly::if_array::enabled<T>>
 Json::Json(const T &value) noexcept :
-    m_type(TYPE_ARRAY),
+    m_type(Type::Array),
     m_value(value),
     m_validationError()
 {
@@ -781,7 +781,7 @@ Json::Json(const T &value) noexcept :
 //==============================================================================
 template <typename T, fly::if_boolean::enabled<T>>
 Json::Json(const T &value) noexcept :
-    m_type(TYPE_BOOLEAN),
+    m_type(Type::Boolean),
     m_value(value),
     m_validationError()
 {
@@ -790,7 +790,7 @@ Json::Json(const T &value) noexcept :
 //==============================================================================
 template <typename T, fly::if_signed_integer::enabled<T>>
 Json::Json(const T &value) noexcept :
-    m_type(TYPE_SIGNED),
+    m_type(Type::Signed),
     m_value(value),
     m_validationError()
 {
@@ -799,7 +799,7 @@ Json::Json(const T &value) noexcept :
 //==============================================================================
 template <typename T, fly::if_unsigned_integer::enabled<T>>
 Json::Json(const T &value) noexcept :
-    m_type(TYPE_UNSIGNED),
+    m_type(Type::Unsigned),
     m_value(value),
     m_validationError()
 {
@@ -808,7 +808,7 @@ Json::Json(const T &value) noexcept :
 //==============================================================================
 template <typename T, fly::if_floating_point::enabled<T>>
 Json::Json(const T &value) noexcept :
-    m_type(TYPE_FLOAT),
+    m_type(Type::Float),
     m_value(value),
     m_validationError()
 {
@@ -834,7 +834,7 @@ Json::operator T () const
     }
 
     throw JsonException(
-        *this, String::Format("Type %s is not an object", type())
+        *this, String::Format("Type %s is not an object", m_type)
     );
 }
 
@@ -848,7 +848,7 @@ Json::operator T () const
     }
 
     throw JsonException(
-        *this, String::Format("Type %s is not an array", type())
+        *this, String::Format("Type %s is not an array", m_type)
     );
 }
 
@@ -870,7 +870,7 @@ Json::operator std::array<T, N> () const
     }
 
     throw JsonException(
-        *this, String::Format("Type %s is not an array", type())
+        *this, String::Format("Type %s is not an array", m_type)
     );
 }
 
@@ -880,25 +880,25 @@ Json::operator T () const
 {
     switch (m_type)
     {
-    case TYPE_STRING:
+    case Type::String:
         return !(m_value.m_pString->empty());
 
-    case TYPE_OBJECT:
+    case Type::Object:
         return !(m_value.m_pObject->empty());
 
-    case TYPE_ARRAY:
+    case Type::Array:
         return !(m_value.m_pArray->empty());
 
-    case TYPE_BOOLEAN:
+    case Type::Boolean:
         return m_value.m_boolean;
 
-    case TYPE_SIGNED:
+    case Type::Signed:
         return (m_value.m_signed != 0);
 
-    case TYPE_UNSIGNED:
+    case Type::Unsigned:
         return (m_value.m_unsigned != 0);
 
-    case TYPE_FLOAT:
+    case Type::Float:
         return (m_value.m_float != 0.0);
 
     default:
@@ -912,7 +912,7 @@ Json::operator T () const
 {
     switch (m_type)
     {
-    case TYPE_STRING:
+    case Type::String:
         try
         {
             return String::Convert<T>(*(m_value.m_pString));
@@ -923,13 +923,13 @@ Json::operator T () const
 
         break;
 
-    case TYPE_SIGNED:
+    case Type::Signed:
         return static_cast<T>(m_value.m_signed);
 
-    case TYPE_UNSIGNED:
+    case Type::Unsigned:
         return static_cast<T>(m_value.m_unsigned);
 
-    case TYPE_FLOAT:
+    case Type::Float:
         return static_cast<T>(m_value.m_float);
 
     default:
@@ -937,7 +937,7 @@ Json::operator T () const
     }
 
     throw JsonException(
-        *this, String::Format("Type %s is not numeric", type())
+        *this, String::Format("Type %s is not numeric", m_type)
     );
 }
 

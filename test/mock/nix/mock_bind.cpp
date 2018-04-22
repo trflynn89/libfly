@@ -14,7 +14,7 @@ extern "C"
 
     int __wrap_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::BIND))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Bind))
         {
             errno = 0;
             return -1;

@@ -16,7 +16,7 @@ extern "C"
     {
         bool fail;
 
-        if (fly::MockSystem::MockEnabled(fly::MockCall::CONNECT, fail))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Connect, fail))
         {
             errno = 0;
             return (fail ? -1 : 0);

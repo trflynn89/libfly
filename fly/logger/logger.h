@@ -24,32 +24,37 @@
 //==============================================================================
 #define LOGD(gameId, fmt, ...)                                                 \
 (                                                                              \
-    LOG(LOG_DEBUG, gameId, fly::String::Format(fmt, ##__VA_ARGS__))            \
+    LOG(fly::Log::Level::Debug, gameId,                                        \
+        fly::String::Format(fmt, ##__VA_ARGS__))                               \
 )
 
 //==============================================================================
 #define LOGI(gameId, fmt, ...)                                                 \
 (                                                                              \
-    LOG(LOG_INFO, gameId, fly::String::Format(fmt, ##__VA_ARGS__))             \
+    LOG(fly::Log::Level::Info, gameId,                                         \
+        fly::String::Format(fmt, ##__VA_ARGS__))                               \
 )
 
 //==============================================================================
 #define LOGW(gameId, fmt, ...)                                                 \
 (                                                                              \
-    LOG(LOG_WARN, gameId, fly::String::Format(fmt, ##__VA_ARGS__))             \
+    LOG(fly::Log::Level::Warn, gameId,                                         \
+        fly::String::Format(fmt, ##__VA_ARGS__))                               \
 )
 
 //==============================================================================
 #define LOGS(gameId, fmt, ...)                                                 \
 (                                                                              \
-    LOG(LOG_WARN, gameId, fly::String::Format(fmt ": ", ##__VA_ARGS__) +       \
-        fly::System::GetErrorString())                                         \
+    LOG(fly::Log::Level::Warn, gameId,                                         \
+        fly::String::Format(fmt ": ", ##__VA_ARGS__) +                         \
+            fly::System::GetErrorString())                                     \
 )
 
 //==============================================================================
 #define LOGE(gameId, fmt, ...)                                                 \
 (                                                                              \
-    LOG(LOG_ERROR, gameId, fly::String::Format(fmt, ##__VA_ARGS__))            \
+    LOG(fly::Log::Level::Error, gameId,                                        \
+        fly::String::Format(fmt, ##__VA_ARGS__))                               \
 )
 
 //==============================================================================
@@ -129,14 +134,14 @@ public:
     /**
      * Add a log to the static logger instance.
      *
-     * @param LogLevel The level (debug, info, etc.) of this log.
+     * @param Level The level (debug, info, etc.) of this log.
      * @param ssize_t The ID of the game storing this entry.
      * @param const char * Name of the file storing this log.
      * @param const char * Name of the function storing this log.
      * @param unsigned int The line number this log point occurs.
      * @param string The message to log.
      */
-    static void AddLog(LogLevel, ssize_t, const char *, const char *, unsigned int, const std::string &);
+    static void AddLog(Log::Level, ssize_t, const char *, const char *, unsigned int, const std::string &);
 
     /**
      * @return string Path to the current log file.
@@ -171,14 +176,14 @@ private:
     /**
      * Add a log to this logger instance.
      *
-     * @param LogLevel The level (debug, info, etc.) of this log.
+     * @param Level The level (debug, info, etc.) of this log.
      * @param ssize_t The ID of the game storing this entry.
      * @param const char * Name of the file storing this log.
      * @param const char * Name of the function storing this log.
      * @param unsigned int The line number this log point occurs.
      * @param string The message to log.
      */
-    void addLog(LogLevel, ssize_t, const char *, const char *, unsigned int, const std::string &);
+    void addLog(Log::Level, ssize_t, const char *, const char *, unsigned int, const std::string &);
 
     /**
      * Create the log file. If a log file is already open, close it.

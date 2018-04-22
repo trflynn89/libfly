@@ -20,7 +20,7 @@ Socket::Socket(Protocol protocol, const SocketConfigPtr &spConfig) :
     m_clientPort(-1),
     m_isAsync(false),
     m_isListening(false),
-    m_aConnectedState(Socket::ConnectedState::NOT_CONNECTED),
+    m_aConnectedState(Socket::ConnectedState::Disconnected),
     m_socketId(s_aNumSockets.fetch_add(1))
 {
 }
@@ -94,31 +94,31 @@ bool Socket::IsListening() const
 //==============================================================================
 bool Socket::IsConnecting() const
 {
-    return (m_aConnectedState.load() == Socket::ConnectedState::CONNECTING);
+    return (m_aConnectedState.load() == Socket::ConnectedState::Connecting);
 }
 
 //==============================================================================
 bool Socket::IsConnected() const
 {
-    return (m_aConnectedState.load() == Socket::ConnectedState::CONNECTED);
+    return (m_aConnectedState.load() == Socket::ConnectedState::Connected);
 }
 
 //==============================================================================
 Socket::ConnectedState Socket::ConnectAsync(std::string hostname, int port)
 {
-    Socket::ConnectedState state = Socket::ConnectedState::NOT_CONNECTED;
+    Socket::ConnectedState state = Socket::ConnectedState::Disconnected;
 
     if (IsTcp() && IsAsync())
     {
         if (Connect(hostname, port))
         {
             LOGD(m_socketId, "Connected to %s:%d", hostname, port);
-            state = Socket::ConnectedState::CONNECTED;
+            state = Socket::ConnectedState::Connected;
         }
         else if (IsConnecting())
         {
             LOGD(m_socketId, "Connect to %s:%d in progress", hostname, port);
-            state = Socket::ConnectedState::CONNECTING;
+            state = Socket::ConnectedState::Connecting;
         }
         else
         {
@@ -138,12 +138,12 @@ bool Socket::FinishConnect()
     if (IsValid() & IsConnecting() && IsErrorFree())
     {
         LOGD(m_socketId, "Connection completed");
-        m_aConnectedState.store(Socket::ConnectedState::CONNECTED);
+        m_aConnectedState.store(Socket::ConnectedState::Connected);
     }
     else
     {
         LOGW(m_socketId, "Could not connect, closing socket");
-        m_aConnectedState.store(Socket::ConnectedState::NOT_CONNECTED);
+        m_aConnectedState.store(Socket::ConnectedState::Disconnected);
         Close();
     }
 

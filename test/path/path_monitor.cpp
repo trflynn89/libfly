@@ -22,7 +22,7 @@ class PathMonitorTest : public ::testing::Test
 public:
     PathMonitorTest() :
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::INI, std::string(), std::string()
+            fly::ConfigManager::ConfigFileType::Ini, std::string(), std::string()
         )),
 
         m_spMonitor(std::make_shared<fly::PathMonitorImpl>(m_spConfigManager)),
@@ -98,15 +98,15 @@ protected:
 
         switch (eventType)
         {
-        case fly::PathMonitor::FILE_CREATED:
+        case fly::PathMonitor::PathEvent::Created:
             ++m_numCreatedFiles[full];
             break;
 
-        case fly::PathMonitor::FILE_DELETED:
+        case fly::PathMonitor::PathEvent::Deleted:
             ++m_numDeletedFiles[full];
             break;
 
-        case fly::PathMonitor::FILE_CHANGED:
+        case fly::PathMonitor::PathEvent::Changed:
             ++m_numChangedFiles[full];
             break;
 
@@ -187,7 +187,7 @@ TEST_F(PathMonitorTest, MockFailedStartMonitorTest)
     m_spMonitor->RemoveAllPaths();
     m_spMonitor->Stop();
 
-    fly::MockSystem mock(fly::MockCall::INOTIFY_INIT1);
+    fly::MockSystem mock(fly::MockCall::InotifyInit1);
 
     ASSERT_FALSE(m_spMonitor->Start());
 
@@ -200,7 +200,7 @@ TEST_F(PathMonitorTest, MockFailedAddPathTest)
 {
     m_spMonitor->RemoveAllPaths();
 
-    fly::MockSystem mock(fly::MockCall::INOTIFY_ADD_WATCH);
+    fly::MockSystem mock(fly::MockCall::InotifyAddWatch);
 
     ASSERT_FALSE(m_spMonitor->AddPath(m_path0, [](...) { }));
     ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, [](...) { }));
@@ -351,7 +351,7 @@ TEST_F(PathMonitorTest, ChangeTest_FileLevel)
 //==============================================================================
 TEST_F(PathMonitorTest, MockFailedPollTest)
 {
-    fly::MockSystem mock(fly::MockCall::POLL);
+    fly::MockSystem mock(fly::MockCall::Poll);
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
     EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
@@ -371,7 +371,7 @@ TEST_F(PathMonitorTest, MockFailedPollTest)
 //==============================================================================
 TEST_F(PathMonitorTest, MockFailedReadTest)
 {
-    fly::MockSystem mock(fly::MockCall::READ);
+    fly::MockSystem mock(fly::MockCall::Read);
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
     EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);

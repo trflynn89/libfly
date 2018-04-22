@@ -23,7 +23,7 @@ extern "C"
 
     int __wrap_fcntl(int fd, int cmd, int args)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::FCNTL))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Fcntl))
         {
             if (++s_callCount == s_nextCall)
             {

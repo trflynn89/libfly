@@ -11,7 +11,7 @@ extern "C"
 
     int __wrap_listen(int sockfd, int backlog)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::LISTEN))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Listen))
         {
             errno = 0;
             return -1;

@@ -14,7 +14,7 @@ extern "C"
 
     int __wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::ACCEPT))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Accept))
         {
             errno = 0;
             return -1;

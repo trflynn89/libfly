@@ -30,11 +30,11 @@ ConfigManager::ConfigManager(
 {
     switch (fileType)
     {
-    case ConfigFileType::INI:
+    case ConfigFileType::Ini:
         m_spParser = std::make_shared<IniParser>(path, file);
         break;
 
-    case ConfigFileType::JSON:
+    case ConfigFileType::Json:
         m_spParser = std::make_shared<JsonParser>(path, file);
         break;
 

@@ -7,73 +7,73 @@ std::ostream &operator << (std::ostream &stream, MockCall call)
 {
     switch (call)
     {
-    case MockCall::ACCEPT:
+    case MockCall::Accept:
         stream << "accept";
         break;
-    case MockCall::BIND:
+    case MockCall::Bind:
         stream << "bind";
         break;
-    case MockCall::CONNECT:
+    case MockCall::Connect:
         stream << "connect";
         break;
-    case MockCall::FCNTL:
+    case MockCall::Fcntl:
         stream << "fcntl";
         break;
-    case MockCall::FTS_READ:
+    case MockCall::FtsRead:
         stream << "fts_read";
         break;
-    case MockCall::GETHOSTBYNAME:
+    case MockCall::Gethostbyname:
         stream << "gethostbyname";
         break;
-    case MockCall::GETSOCKOPT:
+    case MockCall::Getsockopt:
         stream << "getsockopt";
         break;
-    case MockCall::INOTIFY_ADD_WATCH:
+    case MockCall::InotifyAddWatch:
         stream << "inotify_add_watch";
         break;
-    case MockCall::INOTIFY_INIT1:
+    case MockCall::InotifyInit1:
         stream << "inotify_init1";
         break;
-    case MockCall::GETENV:
+    case MockCall::Getenv:
         stream << "getenv";
         break;
-    case MockCall::LISTEN:
+    case MockCall::Listen:
         stream << "listen";
         break;
-    case MockCall::POLL:
+    case MockCall::Poll:
         stream << "poll";
         break;
-    case MockCall::READ:
+    case MockCall::Read:
         stream << "read";
         break;
-    case MockCall::READDIR:
+    case MockCall::Readdir:
         stream << "readdir";
         break;
-    case MockCall::RECV:
+    case MockCall::Recv:
         stream << "recv";
         break;
-    case MockCall::RECVFROM:
+    case MockCall::Recvfrom:
         stream << "recvfrom";
         break;
-    case MockCall::REMOVE:
+    case MockCall::Remove:
         stream << "remove";
         break;
-    case MockCall::SEND:
+    case MockCall::Send:
         stream << "send";
         break;
-    case MockCall::SENDTO:
+    case MockCall::Sendto:
         stream << "sendto";
         break;
-    case MockCall::SETSOCKOPT:
+    case MockCall::Setsockopt:
         stream << "setsockopt";
         break;
-    case MockCall::SOCKET:
+    case MockCall::Socket:
         stream << "socket";
         break;
-    case MockCall::SYSINFO:
+    case MockCall::Sysinfo:
         stream << "sysinfo";
         break;
-    case MockCall::TIMES:
+    case MockCall::Times:
         stream << "times";
         break;
     }

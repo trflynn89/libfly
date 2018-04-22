@@ -13,7 +13,7 @@ extern "C"
 
     clock_t __wrap_times(struct tms *buf)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::TIMES))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Times))
         {
             errno = 0;
             return static_cast<clock_t>(-1);

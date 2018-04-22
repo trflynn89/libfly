@@ -38,9 +38,9 @@ public:
      */
     enum class ConnectedState
     {
-        NOT_CONNECTED,
-        CONNECTING,
-        CONNECTED
+        Disconnected,
+        Connecting,
+        Connected
     };
 
     /**

@@ -26,7 +26,7 @@ JsonParser::JsonParser(const std::string &path, const std::string &file) :
 void JsonParser::ParseInternal(std::ifstream &stream)
 {
     m_states = decltype(m_states)();
-    m_states.push(JSON_NO_STATE);
+    m_states.push(State::NoState);
 
     m_pValue = &m_values;
 
@@ -44,38 +44,39 @@ void JsonParser::ParseInternal(std::ifstream &stream)
 
         while ((c = stream.get()) != EOF)
         {
+            Token token = static_cast<Token>(c);
             ++m_column;
 
-            switch (c)
+            switch (token)
             {
-            case JSON_START_BRACE:
-            case JSON_START_BRACKET:
-                onStartBraceOrBracket(c);
+            case Token::StartBrace:
+            case Token::StartBracket:
+                onStartBraceOrBracket(token, c);
                 break;
 
-            case JSON_CLOSE_BRACE:
-            case JSON_CLOSE_BRACKET:
-                onCloseBraceOrBracket(c);
+            case Token::CloseBrace:
+            case Token::CloseBracket:
+                onCloseBraceOrBracket(token, c);
                 break;
 
-            case JSON_QUOTE:
+            case Token::Quote:
                 onQuotation(c);
                 break;
 
-            case JSON_NEW_LINE:
+            case Token::NewLine:
                 onNewLine(c);
                 break;
 
-            case JSON_COMMA:
+            case Token::Comma:
                 onComma(c);
                 break;
 
-            case JSON_COLON:
+            case Token::Colon:
                 onColon(c);
                 break;
 
             default:
-                onCharacter(c, stream);
+                onCharacter(token, c, stream);
                 break;
             }
         }
@@ -85,7 +86,7 @@ void JsonParser::ParseInternal(std::ifstream &stream)
         throw ParserException(m_file, m_line, m_column, ex.what());
     }
 
-    if (m_states.top() != JSON_NO_STATE)
+    if (m_states.top() != State::NoState)
     {
         throw ParserException(m_file, m_line, m_column,
             "Finished parsing file with incomplete JSON object"
@@ -94,26 +95,26 @@ void JsonParser::ParseInternal(std::ifstream &stream)
 }
 
 //==============================================================================
-void JsonParser::onStartBraceOrBracket(int c)
+void JsonParser::onStartBraceOrBracket(Token token, int c)
 {
     switch (m_states.top())
     {
-    case JSON_PARSING_OBJECT:
+    case State::ParsingObject:
         throw UnexpectedCharacterException(m_file, m_line, m_column, c);
 
-    case JSON_PARSING_ARRAY:
-        m_states.push(JSON_PARSING_VALUE);
+    case State::ParsingArray:
+        m_states.push(State::ParsingValue);
 
         m_pValue = &((*m_pValue)[m_pValue->Size()]);
         m_pParents.push(m_pValue);
 
         break;
 
-    case JSON_PARSING_COLON:
+    case State::ParsingColon:
         throw UnexpectedCharacterException(m_file, m_line, m_column, c);
 
-    case JSON_PARSING_NAME:
-    case JSON_PARSING_VALUE:
+    case State::ParsingName:
+    case State::ParsingValue:
         if (m_parsingString)
         {
             pushValue(c);
@@ -126,31 +127,31 @@ void JsonParser::onStartBraceOrBracket(int c)
         break;
     }
 
-    if (c == JSON_START_BRACE)
+    if (token == Token::StartBrace)
     {
         *m_pValue = Json::object_type();
-        m_states.push(JSON_PARSING_OBJECT);
+        m_states.push(State::ParsingObject);
     }
     else
     {
         *m_pValue = Json::array_type();
-        m_states.push(JSON_PARSING_ARRAY);
+        m_states.push(State::ParsingArray);
     }
 
     m_expectingValue = false;
 }
 
 //==============================================================================
-void JsonParser::onCloseBraceOrBracket(int c)
+void JsonParser::onCloseBraceOrBracket(Token token, int c)
 {
     switch (m_states.top())
     {
-    case JSON_NO_STATE:
-    case JSON_PARSING_COLON:
+    case State::NoState:
+    case State::ParsingColon:
         throw UnexpectedCharacterException(m_file, m_line, m_column, c);
 
-    case JSON_PARSING_NAME:
-    case JSON_PARSING_VALUE:
+    case State::ParsingName:
+    case State::ParsingValue:
         if (m_parsingString)
         {
             pushValue(c);
@@ -171,12 +172,12 @@ void JsonParser::onCloseBraceOrBracket(int c)
     m_pParents.pop();
     m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
 
-    const JsonState expected = (
-        (c == JSON_CLOSE_BRACE) ? JSON_PARSING_OBJECT : JSON_PARSING_ARRAY
+    const State expected = (
+        (token == Token::CloseBrace) ? State::ParsingObject : State::ParsingArray
     );
 
-    const JsonState unexpected = (
-        (c == JSON_CLOSE_BRACE) ? JSON_PARSING_ARRAY : JSON_PARSING_OBJECT
+    const State unexpected = (
+        (token == Token::CloseBrace) ? State::ParsingArray : State::ParsingObject
     );
 
     while (m_states.top() != expected)
@@ -191,9 +192,9 @@ void JsonParser::onCloseBraceOrBracket(int c)
 
     m_states.pop();
 
-    if (m_states.top() != JSON_NO_STATE)
+    if (m_states.top() != State::NoState)
     {
-        m_states.push(JSON_PARSING_COMMA);
+        m_states.push(State::ParsingComma);
     }
 }
 
@@ -202,21 +203,21 @@ void JsonParser::onQuotation(int c)
 {
     switch (m_states.top())
     {
-    case JSON_PARSING_OBJECT:
-        m_states.push(JSON_PARSING_NAME);
+    case State::ParsingObject:
+        m_states.push(State::ParsingName);
         break;
 
-    case JSON_PARSING_ARRAY:
-        m_states.push(JSON_PARSING_VALUE);
+    case State::ParsingArray:
+        m_states.push(State::ParsingValue);
 
         m_pValue = &((*m_pValue)[m_pValue->Size()]);
         m_pParents.push(m_pValue);
 
         break;
 
-    case JSON_PARSING_NAME:
+    case State::ParsingName:
         m_states.pop();
-        m_states.push(JSON_PARSING_COLON);
+        m_states.push(State::ParsingColon);
 
         m_pValue = &((*m_pValue)[m_parsing.str()]);
         m_pParents.push(m_pValue);
@@ -227,13 +228,13 @@ void JsonParser::onQuotation(int c)
 
         break;
 
-    case JSON_PARSING_VALUE:
+    case State::ParsingValue:
         if (m_parsingString)
         {
             m_parsedString = true;
 
             m_states.pop();
-            m_states.push(JSON_PARSING_COMMA);
+            m_states.push(State::ParsingComma);
         }
 
         break;
@@ -262,16 +263,16 @@ void JsonParser::onColon(int c)
 {
     switch (m_states.top())
     {
-    case JSON_PARSING_COLON:
+    case State::ParsingColon:
         m_states.pop();
-        m_states.push(JSON_PARSING_VALUE);
+        m_states.push(State::ParsingValue);
 
         m_expectingValue = true;
 
         break;
 
-    case JSON_PARSING_NAME:
-    case JSON_PARSING_VALUE:
+    case State::ParsingName:
+    case State::ParsingValue:
         if (m_parsingString)
         {
             pushValue(c);
@@ -292,11 +293,11 @@ void JsonParser::onComma(int c)
 {
     switch (m_states.top())
     {
-    case JSON_PARSING_NAME:
+    case State::ParsingName:
         pushValue(c);
         break;
 
-    case JSON_PARSING_VALUE:
+    case State::ParsingValue:
         if (m_parsingString)
         {
             pushValue(c);
@@ -312,11 +313,11 @@ void JsonParser::onComma(int c)
 
         break;
 
-    case JSON_PARSING_COMMA:
+    case State::ParsingComma:
         popValue();
         m_states.pop();
 
-        if (m_states.top() == JSON_PARSING_VALUE)
+        if (m_states.top() == State::ParsingValue)
         {
             m_states.pop();
         }
@@ -331,14 +332,14 @@ void JsonParser::onComma(int c)
 }
 
 //==============================================================================
-void JsonParser::onCharacter(int c, std::ifstream &stream)
+void JsonParser::onCharacter(Token token, int c, std::ifstream &stream)
 {
     switch (m_states.top())
     {
-    case JSON_PARSING_ARRAY:
+    case State::ParsingArray:
         if (!std::isspace(c))
         {
-            m_states.push(JSON_PARSING_VALUE);
+            m_states.push(State::ParsingValue);
 
             m_pValue = &((*m_pValue)[m_pValue->Size()]);
             m_pParents.push(m_pValue);
@@ -348,11 +349,11 @@ void JsonParser::onCharacter(int c, std::ifstream &stream)
 
         break;
 
-    case JSON_PARSING_VALUE:
-    case JSON_PARSING_NAME:
+    case State::ParsingValue:
+    case State::ParsingName:
         if (m_parsingString)
         {
-            if (std::isspace(c) && (c != JSON_SPACE))
+            if (std::isspace(c) && (token != Token::Space))
             {
                 throw UnexpectedCharacterException(m_file, m_line, m_column, c);
             }
@@ -362,7 +363,7 @@ void JsonParser::onCharacter(int c, std::ifstream &stream)
             // Blindly ignore the escaped character, the Json class will check
             // whether it is valid. Just read at least one more character to
             // prevent the parser from failing if the next character is a quote.
-            if (c == JSON_REVERSE_SOLIDUS)
+            if (token == Token::ReverseSolidus)
             {
                 if ((c = stream.get()) == EOF)
                 {

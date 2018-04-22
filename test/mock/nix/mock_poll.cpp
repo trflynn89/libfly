@@ -15,7 +15,7 @@ extern "C"
 
     int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::POLL))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Poll))
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
             errno = 0;

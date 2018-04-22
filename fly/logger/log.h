@@ -6,19 +6,6 @@
 
 #include "fly/fly.h"
 
-/**
- * Enumeration to define the level of a log.
- */
-enum LogLevel
-{
-    LOG_DEBUG,
-    LOG_INFO,
-    LOG_WARN,
-    LOG_ERROR,
-
-    NUM_LEVELS
-};
-
 namespace fly {
 
 FLY_CLASS_PTRS(LoggerConfig);
@@ -40,6 +27,19 @@ FLY_CLASS_PTRS(LoggerConfig);
 struct Log
 {
     /**
+     * Enumeration to define the level of a log.
+     */
+    enum class Level
+    {
+        Debug,
+        Info,
+        Warn,
+        Error,
+
+        NumLevels
+    };
+
+    /**
      * Default constructor.
      */
     Log();
@@ -52,7 +52,7 @@ struct Log
      */
     Log(const LoggerConfigPtr &, const std::string &);
 
-    LogLevel m_level;
+    Level m_level;
     double m_time;
     ssize_t m_gameId;
     char m_file[100];
@@ -61,6 +61,8 @@ struct Log
     std::string m_message;
 
     friend std::ostream &operator << (std::ostream &, const Log &);
+
+    friend std::ostream &operator << (std::ostream &, const Level &);
 };
 
 }

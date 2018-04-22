@@ -14,7 +14,7 @@ extern "C"
 
     int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::SETSOCKOPT))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Setsockopt))
         {
             errno = 0;
             return -1;

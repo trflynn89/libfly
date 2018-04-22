@@ -156,4 +156,11 @@ PathMonitor::PathInfoPtr PathMonitor::getOrCreatePathInfo(const std::string &pat
     return spInfo;
 }
 
+//==============================================================================
+std::ostream &operator << (std::ostream &stream, PathMonitor::PathEvent event)
+{
+    stream << static_cast<int>(event);
+    return stream;
+}
+
 }

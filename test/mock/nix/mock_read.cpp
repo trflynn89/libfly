@@ -15,7 +15,7 @@ extern "C"
 
     ssize_t __wrap_read(int fd, void *buf, size_t count)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::READ))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Read))
         {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             errno = 0;

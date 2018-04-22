@@ -159,7 +159,7 @@ void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
         PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
         PathMonitor::PathEvent event = convertToEvent(pEvent->mask);
 
-        if (event != PathMonitor::NO_CHANGE)
+        if (event != PathMonitor::PathEvent::None)
         {
             PathMonitor::PathEventCallback callback = spInfo->m_fileHandlers[pEvent->name];
 
@@ -182,19 +182,19 @@ void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
 //==============================================================================
 PathMonitor::PathEvent PathMonitorImpl::convertToEvent(int mask) const
 {
-    PathMonitor::PathEvent event = PathMonitor::NO_CHANGE;
+    PathMonitor::PathEvent event = PathMonitor::PathEvent::None;
 
     if ((mask & IN_CREATE) || (mask & IN_MOVED_TO))
     {
-        event = PathMonitor::FILE_CREATED;
+        event = PathMonitor::PathEvent::Created;
     }
     else if ((mask & IN_DELETE) || (mask & IN_MOVED_FROM))
     {
-        event = PathMonitor::FILE_DELETED;
+        event = PathMonitor::PathEvent::Deleted;
     }
     else if (mask & IN_MODIFY)
     {
-        event = PathMonitor::FILE_CHANGED;
+        event = PathMonitor::PathEvent::Changed;
     }
 
     return event;

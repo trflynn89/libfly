@@ -30,12 +30,12 @@ public:
     /**
      * Enumerated list of path events.
      */
-    enum PathEvent
+    enum class PathEvent
     {
-        NO_CHANGE,
-        FILE_CREATED,
-        FILE_DELETED,
-        FILE_CHANGED
+        None,
+        Created,
+        Deleted,
+        Changed
     };
 
     /**
@@ -174,6 +174,11 @@ private:
      * @return PathInfoPtr Shared pointer to the PathInfo struct.
      */
     PathInfoPtr getOrCreatePathInfo(const std::string &);
+
+    /**
+     * Stream the name of a Json instance's type.
+     */
+    friend std::ostream &operator << (std::ostream &, PathEvent);
 };
 
 }

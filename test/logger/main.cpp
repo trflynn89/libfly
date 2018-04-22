@@ -17,7 +17,7 @@ class LoggerTest : public ::testing::Test
 public:
     LoggerTest() :
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::INI, std::string(), std::string()
+            fly::ConfigManager::ConfigFileType::Ini, std::string(), std::string()
         )),
 
         m_path(fly::Path::Join(
@@ -85,7 +85,7 @@ protected:
         fly::Log log;
 
         log.m_message = message;
-        log.m_level = LOG_DEBUG;
+        log.m_level = fly::Log::Level::Debug;
         log.m_line = __LINE__;
 
         ::snprintf(log.m_file, sizeof(log.m_file), "%s", __FILE__);

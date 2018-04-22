@@ -19,7 +19,7 @@ public:
         )),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::INI, m_path, m_file
+            fly::ConfigManager::ConfigFileType::Ini, m_path, m_file
         ))
     {
         LOGC("Using path '%s' : '%s'", m_path, m_file);
@@ -100,7 +100,7 @@ TEST_F(ConfigManagerTest, AllFileTypesTest)
         m_spConfigManager->Stop();
 
         m_spConfigManager = std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::INI, m_path, m_file
+            fly::ConfigManager::ConfigFileType::Ini, m_path, m_file
         );
 
         EXPECT_TRUE(m_spConfigManager->Start());
@@ -109,7 +109,7 @@ TEST_F(ConfigManagerTest, AllFileTypesTest)
         m_spConfigManager->Stop();
 
         m_spConfigManager = std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::JSON, m_path, m_file
+            fly::ConfigManager::ConfigFileType::Json, m_path, m_file
         );
 
         EXPECT_TRUE(m_spConfigManager->Start());

@@ -20,33 +20,33 @@ FLY_CLASS_PTRS(JsonParser);
  */
 class JsonParser : public Parser
 {
-    enum JsonToken
+    enum class Token
     {
-        JSON_NEW_LINE = 0x0A, // \n
-        JSON_SPACE = 0x20, // <space>
+        NewLine = 0x0A, // \n
+        Space = 0x20, // <space>
 
-        JSON_QUOTE = 0x22, // "
-        JSON_COMMA = 0x2c, // ,
-        JSON_COLON = 0x3a, // :
+        Quote = 0x22, // "
+        Comma = 0x2c, // ,
+        Colon = 0x3a, // :
 
-        JSON_START_BRACKET = 0x5b, // [
-        JSON_CLOSE_BRACKET = 0x5d, // ]
+        StartBracket = 0x5b, // [
+        CloseBracket = 0x5d, // ]
 
-        JSON_START_BRACE = 0x7b, // {
-        JSON_CLOSE_BRACE = 0x7d, // }
+        StartBrace = 0x7b, // {
+        CloseBrace = 0x7d, // }
 
-        JSON_REVERSE_SOLIDUS = 0x5C, /* \ */
+        ReverseSolidus = 0x5C, /* \ */
     };
 
-    enum JsonState
+    enum class State
     {
-        JSON_NO_STATE,
-        JSON_PARSING_OBJECT,
-        JSON_PARSING_ARRAY,
-        JSON_PARSING_NAME,
-        JSON_PARSING_VALUE,
-        JSON_PARSING_COLON,
-        JSON_PARSING_COMMA
+        NoState,
+        ParsingObject,
+        ParsingArray,
+        ParsingName,
+        ParsingValue,
+        ParsingColon,
+        ParsingComma
     };
 
 public:
@@ -78,7 +78,7 @@ private:
      *
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
      */
-    void onStartBraceOrBracket(int);
+    void onStartBraceOrBracket(Token, int);
 
     /**
      * Handle the end of an object or array.
@@ -88,7 +88,7 @@ private:
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
      * @throws BadConversionException If a parsed object was invalid.
      */
-    void onCloseBraceOrBracket(int);
+    void onCloseBraceOrBracket(Token, int);
 
     /**
      * Handle the start or end of a string, for either a name or value.
@@ -136,7 +136,7 @@ private:
      *
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
      */
-    void onCharacter(int, std::ifstream &);
+    void onCharacter(Token, int, std::ifstream &);
 
     /**
      * Push a parsed character onto the parsing stream.
@@ -155,7 +155,7 @@ private:
      */
     bool popValue();
 
-    std::stack<JsonState> m_states;
+    std::stack<State> m_states;
 
     Json *m_pValue;
     std::stack<Json *> m_pParents;

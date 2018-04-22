@@ -11,7 +11,7 @@ extern "C"
 
     int __wrap_remove(const char *pathname)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::REMOVE))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::Remove))
         {
             errno = 0;
             return -1;

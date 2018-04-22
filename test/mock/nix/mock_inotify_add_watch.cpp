@@ -11,7 +11,7 @@ extern "C"
 
     int __wrap_inotify_add_watch(int fd, const char *pathname, uint32_t mask)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::INOTIFY_ADD_WATCH))
+        if (fly::MockSystem::MockEnabled(fly::MockCall::InotifyAddWatch))
         {
             errno = 0;
             return -1;
