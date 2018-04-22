@@ -548,7 +548,7 @@ Json::stream_type Json::validateString(const string_type &str)
     const string_type::const_iterator end = str.end();
     bool valid = true;
 
-    for (string_type::const_iterator it = str.begin(); valid && (it != end); ++it)
+    for (string_type::const_iterator it = str.begin(); valid && (it != end); )
     {
         if (*it == '\\')
         {
@@ -557,6 +557,11 @@ Json::stream_type Json::validateString(const string_type &str)
         else
         {
             valid = validateCharacter(stream, it, end);
+        }
+
+        if (it != end)
+        {
+            ++it;
         }
     }
 
