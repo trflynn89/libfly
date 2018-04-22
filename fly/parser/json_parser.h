@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fstream>
-#include <sstream>
 #include <stack>
 #include <string>
 
@@ -161,7 +160,7 @@ private:
     Json *m_pValue;
     std::stack<Json *> m_pParents;
 
-    std::stringstream m_parsing;
+    Json::stream_type m_parsing;
     bool m_parsingString;
     bool m_parsedString;
     bool m_expectingValue;

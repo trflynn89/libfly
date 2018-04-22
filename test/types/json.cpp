@@ -42,9 +42,14 @@ protected:
     {
         SCOPED_TRACE(test);
 
-        EXPECT_THROW({
-            fly::Json actual = test;
-        }, fly::JsonException);
+        fly::Json actual;
+
+        EXPECT_NO_THROW({
+            actual = test;
+        });
+
+        EXPECT_TRUE(actual.HasValidationError());
+        EXPECT_FALSE(actual.GetValidationError().empty());
     }
 
     void ValidatePass(const std::string &test)
@@ -285,8 +290,10 @@ TEST_F(JsonTest, MoveConstructorTest)
 {
     fly::Json string = "abc";
     fly::Json stringCopy(string);
-    fly::Json stringMove(std::move(string));
-    EXPECT_EQ(stringMove, stringCopy);
+    fly::Json stringMove(std::move(stringCopy));
+
+    EXPECT_TRUE(stringCopy.IsNull());
+    EXPECT_EQ(stringMove, string);
 }
 
 //==============================================================================

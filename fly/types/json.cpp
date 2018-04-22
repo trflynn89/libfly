@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <ios>
-#include <sstream>
 #include <utility>
 
 namespace fly {
@@ -13,26 +12,29 @@ namespace fly {
 //==============================================================================
 Json::Json() noexcept :
     m_type(TYPE_NULL),
-    m_value()
+    m_value(),
+    m_validationError()
 {
 }
 
 //==============================================================================
 Json::Json(const null_type &value) noexcept :
     m_type(TYPE_NULL),
-    m_value(value)
+    m_value(value),
+    m_validationError()
 {
 }
 
 //==============================================================================
 Json::Json(const Json &json) noexcept :
     m_type(json.m_type),
-    m_value()
+    m_value(),
+    m_validationError(json.m_validationError)
 {
     switch (m_type)
     {
     case TYPE_STRING:
-        m_value = Value(*(json.m_value.m_pString), false);
+        m_value = *(json.m_value.m_pString);
         break;
 
     case TYPE_OBJECT:
@@ -67,16 +69,19 @@ Json::Json(const Json &json) noexcept :
 //==============================================================================
 Json::Json(Json &&json) noexcept :
     m_type(std::move(json.m_type)),
-    m_value(std::move(json.m_value))
+    m_value(std::move(json.m_value)),
+    m_validationError(std::move(json.m_validationError))
 {
     json.m_type = TYPE_NULL;
     json.m_value = nullptr;
+    json.m_validationError.clear();
 }
 
 //==============================================================================
 Json::Json(const std::initializer_list<Json> &initializer) noexcept :
     m_type(TYPE_NULL),
-    m_value()
+    m_value(),
+    m_validationError()
 {
     auto isObjectLike = [](const Json &json)
     {
@@ -112,6 +117,18 @@ Json::Json(const std::initializer_list<Json> &initializer) noexcept :
 Json::~Json() noexcept
 {
     m_value.Destroy(m_type);
+}
+
+//==============================================================================
+bool Json::HasValidationError() const
+{
+    return !m_validationError.empty();
+}
+
+//==============================================================================
+std::string Json::GetValidationError() const
+{
+    return m_validationError;
 }
 
 //==============================================================================
@@ -177,6 +194,8 @@ Json &Json::operator = (Json json) noexcept
 {
     std::swap(m_type, json.m_type);
     std::swap(m_value, json.m_value);
+    std::swap(m_validationError, json.m_validationError);
+
     return *this;
 }
 
@@ -189,7 +208,7 @@ Json::operator string_type () const
     }
     else
     {
-        std::stringstream stream;
+        stream_type stream;
         stream << *this;
 
         return stream.str();
@@ -220,6 +239,15 @@ Json &Json::operator [] (const typename object_type::key_type &key)
 
     if (IsObject())
     {
+        stream_type parsed = validateString(key);
+
+        if (HasValidationError())
+        {
+            throw JsonException(
+                *this, String::Format("Bad key %s: %s", key, m_validationError)
+            );
+        }
+
         return (*(m_value.m_pObject))[key];
     }
 
@@ -513,73 +541,39 @@ std::string Json::type() const
 }
 
 //==============================================================================
-Json::Value::Value() noexcept :
-    m_null(nullptr)
+Json::stream_type Json::validateString(const string_type &str)
 {
-}
-
-//==============================================================================
-Json::Value::Value(const null_type &value) noexcept :
-    m_null(value)
-{
-}
-
-//==============================================================================
-void Json::Value::Destroy(const Type &type) noexcept
-{
-    switch (type)
-    {
-    case TYPE_STRING:
-        delete m_pString;
-        break;
-
-    case TYPE_OBJECT:
-        delete m_pObject;
-        break;
-
-    case TYPE_ARRAY:
-        delete m_pArray;
-        break;
-
-    default:
-        break;
-    }
-}
-
-//==============================================================================
-Json::string_type Json::Value::ValidateString(const string_type &str) const
-{
-    std::stringstream stream;
+    stream_type stream;
 
     const string_type::const_iterator end = str.end();
+    bool valid = true;
 
-    for (string_type::const_iterator it = str.begin(); it != end; ++it)
+    for (string_type::const_iterator it = str.begin(); valid && (it != end); ++it)
     {
         if (*it == '\\')
         {
-            ReadEscapedCharacter(stream, it, end);
+            valid = readEscapedCharacter(stream, it, end);
         }
         else
         {
-            ValidateCharacter(stream, it, end);
+            valid = validateCharacter(stream, it, end);
         }
     }
 
-    return stream.str();
+    return stream;
 }
 
 //==============================================================================
-void Json::Value::ReadEscapedCharacter(
-    std::stringstream &stream,
+bool Json::readEscapedCharacter(
+    stream_type &stream,
     string_type::const_iterator &it,
     const string_type::const_iterator &end
-) const
+)
 {
     if (++it == end)
     {
-        throw JsonException(nullptr, fly::String::Format(
-            "Expected escaped character after reverse solidus"
-        ));
+        m_validationError = "Expected escaped character after reverse solidus";
+        return false;
     }
 
     switch (*it)
@@ -611,44 +605,47 @@ void Json::Value::ReadEscapedCharacter(
         break;
 
     case 'u':
-        ReadUnicodeCharacter(stream, it, end);
-        break;
+        return readUnicodeCharacter(stream, it, end);
 
     default:
-        throw JsonException(nullptr, fly::String::Format(
+        m_validationError = fly::String::Format(
             "Invalid escape character '%c' (%x)", *it, int(*it)
-        ));
+        );
+
+        std::cout << m_validationError << std::endl;
+
+        return false;
     }
+
+    return true;
 }
 
 //==============================================================================
-void Json::Value::ReadUnicodeCharacter(
-    std::stringstream &stream,
+bool Json::readUnicodeCharacter(
+    stream_type &stream,
     string_type::const_iterator &it,
     const string_type::const_iterator &end
-) const
+)
 {
-    const int highSurrogateCodepoint = ReadUnicodeCodepoint(it, end);
+    const int highSurrogateCodepoint = readUnicodeCodepoint(it, end);
     int codepoint = highSurrogateCodepoint;
 
     if (IS_HIGH_SURROGATE(highSurrogateCodepoint))
     {
-        if ((++it == end) || (*it != '\\'))
+        if (
+            ((++it == end) || (*it != '\\')) ||
+            ((++it == end) || (*it != 'u'))
+        )
         {
-            throw JsonException(nullptr, String::Format(
+            m_validationError = String::Format(
                 "Expected to find \\u after high surrogate %x",
                 highSurrogateCodepoint
-            ));
-        }
-        else if ((++it == end) || (*it != 'u'))
-        {
-            throw JsonException(nullptr, String::Format(
-                "Expected to find \\u after high surrogate %x",
-                highSurrogateCodepoint
-            ));
+            );
+
+            return false;
         }
 
-        const int lowSurrogateCodepoint = ReadUnicodeCodepoint(it, end);
+        const int lowSurrogateCodepoint = readUnicodeCodepoint(it, end);
 
         if (IS_LOW_SURROGATE(lowSurrogateCodepoint))
         {
@@ -665,21 +662,29 @@ void Json::Value::ReadUnicodeCharacter(
         }
         else
         {
-            throw JsonException(nullptr, String::Format(
+            m_validationError = String::Format(
                 "Expected low surrogate to follow high surrogate %x but found %x",
                 highSurrogateCodepoint, lowSurrogateCodepoint
-            ));
+            );
+
+            return false;
         }
     }
     else if (IS_LOW_SURROGATE(highSurrogateCodepoint))
     {
-        throw JsonException(nullptr, String::Format(
+        m_validationError = String::Format(
             "Expected high surrogate to preceed low surrogate %x",
             highSurrogateCodepoint
-        ));
+        );
+
+        return false;
     }
 
-    if (codepoint < 0x80)
+    if (codepoint == -1)
+    {
+        return false;
+    }
+    else if (codepoint < 0x80)
     {
         stream << char(codepoint);
     }
@@ -701,13 +706,15 @@ void Json::Value::ReadUnicodeCharacter(
         stream << char(0x80 | ((codepoint >> 6) & 0x3F));
         stream << char(0x80 | (codepoint & 0x3F));
     }
+
+    return true;
 }
 
 //==============================================================================
-int Json::Value::ReadUnicodeCodepoint(
+int Json::readUnicodeCodepoint(
     string_type::const_iterator &it,
     const string_type::const_iterator &end
-) const
+)
 {
     int codepoint = 0;
 
@@ -715,9 +722,11 @@ int Json::Value::ReadUnicodeCodepoint(
     {
         if (++it == end)
         {
-            throw JsonException(nullptr, String::Format(
-                "Expected exactly 4 hexadecimals after \\u, only found %d", i
-            ));
+            m_validationError = String::Format(
+                "Expected exactly 4 hexadecimals after \\u, found %d", i
+            );
+
+            return -1;
         }
 
         const int shift = (4 * (3 - i));
@@ -736,9 +745,11 @@ int Json::Value::ReadUnicodeCodepoint(
         }
         else
         {
-            throw JsonException(nullptr, String::Format(
+            m_validationError = String::Format(
                 "Expected '%c' (%x) to be a hexadecimal", *it, int(*it)
-            ));
+            );
+
+            return -1;
         }
     }
 
@@ -746,11 +757,11 @@ int Json::Value::ReadUnicodeCodepoint(
 }
 
 //==============================================================================
-void Json::Value::ValidateCharacter(
-    std::stringstream &stream,
+bool Json::validateCharacter(
+    stream_type &stream,
     string_type::const_iterator &it,
     const string_type::const_iterator &end
-) const
+)
 {
     unsigned char c = *it;
 
@@ -768,23 +779,25 @@ void Json::Value::ValidateCharacter(
         return true;
     };
 
-    auto invalid = [&c](int location)
+    auto invalid = [this, &c](int location) -> bool
     {
-        throw JsonException(nullptr, fly::String::Format(
+        m_validationError = fly::String::Format(
             "Invalid control character '%x' (location %d)", int(c), location
-        ));
+        );
+
+        return false;
     };
 
     // Invalid control characters
     if (c <= 0x1F)
     {
-        invalid(1);
+        return invalid(1);
     }
 
     // Quote or reverse solidus
     else if ((c == 0x22) || (c == 0x5C))
     {
-        invalid(2);
+        return invalid(2);
     }
 
     // Valid ASCII character
@@ -797,7 +810,7 @@ void Json::Value::ValidateCharacter(
     {
         if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(3);
+            return invalid(3);
         }
     }
 
@@ -806,11 +819,11 @@ void Json::Value::ValidateCharacter(
     {
         if (!next() || (c < 0xA0) || (c > 0xBF))
         {
-            invalid(4);
+            return invalid(4);
         }
         else if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(5);
+            return invalid(5);
         }
     }
 
@@ -820,11 +833,11 @@ void Json::Value::ValidateCharacter(
     {
         if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(6);
+            return invalid(6);
         }
         else if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(7);
+            return invalid(7);
         }
     }
 
@@ -833,11 +846,11 @@ void Json::Value::ValidateCharacter(
     {
         if (!next() || (c < 0x80) || (c > 0x9F))
         {
-            invalid(8);
+            return invalid(8);
         }
         else if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(9);
+            return invalid(9);
         }
     }
 
@@ -846,15 +859,15 @@ void Json::Value::ValidateCharacter(
     {
         if (!next() || (c < 0x90) || (c > 0xBF))
         {
-            invalid(10);
+            return invalid(10);
         }
         else if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(11);
+            return invalid(11);
         }
         else if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(12);
+            return invalid(12);
         }
     }
 
@@ -863,15 +876,15 @@ void Json::Value::ValidateCharacter(
     {
         if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(13);
+            return invalid(13);
         }
         else if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(14);
+            return invalid(14);
         }
         else if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(15);
+            return invalid(15);
         }
     }
 
@@ -880,25 +893,60 @@ void Json::Value::ValidateCharacter(
     {
         if (!next() || (c < 0x80) || (c > 0x8F))
         {
-            invalid(16);
+            return invalid(16);
         }
         else if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(17);
+            return invalid(17);
         }
         else if (!next() || (c < 0x80) || (c > 0xBF))
         {
-            invalid(18);
+            return invalid(18);
         }
     }
 
     // Remaining bytes (80..C1 and F5..FF) are ill-formed
     else
     {
-        invalid(19);
+        return invalid(19);
     }
 
     stream << *it;
+    return true;
+}
+
+//==============================================================================
+Json::Value::Value() noexcept :
+    m_null(nullptr)
+{
+}
+
+//==============================================================================
+Json::Value::Value(const null_type &value) noexcept :
+    m_null(value)
+{
+}
+
+//==============================================================================
+void Json::Value::Destroy(const Type &type) noexcept
+{
+    switch (type)
+    {
+    case TYPE_STRING:
+        delete m_pString;
+        break;
+
+    case TYPE_OBJECT:
+        delete m_pObject;
+        break;
+
+    case TYPE_ARRAY:
+        delete m_pArray;
+        break;
+
+    default:
+        break;
+    }
 }
 
 //==============================================================================

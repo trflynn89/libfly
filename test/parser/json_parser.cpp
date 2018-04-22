@@ -310,6 +310,7 @@ TEST_F(JsonParserTest, BadlyFormedObjectTest)
     ValidateFailRaw("{ \"a\" : 1, { }");
     ValidateFailRaw("{ \"a\" : \"\\");
     ValidateFailRaw("{ \"a\" : \"\x01\" }");
+    ValidateFailRaw("{ \"\x01\" : \"a\" }");
     ValidateFailRaw("{ 1 : 1 }");
 }
 

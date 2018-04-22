@@ -390,7 +390,7 @@ void JsonParser::onCharacter(int c, std::ifstream &stream)
 //==============================================================================
 void JsonParser::pushValue(int c)
 {
-    m_parsing << char(c);
+    m_parsing << static_cast<Json::stream_type::char_type>(c);
 }
 
 //==============================================================================
@@ -491,6 +491,14 @@ bool JsonParser::popValue()
         {
             throw BadConversionException(m_file, m_line, m_column, value);
         }
+    }
+
+    // Check for failed construction of the parsed type
+    if (m_pValue->HasValidationError())
+    {
+        throw ParserException(
+            m_file, m_line, m_column, m_pValue->GetValidationError()
+        );
     }
 
     m_pParents.pop();
