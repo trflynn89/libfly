@@ -13,16 +13,6 @@
     #include "test/mock/mock_system.h"
 #endif
 
-namespace
-{
-    static int s_lastSignal = 0;
-
-    void handleSignal(int signal)
-    {
-        s_lastSignal = signal;
-    }
-}
-
 //==============================================================================
 class SystemMonitorTest : public ::testing::Test
 {
@@ -151,7 +141,11 @@ TEST_F(SystemMonitorTest, MemoryUsageTest)
     uint64_t systemBefore = m_spMonitor->GetSystemMemoryUsage();
     uint64_t processBefore = m_spMonitor->GetProcessMemoryUsage();
 
-    std::string consumed((totalBefore - systemBefore) / 10, '\0');
+    auto size = static_cast<std::string::size_type>(
+        (totalBefore - systemBefore) / 10
+    );
+
+    std::string consumed(size, '\0');
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
     uint64_t totalAfter = m_spMonitor->GetTotalSystemMemory();
