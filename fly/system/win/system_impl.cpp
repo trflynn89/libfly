@@ -7,6 +7,7 @@
 #include <Windows.h>
 
 #include "fly/logger/logger.h"
+#include "fly/string/string.h"
 
 namespace fly {
 
@@ -68,6 +69,8 @@ std::string SystemImpl::GetErrorString(int code)
     else
     {
         ret = "(" + std::to_string(code) + ") " + str;
+        String::Trim(ret);
+
         ::LocalFree(str);
     }
 
