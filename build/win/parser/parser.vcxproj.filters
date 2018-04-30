@@ -5,7 +5,4 @@
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\test\parser\json_parser.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\test\parser\parser_test.h" />
-  </ItemGroup>
 </Project>
