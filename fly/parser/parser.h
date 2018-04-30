@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fstream>
+#include <istream>
 #include <shared_mutex>
 #include <string>
 
@@ -12,8 +12,8 @@ namespace fly {
 FLY_CLASS_PTRS(Parser);
 
 /**
- * Virtual interface to parse a file. Parsers for specific file formats should
- * inherit from this class.
+ * Virtual interface to parse a file or string. Parsers for specific formats
+ * should inherit from this class.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 18, 2016
@@ -23,18 +23,27 @@ class Parser
 public:
     /**
      * Constructor.
+     */
+    Parser();
+
+    /**
+     * Parse a string and store parsed values.
+     *
+     * @param string String contents to parse.
+     *
+     * @throws ParserException Thrown if an error occurs parsing the string.
+     */
+    void Parse(const std::string &);
+
+    /**
+     * Parse a file and store parsed values.
      *
      * @param string Directory containing the file to parse.
      * @param string Name of the file to parse.
-     */
-    Parser(const std::string &, const std::string &);
-
-    /**
-     * Parse the configured file and store parsed values.
      *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    void Parse();
+    void Parse(const std::string &, const std::string &);
 
     /**
      * Get the entire set of parsed values, stored as a JSON object.
@@ -55,16 +64,13 @@ public:
 
 protected:
     /**
-     * Parse the configured file and store parsed values.
+     * Parse a stream and store the parsed values.
      *
-     * @param ifstream Stream holding the open file.
+     * @param istream Stream holding the contents to parse.
      *
-     * @throws ParserException Thrown if an error occurs parsing the file.
+     * @throws ParserException Thrown if an error occurs parsing the stream.
      */
-    virtual void ParseInternal(std::ifstream &) = 0;
-
-    const std::string m_path;
-    const std::string m_file;
+    virtual void ParseInternal(std::istream &) = 0;
 
     Json m_values;
 

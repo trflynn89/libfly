@@ -8,14 +8,9 @@
 namespace fly {
 
 //==============================================================================
-ParserException::ParserException(
-    const std::string &file,
-    int line,
-    const std::string &message
-) :
+ParserException::ParserException(int line, const std::string &message) :
     m_message(String::Format(
-        "ParserException: Error parsing %s at [line %d]: %s",
-        file, line, message
+        "ParserException: Error parsing at [line %d]: %s", line, message
     ))
 {
     LOGW(-1, "%s", m_message);
@@ -23,14 +18,13 @@ ParserException::ParserException(
 
 //==============================================================================
 ParserException::ParserException(
-    const std::string &file,
     int line,
     int column,
     const std::string &message
 ) :
     m_message(String::Format(
-        "ParserException: Error parsing %s at [line %d, column %d]: %s",
-        file, line, column, message
+        "ParserException: Error parsing at [line %d, column %d]: %s",
+        line, column, message
     ))
 {
     LOGW(-1, "%s", m_message);
@@ -44,12 +38,11 @@ const char *ParserException::what() const noexcept
 
 //==============================================================================
 UnexpectedCharacterException::UnexpectedCharacterException(
-    const std::string &file,
     int line,
     int column,
     int c
 ) :
-    ParserException(file, line, column, (std::isprint(c) ?
+    ParserException(line, column, (std::isprint(c) ?
         String::Format("Unexpected character '%c' (%x)", char(c), c) :
         String::Format("Unexpected character '%x'", c)
     ))
@@ -58,12 +51,11 @@ UnexpectedCharacterException::UnexpectedCharacterException(
 
 //==============================================================================
 BadConversionException::BadConversionException(
-    const std::string &file,
     int line,
     int column,
     const std::string &value
 ) :
-    ParserException(file, line, column,
+    ParserException(line, column,
         String::Format("Could not convert '%s' to a value", value)
     )
 {

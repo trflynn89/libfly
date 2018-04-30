@@ -1,39 +1,32 @@
-#include "test/parser/parser_test.h"
-
 #include <gtest/gtest.h>
 
 #include "fly/parser/exceptions.h"
 #include "fly/parser/ini_parser.h"
+#include "fly/path/path.h"
 
 //==============================================================================
-class IniParserTest : public ParserTest
+class IniParserTest : public ::testing::Test
 {
 public:
-    IniParserTest() :
-        ParserTest(),
-        m_spParser(std::make_shared<fly::IniParser>(m_path, m_file))
+    IniParserTest() : m_spParser(std::make_shared<fly::IniParser>())
     {
     }
 
 protected:
-    fly::IniParserPtr m_spParser;
+    fly::ParserPtr m_spParser;
 };
 
 //==============================================================================
 TEST_F(IniParserTest, NonExistingPathTest)
 {
-    m_spParser = std::make_shared<fly::IniParser>(m_path + "foo", m_file);
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse("foo_abc", "abc.ini"));
     EXPECT_EQ(m_spParser->GetValues().Size(), 0);
 }
 
 //==============================================================================
 TEST_F(IniParserTest, NonExistingFileTest)
 {
-    m_spParser = std::make_shared<fly::IniParser>(m_path, m_file + "foo");
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.ini"));
     EXPECT_EQ(m_spParser->GetValues().Size(), 0);
 }
 
@@ -41,9 +34,8 @@ TEST_F(IniParserTest, NonExistingFileTest)
 TEST_F(IniParserTest, EmptyFileTest)
 {
     const std::string contents;
-    CreateFile(contents);
 
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
     EXPECT_EQ(m_spParser->GetValues().Size(), 0);
 }
 
@@ -51,9 +43,8 @@ TEST_F(IniParserTest, EmptyFileTest)
 TEST_F(IniParserTest, EmptySectionTest)
 {
     const std::string contents("[section]");
-    CreateFile(contents);
 
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
     EXPECT_EQ(m_spParser->GetValues().Size(), 0);
 }
 
@@ -66,9 +57,7 @@ TEST_F(IniParserTest, NonEmptySectionTest)
         "address=USA"
     );
 
-    CreateFile(contents);
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
 
     EXPECT_EQ(m_spParser->GetValues().Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
@@ -83,9 +72,7 @@ TEST_F(IniParserTest, NonExistingTest)
         "address=USA"
     );
 
-    CreateFile(contents);
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
 
     EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
     EXPECT_EQ(m_spParser->GetValues("bad-section").Size(), 0);
@@ -102,9 +89,7 @@ TEST_F(IniParserTest, CommentTest)
         "; name=Jane Doe\n"
     );
 
-    CreateFile(contents);
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
 
     EXPECT_EQ(m_spParser->GetValues().Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
@@ -120,9 +105,7 @@ TEST_F(IniParserTest, ErrantSpacesTest)
         "\taddress  = USA\t \r \n"
     );
 
-    CreateFile(contents);
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
 
     EXPECT_EQ(m_spParser->GetValues().Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
@@ -137,9 +120,7 @@ TEST_F(IniParserTest, QuotedValueTest)
         "address= \t '\\tUSA'"
     );
 
-    CreateFile(contents);
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
 
     EXPECT_EQ(m_spParser->GetValues().Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
@@ -160,9 +141,7 @@ TEST_F(IniParserTest, MutlipleSectionTypeTest)
         "noage=1\n"
     );
 
-    CreateFile(contents);
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
 
     EXPECT_EQ(m_spParser->GetValues().Size(), 3);
     EXPECT_EQ(m_spParser->GetValues("section1").Size(), 2);
@@ -180,8 +159,7 @@ TEST_F(IniParserTest, DuplicateSectionTest)
         "name=Jane Doe\n"
     );
 
-    CreateFile(contents1);
-    EXPECT_NO_THROW(m_spParser->Parse());
+    EXPECT_NO_THROW(m_spParser->Parse(contents1));
     EXPECT_EQ(m_spParser->GetValues().Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section")["name"], "Jane Doe");
@@ -193,8 +171,7 @@ TEST_F(IniParserTest, DuplicateSectionTest)
         "name=Jane Doe\n"
     );
 
-    CreateFile(contents2);
-    EXPECT_NO_THROW(m_spParser->Parse());
+    EXPECT_NO_THROW(m_spParser->Parse(contents2));
     EXPECT_EQ(m_spParser->GetValues().Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section")["name"], "Jane Doe");
@@ -209,8 +186,7 @@ TEST_F(IniParserTest, DuplicateValueTest)
         "name=Jane Doe\n"
     );
 
-    CreateFile(contents);
-    EXPECT_NO_THROW(m_spParser->Parse());
+    EXPECT_NO_THROW(m_spParser->Parse(contents));
     EXPECT_EQ(m_spParser->GetValues().Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section")["name"], "Jane Doe");
@@ -229,11 +205,8 @@ TEST_F(IniParserTest, ImbalancedBraceTest)
         "name=John Doe\n"
     );
 
-    CreateFile(contents1);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents2);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents1), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents2), fly::ParserException);
 }
 
 //==============================================================================
@@ -268,23 +241,12 @@ TEST_F(IniParserTest, ImbalancedQuoteTest)
         "name='John Doe\"\n"
     );
 
-    CreateFile(contents1);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents2);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents3);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents4);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents5);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents6);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents1), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents2), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents3), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents4), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents5), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents6), fly::ParserException);
 }
 
 //==============================================================================
@@ -320,23 +282,12 @@ TEST_F(IniParserTest, MisplacedQuoteTest)
         "name=John Doe\n"
     );
 
-    CreateFile(contents1);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents2);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents3);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents4);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents5);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents6);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents1), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents2), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents3), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents4), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents5), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents6), fly::ParserException);
 }
 
 //==============================================================================
@@ -351,13 +302,11 @@ TEST_F(IniParserTest, MultipleAssignmentTest)
         "name=\"John=Doe\"\n"
     );
 
-    CreateFile(contents1);
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents1));
     EXPECT_EQ(m_spParser->GetValues().Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
 
-    CreateFile(contents2);
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents2));
     EXPECT_EQ(m_spParser->GetValues().Size(), 1);
     EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
 }
@@ -375,11 +324,8 @@ TEST_F(IniParserTest, MissingAssignmentTest)
         "name=\n"
     );
 
-    CreateFile(contents1);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents2);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents1), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents2), fly::ParserException);
 }
 
 //==============================================================================
@@ -400,14 +346,9 @@ TEST_F(IniParserTest, EarlyAssignmentTest)
         "[section]\n"
     );
 
-    CreateFile(contents1);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents2);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
-
-    CreateFile(contents3);
-    EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents1), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents2), fly::ParserException);
+    EXPECT_THROW(m_spParser->Parse(contents3), fly::ParserException);
 }
 
 //==============================================================================
@@ -419,11 +360,9 @@ TEST_F(IniParserTest, MultipleParseTest)
         "address=USA"
     );
 
-    CreateFile(contents);
-
     for (int i = 0; i < 5; ++i)
     {
-        ASSERT_NO_THROW(m_spParser->Parse());
+        ASSERT_NO_THROW(m_spParser->Parse(contents));
 
         EXPECT_EQ(m_spParser->GetValues().Size(), 1);
         EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);

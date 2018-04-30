@@ -13,7 +13,7 @@ FLY_CLASS_PTRS(Json);
 FLY_CLASS_PTRS(JsonParser);
 
 /**
- * Implementation of the Parser interface for .json files.
+ * Implementation of the Parser interface for the .json format.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 19, 2017
@@ -52,23 +52,20 @@ class JsonParser : public Parser
 public:
     /**
      * Constructor.
-     *
-     * @param string Directory containing the file to parse.
-     * @param string Name of the file to parse.
      */
-    JsonParser(const std::string &, const std::string &);
+    JsonParser();
 
 protected:
     /**
-     * Parse the configured file and store parsed values.
+     * Parse a stream and store the parsed values.
      *
-     * @param ifstream Stream holding the open file.
+     * @param istream Stream holding the contents to parse.
      *
-     * @throws ParserException If an error occurs parsing the file.
+     * @throws ParserException If an error occurs parsing the stream.
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
      * @throws BadConversionException If a parsed object was invalid.
      */
-    virtual void ParseInternal(std::ifstream &);
+    virtual void ParseInternal(std::istream &);
 
 private:
     /**
@@ -136,7 +133,7 @@ private:
      *
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
      */
-    void onCharacter(Token, int, std::ifstream &);
+    void onCharacter(Token, int, std::istream &);
 
     /**
      * Push a parsed character onto the parsing stream.

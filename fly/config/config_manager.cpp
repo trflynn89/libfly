@@ -31,11 +31,11 @@ ConfigManager::ConfigManager(
     switch (fileType)
     {
     case ConfigFileType::Ini:
-        m_spParser = std::make_shared<IniParser>(path, file);
+        m_spParser = std::make_shared<IniParser>();
         break;
 
     case ConfigFileType::Json:
-        m_spParser = std::make_shared<JsonParser>(path, file);
+        m_spParser = std::make_shared<JsonParser>();
         break;
 
     default:
@@ -117,7 +117,7 @@ bool ConfigManager::DoWork()
     {
         try
         {
-            m_spParser->Parse();
+            m_spParser->Parse(m_path, m_file);
 
             std::lock_guard<std::mutex> lock(m_configsMutex);
 

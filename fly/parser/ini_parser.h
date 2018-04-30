@@ -11,7 +11,7 @@ namespace fly {
 FLY_CLASS_PTRS(IniParser);
 
 /**
- * Implementation of the Parser interface for .ini files.
+ * Implementation of the Parser interface for the .ini format.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 18, 2016
@@ -21,21 +21,18 @@ class IniParser : public Parser
 public:
     /**
      * Constructor.
-     *
-     * @param string Directory containing the file to parse.
-     * @param string Name of the file to parse.
      */
-    IniParser(const std::string &, const std::string &);
+    IniParser();
 
 protected:
     /**
-     * Parse the configured file and store parsed values.
+     * Parse a stream and store the parsed values.
      *
-     * @param ifstream Stream holding the open file.
+     * @param istream Stream holding the contents to parse.
      *
-     * @throws ParserException Thrown if an error occurs parsing the file.
+     * @throws ParserException Thrown if an error occurs parsing the stream.
      */
-    virtual void ParseInternal(std::ifstream &);
+    virtual void ParseInternal(std::istream &);
 
 private:
     /**

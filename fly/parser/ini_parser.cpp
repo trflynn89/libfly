@@ -8,13 +8,12 @@
 namespace fly {
 
 //==============================================================================
-IniParser::IniParser(const std::string &path, const std::string &file) :
-    Parser(path, file)
+IniParser::IniParser() : Parser()
 {
 }
 
 //==============================================================================
-void IniParser::ParseInternal(std::ifstream &stream)
+void IniParser::ParseInternal(std::istream &stream)
 {
     std::string line, section;
 
@@ -37,7 +36,7 @@ void IniParser::ParseInternal(std::ifstream &stream)
         }
         else
         {
-            throw ParserException(m_file, m_line,
+            throw ParserException(m_line,
                 "A section must be defined before name=value pairs"
             );
         }
@@ -52,9 +51,7 @@ std::string IniParser::onSection(const std::string &line)
 
     if (trimValue(section, '\'') || trimValue(section, '\"'))
     {
-        throw ParserException(m_file, m_line,
-            "Section names must not be quoted"
-        );
+        throw ParserException(m_line, "Section names must not be quoted");
     }
 
     return section;
@@ -76,9 +73,7 @@ void IniParser::onValue(const std::string &section, const std::string &line)
 
         if (trimValue(name, '\'') || trimValue(name, '\"'))
         {
-            throw ParserException(m_file, m_line,
-                "Value names must not be quoted"
-            );
+            throw ParserException(m_line, "Value names must not be quoted");
         }
 
         trimValue(value, '\'');
@@ -88,7 +83,7 @@ void IniParser::onValue(const std::string &section, const std::string &line)
     }
     else
     {
-        throw ParserException(m_file, m_line,
+        throw ParserException(m_line,
             "Require name/value pairs of the form name=value"
         );
     }
@@ -114,7 +109,7 @@ bool IniParser::trimValue(std::string &str, char start, char end) const
         }
         else
         {
-            throw ParserException(m_file, m_line, String::Format(
+            throw ParserException(m_line, String::Format(
                 "Imbalanced characters: \"%c\" and \"%c\"", start, end
             ));
         }

@@ -1,5 +1,3 @@
-#include "test/parser/parser_test.h"
-
 #include <sstream>
 #include <vector>
 
@@ -12,12 +10,10 @@
 #include "fly/types/json.h"
 
 //==============================================================================
-class JsonParserTest : public ParserTest
+class JsonParserTest : public ::testing::Test
 {
 public:
-    JsonParserTest() :
-        ParserTest(),
-        m_spParser(std::make_shared<fly::JsonParser>(m_path, m_file))
+    JsonParserTest() : m_spParser(std::make_shared<fly::JsonParser>())
     {
     }
 
@@ -30,9 +26,7 @@ protected:
     void ValidateFailRaw(const std::string &test)
     {
         SCOPED_TRACE(test);
-
-        CreateFile(test);
-        EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+        EXPECT_THROW(m_spParser->Parse(test), fly::ParserException);
     }
 
     void ValidatePass(const std::string &test, const fly::Json &expected)
@@ -43,9 +37,7 @@ protected:
     void ValidatePassRaw(const std::string &test, const std::string &key, const fly::Json &expected)
     {
         SCOPED_TRACE(test);
-
-        CreateFile(test);
-        EXPECT_NO_THROW(m_spParser->Parse());
+        EXPECT_NO_THROW(m_spParser->Parse(test));
 
         fly::Json actual = m_spParser->GetValues();
 
@@ -61,14 +53,13 @@ protected:
         std::stringstream ss;
         ss << actual;
 
-        CreateFile(ss.str());
-        EXPECT_NO_THROW(m_spParser->Parse());
+        EXPECT_NO_THROW(m_spParser->Parse(ss.str()));
 
         fly::Json repeat = m_spParser->GetValues();
         EXPECT_EQ(actual, repeat);
     }
 
-    fly::JsonParserPtr m_spParser;
+    fly::ParserPtr m_spParser;
 };
 
 //==============================================================================
@@ -90,16 +81,15 @@ TEST_F(JsonParserTest, JsonCheckerTest)
 
     for (const std::string &file : files)
     {
-        m_spParser = std::make_shared<fly::JsonParser>(path, file);
         SCOPED_TRACE(file);
 
         if (fly::String::WildcardMatch(file, "pass*.json"))
         {
-            EXPECT_NO_THROW(m_spParser->Parse());
+            EXPECT_NO_THROW(m_spParser->Parse(path, file));
         }
         else if (fly::String::WildcardMatch(file, "fail*.json"))
         {
-            EXPECT_THROW(m_spParser->Parse(), fly::ParserException);
+            EXPECT_THROW(m_spParser->Parse(path, file), fly::ParserException);
         }
         else
         {
@@ -115,8 +105,7 @@ TEST_F(JsonParserTest, JsonTestSuiteTest)
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
     std::string path = fly::Path::Join(segments[0], "json_test_suite");
 
-    m_spParser = std::make_shared<fly::JsonParser>(path, "sample.json");
-    EXPECT_NO_THROW(m_spParser->Parse());
+    EXPECT_NO_THROW(m_spParser->Parse(path, "sample.json"));
 }
 
 //==============================================================================
@@ -125,26 +114,21 @@ TEST_F(JsonParserTest, AllUnicodeTest)
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
     std::string path = fly::Path::Join(segments[0], "unicode");
 
-    m_spParser = std::make_shared<fly::JsonParser>(path, "all_unicode.json");
-    EXPECT_NO_THROW(m_spParser->Parse());
+    EXPECT_NO_THROW(m_spParser->Parse(path, "all_unicode.json"));
     EXPECT_EQ(m_spParser->GetValues().Size(), 1112064);
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, NonExistingPathTest)
 {
-    m_spParser = std::make_shared<fly::JsonParser>(m_path + "foo", m_file);
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse("foo_abc", "abc.json"));
     EXPECT_TRUE(m_spParser->GetValues().IsNull());
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, NonExistingFileTest)
 {
-    m_spParser = std::make_shared<fly::JsonParser>(m_path, m_file + "foo");
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.json"));
     EXPECT_TRUE(m_spParser->GetValues().IsNull());
 }
 
@@ -152,9 +136,8 @@ TEST_F(JsonParserTest, NonExistingFileTest)
 TEST_F(JsonParserTest, EmptyFileTest)
 {
     const std::string contents;
-    CreateFile(contents);
 
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
     EXPECT_TRUE(m_spParser->GetValues().IsNull());
 }
 
@@ -162,9 +145,7 @@ TEST_F(JsonParserTest, EmptyFileTest)
 TEST_F(JsonParserTest, EmptyObjectTest)
 {
     const std::string contents("{}");
-    CreateFile(contents);
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
 
     fly::Json json = m_spParser->GetValues();
     EXPECT_TRUE(json.IsObject());
@@ -175,9 +156,7 @@ TEST_F(JsonParserTest, EmptyObjectTest)
 TEST_F(JsonParserTest, EmptyArrayTest)
 {
     const std::string contents("[]");
-    CreateFile(contents);
-
-    ASSERT_NO_THROW(m_spParser->Parse());
+    ASSERT_NO_THROW(m_spParser->Parse(contents));
 
     fly::Json json = m_spParser->GetValues();
     EXPECT_TRUE(json.IsArray());
@@ -189,9 +168,7 @@ TEST_F(JsonParserTest, EmptyNestedObjectArrayTest)
 {
     {
         const std::string contents("[{}]");
-        CreateFile(contents);
-
-        ASSERT_NO_THROW(m_spParser->Parse());
+        ASSERT_NO_THROW(m_spParser->Parse(contents));
 
         fly::Json json = m_spParser->GetValues();
         EXPECT_TRUE(json.IsArray());
@@ -203,9 +180,7 @@ TEST_F(JsonParserTest, EmptyNestedObjectArrayTest)
     }
     {
         const std::string contents("[[]]");
-        CreateFile(contents);
-
-        ASSERT_NO_THROW(m_spParser->Parse());
+        ASSERT_NO_THROW(m_spParser->Parse(contents));
 
         fly::Json json = m_spParser->GetValues();
         EXPECT_TRUE(json.IsArray());
@@ -222,9 +197,7 @@ TEST_F(JsonParserTest, EmptyStringTest)
 {
     {
         const std::string contents("{\"a\" : \"\" }");
-        CreateFile(contents);
-
-        ASSERT_NO_THROW(m_spParser->Parse());
+        ASSERT_NO_THROW(m_spParser->Parse(contents));
 
         fly::Json json = m_spParser->GetValues("a");
         EXPECT_TRUE(json.IsString());
@@ -233,9 +206,7 @@ TEST_F(JsonParserTest, EmptyStringTest)
     }
     {
         const std::string contents("{\"\" : \"a\" }");
-        CreateFile(contents);
-
-        ASSERT_NO_THROW(m_spParser->Parse());
+        ASSERT_NO_THROW(m_spParser->Parse(contents));
 
         fly::Json json = m_spParser->GetValues("");
         EXPECT_TRUE(json.IsString());
@@ -244,9 +215,7 @@ TEST_F(JsonParserTest, EmptyStringTest)
     }
     {
         const std::string contents("{\"\" : \"\" }");
-        CreateFile(contents);
-
-        ASSERT_NO_THROW(m_spParser->Parse());
+        ASSERT_NO_THROW(m_spParser->Parse(contents));
 
         fly::Json json = m_spParser->GetValues("");
         EXPECT_TRUE(json.IsString());

@@ -6,7 +6,7 @@
 namespace fly {
 
 /**
- * Exception to be raised if an error was encountered parsing a file.
+ * Exception to be raised if an error was encountered while parsing.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version April 21, 2018
@@ -17,21 +17,19 @@ public:
     /**
      * Constructor.
      *
-     * @param string Name of the file failed to parse parse.
-     * @param int Line number in file where error was encountered.
+     * @param int Line number where error was encountered.
      * @param string Message indicating what error was encountered.
      */
-    ParserException(const std::string &, int, const std::string &);
+    ParserException(int, const std::string &);
 
     /**
      * Constructor.
      *
-     * @param string Name of the file failed to parse parse.
-     * @param int Line number in file where error was encountered.
+     * @param int Line number where error was encountered.
      * @param int Column number in line where error was encountered.
      * @param string Message indicating what error was encountered.
      */
-    ParserException(const std::string &, int, int, const std::string &);
+    ParserException(int, int, const std::string &);
 
     /**
      * @return A C-string representing this exception.
@@ -43,8 +41,7 @@ private:
 };
 
 /**
- * Exception to be raised if an unexpected character was encountered parsing a
- * file.
+ * Exception to be raised if an unexpected character was encountered.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version April 21, 2018
@@ -55,12 +52,11 @@ public:
     /**
      * Constructor.
      *
-     * @param string Name of the file failed to parse parse.
-     * @param int Line number in file where error was encountered.
+     * @param int Line number where error was encountered.
      * @param int Column number in line where error was encountered.
      * @param int Unexpected character code.
      */
-    UnexpectedCharacterException(const std::string &, int, int, int);
+    UnexpectedCharacterException(int, int, int);
 };
 
 /**
@@ -75,12 +71,11 @@ public:
     /**
      * Constructor.
      *
-     * @param string Name of the file failed to parse parse.
-     * @param int Line number in file where error was encountered.
+     * @param int Line number where error was encountered.
      * @param int Column number in line where error was encountered.
      * @param string The unconvertable value.
      */
-    BadConversionException(const std::string &, int, int, const std::string &);
+    BadConversionException(int, int, const std::string &);
 };
 
 }
