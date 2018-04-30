@@ -1,7 +1,6 @@
 #pragma once
 
 #include <istream>
-#include <shared_mutex>
 #include <string>
 
 #include "fly/fly.h"
@@ -27,58 +26,40 @@ public:
     Parser();
 
     /**
-     * Parse a string and store parsed values.
+     * Parse a string and retrieve parsed values.
      *
      * @param string String contents to parse.
      *
+     * @return Json The parsed values.
+     *
      * @throws ParserException Thrown if an error occurs parsing the string.
      */
-    void Parse(const std::string &);
+    Json Parse(const std::string &);
 
     /**
-     * Parse a file and store parsed values.
+     * Parse a file and retrieve parsed values.
      *
      * @param string Directory containing the file to parse.
      * @param string Name of the file to parse.
      *
+     * @return Json The parsed values.
+     *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    void Parse(const std::string &, const std::string &);
-
-    /**
-     * Get the entire set of parsed values, stored as a JSON object.
-     *
-     * @return Json The parsed values.
-     */
-    Json GetValues() const;
-
-    /**
-     * Try to get a sub-object from the set of parsed values. If the given
-     * key doesn't exist, returns a NULL JSON object.
-     *
-     * @param string The key to retrieve.
-     *
-     * @return The parsed values.
-     */
-    Json GetValues(const std::string &) const;
+    Json Parse(const std::string &, const std::string &);
 
 protected:
     /**
-     * Parse a stream and store the parsed values.
+     * Parse a stream and retrieve the parsed values.
      *
      * @param istream Stream holding the contents to parse.
      *
      * @throws ParserException Thrown if an error occurs parsing the stream.
      */
-    virtual void ParseInternal(std::istream &) = 0;
-
-    Json m_values;
+    virtual Json ParseInternal(std::istream &) = 0;
 
     int m_line;
     int m_column;
-
-private:
-    mutable std::shared_timed_mutex m_valuesMutex;
 };
 
 }

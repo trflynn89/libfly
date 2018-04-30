@@ -5,6 +5,7 @@
 
 #include "fly/fly.h"
 #include "fly/parser/parser.h"
+#include "fly/types/json.h"
 
 namespace fly {
 
@@ -26,13 +27,15 @@ public:
 
 protected:
     /**
-     * Parse a stream and store the parsed values.
+     * Parse a stream and retrieve the parsed values.
      *
      * @param istream Stream holding the contents to parse.
      *
+     * @return Json The parsed values.
+     *
      * @throws ParserException Thrown if an error occurs parsing the stream.
      */
-    virtual void ParseInternal(std::istream &);
+    virtual Json ParseInternal(std::istream &);
 
 private:
     /**
@@ -47,10 +50,10 @@ private:
     /**
      * Parse a line containing a name/value pair.
      *
-     * @param string Section containing the pair.
+     * @param Json Section containing the pair.
      * @param string Line containing the pair.
      */
-    void onValue(const std::string &, const std::string &);
+    void onValue(Json &, const std::string &);
 
     /**
      * If the given string begins and ends with the given character, remove that

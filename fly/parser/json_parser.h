@@ -6,6 +6,7 @@
 
 #include "fly/fly.h"
 #include "fly/parser/parser.h"
+#include "fly/types/json.h"
 
 namespace fly {
 
@@ -57,15 +58,17 @@ public:
 
 protected:
     /**
-     * Parse a stream and store the parsed values.
+     * Parse a stream and retrieve the parsed values.
      *
      * @param istream Stream holding the contents to parse.
+     *
+     * @return Json The parsed values.
      *
      * @throws ParserException If an error occurs parsing the stream.
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
      * @throws BadConversionException If a parsed object was invalid.
      */
-    virtual void ParseInternal(std::istream &);
+    virtual Json ParseInternal(std::istream &);
 
 private:
     /**

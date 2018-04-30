@@ -36,10 +36,10 @@ protected:
 
     void ValidatePassRaw(const std::string &test, const std::string &key, const fly::Json &expected)
     {
-        SCOPED_TRACE(test);
-        EXPECT_NO_THROW(m_spParser->Parse(test));
+        fly::Json actual, repeat;
 
-        fly::Json actual = m_spParser->GetValues();
+        SCOPED_TRACE(test);
+        EXPECT_NO_THROW(actual = m_spParser->Parse(test));
 
         if (expected.IsFloat())
         {
@@ -53,9 +53,7 @@ protected:
         std::stringstream ss;
         ss << actual;
 
-        EXPECT_NO_THROW(m_spParser->Parse(ss.str()));
-
-        fly::Json repeat = m_spParser->GetValues();
+        EXPECT_NO_THROW(repeat = m_spParser->Parse(ss.str()));
         EXPECT_EQ(actual, repeat);
     }
 
@@ -113,114 +111,117 @@ TEST_F(JsonParserTest, AllUnicodeTest)
 {
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
     std::string path = fly::Path::Join(segments[0], "unicode");
+    fly::Json values;
 
-    EXPECT_NO_THROW(m_spParser->Parse(path, "all_unicode.json"));
-    EXPECT_EQ(m_spParser->GetValues().Size(), 1112064);
+    EXPECT_NO_THROW(values = m_spParser->Parse(path, "all_unicode.json"));
+    EXPECT_EQ(values.Size(), 1112064);
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, NonExistingPathTest)
 {
+    fly::Json values;
+
     ASSERT_NO_THROW(m_spParser->Parse("foo_abc", "abc.json"));
-    EXPECT_TRUE(m_spParser->GetValues().IsNull());
+    EXPECT_TRUE(values.IsNull());
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, NonExistingFileTest)
 {
+    fly::Json values;
+
     ASSERT_NO_THROW(m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.json"));
-    EXPECT_TRUE(m_spParser->GetValues().IsNull());
+    EXPECT_TRUE(values.IsNull());
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, EmptyFileTest)
 {
     const std::string contents;
+    fly::Json values;
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
-    EXPECT_TRUE(m_spParser->GetValues().IsNull());
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
+    EXPECT_TRUE(values.IsNull());
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, EmptyObjectTest)
 {
     const std::string contents("{}");
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
+    fly::Json values;
 
-    fly::Json json = m_spParser->GetValues();
-    EXPECT_TRUE(json.IsObject());
-    EXPECT_EQ(json.Size(), 0);
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
+    EXPECT_TRUE(values.IsObject());
+    EXPECT_EQ(values.Size(), 0);
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, EmptyArrayTest)
 {
     const std::string contents("[]");
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
+    fly::Json values;
 
-    fly::Json json = m_spParser->GetValues();
-    EXPECT_TRUE(json.IsArray());
-    EXPECT_EQ(json.Size(), 0);
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
+    EXPECT_TRUE(values.IsArray());
+    EXPECT_EQ(values.Size(), 0);
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, EmptyNestedObjectArrayTest)
 {
+    fly::Json values;
     {
         const std::string contents("[{}]");
-        ASSERT_NO_THROW(m_spParser->Parse(contents));
+        ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-        fly::Json json = m_spParser->GetValues();
-        EXPECT_TRUE(json.IsArray());
-        EXPECT_EQ(json.Size(), 1);
+        EXPECT_TRUE(values.IsArray());
+        EXPECT_EQ(values.Size(), 1);
 
-        json = json[0];
-        EXPECT_TRUE(json.IsObject());
-        EXPECT_EQ(json.Size(), 0);
+        values = values[0];
+        EXPECT_TRUE(values.IsObject());
+        EXPECT_EQ(values.Size(), 0);
     }
     {
         const std::string contents("[[]]");
-        ASSERT_NO_THROW(m_spParser->Parse(contents));
+        ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-        fly::Json json = m_spParser->GetValues();
-        EXPECT_TRUE(json.IsArray());
-        EXPECT_EQ(json.Size(), 1);
+        EXPECT_TRUE(values.IsArray());
+        EXPECT_EQ(values.Size(), 1);
 
-        json = json[0];
-        EXPECT_TRUE(json.IsArray());
-        EXPECT_EQ(json.Size(), 0);
+        values = values[0];
+        EXPECT_TRUE(values.IsArray());
+        EXPECT_EQ(values.Size(), 0);
     }
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, EmptyStringTest)
 {
+    fly::Json values;
     {
         const std::string contents("{\"a\" : \"\" }");
-        ASSERT_NO_THROW(m_spParser->Parse(contents));
+        ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-        fly::Json json = m_spParser->GetValues("a");
-        EXPECT_TRUE(json.IsString());
-        EXPECT_EQ(json.Size(), 0);
-        EXPECT_EQ(json, "");
+        EXPECT_TRUE(values["a"].IsString());
+        EXPECT_EQ(values["a"].Size(), 0);
+        EXPECT_EQ(values["a"], "");
     }
     {
         const std::string contents("{\"\" : \"a\" }");
-        ASSERT_NO_THROW(m_spParser->Parse(contents));
+        ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-        fly::Json json = m_spParser->GetValues("");
-        EXPECT_TRUE(json.IsString());
-        EXPECT_EQ(json.Size(), 1);
-        EXPECT_EQ(json, "a");
+        EXPECT_TRUE(values[""].IsString());
+        EXPECT_EQ(values[""].Size(), 1);
+        EXPECT_EQ(values[""], "a");
     }
     {
         const std::string contents("{\"\" : \"\" }");
-        ASSERT_NO_THROW(m_spParser->Parse(contents));
+        ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-        fly::Json json = m_spParser->GetValues("");
-        EXPECT_TRUE(json.IsString());
-        EXPECT_EQ(json.Size(), 0);
-        EXPECT_EQ(json, "");
+        EXPECT_TRUE(values[""].IsString());
+        EXPECT_EQ(values[""].Size(), 0);
+        EXPECT_EQ(values[""], "");
     }
 }
 

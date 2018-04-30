@@ -12,6 +12,7 @@
 #include "fly/logger/logger.h"
 #include "fly/parser/parser.h"
 #include "fly/task/runner.h"
+#include "fly/types/json.h"
 
 namespace fly {
 
@@ -99,6 +100,7 @@ protected:
 private:
     PathMonitorPtr m_spMonitor;
     ParserPtr m_spParser;
+    Json m_values;
 
     const std::string m_path;
     const std::string m_file;
@@ -144,7 +146,7 @@ std::shared_ptr<T> ConfigManager::CreateConfig()
 
     if (spConfig)
     {
-        spConfig->Update(m_spParser->GetValues(name));
+        spConfig->Update(m_values[name]);
     }
     else
     {

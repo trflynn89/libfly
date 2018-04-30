@@ -291,3 +291,25 @@ TEST_F(ConfigManagerTest, BadUpdateTest)
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");
 }
+
+//==============================================================================
+TEST_F(ConfigManagerTest, BadObjectTest)
+{
+    m_spConfigManager->Stop();
+
+    m_spConfigManager = std::make_shared<fly::ConfigManager>(
+        fly::ConfigManager::ConfigFileType::Json, m_path, m_file
+    );
+
+    EXPECT_TRUE(m_spConfigManager->Start());
+
+    auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
+
+    const std::string contents("[1, 2, 3]");
+
+    CreateFile(contents);
+    std::this_thread::sleep_for(std::chrono::seconds(8));
+
+    EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "");
+    EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");
+}

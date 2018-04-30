@@ -23,12 +23,13 @@ JsonParser::JsonParser() :
 }
 
 //==============================================================================
-void JsonParser::ParseInternal(std::istream &stream)
+Json JsonParser::ParseInternal(std::istream &stream)
 {
     m_states = decltype(m_states)();
     m_states.push(State::NoState);
 
-    m_pValue = &m_values;
+    Json values;
+    m_pValue = &values;
 
     m_pParents = decltype(m_pParents)();
     m_pParents.push(m_pValue);
@@ -92,6 +93,8 @@ void JsonParser::ParseInternal(std::istream &stream)
             "Finished parsing with incomplete JSON object"
         );
     }
+
+    return values;
 }
 
 //==============================================================================

@@ -19,15 +19,17 @@ protected:
 //==============================================================================
 TEST_F(IniParserTest, NonExistingPathTest)
 {
-    ASSERT_NO_THROW(m_spParser->Parse("foo_abc", "abc.ini"));
-    EXPECT_EQ(m_spParser->GetValues().Size(), 0);
+    fly::Json values;
+    ASSERT_NO_THROW(values = m_spParser->Parse("foo_abc", "abc.ini"));
+    EXPECT_EQ(values.Size(), 0);
 }
 
 //==============================================================================
 TEST_F(IniParserTest, NonExistingFileTest)
 {
-    ASSERT_NO_THROW(m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.ini"));
-    EXPECT_EQ(m_spParser->GetValues().Size(), 0);
+    fly::Json values;
+    ASSERT_NO_THROW(values = m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.ini"));
+    EXPECT_EQ(values.Size(), 0);
 }
 
 //==============================================================================
@@ -35,8 +37,9 @@ TEST_F(IniParserTest, EmptyFileTest)
 {
     const std::string contents;
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
-    EXPECT_EQ(m_spParser->GetValues().Size(), 0);
+    fly::Json values;
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
+    EXPECT_EQ(values.Size(), 0);
 }
 
 //==============================================================================
@@ -44,8 +47,9 @@ TEST_F(IniParserTest, EmptySectionTest)
 {
     const std::string contents("[section]");
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
-    EXPECT_EQ(m_spParser->GetValues().Size(), 0);
+    fly::Json values;
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
+    EXPECT_EQ(values.Size(), 0);
 }
 
 //==============================================================================
@@ -57,10 +61,11 @@ TEST_F(IniParserTest, NonEmptySectionTest)
         "address=USA"
     );
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
+    fly::Json values;
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
+    EXPECT_EQ(values.Size(), 1);
+    EXPECT_EQ(values["section"].Size(), 2);
 }
 
 //==============================================================================
@@ -72,11 +77,12 @@ TEST_F(IniParserTest, NonExistingTest)
         "address=USA"
     );
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
+    fly::Json values;
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-    EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
-    EXPECT_EQ(m_spParser->GetValues("bad-section").Size(), 0);
-    EXPECT_EQ(m_spParser->GetValues("section-bad").Size(), 0);
+    EXPECT_EQ(values["section"].Size(), 2);
+    EXPECT_EQ(values["bad-section"].Size(), 0);
+    EXPECT_EQ(values["section-bad"].Size(), 0);
 }
 
 //==============================================================================
@@ -89,11 +95,12 @@ TEST_F(IniParserTest, CommentTest)
         "; name=Jane Doe\n"
     );
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
+    fly::Json values;
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("other-section").Size(), 0);
+    EXPECT_EQ(values.Size(), 1);
+    EXPECT_EQ(values["section"].Size(), 1);
+    EXPECT_EQ(values["other-section"].Size(), 0);
 }
 
 //==============================================================================
@@ -105,10 +112,11 @@ TEST_F(IniParserTest, ErrantSpacesTest)
         "\taddress  = USA\t \r \n"
     );
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
+    fly::Json values;
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
+    EXPECT_EQ(values.Size(), 1);
+    EXPECT_EQ(values["section"].Size(), 2);
 }
 
 //==============================================================================
@@ -120,10 +128,11 @@ TEST_F(IniParserTest, QuotedValueTest)
         "address= \t '\\tUSA'"
     );
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
+    fly::Json values;
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
+    EXPECT_EQ(values.Size(), 1);
+    EXPECT_EQ(values["section"].Size(), 2);
 }
 
 //==============================================================================
@@ -141,12 +150,13 @@ TEST_F(IniParserTest, MutlipleSectionTypeTest)
         "noage=1\n"
     );
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents));
+    fly::Json values;
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-    EXPECT_EQ(m_spParser->GetValues().Size(), 3);
-    EXPECT_EQ(m_spParser->GetValues("section1").Size(), 2);
-    EXPECT_EQ(m_spParser->GetValues("section2").Size(), 2);
-    EXPECT_EQ(m_spParser->GetValues("section3").Size(), 2);
+    EXPECT_EQ(values.Size(), 3);
+    EXPECT_EQ(values["section1"].Size(), 2);
+    EXPECT_EQ(values["section2"].Size(), 2);
+    EXPECT_EQ(values["section3"].Size(), 2);
 }
 
 //==============================================================================
@@ -159,10 +169,11 @@ TEST_F(IniParserTest, DuplicateSectionTest)
         "name=Jane Doe\n"
     );
 
-    EXPECT_NO_THROW(m_spParser->Parse(contents1));
-    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section")["name"], "Jane Doe");
+    fly::Json values;
+    EXPECT_NO_THROW(values = m_spParser->Parse(contents1));
+    EXPECT_EQ(values.Size(), 1);
+    EXPECT_EQ(values["section"].Size(), 1);
+    EXPECT_EQ(values["section"]["name"], "Jane Doe");
 
     const std::string contents2(
         "[  \tsection]\n"
@@ -171,10 +182,10 @@ TEST_F(IniParserTest, DuplicateSectionTest)
         "name=Jane Doe\n"
     );
 
-    EXPECT_NO_THROW(m_spParser->Parse(contents2));
-    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section")["name"], "Jane Doe");
+    EXPECT_NO_THROW(values = m_spParser->Parse(contents2));
+    EXPECT_EQ(values.Size(), 1);
+    EXPECT_EQ(values["section"].Size(), 1);
+    EXPECT_EQ(values["section"]["name"], "Jane Doe");
 }
 
 //==============================================================================
@@ -186,10 +197,11 @@ TEST_F(IniParserTest, DuplicateValueTest)
         "name=Jane Doe\n"
     );
 
-    EXPECT_NO_THROW(m_spParser->Parse(contents));
-    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section")["name"], "Jane Doe");
+    fly::Json values;
+    EXPECT_NO_THROW(values = m_spParser->Parse(contents));
+    EXPECT_EQ(values.Size(), 1);
+    EXPECT_EQ(values["section"].Size(), 1);
+    EXPECT_EQ(values["section"]["name"], "Jane Doe");
 }
 
 //==============================================================================
@@ -302,13 +314,15 @@ TEST_F(IniParserTest, MultipleAssignmentTest)
         "name=\"John=Doe\"\n"
     );
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents1));
-    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
+    fly::Json values;
 
-    ASSERT_NO_THROW(m_spParser->Parse(contents2));
-    EXPECT_EQ(m_spParser->GetValues().Size(), 1);
-    EXPECT_EQ(m_spParser->GetValues("section").Size(), 1);
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents1));
+    EXPECT_EQ(values.Size(), 1);
+    EXPECT_EQ(values["section"].Size(), 1);
+
+    ASSERT_NO_THROW(values = m_spParser->Parse(contents2));
+    EXPECT_EQ(values.Size(), 1);
+    EXPECT_EQ(values["section"].Size(), 1);
 }
 
 //==============================================================================
@@ -360,11 +374,13 @@ TEST_F(IniParserTest, MultipleParseTest)
         "address=USA"
     );
 
+    fly::Json values;
+
     for (int i = 0; i < 5; ++i)
     {
-        ASSERT_NO_THROW(m_spParser->Parse(contents));
+        ASSERT_NO_THROW(values = m_spParser->Parse(contents));
 
-        EXPECT_EQ(m_spParser->GetValues().Size(), 1);
-        EXPECT_EQ(m_spParser->GetValues("section").Size(), 2);
+        EXPECT_EQ(values.Size(), 1);
+        EXPECT_EQ(values["section"].Size(), 2);
     }
 }

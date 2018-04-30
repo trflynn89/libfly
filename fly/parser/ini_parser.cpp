@@ -13,9 +13,10 @@ IniParser::IniParser() : Parser()
 }
 
 //==============================================================================
-void IniParser::ParseInternal(std::istream &stream)
+Json IniParser::ParseInternal(std::istream &stream)
 {
     std::string line, section;
+    Json values;
 
     while (stream.good() && std::getline(stream, line))
     {
@@ -32,7 +33,7 @@ void IniParser::ParseInternal(std::istream &stream)
         }
         else if (!section.empty())
         {
-            onValue(section, line);
+            onValue(values[section], line);
         }
         else
         {
@@ -41,6 +42,8 @@ void IniParser::ParseInternal(std::istream &stream)
             );
         }
     }
+
+    return values;
 }
 
 //==============================================================================
@@ -58,7 +61,7 @@ std::string IniParser::onSection(const std::string &line)
 }
 
 //==============================================================================
-void IniParser::onValue(const std::string &section, const std::string &line)
+void IniParser::onValue(Json &section, const std::string &line)
 {
     static const size_t size = 2;
 
@@ -79,7 +82,7 @@ void IniParser::onValue(const std::string &section, const std::string &line)
         trimValue(value, '\'');
         trimValue(value, '\"');
 
-        m_values[section][name] = value;
+        section[name] = value;
     }
     else
     {

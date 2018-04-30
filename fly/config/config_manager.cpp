@@ -115,19 +115,27 @@ bool ConfigManager::DoWork()
 
     if (m_aFileChanged.compare_exchange_strong(expected, false))
     {
+        std::lock_guard<std::mutex> lock(m_configsMutex);
+
         try
         {
-            m_spParser->Parse(m_path, m_file);
+            m_values = m_spParser->Parse(m_path, m_file);
+        }
+        catch (const ParserException &)
+        {
+            LOGW(-1, "Could not parse file, ignoring update");
+            m_values = nullptr;
+        }
 
-            std::lock_guard<std::mutex> lock(m_configsMutex);
-
+        if (m_values.IsObject() || m_values.IsNull())
+        {
             for (auto it = m_configs.begin(); it != m_configs.end(); )
             {
                 ConfigPtr spConfig = it->second.lock();
 
                 if (spConfig)
                 {
-                    spConfig->Update(m_spParser->GetValues(it->first));
+                    spConfig->Update(m_values[it->first]);
                     ++it;
                 }
                 else
@@ -136,9 +144,10 @@ bool ConfigManager::DoWork()
                 }
             }
         }
-        catch (const ParserException &)
+        else
         {
-            LOGW(-1, "Could not parse file, ignoring update");
+            LOGW(-1, "Parsed non key-value pairs file, ignoring update");
+            m_values = nullptr;
         }
     }
 
