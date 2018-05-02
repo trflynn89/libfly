@@ -171,6 +171,32 @@ TEST_F(ConfigManagerTest, DeletedConfigTest)
 }
 
 //==============================================================================
+TEST_F(ConfigManagerTest, DeletedConfigDetectedByPollerTest)
+{
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
+
+    const std::string contents(
+        "[" + fly::Config::GetName() + "]\n"
+        "name=John Doe\n"
+        "address=USA"
+    );
+
+    CreateFile(contents);
+    std::this_thread::sleep_for(std::chrono::seconds(8));
+
+    {
+        auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
+        EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize + 1);
+
+        EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "John Doe");
+        EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
+    }
+
+    std::this_thread::sleep_for(std::chrono::seconds(8));
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
+}
+
+//==============================================================================
 TEST_F(ConfigManagerTest, BadConfigTypeTest)
 {
     EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
