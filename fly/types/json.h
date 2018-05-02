@@ -92,9 +92,11 @@ public:
      * @tparam T The string-like type.
      *
      * @param T The string-like value.
+     *
+     * @throws JsonException If the string-like value is not valid.
      */
     template <typename T, fly::if_string::enabled<T> = 0>
-    Json(const T &) noexcept;
+    Json(const T &);
 
     /**
      * Object constructor. Intializes the Json instance to an object's values.
@@ -209,16 +211,6 @@ public:
      * Destructor. Delete any memory allocated for the JSON value.
      */
     virtual ~Json() noexcept;
-
-    /**
-     * @return bool True if an error occurred initializing the Json instance.
-     */
-    bool HasValidationError() const;
-
-    /**
-     * @return string The error that occurred initializing the Json instance.
-     */
-    std::string GetValidationError() const;
 
     /**
      * @return bool True if the Json instance is a string.
@@ -387,7 +379,8 @@ public:
      *
      * @param key_type The key value to lookup.
      *
-     * @throws JsonException If the Json instance is neither an object nor null.
+     * @throws JsonException If the Json instance is neither an object nor null,
+     *                       or the key value is invalid.
      *
      * @return Json A reference to the Json instance at the key value.
      */
@@ -401,8 +394,8 @@ public:
      *
      * @param key_type The key value to lookup.
      *
-     * @throws JsonException If the Json instance is not an object or the key
-     *                       value does not exist.
+     * @throws JsonException If the Json instance is not an object, or the key
+     *                       value does not exist, or the key value is invalid.
      *
      * @return Json A reference to the Json instance at the key value.
      */
@@ -741,22 +734,23 @@ private:
 
 //==============================================================================
 template <typename T, fly::if_string::enabled<T>>
-Json::Json(const T &value) noexcept :
+Json::Json(const T &value) :
     m_type(),
     m_value(),
     m_validationError()
 {
     stream_type parsed = validateString(value);
 
-    if (HasValidationError())
-    {
-        m_type = Type::Null;
-        m_value = nullptr;
-    }
-    else
+    if (m_validationError.empty())
     {
         m_type = Type::String;
         m_value = parsed.str();
+    }
+    else
+    {
+        throw JsonException(
+            *this, String::Format("Bad string %s: %s", value, m_validationError)
+        );
     }
 }
 

@@ -120,18 +120,6 @@ Json::~Json() noexcept
 }
 
 //==============================================================================
-bool Json::HasValidationError() const
-{
-    return !m_validationError.empty();
-}
-
-//==============================================================================
-std::string Json::GetValidationError() const
-{
-    return m_validationError;
-}
-
-//==============================================================================
 bool Json::IsString() const
 {
     return (m_type == Type::String);
@@ -239,16 +227,8 @@ Json &Json::operator [] (const typename object_type::key_type &key)
 
     if (IsObject())
     {
-        stream_type parsed = validateString(key);
-
-        if (HasValidationError())
-        {
-            throw JsonException(
-                *this, String::Format("Bad key %s: %s", key, m_validationError)
-            );
-        }
-
-        return (*(m_value.m_pObject))[key];
+        const Json json(key);
+        return (*(m_value.m_pObject))[object_type::key_type(json)];
     }
 
     throw JsonException(
@@ -261,7 +241,8 @@ const Json &Json::operator [] (const typename object_type::key_type &key) const
 {
     if (IsObject())
     {
-        auto it = m_value.m_pObject->find(key);
+        const Json json(key);
+        auto it = m_value.m_pObject->find(object_type::key_type(json));
 
         if (it == m_value.m_pObject->end())
         {

@@ -506,12 +506,6 @@ bool JsonParser::storeValue()
         }
     }
 
-    // Check for failed construction of the parsed type
-    if (m_pValue->HasValidationError())
-    {
-        throw ParserException(m_line, m_column, m_pValue->GetValidationError());
-    }
-
     m_pParents.pop();
     m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
 

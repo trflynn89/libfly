@@ -44,12 +44,9 @@ protected:
 
         fly::Json actual;
 
-        EXPECT_NO_THROW({
+        EXPECT_THROW({
             actual = test;
-        });
-
-        EXPECT_TRUE(actual.HasValidationError());
-        EXPECT_FALSE(actual.GetValidationError().empty());
+        }, fly::JsonException);
     }
 
     void ValidatePass(const std::string &test)
