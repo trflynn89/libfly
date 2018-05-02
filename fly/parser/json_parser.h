@@ -74,6 +74,16 @@ protected:
 
 private:
     /**
+     * Handle a whitespace character.
+     *
+     * @param Token The current parsed token.
+     * @param int The current parsed character.
+     *
+     * @throws UnexpectedCharacterException If a parsed character was unexpected.
+     */
+    void onWhitespace(Token, int);
+
+    /**
      * Handle the start of an object or array.
      *
      * @param Token The current parsed token.
@@ -102,16 +112,6 @@ private:
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
      */
     void onQuotation(int);
-
-    /**
-     * Handle a whitespace character.
-     *
-     * @param Token The current parsed token.
-     * @param int The current parsed character.
-     *
-     * @throws UnexpectedCharacterException If a parsed character was unexpected.
-     */
-    void onWhitespace(Token, int);
 
     /**
      * Handle a colon between name-value pairs.

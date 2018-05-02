@@ -54,6 +54,13 @@ Json JsonParser::ParseInternal(std::istream &stream)
 
             switch (token)
             {
+            case Token::Tab:
+            case Token::NewLine:
+            case Token::CarriageReturn:
+            case Token::Space:
+                onWhitespace(token, c);
+                break;
+
             case Token::StartBrace:
             case Token::StartBracket:
                 onStartBraceOrBracket(token, c);
@@ -66,13 +73,6 @@ Json JsonParser::ParseInternal(std::istream &stream)
 
             case Token::Quote:
                 onQuotation(c);
-                break;
-
-            case Token::Tab:
-            case Token::NewLine:
-            case Token::CarriageReturn:
-            case Token::Space:
-                onWhitespace(token, c);
                 break;
 
             case Token::Comma:
@@ -102,6 +102,33 @@ Json JsonParser::ParseInternal(std::istream &stream)
     }
 
     return values;
+}
+
+//==============================================================================
+void JsonParser::onWhitespace(Token token, int c)
+{
+    if (m_parsingString)
+    {
+        if (token != Token::Space)
+        {
+            throw UnexpectedCharacterException(m_line, m_column, c);
+        }
+
+        pushValue(c);
+    }
+    else
+    {
+        if (m_parsingStarted)
+        {
+            m_parsingComplete = true;
+        }
+
+        if (token == Token::NewLine)
+        {
+            ++m_line;
+            m_column = 0;
+        }
+    }
 }
 
 //==============================================================================
@@ -269,30 +296,6 @@ void JsonParser::onQuotation(int c)
     }
 
     m_parsingString = !m_parsingString;
-}
-
-//==============================================================================
-void JsonParser::onWhitespace(Token token, int c)
-{
-    if (m_parsingString)
-    {
-        if (token != Token::Space)
-        {
-            throw UnexpectedCharacterException(m_line, m_column, c);
-        }
-
-        pushValue(c);
-    }
-    else if (m_parsingStarted)
-    {
-        m_parsingComplete = true;
-    }
-
-    if (token == Token::NewLine)
-    {
-        ++m_line;
-        m_column = 0;
-    }
 }
 
 //==============================================================================
@@ -484,19 +487,14 @@ bool JsonParser::storeValue()
 
         try
         {
-            // Parsed a float
             if (isFloat)
             {
                 *m_pValue = String::Convert<Json::float_type>(value);
             }
-
-            // Parsed a signed integer
             else if (isSigned)
             {
                 *m_pValue = String::Convert<Json::signed_type>(value);
             }
-
-            // Parsed an unsigned integer
             else
             {
                 *m_pValue = String::Convert<Json::unsigned_type>(value);
