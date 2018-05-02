@@ -548,11 +548,7 @@ void JsonParser::validateNumber(
         const std::string::size_type e = signless.find('e');
         const std::string::size_type E = signless.find('E');
 
-        if ((d == 0) || (e == 0) || (E == 0))
-        {
-            throw BadConversionException(m_line, m_column, signless);
-        }
-        else if (d != std::string::npos)
+        if (d != std::string::npos)
         {
             std::string::size_type end = signless.size();
 
