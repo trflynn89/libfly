@@ -65,11 +65,11 @@ TEST_F(JsonParserTest, JsonCheckerTest)
 {
     // Run the parser against test files from http://www.json.org/JSON_checker/
     // The following files are excluded from this test:
-    //      - fail18.json: The parser has no max-depth
+    // - fail18.json: The parser has no max-depth
 
     // Get the path to the JSON checker directory
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
-    std::string path = fly::Path::Join(segments[0], "json_checker");
+    std::string path = fly::Path::Join(segments[0], "json", "json_checker");
 
     // Validate each JSON file in the JSON checker directory
     std::vector<std::string> directories;
@@ -81,11 +81,11 @@ TEST_F(JsonParserTest, JsonCheckerTest)
     {
         SCOPED_TRACE(file);
 
-        if (fly::String::WildcardMatch(file, "pass*.json"))
+        if (fly::String::StartsWith(file, "pass"))
         {
             EXPECT_NO_THROW(m_spParser->Parse(path, file));
         }
-        else if (fly::String::WildcardMatch(file, "fail*.json"))
+        else if (fly::String::StartsWith(file, "fail"))
         {
             EXPECT_THROW(m_spParser->Parse(path, file), fly::ParserException);
         }
@@ -97,20 +97,84 @@ TEST_F(JsonParserTest, JsonCheckerTest)
 }
 
 //==============================================================================
-TEST_F(JsonParserTest, JsonTestSuiteTest)
+TEST_F(JsonParserTest, GoogleJsonTestSuiteTest)
 {
     // https://code.google.com/archive/p/json-test-suite/
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
-    std::string path = fly::Path::Join(segments[0], "json_test_suite");
+    std::string path = fly::Path::Join(segments[0], "json", "google_json_test_suite");
 
     EXPECT_NO_THROW(m_spParser->Parse(path, "sample.json"));
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
+{
+    // Run the parser against test files from https://github.com/nst/JSONTestSuite
+    // The following files are excluded from this test:
+    // - n_single_space.json: Empty files are allowed
+    // - n_structure_100000_opening_arrays.json: Too nested, causes stack overflow
+    // - n_structure_no_data.json: Empty files are allowed
+    // - n_structure_open_array_object.json: Too nested, causes stack overflow
+    // - y_string_space.json: Only allow objects and arrays
+    // - y_structure_lonely_false.json: Only allow objects and arrays
+    // - y_structure_lonely_int.json: Only allow objects and arrays
+    // - y_structure_lonely_negative_real.json: Only allow objects and arrays
+    // - y_structure_lonely_null.json: Only allow objects and arrays
+    // - y_structure_lonely_string.json: Only allow objects and arrays
+    // - y_structure_lonely_true.json: Only allow objects and arrays
+    // - y_structure_string_empty.json: Only allow objects and arrays
+
+    // Get the path to the JSONTestSuite directory
+    std::vector<std::string> segments = fly::Path::Split(__FILE__);
+    std::string path = fly::Path::Join(segments[0], "json", "nst_json_test_suite", "test_parsing");
+
+    // Validate each JSON file in the JSONTestSuite directory
+    std::vector<std::string> directories;
+    std::vector<std::string> files;
+
+    ASSERT_TRUE(fly::Path::ListPath(path, directories, files));
+
+    for (const std::string &file : files)
+    {
+        SCOPED_TRACE(file);
+
+        if (fly::String::StartsWith(file, "y"))
+        {
+            EXPECT_NO_THROW(m_spParser->Parse(path, file));
+        }
+        else if (fly::String::StartsWith(file, "n"))
+        {
+            EXPECT_THROW(m_spParser->Parse(path, file), fly::ParserException);
+        }
+        else if (fly::String::StartsWith(file, "i"))
+        {
+            // TODO figure out indeterminate results
+        }
+    }
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, BigListOfNaughtyStringsTest)
+{
+    // https://github.com/minimaxir/big-list-of-naughty-strings
+    std::vector<std::string> segments = fly::Path::Split(__FILE__);
+    std::string path = fly::Path::Join(segments[0], "json", "big_list_of_naughty_strings");
+    fly::Json values;
+
+    EXPECT_NO_THROW(values = m_spParser->Parse(path, "blns.json"));
+    EXPECT_EQ(values.Size(), 507);
+
+    for (size_t i = 0; i < values.Size(); ++i)
+    {
+        EXPECT_TRUE(values[i].IsString());
+    }
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, AllUnicodeTest)
 {
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
-    std::string path = fly::Path::Join(segments[0], "unicode");
+    std::string path = fly::Path::Join(segments[0], "json", "unicode");
     fly::Json values;
 
     EXPECT_NO_THROW(values = m_spParser->Parse(path, "all_unicode.json"));

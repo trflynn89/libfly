@@ -23,7 +23,9 @@ class JsonParser : public Parser
 {
     enum class Token
     {
+        Tab = 0x09, // \t
         NewLine = 0x0A, // \n
+        CarriageReturn = 0x0D, // \r
         Space = 0x20, // <space>
 
         Quote = 0x22, // "
@@ -74,6 +76,7 @@ private:
     /**
      * Handle the start of an object or array.
      *
+     * @param Token The current parsed token.
      * @param int The current parsed character ({ or [).
      *
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
@@ -83,6 +86,7 @@ private:
     /**
      * Handle the end of an object or array.
      *
+     * @param Token The current parsed token.
      * @param int The current parsed character (} or ]).
      *
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
@@ -100,13 +104,14 @@ private:
     void onQuotation(int);
 
     /**
-     * Handle a new line character.
+     * Handle a whitespace character.
      *
-     * @param int The current parsed character (\n).
+     * @param Token The current parsed token.
+     * @param int The current parsed character.
      *
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
      */
-    void onNewLine(int);
+    void onWhitespace(Token, int);
 
     /**
      * Handle a colon between name-value pairs.
@@ -131,8 +136,9 @@ private:
      * Handle any other character. If the character is a reverse solidus, accept
      * the next character as well.
      *
+     * @param Token The current parsed token.
      * @param int The current parsed character.
-     * @param int The next parsed character (or EOF).
+     * @param istream Stream holding the contents to parse.
      *
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
      */
@@ -146,6 +152,13 @@ private:
     void pushValue(int);
 
     /**
+     * Retrieve and clear the current value of the parsing stream.
+     *
+     * @return string The current value of the parsing stream.
+     */
+    std::string popValue();
+
+    /**
      * Store the current value of the parsing stream as a JSON object. Ensures
      * that the syntax of the value is compliant with http://www.json.org.
      *
@@ -153,7 +166,18 @@ private:
      *
      * @throws BadConversionException If a parsed object was invalid.
      */
-    bool popValue();
+    bool storeValue();
+
+    /**
+     * Validate that a parsed number is compliant with http://www.json.org.
+     *
+     * @param string The parsed number to validate.
+     * @param bool Set to true if the parsed number is a floating point.
+     * @param bool Set to true if the parsed number is signed.
+     *
+     * @throws BadConversionException If a parsed number was invalid.
+     */
+    void validateNumber(const std::string &, bool &, bool &) const;
 
     std::stack<State> m_states;
 
@@ -161,6 +185,9 @@ private:
     std::stack<Json *> m_pParents;
 
     Json::stream_type m_parsing;
+
+    bool m_parsingStarted;
+    bool m_parsingComplete;
     bool m_parsingString;
     bool m_parsedString;
     bool m_expectingValue;
