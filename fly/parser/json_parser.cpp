@@ -538,7 +538,7 @@ void JsonParser::validateNumber(
         return (
             (signless.size() > 1) &&
             (signless[0] == '0') &&
-            std::isdigit(signless[1])
+            std::isdigit((unsigned char)(signless[1]))
         );
     };
 
@@ -572,7 +572,7 @@ void JsonParser::validateNumber(
         return ((e != std::string::npos) || (E != std::string::npos));
     };
 
-    if ((value[0] == '+') || !std::isdigit(signless[0]))
+    if ((value[0] == '+') || !std::isdigit((unsigned char)(signless[0])))
     {
         throw BadConversionException(m_line, m_column, value);
     }
