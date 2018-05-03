@@ -145,13 +145,13 @@ void SocketManager::HandleNewAndClosedSockets(
     {
         const SocketPtr &spSocket = *it;
 
-        auto isSameSocket = [&spSocket](SocketPtr spClosed)
+        auto is_same_socket = [&spSocket](SocketPtr spClosed)
         {
             return (spSocket->GetSocketId() == spClosed->GetSocketId());
         };
 
         m_aioSockets.erase(
-            std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), isSameSocket),
+            std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), is_same_socket),
             m_aioSockets.end()
         );
     }

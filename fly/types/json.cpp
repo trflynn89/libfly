@@ -6,9 +6,6 @@
 
 namespace fly {
 
-#define IS_HIGH_SURROGATE(c) ((c >= 0xD800) && (c <= 0xDBFF))
-#define IS_LOW_SURROGATE(c) ((c >= 0xDC00) && (c <= 0xDFFF))
-
 //==============================================================================
 Json::Json() noexcept :
     m_type(Type::Null),
@@ -77,12 +74,12 @@ Json::Json(const std::initializer_list<Json> &initializer) noexcept :
     m_type(Type::Null),
     m_value()
 {
-    auto isObjectLike = [](const Json &json)
+    auto is_object_like = [](const Json &json)
     {
         return json.IsObjectLike();
     };
 
-    if (std::all_of(initializer.begin(), initializer.end(), isObjectLike))
+    if (std::all_of(initializer.begin(), initializer.end(), is_object_like))
     {
         m_type = Type::Object;
         m_value = object_type();
@@ -599,10 +596,20 @@ void Json::readUnicodeCharacter(
     const string_type::const_iterator &end
 ) const
 {
+    auto is_high_surrogate = [](int c) -> bool
+    {
+        return ((c >= 0xD800) && (c <= 0xDBFF));
+    };
+
+    auto is_low_surrogate = [](int c) -> bool
+    {
+        return ((c >= 0xDC00) && (c <= 0xDFFF));
+    };
+
     const int highSurrogateCodepoint = readUnicodeCodepoint(it, end);
     int codepoint = highSurrogateCodepoint;
 
-    if (IS_HIGH_SURROGATE(highSurrogateCodepoint))
+    if (is_high_surrogate(highSurrogateCodepoint))
     {
         if (
             ((++it == end) || (*it != '\\')) ||
@@ -617,7 +624,7 @@ void Json::readUnicodeCharacter(
 
         const int lowSurrogateCodepoint = readUnicodeCodepoint(it, end);
 
-        if (IS_LOW_SURROGATE(lowSurrogateCodepoint))
+        if (is_low_surrogate(lowSurrogateCodepoint))
         {
             // The formula to convert a surrogate pair to a single codepoint is:
             //
@@ -638,7 +645,7 @@ void Json::readUnicodeCharacter(
             ));
         }
     }
-    else if (IS_LOW_SURROGATE(highSurrogateCodepoint))
+    else if (is_low_surrogate(highSurrogateCodepoint))
     {
         throw JsonException(nullptr, String::Format(
             "Expected high surrogate to preceed low surrogate %x",

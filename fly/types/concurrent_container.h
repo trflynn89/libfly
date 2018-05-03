@@ -114,8 +114,8 @@ bool ConcurrentContainer<T, Container>::Pop(
 {
     std::unique_lock<std::mutex> lock(m_containerMutex);
 
-    auto emptyTest = [&] { return !m_container.empty(); };
-    bool itemPopped = m_pushCondition.wait_for(lock, waitTime, emptyTest);
+    auto empty_test = [&] { return !m_container.empty(); };
+    bool itemPopped = m_pushCondition.wait_for(lock, waitTime, empty_test);
 
     if (itemPopped)
     {

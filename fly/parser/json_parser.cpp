@@ -144,6 +144,7 @@ void JsonParser::onStartBraceOrBracket(Token token, int c)
 
         break;
 
+    case State::ParsingColon:
     case State::ParsingObject:
         throw UnexpectedCharacterException(m_line, m_column, c);
 
@@ -154,9 +155,6 @@ void JsonParser::onStartBraceOrBracket(Token token, int c)
         m_pParents.push(m_pValue);
 
         break;
-
-    case State::ParsingColon:
-        throw UnexpectedCharacterException(m_line, m_column, c);
 
     case State::ParsingName:
     case State::ParsingValue:
@@ -392,25 +390,18 @@ void JsonParser::onCharacter(Token token, int c, std::istream &stream)
 
     case State::ParsingValue:
     case State::ParsingName:
-        if (m_parsingString)
-        {
-            pushValue(c);
+        pushValue(c);
 
-            // Blindly ignore the escaped character, the Json class will check
-            // whether it is valid. Just read at least one more character to
-            // prevent the parser from failing if the next character is a quote.
-            if (token == Token::ReverseSolidus)
+        // Blindly ignore the escaped character, the Json class will check
+        // whether it is valid. Just read at least one more character to prevent
+        // the parser from failing if the next character is a quote.
+        if (m_parsingString && (token == Token::ReverseSolidus))
+        {
+            if ((c = stream.get()) == EOF)
             {
-                if ((c = stream.get()) == EOF)
-                {
-                    throw UnexpectedCharacterException(m_line, m_column, c);
-                }
-
-                pushValue(c);
+                throw UnexpectedCharacterException(m_line, m_column, c);
             }
-        }
-        else
-        {
+
             pushValue(c);
         }
 
@@ -560,7 +551,7 @@ void JsonParser::validateNumber(
         return ((e != std::string::npos) || (E != std::string::npos));
     };
 
-    if ((value[0] == '+') || !std::isdigit((unsigned char)(signless[0])))
+    if (!std::isdigit((unsigned char)(signless[0])))
     {
         throw BadConversionException(m_line, m_column, value);
     }
