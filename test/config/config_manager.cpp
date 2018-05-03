@@ -182,7 +182,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPollerTest)
     );
 
     CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     {
         auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
@@ -192,7 +192,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPollerTest)
         EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
     EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
 }
 
@@ -219,7 +219,7 @@ TEST_F(ConfigManagerTest, InitialFileFirstTest)
     );
 
     CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
 
@@ -239,7 +239,7 @@ TEST_F(ConfigManagerTest, InitialFileSecondTest)
     );
 
     CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "John Doe");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
@@ -257,7 +257,7 @@ TEST_F(ConfigManagerTest, FileChangeTest)
     );
 
     CreateFile(contents1);
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "John Doe");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
@@ -270,7 +270,7 @@ TEST_F(ConfigManagerTest, FileChangeTest)
     );
 
     CreateFile(contents2);
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "Jane Doe");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");
@@ -289,13 +289,13 @@ TEST_F(ConfigManagerTest, DeleteFileTest)
     );
 
     CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "John Doe");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
 
     std::remove(GetFullPath().c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");
@@ -312,7 +312,7 @@ TEST_F(ConfigManagerTest, BadUpdateTest)
     );
 
     CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");
@@ -334,7 +334,7 @@ TEST_F(ConfigManagerTest, BadObjectTest)
     const std::string contents("[1, 2, 3]");
 
     CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    std::this_thread::sleep_for(std::chrono::seconds(8));
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");

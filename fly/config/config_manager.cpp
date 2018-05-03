@@ -14,7 +14,7 @@ namespace fly {
 namespace
 {
     // TODO make configurable
-    static const std::chrono::milliseconds s_delay(2000);
+    static const std::chrono::milliseconds s_delay(5000);
 }
 
 //==============================================================================
