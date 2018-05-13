@@ -144,15 +144,15 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
     {
         SCOPED_TRACE(file);
 
-        if (fly::String::StartsWith(file, "y"))
+        if (fly::String::StartsWith(file, 'y'))
         {
             EXPECT_NO_THROW(m_spParser->Parse(path, file));
         }
-        else if (fly::String::StartsWith(file, "n"))
+        else if (fly::String::StartsWith(file, 'n'))
         {
             EXPECT_THROW(m_spParser->Parse(path, file), fly::ParserException);
         }
-        else if (fly::String::StartsWith(file, "i"))
+        else if (fly::String::StartsWith(file, 'i'))
         {
             if (std::find(iPass.begin(), iPass.end(), file) != iPass.end())
             {
@@ -162,6 +162,10 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
             {
                 EXPECT_THROW(m_spParser->Parse(path, file), fly::ParserException);
             }
+        }
+        else
+        {
+            FAIL() << "Unrecognized JSON file: " << file;
         }
     }
 }
