@@ -115,6 +115,7 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
     // - n_structure_100000_opening_arrays.json: Too nested, causes stack overflow
     // - n_structure_no_data.json: Empty files are allowed
     // - n_structure_open_array_object.json: Too nested, causes stack overflow
+    // - n_structure_UTF8_BOM_no_data.json: Empty files are allowed
     // - y_string_space.json: Only allow objects and arrays
     // - y_structure_lonely_false.json: Only allow objects and arrays
     // - y_structure_lonely_int.json: Only allow objects and arrays
@@ -123,11 +124,12 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
     // - y_structure_lonely_string.json: Only allow objects and arrays
     // - y_structure_lonely_true.json: Only allow objects and arrays
     // - y_structure_string_empty.json: Only allow objects and arrays
+    // - i_number_double_huge_neg_exp.json: Depends on platform (fails on Windows)
 
     // Indeterminate files expected to pass
     std::vector<std::string> iPass = {
-        "i_number_double_huge_neg_exp.json",
-        "i_structure_500_nested_arrays.json"
+        "i_structure_500_nested_arrays.json", // No enforced depth limit
+        "i_structure_UTF-8_BOM_empty_object.json", // Byte order mark ignored
     };
 
     // Get the path to the JSONTestSuite directory

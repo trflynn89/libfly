@@ -60,6 +60,15 @@ protected:
 
     int m_line;
     int m_column;
+
+private:
+    /**
+     * Before passing a stream to the parser implementation, discard any byte
+     * order marks (supports UTF-8, UTF-16, and UTF-32).
+     *
+     * @param istream Stream holding the contents to parse.
+     */
+    void consumeByteOrderMark(std::istream &);
 };
 
 }
