@@ -124,6 +124,12 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
     // - y_structure_lonely_true.json: Only allow objects and arrays
     // - y_structure_string_empty.json: Only allow objects and arrays
 
+    // Indeterminate files expected to pass
+    std::vector<std::string> iPass = {
+        "i_number_double_huge_neg_exp.json",
+        "i_structure_500_nested_arrays.json"
+    };
+
     // Get the path to the JSONTestSuite directory
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
     std::string path = fly::Path::Join(segments[0], "json", "nst_json_test_suite", "test_parsing");
@@ -148,7 +154,14 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
         }
         else if (fly::String::StartsWith(file, "i"))
         {
-            // TODO figure out indeterminate results
+            if (std::find(iPass.begin(), iPass.end(), file) != iPass.end())
+            {
+                EXPECT_NO_THROW(m_spParser->Parse(path, file));
+            }
+            else
+            {
+                EXPECT_THROW(m_spParser->Parse(path, file), fly::ParserException);
+            }
         }
     }
 }
