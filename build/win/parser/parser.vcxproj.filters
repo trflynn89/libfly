@@ -4,5 +4,6 @@
     <ClCompile Include="..\..\..\test\parser\exceptions.cpp" />
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\test\parser\json_parser.cpp" />
+    <ClCompile Include="..\..\..\test\parser\parser.cpp" />
   </ItemGroup>
 </Project>

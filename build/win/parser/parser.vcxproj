@@ -185,6 +185,7 @@
     <ClCompile Include="..\..\..\test\parser\exceptions.cpp" />
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\test\parser\json_parser.cpp" />
+    <ClCompile Include="..\..\..\test\parser\parser.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
