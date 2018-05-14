@@ -134,7 +134,7 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
 
     // Get the path to the JSONTestSuite directory
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
-    std::string path = fly::Path::Join(segments[0], "json", "nst_json_test_suite", "test_parsing");
+    std::string path = fly::Path::Join(segments[0], "json", "nst_json_test_suite");
 
     // Validate each JSON file in the JSONTestSuite directory
     std::vector<std::string> directories;
