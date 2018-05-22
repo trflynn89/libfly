@@ -17,6 +17,7 @@ FLY_CLASS_PTRS(ConfigManager);
 FLY_CLASS_PTRS(Socket);
 FLY_CLASS_PTRS(SocketConfig);
 FLY_CLASS_PTRS(SocketManager);
+enum class Protocol;
 
 /**
  * Class to manage the creation of sockets and IO operations over asynchronous
@@ -59,34 +60,23 @@ public:
     void ClearClientCallbacks();
 
     /**
-     * Create and initialize a synchronous TCP socket.
+     * Create and initialize a synchronous socket.
+     *
+     * @param Protocol The communication protocol of the socket.
      *
      * @return Shared pointer to the socket.
      */
-    SocketPtr CreateTcpSocket();
+    SocketPtr CreateSocket(Protocol);
 
     /**
-     * Create and initialize an asynchronous TCP socket. The socket manager
-     * will own this socket.
+     * Create and initialize an asynchronous socket. The socket manager will own
+     * this socket.
+     *
+     * @param Protocol The communication protocol of the socket.
      *
      * @return Weak pointer to the socket.
      */
-    SocketWPtr CreateAsyncTcpSocket();
-
-    /**
-     * Create and initialize a synchronous UDP socket.
-     *
-     * @return Shared pointer to the socket.
-     */
-    SocketPtr CreateUdpSocket();
-
-    /**
-     * Create and initialize an asynchronous UDP socket. The socket manager
-     * will own this socket.
-     *
-     * @return Weak pointer to the socket.
-     */
-    SocketWPtr CreateAsyncUdpSocket();
+    SocketWPtr CreateAsyncSocket(Protocol);
 
     /**
      * Wait for an asynchronous read to complete.

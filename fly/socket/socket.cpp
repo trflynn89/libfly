@@ -20,7 +20,7 @@ Socket::Socket(Protocol protocol, const SocketConfigPtr &spConfig) :
     m_clientPort(-1),
     m_isAsync(false),
     m_isListening(false),
-    m_aConnectedState(Socket::ConnectedState::Disconnected),
+    m_aConnectedState(ConnectedState::Disconnected),
     m_socketId(s_aNumSockets.fetch_add(1))
 {
 }
@@ -70,13 +70,13 @@ int Socket::GetSocketId() const
 //==============================================================================
 bool Socket::IsTcp() const
 {
-    return (m_protocol == Socket::Protocol::TCP);
+    return (m_protocol == Protocol::TCP);
 }
 
 //==============================================================================
 bool Socket::IsUdp() const
 {
-    return (m_protocol == Socket::Protocol::UDP);
+    return (m_protocol == Protocol::UDP);
 }
 
 //==============================================================================
@@ -94,31 +94,31 @@ bool Socket::IsListening() const
 //==============================================================================
 bool Socket::IsConnecting() const
 {
-    return (m_aConnectedState.load() == Socket::ConnectedState::Connecting);
+    return (m_aConnectedState.load() == ConnectedState::Connecting);
 }
 
 //==============================================================================
 bool Socket::IsConnected() const
 {
-    return (m_aConnectedState.load() == Socket::ConnectedState::Connected);
+    return (m_aConnectedState.load() == ConnectedState::Connected);
 }
 
 //==============================================================================
-Socket::ConnectedState Socket::ConnectAsync(std::string hostname, int port)
+ConnectedState Socket::ConnectAsync(std::string hostname, int port)
 {
-    Socket::ConnectedState state = Socket::ConnectedState::Disconnected;
+    ConnectedState state = ConnectedState::Disconnected;
 
     if (IsTcp() && IsAsync())
     {
         if (Connect(hostname, port))
         {
             LOGD(m_socketId, "Connected to %s:%d", hostname, port);
-            state = Socket::ConnectedState::Connected;
+            state = ConnectedState::Connected;
         }
         else if (IsConnecting())
         {
             LOGD(m_socketId, "Connect to %s:%d in progress", hostname, port);
-            state = Socket::ConnectedState::Connecting;
+            state = ConnectedState::Connecting;
         }
         else
         {
@@ -138,12 +138,13 @@ bool Socket::FinishConnect()
     if (IsValid() & IsConnecting() && IsErrorFree())
     {
         LOGD(m_socketId, "Connection completed");
-        m_aConnectedState.store(Socket::ConnectedState::Connected);
+        m_aConnectedState.store(ConnectedState::Connected);
     }
     else
     {
         LOGW(m_socketId, "Could not connect, closing socket");
-        m_aConnectedState.store(Socket::ConnectedState::Disconnected);
+        m_aConnectedState.store(ConnectedState::Disconnected);
+
         Close();
     }
 
@@ -197,16 +198,17 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
             const std::string &msg = request.GetRequestRemaining();
             size_t bytesSent = 0;
 
-            if (IsTcp())
+            switch (m_protocol)
             {
+            case Protocol::TCP:
                 bytesSent = Send(msg, wouldBlock);
-            }
-            else if (IsUdp())
-            {
-                const std::string &hostname = request.GetHostname();
-                int port = request.GetPort();
+                break;
 
-                bytesSent = SendTo(msg, hostname, port, wouldBlock);
+            case Protocol::UDP:
+                bytesSent = SendTo(
+                    msg, request.GetHostname(), request.GetPort(), wouldBlock
+                );
+                break;
             }
 
             if (bytesSent == msg.length())
@@ -241,13 +243,15 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
     {
         std::string received;
 
-        if (IsTcp())
+        switch (m_protocol)
         {
+        case Protocol::TCP:
             received = Recv(wouldBlock, isComplete);
-        }
-        else if (IsUdp())
-        {
+            break;
+
+        case Protocol::UDP:
             received = RecvFrom(wouldBlock, isComplete);
+            break;
         }
 
         if ((received.length() > 0) || isComplete)

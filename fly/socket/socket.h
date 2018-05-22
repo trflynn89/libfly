@@ -15,6 +15,25 @@ FLY_CLASS_PTRS(Socket);
 FLY_CLASS_PTRS(SocketConfig);
 
 /**
+ * Types of supported sockets.
+ */
+enum class Protocol
+{
+    TCP,
+    UDP
+};
+
+/**
+ * Enumerated connection state values.
+ */
+enum class ConnectedState
+{
+    Disconnected,
+    Connecting,
+    Connected
+};
+
+/**
  * Virtual interface to represent a network socket. This interface is platform
  * independent - OS dependent implementations should inherit from this class.
  *
@@ -24,25 +43,6 @@ FLY_CLASS_PTRS(SocketConfig);
 class Socket
 {
 public:
-    /**
-     * Types of supported sockets.
-     */
-    enum class Protocol
-    {
-        TCP,
-        UDP
-    };
-
-    /**
-     * Enumerated connection state values.
-     */
-    enum class ConnectedState
-    {
-        Disconnected,
-        Connecting,
-        Connected
-    };
-
     /**
      * Default constructor to initialize all values.
      */
@@ -183,7 +183,7 @@ public:
      *
      * @return The connection state (not connected, connecting, or connected).
      */
-    Socket::ConnectedState ConnectAsync(std::string, int);
+    ConnectedState ConnectAsync(std::string, int);
 
     /**
      * After an asynchronous socket in a connecting state becomes available for
@@ -336,7 +336,7 @@ protected:
     bool m_isListening;
 
     // Whether this socket is not connected, connecting, or connected to a server
-    std::atomic<Socket::ConnectedState> m_aConnectedState;
+    std::atomic<ConnectedState> m_aConnectedState;
 
 private:
     static std::atomic_int s_aNumSockets;

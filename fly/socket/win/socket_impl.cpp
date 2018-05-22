@@ -38,16 +38,18 @@ namespace
 }
 
 //==============================================================================
-SocketImpl::SocketImpl(Socket::Protocol protocol, const SocketConfigPtr &spConfig) :
+SocketImpl::SocketImpl(Protocol protocol, const SocketConfigPtr &spConfig) :
     Socket(protocol, spConfig)
 {
-    if (IsTcp())
+    switch (m_protocol)
     {
+    case Protocol::TCP:
         m_socketHandle = ::socket(AF_INET, SOCK_STREAM, 0);
-    }
-    else if (IsUdp())
-    {
+        break;
+
+    case Protocol::UDP:
         m_socketHandle = ::socket(AF_INET, SOCK_DGRAM, 0);
+        break;
     }
 }
 
@@ -168,27 +170,25 @@ bool SocketImpl::Connect(const std::string &hostname, int port)
 
         if ((error == WSAEWOULDBLOCK) || (error == WSAEINPROGRESS))
         {
-            m_aConnectedState.store(Socket::ConnectedState::Connecting);
+            m_aConnectedState.store(ConnectedState::Connecting);
         }
 
         return false;
     }
 
-    m_aConnectedState.store(Socket::ConnectedState::Connected);
+    m_aConnectedState.store(ConnectedState::Connected);
     return true;
 }
 
 //==============================================================================
 SocketPtr SocketImpl::Accept() const
 {
-    SocketImplPtr ret = std::make_shared<SocketImpl>(
-        Socket::Protocol::TCP, m_spConfig
-    );
+    SocketImplPtr ret = std::make_shared<SocketImpl>(m_protocol, m_spConfig);
 
     struct sockaddr_in client;
     int clientLen = sizeof(client);
 
-    SOCKET skt = ::accept(m_socketHandle, (struct sockaddr *)&client, &clientLen);
+    socket_type skt = ::accept(m_socketHandle, (struct sockaddr *)&client, &clientLen);
 
     if (skt == InvalidSocket())
     {
@@ -202,7 +202,7 @@ SocketPtr SocketImpl::Accept() const
         ret->m_socketHandle = skt;
         ret->m_clientIp = ntohl(client.sin_addr.s_addr);
         ret->m_clientPort = ntohs(client.sin_port);
-        ret->m_aConnectedState.store(Socket::ConnectedState::Connected);
+        ret->m_aConnectedState.store(ConnectedState::Connected);
     }
 
     return ret;

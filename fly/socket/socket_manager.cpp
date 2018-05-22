@@ -43,11 +43,9 @@ void SocketManager::ClearClientCallbacks()
 }
 
 //==============================================================================
-SocketPtr SocketManager::CreateTcpSocket()
+SocketPtr SocketManager::CreateSocket(Protocol protocol)
 {
-    SocketImplPtr spSocket = std::make_shared<SocketImpl>(
-        Socket::Protocol::TCP, m_spConfig
-    );
+    SocketPtr spSocket = std::make_shared<SocketImpl>(protocol, m_spConfig);
 
     if (!spSocket->IsValid())
     {
@@ -58,45 +56,9 @@ SocketPtr SocketManager::CreateTcpSocket()
 }
 
 //==============================================================================
-SocketWPtr SocketManager::CreateAsyncTcpSocket()
+SocketWPtr SocketManager::CreateAsyncSocket(Protocol protocol)
 {
-    SocketPtr spSocket = CreateTcpSocket();
-
-    if (spSocket)
-    {
-        if (spSocket->SetAsync())
-        {
-            std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
-            m_aioSockets.push_back(spSocket);
-        }
-        else
-        {
-            spSocket.reset();
-        }
-    }
-
-    return spSocket;
-}
-
-//==============================================================================
-SocketPtr SocketManager::CreateUdpSocket()
-{
-    SocketImplPtr spSocket = std::make_shared<SocketImpl>(
-        Socket::Protocol::UDP, m_spConfig
-    );
-
-    if (!spSocket->IsValid())
-    {
-        spSocket.reset();
-    }
-
-    return spSocket;
-}
-
-//==============================================================================
-SocketWPtr SocketManager::CreateAsyncUdpSocket()
-{
-    SocketPtr spSocket = CreateUdpSocket();
+    SocketPtr spSocket = CreateSocket(protocol);
 
     if (spSocket)
     {
