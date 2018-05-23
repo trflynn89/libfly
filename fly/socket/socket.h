@@ -7,7 +7,7 @@
 
 #include "fly/fly.h"
 #include "fly/socket/async_request.h"
-#include "fly/socket/socket_type.h"
+#include "fly/socket/socket_types.h"
 
 namespace fly {
 
@@ -54,7 +54,7 @@ public:
      *
      * @return INADDR_ANY for the target system.
      */
-    static int InAddrAny();
+    static address_type InAddrAny();
 
     /**
      * Invalid socket handles may be different depending on the OS. This
@@ -96,12 +96,12 @@ public:
     /**
      * @return Return the client IP this socket is connected to.
      */
-    int GetClientIp() const;
+    address_type GetClientIp() const;
 
     /**
      * @return Return the client port this socket is connected to.
      */
-    int GetClientPort() const;
+    port_type GetClientPort() const;
 
     /**
      * @return This socket's ID.
@@ -111,22 +111,22 @@ public:
     /**
      * Bind this socket to an address.
      *
-     * @param int The server IP to bind to.
-     * @param int The server port to bind to.
+     * @param address_type The server IP to bind to.
+     * @param port_type The server port to bind to.
      *
      * @return True if the binding was successful.
      */
-    virtual bool Bind(int, int) const = 0;
+    virtual bool Bind(address_type, port_type) const = 0;
 
     /**
      * Bind this socket to an address, allowing the port to be reused.
      *
-     * @param int The server IP to bind to.
-     * @param int The server port to bind to.
+     * @param address_type The server IP to bind to.
+     * @param port_type The server port to bind to.
      *
      * @return True if the binding was successful.
      */
-    virtual bool BindForReuse(int, int) const = 0;
+    virtual bool BindForReuse(address_type, port_type) const = 0;
 
     /**
      * Allow socket to listen for incoming connections.
@@ -167,11 +167,11 @@ public:
      * Connect to a listening socket.
      *
      * @param string The hostname or IPv4 address to connect to.
-     * @param int The port to connect to.
+     * @param port_type The port to connect to.
      *
      * @param bool True if the connection was successful, false otherwise.
      */
-    virtual bool Connect(const std::string &, int) = 0;
+    virtual bool Connect(const std::string &, port_type) = 0;
 
     /**
      * Asynchronously connect to a listening socket. The connect may finish
@@ -179,11 +179,11 @@ public:
      * boolean. If this is not an asynchronous socket, nothing will occur.
      *
      * @param string The hostname or IPv4 address to connect to.
-     * @param int The port to connect to.
+     * @param port_type The port to connect to.
      *
      * @return The connection state (not connected, connecting, or connected).
      */
-    ConnectedState ConnectAsync(std::string, int);
+    ConnectedState ConnectAsync(std::string, port_type);
 
     /**
      * After an asynchronous socket in a connecting state becomes available for
@@ -223,20 +223,24 @@ public:
      * Write data on the socket.
      *
      * @param string The data to send.
+     * @param string The hostname or IPv4 address to send data to.
+     * @param port_type The port to send data to.
      *
      * @return The number of bytes sent.
      */
-    virtual size_t SendTo(const std::string &, const std::string &, int) const = 0;
+    virtual size_t SendTo(const std::string &, const std::string &, port_type) const = 0;
 
     /**
      * Write data on the socket.
      *
      * @param string The data to send.
+     * @param string The hostname or IPv4 address to send data to.
+     * @param port_type The port to send data to.
      * @param bool & Reference to a bool, set to true if the operation would block.
      *
      * @return The number of bytes sent.
      */
-    virtual size_t SendTo(const std::string &, const std::string &, int, bool &) const = 0;
+    virtual size_t SendTo(const std::string &, const std::string &, port_type, bool &) const = 0;
 
     /**
      * Request data to be written on the socket asynchronously. If this is not
@@ -253,10 +257,12 @@ public:
      * an ansynchronous socket, nothing will occur.
      *
      * @param string The data to send.
+     * @param string The hostname or IPv4 address to send data to.
+     * @param port_type The port to send data to.
      *
      * @return True if the request was made.
      */
-    bool SendToAsync(const std::string &, const std::string &, int);
+    bool SendToAsync(const std::string &, const std::string &, port_type);
 
     /**
      * Read data on this socket until the end-of-message character is received.
@@ -326,8 +332,8 @@ protected:
     socket_type m_socketHandle;
 
     // Client IP and port this socket is connected to.
-    int m_clientIp;
-    int m_clientPort;
+    address_type m_clientIp;
+    port_type m_clientPort;
 
     // Whether this socket should allow asynchronous operations
     bool m_isAsync;

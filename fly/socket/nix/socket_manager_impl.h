@@ -6,7 +6,7 @@
 
 #include "fly/fly.h"
 #include "fly/socket/socket_manager.h"
-#include "fly/socket/socket_type.h"
+#include "fly/socket/socket_types.h"
 
 namespace fly {
 

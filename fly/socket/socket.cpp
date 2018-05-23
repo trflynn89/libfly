@@ -26,7 +26,7 @@ Socket::Socket(Protocol protocol, const SocketConfigPtr &spConfig) :
 }
 
 //==============================================================================
-int Socket::InAddrAny()
+address_type Socket::InAddrAny()
 {
     return SocketImpl::InAddrAny();
 }
@@ -50,13 +50,13 @@ socket_type Socket::GetHandle() const
 }
 
 //==============================================================================
-int Socket::GetClientIp() const
+address_type Socket::GetClientIp() const
 {
     return m_clientIp;
 }
 
 //==============================================================================
-int Socket::GetClientPort() const
+port_type Socket::GetClientPort() const
 {
     return m_clientPort;
 }
@@ -104,7 +104,7 @@ bool Socket::IsConnected() const
 }
 
 //==============================================================================
-ConnectedState Socket::ConnectAsync(std::string hostname, int port)
+ConnectedState Socket::ConnectAsync(std::string hostname, port_type port)
 {
     ConnectedState state = ConnectedState::Disconnected;
 
@@ -169,7 +169,7 @@ bool Socket::SendAsync(const std::string &msg)
 bool Socket::SendToAsync(
     const std::string &msg,
     const std::string &hostname,
-    int port
+    port_type port
 )
 {
     if (IsUdp() && IsAsync())

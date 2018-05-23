@@ -4,6 +4,7 @@
 
 #include "fly/fly.h"
 #include "fly/socket/socket.h"
+#include "fly/socket/socket_types.h"
 
 namespace fly {
 
@@ -22,7 +23,7 @@ public:
     SocketImpl(Protocol, const SocketConfigPtr &);
     ~SocketImpl();
 
-    static int InAddrAny();
+    static address_type InAddrAny();
 
     static socket_type InvalidSocket();
 
@@ -32,17 +33,17 @@ public:
 
     bool SetAsync();
 
-    bool Bind(int, int) const;
-    bool BindForReuse(int, int) const;
+    bool Bind(address_type, port_type) const;
+    bool BindForReuse(address_type, port_type) const;
     bool Listen();
-    bool Connect(const std::string &, int);
+    bool Connect(const std::string &, port_type);
     SocketPtr Accept() const;
 
     size_t Send(const std::string &) const;
     size_t Send(const std::string &, bool &) const;
 
-    size_t SendTo(const std::string &, const std::string &, int) const;
-    size_t SendTo(const std::string &, const std::string &, int, bool &) const;
+    size_t SendTo(const std::string &, const std::string &, port_type) const;
+    size_t SendTo(const std::string &, const std::string &, port_type, bool &) const;
 
     std::string Recv() const;
     std::string Recv(bool &, bool &) const;

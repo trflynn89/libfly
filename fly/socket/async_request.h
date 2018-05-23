@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "fly/socket/socket_types.h"
 #include "fly/types/concurrent_queue.h"
 
 namespace fly {
@@ -29,9 +30,10 @@ public:
     AsyncRequest(int, const std::string &);
 
     /**
-     * Constructor to set the ID of the owning socket and the request message.
+     * Constructor to set the ID of the owning socket, the request message, and
+     * the address and port of the owning socket.
      */
-    AsyncRequest(int, const std::string &, const std::string &, int);
+    AsyncRequest(int, const std::string &, const std::string &, port_type);
 
     /**
      * @return True if the socket ID is valid (i.e. has been explicitly set).
@@ -69,7 +71,7 @@ public:
     /**
      * @return The request port (for UDP sockets).
      */
-    int GetPort() const;
+    port_type GetPort() const;
 
 private:
     int m_socketId;
@@ -78,7 +80,7 @@ private:
     std::string m_request;
 
     std::string m_hostname;
-    int m_port;
+    port_type m_port;
 };
 
 }

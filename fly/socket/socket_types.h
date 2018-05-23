@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include "fly/fly.h"
 
 #if defined(FLY_WINDOWS)
@@ -15,5 +17,8 @@ namespace fly {
 #else
     #error Unknown socket type
 #endif
+
+typedef uint32_t address_type;
+typedef uint16_t port_type;
 
 }

@@ -77,9 +77,6 @@
     <ClInclude Include="..\..\..\fly\socket\socket_manager.h">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket_type.h">
-      <Filter>socket</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\random\random_device.h">
       <Filter>random</Filter>
     </ClInclude>
@@ -148,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\concurrent_stack.h">
       <Filter>types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\socket\socket_types.h">
+      <Filter>socket</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

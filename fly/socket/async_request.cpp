@@ -33,7 +33,7 @@ AsyncRequest::AsyncRequest(
     int socketId,
     const std::string &request,
     const std::string &hostname,
-    int port
+    port_type port
 ) :
     m_socketId(socketId),
     m_requestOffset(0),
@@ -80,7 +80,7 @@ std::string AsyncRequest::GetHostname() const
 }
 
 //==============================================================================
-int AsyncRequest::GetPort() const
+port_type AsyncRequest::GetPort() const
 {
     return m_port;
 }

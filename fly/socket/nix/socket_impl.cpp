@@ -17,28 +17,28 @@ namespace fly {
 
 namespace
 {
-    struct sockaddr_in HostToSockAddr(
+    struct sockaddr_in HostToSocketAddress(
         size_t socketId,
         const std::string &hostname,
-        int port
+        port_type port
     )
     {
-        struct hostent *ipaddr = ::gethostbyname(hostname.c_str());
-        struct sockaddr_in addr;
+        struct hostent *ipAddress = ::gethostbyname(hostname.c_str());
+        struct sockaddr_in address;
 
-        if (ipaddr == NULL)
+        if (ipAddress == NULL)
         {
             LOGS(socketId, "Error resolving %s", hostname);
         }
         else
         {
-            memset(&addr, 0, sizeof(addr));
-            addr.sin_family = AF_INET;
-            memcpy((char *)&addr.sin_addr, ipaddr->h_addr, ipaddr->h_length);
-            addr.sin_port = htons(port);
+            memset(&address, 0, sizeof(address));
+            address.sin_family = AF_INET;
+            memcpy((char *)&address.sin_addr, ipAddress->h_addr, ipAddress->h_length);
+            address.sin_port = htons(port);
         }
 
-        return addr;
+        return address;
     }
 }
 
@@ -65,7 +65,7 @@ SocketImpl::~SocketImpl()
 }
 
 //==============================================================================
-int SocketImpl::InAddrAny()
+address_type SocketImpl::InAddrAny()
 {
     return INADDR_ANY;
 }
@@ -121,18 +121,18 @@ bool SocketImpl::SetAsync()
 }
 
 //==============================================================================
-bool SocketImpl::Bind(int addr, int port) const
+bool SocketImpl::Bind(address_type address, port_type port) const
 {
-    struct sockaddr_in servAddr;
-    memset(&servAddr, 0, sizeof(servAddr));
+    struct sockaddr_in serverAddress;
+    memset(&serverAddress, 0, sizeof(serverAddress));
 
-    servAddr.sin_family = AF_INET;
-    servAddr.sin_addr.s_addr = htonl(addr);
-    servAddr.sin_port = htons(port);
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = htonl(address);
+    serverAddress.sin_port = htons(port);
 
-    struct sockaddr *sockAddr = reinterpret_cast<sockaddr *>(&servAddr);
+    struct sockaddr *socketAddress = reinterpret_cast<sockaddr *>(&serverAddress);
 
-    if (::bind(m_socketHandle, sockAddr, sizeof(servAddr)) == -1)
+    if (::bind(m_socketHandle, socketAddress, sizeof(serverAddress)) == -1)
     {
         LOGS(m_socketHandle, "Error binding to %d", port);
         return false;
@@ -142,7 +142,7 @@ bool SocketImpl::Bind(int addr, int port) const
 }
 
 //==============================================================================
-bool SocketImpl::BindForReuse(int addr, int port) const
+bool SocketImpl::BindForReuse(address_type address, port_type port) const
 {
     const int opt = 1;
     socklen_t len = sizeof(opt);
@@ -153,7 +153,7 @@ bool SocketImpl::BindForReuse(int addr, int port) const
         return false;
     }
 
-    return Bind(addr, port);
+    return Bind(address, port);
 }
 
 //==============================================================================
@@ -170,9 +170,9 @@ bool SocketImpl::Listen()
 }
 
 //==============================================================================
-bool SocketImpl::Connect(const std::string &hostname, int port)
+bool SocketImpl::Connect(const std::string &hostname, port_type port)
 {
-    struct sockaddr_in server = HostToSockAddr(m_socketHandle, hostname, port);
+    struct sockaddr_in server = HostToSocketAddress(m_socketHandle, hostname, port);
 
     if (::connect(m_socketHandle, (struct sockaddr *)&server, sizeof(server)) == -1)
     {
@@ -273,7 +273,7 @@ size_t SocketImpl::Send(const std::string &msg, bool &wouldBlock) const
 size_t SocketImpl::SendTo(
     const std::string &msg,
     const std::string &hostname,
-    int port
+    port_type port
 ) const
 {
     bool wouldBlock = false;
@@ -284,7 +284,7 @@ size_t SocketImpl::SendTo(
 size_t SocketImpl::SendTo(
     const std::string &msg,
     const std::string &hostname,
-    int port,
+    port_type port,
     bool &wouldBlock
 ) const
 {
@@ -295,7 +295,7 @@ size_t SocketImpl::SendTo(
     size_t bytesSent = 0;
     wouldBlock = false;
 
-    struct sockaddr_in server = HostToSockAddr(m_socketHandle, hostname, port);
+    struct sockaddr_in server = HostToSocketAddress(m_socketHandle, hostname, port);
 
     while (keepSending)
     {
@@ -400,13 +400,13 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
     struct sockaddr_in client;
     socklen_t clientLen = sizeof(client);
 
-    struct sockaddr *sockAddr = reinterpret_cast<sockaddr *>(&client);
+    struct sockaddr *socketAddress = reinterpret_cast<sockaddr *>(&client);
 
     while (keepReading)
     {
         char *buff = (char *)calloc(1, m_packetSize * sizeof(char));
         ssize_t bytesRead = ::recvfrom(m_socketHandle, buff, m_packetSize,
-            0, sockAddr, &clientLen);
+            0, socketAddress, &clientLen);
 
         if (bytesRead > 0)
         {

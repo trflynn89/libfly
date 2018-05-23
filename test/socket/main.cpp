@@ -12,6 +12,7 @@
 #include "fly/socket/async_request.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_manager.h"
+#include "fly/socket/socket_types.h"
 #include "fly/string/string.h"
 #include "fly/types/concurrent_queue.h"
 
@@ -111,7 +112,7 @@ protected:
     fly::ConcurrentQueue<int> m_eventQueue;
 
     std::string m_host;
-    int m_port;
+    fly::port_type m_port;
 };
 
 #ifdef FLY_LINUX
@@ -508,8 +509,8 @@ public:
             fly::SocketPtr spRecvSocket = spAcceptSocket->Accept();
             ASSERT_EQ(spRecvSocket->Recv(), s_largeMessage);
 
-            ASSERT_GT(spRecvSocket->GetClientIp(), 0);
-            ASSERT_GT(spRecvSocket->GetClientPort(), 0);
+            ASSERT_GT(spRecvSocket->GetClientIp(), 0U);
+            ASSERT_GT(spRecvSocket->GetClientPort(), 0U);
             ASSERT_GE(spRecvSocket->GetSocketId(), 0);
             ASSERT_TRUE(spRecvSocket->IsTcp());
             ASSERT_FALSE(spRecvSocket->IsUdp());
