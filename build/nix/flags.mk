@@ -13,7 +13,7 @@ LDLIBS :=
 
 # Compiler flags for both C and C++ files
 CF_ALL := -MMD -MP
-CF_ALL += -Wall -Wextra
+CF_ALL += -Wall -Wextra -Werror
 CF_ALL += -I$(SOURCE_ROOT) -I$(GEN_DIR)
 
 ifeq ($(arch), x86)
@@ -28,7 +28,7 @@ endif
 
 # Optimize release builds and add GDB symbols to debug builds
 ifeq ($(release), 1)
-    CF_ALL += -O2 -Werror
+    CF_ALL += -O2
 
     ifeq ($(TARGET_TYPE), LIB)
         CF_ALL += -fPIC
