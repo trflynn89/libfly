@@ -138,23 +138,6 @@ bool SocketImpl::Bind(
 }
 
 //==============================================================================
-bool SocketImpl::Bind(
-    const std::string &hostname,
-    port_type port,
-    BindOption option
-) const
-{
-    address_type address = 0;
-
-    if (HostnameToAddress(hostname, address))
-    {
-        return Bind(address, port, option);
-    }
-
-    return false;
-}
-
-//==============================================================================
 bool SocketImpl::Listen()
 {
     if (::listen(m_socketHandle, 100) == SOCKET_ERROR)
@@ -191,19 +174,6 @@ bool SocketImpl::Connect(address_type address, port_type port)
 }
 
 //==============================================================================
-bool SocketImpl::Connect(const std::string &hostname, port_type port)
-{
-    address_type address = 0;
-
-    if (HostnameToAddress(hostname, address))
-    {
-        return Connect(address, port);
-    }
-
-    return false;
-}
-
-//==============================================================================
 SocketPtr SocketImpl::Accept() const
 {
     SocketImplPtr ret = std::make_shared<SocketImpl>(m_protocol, m_spConfig);
@@ -230,13 +200,6 @@ SocketPtr SocketImpl::Accept() const
     }
 
     return ret;
-}
-
-//==============================================================================
-size_t SocketImpl::Send(const std::string &message) const
-{
-    bool wouldBlock = false;
-    return Send(message, wouldBlock);
 }
 
 //==============================================================================
@@ -297,28 +260,6 @@ size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
 size_t SocketImpl::SendTo(
     const std::string &message,
     address_type address,
-    port_type port
-) const
-{
-    bool wouldBlock = false;
-    return SendTo(message, address, port, wouldBlock);
-}
-
-//==============================================================================
-size_t SocketImpl::SendTo(
-    const std::string &message,
-    const std::string &hostname,
-    port_type port
-) const
-{
-    bool wouldBlock = false;
-    return SendTo(message, hostname, port, wouldBlock);
-}
-
-//==============================================================================
-size_t SocketImpl::SendTo(
-    const std::string &message,
-    address_type address,
     port_type port,
     bool &wouldBlock
 ) const
@@ -369,31 +310,6 @@ size_t SocketImpl::SendTo(
 }
 
 //==============================================================================
-size_t SocketImpl::SendTo(
-    const std::string &message,
-    const std::string &hostname,
-    port_type port,
-    bool &wouldBlock
-) const
-{
-    address_type address = 0;
-
-    if (HostnameToAddress(hostname, address))
-    {
-        return SendTo(message, address, port, wouldBlock);
-    }
-
-    return 0;
-}
-
-//==============================================================================
-std::string SocketImpl::Recv() const
-{
-    bool wouldBlock = false, isComplete = false;
-    return Recv(wouldBlock, isComplete);
-}
-
-//==============================================================================
 std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const
 {
     std::string ret;
@@ -435,13 +351,6 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const
     }
 
     return ret;
-}
-
-//==============================================================================
-std::string SocketImpl::RecvFrom() const
-{
-    bool wouldBlock = false, isComplete = false;
-    return RecvFrom(wouldBlock, isComplete);
 }
 
 //==============================================================================

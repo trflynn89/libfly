@@ -93,31 +93,6 @@ public:
     int GetSocketId() const;
 
     /**
-     * Bind this socket to an address.
-     *
-     * @param address_type The host-order IPv4 address to bind to.
-     * @param port_type The port to bind to.
-     *
-     * @return True if the binding was successful.
-     */
-    virtual bool Bind(address_type, port_type, BindOption) const = 0;
-
-    /**
-     * Bind this socket to an address.
-     *
-     * @param string The hostname or IPv4 address to bind to.
-     * @param port_type The port to bind to.
-     *
-     * @return True if the binding was successful.
-     */
-    virtual bool Bind(const std::string &, port_type, BindOption) const = 0;
-
-    /**
-     * Allow socket to listen for incoming connections.
-     */
-    virtual bool Listen() = 0;
-
-    /**
      * @return True if this is a TCP socket, false otherwise.
      */
     bool IsTcp() const;
@@ -148,6 +123,31 @@ public:
     bool IsConnected() const;
 
     /**
+     * Bind this socket to an address.
+     *
+     * @param address_type The host-order IPv4 address to bind to.
+     * @param port_type The port to bind to.
+     *
+     * @return True if the binding was successful.
+     */
+    virtual bool Bind(address_type, port_type, BindOption) const = 0;
+
+    /**
+     * Bind this socket to an address.
+     *
+     * @param string The hostname or IPv4 address to bind to.
+     * @param port_type The port to bind to.
+     *
+     * @return True if the binding was successful.
+     */
+    bool Bind(const std::string &, port_type, BindOption) const;
+
+    /**
+     * Allow socket to listen for incoming connections.
+     */
+    virtual bool Listen() = 0;
+
+    /**
      * Connect to a listening socket.
      *
      * @param address_type The host-order IPv4 address to connect to.
@@ -165,7 +165,7 @@ public:
      *
      * @param bool True if the connection was successful, false otherwise.
      */
-    virtual bool Connect(const std::string &, port_type) = 0;
+    bool Connect(const std::string &, port_type);
 
     /**
      * Asynchronously connect to a listening socket. The connect may finish
@@ -213,7 +213,7 @@ public:
      *
      * @return The number of bytes sent.
      */
-    virtual size_t Send(const std::string &) const = 0;
+    size_t Send(const std::string &) const;
 
     /**
      * Write data on the socket.
@@ -234,7 +234,7 @@ public:
      *
      * @return The number of bytes sent.
      */
-    virtual size_t SendTo(const std::string &, address_type, port_type) const = 0;
+    size_t SendTo(const std::string &, address_type, port_type) const;
 
     /**
      * Write data on the socket.
@@ -245,7 +245,7 @@ public:
      *
      * @return The number of bytes sent.
      */
-    virtual size_t SendTo(const std::string &, const std::string &, port_type) const = 0;
+    size_t SendTo(const std::string &, const std::string &, port_type) const;
 
     /**
      * Write data on the socket.
@@ -269,7 +269,7 @@ public:
      *
      * @return The number of bytes sent.
      */
-    virtual size_t SendTo(const std::string &, const std::string &, port_type, bool &) const = 0;
+    size_t SendTo(const std::string &, const std::string &, port_type, bool &) const;
 
     /**
      * Request data to be written on the socket asynchronously. If this is not
@@ -310,7 +310,7 @@ public:
      *
      * @return The data received.
      */
-    virtual std::string Recv() const = 0;
+    std::string Recv() const;
 
     /**
      * Read data on this socket until the end-of-message character is received.
@@ -327,7 +327,7 @@ public:
      *
      * @return The data received.
      */
-    virtual std::string RecvFrom() const = 0;
+    std::string RecvFrom() const;
 
     /**
      * Read data on this socket until the end-of-message character is received.

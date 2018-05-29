@@ -104,6 +104,36 @@ bool Socket::IsConnected() const
 }
 
 //==============================================================================
+bool Socket::Bind(
+    const std::string &hostname,
+    port_type port,
+    BindOption option
+) const
+{
+    address_type address = 0;
+
+    if (HostnameToAddress(hostname, address))
+    {
+        return Bind(address, port, option);
+    }
+
+    return false;
+}
+
+//==============================================================================
+bool Socket::Connect(const std::string &hostname, port_type port)
+{
+    address_type address = 0;
+
+    if (HostnameToAddress(hostname, address))
+    {
+        return Connect(address, port);
+    }
+
+    return false;
+}
+
+//==============================================================================
 ConnectedState Socket::ConnectAsync(address_type address, port_type port)
 {
     ConnectedState state = ConnectedState::Disconnected;
@@ -165,6 +195,53 @@ bool Socket::FinishConnect()
 }
 
 //==============================================================================
+size_t Socket::Send(const std::string &message) const
+{
+    bool wouldBlock = false;
+    return Send(message, wouldBlock);
+}
+
+//==============================================================================
+size_t Socket::SendTo(
+    const std::string &message,
+    address_type address,
+    port_type port
+) const
+{
+    bool wouldBlock = false;
+    return SendTo(message, address, port, wouldBlock);
+}
+
+//==============================================================================
+size_t Socket::SendTo(
+    const std::string &message,
+    const std::string &hostname,
+    port_type port
+) const
+{
+    bool wouldBlock = false;
+    return SendTo(message, hostname, port, wouldBlock);
+}
+
+//==============================================================================
+size_t Socket::SendTo(
+    const std::string &message,
+    const std::string &hostname,
+    port_type port,
+    bool &wouldBlock
+) const
+{
+    address_type address = 0;
+
+    if (HostnameToAddress(hostname, address))
+    {
+        return SendTo(message, address, port, wouldBlock);
+    }
+
+    return 0;
+}
+
+//==============================================================================
 bool Socket::SendAsync(const std::string &message)
 {
     if (IsTcp() && IsAsync())
@@ -211,6 +288,20 @@ bool Socket::SendToAsync(
     }
 
     return false;
+}
+
+//==============================================================================
+std::string Socket::Recv() const
+{
+    bool wouldBlock = false, isComplete = false;
+    return Recv(wouldBlock, isComplete);
+}
+
+//==============================================================================
+std::string Socket::RecvFrom() const
+{
+    bool wouldBlock = false, isComplete = false;
+    return RecvFrom(wouldBlock, isComplete);
 }
 
 //==============================================================================
