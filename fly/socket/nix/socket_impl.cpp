@@ -53,6 +53,27 @@ SocketImpl::~SocketImpl()
 }
 
 //==============================================================================
+bool SocketImpl::HostnameToAddress(
+    const std::string &hostname,
+    address_type &address
+)
+{
+    struct hostent *ipAddress = ::gethostbyname(hostname.c_str());
+
+    if (ipAddress == NULL)
+    {
+        LOGS(-1, "Error resolving %s", hostname);
+        return false;
+    }
+
+    memcpy((char *)&address, ipAddress->h_addr, ipAddress->h_length);
+    address = ntohl(address);
+
+    LOGD(-1, "Converted hostname %s to %d", hostname, address);
+    return true;
+}
+
+//==============================================================================
 address_type SocketImpl::InAddrAny()
 {
     return INADDR_ANY;
@@ -394,27 +415,6 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
     }
 
     return ret;
-}
-
-//==============================================================================
-bool SocketImpl::HostnameToAddress(
-    const std::string &hostname,
-    address_type &address
-) const
-{
-    struct hostent *ipAddress = ::gethostbyname(hostname.c_str());
-
-    if (ipAddress == NULL)
-    {
-        LOGS(m_socketHandle, "Error resolving %s", hostname);
-        return false;
-    }
-
-    memcpy((char *)&address, ipAddress->h_addr, ipAddress->h_length);
-    address = ntohl(address);
-
-    LOGD(m_socketHandle, "Converted hostname %s to %d", hostname, address);
-    return true;
 }
 
 }

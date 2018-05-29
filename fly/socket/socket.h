@@ -33,6 +33,17 @@ public:
     Socket(Protocol, const SocketConfigPtr &);
 
     /**
+     * Convert a string hostname or IPv4 address to a host-order numeric IPv4
+     * address.
+     *
+     * @param string The hostname or IPv4 address to convert.
+     * @param address_type The location to store the converted address.
+     *
+     * @return bool True if the hostname/address string could be converted.
+     */
+    static bool HostnameToAddress(const std::string &, address_type &);
+
+    /**
      * INADDR_ANY may be different depending on the OS. This function will
      * return the value for the compiled target's OS.
      *
@@ -356,17 +367,6 @@ protected:
      * @return The data received.
      */
     virtual std::string RecvFrom(bool &, bool &) const = 0;
-
-    /**
-     * Convert a string hostname or IPv4 address to a host-order numeric IPv4
-     * address.
-     *
-     * @param string The hostname or IPv4 address to convert.
-     * @param address_type The location to store the converted address.
-     *
-     * @return bool True if the hostname/address string could be converted.
-     */
-    virtual bool HostnameToAddress(const std::string &, address_type &) const = 0;
 
     // Socket protocol
     Protocol m_protocol;

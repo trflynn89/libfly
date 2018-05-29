@@ -23,6 +23,8 @@ public:
     SocketImpl(Protocol, const SocketConfigPtr &);
     ~SocketImpl();
 
+    static bool HostnameToAddress(const std::string &, address_type &);
+
     static address_type InAddrAny();
 
     static socket_type InvalidSocket();
@@ -47,8 +49,6 @@ protected:
 
     std::string Recv(bool &, bool &) const;
     std::string RecvFrom(bool &, bool &) const;
-
-    bool HostnameToAddress(const std::string &, address_type &) const;
 };
 
 }

@@ -26,6 +26,15 @@ Socket::Socket(Protocol protocol, const SocketConfigPtr &spConfig) :
 }
 
 //==============================================================================
+bool Socket::HostnameToAddress(
+    const std::string &hostname,
+    address_type &address
+)
+{
+    return SocketImpl::HostnameToAddress(hostname, address);
+}
+
+//==============================================================================
 address_type Socket::InAddrAny()
 {
     return SocketImpl::InAddrAny();
