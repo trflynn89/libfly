@@ -107,7 +107,8 @@ bool SocketImpl::Bind(
 ) const
 {
     static const char bindForReuseOption = 1;
-    static const int bindForReuseOptionLength = static_cast<int>(sizeof(opt));
+    static const int bindForReuseOptionLength =
+        static_cast<int>(sizeof(bindForReuseOption));
 
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
     struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
