@@ -109,10 +109,33 @@ bool SocketImpl::SetAsync()
 }
 
 //==============================================================================
-bool SocketImpl::Bind(address_type address, port_type port) const
+bool SocketImpl::Bind(
+    address_type address,
+    port_type port,
+    BindOption option
+) const
 {
+    static const int bindForReuseOption = 1;
+    static const socklen_t bindForReuseOptionLength = sizeof(bindForReuseOption);
+
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
     struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+
+    switch (option)
+    {
+    case BindOption::SingleUse:
+        break;
+
+    case BindOption::AllowReuse:
+        if (::setsockopt(m_socketHandle, SOL_SOCKET, SO_REUSEADDR,
+            &bindForReuseOption, bindForReuseOptionLength) == -1)
+        {
+            LOGS(m_socketHandle, "Error setting reuse flag");
+            return false;
+        }
+
+        break;
+    }
 
     if (::bind(m_socketHandle, pSocketAddress, sizeof(socketAddress)) == -1)
     {
@@ -124,41 +147,17 @@ bool SocketImpl::Bind(address_type address, port_type port) const
 }
 
 //==============================================================================
-bool SocketImpl::Bind(const std::string &hostname, port_type port) const
+bool SocketImpl::Bind(
+    const std::string &hostname,
+    port_type port,
+    BindOption option
+) const
 {
     address_type address = 0;
 
     if (HostnameToAddress(hostname, address))
     {
-        return Bind(address, port);
-    }
-
-    return false;
-}
-
-//==============================================================================
-bool SocketImpl::BindForReuse(address_type address, port_type port) const
-{
-    const int opt = 1;
-    const socklen_t len = sizeof(opt);
-
-    if (::setsockopt(m_socketHandle, SOL_SOCKET, SO_REUSEADDR, &opt, len) == -1)
-    {
-        LOGS(m_socketHandle, "Error setting reuse flag");
-        return false;
-    }
-
-    return Bind(address, port);
-}
-
-//==============================================================================
-bool SocketImpl::BindForReuse(const std::string &hostname, port_type port) const
-{
-    address_type address = 0;
-
-    if (HostnameToAddress(hostname, address))
-    {
-        return BindForReuse(address, port);
+        return Bind(address, port, option);
     }
 
     return false;

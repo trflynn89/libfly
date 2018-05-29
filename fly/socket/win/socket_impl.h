@@ -33,11 +33,8 @@ public:
 
     bool SetAsync();
 
-    bool Bind(address_type, port_type) const;
-    bool Bind(const std::string &, port_type) const;
-
-    bool BindForReuse(address_type, port_type) const;
-    bool BindForReuse(const std::string &, port_type) const;
+    bool Bind(address_type, port_type, BindOption) const;
+    bool Bind(const std::string &, port_type, BindOption) const;
 
     bool Listen();
 

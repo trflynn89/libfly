@@ -153,8 +153,8 @@ TEST_F(SocketTest, Bind_MockBindFail)
     fly::MockSystem mock(fly::MockCall::Bind);
 
     fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, false);
-    ASSERT_FALSE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
-    ASSERT_FALSE(spSocket->Bind(fly::Socket::InAddrAny(), m_port));
+    ASSERT_FALSE(spSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
+    ASSERT_FALSE(spSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::SingleUse));
 }
 
 /**
@@ -165,7 +165,7 @@ TEST_F(SocketTest, Bind_MockSetsockoptFail)
     fly::MockSystem mock(fly::MockCall::Setsockopt);
 
     fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, false);
-    ASSERT_FALSE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_FALSE(spSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 }
 
 /**
@@ -176,7 +176,7 @@ TEST_F(SocketTest, Listen_MockListenFail)
     fly::MockSystem mock(fly::MockCall::Listen);
 
     fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, false);
-    ASSERT_TRUE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_FALSE(spSocket->Listen());
 }
 
@@ -188,7 +188,7 @@ TEST_F(SocketTest, Connect_Sync_MockConnectFail)
     fly::MockSystem mock(fly::MockCall::Connect);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, false);
@@ -203,7 +203,7 @@ TEST_F(SocketTest, Connect_Sync_MockGethostbynameFail)
     fly::MockSystem mock(fly::MockCall::Gethostbyname);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, false);
@@ -218,7 +218,7 @@ TEST_F(SocketTest, Connect_Async_MockConnectFail)
     fly::MockSystem mock(fly::MockCall::Connect);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, true);
@@ -235,7 +235,7 @@ TEST_F(SocketTest, Connect_Async_MockConnectImmediateSuccess)
     fly::MockSystem mock(fly::MockCall::Connect, false);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, true);
@@ -252,7 +252,7 @@ TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
     fly::MockSystem mock(fly::MockCall::Getsockopt);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
@@ -284,7 +284,7 @@ TEST_F(SocketTest, Accept_MockAcceptFail)
     fly::MockSystem mock(fly::MockCall::Accept);
 
     fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, false);
-    ASSERT_TRUE(spSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spSocket->Listen());
 
     ASSERT_FALSE(spSocket->Accept());
@@ -298,7 +298,7 @@ TEST_F(SocketTest, Send_Sync_MockSendFail)
     fly::MockSystem mock(fly::MockCall::Send);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, false);
@@ -315,7 +315,7 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
     fly::MockSystem mock(fly::MockCall::Send);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
@@ -349,7 +349,7 @@ TEST_F(SocketTest, Send_Sync_MockSendtoFail)
     fly::MockSystem mock(fly::MockCall::Sendto);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, false);
     ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), 0);
@@ -363,7 +363,7 @@ TEST_F(SocketTest, Send_Async_MockSendtoFail)
     fly::MockSystem mock(fly::MockCall::Sendto);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
     fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
     m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
@@ -386,7 +386,7 @@ TEST_F(SocketTest, Recv_Sync_MockRecvFail)
     fly::MockSystem mock(fly::MockCall::Recv);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, false);
@@ -401,7 +401,7 @@ TEST_F(SocketTest, Recv_Async_MockRecvFail)
     fly::MockSystem mock(fly::MockCall::Recv);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
     fly::SocketPtr spRecvSocket;
@@ -436,7 +436,7 @@ TEST_F(SocketTest, Recv_Sync_MockRecvfromFail)
     fly::MockSystem mock(fly::MockCall::Recvfrom);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, false);
     ASSERT_EQ(spClientSocket->RecvFrom(), std::string());
@@ -450,7 +450,7 @@ TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
     fly::MockSystem mock(fly::MockCall::Recvfrom);
 
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(spServerSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
     fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
     m_spServerSocketManager->SetClientCallbacks(nullptr, callback);
@@ -489,7 +489,7 @@ public:
         ASSERT_TRUE(spAcceptSocket->IsTcp());
         ASSERT_FALSE(spAcceptSocket->IsUdp());
 
-        ASSERT_TRUE(spAcceptSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+        ASSERT_TRUE(spAcceptSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
         ASSERT_TRUE(spAcceptSocket->Listen());
         m_eventQueue.Push(1);
 
@@ -652,7 +652,7 @@ public:
         ASSERT_FALSE(spRecvSocket->IsTcp());
         ASSERT_TRUE(spRecvSocket->IsUdp());
 
-        ASSERT_TRUE(spRecvSocket->BindForReuse(fly::Socket::InAddrAny(), m_port));
+        ASSERT_TRUE(spRecvSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
         m_eventQueue.Push(1);
 
         if (doAsync)

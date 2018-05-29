@@ -15,25 +15,6 @@ FLY_CLASS_PTRS(Socket);
 FLY_CLASS_PTRS(SocketConfig);
 
 /**
- * Types of supported sockets.
- */
-enum class Protocol
-{
-    TCP,
-    UDP
-};
-
-/**
- * Enumerated connection state values.
- */
-enum class ConnectedState
-{
-    Disconnected,
-    Connecting,
-    Connected
-};
-
-/**
  * Virtual interface to represent a network socket. This interface is platform
  * independent - OS dependent implementations should inherit from this class.
  *
@@ -119,7 +100,7 @@ public:
      *
      * @return True if the binding was successful.
      */
-    virtual bool Bind(address_type, port_type) const = 0;
+    virtual bool Bind(address_type, port_type, BindOption) const = 0;
 
     /**
      * Bind this socket to an address.
@@ -129,27 +110,7 @@ public:
      *
      * @return True if the binding was successful.
      */
-    virtual bool Bind(const std::string &, port_type) const = 0;
-
-    /**
-     * Bind this socket to an address, allowing the port to be reused.
-     *
-     * @param address_type The host-order IPv4 address to bind to.
-     * @param port_type The port to bind to.
-     *
-     * @return True if the binding was successful.
-     */
-    virtual bool BindForReuse(address_type, port_type) const = 0;
-
-    /**
-     * Bind this socket to an address, allowing the port to be reused.
-     *
-     * @param string The hostname or IPv4 address to bind to.
-     * @param port_type The port to bind to.
-     *
-     * @return True if the binding was successful.
-     */
-    virtual bool BindForReuse(const std::string &, port_type) const = 0;
+    virtual bool Bind(const std::string &, port_type, BindOption) const = 0;
 
     /**
      * Allow socket to listen for incoming connections.

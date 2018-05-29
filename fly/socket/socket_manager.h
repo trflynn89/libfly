@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -17,7 +18,7 @@ FLY_CLASS_PTRS(ConfigManager);
 FLY_CLASS_PTRS(Socket);
 FLY_CLASS_PTRS(SocketConfig);
 FLY_CLASS_PTRS(SocketManager);
-enum class Protocol;
+enum class Protocol : uint8_t;
 
 /**
  * Class to manage the creation of sockets and IO operations over asynchronous
