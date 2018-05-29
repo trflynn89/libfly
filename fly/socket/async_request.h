@@ -33,6 +33,12 @@ public:
      * Constructor to set the ID of the owning socket, the request message, and
      * the address and port of the owning socket.
      */
+    AsyncRequest(int, const std::string &, address_type, port_type);
+
+    /**
+     * Constructor to set the ID of the owning socket, the request message, and
+     * the address and port of the owning socket.
+     */
     AsyncRequest(int, const std::string &, const std::string &, port_type);
 
     /**
@@ -56,7 +62,7 @@ public:
     /**
      * @return The request message - the message to be sent or received.
      */
-    std::string GetRequest() const;
+    const std::string &GetRequest() const;
 
     /**
      * @return The request message starting at its current offset.
@@ -64,9 +70,9 @@ public:
     std::string GetRequestRemaining() const;
 
     /**
-     * @return The request hostname (for UDP sockets).
+     * @return The request address (for UDP sockets).
      */
-    std::string GetHostname() const;
+    address_type GetAddress() const;
 
     /**
      * @return The request port (for UDP sockets).
@@ -79,7 +85,7 @@ private:
     std::string::size_type m_requestOffset;
     std::string m_request;
 
-    std::string m_hostname;
+    address_type m_address;
     port_type m_port;
 };
 

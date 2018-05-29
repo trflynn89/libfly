@@ -44,7 +44,10 @@ class Socket
 {
 public:
     /**
-     * Default constructor to initialize all values.
+     * Constructor.
+     *
+     * @param Protocol The communication protocol of the socket.
+     * @param SocketConfigPtr Reference to the socket configuration.
      */
     Socket(Protocol, const SocketConfigPtr &);
 
@@ -111,22 +114,42 @@ public:
     /**
      * Bind this socket to an address.
      *
-     * @param address_type The server IP to bind to.
-     * @param port_type The server port to bind to.
+     * @param address_type The host-order IPv4 address to bind to.
+     * @param port_type The port to bind to.
      *
      * @return True if the binding was successful.
      */
     virtual bool Bind(address_type, port_type) const = 0;
 
     /**
+     * Bind this socket to an address.
+     *
+     * @param string The hostname or IPv4 address to bind to.
+     * @param port_type The port to bind to.
+     *
+     * @return True if the binding was successful.
+     */
+    virtual bool Bind(const std::string &, port_type) const = 0;
+
+    /**
      * Bind this socket to an address, allowing the port to be reused.
      *
-     * @param address_type The server IP to bind to.
-     * @param port_type The server port to bind to.
+     * @param address_type The host-order IPv4 address to bind to.
+     * @param port_type The port to bind to.
      *
      * @return True if the binding was successful.
      */
     virtual bool BindForReuse(address_type, port_type) const = 0;
+
+    /**
+     * Bind this socket to an address, allowing the port to be reused.
+     *
+     * @param string The hostname or IPv4 address to bind to.
+     * @param port_type The port to bind to.
+     *
+     * @return True if the binding was successful.
+     */
+    virtual bool BindForReuse(const std::string &, port_type) const = 0;
 
     /**
      * Allow socket to listen for incoming connections.
@@ -166,6 +189,16 @@ public:
     /**
      * Connect to a listening socket.
      *
+     * @param address_type The host-order IPv4 address to connect to.
+     * @param port_type The port to connect to.
+     *
+     * @param bool True if the connection was successful, false otherwise.
+     */
+    virtual bool Connect(address_type, port_type) = 0;
+
+    /**
+     * Connect to a listening socket.
+     *
      * @param string The hostname or IPv4 address to connect to.
      * @param port_type The port to connect to.
      *
@@ -178,12 +211,24 @@ public:
      * immediately, so the connection state is returned rather than a binary
      * boolean. If this is not an asynchronous socket, nothing will occur.
      *
+     * @param address_type The host-order IPv4 address to connect to.
+     * @param port_type The port to connect to.
+     *
+     * @return The connection state (not connected, connecting, or connected).
+     */
+    ConnectedState ConnectAsync(address_type, port_type);
+
+    /**
+     * Asynchronously connect to a listening socket. The connect may finish
+     * immediately, so the connection state is returned rather than a binary
+     * boolean. If this is not an asynchronous socket, nothing will occur.
+     *
      * @param string The hostname or IPv4 address to connect to.
      * @param port_type The port to connect to.
      *
      * @return The connection state (not connected, connecting, or connected).
      */
-    ConnectedState ConnectAsync(std::string, port_type);
+    ConnectedState ConnectAsync(const std::string &, port_type);
 
     /**
      * After an asynchronous socket in a connecting state becomes available for
@@ -223,12 +268,35 @@ public:
      * Write data on the socket.
      *
      * @param string The data to send.
+     * @param address_type The host-order IPv4 address to send data to.
+     * @param port_type The port to send data to.
+     *
+     * @return The number of bytes sent.
+     */
+    virtual size_t SendTo(const std::string &, address_type, port_type) const = 0;
+
+    /**
+     * Write data on the socket.
+     *
+     * @param string The data to send.
      * @param string The hostname or IPv4 address to send data to.
      * @param port_type The port to send data to.
      *
      * @return The number of bytes sent.
      */
     virtual size_t SendTo(const std::string &, const std::string &, port_type) const = 0;
+
+    /**
+     * Write data on the socket.
+     *
+     * @param string The data to send.
+     * @param address_type The host-order IPv4 address to send data to.
+     * @param port_type The port to send data to.
+     * @param bool & Reference to a bool, set to true if the operation would block.
+     *
+     * @return The number of bytes sent.
+     */
+    virtual size_t SendTo(const std::string &, address_type, port_type, bool &) const = 0;
 
     /**
      * Write data on the socket.
@@ -251,6 +319,18 @@ public:
      * @return True if the request was made.
      */
     bool SendAsync(const std::string &);
+
+    /**
+     * Request data to be written on the socket asynchronously. If this is not
+     * an ansynchronous socket, nothing will occur.
+     *
+     * @param string The data to send.
+     * @param string The host-order IPv4 address to send data to.
+     * @param port_type The port to send data to.
+     *
+     * @return True if the request was made.
+     */
+    bool SendToAsync(const std::string &, address_type, port_type);
 
     /**
      * Request data to be written on the socket asynchronously. If this is not
@@ -316,6 +396,17 @@ public:
     void ServiceRecvRequests(AsyncRequest::RequestQueue &);
 
 protected:
+    /**
+     * Convert a string hostname or IPv4 address to a host-order numeric IPv4
+     * address.
+     *
+     * @param string The hostname or IPv4 address to convert.
+     * @param address_type The location to store the converted address.
+     *
+     * @return bool True if the hostname/address string could be converted.
+     */
+    virtual bool HostnameToAddress(const std::string &, address_type &) const = 0;
+
     // Socket protocol
     Protocol m_protocol;
 
