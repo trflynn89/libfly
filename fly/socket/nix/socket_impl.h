@@ -41,13 +41,13 @@ public:
 
     SocketPtr Accept() const;
 
+protected:
     size_t Send(const std::string &, bool &) const;
     size_t SendTo(const std::string &, address_type, port_type, bool &) const;
 
     std::string Recv(bool &, bool &) const;
     std::string RecvFrom(bool &, bool &) const;
 
-protected:
     bool HostnameToAddress(const std::string &, address_type &) const;
 };
 

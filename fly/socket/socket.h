@@ -219,16 +219,6 @@ public:
      * Write data on the socket.
      *
      * @param string The data to send.
-     * @param bool & Reference to a bool, set to true if the operation would block.
-     *
-     * @return The number of bytes sent.
-     */
-    virtual size_t Send(const std::string &, bool &) const = 0;
-
-    /**
-     * Write data on the socket.
-     *
-     * @param string The data to send.
      * @param address_type The host-order IPv4 address to send data to.
      * @param port_type The port to send data to.
      *
@@ -246,30 +236,6 @@ public:
      * @return The number of bytes sent.
      */
     size_t SendTo(const std::string &, const std::string &, port_type) const;
-
-    /**
-     * Write data on the socket.
-     *
-     * @param string The data to send.
-     * @param address_type The host-order IPv4 address to send data to.
-     * @param port_type The port to send data to.
-     * @param bool & Reference to a bool, set to true if the operation would block.
-     *
-     * @return The number of bytes sent.
-     */
-    virtual size_t SendTo(const std::string &, address_type, port_type, bool &) const = 0;
-
-    /**
-     * Write data on the socket.
-     *
-     * @param string The data to send.
-     * @param string The hostname or IPv4 address to send data to.
-     * @param port_type The port to send data to.
-     * @param bool & Reference to a bool, set to true if the operation would block.
-     *
-     * @return The number of bytes sent.
-     */
-    size_t SendTo(const std::string &, const std::string &, port_type, bool &) const;
 
     /**
      * Request data to be written on the socket asynchronously. If this is not
@@ -315,29 +281,9 @@ public:
     /**
      * Read data on this socket until the end-of-message character is received.
      *
-     * @param bool & Reference to a bool, set to true if the operation would block.
-     * @param bool & Reference to a bool, set to true if the EoM char was received.
-     *
-     * @return The data received.
-     */
-    virtual std::string Recv(bool &, bool &) const = 0;
-
-    /**
-     * Read data on this socket until the end-of-message character is received.
-     *
      * @return The data received.
      */
     std::string RecvFrom() const;
-
-    /**
-     * Read data on this socket until the end-of-message character is received.
-     *
-     * @param bool & Reference to a bool, set to true if the operation would block.
-     * @param bool & Reference to a bool, set to true if the EoM char was received.
-     *
-     * @return The data received.
-     */
-    virtual std::string RecvFrom(bool &, bool &) const = 0;
 
     /**
      * Iterate thru all pending asynchronous sends. Service each request until
@@ -357,6 +303,60 @@ public:
     void ServiceRecvRequests(AsyncRequest::RequestQueue &);
 
 protected:
+    /**
+     * Write data on the socket.
+     *
+     * @param string The data to send.
+     * @param bool Reference to a bool, set to true if the operation would block.
+     *
+     * @return The number of bytes sent.
+     */
+    virtual size_t Send(const std::string &, bool &) const = 0;
+
+    /**
+     * Write data on the socket.
+     *
+     * @param string The data to send.
+     * @param address_type The host-order IPv4 address to send data to.
+     * @param port_type The port to send data to.
+     * @param bool Reference to a bool, set to true if the operation would block.
+     *
+     * @return The number of bytes sent.
+     */
+    virtual size_t SendTo(const std::string &, address_type, port_type, bool &) const = 0;
+
+    /**
+     * Write data on the socket.
+     *
+     * @param string The data to send.
+     * @param string The hostname or IPv4 address to send data to.
+     * @param port_type The port to send data to.
+     * @param bool Reference to a bool, set to true if the operation would block.
+     *
+     * @return The number of bytes sent.
+     */
+    size_t SendTo(const std::string &, const std::string &, port_type, bool &) const;
+
+    /**
+     * Read data on this socket until the end-of-message character is received.
+     *
+     * @param bool Reference to a bool, set to true if the operation would block.
+     * @param bool Reference to a bool, set to true if the EoM char was received.
+     *
+     * @return The data received.
+     */
+    virtual std::string Recv(bool &, bool &) const = 0;
+
+    /**
+     * Read data on this socket until the end-of-message character is received.
+     *
+     * @param bool Reference to a bool, set to true if the operation would block.
+     * @param bool Reference to a bool, set to true if the EoM char was received.
+     *
+     * @return The data received.
+     */
+    virtual std::string RecvFrom(bool &, bool &) const = 0;
+
     /**
      * Convert a string hostname or IPv4 address to a host-order numeric IPv4
      * address.
