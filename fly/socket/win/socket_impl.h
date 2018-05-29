@@ -34,15 +34,25 @@ public:
     bool SetAsync();
 
     bool Bind(address_type, port_type) const;
+    bool Bind(const std::string &, port_type) const;
+
     bool BindForReuse(address_type, port_type) const;
+    bool BindForReuse(const std::string &, port_type) const;
+
     bool Listen();
+
+    bool Connect(address_type, port_type);
     bool Connect(const std::string &, port_type);
+
     SocketPtr Accept() const;
 
     size_t Send(const std::string &) const;
     size_t Send(const std::string &, bool &) const;
 
+    size_t SendTo(const std::string &, address_type, port_type) const;
     size_t SendTo(const std::string &, const std::string &, port_type) const;
+
+    size_t SendTo(const std::string &, address_type, port_type, bool &) const;
     size_t SendTo(const std::string &, const std::string &, port_type, bool &) const;
 
     std::string Recv() const;
@@ -50,6 +60,9 @@ public:
 
     std::string RecvFrom() const;
     std::string RecvFrom(bool &, bool &) const;
+
+protected:
+    bool HostnameToAddress(const std::string &, address_type &) const;
 };
 
 }

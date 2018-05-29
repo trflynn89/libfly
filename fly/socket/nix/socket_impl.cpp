@@ -140,7 +140,7 @@ bool SocketImpl::Bind(const std::string &hostname, port_type port) const
 bool SocketImpl::BindForReuse(address_type address, port_type port) const
 {
     const int opt = 1;
-    socklen_t len = sizeof(opt);
+    const socklen_t len = sizeof(opt);
 
     if (::setsockopt(m_socketHandle, SOL_SOCKET, SO_REUSEADDR, &opt, len) == -1)
     {
@@ -450,16 +450,15 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
     wouldBlock = false;
     isComplete = false;
 
-    struct sockaddr_in client;
-    socklen_t clientLen = sizeof(client);
-
-    struct sockaddr *socketAddress = reinterpret_cast<sockaddr *>(&client);
+    struct sockaddr_in socketAddress;
+    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    socklen_t socketAddressLength = sizeof(socketAddress);
 
     while (keepReading)
     {
         char *buff = (char *)calloc(1, m_packetSize * sizeof(char));
         ssize_t bytesRead = ::recvfrom(m_socketHandle, buff, m_packetSize,
-            0, socketAddress, &clientLen);
+            0, pSocketAddress, &socketAddressLength);
 
         if (bytesRead > 0)
         {
