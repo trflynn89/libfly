@@ -26,6 +26,15 @@ Socket::Socket(Protocol protocol, const SocketConfigPtr &spConfig) :
 }
 
 //==============================================================================
+bool Socket::HostnameToAddress(
+    const std::string &hostname,
+    address_type &address
+)
+{
+    return SocketImpl::HostnameToAddress(hostname, address);
+}
+
+//==============================================================================
 address_type Socket::InAddrAny()
 {
     return SocketImpl::InAddrAny();
@@ -104,32 +113,75 @@ bool Socket::IsConnected() const
 }
 
 //==============================================================================
-ConnectedState Socket::ConnectAsync(std::string hostname, port_type port)
+bool Socket::Bind(
+    const std::string &hostname,
+    port_type port,
+    BindOption option
+) const
+{
+    address_type address = 0;
+
+    if (HostnameToAddress(hostname, address))
+    {
+        return Bind(address, port, option);
+    }
+
+    return false;
+}
+
+//==============================================================================
+bool Socket::Connect(const std::string &hostname, port_type port)
+{
+    address_type address = 0;
+
+    if (HostnameToAddress(hostname, address))
+    {
+        return Connect(address, port);
+    }
+
+    return false;
+}
+
+//==============================================================================
+ConnectedState Socket::ConnectAsync(address_type address, port_type port)
 {
     ConnectedState state = ConnectedState::Disconnected;
 
     if (IsTcp() && IsAsync())
     {
-        if (Connect(hostname, port))
+        if (Connect(address, port))
         {
-            LOGD(m_socketId, "Connected to %s:%d", hostname, port);
+            LOGD(m_socketId, "Connected to %d:%d", address, port);
             state = ConnectedState::Connected;
         }
         else if (IsConnecting())
         {
-            LOGD(m_socketId, "Connect to %s:%d in progress", hostname, port);
+            LOGD(m_socketId, "Connect to %d:%d in progress", address, port);
             state = ConnectedState::Connecting;
         }
         else
         {
-            LOGW(m_socketId, "Could not connect to %s:%d, closing socket",
-                hostname, port);
+            LOGW(m_socketId, "Could not connect to %d:%d, closing socket",
+                address, port);
 
             Close();
         }
     }
 
     return state;
+}
+
+//==============================================================================
+ConnectedState Socket::ConnectAsync(const std::string &hostname, port_type port)
+{
+    address_type address = 0;
+
+    if (HostnameToAddress(hostname, address))
+    {
+        return ConnectAsync(address, port);
+    }
+
+    return ConnectedState::Disconnected;
 }
 
 //==============================================================================
@@ -152,11 +204,58 @@ bool Socket::FinishConnect()
 }
 
 //==============================================================================
-bool Socket::SendAsync(const std::string &msg)
+size_t Socket::Send(const std::string &message) const
+{
+    bool wouldBlock = false;
+    return Send(message, wouldBlock);
+}
+
+//==============================================================================
+size_t Socket::SendTo(
+    const std::string &message,
+    address_type address,
+    port_type port
+) const
+{
+    bool wouldBlock = false;
+    return SendTo(message, address, port, wouldBlock);
+}
+
+//==============================================================================
+size_t Socket::SendTo(
+    const std::string &message,
+    const std::string &hostname,
+    port_type port
+) const
+{
+    bool wouldBlock = false;
+    return SendTo(message, hostname, port, wouldBlock);
+}
+
+//==============================================================================
+size_t Socket::SendTo(
+    const std::string &message,
+    const std::string &hostname,
+    port_type port,
+    bool &wouldBlock
+) const
+{
+    address_type address = 0;
+
+    if (HostnameToAddress(hostname, address))
+    {
+        return SendTo(message, address, port, wouldBlock);
+    }
+
+    return 0;
+}
+
+//==============================================================================
+bool Socket::SendAsync(const std::string &message)
 {
     if (IsTcp() && IsAsync())
     {
-        AsyncRequest request(m_socketId, msg);
+        AsyncRequest request(m_socketId, message);
         m_pendingSends.Push(request);
 
         return true;
@@ -167,20 +266,51 @@ bool Socket::SendAsync(const std::string &msg)
 
 //==============================================================================
 bool Socket::SendToAsync(
-    const std::string &msg,
-    const std::string &hostname,
+    const std::string &message,
+    address_type address,
     port_type port
 )
 {
     if (IsUdp() && IsAsync())
     {
-        AsyncRequest request(m_socketId, msg, hostname, port);
+        AsyncRequest request(m_socketId, message, address, port);
         m_pendingSends.Push(request);
 
         return true;
     }
 
     return false;
+}
+
+//==============================================================================
+bool Socket::SendToAsync(
+    const std::string &message,
+    const std::string &hostname,
+    port_type port
+)
+{
+    address_type address = 0;
+
+    if (HostnameToAddress(hostname, address))
+    {
+        return SendToAsync(message, address, port);
+    }
+
+    return false;
+}
+
+//==============================================================================
+std::string Socket::Recv() const
+{
+    bool wouldBlock = false, isComplete = false;
+    return Recv(wouldBlock, isComplete);
+}
+
+//==============================================================================
+std::string Socket::RecvFrom() const
+{
+    bool wouldBlock = false, isComplete = false;
+    return RecvFrom(wouldBlock, isComplete);
 }
 
 //==============================================================================
@@ -195,23 +325,24 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
 
         if (request.IsValid())
         {
-            const std::string &msg = request.GetRequestRemaining();
+            const std::string &message = request.GetRequestRemaining();
             size_t bytesSent = 0;
 
             switch (m_protocol)
             {
             case Protocol::TCP:
-                bytesSent = Send(msg, wouldBlock);
+                bytesSent = Send(message, wouldBlock);
                 break;
 
             case Protocol::UDP:
                 bytesSent = SendTo(
-                    msg, request.GetHostname(), request.GetPort(), wouldBlock
+                    message, request.GetAddress(), request.GetPort(), wouldBlock
                 );
+
                 break;
             }
 
-            if (bytesSent == msg.length())
+            if (bytesSent == message.length())
             {
                 LOGD(m_socketId, "Sent %zu bytes", bytesSent);
                 completedSends.Push(request);
@@ -219,7 +350,7 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
             else if (wouldBlock)
             {
                 LOGI(m_socketId, "Send would block - sent %zu of %zu bytes, "
-                    "will finish later", bytesSent, msg.length());
+                    "will finish later", bytesSent, message.length());
 
                 request.IncrementRequestOffset(bytesSent);
                 m_pendingSends.Push(request);

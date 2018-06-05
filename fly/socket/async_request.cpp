@@ -13,7 +13,7 @@ AsyncRequest::AsyncRequest() :
     m_socketId(s_invalidId),
     m_requestOffset(0),
     m_request(),
-    m_hostname(),
+    m_address(),
     m_port()
 {
 }
@@ -23,7 +23,7 @@ AsyncRequest::AsyncRequest(int socketId, const std::string &request) :
     m_socketId(socketId),
     m_requestOffset(0),
     m_request(request),
-    m_hostname(),
+    m_address(),
     m_port()
 {
 }
@@ -32,13 +32,13 @@ AsyncRequest::AsyncRequest(int socketId, const std::string &request) :
 AsyncRequest::AsyncRequest(
     int socketId,
     const std::string &request,
-    const std::string &hostname,
+    address_type address,
     port_type port
 ) :
     m_socketId(socketId),
     m_requestOffset(0),
     m_request(request),
-    m_hostname(hostname),
+    m_address(address),
     m_port(port)
 {
 }
@@ -62,7 +62,7 @@ void AsyncRequest::IncrementRequestOffset(std::string::size_type offset)
 }
 
 //==============================================================================
-std::string AsyncRequest::GetRequest() const
+const std::string &AsyncRequest::GetRequest() const
 {
     return m_request;
 }
@@ -74,9 +74,9 @@ std::string AsyncRequest::GetRequestRemaining() const
 }
 
 //==============================================================================
-std::string AsyncRequest::GetHostname() const
+address_type AsyncRequest::GetAddress() const
 {
-    return m_hostname;
+    return m_address;
 }
 
 //==============================================================================

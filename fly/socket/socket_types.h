@@ -21,4 +21,32 @@ namespace fly {
 typedef uint32_t address_type;
 typedef uint16_t port_type;
 
+/**
+ * Types of supported sockets.
+ */
+enum class Protocol : uint8_t
+{
+    TCP,
+    UDP
+};
+
+/**
+ * Supported options for binding sockets.
+ */
+enum class BindOption : uint8_t
+{
+    SingleUse,
+    AllowReuse
+};
+
+/**
+ * TCP socket connection states.
+ */
+enum class ConnectedState : uint8_t
+{
+    Disconnected,
+    Connecting,
+    Connected
+};
+
 }
