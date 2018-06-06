@@ -98,7 +98,7 @@ install: $(TARGET_PACKAGE)
 # Install dependencies
 setup:
 ifeq ($(HOST), DEBIAN)
-	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib
+	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib clang llvm
 else
 	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"
 	$(Q)exit 1
