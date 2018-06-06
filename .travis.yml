@@ -27,6 +27,9 @@ matrix:
 
       addons:
         apt:
+          sources:
+            - llvm-toolchain-trusty-6.0
+
           packages:
             - clang-6.0
 
