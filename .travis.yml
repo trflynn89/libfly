@@ -33,6 +33,10 @@ matrix:
 
           packages:
             - clang-6.0
+            - gcc-7
+            - g++-7
+            - gcc-7-multilib
+            - g++-7-multilib
 
       env:
         - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
