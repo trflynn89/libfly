@@ -25,6 +25,11 @@ public:
      */
     IniParser();
 
+    /**
+     * Destructor.
+     */
+    virtual ~IniParser() = default;
+
 protected:
     /**
      * Parse a stream and retrieve the parsed values.

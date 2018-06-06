@@ -26,7 +26,9 @@ ifneq ($(findstring $(target),$(TEST_TARGETS)),)
     CF_ALL += -I$(SOURCE_ROOT)/test/googletest/googletest
 endif
 
-# Optimize release builds and add GDB symbols to debug builds
+# Optimize release builds, and add debug symbols / use address sanitizer for
+# debug builds - but only use address sanitizer on 64-bit builds:
+# https://github.com/google/sanitizers/issues/954
 ifeq ($(release), 1)
     CF_ALL += -O2
 
@@ -34,7 +36,11 @@ ifeq ($(release), 1)
         CF_ALL += -fPIC
     endif
 else
-    CF_ALL += -O0 -g --coverage -fsanitize=address -fno-omit-frame-pointer
+    CF_ALL += -O0 -g --coverage
+
+    ifeq ($(arch), x64)
+        CF_ALL += -fsanitize=address -fno-omit-frame-pointer
+    endif
 endif
 
 # Qt5 flags

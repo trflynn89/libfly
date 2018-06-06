@@ -5,6 +5,7 @@ dist: trusty
 
 matrix:
   include:
+    # Linux GCC 7
     - os: linux
 
       addons:
@@ -20,6 +21,17 @@ matrix:
 
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
+    # Linux Clang 6
+    - os: linux
+
+      addons:
+        apt:
+          packages:
+            - clang-6.0
+
+      env:
+        - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
 
 before_install:
   - eval "$MATRIX_EVAL"

@@ -75,10 +75,8 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
 {
     SocketList newClients, connectedClients, closedClients;
 
-    for (auto it = m_aioSockets.begin(); it != m_aioSockets.end(); ++it)
+    for (const SocketPtr &spSocket : m_aioSockets)
     {
-        SocketPtr &spSocket = *it;
-
         if (spSocket->IsValid())
         {
             socket_type handle = spSocket->GetHandle();
@@ -110,10 +108,6 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
                     if (spSocket->FinishConnect())
                     {
                         connectedClients.push_back(spSocket);
-                    }
-                    else
-                    {
-                        closedClients.push_back(spSocket);
                     }
                 }
                 else if (spSocket->IsConnected() || spSocket->IsUdp())

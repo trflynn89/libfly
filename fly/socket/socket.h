@@ -33,6 +33,11 @@ public:
     Socket(Protocol, const SocketConfigPtr &);
 
     /**
+     * Destructor.
+     */
+    virtual ~Socket() = default;
+
+    /**
      * Convert a string hostname or IPv4 address to a host-order numeric IPv4
      * address.
      *

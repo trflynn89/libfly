@@ -7,7 +7,8 @@ SRC_DIRS_$(d) := \
     fly/socket \
     fly/string \
     fly/system \
-    fly/task
+    fly/task \
+    fly/types
 
 # Add libfly.so to release package
 $(eval $(call ADD_REL_LIB, $(TARGET_NAME)))

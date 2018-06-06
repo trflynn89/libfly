@@ -285,8 +285,8 @@ TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
     ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
-    fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
-    m_spClientSocketManager->SetClientCallbacks(callback, callback);
+    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr) { m_eventQueue.Push(1); } );
+    m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
     std::chrono::seconds waitTime(10);
@@ -295,11 +295,6 @@ TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
 
     fly::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
     ASSERT_NE(state, fly::ConnectedState::Disconnected);
-
-    if (state == fly::ConnectedState::Connecting)
-    {
-        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
-    }
 
     ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
     ASSERT_FALSE(spClientSocket->IsConnected());
@@ -334,7 +329,7 @@ TEST_F(SocketTest, Send_Sync_MockSendFail)
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, false);
     ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
 
-    ASSERT_EQ(spClientSocket->Send(s_smallMessage), 0);
+    ASSERT_EQ(spClientSocket->Send(s_smallMessage), 0U);
 }
 
 /**
@@ -348,7 +343,7 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
     ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
-    fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
+    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr) { m_eventQueue.Push(1); } );
     m_spClientSocketManager->SetClientCallbacks(callback, callback);
 
     int item = 0;
@@ -382,7 +377,7 @@ TEST_F(SocketTest, Send_Sync_MockSendtoFail)
     ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, false);
-    ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), 0);
+    ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), 0U);
 }
 
 /**
@@ -396,7 +391,7 @@ TEST_F(SocketTest, Send_Sync_MockGethostbynameFail)
     ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, false);
-    ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), 0);
+    ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), 0U);
 }
 
 /**
@@ -409,7 +404,7 @@ TEST_F(SocketTest, Send_Async_MockSendtoFail)
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
     ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
-    fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
+    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr) { m_eventQueue.Push(1); } );
     m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
@@ -470,7 +465,7 @@ TEST_F(SocketTest, Recv_Async_MockRecvFail)
         m_eventQueue.Push(1);
     });
 
-    fly::SocketManager::SocketCallback disconnectCallback([&](...) { m_eventQueue.Push(1); } );
+    fly::SocketManager::SocketCallback disconnectCallback([&](fly::SocketPtr) { m_eventQueue.Push(1); } );
     m_spServerSocketManager->SetClientCallbacks(connectCallback, disconnectCallback);
 
     int item = 0;
@@ -510,7 +505,7 @@ TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::UDP, true);
     ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
-    fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
+    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr) { m_eventQueue.Push(1); } );
     m_spServerSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
@@ -593,7 +588,7 @@ public:
         std::chrono::seconds waitTime(120);
         ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
 
-        fly::SocketManager::SocketCallback callback([&](...) { m_eventQueue.Push(1); } );
+        fly::SocketManager::SocketCallback callback([&](fly::SocketPtr) { m_eventQueue.Push(1); } );
         m_spClientSocketManager->SetClientCallbacks(callback, nullptr);
 
         if (doAsync)
