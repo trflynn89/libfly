@@ -58,6 +58,11 @@ public:
      */
     JsonParser();
 
+    /**
+     * Constructor.
+     */
+    virtual ~JsonParser() = default;
+
 protected:
     /**
      * Parse a stream and retrieve the parsed values.

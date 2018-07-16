@@ -21,7 +21,7 @@ class SocketImpl : public Socket
 {
 public:
     SocketImpl(Protocol, const SocketConfigPtr &);
-    ~SocketImpl();
+    virtual ~SocketImpl();
 
     static bool HostnameToAddress(const std::string &, address_type &);
 

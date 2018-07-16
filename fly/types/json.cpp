@@ -742,7 +742,7 @@ void Json::validateCharacter(
         return true;
     };
 
-    auto invalid = [this, &c](int location)
+    auto invalid = [&c](int location)
     {
         throw JsonException(nullptr, fly::String::Format(
             "Invalid control character '%x' (location %d)", int(c), location

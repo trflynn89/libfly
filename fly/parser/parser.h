@@ -26,6 +26,11 @@ public:
     Parser();
 
     /**
+     * Destructor.
+     */
+    virtual ~Parser() = default;
+
+    /**
      * Parse a string and retrieve parsed values.
      *
      * @param string String contents to parse.

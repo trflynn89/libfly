@@ -103,17 +103,15 @@ void SocketManager::HandleNewAndClosedSockets(
     m_aioSockets.insert(m_aioSockets.end(), newSockets.begin(), newSockets.end());
 
     // Remove closed sockets from the socket system
-    for (auto it = closedSockets.begin(); it != closedSockets.end(); ++it)
+    for (const SocketPtr &spSocket : closedSockets)
     {
-        const SocketPtr &spSocket = *it;
-
-        auto is_same_socket = [&spSocket](SocketPtr spClosed)
+        auto is_same = [&spSocket](const SocketPtr &spClosed) -> bool
         {
             return (spSocket->GetSocketId() == spClosed->GetSocketId());
         };
 
         m_aioSockets.erase(
-            std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), is_same_socket),
+            std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), is_same),
             m_aioSockets.end()
         );
     }
