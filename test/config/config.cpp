@@ -1,3 +1,5 @@
+#include <cstddef>
+
 #include <gtest/gtest.h>
 
 #include "fly/config/config.h"
@@ -32,7 +34,7 @@ TEST_F(ConfigTest, NonCovertibleTest)
     m_spConfig->Update(values);
 
     EXPECT_EQ(m_spConfig->GetValue<int>("name", 12), 12);
-    EXPECT_EQ(m_spConfig->GetValue<nullptr_t>("address", nullptr), nullptr);
+    EXPECT_EQ(m_spConfig->GetValue<std::nullptr_t>("address", nullptr), nullptr);
 }
 
 //==============================================================================
