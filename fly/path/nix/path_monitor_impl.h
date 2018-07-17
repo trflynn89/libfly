@@ -24,25 +24,25 @@ class PathMonitorImpl : public PathMonitor
 {
 public:
     PathMonitorImpl(ConfigManagerPtr &);
-    virtual ~PathMonitorImpl();
+    ~PathMonitorImpl() override;
 
 protected:
     /**
      * Create the path monitor's inotify handle.
      */
-    virtual void StartMonitor();
+    void StartMonitor() override;
 
     /**
      * Close the path monitor's inotify handle.
      */
-    virtual void StopMonitor();
+    void StopMonitor() override;
 
     /**
      * Check if the path monitor's inotify handle was successfully created.
      *
      * @return bool True if the inotify handle is valid.
      */
-    virtual bool IsValid() const;
+    bool IsValid() const override;
 
     /**
      * Check if the path monitor's inotify handle has any events to be read,
@@ -50,9 +50,9 @@ protected:
      *
      * @param milliseconds Max time allow for an event to be readable.
      */
-    virtual void Poll(const std::chrono::milliseconds &);
+    void Poll(const std::chrono::milliseconds &) override;
 
-    virtual PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const;
+    PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const override;
 
 private:
     FLY_STRUCT_PTRS(PathInfoImpl);
@@ -65,12 +65,12 @@ private:
     struct PathInfoImpl : PathMonitor::PathInfo
     {
         PathInfoImpl(int, const std::string &);
-        virtual ~PathInfoImpl();
+        ~PathInfoImpl() override;
 
         /**
          * @return bool True if initialization was sucessful.
          */
-        virtual bool IsValid() const;
+        bool IsValid() const override;
 
         int m_monitorDescriptor;
         int m_watchDescriptor;

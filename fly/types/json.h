@@ -210,7 +210,7 @@ public:
     /**
      * Destructor. Delete any memory allocated for the JSON value.
      */
-    virtual ~Json() noexcept;
+    ~Json() noexcept;
 
     /**
      * @return bool True if the Json instance is a string.

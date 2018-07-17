@@ -35,7 +35,7 @@ public:
     /**
      * Destructor. Stop the running tasks if necessary.
      */
-    virtual ~Runner();
+    virtual ~Runner() = default;
 
     /**
      * Initialize the task and start the configured number of worker threads.

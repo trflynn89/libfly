@@ -17,11 +17,6 @@ SystemMonitor::SystemMonitor(ConfigManagerPtr &spConfigManager) :
 }
 
 //==============================================================================
-SystemMonitor::~SystemMonitor()
-{
-}
-
-//==============================================================================
 uint32_t SystemMonitor::GetSystemCpuCount() const
 {
     return m_systemCpuCount.load();

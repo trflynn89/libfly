@@ -21,7 +21,7 @@ class SocketImpl : public Socket
 {
 public:
     SocketImpl(Protocol, const SocketConfigPtr &);
-    virtual ~SocketImpl();
+    ~SocketImpl() override;
 
     static bool HostnameToAddress(const std::string &, address_type &);
 
@@ -29,26 +29,26 @@ public:
 
     static socket_type InvalidSocket();
 
-    void Close();
+    void Close() override;
 
-    bool IsErrorFree();
+    bool IsErrorFree() override;
 
-    bool SetAsync();
+    bool SetAsync() override;
 
-    bool Bind(address_type, port_type, BindOption) const;
+    bool Bind(address_type, port_type, BindOption) const override;
 
-    bool Listen();
+    bool Listen() override;
 
-    bool Connect(address_type, port_type);
+    bool Connect(address_type, port_type) override;
 
-    SocketPtr Accept() const;
+    SocketPtr Accept() const override;
 
 protected:
-    size_t Send(const std::string &, bool &) const;
-    size_t SendTo(const std::string &, address_type, port_type, bool &) const;
+    size_t Send(const std::string &, bool &) const override;
+    size_t SendTo(const std::string &, address_type, port_type, bool &) const override;
 
-    std::string Recv(bool &, bool &) const;
-    std::string RecvFrom(bool &, bool &) const;
+    std::string Recv(bool &, bool &) const override;
+    std::string RecvFrom(bool &, bool &) const override;
 };
 
 }

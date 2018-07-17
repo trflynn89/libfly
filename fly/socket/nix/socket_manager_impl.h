@@ -22,10 +22,10 @@ class SocketManagerImpl : public SocketManager
 {
 public:
     SocketManagerImpl(ConfigManagerPtr &);
-    virtual ~SocketManagerImpl();
+    ~SocketManagerImpl() override = default;
 
 protected:
-    virtual bool DoWork();
+    bool DoWork() override;
 
 private:
     socket_type setReadAndWriteMasks(fd_set *, fd_set *);

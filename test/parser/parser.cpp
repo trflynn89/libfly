@@ -26,7 +26,7 @@ namespace
         /**
          * Dummy parser to fail if the given stream contains any characters.
          */
-        virtual fly::Json ParseInternal(std::istream &stream)
+        fly::Json ParseInternal(std::istream &stream) override
         {
             m_chars.clear();
             int c = 0;

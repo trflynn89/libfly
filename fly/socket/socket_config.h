@@ -20,16 +20,6 @@ class SocketConfig : public Config
 {
 public:
     /**
-     * Constructor.
-     */
-    SocketConfig();
-
-    /**
-     * Destructor.
-     */
-    virtual ~SocketConfig();
-
-    /**
      * Get the name to associate with this configuration.
      */
     static std::string GetName();

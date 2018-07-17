@@ -109,7 +109,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~Logger();
+    ~Logger() override;
 
     /**
      * Set the logger instance so that the LOG* macros function.
@@ -159,18 +159,18 @@ protected:
      *
      * @return True if the log file could be created.
      */
-    virtual bool StartRunner();
+    bool StartRunner() override;
 
     /**
      * Stop the logger.
      */
-    virtual void StopRunner();
+    void StopRunner() override;
 
     /**
      * Perform any IO operations. Wait for a log item to be available and write
      * it to disk.
      */
-    virtual bool DoWork();
+    bool DoWork() override;
 
 private:
     /**

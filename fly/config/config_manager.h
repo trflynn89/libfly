@@ -58,7 +58,7 @@ public:
     /**
      * Destructor. Stop the configuration manager.
      */
-    virtual ~ConfigManager();
+    ~ConfigManager() override;
 
     /**
      * Create a configuration object, or if one with the given type's name
@@ -85,12 +85,12 @@ protected:
      *
      * @return True if the monitor could be started.
      */
-    virtual bool StartRunner();
+    bool StartRunner() override;
 
     /**
      * Stop the configuration manager and underlying objects.
      */
-    virtual void StopRunner();
+    void StopRunner() override;
 
     /**
      * @return False - no workers are used, thus this should not be called.

@@ -66,7 +66,7 @@ protected:
     /**
      * Start the socket managers.
      */
-    void SetUp()
+    void SetUp() override
     {
         ASSERT_TRUE(fly::Socket::HostnameToAddress(m_host, m_address));
 
@@ -77,7 +77,7 @@ protected:
     /**
      * Stop the socket managers.
      */
-    void TearDown()
+    void TearDown() override
     {
         m_spClientSocketManager->Stop();
         m_spServerSocketManager->Stop();
@@ -524,15 +524,11 @@ TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
 class TcpSocketTest : public SocketTest
 {
 public:
-    TcpSocketTest() : SocketTest()
-    {
-    }
-
     /**
      * Thread to run server functions do handle accepting a client socket and
      * receiving data from it.
      */
-    void ServerThread(bool doAsync)
+    void ServerThread(bool doAsync) override
     {
         fly::SocketPtr spAcceptSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, doAsync);
 
@@ -574,7 +570,7 @@ public:
      * Thread to run client functions to connect to the server socket and send
      * data to it.
      */
-    void ClientThread(bool doAsync)
+    void ClientThread(bool doAsync) override
     {
         fly::SocketPtr spSendSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, doAsync);
 
@@ -687,15 +683,11 @@ TEST_F(TcpSocketTest, AsyncServer_AsyncClient_Test)
 class UdpSocketTest : public SocketTest
 {
 public:
-    UdpSocketTest() : SocketTest()
-    {
-    }
-
     /**
      * Thread to run server functions do handle accepting a client socket and
      * receiving data from it.
      */
-    void ServerThread(bool doAsync)
+    void ServerThread(bool doAsync) override
     {
         fly::SocketPtr spRecvSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::UDP, doAsync);
 
@@ -728,7 +720,7 @@ public:
      * Thread to run client functions to connect to the server socket and send
      * data to it.
      */
-    void ClientThread(bool doAsync)
+    void ClientThread(bool doAsync) override
     {
         static unsigned int callCount = 0;
 

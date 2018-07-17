@@ -34,7 +34,7 @@ public:
     /**
      * @return A C-string representing this exception.
      */
-    virtual const char *what() const noexcept;
+    const char *what() const noexcept override;
 
 private:
     const std::string m_message;

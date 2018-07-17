@@ -52,7 +52,7 @@ public:
     /**
      * Create and start the path monitor.
      */
-    virtual void SetUp()
+    void SetUp() override
     {
         ASSERT_TRUE(fly::Path::MakePath(m_path0));
         ASSERT_TRUE(fly::Path::MakePath(m_path1));
@@ -72,7 +72,7 @@ public:
     /**
      * Stop the path monitor and delete the created directory.
      */
-    virtual void TearDown()
+    void TearDown() override
     {
         m_spMonitor->Stop();
 

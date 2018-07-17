@@ -28,11 +28,6 @@ public:
      */
     Monitor(const std::string &, ConfigManagerPtr &);
 
-    /**
-     * Destructor.
-     */
-    virtual ~Monitor();
-
 protected:
     /**
      * Start the monitor.
@@ -63,19 +58,19 @@ protected:
      *
      * @return bool True.
      */
-    virtual bool StartRunner();
+    bool StartRunner() override;
 
     /**
      * Stop the monitor.
      */
-    virtual void StopRunner();
+    void StopRunner() override;
 
     /**
      * Run one iteration of the monitor if it is in a good state.
      *
      * @return bool True if the monitor is healthy.
      */
-    virtual bool DoWork();
+    bool DoWork() override;
 
 private:
     TaskConfigPtr m_spConfig;

@@ -26,16 +26,16 @@ public:
     }
 
 protected:
-    virtual bool StartRunner()
+    bool StartRunner() override
     {
         return m_run;
     }
 
-    virtual void StopRunner()
+    void StopRunner() override
     {
     }
 
-    virtual bool DoWork()
+    bool DoWork() override
     {
         ++m_callCount;
 

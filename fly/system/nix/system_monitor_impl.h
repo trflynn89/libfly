@@ -22,32 +22,32 @@ class SystemMonitorImpl : public SystemMonitor
 {
 public:
     SystemMonitorImpl(ConfigManagerPtr &);
-    virtual ~SystemMonitorImpl();
+    ~SystemMonitorImpl() override;
 
 protected:
     /**
      * Set the system CPU count.
      */
-    virtual void StartMonitor();
+    void StartMonitor() override;
 
     /**
      * Does nothing.
      */
-    virtual void StopMonitor();
+    void StopMonitor() override;
 
     /**
      * Check if the system CPU count was successfully set.
      *
      * @return bool True if the CPU count is valid.
      */
-    virtual bool IsValid() const;
+    bool IsValid() const override;
 
-    virtual void UpdateSystemCpuCount();
-    virtual void UpdateSystemCpuUsage();
-    virtual void UpdateProcessCpuUsage();
+    void UpdateSystemCpuCount() override;
+    void UpdateSystemCpuUsage() override;
+    void UpdateProcessCpuUsage() override;
 
-    virtual void UpdateSystemMemoryUsage();
-    virtual void UpdateProcessMemoryUsage();
+    void UpdateSystemMemoryUsage() override;
+    void UpdateProcessMemoryUsage() override;
 
 private:
     uint64_t m_prevSystemUserTime;

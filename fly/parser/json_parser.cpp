@@ -10,21 +10,6 @@
 namespace fly {
 
 //==============================================================================
-JsonParser::JsonParser() :
-    Parser(),
-    m_states(),
-    m_pValue(),
-    m_pParents(),
-    m_parsing(),
-    m_parsingStarted(false),
-    m_parsingComplete(false),
-    m_parsingString(false),
-    m_parsedString(false),
-    m_expectingValue(false)
-{
-}
-
-//==============================================================================
 Json JsonParser::ParseInternal(std::istream &stream)
 {
     m_states = decltype(m_states)();

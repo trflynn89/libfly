@@ -11,7 +11,7 @@ Log::Log() :
     m_level(Level::NumLevels),
     m_time(-1.0),
     m_gameId(-1),
-    m_line(-1),
+    m_line(0),
     m_message()
 {
     ::memset(m_file, 0, sizeof(m_file));
@@ -23,7 +23,7 @@ Log::Log(const LoggerConfigPtr &spConfig, const std::string &message) :
     m_level(Level::NumLevels),
     m_time(-1.0),
     m_gameId(-1),
-    m_line(-1),
+    m_line(0),
     m_message(message, 0, spConfig->MaxMessageSize())
 {
     ::memset(m_file, 0, sizeof(m_file));

@@ -21,10 +21,10 @@ class SocketManagerImpl : public SocketManager
 {
 public:
     SocketManagerImpl(ConfigManagerPtr &);
-    virtual ~SocketManagerImpl();
+    ~SocketManagerImpl() override;
 
 protected:
-    virtual bool DoWork();
+    bool DoWork() override;
 
 private:
     bool setReadAndWriteMasks(fd_set *, fd_set *);

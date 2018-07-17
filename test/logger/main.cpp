@@ -32,7 +32,7 @@ public:
     /**
      * Create the file directory.
      */
-    virtual void SetUp()
+    void SetUp() override
     {
         ASSERT_TRUE(fly::Path::MakePath(m_path));
 
@@ -43,7 +43,7 @@ public:
     /**
      * Delete the created directory.
      */
-    virtual void TearDown()
+    void TearDown() override
     {
         fly::Logger::SetInstance(fly::LoggerPtr());
         m_spLogger->Stop();

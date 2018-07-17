@@ -20,16 +20,6 @@ class LoggerConfig : public Config
 {
 public:
     /**
-     * Constructor.
-     */
-    LoggerConfig();
-
-    /**
-     * Destructor.
-     */
-    virtual ~LoggerConfig();
-
-    /**
      * Get the name to associate with this configuration.
      */
     static std::string GetName();

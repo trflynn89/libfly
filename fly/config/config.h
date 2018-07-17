@@ -25,14 +25,9 @@ class Config
 {
 public:
     /**
-     * Constructor.
-     */
-    Config();
-
-    /**
      * Destructor.
      */
-    virtual ~Config();
+    virtual ~Config() = default;
 
     /**
      * Get the name to associate with this configuration.

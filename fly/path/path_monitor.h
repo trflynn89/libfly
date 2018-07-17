@@ -1,6 +1,5 @@
 #pragma once
 
-#include <chrono>
 #include <functional>
 #include <map>
 #include <memory>
@@ -53,7 +52,7 @@ public:
     /**
      * Destructor. Remove all paths from the path monitor.
      */
-    virtual ~PathMonitor();
+    ~PathMonitor() override;
 
     /**
      * Monitor for changes to all files under a path. Callbacks registered with
@@ -113,6 +112,11 @@ protected:
     struct PathInfo
     {
         /**
+         * Destructor.
+         */
+        virtual ~PathInfo() = default;
+
+        /**
          * Check if the monitored path is in a good state.
          *
          * @return bool True if the monitored path is healthy.
@@ -127,30 +131,6 @@ protected:
      * Map of monitored paths to their path information.
      */
     typedef std::map<std::string, PathInfoPtr> PathInfoMap;
-
-    /**
-     * Start the path monitor.
-     */
-    virtual void StartMonitor() = 0;
-
-    /**
-     * Stop the path monitor.
-     */
-    virtual void StopMonitor() = 0;
-
-    /**
-     * Check if the monitor implementation is in a good state.
-     *
-     * @return True if the monitor is healthy.
-     */
-    virtual bool IsValid() const = 0;
-
-    /**
-     * Poll the monitored paths for changes.
-     *
-     * @param milliseconds Time to sleep between poll intervals.
-     */
-    virtual void Poll(const std::chrono::milliseconds &) = 0;
 
     /**
      * Create an instance of the OS dependent PathInfo struct.

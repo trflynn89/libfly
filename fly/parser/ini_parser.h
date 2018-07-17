@@ -19,17 +19,6 @@ FLY_CLASS_PTRS(IniParser);
  */
 class IniParser : public Parser
 {
-public:
-    /**
-     * Constructor.
-     */
-    IniParser();
-
-    /**
-     * Destructor.
-     */
-    virtual ~IniParser() = default;
-
 protected:
     /**
      * Parse a stream and retrieve the parsed values.
@@ -40,7 +29,7 @@ protected:
      *
      * @throws ParserException Thrown if an error occurs parsing the stream.
      */
-    virtual Json ParseInternal(std::istream &);
+    Json ParseInternal(std::istream &) override;
 
 private:
     /**

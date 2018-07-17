@@ -16,11 +16,6 @@ SocketManagerImpl::SocketManagerImpl(ConfigManagerPtr &spConfigManager) :
 }
 
 //==============================================================================
-SocketManagerImpl::~SocketManagerImpl()
-{
-}
-
-//==============================================================================
 bool SocketManagerImpl::DoWork()
 {
     fd_set readFd, writeFd;

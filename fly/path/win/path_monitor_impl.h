@@ -24,25 +24,25 @@ class PathMonitorImpl : public PathMonitor
 {
 public:
     PathMonitorImpl(ConfigManagerPtr &);
-    virtual ~PathMonitorImpl();
+    ~PathMonitorImpl() override;
 
 protected:
     /**
      * Create the path monitor's IOCP.
      */
-    virtual void StartMonitor();
+    void StartMonitor() override;
 
     /**
      * Close the path monitor's IOCP.
      */
-    virtual void StopMonitor();
+    void StopMonitor() override;
 
     /**
      * Check if the path monitor's IOCP was successfully created.
      *
      * @return bool True if the IOCP is valid.
      */
-    virtual bool IsValid() const;
+    bool IsValid() const override;
 
     /**
      * Check if the path monitor's IOCP has any posted completions, and handle
@@ -50,9 +50,9 @@ protected:
      *
      * @param milliseconds Max time allow for a completion to be posted.
      */
-    virtual void Poll(const std::chrono::milliseconds &);
+    void Poll(const std::chrono::milliseconds &) override;
 
-    virtual PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const;
+    PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const override;
 
 private:
     FLY_STRUCT_PTRS(PathInfoImpl);
@@ -65,12 +65,12 @@ private:
     struct PathInfoImpl : public PathMonitor::PathInfo
     {
         PathInfoImpl(HANDLE, const std::string &);
-        virtual ~PathInfoImpl();
+        ~PathInfoImpl() override;
 
         /**
          * @return bool True if initialization was sucessful.
          */
-        virtual bool IsValid() const;
+        bool IsValid() const override;
 
         /**
          * Call the ReadDirectoryChangesW API for this path. Should be called
