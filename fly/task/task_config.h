@@ -20,16 +20,6 @@ class TaskConfig : public Config
 {
 public:
     /**
-     * Constructor.
-     */
-    TaskConfig();
-
-    /**
-     * Destructor.
-     */
-    virtual ~TaskConfig();
-
-    /**
      * Get the name to associate with this configuration.
      */
     static std::string GetName();

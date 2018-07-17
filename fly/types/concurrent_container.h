@@ -21,6 +21,11 @@ public:
     typedef typename Container::size_type size_type;
 
     /**
+     * Destructor.
+     */
+    virtual ~ConcurrentContainer() = default;
+
+    /**
      * Push an item onto the container.
      *
      * @param T Reference to an object of type T to push onto the container.

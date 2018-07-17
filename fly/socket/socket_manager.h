@@ -45,7 +45,7 @@ public:
     /**
      * Default destructor.
      */
-    virtual ~SocketManager();
+    ~SocketManager() override;
 
     /**
      * Set callbacks for when a client connects or disconnects.
@@ -105,17 +105,12 @@ protected:
     /**
      * @return True.
      */
-    virtual bool StartRunner();
+    bool StartRunner() override;
 
     /**
      * Stop the socket manager and close all sockets.
      */
-    virtual void StopRunner();
-
-    /**
-     * Check monitored for healthy and available IO.
-     */
-    virtual bool DoWork() = 0;
+    void StopRunner() override;
 
     /**
      * Add new sockets to and remove closed sockets from the socket system.

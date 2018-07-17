@@ -8,11 +8,6 @@
 namespace fly {
 
 //==============================================================================
-IniParser::IniParser() : Parser()
-{
-}
-
-//==============================================================================
 Json IniParser::ParseInternal(std::istream &stream)
 {
     std::string line, section;

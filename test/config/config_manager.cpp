@@ -28,7 +28,7 @@ public:
     /**
      * Create the file directory.
      */
-    virtual void SetUp()
+    void SetUp() override
     {
         ASSERT_TRUE(fly::Path::MakePath(m_path));
         ASSERT_TRUE(m_spConfigManager->Start());
@@ -39,7 +39,7 @@ public:
     /**
      * Delete the created directory.
      */
-    virtual void TearDown()
+    void TearDown() override
     {
         m_spConfigManager->Stop();
         ASSERT_TRUE(fly::Path::RemovePath(m_path));

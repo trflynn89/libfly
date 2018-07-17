@@ -52,17 +52,6 @@ class JsonParser : public Parser
         ParsingComma
     };
 
-public:
-    /**
-     * Constructor.
-     */
-    JsonParser();
-
-    /**
-     * Constructor.
-     */
-    virtual ~JsonParser() = default;
-
 protected:
     /**
      * Parse a stream and retrieve the parsed values.
@@ -75,7 +64,7 @@ protected:
      * @throws UnexpectedCharacterException If a parsed character was unexpected.
      * @throws BadConversionException If a parsed object was invalid.
      */
-    virtual Json ParseInternal(std::istream &);
+    Json ParseInternal(std::istream &) override;
 
 private:
     /**

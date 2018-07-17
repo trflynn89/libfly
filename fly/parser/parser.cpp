@@ -8,13 +8,6 @@
 namespace fly {
 
 //==============================================================================
-Parser::Parser() :
-    m_line(0),
-    m_column(0)
-{
-}
-
-//==============================================================================
 Json Parser::Parse(const std::string &contents)
 {
     std::istringstream stream(contents);

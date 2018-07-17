@@ -31,11 +31,6 @@ public:
     SystemMonitor(ConfigManagerPtr &);
 
     /**
-     * Destructor.
-     */
-    virtual ~SystemMonitor();
-
-    /**
      * Get the system's CPU count.
      *
      * @return uint32_t System CPU count.
@@ -79,28 +74,11 @@ public:
 
 protected:
     /**
-     * Start the system monitor.
-     */
-    virtual void StartMonitor() = 0;
-
-    /**
-     * Stop the system monitor.
-     */
-    virtual void StopMonitor() = 0;
-
-    /**
-     * Check if the monitor implementation is in a good state.
-     *
-     * @return bool True if the monitor is healthy.
-     */
-    virtual bool IsValid() const = 0;
-
-    /**
      * Update the system's resources.
      *
      * @param milliseconds Time to sleep between poll intervals.
      */
-    virtual void Poll(const std::chrono::milliseconds &);
+    void Poll(const std::chrono::milliseconds &) override;
 
     /**
      * Update the system's current CPU count.

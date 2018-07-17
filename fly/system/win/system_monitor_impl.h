@@ -22,18 +22,18 @@ class SystemMonitorImpl : public SystemMonitor
 {
 public:
     SystemMonitorImpl(ConfigManagerPtr &);
-    virtual ~SystemMonitorImpl();
+    ~SystemMonitorImpl() override;
 
 protected:
     /**
      * Open the system monitor's CPU query and set the system CPU count.
      */
-    virtual void StartMonitor();
+    void StartMonitor() override;
 
     /**
      * Close the system monitor's CPU query.
      */
-    virtual void StopMonitor();
+    void StopMonitor() override;
 
     /**
      * Check if the system monitor's CPU query was successfully created, and if
@@ -41,14 +41,14 @@ protected:
      *
      * @return bool True if the CPU query and count are valid.
      */
-    virtual bool IsValid() const;
+    bool IsValid() const override;
 
-    virtual void UpdateSystemCpuCount();
-    virtual void UpdateSystemCpuUsage();
-    virtual void UpdateProcessCpuUsage();
+    void UpdateSystemCpuCount() override;
+    void UpdateSystemCpuUsage() override;
+    void UpdateProcessCpuUsage() override;
 
-    virtual void UpdateSystemMemoryUsage();
-    virtual void UpdateProcessMemoryUsage();
+    void UpdateSystemMemoryUsage() override;
+    void UpdateProcessMemoryUsage() override;
 
 private:
     HANDLE m_process;

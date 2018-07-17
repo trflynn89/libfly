@@ -21,11 +21,6 @@ class Parser
 {
 public:
     /**
-     * Constructor.
-     */
-    Parser();
-
-    /**
      * Destructor.
      */
     virtual ~Parser() = default;

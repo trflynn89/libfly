@@ -30,7 +30,7 @@ public:
     /**
      * Create and start the system monitor.
      */
-    virtual void SetUp()
+    void SetUp() override
     {
         ASSERT_TRUE(m_spMonitor && m_spMonitor->Start());
 
@@ -41,7 +41,7 @@ public:
     /**
      * Stop the system monitor.
      */
-    virtual void TearDown()
+    void TearDown() override
     {
         m_spMonitor->Stop();
     }
