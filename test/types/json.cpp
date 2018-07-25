@@ -12,8 +12,8 @@
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
-#include "fly/string/string.h"
 #include "fly/types/json.h"
+#include "fly/types/string.h"
 
 #if defined(FLY_WINDOWS)
     #include <Windows.h>

@@ -1,6 +1,5 @@
 # Define the directories to include and compile
 SRC_DIRS_$(d) := \
-    fly/string \
     fly/types
 
 # Define libraries to link

@@ -5,7 +5,6 @@ SRC_DIRS_$(d) := \
     fly/parser \
     fly/path \
     fly/socket \
-    fly/string \
     fly/system \
     fly/task \
     fly/types

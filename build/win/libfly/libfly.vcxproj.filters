@@ -13,9 +13,6 @@
     <Filter Include="socket">
       <UniqueIdentifier>{c64c6e9a-2b73-4e4c-af81-bebf6171d91c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="string">
-      <UniqueIdentifier>{ac7cebd9-5c91-4041-9924-7271cca03d27}</UniqueIdentifier>
-    </Filter>
     <Filter Include="system">
       <UniqueIdentifier>{43fcbaca-3ea1-4886-bc2e-699655d936a6}</UniqueIdentifier>
     </Filter>
@@ -64,9 +61,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\system\system.h">
       <Filter>system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\string\string.h">
-      <Filter>string</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\socket\socket.h">
       <Filter>socket</Filter>
@@ -149,6 +143,9 @@
     <ClInclude Include="..\..\..\fly\socket\socket_types.h">
       <Filter>socket</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string.h">
+      <Filter>types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp">
@@ -168,9 +165,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\system\system.cpp">
       <Filter>system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\string\string.cpp">
-      <Filter>string</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\socket\socket.cpp">
       <Filter>socket</Filter>
@@ -233,6 +227,9 @@
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\types\json.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\types\string.cpp">
       <Filter>types</Filter>
     </ClCompile>
   </ItemGroup>

@@ -7,7 +7,7 @@
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/path/path.h"
-#include "fly/string/string.h"
+#include "fly/types/string.h"
 
 //==============================================================================
 class ConfigManagerTest : public ::testing::Test

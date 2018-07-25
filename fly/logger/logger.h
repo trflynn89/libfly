@@ -10,10 +10,10 @@
 
 #include "fly/fly.h"
 #include "fly/logger/log.h"
-#include "fly/string/string.h"
 #include "fly/system/system.h"
 #include "fly/task/runner.h"
 #include "fly/types/concurrent_queue.h"
+#include "fly/types/string.h"
 
 //==============================================================================
 #define LOG(lvl, gameId, fmt)                                                  \
