@@ -6,7 +6,7 @@
 
 #include "fly/fly.h"
 #include "fly/path/path.h"
-#include "fly/string/string.h"
+#include "fly/types/string.h"
 
 #ifdef FLY_LINUX
     #include "test/mock/mock_system.h"

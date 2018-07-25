@@ -9,7 +9,7 @@
 #include "fly/logger/logger.h"
 #include "fly/logger/logger_config.h"
 #include "fly/path/path.h"
-#include "fly/string/string.h"
+#include "fly/types/string.h"
 
 //==============================================================================
 class LoggerTest : public ::testing::Test

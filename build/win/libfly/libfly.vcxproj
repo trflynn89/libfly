@@ -166,7 +166,6 @@
     <ClInclude Include="..\..\..\fly\socket\socket_types.h" />
     <ClInclude Include="..\..\..\fly\socket\win\socket_impl.h" />
     <ClInclude Include="..\..\..\fly\socket\win\socket_manager_impl.h" />
-    <ClInclude Include="..\..\..\fly\string\string.h" />
     <ClInclude Include="..\..\..\fly\system\system.h" />
     <ClInclude Include="..\..\..\fly\system\system_monitor.h" />
     <ClInclude Include="..\..\..\fly\system\win\system_impl.h" />
@@ -179,6 +178,7 @@
     <ClInclude Include="..\..\..\fly\types\concurrent_queue.h" />
     <ClInclude Include="..\..\..\fly\types\concurrent_stack.h" />
     <ClInclude Include="..\..\..\fly\types\json.h" />
+    <ClInclude Include="..\..\..\fly\types\string.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp" />
@@ -200,7 +200,6 @@
     <ClCompile Include="..\..\..\fly\socket\socket_manager.cpp" />
     <ClCompile Include="..\..\..\fly\socket\win\socket_impl.cpp" />
     <ClCompile Include="..\..\..\fly\socket\win\socket_manager_impl.cpp" />
-    <ClCompile Include="..\..\..\fly\string\string.cpp" />
     <ClCompile Include="..\..\..\fly\system\system.cpp" />
     <ClCompile Include="..\..\..\fly\system\system_monitor.cpp" />
     <ClCompile Include="..\..\..\fly\system\win\system_impl.cpp" />
@@ -209,6 +208,7 @@
     <ClCompile Include="..\..\..\fly\task\runner.cpp" />
     <ClCompile Include="..\..\..\fly\task\task_config.cpp" />
     <ClCompile Include="..\..\..\fly\types\json.cpp" />
+    <ClCompile Include="..\..\..\fly\types\string.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

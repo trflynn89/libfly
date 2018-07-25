@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "fly/fly.h"
-#include "fly/string/string.h"
+#include "fly/types/string.h"
 
 namespace fly {
 

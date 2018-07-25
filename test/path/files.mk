@@ -4,7 +4,6 @@ SRC_DIRS_$(d) := \
     fly/logger \
     fly/parser \
     fly/path \
-    fly/string \
     fly/system \
     fly/task \
     fly/types

@@ -3,5 +3,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\test\types\concurrent_container.cpp" />
     <ClCompile Include="..\..\..\test\types\json.cpp" />
+    <ClCompile Include="..\..\..\test\types\string.cpp" />
   </ItemGroup>
 </Project>

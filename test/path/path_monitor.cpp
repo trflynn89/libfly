@@ -10,7 +10,7 @@
 #include "fly/config/config_manager.h"
 #include "fly/path/path.h"
 #include "fly/path/path_monitor.h"
-#include "fly/string/string.h"
+#include "fly/types/string.h"
 
 #ifdef FLY_LINUX
     #include "test/mock/mock_system.h"
