@@ -24,14 +24,12 @@ PathMonitor::~PathMonitor()
 }
 
 //==============================================================================
-bool PathMonitor::Start()
+void PathMonitor::Start()
 {
     PathMonitorPtr spPathMonitor = shared_from_this();
 
     m_spTask = std::make_shared<PathMonitorTask>(spPathMonitor);
     m_spTaskRunner->PostTask(m_spTask);
-
-    return true;
 }
 
 //==============================================================================

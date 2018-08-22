@@ -111,7 +111,7 @@ public:
 
 protected:
     FLY_STRUCT_PTRS(PathInfo);
-    FLY_STRUCT_PTRS(PathMonitorTask);
+    FLY_CLASS_PTRS(PathMonitorTask);
     friend class PathMonitorTask;
 
     /**

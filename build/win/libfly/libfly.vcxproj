@@ -155,6 +155,7 @@
     <ClInclude Include="..\..\..\fly\parser\json_parser.h" />
     <ClInclude Include="..\..\..\fly\parser\parser.h" />
     <ClInclude Include="..\..\..\fly\path\path.h" />
+    <ClInclude Include="..\..\..\fly\path\path_config.h" />
     <ClInclude Include="..\..\..\fly\path\path_monitor.h" />
     <ClInclude Include="..\..\..\fly\path\win\path_impl.h" />
     <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.h" />
@@ -172,13 +173,17 @@
     <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.h" />
     <ClInclude Include="..\..\..\fly\task\monitor.h" />
     <ClInclude Include="..\..\..\fly\task\runner.h" />
+    <ClInclude Include="..\..\..\fly\task\task.h" />
     <ClInclude Include="..\..\..\fly\task\task_config.h" />
+    <ClInclude Include="..\..\..\fly\task\task_manager.h" />
+    <ClInclude Include="..\..\..\fly\task\task_runner.h" />
     <ClInclude Include="..\..\..\fly\traits\traits.h" />
     <ClInclude Include="..\..\..\fly\types\concurrent_container.h" />
     <ClInclude Include="..\..\..\fly\types\concurrent_queue.h" />
     <ClInclude Include="..\..\..\fly\types\concurrent_stack.h" />
     <ClInclude Include="..\..\..\fly\types\json.h" />
     <ClInclude Include="..\..\..\fly\types\string.h" />
+    <ClInclude Include="..\..\..\test\util\waitable_task_runner.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp" />
@@ -191,6 +196,7 @@
     <ClCompile Include="..\..\..\fly\parser\json_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\parser.cpp" />
     <ClCompile Include="..\..\..\fly\path\path.cpp" />
+    <ClCompile Include="..\..\..\fly\path\path_config.cpp" />
     <ClCompile Include="..\..\..\fly\path\path_monitor.cpp" />
     <ClCompile Include="..\..\..\fly\path\win\path_impl.cpp" />
     <ClCompile Include="..\..\..\fly\path\win\path_monitor_impl.cpp" />
@@ -207,8 +213,11 @@
     <ClCompile Include="..\..\..\fly\task\monitor.cpp" />
     <ClCompile Include="..\..\..\fly\task\runner.cpp" />
     <ClCompile Include="..\..\..\fly\task\task_config.cpp" />
+    <ClCompile Include="..\..\..\fly\task\task_manager.cpp" />
+    <ClCompile Include="..\..\..\fly\task\task_runner.cpp" />
     <ClCompile Include="..\..\..\fly\types\json.cpp" />
     <ClCompile Include="..\..\..\fly\types\string.cpp" />
+    <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
