@@ -10,6 +10,7 @@
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/system/system.h"
+#include "fly/task/task_runner.h"
 
 namespace fly {
 
@@ -29,23 +30,13 @@ namespace
 }
 
 //==============================================================================
-PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
-    PathMonitor(spConfigManager),
-    m_monitorDescriptor(-1)
+PathMonitorImpl::PathMonitorImpl(
+    const ConfigManagerPtr &spConfigManager,
+    const TaskRunnerPtr &spTaskRunner
+) :
+    PathMonitor(spConfigManager, spTaskRunner),
+    m_monitorDescriptor(::inotify_init1(s_initFlags))
 {
-}
-
-//==============================================================================
-PathMonitorImpl::~PathMonitorImpl()
-{
-    Stop();
-}
-
-//==============================================================================
-void PathMonitorImpl::StartMonitor()
-{
-    m_monitorDescriptor = ::inotify_init1(s_initFlags);
-
     if (m_monitorDescriptor == -1)
     {
         LOGS(-1, "Could not initialize monitor");
@@ -53,7 +44,7 @@ void PathMonitorImpl::StartMonitor()
 }
 
 //==============================================================================
-void PathMonitorImpl::StopMonitor()
+PathMonitorImpl::~PathMonitorImpl()
 {
     if (m_monitorDescriptor != -1)
     {

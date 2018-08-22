@@ -11,13 +11,16 @@
 #include "fly/config/config.h"
 #include "fly/logger/logger.h"
 #include "fly/parser/parser.h"
-#include "fly/task/runner.h"
+#include "fly/task/task.h"
 #include "fly/types/json.h"
 
 namespace fly {
 
 FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(ConfigUpdateTask);
+
 FLY_CLASS_PTRS(PathMonitor);
+FLY_CLASS_PTRS(TaskRunner);
 
 /**
  * Class to create and manage a set of configurations.
@@ -25,8 +28,10 @@ FLY_CLASS_PTRS(PathMonitor);
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 21, 2016
  */
-class ConfigManager : public Runner
+class ConfigManager : public std::enable_shared_from_this<ConfigManager>
 {
+    friend class ConfigUpdateTask;
+
     /**
      * Map of configuration group names to configuration objects.
      */
@@ -50,15 +55,16 @@ public:
      * @param string Name of the configuration file.
      */
     ConfigManager(
+        const TaskRunnerPtr &,
         ConfigFileType,
         const std::string &,
         const std::string &
     );
 
     /**
-     * Destructor. Stop the configuration manager.
+     * Destructor. Stop the configuration manager and underlying objects.
      */
-    ~ConfigManager() override;
+    ~ConfigManager();
 
     /**
      * Create a configuration object, or if one with the given type's name
@@ -79,25 +85,19 @@ public:
      */
     ConfigMap::size_type GetSize();
 
-protected:
     /**
      * Start the configuration manager and underlying objects.
      *
      * @return True if the monitor could be started.
      */
-    bool StartRunner() override;
-
-    /**
-     * Stop the configuration manager and underlying objects.
-     */
-    void StopRunner() override;
-
-    /**
-     * @return False - no workers are used, thus this should not be called.
-     */
-    bool DoWork();
+    bool Start();
 
 private:
+    /**
+     * Parse the configuration file and store the parsed values in memory.
+     */
+    void updateConfig();
+
     PathMonitorPtr m_spMonitor;
     ParserPtr m_spParser;
     Json m_values;
@@ -105,10 +105,32 @@ private:
     const std::string m_path;
     const std::string m_file;
 
-    std::atomic_bool m_aFileChanged;
+    TaskRunnerPtr m_spTaskRunner;
+    TaskPtr m_spTask;
 
     mutable std::mutex m_configsMutex;
     ConfigMap m_configs;
+};
+
+/**
+ * Task to be executed when the configuration file changes.
+ *
+ * @author Timothy Flynn (trflynn89@gmail.com)
+ * @version August 12, 2018
+ */
+class ConfigUpdateTask : public Task
+{
+public:
+    ConfigUpdateTask(const ConfigManagerWPtr &);
+
+protected:
+    /**
+     * Call back into the config manager to re-parse the configuration file.
+     */
+    void Run() override;
+
+private:
+    ConfigManagerWPtr m_wpConfigManager;
 };
 
 //==============================================================================

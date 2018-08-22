@@ -7,7 +7,11 @@
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/path/path.h"
+#include "fly/task/task_manager.h"
+#include "fly/task/task_runner.h"
 #include "fly/types/string.h"
+
+#include "test/util/waitable_task_runner.h"
 
 //==============================================================================
 class ConfigManagerTest : public ::testing::Test
@@ -15,11 +19,19 @@ class ConfigManagerTest : public ::testing::Test
 public:
     ConfigManagerTest() :
         m_path(fly::Path::Join(
-            fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
+            fly::Path::GetTempDirectory(),
+            fly::String::GenerateRandomString(10)
         )),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
+        m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
+        m_spTaskRunner(
+            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+        ),
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::Ini, m_path, m_file
+            m_spTaskRunner,
+            fly::ConfigManager::ConfigFileType::Ini,
+            m_path,
+            m_file
         ))
     {
         LOGC("Using path '%s' : '%s'", m_path, m_file);
@@ -41,7 +53,10 @@ public:
      */
     void TearDown() override
     {
-        m_spConfigManager->Stop();
+        // This reset isn't really needed, but tests complete quicker if this
+        // object (and the task is owns) is deleted sooner rather than later.
+        m_spConfigManager.reset();
+
         ASSERT_TRUE(fly::Path::RemovePath(m_path));
     }
 
@@ -81,6 +96,9 @@ protected:
     std::string m_path;
     std::string m_file;
 
+    fly::TaskManagerPtr m_spTaskManager;
+    fly::WaitableSequencedTaskRunnerPtr m_spTaskRunner;
+
     fly::ConfigManagerPtr m_spConfigManager;
 
     size_t m_initialSize;
@@ -97,19 +115,21 @@ class BadConfig : public fly::Config
 TEST_F(ConfigManagerTest, AllFileTypesTest)
 {
     {
-        m_spConfigManager->Stop();
-
         m_spConfigManager = std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::Ini, m_path, m_file
+            m_spTaskRunner,
+            fly::ConfigManager::ConfigFileType::Ini,
+            m_path,
+            m_file
         );
 
         EXPECT_TRUE(m_spConfigManager->Start());
     }
     {
-        m_spConfigManager->Stop();
-
         m_spConfigManager = std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::Json, m_path, m_file
+            m_spTaskRunner,
+            fly::ConfigManager::ConfigFileType::Json,
+            m_path,
+            m_file
         );
 
         EXPECT_TRUE(m_spConfigManager->Start());
@@ -119,10 +139,11 @@ TEST_F(ConfigManagerTest, AllFileTypesTest)
 //==============================================================================
 TEST_F(ConfigManagerTest, BadFileTypeTest)
 {
-    m_spConfigManager->Stop();
-
     m_spConfigManager = std::make_shared<fly::ConfigManager>(
-        static_cast<fly::ConfigManager::ConfigFileType>(-1), m_path, m_file
+        m_spTaskRunner,
+        static_cast<fly::ConfigManager::ConfigFileType>(-1),
+        m_path,
+        m_file
     );
 
     EXPECT_FALSE(m_spConfigManager->Start());
@@ -181,8 +202,9 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPollerTest)
         "address=USA"
     );
 
-    CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    CreateFile(contents); // Expect a file created and modified event
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     {
         auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
@@ -192,7 +214,9 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPollerTest)
         EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    CreateFile(contents + "\n"); // Expect a file modified event
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+
     EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
 }
 
@@ -218,8 +242,9 @@ TEST_F(ConfigManagerTest, InitialFileFirstTest)
         "address=USA"
     );
 
-    CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    CreateFile(contents); // Expect a file created and modified event
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     auto spConfig = m_spConfigManager->CreateConfig<fly::Config>();
 
@@ -238,8 +263,9 @@ TEST_F(ConfigManagerTest, InitialFileSecondTest)
         "address=USA"
     );
 
-    CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    CreateFile(contents); // Expect a file created and modified event
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "John Doe");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
@@ -256,8 +282,9 @@ TEST_F(ConfigManagerTest, FileChangeTest)
         "address=USA"
     );
 
-    CreateFile(contents1);
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    CreateFile(contents1); // Expect a file created and modified event
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "John Doe");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
@@ -269,8 +296,8 @@ TEST_F(ConfigManagerTest, FileChangeTest)
         "age=27"
     );
 
-    CreateFile(contents2);
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    CreateFile(contents2); // Expect a file modified event
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "Jane Doe");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");
@@ -288,14 +315,15 @@ TEST_F(ConfigManagerTest, DeleteFileTest)
         "address=USA"
     );
 
-    CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    CreateFile(contents); // Expect a file created and modified event
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "John Doe");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
 
-    std::remove(GetFullPath().c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    std::remove(GetFullPath().c_str()); // Expect a file deleted event
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");
@@ -311,8 +339,9 @@ TEST_F(ConfigManagerTest, BadUpdateTest)
         "name"
     );
 
-    CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    CreateFile(contents); // Expect a file created and modified event
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");
@@ -321,10 +350,11 @@ TEST_F(ConfigManagerTest, BadUpdateTest)
 //==============================================================================
 TEST_F(ConfigManagerTest, BadObjectTest)
 {
-    m_spConfigManager->Stop();
-
     m_spConfigManager = std::make_shared<fly::ConfigManager>(
-        fly::ConfigManager::ConfigFileType::Json, m_path, m_file
+        m_spTaskRunner,
+        fly::ConfigManager::ConfigFileType::Json,
+        m_path,
+        m_file
     );
 
     EXPECT_TRUE(m_spConfigManager->Start());
@@ -333,8 +363,9 @@ TEST_F(ConfigManagerTest, BadObjectTest)
 
     const std::string contents("[1, 2, 3]");
 
-    CreateFile(contents);
-    std::this_thread::sleep_for(std::chrono::seconds(8));
+    CreateFile(contents); // Expect a file created and modified event
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");

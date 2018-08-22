@@ -8,6 +8,7 @@
 #include "fly/parser/ini_parser.h"
 #include "fly/parser/json_parser.h"
 #include "fly/path/path_monitor.h"
+#include "fly/task/task_runner.h"
 
 namespace fly {
 
@@ -19,14 +20,14 @@ namespace
 
 //==============================================================================
 ConfigManager::ConfigManager(
+    const TaskRunnerPtr &spTaskRunner,
     ConfigFileType fileType,
     const std::string &path,
     const std::string &file
 ) :
-    Runner("ConfigManager", 1),
     m_path(path),
     m_file(file),
-    m_aFileChanged(true)
+    m_spTaskRunner(spTaskRunner)
 {
     switch (fileType)
     {
@@ -48,7 +49,10 @@ ConfigManager::ConfigManager(
 //==============================================================================
 ConfigManager::~ConfigManager()
 {
-    Stop();
+    if (m_spMonitor)
+    {
+        m_spMonitor->RemoveFile(m_path, m_file);
+    }
 }
 
 //==============================================================================
@@ -74,85 +78,85 @@ ConfigManager::ConfigMap::size_type ConfigManager::GetSize()
 }
 
 //==============================================================================
-bool ConfigManager::StartRunner()
+bool ConfigManager::Start()
 {
     if (m_spParser)
     {
-        ConfigManagerPtr spThis = SharedFromThis<ConfigManager>();
+        ConfigManagerPtr spConfigManager = shared_from_this();
 
-        if (spThis)
+        m_spTask = std::make_shared<ConfigUpdateTask>(spConfigManager);
+
+        m_spMonitor = std::make_shared<PathMonitorImpl>(
+            spConfigManager, m_spTaskRunner
+        );
+
+        auto callback = [&](...)
         {
-            m_spMonitor = std::make_shared<PathMonitorImpl>(spThis);
-        }
+            m_spTaskRunner->PostTask(m_spTask);
+        };
 
-        if (m_spMonitor && m_spMonitor->Start())
-        {
-            auto callback = [&aFileChanged = spThis->m_aFileChanged](...)
-            {
-                aFileChanged.store(true);
-            };
-
-            return m_spMonitor->AddFile(m_path, m_file, callback);
-        }
+        m_spMonitor->Start();
+        return m_spMonitor->AddFile(m_path, m_file, callback);
     }
 
     return false;
 }
 
 //==============================================================================
-void ConfigManager::StopRunner()
+void ConfigManager::updateConfig()
 {
-    if (m_spMonitor)
+    std::lock_guard<std::mutex> lock(m_configsMutex);
+
+    try
     {
-        m_spMonitor->Stop();
+        m_values = m_spParser->Parse(m_path, m_file);
+    }
+    catch (const ParserException &)
+    {
+        LOGW(-1, "Could not parse file, ignoring update");
+        m_values = nullptr;
+    }
+
+    if (m_values.IsObject() || m_values.IsNull())
+    {
+        for (auto it = m_configs.begin(); it != m_configs.end(); )
+        {
+            ConfigPtr spConfig = it->second.lock();
+
+            if (spConfig)
+            {
+                spConfig->Update(m_values[it->first]);
+                ++it;
+            }
+            else
+            {
+                it = m_configs.erase(it);
+            }
+        }
+    }
+    else
+    {
+        LOGW(-1, "Parsed non key-value pairs file, ignoring update");
+        m_values = nullptr;
     }
 }
 
 //==============================================================================
-bool ConfigManager::DoWork()
+ConfigUpdateTask::ConfigUpdateTask(const ConfigManagerWPtr &wpConfigManager) :
+    Task(),
+    m_wpConfigManager(wpConfigManager)
 {
-    static bool expected = true;
+}
 
-    if (m_aFileChanged.compare_exchange_strong(expected, false))
+//==============================================================================
+void ConfigUpdateTask::Run()
+{
+    ConfigManagerPtr spConfigManager = m_wpConfigManager.lock();
+
+    if (spConfigManager)
     {
-        std::lock_guard<std::mutex> lock(m_configsMutex);
-
-        try
-        {
-            m_values = m_spParser->Parse(m_path, m_file);
-        }
-        catch (const ParserException &)
-        {
-            LOGW(-1, "Could not parse file, ignoring update");
-            m_values = nullptr;
-        }
-
-        if (m_values.IsObject() || m_values.IsNull())
-        {
-            for (auto it = m_configs.begin(); it != m_configs.end(); )
-            {
-                ConfigPtr spConfig = it->second.lock();
-
-                if (spConfig)
-                {
-                    spConfig->Update(m_values[it->first]);
-                    ++it;
-                }
-                else
-                {
-                    it = m_configs.erase(it);
-                }
-            }
-        }
-        else
-        {
-            LOGW(-1, "Parsed non key-value pairs file, ignoring update");
-            m_values = nullptr;
-        }
+        spConfigManager->updateConfig();
     }
-
-    std::this_thread::sleep_for(s_delay);
-    return true;
 }
 
 }
