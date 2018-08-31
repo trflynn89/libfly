@@ -172,10 +172,8 @@
     <ClInclude Include="..\..\..\fly\system\system_monitor.h" />
     <ClInclude Include="..\..\..\fly\system\win\system_impl.h" />
     <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.h" />
-    <ClInclude Include="..\..\..\fly\task\monitor.h" />
     <ClInclude Include="..\..\..\fly\task\runner.h" />
     <ClInclude Include="..\..\..\fly\task\task.h" />
-    <ClInclude Include="..\..\..\fly\task\task_config.h" />
     <ClInclude Include="..\..\..\fly\task\task_manager.h" />
     <ClInclude Include="..\..\..\fly\task\task_runner.h" />
     <ClInclude Include="..\..\..\fly\traits\traits.h" />
@@ -212,9 +210,7 @@
     <ClCompile Include="..\..\..\fly\system\system_monitor.cpp" />
     <ClCompile Include="..\..\..\fly\system\win\system_impl.cpp" />
     <ClCompile Include="..\..\..\fly\system\win\system_monitor_impl.cpp" />
-    <ClCompile Include="..\..\..\fly\task\monitor.cpp" />
     <ClCompile Include="..\..\..\fly\task\runner.cpp" />
-    <ClCompile Include="..\..\..\fly\task\task_config.cpp" />
     <ClCompile Include="..\..\..\fly\task\task_manager.cpp" />
     <ClCompile Include="..\..\..\fly\task\task_runner.cpp" />
     <ClCompile Include="..\..\..\fly\types\json.cpp" />

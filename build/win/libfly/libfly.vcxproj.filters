@@ -62,9 +62,6 @@
     <ClInclude Include="..\..\..\fly\task\runner.h">
       <Filter>task</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\task\task_config.h">
-      <Filter>task</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\system\system.h">
       <Filter>system</Filter>
     </ClInclude>
@@ -125,9 +122,6 @@
     <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.h">
       <Filter>system\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\task\monitor.h">
-      <Filter>task</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\exceptions.h">
       <Filter>parser</Filter>
     </ClInclude>
@@ -184,9 +178,6 @@
     <ClCompile Include="..\..\..\fly\task\runner.cpp">
       <Filter>task</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\task\task_config.cpp">
-      <Filter>task</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\fly\system\system.cpp">
       <Filter>system</Filter>
     </ClCompile>
@@ -240,9 +231,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\system\win\system_monitor_impl.cpp">
       <Filter>system\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\task\monitor.cpp">
-      <Filter>task</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\exceptions.cpp">
       <Filter>parser</Filter>
