@@ -1,8 +1,7 @@
 # Define source files
 SRC_$(d) := \
     $(d)/googletest/googletest/src/gtest-all.cc \
-    $(d)/googletest/googletest/src/gtest_main.cc \
-    $(d)/util/waitable_task_runner.cpp
+    $(d)/googletest/googletest/src/gtest_main.cc
 
 # Define source files for mocked system calls
 ifneq ($(MOCK_SYSTEM_CALLS), )

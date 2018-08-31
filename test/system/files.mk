@@ -19,6 +19,9 @@ LDLIBS_$(d) := \
 # Define source files
 $(eval $(call WILDCARD_SOURCES))
 
+SRC_$(d) += \
+	$(d)/../util/waitable_task_runner.cpp
+
 # Define mocked system calls
 $(eval $(call MOCK_SYSTEM_CALL, read))
 $(eval $(call MOCK_SYSTEM_CALL, sysinfo))
