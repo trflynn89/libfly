@@ -92,6 +92,8 @@ public:
      */
     void TearDown() override
     {
+        m_spMonitor->RemoveAllPaths();
+
         ASSERT_TRUE(fly::Path::RemovePath(m_path0));
         ASSERT_TRUE(fly::Path::RemovePath(m_path1));
         ASSERT_TRUE(fly::Path::RemovePath(m_path2));

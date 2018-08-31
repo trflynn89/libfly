@@ -8,7 +8,6 @@
 #include "fly/logger/logger.h"
 #include "fly/path/path.h"
 #include "fly/task/task_manager.h"
-#include "fly/task/task_runner.h"
 #include "fly/types/string.h"
 
 #include "test/util/waitable_task_runner.h"
@@ -57,10 +56,6 @@ public:
      */
     void TearDown() override
     {
-        // This reset isn't really needed, but tests complete quicker if this
-        // object (and the task is owns) is deleted sooner rather than later.
-        m_spConfigManager.reset();
-
         ASSERT_TRUE(fly::Path::RemovePath(m_path));
     }
 

@@ -1,19 +1,43 @@
 #include "fly/system/system_monitor.h"
 
-#include "fly/config/config_manager.h"
+#include <chrono>
+#include <thread>
+
+#include "fly/system/system_config.h"
+#include "fly/task/task_runner.h"
 
 namespace fly {
 
 //==============================================================================
-SystemMonitor::SystemMonitor(ConfigManagerPtr &spConfigManager) :
-    Monitor("SystemMonitor", spConfigManager),
+SystemMonitor::SystemMonitor(
+    const TaskRunnerPtr &spTaskRunner,
+    const SystemConfigPtr &spConfig
+) :
     m_systemCpuCount(0),
     m_systemCpuUsage(0.0),
     m_processCpuUsage(0.0),
     m_totalSystemMemory(0),
     m_systemMemoryUsage(0),
-    m_processMemoryUsage(0)
+    m_processMemoryUsage(0),
+    m_spTaskRunner(spTaskRunner),
+    m_spConfig(spConfig)
 {
+}
+
+//==============================================================================
+bool SystemMonitor::Start()
+{
+    if (IsValid())
+    {
+        SystemMonitorPtr spSystemMonitor = shared_from_this();
+
+        m_spTask = std::make_shared<SystemMonitorTask>(spSystemMonitor);
+        m_spTaskRunner->PostTask(m_spTask);
+
+        return true;
+    }
+
+    return false;
 }
 
 //==============================================================================
@@ -53,7 +77,7 @@ uint64_t SystemMonitor::GetProcessMemoryUsage() const
 }
 
 //==============================================================================
-void SystemMonitor::Poll(const std::chrono::milliseconds &delay)
+void SystemMonitor::poll()
 {
     UpdateSystemCpuCount();
     UpdateSystemCpuUsage();
@@ -61,8 +85,32 @@ void SystemMonitor::Poll(const std::chrono::milliseconds &delay)
 
     UpdateSystemMemoryUsage();
     UpdateProcessMemoryUsage();
+}
 
-    std::this_thread::sleep_for(delay);
+//==============================================================================
+SystemMonitorTask::SystemMonitorTask(const SystemMonitorWPtr &wpSystemMonitor) :
+    Task(),
+    m_wpSystemMonitor(wpSystemMonitor)
+{
+}
+
+//==============================================================================
+void SystemMonitorTask::Run()
+{
+    SystemMonitorPtr spSystemMonitor = m_wpSystemMonitor.lock();
+
+    if (spSystemMonitor && spSystemMonitor->IsValid())
+    {
+        spSystemMonitor->poll();
+
+        if (spSystemMonitor->IsValid())
+        {
+            spSystemMonitor->m_spTaskRunner->PostTaskWithDelay(
+                spSystemMonitor->m_spTask,
+                spSystemMonitor->m_spConfig->PollInterval()
+            );
+        }
+    }
 }
 
 }

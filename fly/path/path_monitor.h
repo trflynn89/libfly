@@ -174,11 +174,6 @@ protected:
     mutable std::mutex m_mutex;
     PathInfoMap m_pathInfo;
 
-    TaskRunnerPtr m_spTaskRunner;
-    PathConfigPtr m_spConfig;
-
-    TaskPtr m_spTask;
-
 private:
     /**
      * Search for a path to be monitored in the PathInfo map. If the map does
@@ -194,6 +189,11 @@ private:
      * Stream the name of a Json instance's type.
      */
     friend std::ostream &operator << (std::ostream &, PathEvent);
+
+    TaskRunnerPtr m_spTaskRunner;
+    TaskPtr m_spTask;
+
+    PathConfigPtr m_spConfig;
 };
 
 /**
