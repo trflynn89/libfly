@@ -16,8 +16,8 @@ template <typename T>
 class ConcurrentQueue : public ConcurrentContainer<T, std::queue<T>>
 {
 protected:
-    virtual void push(const T &);
-    virtual void pop(T &);
+    void push(const T &) override;
+    void pop(T &) override;
 };
 
 //==============================================================================

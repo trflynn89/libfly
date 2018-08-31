@@ -16,8 +16,8 @@ template <typename T>
 class ConcurrentStack : public ConcurrentContainer<T, std::stack<T>>
 {
 protected:
-    virtual void push(const T &);
-    virtual void pop(T &);
+    void push(const T &) override;
+    void pop(T &) override;
 };
 
 //==============================================================================

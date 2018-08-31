@@ -2,17 +2,20 @@
 
 #include <algorithm>
 
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_config.h"
+#include "fly/task/task_runner.h"
 
 namespace fly {
 
 //==============================================================================
-SocketManager::SocketManager(ConfigManagerPtr &spConfigManager) :
-    Runner("SocketManager", 1),
-    m_spConfig(spConfigManager->CreateConfig<SocketConfig>()),
+SocketManager::SocketManager(
+    const TaskRunnerPtr &spTaskRunner,
+    const SocketConfigPtr &spConfig
+) :
+    m_spTaskRunner(spTaskRunner),
+    m_spConfig(spConfig),
     m_newClientCallback(nullptr),
     m_closedClientCallback(nullptr)
 {
@@ -21,7 +24,17 @@ SocketManager::SocketManager(ConfigManagerPtr &spConfigManager) :
 //==============================================================================
 SocketManager::~SocketManager()
 {
-    Stop();
+    ClearClientCallbacks();
+
+    std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
+    m_aioSockets.clear();
+}
+
+//==============================================================================
+void SocketManager::Start()
+{
+    SocketManagerPtr spSocketManager = shared_from_this();
+    m_spTask = std::make_shared<SocketManagerTask>(spSocketManager);
 }
 
 //==============================================================================
@@ -65,7 +78,14 @@ SocketWPtr SocketManager::CreateAsyncSocket(Protocol protocol)
         if (spSocket->SetAsync())
         {
             std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
+            bool rearm = m_aioSockets.empty();
+
             m_aioSockets.push_back(spSocket);
+
+            if (rearm)
+            {
+                m_spTaskRunner->PostTask(m_spTask);
+            }
         }
         else
         {
@@ -77,28 +97,13 @@ SocketWPtr SocketManager::CreateAsyncSocket(Protocol protocol)
 }
 
 //==============================================================================
-bool SocketManager::StartRunner()
-{
-    return true;
-}
-
-//==============================================================================
-void SocketManager::StopRunner()
-{
-    LOGC("Stopping socket manager");
-
-    ClearClientCallbacks();
-
-    std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
-    m_aioSockets.clear();
-}
-
-//==============================================================================
 void SocketManager::HandleNewAndClosedSockets(
     const SocketList &newSockets,
     const SocketList &closedSockets
 )
 {
+    bool rearm = m_aioSockets.empty();
+
     // Add new sockets to the socket system
     m_aioSockets.insert(m_aioSockets.end(), newSockets.begin(), newSockets.end());
 
@@ -114,6 +119,11 @@ void SocketManager::HandleNewAndClosedSockets(
             std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), is_same),
             m_aioSockets.end()
         );
+    }
+
+    if (rearm && !m_aioSockets.empty())
+    {
+        m_spTaskRunner->PostTask(m_spTask);
     }
 }
 
@@ -141,6 +151,31 @@ void SocketManager::TriggerCallbacks(
             {
                 m_closedClientCallback(spSocket);
             }
+        }
+    }
+}
+
+//==============================================================================
+SocketManagerTask::SocketManagerTask(const SocketManagerWPtr &wpSocketManager) :
+    Task(),
+    m_wpSocketManager(wpSocketManager)
+{
+}
+
+//==============================================================================
+void SocketManagerTask::Run()
+{
+    SocketManagerPtr spSocketManager = m_wpSocketManager.lock();
+
+    if (spSocketManager)
+    {
+        spSocketManager->Poll(spSocketManager->m_spConfig->IoWaitTime());
+
+        std::lock_guard<std::mutex> lock(spSocketManager->m_aioSocketsMutex);
+
+        if (!spSocketManager->m_aioSockets.empty())
+        {
+            spSocketManager->m_spTaskRunner->PostTask(spSocketManager->m_spTask);
         }
     }
 }

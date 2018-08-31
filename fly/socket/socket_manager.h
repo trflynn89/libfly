@@ -10,14 +10,16 @@
 
 #include "fly/fly.h"
 #include "fly/socket/async_request.h"
-#include "fly/task/runner.h"
+#include "fly/task/task.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(SocketManager);
+FLY_CLASS_PTRS(SocketManagerTask);
+
 FLY_CLASS_PTRS(Socket);
 FLY_CLASS_PTRS(SocketConfig);
-FLY_CLASS_PTRS(SocketManager);
+FLY_CLASS_PTRS(TaskRunner);
 enum class Protocol : uint8_t;
 
 /**
@@ -28,8 +30,10 @@ enum class Protocol : uint8_t;
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 19, 2016
  */
-class SocketManager : public Runner
+class SocketManager : public std::enable_shared_from_this<SocketManager>
 {
+    friend class SocketManagerTask;
+
 public:
     typedef std::function<void(SocketPtr)> SocketCallback;
 
@@ -38,14 +42,20 @@ public:
     /**
      * Constructor.
      *
-     * @param ConfigManagerPtr Reference to the configuration manager.
+     * @param TaskRunnerPtr Task runner for posting socket-related tasks onto.
+     * @param LoggerConfigPtr Reference to socket configuration.
      */
-    SocketManager(ConfigManagerPtr &);
+    SocketManager(const TaskRunnerPtr &, const SocketConfigPtr &);
 
     /**
-     * Default destructor.
+     * Destructor. Close all asynchronous sockets.
      */
-    ~SocketManager() override;
+    virtual ~SocketManager();
+
+    /**
+     * Initialize the socket manager task.
+     */
+    void Start();
 
     /**
      * Set callbacks for when a client connects or disconnects.
@@ -103,14 +113,11 @@ public:
 
 protected:
     /**
-     * @return True.
+     * Check if any asynchronous sockets are available for IO.
+     *
+     * @param microseconds Max time to allow for a socket to be available.
      */
-    bool StartRunner() override;
-
-    /**
-     * Stop the socket manager and close all sockets.
-     */
-    void StopRunner() override;
+    virtual void Poll(const std::chrono::microseconds &) = 0;
 
     /**
      * Add new sockets to and remove closed sockets from the socket system.
@@ -134,12 +141,38 @@ protected:
     AsyncRequest::RequestQueue m_completedReceives;
     AsyncRequest::RequestQueue m_completedSends;
 
+private:
+    TaskRunnerPtr m_spTaskRunner;
+    TaskPtr m_spTask;
+
     SocketConfigPtr m_spConfig;
 
-private:
     std::mutex m_callbackMutex;
     SocketCallback m_newClientCallback;
     SocketCallback m_closedClientCallback;
+};
+
+/**
+ * Task to be executed to check for available asynchronous sockets.
+ *
+ * @author Timothy Flynn (trflynn89@gmail.com)
+ * @version August 12, 2018
+ */
+class SocketManagerTask : public Task
+{
+public:
+    SocketManagerTask(const SocketManagerWPtr &);
+
+protected:
+    /**
+     * Call back into the socket manager to check if any asynchronous sockets
+     * are available for IO. If the socket manager has any asynchronous sockets
+     * after polling, the task re-arms itself.
+     */
+    void Run() override;
+
+private:
+    SocketManagerWPtr m_wpSocketManager;
 };
 
 //==============================================================================

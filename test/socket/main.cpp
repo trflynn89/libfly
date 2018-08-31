@@ -7,12 +7,14 @@
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/async_request.h"
 #include "fly/socket/socket.h"
+#include "fly/socket/socket_config.h"
 #include "fly/socket/socket_manager.h"
 #include "fly/socket/socket_types.h"
+#include "fly/task/task_manager.h"
+#include "fly/task/task_runner.h"
 #include "fly/types/concurrent_queue.h"
 #include "fly/types/string.h"
 
@@ -31,12 +33,17 @@ class SocketTest : public ::testing::Test
 {
 public:
     SocketTest() :
-        m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::Ini, std::string(), std::string()
+        m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
+
+        m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>(
+            m_spTaskManager->CreateTaskRunner<fly::SequencedTaskRunner>(),
+            std::make_shared<fly::SocketConfig>()
         )),
 
-        m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>(m_spConfigManager)),
-        m_spClientSocketManager(std::make_shared<fly::SocketManagerImpl>(m_spConfigManager)),
+        m_spClientSocketManager(std::make_shared<fly::SocketManagerImpl>(
+            m_spTaskManager->CreateTaskRunner<fly::SequencedTaskRunner>(),
+            std::make_shared<fly::SocketConfig>()
+        )),
 
         m_host("localhost"),
         m_address(0),
@@ -75,15 +82,6 @@ protected:
     }
 
     /**
-     * Stop the socket managers.
-     */
-    void TearDown() override
-    {
-        m_spClientSocketManager->Stop();
-        m_spServerSocketManager->Stop();
-    }
-
-    /**
      * Create either a synchronous or an asynchronous socket.
      */
     fly::SocketPtr CreateSocket(
@@ -107,7 +105,7 @@ protected:
         return spSocket;
     }
 
-    fly::ConfigManagerPtr m_spConfigManager;
+    fly::TaskManagerPtr m_spTaskManager;
 
     fly::SocketManagerPtr m_spServerSocketManager;
     fly::SocketManagerPtr m_spClientSocketManager;

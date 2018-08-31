@@ -1,10 +1,10 @@
 #include "fly/socket/win/socket_manager_impl.h"
 
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_config.h"
 #include "fly/socket/socket_types.h"
+#include "fly/task/task_runner.h"
 
 namespace fly {
 
@@ -12,8 +12,11 @@ namespace fly {
 std::atomic_int SocketManagerImpl::s_socketManagerCount(0);
 
 //==============================================================================
-SocketManagerImpl::SocketManagerImpl(ConfigManagerPtr &spConfigManager) :
-    SocketManager(spConfigManager)
+SocketManagerImpl::SocketManagerImpl(
+    const TaskRunnerPtr &spTaskRunner,
+    const SocketConfigPtr &spConfig
+) :
+    SocketManager(spTaskRunner, spConfig)
 {
     if (s_socketManagerCount.fetch_add(1) == 0)
     {
@@ -37,10 +40,10 @@ SocketManagerImpl::~SocketManagerImpl()
 }
 
 //==============================================================================
-bool SocketManagerImpl::DoWork()
+void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
 {
     fd_set readFd, writeFd;
-    struct timeval tv { 0, static_cast<long>(m_spConfig->IoWaitTime().count()) };
+    struct timeval tv { 0, static_cast<long>(timeout.count()) };
 
     bool anyMasksSet = false;
     {
@@ -58,8 +61,6 @@ bool SocketManagerImpl::DoWork()
             handleSocketIO(&readFd, &writeFd);
         }
     }
-
-    return true;
 }
 
 //==============================================================================
