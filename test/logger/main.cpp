@@ -96,6 +96,7 @@ public:
     void TearDown() override
     {
         fly::Logger::SetInstance(fly::LoggerPtr());
+        m_spLogger.reset();
 
         ASSERT_TRUE(fly::Path::RemovePath(m_path));
     }
