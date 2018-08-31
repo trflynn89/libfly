@@ -31,10 +31,10 @@ namespace
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const ConfigManagerPtr &spConfigManager,
-    const TaskRunnerPtr &spTaskRunner
+    const TaskRunnerPtr &spTaskRunner,
+    const PathConfigPtr &spConfig
 ) :
-    PathMonitor(spConfigManager, spTaskRunner),
+    PathMonitor(spTaskRunner, spConfig),
     m_monitorDescriptor(::inotify_init1(s_initFlags))
 {
     if (m_monitorDescriptor == -1)

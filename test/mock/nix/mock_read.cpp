@@ -1,5 +1,4 @@
 #include <cerrno>
-#include <chrono>
 #include <thread>
 
 #include <sys/types.h>
@@ -17,7 +16,6 @@ extern "C"
     {
         if (fly::MockSystem::MockEnabled(fly::MockCall::Read))
         {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
             errno = 0;
             return -1;
         }

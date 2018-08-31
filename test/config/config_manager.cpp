@@ -22,11 +22,15 @@ public:
             fly::Path::GetTempDirectory(),
             fly::String::GenerateRandomString(10)
         )),
+
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
+
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
+
         m_spTaskRunner(
             m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
         ),
+
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
             m_spTaskRunner,
             fly::ConfigManager::ConfigFileType::Ini,

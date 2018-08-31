@@ -39,10 +39,10 @@ namespace
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const ConfigManagerPtr &spConfigManager,
-    const TaskRunnerPtr &spTaskRunner
+    const TaskRunnerPtr &spTaskRunner,
+    const PathConfigPtr &spConfig
 ) :
-    PathMonitor(spConfigManager, spTaskRunner),
+    PathMonitor(spTaskRunner, spConfig),
     m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
 {
     if (m_iocp == NULL)

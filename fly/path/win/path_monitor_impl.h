@@ -12,7 +12,7 @@ namespace fly {
 
 FLY_CLASS_PTRS(PathMonitorImpl);
 
-FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(PathConfig);
 FLY_CLASS_PTRS(TaskRunner);
 
 /**
@@ -28,7 +28,7 @@ public:
     /**
      * Constructor. Create the path monitor's IOCP.
      */
-    PathMonitorImpl(const ConfigManagerPtr &, const TaskRunnerPtr &);
+    PathMonitorImpl(const TaskRunnerPtr &, const PathConfigPtr &);
 
     /**
      * Destructor. Close the path monitor's IOCP.

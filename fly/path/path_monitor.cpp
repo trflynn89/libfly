@@ -9,11 +9,11 @@ namespace fly {
 
 //==============================================================================
 PathMonitor::PathMonitor(
-    const ConfigManagerPtr &spConfigManager,
-    const TaskRunnerPtr &spTaskRunner
+    const TaskRunnerPtr &spTaskRunner,
+    const PathConfigPtr &spConfig
 ) :
-    m_spConfig(spConfigManager->CreateConfig<PathConfig>()),
-    m_spTaskRunner(spTaskRunner)
+    m_spTaskRunner(spTaskRunner),
+    m_spConfig(spConfig)
 {
 }
 
@@ -24,12 +24,19 @@ PathMonitor::~PathMonitor()
 }
 
 //==============================================================================
-void PathMonitor::Start()
+bool PathMonitor::Start()
 {
-    PathMonitorPtr spPathMonitor = shared_from_this();
+    if (IsValid())
+    {
+        PathMonitorPtr spPathMonitor = shared_from_this();
 
-    m_spTask = std::make_shared<PathMonitorTask>(spPathMonitor);
-    m_spTaskRunner->PostTask(m_spTask);
+        m_spTask = std::make_shared<PathMonitorTask>(spPathMonitor);
+        m_spTaskRunner->PostTask(m_spTask);
+
+        return true;
+    }
+
+    return false;
 }
 
 //==============================================================================
@@ -197,16 +204,14 @@ std::ostream &operator << (std::ostream &stream, PathMonitor::PathEvent event)
 }
 
 //==============================================================================
-PathMonitor::PathMonitorTask::PathMonitorTask(
-    const PathMonitorWPtr &wpPathMonitor
-) :
+PathMonitorTask::PathMonitorTask(const PathMonitorWPtr &wpPathMonitor) :
     Task(),
     m_wpPathMonitor(wpPathMonitor)
 {
 }
 
 //==============================================================================
-void PathMonitor::PathMonitorTask::Run()
+void PathMonitorTask::Run()
 {
     PathMonitorPtr spPathMonitor = m_wpPathMonitor.lock();
 

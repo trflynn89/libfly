@@ -50,6 +50,7 @@ public:
     /**
      * Constructor.
      *
+     * @param TaskRunnerPtr Task runner for posting config-related tasks onto.
      * @param ConfigFileType File format of the configuration file.
      * @param string Directory containing the configuration file.
      * @param string Name of the configuration file.

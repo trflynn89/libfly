@@ -7,6 +7,7 @@
 #include "fly/parser/exceptions.h"
 #include "fly/parser/ini_parser.h"
 #include "fly/parser/json_parser.h"
+#include "fly/path/path_config.h"
 #include "fly/path/path_monitor.h"
 #include "fly/task/task_runner.h"
 
@@ -82,21 +83,31 @@ bool ConfigManager::Start()
 {
     if (m_spParser)
     {
-        ConfigManagerPtr spConfigManager = shared_from_this();
-
-        m_spTask = std::make_shared<ConfigUpdateTask>(spConfigManager);
-
         m_spMonitor = std::make_shared<PathMonitorImpl>(
-            spConfigManager, m_spTaskRunner
+            m_spTaskRunner,
+            CreateConfig<PathConfig>()
         );
 
-        auto callback = [&](...)
+        if (m_spMonitor->Start())
         {
-            m_spTaskRunner->PostTask(m_spTask);
-        };
+            ConfigManagerWPtr wpConfigManager = shared_from_this();
 
-        m_spMonitor->Start();
-        return m_spMonitor->AddFile(m_path, m_file, callback);
+            m_spTask = std::make_shared<ConfigUpdateTask>(wpConfigManager);
+            TaskWPtr wpTask = m_spTask;
+
+            auto callback = [wpConfigManager, wpTask](...)
+            {
+                ConfigManagerPtr spConfigManager = wpConfigManager.lock();
+                TaskPtr spTask = wpTask.lock();
+
+                if (spConfigManager && spTask)
+                {
+                    spConfigManager->m_spTaskRunner->PostTask(spTask);
+                }
+            };
+
+            return m_spMonitor->AddFile(m_path, m_file, callback);
+        }
     }
 
     return false;
