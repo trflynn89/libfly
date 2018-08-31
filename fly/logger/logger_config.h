@@ -37,7 +37,7 @@ public:
     /**
      * @return Sleep time for logger IO thread.
      */
-    std::chrono::seconds QueueWaitTime() const;
+    std::chrono::milliseconds QueueWaitTime() const;
 };
 
 }

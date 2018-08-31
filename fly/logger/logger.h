@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstdarg>
 #include <fstream>
+#include <future>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -11,7 +12,7 @@
 #include "fly/fly.h"
 #include "fly/logger/log.h"
 #include "fly/system/system.h"
-#include "fly/task/runner.h"
+#include "fly/task/task.h"
 #include "fly/types/concurrent_queue.h"
 #include "fly/types/string.h"
 
@@ -71,9 +72,11 @@
 
 namespace fly {
 
-FLY_CLASS_PTRS(ConfigManager);
 FLY_CLASS_PTRS(Logger);
+FLY_CLASS_PTRS(LoggerTask);
+
 FLY_CLASS_PTRS(LoggerConfig);
+FLY_CLASS_PTRS(TaskRunner);
 
 /**
  * Provides thread safe instrumentation. There are 4 levels of instrumentation:
@@ -95,21 +98,19 @@ FLY_CLASS_PTRS(LoggerConfig);
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 21, 2016
  */
-class Logger : public Runner
+class Logger : public std::enable_shared_from_this<Logger>
 {
+    friend class LoggerTask;
+
 public:
     /**
      * Constructor.
      *
-     * @param ConfigManagerPtr Reference to the configuration manager.
+     * @param TaskRunnerPtr Task runner for posting logger-related tasks onto.
+     * @param LoggerConfigPtr Reference to logger configuration.
      * @param string Path to store the log file.
      */
-    Logger(ConfigManagerPtr &, const std::string &);
-
-    /**
-     * Destructor.
-     */
-    ~Logger() override;
+    Logger(const TaskRunnerPtr &, const LoggerConfigPtr &, const std::string &);
 
     /**
      * Set the logger instance so that the LOG* macros function.
@@ -144,35 +145,26 @@ public:
     static void AddLog(Log::Level, ssize_t, const char *, const char *, unsigned int, const std::string &);
 
     /**
+     * Create the logger's log file on disk and initialize the logger task.
+     *
+     * @return bool True if the logger is in a valid state.
+     */
+    bool Start();
+
+    /**
      * @return string Path to the current log file.
      */
     std::string GetLogFilePath() const;
 
-    /**
-     * @return LoggerConfigPtr Shared pointer to the log config.
-     */
-    LoggerConfigPtr GetLogConfig() const;
-
-protected:
-    /**
-     * Start the logger. Create the logger's log file on disk.
-     *
-     * @return True if the log file could be created.
-     */
-    bool StartRunner() override;
-
-    /**
-     * Stop the logger.
-     */
-    void StopRunner() override;
-
+private:
     /**
      * Perform any IO operations. Wait for a log item to be available and write
      * it to disk.
+     *
+     * @return bool True if the current log file is still open and healthy.
      */
-    bool DoWork() override;
+    bool poll();
 
-private:
     /**
      * Add a log to this logger instance.
      *
@@ -199,6 +191,9 @@ private:
     fly::ConcurrentQueue<Log> m_logQueue;
     std::future<void> m_future;
 
+    TaskRunnerPtr m_spTaskRunner;
+    TaskPtr m_spTask;
+
     LoggerConfigPtr m_spConfig;
 
     const std::string m_filePath;
@@ -208,6 +203,28 @@ private:
     size_t m_index;
 
     const std::chrono::high_resolution_clock::time_point m_startTime;
+};
+
+/**
+ * Task to be executed to check for new log entries.
+ *
+ * @author Timothy Flynn (trflynn89@gmail.com)
+ * @version August 12, 2018
+ */
+class LoggerTask : public Task
+{
+public:
+    LoggerTask(const LoggerWPtr &);
+
+protected:
+    /**
+     * Call back into the logger to check for new log entries. The task re-arms
+     * itself.
+     */
+    void Run() override;
+
+private:
+    LoggerWPtr m_wpLogger;
 };
 
 }

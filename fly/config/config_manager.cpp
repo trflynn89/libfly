@@ -13,12 +13,6 @@
 
 namespace fly {
 
-namespace
-{
-    // TODO make configurable
-    static const std::chrono::milliseconds s_delay(5000);
-}
-
 //==============================================================================
 ConfigManager::ConfigManager(
     const TaskRunnerPtr &spTaskRunner,
