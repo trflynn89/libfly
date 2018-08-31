@@ -25,6 +25,7 @@ class SocketManagerImpl : public SocketManager
 {
 public:
     SocketManagerImpl(const TaskRunnerPtr &, const SocketConfigPtr &);
+    ~SocketManagerImpl() override;
 
 protected:
     void Poll(const std::chrono::microseconds &) override;

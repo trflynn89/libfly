@@ -59,9 +59,6 @@
     <ClInclude Include="..\..\..\fly\path\path_monitor.h">
       <Filter>path</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\task\runner.h">
-      <Filter>task</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\system\system.h">
       <Filter>system</Filter>
     </ClInclude>
@@ -174,9 +171,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\path\path_monitor.cpp">
       <Filter>path</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\task\runner.cpp">
-      <Filter>task</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\system\system.cpp">
       <Filter>system</Filter>
