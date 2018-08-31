@@ -35,14 +35,6 @@ public:
     ~SystemMonitorImpl() override;
 
 protected:
-    /**
-     * Check if the system monitor's CPU query was successfully created, and if
-     * the system CPU count was successfully set.
-     *
-     * @return bool True if the CPU query and count are valid.
-     */
-    bool IsValid() const override;
-
     void UpdateSystemCpuCount() override;
     void UpdateSystemCpuUsage() override;
     void UpdateProcessCpuUsage() override;

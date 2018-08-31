@@ -48,8 +48,10 @@ SystemMonitorImpl::SystemMonitorImpl(
         ::PdhCloseQuery(m_cpuQuery);
         m_cpuQuery = NULL;
     }
-
-    UpdateSystemCpuCount();
+    else
+    {
+        UpdateSystemCpuCount();
+    }
 }
 
 //==============================================================================
@@ -60,12 +62,6 @@ SystemMonitorImpl::~SystemMonitorImpl()
         ::PdhCloseQuery(m_cpuQuery);
         m_cpuQuery = NULL;
     }
-}
-
-//==============================================================================
-bool SystemMonitorImpl::IsValid() const
-{
-    return ((m_cpuQuery != NULL) && (m_systemCpuCount.load() > 0));
 }
 
 //==============================================================================

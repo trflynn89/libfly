@@ -43,12 +43,6 @@ SystemMonitorImpl::SystemMonitorImpl(
 }
 
 //==============================================================================
-bool SystemMonitorImpl::IsValid() const
-{
-    return (m_systemCpuCount.load() > 0);
-}
-
-//==============================================================================
 void SystemMonitorImpl::UpdateSystemCpuCount()
 {
     std::ifstream stream(s_procStatFile, std::ios::in);

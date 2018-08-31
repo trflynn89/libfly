@@ -27,7 +27,7 @@ SystemMonitor::SystemMonitor(
 //==============================================================================
 bool SystemMonitor::Start()
 {
-    if (IsValid())
+    if (isValid())
     {
         SystemMonitorPtr spSystemMonitor = shared_from_this();
 
@@ -77,6 +77,12 @@ uint64_t SystemMonitor::GetProcessMemoryUsage() const
 }
 
 //==============================================================================
+bool SystemMonitor::isValid() const
+{
+    return (GetSystemCpuCount() > 0);
+}
+
+//==============================================================================
 void SystemMonitor::poll()
 {
     UpdateSystemCpuCount();
@@ -99,11 +105,11 @@ void SystemMonitorTask::Run()
 {
     SystemMonitorPtr spSystemMonitor = m_wpSystemMonitor.lock();
 
-    if (spSystemMonitor && spSystemMonitor->IsValid())
+    if (spSystemMonitor && spSystemMonitor->isValid())
     {
         spSystemMonitor->poll();
 
-        if (spSystemMonitor->IsValid())
+        if (spSystemMonitor->isValid())
         {
             spSystemMonitor->m_spTaskRunner->PostTaskWithDelay(
                 spSystemMonitor->m_spTask,

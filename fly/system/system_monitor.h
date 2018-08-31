@@ -92,13 +92,6 @@ public:
 
 protected:
     /**
-     * Check if the system monitor implementation is valid.
-     *
-     * @return bool True if the implementation is valid.
-     */
-    virtual bool IsValid() const = 0;
-
-    /**
      * Update the system's current CPU count.
      */
     virtual void UpdateSystemCpuCount() = 0;
@@ -132,6 +125,13 @@ protected:
     std::atomic<uint64_t> m_processMemoryUsage;
 
 private:
+    /**
+     * Check if the system CPU count was successfully set.
+     *
+     * @return bool True if the CPU count is valid.
+     */
+    bool isValid() const;
+
     /**
      * Update the system-level resources.
      */

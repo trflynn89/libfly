@@ -29,13 +29,6 @@ public:
     SystemMonitorImpl(const TaskRunnerPtr &, const SystemConfigPtr &);
 
 protected:
-    /**
-     * Check if the system CPU count was successfully set.
-     *
-     * @return bool True if the CPU count is valid.
-     */
-    bool IsValid() const;
-
     void UpdateSystemCpuCount() override;
     void UpdateSystemCpuUsage() override;
     void UpdateProcessCpuUsage() override;
