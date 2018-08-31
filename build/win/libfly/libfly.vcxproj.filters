@@ -167,6 +167,9 @@
     <ClInclude Include="..\..\..\test\util\waitable_task_runner.h">
       <Filter>test\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\system\system_config.h">
+      <Filter>system</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp">
@@ -264,6 +267,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp">
       <Filter>test\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\system\system_config.cpp">
+      <Filter>system</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
