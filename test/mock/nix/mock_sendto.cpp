@@ -5,6 +5,19 @@
 
 #include "test/mock/mock_system.h"
 
+namespace
+{
+    // This is a hack to be able to test sendto() being called multiple times in
+    // SocketTest::Send_Async_MockSendtoBlock.
+    //
+    // On the first call to sendto() when mocked blocking is enabled, send half
+    // of the bytes, simulating packet fragmentation.  On the second call, send
+    // 0 bytes and set errno to EWOULDBLOCK to make SocketImpl break out of its
+    // send loop after the packet fragmentation. On the third call, send the
+    // remaining bytes, completing the send.
+    static int s_callCount = 0;
+}
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -18,6 +31,23 @@ extern "C"
         {
             errno = 0;
             return -1;
+        }
+        else if (fly::MockSystem::MockEnabled(fly::MockCall::Sendto_Blocking))
+        {
+            switch (s_callCount++)
+            {
+            case 0:
+                len /= 2;
+                break;
+
+            case 1:
+                errno = EWOULDBLOCK;
+                return -1;
+
+            case 2:
+                s_callCount = 0;
+                break;
+            }
         }
 
         return __real_sendto(sockfd, buf, len, flags, dest_addr, addrlen);
