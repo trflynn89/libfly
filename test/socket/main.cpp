@@ -455,7 +455,6 @@ TEST_F(SocketTest, Send_Async_MockSendtoBlock)
     fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::UDP, true);
     ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
-
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, true);
     ASSERT_TRUE(spClientSocket->SendToAsync(m_message, m_host, m_port));
 
