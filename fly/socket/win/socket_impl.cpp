@@ -132,7 +132,7 @@ bool SocketImpl::Bind(
         static_cast<int>(sizeof(bindForReuseOption));
 
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
-    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
 
     switch (option)
     {
@@ -141,7 +141,7 @@ bool SocketImpl::Bind(
 
     case BindOption::AllowReuse:
         if (::setsockopt(m_socketHandle, SOL_SOCKET, SO_REUSEADDR,
-            &bindForReuseOption, bindForReuseOptionLength) == -1)
+            &bindForReuseOption, bindForReuseOptionLength) == SOCKET_ERROR)
         {
             LOGS(m_socketHandle, "Error setting reuse flag");
             return false;
@@ -176,7 +176,7 @@ bool SocketImpl::Listen()
 bool SocketImpl::Connect(address_type address, port_type port)
 {
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
-    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
 
     if (::connect(m_socketHandle, pSocketAddress, sizeof(socketAddress)) == SOCKET_ERROR)
     {
@@ -201,7 +201,7 @@ SocketPtr SocketImpl::Accept() const
     SocketImplPtr ret = std::make_shared<SocketImpl>(m_protocol, m_spConfig);
 
     struct sockaddr_in socketAddress;
-    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
     int socketAddressLength = static_cast<int>(sizeof(socketAddress));
 
     socket_type skt = ::accept(m_socketHandle, pSocketAddress, &socketAddressLength);
@@ -261,13 +261,13 @@ size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
             }
 
             toSend = toSend.substr(currSent, std::string::npos);
-            keepSending = (toSend.length() > 0);
+            keepSending = !toSend.empty();
         }
         else
         {
             keepSending = false;
 
-            if (currSent == -1)
+            if (currSent == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
                 LOGS(m_socketHandle, "Error sending");
@@ -294,7 +294,7 @@ size_t SocketImpl::SendTo(
     wouldBlock = false;
 
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
-    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
 
     while (keepSending)
     {
@@ -314,13 +314,13 @@ size_t SocketImpl::SendTo(
             }
 
             toSend = toSend.substr(currSent, std::string::npos);
-            keepSending = (toSend.length() > 0);
+            keepSending = !toSend.empty();
         }
         else
         {
             keepSending = false;
 
-            if (currSent == -1)
+            if (currSent == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
                 LOGS(m_socketHandle, "Error sending");
@@ -362,7 +362,7 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const
         {
             keepReading = false;
 
-            if (bytesRead == -1)
+            if (bytesRead == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
                 LOGS(m_socketHandle, "Error receiving");
@@ -385,7 +385,7 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
     isComplete = false;
 
     struct sockaddr_in socketAddress;
-    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
     int socketAddressLength = static_cast<int>(sizeof(socketAddress));
 
     const int packetSize = static_cast<int>(m_packetSize);
@@ -411,7 +411,7 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
         {
             keepReading = false;
 
-            if (bytesRead == -1)
+            if (bytesRead == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
                 LOGS(m_socketHandle, "Error receiving");

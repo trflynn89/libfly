@@ -140,7 +140,7 @@ bool SocketImpl::Bind(
     static const socklen_t bindForReuseOptionLength = sizeof(bindForReuseOption);
 
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
-    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
 
     switch (option)
     {
@@ -184,7 +184,7 @@ bool SocketImpl::Listen()
 bool SocketImpl::Connect(address_type address, port_type port)
 {
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
-    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
 
     if (::connect(m_socketHandle, pSocketAddress, sizeof(socketAddress)) == -1)
     {
@@ -209,7 +209,7 @@ SocketPtr SocketImpl::Accept() const
     SocketImplPtr ret = std::make_shared<SocketImpl>(m_protocol, m_spConfig);
 
     struct sockaddr_in socketAddress;
-    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
     socklen_t socketAddressLength = sizeof(socketAddress);
 
     socket_type skt = ::accept(m_socketHandle, pSocketAddress, &socketAddressLength);
@@ -258,7 +258,7 @@ size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
             }
 
             toSend = toSend.substr(currSent, std::string::npos);
-            keepSending = (toSend.length() > 0);
+            keepSending = !toSend.empty();
         }
         else
         {
@@ -291,7 +291,7 @@ size_t SocketImpl::SendTo(
     wouldBlock = false;
 
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
-    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
 
     while (keepSending)
     {
@@ -311,7 +311,7 @@ size_t SocketImpl::SendTo(
             }
 
             toSend = toSend.substr(currSent, std::string::npos);
-            keepSending = (toSend.length() > 0);
+            keepSending = !toSend.empty();
         }
         else
         {
@@ -380,7 +380,7 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
     isComplete = false;
 
     struct sockaddr_in socketAddress;
-    struct sockaddr *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
     socklen_t socketAddressLength = sizeof(socketAddress);
 
     while (keepReading)

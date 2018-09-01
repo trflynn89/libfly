@@ -387,8 +387,11 @@ TEST_F(SocketTest, Send_Async_MockSendBlock)
     ASSERT_TRUE(spClientSocket->SendAsync(m_message));
 
     fly::AsyncRequest request;
-    ASSERT_FALSE(m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
-    ASSERT_TRUE(spClientSocket->IsValid());
+    ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
+    ASSERT_EQ(m_message.length(), request.GetRequest().length());
+    ASSERT_EQ(m_message, request.GetRequest());
+
+    ASSERT_EQ(request.GetSocketId(), spClientSocket->GetSocketId());
 }
 
 /**
