@@ -17,10 +17,17 @@ extern "C"
         if (fly::MockSystem::MockEnabled(fly::MockCall::Send))
         {
             errno = 0;
-            return -1;
+        }
+        else if (fly::MockSystem::MockEnabled(fly::MockCall::Send_Blocking))
+        {
+            errno = EWOULDBLOCK;
+        }
+        else
+        {
+            return __real_send(sockfd, buf, len, flags);
         }
 
-        return __real_send(sockfd, buf, len, flags);
+        return -1;
     }
 
 #ifdef __cplusplus
