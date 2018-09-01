@@ -30,6 +30,7 @@ enum class MockCall : unsigned int
     Send,
     Send_Blocking,
     Sendto,
+    Sendto_Blocking,
     Setsockopt,
     Socket,
     Sysinfo,

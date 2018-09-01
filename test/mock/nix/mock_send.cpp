@@ -14,7 +14,7 @@ namespace
     // the bytes, simulating packet fragmentation.  On the second call, send 0
     // bytes and set errno to EWOULDBLOCK to make SocketImpl break out of its
     // send loop after the packet fragmentation. On the third call, send the
-    // remainig bytes, completing the send.
+    // remaining bytes, completing the send.
     static int s_callCount = 0;
 }
 
