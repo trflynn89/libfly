@@ -28,6 +28,7 @@ enum class MockCall : unsigned int
     Recvfrom,
     Remove,
     Send,
+    Send_Blocking,
     Sendto,
     Setsockopt,
     Socket,

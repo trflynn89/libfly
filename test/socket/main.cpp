@@ -22,12 +22,6 @@
     #include "test/mock/mock_system.h"
 #endif
 
-namespace
-{
-    static std::string s_largeMessage;
-    static std::string s_smallMessage;
-}
-
 //==============================================================================
 class SocketTest : public ::testing::Test
 {
@@ -47,16 +41,10 @@ public:
 
         m_host("localhost"),
         m_address(0),
-        m_port(12390)
+        m_port(12390),
+
+        m_message(fly::String::GenerateRandomString((1 << 10) - 1))
     {
-        if (s_largeMessage.empty())
-        {
-            s_largeMessage = fly::String::GenerateRandomString((128 << 20) - 1);
-        }
-        if (s_smallMessage.empty())
-        {
-            s_smallMessage = fly::String::GenerateRandomString((64 << 10) - 1);
-        }
     }
 
     virtual void ServerThread(bool)
@@ -115,6 +103,8 @@ protected:
     std::string m_host;
     fly::address_type m_address;
     fly::port_type m_port;
+
+    std::string m_message;
 };
 
 #ifdef FLY_LINUX
@@ -287,7 +277,7 @@ TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
     m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
-    std::chrono::seconds waitTime(10);
+    std::chrono::milliseconds waitTime(100);
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, true);
 
@@ -327,7 +317,7 @@ TEST_F(SocketTest, Send_Sync_MockSendFail)
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, false);
     ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
 
-    ASSERT_EQ(spClientSocket->Send(s_smallMessage), 0U);
+    ASSERT_EQ(spClientSocket->Send(m_message), 0U);
 }
 
 /**
@@ -345,7 +335,7 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
     m_spClientSocketManager->SetClientCallbacks(callback, callback);
 
     int item = 0;
-    std::chrono::seconds waitTime(10);
+    std::chrono::milliseconds waitTime(100);
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, true);
 
@@ -358,10 +348,48 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
     }
 
     ASSERT_TRUE(spClientSocket->IsConnected());
-    ASSERT_TRUE(spClientSocket->SendAsync(s_smallMessage));
+    ASSERT_TRUE(spClientSocket->SendAsync(m_message));
 
     ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
     ASSERT_FALSE(spClientSocket->IsValid());
+}
+
+/**
+ * Test handling for when socket sending (TCP) blocks due to ::send() system call.
+ */
+TEST_F(SocketTest, Send_Async_MockSendBlock)
+{
+    fly::MockSystem mock(fly::MockCall::Send_Blocking);
+
+    fly::SocketPtr spServerSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
+    ASSERT_TRUE(spServerSocket->Listen());
+
+    fly::SocketManager::SocketCallback callback([&](fly::SocketPtr) { m_eventQueue.Push(1); } );
+    m_spClientSocketManager->SetClientCallbacks(callback, callback);
+
+    int item = 0;
+    std::chrono::milliseconds waitTime(100);
+
+    fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, true);
+
+    fly::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
+    ASSERT_NE(state, fly::ConnectedState::Disconnected);
+
+    if (state == fly::ConnectedState::Connecting)
+    {
+        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    }
+
+    ASSERT_TRUE(spClientSocket->IsConnected());
+    ASSERT_TRUE(spClientSocket->SendAsync(m_message));
+
+    fly::AsyncRequest request;
+    ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
+    ASSERT_EQ(m_message.length(), request.GetRequest().length());
+    ASSERT_EQ(m_message, request.GetRequest());
+
+    ASSERT_EQ(request.GetSocketId(), spClientSocket->GetSocketId());
 }
 
 /**
@@ -375,7 +403,7 @@ TEST_F(SocketTest, Send_Sync_MockSendtoFail)
     ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, false);
-    ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), 0U);
+    ASSERT_EQ(spClientSocket->SendTo(m_message, m_host, m_port), 0U);
 }
 
 /**
@@ -389,7 +417,7 @@ TEST_F(SocketTest, Send_Sync_MockGethostbynameFail)
     ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, false);
-    ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), 0U);
+    ASSERT_EQ(spClientSocket->SendTo(m_message, m_host, m_port), 0U);
 }
 
 /**
@@ -406,10 +434,10 @@ TEST_F(SocketTest, Send_Async_MockSendtoFail)
     m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
-    std::chrono::seconds waitTime(10);
+    std::chrono::milliseconds waitTime(100);
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(spClientSocket->SendToAsync(s_smallMessage, m_host, m_port));
+    ASSERT_TRUE(spClientSocket->SendToAsync(m_message, m_host, m_port));
 
     ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
     ASSERT_FALSE(spClientSocket->IsValid());
@@ -426,7 +454,7 @@ TEST_F(SocketTest, Send_Async_MockGethostbynameFail)
     ASSERT_TRUE(spServerSocket->Bind(fly::Socket::InAddrAny(), m_port, fly::BindOption::AllowReuse));
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, true);
-    ASSERT_FALSE(spClientSocket->SendToAsync(s_smallMessage, m_host, m_port));
+    ASSERT_FALSE(spClientSocket->SendToAsync(m_message, m_host, m_port));
 }
 
 /**
@@ -467,13 +495,13 @@ TEST_F(SocketTest, Recv_Async_MockRecvFail)
     m_spServerSocketManager->SetClientCallbacks(connectCallback, disconnectCallback);
 
     int item = 0;
-    std::chrono::seconds waitTime(10);
+    std::chrono::milliseconds waitTime(100);
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, false);
     ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
     ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
 
-    ASSERT_EQ(spClientSocket->Send(s_smallMessage), s_smallMessage.size());
+    ASSERT_EQ(spClientSocket->Send(m_message), m_message.size());
 
     ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
     ASSERT_FALSE(spRecvSocket->IsValid());
@@ -507,10 +535,10 @@ TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
     m_spServerSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
-    std::chrono::seconds waitTime(10);
+    std::chrono::milliseconds waitTime(100);
 
     fly::SocketPtr spClientSocket = CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, false);
-    ASSERT_EQ(spClientSocket->SendTo(s_smallMessage, m_host, m_port), s_smallMessage.size());
+    ASSERT_EQ(spClientSocket->SendTo(m_message, m_host, m_port), m_message.size());
 
     ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
     ASSERT_FALSE(spServerSocket->IsValid());
@@ -543,18 +571,18 @@ public:
         if (doAsync)
         {
             fly::AsyncRequest request;
-            std::chrono::seconds waitTime(120);
+            std::chrono::seconds waitTime(10);
 
             ASSERT_TRUE(m_spServerSocketManager->WaitForCompletedReceive(request, waitTime));
-            ASSERT_EQ(s_largeMessage.length(), request.GetRequest().length());
-            ASSERT_EQ(s_largeMessage, request.GetRequest());
+            ASSERT_EQ(m_message.length(), request.GetRequest().length());
+            ASSERT_EQ(m_message, request.GetRequest());
 
             ASSERT_GE(request.GetSocketId(), 0);
         }
         else
         {
             fly::SocketPtr spRecvSocket = spAcceptSocket->Accept();
-            ASSERT_EQ(spRecvSocket->Recv(), s_largeMessage);
+            ASSERT_EQ(spRecvSocket->Recv(), m_message);
 
             ASSERT_GT(spRecvSocket->GetClientIp(), 0U);
             ASSERT_GT(spRecvSocket->GetClientPort(), 0U);
@@ -579,7 +607,7 @@ public:
         ASSERT_FALSE(spSendSocket->IsUdp());
 
         int item = 0;
-        std::chrono::seconds waitTime(120);
+        std::chrono::seconds waitTime(10);
         ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
 
         fly::SocketManager::SocketCallback callback([&](fly::SocketPtr) { m_eventQueue.Push(1); } );
@@ -596,21 +624,19 @@ public:
                 ASSERT_TRUE(spSendSocket->IsConnected());
             }
 
-            ASSERT_TRUE(spSendSocket->SendAsync(s_largeMessage));
+            ASSERT_TRUE(spSendSocket->SendAsync(m_message));
 
             fly::AsyncRequest request;
-            std::chrono::seconds waitTime(120);
-
             ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
-            ASSERT_EQ(s_largeMessage.length(), request.GetRequest().length());
-            ASSERT_EQ(s_largeMessage, request.GetRequest());
+            ASSERT_EQ(m_message.length(), request.GetRequest().length());
+            ASSERT_EQ(m_message, request.GetRequest());
 
             ASSERT_EQ(request.GetSocketId(), spSendSocket->GetSocketId());
         }
         else
         {
             ASSERT_TRUE(spSendSocket->Connect(m_host, m_port));
-            ASSERT_EQ(spSendSocket->Send(s_largeMessage), s_largeMessage.length());
+            ASSERT_EQ(spSendSocket->Send(m_message), m_message.length());
         }
 
         m_spClientSocketManager->ClearClientCallbacks();
@@ -625,8 +651,8 @@ TEST_F(TcpSocketTest, AsyncOperationsOnSyncSocketTest)
     fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, false);
 
     ASSERT_EQ(spSocket->ConnectAsync(m_host, m_port), fly::ConnectedState::Disconnected);
-    ASSERT_FALSE(spSocket->SendAsync(s_smallMessage));
-    ASSERT_FALSE(spSocket->SendToAsync(s_smallMessage, m_host, m_port));
+    ASSERT_FALSE(spSocket->SendAsync(m_message));
+    ASSERT_FALSE(spSocket->SendToAsync(m_message, m_host, m_port));
 }
 
 /**
@@ -701,16 +727,16 @@ public:
         if (doAsync)
         {
             fly::AsyncRequest request;
-            std::chrono::seconds waitTime(120);
+            std::chrono::seconds waitTime(10);
 
             ASSERT_TRUE(m_spServerSocketManager->WaitForCompletedReceive(request, waitTime));
-            ASSERT_EQ(s_smallMessage, request.GetRequest());
+            ASSERT_EQ(m_message, request.GetRequest());
 
             ASSERT_EQ(request.GetSocketId(), spRecvSocket->GetSocketId());
         }
         else
         {
-            ASSERT_EQ(spRecvSocket->RecvFrom(), s_smallMessage);
+            ASSERT_EQ(spRecvSocket->RecvFrom(), m_message);
         }
     }
 
@@ -731,25 +757,23 @@ public:
         ASSERT_TRUE(spSendSocket->IsUdp());
 
         int item = 0;
-        std::chrono::seconds waitTime(120);
+        std::chrono::seconds waitTime(10);
         m_eventQueue.Pop(item, waitTime);
 
         if (doAsync)
         {
             if ((callCount++ % 2) == 0)
             {
-                ASSERT_TRUE(spSendSocket->SendToAsync(s_smallMessage, m_address, m_port));
+                ASSERT_TRUE(spSendSocket->SendToAsync(m_message, m_address, m_port));
             }
             else
             {
-                ASSERT_TRUE(spSendSocket->SendToAsync(s_smallMessage, m_host, m_port));
+                ASSERT_TRUE(spSendSocket->SendToAsync(m_message, m_host, m_port));
             }
 
             fly::AsyncRequest request;
-            std::chrono::seconds waitTime(120);
-
             ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
-            ASSERT_EQ(s_smallMessage, request.GetRequest());
+            ASSERT_EQ(m_message, request.GetRequest());
 
             ASSERT_EQ(request.GetSocketId(), spSendSocket->GetSocketId());
         }
@@ -757,11 +781,11 @@ public:
         {
             if ((callCount++ % 2) == 0)
             {
-                ASSERT_EQ(spSendSocket->SendTo(s_smallMessage, m_address, m_port), s_smallMessage.length());
+                ASSERT_EQ(spSendSocket->SendTo(m_message, m_address, m_port), m_message.length());
             }
             else
             {
-                ASSERT_EQ(spSendSocket->SendTo(s_smallMessage, m_host, m_port), s_smallMessage.length());
+                ASSERT_EQ(spSendSocket->SendTo(m_message, m_host, m_port), m_message.length());
             }
         }
     }
@@ -775,8 +799,8 @@ TEST_F(UdpSocketTest, AsyncOperationsOnSyncSocketTest)
     fly::SocketPtr spSocket = CreateSocket(m_spServerSocketManager, fly::Protocol::UDP, false);
 
     ASSERT_EQ(spSocket->ConnectAsync(m_host, m_port), fly::ConnectedState::Disconnected);
-    ASSERT_FALSE(spSocket->SendAsync(s_smallMessage));
-    ASSERT_FALSE(spSocket->SendToAsync(s_smallMessage, m_host, m_port));
+    ASSERT_FALSE(spSocket->SendAsync(m_message));
+    ASSERT_FALSE(spSocket->SendToAsync(m_message, m_host, m_port));
 }
 
 /**

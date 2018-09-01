@@ -61,6 +61,9 @@ std::ostream &operator << (std::ostream &stream, MockCall call)
     case MockCall::Send:
         stream << "send";
         break;
+    case MockCall::Send_Blocking:
+        stream << "send (blocking)";
+        break;
     case MockCall::Sendto:
         stream << "sendto";
         break;

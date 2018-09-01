@@ -59,7 +59,7 @@ bool MockSystem::MockEnabled(MockCall mock, bool &fail)
 
         if (it != s_mockedCalls.end())
         {
-            LOGC_NO_LOCK("Using mock for %s()", mock);
+            LOGC_NO_LOCK("Using mock for %s", mock);
             fail = it->second;
             return true;
         }
