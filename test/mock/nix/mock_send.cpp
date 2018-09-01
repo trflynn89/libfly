@@ -5,6 +5,19 @@
 
 #include "test/mock/mock_system.h"
 
+namespace
+{
+    // This is a hack to be able to test send() being called multiple times in
+    // SocketTest::Send_Async_MockSendBlock.
+    //
+    // On the first call to send() when mocked blocking is enabled, send half of
+    // the bytes, simulating packet fragmentation.  On the second call, send 0
+    // bytes and set errno to EWOULDBLOCK to make SocketImpl break out of its
+    // send loop after the packet fragmentation. On the third call, send the
+    // remainig bytes, completing the send.
+    static int s_callCount = 0;
+}
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -21,13 +34,19 @@ extern "C"
         }
         else if (fly::MockSystem::MockEnabled(fly::MockCall::Send_Blocking))
         {
-            // On the first call, send all but the last byte, setting errno to
-            // indicate that the send would have "blocked". Subsequent calls
-            // will have len == 1; go ahead and finish the send at that point.
-            if (len > 1)
+            switch (s_callCount++)
             {
+            case 0:
+                len /= 2;
+                break;
+
+            case 1:
                 errno = EWOULDBLOCK;
-                len -= 1;
+                return -1;
+
+            case 2:
+                s_callCount = 0;
+                break;
             }
         }
 
