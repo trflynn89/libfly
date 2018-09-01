@@ -40,12 +40,6 @@
     <Filter Include="types">
       <UniqueIdentifier>{2fe9b6ce-cbdc-485c-bd1c-37fe9ef648d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="test">
-      <UniqueIdentifier>{51c0235e-8809-43e6-a7ca-d5c8711dc342}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="test\util">
-      <UniqueIdentifier>{a517c1a3-2373-4199-a1ea-246cb3bf69f5}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\exit_codes.h" />
@@ -155,9 +149,6 @@
     <ClInclude Include="..\..\..\fly\task\task_runner.h">
       <Filter>task</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\test\util\waitable_task_runner.h">
-      <Filter>test\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\system\system_config.h">
       <Filter>system</Filter>
     </ClInclude>
@@ -246,9 +237,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\task\task_runner.cpp">
       <Filter>task</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp">
-      <Filter>test\util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\system\system_config.cpp">
       <Filter>system</Filter>
