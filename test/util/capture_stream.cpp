@@ -8,9 +8,11 @@
 #if defined(FLY_WINDOWS)
     #include <io.h>
 
+    #define close _close
     #define dup _dup
     #define dup2 _dup2
     #define fileno _fileno
+    #define fopen fopen_s
 #elif defined(FLY_LINUX)
     #include <unistd.h>
 #endif
@@ -26,7 +28,7 @@ CaptureStream::CaptureStream(Stream stream) :
     m_stdio(-1),
     m_original(-1)
 {
-    FILE *target = ::fopen(m_path.c_str(), "w");
+    FILE *target = fopen(m_path.c_str(), "w");
 
     if (target != nullptr)
     {
@@ -55,8 +57,8 @@ CaptureStream::~CaptureStream()
 {
     if (m_original != -1)
     {
-        ::dup2(m_original, m_stdio);
-        ::close(m_original);
+        dup2(m_original, m_stdio);
+        close(m_original);
 
         std::remove(m_path.c_str());
     }
