@@ -5,6 +5,8 @@
 
 #include "fly/system/system.h"
 
+#include "test/util/capture_stream.h"
+
 namespace
 {
     static int s_lastSignal = 0;
@@ -18,7 +20,11 @@ namespace
 //==============================================================================
 TEST(SystemTest, PrintBacktraceTest)
 {
+    fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
     fly::System::PrintBacktrace();
+
+    std::string output = capture();
+    EXPECT_FALSE(output.empty());
 }
 
 //==============================================================================

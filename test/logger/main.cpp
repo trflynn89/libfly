@@ -11,7 +11,7 @@
 #include "fly/task/task_manager.h"
 #include "fly/types/string.h"
 
-#include "test/util/capture_cout.h"
+#include "test/util/capture_stream.h"
 #include "test/util/path_util.h"
 #include "test/util/waitable_task_runner.h"
 
@@ -104,7 +104,7 @@ TEST_F(LoggerTest, FilePathTest)
 //==============================================================================
 TEST_F(LoggerTest, ConsoleTest)
 {
-    fly::CaptureCout capture;
+    fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
 
     LOGC("Console Log");
     LOGC("Console Log: %d", __LINE__);
