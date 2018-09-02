@@ -12,7 +12,6 @@
     #define dup _dup
     #define dup2 _dup2
     #define fileno _fileno
-    #define fopen fopen_s
 #elif defined(FLY_LINUX)
     #include <unistd.h>
 #endif
@@ -28,7 +27,13 @@ CaptureStream::CaptureStream(Stream stream) :
     m_stdio(-1),
     m_original(-1)
 {
-    FILE *target = fopen(m_path.c_str(), "w");
+    FILE *target = nullptr;
+
+#if defined(FLY_WINDOWS)
+    ::fopen_s(&target, m_path.c_str(), "w");
+#elif defined(FLY_LINUX)
+    target = ::fopen(m_path.c_str(), "w");
+#endif
 
     if (target != nullptr)
     {
