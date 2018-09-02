@@ -1,9 +1,7 @@
 #include <algorithm>
 #include <cstring>
 #include <fstream>
-#include <iostream>
-#include <limits>
-#include <sstream>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -13,54 +11,16 @@
 #include "fly/task/task_manager.h"
 #include "fly/types/string.h"
 
+#include "test/util/capture_cout.h"
+#include "test/util/path_util.h"
 #include "test/util/waitable_task_runner.h"
-
-namespace
-{
-    /**
-     * RAII helper class to redirect std::cout to a stringstream for inspection.
-     */
-    class CaptureCout
-    {
-    public:
-        /**
-         * Constructor. Redirect std::cout to a stringstream and store the
-         * original streambuf target.
-         */
-        CaptureCout() : m_original(std::cout.rdbuf(m_target.rdbuf()))
-        {
-        }
-
-        /**
-         * Constructor. Restore std::cout to the original streambuf target.
-         */
-        ~CaptureCout()
-        {
-            std::cout.rdbuf(m_original);
-        }
-
-        /**
-         * @return string The contents of std::cout.
-         */
-        std::string operator() () const
-        {
-            return m_target.str();
-        }
-
-    private:
-        std::stringstream m_target;
-        std::streambuf *m_original;
-    };
-}
 
 //==============================================================================
 class LoggerTest : public ::testing::Test
 {
 public:
     LoggerTest() :
-        m_path(fly::Path::Join(
-            fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
-        )),
+        m_path(fly::PathUtil::GenerateTempDirectory()),
 
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
@@ -76,7 +36,6 @@ public:
             m_path
         ))
     {
-        LOGC("Using path '%s'", m_path);
     }
 
     /**
@@ -102,47 +61,6 @@ public:
     }
 
 protected:
-    /**
-     * Read the contents of the current log file.
-     *
-     * @return string Contents of the log file.
-     */
-    std::string FileContents() const
-    {
-        std::string path = m_spLogger->GetLogFilePath();
-
-        std::ifstream stream(path, std::ios::in);
-        std::stringstream sstream;
-
-        if (stream.good())
-        {
-            sstream << stream.rdbuf();
-        }
-
-        return sstream.str();
-    }
-
-    /**
-     * Measure the size, in bytes, of a file.
-     *
-     * @param string Path to the file.
-     *
-     * @return ssize_t Size of the file.
-     */
-    size_t FileSize(const std::string &path)
-    {
-        std::ifstream stream(path, std::ios::in);
-        size_t size = 0;
-
-        if (stream.good())
-        {
-            stream.ignore(std::numeric_limits<std::streamsize>::max());
-            size = static_cast<size_t>(stream.gcount());
-        }
-
-        return size;
-    }
-
     /**
      * Measure the size, in bytes, of a log point.
      *
@@ -186,7 +104,7 @@ TEST_F(LoggerTest, FilePathTest)
 //==============================================================================
 TEST_F(LoggerTest, ConsoleTest)
 {
-    CaptureCout capture;
+    fly::CaptureCout capture;
 
     LOGC("Console Log");
     LOGC("Console Log: %d", __LINE__);
@@ -211,7 +129,7 @@ TEST_F(LoggerTest, DebugTest)
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
 
-    std::string contents = FileContents();
+    std::string contents = fly::PathUtil::ReadFile(m_spLogger->GetLogFilePath());
     EXPECT_FALSE(contents.empty());
 
     EXPECT_NE(contents.find(__FILE__), std::string::npos);
@@ -229,7 +147,7 @@ TEST_F(LoggerTest, InfoTest)
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
 
-    std::string contents = FileContents();
+    std::string contents = fly::PathUtil::ReadFile(m_spLogger->GetLogFilePath());
     EXPECT_FALSE(contents.empty());
 
     EXPECT_NE(contents.find(__FILE__), std::string::npos);
@@ -247,7 +165,7 @@ TEST_F(LoggerTest, WarningTest)
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
 
-    std::string contents = FileContents();
+    std::string contents = fly::PathUtil::ReadFile(m_spLogger->GetLogFilePath());
     EXPECT_FALSE(contents.empty());
 
     EXPECT_NE(contents.find(__FILE__), std::string::npos);
@@ -265,7 +183,7 @@ TEST_F(LoggerTest, ErrorTest)
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
 
-    std::string contents = FileContents();
+    std::string contents = fly::PathUtil::ReadFile(m_spLogger->GetLogFilePath());
     EXPECT_FALSE(contents.empty());
 
     EXPECT_NE(contents.find(__FILE__), std::string::npos);
@@ -300,6 +218,9 @@ TEST_F(LoggerTest, RolloverTest)
 
     EXPECT_NE(path, m_spLogger->GetLogFilePath());
 
-    size_t actualSize = FileSize(path) + FileSize(m_spLogger->GetLogFilePath());
+    size_t actualSize =
+        fly::PathUtil::ComputeFileSize(path) +
+        fly::PathUtil::ComputeFileSize(m_spLogger->GetLogFilePath());
+
     EXPECT_GE(actualSize, expectedSize * count);
 }

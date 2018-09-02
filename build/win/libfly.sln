@@ -28,7 +28,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "traits", "traits\traits.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "types", "types\types.vcxproj", "{F0D172EA-AC6A-45B1-B75F-9D40F6FC171A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "util", "utils\utils.vcxproj", "{49A0898E-A5C8-4500-A592-DC420CE6C047}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "util", "util\util.vcxproj", "{49A0898E-A5C8-4500-A592-DC420CE6C047}"
 	ProjectSection(ProjectDependencies) = postProject
 		{448893A1-77DA-46F1-B951-7EDA72D49FE9} = {448893A1-77DA-46F1-B951-7EDA72D49FE9}
 	EndProjectSection

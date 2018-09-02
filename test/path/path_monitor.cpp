@@ -1,8 +1,6 @@
-#include <cstdio>
-#include <fstream>
 #include <functional>
 #include <map>
-#include <sstream>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -18,6 +16,7 @@
     #include "test/mock/mock_system.h"
 #endif
 
+#include "test/util/path_util.h"
 #include "test/util/waitable_task_runner.h"
 
 namespace
@@ -41,18 +40,9 @@ public:
             std::make_shared<fly::PathConfig>()
         )),
 
-        m_path0(fly::Path::Join(
-            fly::Path::GetTempDirectory(),
-            fly::String::GenerateRandomString(10)
-        )),
-        m_path1(fly::Path::Join(
-            fly::Path::GetTempDirectory(),
-            fly::String::GenerateRandomString(10)
-        )),
-        m_path2(fly::Path::Join(
-            fly::Path::GetTempDirectory(),
-            fly::String::GenerateRandomString(10)
-        )),
+        m_path0(fly::PathUtil::GenerateTempDirectory()),
+        m_path1(fly::PathUtil::GenerateTempDirectory()),
+        m_path2(fly::PathUtil::GenerateTempDirectory()),
 
         m_file0(fly::String::GenerateRandomString(10) + ".txt"),
         m_file1(fly::String::GenerateRandomString(10) + ".txt"),
@@ -133,31 +123,6 @@ protected:
         }
 
         m_eventQueue.Push(event);
-    }
-
-    /**
-     * Create a file with the given contents.
-     *
-     * @param path Full path to the file to create.
-     * @param file Name of the file to create.
-     * @param string Contents of the file to create.
-     */
-    void CreateFile(const std::string &path, const std::string &contents)
-    {
-        {
-            std::ofstream stream(path, std::ios::out);
-            ASSERT_TRUE(stream.good());
-            stream << contents;
-        }
-        {
-            std::ifstream stream(path, std::ios::in);
-            ASSERT_TRUE(stream.good());
-
-            std::stringstream sstream;
-            sstream << stream.rdbuf();
-
-            ASSERT_EQ(contents, sstream.str());
-        }
     }
 
     fly::TaskManagerPtr m_spTaskManager;
@@ -264,7 +229,7 @@ TEST_F(PathMonitorTest, CreateTest_PathLevel)
     EXPECT_EQ(m_numChangedFiles[m_fullPath0], 0);
     EXPECT_EQ(m_numOtherEvents[m_fullPath0], 0);
 
-    CreateFile(m_fullPath0, std::string());
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath0, std::string()));
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
 
     EXPECT_EQ(m_numCreatedFiles[m_fullPath0], 1);
@@ -283,7 +248,7 @@ TEST_F(PathMonitorTest, CreateTest_FileLevel)
     EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
     EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
 
-    CreateFile(m_fullPath1, std::string());
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath1, std::string()));
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
 
     EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 1);
@@ -302,7 +267,7 @@ TEST_F(PathMonitorTest, DeleteTest_PathLevel)
     EXPECT_EQ(m_numChangedFiles[m_fullPath0], 0);
     EXPECT_EQ(m_numOtherEvents[m_fullPath0], 0);
 
-    CreateFile(m_fullPath0, std::string());
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath0, std::string()));
     std::remove(m_fullPath0.c_str());
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
@@ -323,7 +288,7 @@ TEST_F(PathMonitorTest, DeleteTest_FileLevel)
     EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
     EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
 
-    CreateFile(m_fullPath1, std::string());
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath1, std::string()));
     std::remove(m_fullPath1.c_str());
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
@@ -344,7 +309,7 @@ TEST_F(PathMonitorTest, ChangeTest_PathLevel)
     EXPECT_EQ(m_numChangedFiles[m_fullPath0], 0);
     EXPECT_EQ(m_numOtherEvents[m_fullPath0], 0);
 
-    CreateFile(m_fullPath0, "abcdefghi");
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath0, "abcdefghi"));
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
 
@@ -364,7 +329,7 @@ TEST_F(PathMonitorTest, ChangeTest_FileLevel)
     EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
     EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
 
-    CreateFile(m_fullPath1, "abcdefghi");
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath1, "abcdefghi"));
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
 
@@ -387,7 +352,7 @@ TEST_F(PathMonitorTest, MockFailedPollTest)
     EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
     EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
 
-    CreateFile(m_fullPath1, "abcdefghi");
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath1, "abcdefghi"));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
@@ -407,7 +372,7 @@ TEST_F(PathMonitorTest, MockFailedReadTest)
     EXPECT_EQ(m_numChangedFiles[m_fullPath1], 0);
     EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
 
-    CreateFile(m_fullPath1, "abcdefghi");
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath1, "abcdefghi"));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_numCreatedFiles[m_fullPath1], 0);
@@ -427,7 +392,7 @@ TEST_F(PathMonitorTest, OtherFileTest)
     EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
 
     std::string path = fly::Path::Join(m_path1, m_file1 + ".diff");
-    CreateFile(path, "abcdefghi");
+    ASSERT_TRUE(fly::PathUtil::CreateFile(path, "abcdefghi"));
 
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
 
@@ -437,7 +402,7 @@ TEST_F(PathMonitorTest, OtherFileTest)
     EXPECT_EQ(m_numOtherEvents[m_fullPath1], 0);
 
     path = path.substr(0, path.length() - 8);
-    CreateFile(path, "abcdefghi");
+    ASSERT_TRUE(fly::PathUtil::CreateFile(path, "abcdefghi"));
 
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
 
@@ -472,15 +437,15 @@ TEST_F(PathMonitorTest, MultipleFileTest)
     EXPECT_EQ(m_numChangedFiles[m_fullPath0], 0);
     EXPECT_EQ(m_numOtherEvents[m_fullPath0], 0);
 
-    CreateFile(m_fullPath1, std::string());
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath1, std::string()));
 
-    CreateFile(m_fullPath2, std::string());
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath2, std::string()));
     std::remove(m_fullPath2.c_str());
 
-    CreateFile(m_fullPath3, "abcdefghi");
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath3, "abcdefghi"));
     std::remove(m_fullPath3.c_str());
 
-    CreateFile(m_fullPath0, "abcdefghi");
+    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath0, "abcdefghi"));
     std::remove(m_fullPath0.c_str());
 
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
