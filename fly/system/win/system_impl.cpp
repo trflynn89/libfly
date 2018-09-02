@@ -20,7 +20,7 @@ void SystemImpl::PrintBacktrace()
 
     for (USHORT i = 0; i < traceSize; ++i)
     {
-        fprintf(stderr, "[%3u] %x\n", i, trace[i]);
+        fprintf(stderr, "[%3u] %p\n", i, trace[i]);
     }
 }
 
