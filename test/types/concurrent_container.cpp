@@ -21,8 +21,6 @@ public:
 
         for (unsigned int i = 0; i < numWrites; ++i)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
             Object object(i);
             objectQueue.Push(object);
         }
@@ -41,7 +39,7 @@ public:
         {
             Object object;
 
-            if (objectQueue.Pop(object, std::chrono::seconds(1)))
+            if (objectQueue.Pop(object, std::chrono::milliseconds(10)))
             {
                 ++numReads;
             }
@@ -194,11 +192,12 @@ TEST_F(ConcurrencyTest, InfiniteWaitReaderTest)
     auto func = std::bind(&ConcurrencyTest::InfiniteWaitReaderThread, this, std::ref(objectQueue));
     std::future<Object> future = std::async(std::launch::async, func);
 
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::future_status status = future.wait_for(std::chrono::milliseconds(10));
+    ASSERT_EQ(status, std::future_status::timeout);
 
     objectQueue.Push(obj);
 
-    std::future_status status = future.wait_for(std::chrono::seconds(1));
+    status = future.wait_for(std::chrono::milliseconds(10));
     ASSERT_EQ(status, std::future_status::ready);
     ASSERT_EQ(future.get(), obj);
 }
