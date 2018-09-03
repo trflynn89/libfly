@@ -34,7 +34,9 @@ SocketManager::~SocketManager()
 void SocketManager::Start()
 {
     SocketManagerPtr spSocketManager = shared_from_this();
+
     m_spTask = std::make_shared<SocketManagerTask>(spSocketManager);
+    m_spTaskRunner->PostTask(m_spTask);
 }
 
 //==============================================================================
@@ -78,14 +80,7 @@ SocketWPtr SocketManager::CreateAsyncSocket(Protocol protocol)
         if (spSocket->SetAsync())
         {
             std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
-            bool rearm = m_aioSockets.empty();
-
             m_aioSockets.push_back(spSocket);
-
-            if (rearm)
-            {
-                m_spTaskRunner->PostTask(m_spTask);
-            }
         }
         else
         {
@@ -102,8 +97,6 @@ void SocketManager::HandleNewAndClosedSockets(
     const SocketList &closedSockets
 )
 {
-    bool rearm = m_aioSockets.empty();
-
     // Add new sockets to the socket system
     m_aioSockets.insert(m_aioSockets.end(), newSockets.begin(), newSockets.end());
 
@@ -119,11 +112,6 @@ void SocketManager::HandleNewAndClosedSockets(
             std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), is_same),
             m_aioSockets.end()
         );
-    }
-
-    if (rearm && !m_aioSockets.empty())
-    {
-        m_spTaskRunner->PostTask(m_spTask);
     }
 }
 
@@ -170,13 +158,7 @@ void SocketManagerTask::Run()
     if (spSocketManager)
     {
         spSocketManager->Poll(spSocketManager->m_spConfig->IoWaitTime());
-
-        std::lock_guard<std::mutex> lock(spSocketManager->m_aioSocketsMutex);
-
-        if (!spSocketManager->m_aioSockets.empty())
-        {
-            spSocketManager->m_spTaskRunner->PostTask(spSocketManager->m_spTask);
-        }
+        spSocketManager->m_spTaskRunner->PostTask(spSocketManager->m_spTask);
     }
 }
 

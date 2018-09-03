@@ -36,21 +36,23 @@ public:
     }
 
     /**
-     * Create the file directory.
+     * Create the file directory and start the task and config managers.
      */
     void SetUp() override
     {
         ASSERT_TRUE(fly::Path::MakePath(m_path));
+        ASSERT_TRUE(m_spTaskManager->Start());
         ASSERT_TRUE(m_spConfigManager->Start());
 
         m_initialSize = m_spConfigManager->GetSize();
     }
 
     /**
-     * Delete the created directory.
+     * Delete the created directory and stop the task manager.
      */
     void TearDown() override
     {
+        ASSERT_TRUE(m_spTaskManager->Stop());
         ASSERT_TRUE(fly::Path::RemovePath(m_path));
     }
 

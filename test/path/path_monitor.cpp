@@ -57,7 +57,7 @@ public:
     }
 
     /**
-     * Create and start the path monitor.
+     * Create and start the task manager and path monitor.
      */
     void SetUp() override
     {
@@ -68,7 +68,8 @@ public:
         auto callback = std::bind(&PathMonitorTest::HandleEvent, this,
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
-        ASSERT_TRUE(m_spMonitor && m_spMonitor->Start());
+        ASSERT_TRUE(m_spTaskManager->Start());
+        ASSERT_TRUE(m_spMonitor->Start());
         ASSERT_TRUE(m_spMonitor->AddPath(m_path0, callback));
         ASSERT_TRUE(m_spMonitor->AddPath(m_path1, callback));
         ASSERT_TRUE(m_spMonitor->AddFile(m_path1, m_file1, callback));
@@ -77,12 +78,13 @@ public:
     }
 
     /**
-     * Stop the path monitor and delete the created directory.
+     * Stop the task manager and delete the created directory.
      */
     void TearDown() override
     {
-        m_spMonitor->RemoveAllPaths();
+        ASSERT_TRUE(m_spTaskManager->Stop());
 
+        m_spMonitor->RemoveAllPaths();
         ASSERT_TRUE(fly::Path::RemovePath(m_path0));
         ASSERT_TRUE(fly::Path::RemovePath(m_path1));
         ASSERT_TRUE(fly::Path::RemovePath(m_path2));

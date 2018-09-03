@@ -10,35 +10,59 @@ namespace fly {
 
 //==============================================================================
 TaskManager::TaskManager(int numWorkers) :
-    m_aKeepRunning(true),
+    m_aKeepRunning(false),
     m_numWorkers(numWorkers)
 {
-    LOGI(-1, "Starting %d workers", m_numWorkers);
-
-    for (int i = 0; i < m_numWorkers; ++i)
-    {
-        m_futures.push_back(
-            std::async(std::launch::async, &TaskManager::workerThread, this)
-        );
-    }
-
-    m_futures.push_back(
-        std::async(std::launch::async, &TaskManager::timerThread, this)
-    );
 }
 
 //==============================================================================
-TaskManager::~TaskManager()
+bool TaskManager::Start()
 {
-    m_aKeepRunning.store(false);
+    bool expected = false;
 
-    for (auto &future : m_futures)
+    if (m_aKeepRunning.compare_exchange_strong(expected, true))
     {
-        if (future.valid())
+        LOGI(-1, "Starting %d workers", m_numWorkers);
+        TaskManagerPtr spTaskManager = shared_from_this();
+
+        for (int i = 0; i < m_numWorkers; ++i)
         {
-            future.get();
+            m_futures.push_back(std::async(
+                std::launch::async, &TaskManager::workerThread, spTaskManager
+            ));
         }
+
+        m_futures.push_back(std::async(
+            std::launch::async, &TaskManager::timerThread, spTaskManager
+        ));
+
+        return true;
     }
+
+    return false;
+}
+
+//==============================================================================
+bool TaskManager::Stop()
+{
+    bool expected = true;
+
+    if (m_aKeepRunning.compare_exchange_strong(expected, false))
+    {
+        LOGI(-1, "Stopping %d workers", m_numWorkers);
+
+        for (auto &future : m_futures)
+        {
+            if (future.valid())
+            {
+                future.get();
+            }
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 //==============================================================================

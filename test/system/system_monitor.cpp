@@ -37,12 +37,21 @@ public:
     }
 
     /**
-     * Create and start the system monitor.
+     * Start the task manager and system monitor.
      */
     void SetUp() override
     {
-        ASSERT_TRUE(m_spMonitor && m_spMonitor->Start());
+        ASSERT_TRUE(m_spTaskManager->Start());
+        ASSERT_TRUE(m_spMonitor->Start());
         m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
+    }
+
+    /**
+     * Stop the task manager.
+     */
+    void TearDown() override
+    {
+        ASSERT_TRUE(m_spTaskManager->Stop());
     }
 
     /**
@@ -111,7 +120,8 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
             std::make_shared<fly::SystemConfig>()
         );
 
-        SetUp();
+        ASSERT_TRUE(m_spMonitor->Start());
+        m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
 
         fly::MockSystem mock1(fly::MockCall::Read);
         fly::MockSystem mock2(fly::MockCall::Times);

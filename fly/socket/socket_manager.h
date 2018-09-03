@@ -166,8 +166,7 @@ public:
 protected:
     /**
      * Call back into the socket manager to check if any asynchronous sockets
-     * are available for IO. If the socket manager has any asynchronous sockets
-     * after polling, the task re-arms itself.
+     * are available for IO. The task re-arms itself.
      */
     void Run() override;
 

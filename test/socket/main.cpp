@@ -59,14 +59,23 @@ public:
 
 protected:
     /**
-     * Start the socket managers.
+     * Start the task and socket managers.
      */
     void SetUp() override
     {
         ASSERT_TRUE(fly::Socket::HostnameToAddress(m_host, m_address));
 
+        ASSERT_TRUE(m_spTaskManager->Start());
         m_spServerSocketManager->Start();
         m_spClientSocketManager->Start();
+    }
+
+    /**
+     * Stop the task manager.
+     */
+    void TearDown() override
+    {
+        ASSERT_TRUE(m_spTaskManager->Stop());
     }
 
     /**

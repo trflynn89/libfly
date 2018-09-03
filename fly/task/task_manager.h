@@ -38,15 +38,26 @@ class TaskManager : public std::enable_shared_from_this<TaskManager>
 
 public:
     /**
-     * Constructor. Create the worker threads and timer thread.
+     * Constructor.
+     *
+     * @param int Number of worker threads to create.
      */
     TaskManager(int);
 
     /**
-     * Destructor. Destroy the worker threads and timer thread, blocking until
-     * the threads exit.
+     * Create the worker threads and timer thread.
+     *
+     * @return bool True if the threads were created in this invocation.
      */
-    ~TaskManager();
+    bool Start();
+
+    /**
+     * Destroy the worker threads and timer thread, blocking until the threads
+     * exit.
+     *
+     * @return bool True if the threads were destroyed in this invocation.
+     */
+    bool Stop();
 
     /**
      * Create a task runner, holding a weak reference to this task manager.

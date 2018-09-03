@@ -39,21 +39,25 @@ public:
     }
 
     /**
-     * Create the file directory.
+     * Create the file directory and start the task manager and logger.
      */
     void SetUp() override
     {
         ASSERT_TRUE(fly::Path::MakePath(m_path));
+
+        ASSERT_TRUE(m_spTaskManager->Start());
 
         ASSERT_TRUE(m_spLogger->Start());
         fly::Logger::SetInstance(m_spLogger);
     }
 
     /**
-     * Delete the created directory.
+     * Delete the created directory and stop the task manager.
      */
     void TearDown() override
     {
+        ASSERT_TRUE(m_spTaskManager->Stop());
+
         fly::Logger::SetInstance(fly::LoggerPtr());
         m_spLogger.reset();
 
