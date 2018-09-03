@@ -58,8 +58,6 @@ private:
 
     std::string m_path;
 
-    Stream m_stream;
-
     int m_stdio;
     int m_original;
 };
