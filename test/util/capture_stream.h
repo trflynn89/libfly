@@ -2,11 +2,15 @@
 
 #include <string>
 
+#include "fly/fly.h"
+
 namespace fly {
+
+FLY_CLASS_PTRS(CaptureStream);
 
 /**
  * RAII helper class to redirect either stdout or stderr to a file for reading.
- * On destruction, the redirected stream is restored and the file is erased.
+ * On destruction, the redirected stream is restored and the file is deleted.
  * Only meant to be used by unit tests.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
@@ -29,16 +33,29 @@ public:
     CaptureStream(Stream);
 
     /**
-     * Destructor. Restore the redirected stream and erase the file.
+     * Destructor. Restore the redirected stream and delete the redirect file.
      */
     ~CaptureStream();
 
     /**
-     * @return string The contents of the redirected standard stream.
+     * Restore the redirected stream, read the contents of the redirect file,
+     * and delete the file.
+     *
+     * @return string The contents of the redirected stream.
      */
-    std::string operator() () const;
+    std::string operator() ();
 
 private:
+    /**
+     * Restore the redirected stream, read the contents of the redirect file if
+     * specified, and delete the file.
+     *
+     * @param bool True if the file should be read before deletion.
+     *
+     * @return string The contents of the redirected stream.
+     */
+    std::string restore(bool);
+
     std::string m_path;
 
     Stream m_stream;

@@ -60,30 +60,35 @@ CaptureStream::CaptureStream(Stream stream) :
 //==============================================================================
 CaptureStream::~CaptureStream()
 {
+    restore(false);
+}
+
+//==============================================================================
+std::string CaptureStream::operator() ()
+{
+    return restore(true);
+}
+
+//==============================================================================
+std::string CaptureStream::restore(bool read)
+{
+    std::string contents;
+
     if (m_original != -1)
     {
         dup2(m_original, m_stdio);
         close(m_original);
 
+        if (read)
+        {
+            contents = fly::PathUtil::ReadFile(m_path);
+        }
+
         std::remove(m_path.c_str());
-    }
-}
-
-//==============================================================================
-std::string CaptureStream::operator() () const
-{
-    switch (m_stream)
-    {
-    case Stream::Stdout:
-        ::fflush(stdout);
-        break;
-
-    case Stream::Stderr:
-        ::fflush(stderr);
-        break;
+        m_original = -1;
     }
 
-    return fly::PathUtil::ReadFile(m_path);
+    return contents;
 }
 
 }
