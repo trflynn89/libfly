@@ -30,7 +30,7 @@ public:
      *
      * @return bool True if the file was correctly created.
      */
-    static bool CreateFile(const std::string &, const std::string &);
+    static bool WriteFile(const std::string &, const std::string &);
 
     /**
      * Read the contents of a file.

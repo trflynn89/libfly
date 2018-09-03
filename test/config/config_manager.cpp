@@ -165,7 +165,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPollerTest)
         "address=USA"
     );
 
-    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -177,7 +177,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPollerTest)
         EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
     }
 
-    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath, contents + "\n"));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents + "\n"));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
@@ -205,7 +205,7 @@ TEST_F(ConfigManagerTest, InitialFileFirstTest)
         "address=USA"
     );
 
-    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -226,7 +226,7 @@ TEST_F(ConfigManagerTest, InitialFileSecondTest)
         "address=USA"
     );
 
-    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -245,7 +245,7 @@ TEST_F(ConfigManagerTest, FileChangeTest)
         "address=USA"
     );
 
-    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath, contents1));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents1));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -259,7 +259,7 @@ TEST_F(ConfigManagerTest, FileChangeTest)
         "age=27"
     );
 
-    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath, contents2));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents2));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "Jane Doe");
@@ -278,7 +278,7 @@ TEST_F(ConfigManagerTest, DeleteFileTest)
         "address=USA"
     );
 
-    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -302,7 +302,7 @@ TEST_F(ConfigManagerTest, BadUpdateTest)
         "name"
     );
 
-    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -326,7 +326,7 @@ TEST_F(ConfigManagerTest, BadObjectTest)
 
     const std::string contents("[1, 2, 3]");
 
-    ASSERT_TRUE(fly::PathUtil::CreateFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 

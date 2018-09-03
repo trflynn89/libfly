@@ -19,7 +19,7 @@ std::string PathUtil::GenerateTempDirectory()
 }
 
 //==============================================================================
-bool PathUtil::CreateFile(const std::string &path, const std::string &contents)
+bool PathUtil::WriteFile(const std::string &path, const std::string &contents)
 {
     {
         std::ofstream stream(path, std::ios::out);
