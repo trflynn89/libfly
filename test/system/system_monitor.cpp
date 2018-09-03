@@ -73,6 +73,12 @@ protected:
 };
 
 //==============================================================================
+TEST_F(SystemMonitorTest, SystemConfigTest)
+{
+    EXPECT_EQ(fly::SystemConfig::GetName(), "system");
+}
+
+//==============================================================================
 TEST_F(SystemMonitorTest, CpuUsageTest)
 {
     uint32_t countBefore = m_spMonitor->GetSystemCpuCount();

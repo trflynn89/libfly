@@ -116,6 +116,14 @@ protected:
     std::string m_message;
 };
 
+/**
+ * Test handling for when socket creation fails due to ::socket() system call.
+ */
+TEST_F(SocketTest, SocketConfigTest)
+{
+    EXPECT_EQ(fly::SocketConfig::GetName(), "socket");
+}
+
 #ifdef FLY_LINUX
 
 /**

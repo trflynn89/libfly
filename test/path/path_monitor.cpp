@@ -1,5 +1,6 @@
 #include <functional>
 #include <map>
+#include <sstream>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -153,6 +154,42 @@ protected:
     std::map<std::string, unsigned int> m_numChangedFiles;
     std::map<std::string, unsigned int> m_numOtherEvents;
 };
+
+//==============================================================================
+TEST_F(PathMonitorTest, PathConfigTest)
+{
+    EXPECT_EQ(fly::PathConfig::GetName(), "path");
+}
+
+//==============================================================================
+TEST_F(PathMonitorTest, PathEventStreamTest)
+{
+    {
+        std::stringstream stream;
+        stream << static_cast<fly::PathMonitor::PathEvent>(-1);
+        EXPECT_TRUE(stream.str().empty());
+    }
+    {
+        std::stringstream stream;
+        stream << fly::PathMonitor::PathEvent::None;
+        EXPECT_EQ(stream.str(), "None");
+    }
+    {
+        std::stringstream stream;
+        stream << fly::PathMonitor::PathEvent::Created;
+        EXPECT_EQ(stream.str(), "Created");
+    }
+    {
+        std::stringstream stream;
+        stream << fly::PathMonitor::PathEvent::Deleted;
+        EXPECT_EQ(stream.str(), "Deleted");
+    }
+    {
+        std::stringstream stream;
+        stream << fly::PathMonitor::PathEvent::Changed;
+        EXPECT_EQ(stream.str(), "Changed");
+    }
+}
 
 //==============================================================================
 TEST_F(PathMonitorTest, NonExistingPathTest)

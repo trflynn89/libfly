@@ -15,6 +15,22 @@
 #include "test/util/path_util.h"
 #include "test/util/waitable_task_runner.h"
 
+namespace
+{
+    /**
+     * Subclass of the logger config to decrease the default log file size for
+     * faster testing.
+     */
+    class TestLoggerConfig : public fly::LoggerConfig
+    {
+    public:
+        TestLoggerConfig() : fly::LoggerConfig()
+        {
+            m_defaultMaxLogFileSize = 1 << 10;
+        }
+    };
+}
+
 //==============================================================================
 class LoggerTest : public ::testing::Test
 {
@@ -28,7 +44,7 @@ public:
             m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
         ),
 
-        m_spLoggerConfig(std::make_shared<fly::LoggerConfig>()),
+        m_spLoggerConfig(std::make_shared<TestLoggerConfig>()),
 
         m_spLogger(std::make_shared<fly::Logger>(
             m_spTaskRunner,
@@ -96,6 +112,12 @@ protected:
 };
 
 //==============================================================================
+TEST_F(LoggerTest, LoggerConfigTest)
+{
+    EXPECT_EQ(fly::LoggerConfig::GetName(), "logger");
+}
+
+//==============================================================================
 TEST_F(LoggerTest, FilePathTest)
 {
     std::string path = m_spLogger->GetLogFilePath();
@@ -103,6 +125,20 @@ TEST_F(LoggerTest, FilePathTest)
 
     std::ifstream stream(path, std::ios::in);
     EXPECT_TRUE(stream.good());
+}
+
+//==============================================================================
+TEST_F(LoggerTest, BadFilePathTest)
+{
+    fly::Logger::SetInstance(fly::LoggerPtr());
+
+    m_spLogger = std::make_shared<fly::Logger>(
+        m_spTaskRunner,
+        m_spLoggerConfig,
+        fly::PathUtil::GenerateTempDirectory()
+    );
+
+    EXPECT_FALSE(m_spLogger->Start());
 }
 
 //==============================================================================
@@ -211,7 +247,7 @@ TEST_F(LoggerTest, RolloverTest)
 
     // Create enough log points to fill the log file, plus some extra to start
     // filling a second log file
-    while (++count < ((maxFileSize / expectedSize) + maxMessageSize))
+    while (++count < ((maxFileSize / expectedSize) + 10))
     {
         LOGD(-1, "%s", random);
     }
