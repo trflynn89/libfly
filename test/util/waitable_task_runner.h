@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <memory>
 #include <typeinfo>
 
@@ -9,10 +10,86 @@
 
 namespace fly {
 
+FLY_CLASS_PTRS(WaitableParallelTaskRunner);
 FLY_CLASS_PTRS(WaitableSequencedTaskRunner);
 
 FLY_CLASS_PTRS(Task);
 FLY_CLASS_PTRS(TaskManager);
+
+/**
+ * A pseudo task runner to allow waiting for a specific task to be complete. It
+ * is not a valid test runner in itself, in that it doesn't allow actually
+ * running tasks. But the implementations below extend this class for common
+ * functionality. Only meant to be used by unit tests.
+ *
+ * @author Timothy Flynn (trflynn89@gmail.com)
+ * @version August 12, 2018
+ */
+class WaitableTaskRunner
+{
+public:
+    /**
+     * Destructor.
+     */
+    virtual ~WaitableTaskRunner() = default;
+
+    /**
+     * Wait indefinitely for a specific task type to complete execution.
+     *
+     * @tparam TaskType The task subclass to wait on.
+     */
+    template <typename TaskType>
+    void WaitForTaskTypeToComplete();
+
+    /**
+     * Wait for a specific task type to complete execution.
+     *
+     * @tparam TaskType The task subclass to wait on.
+     *
+     * @param duration Time to wait for a completion.
+     *
+     * @return bool True if a completed task was found in the given duration.
+     */
+    template <typename TaskType, typename R, typename P>
+    bool WaitForTaskTypeToComplete(std::chrono::duration<R, P>);
+
+protected:
+    /**
+     * When a task is complete, track it if the task is still valid.
+     *
+     * @param TaskPtr The (possibly NULL) task that was executed or skipped.
+     */
+    virtual void TaskComplete(const TaskPtr &) = 0;
+
+private:
+    ConcurrentQueue<size_t> m_completedTasks;
+};
+
+/**
+ * Subclass of the parllel task runner to provide the same parllel behavior, but
+ * also to allow waiting for a specific task to be complete. Only meant to be
+ * used by unit tests.
+ *
+ * @author Timothy Flynn (trflynn89@gmail.com)
+ * @version August 12, 2018
+ */
+class WaitableParallelTaskRunner :
+    public ParallelTaskRunner,
+    public WaitableTaskRunner
+{
+    friend class TaskManager;
+
+protected:
+    WaitableParallelTaskRunner(const TaskManagerWPtr &);
+
+    /**
+     * When a task is complete, perform the same operations as this runner's
+     * parents.
+     *
+     * @param TaskPtr The (possibly NULL) task that was executed or skipped.
+     */
+    void TaskComplete(const TaskPtr &) override;
+};
 
 /**
  * Subclass of the sequenced task runner to provide the same sequenced behavior,
@@ -22,35 +99,27 @@ FLY_CLASS_PTRS(TaskManager);
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version August 12, 2018
  */
-class WaitableSequencedTaskRunner : public SequencedTaskRunner
+class WaitableSequencedTaskRunner :
+    public SequencedTaskRunner,
+    public WaitableTaskRunner
 {
     friend class TaskManager;
-
-public:
-    /**
-     * Wait indefinitely for a specific task type to complete execution.
-     *
-     * @tparam TaskType The task subclass to wait on.
-     */
-    template <typename TaskType>
-    void WaitForTaskTypeToComplete();
 
 protected:
     WaitableSequencedTaskRunner(const TaskManagerWPtr &);
 
     /**
-     * When a task is complete, perform the same operations as the parent task
-     * runner, but also track the type of completed task.
+     * When a task is complete, perform the same operations as this runner's
+     * parents.
+     *
+     * @param TaskPtr The (possibly NULL) task that was executed or skipped.
      */
     void TaskComplete(const TaskPtr &) override;
-
-private:
-    ConcurrentQueue<size_t> m_completedTasks;
 };
 
 //==============================================================================
 template <typename TaskType>
-void WaitableSequencedTaskRunner::WaitForTaskTypeToComplete()
+void WaitableTaskRunner::WaitForTaskTypeToComplete()
 {
     static_assert(std::is_base_of<Task, TaskType>::value,
         "Given type is not a task");
@@ -62,6 +131,35 @@ void WaitableSequencedTaskRunner::WaitForTaskTypeToComplete()
     {
         m_completedTasks.Pop(completed_hash);
     }
+}
+
+//==============================================================================
+template <typename TaskType, typename R, typename P>
+bool WaitableTaskRunner::WaitForTaskTypeToComplete(
+    std::chrono::duration<R, P> duration
+)
+{
+    static_assert(std::is_base_of<Task, TaskType>::value,
+        "Given type is not a task");
+
+    auto deadline = std::chrono::high_resolution_clock::now() + duration;
+
+    static size_t expected_hash = typeid(TaskType).hash_code();
+    size_t completed_hash = 0;
+
+    while (expected_hash != completed_hash)
+    {
+        m_completedTasks.Pop(completed_hash, duration);
+
+        auto now = std::chrono::high_resolution_clock::now();
+
+        if (now > deadline)
+        {
+            break;
+        }
+    }
+
+    return (expected_hash == completed_hash);
 }
 
 }

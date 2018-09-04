@@ -17,8 +17,8 @@ LDLIBS_$(d) := \
 $(eval $(call WILDCARD_SOURCES))
 
 SRC_$(d) += \
-	$(d)/../util/path_util.cpp \
-	$(d)/../util/waitable_task_runner.cpp
+    $(d)/../util/path_util.cpp \
+    $(d)/../util/waitable_task_runner.cpp
 
 # Define mocked system calls
 $(eval $(call MOCK_SYSTEM_CALL, fts_read))

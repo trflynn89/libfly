@@ -6,6 +6,30 @@
 namespace fly {
 
 //==============================================================================
+void WaitableTaskRunner::TaskComplete(const TaskPtr &spTask)
+{
+    if (spTask)
+    {
+        m_completedTasks.Push(typeid(*spTask).hash_code());
+    }
+}
+
+//==============================================================================
+WaitableParallelTaskRunner::WaitableParallelTaskRunner(
+    const TaskManagerWPtr &wpTaskManager
+) :
+    ParallelTaskRunner(wpTaskManager)
+{
+}
+
+//==============================================================================
+void WaitableParallelTaskRunner::TaskComplete(const TaskPtr &spTask)
+{
+    ParallelTaskRunner::TaskComplete(spTask);
+    WaitableTaskRunner::TaskComplete(spTask);
+}
+
+//==============================================================================
 WaitableSequencedTaskRunner::WaitableSequencedTaskRunner(
     const TaskManagerWPtr &wpTaskManager
 ) :
@@ -17,11 +41,7 @@ WaitableSequencedTaskRunner::WaitableSequencedTaskRunner(
 void WaitableSequencedTaskRunner::TaskComplete(const TaskPtr &spTask)
 {
     SequencedTaskRunner::TaskComplete(spTask);
-
-    if (spTask)
-    {
-        m_completedTasks.Push(typeid(*spTask).hash_code());
-    }
+    WaitableTaskRunner::TaskComplete(spTask);
 }
 
 }
