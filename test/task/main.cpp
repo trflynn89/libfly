@@ -114,7 +114,7 @@ TEST_F(TaskTest, DelayTaskTest)
     auto spTask(std::make_shared<CountTask>());
     EXPECT_EQ(spTask->GetCount(), 0);
 
-    spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(100));
+    spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10));
 
     spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
     EXPECT_EQ(spTask->GetCount(), 1);
@@ -131,11 +131,11 @@ TEST_F(TaskTest, CancelTaskTest)
         auto spTask(std::make_shared<CountTask>());
         EXPECT_EQ(spTask->GetCount(), 0);
 
-        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(100));
+        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10));
     }
 
     EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
-        std::chrono::milliseconds(200)
+        std::chrono::milliseconds(20)
     ));
 }
 
@@ -155,7 +155,7 @@ TEST_F(TaskTest, RunnerBeforeManagerTest)
     spTaskRunner->PostTask(spTask);
 
     EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
-        std::chrono::milliseconds(100)
+        std::chrono::milliseconds(20)
     ));
 
     EXPECT_EQ(spTask->GetCount(), 0);
