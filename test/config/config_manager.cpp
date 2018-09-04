@@ -5,11 +5,30 @@
 #include "fly/config/config.h"
 #include "fly/config/config_manager.h"
 #include "fly/path/path.h"
+#include "fly/path/path_config.h"
 #include "fly/task/task_manager.h"
 #include "fly/types/string.h"
 
 #include "test/util/path_util.h"
 #include "test/util/waitable_task_runner.h"
+
+namespace
+{
+    std::chrono::seconds s_waitTime(5);
+
+    /**
+     * Subclass of the path config to decrease the poll interval for faster
+     * testing.
+     */
+    class TestPathConfig : public fly::PathConfig
+    {
+    public:
+        TestPathConfig() : fly::PathConfig()
+        {
+            m_defaultPollInterval = I64(10);
+        }
+    };
+}
 
 //==============================================================================
 class ConfigManagerTest : public ::testing::Test
@@ -31,7 +50,9 @@ public:
             fly::ConfigManager::ConfigFileType::Ini,
             m_path,
             m_file
-        ))
+        )),
+
+        m_spPathConfig(m_spConfigManager->CreateConfig<TestPathConfig>())
     {
     }
 
@@ -66,6 +87,8 @@ protected:
 
     fly::ConfigManagerPtr m_spConfigManager;
 
+    fly::PathConfigPtr m_spPathConfig;
+
     size_t m_initialSize;
 };
 
@@ -86,6 +109,7 @@ TEST_F(ConfigManagerTest, AllFileTypesTest)
             m_path,
             m_file
         );
+        m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
         EXPECT_TRUE(m_spConfigManager->Start());
     }
@@ -96,6 +120,7 @@ TEST_F(ConfigManagerTest, AllFileTypesTest)
             m_path,
             m_file
         );
+        m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
         EXPECT_TRUE(m_spConfigManager->Start());
     }
@@ -110,6 +135,7 @@ TEST_F(ConfigManagerTest, BadFileTypeTest)
         m_path,
         m_file
     );
+    m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
     EXPECT_FALSE(m_spConfigManager->Start());
 }
@@ -321,6 +347,7 @@ TEST_F(ConfigManagerTest, BadObjectTest)
         m_path,
         m_file
     );
+    m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
     EXPECT_TRUE(m_spConfigManager->Start());
 
