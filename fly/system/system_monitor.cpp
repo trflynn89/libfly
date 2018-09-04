@@ -10,7 +10,7 @@ namespace fly {
 
 //==============================================================================
 SystemMonitor::SystemMonitor(
-    const TaskRunnerPtr &spTaskRunner,
+    const SequencedTaskRunnerPtr &spTaskRunner,
     const SystemConfigPtr &spConfig
 ) :
     m_systemCpuCount(0),

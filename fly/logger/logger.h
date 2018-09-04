@@ -75,8 +75,8 @@ namespace fly {
 FLY_CLASS_PTRS(Logger);
 FLY_CLASS_PTRS(LoggerTask);
 
+FLY_CLASS_PTRS(SequencedTaskRunner);
 FLY_CLASS_PTRS(LoggerConfig);
-FLY_CLASS_PTRS(TaskRunner);
 
 /**
  * Provides thread safe instrumentation. There are 4 levels of instrumentation:
@@ -110,7 +110,7 @@ public:
      * @param LoggerConfigPtr Reference to logger configuration.
      * @param string Path to store the log file.
      */
-    Logger(const TaskRunnerPtr &, const LoggerConfigPtr &, const std::string &);
+    Logger(const SequencedTaskRunnerPtr &, const LoggerConfigPtr &, const std::string &);
 
     /**
      * Set the logger instance so that the LOG* macros function.
@@ -191,7 +191,7 @@ private:
     fly::ConcurrentQueue<Log> m_logQueue;
     std::future<void> m_future;
 
-    TaskRunnerPtr m_spTaskRunner;
+    SequencedTaskRunnerPtr m_spTaskRunner;
     TaskPtr m_spTask;
 
     LoggerConfigPtr m_spConfig;

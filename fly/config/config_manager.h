@@ -19,8 +19,8 @@ namespace fly {
 FLY_CLASS_PTRS(ConfigManager);
 FLY_CLASS_PTRS(ConfigUpdateTask);
 
+FLY_CLASS_PTRS(SequencedTaskRunner);
 FLY_CLASS_PTRS(PathMonitor);
-FLY_CLASS_PTRS(TaskRunner);
 
 /**
  * Class to create and manage a set of configurations.
@@ -56,7 +56,7 @@ public:
      * @param string Name of the configuration file.
      */
     ConfigManager(
-        const TaskRunnerPtr &,
+        const SequencedTaskRunnerPtr &,
         ConfigFileType,
         const std::string &,
         const std::string &
@@ -106,7 +106,7 @@ private:
     const std::string m_path;
     const std::string m_file;
 
-    TaskRunnerPtr m_spTaskRunner;
+    SequencedTaskRunnerPtr m_spTaskRunner;
     TaskPtr m_spTask;
 
     mutable std::mutex m_configsMutex;

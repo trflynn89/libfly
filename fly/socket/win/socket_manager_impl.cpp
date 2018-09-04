@@ -13,7 +13,7 @@ std::atomic_int SocketManagerImpl::s_socketManagerCount(0);
 
 //==============================================================================
 SocketManagerImpl::SocketManagerImpl(
-    const TaskRunnerPtr &spTaskRunner,
+    const SequencedTaskRunnerPtr &spTaskRunner,
     const SocketConfigPtr &spConfig
 ) :
     SocketManager(spTaskRunner, spConfig)

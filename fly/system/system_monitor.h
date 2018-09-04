@@ -12,8 +12,8 @@ namespace fly {
 FLY_CLASS_PTRS(SystemMonitor);
 FLY_CLASS_PTRS(SystemMonitorTask);
 
+FLY_CLASS_PTRS(SequencedTaskRunner);
 FLY_CLASS_PTRS(SystemConfig);
-FLY_CLASS_PTRS(TaskRunner);
 
 /**
  * Virtual interface for monitoring system-level resources. Provides CPU and
@@ -34,7 +34,7 @@ public:
      * @param TaskRunnerPtr Task runner for posting monitor-related tasks onto.
      * @param SystemConfigPtr Reference to system configuration.
      */
-    SystemMonitor(const TaskRunnerPtr &, const SystemConfigPtr &);
+    SystemMonitor(const SequencedTaskRunnerPtr &, const SystemConfigPtr &);
 
     /**
      * Destructor.
@@ -137,7 +137,7 @@ private:
      */
     void poll();
 
-    TaskRunnerPtr m_spTaskRunner;
+    SequencedTaskRunnerPtr m_spTaskRunner;
     TaskPtr m_spTask;
 
     SystemConfigPtr m_spConfig;

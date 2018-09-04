@@ -10,8 +10,8 @@ namespace fly {
 
 FLY_CLASS_PTRS(SystemMonitorImpl);
 
+FLY_CLASS_PTRS(SequencedTaskRunner);
 FLY_CLASS_PTRS(SystemConfig);
-FLY_CLASS_PTRS(TaskRunner);
 
 /**
  * Windows implementation of the SystemMonitor interface. Uses the Windows, PDH,
@@ -27,7 +27,7 @@ public:
      * Constructor. Open the system monitor's CPU query and set the system CPU
      * count.
      */
-    SystemMonitorImpl(const TaskRunnerPtr &, const SystemConfigPtr &);
+    SystemMonitorImpl(const SequencedTaskRunnerPtr &, const SystemConfigPtr &);
 
     /**
      * Destructor. Close the system monitor's CPU query.

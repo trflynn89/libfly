@@ -15,7 +15,7 @@ namespace fly {
 
 //==============================================================================
 ConfigManager::ConfigManager(
-    const TaskRunnerPtr &spTaskRunner,
+    const SequencedTaskRunnerPtr &spTaskRunner,
     ConfigFileType fileType,
     const std::string &path,
     const std::string &file

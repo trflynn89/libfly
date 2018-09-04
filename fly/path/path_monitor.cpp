@@ -9,7 +9,7 @@ namespace fly {
 
 //==============================================================================
 PathMonitor::PathMonitor(
-    const TaskRunnerPtr &spTaskRunner,
+    const SequencedTaskRunnerPtr &spTaskRunner,
     const PathConfigPtr &spConfig
 ) :
     m_spTaskRunner(spTaskRunner),

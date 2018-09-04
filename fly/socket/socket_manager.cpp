@@ -11,7 +11,7 @@ namespace fly {
 
 //==============================================================================
 SocketManager::SocketManager(
-    const TaskRunnerPtr &spTaskRunner,
+    const SequencedTaskRunnerPtr &spTaskRunner,
     const SocketConfigPtr &spConfig
 ) :
     m_spTaskRunner(spTaskRunner),

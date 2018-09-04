@@ -17,7 +17,7 @@ namespace
 
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(
-    const TaskRunnerPtr &spTaskRunner,
+    const SequencedTaskRunnerPtr &spTaskRunner,
     const SystemConfigPtr &spConfig
 ) :
     SystemMonitor(spTaskRunner, spConfig),

@@ -14,8 +14,8 @@ namespace fly {
 FLY_CLASS_PTRS(PathMonitor);
 FLY_CLASS_PTRS(PathMonitorTask);
 
+FLY_CLASS_PTRS(SequencedTaskRunner);
 FLY_CLASS_PTRS(PathConfig);
-FLY_CLASS_PTRS(TaskRunner);
 
 /**
  * Virtual interface to monitor a local path. Provides monitoring of either all
@@ -55,7 +55,7 @@ public:
      * @param TaskRunnerPtr Task runner for posting path-related tasks onto.
      * @param PathConfigPtr Reference to path configuration.
      */
-    PathMonitor(const TaskRunnerPtr &, const PathConfigPtr &);
+    PathMonitor(const SequencedTaskRunnerPtr &, const PathConfigPtr &);
 
     /**
      * Destructor. Remove all paths from the path monitor.
@@ -190,7 +190,7 @@ private:
      */
     friend std::ostream &operator << (std::ostream &, PathEvent);
 
-    TaskRunnerPtr m_spTaskRunner;
+    SequencedTaskRunnerPtr m_spTaskRunner;
     TaskPtr m_spTask;
 
     PathConfigPtr m_spConfig;

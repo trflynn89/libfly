@@ -31,7 +31,7 @@ namespace
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const TaskRunnerPtr &spTaskRunner,
+    const SequencedTaskRunnerPtr &spTaskRunner,
     const PathConfigPtr &spConfig
 ) :
     PathMonitor(spTaskRunner, spConfig),

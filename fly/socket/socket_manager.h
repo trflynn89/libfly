@@ -17,9 +17,9 @@ namespace fly {
 FLY_CLASS_PTRS(SocketManager);
 FLY_CLASS_PTRS(SocketManagerTask);
 
+FLY_CLASS_PTRS(SequencedTaskRunner);
 FLY_CLASS_PTRS(Socket);
 FLY_CLASS_PTRS(SocketConfig);
-FLY_CLASS_PTRS(TaskRunner);
 enum class Protocol : uint8_t;
 
 /**
@@ -45,7 +45,7 @@ public:
      * @param TaskRunnerPtr Task runner for posting socket-related tasks onto.
      * @param LoggerConfigPtr Reference to socket configuration.
      */
-    SocketManager(const TaskRunnerPtr &, const SocketConfigPtr &);
+    SocketManager(const SequencedTaskRunnerPtr &, const SocketConfigPtr &);
 
     /**
      * Destructor. Close all asynchronous sockets.
@@ -142,7 +142,7 @@ protected:
     AsyncRequest::RequestQueue m_completedSends;
 
 private:
-    TaskRunnerPtr m_spTaskRunner;
+    SequencedTaskRunnerPtr m_spTaskRunner;
     TaskPtr m_spTask;
 
     SocketConfigPtr m_spConfig;

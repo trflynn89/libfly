@@ -18,7 +18,7 @@ std::mutex Logger::s_consoleMutex;
 
 //==============================================================================
 Logger::Logger(
-    const TaskRunnerPtr &spTaskRunner,
+    const SequencedTaskRunnerPtr &spTaskRunner,
     const LoggerConfigPtr &spConfig,
     const std::string &filePath
 ):

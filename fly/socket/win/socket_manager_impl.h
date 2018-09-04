@@ -12,8 +12,8 @@ namespace fly {
 
 FLY_CLASS_PTRS(SocketManagerImpl);
 
+FLY_CLASS_PTRS(SequencedTaskRunner);
 FLY_CLASS_PTRS(SocketConfig);
-FLY_CLASS_PTRS(TaskRunner);
 
 /**
  * Windows implementation of the SocketManager interface.
@@ -24,7 +24,7 @@ FLY_CLASS_PTRS(TaskRunner);
 class SocketManagerImpl : public SocketManager
 {
 public:
-    SocketManagerImpl(const TaskRunnerPtr &, const SocketConfigPtr &);
+    SocketManagerImpl(const SequencedTaskRunnerPtr &, const SocketConfigPtr &);
     ~SocketManagerImpl() override;
 
 protected:
