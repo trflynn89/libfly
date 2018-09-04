@@ -12,6 +12,7 @@
 namespace fly {
 
 FLY_CLASS_PTRS(Socket);
+
 FLY_CLASS_PTRS(SocketConfig);
 
 /**
