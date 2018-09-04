@@ -8,6 +8,11 @@
 
 namespace fly {
 
+namespace
+{
+    static std::chrono::milliseconds s_delay(10);
+}
+
 //==============================================================================
 TaskManager::TaskManager(int numWorkers) :
     m_aKeepRunning(false),
@@ -92,12 +97,11 @@ void TaskManager::postTaskWithDelay(
 //==============================================================================
 void TaskManager::workerThread()
 {
-    static std::chrono::milliseconds wait(100);
     TaskHolder task;
 
     while (m_aKeepRunning.load())
     {
-        if (m_tasks.Pop(task, wait) && m_aKeepRunning.load())
+        if (m_tasks.Pop(task, s_delay) && m_aKeepRunning.load())
         {
             TaskRunnerPtr spTaskRunner = task.m_wpTaskRunner.lock();
             TaskPtr spTask = task.m_wpTask.lock();
@@ -118,8 +122,6 @@ void TaskManager::workerThread()
 //==============================================================================
 void TaskManager::timerThread()
 {
-    static std::chrono::milliseconds delay(100);
-
     while (m_aKeepRunning.load())
     {
         auto now = std::chrono::steady_clock::now();
@@ -146,7 +148,7 @@ void TaskManager::timerThread()
             }
         }
 
-        std::this_thread::sleep_for(delay);
+        std::this_thread::sleep_for(s_delay);
     }
 }
 

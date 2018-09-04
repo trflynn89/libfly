@@ -20,6 +20,11 @@ class PathConfig : public Config
 {
 public:
     /**
+     * Constructor.
+     */
+    PathConfig();
+
+    /**
      * Get the name to associate with this configuration.
      */
     static std::string GetName();
@@ -28,6 +33,9 @@ public:
      * @return Delay between path monitor poll intervals.
      */
     virtual std::chrono::milliseconds PollInterval() const;
+
+protected:
+    std::chrono::milliseconds::rep m_defaultPollInterval;
 };
 
 }

@@ -16,6 +16,22 @@
 
 #include "test/util/waitable_task_runner.h"
 
+namespace
+{
+    /**
+     * Subclass of the system config to decrease the poll interval for faster
+     * testing.
+     */
+    class TestSystemConfig : public fly::SystemConfig
+    {
+    public:
+        TestSystemConfig() : fly::SystemConfig()
+        {
+            m_defaultPollInterval = I64(10);
+        }
+    };
+}
+
 //==============================================================================
 class SystemMonitorTest : public ::testing::Test
 {
@@ -29,7 +45,7 @@ public:
 
         m_spMonitor(std::make_shared<fly::SystemMonitorImpl>(
             m_spTaskRunner,
-            std::make_shared<fly::SystemConfig>()
+            std::make_shared<TestSystemConfig>()
         )),
 
         m_aKeepRunning(true)

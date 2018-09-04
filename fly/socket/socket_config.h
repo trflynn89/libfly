@@ -20,6 +20,11 @@ class SocketConfig : public Config
 {
 public:
     /**
+     * Constructor.
+     */
+    SocketConfig();
+
+    /**
      * Get the name to associate with this configuration.
      */
     static std::string GetName();
@@ -38,6 +43,11 @@ public:
      * Size of packet to use for send/receive operations.
      */
     size_t PacketSize() const;
+
+protected:
+    std::chrono::microseconds::rep m_defaultIoWaitTime;
+    char m_defaultEndOfMessage;
+    size_t m_defaultPacketSize;
 };
 
 }

@@ -23,6 +23,19 @@
 namespace
 {
     std::chrono::seconds s_waitTime(5);
+
+    /**
+     * Subclass of the system config to decrease the poll interval for faster
+     * testing.
+     */
+    class TestPathConfig : public fly::PathConfig
+    {
+    public:
+        TestPathConfig() : fly::PathConfig()
+        {
+            m_defaultPollInterval = I64(10);
+        }
+    };
 }
 
 //==============================================================================
@@ -38,7 +51,7 @@ public:
 
         m_spMonitor(std::make_shared<fly::PathMonitorImpl>(
             m_spTaskRunner,
-            std::make_shared<fly::PathConfig>()
+            std::make_shared<TestPathConfig>()
         )),
 
         m_path0(fly::PathUtil::GenerateTempDirectory()),

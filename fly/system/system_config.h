@@ -20,6 +20,11 @@ class SystemConfig : public Config
 {
 public:
     /**
+     * Constructor.
+     */
+    SystemConfig();
+
+    /**
      * Get the name to associate with this configuration.
      */
     static std::string GetName();
@@ -28,6 +33,9 @@ public:
      * @return Delay between system monitor poll intervals.
      */
     virtual std::chrono::milliseconds PollInterval() const;
+
+protected:
+    std::chrono::milliseconds::rep m_defaultPollInterval;
 };
 
 }
