@@ -25,7 +25,7 @@ namespace
     std::chrono::seconds s_waitTime(5);
 
     /**
-     * Subclass of the system config to decrease the poll interval for faster
+     * Subclass of the path config to decrease the poll interval for faster
      * testing.
      */
     class TestPathConfig : public fly::PathConfig
