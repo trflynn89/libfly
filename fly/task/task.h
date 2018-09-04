@@ -16,7 +16,7 @@ FLY_CLASS_PTRS(TaskManager);
  */
 class Task
 {
-friend class TaskManager;
+    friend class TaskManager;
 
 public:
     /**

@@ -149,14 +149,17 @@ bool WaitableTaskRunner::WaitForTaskTypeToComplete(
 
     while (expected_hash != completed_hash)
     {
+        auto before = std::chrono::high_resolution_clock::now();
         m_completedTasks.Pop(completed_hash, duration);
+        auto after = std::chrono::high_resolution_clock::now();
 
-        auto now = std::chrono::high_resolution_clock::now();
-
-        if (now > deadline)
+        if (after > deadline)
         {
             break;
         }
+
+        duration -=
+            std::chrono::duration_cast<decltype(duration)>(after - before);
     }
 
     return (expected_hash == completed_hash);

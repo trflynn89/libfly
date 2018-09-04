@@ -156,8 +156,9 @@ public:
 
 protected:
     /**
-     * Call back into the system monitor update system-level resources. If the
-     * system monitor implementation is still valid, the task re-arms itself.
+     * Call back into the system monitor to update system-level resources. If
+     * the system monitor implementation is still valid, the task re-arms
+     * itself.
      */
     void Run() override;
 

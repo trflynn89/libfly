@@ -5,7 +5,6 @@
 #include <future>
 #include <memory>
 #include <mutex>
-#include <typeinfo>
 #include <vector>
 
 #include "fly/fly.h"

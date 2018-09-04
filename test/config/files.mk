@@ -6,7 +6,8 @@ SRC_DIRS_$(d) := \
     fly/path \
     fly/system \
     fly/task \
-    fly/types
+    fly/types \
+    test/util
 
 # Define libraries to link
 LDLIBS_$(d) := \
@@ -15,7 +16,3 @@ LDLIBS_$(d) := \
 
 # Define source files
 $(eval $(call WILDCARD_SOURCES))
-
-SRC_$(d) += \
-    $(d)/../util/path_util.cpp \
-    $(d)/../util/waitable_task_runner.cpp
