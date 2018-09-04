@@ -8,8 +8,9 @@
 
 namespace fly {
 
-FLY_CLASS_PTRS(SocketConfig);
 FLY_CLASS_PTRS(SocketImpl);
+
+FLY_CLASS_PTRS(SocketConfig);
 
 /**
  * Windows implementation of the Socket interface.

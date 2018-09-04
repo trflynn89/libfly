@@ -7,12 +7,14 @@
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/async_request.h"
 #include "fly/socket/socket.h"
+#include "fly/socket/socket_config.h"
 #include "fly/socket/socket_manager.h"
 #include "fly/socket/socket_types.h"
+#include "fly/task/task_manager.h"
+#include "fly/task/task_runner.h"
 #include "fly/types/concurrent_queue.h"
 #include "fly/types/string.h"
 
@@ -25,12 +27,17 @@ class SocketTest : public ::testing::Test
 {
 public:
     SocketTest() :
-        m_spConfigManager(std::make_shared<fly::ConfigManager>(
-            fly::ConfigManager::ConfigFileType::Ini, std::string(), std::string()
+        m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
+
+        m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>(
+            m_spTaskManager->CreateTaskRunner<fly::SequencedTaskRunner>(),
+            std::make_shared<fly::SocketConfig>()
         )),
 
-        m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>(m_spConfigManager)),
-        m_spClientSocketManager(std::make_shared<fly::SocketManagerImpl>(m_spConfigManager)),
+        m_spClientSocketManager(std::make_shared<fly::SocketManagerImpl>(
+            m_spTaskManager->CreateTaskRunner<fly::SequencedTaskRunner>(),
+            std::make_shared<fly::SocketConfig>()
+        )),
 
         m_host("localhost"),
         m_address(0),
@@ -52,23 +59,23 @@ public:
 
 protected:
     /**
-     * Start the socket managers.
+     * Start the task and socket managers.
      */
     void SetUp() override
     {
         ASSERT_TRUE(fly::Socket::HostnameToAddress(m_host, m_address));
 
+        ASSERT_TRUE(m_spTaskManager->Start());
         m_spServerSocketManager->Start();
         m_spClientSocketManager->Start();
     }
 
     /**
-     * Stop the socket managers.
+     * Stop the task manager.
      */
     void TearDown() override
     {
-        m_spClientSocketManager->Stop();
-        m_spServerSocketManager->Stop();
+        ASSERT_TRUE(m_spTaskManager->Stop());
     }
 
     /**
@@ -95,7 +102,7 @@ protected:
         return spSocket;
     }
 
-    fly::ConfigManagerPtr m_spConfigManager;
+    fly::TaskManagerPtr m_spTaskManager;
 
     fly::SocketManagerPtr m_spServerSocketManager;
     fly::SocketManagerPtr m_spClientSocketManager;
@@ -108,6 +115,14 @@ protected:
 
     std::string m_message;
 };
+
+/**
+ * Test handling for when socket creation fails due to ::socket() system call.
+ */
+TEST_F(SocketTest, SocketConfigTest)
+{
+    EXPECT_EQ(fly::SocketConfig::GetName(), "socket");
+}
 
 #ifdef FLY_LINUX
 

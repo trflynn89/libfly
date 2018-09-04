@@ -1,18 +1,18 @@
-#include "fly/task/task_config.h"
+#include "fly/path/path_config.h"
 
 namespace fly {
 
 //==============================================================================
-std::string TaskConfig::GetName()
+std::string PathConfig::GetName()
 {
-    return "task";
+    return "path";
 }
 
 //==============================================================================
-std::chrono::milliseconds TaskConfig::PollInterval() const
+std::chrono::milliseconds PathConfig::PollInterval() const
 {
     return std::chrono::milliseconds(
-        GetValue<std::chrono::milliseconds::rep>("poll_interval", I64(1000))
+        GetValue<std::chrono::milliseconds::rep>("poll_interval", I64(100))
     );
 }
 

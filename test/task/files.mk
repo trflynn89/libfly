@@ -15,3 +15,6 @@ LDLIBS_$(d) := \
 
 # Define source files
 $(eval $(call WILDCARD_SOURCES))
+
+SRC_$(d) += \
+    $(d)/../util/waitable_task_runner.cpp

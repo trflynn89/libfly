@@ -180,6 +180,9 @@
     <ProjectReference Include="..\googletest\googletest.vcxproj">
       <Project>{aa641cee-1898-4cd1-8df5-4562ef341b36}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\util\util.vcxproj">
+      <Project>{49a0898e-a5c8-4500-a592-dc420ce6c047}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\test\path\path.cpp" />

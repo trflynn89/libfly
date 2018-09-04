@@ -2,25 +2,28 @@
 
 #include <algorithm>
 
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_config.h"
+#include "fly/task/task_runner.h"
 
 namespace fly {
 
 //==============================================================================
-SocketManagerImpl::SocketManagerImpl(ConfigManagerPtr &spConfigManager) :
-    SocketManager(spConfigManager)
+SocketManagerImpl::SocketManagerImpl(
+    const SequencedTaskRunnerPtr &spTaskRunner,
+    const SocketConfigPtr &spConfig
+) :
+    SocketManager(spTaskRunner, spConfig)
 {
 }
 
 //==============================================================================
-bool SocketManagerImpl::DoWork()
+void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
 {
     fd_set readFd, writeFd;
 
-    suseconds_t usec = static_cast<suseconds_t>(m_spConfig->IoWaitTime().count());
+    suseconds_t usec = static_cast<suseconds_t>(timeout.count());
     struct timeval tv { 0, usec };
 
     socket_type maxFd = -1;
@@ -37,8 +40,6 @@ bool SocketManagerImpl::DoWork()
             handleSocketIO(&readFd, &writeFd);
         }
     }
-
-    return true;
 }
 
 //==============================================================================

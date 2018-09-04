@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 
 #include <Windows.h>
 
@@ -9,7 +10,10 @@
 
 namespace fly {
 
-FLY_CLASS_PTRS(ConfigManager);
+FLY_CLASS_PTRS(SocketManagerImpl);
+
+FLY_CLASS_PTRS(SequencedTaskRunner);
+FLY_CLASS_PTRS(SocketConfig);
 
 /**
  * Windows implementation of the SocketManager interface.
@@ -20,11 +24,11 @@ FLY_CLASS_PTRS(ConfigManager);
 class SocketManagerImpl : public SocketManager
 {
 public:
-    SocketManagerImpl(ConfigManagerPtr &);
+    SocketManagerImpl(const SequencedTaskRunnerPtr &, const SocketConfigPtr &);
     ~SocketManagerImpl() override;
 
 protected:
-    bool DoWork() override;
+    void Poll(const std::chrono::microseconds &) override;
 
 private:
     bool setReadAndWriteMasks(fd_set *, fd_set *);

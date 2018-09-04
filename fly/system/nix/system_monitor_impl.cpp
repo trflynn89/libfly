@@ -8,8 +8,9 @@
 #include <sys/sysinfo.h>
 #include <sys/times.h>
 
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
+#include "fly/system/system_config.h"
+#include "fly/task/task_runner.h"
 #include "fly/types/string.h"
 
 namespace fly {
@@ -25,8 +26,11 @@ namespace
 }
 
 //==============================================================================
-SystemMonitorImpl::SystemMonitorImpl(ConfigManagerPtr &spConfigManager) :
-    SystemMonitor(spConfigManager),
+SystemMonitorImpl::SystemMonitorImpl(
+    const SequencedTaskRunnerPtr &spTaskRunner,
+    const SystemConfigPtr &spConfig
+) :
+    SystemMonitor(spTaskRunner, spConfig),
     m_prevSystemUserTime(0),
     m_prevSystemNiceTime(0),
     m_prevSystemSystemTime(0),
@@ -35,29 +39,7 @@ SystemMonitorImpl::SystemMonitorImpl(ConfigManagerPtr &spConfigManager) :
     m_prevProcessUserTime(0),
     m_prevTime(0)
 {
-}
-
-//==============================================================================
-SystemMonitorImpl::~SystemMonitorImpl()
-{
-    Stop();
-}
-
-//==============================================================================
-void SystemMonitorImpl::StartMonitor()
-{
     UpdateSystemCpuCount();
-}
-
-//==============================================================================
-void SystemMonitorImpl::StopMonitor()
-{
-}
-
-//==============================================================================
-bool SystemMonitorImpl::IsValid() const
-{
-    return (m_systemCpuCount.load() > 0);
 }
 
 //==============================================================================

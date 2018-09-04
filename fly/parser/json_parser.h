@@ -10,7 +10,6 @@
 
 namespace fly {
 
-FLY_CLASS_PTRS(Json);
 FLY_CLASS_PTRS(JsonParser);
 
 /**

@@ -8,8 +8,10 @@
 
 namespace fly {
 
-FLY_CLASS_PTRS(ConfigManager);
 FLY_CLASS_PTRS(SystemMonitorImpl);
+
+FLY_CLASS_PTRS(SequencedTaskRunner);
+FLY_CLASS_PTRS(SystemConfig);
 
 /**
  * Linux implementation of the SystemMonitor interface. Uses the /proc file
@@ -21,27 +23,12 @@ FLY_CLASS_PTRS(SystemMonitorImpl);
 class SystemMonitorImpl : public SystemMonitor
 {
 public:
-    SystemMonitorImpl(ConfigManagerPtr &);
-    ~SystemMonitorImpl() override;
+    /**
+     * Constructor. Set the system CPU count.
+     */
+    SystemMonitorImpl(const SequencedTaskRunnerPtr &, const SystemConfigPtr &);
 
 protected:
-    /**
-     * Set the system CPU count.
-     */
-    void StartMonitor() override;
-
-    /**
-     * Does nothing.
-     */
-    void StopMonitor() override;
-
-    /**
-     * Check if the system CPU count was successfully set.
-     *
-     * @return bool True if the CPU count is valid.
-     */
-    bool IsValid() const override;
-
     void UpdateSystemCpuCount() override;
     void UpdateSystemCpuUsage() override;
     void UpdateProcessCpuUsage() override;

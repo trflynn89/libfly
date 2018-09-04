@@ -82,31 +82,31 @@ TEST(PathTest, ListPathTest)
     std::vector<std::string> directories;
     std::vector<std::string> files;
 
-    std::string path1(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path1(fly::String::GenerateRandomString(10));
     std::string path1Full(fly::Path::Join(fly::Path::GetTempDirectory(), path1));
     EXPECT_TRUE(fly::Path::MakePath(path1Full));
 
-    std::string path2(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path2(fly::String::GenerateRandomString(10));
     std::string path2Full(fly::Path::Join(path1Full, path2));
     EXPECT_TRUE(fly::Path::MakePath(path2Full));
 
-    std::string path3(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path3(fly::String::GenerateRandomString(10));
     std::string path3Full(fly::Path::Join(path1Full, path3));
     EXPECT_TRUE(fly::Path::MakePath(path3Full));
 
-    std::string path4(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path4(fly::String::GenerateRandomString(10));
     std::string path4Full(fly::Path::Join(path2Full, path4));
     EXPECT_TRUE(fly::Path::MakePath(path4Full));
 
-    std::string file1(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string file1(fly::String::GenerateRandomString(10));
     std::string file1Full(fly::Path::Join(path1Full, file1));
     std::ofstream(file1Full, std::ios::out);
 
-    std::string file2(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string file2(fly::String::GenerateRandomString(10));
     std::string file2Full(fly::Path::Join(path2Full, file2));
     std::ofstream(file2Full, std::ios::out);
 
-    std::string file3(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string file3(fly::String::GenerateRandomString(10));
     std::string file3Full(fly::Path::Join(path3Full, file3));
     std::ofstream(file3Full, std::ios::out);
 
@@ -176,15 +176,15 @@ TEST(PathTest, MockListPathTest)
     std::vector<std::string> directories;
     std::vector<std::string> files;
 
-    std::string path1(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path1(fly::String::GenerateRandomString(10));
     std::string path1Full(fly::Path::Join(fly::Path::GetTempDirectory(), path1));
     EXPECT_TRUE(fly::Path::MakePath(path1Full));
 
-    std::string path2(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string path2(fly::String::GenerateRandomString(10));
     std::string path2Full(fly::Path::Join(path1Full, path2));
     EXPECT_TRUE(fly::Path::MakePath(path2Full));
 
-    std::string file1(fly::Path::Join(fly::String::GenerateRandomString(10)));
+    std::string file1(fly::String::GenerateRandomString(10));
     std::string file1Full(fly::Path::Join(path1Full, file1));
     std::ofstream(file1Full, std::ios::out);
 
@@ -254,13 +254,9 @@ TEST(PathTest, JoinTest)
 //==============================================================================
 TEST(PathTest, SplitTest)
 {
-    std::string path0(fly::Path::Join(
-        fly::String::GenerateRandomString(10)
-    ));
+    std::string path0(fly::String::GenerateRandomString(10));
 
-    std::string path1(fly::Path::Join(
-        fly::Path::GetTempDirectory()
-    ));
+    std::string path1(fly::Path::GetTempDirectory());
 
     std::string path2(fly::Path::Join(
         fly::Path::GetTempDirectory(),

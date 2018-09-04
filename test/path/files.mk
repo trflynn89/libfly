@@ -16,6 +16,10 @@ LDLIBS_$(d) := \
 # Define source files
 $(eval $(call WILDCARD_SOURCES))
 
+SRC_$(d) += \
+    $(d)/../util/path_util.cpp \
+    $(d)/../util/waitable_task_runner.cpp
+
 # Define mocked system calls
 $(eval $(call MOCK_SYSTEM_CALL, fts_read))
 $(eval $(call MOCK_SYSTEM_CALL, inotify_add_watch))

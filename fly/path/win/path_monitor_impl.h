@@ -10,8 +10,10 @@
 
 namespace fly {
 
-FLY_CLASS_PTRS(ConfigManager);
 FLY_CLASS_PTRS(PathMonitorImpl);
+
+FLY_CLASS_PTRS(SequencedTaskRunner);
+FLY_CLASS_PTRS(PathConfig);
 
 /**
  * Windows implementation of the PathMonitor interface. Uses an IOCP with the
@@ -23,20 +25,17 @@ FLY_CLASS_PTRS(PathMonitorImpl);
 class PathMonitorImpl : public PathMonitor
 {
 public:
-    PathMonitorImpl(ConfigManagerPtr &);
+    /**
+     * Constructor. Create the path monitor's IOCP.
+     */
+    PathMonitorImpl(const SequencedTaskRunnerPtr &, const PathConfigPtr &);
+
+    /**
+     * Destructor. Close the path monitor's IOCP.
+     */
     ~PathMonitorImpl() override;
 
 protected:
-    /**
-     * Create the path monitor's IOCP.
-     */
-    void StartMonitor() override;
-
-    /**
-     * Close the path monitor's IOCP.
-     */
-    void StopMonitor() override;
-
     /**
      * Check if the path monitor's IOCP was successfully created.
      *

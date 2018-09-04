@@ -2,6 +2,7 @@
 
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
+#include "fly/task/task_runner.h"
 
 namespace fly {
 
@@ -37,23 +38,13 @@ namespace
 }
 
 //==============================================================================
-PathMonitorImpl::PathMonitorImpl(ConfigManagerPtr &spConfigManager) :
-    PathMonitor(spConfigManager),
-    m_iocp(NULL)
+PathMonitorImpl::PathMonitorImpl(
+    const SequencedTaskRunnerPtr &spTaskRunner,
+    const PathConfigPtr &spConfig
+) :
+    PathMonitor(spTaskRunner, spConfig),
+    m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
 {
-}
-
-//==============================================================================
-PathMonitorImpl::~PathMonitorImpl()
-{
-    Stop();
-}
-
-//==============================================================================
-void PathMonitorImpl::StartMonitor()
-{
-    m_iocp = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
-
     if (m_iocp == NULL)
     {
         LOGS(-1, "Could not initialize IOCP");
@@ -61,7 +52,7 @@ void PathMonitorImpl::StartMonitor()
 }
 
 //==============================================================================
-void PathMonitorImpl::StopMonitor()
+PathMonitorImpl::~PathMonitorImpl()
 {
     if (m_iocp != NULL)
     {

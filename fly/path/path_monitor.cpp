@@ -2,12 +2,18 @@
 
 #include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
+#include "fly/path/path_config.h"
+#include "fly/task/task_runner.h"
 
 namespace fly {
 
 //==============================================================================
-PathMonitor::PathMonitor(ConfigManagerPtr &spConfigManager) :
-    Monitor("PathMonitor", spConfigManager)
+PathMonitor::PathMonitor(
+    const SequencedTaskRunnerPtr &spTaskRunner,
+    const PathConfigPtr &spConfig
+) :
+    m_spTaskRunner(spTaskRunner),
+    m_spConfig(spConfig)
 {
 }
 
@@ -15,6 +21,22 @@ PathMonitor::PathMonitor(ConfigManagerPtr &spConfigManager) :
 PathMonitor::~PathMonitor()
 {
     RemoveAllPaths();
+}
+
+//==============================================================================
+bool PathMonitor::Start()
+{
+    if (IsValid())
+    {
+        PathMonitorPtr spPathMonitor = shared_from_this();
+
+        m_spTask = std::make_shared<PathMonitorTask>(spPathMonitor);
+        m_spTaskRunner->PostTask(m_spTask);
+
+        return true;
+    }
+
+    return false;
 }
 
 //==============================================================================
@@ -159,8 +181,49 @@ PathMonitor::PathInfoPtr PathMonitor::getOrCreatePathInfo(const std::string &pat
 //==============================================================================
 std::ostream &operator << (std::ostream &stream, PathMonitor::PathEvent event)
 {
-    stream << static_cast<int>(event);
+    switch (event)
+    {
+    case PathMonitor::PathEvent::None:
+        stream << "None";
+        break;
+
+    case PathMonitor::PathEvent::Created:
+        stream << "Created";
+        break;
+
+    case PathMonitor::PathEvent::Deleted:
+        stream << "Deleted";
+        break;
+
+    case PathMonitor::PathEvent::Changed:
+        stream << "Changed";
+        break;
+    }
+
     return stream;
+}
+
+//==============================================================================
+PathMonitorTask::PathMonitorTask(const PathMonitorWPtr &wpPathMonitor) :
+    Task(),
+    m_wpPathMonitor(wpPathMonitor)
+{
+}
+
+//==============================================================================
+void PathMonitorTask::Run()
+{
+    PathMonitorPtr spPathMonitor = m_wpPathMonitor.lock();
+
+    if (spPathMonitor && spPathMonitor->IsValid())
+    {
+        spPathMonitor->Poll(spPathMonitor->m_spConfig->PollInterval());
+
+        if (spPathMonitor->IsValid())
+        {
+            spPathMonitor->m_spTaskRunner->PostTask(spPathMonitor->m_spTask);
+        }
+    }
 }
 
 }

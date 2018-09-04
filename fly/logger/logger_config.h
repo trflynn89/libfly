@@ -20,6 +20,11 @@ class LoggerConfig : public Config
 {
 public:
     /**
+     * Constructor.
+     */
+    LoggerConfig();
+
+    /**
      * Get the name to associate with this configuration.
      */
     static std::string GetName();
@@ -37,7 +42,12 @@ public:
     /**
      * @return Sleep time for logger IO thread.
      */
-    std::chrono::seconds QueueWaitTime() const;
+    std::chrono::milliseconds QueueWaitTime() const;
+
+protected:
+    size_t m_defaultMaxLogFileSize;
+    size_t m_defaultMaxMessageSize;
+    std::chrono::milliseconds::rep m_defaultQueueWaitTime;
 };
 
 }

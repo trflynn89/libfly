@@ -3,6 +3,7 @@
 #include <atomic>
 #include <chrono>
 #include <csignal>
+#include <cstdio>
 
 #include <Windows.h>
 
@@ -19,7 +20,7 @@ void SystemImpl::PrintBacktrace()
 
     for (USHORT i = 0; i < traceSize; ++i)
     {
-        LOGC_NO_LOCK("[%3u] %x", i, trace[i]);
+        fprintf(stderr, "[%3u] %p\n", i, trace[i]);
     }
 }
 

@@ -2,17 +2,20 @@
 
 #include <algorithm>
 
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_config.h"
+#include "fly/task/task_runner.h"
 
 namespace fly {
 
 //==============================================================================
-SocketManager::SocketManager(ConfigManagerPtr &spConfigManager) :
-    Runner("SocketManager", 1),
-    m_spConfig(spConfigManager->CreateConfig<SocketConfig>()),
+SocketManager::SocketManager(
+    const SequencedTaskRunnerPtr &spTaskRunner,
+    const SocketConfigPtr &spConfig
+) :
+    m_spTaskRunner(spTaskRunner),
+    m_spConfig(spConfig),
     m_newClientCallback(nullptr),
     m_closedClientCallback(nullptr)
 {
@@ -21,7 +24,19 @@ SocketManager::SocketManager(ConfigManagerPtr &spConfigManager) :
 //==============================================================================
 SocketManager::~SocketManager()
 {
-    Stop();
+    ClearClientCallbacks();
+
+    std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
+    m_aioSockets.clear();
+}
+
+//==============================================================================
+void SocketManager::Start()
+{
+    SocketManagerPtr spSocketManager = shared_from_this();
+
+    m_spTask = std::make_shared<SocketManagerTask>(spSocketManager);
+    m_spTaskRunner->PostTask(m_spTask);
 }
 
 //==============================================================================
@@ -77,23 +92,6 @@ SocketWPtr SocketManager::CreateAsyncSocket(Protocol protocol)
 }
 
 //==============================================================================
-bool SocketManager::StartRunner()
-{
-    return true;
-}
-
-//==============================================================================
-void SocketManager::StopRunner()
-{
-    LOGC("Stopping socket manager");
-
-    ClearClientCallbacks();
-
-    std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
-    m_aioSockets.clear();
-}
-
-//==============================================================================
 void SocketManager::HandleNewAndClosedSockets(
     const SocketList &newSockets,
     const SocketList &closedSockets
@@ -142,6 +140,25 @@ void SocketManager::TriggerCallbacks(
                 m_closedClientCallback(spSocket);
             }
         }
+    }
+}
+
+//==============================================================================
+SocketManagerTask::SocketManagerTask(const SocketManagerWPtr &wpSocketManager) :
+    Task(),
+    m_wpSocketManager(wpSocketManager)
+{
+}
+
+//==============================================================================
+void SocketManagerTask::Run()
+{
+    SocketManagerPtr spSocketManager = m_wpSocketManager.lock();
+
+    if (spSocketManager)
+    {
+        spSocketManager->Poll(spSocketManager->m_spConfig->IoWaitTime());
+        spSocketManager->m_spTaskRunner->PostTask(spSocketManager->m_spTask);
     }
 }
 

@@ -1,107 +1,222 @@
 #include <atomic>
-#include <chrono>
-#include <thread>
 
 #include <gtest/gtest.h>
 
 #include "fly/fly.h"
-#include "fly/task/runner.h"
+#include "fly/task/task.h"
+#include "fly/task/task_manager.h"
+#include "fly/task/task_runner.h"
+#include "fly/types/concurrent_queue.h"
 
-FLY_CLASS_PTRS(CountTask);
+#include "test/util/waitable_task_runner.h"
+
+namespace
+{
+    //==========================================================================
+    class CountTask : public fly::Task
+    {
+    public:
+        CountTask() : m_count(0)
+        {
+        }
+
+        int GetCount() const
+        {
+            return m_count.load();
+        }
+
+    protected:
+        void Run() override
+        {
+            ++m_count;
+        }
+
+    private:
+        std::atomic_int m_count;
+    };
+
+    //==========================================================================
+    class MarkerTask : public fly::Task
+    {
+    public:
+        MarkerTask(
+            fly::ConcurrentQueue<int> *pOrdering,
+            int marker
+        ) :
+            m_pOrdering(pOrdering),
+            m_marker(marker)
+        {
+        }
+
+    protected:
+        void Run() override
+        {
+            m_pOrdering->Push(m_marker);
+        }
+
+    private:
+        fly::ConcurrentQueue<int> *m_pOrdering;
+        int m_marker;
+    };
+}
 
 //==============================================================================
-class CountTask : public fly::Runner
+class TaskTest : public ::testing::Test
 {
 public:
-    CountTask(bool run) :
-        Runner("CountTask", std::thread::hardware_concurrency()),
-        m_callCount(0),
-        m_run(run)
-    {
-    }
-
-    unsigned int GetCallCount() const
-    {
-        return m_callCount.load();
-    }
-
-protected:
-    bool StartRunner() override
-    {
-        return m_run;
-    }
-
-    void StopRunner() override
-    {
-    }
-
-    bool DoWork() override
-    {
-        ++m_callCount;
-
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        return true;
-    }
-
-private:
-    std::atomic_uint m_callCount;
-    bool m_run;
-};
-
-//==============================================================================
-class RunnerTest : public ::testing::Test
-{
-public:
-    RunnerTest() :
-        m_spTask1(std::make_shared<CountTask>(true)),
-        m_spTask2(std::make_shared<CountTask>(false))
+    TaskTest() : m_spTaskManager(std::make_shared<fly::TaskManager>(1))
     {
     }
 
     /**
-     * Create the file directory.
+     * Start the task manager.
      */
-    virtual void SetUp()
+    void SetUp() override
     {
-        ASSERT_TRUE(m_spTask1->Start());
+        ASSERT_TRUE(m_spTaskManager->Start());
     }
 
     /**
-     * Delete the created directory.
+     * Stop the task manager.
      */
-    virtual void TearDown()
+    void TearDown() override
     {
-        m_spTask1->Stop();
+        ASSERT_TRUE(m_spTaskManager->Stop());
     }
 
 protected:
-    CountTaskPtr m_spTask1;
-    CountTaskPtr m_spTask2;
+    fly::TaskManagerPtr m_spTaskManager;
 };
 
 //==============================================================================
-TEST_F(RunnerTest, DoWorkTest)
+TEST_F(TaskTest, MultipleStartTest)
 {
-    unsigned int count1 = m_spTask1->GetCallCount();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    unsigned int count2 = m_spTask1->GetCallCount();
-
-    EXPECT_LT(count1, count2);
+    ASSERT_FALSE(m_spTaskManager->Start());
 }
 
 //==============================================================================
-TEST_F(RunnerTest, FailedStartTest)
+TEST_F(TaskTest, MultipleStopTest)
 {
-    EXPECT_FALSE(m_spTask2->Start());
+    ASSERT_TRUE(m_spTaskManager->Stop());
+    ASSERT_FALSE(m_spTaskManager->Stop());
+
+    // Start it up again so the TearDown() assertion passes
+    ASSERT_TRUE(m_spTaskManager->Start());
 }
 
 //==============================================================================
-TEST_F(RunnerTest, NeverStartedTest)
+TEST_F(TaskTest, DelayTaskTest)
 {
-    unsigned int count1 = m_spTask2->GetCallCount();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    unsigned int count2 = m_spTask2->GetCallCount();
+    auto spTaskRunner(
+        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+    );
 
-    EXPECT_EQ(count1, 0);
-    EXPECT_EQ(count2, 0);
+    auto spTask(std::make_shared<CountTask>());
+    EXPECT_EQ(spTask->GetCount(), 0);
+
+    spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(100));
+
+    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
+    EXPECT_EQ(spTask->GetCount(), 1);
+}
+
+//==============================================================================
+TEST_F(TaskTest, CancelTaskTest)
+{
+    auto spTaskRunner(
+        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+    );
+
+    {
+        auto spTask(std::make_shared<CountTask>());
+        EXPECT_EQ(spTask->GetCount(), 0);
+
+        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(100));
+    }
+
+    EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
+        std::chrono::milliseconds(200)
+    ));
+}
+
+//==============================================================================
+TEST_F(TaskTest, RunnerBeforeManagerTest)
+{
+    auto spTask(std::make_shared<CountTask>());
+    EXPECT_EQ(spTask->GetCount(), 0);
+
+    auto spTaskManager(std::make_shared<fly::TaskManager>(1));
+    auto spTaskRunner(
+        spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+    );
+
+    spTaskRunner->PostTask(spTask);
+    spTaskRunner->PostTask(spTask);
+    spTaskRunner->PostTask(spTask);
+
+    EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
+        std::chrono::milliseconds(100)
+    ));
+
+    EXPECT_EQ(spTask->GetCount(), 0);
+
+    ASSERT_TRUE(spTaskManager->Start());
+
+    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
+    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
+    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
+
+    EXPECT_EQ(spTask->GetCount(), 3);
+
+    ASSERT_TRUE(spTaskManager->Stop());
+}
+
+//==============================================================================
+TEST_F(TaskTest, ParallelTaskRunnerTest)
+{
+    auto spTaskRunner(
+        m_spTaskManager->CreateTaskRunner<fly::WaitableParallelTaskRunner>()
+    );
+
+    auto spTask(std::make_shared<CountTask>());
+
+    spTaskRunner->PostTask(spTask);
+    spTaskRunner->PostTask(spTask);
+    spTaskRunner->PostTask(spTask);
+
+    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
+    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
+    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
+}
+
+//==============================================================================
+TEST_F(TaskTest, SequencedTaskRunnerTest)
+{
+    auto spTaskRunner(
+        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+    );
+
+    int marker = 0;
+    fly::ConcurrentQueue<int> ordering;
+
+    auto spTask1(std::make_shared<MarkerTask>(&ordering, 1));
+    auto spTask2(std::make_shared<MarkerTask>(&ordering, 2));
+    auto spTask3(std::make_shared<MarkerTask>(&ordering, 3));
+
+    spTaskRunner->PostTask(spTask1);
+    spTaskRunner->PostTask(spTask2);
+    spTaskRunner->PostTask(spTask3);
+
+    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+
+    ordering.Pop(marker);
+    EXPECT_EQ(marker, 1);
+
+    ordering.Pop(marker);
+    EXPECT_EQ(marker, 2);
+
+    ordering.Pop(marker);
+    EXPECT_EQ(marker, 3);
 }

@@ -7,12 +7,15 @@
 #include <string>
 
 #include "fly/fly.h"
-#include "fly/task/monitor.h"
+#include "fly/task/task.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(ConfigManager);
 FLY_CLASS_PTRS(PathMonitor);
+FLY_CLASS_PTRS(PathMonitorTask);
+
+FLY_CLASS_PTRS(SequencedTaskRunner);
+FLY_CLASS_PTRS(PathConfig);
 
 /**
  * Virtual interface to monitor a local path. Provides monitoring of either all
@@ -23,8 +26,10 @@ FLY_CLASS_PTRS(PathMonitor);
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version May 14, 2017
  */
-class PathMonitor : public Monitor
+class PathMonitor : public std::enable_shared_from_this<PathMonitor>
 {
+    friend class PathMonitorTask;
+
 public:
     /**
      * Enumerated list of path events.
@@ -40,19 +45,29 @@ public:
     /**
      * Callback definition for function to be triggered on a path change.
      */
-    typedef std::function<void(const std::string &, const std::string &, PathEvent)> PathEventCallback;
+    typedef
+        std::function<void(const std::string &, const std::string &, PathEvent)>
+        PathEventCallback;
 
     /**
      * Constructor.
      *
-     * @param ConfigManagerPtr Reference to the configuration manager.
+     * @param TaskRunnerPtr Task runner for posting path-related tasks onto.
+     * @param PathConfigPtr Reference to path configuration.
      */
-    PathMonitor(ConfigManagerPtr &);
+    PathMonitor(const SequencedTaskRunnerPtr &, const PathConfigPtr &);
 
     /**
      * Destructor. Remove all paths from the path monitor.
      */
-    ~PathMonitor() override;
+    virtual ~PathMonitor();
+
+    /**
+     * Initialize the path monitor task.
+     *
+     * @return bool True if the path monitor is in a valid state.
+     */
+    bool Start();
 
     /**
      * Monitor for changes to all files under a path. Callbacks registered with
@@ -141,6 +156,21 @@ protected:
      */
     virtual PathInfoPtr CreatePathInfo(const std::string &) const = 0;
 
+    /**
+     * Check if the path monitor implementation is valid.
+     *
+     * @return bool True if the implementation is valid.
+     */
+    virtual bool IsValid() const = 0;
+
+    /**
+     * Check the path monitor implementation for any changes to the monitored
+     * paths.
+     *
+     * @param milliseconds Max time allow for an event to be occur.
+     */
+    virtual void Poll(const std::chrono::milliseconds &) = 0;
+
     mutable std::mutex m_mutex;
     PathInfoMap m_pathInfo;
 
@@ -159,6 +189,34 @@ private:
      * Stream the name of a Json instance's type.
      */
     friend std::ostream &operator << (std::ostream &, PathEvent);
+
+    SequencedTaskRunnerPtr m_spTaskRunner;
+    TaskPtr m_spTask;
+
+    PathConfigPtr m_spConfig;
+};
+
+/**
+ * Task to be executed to check for changes to the monitored paths.
+ *
+ * @author Timothy Flynn (trflynn89@gmail.com)
+ * @version August 12, 2018
+ */
+class PathMonitorTask : public Task
+{
+public:
+    PathMonitorTask(const PathMonitorWPtr &);
+
+protected:
+    /**
+     * Call back into the path monitor to check for any changes to the monitored
+     * paths. If the path monitor implementation is still valid, the task
+     * re-arms itself.
+     */
+    void Run() override;
+
+private:
+    PathMonitorWPtr m_wpPathMonitor;
 };
 
 }

@@ -6,9 +6,9 @@
 #include <cstring>
 #include <cwchar>
 
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger_config.h"
 #include "fly/path/path.h"
+#include "fly/task/task_runner.h"
 
 namespace fly {
 
@@ -17,20 +17,18 @@ LoggerWPtr Logger::s_wpInstance;
 std::mutex Logger::s_consoleMutex;
 
 //==============================================================================
-Logger::Logger(ConfigManagerPtr &spConfigManager, const std::string &filePath) :
-    Runner("Logger", 1),
-    m_spConfig(spConfigManager->CreateConfig<LoggerConfig>()),
+Logger::Logger(
+    const SequencedTaskRunnerPtr &spTaskRunner,
+    const LoggerConfigPtr &spConfig,
+    const std::string &filePath
+):
+    m_spTaskRunner(spTaskRunner),
+    m_spConfig(spConfig),
     m_filePath(filePath),
     m_fileSize(0),
     m_index(0),
     m_startTime(std::chrono::high_resolution_clock::now())
 {
-}
-
-//==============================================================================
-Logger::~Logger()
-{
-    Stop();
 }
 
 //==============================================================================
@@ -79,34 +77,29 @@ void Logger::AddLog(Log::Level level, ssize_t gameId, const char *file,
 }
 
 //==============================================================================
+bool Logger::Start()
+{
+    if (createLogFile())
+    {
+        LoggerPtr spLogger = shared_from_this();
+
+        m_spTask = std::make_shared<LoggerTask>(spLogger);
+        m_spTaskRunner->PostTask(m_spTask);
+
+        return true;
+    }
+
+    return false;
+}
+
+//==============================================================================
 std::string Logger::GetLogFilePath() const
 {
     return m_fileName;
 }
 
 //==============================================================================
-LoggerConfigPtr Logger::GetLogConfig() const
-{
-    return m_spConfig;
-}
-
-//==============================================================================
-bool Logger::StartRunner()
-{
-    return createLogFile();
-}
-
-//==============================================================================
-void Logger::StopRunner()
-{
-    if (m_logFile.is_open())
-    {
-        m_logFile.close();
-    }
-}
-
-//==============================================================================
-bool Logger::DoWork()
+bool Logger::poll()
 {
     Log log;
 
@@ -131,7 +124,10 @@ void Logger::addLog(Log::Level level, ssize_t gameId, const char *file,
     const char *func, unsigned int line, const std::string &message)
 {
     auto now = std::chrono::high_resolution_clock::now();
-    auto logTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - m_startTime);
+
+    auto logTime = std::chrono::duration_cast<std::chrono::duration<double>>(
+        now - m_startTime
+    );
 
     if ((level >= Log::Level::Debug) && (level < Log::Level::NumLevels))
     {
@@ -171,6 +167,24 @@ bool Logger::createLogFile()
     m_fileSize = 0;
 
     return m_logFile.good();
+}
+
+//==============================================================================
+LoggerTask::LoggerTask(const LoggerWPtr &wpLogger) :
+    Task(),
+    m_wpLogger(wpLogger)
+{
+}
+
+//==============================================================================
+void LoggerTask::Run()
+{
+    LoggerPtr spLogger = m_wpLogger.lock();
+
+    if (spLogger && spLogger->poll())
+    {
+        spLogger->m_spTaskRunner->PostTask(spLogger->m_spTask);
+    }
 }
 
 }
