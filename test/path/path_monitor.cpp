@@ -55,6 +55,8 @@ public:
         m_fullPath2(fly::Path::Join(m_path1, m_file2)),
         m_fullPath3(fly::Path::Join(m_path2, m_file3))
     {
+        m_callback = std::bind(&PathMonitorTest::HandleEvent, this,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     }
 
     /**
@@ -66,16 +68,13 @@ public:
         ASSERT_TRUE(fly::Path::MakePath(m_path1));
         ASSERT_TRUE(fly::Path::MakePath(m_path2));
 
-        auto callback = std::bind(&PathMonitorTest::HandleEvent, this,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-
         ASSERT_TRUE(m_spTaskManager->Start());
         ASSERT_TRUE(m_spMonitor->Start());
-        ASSERT_TRUE(m_spMonitor->AddPath(m_path0, callback));
-        ASSERT_TRUE(m_spMonitor->AddPath(m_path1, callback));
-        ASSERT_TRUE(m_spMonitor->AddFile(m_path1, m_file1, callback));
-        ASSERT_TRUE(m_spMonitor->AddFile(m_path1, m_file2, callback));
-        ASSERT_TRUE(m_spMonitor->AddFile(m_path2, m_file3, callback));
+        ASSERT_TRUE(m_spMonitor->AddPath(m_path0, m_callback));
+        ASSERT_TRUE(m_spMonitor->AddPath(m_path1, m_callback));
+        ASSERT_TRUE(m_spMonitor->AddFile(m_path1, m_file1, m_callback));
+        ASSERT_TRUE(m_spMonitor->AddFile(m_path1, m_file2, m_callback));
+        ASSERT_TRUE(m_spMonitor->AddFile(m_path2, m_file3, m_callback));
     }
 
     /**
@@ -132,6 +131,7 @@ protected:
     fly::WaitableSequencedTaskRunnerPtr m_spTaskRunner;
 
     fly::PathMonitorPtr m_spMonitor;
+    fly::PathMonitor::PathEventCallback m_callback;
 
     std::string m_path0;
     std::string m_path1;
@@ -194,8 +194,8 @@ TEST_F(PathMonitorTest, PathEventStreamTest)
 //==============================================================================
 TEST_F(PathMonitorTest, NonExistingPathTest)
 {
-    ASSERT_FALSE(m_spMonitor->AddPath(m_path0 + "foo", [](...) { }));
-    ASSERT_FALSE(m_spMonitor->AddFile(m_path1 + "foo", m_file1, [](...) { }));
+    ASSERT_FALSE(m_spMonitor->AddPath(m_path0 + "foo", m_callback));
+    ASSERT_FALSE(m_spMonitor->AddFile(m_path1 + "foo", m_file1, m_callback));
 }
 
 //==============================================================================
@@ -219,8 +219,8 @@ TEST_F(PathMonitorTest, MockFailedStartMonitorTest)
 
     ASSERT_FALSE(m_spMonitor->Start());
 
-    ASSERT_FALSE(m_spMonitor->AddPath(m_path0, [](...) { }));
-    ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, [](...) { }));
+    ASSERT_FALSE(m_spMonitor->AddPath(m_path0, m_callback));
+    ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, m_callback));
 }
 
 //==============================================================================
@@ -230,8 +230,8 @@ TEST_F(PathMonitorTest, MockFailedAddPathTest)
 
     fly::MockSystem mock(fly::MockCall::InotifyAddWatch);
 
-    ASSERT_FALSE(m_spMonitor->AddPath(m_path0, [](...) { }));
-    ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, [](...) { }));
+    ASSERT_FALSE(m_spMonitor->AddPath(m_path0, m_callback));
+    ASSERT_FALSE(m_spMonitor->AddFile(m_path1, m_file1, m_callback));
 }
 
 #endif

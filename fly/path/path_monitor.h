@@ -45,9 +45,9 @@ public:
     /**
      * Callback definition for function to be triggered on a path change.
      */
-    typedef
-        std::function<void(const std::string &, const std::string &, PathEvent)>
-        PathEventCallback;
+    using PathEventCallback = std::function<void(
+        const std::string &, const std::string &, PathEvent
+    )>;
 
     /**
      * Constructor.

@@ -10,7 +10,8 @@ void WaitableTaskRunner::TaskComplete(const TaskPtr &spTask)
 {
     if (spTask)
     {
-        m_completedTasks.Push(typeid(*spTask).hash_code());
+        const auto &task = *(spTask.get());
+        m_completedTasks.Push(typeid(task).hash_code());
     }
 }
 

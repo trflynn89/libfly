@@ -89,7 +89,9 @@ bool ConfigManager::Start()
             m_spTask = std::make_shared<ConfigUpdateTask>(wpConfigManager);
             TaskWPtr wpTask = m_spTask;
 
-            auto callback = [wpConfigManager, wpTask](...)
+            auto callback = [wpConfigManager, wpTask](
+                const std::string &, const std::string &, PathMonitor::PathEvent
+            )
             {
                 ConfigManagerPtr spConfigManager = wpConfigManager.lock();
                 TaskPtr spTask = wpTask.lock();
