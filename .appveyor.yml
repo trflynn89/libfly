@@ -8,6 +8,9 @@ install:
 build_script:
   - cmd: build\win\release.bat
 
+test_script:
+  - ps: build\win\test.ps1
+
 artifacts:
   - path: build\win\libfly-win*.zip
     name: libfly-zips
