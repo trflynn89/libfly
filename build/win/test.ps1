@@ -14,17 +14,17 @@ function Run-Libfly-Test($arch)
         $duration = $timer.Elapsed.TotalMilliseconds
         $test = $_.Directory.Name + "_" + $arch
 
-        $stdout = $output | ?{ $_ -isnot [System.Management.Automation.ErrorRecord] }
-        $stderr = $output | ?{ $_ -is [System.Management.Automation.ErrorRecord] }
-
         if ($LASTEXITCODE)
         {
+            $stdout = $output | ?{ $_ -isnot [System.Management.Automation.ErrorRecord] }
+            $stderr = $output | ?{ $_ -is [System.Management.Automation.ErrorRecord] }
+
             Add-AppveyorTest $test -Outcome Failed -FileName $_ -StdOut $stdout.ToString() -StdErr $stderr.ToString() -Duration $duration -ErrorMessage "Failed $test test"
             $failed = $TRUE
         }
         else
         {
-            Add-AppveyorTest $test -Outcome Passed -FileName $_ -StdOut $stdout.ToString() -StdErr $stderr.ToString() -Duration $duration
+            Add-AppveyorTest $test -Outcome Passed -FileName $_ -StdOut $output.ToString() -Duration $duration
         }
     }
 
