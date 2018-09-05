@@ -27,7 +27,7 @@ namespace
     public:
         TestSystemConfig() : fly::SystemConfig()
         {
-            m_defaultPollInterval = I64(10);
+            m_defaultPollInterval = I64(100);
         }
     };
 }
