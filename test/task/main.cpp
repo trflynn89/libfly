@@ -173,6 +173,40 @@ TEST_F(TaskTest, DelayTaskTest)
 }
 
 //==============================================================================
+TEST_F(TaskTest, ImmediateAndDelayTaskTest)
+{
+    auto spTaskRunner(
+        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+    );
+
+    int marker = 0;
+    fly::ConcurrentQueue<int> ordering;
+
+    auto spTask1(std::make_shared<MarkerTask>(&ordering, 1));
+    auto spTask2(std::make_shared<MarkerTask>(&ordering, 2));
+    auto spTask3(std::make_shared<MarkerTask>(&ordering, 3));
+
+    EXPECT_TRUE(
+        spTaskRunner->PostTaskWithDelay(spTask1, std::chrono::milliseconds(10)
+    ));
+    EXPECT_TRUE(spTaskRunner->PostTask(spTask2));
+    EXPECT_TRUE(spTaskRunner->PostTask(spTask3));
+
+    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+
+    ordering.Pop(marker);
+    EXPECT_EQ(marker, 2);
+
+    ordering.Pop(marker);
+    EXPECT_EQ(marker, 3);
+
+    ordering.Pop(marker);
+    EXPECT_EQ(marker, 1);
+}
+
+//==============================================================================
 TEST_F(TaskTest, CancelTaskTest)
 {
     auto spTaskRunner(
@@ -191,6 +225,45 @@ TEST_F(TaskTest, CancelTaskTest)
     EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
         std::chrono::milliseconds(20)
     ));
+}
+
+//==============================================================================
+TEST_F(TaskTest, ImmediateAndDelayCancelTaskTest)
+{
+    auto spTaskRunner(
+        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+    );
+
+    int marker = 0;
+    fly::ConcurrentQueue<int> ordering;
+
+    {
+        auto spTask1(std::make_shared<CountTask>());
+        EXPECT_EQ(spTask1->GetCount(), 0);
+
+        EXPECT_TRUE(spTaskRunner->PostTaskWithDelay(
+            spTask1, std::chrono::milliseconds(10)
+        ));
+    }
+
+    auto spTask2(std::make_shared<MarkerTask>(&ordering, 2));
+    auto spTask3(std::make_shared<MarkerTask>(&ordering, 3));
+
+    EXPECT_TRUE(spTaskRunner->PostTask(spTask2));
+    EXPECT_TRUE(spTaskRunner->PostTask(spTask3));
+
+    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+
+    EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
+        std::chrono::milliseconds(20)
+    ));
+
+    ordering.Pop(marker);
+    EXPECT_EQ(marker, 2);
+
+    ordering.Pop(marker);
+    EXPECT_EQ(marker, 3);
 }
 
 //==============================================================================
