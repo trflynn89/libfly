@@ -7,7 +7,7 @@ function Run-Libfly-Test($arch)
     $tests_passed = 0
     $tests_failed = 0
 
-    Get-ChildItem -path $full_path -Recurse -Include *.exe  | ForEach {
+    Get-ChildItem -path $full_path -Recurse -Include *_test.exe  | ForEach {
         $timer = [Diagnostics.Stopwatch]::StartNew()
         & $_ 2>&1 | tee -Variable output
         $status = $LASTEXITCODE
