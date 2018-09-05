@@ -8,7 +8,7 @@ function Run-Libfly-Test($arch)
 
     Get-ChildItem -path $full_path -Recurse -Include *.exe  | ForEach {
         $timer = [Diagnostics.Stopwatch]::StartNew()
-        & $_ 2>&1 | tee -Variable $output
+        & $_ 2>&1 | tee -Variable output
         $timer.Stop()
 
         $duration = $timer.Elapsed.TotalMilliseconds
