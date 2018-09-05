@@ -14,8 +14,6 @@
 
 namespace
 {
-    std::chrono::seconds s_waitTime(5);
-
     /**
      * Subclass of the path config to decrease the poll interval for faster
      * testing.
@@ -135,7 +133,6 @@ TEST_F(ConfigManagerTest, BadFileTypeTest)
         m_path,
         m_file
     );
-    m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
     EXPECT_FALSE(m_spConfigManager->Start());
 }
