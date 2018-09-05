@@ -19,12 +19,12 @@ function Run-Libfly-Test($arch)
 
         if ($LASTEXITCODE)
         {
-            Add-AppveyorTest $test -Outcome Failed -FileName $_ -StdOut "$stdout.ToString()" -StdErr "$stderr.ToString()" -Duration $duration -ErrorMessage "Failed $test test"
+            Add-AppveyorTest $test -Outcome Failed -FileName $_ -StdOut $stdout.ToString() -StdErr $stderr.ToString() -Duration $duration -ErrorMessage "Failed $test test"
             $failed = $TRUE
         }
         else
         {
-            Add-AppveyorTest $test -Outcome Passed -FileName $_ -StdOut "$stdout.ToString()" -StdErr "$stderr.ToString()" -Duration $duration
+            Add-AppveyorTest $test -Outcome Passed -FileName $_ -StdOut $stdout.ToString() -StdErr $stderr.ToString() -Duration $duration
         }
     }
 
