@@ -40,8 +40,10 @@ public:
      * if the task manager has not yet begun executing the task.
      *
      * @param TaskWPtr Weak reference to the task the be executed.
+     *
+     * @return bool True if the task was posted for execution.
      */
-    virtual void PostTask(const TaskWPtr &) = 0;
+    virtual bool PostTask(const TaskWPtr &) = 0;
 
     /**
      * Schedule a task to be posted after a delay. The task is given to the
@@ -55,8 +57,10 @@ public:
      *
      * @param TaskWPtr Weak reference to the task the be executed.
      * @param milliseconds Delay before posting the task.
+     *
+     * @return bool True if the task was posted for delayed execution.
      */
-    void PostTaskWithDelay(const TaskWPtr &, std::chrono::milliseconds);
+    bool PostTaskWithDelay(const TaskWPtr &, std::chrono::milliseconds);
 
 protected:
     /**
@@ -80,8 +84,10 @@ protected:
      * thread is available.
      *
      * @param TaskWPtr Weak reference to the task the be executed.
+     *
+     * @return bool True if the task was posted for execution.
      */
-    void PostTaskToTaskManager(const TaskWPtr &);
+    bool PostTaskToTaskManager(const TaskWPtr &);
 
 private:
     TaskManagerWPtr m_wpTaskManager;
@@ -99,7 +105,7 @@ class ParallelTaskRunner : public TaskRunner
     friend class TaskManager;
 
 public:
-    void PostTask(const TaskWPtr &) override;
+    bool PostTask(const TaskWPtr &) override;
 
 protected:
     ParallelTaskRunner(const TaskManagerWPtr &);
@@ -130,7 +136,7 @@ class SequencedTaskRunner : public TaskRunner
     friend class TaskManager;
 
 public:
-    void PostTask(const TaskWPtr &) override;
+    bool PostTask(const TaskWPtr &) override;
 
 protected:
     SequencedTaskRunner(const TaskManagerWPtr &);
@@ -146,8 +152,11 @@ private:
     /**
      * If no task has been posted for execution, post the first task in the
      * pending queue.
+     *
+     * @return bool True if the task was posted for execution or added to the
+     *              pending queue.
      */
-    void maybePostTask();
+    bool maybePostTask();
 
     ConcurrentQueue<TaskWPtr> m_pendingTasks;
     std::atomic_bool m_aHasRunningTask;

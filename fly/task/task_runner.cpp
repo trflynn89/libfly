@@ -13,29 +13,37 @@ TaskRunner::TaskRunner(const TaskManagerWPtr &wpTaskManager) :
 }
 
 //==============================================================================
-void TaskRunner::PostTaskWithDelay(
+bool TaskRunner::PostTaskWithDelay(
     const TaskWPtr &wpTask,
     std::chrono::milliseconds delay)
 {
     TaskManagerPtr spTaskManager = m_wpTaskManager.lock();
-    TaskRunnerPtr spTaskRunner = shared_from_this();
 
     if (spTaskManager)
     {
+        TaskRunnerPtr spTaskRunner = shared_from_this();
         spTaskManager->postTaskWithDelay(wpTask, spTaskRunner, delay);
+
+        return true;
     }
+
+    return false;
 }
 
 //==============================================================================
-void TaskRunner::PostTaskToTaskManager(const TaskWPtr &wpTask)
+bool TaskRunner::PostTaskToTaskManager(const TaskWPtr &wpTask)
 {
     TaskManagerPtr spTaskManager = m_wpTaskManager.lock();
-    TaskRunnerPtr spTaskRunner = shared_from_this();
 
     if (spTaskManager)
     {
+        TaskRunnerPtr spTaskRunner = shared_from_this();
         spTaskManager->postTask(wpTask, spTaskRunner);
+
+        return true;
     }
+
+    return false;
 }
 
 //==============================================================================
@@ -45,9 +53,9 @@ ParallelTaskRunner::ParallelTaskRunner(const TaskManagerWPtr &wpTaskManager) :
 }
 
 //==============================================================================
-void ParallelTaskRunner::PostTask(const TaskWPtr &wpTask)
+bool ParallelTaskRunner::PostTask(const TaskWPtr &wpTask)
 {
-    PostTaskToTaskManager(wpTask);
+    return PostTaskToTaskManager(wpTask);
 }
 
 //==============================================================================
@@ -63,15 +71,10 @@ SequencedTaskRunner::SequencedTaskRunner(const TaskManagerWPtr &wpTaskManager) :
 }
 
 //==============================================================================
-void SequencedTaskRunner::PostTask(const TaskWPtr &wpTask)
+bool SequencedTaskRunner::PostTask(const TaskWPtr &wpTask)
 {
-    TaskPtr spTask = wpTask.lock();
-
-    if (spTask)
-    {
-        m_pendingTasks.Push(wpTask);
-        maybePostTask();
-    }
+    m_pendingTasks.Push(wpTask);
+    return maybePostTask();
 }
 
 //==============================================================================
@@ -82,24 +85,30 @@ void SequencedTaskRunner::TaskComplete(const TaskPtr &)
 }
 
 //==============================================================================
-void SequencedTaskRunner::maybePostTask()
+bool SequencedTaskRunner::maybePostTask()
 {
     static std::chrono::seconds wait(0);
     bool expected = false;
 
     if (m_aHasRunningTask.compare_exchange_strong(expected, true))
     {
+        bool posted = false;
         TaskWPtr wpTask;
 
         if (m_pendingTasks.Pop(wpTask, wait))
         {
-            PostTaskToTaskManager(wpTask);
+            posted = PostTaskToTaskManager(wpTask);
         }
-        else
+
+        if (!posted)
         {
             m_aHasRunningTask.store(false);
         }
+
+        return posted;
     }
+
+    return true;
 }
 
 }
