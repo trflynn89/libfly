@@ -19,12 +19,12 @@ function Run-Libfly-Test($arch)
             $stdout = $output | ?{ $_ -isnot [System.Management.Automation.ErrorRecord] }
             $stderr = $output | ?{ $_ -is [System.Management.Automation.ErrorRecord] }
 
-            Add-AppveyorTest $test -Outcome Failed -FileName $_ -StdOut $stdout.ToString() -StdErr $stderr.ToString() -Duration $duration -ErrorMessage "Failed $test test"
+            Add-AppveyorTest $test -Outcome Failed -FileName $_ -StdOut ($stdout | Out-String).Trim() -StdErr ($stderr | Out-String).Trim() -Duration $duration -ErrorMessage "Failed $test test"
             $failed = $TRUE
         }
         else
         {
-            Add-AppveyorTest $test -Outcome Passed -FileName $_ -StdOut $output.ToString() -Duration $duration
+            Add-AppveyorTest $test -Outcome Passed -FileName $_ -StdOut ($output | Out-String).Trim() -Duration $duration
         }
     }
 
