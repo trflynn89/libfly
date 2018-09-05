@@ -2,7 +2,9 @@
 function Run-Libfly-Test($arch)
 {
     Write-Output "Running $arch tests"
+
     $full_path = $PSScriptRoot + "\\Debug-" + $arch
+    $failed = $FALSE
 
     Get-ChildItem -path $full_path -Recurse -Include *.exe  | ForEach {
         $test = $_.Directory.Name
@@ -11,11 +13,18 @@ function Run-Libfly-Test($arch)
         if ($LASTEXITCODE)
         {
             Add-AppveyorTest $test -Outcome Failed -FileName $_ -ErrorMessage "Failed $test test"
+            $failed = $TRUE
         }
         else
         {
             Add-AppveyorTest $test -Outcome Passed -FileName $_
         }
+    }
+
+    if ($failed -eq $TRUE)
+    {
+        Write-Error "Failed $arch tests"
+        exit 1
     }
 }
 
