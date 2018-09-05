@@ -4,7 +4,8 @@ function Run-Libfly-Test($arch)
     Write-Output "Running $arch tests"
 
     $full_path = $PSScriptRoot + "\\Debug-" + $arch
-    $failed = $FALSE
+    $tests_passed = 0
+    $tests_failed = 0
 
     Get-ChildItem -path $full_path -Recurse -Include *.exe  | ForEach {
         $timer = [Diagnostics.Stopwatch]::StartNew()
@@ -19,18 +20,19 @@ function Run-Libfly-Test($arch)
         $stdout = $output[0]
         $stderr = $output[1]
 
-        if ($status)
+        if ($status -eq 0)
         {
-            Add-AppveyorTest $test -Outcome Failed -FileName $_ -StdOut $stdout -StdErr $stderr -Duration $duration -ErrorMessage "Failed $test test"
-            $failed = $TRUE
+            Add-AppveyorTest $test -Outcome Passed -FileName $_ -StdOut $stdout -StdErr $stderr -Duration $duration
+            ++$tests_passed
         }
         else
         {
-            Add-AppveyorTest $test -Outcome Passed -FileName $_ -StdOut $stdout -StdErr $stderr -Duration $duration
+            Add-AppveyorTest $test -Outcome Failed -FileName $_ -StdOut $stdout -StdErr $stderr -Duration $duration -ErrorMessage "Failed $test test"
+            ++$tests_failed
         }
     }
 
-    if ($failed -eq $TRUE)
+    if (($tests_passed -eq 0) -or ($tests_failed -ne 0))
     {
         Write-Error "Failed $arch tests"
         exit 1
