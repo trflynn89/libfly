@@ -9,6 +9,16 @@
 namespace fly {
 
 //==============================================================================
+JsonParser::JsonParser() : Parser(), m_features(Features::Strict)
+{
+}
+
+//==============================================================================
+JsonParser::JsonParser(Features features) : Parser(), m_features(features)
+{
+}
+
+//==============================================================================
 Json JsonParser::ParseInternal(std::istream &stream)
 {
     m_states = decltype(m_states)();
@@ -65,6 +75,10 @@ Json JsonParser::ParseInternal(std::istream &stream)
 
             case Token::Colon:
                 onColon(c);
+                break;
+
+            case Token::Solidus:
+                onSolidus(c, stream);
                 break;
 
             default:
@@ -350,7 +364,69 @@ void JsonParser::onComma(int c)
         throw UnexpectedCharacterException(m_line, m_column, c);
     }
 
-    m_expectingValue = !m_parsingString;
+    if (isFeatureAllowed(Features::AllowTrailingComma))
+    {
+        m_expectingValue = false;
+    }
+    else
+    {
+        m_expectingValue = !m_parsingString;
+    }
+}
+
+//==============================================================================
+void JsonParser::onSolidus(int c, std::istream &stream)
+{
+    if (m_parsingString)
+    {
+        pushValue(c);
+    }
+    else if (isFeatureAllowed(Features::AllowComments))
+    {
+        Token token = static_cast<Token>(stream.get());
+
+        switch (token)
+        {
+        case Token::Solidus:
+            do
+            {
+                c = stream.get();
+            } while ((c != EOF) && (static_cast<Token>(c) != Token::NewLine));
+
+            break;
+
+        case Token::Asterisk:
+        {
+            bool parsing = true;
+
+            do
+            {
+                c = stream.get();
+
+                if ((static_cast<Token>(c) == Token::Asterisk) &&
+                    (static_cast<Token>(stream.peek()) == Token::Solidus))
+                {
+                    parsing = false;
+                    stream.get();
+                }
+            } while ((c != EOF) && parsing);
+
+            if (parsing)
+            {
+                throw UnexpectedCharacterException(m_line, m_column, c);
+            }
+
+            break;
+        }
+
+        default:
+            throw UnexpectedCharacterException(m_line, m_column, c);
+        }
+    }
+    else
+    {
+        throw UnexpectedCharacterException(m_line, m_column, c);
+    }
 }
 
 //==============================================================================
@@ -545,6 +621,30 @@ void JsonParser::validateNumber(
     }
 
     isFloat = is_float();
+}
+
+//==============================================================================
+bool JsonParser::isFeatureAllowed(Features feature) const
+{
+    return ((m_features & feature) != Features::Strict);
+}
+
+//==============================================================================
+JsonParser::Features operator & (JsonParser::Features a, JsonParser::Features b)
+{
+    return static_cast<JsonParser::Features>(
+        static_cast<std::underlying_type_t<JsonParser::Features>>(a) &
+        static_cast<std::underlying_type_t<JsonParser::Features>>(b)
+    );
+}
+
+//==============================================================================
+JsonParser::Features operator | (JsonParser::Features a, JsonParser::Features b)
+{
+    return static_cast<JsonParser::Features>(
+        static_cast<std::underlying_type_t<JsonParser::Features>>(a) |
+        static_cast<std::underlying_type_t<JsonParser::Features>>(b)
+    );
 }
 
 }

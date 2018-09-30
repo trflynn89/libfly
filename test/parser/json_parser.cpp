@@ -448,3 +448,329 @@ TEST_F(JsonParserTest, NumericConversionTest)
     ValidateFail("e5");
     ValidateFail("E5");
 }
+
+//==============================================================================
+TEST_F(JsonParserTest, SingleLineCommentTest)
+{
+    auto spParser = std::make_shared<fly::JsonParser>(
+        fly::JsonParser::Features::AllowComments
+    );
+    {
+        std::string str = R"({
+            "a" : 12, // here is a comment
+            "b" : 13
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_NO_THROW(json = spParser->Parse(str));
+        EXPECT_EQ(json.Size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"({
+            // here is a comment
+            "a" : 12,
+            // here is a comment
+            "b" : 13
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_NO_THROW(json = spParser->Parse(str));
+        EXPECT_EQ(json.Size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"({
+            "a" : "abdc // here is a comment efgh",
+            "b" : 13
+        })";
+
+        fly::Json json;
+
+        EXPECT_NO_THROW(m_spParser->Parse(str));
+        EXPECT_NO_THROW(json = spParser->Parse(str));
+        EXPECT_EQ(json.Size(), 2);
+        EXPECT_EQ(json["a"], "abdc // here is a comment efgh");
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"({
+            "a" : 12 / here is a bad comment
+        })";
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_THROW(spParser->Parse(str), fly::ParserException);
+    }
+    {
+        std::string str = R"({"a" : 12 /)";
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_THROW(spParser->Parse(str), fly::ParserException);
+    }
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, MultiLineCommentTest)
+{
+    auto spParser = std::make_shared<fly::JsonParser>(
+        fly::JsonParser::Features::AllowComments
+    );
+    {
+        std::string str = R"({
+            "a" : 12, /* here is a comment */
+            "b" : 13
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_NO_THROW(json = spParser->Parse(str));
+        EXPECT_EQ(json.Size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"({
+            /* here is a comment */
+            "a" : 12,
+            /* here is a comment */
+            "b" : 13
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_NO_THROW(json = spParser->Parse(str));
+        EXPECT_EQ(json.Size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"({
+            /*
+                here is a comment
+                that crosses multiple lines
+                and has JSON embedded in it
+                "c" : 14,
+                "d" : 15
+            */
+            "a" : 12,
+            /* here is a comment */
+            "b" : 13
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_NO_THROW(json = spParser->Parse(str));
+        EXPECT_EQ(json.Size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"({
+            "a" : "abdc /* here is a comment */ efgh",
+            "b" : 13
+        })";
+
+        fly::Json json;
+
+        EXPECT_NO_THROW(m_spParser->Parse(str));
+        EXPECT_NO_THROW(json = spParser->Parse(str));
+        EXPECT_EQ(json.Size(), 2);
+        EXPECT_EQ(json["a"], "abdc /* here is a comment */ efgh");
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"({
+            "a" : 12 /* here is a bad comment
+        })";
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_THROW(spParser->Parse(str), fly::ParserException);
+    }
+    {
+        std::string str = R"({"a" : 12 /*)";
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_THROW(spParser->Parse(str), fly::ParserException);
+    }
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, TrailingCommaObjectTest)
+{
+    auto spParser = std::make_shared<fly::JsonParser>(
+        fly::JsonParser::Features::AllowTrailingComma
+    );
+    {
+        std::string str = R"({
+            "a" : 12,
+            "b" : 13,
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_NO_THROW(json = spParser->Parse(str));
+        EXPECT_EQ(json.Size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"({
+            "a" : 12,,
+            "b" : 13,
+        })";
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_THROW(spParser->Parse(str), fly::ParserException);
+    }
+    {
+        std::string str = R"({
+            "a" : 12,
+            "b" : 13,,
+        })";
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_THROW(spParser->Parse(str), fly::ParserException);
+    }
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, TrailingCommaArrayTest)
+{
+    auto spParser = std::make_shared<fly::JsonParser>(
+        fly::JsonParser::Features::AllowTrailingComma
+    );
+    {
+        std::string str = R"({
+            "a" : 12,
+            "b" : [1, 2,],
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_NO_THROW(json = spParser->Parse(str));
+        EXPECT_EQ(json.Size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_TRUE(json["b"].IsArray());
+        EXPECT_EQ(json["b"].Size(), 2);
+        EXPECT_EQ(json["b"][0], 1);
+        EXPECT_EQ(json["b"][1], 2);
+    }
+    {
+        std::string str = R"({
+            "a" : 12,
+            "b" : [1,, 2,],
+        })";
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_THROW(spParser->Parse(str), fly::ParserException);
+    }
+    {
+        std::string str = R"({
+            "a" : 12,
+            "b" : [1, 2,,],
+        })";
+
+        EXPECT_THROW(m_spParser->Parse(str), fly::ParserException);
+        EXPECT_THROW(spParser->Parse(str), fly::ParserException);
+    }
+}
+
+//==============================================================================
+TEST(JsonParserFeatures, CombinedFeaturesTest)
+{
+    {
+        auto features = fly::JsonParser::Features::Strict;
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowComments,
+            fly::JsonParser::Features::Strict
+        );
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowTrailingComma,
+            fly::JsonParser::Features::Strict
+        );
+    }
+
+    {
+        auto features = fly::JsonParser::Features::AllowComments;
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowComments,
+            fly::JsonParser::Features::AllowComments
+        );
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowTrailingComma,
+            fly::JsonParser::Features::Strict
+        );
+    }
+    {
+        auto features = fly::JsonParser::Features::Strict;
+        features = features | fly::JsonParser::Features::AllowComments;
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowComments,
+            fly::JsonParser::Features::AllowComments
+        );
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowTrailingComma,
+            fly::JsonParser::Features::Strict
+        );
+    }
+
+    {
+        auto features = fly::JsonParser::Features::AllowTrailingComma;
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowComments,
+            fly::JsonParser::Features::Strict
+        );
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowTrailingComma,
+            fly::JsonParser::Features::AllowTrailingComma
+        );
+    }
+    {
+        auto features = fly::JsonParser::Features::Strict;
+        features = features | fly::JsonParser::Features::AllowTrailingComma;
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowComments,
+            fly::JsonParser::Features::Strict
+        );
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowTrailingComma,
+            fly::JsonParser::Features::AllowTrailingComma
+        );
+    }
+
+    {
+        auto features = fly::JsonParser::Features::AllFeatures;
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowComments,
+            fly::JsonParser::Features::AllowComments
+        );
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowTrailingComma,
+            fly::JsonParser::Features::AllowTrailingComma
+        );
+    }
+    {
+        auto features = fly::JsonParser::Features::Strict;
+        features = features | fly::JsonParser::Features::AllowComments;
+        features = features | fly::JsonParser::Features::AllowTrailingComma;
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowComments,
+            fly::JsonParser::Features::AllowComments
+        );
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowTrailingComma,
+            fly::JsonParser::Features::AllowTrailingComma
+        );
+    }
+}
