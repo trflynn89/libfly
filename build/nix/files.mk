@@ -8,9 +8,6 @@ QT5_UICS :=
 QT5_MOCS :=
 QT5_RCCS :=
 
-# A list of system calls to mock
-MOCK_SYSTEM_CALLS :=
-
 # Set a source directory's source files to all C/C++ files.
 define WILDCARD_SOURCES
 
@@ -18,17 +15,6 @@ SRC_$(d) := \
     $(wildcard $(d)/*.c) \
     $(wildcard $(d)/*.cc) \
     $(wildcard $(d)/*.cpp)
-
-endef
-
-# Add a system call to be mocked for unit tests.
-# $(1) = The system call to mock.
-define MOCK_SYSTEM_CALL
-
-MOCK_SYSTEM_CALLS += $$(strip $(1))
-
-LDFLAGS_$(d) += \
-    -Wl,--wrap=$$(strip $(1))
 
 endef
 
