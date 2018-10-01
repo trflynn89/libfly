@@ -12,7 +12,7 @@ $(eval $(call SET_DEFAULT_TARGET, libfly))
 
 # Build targets
 $(eval $(call ADD_TARGET, libfly, fly, LIB))
-$(eval $(call ADD_TEST_TARGET, unit_tests, test))
+$(eval $(call ADD_TEST_TARGET, libfly_unit_tests, test))
 
 # Import the build system
 include build.mk

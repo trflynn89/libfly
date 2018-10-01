@@ -98,6 +98,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -107,6 +108,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -118,6 +120,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -134,6 +137,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -159,7 +163,6 @@
     <ClInclude Include="..\..\..\fly\path\path_monitor.h" />
     <ClInclude Include="..\..\..\fly\path\win\path_impl.h" />
     <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.h" />
-    <ClInclude Include="..\..\..\fly\random\random_device.h" />
     <ClInclude Include="..\..\..\fly\socket\async_request.h" />
     <ClInclude Include="..\..\..\fly\socket\socket.h" />
     <ClInclude Include="..\..\..\fly\socket\socket_config.h" />

@@ -7,9 +7,6 @@
     <Filter Include="path">
       <UniqueIdentifier>{7e00e5db-2667-4fb1-ab52-071772a04b6c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="random">
-      <UniqueIdentifier>{5c6aa4c5-fe2f-4e8d-a6a5-be89a547ca25}</UniqueIdentifier>
-    </Filter>
     <Filter Include="socket">
       <UniqueIdentifier>{c64c6e9a-2b73-4e4c-af81-bebf6171d91c}</UniqueIdentifier>
     </Filter>
@@ -64,9 +61,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\socket\socket_manager.h">
       <Filter>socket</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\random\random_device.h">
-      <Filter>random</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\socket\async_request.h">
       <Filter>socket</Filter>
