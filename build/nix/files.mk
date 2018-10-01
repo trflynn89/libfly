@@ -8,16 +8,6 @@ QT5_UICS :=
 QT5_MOCS :=
 QT5_RCCS :=
 
-# Set a source directory's source files to all C/C++ files.
-define WILDCARD_SOURCES
-
-SRC_$(d) := \
-    $(wildcard $(d)/*.c) \
-    $(wildcard $(d)/*.cc) \
-    $(wildcard $(d)/*.cpp)
-
-endef
-
 # Define output files for compiled C/C++ targets.
 # $(1) = The C/C++ files to be compiled.
 define OBJ_OUT_FILES

@@ -253,7 +253,9 @@ $$(eval $$(call POP_DIR))
 
 endef
 
-# Define the rules to build a source directory. The files.mk should define:
+# Define the rules to build a source directory. The files.mk is optional for
+# source directories. If not found, all source files in the directory will be
+# built. If found, the files.mk should define:
 # 1. SRC_$(d) = The sources to be built in the target.
 define DEFINE_SRC_RULES
 
@@ -261,7 +263,15 @@ define DEFINE_SRC_RULES
 $$(eval $$(call PUSH_DIR))
 
 # Define source, object and dependency files
-include $$(d)/files.mk
+ifeq ($$(wildcard $$(d)/files.mk),)
+    SRC_$$(d) := \
+        $$(wildcard $$(d)/*.c) \
+        $$(wildcard $$(d)/*.cc) \
+        $$(wildcard $$(d)/*.cpp)
+else
+    include $$(d)/files.mk
+endif
+
 $$(eval $$(call OBJ_OUT_FILES, $$(SRC_$$(d))))
 
 # Define the compile rules
