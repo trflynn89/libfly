@@ -21,16 +21,14 @@ std::string PathUtil::GenerateTempDirectory()
 //==============================================================================
 bool PathUtil::WriteFile(const std::string &path, const std::string &contents)
 {
-    {
-        std::ofstream stream(path, std::ios::out);
+    std::ofstream stream(path, std::ios::out);
 
-        if (stream.good())
-        {
-            stream << contents;
-        }
+    if (stream.good())
+    {
+        stream << contents;
     }
 
-    return (contents == ReadFile(path));
+    return stream.good();
 }
 
 //==============================================================================

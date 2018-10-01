@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="config">
+      <UniqueIdentifier>{ee0c6b14-fa2b-4f87-a3b0-ccbf7c4c13c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="logger">
+      <UniqueIdentifier>{7ecf1fbd-e9f8-430f-aa13-4ddb9e46dbd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="parser">
+      <UniqueIdentifier>{c4c87e06-0ba0-4d4f-902e-35c28da6e07e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="path">
+      <UniqueIdentifier>{3387ecc5-ca3c-4b0c-83b8-1c62c1b9556b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="socket">
+      <UniqueIdentifier>{3df267bc-741a-4dc2-bf16-21deb3af15a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="system">
+      <UniqueIdentifier>{824ceb0d-1c4e-40bf-9bbc-68494ebe321e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="task">
+      <UniqueIdentifier>{efd06495-eee3-4270-a39c-2d065f559bc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="traits">
+      <UniqueIdentifier>{1716af47-ff79-4f7f-b910-fefa3c97bfe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="types">
+      <UniqueIdentifier>{3120a3ba-5fe5-417c-9e5f-33d9537560d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="googletest">
+      <UniqueIdentifier>{096b28ab-f8d6-40ee-a560-5ec9f8da812d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util">
+      <UniqueIdentifier>{fd334c96-5889-4f05-adac-3a0420db077e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\test\util\capture_stream.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\util\path_util.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\concurrent_container.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\json.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\string.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\system\system.cpp">
+      <Filter>system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\system\system_monitor.cpp">
+      <Filter>system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\path\path.cpp">
+      <Filter>path</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\path\path_monitor.cpp">
+      <Filter>path</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\parser\exceptions.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\parser\ini_parser.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\parser\json_parser.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\parser\parser.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest-all.cc">
+      <Filter>googletest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest_main.cc">
+      <Filter>googletest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\config\config_manager.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\config\config.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\traits\traits.cpp">
+      <Filter>traits</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\task\task.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\socket\socket.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\logger\logger.cpp">
+      <Filter>logger</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\test\util\capture_stream.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\test\util\path_util.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\test\util\waitable_task_runner.h">
+      <Filter>util</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -62,10 +62,6 @@ define INCLUDE_SRC_DIRS
 
 $(foreach dir, $(1), $(call INCLUDE_SRC_DIR, $(SOURCE_ROOT), $(dir)))
 
-ifneq ($(findstring $(target),$(TEST_TARGETS)),)
-    $(call INCLUDE_SRC_DIR, $(SOURCE_ROOT), test)
-endif
-
 endef
 
 # Push the current directory to the stack.

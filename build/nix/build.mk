@@ -6,6 +6,7 @@
 .PHONY: all
 .PHONY: clean
 .PHONY: tests
+.PHONY: gcov
 .PHONY: run
 .PHONY: install
 .PHONY: setup
