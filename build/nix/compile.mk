@@ -22,6 +22,7 @@ STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
 STRIP := $(Q)strip $$@
 
 # Compile C/C++ files to object files.
+#
 # $(1) = Path to directory where object files should be placed.
 define OBJ_RULES
 
@@ -51,8 +52,8 @@ $$(strip $(1))/%.o: $(d)/%.cpp $$(MAKEFILES_$(d))
 endef
 
 # Compile source files to QT5 files.
+#
 # $(1) = Path to directory where object files should be placed.
-# $(2) = Path to directory where generated files should be placed.
 define QT5_RULES
 
 .PRECIOUS: $(GEN_DIR)/%.uic.h $(GEN_DIR)/%.moc.cpp $(GEN_DIR)/%.rcc.cpp
@@ -87,33 +88,21 @@ $(GEN_DIR)/%.rcc.cpp: $(d)/%.qrc $$(MAKEFILES_$(d))
 
 endef
 
-# Compile a set of C/C++ files for a source directory. These rules aren't used
-# by the make system, but are defined for convenience. These targets may be
-# invoked by calling "make The/Directory/To/Build".
-# $(1) = All object files to be built in this source directory.
-# $(2) = All intermediate files to be cleaned with this directory.
-define SRC_RULES
-
-$(td): $(1)
-	@echo "[Finished $$(subst $(SOURCE_ROOT)/,,$$@)]"
-
-$(td)_clean:
-	@echo "[Clean $$(subst $(SOURCE_ROOT)/,,$(td))]"
-	$(Q)$(RM) $(2)
-
-endef
-
 # Link a binary target from a set of object files.
+#
+# $(1) = The target's name.
+# $(2) = The path to the target output binary.
 define BIN_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
-$(TARGET_NAME): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
-$(TARGET_NAME): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
-$(TARGET_NAME): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
-$(TARGET_NAME): LDLIBS := $(LDLIBS_$(d)) $(LDLIBS)
+$$(strip $(2)): OBJS := $$(OBJS_$$(strip $(1)))
+$$(strip $(2)): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
+$$(strip $(2)): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
+$$(strip $(2)): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
+$$(strip $(2)): LDLIBS := $(LDLIBS_$(d)) $(LDLIBS)
 
-$(TARGET_NAME): $$(QT5_UICS) $$(QT5_MOCS) $$(QT5_RCCS) $$(OBJS) $$(MAKEFILES_$(d))
+$$(strip $(2)): $$(QT5_UICS) $$(QT5_MOCS) $$(QT5_RCCS) $$(OBJS_$$(strip $(1))) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 	@echo "[Link $$(subst $(CURDIR)/,,$$@)]"
@@ -127,15 +116,19 @@ endif
 endef
 
 # Link a library target from a set of object files.
+#
+# $(1) = The target's name.
+# $(2) = The path to the target output binary.
 define LIB_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
-$(TARGET_NAME): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
-$(TARGET_NAME): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
-$(TARGET_NAME): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
+$$(strip $(2)): OBJS := $$(OBJS_$$(strip $(1)))
+$$(strip $(2)): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
+$$(strip $(2)): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
+$$(strip $(2)): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 
-$(TARGET_NAME): $$(OBJS) $$(MAKEFILES_$(d))
+$$(strip $(2)): $$(OBJS_$$(strip $(1))) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 ifeq ($(release),1)
@@ -150,23 +143,32 @@ endif
 endef
 
 # Build a release package.
+#
+# $(1) = The target's name.
+# $(2) = The path to the target output binary or library.
+# $(3) = The path to the target release package.
 define PKG_RULES
 
 # Force repackaging if any build files change
 MAKEFILES_$(d) := $(BUILD_ROOT)/*.mk
 
-$(TARGET_PACKAGE): $(TARGET_NAME) $$(MAKEFILES_$(d))
-ifneq ($(REL_CMDS),)
-	@echo "[Package $$(subst $(CURDIR)/,,$$@)]"
+$$(strip $(3)): REL_CMDS := $$(REL_CMDS_$$(strip $(1)))
+$$(strip $(3)): REL_NAME := $$(REL_NAME_$$(strip $(1)))
+
+$$(strip $(3)): $$(strip $(2)) $$(MAKEFILES_$(d))
 	$(Q)$$(BUILD_REL)
-endif
 
 endef
 
 # Define the rules to build a binary target. The files.mk should define:
-# 1. SRC_DIRS_$(d) = The source directories to include in the build.
-# 2. LDLIBS_$(d) = The libraries to be linked in the target binary.
-# 3. SRC_$(d) = The sources to be built in the target binary.
+#
+#     SRC_DIRS_$(d) = The source directories to include in the build.
+#     LDLIBS_$(d) = The libraries to be linked in the target binary.
+#     SRC_$(d) = The sources to be built in the target binary.
+#
+# $(1) = The target's name.
+# $(2) = The path to the target output binary.
+# $(3) = The path to the target release package.
 define DEFINE_BIN_RULES
 
 # Push current dir to stack
@@ -174,15 +176,15 @@ $$(eval $$(call PUSH_DIR))
 
 # Define source, object, dependency, and binary files
 include $$(d)/files.mk
-$$(eval $$(call BIN_OUT_FILES, $$(SRC_$$(d))))
+$$(eval $$(call OBJ_OUT_FILES, $(1), $$(SRC_$$(d))))
 
 # Include the source directories
-$$(eval $$(call INCLUDE_SRC_DIRS, $$(SRC_DIRS_$$(d))))
+$$(eval $$(call INCLUDE_SRC_DIRS, $(1), $$(SRC_DIRS_$$(d))))
 
 # Define the compile rules
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
-$$(eval $$(call BIN_RULES))
-$$(eval $$(call PKG_RULES))
+$$(eval $$(call BIN_RULES, $(1), $(2)))
+$$(eval $$(call PKG_RULES, $(1), $(2), $(3)))
 
 # Include dependency files
 -include $$(DEP_$$(d))
@@ -193,12 +195,17 @@ $$(eval $$(call POP_DIR))
 endef
 
 # Define the rules to build a QT5 target. The files.mk should define:
-# 1. SRC_DIRS_$(d) = The source directories to include in the build.
-# 2. LDLIBS_$(d) = The libraries to be linked in the target binary.
-# 3. SRC_$(d) = The sources to be built in the target binary.
-# 4. QT5_UIC_$(d) = The QT5 UIC source files.
-# 5. QT5_MOC_$(d) = The QT5 MOC source files.
-# 6. QT5_RCC_$(d) = The QT5 RCC source files.
+#
+#     SRC_DIRS_$(d) = The source directories to include in the build.
+#     LDLIBS_$(d) = The libraries to be linked in the target binary.
+#     SRC_$(d) = The sources to be built in the target binary.
+#     QT5_UIC_$(d) = The QT5 UIC source files.
+#     QT5_MOC_$(d) = The QT5 MOC source files.
+#     QT5_RCC_$(d) = The QT5 RCC source files.
+#
+# $(1) = The target's name.
+# $(2) = The path to the target output binary.
+# $(3) = The path to the target release package.
 define DEFINE_QT5_RULES
 
 # Push current dir to stack
@@ -206,16 +213,16 @@ $$(eval $$(call PUSH_DIR))
 
 # Define source, object, dependency, and binary files
 include $$(d)/files.mk
-$$(eval $$(call QT5_OUT_FILES, $$(SRC_$$(d)), $$(QT5_UIC_$$(d)), $$(QT5_MOC_$$(d)), $$(QT5_RCC_$$(d))))
+$$(eval $$(call QT5_OUT_FILES, $(1), $$(SRC_$$(d)), $$(QT5_UIC_$$(d)), $$(QT5_MOC_$$(d)), $$(QT5_RCC_$$(d))))
 
 # Include the source directories
-$$(eval $$(call INCLUDE_SRC_DIRS, $$(SRC_DIRS_$$(d))))
+$$(eval $$(call INCLUDE_SRC_DIRS, $(1), $$(SRC_DIRS_$$(d))))
 
 # Define the compile rules
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 $$(eval $$(call QT5_RULES, $$(OBJ_DIR_$$(d))))
-$$(eval $$(call BIN_RULES))
-$$(eval $$(call PKG_RULES))
+$$(eval $$(call BIN_RULES, $(1), $(2)))
+$$(eval $$(call PKG_RULES, $(1), $(2), $(3)))
 
 # Include dependency files
 -include $$(DEP_$$(d))
@@ -226,8 +233,13 @@ $$(eval $$(call POP_DIR))
 endef
 
 # Define the rules to build a library target. The files.mk should define:
-# 1. SRC_DIRS_$(d) = The source directories to include in the build.
-# 2. SRC_$(d) = The sources to be built in the target library.
+#
+#     SRC_DIRS_$(d) = The source directories to include in the build.
+#     SRC_$(d) = The sources to be built in the target library.
+#
+# $(1) = The target's name.
+# $(2) = The path to the target output library.
+# $(3) = The path to the target release package.
 define DEFINE_LIB_RULES
 
 # Push current dir to stack
@@ -235,15 +247,15 @@ $$(eval $$(call PUSH_DIR))
 
 # Define source, object, dependency, and binary files
 include $$(d)/files.mk
-$$(eval $$(call LIB_OUT_FILES, $$(SRC_$$(d))))
+$$(eval $$(call OBJ_OUT_FILES, $(1), $$(SRC_$$(d))))
 
 # Include the source directories
-$$(eval $$(call INCLUDE_SRC_DIRS, $$(SRC_DIRS_$$(d))))
+$$(eval $$(call INCLUDE_SRC_DIRS, $(1), $$(SRC_DIRS_$$(d))))
 
 # Define the compile rules
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
-$$(eval $$(call LIB_RULES))
-$$(eval $$(call PKG_RULES))
+$$(eval $$(call LIB_RULES, $(1), $(2)))
+$$(eval $$(call PKG_RULES, $(1), $(2), $(3)))
 
 # Include dependency files
 -include $$(DEP_$$(d))
@@ -256,7 +268,10 @@ endef
 # Define the rules to build a source directory. The files.mk is optional for
 # source directories. If not found, all source files in the directory will be
 # built. If found, the files.mk should define:
-# 1. SRC_$(d) = The sources to be built in the target.
+#
+#     SRC_$(d) = The sources to be built in the target.
+#
+# $(1) = The target's name.
 define DEFINE_SRC_RULES
 
 # Push current dir to stack
@@ -272,11 +287,10 @@ else
     include $$(d)/files.mk
 endif
 
-$$(eval $$(call OBJ_OUT_FILES, $$(SRC_$$(d))))
+$$(eval $$(call OBJ_OUT_FILES, $(1), $$(SRC_$$(d))))
 
 # Define the compile rules
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
-$$(eval $$(call SRC_RULES, $$(OBJ_$$(d)), $$(CLEAN_$$(d))))
 
 # Include dependency files
 -include $$(DEP_$$(d))

@@ -1,9 +1,6 @@
 # Define the default make configuration. Not all defaults are defined here, but
 # all command line options are listed here for convenience.
 
-# Define the target to build
-target := $(target)
-
 # Define debug vs. release
 release := 0
 
@@ -38,7 +35,6 @@ else
     $(info Gen dir = $(GEN_DIR))
     $(info Obj dir = $(OBJ_DIR))
     $(info Etc dir = $(ETC_DIR))
-    $(info Target = $(target))
     $(info Release = $(release))
     $(info Arch = $(arch))
 endif

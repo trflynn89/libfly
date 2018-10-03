@@ -8,6 +8,19 @@
 #include <execinfo.h>
 #include <unistd.h>
 
+#if defined(FLY_USE_SANITIZER)
+
+/**
+ * AddressSanitizer catches SIGSEGV by default. Override the default options to
+ * allow a user-specified handler.
+ */
+extern "C" const char *__asan_default_options()
+{
+    return "allow_user_segv_handler=1";
+}
+
+#endif
+
 namespace fly {
 
 //==============================================================================

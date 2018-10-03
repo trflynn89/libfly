@@ -7,9 +7,9 @@
 .PHONY: clean
 .PHONY: tests
 .PHONY: gcov
-.PHONY: run
 .PHONY: install
 .PHONY: setup
+.PHONY: $(TARGETS)
 
 # Verify expected variables
 ifeq ($(SOURCE_ROOT),)
@@ -28,27 +28,18 @@ endif
 BUILD_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 BUILD_ROOT := $(patsubst %/,%,$(BUILD_ROOT))
 
+# Define 'all' target before importing the build system
+all: $(TARGETS)
+
 # Import the build system
 include $(BUILD_ROOT)/system.mk
 include $(BUILD_ROOT)/config.mk
-include $(BUILD_ROOT)/target.mk
+include $(BUILD_ROOT)/release.mk
 include $(BUILD_ROOT)/flags.mk
-include $(BUILD_ROOT)/stack.mk
 include $(BUILD_ROOT)/files.mk
 include $(BUILD_ROOT)/compile.mk
-include $(BUILD_ROOT)/release.mk
-
-# Define 'all' target before including source directory
-all: $(TARGET_PACKAGE)
-
-# Include top-level source directory's files.mk file
-ifeq ($(TARGET_TYPE), BIN)
-    $(eval $(call INCLUDE_BIN_DIR, $(SOURCE_ROOT), $(TARGET_PATH)))
-else ifeq ($(TARGET_TYPE), QT5)
-    $(eval $(call INCLUDE_QT5_DIR, $(SOURCE_ROOT), $(TARGET_PATH)))
-else ifeq ($(TARGET_TYPE), LIB)
-    $(eval $(call INCLUDE_LIB_DIR, $(SOURCE_ROOT), $(TARGET_PATH)))
-endif
+include $(BUILD_ROOT)/stack.mk
+include $(BUILD_ROOT)/target.mk
 
 # Clean up output files
 clean:
@@ -56,41 +47,33 @@ clean:
 	$(Q)$(RM) -r $(OUT_DIR)
 
 # Run all unit tests
-tests:
-	$(Q)numPass=0; numFail=0; \
-	for tgt in $(TEST_TARGETS) ; do \
-		printf -- "----------- [Test $$tgt] -----------\n\n"; \
-		$(MAKE) -j $(NUM_CORES) target=$$tgt run; \
+tests: $(TEST_BINARIES)
+	$(Q)passed=0; failed=0; \
+	for tgt in $(TEST_BINARIES) ; do \
+		printf -- "----------- [$$tgt] -----------\n\n"; \
+		$$tgt; \
 		if [ $$? -ne 0 ] ; then \
-			printf -- "[ERROR $$tgt]\n\n"; \
-			numFail=$$((numFail+1)); \
+			failed=$$((failed+1)); \
 		else \
-			printf -- "[SUCCESS $$tgt]\n\n"; \
-			numPass=$$((numPass+1)); \
+			passed=$$((passed+1)); \
 		fi; \
 	done; \
-	printf -- "----------- [Pass $$numPass, Fail $$numFail] -----------\n\n"; \
-	exit $$numFail
+	printf -- "\n----------- [Pass $$passed, Fail $$failed] -----------\n\n"; \
+	exit $$failed
 
 # Create coverage reports
-gcov:
-	$(Q)for obj in $(OBJS) ; do \
-		path=$$(dirname "$$obj") ; \
-		file=$$(basename "$$obj") ; \
+gcov: tests
+	$(Q)for obj in $$(find $(OBJ_DIR) -name "*.o" -print) ; do \
+		path=$$(dirname "$$obj"); \
+		file=$$(basename "$$obj"); \
 		\
-		pushd $$path > /dev/null ; \
-		gcov $(GCOV_FLAGS) $$file ; \
+		pushd $$path > /dev/null; \
+		gcov $(GCOV_FLAGS) $$file; \
 		\
-		popd > /dev/null ; \
-	done ; \
+		popd > /dev/null; \
+	done; \
 	\
 	find . -name "*\#\#*.gcov" | xargs grep -l "/usr/include" | xargs -I {} $(RM) {}
-
-# Build and run the target
-run: $(TARGET_PACKAGE)
-ifeq ($(TARGET_TYPE), BIN)
-	$(Q)$(ASAN_FLAGS) $(TARGET_NAME) $(args)
-endif
 
 # Install the target
 install: $(TARGET_PACKAGE)

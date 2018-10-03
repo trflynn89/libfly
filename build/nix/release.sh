@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-DIR=`dirname "$(readlink -f "$0")"`
-NPROC=`nproc`
+DIR=$(dirname "$(readlink -f "$0")")
+NPROC=$(nproc)
 
 # Create a clean build and run unit tests.
 # $1 = True if this is a release build, false otherwise.
@@ -9,7 +9,7 @@ do_build()
 {
     conf="-j $NPROC -C $DIR $2"
 
-    make $conf clean && make $conf all && ( $1 || make $conf tests )
+    make $conf clean && make $conf libfly && ( $1 || make $conf tests )
 
     if [ $? != 0 ] ; then
         echo "error: Failed build $1"

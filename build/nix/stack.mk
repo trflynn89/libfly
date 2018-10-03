@@ -17,50 +17,66 @@
 # The current directory is defined when it is included with INCLUDE_*_DIR.
 
 # Include the build rules for the given binary target directory.
-# $(1) = The path to the directory to include.
-# $(2) = The directory to include.
+#
+# $(1) = The target's name.
+# $(2) = The path to the root source directory.
+# $(3) = The path to the target source directory.
+# $(4) = The path to the target output binary.
+# $(5) = The path to the target release package.
 define INCLUDE_BIN_DIR
 
-curr_dir := $$(strip $(1))/$$(strip $(2))
-$(call DEFINE_BIN_RULES)
+curr_dir := $$(strip $(2))/$$(strip $(3))
+$(call DEFINE_BIN_RULES, $$(strip $(1)), $$(strip $(4)), $$(strip $(5)))
 
 endef
 
 # Include the build rules for the given QT5 target directory.
-# $(1) = The path to the directory to include.
-# $(2) = The directory to include.
+#
+# $(1) = The target's name.
+# $(2) = The path to the root source directory.
+# $(3) = The path to the target source directory.
+# $(4) = The path to the target output binary.
+# $(5) = The path to the target release package.
 define INCLUDE_QT5_DIR
 
-curr_dir := $$(strip $(1))/$$(strip $(2))
-$(call DEFINE_QT5_RULES)
+curr_dir := $$(strip $(2))/$$(strip $(3))
+$(call DEFINE_QT5_RULES, $$(strip $(1)), $$(strip $(4)), $$(strip $(5)))
 
 endef
 
 # Include the build rules for the given library target directory.
-# $(1) = The path to the directory to include.
-# $(2) = The directory to include.
+#
+# $(1) = The target's name.
+# $(2) = The path to the root source directory.
+# $(3) = The path to the target source directory.
+# $(4) = The path to the target output library.
+# $(5) = The path to the target release package.
 define INCLUDE_LIB_DIR
 
-curr_dir := $$(strip $(1))/$$(strip $(2))
-$(call DEFINE_LIB_RULES)
+curr_dir := $$(strip $(2))/$$(strip $(3))
+$(call DEFINE_LIB_RULES, $$(strip $(1)), $$(strip $(4)), $$(strip $(5)))
 
 endef
 
 # Include the build rules for the given target source directory.
-# $(1) = The path to the directory to include.
-# $(2) = The directory to include.
+#
+# $(1) = The target's name.
+# $(2) = The path to the directory to include.
+# $(3) = The directory to include.
 define INCLUDE_SRC_DIR
 
-curr_dir := $$(strip $(1))/$$(strip $(2))
-$(call DEFINE_SRC_RULES)
+curr_dir := $$(strip $(2))/$$(strip $(3))
+$(call DEFINE_SRC_RULES, $$(strip $(1)))
 
 endef
 
 # Include the build rules for each of the given target source directories.
-# $(1) = The directories to include.
+#
+# $(1) = The target's name.
+# $(2) = The directories to include.
 define INCLUDE_SRC_DIRS
 
-$(foreach dir, $(1), $(call INCLUDE_SRC_DIR, $(SOURCE_ROOT), $(dir)))
+$(foreach dir, $(2), $(call INCLUDE_SRC_DIR, $(1), $(SOURCE_ROOT), $(dir)))
 
 endef
 

@@ -7,9 +7,6 @@ VERSION = $(shell cat $(SOURCE_ROOT)/VERSION.md)
 # Import the build API
 include api.mk
 
-# Set default target
-$(eval $(call SET_DEFAULT_TARGET, libfly))
-
 # Build targets
 $(eval $(call ADD_TARGET, libfly, fly, LIB))
 $(eval $(call ADD_TEST_TARGET, libfly_unit_tests, test))

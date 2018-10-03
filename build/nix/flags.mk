@@ -21,25 +21,19 @@ ifeq ($(arch), x86)
 endif
 
 # Unit tests include Google test
-ifneq ($(findstring $(target),$(TEST_TARGETS)),)
-    CF_ALL += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
-    CF_ALL += -I$(SOURCE_ROOT)/test/googletest/googletest
-endif
+CF_ALL += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
+CF_ALL += -I$(SOURCE_ROOT)/test/googletest/googletest
 
 # Optimize release builds, and add debug symbols / use address sanitizer for
 # debug builds - but only use address sanitizer on 64-bit builds:
 # https://github.com/google/sanitizers/issues/954
 ifeq ($(release), 1)
-    CF_ALL += -O2
-
-    ifeq ($(TARGET_TYPE), LIB)
-        CF_ALL += -fPIC
-    endif
+    CF_ALL += -O2 -fPIC
 else
     CF_ALL += -O0 -g --coverage
 
     ifeq ($(arch), x64)
-        CF_ALL += -fsanitize=address -fno-omit-frame-pointer
+        CF_ALL += -DFLY_USE_SANITIZER -fsanitize=address -fno-omit-frame-pointer
     endif
 endif
 
@@ -53,6 +47,7 @@ QT5_UIC := $(QT5_BIN)/uic
 QT5_MOC := $(QT5_BIN)/moc
 QT5_RCC := $(QT5_BIN)/rcc
 
+# TODO this won't work anymore, TARGET_TYPE doesn't exist
 ifeq ($(TARGET_TYPE), QT5)
     CF_ALL += -fPIC -I$(QT5_INC) -I$(QT5_INC)/QtWidgets -I$(QT5_INC)/QtGui -I$(QT5_INC)/QtCore
     LDFLAGS += -Wl,-rpath,$(QT5_LIB) -L$(QT5_LIB)
@@ -65,13 +60,6 @@ CXXFLAGS := -std=c++14 $(CF_ALL)
 
 # gcov flags
 GCOV_FLAGS := -l
-
-# Address Sanitizer flags
-ASAN_FLAGS :=
-
-ifeq ($(release), 0)
-    ASAN_FLAGS += ASAN_OPTIONS=allow_user_segv_handler=true
-endif
 
 # tar flags
 ifeq ($(verbose), 1)

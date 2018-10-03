@@ -17,9 +17,6 @@ ifneq ($(arch), $(filter $(SUPPORTED_ARCH), $(arch)))
     $(error Architecture $(arch) not supported, check system.mk)
 endif
 
-# Determine number of cores
-NUM_CORES := $(shell grep -c ^processor /proc/cpuinfo)
-
 # Determine installation directories
 INSTALL_BIN_DIR := /usr/bin
 INSTALL_INC_DIR := /usr/include
