@@ -28,23 +28,23 @@ define OBJ_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
-$$(strip $(1))/%.o: CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
-$$(strip $(1))/%.o: CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
+$(1)/%.o: CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
+$(1)/%.o: CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
 
 # C files
-$$(strip $(1))/%.o: $(d)/%.c $$(MAKEFILES_$(d))
+$(1)/%.o: $(d)/%.c $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CC)
 
 # CC files
-$$(strip $(1))/%.o: $(d)/%.cc $$(MAKEFILES_$(d))
+$(1)/%.o: $(d)/%.cc $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
 
 # C++ files
-$$(strip $(1))/%.o: $(d)/%.cpp $$(MAKEFILES_$(d))
+$(1)/%.o: $(d)/%.cpp $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
@@ -65,7 +65,7 @@ $(GEN_DIR)/%.uic.h: $(d)/%.ui $$(MAKEFILES_$(d))
 	$(UIC)
 
 # MOC files
-$$(strip $(1))/%.moc.o: $(GEN_DIR)/%.moc.cpp
+$(1)/%.moc.o: $(GEN_DIR)/%.moc.cpp
 	@mkdir -p $$(@D)
 	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
@@ -76,7 +76,7 @@ $(GEN_DIR)/%.moc.cpp: $(d)/%.h $$(MAKEFILES_$(d))
 	$(MOC)
 
 # RCC files
-$$(strip $(1))/%.rcc.o: $(GEN_DIR)/%.rcc.cpp
+$(1)/%.rcc.o: $(GEN_DIR)/%.rcc.cpp
 	@mkdir -p $$(@D)
 	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
@@ -96,13 +96,13 @@ define BIN_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
-$$(strip $(2)): OBJS := $$(OBJS_$$(strip $(1)))
-$$(strip $(2)): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
-$$(strip $(2)): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
-$$(strip $(2)): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
-$$(strip $(2)): LDLIBS := $(LDLIBS_$(d)) $(LDLIBS)
+$(2): OBJS := $$(OBJS_$$(strip $(1)))
+$(2): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
+$(2): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
+$(2): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
+$(2): LDLIBS := $(LDLIBS_$(d)) $(LDLIBS)
 
-$$(strip $(2)): $$(QT5_UICS) $$(QT5_MOCS) $$(QT5_RCCS) $$(OBJS_$$(strip $(1))) $$(MAKEFILES_$(d))
+$(2): $$(QT5_UICS) $$(QT5_MOCS) $$(QT5_RCCS) $$(OBJS_$$(strip $(1))) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 	@echo "[Link $$(subst $(CURDIR)/,,$$@)]"
@@ -123,12 +123,12 @@ define LIB_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
-$$(strip $(2)): OBJS := $$(OBJS_$$(strip $(1)))
-$$(strip $(2)): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
-$$(strip $(2)): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
-$$(strip $(2)): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
+$(2): OBJS := $$(OBJS_$$(strip $(1)))
+$(2): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
+$(2): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
+$(2): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 
-$$(strip $(2)): $$(OBJS_$$(strip $(1))) $$(MAKEFILES_$(d))
+$(2): $$(OBJS_$$(strip $(1))) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 ifeq ($(release),1)
@@ -152,10 +152,10 @@ define PKG_RULES
 # Force repackaging if any build files change
 MAKEFILES_$(d) := $(BUILD_ROOT)/*.mk
 
-$$(strip $(3)): REL_CMDS := $$(REL_CMDS_$$(strip $(1)))
-$$(strip $(3)): REL_NAME := $$(REL_NAME_$$(strip $(1)))
+$(3): REL_CMDS := $$(REL_CMDS_$$(strip $(1)))
+$(3): REL_NAME := $$(REL_NAME_$$(strip $(1)))
 
-$$(strip $(3)): $$(strip $(2)) $$(MAKEFILES_$(d))
+$(3): $(2) $$(MAKEFILES_$(d))
 	$(Q)$$(BUILD_REL)
 
 endef

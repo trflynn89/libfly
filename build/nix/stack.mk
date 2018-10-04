@@ -26,7 +26,7 @@
 define INCLUDE_BIN_DIR
 
 curr_dir := $$(strip $(2))/$$(strip $(3))
-$(call DEFINE_BIN_RULES, $$(strip $(1)), $$(strip $(4)), $$(strip $(5)))
+$(call DEFINE_BIN_RULES, $(1), $(4), $(5))
 
 endef
 
@@ -40,7 +40,7 @@ endef
 define INCLUDE_QT5_DIR
 
 curr_dir := $$(strip $(2))/$$(strip $(3))
-$(call DEFINE_QT5_RULES, $$(strip $(1)), $$(strip $(4)), $$(strip $(5)))
+$(call DEFINE_QT5_RULES, $(1), $(4), $(5))
 
 endef
 
@@ -54,7 +54,7 @@ endef
 define INCLUDE_LIB_DIR
 
 curr_dir := $$(strip $(2))/$$(strip $(3))
-$(call DEFINE_LIB_RULES, $$(strip $(1)), $$(strip $(4)), $$(strip $(5)))
+$(call DEFINE_LIB_RULES, $(1), $(4), $(5))
 
 endef
 
@@ -66,7 +66,7 @@ endef
 define INCLUDE_SRC_DIR
 
 curr_dir := $$(strip $(2))/$$(strip $(3))
-$(call DEFINE_SRC_RULES, $$(strip $(1)))
+$(call DEFINE_SRC_RULES, $(1))
 
 endef
 

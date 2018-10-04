@@ -8,10 +8,10 @@
 # $(3) = The target's type (BIN, QT5, or LIB).
 define ADD_TARGET
 
-TARGETS += $$(strip $(1))
+TARGETS += $(1)
 
-TARGET_PATH_$$(strip $(1)) := $$(strip $(2))
-TARGET_TYPE_$$(strip $(1)) := $$(strip $(3))
+TARGET_PATH_$$(strip $(1)) := $(2)
+TARGET_TYPE_$$(strip $(1)) := $(3)
 
 endef
 
@@ -22,6 +22,6 @@ endef
 define ADD_TEST_TARGET
 
 $(call ADD_TARGET, $(1), $(2), BIN)
-TEST_TARGETS += $$(strip $(1))
+TEST_TARGETS += $(1)
 
 endef
