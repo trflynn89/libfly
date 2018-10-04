@@ -52,7 +52,7 @@ tests: $(TEST_BINARIES)
 	for tgt in $(TEST_BINARIES) ; do \
 		printf -- "----------- [$$tgt] -----------\n\n"; \
 		$$tgt; \
-		if [ $$? -ne 0 ] ; then \
+		if [[ $$? -ne 0 ]] ; then \
 			failed=$$((failed+1)); \
 		else \
 			passed=$$((passed+1)); \

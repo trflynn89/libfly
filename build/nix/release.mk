@@ -27,7 +27,7 @@ define BUILD_REL
         dst=$${src%.*}; \
         ext=$${src##*.}; \
         \
-        while [ "$$ext" != "so" ] ; do \
+        while [[ "$$ext" != "so" ]] ; do \
             ln -sf $$src .$$dst; \
             \
             src=$$dst; \
