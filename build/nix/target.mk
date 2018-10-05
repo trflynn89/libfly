@@ -1,5 +1,8 @@
 # Verify targets added via api.mk and define make goals for each of the targets.
 
+# List of all target release packages
+TARGET_PACKAGES :=
+
 # Verify a single target and, if valid, define a make goal to build that target.
 #
 # $(1) = The target's name.
@@ -28,6 +31,7 @@ endif
 
 # Define the path to the target release package
 TARGET_PACKAGE_$$(t) := $(ETC_DIR)/$$(t)-nix-$(VERSION).$(arch).tar.bz2
+TARGET_PACKAGES += $$(TARGET_PACKAGE_$$(t))
 
 # Define the make goal to build the target
 $$(t): $$(TARGET_FILE_$$(t)) $$(TARGET_PACKAGE_$$(t))

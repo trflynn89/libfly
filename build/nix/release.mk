@@ -37,7 +37,7 @@ define BUILD_REL
     done; \
     \
     if [[ $$? -ne 0 ]] ; then \
-        exit 0; \
+        exit 1; \
     fi; \
     \
     echo "#!/usr/bin/env bash" > $(REL_BIN_DIR)/uninstall_$(REL_NAME); \
@@ -65,13 +65,14 @@ endef
 # have its symbols stripped.
 #
 # $(1) = The target's name.
-# $(2) = The path to the binary.
 define ADD_REL_BIN
 
-REL_NAME_$(strip $(1)) := $(1)
-$(eval $(call ADD_REL_CMD, $(1), cp -f $(2) $(REL_BIN_DIR)))
-$(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_BIN_DIR)/$(notdir $(2))))
-$(eval $(call ADD_REL_CMD, $(1), chmod 755 $(REL_BIN_DIR)/$(notdir $(2))))
+t := $(strip $(1))
+
+REL_NAME_$(t) := $(1)
+$(eval $(call ADD_REL_CMD, $(1), cp -f $(BIN_DIR)/$(t) $(REL_BIN_DIR)))
+$(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_BIN_DIR)/$(t)))
+$(eval $(call ADD_REL_CMD, $(1), chmod 755 $(REL_BIN_DIR)/$(t)))
 
 endef
 
@@ -79,12 +80,13 @@ endef
 # stripped.
 #
 # $(1) = The target's name.
-# $(2) = The path to the library.
 define ADD_REL_LIB
 
-REL_NAME_$(strip $(1)) := $(1)
-$(eval $(call ADD_REL_CMD, $(1), cp -f $(LIB_DIR)/$(strip $(1)).* $(REL_LIB_DIR)))
-$(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_LIB_DIR)/$(strip $(1)).*))
+t := $(strip $(1))
+
+REL_NAME_$(t) := $(1)
+$(eval $(call ADD_REL_CMD, $(1), cp -f $(LIB_DIR)/$(t).* $(REL_LIB_DIR)))
+$(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_LIB_DIR)/$(t).*))
 
 endef
 

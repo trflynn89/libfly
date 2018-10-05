@@ -1,3 +1,5 @@
+# Example usage of the build system.
+
 # Define the path to the source directory
 SOURCE_ROOT := $(CURDIR)/../..
 
@@ -5,11 +7,10 @@ SOURCE_ROOT := $(CURDIR)/../..
 VERSION := $(shell cat $(SOURCE_ROOT)/VERSION.md)
 
 # Import the build API
-include api.mk
+include ../../build/nix/api.mk
 
 # Build targets
-$(eval $(call ADD_TARGET, libfly, fly, LIB))
-$(eval $(call ADD_TEST_TARGET, libfly_unit_tests, test))
+$(eval $(call ADD_TARGET, libfly_qt5_example, test/qt5/example, QT5))
 
 # Import the build system
-include build.mk
+include ../../build/nix/build.mk

@@ -37,23 +37,6 @@ else
     endif
 endif
 
-# Qt5 flags
-QT5_DIR := /opt/Qt/5.7/gcc_64
-QT5_BIN := $(QT5_DIR)/bin
-QT5_INC := $(QT5_DIR)/include
-QT5_LIB := $(QT5_DIR)/lib
-
-QT5_UIC := $(QT5_BIN)/uic
-QT5_MOC := $(QT5_BIN)/moc
-QT5_RCC := $(QT5_BIN)/rcc
-
-# TODO this won't work anymore, TARGET_TYPE doesn't exist
-ifeq ($(TARGET_TYPE), QT5)
-    CF_ALL += -fPIC -I$(QT5_INC) -I$(QT5_INC)/QtWidgets -I$(QT5_INC)/QtGui -I$(QT5_INC)/QtCore
-    LDFLAGS += -Wl,-rpath,$(QT5_LIB) -L$(QT5_LIB)
-    LDLIBS += -lQt5Widgets -lQt5Gui -lQt5Core -lGL
-endif
-
 # C and C++ specific flags
 CFLAGS := -std=c14 $(CF_ALL)
 CXXFLAGS := -std=c++14 $(CF_ALL)

@@ -32,6 +32,7 @@ BUILD_ROOT := $(patsubst %/,%,$(BUILD_ROOT))
 all: $(TARGETS)
 
 # Import the build system
+include $(BUILD_ROOT)/qt5.mk
 include $(BUILD_ROOT)/system.mk
 include $(BUILD_ROOT)/config.mk
 include $(BUILD_ROOT)/release.mk
@@ -48,17 +49,13 @@ clean:
 
 # Run all unit tests
 tests: $(TEST_BINARIES)
-	$(Q)passed=0; failed=0; \
+	$(Q)failed=0; \
 	for tgt in $(TEST_BINARIES) ; do \
-		printf -- "----------- [$$tgt] -----------\n\n"; \
 		$$tgt; \
 		if [[ $$? -ne 0 ]] ; then \
 			failed=$$((failed+1)); \
-		else \
-			passed=$$((passed+1)); \
 		fi; \
 	done; \
-	printf -- "\n----------- [Pass $$passed, Fail $$failed] -----------\n\n"; \
 	exit $$failed
 
 # Create coverage reports
@@ -76,13 +73,23 @@ gcov: tests
 	find . -name "*\#\#*.gcov" | xargs grep -l "/usr/include" | xargs -I {} $(RM) {}
 
 # Install the target
-install: $(TARGET_PACKAGE)
-	$(Q)sudo tar -C / $(TAR_EXTRACT_FLAGS) $(TARGET_PACKAGE)
+install: $(TARGET_PACKAGES)
+	$(Q)failed=0; \
+	for pkg in $(TARGET_PACKAGES) ; do \
+		if [[ -f $$pkg ]] ; then \
+			sudo tar -C / $(TAR_EXTRACT_FLAGS) $$pkg; \
+			if [[ $$? -ne 0 ]] ; then \
+				failed=$$((failed+1)); \
+			fi; \
+		fi; \
+	done; \
+	exit $$failed
 
 # Install dependencies
 setup:
 ifeq ($(HOST), DEBIAN)
 	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib clang llvm
+	$(Q)$(QT5_INSTALL)
 else
 	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"
 	$(Q)exit 1

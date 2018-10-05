@@ -51,43 +51,6 @@ $(1)/%.o: $(d)/%.cpp $$(MAKEFILES_$(d))
 
 endef
 
-# Compile source files to QT5 files.
-#
-# $(1) = Path to directory where object files should be placed.
-define QT5_RULES
-
-.PRECIOUS: $(GEN_DIR)/%.uic.h $(GEN_DIR)/%.moc.cpp $(GEN_DIR)/%.rcc.cpp
-
-# UIC files
-$(GEN_DIR)/%.uic.h: $(d)/%.ui $$(MAKEFILES_$(d))
-	@mkdir -p $$(@D)
-	@echo "[UIC $$(subst $(SOURCE_ROOT)/,,$$<)]"
-	$(UIC)
-
-# MOC files
-$(1)/%.moc.o: $(GEN_DIR)/%.moc.cpp
-	@mkdir -p $$(@D)
-	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
-	$(COMP_CXX)
-
-$(GEN_DIR)/%.moc.cpp: $(d)/%.h $$(MAKEFILES_$(d))
-	@mkdir -p $$(@D)
-	@echo "[MOC $$(subst $(SOURCE_ROOT)/,,$$<)]"
-	$(MOC)
-
-# RCC files
-$(1)/%.rcc.o: $(GEN_DIR)/%.rcc.cpp
-	@mkdir -p $$(@D)
-	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
-	$(COMP_CXX)
-
-$(GEN_DIR)/%.rcc.cpp: $(d)/%.qrc $$(MAKEFILES_$(d))
-	@mkdir -p $$(@D)
-	@echo "[RCC $$(subst $(SOURCE_ROOT)/,,$$<)]"
-	$(RCC)
-
-endef
-
 # Link a binary target from a set of object files.
 #
 # $(1) = The target's name.
@@ -96,13 +59,13 @@ define BIN_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
-$(2): OBJS := $$(OBJS_$$(strip $(1)))
+$(2): OBJS := $$(OBJ_$$(strip $(1)))
 $(2): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
 $(2): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
 $(2): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 $(2): LDLIBS := $(LDLIBS_$(d)) $(LDLIBS)
 
-$(2): $$(QT5_UICS) $$(QT5_MOCS) $$(QT5_RCCS) $$(OBJS_$$(strip $(1))) $$(MAKEFILES_$(d))
+$(2): $$(OBJ_$$(strip $(1))) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 	@echo "[Link $$(subst $(CURDIR)/,,$$@)]"
@@ -115,6 +78,44 @@ endif
 
 endef
 
+# Compile source files to QT5 files.
+#
+# $(1) = Path to directory where object files should be placed.
+# $(2) = Path to directory where generated files should be placed.
+define QT5_RULES
+
+.PRECIOUS: $(2)/%.uic.h $(2)/%.moc.cpp $(2)/%.rcc.cpp
+
+# UIC files
+$(2)/%.uic.h: $(d)/%.ui $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
+	@echo "[UIC $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	$(UIC)
+
+# MOC files
+$(1)/%.moc.o: $(2)/%.moc.cpp
+	@mkdir -p $$(@D)
+	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	$(COMP_CXX)
+
+$(2)/%.moc.cpp: $(d)/%.h $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
+	@echo "[MOC $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	$(MOC)
+
+# RCC files
+$(1)/%.rcc.o: $(2)/%.rcc.cpp
+	@mkdir -p $$(@D)
+	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	$(COMP_CXX)
+
+$(2)/%.rcc.cpp: $(d)/%.qrc $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
+	@echo "[RCC $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	$(RCC)
+
+endef
+
 # Link a library target from a set of object files.
 #
 # $(1) = The target's name.
@@ -123,12 +124,12 @@ define LIB_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
-$(2): OBJS := $$(OBJS_$$(strip $(1)))
+$(2): OBJS := $$(OBJ_$$(strip $(1)))
 $(2): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
 $(2): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
 $(2): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 
-$(2): $$(OBJS_$$(strip $(1))) $$(MAKEFILES_$(d))
+$(2): $$(OBJ_$$(strip $(1))) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 ifeq ($(release),1)
@@ -218,9 +219,15 @@ $$(eval $$(call QT5_OUT_FILES, $(1), $$(SRC_$$(d)), $$(QT5_UIC_$$(d)), $$(QT5_MO
 # Include the source directories
 $$(eval $$(call INCLUDE_SRC_DIRS, $(1), $$(SRC_DIRS_$$(d))))
 
+# Add build flags needed for Qt5 projects
+CFLAGS_$$(d) += $(QT5_CFLAGS)
+CXXFLAGS_$$(d) += $(QT5_CFLAGS)
+LDFLAGS_$$(d) += $(QT5_LDFLAGS)
+LDLIBS_$$(d) += $(QT5_LDLIBS)
+
 # Define the compile rules
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
-$$(eval $$(call QT5_RULES, $$(OBJ_DIR_$$(d))))
+$$(eval $$(call QT5_RULES, $$(OBJ_DIR_$$(d)), $$(GEN_DIR_$$(d))))
 $$(eval $$(call BIN_RULES, $(1), $(2)))
 $$(eval $$(call PKG_RULES, $(1), $(2), $(3)))
 

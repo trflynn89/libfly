@@ -8,13 +8,11 @@ define OBJ_OUT_FILES
 
 OBJ_DIR_$(d) := $(OBJ_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
 
-OBJ_$(d) := $$(addsuffix .o, $$(subst $(d),,$$(basename $(2))))
-OBJ_$(d) := $$(addprefix $$(OBJ_DIR_$(d)), $$(OBJ_$(d)))
-OBJS_$$(strip $(1)) += $$(OBJ_$(d))
+o_$(d) := $$(addsuffix .o, $$(subst $(d),,$$(basename $(2))))
+o_$(d) := $$(addprefix $$(OBJ_DIR_$(d)), $$(o_$(d)))
 
-DEP_$(d) := $$(OBJ_$(d):%.o=%.d)
-
-CLEAN_$(d) := $$(OBJ_$(d)) $$(DEP_$(d))
+OBJ_$$(strip $(1)) += $$(o_$(d))
+DEP_$(d) := $$(o_$(d):%.o=%.d)
 
 endef
 
@@ -27,19 +25,14 @@ endef
 # $(5) = The QT5 RCC source files.
 define QT5_OUT_FILES
 
-$(call OBJ_OUT_FILES, $(1), $(2))
+OBJ_DIR_$(d) := $(OBJ_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
+GEN_DIR_$(d) := $(GEN_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
 
-QT5_UIC_$(d) := $$(addprefix $(GEN_DIR)/, $$(addsuffix .uic.h, $(3)))
-QT5_UICS += $$(QT5_UIC_$(d))
-
+QT5_UIC_$(d) := $$(addprefix $$(GEN_DIR_$(d))/, $$(addsuffix .uic.h, $(3)))
 QT5_MOC_$(d) := $$(addprefix $$(OBJ_DIR_$(d))/, $$(addsuffix .moc.o, $(4)))
-QT5_MOCS += $$(QT5_MOC_$(d))
-
 QT5_RCC_$(d) := $$(addprefix $$(OBJ_DIR_$(d))/, $$(addsuffix .rcc.o, $(5)))
-QT5_RCCS += $$(QT5_RCC_$(d))
 
-CLEAN_$(d) += $$(QT5_UIC_$(d)) $$(QT5_MOC_$(d)) $$(QT5_RCC_$(d))
-OBJ_$(d) += $$(QT5_MOC_$(d)) $$(QT5_RCC_$(d))
-OBJS_$$(strip $(1)) += $$(QT5_MOC_$(d)) $$(QT5_RCC_$(d))
+OBJ_$$(strip $(1)) += $$(QT5_UIC_$(d)) $$(QT5_MOC_$(d)) $$(QT5_RCC_$(d))
+$(call OBJ_OUT_FILES, $(1), $(2))
 
 endef
