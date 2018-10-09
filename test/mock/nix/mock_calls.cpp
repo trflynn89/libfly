@@ -142,8 +142,7 @@ std::ostream &operator << (std::ostream &stream, MockCall call)
 }
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 //==============================================================================
