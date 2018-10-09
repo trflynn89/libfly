@@ -39,15 +39,15 @@ TARGET_PACKAGES += $$(TARGET_PACKAGE_$$(t))
 # Define the make goal to build the target
 $$(t): $$(TARGET_FILE_$$(t)) $$(TARGET_PACKAGE_$$(t))
 
-# Include top-level source directory's files.mk file
+# Define the compilation goals for the target
 ifeq ($$(TARGET_TYPE_$$(t)), BIN)
-    $(call INCLUDE_BIN_DIR, $$(t), $(SOURCE_ROOT), $$(TARGET_PATH_$$(t)), \
+    $(call DEFINE_BIN_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
         $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 else ifeq ($$(TARGET_TYPE_$$(t)), QT5)
-    $(call INCLUDE_QT5_DIR, $$(t), $(SOURCE_ROOT), $$(TARGET_PATH_$$(t)), \
+    $(call DEFINE_QT5_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
         $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
-    $(call INCLUDE_LIB_DIR, $$(t), $(SOURCE_ROOT), $$(TARGET_PATH_$$(t)), \
+    $(call DEFINE_LIB_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
         $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 endif
 
