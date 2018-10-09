@@ -28,6 +28,15 @@ SRC_$(d) := \
     $(d)/googletest/googletest/src/gtest-all.cc \
     $(d)/googletest/googletest/src/gtest_main.cc
 
+# Define the list of available mocked system calls
+SYSTEM_CALLS_$(d) := \
+    ${shell grep -ohP "(?<=__wrap_)[a-zA-Z0-9_]+" "$(d)/mock/nix/mock_calls.cpp"}
+
+# Define linker flags
+LDFLAGS_$(d) += \
+    -static-libstdc++ \
+    $(foreach mock, $(SYSTEM_CALLS_$(d)), -Wl,--wrap=$(mock))
+
 # Define libraries to link
 LDLIBS_$(d) := \
     -latomic \

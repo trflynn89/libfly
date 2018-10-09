@@ -1,6 +1,12 @@
 # Set of API functions for using the build system. Applications using this build
 # system should include this file first.
 
+# List of all target names
+TARGETS :=
+
+# List of all test target names
+TEST_TARGETS :=
+
 # Function to define a target.
 #
 # $(1) = The target's name.

@@ -16,5 +16,4 @@ $(eval $(call ADD_REL_LIB, libfly))
 $(eval $(call ADD_REL_INC, libfly, $(d), *.h))
 
 # Add make system files to release package
-$(eval $(call ADD_REL_SRC, libfly, $(BUILD_ROOT), *.mk))
-$(eval $(call ADD_REL_CMD, libfly, mv $(REL_SRC_DIR)/$(notdir $(BUILD_ROOT)) $(REL_SRC_DIR)/fly))
+$(eval $(call ADD_REL_SRC, libfly, $(BUILD_ROOT)/, *.mk))

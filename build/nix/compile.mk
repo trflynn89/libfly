@@ -150,11 +150,18 @@ endef
 # $(3) = The path to the target release package.
 define PKG_RULES
 
+t := $$(strip $(1))
+
 # Force repackaging if any build files change
 MAKEFILES_$(d) := $(BUILD_ROOT)/*.mk
 
-$(3): REL_CMDS := $$(REL_CMDS_$$(strip $(1)))
-$(3): REL_NAME := $$(REL_NAME_$$(strip $(1)))
+$(3): REL_CMDS := $$(REL_CMDS_$$(t))
+$(3): REL_NAME := $$(REL_NAME_$$(t))
+$(3): ETC_TMP_DIR := $$(ETC_TMP_DIR_$$(t))
+$(3): REL_BIN_DIR := $$(REL_BIN_DIR_$$(t))
+$(3): REL_LIB_DIR := $$(REL_LIB_DIR_$$(t))
+$(3): REL_INC_DIR := $$(REL_INC_DIR_$$(t))
+$(3): REL_SRC_DIR := $$(REL_SRC_DIR_$$(t))
 
 $(3): $(2) $$(MAKEFILES_$(d))
 	$(Q)$$(BUILD_REL)

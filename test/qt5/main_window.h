@@ -4,7 +4,7 @@
 
 #include <QMainWindow>
 
-#include "test/qt5/example/mainwindow.uic.h"
+#include "test/qt5/main_window.uic.h"
 
 namespace fly {
 

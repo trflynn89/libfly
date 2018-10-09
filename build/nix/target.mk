@@ -3,6 +3,9 @@
 # List of all target release packages
 TARGET_PACKAGES :=
 
+# List of all test target output binaries
+TEST_BINARIES :=
+
 # Verify a single target and, if valid, define a make goal to build that target.
 #
 # $(1) = The target's name.

@@ -1,10 +1,5 @@
 # Define steps for making a release target.
 
-REL_BIN_DIR := $(ETC_DIR)$(INSTALL_BIN_DIR)
-REL_LIB_DIR := $(ETC_DIR)$(INSTALL_LIB_DIR)
-REL_INC_DIR := $(ETC_DIR)$(INSTALL_INC_DIR)
-REL_SRC_DIR := $(ETC_DIR)$(INSTALL_SRC_DIR)
-
 COMMA := ,
 
 # Build the release package
@@ -16,11 +11,11 @@ define BUILD_REL
     \
     echo "[Package $(subst $(CURDIR)/,,$@)]"; \
     \
-    $(RM) -r $(ETC_DIR) && \
+    $(RM) -r $(ETC_TMP_DIR) && \
     mkdir -p $(REL_BIN_DIR) $(REL_LIB_DIR) $(REL_INC_DIR) $(REL_SRC_DIR) \
     \
     $(REL_CMDS) && \
-    cd $(ETC_DIR) && \
+    cd $(ETC_TMP_DIR) && \
     \
     for f in `find .$(INSTALL_LIB_DIR) -type f -name "*\.so\.*\.*\.*"` ; do \
         src=$${f:1}; \
@@ -47,7 +42,24 @@ define BUILD_REL
         echo $(RM) $${f:1} >> $(REL_BIN_DIR)/uninstall_$(REL_NAME); \
     done; \
     \
-    tar --remove-files $(TAR_CREATE_FLAGS) $@ *
+    tar --remove-files $(TAR_CREATE_FLAGS) $@ *; \
+    $(RM) -r $(ETC_TMP_DIR)
+
+endef
+
+# Set the path and target variables for the release package.
+#
+# $(1) = The target's name.
+define SET_REL_VAR
+
+t := $(strip $(1))
+
+REL_NAME_$$(t) := $$(t)
+ETC_TMP_DIR_$$(t) := $(ETC_DIR)/$$(t)
+REL_BIN_DIR_$$(t) := $$(ETC_TMP_DIR_$$(t))$(INSTALL_BIN_DIR)
+REL_LIB_DIR_$$(t) := $$(ETC_TMP_DIR_$$(t))$(INSTALL_LIB_DIR)
+REL_INC_DIR_$$(t) := $$(ETC_TMP_DIR_$$(t))$(INSTALL_INC_DIR)
+REL_SRC_DIR_$$(t) := $$(ETC_TMP_DIR_$$(t))$(INSTALL_SRC_DIR)
 
 endef
 
@@ -57,7 +69,9 @@ endef
 # $(2) = The command to run.
 define ADD_REL_CMD
 
-REL_CMDS_$(strip $(1)) := $(REL_CMDS_$(strip $(1))) && $(2)
+t := $(strip $(1))
+
+REL_CMDS_$(t) := $(REL_CMDS_$(t)) && $(2)
 
 endef
 
@@ -69,10 +83,10 @@ define ADD_REL_BIN
 
 t := $(strip $(1))
 
-REL_NAME_$(t) := $(1)
-$(eval $(call ADD_REL_CMD, $(1), cp -f $(BIN_DIR)/$(t) $(REL_BIN_DIR)))
-$(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_BIN_DIR)/$(t)))
-$(eval $(call ADD_REL_CMD, $(1), chmod 755 $(REL_BIN_DIR)/$(t)))
+$(eval $(call SET_REL_VAR, $(1)))
+$(eval $(call ADD_REL_CMD, $(1), cp -f $(BIN_DIR)/$(t) $(REL_BIN_DIR_$(t))))
+$(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_BIN_DIR_$(t))/$(t)))
+$(eval $(call ADD_REL_CMD, $(1), chmod 755 $(REL_BIN_DIR_$(t))/$(t)))
 
 endef
 
@@ -84,9 +98,9 @@ define ADD_REL_LIB
 
 t := $(strip $(1))
 
-REL_NAME_$(t) := $(1)
-$(eval $(call ADD_REL_CMD, $(1), cp -f $(LIB_DIR)/$(t).* $(REL_LIB_DIR)))
-$(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_LIB_DIR)/$(t).*))
+$(eval $(call SET_REL_VAR, $(1)))
+$(eval $(call ADD_REL_CMD, $(1), cp -f $(LIB_DIR)/$(t).* $(REL_LIB_DIR_$(t))))
+$(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_LIB_DIR_$(t))/$(t).*))
 
 endef
 
@@ -97,19 +111,19 @@ endef
 # $(3) = Header file extension.
 define ADD_REL_INC
 
-REL_NAME_$(strip $(1)) := $(1)
-$(eval $(call ADD_REL_CMD, $(1), rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' $(2) $(REL_INC_DIR)))
+$(eval $(call SET_REL_VAR, $(1)))
+$(eval $(call ADD_REL_CMD, $(1), rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' $(2) $(REL_INC_DIR_$(t))))
 
 endef
 
-# Add all header files under a directory to the release package.
+# Add all source files under a directory to the release package.
 #
 # $(1) = The target's name.
 # $(2) = The path to the directory.
 # $(3) = Source file extension.
 define ADD_REL_SRC
 
-REL_NAME_$(strip $(1)) := $(1)
-$(eval $(call ADD_REL_CMD, $(1), rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' $(2) $(REL_SRC_DIR)))
+$(eval $(call SET_REL_VAR, $(1)))
+$(eval $(call ADD_REL_CMD, $(1), rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' $(2) $(REL_SRC_DIR_$(t))))
 
 endef

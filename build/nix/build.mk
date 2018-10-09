@@ -89,7 +89,11 @@ install: $(TARGET_PACKAGES)
 setup:
 ifeq ($(HOST), DEBIAN)
 	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib clang llvm
+
+ifeq ($(qt5), 1)
+	$(Q)sudo apt-get install -y mesa-common-dev
 	$(Q)$(QT5_INSTALL)
+endif
 else
 	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"
 	$(Q)exit 1

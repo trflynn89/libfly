@@ -13,6 +13,9 @@ verbose := 0
 # Arguments to give to target when run
 args :=
 
+# Whether to install Qt5 during setup
+qt5 := 0
+
 # Define the output directories
 ifeq ($(release), 1)
     OUT_DIR := $(CURDIR)/release-$(arch)

@@ -1,11 +1,11 @@
 # Define source files
 SRC_$(d) := \
     $(d)/main.cpp \
-    $(d)/mainwindow.cpp
+    $(d)/main_window.cpp
 
 # Define QT5 UIC/MOC/RCC source files
-QT5_UIC_$(d) := mainwindow
-QT5_MOC_$(d) := mainwindow
+QT5_UIC_$(d) := main_window
+QT5_MOC_$(d) := main_window
 QT5_RCC_$(d) := example
 
 # Define libraries to link
