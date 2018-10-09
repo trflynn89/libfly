@@ -11,23 +11,17 @@ TEST_TARGETS :=
 #
 # $(1) = The target's name.
 # $(2) = The target's source directory.
-# $(3) = The target's type (BIN, QT5, or LIB).
+# $(3) = The target's type (BIN, QT5, LIB, or TEST).
 define ADD_TARGET
 
 TARGETS += $(1)
-
 TARGET_PATH_$$(strip $(1)) := $(2)
-TARGET_TYPE_$$(strip $(1)) := $(3)
 
-endef
-
-# Function to define a unit test target.
-#
-# $(1) = The target's name.
-# $(2) = The target's source directory.
-define ADD_TEST_TARGET
-
-$(call ADD_TARGET, $(1), $(2), BIN)
-TEST_TARGETS += $(1)
+ifeq ($(strip $(3)), TEST)
+    TEST_TARGETS += $(1)
+    TARGET_TYPE_$$(strip $(1)) := BIN
+else
+    TARGET_TYPE_$$(strip $(1)) := $(3)
+endif
 
 endef
