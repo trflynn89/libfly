@@ -1,5 +1,3 @@
-#ifdef FLY_USE_SANITIZER
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,6 +29,4 @@ const char *__lsan_default_suppressions()
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

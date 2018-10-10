@@ -33,7 +33,7 @@ else
     CF_ALL += -O0 -g --coverage
 
     ifeq ($(arch), x64)
-        CF_ALL += -DFLY_USE_SANITIZER -fsanitize=address -fno-omit-frame-pointer
+        CF_ALL += -fsanitize=address -fno-omit-frame-pointer
     endif
 endif
 
