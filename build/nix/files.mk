@@ -25,14 +25,15 @@ endef
 # $(5) = The QT5 RCC source files.
 define QT5_OUT_FILES
 
+t := $$(strip $(1))
+
 OBJ_DIR_$(d) := $(OBJ_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
 GEN_DIR_$(d) := $(GEN_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
 
-QT5_UIC_$(d) := $$(addprefix $$(GEN_DIR_$(d))/, $$(addsuffix .uic.h, $(3)))
-QT5_MOC_$(d) := $$(addprefix $$(OBJ_DIR_$(d))/, $$(addsuffix .moc.o, $(4)))
-QT5_RCC_$(d) := $$(addprefix $$(OBJ_DIR_$(d))/, $$(addsuffix .rcc.o, $(5)))
+GEN_$$(t) += $$(addprefix $$(GEN_DIR_$(d))/, $$(addsuffix .uic.h, $(3)))
+OBJ_$$(t) += $$(addprefix $$(OBJ_DIR_$(d))/, $$(addsuffix .moc.o, $(4)))
+OBJ_$$(t) += $$(addprefix $$(OBJ_DIR_$(d))/, $$(addsuffix .rcc.o, $(5)))
 
-OBJ_$$(strip $(1)) += $$(QT5_UIC_$(d)) $$(QT5_MOC_$(d)) $$(QT5_RCC_$(d))
 $(call OBJ_OUT_FILES, $(1), $(2))
 
 endef

@@ -66,9 +66,9 @@ private:
 };
 
 /**
- * Subclass of the parllel task runner to provide the same parllel behavior, but
- * also to allow waiting for a specific task to be complete. Only meant to be
- * used by unit tests.
+ * Subclass of the parallel task runner to provide the same parllel behavior,
+ * but also to allow waiting for a specific task to be complete. Only meant to
+ * be used by unit tests.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version August 12, 2018

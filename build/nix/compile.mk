@@ -27,15 +27,17 @@ STRIP := $(Q)strip $$@
 # $(2) = The path to the target output binary.
 define BIN_RULES
 
+t := $$(strip $(1))
+
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
-$(2): OBJS := $$(OBJ_$$(strip $(1)))
+$(2): OBJS := $$(OBJ_$$(t))
 $(2): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
 $(2): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
 $(2): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 $(2): LDLIBS := $(LDLIBS_$(d)) $(LDLIBS)
 
-$(2): $$(OBJ_$$(strip $(1))) $$(MAKEFILES_$(d))
+$(2): $$(OBJ_$$(t)) $$(GEN_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 	@echo "[Link $$(subst $(CURDIR)/,,$$@)]"
@@ -92,14 +94,16 @@ endef
 # $(2) = The path to the target output binary.
 define LIB_RULES
 
+t := $$(strip $(1))
+
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
 
-$(2): OBJS := $$(OBJ_$$(strip $(1)))
+$(2): OBJS := $$(OBJ_$$(t))
 $(2): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
 $(2): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
 $(2): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 
-$(2): $$(OBJ_$$(strip $(1))) $$(MAKEFILES_$(d))
+$(2): $$(OBJ_$$(t)) $$(GEN_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 ifeq ($(release),1)
