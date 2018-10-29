@@ -1,33 +1,27 @@
 # Set of API functions for using the build system. Applications using this build
 # system should include this file first.
 
-# Set the default target, if one has not already been defined.
-# $(1) = The target's name.
-define SET_DEFAULT_TARGET
+# List of all target names
+TARGETS :=
 
-target ?= $$(strip $(1))
-
-endef
+# List of all test target names
+TEST_TARGETS :=
 
 # Function to define a target.
+#
 # $(1) = The target's name.
 # $(2) = The target's source directory.
-# $(3) = The target's type (BIN, QT5, or LIB).
+# $(3) = The target's type (BIN, QT5, LIB, or TEST).
 define ADD_TARGET
 
-ifeq ($(target),$$(strip $(1)))
-    TARGET_PATH := $$(strip $(2))
-    TARGET_TYPE := $$(strip $(3))
+TARGETS += $(1)
+TARGET_PATH_$$(strip $(1)) := $(2)
+
+ifeq ($(strip $(3)), TEST)
+    TEST_TARGETS += $(1)
+    TARGET_TYPE_$$(strip $(1)) := BIN
+else
+    TARGET_TYPE_$$(strip $(1)) := $(3)
 endif
-
-endef
-
-# Function to define a unit test target.
-# $(1) = The target's name.
-# $(2) = The target's source directory.
-define ADD_TEST_TARGET
-
-$(call ADD_TARGET, $(1), $(2), BIN)
-TEST_TARGETS += $$(strip $(1))
 
 endef

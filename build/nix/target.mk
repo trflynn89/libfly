@@ -1,34 +1,56 @@
-# Verify targets added via api.mk, and verify current target.
+# Verify targets added via api.mk and define make goals for each of the targets.
 
-SUPPORTED_TARGET_TYPES := BIN QT5 LIB
+# List of all target release packages
+TARGET_PACKAGES :=
 
-# Make sure target is defined
-ifeq ($(target),)
-    $(error Target must be defined, possibly with SET_DEFAULT_TARGET)
-endif
+# List of all test target output binaries
+TEST_BINARIES :=
 
-# Make sure target was known
-ifeq ($(TARGET_PATH),)
-    $(error Unknown target $(target))
-endif
+# Verify a single target and, if valid, define a make goal to build that target.
+#
+# $(1) = The target's name.
+define DEFINE_TARGET
 
-# Make sure target type is supported
-ifneq ($(TARGET_TYPE), $(filter $(SUPPORTED_TARGET_TYPES), $(TARGET_TYPE)))
-    $(error Target type $(TARGET_TYPE) not one of: $(SUPPORTED_TARGET_TYPES))
-endif
+t := $$(strip $(1))
 
-# Target binary / library
-ifeq ($(TARGET_TYPE), BIN)
-    TARGET_NAME := $(BIN_DIR)/$(target)
-else ifeq ($(TARGET_TYPE), QT5)
-    TARGET_NAME := $(BIN_DIR)/$(target)
-else ifeq ($(TARGET_TYPE), LIB)
-    ifeq ($(release), 1)
-        TARGET_NAME := $(LIB_DIR)/$(target).so.$(VERSION)
-    else
-        TARGET_NAME := $(LIB_DIR)/$(target).a
+# Define the path to the target output binary/library
+ifeq ($$(TARGET_TYPE_$$(t)), BIN)
+    TARGET_FILE_$$(t) := $(BIN_DIR)/$$(t)
+
+    ifneq ($$(filter $(TEST_TARGETS), $$(t)),)
+        TEST_BINARIES += $$(TARGET_FILE_$$(t))
     endif
+else ifeq ($$(TARGET_TYPE_$$(t)), QT5)
+    TARGET_FILE_$$(t) := $(BIN_DIR)/$$(t)
+else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
+    ifeq ($(release), 1)
+        TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).so.$(VERSION)
+    else
+        TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).a
+    endif
+else
+    $$(error Target type $$(TARGET_TYPE_$$(t)) not supported)
 endif
 
-# Target release package
-TARGET_PACKAGE := $(ETC_DIR)/$(target)-nix-$(VERSION).$(arch).tar.bz2
+# Define the path to the target release package
+TARGET_PACKAGE_$$(t) := $(ETC_DIR)/$$(t)-nix-$(VERSION).$(arch).tar.bz2
+TARGET_PACKAGES += $$(TARGET_PACKAGE_$$(t))
+
+# Define the make goal to build the target
+$$(t): $$(TARGET_FILE_$$(t)) $$(TARGET_PACKAGE_$$(t))
+
+# Define the compilation goals for the target
+ifeq ($$(TARGET_TYPE_$$(t)), BIN)
+    $(call DEFINE_BIN_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
+        $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
+else ifeq ($$(TARGET_TYPE_$$(t)), QT5)
+    $(call DEFINE_QT5_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
+        $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
+else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
+    $(call DEFINE_LIB_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
+        $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
+endif
+
+endef
+
+$(foreach target, $(TARGETS), $(eval $(call DEFINE_TARGET, $(target))))

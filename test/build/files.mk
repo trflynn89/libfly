@@ -6,4 +6,5 @@ SRC_DIRS_$(d) := \
 LDLIBS_$(d) := -lfly -lpthread
 
 # Define source files
-$(eval $(call WILDCARD_SOURCES))
+SRC_$(d) := \
+    $(d)/main.cpp

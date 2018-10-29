@@ -1,9 +1,6 @@
 # Define the default make configuration. Not all defaults are defined here, but
 # all command line options are listed here for convenience.
 
-# Define the target to build
-target := $(target)
-
 # Define debug vs. release
 release := 0
 
@@ -13,8 +10,8 @@ arch := $(arch)
 # Enable verbose builds
 verbose := 0
 
-# Arguments to give to target when run
-args :=
+# Whether to install Qt5 during setup
+qt5 := 0
 
 # Define the output directories
 ifeq ($(release), 1)
@@ -38,7 +35,6 @@ else
     $(info Gen dir = $(GEN_DIR))
     $(info Obj dir = $(OBJ_DIR))
     $(info Etc dir = $(ETC_DIR))
-    $(info Target = $(target))
     $(info Release = $(release))
     $(info Arch = $(arch))
 endif

@@ -7,9 +7,9 @@
 .PHONY: clean
 .PHONY: tests
 .PHONY: gcov
-.PHONY: run
 .PHONY: install
 .PHONY: setup
+.PHONY: $(TARGETS)
 
 # Verify expected variables
 ifeq ($(SOURCE_ROOT),)
@@ -28,27 +28,19 @@ endif
 BUILD_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 BUILD_ROOT := $(patsubst %/,%,$(BUILD_ROOT))
 
+# Define 'all' target before importing the build system
+all: $(TARGETS)
+
 # Import the build system
+include $(BUILD_ROOT)/qt5.mk
 include $(BUILD_ROOT)/system.mk
 include $(BUILD_ROOT)/config.mk
-include $(BUILD_ROOT)/target.mk
+include $(BUILD_ROOT)/release.mk
 include $(BUILD_ROOT)/flags.mk
-include $(BUILD_ROOT)/stack.mk
 include $(BUILD_ROOT)/files.mk
 include $(BUILD_ROOT)/compile.mk
-include $(BUILD_ROOT)/release.mk
-
-# Define 'all' target before including source directory
-all: $(TARGET_PACKAGE)
-
-# Include top-level source directory's files.mk file
-ifeq ($(TARGET_TYPE), BIN)
-    $(eval $(call INCLUDE_BIN_DIR, $(SOURCE_ROOT), $(TARGET_PATH)))
-else ifeq ($(TARGET_TYPE), QT5)
-    $(eval $(call INCLUDE_QT5_DIR, $(SOURCE_ROOT), $(TARGET_PATH)))
-else ifeq ($(TARGET_TYPE), LIB)
-    $(eval $(call INCLUDE_LIB_DIR, $(SOURCE_ROOT), $(TARGET_PATH)))
-endif
+include $(BUILD_ROOT)/stack.mk
+include $(BUILD_ROOT)/target.mk
 
 # Clean up output files
 clean:
@@ -56,50 +48,52 @@ clean:
 	$(Q)$(RM) -r $(OUT_DIR)
 
 # Run all unit tests
-tests:
-	$(Q)numPass=0; numFail=0; \
-	for tgt in $(TEST_TARGETS) ; do \
-		printf -- "----------- [Test $$tgt] -----------\n\n"; \
-		$(MAKE) -j $(NUM_CORES) target=$$tgt run; \
-		if [ $$? -ne 0 ] ; then \
-			printf -- "[ERROR $$tgt]\n\n"; \
-			numFail=$$((numFail+1)); \
-		else \
-			printf -- "[SUCCESS $$tgt]\n\n"; \
-			numPass=$$((numPass+1)); \
+tests: $(TEST_BINARIES)
+	$(Q)failed=0; \
+	for tgt in $(TEST_BINARIES) ; do \
+		$$tgt; \
+		if [[ $$? -ne 0 ]] ; then \
+			failed=$$((failed+1)); \
 		fi; \
 	done; \
-	printf -- "----------- [Pass $$numPass, Fail $$numFail] -----------\n\n"; \
-	exit $$numFail
+	exit $$failed
 
 # Create coverage reports
-gcov:
-	$(Q)for obj in $(OBJS) ; do \
-		path=$$(dirname "$$obj") ; \
-		file=$$(basename "$$obj") ; \
+gcov: tests
+	$(Q)for obj in $$(find $(OBJ_DIR) -name "*.o" -print) ; do \
+		path=$$(dirname "$$obj"); \
+		file=$$(basename "$$obj"); \
 		\
-		pushd $$path > /dev/null ; \
-		gcov $(GCOV_FLAGS) $$file ; \
+		pushd $$path > /dev/null; \
+		gcov $(GCOV_FLAGS) $$file; \
 		\
-		popd > /dev/null ; \
-	done ; \
+		popd > /dev/null; \
+	done; \
 	\
 	find . -name "*\#\#*.gcov" | xargs grep -l "/usr/include" | xargs -I {} $(RM) {}
 
-# Build and run the target
-run: $(TARGET_PACKAGE)
-ifeq ($(TARGET_TYPE), BIN)
-	$(Q)$(ASAN_FLAGS) $(TARGET_NAME) $(args)
-endif
-
 # Install the target
-install: $(TARGET_PACKAGE)
-	$(Q)sudo tar -C / $(TAR_EXTRACT_FLAGS) $(TARGET_PACKAGE)
+install: $(TARGET_PACKAGES)
+	$(Q)failed=0; \
+	for pkg in $(TARGET_PACKAGES) ; do \
+		if [[ -f $$pkg ]] ; then \
+			sudo tar -C / $(TAR_EXTRACT_FLAGS) $$pkg; \
+			if [[ $$? -ne 0 ]] ; then \
+				failed=$$((failed+1)); \
+			fi; \
+		fi; \
+	done; \
+	exit $$failed
 
 # Install dependencies
 setup:
 ifeq ($(HOST), DEBIAN)
 	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib clang llvm
+
+ifeq ($(qt5), 1)
+	$(Q)sudo apt-get install -y mesa-common-dev
+	$(Q)$(QT5_INSTALL)
+endif
 else
 	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"
 	$(Q)exit 1
