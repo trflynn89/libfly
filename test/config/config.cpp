@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <memory>
 
 #include <gtest/gtest.h>
 
@@ -14,7 +15,7 @@ public:
     }
 
 protected:
-    fly::ConfigPtr m_spConfig;
+    std::shared_ptr<fly::Config> m_spConfig;
 };
 
 //==============================================================================
@@ -34,7 +35,10 @@ TEST_F(ConfigTest, NonCovertibleTest)
     m_spConfig->Update(values);
 
     EXPECT_EQ(m_spConfig->GetValue<int>("name", 12), 12);
-    EXPECT_EQ(m_spConfig->GetValue<std::nullptr_t>("address", nullptr), nullptr);
+    EXPECT_EQ(
+        m_spConfig->GetValue<std::nullptr_t>("address", nullptr),
+        nullptr
+    );
 }
 
 //==============================================================================

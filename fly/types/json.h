@@ -10,14 +10,10 @@
 #include <string>
 #include <vector>
 
-#include "fly/fly.h"
 #include "fly/traits/traits.h"
 #include "fly/types/string.h"
 
 namespace fly {
-
-FLY_CLASS_PTRS(Json);
-FLY_CLASS_PTRS(JsonException);
 
 /**
  * Class to represent JSON values defined by http://www.json.org. The class
@@ -801,11 +797,11 @@ Json::operator T () const
     {
         T t { };
 
-        for (auto it = m_value.m_pObject->begin(); it != m_value.m_pObject->end(); ++it)
+        for (const auto &kv : *(m_value.m_pObject))
         {
             t.insert({
-                typename T::key_type(it->first),
-                typename T::mapped_type(it->second)
+                typename T::key_type(kv.first),
+                typename T::mapped_type(kv.second)
             });
         }
 

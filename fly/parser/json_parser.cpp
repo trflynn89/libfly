@@ -1,7 +1,7 @@
 #include "fly/parser/json_parser.h"
 
 #include <cctype>
-#include <cstring>
+#include <cstdio>
 
 #include "fly/parser/exceptions.h"
 #include "fly/types/string.h"
@@ -217,13 +217,10 @@ void JsonParser::onCloseBraceOrBracket(Token token, int c)
     m_pParents.pop();
     m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
 
-    const State expected = (
-        (token == Token::CloseBrace) ? State::ParsingObject : State::ParsingArray
-    );
-
-    const State unexpected = (
-        (token == Token::CloseBrace) ? State::ParsingArray : State::ParsingObject
-    );
+    const State expected = (token == Token::CloseBrace) ?
+        State::ParsingObject : State::ParsingArray;
+    const State unexpected = (token == Token::CloseBrace) ?
+        State::ParsingArray : State::ParsingObject;
 
     while (m_states.top() != expected)
     {
@@ -581,7 +578,7 @@ void JsonParser::validateNumber(
         return (
             (signless.size() > 1) &&
             (signless[0] == '0') &&
-            std::isdigit((unsigned char)(signless[1]))
+            std::isdigit(static_cast<unsigned char>(signless[1]))
         );
     };
 
@@ -611,7 +608,7 @@ void JsonParser::validateNumber(
         return ((e != std::string::npos) || (E != std::string::npos));
     };
 
-    if (!std::isdigit((unsigned char)(signless[0])))
+    if (!std::isdigit(static_cast<unsigned char>(signless[0])))
     {
         throw BadConversionException(m_line, m_column, value);
     }

@@ -1,10 +1,8 @@
 #include "fly/logger/logger.h"
 
 #include <algorithm>
-#include <climits>
 #include <cstdio>
 #include <cstring>
-#include <cwchar>
 
 #include "fly/logger/logger_config.h"
 #include "fly/path/path.h"
@@ -13,13 +11,13 @@
 namespace fly {
 
 //==============================================================================
-LoggerWPtr Logger::s_wpInstance;
+std::weak_ptr<Logger> Logger::s_wpInstance;
 std::mutex Logger::s_consoleMutex;
 
 //==============================================================================
 Logger::Logger(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const LoggerConfigPtr &spConfig,
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<LoggerConfig> &spConfig,
     const std::string &filePath
 ):
     m_spTaskRunner(spTaskRunner),
@@ -32,13 +30,13 @@ Logger::Logger(
 }
 
 //==============================================================================
-void Logger::SetInstance(const LoggerPtr &spLogger)
+void Logger::SetInstance(const std::shared_ptr<Logger> &spLogger)
 {
     s_wpInstance = spLogger;
 }
 
 //==============================================================================
-LoggerPtr Logger::GetInstance()
+std::shared_ptr<Logger> Logger::GetInstance()
 {
     return s_wpInstance.lock();
 }
@@ -58,19 +56,26 @@ void Logger::ConsoleLog(bool acquireLock, const std::string &message)
 }
 
 //==============================================================================
-void Logger::AddLog(Log::Level level, ssize_t gameId, const char *file,
-    const char *func, unsigned int line, const std::string &message)
+void Logger::AddLog(
+    Log::Level level,
+    ssize_t fixed,
+    const char *file,
+    const char *func,
+    unsigned int line,
+    const std::string &message
+)
 {
-    LoggerPtr spLogger = GetInstance();
+    std::shared_ptr<Logger> spLogger = GetInstance();
 
     if (spLogger)
     {
-        spLogger->addLog(level, gameId, file, func, line, message);
+        spLogger->addLog(level, fixed, file, func, line, message);
     }
     else
     {
-        std::string console = String::Format("%d %d %s:%s:%d %s",
-            level, gameId, file, func, line, message);
+        std::string console = String::Format(
+            "%d %d %s:%s:%d %s", level, fixed, file, func, line, message
+        );
 
         ConsoleLog(true, console);
     }
@@ -81,7 +86,7 @@ bool Logger::Start()
 {
     if (createLogFile())
     {
-        LoggerPtr spLogger = shared_from_this();
+        std::shared_ptr<Logger> spLogger = shared_from_this();
 
         m_spTask = std::make_shared<LoggerTask>(spLogger);
         m_spTaskRunner->PostTask(m_spTask);
@@ -120,8 +125,14 @@ bool Logger::poll()
 }
 
 //==============================================================================
-void Logger::addLog(Log::Level level, ssize_t gameId, const char *file,
-    const char *func, unsigned int line, const std::string &message)
+void Logger::addLog(
+    Log::Level level,
+    ssize_t fixed,
+    const char *file,
+    const char *func,
+    unsigned int line,
+    const std::string &message
+)
 {
     auto now = std::chrono::high_resolution_clock::now();
 
@@ -135,7 +146,7 @@ void Logger::addLog(Log::Level level, ssize_t gameId, const char *file,
 
         log.m_level = level;
         log.m_time = logTime.count();
-        log.m_gameId = gameId;
+        log.m_fixed = fixed;
         log.m_line = line;
 
         snprintf(log.m_file, sizeof(log.m_file), "%s", file);
@@ -170,7 +181,7 @@ bool Logger::createLogFile()
 }
 
 //==============================================================================
-LoggerTask::LoggerTask(const LoggerWPtr &wpLogger) :
+LoggerTask::LoggerTask(const std::weak_ptr<Logger> &wpLogger) :
     Task(),
     m_wpLogger(wpLogger)
 {
@@ -179,7 +190,7 @@ LoggerTask::LoggerTask(const LoggerWPtr &wpLogger) :
 //==============================================================================
 void LoggerTask::Run()
 {
-    LoggerPtr spLogger = m_wpLogger.lock();
+    std::shared_ptr<Logger> spLogger = m_wpLogger.lock();
 
     if (spLogger && spLogger->poll())
     {

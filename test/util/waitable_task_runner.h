@@ -4,17 +4,13 @@
 #include <memory>
 #include <typeinfo>
 
-#include "fly/fly.h"
 #include "fly/task/task_runner.h"
 #include "fly/types/concurrent_queue.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(WaitableParallelTaskRunner);
-FLY_CLASS_PTRS(WaitableSequencedTaskRunner);
-
-FLY_CLASS_PTRS(Task);
-FLY_CLASS_PTRS(TaskManager);
+class Task;
+class TaskManager;
 
 /**
  * A pseudo task runner to allow waiting for a specific task to be complete. It
@@ -57,9 +53,9 @@ protected:
     /**
      * When a task is complete, track it if the task is still valid.
      *
-     * @param TaskPtr The (possibly NULL) task that was executed or skipped.
+     * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    virtual void TaskComplete(const TaskPtr &) = 0;
+    virtual void TaskComplete(const std::shared_ptr<Task> &) = 0;
 
 private:
     ConcurrentQueue<size_t> m_completedTasks;
@@ -80,15 +76,15 @@ class WaitableParallelTaskRunner :
     friend class TaskManager;
 
 protected:
-    WaitableParallelTaskRunner(const TaskManagerWPtr &);
+    WaitableParallelTaskRunner(const std::weak_ptr<TaskManager> &);
 
     /**
      * When a task is complete, perform the same operations as this runner's
      * parents.
      *
-     * @param TaskPtr The (possibly NULL) task that was executed or skipped.
+     * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    void TaskComplete(const TaskPtr &) override;
+    void TaskComplete(const std::shared_ptr<Task> &) override;
 };
 
 /**
@@ -106,15 +102,15 @@ class WaitableSequencedTaskRunner :
     friend class TaskManager;
 
 protected:
-    WaitableSequencedTaskRunner(const TaskManagerWPtr &);
+    WaitableSequencedTaskRunner(const std::weak_ptr<TaskManager> &);
 
     /**
      * When a task is complete, perform the same operations as this runner's
      * parents.
      *
-     * @param TaskPtr The (possibly NULL) task that was executed or skipped.
+     * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    void TaskComplete(const TaskPtr &) override;
+    void TaskComplete(const std::shared_ptr<Task> &) override;
 };
 
 //==============================================================================

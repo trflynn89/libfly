@@ -1,5 +1,7 @@
 #include "fly/socket/socket_config.h"
 
+#include "fly/fly.h"
+
 namespace fly {
 
 //==============================================================================

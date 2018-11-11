@@ -3,15 +3,12 @@
 #include <Windows.h>
 #include <Pdh.h>
 
-#include "fly/fly.h"
 #include "fly/system/system_monitor.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(SystemMonitorImpl);
-
-FLY_CLASS_PTRS(SequencedTaskRunner);
-FLY_CLASS_PTRS(SystemConfig);
+class SequencedTaskRunner;
+class SystemConfig;
 
 /**
  * Windows implementation of the SystemMonitor interface. Uses the Windows, PDH,
@@ -27,7 +24,10 @@ public:
      * Constructor. Open the system monitor's CPU query and set the system CPU
      * count.
      */
-    SystemMonitorImpl(const SequencedTaskRunnerPtr &, const SystemConfigPtr &);
+    SystemMonitorImpl(
+        const std::shared_ptr<SequencedTaskRunner> &,
+        const std::shared_ptr<SystemConfig> &
+    );
 
     /**
      * Destructor. Close the system monitor's CPU query.

@@ -3,7 +3,6 @@
 #include <atomic>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "fly/fly.h"
 #include "fly/socket/async_request.h"
@@ -11,9 +10,7 @@
 
 namespace fly {
 
-FLY_CLASS_PTRS(Socket);
-
-FLY_CLASS_PTRS(SocketConfig);
+class SocketConfig;
 
 /**
  * Virtual interface to represent a network socket. This interface is platform
@@ -29,9 +26,9 @@ public:
      * Constructor.
      *
      * @param Protocol The communication protocol of the socket.
-     * @param SocketConfigPtr Reference to the socket configuration.
+     * @param SocketConfig Reference to the socket configuration.
      */
-    Socket(Protocol, const SocketConfigPtr &);
+    Socket(Protocol, const std::shared_ptr<SocketConfig> &);
 
     /**
      * Destructor.
@@ -130,12 +127,12 @@ public:
     bool IsListening() const;
 
     /**
-     * @return True if this socket is connecting to a server.
+     * @return True if this socket is connecting to a remote endpoint.
      */
     bool IsConnecting() const;
 
     /**
-     * @return True if this socket is connected to a server.
+     * @return True if this socket is connected to a remote endpoint.
      */
     bool IsConnected() const;
 
@@ -221,7 +218,7 @@ public:
      *
      * @return A Socket on which the actual connection is made.
      */
-    virtual SocketPtr Accept() const = 0;
+    virtual std::shared_ptr<Socket> Accept() const = 0;
 
     /**
      * Write data on the socket.
@@ -324,7 +321,7 @@ protected:
      * Write data on the socket.
      *
      * @param string The data to send.
-     * @param bool Reference to a bool, set to true if the operation would block.
+     * @param bool Boolean set to true if the operation would block.
      *
      * @return The number of bytes sent.
      */
@@ -336,11 +333,16 @@ protected:
      * @param string The data to send.
      * @param address_type The host-order IPv4 address to send data to.
      * @param port_type The port to send data to.
-     * @param bool Reference to a bool, set to true if the operation would block.
+     * @param bool Boolean set to true if the operation would block.
      *
      * @return The number of bytes sent.
      */
-    virtual size_t SendTo(const std::string &, address_type, port_type, bool &) const = 0;
+    virtual size_t SendTo(
+        const std::string &,
+        address_type,
+        port_type,
+        bool &
+    ) const = 0;
 
     /**
      * Write data on the socket.
@@ -348,17 +350,22 @@ protected:
      * @param string The data to send.
      * @param string The hostname or IPv4 address to send data to.
      * @param port_type The port to send data to.
-     * @param bool Reference to a bool, set to true if the operation would block.
+     * @param bool Boolean set to true if the operation would block.
      *
      * @return The number of bytes sent.
      */
-    size_t SendTo(const std::string &, const std::string &, port_type, bool &) const;
+    size_t SendTo(
+        const std::string &,
+        const std::string &,
+        port_type,
+        bool &
+    ) const;
 
     /**
      * Read data on this socket until the end-of-message character is received.
      *
-     * @param bool Reference to a bool, set to true if the operation would block.
-     * @param bool Reference to a bool, set to true if the EoM char was received.
+     * @param bool Boolean set to true if the operation would block.
+     * @param bool Boolean set to true if the EoM char was received.
      *
      * @return The data received.
      */
@@ -367,8 +374,8 @@ protected:
     /**
      * Read data on this socket until the end-of-message character is received.
      *
-     * @param bool Reference to a bool, set to true if the operation would block.
-     * @param bool Reference to a bool, set to true if the EoM char was received.
+     * @param bool Boolean set to true if the operation would block.
+     * @param bool Boolean set to true if the EoM char was received.
      *
      * @return The data received.
      */
@@ -378,7 +385,7 @@ protected:
     Protocol m_protocol;
 
     // Socket config
-    const SocketConfigPtr &m_spConfig;
+    const std::shared_ptr<SocketConfig> &m_spConfig;
 
     // End of message character
     const char m_socketEoM;
@@ -399,7 +406,7 @@ protected:
     // Whether this socket is a listening socket
     bool m_isListening;
 
-    // Whether this socket is not connected, connecting, or connected to a server
+    // Whether this socket is not connected, connecting, or connected
     std::atomic<ConnectedState> m_aConnectedState;
 
 private:

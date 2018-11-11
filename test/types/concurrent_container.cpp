@@ -69,14 +69,23 @@ protected:
         // Create numWriters writer threads
         for (unsigned int i = 0; i < numWriters; ++i)
         {
-            auto func = std::bind(&ConcurrencyTest::WriterThread, this, std::ref(objectQueue));
+            auto func = std::bind(
+                &ConcurrencyTest::WriterThread,
+                this,
+                std::ref(objectQueue)
+            );
             writerFutures.push_back(std::async(std::launch::async, func));
         }
 
         // Create numReaders reader threads
         for (unsigned int i = 0; i < numReaders; ++i)
         {
-            auto func = std::bind(&ConcurrencyTest::ReaderThread, this, std::ref(objectQueue), std::ref(finishedWrites));
+            auto func = std::bind(
+                &ConcurrencyTest::ReaderThread,
+                this,
+                std::ref(objectQueue),
+                std::ref(finishedWrites)
+            );
             readerFutures.push_back(std::async(std::launch::async, func));
         }
 
@@ -189,7 +198,9 @@ TEST_F(ConcurrencyTest, InfiniteWaitReaderTest)
     ObjectQueue objectQueue;
     Object obj(123);
 
-    auto func = std::bind(&ConcurrencyTest::InfiniteWaitReaderThread, this, std::ref(objectQueue));
+    auto func = std::bind(
+        &ConcurrencyTest::InfiniteWaitReaderThread, this, std::ref(objectQueue)
+    );
     std::future<Object> future = std::async(std::launch::async, func);
 
     std::future_status status = future.wait_for(std::chrono::milliseconds(10));

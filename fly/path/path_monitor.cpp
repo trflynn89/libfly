@@ -1,6 +1,5 @@
 #include "fly/path/path_monitor.h"
 
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
 #include "fly/path/path_config.h"
 #include "fly/task/task_runner.h"
@@ -9,8 +8,8 @@ namespace fly {
 
 //==============================================================================
 PathMonitor::PathMonitor(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const PathConfigPtr &spConfig
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<PathConfig> &spConfig
 ) :
     m_spTaskRunner(spTaskRunner),
     m_spConfig(spConfig)
@@ -28,7 +27,7 @@ bool PathMonitor::Start()
 {
     if (IsValid())
     {
-        PathMonitorPtr spPathMonitor = shared_from_this();
+        std::shared_ptr<PathMonitor> spPathMonitor = shared_from_this();
 
         m_spTask = std::make_shared<PathMonitorTask>(spPathMonitor);
         m_spTaskRunner->PostTask(m_spTask);
@@ -49,7 +48,7 @@ bool PathMonitor::AddPath(const std::string &path, PathEventCallback callback)
     else
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        PathInfoPtr spInfo = getOrCreatePathInfo(path);
+        std::shared_ptr<PathInfo> spInfo = getOrCreatePathInfo(path);
 
         if (spInfo)
         {
@@ -104,7 +103,7 @@ bool PathMonitor::AddFile(
     else
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        PathInfoPtr spInfo = getOrCreatePathInfo(path);
+        std::shared_ptr<PathInfo> spInfo = getOrCreatePathInfo(path);
 
         if (spInfo)
         {
@@ -132,7 +131,7 @@ bool PathMonitor::RemoveFile(const std::string &path, const std::string &file)
             return false;
         }
 
-        PathInfoPtr spInfo(it->second);
+        std::shared_ptr<PathInfo> spInfo(it->second);
         auto it2 = spInfo->m_fileHandlers.find(file);
 
         if (it2 == spInfo->m_fileHandlers.end())
@@ -151,9 +150,11 @@ bool PathMonitor::RemoveFile(const std::string &path, const std::string &file)
 }
 
 //==============================================================================
-PathMonitor::PathInfoPtr PathMonitor::getOrCreatePathInfo(const std::string &path)
+std::shared_ptr<PathMonitor::PathInfo> PathMonitor::getOrCreatePathInfo(
+    const std::string &path
+)
 {
-    PathInfoPtr spInfo;
+    std::shared_ptr<PathInfo> spInfo;
 
     auto it = m_pathInfo.find(path);
 
@@ -204,7 +205,9 @@ std::ostream &operator << (std::ostream &stream, PathMonitor::PathEvent event)
 }
 
 //==============================================================================
-PathMonitorTask::PathMonitorTask(const PathMonitorWPtr &wpPathMonitor) :
+PathMonitorTask::PathMonitorTask(
+    const std::weak_ptr<PathMonitor> &wpPathMonitor
+) :
     Task(),
     m_wpPathMonitor(wpPathMonitor)
 {
@@ -213,7 +216,7 @@ PathMonitorTask::PathMonitorTask(const PathMonitorWPtr &wpPathMonitor) :
 //==============================================================================
 void PathMonitorTask::Run()
 {
-    PathMonitorPtr spPathMonitor = m_wpPathMonitor.lock();
+    std::shared_ptr<PathMonitor> spPathMonitor = m_wpPathMonitor.lock();
 
     if (spPathMonitor && spPathMonitor->IsValid())
     {

@@ -83,7 +83,9 @@ TEST(PathTest, ListPathTest)
     std::vector<std::string> files;
 
     std::string path1(fly::String::GenerateRandomString(10));
-    std::string path1Full(fly::Path::Join(fly::Path::GetTempDirectory(), path1));
+    std::string path1Full(
+        fly::Path::Join(fly::Path::GetTempDirectory(), path1)
+    );
     EXPECT_TRUE(fly::Path::MakePath(path1Full));
 
     std::string path2(fly::String::GenerateRandomString(10));
@@ -161,7 +163,9 @@ TEST(PathTest, ListPathTest)
     EXPECT_FALSE(fly::Path::ListPath(file1Full, directories, files));
     EXPECT_FALSE(fly::Path::ListPath(file2Full, directories, files));
     EXPECT_FALSE(fly::Path::ListPath(file3Full, directories, files));
-    EXPECT_FALSE(fly::Path::ListPath(fly::String::GenerateRandomString(10), directories, files));
+    EXPECT_FALSE(fly::Path::ListPath(
+        fly::String::GenerateRandomString(10), directories, files)
+    );
 
     EXPECT_TRUE(fly::Path::RemovePath(path1Full));
 }
@@ -177,7 +181,9 @@ TEST(PathTest, MockListPathTest)
     std::vector<std::string> files;
 
     std::string path1(fly::String::GenerateRandomString(10));
-    std::string path1Full(fly::Path::Join(fly::Path::GetTempDirectory(), path1));
+    std::string path1Full(fly::Path::Join(
+        fly::Path::GetTempDirectory(), path1)
+    );
     EXPECT_TRUE(fly::Path::MakePath(path1Full));
 
     std::string path2(fly::String::GenerateRandomString(10));

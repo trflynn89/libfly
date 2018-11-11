@@ -1,5 +1,6 @@
 #include <functional>
 #include <future>
+#include <memory>
 #include <string>
 #include <thread>
 
@@ -40,7 +41,8 @@ public:
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
         m_spTaskRunner(
-            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>(
+            )
         ),
 
         m_spMonitor(std::make_shared<fly::SystemMonitorImpl>(
@@ -81,10 +83,10 @@ public:
     }
 
 protected:
-    fly::TaskManagerPtr m_spTaskManager;
-    fly::WaitableSequencedTaskRunnerPtr m_spTaskRunner;
+    std::shared_ptr<fly::TaskManager> m_spTaskManager;
+    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_spTaskRunner;
 
-    fly::SystemMonitorPtr m_spMonitor;
+    std::shared_ptr<fly::SystemMonitor> m_spMonitor;
     std::atomic_bool m_aKeepRunning;
 };
 

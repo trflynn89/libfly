@@ -1,19 +1,17 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
 #include <string>
 
 #include <Windows.h>
 
-#include "fly/fly.h"
 #include "fly/path/path_monitor.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(PathMonitorImpl);
-
-FLY_CLASS_PTRS(SequencedTaskRunner);
-FLY_CLASS_PTRS(PathConfig);
+class PathConfig;
+class SequencedTaskRunner;
 
 /**
  * Windows implementation of the PathMonitor interface. Uses an IOCP with the
@@ -28,7 +26,10 @@ public:
     /**
      * Constructor. Create the path monitor's IOCP.
      */
-    PathMonitorImpl(const SequencedTaskRunnerPtr &, const PathConfigPtr &);
+    PathMonitorImpl(
+        const std::shared_ptr<SequencedTaskRunner> &,
+        const std::shared_ptr<PathConfig> &
+    );
 
     /**
      * Destructor. Close the path monitor's IOCP.
@@ -51,11 +52,11 @@ protected:
      */
     void Poll(const std::chrono::milliseconds &) override;
 
-    PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const override;
+    std::shared_ptr<PathMonitor::PathInfo> CreatePathInfo(
+        const std::string &
+    ) const override;
 
 private:
-    FLY_STRUCT_PTRS(PathInfoImpl);
-
     /**
      * Windows implementation of the PathInfo interface. Stores a handle to the
      * monitored path, as well as an array to store changes found by the
@@ -89,10 +90,13 @@ private:
     /**
      * Handle a FILE_NOTIFY_INFORMATION event for a path.
      *
-     * @param PathInfoImplPtr The path's entry in the PathInfo map.
+     * @param PathInfoImpl The path's entry in the PathInfo map.
      * @param string Name of the path.
      */
-    void handleEvents(const PathInfoImplPtr &, const std::string &) const;
+    void handleEvents(
+        const std::shared_ptr<PathInfoImpl> &,
+        const std::string &
+    ) const;
 
     /**
      * Convert a FILE_NOTIFY_INFORMATION event to a PathEvent.

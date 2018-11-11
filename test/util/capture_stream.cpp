@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "fly/fly.h"
+
 #if defined(FLY_WINDOWS)
     #include <io.h>
 

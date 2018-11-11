@@ -7,15 +7,12 @@
 #include <mutex>
 #include <vector>
 
-#include "fly/fly.h"
 #include "fly/types/concurrent_queue.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(TaskManager);
-
-FLY_CLASS_PTRS(Task);
-FLY_CLASS_PTRS(TaskRunner);
+class Task;
+class TaskRunner;
 
 /**
  * Class to manage a pool of threads for executing tasks posted by any task
@@ -63,7 +60,7 @@ public:
      *
      * @tparam TaskRunnerType The type of task runner to create.
      *
-     * @return SequencedTaskRunnerPtr The created task runner.
+     * @return SequencedTaskRunner The created task runner.
      */
     template <typename TaskRunnerType>
     std::shared_ptr<TaskRunnerType> CreateTaskRunner();
@@ -75,29 +72,32 @@ private:
      */
     struct TaskHolder
     {
-        TaskWPtr m_wpTask;
-        TaskRunnerWPtr m_wpTaskRunner;
+        std::weak_ptr<Task> m_wpTask;
+        std::weak_ptr<TaskRunner> m_wpTaskRunner;
         std::chrono::steady_clock::time_point m_schedule;
     };
 
     /**
      * Post a task to be executed as soon as a worker thread is available.
      *
-     * @param TaskWPtr Weak reference to the task the be executed.
-     * @param TaskRunnerWPtr Weak reference to the task runner posting the task.
+     * @param Task Weak reference to the task the be executed.
+     * @param TaskRunner Weak reference to the task runner posting the task.
      */
-    void postTask(const TaskWPtr &, const TaskRunnerWPtr &);
+    void postTask(
+        const std::weak_ptr<Task> &,
+        const std::weak_ptr<TaskRunner> &
+    );
 
     /**
      * Schedule a task to be posted for execution after some delay.
      *
-     * @param TaskWPtr Weak reference to the task the be executed.
-     * @param TaskRunnerWPtr Weak reference to the task runner posting the task.
+     * @param Task Weak reference to the task the be executed.
+     * @param TaskRunner Weak reference to the task runner posting the task.
      * @param milliseconds Delay before posting the task.
      */
     void postTaskWithDelay(
-        const TaskWPtr &,
-        const TaskRunnerWPtr &,
+        const std::weak_ptr<Task> &,
+        const std::weak_ptr<TaskRunner> &,
         std::chrono::milliseconds
     );
 
@@ -130,7 +130,7 @@ std::shared_ptr<TaskRunnerType> TaskManager::CreateTaskRunner()
     static_assert(std::is_base_of<TaskRunner, TaskRunnerType>::value,
         "Given type is not a task runner");
 
-    const TaskManagerPtr spTaskManager = shared_from_this();
+    const std::shared_ptr<TaskManager> spTaskManager = shared_from_this();
     return std::shared_ptr<TaskRunnerType>(new TaskRunnerType(spTaskManager));
 }
 

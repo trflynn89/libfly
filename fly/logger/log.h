@@ -1,21 +1,19 @@
 #pragma once
 
-#include <climits>
 #include <iostream>
+#include <memory>
 #include <string>
-
-#include "fly/fly.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(LoggerConfig);
+class LoggerConfig;
 
 /**
  * Struct to store data about single log. A log contains:
  *
  * 1. The log level.
  * 2. The time the log was made.
- * 3. The ID of the game/socket making the log.
+ * 3. A fixed argument.
  * 4. The file name the log is in.
  * 5. The function name the log is in.
  * 6. The line number the log is on.
@@ -47,14 +45,14 @@ struct Log
     /**
      * Constructor. Initialize with a message.
      *
-     * @param LoggerConfigPtr Reference to the logger config.
+     * @param LoggerConfig Reference to the logger config.
      * @param string Message to store.
      */
-    Log(const LoggerConfigPtr &, const std::string &);
+    Log(const std::shared_ptr<LoggerConfig> &, const std::string &);
 
     Level m_level;
     double m_time;
-    ssize_t m_gameId;
+    ssize_t m_fixed;
     char m_file[100];
     char m_function[100];
     unsigned int m_line;

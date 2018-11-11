@@ -3,12 +3,9 @@
 #include <istream>
 #include <string>
 
-#include "fly/fly.h"
 #include "fly/types/json.h"
 
 namespace fly {
-
-FLY_CLASS_PTRS(Parser);
 
 /**
  * Virtual interface to parse a file or string. Parsers for specific formats

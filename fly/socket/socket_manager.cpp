@@ -11,8 +11,8 @@ namespace fly {
 
 //==============================================================================
 SocketManager::SocketManager(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const SocketConfigPtr &spConfig
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<SocketConfig> &spConfig
 ) :
     m_spTaskRunner(spTaskRunner),
     m_spConfig(spConfig),
@@ -33,7 +33,7 @@ SocketManager::~SocketManager()
 //==============================================================================
 void SocketManager::Start()
 {
-    SocketManagerPtr spSocketManager = shared_from_this();
+    std::shared_ptr<SocketManager> spSocketManager = shared_from_this();
 
     m_spTask = std::make_shared<SocketManagerTask>(spSocketManager);
     m_spTaskRunner->PostTask(m_spTask);
@@ -58,9 +58,9 @@ void SocketManager::ClearClientCallbacks()
 }
 
 //==============================================================================
-SocketPtr SocketManager::CreateSocket(Protocol protocol)
+std::shared_ptr<Socket> SocketManager::CreateSocket(Protocol protocol)
 {
-    SocketPtr spSocket = std::make_shared<SocketImpl>(protocol, m_spConfig);
+    auto spSocket = std::make_shared<SocketImpl>(protocol, m_spConfig);
 
     if (!spSocket->IsValid())
     {
@@ -71,9 +71,9 @@ SocketPtr SocketManager::CreateSocket(Protocol protocol)
 }
 
 //==============================================================================
-SocketWPtr SocketManager::CreateAsyncSocket(Protocol protocol)
+std::weak_ptr<Socket> SocketManager::CreateAsyncSocket(Protocol protocol)
 {
-    SocketPtr spSocket = CreateSocket(protocol);
+    auto spSocket = CreateSocket(protocol);
 
     if (spSocket)
     {
@@ -98,12 +98,14 @@ void SocketManager::HandleNewAndClosedSockets(
 )
 {
     // Add new sockets to the socket system
-    m_aioSockets.insert(m_aioSockets.end(), newSockets.begin(), newSockets.end());
+    m_aioSockets.insert(
+        m_aioSockets.end(), newSockets.begin(), newSockets.end()
+    );
 
     // Remove closed sockets from the socket system
-    for (const SocketPtr &spSocket : closedSockets)
+    for (const std::shared_ptr<Socket> &spSocket : closedSockets)
     {
-        auto is_same = [&spSocket](const SocketPtr &spClosed) -> bool
+        auto is_same = [&spSocket](const std::shared_ptr<Socket> &spClosed)
         {
             return (spSocket->GetSocketId() == spClosed->GetSocketId());
         };
@@ -127,7 +129,7 @@ void SocketManager::TriggerCallbacks(
 
         if (m_newClientCallback != nullptr)
         {
-            for (const SocketPtr &spSocket : connectedClients)
+            for (const std::shared_ptr<Socket> &spSocket : connectedClients)
             {
                 m_newClientCallback(spSocket);
             }
@@ -135,7 +137,7 @@ void SocketManager::TriggerCallbacks(
 
         if (m_closedClientCallback != nullptr)
         {
-            for (const SocketPtr &spSocket : closedClients)
+            for (const std::shared_ptr<Socket> &spSocket : closedClients)
             {
                 m_closedClientCallback(spSocket);
             }
@@ -144,7 +146,9 @@ void SocketManager::TriggerCallbacks(
 }
 
 //==============================================================================
-SocketManagerTask::SocketManagerTask(const SocketManagerWPtr &wpSocketManager) :
+SocketManagerTask::SocketManagerTask(
+    const std::weak_ptr<SocketManager> &wpSocketManager
+) :
     Task(),
     m_wpSocketManager(wpSocketManager)
 {
@@ -153,7 +157,7 @@ SocketManagerTask::SocketManagerTask(const SocketManagerWPtr &wpSocketManager) :
 //==============================================================================
 void SocketManagerTask::Run()
 {
-    SocketManagerPtr spSocketManager = m_wpSocketManager.lock();
+    std::shared_ptr<SocketManager> spSocketManager = m_wpSocketManager.lock();
 
     if (spSocketManager)
     {

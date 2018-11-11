@@ -3,6 +3,8 @@
 #include <csignal>
 #include <vector>
 
+#include "fly/fly.h"
+
 #include FLY_OS_IMPL_PATH(system, system)
 
 namespace fly {

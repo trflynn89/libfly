@@ -31,7 +31,9 @@ namespace
             size_t numHash = numHasher(m_num);
 
             // Derived from boost::hash_combine
-            return (strHash ^ (numHash + magic + (strHash << 6) + (strHash >> 2)));
+            return (
+                strHash ^ (numHash + magic + (strHash << 6) + (strHash >> 2))
+            );
         }
 
     private:
@@ -61,7 +63,10 @@ namespace
 
     std::ostream &operator << (std::ostream &stream, const Streamable &obj)
     {
-        stream << '[' << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec << ']';
+        stream << '[';
+        stream << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec;
+        stream << ']';
+
         return stream;
     }
 
@@ -72,12 +77,21 @@ namespace
         {
         }
 
-        friend std::ostream &operator << (std::ostream &, const HashableAndStreamable &);
+        friend std::ostream &operator << (
+            std::ostream &,
+            const HashableAndStreamable &
+        );
     };
 
-    std::ostream &operator << (std::ostream &stream, const HashableAndStreamable &obj)
+    std::ostream &operator << (
+        std::ostream &stream,
+        const HashableAndStreamable &obj
+    )
     {
-        stream << '[' << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec << ']';
+        stream << '[';
+        stream << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec;
+        stream << ']';
+
         return stream;
     }
 
@@ -173,7 +187,7 @@ TEST(StringTest, MaxSplitTest)
         input += curr + delim;
     }
 
-    std::vector<std::string> outputSplit = fly::String::Split(input, delim, maxSectors);
+    auto outputSplit = fly::String::Split(input, delim, maxSectors);
     ASSERT_EQ(inputSplit.size(), outputSplit.size());
 
     for (int i = 0; i < maxSectors; ++i)
@@ -349,9 +363,20 @@ TEST(StringTest, FormatTest)
     EXPECT_EQ("%%", fly::String::Format("%%"));
     EXPECT_EQ("%d", fly::String::Format("%d"));
     EXPECT_EQ("This is a test", fly::String::Format("This is a test"));
-    EXPECT_EQ("there are no formatters", fly::String::Format("there are no formatters", 1, 2, 3, 4));
-    EXPECT_EQ("test some string s", fly::String::Format("test %s %c", std::string("some string"), 's'));
-    EXPECT_EQ("test 1 true 2.100000 false 1.230000e+02 0xff", fly::String::Format("test %d %d %f %d %e %x", 1, true, 2.1f, false, 123.0, 255));
+    EXPECT_EQ(
+        "there are no formatters",
+        fly::String::Format("there are no formatters", 1, 2, 3, 4)
+    );
+    EXPECT_EQ(
+        "test some string s",
+        fly::String::Format("test %s %c", std::string("some string"), 's')
+    );
+    EXPECT_EQ(
+        "test 1 true 2.100000 false 1.230000e+02 0xff",
+        fly::String::Format(
+            "test %d %d %f %d %e %x", 1, true, 2.1f, false, 123.0, 255
+        )
+    );
 }
 
 //==============================================================================
@@ -389,11 +414,19 @@ TEST(StringTest, JoinTest)
     EXPECT_EQ("d,d", fly::String::Join(',', chr, chr));
 
     EXPECT_EQ("[goodbye beef]", fly::String::Join('.', obj2));
-    EXPECT_EQ("a:[goodbye beef]:c:d", fly::String::Join(':', str, obj2, arr, chr));
+    EXPECT_EQ(
+        "a:[goodbye beef]:c:d",
+        fly::String::Join(':', str, obj2, arr, chr)
+    );
     EXPECT_EQ("a:c:d", fly::String::Join(':', str, arr, chr));
 
-    std::regex test("(\\[0x[0-9a-fA-F]+\\]:2:\\[goodbye beef\\]:\\[world f00d\\])");
-    ASSERT_TRUE(std::regex_match(fly::String::Join(':', obj1, 2, obj2, obj3), test));
+    std::regex test(
+        "(\\[0x[0-9a-fA-F]+\\]:2:\\[goodbye beef\\]:\\[world f00d\\])"
+    );
+    ASSERT_TRUE(std::regex_match(
+        fly::String::Join(':', obj1, 2, obj2, obj3),
+        test
+    ));
 }
 
 //==============================================================================
@@ -413,85 +446,145 @@ TEST(StringTest, ConvertTest)
     // CHAR
     EXPECT_EQ(fly::String::Convert<char>("0"), '\0');
     EXPECT_EQ(fly::String::Convert<char>("65"), 'A');
-    EXPECT_THROW(fly::String::Convert<char>(min_to_string<char>()), std::out_of_range);
-    EXPECT_THROW(fly::String::Convert<char>(max_to_string<char>()), std::out_of_range);
+    EXPECT_THROW(
+        fly::String::Convert<char>(min_to_string<char>()), std::out_of_range
+    );
+    EXPECT_THROW(
+        fly::String::Convert<char>(max_to_string<char>()), std::out_of_range
+    );
     EXPECT_THROW(fly::String::Convert<char>("abc"), std::invalid_argument);
     EXPECT_THROW(fly::String::Convert<char>("2a"), std::invalid_argument);
 
     EXPECT_EQ(fly::String::Convert<unsigned char>("0"), '\0');
     EXPECT_EQ(fly::String::Convert<unsigned char>("200"), (unsigned char)200);
-    EXPECT_THROW(fly::String::Convert<unsigned char>(min_to_string<unsigned char>()), std::out_of_range);
-    EXPECT_THROW(fly::String::Convert<unsigned char>(max_to_string<unsigned char>()), std::out_of_range);
-    EXPECT_THROW(fly::String::Convert<unsigned char>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<unsigned char>("2a"), std::invalid_argument);
+    EXPECT_THROW(
+        fly::String::Convert<unsigned char>(min_to_string<unsigned char>()),
+        std::out_of_range
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned char>(max_to_string<unsigned char>()),
+        std::out_of_range
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned char>("abc"), std::invalid_argument
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned char>("2a"), std::invalid_argument
+    );
 
     // SHORT
-    EXPECT_EQ(fly::String::Convert<short>("-4000"), (short)-4000);
-    EXPECT_EQ(fly::String::Convert<short>("4000"), (short)4000);
-    EXPECT_THROW(fly::String::Convert<short>(min_to_string<short>()), std::out_of_range);
-    EXPECT_THROW(fly::String::Convert<short>(max_to_string<short>()), std::out_of_range);
+    EXPECT_EQ(fly::String::Convert<short>("-400"), (short)-400);
+    EXPECT_EQ(fly::String::Convert<short>("400"), (short)400);
+    EXPECT_THROW(
+        fly::String::Convert<short>(min_to_string<short>()), std::out_of_range
+    );
+    EXPECT_THROW(
+        fly::String::Convert<short>(max_to_string<short>()), std::out_of_range
+    );
     EXPECT_THROW(fly::String::Convert<short>("abc"), std::invalid_argument);
     EXPECT_THROW(fly::String::Convert<short>("2a"), std::invalid_argument);
 
     EXPECT_EQ(fly::String::Convert<unsigned short>("0"), (unsigned short)0);
-    EXPECT_EQ(fly::String::Convert<unsigned short>("4000"), (unsigned short)4000);
-    EXPECT_THROW(fly::String::Convert<unsigned short>(min_to_string<unsigned short>()), std::out_of_range);
-    EXPECT_THROW(fly::String::Convert<unsigned short>(max_to_string<unsigned short>()), std::out_of_range);
-    EXPECT_THROW(fly::String::Convert<unsigned short>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<unsigned short>("2a"), std::invalid_argument);
+    EXPECT_EQ(fly::String::Convert<unsigned short>("400"), (unsigned short)400);
+    EXPECT_THROW(
+        fly::String::Convert<unsigned short>(min_to_string<unsigned short>()),
+        std::out_of_range
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned short>(max_to_string<unsigned short>()),
+        std::out_of_range
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned short>("abc"),
+        std::invalid_argument
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned short>("2a"),
+        std::invalid_argument
+    );
 
     // INT
-    EXPECT_EQ(fly::String::Convert<int>("-4000"), (int)-4000);
-    EXPECT_EQ(fly::String::Convert<int>("4000"), (int)4000);
-    EXPECT_THROW(fly::String::Convert<int>(min_to_string<int>()), std::out_of_range);
-    EXPECT_THROW(fly::String::Convert<int>(max_to_string<int>()), std::out_of_range);
+    EXPECT_EQ(fly::String::Convert<int>("-400"), (int)-400);
+    EXPECT_EQ(fly::String::Convert<int>("400"), (int)400);
+    EXPECT_THROW(
+        fly::String::Convert<int>(min_to_string<int>()), std::out_of_range
+    );
+    EXPECT_THROW(
+        fly::String::Convert<int>(max_to_string<int>()), std::out_of_range
+    );
     EXPECT_THROW(fly::String::Convert<int>("abc"), std::invalid_argument);
     EXPECT_THROW(fly::String::Convert<int>("2a"), std::invalid_argument);
 
     EXPECT_EQ(fly::String::Convert<unsigned int>("0"), (unsigned int)0);
-    EXPECT_EQ(fly::String::Convert<unsigned int>("4000"), (unsigned int)4000);
-    EXPECT_THROW(fly::String::Convert<unsigned int>(min_to_string<unsigned int>()), std::out_of_range);
-    EXPECT_THROW(fly::String::Convert<unsigned int>(max_to_string<unsigned int>()), std::out_of_range);
-    EXPECT_THROW(fly::String::Convert<unsigned int>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<unsigned int>("2a"), std::invalid_argument);
+    EXPECT_EQ(fly::String::Convert<unsigned int>("400"), (unsigned int)400);
+    EXPECT_THROW(
+        fly::String::Convert<unsigned int>(min_to_string<unsigned int>()),
+        std::out_of_range
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned int>(max_to_string<unsigned int>()),
+        std::out_of_range
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned int>("abc"), std::invalid_argument
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned int>("2a"), std::invalid_argument
+    );
 
     // LONG
-    EXPECT_EQ(fly::String::Convert<long>("-4000"), (long)-4000);
-    EXPECT_EQ(fly::String::Convert<long>("4000"), (long)4000);
+    EXPECT_EQ(fly::String::Convert<long>("-400"), (long)-400);
+    EXPECT_EQ(fly::String::Convert<long>("400"), (long)400);
     EXPECT_THROW(fly::String::Convert<long>("abc"), std::invalid_argument);
     EXPECT_THROW(fly::String::Convert<long>("2a"), std::invalid_argument);
 
     EXPECT_EQ(fly::String::Convert<unsigned long>("0"), (unsigned long)0);
-    EXPECT_EQ(fly::String::Convert<unsigned long>("4000"), (unsigned long)4000);
-    EXPECT_THROW(fly::String::Convert<unsigned long>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<unsigned long>("2a"), std::invalid_argument);
+    EXPECT_EQ(fly::String::Convert<unsigned long>("400"), (unsigned long)400);
+    EXPECT_THROW(
+        fly::String::Convert<unsigned long>("abc"), std::invalid_argument
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned long>("2a"), std::invalid_argument
+    );
 
     // LONG LONG
-    EXPECT_EQ(fly::String::Convert<long long>("-4000"), (long long)-4000);
-    EXPECT_EQ(fly::String::Convert<long long>("4000"), (long long)4000);
+    EXPECT_EQ(fly::String::Convert<long long>("-400"), (long long)-400);
+    EXPECT_EQ(fly::String::Convert<long long>("400"), (long long)400);
     EXPECT_THROW(fly::String::Convert<long long>("abc"), std::invalid_argument);
     EXPECT_THROW(fly::String::Convert<long long>("2a"), std::invalid_argument);
 
-    EXPECT_EQ(fly::String::Convert<unsigned long long>("0"), (unsigned long long)0);
-    EXPECT_EQ(fly::String::Convert<unsigned long long>("4000"), (unsigned long long)4000);
-    EXPECT_THROW(fly::String::Convert<unsigned long long>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<unsigned long long>("2a"), std::invalid_argument);
+    EXPECT_EQ(
+        fly::String::Convert<unsigned long long>("0"), (unsigned long long)0
+    );
+    EXPECT_EQ(
+        fly::String::Convert<unsigned long long>("400"), (unsigned long long)400
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned long long>("abc"), std::invalid_argument
+    );
+    EXPECT_THROW(
+        fly::String::Convert<unsigned long long>("2a"), std::invalid_argument
+    );
 
     // FLOAT
-    EXPECT_EQ(fly::String::Convert<float>("-4000.123"), -4000.123f);
-    EXPECT_EQ(fly::String::Convert<float>("4000.456"), 4000.456f);
+    EXPECT_EQ(fly::String::Convert<float>("-400.123"), -400.123f);
+    EXPECT_EQ(fly::String::Convert<float>("400.456"), 400.456f);
     EXPECT_THROW(fly::String::Convert<float>("abc"), std::invalid_argument);
     EXPECT_THROW(fly::String::Convert<float>("2a"), std::invalid_argument);
 
     // DOUBLE
-    EXPECT_EQ(fly::String::Convert<double>("-4000.123"), -4000.123);
-    EXPECT_EQ(fly::String::Convert<double>("4000.456"), 4000.456);
+    EXPECT_EQ(fly::String::Convert<double>("-400.123"), -400.123);
+    EXPECT_EQ(fly::String::Convert<double>("400.456"), 400.456);
     EXPECT_THROW(fly::String::Convert<double>("abc"), std::invalid_argument);
     EXPECT_THROW(fly::String::Convert<double>("2a"), std::invalid_argument);
 
     // LONG DOUBLE
-    EXPECT_EQ(fly::String::Convert<long double>("-4000.123"), -4000.123L);
-    EXPECT_EQ(fly::String::Convert<long double>("4000.456"), 4000.456L);
-    EXPECT_THROW(fly::String::Convert<long double>("abc"), std::invalid_argument);
-    EXPECT_THROW(fly::String::Convert<long double>("2a"), std::invalid_argument);
+    EXPECT_EQ(fly::String::Convert<long double>("-400.123"), -400.123L);
+    EXPECT_EQ(fly::String::Convert<long double>("400.456"), 400.456L);
+    EXPECT_THROW(
+        fly::String::Convert<long double>("abc"), std::invalid_argument
+    );
+    EXPECT_THROW(
+        fly::String::Convert<long double>("2a"), std::invalid_argument
+    );
 }

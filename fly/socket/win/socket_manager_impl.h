@@ -5,15 +5,12 @@
 
 #include <Windows.h>
 
-#include "fly/fly.h"
 #include "fly/socket/socket_manager.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(SocketManagerImpl);
-
-FLY_CLASS_PTRS(SequencedTaskRunner);
-FLY_CLASS_PTRS(SocketConfig);
+class SequencedTaskRunner;
+class SocketConfig;
 
 /**
  * Windows implementation of the SocketManager interface.
@@ -24,7 +21,10 @@ FLY_CLASS_PTRS(SocketConfig);
 class SocketManagerImpl : public SocketManager
 {
 public:
-    SocketManagerImpl(const SequencedTaskRunnerPtr &, const SocketConfigPtr &);
+    SocketManagerImpl(
+        const std::shared_ptr<SequencedTaskRunner> &,
+        const std::shared_ptr<SocketConfig> &
+    );
     ~SocketManagerImpl() override;
 
 protected:

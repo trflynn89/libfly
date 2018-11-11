@@ -1,19 +1,16 @@
 #pragma once
 
 #include <cstdint>
-#include <fstream>
+#include <istream>
 #include <limits>
 #include <stack>
 #include <string>
 #include <type_traits>
 
-#include "fly/fly.h"
 #include "fly/parser/parser.h"
 #include "fly/types/json.h"
 
 namespace fly {
-
-FLY_CLASS_PTRS(JsonParser);
 
 /**
  * Implementation of the Parser interface for the .json format.

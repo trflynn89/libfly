@@ -11,7 +11,6 @@
 
 #include <gtest/gtest.h>
 
-#include "fly/fly.h"
 #include "fly/traits/traits.h"
 
 namespace

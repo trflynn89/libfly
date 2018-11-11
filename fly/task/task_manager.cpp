@@ -28,7 +28,7 @@ bool TaskManager::Start()
     if (m_aKeepRunning.compare_exchange_strong(expected, true))
     {
         LOGI(-1, "Starting %d workers", m_numWorkers);
-        TaskManagerPtr spTaskManager = shared_from_this();
+        std::shared_ptr<TaskManager> spTaskManager = shared_from_this();
 
         for (int i = 0; i < m_numWorkers; ++i)
         {
@@ -72,8 +72,8 @@ bool TaskManager::Stop()
 
 //==============================================================================
 void TaskManager::postTask(
-    const TaskWPtr &wpTask,
-    const TaskRunnerWPtr &wpTaskRunner
+    const std::weak_ptr<Task> &wpTask,
+    const std::weak_ptr<TaskRunner> &wpTaskRunner
 )
 {
     TaskHolder task { wpTask, wpTaskRunner, std::chrono::steady_clock::now() };
@@ -82,8 +82,8 @@ void TaskManager::postTask(
 
 //==============================================================================
 void TaskManager::postTaskWithDelay(
-    const TaskWPtr &wpTask,
-    const TaskRunnerWPtr &wpTaskRunner,
+    const std::weak_ptr<Task> &wpTask,
+    const std::weak_ptr<TaskRunner> &wpTaskRunner,
     std::chrono::milliseconds delay
 )
 {
@@ -103,8 +103,8 @@ void TaskManager::workerThread()
     {
         if (m_tasks.Pop(task, s_delay) && m_aKeepRunning.load())
         {
-            TaskRunnerPtr spTaskRunner = task.m_wpTaskRunner.lock();
-            TaskPtr spTask = task.m_wpTask.lock();
+            auto spTaskRunner = task.m_wpTaskRunner.lock();
+            auto spTask = task.m_wpTask.lock();
 
             if (spTaskRunner)
             {
@@ -132,7 +132,7 @@ void TaskManager::timerThread()
             {
                 if (it->m_schedule <= now)
                 {
-                    TaskRunnerPtr spTaskRunner = it->m_wpTaskRunner.lock();
+                    auto spTaskRunner = it->m_wpTaskRunner.lock();
 
                     if (spTaskRunner)
                     {

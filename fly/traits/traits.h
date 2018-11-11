@@ -50,14 +50,17 @@ struct if_##label \
         static constexpr auto test_##label(...) -> std::false_type; \
         \
         template <typename Type> \
-        using is_undefined = std::is_same<decltype(test_##label<Type>(0)), std::false_type>; \
+        using is_undefined = \
+            std::is_same<decltype(test_##label<Type>(0)), std::false_type>; \
     }; \
     \
     template <typename Type> \
-    using enabled = std::enable_if_t<!__##label::is_undefined<Type>::value, bool>; \
+    using enabled = \
+        std::enable_if_t<!__##label::is_undefined<Type>::value, bool>; \
     \
     template <typename Type> \
-    using disabled = std::enable_if_t<__##label::is_undefined<Type>::value, bool>; \
+    using disabled = \
+        std::enable_if_t<__##label::is_undefined<Type>::value, bool>; \
 };
 
 /**
@@ -303,6 +306,10 @@ struct if_array
 /**
  * Tests for whether a type defines operator<<.
  */
-DECLARATION_TESTS(ostream, T, std::declval<std::ostream &>() << std::declval<const T &>());
+DECLARATION_TESTS(
+    ostream,
+    T,
+    std::declval<std::ostream &>() << std::declval<const T &>()
+);
 
 }

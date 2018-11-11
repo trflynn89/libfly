@@ -22,7 +22,8 @@ namespace
     class FtsWrapper
     {
     public:
-        FtsWrapper(char * const *files) : m_pFts(::fts_open(files, s_ftsMode, NULL))
+        FtsWrapper(char * const *files) :
+            m_pFts(::fts_open(files, s_ftsMode, NULL))
         {
         }
 
@@ -213,7 +214,10 @@ char PathImpl::GetSeparator()
 //==============================================================================
 std::string PathImpl::GetTempDirectory()
 {
-    static const std::string envs[] = { "TMPDIR", "TMP", "TEMP", "TEMPDIR", "" };
+    static const std::string envs[] =
+    {
+        "TMPDIR", "TMP", "TEMP", "TEMPDIR", ""
+    };
 
     for (int i = 0; !envs[i].empty(); ++i)
     {

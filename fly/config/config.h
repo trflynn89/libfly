@@ -1,15 +1,11 @@
 #pragma once
 
-#include <map>
 #include <shared_mutex>
+#include <string>
 
-#include "fly/fly.h"
-#include "fly/parser/parser.h"
 #include "fly/types/json.h"
 
 namespace fly {
-
-FLY_CLASS_PTRS(Config);
 
 /**
  * Class to hold a set of related configuration values.
@@ -42,7 +38,7 @@ public:
      * @tparam T The basic return type of the value.
      *
      * @param string The name of the value.
-     * @param T Default value to use if the value could not be found or converted.
+     * @param T Default value to use if needed.
      *
      * @return The converted value or the default value.
      */

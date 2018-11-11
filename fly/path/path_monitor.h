@@ -11,11 +11,9 @@
 
 namespace fly {
 
-FLY_CLASS_PTRS(PathMonitor);
-FLY_CLASS_PTRS(PathMonitorTask);
-
-FLY_CLASS_PTRS(SequencedTaskRunner);
-FLY_CLASS_PTRS(PathConfig);
+class PathConfig;
+class PathMonitorTask;
+class SequencedTaskRunner;
 
 /**
  * Virtual interface to monitor a local path. Provides monitoring of either all
@@ -52,10 +50,13 @@ public:
     /**
      * Constructor.
      *
-     * @param TaskRunnerPtr Task runner for posting path-related tasks onto.
-     * @param PathConfigPtr Reference to path configuration.
+     * @param TaskRunner Task runner for posting path-related tasks onto.
+     * @param PathConfig Reference to path configuration.
      */
-    PathMonitor(const SequencedTaskRunnerPtr &, const PathConfigPtr &);
+    PathMonitor(
+        const std::shared_ptr<SequencedTaskRunner> &,
+        const std::shared_ptr<PathConfig> &
+    );
 
     /**
      * Destructor. Remove all paths from the path monitor.
@@ -74,7 +75,7 @@ public:
      * AddFile take precendence over callbacks registered with AddPath.
      *
      * @param string Path to start monitoring.
-     * @param PathEventCallback Callback to trigger when a file under the path changes.
+     * @param PathEventCallback Callback to trigger when a file changes.
      *
      * @return bool True if the path could be added.
      */
@@ -117,8 +118,6 @@ public:
     bool RemoveFile(const std::string &, const std::string &);
 
 protected:
-    FLY_STRUCT_PTRS(PathInfo);
-
     /**
      * Struct to store information about a monitored path. OS dependent
      * implementations of PathMonitor should also have a concrete defintion
@@ -145,16 +144,18 @@ protected:
     /**
      * Map of monitored paths to their path information.
      */
-    typedef std::map<std::string, PathInfoPtr> PathInfoMap;
+    typedef std::map<std::string, std::shared_ptr<PathInfo>> PathInfoMap;
 
     /**
      * Create an instance of the OS dependent PathInfo struct.
      *
      * @param string The path to be monitored.
      *
-     * @return PathInfoPtr Up-casted shared pointer to the PathInfo struct.
+     * @return PathInfo Up-casted shared pointer to the PathInfo struct.
      */
-    virtual PathInfoPtr CreatePathInfo(const std::string &) const = 0;
+    virtual std::shared_ptr<PathInfo> CreatePathInfo(
+        const std::string &
+    ) const = 0;
 
     /**
      * Check if the path monitor implementation is valid.
@@ -181,19 +182,19 @@ private:
      *
      * @param string The path to be monitored.
      *
-     * @return PathInfoPtr Shared pointer to the PathInfo struct.
+     * @return PathInfo Shared pointer to the PathInfo struct.
      */
-    PathInfoPtr getOrCreatePathInfo(const std::string &);
+    std::shared_ptr<PathInfo> getOrCreatePathInfo(const std::string &);
 
     /**
      * Stream the name of a Json instance's type.
      */
     friend std::ostream &operator << (std::ostream &, PathEvent);
 
-    SequencedTaskRunnerPtr m_spTaskRunner;
-    TaskPtr m_spTask;
+    std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
+    std::shared_ptr<Task> m_spTask;
 
-    PathConfigPtr m_spConfig;
+    std::shared_ptr<PathConfig> m_spConfig;
 };
 
 /**
@@ -205,7 +206,7 @@ private:
 class PathMonitorTask : public Task
 {
 public:
-    PathMonitorTask(const PathMonitorWPtr &);
+    PathMonitorTask(const std::weak_ptr<PathMonitor> &);
 
 protected:
     /**
@@ -216,7 +217,7 @@ protected:
     void Run() override;
 
 private:
-    PathMonitorWPtr m_wpPathMonitor;
+    std::weak_ptr<PathMonitor> m_wpPathMonitor;
 };
 
 }

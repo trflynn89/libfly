@@ -24,7 +24,10 @@
         {
             static char buff[1024];
 
-            ::WideCharToMultiByte(CP_UTF8, 0, str, -1, buff, sizeof(buff), NULL, NULL);
+            ::WideCharToMultiByte(
+                CP_UTF8, 0, str, -1, buff, sizeof(buff), NULL, NULL
+            );
+
             return buff;
         }
     }
@@ -131,10 +134,14 @@ TEST_F(JsonTest, ObjectConstructorTest)
     std::multimap<std::string, int> multimap = { { "c", 3 }, { "d", 4 } };
     EXPECT_TRUE(fly::Json(multimap).IsObject());
 
-    std::unordered_map<std::string, int> unordered_map = { { "e", 5 }, { "f", 6 } };
+    std::unordered_map<std::string, int> unordered_map = {
+        { "e", 5 }, { "f", 6 }
+    };
     EXPECT_TRUE(fly::Json(unordered_map).IsObject());
 
-    std::unordered_multimap<std::string, int> unordered_multimap = { { "h", 7 }, { "i", 8 } };
+    std::unordered_multimap<std::string, int> unordered_multimap = {
+        { "h", 7 }, { "i", 8 }
+    };
     EXPECT_TRUE(fly::Json(unordered_multimap).IsObject());
 }
 
@@ -1095,14 +1102,24 @@ TEST_F(JsonTest, MarkusKuhnStressTest)
             ValidateFail("\x80\xbf\x80\xbf\x80\xbf\x80");
 
             // 3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf)
-            ValidateFail("\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf");
+            ValidateFail(
+                "\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e"
+                "\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d"
+                "\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac"
+                "\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb"
+                "\xbc\xbd\xbe\xbf"
+            );
         }
 
         // 3.2  Lonely start characters
         {
             // 3.2.1  All 32 first bytes of 2-byte sequences (0xc0-0xdf),
             //        each followed by a space character
-            ValidateFail("\xc0 \xc1 \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb \xdc \xdd \xde \xdf");
+            ValidateFail(
+                "\xc0 \xc1 \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb "
+                "\xcc \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 "
+                "\xd8 \xd9 \xda \xdb \xdc \xdd \xde \xdf "
+            );
             ValidateFail("\xc0 ");
             ValidateFail("\xc1 ");
             ValidateFail("\xc2 ");
@@ -1138,7 +1155,10 @@ TEST_F(JsonTest, MarkusKuhnStressTest)
 
             // 3.2.2  All 16 first bytes of 3-byte sequences (0xe0-0xef)
             //        each followed by a space character
-            ValidateFail("\xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb \xec \xed \xee \xef");
+            ValidateFail(
+                "\xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb "
+                "\xec \xed \xee \xef "
+            );
             ValidateFail("\xe0 ");
             ValidateFail("\xe1 ");
             ValidateFail("\xe2 ");
@@ -1219,7 +1239,10 @@ TEST_F(JsonTest, MarkusKuhnStressTest)
         // 3.4  Concatenation of incomplete sequences
         {
             // All the 10 sequences of 3.3 concatenated
-            ValidateFail("\xc0\xe0\x80\xf0\x80\x80\xf8\x80\x80\x80\xfc\x80\x80\x80\x80\xdf\xef\xbf\xf7\xbf\xbf\xfb\xbf\xbf\xbf\xfd\xbf\xbf\xbf\xbf");
+            ValidateFail(
+                "\xc0\xe0\x80\xf0\x80\x80\xf8\x80\x80\x80\xfc\x80\x80\x80\x80"
+                "\xdf\xef\xbf\xf7\xbf\xbf\xfb\xbf\xbf\xbf\xfd\xbf\xbf\xbf\xbf"
+            );
         }
 
         // 3.5  Impossible bytes

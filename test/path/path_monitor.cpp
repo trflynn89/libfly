@@ -1,5 +1,6 @@
 #include <functional>
 #include <map>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -46,7 +47,8 @@ public:
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
         m_spTaskRunner(
-            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>(
+            )
         ),
 
         m_spMonitor(std::make_shared<fly::PathMonitorImpl>(
@@ -68,8 +70,13 @@ public:
         m_fullPath2(fly::Path::Join(m_path1, m_file2)),
         m_fullPath3(fly::Path::Join(m_path2, m_file3))
     {
-        m_callback = std::bind(&PathMonitorTest::HandleEvent, this,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        m_callback = std::bind(
+            &PathMonitorTest::HandleEvent,
+            this,
+            std::placeholders::_1,
+            std::placeholders::_2,
+            std::placeholders::_3
+        );
     }
 
     /**
@@ -140,10 +147,10 @@ protected:
         m_eventQueue.Push(event);
     }
 
-    fly::TaskManagerPtr m_spTaskManager;
-    fly::WaitableSequencedTaskRunnerPtr m_spTaskRunner;
+    std::shared_ptr<fly::TaskManager> m_spTaskManager;
+    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_spTaskRunner;
 
-    fly::PathMonitorPtr m_spMonitor;
+    std::shared_ptr<fly::PathMonitor> m_spMonitor;
     fly::PathMonitor::PathEventCallback m_callback;
 
     std::string m_path0;

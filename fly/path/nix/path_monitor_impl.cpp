@@ -7,9 +7,7 @@
 #include <poll.h>
 #include <unistd.h>
 
-#include "fly/config/config_manager.h"
 #include "fly/logger/logger.h"
-#include "fly/system/system.h"
 #include "fly/task/task_runner.h"
 
 namespace fly {
@@ -31,8 +29,8 @@ namespace
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const PathConfigPtr &spConfig
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<PathConfig> &spConfig
 ) :
     PathMonitor(spTaskRunner, spConfig),
     m_monitorDescriptor(::inotify_init1(s_initFlags))
@@ -84,9 +82,11 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 }
 
 //==============================================================================
-PathMonitor::PathInfoPtr PathMonitorImpl::CreatePathInfo(const std::string &path) const
+std::shared_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
+    const std::string &path
+) const
 {
-    PathMonitor::PathInfoPtr spInfo;
+    std::shared_ptr<PathMonitor::PathInfo> spInfo;
 
     if (IsValid())
     {
@@ -105,7 +105,9 @@ bool PathMonitorImpl::readEvents() const
     // aligned. On other systems, incorrect alignment may decrease performance.
     // Hence, the buffer used for reading from the inotify file descriptor
     // should have the same alignment as struct inotify_event.
-    char buff[8 << 10] __attribute__ ((aligned(__alignof__(struct inotify_event))));
+    char buff[8 << 10] __attribute__ ((
+        aligned(__alignof__(struct inotify_event))
+    ));
 
     ssize_t len = ::read(m_monitorDescriptor, buff, sizeof(buff));
 
@@ -140,19 +142,19 @@ void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
     auto it = std::find_if(m_pathInfo.begin(), m_pathInfo.end(),
         [&pEvent](const PathInfoMap::value_type &value) -> bool
         {
-            PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(value.second));
+            auto spInfo(std::static_pointer_cast<PathInfoImpl>(value.second));
             return (spInfo->m_watchDescriptor == pEvent->wd);
         }
     );
 
     if (it != m_pathInfo.end())
     {
-        PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
+        auto spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
         PathMonitor::PathEvent event = convertToEvent(pEvent->mask);
 
         if (event != PathMonitor::PathEvent::None)
         {
-            PathMonitor::PathEventCallback callback = spInfo->m_fileHandlers[pEvent->name];
+            auto callback = spInfo->m_fileHandlers[pEvent->name];
 
             if (callback == nullptr)
             {

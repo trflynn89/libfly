@@ -3,12 +3,9 @@
 #include <chrono>
 #include <string>
 
-#include "fly/fly.h"
 #include "fly/config/config.h"
 
 namespace fly {
-
-FLY_CLASS_PTRS(LoggerConfig);
 
 /**
  * Class to hold configuration values related to the logger.

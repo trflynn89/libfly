@@ -1,6 +1,5 @@
 #include "fly/system/nix/system_impl.h"
 
-#include <atomic>
 #include <chrono>
 #include <csignal>
 #include <cstring>

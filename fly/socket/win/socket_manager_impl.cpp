@@ -1,6 +1,5 @@
 #include "fly/socket/win/socket_manager_impl.h"
 
-#include "fly/logger/logger.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_config.h"
 #include "fly/socket/socket_types.h"
@@ -13,8 +12,8 @@ std::atomic_int SocketManagerImpl::s_socketManagerCount(0);
 
 //==============================================================================
 SocketManagerImpl::SocketManagerImpl(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const SocketConfigPtr &spConfig
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<SocketConfig> &spConfig
 ) :
     SocketManager(spTaskRunner, spConfig)
 {
@@ -54,7 +53,6 @@ void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
     if (anyMasksSet)
     {
         // First argument of ::select() is ignored in Windows
-        // https://msdn.microsoft.com/en-us/library/windows/desktop/ms740141(v=vs.85).aspx
         if (::select(0, &readFd, &writeFd, NULL, &tv) > 0)
         {
             std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
@@ -71,7 +69,7 @@ bool SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
     FD_ZERO(readFd);
     FD_ZERO(writeFd);
 
-    for (const SocketPtr &spSocket : m_aioSockets)
+    for (const std::shared_ptr<Socket> &spSocket : m_aioSockets)
     {
         if (spSocket->IsValid())
         {
@@ -94,7 +92,7 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
 
     for (auto it = m_aioSockets.begin(); it != m_aioSockets.end(); ++it)
     {
-        SocketPtr &spSocket = *it;
+        std::shared_ptr<Socket> &spSocket = *it;
 
         if (spSocket->IsValid())
         {
@@ -105,7 +103,7 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
             {
                 if (spSocket->IsListening())
                 {
-                    SocketPtr spNewClient = spSocket->Accept();
+                    std::shared_ptr<Socket> spNewClient = spSocket->Accept();
 
                     if (spNewClient && spNewClient->SetAsync())
                     {

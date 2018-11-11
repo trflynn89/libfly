@@ -4,17 +4,14 @@
 #include <chrono>
 #include <memory>
 
-#include "fly/fly.h"
 #include "fly/types/concurrent_queue.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(TaskRunner);
-FLY_CLASS_PTRS(ParallelTaskRunner);
-FLY_CLASS_PTRS(SequencedTaskRunner);
-
-FLY_CLASS_PTRS(Task);
-FLY_CLASS_PTRS(TaskManager);
+class ParallelTaskRunner;
+class SequencedTaskRunner;
+class Task;
+class TaskManager;
 
 /**
  * Base class for controlling the execution of tasks.
@@ -39,11 +36,11 @@ public:
      * the task object or the task runner itself. This will only cancel the task
      * if the task manager has not yet begun executing the task.
      *
-     * @param TaskWPtr Weak reference to the task the be executed.
+     * @param Task Weak reference to the task the be executed.
      *
      * @return bool True if the task was posted for execution.
      */
-    virtual bool PostTask(const TaskWPtr &) = 0;
+    virtual bool PostTask(const std::weak_ptr<Task> &) = 0;
 
     /**
      * Schedule a task to be posted after a delay. The task is given to the
@@ -55,42 +52,45 @@ public:
      * the task object or the task runner itself. This will only cancel the task
      * if the task manager has not yet begun executing the task.
      *
-     * @param TaskWPtr Weak reference to the task the be executed.
+     * @param Task Weak reference to the task the be executed.
      * @param milliseconds Delay before posting the task.
      *
      * @return bool True if the task was posted for delayed execution.
      */
-    bool PostTaskWithDelay(const TaskWPtr &, std::chrono::milliseconds);
+    bool PostTaskWithDelay(
+        const std::weak_ptr<Task> &,
+        std::chrono::milliseconds
+    );
 
 protected:
     /**
      * Private constructor. Task runners may only be created by the task
      * manager.
      *
-     * @param TaskManagerWPtr Weak reference to the task manager.
+     * @param TaskManager Weak reference to the task manager.
      */
-    TaskRunner(const TaskManagerWPtr &);
+    TaskRunner(const std::weak_ptr<TaskManager> &);
 
     /**
      * Completion notification triggered by the task manager that a task has
      * finished execution (or was skipped).
      *
-     * @param TaskPtr The (possibly NULL) task that was executed or skipped.
+     * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    virtual void TaskComplete(const TaskPtr &) = 0;
+    virtual void TaskComplete(const std::shared_ptr<Task> &) = 0;
 
     /**
      * Forward a task to the task manager to be executed as soon as a worker
      * thread is available.
      *
-     * @param TaskWPtr Weak reference to the task the be executed.
+     * @param Task Weak reference to the task the be executed.
      *
      * @return bool True if the task was posted for execution.
      */
-    bool PostTaskToTaskManager(const TaskWPtr &);
+    bool PostTaskToTaskManager(const std::weak_ptr<Task> &);
 
 private:
-    TaskManagerWPtr m_wpTaskManager;
+    std::weak_ptr<TaskManager> m_wpTaskManager;
 };
 
 /**
@@ -105,17 +105,17 @@ class ParallelTaskRunner : public TaskRunner
     friend class TaskManager;
 
 public:
-    bool PostTask(const TaskWPtr &) override;
+    bool PostTask(const std::weak_ptr<Task> &) override;
 
 protected:
-    ParallelTaskRunner(const TaskManagerWPtr &);
+    ParallelTaskRunner(const std::weak_ptr<TaskManager> &);
 
     /**
      * This implementation does nothing.
      *
-     * @param TaskPtr The (possibly NULL) task that was executed or skipped.
+     * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    void TaskComplete(const TaskPtr &) override;
+    void TaskComplete(const std::shared_ptr<Task> &) override;
 };
 
 /**
@@ -136,17 +136,17 @@ class SequencedTaskRunner : public TaskRunner
     friend class TaskManager;
 
 public:
-    bool PostTask(const TaskWPtr &) override;
+    bool PostTask(const std::weak_ptr<Task> &) override;
 
 protected:
-    SequencedTaskRunner(const TaskManagerWPtr &);
+    SequencedTaskRunner(const std::weak_ptr<TaskManager> &);
 
     /**
      * When a task is complete, post the next task in the pending queue.
      *
-     * @param TaskPtr The (possibly NULL) task that was executed or skipped.
+     * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    void TaskComplete(const TaskPtr &) override;
+    void TaskComplete(const std::shared_ptr<Task> &) override;
 
 private:
     /**
@@ -158,7 +158,7 @@ private:
      */
     bool maybePostTask();
 
-    ConcurrentQueue<TaskWPtr> m_pendingTasks;
+    ConcurrentQueue<std::weak_ptr<Task>> m_pendingTasks;
     std::atomic_bool m_aHasRunningTask;
 };
 

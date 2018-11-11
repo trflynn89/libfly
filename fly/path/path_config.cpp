@@ -1,5 +1,7 @@
 #include "fly/path/path_config.h"
 
+#include "fly/fly.h"
+
 namespace fly {
 
 //==============================================================================

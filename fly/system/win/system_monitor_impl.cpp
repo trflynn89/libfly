@@ -17,8 +17,8 @@ namespace
 
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const SystemConfigPtr &spConfig
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<SystemConfig> &spConfig
 ) :
     SystemMonitor(spTaskRunner, spConfig),
     m_process(::GetCurrentProcess()),
@@ -28,30 +28,28 @@ SystemMonitorImpl::SystemMonitorImpl(
     m_prevProcessUserTime(0),
     m_prevTime(0)
 {
-    PDH_STATUS status = ERROR_SUCCESS;
-
-    if ((status = ::PdhOpenQuery(NULL, NULL, &m_cpuQuery)) != ERROR_SUCCESS)
+    PDH_STATUS status = ::PdhOpenQuery(NULL, NULL, &m_cpuQuery);
+    if (status != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not open CPU query (%x)", status);
+        return;
     }
-    else if ((status = ::PdhAddCounter(m_cpuQuery, s_cpuPath, NULL, &m_cpuCounter)) != ERROR_SUCCESS)
+
+    status = ::PdhAddCounter(m_cpuQuery, s_cpuPath, NULL, &m_cpuCounter);
+    if (status != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not add CPU counter (%x)", status);
-
-        ::PdhCloseQuery(m_cpuQuery);
-        m_cpuQuery = NULL;
+        return;
     }
-    else if ((status = ::PdhCollectQueryData(m_cpuQuery)) != ERROR_SUCCESS)
+
+    status = ::PdhCollectQueryData(m_cpuQuery);
+    if (status != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not poll CPU counter (%x)", status);
+        return;
+    }
 
-        ::PdhCloseQuery(m_cpuQuery);
-        m_cpuQuery = NULL;
-    }
-    else
-    {
-        UpdateSystemCpuCount();
-    }
+    UpdateSystemCpuCount();
 }
 
 //==============================================================================
@@ -83,21 +81,25 @@ void SystemMonitorImpl::UpdateSystemCpuCount()
 //==============================================================================
 void SystemMonitorImpl::UpdateSystemCpuUsage()
 {
-    PDH_STATUS status = ERROR_SUCCESS;
     PDH_FMT_COUNTERVALUE value;
 
-    if ((status = ::PdhCollectQueryData(m_cpuQuery)) != ERROR_SUCCESS)
+    PDH_STATUS status = ::PdhCollectQueryData(m_cpuQuery);
+    if (status != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not poll CPU counter (%x)", status);
+        return;
     }
-    else if ((status = ::PdhGetFormattedCounterValue(m_cpuCounter, PDH_FMT_DOUBLE, NULL, &value)) != ERROR_SUCCESS)
+
+    status = ::PdhGetFormattedCounterValue(
+        m_cpuCounter, PDH_FMT_DOUBLE, NULL, &value
+    );
+    if (status != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not format CPU counter (%x)", status);
+        return;
     }
-    else
-    {
-        m_systemCpuUsage.store(value.doubleValue);
-    }
+
+    m_systemCpuUsage.store(value.doubleValue);
 }
 
 //==============================================================================

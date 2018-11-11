@@ -1,26 +1,22 @@
 #pragma once
 
-#include <atomic>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <type_traits>
 
-#include "fly/fly.h"
 #include "fly/config/config.h"
 #include "fly/logger/logger.h"
-#include "fly/parser/parser.h"
 #include "fly/task/task.h"
 #include "fly/types/json.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(ConfigManager);
-FLY_CLASS_PTRS(ConfigUpdateTask);
-
-FLY_CLASS_PTRS(SequencedTaskRunner);
-FLY_CLASS_PTRS(PathMonitor);
+class ConfigUpdateTask;
+class Parser;
+class PathMonitor;
+class SequencedTaskRunner;
 
 /**
  * Class to create and manage a set of configurations.
@@ -35,7 +31,7 @@ class ConfigManager : public std::enable_shared_from_this<ConfigManager>
     /**
      * Map of configuration group names to configuration objects.
      */
-    typedef std::map<std::string, ConfigWPtr> ConfigMap;
+    typedef std::map<std::string, std::weak_ptr<Config>> ConfigMap;
 
 public:
     /**
@@ -50,13 +46,13 @@ public:
     /**
      * Constructor.
      *
-     * @param TaskRunnerPtr Task runner for posting config-related tasks onto.
+     * @param TaskRunner Task runner for posting config-related tasks onto.
      * @param ConfigFileType File format of the configuration file.
      * @param string Directory containing the configuration file.
      * @param string Name of the configuration file.
      */
     ConfigManager(
-        const SequencedTaskRunnerPtr &,
+        const std::shared_ptr<SequencedTaskRunner> &,
         ConfigFileType,
         const std::string &,
         const std::string &
@@ -99,15 +95,15 @@ private:
      */
     void updateConfig();
 
-    PathMonitorPtr m_spMonitor;
-    ParserPtr m_spParser;
+    std::shared_ptr<PathMonitor> m_spMonitor;
+    std::shared_ptr<Parser> m_spParser;
     Json m_values;
 
     const std::string m_path;
     const std::string m_file;
 
-    SequencedTaskRunnerPtr m_spTaskRunner;
-    TaskPtr m_spTask;
+    std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
+    std::shared_ptr<Task> m_spTask;
 
     mutable std::mutex m_configsMutex;
     ConfigMap m_configs;
@@ -122,7 +118,7 @@ private:
 class ConfigUpdateTask : public Task
 {
 public:
-    ConfigUpdateTask(const ConfigManagerWPtr &);
+    ConfigUpdateTask(const std::weak_ptr<ConfigManager> &);
 
 protected:
     /**
@@ -131,7 +127,7 @@ protected:
     void Run() override;
 
 private:
-    ConfigManagerWPtr m_wpConfigManager;
+    std::weak_ptr<ConfigManager> m_wpConfigManager;
 };
 
 //==============================================================================
@@ -154,7 +150,7 @@ std::shared_ptr<T> ConfigManager::CreateConfig()
     }
     else
     {
-        ConfigPtr spBaseConfig = it->second.lock();
+        std::shared_ptr<Config> spBaseConfig = it->second.lock();
 
         if (spBaseConfig)
         {

@@ -10,7 +10,7 @@ namespace fly {
 Log::Log() :
     m_level(Level::NumLevels),
     m_time(-1.0),
-    m_gameId(-1),
+    m_fixed(-1),
     m_line(0),
     m_message()
 {
@@ -19,10 +19,13 @@ Log::Log() :
 }
 
 //==============================================================================
-Log::Log(const LoggerConfigPtr &spConfig, const std::string &message) :
+Log::Log(
+    const std::shared_ptr<LoggerConfig> &spConfig,
+    const std::string &message
+) :
     m_level(Level::NumLevels),
     m_time(-1.0),
-    m_gameId(-1),
+    m_fixed(-1),
     m_line(0),
     m_message(message, 0, spConfig->MaxMessageSize())
 {
@@ -33,13 +36,13 @@ Log::Log(const LoggerConfigPtr &spConfig, const std::string &message) :
 //==============================================================================
 std::ostream &operator << (std::ostream &stream, const Log &log)
 {
-    stream << log.m_level << "\t";
-    stream << log.m_time << "\t";
-    stream << log.m_gameId << "\t";
-    stream << log.m_file << "\t";
-    stream << log.m_function << "\t";
-    stream << log.m_line << "\t";
-    stream << log.m_message << "\n";
+    stream << log.m_level << '\t';
+    stream << log.m_time << '\t';
+    stream << log.m_fixed << '\t';
+    stream << log.m_file << '\t';
+    stream << log.m_function << '\t';
+    stream << log.m_line << '\t';
+    stream << log.m_message << '\n';
 
     return stream;
 }

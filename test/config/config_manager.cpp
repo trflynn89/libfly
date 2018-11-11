@@ -1,7 +1,9 @@
+#include <memory>
 #include <string>
 
 #include <gtest/gtest.h>
 
+#include "fly/fly.h"
 #include "fly/config/config.h"
 #include "fly/config/config_manager.h"
 #include "fly/path/path.h"
@@ -40,7 +42,8 @@ public:
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
         m_spTaskRunner(
-            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>(
+            )
         ),
 
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
@@ -80,12 +83,12 @@ protected:
     std::string m_file;
     std::string m_fullPath;
 
-    fly::TaskManagerPtr m_spTaskManager;
-    fly::WaitableSequencedTaskRunnerPtr m_spTaskRunner;
+    std::shared_ptr<fly::TaskManager> m_spTaskManager;
+    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_spTaskRunner;
 
-    fly::ConfigManagerPtr m_spConfigManager;
+    std::shared_ptr<fly::ConfigManager> m_spConfigManager;
 
-    fly::PathConfigPtr m_spPathConfig;
+    std::shared_ptr<fly::PathConfig> m_spPathConfig;
 
     size_t m_initialSize;
 };

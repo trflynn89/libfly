@@ -27,8 +27,8 @@ namespace
 
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const SystemConfigPtr &spConfig
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<SystemConfig> &spConfig
 ) :
     SystemMonitor(spTaskRunner, spConfig),
     m_prevSystemUserTime(0),
@@ -84,7 +84,9 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
 
     if (stream.good() && std::getline(stream, line))
     {
-        scanned = ::sscanf(line.c_str(), s_procStatFormat, &user, &nice, &sys, &idle);
+        scanned = ::sscanf(
+            line.c_str(), s_procStatFormat, &user, &nice, &sys, &idle
+        );
     }
 
     if (scanned != 4)
@@ -149,8 +151,8 @@ void SystemMonitorImpl::UpdateSystemMemoryUsage()
 
     if (::sysinfo(&info) == 0)
     {
-        uint64_t totalMemory = static_cast<uint64_t>(info.totalram) * info.mem_unit;
-        uint64_t freeMemory = static_cast<uint64_t>(info.freeram) * info.mem_unit;
+        auto totalMemory = static_cast<uint64_t>(info.totalram) * info.mem_unit;
+        auto freeMemory = static_cast<uint64_t>(info.freeram) * info.mem_unit;
 
         m_totalSystemMemory.store(totalMemory);
         m_systemMemoryUsage.store(totalMemory - freeMemory);
@@ -168,15 +170,12 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage()
     std::string contents, line;
 
     uint64_t processMemoryUsage = 0;
+    int count = 0;
 
-    while (stream.good() && std::getline(stream, line))
+    while (stream.good() && std::getline(stream, line) && (count != 1))
     {
+        count = ::sscanf(line.c_str(), s_selfStatusFormat, &processMemoryUsage);
         contents += line + "\\n";
-
-        if (::sscanf(line.c_str(), s_selfStatusFormat, &processMemoryUsage) == 1)
-        {
-            break;
-        }
     }
 
     if (processMemoryUsage == 0)

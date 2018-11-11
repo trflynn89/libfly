@@ -1,19 +1,17 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
 #include <string>
 
 #include <sys/inotify.h>
 
-#include "fly/fly.h"
 #include "fly/path/path_monitor.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(PathMonitorImpl);
-
-FLY_CLASS_PTRS(SequencedTaskRunner);
-FLY_CLASS_PTRS(PathConfig);
+class PathConfig;
+class SequencedTaskRunner;
 
 /**
  * Linux implementation of the PathMonitor interface. Uses the inotify API to
@@ -28,7 +26,10 @@ public:
     /**
      * Constructor. Create the path monitor's inotify handle.
      */
-    PathMonitorImpl(const SequencedTaskRunnerPtr &, const PathConfigPtr &);
+    PathMonitorImpl(
+        const std::shared_ptr<SequencedTaskRunner> &,
+        const std::shared_ptr<PathConfig> &
+    );
 
     /**
      * Destructor. Close the path monitor's inotify handle.
@@ -51,11 +52,11 @@ protected:
      */
     void Poll(const std::chrono::milliseconds &) override;
 
-    PathMonitor::PathInfoPtr CreatePathInfo(const std::string &) const override;
+    std::shared_ptr<PathMonitor::PathInfo> CreatePathInfo(
+        const std::string &
+    ) const override;
 
 private:
-    FLY_STRUCT_PTRS(PathInfoImpl);
-
     /**
      * Linux implementation of the PathInfo interface. Stores the path monitor's
      * inotify handle for adding/removing the monitored path, as well as a

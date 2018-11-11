@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 
-#include "fly/fly.h"
 #include "fly/types/string.h"
 
 namespace fly {

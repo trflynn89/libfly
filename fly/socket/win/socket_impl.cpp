@@ -27,7 +27,10 @@ namespace
 }
 
 //==============================================================================
-SocketImpl::SocketImpl(Protocol protocol, const SocketConfigPtr &spConfig) :
+SocketImpl::SocketImpl(
+    Protocol protocol,
+    const std::shared_ptr<SocketConfig> &spConfig
+) :
     Socket(protocol, spConfig)
 {
     switch (m_protocol)
@@ -97,7 +100,11 @@ bool SocketImpl::IsErrorFree()
     int opt = 0;
     int len = sizeof(opt);
 
-    if (::getsockopt(m_socketHandle, SOL_SOCKET, SO_ERROR, (char *)&opt, &len) == SOCKET_ERROR)
+    int ret = ::getsockopt(
+        m_socketHandle, SOL_SOCKET, SO_ERROR, (char *)&opt, &len
+    );
+
+    if (ret == SOCKET_ERROR)
     {
         LOGS(m_socketHandle, "Error getting error flag");
     }
@@ -150,7 +157,9 @@ bool SocketImpl::Bind(
         break;
     }
 
-    if (::bind(m_socketHandle, pSocketAddress, sizeof(socketAddress)) == SOCKET_ERROR)
+    int ret = ::bind(m_socketHandle, pSocketAddress, sizeof(socketAddress));
+
+    if (ret == SOCKET_ERROR)
     {
         LOGS(m_socketHandle, "Error binding to %d", port);
         return false;
@@ -178,7 +187,9 @@ bool SocketImpl::Connect(address_type address, port_type port)
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
     auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
 
-    if (::connect(m_socketHandle, pSocketAddress, sizeof(socketAddress)) == SOCKET_ERROR)
+    int ret = ::connect(m_socketHandle, pSocketAddress, sizeof(socketAddress));
+
+    if (ret == SOCKET_ERROR)
     {
         LOGS(m_socketHandle, "Error connecting");
         int error = System::GetErrorCode();
@@ -196,15 +207,17 @@ bool SocketImpl::Connect(address_type address, port_type port)
 }
 
 //==============================================================================
-SocketPtr SocketImpl::Accept() const
+std::shared_ptr<Socket> SocketImpl::Accept() const
 {
-    SocketImplPtr ret = std::make_shared<SocketImpl>(m_protocol, m_spConfig);
+    auto ret = std::make_shared<SocketImpl>(m_protocol, m_spConfig);
 
     struct sockaddr_in socketAddress;
     auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
     int socketAddressLength = static_cast<int>(sizeof(socketAddress));
 
-    socket_type skt = ::accept(m_socketHandle, pSocketAddress, &socketAddressLength);
+    socket_type skt = ::accept(
+        m_socketHandle, pSocketAddress, &socketAddressLength
+    );
 
     if (skt == InvalidSocket())
     {
@@ -213,7 +226,8 @@ SocketPtr SocketImpl::Accept() const
     }
     else
     {
-        LOGD(m_socketHandle, "Accepted new socket: %d (%d)", ret->GetSocketId(), skt);
+        LOGD(m_socketHandle, "Accepted new socket: %d (%d)",
+            ret->GetSocketId(), skt);
 
         ret->m_socketHandle = skt;
         ret->m_clientIp = ntohl(socketAddress.sin_addr.s_addr);
@@ -236,16 +250,10 @@ size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
 
     while (keepSending)
     {
-        int toSendSize = static_cast<int>(toSend.size());
-
         // Window's ::send() takes string size as an integer, but std::string's
         // length is size_t - send at most MAX_INT bytes at a time
-        static unsigned int intMax = std::numeric_limits<int>::max();
-
-        if (toSend.size() > intMax)
-        {
-            toSendSize = std::numeric_limits<int>::max();
-        }
+        static size_t intMax = std::numeric_limits<int>::max();
+        int toSendSize = static_cast<int>(std::min(toSend.size(), intMax));
 
         int currSent = ::send(m_socketHandle, toSend.c_str(), toSendSize, 0);
 
@@ -298,9 +306,14 @@ size_t SocketImpl::SendTo(
 
     while (keepSending)
     {
-        int toSendSize = static_cast<int>(std::min(m_packetSize, toSend.size()));
-        int currSent = ::sendto(m_socketHandle, toSend.c_str(), toSendSize, 0,
-            pSocketAddress, sizeof(socketAddress));
+        int currSent = ::sendto(
+            m_socketHandle,
+            toSend.c_str(),
+            static_cast<int>(std::min(m_packetSize, toSend.size())),
+            0,
+            pSocketAddress,
+            sizeof(socketAddress)
+        );
 
         if (currSent > 0)
         {
@@ -393,8 +406,15 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
     while (keepReading)
     {
         char *buff = (char *)calloc(1, m_packetSize * sizeof(char));
-        int bytesRead = ::recvfrom(m_socketHandle, buff, packetSize, 0,
-            pSocketAddress, &socketAddressLength);
+
+        int bytesRead = ::recvfrom(
+            m_socketHandle,
+            buff,
+            packetSize,
+            0,
+            pSocketAddress,
+            &socketAddressLength
+        );
 
         if (bytesRead > 0)
         {

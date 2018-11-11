@@ -1,8 +1,6 @@
 #include "fly/config/config_manager.h"
 
-#include <chrono>
 #include <functional>
-#include <memory>
 
 #include "fly/parser/exceptions.h"
 #include "fly/parser/ini_parser.h"
@@ -15,7 +13,7 @@ namespace fly {
 
 //==============================================================================
 ConfigManager::ConfigManager(
-    const SequencedTaskRunnerPtr &spTaskRunner,
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     ConfigFileType fileType,
     const std::string &path,
     const std::string &file
@@ -57,7 +55,7 @@ ConfigManager::ConfigMap::size_type ConfigManager::GetSize()
 
     for (auto it = m_configs.begin(); it != m_configs.end(); )
     {
-        ConfigPtr spConfig = it->second.lock();
+        std::shared_ptr<Config> spConfig = it->second.lock();
 
         if (spConfig)
         {
@@ -84,17 +82,19 @@ bool ConfigManager::Start()
 
         if (m_spMonitor->Start())
         {
-            ConfigManagerWPtr wpConfigManager = shared_from_this();
+            std::weak_ptr<ConfigManager> wpConfigManager = shared_from_this();
 
             m_spTask = std::make_shared<ConfigUpdateTask>(wpConfigManager);
-            TaskWPtr wpTask = m_spTask;
+            std::weak_ptr<Task> wpTask = m_spTask;
 
             auto callback = [wpConfigManager, wpTask](
-                const std::string &, const std::string &, PathMonitor::PathEvent
+                const std::string &,
+                const std::string &,
+                PathMonitor::PathEvent
             )
             {
-                ConfigManagerPtr spConfigManager = wpConfigManager.lock();
-                TaskPtr spTask = wpTask.lock();
+                auto spConfigManager = wpConfigManager.lock();
+                auto spTask = wpTask.lock();
 
                 if (spConfigManager && spTask)
                 {
@@ -128,7 +128,7 @@ void ConfigManager::updateConfig()
     {
         for (auto it = m_configs.begin(); it != m_configs.end(); )
         {
-            ConfigPtr spConfig = it->second.lock();
+            std::shared_ptr<Config> spConfig = it->second.lock();
 
             if (spConfig)
             {
@@ -149,7 +149,9 @@ void ConfigManager::updateConfig()
 }
 
 //==============================================================================
-ConfigUpdateTask::ConfigUpdateTask(const ConfigManagerWPtr &wpConfigManager) :
+ConfigUpdateTask::ConfigUpdateTask(
+    const std::weak_ptr<ConfigManager> &wpConfigManager
+) :
     Task(),
     m_wpConfigManager(wpConfigManager)
 {
@@ -158,7 +160,7 @@ ConfigUpdateTask::ConfigUpdateTask(const ConfigManagerWPtr &wpConfigManager) :
 //==============================================================================
 void ConfigUpdateTask::Run()
 {
-    ConfigManagerPtr spConfigManager = m_wpConfigManager.lock();
+    std::shared_ptr<ConfigManager> spConfigManager = m_wpConfigManager.lock();
 
     if (spConfigManager)
     {

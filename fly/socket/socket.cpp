@@ -10,7 +10,10 @@ namespace fly {
 std::atomic_int Socket::s_aNumSockets(0);
 
 //==============================================================================
-Socket::Socket(Protocol protocol, const SocketConfigPtr &spConfig) :
+Socket::Socket(
+    Protocol protocol,
+    const std::shared_ptr<SocketConfig> &spConfig
+) :
     m_protocol(protocol),
     m_spConfig(spConfig),
     m_socketEoM(spConfig->EndOfMessage()),
@@ -338,7 +341,6 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
                 bytesSent = SendTo(
                     message, request.GetAddress(), request.GetPort(), wouldBlock
                 );
-
                 break;
             }
 
@@ -394,7 +396,8 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
 
             if (isComplete)
             {
-                LOGD(m_socketId, "Completed message, %u bytes", m_receiveBuffer.length());
+                LOGD(m_socketId, "Completed message, %u bytes",
+                    m_receiveBuffer.length());
 
                 AsyncRequest request(m_socketId, m_receiveBuffer);
                 completedReceives.Push(request);

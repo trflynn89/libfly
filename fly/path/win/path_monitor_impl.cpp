@@ -1,6 +1,6 @@
 #include "fly/path/win/path_monitor_impl.h"
 
-#include "fly/config/config_manager.h"
+#include "fly/fly.h"
 #include "fly/logger/logger.h"
 #include "fly/task/task_runner.h"
 
@@ -39,8 +39,8 @@ namespace
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const PathConfigPtr &spConfig
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<PathConfig> &spConfig
 ) :
     PathMonitor(spTaskRunner, spConfig),
     m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
@@ -73,25 +73,25 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
     DWORD bytes = 0;
     ULONG_PTR pKey = NULL;
     LPOVERLAPPED pOverlapped = NULL;
-    DWORD millis = static_cast<DWORD>(timeout.count());
+    DWORD delay = static_cast<DWORD>(timeout.count());
 
     std::string pathToRemove;
 
-    if (::GetQueuedCompletionStatus(m_iocp, &bytes, &pKey, &pOverlapped, millis))
+    if (::GetQueuedCompletionStatus(m_iocp, &bytes, &pKey, &pOverlapped, delay))
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
         auto it = std::find_if(m_pathInfo.begin(), m_pathInfo.end(),
-            [&pKey](const PathInfoMap::value_type &value) -> bool
+            [&pKey](const PathInfoMap::value_type &val) -> bool
             {
-                PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(value.second));
+                auto spInfo(std::static_pointer_cast<PathInfoImpl>(val.second));
                 return ((ULONG_PTR)(spInfo->m_handle) == pKey);
             }
         );
 
         if (it != m_pathInfo.end())
         {
-            PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
+            auto spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
             handleEvents(spInfo, it->first);
 
             if (!spInfo->Refresh(it->first))
@@ -108,9 +108,11 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 }
 
 //==============================================================================
-PathMonitor::PathInfoPtr PathMonitorImpl::CreatePathInfo(const std::string &path) const
+std::shared_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
+    const std::string &path
+) const
 {
-    PathMonitor::PathInfoPtr spInfo;
+    std::shared_ptr<PathMonitor::PathInfo> spInfo;
 
     if (IsValid())
     {
@@ -122,7 +124,7 @@ PathMonitor::PathInfoPtr PathMonitorImpl::CreatePathInfo(const std::string &path
 
 //==============================================================================
 void PathMonitorImpl::handleEvents(
-    const PathInfoImplPtr &spInfo,
+    const std::shared_ptr<PathInfoImpl> &spInfo,
     const std::string &path
 ) const
 {
@@ -130,14 +132,17 @@ void PathMonitorImpl::handleEvents(
 
     while (pInfo != NULL)
     {
-        std::wstring wFile(pInfo->FileName, pInfo->FileNameLength / sizeof(wchar_t));
-        std::string file(wFile.begin(), wFile.end());
-
         PathMonitor::PathEvent event = convertToEvent(pInfo->Action);
 
         if (event != PathMonitor::PathEvent::None)
         {
-            PathMonitor::PathEventCallback callback = spInfo->m_fileHandlers[file];
+            std::wstring wFile(
+                pInfo->FileName,
+                pInfo->FileNameLength / sizeof(wchar_t)
+            );
+            std::string file(wFile.begin(), wFile.end());
+
+            auto callback = spInfo->m_fileHandlers[file];
 
             if (callback == nullptr)
             {
@@ -195,11 +200,14 @@ PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
 }
 
 //==============================================================================
-PathMonitorImpl::PathInfoImpl::PathInfoImpl(HANDLE iocp, const std::string &path) :
+PathMonitorImpl::PathInfoImpl::PathInfoImpl(
+    HANDLE iocp,
+    const std::string &path
+) :
     PathMonitorImpl::PathInfo(),
     m_valid(false),
     m_handle(INVALID_HANDLE_VALUE),
-    m_pInfo(NULL)
+    m_pInfo(new FILE_NOTIFY_INFORMATION[s_buffSize])
 {
     ::memset(&m_overlapped, 0, sizeof(m_overlapped));
 
@@ -213,26 +221,35 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(HANDLE iocp, const std::string &path
     }
 
     m_handle = ::CreateFile(
-        path.c_str(), s_accessFlags, s_shareFlags, NULL, s_dispositionFlags,
-        s_attributeFlags, NULL
+        path.c_str(),
+        s_accessFlags,
+        s_shareFlags,
+        NULL,
+        s_dispositionFlags,
+        s_attributeFlags,
+        NULL
     );
 
     if (m_handle == INVALID_HANDLE_VALUE)
     {
         LOGS(-1, "Could not create file for \"%s\"", path);
+        return;
     }
-    else if ((m_pInfo = new FILE_NOTIFY_INFORMATION[s_buffSize]) == NULL)
-    {
-        LOGS(-1, "Could not create notify info for \"%s\"", path);
-    }
-    else if (::CreateIoCompletionPort(m_handle, iocp, (ULONG_PTR)m_handle, 0) == NULL)
+
+    HANDLE port = ::CreateIoCompletionPort(
+        m_handle,
+        iocp,
+        (ULONG_PTR)m_handle,
+        0
+    );
+
+    if (port == NULL)
     {
         LOGS(-1, "Could not create IOCP info for \"%s\"", path);
+        return;
     }
-    else
-    {
-        m_valid = Refresh(path);
-    }
+
+    m_valid = Refresh(path);
 }
 
 //==============================================================================
@@ -255,7 +272,7 @@ PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 //==============================================================================
 bool PathMonitorImpl::PathInfoImpl::IsValid() const
 {
-    return (m_valid && (m_handle != INVALID_HANDLE_VALUE) && (m_pInfo != NULL));
+    return (m_valid && (m_handle != INVALID_HANDLE_VALUE));
 }
 
 //==============================================================================
@@ -265,7 +282,14 @@ bool PathMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
     DWORD bytes = 0;
 
     BOOL success = ::ReadDirectoryChangesW(
-        m_handle, m_pInfo, size, FALSE, s_changeFlags, &bytes, &m_overlapped, NULL
+        m_handle,
+        m_pInfo,
+        size,
+        FALSE,
+        s_changeFlags,
+        &bytes,
+        &m_overlapped,
+        NULL
     );
 
     if (success == FALSE)

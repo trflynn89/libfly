@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <gtest/gtest.h>
 
 #include "fly/parser/exceptions.h"
@@ -13,7 +15,7 @@ public:
     }
 
 protected:
-    fly::ParserPtr m_spParser;
+    std::shared_ptr<fly::Parser> m_spParser;
 };
 
 //==============================================================================
@@ -28,7 +30,9 @@ TEST_F(IniParserTest, NonExistingPathTest)
 TEST_F(IniParserTest, NonExistingFileTest)
 {
     fly::Json values;
-    ASSERT_NO_THROW(values = m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.ini"));
+    ASSERT_NO_THROW(
+        values = m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.ini")
+    );
     EXPECT_EQ(values.Size(), 0);
 }
 

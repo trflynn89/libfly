@@ -274,7 +274,9 @@ Json &Json::operator [] (const typename array_type::size_type &index)
 }
 
 //==============================================================================
-const Json &Json::operator [] (const typename array_type::size_type &index) const
+const Json &Json::operator [] (
+    const typename array_type::size_type &index
+) const
 {
     if (IsArray())
     {
@@ -353,38 +355,56 @@ bool operator == (const Json &json1, const Json &json2)
     }
 
     // One instance is a signed integer, other instance is an unsigned integer
-    else if ((json1.m_type == Json::Type::Signed) && (json2.m_type == Json::Type::Unsigned))
+    else if (
+        (json1.m_type == Json::Type::Signed) &&
+        (json2.m_type == Json::Type::Unsigned)
+    )
     {
-        Json::signed_type value2 = static_cast<Json::signed_type>(json2.m_value.m_unsigned);
+        auto value2 = static_cast<Json::signed_type>(json2.m_value.m_unsigned);
         return (json1.m_value.m_signed == value2);
     }
-    else if ((json1.m_type == Json::Type::Unsigned) && (json2.m_type == Json::Type::Signed))
+    else if (
+        (json1.m_type == Json::Type::Unsigned) &&
+        (json2.m_type == Json::Type::Signed)
+    )
     {
-        Json::signed_type value1 = static_cast<Json::signed_type>(json1.m_value.m_unsigned);
+        auto value1 = static_cast<Json::signed_type>(json1.m_value.m_unsigned);
         return (value1 == json2.m_value.m_signed);
     }
 
     // One instance is a signed integer, other instance is a float
-    else if ((json1.m_type == Json::Type::Signed) && (json2.m_type == Json::Type::Float))
+    else if (
+        (json1.m_type == Json::Type::Signed) &&
+        (json2.m_type == Json::Type::Float)
+    )
     {
-        Json::float_type value1 = static_cast<Json::float_type>(json1.m_value.m_signed);
+        auto value1 = static_cast<Json::float_type>(json1.m_value.m_signed);
         return (value1 == json2.m_value.m_float);
     }
-    else if ((json1.m_type == Json::Type::Float) && (json2.m_type == Json::Type::Signed))
+    else if (
+        (json1.m_type == Json::Type::Float) &&
+        (json2.m_type == Json::Type::Signed)
+    )
     {
-        Json::float_type value2 = static_cast<Json::float_type>(json2.m_value.m_signed);
+        auto value2 = static_cast<Json::float_type>(json2.m_value.m_signed);
         return (json1.m_value.m_float == value2);
     }
 
     // One instance is an unsigned integer, other instance is a float
-    else if ((json1.m_type == Json::Type::Unsigned) && (json2.m_type == Json::Type::Float))
+    else if (
+        (json1.m_type == Json::Type::Unsigned) &&
+        (json2.m_type == Json::Type::Float)
+    )
     {
-        Json::float_type value1 = static_cast<Json::float_type>(json1.m_value.m_unsigned);
+        auto value1 = static_cast<Json::float_type>(json1.m_value.m_unsigned);
         return (value1 == json2.m_value.m_float);
     }
-    else if ((json1.m_type == Json::Type::Float) && (json2.m_type == Json::Type::Unsigned))
+    else if (
+        (json1.m_type == Json::Type::Float) &&
+        (json2.m_type == Json::Type::Unsigned)
+    )
     {
-        Json::float_type value2 = static_cast<Json::float_type>(json2.m_value.m_unsigned);
+        auto value2 = static_cast<Json::float_type>(json2.m_value.m_unsigned);
         return (json1.m_value.m_float == value2);
     }
 
@@ -598,12 +618,12 @@ void Json::readUnicodeCharacter(
 {
     auto is_high_surrogate = [](int c) -> bool
     {
-        return ((c >= 0xD800) && (c <= 0xDBFF));
+        return ((c >= 0xd800) && (c <= 0xdbff));
     };
 
     auto is_low_surrogate = [](int c) -> bool
     {
-        return ((c >= 0xDC00) && (c <= 0xDFFF));
+        return ((c >= 0xdc00) && (c <= 0xdfff));
     };
 
     const int highSurrogateCodepoint = readUnicodeCodepoint(it, end);
@@ -628,19 +648,19 @@ void Json::readUnicodeCharacter(
         {
             // The formula to convert a surrogate pair to a single codepoint is:
             //
-            //      C = ((HS - 0xD800) * 0x400) + (LS - 0xDC00) + 0x10000
+            //     C = ((HS - 0xd800) * 0x400) + (LS - 0xdc00) + 0x10000
             //
             // Multiplying by 0x400 (1024) is the same as bit-shifting left by
             // 10 bits. The formula then simplies to:
             codepoint =
                 (highSurrogateCodepoint << 10)
                 + lowSurrogateCodepoint
-                - 0x35FDC00;
+                - 0x35fdc00;
         }
         else
         {
             throw JsonException(nullptr, String::Format(
-                "Expected low surrogate to follow high surrogate %x but found %x",
+                "Expected low surrogate to follow high surrogate %x, found %x",
                 highSurrogateCodepoint, lowSurrogateCodepoint
             ));
         }
@@ -657,23 +677,23 @@ void Json::readUnicodeCharacter(
     {
         stream << char(codepoint);
     }
-    else if (codepoint <= 0x7FF)
+    else if (codepoint <= 0x7ff)
     {
-        stream << char(0xC0 | (codepoint >> 6));
-        stream << char(0x80 | (codepoint & 0x3F));
+        stream << char(0xc0 | (codepoint >> 6));
+        stream << char(0x80 | (codepoint & 0x3f));
     }
-    else if (codepoint <= 0xFFFF)
+    else if (codepoint <= 0xffff)
     {
-        stream << char(0xE0 | (codepoint >> 12));
-        stream << char(0x80 | ((codepoint >> 6) & 0x3F));
-        stream << char(0x80 | (codepoint & 0x3F));
+        stream << char(0xe0 | (codepoint >> 12));
+        stream << char(0x80 | ((codepoint >> 6) & 0x3f));
+        stream << char(0x80 | (codepoint & 0x3f));
     }
     else
     {
-        stream << char(0xF0 | (codepoint >> 18));
-        stream << char(0x80 | ((codepoint >> 12) & 0x3F));
-        stream << char(0x80 | ((codepoint >> 6) & 0x3F));
-        stream << char(0x80 | (codepoint & 0x3F));
+        stream << char(0xf0 | (codepoint >> 18));
+        stream << char(0x80 | ((codepoint >> 12) & 0x3f));
+        stream << char(0x80 | ((codepoint >> 6) & 0x3f));
+        stream << char(0x80 | (codepoint & 0x3f));
     }
 }
 
@@ -750,39 +770,39 @@ void Json::validateCharacter(
     };
 
     // Invalid control characters
-    if (c <= 0x1F)
+    if (c <= 0x1f)
     {
         invalid(1);
     }
 
     // Quote or reverse solidus
-    else if ((c == 0x22) || (c == 0x5C))
+    else if ((c == 0x22) || (c == 0x5c))
     {
         invalid(2);
     }
 
     // Valid ASCII character
-    else if ((c >= 0x20) && (c <= 0x7F))
+    else if ((c >= 0x20) && (c <= 0x7f))
     {
     }
 
     // U+0080..U+07FF: bytes C2..DF 80..BF
-    else if ((c >= 0xC2) && (c <= 0xDF))
+    else if ((c >= 0xc2) && (c <= 0xdf))
     {
-        if (!next() || (c < 0x80) || (c > 0xBF))
+        if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(3);
         }
     }
 
     // U+0800..U+0FFF: bytes E0 A0..BF 80..BF
-    else if (c == 0xE0)
+    else if (c == 0xe0)
     {
-        if (!next() || (c < 0xA0) || (c > 0xBF))
+        if (!next() || (c < 0xa0) || (c > 0xbf))
         {
             invalid(4);
         }
-        else if (!next() || (c < 0x80) || (c > 0xBF))
+        else if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(5);
         }
@@ -790,77 +810,77 @@ void Json::validateCharacter(
 
     // U+1000..U+CFFF: bytes E1..EC 80..BF 80..BF
     // U+E000..U+FFFF: bytes EE..EF 80..BF 80..BF
-    else if (((c >= 0xE1) && (c <= 0xEC)) || (c == 0xEE) || (c == 0xEF))
+    else if (((c >= 0xe1) && (c <= 0xec)) || (c == 0xee) || (c == 0xef))
     {
-        if (!next() || (c < 0x80) || (c > 0xBF))
+        if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(6);
         }
-        else if (!next() || (c < 0x80) || (c > 0xBF))
+        else if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(7);
         }
     }
 
     // U+D000..U+D7FF: bytes ED 80..9F 80..BF
-    else if (c == 0xED)
+    else if (c == 0xed)
     {
-        if (!next() || (c < 0x80) || (c > 0x9F))
+        if (!next() || (c < 0x80) || (c > 0x9f))
         {
             invalid(8);
         }
-        else if (!next() || (c < 0x80) || (c > 0xBF))
+        else if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(9);
         }
     }
 
     // U+10000..U+3FFFF: bytes F0 90..BF 80..BF 80..BF
-    else if (c == 0xF0)
+    else if (c == 0xf0)
     {
-        if (!next() || (c < 0x90) || (c > 0xBF))
+        if (!next() || (c < 0x90) || (c > 0xbf))
         {
             invalid(10);
         }
-        else if (!next() || (c < 0x80) || (c > 0xBF))
+        else if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(11);
         }
-        else if (!next() || (c < 0x80) || (c > 0xBF))
+        else if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(12);
         }
     }
 
     // U+40000..U+FFFFF: bytes F1..F3 80..BF 80..BF 80..BF
-    else if ((c >= 0xF1) && (c <= 0xF3))
+    else if ((c >= 0xf1) && (c <= 0xf3))
     {
-        if (!next() || (c < 0x80) || (c > 0xBF))
+        if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(13);
         }
-        else if (!next() || (c < 0x80) || (c > 0xBF))
+        else if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(14);
         }
-        else if (!next() || (c < 0x80) || (c > 0xBF))
+        else if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(15);
         }
     }
 
     // U+100000..U+10FFFF: bytes F4 80..8F 80..BF 80..BF
-    else if (c == 0xF4)
+    else if (c == 0xf4)
     {
-        if (!next() || (c < 0x80) || (c > 0x8F))
+        if (!next() || (c < 0x80) || (c > 0x8f))
         {
             invalid(16);
         }
-        else if (!next() || (c < 0x80) || (c > 0xBF))
+        else if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(17);
         }
-        else if (!next() || (c < 0x80) || (c > 0xBF))
+        else if (!next() || (c < 0x80) || (c > 0xbf))
         {
             invalid(18);
         }

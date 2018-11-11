@@ -1,8 +1,8 @@
 #include <atomic>
+#include <memory>
 
 #include <gtest/gtest.h>
 
-#include "fly/fly.h"
 #include "fly/task/task.h"
 #include "fly/task/task_manager.h"
 #include "fly/task/task_runner.h"
@@ -85,7 +85,7 @@ public:
     }
 
 protected:
-    fly::TaskManagerPtr m_spTaskManager;
+    std::shared_ptr<fly::TaskManager> m_spTaskManager;
 };
 
 //==============================================================================

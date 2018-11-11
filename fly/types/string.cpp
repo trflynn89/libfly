@@ -25,7 +25,11 @@ std::vector<std::string> String::Split(const std::string &input, char delim)
 }
 
 //==============================================================================
-std::vector<std::string> String::Split(const std::string &input, char delim, size_t max)
+std::vector<std::string> String::Split(
+    const std::string &input,
+    char delim,
+    size_t max
+)
 {
     std::string item;
     std::stringstream ss(input);
@@ -64,7 +68,11 @@ void String::Trim(std::string &str)
 }
 
 //==============================================================================
-void String::ReplaceAll(std::string &target, const std::string &search, const char &replace)
+void String::ReplaceAll(
+    std::string &target,
+    const std::string &search,
+    const char &replace
+)
 {
     size_t pos = target.find(search);
 
@@ -76,7 +84,11 @@ void String::ReplaceAll(std::string &target, const std::string &search, const ch
 }
 
 //==============================================================================
-void String::ReplaceAll(std::string &target, const std::string &search, const std::string &replace)
+void String::ReplaceAll(
+    std::string &target,
+    const std::string &search,
+    const std::string &replace
+)
 {
     size_t pos = target.find(search);
 
@@ -101,11 +113,13 @@ std::string String::GenerateRandomString(const size_t len)
 
     static auto now = std::chrono::system_clock::now().time_since_epoch();
 
-    static auto limit = static_cast<short_distribution::result_type>(s_alphaNum.size() - 1);
     static auto seed = static_cast<std::mt19937::result_type>(now.count());
+    static auto limit = static_cast<short_distribution::result_type>(
+        s_alphaNum.size() - 1
+    );
 
-    static short_distribution distribution(0, limit);
     static std::mt19937 engine(seed);
+    static short_distribution distribution(0, limit);
 
     std::string ret;
     ret.reserve(len);

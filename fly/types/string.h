@@ -63,7 +63,11 @@ public:
      * @param string The string to search for and replace.
      * @param string The replacement string.
      */
-    static void ReplaceAll(std::string &, const std::string &, const std::string &);
+    static void ReplaceAll(
+        std::string &,
+        const std::string &,
+        const std::string &
+    );
 
     /**
      * Remove all instances of a substring in a string.
@@ -189,7 +193,12 @@ private:
      * into the given ostream.
      */
     template <typename T, typename ... Args>
-    static void format(std::ostream &, const char *, const T &, const Args &...);
+    static void format(
+        std::ostream &,
+        const char *,
+        const T &,
+        const Args &...
+    );
 
     /**
      * Terminator for the variadic template formatter. Stream the rest of the

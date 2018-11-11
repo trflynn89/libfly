@@ -12,6 +12,17 @@
 
 namespace fly {
 
+namespace
+{
+    static const DWORD s_formatFlags = (
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_IGNORE_INSERTS
+    );
+
+    static const DWORD s_langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
+}
+
 //==============================================================================
 void SystemImpl::PrintBacktrace()
 {
@@ -58,10 +69,7 @@ std::string SystemImpl::GetErrorString(int code)
     LPTSTR str = NULL;
     std::string ret;
 
-    ::FormatMessage(
-        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&str, 0, NULL
-    );
+    ::FormatMessage(s_formatFlags, NULL, code, s_langId, (LPTSTR)&str, 0, NULL);
 
     if (str == NULL)
     {

@@ -9,11 +9,9 @@
 
 namespace fly {
 
-FLY_CLASS_PTRS(SystemMonitor);
-FLY_CLASS_PTRS(SystemMonitorTask);
-
-FLY_CLASS_PTRS(SequencedTaskRunner);
-FLY_CLASS_PTRS(SystemConfig);
+class SequencedTaskRunner;
+class SystemConfig;
+class SystemMonitorTask;
 
 /**
  * Virtual interface for monitoring system-level resources. Provides CPU and
@@ -31,10 +29,13 @@ public:
     /**
      * Constructor.
      *
-     * @param TaskRunnerPtr Task runner for posting monitor-related tasks onto.
-     * @param SystemConfigPtr Reference to system configuration.
+     * @param TaskRunner Task runner for posting monitor-related tasks onto.
+     * @param SystemConfig Reference to system configuration.
      */
-    SystemMonitor(const SequencedTaskRunnerPtr &, const SystemConfigPtr &);
+    SystemMonitor(
+        const std::shared_ptr<SequencedTaskRunner> &,
+        const std::shared_ptr<SystemConfig> &
+    );
 
     /**
      * Destructor.
@@ -137,10 +138,10 @@ private:
      */
     void poll();
 
-    SequencedTaskRunnerPtr m_spTaskRunner;
-    TaskPtr m_spTask;
+    std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
+    std::shared_ptr<Task> m_spTask;
 
-    SystemConfigPtr m_spConfig;
+    std::shared_ptr<SystemConfig> m_spConfig;
 };
 
 /**
@@ -152,7 +153,7 @@ private:
 class SystemMonitorTask : public Task
 {
 public:
-    SystemMonitorTask(const SystemMonitorWPtr &);
+    SystemMonitorTask(const std::weak_ptr<SystemMonitor> &);
 
 protected:
     /**
@@ -163,7 +164,7 @@ protected:
     void Run() override;
 
 private:
-    SystemMonitorWPtr m_wpSystemMonitor;
+    std::weak_ptr<SystemMonitor> m_wpSystemMonitor;
 };
 
 }

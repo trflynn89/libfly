@@ -3,15 +3,12 @@
 #include <cstdint>
 #include <ctime>
 
-#include "fly/fly.h"
 #include "fly/system/system_monitor.h"
 
 namespace fly {
 
-FLY_CLASS_PTRS(SystemMonitorImpl);
-
-FLY_CLASS_PTRS(SequencedTaskRunner);
-FLY_CLASS_PTRS(SystemConfig);
+class SequencedTaskRunner;
+class SystemConfig;
 
 /**
  * Linux implementation of the SystemMonitor interface. Uses the /proc file
@@ -26,7 +23,10 @@ public:
     /**
      * Constructor. Set the system CPU count.
      */
-    SystemMonitorImpl(const SequencedTaskRunnerPtr &, const SystemConfigPtr &);
+    SystemMonitorImpl(
+        const std::shared_ptr<SequencedTaskRunner> &,
+        const std::shared_ptr<SystemConfig> &
+    );
 
 protected:
     void UpdateSystemCpuCount() override;

@@ -11,10 +11,11 @@ namespace fly {
 //==============================================================================
 bool PathImpl::MakePath(const std::string &path)
 {
-    TCHAR buffer[4096];
+    static const size_t bufferSize = 4096;
+    TCHAR buffer[bufferSize];
     int ret = 0;
 
-    if (::GetFullPathName(path.c_str(), sizeof(buffer), buffer, NULL) > 0)
+    if (::GetFullPathName(path.c_str(), bufferSize, buffer, NULL) > 0)
     {
         if (PathIsFile(buffer))
         {
@@ -40,12 +41,13 @@ bool PathImpl::MakePath(const std::string &path)
 //==============================================================================
 bool PathImpl::RemovePath(const std::string &path)
 {
-    TCHAR buffer[4096];
-    DWORD len = ::GetFullPathName(path.c_str(), sizeof(buffer), buffer, NULL);
+    static const size_t bufferSize = 4096;
+    TCHAR buffer[bufferSize];
 
-    bool ret = ((len > 0) && (len < (sizeof(buffer) - 2)) && !PathIsFile(buffer));
+    DWORD len = ::GetFullPathName(path.c_str(), bufferSize, buffer, NULL);
+    bool ret = true;
 
-    if (ret)
+    if ((len > 0) && (len < (bufferSize - 2)) && !PathIsFile(buffer))
     {
         // SHFILEOPSTRUCT requires the path to be double-NULL-terminated
         buffer[len + 1] = '\0';

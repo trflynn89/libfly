@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cstring>
 #include <fstream>
+#include <memory>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -41,7 +42,8 @@ public:
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
         m_spTaskRunner(
-            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
+            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>(
+            )
         ),
 
         m_spLoggerConfig(std::make_shared<TestLoggerConfig>()),
@@ -74,7 +76,7 @@ public:
     {
         ASSERT_TRUE(m_spTaskManager->Stop());
 
-        fly::Logger::SetInstance(fly::LoggerPtr());
+        fly::Logger::SetInstance(nullptr);
         m_spLogger.reset();
 
         ASSERT_TRUE(fly::Path::RemovePath(m_path));
@@ -104,11 +106,11 @@ protected:
 
     std::string m_path;
 
-    fly::TaskManagerPtr m_spTaskManager;
-    fly::WaitableSequencedTaskRunnerPtr m_spTaskRunner;
+    std::shared_ptr<fly::TaskManager> m_spTaskManager;
+    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_spTaskRunner;
 
-    fly::LoggerConfigPtr m_spLoggerConfig;
-    fly::LoggerPtr m_spLogger;
+    std::shared_ptr<fly::LoggerConfig> m_spLoggerConfig;
+    std::shared_ptr<fly::Logger> m_spLogger;
 };
 
 //==============================================================================
@@ -130,7 +132,7 @@ TEST_F(LoggerTest, FilePathTest)
 //==============================================================================
 TEST_F(LoggerTest, BadFilePathTest)
 {
-    fly::Logger::SetInstance(fly::LoggerPtr());
+    fly::Logger::SetInstance(nullptr);
 
     m_spLogger = std::make_shared<fly::Logger>(
         m_spTaskRunner,

@@ -1,6 +1,6 @@
 #include "fly/parser/ini_parser.h"
 
-#include <cstring>
+#include <vector>
 
 #include "fly/parser/exceptions.h"
 #include "fly/types/string.h"
@@ -32,8 +32,8 @@ Json IniParser::ParseInternal(std::istream &stream)
         }
         else
         {
-            throw ParserException(m_line,
-                "A section must be defined before name=value pairs"
+            throw ParserException(
+                m_line, "A section must be defined before name=value pairs"
             );
         }
     }
@@ -81,8 +81,8 @@ void IniParser::onValue(Json &section, const std::string &line)
     }
     else
     {
-        throw ParserException(m_line,
-            "Require name/value pairs of the form name=value"
+        throw ParserException(
+            m_line, "Require name/value pairs of the form name=value"
         );
     }
 }
@@ -99,18 +99,15 @@ bool IniParser::trimValue(std::string &str, char start, char end) const
     bool startsWithChar = String::StartsWith(str, start);
     bool endsWithChar = String::EndsWith(str, end);
 
-    if (startsWithChar || endsWithChar)
+    if (startsWithChar && endsWithChar)
     {
-        if (startsWithChar && endsWithChar)
-        {
-            str = str.substr(1, str.size() - 2);
-        }
-        else
-        {
-            throw ParserException(m_line, String::Format(
-                "Imbalanced characters: \"%c\" and \"%c\"", start, end
-            ));
-        }
+        str = str.substr(1, str.size() - 2);
+    }
+    else if (startsWithChar || endsWithChar)
+    {
+        throw ParserException(m_line, String::Format(
+            "Imbalanced characters: \"%c\" and \"%c\"", start, end
+        ));
     }
 
     return (startsWithChar && endsWithChar);

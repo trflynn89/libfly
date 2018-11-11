@@ -1,5 +1,7 @@
 #include "fly/path/path.h"
 
+#include "fly/fly.h"
+
 #include FLY_OS_IMPL_PATH(path, path)
 
 namespace fly {
