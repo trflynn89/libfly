@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+#include "fly/fly.h"
+
 namespace fly {
 
 class LoggerConfig;

@@ -7,6 +7,7 @@
 #include <mutex>
 #include <string>
 
+#include "fly/fly.h"
 #include "fly/logger/log.h"
 #include "fly/system/system.h"
 #include "fly/task/task.h"

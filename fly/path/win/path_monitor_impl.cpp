@@ -96,6 +96,7 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 
             if (!spInfo->Refresh(it->first))
             {
+                // Hold onto the path to be removed until the mutex is released
                 pathToRemove = it->first;
             }
         }
