@@ -45,7 +45,7 @@ bool PathImpl::RemovePath(const std::string &path)
     TCHAR buffer[bufferSize];
 
     DWORD len = ::GetFullPathName(path.c_str(), bufferSize, buffer, NULL);
-    bool ret = true;
+    bool ret = false;
 
     if ((len > 0) && (len < (bufferSize - 2)) && !PathIsFile(buffer))
     {
@@ -68,11 +68,11 @@ bool PathImpl::RemovePath(const std::string &path)
         if (error == 0)
         {
             LOGD(-1, "Removed \"%s\"", path);
+            ret = true;
         }
         else
         {
             LOGW(-1, "Could not remove \"%s\": %d (%x)", path, error, error);
-            ret = false;
         }
     }
 
