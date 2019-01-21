@@ -9,6 +9,7 @@
 .PHONY: gcov
 .PHONY: install
 .PHONY: setup
+.PHONY: style
 .PHONY: $(TARGETS)
 
 # Verify expected variables
@@ -98,3 +99,8 @@ else
 	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"
 	$(Q)exit 1
 endif
+
+# Style enforcement
+style:
+	clang-format -i $$(find $(SOURCE_ROOT)/fly -iname "*.h" -o -iname "*.cpp")
+
