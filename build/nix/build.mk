@@ -89,7 +89,7 @@ install: $(TARGET_PACKAGES)
 # Install dependencies
 setup:
 ifeq ($(HOST), DEBIAN)
-	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib clang llvm
+	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib clang llvm clang-format
 
 ifeq ($(qt5), 1)
 	$(Q)sudo apt-get install -y mesa-common-dev
