@@ -1,15 +1,15 @@
 #pragma once
 
+#include "fly/fly.h"
+#include "fly/socket/async_request.h"
+#include "fly/task/task.h"
+
 #include <chrono>
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <vector>
-
-#include "fly/fly.h"
-#include "fly/socket/async_request.h"
-#include "fly/task/task.h"
 
 namespace fly {
 
@@ -44,8 +44,7 @@ public:
      */
     SocketManager(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SocketConfig> &
-    );
+        const std::shared_ptr<SocketConfig> &);
 
     /**
      * Destructor. Close all asynchronous sockets.
@@ -178,8 +177,7 @@ private:
 template <typename R, typename P>
 bool SocketManager::WaitForCompletedReceive(
     AsyncRequest &request,
-    std::chrono::duration<R, P> waitTime
-)
+    std::chrono::duration<R, P> waitTime)
 {
     return m_completedReceives.Pop(request, waitTime);
 }
@@ -188,12 +186,11 @@ bool SocketManager::WaitForCompletedReceive(
 template <typename R, typename P>
 bool SocketManager::WaitForCompletedSend(
     AsyncRequest &request,
-    std::chrono::duration<R, P> waitTime
-)
+    std::chrono::duration<R, P> waitTime)
 {
     return m_completedSends.Pop(request, waitTime);
 }
 
-}
+} // namespace fly
 
 #include FLY_OS_IMPL_PATH(socket, socket_manager)

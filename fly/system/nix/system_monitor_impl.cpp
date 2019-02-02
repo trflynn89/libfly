@@ -1,35 +1,35 @@
 #include "fly/system/nix/system_monitor_impl.h"
 
-#include <cinttypes>
-#include <cstring>
-#include <fstream>
-#include <string>
-
-#include <sys/sysinfo.h>
-#include <sys/times.h>
-
 #include "fly/logger/logger.h"
 #include "fly/system/system_config.h"
 #include "fly/task/task_runner.h"
 #include "fly/types/string.h"
 
+#include <sys/sysinfo.h>
+#include <sys/times.h>
+
+#include <cinttypes>
+#include <cstring>
+#include <fstream>
+#include <string>
+
 namespace fly {
 
-namespace
-{
-    static const char *s_procStatFile = "/proc/stat";
-    static const char *s_procStatFormat =
+namespace {
+
+    const char *s_procStatFile = "/proc/stat";
+    const char *s_procStatFormat =
         "cpu %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64;
 
-    static const char *s_selfStatusFile = "/proc/self/status";
-    static const char *s_selfStatusFormat = "VmRSS: %" SCNu64 " kB";
-}
+    const char *s_selfStatusFile = "/proc/self/status";
+    const char *s_selfStatusFormat = "VmRSS: %" SCNu64 " kB";
+
+} // namespace
 
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SystemConfig> &spConfig
-) :
+    const std::shared_ptr<SystemConfig> &spConfig) :
     SystemMonitor(spTaskRunner, spConfig),
     m_prevSystemUserTime(0),
     m_prevSystemNiceTime(0),
@@ -84,9 +84,8 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
 
     if (stream.good() && std::getline(stream, line))
     {
-        scanned = ::sscanf(
-            line.c_str(), s_procStatFormat, &user, &nice, &sys, &idle
-        );
+        scanned =
+            ::sscanf(line.c_str(), s_procStatFormat, &user, &nice, &sys, &idle);
     }
 
     if (scanned != 4)
@@ -98,10 +97,8 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
     if ((user >= m_prevSystemUserTime) && (nice >= m_prevSystemNiceTime) &&
         (sys >= m_prevSystemSystemTime) && (idle >= m_prevSystemIdleTime))
     {
-        uint64_t active =
-            (user - m_prevSystemUserTime) +
-            (nice - m_prevSystemNiceTime) +
-            (sys - m_prevSystemSystemTime);
+        uint64_t active = (user - m_prevSystemUserTime) +
+            (nice - m_prevSystemNiceTime) + (sys - m_prevSystemSystemTime);
 
         uint64_t total = active + (idle - m_prevSystemIdleTime);
 
@@ -126,12 +123,10 @@ void SystemMonitorImpl::UpdateProcessCpuUsage()
         return;
     }
 
-    if ((now > m_prevTime) &&
-        (sample.tms_stime >= m_prevProcessSystemTime) &&
+    if ((now > m_prevTime) && (sample.tms_stime >= m_prevProcessSystemTime) &&
         (sample.tms_utime >= m_prevProcessUserTime))
     {
-        uint64_t cpu =
-            (sample.tms_stime - m_prevProcessSystemTime) +
+        uint64_t cpu = (sample.tms_stime - m_prevProcessSystemTime) +
             (sample.tms_utime - m_prevProcessUserTime);
 
         clock_t time = now - m_prevTime;
@@ -189,4 +184,4 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage()
     }
 }
 
-}
+} // namespace fly

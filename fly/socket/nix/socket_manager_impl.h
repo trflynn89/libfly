@@ -1,11 +1,11 @@
 #pragma once
 
-#include <chrono>
+#include "fly/socket/socket_manager.h"
+#include "fly/socket/socket_types.h"
 
 #include <sys/select.h>
 
-#include "fly/socket/socket_manager.h"
-#include "fly/socket/socket_types.h"
+#include <chrono>
 
 namespace fly {
 
@@ -23,8 +23,7 @@ class SocketManagerImpl : public SocketManager
 public:
     SocketManagerImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SocketConfig> &
-    );
+        const std::shared_ptr<SocketConfig> &);
 
 protected:
     void Poll(const std::chrono::microseconds &) override;
@@ -34,4 +33,4 @@ private:
     void handleSocketIO(fd_set *, fd_set *);
 };
 
-}
+} // namespace fly

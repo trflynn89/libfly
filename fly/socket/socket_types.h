@@ -1,21 +1,21 @@
 #pragma once
 
-#include <cstdint>
-
 #include "fly/fly.h"
 
+#include <cstdint>
+
 #if defined(FLY_WINDOWS)
-    #include <WinSock.h>
+#    include <WinSock.h>
 #endif
 
 namespace fly {
 
 #if defined(FLY_WINDOWS)
-    typedef SOCKET socket_type;
+typedef SOCKET socket_type;
 #elif defined(FLY_LINUX)
-    typedef int socket_type;
+typedef int socket_type;
 #else
-    #error Unknown socket type
+#    error Unknown socket type
 #endif
 
 typedef uint32_t address_type;
@@ -49,4 +49,4 @@ enum class ConnectedState : uint8_t
     Connected
 };
 
-}
+} // namespace fly

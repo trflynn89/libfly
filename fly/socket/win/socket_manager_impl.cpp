@@ -13,8 +13,7 @@ std::atomic_int SocketManagerImpl::s_socketManagerCount(0);
 //==============================================================================
 SocketManagerImpl::SocketManagerImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SocketConfig> &spConfig
-) :
+    const std::shared_ptr<SocketConfig> &spConfig) :
     SocketManager(spTaskRunner, spConfig)
 {
     if (s_socketManagerCount.fetch_add(1) == 0)
@@ -42,7 +41,10 @@ SocketManagerImpl::~SocketManagerImpl()
 void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
 {
     fd_set readFd, writeFd;
-    struct timeval tv { 0, static_cast<long>(timeout.count()) };
+    struct timeval tv
+    {
+        0, static_cast<long>(timeout.count())
+    };
 
     bool anyMasksSet = false;
     {
@@ -148,4 +150,4 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
     TriggerCallbacks(connectedClients, closedClients);
 }
 
-}
+} // namespace fly

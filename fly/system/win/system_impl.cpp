@@ -1,27 +1,25 @@
 #include "fly/system/win/system_impl.h"
 
+#include "fly/logger/logger.h"
+#include "fly/types/string.h"
+
+#include <Windows.h>
+
 #include <atomic>
 #include <chrono>
 #include <csignal>
 #include <cstdio>
 
-#include <Windows.h>
-
-#include "fly/logger/logger.h"
-#include "fly/types/string.h"
-
 namespace fly {
 
-namespace
-{
-    static const DWORD s_formatFlags = (
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_IGNORE_INSERTS
-    );
+namespace {
 
-    static const DWORD s_langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
-}
+    const DWORD s_formatFlags = FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS;
+
+    const DWORD s_langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
+
+} // namespace
 
 //==============================================================================
 void SystemImpl::PrintBacktrace()
@@ -89,10 +87,9 @@ std::string SystemImpl::GetErrorString(int code)
 //==============================================================================
 std::vector<int> SystemImpl::GetSignals()
 {
-    return std::vector<int>
-    {
+    return std::vector<int>{
         SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV
     };
 }
 
-}
+} // namespace fly

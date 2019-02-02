@@ -1,12 +1,12 @@
 #pragma once
 
-#include <atomic>
-#include <memory>
-#include <string>
-
 #include "fly/fly.h"
 #include "fly/socket/async_request.h"
 #include "fly/socket/socket_types.h"
+
+#include <atomic>
+#include <memory>
+#include <string>
 
 namespace fly {
 
@@ -337,12 +337,8 @@ protected:
      *
      * @return The number of bytes sent.
      */
-    virtual size_t SendTo(
-        const std::string &,
-        address_type,
-        port_type,
-        bool &
-    ) const = 0;
+    virtual size_t
+    SendTo(const std::string &, address_type, port_type, bool &) const = 0;
 
     /**
      * Write data on the socket.
@@ -354,12 +350,8 @@ protected:
      *
      * @return The number of bytes sent.
      */
-    size_t SendTo(
-        const std::string &,
-        const std::string &,
-        port_type,
-        bool &
-    ) const;
+    size_t
+    SendTo(const std::string &, const std::string &, port_type, bool &) const;
 
     /**
      * Read data on this socket until the end-of-message character is received.
@@ -418,6 +410,6 @@ private:
     std::string m_receiveBuffer;
 };
 
-}
+} // namespace fly
 
 #include FLY_OS_IMPL_PATH(socket, socket)

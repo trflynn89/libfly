@@ -1,9 +1,9 @@
 #pragma once
 
+#include "fly/types/json.h"
+
 #include <istream>
 #include <string>
-
-#include "fly/types/json.h"
 
 namespace fly {
 
@@ -68,4 +68,4 @@ private:
     void consumeByteOrderMark(std::istream &);
 };
 
-}
+} // namespace fly

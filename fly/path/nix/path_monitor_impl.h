@@ -1,12 +1,12 @@
 #pragma once
 
-#include <chrono>
-#include <memory>
-#include <string>
+#include "fly/path/path_monitor.h"
 
 #include <sys/inotify.h>
 
-#include "fly/path/path_monitor.h"
+#include <chrono>
+#include <memory>
+#include <string>
 
 namespace fly {
 
@@ -28,8 +28,7 @@ public:
      */
     PathMonitorImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<PathConfig> &
-    );
+        const std::shared_ptr<PathConfig> &);
 
     /**
      * Destructor. Close the path monitor's inotify handle.
@@ -52,9 +51,8 @@ protected:
      */
     void Poll(const std::chrono::milliseconds &) override;
 
-    std::shared_ptr<PathMonitor::PathInfo> CreatePathInfo(
-        const std::string &
-    ) const override;
+    std::shared_ptr<PathMonitor::PathInfo>
+    CreatePathInfo(const std::string &) const override;
 
 private:
     /**
@@ -102,4 +100,4 @@ private:
     int m_monitorDescriptor;
 };
 
-}
+} // namespace fly

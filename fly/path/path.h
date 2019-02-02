@@ -1,9 +1,9 @@
 #pragma once
 
+#include "fly/types/string.h"
+
 #include <string>
 #include <vector>
-
-#include "fly/types/string.h"
 
 namespace fly {
 
@@ -46,8 +46,7 @@ public:
     static bool ListPath(
         const std::string &,
         std::vector<std::string> &,
-        std::vector<std::string> &
-    );
+        std::vector<std::string> &);
 
     /**
      * @return The system's path separator.
@@ -63,7 +62,7 @@ public:
      *
      * @return The resulting join of the given arguments.
      */
-    template <typename ... Args>
+    template <typename... Args>
     static std::string Join(const Args &...);
 
     /**
@@ -83,8 +82,8 @@ public:
 };
 
 //==============================================================================
-template <typename ... Args>
-std::string Path::Join(const Args &...args)
+template <typename... Args>
+std::string Path::Join(const Args &... args)
 {
     static const char separator(GetSeparator());
     static const std::string separator2x(2, separator);
@@ -95,4 +94,4 @@ std::string Path::Join(const Args &...args)
     return path;
 }
 
-}
+} // namespace fly

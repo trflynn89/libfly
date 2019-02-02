@@ -1,13 +1,13 @@
 #include "fly/config/config_manager.h"
 
-#include <functional>
-
 #include "fly/parser/exceptions.h"
 #include "fly/parser/ini_parser.h"
 #include "fly/parser/json_parser.h"
 #include "fly/path/path_config.h"
 #include "fly/path/path_monitor.h"
 #include "fly/task/task_runner.h"
+
+#include <functional>
 
 namespace fly {
 
@@ -16,26 +16,27 @@ ConfigManager::ConfigManager(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     ConfigFileType fileType,
     const std::string &path,
-    const std::string &file
-) :
+    const std::string &file) :
     m_path(path),
     m_file(file),
     m_spTaskRunner(spTaskRunner)
 {
     switch (fileType)
     {
-    case ConfigFileType::Ini:
-        m_spParser = std::make_shared<IniParser>();
-        break;
+        case ConfigFileType::Ini:
+            m_spParser = std::make_shared<IniParser>();
+            break;
 
-    case ConfigFileType::Json:
-        m_spParser = std::make_shared<JsonParser>();
-        break;
+        case ConfigFileType::Json:
+            m_spParser = std::make_shared<JsonParser>();
+            break;
 
-    default:
-        LOGE(-1, "Unrecognized configuration type: %d",
-            static_cast<int>(fileType));
-        break;
+        default:
+            LOGE(
+                -1,
+                "Unrecognized configuration type: %d",
+                static_cast<int>(fileType));
+            break;
     }
 }
 
@@ -53,7 +54,7 @@ ConfigManager::ConfigMap::size_type ConfigManager::GetSize()
 {
     std::lock_guard<std::mutex> lock(m_configsMutex);
 
-    for (auto it = m_configs.begin(); it != m_configs.end(); )
+    for (auto it = m_configs.begin(); it != m_configs.end();)
     {
         std::shared_ptr<Config> spConfig = it->second.lock();
 
@@ -76,9 +77,7 @@ bool ConfigManager::Start()
     if (m_spParser)
     {
         m_spMonitor = std::make_shared<PathMonitorImpl>(
-            m_spTaskRunner,
-            CreateConfig<PathConfig>()
-        );
+            m_spTaskRunner, CreateConfig<PathConfig>());
 
         if (m_spMonitor->Start())
         {
@@ -87,11 +86,12 @@ bool ConfigManager::Start()
             m_spTask = std::make_shared<ConfigUpdateTask>(wpConfigManager);
             std::weak_ptr<Task> wpTask = m_spTask;
 
+            // Formatter doesn't put bracket on newline after lambdas
+            // clang-format off
             auto callback = [wpConfigManager, wpTask](
                 const std::string &,
                 const std::string &,
-                PathMonitor::PathEvent
-            )
+                PathMonitor::PathEvent)
             {
                 auto spConfigManager = wpConfigManager.lock();
                 auto spTask = wpTask.lock();
@@ -101,6 +101,7 @@ bool ConfigManager::Start()
                     spConfigManager->m_spTaskRunner->PostTask(spTask);
                 }
             };
+            // clang-format on
 
             return m_spMonitor->AddFile(m_path, m_file, callback);
         }
@@ -126,7 +127,7 @@ void ConfigManager::updateConfig()
 
     if (m_values.IsObject() || m_values.IsNull())
     {
-        for (auto it = m_configs.begin(); it != m_configs.end(); )
+        for (auto it = m_configs.begin(); it != m_configs.end();)
         {
             std::shared_ptr<Config> spConfig = it->second.lock();
 
@@ -150,8 +151,7 @@ void ConfigManager::updateConfig()
 
 //==============================================================================
 ConfigUpdateTask::ConfigUpdateTask(
-    const std::weak_ptr<ConfigManager> &wpConfigManager
-) :
+    const std::weak_ptr<ConfigManager> &wpConfigManager) :
     Task(),
     m_wpConfigManager(wpConfigManager)
 {
@@ -168,4 +168,4 @@ void ConfigUpdateTask::Run()
     }
 }
 
-}
+} // namespace fly

@@ -1,17 +1,18 @@
 #include "fly/task/task_manager.h"
 
-#include <thread>
-
 #include "fly/logger/logger.h"
 #include "fly/task/task.h"
 #include "fly/task/task_runner.h"
 
+#include <thread>
+
 namespace fly {
 
-namespace
-{
-    static std::chrono::milliseconds s_delay(10);
-}
+namespace {
+
+    const std::chrono::milliseconds s_delay(10);
+
+} // namespace
 
 //==============================================================================
 TaskManager::TaskManager(int numWorkers) :
@@ -33,13 +34,11 @@ bool TaskManager::Start()
         for (int i = 0; i < m_numWorkers; ++i)
         {
             m_futures.push_back(std::async(
-                std::launch::async, &TaskManager::workerThread, spTaskManager
-            ));
+                std::launch::async, &TaskManager::workerThread, spTaskManager));
         }
 
         m_futures.push_back(std::async(
-            std::launch::async, &TaskManager::timerThread, spTaskManager
-        ));
+            std::launch::async, &TaskManager::timerThread, spTaskManager));
 
         return true;
     }
@@ -73,10 +72,9 @@ bool TaskManager::Stop()
 //==============================================================================
 void TaskManager::postTask(
     const std::weak_ptr<Task> &wpTask,
-    const std::weak_ptr<TaskRunner> &wpTaskRunner
-)
+    const std::weak_ptr<TaskRunner> &wpTaskRunner)
 {
-    TaskHolder task { wpTask, wpTaskRunner, std::chrono::steady_clock::now() };
+    TaskHolder task{ wpTask, wpTaskRunner, std::chrono::steady_clock::now() };
     m_tasks.Push(task);
 }
 
@@ -84,11 +82,10 @@ void TaskManager::postTask(
 void TaskManager::postTaskWithDelay(
     const std::weak_ptr<Task> &wpTask,
     const std::weak_ptr<TaskRunner> &wpTaskRunner,
-    std::chrono::milliseconds delay
-)
+    std::chrono::milliseconds delay)
 {
     auto schedule = std::chrono::steady_clock::now() + delay;
-    TaskHolder task { wpTask, wpTaskRunner, schedule };
+    TaskHolder task{ wpTask, wpTaskRunner, schedule };
 
     std::unique_lock<std::mutex> lock(m_delayedTasksMutex);
     m_delayedTasks.push_back(task);
@@ -128,7 +125,7 @@ void TaskManager::timerThread()
         {
             std::unique_lock<std::mutex> lock(m_delayedTasksMutex);
 
-            for (auto it = m_delayedTasks.begin(); it != m_delayedTasks.end(); )
+            for (auto it = m_delayedTasks.begin(); it != m_delayedTasks.end();)
             {
                 if (it->m_schedule <= now)
                 {
@@ -152,4 +149,4 @@ void TaskManager::timerThread()
     }
 }
 
-}
+} // namespace fly

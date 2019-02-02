@@ -10,13 +10,14 @@
 
 namespace fly {
 
-namespace
-{
-    static const std::string s_alphaNum =
+namespace {
+
+    const std::string s_alphaNum =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz";
-}
+
+} // namespace
 
 //==============================================================================
 std::vector<std::string> String::Split(const std::string &input, char delim)
@@ -25,11 +26,8 @@ std::vector<std::string> String::Split(const std::string &input, char delim)
 }
 
 //==============================================================================
-std::vector<std::string> String::Split(
-    const std::string &input,
-    char delim,
-    size_t max
-)
+std::vector<std::string>
+String::Split(const std::string &input, char delim, size_t max)
 {
     std::string item;
     std::stringstream ss(input);
@@ -59,20 +57,28 @@ std::vector<std::string> String::Split(
 void String::Trim(std::string &str)
 {
     // Remove leading whitespace
-    str.erase(str.begin(), std::find_if(str.begin(), str.end(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))));
+    str.erase(
+        str.begin(),
+        std::find_if(
+            str.begin(),
+            str.end(),
+            std::not1(std::ptr_fun<int, int>(std::isspace))));
 
     // Remove trailing whitespace
-    str.erase(std::find_if(str.rbegin(), str.rend(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))).base(), str.end());
+    str.erase(
+        std::find_if(
+            str.rbegin(),
+            str.rend(),
+            std::not1(std::ptr_fun<int, int>(std::isspace)))
+            .base(),
+        str.end());
 }
 
 //==============================================================================
 void String::ReplaceAll(
     std::string &target,
     const std::string &search,
-    const char &replace
-)
+    const char &replace)
 {
     size_t pos = target.find(search);
 
@@ -87,8 +93,7 @@ void String::ReplaceAll(
 void String::ReplaceAll(
     std::string &target,
     const std::string &search,
-    const std::string &replace
-)
+    const std::string &replace)
 {
     size_t pos = target.find(search);
 
@@ -102,8 +107,7 @@ void String::ReplaceAll(
 //==============================================================================
 void String::RemoveAll(std::string &target, const std::string &search)
 {
-    static const std::string empty;
-    ReplaceAll(target, search, empty);
+    ReplaceAll(target, search, std::string());
 }
 
 //==============================================================================
@@ -111,15 +115,14 @@ std::string String::GenerateRandomString(const size_t len)
 {
     typedef std::uniform_int_distribution<short> short_distribution;
 
-    static auto now = std::chrono::system_clock::now().time_since_epoch();
+    auto now = std::chrono::system_clock::now().time_since_epoch();
 
-    static auto seed = static_cast<std::mt19937::result_type>(now.count());
-    static auto limit = static_cast<short_distribution::result_type>(
-        s_alphaNum.size() - 1
-    );
+    auto seed = static_cast<std::mt19937::result_type>(now.count());
+    auto limit =
+        static_cast<short_distribution::result_type>(s_alphaNum.size() - 1);
 
-    static std::mt19937 engine(seed);
-    static short_distribution distribution(0, limit);
+    std::mt19937 engine(seed);
+    short_distribution distribution(0, limit);
 
     std::string ret;
     ret.reserve(len);
@@ -491,4 +494,4 @@ void String::format(std::ostream &stream, const char *fmt)
     stream << fmt;
 }
 
-}
+} // namespace fly

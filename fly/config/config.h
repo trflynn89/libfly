@@ -1,9 +1,9 @@
 #pragma once
 
+#include "fly/types/json.h"
+
 #include <shared_mutex>
 #include <string>
-
-#include "fly/types/json.h"
 
 namespace fly {
 
@@ -72,4 +72,4 @@ T Config::GetValue(const std::string &name, T def) const
     return def;
 }
 
-}
+} // namespace fly

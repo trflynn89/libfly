@@ -1,12 +1,12 @@
 #pragma once
 
-#include <chrono>
-#include <memory>
-#include <string>
+#include "fly/path/path_monitor.h"
 
 #include <Windows.h>
 
-#include "fly/path/path_monitor.h"
+#include <chrono>
+#include <memory>
+#include <string>
 
 namespace fly {
 
@@ -28,8 +28,7 @@ public:
      */
     PathMonitorImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<PathConfig> &
-    );
+        const std::shared_ptr<PathConfig> &);
 
     /**
      * Destructor. Close the path monitor's IOCP.
@@ -52,9 +51,8 @@ protected:
      */
     void Poll(const std::chrono::milliseconds &) override;
 
-    std::shared_ptr<PathMonitor::PathInfo> CreatePathInfo(
-        const std::string &
-    ) const override;
+    std::shared_ptr<PathMonitor::PathInfo>
+    CreatePathInfo(const std::string &) const override;
 
 private:
     /**
@@ -95,8 +93,7 @@ private:
      */
     void handleEvents(
         const std::shared_ptr<PathInfoImpl> &,
-        const std::string &
-    ) const;
+        const std::string &) const;
 
     /**
      * Convert a FILE_NOTIFY_INFORMATION event to a PathEvent.
@@ -110,4 +107,4 @@ private:
     HANDLE m_iocp;
 };
 
-}
+} // namespace fly

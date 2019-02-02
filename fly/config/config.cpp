@@ -15,4 +15,4 @@ void Config::Update(const Json &values)
     m_values = values;
 }
 
-}
+} // namespace fly

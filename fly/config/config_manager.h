@@ -1,15 +1,15 @@
 #pragma once
 
+#include "fly/config/config.h"
+#include "fly/logger/logger.h"
+#include "fly/task/task.h"
+#include "fly/types/json.h"
+
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <type_traits>
-
-#include "fly/config/config.h"
-#include "fly/logger/logger.h"
-#include "fly/task/task.h"
-#include "fly/types/json.h"
 
 namespace fly {
 
@@ -55,8 +55,7 @@ public:
         const std::shared_ptr<SequencedTaskRunner> &,
         ConfigFileType,
         const std::string &,
-        const std::string &
-    );
+        const std::string &);
 
     /**
      * Destructor. Stop the configuration manager and underlying objects.
@@ -134,7 +133,8 @@ private:
 template <typename T>
 std::shared_ptr<T> ConfigManager::CreateConfig()
 {
-    static_assert(std::is_base_of<Config, T>::value,
+    static_assert(
+        std::is_base_of<Config, T>::value,
         "Given type is not a configuration type");
 
     std::shared_ptr<T> spConfig;
@@ -175,4 +175,4 @@ std::shared_ptr<T> ConfigManager::CreateConfig()
     return spConfig;
 }
 
-}
+} // namespace fly

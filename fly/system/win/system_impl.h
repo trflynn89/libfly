@@ -21,4 +21,4 @@ public:
     static std::vector<int> GetSignals();
 };
 
-}
+} // namespace fly

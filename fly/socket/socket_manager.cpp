@@ -1,19 +1,18 @@
 #include "fly/socket/socket_manager.h"
 
-#include <algorithm>
-
 #include "fly/logger/logger.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_config.h"
 #include "fly/task/task_runner.h"
+
+#include <algorithm>
 
 namespace fly {
 
 //==============================================================================
 SocketManager::SocketManager(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SocketConfig> &spConfig
-) :
+    const std::shared_ptr<SocketConfig> &spConfig) :
     m_spTaskRunner(spTaskRunner),
     m_spConfig(spConfig),
     m_newClientCallback(nullptr),
@@ -42,8 +41,7 @@ void SocketManager::Start()
 //==============================================================================
 void SocketManager::SetClientCallbacks(
     SocketCallback newClient,
-    SocketCallback closedClient
-)
+    SocketCallback closedClient)
 {
     std::lock_guard<std::mutex> lock(m_callbackMutex);
 
@@ -94,34 +92,29 @@ std::weak_ptr<Socket> SocketManager::CreateAsyncSocket(Protocol protocol)
 //==============================================================================
 void SocketManager::HandleNewAndClosedSockets(
     const SocketList &newSockets,
-    const SocketList &closedSockets
-)
+    const SocketList &closedSockets)
 {
     // Add new sockets to the socket system
     m_aioSockets.insert(
-        m_aioSockets.end(), newSockets.begin(), newSockets.end()
-    );
+        m_aioSockets.end(), newSockets.begin(), newSockets.end());
 
     // Remove closed sockets from the socket system
     for (const std::shared_ptr<Socket> &spSocket : closedSockets)
     {
-        auto is_same = [&spSocket](const std::shared_ptr<Socket> &spClosed)
-        {
+        auto is_same = [&spSocket](const std::shared_ptr<Socket> &spClosed) {
             return (spSocket->GetSocketId() == spClosed->GetSocketId());
         };
 
         m_aioSockets.erase(
             std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), is_same),
-            m_aioSockets.end()
-        );
+            m_aioSockets.end());
     }
 }
 
 //==============================================================================
 void SocketManager::TriggerCallbacks(
     const SocketList &connectedClients,
-    const SocketList &closedClients
-)
+    const SocketList &closedClients)
 {
     if (!connectedClients.empty() || !closedClients.empty())
     {
@@ -147,8 +140,7 @@ void SocketManager::TriggerCallbacks(
 
 //==============================================================================
 SocketManagerTask::SocketManagerTask(
-    const std::weak_ptr<SocketManager> &wpSocketManager
-) :
+    const std::weak_ptr<SocketManager> &wpSocketManager) :
     Task(),
     m_wpSocketManager(wpSocketManager)
 {
@@ -166,4 +158,4 @@ void SocketManagerTask::Run()
     }
 }
 
-}
+} // namespace fly

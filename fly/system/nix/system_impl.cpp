@@ -1,11 +1,11 @@
 #include "fly/system/nix/system_impl.h"
 
+#include <execinfo.h>
+#include <unistd.h>
+
 #include <chrono>
 #include <csignal>
 #include <cstring>
-
-#include <execinfo.h>
-#include <unistd.h>
 
 namespace fly {
 
@@ -54,10 +54,8 @@ std::string SystemImpl::GetErrorString(int code)
 //==============================================================================
 std::vector<int> SystemImpl::GetSignals()
 {
-    return std::vector<int>
-    {
-        SIGINT, SIGTERM, SIGSYS, SIGBUS, SIGILL, SIGFPE, SIGABRT, SIGSEGV
-    };
+    return std::vector<int>{ SIGINT, SIGTERM, SIGSYS,  SIGBUS,
+                             SIGILL, SIGFPE,  SIGABRT, SIGSEGV };
 }
 
-}
+} // namespace fly

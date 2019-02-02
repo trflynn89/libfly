@@ -53,4 +53,4 @@ public:
     static void SetSignalHandler(SignalHandler);
 };
 
-}
+} // namespace fly

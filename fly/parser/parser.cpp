@@ -1,9 +1,9 @@
 #include "fly/parser/parser.h"
 
+#include "fly/path/path.h"
+
 #include <fstream>
 #include <sstream>
-
-#include "fly/path/path.h"
 
 namespace fly {
 
@@ -49,7 +49,7 @@ void Parser::consumeByteOrderMark(std::istream &stream)
                     return;
                 }
 
-               stream.unget();
+                stream.unget();
             }
 
             stream.unget();
@@ -119,4 +119,4 @@ void Parser::consumeByteOrderMark(std::istream &stream)
     }
 }
 
-}
+} // namespace fly

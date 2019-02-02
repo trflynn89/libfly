@@ -48,8 +48,7 @@ bool TaskRunner::PostTaskToTaskManager(const std::weak_ptr<Task> &wpTask)
 
 //==============================================================================
 ParallelTaskRunner::ParallelTaskRunner(
-    const std::weak_ptr<TaskManager> &wpTaskManager
-) :
+    const std::weak_ptr<TaskManager> &wpTaskManager) :
     TaskRunner(wpTaskManager)
 {
 }
@@ -67,8 +66,7 @@ void ParallelTaskRunner::TaskComplete(const std::shared_ptr<Task> &)
 
 //==============================================================================
 SequencedTaskRunner::SequencedTaskRunner(
-    const std::weak_ptr<TaskManager> &wpTaskManager
-) :
+    const std::weak_ptr<TaskManager> &wpTaskManager) :
     TaskRunner(wpTaskManager),
     m_aHasRunningTask(false)
 {
@@ -115,4 +113,4 @@ bool SequencedTaskRunner::maybePostTask()
     return true;
 }
 
-}
+} // namespace fly

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
-
 #include "fly/socket/socket_types.h"
 #include "fly/types/concurrent_queue.h"
+
+#include <string>
 
 namespace fly {
 
@@ -89,4 +89,4 @@ private:
     port_type m_port;
 };
 
-}
+} // namespace fly

@@ -9,8 +9,7 @@ namespace fly {
 //==============================================================================
 PathMonitor::PathMonitor(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<PathConfig> &spConfig
-) :
+    const std::shared_ptr<PathConfig> &spConfig) :
     m_spTaskRunner(spTaskRunner),
     m_spConfig(spConfig)
 {
@@ -93,8 +92,7 @@ void PathMonitor::RemoveAllPaths()
 bool PathMonitor::AddFile(
     const std::string &path,
     const std::string &file,
-    PathEventCallback callback
-)
+    PathEventCallback callback)
 {
     if (callback == nullptr)
     {
@@ -150,9 +148,8 @@ bool PathMonitor::RemoveFile(const std::string &path, const std::string &file)
 }
 
 //==============================================================================
-std::shared_ptr<PathMonitor::PathInfo> PathMonitor::getOrCreatePathInfo(
-    const std::string &path
-)
+std::shared_ptr<PathMonitor::PathInfo>
+PathMonitor::getOrCreatePathInfo(const std::string &path)
 {
     std::shared_ptr<PathInfo> spInfo;
 
@@ -180,25 +177,25 @@ std::shared_ptr<PathMonitor::PathInfo> PathMonitor::getOrCreatePathInfo(
 }
 
 //==============================================================================
-std::ostream &operator << (std::ostream &stream, PathMonitor::PathEvent event)
+std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event)
 {
     switch (event)
     {
-    case PathMonitor::PathEvent::None:
-        stream << "None";
-        break;
+        case PathMonitor::PathEvent::None:
+            stream << "None";
+            break;
 
-    case PathMonitor::PathEvent::Created:
-        stream << "Created";
-        break;
+        case PathMonitor::PathEvent::Created:
+            stream << "Created";
+            break;
 
-    case PathMonitor::PathEvent::Deleted:
-        stream << "Deleted";
-        break;
+        case PathMonitor::PathEvent::Deleted:
+            stream << "Deleted";
+            break;
 
-    case PathMonitor::PathEvent::Changed:
-        stream << "Changed";
-        break;
+        case PathMonitor::PathEvent::Changed:
+            stream << "Changed";
+            break;
     }
 
     return stream;
@@ -206,8 +203,7 @@ std::ostream &operator << (std::ostream &stream, PathMonitor::PathEvent event)
 
 //==============================================================================
 PathMonitorTask::PathMonitorTask(
-    const std::weak_ptr<PathMonitor> &wpPathMonitor
-) :
+    const std::weak_ptr<PathMonitor> &wpPathMonitor) :
     Task(),
     m_wpPathMonitor(wpPathMonitor)
 {
@@ -229,4 +225,4 @@ void PathMonitorTask::Run()
     }
 }
 
-}
+} // namespace fly

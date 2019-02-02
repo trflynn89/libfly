@@ -1,10 +1,10 @@
 #pragma once
 
+#include "fly/fly.h"
+
 #include <iostream>
 #include <memory>
 #include <string>
-
-#include "fly/fly.h"
 
 namespace fly {
 
@@ -60,9 +60,9 @@ struct Log
     unsigned int m_line;
     std::string m_message;
 
-    friend std::ostream &operator << (std::ostream &, const Log &);
+    friend std::ostream &operator<<(std::ostream &, const Log &);
 
-    friend std::ostream &operator << (std::ostream &, const Level &);
+    friend std::ostream &operator<<(std::ostream &, const Level &);
 };
 
-}
+} // namespace fly

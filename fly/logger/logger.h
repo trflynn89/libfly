@@ -1,12 +1,5 @@
 #pragma once
 
-#include <chrono>
-#include <cstdarg>
-#include <fstream>
-#include <memory>
-#include <mutex>
-#include <string>
-
 #include "fly/fly.h"
 #include "fly/logger/log.h"
 #include "fly/system/system.h"
@@ -14,59 +7,47 @@
 #include "fly/types/concurrent_queue.h"
 #include "fly/types/string.h"
 
+#include <chrono>
+#include <cstdarg>
+#include <fstream>
+#include <memory>
+#include <mutex>
+#include <string>
+
 //==============================================================================
 #define LOG(lvl, fixed, fmt)                                                   \
-(                                                                              \
-    fly::Logger::AddLog(lvl, fixed, __FILE__, __FUNCTION__, __LINE__, fmt)     \
-)
+    fly::Logger::AddLog(lvl, fixed, __FILE__, __FUNCTION__, __LINE__, fmt)
 
 //==============================================================================
 #define LOGD(fixed, fmt, ...)                                                  \
-(                                                                              \
-    LOG(fly::Log::Level::Debug, fixed,                                         \
-        fly::String::Format(fmt, ##__VA_ARGS__))                               \
-)
+    LOG(fly::Log::Level::Debug, fixed, fly::String::Format(fmt, ##__VA_ARGS__))
 
 //==============================================================================
 #define LOGI(fixed, fmt, ...)                                                  \
-(                                                                              \
-    LOG(fly::Log::Level::Info, fixed,                                          \
-        fly::String::Format(fmt, ##__VA_ARGS__))                               \
-)
+    LOG(fly::Log::Level::Info, fixed, fly::String::Format(fmt, ##__VA_ARGS__))
 
 //==============================================================================
 #define LOGW(fixed, fmt, ...)                                                  \
-(                                                                              \
-    LOG(fly::Log::Level::Warn, fixed,                                          \
-        fly::String::Format(fmt, ##__VA_ARGS__))                               \
-)
+    LOG(fly::Log::Level::Warn, fixed, fly::String::Format(fmt, ##__VA_ARGS__))
 
 //==============================================================================
 #define LOGS(fixed, fmt, ...)                                                  \
-(                                                                              \
-    LOG(fly::Log::Level::Warn, fixed,                                          \
+    LOG(fly::Log::Level::Warn,                                                 \
+        fixed,                                                                 \
         fly::String::Format(fmt ": ", ##__VA_ARGS__) +                         \
-            fly::System::GetErrorString())                                     \
-)
+            fly::System::GetErrorString())
 
 //==============================================================================
 #define LOGE(fixed, fmt, ...)                                                  \
-(                                                                              \
-    LOG(fly::Log::Level::Error, fixed,                                         \
-        fly::String::Format(fmt, ##__VA_ARGS__))                               \
-)
+    LOG(fly::Log::Level::Error, fixed, fly::String::Format(fmt, ##__VA_ARGS__))
 
 //==============================================================================
 #define LOGC(fmt, ...)                                                         \
-(                                                                              \
-    fly::Logger::ConsoleLog(true, fly::String::Format(fmt, ##__VA_ARGS__))     \
-)
+    fly::Logger::ConsoleLog(true, fly::String::Format(fmt, ##__VA_ARGS__))
 
 //==============================================================================
 #define LOGC_NO_LOCK(fmt, ...)                                                 \
-(                                                                              \
-    fly::Logger::ConsoleLog(false, fly::String::Format(fmt, ##__VA_ARGS__))    \
-)
+    fly::Logger::ConsoleLog(false, fly::String::Format(fmt, ##__VA_ARGS__))
 
 namespace fly {
 
@@ -112,8 +93,7 @@ public:
     Logger(
         const std::shared_ptr<SequencedTaskRunner> &,
         const std::shared_ptr<LoggerConfig> &,
-        const std::string &
-    );
+        const std::string &);
 
     /**
      * Set the logger instance so that the LOG* macros function.
@@ -151,8 +131,7 @@ public:
         const char *,
         const char *,
         unsigned int,
-        const std::string &
-    );
+        const std::string &);
 
     /**
      * Create the logger's log file on disk and initialize the logger task.
@@ -191,8 +170,7 @@ private:
         const char *,
         const char *,
         unsigned int,
-        const std::string &
-    );
+        const std::string &);
 
     /**
      * Create the log file. If a log file is already open, close it.
@@ -243,4 +221,4 @@ private:
     std::weak_ptr<Logger> m_wpLogger;
 };
 
-}
+} // namespace fly

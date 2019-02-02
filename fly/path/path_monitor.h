@@ -1,13 +1,13 @@
 #pragma once
 
+#include "fly/fly.h"
+#include "fly/task/task.h"
+
 #include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
-
-#include "fly/fly.h"
-#include "fly/task/task.h"
 
 namespace fly {
 
@@ -43,9 +43,8 @@ public:
     /**
      * Callback definition for function to be triggered on a path change.
      */
-    using PathEventCallback = std::function<void(
-        const std::string &, const std::string &, PathEvent
-    )>;
+    using PathEventCallback = std::function<
+        void(const std::string &, const std::string &, PathEvent)>;
 
     /**
      * Constructor.
@@ -55,8 +54,7 @@ public:
      */
     PathMonitor(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<PathConfig> &
-    );
+        const std::shared_ptr<PathConfig> &);
 
     /**
      * Destructor. Remove all paths from the path monitor.
@@ -153,9 +151,8 @@ protected:
      *
      * @return PathInfo Up-casted shared pointer to the PathInfo struct.
      */
-    virtual std::shared_ptr<PathInfo> CreatePathInfo(
-        const std::string &
-    ) const = 0;
+    virtual std::shared_ptr<PathInfo>
+    CreatePathInfo(const std::string &) const = 0;
 
     /**
      * Check if the path monitor implementation is valid.
@@ -189,7 +186,7 @@ private:
     /**
      * Stream the name of a Json instance's type.
      */
-    friend std::ostream &operator << (std::ostream &, PathEvent);
+    friend std::ostream &operator<<(std::ostream &, PathEvent);
 
     std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
     std::shared_ptr<Task> m_spTask;
@@ -220,6 +217,6 @@ private:
     std::weak_ptr<PathMonitor> m_wpPathMonitor;
 };
 
-}
+} // namespace fly
 
 #include FLY_OS_IMPL_PATH(path, path_monitor)

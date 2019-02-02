@@ -1,10 +1,10 @@
 #include "fly/path/win/path_impl.h"
 
+#include "fly/logger/logger.h"
+
 #include <shlobj.h>
 #include <strsafe.h>
 #include <tchar.h>
-
-#include "fly/logger/logger.h"
 
 namespace fly {
 
@@ -32,10 +32,8 @@ bool PathImpl::MakePath(const std::string &path)
     }
 
     return (
-        (ret == ERROR_SUCCESS) ||
-        (ret == ERROR_FILE_EXISTS) ||
-        (ret == ERROR_ALREADY_EXISTS)
-    );
+        (ret == ERROR_SUCCESS) || (ret == ERROR_FILE_EXISTS) ||
+        (ret == ERROR_ALREADY_EXISTS));
 }
 
 //==============================================================================
@@ -52,16 +50,8 @@ bool PathImpl::RemovePath(const std::string &path)
         // SHFILEOPSTRUCT requires the path to be double-NULL-terminated
         buffer[len + 1] = '\0';
 
-        SHFILEOPSTRUCT operation = {
-            NULL,
-            FO_DELETE,
-            buffer,
-            NULL,
-            FOF_NO_UI,
-            FALSE,
-            NULL,
-            NULL
-        };
+        SHFILEOPSTRUCT operation = { NULL,      FO_DELETE, buffer, NULL,
+                                     FOF_NO_UI, FALSE,     NULL,   NULL };
 
         int error = ::SHFileOperation(&operation);
 
@@ -83,8 +73,7 @@ bool PathImpl::RemovePath(const std::string &path)
 bool PathImpl::ListPath(
     const std::string &path,
     std::vector<std::string> &directories,
-    std::vector<std::string> &files
-)
+    std::vector<std::string> &files)
 {
     // For FindFile(), need to append "\\*" - make sure there is enough space
     if (path.length() > (MAX_PATH - 3))
@@ -158,10 +147,8 @@ bool PathImpl::PathIsFile(LPCSTR path)
 {
     DWORD attributes = ::GetFileAttributes(path);
 
-    return (
-        (attributes != INVALID_FILE_ATTRIBUTES) &&
-        ((attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
-    );
+    return (attributes != INVALID_FILE_ATTRIBUTES) &&
+        ((attributes & FILE_ATTRIBUTE_DIRECTORY) == 0);
 }
 
-}
+} // namespace fly

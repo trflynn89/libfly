@@ -1,13 +1,13 @@
 #pragma once
 
+#include "fly/types/concurrent_queue.h"
+
 #include <atomic>
 #include <chrono>
 #include <future>
 #include <memory>
 #include <mutex>
 #include <vector>
-
-#include "fly/types/concurrent_queue.h"
 
 namespace fly {
 
@@ -83,10 +83,8 @@ private:
      * @param Task Weak reference to the task the be executed.
      * @param TaskRunner Weak reference to the task runner posting the task.
      */
-    void postTask(
-        const std::weak_ptr<Task> &,
-        const std::weak_ptr<TaskRunner> &
-    );
+    void
+    postTask(const std::weak_ptr<Task> &, const std::weak_ptr<TaskRunner> &);
 
     /**
      * Schedule a task to be posted for execution after some delay.
@@ -98,8 +96,7 @@ private:
     void postTaskWithDelay(
         const std::weak_ptr<Task> &,
         const std::weak_ptr<TaskRunner> &,
-        std::chrono::milliseconds
-    );
+        std::chrono::milliseconds);
 
     /**
      * Worker thread for executing tasks.
@@ -127,11 +124,12 @@ private:
 template <typename TaskRunnerType>
 std::shared_ptr<TaskRunnerType> TaskManager::CreateTaskRunner()
 {
-    static_assert(std::is_base_of<TaskRunner, TaskRunnerType>::value,
+    static_assert(
+        std::is_base_of<TaskRunner, TaskRunnerType>::value,
         "Given type is not a task runner");
 
     const std::shared_ptr<TaskManager> spTaskManager = shared_from_this();
     return std::shared_ptr<TaskRunnerType>(new TaskRunnerType(spTaskManager));
 }
 
-}
+} // namespace fly

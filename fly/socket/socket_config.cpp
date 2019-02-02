@@ -21,11 +21,8 @@ std::string SocketConfig::GetName()
 //==============================================================================
 std::chrono::microseconds SocketConfig::IoWaitTime() const
 {
-    return std::chrono::microseconds(
-        GetValue<std::chrono::microseconds::rep>(
-            "io_wait_time", m_defaultIoWaitTime
-        )
-    );
+    return std::chrono::microseconds(GetValue<std::chrono::microseconds::rep>(
+        "io_wait_time", m_defaultIoWaitTime));
 }
 
 //==============================================================================
@@ -40,4 +37,4 @@ size_t SocketConfig::PacketSize() const
     return GetValue<size_t>("packet_size", m_defaultPacketSize);
 }
 
-}
+} // namespace fly

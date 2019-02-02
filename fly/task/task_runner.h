@@ -1,10 +1,10 @@
 #pragma once
 
+#include "fly/types/concurrent_queue.h"
+
 #include <atomic>
 #include <chrono>
 #include <memory>
-
-#include "fly/types/concurrent_queue.h"
 
 namespace fly {
 
@@ -57,10 +57,8 @@ public:
      *
      * @return bool True if the task was posted for delayed execution.
      */
-    bool PostTaskWithDelay(
-        const std::weak_ptr<Task> &,
-        std::chrono::milliseconds
-    );
+    bool
+    PostTaskWithDelay(const std::weak_ptr<Task> &, std::chrono::milliseconds);
 
 protected:
     /**
@@ -162,4 +160,4 @@ private:
     std::atomic_bool m_aHasRunningTask;
 };
 
-}
+} // namespace fly

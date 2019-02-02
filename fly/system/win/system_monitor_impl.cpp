@@ -1,25 +1,25 @@
 #include "fly/system/win/system_monitor_impl.h"
 
-#include <cstring>
-
-#include <Psapi.h>
-
 #include "fly/logger/logger.h"
 #include "fly/system/system_config.h"
 #include "fly/task/task_runner.h"
 
+#include <Psapi.h>
+
+#include <cstring>
+
 namespace fly {
 
-namespace
-{
-    static const LPCSTR s_cpuPath = "\\Processor(_Total)\\% Processor Time";
-}
+namespace {
+
+    const LPCSTR s_cpuPath = "\\Processor(_Total)\\% Processor Time";
+
+} // namespace
 
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SystemConfig> &spConfig
-) :
+    const std::shared_ptr<SystemConfig> &spConfig) :
     SystemMonitor(spTaskRunner, spConfig),
     m_process(::GetCurrentProcess()),
     m_cpuQuery(NULL),
@@ -91,8 +91,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
     }
 
     status = ::PdhGetFormattedCounterValue(
-        m_cpuCounter, PDH_FMT_DOUBLE, NULL, &value
-    );
+        m_cpuCounter, PDH_FMT_DOUBLE, NULL, &value);
     if (status != ERROR_SUCCESS)
     {
         LOGS(-1, "Could not format CPU counter (%x)", status);
@@ -116,8 +115,7 @@ void SystemMonitorImpl::UpdateProcessCpuUsage()
         ::memcpy(&system, &fsystem, sizeof(FILETIME));
         ::memcpy(&user, &fuser, sizeof(FILETIME));
 
-        ULONGLONG cpu =
-            (system.QuadPart - m_prevProcessSystemTime) +
+        ULONGLONG cpu = (system.QuadPart - m_prevProcessSystemTime) +
             (user.QuadPart - m_prevProcessUserTime);
 
         ULONGLONG time = now.QuadPart - m_prevTime;
@@ -166,4 +164,4 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage()
     }
 }
 
-}
+} // namespace fly

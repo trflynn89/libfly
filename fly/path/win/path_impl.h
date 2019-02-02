@@ -1,9 +1,9 @@
 #pragma once
 
+#include <Windows.h>
+
 #include <string>
 #include <vector>
-
-#include <Windows.h>
 
 namespace fly {
 
@@ -21,8 +21,7 @@ public:
     static bool ListPath(
         const std::string &,
         std::vector<std::string> &,
-        std::vector<std::string> &
-    );
+        std::vector<std::string> &);
     static char GetSeparator();
     static std::string GetTempDirectory();
 
@@ -30,4 +29,4 @@ private:
     static bool PathIsFile(LPCTSTR);
 };
 
-}
+} // namespace fly

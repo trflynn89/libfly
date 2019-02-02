@@ -6,42 +6,30 @@
 
 namespace fly {
 
-namespace
-{
-    static const DWORD s_accessFlags = (
-        FILE_LIST_DIRECTORY
-    );
+namespace {
 
-    static const DWORD s_shareFlags = (
-        FILE_SHARE_WRITE |
-        FILE_SHARE_READ |
-        FILE_SHARE_DELETE
-    );
+    const DWORD s_accessFlags = FILE_LIST_DIRECTORY;
 
-    static const DWORD s_dispositionFlags = (
-        OPEN_EXISTING
-    );
+    const DWORD s_shareFlags =
+        FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE;
 
-    static const DWORD s_attributeFlags = (
-        FILE_FLAG_BACKUP_SEMANTICS |
-        FILE_FLAG_OVERLAPPED
-    );
+    const DWORD s_dispositionFlags = OPEN_EXISTING;
 
-    static const DWORD s_changeFlags = (
-        FILE_NOTIFY_CHANGE_FILE_NAME |
-        FILE_NOTIFY_CHANGE_DIR_NAME |
-        FILE_NOTIFY_CHANGE_LAST_WRITE |
-        FILE_NOTIFY_CHANGE_CREATION
-    );
+    const DWORD s_attributeFlags =
+        FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED;
 
-    static const DWORD s_buffSize = 100;
-}
+    const DWORD s_changeFlags = FILE_NOTIFY_CHANGE_FILE_NAME |
+        FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE |
+        FILE_NOTIFY_CHANGE_CREATION;
+
+    const DWORD s_buffSize = 100;
+
+} // namespace
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<PathConfig> &spConfig
-) :
+    const std::shared_ptr<PathConfig> &spConfig) :
     PathMonitor(spTaskRunner, spConfig),
     m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
 {
@@ -81,13 +69,17 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        auto it = std::find_if(m_pathInfo.begin(), m_pathInfo.end(),
+        // Formatter doesn't put bracket on newline after lambdas
+        // clang-format off
+        auto it = std::find_if(
+            m_pathInfo.begin(),
+            m_pathInfo.end(),
             [&pKey](const PathInfoMap::value_type &val) -> bool
             {
                 auto spInfo(std::static_pointer_cast<PathInfoImpl>(val.second));
                 return ((ULONG_PTR)(spInfo->m_handle) == pKey);
-            }
-        );
+            });
+        // clang-format on
 
         if (it != m_pathInfo.end())
         {
@@ -96,7 +88,8 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 
             if (!spInfo->Refresh(it->first))
             {
-                // Hold onto the path to be removed until the mutex is released
+                // Hold onto the path to be removed until the mutex
+                // is released
                 pathToRemove = it->first;
             }
         }
@@ -109,9 +102,8 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 }
 
 //==============================================================================
-std::shared_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
-    const std::string &path
-) const
+std::shared_ptr<PathMonitor::PathInfo>
+PathMonitorImpl::CreatePathInfo(const std::string &path) const
 {
     std::shared_ptr<PathMonitor::PathInfo> spInfo;
 
@@ -126,8 +118,7 @@ std::shared_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
 //==============================================================================
 void PathMonitorImpl::handleEvents(
     const std::shared_ptr<PathInfoImpl> &spInfo,
-    const std::string &path
-) const
+    const std::string &path) const
 {
     PFILE_NOTIFY_INFORMATION pInfo = spInfo->m_pInfo;
 
@@ -138,9 +129,7 @@ void PathMonitorImpl::handleEvents(
         if (event != PathMonitor::PathEvent::None)
         {
             std::wstring wFile(
-                pInfo->FileName,
-                pInfo->FileNameLength / sizeof(wchar_t)
-            );
+                pInfo->FileName, pInfo->FileNameLength / sizeof(wchar_t));
             std::string file(wFile.begin(), wFile.end());
 
             auto callback = spInfo->m_fileHandlers[file];
@@ -152,8 +141,12 @@ void PathMonitorImpl::handleEvents(
 
             if (callback != nullptr)
             {
-                LOGI(-1, "Handling event %d for \"%s\" in \"%s\"",
-                    event, file, path);
+                LOGI(
+                    -1,
+                    "Handling event %d for \"%s\" in \"%s\"",
+                    event,
+                    file,
+                    path);
 
                 callback(path, file, event);
             }
@@ -166,8 +159,7 @@ void PathMonitorImpl::handleEvents(
         else
         {
             pInfo = reinterpret_cast<PFILE_NOTIFY_INFORMATION>(
-                reinterpret_cast<LPBYTE>(pInfo) + pInfo->NextEntryOffset
-            );
+                reinterpret_cast<LPBYTE>(pInfo) + pInfo->NextEntryOffset);
         }
     }
 }
@@ -179,22 +171,22 @@ PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
 
     switch (action)
     {
-    case FILE_ACTION_ADDED:
-    case FILE_ACTION_RENAMED_NEW_NAME:
-        event = PathMonitor::PathEvent::Created;
-        break;
+        case FILE_ACTION_ADDED:
+        case FILE_ACTION_RENAMED_NEW_NAME:
+            event = PathMonitor::PathEvent::Created;
+            break;
 
-    case FILE_ACTION_REMOVED:
-    case FILE_ACTION_RENAMED_OLD_NAME:
-        event = PathMonitor::PathEvent::Deleted;
-        break;
+        case FILE_ACTION_REMOVED:
+        case FILE_ACTION_RENAMED_OLD_NAME:
+            event = PathMonitor::PathEvent::Deleted;
+            break;
 
-    case FILE_ACTION_MODIFIED:
-        event = PathMonitor::PathEvent::Changed;
-        break;
+        case FILE_ACTION_MODIFIED:
+            event = PathMonitor::PathEvent::Changed;
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 
     return event;
@@ -203,8 +195,7 @@ PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
 //==============================================================================
 PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     HANDLE iocp,
-    const std::string &path
-) :
+    const std::string &path) :
     PathMonitorImpl::PathInfo(),
     m_valid(false),
     m_handle(INVALID_HANDLE_VALUE),
@@ -228,8 +219,7 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
         NULL,
         s_dispositionFlags,
         s_attributeFlags,
-        NULL
-    );
+        NULL);
 
     if (m_handle == INVALID_HANDLE_VALUE)
     {
@@ -237,12 +227,8 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
         return;
     }
 
-    HANDLE port = ::CreateIoCompletionPort(
-        m_handle,
-        iocp,
-        (ULONG_PTR)m_handle,
-        0
-    );
+    HANDLE port =
+        ::CreateIoCompletionPort(m_handle, iocp, (ULONG_PTR)m_handle, 0);
 
     if (port == NULL)
     {
@@ -290,8 +276,7 @@ bool PathMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
         s_changeFlags,
         &bytes,
         &m_overlapped,
-        NULL
-    );
+        NULL);
 
     if (success == FALSE)
     {
@@ -301,4 +286,4 @@ bool PathMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
     return (success == TRUE);
 }
 
-}
+} // namespace fly

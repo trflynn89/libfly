@@ -1,10 +1,10 @@
 #pragma once
 
-#include <istream>
-#include <string>
-
 #include "fly/parser/parser.h"
 #include "fly/types/json.h"
+
+#include <istream>
+#include <string>
 
 namespace fly {
 
@@ -77,4 +77,4 @@ private:
     bool trimValue(std::string &, char, char) const;
 };
 
-}
+} // namespace fly

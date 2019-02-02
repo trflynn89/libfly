@@ -1,11 +1,11 @@
 #pragma once
 
+#include "fly/fly.h"
+#include "fly/task/task.h"
+
 #include <atomic>
 #include <cstdint>
 #include <memory>
-
-#include "fly/fly.h"
-#include "fly/task/task.h"
 
 namespace fly {
 
@@ -34,8 +34,7 @@ public:
      */
     SystemMonitor(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SystemConfig> &
-    );
+        const std::shared_ptr<SystemConfig> &);
 
     /**
      * Destructor.
@@ -167,6 +166,6 @@ private:
     std::weak_ptr<SystemMonitor> m_wpSystemMonitor;
 };
 
-}
+} // namespace fly
 
 #include FLY_OS_IMPL_PATH(system, system_monitor)

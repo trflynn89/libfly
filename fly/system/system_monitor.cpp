@@ -1,18 +1,17 @@
 #include "fly/system/system_monitor.h"
 
-#include <chrono>
-#include <thread>
-
 #include "fly/system/system_config.h"
 #include "fly/task/task_runner.h"
+
+#include <chrono>
+#include <thread>
 
 namespace fly {
 
 //==============================================================================
 SystemMonitor::SystemMonitor(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SystemConfig> &spConfig
-) :
+    const std::shared_ptr<SystemConfig> &spConfig) :
     m_systemCpuCount(0),
     m_systemCpuUsage(0.0),
     m_processCpuUsage(0.0),
@@ -95,8 +94,7 @@ void SystemMonitor::poll()
 
 //==============================================================================
 SystemMonitorTask::SystemMonitorTask(
-    const std::weak_ptr<SystemMonitor> &wpSystemMonitor
-) :
+    const std::weak_ptr<SystemMonitor> &wpSystemMonitor) :
     Task(),
     m_wpSystemMonitor(wpSystemMonitor)
 {
@@ -115,10 +113,9 @@ void SystemMonitorTask::Run()
         {
             spSystemMonitor->m_spTaskRunner->PostTaskWithDelay(
                 spSystemMonitor->m_spTask,
-                spSystemMonitor->m_spConfig->PollInterval()
-            );
+                spSystemMonitor->m_spConfig->PollInterval());
         }
     }
 }
 
-}
+} // namespace fly

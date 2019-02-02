@@ -1,20 +1,24 @@
 #include "fly/path/nix/path_impl.h"
 
-#include <cstring>
+#include "fly/logger/logger.h"
+#include "fly/path/path.h"
 
 #include <dirent.h>
 #include <fts.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "fly/logger/logger.h"
-#include "fly/path/path.h"
+#include <cstring>
 
 namespace fly {
 
-namespace
-{
-    static const int s_ftsMode = FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV;
+namespace {
+
+    const mode_t s_makePathMode = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
+
+    const int s_ftsMode = FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV;
+
+    const std::string s_tmpEnvs[] = { "TMPDIR", "TMP", "TEMP", "TEMPDIR", "" };
 
     /**
      * RAII wrapper around ::fts_open().
@@ -22,7 +26,7 @@ namespace
     class FtsWrapper
     {
     public:
-        FtsWrapper(char * const *files) :
+        FtsWrapper(char *const *files) :
             m_pFts(::fts_open(files, s_ftsMode, NULL))
         {
         }
@@ -35,7 +39,7 @@ namespace
             }
         }
 
-        FTS *operator () () const
+        FTS *operator()() const
         {
             return m_pFts;
         }
@@ -71,7 +75,7 @@ namespace
             }
         }
 
-        DIR *operator () () const
+        DIR *operator()() const
         {
             return m_pDir;
         }
@@ -84,12 +88,12 @@ namespace
     private:
         DIR *m_pDir;
     };
-}
+
+} // namespace
 
 //==============================================================================
 bool PathImpl::MakePath(const std::string &path)
 {
-    static const mode_t mode = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
     struct stat st;
 
     if (::stat(path.c_str(), &st) == 0)
@@ -113,7 +117,7 @@ bool PathImpl::MakePath(const std::string &path)
         }
     }
 
-    return ((::mkdir(path.c_str(), mode) == 0) || (errno == EEXIST));
+    return ((::mkdir(path.c_str(), s_makePathMode) == 0) || (errno == EEXIST));
 }
 
 //==============================================================================
@@ -135,33 +139,33 @@ bool PathImpl::RemovePath(const std::string &path)
 
             switch (pCurr->fts_info)
             {
-            case FTS_NS:
-            case FTS_DNR:
-            case FTS_ERR:
-                errno = pCurr->fts_errno; // man page shows errno may not be set
-                LOGS(-1, "Could not read \"%s\"", file);
-                ret = false;
-                break;
-
-            case FTS_DP:
-            case FTS_F:
-            case FTS_SL:
-            case FTS_SLNONE:
-            case FTS_DEFAULT:
-                if (::remove(pCurr->fts_accpath) == 0)
-                {
-                    LOGD(-1, "Removed \"%s\"", file);
-                }
-                else
-                {
-                    LOGS(-1, "Could not remove \"%s\"", file);
+                case FTS_NS:
+                case FTS_DNR:
+                case FTS_ERR:
+                    errno = pCurr->fts_errno; // errno may not be set
+                    LOGS(-1, "Could not read \"%s\"", file);
                     ret = false;
-                }
+                    break;
 
-                break;
+                case FTS_DP:
+                case FTS_F:
+                case FTS_SL:
+                case FTS_SLNONE:
+                case FTS_DEFAULT:
+                    if (::remove(pCurr->fts_accpath) == 0)
+                    {
+                        LOGD(-1, "Removed \"%s\"", file);
+                    }
+                    else
+                    {
+                        LOGS(-1, "Could not remove \"%s\"", file);
+                        ret = false;
+                    }
 
-            default:
-                break;
+                    break;
+
+                default:
+                    break;
             }
         }
     }
@@ -173,8 +177,7 @@ bool PathImpl::RemovePath(const std::string &path)
 bool PathImpl::ListPath(
     const std::string &path,
     std::vector<std::string> &directories,
-    std::vector<std::string> &files
-)
+    std::vector<std::string> &files)
 {
     DirWrapper dir(path.c_str());
     struct dirent *ent = NULL;
@@ -185,20 +188,20 @@ bool PathImpl::ListPath(
 
         switch (ent->d_type)
         {
-        case DT_DIR:
-            if ((file != ".") && (file != ".."))
-            {
-                directories.push_back(file);
-            }
-            break;
+            case DT_DIR:
+                if ((file != ".") && (file != ".."))
+                {
+                    directories.push_back(file);
+                }
+                break;
 
-        case DT_LNK:
-        case DT_REG:
-            files.push_back(file);
-            break;
+            case DT_LNK:
+            case DT_REG:
+                files.push_back(file);
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 
@@ -214,14 +217,9 @@ char PathImpl::GetSeparator()
 //==============================================================================
 std::string PathImpl::GetTempDirectory()
 {
-    static const std::string envs[] =
+    for (int i = 0; !s_tmpEnvs[i].empty(); ++i)
     {
-        "TMPDIR", "TMP", "TEMP", "TEMPDIR", ""
-    };
-
-    for (int i = 0; !envs[i].empty(); ++i)
-    {
-        char *dir = ::getenv(envs[i].c_str());
+        char *dir = ::getenv(s_tmpEnvs[i].c_str());
 
         if (dir != NULL)
         {
@@ -232,4 +230,4 @@ std::string PathImpl::GetTempDirectory()
     return std::string("/tmp");
 }
 
-}
+} // namespace fly

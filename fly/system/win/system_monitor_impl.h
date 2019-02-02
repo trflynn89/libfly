@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Windows.h>
-#include <Pdh.h>
-
 #include "fly/system/system_monitor.h"
+
+#include <Pdh.h>
+#include <Windows.h>
 
 namespace fly {
 
@@ -26,8 +26,7 @@ public:
      */
     SystemMonitorImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SystemConfig> &
-    );
+        const std::shared_ptr<SystemConfig> &);
 
     /**
      * Destructor. Close the system monitor's CPU query.
@@ -53,4 +52,4 @@ private:
     ULONGLONG m_prevTime;
 };
 
-}
+} // namespace fly

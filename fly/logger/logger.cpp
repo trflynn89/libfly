@@ -1,12 +1,12 @@
 #include "fly/logger/logger.h"
 
-#include <algorithm>
-#include <cstdio>
-#include <cstring>
-
 #include "fly/logger/logger_config.h"
 #include "fly/path/path.h"
 #include "fly/task/task_runner.h"
+
+#include <algorithm>
+#include <cstdio>
+#include <cstring>
 
 namespace fly {
 
@@ -18,8 +18,7 @@ std::mutex Logger::s_consoleMutex;
 Logger::Logger(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     const std::shared_ptr<LoggerConfig> &spConfig,
-    const std::string &filePath
-):
+    const std::string &filePath) :
     m_spTaskRunner(spTaskRunner),
     m_spConfig(spConfig),
     m_filePath(filePath),
@@ -62,8 +61,7 @@ void Logger::AddLog(
     const char *file,
     const char *func,
     unsigned int line,
-    const std::string &message
-)
+    const std::string &message)
 {
     std::shared_ptr<Logger> spLogger = GetInstance();
 
@@ -74,8 +72,7 @@ void Logger::AddLog(
     else
     {
         std::string console = String::Format(
-            "%d %d %s:%s:%d %s", level, fixed, file, func, line, message
-        );
+            "%d %d %s:%s:%d %s", level, fixed, file, func, line, message);
 
         ConsoleLog(true, console);
     }
@@ -131,14 +128,12 @@ void Logger::addLog(
     const char *file,
     const char *func,
     unsigned int line,
-    const std::string &message
-)
+    const std::string &message)
 {
     auto now = std::chrono::high_resolution_clock::now();
 
     auto logTime = std::chrono::duration_cast<std::chrono::duration<double>>(
-        now - m_startTime
-    );
+        now - m_startTime);
 
     if ((level >= Log::Level::Debug) && (level < Log::Level::NumLevels))
     {
@@ -198,4 +193,4 @@ void LoggerTask::Run()
     }
 }
 
-}
+} // namespace fly

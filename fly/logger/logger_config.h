@@ -1,9 +1,9 @@
 #pragma once
 
+#include "fly/config/config.h"
+
 #include <chrono>
 #include <string>
-
-#include "fly/config/config.h"
 
 namespace fly {
 
@@ -47,4 +47,4 @@ protected:
     std::chrono::milliseconds::rep m_defaultQueueWaitTime;
 };
 
-}
+} // namespace fly

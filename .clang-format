@@ -4,9 +4,9 @@ AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveAssignments: 'false'
 AlignConsecutiveDeclarations: 'false'
 AlignEscapedNewlines: Right
-AlignOperands: 'true'
+AlignOperands: 'false'
 AlignTrailingComments: 'false'
-AllowAllParametersOfDeclarationOnNextLine: 'true'
+AllowAllParametersOfDeclarationOnNextLine: 'false'
 AllowShortBlocksOnASingleLine: 'false'
 AllowShortCaseLabelsOnASingleLine: 'false'
 AllowShortFunctionsOnASingleLine: None
@@ -49,12 +49,14 @@ DisableFormat: 'false'
 FixNamespaceComments: 'true'
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:    '^((<|")(fly|test)/)'
-    Priority: 3
-  - Regex:    '^((<|")(gtest|gmock)/)'
+  - Regex: '^"(fly|test)/'
     Priority: 2
-  - Regex:    '.*'
-    Priority: 1
+  - Regex: '^((<|")(gtest|gmock)/)'
+    Priority: 3
+  - Regex: '<[[:alnum:]./_]+\.h>'
+    Priority: 4
+  - Regex: '<[[:alnum:]./_]+>'
+    Priority: 5
 IndentCaseLabels: 'true'
 IndentPPDirectives: AfterHash
 IndentWidth: '4'

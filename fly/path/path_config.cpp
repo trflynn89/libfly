@@ -18,11 +18,8 @@ std::string PathConfig::GetName()
 //==============================================================================
 std::chrono::milliseconds PathConfig::PollInterval() const
 {
-    return std::chrono::milliseconds(
-        GetValue<std::chrono::milliseconds::rep>(
-            "poll_interval", m_defaultPollInterval
-        )
-    );
+    return std::chrono::milliseconds(GetValue<std::chrono::milliseconds::rep>(
+        "poll_interval", m_defaultPollInterval));
 }
 
-}
+} // namespace fly

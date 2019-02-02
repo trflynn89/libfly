@@ -33,11 +33,8 @@ size_t LoggerConfig::MaxMessageSize() const
 //==============================================================================
 std::chrono::milliseconds LoggerConfig::QueueWaitTime() const
 {
-    return std::chrono::milliseconds(
-        GetValue<std::chrono::milliseconds::rep>(
-            "queue_wait_time", m_defaultQueueWaitTime
-        )
-    );
+    return std::chrono::milliseconds(GetValue<std::chrono::milliseconds::rep>(
+        "queue_wait_time", m_defaultQueueWaitTime));
 }
 
-}
+} // namespace fly

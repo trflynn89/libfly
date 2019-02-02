@@ -1,11 +1,11 @@
 #pragma once
 
-#include <atomic>
-#include <chrono>
+#include "fly/socket/socket_manager.h"
 
 #include <Windows.h>
 
-#include "fly/socket/socket_manager.h"
+#include <atomic>
+#include <chrono>
 
 namespace fly {
 
@@ -23,8 +23,7 @@ class SocketManagerImpl : public SocketManager
 public:
     SocketManagerImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SocketConfig> &
-    );
+        const std::shared_ptr<SocketConfig> &);
     ~SocketManagerImpl() override;
 
 protected:
@@ -37,4 +36,4 @@ private:
     static std::atomic_int s_socketManagerCount;
 };
 
-}
+} // namespace fly

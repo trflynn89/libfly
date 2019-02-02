@@ -1,14 +1,14 @@
 #pragma once
 
+#include "fly/parser/parser.h"
+#include "fly/types/json.h"
+
 #include <cstdint>
 #include <istream>
 #include <limits>
 #include <stack>
 #include <string>
 #include <type_traits>
-
-#include "fly/parser/parser.h"
-#include "fly/types/json.h"
 
 namespace fly {
 
@@ -245,11 +245,11 @@ private:
 /**
  * Combine two Features instances into a single instance via bitwise-and.
  */
-JsonParser::Features operator & (JsonParser::Features, JsonParser::Features);
+JsonParser::Features operator&(JsonParser::Features, JsonParser::Features);
 
 /**
  * Combine two Features instances into a single instance via bitwise-or.
  */
-JsonParser::Features operator | (JsonParser::Features, JsonParser::Features);
+JsonParser::Features operator|(JsonParser::Features, JsonParser::Features);
 
-}
+} // namespace fly

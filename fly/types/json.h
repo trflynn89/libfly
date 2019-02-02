@@ -1,5 +1,8 @@
 #pragma once
 
+#include "fly/traits/traits.h"
+#include "fly/types/string.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -9,9 +12,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include "fly/traits/traits.h"
-#include "fly/types/string.h"
 
 namespace fly {
 
@@ -266,7 +266,7 @@ public:
      *
      * @return Json A reference to this Json instance.
      */
-    Json &operator = (Json) noexcept;
+    Json &operator=(Json) noexcept;
 
     /**
      * String conversion operator. Converts the Json instance to a string. Note
@@ -276,7 +276,7 @@ public:
      *
      * @return string_type The Json instance as a string.
      */
-    explicit operator string_type () const;
+    explicit operator string_type() const;
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The
@@ -290,7 +290,7 @@ public:
      * @return T The Json instance as the object-like type.
      */
     template <typename T, fly::if_map::enabled<T> = 0>
-    explicit operator T () const;
+    explicit operator T() const;
 
     /**
      * Array conversion operator. Converts the Json instance to an array. The
@@ -306,7 +306,7 @@ public:
      * @return T The Json instance as the array-like type.
      */
     template <typename T, fly::if_array::enabled<T> = 0>
-    explicit operator T () const;
+    explicit operator T() const;
 
     /**
      * Array conversion operator. Converts the Json instance to a std::array. If
@@ -322,7 +322,7 @@ public:
      * @return T The Json instance as a std::array.
      */
     template <typename T, std::size_t N>
-    explicit operator std::array<T, N> () const;
+    explicit operator std::array<T, N>() const;
 
     /**
      * Boolean conversion operator. Converts the Json instance to a boolean. For
@@ -336,7 +336,7 @@ public:
      * @param T The Json instance as a boolean.
      */
     template <typename T, fly::if_boolean::enabled<T> = 0>
-    explicit operator T () const;
+    explicit operator T() const;
 
     /**
      * Numeric conversion operator. Converts the Json instance to a numeric
@@ -353,7 +353,7 @@ public:
      * @return T The Json instance as the numeric type.
      */
     template <typename T, fly::if_numeric::enabled<T> = 0>
-    explicit operator T () const;
+    explicit operator T() const;
 
     /**
      * Null conversion operator. Converts the Json instance to a null type.
@@ -362,7 +362,7 @@ public:
      *
      * @return null_type The Json instance as a number.
      */
-    explicit operator null_type () const;
+    explicit operator null_type() const;
 
     /**
      * Object access operator.
@@ -380,7 +380,7 @@ public:
      *
      * @return Json A reference to the Json instance at the key value.
      */
-    Json &operator [] (const typename object_type::key_type &);
+    Json &operator[](const typename object_type::key_type &);
 
     /**
      * Object read-only access operator.
@@ -395,7 +395,7 @@ public:
      *
      * @return Json A reference to the Json instance at the key value.
      */
-    const Json &operator [] (const typename object_type::key_type &) const;
+    const Json &operator[](const typename object_type::key_type &) const;
 
     /**
      * Array access operator.
@@ -412,7 +412,7 @@ public:
      *
      * @return Json A reference to the Json instance at the index.
      */
-    Json &operator [] (const typename array_type::size_type &);
+    Json &operator[](const typename array_type::size_type &);
 
     /**
      * Array read-only access operator.
@@ -427,7 +427,7 @@ public:
      *
      * @return Json A reference to the Json instance at the index.
      */
-    const Json &operator [] (const typename array_type::size_type &) const;
+    const Json &operator[](const typename array_type::size_type &) const;
 
     /**
      * Get the size of the Json instance.
@@ -455,7 +455,7 @@ public:
      *
      * @return bool True if the two Json instances are equal.
      */
-    friend bool operator == (const Json &, const Json &);
+    friend bool operator==(const Json &, const Json &);
 
     /**
      * Unequality operator. Compares two Json instances for unequality. They are
@@ -463,7 +463,7 @@ public:
      *
      * @return bool True if the two Json instances are unequal.
      */
-    friend bool operator != (const Json &, const Json &);
+    friend bool operator!=(const Json &, const Json &);
 
     /**
      * Stream operator. Stream the Json instance into an output stream.
@@ -473,7 +473,7 @@ public:
      *
      * @return ostream A reference to the output stream.
      */
-    friend std::ostream &operator << (std::ostream &, const Json &);
+    friend std::ostream &operator<<(std::ostream &, const Json &);
 
 private:
     /**
@@ -644,8 +644,7 @@ private:
     void readEscapedCharacter(
         stream_type &,
         string_type::const_iterator &,
-        const string_type::const_iterator &
-    ) const;
+        const string_type::const_iterator &) const;
 
     /**
      * After determining the escaped character is a unicode encoding, read the
@@ -663,8 +662,7 @@ private:
     void readUnicodeCharacter(
         stream_type &,
         string_type::const_iterator &,
-        const string_type::const_iterator &
-    ) const;
+        const string_type::const_iterator &) const;
 
     /**
      * Read a single 4-byte unicode encoding.
@@ -679,8 +677,7 @@ private:
      */
     int readUnicodeCodepoint(
         string_type::const_iterator &,
-        const string_type::const_iterator &
-    ) const;
+        const string_type::const_iterator &) const;
 
     /**
      * Validate a single non-escaped character is compliant.
@@ -694,13 +691,12 @@ private:
     void validateCharacter(
         stream_type &,
         string_type::const_iterator &,
-        const string_type::const_iterator &
-    ) const;
+        const string_type::const_iterator &) const;
 
     /**
      * Stream the name of a Json instance's type.
      */
-    friend std::ostream &operator << (std::ostream &, Type);
+    friend std::ostream &operator<<(std::ostream &, Type);
 
     Type m_type;
     Value m_value;
@@ -743,79 +739,64 @@ Json::Json(const T &value) :
 
 //==============================================================================
 template <typename T, fly::if_map::enabled<T>>
-Json::Json(const T &value) noexcept :
-    m_type(Type::Object),
-    m_value(value)
+Json::Json(const T &value) noexcept : m_type(Type::Object), m_value(value)
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_array::enabled<T>>
-Json::Json(const T &value) noexcept :
-    m_type(Type::Array),
-    m_value(value)
+Json::Json(const T &value) noexcept : m_type(Type::Array), m_value(value)
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_boolean::enabled<T>>
-Json::Json(const T &value) noexcept :
-    m_type(Type::Boolean),
-    m_value(value)
+Json::Json(const T &value) noexcept : m_type(Type::Boolean), m_value(value)
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_signed_integer::enabled<T>>
-Json::Json(const T &value) noexcept :
-    m_type(Type::Signed),
-    m_value(value)
+Json::Json(const T &value) noexcept : m_type(Type::Signed), m_value(value)
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_unsigned_integer::enabled<T>>
-Json::Json(const T &value) noexcept :
-    m_type(Type::Unsigned),
-    m_value(value)
+Json::Json(const T &value) noexcept : m_type(Type::Unsigned), m_value(value)
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_floating_point::enabled<T>>
-Json::Json(const T &value) noexcept :
-    m_type(Type::Float),
-    m_value(value)
+Json::Json(const T &value) noexcept : m_type(Type::Float), m_value(value)
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_map::enabled<T>>
-Json::operator T () const
+Json::operator T() const
 {
     if (IsObject())
     {
-        T t { };
+        T t{};
 
         for (const auto &kv : *(m_value.m_pObject))
         {
-            t.insert({
-                typename T::key_type(kv.first),
-                typename T::mapped_type(kv.second)
-            });
+            t.insert({ typename T::key_type(kv.first),
+                       typename T::mapped_type(kv.second) });
         }
 
         return t;
     }
 
     throw JsonException(
-        *this, String::Format("Type %s is not an object", m_type)
-    );
+        *this, String::Format("Type %s is not an object", m_type));
 }
 
 //==============================================================================
 template <typename T, fly::if_array::enabled<T>>
-Json::operator T () const
+Json::operator T() const
 {
     if (IsArray())
     {
@@ -823,17 +804,16 @@ Json::operator T () const
     }
 
     throw JsonException(
-        *this, String::Format("Type %s is not an array", m_type)
-    );
+        *this, String::Format("Type %s is not an array", m_type));
 }
 
 //==============================================================================
 template <typename T, std::size_t N>
-Json::operator std::array<T, N> () const
+Json::operator std::array<T, N>() const
 {
     if (IsArray())
     {
-        std::array<T, N> array { };
+        std::array<T, N> array{};
         const std::size_t size = std::min(N, m_value.m_pArray->size());
 
         for (std::size_t i = 0; i < size; ++i)
@@ -845,81 +825,78 @@ Json::operator std::array<T, N> () const
     }
 
     throw JsonException(
-        *this, String::Format("Type %s is not an array", m_type)
-    );
+        *this, String::Format("Type %s is not an array", m_type));
 }
 
 //==============================================================================
 template <typename T, fly::if_boolean::enabled<T>>
-Json::operator T () const
+Json::operator T() const
 {
     switch (m_type)
     {
-    case Type::String:
-        return !(m_value.m_pString->empty());
+        case Type::String:
+            return !(m_value.m_pString->empty());
 
-    case Type::Object:
-        return !(m_value.m_pObject->empty());
+        case Type::Object:
+            return !(m_value.m_pObject->empty());
 
-    case Type::Array:
-        return !(m_value.m_pArray->empty());
+        case Type::Array:
+            return !(m_value.m_pArray->empty());
 
-    case Type::Boolean:
-        return m_value.m_boolean;
+        case Type::Boolean:
+            return m_value.m_boolean;
 
-    case Type::Signed:
-        return (m_value.m_signed != 0);
+        case Type::Signed:
+            return (m_value.m_signed != 0);
 
-    case Type::Unsigned:
-        return (m_value.m_unsigned != 0);
+        case Type::Unsigned:
+            return (m_value.m_unsigned != 0);
 
-    case Type::Float:
-        return (m_value.m_float != 0.0);
+        case Type::Float:
+            return (m_value.m_float != 0.0);
 
-    default:
-        return false;
+        default:
+            return false;
     }
 }
 
 //==============================================================================
 template <typename T, fly::if_numeric::enabled<T>>
-Json::operator T () const
+Json::operator T() const
 {
     switch (m_type)
     {
-    case Type::String:
-        try
-        {
-            return String::Convert<T>(*(m_value.m_pString));
-        }
-        catch (...)
-        {
-        }
+        case Type::String:
+            try
+            {
+                return String::Convert<T>(*(m_value.m_pString));
+            }
+            catch (...)
+            {
+            }
 
-        break;
+            break;
 
-    case Type::Signed:
-        return static_cast<T>(m_value.m_signed);
+        case Type::Signed:
+            return static_cast<T>(m_value.m_signed);
 
-    case Type::Unsigned:
-        return static_cast<T>(m_value.m_unsigned);
+        case Type::Unsigned:
+            return static_cast<T>(m_value.m_unsigned);
 
-    case Type::Float:
-        return static_cast<T>(m_value.m_float);
+        case Type::Float:
+            return static_cast<T>(m_value.m_float);
 
-    default:
-        break;
+        default:
+            break;
     }
 
     throw JsonException(
-        *this, String::Format("Type %s is not numeric", m_type)
-    );
+        *this, String::Format("Type %s is not numeric", m_type));
 }
 
 //==============================================================================
 template <typename T, fly::if_string::enabled<T>>
-Json::Value::Value(const T &value) noexcept :
-    m_pString(new string_type(value))
+Json::Value::Value(const T &value) noexcept : m_pString(new string_type(value))
 {
 }
 
@@ -939,30 +916,26 @@ Json::Value::Value(const T &value) noexcept :
 
 //==============================================================================
 template <typename T, fly::if_boolean::enabled<T>>
-Json::Value::Value(const T &value) noexcept :
-    m_boolean(value)
+Json::Value::Value(const T &value) noexcept : m_boolean(value)
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_signed_integer::enabled<T>>
-Json::Value::Value(const T &value) noexcept :
-    m_signed(value)
+Json::Value::Value(const T &value) noexcept : m_signed(value)
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_unsigned_integer::enabled<T>>
-Json::Value::Value(const T &value) noexcept :
-    m_unsigned(value)
+Json::Value::Value(const T &value) noexcept : m_unsigned(value)
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_floating_point::enabled<T>>
-Json::Value::Value(const T &value) noexcept :
-    m_float(value)
+Json::Value::Value(const T &value) noexcept : m_float(value)
 {
 }
 
-}
+} // namespace fly

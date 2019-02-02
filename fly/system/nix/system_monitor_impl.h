@@ -1,9 +1,9 @@
 #pragma once
 
+#include "fly/system/system_monitor.h"
+
 #include <cstdint>
 #include <ctime>
-
-#include "fly/system/system_monitor.h"
 
 namespace fly {
 
@@ -25,8 +25,7 @@ public:
      */
     SystemMonitorImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SystemConfig> &
-    );
+        const std::shared_ptr<SystemConfig> &);
 
 protected:
     void UpdateSystemCpuCount() override;
@@ -47,4 +46,4 @@ private:
     clock_t m_prevTime;
 };
 
-}
+} // namespace fly

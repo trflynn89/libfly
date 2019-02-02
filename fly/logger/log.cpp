@@ -1,8 +1,8 @@
 #include "fly/logger/log.h"
 
-#include <cstring>
-
 #include "fly/logger/logger_config.h"
+
+#include <cstring>
 
 namespace fly {
 
@@ -21,8 +21,7 @@ Log::Log() :
 //==============================================================================
 Log::Log(
     const std::shared_ptr<LoggerConfig> &spConfig,
-    const std::string &message
-) :
+    const std::string &message) :
     m_level(Level::NumLevels),
     m_time(-1.0),
     m_fixed(-1),
@@ -34,7 +33,7 @@ Log::Log(
 }
 
 //==============================================================================
-std::ostream &operator << (std::ostream &stream, const Log &log)
+std::ostream &operator<<(std::ostream &stream, const Log &log)
 {
     stream << log.m_level << '\t';
     stream << log.m_time << '\t';
@@ -48,10 +47,10 @@ std::ostream &operator << (std::ostream &stream, const Log &log)
 }
 
 //==============================================================================
-std::ostream &operator << (std::ostream &stream, const Log::Level &level)
+std::ostream &operator<<(std::ostream &stream, const Log::Level &level)
 {
     stream << static_cast<int>(level);
     return stream;
 }
 
-}
+} // namespace fly

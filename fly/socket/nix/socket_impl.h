@@ -1,10 +1,10 @@
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_types.h"
+
+#include <memory>
+#include <string>
 
 namespace fly {
 
@@ -44,15 +44,11 @@ public:
 
 protected:
     size_t Send(const std::string &, bool &) const override;
-    size_t SendTo(
-        const std::string &,
-        address_type,
-        port_type,
-        bool &
-    ) const override;
+    size_t
+    SendTo(const std::string &, address_type, port_type, bool &) const override;
 
     std::string Recv(bool &, bool &) const override;
     std::string RecvFrom(bool &, bool &) const override;
 };
 
-}
+} // namespace fly

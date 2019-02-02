@@ -42,7 +42,7 @@ define BUILD_REL
         echo $(RM) $${f:1} >> $(REL_BIN_DIR)/uninstall_$(REL_NAME); \
     done; \
     \
-    tar --remove-files $(TAR_CREATE_FLAGS) $@ *; \
+    tar $(TAR_CREATE_FLAGS) $@ *; \
     $(RM) -r $(ETC_TMP_DIR)
 
 endef
