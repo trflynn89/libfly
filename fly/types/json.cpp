@@ -102,57 +102,56 @@ Json::~Json() noexcept
 //==============================================================================
 bool Json::IsString() const
 {
-    return (m_type == Type::String);
+    return m_type == Type::String;
 }
 
 //==============================================================================
 bool Json::IsObject() const
 {
-    return (m_type == Type::Object);
+    return m_type == Type::Object;
 }
 
 //==============================================================================
 bool Json::IsObjectLike() const
 {
-    return (
-        IsArray() && (m_value.m_pArray->size() == 2) &&
-        m_value.m_pArray->at(0).IsString());
+    return IsArray() && (m_value.m_pArray->size() == 2) &&
+        m_value.m_pArray->at(0).IsString();
 }
 
 //==============================================================================
 bool Json::IsArray() const
 {
-    return (m_type == Type::Array);
+    return m_type == Type::Array;
 }
 
 //==============================================================================
 bool Json::IsBoolean() const
 {
-    return (m_type == Type::Boolean);
+    return m_type == Type::Boolean;
 }
 
 //==============================================================================
 bool Json::IsSignedInteger() const
 {
-    return (m_type == Type::Signed);
+    return m_type == Type::Signed;
 }
 
 //==============================================================================
 bool Json::IsUnsignedInteger() const
 {
-    return (m_type == Type::Unsigned);
+    return m_type == Type::Unsigned;
 }
 
 //==============================================================================
 bool Json::IsFloat() const
 {
-    return (m_type == Type::Float);
+    return m_type == Type::Float;
 }
 
 //==============================================================================
 bool Json::IsNull() const
 {
-    return (m_type == Type::Null);
+    return m_type == Type::Null;
 }
 
 //==============================================================================
@@ -306,27 +305,25 @@ bool operator==(const Json &json1, const Json &json2)
         switch (type1)
         {
             case Json::Type::String:
-                return (
-                    *(json1.m_value.m_pString) == *(json2.m_value.m_pString));
+                return *(json1.m_value.m_pString) == *(json2.m_value.m_pString);
 
             case Json::Type::Object:
-                return (
-                    *(json1.m_value.m_pObject) == *(json2.m_value.m_pObject));
+                return *(json1.m_value.m_pObject) == *(json2.m_value.m_pObject);
 
             case Json::Type::Array:
-                return (*(json1.m_value.m_pArray) == *(json2.m_value.m_pArray));
+                return *(json1.m_value.m_pArray) == *(json2.m_value.m_pArray);
 
             case Json::Type::Boolean:
-                return (json1.m_value.m_boolean == json2.m_value.m_boolean);
+                return json1.m_value.m_boolean == json2.m_value.m_boolean;
 
             case Json::Type::Signed:
-                return (json1.m_value.m_signed == json2.m_value.m_signed);
+                return json1.m_value.m_signed == json2.m_value.m_signed;
 
             case Json::Type::Unsigned:
-                return (json1.m_value.m_unsigned == json2.m_value.m_unsigned);
+                return json1.m_value.m_unsigned == json2.m_value.m_unsigned;
 
             case Json::Type::Float:
-                return (json1.m_value.m_float == json2.m_value.m_float);
+                return json1.m_value.m_float == json2.m_value.m_float;
 
             case Json::Type::Null:
                 return true;
@@ -339,14 +336,14 @@ bool operator==(const Json &json1, const Json &json2)
         (json2.m_type == Json::Type::Unsigned))
     {
         auto value2 = static_cast<Json::signed_type>(json2.m_value.m_unsigned);
-        return (json1.m_value.m_signed == value2);
+        return json1.m_value.m_signed == value2;
     }
     else if (
         (json1.m_type == Json::Type::Unsigned) &&
         (json2.m_type == Json::Type::Signed))
     {
         auto value1 = static_cast<Json::signed_type>(json1.m_value.m_unsigned);
-        return (value1 == json2.m_value.m_signed);
+        return value1 == json2.m_value.m_signed;
     }
 
     // One instance is a signed integer, other instance is a float
@@ -355,14 +352,14 @@ bool operator==(const Json &json1, const Json &json2)
         (json2.m_type == Json::Type::Float))
     {
         auto value1 = static_cast<Json::float_type>(json1.m_value.m_signed);
-        return (value1 == json2.m_value.m_float);
+        return value1 == json2.m_value.m_float;
     }
     else if (
         (json1.m_type == Json::Type::Float) &&
         (json2.m_type == Json::Type::Signed))
     {
         auto value2 = static_cast<Json::float_type>(json2.m_value.m_signed);
-        return (json1.m_value.m_float == value2);
+        return json1.m_value.m_float == value2;
     }
 
     // One instance is an unsigned integer, other instance is a float
@@ -371,14 +368,14 @@ bool operator==(const Json &json1, const Json &json2)
         (json2.m_type == Json::Type::Float))
     {
         auto value1 = static_cast<Json::float_type>(json1.m_value.m_unsigned);
-        return (value1 == json2.m_value.m_float);
+        return value1 == json2.m_value.m_float;
     }
     else if (
         (json1.m_type == Json::Type::Float) &&
         (json2.m_type == Json::Type::Unsigned))
     {
         auto value2 = static_cast<Json::float_type>(json2.m_value.m_unsigned);
-        return (json1.m_value.m_float == value2);
+        return json1.m_value.m_float == value2;
     }
 
     return false;
@@ -590,11 +587,10 @@ void Json::readUnicodeCharacter(
     const string_type::const_iterator &end) const
 {
     auto is_high_surrogate = [](int c) -> bool {
-        return ((c >= 0xd800) && (c <= 0xdbff));
+        return (c >= 0xd800) && (c <= 0xdbff);
     };
-
     auto is_low_surrogate = [](int c) -> bool {
-        return ((c >= 0xdc00) && (c <= 0xdfff));
+        return (c >= 0xdc00) && (c <= 0xdfff);
     };
 
     const int highSurrogateCodepoint = readUnicodeCodepoint(it, end);

@@ -107,7 +107,7 @@ bool SocketImpl::IsErrorFree()
         LOGS(m_socketHandle, "Error getting error flag");
     }
 
-    return (opt == 0);
+    return opt == 0;
 }
 
 //==============================================================================
@@ -251,9 +251,8 @@ size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
 
     while (keepSending)
     {
-        // Window's ::send() takes string size as an integer, but
-        // std::string's length is size_t - send at most MAX_INT bytes at a
-        // time
+        // Window's ::send() takes string size as an integer, but std::string's
+        // length is size_t - send at most MAX_INT bytes at a time
         static size_t intMax = std::numeric_limits<int>::max();
         int toSendSize = static_cast<int>(std::min(toSend.size(), intMax));
 

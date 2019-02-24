@@ -108,7 +108,7 @@ bool SocketImpl::IsErrorFree()
         LOGS(m_socketHandle, "Error getting error flag");
     }
 
-    return (opt == 0);
+    return opt == 0;
 }
 
 //==============================================================================

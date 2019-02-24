@@ -47,7 +47,7 @@ PathMonitorImpl::~PathMonitorImpl()
 //==============================================================================
 bool PathMonitorImpl::IsValid() const
 {
-    return (m_monitorDescriptor != -1);
+    return m_monitorDescriptor != -1;
 }
 
 //==============================================================================
@@ -124,23 +124,19 @@ bool PathMonitorImpl::readEvents() const
         }
     }
 
-    return (len > 0);
+    return len > 0;
 }
 
 //==============================================================================
 void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
 {
-    // Formatter doesn't put bracket on newline after lambdas
-    // clang-format off
     auto it = std::find_if(
         m_pathInfo.begin(),
         m_pathInfo.end(),
-        [&pEvent](const PathInfoMap::value_type &value) -> bool
-        {
+        [&pEvent](const PathInfoMap::value_type &value) -> bool {
             auto spInfo(std::static_pointer_cast<PathInfoImpl>(value.second));
-            return (spInfo->m_watchDescriptor == pEvent->wd);
+            return spInfo->m_watchDescriptor == pEvent->wd;
         });
-    // clang-format on
 
     if (it != m_pathInfo.end())
     {
@@ -222,7 +218,7 @@ PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 //==============================================================================
 bool PathMonitorImpl::PathInfoImpl::IsValid() const
 {
-    return (m_watchDescriptor != -1);
+    return m_watchDescriptor != -1;
 }
 
 } // namespace fly

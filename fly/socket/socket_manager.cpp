@@ -102,7 +102,7 @@ void SocketManager::HandleNewAndClosedSockets(
     for (const std::shared_ptr<Socket> &spSocket : closedSockets)
     {
         auto is_same = [&spSocket](const std::shared_ptr<Socket> &spClosed) {
-            return (spSocket->GetSocketId() == spClosed->GetSocketId());
+            return spSocket->GetSocketId() == spClosed->GetSocketId();
         };
 
         m_aioSockets.erase(

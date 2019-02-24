@@ -46,7 +46,7 @@ namespace {
 
         operator bool() const
         {
-            return (m_pFts != NULL);
+            return m_pFts != NULL;
         }
 
     private:
@@ -82,7 +82,7 @@ namespace {
 
         operator bool() const
         {
-            return (m_pDir != NULL);
+            return m_pDir != NULL;
         }
 
     private:
@@ -117,7 +117,7 @@ bool PathImpl::MakePath(const std::string &path)
         }
     }
 
-    return ((::mkdir(path.c_str(), s_makePathMode) == 0) || (errno == EEXIST));
+    return (::mkdir(path.c_str(), s_makePathMode) == 0) || (errno == EEXIST);
 }
 
 //==============================================================================

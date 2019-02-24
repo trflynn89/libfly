@@ -46,7 +46,7 @@ AsyncRequest::AsyncRequest(
 //==============================================================================
 bool AsyncRequest::IsValid() const
 {
-    return (m_socketId != s_invalidId);
+    return m_socketId != s_invalidId;
 }
 
 //==============================================================================

@@ -87,9 +87,7 @@ std::string SystemImpl::GetErrorString(int code)
 //==============================================================================
 std::vector<int> SystemImpl::GetSignals()
 {
-    return std::vector<int>{
-        SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV
-    };
+    return { SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV };
 }
 
 } // namespace fly

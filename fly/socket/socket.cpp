@@ -50,7 +50,7 @@ socket_type Socket::InvalidSocket()
 //==============================================================================
 bool Socket::IsValid() const
 {
-    return (m_socketHandle != InvalidSocket());
+    return m_socketHandle != InvalidSocket();
 }
 
 //==============================================================================
@@ -80,13 +80,13 @@ int Socket::GetSocketId() const
 //==============================================================================
 bool Socket::IsTcp() const
 {
-    return (m_protocol == Protocol::TCP);
+    return m_protocol == Protocol::TCP;
 }
 
 //==============================================================================
 bool Socket::IsUdp() const
 {
-    return (m_protocol == Protocol::UDP);
+    return m_protocol == Protocol::UDP;
 }
 
 //==============================================================================
@@ -104,13 +104,13 @@ bool Socket::IsListening() const
 //==============================================================================
 bool Socket::IsConnecting() const
 {
-    return (m_aConnectedState.load() == ConnectedState::Connecting);
+    return m_aConnectedState.load() == ConnectedState::Connecting;
 }
 
 //==============================================================================
 bool Socket::IsConnected() const
 {
-    return (m_aConnectedState.load() == ConnectedState::Connected);
+    return m_aConnectedState.load() == ConnectedState::Connected;
 }
 
 //==============================================================================
@@ -203,7 +203,7 @@ bool Socket::FinishConnect()
         Close();
     }
 
-    return (IsValid() && IsConnected());
+    return IsValid() && IsConnected();
 }
 
 //==============================================================================

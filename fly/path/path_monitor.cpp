@@ -144,7 +144,7 @@ bool PathMonitor::RemoveFile(const std::string &path, const std::string &file)
         removePath = spInfo->m_fileHandlers.empty();
     }
 
-    return (removePath ? RemovePath(path) : true);
+    return removePath ? RemovePath(path) : true;
 }
 
 //==============================================================================

@@ -10,9 +10,9 @@ extern "C"
     const char *__asan_default_options()
     {
         return R"(
-        allow_user_segv_handler=1
-        print_suppressions=0
-    )";
+            allow_user_segv_handler=1
+            print_suppressions=0
+        )";
     }
 
     /**
@@ -22,10 +22,10 @@ extern "C"
     const char *__lsan_default_suppressions()
     {
         return R"(
-        leak:libdbus-1
-        leak:libfontconfig
-        leak:vmwgfx_dri
-    )";
+            leak:libdbus-1
+            leak:libfontconfig
+            leak:vmwgfx_dri
+        )";
     }
 
 #ifdef __cplusplus

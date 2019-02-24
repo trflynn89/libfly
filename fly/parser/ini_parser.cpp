@@ -109,7 +109,7 @@ bool IniParser::trimValue(std::string &str, char start, char end) const
                 "Imbalanced characters: \"%c\" and \"%c\"", start, end));
     }
 
-    return (startsWithChar && endsWithChar);
+    return startsWithChar && endsWithChar;
 }
 
 } // namespace fly

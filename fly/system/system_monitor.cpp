@@ -78,7 +78,7 @@ uint64_t SystemMonitor::GetProcessMemoryUsage() const
 //==============================================================================
 bool SystemMonitor::isValid() const
 {
-    return (GetSystemCpuCount() > 0);
+    return GetSystemCpuCount() > 0;
 }
 
 //==============================================================================

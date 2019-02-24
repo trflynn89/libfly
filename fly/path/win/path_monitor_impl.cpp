@@ -52,7 +52,7 @@ PathMonitorImpl::~PathMonitorImpl()
 //==============================================================================
 bool PathMonitorImpl::IsValid() const
 {
-    return (m_iocp != NULL);
+    return m_iocp != NULL;
 }
 
 //==============================================================================
@@ -69,17 +69,13 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        // Formatter doesn't put bracket on newline after lambdas
-        // clang-format off
         auto it = std::find_if(
             m_pathInfo.begin(),
             m_pathInfo.end(),
-            [&pKey](const PathInfoMap::value_type &val) -> bool
-            {
+            [&pKey](const PathInfoMap::value_type &val) -> bool {
                 auto spInfo(std::static_pointer_cast<PathInfoImpl>(val.second));
-                return ((ULONG_PTR)(spInfo->m_handle) == pKey);
+                return ((ULONG_PTR)(spInfo->m_handle)) == pKey;
             });
-        // clang-format on
 
         if (it != m_pathInfo.end())
         {
@@ -259,7 +255,7 @@ PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 //==============================================================================
 bool PathMonitorImpl::PathInfoImpl::IsValid() const
 {
-    return (m_valid && (m_handle != INVALID_HANDLE_VALUE));
+    return m_valid && (m_handle != INVALID_HANDLE_VALUE);
 }
 
 //==============================================================================
@@ -283,7 +279,7 @@ bool PathMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
         LOGS(-1, "Could not check events for \"%s\"", path);
     }
 
-    return (success == TRUE);
+    return success == TRUE;
 }
 
 } // namespace fly

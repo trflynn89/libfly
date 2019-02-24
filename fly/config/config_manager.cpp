@@ -86,7 +86,7 @@ bool ConfigManager::Start()
             m_spTask = std::make_shared<ConfigUpdateTask>(wpConfigManager);
             std::weak_ptr<Task> wpTask = m_spTask;
 
-            // Formatter doesn't put bracket on newline after lambdas
+            // Formatter badly handles hanging indent in lambda parameters
             // clang-format off
             auto callback = [wpConfigManager, wpTask](
                 const std::string &,

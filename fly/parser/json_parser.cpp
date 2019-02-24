@@ -576,21 +576,12 @@ void JsonParser::validateNumber(
 
     const std::string signless = (isSigned ? value.substr(1) : value);
 
-    // Formatter doesn't put bracket on newline after lambdas
-    // clang-format off
-    auto is_octal = [&signless]() -> bool
-    {
-        return (
-            (signless.size() > 1) &&
-            (signless[0] == '0') &&
-            std::isdigit(static_cast<unsigned char>(signless[1])));
+    auto is_octal = [&signless]() -> bool {
+        return (signless.size() > 1) && (signless[0] == '0') &&
+            std::isdigit(static_cast<unsigned char>(signless[1]));
     };
-    // clang-format on
 
-    // Formatter doesn't put bracket on newline after lambdas
-    // clang-format off
-    auto is_float = [this, &signless]() -> bool
-    {
+    auto is_float = [this, &signless]() -> bool {
         const std::string::size_type d = signless.find('.');
         const std::string::size_type e = signless.find('e');
         const std::string::size_type E = signless.find('E');
@@ -612,9 +603,8 @@ void JsonParser::validateNumber(
             return true;
         }
 
-        return ((e != std::string::npos) || (E != std::string::npos));
+        return (e != std::string::npos) || (E != std::string::npos);
     };
-    // clang-format on
 
     if (!std::isdigit(static_cast<unsigned char>(signless[0])))
     {
@@ -631,7 +621,7 @@ void JsonParser::validateNumber(
 //==============================================================================
 bool JsonParser::isFeatureAllowed(Features feature) const
 {
-    return ((m_features & feature) != Features::Strict);
+    return (m_features & feature) != Features::Strict;
 }
 
 //==============================================================================

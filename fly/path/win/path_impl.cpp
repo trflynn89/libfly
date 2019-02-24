@@ -31,9 +31,8 @@ bool PathImpl::MakePath(const std::string &path)
         ret = ERROR_BAD_PATHNAME;
     }
 
-    return (
-        (ret == ERROR_SUCCESS) || (ret == ERROR_FILE_EXISTS) ||
-        (ret == ERROR_ALREADY_EXISTS));
+    return (ret == ERROR_SUCCESS) || (ret == ERROR_FILE_EXISTS) ||
+        (ret == ERROR_ALREADY_EXISTS);
 }
 
 //==============================================================================
