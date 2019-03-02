@@ -1,31 +1,54 @@
-pool:
-  vmImage: 'Ubuntu-16.04'
+jobs:
+  #### Ubuntu ####
+  - job: Ubuntu
+    pool:
+      vmImage: 'Ubuntu-16.04'
 
-strategy:
-  matrix:
-    ubuntu18:
-      containerImage: ubuntu:18.04
+    steps:
+    - script: |
+        nproc
+        lsb_release -a
+        sudo apt-get install -y gcc-multilib g++-multilib
+        git submodule update --init --recursive
+      displayName: 'setup'
 
-container: $[ variables['containerImage'] ]
+    - script: build/nix/release.sh
+      displayName: 'build'
 
-steps:
-- script: |
-    nproc
-    lsb_release -a
-    sudo apt-get install -y gcc-multilib g++-multilib
-    git submodule update --init --recursive
-  displayName: 'setup'
+    - task: CopyFiles@2
+      inputs:
+        Contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
+        TargetFolder: $(Build.ArtifactStagingDirectory)
+        flattenFolders: true
 
-- script: ./build/nix/release.sh
-  displayName: 'build'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: $(Build.ArtifactStagingDirectory)
+        ArtifactName: linux
 
-- task: CopyFiles@2
-  inputs:
-    Contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
-    TargetFolder: $(Build.ArtifactStagingDirectory)
-    flattenFolders: true
+  #### Windows ####
+  - job: Windows
+    pool:
+      vmImage: 'vs2017-win2016'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: $(Build.ArtifactStagingDirectory)
-    ArtifactName: artifacts
+    steps:
+    - script: |
+        git submodule update --init --recursive
+      displayName: 'setup'
+
+    - script: build\win\release.bat
+      displayName: 'build'
+
+    - script: build\win\test.ps1
+      displayName: 'test'
+
+    - task: CopyFiles@2
+      inputs:
+        Contents: 'build\win\libfly-*.zip'
+        TargetFolder: $(Build.ArtifactStagingDirectory)
+        flattenFolders: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: $(Build.ArtifactStagingDirectory)
+        ArtifactName: windows
