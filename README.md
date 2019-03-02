@@ -1,3 +1,2 @@
 # libfly, a C++ utility library for Linux and Windows.
-[![Build Status](https://travis-ci.org/trflynn89/libfly.svg?branch=master)](https://travis-ci.org/trflynn89/libfly) [![Build status](https://ci.appveyor.com/api/projects/status/j9dncuoismnwcu5r/branch/master?svg=true)](https://ci.appveyor.com/project/trflynn89/libfly/branch/master)
- [![codecov](https://codecov.io/gh/trflynn89/libfly/branch/master/graph/badge.svg)](https://codecov.io/gh/trflynn89/libfly)
+[![Build Status](https://dev.azure.com/trflynn89/libfly/_apis/build/status/trflynn89.libfly?branchName=master)](https://dev.azure.com/trflynn89/libfly/_build/latest?definitionId=1&branchName=master) [![codecov](https://codecov.io/gh/trflynn89/libfly/branch/master/graph/badge.svg)](https://codecov.io/gh/trflynn89/libfly)
