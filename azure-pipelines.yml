@@ -6,8 +6,6 @@ jobs:
 
     steps:
     - script: |
-        nproc
-        lsb_release -a
         sudo apt-get install -y gcc-multilib g++-multilib
         git submodule update --init --recursive
       displayName: 'setup'
@@ -36,8 +34,40 @@ jobs:
         git submodule update --init --recursive
       displayName: 'setup'
 
+    - task: MSBuild@1
+      inputs:
+        solution: 'build\win\libfly.sln'
+        maximumCpuCount: true
+        configuration: 'Debug'
+        platform: 'x64'
+      displayName: 'build debug x64'
+
+    - task: MSBuild@1
+      inputs:
+        solution: 'build\win\libfly.sln'
+        maximumCpuCount: true
+        configuration: 'Debug'
+        platform: 'x86'
+      displayName: 'build debug x86'
+
+    - task: MSBuild@1
+      inputs:
+        solution: 'build\win\libfly.sln'
+        maximumCpuCount: true
+        configuration: 'Release'
+        platform: 'x64'
+      displayName: 'build release x64'
+
+    - task: MSBuild@1
+      inputs:
+        solution: 'build\win\libfly.sln'
+        maximumCpuCount: true
+        configuration: 'Release'
+        platform: 'x86'
+      displayName: 'build release x86'
+
     - script: build\win\release.bat
-      displayName: 'build'
+      displayName: 'package'
 
     - script: build\win\test.ps1
       displayName: 'test'

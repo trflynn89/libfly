@@ -22,12 +22,12 @@ function Run-Libfly-Test($arch)
 
         if ($status -eq 0)
         {
-            Add-AppveyorTest $test -Outcome Passed -FileName $_ -StdOut $stdout -StdErr $stderr -Duration $duration
+            # Add-AppveyorTest $test -Outcome Passed -FileName $_ -StdOut $stdout -StdErr $stderr -Duration $duration
             ++$tests_passed
         }
         else
         {
-            Add-AppveyorTest $test -Outcome Failed -FileName $_ -StdOut $stdout -StdErr $stderr -Duration $duration -ErrorMessage "Failed $test test"
+            # Add-AppveyorTest $test -Outcome Failed -FileName $_ -StdOut $stdout -StdErr $stderr -Duration $duration -ErrorMessage "Failed $test test"
             ++$tests_failed
         }
     }
