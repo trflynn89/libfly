@@ -27,7 +27,7 @@ jobs:
       displayName: 'Publish'
 
   #### Windows Debug x86 ####
-  - job: Windows Debug x86
+  - job: Windows_Debug_x86
     pool:
       vmImage: 'vs2017-win2016'
 
@@ -51,7 +51,7 @@ jobs:
       displayName: 'Test'
 
   #### Windows Debug x64 ####
-  - job: Windows Debug x64
+  - job: Windows_Debug_x64
     pool:
       vmImage: 'vs2017-win2016'
 
@@ -75,7 +75,7 @@ jobs:
       displayName: 'Test'
 
   #### Windows Release x86 ####
-  - job: Windows Release x86
+  - job: Windows_Release_x86
     pool:
       vmImage: 'vs2017-win2016'
 
@@ -109,7 +109,7 @@ jobs:
       displayName: 'Publish'
 
   #### Windows Release x64 ####
-  - job: Windows Release x64
+  - job: Windows_Release_x64
     pool:
       vmImage: 'vs2017-win2016'
 
