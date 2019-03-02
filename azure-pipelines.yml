@@ -1,0 +1,21 @@
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+strategy:
+  matrix:
+    ubuntu18:
+      containerImage: ubuntu:18.04
+
+steps:
+- script: ./build/nix/release.sh
+  displayName: 'build'
+
+- task: CopyFiles@2
+  inputs:
+    Contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
+    TargetFolder: $(Build.ArtifactStagingDirectory)
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: $(Build.ArtifactStagingDirectory)
+    ArtifactName: artifacts
