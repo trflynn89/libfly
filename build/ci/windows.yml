@@ -8,7 +8,7 @@ jobs:
       vmImage: 'vs2017-win2016'
 
     steps:
-    - template: build/ci/setup.yml
+    - template: setup.yml
       parameters:
         platform: Windows
         arch: ${{ parameters.arch }}
@@ -32,7 +32,7 @@ jobs:
       condition: eq('${{ parameters.configuration }}', 'Release')
       displayName: 'Package'
 
-    - template: build/ci/package.yml
+    - template: package.yml
       parameters:
         configuration: '${{ parameters.configuration }}'
         contents: 'build\win\libfly-*.zip'
