@@ -14,14 +14,12 @@ jobs:
         arch: ${{ parameters.arch }}
 
     - script: |
-        make -j -C build/nix release=0 arch=${{ parameters.arch }} libfly
-        make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
+        make -j -C build/nix release=0 arch=${{ parameters.arch }} libfly tests
       condition: eq('${{ parameters.configuration }}', 'Debug')
       displayName: 'Build'
 
     - script: |
         make -j -C build/nix release=1 arch=${{ parameters.arch }} libfly
-        make -j -C build/nix release=1 arch=${{ parameters.arch }} tests
       condition: eq('${{ parameters.configuration }}', 'Release')
       displayName: 'Build'
 
