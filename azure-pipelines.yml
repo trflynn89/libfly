@@ -1,30 +1,24 @@
 jobs:
   #### Linux ####
-  - job: Linux
-    pool:
-      vmImage: 'Ubuntu-16.04'
+  - template: build/nix/debug.yml
+    parameters:
+      name: Linux_Debug_x86
+      arch: 'x86'
 
-    steps:
-    - script: |
-        sudo apt-get install -y gcc-multilib g++-multilib
-        git submodule update --init --recursive
-      displayName: 'Setup'
+  - template: build/nix/debug.yml
+    parameters:
+      name: Linux_Debug_x64
+      arch: 'x64'
 
-    - script: build/nix/release.sh
-      displayName: 'Build'
+  - template: build/nix/release.yml
+    parameters:
+      name: Linux_Release_x86
+      arch: 'x86'
 
-    - task: CopyFiles@2
-      inputs:
-        contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
-        targetFolder: $(Build.ArtifactStagingDirectory)
-        flattenFolders: true
-      displayName: 'Collect'
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathtoPublish: $(Build.ArtifactStagingDirectory)
-        artifactName: libfly
-      displayName: 'Publish'
+  - template: build/nix/release.yml
+    parameters:
+      name: Linux_Release_x64
+      arch: 'x64'
 
   #### Windows ####
   - template: build/win/debug.yml

@@ -1,0 +1,35 @@
+parameters:
+  name: 'Linux_Release'
+  arch: 'x64'
+
+jobs:
+  - job: ${{ parameters.name }}
+    pool:
+      vmImage: 'Ubuntu-16.04'
+
+    steps:
+    - script: |
+        sudo apt-get install -y gcc-multilib g++-multilib
+      condition: eq(parameters['arch'], x86)
+      displayName: 'Dependencies'
+
+    - script: |
+        git submodule update --init --recursive
+      displayName: 'Setup'
+
+    - script: |
+        make -j -C build/nix release=1 arch=${{ parameters.arch }} libfly
+      displayName: 'Build'
+
+    - task: CopyFiles@2
+      inputs:
+        contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
+        targetFolder: $(Build.ArtifactStagingDirectory)
+        flattenFolders: true
+      displayName: 'Collect'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: $(Build.ArtifactStagingDirectory)
+        artifactName: libfly
+      displayName: 'Publish'
