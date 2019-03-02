@@ -8,7 +8,9 @@ strategy:
 
 steps:
 - script: |
+    lsb_release -a
     sudo apt-get install -y gcc-multilib g++-multilib
+    git submodule update --init --recursive
   displayName: 'setup'
 
 - script: ./build/nix/release.sh
