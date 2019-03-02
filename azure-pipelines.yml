@@ -6,8 +6,11 @@ strategy:
     ubuntu18:
       containerImage: ubuntu:18.04
 
+container: $[ variables['containerImage'] ]
+
 steps:
 - script: |
+    nproc
     lsb_release -a
     sudo apt-get install -y gcc-multilib g++-multilib
     git submodule update --init --recursive
@@ -20,6 +23,7 @@ steps:
   inputs:
     Contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
     TargetFolder: $(Build.ArtifactStagingDirectory)
+    flattenFolders: true
 
 - task: PublishBuildArtifacts@1
   inputs:
