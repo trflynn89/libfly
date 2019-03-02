@@ -1,0 +1,90 @@
+jobs:
+  #### Ubuntu ####
+  - job: Ubuntu
+    pool:
+      vmImage: 'Ubuntu-16.04'
+
+    steps:
+    - script: |
+        sudo apt-get install -y gcc-multilib g++-multilib
+        git submodule update --init --recursive
+      displayName: 'setup'
+
+    - script: build/nix/release.sh
+      displayName: 'build'
+
+    - task: CopyFiles@2
+      inputs:
+        Contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
+        TargetFolder: $(Build.ArtifactStagingDirectory)
+        flattenFolders: true
+      displayName: 'collect'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: $(Build.ArtifactStagingDirectory)
+        ArtifactName: linux
+      displayName: 'publish'
+
+  #### Windows ####
+  - job: Windows
+    pool:
+      vmImage: 'vs2017-win2016'
+
+    steps:
+    - script: |
+        git submodule update --init --recursive
+      displayName: 'setup'
+
+    - task: MSBuild@1
+      inputs:
+        solution: 'build\win\libfly.sln'
+        maximumCpuCount: true
+        configuration: 'Debug'
+        platform: 'x64'
+      displayName: 'build debug x64'
+
+    - task: MSBuild@1
+      inputs:
+        solution: 'build\win\libfly.sln'
+        maximumCpuCount: true
+        configuration: 'Debug'
+        platform: 'x86'
+      displayName: 'build debug x86'
+
+    - task: MSBuild@1
+      inputs:
+        solution: 'build\win\libfly.sln'
+        maximumCpuCount: true
+        configuration: 'Release'
+        platform: 'x64'
+      displayName: 'build release x64'
+
+    - task: MSBuild@1
+      inputs:
+        solution: 'build\win\libfly.sln'
+        maximumCpuCount: true
+        configuration: 'Release'
+        platform: 'x86'
+      displayName: 'build release x86'
+
+    - task: PowerShell@2
+      inputs:
+        filePath: build\win\test.ps1
+      displayName: 'test'
+
+    - script: build\win\release.bat
+      displayName: 'package'
+
+    - task: CopyFiles@2
+      inputs:
+        Contents: 'build\win\libfly-*.zip'
+        TargetFolder: $(Build.ArtifactStagingDirectory)
+        flattenFolders: true
+      displayName: 'collect'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: $(Build.ArtifactStagingDirectory)
+        ArtifactName: windows
+      displayName: 'publish'
