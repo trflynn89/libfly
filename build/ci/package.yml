@@ -1,4 +1,5 @@
 parameters:
+  configuration: 'Debug'
   contents: ''
 
 steps:
@@ -7,10 +8,12 @@ steps:
     contents: '${{ parameters.contents }}'
     targetFolder: $(Build.ArtifactStagingDirectory)
     flattenFolders: true
+  condition: eq('${{ parameters.configuration }}', 'Release')
   displayName: 'Collect'
 
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: $(Build.ArtifactStagingDirectory)
     artifactName: libfly
+  condition: eq('${{ parameters.configuration }}', 'Release')
   displayName: 'Publish'

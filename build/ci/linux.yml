@@ -26,6 +26,6 @@ jobs:
       displayName: 'Build'
 
     - template: build/ci/package.yml
-      condition: eq('${{ parameters.configuration }}', 'Release')
       parameters:
+        configuration: '${{ parameters.configuration }}'
         contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'

@@ -33,6 +33,6 @@ jobs:
       displayName: 'Package'
 
     - template: build/ci/package.yml
-      condition: eq('${{ parameters.configuration }}', 'Release')
       parameters:
+        configuration: '${{ parameters.configuration }}'
         contents: 'build\win\libfly-*.zip'
