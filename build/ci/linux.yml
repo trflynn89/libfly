@@ -8,10 +8,12 @@ jobs:
       vmImage: 'Ubuntu-16.04'
 
     steps:
+    - script: |
+        sudo apt-get install -y gcc-multilib g++-multilib
+      condition: eq('${{ parameters.arch }}', 'x86')
+      displayName: 'Dependencies'
+
     - template: setup.yml
-      parameters:
-        platform: Linux
-        arch: ${{ parameters.arch }}
 
     - script: |
         make -j -C build/nix release=0 arch=${{ parameters.arch }} libfly tests

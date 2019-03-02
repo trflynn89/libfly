@@ -9,9 +9,6 @@ jobs:
 
     steps:
     - template: setup.yml
-      parameters:
-        platform: Windows
-        arch: ${{ parameters.arch }}
 
     - task: MSBuild@1
       inputs:
