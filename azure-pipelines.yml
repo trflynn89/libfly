@@ -8,23 +8,23 @@ jobs:
     - script: |
         sudo apt-get install -y gcc-multilib g++-multilib
         git submodule update --init --recursive
-      displayName: 'setup'
+      displayName: 'Setup'
 
     - script: build/nix/release.sh
-      displayName: 'build'
+      displayName: 'Build'
 
     - task: CopyFiles@2
       inputs:
-        Contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
-        TargetFolder: $(Build.ArtifactStagingDirectory)
+        contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
+        targetFolder: $(Build.ArtifactStagingDirectory)
         flattenFolders: true
-      displayName: 'collect'
+      displayName: 'Collect'
 
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: $(Build.ArtifactStagingDirectory)
-        ArtifactName: linux
-      displayName: 'publish'
+        pathtoPublish: $(Build.ArtifactStagingDirectory)
+        artifactName: libfly
+      displayName: 'Publish'
 
   #### Windows ####
   - job: Windows
@@ -34,7 +34,7 @@ jobs:
     steps:
     - script: |
         git submodule update --init --recursive
-      displayName: 'setup'
+      displayName: 'Setup'
 
     - task: MSBuild@1
       inputs:
@@ -42,7 +42,7 @@ jobs:
         maximumCpuCount: true
         configuration: 'Debug'
         platform: 'x64'
-      displayName: 'build debug x64'
+      displayName: 'Build debug x64'
 
     - task: MSBuild@1
       inputs:
@@ -50,7 +50,7 @@ jobs:
         maximumCpuCount: true
         configuration: 'Debug'
         platform: 'x86'
-      displayName: 'build debug x86'
+      displayName: 'Build debug x86'
 
     - task: MSBuild@1
       inputs:
@@ -58,7 +58,7 @@ jobs:
         maximumCpuCount: true
         configuration: 'Release'
         platform: 'x64'
-      displayName: 'build release x64'
+      displayName: 'Build release x64'
 
     - task: MSBuild@1
       inputs:
@@ -66,25 +66,25 @@ jobs:
         maximumCpuCount: true
         configuration: 'Release'
         platform: 'x86'
-      displayName: 'build release x86'
+      displayName: 'Build release x86'
 
     - task: PowerShell@2
       inputs:
         filePath: build\win\test.ps1
-      displayName: 'test'
+      displayName: 'Test'
 
     - script: build\win\release.bat
-      displayName: 'package'
+      displayName: 'Package'
 
     - task: CopyFiles@2
       inputs:
-        Contents: 'build\win\libfly-*.zip'
-        TargetFolder: $(Build.ArtifactStagingDirectory)
+        contents: 'build\win\libfly-*.zip'
+        targetFolder: $(Build.ArtifactStagingDirectory)
         flattenFolders: true
-      displayName: 'collect'
+      displayName: 'Collect'
 
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: $(Build.ArtifactStagingDirectory)
-        ArtifactName: windows
-      displayName: 'publish'
+        pathtoPublish: $(Build.ArtifactStagingDirectory)
+        artifactName: libfly
+      displayName: 'Publish'
