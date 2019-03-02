@@ -26,118 +26,23 @@ jobs:
         artifactName: libfly
       displayName: 'Publish'
 
-  #### Windows Debug x86 ####
-  - job: Windows_Debug_x86
-    pool:
-      vmImage: 'vs2017-win2016'
+  #### Windows ####
+  - template: build/win/debug.yml
+    parameters:
+      name: Windows_Debug_x86
+      arch: 'x86'
 
-    steps:
-    - script: |
-        git submodule update --init --recursive
-      displayName: 'Setup'
+  - template: build/win/debug.yml
+    parameters:
+      name: Windows_Debug_x64
+      arch: 'x64'
 
-    - task: MSBuild@1
-      inputs:
-        solution: 'build\win\libfly.sln'
-        maximumCpuCount: true
-        configuration: 'Debug'
-        platform: 'x86'
-      displayName: 'Build'
+  - template: build/win/release.yml
+    parameters:
+      name: Windows_Release_x86
+      arch: 'x86'
 
-    - task: PowerShell@2
-      inputs:
-        filePath: build\win\test.ps1
-        arguments: -arch x86
-      displayName: 'Test'
-
-  #### Windows Debug x64 ####
-  - job: Windows_Debug_x64
-    pool:
-      vmImage: 'vs2017-win2016'
-
-    steps:
-    - script: |
-        git submodule update --init --recursive
-      displayName: 'Setup'
-
-    - task: MSBuild@1
-      inputs:
-        solution: 'build\win\libfly.sln'
-        maximumCpuCount: true
-        configuration: 'Debug'
-        platform: 'x64'
-      displayName: 'Build'
-
-    - task: PowerShell@2
-      inputs:
-        filePath: build\win\test.ps1
-        arguments: -arch x64
-      displayName: 'Test'
-
-  #### Windows Release x86 ####
-  - job: Windows_Release_x86
-    pool:
-      vmImage: 'vs2017-win2016'
-
-    steps:
-    - script: |
-        git submodule update --init --recursive
-      displayName: 'Setup'
-
-    - task: MSBuild@1
-      inputs:
-        solution: 'build\win\libfly.sln'
-        maximumCpuCount: true
-        configuration: 'Release'
-        platform: 'x86'
-      displayName: 'Build'
-
-    - script: build\win\release.bat
-      displayName: 'Package'
-
-    - task: CopyFiles@2
-      inputs:
-        contents: 'build\win\libfly-*.zip'
-        targetFolder: $(Build.ArtifactStagingDirectory)
-        flattenFolders: true
-      displayName: 'Collect'
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathtoPublish: $(Build.ArtifactStagingDirectory)
-        artifactName: libfly
-      displayName: 'Publish'
-
-  #### Windows Release x64 ####
-  - job: Windows_Release_x64
-    pool:
-      vmImage: 'vs2017-win2016'
-
-    steps:
-    - script: |
-        git submodule update --init --recursive
-      displayName: 'Setup'
-
-    - task: MSBuild@1
-      inputs:
-        solution: 'build\win\libfly.sln'
-        maximumCpuCount: true
-        configuration: 'Release'
-        platform: 'x64'
-      displayName: 'Build'
-
-    - script: build\win\release.bat
-      displayName: 'Package'
-
-    - task: CopyFiles@2
-      inputs:
-        contents: 'build\win\libfly-*.zip'
-        targetFolder: $(Build.ArtifactStagingDirectory)
-        flattenFolders: true
-      displayName: 'Collect'
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathtoPublish: $(Build.ArtifactStagingDirectory)
-        artifactName: libfly
-      displayName: 'Publish'
+  - template: build/win/release.yml
+    parameters:
+      name: Windows_Release_x64
+      arch: 'x64'
