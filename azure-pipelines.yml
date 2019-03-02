@@ -1,6 +1,6 @@
 jobs:
-  #### Ubuntu ####
-  - job: Ubuntu
+  #### Linux ####
+  - job: Linux
     pool:
       vmImage: 'Ubuntu-16.04'
 
@@ -26,8 +26,32 @@ jobs:
         artifactName: libfly
       displayName: 'Publish'
 
-  #### Windows ####
-  - job: Windows
+  #### Windows Debug x86 ####
+  - job: Windows Debug x86
+    pool:
+      vmImage: 'vs2017-win2016'
+
+    steps:
+    - script: |
+        git submodule update --init --recursive
+      displayName: 'Setup'
+
+    - task: MSBuild@1
+      inputs:
+        solution: 'build\win\libfly.sln'
+        maximumCpuCount: true
+        configuration: 'Debug'
+        platform: 'x86'
+      displayName: 'Build'
+
+    - task: PowerShell@2
+      inputs:
+        filePath: build\win\test.ps1
+        arguments: -arch x86
+      displayName: 'Test'
+
+  #### Windows Debug x64 ####
+  - job: Windows Debug x64
     pool:
       vmImage: 'vs2017-win2016'
 
@@ -42,15 +66,57 @@ jobs:
         maximumCpuCount: true
         configuration: 'Debug'
         platform: 'x64'
-      displayName: 'Build debug x64'
+      displayName: 'Build'
+
+    - task: PowerShell@2
+      inputs:
+        filePath: build\win\test.ps1
+        arguments: -arch x64
+      displayName: 'Test'
+
+  #### Windows Release x86 ####
+  - job: Windows Release x86
+    pool:
+      vmImage: 'vs2017-win2016'
+
+    steps:
+    - script: |
+        git submodule update --init --recursive
+      displayName: 'Setup'
 
     - task: MSBuild@1
       inputs:
         solution: 'build\win\libfly.sln'
         maximumCpuCount: true
-        configuration: 'Debug'
+        configuration: 'Release'
         platform: 'x86'
-      displayName: 'Build debug x86'
+      displayName: 'Build'
+
+    - script: build\win\release.bat
+      displayName: 'Package'
+
+    - task: CopyFiles@2
+      inputs:
+        contents: 'build\win\libfly-*.zip'
+        targetFolder: $(Build.ArtifactStagingDirectory)
+        flattenFolders: true
+      displayName: 'Collect'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: $(Build.ArtifactStagingDirectory)
+        artifactName: libfly
+      displayName: 'Publish'
+
+  #### Windows Release x64 ####
+  - job: Windows Release x64
+    pool:
+      vmImage: 'vs2017-win2016'
+
+    steps:
+    - script: |
+        git submodule update --init --recursive
+      displayName: 'Setup'
 
     - task: MSBuild@1
       inputs:
@@ -58,20 +124,7 @@ jobs:
         maximumCpuCount: true
         configuration: 'Release'
         platform: 'x64'
-      displayName: 'Build release x64'
-
-    - task: MSBuild@1
-      inputs:
-        solution: 'build\win\libfly.sln'
-        maximumCpuCount: true
-        configuration: 'Release'
-        platform: 'x86'
-      displayName: 'Build release x86'
-
-    - task: PowerShell@2
-      inputs:
-        filePath: build\win\test.ps1
-      displayName: 'Test'
+      displayName: 'Build'
 
     - script: build\win\release.bat
       displayName: 'Package'

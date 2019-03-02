@@ -1,3 +1,7 @@
+param (
+    [Parameter(Mandatory=$true)][string]$arch
+ )
+
 # Run all unit tests for an architecture and upload results to appveyor.
 function Run-Libfly-Test($arch)
 {
@@ -34,5 +38,4 @@ function Run-Libfly-Test($arch)
 }
 
 # Run the tests
-Run-Libfly-Test x86
-Run-Libfly-Test x64
+Run-Libfly-Test $arch
