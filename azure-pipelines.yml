@@ -18,11 +18,13 @@ jobs:
         Contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
         TargetFolder: $(Build.ArtifactStagingDirectory)
         flattenFolders: true
+      displayName: 'collect'
 
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: $(Build.ArtifactStagingDirectory)
         ArtifactName: linux
+      displayName: 'publish'
 
   #### Windows ####
   - job: Windows
@@ -66,20 +68,23 @@ jobs:
         platform: 'x86'
       displayName: 'build release x86'
 
+    - task: PowerShell@2
+      inputs:
+        filePath: build\win\test.ps1
+      displayName: 'test'
+
     - script: build\win\release.bat
       displayName: 'package'
-
-    - task: PowerShell@2
-      filePath: build\win\test.ps1
-      displayName: 'test'
 
     - task: CopyFiles@2
       inputs:
         Contents: 'build\win\libfly-*.zip'
         TargetFolder: $(Build.ArtifactStagingDirectory)
         flattenFolders: true
+      displayName: 'collect'
 
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: $(Build.ArtifactStagingDirectory)
         ArtifactName: windows
+      displayName: 'publish'
