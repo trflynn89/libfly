@@ -14,6 +14,8 @@ jobs:
       displayName: 'Dependencies'
 
     - template: setup.yml
+      parameters:
+        configuration: '${{ parameters.configuration }}'
 
     - script: |
         make -j -C build/nix release=0 arch=${{ parameters.arch }} libfly tests

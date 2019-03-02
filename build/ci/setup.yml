@@ -1,4 +1,8 @@
+parameters:
+  configuration: 'Debug'
+
 steps:
 - script: |
     git submodule update --init --recursive
+  condition: eq('${{ parameters.configuration }}', 'Debug')
   displayName: 'Setup'

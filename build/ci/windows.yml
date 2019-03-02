@@ -9,6 +9,8 @@ jobs:
 
     steps:
     - template: setup.yml
+      parameters:
+        configuration: '${{ parameters.configuration }}'
 
     - task: MSBuild@1
       inputs:
