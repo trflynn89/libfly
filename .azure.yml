@@ -1,42 +1,42 @@
 jobs:
   #### Linux ####
-  - template: build/ci/nix_debug.yml
+  - template: build/ci/linux.yml
     parameters:
-      name: Linux_Debug_x86
+      configuration: 'Debug'
       arch: 'x86'
 
-  - template: build/ci/nix_debug.yml
+  - template: build/ci/linux.yml
     parameters:
-      name: Linux_Debug_x64
+      configuration: 'Debug'
       arch: 'x64'
 
-  - template: build/ci/nix_release.yml
+  - template: build/ci/linux.yml
     parameters:
-      name: Linux_Release_x86
+      configuration: 'Release'
       arch: 'x86'
 
-  - template: build/ci/nix_release.yml
+  - template: build/ci/linux.yml
     parameters:
-      name: Linux_Release_x64
+      configuration: 'Release'
       arch: 'x64'
 
   #### Windows ####
-  - template: build/ci/win_debug.yml
+  - template: build/ci/windows.yml
     parameters:
-      name: Windows_Debug_x86
+      configuration: 'Debug'
       arch: 'x86'
 
-  - template: build/ci/win_debug.yml
+  - template: build/ci/windows.yml
     parameters:
-      name: Windows_Debug_x64
+      configuration: 'Debug'
       arch: 'x64'
 
-  - template: build/ci/win_release.yml
+  - template: build/ci/windows.yml
     parameters:
-      name: Windows_Release_x86
+      configuration: 'Release'
       arch: 'x86'
 
-  - template: build/ci/win_release.yml
+  - template: build/ci/windows.yml
     parameters:
-      name: Windows_Release_x64
+      configuration: 'Release'
       arch: 'x64'

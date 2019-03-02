@@ -1,0 +1,38 @@
+parameters:
+  configuration: 'Debug'
+  arch: 'x64'
+
+jobs:
+  - job: 'Windows_${{ parameters.configuration }}_${{ parameters.arch }}'
+    pool:
+      vmImage: 'vs2017-win2016'
+
+    steps:
+    - template: build/ci/setup.yml
+      parameters:
+        platform: Windows
+        arch: ${{ parameters.arch }}
+
+    - task: MSBuild@1
+      inputs:
+        solution: 'build\win\libfly.sln'
+        maximumCpuCount: true
+        configuration: '${{ parameters.configuration }}'
+        platform: '${{ parameters.arch }}'
+      displayName: 'Build'
+
+    - task: PowerShell@2
+      inputs:
+        filePath: build\win\test.ps1
+        arguments: -arch ${{ parameters.arch }}
+      condition: eq('${{ parameters.configuration }}', 'Debug')
+      displayName: 'Test'
+
+    - script: build\win\release.bat
+      condition: eq('${{ parameters.configuration }}', 'Release')
+      displayName: 'Package'
+
+    - template: build/ci/package.yml
+      condition: eq('${{ parameters.configuration }}', 'Release')
+      parameters:
+        contents: 'build\win\libfly-*.zip'
