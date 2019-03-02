@@ -1,5 +1,9 @@
 @echo off
 
+:: Set the build directory
+set root_dir=%~dp0
+if not exist "%root_dir%" echo error: "%root_dir%": not found & goto :eof
+
 :: Create release zips
 call:create_release x86
 call:create_release x64
