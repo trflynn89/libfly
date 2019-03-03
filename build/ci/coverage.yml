@@ -1,9 +1,0 @@
-steps:
-- script: sudo python -m pip install --upgrade pip setuptools wheel
-  displayName: 'Upgrade'
-
-- script: sudo pip install coverage
-  displayName: 'Pip'
-
-- script: bash <(curl -s https://codecov.io/bash)
-  displayName: 'Coverage'

@@ -18,9 +18,8 @@ jobs:
     - ${{ if eq(parameters.configuration, 'Debug') }}:
       - script: |
           make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
+          bash <(curl -s https://codecov.io/bash)
         displayName: 'Test'
-
-      - template: coverage.yml
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |
