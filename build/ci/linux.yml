@@ -20,6 +20,10 @@ jobs:
           make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
         displayName: 'Test'
 
+      - script: |
+          bash <(curl -s https://codecov.io/bash)
+        displayName: 'Coverage'
+
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |
           make -j -C build/nix release=1 arch=${{ parameters.arch }} libfly
