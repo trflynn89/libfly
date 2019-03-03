@@ -1,4 +1,13 @@
+parameters:
+  presteps: []
+  poststeps: []
+
 steps:
+- ${{ parameters.presteps }}
+
 - script: |
     git submodule update --init --recursive
+    pip install --upgrade pip
   displayName: 'Setup'
+
+- ${{ parameters.poststeps }}
