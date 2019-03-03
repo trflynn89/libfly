@@ -8,23 +8,19 @@ jobs:
       vmImage: 'Ubuntu-16.04'
 
     steps:
+    - ${{ if eq(parameters.arch, 'x86') }}:
+      - script: |
+          sudo apt-get install -y gcc-multilib g++-multilib
+        displayName: 'Dependencies'
+
     - template: setup.yml
-      parameters:
-        before:
-          - ${{ if eq(parameters.arch, 'x86') }}:
-            - script: sudo apt-get install -y gcc-multilib g++-multilib
-        after:
-          - ${{ if eq(parameters.configuration, 'Debug') }}:
-            - script: pip install coverage
 
     - ${{ if eq(parameters.configuration, 'Debug') }}:
       - script: |
           make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
         displayName: 'Test'
 
-      - script: |
-          bash <(curl -s https://codecov.io/bash)
-        displayName: 'Coverage'
+      - template: coverage.yml
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |
