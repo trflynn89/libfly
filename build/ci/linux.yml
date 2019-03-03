@@ -17,9 +17,14 @@ jobs:
 
     - ${{ if eq(parameters.configuration, 'Debug') }}:
       - script: |
-          echo $PATH
           make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
-          bash <(curl -s https://codecov.io/bash)
+
+          echo $PATH
+          path="${PATH%\"}"
+          path="${path#\"}"
+          echo $path
+
+          PATH=$path bash <(curl -s https://codecov.io/bash)
         displayName: 'Test'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
