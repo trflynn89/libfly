@@ -18,14 +18,13 @@ jobs:
     - ${{ if eq(parameters.configuration, 'Debug') }}:
       - script: |
           make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
-
-          echo $PATH
-          path="${PATH%\"}"
-          path="${path#\"}"
-          echo $path
-
-          PATH=$path bash <(curl -s https://codecov.io/bash)
         displayName: 'Test'
+
+      # Fix PATH to remove leading and trailing quotes, otherwise codecov fails
+      # when it runs `find`, which thinks that PATH is relative.
+      - script: |
+          PATH=${${PATH%\"}#\"} bash <(curl -s https://codecov.io/bash)
+        displayName: 'Coverage'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |
