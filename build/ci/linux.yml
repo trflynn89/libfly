@@ -10,11 +10,11 @@ jobs:
     steps:
     - template: setup.yml
       parameters:
-        ${{ if eq(parameters.arch, 'x86') }}:
-          before:
+        before:
+          ${{ if eq(parameters.arch, 'x86') }}:
             - script: sudo apt-get install -y gcc-multilib g++-multilib
-        ${{ if eq(parameters.configuration, 'Debug') }}:
-          after:
+        after:
+          ${{ if eq(parameters.configuration, 'Debug') }}:
             - script: pip install coverage
 
     - ${{ if eq(parameters.configuration, 'Debug') }}:
