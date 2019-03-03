@@ -13,23 +13,22 @@ jobs:
     - task: MSBuild@1
       inputs:
         solution: 'build\win\libfly.sln'
+        configuration: ${{ parameters.configuration }}
+        platform: ${{ parameters.arch }}
         maximumCpuCount: true
-        configuration: '${{ parameters.configuration }}'
-        platform: '${{ parameters.arch }}'
       displayName: 'Build'
 
-    - task: PowerShell@2
-      inputs:
-        filePath: build\win\test.ps1
-        arguments: -arch ${{ parameters.arch }}
-      condition: eq('${{ parameters.configuration }}', 'Debug')
-      displayName: 'Test'
+    - ${{ if eq(parameters.configuration, 'Debug') }}:
+      - task: PowerShell@2
+        inputs:
+          filePath: build\win\test.ps1
+          arguments: -arch ${{ parameters.arch }}
+        displayName: 'Test'
 
-    - script: build\win\release.bat
-      condition: eq('${{ parameters.configuration }}', 'Release')
-      displayName: 'Package'
+    - ${{ if eq(parameters.configuration, 'Release') }}:
+      - script: build\win\release.bat
+        displayName: 'Package'
 
-    - template: package.yml
-      parameters:
-        configuration: '${{ parameters.configuration }}'
-        contents: 'build\win\libfly-*.zip'
+      - template: package.yml
+        parameters:
+          contents: 'build\win\libfly-*.zip'

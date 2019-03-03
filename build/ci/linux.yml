@@ -8,24 +8,23 @@ jobs:
       vmImage: 'Ubuntu-16.04'
 
     steps:
-    - script: |
-        sudo apt-get install -y gcc-multilib g++-multilib
-      condition: eq('${{ parameters.arch }}', 'x86')
-      displayName: 'Dependencies'
+    - ${{ if eq(parameters.arch, 'x86') }}:
+      - script: |
+          sudo apt-get install -y gcc-multilib g++-multilib
+        displayName: 'Dependencies'
 
     - template: setup.yml
 
-    - script: |
-        make -j -C build/nix release=0 arch=${{ parameters.arch }} libfly tests
-      condition: eq('${{ parameters.configuration }}', 'Debug')
-      displayName: 'Build'
+    - ${{ if eq(parameters.configuration, 'Debug') }}:
+      - script: |
+          make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
+        displayName: 'Test'
 
-    - script: |
-        make -j -C build/nix release=1 arch=${{ parameters.arch }} libfly
-      condition: eq('${{ parameters.configuration }}', 'Release')
-      displayName: 'Build'
+    - ${{ if eq(parameters.configuration, 'Release') }}:
+      - script: |
+          make -j -C build/nix release=1 arch=${{ parameters.arch }} libfly
+        displayName: 'Build'
 
-    - template: package.yml
-      parameters:
-        configuration: '${{ parameters.configuration }}'
-        contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
+      - template: package.yml
+        parameters:
+          contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
