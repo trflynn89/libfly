@@ -41,10 +41,7 @@ SocketManagerImpl::~SocketManagerImpl()
 void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
 {
     fd_set readFd, writeFd;
-    struct timeval tv
-    {
-        0, static_cast<long>(timeout.count())
-    };
+    struct timeval tv({0, static_cast<long>(timeout.count())});
 
     bool anyMasksSet = false;
     {

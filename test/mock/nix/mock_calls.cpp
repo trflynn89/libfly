@@ -24,8 +24,8 @@ namespace {
 // The socket_test unit test will test SetAsync() twice. In the first test,
 // fcntl() will fail on its first invocation. In the second test, fcntl()
 // will behave normally on its first invocation, and fail on the second.
-static int s_fcntlCallCount = 0;
-static int s_fcntlNextCall = 1;
+int s_fcntlCallCount = 0;
+int s_fcntlNextCall = 1;
 
 // This is a hack to be able to test send() being called multiple times in
 // SocketTest::Send_Async_MockSendBlock.
@@ -35,7 +35,7 @@ static int s_fcntlNextCall = 1;
 // bytes and set errno to EWOULDBLOCK to make SocketImpl break out of its
 // send loop after the packet fragmentation. On the third call, send the
 // remaining bytes, completing the send.
-static int s_sendCallCount = 0;
+int s_sendCallCount = 0;
 
 // This is a hack to be able to test sendto() being called multiple times in
 // SocketTest::Send_Async_MockSendtoBlock.
@@ -45,10 +45,9 @@ static int s_sendCallCount = 0;
 // 0 bytes and set errno to EWOULDBLOCK to make SocketImpl break out of its
 // send loop after the packet fragmentation. On the third call, send the
 // remaining bytes, completing the send.
-static int s_sendtoCallCount = 0;
+int s_sendtoCallCount = 0;
 
-static const std::vector<std::string> s_tmpEnvs = {
-    {"TMPDIR", "TMP", "TEMP", "TEMPDIR"}};
+const std::vector<std::string> s_tmpEnvs = {"TMPDIR", "TMP", "TEMP", "TEMPDIR"};
 
 } // namespace
 

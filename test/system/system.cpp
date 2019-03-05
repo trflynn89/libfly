@@ -9,7 +9,7 @@
 
 namespace {
 
-static int s_lastSignal = 0;
+int s_lastSignal = 0;
 
 void handleSignal(int signal)
 {

@@ -22,10 +22,7 @@ void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
     fd_set readFd, writeFd;
 
     suseconds_t usec = static_cast<suseconds_t>(timeout.count());
-    struct timeval tv
-    {
-        0, usec
-    };
+    struct timeval tv({0, usec});
 
     socket_type maxFd = -1;
     {

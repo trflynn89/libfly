@@ -1,6 +1,6 @@
 ﻿# Upstream issues to track for better formatting:
-#   Prevent all function arguments on one line https://reviews.llvm.org/D40988
-#   Newlines before brackets after lambdas https://reviews.llvm.org/D44609
+#     Prevent all function arguments on one line https://reviews.llvm.org/D40988
+#     Newlines before brackets after lambdas https://reviews.llvm.org/D44609
 ---
 BasedOnStyle: WebKit
 AccessModifierOffset: -4
