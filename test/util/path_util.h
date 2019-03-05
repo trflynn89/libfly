@@ -51,4 +51,4 @@ public:
     static size_t ComputeFileSize(const std::string &path);
 };
 
-}
+} // namespace fly

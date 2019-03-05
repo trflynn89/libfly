@@ -49,8 +49,8 @@ bool PathImpl::RemovePath(const std::string &path)
         // SHFILEOPSTRUCT requires the path to be double-NULL-terminated
         buffer[len + 1] = '\0';
 
-        SHFILEOPSTRUCT operation = { NULL,      FO_DELETE, buffer, NULL,
-                                     FOF_NO_UI, FALSE,     NULL,   NULL };
+        SHFILEOPSTRUCT operation = {
+            NULL, FO_DELETE, buffer, NULL, FOF_NO_UI, FALSE, NULL, NULL};
 
         int error = ::SHFileOperation(&operation);
 

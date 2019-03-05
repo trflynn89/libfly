@@ -1,138 +1,137 @@
+#include "fly/types/string.h"
+
+#include <gtest/gtest.h>
+
 #include <regex>
 #include <string>
 #include <vector>
 
-#include <gtest/gtest.h>
+namespace {
 
-#include "fly/types/string.h"
-
-namespace
+//==========================================================================
+class Base
 {
-    //==========================================================================
-    class Base
+public:
+    Base(const std::string &str, int num) : m_str(str), m_num(num)
     {
-    public:
-        Base(const std::string &str, int num) :
-            m_str(str),
-            m_num(num)
-        {
-        }
-
-        std::string GetStr() const { return m_str; };
-        int GetNum() const { return m_num; };
-
-        size_t Hash() const
-        {
-            static std::hash<std::string> strHasher;
-            static std::hash<int> numHasher;
-            static int magic = 0x9e3779b9;
-
-            size_t strHash = strHasher(m_str);
-            size_t numHash = numHasher(m_num);
-
-            // Derived from boost::hash_combine
-            return (
-                strHash ^ (numHash + magic + (strHash << 6) + (strHash >> 2))
-            );
-        }
-
-    private:
-        std::string m_str;
-        int m_num;
-    };
-
-    //==========================================================================
-    class Hashable : public Base
-    {
-    public:
-        Hashable(const std::string &str, int num) : Base(str, num)
-        {
-        }
-    };
-
-    //==========================================================================
-    class Streamable : public Base
-    {
-    public:
-        Streamable(const std::string &str, int num) : Base(str, num)
-        {
-        }
-
-        friend std::ostream &operator << (std::ostream &, const Streamable &);
-    };
-
-    std::ostream &operator << (std::ostream &stream, const Streamable &obj)
-    {
-        stream << '[';
-        stream << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec;
-        stream << ']';
-
-        return stream;
     }
 
-    class HashableAndStreamable : public Base
+    std::string GetStr() const
     {
-    public:
-        HashableAndStreamable(const std::string &str, int num) : Base(str, num)
-        {
-        }
-
-        friend std::ostream &operator << (
-            std::ostream &,
-            const HashableAndStreamable &
-        );
+        return m_str;
+    };
+    int GetNum() const
+    {
+        return m_num;
     };
 
-    std::ostream &operator << (
-        std::ostream &stream,
-        const HashableAndStreamable &obj
-    )
+    size_t Hash() const
     {
-        stream << '[';
-        stream << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec;
-        stream << ']';
+        static std::hash<std::string> strHasher;
+        static std::hash<int> numHasher;
+        static int magic = 0x9e3779b9;
 
-        return stream;
+        size_t strHash = strHasher(m_str);
+        size_t numHash = numHasher(m_num);
+
+        // Derived from boost::hash_combine
+        return (strHash ^ (numHash + magic + (strHash << 6) + (strHash >> 2)));
     }
 
-    //==========================================================================
-    template <typename T>
-    std::string min_to_string()
+private:
+    std::string m_str;
+    int m_num;
+};
+
+//==========================================================================
+class Hashable : public Base
+{
+public:
+    Hashable(const std::string &str, int num) : Base(str, num)
     {
-        long long min = std::numeric_limits<T>::min();
-        return std::to_string(min - 1);
+    }
+};
+
+//==========================================================================
+class Streamable : public Base
+{
+public:
+    Streamable(const std::string &str, int num) : Base(str, num)
+    {
     }
 
-    //==========================================================================
-    template <typename T>
-    std::string max_to_string()
-    {
-        unsigned long long max = std::numeric_limits<T>::max();
-        return std::to_string(max + 1);
-    }
+    friend std::ostream &operator<<(std::ostream &, const Streamable &);
+};
+
+std::ostream &operator<<(std::ostream &stream, const Streamable &obj)
+{
+    stream << '[';
+    stream << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec;
+    stream << ']';
+
+    return stream;
 }
+
+class HashableAndStreamable : public Base
+{
+public:
+    HashableAndStreamable(const std::string &str, int num) : Base(str, num)
+    {
+    }
+
+    friend std::ostream &
+    operator<<(std::ostream &, const HashableAndStreamable &);
+};
+
+std::ostream &operator<<(std::ostream &stream, const HashableAndStreamable &obj)
+{
+    stream << '[';
+    stream << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec;
+    stream << ']';
+
+    return stream;
+}
+
+//==========================================================================
+template <typename T>
+std::string min_to_string()
+{
+    long long min = std::numeric_limits<T>::min();
+    return std::to_string(min - 1);
+}
+
+//==========================================================================
+template <typename T>
+std::string max_to_string()
+{
+    unsigned long long max = std::numeric_limits<T>::max();
+    return std::to_string(max + 1);
+}
+
+} // namespace
 
 //==============================================================================
-namespace std
-{
-    template <>
-    struct hash<Hashable *>
-    {
-        size_t operator()(const Hashable *value) const
-        {
-            return value->Hash();
-        }
-    };
+namespace std {
 
-    template <>
-    struct hash<HashableAndStreamable *>
+template <>
+struct hash<Hashable *>
+{
+    size_t operator()(const Hashable *value) const
     {
-        size_t operator()(const HashableAndStreamable *value) const
-        {
-            return value->Hash();
-        }
-    };
-}
+        return value->Hash();
+    }
+};
+
+template <>
+struct hash<HashableAndStreamable *>
+{
+    size_t operator()(const HashableAndStreamable *value) const
+    {
+        return value->Hash();
+    }
+};
+
+} // namespace std
 
 //==============================================================================
 TEST(StringTest, SplitTest)
@@ -365,18 +364,14 @@ TEST(StringTest, FormatTest)
     EXPECT_EQ("This is a test", fly::String::Format("This is a test"));
     EXPECT_EQ(
         "there are no formatters",
-        fly::String::Format("there are no formatters", 1, 2, 3, 4)
-    );
+        fly::String::Format("there are no formatters", 1, 2, 3, 4));
     EXPECT_EQ(
         "test some string s",
-        fly::String::Format("test %s %c", std::string("some string"), 's')
-    );
+        fly::String::Format("test %s %c", std::string("some string"), 's'));
     EXPECT_EQ(
         "test 1 true 2.100000 false 1.230000e+02 0xff",
         fly::String::Format(
-            "test %d %d %f %d %e %x", 1, true, 2.1f, false, 123.0, 255
-        )
-    );
+            "test %d %d %f %d %e %x", 1, true, 2.1f, false, 123.0, 255));
 }
 
 //==============================================================================
@@ -388,7 +383,7 @@ TEST(StringTest, JoinTest)
 
     std::string str("a");
     const char *ctr = "b";
-    char arr[] = { 'c', '\0' };
+    char arr[] = {'c', '\0'};
     char chr = 'd';
 
     EXPECT_EQ("a", fly::String::Join('.', str));
@@ -415,18 +410,13 @@ TEST(StringTest, JoinTest)
 
     EXPECT_EQ("[goodbye beef]", fly::String::Join('.', obj2));
     EXPECT_EQ(
-        "a:[goodbye beef]:c:d",
-        fly::String::Join(':', str, obj2, arr, chr)
-    );
+        "a:[goodbye beef]:c:d", fly::String::Join(':', str, obj2, arr, chr));
     EXPECT_EQ("a:c:d", fly::String::Join(':', str, arr, chr));
 
     std::regex test(
-        "(\\[0x[0-9a-fA-F]+\\]:2:\\[goodbye beef\\]:\\[world f00d\\])"
-    );
-    ASSERT_TRUE(std::regex_match(
-        fly::String::Join(':', obj1, 2, obj2, obj3),
-        test
-    ));
+        "(\\[0x[0-9a-fA-F]+\\]:2:\\[goodbye beef\\]:\\[world f00d\\])");
+    ASSERT_TRUE(
+        std::regex_match(fly::String::Join(':', obj1, 2, obj2, obj3), test));
 }
 
 //==============================================================================
@@ -447,11 +437,9 @@ TEST(StringTest, ConvertTest)
     EXPECT_EQ(fly::String::Convert<char>("0"), '\0');
     EXPECT_EQ(fly::String::Convert<char>("65"), 'A');
     EXPECT_THROW(
-        fly::String::Convert<char>(min_to_string<char>()), std::out_of_range
-    );
+        fly::String::Convert<char>(min_to_string<char>()), std::out_of_range);
     EXPECT_THROW(
-        fly::String::Convert<char>(max_to_string<char>()), std::out_of_range
-    );
+        fly::String::Convert<char>(max_to_string<char>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<char>("abc"), std::invalid_argument);
     EXPECT_THROW(fly::String::Convert<char>("2a"), std::invalid_argument);
 
@@ -459,28 +447,22 @@ TEST(StringTest, ConvertTest)
     EXPECT_EQ(fly::String::Convert<unsigned char>("200"), (unsigned char)200);
     EXPECT_THROW(
         fly::String::Convert<unsigned char>(min_to_string<unsigned char>()),
-        std::out_of_range
-    );
+        std::out_of_range);
     EXPECT_THROW(
         fly::String::Convert<unsigned char>(max_to_string<unsigned char>()),
-        std::out_of_range
-    );
+        std::out_of_range);
     EXPECT_THROW(
-        fly::String::Convert<unsigned char>("abc"), std::invalid_argument
-    );
+        fly::String::Convert<unsigned char>("abc"), std::invalid_argument);
     EXPECT_THROW(
-        fly::String::Convert<unsigned char>("2a"), std::invalid_argument
-    );
+        fly::String::Convert<unsigned char>("2a"), std::invalid_argument);
 
     // SHORT
     EXPECT_EQ(fly::String::Convert<short>("-400"), (short)-400);
     EXPECT_EQ(fly::String::Convert<short>("400"), (short)400);
     EXPECT_THROW(
-        fly::String::Convert<short>(min_to_string<short>()), std::out_of_range
-    );
+        fly::String::Convert<short>(min_to_string<short>()), std::out_of_range);
     EXPECT_THROW(
-        fly::String::Convert<short>(max_to_string<short>()), std::out_of_range
-    );
+        fly::String::Convert<short>(max_to_string<short>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<short>("abc"), std::invalid_argument);
     EXPECT_THROW(fly::String::Convert<short>("2a"), std::invalid_argument);
 
@@ -488,30 +470,22 @@ TEST(StringTest, ConvertTest)
     EXPECT_EQ(fly::String::Convert<unsigned short>("400"), (unsigned short)400);
     EXPECT_THROW(
         fly::String::Convert<unsigned short>(min_to_string<unsigned short>()),
-        std::out_of_range
-    );
+        std::out_of_range);
     EXPECT_THROW(
         fly::String::Convert<unsigned short>(max_to_string<unsigned short>()),
-        std::out_of_range
-    );
+        std::out_of_range);
     EXPECT_THROW(
-        fly::String::Convert<unsigned short>("abc"),
-        std::invalid_argument
-    );
+        fly::String::Convert<unsigned short>("abc"), std::invalid_argument);
     EXPECT_THROW(
-        fly::String::Convert<unsigned short>("2a"),
-        std::invalid_argument
-    );
+        fly::String::Convert<unsigned short>("2a"), std::invalid_argument);
 
     // INT
     EXPECT_EQ(fly::String::Convert<int>("-400"), (int)-400);
     EXPECT_EQ(fly::String::Convert<int>("400"), (int)400);
     EXPECT_THROW(
-        fly::String::Convert<int>(min_to_string<int>()), std::out_of_range
-    );
+        fly::String::Convert<int>(min_to_string<int>()), std::out_of_range);
     EXPECT_THROW(
-        fly::String::Convert<int>(max_to_string<int>()), std::out_of_range
-    );
+        fly::String::Convert<int>(max_to_string<int>()), std::out_of_range);
     EXPECT_THROW(fly::String::Convert<int>("abc"), std::invalid_argument);
     EXPECT_THROW(fly::String::Convert<int>("2a"), std::invalid_argument);
 
@@ -519,18 +493,14 @@ TEST(StringTest, ConvertTest)
     EXPECT_EQ(fly::String::Convert<unsigned int>("400"), (unsigned int)400);
     EXPECT_THROW(
         fly::String::Convert<unsigned int>(min_to_string<unsigned int>()),
-        std::out_of_range
-    );
+        std::out_of_range);
     EXPECT_THROW(
         fly::String::Convert<unsigned int>(max_to_string<unsigned int>()),
-        std::out_of_range
-    );
+        std::out_of_range);
     EXPECT_THROW(
-        fly::String::Convert<unsigned int>("abc"), std::invalid_argument
-    );
+        fly::String::Convert<unsigned int>("abc"), std::invalid_argument);
     EXPECT_THROW(
-        fly::String::Convert<unsigned int>("2a"), std::invalid_argument
-    );
+        fly::String::Convert<unsigned int>("2a"), std::invalid_argument);
 
     // LONG
     EXPECT_EQ(fly::String::Convert<long>("-400"), (long)-400);
@@ -541,11 +511,9 @@ TEST(StringTest, ConvertTest)
     EXPECT_EQ(fly::String::Convert<unsigned long>("0"), (unsigned long)0);
     EXPECT_EQ(fly::String::Convert<unsigned long>("400"), (unsigned long)400);
     EXPECT_THROW(
-        fly::String::Convert<unsigned long>("abc"), std::invalid_argument
-    );
+        fly::String::Convert<unsigned long>("abc"), std::invalid_argument);
     EXPECT_THROW(
-        fly::String::Convert<unsigned long>("2a"), std::invalid_argument
-    );
+        fly::String::Convert<unsigned long>("2a"), std::invalid_argument);
 
     // LONG LONG
     EXPECT_EQ(fly::String::Convert<long long>("-400"), (long long)-400);
@@ -554,17 +522,14 @@ TEST(StringTest, ConvertTest)
     EXPECT_THROW(fly::String::Convert<long long>("2a"), std::invalid_argument);
 
     EXPECT_EQ(
-        fly::String::Convert<unsigned long long>("0"), (unsigned long long)0
-    );
+        fly::String::Convert<unsigned long long>("0"), (unsigned long long)0);
     EXPECT_EQ(
-        fly::String::Convert<unsigned long long>("400"), (unsigned long long)400
-    );
+        fly::String::Convert<unsigned long long>("400"),
+        (unsigned long long)400);
     EXPECT_THROW(
-        fly::String::Convert<unsigned long long>("abc"), std::invalid_argument
-    );
+        fly::String::Convert<unsigned long long>("abc"), std::invalid_argument);
     EXPECT_THROW(
-        fly::String::Convert<unsigned long long>("2a"), std::invalid_argument
-    );
+        fly::String::Convert<unsigned long long>("2a"), std::invalid_argument);
 
     // FLOAT
     EXPECT_EQ(fly::String::Convert<float>("-400.123"), -400.123f);
@@ -582,9 +547,7 @@ TEST(StringTest, ConvertTest)
     EXPECT_EQ(fly::String::Convert<long double>("-400.123"), -400.123L);
     EXPECT_EQ(fly::String::Convert<long double>("400.456"), 400.456L);
     EXPECT_THROW(
-        fly::String::Convert<long double>("abc"), std::invalid_argument
-    );
+        fly::String::Convert<long double>("abc"), std::invalid_argument);
     EXPECT_THROW(
-        fly::String::Convert<long double>("2a"), std::invalid_argument
-    );
+        fly::String::Convert<long double>("2a"), std::invalid_argument);
 }

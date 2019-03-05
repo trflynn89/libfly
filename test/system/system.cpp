@@ -1,21 +1,22 @@
-#include <csignal>
-#include <string>
-
-#include <gtest/gtest.h>
-
 #include "fly/system/system.h"
 
 #include "test/util/capture_stream.h"
 
-namespace
-{
-    static int s_lastSignal = 0;
+#include <gtest/gtest.h>
 
-    void handleSignal(int signal)
-    {
-        s_lastSignal = signal;
-    }
+#include <csignal>
+#include <string>
+
+namespace {
+
+static int s_lastSignal = 0;
+
+void handleSignal(int signal)
+{
+    s_lastSignal = signal;
 }
+
+} // namespace
 
 //==============================================================================
 TEST(SystemTest, PrintBacktraceTest)

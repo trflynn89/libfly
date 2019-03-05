@@ -1,10 +1,9 @@
 #pragma once
 
-#include <memory>
+#include "test/qt5/main_window.uic.h"
 
 #include <QMainWindow>
-
-#include "test/qt5/main_window.uic.h"
+#include <memory>
 
 namespace fly {
 
@@ -25,4 +24,4 @@ private:
     std::unique_ptr<Ui::MainWindow> m_upUi;
 };
 
-}
+} // namespace fly

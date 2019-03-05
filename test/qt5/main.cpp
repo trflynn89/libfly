@@ -1,8 +1,8 @@
+#include "test/qt5/main_window.h"
+
 #include <QApplication>
 #include <QLabel>
 #include <QtGui>
-
-#include "test/qt5/main_window.h"
 
 //==============================================================================
 int main(int argc, char **argv)

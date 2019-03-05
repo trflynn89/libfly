@@ -1,19 +1,19 @@
 #include "test/util/capture_stream.h"
 
+#include "fly/fly.h"
+
 #include <cstdio>
 #include <cstdlib>
 
-#include "fly/fly.h"
-
 #if defined(FLY_WINDOWS)
-    #include <io.h>
+#    include <io.h>
 
-    #define close _close
-    #define dup _dup
-    #define dup2 _dup2
-    #define fileno _fileno
+#    define close _close
+#    define dup _dup
+#    define dup2 _dup2
+#    define fileno _fileno
 #elif defined(FLY_LINUX)
-    #include <unistd.h>
+#    include <unistd.h>
 #endif
 
 #include "test/util/path_util.h"
@@ -40,13 +40,13 @@ CaptureStream::CaptureStream(Stream stream) :
 
         switch (stream)
         {
-        case Stream::Stdout:
-            m_stdio = ::fileno(stdout);
-            break;
+            case Stream::Stdout:
+                m_stdio = ::fileno(stdout);
+                break;
 
-        case Stream::Stderr:
-            m_stdio = ::fileno(stderr);
-            break;
+            case Stream::Stderr:
+                m_stdio = ::fileno(stderr);
+                break;
         }
 
         m_original = ::dup(m_stdio);
@@ -63,7 +63,7 @@ CaptureStream::~CaptureStream()
 }
 
 //==============================================================================
-std::string CaptureStream::operator() ()
+std::string CaptureStream::operator()()
 {
     return restore(true);
 }
@@ -90,4 +90,4 @@ std::string CaptureStream::restore(bool read)
     return contents;
 }
 
-}
+} // namespace fly

@@ -1,14 +1,14 @@
 #pragma once
 
+#include "fly/fly.h"
+
 #include <map>
 #include <mutex>
-
-#include "fly/fly.h"
 
 #if defined(FLY_WINDOWS)
 
 #elif defined(FLY_LINUX)
-    #include "test/mock/nix/mock_calls.h"
+#    include "test/mock/nix/mock_calls.h"
 #endif
 
 namespace fly {
@@ -78,4 +78,4 @@ private:
     const MockCall m_mock;
 };
 
-}
+} // namespace fly

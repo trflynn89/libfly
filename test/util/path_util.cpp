@@ -1,11 +1,11 @@
 #include "test/util/path_util.h"
 
-#include <limits>
-#include <fstream>
-#include <sstream>
-
 #include "fly/path/path.h"
 #include "fly/types/string.h"
+
+#include <fstream>
+#include <limits>
+#include <sstream>
 
 namespace fly {
 
@@ -13,9 +13,7 @@ namespace fly {
 std::string PathUtil::GenerateTempDirectory()
 {
     return fly::Path::Join(
-        fly::Path::GetTempDirectory(),
-        fly::String::GenerateRandomString(10)
-    );
+        fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10));
 }
 
 //==============================================================================
@@ -60,4 +58,4 @@ size_t PathUtil::ComputeFileSize(const std::string &path)
     return size;
 }
 
-}
+} // namespace fly

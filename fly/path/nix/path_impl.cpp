@@ -18,7 +18,7 @@ namespace {
 
     const int s_ftsMode = FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV;
 
-    const std::string s_tmpEnvs[] = { "TMPDIR", "TMP", "TEMP", "TEMPDIR", "" };
+    const std::string s_tmpEnvs[] = {"TMPDIR", "TMP", "TEMP", "TEMPDIR", ""};
 
     /**
      * RAII wrapper around ::fts_open().
@@ -128,7 +128,7 @@ bool PathImpl::RemovePath(const std::string &path)
 
     if (ret)
     {
-        char *files[] = { (char *)path.c_str(), NULL };
+        char *files[] = {(char *)path.c_str(), NULL};
 
         FtsWrapper fts(files);
         FTSENT *pCurr = NULL;

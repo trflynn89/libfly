@@ -102,4 +102,6 @@ endif
 
 # Style enforcement
 style:
-	clang-format -i $$(find $(SOURCE_ROOT)/fly -iname "*.h" -o -iname "*.cpp")
+	$(Q)clang-format -i $$(find $(SOURCE_ROOT) \
+		-not \( -path "*googletest*" -prune \) \
+		-name "*.h" -o -name "*.cpp")

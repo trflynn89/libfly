@@ -779,12 +779,12 @@ Json::operator T() const
 {
     if (IsObject())
     {
-        T t{};
+        T t {};
 
         for (const auto &kv : *(m_value.m_pObject))
         {
-            t.insert({ typename T::key_type(kv.first),
-                       typename T::mapped_type(kv.second) });
+            t.insert({typename T::key_type(kv.first),
+                      typename T::mapped_type(kv.second)});
         }
 
         return t;
@@ -813,7 +813,7 @@ Json::operator std::array<T, N>() const
 {
     if (IsArray())
     {
-        std::array<T, N> array{};
+        std::array<T, N> array {};
         const std::size_t size = std::min(N, m_value.m_pArray->size());
 
         for (std::size_t i = 0; i < size; ++i)

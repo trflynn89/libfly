@@ -1,10 +1,11 @@
-#include <memory>
+#include "fly/parser/ini_parser.h"
+
+#include "fly/parser/exceptions.h"
+#include "fly/path/path.h"
 
 #include <gtest/gtest.h>
 
-#include "fly/parser/exceptions.h"
-#include "fly/parser/ini_parser.h"
-#include "fly/path/path.h"
+#include <memory>
 
 //==============================================================================
 class IniParserTest : public ::testing::Test
@@ -31,8 +32,7 @@ TEST_F(IniParserTest, NonExistingFileTest)
 {
     fly::Json values;
     ASSERT_NO_THROW(
-        values = m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.ini")
-    );
+        values = m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.ini"));
     EXPECT_EQ(values.Size(), 0);
 }
 
@@ -62,8 +62,7 @@ TEST_F(IniParserTest, NonEmptySectionTest)
     const std::string contents(
         "[section]\n"
         "name=John Doe\n"
-        "address=USA"
-    );
+        "address=USA");
 
     fly::Json values;
     ASSERT_NO_THROW(values = m_spParser->Parse(contents));
@@ -78,8 +77,7 @@ TEST_F(IniParserTest, NonExistingTest)
     const std::string contents(
         "[section]\n"
         "name=John Doe\n"
-        "address=USA"
-    );
+        "address=USA");
 
     fly::Json values;
     ASSERT_NO_THROW(values = m_spParser->Parse(contents));
@@ -96,8 +94,7 @@ TEST_F(IniParserTest, CommentTest)
         "[section]\n"
         "name=John Doe\n"
         "; [other-section]\n"
-        "; name=Jane Doe\n"
-    );
+        "; name=Jane Doe\n");
 
     fly::Json values;
     ASSERT_NO_THROW(values = m_spParser->Parse(contents));
@@ -113,8 +110,7 @@ TEST_F(IniParserTest, ErrantSpacesTest)
     const std::string contents(
         "   [section   ]  \n"
         "\t\t\n   name=John Doe\t  \n"
-        "\taddress  = USA\t \r \n"
-    );
+        "\taddress  = USA\t \r \n");
 
     fly::Json values;
     ASSERT_NO_THROW(values = m_spParser->Parse(contents));
@@ -129,8 +125,7 @@ TEST_F(IniParserTest, QuotedValueTest)
     const std::string contents(
         "[section]\n"
         "name=\"  John Doe  \"\n"
-        "address= \t '\\tUSA'"
-    );
+        "address= \t '\\tUSA'");
 
     fly::Json values;
     ASSERT_NO_THROW(values = m_spParser->Parse(contents));
@@ -151,8 +146,7 @@ TEST_F(IniParserTest, MutlipleSectionTypeTest)
         "age=30.12\n"
         "[section3]\n"
         "name=Joe Doe\n"
-        "noage=1\n"
-    );
+        "noage=1\n");
 
     fly::Json values;
     ASSERT_NO_THROW(values = m_spParser->Parse(contents));
@@ -170,8 +164,7 @@ TEST_F(IniParserTest, DuplicateSectionTest)
         "[section]\n"
         "name=John Doe\n"
         "[section]\n"
-        "name=Jane Doe\n"
-    );
+        "name=Jane Doe\n");
 
     fly::Json values;
     EXPECT_NO_THROW(values = m_spParser->Parse(contents1));
@@ -183,8 +176,7 @@ TEST_F(IniParserTest, DuplicateSectionTest)
         "[  \tsection]\n"
         "name=John Doe\n"
         "[section  ]\n"
-        "name=Jane Doe\n"
-    );
+        "name=Jane Doe\n");
 
     EXPECT_NO_THROW(values = m_spParser->Parse(contents2));
     EXPECT_EQ(values.Size(), 1);
@@ -198,8 +190,7 @@ TEST_F(IniParserTest, DuplicateValueTest)
     const std::string contents(
         "[section]\n"
         "name=John Doe\n"
-        "name=Jane Doe\n"
-    );
+        "name=Jane Doe\n");
 
     fly::Json values;
     EXPECT_NO_THROW(values = m_spParser->Parse(contents));
@@ -213,13 +204,11 @@ TEST_F(IniParserTest, ImbalancedBraceTest)
 {
     const std::string contents1(
         "[section\n"
-        "name=John Doe\n"
-    );
+        "name=John Doe\n");
 
     const std::string contents2(
         "section]\n"
-        "name=John Doe\n"
-    );
+        "name=John Doe\n");
 
     EXPECT_THROW(m_spParser->Parse(contents1), fly::ParserException);
     EXPECT_THROW(m_spParser->Parse(contents2), fly::ParserException);
@@ -230,32 +219,26 @@ TEST_F(IniParserTest, ImbalancedQuoteTest)
 {
     const std::string contents1(
         "[section]\n"
-        "name=\"John Doe\n"
-    );
+        "name=\"John Doe\n");
 
     const std::string contents2(
         "[section]\n"
-        "name=John Doe\"\n"
-    );
+        "name=John Doe\"\n");
     const std::string contents3(
         "[section]\n"
-        "name='John Doe\n"
-    );
+        "name='John Doe\n");
 
     const std::string contents4(
         "[section]\n"
-        "name=John Doe'\n"
-    );
+        "name=John Doe'\n");
 
     const std::string contents5(
         "[section]\n"
-        "name=\"John Doe'\n"
-    );
+        "name=\"John Doe'\n");
 
     const std::string contents6(
         "[section]\n"
-        "name='John Doe\"\n"
-    );
+        "name='John Doe\"\n");
 
     EXPECT_THROW(m_spParser->Parse(contents1), fly::ParserException);
     EXPECT_THROW(m_spParser->Parse(contents2), fly::ParserException);
@@ -270,33 +253,27 @@ TEST_F(IniParserTest, MisplacedQuoteTest)
 {
     const std::string contents1(
         "[section]\n"
-        "\"name\"=John Doe\n"
-    );
+        "\"name\"=John Doe\n");
 
     const std::string contents2(
         "[section]\n"
-        "\'name\'=John Doe\n"
-    );
+        "\'name\'=John Doe\n");
 
     const std::string contents3(
         "[\"section\"]\n"
-        "name=John Doe\n"
-    );
+        "name=John Doe\n");
 
     const std::string contents4(
         "[\'section\']\n"
-        "name=John Doe\n"
-    );
+        "name=John Doe\n");
 
     const std::string contents5(
         "\"[section]\"\n"
-        "name=John Doe\n"
-    );
+        "name=John Doe\n");
 
     const std::string contents6(
         "\'[section]\'\n"
-        "name=John Doe\n"
-    );
+        "name=John Doe\n");
 
     EXPECT_THROW(m_spParser->Parse(contents1), fly::ParserException);
     EXPECT_THROW(m_spParser->Parse(contents2), fly::ParserException);
@@ -311,12 +288,10 @@ TEST_F(IniParserTest, MultipleAssignmentTest)
 {
     const std::string contents1(
         "[section]\n"
-        "name=John=Doe\n"
-    );
+        "name=John=Doe\n");
     const std::string contents2(
         "[section]\n"
-        "name=\"John=Doe\"\n"
-    );
+        "name=\"John=Doe\"\n");
 
     fly::Json values;
 
@@ -334,13 +309,11 @@ TEST_F(IniParserTest, MissingAssignmentTest)
 {
     const std::string contents1(
         "[section]\n"
-        "name\n"
-    );
+        "name\n");
 
     const std::string contents2(
         "[section]\n"
-        "name=\n"
-    );
+        "name=\n");
 
     EXPECT_THROW(m_spParser->Parse(contents1), fly::ParserException);
     EXPECT_THROW(m_spParser->Parse(contents2), fly::ParserException);
@@ -351,18 +324,15 @@ TEST_F(IniParserTest, EarlyAssignmentTest)
 {
     const std::string contents1(
         "name=John Doe\n"
-        "[section]\n"
-    );
+        "[section]\n");
 
     const std::string contents2(
         "name=\n"
-        "[section]\n"
-    );
+        "[section]\n");
 
     const std::string contents3(
         "name\n"
-        "[section]\n"
-    );
+        "[section]\n");
 
     EXPECT_THROW(m_spParser->Parse(contents1), fly::ParserException);
     EXPECT_THROW(m_spParser->Parse(contents2), fly::ParserException);
@@ -375,8 +345,7 @@ TEST_F(IniParserTest, MultipleParseTest)
     const std::string contents(
         "[section]\n"
         "name=John Doe\n"
-        "address=USA"
-    );
+        "address=USA");
 
     fly::Json values;
 

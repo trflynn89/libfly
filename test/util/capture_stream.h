@@ -39,7 +39,7 @@ public:
      *
      * @return string The contents of the redirected stream.
      */
-    std::string operator() ();
+    std::string operator()();
 
 private:
     /**
@@ -58,4 +58,4 @@ private:
     int m_original;
 };
 
-}
+} // namespace fly

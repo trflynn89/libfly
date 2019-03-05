@@ -12,4 +12,4 @@ private:
     const int m_value;
 };
 
-}
+} // namespace fly

@@ -1,11 +1,11 @@
 #pragma once
 
+#include "fly/task/task_runner.h"
+#include "fly/types/concurrent_queue.h"
+
 #include <chrono>
 #include <memory>
 #include <typeinfo>
-
-#include "fly/task/task_runner.h"
-#include "fly/types/concurrent_queue.h"
 
 namespace fly {
 
@@ -117,8 +117,8 @@ protected:
 template <typename TaskType>
 void WaitableTaskRunner::WaitForTaskTypeToComplete()
 {
-    static_assert(std::is_base_of<Task, TaskType>::value,
-        "Given type is not a task");
+    static_assert(
+        std::is_base_of<Task, TaskType>::value, "Given type is not a task");
 
     static size_t expected_hash = typeid(TaskType).hash_code();
     size_t completed_hash = 0;
@@ -132,11 +132,10 @@ void WaitableTaskRunner::WaitForTaskTypeToComplete()
 //==============================================================================
 template <typename TaskType, typename R, typename P>
 bool WaitableTaskRunner::WaitForTaskTypeToComplete(
-    std::chrono::duration<R, P> duration
-)
+    std::chrono::duration<R, P> duration)
 {
-    static_assert(std::is_base_of<Task, TaskType>::value,
-        "Given type is not a task");
+    static_assert(
+        std::is_base_of<Task, TaskType>::value, "Given type is not a task");
 
     auto deadline = std::chrono::high_resolution_clock::now() + duration;
 
@@ -161,4 +160,4 @@ bool WaitableTaskRunner::WaitForTaskTypeToComplete(
     return (expected_hash == completed_hash);
 }
 
-}
+} // namespace fly

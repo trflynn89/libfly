@@ -1,10 +1,11 @@
-#include <cstddef>
-#include <memory>
+#include "fly/config/config.h"
+
+#include "fly/types/json.h"
 
 #include <gtest/gtest.h>
 
-#include "fly/config/config.h"
-#include "fly/types/json.h"
+#include <cstddef>
+#include <memory>
 
 //==============================================================================
 class ConfigTest : public ::testing::Test
@@ -27,29 +28,22 @@ TEST_F(ConfigTest, NonExistingTest)
 //==============================================================================
 TEST_F(ConfigTest, NonCovertibleTest)
 {
-    const fly::Json values = {
-        { "name", "John Doe" },
-        { "address", "USA" }
-    };
+    const fly::Json values = {{"name", "John Doe"}, {"address", "USA"}};
 
     m_spConfig->Update(values);
 
     EXPECT_EQ(m_spConfig->GetValue<int>("name", 12), 12);
     EXPECT_EQ(
-        m_spConfig->GetValue<std::nullptr_t>("address", nullptr),
-        nullptr
-    );
+        m_spConfig->GetValue<std::nullptr_t>("address", nullptr), nullptr);
 }
 
 //==============================================================================
 TEST_F(ConfigTest, MultipleValueTypeTest)
 {
-    const fly::Json values = {
-        { "name", "John Doe" },
-        { "address", "123" },
-        { "employed", "1" },
-        { "age", "26.2" }
-    };
+    const fly::Json values = {{"name", "John Doe"},
+                              {"address", "123"},
+                              {"employed", "1"},
+                              {"age", "26.2"}};
 
     m_spConfig->Update(values);
 

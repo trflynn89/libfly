@@ -1,64 +1,62 @@
-#include <atomic>
-#include <memory>
-
-#include <gtest/gtest.h>
-
 #include "fly/task/task.h"
+
 #include "fly/task/task_manager.h"
 #include "fly/task/task_runner.h"
 #include "fly/types/concurrent_queue.h"
-
 #include "test/util/waitable_task_runner.h"
 
-namespace
+#include <gtest/gtest.h>
+
+#include <atomic>
+#include <memory>
+
+namespace {
+
+//==========================================================================
+class CountTask : public fly::Task
 {
-    //==========================================================================
-    class CountTask : public fly::Task
+public:
+    CountTask() : m_count(0)
     {
-    public:
-        CountTask() : m_count(0)
-        {
-        }
+    }
 
-        int GetCount() const
-        {
-            return m_count.load();
-        }
-
-    protected:
-        void Run() override
-        {
-            ++m_count;
-        }
-
-    private:
-        std::atomic_int m_count;
-    };
-
-    //==========================================================================
-    class MarkerTask : public fly::Task
+    int GetCount() const
     {
-    public:
-        MarkerTask(
-            fly::ConcurrentQueue<int> *pOrdering,
-            int marker
-        ) :
-            m_pOrdering(pOrdering),
-            m_marker(marker)
-        {
-        }
+        return m_count.load();
+    }
 
-    protected:
-        void Run() override
-        {
-            m_pOrdering->Push(m_marker);
-        }
+protected:
+    void Run() override
+    {
+        ++m_count;
+    }
 
-    private:
-        fly::ConcurrentQueue<int> *m_pOrdering;
-        int m_marker;
-    };
-}
+private:
+    std::atomic_int m_count;
+};
+
+//==========================================================================
+class MarkerTask : public fly::Task
+{
+public:
+    MarkerTask(fly::ConcurrentQueue<int> *pOrdering, int marker) :
+        m_pOrdering(pOrdering),
+        m_marker(marker)
+    {
+    }
+
+protected:
+    void Run() override
+    {
+        m_pOrdering->Push(m_marker);
+    }
+
+private:
+    fly::ConcurrentQueue<int> *m_pOrdering;
+    int m_marker;
+};
+
+} // namespace
 
 //==============================================================================
 class TaskTest : public ::testing::Test
@@ -108,8 +106,7 @@ TEST_F(TaskTest, MultipleStopTest)
 TEST_F(TaskTest, ParallelTaskRunnerTest)
 {
     auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableParallelTaskRunner>()
-    );
+        m_spTaskManager->CreateTaskRunner<fly::WaitableParallelTaskRunner>());
 
     auto spTask(std::make_shared<CountTask>());
 
@@ -126,8 +123,7 @@ TEST_F(TaskTest, ParallelTaskRunnerTest)
 TEST_F(TaskTest, SequencedTaskRunnerTest)
 {
     auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
-    );
+        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
 
     int marker = 0;
     fly::ConcurrentQueue<int> ordering;
@@ -158,15 +154,13 @@ TEST_F(TaskTest, SequencedTaskRunnerTest)
 TEST_F(TaskTest, DelayTaskTest)
 {
     auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
-    );
+        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
 
     auto spTask(std::make_shared<CountTask>());
     EXPECT_EQ(spTask->GetCount(), 0);
 
     EXPECT_TRUE(
-        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10)
-    ));
+        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10)));
 
     spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
     EXPECT_EQ(spTask->GetCount(), 1);
@@ -176,8 +170,7 @@ TEST_F(TaskTest, DelayTaskTest)
 TEST_F(TaskTest, ImmediateAndDelayTaskTest)
 {
     auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
-    );
+        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
 
     int marker = 0;
     fly::ConcurrentQueue<int> ordering;
@@ -186,9 +179,8 @@ TEST_F(TaskTest, ImmediateAndDelayTaskTest)
     auto spTask2(std::make_shared<MarkerTask>(&ordering, 2));
     auto spTask3(std::make_shared<MarkerTask>(&ordering, 3));
 
-    EXPECT_TRUE(
-        spTaskRunner->PostTaskWithDelay(spTask1, std::chrono::milliseconds(10)
-    ));
+    EXPECT_TRUE(spTaskRunner->PostTaskWithDelay(
+        spTask1, std::chrono::milliseconds(10)));
     EXPECT_TRUE(spTaskRunner->PostTask(spTask2));
     EXPECT_TRUE(spTaskRunner->PostTask(spTask3));
 
@@ -210,29 +202,25 @@ TEST_F(TaskTest, ImmediateAndDelayTaskTest)
 TEST_F(TaskTest, CancelTaskTest)
 {
     auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
-    );
+        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
 
     {
         auto spTask(std::make_shared<CountTask>());
         EXPECT_EQ(spTask->GetCount(), 0);
 
         EXPECT_TRUE(spTaskRunner->PostTaskWithDelay(
-            spTask, std::chrono::milliseconds(10)
-        ));
+            spTask, std::chrono::milliseconds(10)));
     }
 
     EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
-        std::chrono::milliseconds(20)
-    ));
+        std::chrono::milliseconds(20)));
 }
 
 //==============================================================================
 TEST_F(TaskTest, ImmediateAndDelayCancelTaskTest)
 {
     auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
-    );
+        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
 
     int marker = 0;
     fly::ConcurrentQueue<int> ordering;
@@ -242,8 +230,7 @@ TEST_F(TaskTest, ImmediateAndDelayCancelTaskTest)
         EXPECT_EQ(spTask1->GetCount(), 0);
 
         EXPECT_TRUE(spTaskRunner->PostTaskWithDelay(
-            spTask1, std::chrono::milliseconds(10)
-        ));
+            spTask1, std::chrono::milliseconds(10)));
     }
 
     auto spTask2(std::make_shared<MarkerTask>(&ordering, 2));
@@ -256,8 +243,7 @@ TEST_F(TaskTest, ImmediateAndDelayCancelTaskTest)
     spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
 
     EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
-        std::chrono::milliseconds(20)
-    ));
+        std::chrono::milliseconds(20)));
 
     ordering.Pop(marker);
     EXPECT_EQ(marker, 2);
@@ -274,16 +260,14 @@ TEST_F(TaskTest, RunnerBeforeManagerStartedTest)
 
     auto spTaskManager(std::make_shared<fly::TaskManager>(1));
     auto spTaskRunner(
-        spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
-    );
+        spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
 
     EXPECT_TRUE(spTaskRunner->PostTask(spTask));
     EXPECT_TRUE(spTaskRunner->PostTask(spTask));
     EXPECT_TRUE(spTaskRunner->PostTask(spTask));
 
     EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
-        std::chrono::milliseconds(20)
-    ));
+        std::chrono::milliseconds(20)));
 
     EXPECT_EQ(spTask->GetCount(), 0);
 
@@ -308,16 +292,14 @@ TEST_F(TaskTest, ParallelRunnerAfterManagerDeletedTest)
     ASSERT_TRUE(spTaskManager->Start());
 
     auto spTaskRunner(
-        spTaskManager->CreateTaskRunner<fly::ParallelTaskRunner>()
-    );
+        spTaskManager->CreateTaskRunner<fly::ParallelTaskRunner>());
 
     ASSERT_TRUE(spTaskManager->Stop());
     spTaskManager.reset();
 
     EXPECT_FALSE(spTaskRunner->PostTask(spTask));
     EXPECT_FALSE(
-        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10)
-    ));
+        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10)));
 
     EXPECT_EQ(spTask->GetCount(), 0);
 }
@@ -332,16 +314,14 @@ TEST_F(TaskTest, SequencedRunnerAfterManagerDeletedTest)
     ASSERT_TRUE(spTaskManager->Start());
 
     auto spTaskRunner(
-        spTaskManager->CreateTaskRunner<fly::SequencedTaskRunner>()
-    );
+        spTaskManager->CreateTaskRunner<fly::SequencedTaskRunner>());
 
     ASSERT_TRUE(spTaskManager->Stop());
     spTaskManager.reset();
 
     EXPECT_FALSE(spTaskRunner->PostTask(spTask));
     EXPECT_FALSE(
-        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10)
-    ));
+        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10)));
 
     EXPECT_EQ(spTask->GetCount(), 0);
 }
