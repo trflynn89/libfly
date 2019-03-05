@@ -1,13 +1,15 @@
-#include <sstream>
-#include <vector>
-
-#include <gtest/gtest.h>
+#include "fly/parser/json_parser.h"
 
 #include "fly/parser/exceptions.h"
-#include "fly/parser/json_parser.h"
 #include "fly/path/path.h"
 #include "fly/types/json.h"
 #include "fly/types/string.h"
+
+#include <gtest/gtest.h>
+
+#include <memory>
+#include <sstream>
+#include <vector>
 
 //==============================================================================
 class JsonParserTest : public ::testing::Test
@@ -31,10 +33,14 @@ protected:
 
     void ValidatePass(const std::string &test, const fly::Json &expected)
     {
-        ValidatePassRaw(fly::String::Format("{ \"a\" : %s }", test), "a", expected);
+        ValidatePassRaw(
+            fly::String::Format("{ \"a\" : %s }", test), "a", expected);
     }
 
-    void ValidatePassRaw(const std::string &test, const std::string &key, const fly::Json &expected)
+    void ValidatePassRaw(
+        const std::string &test,
+        const std::string &key,
+        const fly::Json &expected)
     {
         fly::Json actual, repeat;
 
@@ -57,13 +63,13 @@ protected:
         EXPECT_EQ(actual, repeat);
     }
 
-    fly::ParserPtr m_spParser;
+    std::shared_ptr<fly::Parser> m_spParser;
 };
 
 //==============================================================================
 TEST_F(JsonParserTest, JsonCheckerTest)
 {
-    // Run the parser against test files from http://www.json.org/JSON_checker/
+    // http://www.json.org/JSON_checker/
     // The following files are excluded from this test:
     // - fail18.json: The parser has no max-depth
 
@@ -101,7 +107,8 @@ TEST_F(JsonParserTest, GoogleJsonTestSuiteTest)
 {
     // https://code.google.com/archive/p/json-test-suite/
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
-    std::string path = fly::Path::Join(segments[0], "json", "google_json_test_suite");
+    std::string path =
+        fly::Path::Join(segments[0], "json", "google_json_test_suite");
 
     EXPECT_NO_THROW(m_spParser->Parse(path, "sample.json"));
 }
@@ -109,10 +116,10 @@ TEST_F(JsonParserTest, GoogleJsonTestSuiteTest)
 //==============================================================================
 TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
 {
-    // Run the parser against test files from https://github.com/nst/JSONTestSuite
+    // https://github.com/nst/JSONTestSuite
     // The following files are excluded from this test:
     // - n_single_space.json: Empty files are allowed
-    // - n_structure_100000_opening_arrays.json: Too nested, causes stack overflow
+    // - n_structure_100000_opening_arrays.json: Causes stack overflow
     // - n_structure_no_data.json: Empty files are allowed
     // - n_structure_open_array_object.json: Too nested, causes stack overflow
     // - n_structure_UTF8_BOM_no_data.json: Empty files are allowed
@@ -124,7 +131,7 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
     // - y_structure_lonely_string.json: Only allow objects and arrays
     // - y_structure_lonely_true.json: Only allow objects and arrays
     // - y_structure_string_empty.json: Only allow objects and arrays
-    // - i_number_double_huge_neg_exp.json: Depends on platform (fails on Windows)
+    // - i_number_double_huge_neg_exp.json: Platform dependent (fails Windows)
 
     // Indeterminate files expected to pass
     std::vector<std::string> iPass = {
@@ -134,7 +141,8 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
 
     // Get the path to the JSONTestSuite directory
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
-    std::string path = fly::Path::Join(segments[0], "json", "nst_json_test_suite");
+    std::string path =
+        fly::Path::Join(segments[0], "json", "nst_json_test_suite");
 
     // Validate each JSON file in the JSONTestSuite directory
     std::vector<std::string> directories;
@@ -162,7 +170,8 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
             }
             else
             {
-                EXPECT_THROW(m_spParser->Parse(path, file), fly::ParserException);
+                EXPECT_THROW(
+                    m_spParser->Parse(path, file), fly::ParserException);
             }
         }
         else
@@ -177,7 +186,8 @@ TEST_F(JsonParserTest, BigListOfNaughtyStringsTest)
 {
     // https://github.com/minimaxir/big-list-of-naughty-strings
     std::vector<std::string> segments = fly::Path::Split(__FILE__);
-    std::string path = fly::Path::Join(segments[0], "json", "big_list_of_naughty_strings");
+    std::string path =
+        fly::Path::Join(segments[0], "json", "big_list_of_naughty_strings");
     fly::Json values;
 
     EXPECT_NO_THROW(values = m_spParser->Parse(path, "blns.json"));
@@ -205,7 +215,7 @@ TEST_F(JsonParserTest, NonExistingPathTest)
 {
     fly::Json values;
 
-    ASSERT_NO_THROW(m_spParser->Parse("foo_abc", "abc.json"));
+    ASSERT_NO_THROW(m_spParser->Parse("foo_abc", "a.json"));
     EXPECT_TRUE(values.IsNull());
 }
 
@@ -214,7 +224,7 @@ TEST_F(JsonParserTest, NonExistingFileTest)
 {
     fly::Json values;
 
-    ASSERT_NO_THROW(m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.json"));
+    ASSERT_NO_THROW(m_spParser->Parse(fly::Path::GetTempDirectory(), "a.json"));
     EXPECT_TRUE(values.IsNull());
 }
 
@@ -453,8 +463,7 @@ TEST_F(JsonParserTest, NumericConversionTest)
 TEST_F(JsonParserTest, SingleLineCommentTest)
 {
     auto spParser = std::make_shared<fly::JsonParser>(
-        fly::JsonParser::Features::AllowComments
-    );
+        fly::JsonParser::Features::AllowComments);
     {
         std::string str = R"({
             "a" : 12, // here is a comment
@@ -519,8 +528,7 @@ TEST_F(JsonParserTest, SingleLineCommentTest)
 TEST_F(JsonParserTest, MultiLineCommentTest)
 {
     auto spParser = std::make_shared<fly::JsonParser>(
-        fly::JsonParser::Features::AllowComments
-    );
+        fly::JsonParser::Features::AllowComments);
     {
         std::string str = R"({
             "a" : 12, /* here is a comment */
@@ -607,8 +615,7 @@ TEST_F(JsonParserTest, MultiLineCommentTest)
 TEST_F(JsonParserTest, TrailingCommaObjectTest)
 {
     auto spParser = std::make_shared<fly::JsonParser>(
-        fly::JsonParser::Features::AllowTrailingComma
-    );
+        fly::JsonParser::Features::AllowTrailingComma);
     {
         std::string str = R"({
             "a" : 12,
@@ -647,8 +654,7 @@ TEST_F(JsonParserTest, TrailingCommaObjectTest)
 TEST_F(JsonParserTest, TrailingCommaArrayTest)
 {
     auto spParser = std::make_shared<fly::JsonParser>(
-        fly::JsonParser::Features::AllowTrailingComma
-    );
+        fly::JsonParser::Features::AllowTrailingComma);
     {
         std::string str = R"({
             "a" : 12,
@@ -693,72 +699,60 @@ TEST(JsonParserFeatures, CombinedFeaturesTest)
         auto features = fly::JsonParser::Features::Strict;
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowComments,
-            fly::JsonParser::Features::Strict
-        );
+            fly::JsonParser::Features::Strict);
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
-            fly::JsonParser::Features::Strict
-        );
+            fly::JsonParser::Features::Strict);
     }
 
     {
         auto features = fly::JsonParser::Features::AllowComments;
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowComments,
-            fly::JsonParser::Features::AllowComments
-        );
+            fly::JsonParser::Features::AllowComments);
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
-            fly::JsonParser::Features::Strict
-        );
+            fly::JsonParser::Features::Strict);
     }
     {
         auto features = fly::JsonParser::Features::Strict;
         features = features | fly::JsonParser::Features::AllowComments;
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowComments,
-            fly::JsonParser::Features::AllowComments
-        );
+            fly::JsonParser::Features::AllowComments);
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
-            fly::JsonParser::Features::Strict
-        );
+            fly::JsonParser::Features::Strict);
     }
 
     {
         auto features = fly::JsonParser::Features::AllowTrailingComma;
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowComments,
-            fly::JsonParser::Features::Strict
-        );
+            fly::JsonParser::Features::Strict);
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
-            fly::JsonParser::Features::AllowTrailingComma
-        );
+            fly::JsonParser::Features::AllowTrailingComma);
     }
     {
         auto features = fly::JsonParser::Features::Strict;
         features = features | fly::JsonParser::Features::AllowTrailingComma;
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowComments,
-            fly::JsonParser::Features::Strict
-        );
+            fly::JsonParser::Features::Strict);
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
-            fly::JsonParser::Features::AllowTrailingComma
-        );
+            fly::JsonParser::Features::AllowTrailingComma);
     }
 
     {
         auto features = fly::JsonParser::Features::AllFeatures;
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowComments,
-            fly::JsonParser::Features::AllowComments
-        );
+            fly::JsonParser::Features::AllowComments);
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
-            fly::JsonParser::Features::AllowTrailingComma
-        );
+            fly::JsonParser::Features::AllowTrailingComma);
     }
     {
         auto features = fly::JsonParser::Features::Strict;
@@ -766,11 +760,9 @@ TEST(JsonParserFeatures, CombinedFeaturesTest)
         features = features | fly::JsonParser::Features::AllowTrailingComma;
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowComments,
-            fly::JsonParser::Features::AllowComments
-        );
+            fly::JsonParser::Features::AllowComments);
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
-            fly::JsonParser::Features::AllowTrailingComma
-        );
+            fly::JsonParser::Features::AllowTrailingComma);
     }
 }

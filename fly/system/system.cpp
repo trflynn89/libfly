@@ -1,5 +1,7 @@
 #include "fly/system/system.h"
 
+#include "fly/fly.h"
+
 #include <csignal>
 #include <vector>
 
@@ -51,4 +53,4 @@ void System::SetSignalHandler(SignalHandler handler)
     }
 }
 
-}
+} // namespace fly

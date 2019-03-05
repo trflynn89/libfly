@@ -1,15 +1,12 @@
 #pragma once
 
-#include <fstream>
-#include <string>
-
-#include "fly/fly.h"
 #include "fly/parser/parser.h"
 #include "fly/types/json.h"
 
-namespace fly {
+#include <istream>
+#include <string>
 
-FLY_CLASS_PTRS(IniParser);
+namespace fly {
 
 /**
  * Implementation of the Parser interface for the .ini format.
@@ -80,4 +77,4 @@ private:
     bool trimValue(std::string &, char, char) const;
 };
 
-}
+} // namespace fly

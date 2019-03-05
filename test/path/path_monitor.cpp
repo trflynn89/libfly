@@ -1,42 +1,45 @@
-#include <functional>
-#include <map>
-#include <sstream>
-#include <string>
-
-#include <gtest/gtest.h>
+#include "fly/path/path_monitor.h"
 
 #include "fly/fly.h"
 #include "fly/path/path.h"
 #include "fly/path/path_config.h"
-#include "fly/path/path_monitor.h"
 #include "fly/task/task_manager.h"
 #include "fly/types/concurrent_queue.h"
 #include "fly/types/string.h"
 
+#include <gtest/gtest.h>
+
+#include <functional>
+#include <map>
+#include <memory>
+#include <sstream>
+#include <string>
+
 #ifdef FLY_LINUX
-    #include "test/mock/mock_system.h"
+#    include "test/mock/mock_system.h"
 #endif
 
 #include "test/util/path_util.h"
 #include "test/util/waitable_task_runner.h"
 
-namespace
-{
-    std::chrono::seconds s_waitTime(5);
+namespace {
 
-    /**
-     * Subclass of the path config to decrease the poll interval for faster
-     * testing.
-     */
-    class TestPathConfig : public fly::PathConfig
+std::chrono::seconds s_waitTime(5);
+
+/**
+ * Subclass of the path config to decrease the poll interval for faster
+ * testing.
+ */
+class TestPathConfig : public fly::PathConfig
+{
+public:
+    TestPathConfig() : fly::PathConfig()
     {
-    public:
-        TestPathConfig() : fly::PathConfig()
-        {
-            m_defaultPollInterval = I64(10);
-        }
-    };
-}
+        m_defaultPollInterval = I64(10);
+    }
+};
+
+} // namespace
 
 //==============================================================================
 class PathMonitorTest : public ::testing::Test
@@ -46,13 +49,12 @@ public:
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
         m_spTaskRunner(
-            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
-        ),
+            m_spTaskManager
+                ->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()),
 
         m_spMonitor(std::make_shared<fly::PathMonitorImpl>(
             m_spTaskRunner,
-            std::make_shared<TestPathConfig>()
-        )),
+            std::make_shared<TestPathConfig>())),
 
         m_path0(fly::PathUtil::GenerateTempDirectory()),
         m_path1(fly::PathUtil::GenerateTempDirectory()),
@@ -68,8 +70,12 @@ public:
         m_fullPath2(fly::Path::Join(m_path1, m_file2)),
         m_fullPath3(fly::Path::Join(m_path2, m_file3))
     {
-        m_callback = std::bind(&PathMonitorTest::HandleEvent, this,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        m_callback = std::bind(
+            &PathMonitorTest::HandleEvent,
+            this,
+            std::placeholders::_1,
+            std::placeholders::_2,
+            std::placeholders::_3);
     }
 
     /**
@@ -120,30 +126,30 @@ protected:
 
         switch (event)
         {
-        case fly::PathMonitor::PathEvent::Created:
-            ++m_numCreatedFiles[full];
-            break;
+            case fly::PathMonitor::PathEvent::Created:
+                ++m_numCreatedFiles[full];
+                break;
 
-        case fly::PathMonitor::PathEvent::Deleted:
-            ++m_numDeletedFiles[full];
-            break;
+            case fly::PathMonitor::PathEvent::Deleted:
+                ++m_numDeletedFiles[full];
+                break;
 
-        case fly::PathMonitor::PathEvent::Changed:
-            ++m_numChangedFiles[full];
-            break;
+            case fly::PathMonitor::PathEvent::Changed:
+                ++m_numChangedFiles[full];
+                break;
 
-        default:
-            ++m_numOtherEvents[full];
-            break;
+            default:
+                ++m_numOtherEvents[full];
+                break;
         }
 
         m_eventQueue.Push(event);
     }
 
-    fly::TaskManagerPtr m_spTaskManager;
-    fly::WaitableSequencedTaskRunnerPtr m_spTaskRunner;
+    std::shared_ptr<fly::TaskManager> m_spTaskManager;
+    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_spTaskRunner;
 
-    fly::PathMonitorPtr m_spMonitor;
+    std::shared_ptr<fly::PathMonitor> m_spMonitor;
     fly::PathMonitor::PathEventCallback m_callback;
 
     std::string m_path0;
@@ -226,9 +232,7 @@ TEST_F(PathMonitorTest, MockFailedStartMonitorTest)
     fly::MockSystem mock(fly::MockCall::InotifyInit1);
 
     m_spMonitor = std::make_shared<fly::PathMonitorImpl>(
-        m_spTaskRunner,
-        std::make_shared<fly::PathConfig>()
-    );
+        m_spTaskRunner, std::make_shared<fly::PathConfig>());
 
     ASSERT_FALSE(m_spMonitor->Start());
 

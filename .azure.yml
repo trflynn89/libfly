@@ -1,0 +1,42 @@
+jobs:
+  #### Linux ####
+  - template: build/ci/linux.yml
+    parameters:
+      configuration: 'Debug'
+      arch: 'x86'
+
+  - template: build/ci/linux.yml
+    parameters:
+      configuration: 'Debug'
+      arch: 'x64'
+
+  - template: build/ci/linux.yml
+    parameters:
+      configuration: 'Release'
+      arch: 'x86'
+
+  - template: build/ci/linux.yml
+    parameters:
+      configuration: 'Release'
+      arch: 'x64'
+
+  #### Windows ####
+  - template: build/ci/windows.yml
+    parameters:
+      configuration: 'Debug'
+      arch: 'x86'
+
+  - template: build/ci/windows.yml
+    parameters:
+      configuration: 'Debug'
+      arch: 'x64'
+
+  - template: build/ci/windows.yml
+    parameters:
+      configuration: 'Release'
+      arch: 'x86'
+
+  - template: build/ci/windows.yml
+    parameters:
+      configuration: 'Release'
+      arch: 'x64'

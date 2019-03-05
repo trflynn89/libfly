@@ -1,14 +1,11 @@
 #pragma once
 
+#include "fly/config/config.h"
+
 #include <chrono>
 #include <string>
 
-#include "fly/fly.h"
-#include "fly/config/config.h"
-
 namespace fly {
-
-FLY_CLASS_PTRS(PathConfig);
 
 /**
  * Class to hold configuration values related to paths.
@@ -38,4 +35,4 @@ protected:
     std::chrono::milliseconds::rep m_defaultPollInterval;
 };
 
-}
+} // namespace fly

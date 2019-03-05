@@ -1,5 +1,7 @@
 #include "fly/path/path.h"
 
+#include "fly/fly.h"
+
 #include FLY_OS_IMPL_PATH(path, path)
 
 namespace fly {
@@ -20,8 +22,7 @@ bool Path::RemovePath(const std::string &path)
 bool Path::ListPath(
     const std::string &path,
     std::vector<std::string> &directories,
-    std::vector<std::string> &files
-)
+    std::vector<std::string> &files)
 {
     directories.clear();
     files.clear();
@@ -69,4 +70,4 @@ std::string Path::GetTempDirectory()
     return ret;
 }
 
-}
+} // namespace fly

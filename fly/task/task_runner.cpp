@@ -7,21 +7,21 @@
 namespace fly {
 
 //==============================================================================
-TaskRunner::TaskRunner(const TaskManagerWPtr &wpTaskManager) :
+TaskRunner::TaskRunner(const std::weak_ptr<TaskManager> &wpTaskManager) :
     m_wpTaskManager(wpTaskManager)
 {
 }
 
 //==============================================================================
 bool TaskRunner::PostTaskWithDelay(
-    const TaskWPtr &wpTask,
+    const std::weak_ptr<Task> &wpTask,
     std::chrono::milliseconds delay)
 {
-    TaskManagerPtr spTaskManager = m_wpTaskManager.lock();
+    std::shared_ptr<TaskManager> spTaskManager = m_wpTaskManager.lock();
 
     if (spTaskManager)
     {
-        TaskRunnerPtr spTaskRunner = shared_from_this();
+        std::shared_ptr<TaskRunner> spTaskRunner = shared_from_this();
         spTaskManager->postTaskWithDelay(wpTask, spTaskRunner, delay);
 
         return true;
@@ -31,13 +31,13 @@ bool TaskRunner::PostTaskWithDelay(
 }
 
 //==============================================================================
-bool TaskRunner::PostTaskToTaskManager(const TaskWPtr &wpTask)
+bool TaskRunner::PostTaskToTaskManager(const std::weak_ptr<Task> &wpTask)
 {
-    TaskManagerPtr spTaskManager = m_wpTaskManager.lock();
+    std::shared_ptr<TaskManager> spTaskManager = m_wpTaskManager.lock();
 
     if (spTaskManager)
     {
-        TaskRunnerPtr spTaskRunner = shared_from_this();
+        std::shared_ptr<TaskRunner> spTaskRunner = shared_from_this();
         spTaskManager->postTask(wpTask, spTaskRunner);
 
         return true;
@@ -47,38 +47,40 @@ bool TaskRunner::PostTaskToTaskManager(const TaskWPtr &wpTask)
 }
 
 //==============================================================================
-ParallelTaskRunner::ParallelTaskRunner(const TaskManagerWPtr &wpTaskManager) :
+ParallelTaskRunner::ParallelTaskRunner(
+    const std::weak_ptr<TaskManager> &wpTaskManager) :
     TaskRunner(wpTaskManager)
 {
 }
 
 //==============================================================================
-bool ParallelTaskRunner::PostTask(const TaskWPtr &wpTask)
+bool ParallelTaskRunner::PostTask(const std::weak_ptr<Task> &wpTask)
 {
     return PostTaskToTaskManager(wpTask);
 }
 
 //==============================================================================
-void ParallelTaskRunner::TaskComplete(const TaskPtr &)
+void ParallelTaskRunner::TaskComplete(const std::shared_ptr<Task> &)
 {
 }
 
 //==============================================================================
-SequencedTaskRunner::SequencedTaskRunner(const TaskManagerWPtr &wpTaskManager) :
+SequencedTaskRunner::SequencedTaskRunner(
+    const std::weak_ptr<TaskManager> &wpTaskManager) :
     TaskRunner(wpTaskManager),
     m_aHasRunningTask(false)
 {
 }
 
 //==============================================================================
-bool SequencedTaskRunner::PostTask(const TaskWPtr &wpTask)
+bool SequencedTaskRunner::PostTask(const std::weak_ptr<Task> &wpTask)
 {
     m_pendingTasks.Push(wpTask);
     return maybePostTask();
 }
 
 //==============================================================================
-void SequencedTaskRunner::TaskComplete(const TaskPtr &)
+void SequencedTaskRunner::TaskComplete(const std::shared_ptr<Task> &)
 {
     m_aHasRunningTask.store(false);
     maybePostTask();
@@ -93,7 +95,7 @@ bool SequencedTaskRunner::maybePostTask()
     if (m_aHasRunningTask.compare_exchange_strong(expected, true))
     {
         bool posted = false;
-        TaskWPtr wpTask;
+        std::weak_ptr<Task> wpTask;
 
         if (m_pendingTasks.Pop(wpTask, wait))
         {
@@ -111,4 +113,4 @@ bool SequencedTaskRunner::maybePostTask()
     return true;
 }
 
-}
+} // namespace fly

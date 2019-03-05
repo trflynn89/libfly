@@ -1,9 +1,9 @@
 #include "fly/parser/parser.h"
 
+#include "fly/path/path.h"
+
 #include <fstream>
 #include <sstream>
-
-#include "fly/path/path.h"
 
 namespace fly {
 
@@ -40,25 +40,25 @@ void Parser::consumeByteOrderMark(std::istream &stream)
         int c = stream.get();
 
         // UTF-8 byte order mark
-        if ((c == 0xEF) && (stream.peek() != EOF))
+        if ((c == 0xef) && (stream.peek() != EOF))
         {
-            if ((stream.get() == 0xBB) && (stream.peek() != EOF))
+            if ((stream.get() == 0xbb) && (stream.peek() != EOF))
             {
-                if (stream.get() == 0xBF)
+                if (stream.get() == 0xbf)
                 {
                     return;
                 }
 
-               stream.unget();
+                stream.unget();
             }
 
             stream.unget();
         }
 
         // UTF-16 big-endian byte order mark
-        else if ((c == 0xFE) && (stream.peek() != EOF))
+        else if ((c == 0xfe) && (stream.peek() != EOF))
         {
-            if (stream.get() == 0xFF)
+            if (stream.get() == 0xff)
             {
                 return;
             }
@@ -67,9 +67,9 @@ void Parser::consumeByteOrderMark(std::istream &stream)
         }
 
         // UTF-16 little-endian byte order mark
-        else if ((c == 0xFF) && (stream.peek() != EOF))
+        else if ((c == 0xff) && (stream.peek() != EOF))
         {
-            if (stream.get() == 0xFE)
+            if (stream.get() == 0xfe)
             {
                 if (stream.peek() != EOF)
                 {
@@ -98,9 +98,9 @@ void Parser::consumeByteOrderMark(std::istream &stream)
         {
             if ((stream.get() == 0x00) && (stream.peek() != EOF))
             {
-                if ((stream.get() == 0xFE) && (stream.peek() != EOF))
+                if ((stream.get() == 0xfe) && (stream.peek() != EOF))
                 {
-                    if (stream.get() == 0xFF)
+                    if (stream.get() == 0xff)
                     {
                         return;
                     }
@@ -119,4 +119,4 @@ void Parser::consumeByteOrderMark(std::istream &stream)
     }
 }
 
-}
+} // namespace fly

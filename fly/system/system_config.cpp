@@ -1,5 +1,7 @@
 #include "fly/system/system_config.h"
 
+#include "fly/fly.h"
+
 namespace fly {
 
 //==============================================================================
@@ -16,11 +18,8 @@ std::string SystemConfig::GetName()
 //==============================================================================
 std::chrono::milliseconds SystemConfig::PollInterval() const
 {
-    return std::chrono::milliseconds(
-        GetValue<std::chrono::milliseconds::rep>(
-            "poll_interval", m_defaultPollInterval
-        )
-    );
+    return std::chrono::milliseconds(GetValue<std::chrono::milliseconds::rep>(
+        "poll_interval", m_defaultPollInterval));
 }
 
-}
+} // namespace fly

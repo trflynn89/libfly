@@ -1,0 +1,75 @@
+# Source files
+*.c text eol=lf diff=cpp
+*.cc text eol=lf diff=cpp
+*.cxx text eol=lf diff=cpp
+*.cpp text eol=lf diff=cpp
+*.c++ text eol=lf diff=cpp
+*.h text eol=lf diff=cpp
+*.hh text eol=lf diff=cpp
+*.hpp text eol=lf diff=cpp
+*.h++ text eol=lf diff=cpp
+*.json text eol=lf
+
+# Qt5 files
+*.creator text eol=lf
+*.files text eol=lf
+*.qrc text eol=lf
+*.ui text eol=lf
+
+# Build files
+Makefile text eol=lf
+*.mk text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=lf
+*.bat text eol=lf
+*.yml text eol=lf
+
+# Git files
+*.gitattributes text eol=lf
+.gitmodules text eol=lf
+.gitignore text eol=lf
+*.md text eol=lf
+
+# Compiled object files
+*.slo binary
+*.lo binary
+*.o binary
+*.obj binary
+
+# Precompiled headers
+*.gch binary
+*.pch binary
+
+# Compiled dynamic libraries
+*.so binary
+*.dylib binary
+*.dll binary
+
+# Compiled static libraries
+*.lai binary
+*.la binary
+*.a binary
+*.lib binary
+
+# Executables
+*.exe binary
+*.out binary
+*.app binary
+
+# Visual Studio
+*.sln text eol=crlf
+*.csproj text eol=crlf
+*.vbproj text eol=crlf
+*.vcxproj text eol=crlf
+*.vcproj text eol=crlf
+*.dbproj text eol=crlf
+*.fsproj text eol=crlf
+*.lsproj text eol=crlf
+*.wixproj text eol=crlf
+*.modelproj text eol=crlf
+*.sqlproj text eol=crlf
+*.wmaproj text eol=crlf
+*.xproj text eol=crlf
+*.props text eol=crlf
+*.filters text eol=crlf
+*.vcxitems text eol=crlf

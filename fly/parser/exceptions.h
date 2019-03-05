@@ -78,4 +78,4 @@ public:
     BadConversionException(int, int, const std::string &);
 };
 
-}
+} // namespace fly

@@ -3,10 +3,11 @@
 namespace fly {
 
 //==============================================================================
-namespace
-{
-    static int s_invalidId = -1;
-}
+namespace {
+
+    const int s_invalidId = -1;
+
+} // namespace
 
 //==============================================================================
 AsyncRequest::AsyncRequest() :
@@ -33,8 +34,7 @@ AsyncRequest::AsyncRequest(
     int socketId,
     const std::string &request,
     address_type address,
-    port_type port
-) :
+    port_type port) :
     m_socketId(socketId),
     m_requestOffset(0),
     m_request(request),
@@ -46,7 +46,7 @@ AsyncRequest::AsyncRequest(
 //==============================================================================
 bool AsyncRequest::IsValid() const
 {
-    return (m_socketId != s_invalidId);
+    return m_socketId != s_invalidId;
 }
 
 //==============================================================================
@@ -85,4 +85,4 @@ port_type AsyncRequest::GetPort() const
     return m_port;
 }
 
-}
+} // namespace fly

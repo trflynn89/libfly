@@ -1,27 +1,26 @@
+#include "fly/path/path.h"
+
+#include "fly/fly.h"
+#include "fly/types/string.h"
+
+#include <gtest/gtest.h>
+
 #include <algorithm>
 #include <cstdio>
 #include <fstream>
 
-#include <gtest/gtest.h>
-
-#include "fly/fly.h"
-#include "fly/path/path.h"
-#include "fly/types/string.h"
-
 #ifdef FLY_LINUX
-    #include "test/mock/mock_system.h"
+#    include "test/mock/mock_system.h"
 #endif
 
 //==============================================================================
 TEST(PathTest, MakeAndRemovePathTest)
 {
     std::string path(fly::Path::Join(
-        fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
-    ));
+        fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)));
 
-    std::string path2(fly::Path::Join(
-        path, fly::String::GenerateRandomString(10)
-    ));
+    std::string path2(
+        fly::Path::Join(path, fly::String::GenerateRandomString(10)));
 
     // Should not be able to remove a non-existing path
     EXPECT_FALSE(fly::Path::RemovePath(path));
@@ -56,8 +55,7 @@ TEST(PathTest, MakeAndRemovePathTest)
 TEST(PathTest, MockRemovePathTest)
 {
     std::string path(fly::Path::Join(
-        fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)
-    ));
+        fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)));
 
     EXPECT_TRUE(fly::Path::MakePath(path));
 
@@ -83,7 +81,8 @@ TEST(PathTest, ListPathTest)
     std::vector<std::string> files;
 
     std::string path1(fly::String::GenerateRandomString(10));
-    std::string path1Full(fly::Path::Join(fly::Path::GetTempDirectory(), path1));
+    std::string path1Full(
+        fly::Path::Join(fly::Path::GetTempDirectory(), path1));
     EXPECT_TRUE(fly::Path::MakePath(path1Full));
 
     std::string path2(fly::String::GenerateRandomString(10));
@@ -112,8 +111,8 @@ TEST(PathTest, ListPathTest)
 
     EXPECT_TRUE(fly::Path::ListPath(path1Full, directories, files));
     {
-        std::vector<std::string> expectedDirectories = { path2, path3 };
-        std::vector<std::string> expectedFiles = { file1 };
+        std::vector<std::string> expectedDirectories = {path2, path3};
+        std::vector<std::string> expectedFiles = {file1};
 
         std::sort(directories.begin(), directories.end());
         std::sort(files.begin(), files.end());
@@ -127,8 +126,8 @@ TEST(PathTest, ListPathTest)
 
     EXPECT_TRUE(fly::Path::ListPath(path2Full, directories, files));
     {
-        std::vector<std::string> expectedDirectories = { path4 };
-        std::vector<std::string> expectedFiles = { file2 };
+        std::vector<std::string> expectedDirectories = {path4};
+        std::vector<std::string> expectedFiles = {file2};
 
         std::sort(directories.begin(), directories.end());
         std::sort(files.begin(), files.end());
@@ -142,7 +141,7 @@ TEST(PathTest, ListPathTest)
 
     EXPECT_TRUE(fly::Path::ListPath(path3Full, directories, files));
     {
-        std::vector<std::string> expectedFiles = { file3 };
+        std::vector<std::string> expectedFiles = {file3};
 
         std::sort(files.begin(), files.end());
 
@@ -161,7 +160,8 @@ TEST(PathTest, ListPathTest)
     EXPECT_FALSE(fly::Path::ListPath(file1Full, directories, files));
     EXPECT_FALSE(fly::Path::ListPath(file2Full, directories, files));
     EXPECT_FALSE(fly::Path::ListPath(file3Full, directories, files));
-    EXPECT_FALSE(fly::Path::ListPath(fly::String::GenerateRandomString(10), directories, files));
+    EXPECT_FALSE(fly::Path::ListPath(
+        fly::String::GenerateRandomString(10), directories, files));
 
     EXPECT_TRUE(fly::Path::RemovePath(path1Full));
 }
@@ -177,7 +177,8 @@ TEST(PathTest, MockListPathTest)
     std::vector<std::string> files;
 
     std::string path1(fly::String::GenerateRandomString(10));
-    std::string path1Full(fly::Path::Join(fly::Path::GetTempDirectory(), path1));
+    std::string path1Full(
+        fly::Path::Join(fly::Path::GetTempDirectory(), path1));
     EXPECT_TRUE(fly::Path::MakePath(path1Full));
 
     std::string path2(fly::String::GenerateRandomString(10));
@@ -259,17 +260,14 @@ TEST(PathTest, SplitTest)
     std::string path1(fly::Path::GetTempDirectory());
 
     std::string path2(fly::Path::Join(
-        fly::Path::GetTempDirectory(),
-        fly::String::GenerateRandomString(10)
-    ));
+        fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10)));
 
     std::string path3(fly::Path::Join(
         fly::Path::GetTempDirectory(),
         fly::String::GenerateRandomString(10),
         fly::String::GenerateRandomString(10),
         fly::String::GenerateRandomString(10),
-        fly::String::GenerateRandomString(10)
-    ));
+        fly::String::GenerateRandomString(10)));
 
     std::vector<std::string> segments0 = fly::Path::Split(path0);
     std::vector<std::string> segments1 = fly::Path::Split(path1);
@@ -305,8 +303,7 @@ TEST(PathTest, SplitAndJoinTest)
         fly::String::GenerateRandomString(10),
         fly::String::GenerateRandomString(10),
         fly::String::GenerateRandomString(10),
-        fly::String::GenerateRandomString(10)
-    ));
+        fly::String::GenerateRandomString(10)));
 
     std::vector<std::string> segments = fly::Path::Split(path);
     std::string newPath = segments.front();

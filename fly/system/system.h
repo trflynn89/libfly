@@ -3,8 +3,6 @@
 #include <functional>
 #include <string>
 
-#include "fly/fly.h"
-
 namespace fly {
 
 /**
@@ -55,4 +53,4 @@ public:
     static void SetSignalHandler(SignalHandler);
 };
 
-}
+} // namespace fly

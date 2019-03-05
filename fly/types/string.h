@@ -1,10 +1,10 @@
 #pragma once
 
+#include "fly/traits/traits.h"
+
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include "fly/traits/traits.h"
 
 namespace fly {
 
@@ -63,7 +63,8 @@ public:
      * @param string The string to search for and replace.
      * @param string The replacement string.
      */
-    static void ReplaceAll(std::string &, const std::string &, const std::string &);
+    static void
+    ReplaceAll(std::string &, const std::string &, const std::string &);
 
     /**
      * Remove all instances of a substring in a string.
@@ -152,7 +153,7 @@ public:
      *
      * @return A string that has been formatted with the given arguments.
      */
-    template <typename ... Args>
+    template <typename... Args>
     static std::string Format(const char *, const Args &...);
 
     /**
@@ -165,7 +166,7 @@ public:
      *
      * @return The resulting join of the given arguments.
      */
-    template <typename ... Args>
+    template <typename... Args>
     static std::string Join(const char &, const Args &...);
 
     /**
@@ -188,8 +189,9 @@ private:
      * Recursively format a string with one argument. The result is streamed
      * into the given ostream.
      */
-    template <typename T, typename ... Args>
-    static void format(std::ostream &, const char *, const T &, const Args &...);
+    template <typename T, typename... Args>
+    static void
+    format(std::ostream &, const char *, const T &, const Args &...);
 
     /**
      * Terminator for the variadic template formatter. Stream the rest of the
@@ -200,7 +202,7 @@ private:
     /**
      * Recursively join one argument into the given ostream.
      */
-    template <typename T, typename ... Args>
+    template <typename T, typename... Args>
     static void join(std::ostream &, const char &, const T &, const Args &...);
 
     /**
@@ -224,8 +226,8 @@ private:
 };
 
 //==============================================================================
-template <typename ... Args>
-std::string String::Format(const char *fmt, const Args &...args)
+template <typename... Args>
+std::string String::Format(const char *fmt, const Args &... args)
 {
     std::ostringstream stream;
     stream.precision(6);
@@ -239,15 +241,14 @@ std::string String::Format(const char *fmt, const Args &...args)
 }
 
 //==============================================================================
-template <typename T, typename ... Args>
+template <typename T, typename... Args>
 void String::format(
     std::ostream &stream,
     const char *fmt,
     const T &value,
-    const Args &...args
-)
+    const Args &... args)
 {
-    for ( ; *fmt != '\0'; ++fmt)
+    for (; *fmt != '\0'; ++fmt)
     {
         if (*fmt == '%')
         {
@@ -255,36 +256,36 @@ void String::format(
 
             switch (type)
             {
-            case '\0':
-                stream << *fmt;
-                return;
+                case '\0':
+                    stream << *fmt;
+                    return;
 
-            case 'x':
-            case 'X':
-                stream << "0x" << std::hex;
-                getValue(stream, value);
-                stream << std::dec;
-                break;
+                case 'x':
+                case 'X':
+                    stream << "0x" << std::hex;
+                    getValue(stream, value);
+                    stream << std::dec;
+                    break;
 
-            case 'f':
-            case 'F':
-            case 'g':
-            case 'G':
-                stream << std::fixed;
-                getValue(stream, value);
-                stream.unsetf(std::ios_base::fixed);
-                break;
+                case 'f':
+                case 'F':
+                case 'g':
+                case 'G':
+                    stream << std::fixed;
+                    getValue(stream, value);
+                    stream.unsetf(std::ios_base::fixed);
+                    break;
 
-            case 'e':
-            case 'E':
-                stream << std::scientific;
-                getValue(stream, value);
-                stream.unsetf(std::ios_base::scientific);
-                break;
+                case 'e':
+                case 'E':
+                    stream << std::scientific;
+                    getValue(stream, value);
+                    stream.unsetf(std::ios_base::scientific);
+                    break;
 
-            default:
-                getValue(stream, value);
-                break;
+                default:
+                    getValue(stream, value);
+                    break;
             }
 
             format(stream, fmt + 2, args...);
@@ -296,8 +297,8 @@ void String::format(
 }
 
 //==============================================================================
-template <typename ... Args>
-std::string String::Join(const char &separator, const Args &...args)
+template <typename... Args>
+std::string String::Join(const char &separator, const Args &... args)
 {
     std::ostringstream stream;
     join(stream, separator, args...);
@@ -306,13 +307,12 @@ std::string String::Join(const char &separator, const Args &...args)
 }
 
 //==============================================================================
-template <typename T, typename ... Args>
+template <typename T, typename... Args>
 void String::join(
     std::ostream &stream,
     const char &separator,
     const T &value,
-    const Args &...args
-)
+    const Args &... args)
 {
     getValue(stream, value);
     stream << separator;
@@ -342,4 +342,4 @@ void String::getValue(std::ostream &stream, const T &value)
     stream << "[0x" << std::hex << hasher(&value) << std::dec << ']';
 }
 
-}
+} // namespace fly

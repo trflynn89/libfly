@@ -2,11 +2,7 @@
 
 #include <string>
 
-#include "fly/fly.h"
-
 namespace fly {
-
-FLY_CLASS_PTRS(CaptureStream);
 
 /**
  * RAII helper class to redirect either stdout or stderr to a file for reading.
@@ -43,7 +39,7 @@ public:
      *
      * @return string The contents of the redirected stream.
      */
-    std::string operator() ();
+    std::string operator()();
 
 private:
     /**
@@ -62,4 +58,4 @@ private:
     int m_original;
 };
 
-}
+} // namespace fly

@@ -1,36 +1,39 @@
-#include <functional>
-#include <future>
-#include <string>
-#include <thread>
-
-#include <gtest/gtest.h>
+#include "fly/system/system_monitor.h"
 
 #include "fly/fly.h"
 #include "fly/system/system_config.h"
-#include "fly/system/system_monitor.h"
 #include "fly/task/task_manager.h"
 
+#include <gtest/gtest.h>
+
+#include <functional>
+#include <future>
+#include <memory>
+#include <string>
+#include <thread>
+
 #ifdef FLY_LINUX
-    #include "test/mock/mock_system.h"
+#    include "test/mock/mock_system.h"
 #endif
 
 #include "test/util/waitable_task_runner.h"
 
-namespace
+namespace {
+
+/**
+ * Subclass of the system config to decrease the poll interval for faster
+ * testing.
+ */
+class TestSystemConfig : public fly::SystemConfig
 {
-    /**
-     * Subclass of the system config to decrease the poll interval for faster
-     * testing.
-     */
-    class TestSystemConfig : public fly::SystemConfig
+public:
+    TestSystemConfig() : fly::SystemConfig()
     {
-    public:
-        TestSystemConfig() : fly::SystemConfig()
-        {
-            m_defaultPollInterval = I64(100);
-        }
-    };
-}
+        m_defaultPollInterval = I64(100);
+    }
+};
+
+} // namespace
 
 //==============================================================================
 class SystemMonitorTest : public ::testing::Test
@@ -40,13 +43,12 @@ public:
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
         m_spTaskRunner(
-            m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()
-        ),
+            m_spTaskManager
+                ->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()),
 
         m_spMonitor(std::make_shared<fly::SystemMonitorImpl>(
             m_spTaskRunner,
-            std::make_shared<TestSystemConfig>()
-        )),
+            std::make_shared<TestSystemConfig>())),
 
         m_aKeepRunning(true)
     {
@@ -81,10 +83,10 @@ public:
     }
 
 protected:
-    fly::TaskManagerPtr m_spTaskManager;
-    fly::WaitableSequencedTaskRunnerPtr m_spTaskRunner;
+    std::shared_ptr<fly::TaskManager> m_spTaskManager;
+    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_spTaskRunner;
 
-    fly::SystemMonitorPtr m_spMonitor;
+    std::shared_ptr<fly::SystemMonitor> m_spMonitor;
     std::atomic_bool m_aKeepRunning;
 };
 
@@ -100,9 +102,8 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
     uint32_t countBefore = m_spMonitor->GetSystemCpuCount();
     double processBefore = m_spMonitor->GetProcessCpuUsage();
 
-    std::future<void> result = std::async(
-        std::launch::async, &SystemMonitorTest::SpinThread, this
-    );
+    std::future<void> result =
+        std::async(std::launch::async, &SystemMonitorTest::SpinThread, this);
 
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
 
@@ -128,9 +129,7 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
         fly::MockSystem mock(fly::MockCall::Read);
 
         m_spMonitor = std::make_shared<fly::SystemMonitorImpl>(
-            m_spTaskRunner,
-            std::make_shared<fly::SystemConfig>()
-        );
+            m_spTaskRunner, std::make_shared<fly::SystemConfig>());
 
         ASSERT_FALSE(m_spMonitor->Start());
         ASSERT_EQ(m_spMonitor->GetSystemCpuCount(), 0);
@@ -138,9 +137,7 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
 
     {
         m_spMonitor = std::make_shared<fly::SystemMonitorImpl>(
-            m_spTaskRunner,
-            std::make_shared<fly::SystemConfig>()
-        );
+            m_spTaskRunner, std::make_shared<fly::SystemConfig>());
 
         ASSERT_TRUE(m_spMonitor->Start());
         m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
@@ -152,8 +149,7 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
         double processBefore = m_spMonitor->GetProcessCpuUsage();
 
         std::future<void> result = std::async(
-            std::launch::async, &SystemMonitorTest::SpinThread, this
-        );
+            std::launch::async, &SystemMonitorTest::SpinThread, this);
 
         m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
 
@@ -178,9 +174,8 @@ TEST_F(SystemMonitorTest, MemoryUsageTest)
     uint64_t systemBefore = m_spMonitor->GetSystemMemoryUsage();
     uint64_t processBefore = m_spMonitor->GetProcessMemoryUsage();
 
-    auto size = static_cast<std::string::size_type>(
-        (totalBefore - systemBefore) / 10
-    );
+    auto size =
+        static_cast<std::string::size_type>((totalBefore - systemBefore) / 10);
 
     std::string consumed(size, '\0');
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();

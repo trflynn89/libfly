@@ -1,7 +1,8 @@
-#include <gtest/gtest.h>
-
 #include "fly/parser/exceptions.h"
+
 #include "fly/types/string.h"
+
+#include <gtest/gtest.h>
 
 //==============================================================================
 TEST(ParserExceptionTest, ParserExceptionTest)

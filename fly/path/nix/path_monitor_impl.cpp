@@ -1,39 +1,30 @@
 #include "fly/path/nix/path_monitor_impl.h"
 
-#include <algorithm>
-#include <cstdlib>
-#include <cstring>
+#include "fly/logger/logger.h"
+#include "fly/task/task_runner.h"
 
 #include <poll.h>
 #include <unistd.h>
 
-#include "fly/config/config_manager.h"
-#include "fly/logger/logger.h"
-#include "fly/system/system.h"
-#include "fly/task/task_runner.h"
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
 
 namespace fly {
 
-namespace
-{
-    static const int s_initFlags = (
-        IN_NONBLOCK
-    );
+namespace {
 
-    static const int s_changeFlags = (
-        IN_CREATE |
-        IN_DELETE |
-        IN_MOVED_TO |
-        IN_MOVED_FROM |
-        IN_MODIFY
-    );
-}
+    const int s_initFlags = IN_NONBLOCK;
+
+    const int s_changeFlags =
+        IN_CREATE | IN_DELETE | IN_MOVED_TO | IN_MOVED_FROM | IN_MODIFY;
+
+} // namespace
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const PathConfigPtr &spConfig
-) :
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<PathConfig> &spConfig) :
     PathMonitor(spTaskRunner, spConfig),
     m_monitorDescriptor(::inotify_init1(s_initFlags))
 {
@@ -56,7 +47,7 @@ PathMonitorImpl::~PathMonitorImpl()
 //==============================================================================
 bool PathMonitorImpl::IsValid() const
 {
-    return (m_monitorDescriptor != -1);
+    return m_monitorDescriptor != -1;
 }
 
 //==============================================================================
@@ -84,9 +75,10 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 }
 
 //==============================================================================
-PathMonitor::PathInfoPtr PathMonitorImpl::CreatePathInfo(const std::string &path) const
+std::shared_ptr<PathMonitor::PathInfo>
+PathMonitorImpl::CreatePathInfo(const std::string &path) const
 {
-    PathMonitor::PathInfoPtr spInfo;
+    std::shared_ptr<PathMonitor::PathInfo> spInfo;
 
     if (IsValid())
     {
@@ -105,7 +97,8 @@ bool PathMonitorImpl::readEvents() const
     // aligned. On other systems, incorrect alignment may decrease performance.
     // Hence, the buffer used for reading from the inotify file descriptor
     // should have the same alignment as struct inotify_event.
-    char buff[8 << 10] __attribute__ ((aligned(__alignof__(struct inotify_event))));
+    char buff[8 << 10]
+        __attribute__((aligned(__alignof__(struct inotify_event))));
 
     ssize_t len = ::read(m_monitorDescriptor, buff, sizeof(buff));
 
@@ -131,28 +124,28 @@ bool PathMonitorImpl::readEvents() const
         }
     }
 
-    return (len > 0);
+    return len > 0;
 }
 
 //==============================================================================
 void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
 {
-    auto it = std::find_if(m_pathInfo.begin(), m_pathInfo.end(),
-        [&pEvent](const PathInfoMap::value_type &value) -> bool
-        {
-            PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(value.second));
-            return (spInfo->m_watchDescriptor == pEvent->wd);
-        }
-    );
+    auto it = std::find_if(
+        m_pathInfo.begin(),
+        m_pathInfo.end(),
+        [&pEvent](const PathInfoMap::value_type &value) -> bool {
+            auto spInfo(std::static_pointer_cast<PathInfoImpl>(value.second));
+            return spInfo->m_watchDescriptor == pEvent->wd;
+        });
 
     if (it != m_pathInfo.end())
     {
-        PathInfoImplPtr spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
+        auto spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
         PathMonitor::PathEvent event = convertToEvent(pEvent->mask);
 
         if (event != PathMonitor::PathEvent::None)
         {
-            PathMonitor::PathEventCallback callback = spInfo->m_fileHandlers[pEvent->name];
+            auto callback = spInfo->m_fileHandlers[pEvent->name];
 
             if (callback == nullptr)
             {
@@ -161,8 +154,12 @@ void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
 
             if (callback != nullptr)
             {
-                LOGI(-1, "Handling event %d for \"%s\" in \"%s\"",
-                    event, pEvent->name, it->first);
+                LOGI(
+                    -1,
+                    "Handling event %d for \"%s\" in \"%s\"",
+                    event,
+                    pEvent->name,
+                    it->first);
 
                 callback(it->first, pEvent->name, event);
             }
@@ -194,15 +191,13 @@ PathMonitor::PathEvent PathMonitorImpl::convertToEvent(int mask) const
 //==============================================================================
 PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     int monitorDescriptor,
-    const std::string &path
-) :
+    const std::string &path) :
     PathMonitorImpl::PathInfo(),
     m_monitorDescriptor(monitorDescriptor),
     m_watchDescriptor(-1)
 {
-    m_watchDescriptor = ::inotify_add_watch(
-        m_monitorDescriptor, path.c_str(), s_changeFlags
-    );
+    m_watchDescriptor =
+        ::inotify_add_watch(m_monitorDescriptor, path.c_str(), s_changeFlags);
 
     if (m_watchDescriptor == -1)
     {
@@ -223,7 +218,7 @@ PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 //==============================================================================
 bool PathMonitorImpl::PathInfoImpl::IsValid() const
 {
-    return (m_watchDescriptor != -1);
+    return m_watchDescriptor != -1;
 }
 
-}
+} // namespace fly

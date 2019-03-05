@@ -1,0 +1,16 @@
+parameters:
+  contents: ''
+
+steps:
+- task: CopyFiles@2
+  inputs:
+    contents: ${{ parameters.contents }}
+    targetFolder: $(Build.ArtifactStagingDirectory)
+    flattenFolders: true
+  displayName: 'Collect'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: libfly
+  displayName: 'Publish'

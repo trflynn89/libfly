@@ -1,19 +1,17 @@
 #include "fly/socket/nix/socket_manager_impl.h"
 
-#include <algorithm>
-
-#include "fly/logger/logger.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_config.h"
 #include "fly/task/task_runner.h"
+
+#include <algorithm>
 
 namespace fly {
 
 //==============================================================================
 SocketManagerImpl::SocketManagerImpl(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const SocketConfigPtr &spConfig
-) :
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<SocketConfig> &spConfig) :
     SocketManager(spTaskRunner, spConfig)
 {
 }
@@ -24,7 +22,7 @@ void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
     fd_set readFd, writeFd;
 
     suseconds_t usec = static_cast<suseconds_t>(timeout.count());
-    struct timeval tv { 0, usec };
+    struct timeval tv = {0, usec};
 
     socket_type maxFd = -1;
     {
@@ -43,14 +41,15 @@ void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
 }
 
 //==============================================================================
-socket_type SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
+socket_type
+SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
 {
     socket_type maxFd = -1;
 
     FD_ZERO(readFd);
     FD_ZERO(writeFd);
 
-    for (const SocketPtr &spSocket : m_aioSockets)
+    for (const std::shared_ptr<Socket> &spSocket : m_aioSockets)
     {
         if (spSocket->IsValid())
         {
@@ -71,7 +70,7 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
 {
     SocketList newClients, connectedClients, closedClients;
 
-    for (const SocketPtr &spSocket : m_aioSockets)
+    for (const std::shared_ptr<Socket> &spSocket : m_aioSockets)
     {
         if (spSocket->IsValid())
         {
@@ -82,7 +81,7 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
             {
                 if (spSocket->IsListening())
                 {
-                    SocketPtr spNewClient = spSocket->Accept();
+                    std::shared_ptr<Socket> spNewClient = spSocket->Accept();
 
                     if (spNewClient && spNewClient->SetAsync())
                     {
@@ -123,4 +122,4 @@ void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
     TriggerCallbacks(connectedClients, closedClients);
 }
 
-}
+} // namespace fly

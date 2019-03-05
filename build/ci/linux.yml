@@ -1,0 +1,39 @@
+parameters:
+  configuration: 'Debug'
+  arch: 'x64'
+
+jobs:
+  - job: 'Linux_${{ parameters.configuration }}_${{ parameters.arch }}'
+    pool:
+      vmImage: 'Ubuntu-16.04'
+
+    steps:
+    - ${{ if eq(parameters.arch, 'x86') }}:
+      - script: |
+          sudo apt-get install -y gcc-multilib g++-multilib
+        displayName: 'Dependencies'
+
+    - template: setup.yml
+
+    - ${{ if eq(parameters.configuration, 'Debug') }}:
+      - script: |
+          make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
+        displayName: 'Test'
+
+      # Fix PATH to remove leading and trailing quotes, otherwise codecov fails
+      # when it runs `find`, which thinks that PATH is relative.
+      - script: |
+          path="${PATH%\"}"
+          path="${path#\"}"
+
+          PATH=$path bash <(curl -s https://codecov.io/bash)
+        displayName: 'Coverage'
+
+    - ${{ if eq(parameters.configuration, 'Release') }}:
+      - script: |
+          make -j -C build/nix release=1 arch=${{ parameters.arch }} libfly
+        displayName: 'Build'
+
+      - template: package.yml
+        parameters:
+          contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'

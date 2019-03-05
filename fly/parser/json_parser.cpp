@@ -1,10 +1,10 @@
 #include "fly/parser/json_parser.h"
 
-#include <cctype>
-#include <cstring>
-
 #include "fly/parser/exceptions.h"
 #include "fly/types/string.h"
+
+#include <cctype>
+#include <cstdio>
 
 namespace fly {
 
@@ -48,42 +48,42 @@ Json JsonParser::ParseInternal(std::istream &stream)
 
             switch (token)
             {
-            case Token::Tab:
-            case Token::NewLine:
-            case Token::CarriageReturn:
-            case Token::Space:
-                onWhitespace(token, c);
-                break;
+                case Token::Tab:
+                case Token::NewLine:
+                case Token::CarriageReturn:
+                case Token::Space:
+                    onWhitespace(token, c);
+                    break;
 
-            case Token::StartBrace:
-            case Token::StartBracket:
-                onStartBraceOrBracket(token, c);
-                break;
+                case Token::StartBrace:
+                case Token::StartBracket:
+                    onStartBraceOrBracket(token, c);
+                    break;
 
-            case Token::CloseBrace:
-            case Token::CloseBracket:
-                onCloseBraceOrBracket(token, c);
-                break;
+                case Token::CloseBrace:
+                case Token::CloseBracket:
+                    onCloseBraceOrBracket(token, c);
+                    break;
 
-            case Token::Quote:
-                onQuotation(c);
-                break;
+                case Token::Quote:
+                    onQuotation(c);
+                    break;
 
-            case Token::Comma:
-                onComma(c);
-                break;
+                case Token::Comma:
+                    onComma(c);
+                    break;
 
-            case Token::Colon:
-                onColon(c);
-                break;
+                case Token::Colon:
+                    onColon(c);
+                    break;
 
-            case Token::Solidus:
-                onSolidus(c, stream);
-                break;
+                case Token::Solidus:
+                    onSolidus(c, stream);
+                    break;
 
-            default:
-                onCharacter(token, c, stream);
-                break;
+                default:
+                    onCharacter(token, c, stream);
+                    break;
             }
         }
     }
@@ -94,9 +94,8 @@ Json JsonParser::ParseInternal(std::istream &stream)
 
     if (m_states.top() != State::NoState)
     {
-        throw ParserException(m_line, m_column,
-            "Finished parsing with incomplete JSON object"
-        );
+        throw ParserException(
+            m_line, m_column, "Finished parsing with incomplete JSON object");
     }
 
     return values;
@@ -134,42 +133,42 @@ void JsonParser::onStartBraceOrBracket(Token token, int c)
 {
     switch (m_states.top())
     {
-    case State::NoState:
-        if (m_pValue == nullptr)
-        {
+        case State::NoState:
+            if (m_pValue == nullptr)
+            {
+                throw UnexpectedCharacterException(m_line, m_column, c);
+            }
+
+            break;
+
+        case State::ParsingColon:
+        case State::ParsingObject:
             throw UnexpectedCharacterException(m_line, m_column, c);
-        }
 
-        break;
+        case State::ParsingArray:
+            m_states.push(State::ParsingValue);
 
-    case State::ParsingColon:
-    case State::ParsingObject:
-        throw UnexpectedCharacterException(m_line, m_column, c);
+            m_pValue = &((*m_pValue)[m_pValue->Size()]);
+            m_pParents.push(m_pValue);
 
-    case State::ParsingArray:
-        m_states.push(State::ParsingValue);
+            break;
 
-        m_pValue = &((*m_pValue)[m_pValue->Size()]);
-        m_pParents.push(m_pValue);
+        case State::ParsingName:
+        case State::ParsingValue:
+            if (m_parsingString)
+            {
+                pushValue(c);
+                return;
+            }
+            else if (m_parsingStarted)
+            {
+                throw UnexpectedCharacterException(m_line, m_column, c);
+            }
 
-        break;
+            break;
 
-    case State::ParsingName:
-    case State::ParsingValue:
-        if (m_parsingString)
-        {
-            pushValue(c);
-            return;
-        }
-        else if (m_parsingStarted)
-        {
-            throw UnexpectedCharacterException(m_line, m_column, c);
-        }
-
-        break;
-
-    default:
-        break;
+        default:
+            break;
     }
 
     if (token == Token::StartBrace)
@@ -191,22 +190,22 @@ void JsonParser::onCloseBraceOrBracket(Token token, int c)
 {
     switch (m_states.top())
     {
-    case State::NoState:
-    case State::ParsingColon:
-        throw UnexpectedCharacterException(m_line, m_column, c);
+        case State::NoState:
+        case State::ParsingColon:
+            throw UnexpectedCharacterException(m_line, m_column, c);
 
-    case State::ParsingName:
-    case State::ParsingValue:
-        if (m_parsingString)
-        {
-            pushValue(c);
-            return;
-        }
+        case State::ParsingName:
+        case State::ParsingValue:
+            if (m_parsingString)
+            {
+                pushValue(c);
+                return;
+            }
 
-        break;
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 
     if ((!storeValue() && m_expectingValue) || m_pParents.empty())
@@ -217,13 +216,13 @@ void JsonParser::onCloseBraceOrBracket(Token token, int c)
     m_pParents.pop();
     m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
 
-    const State expected = (
-        (token == Token::CloseBrace) ? State::ParsingObject : State::ParsingArray
-    );
-
-    const State unexpected = (
-        (token == Token::CloseBrace) ? State::ParsingArray : State::ParsingObject
-    );
+    // Formatter doesn't have options for hanging indent after ternary operator
+    // clang-format off
+    const State expected = (token == Token::CloseBrace) ?
+        State::ParsingObject : State::ParsingArray;
+    const State unexpected = (token == Token::CloseBrace) ?
+        State::ParsingArray : State::ParsingObject;
+    // clang-format on
 
     while (m_states.top() != expected)
     {
@@ -248,47 +247,47 @@ void JsonParser::onQuotation(int c)
 {
     switch (m_states.top())
     {
-    case State::ParsingObject:
-        m_states.push(State::ParsingName);
-        break;
+        case State::ParsingObject:
+            m_states.push(State::ParsingName);
+            break;
 
-    case State::ParsingArray:
-        m_states.push(State::ParsingValue);
+        case State::ParsingArray:
+            m_states.push(State::ParsingValue);
 
-        m_pValue = &((*m_pValue)[m_pValue->Size()]);
-        m_pParents.push(m_pValue);
+            m_pValue = &((*m_pValue)[m_pValue->Size()]);
+            m_pParents.push(m_pValue);
 
-        break;
+            break;
 
-    case State::ParsingName:
-        m_states.pop();
-        m_states.push(State::ParsingColon);
-
-        m_pValue = &((*m_pValue)[popValue()]);
-        m_pParents.push(m_pValue);
-
-        m_expectingValue = false;
-
-        break;
-
-    case State::ParsingValue:
-        if (m_parsingString)
-        {
-            m_parsingComplete = true;
-            m_parsedString = true;
-
+        case State::ParsingName:
             m_states.pop();
-            m_states.push(State::ParsingComma);
-        }
-        else if (m_parsingStarted)
-        {
+            m_states.push(State::ParsingColon);
+
+            m_pValue = &((*m_pValue)[popValue()]);
+            m_pParents.push(m_pValue);
+
+            m_expectingValue = false;
+
+            break;
+
+        case State::ParsingValue:
+            if (m_parsingString)
+            {
+                m_parsingComplete = true;
+                m_parsedString = true;
+
+                m_states.pop();
+                m_states.push(State::ParsingComma);
+            }
+            else if (m_parsingStarted)
+            {
+                throw UnexpectedCharacterException(m_line, m_column, c);
+            }
+
+            break;
+
+        default:
             throw UnexpectedCharacterException(m_line, m_column, c);
-        }
-
-        break;
-
-    default:
-        throw UnexpectedCharacterException(m_line, m_column, c);
     }
 
     m_parsingString = !m_parsingString;
@@ -299,28 +298,28 @@ void JsonParser::onColon(int c)
 {
     switch (m_states.top())
     {
-    case State::ParsingColon:
-        m_states.pop();
-        m_states.push(State::ParsingValue);
+        case State::ParsingColon:
+            m_states.pop();
+            m_states.push(State::ParsingValue);
 
-        m_expectingValue = true;
+            m_expectingValue = true;
 
-        break;
+            break;
 
-    case State::ParsingName:
-    case State::ParsingValue:
-        if (m_parsingString)
-        {
-            pushValue(c);
-        }
-        else
-        {
+        case State::ParsingName:
+        case State::ParsingValue:
+            if (m_parsingString)
+            {
+                pushValue(c);
+            }
+            else
+            {
+                throw UnexpectedCharacterException(m_line, m_column, c);
+            }
+            break;
+
+        default:
             throw UnexpectedCharacterException(m_line, m_column, c);
-        }
-        break;
-
-    default:
-        throw UnexpectedCharacterException(m_line, m_column, c);
     }
 }
 
@@ -329,39 +328,39 @@ void JsonParser::onComma(int c)
 {
     switch (m_states.top())
     {
-    case State::ParsingName:
-        pushValue(c);
-        break;
-
-    case State::ParsingValue:
-        if (m_parsingString)
-        {
+        case State::ParsingName:
             pushValue(c);
-        }
-        else if (storeValue())
-        {
+            break;
+
+        case State::ParsingValue:
+            if (m_parsingString)
+            {
+                pushValue(c);
+            }
+            else if (storeValue())
+            {
+                m_states.pop();
+            }
+            else if (m_expectingValue)
+            {
+                throw UnexpectedCharacterException(m_line, m_column, c);
+            }
+
+            break;
+
+        case State::ParsingComma:
+            storeValue();
             m_states.pop();
-        }
-        else if (m_expectingValue)
-        {
+
+            if (m_states.top() == State::ParsingValue)
+            {
+                m_states.pop();
+            }
+
+            break;
+
+        default:
             throw UnexpectedCharacterException(m_line, m_column, c);
-        }
-
-        break;
-
-    case State::ParsingComma:
-        storeValue();
-        m_states.pop();
-
-        if (m_states.top() == State::ParsingValue)
-        {
-            m_states.pop();
-        }
-
-        break;
-
-    default:
-        throw UnexpectedCharacterException(m_line, m_column, c);
     }
 
     if (isFeatureAllowed(Features::AllowTrailingComma))
@@ -387,40 +386,41 @@ void JsonParser::onSolidus(int c, std::istream &stream)
 
         switch (token)
         {
-        case Token::Solidus:
-            do
-            {
-                c = stream.get();
-            } while ((c != EOF) && (static_cast<Token>(c) != Token::NewLine));
-
-            break;
-
-        case Token::Asterisk:
-        {
-            bool parsing = true;
-
-            do
-            {
-                c = stream.get();
-
-                if ((static_cast<Token>(c) == Token::Asterisk) &&
-                    (static_cast<Token>(stream.peek()) == Token::Solidus))
+            case Token::Solidus:
+                do
                 {
-                    parsing = false;
-                    stream.get();
-                }
-            } while ((c != EOF) && parsing);
+                    c = stream.get();
+                } while ((c != EOF) &&
+                         (static_cast<Token>(c) != Token::NewLine));
 
-            if (parsing)
+                break;
+
+            case Token::Asterisk:
             {
-                throw UnexpectedCharacterException(m_line, m_column, c);
+                bool parsing = true;
+
+                do
+                {
+                    c = stream.get();
+
+                    if ((static_cast<Token>(c) == Token::Asterisk) &&
+                        (static_cast<Token>(stream.peek()) == Token::Solidus))
+                    {
+                        parsing = false;
+                        stream.get();
+                    }
+                } while ((c != EOF) && parsing);
+
+                if (parsing)
+                {
+                    throw UnexpectedCharacterException(m_line, m_column, c);
+                }
+
+                break;
             }
 
-            break;
-        }
-
-        default:
-            throw UnexpectedCharacterException(m_line, m_column, c);
+            default:
+                throw UnexpectedCharacterException(m_line, m_column, c);
         }
     }
     else
@@ -439,36 +439,37 @@ void JsonParser::onCharacter(Token token, int c, std::istream &stream)
 
     switch (m_states.top())
     {
-    case State::ParsingArray:
-        m_states.push(State::ParsingValue);
+        case State::ParsingArray:
+            m_states.push(State::ParsingValue);
 
-        m_pValue = &((*m_pValue)[m_pValue->Size()]);
-        m_pParents.push(m_pValue);
-
-        pushValue(c);
-        break;
-
-    case State::ParsingValue:
-    case State::ParsingName:
-        pushValue(c);
-
-        // Blindly ignore the escaped character, the Json class will check
-        // whether it is valid. Just read at least one more character to prevent
-        // the parser from failing if the next character is a quote.
-        if (m_parsingString && (token == Token::ReverseSolidus))
-        {
-            if ((c = stream.get()) == EOF)
-            {
-                throw UnexpectedCharacterException(m_line, m_column, c);
-            }
+            m_pValue = &((*m_pValue)[m_pValue->Size()]);
+            m_pParents.push(m_pValue);
 
             pushValue(c);
-        }
+            break;
 
-        break;
+        case State::ParsingValue:
+        case State::ParsingName:
+            pushValue(c);
 
-    default:
-        throw UnexpectedCharacterException(m_line, m_column, c);
+            // Blindly ignore the escaped character, the Json class will
+            // check whether it is valid. Just read at least one more
+            // character to prevent the parser from failing if the next
+            // character is a quote.
+            if (m_parsingString && (token == Token::ReverseSolidus))
+            {
+                if ((c = stream.get()) == EOF)
+                {
+                    throw UnexpectedCharacterException(m_line, m_column, c);
+                }
+
+                pushValue(c);
+            }
+
+            break;
+
+        default:
+            throw UnexpectedCharacterException(m_line, m_column, c);
     }
 }
 
@@ -569,24 +570,18 @@ bool JsonParser::storeValue()
 void JsonParser::validateNumber(
     const std::string &value,
     bool &isFloat,
-    bool &isSigned
-) const
+    bool &isSigned) const
 {
     isSigned = (value[0] == '-');
 
     const std::string signless = (isSigned ? value.substr(1) : value);
 
-    auto is_octal = [&signless]() -> bool
-    {
-        return (
-            (signless.size() > 1) &&
-            (signless[0] == '0') &&
-            std::isdigit((unsigned char)(signless[1]))
-        );
+    auto is_octal = [&signless]() -> bool {
+        return (signless.size() > 1) && (signless[0] == '0') &&
+            std::isdigit(static_cast<unsigned char>(signless[1]));
     };
 
-    auto is_float = [this, &signless]() -> bool
-    {
+    auto is_float = [this, &signless]() -> bool {
         const std::string::size_type d = signless.find('.');
         const std::string::size_type e = signless.find('e');
         const std::string::size_type E = signless.find('E');
@@ -608,10 +603,10 @@ void JsonParser::validateNumber(
             return true;
         }
 
-        return ((e != std::string::npos) || (E != std::string::npos));
+        return (e != std::string::npos) || (E != std::string::npos);
     };
 
-    if (!std::isdigit((unsigned char)(signless[0])))
+    if (!std::isdigit(static_cast<unsigned char>(signless[0])))
     {
         throw BadConversionException(m_line, m_column, value);
     }
@@ -626,25 +621,23 @@ void JsonParser::validateNumber(
 //==============================================================================
 bool JsonParser::isFeatureAllowed(Features feature) const
 {
-    return ((m_features & feature) != Features::Strict);
+    return (m_features & feature) != Features::Strict;
 }
 
 //==============================================================================
-JsonParser::Features operator & (JsonParser::Features a, JsonParser::Features b)
+JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b)
 {
     return static_cast<JsonParser::Features>(
         static_cast<std::underlying_type_t<JsonParser::Features>>(a) &
-        static_cast<std::underlying_type_t<JsonParser::Features>>(b)
-    );
+        static_cast<std::underlying_type_t<JsonParser::Features>>(b));
 }
 
 //==============================================================================
-JsonParser::Features operator | (JsonParser::Features a, JsonParser::Features b)
+JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b)
 {
     return static_cast<JsonParser::Features>(
         static_cast<std::underlying_type_t<JsonParser::Features>>(a) |
-        static_cast<std::underlying_type_t<JsonParser::Features>>(b)
-    );
+        static_cast<std::underlying_type_t<JsonParser::Features>>(b));
 }
 
-}
+} // namespace fly

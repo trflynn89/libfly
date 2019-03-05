@@ -1,6 +1,9 @@
 #pragma once
 
-#include <atomic>
+#include "fly/fly.h"
+#include "fly/socket/async_request.h"
+#include "fly/task/task.h"
+
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -8,18 +11,12 @@
 #include <mutex>
 #include <vector>
 
-#include "fly/fly.h"
-#include "fly/socket/async_request.h"
-#include "fly/task/task.h"
-
 namespace fly {
 
-FLY_CLASS_PTRS(SocketManager);
-FLY_CLASS_PTRS(SocketManagerTask);
-
-FLY_CLASS_PTRS(SequencedTaskRunner);
-FLY_CLASS_PTRS(Socket);
-FLY_CLASS_PTRS(SocketConfig);
+class SequencedTaskRunner;
+class Socket;
+class SocketConfig;
+class SocketManagerTask;
 enum class Protocol : uint8_t;
 
 /**
@@ -35,17 +32,19 @@ class SocketManager : public std::enable_shared_from_this<SocketManager>
     friend class SocketManagerTask;
 
 public:
-    typedef std::function<void(SocketPtr)> SocketCallback;
+    typedef std::function<void(std::shared_ptr<Socket>)> SocketCallback;
 
-    typedef std::vector<SocketPtr> SocketList;
+    typedef std::vector<std::shared_ptr<Socket>> SocketList;
 
     /**
      * Constructor.
      *
-     * @param TaskRunnerPtr Task runner for posting socket-related tasks onto.
-     * @param LoggerConfigPtr Reference to socket configuration.
+     * @param TaskRunner Task runner for posting socket-related tasks onto.
+     * @param LoggerConfig Reference to socket configuration.
      */
-    SocketManager(const SequencedTaskRunnerPtr &, const SocketConfigPtr &);
+    SocketManager(
+        const std::shared_ptr<SequencedTaskRunner> &,
+        const std::shared_ptr<SocketConfig> &);
 
     /**
      * Destructor. Close all asynchronous sockets.
@@ -77,7 +76,7 @@ public:
      *
      * @return Shared pointer to the socket.
      */
-    SocketPtr CreateSocket(Protocol);
+    std::shared_ptr<Socket> CreateSocket(Protocol);
 
     /**
      * Create and initialize an asynchronous socket. The socket manager will own
@@ -87,7 +86,7 @@ public:
      *
      * @return Weak pointer to the socket.
      */
-    SocketWPtr CreateAsyncSocket(Protocol);
+    std::weak_ptr<Socket> CreateAsyncSocket(Protocol);
 
     /**
      * Wait for an asynchronous read to complete.
@@ -142,10 +141,10 @@ protected:
     AsyncRequest::RequestQueue m_completedSends;
 
 private:
-    SequencedTaskRunnerPtr m_spTaskRunner;
-    TaskPtr m_spTask;
+    std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
+    std::shared_ptr<Task> m_spTask;
 
-    SocketConfigPtr m_spConfig;
+    std::shared_ptr<SocketConfig> m_spConfig;
 
     std::mutex m_callbackMutex;
     SocketCallback m_newClientCallback;
@@ -161,7 +160,7 @@ private:
 class SocketManagerTask : public Task
 {
 public:
-    SocketManagerTask(const SocketManagerWPtr &);
+    SocketManagerTask(const std::weak_ptr<SocketManager> &);
 
 protected:
     /**
@@ -171,15 +170,14 @@ protected:
     void Run() override;
 
 private:
-    SocketManagerWPtr m_wpSocketManager;
+    std::weak_ptr<SocketManager> m_wpSocketManager;
 };
 
 //==============================================================================
 template <typename R, typename P>
 bool SocketManager::WaitForCompletedReceive(
     AsyncRequest &request,
-    std::chrono::duration<R, P> waitTime
-)
+    std::chrono::duration<R, P> waitTime)
 {
     return m_completedReceives.Pop(request, waitTime);
 }
@@ -188,12 +186,11 @@ bool SocketManager::WaitForCompletedReceive(
 template <typename R, typename P>
 bool SocketManager::WaitForCompletedSend(
     AsyncRequest &request,
-    std::chrono::duration<R, P> waitTime
-)
+    std::chrono::duration<R, P> waitTime)
 {
     return m_completedSends.Pop(request, waitTime);
 }
 
-}
+} // namespace fly
 
 #include FLY_OS_IMPL_PATH(socket, socket_manager)

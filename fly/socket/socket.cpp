@@ -10,7 +10,9 @@ namespace fly {
 std::atomic_int Socket::s_aNumSockets(0);
 
 //==============================================================================
-Socket::Socket(Protocol protocol, const SocketConfigPtr &spConfig) :
+Socket::Socket(
+    Protocol protocol,
+    const std::shared_ptr<SocketConfig> &spConfig) :
     m_protocol(protocol),
     m_spConfig(spConfig),
     m_socketEoM(spConfig->EndOfMessage()),
@@ -28,8 +30,7 @@ Socket::Socket(Protocol protocol, const SocketConfigPtr &spConfig) :
 //==============================================================================
 bool Socket::HostnameToAddress(
     const std::string &hostname,
-    address_type &address
-)
+    address_type &address)
 {
     return SocketImpl::HostnameToAddress(hostname, address);
 }
@@ -49,7 +50,7 @@ socket_type Socket::InvalidSocket()
 //==============================================================================
 bool Socket::IsValid() const
 {
-    return (m_socketHandle != InvalidSocket());
+    return m_socketHandle != InvalidSocket();
 }
 
 //==============================================================================
@@ -79,13 +80,13 @@ int Socket::GetSocketId() const
 //==============================================================================
 bool Socket::IsTcp() const
 {
-    return (m_protocol == Protocol::TCP);
+    return m_protocol == Protocol::TCP;
 }
 
 //==============================================================================
 bool Socket::IsUdp() const
 {
-    return (m_protocol == Protocol::UDP);
+    return m_protocol == Protocol::UDP;
 }
 
 //==============================================================================
@@ -103,21 +104,20 @@ bool Socket::IsListening() const
 //==============================================================================
 bool Socket::IsConnecting() const
 {
-    return (m_aConnectedState.load() == ConnectedState::Connecting);
+    return m_aConnectedState.load() == ConnectedState::Connecting;
 }
 
 //==============================================================================
 bool Socket::IsConnected() const
 {
-    return (m_aConnectedState.load() == ConnectedState::Connected);
+    return m_aConnectedState.load() == ConnectedState::Connected;
 }
 
 //==============================================================================
 bool Socket::Bind(
     const std::string &hostname,
     port_type port,
-    BindOption option
-) const
+    BindOption option) const
 {
     address_type address = 0;
 
@@ -161,8 +161,11 @@ ConnectedState Socket::ConnectAsync(address_type address, port_type port)
         }
         else
         {
-            LOGW(m_socketId, "Could not connect to %d:%d, closing socket",
-                address, port);
+            LOGW(
+                m_socketId,
+                "Could not connect to %d:%d, closing socket",
+                address,
+                port);
 
             Close();
         }
@@ -200,7 +203,7 @@ bool Socket::FinishConnect()
         Close();
     }
 
-    return (IsValid() && IsConnected());
+    return IsValid() && IsConnected();
 }
 
 //==============================================================================
@@ -214,8 +217,7 @@ size_t Socket::Send(const std::string &message) const
 size_t Socket::SendTo(
     const std::string &message,
     address_type address,
-    port_type port
-) const
+    port_type port) const
 {
     bool wouldBlock = false;
     return SendTo(message, address, port, wouldBlock);
@@ -225,8 +227,7 @@ size_t Socket::SendTo(
 size_t Socket::SendTo(
     const std::string &message,
     const std::string &hostname,
-    port_type port
-) const
+    port_type port) const
 {
     bool wouldBlock = false;
     return SendTo(message, hostname, port, wouldBlock);
@@ -237,8 +238,7 @@ size_t Socket::SendTo(
     const std::string &message,
     const std::string &hostname,
     port_type port,
-    bool &wouldBlock
-) const
+    bool &wouldBlock) const
 {
     address_type address = 0;
 
@@ -268,8 +268,7 @@ bool Socket::SendAsync(const std::string &message)
 bool Socket::SendToAsync(
     const std::string &message,
     address_type address,
-    port_type port
-)
+    port_type port)
 {
     if (IsUdp() && IsAsync())
     {
@@ -286,8 +285,7 @@ bool Socket::SendToAsync(
 bool Socket::SendToAsync(
     const std::string &message,
     const std::string &hostname,
-    port_type port
-)
+    port_type port)
 {
     address_type address = 0;
 
@@ -330,16 +328,17 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
 
             switch (m_protocol)
             {
-            case Protocol::TCP:
-                bytesSent = Send(message, wouldBlock);
-                break;
+                case Protocol::TCP:
+                    bytesSent = Send(message, wouldBlock);
+                    break;
 
-            case Protocol::UDP:
-                bytesSent = SendTo(
-                    message, request.GetAddress(), request.GetPort(), wouldBlock
-                );
-
-                break;
+                case Protocol::UDP:
+                    bytesSent = SendTo(
+                        message,
+                        request.GetAddress(),
+                        request.GetPort(),
+                        wouldBlock);
+                    break;
             }
 
             if (bytesSent == message.length())
@@ -349,8 +348,12 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
             }
             else if (wouldBlock)
             {
-                LOGI(m_socketId, "Send would block - sent %zu of %zu bytes, "
-                    "will finish later", bytesSent, message.length());
+                LOGI(
+                    m_socketId,
+                    "Send would block - sent %zu of %zu bytes, "
+                    "will finish later",
+                    bytesSent,
+                    message.length());
 
                 request.IncrementRequestOffset(bytesSent);
                 m_pendingSends.Push(request);
@@ -376,25 +379,31 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
 
         switch (m_protocol)
         {
-        case Protocol::TCP:
-            received = Recv(wouldBlock, isComplete);
-            break;
+            case Protocol::TCP:
+                received = Recv(wouldBlock, isComplete);
+                break;
 
-        case Protocol::UDP:
-            received = RecvFrom(wouldBlock, isComplete);
-            break;
+            case Protocol::UDP:
+                received = RecvFrom(wouldBlock, isComplete);
+                break;
         }
 
         if ((received.length() > 0) || isComplete)
         {
-            LOGD(m_socketId, "Received %u bytes, %u in buffer",
-                received.length(), m_receiveBuffer.length());
+            LOGD(
+                m_socketId,
+                "Received %u bytes, %u in buffer",
+                received.length(),
+                m_receiveBuffer.length());
 
             m_receiveBuffer += received;
 
             if (isComplete)
             {
-                LOGD(m_socketId, "Completed message, %u bytes", m_receiveBuffer.length());
+                LOGD(
+                    m_socketId,
+                    "Completed message, %u bytes",
+                    m_receiveBuffer.length());
 
                 AsyncRequest request(m_socketId, m_receiveBuffer);
                 completedReceives.Push(request);
@@ -403,8 +412,11 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
         }
         else if (wouldBlock)
         {
-            LOGI(m_socketId, "Receive would block - received %u bytes, "
-                "will finish later", m_receiveBuffer.length());
+            LOGI(
+                m_socketId,
+                "Receive would block - received %u bytes, "
+                "will finish later",
+                m_receiveBuffer.length());
         }
         else
         {
@@ -414,4 +426,4 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
     }
 }
 
-}
+} // namespace fly

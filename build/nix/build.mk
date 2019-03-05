@@ -9,6 +9,7 @@
 .PHONY: gcov
 .PHONY: install
 .PHONY: setup
+.PHONY: style
 .PHONY: $(TARGETS)
 
 # Verify expected variables
@@ -88,7 +89,7 @@ install: $(TARGET_PACKAGES)
 # Install dependencies
 setup:
 ifeq ($(HOST), DEBIAN)
-	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib clang llvm
+	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib clang llvm clang-format
 
 ifeq ($(qt5), 1)
 	$(Q)sudo apt-get install -y mesa-common-dev
@@ -98,3 +99,9 @@ else
 	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"
 	$(Q)exit 1
 endif
+
+# Style enforcement
+style:
+	$(Q)clang-format -i $$(find $(SOURCE_ROOT) \
+		-not \( -path "*googletest*" -prune \) \
+		-name "*.h" -o -name "*.c" -o -name "*.cc" -o -name "*.cpp")

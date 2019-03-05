@@ -40,6 +40,6 @@ enum class MockCall : unsigned int
 /**
  * Stream the name of a mocked system.
  */
-std::ostream &operator << (std::ostream &, MockCall);
+std::ostream &operator<<(std::ostream &, MockCall);
 
-}
+} // namespace fly

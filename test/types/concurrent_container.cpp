@@ -1,12 +1,12 @@
+#include "fly/types/concurrent_queue.h"
+
+#include <gtest/gtest.h>
+
 #include <atomic>
 #include <chrono>
 #include <functional>
 #include <future>
 #include <vector>
-
-#include <gtest/gtest.h>
-
-#include "fly/types/concurrent_queue.h"
 
 //==============================================================================
 class ConcurrencyTest : public ::testing::Test
@@ -28,10 +28,8 @@ public:
         return numWrites;
     }
 
-    unsigned int ReaderThread(
-        ObjectQueue &objectQueue,
-        std::atomic_bool &finishedWrites
-    )
+    unsigned int
+    ReaderThread(ObjectQueue &objectQueue, std::atomic_bool &finishedWrites)
     {
         unsigned int numReads = 0;
 
@@ -69,14 +67,19 @@ protected:
         // Create numWriters writer threads
         for (unsigned int i = 0; i < numWriters; ++i)
         {
-            auto func = std::bind(&ConcurrencyTest::WriterThread, this, std::ref(objectQueue));
+            auto func = std::bind(
+                &ConcurrencyTest::WriterThread, this, std::ref(objectQueue));
             writerFutures.push_back(std::async(std::launch::async, func));
         }
 
         // Create numReaders reader threads
         for (unsigned int i = 0; i < numReaders; ++i)
         {
-            auto func = std::bind(&ConcurrencyTest::ReaderThread, this, std::ref(objectQueue), std::ref(finishedWrites));
+            auto func = std::bind(
+                &ConcurrencyTest::ReaderThread,
+                this,
+                std::ref(objectQueue),
+                std::ref(finishedWrites));
             readerFutures.push_back(std::async(std::launch::async, func));
         }
 
@@ -103,8 +106,7 @@ protected:
     void DoQueuePush(
         ObjectQueue &objectQueue,
         const Object &object,
-        ObjectQueue::size_type expectedSize
-    )
+        ObjectQueue::size_type expectedSize)
     {
         objectQueue.Push(object);
 
@@ -115,8 +117,7 @@ protected:
     void DoQueuePop(
         ObjectQueue &objectQueue,
         const Object &expectedObject,
-        ObjectQueue::size_type expectedSize
-    )
+        ObjectQueue::size_type expectedSize)
     {
         Object object;
 
@@ -189,7 +190,10 @@ TEST_F(ConcurrencyTest, InfiniteWaitReaderTest)
     ObjectQueue objectQueue;
     Object obj(123);
 
-    auto func = std::bind(&ConcurrencyTest::InfiniteWaitReaderThread, this, std::ref(objectQueue));
+    auto func = std::bind(
+        &ConcurrencyTest::InfiniteWaitReaderThread,
+        this,
+        std::ref(objectQueue));
     std::future<Object> future = std::async(std::launch::async, func);
 
     std::future_status status = future.wait_for(std::chrono::milliseconds(10));

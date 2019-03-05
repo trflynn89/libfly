@@ -1,14 +1,11 @@
 #pragma once
 
+#include "fly/config/config.h"
+
 #include <chrono>
 #include <string>
 
-#include "fly/fly.h"
-#include "fly/config/config.h"
-
 namespace fly {
-
-FLY_CLASS_PTRS(LoggerConfig);
 
 /**
  * Class to hold configuration values related to the logger.
@@ -50,4 +47,4 @@ protected:
     std::chrono::milliseconds::rep m_defaultQueueWaitTime;
 };
 
-}
+} // namespace fly

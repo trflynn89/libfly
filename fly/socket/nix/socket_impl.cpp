@@ -1,6 +1,8 @@
 #include "fly/socket/nix/socket_impl.h"
 
-#include <cstring>
+#include "fly/logger/logger.h"
+#include "fly/socket/socket_config.h"
+#include "fly/system/system.h"
 
 #include <fcntl.h>
 #include <netdb.h>
@@ -9,14 +11,12 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "fly/logger/logger.h"
-#include "fly/socket/socket_config.h"
-#include "fly/system/system.h"
+#include <cstring>
 
 namespace fly {
 
-namespace
-{
+namespace {
+
     struct sockaddr_in CreateSocketAddress(address_type address, port_type port)
     {
         struct sockaddr_in socketAddress;
@@ -28,21 +28,24 @@ namespace
 
         return socketAddress;
     }
-}
+
+} // namespace
 
 //==============================================================================
-SocketImpl::SocketImpl(Protocol protocol, const SocketConfigPtr &spConfig) :
+SocketImpl::SocketImpl(
+    Protocol protocol,
+    const std::shared_ptr<SocketConfig> &spConfig) :
     Socket(protocol, spConfig)
 {
     switch (m_protocol)
     {
-    case Protocol::TCP:
-        m_socketHandle = ::socket(AF_INET, SOCK_STREAM, 0);
-        break;
+        case Protocol::TCP:
+            m_socketHandle = ::socket(AF_INET, SOCK_STREAM, 0);
+            break;
 
-    case Protocol::UDP:
-        m_socketHandle = ::socket(AF_INET, SOCK_DGRAM, 0);
-        break;
+        case Protocol::UDP:
+            m_socketHandle = ::socket(AF_INET, SOCK_DGRAM, 0);
+            break;
     }
 }
 
@@ -55,8 +58,7 @@ SocketImpl::~SocketImpl()
 //==============================================================================
 bool SocketImpl::HostnameToAddress(
     const std::string &hostname,
-    address_type &address
-)
+    address_type &address)
 {
     struct hostent *ipAddress = ::gethostbyname(hostname.c_str());
 
@@ -106,7 +108,7 @@ bool SocketImpl::IsErrorFree()
         LOGS(m_socketHandle, "Error getting error flag");
     }
 
-    return (opt == 0);
+    return opt == 0;
 }
 
 //==============================================================================
@@ -130,32 +132,34 @@ bool SocketImpl::SetAsync()
 }
 
 //==============================================================================
-bool SocketImpl::Bind(
-    address_type address,
-    port_type port,
-    BindOption option
-) const
+bool SocketImpl::Bind(address_type address, port_type port, BindOption option)
+    const
 {
     static const int bindForReuseOption = 1;
-    static const socklen_t bindForReuseOptionLength = sizeof(bindForReuseOption);
+    static const socklen_t bindForReuseOptionLength =
+        sizeof(bindForReuseOption);
 
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
     auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
 
     switch (option)
     {
-    case BindOption::SingleUse:
-        break;
+        case BindOption::SingleUse:
+            break;
 
-    case BindOption::AllowReuse:
-        if (::setsockopt(m_socketHandle, SOL_SOCKET, SO_REUSEADDR,
-            &bindForReuseOption, bindForReuseOptionLength) == -1)
-        {
-            LOGS(m_socketHandle, "Error setting reuse flag");
-            return false;
-        }
+        case BindOption::AllowReuse:
+            if (::setsockopt(
+                    m_socketHandle,
+                    SOL_SOCKET,
+                    SO_REUSEADDR,
+                    &bindForReuseOption,
+                    bindForReuseOptionLength) == -1)
+            {
+                LOGS(m_socketHandle, "Error setting reuse flag");
+                return false;
+            }
 
-        break;
+            break;
     }
 
     if (::bind(m_socketHandle, pSocketAddress, sizeof(socketAddress)) == -1)
@@ -204,15 +208,16 @@ bool SocketImpl::Connect(address_type address, port_type port)
 }
 
 //==============================================================================
-SocketPtr SocketImpl::Accept() const
+std::shared_ptr<Socket> SocketImpl::Accept() const
 {
-    SocketImplPtr ret = std::make_shared<SocketImpl>(m_protocol, m_spConfig);
+    auto ret = std::make_shared<SocketImpl>(m_protocol, m_spConfig);
 
     struct sockaddr_in socketAddress;
     auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
     socklen_t socketAddressLength = sizeof(socketAddress);
 
-    socket_type skt = ::accept(m_socketHandle, pSocketAddress, &socketAddressLength);
+    socket_type skt =
+        ::accept(m_socketHandle, pSocketAddress, &socketAddressLength);
 
     if (skt == InvalidSocket())
     {
@@ -221,7 +226,11 @@ SocketPtr SocketImpl::Accept() const
     }
     else
     {
-        LOGD(m_socketHandle, "Accepted new socket: %d (%d)", ret->GetSocketId(), skt);
+        LOGD(
+            m_socketHandle,
+            "Accepted new socket: %d (%d)",
+            ret->GetSocketId(),
+            skt);
 
         ret->m_socketHandle = skt;
         ret->m_clientIp = ntohl(socketAddress.sin_addr.s_addr);
@@ -244,7 +253,8 @@ size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
 
     while (keepSending)
     {
-        ssize_t currSent = ::send(m_socketHandle, toSend.c_str(), toSend.length(), 0);
+        ssize_t currSent =
+            ::send(m_socketHandle, toSend.c_str(), toSend.length(), 0);
 
         if (currSent > 0)
         {
@@ -280,8 +290,7 @@ size_t SocketImpl::SendTo(
     const std::string &message,
     address_type address,
     port_type port,
-    bool &wouldBlock
-) const
+    bool &wouldBlock) const
 {
     static const std::string eom(1, m_socketEoM);
     std::string toSend = message + eom;
@@ -295,9 +304,13 @@ size_t SocketImpl::SendTo(
 
     while (keepSending)
     {
-        size_t toSendSize = std::min(m_packetSize, toSend.length());
-        ssize_t currSent = ::sendto(m_socketHandle, toSend.c_str(), toSendSize,
-            0, pSocketAddress, sizeof(socketAddress));
+        ssize_t currSent = ::sendto(
+            m_socketHandle,
+            toSend.c_str(),
+            std::min(m_packetSize, toSend.length()),
+            0,
+            pSocketAddress,
+            sizeof(socketAddress));
 
         if (currSent > 0)
         {
@@ -386,8 +399,14 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
     while (keepReading)
     {
         char *buff = (char *)calloc(1, m_packetSize * sizeof(char));
-        ssize_t bytesRead = ::recvfrom(m_socketHandle, buff, m_packetSize,
-            0, pSocketAddress, &socketAddressLength);
+
+        ssize_t bytesRead = ::recvfrom(
+            m_socketHandle,
+            buff,
+            m_packetSize,
+            0,
+            pSocketAddress,
+            &socketAddressLength);
 
         if (bytesRead > 0)
         {
@@ -417,4 +436,4 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
     return ret;
 }
 
-}
+} // namespace fly

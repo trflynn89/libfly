@@ -1,16 +1,14 @@
 #pragma once
 
-#include <string>
-
-#include "fly/fly.h"
 #include "fly/socket/socket.h"
 #include "fly/socket/socket_types.h"
 
+#include <memory>
+#include <string>
+
 namespace fly {
 
-FLY_CLASS_PTRS(SocketImpl);
-
-FLY_CLASS_PTRS(SocketConfig);
+class SocketConfig;
 
 /**
  * Linux implementation of the Socket interface.
@@ -21,7 +19,7 @@ FLY_CLASS_PTRS(SocketConfig);
 class SocketImpl : public Socket
 {
 public:
-    SocketImpl(Protocol, const SocketConfigPtr &);
+    SocketImpl(Protocol, const std::shared_ptr<SocketConfig> &);
     ~SocketImpl() override;
 
     static bool HostnameToAddress(const std::string &, address_type &);
@@ -42,14 +40,15 @@ public:
 
     bool Connect(address_type, port_type) override;
 
-    SocketPtr Accept() const override;
+    std::shared_ptr<Socket> Accept() const override;
 
 protected:
     size_t Send(const std::string &, bool &) const override;
-    size_t SendTo(const std::string &, address_type, port_type, bool &) const override;
+    size_t
+    SendTo(const std::string &, address_type, port_type, bool &) const override;
 
     std::string Recv(bool &, bool &) const override;
     std::string RecvFrom(bool &, bool &) const override;
 };
 
-}
+} // namespace fly

@@ -1,14 +1,11 @@
 #pragma once
 
+#include "fly/config/config.h"
+
 #include <chrono>
 #include <string>
 
-#include "fly/fly.h"
-#include "fly/config/config.h"
-
 namespace fly {
-
-FLY_CLASS_PTRS(SocketConfig);
 
 /**
  * Class to hold networking-related configuration values.
@@ -50,4 +47,4 @@ protected:
     size_t m_defaultPacketSize;
 };
 
-}
+} // namespace fly

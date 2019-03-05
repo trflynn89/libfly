@@ -10,4 +10,4 @@ MainWindow::MainWindow(QWidget *parent) :
     m_upUi->setupUi(this);
 }
 
-}
+} // namespace fly

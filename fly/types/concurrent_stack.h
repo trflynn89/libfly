@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stack>
-
 #include "fly/types/concurrent_container.h"
+
+#include <stack>
 
 namespace fly {
 
@@ -35,4 +35,4 @@ void ConcurrentStack<T>::pop(T &item)
     this->m_container.pop();
 }
 
-}
+} // namespace fly

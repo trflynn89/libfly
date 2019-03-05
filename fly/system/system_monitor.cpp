@@ -1,18 +1,17 @@
 #include "fly/system/system_monitor.h"
 
-#include <chrono>
-#include <thread>
-
 #include "fly/system/system_config.h"
 #include "fly/task/task_runner.h"
+
+#include <chrono>
+#include <thread>
 
 namespace fly {
 
 //==============================================================================
 SystemMonitor::SystemMonitor(
-    const SequencedTaskRunnerPtr &spTaskRunner,
-    const SystemConfigPtr &spConfig
-) :
+    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
+    const std::shared_ptr<SystemConfig> &spConfig) :
     m_systemCpuCount(0),
     m_systemCpuUsage(0.0),
     m_processCpuUsage(0.0),
@@ -29,7 +28,7 @@ bool SystemMonitor::Start()
 {
     if (isValid())
     {
-        SystemMonitorPtr spSystemMonitor = shared_from_this();
+        std::shared_ptr<SystemMonitor> spSystemMonitor = shared_from_this();
 
         m_spTask = std::make_shared<SystemMonitorTask>(spSystemMonitor);
         m_spTaskRunner->PostTask(m_spTask);
@@ -79,7 +78,7 @@ uint64_t SystemMonitor::GetProcessMemoryUsage() const
 //==============================================================================
 bool SystemMonitor::isValid() const
 {
-    return (GetSystemCpuCount() > 0);
+    return GetSystemCpuCount() > 0;
 }
 
 //==============================================================================
@@ -94,7 +93,8 @@ void SystemMonitor::poll()
 }
 
 //==============================================================================
-SystemMonitorTask::SystemMonitorTask(const SystemMonitorWPtr &wpSystemMonitor) :
+SystemMonitorTask::SystemMonitorTask(
+    const std::weak_ptr<SystemMonitor> &wpSystemMonitor) :
     Task(),
     m_wpSystemMonitor(wpSystemMonitor)
 {
@@ -103,7 +103,7 @@ SystemMonitorTask::SystemMonitorTask(const SystemMonitorWPtr &wpSystemMonitor) :
 //==============================================================================
 void SystemMonitorTask::Run()
 {
-    SystemMonitorPtr spSystemMonitor = m_wpSystemMonitor.lock();
+    std::shared_ptr<SystemMonitor> spSystemMonitor = m_wpSystemMonitor.lock();
 
     if (spSystemMonitor && spSystemMonitor->isValid())
     {
@@ -113,10 +113,9 @@ void SystemMonitorTask::Run()
         {
             spSystemMonitor->m_spTaskRunner->PostTaskWithDelay(
                 spSystemMonitor->m_spTask,
-                spSystemMonitor->m_spConfig->PollInterval()
-            );
+                spSystemMonitor->m_spConfig->PollInterval());
         }
     }
 }
 
-}
+} // namespace fly

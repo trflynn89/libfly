@@ -1,3 +1,7 @@
+#include "fly/traits/traits.h"
+
+#include <gtest/gtest.h>
+
 #include <array>
 #include <deque>
 #include <forward_list>
@@ -9,175 +13,178 @@
 #include <unordered_set>
 #include <vector>
 
-#include <gtest/gtest.h>
+namespace {
 
-#include "fly/fly.h"
-#include "fly/traits/traits.h"
+//==========================================================================
+DECLARATION_TESTS(foo, T, std::declval<const T &>().Foo());
 
-namespace
+//==========================================================================
+class FooClass
 {
-    //==========================================================================
-    DECLARATION_TESTS(foo, T, std::declval<const T &>().Foo());
-
-    //==========================================================================
-    class FooClass
+public:
+    FooClass()
     {
-    public:
-        FooClass() { }
-        bool Foo() const { return true; }
-    };
-
-    //==========================================================================
-    class BarClass
-    {
-    public:
-        BarClass() { }
-
-        std::string operator()() const
-        {
-            return "BarClass";
-        }
-
-    private:
-        friend std::ostream &operator << (std::ostream &, const BarClass &);
-    };
-
-    std::ostream &operator << (std::ostream &stream, const BarClass &bar)
-    {
-        return (stream << bar());
     }
-
-    //==========================================================================
-    template <typename T, if_foo::enabled<T> = 0>
-    bool callFoo(const T &arg)
-    {
-        return arg.Foo();
-    }
-
-    template <typename T, if_foo::disabled<T> = 0>
-    bool callFoo(const T &)
-    {
-        return false;
-    }
-
-    //==========================================================================
-    template <typename T, fly::if_string::enabled<T> = 0>
-    bool isString(const T &)
+    bool Foo() const
     {
         return true;
     }
+};
 
-    template <typename T, fly::if_string::disabled<T> = 0>
-    bool isString(const T &)
+//==========================================================================
+class BarClass
+{
+public:
+    BarClass()
     {
-        return false;
     }
 
-    //==========================================================================
-    template <typename T, fly::if_ostream::enabled<T> = 0>
-    bool isStreamable(std::ostream &stream, const T &arg)
+    std::string operator()() const
     {
-        stream << arg;
-        return true;
+        return "BarClass";
     }
 
-    template <typename T, fly::if_ostream::disabled<T> = 0>
-    bool isStreamable(std::ostream &, const T &)
-    {
-        return false;
-    }
+private:
+    friend std::ostream &operator<<(std::ostream &, const BarClass &);
+};
 
-    //==========================================================================
-    template <typename T, fly::if_signed_integer::enabled<T> = 0>
-    bool isSignedInteger(const T &)
-    {
-        return true;
-    }
-
-    template <typename T, fly::if_signed_integer::disabled<T> = 0>
-    bool isSignedInteger(const T &)
-    {
-        return false;
-    }
-
-    //==========================================================================
-    template <typename T, fly::if_unsigned_integer::enabled<T> = 0>
-    bool isUnsignedInteger(const T &)
-    {
-        return true;
-    }
-
-    template <typename T, fly::if_unsigned_integer::disabled<T> = 0>
-    bool isUnsignedInteger(const T &)
-    {
-        return false;
-    }
-
-    //==========================================================================
-    template <typename T, fly::if_floating_point::enabled<T> = 0>
-    bool isFloat(const T &)
-    {
-        return true;
-    }
-
-    template <typename T, fly::if_floating_point::disabled<T> = 0>
-    bool isFloat(const T &)
-    {
-        return false;
-    }
-
-    //==========================================================================
-    template <typename T, fly::if_numeric::enabled<T> = 0>
-    bool isNumeric(const T &)
-    {
-        return true;
-    }
-
-    template <typename T, fly::if_numeric::disabled<T> = 0>
-    bool isNumeric(const T &)
-    {
-        return false;
-    }
-
-    //==========================================================================
-    template <typename T, fly::if_boolean::enabled<T> = 0>
-    bool isBool(const T &)
-    {
-        return true;
-    }
-
-    template <typename T, fly::if_boolean::disabled<T> = 0>
-    bool isBool(const T &)
-    {
-        return false;
-    }
-
-    //==========================================================================
-    template <typename T, fly::if_map::enabled<T> = 0>
-    bool isMap(const T &)
-    {
-        return true;
-    }
-
-    template <typename T, fly::if_map::disabled<T> = 0>
-    bool isMap(const T &)
-    {
-        return false;
-    }
-
-    //==========================================================================
-    template <typename T, fly::if_array::enabled<T> = 0>
-    bool isArray(const T &)
-    {
-        return true;
-    }
-
-    template <typename T, fly::if_array::disabled<T> = 0>
-    bool isArray(const T &)
-    {
-        return false;
-    }
+std::ostream &operator<<(std::ostream &stream, const BarClass &bar)
+{
+    return (stream << bar());
 }
+
+//==========================================================================
+template <typename T, if_foo::enabled<T> = 0>
+bool callFoo(const T &arg)
+{
+    return arg.Foo();
+}
+
+template <typename T, if_foo::disabled<T> = 0>
+bool callFoo(const T &)
+{
+    return false;
+}
+
+//==========================================================================
+template <typename T, fly::if_string::enabled<T> = 0>
+bool isString(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::if_string::disabled<T> = 0>
+bool isString(const T &)
+{
+    return false;
+}
+
+//==========================================================================
+template <typename T, fly::if_ostream::enabled<T> = 0>
+bool isStreamable(std::ostream &stream, const T &arg)
+{
+    stream << arg;
+    return true;
+}
+
+template <typename T, fly::if_ostream::disabled<T> = 0>
+bool isStreamable(std::ostream &, const T &)
+{
+    return false;
+}
+
+//==========================================================================
+template <typename T, fly::if_signed_integer::enabled<T> = 0>
+bool isSignedInteger(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::if_signed_integer::disabled<T> = 0>
+bool isSignedInteger(const T &)
+{
+    return false;
+}
+
+//==========================================================================
+template <typename T, fly::if_unsigned_integer::enabled<T> = 0>
+bool isUnsignedInteger(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::if_unsigned_integer::disabled<T> = 0>
+bool isUnsignedInteger(const T &)
+{
+    return false;
+}
+
+//==========================================================================
+template <typename T, fly::if_floating_point::enabled<T> = 0>
+bool isFloat(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::if_floating_point::disabled<T> = 0>
+bool isFloat(const T &)
+{
+    return false;
+}
+
+//==========================================================================
+template <typename T, fly::if_numeric::enabled<T> = 0>
+bool isNumeric(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::if_numeric::disabled<T> = 0>
+bool isNumeric(const T &)
+{
+    return false;
+}
+
+//==========================================================================
+template <typename T, fly::if_boolean::enabled<T> = 0>
+bool isBool(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::if_boolean::disabled<T> = 0>
+bool isBool(const T &)
+{
+    return false;
+}
+
+//==========================================================================
+template <typename T, fly::if_map::enabled<T> = 0>
+bool isMap(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::if_map::disabled<T> = 0>
+bool isMap(const T &)
+{
+    return false;
+}
+
+//==========================================================================
+template <typename T, fly::if_array::enabled<T> = 0>
+bool isArray(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::if_array::disabled<T> = 0>
+bool isArray(const T &)
+{
+    return false;
+}
+
+} // namespace
 
 //==============================================================================
 TEST(TraitsTest, FooTest)
@@ -203,8 +210,8 @@ TEST(TraitsTest, StringTest)
     const char chr1 = 'e';
     char chr2 = 'f';
 
-    const char arr1[] = { 'g', '\0' };
-    char arr2[] = { 'h', '\0' };
+    const char arr1[] = {'g', '\0'};
+    char arr2[] = {'h', '\0'};
 
     ASSERT_TRUE(isString(str1));
     ASSERT_TRUE(isString(str1));
@@ -290,7 +297,8 @@ TEST(TraitsTest, UnsignedIntegerTest)
     ASSERT_FALSE(isUnsignedInteger(std::multiset<int>()));
     ASSERT_FALSE(isUnsignedInteger(std::set<int>()));
     ASSERT_FALSE(isUnsignedInteger(std::unordered_map<std::string, int>()));
-    ASSERT_FALSE(isUnsignedInteger(std::unordered_multimap<std::string, int>()));
+    ASSERT_FALSE(
+        isUnsignedInteger(std::unordered_multimap<std::string, int>()));
     ASSERT_FALSE(isUnsignedInteger(std::unordered_multiset<int>()));
     ASSERT_FALSE(isUnsignedInteger(std::unordered_set<int>()));
     ASSERT_FALSE(isUnsignedInteger(std::vector<int>()));

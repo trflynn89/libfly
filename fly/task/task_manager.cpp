@@ -1,17 +1,18 @@
 #include "fly/task/task_manager.h"
 
-#include <thread>
-
 #include "fly/logger/logger.h"
 #include "fly/task/task.h"
 #include "fly/task/task_runner.h"
 
+#include <thread>
+
 namespace fly {
 
-namespace
-{
-    static std::chrono::milliseconds s_delay(10);
-}
+namespace {
+
+    const std::chrono::milliseconds s_delay(10);
+
+} // namespace
 
 //==============================================================================
 TaskManager::TaskManager(int numWorkers) :
@@ -28,18 +29,16 @@ bool TaskManager::Start()
     if (m_aKeepRunning.compare_exchange_strong(expected, true))
     {
         LOGI(-1, "Starting %d workers", m_numWorkers);
-        TaskManagerPtr spTaskManager = shared_from_this();
+        std::shared_ptr<TaskManager> spTaskManager = shared_from_this();
 
         for (int i = 0; i < m_numWorkers; ++i)
         {
             m_futures.push_back(std::async(
-                std::launch::async, &TaskManager::workerThread, spTaskManager
-            ));
+                std::launch::async, &TaskManager::workerThread, spTaskManager));
         }
 
         m_futures.push_back(std::async(
-            std::launch::async, &TaskManager::timerThread, spTaskManager
-        ));
+            std::launch::async, &TaskManager::timerThread, spTaskManager));
 
         return true;
     }
@@ -72,23 +71,21 @@ bool TaskManager::Stop()
 
 //==============================================================================
 void TaskManager::postTask(
-    const TaskWPtr &wpTask,
-    const TaskRunnerWPtr &wpTaskRunner
-)
+    const std::weak_ptr<Task> &wpTask,
+    const std::weak_ptr<TaskRunner> &wpTaskRunner)
 {
-    TaskHolder task { wpTask, wpTaskRunner, std::chrono::steady_clock::now() };
+    TaskHolder task {wpTask, wpTaskRunner, std::chrono::steady_clock::now()};
     m_tasks.Push(task);
 }
 
 //==============================================================================
 void TaskManager::postTaskWithDelay(
-    const TaskWPtr &wpTask,
-    const TaskRunnerWPtr &wpTaskRunner,
-    std::chrono::milliseconds delay
-)
+    const std::weak_ptr<Task> &wpTask,
+    const std::weak_ptr<TaskRunner> &wpTaskRunner,
+    std::chrono::milliseconds delay)
 {
     auto schedule = std::chrono::steady_clock::now() + delay;
-    TaskHolder task { wpTask, wpTaskRunner, schedule };
+    TaskHolder task {wpTask, wpTaskRunner, schedule};
 
     std::unique_lock<std::mutex> lock(m_delayedTasksMutex);
     m_delayedTasks.push_back(task);
@@ -103,8 +100,8 @@ void TaskManager::workerThread()
     {
         if (m_tasks.Pop(task, s_delay) && m_aKeepRunning.load())
         {
-            TaskRunnerPtr spTaskRunner = task.m_wpTaskRunner.lock();
-            TaskPtr spTask = task.m_wpTask.lock();
+            auto spTaskRunner = task.m_wpTaskRunner.lock();
+            auto spTask = task.m_wpTask.lock();
 
             if (spTaskRunner)
             {
@@ -128,11 +125,11 @@ void TaskManager::timerThread()
         {
             std::unique_lock<std::mutex> lock(m_delayedTasksMutex);
 
-            for (auto it = m_delayedTasks.begin(); it != m_delayedTasks.end(); )
+            for (auto it = m_delayedTasks.begin(); it != m_delayedTasks.end();)
             {
                 if (it->m_schedule <= now)
                 {
-                    TaskRunnerPtr spTaskRunner = it->m_wpTaskRunner.lock();
+                    auto spTaskRunner = it->m_wpTaskRunner.lock();
 
                     if (spTaskRunner)
                     {
@@ -152,4 +149,4 @@ void TaskManager::timerThread()
     }
 }
 
-}
+} // namespace fly

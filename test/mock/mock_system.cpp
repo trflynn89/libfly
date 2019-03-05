@@ -68,4 +68,4 @@ bool MockSystem::MockEnabled(MockCall mock, bool &fail)
     return false;
 }
 
-}
+} // namespace fly

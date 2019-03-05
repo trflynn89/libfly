@@ -1,8 +1,8 @@
 #pragma once
 
-#include <queue>
-
 #include "fly/types/concurrent_container.h"
+
+#include <queue>
 
 namespace fly {
 
@@ -35,4 +35,4 @@ void ConcurrentQueue<T>::pop(T &item)
     this->m_container.pop();
 }
 
-}
+} // namespace fly

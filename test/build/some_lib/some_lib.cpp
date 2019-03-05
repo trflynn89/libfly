@@ -13,4 +13,4 @@ int SomeClass::operator()() const
     return m_value;
 }
 
-}
+} // namespace fly

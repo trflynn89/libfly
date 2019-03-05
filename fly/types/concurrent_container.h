@@ -4,8 +4,6 @@
 #include <condition_variable>
 #include <mutex>
 
-#include "fly/fly.h"
-
 namespace fly {
 
 /**
@@ -111,11 +109,11 @@ void ConcurrentContainer<T, Container>::Pop(T &item)
 }
 
 //==============================================================================
-template <typename T, typename Container> template <typename R, typename P>
+template <typename T, typename Container>
+template <typename R, typename P>
 bool ConcurrentContainer<T, Container>::Pop(
     T &item,
-    std::chrono::duration<R, P> waitTime
-)
+    std::chrono::duration<R, P> waitTime)
 {
     std::unique_lock<std::mutex> lock(m_containerMutex);
 
@@ -146,4 +144,4 @@ auto ConcurrentContainer<T, Container>::Size() const -> size_type
     return m_container.size();
 }
 
-}
+} // namespace fly
