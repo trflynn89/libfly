@@ -63,7 +63,7 @@ namespace {
         {
             if (m_pDir == NULL)
             {
-                LOGS(-1, "Could not open \"%s\"", path);
+                LOGS("Could not open \"%s\"", path);
             }
         }
 
@@ -143,7 +143,7 @@ bool PathImpl::RemovePath(const std::string &path)
                 case FTS_DNR:
                 case FTS_ERR:
                     errno = pCurr->fts_errno; // errno may not be set
-                    LOGS(-1, "Could not read \"%s\"", file);
+                    LOGS("Could not read \"%s\"", file);
                     ret = false;
                     break;
 
@@ -154,11 +154,11 @@ bool PathImpl::RemovePath(const std::string &path)
                 case FTS_DEFAULT:
                     if (::remove(pCurr->fts_accpath) == 0)
                     {
-                        LOGD(-1, "Removed \"%s\"", file);
+                        LOGD("Removed \"%s\"", file);
                     }
                     else
                     {
-                        LOGS(-1, "Could not remove \"%s\"", file);
+                        LOGS("Could not remove \"%s\"", file);
                         ret = false;
                     }
 

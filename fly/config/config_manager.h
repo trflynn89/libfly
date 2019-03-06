@@ -169,7 +169,7 @@ std::shared_ptr<T> ConfigManager::CreateConfig()
     }
     else
     {
-        LOGW(-1, "Could not create configuration for type %s", name);
+        LOGW("Could not create configuration for type %s", name);
     }
 
     return spConfig;

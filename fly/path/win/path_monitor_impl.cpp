@@ -35,7 +35,7 @@ PathMonitorImpl::PathMonitorImpl(
 {
     if (m_iocp == NULL)
     {
-        LOGS(-1, "Could not initialize IOCP");
+        LOGS("Could not initialize IOCP");
     }
 }
 
@@ -138,7 +138,6 @@ void PathMonitorImpl::handleEvents(
             if (callback != nullptr)
             {
                 LOGI(
-                    -1,
                     "Handling event %d for \"%s\" in \"%s\"",
                     event,
                     file,
@@ -204,7 +203,7 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     if ((attributes == INVALID_FILE_ATTRIBUTES) ||
         ((attributes & FILE_ATTRIBUTE_DIRECTORY) == 0))
     {
-        LOGW(-1, "Could not find directory for \"%s\"", path);
+        LOGW("Could not find directory for \"%s\"", path);
         return;
     }
 
@@ -219,7 +218,7 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
 
     if (m_handle == INVALID_HANDLE_VALUE)
     {
-        LOGS(-1, "Could not create file for \"%s\"", path);
+        LOGS("Could not create file for \"%s\"", path);
         return;
     }
 
@@ -228,7 +227,7 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
 
     if (port == NULL)
     {
-        LOGS(-1, "Could not create IOCP info for \"%s\"", path);
+        LOGS("Could not create IOCP info for \"%s\"", path);
         return;
     }
 
@@ -276,7 +275,7 @@ bool PathMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
 
     if (success == FALSE)
     {
-        LOGS(-1, "Could not check events for \"%s\"", path);
+        LOGS("Could not check events for \"%s\"", path);
     }
 
     return success == TRUE;

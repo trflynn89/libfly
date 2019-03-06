@@ -1,12 +1,19 @@
 #pragma once
 
 #include "fly/fly.h"
+#include "fly/logger/logger.h"
 
 #include <cstdint>
 
 #if defined(FLY_WINDOWS)
 #    include <WinSock.h>
 #endif
+
+#define SLOGD(handle, format, ...) LOGD("[%d] " format, handle, ##__VA_ARGS__)
+#define SLOGI(handle, format, ...) LOGI("[%d] " format, handle, ##__VA_ARGS__)
+#define SLOGW(handle, format, ...) LOGW("[%d] " format, handle, ##__VA_ARGS__)
+#define SLOGS(handle, format, ...) LOGS("[%d] " format, handle, ##__VA_ARGS__)
+#define SLOGE(handle, format, ...) LOGE("[%d] " format, handle, ##__VA_ARGS__)
 
 namespace fly {
 

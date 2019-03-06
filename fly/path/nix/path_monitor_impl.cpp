@@ -30,7 +30,7 @@ PathMonitorImpl::PathMonitorImpl(
 {
     if (m_monitorDescriptor == -1)
     {
-        LOGS(-1, "Could not initialize monitor");
+        LOGS("Could not initialize monitor");
     }
 }
 
@@ -62,7 +62,7 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 
     if (numEvents == -1)
     {
-        LOGS(-1, "Could not create poller");
+        LOGS("Could not create poller");
     }
     else if ((numEvents > 0) && (pollFd.revents & POLLIN))
     {
@@ -106,7 +106,7 @@ bool PathMonitorImpl::readEvents() const
     {
         if ((len == -1) && (System::GetErrorCode() != EAGAIN))
         {
-            LOGS(-1, "Could not read polled event");
+            LOGS("Could not read polled event");
         }
     }
     else
@@ -155,7 +155,6 @@ void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
             if (callback != nullptr)
             {
                 LOGI(
-                    -1,
                     "Handling event %d for \"%s\" in \"%s\"",
                     event,
                     pEvent->name,
@@ -201,7 +200,7 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
 
     if (m_watchDescriptor == -1)
     {
-        LOGS(-1, "Could not add watcher for \"%s\"", path);
+        LOGS("Could not add watcher for \"%s\"", path);
     }
 }
 

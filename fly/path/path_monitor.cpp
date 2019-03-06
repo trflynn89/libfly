@@ -42,7 +42,7 @@ bool PathMonitor::AddPath(const std::string &path, PathEventCallback callback)
 {
     if (callback == nullptr)
     {
-        LOGW(-1, "Ignoring NULL callback for \"%s\"", path);
+        LOGW("Ignoring NULL callback for \"%s\"", path);
     }
     else
     {
@@ -51,7 +51,7 @@ bool PathMonitor::AddPath(const std::string &path, PathEventCallback callback)
 
         if (spInfo)
         {
-            LOGD(-1, "Monitoring all files in \"%s\"", path);
+            LOGD("Monitoring all files in \"%s\"", path);
             spInfo->m_pathHandler = callback;
 
             return true;
@@ -69,11 +69,11 @@ bool PathMonitor::RemovePath(const std::string &path)
 
     if (it == m_pathInfo.end())
     {
-        LOGW(-1, "Wasn't monitoring \"%s\"", path);
+        LOGW("Wasn't monitoring \"%s\"", path);
         return false;
     }
 
-    LOGI(-1, "Removed monitor for \"%s\"", path);
+    LOGI("Removed monitor for \"%s\"", path);
     m_pathInfo.erase(it);
 
     return true;
@@ -84,7 +84,7 @@ void PathMonitor::RemoveAllPaths()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    LOGI(-1, "Removed all monitors");
+    LOGI("Removed all monitors");
     m_pathInfo.clear();
 }
 
@@ -96,7 +96,7 @@ bool PathMonitor::AddFile(
 {
     if (callback == nullptr)
     {
-        LOGW(-1, "Ignoring NULL callback for \"%s\"", path);
+        LOGW("Ignoring NULL callback for \"%s\"", path);
     }
     else
     {
@@ -105,7 +105,7 @@ bool PathMonitor::AddFile(
 
         if (spInfo)
         {
-            LOGD(-1, "Monitoring \"%s\" in \"%s\"", file, path);
+            LOGD("Monitoring \"%s\" in \"%s\"", file, path);
             spInfo->m_fileHandlers[file] = callback;
 
             return true;
@@ -125,7 +125,7 @@ bool PathMonitor::RemoveFile(const std::string &path, const std::string &file)
 
         if (it == m_pathInfo.end())
         {
-            LOGW(-1, "Wasn't monitoring \"%s\"", path);
+            LOGW("Wasn't monitoring \"%s\"", path);
             return false;
         }
 
@@ -134,11 +134,11 @@ bool PathMonitor::RemoveFile(const std::string &path, const std::string &file)
 
         if (it2 == spInfo->m_fileHandlers.end())
         {
-            LOGW(-1, "Wasn't monitoring \"%s\" in \"%s\"", file, path);
+            LOGW("Wasn't monitoring \"%s\" in \"%s\"", file, path);
             return false;
         }
 
-        LOGD(-1, "Stopped monitoring \"%s\" in \"%s\"", file, path);
+        LOGD("Stopped monitoring \"%s\" in \"%s\"", file, path);
         spInfo->m_fileHandlers.erase(it2);
 
         removePath = spInfo->m_fileHandlers.empty();

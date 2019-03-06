@@ -31,21 +31,21 @@ SystemMonitorImpl::SystemMonitorImpl(
     PDH_STATUS status = ::PdhOpenQuery(NULL, NULL, &m_cpuQuery);
     if (status != ERROR_SUCCESS)
     {
-        LOGS(-1, "Could not open CPU query (%x)", status);
+        LOGS("Could not open CPU query (%x)", status);
         return;
     }
 
     status = ::PdhAddCounter(m_cpuQuery, s_cpuPath, NULL, &m_cpuCounter);
     if (status != ERROR_SUCCESS)
     {
-        LOGS(-1, "Could not add CPU counter (%x)", status);
+        LOGS("Could not add CPU counter (%x)", status);
         return;
     }
 
     status = ::PdhCollectQueryData(m_cpuQuery);
     if (status != ERROR_SUCCESS)
     {
-        LOGS(-1, "Could not poll CPU counter (%x)", status);
+        LOGS("Could not poll CPU counter (%x)", status);
         return;
     }
 
@@ -70,7 +70,7 @@ void SystemMonitorImpl::UpdateSystemCpuCount()
 
     if (info.dwNumberOfProcessors == 0)
     {
-        LOGS(-1, "Could not poll system CPU count");
+        LOGS("Could not poll system CPU count");
     }
     else
     {
@@ -86,7 +86,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
     PDH_STATUS status = ::PdhCollectQueryData(m_cpuQuery);
     if (status != ERROR_SUCCESS)
     {
-        LOGS(-1, "Could not poll CPU counter (%x)", status);
+        LOGS("Could not poll CPU counter (%x)", status);
         return;
     }
 
@@ -94,7 +94,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
         m_cpuCounter, PDH_FMT_DOUBLE, NULL, &value);
     if (status != ERROR_SUCCESS)
     {
-        LOGS(-1, "Could not format CPU counter (%x)", status);
+        LOGS("Could not format CPU counter (%x)", status);
         return;
     }
 
@@ -128,7 +128,7 @@ void SystemMonitorImpl::UpdateProcessCpuUsage()
     }
     else
     {
-        LOGS(-1, "Could not poll process CPU");
+        LOGS("Could not poll process CPU");
     }
 }
 
@@ -145,7 +145,7 @@ void SystemMonitorImpl::UpdateSystemMemoryUsage()
     }
     else
     {
-        LOGS(-1, "Could not poll system memory");
+        LOGS("Could not poll system memory");
     }
 }
 
@@ -160,7 +160,7 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage()
     }
     else
     {
-        LOGS(-1, "Could not poll process memory");
+        LOGS("Could not poll process memory");
     }
 }
 
