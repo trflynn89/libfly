@@ -12,6 +12,8 @@ jobs:
       CXX: 'g++-8'
 
     steps:
+    - template: setup.yml
+
     - script: |
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
@@ -26,8 +28,6 @@ jobs:
       - script: |
           sudo apt-get install -y $CC-multilib $CXX-8-multilib
         displayName: 'GCC 8 Multilib'
-
-    - template: setup.yml
 
     - ${{ if eq(parameters.configuration, 'Debug') }}:
       - script: |
