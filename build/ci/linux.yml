@@ -15,16 +15,16 @@ jobs:
     - script: |
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
-        sudo apt-get install -y gcc-8 g++-8
+        sudo apt-get install -y $CC $CXX
       displayName: 'GCC 8'
 
     - script: |
-        $CXX --version
+        make version_check
       displayName: 'GCC 8 Check'
 
     - ${{ if eq(parameters.arch, 'x86') }}:
       - script: |
-          sudo apt-get install -y gcc-multilib g++-multilib
+          sudo apt-get install -y $CC-multilib $CXX-8-multilib
         displayName: 'GCC 8 Multilib'
 
     - template: setup.yml

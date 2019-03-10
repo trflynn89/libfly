@@ -1,4 +1,5 @@
 steps:
 - script: |
     git submodule update --init --recursive
+  failOnStderr: false
   displayName: 'Setup'
