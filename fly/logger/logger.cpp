@@ -57,7 +57,6 @@ void Logger::ConsoleLog(bool acquireLock, const std::string &message)
 //==============================================================================
 void Logger::AddLog(
     Log::Level level,
-    ssize_t fixed,
     const char *file,
     const char *func,
     unsigned int line,
@@ -67,12 +66,12 @@ void Logger::AddLog(
 
     if (spLogger)
     {
-        spLogger->addLog(level, fixed, file, func, line, message);
+        spLogger->addLog(level, file, func, line, message);
     }
     else
     {
-        std::string console = String::Format(
-            "%d %d %s:%s:%d %s", level, fixed, file, func, line, message);
+        std::string console =
+            String::Format("%d %s:%s:%d %s", level, file, func, line, message);
 
         ConsoleLog(true, console);
     }
@@ -124,7 +123,6 @@ bool Logger::poll()
 //==============================================================================
 void Logger::addLog(
     Log::Level level,
-    ssize_t fixed,
     const char *file,
     const char *func,
     unsigned int line,
@@ -141,7 +139,6 @@ void Logger::addLog(
 
         log.m_level = level;
         log.m_time = logTime.count();
-        log.m_fixed = fixed;
         log.m_line = line;
 
         snprintf(log.m_file, sizeof(log.m_file), "%s", file);

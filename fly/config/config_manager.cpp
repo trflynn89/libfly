@@ -33,7 +33,6 @@ ConfigManager::ConfigManager(
 
         default:
             LOGE(
-                -1,
                 "Unrecognized configuration type: %d",
                 static_cast<int>(fileType));
             break;
@@ -121,7 +120,7 @@ void ConfigManager::updateConfig()
     }
     catch (const ParserException &)
     {
-        LOGW(-1, "Could not parse file, ignoring update");
+        LOGW("Could not parse file, ignoring update");
         m_values = nullptr;
     }
 
@@ -144,7 +143,7 @@ void ConfigManager::updateConfig()
     }
     else
     {
-        LOGW(-1, "Parsed non key-value pairs file, ignoring update");
+        LOGW("Parsed non key-value pairs file, ignoring update");
         m_values = nullptr;
     }
 }

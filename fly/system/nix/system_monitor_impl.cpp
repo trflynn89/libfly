@@ -65,7 +65,7 @@ void SystemMonitorImpl::UpdateSystemCpuCount()
 
     if (cpuCount == 0)
     {
-        LOGS(-1, "Could not poll system CPU count (%s)", contents);
+        LOGS("Could not poll system CPU count (%s)", contents);
     }
     else
     {
@@ -90,7 +90,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
 
     if (scanned != 4)
     {
-        LOGS(-1, "Could not poll system CPU (%s)", line);
+        LOGS("Could not poll system CPU (%s)", line);
         return;
     }
 
@@ -119,7 +119,7 @@ void SystemMonitorImpl::UpdateProcessCpuUsage()
 
     if (now == static_cast<clock_t>(-1))
     {
-        LOGS(-1, "Could not poll process CPU");
+        LOGS("Could not poll process CPU");
         return;
     }
 
@@ -154,7 +154,7 @@ void SystemMonitorImpl::UpdateSystemMemoryUsage()
     }
     else
     {
-        LOGS(-1, "Could not poll system memory");
+        LOGS("Could not poll system memory");
     }
 }
 
@@ -175,7 +175,7 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage()
 
     if (processMemoryUsage == 0)
     {
-        LOGS(-1, "Could not poll process memory (%s)", contents);
+        LOGS("Could not poll process memory (%s)", contents);
     }
     else
     {

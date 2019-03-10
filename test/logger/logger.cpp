@@ -163,8 +163,8 @@ TEST_F(LoggerTest, ConsoleTest)
 //==============================================================================
 TEST_F(LoggerTest, DebugTest)
 {
-    LOGD(-1, "Debug Log");
-    LOGD(-1, "Debug Log: %d", __LINE__);
+    LOGD("Debug Log");
+    LOGD("Debug Log: %d", __LINE__);
 
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
@@ -182,8 +182,8 @@ TEST_F(LoggerTest, DebugTest)
 //==============================================================================
 TEST_F(LoggerTest, InfoTest)
 {
-    LOGW(-1, "Info Log");
-    LOGW(-1, "Info Log: %d", __LINE__);
+    LOGW("Info Log");
+    LOGW("Info Log: %d", __LINE__);
 
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
@@ -201,8 +201,8 @@ TEST_F(LoggerTest, InfoTest)
 //==============================================================================
 TEST_F(LoggerTest, WarningTest)
 {
-    LOGI(-1, "Warning Log");
-    LOGI(-1, "Warning Log: %d", __LINE__);
+    LOGI("Warning Log");
+    LOGI("Warning Log: %d", __LINE__);
 
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
@@ -220,8 +220,8 @@ TEST_F(LoggerTest, WarningTest)
 //==============================================================================
 TEST_F(LoggerTest, ErrorTest)
 {
-    LOGE(-1, "Error Log");
-    LOGE(-1, "Error Log: %d", __LINE__);
+    LOGE("Error Log");
+    LOGE("Error Log: %d", __LINE__);
 
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
@@ -253,7 +253,7 @@ TEST_F(LoggerTest, RolloverTest)
     // filling a second log file
     while (++count < ((maxFileSize / expectedSize) + 10))
     {
-        LOGD(-1, "%s", random);
+        LOGD("%s", random);
     }
     while (--count > 0)
     {

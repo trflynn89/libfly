@@ -15,39 +15,39 @@
 #include <string>
 
 //==============================================================================
-#define LOG(lvl, fixed, fmt)                                                   \
-    fly::Logger::AddLog(lvl, fixed, __FILE__, __FUNCTION__, __LINE__, fmt)
+#define _LOG(level, format)                                                    \
+    fly::Logger::AddLog(level, __FILE__, __FUNCTION__, __LINE__, format)
 
 //==============================================================================
-#define LOGD(fixed, fmt, ...)                                                  \
-    LOG(fly::Log::Level::Debug, fixed, fly::String::Format(fmt, ##__VA_ARGS__))
+#define LOGD(format, ...)                                                      \
+    _LOG(fly::Log::Level::Debug, fly::String::Format(format, ##__VA_ARGS__))
 
 //==============================================================================
-#define LOGI(fixed, fmt, ...)                                                  \
-    LOG(fly::Log::Level::Info, fixed, fly::String::Format(fmt, ##__VA_ARGS__))
+#define LOGI(format, ...)                                                      \
+    _LOG(fly::Log::Level::Info, fly::String::Format(format, ##__VA_ARGS__))
 
 //==============================================================================
-#define LOGW(fixed, fmt, ...)                                                  \
-    LOG(fly::Log::Level::Warn, fixed, fly::String::Format(fmt, ##__VA_ARGS__))
+#define LOGW(format, ...)                                                      \
+    _LOG(fly::Log::Level::Warn, fly::String::Format(format, ##__VA_ARGS__))
 
 //==============================================================================
-#define LOGS(fixed, fmt, ...)                                                  \
-    LOG(fly::Log::Level::Warn,                                                 \
-        fixed,                                                                 \
-        fly::String::Format(fmt ": ", ##__VA_ARGS__) +                         \
-            fly::System::GetErrorString())
+#define LOGS(format, ...)                                                      \
+    _LOG(                                                                      \
+        fly::Log::Level::Warn,                                                 \
+        fly::String::Format(                                                   \
+            format ": %s", ##__VA_ARGS__, fly::System::GetErrorString()))
 
 //==============================================================================
-#define LOGE(fixed, fmt, ...)                                                  \
-    LOG(fly::Log::Level::Error, fixed, fly::String::Format(fmt, ##__VA_ARGS__))
+#define LOGE(format, ...)                                                      \
+    _LOG(fly::Log::Level::Error, fly::String::Format(format, ##__VA_ARGS__))
 
 //==============================================================================
-#define LOGC(fmt, ...)                                                         \
-    fly::Logger::ConsoleLog(true, fly::String::Format(fmt, ##__VA_ARGS__))
+#define LOGC(format, ...)                                                      \
+    fly::Logger::ConsoleLog(true, fly::String::Format(format, ##__VA_ARGS__))
 
 //==============================================================================
-#define LOGC_NO_LOCK(fmt, ...)                                                 \
-    fly::Logger::ConsoleLog(false, fly::String::Format(fmt, ##__VA_ARGS__))
+#define LOGC_NO_LOCK(format, ...)                                              \
+    fly::Logger::ConsoleLog(false, fly::String::Format(format, ##__VA_ARGS__))
 
 namespace fly {
 
@@ -65,11 +65,8 @@ class SequencedTaskRunner;
  * The following macros should be used to add points to the log: LOGD, LOGI,
  * LOGW, LOGE. Usage is as follows:
  *
- *   LOGD(fixed argument, message, message arguments)
+ *   LOGD(message, message arguments)
  *   For example, LOGD(1, "This is message number %d", 10)
- *
- * The fixed argument is to associate the log point with the object creating the
- * log. For example, a socket handle.
  *
  * The LOGC macro is also provided for thread-safe console logging. LOGC_NO_LOCK
  * is also provided for console logging without acquiring the console lock while
@@ -119,7 +116,6 @@ public:
      * Add a log to the static logger instance.
      *
      * @param Level The level (debug, info, etc.) of the log.
-     * @param ssize_t Fixed argument associated with the owner storing the log.
      * @param const char * Name of the file storing the log.
      * @param const char * Name of the function storing the log.
      * @param unsigned int The line number the log point occurs.
@@ -127,7 +123,6 @@ public:
      */
     static void AddLog(
         Log::Level,
-        ssize_t,
         const char *,
         const char *,
         unsigned int,
@@ -158,7 +153,6 @@ private:
      * Add a log to this logger instance.
      *
      * @param Level The level (debug, info, etc.) of the log.
-     * @param ssize_t Fixed argument associated with the owner storing the log.
      * @param const char * Name of the file storing the log.
      * @param const char * Name of the function storing the log.
      * @param unsigned int The line number the log point occurs.
@@ -166,7 +160,6 @@ private:
      */
     void addLog(
         Log::Level,
-        ssize_t,
         const char *,
         const char *,
         unsigned int,

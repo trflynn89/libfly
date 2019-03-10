@@ -14,7 +14,7 @@ ParserException::ParserException(int line, const std::string &message) :
         line,
         message))
 {
-    LOGW(-1, "%s", m_message);
+    LOGW("%s", m_message);
 }
 
 //==============================================================================
@@ -28,7 +28,7 @@ ParserException::ParserException(
         column,
         message))
 {
-    LOGW(-1, "%s", m_message);
+    LOGW("%s", m_message);
 }
 
 //==============================================================================

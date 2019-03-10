@@ -151,17 +151,17 @@ ConnectedState Socket::ConnectAsync(address_type address, port_type port)
     {
         if (Connect(address, port))
         {
-            LOGD(m_socketId, "Connected to %d:%d", address, port);
+            SLOGD(m_socketId, "Connected to %d:%d", address, port);
             state = ConnectedState::Connected;
         }
         else if (IsConnecting())
         {
-            LOGD(m_socketId, "Connect to %d:%d in progress", address, port);
+            SLOGD(m_socketId, "Connect to %d:%d in progress", address, port);
             state = ConnectedState::Connecting;
         }
         else
         {
-            LOGW(
+            SLOGW(
                 m_socketId,
                 "Could not connect to %d:%d, closing socket",
                 address,
@@ -192,12 +192,12 @@ bool Socket::FinishConnect()
 {
     if (IsValid() & IsConnecting() && IsErrorFree())
     {
-        LOGD(m_socketId, "Connection completed");
+        SLOGD(m_socketId, "Connection completed");
         m_aConnectedState.store(ConnectedState::Connected);
     }
     else
     {
-        LOGW(m_socketId, "Could not connect, closing socket");
+        SLOGW(m_socketId, "Could not connect, closing socket");
         m_aConnectedState.store(ConnectedState::Disconnected);
 
         Close();
@@ -343,12 +343,12 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
 
             if (bytesSent == message.length())
             {
-                LOGD(m_socketId, "Sent %zu bytes", bytesSent);
+                SLOGD(m_socketId, "Sent %zu bytes", bytesSent);
                 completedSends.Push(request);
             }
             else if (wouldBlock)
             {
-                LOGI(
+                SLOGI(
                     m_socketId,
                     "Send would block - sent %zu of %zu bytes, "
                     "will finish later",
@@ -360,7 +360,7 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
             }
             else
             {
-                LOGW(m_socketId, "Can't send, closing socket");
+                SLOGW(m_socketId, "Can't send, closing socket");
                 Close();
             }
         }
@@ -390,7 +390,7 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
 
         if ((received.length() > 0) || isComplete)
         {
-            LOGD(
+            SLOGD(
                 m_socketId,
                 "Received %u bytes, %u in buffer",
                 received.length(),
@@ -400,7 +400,7 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
 
             if (isComplete)
             {
-                LOGD(
+                SLOGD(
                     m_socketId,
                     "Completed message, %u bytes",
                     m_receiveBuffer.length());
@@ -412,7 +412,7 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
         }
         else if (wouldBlock)
         {
-            LOGI(
+            SLOGI(
                 m_socketId,
                 "Receive would block - received %u bytes, "
                 "will finish later",
@@ -420,7 +420,7 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
         }
         else
         {
-            LOGW(m_socketId, "Can't receive, closing socket");
+            SLOGW(m_socketId, "Can't receive, closing socket");
             Close();
         }
     }

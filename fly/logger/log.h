@@ -1,7 +1,5 @@
 #pragma once
 
-#include "fly/fly.h"
-
 #include <iostream>
 #include <memory>
 #include <string>
@@ -54,7 +52,6 @@ struct Log
 
     Level m_level;
     double m_time;
-    ssize_t m_fixed;
     char m_file[100];
     char m_function[100];
     unsigned int m_line;

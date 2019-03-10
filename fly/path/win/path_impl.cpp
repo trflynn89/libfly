@@ -56,12 +56,12 @@ bool PathImpl::RemovePath(const std::string &path)
 
         if (error == 0)
         {
-            LOGD(-1, "Removed \"%s\"", path);
+            LOGD("Removed \"%s\"", path);
             ret = true;
         }
         else
         {
-            LOGW(-1, "Could not remove \"%s\": %d (%x)", path, error, error);
+            LOGW("Could not remove \"%s\": %d (%x)", path, error, error);
         }
     }
 
@@ -77,7 +77,7 @@ bool PathImpl::ListPath(
     // For FindFile(), need to append "\\*" - make sure there is enough space
     if (path.length() > (MAX_PATH - 3))
     {
-        LOGW(-1, "Path \"%s\" is too long", path);
+        LOGW("Path \"%s\" is too long", path);
         return false;
     }
 
@@ -91,7 +91,7 @@ bool PathImpl::ListPath(
 
     if (handle == INVALID_HANDLE_VALUE)
     {
-        LOGW(-1, "Could not open \"%s\"", path);
+        LOGW("Could not open \"%s\"", path);
         return false;
     }
 
@@ -114,7 +114,7 @@ bool PathImpl::ListPath(
 
     if (System::GetErrorCode() != ERROR_NO_MORE_FILES)
     {
-        LOGS(-1, "Could not completely list \"%s\"", path);
+        LOGS("Could not completely list \"%s\"", path);
         return false;
     }
 

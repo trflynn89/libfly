@@ -60,14 +60,14 @@ bool SocketImpl::HostnameToAddress(
 
     if (ipAddress == NULL)
     {
-        LOGS(-1, "Error resolving %s", hostname);
+        LOGS("Error resolving %s", hostname);
         return false;
     }
 
     memcpy((char *)&address, ipAddress->h_addr, ipAddress->h_length);
     address = ntohl(address);
 
-    LOGD(-1, "Converted hostname %s to %d", hostname, address);
+    LOGD("Converted hostname %s to %d", hostname, address);
     return true;
 }
 
@@ -104,7 +104,7 @@ bool SocketImpl::IsErrorFree()
 
     if (ret == SOCKET_ERROR)
     {
-        LOGS(m_socketHandle, "Error getting error flag");
+        SLOGS(m_socketHandle, "Error getting error flag");
     }
 
     return opt == 0;
@@ -117,7 +117,7 @@ bool SocketImpl::SetAsync()
 
     if (::ioctlsocket(m_socketHandle, FIONBIO, &nonZero) == SOCKET_ERROR)
     {
-        LOGS(m_socketHandle, "Error setting async flag");
+        SLOGS(m_socketHandle, "Error setting async flag");
         return false;
     }
 
@@ -149,7 +149,7 @@ bool SocketImpl::Bind(address_type address, port_type port, BindOption option)
                     &bindForReuseOption,
                     bindForReuseOptionLength) == SOCKET_ERROR)
             {
-                LOGS(m_socketHandle, "Error setting reuse flag");
+                SLOGS(m_socketHandle, "Error setting reuse flag");
                 return false;
             }
 
@@ -160,7 +160,7 @@ bool SocketImpl::Bind(address_type address, port_type port, BindOption option)
 
     if (ret == SOCKET_ERROR)
     {
-        LOGS(m_socketHandle, "Error binding to %d", port);
+        SLOGS(m_socketHandle, "Error binding to %d", port);
         return false;
     }
 
@@ -172,7 +172,7 @@ bool SocketImpl::Listen()
 {
     if (::listen(m_socketHandle, 100) == SOCKET_ERROR)
     {
-        LOGS(m_socketHandle, "Error listening");
+        SLOGS(m_socketHandle, "Error listening");
         return false;
     }
 
@@ -190,7 +190,7 @@ bool SocketImpl::Connect(address_type address, port_type port)
 
     if (ret == SOCKET_ERROR)
     {
-        LOGS(m_socketHandle, "Error connecting");
+        SLOGS(m_socketHandle, "Error connecting");
         int error = System::GetErrorCode();
 
         if ((error == WSAEWOULDBLOCK) || (error == WSAEINPROGRESS))
@@ -219,12 +219,12 @@ std::shared_ptr<Socket> SocketImpl::Accept() const
 
     if (skt == InvalidSocket())
     {
-        LOGS(m_socketHandle, "Error accepting");
+        SLOGS(m_socketHandle, "Error accepting");
         ret.reset();
     }
     else
     {
-        LOGD(
+        SLOGD(
             m_socketHandle,
             "Accepted new socket: %d (%d)",
             ret->GetSocketId(),
@@ -279,7 +279,7 @@ size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
             if (currSent == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
-                LOGS(m_socketHandle, "Error sending");
+                SLOGS(m_socketHandle, "Error sending");
             }
         }
     }
@@ -335,7 +335,7 @@ size_t SocketImpl::SendTo(
             if (currSent == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
-                LOGS(m_socketHandle, "Error sending");
+                SLOGS(m_socketHandle, "Error sending");
             }
         }
     }
@@ -377,7 +377,7 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const
             if (bytesRead == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
-                LOGS(m_socketHandle, "Error receiving");
+                SLOGS(m_socketHandle, "Error receiving");
             }
         }
 
@@ -432,7 +432,7 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
             if (bytesRead == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
-                LOGS(m_socketHandle, "Error receiving");
+                SLOGS(m_socketHandle, "Error receiving");
             }
         }
 

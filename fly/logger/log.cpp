@@ -7,12 +7,7 @@
 namespace fly {
 
 //==============================================================================
-Log::Log() :
-    m_level(Level::NumLevels),
-    m_time(-1.0),
-    m_fixed(-1),
-    m_line(0),
-    m_message()
+Log::Log() : m_level(Level::NumLevels), m_time(-1.0), m_line(0), m_message()
 {
     ::memset(m_file, 0, sizeof(m_file));
     ::memset(m_function, 0, sizeof(m_file));
@@ -24,7 +19,6 @@ Log::Log(
     const std::string &message) :
     m_level(Level::NumLevels),
     m_time(-1.0),
-    m_fixed(-1),
     m_line(0),
     m_message(message, 0, spConfig->MaxMessageSize())
 {
@@ -37,7 +31,6 @@ std::ostream &operator<<(std::ostream &stream, const Log &log)
 {
     stream << log.m_level << '\t';
     stream << log.m_time << '\t';
-    stream << log.m_fixed << '\t';
     stream << log.m_file << '\t';
     stream << log.m_function << '\t';
     stream << log.m_line << '\t';
