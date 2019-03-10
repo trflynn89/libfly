@@ -1,5 +1,3 @@
 steps:
-- script: |
-    git submodule update --init --recursive
-  failOnStderr: false
-  displayName: 'Setup'
+  - checkout: self
+    submodules: true
