@@ -11,7 +11,6 @@
 .PHONY: setup
 .PHONY: style
 .PHONY: $(TARGETS)
-.PHONY: version_check
 
 # Verify expected variables
 ifeq ($(SOURCE_ROOT),)
@@ -43,10 +42,6 @@ include $(BUILD_ROOT)/files.mk
 include $(BUILD_ROOT)/compile.mk
 include $(BUILD_ROOT)/stack.mk
 include $(BUILD_ROOT)/target.mk
-
-version_check:
-	@$(CC) --version
-	@$(CXX) --version
 
 # Clean up output files
 clean:
