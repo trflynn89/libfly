@@ -7,11 +7,25 @@ jobs:
     pool:
       vmImage: 'Ubuntu-16.04'
 
+    variables:
+      CC: 'gcc-8'
+      CXX: 'g++-8'
+
     steps:
+    - script: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install -y gcc-8 g++-8
+      displayName: 'GCC 8'
+
+    - script: |
+        $CXX --version
+      displayName: 'GCC 8 Check'
+
     - ${{ if eq(parameters.arch, 'x86') }}:
       - script: |
           sudo apt-get install -y gcc-multilib g++-multilib
-        displayName: 'Dependencies'
+        displayName: 'GCC 8 Multilib'
 
     - template: setup.yml
 
