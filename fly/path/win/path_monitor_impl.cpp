@@ -2,10 +2,8 @@
 
 #include "fly/fly.h"
 #include "fly/logger/logger.h"
+#include "fly/types/string.h"
 #include "fly/task/task_runner.h"
-
-#include <codecvt>
-#include <locale>
 
 namespace fly {
 
@@ -127,11 +125,9 @@ void PathMonitorImpl::handleEvents(
 
         if (event != PathMonitor::PathEvent::None)
         {
-            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-
             std::wstring wFile(
                 pInfo->FileName, pInfo->FileNameLength / sizeof(wchar_t));
-            std::string file = converter.to_bytes(wFile);
+            std::string file = String::FromWideString(wFile);
 
             auto callback = spInfo->m_fileHandlers[file];
 

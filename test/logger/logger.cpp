@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <string>
@@ -60,7 +61,7 @@ public:
      */
     void SetUp() override
     {
-        ASSERT_TRUE(fly::Path::MakePath(m_path));
+        ASSERT_TRUE(std::filesystem::create_directories(m_path));
 
         ASSERT_TRUE(m_spTaskManager->Start());
 
@@ -78,7 +79,7 @@ public:
         fly::Logger::SetInstance(nullptr);
         m_spLogger.reset();
 
-        ASSERT_TRUE(fly::Path::RemovePath(m_path));
+        std::filesystem::remove_all(m_path);
     }
 
 protected:
@@ -254,16 +255,11 @@ TEST_F(LoggerTest, RolloverTest)
     while (++count < ((maxFileSize / expectedSize) + 10))
     {
         LOGD("%s", random);
-    }
-    while (--count > 0)
-    {
         m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
     }
 
     EXPECT_NE(path, m_spLogger->GetLogFilePath());
 
-    size_t actualSize = fly::PathUtil::ComputeFileSize(path) +
-        fly::PathUtil::ComputeFileSize(m_spLogger->GetLogFilePath());
-
-    EXPECT_GE(actualSize, expectedSize * count);
+    size_t actualSize = std::filesystem::file_size(path);
+    EXPECT_GE(actualSize, maxMessageSize);
 }

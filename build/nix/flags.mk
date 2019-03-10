@@ -38,8 +38,8 @@ else
 endif
 
 # C and C++ specific flags
-CFLAGS := -std=c14 $(CF_ALL)
-CXXFLAGS := -std=c++14 $(CF_ALL)
+CFLAGS := -std=c17 $(CF_ALL)
+CXXFLAGS := -std=c++17 $(CF_ALL)
 
 # gcov flags
 GCOV_FLAGS := -l

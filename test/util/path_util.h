@@ -40,15 +40,6 @@ public:
      * @return string Contents of the file.
      */
     static std::string ReadFile(const std::string &);
-
-    /**
-     * Measure the size, in bytes, of a file.
-     *
-     * @param string Path to the file.
-     *
-     * @return size_t Size of the file.
-     */
-    static size_t ComputeFileSize(const std::string &path);
 };
 
 } // namespace fly

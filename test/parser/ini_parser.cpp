@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 
+#include <filesystem>
 #include <memory>
 
 //==============================================================================
@@ -32,7 +33,8 @@ TEST_F(IniParserTest, NonExistingFileTest)
 {
     fly::Json values;
     ASSERT_NO_THROW(
-        values = m_spParser->Parse(fly::Path::GetTempDirectory(), "abc.ini"));
+        values = m_spParser->Parse(
+            std::filesystem::temp_directory_path().string(), "abc.ini"));
     EXPECT_EQ(values.Size(), 0);
 }
 

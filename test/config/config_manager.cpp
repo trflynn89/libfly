@@ -11,6 +11,7 @@
 
 #include <gtest/gtest.h>
 
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -61,7 +62,7 @@ public:
      */
     void SetUp() override
     {
-        ASSERT_TRUE(fly::Path::MakePath(m_path));
+        ASSERT_TRUE(std::filesystem::create_directories(m_path));
         ASSERT_TRUE(m_spTaskManager->Start());
         ASSERT_TRUE(m_spConfigManager->Start());
 
@@ -74,7 +75,7 @@ public:
     void TearDown() override
     {
         ASSERT_TRUE(m_spTaskManager->Stop());
-        ASSERT_TRUE(fly::Path::RemovePath(m_path));
+        std::filesystem::remove_all(m_path);
     }
 
 protected:

@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <filesystem>
 #include <memory>
 #include <sstream>
 #include <vector>
@@ -78,13 +79,9 @@ TEST_F(JsonParserTest, JsonCheckerTest)
     std::string path = fly::Path::Join(segments[0], "json", "json_checker");
 
     // Validate each JSON file in the JSON checker directory
-    std::vector<std::string> directories;
-    std::vector<std::string> files;
-
-    ASSERT_TRUE(fly::Path::ListPath(path, directories, files));
-
-    for (const std::string &file : files)
+    for (const auto &it : std::filesystem::directory_iterator(path))
     {
+        const std::string file = it.path().filename().string();
         SCOPED_TRACE(file);
 
         if (fly::String::StartsWith(file, "pass"))
@@ -145,13 +142,9 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
         fly::Path::Join(segments[0], "json", "nst_json_test_suite");
 
     // Validate each JSON file in the JSONTestSuite directory
-    std::vector<std::string> directories;
-    std::vector<std::string> files;
-
-    ASSERT_TRUE(fly::Path::ListPath(path, directories, files));
-
-    for (const std::string &file : files)
+    for (const auto &it : std::filesystem::directory_iterator(path))
     {
+        const std::string file = it.path().filename().string();
         SCOPED_TRACE(file);
 
         if (fly::String::StartsWith(file, 'y'))
@@ -224,7 +217,8 @@ TEST_F(JsonParserTest, NonExistingFileTest)
 {
     fly::Json values;
 
-    ASSERT_NO_THROW(m_spParser->Parse(fly::Path::GetTempDirectory(), "a.json"));
+    ASSERT_NO_THROW(m_spParser->Parse(
+        std::filesystem::temp_directory_path().string(), "a.json"));
     EXPECT_TRUE(values.IsNull());
 }
 

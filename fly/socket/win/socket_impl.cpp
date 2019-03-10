@@ -1,5 +1,3 @@
-#define NOMINMAX
-
 #include "fly/socket/win/socket_impl.h"
 
 #include "fly/logger/logger.h"

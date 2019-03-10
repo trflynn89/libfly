@@ -9,6 +9,7 @@
 
 #include <gtest/gtest.h>
 
+#include <filesystem>
 #include <functional>
 #include <map>
 #include <memory>
@@ -83,9 +84,9 @@ public:
      */
     void SetUp() override
     {
-        ASSERT_TRUE(fly::Path::MakePath(m_path0));
-        ASSERT_TRUE(fly::Path::MakePath(m_path1));
-        ASSERT_TRUE(fly::Path::MakePath(m_path2));
+        ASSERT_TRUE(std::filesystem::create_directories(m_path0));
+        ASSERT_TRUE(std::filesystem::create_directories(m_path1));
+        ASSERT_TRUE(std::filesystem::create_directories(m_path2));
 
         ASSERT_TRUE(m_spTaskManager->Start());
         ASSERT_TRUE(m_spMonitor->Start());
@@ -104,9 +105,9 @@ public:
         ASSERT_TRUE(m_spTaskManager->Stop());
 
         m_spMonitor->RemoveAllPaths();
-        ASSERT_TRUE(fly::Path::RemovePath(m_path0));
-        ASSERT_TRUE(fly::Path::RemovePath(m_path1));
-        ASSERT_TRUE(fly::Path::RemovePath(m_path2));
+        std::filesystem::remove_all(m_path0);
+        std::filesystem::remove_all(m_path1);
+        std::filesystem::remove_all(m_path2);
     }
 
 protected:

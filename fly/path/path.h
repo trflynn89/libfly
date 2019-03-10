@@ -1,7 +1,9 @@
 #pragma once
 
+#include "fly/fly.h"
 #include "fly/types/string.h"
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -16,43 +18,6 @@ namespace fly {
 class Path
 {
 public:
-    /**
-     * Create a directory and the path to that directory, if needed.
-     *
-     * @param string Path to the directory to create.
-     *
-     * @return True if the directory could be created (or already exists).
-     */
-    static bool MakePath(const std::string &);
-
-    /**
-     * Remove a directory.
-     *
-     * @param string Path to the directory to remove.
-     *
-     * @return True if the directory could be removed.
-     */
-    static bool RemovePath(const std::string &);
-
-    /**
-     * List the directories and files directly under a path.
-     *
-     * @param string The path to retrieve a listing for.
-     * @param vector A vector to store the directories under the path.
-     * @param vector A vector to store the files under the path.
-     *
-     * @return True if the directory could be listed.
-     */
-    static bool ListPath(
-        const std::string &,
-        std::vector<std::string> &,
-        std::vector<std::string> &);
-
-    /**
-     * @return The system's path separator.
-     */
-    static char GetSeparator();
-
     /**
      * Concatenate a list of objects with the system's path separator.
      *
@@ -74,22 +39,19 @@ public:
      * @return A vector containing the head and tail of the path.
      */
     static std::vector<std::string> Split(const std::string &);
-
-    /**
-     * @return The system's temporary directory path.
-     */
-    static std::string GetTempDirectory();
 };
 
 //==============================================================================
 template <typename... Args>
 std::string Path::Join(const Args &... args)
 {
-    static const char separator(GetSeparator());
-    static const std::string separator2x(2, separator);
+    static const std::string separator2x(
+        2, std::filesystem::path::preferred_separator);
 
-    std::string path = String::Join(separator, args...);
-    String::ReplaceAll(path, separator2x, separator);
+    std::string path =
+        String::Join(std::filesystem::path::preferred_separator, args...);
+    String::ReplaceAll(
+        path, separator2x, std::filesystem::path::preferred_separator);
 
     return path;
 }

@@ -86,9 +86,6 @@
     <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.h">
       <Filter>path\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\path\win\path_impl.h">
-      <Filter>path\win</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\socket\win\socket_impl.h">
       <Filter>socket\win</Filter>
     </ClInclude>
@@ -191,9 +188,6 @@
       <Filter>logger</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\path\win\path_monitor_impl.cpp">
-      <Filter>path\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\path\win\path_impl.cpp">
       <Filter>path\win</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\socket\win\socket_impl.cpp">
