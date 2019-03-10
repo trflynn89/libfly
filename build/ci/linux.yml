@@ -18,12 +18,12 @@ jobs:
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
         sudo apt-get install -y $CC $CXX
-      displayName: 'GCC 8'
+      displayName: 'GCC'
 
     - ${{ if eq(parameters.arch, 'x86') }}:
       - script: |
           sudo apt-get install -y $CC-multilib $CXX-multilib
-        displayName: 'GCC 8 Multilib'
+        displayName: 'GCC Multilib'
 
     - ${{ if eq(parameters.configuration, 'Debug') }}:
       - script: |
