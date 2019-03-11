@@ -189,7 +189,7 @@ PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
 //==============================================================================
 PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     HANDLE iocp,
-    const filesystem::path &path) :
+    const std::filesystem::path &path) :
     PathMonitorImpl::PathInfo(),
     m_valid(false),
     m_handle(INVALID_HANDLE_VALUE),
