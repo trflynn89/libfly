@@ -319,7 +319,7 @@ TEST_F(PathMonitorTest, DeleteTest_PathLevel)
     EXPECT_EQ(m_numOtherEvents[m_file0], 0);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file0, std::string()));
-    std::remove(m_file0.c_str());
+    std::filesystem::remove(m_file0);
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
 
@@ -340,7 +340,7 @@ TEST_F(PathMonitorTest, DeleteTest_FileLevel)
     EXPECT_EQ(m_numOtherEvents[m_file1], 0);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, std::string()));
-    std::remove(m_file1.c_str());
+    std::filesystem::remove(m_file1);
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
 
@@ -492,13 +492,13 @@ TEST_F(PathMonitorTest, MultipleFileTest)
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, std::string()));
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file2, std::string()));
-    std::remove(m_file2.c_str());
+    std::filesystem::remove(m_file2);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file3, "abcdefghi"));
-    std::remove(m_file3.c_str());
+    std::filesystem::remove(m_file3);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file0, "abcdefghi"));
-    std::remove(m_file0.c_str());
+    std::filesystem::remove(m_file0);
 
     ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
 
