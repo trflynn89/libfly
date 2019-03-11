@@ -1,7 +1,6 @@
 #include "fly/path/path_monitor.h"
 
 #include "fly/fly.h"
-#include "fly/path/path.h"
 #include "fly/path/path_config.h"
 #include "fly/task/task_manager.h"
 #include "fly/types/concurrent_queue.h"

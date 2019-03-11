@@ -2,7 +2,6 @@
 
 #include "fly/config/config.h"
 #include "fly/fly.h"
-#include "fly/path/path.h"
 #include "fly/path/path_config.h"
 #include "fly/task/task_manager.h"
 #include "fly/types/string.h"
@@ -39,7 +38,7 @@ public:
     ConfigManagerTest() :
         m_path(fly::PathUtil::GenerateTempDirectory()),
         m_file(fly::String::GenerateRandomString(10) + ".txt"),
-        m_fullPath(fly::Path::Join(m_path, m_file)),
+        m_fullPath(m_path / m_file),
 
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
@@ -79,9 +78,9 @@ public:
     }
 
 protected:
-    std::string m_path;
-    std::string m_file;
-    std::string m_fullPath;
+    std::filesystem::path m_path;
+    std::filesystem::path m_file;
+    std::filesystem::path m_fullPath;
 
     std::shared_ptr<fly::TaskManager> m_spTaskManager;
     std::shared_ptr<fly::WaitableSequencedTaskRunner> m_spTaskRunner;

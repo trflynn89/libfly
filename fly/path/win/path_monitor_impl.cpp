@@ -2,8 +2,10 @@
 
 #include "fly/fly.h"
 #include "fly/logger/logger.h"
-#include "fly/types/string.h"
 #include "fly/task/task_runner.h"
+#include "fly/types/string.h"
+
+#include <string>
 
 namespace fly {
 
@@ -64,7 +66,7 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
     LPOVERLAPPED pOverlapped = NULL;
     DWORD delay = static_cast<DWORD>(timeout.count());
 
-    std::string pathToRemove;
+    std::filesystem::path pathToRemove;
 
     if (::GetQueuedCompletionStatus(m_iocp, &bytes, &pKey, &pOverlapped, delay))
     {
@@ -85,8 +87,7 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 
             if (!spInfo->Refresh(it->first))
             {
-                // Hold onto the path to be removed until the mutex
-                // is released
+                // Hold onto the path to be removed until the mutex is released
                 pathToRemove = it->first;
             }
         }
@@ -100,7 +101,7 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 
 //==============================================================================
 std::shared_ptr<PathMonitor::PathInfo>
-PathMonitorImpl::CreatePathInfo(const std::string &path) const
+PathMonitorImpl::CreatePathInfo(const std::filesystem::path &path) const
 {
     std::shared_ptr<PathMonitor::PathInfo> spInfo;
 
@@ -115,7 +116,7 @@ PathMonitorImpl::CreatePathInfo(const std::string &path) const
 //==============================================================================
 void PathMonitorImpl::handleEvents(
     const std::shared_ptr<PathInfoImpl> &spInfo,
-    const std::string &path) const
+    const std::filesystem::path &path) const
 {
     PFILE_NOTIFY_INFORMATION pInfo = spInfo->m_pInfo;
 
@@ -127,8 +128,8 @@ void PathMonitorImpl::handleEvents(
         {
             std::wstring wFile(
                 pInfo->FileName, pInfo->FileNameLength / sizeof(wchar_t));
-            std::string file = String::FromWideString(wFile);
 
+            std::filesystem::path file(String::FromWideString(wFile));
             auto callback = spInfo->m_fileHandlers[file];
 
             if (callback == nullptr)
@@ -138,13 +139,10 @@ void PathMonitorImpl::handleEvents(
 
             if (callback != nullptr)
             {
-                LOGI(
-                    "Handling event %d for \"%s\" in \"%s\"",
-                    event,
-                    file,
-                    path);
+                auto full = path / file;
 
-                callback(path, file, event);
+                LOGI("Handling event %d for %s", event, full);
+                callback(full, event);
             }
         }
 
@@ -191,7 +189,7 @@ PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
 //==============================================================================
 PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     HANDLE iocp,
-    const std::string &path) :
+    const filesystem::path &path) :
     PathMonitorImpl::PathInfo(),
     m_valid(false),
     m_handle(INVALID_HANDLE_VALUE),
@@ -199,17 +197,8 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
 {
     ::memset(&m_overlapped, 0, sizeof(m_overlapped));
 
-    DWORD attributes = ::GetFileAttributes(path.c_str());
-
-    if ((attributes == INVALID_FILE_ATTRIBUTES) ||
-        ((attributes & FILE_ATTRIBUTE_DIRECTORY) == 0))
-    {
-        LOGW("Could not find directory for \"%s\"", path);
-        return;
-    }
-
     m_handle = ::CreateFile(
-        path.c_str(),
+        path.string().c_str(),
         s_accessFlags,
         s_shareFlags,
         NULL,
@@ -259,7 +248,7 @@ bool PathMonitorImpl::PathInfoImpl::IsValid() const
 }
 
 //==============================================================================
-bool PathMonitorImpl::PathInfoImpl::Refresh(const std::string &path)
+bool PathMonitorImpl::PathInfoImpl::Refresh(const std::filesystem::path &path)
 {
     static const DWORD size = (s_buffSize * sizeof(FILE_NOTIFY_INFORMATION));
     DWORD bytes = 0;

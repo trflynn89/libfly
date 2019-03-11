@@ -2,6 +2,7 @@
 
 #include "fly/types/json.h"
 
+#include <filesystem>
 #include <istream>
 #include <string>
 
@@ -31,19 +32,18 @@ public:
      *
      * @throws ParserException Thrown if an error occurs parsing the string.
      */
-    Json Parse(const std::string &);
+    Json ParseString(const std::string &);
 
     /**
      * Parse a file and retrieve parsed values.
      *
-     * @param string Directory containing the file to parse.
-     * @param string Name of the file to parse.
+     * @param path Path to the file to parse.
      *
      * @return Json The parsed values.
      *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    Json Parse(const std::string &, const std::string &);
+    Json ParseFile(const std::filesystem::path &);
 
 protected:
     /**

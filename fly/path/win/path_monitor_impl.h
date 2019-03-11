@@ -5,8 +5,8 @@
 #include <Windows.h>
 
 #include <chrono>
+#include <filesystem>
 #include <memory>
-#include <string>
 
 namespace fly {
 
@@ -52,7 +52,7 @@ protected:
     void Poll(const std::chrono::milliseconds &) override;
 
     std::shared_ptr<PathMonitor::PathInfo>
-    CreatePathInfo(const std::string &) const override;
+    CreatePathInfo(const std::filesystem::path &) const override;
 
 private:
     /**
@@ -62,7 +62,7 @@ private:
      */
     struct PathInfoImpl : public PathMonitor::PathInfo
     {
-        PathInfoImpl(HANDLE, const std::string &);
+        PathInfoImpl(HANDLE, const std::filesystem::path &);
         ~PathInfoImpl() override;
 
         /**
@@ -75,9 +75,9 @@ private:
          * after initialization and each time an IOCP completion occurs for
          * this path.
          *
-         * @param string Name of the monitored path.
+         * @param path Name of the monitored path.
          */
-        bool Refresh(const std::string &);
+        bool Refresh(const std::filesystem::path &);
 
         bool m_valid;
         HANDLE m_handle;
@@ -89,11 +89,11 @@ private:
      * Handle a FILE_NOTIFY_INFORMATION event for a path.
      *
      * @param PathInfoImpl The path's entry in the PathInfo map.
-     * @param string Name of the path.
+     * @param path Name of the path.
      */
     void handleEvents(
         const std::shared_ptr<PathInfoImpl> &,
-        const std::string &) const;
+        const std::filesystem::path &) const;
 
     /**
      * Convert a FILE_NOTIFY_INFORMATION event to a PathEvent.

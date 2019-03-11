@@ -50,7 +50,7 @@ bool PathMonitor::AddPath(
     {
         LOGW("Ignoring NULL callback for %s", path);
     }
-    else if (!std::filesystem::is_directory(path))
+    else if (!std::filesystem::is_directory(path, error))
     {
         LOGW("Ignoring non-directory %s: %s", path, error);
     }
@@ -109,9 +109,13 @@ bool PathMonitor::AddFile(
     {
         LOGW("Ignoring NULL callback for %s", file);
     }
-    else if (std::filesystem::is_directory(file))
+    else if (std::filesystem::is_directory(file, error))
     {
         LOGW("Ignoring directory %s: %s", file, error);
+    }
+    else if (!std::filesystem::is_directory(file.parent_path(), error))
+    {
+        LOGW("Ignoring file under non-directory %s: %s", file, error);
     }
     else
     {

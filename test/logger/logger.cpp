@@ -1,7 +1,6 @@
 #include "fly/logger/logger.h"
 
 #include "fly/logger/logger_config.h"
-#include "fly/path/path.h"
 #include "fly/task/task_manager.h"
 #include "fly/types/string.h"
 #include "test/util/capture_stream.h"

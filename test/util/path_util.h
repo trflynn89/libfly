@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 
 namespace fly {
@@ -19,27 +20,27 @@ public:
      *
      * @param The random directory path.
      */
-    static std::string GenerateTempDirectory();
+    static std::filesystem::path GenerateTempDirectory();
 
     /**
      * Create a file with the given contents, verifying the file was correctly
      * written after creation.
      *
-     * @param string Path to the file to create.
+     * @param path Path to the file to create.
      * @param string Contents of the file to create.
      *
      * @return bool True if the file was correctly created.
      */
-    static bool WriteFile(const std::string &, const std::string &);
+    static bool WriteFile(const std::filesystem::path &, const std::string &);
 
     /**
      * Read the contents of a file.
      *
-     * @param string Path to the file to read.
+     * @param path Path to the file to read.
      *
      * @return string Contents of the file.
      */
-    static std::string ReadFile(const std::string &);
+    static std::string ReadFile(const std::filesystem::path &);
 };
 
 } // namespace fly

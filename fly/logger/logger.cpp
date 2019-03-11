@@ -1,7 +1,6 @@
 #include "fly/logger/logger.h"
 
 #include "fly/logger/logger_config.h"
-#include "fly/path/path.h"
 #include "fly/task/task_runner.h"
 
 #include <algorithm>
@@ -18,7 +17,7 @@ std::mutex Logger::s_consoleMutex;
 Logger::Logger(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     const std::shared_ptr<LoggerConfig> &spConfig,
-    const std::string &filePath) :
+    const std::filesystem::path &filePath) :
     m_spTaskRunner(spTaskRunner),
     m_spConfig(spConfig),
     m_filePath(filePath),
@@ -94,7 +93,7 @@ bool Logger::Start()
 }
 
 //==============================================================================
-std::string Logger::GetLogFilePath() const
+std::filesystem::path Logger::GetLogFilePath() const
 {
     return m_fileName;
 }
@@ -158,7 +157,7 @@ bool Logger::createLogFile()
     String::ReplaceAll(timeStr, " ", "_");
 
     std::string fileName = String::Format("Log_%s_%s.log", timeStr, randStr);
-    m_fileName = Path::Join(m_filePath, fileName);
+    m_fileName = m_filePath / fileName;
 
     if (m_logFile.is_open())
     {

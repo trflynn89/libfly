@@ -3,7 +3,6 @@
 #include "fly/parser/exceptions.h"
 #include "fly/parser/ini_parser.h"
 #include "fly/parser/json_parser.h"
-#include "fly/path/path.h"
 #include "fly/path/path_config.h"
 #include "fly/path/path_monitor.h"
 #include "fly/task/task_runner.h"
@@ -17,8 +16,8 @@ namespace fly {
 ConfigManager::ConfigManager(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     ConfigFileType fileType,
-    const std::string &path,
-    const std::string &file) :
+    const std::filesystem::path &path,
+    const std::filesystem::path &file) :
     m_path(path),
     m_file(file),
     m_spTaskRunner(spTaskRunner)
@@ -46,7 +45,7 @@ ConfigManager::~ConfigManager()
 {
     if (m_spMonitor)
     {
-        m_spMonitor->RemoveFile(Path::Join(m_path, m_file));
+        m_spMonitor->RemoveFile(m_path / m_file);
     }
 }
 
@@ -103,7 +102,7 @@ bool ConfigManager::Start()
             };
             // clang-format on
 
-            return m_spMonitor->AddFile(Path::Join(m_path, m_file), callback);
+            return m_spMonitor->AddFile(m_path / m_file, callback);
         }
     }
 
@@ -117,7 +116,7 @@ void ConfigManager::updateConfig()
 
     try
     {
-        m_values = m_spParser->Parse(m_path, m_file);
+        m_values = m_spParser->ParseFile(m_path / m_file);
     }
     catch (const ParserException &)
     {
