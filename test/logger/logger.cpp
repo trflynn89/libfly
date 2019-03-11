@@ -103,7 +103,7 @@ protected:
         return fly::String::Format("%d\t%s", 1, log).length();
     }
 
-    std::string m_path;
+    std::filesystem::path m_path;
 
     std::shared_ptr<fly::TaskManager> m_spTaskManager;
     std::shared_ptr<fly::WaitableSequencedTaskRunner> m_spTaskRunner;
@@ -121,7 +121,7 @@ TEST_F(LoggerTest, LoggerConfigTest)
 //==============================================================================
 TEST_F(LoggerTest, FilePathTest)
 {
-    std::string path = m_spLogger->GetLogFilePath();
+    std::filesystem::path path = m_spLogger->GetLogFilePath();
     EXPECT_TRUE(fly::String::StartsWith(path, m_path));
 
     std::ifstream stream(path, std::ios::in);
@@ -239,7 +239,7 @@ TEST_F(LoggerTest, ErrorTest)
 //==============================================================================
 TEST_F(LoggerTest, RolloverTest)
 {
-    std::string path = m_spLogger->GetLogFilePath();
+    std::filesystem::path path = m_spLogger->GetLogFilePath();
 
     size_t maxMessageSize = m_spLoggerConfig->MaxMessageSize();
     size_t maxFileSize = m_spLoggerConfig->MaxLogFileSize();

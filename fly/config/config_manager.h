@@ -49,13 +49,11 @@ public:
      *
      * @param TaskRunner Task runner for posting config-related tasks onto.
      * @param ConfigFileType File format of the configuration file.
-     * @param path Directory containing the configuration file.
-     * @param path Name of the configuration file.
+     * @param path Path to the configuration file.
      */
     ConfigManager(
         const std::shared_ptr<SequencedTaskRunner> &,
         ConfigFileType,
-        const std::filesystem::path &,
         const std::filesystem::path &);
 
     /**
@@ -100,7 +98,6 @@ private:
     Json m_values;
 
     const std::filesystem::path m_path;
-    const std::filesystem::path m_file;
 
     std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
     std::shared_ptr<Task> m_spTask;

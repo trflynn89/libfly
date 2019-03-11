@@ -16,10 +16,8 @@ namespace fly {
 ConfigManager::ConfigManager(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     ConfigFileType fileType,
-    const std::filesystem::path &path,
-    const std::filesystem::path &file) :
+    const std::filesystem::path &path) :
     m_path(path),
-    m_file(file),
     m_spTaskRunner(spTaskRunner)
 {
     switch (fileType)
@@ -45,7 +43,7 @@ ConfigManager::~ConfigManager()
 {
     if (m_spMonitor)
     {
-        m_spMonitor->RemoveFile(m_path / m_file);
+        m_spMonitor->RemoveFile(m_path);
     }
 }
 
@@ -102,7 +100,7 @@ bool ConfigManager::Start()
             };
             // clang-format on
 
-            return m_spMonitor->AddFile(m_path / m_file, callback);
+            return m_spMonitor->AddFile(m_path, callback);
         }
     }
 
@@ -116,7 +114,7 @@ void ConfigManager::updateConfig()
 
     try
     {
-        m_values = m_spParser->ParseFile(m_path / m_file);
+        m_values = m_spParser->ParseFile(m_path);
     }
     catch (const ParserException &)
     {

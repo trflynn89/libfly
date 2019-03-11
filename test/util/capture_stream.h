@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 
 namespace fly {
@@ -52,7 +53,7 @@ private:
      */
     std::string restore(bool);
 
-    std::string m_path;
+    std::filesystem::path m_path;
 
     int m_stdio;
     int m_original;
