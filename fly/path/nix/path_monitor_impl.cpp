@@ -76,7 +76,7 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 
 //==============================================================================
 std::shared_ptr<PathMonitor::PathInfo>
-PathMonitorImpl::CreatePathInfo(const std::string &path) const
+PathMonitorImpl::CreatePathInfo(const std::filesystem::path &path) const
 {
     std::shared_ptr<PathMonitor::PathInfo> spInfo;
 
@@ -145,7 +145,8 @@ void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
 
         if (event != PathMonitor::PathEvent::None)
         {
-            auto callback = spInfo->m_fileHandlers[pEvent->name];
+            const std::filesystem::path file(pEvent->name);
+            auto callback = spInfo->m_fileHandlers[file];
 
             if (callback == nullptr)
             {
@@ -154,13 +155,10 @@ void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
 
             if (callback != nullptr)
             {
-                LOGI(
-                    "Handling event %d for \"%s\" in \"%s\"",
-                    event,
-                    pEvent->name,
-                    it->first);
+                auto path = std::filesystem::path(it->first) / file;
 
-                callback(it->first, pEvent->name, event);
+                LOGI("Handling event %d for %s", event, path);
+                callback(path, event);
             }
         }
     }
@@ -190,17 +188,17 @@ PathMonitor::PathEvent PathMonitorImpl::convertToEvent(int mask) const
 //==============================================================================
 PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     int monitorDescriptor,
-    const std::string &path) :
+    const std::filesystem::path &path) :
     PathMonitorImpl::PathInfo(),
     m_monitorDescriptor(monitorDescriptor),
     m_watchDescriptor(-1)
 {
-    m_watchDescriptor =
-        ::inotify_add_watch(m_monitorDescriptor, path.c_str(), s_changeFlags);
+    m_watchDescriptor = ::inotify_add_watch(
+        m_monitorDescriptor, path.string().c_str(), s_changeFlags);
 
     if (m_watchDescriptor == -1)
     {
-        LOGS("Could not add watcher for \"%s\"", path);
+        LOGS("Could not add watcher for %s", path);
     }
 }
 

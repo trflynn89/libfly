@@ -4,6 +4,8 @@
 #include "fly/path/path_config.h"
 #include "fly/task/task_runner.h"
 
+#include <system_error>
+
 namespace fly {
 
 //==============================================================================
@@ -38,11 +40,19 @@ bool PathMonitor::Start()
 }
 
 //==============================================================================
-bool PathMonitor::AddPath(const std::string &path, PathEventCallback callback)
+bool PathMonitor::AddPath(
+    const std::filesystem::path &path,
+    PathEventCallback callback)
 {
+    std::error_code error;
+
     if (callback == nullptr)
     {
-        LOGW("Ignoring NULL callback for \"%s\"", path);
+        LOGW("Ignoring NULL callback for %s", path);
+    }
+    else if (!std::filesystem::is_directory(path))
+    {
+        LOGW("Ignoring non-directory %s: %s", path, error);
     }
     else
     {
@@ -51,7 +61,7 @@ bool PathMonitor::AddPath(const std::string &path, PathEventCallback callback)
 
         if (spInfo)
         {
-            LOGD("Monitoring all files in \"%s\"", path);
+            LOGD("Monitoring all files in %s", path);
             spInfo->m_pathHandler = callback;
 
             return true;
@@ -62,18 +72,18 @@ bool PathMonitor::AddPath(const std::string &path, PathEventCallback callback)
 }
 
 //==============================================================================
-bool PathMonitor::RemovePath(const std::string &path)
+bool PathMonitor::RemovePath(const std::filesystem::path &path)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_pathInfo.find(path);
 
     if (it == m_pathInfo.end())
     {
-        LOGW("Wasn't monitoring \"%s\"", path);
+        LOGW("Wasn't monitoring %s", path);
         return false;
     }
 
-    LOGI("Removed monitor for \"%s\"", path);
+    LOGI("Removed monitor for %s", path);
     m_pathInfo.erase(it);
 
     return true;
@@ -90,23 +100,29 @@ void PathMonitor::RemoveAllPaths()
 
 //==============================================================================
 bool PathMonitor::AddFile(
-    const std::string &path,
-    const std::string &file,
+    const std::filesystem::path &file,
     PathEventCallback callback)
 {
+    std::error_code error;
+
     if (callback == nullptr)
     {
-        LOGW("Ignoring NULL callback for \"%s\"", path);
+        LOGW("Ignoring NULL callback for %s", file);
+    }
+    else if (std::filesystem::is_directory(file))
+    {
+        LOGW("Ignoring directory %s: %s", file, error);
     }
     else
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        std::shared_ptr<PathInfo> spInfo = getOrCreatePathInfo(path);
+        std::shared_ptr<PathInfo> spInfo =
+            getOrCreatePathInfo(file.parent_path());
 
         if (spInfo)
         {
-            LOGD("Monitoring \"%s\" in \"%s\"", file, path);
-            spInfo->m_fileHandlers[file] = callback;
+            LOGD("Monitoring file %s", file);
+            spInfo->m_fileHandlers[file.filename()] = callback;
 
             return true;
         }
@@ -116,40 +132,40 @@ bool PathMonitor::AddFile(
 }
 
 //==============================================================================
-bool PathMonitor::RemoveFile(const std::string &path, const std::string &file)
+bool PathMonitor::RemoveFile(const std::filesystem::path &file)
 {
     bool removePath = false;
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        auto it = m_pathInfo.find(path);
+        auto it = m_pathInfo.find(file.parent_path());
 
         if (it == m_pathInfo.end())
         {
-            LOGW("Wasn't monitoring \"%s\"", path);
+            LOGW("Wasn't monitoring %s", file);
             return false;
         }
 
         std::shared_ptr<PathInfo> spInfo(it->second);
-        auto it2 = spInfo->m_fileHandlers.find(file);
+        auto it2 = spInfo->m_fileHandlers.find(file.filename());
 
         if (it2 == spInfo->m_fileHandlers.end())
         {
-            LOGW("Wasn't monitoring \"%s\" in \"%s\"", file, path);
+            LOGW("Wasn't monitoring %s", file);
             return false;
         }
 
-        LOGD("Stopped monitoring \"%s\" in \"%s\"", file, path);
+        LOGD("Stopped monitoring %s", file);
         spInfo->m_fileHandlers.erase(it2);
 
-        removePath = spInfo->m_fileHandlers.empty();
+        removePath = spInfo->m_fileHandlers.empty() && !(spInfo->m_pathHandler);
     }
 
-    return removePath ? RemovePath(path) : true;
+    return removePath ? RemovePath(file.parent_path()) : true;
 }
 
 //==============================================================================
 std::shared_ptr<PathMonitor::PathInfo>
-PathMonitor::getOrCreatePathInfo(const std::string &path)
+PathMonitor::getOrCreatePathInfo(const std::filesystem::path &path)
 {
     std::shared_ptr<PathInfo> spInfo;
 

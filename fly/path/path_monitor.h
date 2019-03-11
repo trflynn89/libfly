@@ -3,11 +3,11 @@
 #include "fly/fly.h"
 #include "fly/task/task.h"
 
+#include <filesystem>
 #include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
-#include <string>
 
 namespace fly {
 
@@ -43,8 +43,8 @@ public:
     /**
      * Callback definition for function to be triggered on a path change.
      */
-    using PathEventCallback = std::function<
-        void(const std::string &, const std::string &, PathEvent)>;
+    using PathEventCallback =
+        std::function<void(const std::filesystem::path &, PathEvent)>;
 
     /**
      * Constructor.
@@ -72,21 +72,21 @@ public:
      * Monitor for changes to all files under a path. Callbacks registered with
      * AddFile take precendence over callbacks registered with AddPath.
      *
-     * @param string Path to start monitoring.
+     * @param path Path to start monitoring.
      * @param PathEventCallback Callback to trigger when a file changes.
      *
      * @return bool True if the path could be added.
      */
-    bool AddPath(const std::string &, PathEventCallback);
+    bool AddPath(const std::filesystem::path &, PathEventCallback);
 
     /**
      * Stop monitoring for changes to all files under a path.
      *
-     * @param string The path to stop monitoring.
+     * @param path The path to stop monitoring.
      *
      * @return bool True if the path was removed.
      */
-    bool RemovePath(const std::string &);
+    bool RemovePath(const std::filesystem::path &);
 
     /**
      * Stop monitoring all paths.
@@ -97,23 +97,21 @@ public:
      * Monitor for changes to a single file under a path. Callbacks registered
      * with AddFile take precendence over callbacks registered with AddPath.
      *
-     * @param string Path containing the file to start monitoring.
-     * @param string Name of the file to start monitoring.
+     * @param path Path to start monitoring.
      * @param PathEventCallback Callback to trigger when the file changes.
      *
      * @return bool True if the file could be added.
      */
-    bool AddFile(const std::string &, const std::string &, PathEventCallback);
+    bool AddFile(const std::filesystem::path &, PathEventCallback);
 
     /**
      * Stop monitoring for changes to a single file under a path.
      *
-     * @param string Path containing the file to stop monitoring.
-     * @param string Name of the file to stop monitoring.
+     * @param path The path to stop monitoring.
      *
      * @return bool True if the file was removed.
      */
-    bool RemoveFile(const std::string &, const std::string &);
+    bool RemoveFile(const std::filesystem::path &);
 
 protected:
     /**
@@ -136,23 +134,24 @@ protected:
         virtual bool IsValid() const = 0;
 
         PathEventCallback m_pathHandler;
-        std::map<std::string, PathEventCallback> m_fileHandlers;
+        std::map<std::filesystem::path, PathEventCallback> m_fileHandlers;
     };
 
     /**
      * Map of monitored paths to their path information.
      */
-    typedef std::map<std::string, std::shared_ptr<PathInfo>> PathInfoMap;
+    using PathInfoMap =
+        std::map<std::filesystem::path, std::shared_ptr<PathInfo>>;
 
     /**
      * Create an instance of the OS dependent PathInfo struct.
      *
-     * @param string The path to be monitored.
+     * @param path The path to be monitored.
      *
      * @return PathInfo Up-casted shared pointer to the PathInfo struct.
      */
     virtual std::shared_ptr<PathInfo>
-    CreatePathInfo(const std::string &) const = 0;
+    CreatePathInfo(const std::filesystem::path &) const = 0;
 
     /**
      * Check if the path monitor implementation is valid.
@@ -177,11 +176,12 @@ private:
      * Search for a path to be monitored in the PathInfo map. If the map does
      * not contain the path, create an entry.
      *
-     * @param string The path to be monitored.
+     * @param path The path to be monitored.
      *
      * @return PathInfo Shared pointer to the PathInfo struct.
      */
-    std::shared_ptr<PathInfo> getOrCreatePathInfo(const std::string &);
+    std::shared_ptr<PathInfo>
+    getOrCreatePathInfo(const std::filesystem::path &);
 
     /**
      * Stream the name of a Json instance's type.
