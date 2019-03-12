@@ -122,7 +122,7 @@ TEST_F(LoggerTest, LoggerConfigTest)
 TEST_F(LoggerTest, FilePathTest)
 {
     std::filesystem::path path = m_spLogger->GetLogFilePath();
-    EXPECT_TRUE(fly::String::StartsWith(path, m_path));
+    EXPECT_TRUE(fly::String::StartsWith(path.string(), m_path.string()));
 
     std::ifstream stream(path, std::ios::in);
     EXPECT_TRUE(stream.good());

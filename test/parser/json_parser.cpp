@@ -83,11 +83,11 @@ TEST_F(JsonParserTest, JsonCheckerTest)
         const auto file = it.path().filename();
         SCOPED_TRACE(file);
 
-        if (fly::String::StartsWith(file, "pass"))
+        if (fly::String::StartsWith(file.string(), "pass"))
         {
             EXPECT_NO_THROW(m_spParser->ParseFile(it.path()));
         }
-        else if (fly::String::StartsWith(file, "fail"))
+        else if (fly::String::StartsWith(file.string(), "fail"))
         {
             EXPECT_THROW(
                 m_spParser->ParseFile(it.path()), fly::ParserException);
@@ -145,16 +145,16 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
         const auto file = it.path().filename();
         SCOPED_TRACE(file);
 
-        if (fly::String::StartsWith(file, 'y'))
+        if (fly::String::StartsWith(file.string(), 'y'))
         {
             EXPECT_NO_THROW(m_spParser->ParseFile(it.path()));
         }
-        else if (fly::String::StartsWith(file, 'n'))
+        else if (fly::String::StartsWith(file.string(), 'n'))
         {
             EXPECT_THROW(
                 m_spParser->ParseFile(it.path()), fly::ParserException);
         }
-        else if (fly::String::StartsWith(file, 'i'))
+        else if (fly::String::StartsWith(file.string(), 'i'))
         {
             if (std::find(iPass.begin(), iPass.end(), file) != iPass.end())
             {
