@@ -31,7 +31,7 @@ jobs:
         displayName: 'Test'
 
       - script: |
-          (cd /tmp && curl -O https://github.com/linux-test-project/lcov/releases/download/v1.14/lcov-1.14.tar.gz)
+          (cd /tmp && curl -LO https://github.com/linux-test-project/lcov/releases/download/v1.14/lcov-1.14.tar.gz)
           (cd /tmp && tar -xf lcov-1.14.tar.gz)
           /tmp/lcov-1.14/bin/lcov --version
         displayName: 'LCOV'
