@@ -10,6 +10,7 @@ jobs:
     variables:
       CC: 'gcc-8'
       CXX: 'g++-8'
+      GCOV: 'gcov-8'
 
     steps:
     - template: setup.yml
@@ -36,7 +37,7 @@ jobs:
           path="${PATH%\"}"
           path="${path#\"}"
 
-          PATH=$path bash <(curl -s https://codecov.io/bash)
+          PATH=$path bash <(curl -s https://codecov.io/bash) -x $GCOV
         displayName: 'Coverage'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
