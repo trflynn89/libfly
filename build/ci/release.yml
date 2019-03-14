@@ -1,0 +1,15 @@
+parameters:
+  contents: ''
+
+steps:
+- task: GitHubRelease@0
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+  inputs:
+    action: 'edit'
+    tag: $(Build.SourceBranchName)
+    tagSource: 'Git tag'
+    gitHubConnection: libfly
+    repositoryName: trflynn89/libfly
+    assets: $(Build.ArtifactStagingDirectory)/${{ parameters.contents }}
+    assetUploadMode: 'replace'
+  displayName: Release
