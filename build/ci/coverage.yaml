@@ -1,0 +1,20 @@
+parameters:
+  lcov_url: 'https://github.com/linux-test-project/lcov/releases/download/v1.14/lcov-1.14.tar.gz'
+
+steps:
+  - script: |
+      (cd /tmp && curl -L ${{ parameters.lcov_url }} -o lcov.tar.gz)
+      (cd /tmp && tar -xf lcov.tar.gz)
+      (cd /tmp && tar -tf lcov.tar.gz | head -n1 | xargs -i mv {} lcov)
+      /tmp/lcov/bin/lcov --version
+    displayName: 'LCOV'
+
+  # Fix PATH to remove leading and trailing quotes, otherwise codecov fails
+  # when it runs `find`, which thinks that PATH is relative.
+  - script: |
+      /tmp/lcov/bin/lcov --directory build/nix --capture --output-file coverage.info
+      /tmp/lcov/bin/lcov --remove coverage.info '/usr/*' '*/test/*' --output-file coverage.info
+      /tmp/lcov/bin/lcov --list coverage.info
+
+      bash <(curl -s https://codecov.io/bash) -f coverage.info
+    displayName: 'Coverage'

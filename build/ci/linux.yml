@@ -10,6 +10,7 @@ jobs:
     variables:
       CC: 'gcc-8'
       CXX: 'g++-8'
+      GCOV: 'gcov-8'
 
     steps:
     - template: setup.yml
@@ -18,6 +19,9 @@ jobs:
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
         sudo apt-get install -y $CC $CXX
+
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/$CC 800 --slave /usr/bin/g++ g++ /usr/bin/$CXX
+        sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/$GCOV 800
       displayName: 'GCC'
 
     - ${{ if eq(parameters.arch, 'x86') }}:
@@ -30,21 +34,7 @@ jobs:
           make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
         displayName: 'Test'
 
-      - script: |
-          (cd /tmp && curl -LO https://github.com/linux-test-project/lcov/releases/download/v1.14/lcov-1.14.tar.gz)
-          (cd /tmp && tar -xf lcov-1.14.tar.gz)
-          /tmp/lcov-1.14/bin/lcov --version
-        displayName: 'LCOV'
-
-      # Fix PATH to remove leading and trailing quotes, otherwise codecov fails
-      # when it runs `find`, which thinks that PATH is relative.
-      - script: |
-          /tmp/lcov-1.14/bin/lcov --directory build/nix --capture --output-file coverage.info
-          /tmp/lcov-1.14/bin/lcov --remove coverage.info '/usr/*' '*/test/*' --output-file coverage.info
-          /tmp/lcov-1.14/bin/lcov --list coverage.info
-
-          bash <(curl -s https://codecov.io/bash) -f coverage.info
-        displayName: 'Coverage'
+      - template: coverage.yml
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |
