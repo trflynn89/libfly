@@ -539,7 +539,7 @@ TEST_F(PathMonitorTest, MultipleFileTest)
 TEST_F(PathMonitorTest, RemoveTest)
 {
     // Test removing files and paths that were not being monitored
-    EXPECT_FALSE(m_spMonitor->RemoveFile(m_file1 / "was not"));
+    EXPECT_FALSE(m_spMonitor->RemoveFile(m_path1 / "was not"));
     EXPECT_FALSE(m_spMonitor->RemovePath(m_path1 / "monitoring"));
     EXPECT_FALSE(m_spMonitor->RemovePath("any of this"));
 
