@@ -203,6 +203,7 @@ TEST_F(PathMonitorTest, PathEventStreamTest)
 TEST_F(PathMonitorTest, NonExistingPathTest)
 {
     ASSERT_FALSE(m_spMonitor->AddPath(m_path0 / "_", m_callback));
+    ASSERT_FALSE(m_spMonitor->AddFile(m_path0 / "_" / "foo.txt", m_callback));
 }
 
 //==============================================================================
