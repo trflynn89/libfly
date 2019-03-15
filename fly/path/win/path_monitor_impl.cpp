@@ -3,7 +3,6 @@
 #include "fly/fly.h"
 #include "fly/logger/logger.h"
 #include "fly/task/task_runner.h"
-#include "fly/types/string.h"
 
 #include <string>
 
@@ -126,10 +125,10 @@ void PathMonitorImpl::handleEvents(
 
         if (event != PathMonitor::PathEvent::None)
         {
-            std::wstring wFile(
+            const std::wstring wFile(
                 pInfo->FileName, pInfo->FileNameLength / sizeof(wchar_t));
 
-            std::filesystem::path file(String::FromWideString(wFile));
+            const std::filesystem::path file(wFile);
             auto callback = spInfo->m_fileHandlers[file];
 
             if (callback == nullptr)
