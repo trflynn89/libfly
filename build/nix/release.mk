@@ -109,10 +109,11 @@ endef
 # $(1) = The target's name.
 # $(2) = The path to the directory.
 # $(3) = Header file extension.
+# $(4) = Header file destination.
 define ADD_REL_INC
 
 $(eval $(call SET_REL_VAR, $(1)))
-$(eval $(call ADD_REL_CMD, $(1), rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' $(2) $(REL_INC_DIR_$(t))))
+$(eval $(call ADD_REL_CMD, $(1), rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' $(2)/ $(REL_INC_DIR_$(t))/$(strip $(4))))
 
 endef
 
@@ -121,9 +122,10 @@ endef
 # $(1) = The target's name.
 # $(2) = The path to the directory.
 # $(3) = Source file extension.
+# $(4) = Source file destination.
 define ADD_REL_SRC
 
 $(eval $(call SET_REL_VAR, $(1)))
-$(eval $(call ADD_REL_CMD, $(1), rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' $(2) $(REL_SRC_DIR_$(t))))
+$(eval $(call ADD_REL_CMD, $(1), rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' $(2)/ $(REL_SRC_DIR_$(t))/$(strip $(4))))
 
 endef

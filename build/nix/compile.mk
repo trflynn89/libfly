@@ -29,7 +29,7 @@ define BIN_RULES
 
 t := $$(strip $(1))
 
-MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
+MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
 $(2): OBJS := $$(OBJ_$$(t))
 $(2): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
@@ -88,39 +88,37 @@ $(2)/%.rcc.cpp: $(d)/%.qrc $$(MAKEFILES_$(d))
 
 endef
 
-# Link a library target from a set of object files.
+# Link static and shared libraries targets from a set of object files.
 #
 # $(1) = The target's name.
-# $(2) = The path to the target output binary.
 define LIB_RULES
 
 t := $$(strip $(1))
 
-MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
+MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
-$(2): OBJS := $$(OBJ_$$(t))
-$(2): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
-$(2): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
-$(2): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
+%.a %.so.$(VERSION): OBJS := $$(OBJ_$$(t))
+%.a %.so.$(VERSION): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
+%.a %.so.$(VERSION): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
+%.a %.so.$(VERSION): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 
-$(2): $$(OBJ_$$(t)) $$(GEN_$$(t)) $$(MAKEFILES_$(d))
+%.a: $$(OBJ_$$(t)) $$(GEN_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
+	@echo "[Static $$(subst $(CURDIR)/,,$$@)]"
+	$(STATIC)
 
-ifeq ($(release),1)
+%.so.$(VERSION): $$(OBJ_$$(t)) $$(GEN_$$(t)) $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
 	@echo "[Shared $$(subst $(CURDIR)/,,$$@)]"
 	$(SHARED_CXX)
 	$(STRIP)
-else
-	@echo "[Static $$(subst $(CURDIR)/,,$$@)]"
-	$(STATIC)
-endif
 
 endef
 
 # Build a release package.
 #
 # $(1) = The target's name.
-# $(2) = The path to the target output binary or library.
+# $(2) = The path to the target output binary or libraries.
 # $(3) = The path to the target release package.
 define PKG_RULES
 
@@ -147,7 +145,7 @@ endef
 # $(1) = Path to directory where object files should be placed.
 define OBJ_RULES
 
-MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(d)/*.mk
+MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
 $(1)/%.o: CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
 $(1)/%.o: CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
@@ -180,7 +178,7 @@ endef
 #
 # $(1) = The target's name.
 # $(2) = The path to the target root directory.
-# $(3) = The path to the target output library.
+# $(3) = The path to the target output libraries.
 # $(4) = The path to the target release package.
 define DEFINE_BIN_RULES
 
@@ -219,7 +217,7 @@ endef
 #
 # $(1) = The target's name.
 # $(2) = The path to the target root directory.
-# $(3) = The path to the target output library.
+# $(3) = The path to the target output libraries.
 # $(4) = The path to the target release package.
 define DEFINE_QT5_RULES
 
@@ -255,14 +253,15 @@ $$(eval $$(call POP_DIR))
 
 endef
 
-# Define the rules to build a library target. The files.mk should define:
+# Define the rules to build static and shared library targets. The files.mk
+# should define:
 #
 #     SRC_DIRS_$(d) = The source directories to include in the build.
-#     SRC_$(d) = The sources to be built in the target library.
+#     SRC_$(d) = The sources to be built in the target libraries.
 #
 # $(1) = The target's name.
 # $(2) = The path to the target root directory.
-# $(3) = The path to the target output library.
+# $(3) = The path to the target output libraries.
 # $(4) = The path to the target release package.
 define DEFINE_LIB_RULES
 
@@ -278,7 +277,7 @@ $$(foreach dir, $$(SRC_DIRS_$$(d)), \
     $$(eval $$(call DEFINE_SRC_RULES, $(1), $$(dir))))
 
 # Define the compile rules
-$$(eval $$(call LIB_RULES, $(1), $(3)))
+$$(eval $$(call LIB_RULES, $(1)))
 $$(eval $$(call PKG_RULES, $(1), $(3), $(4)))
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 
