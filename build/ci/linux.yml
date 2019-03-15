@@ -47,7 +47,3 @@ jobs:
       - template: package.yml
         parameters:
           contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
-
-      - template: release.yml
-        parameters:
-          contents: 'libfly-*.tar.bz2'
