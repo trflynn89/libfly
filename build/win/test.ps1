@@ -1,13 +1,13 @@
 param (
     [Parameter(Mandatory=$true)][string]$arch
- )
+)
 
-# Run all unit tests for an architecture and upload results to appveyor.
+# Run all unit tests for an architecture.
 function Run-Libfly-Test($arch)
 {
     Write-Output "Running $arch tests"
 
-    $full_path = $PSScriptRoot + "\\Debug-" + $arch
+    $full_path = $PSScriptRoot + "\Debug-" + $arch
     $tests_passed = 0
     $tests_failed = 0
 
