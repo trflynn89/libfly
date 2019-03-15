@@ -1,5 +1,6 @@
 parameters:
   contents: ''
+  release: ''
 
 steps:
 - task: CopyFiles@2
@@ -14,3 +15,15 @@ steps:
     pathtoPublish: $(Build.ArtifactStagingDirectory)
     artifactName: libfly
   displayName: 'Publish'
+
+- task: GitHubRelease@0
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+  inputs:
+    action: 'edit'
+    tag: $(Build.SourceBranchName)
+    tagSource: 'Git tag'
+    gitHubConnection: libfly
+    repositoryName: trflynn89/libfly
+    assets: $(Build.ArtifactStagingDirectory)/*
+    assetUploadMode: 'replace'
+  displayName: Release

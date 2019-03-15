@@ -26,7 +26,10 @@ jobs:
         displayName: 'Test'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
-      - script: build\win\release.bat
+      - task: PowerShell@2
+        inputs:
+          filePath: build\win\release.ps1
+          arguments: -arch ${{ parameters.arch }}
         displayName: 'Package'
 
       - template: package.yml

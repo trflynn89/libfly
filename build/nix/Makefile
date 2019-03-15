@@ -12,7 +12,9 @@ $(eval $(call ADD_TARGET, libfly, fly, LIB))
 
 # Test targets
 $(eval $(call ADD_TARGET, libfly_unit_tests, test, TEST))
-$(eval $(call ADD_TARGET, libfly_qt5_example, test/qt5, QT5))
+ifeq ($(qt5), 1)
+    $(eval $(call ADD_TARGET, libfly_qt5_example, test/qt5, QT5))
+endif
 
 # Import the build system
 include build.mk

@@ -23,11 +23,8 @@ ifeq ($$(TARGET_TYPE_$$(t)), BIN)
 else ifeq ($$(TARGET_TYPE_$$(t)), QT5)
     TARGET_FILE_$$(t) := $(BIN_DIR)/$$(t)
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
-    ifeq ($(release), 1)
-        TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).so.$(VERSION)
-    else
-        TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).a
-    endif
+    TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).so.$(VERSION)
+    TARGET_FILE_$$(t) += $(LIB_DIR)/$$(t).a
 else
     $$(error Target type $$(TARGET_TYPE_$$(t)) not supported)
 endif
@@ -36,7 +33,7 @@ endif
 TARGET_PACKAGE_$$(t) := $(ETC_DIR)/$$(t)-nix-$(VERSION).$(arch).tar.bz2
 TARGET_PACKAGES += $$(TARGET_PACKAGE_$$(t))
 
-# Define the make goal to build the target
+# Define the make goal to build the targets
 $$(t): $$(TARGET_FILE_$$(t)) $$(TARGET_PACKAGE_$$(t))
 
 # Define the compilation goals for the target

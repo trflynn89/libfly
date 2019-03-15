@@ -9,11 +9,8 @@ VERSION = 1.0.0
 # Import the build API
 include /usr/src/fly/api.mk
 
-# Set default target
-$(eval $(call SET_DEFAULT_TARGET, libflytest))
-
 # Main targets
-$(eval $(call ADD_TARGET, libflytest, ., BIN))
+$(eval $(call ADD_TARGET, libfly_build_test, ., BIN))
 
 # Import the build system
 include /usr/src/fly/build.mk
