@@ -7,10 +7,6 @@
 #include <cstdlib>
 #include <random>
 
-#if defined(FLY_WINDOWS)
-#    include <Windows.h>
-#endif
-
 namespace fly {
 
 namespace {
@@ -223,34 +219,6 @@ bool String::WildcardMatch(const std::string &source, const std::string &search)
 
     return ret;
 }
-
-//==============================================================================
-#if defined(FLY_WINDOWS)
-std::string String::FromWideString(const std::wstring &wide)
-{
-    if (wide.empty())
-    {
-        return std::string();
-    }
-
-    int size = ::WideCharToMultiByte(
-        CP_UTF8, 0, &wide[0], (int)wide.size(), NULL, 0, NULL, NULL);
-
-    std::string converted(size, 0);
-
-    ::WideCharToMultiByte(
-        CP_UTF8,
-        0,
-        &wide[0],
-        (int)wide.size(),
-        &converted[0],
-        size,
-        NULL,
-        NULL);
-
-    return converted;
-}
-#endif
 
 //==============================================================================
 template <>
