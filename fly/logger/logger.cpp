@@ -110,9 +110,9 @@ bool Logger::poll()
         m_logStream << logStr << std::flush;
 
         std::error_code error;
-        std::uintmax_t size = std::filesystem::file_size(m_logFile, error);
 
-        if ((size == -1) || (size > m_spConfig->MaxLogFileSize()))
+        if (std::filesystem::file_size(m_logFile, error) >
+            m_spConfig->MaxLogFileSize())
         {
             createLogFile();
         }
