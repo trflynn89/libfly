@@ -2,8 +2,6 @@
 
 #include "test/mock/mock_system.h"
 
-#include <dirent.h>
-#include <fts.h>
 #include <netdb.h>
 #include <poll.h>
 #include <sys/socket.h>
@@ -47,8 +45,6 @@ int s_sendCallCount = 0;
 // remaining bytes, completing the send.
 int s_sendtoCallCount = 0;
 
-const std::vector<std::string> s_tmpEnvs = {"TMPDIR", "TMP", "TEMP", "TEMPDIR"};
-
 } // namespace
 
 namespace fly {
@@ -70,9 +66,6 @@ std::ostream &operator<<(std::ostream &stream, MockCall call)
         case MockCall::Fcntl:
             stream << "fcntl";
             break;
-        case MockCall::FtsRead:
-            stream << "fts_read";
-            break;
         case MockCall::Gethostbyname:
             stream << "gethostbyname";
             break;
@@ -85,9 +78,6 @@ std::ostream &operator<<(std::ostream &stream, MockCall call)
         case MockCall::InotifyInit1:
             stream << "inotify_init1";
             break;
-        case MockCall::Getenv:
-            stream << "getenv";
-            break;
         case MockCall::Listen:
             stream << "listen";
             break;
@@ -97,17 +87,11 @@ std::ostream &operator<<(std::ostream &stream, MockCall call)
         case MockCall::Read:
             stream << "read";
             break;
-        case MockCall::Readdir:
-            stream << "readdir";
-            break;
         case MockCall::Recv:
             stream << "recv";
             break;
         case MockCall::Recvfrom:
             stream << "recvfrom";
-            break;
-        case MockCall::Remove:
-            stream << "remove";
             break;
         case MockCall::Send:
             stream << "send";
@@ -214,43 +198,6 @@ extern "C"
         }
 
         return __real_fcntl(fd, cmd, args);
-    }
-
-    //==========================================================================
-    FTSENT *__real_fts_read(FTS *ftsp);
-
-    FTSENT *__wrap_fts_read(FTS *ftsp)
-    {
-        FTSENT *pFtsent = __real_fts_read(ftsp);
-
-        if (fly::MockSystem::MockEnabled(fly::MockCall::FtsRead))
-        {
-            pFtsent->fts_info = FTS_ERR;
-            errno = 0;
-        }
-
-        return pFtsent;
-    }
-
-    //==========================================================================
-    char *__real_getenv(const char *name);
-
-    char *__wrap_getenv(const char *name)
-    {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Getenv))
-        {
-            errno = 0;
-
-            if (std::find(s_tmpEnvs.begin(), s_tmpEnvs.end(), name) !=
-                s_tmpEnvs.end())
-            {
-                return (char *)("/tmp/");
-            }
-
-            return NULL;
-        }
-
-        return __real_getenv(name);
     }
 
     //==========================================================================
@@ -363,26 +310,6 @@ extern "C"
     }
 
     //==========================================================================
-    struct dirent *__real_readdir(DIR *dirp);
-
-    struct dirent *__wrap_readdir(DIR *dirp)
-    {
-        struct dirent *ent = __real_readdir(dirp);
-
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Readdir))
-        {
-            if (ent != NULL)
-            {
-                ent->d_type = DT_UNKNOWN;
-            }
-
-            errno = 0;
-        }
-
-        return ent;
-    }
-
-    //==========================================================================
     ssize_t __real_recv(int sockfd, void *buf, size_t len, int flags);
 
     ssize_t __wrap_recv(int sockfd, void *buf, size_t len, int flags)
@@ -420,20 +347,6 @@ extern "C"
         }
 
         return __real_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
-    }
-
-    //==========================================================================
-    int __real_remove(const char *pathname);
-
-    int __wrap_remove(const char *pathname)
-    {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Remove))
-        {
-            errno = 0;
-            return -1;
-        }
-
-        return __real_remove(pathname);
     }
 
     //==========================================================================

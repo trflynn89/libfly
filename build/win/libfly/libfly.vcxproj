@@ -99,6 +99,8 @@
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -109,6 +111,8 @@
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -121,6 +125,8 @@
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -138,6 +144,8 @@
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -158,10 +166,8 @@
     <ClInclude Include="..\..\..\fly\parser\ini_parser.h" />
     <ClInclude Include="..\..\..\fly\parser\json_parser.h" />
     <ClInclude Include="..\..\..\fly\parser\parser.h" />
-    <ClInclude Include="..\..\..\fly\path\path.h" />
     <ClInclude Include="..\..\..\fly\path\path_config.h" />
     <ClInclude Include="..\..\..\fly\path\path_monitor.h" />
-    <ClInclude Include="..\..\..\fly\path\win\path_impl.h" />
     <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.h" />
     <ClInclude Include="..\..\..\fly\socket\async_request.h" />
     <ClInclude Include="..\..\..\fly\socket\socket.h" />
@@ -195,10 +201,8 @@
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\json_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\parser.cpp" />
-    <ClCompile Include="..\..\..\fly\path\path.cpp" />
     <ClCompile Include="..\..\..\fly\path\path_config.cpp" />
     <ClCompile Include="..\..\..\fly\path\path_monitor.cpp" />
-    <ClCompile Include="..\..\..\fly\path\win\path_impl.cpp" />
     <ClCompile Include="..\..\..\fly\path\win\path_monitor_impl.cpp" />
     <ClCompile Include="..\..\..\fly\socket\async_request.cpp" />
     <ClCompile Include="..\..\..\fly\socket\socket.cpp" />

@@ -1,8 +1,8 @@
 #include "test/util/path_util.h"
 
-#include "fly/path/path.h"
 #include "fly/types/string.h"
 
+#include <filesystem>
 #include <fstream>
 #include <limits>
 #include <sstream>
@@ -10,14 +10,16 @@
 namespace fly {
 
 //==============================================================================
-std::string PathUtil::GenerateTempDirectory()
+std::filesystem::path PathUtil::GenerateTempDirectory()
 {
-    return fly::Path::Join(
-        fly::Path::GetTempDirectory(), fly::String::GenerateRandomString(10));
+    return std::filesystem::temp_directory_path() /
+        fly::String::GenerateRandomString(10);
 }
 
 //==============================================================================
-bool PathUtil::WriteFile(const std::string &path, const std::string &contents)
+bool PathUtil::WriteFile(
+    const std::filesystem::path &path,
+    const std::string &contents)
 {
     std::ofstream stream(path, std::ios::out);
 
@@ -30,7 +32,7 @@ bool PathUtil::WriteFile(const std::string &path, const std::string &contents)
 }
 
 //==============================================================================
-std::string PathUtil::ReadFile(const std::string &path)
+std::string PathUtil::ReadFile(const std::filesystem::path &path)
 {
     std::ifstream stream(path, std::ios::in);
     std::stringstream sstream;
@@ -41,21 +43,6 @@ std::string PathUtil::ReadFile(const std::string &path)
     }
 
     return sstream.str();
-}
-
-//==============================================================================
-size_t PathUtil::ComputeFileSize(const std::string &path)
-{
-    std::ifstream stream(path, std::ios::in);
-    size_t size = 0;
-
-    if (stream.good())
-    {
-        stream.ignore(std::numeric_limits<std::streamsize>::max());
-        size = static_cast<size_t>(stream.gcount());
-    }
-
-    return size;
 }
 
 } // namespace fly

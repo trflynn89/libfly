@@ -65,9 +65,6 @@
     <ClInclude Include="..\..\..\fly\socket\async_request.h">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\path\path.h">
-      <Filter>path</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\ini_parser.h">
       <Filter>parser</Filter>
     </ClInclude>
@@ -84,9 +81,6 @@
       <Filter>logger</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.h">
-      <Filter>path\win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\path\win\path_impl.h">
       <Filter>path\win</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\socket\win\socket_impl.h">
@@ -172,9 +166,6 @@
     <ClCompile Include="..\..\..\fly\socket\async_request.cpp">
       <Filter>socket</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\path\path.cpp">
-      <Filter>path</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp">
       <Filter>parser</Filter>
     </ClCompile>
@@ -191,9 +182,6 @@
       <Filter>logger</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\path\win\path_monitor_impl.cpp">
-      <Filter>path\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\path\win\path_impl.cpp">
       <Filter>path\win</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\socket\win\socket_impl.cpp">

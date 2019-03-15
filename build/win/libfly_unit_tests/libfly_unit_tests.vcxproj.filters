@@ -60,9 +60,6 @@
     <ClCompile Include="..\..\..\test\system\system_monitor.cpp">
       <Filter>system</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\path\path.cpp">
-      <Filter>path</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\test\path\path_monitor.cpp">
       <Filter>path</Filter>
     </ClCompile>

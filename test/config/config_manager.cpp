@@ -2,7 +2,6 @@
 
 #include "fly/config/config.h"
 #include "fly/fly.h"
-#include "fly/path/path.h"
 #include "fly/path/path_config.h"
 #include "fly/task/task_manager.h"
 #include "fly/types/string.h"
@@ -11,6 +10,7 @@
 
 #include <gtest/gtest.h>
 
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -37,8 +37,7 @@ class ConfigManagerTest : public ::testing::Test
 public:
     ConfigManagerTest() :
         m_path(fly::PathUtil::GenerateTempDirectory()),
-        m_file(fly::String::GenerateRandomString(10) + ".txt"),
-        m_fullPath(fly::Path::Join(m_path, m_file)),
+        m_file(m_path / (fly::String::GenerateRandomString(10) + ".txt")),
 
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
@@ -49,7 +48,6 @@ public:
         m_spConfigManager(std::make_shared<fly::ConfigManager>(
             m_spTaskRunner,
             fly::ConfigManager::ConfigFileType::Ini,
-            m_path,
             m_file)),
 
         m_spPathConfig(m_spConfigManager->CreateConfig<TestPathConfig>())
@@ -61,7 +59,7 @@ public:
      */
     void SetUp() override
     {
-        ASSERT_TRUE(fly::Path::MakePath(m_path));
+        ASSERT_TRUE(std::filesystem::create_directories(m_path));
         ASSERT_TRUE(m_spTaskManager->Start());
         ASSERT_TRUE(m_spConfigManager->Start());
 
@@ -74,13 +72,12 @@ public:
     void TearDown() override
     {
         ASSERT_TRUE(m_spTaskManager->Stop());
-        ASSERT_TRUE(fly::Path::RemovePath(m_path));
+        std::filesystem::remove_all(m_path);
     }
 
 protected:
-    std::string m_path;
-    std::string m_file;
-    std::string m_fullPath;
+    std::filesystem::path m_path;
+    std::filesystem::path m_file;
 
     std::shared_ptr<fly::TaskManager> m_spTaskManager;
     std::shared_ptr<fly::WaitableSequencedTaskRunner> m_spTaskRunner;
@@ -104,20 +101,14 @@ TEST_F(ConfigManagerTest, AllFileTypesTest)
 {
     {
         m_spConfigManager = std::make_shared<fly::ConfigManager>(
-            m_spTaskRunner,
-            fly::ConfigManager::ConfigFileType::Ini,
-            m_path,
-            m_file);
+            m_spTaskRunner, fly::ConfigManager::ConfigFileType::Ini, m_file);
         m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
         EXPECT_TRUE(m_spConfigManager->Start());
     }
     {
         m_spConfigManager = std::make_shared<fly::ConfigManager>(
-            m_spTaskRunner,
-            fly::ConfigManager::ConfigFileType::Json,
-            m_path,
-            m_file);
+            m_spTaskRunner, fly::ConfigManager::ConfigFileType::Json, m_file);
         m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
         EXPECT_TRUE(m_spConfigManager->Start());
@@ -130,7 +121,6 @@ TEST_F(ConfigManagerTest, BadFileTypeTest)
     m_spConfigManager = std::make_shared<fly::ConfigManager>(
         m_spTaskRunner,
         static_cast<fly::ConfigManager::ConfigFileType>(-1),
-        m_path,
         m_file);
 
     EXPECT_FALSE(m_spConfigManager->Start());
@@ -189,7 +179,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPollerTest)
         "address=USA",
         fly::Config::GetName());
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -201,7 +191,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPollerTest)
         EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
     }
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents + "\n"));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents + "\n"));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
@@ -229,7 +219,7 @@ TEST_F(ConfigManagerTest, InitialFileFirstTest)
         "address=USA",
         fly::Config::GetName());
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -250,7 +240,7 @@ TEST_F(ConfigManagerTest, InitialFileSecondTest)
         "address=USA",
         fly::Config::GetName());
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -269,7 +259,7 @@ TEST_F(ConfigManagerTest, FileChangeTest)
         "address=USA",
         fly::Config::GetName());
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents1));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents1));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -283,7 +273,7 @@ TEST_F(ConfigManagerTest, FileChangeTest)
         "age=27",
         fly::Config::GetName());
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents2));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents2));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "Jane Doe");
@@ -302,14 +292,14 @@ TEST_F(ConfigManagerTest, DeleteFileTest)
         "address=USA",
         fly::Config::GetName());
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "John Doe");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "USA");
 
-    std::remove(m_fullPath.c_str());
+    std::filesystem::remove(m_file);
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "");
@@ -326,7 +316,7 @@ TEST_F(ConfigManagerTest, BadUpdateTest)
         "name",
         fly::Config::GetName());
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
@@ -338,10 +328,7 @@ TEST_F(ConfigManagerTest, BadUpdateTest)
 TEST_F(ConfigManagerTest, BadObjectTest)
 {
     m_spConfigManager = std::make_shared<fly::ConfigManager>(
-        m_spTaskRunner,
-        fly::ConfigManager::ConfigFileType::Json,
-        m_path,
-        m_file);
+        m_spTaskRunner, fly::ConfigManager::ConfigFileType::Json, m_file);
     m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
     EXPECT_TRUE(m_spConfigManager->Start());
@@ -350,7 +337,7 @@ TEST_F(ConfigManagerTest, BadObjectTest)
 
     const std::string contents("[1, 2, 3]");
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_fullPath, contents));
+    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 

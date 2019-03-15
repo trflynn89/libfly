@@ -29,9 +29,9 @@ CaptureStream::CaptureStream(Stream stream) :
     FILE *target = nullptr;
 
 #if defined(FLY_WINDOWS)
-    ::fopen_s(&target, m_path.c_str(), "w");
+    ::fopen_s(&target, m_path.string().c_str(), "w");
 #elif defined(FLY_LINUX)
-    target = ::fopen(m_path.c_str(), "w");
+    target = ::fopen(m_path.string().c_str(), "w");
 #endif
 
     if (target != nullptr)
@@ -83,7 +83,7 @@ std::string CaptureStream::restore(bool read)
             contents = fly::PathUtil::ReadFile(m_path);
         }
 
-        std::remove(m_path.c_str());
+        std::filesystem::remove(m_path);
         m_original = -1;
     }
 

@@ -5,8 +5,11 @@
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
-#include <functional>
 #include <random>
+
+#if defined(FLY_WINDOWS)
+#    include <Windows.h>
+#endif
 
 namespace fly {
 
@@ -56,22 +59,14 @@ String::Split(const std::string &input, char delim, size_t max)
 //==============================================================================
 void String::Trim(std::string &str)
 {
+    auto is_non_space = [](int ch) { return !std::isspace(ch); };
+
     // Remove leading whitespace
-    str.erase(
-        str.begin(),
-        std::find_if(
-            str.begin(),
-            str.end(),
-            std::not1(std::ptr_fun<int, int>(std::isspace))));
+    str.erase(str.begin(), std::find_if(str.begin(), str.end(), is_non_space));
 
     // Remove trailing whitespace
     str.erase(
-        std::find_if(
-            str.rbegin(),
-            str.rend(),
-            std::not1(std::ptr_fun<int, int>(std::isspace)))
-            .base(),
-        str.end());
+        std::find_if(str.rbegin(), str.rend(), is_non_space).base(), str.end());
 }
 
 //==============================================================================
@@ -228,6 +223,34 @@ bool String::WildcardMatch(const std::string &source, const std::string &search)
 
     return ret;
 }
+
+//==============================================================================
+#if defined(FLY_WINDOWS)
+std::string String::FromWideString(const std::wstring &wide)
+{
+    if (wide.empty())
+    {
+        return std::string();
+    }
+
+    int size = ::WideCharToMultiByte(
+        CP_UTF8, 0, &wide[0], (int)wide.size(), NULL, 0, NULL, NULL);
+
+    std::string converted(size, 0);
+
+    ::WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        &wide[0],
+        (int)wide.size(),
+        &converted[0],
+        size,
+        NULL,
+        NULL);
+
+    return converted;
+}
+#endif
 
 //==============================================================================
 template <>

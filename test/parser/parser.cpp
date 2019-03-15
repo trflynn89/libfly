@@ -1,6 +1,5 @@
 #include "fly/parser/exceptions.h"
 #include "fly/parser/json_parser.h"
-#include "fly/path/path.h"
 #include "fly/types/json.h"
 #include "fly/types/string.h"
 
@@ -68,52 +67,52 @@ protected:
 //==============================================================================
 TEST_F(ParserTest, NonByteOrderMarkTest)
 {
-    EXPECT_THROW(m_spParser->Parse("\xEE"), fly::ParserException);
+    EXPECT_THROW(m_spParser->ParseString("\xEE"), fly::ParserException);
     m_spParser->CompareParsed({0xEE});
 }
 
 //==============================================================================
 TEST_F(ParserTest, Utf8ByteOrderMarkTest)
 {
-    EXPECT_THROW(m_spParser->Parse("\xEF"), fly::ParserException);
+    EXPECT_THROW(m_spParser->ParseString("\xEF"), fly::ParserException);
     m_spParser->CompareParsed({0xEF});
 
-    EXPECT_THROW(m_spParser->Parse("\xEF\xEE"), fly::ParserException);
+    EXPECT_THROW(m_spParser->ParseString("\xEF\xEE"), fly::ParserException);
     m_spParser->CompareParsed({0xEF, 0xEE});
 
-    EXPECT_THROW(m_spParser->Parse("\xEF\xBB"), fly::ParserException);
+    EXPECT_THROW(m_spParser->ParseString("\xEF\xBB"), fly::ParserException);
     m_spParser->CompareParsed({0xEF, 0xBB});
 
-    EXPECT_THROW(m_spParser->Parse("\xEF\xBB\xEE"), fly::ParserException);
+    EXPECT_THROW(m_spParser->ParseString("\xEF\xBB\xEE"), fly::ParserException);
     m_spParser->CompareParsed({0xEF, 0xBB, 0xEE});
 
-    EXPECT_NO_THROW(m_spParser->Parse("\xEF\xBB\xBF"));
+    EXPECT_NO_THROW(m_spParser->ParseString("\xEF\xBB\xBF"));
     m_spParser->CompareParsed({});
 }
 
 //==============================================================================
 TEST_F(ParserTest, Utf16BigEndianByteOrderMarkTest)
 {
-    EXPECT_THROW(m_spParser->Parse("\xFE"), fly::ParserException);
+    EXPECT_THROW(m_spParser->ParseString("\xFE"), fly::ParserException);
     m_spParser->CompareParsed({0xFE});
 
-    EXPECT_THROW(m_spParser->Parse("\xFE\xEE"), fly::ParserException);
+    EXPECT_THROW(m_spParser->ParseString("\xFE\xEE"), fly::ParserException);
     m_spParser->CompareParsed({0xFE, 0xEE});
 
-    EXPECT_NO_THROW(m_spParser->Parse("\xFE\xFF"));
+    EXPECT_NO_THROW(m_spParser->ParseString("\xFE\xFF"));
     m_spParser->CompareParsed({});
 }
 
 //==============================================================================
 TEST_F(ParserTest, Utf16LittleEndianByteOrderMarkTest)
 {
-    EXPECT_THROW(m_spParser->Parse("\xFF"), fly::ParserException);
+    EXPECT_THROW(m_spParser->ParseString("\xFF"), fly::ParserException);
     m_spParser->CompareParsed({0xFF});
 
-    EXPECT_THROW(m_spParser->Parse("\xFF\xEE"), fly::ParserException);
+    EXPECT_THROW(m_spParser->ParseString("\xFF\xEE"), fly::ParserException);
     m_spParser->CompareParsed({0xFF, 0xEE});
 
-    EXPECT_NO_THROW(m_spParser->Parse("\xFF\xFE"));
+    EXPECT_NO_THROW(m_spParser->ParseString("\xFF\xFE"));
     m_spParser->CompareParsed({});
 }
 
@@ -121,52 +120,56 @@ TEST_F(ParserTest, Utf16LittleEndianByteOrderMarkTest)
 TEST_F(ParserTest, Utf32BigEndianByteOrderMarkTest)
 {
     EXPECT_THROW(
-        m_spParser->Parse(std::string("\x00", 1)), fly::ParserException);
+        m_spParser->ParseString(std::string("\x00", 1)), fly::ParserException);
     m_spParser->CompareParsed({0x00});
 
     EXPECT_THROW(
-        m_spParser->Parse(std::string("\x00\xEE", 2)), fly::ParserException);
+        m_spParser->ParseString(std::string("\x00\xEE", 2)),
+        fly::ParserException);
     m_spParser->CompareParsed({0x00, 0xEE});
 
     EXPECT_THROW(
-        m_spParser->Parse(std::string("\x00\x00", 2)), fly::ParserException);
+        m_spParser->ParseString(std::string("\x00\x00", 2)),
+        fly::ParserException);
     m_spParser->CompareParsed({0x00, 0x00});
 
     EXPECT_THROW(
-        m_spParser->Parse(std::string("\x00\x00\xEE", 3)),
+        m_spParser->ParseString(std::string("\x00\x00\xEE", 3)),
         fly::ParserException);
     m_spParser->CompareParsed({0x00, 0x00, 0xEE});
 
     EXPECT_THROW(
-        m_spParser->Parse(std::string("\x00\x00\xFE", 3)),
+        m_spParser->ParseString(std::string("\x00\x00\xFE", 3)),
         fly::ParserException);
     m_spParser->CompareParsed({0x00, 0x00, 0xFE});
 
     EXPECT_THROW(
-        m_spParser->Parse(std::string("\x00\x00\xFE\xEE", 4)),
+        m_spParser->ParseString(std::string("\x00\x00\xFE\xEE", 4)),
         fly::ParserException);
     m_spParser->CompareParsed({0x00, 0x00, 0xFE, 0xEE});
 
-    EXPECT_NO_THROW(m_spParser->Parse(std::string("\x00\x00\xFE\xFF", 4)));
+    EXPECT_NO_THROW(
+        m_spParser->ParseString(std::string("\x00\x00\xFE\xFF", 4)));
     m_spParser->CompareParsed({});
 }
 
 //==============================================================================
 TEST_F(ParserTest, Utf32LittleEndianByteOrderMarkTest)
 {
-    EXPECT_THROW(m_spParser->Parse("\xFF\xFE\xEE"), fly::ParserException);
+    EXPECT_THROW(m_spParser->ParseString("\xFF\xFE\xEE"), fly::ParserException);
     m_spParser->CompareParsed({0xEE}); // 0xFF 0xFE is parsed as UTF-16
 
     EXPECT_THROW(
-        m_spParser->Parse(std::string("\xFF\xFE\x00", 3)),
+        m_spParser->ParseString(std::string("\xFF\xFE\x00", 3)),
         fly::ParserException);
     m_spParser->CompareParsed({0x00}); // 0xFF 0xFE is parsed as UTF-16
 
     EXPECT_THROW(
-        m_spParser->Parse(std::string("\xFF\xFE\x00\xEE", 4)),
+        m_spParser->ParseString(std::string("\xFF\xFE\x00\xEE", 4)),
         fly::ParserException);
     m_spParser->CompareParsed({0x00, 0xEE}); // 0xFF 0xFE is parsed as UTF-16
 
-    EXPECT_NO_THROW(m_spParser->Parse(std::string("\xFF\xFE\x00\x00", 4)));
+    EXPECT_NO_THROW(
+        m_spParser->ParseString(std::string("\xFF\xFE\x00\x00", 4)));
     m_spParser->CompareParsed({});
 }

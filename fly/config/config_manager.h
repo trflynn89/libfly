@@ -5,6 +5,7 @@
 #include "fly/task/task.h"
 #include "fly/types/json.h"
 
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -48,14 +49,12 @@ public:
      *
      * @param TaskRunner Task runner for posting config-related tasks onto.
      * @param ConfigFileType File format of the configuration file.
-     * @param string Directory containing the configuration file.
-     * @param string Name of the configuration file.
+     * @param path Path to the configuration file.
      */
     ConfigManager(
         const std::shared_ptr<SequencedTaskRunner> &,
         ConfigFileType,
-        const std::string &,
-        const std::string &);
+        const std::filesystem::path &);
 
     /**
      * Destructor. Stop the configuration manager and underlying objects.
@@ -98,8 +97,7 @@ private:
     std::shared_ptr<Parser> m_spParser;
     Json m_values;
 
-    const std::string m_path;
-    const std::string m_file;
+    const std::filesystem::path m_path;
 
     std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
     std::shared_ptr<Task> m_spTask;

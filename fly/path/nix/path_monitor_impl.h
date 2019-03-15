@@ -5,8 +5,8 @@
 #include <sys/inotify.h>
 
 #include <chrono>
+#include <filesystem>
 #include <memory>
-#include <string>
 
 namespace fly {
 
@@ -52,7 +52,7 @@ protected:
     void Poll(const std::chrono::milliseconds &) override;
 
     std::shared_ptr<PathMonitor::PathInfo>
-    CreatePathInfo(const std::string &) const override;
+    CreatePathInfo(const std::filesystem::path &) const override;
 
 private:
     /**
@@ -62,7 +62,7 @@ private:
      */
     struct PathInfoImpl : PathMonitor::PathInfo
     {
-        PathInfoImpl(int, const std::string &);
+        PathInfoImpl(int, const std::filesystem::path &);
         ~PathInfoImpl() override;
 
         /**

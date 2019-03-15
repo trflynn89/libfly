@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <cstdarg>
+#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <mutex>
@@ -85,12 +86,12 @@ public:
      *
      * @param TaskRunner Task runner for posting logger-related tasks onto.
      * @param LoggerConfig Reference to logger configuration.
-     * @param string Path to store the log file.
+     * @param path Path to store the log file.
      */
     Logger(
         const std::shared_ptr<SequencedTaskRunner> &,
         const std::shared_ptr<LoggerConfig> &,
-        const std::string &);
+        const std::filesystem::path &);
 
     /**
      * Set the logger instance so that the LOG* macros function.
@@ -136,9 +137,9 @@ public:
     bool Start();
 
     /**
-     * @return string Path to the current log file.
+     * @return path Path to the current log file.
      */
-    std::string GetLogFilePath() const;
+    std::filesystem::path GetLogFilePath() const;
 
 private:
     /**
@@ -175,7 +176,6 @@ private:
     static std::weak_ptr<Logger> s_wpInstance;
     static std::mutex s_consoleMutex;
 
-    std::ofstream m_logFile;
     fly::ConcurrentQueue<Log> m_logQueue;
 
     std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
@@ -183,9 +183,9 @@ private:
 
     std::shared_ptr<LoggerConfig> m_spConfig;
 
-    const std::string m_filePath;
-    std::string m_fileName;
-    size_t m_fileSize;
+    const std::filesystem::path m_logDirectory;
+    std::filesystem::path m_logFile;
+    std::ofstream m_logStream;
 
     size_t m_index;
 

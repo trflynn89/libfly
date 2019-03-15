@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/fly.h"
 #include "fly/traits/traits.h"
 
 #include <sstream>
@@ -168,6 +169,18 @@ public:
      */
     template <typename... Args>
     static std::string Join(const char &, const Args &...);
+
+#if defined(FLY_WINDOWS)
+    /**
+     * Convert a wide string to an UTF-8 string.
+     * TODO Linux.
+     *
+     * @param wstring The wide string to convert.
+     *
+     * @return The resulting conversion of the given string.
+     */
+    static std::string FromWideString(const std::wstring &);
+#endif
 
     /**
      * Convert a string to a basic type, e.g. int or bool.

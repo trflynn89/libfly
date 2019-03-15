@@ -7,6 +7,7 @@
 #include "fly/path/path_monitor.h"
 #include "fly/task/task_runner.h"
 
+#include <filesystem>
 #include <functional>
 
 namespace fly {
@@ -15,10 +16,8 @@ namespace fly {
 ConfigManager::ConfigManager(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     ConfigFileType fileType,
-    const std::string &path,
-    const std::string &file) :
+    const std::filesystem::path &path) :
     m_path(path),
-    m_file(file),
     m_spTaskRunner(spTaskRunner)
 {
     switch (fileType)
@@ -44,7 +43,7 @@ ConfigManager::~ConfigManager()
 {
     if (m_spMonitor)
     {
-        m_spMonitor->RemoveFile(m_path, m_file);
+        m_spMonitor->RemoveFile(m_path);
     }
 }
 
@@ -88,8 +87,7 @@ bool ConfigManager::Start()
             // Formatter badly handles hanging indent in lambda parameters
             // clang-format off
             auto callback = [wpConfigManager, wpTask](
-                const std::string &,
-                const std::string &,
+                const std::filesystem::path &,
                 PathMonitor::PathEvent)
             {
                 auto spConfigManager = wpConfigManager.lock();
@@ -102,7 +100,7 @@ bool ConfigManager::Start()
             };
             // clang-format on
 
-            return m_spMonitor->AddFile(m_path, m_file, callback);
+            return m_spMonitor->AddFile(m_path, callback);
         }
     }
 
@@ -116,7 +114,7 @@ void ConfigManager::updateConfig()
 
     try
     {
-        m_values = m_spParser->Parse(m_path, m_file);
+        m_values = m_spParser->ParseFile(m_path);
     }
     catch (const ParserException &)
     {

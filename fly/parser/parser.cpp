@@ -1,14 +1,12 @@
 #include "fly/parser/parser.h"
 
-#include "fly/path/path.h"
-
 #include <fstream>
 #include <sstream>
 
 namespace fly {
 
 //==============================================================================
-Json Parser::Parse(const std::string &contents)
+Json Parser::ParseString(const std::string &contents)
 {
     std::istringstream stream(contents);
 
@@ -20,10 +18,9 @@ Json Parser::Parse(const std::string &contents)
 }
 
 //==============================================================================
-Json Parser::Parse(const std::string &path, const std::string &file)
+Json Parser::ParseFile(const std::filesystem::path &path)
 {
-    const std::string fullPath = Path::Join(path, file);
-    std::ifstream stream(fullPath, std::ios::in);
+    std::ifstream stream(path, std::ios::in);
 
     m_line = 1;
     m_column = 0;
