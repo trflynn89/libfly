@@ -4,8 +4,10 @@
 #include "fly/task/task_runner.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <system_error>
 
 namespace fly {
 
@@ -17,11 +19,10 @@ std::mutex Logger::s_consoleMutex;
 Logger::Logger(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     const std::shared_ptr<LoggerConfig> &spConfig,
-    const std::filesystem::path &filePath) :
+    const std::filesystem::path &loggerDirectory) :
     m_spTaskRunner(spTaskRunner),
     m_spConfig(spConfig),
-    m_filePath(filePath),
-    m_fileSize(0),
+    m_logDirectory(loggerDirectory),
     m_index(0),
     m_startTime(std::chrono::high_resolution_clock::now())
 {
@@ -95,7 +96,7 @@ bool Logger::Start()
 //==============================================================================
 std::filesystem::path Logger::GetLogFilePath() const
 {
-    return m_fileName;
+    return m_logFile;
 }
 
 //==============================================================================
@@ -103,20 +104,21 @@ bool Logger::poll()
 {
     Log log;
 
-    if (m_logQueue.Pop(log, m_spConfig->QueueWaitTime()) && m_logFile.good())
+    if (m_logQueue.Pop(log, m_spConfig->QueueWaitTime()) && m_logStream.good())
     {
         const std::string logStr = String::Format("%u\t%s", m_index++, log);
+        m_logStream << logStr << std::flush;
 
-        m_logFile << logStr << std::flush;
-        m_fileSize += logStr.size();
+        std::error_code error;
+        std::uintmax_t size = std::filesystem::file_size(m_logFile, error);
 
-        if (m_fileSize > m_spConfig->MaxLogFileSize())
+        if ((size == -1) || (size > m_spConfig->MaxLogFileSize()))
         {
             createLogFile();
         }
     }
 
-    return m_logFile.good();
+    return m_logStream.good();
 }
 
 //==============================================================================
@@ -157,18 +159,17 @@ bool Logger::createLogFile()
     String::ReplaceAll(timeStr, " ", "_");
 
     std::string fileName = String::Format("Log_%s_%s.log", timeStr, randStr);
-    m_fileName = m_filePath / fileName;
+    m_logFile = m_logDirectory / fileName;
 
-    if (m_logFile.is_open())
+    if (m_logStream.is_open())
     {
-        m_logFile.close();
+        m_logStream.close();
     }
 
-    LOGC("Creating logger file: %s", m_fileName);
-    m_logFile.open(m_fileName, std::ios::out);
-    m_fileSize = 0;
+    LOGC("Creating logger file: %s", m_logFile);
+    m_logStream.open(m_logFile, std::ios::out);
 
-    return m_logFile.good();
+    return m_logStream.good();
 }
 
 //==============================================================================

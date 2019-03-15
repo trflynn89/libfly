@@ -19,9 +19,10 @@ std::string LoggerConfig::GetName()
 }
 
 //==============================================================================
-size_t LoggerConfig::MaxLogFileSize() const
+std::uintmax_t LoggerConfig::MaxLogFileSize() const
 {
-    return GetValue<size_t>("max_log_file_size", m_defaultMaxLogFileSize);
+    return GetValue<std::uintmax_t>(
+        "max_log_file_size", m_defaultMaxLogFileSize);
 }
 
 //==============================================================================

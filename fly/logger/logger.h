@@ -176,7 +176,6 @@ private:
     static std::weak_ptr<Logger> s_wpInstance;
     static std::mutex s_consoleMutex;
 
-    std::ofstream m_logFile;
     fly::ConcurrentQueue<Log> m_logQueue;
 
     std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
@@ -184,9 +183,9 @@ private:
 
     std::shared_ptr<LoggerConfig> m_spConfig;
 
-    const std::filesystem::path m_filePath;
-    std::filesystem::path m_fileName;
-    size_t m_fileSize;
+    const std::filesystem::path m_logDirectory;
+    std::filesystem::path m_logFile;
+    std::ofstream m_logStream;
 
     size_t m_index;
 

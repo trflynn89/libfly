@@ -69,22 +69,22 @@ public:
     bool Start();
 
     /**
-     * Monitor for changes to all files under a path. Callbacks registered with
-     * AddFile take precendence over callbacks registered with AddPath.
+     * Monitor for changes to all files under a directory. Callbacks registered
+     * with AddFile take precendence over callbacks registered with AddPath.
      *
-     * @param path Path to start monitoring.
+     * @param path Path to the directory to start monitoring.
      * @param PathEventCallback Callback to trigger when a file changes.
      *
-     * @return bool True if the path could be added.
+     * @return bool True if the directory could be added.
      */
     bool AddPath(const std::filesystem::path &, PathEventCallback);
 
     /**
-     * Stop monitoring for changes to all files under a path.
+     * Stop monitoring for changes to all files under a directory.
      *
-     * @param path The path to stop monitoring.
+     * @param path Path to the directory to stop monitoring.
      *
-     * @return bool True if the path was removed.
+     * @return bool True if the directory was removed.
      */
     bool RemovePath(const std::filesystem::path &);
 
@@ -94,10 +94,10 @@ public:
     void RemoveAllPaths();
 
     /**
-     * Monitor for changes to a single file under a path. Callbacks registered
-     * with AddFile take precendence over callbacks registered with AddPath.
+     * Monitor for changes to a single file. Callbacks registered with AddFile
+     * take precendence over callbacks registered with AddPath.
      *
-     * @param path Path to start monitoring.
+     * @param path Path to the file to start monitoring.
      * @param PathEventCallback Callback to trigger when the file changes.
      *
      * @return bool True if the file could be added.
@@ -105,9 +105,11 @@ public:
     bool AddFile(const std::filesystem::path &, PathEventCallback);
 
     /**
-     * Stop monitoring for changes to a single file under a path.
+     * Stop monitoring for changes to a single file. If there are no more files
+     * monitored in the file's directory, and there is no callback registered
+     * for that directory, the directory itself is removed from the monitor.
      *
-     * @param path The path to stop monitoring.
+     * @param path Path to the file to stop monitoring.
      *
      * @return bool True if the file was removed.
      */

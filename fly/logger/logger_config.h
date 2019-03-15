@@ -3,6 +3,7 @@
 #include "fly/config/config.h"
 
 #include <chrono>
+#include <cstdint>
 #include <string>
 
 namespace fly {
@@ -29,7 +30,7 @@ public:
     /**
      * @return Max log file size (in bytes) before rotating the log file.
      */
-    size_t MaxLogFileSize() const;
+    std::uintmax_t MaxLogFileSize() const;
 
     /**
      * @return Max message size (in bytes) per log.
