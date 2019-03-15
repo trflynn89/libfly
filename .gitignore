@@ -23,7 +23,7 @@ libfly-*x64.zip
 *.gcov
 *.gcda
 *.gcno
-*.coverage
+*.info
 
 # Precompiled Headers
 *.gch
