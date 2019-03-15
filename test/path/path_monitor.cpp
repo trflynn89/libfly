@@ -203,6 +203,7 @@ TEST_F(PathMonitorTest, PathEventStreamTest)
 TEST_F(PathMonitorTest, NonExistingPathTest)
 {
     ASSERT_FALSE(m_spMonitor->AddPath(m_path0 / "_", m_callback));
+    ASSERT_FALSE(m_spMonitor->AddFile(m_path0 / "_" / "foo.txt", m_callback));
 }
 
 //==============================================================================
@@ -538,7 +539,7 @@ TEST_F(PathMonitorTest, MultipleFileTest)
 TEST_F(PathMonitorTest, RemoveTest)
 {
     // Test removing files and paths that were not being monitored
-    EXPECT_FALSE(m_spMonitor->RemoveFile(m_file1 / "was not"));
+    EXPECT_FALSE(m_spMonitor->RemoveFile(m_path1 / "was not"));
     EXPECT_FALSE(m_spMonitor->RemovePath(m_path1 / "monitoring"));
     EXPECT_FALSE(m_spMonitor->RemovePath("any of this"));
 
