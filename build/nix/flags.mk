@@ -12,7 +12,7 @@ LDFLAGS := -L$(LIB_DIR) -fuse-ld=gold
 LDLIBS :=
 
 # Compiler flags for both C and C++ files
-CF_ALL := -MMD -MP
+CF_ALL := -MMD -MP -fPIC
 CF_ALL += -Wall -Wextra -Werror
 CF_ALL += -I$(SOURCE_ROOT) -I$(GEN_DIR)
 
@@ -28,7 +28,7 @@ CF_ALL += -I$(SOURCE_ROOT)/test/googletest/googletest
 # debug builds - but only use address sanitizer on 64-bit builds:
 # https://github.com/google/sanitizers/issues/954
 ifeq ($(release), 1)
-    CF_ALL += -O2 -fPIC
+    CF_ALL += -O2
 else
     CF_ALL += -O0 -g --coverage
 
