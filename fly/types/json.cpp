@@ -127,7 +127,7 @@ Json::operator null_type() const
     }
     else
     {
-        throw JsonException(*this, "JSON is not null");
+        throw JsonException(*this, "JSON type is not null");
     }
 }
 
@@ -163,7 +163,7 @@ Json &Json::operator[](const typename object_type::key_type &key)
         return value[object_type::key_type(json)];
     }
 
-    throw JsonException(*this, "JSON invalid for operator[key]");
+    throw JsonException(*this, "JSON type invalid for operator[key]");
 }
 
 //==============================================================================
@@ -185,7 +185,7 @@ const Json &Json::operator[](const typename object_type::key_type &key) const
         return it->second;
     }
 
-    throw JsonException(*this, "JSON invalid for operator[key]");
+    throw JsonException(*this, "JSON type invalid for operator[key]");
 }
 
 //==============================================================================
@@ -208,7 +208,7 @@ Json &Json::operator[](const typename array_type::size_type &index)
         return value.at(index);
     }
 
-    throw JsonException(*this, "JSON invalid for operator[index]");
+    throw JsonException(*this, "JSON type invalid for operator[index]");
 }
 
 //==============================================================================
@@ -227,7 +227,7 @@ const Json &Json::operator[](const typename array_type::size_type &index) const
         return value.at(index);
     }
 
-    throw JsonException(*this, "JSON invalid for operator[index]");
+    throw JsonException(*this, "JSON type invalid for operator[index]");
 }
 
 //==============================================================================
@@ -382,8 +382,7 @@ void Json::readEscapedCharacter(
 {
     if (++it == end)
     {
-        throw JsonException(
-            nullptr, "Expected escaped character after reverse solidus");
+        throw JsonException("Expected escaped character after reverse solidus");
     }
 
     switch (*it)
@@ -419,10 +418,8 @@ void Json::readEscapedCharacter(
             break;
 
         default:
-            throw JsonException(
-                nullptr,
-                fly::String::Format(
-                    "Invalid escape character '%c' (%x)", *it, int(*it)));
+            throw JsonException(fly::String::Format(
+                "Invalid escape character '%c' (%x)", *it, int(*it)));
     }
 }
 
@@ -439,23 +436,20 @@ void Json::readUnicodeCharacter(
         return (c >= 0xdc00) && (c <= 0xdfff);
     };
 
-    const int highSurrogateCodepoint = readUnicodeCodepoint(it, end);
-    int codepoint = highSurrogateCodepoint;
+    const int highSurrogate = readUnicodeCodepoint(it, end);
+    int codepoint = highSurrogate;
 
-    if (is_high_surrogate(highSurrogateCodepoint))
+    if (is_high_surrogate(highSurrogate))
     {
         if (((++it == end) || (*it != '\\')) || ((++it == end) || (*it != 'u')))
         {
-            throw JsonException(
-                nullptr,
-                String::Format(
-                    "Expected to find \\u after high surrogate %x",
-                    highSurrogateCodepoint));
+            throw JsonException(String::Format(
+                "Expected \\u to follow high surrogate %x", highSurrogate));
         }
 
-        const int lowSurrogateCodepoint = readUnicodeCodepoint(it, end);
+        const int lowSurrogate = readUnicodeCodepoint(it, end);
 
-        if (is_low_surrogate(lowSurrogateCodepoint))
+        if (is_low_surrogate(lowSurrogate))
         {
             // The formula to convert a surrogate pair to a single
             // codepoint is:
@@ -464,28 +458,21 @@ void Json::readUnicodeCharacter(
             //
             // Multiplying by 0x400 (1024) is the same as bit-shifting
             // left by 10 bits. The formula then simplies to:
-            codepoint = (highSurrogateCodepoint << 10) + lowSurrogateCodepoint -
-                0x35fdc00;
+            codepoint = (highSurrogate << 10) + lowSurrogate - 0x35fdc00;
         }
         else
         {
-            throw JsonException(
-                nullptr,
-                String::Format(
-                    "Expected low surrogate to follow high surrogate "
-                    "%x, found "
-                    "%x",
-                    highSurrogateCodepoint,
-                    lowSurrogateCodepoint));
+            throw JsonException(String::Format(
+                "Expected low surrogate to follow high surrogate %x, found %x",
+                highSurrogate,
+                lowSurrogate));
         }
     }
-    else if (is_low_surrogate(highSurrogateCodepoint))
+    else if (is_low_surrogate(highSurrogate))
     {
-        throw JsonException(
-            nullptr,
-            String::Format(
-                "Expected high surrogate to preceed low surrogate %x",
-                highSurrogateCodepoint));
+        throw JsonException(String::Format(
+            "Expected high surrogate to preceed low surrogate %x",
+            highSurrogate));
     }
 
     if (codepoint < 0x80)
@@ -523,12 +510,8 @@ int Json::readUnicodeCodepoint(
     {
         if (++it == end)
         {
-            throw JsonException(
-                nullptr,
-                String::Format(
-                    "Expected exactly 4 hexadecimals after \\u, only "
-                    "found %d",
-                    i));
+            throw JsonException(String::Format(
+                "Expected exactly 4 hexadecimals after \\u, only found %d", i));
         }
 
         const int shift = (4 * (3 - i));
@@ -547,10 +530,8 @@ int Json::readUnicodeCodepoint(
         }
         else
         {
-            throw JsonException(
-                nullptr,
-                String::Format(
-                    "Expected '%c' (%x) to be a hexadecimal", *it, int(*it)));
+            throw JsonException(String::Format(
+                "Expected '%c' (%x) to be a hexadecimal", *it, int(*it)));
         }
     }
 
@@ -579,12 +560,8 @@ void Json::validateCharacter(
     };
 
     auto invalid = [&c](int location) {
-        throw JsonException(
-            nullptr,
-            fly::String::Format(
-                "Invalid control character '%x' (location %d)",
-                int(c),
-                location));
+        throw JsonException(fly::String::Format(
+            "Invalid control character '%x' (location %d)", int(c), location));
     };
 
     // Invalid control characters
@@ -711,6 +688,12 @@ void Json::validateCharacter(
     }
 
     stream << *it;
+}
+
+//==============================================================================
+JsonException::JsonException(const std::string &message) :
+    m_message(String::Format("JsonException: %s", message))
+{
 }
 
 //==============================================================================

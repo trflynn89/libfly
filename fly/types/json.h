@@ -580,6 +580,13 @@ public:
     /**
      * Constructor.
      *
+     * @param string Message indicating what error was encountered.
+     */
+    JsonException(const std::string &);
+
+    /**
+     * Constructor.
+     *
      * @param Json The Json instance for which the error was encountered.
      * @param string Message indicating what error was encountered.
      */
@@ -656,7 +663,7 @@ Json::operator T() const
         return t;
     }
 
-    throw JsonException(*this, "JSON is not an object");
+    throw JsonException(*this, "JSON type is not an object");
 }
 
 //==============================================================================
@@ -669,7 +676,7 @@ Json::operator T() const
         return T(value.begin(), value.end());
     }
 
-    throw JsonException(*this, "JSON is not an array");
+    throw JsonException(*this, "JSON type is not an array");
 }
 
 //==============================================================================
@@ -689,7 +696,7 @@ Json::operator std::array<T, N>() const
         return array;
     }
 
-    throw JsonException(*this, "JSON is not an array");
+    throw JsonException(*this, "JSON type is not an array");
 }
 
 //==============================================================================
@@ -748,7 +755,7 @@ Json::operator T() const
             return static_cast<T>(value);
         }
 
-        throw JsonException(*this, "JSON is not numeric");
+        throw JsonException(*this, "JSON type is not numeric");
     };
 
     return std::visit(visitor, m_value);
