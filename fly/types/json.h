@@ -63,27 +63,27 @@ public:
      * reasonable default types for now, and the Json class constructors allow
      * for type flexibility.
      */
+    using null_type = std::nullptr_t;
     using string_type = std::string;
     using object_type = std::map<string_type, Json>;
     using array_type = std::vector<Json>;
     using boolean_type = bool;
-    using signed_type = std::int64_t;
-    using unsigned_type = std::uint64_t;
+    using signed_type = std::intmax_t;
+    using unsigned_type = std::uintmax_t;
     using float_type = long double;
-    using null_type = std::nullptr_t;
 
     /**
-     * Also for the std::variant holding the above JSON types.
+     * Alias for the std::variant holding the above JSON types.
      */
     using json_type = std::variant<
+        null_type,
         string_type,
         object_type,
         array_type,
         boolean_type,
         signed_type,
         unsigned_type,
-        float_type,
-        null_type>;
+        float_type>;
 
     /**
      * Alias for a basic_stringstream with the JSON string type.
@@ -94,6 +94,13 @@ public:
      * Default constructor. Intializes the Json instance to a NULL value.
      */
     Json() noexcept;
+
+    /**
+     * Null constructor. Intializes the Json instance to a null value.
+     *
+     * @param null_type The null value.
+     */
+    Json(const null_type &) noexcept;
 
     /**
      * String constructor. Intializes the Json instance to a string value. The
@@ -183,13 +190,6 @@ public:
     Json(const T &) noexcept;
 
     /**
-     * Null constructor. Intializes the Json instance to a null value.
-     *
-     * @param null_type The null value.
-     */
-    Json(const null_type &) noexcept;
-
-    /**
      * Copy constructor. Intializes the Json instance with the type and value
      * of another Json instance. The other Json instance is set to a null value.
      *
@@ -217,6 +217,11 @@ public:
      * @param std::initializer_list The initializer list.
      */
     Json(const std::initializer_list<Json> &) noexcept;
+
+    /**
+     * @return bool True if the Json instance is null.
+     */
+    bool IsNull() const;
 
     /**
      * @return bool True if the Json instance is a string.
@@ -264,11 +269,6 @@ public:
     bool IsFloat() const;
 
     /**
-     * @return bool True if the Json instance is null.
-     */
-    bool IsNull() const;
-
-    /**
      * Assignment operator. Intializes the Json instance with the type and value
      * of another Json instance, using the copy-and-swap idiom.
      *
@@ -277,6 +277,15 @@ public:
      * @return Json A reference to this Json instance.
      */
     Json &operator=(Json) noexcept;
+
+    /**
+     * Null conversion operator. Converts the Json instance to a null type.
+     *
+     * @throws JsonException If the Json instance is not null.
+     *
+     * @return null_type The Json instance as a number.
+     */
+    explicit operator null_type() const;
 
     /**
      * String conversion operator. Converts the Json instance to a string. Note
@@ -366,15 +375,6 @@ public:
     explicit operator T() const;
 
     /**
-     * Null conversion operator. Converts the Json instance to a null type.
-     *
-     * @throws JsonException If the Json instance is not null.
-     *
-     * @return null_type The Json instance as a number.
-     */
-    explicit operator null_type() const;
-
-    /**
      * Object access operator.
      *
      * If the Json instance is an object, perform a lookup on the object with a
@@ -445,11 +445,11 @@ public:
      * If the Json instance is an object or array, return the number of elements
      * stored in the object or array.
      *
+     * If the Json instance is null, return 0.
+     *
      * If the Json instance is a string, return the length of the string.
      *
      * If the Json instance is a boolean or numeric, return 1.
-     *
-     * If the Json instance is null, return 0.
      *
      * @return size_t The size of the Json instance.
      */

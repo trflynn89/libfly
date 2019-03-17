@@ -7,7 +7,7 @@
 namespace fly {
 
 //==============================================================================
-Json::Json() noexcept : m_value(nullptr)
+Json::Json() noexcept : m_value()
 {
 }
 
@@ -28,8 +28,7 @@ Json::Json(Json &&json) noexcept : m_value(std::move(json.m_value))
 }
 
 //==============================================================================
-Json::Json(const std::initializer_list<Json> &initializer) noexcept :
-    m_value(nullptr)
+Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
 {
     auto is_object_like = [](const Json &json) { return json.IsObjectLike(); };
 
@@ -53,6 +52,12 @@ Json::Json(const std::initializer_list<Json> &initializer) noexcept :
             std::get<array_type>(m_value).push_back(std::move(*it));
         }
     }
+}
+
+//==============================================================================
+bool Json::IsNull() const
+{
+    return std::holds_alternative<null_type>(m_value);
 }
 
 //==============================================================================
@@ -107,16 +112,23 @@ bool Json::IsFloat() const
 }
 
 //==============================================================================
-bool Json::IsNull() const
-{
-    return std::holds_alternative<null_type>(m_value);
-}
-
-//==============================================================================
 Json &Json::operator=(Json json) noexcept
 {
     std::swap(m_value, json.m_value);
     return *this;
+}
+
+//==============================================================================
+Json::operator null_type() const
+{
+    if (IsNull())
+    {
+        return std::get<null_type>(m_value);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON is not null");
+    }
 }
 
 //==============================================================================
@@ -132,19 +144,6 @@ Json::operator string_type() const
         stream << *this;
 
         return stream.str();
-    }
-}
-
-//==============================================================================
-Json::operator null_type() const
-{
-    if (IsNull())
-    {
-        return std::get<null_type>(m_value);
-    }
-    else
-    {
-        throw JsonException(*this, "JSON is not null");
     }
 }
 
@@ -237,16 +236,16 @@ std::size_t Json::Size() const
     auto visitor = [](const auto &value) -> std::size_t {
         using U = std::decay_t<decltype(value)>;
 
-        if constexpr (
+        if constexpr (std::is_same_v<U, Json::null_type>)
+        {
+            return 0;
+        }
+        else if constexpr (
             std::is_same_v<U, Json::string_type> ||
             std::is_same_v<U, Json::object_type> ||
             std::is_same_v<U, Json::array_type>)
         {
             return value.size();
-        }
-        else if constexpr (std::is_same_v<U, Json::null_type>)
-        {
-            return 0;
         }
         else
         {
@@ -294,7 +293,11 @@ std::ostream &operator<<(std::ostream &stream, const Json &json)
     auto visitor = [&stream](const auto &value) {
         using U = std::decay_t<decltype(value)>;
 
-        if constexpr (std::is_same_v<U, Json::string_type>)
+        if constexpr (std::is_same_v<U, Json::null_type>)
+        {
+            stream << "null";
+        }
+        else if constexpr (std::is_same_v<U, Json::string_type>)
         {
             stream << '"' << value << '"';
         }
@@ -334,16 +337,9 @@ std::ostream &operator<<(std::ostream &stream, const Json &json)
         {
             stream << std::boolalpha << value;
         }
-        else if constexpr (
-            std::is_same_v<U, Json::signed_type> ||
-            std::is_same_v<U, Json::unsigned_type> ||
-            std::is_same_v<U, Json::float_type>)
-        {
-            stream << value;
-        }
         else
         {
-            stream << "null";
+            stream << value;
         }
     };
 
