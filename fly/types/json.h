@@ -652,15 +652,7 @@ Json::operator T() const
     if (IsObject())
     {
         const object_type &value = std::get<object_type>(m_value);
-        T t {};
-
-        for (const auto &kv : value)
-        {
-            t.insert({typename T::key_type(kv.first),
-                      typename T::mapped_type(kv.second)});
-        }
-
-        return t;
+        return T(value.begin(), value.end());
     }
 
     throw JsonException(*this, "JSON type is not an object");
