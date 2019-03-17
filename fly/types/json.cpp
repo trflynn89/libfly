@@ -28,7 +28,8 @@ Json::Json(Json &&json) noexcept : m_value(std::move(json.m_value))
 }
 
 //==============================================================================
-Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
+Json::Json(const std::initializer_list<Json> &initializer) noexcept :
+    m_value(nullptr)
 {
     auto is_object_like = [](const Json &json) { return json.IsObjectLike(); };
 
@@ -121,42 +122,30 @@ Json &Json::operator=(Json json) noexcept
 //==============================================================================
 Json::operator string_type() const
 {
-    auto visitor = [this](const auto &value) -> string_type {
-        using U = std::decay_t<decltype(value)>;
+    if (IsString())
+    {
+        return std::get<string_type>(m_value);
+    }
+    else
+    {
+        stream_type stream;
+        stream << *this;
 
-        if constexpr (std::is_same_v<U, Json::string_type>)
-        {
-            return value;
-        }
-        else
-        {
-            stream_type stream;
-            stream << *this;
-
-            return stream.str();
-        }
-    };
-
-    return std::visit(visitor, m_value);
+        return stream.str();
+    }
 }
 
 //==============================================================================
 Json::operator null_type() const
 {
-    auto visitor = [this](const auto &value) -> null_type {
-        using U = std::decay_t<decltype(value)>;
-
-        if constexpr (std::is_same_v<U, Json::null_type>)
-        {
-            return value;
-        }
-        else
-        {
-            throw JsonException(*this, "JSON is not null");
-        }
-    };
-
-    return std::visit(visitor, m_value);
+    if (IsNull())
+    {
+        return std::get<null_type>(m_value);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON is not null");
+    }
 }
 
 //==============================================================================
