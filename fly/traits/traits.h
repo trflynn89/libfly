@@ -79,11 +79,10 @@ struct if_string
     struct __
     {
         template <typename T>
-        using is_string = std::integral_constant<
-            bool,
+        using is_string = std::bool_constant<
             std::is_same<char *, std::decay_t<T>>::value ||
-                std::is_same<char const *, std::decay_t<T>>::value ||
-                std::is_same<std::string, std::decay_t<T>>::value>;
+            std::is_same<char const *, std::decay_t<T>>::value ||
+            std::is_same<std::string, std::decay_t<T>>::value>;
     };
 
     template <typename T>
@@ -101,11 +100,10 @@ struct if_signed_integer
     struct __
     {
         template <typename T>
-        using is_signed_integer = std::integral_constant<
-            bool,
+        using is_signed_integer = std::bool_constant<
             std::is_integral<std::decay_t<T>>::value &&
-                std::is_signed<std::decay_t<T>>::value &&
-                !std::is_same<bool, std::decay_t<T>>::value>;
+            std::is_signed<std::decay_t<T>>::value &&
+            !std::is_same<bool, std::decay_t<T>>::value>;
     };
 
     template <typename T>
@@ -123,11 +121,10 @@ struct if_unsigned_integer
     struct __
     {
         template <typename T>
-        using is_unsigned_integer = std::integral_constant<
-            bool,
+        using is_unsigned_integer = std::bool_constant<
             std::is_integral<std::decay_t<T>>::value &&
-                std::is_unsigned<std::decay_t<T>>::value &&
-                !std::is_same<bool, std::decay_t<T>>::value>;
+            std::is_unsigned<std::decay_t<T>>::value &&
+            !std::is_same<bool, std::decay_t<T>>::value>;
     };
 
     template <typename T>
@@ -145,9 +142,8 @@ struct if_floating_point
     struct __
     {
         template <typename T>
-        using is_floating_point = std::integral_constant<
-            bool,
-            std::is_floating_point<std::decay_t<T>>::value>;
+        using is_floating_point =
+            std::bool_constant<std::is_floating_point<std::decay_t<T>>::value>;
     };
 
     template <typename T>
@@ -165,10 +161,9 @@ struct if_numeric
     struct __
     {
         template <typename T>
-        using is_numeric = std::integral_constant<
-            bool,
+        using is_numeric = std::bool_constant<
             std::is_arithmetic<std::decay_t<T>>::value &&
-                !std::is_same<bool, std::decay_t<T>>::value>;
+            !std::is_same<bool, std::decay_t<T>>::value>;
     };
 
     template <typename T>
@@ -186,8 +181,8 @@ struct if_boolean
     struct __
     {
         template <typename T>
-        using is_boolean = std::
-            integral_constant<bool, std::is_same<bool, std::decay_t<T>>::value>;
+        using is_boolean =
+            std::bool_constant<std::is_same<bool, std::decay_t<T>>::value>;
     };
 
     template <typename T>
