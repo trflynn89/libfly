@@ -369,17 +369,27 @@ TEST_F(JsonTest, ObjectConversionTest)
     json = "abc";
     EXPECT_THROW((std::map<std::string, fly::Json>(json)), fly::JsonException);
 
-    std::map<std::string, int> map = {{"a", 1}, {"b", 2}};
+    std::map<std::string, int> map = {};
     std::multimap<std::string, int> multimap(map.begin(), map.end());
     json = map;
-    EXPECT_EQ((std::map<std::string, int>(json)), map);
-    EXPECT_EQ((std::multimap<std::string, int>(json)), multimap);
+    EXPECT_EQ(decltype(map)(json), map);
+    EXPECT_EQ(decltype(multimap)(json), multimap);
 
-    std::map<std::string, int> empty = {};
-    std::multimap<std::string, int> multiempty(empty.begin(), empty.end());
-    json = empty;
-    EXPECT_EQ((std::map<std::string, int>(json)), empty);
-    EXPECT_EQ((std::multimap<std::string, int>(json)), multiempty);
+    map = {{"a", 1}, {"b", 2}};
+    multimap = decltype(multimap)(map.begin(), map.end());
+    json = map;
+    EXPECT_EQ(decltype(map)(json), map);
+    EXPECT_EQ(decltype(multimap)(json), multimap);
+
+    std::unordered_map<std::string, int> umap(map.begin(), map.end());
+    json = umap;
+    EXPECT_EQ(decltype(map)(json), map);
+    EXPECT_EQ(decltype(umap)(json), umap);
+
+    std::unordered_multimap<std::string, int> umultimap(map.begin(), map.end());
+    json = umap;
+    EXPECT_EQ(decltype(map)(json), map);
+    EXPECT_EQ(decltype(umultimap)(json), umultimap);
 
     json = {'7', 8};
     EXPECT_THROW((std::map<std::string, fly::Json>(json)), fly::JsonException);

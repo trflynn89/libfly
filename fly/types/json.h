@@ -11,6 +11,8 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <type_traits>
+#include <variant>
 #include <vector>
 
 namespace fly {
@@ -61,14 +63,27 @@ public:
      * reasonable default types for now, and the Json class constructors allow
      * for type flexibility.
      */
+    using null_type = std::nullptr_t;
     using string_type = std::string;
     using object_type = std::map<string_type, Json>;
     using array_type = std::vector<Json>;
     using boolean_type = bool;
-    using signed_type = int64_t;
-    using unsigned_type = uint64_t;
+    using signed_type = std::intmax_t;
+    using unsigned_type = std::uintmax_t;
     using float_type = long double;
-    using null_type = std::nullptr_t;
+
+    /**
+     * Alias for the std::variant holding the above JSON types.
+     */
+    using json_type = std::variant<
+        null_type,
+        string_type,
+        object_type,
+        array_type,
+        boolean_type,
+        signed_type,
+        unsigned_type,
+        float_type>;
 
     /**
      * Alias for a basic_stringstream with the JSON string type.
@@ -79,6 +94,13 @@ public:
      * Default constructor. Intializes the Json instance to a NULL value.
      */
     Json() noexcept;
+
+    /**
+     * Null constructor. Intializes the Json instance to a null value.
+     *
+     * @param null_type The null value.
+     */
+    Json(const null_type &) noexcept;
 
     /**
      * String constructor. Intializes the Json instance to a string value. The
@@ -168,13 +190,6 @@ public:
     Json(const T &) noexcept;
 
     /**
-     * Null constructor. Intializes the Json instance to a null value.
-     *
-     * @param null_type The null value.
-     */
-    Json(const null_type &) noexcept;
-
-    /**
      * Copy constructor. Intializes the Json instance with the type and value
      * of another Json instance. The other Json instance is set to a null value.
      *
@@ -204,9 +219,9 @@ public:
     Json(const std::initializer_list<Json> &) noexcept;
 
     /**
-     * Destructor. Delete any memory allocated for the JSON value.
+     * @return bool True if the Json instance is null.
      */
-    ~Json() noexcept;
+    bool IsNull() const;
 
     /**
      * @return bool True if the Json instance is a string.
@@ -254,11 +269,6 @@ public:
     bool IsFloat() const;
 
     /**
-     * @return bool True if the Json instance is null.
-     */
-    bool IsNull() const;
-
-    /**
      * Assignment operator. Intializes the Json instance with the type and value
      * of another Json instance, using the copy-and-swap idiom.
      *
@@ -267,6 +277,15 @@ public:
      * @return Json A reference to this Json instance.
      */
     Json &operator=(Json) noexcept;
+
+    /**
+     * Null conversion operator. Converts the Json instance to a null type.
+     *
+     * @throws JsonException If the Json instance is not null.
+     *
+     * @return null_type The Json instance as a number.
+     */
+    explicit operator null_type() const;
 
     /**
      * String conversion operator. Converts the Json instance to a string. Note
@@ -356,15 +375,6 @@ public:
     explicit operator T() const;
 
     /**
-     * Null conversion operator. Converts the Json instance to a null type.
-     *
-     * @throws JsonException If the Json instance is not null.
-     *
-     * @return null_type The Json instance as a number.
-     */
-    explicit operator null_type() const;
-
-    /**
      * Object access operator.
      *
      * If the Json instance is an object, perform a lookup on the object with a
@@ -435,11 +445,11 @@ public:
      * If the Json instance is an object or array, return the number of elements
      * stored in the object or array.
      *
+     * If the Json instance is null, return 0.
+     *
      * If the Json instance is a string, return the length of the string.
      *
      * If the Json instance is a boolean or numeric, return 1.
-     *
-     * If the Json instance is null, return 0.
      *
      * @return size_t The size of the Json instance.
      */
@@ -451,7 +461,8 @@ public:
      *
      * 1. The two Json instances are of the same type and have the same value.
      * 2. The two Json instances are of a numeric type (signed, unsigned, or
-     *    float) and have the same value after converting to the same type.
+     *    float) and have the same value after converting the second Json value
+     *    to the same type as the first Json value.
      *
      * @return bool True if the two Json instances are equal.
      */
@@ -476,146 +487,6 @@ public:
     friend std::ostream &operator<<(std::ostream &, const Json &);
 
 private:
-    /**
-     * An enumerated list of possible JSON types.
-     */
-    enum class Type
-    {
-        Null,
-        String,
-        Object,
-        Array,
-        Boolean,
-        Signed,
-        Unsigned,
-        Float
-    };
-
-    /**
-     * A union to store the JSON value.
-     *
-     * Strings, objects, and arrays must be stored as dynamically allocated
-     * pointers to be allowed in the union. As such, callers must be sure to
-     * release the value by calling the Destroy() method. Hopefully this can be
-     * replaced with std::variant via C++17.
-     */
-    union Value
-    {
-        string_type *m_pString;
-        object_type *m_pObject;
-        array_type *m_pArray;
-        boolean_type m_boolean;
-        signed_type m_signed;
-        unsigned_type m_unsigned;
-        float_type m_float;
-        null_type m_null;
-
-        /**
-         * Default constructor. Intializes the Value instance to a null value.
-         */
-        Value() noexcept;
-
-        /**
-         * String constructor. Intializes the Value instance to a string value.
-         * The SFINAE declaration allows construction of a string value from any
-         * string-like type (e.g. std::string, char *).
-         *
-         * @tparam T The string-like type.
-         *
-         * @param T The string-like value.
-         */
-        template <typename T, fly::if_string::enabled<T> = 0>
-        Value(const T &) noexcept;
-
-        /**
-         * Object constructor. Intializes the Value instance to an object's
-         * values. The SFINAE declaration allows construction of an object value
-         * from any object-like type (e.g. std::map, std::multimap).
-         *
-         * @tparam T The object-like type.
-         *
-         * @param T The object-like value.
-         */
-        template <typename T, fly::if_map::enabled<T> = 0>
-        Value(const T &) noexcept;
-
-        /**
-         * Array constructor. Intializes the Value instance to an array's
-         * values. The SFINAE declaration allows construction of an array value
-         * from any array-like type (e.g. std::list, std::vector).
-         *
-         * @tparam T The array-like type.
-         *
-         * @param T The array value.
-         */
-        template <typename T, fly::if_array::enabled<T> = 0>
-        Value(const T &) noexcept;
-
-        /**
-         * Boolean constructor. Intializes the Value instance to a boolean
-         * value. The SFINAE declaration forbids construction of a boolean value
-         * from any non-boolean type (e.g. int could be implicitly cast to
-         * bool).
-         *
-         * @tparam T The boolean type.
-         *
-         * @param T The boolean value.
-         */
-        template <typename T, fly::if_boolean::enabled<T> = 0>
-        Value(const T &) noexcept;
-
-        /**
-         * Signed integer constructor. Intializes the Value instance to a signed
-         * integer value. The SFINAE declaration allows construction of a signed
-         * integer value from any signed type (e.g. char, int, int64_t).
-         *
-         * @tparam T The signed type.
-         *
-         * @param T The signed value.
-         */
-        template <typename T, fly::if_signed_integer::enabled<T> = 0>
-        Value(const T &) noexcept;
-
-        /**
-         * Unsigned integer constructor. Intializes the Json instance to an
-         * unsigned integer value. The SFINAE declaration allows construction of
-         * an unsigned integer value from any unsigned type (e.g. unsigned char,
-         * unsigned int, uint64_t).
-         *
-         * @tparam T The unsigned type.
-         *
-         * @param T The unsigned value.
-         */
-        template <typename T, fly::if_unsigned_integer::enabled<T> = 0>
-        Value(const T &) noexcept;
-
-        /**
-         * Floating point constructor. Intializes the Json instance to a
-         * floating point value. The SFINAE declaration allows construction of a
-         * floating value from any floating point type (e.g. float, double).
-         *
-         * @tparam T The floating point type.
-         *
-         * @param T The floating point value.
-         */
-        template <typename T, fly::if_floating_point::enabled<T> = 0>
-        Value(const T &) noexcept;
-
-        /**
-         * Null constructor. Intializes the Json instance to a null value.
-         *
-         * @param null_type The null value.
-         */
-        Value(const null_type &) noexcept;
-
-        /**
-         * Pseudo-destructor. The union cannot store its instantiated type, so
-         * callers must be sure to store it and call this method to release the
-         * instantiated value.
-         */
-        void Destroy(const Type &) noexcept;
-    };
-
     /**
      * Validate the string for compliance according to http://www.json.org.
      * Validation includes handling escaped and unicode characters.
@@ -693,13 +564,7 @@ private:
         string_type::const_iterator &,
         const string_type::const_iterator &) const;
 
-    /**
-     * Stream the name of a Json instance's type.
-     */
-    friend std::ostream &operator<<(std::ostream &, Type);
-
-    Type m_type;
-    Value m_value;
+    json_type m_value;
 };
 
 /**
@@ -712,6 +577,13 @@ private:
 class JsonException : public std::exception
 {
 public:
+    /**
+     * Constructor.
+     *
+     * @param string Message indicating what error was encountered.
+     */
+    JsonException(const std::string &);
+
     /**
      * Constructor.
      *
@@ -731,45 +603,45 @@ private:
 
 //==============================================================================
 template <typename T, fly::if_string::enabled<T>>
-Json::Json(const T &value) :
-    m_type(Type::String),
-    m_value(validateString(value))
+Json::Json(const T &value) : m_value(validateString(value))
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_map::enabled<T>>
-Json::Json(const T &value) noexcept : m_type(Type::Object), m_value(value)
+Json::Json(const T &value) noexcept :
+    m_value(object_type(value.begin(), value.end()))
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_array::enabled<T>>
-Json::Json(const T &value) noexcept : m_type(Type::Array), m_value(value)
+Json::Json(const T &value) noexcept :
+    m_value(array_type(value.begin(), value.end()))
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_boolean::enabled<T>>
-Json::Json(const T &value) noexcept : m_type(Type::Boolean), m_value(value)
+Json::Json(const T &value) noexcept : m_value(static_cast<boolean_type>(value))
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_signed_integer::enabled<T>>
-Json::Json(const T &value) noexcept : m_type(Type::Signed), m_value(value)
+Json::Json(const T &value) noexcept : m_value(static_cast<signed_type>(value))
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_unsigned_integer::enabled<T>>
-Json::Json(const T &value) noexcept : m_type(Type::Unsigned), m_value(value)
+Json::Json(const T &value) noexcept : m_value(static_cast<unsigned_type>(value))
 {
 }
 
 //==============================================================================
 template <typename T, fly::if_floating_point::enabled<T>>
-Json::Json(const T &value) noexcept : m_type(Type::Float), m_value(value)
+Json::Json(const T &value) noexcept : m_value(static_cast<float_type>(value))
 {
 }
 
@@ -779,19 +651,11 @@ Json::operator T() const
 {
     if (IsObject())
     {
-        T t {};
-
-        for (const auto &kv : *(m_value.m_pObject))
-        {
-            t.insert({typename T::key_type(kv.first),
-                      typename T::mapped_type(kv.second)});
-        }
-
-        return t;
+        const object_type &value = std::get<object_type>(m_value);
+        return T(value.begin(), value.end());
     }
 
-    throw JsonException(
-        *this, String::Format("Type %s is not an object", m_type));
+    throw JsonException(*this, "JSON type is not an object");
 }
 
 //==============================================================================
@@ -800,11 +664,11 @@ Json::operator T() const
 {
     if (IsArray())
     {
-        return T(m_value.m_pArray->begin(), m_value.m_pArray->end());
+        const array_type &value = std::get<array_type>(m_value);
+        return T(value.begin(), value.end());
     }
 
-    throw JsonException(
-        *this, String::Format("Type %s is not an array", m_type));
+    throw JsonException(*this, "JSON type is not an array");
 }
 
 //==============================================================================
@@ -813,129 +677,80 @@ Json::operator std::array<T, N>() const
 {
     if (IsArray())
     {
+        const array_type &value = std::get<array_type>(m_value);
         std::array<T, N> array {};
-        const std::size_t size = std::min(N, m_value.m_pArray->size());
 
-        for (std::size_t i = 0; i < size; ++i)
+        for (std::size_t i = 0; i < std::min(N, value.size()); ++i)
         {
-            array[i] = T(m_value.m_pArray->at(i));
+            array[i] = T(value.at(i));
         }
 
         return array;
     }
 
-    throw JsonException(
-        *this, String::Format("Type %s is not an array", m_type));
+    throw JsonException(*this, "JSON type is not an array");
 }
 
 //==============================================================================
 template <typename T, fly::if_boolean::enabled<T>>
 Json::operator T() const
 {
-    switch (m_type)
-    {
-        case Type::String:
-            return !(m_value.m_pString->empty());
+    auto visitor = [](const auto &value) -> T {
+        using U = std::decay_t<decltype(value)>;
 
-        case Type::Object:
-            return !(m_value.m_pObject->empty());
-
-        case Type::Array:
-            return !(m_value.m_pArray->empty());
-
-        case Type::Boolean:
-            return m_value.m_boolean;
-
-        case Type::Signed:
-            return (m_value.m_signed != 0);
-
-        case Type::Unsigned:
-            return (m_value.m_unsigned != 0);
-
-        case Type::Float:
-            return (m_value.m_float != 0.0);
-
-        default:
+        if constexpr (
+            std::is_same_v<U, Json::string_type> ||
+            std::is_same_v<U, Json::object_type> ||
+            std::is_same_v<U, Json::array_type>)
+        {
+            return !value.empty();
+        }
+        else if constexpr (
+            std::is_same_v<U, Json::boolean_type> ||
+            std::is_same_v<U, Json::signed_type> ||
+            std::is_same_v<U, Json::unsigned_type> ||
+            std::is_same_v<U, Json::float_type>)
+        {
+            return value != static_cast<U>(0);
+        }
+        else
+        {
             return false;
-    }
+        }
+    };
+
+    return std::visit(visitor, m_value);
 }
 
 //==============================================================================
 template <typename T, fly::if_numeric::enabled<T>>
 Json::operator T() const
 {
-    switch (m_type)
-    {
-        case Type::String:
+    auto visitor = [this](const auto &value) -> T {
+        using U = std::decay_t<decltype(value)>;
+
+        if constexpr (std::is_same_v<U, Json::string_type>)
+        {
             try
             {
-                return String::Convert<T>(*(m_value.m_pString));
+                return String::Convert<T>(value);
             }
             catch (...)
             {
             }
+        }
+        else if constexpr (
+            std::is_same_v<U, Json::signed_type> ||
+            std::is_same_v<U, Json::unsigned_type> ||
+            std::is_same_v<U, Json::float_type>)
+        {
+            return static_cast<T>(value);
+        }
 
-            break;
+        throw JsonException(*this, "JSON type is not numeric");
+    };
 
-        case Type::Signed:
-            return static_cast<T>(m_value.m_signed);
-
-        case Type::Unsigned:
-            return static_cast<T>(m_value.m_unsigned);
-
-        case Type::Float:
-            return static_cast<T>(m_value.m_float);
-
-        default:
-            break;
-    }
-
-    throw JsonException(
-        *this, String::Format("Type %s is not numeric", m_type));
-}
-
-//==============================================================================
-template <typename T, fly::if_string::enabled<T>>
-Json::Value::Value(const T &value) noexcept : m_pString(new string_type(value))
-{
-}
-
-//==============================================================================
-template <typename T, fly::if_map::enabled<T>>
-Json::Value::Value(const T &value) noexcept :
-    m_pObject(new object_type(value.begin(), value.end()))
-{
-}
-
-//==============================================================================
-template <typename T, fly::if_array::enabled<T>>
-Json::Value::Value(const T &value) noexcept :
-    m_pArray(new array_type(value.begin(), value.end()))
-{
-}
-
-//==============================================================================
-template <typename T, fly::if_boolean::enabled<T>>
-Json::Value::Value(const T &value) noexcept : m_boolean(value)
-{
-}
-
-//==============================================================================
-template <typename T, fly::if_signed_integer::enabled<T>>
-Json::Value::Value(const T &value) noexcept : m_signed(value)
-{
-}
-
-//==============================================================================
-template <typename T, fly::if_unsigned_integer::enabled<T>>
-Json::Value::Value(const T &value) noexcept : m_unsigned(value)
-{
-}
-
-//==============================================================================
-template <typename T, fly::if_floating_point::enabled<T>>
-Json::Value::Value(const T &value) noexcept : m_float(value)
-{
+    return std::visit(visitor, m_value);
 }
 
 } // namespace fly

@@ -7,160 +7,128 @@
 namespace fly {
 
 //==============================================================================
-Json::Json() noexcept : m_type(Type::Null), m_value()
+Json::Json() noexcept : m_value()
 {
 }
 
 //==============================================================================
-Json::Json(const null_type &value) noexcept : m_type(Type::Null), m_value(value)
+Json::Json(const null_type &value) noexcept : m_value(value)
 {
 }
 
 //==============================================================================
-Json::Json(const Json &json) noexcept : m_type(json.m_type), m_value()
+Json::Json(const Json &json) noexcept : m_value(json.m_value)
 {
-    switch (m_type)
-    {
-        case Type::String:
-            m_value = *(json.m_value.m_pString);
-            break;
-
-        case Type::Object:
-            m_value = *(json.m_value.m_pObject);
-            break;
-
-        case Type::Array:
-            m_value = *(json.m_value.m_pArray);
-            break;
-
-        case Type::Boolean:
-            m_value = json.m_value.m_boolean;
-            break;
-
-        case Type::Signed:
-            m_value = json.m_value.m_signed;
-            break;
-
-        case Type::Unsigned:
-            m_value = json.m_value.m_unsigned;
-            break;
-
-        case Type::Float:
-            m_value = json.m_value.m_float;
-            break;
-
-        case Type::Null:
-            break;
-    }
 }
 
 //==============================================================================
-Json::Json(Json &&json) noexcept :
-    m_type(std::move(json.m_type)),
-    m_value(std::move(json.m_value))
+Json::Json(Json &&json) noexcept : m_value(std::move(json.m_value))
 {
-    json.m_type = Type::Null;
     json.m_value = nullptr;
 }
 
 //==============================================================================
-Json::Json(const std::initializer_list<Json> &initializer) noexcept :
-    m_type(Type::Null),
-    m_value()
+Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
 {
     auto is_object_like = [](const Json &json) { return json.IsObjectLike(); };
 
     if (std::all_of(initializer.begin(), initializer.end(), is_object_like))
     {
-        m_type = Type::Object;
         m_value = object_type();
 
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
         {
-            m_value.m_pObject->emplace(
-                std::move(*((*it)[0].m_value.m_pString)), std::move((*it)[1]));
+            std::get<object_type>(m_value).emplace(
+                std::move(std::get<string_type>((*it)[0].m_value)),
+                std::move((*it)[1]));
         }
     }
     else
     {
-        m_type = Type::Array;
         m_value = array_type();
 
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
         {
-            m_value.m_pArray->push_back(std::move(*it));
+            std::get<array_type>(m_value).push_back(std::move(*it));
         }
     }
-}
-
-//==============================================================================
-Json::~Json() noexcept
-{
-    m_value.Destroy(m_type);
-}
-
-//==============================================================================
-bool Json::IsString() const
-{
-    return m_type == Type::String;
-}
-
-//==============================================================================
-bool Json::IsObject() const
-{
-    return m_type == Type::Object;
-}
-
-//==============================================================================
-bool Json::IsObjectLike() const
-{
-    return IsArray() && (m_value.m_pArray->size() == 2) &&
-        m_value.m_pArray->at(0).IsString();
-}
-
-//==============================================================================
-bool Json::IsArray() const
-{
-    return m_type == Type::Array;
-}
-
-//==============================================================================
-bool Json::IsBoolean() const
-{
-    return m_type == Type::Boolean;
-}
-
-//==============================================================================
-bool Json::IsSignedInteger() const
-{
-    return m_type == Type::Signed;
-}
-
-//==============================================================================
-bool Json::IsUnsignedInteger() const
-{
-    return m_type == Type::Unsigned;
-}
-
-//==============================================================================
-bool Json::IsFloat() const
-{
-    return m_type == Type::Float;
 }
 
 //==============================================================================
 bool Json::IsNull() const
 {
-    return m_type == Type::Null;
+    return std::holds_alternative<null_type>(m_value);
+}
+
+//==============================================================================
+bool Json::IsString() const
+{
+    return std::holds_alternative<string_type>(m_value);
+}
+
+//==============================================================================
+bool Json::IsObject() const
+{
+    return std::holds_alternative<object_type>(m_value);
+}
+
+//==============================================================================
+bool Json::IsObjectLike() const
+{
+    const array_type *value = std::get_if<array_type>(&m_value);
+
+    return (value != nullptr) && (value->size() == 2) &&
+        value->at(0).IsString();
+}
+
+//==============================================================================
+bool Json::IsArray() const
+{
+    return std::holds_alternative<array_type>(m_value);
+}
+
+//==============================================================================
+bool Json::IsBoolean() const
+{
+    return std::holds_alternative<boolean_type>(m_value);
+}
+
+//==============================================================================
+bool Json::IsSignedInteger() const
+{
+    return std::holds_alternative<signed_type>(m_value);
+}
+
+//==============================================================================
+bool Json::IsUnsignedInteger() const
+{
+    return std::holds_alternative<unsigned_type>(m_value);
+}
+
+//==============================================================================
+bool Json::IsFloat() const
+{
+    return std::holds_alternative<float_type>(m_value);
 }
 
 //==============================================================================
 Json &Json::operator=(Json json) noexcept
 {
-    std::swap(m_type, json.m_type);
     std::swap(m_value, json.m_value);
-
     return *this;
+}
+
+//==============================================================================
+Json::operator null_type() const
+{
+    if (IsNull())
+    {
+        return std::get<null_type>(m_value);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON type is not null");
+    }
 }
 
 //==============================================================================
@@ -168,7 +136,7 @@ Json::operator string_type() const
 {
     if (IsString())
     {
-        return *(m_value.m_pString);
+        return std::get<string_type>(m_value);
     }
     else
     {
@@ -180,33 +148,22 @@ Json::operator string_type() const
 }
 
 //==============================================================================
-Json::operator null_type() const
-{
-    if (IsNull())
-    {
-        return m_value.m_null;
-    }
-
-    throw JsonException(*this, String::Format("Type %s is not null", m_type));
-}
-
-//==============================================================================
 Json &Json::operator[](const typename object_type::key_type &key)
 {
     if (IsNull())
     {
-        m_type = Type::Object;
         m_value = object_type();
     }
 
     if (IsObject())
     {
         const Json json(key);
-        return (*(m_value.m_pObject))[object_type::key_type(json)];
+        object_type &value = std::get<object_type>(m_value);
+
+        return value[object_type::key_type(json)];
     }
 
-    throw JsonException(
-        *this, String::Format("Type %s invalid for operator[key]", m_type));
+    throw JsonException(*this, "JSON type invalid for operator[key]");
 }
 
 //==============================================================================
@@ -215,9 +172,11 @@ const Json &Json::operator[](const typename object_type::key_type &key) const
     if (IsObject())
     {
         const Json json(key);
-        auto it = m_value.m_pObject->find(object_type::key_type(json));
+        const object_type &value = std::get<object_type>(m_value);
 
-        if (it == m_value.m_pObject->end())
+        auto it = value.find(object_type::key_type(json));
+
+        if (it == value.end())
         {
             throw JsonException(
                 *this, String::Format("Given key (%s) not found", key));
@@ -226,8 +185,7 @@ const Json &Json::operator[](const typename object_type::key_type &key) const
         return it->second;
     }
 
-    throw JsonException(
-        *this, String::Format("Type %s invalid for operator[key]", m_type));
+    throw JsonException(*this, "JSON type invalid for operator[key]");
 }
 
 //==============================================================================
@@ -235,22 +193,22 @@ Json &Json::operator[](const typename array_type::size_type &index)
 {
     if (IsNull())
     {
-        m_type = Type::Array;
         m_value = array_type();
     }
 
     if (IsArray())
     {
-        if (index >= m_value.m_pArray->size())
+        array_type &value = std::get<array_type>(m_value);
+
+        if (index >= value.size())
         {
-            m_value.m_pArray->resize(index + 1);
+            value.resize(index + 1);
         }
 
-        return m_value.m_pArray->at(index);
+        return value.at(index);
     }
 
-    throw JsonException(
-        *this, String::Format("Type %s invalid for operator[index]", m_type));
+    throw JsonException(*this, "JSON type invalid for operator[index]");
 }
 
 //==============================================================================
@@ -258,124 +216,66 @@ const Json &Json::operator[](const typename array_type::size_type &index) const
 {
     if (IsArray())
     {
-        if (index >= m_value.m_pArray->size())
+        const array_type &value = std::get<array_type>(m_value);
+
+        if (index >= value.size())
         {
             throw JsonException(
                 *this, String::Format("Given index (%d) not found", index));
         }
 
-        return m_value.m_pArray->at(index);
+        return value.at(index);
     }
 
-    throw JsonException(
-        *this, String::Format("Type %s invalid for operator[index]", m_type));
+    throw JsonException(*this, "JSON type invalid for operator[index]");
 }
 
 //==============================================================================
 std::size_t Json::Size() const
 {
-    switch (m_type)
-    {
-        case Type::String:
-            return m_value.m_pString->size();
+    auto visitor = [](const auto &value) -> std::size_t {
+        using U = std::decay_t<decltype(value)>;
 
-        case Type::Object:
-            return m_value.m_pObject->size();
-
-        case Type::Array:
-            return m_value.m_pArray->size();
-
-        case Type::Null:
+        if constexpr (std::is_same_v<U, Json::null_type>)
+        {
             return 0;
-
-        default:
+        }
+        else if constexpr (
+            std::is_same_v<U, Json::string_type> ||
+            std::is_same_v<U, Json::object_type> ||
+            std::is_same_v<U, Json::array_type>)
+        {
+            return value.size();
+        }
+        else
+        {
             return 1;
-    }
+        }
+    };
+
+    return std::visit(visitor, m_value);
 }
 
 //==============================================================================
 bool operator==(const Json &json1, const Json &json2)
 {
-    const Json::Type type1 = json1.m_type;
-    const Json::Type type2 = json2.m_type;
+    auto is_numeric = [](const Json &json) {
+        return json.IsSignedInteger() || json.IsUnsignedInteger() ||
+            json.IsFloat();
+    };
 
-    // Both instances are the same type
-    if (type1 == type2)
+    if (json1.m_value.index() == json2.m_value.index())
     {
-        switch (type1)
-        {
-            case Json::Type::String:
-                return *(json1.m_value.m_pString) == *(json2.m_value.m_pString);
-
-            case Json::Type::Object:
-                return *(json1.m_value.m_pObject) == *(json2.m_value.m_pObject);
-
-            case Json::Type::Array:
-                return *(json1.m_value.m_pArray) == *(json2.m_value.m_pArray);
-
-            case Json::Type::Boolean:
-                return json1.m_value.m_boolean == json2.m_value.m_boolean;
-
-            case Json::Type::Signed:
-                return json1.m_value.m_signed == json2.m_value.m_signed;
-
-            case Json::Type::Unsigned:
-                return json1.m_value.m_unsigned == json2.m_value.m_unsigned;
-
-            case Json::Type::Float:
-                return json1.m_value.m_float == json2.m_value.m_float;
-
-            case Json::Type::Null:
-                return true;
-        }
+        return json1.m_value == json2.m_value;
     }
+    else if (is_numeric(json1) && is_numeric(json2))
+    {
+        auto visitor = [&json2](const auto &value) -> bool {
+            using U = std::decay_t<decltype(value)>;
+            return value == U(json2);
+        };
 
-    // One instance is a signed integer, other instance is an unsigned integer
-    else if (
-        (json1.m_type == Json::Type::Signed) &&
-        (json2.m_type == Json::Type::Unsigned))
-    {
-        auto value2 = static_cast<Json::signed_type>(json2.m_value.m_unsigned);
-        return json1.m_value.m_signed == value2;
-    }
-    else if (
-        (json1.m_type == Json::Type::Unsigned) &&
-        (json2.m_type == Json::Type::Signed))
-    {
-        auto value1 = static_cast<Json::signed_type>(json1.m_value.m_unsigned);
-        return value1 == json2.m_value.m_signed;
-    }
-
-    // One instance is a signed integer, other instance is a float
-    else if (
-        (json1.m_type == Json::Type::Signed) &&
-        (json2.m_type == Json::Type::Float))
-    {
-        auto value1 = static_cast<Json::float_type>(json1.m_value.m_signed);
-        return value1 == json2.m_value.m_float;
-    }
-    else if (
-        (json1.m_type == Json::Type::Float) &&
-        (json2.m_type == Json::Type::Signed))
-    {
-        auto value2 = static_cast<Json::float_type>(json2.m_value.m_signed);
-        return json1.m_value.m_float == value2;
-    }
-
-    // One instance is an unsigned integer, other instance is a float
-    else if (
-        (json1.m_type == Json::Type::Unsigned) &&
-        (json2.m_type == Json::Type::Float))
-    {
-        auto value1 = static_cast<Json::float_type>(json1.m_value.m_unsigned);
-        return value1 == json2.m_value.m_float;
-    }
-    else if (
-        (json1.m_type == Json::Type::Float) &&
-        (json2.m_type == Json::Type::Unsigned))
-    {
-        auto value2 = static_cast<Json::float_type>(json2.m_value.m_unsigned);
-        return json1.m_value.m_float == value2;
+        return std::visit(visitor, json1.m_value);
     }
 
     return false;
@@ -390,112 +290,60 @@ bool operator!=(const Json &json1, const Json &json2)
 //==============================================================================
 std::ostream &operator<<(std::ostream &stream, const Json &json)
 {
-    switch (json.m_type)
-    {
-        case Json::Type::String:
-            stream << '"' << *(json.m_value.m_pString) << '"';
-            break;
+    auto visitor = [&stream](const auto &value) {
+        using U = std::decay_t<decltype(value)>;
 
-        case Json::Type::Object:
+        if constexpr (std::is_same_v<U, Json::null_type>)
         {
-            const Json::object_type *pObject = json.m_value.m_pObject;
+            stream << "null";
+        }
+        else if constexpr (std::is_same_v<U, Json::string_type>)
+        {
+            stream << '"' << value << '"';
+        }
+        else if constexpr (std::is_same_v<U, Json::object_type>)
+        {
             stream << '{';
 
-            for (auto it = pObject->begin(); it != pObject->end();)
+            for (auto it = value.begin(); it != value.end();)
             {
                 stream << '"' << it->first << '"' << ':' << it->second;
 
-                if (++it != pObject->end())
+                if (++it != value.end())
                 {
                     stream << ',';
                 }
             }
 
             stream << '}';
-            break;
         }
-
-        case Json::Type::Array:
+        else if constexpr (std::is_same_v<U, Json::array_type>)
         {
-            const Json::array_type *pArray = json.m_value.m_pArray;
             stream << '[';
 
-            for (auto it = pArray->begin(); it != pArray->end();)
+            for (auto it = value.begin(); it != value.end();)
             {
                 stream << *it;
 
-                if (++it != pArray->end())
+                if (++it != value.end())
                 {
                     stream << ',';
                 }
             }
 
             stream << ']';
-            break;
         }
+        else if constexpr (std::is_same_v<U, Json::boolean_type>)
+        {
+            stream << std::boolalpha << value;
+        }
+        else
+        {
+            stream << value;
+        }
+    };
 
-        case Json::Type::Boolean:
-            stream << std::boolalpha << json.m_value.m_boolean;
-            break;
-
-        case Json::Type::Signed:
-            stream << json.m_value.m_signed;
-            break;
-
-        case Json::Type::Unsigned:
-            stream << json.m_value.m_unsigned;
-            break;
-
-        case Json::Type::Float:
-            stream << json.m_value.m_float;
-            break;
-
-        case Json::Type::Null:
-            stream << "null";
-            break;
-    }
-
-    return stream;
-}
-
-//==============================================================================
-std::ostream &operator<<(std::ostream &stream, Json::Type type)
-{
-    switch (type)
-    {
-        case Json::Type::String:
-            stream << "string";
-            break;
-
-        case Json::Type::Object:
-            stream << "object";
-            break;
-
-        case Json::Type::Array:
-            stream << "array";
-            break;
-
-        case Json::Type::Boolean:
-            stream << "boolean";
-            break;
-
-        case Json::Type::Signed:
-            stream << "signed";
-            break;
-
-        case Json::Type::Unsigned:
-            stream << "unsigned";
-            break;
-
-        case Json::Type::Float:
-            stream << "float";
-            break;
-
-        case Json::Type::Null:
-            stream << "null";
-            break;
-    }
-
+    std::visit(visitor, json.m_value);
     return stream;
 }
 
@@ -534,10 +382,7 @@ void Json::readEscapedCharacter(
 {
     if (++it == end)
     {
-        throw JsonException(
-            nullptr,
-            fly::String::Format(
-                "Expected escaped character after reverse solidus"));
+        throw JsonException("Expected escaped character after reverse solidus");
     }
 
     switch (*it)
@@ -573,10 +418,8 @@ void Json::readEscapedCharacter(
             break;
 
         default:
-            throw JsonException(
-                nullptr,
-                fly::String::Format(
-                    "Invalid escape character '%c' (%x)", *it, int(*it)));
+            throw JsonException(fly::String::Format(
+                "Invalid escape character '%c' (%x)", *it, int(*it)));
     }
 }
 
@@ -593,23 +436,20 @@ void Json::readUnicodeCharacter(
         return (c >= 0xdc00) && (c <= 0xdfff);
     };
 
-    const int highSurrogateCodepoint = readUnicodeCodepoint(it, end);
-    int codepoint = highSurrogateCodepoint;
+    const int highSurrogate = readUnicodeCodepoint(it, end);
+    int codepoint = highSurrogate;
 
-    if (is_high_surrogate(highSurrogateCodepoint))
+    if (is_high_surrogate(highSurrogate))
     {
         if (((++it == end) || (*it != '\\')) || ((++it == end) || (*it != 'u')))
         {
-            throw JsonException(
-                nullptr,
-                String::Format(
-                    "Expected to find \\u after high surrogate %x",
-                    highSurrogateCodepoint));
+            throw JsonException(String::Format(
+                "Expected \\u to follow high surrogate %x", highSurrogate));
         }
 
-        const int lowSurrogateCodepoint = readUnicodeCodepoint(it, end);
+        const int lowSurrogate = readUnicodeCodepoint(it, end);
 
-        if (is_low_surrogate(lowSurrogateCodepoint))
+        if (is_low_surrogate(lowSurrogate))
         {
             // The formula to convert a surrogate pair to a single
             // codepoint is:
@@ -618,28 +458,21 @@ void Json::readUnicodeCharacter(
             //
             // Multiplying by 0x400 (1024) is the same as bit-shifting
             // left by 10 bits. The formula then simplies to:
-            codepoint = (highSurrogateCodepoint << 10) + lowSurrogateCodepoint -
-                0x35fdc00;
+            codepoint = (highSurrogate << 10) + lowSurrogate - 0x35fdc00;
         }
         else
         {
-            throw JsonException(
-                nullptr,
-                String::Format(
-                    "Expected low surrogate to follow high surrogate "
-                    "%x, found "
-                    "%x",
-                    highSurrogateCodepoint,
-                    lowSurrogateCodepoint));
+            throw JsonException(String::Format(
+                "Expected low surrogate to follow high surrogate %x, found %x",
+                highSurrogate,
+                lowSurrogate));
         }
     }
-    else if (is_low_surrogate(highSurrogateCodepoint))
+    else if (is_low_surrogate(highSurrogate))
     {
-        throw JsonException(
-            nullptr,
-            String::Format(
-                "Expected high surrogate to preceed low surrogate %x",
-                highSurrogateCodepoint));
+        throw JsonException(String::Format(
+            "Expected high surrogate to preceed low surrogate %x",
+            highSurrogate));
     }
 
     if (codepoint < 0x80)
@@ -677,12 +510,8 @@ int Json::readUnicodeCodepoint(
     {
         if (++it == end)
         {
-            throw JsonException(
-                nullptr,
-                String::Format(
-                    "Expected exactly 4 hexadecimals after \\u, only "
-                    "found %d",
-                    i));
+            throw JsonException(String::Format(
+                "Expected exactly 4 hexadecimals after \\u, only found %d", i));
         }
 
         const int shift = (4 * (3 - i));
@@ -701,10 +530,8 @@ int Json::readUnicodeCodepoint(
         }
         else
         {
-            throw JsonException(
-                nullptr,
-                String::Format(
-                    "Expected '%c' (%x) to be a hexadecimal", *it, int(*it)));
+            throw JsonException(String::Format(
+                "Expected '%c' (%x) to be a hexadecimal", *it, int(*it)));
         }
     }
 
@@ -733,12 +560,8 @@ void Json::validateCharacter(
     };
 
     auto invalid = [&c](int location) {
-        throw JsonException(
-            nullptr,
-            fly::String::Format(
-                "Invalid control character '%x' (location %d)",
-                int(c),
-                location));
+        throw JsonException(fly::String::Format(
+            "Invalid control character '%x' (location %d)", int(c), location));
     };
 
     // Invalid control characters
@@ -868,35 +691,9 @@ void Json::validateCharacter(
 }
 
 //==============================================================================
-Json::Value::Value() noexcept : m_null(nullptr)
+JsonException::JsonException(const std::string &message) :
+    m_message(String::Format("JsonException: %s", message))
 {
-}
-
-//==============================================================================
-Json::Value::Value(const null_type &value) noexcept : m_null(value)
-{
-}
-
-//==============================================================================
-void Json::Value::Destroy(const Type &type) noexcept
-{
-    switch (type)
-    {
-        case Type::String:
-            delete m_pString;
-            break;
-
-        case Type::Object:
-            delete m_pObject;
-            break;
-
-        case Type::Array:
-            delete m_pArray;
-            break;
-
-        default:
-            break;
-    }
 }
 
 //==============================================================================
