@@ -202,7 +202,7 @@ TEST_F(ConcurrencyTest, InfiniteWaitReaderTest)
     std::future_status status = future.wait_for(std::chrono::milliseconds(10));
     ASSERT_EQ(status, std::future_status::timeout);
 
-    objectQueue.Push(Object(obj));
+    objectQueue.Push(std::move(Object(obj)));
 
     status = future.wait_for(std::chrono::milliseconds(10));
     ASSERT_EQ(status, std::future_status::ready);
