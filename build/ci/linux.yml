@@ -8,7 +8,7 @@ jobs:
     pool:
       vmImage: 'Ubuntu-16.04'
 
-    # Build image with: sudo docker build --tag "trflynn89/libfly:ubuntu18_gcc8"
+    # Build image with: docker build --tag "trflynn89/libfly:ubuntu18_gcc8"
     container:
       image: trflynn89/libfly:ubuntu18_gcc8
       options: --cap-add SYS_PTRACE
@@ -26,10 +26,13 @@ jobs:
           make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
         displayName: 'Test'
 
-      - template: coverage.yml
-        parameters:
-          build_path: 'build/nix'
-          gcov: '$GCOV'
+      - script: |
+          lcov --gcov-tool $GCOV --capture --directory build/nix --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/test/*' --output-file coverage.info
+          lcov --list coverage.info
+
+          bash <(curl -s https://codecov.io/bash) -f coverage.info
+        displayName: 'Coverage'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |
