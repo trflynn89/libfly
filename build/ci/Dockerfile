@@ -27,10 +27,10 @@ RUN apt-get update && \
     update-alternatives --install /usr/bin/gcov gcov /usr/bin/$GCOV 1 && \
     \
     # Replace LCOV with a more recent version that supports GCC 8
-    curl -L $LCOV -o lcov.tar.gz && \
-    tar -xf lcov.tar.gz && \
-    (tar -tf lcov.tar.gz | head -n1 | xargs -i mv {} lcov) && \
-    (find lcov/bin -type f ! -name "*.*" | xargs -i mv {} /usr/bin/) && \
+    (cd /tmp && curl -L $LCOV -o lcov.tar.gz) && \
+    (cd /tmp && tar -xf lcov.tar.gz) && \
+    (cd /tmp && tar -tf lcov.tar.gz | head -n1 | xargs -i mv {} lcov) && \
+    (cd /tmp && find lcov/bin -type f ! -name "*.*" | xargs -i mv {} /usr/bin/) && \
     \
     # Cleanup
     apt-get clean && \
