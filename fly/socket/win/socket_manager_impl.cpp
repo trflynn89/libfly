@@ -13,8 +13,8 @@ std::atomic_int SocketManagerImpl::s_socketManagerCount(0);
 //==============================================================================
 SocketManagerImpl::SocketManagerImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SocketConfig> &spConfig) :
-    SocketManager(spTaskRunner, spConfig) noexcept
+    const std::shared_ptr<SocketConfig> &spConfig) noexcept :
+    SocketManager(spTaskRunner, spConfig)
 {
     if (s_socketManagerCount.fetch_add(1) == 0)
     {
