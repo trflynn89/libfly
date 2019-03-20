@@ -19,12 +19,14 @@ jobs:
     - template: setup.yml
 
     - script: |
-        sudo apt-get install -y $CC $CXX
+        whoami
+        gcc --version
+        apt-get install -y $CC $CXX
       displayName: 'GCC'
 
     - ${{ if eq(parameters.arch, 'x86') }}:
       - script: |
-          sudo apt-get install -y $CC-multilib $CXX-multilib
+          apt-get install -y $CC-multilib $CXX-multilib
         displayName: 'GCC Multilib'
 
     - ${{ if eq(parameters.configuration, 'Debug') }}:
