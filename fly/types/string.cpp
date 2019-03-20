@@ -124,10 +124,7 @@ String::GenerateRandomString(const std::string::size_type len) noexcept
 
     for (std::string::size_type i = 0; i < len; ++i)
     {
-        auto d = distribution(engine);
-        if (len < 100)
-            std::cout << d << ' ' << s_alphaNum[d] << std::endl;
-        ret += s_alphaNum[d];
+        ret += s_alphaNum[distribution(engine)];
     }
 
     return ret;
