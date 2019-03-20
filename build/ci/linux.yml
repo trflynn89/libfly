@@ -4,37 +4,29 @@ parameters:
 
 jobs:
   - job: 'Linux_${{ parameters.configuration }}_${{ parameters.arch }}'
+
     pool:
       vmImage: 'Ubuntu-16.04'
 
-    variables:
-      CC: 'gcc-8'
-      CXX: 'g++-8'
-      GCOV: 'gcov-8'
+    container:
+      image: trflynn89/libfly:ubuntu18_gcc8
+      options: --cap-add SYS_PTRACE
 
     steps:
     - template: setup.yml
-
-    - script: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install -y $CC $CXX
-      displayName: 'GCC'
-
-    - ${{ if eq(parameters.arch, 'x86') }}:
-      - script: |
-          sudo apt-get install -y $CC-multilib $CXX-multilib
-        displayName: 'GCC Multilib'
 
     - ${{ if eq(parameters.configuration, 'Debug') }}:
       - script: |
           make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
         displayName: 'Test'
 
-      - template: coverage.yml
-        parameters:
-          build_path: 'build/nix'
-          gcov: '$GCOV'
+      - script: |
+          lcov --capture --directory build/nix --output-file coverage
+          lcov --remove coverage '/usr/*' '*/test/*' --output-file coverage
+          lcov --list coverage
+
+          bash <(curl -s https://codecov.io/bash) -f coverage
+        displayName: 'Coverage'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |

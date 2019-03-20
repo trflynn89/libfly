@@ -1,6 +1,5 @@
 parameters:
   contents: ''
-  release: ''
 
 steps:
 - task: CopyFiles@2
