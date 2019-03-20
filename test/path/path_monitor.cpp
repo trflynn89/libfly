@@ -33,7 +33,7 @@ std::chrono::seconds s_waitTime(5);
 class TestPathConfig : public fly::PathConfig
 {
 public:
-    TestPathConfig() : fly::PathConfig()
+    TestPathConfig() noexcept : fly::PathConfig()
     {
         m_defaultPollInterval = I64(10);
     }
@@ -45,7 +45,7 @@ public:
 class PathMonitorTest : public ::testing::Test
 {
 public:
-    PathMonitorTest() :
+    PathMonitorTest() noexcept :
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
         m_spTaskRunner(
@@ -75,7 +75,7 @@ public:
     /**
      * Create and start the task manager and path monitor.
      */
-    void SetUp() override
+    void SetUp() noexcept override
     {
         ASSERT_TRUE(std::filesystem::create_directories(m_path0));
         ASSERT_TRUE(std::filesystem::create_directories(m_path1));
@@ -96,7 +96,7 @@ public:
     /**
      * Stop the task manager and delete the created directory.
      */
-    void TearDown() override
+    void TearDown() noexcept override
     {
         ASSERT_TRUE(m_spTaskManager->Stop());
 
@@ -116,7 +116,7 @@ protected:
      */
     void HandleEvent(
         const std::filesystem::path &path,
-        fly::PathMonitor::PathEvent event)
+        fly::PathMonitor::PathEvent event) noexcept
     {
         switch (event)
         {
@@ -137,7 +137,7 @@ protected:
                 break;
         }
 
-        m_eventQueue.Push(event);
+        m_eventQueue.Push(std::move(event));
     }
 
     std::shared_ptr<fly::TaskManager> m_spTaskManager;
@@ -162,12 +162,6 @@ protected:
     std::map<std::filesystem::path, unsigned int> m_numChangedFiles;
     std::map<std::filesystem::path, unsigned int> m_numOtherEvents;
 };
-
-//==============================================================================
-TEST_F(PathMonitorTest, PathConfigTest)
-{
-    EXPECT_EQ(fly::PathConfig::GetName(), "path");
-}
 
 //==============================================================================
 TEST_F(PathMonitorTest, PathEventStreamTest)

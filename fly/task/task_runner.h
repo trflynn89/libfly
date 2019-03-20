@@ -40,7 +40,7 @@ public:
      *
      * @return bool True if the task was posted for execution.
      */
-    virtual bool PostTask(const std::weak_ptr<Task> &) = 0;
+    virtual bool PostTask(std::weak_ptr<Task>) noexcept = 0;
 
     /**
      * Schedule a task to be posted after a delay. The task is given to the
@@ -57,8 +57,9 @@ public:
      *
      * @return bool True if the task was posted for delayed execution.
      */
-    bool
-    PostTaskWithDelay(const std::weak_ptr<Task> &, std::chrono::milliseconds);
+    bool PostTaskWithDelay(
+        std::weak_ptr<Task>,
+        std::chrono::milliseconds) noexcept;
 
 protected:
     /**
@@ -67,7 +68,7 @@ protected:
      *
      * @param TaskManager Weak reference to the task manager.
      */
-    TaskRunner(const std::weak_ptr<TaskManager> &);
+    TaskRunner(std::weak_ptr<TaskManager>) noexcept;
 
     /**
      * Completion notification triggered by the task manager that a task has
@@ -75,7 +76,7 @@ protected:
      *
      * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    virtual void TaskComplete(const std::shared_ptr<Task> &) = 0;
+    virtual void TaskComplete(const std::shared_ptr<Task> &) noexcept = 0;
 
     /**
      * Forward a task to the task manager to be executed as soon as a worker
@@ -85,14 +86,14 @@ protected:
      *
      * @return bool True if the task was posted for execution.
      */
-    bool PostTaskToTaskManager(const std::weak_ptr<Task> &);
+    bool PostTaskToTaskManager(std::weak_ptr<Task>) noexcept;
 
 private:
     std::weak_ptr<TaskManager> m_wpTaskManager;
 };
 
 /**
- * Task runner implementation for executing a task in parallel. Tasks posted to
+ * Task runner implementation for executing tasks in parallel. Tasks posted to
  * this task runner may be executed in any order.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
@@ -103,21 +104,21 @@ class ParallelTaskRunner : public TaskRunner
     friend class TaskManager;
 
 public:
-    bool PostTask(const std::weak_ptr<Task> &) override;
+    bool PostTask(std::weak_ptr<Task>) noexcept override;
 
 protected:
-    ParallelTaskRunner(const std::weak_ptr<TaskManager> &);
+    ParallelTaskRunner(std::weak_ptr<TaskManager>) noexcept;
 
     /**
      * This implementation does nothing.
      *
      * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    void TaskComplete(const std::shared_ptr<Task> &) override;
+    void TaskComplete(const std::shared_ptr<Task> &) noexcept override;
 };
 
 /**
- * Task runner implementation for executing a task in sequence. Only one task
+ * Task runner implementation for executing tasks in sequence. Only one task
  * posted to this task runner will execute at a time. Tasks are executed in a
  * FIFO manner; once one task completes, the next task in line will be posted
  * for execution.
@@ -134,17 +135,17 @@ class SequencedTaskRunner : public TaskRunner
     friend class TaskManager;
 
 public:
-    bool PostTask(const std::weak_ptr<Task> &) override;
+    bool PostTask(std::weak_ptr<Task>) noexcept override;
 
 protected:
-    SequencedTaskRunner(const std::weak_ptr<TaskManager> &);
+    SequencedTaskRunner(std::weak_ptr<TaskManager>) noexcept;
 
     /**
      * When a task is complete, post the next task in the pending queue.
      *
      * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    void TaskComplete(const std::shared_ptr<Task> &) override;
+    void TaskComplete(const std::shared_ptr<Task> &) noexcept override;
 
 private:
     /**
@@ -154,7 +155,7 @@ private:
      * @return bool True if the task was posted for execution or added to the
      *              pending queue.
      */
-    bool maybePostTask();
+    bool maybePostTask() noexcept;
 
     ConcurrentQueue<std::weak_ptr<Task>> m_pendingTasks;
     std::atomic_bool m_aHasRunningTask;

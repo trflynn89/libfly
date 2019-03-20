@@ -16,17 +16,17 @@ namespace {
 class CountTask : public fly::Task
 {
 public:
-    CountTask() : m_count(0)
+    CountTask() noexcept : m_count(0)
     {
     }
 
-    int GetCount() const
+    int GetCount() const noexcept
     {
         return m_count.load();
     }
 
 protected:
-    void Run() override
+    void Run() noexcept override
     {
         ++m_count;
     }
@@ -39,16 +39,16 @@ private:
 class MarkerTask : public fly::Task
 {
 public:
-    MarkerTask(fly::ConcurrentQueue<int> *pOrdering, int marker) :
+    MarkerTask(fly::ConcurrentQueue<int> *pOrdering, int marker) noexcept :
         m_pOrdering(pOrdering),
         m_marker(marker)
     {
     }
 
 protected:
-    void Run() override
+    void Run() noexcept override
     {
-        m_pOrdering->Push(m_marker);
+        m_pOrdering->Push(std::move(m_marker));
     }
 
 private:
@@ -62,14 +62,14 @@ private:
 class TaskTest : public ::testing::Test
 {
 public:
-    TaskTest() : m_spTaskManager(std::make_shared<fly::TaskManager>(1))
+    TaskTest() noexcept : m_spTaskManager(std::make_shared<fly::TaskManager>(1))
     {
     }
 
     /**
      * Start the task manager.
      */
-    void SetUp() override
+    void SetUp() noexcept override
     {
         ASSERT_TRUE(m_spTaskManager->Start());
     }
@@ -77,7 +77,7 @@ public:
     /**
      * Stop the task manager.
      */
-    void TearDown() override
+    void TearDown() noexcept override
     {
         ASSERT_TRUE(m_spTaskManager->Stop());
     }

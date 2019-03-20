@@ -25,7 +25,7 @@ namespace {
 class TestLoggerConfig : public fly::LoggerConfig
 {
 public:
-    TestLoggerConfig() : fly::LoggerConfig()
+    TestLoggerConfig() noexcept : fly::LoggerConfig()
     {
         m_defaultMaxLogFileSize = 1 << 10;
     }
@@ -37,7 +37,7 @@ public:
 class LoggerTest : public ::testing::Test
 {
 public:
-    LoggerTest() :
+    LoggerTest() noexcept :
         m_path(fly::PathUtil::GenerateTempDirectory()),
 
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
@@ -58,7 +58,7 @@ public:
     /**
      * Create the file directory and start the task manager and logger.
      */
-    void SetUp() override
+    void SetUp() noexcept override
     {
         ASSERT_TRUE(std::filesystem::create_directories(m_path));
 
@@ -71,7 +71,7 @@ public:
     /**
      * Delete the created directory and stop the task manager.
      */
-    void TearDown() override
+    void TearDown() noexcept override
     {
         ASSERT_TRUE(m_spTaskManager->Stop());
 
@@ -89,7 +89,7 @@ protected:
      *
      * @return size_t Size of the log point.
      */
-    size_t LogSize(const std::string &message)
+    size_t LogSize(const std::string &message) noexcept
     {
         fly::Log log;
 
@@ -111,12 +111,6 @@ protected:
     std::shared_ptr<fly::LoggerConfig> m_spLoggerConfig;
     std::shared_ptr<fly::Logger> m_spLogger;
 };
-
-//==============================================================================
-TEST_F(LoggerTest, LoggerConfigTest)
-{
-    EXPECT_EQ(fly::LoggerConfig::GetName(), "logger");
-}
 
 //==============================================================================
 TEST_F(LoggerTest, FilePathTest)

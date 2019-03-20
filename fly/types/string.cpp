@@ -19,14 +19,15 @@ namespace {
 } // namespace
 
 //==============================================================================
-std::vector<std::string> String::Split(const std::string &input, char delim)
+std::vector<std::string>
+String::Split(const std::string &input, char delim) noexcept
 {
     return Split(input, delim, 0);
 }
 
 //==============================================================================
 std::vector<std::string>
-String::Split(const std::string &input, char delim, size_t max)
+String::Split(const std::string &input, char delim, size_t max) noexcept
 {
     std::string item;
     std::stringstream ss(input);
@@ -53,7 +54,7 @@ String::Split(const std::string &input, char delim, size_t max)
 }
 
 //==============================================================================
-void String::Trim(std::string &str)
+void String::Trim(std::string &str) noexcept
 {
     auto is_non_space = [](int ch) { return !std::isspace(ch); };
 
@@ -69,7 +70,7 @@ void String::Trim(std::string &str)
 void String::ReplaceAll(
     std::string &target,
     const std::string &search,
-    const char &replace)
+    const char &replace) noexcept
 {
     size_t pos = target.find(search);
 
@@ -84,7 +85,7 @@ void String::ReplaceAll(
 void String::ReplaceAll(
     std::string &target,
     const std::string &search,
-    const std::string &replace)
+    const std::string &replace) noexcept
 {
     size_t pos = target.find(search);
 
@@ -96,13 +97,13 @@ void String::ReplaceAll(
 }
 
 //==============================================================================
-void String::RemoveAll(std::string &target, const std::string &search)
+void String::RemoveAll(std::string &target, const std::string &search) noexcept
 {
     ReplaceAll(target, search, std::string());
 }
 
 //==============================================================================
-std::string String::GenerateRandomString(const size_t len)
+std::string String::GenerateRandomString(const size_t len) noexcept
 {
     typedef std::uniform_int_distribution<short> short_distribution;
 
@@ -127,7 +128,7 @@ std::string String::GenerateRandomString(const size_t len)
 }
 
 //==============================================================================
-bool String::StartsWith(const std::string &source, const char &search)
+bool String::StartsWith(const std::string &source, const char &search) noexcept
 {
     bool ret = false;
 
@@ -140,7 +141,9 @@ bool String::StartsWith(const std::string &source, const char &search)
 }
 
 //==============================================================================
-bool String::StartsWith(const std::string &source, const std::string &search)
+bool String::StartsWith(
+    const std::string &source,
+    const std::string &search) noexcept
 {
     bool ret = false;
 
@@ -156,7 +159,7 @@ bool String::StartsWith(const std::string &source, const std::string &search)
 }
 
 //==============================================================================
-bool String::EndsWith(const std::string &source, const char &search)
+bool String::EndsWith(const std::string &source, const char &search) noexcept
 {
     bool ret = false;
 
@@ -171,7 +174,9 @@ bool String::EndsWith(const std::string &source, const char &search)
 }
 
 //==============================================================================
-bool String::EndsWith(const std::string &source, const std::string &search)
+bool String::EndsWith(
+    const std::string &source,
+    const std::string &search) noexcept
 {
     bool ret = false;
 
@@ -187,7 +192,9 @@ bool String::EndsWith(const std::string &source, const std::string &search)
 }
 
 //==============================================================================
-bool String::WildcardMatch(const std::string &source, const std::string &search)
+bool String::WildcardMatch(
+    const std::string &source,
+    const std::string &search) noexcept
 {
     static const char wildcard = '*';
     bool ret = !search.empty();
@@ -222,14 +229,14 @@ bool String::WildcardMatch(const std::string &source, const std::string &search)
 
 //==============================================================================
 template <>
-std::string String::Convert(const std::string &value)
+std::string String::Convert(const std::string &value) noexcept
 {
     return value;
 }
 
 //==============================================================================
 template <>
-bool String::Convert(const std::string &value)
+bool String::Convert(const std::string &value) noexcept(false)
 {
     static const long long min = std::numeric_limits<bool>::min();
     static const long long max = std::numeric_limits<bool>::max();
@@ -251,7 +258,7 @@ bool String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-char String::Convert(const std::string &value)
+char String::Convert(const std::string &value) noexcept(false)
 {
     static const long long min = std::numeric_limits<char>::min();
     static const long long max = std::numeric_limits<char>::max();
@@ -273,7 +280,7 @@ char String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-unsigned char String::Convert(const std::string &value)
+unsigned char String::Convert(const std::string &value) noexcept(false)
 {
     static const long long min = std::numeric_limits<unsigned char>::min();
     static const long long max = std::numeric_limits<unsigned char>::max();
@@ -295,7 +302,7 @@ unsigned char String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-short String::Convert(const std::string &value)
+short String::Convert(const std::string &value) noexcept(false)
 {
     static const long long min = std::numeric_limits<short>::min();
     static const long long max = std::numeric_limits<short>::max();
@@ -317,7 +324,7 @@ short String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-unsigned short String::Convert(const std::string &value)
+unsigned short String::Convert(const std::string &value) noexcept(false)
 {
     static const long long min = std::numeric_limits<unsigned short>::min();
     static const long long max = std::numeric_limits<unsigned short>::max();
@@ -339,7 +346,7 @@ unsigned short String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-int String::Convert(const std::string &value)
+int String::Convert(const std::string &value) noexcept(false)
 {
     std::size_t index = 0;
     int result = std::stoi(value, &index);
@@ -354,7 +361,7 @@ int String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-unsigned int String::Convert(const std::string &value)
+unsigned int String::Convert(const std::string &value) noexcept(false)
 {
     static const long long min = std::numeric_limits<unsigned int>::min();
     static const long long max = std::numeric_limits<unsigned int>::max();
@@ -376,7 +383,7 @@ unsigned int String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-long String::Convert(const std::string &value)
+long String::Convert(const std::string &value) noexcept(false)
 {
     std::size_t index = 0;
     long result = std::stol(value, &index);
@@ -391,7 +398,7 @@ long String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-unsigned long String::Convert(const std::string &value)
+unsigned long String::Convert(const std::string &value) noexcept(false)
 {
     std::size_t index = 0;
     unsigned long result = std::stoul(value, &index);
@@ -406,7 +413,7 @@ unsigned long String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-long long String::Convert(const std::string &value)
+long long String::Convert(const std::string &value) noexcept(false)
 {
     std::size_t index = 0;
     long long result = std::stoll(value, &index);
@@ -421,7 +428,7 @@ long long String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-unsigned long long String::Convert(const std::string &value)
+unsigned long long String::Convert(const std::string &value) noexcept(false)
 {
     std::size_t index = 0;
     unsigned long long result = std::stoull(value, &index);
@@ -436,7 +443,7 @@ unsigned long long String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-float String::Convert(const std::string &value)
+float String::Convert(const std::string &value) noexcept(false)
 {
     std::size_t index = 0;
     float result = std::stof(value, &index);
@@ -451,7 +458,7 @@ float String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-double String::Convert(const std::string &value)
+double String::Convert(const std::string &value) noexcept(false)
 {
     std::size_t index = 0;
     double result = std::stod(value, &index);
@@ -466,7 +473,7 @@ double String::Convert(const std::string &value)
 
 //==============================================================================
 template <>
-long double String::Convert(const std::string &value)
+long double String::Convert(const std::string &value) noexcept(false)
 {
     std::size_t index = 0;
     long double result = std::stold(value, &index);
@@ -480,7 +487,7 @@ long double String::Convert(const std::string &value)
 }
 
 //==============================================================================
-void String::format(std::ostream &stream, const char *fmt)
+void String::format(std::ostream &stream, const char *fmt) noexcept
 {
     stream << fmt;
 }

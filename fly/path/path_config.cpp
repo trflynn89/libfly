@@ -5,18 +5,12 @@
 namespace fly {
 
 //==============================================================================
-PathConfig::PathConfig() : m_defaultPollInterval(I64(1000))
+PathConfig::PathConfig() noexcept : m_defaultPollInterval(I64(1000))
 {
 }
 
 //==============================================================================
-std::string PathConfig::GetName()
-{
-    return "path";
-}
-
-//==============================================================================
-std::chrono::milliseconds PathConfig::PollInterval() const
+std::chrono::milliseconds PathConfig::PollInterval() const noexcept
 {
     return std::chrono::milliseconds(GetValue<std::chrono::milliseconds::rep>(
         "poll_interval", m_defaultPollInterval));

@@ -15,23 +15,24 @@
 class JsonParserTest : public ::testing::Test
 {
 public:
-    JsonParserTest() : m_spParser(std::make_shared<fly::JsonParser>())
+    JsonParserTest() noexcept : m_spParser(std::make_shared<fly::JsonParser>())
     {
     }
 
 protected:
-    void ValidateFail(const std::string &test)
+    void ValidateFail(const std::string &test) noexcept
     {
         ValidateFailRaw(fly::String::Format("{ \"a\" : %s }", test));
     }
 
-    void ValidateFailRaw(const std::string &test)
+    void ValidateFailRaw(const std::string &test) noexcept
     {
         SCOPED_TRACE(test);
         EXPECT_THROW(m_spParser->ParseString(test), fly::ParserException);
     }
 
-    void ValidatePass(const std::string &test, const fly::Json &expected)
+    void
+    ValidatePass(const std::string &test, const fly::Json &expected) noexcept
     {
         ValidatePassRaw(
             fly::String::Format("{ \"a\" : %s }", test), "a", expected);
@@ -40,7 +41,7 @@ protected:
     void ValidatePassRaw(
         const std::string &test,
         const std::string &key,
-        const fly::Json &expected)
+        const fly::Json &expected) noexcept
     {
         fly::Json actual, repeat;
 

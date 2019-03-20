@@ -38,14 +38,14 @@ public:
      *
      * @param int Number of worker threads to create.
      */
-    TaskManager(int);
+    TaskManager(int) noexcept;
 
     /**
      * Create the worker threads and timer thread.
      *
      * @return bool True if the threads were created in this invocation.
      */
-    bool Start();
+    bool Start() noexcept;
 
     /**
      * Destroy the worker threads and timer thread, blocking until the threads
@@ -53,7 +53,7 @@ public:
      *
      * @return bool True if the threads were destroyed in this invocation.
      */
-    bool Stop();
+    bool Stop() noexcept;
 
     /**
      * Create a task runner, holding a weak reference to this task manager.
@@ -63,7 +63,7 @@ public:
      * @return SequencedTaskRunner The created task runner.
      */
     template <typename TaskRunnerType>
-    std::shared_ptr<TaskRunnerType> CreateTaskRunner();
+    std::shared_ptr<TaskRunnerType> CreateTaskRunner() noexcept;
 
 private:
     /**
@@ -83,8 +83,7 @@ private:
      * @param Task Weak reference to the task the be executed.
      * @param TaskRunner Weak reference to the task runner posting the task.
      */
-    void
-    postTask(const std::weak_ptr<Task> &, const std::weak_ptr<TaskRunner> &);
+    void postTask(std::weak_ptr<Task>, std::weak_ptr<TaskRunner>) noexcept;
 
     /**
      * Schedule a task to be posted for execution after some delay.
@@ -94,19 +93,19 @@ private:
      * @param milliseconds Delay before posting the task.
      */
     void postTaskWithDelay(
-        const std::weak_ptr<Task> &,
-        const std::weak_ptr<TaskRunner> &,
-        std::chrono::milliseconds);
+        std::weak_ptr<Task>,
+        std::weak_ptr<TaskRunner>,
+        std::chrono::milliseconds) noexcept;
 
     /**
      * Worker thread for executing tasks.
      */
-    void workerThread();
+    void workerThread() noexcept;
 
     /**
      * Timer thread for holding delayed tasks until their scheduled time.
      */
-    void timerThread();
+    void timerThread() noexcept;
 
     ConcurrentQueue<TaskHolder> m_tasks;
 
@@ -122,11 +121,9 @@ private:
 
 //==============================================================================
 template <typename TaskRunnerType>
-std::shared_ptr<TaskRunnerType> TaskManager::CreateTaskRunner()
+std::shared_ptr<TaskRunnerType> TaskManager::CreateTaskRunner() noexcept
 {
-    static_assert(
-        std::is_base_of<TaskRunner, TaskRunnerType>::value,
-        "Given type is not a task runner");
+    static_assert(std::is_base_of_v<TaskRunner, TaskRunnerType>);
 
     const std::shared_ptr<TaskManager> spTaskManager = shared_from_this();
     return std::shared_ptr<TaskRunnerType>(new TaskRunnerType(spTaskManager));

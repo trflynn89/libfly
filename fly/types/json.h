@@ -114,7 +114,7 @@ public:
      * @throws JsonException If the string-like value is not valid.
      */
     template <typename T, fly::if_string::enabled<T> = 0>
-    Json(const T &);
+    Json(const T &) noexcept(false);
 
     /**
      * Object constructor. Intializes the Json instance to an object's values.
@@ -221,17 +221,17 @@ public:
     /**
      * @return bool True if the Json instance is null.
      */
-    bool IsNull() const;
+    bool IsNull() const noexcept;
 
     /**
      * @return bool True if the Json instance is a string.
      */
-    bool IsString() const;
+    bool IsString() const noexcept;
 
     /**
      * @return bool True if the Json instance is an object.
      */
-    bool IsObject() const;
+    bool IsObject() const noexcept;
 
     /**
      * Determine if the Json instance is object-like. This is mostly useful for
@@ -241,32 +241,32 @@ public:
      *
      * @return bool True if the Json instance is object-like.
      */
-    bool IsObjectLike() const;
+    bool IsObjectLike() const noexcept;
 
     /**
      * @return bool True if the Json instance is an array.
      */
-    bool IsArray() const;
+    bool IsArray() const noexcept;
 
     /**
      * @return bool True if the Json instance is a boolean.
      */
-    bool IsBoolean() const;
+    bool IsBoolean() const noexcept;
 
     /**
      * @return bool True if the Json instance is a signed integer.
      */
-    bool IsSignedInteger() const;
+    bool IsSignedInteger() const noexcept;
 
     /**
      * @return bool True if the Json instance is an unsigned integer.
      */
-    bool IsUnsignedInteger() const;
+    bool IsUnsignedInteger() const noexcept;
 
     /**
      * @return bool True if the Json instance is a float.
      */
-    bool IsFloat() const;
+    bool IsFloat() const noexcept;
 
     /**
      * Assignment operator. Intializes the Json instance with the type and value
@@ -285,7 +285,7 @@ public:
      *
      * @return null_type The Json instance as a number.
      */
-    explicit operator null_type() const;
+    explicit operator null_type() const noexcept(false);
 
     /**
      * String conversion operator. Converts the Json instance to a string. Note
@@ -295,7 +295,7 @@ public:
      *
      * @return string_type The Json instance as a string.
      */
-    explicit operator string_type() const;
+    explicit operator string_type() const noexcept(false);
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The
@@ -309,7 +309,7 @@ public:
      * @return T The Json instance as the object-like type.
      */
     template <typename T, fly::if_map::enabled<T> = 0>
-    explicit operator T() const;
+    explicit operator T() const noexcept(false);
 
     /**
      * Array conversion operator. Converts the Json instance to an array. The
@@ -325,7 +325,7 @@ public:
      * @return T The Json instance as the array-like type.
      */
     template <typename T, fly::if_array::enabled<T> = 0>
-    explicit operator T() const;
+    explicit operator T() const noexcept(false);
 
     /**
      * Array conversion operator. Converts the Json instance to a std::array. If
@@ -341,7 +341,7 @@ public:
      * @return T The Json instance as a std::array.
      */
     template <typename T, std::size_t N>
-    explicit operator std::array<T, N>() const;
+    explicit operator std::array<T, N>() const noexcept(false);
 
     /**
      * Boolean conversion operator. Converts the Json instance to a boolean. For
@@ -355,7 +355,7 @@ public:
      * @param T The Json instance as a boolean.
      */
     template <typename T, fly::if_boolean::enabled<T> = 0>
-    explicit operator T() const;
+    explicit operator T() const noexcept(false);
 
     /**
      * Numeric conversion operator. Converts the Json instance to a numeric
@@ -372,7 +372,7 @@ public:
      * @return T The Json instance as the numeric type.
      */
     template <typename T, fly::if_numeric::enabled<T> = 0>
-    explicit operator T() const;
+    explicit operator T() const noexcept(false);
 
     /**
      * Object access operator.
@@ -390,7 +390,7 @@ public:
      *
      * @return Json A reference to the Json instance at the key value.
      */
-    Json &operator[](const typename object_type::key_type &);
+    Json &operator[](const typename object_type::key_type &) noexcept(false);
 
     /**
      * Object read-only access operator.
@@ -405,7 +405,8 @@ public:
      *
      * @return Json A reference to the Json instance at the key value.
      */
-    const Json &operator[](const typename object_type::key_type &) const;
+    const Json &operator[](const typename object_type::key_type &) const
+        noexcept(false);
 
     /**
      * Array access operator.
@@ -422,7 +423,7 @@ public:
      *
      * @return Json A reference to the Json instance at the index.
      */
-    Json &operator[](const typename array_type::size_type &);
+    Json &operator[](const typename array_type::size_type &) noexcept(false);
 
     /**
      * Array read-only access operator.
@@ -437,7 +438,8 @@ public:
      *
      * @return Json A reference to the Json instance at the index.
      */
-    const Json &operator[](const typename array_type::size_type &) const;
+    const Json &operator[](const typename array_type::size_type &) const
+        noexcept(false);
 
     /**
      * Get the size of the Json instance.
@@ -453,7 +455,7 @@ public:
      *
      * @return size_t The size of the Json instance.
      */
-    std::size_t Size() const;
+    std::size_t Size() const noexcept;
 
     /**
      * Equality operator. Compares two Json instances for equality. They are
@@ -466,7 +468,7 @@ public:
      *
      * @return bool True if the two Json instances are equal.
      */
-    friend bool operator==(const Json &, const Json &);
+    friend bool operator==(const Json &, const Json &) noexcept;
 
     /**
      * Unequality operator. Compares two Json instances for unequality. They are
@@ -474,7 +476,7 @@ public:
      *
      * @return bool True if the two Json instances are unequal.
      */
-    friend bool operator!=(const Json &, const Json &);
+    friend bool operator!=(const Json &, const Json &) noexcept;
 
     /**
      * Stream operator. Stream the Json instance into an output stream.
@@ -484,7 +486,7 @@ public:
      *
      * @return ostream A reference to the output stream.
      */
-    friend std::ostream &operator<<(std::ostream &, const Json &);
+    friend std::ostream &operator<<(std::ostream &, const Json &) noexcept;
 
 private:
     /**
@@ -498,7 +500,7 @@ private:
      *
      * @throws JsonException If the string value is not valid.
      */
-    string_type validateString(const string_type &) const;
+    string_type validateString(const string_type &) const noexcept(false);
 
     /**
      * After reading a reverse solidus character, read the escaped character
@@ -515,7 +517,7 @@ private:
     void readEscapedCharacter(
         stream_type &,
         string_type::const_iterator &,
-        const string_type::const_iterator &) const;
+        const string_type::const_iterator &) const noexcept(false);
 
     /**
      * After determining the escaped character is a unicode encoding, read the
@@ -533,7 +535,7 @@ private:
     void readUnicodeCharacter(
         stream_type &,
         string_type::const_iterator &,
-        const string_type::const_iterator &) const;
+        const string_type::const_iterator &) const noexcept(false);
 
     /**
      * Read a single 4-byte unicode encoding.
@@ -548,7 +550,7 @@ private:
      */
     int readUnicodeCodepoint(
         string_type::const_iterator &,
-        const string_type::const_iterator &) const;
+        const string_type::const_iterator &) const noexcept(false);
 
     /**
      * Validate a single non-escaped character is compliant.
@@ -562,7 +564,7 @@ private:
     void validateCharacter(
         stream_type &,
         string_type::const_iterator &,
-        const string_type::const_iterator &) const;
+        const string_type::const_iterator &) const noexcept(false);
 
     json_type m_value;
 };
@@ -582,7 +584,7 @@ public:
      *
      * @param string Message indicating what error was encountered.
      */
-    JsonException(const std::string &);
+    JsonException(const std::string &) noexcept;
 
     /**
      * Constructor.
@@ -590,7 +592,7 @@ public:
      * @param Json The Json instance for which the error was encountered.
      * @param string Message indicating what error was encountered.
      */
-    JsonException(const Json &, const std::string &);
+    JsonException(const Json &, const std::string &) noexcept;
 
     /**
      * @return A C-string representing this exception.
@@ -603,7 +605,7 @@ private:
 
 //==============================================================================
 template <typename T, fly::if_string::enabled<T>>
-Json::Json(const T &value) : m_value(validateString(value))
+Json::Json(const T &value) noexcept(false) : m_value(validateString(value))
 {
 }
 
@@ -647,7 +649,7 @@ Json::Json(const T &value) noexcept : m_value(static_cast<float_type>(value))
 
 //==============================================================================
 template <typename T, fly::if_map::enabled<T>>
-Json::operator T() const
+Json::operator T() const noexcept(false)
 {
     if (IsObject())
     {
@@ -660,7 +662,7 @@ Json::operator T() const
 
 //==============================================================================
 template <typename T, fly::if_array::enabled<T>>
-Json::operator T() const
+Json::operator T() const noexcept(false)
 {
     if (IsArray())
     {
@@ -673,7 +675,7 @@ Json::operator T() const
 
 //==============================================================================
 template <typename T, std::size_t N>
-Json::operator std::array<T, N>() const
+Json::operator std::array<T, N>() const noexcept(false)
 {
     if (IsArray())
     {
@@ -693,7 +695,7 @@ Json::operator std::array<T, N>() const
 
 //==============================================================================
 template <typename T, fly::if_boolean::enabled<T>>
-Json::operator T() const
+Json::operator T() const noexcept(false)
 {
     auto visitor = [](const auto &value) -> T {
         using U = std::decay_t<decltype(value)>;
@@ -724,7 +726,7 @@ Json::operator T() const
 
 //==============================================================================
 template <typename T, fly::if_numeric::enabled<T>>
-Json::operator T() const
+Json::operator T() const noexcept(false)
 {
     auto visitor = [this](const auto &value) -> T {
         using U = std::decay_t<decltype(value)>;

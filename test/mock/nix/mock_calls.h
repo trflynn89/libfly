@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <iostream>
 #include <string>
 
@@ -8,7 +9,7 @@ namespace fly {
 /**
  * Enumerated list of mocked system calls.
  */
-enum class MockCall : unsigned int
+enum class MockCall : std::uint8_t
 {
     Accept,
     Bind,

@@ -15,14 +15,14 @@ namespace {
 } // namespace
 
 //==============================================================================
-TaskManager::TaskManager(int numWorkers) :
+TaskManager::TaskManager(int numWorkers) noexcept :
     m_aKeepRunning(false),
     m_numWorkers(numWorkers)
 {
 }
 
 //==============================================================================
-bool TaskManager::Start()
+bool TaskManager::Start() noexcept
 {
     bool expected = false;
 
@@ -47,7 +47,7 @@ bool TaskManager::Start()
 }
 
 //==============================================================================
-bool TaskManager::Stop()
+bool TaskManager::Stop() noexcept
 {
     bool expected = true;
 
@@ -71,28 +71,28 @@ bool TaskManager::Stop()
 
 //==============================================================================
 void TaskManager::postTask(
-    const std::weak_ptr<Task> &wpTask,
-    const std::weak_ptr<TaskRunner> &wpTaskRunner)
+    std::weak_ptr<Task> wpTask,
+    std::weak_ptr<TaskRunner> wpTaskRunner) noexcept
 {
     TaskHolder task {wpTask, wpTaskRunner, std::chrono::steady_clock::now()};
-    m_tasks.Push(task);
+    m_tasks.Push(std::move(task));
 }
 
 //==============================================================================
 void TaskManager::postTaskWithDelay(
-    const std::weak_ptr<Task> &wpTask,
-    const std::weak_ptr<TaskRunner> &wpTaskRunner,
-    std::chrono::milliseconds delay)
+    std::weak_ptr<Task> wpTask,
+    std::weak_ptr<TaskRunner> wpTaskRunner,
+    std::chrono::milliseconds delay) noexcept
 {
     auto schedule = std::chrono::steady_clock::now() + delay;
     TaskHolder task {wpTask, wpTaskRunner, schedule};
 
     std::unique_lock<std::mutex> lock(m_delayedTasksMutex);
-    m_delayedTasks.push_back(task);
+    m_delayedTasks.push_back(std::move(task));
 }
 
 //==============================================================================
-void TaskManager::workerThread()
+void TaskManager::workerThread() noexcept
 {
     TaskHolder task;
 
@@ -117,7 +117,7 @@ void TaskManager::workerThread()
 }
 
 //==============================================================================
-void TaskManager::timerThread()
+void TaskManager::timerThread() noexcept
 {
     while (m_aKeepRunning.load())
     {

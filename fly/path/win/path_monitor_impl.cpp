@@ -31,7 +31,7 @@ namespace {
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<PathConfig> &spConfig) :
+    const std::shared_ptr<PathConfig> &spConfig) noexcept :
     PathMonitor(spTaskRunner, spConfig),
     m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
 {
@@ -52,13 +52,13 @@ PathMonitorImpl::~PathMonitorImpl()
 }
 
 //==============================================================================
-bool PathMonitorImpl::IsValid() const
+bool PathMonitorImpl::IsValid() const noexcept
 {
     return m_iocp != NULL;
 }
 
 //==============================================================================
-void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
+void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout) noexcept
 {
     DWORD bytes = 0;
     ULONG_PTR pKey = NULL;
@@ -101,6 +101,7 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout)
 //==============================================================================
 std::shared_ptr<PathMonitor::PathInfo>
 PathMonitorImpl::CreatePathInfo(const std::filesystem::path &path) const
+    noexcept
 {
     std::shared_ptr<PathMonitor::PathInfo> spInfo;
 
@@ -115,7 +116,7 @@ PathMonitorImpl::CreatePathInfo(const std::filesystem::path &path) const
 //==============================================================================
 void PathMonitorImpl::handleEvents(
     const std::shared_ptr<PathInfoImpl> &spInfo,
-    const std::filesystem::path &path) const
+    const std::filesystem::path &path) const noexcept
 {
     PFILE_NOTIFY_INFORMATION pInfo = spInfo->m_pInfo;
 
@@ -159,6 +160,7 @@ void PathMonitorImpl::handleEvents(
 
 //==============================================================================
 PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
+    noexcept
 {
     PathMonitor::PathEvent event = PathMonitor::PathEvent::None;
 
@@ -188,7 +190,7 @@ PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
 //==============================================================================
 PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     HANDLE iocp,
-    const std::filesystem::path &path) :
+    const std::filesystem::path &path) noexcept :
     PathMonitorImpl::PathInfo(),
     m_valid(false),
     m_handle(INVALID_HANDLE_VALUE),
@@ -241,13 +243,14 @@ PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 }
 
 //==============================================================================
-bool PathMonitorImpl::PathInfoImpl::IsValid() const
+bool PathMonitorImpl::PathInfoImpl::IsValid() const noexcept
 {
     return m_valid && (m_handle != INVALID_HANDLE_VALUE);
 }
 
 //==============================================================================
-bool PathMonitorImpl::PathInfoImpl::Refresh(const std::filesystem::path &path)
+bool PathMonitorImpl::PathInfoImpl::Refresh(
+    const std::filesystem::path &path) noexcept
 {
     static const DWORD size = (s_buffSize * sizeof(FILE_NOTIFY_INFORMATION));
     DWORD bytes = 0;

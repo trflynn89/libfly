@@ -29,7 +29,7 @@ namespace {
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SystemConfig> &spConfig) :
+    const std::shared_ptr<SystemConfig> &spConfig) noexcept :
     SystemMonitor(spTaskRunner, spConfig),
     m_prevSystemUserTime(0),
     m_prevSystemNiceTime(0),
@@ -43,7 +43,7 @@ SystemMonitorImpl::SystemMonitorImpl(
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemCpuCount()
+void SystemMonitorImpl::UpdateSystemCpuCount() noexcept
 {
     std::ifstream stream(s_procStatFile, std::ios::in);
     std::string contents, line;
@@ -74,7 +74,7 @@ void SystemMonitorImpl::UpdateSystemCpuCount()
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemCpuUsage()
+void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
 {
     std::ifstream stream(s_procStatFile, std::ios::in);
     std::string line;
@@ -112,7 +112,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateProcessCpuUsage()
+void SystemMonitorImpl::UpdateProcessCpuUsage() noexcept
 {
     struct tms sample;
     clock_t now = ::times(&sample);
@@ -140,7 +140,7 @@ void SystemMonitorImpl::UpdateProcessCpuUsage()
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemMemoryUsage()
+void SystemMonitorImpl::UpdateSystemMemoryUsage() noexcept
 {
     struct sysinfo info;
 
@@ -159,7 +159,7 @@ void SystemMonitorImpl::UpdateSystemMemoryUsage()
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateProcessMemoryUsage()
+void SystemMonitorImpl::UpdateProcessMemoryUsage() noexcept
 {
     std::ifstream stream(s_selfStatusFile, std::ios::in);
     std::string contents, line;

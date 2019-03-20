@@ -17,7 +17,8 @@ namespace fly {
 
 namespace {
 
-    struct sockaddr_in CreateSocketAddress(address_type address, port_type port)
+    struct sockaddr_in
+    CreateSocketAddress(address_type address, port_type port) noexcept
     {
         struct sockaddr_in socketAddress;
         memset(&socketAddress, 0, sizeof(socketAddress));
@@ -34,7 +35,7 @@ namespace {
 //==============================================================================
 SocketImpl::SocketImpl(
     Protocol protocol,
-    const std::shared_ptr<SocketConfig> &spConfig) :
+    const std::shared_ptr<SocketConfig> &spConfig) noexcept :
     Socket(protocol, spConfig)
 {
     switch (m_protocol)
@@ -58,7 +59,7 @@ SocketImpl::~SocketImpl()
 //==============================================================================
 bool SocketImpl::HostnameToAddress(
     const std::string &hostname,
-    address_type &address)
+    address_type &address) noexcept
 {
     struct hostent *ipAddress = ::gethostbyname(hostname.c_str());
 
@@ -76,19 +77,19 @@ bool SocketImpl::HostnameToAddress(
 }
 
 //==============================================================================
-address_type SocketImpl::InAddrAny()
+address_type SocketImpl::InAddrAny() noexcept
 {
     return INADDR_ANY;
 }
 
 //==============================================================================
-socket_type SocketImpl::InvalidSocket()
+socket_type SocketImpl::InvalidSocket() noexcept
 {
     return -1;
 }
 
 //==============================================================================
-void SocketImpl::Close()
+void SocketImpl::Close() noexcept
 {
     if (IsValid())
     {
@@ -98,7 +99,7 @@ void SocketImpl::Close()
 }
 
 //==============================================================================
-bool SocketImpl::IsErrorFree()
+bool SocketImpl::IsErrorFree() noexcept
 {
     int opt = -1;
     socklen_t len = sizeof(opt);
@@ -112,7 +113,7 @@ bool SocketImpl::IsErrorFree()
 }
 
 //==============================================================================
-bool SocketImpl::SetAsync()
+bool SocketImpl::SetAsync() noexcept
 {
     int flags = ::fcntl(m_socketHandle, F_GETFL, 0);
 
@@ -133,7 +134,7 @@ bool SocketImpl::SetAsync()
 
 //==============================================================================
 bool SocketImpl::Bind(address_type address, port_type port, BindOption option)
-    const
+    const noexcept
 {
     static const int bindForReuseOption = 1;
     static const socklen_t bindForReuseOptionLength =
@@ -172,7 +173,7 @@ bool SocketImpl::Bind(address_type address, port_type port, BindOption option)
 }
 
 //==============================================================================
-bool SocketImpl::Listen()
+bool SocketImpl::Listen() noexcept
 {
     if (::listen(m_socketHandle, 100) == -1)
     {
@@ -185,7 +186,7 @@ bool SocketImpl::Listen()
 }
 
 //==============================================================================
-bool SocketImpl::Connect(address_type address, port_type port)
+bool SocketImpl::Connect(address_type address, port_type port) noexcept
 {
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
     auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
@@ -208,7 +209,7 @@ bool SocketImpl::Connect(address_type address, port_type port)
 }
 
 //==============================================================================
-std::shared_ptr<Socket> SocketImpl::Accept() const
+std::shared_ptr<Socket> SocketImpl::Accept() const noexcept
 {
     auto ret = std::make_shared<SocketImpl>(m_protocol, m_spConfig);
 
@@ -243,6 +244,7 @@ std::shared_ptr<Socket> SocketImpl::Accept() const
 
 //==============================================================================
 size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
+    noexcept
 {
     static const std::string eom(1, m_socketEoM);
     std::string toSend = message + eom;
@@ -290,7 +292,7 @@ size_t SocketImpl::SendTo(
     const std::string &message,
     address_type address,
     port_type port,
-    bool &wouldBlock) const
+    bool &wouldBlock) const noexcept
 {
     static const std::string eom(1, m_socketEoM);
     std::string toSend = message + eom;
@@ -342,7 +344,7 @@ size_t SocketImpl::SendTo(
 }
 
 //==============================================================================
-std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const
+std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const noexcept
 {
     std::string ret;
 
@@ -385,6 +387,7 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const
 
 //==============================================================================
 std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
+    noexcept
 {
     std::string ret;
 

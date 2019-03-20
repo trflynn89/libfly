@@ -19,7 +19,7 @@ std::mutex Logger::s_consoleMutex;
 Logger::Logger(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     const std::shared_ptr<LoggerConfig> &spConfig,
-    const std::filesystem::path &loggerDirectory) :
+    const std::filesystem::path &loggerDirectory) noexcept :
     m_spTaskRunner(spTaskRunner),
     m_spConfig(spConfig),
     m_logDirectory(loggerDirectory),
@@ -29,19 +29,19 @@ Logger::Logger(
 }
 
 //==============================================================================
-void Logger::SetInstance(const std::shared_ptr<Logger> &spLogger)
+void Logger::SetInstance(const std::shared_ptr<Logger> &spLogger) noexcept
 {
     s_wpInstance = spLogger;
 }
 
 //==============================================================================
-std::shared_ptr<Logger> Logger::GetInstance()
+std::shared_ptr<Logger> Logger::GetInstance() noexcept
 {
     return s_wpInstance.lock();
 }
 
 //==============================================================================
-void Logger::ConsoleLog(bool acquireLock, const std::string &message)
+void Logger::ConsoleLog(bool acquireLock, const std::string &message) noexcept
 {
     std::unique_lock<std::mutex> lock(s_consoleMutex, std::defer_lock);
     std::string timeStr = System::LocalTime();
@@ -60,7 +60,7 @@ void Logger::AddLog(
     const char *file,
     const char *func,
     unsigned int line,
-    const std::string &message)
+    const std::string &message) noexcept
 {
     std::shared_ptr<Logger> spLogger = GetInstance();
 
@@ -78,7 +78,7 @@ void Logger::AddLog(
 }
 
 //==============================================================================
-bool Logger::Start()
+bool Logger::Start() noexcept
 {
     if (createLogFile())
     {
@@ -94,13 +94,13 @@ bool Logger::Start()
 }
 
 //==============================================================================
-std::filesystem::path Logger::GetLogFilePath() const
+std::filesystem::path Logger::GetLogFilePath() const noexcept
 {
     return m_logFile;
 }
 
 //==============================================================================
-bool Logger::poll()
+bool Logger::poll() noexcept
 {
     Log log;
 
@@ -127,7 +127,7 @@ void Logger::addLog(
     const char *file,
     const char *func,
     unsigned int line,
-    const std::string &message)
+    const std::string &message) noexcept
 {
     auto now = std::chrono::high_resolution_clock::now();
 
@@ -145,12 +145,12 @@ void Logger::addLog(
         snprintf(log.m_file, sizeof(log.m_file), "%s", file);
         snprintf(log.m_function, sizeof(log.m_function), "%s", func);
 
-        m_logQueue.Push(log);
+        m_logQueue.Push(std::move(log));
     }
 }
 
 //==============================================================================
-bool Logger::createLogFile()
+bool Logger::createLogFile() noexcept
 {
     std::string randStr = String::GenerateRandomString(10);
     std::string timeStr = System::LocalTime();
@@ -173,14 +173,14 @@ bool Logger::createLogFile()
 }
 
 //==============================================================================
-LoggerTask::LoggerTask(const std::weak_ptr<Logger> &wpLogger) :
+LoggerTask::LoggerTask(std::weak_ptr<Logger> wpLogger) noexcept :
     Task(),
     m_wpLogger(wpLogger)
 {
 }
 
 //==============================================================================
-void LoggerTask::Run()
+void LoggerTask::Run() noexcept
 {
     std::shared_ptr<Logger> spLogger = m_wpLogger.lock();
 

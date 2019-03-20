@@ -20,7 +20,7 @@ public:
      *
      * @param The random directory path.
      */
-    static std::filesystem::path GenerateTempDirectory();
+    static std::filesystem::path GenerateTempDirectory() noexcept;
 
     /**
      * Create a file with the given contents, verifying the file was correctly
@@ -31,7 +31,8 @@ public:
      *
      * @return bool True if the file was correctly created.
      */
-    static bool WriteFile(const std::filesystem::path &, const std::string &);
+    static bool
+    WriteFile(const std::filesystem::path &, const std::string &) noexcept;
 
     /**
      * Read the contents of a file.
@@ -40,7 +41,7 @@ public:
      *
      * @return string Contents of the file.
      */
-    static std::string ReadFile(const std::filesystem::path &);
+    static std::string ReadFile(const std::filesystem::path &) noexcept;
 };
 
 } // namespace fly

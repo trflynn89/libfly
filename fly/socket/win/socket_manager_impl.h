@@ -23,15 +23,15 @@ class SocketManagerImpl : public SocketManager
 public:
     SocketManagerImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SocketConfig> &);
+        const std::shared_ptr<SocketConfig> &) noexcept;
     ~SocketManagerImpl() override;
 
 protected:
-    void Poll(const std::chrono::microseconds &) override;
+    void Poll(const std::chrono::microseconds &) noexcept override;
 
 private:
-    bool setReadAndWriteMasks(fd_set *, fd_set *);
-    void handleSocketIO(fd_set *, fd_set *);
+    bool setReadAndWriteMasks(fd_set *, fd_set *) noexcept;
+    void handleSocketIO(fd_set *, fd_set *) noexcept;
 
     static std::atomic_int s_socketManagerCount;
 };

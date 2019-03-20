@@ -23,14 +23,14 @@ class SocketManagerImpl : public SocketManager
 public:
     SocketManagerImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SocketConfig> &);
+        const std::shared_ptr<SocketConfig> &) noexcept;
 
 protected:
-    void Poll(const std::chrono::microseconds &) override;
+    void Poll(const std::chrono::microseconds &) noexcept override;
 
 private:
-    socket_type setReadAndWriteMasks(fd_set *, fd_set *);
-    void handleSocketIO(fd_set *, fd_set *);
+    socket_type setReadAndWriteMasks(fd_set *, fd_set *) noexcept;
+    void handleSocketIO(fd_set *, fd_set *) noexcept;
 };
 
 } // namespace fly

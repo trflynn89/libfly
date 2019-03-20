@@ -32,7 +32,7 @@ public:
      *
      * @throws ParserException Thrown if an error occurs parsing the string.
      */
-    Json ParseString(const std::string &);
+    Json ParseString(const std::string &) noexcept(false);
 
     /**
      * Parse a file and retrieve parsed values.
@@ -43,7 +43,7 @@ public:
      *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    Json ParseFile(const std::filesystem::path &);
+    Json ParseFile(const std::filesystem::path &) noexcept(false);
 
 protected:
     /**
@@ -53,7 +53,7 @@ protected:
      *
      * @throws ParserException Thrown if an error occurs parsing the stream.
      */
-    virtual Json ParseInternal(std::istream &) = 0;
+    virtual Json ParseInternal(std::istream &) noexcept(false) = 0;
 
     int m_line;
     int m_column;
@@ -65,7 +65,7 @@ private:
      *
      * @param istream Stream holding the contents to parse.
      */
-    void consumeByteOrderMark(std::istream &);
+    void consumeByteOrderMark(std::istream &) const noexcept;
 };
 
 } // namespace fly

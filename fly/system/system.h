@@ -19,22 +19,22 @@ public:
     /**
      * Print the backtrace to stderr.
      */
-    static void PrintBacktrace();
+    static void PrintBacktrace() noexcept;
 
     /**
      * @return The local time formatted as a string.
      */
-    static std::string LocalTime();
+    static std::string LocalTime() noexcept;
 
     /**
      * @return The last system error code.
      */
-    static int GetErrorCode();
+    static int GetErrorCode() noexcept;
 
     /**
      * @return The last system error code as a string.
      */
-    static std::string GetErrorString();
+    static std::string GetErrorString() noexcept;
 
     /**
      * Convert a system error code to a string.
@@ -43,14 +43,14 @@ public:
      *
      * @return The given system error code as a string.
      */
-    static std::string GetErrorString(int);
+    static std::string GetErrorString(int) noexcept;
 
     /**
      * Set a signal handler for all terminal signals.
      *
      * @param SignalHandler The signal handler function to set.
      */
-    static void SetSignalHandler(SignalHandler);
+    static void SetSignalHandler(SignalHandler) noexcept;
 };
 
 } // namespace fly

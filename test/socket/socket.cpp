@@ -27,7 +27,7 @@
 class SocketTest : public ::testing::Test
 {
 public:
-    SocketTest() :
+    SocketTest() noexcept :
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
         m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>(
@@ -46,12 +46,12 @@ public:
     {
     }
 
-    virtual void ServerThread(bool)
+    virtual void ServerThread(bool) noexcept
     {
         ASSERT_TRUE(false);
     };
 
-    virtual void ClientThread(bool)
+    virtual void ClientThread(bool) noexcept
     {
         ASSERT_TRUE(false);
     };
@@ -60,7 +60,7 @@ protected:
     /**
      * Start the task and socket managers.
      */
-    void SetUp() override
+    void SetUp() noexcept override
     {
         ASSERT_TRUE(fly::Socket::HostnameToAddress(m_host, m_address));
 
@@ -72,7 +72,7 @@ protected:
     /**
      * Stop the task manager.
      */
-    void TearDown() override
+    void TearDown() noexcept override
     {
         ASSERT_TRUE(m_spTaskManager->Stop());
     }
@@ -113,14 +113,6 @@ protected:
 
     std::string m_message;
 };
-
-/**
- * Test handling for when socket creation fails due to ::socket() system call.
- */
-TEST_F(SocketTest, SocketConfigTest)
-{
-    EXPECT_EQ(fly::SocketConfig::GetName(), "socket");
-}
 
 #ifdef FLY_LINUX
 
@@ -417,7 +409,7 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
     }
 
     ASSERT_TRUE(spClientSocket->IsConnected());
-    ASSERT_TRUE(spClientSocket->SendAsync(m_message));
+    ASSERT_TRUE(spClientSocket->SendAsync(std::move(m_message)));
 
     ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
     ASSERT_FALSE(spClientSocket->IsValid());
@@ -454,14 +446,15 @@ TEST_F(SocketTest, Send_Async_MockSendBlock)
         ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
     }
 
+    std::string message(m_message);
     ASSERT_TRUE(spClientSocket->IsConnected());
-    ASSERT_TRUE(spClientSocket->SendAsync(m_message));
+    ASSERT_TRUE(spClientSocket->SendAsync(std::move(m_message)));
 
     fly::AsyncRequest request;
     ASSERT_TRUE(
         m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
-    ASSERT_EQ(m_message.length(), request.GetRequest().length());
-    ASSERT_EQ(m_message, request.GetRequest());
+    ASSERT_EQ(message.length(), request.GetRequest().length());
+    ASSERT_EQ(message, request.GetRequest());
 
     ASSERT_EQ(request.GetSocketId(), spClientSocket->GetSocketId());
 }
@@ -523,7 +516,8 @@ TEST_F(SocketTest, Send_Async_MockSendtoFail)
 
     auto spClientSocket =
         CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(spClientSocket->SendToAsync(m_message, m_host, m_port));
+    ASSERT_TRUE(
+        spClientSocket->SendToAsync(std::move(m_message), m_host, m_port));
 
     ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
     ASSERT_FALSE(spClientSocket->IsValid());
@@ -544,15 +538,18 @@ TEST_F(SocketTest, Send_Async_MockSendtoBlock)
 
     auto spClientSocket =
         CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(spClientSocket->SendToAsync(m_message, m_host, m_port));
+
+    std::string message(m_message);
+    ASSERT_TRUE(
+        spClientSocket->SendToAsync(std::move(m_message), m_host, m_port));
 
     fly::AsyncRequest request;
     std::chrono::milliseconds waitTime(100);
 
     ASSERT_TRUE(
         m_spClientSocketManager->WaitForCompletedSend(request, waitTime));
-    ASSERT_EQ(m_message.length(), request.GetRequest().length());
-    ASSERT_EQ(m_message, request.GetRequest());
+    ASSERT_EQ(message.length(), request.GetRequest().length());
+    ASSERT_EQ(message, request.GetRequest());
 
     ASSERT_EQ(request.GetSocketId(), spClientSocket->GetSocketId());
 }
@@ -572,7 +569,8 @@ TEST_F(SocketTest, Send_Async_MockGethostbynameFail)
 
     auto spClientSocket =
         CreateSocket(m_spClientSocketManager, fly::Protocol::UDP, true);
-    ASSERT_FALSE(spClientSocket->SendToAsync(m_message, m_host, m_port));
+    ASSERT_FALSE(
+        spClientSocket->SendToAsync(std::move(m_message), m_host, m_port));
 }
 
 /**
@@ -689,7 +687,7 @@ public:
      * Thread to run server functions do handle accepting a client socket and
      * receiving data from it.
      */
-    void ServerThread(bool doAsync) override
+    void ServerThread(bool doAsync) noexcept override
     {
         auto spAcceptSocket =
             CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, doAsync);
@@ -734,7 +732,7 @@ public:
      * Thread to run client functions to connect to the server socket and send
      * data to it.
      */
-    void ClientThread(bool doAsync) override
+    void ClientThread(bool doAsync) noexcept override
     {
         auto spSendSocket =
             CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, doAsync);
@@ -764,13 +762,14 @@ public:
                 ASSERT_TRUE(spSendSocket->IsConnected());
             }
 
-            ASSERT_TRUE(spSendSocket->SendAsync(m_message));
+            std::string message(m_message);
+            ASSERT_TRUE(spSendSocket->SendAsync(std::move(m_message)));
 
             fly::AsyncRequest request;
             ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedSend(
                 request, waitTime));
-            ASSERT_EQ(m_message.length(), request.GetRequest().length());
-            ASSERT_EQ(m_message, request.GetRequest());
+            ASSERT_EQ(message.length(), request.GetRequest().length());
+            ASSERT_EQ(message, request.GetRequest());
 
             ASSERT_EQ(request.GetSocketId(), spSendSocket->GetSocketId());
         }
@@ -795,8 +794,8 @@ TEST_F(TcpSocketTest, AsyncOperationsOnSyncSocketTest)
     ASSERT_EQ(
         spSocket->ConnectAsync(m_host, m_port),
         fly::ConnectedState::Disconnected);
-    ASSERT_FALSE(spSocket->SendAsync(m_message));
-    ASSERT_FALSE(spSocket->SendToAsync(m_message, m_host, m_port));
+    ASSERT_FALSE(spSocket->SendAsync("abc"));
+    ASSERT_FALSE(spSocket->SendToAsync("abc", m_host, m_port));
 }
 
 /**
@@ -867,7 +866,7 @@ public:
      * Thread to run server functions do handle accepting a client socket and
      * receiving data from it.
      */
-    void ServerThread(bool doAsync) override
+    void ServerThread(bool doAsync) noexcept override
     {
         auto spRecvSocket =
             CreateSocket(m_spServerSocketManager, fly::Protocol::UDP, doAsync);
@@ -903,7 +902,7 @@ public:
      * Thread to run client functions to connect to the server socket and send
      * data to it.
      */
-    void ClientThread(bool doAsync) override
+    void ClientThread(bool doAsync) noexcept override
     {
         static unsigned int callCount = 0;
 
@@ -922,21 +921,23 @@ public:
 
         if (doAsync)
         {
+            std::string message(m_message);
+
             if ((callCount++ % 2) == 0)
             {
-                ASSERT_TRUE(
-                    spSendSocket->SendToAsync(m_message, m_address, m_port));
+                ASSERT_TRUE(spSendSocket->SendToAsync(
+                    std::move(m_message), m_address, m_port));
             }
             else
             {
-                ASSERT_TRUE(
-                    spSendSocket->SendToAsync(m_message, m_host, m_port));
+                ASSERT_TRUE(spSendSocket->SendToAsync(
+                    std::move(m_message), m_host, m_port));
             }
 
             fly::AsyncRequest request;
             ASSERT_TRUE(m_spClientSocketManager->WaitForCompletedSend(
                 request, waitTime));
-            ASSERT_EQ(m_message, request.GetRequest());
+            ASSERT_EQ(message, request.GetRequest());
 
             ASSERT_EQ(request.GetSocketId(), spSendSocket->GetSocketId());
         }
@@ -969,8 +970,8 @@ TEST_F(UdpSocketTest, AsyncOperationsOnSyncSocketTest)
     ASSERT_EQ(
         spSocket->ConnectAsync(m_host, m_port),
         fly::ConnectedState::Disconnected);
-    ASSERT_FALSE(spSocket->SendAsync(m_message));
-    ASSERT_FALSE(spSocket->SendToAsync(m_message, m_host, m_port));
+    ASSERT_FALSE(spSocket->SendAsync("abc"));
+    ASSERT_FALSE(spSocket->SendToAsync("abc", m_host, m_port));
 }
 
 /**

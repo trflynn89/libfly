@@ -19,7 +19,7 @@ namespace {
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SystemConfig> &spConfig) :
+    const std::shared_ptr<SystemConfig> &spConfig) noexcept :
     SystemMonitor(spTaskRunner, spConfig),
     m_process(::GetCurrentProcess()),
     m_cpuQuery(NULL),
@@ -63,7 +63,7 @@ SystemMonitorImpl::~SystemMonitorImpl()
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemCpuCount()
+void SystemMonitorImpl::UpdateSystemCpuCount() noexcept
 {
     SYSTEM_INFO info;
     ::GetSystemInfo(&info);
@@ -79,7 +79,7 @@ void SystemMonitorImpl::UpdateSystemCpuCount()
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemCpuUsage()
+void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
 {
     PDH_FMT_COUNTERVALUE value;
 
@@ -102,7 +102,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage()
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateProcessCpuUsage()
+void SystemMonitorImpl::UpdateProcessCpuUsage() noexcept
 {
     ULARGE_INTEGER now, system, user;
     FILETIME fnow, fsystem, fuser;
@@ -133,7 +133,7 @@ void SystemMonitorImpl::UpdateProcessCpuUsage()
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemMemoryUsage()
+void SystemMonitorImpl::UpdateSystemMemoryUsage() noexcept
 {
     MEMORYSTATUSEX info;
     info.dwLength = sizeof(MEMORYSTATUSEX);
@@ -150,7 +150,7 @@ void SystemMonitorImpl::UpdateSystemMemoryUsage()
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateProcessMemoryUsage()
+void SystemMonitorImpl::UpdateProcessMemoryUsage() noexcept
 {
     PROCESS_MEMORY_COUNTERS pmc;
 

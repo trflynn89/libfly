@@ -19,36 +19,36 @@ class SocketConfig;
 class SocketImpl : public Socket
 {
 public:
-    SocketImpl(Protocol, const std::shared_ptr<SocketConfig> &);
+    SocketImpl(Protocol, const std::shared_ptr<SocketConfig> &) noexcept;
     ~SocketImpl() override;
 
-    static bool HostnameToAddress(const std::string &, address_type &);
+    static bool HostnameToAddress(const std::string &, address_type &) noexcept;
 
-    static address_type InAddrAny();
+    static address_type InAddrAny() noexcept;
 
-    static socket_type InvalidSocket();
+    static socket_type InvalidSocket() noexcept;
 
-    void Close() override;
+    void Close() noexcept override;
 
-    bool IsErrorFree() override;
+    bool IsErrorFree() noexcept override;
 
-    bool SetAsync() override;
+    bool SetAsync() noexcept override;
 
-    bool Bind(address_type, port_type, BindOption) const override;
+    bool Bind(address_type, port_type, BindOption) const noexcept override;
 
-    bool Listen() override;
+    bool Listen() noexcept override;
 
-    bool Connect(address_type, port_type) override;
+    bool Connect(address_type, port_type) noexcept override;
 
-    std::shared_ptr<Socket> Accept() const override;
+    std::shared_ptr<Socket> Accept() const noexcept override;
 
 protected:
-    size_t Send(const std::string &, bool &) const override;
-    size_t
-    SendTo(const std::string &, address_type, port_type, bool &) const override;
+    size_t Send(const std::string &, bool &) const noexcept override;
+    size_t SendTo(const std::string &, address_type, port_type, bool &) const
+        noexcept override;
 
-    std::string Recv(bool &, bool &) const override;
-    std::string RecvFrom(bool &, bool &) const override;
+    std::string Recv(bool &, bool &) const noexcept override;
+    std::string RecvFrom(bool &, bool &) const noexcept override;
 };
 
 } // namespace fly

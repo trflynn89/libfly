@@ -36,7 +36,7 @@ public:
      *
      * @param MockCall Mocked system call to enable.
      */
-    MockSystem(MockCall);
+    MockSystem(MockCall) noexcept;
 
     /**
      * Enable a mocked system call, specifying whether the call should fail.
@@ -44,7 +44,7 @@ public:
      * @param MockCall Mocked system call to enable.
      * @param bool Whether the system call should fail.
      */
-    MockSystem(MockCall, bool);
+    MockSystem(MockCall, bool) noexcept;
 
     /**
      * Disable the mocked system call.
@@ -58,7 +58,7 @@ public:
      *
      * @return bool True if the mocked system call is enabled.
      */
-    static bool MockEnabled(MockCall);
+    static bool MockEnabled(MockCall) noexcept;
 
     /**
      * Check if a mocked system call is enabled.
@@ -68,7 +68,7 @@ public:
      *
      * @return bool True if the mocked system call is enabled.
      */
-    static bool MockEnabled(MockCall, bool &);
+    static bool MockEnabled(MockCall, bool &) noexcept;
 
 private:
     static std::mutex s_mockSystemMutex;

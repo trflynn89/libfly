@@ -12,7 +12,7 @@ namespace fly {
 //==============================================================================
 SocketManager::SocketManager(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SocketConfig> &spConfig) :
+    const std::shared_ptr<SocketConfig> &spConfig) noexcept :
     m_spTaskRunner(spTaskRunner),
     m_spConfig(spConfig),
     m_newClientCallback(nullptr),
@@ -30,7 +30,7 @@ SocketManager::~SocketManager()
 }
 
 //==============================================================================
-void SocketManager::Start()
+void SocketManager::Start() noexcept
 {
     std::shared_ptr<SocketManager> spSocketManager = shared_from_this();
 
@@ -41,7 +41,7 @@ void SocketManager::Start()
 //==============================================================================
 void SocketManager::SetClientCallbacks(
     SocketCallback newClient,
-    SocketCallback closedClient)
+    SocketCallback closedClient) noexcept
 {
     std::lock_guard<std::mutex> lock(m_callbackMutex);
 
@@ -50,13 +50,13 @@ void SocketManager::SetClientCallbacks(
 }
 
 //==============================================================================
-void SocketManager::ClearClientCallbacks()
+void SocketManager::ClearClientCallbacks() noexcept
 {
     SetClientCallbacks(nullptr, nullptr);
 }
 
 //==============================================================================
-std::shared_ptr<Socket> SocketManager::CreateSocket(Protocol protocol)
+std::shared_ptr<Socket> SocketManager::CreateSocket(Protocol protocol) noexcept
 {
     auto spSocket = std::make_shared<SocketImpl>(protocol, m_spConfig);
 
@@ -69,7 +69,8 @@ std::shared_ptr<Socket> SocketManager::CreateSocket(Protocol protocol)
 }
 
 //==============================================================================
-std::weak_ptr<Socket> SocketManager::CreateAsyncSocket(Protocol protocol)
+std::weak_ptr<Socket>
+SocketManager::CreateAsyncSocket(Protocol protocol) noexcept
 {
     auto spSocket = CreateSocket(protocol);
 
@@ -92,7 +93,7 @@ std::weak_ptr<Socket> SocketManager::CreateAsyncSocket(Protocol protocol)
 //==============================================================================
 void SocketManager::HandleNewAndClosedSockets(
     const SocketList &newSockets,
-    const SocketList &closedSockets)
+    const SocketList &closedSockets) noexcept
 {
     // Add new sockets to the socket system
     m_aioSockets.insert(
@@ -114,7 +115,7 @@ void SocketManager::HandleNewAndClosedSockets(
 //==============================================================================
 void SocketManager::TriggerCallbacks(
     const SocketList &connectedClients,
-    const SocketList &closedClients)
+    const SocketList &closedClients) noexcept
 {
     if (!connectedClients.empty() || !closedClients.empty())
     {
@@ -140,14 +141,14 @@ void SocketManager::TriggerCallbacks(
 
 //==============================================================================
 SocketManagerTask::SocketManagerTask(
-    const std::weak_ptr<SocketManager> &wpSocketManager) :
+    std::weak_ptr<SocketManager> wpSocketManager) noexcept :
     Task(),
     m_wpSocketManager(wpSocketManager)
 {
 }
 
 //==============================================================================
-void SocketManagerTask::Run()
+void SocketManagerTask::Run() noexcept
 {
     std::shared_ptr<SocketManager> spSocketManager = m_wpSocketManager.lock();
 

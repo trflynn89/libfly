@@ -3,7 +3,6 @@
 #include "fly/config/config.h"
 
 #include <chrono>
-#include <string>
 
 namespace fly {
 
@@ -16,30 +15,27 @@ namespace fly {
 class SocketConfig : public Config
 {
 public:
+    static constexpr const char *identifier = "socket";
+
     /**
      * Constructor.
      */
-    SocketConfig();
-
-    /**
-     * Get the name to associate with this configuration.
-     */
-    static std::string GetName();
+    SocketConfig() noexcept;
 
     /**
      * @return Sleep time for socket IO thread.
      */
-    std::chrono::microseconds IoWaitTime() const;
+    std::chrono::microseconds IoWaitTime() const noexcept;
 
     /**
      * @return Character signifying the end of a message received over a socket.
      */
-    char EndOfMessage() const;
+    char EndOfMessage() const noexcept;
 
     /**
      * Size of packet to use for send/receive operations.
      */
-    size_t PacketSize() const;
+    size_t PacketSize() const noexcept;
 
 protected:
     std::chrono::microseconds::rep m_defaultIoWaitTime;

@@ -16,16 +16,17 @@
 namespace {
 
 //==========================================================================
-DECLARATION_TESTS(foo, T, std::declval<const T &>().Foo());
+FLY_DECLARATION_TESTS(foo, T, std::declval<const T &>().Foo());
 
 //==========================================================================
 class FooClass
 {
 public:
-    FooClass()
+    FooClass() noexcept
     {
     }
-    bool Foo() const
+
+    bool Foo() const noexcept
     {
         return true;
     }
@@ -35,11 +36,11 @@ public:
 class BarClass
 {
 public:
-    BarClass()
+    BarClass() noexcept
     {
     }
 
-    std::string operator()() const
+    std::string operator()() const noexcept
     {
         return "BarClass";
     }
@@ -55,131 +56,131 @@ std::ostream &operator<<(std::ostream &stream, const BarClass &bar)
 
 //==========================================================================
 template <typename T, if_foo::enabled<T> = 0>
-bool callFoo(const T &arg)
+bool callFoo(const T &arg) noexcept
 {
     return arg.Foo();
 }
 
 template <typename T, if_foo::disabled<T> = 0>
-bool callFoo(const T &)
+bool callFoo(const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
 template <typename T, fly::if_string::enabled<T> = 0>
-bool isString(const T &)
+bool isString(const T &) noexcept
 {
     return true;
 }
 
 template <typename T, fly::if_string::disabled<T> = 0>
-bool isString(const T &)
+bool isString(const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
 template <typename T, fly::if_ostream::enabled<T> = 0>
-bool isStreamable(std::ostream &stream, const T &arg)
+bool isStreamable(std::ostream &stream, const T &arg) noexcept
 {
     stream << arg;
     return true;
 }
 
 template <typename T, fly::if_ostream::disabled<T> = 0>
-bool isStreamable(std::ostream &, const T &)
+bool isStreamable(std::ostream &, const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
 template <typename T, fly::if_signed_integer::enabled<T> = 0>
-bool isSignedInteger(const T &)
+bool isSignedInteger(const T &) noexcept
 {
     return true;
 }
 
 template <typename T, fly::if_signed_integer::disabled<T> = 0>
-bool isSignedInteger(const T &)
+bool isSignedInteger(const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
 template <typename T, fly::if_unsigned_integer::enabled<T> = 0>
-bool isUnsignedInteger(const T &)
+bool isUnsignedInteger(const T &) noexcept
 {
     return true;
 }
 
 template <typename T, fly::if_unsigned_integer::disabled<T> = 0>
-bool isUnsignedInteger(const T &)
+bool isUnsignedInteger(const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
 template <typename T, fly::if_floating_point::enabled<T> = 0>
-bool isFloat(const T &)
+bool isFloat(const T &) noexcept
 {
     return true;
 }
 
 template <typename T, fly::if_floating_point::disabled<T> = 0>
-bool isFloat(const T &)
+bool isFloat(const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
 template <typename T, fly::if_numeric::enabled<T> = 0>
-bool isNumeric(const T &)
+bool isNumeric(const T &) noexcept
 {
     return true;
 }
 
 template <typename T, fly::if_numeric::disabled<T> = 0>
-bool isNumeric(const T &)
+bool isNumeric(const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
 template <typename T, fly::if_boolean::enabled<T> = 0>
-bool isBool(const T &)
+bool isBool(const T &) noexcept
 {
     return true;
 }
 
 template <typename T, fly::if_boolean::disabled<T> = 0>
-bool isBool(const T &)
+bool isBool(const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
 template <typename T, fly::if_map::enabled<T> = 0>
-bool isMap(const T &)
+bool isMap(const T &) noexcept
 {
     return true;
 }
 
 template <typename T, fly::if_map::disabled<T> = 0>
-bool isMap(const T &)
+bool isMap(const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
 template <typename T, fly::if_array::enabled<T> = 0>
-bool isArray(const T &)
+bool isArray(const T &) noexcept
 {
     return true;
 }
 
 template <typename T, fly::if_array::disabled<T> = 0>
-bool isArray(const T &)
+bool isArray(const T &) noexcept
 {
     return false;
 }

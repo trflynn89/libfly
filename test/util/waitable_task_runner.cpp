@@ -6,7 +6,8 @@
 namespace fly {
 
 //==============================================================================
-void WaitableTaskRunner::TaskComplete(const std::shared_ptr<Task> &spTask)
+void WaitableTaskRunner::TaskComplete(
+    const std::shared_ptr<Task> &spTask) noexcept
 {
     if (spTask)
     {
@@ -17,14 +18,14 @@ void WaitableTaskRunner::TaskComplete(const std::shared_ptr<Task> &spTask)
 
 //==============================================================================
 WaitableParallelTaskRunner::WaitableParallelTaskRunner(
-    const std::weak_ptr<TaskManager> &wpTaskManager) :
+    std::weak_ptr<TaskManager> wpTaskManager) noexcept :
     ParallelTaskRunner(wpTaskManager)
 {
 }
 
 //==============================================================================
 void WaitableParallelTaskRunner::TaskComplete(
-    const std::shared_ptr<Task> &spTask)
+    const std::shared_ptr<Task> &spTask) noexcept
 {
     ParallelTaskRunner::TaskComplete(spTask);
     WaitableTaskRunner::TaskComplete(spTask);
@@ -32,14 +33,14 @@ void WaitableParallelTaskRunner::TaskComplete(
 
 //==============================================================================
 WaitableSequencedTaskRunner::WaitableSequencedTaskRunner(
-    const std::weak_ptr<TaskManager> &wpTaskManager) :
+    std::weak_ptr<TaskManager> wpTaskManager) noexcept :
     SequencedTaskRunner(wpTaskManager)
 {
 }
 
 //==============================================================================
 void WaitableSequencedTaskRunner::TaskComplete(
-    const std::shared_ptr<Task> &spTask)
+    const std::shared_ptr<Task> &spTask) noexcept
 {
     SequencedTaskRunner::TaskComplete(spTask);
     WaitableTaskRunner::TaskComplete(spTask);

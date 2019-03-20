@@ -7,15 +7,15 @@
 namespace fly {
 
 //==============================================================================
-TaskRunner::TaskRunner(const std::weak_ptr<TaskManager> &wpTaskManager) :
+TaskRunner::TaskRunner(std::weak_ptr<TaskManager> wpTaskManager) noexcept :
     m_wpTaskManager(wpTaskManager)
 {
 }
 
 //==============================================================================
 bool TaskRunner::PostTaskWithDelay(
-    const std::weak_ptr<Task> &wpTask,
-    std::chrono::milliseconds delay)
+    std::weak_ptr<Task> wpTask,
+    std::chrono::milliseconds delay) noexcept
 {
     std::shared_ptr<TaskManager> spTaskManager = m_wpTaskManager.lock();
 
@@ -31,7 +31,7 @@ bool TaskRunner::PostTaskWithDelay(
 }
 
 //==============================================================================
-bool TaskRunner::PostTaskToTaskManager(const std::weak_ptr<Task> &wpTask)
+bool TaskRunner::PostTaskToTaskManager(std::weak_ptr<Task> wpTask) noexcept
 {
     std::shared_ptr<TaskManager> spTaskManager = m_wpTaskManager.lock();
 
@@ -48,46 +48,46 @@ bool TaskRunner::PostTaskToTaskManager(const std::weak_ptr<Task> &wpTask)
 
 //==============================================================================
 ParallelTaskRunner::ParallelTaskRunner(
-    const std::weak_ptr<TaskManager> &wpTaskManager) :
+    std::weak_ptr<TaskManager> wpTaskManager) noexcept :
     TaskRunner(wpTaskManager)
 {
 }
 
 //==============================================================================
-bool ParallelTaskRunner::PostTask(const std::weak_ptr<Task> &wpTask)
+bool ParallelTaskRunner::PostTask(std::weak_ptr<Task> wpTask) noexcept
 {
     return PostTaskToTaskManager(wpTask);
 }
 
 //==============================================================================
-void ParallelTaskRunner::TaskComplete(const std::shared_ptr<Task> &)
+void ParallelTaskRunner::TaskComplete(const std::shared_ptr<Task> &) noexcept
 {
 }
 
 //==============================================================================
 SequencedTaskRunner::SequencedTaskRunner(
-    const std::weak_ptr<TaskManager> &wpTaskManager) :
+    std::weak_ptr<TaskManager> wpTaskManager) noexcept :
     TaskRunner(wpTaskManager),
     m_aHasRunningTask(false)
 {
 }
 
 //==============================================================================
-bool SequencedTaskRunner::PostTask(const std::weak_ptr<Task> &wpTask)
+bool SequencedTaskRunner::PostTask(std::weak_ptr<Task> wpTask) noexcept
 {
-    m_pendingTasks.Push(wpTask);
+    m_pendingTasks.Push(std::move(wpTask));
     return maybePostTask();
 }
 
 //==============================================================================
-void SequencedTaskRunner::TaskComplete(const std::shared_ptr<Task> &)
+void SequencedTaskRunner::TaskComplete(const std::shared_ptr<Task> &) noexcept
 {
     m_aHasRunningTask.store(false);
     maybePostTask();
 }
 
 //==============================================================================
-bool SequencedTaskRunner::maybePostTask()
+bool SequencedTaskRunner::maybePostTask() noexcept
 {
     static std::chrono::seconds wait(0);
     bool expected = false;

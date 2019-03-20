@@ -8,7 +8,7 @@
 namespace fly {
 
 //==============================================================================
-Json IniParser::ParseInternal(std::istream &stream)
+Json IniParser::ParseInternal(std::istream &stream) noexcept(false)
 {
     std::string line, section;
     Json values;
@@ -41,7 +41,7 @@ Json IniParser::ParseInternal(std::istream &stream)
 }
 
 //==============================================================================
-std::string IniParser::onSection(const std::string &line)
+std::string IniParser::onSection(const std::string &line) noexcept(false)
 {
     std::string section = line;
     String::Trim(section);
@@ -55,7 +55,7 @@ std::string IniParser::onSection(const std::string &line)
 }
 
 //==============================================================================
-void IniParser::onValue(Json &section, const std::string &line)
+void IniParser::onValue(Json &section, const std::string &line) noexcept(false)
 {
     static const size_t size = 2;
 
@@ -86,13 +86,14 @@ void IniParser::onValue(Json &section, const std::string &line)
 }
 
 //==============================================================================
-bool IniParser::trimValue(std::string &str, char ch) const
+bool IniParser::trimValue(std::string &str, char ch) const noexcept(false)
 {
     return trimValue(str, ch, ch);
 }
 
 //==============================================================================
 bool IniParser::trimValue(std::string &str, char start, char end) const
+    noexcept(false)
 {
     bool startsWithChar = String::StartsWith(str, start);
     bool endsWithChar = String::EndsWith(str, end);

@@ -3,13 +3,7 @@
 namespace fly {
 
 //==============================================================================
-std::string Config::GetName()
-{
-    return "Config";
-}
-
-//==============================================================================
-void Config::Update(const Json &values)
+void Config::Update(const Json &values) noexcept
 {
     std::unique_lock<std::shared_timed_mutex> lock(m_valuesMutex);
     m_values = values;
