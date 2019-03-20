@@ -10,15 +10,15 @@ jobs:
     steps:
     - template: setup.yml
 
-    - task: MSBuild@1
-      inputs:
-        solution: 'build\win\libfly.sln'
-        configuration: ${{ parameters.configuration }}
-        platform: ${{ parameters.arch }}
-        maximumCpuCount: true
-      displayName: 'Build'
-
     - ${{ if eq(parameters.configuration, 'Debug') }}:
+      - task: VSBuild@1
+        inputs:
+          solution: 'build\win\libfly.sln'
+          configuration: ${{ parameters.configuration }}
+          platform: ${{ parameters.arch }}
+          maximumCpuCount: true
+        displayName: 'Build'
+
       - task: PowerShell@2
         inputs:
           filePath: build\win\test.ps1
@@ -26,6 +26,15 @@ jobs:
         displayName: 'Test'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
+      - task: VSBuild@1
+        inputs:
+          solution: 'build\win\libfly.sln'
+          msbuildArgs: '/t:libfly'
+          configuration: ${{ parameters.configuration }}
+          platform: ${{ parameters.arch }}
+          maximumCpuCount: true
+        displayName: 'Build'
+
       - task: PowerShell@2
         inputs:
           filePath: build\win\release.ps1
