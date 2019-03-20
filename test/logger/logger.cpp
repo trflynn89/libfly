@@ -87,9 +87,9 @@ protected:
      *
      * @param string Message to store in the log.
      *
-     * @return size_t Size of the log point.
+     * @return uintmax_t Size of the log point.
      */
-    size_t LogSize(const std::string &message) noexcept
+    std::uintmax_t LogSize(const std::string &message) noexcept
     {
         fly::Log log;
 
@@ -235,17 +235,17 @@ TEST_F(LoggerTest, RolloverTest)
 {
     std::filesystem::path path = m_spLogger->GetLogFilePath();
 
-    size_t maxMessageSize = m_spLoggerConfig->MaxMessageSize();
-    size_t maxFileSize = m_spLoggerConfig->MaxLogFileSize();
+    std::uintmax_t maxLogFileSize = m_spLoggerConfig->MaxLogFileSize();
+    std::uint32_t maxMessageSize = m_spLoggerConfig->MaxMessageSize();
 
     std::string random = fly::String::GenerateRandomString(maxMessageSize);
 
-    ssize_t expectedSize = LogSize(random);
-    size_t count = 0;
+    std::uintmax_t expectedSize = LogSize(random);
+    std::uintmax_t count = 0;
 
     // Create enough log points to fill the log file, plus some extra to start
     // filling a second log file
-    while (++count < ((maxFileSize / expectedSize) + 10))
+    while (++count < ((maxLogFileSize / expectedSize) + 10))
     {
         LOGD("%s", random);
         m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
@@ -253,6 +253,6 @@ TEST_F(LoggerTest, RolloverTest)
 
     EXPECT_NE(path, m_spLogger->GetLogFilePath());
 
-    size_t actualSize = std::filesystem::file_size(path);
+    std::uintmax_t actualSize = std::filesystem::file_size(path);
     EXPECT_GE(actualSize, maxMessageSize);
 }

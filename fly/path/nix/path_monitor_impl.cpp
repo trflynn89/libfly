@@ -92,7 +92,7 @@ PathMonitorImpl::CreatePathInfo(const std::filesystem::path &path) const
 //==============================================================================
 bool PathMonitorImpl::readEvents() const noexcept
 {
-    static const size_t eventSize = sizeof(struct inotify_event);
+    static const std::size_t eventSize = sizeof(struct inotify_event);
 
     // Some systems cannot read integer variables if they are not properly
     // aligned. On other systems, incorrect alignment may decrease performance.

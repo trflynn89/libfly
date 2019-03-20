@@ -186,7 +186,7 @@ TEST_F(JsonParserTest, BigListOfNaughtyStringsTest)
     EXPECT_NO_THROW(values = m_spParser->ParseFile(path / "blns.json"));
     EXPECT_EQ(values.Size(), 507);
 
-    for (size_t i = 0; i < values.Size(); ++i)
+    for (std::size_t i = 0; i < values.Size(); ++i)
     {
         EXPECT_TRUE(values[i].IsString());
     }

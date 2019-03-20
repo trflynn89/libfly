@@ -36,10 +36,10 @@ protected:
     void UpdateProcessMemoryUsage() noexcept override;
 
 private:
-    uint64_t m_prevSystemUserTime;
-    uint64_t m_prevSystemNiceTime;
-    uint64_t m_prevSystemSystemTime;
-    uint64_t m_prevSystemIdleTime;
+    std::uint64_t m_prevSystemUserTime;
+    std::uint64_t m_prevSystemNiceTime;
+    std::uint64_t m_prevSystemSystemTime;
+    std::uint64_t m_prevSystemIdleTime;
 
     clock_t m_prevProcessSystemTime;
     clock_t m_prevProcessUserTime;

@@ -13,9 +13,6 @@
 #if defined(FLY_WINDOWS)
 #    define I64(n) (n##ll)
 #    define U64(n) (n##ull)
-
-#    include <BaseTsd.h>
-typedef SSIZE_T ssize_t;
 #elif defined(FLY_LINUX)
 #    include <cstdint>
 #    define I64(n) __INT64_C(n)

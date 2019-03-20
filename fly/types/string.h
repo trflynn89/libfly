@@ -3,6 +3,7 @@
 #include "fly/fly.h"
 #include "fly/traits/traits.h"
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -36,12 +37,12 @@ public:
      *
      * @param string The string to split.
      * @param char The delimiter to split the string on.
-     * @param size_t The maximum return vector size. Zero implies unlimited.
+     * @param uint32_t The maximum return vector size. Zero implies unlimited.
      *
      * @return A vector containing the split strings.
      */
     static std::vector<std::string>
-    Split(const std::string &, char, size_t) noexcept;
+    Split(const std::string &, char, std::uint32_t) noexcept;
 
     /**
      * Remove leading and trailing whitespace from a string.
@@ -134,11 +135,12 @@ public:
     /**
      * Generate a random string of the given size.
      *
-     * @param size_t The length of the string to generate.
+     * @param size_type The length of the string to generate.
      *
      * @return The generated string.
      */
-    static std::string GenerateRandomString(const size_t) noexcept;
+    static std::string
+    GenerateRandomString(const std::string::size_type) noexcept;
 
     /**
      * Format a string with variadic template arguments. This is type safe in

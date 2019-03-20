@@ -26,14 +26,14 @@ public:
         return m_num;
     };
 
-    size_t Hash() const noexcept
+    std::size_t Hash() const noexcept
     {
         static std::hash<std::string> strHasher;
         static std::hash<int> numHasher;
         static int magic = 0x9e3779b9;
 
-        size_t strHash = strHasher(m_str);
-        size_t numHash = numHasher(m_num);
+        std::size_t strHash = strHasher(m_str);
+        std::size_t numHash = numHasher(m_num);
 
         // Derived from boost::hash_combine
         return (strHash ^ (numHash + magic + (strHash << 6) + (strHash >> 2)));
@@ -120,7 +120,7 @@ namespace std {
 template <>
 struct hash<Hashable *>
 {
-    size_t operator()(const Hashable *value) const noexcept
+    std::size_t operator()(const Hashable *value) const noexcept
     {
         return value->Hash();
     }
@@ -129,7 +129,7 @@ struct hash<Hashable *>
 template <>
 struct hash<HashableAndStreamable *>
 {
-    size_t operator()(const HashableAndStreamable *value) const noexcept
+    std::size_t operator()(const HashableAndStreamable *value) const noexcept
     {
         return value->Hash();
     }
@@ -351,7 +351,7 @@ TEST(StringTest, WildcardTest)
 //==============================================================================
 TEST(StringTest, GenerateRandomStringTest)
 {
-    static const size_t length = (1 << 20);
+    static constexpr std::string::size_type length = (1 << 20);
 
     std::string random = fly::String::GenerateRandomString(length);
     ASSERT_EQ(length, random.length());

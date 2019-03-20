@@ -57,7 +57,7 @@ std::string IniParser::onSection(const std::string &line) noexcept(false)
 //==============================================================================
 void IniParser::onValue(Json &section, const std::string &line) noexcept(false)
 {
-    static const size_t size = 2;
+    static constexpr std::uint32_t size = 2;
 
     std::vector<std::string> nameValue = String::Split(line, '=', size);
 

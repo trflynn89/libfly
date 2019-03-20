@@ -26,9 +26,9 @@ char SocketConfig::EndOfMessage() const noexcept
 }
 
 //==============================================================================
-size_t SocketConfig::PacketSize() const noexcept
+std::size_t SocketConfig::PacketSize() const noexcept
 {
-    return GetValue<size_t>("packet_size", m_defaultPacketSize);
+    return GetValue<std::size_t>("packet_size", m_defaultPacketSize);
 }
 
 } // namespace fly

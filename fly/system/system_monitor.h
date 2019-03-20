@@ -53,7 +53,7 @@ public:
      *
      * @return uint32_t System CPU count.
      */
-    uint32_t GetSystemCpuCount() const noexcept;
+    std::uint32_t GetSystemCpuCount() const noexcept;
 
     /**
      * Get the system's CPU usage percentage (0-100%) over the last second.
@@ -74,21 +74,21 @@ public:
      *
      * @return uint64_t Total system memory.
      */
-    uint64_t GetTotalSystemMemory() const noexcept;
+    std::uint64_t GetTotalSystemMemory() const noexcept;
 
     /**
      * Get the system's physical memory usage in bytes.
      *
      * @return uint64_t Current system memory usage.
      */
-    uint64_t GetSystemMemoryUsage() const noexcept;
+    std::uint64_t GetSystemMemoryUsage() const noexcept;
 
     /**
      * Get the process's physical memory usage in bytes.
      *
      * @return uint64_t Current process memory usage.
      */
-    uint64_t GetProcessMemoryUsage() const noexcept;
+    std::uint64_t GetProcessMemoryUsage() const noexcept;
 
 protected:
     /**
@@ -116,13 +116,13 @@ protected:
      */
     virtual void UpdateProcessMemoryUsage() noexcept = 0;
 
-    std::atomic<uint32_t> m_systemCpuCount;
+    std::atomic<std::uint32_t> m_systemCpuCount;
     std::atomic<double> m_systemCpuUsage;
     std::atomic<double> m_processCpuUsage;
 
-    std::atomic<uint64_t> m_totalSystemMemory;
-    std::atomic<uint64_t> m_systemMemoryUsage;
-    std::atomic<uint64_t> m_processMemoryUsage;
+    std::atomic<std::uint64_t> m_totalSystemMemory;
+    std::atomic<std::uint64_t> m_systemMemoryUsage;
+    std::atomic<std::uint64_t> m_processMemoryUsage;
 
 private:
     /**

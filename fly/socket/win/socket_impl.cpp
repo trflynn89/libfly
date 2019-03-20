@@ -239,21 +239,21 @@ std::shared_ptr<Socket> SocketImpl::Accept() const noexcept
 }
 
 //==============================================================================
-size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
+std::size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
     noexcept
 {
     static const std::string eom(1, m_socketEoM);
     std::string toSend = message + eom;
 
     bool keepSending = !toSend.empty();
-    size_t bytesSent = 0;
+    std::size_t bytesSent = 0;
     wouldBlock = false;
 
     while (keepSending)
     {
         // Window's ::send() takes string size as an integer, but std::string's
-        // length is size_t - send at most MAX_INT bytes at a time
-        static size_t intMax = std::numeric_limits<int>::max();
+        // length is std::size_t - send at most MAX_INT bytes at a time
+        static constexpr std::size_t intMax = std::numeric_limits<int>::max();
         int toSendSize = static_cast<int>(std::min(toSend.size(), intMax));
 
         int currSent = ::send(m_socketHandle, toSend.c_str(), toSendSize, 0);
@@ -288,7 +288,7 @@ size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
 }
 
 //==============================================================================
-size_t SocketImpl::SendTo(
+std::size_t SocketImpl::SendTo(
     const std::string &message,
     address_type address,
     port_type port,
@@ -298,7 +298,7 @@ size_t SocketImpl::SendTo(
     std::string toSend = message + eom;
 
     bool keepSending = !toSend.empty();
-    size_t bytesSent = 0;
+    std::size_t bytesSent = 0;
     wouldBlock = false;
 
     struct sockaddr_in socketAddress = CreateSocketAddress(address, port);

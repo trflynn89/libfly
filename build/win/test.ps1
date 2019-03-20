@@ -7,20 +7,14 @@ function Run-Libfly-Test($arch)
 {
     Write-Output "Running $arch tests"
 
-    $full_path = $PSScriptRoot + "\Debug-" + $arch
+    $full_path = $PSScriptRoot + "\Release-" + $arch
     $tests_passed = 0
     $tests_failed = 0
 
-    Get-ChildItem -path $full_path -Recurse -Include *_tests.exe  | ForEach {
-        $timer = [Diagnostics.Stopwatch]::StartNew()
+    Get-ChildItem -path $full_path -Recurse -Include *_tests.exe | ForEach {
         & $_
-        $status = $LASTEXITCODE
-        $timer.Stop()
 
-        $duration = $timer.Elapsed.TotalMilliseconds
-        $test = $_.Directory.Name + "_" + $arch
-
-        if ($status -eq 0)
+        if ($LASTEXITCODE -eq 0)
         {
             ++$tests_passed
         }
