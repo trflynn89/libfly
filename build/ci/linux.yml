@@ -8,7 +8,10 @@ jobs:
     pool:
       vmImage: 'Ubuntu-16.04'
 
-    container: trflynn89/libfly:ubuntu18.04_gcc8
+    # Build image with: sudo docker build --tag "trflynn89/libfly:ubuntu18_gcc8"
+    container:
+      image: trflynn89/libfly:ubuntu18_gcc8
+      options: --cap-add SYS_PTRACE
 
     variables:
       CC: 'gcc-8'
