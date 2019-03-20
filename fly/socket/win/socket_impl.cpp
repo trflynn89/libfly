@@ -125,10 +125,8 @@ bool SocketImpl::SetAsync() noexcept
 }
 
 //==============================================================================
-bool SocketImpl::Bind(
-    address_type address,
-    port_type port,
-    BindOption option) const noexcept
+bool SocketImpl::Bind(address_type address, port_type port, BindOption option)
+    const noexcept
 {
     static const char bindForReuseOption = 1;
     static const int bindForReuseOptionLength =

@@ -628,7 +628,8 @@ bool JsonParser::isFeatureAllowed(Features feature) const noexcept(false)
 }
 
 //==============================================================================
-JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b) noexcept
+JsonParser::Features
+operator&(JsonParser::Features a, JsonParser::Features b) noexcept
 {
     return static_cast<JsonParser::Features>(
         static_cast<std::underlying_type_t<JsonParser::Features>>(a) &
@@ -636,7 +637,8 @@ JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b) n
 }
 
 //==============================================================================
-JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b) noexcept
+JsonParser::Features
+operator|(JsonParser::Features a, JsonParser::Features b) noexcept
 {
     return static_cast<JsonParser::Features>(
         static_cast<std::underlying_type_t<JsonParser::Features>>(a) |

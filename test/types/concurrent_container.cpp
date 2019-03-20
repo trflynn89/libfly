@@ -28,8 +28,9 @@ public:
         return numWrites;
     }
 
-    unsigned int
-    ReaderThread(ObjectQueue &objectQueue, std::atomic_bool &finishedWrites) noexcept
+    unsigned int ReaderThread(
+        ObjectQueue &objectQueue,
+        std::atomic_bool &finishedWrites) noexcept
     {
         unsigned int numReads = 0;
 
@@ -55,7 +56,9 @@ public:
     }
 
 protected:
-    void RunMultiThreadedTest(unsigned int numWriters, unsigned int numReaders) noexcept
+    void RunMultiThreadedTest(
+        unsigned int numWriters,
+        unsigned int numReaders) noexcept
     {
         ObjectQueue objectQueue;
 

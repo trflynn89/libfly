@@ -56,7 +56,8 @@ protected:
         ValidatePass(test, test);
     }
 
-    void ValidatePass(const std::string &test, const std::string &expected) noexcept
+    void
+    ValidatePass(const std::string &test, const std::string &expected) noexcept
     {
         SCOPED_TRACE(test);
 

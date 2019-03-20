@@ -77,7 +77,8 @@ std::ostream &operator<<(std::ostream &stream, const Streamable &obj)
 class HashableAndStreamable : public Base
 {
 public:
-    HashableAndStreamable(const std::string &str, int num) noexcept : Base(str, num)
+    HashableAndStreamable(const std::string &str, int num) noexcept :
+        Base(str, num)
     {
     }
 
@@ -85,7 +86,8 @@ public:
     operator<<(std::ostream &, const HashableAndStreamable &) noexcept;
 };
 
-std::ostream &operator<<(std::ostream &stream, const HashableAndStreamable &obj) noexcept
+std::ostream &
+operator<<(std::ostream &stream, const HashableAndStreamable &obj) noexcept
 {
     stream << '[';
     stream << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec;

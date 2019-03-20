@@ -248,11 +248,13 @@ private:
 /**
  * Combine two Features instances into a single instance via bitwise-and.
  */
-JsonParser::Features operator&(JsonParser::Features, JsonParser::Features) noexcept;
+JsonParser::Features
+operator&(JsonParser::Features, JsonParser::Features) noexcept;
 
 /**
  * Combine two Features instances into a single instance via bitwise-or.
  */
-JsonParser::Features operator|(JsonParser::Features, JsonParser::Features) noexcept;
+JsonParser::Features
+operator|(JsonParser::Features, JsonParser::Features) noexcept;
 
 } // namespace fly

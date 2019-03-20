@@ -31,7 +31,8 @@ public:
      *
      * @return bool True if the file was correctly created.
      */
-    static bool WriteFile(const std::filesystem::path &, const std::string &) noexcept;
+    static bool
+    WriteFile(const std::filesystem::path &, const std::string &) noexcept;
 
     /**
      * Read the contents of a file.

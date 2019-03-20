@@ -197,7 +197,8 @@ PathMonitor::getOrCreatePathInfo(const std::filesystem::path &path) noexcept
 }
 
 //==============================================================================
-std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event) noexcept
+std::ostream &
+operator<<(std::ostream &stream, PathMonitor::PathEvent event) noexcept
 {
     switch (event)
     {
