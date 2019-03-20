@@ -11,7 +11,7 @@ namespace fly {
 //==============================================================================
 SystemMonitor::SystemMonitor(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SystemConfig> &spConfig) :
+    const std::shared_ptr<SystemConfig> &spConfig) noexcept :
     m_systemCpuCount(0),
     m_systemCpuUsage(0.0),
     m_processCpuUsage(0.0),
@@ -24,7 +24,7 @@ SystemMonitor::SystemMonitor(
 }
 
 //==============================================================================
-bool SystemMonitor::Start()
+bool SystemMonitor::Start() noexcept
 {
     if (isValid())
     {
@@ -40,49 +40,49 @@ bool SystemMonitor::Start()
 }
 
 //==============================================================================
-uint32_t SystemMonitor::GetSystemCpuCount() const
+uint32_t SystemMonitor::GetSystemCpuCount() const noexcept
 {
     return m_systemCpuCount.load();
 }
 
 //==============================================================================
-double SystemMonitor::GetSystemCpuUsage() const
+double SystemMonitor::GetSystemCpuUsage() const noexcept
 {
     return m_systemCpuUsage.load();
 }
 
 //==============================================================================
-double SystemMonitor::GetProcessCpuUsage() const
+double SystemMonitor::GetProcessCpuUsage() const noexcept
 {
     return m_processCpuUsage.load();
 }
 
 //==============================================================================
-uint64_t SystemMonitor::GetTotalSystemMemory() const
+uint64_t SystemMonitor::GetTotalSystemMemory() const noexcept
 {
     return m_totalSystemMemory.load();
 }
 
 //==============================================================================
-uint64_t SystemMonitor::GetSystemMemoryUsage() const
+uint64_t SystemMonitor::GetSystemMemoryUsage() const noexcept
 {
     return m_systemMemoryUsage.load();
 }
 
 //==============================================================================
-uint64_t SystemMonitor::GetProcessMemoryUsage() const
+uint64_t SystemMonitor::GetProcessMemoryUsage() const noexcept
 {
     return m_processMemoryUsage.load();
 }
 
 //==============================================================================
-bool SystemMonitor::isValid() const
+bool SystemMonitor::isValid() const noexcept
 {
     return GetSystemCpuCount() > 0;
 }
 
 //==============================================================================
-void SystemMonitor::poll()
+void SystemMonitor::poll() noexcept
 {
     UpdateSystemCpuCount();
     UpdateSystemCpuUsage();
@@ -94,14 +94,14 @@ void SystemMonitor::poll()
 
 //==============================================================================
 SystemMonitorTask::SystemMonitorTask(
-    const std::weak_ptr<SystemMonitor> &wpSystemMonitor) :
+    std::weak_ptr<SystemMonitor> wpSystemMonitor) noexcept :
     Task(),
     m_wpSystemMonitor(wpSystemMonitor)
 {
 }
 
 //==============================================================================
-void SystemMonitorTask::Run()
+void SystemMonitorTask::Run() noexcept
 {
     std::shared_ptr<SystemMonitor> spSystemMonitor = m_wpSystemMonitor.lock();
 

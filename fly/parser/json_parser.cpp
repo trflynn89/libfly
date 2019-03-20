@@ -9,17 +9,19 @@
 namespace fly {
 
 //==============================================================================
-JsonParser::JsonParser() : Parser(), m_features(Features::Strict)
+JsonParser::JsonParser() noexcept : Parser(), m_features(Features::Strict)
 {
 }
 
 //==============================================================================
-JsonParser::JsonParser(Features features) : Parser(), m_features(features)
+JsonParser::JsonParser(Features features) noexcept :
+    Parser(),
+    m_features(features)
 {
 }
 
 //==============================================================================
-Json JsonParser::ParseInternal(std::istream &stream)
+Json JsonParser::ParseInternal(std::istream &stream) noexcept(false)
 {
     m_states = decltype(m_states)();
     m_states.push(State::NoState);
@@ -102,7 +104,7 @@ Json JsonParser::ParseInternal(std::istream &stream)
 }
 
 //==============================================================================
-void JsonParser::onWhitespace(Token token, int c)
+void JsonParser::onWhitespace(Token token, int c) noexcept(false)
 {
     if (m_parsingString)
     {
@@ -129,7 +131,7 @@ void JsonParser::onWhitespace(Token token, int c)
 }
 
 //==============================================================================
-void JsonParser::onStartBraceOrBracket(Token token, int c)
+void JsonParser::onStartBraceOrBracket(Token token, int c) noexcept(false)
 {
     switch (m_states.top())
     {
@@ -186,7 +188,7 @@ void JsonParser::onStartBraceOrBracket(Token token, int c)
 }
 
 //==============================================================================
-void JsonParser::onCloseBraceOrBracket(Token token, int c)
+void JsonParser::onCloseBraceOrBracket(Token token, int c) noexcept(false)
 {
     switch (m_states.top())
     {
@@ -243,7 +245,7 @@ void JsonParser::onCloseBraceOrBracket(Token token, int c)
 }
 
 //==============================================================================
-void JsonParser::onQuotation(int c)
+void JsonParser::onQuotation(int c) noexcept(false)
 {
     switch (m_states.top())
     {
@@ -294,7 +296,7 @@ void JsonParser::onQuotation(int c)
 }
 
 //==============================================================================
-void JsonParser::onColon(int c)
+void JsonParser::onColon(int c) noexcept(false)
 {
     switch (m_states.top())
     {
@@ -324,7 +326,7 @@ void JsonParser::onColon(int c)
 }
 
 //==============================================================================
-void JsonParser::onComma(int c)
+void JsonParser::onComma(int c) noexcept(false)
 {
     switch (m_states.top())
     {
@@ -374,7 +376,7 @@ void JsonParser::onComma(int c)
 }
 
 //==============================================================================
-void JsonParser::onSolidus(int c, std::istream &stream)
+void JsonParser::onSolidus(int c, std::istream &stream) noexcept(false)
 {
     if (m_parsingString)
     {
@@ -430,7 +432,8 @@ void JsonParser::onSolidus(int c, std::istream &stream)
 }
 
 //==============================================================================
-void JsonParser::onCharacter(Token token, int c, std::istream &stream)
+void JsonParser::onCharacter(Token token, int c, std::istream &stream) noexcept(
+    false)
 {
     if (std::isspace(c))
     {
@@ -474,7 +477,7 @@ void JsonParser::onCharacter(Token token, int c, std::istream &stream)
 }
 
 //==============================================================================
-void JsonParser::pushValue(int c)
+void JsonParser::pushValue(int c) noexcept(false)
 {
     if (m_parsingComplete)
     {
@@ -486,7 +489,7 @@ void JsonParser::pushValue(int c)
 }
 
 //==============================================================================
-std::string JsonParser::popValue()
+std::string JsonParser::popValue() noexcept
 {
     const std::string value = m_parsing.str();
 
@@ -498,7 +501,7 @@ std::string JsonParser::popValue()
 }
 
 //==============================================================================
-bool JsonParser::storeValue()
+bool JsonParser::storeValue() noexcept(false)
 {
     const std::string value = popValue();
 
@@ -570,7 +573,7 @@ bool JsonParser::storeValue()
 void JsonParser::validateNumber(
     const std::string &value,
     bool &isFloat,
-    bool &isSigned) const
+    bool &isSigned) const noexcept(false)
 {
     isSigned = (value[0] == '-');
 
@@ -619,13 +622,13 @@ void JsonParser::validateNumber(
 }
 
 //==============================================================================
-bool JsonParser::isFeatureAllowed(Features feature) const
+bool JsonParser::isFeatureAllowed(Features feature) const noexcept(false)
 {
     return (m_features & feature) != Features::Strict;
 }
 
 //==============================================================================
-JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b)
+JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b) noexcept
 {
     return static_cast<JsonParser::Features>(
         static_cast<std::underlying_type_t<JsonParser::Features>>(a) &
@@ -633,7 +636,7 @@ JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b)
 }
 
 //==============================================================================
-JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b)
+JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b) noexcept
 {
     return static_cast<JsonParser::Features>(
         static_cast<std::underlying_type_t<JsonParser::Features>>(a) |

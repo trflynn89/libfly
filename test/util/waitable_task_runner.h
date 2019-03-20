@@ -35,7 +35,7 @@ public:
      * @tparam TaskType The task subclass to wait on.
      */
     template <typename TaskType>
-    void WaitForTaskTypeToComplete();
+    void WaitForTaskTypeToComplete() noexcept;
 
     /**
      * Wait for a specific task type to complete execution.
@@ -47,7 +47,7 @@ public:
      * @return bool True if a completed task was found in the given duration.
      */
     template <typename TaskType, typename R, typename P>
-    bool WaitForTaskTypeToComplete(std::chrono::duration<R, P>);
+    bool WaitForTaskTypeToComplete(std::chrono::duration<R, P>) noexcept;
 
 protected:
     /**
@@ -55,7 +55,7 @@ protected:
      *
      * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    virtual void TaskComplete(const std::shared_ptr<Task> &) = 0;
+    virtual void TaskComplete(const std::shared_ptr<Task> &) noexcept = 0;
 
 private:
     ConcurrentQueue<size_t> m_completedTasks;
@@ -76,7 +76,7 @@ class WaitableParallelTaskRunner :
     friend class TaskManager;
 
 protected:
-    WaitableParallelTaskRunner(const std::weak_ptr<TaskManager> &);
+    WaitableParallelTaskRunner(std::weak_ptr<TaskManager>) noexcept;
 
     /**
      * When a task is complete, perform the same operations as this runner's
@@ -84,7 +84,7 @@ protected:
      *
      * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    void TaskComplete(const std::shared_ptr<Task> &) override;
+    void TaskComplete(const std::shared_ptr<Task> &) noexcept override;
 };
 
 /**
@@ -102,7 +102,7 @@ class WaitableSequencedTaskRunner :
     friend class TaskManager;
 
 protected:
-    WaitableSequencedTaskRunner(const std::weak_ptr<TaskManager> &);
+    WaitableSequencedTaskRunner(std::weak_ptr<TaskManager>) noexcept;
 
     /**
      * When a task is complete, perform the same operations as this runner's
@@ -110,12 +110,12 @@ protected:
      *
      * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    void TaskComplete(const std::shared_ptr<Task> &) override;
+    void TaskComplete(const std::shared_ptr<Task> &) noexcept override;
 };
 
 //==============================================================================
 template <typename TaskType>
-void WaitableTaskRunner::WaitForTaskTypeToComplete()
+void WaitableTaskRunner::WaitForTaskTypeToComplete() noexcept
 {
     static_assert(
         std::is_base_of<Task, TaskType>::value, "Given type is not a task");
@@ -132,7 +132,7 @@ void WaitableTaskRunner::WaitForTaskTypeToComplete()
 //==============================================================================
 template <typename TaskType, typename R, typename P>
 bool WaitableTaskRunner::WaitForTaskTypeToComplete(
-    std::chrono::duration<R, P> duration)
+    std::chrono::duration<R, P> duration) noexcept
 {
     static_assert(
         std::is_base_of<Task, TaskType>::value, "Given type is not a task");

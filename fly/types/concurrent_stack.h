@@ -16,20 +16,20 @@ template <typename T>
 class ConcurrentStack : public ConcurrentContainer<T, std::stack<T>>
 {
 protected:
-    void push(const T &) override;
-    void pop(T &) override;
+    void push(T &&) noexcept override;
+    void pop(T &) noexcept override;
 };
 
 //==============================================================================
 template <typename T>
-void ConcurrentStack<T>::push(const T &item)
+void ConcurrentStack<T>::push(T &&item) noexcept
 {
     this->m_container.push(std::move(item));
 }
 
 //==============================================================================
 template <typename T>
-void ConcurrentStack<T>::pop(T &item)
+void ConcurrentStack<T>::pop(T &item) noexcept
 {
     item = std::move(this->m_container.top());
     this->m_container.pop();

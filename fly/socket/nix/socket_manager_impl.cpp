@@ -11,13 +11,13 @@ namespace fly {
 //==============================================================================
 SocketManagerImpl::SocketManagerImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SocketConfig> &spConfig) :
+    const std::shared_ptr<SocketConfig> &spConfig) noexcept :
     SocketManager(spTaskRunner, spConfig)
 {
 }
 
 //==============================================================================
-void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
+void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout) noexcept
 {
     fd_set readFd, writeFd;
 
@@ -41,8 +41,9 @@ void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
 }
 
 //==============================================================================
-socket_type
-SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
+socket_type SocketManagerImpl::setReadAndWriteMasks(
+    fd_set *readFd,
+    fd_set *writeFd) noexcept
 {
     socket_type maxFd = -1;
 
@@ -66,7 +67,7 @@ SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
 }
 
 //==============================================================================
-void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
+void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd) noexcept
 {
     SocketList newClients, connectedClients, closedClients;
 

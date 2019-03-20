@@ -12,20 +12,21 @@ namespace {
 class Base
 {
 public:
-    Base(const std::string &str, int num) : m_str(str), m_num(num)
+    Base(const std::string &str, int num) noexcept : m_str(str), m_num(num)
     {
     }
 
-    std::string GetStr() const
+    std::string GetStr() const noexcept
     {
         return m_str;
     };
-    int GetNum() const
+
+    int GetNum() const noexcept
     {
         return m_num;
     };
 
-    size_t Hash() const
+    size_t Hash() const noexcept
     {
         static std::hash<std::string> strHasher;
         static std::hash<int> numHasher;
@@ -47,7 +48,7 @@ private:
 class Hashable : public Base
 {
 public:
-    Hashable(const std::string &str, int num) : Base(str, num)
+    Hashable(const std::string &str, int num) noexcept : Base(str, num)
     {
     }
 };
@@ -56,7 +57,7 @@ public:
 class Streamable : public Base
 {
 public:
-    Streamable(const std::string &str, int num) : Base(str, num)
+    Streamable(const std::string &str, int num) noexcept : Base(str, num)
     {
     }
 
@@ -72,18 +73,19 @@ std::ostream &operator<<(std::ostream &stream, const Streamable &obj)
     return stream;
 }
 
+//==========================================================================
 class HashableAndStreamable : public Base
 {
 public:
-    HashableAndStreamable(const std::string &str, int num) : Base(str, num)
+    HashableAndStreamable(const std::string &str, int num) noexcept : Base(str, num)
     {
     }
 
     friend std::ostream &
-    operator<<(std::ostream &, const HashableAndStreamable &);
+    operator<<(std::ostream &, const HashableAndStreamable &) noexcept;
 };
 
-std::ostream &operator<<(std::ostream &stream, const HashableAndStreamable &obj)
+std::ostream &operator<<(std::ostream &stream, const HashableAndStreamable &obj) noexcept
 {
     stream << '[';
     stream << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec;
@@ -94,7 +96,7 @@ std::ostream &operator<<(std::ostream &stream, const HashableAndStreamable &obj)
 
 //==========================================================================
 template <typename T>
-std::string min_to_string()
+std::string min_to_string() noexcept
 {
     long long min = std::numeric_limits<T>::min();
     return std::to_string(min - 1);
@@ -102,7 +104,7 @@ std::string min_to_string()
 
 //==========================================================================
 template <typename T>
-std::string max_to_string()
+std::string max_to_string() noexcept
 {
     unsigned long long max = std::numeric_limits<T>::max();
     return std::to_string(max + 1);
@@ -116,7 +118,7 @@ namespace std {
 template <>
 struct hash<Hashable *>
 {
-    size_t operator()(const Hashable *value) const
+    size_t operator()(const Hashable *value) const noexcept
     {
         return value->Hash();
     }
@@ -125,7 +127,7 @@ struct hash<Hashable *>
 template <>
 struct hash<HashableAndStreamable *>
 {
-    size_t operator()(const HashableAndStreamable *value) const
+    size_t operator()(const HashableAndStreamable *value) const noexcept
     {
         return value->Hash();
     }

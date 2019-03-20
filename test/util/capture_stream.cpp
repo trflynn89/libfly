@@ -21,7 +21,7 @@
 namespace fly {
 
 //==============================================================================
-CaptureStream::CaptureStream(Stream stream) :
+CaptureStream::CaptureStream(Stream stream) noexcept :
     m_path(fly::PathUtil::GenerateTempDirectory()),
     m_stdio(-1),
     m_original(-1)
@@ -63,13 +63,13 @@ CaptureStream::~CaptureStream()
 }
 
 //==============================================================================
-std::string CaptureStream::operator()()
+std::string CaptureStream::operator()() noexcept
 {
     return restore(true);
 }
 
 //==============================================================================
-std::string CaptureStream::restore(bool read)
+std::string CaptureStream::restore(bool read) noexcept
 {
     std::string contents;
 

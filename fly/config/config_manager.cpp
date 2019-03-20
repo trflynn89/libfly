@@ -16,7 +16,7 @@ namespace fly {
 ConfigManager::ConfigManager(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     ConfigFileType fileType,
-    const std::filesystem::path &path) :
+    const std::filesystem::path &path) noexcept :
     m_path(path),
     m_spTaskRunner(spTaskRunner)
 {
@@ -48,7 +48,7 @@ ConfigManager::~ConfigManager()
 }
 
 //==============================================================================
-ConfigManager::ConfigMap::size_type ConfigManager::GetSize()
+ConfigManager::ConfigMap::size_type ConfigManager::GetSize() noexcept
 {
     std::lock_guard<std::mutex> lock(m_configsMutex);
 
@@ -70,7 +70,7 @@ ConfigManager::ConfigMap::size_type ConfigManager::GetSize()
 }
 
 //==============================================================================
-bool ConfigManager::Start()
+bool ConfigManager::Start() noexcept
 {
     if (m_spParser)
     {
@@ -108,7 +108,7 @@ bool ConfigManager::Start()
 }
 
 //==============================================================================
-void ConfigManager::updateConfig()
+void ConfigManager::updateConfig() noexcept
 {
     std::lock_guard<std::mutex> lock(m_configsMutex);
 
@@ -148,14 +148,14 @@ void ConfigManager::updateConfig()
 
 //==============================================================================
 ConfigUpdateTask::ConfigUpdateTask(
-    const std::weak_ptr<ConfigManager> &wpConfigManager) :
+    std::weak_ptr<ConfigManager> wpConfigManager) noexcept :
     Task(),
     m_wpConfigManager(wpConfigManager)
 {
 }
 
 //==============================================================================
-void ConfigUpdateTask::Run()
+void ConfigUpdateTask::Run() noexcept
 {
     std::shared_ptr<ConfigManager> spConfigManager = m_wpConfigManager.lock();
 

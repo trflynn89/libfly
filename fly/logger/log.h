@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -27,7 +28,7 @@ struct Log
     /**
      * Enumeration to define the level of a log.
      */
-    enum class Level
+    enum class Level : std::uint8_t
     {
         Debug,
         Info,
@@ -40,7 +41,12 @@ struct Log
     /**
      * Default constructor.
      */
-    Log();
+    Log() noexcept;
+
+    /**
+     * Move constructor.
+     */
+    Log(Log &&) noexcept;
 
     /**
      * Constructor. Initialize with a message.
@@ -48,7 +54,12 @@ struct Log
      * @param LoggerConfig Reference to the logger config.
      * @param string Message to store.
      */
-    Log(const std::shared_ptr<LoggerConfig> &, const std::string &);
+    Log(const std::shared_ptr<LoggerConfig> &, const std::string &) noexcept;
+
+    /**
+     * Move assignment operator.
+     */
+    Log &operator=(Log &&) noexcept;
 
     Level m_level;
     double m_time;
@@ -57,9 +68,9 @@ struct Log
     unsigned int m_line;
     std::string m_message;
 
-    friend std::ostream &operator<<(std::ostream &, const Log &);
+    friend std::ostream &operator<<(std::ostream &, const Log &) noexcept;
 
-    friend std::ostream &operator<<(std::ostream &, const Level &);
+    friend std::ostream &operator<<(std::ostream &, const Level &) noexcept;
 };
 
 } // namespace fly

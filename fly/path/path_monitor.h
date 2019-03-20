@@ -3,6 +3,7 @@
 #include "fly/fly.h"
 #include "fly/task/task.h"
 
+#include <cstdint>
 #include <filesystem>
 #include <functional>
 #include <map>
@@ -32,7 +33,7 @@ public:
     /**
      * Enumerated list of path events.
      */
-    enum class PathEvent
+    enum class PathEvent : std::uint8_t
     {
         None,
         Created,
@@ -54,7 +55,7 @@ public:
      */
     PathMonitor(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<PathConfig> &);
+        const std::shared_ptr<PathConfig> &) noexcept;
 
     /**
      * Destructor. Remove all paths from the path monitor.
@@ -66,7 +67,7 @@ public:
      *
      * @return bool True if the path monitor is in a valid state.
      */
-    bool Start();
+    bool Start() noexcept;
 
     /**
      * Monitor for changes to all files under a directory. Callbacks registered
@@ -77,7 +78,7 @@ public:
      *
      * @return bool True if the directory could be added.
      */
-    bool AddPath(const std::filesystem::path &, PathEventCallback);
+    bool AddPath(const std::filesystem::path &, PathEventCallback) noexcept;
 
     /**
      * Stop monitoring for changes to all files under a directory.
@@ -86,12 +87,12 @@ public:
      *
      * @return bool True if the directory was removed.
      */
-    bool RemovePath(const std::filesystem::path &);
+    bool RemovePath(const std::filesystem::path &) noexcept;
 
     /**
      * Stop monitoring all paths.
      */
-    void RemoveAllPaths();
+    void RemoveAllPaths() noexcept;
 
     /**
      * Monitor for changes to a single file. Callbacks registered with AddFile
@@ -102,7 +103,7 @@ public:
      *
      * @return bool True if the file could be added.
      */
-    bool AddFile(const std::filesystem::path &, PathEventCallback);
+    bool AddFile(const std::filesystem::path &, PathEventCallback) noexcept;
 
     /**
      * Stop monitoring for changes to a single file. If there are no more files
@@ -113,7 +114,7 @@ public:
      *
      * @return bool True if the file was removed.
      */
-    bool RemoveFile(const std::filesystem::path &);
+    bool RemoveFile(const std::filesystem::path &) noexcept;
 
 protected:
     /**
@@ -133,7 +134,7 @@ protected:
          *
          * @return bool True if the monitored path is healthy.
          */
-        virtual bool IsValid() const = 0;
+        virtual bool IsValid() const noexcept = 0;
 
         PathEventCallback m_pathHandler;
         std::map<std::filesystem::path, PathEventCallback> m_fileHandlers;
@@ -153,14 +154,14 @@ protected:
      * @return PathInfo Up-casted shared pointer to the PathInfo struct.
      */
     virtual std::shared_ptr<PathInfo>
-    CreatePathInfo(const std::filesystem::path &) const = 0;
+    CreatePathInfo(const std::filesystem::path &) const noexcept = 0;
 
     /**
      * Check if the path monitor implementation is valid.
      *
      * @return bool True if the implementation is valid.
      */
-    virtual bool IsValid() const = 0;
+    virtual bool IsValid() const noexcept = 0;
 
     /**
      * Check the path monitor implementation for any changes to the monitored
@@ -168,7 +169,7 @@ protected:
      *
      * @param milliseconds Max time allow for an event to be occur.
      */
-    virtual void Poll(const std::chrono::milliseconds &) = 0;
+    virtual void Poll(const std::chrono::milliseconds &) noexcept = 0;
 
     mutable std::mutex m_mutex;
     PathInfoMap m_pathInfo;
@@ -183,12 +184,12 @@ private:
      * @return PathInfo Shared pointer to the PathInfo struct.
      */
     std::shared_ptr<PathInfo>
-    getOrCreatePathInfo(const std::filesystem::path &);
+    getOrCreatePathInfo(const std::filesystem::path &) noexcept;
 
     /**
      * Stream the name of a Json instance's type.
      */
-    friend std::ostream &operator<<(std::ostream &, PathEvent);
+    friend std::ostream &operator<<(std::ostream &, PathEvent) noexcept;
 
     std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
     std::shared_ptr<Task> m_spTask;
@@ -205,7 +206,7 @@ private:
 class PathMonitorTask : public Task
 {
 public:
-    PathMonitorTask(const std::weak_ptr<PathMonitor> &);
+    PathMonitorTask(std::weak_ptr<PathMonitor>) noexcept;
 
 protected:
     /**
@@ -213,7 +214,7 @@ protected:
      * paths. If the path monitor implementation is still valid, the task
      * re-arms itself.
      */
-    void Run() override;
+    void Run() noexcept override;
 
 private:
     std::weak_ptr<PathMonitor> m_wpPathMonitor;

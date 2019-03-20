@@ -34,7 +34,7 @@ public:
      */
     SystemMonitor(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SystemConfig> &);
+        const std::shared_ptr<SystemConfig> &) noexcept;
 
     /**
      * Destructor.
@@ -46,75 +46,75 @@ public:
      *
      * @return bool True if the path monitor is in a valid state.
      */
-    bool Start();
+    bool Start() noexcept;
 
     /**
      * Get the system's CPU count.
      *
      * @return uint32_t System CPU count.
      */
-    uint32_t GetSystemCpuCount() const;
+    uint32_t GetSystemCpuCount() const noexcept;
 
     /**
      * Get the system's CPU usage percentage (0-100%) over the last second.
      *
      * @return double Current system CPU usage.
      */
-    double GetSystemCpuUsage() const;
+    double GetSystemCpuUsage() const noexcept;
 
     /**
      * Get the process's CPU usage percentage (0-100%) over the last second.
      *
      * @return double Current process CPU usage.
      */
-    double GetProcessCpuUsage() const;
+    double GetProcessCpuUsage() const noexcept;
 
     /**
      * Get the system's total physical memory available in bytes.
      *
      * @return uint64_t Total system memory.
      */
-    uint64_t GetTotalSystemMemory() const;
+    uint64_t GetTotalSystemMemory() const noexcept;
 
     /**
      * Get the system's physical memory usage in bytes.
      *
      * @return uint64_t Current system memory usage.
      */
-    uint64_t GetSystemMemoryUsage() const;
+    uint64_t GetSystemMemoryUsage() const noexcept;
 
     /**
      * Get the process's physical memory usage in bytes.
      *
      * @return uint64_t Current process memory usage.
      */
-    uint64_t GetProcessMemoryUsage() const;
+    uint64_t GetProcessMemoryUsage() const noexcept;
 
 protected:
     /**
      * Update the system's current CPU count.
      */
-    virtual void UpdateSystemCpuCount() = 0;
+    virtual void UpdateSystemCpuCount() noexcept = 0;
 
     /**
      * Update the system's current CPU usage.
      */
-    virtual void UpdateSystemCpuUsage() = 0;
+    virtual void UpdateSystemCpuUsage() noexcept = 0;
 
     /**
      * Update the process's current CPU usage.
      */
-    virtual void UpdateProcessCpuUsage() = 0;
+    virtual void UpdateProcessCpuUsage() noexcept = 0;
 
     /**
      * Update the system's current memory usage.
      */
-    virtual void UpdateSystemMemoryUsage() = 0;
+    virtual void UpdateSystemMemoryUsage() noexcept = 0;
 
     /**
      * Update the process's current memory usage.
      */
-    virtual void UpdateProcessMemoryUsage() = 0;
+    virtual void UpdateProcessMemoryUsage() noexcept = 0;
 
     std::atomic<uint32_t> m_systemCpuCount;
     std::atomic<double> m_systemCpuUsage;
@@ -130,12 +130,12 @@ private:
      *
      * @return bool True if the CPU count is valid.
      */
-    bool isValid() const;
+    bool isValid() const noexcept;
 
     /**
      * Update the system-level resources.
      */
-    void poll();
+    void poll() noexcept;
 
     std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
     std::shared_ptr<Task> m_spTask;
@@ -152,7 +152,7 @@ private:
 class SystemMonitorTask : public Task
 {
 public:
-    SystemMonitorTask(const std::weak_ptr<SystemMonitor> &);
+    SystemMonitorTask(std::weak_ptr<SystemMonitor>) noexcept;
 
 protected:
     /**
@@ -160,7 +160,7 @@ protected:
      * the system monitor implementation is still valid, the task re-arms
      * itself.
      */
-    void Run() override;
+    void Run() noexcept override;
 
 private:
     std::weak_ptr<SystemMonitor> m_wpSystemMonitor;

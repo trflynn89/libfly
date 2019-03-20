@@ -5,6 +5,7 @@
 #include "fly/task/task.h"
 #include "fly/types/json.h"
 
+#include <cstdint>
 #include <filesystem>
 #include <map>
 #include <memory>
@@ -38,7 +39,7 @@ public:
     /**
      * Enumerated list of supported configuration file formats.
      */
-    enum class ConfigFileType
+    enum class ConfigFileType : std::uint8_t
     {
         Ini,
         Json,
@@ -54,7 +55,7 @@ public:
     ConfigManager(
         const std::shared_ptr<SequencedTaskRunner> &,
         ConfigFileType,
-        const std::filesystem::path &);
+        const std::filesystem::path &) noexcept;
 
     /**
      * Destructor. Stop the configuration manager and underlying objects.
@@ -70,7 +71,7 @@ public:
      * @return A reference to the created/found configuration.
      */
     template <typename T>
-    std::shared_ptr<T> CreateConfig();
+    std::shared_ptr<T> CreateConfig() noexcept;
 
     /**
      * Get the number of configuration objects currently created. Erases any
@@ -78,20 +79,20 @@ public:
      *
      * @return The number of configurations.
      */
-    ConfigMap::size_type GetSize();
+    ConfigMap::size_type GetSize() noexcept;
 
     /**
      * Start the configuration manager and underlying objects.
      *
      * @return True if the monitor could be started.
      */
-    bool Start();
+    bool Start() noexcept;
 
 private:
     /**
      * Parse the configuration file and store the parsed values in memory.
      */
-    void updateConfig();
+    void updateConfig() noexcept;
 
     std::shared_ptr<PathMonitor> m_spMonitor;
     std::shared_ptr<Parser> m_spParser;
@@ -115,13 +116,13 @@ private:
 class ConfigUpdateTask : public Task
 {
 public:
-    ConfigUpdateTask(const std::weak_ptr<ConfigManager> &);
+    ConfigUpdateTask(std::weak_ptr<ConfigManager>) noexcept;
 
 protected:
     /**
      * Call back into the config manager to re-parse the configuration file.
      */
-    void Run() override;
+    void Run() noexcept override;
 
 private:
     std::weak_ptr<ConfigManager> m_wpConfigManager;
@@ -129,22 +130,19 @@ private:
 
 //==============================================================================
 template <typename T>
-std::shared_ptr<T> ConfigManager::CreateConfig()
+std::shared_ptr<T> ConfigManager::CreateConfig() noexcept
 {
-    static_assert(
-        std::is_base_of<Config, T>::value,
-        "Given type is not a configuration type");
+    static_assert(std::is_base_of_v<Config, T>);
 
     std::shared_ptr<T> spConfig;
-    std::string name(T::GetName());
 
     std::lock_guard<std::mutex> lock(m_configsMutex);
-    ConfigMap::const_iterator it = m_configs.find(name);
+    ConfigMap::const_iterator it = m_configs.find(T::identifier);
 
     if (it == m_configs.end())
     {
         spConfig = std::make_shared<T>();
-        m_configs[name] = spConfig;
+        m_configs[T::identifier] = spConfig;
     }
     else
     {
@@ -157,17 +155,17 @@ std::shared_ptr<T> ConfigManager::CreateConfig()
         else
         {
             spConfig = std::make_shared<T>();
-            m_configs[name] = spConfig;
+            m_configs[T::identifier] = spConfig;
         }
     }
 
     if (spConfig)
     {
-        spConfig->Update(m_values[name]);
+        spConfig->Update(m_values[T::identifier]);
     }
     else
     {
-        LOGW("Could not create configuration for type %s", name);
+        LOGW("Could not create configuration for type %s", T::identifier);
     }
 
     return spConfig;

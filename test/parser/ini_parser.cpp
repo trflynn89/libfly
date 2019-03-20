@@ -11,7 +11,7 @@
 class IniParserTest : public ::testing::Test
 {
 public:
-    IniParserTest() : m_spParser(std::make_shared<fly::IniParser>())
+    IniParserTest() noexcept : m_spParser(std::make_shared<fly::IniParser>())
     {
     }
 

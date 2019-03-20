@@ -10,7 +10,7 @@ bool MockSystem::s_mockSystemEnabled = false;
 MockCalls MockSystem::s_mockedCalls;
 
 //==============================================================================
-MockSystem::MockSystem(MockCall mock) : m_mock(mock)
+MockSystem::MockSystem(MockCall mock) noexcept : m_mock(mock)
 {
     std::lock_guard<std::mutex> lock(s_mockSystemMutex);
 
@@ -18,7 +18,7 @@ MockSystem::MockSystem(MockCall mock) : m_mock(mock)
     s_mockSystemEnabled = true;
 }
 //==============================================================================
-MockSystem::MockSystem(MockCall mock, bool fail) : m_mock(mock)
+MockSystem::MockSystem(MockCall mock, bool fail) noexcept : m_mock(mock)
 {
     std::lock_guard<std::mutex> lock(s_mockSystemMutex);
 
@@ -42,14 +42,14 @@ MockSystem::~MockSystem()
 }
 
 //==============================================================================
-bool MockSystem::MockEnabled(MockCall mock)
+bool MockSystem::MockEnabled(MockCall mock) noexcept
 {
     bool fail;
     return MockEnabled(mock, fail);
 }
 
 //==============================================================================
-bool MockSystem::MockEnabled(MockCall mock, bool &fail)
+bool MockSystem::MockEnabled(MockCall mock, bool &fail) noexcept
 {
     std::lock_guard<std::mutex> lock(s_mockSystemMutex);
 

@@ -38,7 +38,7 @@
  * @param Type The type to be tested.
  * @param functor The function to test for.
  */
-#define DECLARATION_TESTS(label, Type, functor)                                \
+#define FLY_DECLARATION_TESTS(label, Type, functor)                            \
     struct if_##label                                                          \
     {                                                                          \
         struct __##label                                                       \
@@ -50,17 +50,18 @@
             static constexpr auto test_##label(...) -> std::false_type;        \
                                                                                \
             template <typename Type>                                           \
-            using is_undefined = std::                                         \
-                is_same<decltype(test_##label<Type>(0)), std::false_type>;     \
+            inline static constexpr bool is_undefined = std::is_same<          \
+                decltype(test_##label<Type>(0)),                               \
+                std::false_type>::value;                                       \
         };                                                                     \
                                                                                \
         template <typename Type>                                               \
         using enabled =                                                        \
-            std::enable_if_t<!__##label::is_undefined<Type>::value, bool>;     \
+            std::enable_if_t<!__##label::is_undefined<Type>, bool>;            \
                                                                                \
         template <typename Type>                                               \
         using disabled =                                                       \
-            std::enable_if_t<__##label::is_undefined<Type>::value, bool>;      \
+            std::enable_if_t<__##label::is_undefined<Type>, bool>;             \
     };
 
 /**
@@ -79,17 +80,17 @@ struct if_string
     struct __
     {
         template <typename T>
-        using is_string = std::bool_constant<
-            std::is_same<char *, std::decay_t<T>>::value ||
-            std::is_same<char const *, std::decay_t<T>>::value ||
-            std::is_same<std::string, std::decay_t<T>>::value>;
+        inline static constexpr bool is_string = std::bool_constant<
+            std::is_same_v<char *, std::decay_t<T>> ||
+            std::is_same_v<char const *, std::decay_t<T>> ||
+            std::is_same_v<std::string, std::decay_t<T>>>::value;
     };
 
     template <typename T>
-    using enabled = std::enable_if_t<__::is_string<T>::value, bool>;
+    using enabled = std::enable_if_t<__::is_string<T>, bool>;
 
     template <typename T>
-    using disabled = std::enable_if_t<!__::is_string<T>::value, bool>;
+    using disabled = std::enable_if_t<!__::is_string<T>, bool>;
 };
 
 /**
@@ -100,17 +101,17 @@ struct if_signed_integer
     struct __
     {
         template <typename T>
-        using is_signed_integer = std::bool_constant<
-            std::is_integral<std::decay_t<T>>::value &&
-            std::is_signed<std::decay_t<T>>::value &&
-            !std::is_same<bool, std::decay_t<T>>::value>;
+        inline static constexpr bool is_signed_integer = std::bool_constant<
+            std::is_integral_v<std::decay_t<T>> &&
+            std::is_signed_v<std::decay_t<T>> &&
+            !std::is_same_v<bool, std::decay_t<T>>>::value;
     };
 
     template <typename T>
-    using enabled = std::enable_if_t<__::is_signed_integer<T>::value, bool>;
+    using enabled = std::enable_if_t<__::is_signed_integer<T>, bool>;
 
     template <typename T>
-    using disabled = std::enable_if_t<!__::is_signed_integer<T>::value, bool>;
+    using disabled = std::enable_if_t<!__::is_signed_integer<T>, bool>;
 };
 
 /**
@@ -121,17 +122,17 @@ struct if_unsigned_integer
     struct __
     {
         template <typename T>
-        using is_unsigned_integer = std::bool_constant<
-            std::is_integral<std::decay_t<T>>::value &&
-            std::is_unsigned<std::decay_t<T>>::value &&
-            !std::is_same<bool, std::decay_t<T>>::value>;
+        inline static constexpr bool is_unsigned_integer = std::bool_constant<
+            std::is_integral_v<std::decay_t<T>> &&
+            std::is_unsigned_v<std::decay_t<T>> &&
+            !std::is_same_v<bool, std::decay_t<T>>>::value;
     };
 
     template <typename T>
-    using enabled = std::enable_if_t<__::is_unsigned_integer<T>::value, bool>;
+    using enabled = std::enable_if_t<__::is_unsigned_integer<T>, bool>;
 
     template <typename T>
-    using disabled = std::enable_if_t<!__::is_unsigned_integer<T>::value, bool>;
+    using disabled = std::enable_if_t<!__::is_unsigned_integer<T>, bool>;
 };
 
 /**
@@ -142,15 +143,15 @@ struct if_floating_point
     struct __
     {
         template <typename T>
-        using is_floating_point =
-            std::bool_constant<std::is_floating_point<std::decay_t<T>>::value>;
+        inline static constexpr bool is_floating_point = std::bool_constant<
+            std::is_floating_point_v<std::decay_t<T>>>::value;
     };
 
     template <typename T>
-    using enabled = std::enable_if_t<__::is_floating_point<T>::value, bool>;
+    using enabled = std::enable_if_t<__::is_floating_point<T>, bool>;
 
     template <typename T>
-    using disabled = std::enable_if_t<!__::is_floating_point<T>::value, bool>;
+    using disabled = std::enable_if_t<!__::is_floating_point<T>, bool>;
 };
 
 /**
@@ -161,16 +162,16 @@ struct if_numeric
     struct __
     {
         template <typename T>
-        using is_numeric = std::bool_constant<
-            std::is_arithmetic<std::decay_t<T>>::value &&
-            !std::is_same<bool, std::decay_t<T>>::value>;
+        inline static constexpr bool is_numeric = std::bool_constant<
+            std::is_arithmetic_v<std::decay_t<T>> &&
+            !std::is_same_v<bool, std::decay_t<T>>>::value;
     };
 
     template <typename T>
-    using enabled = std::enable_if_t<__::is_numeric<T>::value, bool>;
+    using enabled = std::enable_if_t<__::is_numeric<T>, bool>;
 
     template <typename T>
-    using disabled = std::enable_if_t<!__::is_numeric<T>::value, bool>;
+    using disabled = std::enable_if_t<!__::is_numeric<T>, bool>;
 };
 
 /**
@@ -181,15 +182,15 @@ struct if_boolean
     struct __
     {
         template <typename T>
-        using is_boolean =
-            std::bool_constant<std::is_same<bool, std::decay_t<T>>::value>;
+        inline static constexpr bool is_boolean =
+            std::bool_constant<std::is_same_v<bool, std::decay_t<T>>>::value;
     };
 
     template <typename T>
-    using enabled = std::enable_if_t<__::is_boolean<T>::value, bool>;
+    using enabled = std::enable_if_t<__::is_boolean<T>, bool>;
 
     template <typename T>
-    using disabled = std::enable_if_t<!__::is_boolean<T>::value, bool>;
+    using disabled = std::enable_if_t<!__::is_boolean<T>, bool>;
 };
 
 /**
@@ -300,7 +301,7 @@ struct if_array
 /**
  * Tests for whether a type defines operator<<.
  */
-DECLARATION_TESTS(
+FLY_DECLARATION_TESTS(
     ostream,
     T,
     std::declval<std::ostream &>() << std::declval<const T &>());

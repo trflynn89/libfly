@@ -20,7 +20,7 @@ public:
      * @param int Line number where error was encountered.
      * @param string Message indicating what error was encountered.
      */
-    ParserException(int, const std::string &);
+    ParserException(int, const std::string &) noexcept;
 
     /**
      * Constructor.
@@ -29,7 +29,7 @@ public:
      * @param int Column number in line where error was encountered.
      * @param string Message indicating what error was encountered.
      */
-    ParserException(int, int, const std::string &);
+    ParserException(int, int, const std::string &) noexcept;
 
     /**
      * @return A C-string representing this exception.
@@ -56,7 +56,7 @@ public:
      * @param int Column number in line where error was encountered.
      * @param int Unexpected character code.
      */
-    UnexpectedCharacterException(int, int, int);
+    UnexpectedCharacterException(int, int, int) noexcept;
 };
 
 /**
@@ -75,7 +75,7 @@ public:
      * @param int Column number in line where error was encountered.
      * @param string The unconvertable value.
      */
-    BadConversionException(int, int, const std::string &);
+    BadConversionException(int, int, const std::string &) noexcept;
 };
 
 } // namespace fly

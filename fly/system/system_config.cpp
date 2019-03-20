@@ -5,18 +5,11 @@
 namespace fly {
 
 //==============================================================================
-SystemConfig::SystemConfig() : m_defaultPollInterval(I64(1000))
+SystemConfig::SystemConfig() noexcept : m_defaultPollInterval(I64(1000))
 {
 }
-
 //==============================================================================
-std::string SystemConfig::GetName()
-{
-    return "system";
-}
-
-//==============================================================================
-std::chrono::milliseconds SystemConfig::PollInterval() const
+std::chrono::milliseconds SystemConfig::PollInterval() const noexcept
 {
     return std::chrono::milliseconds(GetValue<std::chrono::milliseconds::rep>(
         "poll_interval", m_defaultPollInterval));

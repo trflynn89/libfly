@@ -22,7 +22,7 @@ namespace {
 } // namespace
 
 //==============================================================================
-void SystemImpl::PrintBacktrace()
+void SystemImpl::PrintBacktrace() noexcept
 {
     void *trace[10];
     const USHORT traceSize = ::CaptureStackBackTrace(0, 10, trace, NULL);
@@ -34,7 +34,7 @@ void SystemImpl::PrintBacktrace()
 }
 
 //==============================================================================
-std::string SystemImpl::LocalTime(const std::string &fmt)
+std::string SystemImpl::LocalTime(const std::string &fmt) noexcept
 {
     auto sys = std::chrono::system_clock::now();
     time_t now = std::chrono::system_clock::to_time_t(sys);
@@ -56,13 +56,13 @@ std::string SystemImpl::LocalTime(const std::string &fmt)
 }
 
 //==============================================================================
-int SystemImpl::GetErrorCode()
+int SystemImpl::GetErrorCode() noexcept
 {
     return ::WSAGetLastError();
 }
 
 //==============================================================================
-std::string SystemImpl::GetErrorString(int code)
+std::string SystemImpl::GetErrorString(int code) noexcept
 {
     LPTSTR str = NULL;
     std::string ret;
@@ -85,7 +85,7 @@ std::string SystemImpl::GetErrorString(int code)
 }
 
 //==============================================================================
-std::vector<int> SystemImpl::GetSignals()
+std::vector<int> SystemImpl::GetSignals() noexcept
 {
     return {SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV};
 }

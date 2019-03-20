@@ -12,7 +12,7 @@ std::atomic_int Socket::s_aNumSockets(0);
 //==============================================================================
 Socket::Socket(
     Protocol protocol,
-    const std::shared_ptr<SocketConfig> &spConfig) :
+    const std::shared_ptr<SocketConfig> &spConfig) noexcept :
     m_protocol(protocol),
     m_spConfig(spConfig),
     m_socketEoM(spConfig->EndOfMessage()),
@@ -30,85 +30,85 @@ Socket::Socket(
 //==============================================================================
 bool Socket::HostnameToAddress(
     const std::string &hostname,
-    address_type &address)
+    address_type &address) noexcept
 {
     return SocketImpl::HostnameToAddress(hostname, address);
 }
 
 //==============================================================================
-address_type Socket::InAddrAny()
+address_type Socket::InAddrAny() noexcept
 {
     return SocketImpl::InAddrAny();
 }
 
 //==============================================================================
-socket_type Socket::InvalidSocket()
+socket_type Socket::InvalidSocket() noexcept
 {
     return SocketImpl::InvalidSocket();
 }
 
 //==============================================================================
-bool Socket::IsValid() const
+bool Socket::IsValid() const noexcept
 {
     return m_socketHandle != InvalidSocket();
 }
 
 //==============================================================================
-socket_type Socket::GetHandle() const
+socket_type Socket::GetHandle() const noexcept
 {
     return m_socketHandle;
 }
 
 //==============================================================================
-address_type Socket::GetClientIp() const
+address_type Socket::GetClientIp() const noexcept
 {
     return m_clientIp;
 }
 
 //==============================================================================
-port_type Socket::GetClientPort() const
+port_type Socket::GetClientPort() const noexcept
 {
     return m_clientPort;
 }
 
 //==============================================================================
-int Socket::GetSocketId() const
+int Socket::GetSocketId() const noexcept
 {
     return m_socketId;
 }
 
 //==============================================================================
-bool Socket::IsTcp() const
+bool Socket::IsTcp() const noexcept
 {
     return m_protocol == Protocol::TCP;
 }
 
 //==============================================================================
-bool Socket::IsUdp() const
+bool Socket::IsUdp() const noexcept
 {
     return m_protocol == Protocol::UDP;
 }
 
 //==============================================================================
-bool Socket::IsAsync() const
+bool Socket::IsAsync() const noexcept
 {
     return m_isAsync;
 }
 
 //==============================================================================
-bool Socket::IsListening() const
+bool Socket::IsListening() const noexcept
 {
     return m_isListening;
 }
 
 //==============================================================================
-bool Socket::IsConnecting() const
+bool Socket::IsConnecting() const noexcept
 {
     return m_aConnectedState.load() == ConnectedState::Connecting;
 }
 
 //==============================================================================
-bool Socket::IsConnected() const
+bool Socket::IsConnected() const noexcept
 {
     return m_aConnectedState.load() == ConnectedState::Connected;
 }
@@ -117,7 +117,7 @@ bool Socket::IsConnected() const
 bool Socket::Bind(
     const std::string &hostname,
     port_type port,
-    BindOption option) const
+    BindOption option) const noexcept
 {
     address_type address = 0;
 
@@ -130,7 +130,7 @@ bool Socket::Bind(
 }
 
 //==============================================================================
-bool Socket::Connect(const std::string &hostname, port_type port)
+bool Socket::Connect(const std::string &hostname, port_type port) noexcept
 {
     address_type address = 0;
 
@@ -143,7 +143,8 @@ bool Socket::Connect(const std::string &hostname, port_type port)
 }
 
 //==============================================================================
-ConnectedState Socket::ConnectAsync(address_type address, port_type port)
+ConnectedState
+Socket::ConnectAsync(address_type address, port_type port) noexcept
 {
     ConnectedState state = ConnectedState::Disconnected;
 
@@ -175,7 +176,8 @@ ConnectedState Socket::ConnectAsync(address_type address, port_type port)
 }
 
 //==============================================================================
-ConnectedState Socket::ConnectAsync(const std::string &hostname, port_type port)
+ConnectedState
+Socket::ConnectAsync(const std::string &hostname, port_type port) noexcept
 {
     address_type address = 0;
 
@@ -188,7 +190,7 @@ ConnectedState Socket::ConnectAsync(const std::string &hostname, port_type port)
 }
 
 //==============================================================================
-bool Socket::FinishConnect()
+bool Socket::FinishConnect() noexcept
 {
     if (IsValid() & IsConnecting() && IsErrorFree())
     {
@@ -207,7 +209,7 @@ bool Socket::FinishConnect()
 }
 
 //==============================================================================
-size_t Socket::Send(const std::string &message) const
+size_t Socket::Send(const std::string &message) const noexcept
 {
     bool wouldBlock = false;
     return Send(message, wouldBlock);
@@ -217,7 +219,7 @@ size_t Socket::Send(const std::string &message) const
 size_t Socket::SendTo(
     const std::string &message,
     address_type address,
-    port_type port) const
+    port_type port) const noexcept
 {
     bool wouldBlock = false;
     return SendTo(message, address, port, wouldBlock);
@@ -227,7 +229,7 @@ size_t Socket::SendTo(
 size_t Socket::SendTo(
     const std::string &message,
     const std::string &hostname,
-    port_type port) const
+    port_type port) const noexcept
 {
     bool wouldBlock = false;
     return SendTo(message, hostname, port, wouldBlock);
@@ -238,7 +240,7 @@ size_t Socket::SendTo(
     const std::string &message,
     const std::string &hostname,
     port_type port,
-    bool &wouldBlock) const
+    bool &wouldBlock) const noexcept
 {
     address_type address = 0;
 
@@ -251,12 +253,12 @@ size_t Socket::SendTo(
 }
 
 //==============================================================================
-bool Socket::SendAsync(const std::string &message)
+bool Socket::SendAsync(std::string &&message) noexcept
 {
     if (IsTcp() && IsAsync())
     {
-        AsyncRequest request(m_socketId, message);
-        m_pendingSends.Push(request);
+        AsyncRequest request(m_socketId, std::move(message));
+        m_pendingSends.Push(std::move(request));
 
         return true;
     }
@@ -266,14 +268,14 @@ bool Socket::SendAsync(const std::string &message)
 
 //==============================================================================
 bool Socket::SendToAsync(
-    const std::string &message,
+    std::string &&message,
     address_type address,
-    port_type port)
+    port_type port) noexcept
 {
     if (IsUdp() && IsAsync())
     {
-        AsyncRequest request(m_socketId, message, address, port);
-        m_pendingSends.Push(request);
+        AsyncRequest request(m_socketId, std::move(message), address, port);
+        m_pendingSends.Push(std::move(request));
 
         return true;
     }
@@ -283,36 +285,37 @@ bool Socket::SendToAsync(
 
 //==============================================================================
 bool Socket::SendToAsync(
-    const std::string &message,
+    std::string &&message,
     const std::string &hostname,
-    port_type port)
+    port_type port) noexcept
 {
     address_type address = 0;
 
     if (HostnameToAddress(hostname, address))
     {
-        return SendToAsync(message, address, port);
+        return SendToAsync(std::move(message), address, port);
     }
 
     return false;
 }
 
 //==============================================================================
-std::string Socket::Recv() const
+std::string Socket::Recv() const noexcept
 {
     bool wouldBlock = false, isComplete = false;
     return Recv(wouldBlock, isComplete);
 }
 
 //==============================================================================
-std::string Socket::RecvFrom() const
+std::string Socket::RecvFrom() const noexcept
 {
     bool wouldBlock = false, isComplete = false;
     return RecvFrom(wouldBlock, isComplete);
 }
 
 //==============================================================================
-void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
+void Socket::ServiceSendRequests(
+    AsyncRequest::RequestQueue &completedSends) noexcept
 {
     bool wouldBlock = false;
 
@@ -344,7 +347,7 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
             if (bytesSent == message.length())
             {
                 SLOGD(m_socketId, "Sent %zu bytes", bytesSent);
-                completedSends.Push(request);
+                completedSends.Push(std::move(request));
             }
             else if (wouldBlock)
             {
@@ -356,7 +359,7 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
                     message.length());
 
                 request.IncrementRequestOffset(bytesSent);
-                m_pendingSends.Push(request);
+                m_pendingSends.Push(std::move(request));
             }
             else
             {
@@ -368,7 +371,8 @@ void Socket::ServiceSendRequests(AsyncRequest::RequestQueue &completedSends)
 }
 
 //==============================================================================
-void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
+void Socket::ServiceRecvRequests(
+    AsyncRequest::RequestQueue &completedReceives) noexcept
 {
     bool wouldBlock = false;
     bool isComplete = false;
@@ -405,8 +409,8 @@ void Socket::ServiceRecvRequests(AsyncRequest::RequestQueue &completedReceives)
                     "Completed message, %u bytes",
                     m_receiveBuffer.length());
 
-                AsyncRequest request(m_socketId, m_receiveBuffer);
-                completedReceives.Push(request);
+                AsyncRequest request(m_socketId, std::move(m_receiveBuffer));
+                completedReceives.Push(std::move(request));
                 m_receiveBuffer.clear();
             }
         }

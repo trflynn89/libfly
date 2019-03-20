@@ -42,7 +42,7 @@ const char *ConvertToUTF8(const wchar_t *str)
 class JsonTest : public ::testing::Test
 {
 protected:
-    void ValidateFail(const std::string &test)
+    void ValidateFail(const std::string &test) noexcept
     {
         SCOPED_TRACE(test);
 
@@ -51,12 +51,12 @@ protected:
         EXPECT_THROW({ actual = test; }, fly::JsonException);
     }
 
-    void ValidatePass(const std::string &test)
+    void ValidatePass(const std::string &test) noexcept
     {
         ValidatePass(test, test);
     }
 
-    void ValidatePass(const std::string &test, const std::string &expected)
+    void ValidatePass(const std::string &test, const std::string &expected) noexcept
     {
         SCOPED_TRACE(test);
 

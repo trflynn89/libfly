@@ -25,15 +25,15 @@ public:
      */
     SystemMonitorImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SystemConfig> &);
+        const std::shared_ptr<SystemConfig> &) noexcept;
 
 protected:
-    void UpdateSystemCpuCount() override;
-    void UpdateSystemCpuUsage() override;
-    void UpdateProcessCpuUsage() override;
+    void UpdateSystemCpuCount() noexcept override;
+    void UpdateSystemCpuUsage() noexcept override;
+    void UpdateProcessCpuUsage() noexcept override;
 
-    void UpdateSystemMemoryUsage() override;
-    void UpdateProcessMemoryUsage() override;
+    void UpdateSystemMemoryUsage() noexcept override;
+    void UpdateProcessMemoryUsage() noexcept override;
 
 private:
     uint64_t m_prevSystemUserTime;

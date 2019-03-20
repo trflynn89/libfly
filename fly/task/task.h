@@ -25,7 +25,7 @@ protected:
      * Classes which inherit from this class should implement this method to
      * perform the work required by the task.
      */
-    virtual void Run() = 0;
+    virtual void Run() noexcept = 0;
 };
 
 } // namespace fly

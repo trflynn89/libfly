@@ -27,7 +27,7 @@ namespace {
 class TestSystemConfig : public fly::SystemConfig
 {
 public:
-    TestSystemConfig() : fly::SystemConfig()
+    TestSystemConfig() noexcept : fly::SystemConfig()
     {
         m_defaultPollInterval = I64(100);
     }
@@ -39,7 +39,7 @@ public:
 class SystemMonitorTest : public ::testing::Test
 {
 public:
-    SystemMonitorTest() :
+    SystemMonitorTest() noexcept :
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
         m_spTaskRunner(
@@ -57,7 +57,7 @@ public:
     /**
      * Start the task manager and system monitor.
      */
-    void SetUp() override
+    void SetUp() noexcept override
     {
         ASSERT_TRUE(m_spTaskManager->Start());
         ASSERT_TRUE(m_spMonitor->Start());
@@ -67,7 +67,7 @@ public:
     /**
      * Stop the task manager.
      */
-    void TearDown() override
+    void TearDown() noexcept override
     {
         ASSERT_TRUE(m_spTaskManager->Stop());
     }
@@ -75,7 +75,7 @@ public:
     /**
      * Thread to spin infinitely until signaled to stop.
      */
-    void SpinThread()
+    void SpinThread() noexcept
     {
         while (m_aKeepRunning.load())
         {
@@ -89,12 +89,6 @@ protected:
     std::shared_ptr<fly::SystemMonitor> m_spMonitor;
     std::atomic_bool m_aKeepRunning;
 };
-
-//==============================================================================
-TEST_F(SystemMonitorTest, SystemConfigTest)
-{
-    EXPECT_EQ(fly::SystemConfig::GetName(), "system");
-}
 
 //==============================================================================
 TEST_F(SystemMonitorTest, CpuUsageTest)

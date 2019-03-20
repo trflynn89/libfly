@@ -24,11 +24,11 @@ public:
     virtual ~ConcurrentContainer() = default;
 
     /**
-     * Push an item onto the container.
+     * Move an item onto the container.
      *
      * @param T Reference to an object of type T to push onto the container.
      */
-    void Push(const T &);
+    void Push(T &&) noexcept;
 
     /**
      * Pop an item from the container. If the container is empty, wait
@@ -36,7 +36,7 @@ public:
      *
      * @param T Reference to an object of type T where the item will be stored.
      */
-    void Pop(T &);
+    void Pop(T &) noexcept;
 
     /**
      * Pop an item from the container. If the container is empty, wait (at most)
@@ -48,32 +48,32 @@ public:
      * @return True if an object was popped in the given duration.
      */
     template <typename R, typename P>
-    bool Pop(T &, std::chrono::duration<R, P>);
+    bool Pop(T &, std::chrono::duration<R, P>) noexcept;
 
     /**
      * @return True if the container is empty, false otherwise.
      */
-    bool IsEmpty() const;
+    bool IsEmpty() const noexcept;
 
     /**
      * @return The number of items in the container.
      */
-    size_type Size() const;
+    size_type Size() const noexcept;
 
 protected:
     /**
-     * Implementation-specific method to push an item onto the container.
+     * Implementation-specific method to move an item onto the container.
      *
      * @param T Reference to an object of type T to push onto the container.
      */
-    virtual void push(const T &) = 0;
+    virtual void push(T &&) noexcept = 0;
 
     /**
      * Implementation-specific method to pop an item from the container.
      *
      * @param T Reference to an object of type T where the item will be stored.
      */
-    virtual void pop(T &) = 0;
+    virtual void pop(T &) noexcept = 0;
 
     mutable std::mutex m_containerMutex;
     Container m_container;
@@ -84,11 +84,11 @@ private:
 
 //==============================================================================
 template <typename T, typename Container>
-void ConcurrentContainer<T, Container>::Push(const T &item)
+void ConcurrentContainer<T, Container>::Push(T &&item) noexcept
 {
     {
         std::unique_lock<std::mutex> lock(m_containerMutex);
-        push(item);
+        push(std::move(item));
     }
 
     m_pushCondition.notify_one();
@@ -96,7 +96,7 @@ void ConcurrentContainer<T, Container>::Push(const T &item)
 
 //==============================================================================
 template <typename T, typename Container>
-void ConcurrentContainer<T, Container>::Pop(T &item)
+void ConcurrentContainer<T, Container>::Pop(T &item) noexcept
 {
     std::unique_lock<std::mutex> lock(m_containerMutex);
 
@@ -113,7 +113,7 @@ template <typename T, typename Container>
 template <typename R, typename P>
 bool ConcurrentContainer<T, Container>::Pop(
     T &item,
-    std::chrono::duration<R, P> waitTime)
+    std::chrono::duration<R, P> waitTime) noexcept
 {
     std::unique_lock<std::mutex> lock(m_containerMutex);
 
@@ -130,7 +130,7 @@ bool ConcurrentContainer<T, Container>::Pop(
 
 //==============================================================================
 template <typename T, typename Container>
-bool ConcurrentContainer<T, Container>::IsEmpty() const
+bool ConcurrentContainer<T, Container>::IsEmpty() const noexcept
 {
     std::unique_lock<std::mutex> lock(m_containerMutex);
     return m_container.empty();
@@ -138,7 +138,7 @@ bool ConcurrentContainer<T, Container>::IsEmpty() const
 
 //==============================================================================
 template <typename T, typename Container>
-auto ConcurrentContainer<T, Container>::Size() const -> size_type
+auto ConcurrentContainer<T, Container>::Size() const noexcept -> size_type
 {
     std::unique_lock<std::mutex> lock(m_containerMutex);
     return m_container.size();

@@ -8,7 +8,9 @@
 namespace fly {
 
 //==============================================================================
-ParserException::ParserException(int line, const std::string &message) :
+ParserException::ParserException(
+    int line,
+    const std::string &message) noexcept :
     m_message(String::Format(
         "ParserException: Error parsing at [line %d]: %s",
         line,
@@ -21,7 +23,7 @@ ParserException::ParserException(int line, const std::string &message) :
 ParserException::ParserException(
     int line,
     int column,
-    const std::string &message) :
+    const std::string &message) noexcept :
     m_message(String::Format(
         "ParserException: Error parsing at [line %d, column %d]: %s",
         line,
@@ -41,13 +43,13 @@ const char *ParserException::what() const noexcept
 UnexpectedCharacterException::UnexpectedCharacterException(
     int line,
     int column,
-    int c) :
+    int c) noexcept :
     ParserException(
         line,
         column,
-        (std::isprint(c) ?
-             String::Format("Unexpected character '%c' (%x)", char(c), c) :
-             String::Format("Unexpected character '%x'", c)))
+        std::isprint(c) ?
+            String::Format("Unexpected character '%c' (%x)", char(c), c) :
+            String::Format("Unexpected character '%x'", c))
 {
 }
 
@@ -55,7 +57,7 @@ UnexpectedCharacterException::UnexpectedCharacterException(
 BadConversionException::BadConversionException(
     int line,
     int column,
-    const std::string &value) :
+    const std::string &value) noexcept :
     ParserException(
         line,
         column,

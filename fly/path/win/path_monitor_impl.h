@@ -28,7 +28,7 @@ public:
      */
     PathMonitorImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<PathConfig> &);
+        const std::shared_ptr<PathConfig> &) noexcept;
 
     /**
      * Destructor. Close the path monitor's IOCP.
@@ -41,7 +41,7 @@ protected:
      *
      * @return bool True if the IOCP is valid.
      */
-    bool IsValid() const override;
+    bool IsValid() const noexcept override;
 
     /**
      * Check if the path monitor's IOCP has any posted completions, and handle
@@ -49,10 +49,10 @@ protected:
      *
      * @param milliseconds Max time allow for a completion to be posted.
      */
-    void Poll(const std::chrono::milliseconds &) override;
+    void Poll(const std::chrono::milliseconds &) noexcept override;
 
     std::shared_ptr<PathMonitor::PathInfo>
-    CreatePathInfo(const std::filesystem::path &) const override;
+    CreatePathInfo(const std::filesystem::path &) const noexcept override;
 
 private:
     /**
@@ -62,13 +62,13 @@ private:
      */
     struct PathInfoImpl : public PathMonitor::PathInfo
     {
-        PathInfoImpl(HANDLE, const std::filesystem::path &);
+        PathInfoImpl(HANDLE, const std::filesystem::path &) noexcept;
         ~PathInfoImpl() override;
 
         /**
          * @return bool True if initialization was sucessful.
          */
-        bool IsValid() const override;
+        bool IsValid() const noexcept override;
 
         /**
          * Call the ReadDirectoryChangesW API for this path. Should be called
@@ -77,7 +77,7 @@ private:
          *
          * @param path Name of the monitored path.
          */
-        bool Refresh(const std::filesystem::path &);
+        bool Refresh(const std::filesystem::path &) noexcept;
 
         bool m_valid;
         HANDLE m_handle;
@@ -93,7 +93,7 @@ private:
      */
     void handleEvents(
         const std::shared_ptr<PathInfoImpl> &,
-        const std::filesystem::path &) const;
+        const std::filesystem::path &) const noexcept;
 
     /**
      * Convert a FILE_NOTIFY_INFORMATION event to a PathEvent.
@@ -102,7 +102,7 @@ private:
      *
      * @return PathEvent A PathEvent that matches the given event.
      */
-    PathMonitor::PathEvent convertToEvent(DWORD) const;
+    PathMonitor::PathEvent convertToEvent(DWORD) const noexcept;
 
     HANDLE m_iocp;
 };

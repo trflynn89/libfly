@@ -4,7 +4,6 @@
 
 #include <chrono>
 #include <cstdint>
-#include <string>
 
 namespace fly {
 
@@ -17,30 +16,27 @@ namespace fly {
 class LoggerConfig : public Config
 {
 public:
+    static constexpr const char *identifier = "logger";
+
     /**
      * Constructor.
      */
-    LoggerConfig();
-
-    /**
-     * Get the name to associate with this configuration.
-     */
-    static std::string GetName();
+    LoggerConfig() noexcept;
 
     /**
      * @return Max log file size (in bytes) before rotating the log file.
      */
-    std::uintmax_t MaxLogFileSize() const;
+    std::uintmax_t MaxLogFileSize() const noexcept;
 
     /**
      * @return Max message size (in bytes) per log.
      */
-    size_t MaxMessageSize() const;
+    size_t MaxMessageSize() const noexcept;
 
     /**
      * @return Sleep time for logger IO thread.
      */
-    std::chrono::milliseconds QueueWaitTime() const;
+    std::chrono::milliseconds QueueWaitTime() const noexcept;
 
 protected:
     size_t m_defaultMaxLogFileSize;

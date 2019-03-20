@@ -11,7 +11,7 @@ namespace fly {
 //==============================================================================
 PathMonitor::PathMonitor(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<PathConfig> &spConfig) :
+    const std::shared_ptr<PathConfig> &spConfig) noexcept :
     m_spTaskRunner(spTaskRunner),
     m_spConfig(spConfig)
 {
@@ -24,7 +24,7 @@ PathMonitor::~PathMonitor()
 }
 
 //==============================================================================
-bool PathMonitor::Start()
+bool PathMonitor::Start() noexcept
 {
     if (IsValid())
     {
@@ -42,7 +42,7 @@ bool PathMonitor::Start()
 //==============================================================================
 bool PathMonitor::AddPath(
     const std::filesystem::path &path,
-    PathEventCallback callback)
+    PathEventCallback callback) noexcept
 {
     std::error_code error;
 
@@ -72,7 +72,7 @@ bool PathMonitor::AddPath(
 }
 
 //==============================================================================
-bool PathMonitor::RemovePath(const std::filesystem::path &path)
+bool PathMonitor::RemovePath(const std::filesystem::path &path) noexcept
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_pathInfo.find(path);
@@ -90,7 +90,7 @@ bool PathMonitor::RemovePath(const std::filesystem::path &path)
 }
 
 //==============================================================================
-void PathMonitor::RemoveAllPaths()
+void PathMonitor::RemoveAllPaths() noexcept
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -101,7 +101,7 @@ void PathMonitor::RemoveAllPaths()
 //==============================================================================
 bool PathMonitor::AddFile(
     const std::filesystem::path &file,
-    PathEventCallback callback)
+    PathEventCallback callback) noexcept
 {
     std::error_code error;
 
@@ -136,7 +136,7 @@ bool PathMonitor::AddFile(
 }
 
 //==============================================================================
-bool PathMonitor::RemoveFile(const std::filesystem::path &file)
+bool PathMonitor::RemoveFile(const std::filesystem::path &file) noexcept
 {
     bool removePath = false;
     {
@@ -169,7 +169,7 @@ bool PathMonitor::RemoveFile(const std::filesystem::path &file)
 
 //==============================================================================
 std::shared_ptr<PathMonitor::PathInfo>
-PathMonitor::getOrCreatePathInfo(const std::filesystem::path &path)
+PathMonitor::getOrCreatePathInfo(const std::filesystem::path &path) noexcept
 {
     std::shared_ptr<PathInfo> spInfo;
 
@@ -197,7 +197,7 @@ PathMonitor::getOrCreatePathInfo(const std::filesystem::path &path)
 }
 
 //==============================================================================
-std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event)
+std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event) noexcept
 {
     switch (event)
     {
@@ -223,14 +223,14 @@ std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event)
 
 //==============================================================================
 PathMonitorTask::PathMonitorTask(
-    const std::weak_ptr<PathMonitor> &wpPathMonitor) :
+    std::weak_ptr<PathMonitor> wpPathMonitor) noexcept :
     Task(),
     m_wpPathMonitor(wpPathMonitor)
 {
 }
 
 //==============================================================================
-void PathMonitorTask::Run()
+void PathMonitorTask::Run() noexcept
 {
     std::shared_ptr<PathMonitor> spPathMonitor = m_wpPathMonitor.lock();
 

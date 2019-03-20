@@ -44,7 +44,7 @@ public:
      */
     SocketManager(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SocketConfig> &);
+        const std::shared_ptr<SocketConfig> &) noexcept;
 
     /**
      * Destructor. Close all asynchronous sockets.
@@ -54,7 +54,7 @@ public:
     /**
      * Initialize the socket manager task.
      */
-    void Start();
+    void Start() noexcept;
 
     /**
      * Set callbacks for when a client connects or disconnects.
@@ -62,12 +62,12 @@ public:
      * @param SocketCallback Callback for when a new client connects.
      * @param SocketCallback Callback for when a client disconnects.
      */
-    void SetClientCallbacks(SocketCallback, SocketCallback);
+    void SetClientCallbacks(SocketCallback, SocketCallback) noexcept;
 
     /**
      * Remove the callbacks for when a client connects or disconnects.
      */
-    void ClearClientCallbacks();
+    void ClearClientCallbacks() noexcept;
 
     /**
      * Create and initialize a synchronous socket.
@@ -76,7 +76,7 @@ public:
      *
      * @return Shared pointer to the socket.
      */
-    std::shared_ptr<Socket> CreateSocket(Protocol);
+    std::shared_ptr<Socket> CreateSocket(Protocol) noexcept;
 
     /**
      * Create and initialize an asynchronous socket. The socket manager will own
@@ -86,7 +86,7 @@ public:
      *
      * @return Weak pointer to the socket.
      */
-    std::weak_ptr<Socket> CreateAsyncSocket(Protocol);
+    std::weak_ptr<Socket> CreateAsyncSocket(Protocol) noexcept;
 
     /**
      * Wait for an asynchronous read to complete.
@@ -97,7 +97,9 @@ public:
      * @return True if a completed receive was found in the given duration.
      */
     template <typename R, typename P>
-    bool WaitForCompletedReceive(AsyncRequest &, std::chrono::duration<R, P>);
+    bool WaitForCompletedReceive(
+        AsyncRequest &,
+        std::chrono::duration<R, P>) noexcept;
 
     /**
      * Wait for an asynchronous send to complete.
@@ -108,7 +110,8 @@ public:
      * @return True if a completed send was found in the given duration.
      */
     template <typename R, typename P>
-    bool WaitForCompletedSend(AsyncRequest &, std::chrono::duration<R, P>);
+    bool
+    WaitForCompletedSend(AsyncRequest &, std::chrono::duration<R, P>) noexcept;
 
 protected:
     /**
@@ -116,7 +119,7 @@ protected:
      *
      * @param microseconds Max time to allow for a socket to be available.
      */
-    virtual void Poll(const std::chrono::microseconds &) = 0;
+    virtual void Poll(const std::chrono::microseconds &) noexcept = 0;
 
     /**
      * Add new sockets to and remove closed sockets from the socket system.
@@ -124,7 +127,8 @@ protected:
      * @param SocketList Newly added sockets.
      * @param SocketList Newly closed sockets.
      */
-    void HandleNewAndClosedSockets(const SocketList &, const SocketList &);
+    void
+    HandleNewAndClosedSockets(const SocketList &, const SocketList &) noexcept;
 
     /**
      * Trigger the connected and closed client callbacks.
@@ -132,7 +136,7 @@ protected:
      * @param SocketList Newly connected clients.
      * @param SocketList Newly closed clients.
      */
-    void TriggerCallbacks(const SocketList &, const SocketList &);
+    void TriggerCallbacks(const SocketList &, const SocketList &) noexcept;
 
     std::mutex m_aioSocketsMutex;
     SocketList m_aioSockets;
@@ -160,14 +164,14 @@ private:
 class SocketManagerTask : public Task
 {
 public:
-    SocketManagerTask(const std::weak_ptr<SocketManager> &);
+    SocketManagerTask(std::weak_ptr<SocketManager>) noexcept;
 
 protected:
     /**
      * Call back into the socket manager to check if any asynchronous sockets
      * are available for IO. The task re-arms itself.
      */
-    void Run() override;
+    void Run() noexcept override;
 
 private:
     std::weak_ptr<SocketManager> m_wpSocketManager;
@@ -177,7 +181,7 @@ private:
 template <typename R, typename P>
 bool SocketManager::WaitForCompletedReceive(
     AsyncRequest &request,
-    std::chrono::duration<R, P> waitTime)
+    std::chrono::duration<R, P> waitTime) noexcept
 {
     return m_completedReceives.Pop(request, waitTime);
 }
@@ -186,7 +190,7 @@ bool SocketManager::WaitForCompletedReceive(
 template <typename R, typename P>
 bool SocketManager::WaitForCompletedSend(
     AsyncRequest &request,
-    std::chrono::duration<R, P> waitTime)
+    std::chrono::duration<R, P> waitTime) noexcept
 {
     return m_completedSends.Pop(request, waitTime);
 }

@@ -20,7 +20,7 @@ namespace fly {
  */
 class JsonParser : public Parser
 {
-    enum class Token
+    enum class Token : std::uint8_t
     {
         Tab = 0x09, // \t
         NewLine = 0x0a, // \n
@@ -42,7 +42,7 @@ class JsonParser : public Parser
         ReverseSolidus = 0x5c, /* \ */
     };
 
-    enum class State
+    enum class State : std::uint8_t
     {
         NoState,
         ParsingObject,
@@ -57,7 +57,7 @@ public:
     /**
      * Optional parsing features. May be combined with bitwise and/or operators.
      */
-    enum class Features : uint8_t
+    enum class Features : std::uint8_t
     {
         // Strict compliance with http://www.json.org.
         Strict = 0,
@@ -76,14 +76,14 @@ public:
     /**
      * Constructor. Create a parser with strict http://www.json.org compliance.
      */
-    JsonParser();
+    JsonParser() noexcept;
 
     /**
      * Constructor. Create a parser with the specific features.
      *
      * @param Features The extra features to allow.
      */
-    JsonParser(Features);
+    JsonParser(Features) noexcept;
 
 protected:
     /**
@@ -97,7 +97,7 @@ protected:
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      * @throws BadConversionException A parsed object was invalid.
      */
-    Json ParseInternal(std::istream &) override;
+    Json ParseInternal(std::istream &) noexcept(false) override;
 
 private:
     /**
@@ -108,7 +108,7 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onWhitespace(Token, int);
+    void onWhitespace(Token, int) noexcept(false);
 
     /**
      * Handle the start of an object or array.
@@ -118,7 +118,7 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onStartBraceOrBracket(Token, int);
+    void onStartBraceOrBracket(Token, int) noexcept(false);
 
     /**
      * Handle the end of an object or array.
@@ -129,7 +129,7 @@ private:
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      * @throws BadConversionException A parsed object was invalid.
      */
-    void onCloseBraceOrBracket(Token, int);
+    void onCloseBraceOrBracket(Token, int) noexcept(false);
 
     /**
      * Handle the start or end of a string, for either a name or value.
@@ -138,7 +138,7 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onQuotation(int);
+    void onQuotation(int) noexcept(false);
 
     /**
      * Handle a colon between name-value pairs.
@@ -147,7 +147,7 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onColon(int);
+    void onColon(int) noexcept(false);
 
     /**
      * Handle a comma, either in an array or after an object.
@@ -157,7 +157,7 @@ private:
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      * @throws BadConversionException A parsed object was invalid.
      */
-    void onComma(int);
+    void onComma(int) noexcept(false);
 
     /**
      * Handle the start of a comment, if comments are allowed. Consumes the
@@ -168,7 +168,7 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onSolidus(int, std::istream &);
+    void onSolidus(int, std::istream &) noexcept(false);
 
     /**
      * Handle any other character. If the character is a reverse solidus, accept
@@ -180,21 +180,23 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onCharacter(Token, int, std::istream &);
+    void onCharacter(Token, int, std::istream &) noexcept(false);
 
     /**
      * Push a parsed character onto the parsing stream.
      *
      * @param int The current parsed character.
+     *
+     * @throws UnexpectedCharacterException Any character was unexpected.
      */
-    void pushValue(int);
+    void pushValue(int) noexcept(false);
 
     /**
      * Retrieve and clear the current value of the parsing stream.
      *
      * @return string The current value of the parsing stream.
      */
-    std::string popValue();
+    std::string popValue() noexcept;
 
     /**
      * Store the current value of the parsing stream as a JSON object. Ensures
@@ -204,7 +206,7 @@ private:
      *
      * @throws BadConversionException A parsed object was invalid.
      */
-    bool storeValue();
+    bool storeValue() noexcept(false);
 
     /**
      * Validate that a parsed number is compliant with http://www.json.org.
@@ -215,7 +217,8 @@ private:
      *
      * @throws BadConversionException A parsed number was invalid.
      */
-    void validateNumber(const std::string &, bool &, bool &) const;
+    void validateNumber(const std::string &, bool &, bool &) const
+        noexcept(false);
 
     /**
      * Check if a feature has been allowed.
@@ -224,7 +227,7 @@ private:
      *
      * @return True if the feature is allowed.
      */
-    bool isFeatureAllowed(Features) const;
+    bool isFeatureAllowed(Features) const noexcept(false);
 
     Features m_features;
 
@@ -245,11 +248,11 @@ private:
 /**
  * Combine two Features instances into a single instance via bitwise-and.
  */
-JsonParser::Features operator&(JsonParser::Features, JsonParser::Features);
+JsonParser::Features operator&(JsonParser::Features, JsonParser::Features) noexcept;
 
 /**
  * Combine two Features instances into a single instance via bitwise-or.
  */
-JsonParser::Features operator|(JsonParser::Features, JsonParser::Features);
+JsonParser::Features operator|(JsonParser::Features, JsonParser::Features) noexcept;
 
 } // namespace fly

@@ -3,7 +3,6 @@
 #include "fly/config/config.h"
 
 #include <chrono>
-#include <string>
 
 namespace fly {
 
@@ -16,20 +15,17 @@ namespace fly {
 class SystemConfig : public Config
 {
 public:
+    static constexpr const char *identifier = "system";
+
     /**
      * Constructor.
      */
-    SystemConfig();
-
-    /**
-     * Get the name to associate with this configuration.
-     */
-    static std::string GetName();
+    SystemConfig() noexcept;
 
     /**
      * @return Delay between system monitor poll intervals.
      */
-    virtual std::chrono::milliseconds PollInterval() const;
+    virtual std::chrono::milliseconds PollInterval() const noexcept;
 
 protected:
     std::chrono::milliseconds::rep m_defaultPollInterval;

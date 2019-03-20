@@ -14,7 +14,7 @@ std::atomic_int SocketManagerImpl::s_socketManagerCount(0);
 SocketManagerImpl::SocketManagerImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     const std::shared_ptr<SocketConfig> &spConfig) :
-    SocketManager(spTaskRunner, spConfig)
+    SocketManager(spTaskRunner, spConfig) noexcept
 {
     if (s_socketManagerCount.fetch_add(1) == 0)
     {
@@ -38,7 +38,7 @@ SocketManagerImpl::~SocketManagerImpl()
 }
 
 //==============================================================================
-void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
+void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout) noexcept
 {
     fd_set readFd, writeFd;
     struct timeval tv = {0, static_cast<long>(timeout.count())};
@@ -61,7 +61,9 @@ void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout)
 }
 
 //==============================================================================
-bool SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
+bool SocketManagerImpl::setReadAndWriteMasks(
+    fd_set *readFd,
+    fd_set *writeFd) noexcept
 {
     bool anyMasksSet = false;
 
@@ -85,7 +87,7 @@ bool SocketManagerImpl::setReadAndWriteMasks(fd_set *readFd, fd_set *writeFd)
 }
 
 //==============================================================================
-void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd)
+void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd) noexcept
 {
     SocketList newClients, connectedClients, closedClients;
 

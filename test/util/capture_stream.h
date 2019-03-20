@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <filesystem>
 #include <string>
 
@@ -16,7 +17,7 @@ namespace fly {
 class CaptureStream
 {
 public:
-    enum class Stream
+    enum class Stream : std::uint8_t
     {
         Stdout,
         Stderr
@@ -27,7 +28,7 @@ public:
      *
      * @param Stream The standard stream to redirect.
      */
-    CaptureStream(Stream);
+    CaptureStream(Stream) noexcept;
 
     /**
      * Destructor. Restore the redirected stream and delete the redirect file.
@@ -40,7 +41,7 @@ public:
      *
      * @return string The contents of the redirected stream.
      */
-    std::string operator()();
+    std::string operator()() noexcept;
 
 private:
     /**
@@ -51,7 +52,7 @@ private:
      *
      * @return string The contents of the redirected stream.
      */
-    std::string restore(bool);
+    std::string restore(bool) noexcept;
 
     std::filesystem::path m_path;
 

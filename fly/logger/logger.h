@@ -91,19 +91,19 @@ public:
     Logger(
         const std::shared_ptr<SequencedTaskRunner> &,
         const std::shared_ptr<LoggerConfig> &,
-        const std::filesystem::path &);
+        const std::filesystem::path &) noexcept;
 
     /**
      * Set the logger instance so that the LOG* macros function.
      *
      * @param Logger The logger instance.
      */
-    static void SetInstance(const std::shared_ptr<Logger> &);
+    static void SetInstance(const std::shared_ptr<Logger> &) noexcept;
 
     /**
      * @return The logger instance.
      */
-    static std::shared_ptr<Logger> GetInstance();
+    static std::shared_ptr<Logger> GetInstance() noexcept;
 
     /**
      * Log to the console in a thread-safe manner.
@@ -111,7 +111,7 @@ public:
      * @param bool Whether to acquire lock before logging.
      * @param string The message to log.
      */
-    static void ConsoleLog(bool, const std::string &);
+    static void ConsoleLog(bool, const std::string &) noexcept;
 
     /**
      * Add a log to the static logger instance.
@@ -127,19 +127,19 @@ public:
         const char *,
         const char *,
         unsigned int,
-        const std::string &);
+        const std::string &) noexcept;
 
     /**
      * Create the logger's log file on disk and initialize the logger task.
      *
      * @return bool True if the logger is in a valid state.
      */
-    bool Start();
+    bool Start() noexcept;
 
     /**
      * @return path Path to the current log file.
      */
-    std::filesystem::path GetLogFilePath() const;
+    std::filesystem::path GetLogFilePath() const noexcept;
 
 private:
     /**
@@ -148,7 +148,7 @@ private:
      *
      * @return bool True if the current log file is still open and healthy.
      */
-    bool poll();
+    bool poll() noexcept;
 
     /**
      * Add a log to this logger instance.
@@ -164,14 +164,14 @@ private:
         const char *,
         const char *,
         unsigned int,
-        const std::string &);
+        const std::string &) noexcept;
 
     /**
      * Create the log file. If a log file is already open, close it.
      *
      * @return True if the log file could be opened.
      */
-    bool createLogFile();
+    bool createLogFile() noexcept;
 
     static std::weak_ptr<Logger> s_wpInstance;
     static std::mutex s_consoleMutex;
@@ -201,14 +201,14 @@ private:
 class LoggerTask : public Task
 {
 public:
-    LoggerTask(const std::weak_ptr<Logger> &);
+    LoggerTask(std::weak_ptr<Logger>) noexcept;
 
 protected:
     /**
      * Call back into the logger to check for new log entries. The task re-arms
      * itself.
      */
-    void Run() override;
+    void Run() noexcept override;
 
 private:
     std::weak_ptr<Logger> m_wpLogger;

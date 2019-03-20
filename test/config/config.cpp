@@ -1,6 +1,7 @@
 #include "fly/config/config.h"
 
 #include "fly/types/json.h"
+#include "test/config/test_config.h"
 
 #include <gtest/gtest.h>
 
@@ -11,12 +12,12 @@
 class ConfigTest : public ::testing::Test
 {
 public:
-    ConfigTest() : m_spConfig(std::make_shared<fly::Config>())
+    ConfigTest() noexcept : m_spConfig(std::make_shared<TestConfig>())
     {
     }
 
 protected:
-    std::shared_ptr<fly::Config> m_spConfig;
+    std::shared_ptr<TestConfig> m_spConfig;
 };
 
 //==============================================================================

@@ -28,7 +28,7 @@ public:
      */
     PathMonitorImpl(
         const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<PathConfig> &);
+        const std::shared_ptr<PathConfig> &) noexcept;
 
     /**
      * Destructor. Close the path monitor's inotify handle.
@@ -41,7 +41,7 @@ protected:
      *
      * @return bool True if the inotify handle is valid.
      */
-    bool IsValid() const override;
+    bool IsValid() const noexcept override;
 
     /**
      * Check if the path monitor's inotify handle has any events to be read,
@@ -49,10 +49,10 @@ protected:
      *
      * @param milliseconds Max time allow for an event to be readable.
      */
-    void Poll(const std::chrono::milliseconds &) override;
+    void Poll(const std::chrono::milliseconds &) noexcept override;
 
     std::shared_ptr<PathMonitor::PathInfo>
-    CreatePathInfo(const std::filesystem::path &) const override;
+    CreatePathInfo(const std::filesystem::path &) const noexcept override;
 
 private:
     /**
@@ -62,13 +62,13 @@ private:
      */
     struct PathInfoImpl : PathMonitor::PathInfo
     {
-        PathInfoImpl(int, const std::filesystem::path &);
+        PathInfoImpl(int, const std::filesystem::path &) noexcept;
         ~PathInfoImpl() override;
 
         /**
          * @return bool True if initialization was sucessful.
          */
-        bool IsValid() const override;
+        bool IsValid() const noexcept override;
 
         int m_monitorDescriptor;
         int m_watchDescriptor;
@@ -79,14 +79,14 @@ private:
      *
      * @return bool True if any events were read.
      */
-    bool readEvents() const;
+    bool readEvents() const noexcept;
 
     /**
      * Handle a single inotify event. Find a monitored path that corresponds
      * to the event and trigger its callback. If no path was found, drop the
      * event.
      */
-    void handleEvent(const struct inotify_event *) const;
+    void handleEvent(const struct inotify_event *) const noexcept;
 
     /**
      * Convert an inotify event mask to a PathEvent.
@@ -95,7 +95,7 @@ private:
      *
      * @return PathEvent A PathEvent that matches the event mask.
      */
-    PathMonitor::PathEvent convertToEvent(int) const;
+    PathMonitor::PathEvent convertToEvent(int) const noexcept;
 
     int m_monitorDescriptor;
 };

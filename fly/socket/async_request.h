@@ -22,34 +22,38 @@ public:
      * Default constructor to set the socket ID to an invalid value and the
      * request message to an empty string.
      */
-    AsyncRequest();
+    AsyncRequest() noexcept;
+
+    /**
+     * Move constructor. The moved request is invalidated.
+     */
+    AsyncRequest(AsyncRequest &&) noexcept;
 
     /**
      * Constructor to set the ID of the owning socket and the request message.
      */
-    AsyncRequest(int, const std::string &);
+    AsyncRequest(int, std::string &&) noexcept;
 
     /**
      * Constructor to set the ID of the owning socket, the request message, and
      * the address and port of the owning socket.
      */
-    AsyncRequest(int, const std::string &, address_type, port_type);
+    AsyncRequest(int, std::string &&, address_type, port_type) noexcept;
 
     /**
-     * Constructor to set the ID of the owning socket, the request message, and
-     * the address and port of the owning socket.
+     * Move assignment operator. The moved request is invalidated.
      */
-    AsyncRequest(int, const std::string &, const std::string &, port_type);
+    AsyncRequest &operator=(AsyncRequest &&) noexcept;
 
     /**
      * @return True if the socket ID is valid (i.e. has been explicitly set).
      */
-    bool IsValid() const;
+    bool IsValid() const noexcept;
 
     /**
      * @return The ID of the socket who owns this structure.
      */
-    int GetSocketId() const;
+    int GetSocketId() const noexcept;
 
     /**
      * Increase the current offset into the request message to mark how much
@@ -57,27 +61,27 @@ public:
      *
      * @param string::size_type The offset to set.
      */
-    void IncrementRequestOffset(std::string::size_type);
+    void IncrementRequestOffset(std::string::size_type) noexcept;
 
     /**
      * @return The request message - the message to be sent or received.
      */
-    const std::string &GetRequest() const;
+    const std::string &GetRequest() const noexcept;
 
     /**
      * @return The request message starting at its current offset.
      */
-    std::string GetRequestRemaining() const;
+    std::string GetRequestRemaining() const noexcept;
 
     /**
      * @return The request address (for UDP sockets).
      */
-    address_type GetAddress() const;
+    address_type GetAddress() const noexcept;
 
     /**
      * @return The request port (for UDP sockets).
      */
-    port_type GetPort() const;
+    port_type GetPort() const noexcept;
 
 private:
     int m_socketId;

@@ -15,21 +15,21 @@ public:
     typedef int Object;
     typedef fly::ConcurrentQueue<Object> ObjectQueue;
 
-    unsigned int WriterThread(ObjectQueue &objectQueue)
+    unsigned int WriterThread(ObjectQueue &objectQueue) noexcept
     {
         unsigned int numWrites = 100;
 
         for (unsigned int i = 0; i < numWrites; ++i)
         {
             Object object(i);
-            objectQueue.Push(object);
+            objectQueue.Push(std::move(object));
         }
 
         return numWrites;
     }
 
     unsigned int
-    ReaderThread(ObjectQueue &objectQueue, std::atomic_bool &finishedWrites)
+    ReaderThread(ObjectQueue &objectQueue, std::atomic_bool &finishedWrites) noexcept
     {
         unsigned int numReads = 0;
 
@@ -46,7 +46,7 @@ public:
         return numReads;
     }
 
-    Object InfiniteWaitReaderThread(ObjectQueue &objectQueue)
+    Object InfiniteWaitReaderThread(ObjectQueue &objectQueue) noexcept
     {
         Object object;
         objectQueue.Pop(object);
@@ -55,7 +55,7 @@ public:
     }
 
 protected:
-    void RunMultiThreadedTest(unsigned int numWriters, unsigned int numReaders)
+    void RunMultiThreadedTest(unsigned int numWriters, unsigned int numReaders) noexcept
     {
         ObjectQueue objectQueue;
 
@@ -105,10 +105,10 @@ protected:
 
     void DoQueuePush(
         ObjectQueue &objectQueue,
-        const Object &object,
-        ObjectQueue::size_type expectedSize)
+        Object object,
+        ObjectQueue::size_type expectedSize) noexcept
     {
-        objectQueue.Push(object);
+        objectQueue.Push(std::move(object));
 
         ASSERT_EQ(objectQueue.Size(), expectedSize);
         ASSERT_FALSE(objectQueue.IsEmpty());
@@ -117,7 +117,7 @@ protected:
     void DoQueuePop(
         ObjectQueue &objectQueue,
         const Object &expectedObject,
-        ObjectQueue::size_type expectedSize)
+        ObjectQueue::size_type expectedSize) noexcept
     {
         Object object;
 
@@ -148,7 +148,7 @@ TEST_F(ConcurrencyTest, PopFromEmptyQueueTest)
     ASSERT_FALSE(objectQueue.Pop(obj1, std::chrono::milliseconds(0)));
 
     // Push an item onto the queue and immediately pop it
-    objectQueue.Push(obj2);
+    objectQueue.Push(std::move(obj2));
     ASSERT_TRUE(objectQueue.Pop(obj1, std::chrono::milliseconds(0)));
 
     // Make sure popping an item from the no-longer non-empty queue is invalid
@@ -199,7 +199,7 @@ TEST_F(ConcurrencyTest, InfiniteWaitReaderTest)
     std::future_status status = future.wait_for(std::chrono::milliseconds(10));
     ASSERT_EQ(status, std::future_status::timeout);
 
-    objectQueue.Push(obj);
+    objectQueue.Push(Object(obj));
 
     status = future.wait_for(std::chrono::milliseconds(10));
     ASSERT_EQ(status, std::future_status::ready);
