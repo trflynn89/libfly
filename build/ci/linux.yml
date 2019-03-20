@@ -8,7 +8,7 @@ jobs:
     pool:
       vmImage: 'Ubuntu-16.04'
 
-    container: ubuntu:18.04
+    container: trflynn89/libfly:ubuntu18.04_gcc8
 
     variables:
       CC: 'gcc-8'
@@ -17,17 +17,6 @@ jobs:
 
     steps:
     - template: setup.yml
-
-    - script: |
-        whoami
-        gcc --version
-        apt-get install -y $CC $CXX
-      displayName: 'GCC'
-
-    - ${{ if eq(parameters.arch, 'x86') }}:
-      - script: |
-          apt-get install -y $CC-multilib $CXX-multilib
-        displayName: 'GCC Multilib'
 
     - ${{ if eq(parameters.configuration, 'Debug') }}:
       - script: |
