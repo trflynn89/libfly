@@ -91,6 +91,14 @@ protected:
 };
 
 //==============================================================================
+class BadConfig : public fly::Config
+{
+public:
+    // Badly written config class which uses the same identifier as TestConfig.
+    static constexpr const char *identifier = TestConfig::identifier;
+};
+
+//==============================================================================
 TEST_F(ConfigManagerTest, AllFileTypesTest)
 {
     {
@@ -118,6 +126,19 @@ TEST_F(ConfigManagerTest, BadFileTypeTest)
         m_file);
 
     EXPECT_FALSE(m_spConfigManager->Start());
+}
+
+//==============================================================================
+TEST_F(ConfigManagerTest, BadConfigTypeTest)
+{
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize);
+
+    auto spConfig = m_spConfigManager->CreateConfig<TestConfig>();
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize + 1);
+
+    auto spConfig2 = m_spConfigManager->CreateConfig<BadConfig>();
+    EXPECT_EQ(m_spConfigManager->GetSize(), m_initialSize + 1);
+    EXPECT_FALSE(spConfig2);
 }
 
 //==============================================================================

@@ -33,7 +33,7 @@ class ConfigManager : public std::enable_shared_from_this<ConfigManager>
     /**
      * Map of configuration group names to configuration objects.
      */
-    typedef std::map<std::string, std::weak_ptr<Config>> ConfigMap;
+    typedef std::map<const char *, std::weak_ptr<Config>> ConfigMap;
 
 public:
     /**
