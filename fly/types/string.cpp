@@ -108,16 +108,15 @@ std::string
 String::GenerateRandomString(const std::string::size_type len) noexcept
 {
     using short_distribution = std::uniform_int_distribution<short>;
+    static_assert(s_alphaNum.size() > 0);
 
-    static const auto now = std::chrono::system_clock::now().time_since_epoch();
-    static const auto seed =
-        static_cast<std::mt19937::result_type>(now.count());
-
-    static constexpr auto limit =
+    constexpr auto limit =
         static_cast<short_distribution::result_type>(s_alphaNum.size() - 1);
-
-    std::mt19937 engine(seed);
     short_distribution distribution(0, limit);
+
+    const auto now = std::chrono::system_clock::now().time_since_epoch();
+    const auto seed = static_cast<std::mt19937::result_type>(now.count());
+    std::mt19937 engine(seed);
 
     std::string ret;
     ret.reserve(len);
