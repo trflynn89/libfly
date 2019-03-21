@@ -7,11 +7,11 @@ function Run-Libfly-Test($arch)
 {
     Write-Output "Running $arch tests"
 
-    $full_path = $PSScriptRoot + "\Release-" + $arch
+    $full_path = $PSScriptRoot + "\Debug-" + $arch
     $tests_passed = 0
     $tests_failed = 0
 
-    Get-ChildItem -path $full_path -Recurse -Include *_tests.exe | ForEach {
+    Get-ChildItem -path $full_path -Recurse -Include *_tests.exe  | ForEach {
         & $_
 
         if ($LASTEXITCODE -eq 0)

@@ -1,35 +1,47 @@
 parameters:
+  configuration: 'Debug'
   arch: 'x64'
 
 jobs:
-  - job: 'Windows_${{ parameters.arch }}'
+  - job: 'Windows_${{ parameters.configuration }}_${{ parameters.arch }}'
     pool:
       vmImage: 'windows-2019'
 
     steps:
     - template: setup.yml
 
-    - task: VSBuild@1
-      inputs:
-        solution: 'build\win\libfly.sln'
-        configuration: 'Release'
-        platform: ${{ parameters.arch }}
-        maximumCpuCount: true
-      displayName: 'Build'
+    - ${{ if eq(parameters.configuration, 'Debug') }}:
+      - task: VSBuild@1
+        inputs:
+          solution: 'build\win\libfly.sln'
+          configuration: ${{ parameters.configuration }}
+          platform: ${{ parameters.arch }}
+          maximumCpuCount: true
+        displayName: 'Build'
 
-    - task: PowerShell@2
-      inputs:
-        filePath: build\win\test.ps1
-        arguments: -arch ${{ parameters.arch }}
-        failOnStderr: false
-      displayName: 'Test'
+      - task: PowerShell@2
+        inputs:
+          filePath: build\win\test.ps1
+          arguments: -arch ${{ parameters.arch }}
+          failOnStderr: false
+        displayName: 'Test'
 
-    - task: PowerShell@2
-      inputs:
-        filePath: build\win\release.ps1
-        arguments: -arch ${{ parameters.arch }}
-      displayName: 'Package'
+    - ${{ if eq(parameters.configuration, 'Release') }}:
+      - task: VSBuild@1
+        inputs:
+          solution: 'build\win\libfly.sln'
+          msbuildArgs: '/t:libfly'
+          configuration: ${{ parameters.configuration }}
+          platform: ${{ parameters.arch }}
+          maximumCpuCount: true
+        displayName: 'Build'
 
-    - template: package.yml
-      parameters:
-        contents: 'build\win\libfly-*.zip'
+      - task: PowerShell@2
+        inputs:
+          filePath: build\win\release.ps1
+          arguments: -arch ${{ parameters.arch }}
+        displayName: 'Package'
+
+      - template: package.yml
+        parameters:
+          contents: 'build\win\libfly-*.zip'

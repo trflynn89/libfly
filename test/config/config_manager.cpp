@@ -14,7 +14,6 @@
 #include <filesystem>
 #include <memory>
 #include <string>
-#include <system_error>
 
 namespace {
 
@@ -61,14 +60,7 @@ public:
      */
     void SetUp() noexcept override
     {
-        std::error_code e;
-        std::cout << "!!! Making directory: " << m_path << std::endl;
-        if (!std::filesystem::create_directories(m_path, e))
-        {
-            std::cout << e << std::endl;
-            ASSERT_TRUE(false);
-        }
-
+        ASSERT_TRUE(std::filesystem::create_directories(m_path));
         ASSERT_TRUE(m_spTaskManager->Start());
         ASSERT_TRUE(m_spConfigManager->Start());
 
