@@ -35,12 +35,12 @@ public:
     /**
      * Size of packet to use for send/receive operations.
      */
-    size_t PacketSize() const noexcept;
+    std::size_t PacketSize() const noexcept;
 
 protected:
     std::chrono::microseconds::rep m_defaultIoWaitTime;
     char m_defaultEndOfMessage;
-    size_t m_defaultPacketSize;
+    std::size_t m_defaultPacketSize;
 };
 
 } // namespace fly

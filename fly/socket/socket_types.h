@@ -25,8 +25,8 @@ typedef int socket_type;
 #    error Unknown socket type
 #endif
 
-typedef uint32_t address_type;
-typedef uint16_t port_type;
+typedef std::uint32_t address_type;
+typedef std::uint16_t port_type;
 
 /**
  * Types of supported sockets.

@@ -58,7 +58,7 @@ protected:
     virtual void TaskComplete(const std::shared_ptr<Task> &) noexcept = 0;
 
 private:
-    ConcurrentQueue<size_t> m_completedTasks;
+    ConcurrentQueue<std::size_t> m_completedTasks;
 };
 
 /**
@@ -120,8 +120,8 @@ void WaitableTaskRunner::WaitForTaskTypeToComplete() noexcept
     static_assert(
         std::is_base_of<Task, TaskType>::value, "Given type is not a task");
 
-    static size_t expected_hash = typeid(TaskType).hash_code();
-    size_t completed_hash = 0;
+    static std::size_t expected_hash = typeid(TaskType).hash_code();
+    std::size_t completed_hash = 0;
 
     while (expected_hash != completed_hash)
     {
@@ -139,8 +139,8 @@ bool WaitableTaskRunner::WaitForTaskTypeToComplete(
 
     auto deadline = std::chrono::high_resolution_clock::now() + duration;
 
-    static size_t expected_hash = typeid(TaskType).hash_code();
-    size_t completed_hash = 0;
+    static std::size_t expected_hash = typeid(TaskType).hash_code();
+    std::size_t completed_hash = 0;
 
     while (expected_hash != completed_hash)
     {

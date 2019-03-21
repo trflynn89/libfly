@@ -12,15 +12,9 @@ function Run-Libfly-Test($arch)
     $tests_failed = 0
 
     Get-ChildItem -path $full_path -Recurse -Include *_tests.exe  | ForEach {
-        $timer = [Diagnostics.Stopwatch]::StartNew()
         & $_
-        $status = $LASTEXITCODE
-        $timer.Stop()
 
-        $duration = $timer.Elapsed.TotalMilliseconds
-        $test = $_.Directory.Name + "_" + $arch
-
-        if ($status -eq 0)
+        if ($LASTEXITCODE -eq 0)
         {
             ++$tests_passed
         }

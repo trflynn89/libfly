@@ -93,7 +93,7 @@ protected:
 //==============================================================================
 TEST_F(SystemMonitorTest, CpuUsageTest)
 {
-    uint32_t countBefore = m_spMonitor->GetSystemCpuCount();
+    std::uint32_t countBefore = m_spMonitor->GetSystemCpuCount();
     double processBefore = m_spMonitor->GetProcessCpuUsage();
 
     std::future<void> result =
@@ -101,7 +101,7 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
 
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
 
-    uint32_t countAfter = m_spMonitor->GetSystemCpuCount();
+    std::uint32_t countAfter = m_spMonitor->GetSystemCpuCount();
     double systemAfter = m_spMonitor->GetSystemCpuUsage();
     double processAfter = m_spMonitor->GetProcessCpuUsage();
 
@@ -164,9 +164,9 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
 //==============================================================================
 TEST_F(SystemMonitorTest, MemoryUsageTest)
 {
-    uint64_t totalBefore = m_spMonitor->GetTotalSystemMemory();
-    uint64_t systemBefore = m_spMonitor->GetSystemMemoryUsage();
-    uint64_t processBefore = m_spMonitor->GetProcessMemoryUsage();
+    std::uint64_t totalBefore = m_spMonitor->GetTotalSystemMemory();
+    std::uint64_t systemBefore = m_spMonitor->GetSystemMemoryUsage();
+    std::uint64_t processBefore = m_spMonitor->GetProcessMemoryUsage();
 
     auto size =
         static_cast<std::string::size_type>((totalBefore - systemBefore) / 10);
@@ -174,9 +174,9 @@ TEST_F(SystemMonitorTest, MemoryUsageTest)
     std::string consumed(size, '\0');
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
 
-    uint64_t totalAfter = m_spMonitor->GetTotalSystemMemory();
-    uint64_t systemAfter = m_spMonitor->GetSystemMemoryUsage();
-    uint64_t processAfter = m_spMonitor->GetProcessMemoryUsage();
+    std::uint64_t totalAfter = m_spMonitor->GetTotalSystemMemory();
+    std::uint64_t systemAfter = m_spMonitor->GetSystemMemoryUsage();
+    std::uint64_t processAfter = m_spMonitor->GetProcessMemoryUsage();
 
     ASSERT_EQ(totalBefore, totalAfter);
     ASSERT_GT(systemBefore, U64(0));
@@ -192,16 +192,16 @@ TEST_F(SystemMonitorTest, MockMemoryUsageTest)
     fly::MockSystem mock1(fly::MockCall::Sysinfo);
     fly::MockSystem mock2(fly::MockCall::Read);
 
-    uint64_t totalBefore = m_spMonitor->GetTotalSystemMemory();
-    uint64_t systemBefore = m_spMonitor->GetSystemMemoryUsage();
-    uint64_t processBefore = m_spMonitor->GetProcessMemoryUsage();
+    std::uint64_t totalBefore = m_spMonitor->GetTotalSystemMemory();
+    std::uint64_t systemBefore = m_spMonitor->GetSystemMemoryUsage();
+    std::uint64_t processBefore = m_spMonitor->GetProcessMemoryUsage();
 
     std::string consumed((totalBefore - systemBefore) / 10, '\0');
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
 
-    uint64_t totalAfter = m_spMonitor->GetTotalSystemMemory();
-    uint64_t systemAfter = m_spMonitor->GetSystemMemoryUsage();
-    uint64_t processAfter = m_spMonitor->GetProcessMemoryUsage();
+    std::uint64_t totalAfter = m_spMonitor->GetTotalSystemMemory();
+    std::uint64_t systemAfter = m_spMonitor->GetSystemMemoryUsage();
+    std::uint64_t processAfter = m_spMonitor->GetProcessMemoryUsage();
 
     ASSERT_EQ(totalBefore, totalAfter);
     ASSERT_EQ(systemBefore, systemAfter);

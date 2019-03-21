@@ -40,7 +40,7 @@ bool SystemMonitor::Start() noexcept
 }
 
 //==============================================================================
-uint32_t SystemMonitor::GetSystemCpuCount() const noexcept
+std::uint32_t SystemMonitor::GetSystemCpuCount() const noexcept
 {
     return m_systemCpuCount.load();
 }
@@ -58,19 +58,19 @@ double SystemMonitor::GetProcessCpuUsage() const noexcept
 }
 
 //==============================================================================
-uint64_t SystemMonitor::GetTotalSystemMemory() const noexcept
+std::uint64_t SystemMonitor::GetTotalSystemMemory() const noexcept
 {
     return m_totalSystemMemory.load();
 }
 
 //==============================================================================
-uint64_t SystemMonitor::GetSystemMemoryUsage() const noexcept
+std::uint64_t SystemMonitor::GetSystemMemoryUsage() const noexcept
 {
     return m_systemMemoryUsage.load();
 }
 
 //==============================================================================
-uint64_t SystemMonitor::GetProcessMemoryUsage() const noexcept
+std::uint64_t SystemMonitor::GetProcessMemoryUsage() const noexcept
 {
     return m_processMemoryUsage.load();
 }

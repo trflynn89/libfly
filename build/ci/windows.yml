@@ -23,6 +23,7 @@ jobs:
         inputs:
           filePath: build\win\test.ps1
           arguments: -arch ${{ parameters.arch }}
+          failOnStderr: false
         displayName: 'Test'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:

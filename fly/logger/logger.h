@@ -187,7 +187,7 @@ private:
     std::filesystem::path m_logFile;
     std::ofstream m_logStream;
 
-    size_t m_index;
+    std::uintmax_t m_index;
 
     const std::chrono::high_resolution_clock::time_point m_startTime;
 };

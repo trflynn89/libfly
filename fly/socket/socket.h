@@ -227,7 +227,7 @@ public:
      *
      * @return The number of bytes sent.
      */
-    size_t Send(const std::string &) const noexcept;
+    std::size_t Send(const std::string &) const noexcept;
 
     /**
      * Write data on the socket.
@@ -238,7 +238,8 @@ public:
      *
      * @return The number of bytes sent.
      */
-    size_t SendTo(const std::string &, address_type, port_type) const noexcept;
+    std::size_t SendTo(const std::string &, address_type, port_type) const
+        noexcept;
 
     /**
      * Write data on the socket.
@@ -249,8 +250,8 @@ public:
      *
      * @return The number of bytes sent.
      */
-    size_t SendTo(const std::string &, const std::string &, port_type) const
-        noexcept;
+    std::size_t
+    SendTo(const std::string &, const std::string &, port_type) const noexcept;
 
     /**
      * Request data to be written on the socket asynchronously. If this is not
@@ -326,7 +327,7 @@ protected:
      *
      * @return The number of bytes sent.
      */
-    virtual size_t Send(const std::string &, bool &) const noexcept = 0;
+    virtual std::size_t Send(const std::string &, bool &) const noexcept = 0;
 
     /**
      * Write data on the socket.
@@ -338,7 +339,7 @@ protected:
      *
      * @return The number of bytes sent.
      */
-    virtual size_t
+    virtual std::size_t
     SendTo(const std::string &, address_type, port_type, bool &) const
         noexcept = 0;
 
@@ -352,7 +353,7 @@ protected:
      *
      * @return The number of bytes sent.
      */
-    size_t
+    std::size_t
     SendTo(const std::string &, const std::string &, port_type, bool &) const
         noexcept;
 
@@ -386,7 +387,7 @@ protected:
     const char m_socketEoM;
 
     // Send/recv packet size
-    const size_t m_packetSize;
+    const std::size_t m_packetSize;
 
     // File descriptor for this socket.
     socket_type m_socketHandle;

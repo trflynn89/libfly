@@ -31,7 +31,7 @@ public:
     /**
      * @return Max message size (in bytes) per log.
      */
-    size_t MaxMessageSize() const noexcept;
+    std::uint32_t MaxMessageSize() const noexcept;
 
     /**
      * @return Sleep time for logger IO thread.
@@ -39,8 +39,8 @@ public:
     std::chrono::milliseconds QueueWaitTime() const noexcept;
 
 protected:
-    size_t m_defaultMaxLogFileSize;
-    size_t m_defaultMaxMessageSize;
+    std::uintmax_t m_defaultMaxLogFileSize;
+    std::uint32_t m_defaultMaxMessageSize;
     std::chrono::milliseconds::rep m_defaultQueueWaitTime;
 };
 

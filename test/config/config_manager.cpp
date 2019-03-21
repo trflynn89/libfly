@@ -87,7 +87,7 @@ protected:
 
     std::shared_ptr<fly::PathConfig> m_spPathConfig;
 
-    size_t m_initialSize;
+    fly::ConfigManager::ConfigMap::size_type m_initialSize;
 };
 
 //==============================================================================

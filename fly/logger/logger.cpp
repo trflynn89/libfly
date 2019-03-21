@@ -158,7 +158,8 @@ bool Logger::createLogFile() noexcept
     String::ReplaceAll(timeStr, ":", "-");
     String::ReplaceAll(timeStr, " ", "_");
 
-    std::string fileName = String::Format("Log_%s_%s.log", timeStr, randStr);
+    const std::string fileName =
+        String::Format("Log_%s_%s.log", timeStr, randStr);
     m_logFile = m_logDirectory / fileName;
 
     if (m_logStream.is_open())

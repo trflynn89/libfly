@@ -6,12 +6,13 @@
 #include <cmath>
 #include <cstdlib>
 #include <random>
+#include <string_view>
 
 namespace fly {
 
 namespace {
 
-    const std::string s_alphaNum =
+    constexpr std::string_view s_alphaNum =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz";
@@ -27,12 +28,12 @@ String::Split(const std::string &input, char delim) noexcept
 
 //==============================================================================
 std::vector<std::string>
-String::Split(const std::string &input, char delim, size_t max) noexcept
+String::Split(const std::string &input, char delim, std::uint32_t max) noexcept
 {
     std::string item;
     std::stringstream ss(input);
     std::vector<std::string> elems;
-    size_t numItems = 0;
+    std::uint32_t numItems = 0;
 
     while (std::getline(ss, item, delim))
     {
@@ -72,7 +73,7 @@ void String::ReplaceAll(
     const std::string &search,
     const char &replace) noexcept
 {
-    size_t pos = target.find(search);
+    std::string::size_type pos = target.find(search);
 
     while (!search.empty() && (pos != std::string::npos))
     {
@@ -87,7 +88,7 @@ void String::ReplaceAll(
     const std::string &search,
     const std::string &replace) noexcept
 {
-    size_t pos = target.find(search);
+    std::string::size_type pos = target.find(search);
 
     while (!search.empty() && (pos != std::string::npos))
     {
@@ -103,23 +104,24 @@ void String::RemoveAll(std::string &target, const std::string &search) noexcept
 }
 
 //==============================================================================
-std::string String::GenerateRandomString(const size_t len) noexcept
+std::string
+String::GenerateRandomString(const std::string::size_type len) noexcept
 {
-    typedef std::uniform_int_distribution<short> short_distribution;
+    using short_distribution = std::uniform_int_distribution<short>;
+    static_assert(s_alphaNum.size() > 0);
 
-    auto now = std::chrono::system_clock::now().time_since_epoch();
-
-    auto seed = static_cast<std::mt19937::result_type>(now.count());
-    auto limit =
+    constexpr auto limit =
         static_cast<short_distribution::result_type>(s_alphaNum.size() - 1);
-
-    std::mt19937 engine(seed);
     short_distribution distribution(0, limit);
+
+    const auto now = std::chrono::system_clock::now().time_since_epoch();
+    const auto seed = static_cast<std::mt19937::result_type>(now.count());
+    std::mt19937 engine(seed);
 
     std::string ret;
     ret.reserve(len);
 
-    for (size_t i = 0; i < len; ++i)
+    for (std::string::size_type i = 0; i < len; ++i)
     {
         ret += s_alphaNum[distribution(engine)];
     }
@@ -147,8 +149,8 @@ bool String::StartsWith(
 {
     bool ret = false;
 
-    const size_t sourceSz = source.length();
-    const size_t searchSz = search.length();
+    const std::string::size_type sourceSz = source.length();
+    const std::string::size_type searchSz = search.length();
 
     if (sourceSz >= searchSz)
     {
@@ -163,7 +165,7 @@ bool String::EndsWith(const std::string &source, const char &search) noexcept
 {
     bool ret = false;
 
-    const size_t sourceSz = source.length();
+    const std::string::size_type sourceSz = source.length();
 
     if (sourceSz > 0)
     {
@@ -180,8 +182,8 @@ bool String::EndsWith(
 {
     bool ret = false;
 
-    const size_t sourceSz = source.length();
-    const size_t searchSz = search.length();
+    const std::string::size_type sourceSz = source.length();
+    const std::string::size_type searchSz = search.length();
 
     if (sourceSz >= searchSz)
     {

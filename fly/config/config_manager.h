@@ -30,12 +30,12 @@ class ConfigManager : public std::enable_shared_from_this<ConfigManager>
 {
     friend class ConfigUpdateTask;
 
+public:
     /**
      * Map of configuration group names to configuration objects.
      */
     typedef std::map<const char *, std::weak_ptr<Config>> ConfigMap;
 
-public:
     /**
      * Enumerated list of supported configuration file formats.
      */
