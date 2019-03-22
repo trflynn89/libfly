@@ -45,46 +45,34 @@ private:
 };
 
 //==============================================================================
-template <typename StringType>
+template <typename StringType, typename T>
 StringType minstr() noexcept
 {
+    static constexpr std::intmax_t min = std::numeric_limits<T>::min();
+
     if constexpr (std::is_same_v<StringType, std::string>)
     {
-        return "-19000000000000000000";
+        return std::to_string(min - 1);
     }
     else if constexpr (std::is_same_v<StringType, std::wstring>)
     {
-        return L"-19000000000000000000";
-    }
-    else if constexpr (std::is_same_v<StringType, std::u16string>)
-    {
-        return u"-19000000000000000000";
-    }
-    else if constexpr (std::is_same_v<StringType, std::u32string>)
-    {
-        return U"-19000000000000000000";
+        return std::to_wstring(min - 1);
     }
 }
 
 //==============================================================================
-template <typename StringType>
+template <typename StringType, typename T>
 StringType maxstr() noexcept
 {
+    static constexpr std::uintmax_t max = std::numeric_limits<T>::max();
+
     if constexpr (std::is_same_v<StringType, std::string>)
     {
-        return "19000000000000000000";
+        return std::to_string(max + 1);
     }
     else if constexpr (std::is_same_v<StringType, std::wstring>)
     {
-        return L"19000000000000000000";
-    }
-    else if constexpr (std::is_same_v<StringType, std::u16string>)
-    {
-        return u"19000000000000000000";
-    }
-    else if constexpr (std::is_same_v<StringType, std::u32string>)
-    {
-        return U"19000000000000000000";
+        return std::to_wstring(max + 1);
     }
 }
 
@@ -719,19 +707,26 @@ TYPED_TEST(BasicStringTest, ConvertCharTest)
     EXPECT_THROW(
         StringClass::template Convert<uchar_type>(s), std::invalid_argument);
 
-    EXPECT_THROW(
-        StringClass::template Convert<char_type>(minstr<string_type>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<char_type>(maxstr<string_type>()),
-        std::out_of_range);
+    if constexpr (fly::if_string::convertible<string_type>)
+    {
+        EXPECT_THROW(
+            StringClass::template Convert<char_type>(
+                minstr<string_type, char_type>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<char_type>(
+                maxstr<string_type, char_type>()),
+            std::out_of_range);
 
-    EXPECT_THROW(
-        StringClass::template Convert<uchar_type>(minstr<string_type>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<uchar_type>(maxstr<string_type>()),
-        std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<uchar_type>(
+                minstr<string_type, uchar_type>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<uchar_type>(
+                maxstr<string_type, uchar_type>()),
+            std::out_of_range);
+    }
 }
 
 //==============================================================================
@@ -767,19 +762,26 @@ TYPED_TEST(BasicStringTest, ConvertInt8Test)
     EXPECT_THROW(
         StringClass::template Convert<std::uint8_t>(s), std::invalid_argument);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::int8_t>(minstr<string_type>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::int8_t>(maxstr<string_type>()),
-        std::out_of_range);
+    if constexpr (fly::if_string::convertible<string_type>)
+    {
+        EXPECT_THROW(
+            StringClass::template Convert<std::int8_t>(
+                minstr<string_type, std::int8_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::int8_t>(
+                maxstr<string_type, std::int8_t>()),
+            std::out_of_range);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint8_t>(minstr<string_type>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint8_t>(maxstr<string_type>()),
-        std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint8_t>(
+                minstr<string_type, std::uint8_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint8_t>(
+                maxstr<string_type, std::uint8_t>()),
+            std::out_of_range);
+    }
 }
 
 //==============================================================================
@@ -818,19 +820,26 @@ TYPED_TEST(BasicStringTest, ConvertInt16Test)
     EXPECT_THROW(
         StringClass::template Convert<std::uint16_t>(s), std::invalid_argument);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::int16_t>(minstr<string_type>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::int16_t>(maxstr<string_type>()),
-        std::out_of_range);
+    if constexpr (fly::if_string::convertible<string_type>)
+    {
+        EXPECT_THROW(
+            StringClass::template Convert<std::int16_t>(
+                minstr<string_type, std::int16_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::int16_t>(
+                maxstr<string_type, std::int16_t>()),
+            std::out_of_range);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint16_t>(minstr<string_type>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint16_t>(maxstr<string_type>()),
-        std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint16_t>(
+                minstr<string_type, std::uint16_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint16_t>(
+                maxstr<string_type, std::uint16_t>()),
+            std::out_of_range);
+    }
 }
 
 //==============================================================================
@@ -869,19 +878,26 @@ TYPED_TEST(BasicStringTest, ConvertInt32Test)
     EXPECT_THROW(
         StringClass::template Convert<std::uint32_t>(s), std::invalid_argument);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::int32_t>(minstr<string_type>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::int32_t>(maxstr<string_type>()),
-        std::out_of_range);
+    if constexpr (fly::if_string::convertible<string_type>)
+    {
+        EXPECT_THROW(
+            StringClass::template Convert<std::int32_t>(
+                minstr<string_type, std::int32_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::int32_t>(
+                maxstr<string_type, std::int32_t>()),
+            std::out_of_range);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint32_t>(minstr<string_type>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint32_t>(maxstr<string_type>()),
-        std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint32_t>(
+                minstr<string_type, std::uint32_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint32_t>(
+                maxstr<string_type, std::uint32_t>()),
+            std::out_of_range);
+    }
 }
 
 //==============================================================================
@@ -951,4 +967,26 @@ TYPED_TEST(BasicStringTest, ConvertDecimalTest)
         StringClass::template Convert<double>(s), std::invalid_argument);
     EXPECT_THROW(
         StringClass::template Convert<long double>(s), std::invalid_argument);
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTest, BasicStringStreamerTest)
+{
+    using string_type = typename TestFixture::string_type;
+    using StringClass = fly::BasicString<string_type>;
+    using streamed_type = typename StringClass::streamed_type;
+    using osstream_type = typename StringClass::osstream_type;
+    using streamer = typename StringClass::streamer;
+
+    // Extra test case to make sure the hexadecimal conversion feature in
+    // BasicStringStreamer is handled correctly.
+    if constexpr (!fly::if_string::convertible<string_type>)
+    {
+        string_type s;
+        ASSIGN_TEST_STRING(string_type, s, "\u00f0\u0178\u008d\u2022");
+
+        osstream_type ostream;
+        streamer::Stream(ostream, s);
+        EXPECT_EQ("[0xf0][0x178][0x8d][0x2022]", ostream.str());
+    }
 }

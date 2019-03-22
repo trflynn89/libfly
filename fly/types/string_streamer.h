@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 
+namespace fly {
+
 /**
  * Helper struct to stream a std::basic_string<> to a std::basic_ostream<>, and
  * to define aliases for what file/string stream types should be used for that
@@ -190,3 +192,5 @@ struct BasicStringStreamer<std::u32string>
         }
     }
 };
+
+} // namespace fly
