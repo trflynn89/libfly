@@ -5,6 +5,7 @@
 #include <array>
 #include <deque>
 #include <forward_list>
+#include <iostream>
 #include <list>
 #include <map>
 #include <set>
@@ -17,6 +18,12 @@ namespace {
 
 //==========================================================================
 FLY_DECLARATION_TESTS(foo, T, std::declval<const T &>().Foo());
+
+//==========================================================================
+FLY_DECLARATION_TESTS(
+    ostream,
+    T,
+    std::declval<std::ostream &>() << std::declval<const T &>());
 
 //==========================================================================
 class FooClass
@@ -68,6 +75,20 @@ bool callFoo(const T &) noexcept
 }
 
 //==========================================================================
+template <typename T, if_ostream::enabled<T> = 0>
+bool isStreamable(std::ostream &stream, const T &arg) noexcept
+{
+    stream << arg;
+    return true;
+}
+
+template <typename T, if_ostream::disabled<T> = 0>
+bool isStreamable(std::ostream &, const T &) noexcept
+{
+    return false;
+}
+
+//==========================================================================
 template <typename T, fly::if_string::enabled<T> = 0>
 bool isString(const T &) noexcept
 {
@@ -76,20 +97,6 @@ bool isString(const T &) noexcept
 
 template <typename T, fly::if_string::disabled<T> = 0>
 bool isString(const T &) noexcept
-{
-    return false;
-}
-
-//==========================================================================
-template <typename T, fly::if_ostream::enabled<T> = 0>
-bool isStreamable(std::ostream &stream, const T &arg) noexcept
-{
-    stream << arg;
-    return true;
-}
-
-template <typename T, fly::if_ostream::disabled<T> = 0>
-bool isStreamable(std::ostream &, const T &) noexcept
 {
     return false;
 }
@@ -198,6 +205,33 @@ TEST(TraitsTest, FooTest)
 }
 
 //==============================================================================
+TEST(TraitsTest, StreamTest)
+{
+    std::stringstream stream;
+
+    const FooClass fc;
+    const BarClass bc;
+
+    const std::string str("a");
+
+    ASSERT_TRUE(isStreamable(stream, bc));
+    ASSERT_EQ(stream.str(), bc());
+    stream.str(std::string());
+
+    ASSERT_TRUE(isStreamable(stream, str));
+    ASSERT_EQ(stream.str(), str);
+    stream.str(std::string());
+
+    ASSERT_TRUE(isStreamable(stream, 1));
+    ASSERT_EQ(stream.str(), "1");
+    stream.str(std::string());
+
+    ASSERT_FALSE(isStreamable(stream, fc));
+    ASSERT_EQ(stream.str(), std::string());
+    stream.str(std::string());
+}
+
+//==============================================================================
 TEST(TraitsTest, StringTest)
 {
     const FooClass fc;
@@ -228,33 +262,6 @@ TEST(TraitsTest, StringTest)
     ASSERT_FALSE(isString(fc));
     ASSERT_FALSE(isString(chr1));
     ASSERT_FALSE(isString(chr2));
-}
-
-//==============================================================================
-TEST(TraitsTest, StreamTest)
-{
-    std::stringstream stream;
-
-    const FooClass fc;
-    const BarClass bc;
-
-    const std::string str("a");
-
-    ASSERT_TRUE(isStreamable(stream, bc));
-    ASSERT_EQ(stream.str(), bc());
-    stream.str(std::string());
-
-    ASSERT_TRUE(isStreamable(stream, str));
-    ASSERT_EQ(stream.str(), str);
-    stream.str(std::string());
-
-    ASSERT_TRUE(isStreamable(stream, 1));
-    ASSERT_EQ(stream.str(), "1");
-    stream.str(std::string());
-
-    ASSERT_FALSE(isStreamable(stream, fc));
-    ASSERT_EQ(stream.str(), std::string());
-    stream.str(std::string());
 }
 
 //==============================================================================

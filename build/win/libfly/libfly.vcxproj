@@ -218,7 +218,6 @@
     <ClCompile Include="..\..\..\fly\task\task_manager.cpp" />
     <ClCompile Include="..\..\..\fly\task\task_runner.cpp" />
     <ClCompile Include="..\..\..\fly\types\json.cpp" />
-    <ClCompile Include="..\..\..\fly\types\string.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

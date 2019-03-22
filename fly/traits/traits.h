@@ -3,7 +3,6 @@
 #include <array>
 #include <deque>
 #include <forward_list>
-#include <iostream>
 #include <list>
 #include <map>
 #include <set>
@@ -297,13 +296,5 @@ struct if_array
     template <typename T>
     using disabled = std::enable_if_t<!__::is_array<T>::value, bool>;
 };
-
-/**
- * Tests for whether a type defines operator<<.
- */
-FLY_DECLARATION_TESTS(
-    ostream,
-    T,
-    std::declval<std::ostream &>() << std::declval<const T &>());
 
 } // namespace fly
