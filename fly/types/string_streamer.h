@@ -121,7 +121,9 @@ struct BasicStringStreamer<std::u16string>
 
     static void Stream(ostream_type &stream, const char16_t *value) noexcept
     {
-        for (auto i = 0; i < std::char_traits<char16_t>::length(value); ++i)
+        const std::size_t size = std::char_traits<char16_t>::length(value);
+
+        for (std::size_t i = 0; i < size; ++i)
         {
             Stream(stream, value[i]);
         }
@@ -129,9 +131,7 @@ struct BasicStringStreamer<std::u16string>
 
     static void Stream(ostream_type &stream, const char16_t value) noexcept
     {
-        auto is_ascii = [](char16_t ch) { return (ch >= 0) && (ch <= 127); };
-
-        if (is_ascii(value))
+        if (value <= 127)
         {
             stream << static_cast<ostream_type::char_type>(value);
         }
@@ -170,7 +170,9 @@ struct BasicStringStreamer<std::u32string>
 
     static void Stream(ostream_type &stream, const char32_t *value) noexcept
     {
-        for (auto i = 0; i < std::char_traits<char32_t>::length(value); ++i)
+        const std::size_t size = std::char_traits<char32_t>::length(value);
+
+        for (std::size_t i = 0; i < size; ++i)
         {
             Stream(stream, value[i]);
         }
@@ -178,9 +180,7 @@ struct BasicStringStreamer<std::u32string>
 
     static void Stream(ostream_type &stream, const char32_t value) noexcept
     {
-        auto is_ascii = [](char32_t ch) { return (ch >= 0) && (ch <= 127); };
-
-        if (is_ascii(value))
+        if (value <= 127)
         {
             stream << static_cast<ostream_type::char_type>(value);
         }
