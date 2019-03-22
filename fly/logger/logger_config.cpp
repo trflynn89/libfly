@@ -22,8 +22,7 @@ std::uintmax_t LoggerConfig::MaxLogFileSize() const noexcept
 //==============================================================================
 std::uint32_t LoggerConfig::MaxMessageSize() const noexcept
 {
-    return GetValue<std::uint32_t>(
-        "max_message_size", m_defaultMaxMessageSize);
+    return GetValue<std::uint32_t>("max_message_size", m_defaultMaxMessageSize);
 }
 
 //==============================================================================

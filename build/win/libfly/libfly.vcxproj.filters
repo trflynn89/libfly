@@ -208,9 +208,6 @@
     <ClCompile Include="..\..\..\fly\types\json.cpp">
       <Filter>types</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\types\string.cpp">
-      <Filter>types</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\fly\path\path_config.cpp">
       <Filter>path</Filter>
     </ClCompile>
