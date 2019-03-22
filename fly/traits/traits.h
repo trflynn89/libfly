@@ -90,6 +90,11 @@ struct if_string
 
     template <typename T>
     using disabled = std::enable_if_t<!__::is_string<T>, bool>;
+
+    template <typename T>
+    inline static constexpr bool convertible = std::bool_constant<
+        std::is_same_v<std::string, std::decay_t<T>> ||
+        std::is_same_v<std::wstring, std::decay_t<T>>>::value;
 };
 
 /**

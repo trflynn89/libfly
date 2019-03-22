@@ -1,6 +1,8 @@
 #pragma once
 
+#include "fly/traits/traits.h"
 #include "fly/types/string_converter.h"
+#include "fly/types/string_streamer.h"
 
 #include <algorithm>
 #include <array>
@@ -9,10 +11,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
-#include <fstream>
-#include <ostream>
 #include <random>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -28,6 +27,8 @@ class BasicString;
 
 using String = BasicString<std::string>;
 using WString = BasicString<std::wstring>;
+using String16 = BasicString<std::u16string>;
+using String32 = BasicString<std::u32string>;
 
 /**
  * Static class to provide string utilities not provided by the STL.
@@ -40,31 +41,34 @@ class BasicString
 {
 public:
     using size_type = typename StringType::size_type;
-    using value_type = typename StringType::value_type;
+    using char_type = typename StringType::value_type;
 
-    using istream_type = std::basic_istream<value_type>;
-    using ostream_type = std::basic_ostream<value_type>;
+    using streamer = BasicStringStreamer<StringType>;
 
-    using fstream_type = std::basic_fstream<value_type>;
-    using ifstream_type = std::basic_ifstream<value_type>;
-    using ofstream_type = std::basic_ofstream<value_type>;
+    using istream_type = typename streamer::istream_type;
+    using ostream_type = typename streamer::ostream_type;
+    using streamed_type = typename streamer::streamed_type;
 
-    using sstream_type = std::basic_stringstream<value_type>;
-    using isstream_type = std::basic_istringstream<value_type>;
-    using osstream_type = std::basic_ostringstream<value_type>;
+    using fstream_type = typename streamer::fstream_type;
+    using ifstream_type = typename streamer::ifstream_type;
+    using ofstream_type = typename streamer::ofstream_type;
 
-    using view_type = std::basic_string_view<value_type>;
+    using sstream_type = typename streamer::sstream_type;
+    using isstream_type = typename streamer::isstream_type;
+    using osstream_type = typename streamer::osstream_type;
+
+    using view_type = std::basic_string_view<char_type>;
 
     /**
      * Split a string into a vector of strings.
      *
      * @param StringType The string to split.
-     * @param value_type The delimiter to split the string on.
+     * @param char_type The delimiter to split the string on.
      *
      * @return A vector containing the split strings.
      */
     static std::vector<StringType>
-    Split(const StringType &, value_type) noexcept;
+    Split(const StringType &, char_type) noexcept;
 
     /**
      * Split a string into a vector of strings, up to a maximum size. If the max
@@ -72,13 +76,13 @@ public:
      * in the vector.
      *
      * @param StringType The string to split.
-     * @param value_type The delimiter to split the string on.
+     * @param char_type The delimiter to split the string on.
      * @param uint32_t The maximum return vector size. Zero implies unlimited.
      *
      * @return A vector containing the split strings.
      */
     static std::vector<StringType>
-    Split(const StringType &, value_type, std::uint32_t) noexcept;
+    Split(const StringType &, char_type, std::uint32_t) noexcept;
 
     /**
      * Remove leading and trailing whitespace from a string.
@@ -92,10 +96,10 @@ public:
      *
      * @param StringType The string container which will be modified.
      * @param StringType The string to search for and replace.
-     * @param value_type The replacement character.
+     * @param char_type The replacement character.
      */
     static void
-    ReplaceAll(StringType &, const StringType &, const value_type &) noexcept;
+    ReplaceAll(StringType &, const StringType &, const char_type &) noexcept;
 
     /**
      * Replace all instances of a substring in a string with another string.
@@ -119,11 +123,11 @@ public:
      * Check if a string begins with a character.
      *
      * @param StringType The string to check.
-     * @param value_type The beginning to search for.
+     * @param char_type The beginning to search for.
      *
      * @return True if the string begins with the search character.
      */
-    static bool StartsWith(const StringType &, const value_type &) noexcept;
+    static bool StartsWith(const StringType &, const char_type &) noexcept;
 
     /**
      * Check if a string begins with another string.
@@ -143,7 +147,7 @@ public:
      *
      * @return True if the string ends with the search character.
      */
-    static bool EndsWith(const StringType &, const value_type &) noexcept;
+    static bool EndsWith(const StringType &, const char_type &) noexcept;
 
     /**
      * Check if a string ends with another string.
@@ -189,31 +193,31 @@ public:
      *
      * @tparam Args Variadic template arguments.
      *
-     * @param value_type* The string to format.
+     * @param char_type* The string to format.
      * @param Args The variadic list of arguments to be formatted.
      *
      * @return A string that has been formatted with the given arguments.
      */
     template <typename... Args>
-    static StringType Format(const value_type *, const Args &...) noexcept;
+    static streamed_type Format(const char_type *, const Args &...) noexcept;
 
     /**
      * Concatenate a list of objects with the given separator.
      *
      * @tparam Args Variadic template arguments.
      *
-     * @param value_type Character to use as a separator.
+     * @param char_type Character to use as a separator.
      * @param Args The variadic list of arguments to be joined.
      *
      * @return The resulting join of the given arguments.
      */
     template <typename... Args>
-    static StringType Join(const value_type &, const Args &...) noexcept;
+    static streamed_type Join(const char_type &, const Args &...) noexcept;
 
     /**
-     * Convert a string to a basic type, e.g. int or bool.
+     * Convert a string to a plain-old-data type, e.g. int or bool.
      *
-     * @tparam T The desired basic type.
+     * @tparam T The desired plain-old-data type.
      *
      * @param StringType The string to convert.
      *
@@ -234,7 +238,7 @@ private:
     template <typename T, typename... Args>
     static void format(
         ostream_type &,
-        const value_type *,
+        const char_type *,
         const T &,
         const Args &...) noexcept;
 
@@ -242,7 +246,7 @@ private:
      * Terminator for the variadic template formatter. Stream the rest of the
      * string into the given ostream.
      */
-    static void format(ostream_type &, const value_type *) noexcept;
+    static void format(ostream_type &, const char_type *) noexcept;
 
     /**
      * Recursively join one argument into the given ostream.
@@ -250,7 +254,7 @@ private:
     template <typename T, typename... Args>
     static void join(
         ostream_type &,
-        const value_type &,
+        const char_type &,
         const T &,
         const Args &...) noexcept;
 
@@ -259,82 +263,82 @@ private:
      * into the given ostream.
      */
     template <typename T>
-    static void join(ostream_type &, const value_type &, const T &) noexcept;
+    static void join(ostream_type &, const char_type &, const T &) noexcept;
 
     /**
      * Stream the given value into the given stream.
      */
     template <typename T>
-    static void getValue(ostream_type &, const T &) noexcept;
+    static void stream(ostream_type &, const T &) noexcept;
 
     /**
      * A list of alpha-numeric characters in the range [0-9a-zA-Z].
      */
-    static constexpr std::array<value_type, 62> s_alphaNum = {{
-        std::char_traits<value_type>::to_char_type(0x30), // 0
-        std::char_traits<value_type>::to_char_type(0x31), // 1
-        std::char_traits<value_type>::to_char_type(0x32), // 2
-        std::char_traits<value_type>::to_char_type(0x33), // 3
-        std::char_traits<value_type>::to_char_type(0x34), // 4
-        std::char_traits<value_type>::to_char_type(0x35), // 5
-        std::char_traits<value_type>::to_char_type(0x36), // 6
-        std::char_traits<value_type>::to_char_type(0x37), // 7
-        std::char_traits<value_type>::to_char_type(0x38), // 8
-        std::char_traits<value_type>::to_char_type(0x39), // 9
+    static constexpr std::array<char_type, 62> s_alphaNum = {{
+        std::char_traits<char_type>::to_char_type(0x30), // 0
+        std::char_traits<char_type>::to_char_type(0x31), // 1
+        std::char_traits<char_type>::to_char_type(0x32), // 2
+        std::char_traits<char_type>::to_char_type(0x33), // 3
+        std::char_traits<char_type>::to_char_type(0x34), // 4
+        std::char_traits<char_type>::to_char_type(0x35), // 5
+        std::char_traits<char_type>::to_char_type(0x36), // 6
+        std::char_traits<char_type>::to_char_type(0x37), // 7
+        std::char_traits<char_type>::to_char_type(0x38), // 8
+        std::char_traits<char_type>::to_char_type(0x39), // 9
 
-        std::char_traits<value_type>::to_char_type(0x41), // A
-        std::char_traits<value_type>::to_char_type(0x42), // B
-        std::char_traits<value_type>::to_char_type(0x43), // C
-        std::char_traits<value_type>::to_char_type(0x44), // D
-        std::char_traits<value_type>::to_char_type(0x45), // E
-        std::char_traits<value_type>::to_char_type(0x46), // F
-        std::char_traits<value_type>::to_char_type(0x47), // G
-        std::char_traits<value_type>::to_char_type(0x48), // H
-        std::char_traits<value_type>::to_char_type(0x49), // I
-        std::char_traits<value_type>::to_char_type(0x4a), // J
-        std::char_traits<value_type>::to_char_type(0x4b), // K
-        std::char_traits<value_type>::to_char_type(0x4c), // L
-        std::char_traits<value_type>::to_char_type(0x4d), // M
-        std::char_traits<value_type>::to_char_type(0x4e), // N
-        std::char_traits<value_type>::to_char_type(0x4f), // O
-        std::char_traits<value_type>::to_char_type(0x50), // P
-        std::char_traits<value_type>::to_char_type(0x51), // Q
-        std::char_traits<value_type>::to_char_type(0x52), // R
-        std::char_traits<value_type>::to_char_type(0x53), // S
-        std::char_traits<value_type>::to_char_type(0x54), // T
-        std::char_traits<value_type>::to_char_type(0x55), // U
-        std::char_traits<value_type>::to_char_type(0x56), // V
-        std::char_traits<value_type>::to_char_type(0x57), // W
-        std::char_traits<value_type>::to_char_type(0x58), // X
-        std::char_traits<value_type>::to_char_type(0x59), // Y
-        std::char_traits<value_type>::to_char_type(0x5a), // Z
+        std::char_traits<char_type>::to_char_type(0x41), // A
+        std::char_traits<char_type>::to_char_type(0x42), // B
+        std::char_traits<char_type>::to_char_type(0x43), // C
+        std::char_traits<char_type>::to_char_type(0x44), // D
+        std::char_traits<char_type>::to_char_type(0x45), // E
+        std::char_traits<char_type>::to_char_type(0x46), // F
+        std::char_traits<char_type>::to_char_type(0x47), // G
+        std::char_traits<char_type>::to_char_type(0x48), // H
+        std::char_traits<char_type>::to_char_type(0x49), // I
+        std::char_traits<char_type>::to_char_type(0x4a), // J
+        std::char_traits<char_type>::to_char_type(0x4b), // K
+        std::char_traits<char_type>::to_char_type(0x4c), // L
+        std::char_traits<char_type>::to_char_type(0x4d), // M
+        std::char_traits<char_type>::to_char_type(0x4e), // N
+        std::char_traits<char_type>::to_char_type(0x4f), // O
+        std::char_traits<char_type>::to_char_type(0x50), // P
+        std::char_traits<char_type>::to_char_type(0x51), // Q
+        std::char_traits<char_type>::to_char_type(0x52), // R
+        std::char_traits<char_type>::to_char_type(0x53), // S
+        std::char_traits<char_type>::to_char_type(0x54), // T
+        std::char_traits<char_type>::to_char_type(0x55), // U
+        std::char_traits<char_type>::to_char_type(0x56), // V
+        std::char_traits<char_type>::to_char_type(0x57), // W
+        std::char_traits<char_type>::to_char_type(0x58), // X
+        std::char_traits<char_type>::to_char_type(0x59), // Y
+        std::char_traits<char_type>::to_char_type(0x5a), // Z
 
-        std::char_traits<value_type>::to_char_type(0x61), // a
-        std::char_traits<value_type>::to_char_type(0x62), // b
-        std::char_traits<value_type>::to_char_type(0x63), // c
-        std::char_traits<value_type>::to_char_type(0x64), // d
-        std::char_traits<value_type>::to_char_type(0x65), // e
-        std::char_traits<value_type>::to_char_type(0x66), // f
-        std::char_traits<value_type>::to_char_type(0x67), // g
-        std::char_traits<value_type>::to_char_type(0x68), // h
-        std::char_traits<value_type>::to_char_type(0x69), // i
-        std::char_traits<value_type>::to_char_type(0x6a), // j
-        std::char_traits<value_type>::to_char_type(0x6b), // k
-        std::char_traits<value_type>::to_char_type(0x6c), // l
-        std::char_traits<value_type>::to_char_type(0x6d), // m
-        std::char_traits<value_type>::to_char_type(0x6e), // n
-        std::char_traits<value_type>::to_char_type(0x6f), // o
-        std::char_traits<value_type>::to_char_type(0x70), // p
-        std::char_traits<value_type>::to_char_type(0x71), // q
-        std::char_traits<value_type>::to_char_type(0x72), // r
-        std::char_traits<value_type>::to_char_type(0x73), // s
-        std::char_traits<value_type>::to_char_type(0x74), // t
-        std::char_traits<value_type>::to_char_type(0x75), // u
-        std::char_traits<value_type>::to_char_type(0x76), // v
-        std::char_traits<value_type>::to_char_type(0x77), // w
-        std::char_traits<value_type>::to_char_type(0x78), // x
-        std::char_traits<value_type>::to_char_type(0x79), // y
-        std::char_traits<value_type>::to_char_type(0x7a), // z
+        std::char_traits<char_type>::to_char_type(0x61), // a
+        std::char_traits<char_type>::to_char_type(0x62), // b
+        std::char_traits<char_type>::to_char_type(0x63), // c
+        std::char_traits<char_type>::to_char_type(0x64), // d
+        std::char_traits<char_type>::to_char_type(0x65), // e
+        std::char_traits<char_type>::to_char_type(0x66), // f
+        std::char_traits<char_type>::to_char_type(0x67), // g
+        std::char_traits<char_type>::to_char_type(0x68), // h
+        std::char_traits<char_type>::to_char_type(0x69), // i
+        std::char_traits<char_type>::to_char_type(0x6a), // j
+        std::char_traits<char_type>::to_char_type(0x6b), // k
+        std::char_traits<char_type>::to_char_type(0x6c), // l
+        std::char_traits<char_type>::to_char_type(0x6d), // m
+        std::char_traits<char_type>::to_char_type(0x6e), // n
+        std::char_traits<char_type>::to_char_type(0x6f), // o
+        std::char_traits<char_type>::to_char_type(0x70), // p
+        std::char_traits<char_type>::to_char_type(0x71), // q
+        std::char_traits<char_type>::to_char_type(0x72), // r
+        std::char_traits<char_type>::to_char_type(0x73), // s
+        std::char_traits<char_type>::to_char_type(0x74), // t
+        std::char_traits<char_type>::to_char_type(0x75), // u
+        std::char_traits<char_type>::to_char_type(0x76), // v
+        std::char_traits<char_type>::to_char_type(0x77), // w
+        std::char_traits<char_type>::to_char_type(0x78), // x
+        std::char_traits<char_type>::to_char_type(0x79), // y
+        std::char_traits<char_type>::to_char_type(0x7a), // z
     }};
 };
 
@@ -342,38 +346,51 @@ private:
 template <typename StringType>
 std::vector<StringType> BasicString<StringType>::Split(
     const StringType &input,
-    value_type delim) noexcept
+    char_type delimiter) noexcept
 {
-    return Split(input, delim, 0);
+    return Split(input, delimiter, 0);
 }
 
 //==============================================================================
 template <typename StringType>
 std::vector<StringType> BasicString<StringType>::Split(
     const StringType &input,
-    value_type delim,
+    char_type delimiter,
     std::uint32_t max) noexcept
 {
-    StringType item;
-    sstream_type ss(input);
     std::vector<StringType> elems;
     std::uint32_t numItems = 0;
+    StringType item;
 
-    while (std::getline(ss, item, delim))
-    {
-        if (!item.empty())
+    size_type start = 0;
+    size_type end = input.find(delimiter);
+
+    auto push_item = [&](const StringType &str) {
+        if (!str.empty())
         {
             if ((max > 0) && (++numItems > max))
             {
-                elems.back() += delim;
-                elems.back() += item;
+                elems.back() += delimiter;
+                elems.back() += str;
             }
             else
             {
-                elems.push_back(item);
+                elems.push_back(str);
             }
         }
+    };
+
+    while (end != std::string::npos)
+    {
+        item = input.substr(start, end - start);
+        push_item(item);
+
+        start = end + 1;
+        end = input.find(delimiter, start);
     }
+
+    item = input.substr(start, end);
+    push_item(item);
 
     return elems;
 }
@@ -397,7 +414,7 @@ template <typename StringType>
 void BasicString<StringType>::ReplaceAll(
     StringType &target,
     const StringType &search,
-    const value_type &replace) noexcept
+    const char_type &replace) noexcept
 {
     size_type pos = target.find(search);
 
@@ -437,7 +454,7 @@ void BasicString<StringType>::RemoveAll(
 template <typename StringType>
 bool BasicString<StringType>::StartsWith(
     const StringType &source,
-    const value_type &search) noexcept
+    const char_type &search) noexcept
 {
     bool ret = false;
 
@@ -472,7 +489,7 @@ bool BasicString<StringType>::StartsWith(
 template <typename StringType>
 bool BasicString<StringType>::EndsWith(
     const StringType &source,
-    const value_type &search) noexcept
+    const char_type &search) noexcept
 {
     bool ret = false;
 
@@ -511,7 +528,7 @@ bool BasicString<StringType>::WildcardMatch(
     const StringType &source,
     const StringType &search) noexcept
 {
-    static constexpr value_type wildcard = '*';
+    static constexpr char_type wildcard = '*';
     bool ret = !search.empty();
 
     const std::vector<StringType> segments = Split(search, wildcard);
@@ -573,27 +590,27 @@ BasicString<StringType>::GenerateRandomString(const size_type len) noexcept
 //==============================================================================
 template <typename StringType>
 template <typename... Args>
-StringType BasicString<StringType>::Format(
-    const value_type *fmt,
-    const Args &... args) noexcept
+auto BasicString<StringType>::Format(
+    const char_type *fmt,
+    const Args &... args) noexcept -> streamed_type
 {
-    osstream_type stream;
-    stream.precision(6);
+    osstream_type ostream;
+    ostream.precision(6);
 
     if (fmt != NULL)
     {
-        format(stream, fmt, args...);
+        format(ostream, fmt, args...);
     }
 
-    return stream.str();
+    return ostream.str();
 }
 
 //==============================================================================
 template <typename StringType>
 template <typename T, typename... Args>
 void BasicString<StringType>::format(
-    ostream_type &stream,
-    const value_type *fmt,
+    ostream_type &ostream,
+    const char_type *fmt,
     const T &value,
     const Args &... args) noexcept
 {
@@ -601,106 +618,117 @@ void BasicString<StringType>::format(
     {
         if (*fmt == '%')
         {
-            value_type type = *(fmt + 1);
+            char_type type = *(fmt + 1);
 
             switch (type)
             {
                 case '\0':
-                    stream << *fmt;
+                    stream(ostream, *fmt);
                     return;
 
                 case 'x':
                 case 'X':
-                    stream << "0x" << std::hex;
-                    getValue(stream, value);
-                    stream << std::dec;
+                    ostream << "0x" << std::hex;
+                    stream(ostream, value);
+                    ostream << std::dec;
                     break;
 
                 case 'f':
                 case 'F':
                 case 'g':
                 case 'G':
-                    stream << std::fixed;
-                    getValue(stream, value);
-                    stream.unsetf(std::ios_base::fixed);
+                    ostream << std::fixed;
+                    stream(ostream, value);
+                    ostream.unsetf(std::ios_base::fixed);
                     break;
 
                 case 'e':
                 case 'E':
-                    stream << std::scientific;
-                    getValue(stream, value);
-                    stream.unsetf(std::ios_base::scientific);
+                    ostream << std::scientific;
+                    stream(ostream, value);
+                    ostream.unsetf(std::ios_base::scientific);
                     break;
 
                 default:
-                    getValue(stream, value);
+                    stream(ostream, value);
                     break;
             }
 
-            format(stream, fmt + 2, args...);
+            format(ostream, fmt + 2, args...);
             return;
         }
 
-        stream << *fmt;
+        stream(ostream, *fmt);
     }
 }
 
 //==============================================================================
 template <typename StringType>
 void BasicString<StringType>::format(
-    ostream_type &stream,
-    const value_type *fmt) noexcept
+    ostream_type &ostream,
+    const char_type *fmt) noexcept
 {
-    stream << fmt;
+    stream(ostream, fmt);
 }
 
 //==============================================================================
 template <typename StringType>
 template <typename... Args>
-StringType BasicString<StringType>::Join(
-    const value_type &separator,
-    const Args &... args) noexcept
+auto BasicString<StringType>::Join(
+    const char_type &separator,
+    const Args &... args) noexcept -> streamed_type
 {
-    osstream_type stream;
-    join(stream, separator, args...);
+    osstream_type ostream;
+    join(ostream, separator, args...);
 
-    return stream.str();
+    return ostream.str();
 }
 
 //==============================================================================
 template <typename StringType>
 template <typename T, typename... Args>
 void BasicString<StringType>::join(
-    ostream_type &stream,
-    const value_type &separator,
+    ostream_type &ostream,
+    const char_type &separator,
     const T &value,
     const Args &... args) noexcept
 {
-    getValue(stream, value);
-    stream << separator;
+    stream(ostream, value);
+    stream(ostream, separator);
 
-    join(stream, separator, args...);
+    join(ostream, separator, args...);
 }
 
 //==============================================================================
 template <typename StringType>
 template <typename T>
 void BasicString<StringType>::join(
-    ostream_type &stream,
-    const value_type &,
+    ostream_type &ostream,
+    const char_type &,
     const T &value) noexcept
 {
-    getValue(stream, value);
+    stream(ostream, value);
 }
 
 //==============================================================================
 template <typename StringType>
 template <typename T>
-void BasicString<StringType>::getValue(
-    ostream_type &stream,
+void BasicString<StringType>::stream(
+    ostream_type &ostream,
     const T &value) noexcept
 {
-    stream << std::boolalpha << value;
+    if constexpr (
+        std::is_same_v<StringType, std::decay_t<T>> ||
+        std::is_same_v<char_type, std::decay_t<T>> ||
+        std::is_same_v<char_type *, std::decay_t<T>> ||
+        std::is_same_v<char_type const *, std::decay_t<T>>)
+    {
+        streamer::Stream(ostream, value);
+    }
+    else
+    {
+        ostream << std::boolalpha << value;
+    }
 }
 
 //==============================================================================
@@ -709,7 +737,21 @@ template <typename T>
 T BasicString<StringType>::Convert(const StringType &value) noexcept(
     std::is_same_v<StringType, std::decay_t<T>>)
 {
-    return BasicStringConverter<StringType, T>::Convert(value);
+    if constexpr (std::is_same_v<StringType, std::decay_t<T>>)
+    {
+        return value;
+    }
+    else if constexpr (if_string::convertible<StringType>)
+    {
+        return BasicStringConverter<StringType, T>::Convert(value);
+    }
+    else
+    {
+        osstream_type ostream;
+        stream(ostream, value);
+
+        return BasicStringConverter<streamed_type, T>::Convert(ostream.str());
+    }
 }
 
 } // namespace fly

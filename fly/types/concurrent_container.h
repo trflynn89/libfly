@@ -16,7 +16,7 @@ template <typename T, typename Container>
 class ConcurrentContainer
 {
 public:
-    typedef typename Container::size_type size_type;
+    using size_type = typename Container::size_type;
 
     /**
      * Destructor.

@@ -13,8 +13,8 @@ template <typename StringType>
 class Streamable
 {
 public:
-    using value_type = typename StringType::value_type;
-    using ostream_type = std::basic_ostream<value_type>;
+    using char_type = typename StringType::value_type;
+    using ostream_type = std::basic_ostream<char_type>;
 
     Streamable(const StringType &str, int num) noexcept : m_str(str), m_num(num)
     {
@@ -85,7 +85,8 @@ struct BasicStringTest : public ::testing::Test
     using string_type = T;
 };
 
-using StringTypes = ::testing::Types<std::string, std::wstring>;
+using StringTypes =
+    ::testing::Types<std::string, std::wstring, std::u16string, std::u32string>;
 TYPED_TEST_CASE(BasicStringTest, StringTypes);
 
 #define ASSIGN_TEST_STRING(Type, var, raw)                                     \
@@ -97,6 +98,14 @@ TYPED_TEST_CASE(BasicStringTest, StringTypes);
     {                                                                          \
         var = L##raw;                                                          \
     }                                                                          \
+    else if constexpr (std::is_same_v<Type, std::u16string>)                   \
+    {                                                                          \
+        var = u##raw;                                                          \
+    }                                                                          \
+    else if constexpr (std::is_same_v<Type, std::u32string>)                   \
+    {                                                                          \
+        var = U##raw;                                                          \
+    }                                                                          \
     else                                                                       \
     {                                                                          \
         ASSERT_TRUE(false);                                                    \
@@ -107,26 +116,26 @@ TYPED_TEST(BasicStringTest, SplitTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using value_type = typename StringClass::value_type;
+    using char_type = typename StringClass::char_type;
 
-    static constexpr int numSectors = 10;
+    static constexpr std::uint32_t numSectors = 10;
     std::vector<string_type> inputSplit(numSectors);
 
-    constexpr value_type delim = ' ';
+    constexpr char_type delim = ' ';
     string_type input;
 
-    for (int i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < numSectors; ++i)
     {
-        string_type curr = StringClass::GenerateRandomString(10);
+        const string_type curr = StringClass::GenerateRandomString(10);
 
-        inputSplit[i] = curr;
         input += curr + delim;
+        inputSplit[i] = curr;
     }
 
     const auto outputSplit = StringClass::Split(input, delim);
     ASSERT_EQ(inputSplit.size(), outputSplit.size());
 
-    for (int i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < numSectors; ++i)
     {
         ASSERT_EQ(inputSplit[i], outputSplit[i]);
     }
@@ -137,18 +146,19 @@ TYPED_TEST(BasicStringTest, MaxSplitTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using value_type = typename StringClass::value_type;
+    using char_type = typename StringClass::char_type;
 
-    static constexpr int numSectors = 10;
-    static constexpr int maxSectors = 6;
+    static constexpr std::uint32_t numSectors = 10;
+    static constexpr std::uint32_t maxSectors = 6;
     std::vector<string_type> inputSplit(maxSectors);
 
-    constexpr value_type delim = ';';
+    constexpr char_type delim = ';';
     string_type input;
 
-    for (int i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < numSectors; ++i)
     {
-        string_type curr = StringClass::GenerateRandomString(10);
+        const string_type curr = StringClass::GenerateRandomString(10);
+        input += curr + delim;
 
         if (i < maxSectors)
         {
@@ -159,14 +169,12 @@ TYPED_TEST(BasicStringTest, MaxSplitTest)
             inputSplit.back() += delim;
             inputSplit.back() += curr;
         }
-
-        input += curr + delim;
     }
 
     const auto outputSplit = StringClass::Split(input, delim, maxSectors);
     ASSERT_EQ(inputSplit.size(), outputSplit.size());
 
-    for (int i = 0; i < maxSectors; ++i)
+    for (std::uint32_t i = 0; i < maxSectors; ++i)
     {
         ASSERT_EQ(inputSplit[i], outputSplit[i]);
     }
@@ -230,12 +238,12 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithCharTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using value_type = typename StringClass::value_type;
+    using char_type = typename StringClass::char_type;
 
     string_type source, search, result;
     ASSIGN_TEST_STRING(string_type, source, "To Be Replaced! To Be Replaced!");
     ASSIGN_TEST_STRING(string_type, search, "Be Replaced");
-    value_type replace('x');
+    char_type replace('x');
     ASSIGN_TEST_STRING(string_type, result, "To x! To x!");
 
     StringClass::ReplaceAll(source, search, replace);
@@ -495,44 +503,47 @@ TYPED_TEST(BasicStringTest, FormatTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using value_type = typename StringClass::value_type;
+    using char_type = typename StringClass::char_type;
+    using streamed_type = typename StringClass::streamed_type;
 
-    string_type expected;
-    const value_type *format;
+    streamed_type expected;
+    const char_type *format;
     string_type arg;
 
-    ASSIGN_TEST_STRING(string_type, expected, "");
+    ASSIGN_TEST_STRING(streamed_type, expected, "");
     ASSIGN_TEST_STRING(string_type, format, "");
     EXPECT_EQ(expected, StringClass::Format(format));
 
-    ASSIGN_TEST_STRING(string_type, expected, "%");
+    ASSIGN_TEST_STRING(streamed_type, expected, "%");
     ASSIGN_TEST_STRING(string_type, format, "%");
     EXPECT_EQ(expected, StringClass::Format(format));
     EXPECT_EQ(expected, StringClass::Format(format, 1));
 
-    ASSIGN_TEST_STRING(string_type, expected, "%%");
+    ASSIGN_TEST_STRING(streamed_type, expected, "%%");
     ASSIGN_TEST_STRING(string_type, format, "%%");
     EXPECT_EQ(expected, StringClass::Format(format));
 
-    ASSIGN_TEST_STRING(string_type, expected, "%d");
+    ASSIGN_TEST_STRING(streamed_type, expected, "%d");
     ASSIGN_TEST_STRING(string_type, format, "%d");
     EXPECT_EQ(expected, StringClass::Format(format));
 
-    ASSIGN_TEST_STRING(string_type, expected, "This is a test");
+    ASSIGN_TEST_STRING(streamed_type, expected, "This is a test");
     ASSIGN_TEST_STRING(string_type, format, "This is a test");
     EXPECT_EQ(expected, StringClass::Format(format));
 
-    ASSIGN_TEST_STRING(string_type, expected, "there are no formatters");
+    ASSIGN_TEST_STRING(streamed_type, expected, "there are no formatters");
     ASSIGN_TEST_STRING(string_type, format, "there are no formatters");
     EXPECT_EQ(expected, StringClass::Format(format, 1, 2, 3, 4));
 
-    ASSIGN_TEST_STRING(string_type, expected, "test some string s");
+    ASSIGN_TEST_STRING(streamed_type, expected, "test some string s");
     ASSIGN_TEST_STRING(string_type, format, "test %s %c");
     ASSIGN_TEST_STRING(string_type, arg, "some string");
     EXPECT_EQ(expected, StringClass::Format(format, arg, 's'));
 
     ASSIGN_TEST_STRING(
-        string_type, expected, "test 1 true 2.100000 false 1.230000e+02 0xff");
+        streamed_type,
+        expected,
+        "test 1 true 2.100000 false 1.230000e+02 0xff");
     ASSIGN_TEST_STRING(string_type, format, "test %d %d %f %d %e %x");
     EXPECT_EQ(
         expected,
@@ -544,85 +555,88 @@ TYPED_TEST(BasicStringTest, JoinTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using value_type = typename StringClass::value_type;
+    using char_type = typename StringClass::char_type;
+    using streamed_type = typename StringClass::streamed_type;
 
-    string_type str, expected;
-    const value_type *ctr;
-    const value_type arr[] = {'c', '\0'};
-    const value_type chr = 'd';
+    streamed_type expected;
+
+    string_type str;
+    const char_type *ctr;
+    const char_type arr[] = {'c', '\0'};
+    const char_type chr = 'd';
     ASSIGN_TEST_STRING(string_type, str, "a");
     ASSIGN_TEST_STRING(string_type, ctr, "b");
 
-    ASSIGN_TEST_STRING(string_type, expected, "goodbye");
-    const Streamable<string_type> obj1(expected, 0xbeef);
+    ASSIGN_TEST_STRING(streamed_type, expected, "goodbye");
+    const Streamable<streamed_type> obj1(expected, 0xbeef);
 
-    ASSIGN_TEST_STRING(string_type, expected, "a");
+    ASSIGN_TEST_STRING(streamed_type, expected, "a");
     EXPECT_EQ(expected, StringClass::Join('.', str));
 
-    ASSIGN_TEST_STRING(string_type, expected, "b");
+    ASSIGN_TEST_STRING(streamed_type, expected, "b");
     EXPECT_EQ(expected, StringClass::Join('.', ctr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "c");
+    ASSIGN_TEST_STRING(streamed_type, expected, "c");
     EXPECT_EQ(expected, StringClass::Join('.', arr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "d");
+    ASSIGN_TEST_STRING(streamed_type, expected, "d");
     EXPECT_EQ(expected, StringClass::Join('.', chr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "a,a");
+    ASSIGN_TEST_STRING(streamed_type, expected, "a,a");
     EXPECT_EQ(expected, StringClass::Join(',', str, str));
 
-    ASSIGN_TEST_STRING(string_type, expected, "a,b");
+    ASSIGN_TEST_STRING(streamed_type, expected, "a,b");
     EXPECT_EQ(expected, StringClass::Join(',', str, ctr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "a,c");
+    ASSIGN_TEST_STRING(streamed_type, expected, "a,c");
     EXPECT_EQ(expected, StringClass::Join(',', str, arr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "a,d");
+    ASSIGN_TEST_STRING(streamed_type, expected, "a,d");
     EXPECT_EQ(expected, StringClass::Join(',', str, chr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "b,a");
+    ASSIGN_TEST_STRING(streamed_type, expected, "b,a");
     EXPECT_EQ(expected, StringClass::Join(',', ctr, str));
 
-    ASSIGN_TEST_STRING(string_type, expected, "b,b");
+    ASSIGN_TEST_STRING(streamed_type, expected, "b,b");
     EXPECT_EQ(expected, StringClass::Join(',', ctr, ctr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "b,c");
+    ASSIGN_TEST_STRING(streamed_type, expected, "b,c");
     EXPECT_EQ(expected, StringClass::Join(',', ctr, arr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "b,d");
+    ASSIGN_TEST_STRING(streamed_type, expected, "b,d");
     EXPECT_EQ(expected, StringClass::Join(',', ctr, chr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "c,a");
+    ASSIGN_TEST_STRING(streamed_type, expected, "c,a");
     EXPECT_EQ(expected, StringClass::Join(',', arr, str));
 
-    ASSIGN_TEST_STRING(string_type, expected, "c,b");
+    ASSIGN_TEST_STRING(streamed_type, expected, "c,b");
     EXPECT_EQ(expected, StringClass::Join(',', arr, ctr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "c,c");
+    ASSIGN_TEST_STRING(streamed_type, expected, "c,c");
     EXPECT_EQ(expected, StringClass::Join(',', arr, arr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "c,d");
+    ASSIGN_TEST_STRING(streamed_type, expected, "c,d");
     EXPECT_EQ(expected, StringClass::Join(',', arr, chr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "d,a");
+    ASSIGN_TEST_STRING(streamed_type, expected, "d,a");
     EXPECT_EQ(expected, StringClass::Join(',', chr, str));
 
-    ASSIGN_TEST_STRING(string_type, expected, "d,b");
+    ASSIGN_TEST_STRING(streamed_type, expected, "d,b");
     EXPECT_EQ(expected, StringClass::Join(',', chr, ctr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "d,c");
+    ASSIGN_TEST_STRING(streamed_type, expected, "d,c");
     EXPECT_EQ(expected, StringClass::Join(',', chr, arr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "d,d");
+    ASSIGN_TEST_STRING(streamed_type, expected, "d,d");
     EXPECT_EQ(expected, StringClass::Join(',', chr, chr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "[goodbye beef]");
+    ASSIGN_TEST_STRING(streamed_type, expected, "[goodbye beef]");
     EXPECT_EQ(expected, StringClass::Join('.', obj1));
 
-    ASSIGN_TEST_STRING(string_type, expected, "a:[goodbye beef]:c:d");
+    ASSIGN_TEST_STRING(streamed_type, expected, "a:[goodbye beef]:c:d");
     EXPECT_EQ(expected, StringClass::Join(':', str, obj1, arr, chr));
 
-    ASSIGN_TEST_STRING(string_type, expected, "a:c:d");
+    ASSIGN_TEST_STRING(streamed_type, expected, "a:c:d");
     EXPECT_EQ(expected, StringClass::Join(':', str, arr, chr));
 }
 
@@ -670,7 +684,7 @@ TYPED_TEST(BasicStringTest, ConvertCharTest)
     using StringClass = fly::BasicString<string_type>;
     string_type s;
 
-    using char_type = typename StringClass::value_type;
+    using char_type = typename StringClass::streamed_type::value_type;
     using uchar_type = std::make_unsigned_t<char_type>;
 
     ASSIGN_TEST_STRING(string_type, s, "0");
@@ -693,23 +707,26 @@ TYPED_TEST(BasicStringTest, ConvertCharTest)
     EXPECT_THROW(
         StringClass::template Convert<uchar_type>(s), std::invalid_argument);
 
-    EXPECT_THROW(
-        StringClass::template Convert<char_type>(
-            minstr<string_type, char_type>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<char_type>(
-            maxstr<string_type, char_type>()),
-        std::out_of_range);
+    if constexpr (fly::if_string::convertible<string_type>)
+    {
+        EXPECT_THROW(
+            StringClass::template Convert<char_type>(
+                minstr<string_type, char_type>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<char_type>(
+                maxstr<string_type, char_type>()),
+            std::out_of_range);
 
-    EXPECT_THROW(
-        StringClass::template Convert<uchar_type>(
-            minstr<string_type, uchar_type>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<uchar_type>(
-            maxstr<string_type, uchar_type>()),
-        std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<uchar_type>(
+                minstr<string_type, uchar_type>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<uchar_type>(
+                maxstr<string_type, uchar_type>()),
+            std::out_of_range);
+    }
 }
 
 //==============================================================================
@@ -745,23 +762,26 @@ TYPED_TEST(BasicStringTest, ConvertInt8Test)
     EXPECT_THROW(
         StringClass::template Convert<std::uint8_t>(s), std::invalid_argument);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::int8_t>(
-            minstr<string_type, std::int8_t>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::int8_t>(
-            maxstr<string_type, std::int8_t>()),
-        std::out_of_range);
+    if constexpr (fly::if_string::convertible<string_type>)
+    {
+        EXPECT_THROW(
+            StringClass::template Convert<std::int8_t>(
+                minstr<string_type, std::int8_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::int8_t>(
+                maxstr<string_type, std::int8_t>()),
+            std::out_of_range);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint8_t>(
-            minstr<string_type, std::uint8_t>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint8_t>(
-            maxstr<string_type, std::uint8_t>()),
-        std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint8_t>(
+                minstr<string_type, std::uint8_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint8_t>(
+                maxstr<string_type, std::uint8_t>()),
+            std::out_of_range);
+    }
 }
 
 //==============================================================================
@@ -800,23 +820,26 @@ TYPED_TEST(BasicStringTest, ConvertInt16Test)
     EXPECT_THROW(
         StringClass::template Convert<std::uint16_t>(s), std::invalid_argument);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::int16_t>(
-            minstr<string_type, std::int16_t>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::int16_t>(
-            maxstr<string_type, std::int16_t>()),
-        std::out_of_range);
+    if constexpr (fly::if_string::convertible<string_type>)
+    {
+        EXPECT_THROW(
+            StringClass::template Convert<std::int16_t>(
+                minstr<string_type, std::int16_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::int16_t>(
+                maxstr<string_type, std::int16_t>()),
+            std::out_of_range);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint16_t>(
-            minstr<string_type, std::uint16_t>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint16_t>(
-            maxstr<string_type, std::uint16_t>()),
-        std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint16_t>(
+                minstr<string_type, std::uint16_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint16_t>(
+                maxstr<string_type, std::uint16_t>()),
+            std::out_of_range);
+    }
 }
 
 //==============================================================================
@@ -855,23 +878,26 @@ TYPED_TEST(BasicStringTest, ConvertInt32Test)
     EXPECT_THROW(
         StringClass::template Convert<std::uint32_t>(s), std::invalid_argument);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::int32_t>(
-            minstr<string_type, std::int32_t>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::int32_t>(
-            maxstr<string_type, std::int32_t>()),
-        std::out_of_range);
+    if constexpr (fly::if_string::convertible<string_type>)
+    {
+        EXPECT_THROW(
+            StringClass::template Convert<std::int32_t>(
+                minstr<string_type, std::int32_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::int32_t>(
+                maxstr<string_type, std::int32_t>()),
+            std::out_of_range);
 
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint32_t>(
-            minstr<string_type, std::uint32_t>()),
-        std::out_of_range);
-    EXPECT_THROW(
-        StringClass::template Convert<std::uint32_t>(
-            maxstr<string_type, std::uint32_t>()),
-        std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint32_t>(
+                minstr<string_type, std::uint32_t>()),
+            std::out_of_range);
+        EXPECT_THROW(
+            StringClass::template Convert<std::uint32_t>(
+                maxstr<string_type, std::uint32_t>()),
+            std::out_of_range);
+    }
 }
 
 //==============================================================================
@@ -941,4 +967,25 @@ TYPED_TEST(BasicStringTest, ConvertDecimalTest)
         StringClass::template Convert<double>(s), std::invalid_argument);
     EXPECT_THROW(
         StringClass::template Convert<long double>(s), std::invalid_argument);
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTest, BasicStringStreamerTest)
+{
+    using string_type = typename TestFixture::string_type;
+    using StringClass = fly::BasicString<string_type>;
+    using osstream_type = typename StringClass::osstream_type;
+    using streamer = typename StringClass::streamer;
+
+    // Extra test case to make sure the hexadecimal conversion feature in
+    // BasicStringStreamer is handled correctly.
+    if constexpr (!fly::if_string::convertible<string_type>)
+    {
+        string_type s;
+        ASSIGN_TEST_STRING(string_type, s, "\u00f0\u0178\u008d\u2022");
+
+        osstream_type ostream;
+        streamer::Stream(ostream, s);
+        EXPECT_EQ("[0xf0][0x178][0x8d][0x2022]", ostream.str());
+    }
 }

@@ -140,6 +140,9 @@
     <ClInclude Include="..\..\..\fly\system\system_config.h">
       <Filter>system</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string_streamer.h">
+      <Filter>types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp">

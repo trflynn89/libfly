@@ -3,14 +3,20 @@
 #include <cstdint>
 #include <stdexcept>
 #include <string>
-#include <type_traits>
 
 namespace fly {
 
 /**
- * Helper class to convert a string type to a basic type, e.g. int or bool. This
- * class is only provided so specializations for each basic type can be defined.
- * Outside callers should use BasicString<StringType>::Convert().
+ * Helper struct to convert a std::basic_string<> type to a plain-old-data type,
+ * e.g. int or bool.
+ *
+ * Internally, the std::stoi family of functions is used to handle conversions,
+ * so only std::string and std::wstring may be directly used. For std::u16string
+ * and std::u32string, first use BasicStringStreamer<>::Stream to convert the
+ * string to std::string.
+ *
+ * It is recommended that outside callers use BasicString<>::Convert<> instead
+ * of using this class directly.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version March 21, 2019
@@ -18,18 +24,6 @@ namespace fly {
 template <typename StringType, typename T>
 struct BasicStringConverter
 {
-    static T Convert(const StringType &) noexcept(
-        std::is_same_v<StringType, std::decay_t<T>>);
-};
-
-//==============================================================================
-template <typename StringType>
-struct BasicStringConverter<StringType, StringType>
-{
-    static StringType Convert(const StringType &value) noexcept
-    {
-        return value;
-    }
 };
 
 //==============================================================================

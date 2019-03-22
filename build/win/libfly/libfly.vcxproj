@@ -190,6 +190,7 @@
     <ClInclude Include="..\..\..\fly\types\concurrent_stack.h" />
     <ClInclude Include="..\..\..\fly\types\json.h" />
     <ClInclude Include="..\..\..\fly\types\string.h" />
+    <ClInclude Include="..\..\..\fly\types\string_streamer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp" />
