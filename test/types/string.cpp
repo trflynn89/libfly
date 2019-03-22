@@ -974,7 +974,6 @@ TYPED_TEST(BasicStringTest, BasicStringStreamerTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using streamed_type = typename StringClass::streamed_type;
     using osstream_type = typename StringClass::osstream_type;
     using streamer = typename StringClass::streamer;
 
