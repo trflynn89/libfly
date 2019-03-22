@@ -136,7 +136,7 @@ TYPED_TEST(BasicStringTest, SplitTest)
     constexpr char_type delim = ' ';
     string_type input;
 
-    for (auto i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < numSectors; ++i)
     {
         const string_type curr = StringClass::GenerateRandomString(10);
 
@@ -147,7 +147,7 @@ TYPED_TEST(BasicStringTest, SplitTest)
     const auto outputSplit = StringClass::Split(input, delim);
     ASSERT_EQ(inputSplit.size(), outputSplit.size());
 
-    for (auto i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < numSectors; ++i)
     {
         ASSERT_EQ(inputSplit[i], outputSplit[i]);
     }
@@ -167,7 +167,7 @@ TYPED_TEST(BasicStringTest, MaxSplitTest)
     constexpr char_type delim = ';';
     string_type input;
 
-    for (auto i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < numSectors; ++i)
     {
         const string_type curr = StringClass::GenerateRandomString(10);
         input += curr + delim;
@@ -186,7 +186,7 @@ TYPED_TEST(BasicStringTest, MaxSplitTest)
     const auto outputSplit = StringClass::Split(input, delim, maxSectors);
     ASSERT_EQ(inputSplit.size(), outputSplit.size());
 
-    for (auto i = 0; i < maxSectors; ++i)
+    for (std::uint32_t i = 0; i < maxSectors; ++i)
     {
         ASSERT_EQ(inputSplit[i], outputSplit[i]);
     }
