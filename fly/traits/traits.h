@@ -64,7 +64,7 @@
     };
 
 /**
- * Custom type traits not provided by the STL.
+ * Type traits not provided by the STL.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 28, 2017
@@ -72,30 +72,54 @@
 namespace fly {
 
 /**
- * Tests for whether a given type is string-like.
+ * Wrapper around std::enable_if for testing that all coditions in a sequence of
+ * traits are true. Example:
+ *
+ *      template <
+ *          typename T,
+ *          fly::enable_if_all<std::is_class<T>, std::is_empty<T>> = 0>
+ *      void func(const T &) { }
  */
-struct if_string
-{
-    struct __
-    {
-        template <typename T>
-        inline static constexpr bool is_string = std::bool_constant<
-            std::is_same_v<char *, std::decay_t<T>> ||
-            std::is_same_v<char const *, std::decay_t<T>> ||
-            std::is_same_v<std::string, std::decay_t<T>>>::value;
-    };
+template <typename... Conditions>
+using enable_if_all = std::enable_if_t<std::conjunction_v<Conditions...>, bool>;
 
-    template <typename T>
-    using enabled = std::enable_if_t<__::is_string<T>, bool>;
+/**
+ * Wrapper around std::enable_if for testing that any codition in a sequence of
+ * traits is true. Example:
+ *
+ *      template <
+ *          typename T,
+ *          fly::enable_if_any<std::is_class<T>, std::is_empty<T>> = 0>
+ *      void func(const T &) { }
+ */
+template <typename... Conditions>
+using enable_if_any = std::enable_if_t<std::disjunction_v<Conditions...>, bool>;
 
-    template <typename T>
-    using disabled = std::enable_if_t<!__::is_string<T>, bool>;
+/**
+ * Wrapper around std::enable_if for testing that all coditions in a sequence of
+ * traits are false. Example:
+ *
+ *      template <
+ *          typename T,
+ *          fly::enable_if_none<std::is_class<T>, std::is_empty<T>> = 0>
+ *      void func(const T &) { }
+ */
+template <typename... Conditions>
+using enable_if_none =
+    std::enable_if_t<std::negation_v<std::disjunction<Conditions...>>, bool>;
 
-    template <typename T>
-    inline static constexpr bool convertible = std::bool_constant<
-        std::is_same_v<std::string, std::decay_t<T>> ||
-        std::is_same_v<std::wstring, std::decay_t<T>>>::value;
-};
+/**
+ * Wrapper around std::enable_if for testing that any codition in a sequence of
+ * traits is false. Example:
+ *
+ *      template <
+ *          typename T,
+ *          fly::enable_if_not_all<std::is_class<T>, std::is_empty<T>> = 0>
+ *      void func(const T &) { }
+ */
+template <typename... Conditions>
+using enable_if_not_all =
+    std::enable_if_t<std::negation_v<std::conjunction<Conditions...>>, bool>;
 
 /**
  * Tests for whether a given type is a signed integer.

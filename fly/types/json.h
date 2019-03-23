@@ -91,7 +91,7 @@ public:
     using stream_type = std::basic_stringstream<string_type::value_type>;
 
     /**
-     * Default constructor. Intializes the Json instance to a NULL value.
+     * Default constructor. Intializes the Json instance to a null value.
      */
     Json() noexcept;
 
@@ -113,7 +113,7 @@ public:
      *
      * @throws JsonException If the string-like value is not valid.
      */
-    template <typename T, fly::if_string::enabled<T> = 0>
+    template <typename T, String::traits::enabled_if_string<T> = 0>
     Json(const T &) noexcept(false);
 
     /**
@@ -125,7 +125,7 @@ public:
      *
      * @param T The object-like value.
      */
-    template <typename T, fly::if_map::enabled<T> = 0>
+    template <typename T, if_map::enabled<T> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -137,7 +137,7 @@ public:
      *
      * @param T The array-like value.
      */
-    template <typename T, fly::if_array::enabled<T> = 0>
+    template <typename T, if_array::enabled<T> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -149,7 +149,7 @@ public:
      *
      * @param T The boolean value.
      */
-    template <typename T, fly::if_boolean::enabled<T> = 0>
+    template <typename T, if_boolean::enabled<T> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -161,7 +161,7 @@ public:
      *
      * @param T The signed value.
      */
-    template <typename T, fly::if_signed_integer::enabled<T> = 0>
+    template <typename T, if_signed_integer::enabled<T> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -174,7 +174,7 @@ public:
      *
      * @param T The unsigned value.
      */
-    template <typename T, fly::if_unsigned_integer::enabled<T> = 0>
+    template <typename T, if_unsigned_integer::enabled<T> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -186,12 +186,12 @@ public:
      *
      * @param T The floating point value.
      */
-    template <typename T, fly::if_floating_point::enabled<T> = 0>
+    template <typename T, if_floating_point::enabled<T> = 0>
     Json(const T &) noexcept;
 
     /**
      * Copy constructor. Intializes the Json instance with the type and value
-     * of another Json instance. The other Json instance is set to a null value.
+     * of another Json instance.
      *
      * @param Json The Json instance to copy.
      */
@@ -199,9 +199,7 @@ public:
 
     /**
      * Move constructor. Intializes the Json instance with the type and value
-     * of another Json instance. It is important to explicitly declare this
-     * constructor to allow the copy-and-swap operation to be valid in the
-     * assignment operator.
+     * of another Json instance. The other Json instance is set to a null value.
      *
      * @param Json The Json instance to copy.
      */
@@ -217,6 +215,16 @@ public:
      * @param std::initializer_list The initializer list.
      */
     Json(const std::initializer_list<Json> &) noexcept;
+
+    /**
+     * Copy assignment operator. Intializes the Json instance with the type and
+     * value of another Json instance, using the copy-and-swap idiom.
+     *
+     * @param Json The Json instance to copy-and-swap.
+     *
+     * @return Json A reference to this Json instance.
+     */
+    Json &operator=(Json) noexcept;
 
     /**
      * @return bool True if the Json instance is null.
@@ -269,16 +277,6 @@ public:
     bool IsFloat() const noexcept;
 
     /**
-     * Assignment operator. Intializes the Json instance with the type and value
-     * of another Json instance, using the copy-and-swap idiom.
-     *
-     * @param Json The Json instance to copy-and-swap.
-     *
-     * @return Json A reference to this Json instance.
-     */
-    Json &operator=(Json) noexcept;
-
-    /**
      * Null conversion operator. Converts the Json instance to a null type.
      *
      * @throws JsonException If the Json instance is not null.
@@ -308,7 +306,7 @@ public:
      *
      * @return T The Json instance as the object-like type.
      */
-    template <typename T, fly::if_map::enabled<T> = 0>
+    template <typename T, if_map::enabled<T> = 0>
     explicit operator T() const noexcept(false);
 
     /**
@@ -324,7 +322,7 @@ public:
      *
      * @return T The Json instance as the array-like type.
      */
-    template <typename T, fly::if_array::enabled<T> = 0>
+    template <typename T, if_array::enabled<T> = 0>
     explicit operator T() const noexcept(false);
 
     /**
@@ -354,7 +352,7 @@ public:
      *
      * @param T The Json instance as a boolean.
      */
-    template <typename T, fly::if_boolean::enabled<T> = 0>
+    template <typename T, if_boolean::enabled<T> = 0>
     explicit operator T() const noexcept(false);
 
     /**
@@ -371,7 +369,7 @@ public:
      *
      * @return T The Json instance as the numeric type.
      */
-    template <typename T, fly::if_numeric::enabled<T> = 0>
+    template <typename T, if_numeric::enabled<T> = 0>
     explicit operator T() const noexcept(false);
 
     /**
@@ -604,51 +602,51 @@ private:
 };
 
 //==============================================================================
-template <typename T, fly::if_string::enabled<T>>
+template <typename T, String::traits::enabled_if_string<T>>
 Json::Json(const T &value) noexcept(false) : m_value(validateString(value))
 {
 }
 
 //==============================================================================
-template <typename T, fly::if_map::enabled<T>>
+template <typename T, if_map::enabled<T>>
 Json::Json(const T &value) noexcept :
     m_value(object_type(value.begin(), value.end()))
 {
 }
 
 //==============================================================================
-template <typename T, fly::if_array::enabled<T>>
+template <typename T, if_array::enabled<T>>
 Json::Json(const T &value) noexcept :
     m_value(array_type(value.begin(), value.end()))
 {
 }
 
 //==============================================================================
-template <typename T, fly::if_boolean::enabled<T>>
+template <typename T, if_boolean::enabled<T>>
 Json::Json(const T &value) noexcept : m_value(static_cast<boolean_type>(value))
 {
 }
 
 //==============================================================================
-template <typename T, fly::if_signed_integer::enabled<T>>
+template <typename T, if_signed_integer::enabled<T>>
 Json::Json(const T &value) noexcept : m_value(static_cast<signed_type>(value))
 {
 }
 
 //==============================================================================
-template <typename T, fly::if_unsigned_integer::enabled<T>>
+template <typename T, if_unsigned_integer::enabled<T>>
 Json::Json(const T &value) noexcept : m_value(static_cast<unsigned_type>(value))
 {
 }
 
 //==============================================================================
-template <typename T, fly::if_floating_point::enabled<T>>
+template <typename T, if_floating_point::enabled<T>>
 Json::Json(const T &value) noexcept : m_value(static_cast<float_type>(value))
 {
 }
 
 //==============================================================================
-template <typename T, fly::if_map::enabled<T>>
+template <typename T, if_map::enabled<T>>
 Json::operator T() const noexcept(false)
 {
     if (IsObject())
@@ -661,7 +659,7 @@ Json::operator T() const noexcept(false)
 }
 
 //==============================================================================
-template <typename T, fly::if_array::enabled<T>>
+template <typename T, if_array::enabled<T>>
 Json::operator T() const noexcept(false)
 {
     if (IsArray())
@@ -694,7 +692,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 }
 
 //==============================================================================
-template <typename T, fly::if_boolean::enabled<T>>
+template <typename T, if_boolean::enabled<T>>
 Json::operator T() const noexcept(false)
 {
     auto visitor = [](const auto &value) -> T {
@@ -725,7 +723,7 @@ Json::operator T() const noexcept(false)
 }
 
 //==============================================================================
-template <typename T, fly::if_numeric::enabled<T>>
+template <typename T, if_numeric::enabled<T>>
 Json::operator T() const noexcept(false)
 {
     auto visitor = [this](const auto &value) -> T {

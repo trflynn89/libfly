@@ -2,7 +2,9 @@
 
 #include "fly/traits/traits.h"
 #include "fly/types/string_converter.h"
+#include "fly/types/string_literal.h"
 #include "fly/types/string_streamer.h"
+#include "fly/types/string_traits.h"
 
 #include <algorithm>
 #include <array>
@@ -40,10 +42,13 @@ template <typename StringType>
 class BasicString
 {
 public:
-    using size_type = typename StringType::size_type;
-    using char_type = typename StringType::value_type;
+    using string_type = StringType;
 
     using streamer = BasicStringStreamer<StringType>;
+    using traits = BasicStringTraits<StringType>;
+
+    using size_type = typename StringType::size_type;
+    using char_type = typename StringType::value_type;
 
     using istream_type = typename streamer::istream_type;
     using ostream_type = typename streamer::ostream_type;
@@ -274,72 +279,14 @@ private:
     /**
      * A list of alpha-numeric characters in the range [0-9a-zA-Z].
      */
-    static constexpr std::array<char_type, 62> s_alphaNum = {{
-        std::char_traits<char_type>::to_char_type(0x30), // 0
-        std::char_traits<char_type>::to_char_type(0x31), // 1
-        std::char_traits<char_type>::to_char_type(0x32), // 2
-        std::char_traits<char_type>::to_char_type(0x33), // 3
-        std::char_traits<char_type>::to_char_type(0x34), // 4
-        std::char_traits<char_type>::to_char_type(0x35), // 5
-        std::char_traits<char_type>::to_char_type(0x36), // 6
-        std::char_traits<char_type>::to_char_type(0x37), // 7
-        std::char_traits<char_type>::to_char_type(0x38), // 8
-        std::char_traits<char_type>::to_char_type(0x39), // 9
+    static constexpr const char_type *s_alphaNum = FLY_STR(
+        char_type,
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz");
 
-        std::char_traits<char_type>::to_char_type(0x41), // A
-        std::char_traits<char_type>::to_char_type(0x42), // B
-        std::char_traits<char_type>::to_char_type(0x43), // C
-        std::char_traits<char_type>::to_char_type(0x44), // D
-        std::char_traits<char_type>::to_char_type(0x45), // E
-        std::char_traits<char_type>::to_char_type(0x46), // F
-        std::char_traits<char_type>::to_char_type(0x47), // G
-        std::char_traits<char_type>::to_char_type(0x48), // H
-        std::char_traits<char_type>::to_char_type(0x49), // I
-        std::char_traits<char_type>::to_char_type(0x4a), // J
-        std::char_traits<char_type>::to_char_type(0x4b), // K
-        std::char_traits<char_type>::to_char_type(0x4c), // L
-        std::char_traits<char_type>::to_char_type(0x4d), // M
-        std::char_traits<char_type>::to_char_type(0x4e), // N
-        std::char_traits<char_type>::to_char_type(0x4f), // O
-        std::char_traits<char_type>::to_char_type(0x50), // P
-        std::char_traits<char_type>::to_char_type(0x51), // Q
-        std::char_traits<char_type>::to_char_type(0x52), // R
-        std::char_traits<char_type>::to_char_type(0x53), // S
-        std::char_traits<char_type>::to_char_type(0x54), // T
-        std::char_traits<char_type>::to_char_type(0x55), // U
-        std::char_traits<char_type>::to_char_type(0x56), // V
-        std::char_traits<char_type>::to_char_type(0x57), // W
-        std::char_traits<char_type>::to_char_type(0x58), // X
-        std::char_traits<char_type>::to_char_type(0x59), // Y
-        std::char_traits<char_type>::to_char_type(0x5a), // Z
-
-        std::char_traits<char_type>::to_char_type(0x61), // a
-        std::char_traits<char_type>::to_char_type(0x62), // b
-        std::char_traits<char_type>::to_char_type(0x63), // c
-        std::char_traits<char_type>::to_char_type(0x64), // d
-        std::char_traits<char_type>::to_char_type(0x65), // e
-        std::char_traits<char_type>::to_char_type(0x66), // f
-        std::char_traits<char_type>::to_char_type(0x67), // g
-        std::char_traits<char_type>::to_char_type(0x68), // h
-        std::char_traits<char_type>::to_char_type(0x69), // i
-        std::char_traits<char_type>::to_char_type(0x6a), // j
-        std::char_traits<char_type>::to_char_type(0x6b), // k
-        std::char_traits<char_type>::to_char_type(0x6c), // l
-        std::char_traits<char_type>::to_char_type(0x6d), // m
-        std::char_traits<char_type>::to_char_type(0x6e), // n
-        std::char_traits<char_type>::to_char_type(0x6f), // o
-        std::char_traits<char_type>::to_char_type(0x70), // p
-        std::char_traits<char_type>::to_char_type(0x71), // q
-        std::char_traits<char_type>::to_char_type(0x72), // r
-        std::char_traits<char_type>::to_char_type(0x73), // s
-        std::char_traits<char_type>::to_char_type(0x74), // t
-        std::char_traits<char_type>::to_char_type(0x75), // u
-        std::char_traits<char_type>::to_char_type(0x76), // v
-        std::char_traits<char_type>::to_char_type(0x77), // w
-        std::char_traits<char_type>::to_char_type(0x78), // x
-        std::char_traits<char_type>::to_char_type(0x79), // y
-        std::char_traits<char_type>::to_char_type(0x7a), // z
-    }};
+    static constexpr std::size_t s_alphaNumLength =
+        std::char_traits<char_type>::length(s_alphaNum);
 };
 
 //==============================================================================
@@ -567,7 +514,7 @@ BasicString<StringType>::GenerateRandomString(const size_type len) noexcept
     using short_distribution = std::uniform_int_distribution<short>;
 
     constexpr auto limit =
-        static_cast<short_distribution::result_type>(s_alphaNum.size() - 1);
+        static_cast<short_distribution::result_type>(s_alphaNumLength - 1);
     static_assert(limit > 0);
 
     short_distribution distribution(0, limit);
@@ -741,7 +688,7 @@ T BasicString<StringType>::Convert(const StringType &value) noexcept(
     {
         return value;
     }
-    else if constexpr (if_string::convertible<StringType>)
+    else if constexpr (traits::has_stoi_family_v)
     {
         return BasicStringConverter<StringType, T>::Convert(value);
     }

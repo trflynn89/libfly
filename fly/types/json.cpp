@@ -55,6 +55,13 @@ Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
 }
 
 //==============================================================================
+Json &Json::operator=(Json json) noexcept
+{
+    std::swap(m_value, json.m_value);
+    return *this;
+}
+
+//==============================================================================
 bool Json::IsNull() const noexcept
 {
     return std::holds_alternative<null_type>(m_value);
@@ -109,13 +116,6 @@ bool Json::IsUnsignedInteger() const noexcept
 bool Json::IsFloat() const noexcept
 {
     return std::holds_alternative<float_type>(m_value);
-}
-
-//==============================================================================
-Json &Json::operator=(Json json) noexcept
-{
-    std::swap(m_value, json.m_value);
-    return *this;
 }
 
 //==============================================================================
@@ -423,7 +423,7 @@ void Json::readEscapedCharacter(
             break;
 
         default:
-            throw JsonException(fly::String::Format(
+            throw JsonException(String::Format(
                 "Invalid escape character '%c' (%x)", *it, int(*it)));
     }
 }
@@ -565,7 +565,7 @@ void Json::validateCharacter(
     };
 
     auto invalid = [&c](int location) {
-        throw JsonException(fly::String::Format(
+        throw JsonException(String::Format(
             "Invalid control character '%x' (location %d)", int(c), location));
     };
 

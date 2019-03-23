@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <sstream>
 #include <string>
 
@@ -25,9 +26,7 @@ namespace fly {
  * @version March 21, 2019
  */
 template <typename StringType>
-struct BasicStringStreamer
-{
-};
+struct BasicStringStreamer;
 
 //==============================================================================
 template <>
