@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/traits/traits.h"
 #include "fly/types/string_streamer.h"
 
 #include <string>
@@ -69,6 +70,16 @@ struct BasicStringTraits
         std::is_same_v<base_string_type, std::wstring>>;
 
     inline static constexpr bool has_stoi_family_v = has_stoi_family::value;
+
+    /**
+     * Define a trait for whether operator<< is defined for a type on the stream
+     * type used for StringType.
+     */
+    template <typename T>
+    using OstreamDeclaration =
+        decltype(std::declval<ostream_type &>() << std::declval<T>());
+
+    using OstreamTraits = DeclarationTraits<OstreamDeclaration>;
 };
 
 } // namespace fly

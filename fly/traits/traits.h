@@ -2,12 +2,6 @@
 
 #include <type_traits>
 
-/**
- * Wrappers around std::enable_if for testing variadic sequences of traits.
- *
- * @author Timothy Flynn (trflynn89@gmail.com)
- * @version July 28, 2017
- */
 namespace fly {
 
 /**
@@ -69,7 +63,7 @@ using enable_if_not_all =
  *     template <typename T>
  *     using FooDeclaration = decltype(std::declval<T>().Foo());
  *
- * Then use that alias to create a fly::Declaration alias:
+ * Then use that alias to create a fly::DeclarationTraits alias:
  *
  *     using FooTraits = fly::DeclarationTraits<FooDeclaration>;
  *
@@ -93,6 +87,17 @@ using enable_if_not_all =
  *         typename T,
  *         fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
  *     void foo_wrapper(const T &) { }
+ *
+ * Or in a constexpr-if expression:
+ *
+ *     template <typename T>
+ *     void foo_wrapper(const T &)
+ *     {
+ *         if constexpr (FooTraits::is_declared_v<T>)
+ *         {
+ *             arg.Foo();
+ *         }
+ *      }
  *
  * @tparam Declaration The decltype alias to test.
  * @tparam T The type to be tested.

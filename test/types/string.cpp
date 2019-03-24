@@ -13,8 +13,8 @@ template <typename StringType>
 class Streamable
 {
 public:
-    using char_type = typename StringType::value_type;
-    using ostream_type = std::basic_ostream<char_type>;
+    using ostream_type = typename fly::BasicStringTraits<
+        StringType>::streamer_type::ostream_type;
 
     Streamable(const StringType &str, int num) noexcept : m_str(str), m_num(num)
     {
@@ -42,6 +42,11 @@ public:
 private:
     StringType m_str;
     int m_num;
+};
+
+//==============================================================================
+class NotStreamable
+{
 };
 
 //==============================================================================
@@ -95,7 +100,8 @@ TYPED_TEST(BasicStringTest, SplitTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     static constexpr std::uint32_t numSectors = 10;
     std::vector<string_type> inputSplit(numSectors);
@@ -125,7 +131,8 @@ TYPED_TEST(BasicStringTest, MaxSplitTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     static constexpr std::uint32_t numSectors = 10;
     static constexpr std::uint32_t maxSectors = 6;
@@ -164,7 +171,8 @@ TYPED_TEST(BasicStringTest, TrimTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type test1;
     string_type test2 = FLY_STR(char_type, "   abc");
@@ -201,7 +209,8 @@ TYPED_TEST(BasicStringTest, ReplaceAllTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
     const string_type search = FLY_STR(char_type, "Be Replaced");
@@ -216,7 +225,8 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithCharTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
     const string_type search = FLY_STR(char_type, "Be Replaced");
@@ -231,7 +241,8 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithEmptyTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
     const string_type replace = FLY_STR(char_type, "new value");
@@ -245,7 +256,8 @@ TYPED_TEST(BasicStringTest, RemoveAllTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
     const string_type search = FLY_STR(char_type, "Be Rep");
@@ -259,7 +271,8 @@ TYPED_TEST(BasicStringTest, RemoveAllWithEmptyTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
 
@@ -272,7 +285,8 @@ TYPED_TEST(BasicStringTest, StartsWithTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type test1, test2;
 
@@ -327,7 +341,8 @@ TYPED_TEST(BasicStringTest, EndsWithTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type test1, test2;
 
@@ -379,7 +394,8 @@ TYPED_TEST(BasicStringTest, WildcardTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type test1, test2;
 
@@ -482,12 +498,11 @@ TYPED_TEST(BasicStringTest, FormatTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
-    using streamed_type =
-        typename fly::BasicStringStreamer<string_type>::streamed_type;
-    using streamed_char =
-        typename fly::BasicStringTraits<streamed_type>::char_type;
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
 
     streamed_type expected;
     const char_type *format;
@@ -534,20 +549,19 @@ TYPED_TEST(BasicStringTest, JoinTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
-    using streamed_type =
-        typename fly::BasicStringStreamer<string_type>::streamed_type;
-    using streamed_char =
-        typename fly::BasicStringTraits<streamed_type>::char_type;
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
 
     string_type str = FLY_STR(char_type, "a");
     const char_type *ctr = FLY_STR(char_type, "b");
     const char_type arr[] = {'c', '\0'};
     const char_type chr = 'd';
 
-    const Streamable<streamed_type> obj1(
-        FLY_STR(streamed_char, "goodbye"), 0xbeef);
+    const Streamable<streamed_type> obj1(FLY_STR(streamed_char, "hi"), 0xbeef);
+    const NotStreamable obj2;
 
     EXPECT_EQ(FLY_STR(streamed_char, "a"), StringClass::Join('.', str));
     EXPECT_EQ(FLY_STR(streamed_char, "b"), StringClass::Join('.', ctr));
@@ -570,12 +584,16 @@ TYPED_TEST(BasicStringTest, JoinTest)
     EXPECT_EQ(FLY_STR(streamed_char, "d,c"), StringClass::Join(',', chr, arr));
     EXPECT_EQ(FLY_STR(streamed_char, "d,d"), StringClass::Join(',', chr, chr));
     EXPECT_EQ(
-        FLY_STR(streamed_char, "[goodbye beef]"), StringClass::Join('.', obj1));
+        FLY_STR(streamed_char, "[hi beef]"), StringClass::Join('.', obj1));
     EXPECT_EQ(
-        FLY_STR(streamed_char, "a:[goodbye beef]:c:d"),
+        FLY_STR(streamed_char, "a:[hi beef]:c:d"),
         StringClass::Join(':', str, obj1, arr, chr));
     EXPECT_EQ(
         FLY_STR(streamed_char, "a:c:d"), StringClass::Join(':', str, arr, chr));
+
+    std::basic_regex<streamed_char> test(
+        FLY_STR(streamed_char, "\\[0x[0-9a-fA-F]+\\]:2:\\[hi beef\\]"));
+    EXPECT_TRUE(std::regex_match(StringClass::Join(':', obj2, 2, obj1), test));
 }
 
 //==============================================================================
@@ -583,7 +601,8 @@ TYPED_TEST(BasicStringTest, ConvertStringTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type s = FLY_STR(char_type, "abc");
     EXPECT_EQ(StringClass::template Convert<string_type>(s), s);
@@ -600,7 +619,8 @@ TYPED_TEST(BasicStringTest, ConvertBoolTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type s;
 
@@ -628,12 +648,11 @@ TYPED_TEST(BasicStringTest, ConvertCharTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
-    using streamed_type =
-        typename fly::BasicStringStreamer<string_type>::streamed_type;
-    using streamed_char =
-        typename fly::BasicStringTraits<streamed_type>::char_type;
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
     using ustreamed_char = std::make_unsigned_t<streamed_char>;
 
     string_type s;
@@ -688,7 +707,8 @@ TYPED_TEST(BasicStringTest, ConvertInt8Test)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type s;
 
@@ -745,7 +765,8 @@ TYPED_TEST(BasicStringTest, ConvertInt16Test)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type s;
 
@@ -805,7 +826,8 @@ TYPED_TEST(BasicStringTest, ConvertInt32Test)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type s;
 
@@ -865,7 +887,8 @@ TYPED_TEST(BasicStringTest, ConvertInt64Test)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type s;
 
@@ -902,7 +925,8 @@ TYPED_TEST(BasicStringTest, ConvertDecimalTest)
 {
     using string_type = typename TestFixture::string_type;
     using StringClass = fly::BasicString<string_type>;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     string_type s;
 
@@ -937,7 +961,8 @@ TYPED_TEST(BasicStringTest, ConvertDecimalTest)
 TYPED_TEST(BasicStringTest, BasicStringStreamerTest)
 {
     using string_type = typename TestFixture::string_type;
-    using char_type = typename fly::BasicStringTraits<string_type>::char_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
 
     // Extra test to make sure the hexadecimal conversion for std::u16string and
     // std::u32string in BasicStringStreamer is exercised correctly.

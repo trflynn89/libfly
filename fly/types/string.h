@@ -697,9 +697,13 @@ void BasicString<StringType>::stream(
     {
         BasicStringStreamer<StringType>::Stream(ostream, value);
     }
-    else
+    else if constexpr (traits::OstreamTraits::template is_declared_v<T>)
     {
         ostream << std::boolalpha << value;
+    }
+    else
+    {
+        ostream << '[' << std::hex << &value << std::dec << ']';
     }
 }
 

@@ -10,6 +10,24 @@
 namespace {
 
 //==============================================================================
+template <typename StringType>
+class Streamable
+{
+public:
+    using ostream_type = typename fly::BasicStringTraits<
+        StringType>::streamer_type::ostream_type;
+
+    friend ostream_type &operator<<(ostream_type &, const Streamable &)
+    {
+    }
+};
+
+//==============================================================================
+class NotStreamable
+{
+};
+
+//==============================================================================
 template <
     typename T,
     fly::enable_if_any<
@@ -241,4 +259,21 @@ TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAETest)
 
     EXPECT_FALSE(isStringLike(int()));
     EXPECT_FALSE(isStringLike(char_type()));
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTraitsTest, OstreamTraitsTest)
+{
+    using string_type = typename TestFixture::string_type;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using streamed_type = typename traits::streamer_type::streamed_type;
+
+    const Streamable<streamed_type> obj1;
+    const NotStreamable obj2;
+
+    EXPECT_TRUE(traits::OstreamTraits::template is_declared_v<int>);
+    EXPECT_TRUE(traits::OstreamTraits::template is_declared_v<bool>);
+    EXPECT_TRUE(traits::OstreamTraits::template is_declared_v<streamed_type>);
+    EXPECT_TRUE(traits::OstreamTraits::template is_declared_v<decltype(obj1)>);
+    EXPECT_FALSE(traits::OstreamTraits::template is_declared_v<decltype(obj2)>);
 }
