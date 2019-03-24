@@ -661,19 +661,22 @@ TYPED_TEST(BasicStringTest, ConvertCharTest)
 
     s = FLY_STR(char_type, "65");
     EXPECT_EQ(StringClass::template Convert<streamed_char>(s), 'A');
-    EXPECT_EQ(StringClass::template Convert<ustreamed_char>(s), (ustreamed_char)65);
+    EXPECT_EQ(
+        StringClass::template Convert<ustreamed_char>(s), (ustreamed_char)65);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
         StringClass::template Convert<streamed_char>(s), std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<ustreamed_char>(s), std::invalid_argument);
+        StringClass::template Convert<ustreamed_char>(s),
+        std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
         StringClass::template Convert<streamed_char>(s), std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<ustreamed_char>(s), std::invalid_argument);
+        StringClass::template Convert<ustreamed_char>(s),
+        std::invalid_argument);
 
     if constexpr (StringClass::traits::has_stoi_family_v)
     {
@@ -976,10 +979,10 @@ TYPED_TEST(BasicStringTest, BasicStringTraitsStoiFamilyTest)
     using string_type = typename TestFixture::string_type;
     using traits = typename fly::BasicString<string_type>::traits;
 
-    EXPECT_EQ(
-        traits::has_stoi_family_v,
-        (std::is_same_v<string_type, std::string> ||
-         std::is_same_v<string_type, std::wstring>));
+    constexpr bool is_string = std::is_same_v<string_type, std::string>;
+    constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
+
+    EXPECT_EQ(traits::has_stoi_family_v, is_string || is_wstring);
 }
 
 //==============================================================================
@@ -993,105 +996,119 @@ TYPED_TEST(BasicStringTest, BasicStringTraitsStringLikeTest)
     constexpr bool is_string16 = std::is_same_v<string_type, std::u16string>;
     constexpr bool is_string32 = std::is_same_v<string_type, std::u32string>;
 
-    EXPECT_FALSE(traits::is_string_like_v<int>);
-    EXPECT_FALSE(traits::is_string_like_v<const int>);
-    EXPECT_FALSE(traits::is_string_like_v<int const>);
+    EXPECT_FALSE(traits::template is_string_like_v<int>);
+    EXPECT_FALSE(traits::template is_string_like_v<const int>);
+    EXPECT_FALSE(traits::template is_string_like_v<int const>);
 
-    EXPECT_FALSE(traits::is_string_like_v<char>);
-    EXPECT_FALSE(traits::is_string_like_v<const char>);
-    EXPECT_FALSE(traits::is_string_like_v<char const>);
+    EXPECT_FALSE(traits::template is_string_like_v<char>);
+    EXPECT_FALSE(traits::template is_string_like_v<const char>);
+    EXPECT_FALSE(traits::template is_string_like_v<char const>);
 
-    EXPECT_FALSE(traits::is_string_like_v<wchar_t>);
-    EXPECT_FALSE(traits::is_string_like_v<const wchar_t>);
-    EXPECT_FALSE(traits::is_string_like_v<wchar_t const>);
+    EXPECT_FALSE(traits::template is_string_like_v<wchar_t>);
+    EXPECT_FALSE(traits::template is_string_like_v<const wchar_t>);
+    EXPECT_FALSE(traits::template is_string_like_v<wchar_t const>);
 
-    EXPECT_FALSE(traits::is_string_like_v<char16_t>);
-    EXPECT_FALSE(traits::is_string_like_v<const char16_t>);
-    EXPECT_FALSE(traits::is_string_like_v<char16_t const>);
+    EXPECT_FALSE(traits::template is_string_like_v<char16_t>);
+    EXPECT_FALSE(traits::template is_string_like_v<const char16_t>);
+    EXPECT_FALSE(traits::template is_string_like_v<char16_t const>);
 
-    EXPECT_FALSE(traits::is_string_like_v<char32_t>);
-    EXPECT_FALSE(traits::is_string_like_v<const char32_t>);
-    EXPECT_FALSE(traits::is_string_like_v<char32_t const>);
+    EXPECT_FALSE(traits::template is_string_like_v<char32_t>);
+    EXPECT_FALSE(traits::template is_string_like_v<const char32_t>);
+    EXPECT_FALSE(traits::template is_string_like_v<char32_t const>);
 
-    EXPECT_FALSE(traits::is_string_like_v<char &>);
-    EXPECT_FALSE(traits::is_string_like_v<const char &>);
-    EXPECT_FALSE(traits::is_string_like_v<char const &>);
+    EXPECT_FALSE(traits::template is_string_like_v<char &>);
+    EXPECT_FALSE(traits::template is_string_like_v<const char &>);
+    EXPECT_FALSE(traits::template is_string_like_v<char const &>);
 
-    EXPECT_FALSE(traits::is_string_like_v<wchar_t &>);
-    EXPECT_FALSE(traits::is_string_like_v<const wchar_t &>);
-    EXPECT_FALSE(traits::is_string_like_v<wchar_t const &>);
+    EXPECT_FALSE(traits::template is_string_like_v<wchar_t &>);
+    EXPECT_FALSE(traits::template is_string_like_v<const wchar_t &>);
+    EXPECT_FALSE(traits::template is_string_like_v<wchar_t const &>);
 
-    EXPECT_FALSE(traits::is_string_like_v<char16_t &>);
-    EXPECT_FALSE(traits::is_string_like_v<const char16_t &>);
-    EXPECT_FALSE(traits::is_string_like_v<char16_t const &>);
+    EXPECT_FALSE(traits::template is_string_like_v<char16_t &>);
+    EXPECT_FALSE(traits::template is_string_like_v<const char16_t &>);
+    EXPECT_FALSE(traits::template is_string_like_v<char16_t const &>);
 
-    EXPECT_FALSE(traits::is_string_like_v<char32_t &>);
-    EXPECT_FALSE(traits::is_string_like_v<const char32_t &>);
-    EXPECT_FALSE(traits::is_string_like_v<char32_t const &>);
+    EXPECT_FALSE(traits::template is_string_like_v<char32_t &>);
+    EXPECT_FALSE(traits::template is_string_like_v<const char32_t &>);
+    EXPECT_FALSE(traits::template is_string_like_v<char32_t const &>);
 
-    EXPECT_EQ(traits::is_string_like_v<char *>, is_string);
-    EXPECT_EQ(traits::is_string_like_v<const char *>, is_string);
-    EXPECT_EQ(traits::is_string_like_v<char const *>, is_string);
+    EXPECT_EQ(traits::template is_string_like_v<char *>, is_string);
+    EXPECT_EQ(traits::template is_string_like_v<const char *>, is_string);
+    EXPECT_EQ(traits::template is_string_like_v<char const *>, is_string);
 
-    EXPECT_EQ(traits::is_string_like_v<wchar_t *>, is_wstring);
-    EXPECT_EQ(traits::is_string_like_v<const wchar_t *>, is_wstring);
-    EXPECT_EQ(traits::is_string_like_v<wchar_t const *>, is_wstring);
+    EXPECT_EQ(traits::template is_string_like_v<wchar_t *>, is_wstring);
+    EXPECT_EQ(traits::template is_string_like_v<const wchar_t *>, is_wstring);
+    EXPECT_EQ(traits::template is_string_like_v<wchar_t const *>, is_wstring);
 
-    EXPECT_EQ(traits::is_string_like_v<char16_t *>, is_string16);
-    EXPECT_EQ(traits::is_string_like_v<const char16_t *>, is_string16);
-    EXPECT_EQ(traits::is_string_like_v<char16_t const *>, is_string16);
+    EXPECT_EQ(traits::template is_string_like_v<char16_t *>, is_string16);
+    EXPECT_EQ(traits::template is_string_like_v<const char16_t *>, is_string16);
+    EXPECT_EQ(traits::template is_string_like_v<char16_t const *>, is_string16);
 
-    EXPECT_EQ(traits::is_string_like_v<char32_t *>, is_string32);
-    EXPECT_EQ(traits::is_string_like_v<const char32_t *>, is_string32);
-    EXPECT_EQ(traits::is_string_like_v<char32_t const *>, is_string32);
+    EXPECT_EQ(traits::template is_string_like_v<char32_t *>, is_string32);
+    EXPECT_EQ(traits::template is_string_like_v<const char32_t *>, is_string32);
+    EXPECT_EQ(traits::template is_string_like_v<char32_t const *>, is_string32);
 
-    EXPECT_EQ(traits::is_string_like_v<std::string>, is_string);
-    EXPECT_EQ(traits::is_string_like_v<const std::string>, is_string);
-    EXPECT_EQ(traits::is_string_like_v<std::string const>, is_string);
+    EXPECT_EQ(traits::template is_string_like_v<std::string>, is_string);
+    EXPECT_EQ(traits::template is_string_like_v<const std::string>, is_string);
+    EXPECT_EQ(traits::template is_string_like_v<std::string const>, is_string);
 
-    EXPECT_EQ(traits::is_string_like_v<std::wstring>, is_wstring);
-    EXPECT_EQ(traits::is_string_like_v<const std::wstring>, is_wstring);
-    EXPECT_EQ(traits::is_string_like_v<std::wstring const>, is_wstring);
+    EXPECT_EQ(traits::template is_string_like_v<std::wstring>, is_wstring);
+    EXPECT_EQ(
+        traits::template is_string_like_v<const std::wstring>, is_wstring);
+    EXPECT_EQ(
+        traits::template is_string_like_v<std::wstring const>, is_wstring);
 
-    EXPECT_EQ(traits::is_string_like_v<std::u16string>, is_string16);
-    EXPECT_EQ(traits::is_string_like_v<const std::u16string>, is_string16);
-    EXPECT_EQ(traits::is_string_like_v<std::u16string const>, is_string16);
+    EXPECT_EQ(traits::template is_string_like_v<std::u16string>, is_string16);
+    EXPECT_EQ(
+        traits::template is_string_like_v<const std::u16string>, is_string16);
+    EXPECT_EQ(
+        traits::template is_string_like_v<std::u16string const>, is_string16);
 
-    EXPECT_EQ(traits::is_string_like_v<std::u32string>, is_string32);
-    EXPECT_EQ(traits::is_string_like_v<const std::u32string>, is_string32);
-    EXPECT_EQ(traits::is_string_like_v<std::u32string const>, is_string32);
+    EXPECT_EQ(traits::template is_string_like_v<std::u32string>, is_string32);
+    EXPECT_EQ(
+        traits::template is_string_like_v<const std::u32string>, is_string32);
+    EXPECT_EQ(
+        traits::template is_string_like_v<std::u32string const>, is_string32);
 
-    EXPECT_EQ(traits::is_string_like_v<std::string &>, is_string);
-    EXPECT_EQ(traits::is_string_like_v<const std::string &>, is_string);
-    EXPECT_EQ(traits::is_string_like_v<std::string const &>, is_string);
+    EXPECT_EQ(traits::template is_string_like_v<std::string &>, is_string);
+    EXPECT_EQ(
+        traits::template is_string_like_v<const std::string &>, is_string);
+    EXPECT_EQ(
+        traits::template is_string_like_v<std::string const &>, is_string);
 
-    EXPECT_EQ(traits::is_string_like_v<std::wstring &>, is_wstring);
-    EXPECT_EQ(traits::is_string_like_v<const std::wstring &>, is_wstring);
-    EXPECT_EQ(traits::is_string_like_v<std::wstring const &>, is_wstring);
+    EXPECT_EQ(traits::template is_string_like_v<std::wstring &>, is_wstring);
+    EXPECT_EQ(
+        traits::template is_string_like_v<const std::wstring &>, is_wstring);
+    EXPECT_EQ(
+        traits::template is_string_like_v<std::wstring const &>, is_wstring);
 
-    EXPECT_EQ(traits::is_string_like_v<std::u16string &>, is_string16);
-    EXPECT_EQ(traits::is_string_like_v<const std::u16string &>, is_string16);
-    EXPECT_EQ(traits::is_string_like_v<std::u16string const &>, is_string16);
+    EXPECT_EQ(traits::template is_string_like_v<std::u16string &>, is_string16);
+    EXPECT_EQ(
+        traits::template is_string_like_v<const std::u16string &>, is_string16);
+    EXPECT_EQ(
+        traits::template is_string_like_v<std::u16string const &>, is_string16);
 
-    EXPECT_EQ(traits::is_string_like_v<std::u32string &>, is_string32);
-    EXPECT_EQ(traits::is_string_like_v<const std::u32string &>, is_string32);
-    EXPECT_EQ(traits::is_string_like_v<std::u32string const &>, is_string32);
+    EXPECT_EQ(traits::template is_string_like_v<std::u32string &>, is_string32);
+    EXPECT_EQ(
+        traits::template is_string_like_v<const std::u32string &>, is_string32);
+    EXPECT_EQ(
+        traits::template is_string_like_v<std::u32string const &>, is_string32);
 
-    EXPECT_FALSE(traits::is_string_like_v<std::string *>);
-    EXPECT_FALSE(traits::is_string_like_v<const std::string *>);
-    EXPECT_FALSE(traits::is_string_like_v<std::string const *>);
+    EXPECT_FALSE(traits::template is_string_like_v<std::string *>);
+    EXPECT_FALSE(traits::template is_string_like_v<const std::string *>);
+    EXPECT_FALSE(traits::template is_string_like_v<std::string const *>);
 
-    EXPECT_FALSE(traits::is_string_like_v<std::wstring *>);
-    EXPECT_FALSE(traits::is_string_like_v<const std::wstring *>);
-    EXPECT_FALSE(traits::is_string_like_v<std::wstring const *>);
+    EXPECT_FALSE(traits::template is_string_like_v<std::wstring *>);
+    EXPECT_FALSE(traits::template is_string_like_v<const std::wstring *>);
+    EXPECT_FALSE(traits::template is_string_like_v<std::wstring const *>);
 
-    EXPECT_FALSE(traits::is_string_like_v<std::u16string *>);
-    EXPECT_FALSE(traits::is_string_like_v<const std::u16string *>);
-    EXPECT_FALSE(traits::is_string_like_v<std::u16string const *>);
+    EXPECT_FALSE(traits::template is_string_like_v<std::u16string *>);
+    EXPECT_FALSE(traits::template is_string_like_v<const std::u16string *>);
+    EXPECT_FALSE(traits::template is_string_like_v<std::u16string const *>);
 
-    EXPECT_FALSE(traits::is_string_like_v<std::u32string *>);
-    EXPECT_FALSE(traits::is_string_like_v<const std::u32string *>);
-    EXPECT_FALSE(traits::is_string_like_v<std::u32string const *>);
+    EXPECT_FALSE(traits::template is_string_like_v<std::u32string *>);
+    EXPECT_FALSE(traits::template is_string_like_v<const std::u32string *>);
+    EXPECT_FALSE(traits::template is_string_like_v<std::u32string const *>);
 }
 
 //==============================================================================
