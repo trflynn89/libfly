@@ -132,7 +132,7 @@ public:
      * Check if a string ends with a character.
      *
      * @param StringType The string to check.
-     * @param StringType The ending to search for.
+     * @param char_type The ending to search for.
      *
      * @return True if the string ends with the search character.
      */
@@ -168,11 +168,14 @@ public:
     static StringType GenerateRandomString(const size_type) noexcept;
 
     /**
-     * Format a string with variadic template arguments. This is type safe in
-     * in that the type doesn't matter with the format specifier (e.g. there's
-     * no error if %s is given an integer). However, specifiers such as %x are
-     * still attempted to be handled. That is, if the matching argument for %x
-     * is numeric, then it will be printed in hexadecimal.
+     * Format a string with variadic template arguments, returning the formatted
+     * string.
+     *
+     * This is type safe in that argument types need not match the format
+     * specifier (i.e. there is no error if %s is given an integer). However,
+     * specifiers such as %x are still attempted to be handled. That is, if the
+     * matching argument for %x is numeric, then it will be converted to a
+     * hexadecimal representation.
      *
      * There is also no checking done on the number of format specifiers and
      * the number of arguments. The format specifiers will be replaced one at a
@@ -189,6 +192,34 @@ public:
      */
     template <typename... Args>
     static streamed_type Format(const char_type *, const Args &...) noexcept;
+
+    /**
+     * Format a string with variadic template arguments, inserting the formatted
+     * string into a stream.
+     *
+     * This is type safe in that argument types need not match the format
+     * specifier (i.e. there is no error if %s is given an integer). However,
+     * specifiers such as %x are still attempted to be handled. That is, if the
+     * matching argument for %x is numeric, then it will be converted to a
+     * hexadecimal representation.
+     *
+     * There is also no checking done on the number of format specifiers and
+     * the number of arguments. The format specifiers will be replaced one at a
+     * time until all arguments are exhausted, then the rest of the string is
+     * taken as-is. Any extra specifiers will be in the string. Any extra
+     * arguments are dropped.
+     *
+     * @tparam Args Variadic template arguments.
+     *
+     * @param ostream The stream to insert the formatted string into.
+     * @param char* The string to format.
+     * @param Args The variadic list of arguments to be formatted.
+     *
+     * @return The same stream object.
+     */
+    template <typename... Args>
+    static ostream_type &
+    Format(ostream_type &, const char_type *, const Args &...) noexcept;
 
     /**
      * Concatenate a list of objects with the given separator.
@@ -528,12 +559,24 @@ auto BasicString<StringType>::Format(
     typename traits::ostringstream_type ostream;
     ostream.precision(6);
 
-    if (fmt != NULL)
+    Format(ostream, fmt, args...);
+    return ostream.str();
+}
+
+//==============================================================================
+template <typename StringType>
+template <typename... Args>
+auto BasicString<StringType>::Format(
+    ostream_type &ostream,
+    const char_type *fmt,
+    const Args &... args) noexcept -> ostream_type &
+{
+    if (fmt != nullptr)
     {
         format(ostream, fmt, args...);
     }
 
-    return ostream.str();
+    return ostream;
 }
 
 //==============================================================================
