@@ -224,6 +224,7 @@
     <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\test\config\test_config.h" />
     <ClInclude Include="..\..\..\test\util\capture_stream.h" />
     <ClInclude Include="..\..\..\test\util\path_util.h" />
     <ClInclude Include="..\..\..\test\util\waitable_task_runner.h" />

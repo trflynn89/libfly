@@ -4,6 +4,9 @@
     <Filter Include="config">
       <UniqueIdentifier>{ee0c6b14-fa2b-4f87-a3b0-ccbf7c4c13c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="googletest">
+      <UniqueIdentifier>{096b28ab-f8d6-40ee-a560-5ec9f8da812d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="logger">
       <UniqueIdentifier>{7ecf1fbd-e9f8-430f-aa13-4ddb9e46dbd8}</UniqueIdentifier>
     </Filter>
@@ -28,40 +31,25 @@
     <Filter Include="types">
       <UniqueIdentifier>{3120a3ba-5fe5-417c-9e5f-33d9537560d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="googletest">
-      <UniqueIdentifier>{096b28ab-f8d6-40ee-a560-5ec9f8da812d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="util">
       <UniqueIdentifier>{fd334c96-5889-4f05-adac-3a0420db077e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\util\capture_stream.cpp">
-      <Filter>util</Filter>
+    <ClCompile Include="..\..\..\test\config\config.cpp">
+      <Filter>config</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\util\path_util.cpp">
-      <Filter>util</Filter>
+    <ClCompile Include="..\..\..\test\config\config_manager.cpp">
+      <Filter>config</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp">
-      <Filter>util</Filter>
+    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest-all.cc">
+      <Filter>googletest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\concurrent_container.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest_main.cc">
+      <Filter>googletest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json.cpp">
-      <Filter>types</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string.cpp">
-      <Filter>types</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\system\system.cpp">
-      <Filter>system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\system\system_monitor.cpp">
-      <Filter>system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\path\path_monitor.cpp">
-      <Filter>path</Filter>
+    <ClCompile Include="..\..\..\test\logger\logger.cpp">
+      <Filter>logger</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\parser\exceptions.cpp">
       <Filter>parser</Filter>
@@ -75,32 +63,47 @@
     <ClCompile Include="..\..\..\test\parser\parser.cpp">
       <Filter>parser</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest-all.cc">
-      <Filter>googletest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest_main.cc">
-      <Filter>googletest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\config\config_manager.cpp">
-      <Filter>config</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\config\config.cpp">
-      <Filter>config</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\traits\traits.cpp">
-      <Filter>traits</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\task\task.cpp">
-      <Filter>task</Filter>
+    <ClCompile Include="..\..\..\test\path\path_monitor.cpp">
+      <Filter>path</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\socket\socket.cpp">
       <Filter>socket</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\logger\logger.cpp">
-      <Filter>logger</Filter>
+    <ClCompile Include="..\..\..\test\system\system.cpp">
+      <Filter>system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\system\system_monitor.cpp">
+      <Filter>system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\task\task.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\traits\traits.cpp">
+      <Filter>traits</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\concurrent_container.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\json.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\string.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\util\capture_stream.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\util\path_util.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp">
+      <Filter>util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\test\config\test_config.h">
+      <Filter>util</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\test\util\capture_stream.h">
       <Filter>util</Filter>
     </ClInclude>

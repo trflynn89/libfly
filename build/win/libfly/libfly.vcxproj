@@ -155,10 +155,9 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\fly\fly.h" />
     <ClInclude Include="..\..\..\fly\config\config.h" />
     <ClInclude Include="..\..\..\fly\config\config_manager.h" />
-    <ClInclude Include="..\..\..\fly\exit_codes.h" />
-    <ClInclude Include="..\..\..\fly\fly.h" />
     <ClInclude Include="..\..\..\fly\logger\log.h" />
     <ClInclude Include="..\..\..\fly\logger\logger.h" />
     <ClInclude Include="..\..\..\fly\logger\logger_config.h" />
@@ -190,7 +189,10 @@
     <ClInclude Include="..\..\..\fly\types\concurrent_stack.h" />
     <ClInclude Include="..\..\..\fly\types\json.h" />
     <ClInclude Include="..\..\..\fly\types\string.h" />
+    <ClInclude Include="..\..\..\fly\types\string_converter.h" />
+    <ClInclude Include="..\..\..\fly\types\string_literal.h" />
     <ClInclude Include="..\..\..\fly\types\string_streamer.h" />
+    <ClInclude Include="..\..\..\fly\types\string_traits.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\config\config.cpp" />
