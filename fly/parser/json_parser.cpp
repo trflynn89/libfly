@@ -175,12 +175,12 @@ void JsonParser::onStartBraceOrBracket(Token token, int c) noexcept(false)
 
     if (token == Token::StartBrace)
     {
-        *m_pValue = Json::object_type();
+        *m_pValue = JsonTraits::object_type();
         m_states.push(State::ParsingObject);
     }
     else
     {
-        *m_pValue = Json::array_type();
+        *m_pValue = JsonTraits::array_type();
         m_states.push(State::ParsingArray);
     }
 
@@ -544,15 +544,15 @@ bool JsonParser::storeValue() noexcept(false)
         {
             if (isFloat)
             {
-                *m_pValue = String::Convert<Json::float_type>(value);
+                *m_pValue = String::Convert<JsonTraits::float_type>(value);
             }
             else if (isSigned)
             {
-                *m_pValue = String::Convert<Json::signed_type>(value);
+                *m_pValue = String::Convert<JsonTraits::signed_type>(value);
             }
             else
             {
-                *m_pValue = String::Convert<Json::unsigned_type>(value);
+                *m_pValue = String::Convert<JsonTraits::unsigned_type>(value);
             }
         }
         catch (...)

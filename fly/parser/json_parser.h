@@ -59,7 +59,7 @@ public:
      */
     enum class Features : std::uint8_t
     {
-        // Strict compliance with http://www.json.org.
+        // Strict compliance with https://www.json.org.
         Strict = 0,
 
         // Allows single-line (//) and multi-line (/* */) comments.
@@ -74,7 +74,7 @@ public:
     };
 
     /**
-     * Constructor. Create a parser with strict http://www.json.org compliance.
+     * Constructor. Create a parser with strict https://www.json.org compliance.
      */
     JsonParser() noexcept;
 
@@ -200,7 +200,7 @@ private:
 
     /**
      * Store the current value of the parsing stream as a JSON object. Ensures
-     * that the syntax of the value is compliant with http://www.json.org.
+     * that the syntax of the value is compliant with https://www.json.org.
      *
      * @return bool True if a value was stored.
      *
@@ -209,7 +209,7 @@ private:
     bool storeValue() noexcept(false);
 
     /**
-     * Validate that a parsed number is compliant with http://www.json.org.
+     * Validate that a parsed number is compliant with https://www.json.org.
      *
      * @param string The parsed number to validate.
      * @param bool Set to true if the parsed number is a floating point.

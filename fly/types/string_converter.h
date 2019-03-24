@@ -16,15 +16,13 @@ namespace fly {
  * string to std::string.
  *
  * It is recommended that outside callers use BasicString<>::Convert<> instead
- * of using this class directly.
+ * of using this struct directly.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version March 21, 2019
  */
 template <typename StringType, typename T>
-struct BasicStringConverter
-{
-};
+struct BasicStringConverter;
 
 //==============================================================================
 template <typename StringType>
