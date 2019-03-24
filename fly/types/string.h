@@ -276,7 +276,7 @@ private:
     static void stream(ostream_type &, const T &) noexcept;
 
     /**
-     * A list of alpha-numeric characters in the range [0-9a-zA-Z].
+     * A list of alpha-numeric characters in the range [0-9A-Za-z].
      */
     static constexpr const char_type *s_alphaNum = FLY_STR(
         char_type,
