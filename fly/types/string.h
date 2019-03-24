@@ -14,7 +14,6 @@
 #include <cstdlib>
 #include <random>
 #include <string>
-#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -40,29 +39,15 @@ using String32 = BasicString<std::u32string>;
 template <typename StringType>
 class BasicString
 {
-public:
-    using string_type = StringType;
-
-    using streamer = BasicStringStreamer<StringType>;
     using traits = BasicStringTraits<StringType>;
 
-    using size_type = typename StringType::size_type;
-    using char_type = typename StringType::value_type;
+    // Forward some aliases from BasicStringTraits<> for convenience.
+    using size_type = typename traits::size_type;
+    using char_type = typename traits::char_type;
+    using ostream_type = typename traits::ostream_type;
+    using streamed_type = typename traits::streamer_type::streamed_type;
 
-    using istream_type = typename streamer::istream_type;
-    using ostream_type = typename streamer::ostream_type;
-    using streamed_type = typename streamer::streamed_type;
-
-    using fstream_type = typename streamer::fstream_type;
-    using ifstream_type = typename streamer::ifstream_type;
-    using ofstream_type = typename streamer::ofstream_type;
-
-    using sstream_type = typename streamer::sstream_type;
-    using isstream_type = typename streamer::isstream_type;
-    using osstream_type = typename streamer::osstream_type;
-
-    using view_type = std::basic_string_view<char_type>;
-
+public:
     /**
      * Split a string into a vector of strings.
      *
@@ -540,7 +525,7 @@ auto BasicString<StringType>::Format(
     const char_type *fmt,
     const Args &... args) noexcept -> streamed_type
 {
-    osstream_type ostream;
+    typename traits::ostringstream_type ostream;
     ostream.precision(6);
 
     if (fmt != NULL)
@@ -624,7 +609,7 @@ auto BasicString<StringType>::Join(
     const char_type &separator,
     const Args &... args) noexcept -> streamed_type
 {
-    osstream_type ostream;
+    typename traits::ostringstream_type ostream;
     join(ostream, separator, args...);
 
     return ostream.str();
@@ -664,12 +649,10 @@ void BasicString<StringType>::stream(
     const T &value) noexcept
 {
     if constexpr (
-        std::is_same_v<StringType, std::decay_t<T>> ||
         std::is_same_v<char_type, std::decay_t<T>> ||
-        std::is_same_v<char_type *, std::decay_t<T>> ||
-        std::is_same_v<char_type const *, std::decay_t<T>>)
+        traits::template is_string_like_v<T>)
     {
-        streamer::Stream(ostream, value);
+        BasicStringStreamer<StringType>::Stream(ostream, value);
     }
     else
     {
@@ -693,7 +676,7 @@ T BasicString<StringType>::Convert(const StringType &value) noexcept(
     }
     else
     {
-        osstream_type ostream;
+        typename traits::ostringstream_type ostream;
         stream(ostream, value);
 
         return BasicStringConverter<streamed_type, T>::Convert(ostream.str());

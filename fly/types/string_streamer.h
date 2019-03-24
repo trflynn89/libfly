@@ -1,6 +1,8 @@
 #pragma once
 
 #include <fstream>
+#include <istream>
+#include <ostream>
 #include <sstream>
 #include <string>
 
@@ -41,9 +43,9 @@ struct BasicStringStreamer<std::string>
     using ifstream_type = std::ifstream;
     using ofstream_type = std::ofstream;
 
-    using sstream_type = std::stringstream;
-    using isstream_type = std::istringstream;
-    using osstream_type = std::ostringstream;
+    using stringstream_type = std::stringstream;
+    using istringstream_type = std::istringstream;
+    using ostringstream_type = std::ostringstream;
 
     static void Stream(ostream_type &stream, const std::string &value) noexcept
     {
@@ -74,9 +76,9 @@ struct BasicStringStreamer<std::wstring>
     using ifstream_type = std::wifstream;
     using ofstream_type = std::wofstream;
 
-    using sstream_type = std::wstringstream;
-    using isstream_type = std::wistringstream;
-    using osstream_type = std::wostringstream;
+    using stringstream_type = std::wstringstream;
+    using istringstream_type = std::wistringstream;
+    using ostringstream_type = std::wostringstream;
 
     static void Stream(ostream_type &stream, const std::wstring &value) noexcept
     {
@@ -107,9 +109,9 @@ struct BasicStringStreamer<std::u16string>
     using ifstream_type = std::ifstream;
     using ofstream_type = std::ofstream;
 
-    using sstream_type = std::stringstream;
-    using isstream_type = std::istringstream;
-    using osstream_type = std::ostringstream;
+    using stringstream_type = std::stringstream;
+    using istringstream_type = std::istringstream;
+    using ostringstream_type = std::ostringstream;
 
     static void
     Stream(ostream_type &stream, const std::u16string &value) noexcept
@@ -156,9 +158,9 @@ struct BasicStringStreamer<std::u32string>
     using ifstream_type = std::ifstream;
     using ofstream_type = std::ofstream;
 
-    using sstream_type = std::stringstream;
-    using isstream_type = std::istringstream;
-    using osstream_type = std::ostringstream;
+    using stringstream_type = std::stringstream;
+    using istringstream_type = std::istringstream;
+    using ostringstream_type = std::ostringstream;
 
     static void
     Stream(ostream_type &stream, const std::u32string &value) noexcept
