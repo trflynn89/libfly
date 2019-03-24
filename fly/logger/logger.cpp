@@ -70,7 +70,7 @@ void Logger::AddLog(
     }
     else
     {
-        std::string console =
+        const std::string console =
             String::Format("%d %s:%s:%d %s", level, file, func, line, message);
 
         ConsoleLog(true, console);
@@ -106,9 +106,7 @@ bool Logger::poll() noexcept
 
     if (m_logQueue.Pop(log, m_spConfig->QueueWaitTime()) && m_logStream.good())
     {
-        const std::string logStr = String::Format("%u\t%s", m_index++, log);
-        m_logStream << logStr << std::flush;
-
+        String::Format(m_logStream, "%u\t%s", m_index++, log) << std::flush;
         std::error_code error;
 
         if (std::filesystem::file_size(m_logFile, error) >
