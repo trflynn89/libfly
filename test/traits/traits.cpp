@@ -7,11 +7,11 @@
 namespace {
 
 //==========================================================================
-FLY_DECLARATION_TESTS(foo, T, std::declval<const T &>().Foo());
+FLY_DECLARATION_TESTS(Foo, T, std::declval<const T &>().Foo());
 
 //==========================================================================
 FLY_DECLARATION_TESTS(
-    ostream,
+    Ostream,
     T,
     std::declval<std::ostream &>() << std::declval<const T &>());
 
@@ -52,27 +52,27 @@ std::ostream &operator<<(std::ostream &stream, const BarClass &bar)
 }
 
 //==========================================================================
-template <typename T, if_foo::enabled<T> = 0>
+template <typename T, fly::enable_if_all<FooTraits::is_declared<T>> = 0>
 bool callFoo(const T &arg) noexcept
 {
     return arg.Foo();
 }
 
-template <typename T, if_foo::disabled<T> = 0>
+template <typename T, fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
 bool callFoo(const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
-template <typename T, if_ostream::enabled<T> = 0>
+template <typename T, fly::enable_if_all<OstreamTraits::is_declared<T>> = 0>
 bool isStreamable(std::ostream &stream, const T &arg) noexcept
 {
     stream << arg;
     return true;
 }
 
-template <typename T, if_ostream::disabled<T> = 0>
+template <typename T, fly::enable_if_not_all<OstreamTraits::is_declared<T>> = 0>
 bool isStreamable(std::ostream &, const T &) noexcept
 {
     return false;
@@ -129,7 +129,10 @@ TEST(TraitsTest, FooTest)
     const BarClass bc;
 
     EXPECT_TRUE(callFoo(fc));
+    EXPECT_TRUE(FooTraits::is_declared_v<FooClass>);
+
     EXPECT_FALSE(callFoo(bc));
+    EXPECT_FALSE(FooTraits::is_declared_v<BarClass>);
 }
 
 //==============================================================================
@@ -143,18 +146,22 @@ TEST(TraitsTest, StreamTest)
     const std::string str("a");
 
     EXPECT_TRUE(isStreamable(stream, bc));
+    EXPECT_TRUE(OstreamTraits::is_declared_v<BarClass>);
     EXPECT_EQ(stream.str(), bc());
     stream.str(std::string());
 
     EXPECT_TRUE(isStreamable(stream, str));
+    EXPECT_TRUE(OstreamTraits::is_declared_v<std::string>);
     EXPECT_EQ(stream.str(), str);
     stream.str(std::string());
 
     EXPECT_TRUE(isStreamable(stream, 1));
+    EXPECT_TRUE(OstreamTraits::is_declared_v<int>);
     EXPECT_EQ(stream.str(), "1");
     stream.str(std::string());
 
     EXPECT_FALSE(isStreamable(stream, fc));
+    EXPECT_FALSE(OstreamTraits::is_declared_v<FooClass>);
     EXPECT_EQ(stream.str(), std::string());
     stream.str(std::string());
 }

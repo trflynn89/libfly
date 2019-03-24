@@ -7,50 +7,53 @@
  *
  * For example, to test if a class of type T declares a function called Foo:
  *
- *      DECL_TESTS(foo, T, std::declval<const T &>().Foo());
+ *     FLY_DECLARATION_TESTS(Foo, T, std::declval<const T &>().Foo());
  *
- * This will define these wrappers around std::enable_if:
+ * The macro invocation will define the following std::bool_constant<> (and
+ * convenience constexpr bool):
  *
- *      if_foo::enabled<T>
- *      if_foo::disabled<T>
+ *     template <typename T>
+ *     struct FooTraits::is_declared<T>;
+ *
+ *     template <typename T>
+ *     inline constexpr bool FooTraits::is_declared_v = is_declared<T>::value;
  *
  * And may be used as SFINAE tests to, e.g., define a function depending on
  * whether or not Foo() was declared:
  *
- *      template <typename T, if_foo::enabled<T> = 0>
- *      void foo_wrapper(const T &arg) { arg.Foo(); }
+ *     template <
+ *         typename T,
+ *         fly::enable_if_all<FooTraits::is_declared<T>> = 0>
+ *     void foo_wrapper(const T &arg) { arg.Foo(); }
  *
- *      template <typename T, if_foo::disabled<T> = 0>
- *      void foo_wrapper(const T &) { }
+ *     template <
+ *         typename T,
+ *         fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
+ *     void foo_wrapper(const T &) { }
  *
- * @param label The name to give the test.
+ * @param Label The name to give the test.
  * @param Type The type to be tested.
  * @param functor The function to test for.
  */
-#define FLY_DECLARATION_TESTS(label, Type, functor)                            \
-    struct if_##label                                                          \
+#define FLY_DECLARATION_TESTS(Label, Type, functor)                            \
+    struct Label##Traits                                                       \
     {                                                                          \
-        struct __##label                                                       \
+        struct __##Label##__                                                   \
         {                                                                      \
             template <typename Type>                                           \
-            static constexpr auto test_##label(Type *) -> decltype(functor);   \
+            static constexpr auto test_##Label(Type *) -> decltype(functor);   \
                                                                                \
             template <typename Type>                                           \
-            static constexpr auto test_##label(...) -> std::false_type;        \
-                                                                               \
-            template <typename Type>                                           \
-            inline static constexpr bool is_undefined = std::is_same<          \
-                decltype(test_##label<Type>(0)),                               \
-                std::false_type>::value;                                       \
+            static constexpr auto test_##Label(...) -> std::false_type;        \
         };                                                                     \
                                                                                \
         template <typename Type>                                               \
-        using enabled =                                                        \
-            std::enable_if_t<!__##label::is_undefined<Type>, bool>;            \
+        using is_declared = std::negation<std::is_same<                        \
+            decltype(__##Label##__::test_##Label<Type>(0)),                    \
+            std::false_type>>;                                                 \
                                                                                \
         template <typename Type>                                               \
-        using disabled =                                                       \
-            std::enable_if_t<__##label::is_undefined<Type>, bool>;             \
+        inline static constexpr bool is_declared_v = is_declared<Type>::value; \
     };
 
 /**

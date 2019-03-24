@@ -1,6 +1,7 @@
 #include "fly/types/string_traits.h"
 
 #include "fly/traits/traits.h"
+#include "fly/types/string_literal.h"
 
 #include <gtest/gtest.h>
 
@@ -34,6 +35,26 @@ constexpr bool isStringLike(const T &) noexcept
     return false;
 }
 
+//==============================================================================
+template <
+    typename StringType,
+    fly::enable_if_all<
+        typename fly::BasicStringTraits<StringType>::has_stoi_family> = 0>
+constexpr int callStoi(const StringType &str) noexcept
+{
+    return std::stoi(str);
+}
+
+//==============================================================================
+template <
+    typename StringType,
+    fly::enable_if_not_all<
+        typename fly::BasicStringTraits<StringType>::has_stoi_family> = 0>
+constexpr int callStoi(const StringType &) noexcept
+{
+    return -1;
+}
+
 } // namespace
 
 //==============================================================================
@@ -58,6 +79,28 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamilyTest)
     constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
 
     EXPECT_EQ(traits::has_stoi_family_v, is_string || is_wstring);
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAETest)
+{
+    using string_type = typename TestFixture::string_type;
+    using char_type = typename string_type::value_type;
+
+    constexpr bool is_string = std::is_same_v<string_type, std::string>;
+    constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
+
+    const string_type s = FLY_STR(char_type, "123");
+    const int i = callStoi(s);
+
+    if constexpr (is_string || is_wstring)
+    {
+        EXPECT_EQ(i, 123);
+    }
+    else
+    {
+        EXPECT_EQ(i, -1);
+    }
 }
 
 //==============================================================================
