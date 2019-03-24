@@ -218,7 +218,9 @@
     <ClCompile Include="..\..\..\test\traits\traits.cpp" />
     <ClCompile Include="..\..\..\test\types\concurrent_container.cpp" />
     <ClCompile Include="..\..\..\test\types\json.cpp" />
+    <ClCompile Include="..\..\..\test\types\json_traits.cpp" />
     <ClCompile Include="..\..\..\test\types\string.cpp" />
+    <ClCompile Include="..\..\..\test\types\string_traits.cpp" />
     <ClCompile Include="..\..\..\test\util\capture_stream.cpp" />
     <ClCompile Include="..\..\..\test\util\path_util.cpp" />
     <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp" />

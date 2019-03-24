@@ -1,6 +1,5 @@
 #pragma once
 
-#include "fly/traits/traits.h"
 #include "fly/types/string_converter.h"
 #include "fly/types/string_literal.h"
 #include "fly/types/string_streamer.h"

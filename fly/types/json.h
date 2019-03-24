@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/traits/traits.h"
+#include "fly/types/json_traits.h"
 #include "fly/types/string.h"
 
 #include <cstddef>
@@ -18,7 +19,7 @@
 namespace fly {
 
 /**
- * Class to represent JSON values defined by http://www.json.org. The class
+ * Class to represent JSON values defined by https://www.json.org. The class
  * provides various user-friendly accessors and initializers to create a JSON
  * value, and to convert the JSON value back its underlying type.
  *
@@ -113,7 +114,7 @@ public:
      *
      * @throws JsonException If the string-like value is not valid.
      */
-    template <typename T, String::traits::enabled_if_string<T> = 0>
+    template <typename T, enable_if_all<String::traits::is_string_like<T>> = 0>
     Json(const T &) noexcept(false);
 
     /**
@@ -125,7 +126,7 @@ public:
      *
      * @param T The object-like value.
      */
-    template <typename T, if_map::enabled<T> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -137,7 +138,7 @@ public:
      *
      * @param T The array-like value.
      */
-    template <typename T, if_array::enabled<T> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -149,7 +150,7 @@ public:
      *
      * @param T The boolean value.
      */
-    template <typename T, if_boolean::enabled<T> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_boolean<T>> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -161,7 +162,7 @@ public:
      *
      * @param T The signed value.
      */
-    template <typename T, if_signed_integer::enabled<T> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_signed_integer<T>> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -174,7 +175,7 @@ public:
      *
      * @param T The unsigned value.
      */
-    template <typename T, if_unsigned_integer::enabled<T> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_unsigned_integer<T>> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -186,7 +187,7 @@ public:
      *
      * @param T The floating point value.
      */
-    template <typename T, if_floating_point::enabled<T> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_floating_point<T>> = 0>
     Json(const T &) noexcept;
 
     /**
@@ -306,7 +307,7 @@ public:
      *
      * @return T The Json instance as the object-like type.
      */
-    template <typename T, if_map::enabled<T> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
     explicit operator T() const noexcept(false);
 
     /**
@@ -322,7 +323,7 @@ public:
      *
      * @return T The Json instance as the array-like type.
      */
-    template <typename T, if_array::enabled<T> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
     explicit operator T() const noexcept(false);
 
     /**
@@ -352,7 +353,7 @@ public:
      *
      * @param T The Json instance as a boolean.
      */
-    template <typename T, if_boolean::enabled<T> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_boolean<T>> = 0>
     explicit operator T() const noexcept(false);
 
     /**
@@ -369,7 +370,12 @@ public:
      *
      * @return T The Json instance as the numeric type.
      */
-    template <typename T, if_numeric::enabled<T> = 0>
+    template <
+        typename T,
+        enable_if_any<
+            JsonTraits::is_signed_integer<T>,
+            JsonTraits::is_unsigned_integer<T>,
+            JsonTraits::is_floating_point<T>> = 0>
     explicit operator T() const noexcept(false);
 
     /**
@@ -488,7 +494,7 @@ public:
 
 private:
     /**
-     * Validate the string for compliance according to http://www.json.org.
+     * Validate the string for compliance according to https://www.json.org.
      * Validation includes handling escaped and unicode characters.
      *
      * @param string_type The string value to validate.
@@ -602,51 +608,51 @@ private:
 };
 
 //==============================================================================
-template <typename T, String::traits::enabled_if_string<T>>
+template <typename T, enable_if_all<String::traits::is_string_like<T>>>
 Json::Json(const T &value) noexcept(false) : m_value(validateString(value))
 {
 }
 
 //==============================================================================
-template <typename T, if_map::enabled<T>>
+template <typename T, enable_if_all<JsonTraits::is_object<T>>>
 Json::Json(const T &value) noexcept :
     m_value(object_type(value.begin(), value.end()))
 {
 }
 
 //==============================================================================
-template <typename T, if_array::enabled<T>>
+template <typename T, enable_if_all<JsonTraits::is_array<T>>>
 Json::Json(const T &value) noexcept :
     m_value(array_type(value.begin(), value.end()))
 {
 }
 
 //==============================================================================
-template <typename T, if_boolean::enabled<T>>
+template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
 Json::Json(const T &value) noexcept : m_value(static_cast<boolean_type>(value))
 {
 }
 
 //==============================================================================
-template <typename T, if_signed_integer::enabled<T>>
+template <typename T, enable_if_all<JsonTraits::is_signed_integer<T>>>
 Json::Json(const T &value) noexcept : m_value(static_cast<signed_type>(value))
 {
 }
 
 //==============================================================================
-template <typename T, if_unsigned_integer::enabled<T>>
+template <typename T, enable_if_all<JsonTraits::is_unsigned_integer<T>>>
 Json::Json(const T &value) noexcept : m_value(static_cast<unsigned_type>(value))
 {
 }
 
 //==============================================================================
-template <typename T, if_floating_point::enabled<T>>
+template <typename T, enable_if_all<JsonTraits::is_floating_point<T>>>
 Json::Json(const T &value) noexcept : m_value(static_cast<float_type>(value))
 {
 }
 
 //==============================================================================
-template <typename T, if_map::enabled<T>>
+template <typename T, enable_if_all<JsonTraits::is_object<T>>>
 Json::operator T() const noexcept(false)
 {
     if (IsObject())
@@ -659,7 +665,7 @@ Json::operator T() const noexcept(false)
 }
 
 //==============================================================================
-template <typename T, if_array::enabled<T>>
+template <typename T, enable_if_all<JsonTraits::is_array<T>>>
 Json::operator T() const noexcept(false)
 {
     if (IsArray())
@@ -692,7 +698,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 }
 
 //==============================================================================
-template <typename T, if_boolean::enabled<T>>
+template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
 Json::operator T() const noexcept(false)
 {
     auto visitor = [](const auto &value) -> T {
@@ -723,7 +729,12 @@ Json::operator T() const noexcept(false)
 }
 
 //==============================================================================
-template <typename T, if_numeric::enabled<T>>
+template <
+    typename T,
+    enable_if_any<
+        JsonTraits::is_signed_integer<T>,
+        JsonTraits::is_unsigned_integer<T>,
+        JsonTraits::is_floating_point<T>>>
 Json::operator T() const noexcept(false)
 {
     auto visitor = [this](const auto &value) -> T {

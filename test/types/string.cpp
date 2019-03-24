@@ -76,32 +76,6 @@ StringType maxstr() noexcept
     }
 }
 
-//==============================================================================
-template <
-    typename T,
-    fly::enable_if_any<
-        fly::BasicStringTraits<std::string>::is_string_like<T>,
-        fly::BasicStringTraits<std::wstring>::is_string_like<T>,
-        fly::BasicStringTraits<std::u16string>::is_string_like<T>,
-        fly::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
-constexpr bool isString(const T &) noexcept
-{
-    return true;
-}
-
-//==============================================================================
-template <
-    typename T,
-    fly::enable_if_none<
-        fly::BasicStringTraits<std::string>::is_string_like<T>,
-        fly::BasicStringTraits<std::wstring>::is_string_like<T>,
-        fly::BasicStringTraits<std::u16string>::is_string_like<T>,
-        fly::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
-constexpr bool isString(const T &) noexcept
-{
-    return false;
-}
-
 } // namespace
 
 //==============================================================================
@@ -138,11 +112,11 @@ TYPED_TEST(BasicStringTest, SplitTest)
     }
 
     const auto outputSplit = StringClass::Split(input, delim);
-    ASSERT_EQ(inputSplit.size(), outputSplit.size());
+    EXPECT_EQ(inputSplit.size(), outputSplit.size());
 
     for (std::uint32_t i = 0; i < numSectors; ++i)
     {
-        ASSERT_EQ(inputSplit[i], outputSplit[i]);
+        EXPECT_EQ(inputSplit[i], outputSplit[i]);
     }
 }
 
@@ -177,11 +151,11 @@ TYPED_TEST(BasicStringTest, MaxSplitTest)
     }
 
     const auto outputSplit = StringClass::Split(input, delim, maxSectors);
-    ASSERT_EQ(inputSplit.size(), outputSplit.size());
+    EXPECT_EQ(inputSplit.size(), outputSplit.size());
 
     for (std::uint32_t i = 0; i < maxSectors; ++i)
     {
-        ASSERT_EQ(inputSplit[i], outputSplit[i]);
+        EXPECT_EQ(inputSplit[i], outputSplit[i]);
     }
 }
 
@@ -234,7 +208,7 @@ TYPED_TEST(BasicStringTest, ReplaceAllTest)
     const string_type replace = FLY_STR(char_type, "new value");
 
     StringClass::ReplaceAll(source, search, replace);
-    ASSERT_EQ(source, FLY_STR(char_type, "To new value! To new value!"));
+    EXPECT_EQ(source, FLY_STR(char_type, "To new value! To new value!"));
 }
 
 //==============================================================================
@@ -249,7 +223,7 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithCharTest)
     const char_type replace('x');
 
     StringClass::ReplaceAll(source, search, replace);
-    ASSERT_EQ(source, FLY_STR(char_type, "To x! To x!"));
+    EXPECT_EQ(source, FLY_STR(char_type, "To x! To x!"));
 }
 
 //==============================================================================
@@ -263,7 +237,7 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithEmptyTest)
     const string_type replace = FLY_STR(char_type, "new value");
 
     StringClass::ReplaceAll(source, string_type(), replace);
-    ASSERT_EQ(source, FLY_STR(char_type, "To Be Replaced! To Be Replaced!"));
+    EXPECT_EQ(source, FLY_STR(char_type, "To Be Replaced! To Be Replaced!"));
 }
 
 //==============================================================================
@@ -277,7 +251,7 @@ TYPED_TEST(BasicStringTest, RemoveAllTest)
     const string_type search = FLY_STR(char_type, "Be Rep");
 
     StringClass::RemoveAll(source, search);
-    ASSERT_EQ(source, FLY_STR(char_type, "To laced! To laced!"));
+    EXPECT_EQ(source, FLY_STR(char_type, "To laced! To laced!"));
 }
 
 //==============================================================================
@@ -290,7 +264,7 @@ TYPED_TEST(BasicStringTest, RemoveAllWithEmptyTest)
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
 
     StringClass::RemoveAll(source, string_type());
-    ASSERT_EQ(source, FLY_STR(char_type, "To Be Replaced! To Be Replaced!"));
+    EXPECT_EQ(source, FLY_STR(char_type, "To Be Replaced! To Be Replaced!"));
 }
 
 //==============================================================================
@@ -500,7 +474,7 @@ TYPED_TEST(BasicStringTest, GenerateRandomStringTest)
     static constexpr size_type length = (1 << 10);
 
     const auto random = StringClass::GenerateRandomString(length);
-    ASSERT_EQ(length, random.length());
+    EXPECT_EQ(length, random.length());
 }
 
 //==============================================================================
@@ -971,158 +945,4 @@ TYPED_TEST(BasicStringTest, BasicStringStreamerTest)
 
         EXPECT_EQ("[0xf0][0x178][0x8d][0x2022]", ostream.str());
     }
-}
-
-//==============================================================================
-TYPED_TEST(BasicStringTest, BasicStringTraitsStoiFamilyTest)
-{
-    using string_type = typename TestFixture::string_type;
-    using traits = typename fly::BasicString<string_type>::traits;
-
-    constexpr bool is_string = std::is_same_v<string_type, std::string>;
-    constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
-
-    EXPECT_EQ(traits::has_stoi_family_v, is_string || is_wstring);
-}
-
-//==============================================================================
-TYPED_TEST(BasicStringTest, BasicStringTraitsStringLikeTest)
-{
-    using string_type = typename TestFixture::string_type;
-    using traits = typename fly::BasicString<string_type>::traits;
-
-    constexpr bool is_string = std::is_same_v<string_type, std::string>;
-    constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
-    constexpr bool is_string16 = std::is_same_v<string_type, std::u16string>;
-    constexpr bool is_string32 = std::is_same_v<string_type, std::u32string>;
-
-    EXPECT_FALSE(traits::template is_string_like_v<int>);
-    EXPECT_FALSE(traits::template is_string_like_v<const int>);
-    EXPECT_FALSE(traits::template is_string_like_v<int const>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<char>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char>);
-    EXPECT_FALSE(traits::template is_string_like_v<char const>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<wchar_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<const wchar_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<wchar_t const>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<char16_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char16_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<char16_t const>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<char32_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char32_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<char32_t const>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<char &>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char &>);
-    EXPECT_FALSE(traits::template is_string_like_v<char const &>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<wchar_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<const wchar_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<wchar_t const &>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<char16_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char16_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<char16_t const &>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<char32_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char32_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<char32_t const &>);
-
-    EXPECT_EQ(traits::template is_string_like_v<char *>, is_string);
-    EXPECT_EQ(traits::template is_string_like_v<const char *>, is_string);
-    EXPECT_EQ(traits::template is_string_like_v<char const *>, is_string);
-
-    EXPECT_EQ(traits::template is_string_like_v<wchar_t *>, is_wstring);
-    EXPECT_EQ(traits::template is_string_like_v<const wchar_t *>, is_wstring);
-    EXPECT_EQ(traits::template is_string_like_v<wchar_t const *>, is_wstring);
-
-    EXPECT_EQ(traits::template is_string_like_v<char16_t *>, is_string16);
-    EXPECT_EQ(traits::template is_string_like_v<const char16_t *>, is_string16);
-    EXPECT_EQ(traits::template is_string_like_v<char16_t const *>, is_string16);
-
-    EXPECT_EQ(traits::template is_string_like_v<char32_t *>, is_string32);
-    EXPECT_EQ(traits::template is_string_like_v<const char32_t *>, is_string32);
-    EXPECT_EQ(traits::template is_string_like_v<char32_t const *>, is_string32);
-
-    EXPECT_EQ(traits::template is_string_like_v<std::string>, is_string);
-    EXPECT_EQ(traits::template is_string_like_v<const std::string>, is_string);
-    EXPECT_EQ(traits::template is_string_like_v<std::string const>, is_string);
-
-    EXPECT_EQ(traits::template is_string_like_v<std::wstring>, is_wstring);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::wstring>, is_wstring);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::wstring const>, is_wstring);
-
-    EXPECT_EQ(traits::template is_string_like_v<std::u16string>, is_string16);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::u16string>, is_string16);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::u16string const>, is_string16);
-
-    EXPECT_EQ(traits::template is_string_like_v<std::u32string>, is_string32);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::u32string>, is_string32);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::u32string const>, is_string32);
-
-    EXPECT_EQ(traits::template is_string_like_v<std::string &>, is_string);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::string &>, is_string);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::string const &>, is_string);
-
-    EXPECT_EQ(traits::template is_string_like_v<std::wstring &>, is_wstring);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::wstring &>, is_wstring);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::wstring const &>, is_wstring);
-
-    EXPECT_EQ(traits::template is_string_like_v<std::u16string &>, is_string16);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::u16string &>, is_string16);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::u16string const &>, is_string16);
-
-    EXPECT_EQ(traits::template is_string_like_v<std::u32string &>, is_string32);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::u32string &>, is_string32);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::u32string const &>, is_string32);
-
-    EXPECT_FALSE(traits::template is_string_like_v<std::string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<const std::string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<std::string const *>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<std::wstring *>);
-    EXPECT_FALSE(traits::template is_string_like_v<const std::wstring *>);
-    EXPECT_FALSE(traits::template is_string_like_v<std::wstring const *>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<std::u16string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<const std::u16string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<std::u16string const *>);
-
-    EXPECT_FALSE(traits::template is_string_like_v<std::u32string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<const std::u32string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<std::u32string const *>);
-}
-
-//==============================================================================
-TYPED_TEST(BasicStringTest, BasicStringTraitsStringLikeSFINAETest)
-{
-    using string_type = typename TestFixture::string_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using char_pointer_type = typename std::add_pointer<char_type>::type;
-
-    EXPECT_TRUE(isString(string_type()));
-    EXPECT_TRUE(isString(char_pointer_type()));
-
-    EXPECT_FALSE(isString(int()));
-    EXPECT_FALSE(isString(char_type()));
 }

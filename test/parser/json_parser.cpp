@@ -70,7 +70,7 @@ protected:
 //==============================================================================
 TEST_F(JsonParserTest, JsonCheckerTest)
 {
-    // http://www.json.org/JSON_checker/
+    // https://www.json.org/JSON_checker/
     // The following files are excluded from this test:
     // - fail18.json: The parser has no max-depth
 

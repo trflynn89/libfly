@@ -1,11 +1,12 @@
 #pragma once
 
 #include <string>
+#include <type_traits>
 
 namespace fly {
 
 /**
- * Traits for standard specializations of std::basic_string<>.
+ * Traits for basic properties of standard std::basic_string<> specializations.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version March 23, 2019
@@ -36,20 +37,6 @@ struct BasicStringTraits
 
     template <typename T>
     inline static constexpr bool is_string_like_v = is_string_like<T>::value;
-
-    /**
-     * Wrapper around std::enable_if for testing if type T is a string-like type
-     * analogous to StringType.
-     */
-    template <typename T>
-    using enabled_if_string = std::enable_if_t<is_string_like_v<T>, bool>;
-
-    /**
-     * Wrapper around std::enable_if for testing if type T is not a string-like
-     * type analogous to StringType.
-     */
-    template <typename T>
-    using enabled_if_non_string = std::enable_if_t<!is_string_like_v<T>, bool>;
 
     /**
      * Define a trait for testing if the STL has defined the std::stoi family

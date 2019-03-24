@@ -87,7 +87,13 @@
     <ClCompile Include="..\..\..\test\types\json.cpp">
       <Filter>types</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\types\json_traits.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\types\string.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\string_traits.cpp">
       <Filter>types</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\util\capture_stream.cpp">
