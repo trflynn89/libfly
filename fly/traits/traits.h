@@ -57,7 +57,7 @@
     };
 
 /**
- * Type traits not provided by the STL.
+ * Wrappers around std::enable_if for testing variadic sequences of traits.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 28, 2017
