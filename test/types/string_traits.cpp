@@ -16,7 +16,7 @@ template <
         fly::BasicStringTraits<std::wstring>::is_string_like<T>,
         fly::BasicStringTraits<std::u16string>::is_string_like<T>,
         fly::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
-constexpr bool isString(const T &) noexcept
+constexpr bool isStringLike(const T &) noexcept
 {
     return true;
 }
@@ -29,7 +29,7 @@ template <
         fly::BasicStringTraits<std::wstring>::is_string_like<T>,
         fly::BasicStringTraits<std::u16string>::is_string_like<T>,
         fly::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
-constexpr bool isString(const T &) noexcept
+constexpr bool isStringLike(const T &) noexcept
 {
     return false;
 }
@@ -193,9 +193,9 @@ TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAETest)
     using char_type = typename string_type::value_type;
     using char_pointer_type = typename std::add_pointer<char_type>::type;
 
-    EXPECT_TRUE(isString(string_type()));
-    EXPECT_TRUE(isString(char_pointer_type()));
+    EXPECT_TRUE(isStringLike(string_type()));
+    EXPECT_TRUE(isStringLike(char_pointer_type()));
 
-    EXPECT_FALSE(isString(int()));
-    EXPECT_FALSE(isString(char_type()));
+    EXPECT_FALSE(isStringLike(int()));
+    EXPECT_FALSE(isStringLike(char_type()));
 }

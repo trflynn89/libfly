@@ -1,6 +1,7 @@
 #include "fly/types/json_traits.h"
 
 #include "fly/traits/traits.h"
+#include "fly/types/string_literal.h"
 
 #include <gtest/gtest.h>
 
@@ -16,6 +17,38 @@
 #include <vector>
 
 namespace {
+
+//==========================================================================
+template <
+    typename T,
+    fly::enable_if_all<fly::JsonTraits::is_string<T>> = 0>
+bool isString(const T &) noexcept
+{
+    return true;
+}
+
+template <
+    typename T,
+    fly::enable_if_not_all<fly::JsonTraits::is_string<T>> = 0>
+bool isString(const T &) noexcept
+{
+    return false;
+}
+
+//==========================================================================
+template <typename T, fly::enable_if_all<fly::JsonTraits::is_boolean<T>> = 0>
+bool isBool(const T &) noexcept
+{
+    return true;
+}
+
+template <
+    typename T,
+    fly::enable_if_not_all<fly::JsonTraits::is_boolean<T>> = 0>
+bool isBool(const T &) noexcept
+{
+    return false;
+}
 
 //==========================================================================
 template <
@@ -69,29 +102,14 @@ bool isFloat(const T &) noexcept
 }
 
 //==========================================================================
-template <typename T, fly::enable_if_all<fly::JsonTraits::is_boolean<T>> = 0>
-bool isBool(const T &) noexcept
-{
-    return true;
-}
-
-template <
-    typename T,
-    fly::enable_if_not_all<fly::JsonTraits::is_boolean<T>> = 0>
-bool isBool(const T &) noexcept
-{
-    return false;
-}
-
-//==========================================================================
 template <typename T, fly::enable_if_all<fly::JsonTraits::is_object<T>> = 0>
-bool isMap(const T &) noexcept
+bool isObject(const T &) noexcept
 {
     return true;
 }
 
 template <typename T, fly::enable_if_not_all<fly::JsonTraits::is_object<T>> = 0>
-bool isMap(const T &) noexcept
+bool isObject(const T &) noexcept
 {
     return false;
 }
@@ -110,6 +128,79 @@ bool isArray(const T &) noexcept
 }
 
 } // namespace
+
+//==============================================================================
+TEST(TraitsTest, StringTest)
+{
+    using string_type = typename fly::JsonTraits::string_type;
+    using char_type = typename string_type::value_type;
+
+    const string_type str1(FLY_STR(char_type, "a"));
+    string_type str2(FLY_STR(char_type, "b"));
+
+    const char_type *cstr1 = "c";
+    char_type *cstr2 = (char_type *)"d";
+
+    const char_type chr1 = 'e';
+    char_type chr2 = 'f';
+
+    const char_type arr1[] = {'g', '\0'};
+    char_type arr2[] = {'h', '\0'};
+
+    EXPECT_TRUE(isString(str1));
+    EXPECT_TRUE(isString(str1));
+    EXPECT_TRUE(isString(cstr1));
+    EXPECT_TRUE(isString(cstr2));
+    EXPECT_TRUE(isString(arr1));
+    EXPECT_TRUE(isString(arr2));
+
+    EXPECT_FALSE(isString(std::array<int, 4>()));
+    EXPECT_FALSE(isString(std::deque<int>()));
+    EXPECT_FALSE(isString(std::forward_list<int>()));
+    EXPECT_FALSE(isString(std::list<int>()));
+    EXPECT_FALSE(isString(std::map<std::string, int>()));
+    EXPECT_FALSE(isString(std::multimap<std::string, int>()));
+    EXPECT_FALSE(isString(std::multiset<int>()));
+    EXPECT_FALSE(isString(std::set<int>()));
+    EXPECT_FALSE(isString(std::unordered_map<std::string, int>()));
+    EXPECT_FALSE(isString(std::unordered_multimap<std::string, int>()));
+    EXPECT_FALSE(isString(std::unordered_multiset<int>()));
+    EXPECT_FALSE(isString(std::unordered_set<int>()));
+    EXPECT_FALSE(isString(std::vector<int>()));
+
+    EXPECT_FALSE(isString(1));
+    EXPECT_FALSE(isString(true));
+    EXPECT_FALSE(isString(3.14159f));
+    EXPECT_FALSE(isString(3.14159f));
+    EXPECT_FALSE(isString(chr1));
+    EXPECT_FALSE(isString(chr2));
+}
+
+//==============================================================================
+TEST(JsonTraitsTest, BoolTest)
+{
+    EXPECT_TRUE(isBool(true));
+    EXPECT_TRUE(isBool(false));
+
+    EXPECT_FALSE(isBool(std::array<int, 4>()));
+    EXPECT_FALSE(isBool(std::deque<int>()));
+    EXPECT_FALSE(isBool(std::forward_list<int>()));
+    EXPECT_FALSE(isBool(std::list<int>()));
+    EXPECT_FALSE(isBool(std::map<std::string, int>()));
+    EXPECT_FALSE(isBool(std::multimap<std::string, int>()));
+    EXPECT_FALSE(isBool(std::multiset<int>()));
+    EXPECT_FALSE(isBool(std::set<int>()));
+    EXPECT_FALSE(isBool(std::unordered_map<std::string, int>()));
+    EXPECT_FALSE(isBool(std::unordered_multimap<std::string, int>()));
+    EXPECT_FALSE(isBool(std::unordered_multiset<int>()));
+    EXPECT_FALSE(isBool(std::unordered_set<int>()));
+    EXPECT_FALSE(isBool(std::vector<int>()));
+
+    EXPECT_FALSE(isBool(1));
+    EXPECT_FALSE(isBool(-1));
+    EXPECT_FALSE(isBool("foo"));
+    EXPECT_FALSE(isBool(3.14));
+}
 
 //==============================================================================
 TEST(JsonTraitsTest, SignedIntegerTest)
@@ -193,54 +284,28 @@ TEST(JsonTraitsTest, FloatTest)
 }
 
 //==============================================================================
-TEST(JsonTraitsTest, BoolTest)
+TEST(JsonTraitsTest, ObjectTest)
 {
-    EXPECT_TRUE(isBool(true));
-    EXPECT_TRUE(isBool(false));
+    EXPECT_TRUE(isObject(std::map<std::string, int>()));
+    EXPECT_TRUE(isObject(std::multimap<std::string, int>()));
+    EXPECT_TRUE(isObject(std::unordered_map<std::string, int>()));
+    EXPECT_TRUE(isObject(std::unordered_multimap<std::string, int>()));
 
-    EXPECT_FALSE(isBool(std::array<int, 4>()));
-    EXPECT_FALSE(isBool(std::deque<int>()));
-    EXPECT_FALSE(isBool(std::forward_list<int>()));
-    EXPECT_FALSE(isBool(std::list<int>()));
-    EXPECT_FALSE(isBool(std::map<std::string, int>()));
-    EXPECT_FALSE(isBool(std::multimap<std::string, int>()));
-    EXPECT_FALSE(isBool(std::multiset<int>()));
-    EXPECT_FALSE(isBool(std::set<int>()));
-    EXPECT_FALSE(isBool(std::unordered_map<std::string, int>()));
-    EXPECT_FALSE(isBool(std::unordered_multimap<std::string, int>()));
-    EXPECT_FALSE(isBool(std::unordered_multiset<int>()));
-    EXPECT_FALSE(isBool(std::unordered_set<int>()));
-    EXPECT_FALSE(isBool(std::vector<int>()));
+    EXPECT_FALSE(isObject(std::array<int, 4>()));
+    EXPECT_FALSE(isObject(std::deque<int>()));
+    EXPECT_FALSE(isObject(std::forward_list<int>()));
+    EXPECT_FALSE(isObject(std::list<int>()));
+    EXPECT_FALSE(isObject(std::multiset<int>()));
+    EXPECT_FALSE(isObject(std::set<int>()));
+    EXPECT_FALSE(isObject(std::unordered_multiset<int>()));
+    EXPECT_FALSE(isObject(std::unordered_set<int>()));
+    EXPECT_FALSE(isObject(std::vector<int>()));
 
-    EXPECT_FALSE(isBool(1));
-    EXPECT_FALSE(isBool(-1));
-    EXPECT_FALSE(isBool("foo"));
-    EXPECT_FALSE(isBool(3.14));
-}
-
-//==============================================================================
-TEST(JsonTraitsTest, MapTest)
-{
-    EXPECT_TRUE(isMap(std::map<std::string, int>()));
-    EXPECT_TRUE(isMap(std::multimap<std::string, int>()));
-    EXPECT_TRUE(isMap(std::unordered_map<std::string, int>()));
-    EXPECT_TRUE(isMap(std::unordered_multimap<std::string, int>()));
-
-    EXPECT_FALSE(isMap(std::array<int, 4>()));
-    EXPECT_FALSE(isMap(std::deque<int>()));
-    EXPECT_FALSE(isMap(std::forward_list<int>()));
-    EXPECT_FALSE(isMap(std::list<int>()));
-    EXPECT_FALSE(isMap(std::multiset<int>()));
-    EXPECT_FALSE(isMap(std::set<int>()));
-    EXPECT_FALSE(isMap(std::unordered_multiset<int>()));
-    EXPECT_FALSE(isMap(std::unordered_set<int>()));
-    EXPECT_FALSE(isMap(std::vector<int>()));
-
-    EXPECT_FALSE(isMap(1));
-    EXPECT_FALSE(isMap(-1));
-    EXPECT_FALSE(isMap("foo"));
-    EXPECT_FALSE(isMap(3.14));
-    EXPECT_FALSE(isMap(true));
+    EXPECT_FALSE(isObject(1));
+    EXPECT_FALSE(isObject(-1));
+    EXPECT_FALSE(isObject("foo"));
+    EXPECT_FALSE(isObject(3.14));
+    EXPECT_FALSE(isObject(true));
 }
 
 //==============================================================================

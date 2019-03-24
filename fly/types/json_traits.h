@@ -1,11 +1,14 @@
 #pragma once
 
+#include "fly/types/string_traits.h"
+
 #include <array>
 #include <deque>
 #include <forward_list>
 #include <list>
 #include <map>
 #include <set>
+#include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
@@ -13,6 +16,8 @@
 #include <vector>
 
 namespace fly {
+
+class Json;
 
 /**
  * Traits for basic properties of JSON types defined by https://www.json.org.
@@ -22,6 +27,40 @@ namespace fly {
  */
 struct JsonTraits
 {
+    /**
+     * Aliases for JSON types. These could be specified as template parameters
+     * to the JsonTraits class to allow callers to override the types. But these
+     * are reasonable default types for now, and the Json class constructors
+     * allow for type flexibility.
+     */
+    using null_type = std::nullptr_t;
+    using string_type = std::string;
+    using boolean_type = bool;
+    using signed_type = std::intmax_t;
+    using unsigned_type = std::uintmax_t;
+    using float_type = long double;
+    using object_type = std::map<string_type, Json>;
+    using array_type = std::vector<Json>;
+
+    /**
+     * Define a trait for testing if type T is a JSON string.
+     */
+    template <typename T>
+    using is_string =
+        typename BasicStringTraits<string_type>::template is_string_like<T>;
+
+    template <typename T>
+    inline static constexpr bool is_string_v = is_string<T>::value;
+
+    /**
+     * Define a trait for testing if type T is a JSON boolean.
+     */
+    template <typename T>
+    using is_boolean = std::is_same<bool, std::decay_t<T>>;
+
+    template <typename T>
+    inline static constexpr bool is_boolean_v = is_boolean<T>::value;
+
     /**
      * Define a trait for testing if type T is a signed JSON number.
      */
@@ -57,15 +96,6 @@ struct JsonTraits
     template <typename T>
     inline static constexpr bool is_floating_point_v =
         is_floating_point<T>::value;
-
-    /**
-     * Define a trait for testing if type T is a JSON boolean.
-     */
-    template <typename T>
-    using is_boolean = std::is_same<bool, std::decay_t<T>>;
-
-    template <typename T>
-    inline static constexpr bool is_boolean_v = is_boolean<T>::value;
 
     /**
      * Helper SFINAE struct to determine whether a type is a JSON object.

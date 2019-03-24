@@ -59,37 +59,23 @@ class Json
 {
 public:
     /**
-     * Aliases for JSON types. These could be specified as template parameters
-     * to the Json class, to allow callers to override the types. But these are
-     * reasonable default types for now, and the Json class constructors allow
-     * for type flexibility.
-     */
-    using null_type = std::nullptr_t;
-    using string_type = std::string;
-    using object_type = std::map<string_type, Json>;
-    using array_type = std::vector<Json>;
-    using boolean_type = bool;
-    using signed_type = std::intmax_t;
-    using unsigned_type = std::uintmax_t;
-    using float_type = long double;
-
-    /**
      * Alias for the std::variant holding the above JSON types.
      */
     using json_type = std::variant<
-        null_type,
-        string_type,
-        object_type,
-        array_type,
-        boolean_type,
-        signed_type,
-        unsigned_type,
-        float_type>;
+        JsonTraits::null_type,
+        JsonTraits::string_type,
+        JsonTraits::object_type,
+        JsonTraits::array_type,
+        JsonTraits::boolean_type,
+        JsonTraits::signed_type,
+        JsonTraits::unsigned_type,
+        JsonTraits::float_type>;
 
     /**
      * Alias for a basic_stringstream with the JSON string type.
      */
-    using stream_type = std::basic_stringstream<string_type::value_type>;
+    using stream_type =
+        std::basic_stringstream<JsonTraits::string_type::value_type>;
 
     /**
      * Default constructor. Intializes the Json instance to a null value.
@@ -99,9 +85,9 @@ public:
     /**
      * Null constructor. Intializes the Json instance to a null value.
      *
-     * @param null_type The null value.
+     * @param JsonTraits::null_type The null value.
      */
-    Json(const null_type &) noexcept;
+    Json(const JsonTraits::null_type &) noexcept;
 
     /**
      * String constructor. Intializes the Json instance to a string value. The
@@ -114,7 +100,7 @@ public:
      *
      * @throws JsonException If the string-like value is not valid.
      */
-    template <typename T, enable_if_all<String::traits::is_string_like<T>> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_string<T>> = 0>
     Json(const T &) noexcept(false);
 
     /**
@@ -282,9 +268,9 @@ public:
      *
      * @throws JsonException If the Json instance is not null.
      *
-     * @return null_type The Json instance as a number.
+     * @return JsonTraits::null_type The Json instance as a number.
      */
-    explicit operator null_type() const noexcept(false);
+    explicit operator JsonTraits::null_type() const noexcept(false);
 
     /**
      * String conversion operator. Converts the Json instance to a string. Note
@@ -292,9 +278,9 @@ public:
      * not allowed to directly convert a Json instance into a char array. If
      * this is needed, first convert to a string, then into a char array.
      *
-     * @return string_type The Json instance as a string.
+     * @return JsonTraits::string_type The Json instance as a string.
      */
-    explicit operator string_type() const noexcept(false);
+    explicit operator JsonTraits::string_type() const noexcept(false);
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The
@@ -394,7 +380,8 @@ public:
      *
      * @return Json A reference to the Json instance at the key value.
      */
-    Json &operator[](const typename object_type::key_type &) noexcept(false);
+    Json &operator[](
+        const typename JsonTraits::object_type::key_type &) noexcept(false);
 
     /**
      * Object read-only access operator.
@@ -409,7 +396,8 @@ public:
      *
      * @return Json A reference to the Json instance at the key value.
      */
-    const Json &operator[](const typename object_type::key_type &) const
+    const Json &
+    operator[](const typename JsonTraits::object_type::key_type &) const
         noexcept(false);
 
     /**
@@ -427,7 +415,8 @@ public:
      *
      * @return Json A reference to the Json instance at the index.
      */
-    Json &operator[](const typename array_type::size_type &) noexcept(false);
+    Json &operator[](
+        const typename JsonTraits::array_type::size_type &) noexcept(false);
 
     /**
      * Array read-only access operator.
@@ -442,7 +431,8 @@ public:
      *
      * @return Json A reference to the Json instance at the index.
      */
-    const Json &operator[](const typename array_type::size_type &) const
+    const Json &
+    operator[](const typename JsonTraits::array_type::size_type &) const
         noexcept(false);
 
     /**
@@ -497,14 +487,15 @@ private:
      * Validate the string for compliance according to https://www.json.org.
      * Validation includes handling escaped and unicode characters.
      *
-     * @param string_type The string value to validate.
+     * @param JsonTraits::string_type The string value to validate.
      *
-     * @return string_type The modified input string value, with escaped and
-     *                     unicode characters interpreted.
+     * @return JsonTraits::string_type The modified input string value, with
+     *                                 escaped and unicode characters handled.
      *
      * @throws JsonException If the string value is not valid.
      */
-    string_type validateString(const string_type &) const noexcept(false);
+    JsonTraits::string_type
+    validateString(const JsonTraits::string_type &) const noexcept(false);
 
     /**
      * After reading a reverse solidus character, read the escaped character
@@ -520,8 +511,8 @@ private:
      */
     void readEscapedCharacter(
         stream_type &,
-        string_type::const_iterator &,
-        const string_type::const_iterator &) const noexcept(false);
+        JsonTraits::string_type::const_iterator &,
+        const JsonTraits::string_type::const_iterator &) const noexcept(false);
 
     /**
      * After determining the escaped character is a unicode encoding, read the
@@ -538,8 +529,8 @@ private:
      */
     void readUnicodeCharacter(
         stream_type &,
-        string_type::const_iterator &,
-        const string_type::const_iterator &) const noexcept(false);
+        JsonTraits::string_type::const_iterator &,
+        const JsonTraits::string_type::const_iterator &) const noexcept(false);
 
     /**
      * Read a single 4-byte unicode encoding.
@@ -553,8 +544,8 @@ private:
      *                       there weren't enough available bytes.
      */
     int readUnicodeCodepoint(
-        string_type::const_iterator &,
-        const string_type::const_iterator &) const noexcept(false);
+        JsonTraits::string_type::const_iterator &,
+        const JsonTraits::string_type::const_iterator &) const noexcept(false);
 
     /**
      * Validate a single non-escaped character is compliant.
@@ -567,8 +558,8 @@ private:
      */
     void validateCharacter(
         stream_type &,
-        string_type::const_iterator &,
-        const string_type::const_iterator &) const noexcept(false);
+        JsonTraits::string_type::const_iterator &,
+        const JsonTraits::string_type::const_iterator &) const noexcept(false);
 
     json_type m_value;
 };
@@ -608,7 +599,7 @@ private:
 };
 
 //==============================================================================
-template <typename T, enable_if_all<String::traits::is_string_like<T>>>
+template <typename T, enable_if_all<JsonTraits::is_string<T>>>
 Json::Json(const T &value) noexcept(false) : m_value(validateString(value))
 {
 }
@@ -616,38 +607,42 @@ Json::Json(const T &value) noexcept(false) : m_value(validateString(value))
 //==============================================================================
 template <typename T, enable_if_all<JsonTraits::is_object<T>>>
 Json::Json(const T &value) noexcept :
-    m_value(object_type(value.begin(), value.end()))
+    m_value(JsonTraits::object_type(value.begin(), value.end()))
 {
 }
 
 //==============================================================================
 template <typename T, enable_if_all<JsonTraits::is_array<T>>>
 Json::Json(const T &value) noexcept :
-    m_value(array_type(value.begin(), value.end()))
+    m_value(JsonTraits::array_type(value.begin(), value.end()))
 {
 }
 
 //==============================================================================
 template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
-Json::Json(const T &value) noexcept : m_value(static_cast<boolean_type>(value))
+Json::Json(const T &value) noexcept :
+    m_value(static_cast<JsonTraits::boolean_type>(value))
 {
 }
 
 //==============================================================================
 template <typename T, enable_if_all<JsonTraits::is_signed_integer<T>>>
-Json::Json(const T &value) noexcept : m_value(static_cast<signed_type>(value))
+Json::Json(const T &value) noexcept :
+    m_value(static_cast<JsonTraits::signed_type>(value))
 {
 }
 
 //==============================================================================
 template <typename T, enable_if_all<JsonTraits::is_unsigned_integer<T>>>
-Json::Json(const T &value) noexcept : m_value(static_cast<unsigned_type>(value))
+Json::Json(const T &value) noexcept :
+    m_value(static_cast<JsonTraits::unsigned_type>(value))
 {
 }
 
 //==============================================================================
 template <typename T, enable_if_all<JsonTraits::is_floating_point<T>>>
-Json::Json(const T &value) noexcept : m_value(static_cast<float_type>(value))
+Json::Json(const T &value) noexcept :
+    m_value(static_cast<JsonTraits::float_type>(value))
 {
 }
 
@@ -657,7 +652,8 @@ Json::operator T() const noexcept(false)
 {
     if (IsObject())
     {
-        const object_type &value = std::get<object_type>(m_value);
+        const JsonTraits::object_type &value =
+            std::get<JsonTraits::object_type>(m_value);
         return T(value.begin(), value.end());
     }
 
@@ -670,7 +666,8 @@ Json::operator T() const noexcept(false)
 {
     if (IsArray())
     {
-        const array_type &value = std::get<array_type>(m_value);
+        const JsonTraits::array_type &value =
+            std::get<JsonTraits::array_type>(m_value);
         return T(value.begin(), value.end());
     }
 
@@ -683,7 +680,8 @@ Json::operator std::array<T, N>() const noexcept(false)
 {
     if (IsArray())
     {
-        const array_type &value = std::get<array_type>(m_value);
+        const JsonTraits::array_type &value =
+            std::get<JsonTraits::array_type>(m_value);
         std::array<T, N> array {};
 
         for (std::size_t i = 0; i < std::min(N, value.size()); ++i)
@@ -705,17 +703,17 @@ Json::operator T() const noexcept(false)
         using U = std::decay_t<decltype(value)>;
 
         if constexpr (
-            std::is_same_v<U, Json::string_type> ||
-            std::is_same_v<U, Json::object_type> ||
-            std::is_same_v<U, Json::array_type>)
+            std::is_same_v<U, JsonTraits::string_type> ||
+            std::is_same_v<U, JsonTraits::object_type> ||
+            std::is_same_v<U, JsonTraits::array_type>)
         {
             return !value.empty();
         }
         else if constexpr (
-            std::is_same_v<U, Json::boolean_type> ||
-            std::is_same_v<U, Json::signed_type> ||
-            std::is_same_v<U, Json::unsigned_type> ||
-            std::is_same_v<U, Json::float_type>)
+            std::is_same_v<U, JsonTraits::boolean_type> ||
+            std::is_same_v<U, JsonTraits::signed_type> ||
+            std::is_same_v<U, JsonTraits::unsigned_type> ||
+            std::is_same_v<U, JsonTraits::float_type>)
         {
             return value != static_cast<U>(0);
         }
@@ -740,7 +738,7 @@ Json::operator T() const noexcept(false)
     auto visitor = [this](const auto &value) -> T {
         using U = std::decay_t<decltype(value)>;
 
-        if constexpr (std::is_same_v<U, Json::string_type>)
+        if constexpr (std::is_same_v<U, JsonTraits::string_type>)
         {
             try
             {
@@ -751,9 +749,9 @@ Json::operator T() const noexcept(false)
             }
         }
         else if constexpr (
-            std::is_same_v<U, Json::signed_type> ||
-            std::is_same_v<U, Json::unsigned_type> ||
-            std::is_same_v<U, Json::float_type>)
+            std::is_same_v<U, JsonTraits::signed_type> ||
+            std::is_same_v<U, JsonTraits::unsigned_type> ||
+            std::is_same_v<U, JsonTraits::float_type>)
         {
             return static_cast<T>(value);
         }
