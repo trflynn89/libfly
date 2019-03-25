@@ -7,13 +7,17 @@
 namespace {
 
 //==========================================================================
-FLY_DECLARATION_TESTS(Foo, T, std::declval<const T &>().Foo());
+template <typename T>
+using OstreamDeclaration =
+    decltype(std::declval<std::ostream &>() << std::declval<T>());
+
+using OstreamTraits = fly::DeclarationTraits<OstreamDeclaration>;
 
 //==========================================================================
-FLY_DECLARATION_TESTS(
-    Ostream,
-    T,
-    std::declval<std::ostream &>() << std::declval<const T &>());
+template <typename T>
+using FooDeclaration = decltype(std::declval<T>().Foo());
+
+using FooTraits = fly::DeclarationTraits<FooDeclaration>;
 
 //==========================================================================
 class FooClass

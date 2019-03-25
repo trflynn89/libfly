@@ -2,66 +2,6 @@
 
 #include <type_traits>
 
-/**
- * Define SFINAE tests for whether a function is declared for a type.
- *
- * For example, to test if a class of type T declares a function called Foo:
- *
- *     FLY_DECLARATION_TESTS(Foo, T, std::declval<const T &>().Foo());
- *
- * The macro invocation will define the following std::bool_constant<> (and
- * convenience constexpr bool):
- *
- *     template <typename T>
- *     struct FooTraits::is_declared<T>;
- *
- *     template <typename T>
- *     inline constexpr bool FooTraits::is_declared_v = is_declared<T>::value;
- *
- * And may be used as SFINAE tests to, e.g., define a function depending on
- * whether or not Foo() was declared:
- *
- *     template <
- *         typename T,
- *         fly::enable_if_all<FooTraits::is_declared<T>> = 0>
- *     void foo_wrapper(const T &arg) { arg.Foo(); }
- *
- *     template <
- *         typename T,
- *         fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
- *     void foo_wrapper(const T &) { }
- *
- * @param Label The name to give the test.
- * @param Type The type to be tested.
- * @param functor The function to test for.
- */
-#define FLY_DECLARATION_TESTS(Label, Type, functor)                            \
-    struct Label##Traits                                                       \
-    {                                                                          \
-        struct __##Label##__                                                   \
-        {                                                                      \
-            template <typename Type>                                           \
-            static constexpr auto test_##Label(Type *) -> decltype(functor);   \
-                                                                               \
-            template <typename Type>                                           \
-            static constexpr auto test_##Label(...) -> std::false_type;        \
-        };                                                                     \
-                                                                               \
-        template <typename Type>                                               \
-        using is_declared = std::negation<std::is_same<                        \
-            decltype(__##Label##__::test_##Label<Type>(0)),                    \
-            std::false_type>>;                                                 \
-                                                                               \
-        template <typename Type>                                               \
-        inline static constexpr bool is_declared_v = is_declared<Type>::value; \
-    };
-
-/**
- * Wrappers around std::enable_if for testing variadic sequences of traits.
- *
- * @author Timothy Flynn (trflynn89@gmail.com)
- * @version July 28, 2017
- */
 namespace fly {
 
 /**
@@ -113,5 +53,75 @@ using enable_if_none =
 template <typename... Conditions>
 using enable_if_not_all =
     std::enable_if_t<std::negation_v<std::conjunction<Conditions...>>, bool>;
+
+/**
+ * Define SFINAE tests for whether a function is declared for a type.
+ *
+ * For example, to test if a class of type T declares a method called Foo, first
+ * define a templated decltype alias for the method:
+ *
+ *     template <typename T>
+ *     using FooDeclaration = decltype(std::declval<T>().Foo());
+ *
+ * Then use that alias to create a fly::DeclarationTraits alias:
+ *
+ *     using FooTraits = fly::DeclarationTraits<FooDeclaration>;
+ *
+ * This provides the following std::bool_constant<> (and constexpr bool):
+ *
+ *     template <typename T>
+ *     struct FooTraits::is_declared<T>;
+ *
+ *     template <typename T>
+ *     inline constexpr bool FooTraits::is_declared_v = is_declared<T>::value;
+ *
+ * Which may be used as SFINAE tests to, e.g., define a function depending on
+ * whether or not Foo() is declared for a type:
+ *
+ *     template <
+ *         typename T,
+ *         fly::enable_if_all<FooTraits::is_declared<T>> = 0>
+ *     void foo_wrapper(const T &arg) { arg.Foo(); }
+ *
+ *     template <
+ *         typename T,
+ *         fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
+ *     void foo_wrapper(const T &) { }
+ *
+ * Or in a constexpr-if expression:
+ *
+ *     template <typename T>
+ *     void foo_wrapper(const T &)
+ *     {
+ *         if constexpr (FooTraits::is_declared_v<T>)
+ *         {
+ *             arg.Foo();
+ *         }
+ *      }
+ *
+ * @tparam Declaration The decltype alias to test.
+ * @tparam T The type to be tested.
+ */
+template <template <typename> class Declaration>
+struct DeclarationTraits
+{
+private:
+    struct __test__
+    {
+        template <typename T>
+        static constexpr auto test(T *) -> Declaration<T>;
+
+        template <typename T>
+        static constexpr auto test(...) -> std::false_type;
+    };
+
+public:
+    template <typename T>
+    using is_declared = std::negation<
+        std::is_same<decltype(__test__::template test<T>(0)), std::false_type>>;
+
+    template <typename T>
+    inline static constexpr bool is_declared_v = is_declared<T>::value;
+};
 
 } // namespace fly
