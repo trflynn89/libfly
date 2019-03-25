@@ -592,7 +592,7 @@ TYPED_TEST(BasicStringTest, JoinTest)
         FLY_STR(streamed_char, "a:c:d"), StringClass::Join(':', str, arr, chr));
 
     std::basic_regex<streamed_char> test(
-        FLY_STR(streamed_char, "\\[0x[0-9a-fA-F]+\\]:2:\\[hi beef\\]"));
+        FLY_STR(streamed_char, "\\[(0x)?[0-9a-fA-F]+\\]:2:\\[hi beef\\]"));
     EXPECT_TRUE(std::regex_match(StringClass::Join(':', obj2, 2, obj1), test));
 }
 
