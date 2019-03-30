@@ -9,7 +9,7 @@ jobs:
       vmImage: 'Ubuntu-16.04'
 
     container:
-      image: trflynn89/libfly:ubuntu18_gcc8
+      image: trflynn89/libfly:ubuntu1904_gcc9
       options: --cap-add SYS_PTRACE
 
     steps:
