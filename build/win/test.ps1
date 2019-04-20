@@ -4,7 +4,7 @@ param (
 )
 
 # Run all unit tests for an architecture.
-function Run-Libfly-Test($arch)
+function Run-Libfly-Test($configuration, $arch)
 {
     Write-Output "Running $arch tests"
 
