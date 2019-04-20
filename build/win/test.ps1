@@ -1,4 +1,5 @@
 param (
+    [Parameter(Mandatory=$true)][string]$configuration
     [Parameter(Mandatory=$true)][string]$arch
 )
 
@@ -7,7 +8,7 @@ function Run-Libfly-Test($arch)
 {
     Write-Output "Running $arch tests"
 
-    $full_path = $PSScriptRoot + "\Release-" + $arch
+    $full_path = $PSScriptRoot + "\" + $configuration + "-" + $arch
     $tests_passed = 0
     $tests_failed = 0
 
@@ -32,4 +33,4 @@ function Run-Libfly-Test($arch)
 }
 
 # Run the tests
-Run-Libfly-Test $arch
+Run-Libfly-Test $configuration $arch

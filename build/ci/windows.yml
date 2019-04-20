@@ -20,7 +20,7 @@ jobs:
     - task: PowerShell@2
       inputs:
         filePath: build\win\test.ps1
-        arguments: -arch ${{ parameters.arch }}
+        arguments: -configuration Release -arch ${{ parameters.arch }}
         failOnStderr: false
       displayName: 'Test'
 
