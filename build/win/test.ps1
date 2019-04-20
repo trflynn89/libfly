@@ -1,5 +1,5 @@
 param (
-    [Parameter(Mandatory=$true)][string]$configuration
+    [Parameter(Mandatory=$true)][string]$configuration,
     [Parameter(Mandatory=$true)][string]$arch
 )
 
