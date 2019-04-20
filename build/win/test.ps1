@@ -7,7 +7,7 @@ function Run-Libfly-Test($arch)
 {
     Write-Output "Running $arch tests"
 
-    $full_path = $PSScriptRoot + "\Debug-" + $arch
+    $full_path = $PSScriptRoot + "\Release-" + $arch
     $tests_passed = 0
     $tests_failed = 0
 
