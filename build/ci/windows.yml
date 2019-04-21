@@ -7,7 +7,15 @@ jobs:
       vmImage: 'windows-2019'
 
     steps:
+    - script: python -m pip install --upgrade pip
+    - script: python -m pip install codecov
+
     - template: setup.yml
+
+    - task: PowerShell@2
+      inputs:
+        filePath: build\win\install_open_cpp_coverage.ps1
+      displayName: 'Dependencies'
 
     - task: VSBuild@1
       inputs:
