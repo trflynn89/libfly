@@ -21,7 +21,7 @@ function Run-Libfly-Test($configuration, $arch)
         $report = $output_path + "\coverage\" + $_.Directory.Name + ".bin"
         $reports += $report
 
-        & $COVERAGE --sources $source_path --export_type=binary:$report -- $_
+        & $COVERAGE --quiet --sources $source_path --export_type=binary:$report -- $_
 
         if ($LASTEXITCODE -eq 0)
         {
@@ -58,7 +58,7 @@ function Upload-Full-Test-Report($source_path, $reports)
 
     $output += "\coverage.xml"
 
-    & $COVERAGE --export_type=cobertura:$output @inputs
+    & $COVERAGE --quiet --export_type=cobertura:$output @inputs
     & codecov --root $source_path --no-color --disable gcov -f $output
 }
 
