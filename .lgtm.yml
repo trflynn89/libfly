@@ -1,0 +1,15 @@
+path_classifiers:
+  test:
+    - test
+    - exclude: test/googletest
+
+extraction:
+  cpp:
+    prepare:
+      packages:
+        - g++-8
+    after_prepare:
+        - git submodule update --init
+    index:
+      build_command:
+        - make -j -C build/nix
