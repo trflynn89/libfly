@@ -1,14 +1,13 @@
-# docker image rm "trflynn89/libfly:ubuntu18_gcc8"
-# docker build --tag "trflynn89/libfly:ubuntu18_gcc8" .
-# docker push "trflynn89/libfly:ubuntu18_gcc8"
-FROM ubuntu:18.04
+# docker image rm "trflynn89/libfly:ubuntu1904_gcc9"
+# docker build --tag "trflynn89/libfly:ubuntu1904_gcc9" .
+# docker push "trflynn89/libfly:ubuntu1904_gcc9"
+FROM ubuntu:19.04
 
 MAINTAINER Timothy Flynn <trflynn89@pm.me>
 
-ENV CC gcc-8
-ENV CXX g++-8
-ENV GCOV gcov-8
-ENV LCOV https://github.com/linux-test-project/lcov/releases/download/v1.14/lcov-1.14.tar.gz
+ENV CC gcc-9
+ENV CXX g++-9
+ENV GCOV gcov-9
 
 RUN apt-get update && \
     # Install build dependencies
@@ -21,19 +20,23 @@ RUN apt-get update && \
         lcov \
         make \
         rsync \
+        \
+        # Temporary until more recent LCOV is available in apt
+        git \
+        libperlio-gzip-perl \
+        libjson-perl \
         && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/$CC 1 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/$CXX 1 && \
     update-alternatives --install /usr/bin/gcov gcov /usr/bin/$GCOV 1 && \
     \
-    # Replace LCOV with a more recent version that supports GCC 8
-    (cd /tmp && curl -L $LCOV -o lcov.tar.gz) && \
-    (cd /tmp && tar -xf lcov.tar.gz) && \
-    (cd /tmp && tar -tf lcov.tar.gz | head -n1 | xargs -i mv {} lcov) && \
-    (cd /tmp && find lcov/bin -type f ! -name "*.*" | xargs -i mv {} /usr/bin/) && \
+    # Replace LCOV with a more recent version that supports GCC 9
+    git clone https://github.com/linux-test-project/lcov.git && \
+    (cd lcov && git reset --hard 75fbae1cfc5027f818a0bb865bf6f96fab3202da) && \
+    (cd lcov && make install) && \
     \
     # Cleanup
-    apt-get clean && \
-    apt-get autoremove && \
-    apt-get purge && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    apt-get clean -y && \
+    apt-get autoremove -y && \
+    apt-get purge -y && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* lcov
