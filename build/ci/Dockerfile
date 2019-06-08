@@ -17,10 +17,14 @@ RUN apt-get update && \
         $CXX \
         $CXX-multilib \
         curl \
-        git \
         lcov \
         make \
         rsync \
+        \
+        # Temporary until more recent LCOV is available in apt
+        git \
+        libperlio-gzip-perl \
+        libjson-perl \
         && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/$CC 1 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/$CXX 1 && \
