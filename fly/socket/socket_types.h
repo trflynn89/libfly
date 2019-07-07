@@ -22,7 +22,7 @@ typedef SOCKET socket_type;
 #elif defined(FLY_LINUX)
 typedef int socket_type;
 #else
-#    error Unknown socket type
+#    error Unknown socket type.
 #endif
 
 typedef std::uint32_t address_type;
@@ -31,7 +31,7 @@ typedef std::uint16_t port_type;
 /**
  * Types of supported sockets.
  */
-enum class Protocol : uint8_t
+enum class Protocol : std::uint8_t
 {
     TCP,
     UDP
@@ -40,7 +40,7 @@ enum class Protocol : uint8_t
 /**
  * Supported options for binding sockets.
  */
-enum class BindOption : uint8_t
+enum class BindOption : std::uint8_t
 {
     SingleUse,
     AllowReuse
@@ -49,7 +49,7 @@ enum class BindOption : uint8_t
 /**
  * TCP socket connection states.
  */
-enum class ConnectedState : uint8_t
+enum class ConnectedState : std::uint8_t
 {
     Disconnected,
     Connecting,

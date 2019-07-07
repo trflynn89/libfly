@@ -116,8 +116,8 @@ bool HuffmanCoder::DecodeInternal(
 }
 
 //==============================================================================
-std::unique_ptr<HuffmanNode>
-HuffmanCoder::createTree(std::istream &input) const noexcept
+std::unique_ptr<HuffmanNode> HuffmanCoder::createTree(std::istream &input) const
+    noexcept
 {
     // Create a frequency map of each input symbol.
     std::map<symbol_type, frequency_type> counts;

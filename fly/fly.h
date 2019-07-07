@@ -17,6 +17,8 @@
 #    include <cstdint>
 #    define I64(n) __INT64_C(n)
 #    define U64(n) __UINT64_C(n)
+#else
+#    error Unkown 64-bit constant macros.
 #endif
 
 // Define macro to convert a macro parameter to a string
@@ -33,4 +35,6 @@
 #    define FLY_OS_IMPL_PATH(module, clss) _FLY_OS_IMPL_PATH(module, win, clss)
 #elif defined(FLY_LINUX)
 #    define FLY_OS_IMPL_PATH(module, clss) _FLY_OS_IMPL_PATH(module, nix, clss)
+#else
+#    error Unknown implementation header.
 #endif
