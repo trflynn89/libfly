@@ -447,8 +447,13 @@ bool HuffmanCoder::decodeStream(
     BitStreamReader &input,
     std::ostream &output) const noexcept
 {
+    static constexpr const std::size_t bufferSize = 1 << 20;
+
     HuffmanNode *node = root.get();
     bool right;
+
+    stream_buffer_type::value_type data[bufferSize];
+    std::size_t bytes = 0;
 
     while ((node != nullptr) && input.ReadBit(right))
     {
@@ -459,9 +464,22 @@ bool HuffmanCoder::decodeStream(
 
         if (!node->m_left || !node->m_right)
         {
-            output << node->m_symbol;
+            data[bytes] =
+                static_cast<stream_buffer_type::value_type>(node->m_symbol);
+
+            if (++bytes == bufferSize)
+            {
+                output.write(data, bytes);
+                bytes = 0;
+            }
+
             node = root.get();
         }
+    }
+
+    if (bytes > 0)
+    {
+        output.write(data, bytes);
     }
 
     return input.ReachedEndOfFile();

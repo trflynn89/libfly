@@ -65,7 +65,7 @@ TEST_F(HuffmanCoderTest, MirrorTest)
 //==============================================================================
 TEST_F(HuffmanCoderTest, LargeMirrorTest)
 {
-    const std::string pre = fly::String::GenerateRandomString(100 << 10);
+    const std::string pre = fly::String::GenerateRandomString(100 << 20);
     std::cout << "." << std::endl;
     std::string enc, dec;
 
