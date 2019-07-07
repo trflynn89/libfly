@@ -51,6 +51,8 @@ protected:
      *
      * @param istream Stream holding the contents to parse.
      *
+     * @return Json The parsed values.
+     *
      * @throws ParserException Thrown if an error occurs parsing the stream.
      */
     virtual Json ParseInternal(std::istream &) noexcept(false) = 0;
