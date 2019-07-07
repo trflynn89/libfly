@@ -34,17 +34,25 @@ protected:
      *
      * The steps to encode a stream are:
      *
-     *     1. Create a Huffman tree from the input stream.
-     *     2. Generate standard Huffman codes from the Huffman tree.
-     *     3. Convert the standard codes to canonical Huffman codes.
-     *     4. Encode the canonical codes.
-     *     5. Encode the input stream using the canonical codes.
+     *     1. Reserve a buffer up-front to store all data from the input stream.
+     *     2. Create a Huffman tree from the input stream.
+     *     3. Generate standard Huffman codes from the Huffman tree.
+     *     4. Convert the standard codes to canonical Huffman codes.
+     *     5. Encode the canonical codes.
+     *     6. Encode the input stream using the canonical codes.
      *
-     * This sequence involves reading the entire input stream twice (to create
-     * the Huffman tree and to encode the stream).
+     * Step 1 is a large speed optimization. On a 100MB file, compiled with -02,
+     * creating the Huffman tree alone took upwards of 5 seconds when reading
+     * the input stream one symbol at a time. Reading the entire stream at once,
+     * steps 1 and 2 together is reduced to milliseconds. Of course, this means
+     * acceptable input size is limited by system memory; step 1 should be
+     * changed to read the stream in large chunks.
+     *
+     * This sequence involves iterating over the entire input stream twice (to
+     * create the Huffman tree and to encode the stream).
      *
      * The coder does not assume the Huffman codes are retained between by the
-     * caller. Thus, the codes are encoded before the input stream (step 4) so
+     * caller. Thus, the codes are encoded before the input stream (step 6) so
      * that they may be learned during decoding. Canonical form is used for its
      * property of generally being describable in fewer bits than standard form.
      *
@@ -90,13 +98,24 @@ protected:
 
 private:
     /**
+     * Read the entire stream into a vector buffer.
+     *
+     * @param istream Stream holding the contents to read.
+     *
+     * @return vector Vector holding the entire contents of the input stream.
+     */
+    std::vector<std::istream::char_type> readStream(std::istream &) const
+        noexcept;
+
+    /**
      * Create a Huffman tree from the given input stream.
      *
-     * @param istream Stream holding the contents to parse.
+     * @param vector Buffer holding the contents to parse.
      *
      * @return unique_ptr Scoped pointer to the root node of the Huffman tree.
      */
-    std::unique_ptr<HuffmanNode> createTree(std::istream &) const noexcept;
+    std::unique_ptr<HuffmanNode>
+    createTree(const std::vector<std::istream::char_type> &) const noexcept;
 
     /**
      * Create a Huffman tree from the given list of Huffman codes. The created
@@ -158,14 +177,14 @@ private:
      * lookup.
      *
      * @param vector List of Huffman codes to encode with.
-     * @param istream Stream holding the contents to encode.
+     * @param vector Buffer holding the contents to parse.
      * @param BitStreamWriter Stream to store the encoded contents.
      *
      * @return bool True if the input stream was successfully encoded.
      */
     bool encodeStream(
         std::vector<HuffmanCode> &,
-        std::istream &,
+        const std::vector<std::istream::char_type> &,
         BitStreamWriter &) const noexcept;
 
     /**

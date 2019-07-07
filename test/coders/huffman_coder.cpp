@@ -72,14 +72,12 @@ TEST_F(HuffmanCoderTest, LargeMirrorTest)
     auto start = std::chrono::system_clock::now();
     ASSERT_TRUE(m_coder.EncodeString(pre, enc));
     auto end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed1 = end - start;
-    std::cout << elapsed1.count() << std::endl;
+    std::cout << std::chrono::duration<double>(end - start).count() << std::endl;
 
     start = std::chrono::system_clock::now();
     ASSERT_TRUE(m_coder.DecodeString(enc, dec));
     end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed2 = end - start;
-    std::cout << elapsed2.count() << std::endl;
+    std::cout << std::chrono::duration<double>(end - start).count() << std::endl;
 
     EXPECT_GT(pre.size(), enc.size());
     EXPECT_EQ(pre, dec);

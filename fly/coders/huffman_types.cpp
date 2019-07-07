@@ -74,6 +74,11 @@ void HuffmanNode::Print(int depth)
 }
 
 //==============================================================================
+HuffmanCode::HuffmanCode() : m_symbol(0), m_code(0), m_length(0)
+{
+}
+
+//==============================================================================
 HuffmanCode::HuffmanCode(
     const symbol_type symbol,
     const code_type code,

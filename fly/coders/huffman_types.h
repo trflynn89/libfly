@@ -70,6 +70,11 @@ struct HuffmanNode
 struct HuffmanCode
 {
     /**
+     * Default constructor. Set all fields to zero.
+     */
+    HuffmanCode();
+
+    /**
      * Constructor.
      *
      * @param symbol_type The symbol from the input stream.
