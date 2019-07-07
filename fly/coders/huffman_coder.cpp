@@ -117,15 +117,15 @@ bool HuffmanCoder::DecodeInternal(
 
 //==============================================================================
 std::unique_ptr<HuffmanNode>
-HuffmanCoder::createTree(std::istream &stream) const noexcept
+HuffmanCoder::createTree(std::istream &input) const noexcept
 {
     // Create a frequency map of each input symbol.
     std::map<symbol_type, frequency_type> counts;
-    symbol_type ch;
+    char ch;
 
-    while (stream.get(ch))
+    while (input.get(ch))
     {
-        ++counts[ch];
+        ++counts[static_cast<symbol_type>(ch)];
     }
 
     if (counts.empty())
@@ -285,7 +285,8 @@ bool HuffmanCoder::encodeCodes(
     }
 
     // Encode the number of code length counts.
-    if (!output.WriteByte(counts.size()))
+    const auto countsSize = static_cast<byte_type>(counts.size());
+    if (!output.WriteByte(countsSize))
     {
         return false;
     }
@@ -317,16 +318,16 @@ bool HuffmanCoder::decodeCodes(
     std::vector<HuffmanCode> &codes) const noexcept
 {
     // Decode the number of code length counts. This number must be at least 1.
-    code_type lengthsSize;
-    if (!input.ReadByte(lengthsSize) || (lengthsSize == 0))
+    code_type countsSize;
+    if (!input.ReadByte(countsSize) || (countsSize == 0))
     {
         return false;
     }
 
     // Decode the code length counts.
-    std::vector<code_type> counts(lengthsSize);
+    std::vector<code_type> counts(countsSize);
 
-    for (code_type i = 0; i < lengthsSize; ++i)
+    for (code_type i = 0; i < countsSize; ++i)
     {
         code_type length;
         if (!input.ReadByte(length))
@@ -338,7 +339,7 @@ bool HuffmanCoder::decodeCodes(
     }
 
     // Decode the symbols.
-    for (code_type length = 0; length < lengthsSize; ++length)
+    for (code_type length = 0; length < countsSize; ++length)
     {
         for (code_type i = 0; i < counts[length]; ++i)
         {
@@ -387,10 +388,10 @@ bool HuffmanCoder::encodeStream(
     input.clear();
     input.seekg(0);
 
-    symbol_type ch;
+    char ch;
     while (input.get(ch))
     {
-        const HuffmanCode &code = symbols.at(ch);
+        const HuffmanCode &code = symbols.at(static_cast<symbol_type>(ch));
 
         if (code.m_length == 0)
         {

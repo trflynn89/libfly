@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="coders">
+      <UniqueIdentifier>{c63b5aa5-4f36-4425-b00e-a823e8ed55fd}</UniqueIdentifier>
+    </Filter>
     <Filter Include="config">
       <UniqueIdentifier>{7bfc9b93-2ef1-48fd-9eb8-ccb630757af9}</UniqueIdentifier>
     </Filter>
@@ -40,6 +43,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\fly.h" />
+    <ClInclude Include="..\..\..\fly\coders\bit_stream.h">
+      <Filter>coders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\coder.h">
+      <Filter>coders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\endian.h">
+      <Filter>coders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\huffman_coder.h">
+      <Filter>coders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\huffman_types.h">
+      <Filter>coders</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\config\config.h">
       <Filter>config</Filter>
     </ClInclude>
@@ -153,6 +171,18 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\fly\coders\bit_stream.cpp">
+      <Filter>coders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\coder.cpp">
+      <Filter>coders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\huffman_coder.cpp">
+      <Filter>coders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\huffman_types.cpp">
+      <Filter>coders</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\fly\config\config.cpp">
       <Filter>config</Filter>
     </ClCompile>

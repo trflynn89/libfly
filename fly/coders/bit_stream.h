@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fly/coders/endian.h>
+#include "fly/coders/endian.h"
 
 #include <cstdint>
 #include <istream>
@@ -224,7 +224,7 @@ byte_type BitStreamReader::fill(BufferType &buffer, byte_type bytes) noexcept
     {
         m_stream.read(reinterpret_cast<char *>(&buffer), bytes);
 
-        const byte_type bytesRead = m_stream.gcount();
+        const auto bytesRead = static_cast<byte_type>(m_stream.gcount());
         buffer = byte_swap(buffer);
 
         return bytesRead;

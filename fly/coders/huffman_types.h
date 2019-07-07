@@ -1,12 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <filesystem>
 #include <memory>
 
 namespace fly {
 
-typedef std::filesystem::path::value_type symbol_type;
+typedef std::uint8_t symbol_type;
 typedef std::uint64_t frequency_type;
 typedef std::uint8_t code_type;
 
