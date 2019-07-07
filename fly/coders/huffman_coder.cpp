@@ -131,7 +131,7 @@ HuffmanCoder::readStream(std::istream &input) const noexcept
 
     if (length > 0)
     {
-        data.resize(length);
+        data.resize(static_cast<std::vector::size_type>(length));
         input.read(data.data(), length);
     }
 
