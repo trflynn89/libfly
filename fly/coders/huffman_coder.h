@@ -97,25 +97,26 @@ protected:
     bool DecodeInternal(BitStreamReader &, std::ostream &) noexcept override;
 
 private:
+    typedef std::vector<std::istream::char_type> stream_buffer_type;
+
     /**
-     * Read the entire stream into a vector buffer.
+     * Read the entire stream into a buffer.
      *
      * @param istream Stream holding the contents to read.
      *
-     * @return vector Vector holding the entire contents of the input stream.
+     * @return stream_buffer_type Buffer holding the contents of the stream.
      */
-    std::vector<std::istream::char_type> readStream(std::istream &) const
-        noexcept;
+    stream_buffer_type readStream(std::istream &) const noexcept;
 
     /**
      * Create a Huffman tree from the given input stream.
      *
-     * @param vector Buffer holding the contents to parse.
+     * @param stream_buffer_type Buffer holding the contents to parse.
      *
      * @return unique_ptr Scoped pointer to the root node of the Huffman tree.
      */
-    std::unique_ptr<HuffmanNode>
-    createTree(const std::vector<std::istream::char_type> &) const noexcept;
+    std::unique_ptr<HuffmanNode> createTree(const stream_buffer_type &) const
+        noexcept;
 
     /**
      * Create a Huffman tree from the given list of Huffman codes. The created
@@ -177,14 +178,14 @@ private:
      * lookup.
      *
      * @param vector List of Huffman codes to encode with.
-     * @param vector Buffer holding the contents to parse.
+     * @param stream_buffer_type Buffer holding the contents to parse.
      * @param BitStreamWriter Stream to store the encoded contents.
      *
      * @return bool True if the input stream was successfully encoded.
      */
     bool encodeStream(
         std::vector<HuffmanCode> &,
-        const std::vector<std::istream::char_type> &,
+        const stream_buffer_type &,
         BitStreamWriter &) const noexcept;
 
     /**

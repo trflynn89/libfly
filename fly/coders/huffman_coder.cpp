@@ -91,7 +91,7 @@ bool HuffmanCoder::EncodeInternal(
     std::istream &input,
     BitStreamWriter &output) noexcept
 {
-    const std::vector<std::istream::char_type> data = readStream(input);
+    const stream_buffer_type data = readStream(input);
     std::vector<HuffmanCode> codes;
     {
         const std::unique_ptr<HuffmanNode> root = createTree(data);
@@ -120,18 +120,18 @@ bool HuffmanCoder::DecodeInternal(
 }
 
 //==============================================================================
-std::vector<std::istream::char_type>
+HuffmanCoder::stream_buffer_type
 HuffmanCoder::readStream(std::istream &input) const noexcept
 {
     input.seekg(0, std::ios::end);
     const std::istream::pos_type length = input.tellg();
     input.seekg(0, std::ios::beg);
 
-    std::vector<std::istream::char_type> data;
+    stream_buffer_type data;
 
     if (length > 0)
     {
-        data.resize(static_cast<std::vector::size_type>(length));
+        data.resize(static_cast<stream_buffer_type::size_type>(length));
         input.read(data.data(), length);
     }
 
@@ -139,8 +139,8 @@ HuffmanCoder::readStream(std::istream &input) const noexcept
 }
 
 //==============================================================================
-std::unique_ptr<HuffmanNode> HuffmanCoder::createTree(
-    const std::vector<std::istream::char_type> &input) const noexcept
+std::unique_ptr<HuffmanNode>
+HuffmanCoder::createTree(const stream_buffer_type &input) const noexcept
 {
     if (input.empty())
     {
@@ -150,7 +150,7 @@ std::unique_ptr<HuffmanNode> HuffmanCoder::createTree(
     // Create a frequency map of each input symbol.
     frequency_type counts[s_maxSymbols] = {0};
 
-    for (const std::istream::char_type &ch : input)
+    for (const stream_buffer_type::value_type &ch : input)
     {
         ++counts[static_cast<symbol_type>(ch)];
     }
@@ -400,7 +400,7 @@ bool HuffmanCoder::decodeCodes(
 //==============================================================================
 bool HuffmanCoder::encodeStream(
     std::vector<HuffmanCode> &codes,
-    const std::vector<std::istream::char_type> &input,
+    const stream_buffer_type &input,
     BitStreamWriter &output) const noexcept
 {
     // Convert the list of Huffman codes to a map keyed by symbol.
@@ -411,7 +411,7 @@ bool HuffmanCoder::encodeStream(
         symbols[code.m_symbol] = std::move(code);
     }
 
-    for (const std::istream::char_type &ch : input)
+    for (const stream_buffer_type::value_type &ch : input)
     {
         const HuffmanCode &code = symbols[static_cast<symbol_type>(ch)];
 
