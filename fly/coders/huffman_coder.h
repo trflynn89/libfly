@@ -174,8 +174,8 @@ private:
 
     /**
      * Encode an input stream with a list of Huffman codes. The list of codes
-     * is effectively destroyed as its elements are moved to a map for easier
-     * lookup.
+     * is effectively destroyed as its elements are moved to a map for faster
+     * lookups.
      *
      * @param vector List of Huffman codes to encode with.
      * @param stream_buffer_type Buffer holding the contents to parse.

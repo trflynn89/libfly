@@ -56,36 +56,44 @@ BitStreamWriter::~BitStreamWriter() noexcept
 //==============================================================================
 bool BitStreamWriter::WriteByte(byte_type byte) noexcept
 {
-    for (byte_type shift = s_bitsPerByte; shift != 0; --shift)
-    {
-        const bool bit = (byte >> (shift - 1)) & 0x1;
+    return WriteBits(byte, s_bitsPerByte);
+}
 
-        if (!WriteBit(bit))
+//==============================================================================
+bool BitStreamWriter::WriteBits(byte_type bits, byte_type size) noexcept
+{
+    // If there are more bits to write than are available in the byte buffer,
+    // break the bits into two chunks.
+    if (size > m_position)
+    {
+        const byte_type diff = size - m_position;
+
+        // Fill the remainder of the byte buffer with as many bits as are
+        // available, and flush it onto the stream.
+        m_buffer |= (static_cast<buffer_type>(bits) >> diff);
+
+        if (!flushBuffer())
         {
             return false;
         }
+
+        // Then update the input bits to retain only those bits that have not
+        // been written yet.
+        bits &= (0xff >> (s_bitsPerByte - diff));
+        size = diff;
     }
 
-    return true;
+    m_buffer |= (static_cast<buffer_type>(bits) << (m_position - size));
+    m_position -= size;
+
+    return (m_position == 0) ? flushBuffer() : true;
 }
 
 //==============================================================================
 bool BitStreamWriter::WriteBit(bool bit) noexcept
 {
     m_buffer |= (static_cast<buffer_type>(bit) << --m_position);
-
-    if (m_position == 0)
-    {
-        if (!flush(m_buffer, s_bufferTypeSize))
-        {
-            return false;
-        }
-
-        m_position = s_mostSignificantBitPosition;
-        m_buffer = 0;
-    }
-
-    return true;
+    return (m_position == 0) ? flushBuffer() : true;
 }
 
 //==============================================================================
@@ -102,6 +110,20 @@ bool BitStreamWriter::flushHeader(byte_type remainder) noexcept
             (s_magic << s_magicShift) | (remainder << s_remainderShift);
 
         return flush(header, s_byteTypeSize);
+    }
+
+    return false;
+}
+
+//==============================================================================
+bool BitStreamWriter::flushBuffer() noexcept
+{
+    if (flush(m_buffer, s_bufferTypeSize))
+    {
+        m_position = s_mostSignificantBitPosition;
+        m_buffer = 0;
+
+        return true;
     }
 
     return false;
@@ -164,16 +186,12 @@ bool BitStreamReader::ReadBit(bool &bit) noexcept
             return false;
         }
 
-        byte_type shift = (s_bufferTypeSize - bytesRead) * s_bitsPerByte;
-
         if (ReachedEndOfFile())
         {
             // At end-of-file, discard any encoded zero-filled bits.
-            shift += m_remainder;
-        }
+            const byte_type shift =
+                (s_bufferTypeSize - bytesRead) * s_bitsPerByte + m_remainder;
 
-        if (shift > 0)
-        {
             m_position = s_mostSignificantBitPosition - shift;
             m_buffer >>= shift;
         }

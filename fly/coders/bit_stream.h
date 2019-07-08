@@ -8,7 +8,7 @@
 namespace fly {
 
 typedef std::uint8_t byte_type;
-typedef std::uint64_t buffer_type;
+typedef std::size_t buffer_type;
 
 /**
  * Base class for writing to and reading from a binary stream. The first byte of
@@ -95,6 +95,19 @@ public:
     bool WriteByte(byte_type) noexcept;
 
     /**
+     * Write a number of bits to the byte buffer. The least-significant bits in
+     * the provided byte will be written. Flush the buffer to the stream if it
+     * is filled during this operation.
+     *
+     * @param byte_type The bits to write.
+     * @param byte_type The number of bits to write.
+     *
+     * @return bool True if the bits were successfully written and flushing the
+     *              byte buffer was successful (if needed).
+     */
+    bool WriteBits(byte_type, byte_type) noexcept;
+
+    /**
      * Write a single bit to the byte buffer. Flush the buffer to the stream if
      * it is filled during this operation.
      *
@@ -114,6 +127,13 @@ private:
      * @return bool True if the header byte was successfully flushed.
      */
     bool flushHeader(byte_type) noexcept;
+
+    /**
+     * Flush the byte buffer onto the stream.
+     *
+     * @return bool True if the byte buffer was successfully flushed.
+     */
+    bool flushBuffer() noexcept;
 
     /**
      * Flush a byte buffer to the stream.

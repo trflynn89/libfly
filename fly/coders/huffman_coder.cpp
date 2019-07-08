@@ -280,6 +280,14 @@ void HuffmanCoder::convertToCanonicalForm(std::vector<HuffmanCode> &codes) const
     {
         // First code is always set to zero. Its length does not change.
         codes[0].m_code = 0;
+
+        if (codes.size() == 1)
+        {
+            // Single-node Huffman trees occur when the input stream contains
+            // only one unique symbol. Set its length to one so a single bit is
+            // encoded for each occurrence of that symbol.
+            codes[0].m_length = 1;
+        }
     }
 
     for (std::size_t i = 1; i < codes.size(); ++i)
@@ -403,7 +411,6 @@ bool HuffmanCoder::encodeStream(
     const stream_buffer_type &input,
     BitStreamWriter &output) const noexcept
 {
-    // Convert the list of Huffman codes to a map keyed by symbol.
     HuffmanCode symbols[s_maxSymbols];
 
     for (HuffmanCode &code : codes)
@@ -415,26 +422,9 @@ bool HuffmanCoder::encodeStream(
     {
         const HuffmanCode &code = symbols[static_cast<symbol_type>(ch)];
 
-        if (code.m_length == 0)
+        if (!output.WriteBits(code.m_code, code.m_length))
         {
-            // Single-node Huffman trees occur when the input stream contains
-            // only one unique symbol. Write out a single bit for that case.
-            if (!output.WriteBit(0))
-            {
-                return false;
-            }
-        }
-        else
-        {
-            for (code_type shift = code.m_length; shift != 0; --shift)
-            {
-                const bool bit = (((code.m_code >> (shift - 1)) & 0x1) == 1);
-
-                if (!output.WriteBit(bit))
-                {
-                    return false;
-                }
-            }
+            return false;
         }
     }
 
