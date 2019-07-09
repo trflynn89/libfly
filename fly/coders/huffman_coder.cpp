@@ -84,6 +84,8 @@ namespace {
     constexpr const symbol_type s_maxSymbols =
         std::numeric_limits<symbol_type>::max();
 
+    constexpr const symbol_type s_huffmanTableSize = 128;
+
 } // namespace
 
 //==============================================================================
@@ -100,7 +102,7 @@ bool HuffmanCoder::EncodeInternal(
         convertToCanonicalForm(codes);
     }
 
-    return encodeCodes(codes, output) && encodeStream(codes, data, output);
+    return encodeCodes(codes, output) && encodeSymbols(codes, data, output);
 }
 
 //==============================================================================
@@ -112,10 +114,12 @@ bool HuffmanCoder::DecodeInternal(
 
     if (decodeCodes(input, codes))
     {
-        HuffmanTable table[s_maxSymbols];
-        createTable(codes, table);
+        HuffmanTable table[s_huffmanTableSize];
 
-        return decodeStream(table, input, output);
+        if (createTable(codes, table))
+        {
+            return decodeSymbols(table, input, output);
+        }
     }
 
     return false;
@@ -189,11 +193,20 @@ HuffmanCoder::createTree(const stream_buffer_type &input) const noexcept
 }
 
 //==============================================================================
-void HuffmanCoder::createTable(
+bool HuffmanCoder::createTable(
     const std::vector<HuffmanCode> &codes,
     HuffmanTable *table) const noexcept
 {
     code_type index = 0;
+
+    auto next_entry = [&table, &index]() -> HuffmanTable * {
+        if (++index < s_huffmanTableSize)
+        {
+            return &table[index];
+        }
+
+        return nullptr;
+    };
 
     for (const HuffmanCode &code : codes)
     {
@@ -203,11 +216,16 @@ void HuffmanCoder::createTable(
         // entries along the way as needed.
         for (code_type shift = code.m_length; shift != 0; --shift)
         {
-            if (entry->IsSymbol())
+            if ((entry->m_left == nullptr) || (entry->m_right == nullptr))
             {
                 // Convert the current entry to an intermediate entry.
-                entry->m_left = &table[++index];
-                entry->m_right = &table[++index];
+                entry->m_left = next_entry();
+                entry->m_right = next_entry();
+
+                if ((entry->m_left == nullptr) || (entry->m_right == nullptr))
+                {
+                    return false;
+                }
             }
 
             const bool left = (((code.m_code >> (shift - 1)) & 0x1) == 0);
@@ -217,6 +235,8 @@ void HuffmanCoder::createTable(
         // Store the symbol at the end of the path
         entry->m_symbol = code.m_symbol;
     }
+
+    return true;
 }
 
 //==============================================================================
@@ -407,7 +427,7 @@ bool HuffmanCoder::decodeCodes(
 }
 
 //==============================================================================
-bool HuffmanCoder::encodeStream(
+bool HuffmanCoder::encodeSymbols(
     std::vector<HuffmanCode> &codes,
     const stream_buffer_type &input,
     BitStreamWriter &output) const noexcept
@@ -433,7 +453,7 @@ bool HuffmanCoder::encodeStream(
 }
 
 //==============================================================================
-bool HuffmanCoder::decodeStream(
+bool HuffmanCoder::decodeSymbols(
     const HuffmanTable *table,
     BitStreamReader &input,
     std::ostream &output) const noexcept

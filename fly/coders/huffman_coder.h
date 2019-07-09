@@ -124,8 +124,10 @@ private:
      *
      * @param vector List of Huffman codes to parse.
      * @param HuffmanTable Pointer to the Huffman table to fill.
+     *
+     * @return bool True if the Huffman table was successfully created.
      */
-    void createTable(const std::vector<HuffmanCode> &, HuffmanTable *) const
+    bool createTable(const std::vector<HuffmanCode> &, HuffmanTable *) const
         noexcept;
 
     /**
@@ -171,32 +173,32 @@ private:
         noexcept;
 
     /**
-     * Encode an input stream with a list of Huffman codes. The list of codes
-     * is effectively destroyed as its elements are moved to a map for faster
-     * lookups.
+     * Encode symbols from an input stream with a list of Huffman codes. The
+     * list of codes is effectively destroyed as its elements are moved to a map
+     * for faster lookups.
      *
      * @param vector List of Huffman codes to encode with.
-     * @param stream_buffer_type Buffer holding the contents to parse.
-     * @param BitStreamWriter Stream to store the encoded contents.
+     * @param stream_buffer_type Buffer holding the symbols to encode.
+     * @param BitStreamWriter Stream to store the encoded symbols.
      *
      * @return bool True if the input stream was successfully encoded.
      */
-    bool encodeStream(
+    bool encodeSymbols(
         std::vector<HuffmanCode> &,
         const stream_buffer_type &,
         BitStreamWriter &) const noexcept;
 
     /**
-     * Decode an encoded input stream with a Huffman table.
+     * Decode symbols from an encoded input stream with a Huffman table.
      *
-     * @param HuffmanTable Pointer to the first entry of the Huffman table.
-     * @param BitStreamReader Stream holding the contents to decode.
-     * @param ostream Stream to store the decoded contents.
+     * @param HuffmanTable Pointer to the Huffman table to decode with.
+     * @param BitStreamReader Stream holding the symbols to decode.
+     * @param ostream Stream to store the decoded symbols.
      *
      * @return bool True if the input stream was successfully decoded.
      */
     bool
-    decodeStream(const HuffmanTable *, BitStreamReader &, std::ostream &) const
+    decodeSymbols(const HuffmanTable *, BitStreamReader &, std::ostream &) const
         noexcept;
 };
 

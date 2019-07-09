@@ -78,13 +78,6 @@ struct HuffmanTable
      */
     HuffmanTable();
 
-    /**
-     * Determine if this entry is a symbol entry by checking if it has children.
-     *
-     * @return bool True if this entry is a symbol entry.
-     */
-    bool IsSymbol() const;
-
     symbol_type m_symbol;
 
     HuffmanTable *m_left;
