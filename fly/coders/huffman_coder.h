@@ -11,6 +11,7 @@ namespace fly {
 
 struct HuffmanCode;
 struct HuffmanNode;
+struct HuffmanTable;
 class BitStreamReader;
 class BitStreamWriter;
 
@@ -119,16 +120,13 @@ private:
         noexcept;
 
     /**
-     * Create a Huffman tree from the given list of Huffman codes. The created
-     * Huffman tree will not contain valid frequencies because that information
-     * is not stored in Huffman codes; it is not needed for decoding.
+     * Create a Huffman table from the given list of Huffman codes.
      *
      * @param vector List of Huffman codes to parse.
-     *
-     * @return unique_ptr Scoped pointer to the root node of the Huffman tree.
+     * @param HuffmanTable Pointer to the Huffman table to fill.
      */
-    std::unique_ptr<HuffmanNode>
-    createTree(const std::vector<HuffmanCode> &) const noexcept;
+    void createTable(const std::vector<HuffmanCode> &, HuffmanTable *) const
+        noexcept;
 
     /**
      * Create a list of Huffman codes from the given Huffman tree. The returned
@@ -189,18 +187,17 @@ private:
         BitStreamWriter &) const noexcept;
 
     /**
-     * Decode an encoded input stream with a Huffman tree.
+     * Decode an encoded input stream with a Huffman table.
      *
-     * @param unique_ptr Scoped pointer to the root node of the Huffman tree.
+     * @param HuffmanTable Pointer to the first entry of the Huffman table.
      * @param BitStreamReader Stream holding the contents to decode.
      * @param ostream Stream to store the decoded contents.
      *
      * @return bool True if the input stream was successfully decoded.
      */
-    bool decodeStream(
-        const std::unique_ptr<HuffmanNode> &,
-        BitStreamReader &,
-        std::ostream &) const noexcept;
+    bool
+    decodeStream(const HuffmanTable *, BitStreamReader &, std::ostream &) const
+        noexcept;
 };
 
 } // namespace fly

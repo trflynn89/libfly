@@ -82,3 +82,21 @@ TEST_F(HuffmanCoderTest, LargeMirrorTest)
     EXPECT_GT(pre.size(), enc.size());
     EXPECT_EQ(pre, dec);
 }
+
+//==============================================================================
+TEST_F(HuffmanCoderTest, UnicodeTest)
+{
+    std::string pre = "🍕😅😅🍕❤️🍕";
+    std::string enc, dec;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        pre += pre;
+    }
+
+    ASSERT_TRUE(m_coder.EncodeString(pre, enc));
+    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+
+    EXPECT_GT(pre.size(), enc.size());
+    EXPECT_EQ(pre, dec);
+}

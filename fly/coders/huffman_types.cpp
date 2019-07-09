@@ -74,6 +74,17 @@ void HuffmanNode::Print(int depth)
 }
 
 //==============================================================================
+HuffmanTable::HuffmanTable() : m_symbol(0), m_left(nullptr), m_right(nullptr)
+{
+}
+
+//==============================================================================
+bool HuffmanTable::IsSymbol() const
+{
+    return (m_left == nullptr);
+}
+
+//==============================================================================
 HuffmanCode::HuffmanCode() : m_symbol(0), m_code(0), m_length(0)
 {
 }

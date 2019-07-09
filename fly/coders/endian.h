@@ -35,7 +35,7 @@ enum class Endian : std::uint16_t
     Big = __ORDER_BIG_ENDIAN__,
     Native = __BYTE_ORDER__
 #else
-#    error Unknown byte swapping methods.
+#    error Unknown system endianness.
 #endif
 };
 

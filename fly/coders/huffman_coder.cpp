@@ -112,8 +112,10 @@ bool HuffmanCoder::DecodeInternal(
 
     if (decodeCodes(input, codes))
     {
-        const std::unique_ptr<HuffmanNode> root = createTree(codes);
-        return decodeStream(root, input, output);
+        HuffmanTable table[s_maxSymbols];
+        createTable(codes, table);
+
+        return decodeStream(table, input, output);
     }
 
     return false;
@@ -187,35 +189,34 @@ HuffmanCoder::createTree(const stream_buffer_type &input) const noexcept
 }
 
 //==============================================================================
-std::unique_ptr<HuffmanNode>
-HuffmanCoder::createTree(const std::vector<HuffmanCode> &codes) const noexcept
+void HuffmanCoder::createTable(
+    const std::vector<HuffmanCode> &codes,
+    HuffmanTable *table) const noexcept
 {
-    auto root = std::make_unique<HuffmanNode>();
+    code_type index = 0;
 
     for (const HuffmanCode &code : codes)
     {
-        auto *node = root.get();
+        HuffmanTable *entry = table;
 
         // Follow the path defined by the Huffman code, creating intermediate
-        // nodes along the way as needed.
+        // entries along the way as needed.
         for (code_type shift = code.m_length; shift != 0; --shift)
         {
-            if (node->IsSymbol())
+            if (entry->IsSymbol())
             {
-                // Convert the current node to an intermediate node
-                node->m_left = std::make_unique<HuffmanNode>();
-                node->m_right = std::make_unique<HuffmanNode>();
+                // Convert the current entry to an intermediate entry.
+                entry->m_left = &table[++index];
+                entry->m_right = &table[++index];
             }
 
             const bool left = (((code.m_code >> (shift - 1)) & 0x1) == 0);
-            node = left ? node->m_left.get() : node->m_right.get();
+            entry = left ? entry->m_left : entry->m_right;
         }
 
         // Store the symbol at the end of the path
-        node->m_symbol = code.m_symbol;
+        entry->m_symbol = code.m_symbol;
     }
-
-    return root;
 }
 
 //==============================================================================
@@ -433,29 +434,26 @@ bool HuffmanCoder::encodeStream(
 
 //==============================================================================
 bool HuffmanCoder::decodeStream(
-    const std::unique_ptr<HuffmanNode> &root,
+    const HuffmanTable *table,
     BitStreamReader &input,
     std::ostream &output) const noexcept
 {
     static constexpr const std::size_t bufferSize = 1 << 20;
 
-    HuffmanNode *node = root.get();
+    const HuffmanTable *entry = table;
     bool right;
 
     stream_buffer_type::value_type data[bufferSize];
     std::size_t bytes = 0;
 
-    while ((node != nullptr) && input.ReadBit(right))
+    while (input.ReadBit(right))
     {
-        if (node->m_right && node->m_left)
-        {
-            node = (right ? node->m_right.get() : node->m_left.get());
-        }
+        entry = right ? entry->m_right : entry->m_left;
 
-        if (!node->m_left || !node->m_right)
+        if (!entry->m_left)
         {
             data[bytes] =
-                static_cast<stream_buffer_type::value_type>(node->m_symbol);
+                static_cast<stream_buffer_type::value_type>(entry->m_symbol);
 
             if (++bytes == bufferSize)
             {
@@ -463,7 +461,7 @@ bool HuffmanCoder::decodeStream(
                 bytes = 0;
             }
 
-            node = root.get();
+            entry = table;
         }
     }
 

@@ -43,7 +43,7 @@ struct HuffmanNode
     HuffmanNode(std::unique_ptr<HuffmanNode>, std::unique_ptr<HuffmanNode>);
 
     /**
-     * Determine if this node is a symbol node by checking it is has children.
+     * Determine if this node is a symbol node by checking if it has children.
      *
      * @return bool True if this node is a symbol node.
      */
@@ -59,6 +59,36 @@ struct HuffmanNode
 
     std::unique_ptr<HuffmanNode> m_left;
     std::unique_ptr<HuffmanNode> m_right;
+};
+
+/**
+ * Struct to store data for a single entry in a Huffman table. Huffman tables
+ * are analogous to Huffman trees, stored in a contiguous array (rather than a
+ * binary tree on the heap) for faster traversal of the paths defined by Huffman
+ * codes. An entry represents either a symbol from the input stream or is an
+ * intermediate storing pointers to the next entries.
+ *
+ * @author Timothy Flynn (trflynn89@gmail.com)
+ * @version July 7, 2019
+ */
+struct HuffmanTable
+{
+    /**
+     * Default constructor. Set all fields to zero.
+     */
+    HuffmanTable();
+
+    /**
+     * Determine if this entry is a symbol entry by checking if it has children.
+     *
+     * @return bool True if this entry is a symbol entry.
+     */
+    bool IsSymbol() const;
+
+    symbol_type m_symbol;
+
+    HuffmanTable *m_left;
+    HuffmanTable *m_right;
 };
 
 /**

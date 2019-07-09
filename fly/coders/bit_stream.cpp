@@ -185,8 +185,7 @@ bool BitStreamReader::ReadBit(bool &bit) noexcept
         {
             return false;
         }
-
-        if (ReachedEndOfFile())
+        else if (ReachedEndOfFile())
         {
             // At end-of-file, discard any encoded zero-filled bits.
             const byte_type shift =
