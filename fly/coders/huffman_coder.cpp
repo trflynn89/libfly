@@ -156,9 +156,7 @@ bool HuffmanCoder::createTree(
             return false;
         }
 
-        node->m_symbol = symbol;
-        node->m_frequency = counts[symbol];
-
+        node->BecomeSymbol(symbol, counts[symbol]);
         queue.push(node);
     }
 
@@ -179,18 +177,12 @@ bool HuffmanCoder::createTree(
             return false;
         }
 
-        node->m_frequency = left->m_frequency + right->m_frequency;
-        node->m_left = left;
-        node->m_right = right;
-
+        node->BecomeIntermediate(left, right);
         queue.push(node);
     }
 
     HuffmanNode *node = queue.top();
-    root->m_symbol = node->m_symbol;
-    root->m_frequency = node->m_frequency;
-    root->m_left = node->m_left;
-    root->m_right = node->m_right;
+    *root = *node;
 
     return true;
 }
@@ -216,14 +208,13 @@ bool HuffmanCoder::createTree(
         HuffmanNode *node = root;
 
         // Follow the path defined by the Huffman code, creating intermediate
-        // entries along the way as needed.
+        // nodes along the way as needed.
         for (code_type shift = code.m_length; shift != 0; --shift)
         {
+            // Convert the current node to an intermediate node.
             if ((node->m_left == nullptr) || (node->m_right == nullptr))
             {
-                // Convert the current node to an intermediate node.
-                node->m_left = next_node();
-                node->m_right = next_node();
+                node->BecomeIntermediate(next_node(), next_node());
 
                 if ((node->m_left == nullptr) || (node->m_right == nullptr))
                 {
@@ -231,12 +222,12 @@ bool HuffmanCoder::createTree(
                 }
             }
 
-            const bool left = (((code.m_code >> (shift - 1)) & 0x1) == 0);
-            node = left ? node->m_left : node->m_right;
+            const bool right = (code.m_code >> (shift - 1)) & 0x1;
+            node = right ? node->m_right : node->m_left;
         }
 
         // Store the symbol at the end of the path
-        node->m_symbol = code.m_symbol;
+        node->BecomeSymbol(code.m_symbol, 0);
     }
 
     return true;

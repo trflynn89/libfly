@@ -31,9 +31,26 @@ typedef std::priority_queue<
 struct HuffmanNode
 {
     /**
-     * Default constructor. Set all fields to zero.
+     * Default constructor. Set all fields to zero/null.
      */
-    HuffmanNode();
+    HuffmanNode() noexcept;
+
+    /**
+     * Change this node to represent a symbol from the input stream.
+     *
+     * @param symbol_type The symbol from the input stream.
+     * @param frequency_type The frequency of the symbol in the input stream.
+     */
+    void BecomeSymbol(symbol_type, frequency_type) noexcept;
+
+    /**
+     * Change this node to represent an intermediate, non-symbol. Its frequency
+     * is set to the sum of its children's frequencies.
+     *
+     * @param HuffmanNode Pointer to the intermediate's left child.
+     * @param HuffmanNode Pointer to the intermediate's right child.
+     */
+    void BecomeIntermediate(HuffmanNode *, HuffmanNode *) noexcept;
 
     symbol_type m_symbol;
     frequency_type m_frequency;
@@ -43,7 +60,7 @@ struct HuffmanNode
 };
 
 /**
- * Comparator for HuffmanNode to be sorted such that the entry with the lowest
+ * Comparator for HuffmanNode to be sorted such that the node with the lowest
  * frequency has the highest priority.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
@@ -51,7 +68,7 @@ struct HuffmanNode
  */
 struct HuffmanNodeComparator
 {
-    bool operator()(const HuffmanNode *left, const HuffmanNode *right);
+    bool operator()(const HuffmanNode *left, const HuffmanNode *right) noexcept;
 };
 
 /**
@@ -65,7 +82,7 @@ struct HuffmanCode
     /**
      * Default constructor. Set all fields to zero.
      */
-    HuffmanCode();
+    HuffmanCode() noexcept;
 
     /**
      * Constructor.
@@ -74,7 +91,7 @@ struct HuffmanCode
      * @param code_type The Huffman code for the symbol.
      * @param code_type The number of bits in the Huffman code.
      */
-    HuffmanCode(const symbol_type, const code_type, const code_type);
+    HuffmanCode(const symbol_type, const code_type, const code_type) noexcept;
 
     symbol_type m_symbol;
     code_type m_code;

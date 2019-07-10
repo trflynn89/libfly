@@ -40,6 +40,9 @@ protected:
      *     5. Encode the canonical codes.
      *     6. Encode the input stream using the canonical codes.
      *
+     * This sequence involves iterating over the entire input stream twice (to
+     * create the Huffman tree and to encode the stream).
+     *
      * Step 1 is a large speed optimization. On a 100MB file, compiled with -02,
      * creating the Huffman tree alone took upwards of 5 seconds when reading
      * the input stream one symbol at a time. Reading the entire stream at once,
@@ -47,13 +50,10 @@ protected:
      * acceptable input size is limited by system memory; step 1 should be
      * changed to read the stream in large chunks.
      *
-     * This sequence involves iterating over the entire input stream twice (to
-     * create the Huffman tree and to encode the stream).
-     *
-     * The coder does not assume the Huffman codes are retained between by the
-     * caller. Thus, the codes are encoded before the input stream (step 6) so
-     * that they may be learned during decoding. Canonical form is used for its
-     * property of generally being describable in fewer bits than standard form.
+     * The coder does not assume the Huffman codes are retained between calls.
+     * Thus, the codes are encoded before the input stream (step 5) so that they
+     * may be learned during decoding. Canonical form is used for its property
+     * of generally being describable in fewer bits than standard form.
      *
      * When in canonical form, the Huffman codes are sorted by code length. With
      * this sorting, the count of the number of symbols for each code length is
@@ -66,7 +66,7 @@ protected:
      *
      * Where S<n> is all symbols of code length <n>.
      *
-     * Encoding the input stream (step 5) consists of reading each symbol from
+     * Encoding the input stream (step 6) consists of reading each symbol from
      * the input stream and outputting that symbol's canonical Huffman code.
      *
      * @param istream Stream holding the contents to encode.

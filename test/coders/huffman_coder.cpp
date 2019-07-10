@@ -18,9 +18,10 @@ protected:
 TEST_F(HuffmanCoderTest, EmptyTest)
 {
     const std::string pre;
-    std::string enc;
+    std::string enc, dec;
 
-    ASSERT_FALSE(m_coder.EncodeString(pre, enc));
+    EXPECT_FALSE(m_coder.EncodeString(pre, enc));
+    EXPECT_FALSE(m_coder.DecodeString(enc, dec));
 }
 
 //==============================================================================
