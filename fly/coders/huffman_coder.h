@@ -3,7 +3,6 @@
 #include "fly/coders/coder.h"
 
 #include <istream>
-#include <memory>
 #include <ostream>
 #include <vector>
 
@@ -11,7 +10,6 @@ namespace fly {
 
 struct HuffmanCode;
 struct HuffmanNode;
-struct HuffmanTable;
 class BitStreamReader;
 class BitStreamWriter;
 
@@ -113,33 +111,32 @@ private:
      * Create a Huffman tree from the given input stream.
      *
      * @param stream_buffer_type Buffer holding the contents to parse.
+     * @param HuffmanNode Pointer to the Huffman tree to fill.
      *
-     * @return unique_ptr Scoped pointer to the root node of the Huffman tree.
+     * @return bool True if the Huffman tree was successfully created.
      */
-    std::unique_ptr<HuffmanNode> createTree(const stream_buffer_type &) const
-        noexcept;
+    bool createTree(const stream_buffer_type &, HuffmanNode *) const noexcept;
 
     /**
-     * Create a Huffman table from the given list of Huffman codes.
+     * Create a Huffman tree from the given list of Huffman codes.
      *
      * @param vector List of Huffman codes to parse.
-     * @param HuffmanTable Pointer to the Huffman table to fill.
+     * @param HuffmanNode Pointer to the Huffman tree to fill.
      *
-     * @return bool True if the Huffman table was successfully created.
+     * @return bool True if the Huffman tree was successfully created.
      */
-    bool createTable(const std::vector<HuffmanCode> &, HuffmanTable *) const
+    bool createTree(const std::vector<HuffmanCode> &, HuffmanNode *) const
         noexcept;
 
     /**
      * Create a list of Huffman codes from the given Huffman tree. The returned
      * list of codes are sorted in accordance with canonical form.
      *
-     * @param unique_ptr Scoped pointer to the root node of the Huffman tree.
+     * @param HuffmanNode Pointer to the root node of the Huffman tree.
      *
      * @return vector List of created Huffman codes.
      */
-    std::vector<HuffmanCode>
-    createCodes(const std::unique_ptr<HuffmanNode> &) const noexcept;
+    std::vector<HuffmanCode> createCodes(HuffmanNode *) const noexcept;
 
     /**
      * Convert a list of standard Huffman codes into canonical Huffman codes. It
@@ -189,16 +186,16 @@ private:
         BitStreamWriter &) const noexcept;
 
     /**
-     * Decode symbols from an encoded input stream with a Huffman table.
+     * Decode symbols from an encoded input stream with a Huffman tree.
      *
-     * @param HuffmanTable Pointer to the Huffman table to decode with.
+     * @param HuffmanNode Pointer to the Huffman tree to decode with.
      * @param BitStreamReader Stream holding the symbols to decode.
      * @param ostream Stream to store the decoded symbols.
      *
      * @return bool True if the input stream was successfully decoded.
      */
     bool
-    decodeSymbols(const HuffmanTable *, BitStreamReader &, std::ostream &) const
+    decodeSymbols(const HuffmanNode *, BitStreamReader &, std::ostream &) const
         noexcept;
 };
 

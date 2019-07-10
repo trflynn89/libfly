@@ -5,51 +5,11 @@
 
 #include <algorithm>
 #include <limits>
-#include <queue>
 #include <stack>
 
 namespace fly {
 
 namespace {
-
-    /**
-     * Comparator for HuffmanNode for use in HuffmanNodeQueue.
-     */
-    struct HuffmanNodeComparator
-    {
-        bool operator()(
-            const std::unique_ptr<HuffmanNode> &left,
-            const std::unique_ptr<HuffmanNode> &right)
-        {
-            // Reverse std::less so the least frequent symbol is on top.
-            return left->m_frequency > right->m_frequency;
-        }
-    };
-
-    /**
-     * Implementation of a std::priority_queue for HuffmanNode. This is needed
-     * because std::priority_queue::top() returns a const reference to the top
-     * value, which prevents using a std::unique_ptr as the value type (because
-     * the implication is that the value cannot be moved). To avoid this
-     * constraint, provides a method to internally pop-and-move the top value.
-     */
-    class HuffmanNodeQueue :
-        public std::priority_queue<
-            std::unique_ptr<HuffmanNode>,
-            std::vector<std::unique_ptr<HuffmanNode>>,
-            HuffmanNodeComparator>
-    {
-    public:
-        value_type PopTop()
-        {
-            std::pop_heap(this->c.begin(), this->c.end(), this->comp);
-
-            value_type top = std::move(this->c.back());
-            this->c.pop_back();
-
-            return top;
-        }
-    };
 
     /**
      * Create and insert a new Huffman code into a list of already sorted codes.
@@ -84,7 +44,7 @@ namespace {
     constexpr const symbol_type s_maxSymbols =
         std::numeric_limits<symbol_type>::max();
 
-    constexpr const symbol_type s_huffmanTableSize = 128;
+    constexpr const symbol_type s_huffmanTreeSize = 128;
 
 } // namespace
 
@@ -94,15 +54,22 @@ bool HuffmanCoder::EncodeInternal(
     BitStreamWriter &output) noexcept
 {
     const stream_buffer_type data = readStream(input);
-    std::vector<HuffmanCode> codes;
-    {
-        const std::unique_ptr<HuffmanNode> root = createTree(data);
+    HuffmanNode tree[s_huffmanTreeSize];
 
-        codes = std::move(createCodes(root));
+    if (createTree(data, tree))
+    {
+        std::vector<HuffmanCode> codes;
+
+        codes = std::move(createCodes(tree));
         convertToCanonicalForm(codes);
+
+        if (encodeCodes(codes, output))
+        {
+            return encodeSymbols(codes, data, output);
+        }
     }
 
-    return encodeCodes(codes, output) && encodeSymbols(codes, data, output);
+    return false;
 }
 
 //==============================================================================
@@ -114,11 +81,11 @@ bool HuffmanCoder::DecodeInternal(
 
     if (decodeCodes(input, codes))
     {
-        HuffmanTable table[s_huffmanTableSize];
+        HuffmanNode tree[s_huffmanTreeSize];
 
-        if (createTable(codes, table))
+        if (createTree(codes, tree))
         {
-            return decodeSymbols(table, input, output);
+            return decodeSymbols(tree, input, output);
         }
     }
 
@@ -145,12 +112,13 @@ HuffmanCoder::readStream(std::istream &input) const noexcept
 }
 
 //==============================================================================
-std::unique_ptr<HuffmanNode>
-HuffmanCoder::createTree(const stream_buffer_type &input) const noexcept
+bool HuffmanCoder::createTree(
+    const stream_buffer_type &input,
+    HuffmanNode *root) const noexcept
 {
     if (input.empty())
     {
-        return nullptr;
+        return false;
     }
 
     // Create a frequency map of each input symbol.
@@ -164,6 +132,16 @@ HuffmanCoder::createTree(const stream_buffer_type &input) const noexcept
     // Create a priority queue of HuffmanNode, sorted such that the least common
     // symbol is always on top.
     HuffmanNodeQueue queue;
+    std::size_t index = 0;
+
+    auto next_node = [&root, &index]() -> HuffmanNode * {
+        if (++index < s_huffmanTreeSize)
+        {
+            return &root[index];
+        }
+
+        return nullptr;
+    };
 
     for (symbol_type symbol = 0; symbol < s_maxSymbols; ++symbol)
     {
@@ -172,8 +150,16 @@ HuffmanCoder::createTree(const stream_buffer_type &input) const noexcept
             continue;
         }
 
-        auto node = std::make_unique<HuffmanNode>(symbol, counts[symbol]);
-        queue.push(std::move(node));
+        HuffmanNode *node = next_node();
+        if (node == nullptr)
+        {
+            return false;
+        }
+
+        node->m_symbol = symbol;
+        node->m_frequency = counts[symbol];
+
+        queue.push(node);
     }
 
     // Convert the priority queue to a Huffman tree. Remove the two least common
@@ -181,28 +167,45 @@ HuffmanCoder::createTree(const stream_buffer_type &input) const noexcept
     // node back into the priority queue. Continue until only the root remains.
     while (queue.size() > 1)
     {
-        auto left = std::move(queue.PopTop());
-        auto right = std::move(queue.PopTop());
+        auto *left = queue.top();
+        queue.pop();
 
-        auto node =
-            std::make_unique<HuffmanNode>(std::move(left), std::move(right));
-        queue.push(std::move(node));
+        auto *right = queue.top();
+        queue.pop();
+
+        HuffmanNode *node = next_node();
+        if (node == nullptr)
+        {
+            return false;
+        }
+
+        node->m_frequency = left->m_frequency + right->m_frequency;
+        node->m_left = left;
+        node->m_right = right;
+
+        queue.push(node);
     }
 
-    return std::move(queue.PopTop());
+    HuffmanNode *node = queue.top();
+    root->m_symbol = node->m_symbol;
+    root->m_frequency = node->m_frequency;
+    root->m_left = node->m_left;
+    root->m_right = node->m_right;
+
+    return true;
 }
 
 //==============================================================================
-bool HuffmanCoder::createTable(
+bool HuffmanCoder::createTree(
     const std::vector<HuffmanCode> &codes,
-    HuffmanTable *table) const noexcept
+    HuffmanNode *root) const noexcept
 {
     code_type index = 0;
 
-    auto next_entry = [&table, &index]() -> HuffmanTable * {
-        if (++index < s_huffmanTableSize)
+    auto next_node = [&root, &index]() -> HuffmanNode * {
+        if (++index < s_huffmanTreeSize)
         {
-            return &table[index];
+            return &root[index];
         }
 
         return nullptr;
@@ -210,54 +213,50 @@ bool HuffmanCoder::createTable(
 
     for (const HuffmanCode &code : codes)
     {
-        HuffmanTable *entry = table;
+        HuffmanNode *node = root;
 
         // Follow the path defined by the Huffman code, creating intermediate
         // entries along the way as needed.
         for (code_type shift = code.m_length; shift != 0; --shift)
         {
-            if ((entry->m_left == nullptr) || (entry->m_right == nullptr))
+            if ((node->m_left == nullptr) || (node->m_right == nullptr))
             {
-                // Convert the current entry to an intermediate entry.
-                entry->m_left = next_entry();
-                entry->m_right = next_entry();
+                // Convert the current node to an intermediate node.
+                node->m_left = next_node();
+                node->m_right = next_node();
 
-                if ((entry->m_left == nullptr) || (entry->m_right == nullptr))
+                if ((node->m_left == nullptr) || (node->m_right == nullptr))
                 {
                     return false;
                 }
             }
 
             const bool left = (((code.m_code >> (shift - 1)) & 0x1) == 0);
-            entry = left ? entry->m_left : entry->m_right;
+            node = left ? node->m_left : node->m_right;
         }
 
         // Store the symbol at the end of the path
-        entry->m_symbol = code.m_symbol;
+        node->m_symbol = code.m_symbol;
     }
 
     return true;
 }
 
 //==============================================================================
-std::vector<HuffmanCode>
-HuffmanCoder::createCodes(const std::unique_ptr<HuffmanNode> &root) const
+std::vector<HuffmanCode> HuffmanCoder::createCodes(HuffmanNode *root) const
     noexcept
 {
     std::vector<HuffmanCode> codes;
 
-    std::stack<HuffmanNode *> pending;
-    std::stack<HuffmanNode *> path;
+    std::stack<const HuffmanNode *> pending;
+    std::stack<const HuffmanNode *> path;
+    const HuffmanNode *node = nullptr;
 
-    // Symbol frequency is no longer needed, so use that field to form codes. Of
-    // course, this is only valid if the frequency storage is large enough.
-    static_assert(sizeof(frequency_type) >= sizeof(code_type));
-    HuffmanNode *node = root.get();
-
-    if (node != nullptr)
+    if (root != nullptr)
     {
-        node->m_frequency = 0;
-        pending.push(node);
+        // Symbol frequency is no longer needed. Use that field to form codes.
+        root->m_frequency = 0;
+        pending.push(root);
     }
 
     while (!pending.empty())
@@ -271,7 +270,7 @@ HuffmanCoder::createCodes(const std::unique_ptr<HuffmanNode> &root) const
         }
         else
         {
-            if (node->IsSymbol())
+            if ((node->m_left == nullptr) && (node->m_right == nullptr))
             {
                 const auto code = static_cast<code_type>(node->m_frequency);
                 const auto length = static_cast<code_type>(path.size());
@@ -280,10 +279,10 @@ HuffmanCoder::createCodes(const std::unique_ptr<HuffmanNode> &root) const
             else
             {
                 node->m_left->m_frequency = node->m_frequency << 1;
-                pending.push(node->m_left.get());
+                pending.push(node->m_left);
 
                 node->m_right->m_frequency = (node->m_frequency << 1) + 1;
-                pending.push(node->m_right.get());
+                pending.push(node->m_right);
             }
 
             path.push(node);
@@ -454,13 +453,13 @@ bool HuffmanCoder::encodeSymbols(
 
 //==============================================================================
 bool HuffmanCoder::decodeSymbols(
-    const HuffmanTable *table,
+    const HuffmanNode *root,
     BitStreamReader &input,
     std::ostream &output) const noexcept
 {
     static constexpr const std::size_t bufferSize = 1 << 20;
 
-    const HuffmanTable *entry = table;
+    const HuffmanNode *node = root;
     bool right;
 
     stream_buffer_type::value_type data[bufferSize];
@@ -468,12 +467,12 @@ bool HuffmanCoder::decodeSymbols(
 
     while (input.ReadBit(right))
     {
-        entry = right ? entry->m_right : entry->m_left;
+        node = right ? node->m_right : node->m_left;
 
-        if (!entry->m_left)
+        if (!node->m_left)
         {
             data[bytes] =
-                static_cast<stream_buffer_type::value_type>(entry->m_symbol);
+                static_cast<stream_buffer_type::value_type>(node->m_symbol);
 
             if (++bytes == bufferSize)
             {
@@ -481,7 +480,7 @@ bool HuffmanCoder::decodeSymbols(
                 bytes = 0;
             }
 
-            entry = table;
+            node = root;
         }
     }
 

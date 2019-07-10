@@ -1,13 +1,23 @@
 #pragma once
 
 #include <cstdint>
-#include <memory>
+#include <queue>
+#include <vector>
 
 namespace fly {
 
 typedef std::uint8_t symbol_type;
 typedef std::uint64_t frequency_type;
 typedef std::uint8_t code_type;
+
+struct HuffmanNode;
+struct HuffmanNodeComparator;
+
+typedef std::priority_queue<
+    HuffmanNode *,
+    std::vector<HuffmanNode *>,
+    HuffmanNodeComparator>
+    HuffmanNodeQueue;
 
 /**
  * Struct to store data for a single node in a Huffman tree. Huffman trees are
@@ -25,63 +35,23 @@ struct HuffmanNode
      */
     HuffmanNode();
 
-    /**
-     * Constructor for a symbol node.
-     *
-     * @param symbol_type The symbol from the input stream.
-     * @param frequency_type The frequency of the symbol in the input stream.
-     */
-    HuffmanNode(const symbol_type, const frequency_type);
-
-    /**
-     * Constructor for a junction node. This node's frequency is set to the sum
-     * of the children's frequencies.
-     *
-     * @return unique_ptr Scoped pointer to the left child of this junction.
-     * @return unique_ptr Scoped pointer to the right child of this junction.
-     */
-    HuffmanNode(std::unique_ptr<HuffmanNode>, std::unique_ptr<HuffmanNode>);
-
-    /**
-     * Determine if this node is a symbol node by checking if it has children.
-     *
-     * @return bool True if this node is a symbol node.
-     */
-    bool IsSymbol() const;
-
-    /**
-     * TODO remove.
-     */
-    void Print(int depth = 0);
-
     symbol_type m_symbol;
     frequency_type m_frequency;
 
-    std::unique_ptr<HuffmanNode> m_left;
-    std::unique_ptr<HuffmanNode> m_right;
+    HuffmanNode *m_left;
+    HuffmanNode *m_right;
 };
 
 /**
- * Struct to store data for a single entry in a Huffman table. Huffman tables
- * are analogous to Huffman trees, stored in a contiguous array (rather than a
- * binary tree on the heap) for faster traversal of the paths defined by Huffman
- * codes. An entry represents either a symbol from the input stream or is an
- * intermediate storing pointers to the next entries.
+ * Comparator for HuffmanNode to be sorted such that the entry with the lowest
+ * frequency has the highest priority.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 7, 2019
  */
-struct HuffmanTable
+struct HuffmanNodeComparator
 {
-    /**
-     * Default constructor. Set all fields to zero.
-     */
-    HuffmanTable();
-
-    symbol_type m_symbol;
-
-    HuffmanTable *m_left;
-    HuffmanTable *m_right;
+    bool operator()(const HuffmanNode *left, const HuffmanNode *right);
 };
 
 /**

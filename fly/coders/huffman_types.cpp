@@ -14,68 +14,10 @@ HuffmanNode::HuffmanNode() :
 }
 
 //==============================================================================
-HuffmanNode::HuffmanNode(
-    const symbol_type symbol,
-    const frequency_type frequency) :
-    m_symbol(symbol),
-    m_frequency(frequency),
-    m_left(nullptr),
-    m_right(nullptr)
+bool HuffmanNodeComparator::
+operator()(const HuffmanNode *left, const HuffmanNode *right)
 {
-}
-
-//==============================================================================
-HuffmanNode::HuffmanNode(
-    std::unique_ptr<HuffmanNode> left,
-    std::unique_ptr<HuffmanNode> right) :
-    m_symbol(0),
-    m_frequency(left && right ? left->m_frequency + right->m_frequency : 0),
-    m_left(std::move(left)),
-    m_right(std::move(right))
-{
-}
-
-//==============================================================================
-bool HuffmanNode::IsSymbol() const
-{
-    return (m_left == nullptr) && (m_right == nullptr);
-}
-
-//==============================================================================
-void HuffmanNode::Print(int depth)
-{
-    if (depth > 0)
-    {
-        std::cout << '|';
-
-        for (int i = 0; i < depth; ++i)
-        {
-            std::cout << "-";
-        }
-    }
-
-    if (m_symbol)
-    {
-        std::cout << m_symbol << " (" << m_frequency << ")\n";
-    }
-    else
-    {
-        std::cout << "[" << m_frequency << "]\n";
-    }
-
-    if (m_left)
-    {
-        m_left->Print(depth + 1);
-    }
-    if (m_right)
-    {
-        m_right->Print(depth + 1);
-    }
-}
-
-//==============================================================================
-HuffmanTable::HuffmanTable() : m_symbol(0), m_left(nullptr), m_right(nullptr)
-{
+    return left->m_frequency > right->m_frequency;
 }
 
 //==============================================================================
