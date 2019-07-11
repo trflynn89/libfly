@@ -20,8 +20,8 @@ TEST_F(HuffmanCoderTest, EmptyTest)
     const std::string pre;
     std::string enc, dec;
 
-    EXPECT_FALSE(m_coder.EncodeString(pre, enc));
-    EXPECT_FALSE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_coder.EncodeString(pre, enc));
+    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
 }
 
 //==============================================================================
