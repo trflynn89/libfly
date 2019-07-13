@@ -58,7 +58,7 @@ TEST(BitStreamTest, StreamTest)
         EXPECT_TRUE(bs.ReadBit(bit));
         EXPECT_TRUE(bit);
 
-        EXPECT_TRUE(bs.ReachedEndOfFile());
+        EXPECT_TRUE(bs.FullyConsumed());
         EXPECT_FALSE(bs.ReadBit(bit));
         EXPECT_FALSE(bs.ReadByte(byte));
     }

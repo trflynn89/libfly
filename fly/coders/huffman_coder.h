@@ -31,6 +31,19 @@ protected:
     /**
      * Huffman encode a stream.
      *
+     * If the input stream is large, in order to limit memory usage, the stream
+     * is encoded in chunks. Each chunk is treated as its own input stream, and
+     * the encoding sequence is repeated for each chunk.
+     *
+     * The first bytes of the output stream are reserved as a header. Currently,
+     * the header contains: the incurred BitStream header, the version of the
+     * Huffman coder used to encode the stream, and the maximum chunk length
+     * used to split large streams (in kilobytes):
+     *
+     *     |      8 bits      |        8 bits        |      16 bits      |
+     *     ---------------------------------------------------------------
+     *     | BitStream header | HuffmanCoder version | Chunk length (KB) |
+     *
      * The steps to encode a stream are:
      *
      *     1. Create a Huffman tree from the input stream.
@@ -41,10 +54,6 @@ protected:
      *
      * This sequence involves iterating over the entire input stream twice (to
      * create the Huffman tree and to encode the stream).
-     *
-     * If the input stream is large, in order to limit memory usage, the stream
-     * is encoded in chunks. Each chunk is treated as its own input stream, and
-     * the encoding sequence is repeated for each chunk.
      *
      * The coder does not assume the Huffman codes are retained between calls.
      * Thus, the codes are encoded before the input stream (step 4) so that they
@@ -103,22 +112,24 @@ private:
      * @param istream Stream holding the contents to read.
      * @param char_type Buffer to store the contents of the stream.
      *
-     * @return size_t The number of bytes that were read.
+     * @return uint32_t The number of bytes that were read.
      */
-    std::size_t readStream(std::istream &, std::istream::char_type *) const
+    std::uint32_t readStream(std::istream &, std::istream::char_type *) const
         noexcept;
 
     /**
      * Create a Huffman tree from the given input stream.
      *
      * @param char_type Buffer holding the contents to parse.
-     * @param size_t The number of bytes the buffer holds.
+     * @param uint32_t The number of bytes the buffer holds.
      * @param HuffmanNode Pointer to the Huffman tree to fill.
      *
      * @return bool True if the Huffman tree was successfully created.
      */
-    bool createTree(const std::istream::char_type *, std::size_t, HuffmanNode *)
-        const noexcept;
+    bool createTree(
+        const std::istream::char_type *,
+        std::uint32_t,
+        HuffmanNode *) const noexcept;
 
     /**
      * Create a Huffman tree from the given list of Huffman codes.
@@ -151,6 +162,38 @@ private:
     void convertToCanonicalForm(std::vector<HuffmanCode> &) const noexcept;
 
     /**
+     * Encode the header to the output stream.
+     *
+     * @param BitStreamWriter Stream to store the encoded header.
+     *
+     * @return bool True if the header was successfully encoded.
+     */
+    bool encodeHeader(BitStreamWriter &) const noexcept;
+
+    /**
+     * Decode the version of the encoder used to encode the stream, and invoke
+     * the header decoder associated with that version.
+     *
+     * @param BitStreamReader Stream storing the encoded header.
+     * @param uint32_t Location to store the maximum chunk size (in bytes).
+     *
+     * @return bool True if the header was successfully decoded.
+     */
+    bool decodeHeader(BitStreamReader &, std::uint32_t &) const noexcept;
+
+    /**
+     * Decode version 1 of the header. Extract the maximum chunk length the
+     * encoder used.
+     *
+     * @param BitStreamWriter Stream to store the encoded header.
+     * @param uint32_t Location to store the maximum chunk size (in bytes).
+     *
+     * @return bool True if the header was successfully encoded.
+     */
+    bool decodeHeaderVersion1(BitStreamReader &, std::uint32_t &) const
+        noexcept;
+
+    /**
      * Encode the Huffman codes to the output stream.
      *
      * @param vector List of Huffman codes to encode.
@@ -178,7 +221,7 @@ private:
      * for faster lookups.
      *
      * @param char_type Buffer holding the symbols to parse.
-     * @param size_t The number of bytes the buffer holds.
+     * @param uint32_t The number of bytes the buffer holds.
      * @param vector List of Huffman codes to encode with.
      * @param BitStreamWriter Stream to store the encoded symbols.
      *
@@ -186,7 +229,7 @@ private:
      */
     bool encodeSymbols(
         const std::istream::char_type *,
-        std::size_t,
+        std::uint32_t,
         std::vector<HuffmanCode> &,
         BitStreamWriter &) const noexcept;
 
@@ -199,9 +242,11 @@ private:
      *
      * @return bool True if the input stream was successfully decoded.
      */
-    bool
-    decodeSymbols(const HuffmanNode *, BitStreamReader &, std::ostream &) const
-        noexcept;
+    bool decodeSymbols(
+        BitStreamReader &,
+        std::uint32_t,
+        const HuffmanNode *,
+        std::ostream &) const noexcept;
 };
 
 } // namespace fly

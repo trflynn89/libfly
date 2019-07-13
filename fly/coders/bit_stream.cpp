@@ -185,7 +185,7 @@ bool BitStreamReader::ReadBit(bool &bit) noexcept
         {
             return false;
         }
-        else if (ReachedEndOfFile())
+        else if (m_stream.peek() == EOF)
         {
             // At end-of-file, discard any encoded zero-filled bits.
             const byte_type shift =
@@ -205,9 +205,14 @@ bool BitStreamReader::ReadBit(bool &bit) noexcept
 }
 
 //==============================================================================
-bool BitStreamReader::ReachedEndOfFile() const noexcept
+bool BitStreamReader::FullyConsumed() const noexcept
 {
-    return m_stream.eof() || (m_stream.good() && (m_stream.peek() == EOF));
+    if (m_stream.eof() || (m_stream.good() && (m_stream.peek() == EOF)))
+    {
+        return m_position == 0;
+    }
+
+    return false;
 }
 
 } // namespace fly

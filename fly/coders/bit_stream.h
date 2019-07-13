@@ -197,11 +197,12 @@ public:
     bool ReadBit(bool &) noexcept;
 
     /**
-     * Check if the stream has reached end-of-file.
+     * Check if the stream has reached end-of-file and the byte buffer has been
+     * fully consumed.
      *
-     * @return bool True if the stream has reached end-of-file.
+     * @return bool True if the stream has been fully consumed.
      */
-    bool ReachedEndOfFile() const noexcept;
+    bool FullyConsumed() const noexcept;
 
 private:
     /**
