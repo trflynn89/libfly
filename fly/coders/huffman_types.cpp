@@ -1,7 +1,5 @@
 #include "fly/coders/huffman_types.h"
 
-#include <iostream>
-
 namespace fly {
 
 //==============================================================================
@@ -14,12 +12,34 @@ HuffmanNode::HuffmanNode() noexcept :
 }
 
 //==============================================================================
+HuffmanNode::HuffmanNode(HuffmanNode &&node) noexcept :
+    m_symbol(std::move(node.m_symbol)),
+    m_frequency(std::move(node.m_frequency)),
+    m_left(node.m_left),
+    m_right(node.m_right)
+{
+}
+
+//==============================================================================
+HuffmanNode &HuffmanNode::operator=(HuffmanNode &&node) noexcept
+{
+    m_symbol = std::move(node.m_symbol);
+    m_frequency = std::move(node.m_frequency);
+    m_left = node.m_left;
+    m_right = node.m_right;
+
+    return *this;
+}
+
+//==============================================================================
 void HuffmanNode::BecomeSymbol(
     symbol_type symbol,
     frequency_type frequency) noexcept
 {
     m_symbol = symbol;
     m_frequency = frequency;
+    m_left = nullptr;
+    m_right = nullptr;
 }
 
 //==============================================================================
@@ -27,6 +47,7 @@ void HuffmanNode::BecomeIntermediate(
     HuffmanNode *left,
     HuffmanNode *right) noexcept
 {
+    m_symbol = 0;
     m_frequency = left->m_frequency + right->m_frequency;
     m_left = left;
     m_right = right;
@@ -53,6 +74,35 @@ HuffmanCode::HuffmanCode(
     m_code(code),
     m_length(length)
 {
+}
+
+//==============================================================================
+HuffmanCode::HuffmanCode(HuffmanCode &&code) noexcept :
+    m_symbol(std::move(code.m_symbol)),
+    m_code(std::move(code.m_code)),
+    m_length(std::move(code.m_length))
+{
+}
+
+//==============================================================================
+HuffmanCode &HuffmanCode::operator=(HuffmanCode &&code) noexcept
+{
+    m_symbol = std::move(code.m_symbol);
+    m_code = std::move(code.m_code);
+    m_length = std::move(code.m_length);
+
+    return *this;
+}
+
+//==============================================================================
+bool operator<(const HuffmanCode &a, const HuffmanCode &b)
+{
+    if (a.m_length == b.m_length)
+    {
+        return a.m_symbol < b.m_symbol;
+    }
+
+    return a.m_length < b.m_length;
 }
 
 } // namespace fly

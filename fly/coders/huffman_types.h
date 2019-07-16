@@ -36,6 +36,32 @@ struct HuffmanNode
     HuffmanNode() noexcept;
 
     /**
+     * Deleted copy constructor.
+     */
+    HuffmanNode(const HuffmanNode &) = delete;
+
+    /**
+     * Move constructor. Move all member variables from the given HuffmanNode
+     * instance into this instance.
+     *
+     * @param HuffmanNode The HuffmanNode instance to move.
+     */
+    HuffmanNode(HuffmanNode &&) noexcept;
+
+    /**
+     * Deleted assignment operator.
+     */
+    HuffmanNode &operator=(const HuffmanNode &) = delete;
+
+    /**
+     * Move assignment operator. Move all member variables from the given
+     * HuffmanNode instance into this instance.
+     *
+     * @param HuffmanNode The HuffmanNode instance to move.
+     */
+    HuffmanNode &operator=(HuffmanNode &&) noexcept;
+
+    /**
      * Change this node to represent a symbol from the input stream.
      *
      * @param symbol_type The symbol from the input stream.
@@ -92,6 +118,43 @@ struct HuffmanCode
      * @param code_type The number of bits in the Huffman code.
      */
     HuffmanCode(const symbol_type, const code_type, const code_type) noexcept;
+
+    /**
+     * Deleted copy constructor.
+     */
+    HuffmanCode(const HuffmanCode &) = delete;
+
+    /**
+     * Move constructor. Move all member variables from the given HuffmanCode
+     * instance into this instance.
+     *
+     * @param HuffmanCode The HuffmanCode instance to move.
+     */
+    HuffmanCode(HuffmanCode &&) noexcept;
+
+    /**
+     * Deleted assignment operator.
+     */
+    HuffmanCode &operator=(const HuffmanCode &) = delete;
+
+    /**
+     * Move assignment operator. Move all member variables from the given
+     * HuffmanCode instance into this instance.
+     *
+     * @param HuffmanCode The HuffmanCode instance to move.
+     */
+    HuffmanCode &operator=(HuffmanCode &&) noexcept;
+
+    /**
+     * Less-than operator. Huffman codes are first compared by code length, and
+     * then by symbol value.
+     *
+     * @param HuffmanCode The first Huffman code to compare.
+     * @param HuffmanCode The second Huffman code to compare.
+     *
+     * @return bool True if the first Huffman code is less than the second.
+     */
+    friend bool operator<(const HuffmanCode &a, const HuffmanCode &b);
 
     symbol_type m_symbol;
     code_type m_code;

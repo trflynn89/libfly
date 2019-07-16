@@ -1,15 +1,15 @@
 #pragma once
 
 #include "fly/coders/coder.h"
+#include "fly/coders/huffman_types.h"
 
+#include <array>
 #include <istream>
 #include <ostream>
 #include <vector>
 
 namespace fly {
 
-struct HuffmanCode;
-struct HuffmanNode;
 class BitStreamReader;
 class BitStreamWriter;
 
@@ -107,6 +107,11 @@ protected:
 
 private:
     /**
+     * Reset internal data structures between encoding or decoding chunks.
+     */
+    void reset() noexcept;
+
+    /**
      * Read the stream into a buffer, up to a static maximum size.
      *
      * @param istream Stream holding the contents to read.
@@ -122,44 +127,41 @@ private:
      *
      * @param char_type Buffer holding the contents to parse.
      * @param uint32_t The number of bytes the buffer holds.
-     * @param HuffmanNode Pointer to the Huffman tree to fill.
      *
      * @return bool True if the Huffman tree was successfully created.
      */
-    bool createTree(
-        const std::istream::char_type *,
-        std::uint32_t,
-        HuffmanNode *) const noexcept;
+    bool createTree(const std::istream::char_type *, std::uint32_t) noexcept;
 
     /**
-     * Create a Huffman tree from the given list of Huffman codes.
-     *
-     * @param vector List of Huffman codes to parse.
-     * @param HuffmanNode Pointer to the Huffman tree to fill.
+     * Create a Huffman tree from the decoded list of Huffman codes.
      *
      * @return bool True if the Huffman tree was successfully created.
      */
-    bool createTree(const std::vector<HuffmanCode> &, HuffmanNode *) const
-        noexcept;
+    bool createTree() noexcept;
 
     /**
-     * Create a list of Huffman codes from the given Huffman tree. The returned
-     * list of codes are sorted in accordance with canonical form.
+     * Create a list of Huffman codes from the generated Huffman tree. The list
+     * of codes will be in canonical form.
      *
-     * @param HuffmanNode Pointer to the root node of the Huffman tree.
-     *
-     * @return vector List of created Huffman codes.
+     * @return bool True if the Huffman codes were successfully created.
      */
-    std::vector<HuffmanCode> createCodes(HuffmanNode *) const noexcept;
+    bool createCodes() noexcept;
 
     /**
-     * Convert a list of standard Huffman codes into canonical Huffman codes. It
-     * is assumed that the codes are already sorted in accordance with canonical
-     * form.
+     * Insert a new Huffman code into the list of already sorted codes.
      *
-     * @return vector List of standard Huffman codes to convert.
+     * @param HuffmanCode The Huffman code to insert.
+     *
+     * @return bool True if the Huffman code could be inserted.
      */
-    void convertToCanonicalForm(std::vector<HuffmanCode> &) const noexcept;
+    bool insertCode(HuffmanCode &&) noexcept;
+
+    /**
+     * Convert the generated list of standard Huffman codes into canonical form.
+     * It is assumed that the codes are already sorted in accordance with
+     * canonical form.
+     */
+    void convertToCanonicalForm() noexcept;
 
     /**
      * Encode the header to the output stream.
@@ -194,35 +196,30 @@ private:
         noexcept;
 
     /**
-     * Encode the Huffman codes to the output stream.
+     * Encode the generated Huffman codes to the output stream.
      *
-     * @param vector List of Huffman codes to encode.
      * @param BitStreamWriter Stream to store the encoded codes.
      *
      * @return bool True if the Huffman codes were successfully encoded.
      */
-    bool encodeCodes(const std::vector<HuffmanCode> &, BitStreamWriter &) const
-        noexcept;
+    bool encodeCodes(BitStreamWriter &) const noexcept;
 
     /**
      * Decode Huffman codes from an encoded input stream.
      *
      * @param BitStreamReader Stream storing the encoded codes.
-     * @param vector List to place the decoded codes into.
      *
      * @return bool True if the Huffman codes were successfully decoded.
      */
-    bool decodeCodes(BitStreamReader &, std::vector<HuffmanCode> &) const
-        noexcept;
+    bool decodeCodes(BitStreamReader &) noexcept;
 
     /**
-     * Encode symbols from an input stream with a list of Huffman codes. The
-     * list of codes is effectively destroyed as its elements are moved to a map
-     * for faster lookups.
+     * Encode symbols from an input stream with the generated list of Huffman
+     * codes. The list of codes is effectively destroyed as its elements are
+     * moved to a map for faster lookups.
      *
      * @param char_type Buffer holding the symbols to parse.
      * @param uint32_t The number of bytes the buffer holds.
-     * @param vector List of Huffman codes to encode with.
      * @param BitStreamWriter Stream to store the encoded symbols.
      *
      * @return bool True if the input stream was successfully encoded.
@@ -230,23 +227,27 @@ private:
     bool encodeSymbols(
         const std::istream::char_type *,
         std::uint32_t,
-        std::vector<HuffmanCode> &,
-        BitStreamWriter &) const noexcept;
+        BitStreamWriter &) noexcept;
 
     /**
      * Decode symbols from an encoded input stream with a Huffman tree.
      *
-     * @param HuffmanNode Pointer to the Huffman tree to decode with.
      * @param BitStreamReader Stream holding the symbols to decode.
+     * @param char_type Intermediate buffer to hold the decoded symbols.
+     * @param uint32_t The number of bytes the intermediate buffer can hold.
      * @param ostream Stream to store the decoded symbols.
      *
      * @return bool True if the input stream was successfully decoded.
      */
     bool decodeSymbols(
         BitStreamReader &,
+        std::ostream::char_type *,
         std::uint32_t,
-        const HuffmanNode *,
         std::ostream &) const noexcept;
+
+    std::array<HuffmanNode, 256> m_huffmanTree;
+    std::array<HuffmanCode, 256> m_huffmanCodes;
+    std::uint16_t m_huffmanCodesSize;
 };
 
 } // namespace fly

@@ -188,7 +188,7 @@ public:
      * Move constructor. Intializes the Json instance with the type and value
      * of another Json instance. The other Json instance is set to a null value.
      *
-     * @param Json The Json instance to copy.
+     * @param Json The Json instance to move.
      */
     Json(Json &&) noexcept;
 
