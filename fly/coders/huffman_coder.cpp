@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <stack>
 
 namespace fly {
@@ -27,14 +28,14 @@ bool HuffmanCoder::EncodeInternal(
         return false;
     }
 
-    std::istream::char_type data[s_chunkSize];
+    auto data = std::make_unique<std::istream::char_type[]>(s_chunkSize);
     std::uint32_t bytes = 0;
 
-    while ((bytes = readStream(input, data)) > 0)
+    while ((bytes = readStream(input, data.get())) > 0)
     {
         reset();
 
-        if (!createTree(data, bytes))
+        if (!createTree(data.get(), bytes))
         {
             return false;
         }
@@ -46,7 +47,7 @@ bool HuffmanCoder::EncodeInternal(
         {
             return false;
         }
-        else if (!encodeSymbols(data, bytes, output))
+        else if (!encodeSymbols(data.get(), bytes, output))
         {
             return false;
         }
@@ -67,7 +68,7 @@ bool HuffmanCoder::DecodeInternal(
         return false;
     }
 
-    std::ostream::char_type data[chunkSize];
+    auto data = std::make_unique<std::ostream::char_type[]>(chunkSize);
 
     while (!input.FullyConsumed())
     {
@@ -81,7 +82,7 @@ bool HuffmanCoder::DecodeInternal(
         {
             return false;
         }
-        else if (!decodeSymbols(input, data, chunkSize, output))
+        else if (!decodeSymbols(input, data.get(), chunkSize, output))
         {
             return false;
         }
@@ -521,7 +522,7 @@ bool HuffmanCoder::encodeSymbols(
     std::uint32_t inputSize,
     BitStreamWriter &output) noexcept
 {
-    HuffmanCode symbols[m_huffmanCodes.size()];
+    decltype(m_huffmanCodes) symbols;
 
     for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
     {
