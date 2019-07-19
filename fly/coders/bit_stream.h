@@ -196,6 +196,8 @@ public:
      */
     bool ReadBit(bool &) noexcept;
 
+    bool Refill() noexcept;
+
     /**
      * Check if the stream has reached end-of-file and the byte buffer has been
      * fully consumed.

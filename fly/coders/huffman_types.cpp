@@ -1,6 +1,40 @@
 #include "fly/coders/huffman_types.h"
 
+#include <iostream>
+
 namespace fly {
+
+//==============================================================================
+void HuffmanNode::Print(int depth) const
+{
+    if (depth > 0)
+    {
+        std::cout << '|';
+
+        for (int i = 0; i < depth; ++i)
+        {
+            std::cout << "-";
+        }
+    }
+
+    if (m_symbol)
+    {
+        std::cout << m_symbol << " (" << m_frequency << ")\n";
+    }
+    else
+    {
+        std::cout << "[" << m_frequency << "]\n";
+    }
+
+    if (m_left)
+    {
+        m_left->Print(depth + 1);
+    }
+    if (m_right)
+    {
+        m_right->Print(depth + 1);
+    }
+}
 
 //==============================================================================
 HuffmanNode::HuffmanNode() noexcept :

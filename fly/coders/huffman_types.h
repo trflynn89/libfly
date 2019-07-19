@@ -30,6 +30,8 @@ typedef std::priority_queue<
  */
 struct HuffmanNode
 {
+    void Print(int depth=0) const;
+
     /**
      * Default constructor. Set all fields to zero/null.
      */

@@ -7,6 +7,9 @@
 #include <memory>
 #include <stack>
 
+#include <iostream>
+#include <bitset>
+
 namespace fly {
 
 namespace {
@@ -78,10 +81,10 @@ bool HuffmanCoder::DecodeInternal(
         {
             return false;
         }
-        else if (!createTree())
-        {
-            return false;
-        }
+        // else if (!createTree())
+        // {
+        //     return false;
+        // }
         else if (!decodeSymbols(input, data.get(), chunkSize, output))
         {
             return false;
@@ -550,29 +553,66 @@ bool HuffmanCoder::decodeSymbols(
     BitStreamReader &input,
     std::ostream::char_type *data,
     std::uint32_t chunkSize,
-    std::ostream &output) const noexcept
+    std::ostream &output) noexcept
 {
-    const HuffmanNode *node = &m_huffmanTree[0];
+    decltype(m_huffmanCodes) codes;
+
+    for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
+    {
+        HuffmanCode code = std::move(m_huffmanCodes[i]);
+        codes[code.m_code] = std::move(code);
+    }
 
     std::uint32_t bytes = 0;
     bool right;
 
+    code_type code = 0;
+    code_type length = 0;
+
     while (input.ReadBit(right))
     {
-        node = right ? node->m_right : node->m_left;
+        code = (code << 1) | right;
+        length += 1;
 
-        if (!node->m_left)
+        const HuffmanCode &candidate = codes[code];
+
+        if (candidate.m_length == length)
         {
-            data[bytes] = static_cast<std::ostream::char_type>(node->m_symbol);
+            data[bytes] = static_cast<std::ostream::char_type>(candidate.m_symbol);
 
             if (++bytes == chunkSize)
             {
                 break;
             }
 
-            node = &m_huffmanTree[0];
+            code = 0;
+            length = 0;
+
+            input.Refill();
         }
     }
+
+    // const HuffmanNode *node = &m_huffmanTree[0];
+
+    // std::uint32_t bytes = 0;
+    // bool right;
+
+    // while (input.ReadBit(right))
+    // {
+    //     node = right ? node->m_right : node->m_left;
+
+    //     if (!node->m_left)
+    //     {
+    //         data[bytes] = static_cast<std::ostream::char_type>(node->m_symbol);
+
+    //         if (++bytes == chunkSize)
+    //         {
+    //             break;
+    //         }
+
+    //         node = &m_huffmanTree[0];
+    //     }
+    // }
 
     if (bytes > 0)
     {

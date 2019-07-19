@@ -243,7 +243,7 @@ private:
         BitStreamReader &,
         std::ostream::char_type *,
         std::uint32_t,
-        std::ostream &) const noexcept;
+        std::ostream &) noexcept;
 
     std::array<HuffmanNode, 256> m_huffmanTree;
     std::array<HuffmanCode, 256> m_huffmanCodes;

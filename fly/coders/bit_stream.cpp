@@ -1,5 +1,8 @@
 #include "fly/coders/bit_stream.h"
 
+#include <bitset>
+#include <iostream>
+
 namespace fly {
 
 namespace {
@@ -177,30 +180,56 @@ bool BitStreamReader::ReadByte(byte_type &byte) noexcept
 //==============================================================================
 bool BitStreamReader::ReadBit(bool &bit) noexcept
 {
-    if (m_position == 0)
+    if ((m_position == 0) && !Refill())
     {
-        const byte_type bytesRead = fill(m_buffer, s_bufferTypeSize);
-
-        if (bytesRead == 0)
-        {
-            return false;
-        }
-        else if (m_stream.peek() == EOF)
-        {
-            // At end-of-file, discard any encoded zero-filled bits.
-            const byte_type shift =
-                (s_bufferTypeSize - bytesRead) * s_bitsPerByte + m_remainder;
-
-            m_position = s_mostSignificantBitPosition - shift;
-            m_buffer >>= shift;
-        }
-        else
-        {
-            m_position = s_mostSignificantBitPosition;
-        }
+        return false;
     }
 
     bit = (m_buffer >> --m_position) & 0x1;
+    return true;
+}
+
+//==============================================================================
+bool BitStreamReader::Refill() noexcept
+{
+    const byte_type bitsToFill = s_mostSignificantBitPosition - m_position;
+    const byte_type bytesToFill = bitsToFill / s_bitsPerByte;
+
+    buffer_type buffer = 0;
+    const byte_type bytesRead = fill(buffer, bytesToFill);
+
+    if (bytesRead == 0)
+    {
+        return false;
+    }
+
+    const byte_type shift = s_mostSignificantBitPosition - bitsToFill;
+
+    if (bitsToFill == s_mostSignificantBitPosition)
+    {
+        m_buffer = 0;
+    }
+    else
+    {
+        m_buffer <<= bitsToFill;
+    }
+
+    m_buffer |= (buffer >> shift);
+
+    if (m_stream.peek() == EOF)
+    {
+        // At end-of-file, discard any encoded zero-filled bits.
+        const byte_type shift =
+            (s_bufferTypeSize - bytesRead) * s_bitsPerByte + m_remainder;
+
+        m_position = s_mostSignificantBitPosition - shift;
+        m_buffer >>= shift;
+    }
+    else
+    {
+        m_position = s_mostSignificantBitPosition;
+    }
+
     return true;
 }
 
