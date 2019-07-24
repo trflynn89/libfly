@@ -245,6 +245,11 @@ private:
         std::uint32_t,
         std::ostream &) noexcept;
 
+    bool decodeSymbol(
+        BitStreamReader &,
+        code_type,
+        symbol_type &) noexcept;
+
     std::array<HuffmanNode, 256> m_huffmanTree;
     std::array<HuffmanCode, 256> m_huffmanCodes;
     std::uint16_t m_huffmanCodesSize;

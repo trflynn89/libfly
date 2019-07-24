@@ -549,6 +549,25 @@ bool HuffmanCoder::encodeSymbols(
 }
 
 //==============================================================================
+bool HuffmanCoder::decodeSymbol(
+    BitStreamReader &input,
+    code_type maxCodeLength,
+    symbol_type &output) noexcept;
+{
+    if (input.Refill())
+    {
+        buffer_type n = input.bits() >> (64 - maxCodeLength);
+
+        int len = bits_to_len_[n];
+        br_.DiscardBits(len);
+        return bits_to_sym_[n];
+    }
+
+    return false;
+
+}
+
+//==============================================================================
 bool HuffmanCoder::decodeSymbols(
     BitStreamReader &input,
     std::ostream::char_type *data,
@@ -556,9 +575,12 @@ bool HuffmanCoder::decodeSymbols(
     std::ostream &output) noexcept
 {
     decltype(m_huffmanCodes) codes;
+    code_type maxCodeLength = 0;
 
     for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
     {
+        maxCodeLength = std::max(maxCodeLength, code.m_length);
+
         HuffmanCode code = std::move(m_huffmanCodes[i]);
         codes[code.m_code] = std::move(code);
     }
@@ -587,8 +609,6 @@ bool HuffmanCoder::decodeSymbols(
 
             code = 0;
             length = 0;
-
-            input.Refill();
         }
     }
 

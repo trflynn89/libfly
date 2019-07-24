@@ -1,8 +1,5 @@
 #include "fly/coders/bit_stream.h"
 
-#include <bitset>
-#include <iostream>
-
 namespace fly {
 
 namespace {
@@ -193,41 +190,35 @@ bool BitStreamReader::ReadBit(bool &bit) noexcept
 bool BitStreamReader::Refill() noexcept
 {
     const byte_type bitsToFill = s_mostSignificantBitPosition - m_position;
-    const byte_type bytesToFill = bitsToFill / s_bitsPerByte;
-
     buffer_type buffer = 0;
-    const byte_type bytesRead = fill(buffer, bytesToFill);
 
-    if (bytesRead == 0)
+    const byte_type bytesRead = fill(buffer, bitsToFill / s_bitsPerByte);
+    const byte_type bitsRead = bytesRead * s_bitsPerByte;
+
+    if (bitsRead == 0)
     {
         return false;
     }
-
-    const byte_type shift = s_mostSignificantBitPosition - bitsToFill;
-
-    if (bitsToFill == s_mostSignificantBitPosition)
+    else if (bitsRead == s_mostSignificantBitPosition)
     {
-        m_buffer = 0;
+        // It is undefined behavior to bitshift by the size of the value being
+        // shifted, so handle that case specifically.
+        m_position = bitsRead;
+        m_buffer = buffer;
     }
     else
     {
-        m_buffer <<= bitsToFill;
-    }
+        m_position += bitsRead;
 
-    m_buffer |= (buffer >> shift);
+        m_buffer <<= bitsRead;
+        m_buffer |= (buffer >> (s_mostSignificantBitPosition - bitsRead));
+    }
 
     if (m_stream.peek() == EOF)
     {
         // At end-of-file, discard any encoded zero-filled bits.
-        const byte_type shift =
-            (s_bufferTypeSize - bytesRead) * s_bitsPerByte + m_remainder;
-
-        m_position = s_mostSignificantBitPosition - shift;
-        m_buffer >>= shift;
-    }
-    else
-    {
-        m_position = s_mostSignificantBitPosition;
+        m_position -= m_remainder;
+        m_buffer >>= m_remainder;
     }
 
     return true;

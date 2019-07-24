@@ -206,6 +206,9 @@ public:
      */
     bool FullyConsumed() const noexcept;
 
+    symbol_type bits() const noexcept { return m_buffer; }
+    void DiscardBits(byte_type length) noexcept { m_position += length; }
+
 private:
     /**
      * Read from the stream to fill a byte buffer.
