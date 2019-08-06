@@ -7,9 +7,6 @@
 #include <memory>
 #include <stack>
 
-#include <iostream>
-#include <bitset>
-
 namespace fly {
 
 namespace {
@@ -81,10 +78,6 @@ bool HuffmanCoder::DecodeInternal(
         {
             return false;
         }
-        // else if (!createTree())
-        // {
-        //     return false;
-        // }
         else if (!decodeSymbols(input, data.get(), chunkSize, output))
         {
             return false;
@@ -195,51 +188,6 @@ bool HuffmanCoder::createTree(
 
     HuffmanNode *node = queue.top();
     m_huffmanTree[0] = std::move(*node);
-
-    return true;
-}
-
-//==============================================================================
-bool HuffmanCoder::createTree() noexcept
-{
-    std::uint16_t index = 0;
-
-    auto next_node = [this, &index]() -> HuffmanNode * {
-        if (++index < m_huffmanTree.size())
-        {
-            return &m_huffmanTree[index];
-        }
-
-        return nullptr;
-    };
-
-    for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
-    {
-        const HuffmanCode &code = m_huffmanCodes[i];
-        HuffmanNode *node = &m_huffmanTree[0];
-
-        // Follow the path defined by the Huffman code, creating intermediate
-        // nodes along the way as needed.
-        for (std::uint8_t shift = code.m_length; shift != 0; --shift)
-        {
-            // Convert the current node to an intermediate node.
-            if ((node->m_left == nullptr) || (node->m_right == nullptr))
-            {
-                node->BecomeIntermediate(next_node(), next_node());
-
-                if ((node->m_left == nullptr) || (node->m_right == nullptr))
-                {
-                    return false;
-                }
-            }
-
-            const bool right = (code.m_code >> (shift - 1)) & 0x1;
-            node = right ? node->m_right : node->m_left;
-        }
-
-        // Store the symbol at the end of the path
-        node->BecomeSymbol(code.m_symbol, 0);
-    }
 
     return true;
 }
@@ -516,7 +464,30 @@ bool HuffmanCoder::decodeCodes(BitStreamReader &input) noexcept
         }
     }
 
+    convertToPrefixTable(countsSize - 1);
     return true;
+}
+
+//==============================================================================
+void HuffmanCoder::convertToPrefixTable(std::uint8_t maxCodeLength) noexcept
+{
+    decltype(m_huffmanCodes) codes;
+
+    for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
+    {
+        HuffmanCode code = std::move(m_huffmanCodes[i]);
+        std::uint8_t shift = maxCodeLength - code.m_length;
+
+        for (std::uint16_t j = 0; j < (1 << shift); ++j)
+        {
+            code_type prefixed = (code.m_code << shift) + j;
+            codes[prefixed].m_symbol = code.m_symbol;
+            codes[prefixed].m_length = code.m_length;
+        }
+    }
+
+    m_huffmanCodesSize = maxCodeLength;
+    m_huffmanCodes.swap(codes);
 }
 
 //==============================================================================
@@ -549,90 +520,22 @@ bool HuffmanCoder::encodeSymbols(
 }
 
 //==============================================================================
-bool HuffmanCoder::decodeSymbol(
-    BitStreamReader &input,
-    code_type maxCodeLength,
-    symbol_type &output) noexcept;
-{
-    if (input.Refill())
-    {
-        buffer_type n = input.bits() >> (64 - maxCodeLength);
-
-        int len = bits_to_len_[n];
-        br_.DiscardBits(len);
-        return bits_to_sym_[n];
-    }
-
-    return false;
-
-}
-
-//==============================================================================
 bool HuffmanCoder::decodeSymbols(
     BitStreamReader &input,
     std::ostream::char_type *data,
     std::uint32_t chunkSize,
     std::ostream &output) noexcept
 {
-    decltype(m_huffmanCodes) codes;
-    code_type maxCodeLength = 0;
-
-    for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
-    {
-        maxCodeLength = std::max(maxCodeLength, code.m_length);
-
-        HuffmanCode code = std::move(m_huffmanCodes[i]);
-        codes[code.m_code] = std::move(code);
-    }
-
     std::uint32_t bytes = 0;
-    bool right;
+    byte_type prefix;
 
-    code_type code = 0;
-    code_type length = 0;
-
-    while (input.ReadBit(right))
+    while ((bytes < chunkSize) && input.PeekBits(m_huffmanCodesSize, prefix))
     {
-        code = (code << 1) | right;
-        length += 1;
+        HuffmanCode &code = m_huffmanCodes[prefix];
 
-        const HuffmanCode &candidate = codes[code];
-
-        if (candidate.m_length == length)
-        {
-            data[bytes] = static_cast<std::ostream::char_type>(candidate.m_symbol);
-
-            if (++bytes == chunkSize)
-            {
-                break;
-            }
-
-            code = 0;
-            length = 0;
-        }
+        data[bytes++] = static_cast<std::ostream::char_type>(code.m_symbol);
+        input.DiscardBits(code.m_length);
     }
-
-    // const HuffmanNode *node = &m_huffmanTree[0];
-
-    // std::uint32_t bytes = 0;
-    // bool right;
-
-    // while (input.ReadBit(right))
-    // {
-    //     node = right ? node->m_right : node->m_left;
-
-    //     if (!node->m_left)
-    //     {
-    //         data[bytes] = static_cast<std::ostream::char_type>(node->m_symbol);
-
-    //         if (++bytes == chunkSize)
-    //         {
-    //             break;
-    //         }
-
-    //         node = &m_huffmanTree[0];
-    //     }
-    // }
 
     if (bytes > 0)
     {

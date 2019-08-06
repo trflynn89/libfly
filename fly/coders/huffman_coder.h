@@ -44,7 +44,7 @@ protected:
      *     ---------------------------------------------------------------
      *     | BitStream header | HuffmanCoder version | Chunk length (KB) |
      *
-     * The steps to encode a stream are:
+     * The sequence to encode a stream is:
      *
      *     1. Create a Huffman tree from the input stream.
      *     2. Generate standard Huffman codes from the Huffman tree.
@@ -84,19 +84,27 @@ protected:
     /**
      * Huffman decode a stream.
      *
-     * The steps to decode a stream are:
-     *
-     *     1. Decode the canonical Huffman codes from the stream.
-     *     2. Create a partial Huffman tree from the canonical codes.
-     *     3. Decode the input stream using the Huffman tree.
-     *
-     * A complete Huffman tree would also contain symbol frequencies. This
-     * information is not required to decode the stream, so it is not encoded.
-     *
      * Because large input streams are encoded in chunks, they must also be
      * decoded in chunks. The input stream is decoded until either the end of
      * the stream or the chunk size is reached. The decoding sequence is then
      * repeated for each chunk.
+     *
+     * The sequence to decode a stream is:
+     *
+     *     1. Decode the canonical Huffman codes from the stream.
+     *     2. Convert the canonical codes to a prefix table.
+     *     3. Decode the input stream using the table.
+     *
+     * Prefix tables (step 2) function via the property that no Huffman code is
+     * a prefix of any other code. Thus, a table can be formed as an array,
+     * whose indices are integers where the most-significant bits are Huffman
+     * codes.
+     *
+     * Decoding a symbol the input stream (step 3) consists of peeking N bits
+     * from the input stream, where N is maximum length of the decoded Huffman
+     * codes. These bits are the index into the prefix table; a single lookup is
+     * performed to find the corresponding Huffman code. The actual length of
+     * the code is discarded from the input stream.
      *
      * @param BitStreamReader Stream holding the contents to decode.
      * @param ostream Stream to store the decoded contents.
@@ -205,13 +213,21 @@ private:
     bool encodeCodes(BitStreamWriter &) const noexcept;
 
     /**
-     * Decode Huffman codes from an encoded input stream.
+     * Decode Huffman codes from an encoded input stream. The list of codes will
+     * be stored as a prefix table.
      *
      * @param BitStreamReader Stream storing the encoded codes.
      *
      * @return bool True if the Huffman codes were successfully decoded.
      */
     bool decodeCodes(BitStreamReader &) noexcept;
+
+    /**
+     * Convert the decoded list of Huffman codes into a prefix table.
+     *
+     * @return bool True if the prefix table was successfully created.
+     */
+    void convertToPrefixTable(std::uint8_t) noexcept;
 
     /**
      * Encode symbols from an input stream with the generated list of Huffman
@@ -244,11 +260,6 @@ private:
         std::ostream::char_type *,
         std::uint32_t,
         std::ostream &) noexcept;
-
-    bool decodeSymbol(
-        BitStreamReader &,
-        code_type,
-        symbol_type &) noexcept;
 
     std::array<HuffmanNode, 256> m_huffmanTree;
     std::array<HuffmanCode, 256> m_huffmanCodes;

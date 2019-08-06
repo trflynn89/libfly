@@ -196,7 +196,27 @@ public:
      */
     bool ReadBit(bool &) noexcept;
 
-    bool Refill() noexcept;
+    /**
+     * Read a number of bits from the byte buffer without discarding those bits.
+     * The most-significant bits in the provided byte will be written. Fill the
+     * buffer from the stream if the number of bits to peek exceeds the number
+     * of bits available.
+     *
+     * @param byte_type The number of bits to peek.
+     * @param byte_type The location to store the peeked bits.
+     *
+     * @return bool True if any bits were successfully peeked and filling the
+     *              byte buffer was successful (if needed).
+     */
+    bool PeekBits(byte_type, byte_type &) noexcept;
+
+    /**
+     * Discard a number of bits from the byte buffer. Should only be used after
+     * a successful call to PeekBits.
+     *
+     * @param byte_type The number of bits to discard.
+     */
+    void DiscardBits(byte_type) noexcept;
 
     /**
      * Check if the stream has reached end-of-file and the byte buffer has been
@@ -206,10 +226,14 @@ public:
      */
     bool FullyConsumed() const noexcept;
 
-    symbol_type bits() const noexcept { return m_buffer; }
-    void DiscardBits(byte_type length) noexcept { m_position += length; }
-
 private:
+    /**
+     * Read from the stream to fill the byte buffer.
+     *
+     * @return bool True if any bits were actually read
+     */
+    bool refillBuffer() noexcept;
+
     /**
      * Read from the stream to fill a byte buffer.
      *
