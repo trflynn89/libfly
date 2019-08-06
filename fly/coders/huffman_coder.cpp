@@ -526,10 +526,11 @@ bool HuffmanCoder::decodeSymbols(
     std::uint32_t chunkSize,
     std::ostream &output) const noexcept
 {
+    const byte_type maxCodeLength = static_cast<byte_type>(m_huffmanCodesSize);
     std::uint32_t bytes = 0;
     byte_type index;
 
-    while ((bytes < chunkSize) && input.PeekBits(m_huffmanCodesSize, index))
+    while ((bytes < chunkSize) && input.PeekBits(maxCodeLength, index))
     {
         const HuffmanCode &code = m_huffmanCodes[index];
 
