@@ -19,6 +19,18 @@ namespace {
     constexpr const byte_type s_mostSignificantBitPosition =
         s_bufferTypeSize * s_bitsPerByte;
 
+    /**
+     * Create a bit-mask with the least-significant bits set.
+     *
+     * @param byte_type The number of bits to set.
+     *
+     * @return byte_type The created mask.
+     */
+    inline byte_type lsbMask(const byte_type bits)
+    {
+        return 0xff >> (s_bitsPerByte - bits);
+    }
+
 } // namespace
 
 //==============================================================================
@@ -79,7 +91,7 @@ bool BitStreamWriter::WriteBits(byte_type bits, byte_type size) noexcept
 
         // Then update the input bits to retain only those bits that have not
         // been written yet.
-        bits &= (0xff >> (s_bitsPerByte - diff));
+        bits &= lsbMask(diff);
         size = diff;
     }
 
@@ -155,53 +167,53 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
 //==============================================================================
 bool BitStreamReader::ReadByte(byte_type &byte) noexcept
 {
-    byte = 0;
-
-    for (byte_type shift = s_bitsPerByte; shift != 0; --shift)
+    if (PeekBits(s_bitsPerByte, byte))
     {
-        bool bit;
+        DiscardBits(s_bitsPerByte);
+        return true;
+    }
 
-        if (ReadBit(bit))
-        {
-            byte |= (bit << (shift - 1));
-        }
-        else
-        {
-            return false;
-        }
+    return false;
+}
+
+//==============================================================================
+bool BitStreamReader::ReadBit(bool &bit) noexcept
+{
+    if ((m_position == 0) && !refillBuffer())
+    {
+        return false;
+    }
+
+    bit = (m_buffer >> --m_position) & 0x1;
+    return true;
+}
+
+//==============================================================================
+bool BitStreamReader::PeekBits(byte_type size, byte_type &bits) noexcept
+{
+    if ((size > m_position) && !refillBuffer())
+    {
+        return false;
+    }
+
+    // If there are more bits to peek than are available in the byte buffer,
+    // then only the remaining bits can be returned.
+    if (size > m_position)
+    {
+        bits = (m_buffer & lsbMask(m_position)) << (size - m_position);
+    }
+    else
+    {
+        bits = (m_buffer >> (m_position - size)) & lsbMask(size);
     }
 
     return true;
 }
 
 //==============================================================================
-bool BitStreamReader::ReadBit(bool &bit) noexcept
+void BitStreamReader::DiscardBits(byte_type size) noexcept
 {
-    if (m_position == 0)
-    {
-        const byte_type bytesRead = fill(m_buffer, s_bufferTypeSize);
-
-        if (bytesRead == 0)
-        {
-            return false;
-        }
-        else if (m_stream.peek() == EOF)
-        {
-            // At end-of-file, discard any encoded zero-filled bits.
-            const byte_type shift =
-                (s_bufferTypeSize - bytesRead) * s_bitsPerByte + m_remainder;
-
-            m_position = s_mostSignificantBitPosition - shift;
-            m_buffer >>= shift;
-        }
-        else
-        {
-            m_position = s_mostSignificantBitPosition;
-        }
-    }
-
-    bit = (m_buffer >> --m_position) & 0x1;
-    return true;
+    m_position -= size;
 }
 
 //==============================================================================
@@ -213,6 +225,44 @@ bool BitStreamReader::FullyConsumed() const noexcept
     }
 
     return false;
+}
+
+//==============================================================================
+bool BitStreamReader::refillBuffer() noexcept
+{
+    const byte_type bitsToFill = s_mostSignificantBitPosition - m_position;
+    buffer_type buffer = 0;
+
+    const byte_type bytesRead = fill(buffer, bitsToFill / s_bitsPerByte);
+    const byte_type bitsRead = bytesRead * s_bitsPerByte;
+
+    if (bitsRead == 0)
+    {
+        return m_position > 0;
+    }
+    else if (bitsRead == s_mostSignificantBitPosition)
+    {
+        // It is undefined behavior to bit-shift by the size of the value being
+        // shifted, so handle that case separately.
+        m_position = bitsRead;
+        m_buffer = buffer;
+    }
+    else
+    {
+        m_position += bitsRead;
+
+        m_buffer <<= bitsRead;
+        m_buffer |= (buffer >> (s_mostSignificantBitPosition - bitsRead));
+    }
+
+    if (m_stream.peek() == EOF)
+    {
+        // At end-of-file, discard any encoded zero-filled bits.
+        m_position -= m_remainder;
+        m_buffer >>= m_remainder;
+    }
+
+    return true;
 }
 
 } // namespace fly
