@@ -480,14 +480,14 @@ void HuffmanCoder::convertToPrefixTable(std::uint8_t maxCodeLength) noexcept
 
         for (std::uint16_t j = 0; j < (1 << shift); ++j)
         {
-            code_type prefixed = (code.m_code << shift) + j;
-            codes[prefixed].m_symbol = code.m_symbol;
-            codes[prefixed].m_length = code.m_length;
+            std::uint16_t index = (code.m_code << shift) + j;
+            codes[index].m_symbol = code.m_symbol;
+            codes[index].m_length = code.m_length;
         }
     }
 
     m_huffmanCodesSize = maxCodeLength;
-    m_huffmanCodes.swap(codes);
+    m_huffmanCodes = std::move(codes);
 }
 
 //==============================================================================
@@ -524,14 +524,14 @@ bool HuffmanCoder::decodeSymbols(
     BitStreamReader &input,
     std::ostream::char_type *data,
     std::uint32_t chunkSize,
-    std::ostream &output) noexcept
+    std::ostream &output) const noexcept
 {
     std::uint32_t bytes = 0;
-    byte_type prefix;
+    byte_type index;
 
-    while ((bytes < chunkSize) && input.PeekBits(m_huffmanCodesSize, prefix))
+    while ((bytes < chunkSize) && input.PeekBits(m_huffmanCodesSize, index))
     {
-        HuffmanCode &code = m_huffmanCodes[prefix];
+        const HuffmanCode &code = m_huffmanCodes[index];
 
         data[bytes++] = static_cast<std::ostream::char_type>(code.m_symbol);
         input.DiscardBits(code.m_length);

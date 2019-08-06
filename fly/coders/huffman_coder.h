@@ -225,6 +225,8 @@ private:
     /**
      * Convert the decoded list of Huffman codes into a prefix table.
      *
+     * @param uint8_t The maximum length of the decoded Huffman codes.
+     *
      * @return bool True if the prefix table was successfully created.
      */
     void convertToPrefixTable(std::uint8_t) noexcept;
@@ -259,7 +261,7 @@ private:
         BitStreamReader &,
         std::ostream::char_type *,
         std::uint32_t,
-        std::ostream &) noexcept;
+        std::ostream &) const noexcept;
 
     std::array<HuffmanNode, 256> m_huffmanTree;
     std::array<HuffmanCode, 256> m_huffmanCodes;

@@ -191,12 +191,14 @@ bool BitStreamReader::ReadBit(bool &bit) noexcept
 //==============================================================================
 bool BitStreamReader::PeekBits(byte_type size, byte_type &bits) noexcept
 {
-    if ((m_position < size) && !refillBuffer())
+    if ((size > m_position) && !refillBuffer())
     {
         return false;
     }
 
-    if (m_position < size)
+    // If there are more bits to peek than are available in the byte buffer,
+    // then only the remaining bits can be returned.
+    if (size > m_position)
     {
         bits = (m_buffer & lsbMask(m_position)) << (size - m_position);
     }
@@ -240,7 +242,7 @@ bool BitStreamReader::refillBuffer() noexcept
     }
     else if (bitsRead == s_mostSignificantBitPosition)
     {
-        // It is undefined behavior to bitshift by the size of the value being
+        // It is undefined behavior to bit-shift by the size of the value being
         // shifted, so handle that case separately.
         m_position = bitsRead;
         m_buffer = buffer;
