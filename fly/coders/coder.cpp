@@ -9,16 +9,24 @@ namespace fly {
 
 namespace {
 
-    constexpr const std::ios::openmode s_binaryIOMode =
-        std::ios::in | std::ios::out | std::ios::binary;
+    constexpr const std::ios::openmode s_inputMode =
+        std::ios::in | std::ios::binary;
+
+    constexpr const std::ios::openmode s_outputMode =
+        std::ios::out | std::ios::binary | std::ios::trunc;
+
+    constexpr const std::ios::openmode s_bidrectionalMode =
+        s_inputMode | s_outputMode;
 
 } // namespace
 
 //==============================================================================
-bool Coder::EncodeString(const std::string &raw, std::string &encoded) noexcept
+bool Coder::EncodeString(
+    const std::string &decoded,
+    std::string &encoded) noexcept
 {
-    std::istringstream input(raw);
-    std::stringstream output(s_binaryIOMode);
+    std::istringstream input(decoded, s_inputMode);
+    std::stringstream output(s_bidrectionalMode);
     {
         BitStreamWriter stream(output);
 
@@ -34,11 +42,11 @@ bool Coder::EncodeString(const std::string &raw, std::string &encoded) noexcept
 
 //==============================================================================
 bool Coder::EncodeFile(
-    const std::filesystem::path &raw,
+    const std::filesystem::path &decoded,
     const std::filesystem::path &encoded) noexcept
 {
-    std::ifstream input(raw);
-    std::fstream output(encoded, s_binaryIOMode);
+    std::ifstream input(decoded, s_inputMode);
+    std::fstream output(encoded, s_bidrectionalMode);
 
     if (input && output)
     {
@@ -50,10 +58,12 @@ bool Coder::EncodeFile(
 }
 
 //==============================================================================
-bool Coder::DecodeString(const std::string &raw, std::string &decoded) noexcept
+bool Coder::DecodeString(
+    const std::string &encoded,
+    std::string &decoded) noexcept
 {
-    std::istringstream input(raw);
-    std::ostringstream output;
+    std::istringstream input(encoded, s_inputMode);
+    std::ostringstream output(s_outputMode);
 
     BitStreamReader stream(input);
 
@@ -68,11 +78,11 @@ bool Coder::DecodeString(const std::string &raw, std::string &decoded) noexcept
 
 //==============================================================================
 bool Coder::DecodeFile(
-    const std::filesystem::path &raw,
+    const std::filesystem::path &encoded,
     const std::filesystem::path &decoded) noexcept
 {
-    std::ifstream input(raw);
-    std::fstream output(decoded);
+    std::ifstream input(encoded, s_inputMode);
+    std::ofstream output(decoded, s_outputMode);
 
     if (input && output)
     {

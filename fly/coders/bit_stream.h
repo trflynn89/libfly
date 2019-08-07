@@ -8,6 +8,7 @@
 namespace fly {
 
 typedef std::uint8_t byte_type;
+typedef std::uint16_t word_type;
 typedef std::size_t buffer_type;
 
 /**
@@ -82,6 +83,17 @@ public:
      * and update the header byte.
      */
     ~BitStreamWriter() noexcept override;
+
+    /**
+     * Write a multibyte word to the byte buffer. Flush the buffer to the stream
+     * if it is filled during this operation.
+     *
+     * @param word_type The word to write.
+     *
+     * @return bool True if the word was successfully written and flushing the
+     *              byte buffer was successful (if needed).
+     */
+    bool WriteWord(word_type) noexcept;
 
     /**
      * Write a full byte to the byte buffer. Flush the buffer to the stream if
@@ -173,6 +185,17 @@ public:
      * @param iostream The stream to read binary data from.
      */
     BitStreamReader(std::istream &) noexcept;
+
+    /**
+     * Read a multibyte word from the byte buffer. Fill the buffer from the
+     * stream if it is fully consumed during this operation.
+     *
+     * @param word_type The location to store the read word.
+     *
+     * @return bool True if the word was successfully read and filling the byte
+     *              buffer was successful (if needed).
+     */
+    bool ReadWord(word_type &) noexcept;
 
     /**
      * Read a full byte from the byte buffer. Fill the buffer from the stream if

@@ -42,6 +42,18 @@ public:
      * @return string Contents of the file.
      */
     static std::string ReadFile(const std::filesystem::path &) noexcept;
+
+    /**
+     * Compare two files for equality. Two files are equal if they have the same
+     * size and the same contents.
+     *
+     * @param path First file to compare.
+     * @param path Second file to compare.
+     *
+     * @return bool True if the given files are equal.
+     */
+    static bool
+    CompareFiles(const std::filesystem::path &, const std::filesystem::path &);
 };
 
 } // namespace fly

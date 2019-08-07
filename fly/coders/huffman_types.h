@@ -8,7 +8,9 @@ namespace fly {
 
 typedef std::uint8_t symbol_type;
 typedef std::uint64_t frequency_type;
+
 typedef std::uint8_t code_type;
+typedef std::uint8_t length_type;
 
 struct HuffmanNode;
 struct HuffmanNodeComparator;
@@ -115,9 +117,9 @@ struct HuffmanCode
      *
      * @param symbol_type The symbol from the input stream.
      * @param code_type The Huffman code for the symbol.
-     * @param code_type The number of bits in the Huffman code.
+     * @param length_type The number of bits in the Huffman code.
      */
-    HuffmanCode(const symbol_type, const code_type, const code_type) noexcept;
+    HuffmanCode(const symbol_type, const code_type, const length_type) noexcept;
 
     /**
      * Deleted copy constructor.
@@ -154,11 +156,11 @@ struct HuffmanCode
      *
      * @return bool True if the first Huffman code is less than the second.
      */
-    friend bool operator<(const HuffmanCode &a, const HuffmanCode &b);
+    friend bool operator<(const HuffmanCode &, const HuffmanCode &);
 
     symbol_type m_symbol;
     code_type m_code;
-    code_type m_length;
+    length_type m_length;
 };
 
 } // namespace fly

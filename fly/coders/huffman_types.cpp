@@ -69,7 +69,7 @@ HuffmanCode::HuffmanCode() noexcept : m_symbol(0), m_code(0), m_length(0)
 HuffmanCode::HuffmanCode(
     const symbol_type symbol,
     const code_type code,
-    const code_type length) noexcept :
+    const length_type length) noexcept :
     m_symbol(symbol),
     m_code(code),
     m_length(length)

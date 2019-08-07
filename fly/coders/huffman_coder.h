@@ -6,7 +6,6 @@
 #include <array>
 #include <istream>
 #include <ostream>
-#include <vector>
 
 namespace fly {
 
@@ -225,11 +224,11 @@ private:
     /**
      * Convert the decoded list of Huffman codes into a prefix table.
      *
-     * @param uint8_t The maximum length of the decoded Huffman codes.
+     * @param length_type The maximum length of the decoded Huffman codes.
      *
      * @return bool True if the prefix table was successfully created.
      */
-    void convertToPrefixTable(std::uint8_t) noexcept;
+    void convertToPrefixTable(length_type) noexcept;
 
     /**
      * Encode symbols from an input stream with the generated list of Huffman
@@ -263,7 +262,7 @@ private:
         std::uint32_t,
         std::ostream &) const noexcept;
 
-    std::array<HuffmanNode, 256> m_huffmanTree;
+    std::array<HuffmanNode, 512> m_huffmanTree;
     std::array<HuffmanCode, 256> m_huffmanCodes;
     std::uint16_t m_huffmanCodesSize;
 };

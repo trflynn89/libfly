@@ -6,6 +6,7 @@
 #include <limits>
 #include <memory>
 #include <stack>
+#include <vector>
 
 namespace fly {
 
@@ -90,9 +91,7 @@ bool HuffmanCoder::DecodeInternal(
 //==============================================================================
 void HuffmanCoder::reset() noexcept
 {
-    decltype(m_huffmanTree) tree;
-    m_huffmanTree.swap(tree);
-
+    decltype(m_huffmanTree)().swap(m_huffmanTree);
     m_huffmanCodesSize = 0;
 }
 
@@ -124,19 +123,7 @@ bool HuffmanCoder::createTree(
     const std::istream::char_type *input,
     std::uint32_t inputSize) noexcept
 {
-    static constexpr auto maxSymbols = std::numeric_limits<symbol_type>::max();
-
-    // Create a frequency map of each input symbol.
-    frequency_type counts[maxSymbols] = {0};
-
-    for (std::uint32_t i = 0; i < inputSize; ++i)
-    {
-        ++counts[static_cast<symbol_type>(input[i])];
-    }
-
-    // Create a priority queue of HuffmanNode, sorted such that the least common
-    // symbol is always on top.
-    HuffmanNodeQueue queue;
+    // Lambda to retrieve the next available HuffmanNode
     std::uint16_t index = 0;
 
     auto next_node = [this, &index]() -> HuffmanNode * {
@@ -148,7 +135,20 @@ bool HuffmanCoder::createTree(
         return nullptr;
     };
 
-    for (symbol_type symbol = 0; symbol < maxSymbols; ++symbol)
+    // Create a frequency map of each input symbol.
+    std::array<frequency_type, 256> counts {};
+
+    for (std::uint32_t i = 0; i < inputSize; ++i)
+    {
+        ++counts[static_cast<symbol_type>(input[i])];
+    }
+
+    // Create a priority queue of HuffmanNode, sorted such that the least common
+    // symbol is always on top.
+    HuffmanNodeQueue queue;
+    symbol_type symbol = 0;
+
+    do
     {
         if (counts[symbol] == 0)
         {
@@ -163,7 +163,7 @@ bool HuffmanCoder::createTree(
 
         node->BecomeSymbol(symbol, counts[symbol]);
         queue.push(node);
-    }
+    } while (++symbol != 0);
 
     // Convert the priority queue to a Huffman tree. Remove the two least common
     // symbols, combining their frequencies into a new node, and insert the new
@@ -218,7 +218,7 @@ bool HuffmanCoder::createCodes() noexcept
             if ((node->m_left == nullptr) && (node->m_right == nullptr))
             {
                 const auto code = static_cast<code_type>(node->m_frequency);
-                const auto length = static_cast<code_type>(path.size());
+                const auto length = static_cast<length_type>(path.size());
 
                 if (!insertCode(HuffmanCode(node->m_symbol, code, length)))
                 {
@@ -281,7 +281,7 @@ void HuffmanCoder::convertToCanonicalForm() noexcept
         // bit-shifted left enough times to maintain the same code length.
         m_huffmanCodes[i].m_code = m_huffmanCodes[i - 1].m_code + 1;
 
-        const std::uint8_t shift =
+        const length_type shift =
             m_huffmanCodes[i].m_length - m_huffmanCodes[i - 1].m_length;
         m_huffmanCodes[i].m_code <<= shift;
     }
@@ -297,11 +297,7 @@ bool HuffmanCoder::encodeHeader(BitStreamWriter &output) const noexcept
     }
 
     // Encode the chunk size.
-    if (!output.WriteByte(static_cast<byte_type>((s_chunkSizeKB >> 8) & 0xff)))
-    {
-        return false;
-    }
-    else if (!output.WriteByte(static_cast<byte_type>(s_chunkSizeKB & 0xff)))
+    if (!output.WriteWord(static_cast<word_type>(s_chunkSizeKB)))
     {
         return false;
     }
@@ -340,17 +336,13 @@ bool HuffmanCoder::decodeHeaderVersion1(
     std::uint32_t &chunkSize) const noexcept
 {
     // Decode the chunk size.
-    byte_type chunkSizeHigh;
-    byte_type chunkSizeLow;
-
-    if (!input.ReadByte(chunkSizeHigh) || !input.ReadByte(chunkSizeLow))
+    word_type chunkSizeKB;
+    if (!input.ReadWord(chunkSizeKB))
     {
         return false;
     }
 
-    chunkSize = (static_cast<std::uint32_t>(chunkSizeHigh << 8)) | chunkSizeLow;
-    chunkSize <<= 10;
-
+    chunkSize = static_cast<std::uint32_t>(chunkSizeKB) << 10;
     return true;
 }
 
@@ -358,7 +350,7 @@ bool HuffmanCoder::decodeHeaderVersion1(
 bool HuffmanCoder::encodeCodes(BitStreamWriter &output) const noexcept
 {
     // At the least, encode that there were zero Huffman codes of length zero.
-    std::vector<code_type> counts(1);
+    std::vector<std::uint16_t> counts(1);
 
     for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
     {
@@ -373,16 +365,15 @@ bool HuffmanCoder::encodeCodes(BitStreamWriter &output) const noexcept
     }
 
     // Encode the number of code length counts.
-    const auto countsSize = static_cast<byte_type>(counts.size());
-    if (!output.WriteByte(countsSize))
+    if (!output.WriteByte(static_cast<byte_type>(counts.size())))
     {
         return false;
     }
 
     // Encode the code length counts.
-    for (const code_type &length : counts)
+    for (const std::uint16_t &length : counts)
     {
-        if (!output.WriteByte(static_cast<byte_type>(length)))
+        if (!output.WriteWord(static_cast<word_type>(length)))
         {
             return false;
         }
@@ -413,23 +404,20 @@ bool HuffmanCoder::decodeCodes(BitStreamReader &input) noexcept
     }
 
     // Decode the code length counts.
-    std::vector<code_type> counts(countsSize);
+    std::vector<std::uint16_t> counts(countsSize);
 
-    for (code_type i = 0; i < countsSize; ++i)
+    for (std::uint16_t &count : counts)
     {
-        byte_type length;
-        if (!input.ReadByte(length))
+        if (!input.ReadWord(count))
         {
             return false;
         }
-
-        counts[i] = static_cast<code_type>(length);
     }
 
     // Decode the symbols.
-    for (std::uint8_t length = 0; length < countsSize; ++length)
+    for (length_type length = 0; length < countsSize; ++length)
     {
-        for (code_type i = 0; i < counts[length]; ++i)
+        for (std::uint16_t i = 0; i < counts[length]; ++i)
         {
             byte_type symbol;
             if (!input.ReadByte(symbol))
@@ -441,15 +429,14 @@ bool HuffmanCoder::decodeCodes(BitStreamReader &input) noexcept
             code_type code = 0;
 
             // Subsequent codes are one greater than the previous code, but also
-            // bit-shifted left enough times to maintain the right code length.
+            // bit-shifted left enough to maintain the right code length.
             if (m_huffmanCodesSize != 0)
             {
                 const HuffmanCode &last =
                     m_huffmanCodes[m_huffmanCodesSize - 1];
-                code = last.m_code + 1;
 
-                const std::uint8_t shift = length - last.m_length;
-                code <<= shift;
+                const length_type shift = length - last.m_length;
+                code = (last.m_code + 1) << shift;
             }
 
             if (m_huffmanCodesSize == m_huffmanCodes.size())
@@ -457,10 +444,8 @@ bool HuffmanCoder::decodeCodes(BitStreamReader &input) noexcept
                 return false;
             }
 
-            m_huffmanCodes[m_huffmanCodesSize++] = HuffmanCode(
-                static_cast<symbol_type>(symbol),
-                code,
-                static_cast<code_type>(length));
+            m_huffmanCodes[m_huffmanCodesSize++] =
+                HuffmanCode(static_cast<symbol_type>(symbol), code, length);
         }
     }
 
@@ -469,16 +454,16 @@ bool HuffmanCoder::decodeCodes(BitStreamReader &input) noexcept
 }
 
 //==============================================================================
-void HuffmanCoder::convertToPrefixTable(std::uint8_t maxCodeLength) noexcept
+void HuffmanCoder::convertToPrefixTable(length_type maxCodeLength) noexcept
 {
-    decltype(m_huffmanCodes) codes;
+    decltype(m_huffmanCodes) codes {};
 
     for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
     {
         HuffmanCode code = std::move(m_huffmanCodes[i]);
-        std::uint8_t shift = maxCodeLength - code.m_length;
+        length_type shift = maxCodeLength - code.m_length;
 
-        for (std::uint16_t j = 0; j < (1 << shift); ++j)
+        for (std::uint8_t j = 0; j < (1 << shift); ++j)
         {
             std::uint16_t index = (code.m_code << shift) + j;
             codes[index].m_symbol = code.m_symbol;

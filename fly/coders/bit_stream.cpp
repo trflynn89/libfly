@@ -1,5 +1,7 @@
 #include "fly/coders/bit_stream.h"
 
+#include <limits>
+
 namespace fly {
 
 namespace {
@@ -14,7 +16,8 @@ namespace {
     constexpr const byte_type s_byteTypeSize = sizeof(byte_type);
     constexpr const byte_type s_bufferTypeSize = sizeof(buffer_type);
 
-    constexpr const byte_type s_bitsPerByte = s_byteTypeSize * 8;
+    constexpr const byte_type s_bitsPerByte =
+        std::numeric_limits<byte_type>::digits;
 
     constexpr const byte_type s_mostSignificantBitPosition =
         s_bufferTypeSize * s_bitsPerByte;
@@ -26,9 +29,9 @@ namespace {
      *
      * @return byte_type The created mask.
      */
-    inline byte_type lsbMask(const byte_type bits)
+    constexpr inline byte_type lsbMask(const byte_type bits)
     {
-        return 0xff >> (s_bitsPerByte - bits);
+        return std::numeric_limits<byte_type>::max() >> (s_bitsPerByte - bits);
     }
 
 } // namespace
@@ -63,6 +66,18 @@ BitStreamWriter::~BitStreamWriter() noexcept
             flushHeader(remainder);
         }
     }
+}
+
+//==============================================================================
+bool BitStreamWriter::WriteWord(word_type word) noexcept
+{
+    constexpr byte_type mask = lsbMask(s_bitsPerByte);
+
+    const byte_type wordHigh =
+        static_cast<byte_type>((word >> s_bitsPerByte) & mask);
+    const byte_type wordLow = static_cast<byte_type>(word & mask);
+
+    return WriteByte(wordHigh) && WriteByte(wordLow);
 }
 
 //==============================================================================
@@ -162,6 +177,21 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
     {
         m_stream.setstate(std::ios::failbit);
     }
+}
+
+//==============================================================================
+bool BitStreamReader::ReadWord(word_type &word) noexcept
+{
+    byte_type wordHigh;
+    byte_type wordLow;
+
+    if (!ReadByte(wordHigh) || !ReadByte(wordLow))
+    {
+        return false;
+    }
+
+    word = static_cast<word_type>(wordHigh << s_bitsPerByte) | wordLow;
+    return true;
 }
 
 //==============================================================================
