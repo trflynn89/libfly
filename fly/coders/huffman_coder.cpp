@@ -34,8 +34,6 @@ bool HuffmanCoder::EncodeInternal(
 
     while ((bytes = readStream(input, data.get())) > 0)
     {
-        reset();
-
         if (!createTree(data.get(), bytes))
         {
             return false;
@@ -73,8 +71,6 @@ bool HuffmanCoder::DecodeInternal(
 
     while (!input.FullyConsumed())
     {
-        reset();
-
         if (!decodeCodes(input))
         {
             return false;
@@ -86,13 +82,6 @@ bool HuffmanCoder::DecodeInternal(
     }
 
     return true;
-}
-
-//==============================================================================
-void HuffmanCoder::reset() noexcept
-{
-    decltype(m_huffmanTree)().swap(m_huffmanTree);
-    m_huffmanCodesSize = 0;
 }
 
 //==============================================================================
@@ -200,6 +189,7 @@ bool HuffmanCoder::createCodes() noexcept
 
     // Symbol frequency is no longer needed. Use that field to form codes.
     m_huffmanTree[0].m_frequency = 0;
+    m_huffmanCodesSize = 0;
 
     const HuffmanNode *node = nullptr;
     pending.push(&m_huffmanTree[0]);
@@ -396,6 +386,8 @@ bool HuffmanCoder::encodeCodes(BitStreamWriter &output) const noexcept
 //==============================================================================
 bool HuffmanCoder::decodeCodes(BitStreamReader &input) noexcept
 {
+    m_huffmanCodesSize = 0;
+
     // Decode the number of code length counts. This number must be at least 1.
     byte_type countsSize;
     if (!input.ReadByte(countsSize) || (countsSize == 0))

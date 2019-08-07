@@ -114,11 +114,6 @@ protected:
 
 private:
     /**
-     * Reset internal data structures between encoding or decoding chunks.
-     */
-    void reset() noexcept;
-
-    /**
      * Read the stream into a buffer, up to a static maximum size.
      *
      * @param istream Stream holding the contents to read.
@@ -262,9 +257,15 @@ private:
         std::uint32_t,
         std::ostream &) const noexcept;
 
-    std::array<HuffmanNode, 512> m_huffmanTree;
-    std::array<HuffmanCode, 256> m_huffmanCodes;
+    // Sized to fit 256 ASCII characters.
+    std::array<HuffmanCode, 1 << 8> m_huffmanCodes;
     std::uint16_t m_huffmanCodesSize;
+
+    // Sized to fit the worst-case Huffman tree size. A bad Huffman code will be
+    // 8 bits in length and have a height of 9 in the Huffman tree. Worst-case
+    // is if all 256 ASCII characters have 8-bit Huffman codes. The number of
+    // nodes would be 2^9 - 1 = 511, but use 512 to keep the size a power of 2.
+    std::array<HuffmanNode, 1 << 9> m_huffmanTree;
 };
 
 } // namespace fly
