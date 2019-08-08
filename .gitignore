@@ -1,3 +1,6 @@
+# TODO: Compress this and decompress it at test time.
+enwik8
+
 #### General
 
 *.db

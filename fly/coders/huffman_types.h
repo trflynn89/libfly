@@ -9,7 +9,8 @@ namespace fly {
 typedef std::uint8_t symbol_type;
 typedef std::uint64_t frequency_type;
 
-typedef std::uint8_t code_type;
+// TODO: Once length limting is implemented, code_type can be 16-bit.
+typedef std::uint32_t code_type;
 typedef std::uint8_t length_type;
 
 struct HuffmanNode;

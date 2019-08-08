@@ -448,23 +448,20 @@ bool HuffmanCoder::decodeCodes(BitStreamReader &input) noexcept
 //==============================================================================
 void HuffmanCoder::convertToPrefixTable(length_type maxCodeLength) noexcept
 {
-    decltype(m_huffmanCodes) codes {};
-
     for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
     {
         HuffmanCode code = std::move(m_huffmanCodes[i]);
         length_type shift = maxCodeLength - code.m_length;
 
-        for (std::uint8_t j = 0; j < (1 << shift); ++j)
+        for (code_type j = 0; j < (1U << shift); ++j)
         {
-            std::uint16_t index = (code.m_code << shift) + j;
-            codes[index].m_symbol = code.m_symbol;
-            codes[index].m_length = code.m_length;
+            code_type index = (code.m_code << shift) + j;
+            m_prefixTable[index].m_symbol = code.m_symbol;
+            m_prefixTable[index].m_length = code.m_length;
         }
     }
 
     m_huffmanCodesSize = maxCodeLength;
-    m_huffmanCodes = std::move(codes);
 }
 
 //==============================================================================
@@ -473,21 +470,18 @@ bool HuffmanCoder::encodeSymbols(
     std::uint32_t inputSize,
     BitStreamWriter &output) noexcept
 {
-    decltype(m_huffmanCodes) symbols;
-
     for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
     {
         HuffmanCode code = std::move(m_huffmanCodes[i]);
-        symbols[code.m_symbol] = std::move(code);
+        m_prefixTable[code.m_symbol] = std::move(code);
     }
 
     for (std::uint32_t i = 0; i < inputSize; ++i)
     {
-        const auto &huffmanCode = symbols[static_cast<symbol_type>(input[i])];
-        const auto code = static_cast<byte_type>(huffmanCode.m_code);
-        const auto length = static_cast<byte_type>(huffmanCode.m_length);
+        const auto &code = m_prefixTable[static_cast<symbol_type>(input[i])];
+        const auto length = static_cast<byte_type>(code.m_length);
 
-        if (!output.WriteBits(code, length))
+        if (!output.WriteBits(code.m_code, length))
         {
             return false;
         }
@@ -505,11 +499,11 @@ bool HuffmanCoder::decodeSymbols(
 {
     const byte_type maxCodeLength = static_cast<byte_type>(m_huffmanCodesSize);
     std::uint32_t bytes = 0;
-    byte_type index;
+    code_type index;
 
-    while ((bytes < chunkSize) && input.PeekBits(maxCodeLength, index))
+    while ((bytes < chunkSize) && (input.PeekBits(maxCodeLength, index) > 0))
     {
-        const HuffmanCode &code = m_huffmanCodes[index];
+        const HuffmanCode &code = m_prefixTable[index];
 
         data[bytes++] = static_cast<std::ostream::char_type>(code.m_symbol);
         input.DiscardBits(code.m_length);

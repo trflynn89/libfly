@@ -88,7 +88,7 @@ TEST_F(HuffmanCoderTest, LargeMirrorTest)
 //==============================================================================
 TEST_F(HuffmanCoderTest, UnicodeTest)
 {
-    std::string raw = "🍕😅😅🍕❤️🍕";
+    std::string raw = "🍕א😅😅🍕❤️א🍕";
     std::string enc, dec;
 
     for (int i = 0; i < 10; ++i)
@@ -165,5 +165,36 @@ TEST_F(HuffmanCoderFileTest, BinaryFileTest)
     ASSERT_TRUE(m_coder.EncodeFile(raw, m_encodedFile));
     ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
 
+    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decodedFile));
+}
+
+//==============================================================================
+TEST_F(HuffmanCoderFileTest, Enwik8FileTest)
+{
+    // Downloaded from: http://mattmahoney.net/dc/enwik8.zip
+    const auto here = std::filesystem::path(__FILE__).parent_path();
+    const auto raw = here / "data" / "enwik8";
+
+    if (!std::filesystem::exists(raw))
+    {
+        // It's a 100MB file...not checking it into git for now.
+        return;
+    }
+
+    auto start = std::chrono::system_clock::now();
+    ASSERT_TRUE(m_coder.EncodeFile(raw, m_encodedFile));
+    auto end = std::chrono::system_clock::now();
+    std::cout << std::chrono::duration<double>(end - start).count()
+              << std::endl;
+
+    start = std::chrono::system_clock::now();
+    ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
+    end = std::chrono::system_clock::now();
+    std::cout << std::chrono::duration<double>(end - start).count()
+              << std::endl;
+
+    EXPECT_GT(
+        std::filesystem::file_size(raw),
+        std::filesystem::file_size(m_encodedFile));
     EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decodedFile));
 }

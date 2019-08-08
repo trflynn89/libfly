@@ -16,23 +16,13 @@ namespace {
     constexpr const byte_type s_byteTypeSize = sizeof(byte_type);
     constexpr const byte_type s_bufferTypeSize = sizeof(buffer_type);
 
+    constexpr const byte_type s_bitsPerWord =
+        std::numeric_limits<word_type>::digits;
     constexpr const byte_type s_bitsPerByte =
         std::numeric_limits<byte_type>::digits;
 
     constexpr const byte_type s_mostSignificantBitPosition =
         s_bufferTypeSize * s_bitsPerByte;
-
-    /**
-     * Create a bit-mask with the least-significant bits set.
-     *
-     * @param byte_type The number of bits to set.
-     *
-     * @return byte_type The created mask.
-     */
-    constexpr inline byte_type lsbMask(const byte_type bits)
-    {
-        return std::numeric_limits<byte_type>::max() >> (s_bitsPerByte - bits);
-    }
 
 } // namespace
 
@@ -71,56 +61,13 @@ BitStreamWriter::~BitStreamWriter() noexcept
 //==============================================================================
 bool BitStreamWriter::WriteWord(word_type word) noexcept
 {
-    constexpr byte_type mask = lsbMask(s_bitsPerByte);
-
-    const byte_type wordHigh =
-        static_cast<byte_type>((word >> s_bitsPerByte) & mask);
-    const byte_type wordLow = static_cast<byte_type>(word & mask);
-
-    return WriteByte(wordHigh) && WriteByte(wordLow);
+    return WriteBits(word, s_bitsPerWord);
 }
 
 //==============================================================================
 bool BitStreamWriter::WriteByte(byte_type byte) noexcept
 {
     return WriteBits(byte, s_bitsPerByte);
-}
-
-//==============================================================================
-bool BitStreamWriter::WriteBits(byte_type bits, byte_type size) noexcept
-{
-    // If there are more bits to write than are available in the byte buffer,
-    // break the bits into two chunks.
-    if (size > m_position)
-    {
-        const byte_type diff = size - m_position;
-
-        // Fill the remainder of the byte buffer with as many bits as are
-        // available, and flush it onto the stream.
-        m_buffer |= (static_cast<buffer_type>(bits) >> diff);
-
-        if (!flushBuffer())
-        {
-            return false;
-        }
-
-        // Then update the input bits to retain only those bits that have not
-        // been written yet.
-        bits &= lsbMask(diff);
-        size = diff;
-    }
-
-    m_buffer |= (static_cast<buffer_type>(bits) << (m_position - size));
-    m_position -= size;
-
-    return (m_position == 0) ? flushBuffer() : true;
-}
-
-//==============================================================================
-bool BitStreamWriter::WriteBit(bool bit) noexcept
-{
-    m_buffer |= (static_cast<buffer_type>(bit) << --m_position);
-    return (m_position == 0) ? flushBuffer() : true;
 }
 
 //==============================================================================
@@ -182,62 +129,13 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
 //==============================================================================
 bool BitStreamReader::ReadWord(word_type &word) noexcept
 {
-    byte_type wordHigh;
-    byte_type wordLow;
-
-    if (!ReadByte(wordHigh) || !ReadByte(wordLow))
-    {
-        return false;
-    }
-
-    word = static_cast<word_type>(wordHigh << s_bitsPerByte) | wordLow;
-    return true;
+    return ReadBits(s_bitsPerWord, word) == s_bitsPerWord;
 }
 
 //==============================================================================
 bool BitStreamReader::ReadByte(byte_type &byte) noexcept
 {
-    if (PeekBits(s_bitsPerByte, byte))
-    {
-        DiscardBits(s_bitsPerByte);
-        return true;
-    }
-
-    return false;
-}
-
-//==============================================================================
-bool BitStreamReader::ReadBit(bool &bit) noexcept
-{
-    if ((m_position == 0) && !refillBuffer())
-    {
-        return false;
-    }
-
-    bit = (m_buffer >> --m_position) & 0x1;
-    return true;
-}
-
-//==============================================================================
-bool BitStreamReader::PeekBits(byte_type size, byte_type &bits) noexcept
-{
-    if ((size > m_position) && !refillBuffer())
-    {
-        return false;
-    }
-
-    // If there are more bits to peek than are available in the byte buffer,
-    // then only the remaining bits can be returned.
-    if (size > m_position)
-    {
-        bits = (m_buffer & lsbMask(m_position)) << (size - m_position);
-    }
-    else
-    {
-        bits = (m_buffer >> (m_position - size)) & lsbMask(size);
-    }
-
-    return true;
+    return ReadBits(s_bitsPerByte, byte) == s_bitsPerByte;
 }
 
 //==============================================================================

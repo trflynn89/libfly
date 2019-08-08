@@ -49,6 +49,19 @@ protected:
      */
     BitStream(byte_type) noexcept;
 
+    /**
+     * Create a bit-mask with the least-significant bits set. The size of the
+     * mask is determined by the template DataType parameter.
+     *
+     * @tparam DataType The data type storing the number of bits to set.
+     *
+     * @param DataType The number of bits to set.
+     *
+     * @return DataType The created mask.
+     */
+    template <typename DataType>
+    constexpr static DataType GenerateMask(const DataType);
+
     byte_type m_position;
     buffer_type m_buffer;
 };
@@ -108,27 +121,19 @@ public:
 
     /**
      * Write a number of bits to the byte buffer. The least-significant bits in
-     * the provided byte will be written. Flush the buffer to the stream if it
-     * is filled during this operation.
+     * the provided data type will be written. Flush the buffer to the stream if
+     * it is filled during this operation.
      *
-     * @param byte_type The bits to write.
+     * @tparam DataType The data type storing the bits to write.
+     *
+     * @param DataType The bits to write.
      * @param byte_type The number of bits to write.
      *
      * @return bool True if the bits were successfully written and flushing the
      *              byte buffer was successful (if needed).
      */
-    bool WriteBits(byte_type, byte_type) noexcept;
-
-    /**
-     * Write a single bit to the byte buffer. Flush the buffer to the stream if
-     * it is filled during this operation.
-     *
-     * @param bool The bit to write.
-     *
-     * @return bool True if the bit was successfully written and flushing the
-     *              byte buffer was successful (if needed).
-     */
-    bool WriteBit(bool) noexcept;
+    template <typename DataType>
+    bool WriteBits(DataType, byte_type) noexcept;
 
 private:
     /**
@@ -209,29 +214,35 @@ public:
     bool ReadByte(byte_type &) noexcept;
 
     /**
-     * Read a single bit from the byte buffer. Fill the buffer from the stream
-     * if it is fully consumed during this operation.
+     * Read a number of bits from the byte buffer. The most-significant bits in
+     * the provided data type will be written. Fill the buffer from the stream
+     * if the number of bits to read exceeds the number of bits available.
      *
-     * @param bool The location to store the read bit.
+     * @tparam DataType The data type of the location to store the read bits.
      *
-     * @return bool True if the bit was successfully read and filling the byte
-     *              buffer was successful (if needed).
+     * @param byte_type The number of bits to read.
+     * @param DataType The location to store the read bits.
+     *
+     * @return byte_type The number of bits successfully read.
      */
-    bool ReadBit(bool &) noexcept;
+    template <typename DataType>
+    byte_type ReadBits(byte_type, DataType &) noexcept;
 
     /**
      * Read a number of bits from the byte buffer without discarding those bits.
-     * The most-significant bits in the provided byte will be written. Fill the
-     * buffer from the stream if the number of bits to peek exceeds the number
-     * of bits available.
+     * The most-significant bits in the provided data type will be written. Fill
+     * the buffer from the stream if the number of bits to peek exceeds the
+     * number of bits available.
+     *
+     * @tparam DataType The data type of the location to store the peeked bits.
      *
      * @param byte_type The number of bits to peek.
-     * @param byte_type The location to store the peeked bits.
+     * @param DataType The location to store the peeked bits.
      *
-     * @return bool True if any bits were successfully peeked and filling the
-     *              byte buffer was successful (if needed).
+     * @return byte_type The number of bits successfully peeked.
      */
-    bool PeekBits(byte_type, byte_type &) noexcept;
+    template <typename DataType>
+    byte_type PeekBits(byte_type, DataType &) noexcept;
 
     /**
      * Discard a number of bits from the byte buffer. Should only be used after
@@ -275,6 +286,47 @@ private:
 };
 
 //==============================================================================
+template <typename DataType>
+constexpr DataType BitStream::GenerateMask(const DataType bits)
+{
+    constexpr auto filledMask = std::numeric_limits<DataType>::max();
+    constexpr auto numberOfBits = std::numeric_limits<DataType>::digits;
+
+    return filledMask >> (numberOfBits - bits);
+}
+
+//==============================================================================
+template <typename DataType>
+bool BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
+{
+    // If there are more bits to write than are available in the byte buffer,
+    // break the bits into two chunks.
+    if (size > m_position)
+    {
+        const byte_type diff = size - m_position;
+
+        // Fill the remainder of the byte buffer with as many bits as are
+        // available, and flush it onto the stream.
+        m_buffer |= (static_cast<buffer_type>(bits) >> diff);
+
+        if (!flushBuffer())
+        {
+            return false;
+        }
+
+        // Then update the input bits to retain only those bits that have not
+        // been written yet.
+        bits &= GenerateMask<DataType>(diff);
+        size = diff;
+    }
+
+    m_buffer |= (static_cast<buffer_type>(bits) << (m_position - size));
+    m_position -= size;
+
+    return (m_position == 0) ? flushBuffer() : true;
+}
+
+//==============================================================================
 template <typename BufferType>
 bool BitStreamWriter::flush(const BufferType &buffer, byte_type bytes) noexcept
 {
@@ -287,6 +339,40 @@ bool BitStreamWriter::flush(const BufferType &buffer, byte_type bytes) noexcept
     }
 
     return false;
+}
+
+//==============================================================================
+template <typename DataType>
+byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
+{
+    const byte_type sizeRead = PeekBits(size, bits);
+    DiscardBits(sizeRead);
+
+    return sizeRead;
+}
+
+//==============================================================================
+template <typename DataType>
+byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
+{
+    if ((size > m_position) && !refillBuffer())
+    {
+        return 0;
+    }
+
+    // If there are more bits to peek than are available in the byte buffer,
+    // then only the remaining bits can be returned.
+    if (size > m_position)
+    {
+        bits = (m_buffer & GenerateMask<DataType>(m_position))
+            << (size - m_position);
+        return m_position;
+    }
+    else
+    {
+        bits = (m_buffer >> (m_position - size)) & GenerateMask<DataType>(size);
+        return size;
+    }
 }
 
 //==============================================================================

@@ -17,13 +17,13 @@ TEST(BitStreamTest, StreamTest)
         bs.WriteByte(0x6c);
         bs.WriteByte(0x6f);
 
-        bs.WriteBit(0);
-        bs.WriteBit(0);
-        bs.WriteBit(1);
-        bs.WriteBit(0);
-        bs.WriteBit(0);
-        bs.WriteBit(0);
-        bs.WriteBit(1);
+        bs.WriteBits(0, 1);
+        bs.WriteBits(0, 1);
+        bs.WriteBits(1, 1);
+        bs.WriteBits(0, 1);
+        bs.WriteBits(0, 1);
+        bs.WriteBits(0, 1);
+        bs.WriteBits(1, 1);
     }
 
     std::stringstream is(os.str(), std::ios::in | std::ios::binary);
@@ -43,23 +43,23 @@ TEST(BitStreamTest, StreamTest)
         EXPECT_TRUE(bs.ReadByte(byte));
         EXPECT_EQ(byte, 0x6f);
 
-        EXPECT_TRUE(bs.ReadBit(bit));
+        EXPECT_TRUE(bs.ReadBits(1, bit));
         EXPECT_FALSE(bit);
-        EXPECT_TRUE(bs.ReadBit(bit));
+        EXPECT_TRUE(bs.ReadBits(1, bit));
         EXPECT_FALSE(bit);
-        EXPECT_TRUE(bs.ReadBit(bit));
+        EXPECT_TRUE(bs.ReadBits(1, bit));
         EXPECT_TRUE(bit);
-        EXPECT_TRUE(bs.ReadBit(bit));
+        EXPECT_TRUE(bs.ReadBits(1, bit));
         EXPECT_FALSE(bit);
-        EXPECT_TRUE(bs.ReadBit(bit));
+        EXPECT_TRUE(bs.ReadBits(1, bit));
         EXPECT_FALSE(bit);
-        EXPECT_TRUE(bs.ReadBit(bit));
+        EXPECT_TRUE(bs.ReadBits(1, bit));
         EXPECT_FALSE(bit);
-        EXPECT_TRUE(bs.ReadBit(bit));
+        EXPECT_TRUE(bs.ReadBits(1, bit));
         EXPECT_TRUE(bit);
 
         EXPECT_TRUE(bs.FullyConsumed());
-        EXPECT_FALSE(bs.ReadBit(bit));
+        EXPECT_FALSE(bs.ReadBits(1, bit));
         EXPECT_FALSE(bs.ReadByte(byte));
     }
 }

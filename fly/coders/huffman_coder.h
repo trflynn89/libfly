@@ -266,6 +266,10 @@ private:
     // is if all 256 ASCII characters have 8-bit Huffman codes. The number of
     // nodes would be 2^9 - 1 = 511, but use 512 to keep the size a power of 2.
     std::array<HuffmanNode, 1 << 9> m_huffmanTree;
+
+    // Sized to fit the worst-case Huffman code length.
+    // TODO: Once length limting is implemented, this can be much smaller.
+    std::array<HuffmanCode, 1 << 21> m_prefixTable;
 };
 
 } // namespace fly
