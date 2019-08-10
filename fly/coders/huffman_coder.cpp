@@ -1,7 +1,7 @@
 #include "fly/coders/huffman_coder.h"
 
-#include "fly/fly.h"
 #include "fly/coders/bit_stream.h"
+#include "fly/fly.h"
 
 #include <algorithm>
 #include <limits>
@@ -20,6 +20,9 @@ namespace {
 
     constexpr const length_type s_maxCodeLength = 11;
 
+    static_assert(std::numeric_limits<code_type>::digits >= s_maxCodeLength,
+        "Maximum Huffman code length is too large for code_type");
+
 } // namespace
 
 //==============================================================================
@@ -32,7 +35,7 @@ bool HuffmanCoder::EncodeInternal(
         return false;
     }
 
-    m_chunkBuffer = std::make_unique<std::ios::char_type[]>(s_chunkSize);
+    m_chunkBuffer = std::make_unique<symbol_type[]>(s_chunkSize);
     std::uint32_t chunkSize = 0;
 
     while ((chunkSize = readStream(input)) > 0)
@@ -71,7 +74,7 @@ bool HuffmanCoder::DecodeInternal(
         return false;
     }
 
-    m_chunkBuffer = std::make_unique<std::ios::char_type[]>(chunkSize);
+    m_chunkBuffer = std::make_unique<symbol_type[]>(chunkSize);
     m_prefixTable = std::make_unique<HuffmanCode[]>(U64(1) << maxCodeLength);
 
     while (!input.FullyConsumed())
@@ -100,9 +103,9 @@ std::uint32_t HuffmanCoder::readStream(std::istream &input) const noexcept
 
     if (length > 0)
     {
-        const auto lengthToRead =
-            std::min(static_cast<std::uint32_t>(length), s_chunkSize);
-        input.read(m_chunkBuffer.get(), lengthToRead);
+        input.read(
+            reinterpret_cast<std::ios::char_type *>(m_chunkBuffer.get()),
+            std::min(static_cast<std::uint32_t>(length), s_chunkSize));
 
         return static_cast<std::uint32_t>(input.gcount());
     }
@@ -130,7 +133,7 @@ bool HuffmanCoder::createTree(std::uint32_t chunkSize) noexcept
 
     for (std::uint32_t i = 0; i < chunkSize; ++i)
     {
-        ++counts[static_cast<symbol_type>(m_chunkBuffer[i])];
+        ++counts[m_chunkBuffer[i]];
     }
 
     // Create a priority queue of HuffmanNode, sorted such that the least common
@@ -284,11 +287,12 @@ void HuffmanCoder::limitCodeLengths() noexcept
     // The code lengths must now be corrected to satisfy the Kraft–McMillan
     // inequality. Starting from the largest code, increase the code lengths
     // until the inequality is satisfied again.
-    for (std::uint16_t i = m_huffmanCodesSize; i-- > 0;)
+    for (std::uint16_t i = m_huffmanCodesSize;
+         (i-- > 0) && (kraft > maxAllowedKraft);)
     {
         HuffmanCode &code = m_huffmanCodes[i];
 
-        while ((kraft > maxAllowedKraft) && (code.m_length < s_maxCodeLength))
+        while (code.m_length < s_maxCodeLength)
         {
             ++code.m_length;
             kraft -= computeKraft(code);
@@ -560,7 +564,7 @@ bool HuffmanCoder::encodeSymbols(
 
     for (std::uint32_t i = 0; i < inputSize; ++i)
     {
-        const auto &code = symbols[static_cast<symbol_type>(m_chunkBuffer[i])];
+        const HuffmanCode &code = symbols[m_chunkBuffer[i]];
         const auto length = static_cast<byte_type>(code.m_length);
 
         if (!output.WriteBits(code.m_code, length))
@@ -582,18 +586,19 @@ bool HuffmanCoder::decodeSymbols(
     std::uint32_t bytes = 0;
     code_type index;
 
-    while ((bytes < chunkSize) && (input.PeekBits(maxCodeLength, index) > 0))
+    while ((bytes < chunkSize) && (input.PeekBits(maxCodeLength, index) != 0))
     {
         const HuffmanCode &code = m_prefixTable[index];
-        input.DiscardBits(code.m_length);
 
-        m_chunkBuffer[bytes++] =
-            static_cast<std::ios::char_type>(code.m_symbol);
+        m_chunkBuffer[bytes++] = code.m_symbol;
+        input.DiscardBits(code.m_length);
     }
 
     if (bytes > 0)
     {
-        output.write(m_chunkBuffer.get(), bytes);
+        output.write(
+            reinterpret_cast<const std::ios::char_type *>(m_chunkBuffer.get()),
+            bytes);
     }
 
     return (bytes == chunkSize) || input.FullyConsumed();

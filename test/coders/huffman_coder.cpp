@@ -187,6 +187,9 @@ TEST_F(HuffmanCoderFileTest, Enwik8FileTest)
     std::cout << std::chrono::duration<double>(end - start).count()
               << std::endl;
 
+    std::cout << std::filesystem::file_size(raw) << std::endl;
+    std::cout << std::filesystem::file_size(m_encodedFile) << std::endl;
+
     start = std::chrono::system_clock::now();
     ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
     end = std::chrono::system_clock::now();

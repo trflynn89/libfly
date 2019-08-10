@@ -1,7 +1,5 @@
 #include "fly/coders/bit_stream.h"
 
-#include <limits>
-
 namespace fly {
 
 namespace {
@@ -9,6 +7,8 @@ namespace {
     constexpr const byte_type s_magic = 0x1a;
     constexpr const byte_type s_magicMask = 0x1f;
     constexpr const byte_type s_magicShift = 0x03;
+
+    static_assert(s_magic <= s_magicMask, "Magic header has exceeded 5 bits");
 
     constexpr const byte_type s_remainderMask = 0x07;
     constexpr const byte_type s_remainderShift = 0x00;
@@ -31,7 +31,6 @@ BitStream::BitStream(byte_type startingPosition) noexcept :
     m_position(startingPosition),
     m_buffer(0)
 {
-    static_assert(s_magic <= s_magicMask, "Magic header has exceeded 5 bits");
 }
 
 //==============================================================================
@@ -112,6 +111,7 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
     byte_type header = 0;
     byte_type magic = 0;
 
+    // Cannot use ReadByte because the remainder bits are not known yet.
     const byte_type bytesRead = fill(header, s_byteTypeSize);
 
     if (bytesRead == 1)

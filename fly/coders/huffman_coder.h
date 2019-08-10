@@ -275,14 +275,14 @@ private:
     decodeSymbols(BitStreamReader &, length_type, std::uint32_t, std::ostream &)
         const noexcept;
 
-    std::unique_ptr<std::ios::char_type[]> m_chunkBuffer;
+    std::unique_ptr<symbol_type[]> m_chunkBuffer;
 
     // Sized to fit 256 ASCII symbols.
     std::array<HuffmanCode, 1 << 8> m_huffmanCodes;
     std::uint16_t m_huffmanCodesSize;
 
     // Sized to fit a complete Huffman tree. With 8-bit symbols, a complete tree
-    // will have a height of 9, and 2^9 - 1 = 511 nodes. Round to 512.
+    // will have a height of 9, and 2^9 - 1 = 511 nodes (round to 512).
     std::array<HuffmanNode, 1 << 9> m_huffmanTree;
 
     // Will be sized to fit the maximum Huffman code length used by the encoder.

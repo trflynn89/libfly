@@ -4,6 +4,8 @@
 
 #include <cstdint>
 #include <istream>
+#include <limits>
+#include <type_traits>
 
 namespace fly {
 
@@ -155,16 +157,16 @@ private:
     /**
      * Flush a byte buffer to the stream.
      *
-     * @tparam BufferType The type of the byte buffer to flush.
+     * @tparam DataType The type of the byte buffer to flush.
      *
-     * @param BufferType The byte buffer to flush.
+     * @param DataType The byte buffer to flush.
      * @param byte_type The number of bytes to flush.
      *
      * @return bool True if the byte buffer was sucessfully flushed and the
      *              stream remains in a good state.
      */
-    template <typename BufferType>
-    bool flush(const BufferType &, byte_type) noexcept;
+    template <typename DataType>
+    bool flush(const DataType &, byte_type) noexcept;
 
     std::iostream &m_stream;
 };
@@ -271,24 +273,50 @@ private:
     /**
      * Read from the stream to fill a byte buffer.
      *
-     * @tparam BufferType The type of the byte buffer to fill.
+     * @tparam DataType The type of the byte buffer to fill.
      *
-     * @param BufferType The byte buffer to fill.
+     * @param DataType The byte buffer to fill.
      * @param byte_type The number of bytes to read.
      *
      * @return byte_type The number of bytes actually read.
      */
-    template <typename BufferType>
-    byte_type fill(BufferType &, byte_type) noexcept;
+    template <typename DataType>
+    byte_type fill(DataType &, byte_type) noexcept;
 
     std::istream &m_stream;
     byte_type m_remainder;
+};
+
+/**
+ * Traits for type safety in the BitStream template methods.
+ *
+ * @author Timothy Flynn (trflynn89@gmail.com)
+ * @version July 7, 2019
+ */
+struct BitStreamTraits
+{
+    /**
+     * Define a trait for testing if type T is an unsigned JSON number.
+     */
+    template <typename T>
+    using is_unsigned_integer = std::bool_constant<
+        std::is_integral_v<std::decay_t<T>> &&
+        std::is_unsigned_v<std::decay_t<T>> &&
+        !std::is_same_v<bool, std::decay_t<T>>>;
+
+    template <typename T>
+    inline static constexpr bool is_unsigned_integer_v =
+        is_unsigned_integer<T>::value;
 };
 
 //==============================================================================
 template <typename DataType>
 constexpr DataType BitStream::GenerateMask(const DataType bits)
 {
+    static_assert(
+        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        "DataType must be an unsigned integer type");
+
     constexpr auto filledMask = std::numeric_limits<DataType>::max();
     constexpr auto numberOfBits = std::numeric_limits<DataType>::digits;
 
@@ -299,6 +327,10 @@ constexpr DataType BitStream::GenerateMask(const DataType bits)
 template <typename DataType>
 bool BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
 {
+    static_assert(
+        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        "DataType must be an unsigned integer type");
+
     // If there are more bits to write than are available in the byte buffer,
     // break the bits into two chunks.
     if (size > m_position)
@@ -327,13 +359,18 @@ bool BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
 }
 
 //==============================================================================
-template <typename BufferType>
-bool BitStreamWriter::flush(const BufferType &buffer, byte_type bytes) noexcept
+template <typename DataType>
+bool BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
 {
+    static_assert(
+        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        "DataType must be an unsigned integer type");
+
     if (m_stream.good())
     {
-        const BufferType data = byte_swap(buffer);
-        m_stream.write(reinterpret_cast<const char *>(&data), bytes);
+        const DataType data = byte_swap(buffer);
+        m_stream.write(
+            reinterpret_cast<const std::ios::char_type *>(&data), bytes);
 
         return m_stream.good();
     }
@@ -345,6 +382,10 @@ bool BitStreamWriter::flush(const BufferType &buffer, byte_type bytes) noexcept
 template <typename DataType>
 byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
 {
+    static_assert(
+        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        "DataType must be an unsigned integer type");
+
     const byte_type sizeRead = PeekBits(size, bits);
     DiscardBits(sizeRead);
 
@@ -355,6 +396,10 @@ byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
 template <typename DataType>
 byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
 {
+    static_assert(
+        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        "DataType must be an unsigned integer type");
+
     if ((size > m_position) && !refillBuffer())
     {
         return 0;
@@ -381,17 +426,19 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
 }
 
 //==============================================================================
-template <typename BufferType>
-byte_type BitStreamReader::fill(BufferType &buffer, byte_type bytes) noexcept
+template <typename DataType>
+byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
 {
+    static_assert(
+        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        "DataType must be an unsigned integer type");
+
     if (m_stream.good())
     {
-        m_stream.read(reinterpret_cast<char *>(&buffer), bytes);
-
-        const auto bytesRead = static_cast<byte_type>(m_stream.gcount());
+        m_stream.read(reinterpret_cast<std::ios::char_type *>(&buffer), bytes);
         buffer = byte_swap(buffer);
 
-        return bytesRead;
+        return static_cast<byte_type>(m_stream.gcount());
     }
 
     return 0;
