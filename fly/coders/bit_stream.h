@@ -364,13 +364,18 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
     // then only the remaining bits can be returned.
     if (size > m_position)
     {
-        bits = (m_buffer & GenerateMask<DataType>(m_position))
-            << (size - m_position);
+        const byte_type shift = size - m_position;
+        const DataType buffer = static_cast<DataType>(m_buffer);
+
+        bits = (buffer & GenerateMask<DataType>(m_position)) << shift;
         return m_position;
     }
     else
     {
-        bits = (m_buffer >> (m_position - size)) & GenerateMask<DataType>(size);
+        const byte_type shift = m_position - size;
+        const DataType buffer = static_cast<DataType>(m_buffer >> shift);
+
+        bits = buffer & GenerateMask<DataType>(size);
         return size;
     }
 }

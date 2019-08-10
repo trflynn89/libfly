@@ -1,5 +1,6 @@
 #include "fly/coders/huffman_coder.h"
 
+#include "fly/fly.h"
 #include "fly/coders/bit_stream.h"
 
 #include <algorithm>
@@ -71,7 +72,7 @@ bool HuffmanCoder::DecodeInternal(
     }
 
     m_chunkBuffer = std::make_unique<std::ios::char_type[]>(chunkSize);
-    m_prefixTable = std::make_unique<HuffmanCode[]>(1 << maxCodeLength);
+    m_prefixTable = std::make_unique<HuffmanCode[]>(U64(1) << maxCodeLength);
 
     while (!input.FullyConsumed())
     {
@@ -207,7 +208,7 @@ bool HuffmanCoder::createCodes() noexcept
         }
         else
         {
-            if ((node->m_left == nullptr) && (node->m_right == nullptr))
+            if ((node->m_left == nullptr) || (node->m_right == nullptr))
             {
                 const auto code = static_cast<code_type>(node->m_frequency);
                 const auto length = static_cast<length_type>(path.size());
@@ -535,7 +536,7 @@ void HuffmanCoder::convertToPrefixTable(length_type maxCodeLength) noexcept
         const HuffmanCode code = std::move(m_huffmanCodes[i]);
         const length_type shift = maxCodeLength - code.m_length;
 
-        for (code_type j = 0; j < (1U << shift); ++j)
+        for (code_type j = 0; j < (1 << shift); ++j)
         {
             const code_type index = (code.m_code << shift) + j;
             m_prefixTable[index].m_symbol = code.m_symbol;
