@@ -30,7 +30,6 @@ TEST(BitStreamTest, StreamTest)
     {
         fly::BitStreamReader bs(is);
         fly::byte_type byte;
-        bool bit;
 
         EXPECT_TRUE(bs.ReadByte(byte));
         EXPECT_EQ(byte, 0x48);
@@ -43,23 +42,23 @@ TEST(BitStreamTest, StreamTest)
         EXPECT_TRUE(bs.ReadByte(byte));
         EXPECT_EQ(byte, 0x6f);
 
-        EXPECT_TRUE(bs.ReadBits(1, bit));
-        EXPECT_FALSE(bit);
-        EXPECT_TRUE(bs.ReadBits(1, bit));
-        EXPECT_FALSE(bit);
-        EXPECT_TRUE(bs.ReadBits(1, bit));
-        EXPECT_TRUE(bit);
-        EXPECT_TRUE(bs.ReadBits(1, bit));
-        EXPECT_FALSE(bit);
-        EXPECT_TRUE(bs.ReadBits(1, bit));
-        EXPECT_FALSE(bit);
-        EXPECT_TRUE(bs.ReadBits(1, bit));
-        EXPECT_FALSE(bit);
-        EXPECT_TRUE(bs.ReadBits(1, bit));
-        EXPECT_TRUE(bit);
+        EXPECT_TRUE(bs.ReadBits(1, byte));
+        EXPECT_EQ(byte, 0);
+        EXPECT_TRUE(bs.ReadBits(1, byte));
+        EXPECT_EQ(byte, 0);
+        EXPECT_TRUE(bs.ReadBits(1, byte));
+        EXPECT_EQ(byte, 1);
+        EXPECT_TRUE(bs.ReadBits(1, byte));
+        EXPECT_EQ(byte, 0);
+        EXPECT_TRUE(bs.ReadBits(1, byte));
+        EXPECT_EQ(byte, 0);
+        EXPECT_TRUE(bs.ReadBits(1, byte));
+        EXPECT_EQ(byte, 0);
+        EXPECT_TRUE(bs.ReadBits(1, byte));
+        EXPECT_EQ(byte, 1);
 
         EXPECT_TRUE(bs.FullyConsumed());
-        EXPECT_FALSE(bs.ReadBits(1, bit));
+        EXPECT_FALSE(bs.ReadBits(1, byte));
         EXPECT_FALSE(bs.ReadByte(byte));
     }
 }
