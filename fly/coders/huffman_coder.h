@@ -14,8 +14,8 @@ class BitStreamReader;
 class BitStreamWriter;
 
 /**
- * Implementation of the Coder interface for Huffman coding. Forms canonical
- * Huffman codes to encode and decode symbols.
+ * Implementation of the Coder interface for Huffman coding. Forms length-
+ * limted, canonical Huffman codes to encode and decode symbols.
  *
  * For reading:
  *
