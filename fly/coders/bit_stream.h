@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/coders/endian.h"
+#include "fly/endian.h"
 
 #include <cstdint>
 #include <istream>

@@ -1,6 +1,6 @@
 #include "fly/path/path_monitor.h"
 
-#include "fly/fly.h"
+#include "fly/literals.h"
 #include "fly/path/path_config.h"
 #include "fly/task/task_manager.h"
 #include "fly/types/concurrent_queue.h"
@@ -35,7 +35,7 @@ class TestPathConfig : public fly::PathConfig
 public:
     TestPathConfig() noexcept : fly::PathConfig()
     {
-        m_defaultPollInterval = I64(10);
+        m_defaultPollInterval = 10_i64;
     }
 };
 

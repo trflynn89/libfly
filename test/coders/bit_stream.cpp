@@ -1,5 +1,7 @@
 #include "fly/coders/bit_stream.h"
 
+#include "fly/literals.h"
+
 #include <gtest/gtest.h>
 
 #include <sstream>
@@ -17,13 +19,13 @@ TEST(BitStreamTest, StreamTest)
         bs.WriteByte(0x6c);
         bs.WriteByte(0x6f);
 
-        bs.WriteBits(fly::byte_type(0), 1);
-        bs.WriteBits(fly::byte_type(0), 1);
-        bs.WriteBits(fly::byte_type(1), 1);
-        bs.WriteBits(fly::byte_type(0), 1);
-        bs.WriteBits(fly::byte_type(0), 1);
-        bs.WriteBits(fly::byte_type(0), 1);
-        bs.WriteBits(fly::byte_type(1), 1);
+        bs.WriteBits(0_u8, 1);
+        bs.WriteBits(0_u8, 1);
+        bs.WriteBits(1_u8, 1);
+        bs.WriteBits(0_u8, 1);
+        bs.WriteBits(0_u8, 1);
+        bs.WriteBits(0_u8, 1);
+        bs.WriteBits(1_u8, 1);
     }
 
     std::stringstream is(os.str(), std::ios::in | std::ios::binary);

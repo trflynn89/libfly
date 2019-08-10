@@ -9,18 +9,6 @@
 #    error Unsupported operating system. Only Windows and Linux are supported.
 #endif
 
-// Define macros to treat numeric constants as 64-bit
-#if defined(FLY_WINDOWS)
-#    define I64(n) (n##ll)
-#    define U64(n) (n##ull)
-#elif defined(FLY_LINUX)
-#    include <cstdint>
-#    define I64(n) __INT64_C(n)
-#    define U64(n) __UINT64_C(n)
-#else
-#    error Unkown 64-bit constant macros.
-#endif
-
 // Define macro to convert a macro parameter to a string
 #define _FLY_STRINGIZE(a) #a
 

@@ -1,14 +1,14 @@
 #include "fly/logger/logger_config.h"
 
-#include "fly/fly.h"
+#include "fly/literals.h"
 
 namespace fly {
 
 //==============================================================================
 LoggerConfig::LoggerConfig() noexcept :
-    m_defaultMaxLogFileSize(U64(20 << 20)),
-    m_defaultMaxMessageSize(U64(256)),
-    m_defaultQueueWaitTime(I64(100))
+    m_defaultMaxLogFileSize(20_u64 << 20),
+    m_defaultMaxMessageSize(256_u64),
+    m_defaultQueueWaitTime(100_i64)
 {
 }
 

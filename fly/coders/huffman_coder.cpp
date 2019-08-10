@@ -1,7 +1,7 @@
 #include "fly/coders/huffman_coder.h"
 
 #include "fly/coders/bit_stream.h"
-#include "fly/fly.h"
+#include "fly/literals.h"
 
 #include <algorithm>
 #include <limits>
@@ -15,7 +15,7 @@ namespace {
 
     constexpr const std::uint8_t s_huffmanVersion = 1;
 
-    constexpr const std::uint16_t s_chunkSizeKB = 1 << 10;
+    constexpr const std::uint16_t s_chunkSizeKB = 1_u16 << 10;
     constexpr const std::uint32_t s_chunkSize = s_chunkSizeKB << 10;
 
     constexpr const length_type s_maxCodeLength = 11;
@@ -75,7 +75,7 @@ bool HuffmanCoder::DecodeInternal(
     }
 
     m_chunkBuffer = std::make_unique<symbol_type[]>(chunkSize);
-    m_prefixTable = std::make_unique<HuffmanCode[]>(U64(1) << maxCodeLength);
+    m_prefixTable = std::make_unique<HuffmanCode[]>(1_u64 << maxCodeLength);
 
     while (!input.FullyConsumed())
     {
@@ -267,10 +267,10 @@ bool HuffmanCoder::insertCode(HuffmanCode &&code) noexcept
 void HuffmanCoder::limitCodeLengths() noexcept
 {
     auto computeKraft = [](const HuffmanCode &code) -> code_type {
-        return 1 << (s_maxCodeLength - code.m_length);
+        return 1_u16 << (s_maxCodeLength - code.m_length);
     };
 
-    constexpr const code_type maxAllowedKraft = (1 << s_maxCodeLength) - 1;
+    constexpr const code_type maxAllowedKraft = (1_u16 << s_maxCodeLength) - 1;
     code_type kraft = 0;
 
     // Limit all Huffman codes to not be larger than the maximum code length.
@@ -540,7 +540,7 @@ void HuffmanCoder::convertToPrefixTable(length_type maxCodeLength) noexcept
         const HuffmanCode code = std::move(m_huffmanCodes[i]);
         const length_type shift = maxCodeLength - code.m_length;
 
-        for (code_type j = 0; j < (1 << shift); ++j)
+        for (code_type j = 0; j < (1_u16 << shift); ++j)
         {
             const code_type index = (code.m_code << shift) + j;
             m_prefixTable[index].m_symbol = code.m_symbol;

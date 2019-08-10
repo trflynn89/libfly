@@ -1,5 +1,7 @@
 #include "fly/coders/bit_stream.h"
 
+#include "fly/literals.h"
+
 namespace fly {
 
 namespace {
@@ -114,7 +116,7 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
     // Cannot use ReadByte because the remainder bits are not known yet.
     const byte_type bytesRead = fill(header, s_byteTypeSize);
 
-    if (bytesRead == 1)
+    if (bytesRead == 1_u8)
     {
         magic = (header >> s_magicShift) & s_magicMask;
         m_remainder = (header >> s_remainderShift) & s_remainderMask;

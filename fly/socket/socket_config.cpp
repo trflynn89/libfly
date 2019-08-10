@@ -1,12 +1,12 @@
 #include "fly/socket/socket_config.h"
 
-#include "fly/fly.h"
+#include "fly/literals.h"
 
 namespace fly {
 
 //==============================================================================
 SocketConfig::SocketConfig() noexcept :
-    m_defaultIoWaitTime(I64(10000)),
+    m_defaultIoWaitTime(10000_i64),
     m_defaultEndOfMessage(0x04),
     m_defaultPacketSize(4096)
 {
