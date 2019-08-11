@@ -21,7 +21,7 @@ namespace {
 } // namespace
 
 //==============================================================================
-bool Coder::EncodeString(
+bool Encoder::EncodeString(
     const std::string &decoded,
     std::string &encoded) noexcept
 {
@@ -41,7 +41,7 @@ bool Coder::EncodeString(
 }
 
 //==============================================================================
-bool Coder::EncodeFile(
+bool Encoder::EncodeFile(
     const std::filesystem::path &decoded,
     const std::filesystem::path &encoded) noexcept
 {
@@ -58,7 +58,7 @@ bool Coder::EncodeFile(
 }
 
 //==============================================================================
-bool Coder::DecodeString(
+bool Decoder::DecodeString(
     const std::string &encoded,
     std::string &decoded) noexcept
 {
@@ -77,7 +77,7 @@ bool Coder::DecodeString(
 }
 
 //==============================================================================
-bool Coder::DecodeFile(
+bool Decoder::DecodeFile(
     const std::filesystem::path &encoded,
     const std::filesystem::path &decoded) noexcept
 {

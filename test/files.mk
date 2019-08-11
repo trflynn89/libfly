@@ -1,6 +1,7 @@
 # Define the directories to include and compile
 SRC_DIRS_$(d) := \
     fly/coders \
+    fly/coders/huffman \
     fly/config \
     fly/logger \
     fly/parser \
@@ -16,6 +17,7 @@ SRC_DIRS_$(d) := \
 # Include the directories containing the unit tests
 SRC_DIRS_$(d) += \
     test/coders \
+    test/coders/huffman \
     test/config \
     test/logger \
     test/parser \

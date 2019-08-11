@@ -1,4 +1,4 @@
-#include "fly/coders/huffman_coder.h"
+#include "fly/coders/huffman/huffman_coder.h"
 
 #include "fly/coders/bit_stream.h"
 #include "fly/literals.h"

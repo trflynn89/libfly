@@ -159,8 +159,8 @@
     <ClInclude Include="..\..\..\fly\coders\bit_stream.h" />
     <ClInclude Include="..\..\..\fly\coders\coder.h" />
     <ClInclude Include="..\..\..\fly\coders\endian.h" />
-    <ClInclude Include="..\..\..\fly\coders\huffman_coder.h" />
-    <ClInclude Include="..\..\..\fly\coders\huffman_types.h" />
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_coder.h" />
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.h" />
     <ClInclude Include="..\..\..\fly\config\config.h" />
     <ClInclude Include="..\..\..\fly\config\config_manager.h" />
     <ClInclude Include="..\..\..\fly\logger\log.h" />
@@ -202,8 +202,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\coders\bit_stream.cpp" />
     <ClCompile Include="..\..\..\fly\coders\coder.cpp" />
-    <ClCompile Include="..\..\..\fly\coders\huffman_coder.cpp" />
-    <ClCompile Include="..\..\..\fly\coders\huffman_types.cpp" />
+    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_coder.cpp" />
+    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_types.cpp" />
     <ClCompile Include="..\..\..\fly\config\config.cpp" />
     <ClCompile Include="..\..\..\fly\config\config_manager.cpp" />
     <ClCompile Include="..\..\..\fly\logger\log.cpp" />

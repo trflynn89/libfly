@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/coders/coder.h"
-#include "fly/coders/huffman_types.h"
+#include "fly/coders/huffman/huffman_types.h"
 
 #include <array>
 #include <istream>
@@ -27,7 +27,7 @@ class BitStreamWriter;
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 7, 2019
  */
-class HuffmanCoder : public Coder
+class HuffmanCoder : public Encoder, public Decoder
 {
 protected:
     /**

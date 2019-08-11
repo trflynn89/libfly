@@ -202,7 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\test\coders\bit_stream.cpp" />
-    <ClCompile Include="..\..\..\test\coders\huffman_coder.cpp" />
+    <ClCompile Include="..\..\..\test\coders\huffman\huffman_coder.cpp" />
     <ClCompile Include="..\..\..\test\config\config.cpp" />
     <ClCompile Include="..\..\..\test\config\config_manager.cpp" />
     <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest-all.cc" />

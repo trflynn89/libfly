@@ -1,4 +1,4 @@
-#include "fly/coders/huffman_coder.h"
+#include "fly/coders/huffman/huffman_coder.h"
 
 #include "fly/types/string.h"
 #include "test/util/path_util.h"
@@ -143,7 +143,7 @@ TEST_F(HuffmanCoderFileTest, AsciiFileTest)
     // Generated with:
     // tr -dc '[:graph:]' </dev/urandom | head -c 4194304 > test.txt
     const auto here = std::filesystem::path(__FILE__).parent_path();
-    const auto raw = here / "data" / "test.txt";
+    const auto raw = here / ".." / "data" / "test.txt";
 
     ASSERT_TRUE(m_coder.EncodeFile(raw, m_encodedFile));
     ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
@@ -160,7 +160,7 @@ TEST_F(HuffmanCoderFileTest, BinaryFileTest)
     // Generated with:
     // dd if=/dev/urandom of=test.bin count=1 bs=4194304
     const auto here = std::filesystem::path(__FILE__).parent_path();
-    const auto raw = here / "data" / "test.bin";
+    const auto raw = here / ".." / "data" / "test.bin";
 
     ASSERT_TRUE(m_coder.EncodeFile(raw, m_encodedFile));
     ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
@@ -173,7 +173,7 @@ TEST_F(HuffmanCoderFileTest, Enwik8FileTest)
 {
     // Downloaded from: http://mattmahoney.net/dc/enwik8.zip
     const auto here = std::filesystem::path(__FILE__).parent_path();
-    const auto raw = here / "data" / "enwik8";
+    const auto raw = here / ".." / "data" / "enwik8";
 
     if (!std::filesystem::exists(raw))
     {
