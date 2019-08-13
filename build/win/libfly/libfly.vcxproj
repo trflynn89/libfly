@@ -155,10 +155,11 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\fly\endian.h" />
     <ClInclude Include="..\..\..\fly\fly.h" />
+    <ClInclude Include="..\..\..\fly\literals.h" />
     <ClInclude Include="..\..\..\fly\coders\bit_stream.h" />
     <ClInclude Include="..\..\..\fly\coders\coder.h" />
-    <ClInclude Include="..\..\..\fly\coders\endian.h" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.h" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.h" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.h" />
