@@ -42,7 +42,7 @@
     <ClCompile Include="..\..\..\test\coders\bit_stream.cpp">
       <Filter>coders</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\coders\coders\huffman_coder.cpp">
+    <ClCompile Include="..\..\..\test\coders\huffman.cpp">
       <Filter>coders</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\config\config.cpp">

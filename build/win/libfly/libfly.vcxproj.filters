@@ -52,7 +52,10 @@
     <ClInclude Include="..\..\..\fly\coders\endian.h">
       <Filter>coders</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_coder.h">
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.h">
+      <Filter>coders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.h">
       <Filter>coders</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.h">
@@ -177,7 +180,10 @@
     <ClCompile Include="..\..\..\fly\coders\coder.cpp">
       <Filter>coders</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_coder.cpp">
+    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_decoder.cpp">
+      <Filter>coders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_encoder.cpp">
       <Filter>coders</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_types.cpp">

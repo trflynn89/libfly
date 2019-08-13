@@ -9,10 +9,10 @@
 
 namespace fly {
 
-class BitStreamReader;
+class BitStreamWriter;
 
 /**
- * Implementation of the Coder interface for Huffman coding. Forms length-
+ * Implementation of the Encoder interface for Huffman coding. Forms length-
  * limted, canonical Huffman codes to encode and decode symbols.
  *
  * For reading:
@@ -25,7 +25,7 @@ class BitStreamReader;
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 7, 2019
  */
-class HuffmanCoder : public Encoder
+class HuffmanEncoder : public Encoder
 {
 protected:
     /**
