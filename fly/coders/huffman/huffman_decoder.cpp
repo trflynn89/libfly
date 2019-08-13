@@ -21,7 +21,7 @@ bool HuffmanDecoder::DecodeInternal(
     }
 
     m_chunkBuffer = std::make_unique<symbol_type[]>(chunkSize);
-    m_prefixTable = std::make_unique<HuffmanCode[]>(1_u64 << maxCodeLength);
+    m_prefixTable = std::make_unique<HuffmanCode[]>(1_zu << maxCodeLength);
 
     while (!input.FullyConsumed())
     {

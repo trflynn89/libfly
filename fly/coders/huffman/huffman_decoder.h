@@ -118,7 +118,7 @@ private:
 
     std::unique_ptr<symbol_type[]> m_chunkBuffer;
 
-    // Sized to fit 256 ASCII symbols.
+    // Sized to fit 8-bit ASCII symbols.
     std::array<HuffmanCode, 1 << 8> m_huffmanCodes;
     std::uint16_t m_huffmanCodesSize;
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 /**
@@ -47,4 +48,9 @@ constexpr std::uint32_t operator"" _u32(unsigned long long int value)
 constexpr std::uint64_t operator"" _u64(unsigned long long int value)
 {
     return static_cast<std::uint64_t>(value);
+}
+
+constexpr std::size_t operator"" _zu(unsigned long long int value)
+{
+    return static_cast<std::size_t>(value);
 }

@@ -13,14 +13,7 @@ class BitStreamWriter;
 
 /**
  * Implementation of the Encoder interface for Huffman coding. Forms length-
- * limted, canonical Huffman codes to encode and decode symbols.
- *
- * For reading:
- *
- *     https://en.wikipedia.org/wiki/Huffman_coding
- *     https://en.wikipedia.org/wiki/Canonical_Huffman_code
- *     https://en.wikipedia.org/wiki/Kraft%E2%80%93McMillan_inequality
- *     https://cbloomrants.blogspot.com/2010/07/07-03-10-length-limitted-huffman-codes.html
+ * limted, canonical Huffman codes to encode symbols.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 7, 2019
@@ -129,8 +122,10 @@ private:
 
     /**
      * Length-limit the generated Huffman codes to a static maximum size, using
-     * a method described in Charles Bloom's blog (link at top of file), which
-     * is based around the Kraft–McMillan inequality.
+     * a method described in Charles Bloom's blog, which is based around the
+     * Kraft–McMillan inequality:
+     *
+     * https://cbloomrants.blogspot.com/2010/07/07-03-10-length-limitted-huffman-codes.html
      */
     void limitCodeLengths() noexcept;
 
@@ -173,7 +168,7 @@ private:
 
     std::unique_ptr<symbol_type[]> m_chunkBuffer;
 
-    // Sized to fit 256 ASCII symbols.
+    // Sized to fit 8-bit ASCII symbols.
     std::array<HuffmanCode, 1 << 8> m_huffmanCodes;
     std::uint16_t m_huffmanCodesSize;
 
