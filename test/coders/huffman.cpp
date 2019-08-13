@@ -1,5 +1,5 @@
-#include "fly/coders/huffman_coder.h"
-
+#include "fly/coders/huffman/huffman_decoder.h"
+#include "fly/coders/huffman/huffman_encoder.h"
 #include "fly/types/string.h"
 #include "test/util/path_util.h"
 
@@ -13,7 +13,8 @@
 class HuffmanCoderTest : public ::testing::Test
 {
 protected:
-    fly::HuffmanCoder m_coder;
+    fly::HuffmanEncoder m_encoder;
+    fly::HuffmanDecoder m_decoder;
 };
 
 //==============================================================================
@@ -22,8 +23,8 @@ TEST_F(HuffmanCoderTest, EmptyTest)
     const std::string raw;
     std::string enc, dec;
 
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_encoder.EncodeString(raw, enc));
+    ASSERT_TRUE(m_decoder.DecodeString(enc, dec));
 }
 
 //==============================================================================
@@ -32,8 +33,8 @@ TEST_F(HuffmanCoderTest, OneSymbolTest)
     const std::string raw = "a";
     std::string enc, dec;
 
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_encoder.EncodeString(raw, enc));
+    ASSERT_TRUE(m_decoder.DecodeString(enc, dec));
 
     EXPECT_EQ(raw, dec);
 }
@@ -44,8 +45,8 @@ TEST_F(HuffmanCoderTest, OneUniqueSymbolTest)
     const std::string raw = "aaaaaaaaaa";
     std::string enc, dec;
 
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_encoder.EncodeString(raw, enc));
+    ASSERT_TRUE(m_decoder.DecodeString(enc, dec));
 
     EXPECT_EQ(raw, dec);
 }
@@ -56,8 +57,8 @@ TEST_F(HuffmanCoderTest, MirrorTest)
     const std::string raw = "abcdefabcbbb";
     std::string enc, dec;
 
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_encoder.EncodeString(raw, enc));
+    ASSERT_TRUE(m_decoder.DecodeString(enc, dec));
 
     EXPECT_EQ(raw, dec);
 }
@@ -70,13 +71,13 @@ TEST_F(HuffmanCoderTest, LargeMirrorTest)
     std::string enc, dec;
 
     auto start = std::chrono::system_clock::now();
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
+    ASSERT_TRUE(m_encoder.EncodeString(raw, enc));
     auto end = std::chrono::system_clock::now();
     std::cout << std::chrono::duration<double>(end - start).count()
               << std::endl;
 
     start = std::chrono::system_clock::now();
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_decoder.DecodeString(enc, dec));
     end = std::chrono::system_clock::now();
     std::cout << std::chrono::duration<double>(end - start).count()
               << std::endl;
@@ -96,8 +97,8 @@ TEST_F(HuffmanCoderTest, UnicodeTest)
         raw += raw;
     }
 
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_encoder.EncodeString(raw, enc));
+    ASSERT_TRUE(m_decoder.DecodeString(enc, dec));
 
     EXPECT_GT(raw.size(), enc.size());
     EXPECT_EQ(raw, dec);
@@ -145,8 +146,8 @@ TEST_F(HuffmanCoderFileTest, AsciiFileTest)
     const auto here = std::filesystem::path(__FILE__).parent_path();
     const auto raw = here / "data" / "test.txt";
 
-    ASSERT_TRUE(m_coder.EncodeFile(raw, m_encodedFile));
-    ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
+    ASSERT_TRUE(m_encoder.EncodeFile(raw, m_encodedFile));
+    ASSERT_TRUE(m_decoder.DecodeFile(m_encodedFile, m_decodedFile));
 
     EXPECT_GT(
         std::filesystem::file_size(raw),
@@ -162,8 +163,8 @@ TEST_F(HuffmanCoderFileTest, BinaryFileTest)
     const auto here = std::filesystem::path(__FILE__).parent_path();
     const auto raw = here / "data" / "test.bin";
 
-    ASSERT_TRUE(m_coder.EncodeFile(raw, m_encodedFile));
-    ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
+    ASSERT_TRUE(m_encoder.EncodeFile(raw, m_encodedFile));
+    ASSERT_TRUE(m_decoder.DecodeFile(m_encodedFile, m_decodedFile));
 
     EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decodedFile));
 }
@@ -182,7 +183,7 @@ TEST_F(HuffmanCoderFileTest, Enwik8FileTest)
     }
 
     auto start = std::chrono::system_clock::now();
-    ASSERT_TRUE(m_coder.EncodeFile(raw, m_encodedFile));
+    ASSERT_TRUE(m_encoder.EncodeFile(raw, m_encodedFile));
     auto end = std::chrono::system_clock::now();
     std::cout << std::chrono::duration<double>(end - start).count()
               << std::endl;
@@ -191,7 +192,7 @@ TEST_F(HuffmanCoderFileTest, Enwik8FileTest)
     std::cout << std::filesystem::file_size(m_encodedFile) << std::endl;
 
     start = std::chrono::system_clock::now();
-    ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
+    ASSERT_TRUE(m_decoder.DecodeFile(m_encodedFile, m_decodedFile));
     end = std::chrono::system_clock::now();
     std::cout << std::chrono::duration<double>(end - start).count()
               << std::endl;

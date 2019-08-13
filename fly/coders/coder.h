@@ -11,19 +11,19 @@ class BitStreamReader;
 class BitStreamWriter;
 
 /**
- * Virtual interface to encode and decode a file or string. Coders for specific
- * algorithms should inherit from this class.
+ * Virtual interface to encode a file or string. Coders for specific algorithms
+ * should inherit from this class to perform encoding.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 7, 2019
  */
-class Coder
+class Encoder
 {
 public:
     /**
      * Destructor.
      */
-    virtual ~Coder() = default;
+    virtual ~Encoder() = default;
 
     /**
      * Encode a string.
@@ -46,6 +46,33 @@ public:
     bool EncodeFile(
         const std::filesystem::path &,
         const std::filesystem::path &) noexcept;
+
+protected:
+    /**
+     * Encode a stream.
+     *
+     * @param istream Stream holding the contents to encode.
+     * @param BitStreamWriter Stream to store the encoded contents.
+     *
+     * @return bool True if the input stream was successfully encoded.
+     */
+    virtual bool EncodeInternal(std::istream &, BitStreamWriter &) noexcept = 0;
+};
+
+/**
+ * Virtual interface to decode a file or string. Coders for specific algorithms
+ * should inherit from this class to perform decoding.
+ *
+ * @author Timothy Flynn (trflynn89@gmail.com)
+ * @version July 7, 2019
+ */
+class Decoder
+{
+public:
+    /**
+     * Destructor.
+     */
+    virtual ~Decoder() = default;
 
     /**
      * Decode a string.
@@ -70,16 +97,6 @@ public:
         const std::filesystem::path &) noexcept;
 
 protected:
-    /**
-     * Encode a stream.
-     *
-     * @param istream Stream holding the contents to encode.
-     * @param BitStreamWriter Stream to store the encoded contents.
-     *
-     * @return bool True if the input stream was successfully encoded.
-     */
-    virtual bool EncodeInternal(std::istream &, BitStreamWriter &) noexcept = 0;
-
     /**
      * Decode a stream.
      *
