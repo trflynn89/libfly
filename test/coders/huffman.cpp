@@ -5,7 +5,6 @@
 
 #include <gtest/gtest.h>
 
-#include <chrono>
 #include <filesystem>
 #include <string>
 
@@ -67,20 +66,10 @@ TEST_F(HuffmanCoderTest, MirrorTest)
 TEST_F(HuffmanCoderTest, LargeMirrorTest)
 {
     const std::string raw = fly::String::GenerateRandomString(100 << 10);
-    std::cout << "." << std::endl;
     std::string enc, dec;
 
-    auto start = std::chrono::system_clock::now();
     ASSERT_TRUE(m_encoder.EncodeString(raw, enc));
-    auto end = std::chrono::system_clock::now();
-    std::cout << std::chrono::duration<double>(end - start).count()
-              << std::endl;
-
-    start = std::chrono::system_clock::now();
     ASSERT_TRUE(m_decoder.DecodeString(enc, dec));
-    end = std::chrono::system_clock::now();
-    std::cout << std::chrono::duration<double>(end - start).count()
-              << std::endl;
 
     EXPECT_GT(raw.size(), enc.size());
     EXPECT_EQ(raw, dec);
@@ -182,20 +171,8 @@ TEST_F(HuffmanCoderFileTest, Enwik8FileTest)
         return;
     }
 
-    auto start = std::chrono::system_clock::now();
     ASSERT_TRUE(m_encoder.EncodeFile(raw, m_encodedFile));
-    auto end = std::chrono::system_clock::now();
-    std::cout << std::chrono::duration<double>(end - start).count()
-              << std::endl;
-
-    std::cout << std::filesystem::file_size(raw) << std::endl;
-    std::cout << std::filesystem::file_size(m_encodedFile) << std::endl;
-
-    start = std::chrono::system_clock::now();
     ASSERT_TRUE(m_decoder.DecodeFile(m_encodedFile, m_decodedFile));
-    end = std::chrono::system_clock::now();
-    std::cout << std::chrono::duration<double>(end - start).count()
-              << std::endl;
 
     EXPECT_GT(
         std::filesystem::file_size(raw),

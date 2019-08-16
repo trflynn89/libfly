@@ -12,6 +12,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <ios>
 #include <random>
 #include <string>
 #include <type_traits>
@@ -588,11 +589,13 @@ void BasicString<StringType>::format(
     const T &value,
     const Args &... args) noexcept
 {
+    const std::ios_base::fmtflags flags(ostream.flags());
+
     for (; *fmt != '\0'; ++fmt)
     {
         if (*fmt == '%')
         {
-            char_type type = *(fmt + 1);
+            const char_type type = *(fmt + 1);
 
             switch (type)
             {
@@ -600,33 +603,55 @@ void BasicString<StringType>::format(
                     stream(ostream, *fmt);
                     return;
 
+                case '%':
+                    stream(ostream, *(++fmt));
+                    continue;
+
                 case 'x':
+                    ostream << "0x" << std::hex << std::nouppercase;
+                    break;
                 case 'X':
-                    ostream << "0x" << std::hex;
-                    stream(ostream, value);
-                    ostream << std::dec;
+                    ostream << "0X" << std::hex << std::uppercase;
+                    break;
+
+                case 'o':
+                    ostream << '0' << std::oct;
+                    break;
+
+                case 'a':
+                    ostream << std::hexfloat << std::nouppercase;
+                    break;
+                case 'A':
+                    ostream << std::hexfloat << std::uppercase;
                     break;
 
                 case 'f':
+                    ostream << std::fixed << std::nouppercase;
+                    break;
                 case 'F':
+                    ostream << std::fixed << std::uppercase;
+                    break;
+
                 case 'g':
+                    ostream << std::nouppercase;
+                    break;
                 case 'G':
-                    ostream << std::fixed;
-                    stream(ostream, value);
-                    ostream.unsetf(std::ios_base::fixed);
+                    ostream << std::uppercase;
                     break;
 
                 case 'e':
+                    ostream << std::scientific << std::nouppercase;
+                    break;
                 case 'E':
-                    ostream << std::scientific;
-                    stream(ostream, value);
-                    ostream.unsetf(std::ios_base::scientific);
+                    ostream << std::scientific << std::uppercase;
                     break;
 
                 default:
-                    stream(ostream, value);
                     break;
             }
+
+            stream(ostream, value);
+            ostream.flags(flags);
 
             format(ostream, fmt + 2, args...);
             return;
@@ -642,7 +667,19 @@ void BasicString<StringType>::format(
     ostream_type &ostream,
     const char_type *fmt) noexcept
 {
-    stream(ostream, fmt);
+    for (; *fmt != '\0'; ++fmt)
+    {
+        const char_type type = *(fmt + 1);
+
+        if ((*fmt == '%') && (type == '%'))
+        {
+            stream(ostream, *(++fmt));
+        }
+        else
+        {
+            stream(ostream, *fmt);
+        }
+    }
 }
 
 //==============================================================================
