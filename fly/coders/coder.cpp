@@ -20,10 +20,11 @@ namespace {
     constexpr const std::ios::openmode s_bidrectionalMode =
         s_inputMode | s_outputMode;
 
+    template <typename SizeType>
     void logEncoderStats(
         std::chrono::time_point<std::chrono::system_clock> start,
-        std::size_t decodedSize,
-        std::size_t encodedSize) noexcept
+        SizeType decodedSize,
+        SizeType encodedSize) noexcept
     {
         const auto end = std::chrono::system_clock::now();
         const auto ratio = static_cast<double>(encodedSize) / decodedSize;
@@ -36,10 +37,11 @@ namespace {
             std::chrono::duration<double>(end - start).count());
     }
 
+    template <typename SizeType>
     void logDecoderStats(
         std::chrono::time_point<std::chrono::system_clock> start,
-        std::size_t encodedSize,
-        std::size_t decodedSize) noexcept
+        SizeType encodedSize,
+        SizeType decodedSize) noexcept
     {
         const auto end = std::chrono::system_clock::now();
 
