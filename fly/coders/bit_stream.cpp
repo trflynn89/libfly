@@ -182,7 +182,7 @@ bool BitStreamReader::refillBuffer() noexcept
         m_buffer |= buffer >> (s_mostSignificantBitPosition - bitsRead);
     }
 
-    if (m_stream.eof())
+    if (m_stream.peek() == EOF)
     {
         // At end-of-file, discard any encoded zero-filled bits.
         m_position -= m_remainder;
