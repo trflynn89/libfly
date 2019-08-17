@@ -669,9 +669,7 @@ void BasicString<StringType>::format(
 {
     for (; *fmt != '\0'; ++fmt)
     {
-        const char_type type = *(fmt + 1);
-
-        if ((*fmt == '%') && (type == '%'))
+        if ((*fmt == '%') && (*(fmt + 1) == '%'))
         {
             stream(ostream, *(++fmt));
         }
