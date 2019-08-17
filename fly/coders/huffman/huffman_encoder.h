@@ -98,27 +98,21 @@ private:
      * Create a Huffman tree from the current chunk buffer.
      *
      * @param uint32_t The number of bytes the chunk buffer holds.
-     *
-     * @return bool True if the Huffman tree was successfully created.
      */
-    bool createTree(std::uint32_t) noexcept;
+    void createTree(std::uint32_t) noexcept;
 
     /**
      * Create a list of Huffman codes from the generated Huffman tree. The list
      * of codes will be in canonical form.
-     *
-     * @return bool True if the Huffman codes were successfully created.
      */
-    bool createCodes() noexcept;
+    void createCodes() noexcept;
 
     /**
      * Insert a new Huffman code into the list of already sorted codes.
      *
      * @param HuffmanCode The Huffman code to insert.
-     *
-     * @return bool True if the Huffman code could be inserted.
      */
-    bool insertCode(HuffmanCode &&) noexcept;
+    void insertCode(HuffmanCode &&) noexcept;
 
     /**
      * Length-limit the generated Huffman codes to a static maximum size, using

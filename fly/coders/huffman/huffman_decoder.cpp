@@ -2,6 +2,7 @@
 
 #include "fly/coders/bit_stream.h"
 #include "fly/literals.h"
+#include "fly/logger/logger.h"
 
 #include <vector>
 
@@ -17,6 +18,7 @@ bool HuffmanDecoder::DecodeInternal(
 
     if (!decodeHeader(input, chunkSize, maxCodeLength))
     {
+        LOGW("Error decoding header from stream");
         return false;
     }
 
@@ -27,10 +29,17 @@ bool HuffmanDecoder::DecodeInternal(
     {
         if (!decodeCodes(input, maxCodeLength))
         {
+            LOGW(
+                "Error decoding codes from stream (maximum code length = %u)",
+                maxCodeLength);
             return false;
         }
         else if (!decodeSymbols(input, maxCodeLength, chunkSize, output))
         {
+            LOGW(
+                "Error decoding %u symbols from stream (fully consumed = %d)",
+                chunkSize,
+                input.FullyConsumed());
             return false;
         }
     }
@@ -49,6 +58,7 @@ bool HuffmanDecoder::decodeHeader(
 
     if (!input.ReadByte(huffmanVersion))
     {
+        LOGW("Could not decode Huffman coder version");
         return false;
     }
 
@@ -74,6 +84,7 @@ bool HuffmanDecoder::decodeHeaderVersion1(
     word_type encodedChunkSizeKB;
     if (!input.ReadWord(encodedChunkSizeKB))
     {
+        LOGW("Could not decode chunk size");
         return false;
     }
 
@@ -81,6 +92,7 @@ bool HuffmanDecoder::decodeHeaderVersion1(
     byte_type encodedMaxCodeLength;
     if (!input.ReadByte(encodedMaxCodeLength))
     {
+        LOGW("Could not decode maximum code length");
         return false;
     }
 
@@ -101,6 +113,7 @@ bool HuffmanDecoder::decodeCodes(
     byte_type countsSize;
     if (!input.ReadByte(countsSize) || (countsSize == 0))
     {
+        LOGW("Could not decode number of code length counts");
         return false;
     }
 
@@ -115,6 +128,7 @@ bool HuffmanDecoder::decodeCodes(
     {
         if (!input.ReadWord(count))
         {
+            LOGW("Could not decode code length counts");
             return false;
         }
     }
@@ -127,6 +141,7 @@ bool HuffmanDecoder::decodeCodes(
             byte_type symbol;
             if (!input.ReadByte(symbol))
             {
+                LOGW("Could not decode code symbol of length %u bits", length);
                 return false;
             }
 
@@ -146,6 +161,7 @@ bool HuffmanDecoder::decodeCodes(
 
             if (m_huffmanCodesSize == m_huffmanCodes.size())
             {
+                LOGW("Exceeded maximum number of codes %u", m_huffmanCodesSize);
                 return false;
             }
 

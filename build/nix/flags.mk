@@ -21,6 +21,8 @@ ifeq ($(arch), x86)
 endif
 
 # Unit tests include Google test
+# TODO: should be moved to //test/files.mk, but first must implement inheriting
+# parent directory CFLAGS.
 CF_ALL += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
 CF_ALL += -I$(SOURCE_ROOT)/test/googletest/googletest
 

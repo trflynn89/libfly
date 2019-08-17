@@ -2,6 +2,7 @@
 
 #include "fly/coders/bit_stream.h"
 #include "fly/literals.h"
+#include "fly/logger/logger.h"
 
 #include <algorithm>
 #include <limits>
@@ -32,6 +33,7 @@ bool HuffmanEncoder::EncodeInternal(
 {
     if (!encodeHeader(output))
     {
+        LOGW("Error encoding header onto stream");
         return false;
     }
 
@@ -40,20 +42,19 @@ bool HuffmanEncoder::EncodeInternal(
 
     while ((chunkSize = readStream(input)) > 0)
     {
-        if (!createTree(chunkSize))
+        createTree(chunkSize);
+        createCodes();
+
+        if (!encodeCodes(output))
         {
-            return false;
-        }
-        else if (!createCodes())
-        {
-            return false;
-        }
-        else if (!encodeCodes(output))
-        {
+            LOGW("Error encoding codes onto stream");
             return false;
         }
         else if (!encodeSymbols(chunkSize, output))
         {
+            LOGW(
+                "Error encoding symbols onto stream (chunk size = %u)",
+                chunkSize);
             return false;
         }
     }
@@ -70,35 +71,33 @@ std::uint32_t HuffmanEncoder::readStream(std::istream &input) const noexcept
     const std::istream::pos_type length = input.tellg() - start;
     input.seekg(start, std::ios::beg);
 
+    std::uint32_t bytesRead = 0;
+
     if (length > 0)
     {
         input.read(
             reinterpret_cast<std::ios::char_type *>(m_chunkBuffer.get()),
             std::min(static_cast<std::uint32_t>(length), s_chunkSize));
 
-        return static_cast<std::uint32_t>(input.gcount());
+        bytesRead = static_cast<std::uint32_t>(input.gcount());
+
+        if (bytesRead == 0)
+        {
+            LOGW("Could not read any bytes from stream");
+        }
     }
 
-    return 0;
+    return bytesRead;
 }
 
 //==============================================================================
-bool HuffmanEncoder::createTree(std::uint32_t chunkSize) noexcept
+void HuffmanEncoder::createTree(std::uint32_t chunkSize) noexcept
 {
     // Lambda to retrieve the next available HuffmanNode
     std::uint16_t index = 0;
 
-    auto next_node = [this, &index]() -> HuffmanNode * {
-        if (++index < m_huffmanTree.size())
-        {
-            return &m_huffmanTree[index];
-        }
-
-        return nullptr;
-    };
-
     // Create a frequency map of each input symbol.
-    std::array<frequency_type, 256> counts {};
+    std::array<frequency_type, 1 << 8> counts {};
 
     for (std::uint32_t i = 0; i < chunkSize; ++i)
     {
@@ -112,19 +111,12 @@ bool HuffmanEncoder::createTree(std::uint32_t chunkSize) noexcept
 
     do
     {
-        if (counts[symbol] == 0)
+        if (counts[symbol] > 0)
         {
-            continue;
+            HuffmanNode *node = &m_huffmanTree[++index];
+            node->BecomeSymbol(symbol, counts[symbol]);
+            queue.push(node);
         }
-
-        HuffmanNode *node = next_node();
-        if (node == nullptr)
-        {
-            return false;
-        }
-
-        node->BecomeSymbol(symbol, counts[symbol]);
-        queue.push(node);
     } while (++symbol != 0);
 
     // Convert the priority queue to a Huffman tree. Remove the two least common
@@ -138,24 +130,17 @@ bool HuffmanEncoder::createTree(std::uint32_t chunkSize) noexcept
         auto *right = queue.top();
         queue.pop();
 
-        HuffmanNode *node = next_node();
-        if (node == nullptr)
-        {
-            return false;
-        }
-
+        HuffmanNode *node = &m_huffmanTree[++index];
         node->BecomeIntermediate(left, right);
         queue.push(node);
     }
 
     HuffmanNode *node = queue.top();
     m_huffmanTree[0] = std::move(*node);
-
-    return true;
 }
 
 //==============================================================================
-bool HuffmanEncoder::createCodes() noexcept
+void HuffmanEncoder::createCodes() noexcept
 {
     std::stack<const HuffmanNode *> pending;
     std::stack<const HuffmanNode *> path;
@@ -186,10 +171,7 @@ bool HuffmanEncoder::createCodes() noexcept
                 const auto length = static_cast<length_type>(path.size());
                 maxCodeLength = std::max(maxCodeLength, length);
 
-                if (!insertCode(HuffmanCode(node->m_symbol, code, length)))
-                {
-                    return false;
-                }
+                insertCode(HuffmanCode(node->m_symbol, code, length));
             }
             else
             {
@@ -210,17 +192,11 @@ bool HuffmanEncoder::createCodes() noexcept
     }
 
     convertToCanonicalForm();
-    return true;
 }
 
 //==============================================================================
-bool HuffmanEncoder::insertCode(HuffmanCode &&code) noexcept
+void HuffmanEncoder::insertCode(HuffmanCode &&code) noexcept
 {
-    if (m_huffmanCodesSize == m_huffmanCodes.size())
-    {
-        return false;
-    }
-
     std::uint16_t pos = m_huffmanCodesSize++;
 
     for (; (pos > 0) && (code < m_huffmanCodes[pos - 1]); --pos)
@@ -229,7 +205,6 @@ bool HuffmanEncoder::insertCode(HuffmanCode &&code) noexcept
     }
 
     m_huffmanCodes[pos] = std::move(code);
-    return true;
 }
 
 //==============================================================================
@@ -300,13 +275,13 @@ void HuffmanEncoder::convertToCanonicalForm() noexcept
 
     for (std::uint16_t i = 1; i < m_huffmanCodesSize; ++i)
     {
+        const HuffmanCode &previous = m_huffmanCodes[i - 1];
+        HuffmanCode &code = m_huffmanCodes[i];
+
         // Subsequent codes are one greater than the previous code, but also
         // bit-shifted left enough times to maintain the same code length.
-        m_huffmanCodes[i].m_code = m_huffmanCodes[i - 1].m_code + 1;
-
-        const length_type shift =
-            m_huffmanCodes[i].m_length - m_huffmanCodes[i - 1].m_length;
-        m_huffmanCodes[i].m_code <<= shift;
+        code.m_code = previous.m_code + 1;
+        code.m_code <<= code.m_length - previous.m_length;
     }
 }
 
@@ -316,18 +291,21 @@ bool HuffmanEncoder::encodeHeader(BitStreamWriter &output) const noexcept
     // Encode the Huffman coder version.
     if (!output.WriteByte(static_cast<byte_type>(s_huffmanVersion)))
     {
+        LOGW("Could not encode Huffman version %u", s_huffmanVersion);
         return false;
     }
 
     // Encode the chunk size.
     if (!output.WriteWord(static_cast<word_type>(s_chunkSizeKB)))
     {
+        LOGW("Could not encode chunk size %u", s_chunkSizeKB);
         return false;
     }
 
     // Encode the maximum Huffman code length.
     if (!output.WriteByte(static_cast<byte_type>(s_maxCodeLength)))
     {
+        LOGW("Could not encode maximum code length %u", s_maxCodeLength);
         return false;
     }
 
@@ -355,6 +333,7 @@ bool HuffmanEncoder::encodeCodes(BitStreamWriter &output) const noexcept
     // Encode the number of code length counts.
     if (!output.WriteByte(static_cast<byte_type>(counts.size())))
     {
+        LOGW("Could not encode number of code length counts %u", counts.size());
         return false;
     }
 
@@ -363,6 +342,7 @@ bool HuffmanEncoder::encodeCodes(BitStreamWriter &output) const noexcept
     {
         if (!output.WriteWord(static_cast<word_type>(length)))
         {
+            LOGW("Could not encode code length count %u", length);
             return false;
         }
     }
@@ -374,6 +354,7 @@ bool HuffmanEncoder::encodeCodes(BitStreamWriter &output) const noexcept
 
         if (!output.WriteByte(static_cast<byte_type>(code.m_symbol)))
         {
+            LOGW("Could not encode code symbol %x", code.m_symbol);
             return false;
         }
     }
@@ -401,6 +382,10 @@ bool HuffmanEncoder::encodeSymbols(
 
         if (!output.WriteBits(code.m_code, length))
         {
+            LOGW(
+                "Could not encode code %x of length %u",
+                code.m_code,
+                code.m_length);
             return false;
         }
     }
