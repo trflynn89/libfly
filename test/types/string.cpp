@@ -656,7 +656,7 @@ TYPED_TEST(BasicStringTest, FormatTest_a)
     // Windows 0-pads std::hexfloat to match the stream precision, Linux does
     // not. This discrepency should be fixed when length modifiers are added.
     EXPECT_EQ(
-        FLY_STR(streamed_char, "0X1.6P00000+2"),
+        FLY_STR(streamed_char, "0X1.600000P+2"),
         StringClass::Format(format, 5.5));
 #else
     EXPECT_EQ(

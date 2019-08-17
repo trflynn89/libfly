@@ -170,22 +170,19 @@ bool BitStreamReader::refillBuffer() noexcept
     {
         return m_position > 0;
     }
-    else if (bitsRead == s_mostSignificantBitPosition)
-    {
-        // It is undefined behavior to bit-shift by the size of the value being
-        // shifted, so handle that case separately.
-        m_position = bitsRead;
-        m_buffer = buffer;
-    }
     else
     {
         m_position += bitsRead;
 
-        m_buffer <<= bitsRead;
-        m_buffer |= (buffer >> (s_mostSignificantBitPosition - bitsRead));
+        // It is undefined behavior to bit-shift by the size of the value being
+        // shifted, i.e. when bitsRead == s_mostSignificantBitPosition. Because
+        // bitsRead is at least 1 here, the left-shift can be broken into two
+        // operations in order to avoid that undefined behavior.
+        m_buffer = (m_buffer << 1) << (bitsRead - 1);
+        m_buffer |= buffer >> (s_mostSignificantBitPosition - bitsRead);
     }
 
-    if (m_stream.peek() == EOF)
+    if (m_stream.eof())
     {
         // At end-of-file, discard any encoded zero-filled bits.
         m_position -= m_remainder;
