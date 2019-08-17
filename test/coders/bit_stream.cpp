@@ -213,8 +213,8 @@ TEST_F(BitStreamTest, MultiBufferTest)
     constexpr auto length = std::numeric_limits<fly::buffer_type>::digits;
     {
         fly::BitStreamWriter stream(m_outputStream);
-        EXPECT_TRUE(stream.WriteBits(0xae1ae1ae1ae1ae1a, length));
-        EXPECT_TRUE(stream.WriteBits(0xc9bc9bc9bc9bc9ba, length));
+        EXPECT_TRUE(stream.WriteBits(0x1ae1ae1a_zu, length));
+        EXPECT_TRUE(stream.WriteBits(0xbc9bc9ba_zu, length));
         EXPECT_TRUE(stream.WriteBits(0x1f_u8, 6));
     }
 
@@ -222,7 +222,7 @@ TEST_F(BitStreamTest, MultiBufferTest)
     // have been written.
     EXPECT_EQ(
         m_outputStream.str().size(),
-        2_u64 + ((length * 2) / sizeof(fly::buffer_type)));
+        2_u64 + ((length * 2) / std::numeric_limits<fly::byte_type>::digits));
 
     // The header should be the magic value and 2 remainder bits.
     fly::byte_type magic = 0, remainder = 0;
@@ -240,10 +240,10 @@ TEST_F(BitStreamTest, MultiBufferTest)
 
         // Reading each full buffer should succeed.
         EXPECT_TRUE(stream.ReadBits(length, buffer));
-        EXPECT_EQ(buffer, 0xae1ae1ae1ae1ae1a);
+        EXPECT_EQ(buffer, 0x1ae1ae1a);
 
         EXPECT_TRUE(stream.ReadBits(length, buffer));
-        EXPECT_EQ(buffer, 0xc9bc9bc9bc9bc9ba);
+        EXPECT_EQ(buffer, 0xbc9bc9ba);
 
         // Reading the last bits should succeed.
         EXPECT_TRUE(stream.ReadBits(6, buffer));
