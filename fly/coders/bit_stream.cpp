@@ -49,13 +49,10 @@ BitStreamWriter::~BitStreamWriter() noexcept
     const byte_type bitsInBuffer = s_mostSignificantBitPosition - m_position;
     const byte_type bitsToFlush = bitsInBuffer + (m_position % s_bitsPerByte);
 
-    if (m_stream.good() && (bitsInBuffer > 0))
+    if ((bitsInBuffer > 0) && flush(m_buffer, bitsToFlush / s_bitsPerByte))
     {
-        if (flush(m_buffer, bitsToFlush / s_bitsPerByte))
-        {
-            const byte_type remainder = (bitsToFlush - bitsInBuffer);
-            flushHeader(remainder);
-        }
+        const byte_type remainder = (bitsToFlush - bitsInBuffer);
+        flushHeader(remainder);
     }
 }
 
