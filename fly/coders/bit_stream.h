@@ -296,7 +296,7 @@ private:
 struct BitStreamTraits
 {
     /**
-     * Define a trait for testing if type T is an unsigned JSON number.
+     * Define a trait for testing if type T is an unsigned integral type.
      */
     template <typename T>
     using is_unsigned_integer = std::bool_constant<

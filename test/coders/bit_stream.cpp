@@ -103,6 +103,28 @@ TEST_F(BitStreamTest, HeaderTest)
 }
 
 //==============================================================================
+TEST_F(BitStreamTest, BadHeaderTest)
+{
+    // The header should be the magic value and no remainder bits.
+    fly::byte_type header = (s_magic - 1) << s_magicShift;
+    m_outputStream << static_cast<std::ios::char_type>(header);
+    m_outputStream << "data";
+
+    m_inputStream.str(m_outputStream.str());
+    {
+        fly::BitStreamReader stream(m_inputStream);
+        fly::byte_type byte;
+
+        // The 1-byte header should have been read, even though it's invalid.
+        EXPECT_EQ(m_inputStream.gcount(), 1);
+
+        // No further reads should succeed.
+        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+        EXPECT_TRUE(m_inputStream.fail());
+    }
+}
+
+//==============================================================================
 TEST_F(BitStreamTest, SingleBitTest)
 {
     {
