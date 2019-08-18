@@ -10,6 +10,7 @@
 namespace fly {
 
 class BitStreamWriter;
+class HuffmanConfig;
 
 /**
  * Implementation of the Encoder interface for Huffman coding. Forms length-
@@ -20,6 +21,14 @@ class BitStreamWriter;
  */
 class HuffmanEncoder : public Encoder
 {
+public:
+    /**
+     * Constructor.
+     *
+     * @param HuffmanConfig Reference to Huffman configuration.
+     */
+    HuffmanEncoder(const std::shared_ptr<HuffmanConfig> &) noexcept;
+
 protected:
     /**
      * Huffman encode a stream.
@@ -159,6 +168,10 @@ private:
      * @return bool True if the input stream was successfully encoded.
      */
     bool encodeSymbols(std::uint32_t, BitStreamWriter &) noexcept;
+
+    // Configuration.
+    const std::uint16_t m_chunkSizeKB;
+    const length_type m_maxCodeLength;
 
     std::unique_ptr<symbol_type[]> m_chunkBuffer;
 

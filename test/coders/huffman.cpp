@@ -1,3 +1,4 @@
+#include "fly/coders/huffman/huffman_config.h"
 #include "fly/coders/huffman/huffman_decoder.h"
 #include "fly/coders/huffman/huffman_encoder.h"
 #include "fly/types/string.h"
@@ -11,7 +12,15 @@
 //==============================================================================
 class HuffmanCoderTest : public ::testing::Test
 {
+public:
+    HuffmanCoderTest() :
+        m_spConfig(std::make_shared<fly::HuffmanConfig>()),
+        m_encoder(m_spConfig)
+    {
+    }
+
 protected:
+    std::shared_ptr<fly::HuffmanConfig> m_spConfig;
     fly::HuffmanEncoder m_encoder;
     fly::HuffmanDecoder m_decoder;
 };

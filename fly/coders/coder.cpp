@@ -27,7 +27,8 @@ namespace {
         SizeType encodedSize) noexcept
     {
         const auto end = std::chrono::system_clock::now();
-        const auto ratio = static_cast<double>(encodedSize) / decodedSize;
+        const auto ratio =
+            (static_cast<double>(decodedSize) - encodedSize) / decodedSize;
 
         LOGD(
             "Encoded %u bytes to %u bytes (%f%%) in %f seconds",

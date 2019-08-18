@@ -1,6 +1,7 @@
 #include "fly/coders/huffman/huffman_encoder.h"
 
 #include "fly/coders/bit_stream.h"
+#include "fly/coders/huffman/huffman_config.h"
 #include "fly/literals.h"
 #include "fly/logger/logger.h"
 
@@ -15,29 +16,35 @@ namespace {
 
     constexpr const std::uint8_t s_huffmanVersion = 1;
 
-    constexpr const std::uint16_t s_chunkSizeKB = 1_u16 << 10;
-    constexpr const std::uint32_t s_chunkSize = s_chunkSizeKB << 10;
-
-    constexpr const length_type s_maxCodeLength = 11;
-
-    static_assert(
-        std::numeric_limits<code_type>::digits >= s_maxCodeLength,
-        "Maximum Huffman code length is too large for code_type");
-
 } // namespace
+
+//==============================================================================
+HuffmanEncoder::HuffmanEncoder(
+    const std::shared_ptr<HuffmanConfig> &spConfig) noexcept :
+    m_chunkSizeKB(spConfig->EncoderChunkSizeKB()),
+    m_maxCodeLength(spConfig->EncoderMaxCodeLength())
+{
+}
 
 //==============================================================================
 bool HuffmanEncoder::EncodeInternal(
     std::istream &input,
     BitStreamWriter &output) noexcept
 {
-    if (!encodeHeader(output))
+    if (m_maxCodeLength > std::numeric_limits<code_type>::digits)
+    {
+        LOGW(
+            "Maximum Huffman code length %u is too large for code_type",
+            m_maxCodeLength);
+        return false;
+    }
+    else if (!encodeHeader(output))
     {
         LOGW("Error encoding header onto stream");
         return false;
     }
 
-    m_chunkBuffer = std::make_unique<symbol_type[]>(s_chunkSize);
+    m_chunkBuffer = std::make_unique<symbol_type[]>(m_chunkSizeKB << 10);
     std::uint32_t chunkSize = 0;
 
     while ((chunkSize = readStream(input)) > 0)
@@ -77,7 +84,9 @@ std::uint32_t HuffmanEncoder::readStream(std::istream &input) const noexcept
     {
         input.read(
             reinterpret_cast<std::ios::char_type *>(m_chunkBuffer.get()),
-            std::min(static_cast<std::uint32_t>(length), s_chunkSize));
+            std::min(
+                static_cast<std::streamsize>(length),
+                static_cast<std::streamsize>(m_chunkSizeKB << 10)));
 
         bytesRead = static_cast<std::uint32_t>(input.gcount());
 
@@ -186,7 +195,7 @@ void HuffmanEncoder::createCodes() noexcept
         }
     }
 
-    if (maxCodeLength > s_maxCodeLength)
+    if (maxCodeLength > m_maxCodeLength)
     {
         limitCodeLengths();
     }
@@ -210,11 +219,11 @@ void HuffmanEncoder::insertCode(HuffmanCode &&code) noexcept
 //==============================================================================
 void HuffmanEncoder::limitCodeLengths() noexcept
 {
-    auto computeKraft = [](const HuffmanCode &code) -> code_type {
-        return 1_u16 << (s_maxCodeLength - code.m_length);
+    auto computeKraft = [this](const HuffmanCode &code) -> code_type {
+        return 1_u16 << (m_maxCodeLength - code.m_length);
     };
 
-    constexpr const code_type maxAllowedKraft = (1_u16 << s_maxCodeLength) - 1;
+    const code_type maxAllowedKraft = (1_u16 << m_maxCodeLength) - 1;
     code_type kraft = 0;
 
     // Limit all Huffman codes to not be larger than the maximum code length.
@@ -224,7 +233,7 @@ void HuffmanEncoder::limitCodeLengths() noexcept
     {
         HuffmanCode &code = m_huffmanCodes[i];
 
-        code.m_length = std::min(code.m_length, s_maxCodeLength);
+        code.m_length = std::min(code.m_length, m_maxCodeLength);
         kraft += computeKraft(code);
     }
 
@@ -236,7 +245,7 @@ void HuffmanEncoder::limitCodeLengths() noexcept
     {
         HuffmanCode &code = m_huffmanCodes[i];
 
-        while (code.m_length < s_maxCodeLength)
+        while (code.m_length < m_maxCodeLength)
         {
             ++code.m_length;
             kraft -= computeKraft(code);
@@ -296,16 +305,16 @@ bool HuffmanEncoder::encodeHeader(BitStreamWriter &output) const noexcept
     }
 
     // Encode the chunk size.
-    if (!output.WriteWord(static_cast<word_type>(s_chunkSizeKB)))
+    if (!output.WriteWord(static_cast<word_type>(m_chunkSizeKB)))
     {
-        LOGW("Could not encode chunk size %u", s_chunkSizeKB);
+        LOGW("Could not encode chunk size %u", m_chunkSizeKB);
         return false;
     }
 
     // Encode the maximum Huffman code length.
-    if (!output.WriteByte(static_cast<byte_type>(s_maxCodeLength)))
+    if (!output.WriteByte(static_cast<byte_type>(m_maxCodeLength)))
     {
-        LOGW("Could not encode maximum code length %u", s_maxCodeLength);
+        LOGW("Could not encode maximum code length %u", m_maxCodeLength);
         return false;
     }
 
