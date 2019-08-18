@@ -54,6 +54,9 @@
     <ClInclude Include="..\..\..\fly\coders\coder.h">
       <Filter>coders</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.h">
+      <Filter>coders\huffman</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.h">
       <Filter>coders\huffman</Filter>
     </ClInclude>
@@ -181,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\coders\coder.cpp">
       <Filter>coders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_config.cpp">
+      <Filter>coders\huffman</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_decoder.cpp">
       <Filter>coders\huffman</Filter>

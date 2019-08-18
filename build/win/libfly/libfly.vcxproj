@@ -160,6 +160,7 @@
     <ClInclude Include="..\..\..\fly\literals.h" />
     <ClInclude Include="..\..\..\fly\coders\bit_stream.h" />
     <ClInclude Include="..\..\..\fly\coders\coder.h" />
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.h" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.h" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.h" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.h" />
@@ -204,6 +205,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\coders\bit_stream.cpp" />
     <ClCompile Include="..\..\..\fly\coders\coder.cpp" />
+    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_config.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_decoder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_encoder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_types.cpp" />
