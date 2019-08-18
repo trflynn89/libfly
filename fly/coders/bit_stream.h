@@ -11,7 +11,7 @@ namespace fly {
 
 typedef std::uint8_t byte_type;
 typedef std::uint16_t word_type;
-typedef std::size_t buffer_type;
+typedef std::uint64_t buffer_type;
 
 /**
  * Base class for writing to and reading from a binary stream. The first byte of

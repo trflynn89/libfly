@@ -105,7 +105,6 @@ TEST_F(BitStreamTest, HeaderTest)
 //==============================================================================
 TEST_F(BitStreamTest, BadHeaderTest)
 {
-    // The header should be the magic value and no remainder bits.
     fly::byte_type header = (s_magic - 1) << s_magicShift;
     m_outputStream << static_cast<std::ios::char_type>(header);
     m_outputStream << "data";
@@ -235,8 +234,8 @@ TEST_F(BitStreamTest, MultiBufferTest)
     constexpr auto length = std::numeric_limits<fly::buffer_type>::digits;
     {
         fly::BitStreamWriter stream(m_outputStream);
-        EXPECT_TRUE(stream.WriteBits(0x1ae1ae1a_zu, length));
-        EXPECT_TRUE(stream.WriteBits(0xbc9bc9ba_zu, length));
+        EXPECT_TRUE(stream.WriteBits(0xae1ae1ae1ae1ae1a_u64, length));
+        EXPECT_TRUE(stream.WriteBits(0xbc9bc9bc9bc9bc9b_u64, length));
         EXPECT_TRUE(stream.WriteBits(0x1f_u8, 6));
     }
 
@@ -262,10 +261,10 @@ TEST_F(BitStreamTest, MultiBufferTest)
 
         // Reading each full buffer should succeed.
         EXPECT_TRUE(stream.ReadBits(length, buffer));
-        EXPECT_EQ(buffer, 0x1ae1ae1a);
+        EXPECT_EQ(buffer, 0xae1ae1ae1ae1ae1a_u64);
 
         EXPECT_TRUE(stream.ReadBits(length, buffer));
-        EXPECT_EQ(buffer, 0xbc9bc9ba);
+        EXPECT_EQ(buffer, 0xbc9bc9bc9bc9bc9b_u64);
 
         // Reading the last bits should succeed.
         EXPECT_TRUE(stream.ReadBits(6, buffer));
