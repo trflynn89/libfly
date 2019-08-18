@@ -62,7 +62,7 @@ protected:
      * @return DataType The created mask.
      */
     template <typename DataType>
-    constexpr static DataType GenerateMask(const DataType);
+    inline static DataType GenerateMask(const DataType);
 
     byte_type m_position;
     buffer_type m_buffer;
@@ -311,11 +311,16 @@ struct BitStreamTraits
 
 //==============================================================================
 template <typename DataType>
-constexpr DataType BitStream::GenerateMask(const DataType bits)
+inline DataType BitStream::GenerateMask(const DataType bits)
 {
     static_assert(
         BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
+
+    if (bits == 0)
+    {
+        return 0;
+    }
 
     constexpr auto filledMask = std::numeric_limits<DataType>::max();
     constexpr auto numberOfBits = std::numeric_limits<DataType>::digits;
