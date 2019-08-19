@@ -54,6 +54,15 @@ protected:
         return true;
     }
 
+    void VerifyHeader(fly::byte_type expectedRemainder)
+    {
+        fly::byte_type magic = 0, actualRemainder = 0;
+        EXPECT_TRUE(ReadHeader(magic, actualRemainder));
+
+        EXPECT_EQ(magic, s_magic);
+        EXPECT_EQ(actualRemainder, expectedRemainder);
+    }
+
     std::istringstream m_inputStream;
     std::stringstream m_outputStream;
 };
@@ -82,11 +91,8 @@ TEST_F(BitStreamTest, HeaderTest)
     // Only a 1-byte header should have been written.
     EXPECT_EQ(m_outputStream.str().size(), 1_u64);
 
-    // The header should be the magic value and no remainder bits.
-    fly::byte_type magic = 0, remainder = 0;
-    EXPECT_TRUE(ReadHeader(magic, remainder));
-    EXPECT_EQ(magic, s_magic);
-    EXPECT_EQ(remainder, 0_u8);
+    // The header should be the magic value and 0 remainder bits.
+    VerifyHeader(0_u8);
 
     m_inputStream.str(m_outputStream.str());
     {
@@ -135,10 +141,7 @@ TEST_F(BitStreamTest, SingleBitTest)
     EXPECT_EQ(m_outputStream.str().size(), 2_u64);
 
     // The header should be the magic value and 7 remainder bits.
-    fly::byte_type magic = 0, remainder = 0;
-    EXPECT_TRUE(ReadHeader(magic, remainder));
-    EXPECT_EQ(magic, s_magic);
-    EXPECT_EQ(remainder, 7_u8);
+    VerifyHeader(7_u8);
 
     m_inputStream.str(m_outputStream.str());
     {
@@ -170,10 +173,7 @@ TEST_F(BitStreamTest, SingleByteTest)
     EXPECT_EQ(m_outputStream.str().size(), 2_u64);
 
     // The header should be the magic value and 0 remainder bits.
-    fly::byte_type magic = 0, remainder = 0;
-    EXPECT_TRUE(ReadHeader(magic, remainder));
-    EXPECT_EQ(magic, s_magic);
-    EXPECT_EQ(remainder, 0_u8);
+    VerifyHeader(0_u8);
 
     m_inputStream.str(m_outputStream.str());
     {
@@ -205,10 +205,7 @@ TEST_F(BitStreamTest, SingleWordTest)
     EXPECT_EQ(m_outputStream.str().size(), 3_u64);
 
     // The header should be the magic value and 0 remainder bits.
-    fly::byte_type magic = 0, remainder = 0;
-    EXPECT_TRUE(ReadHeader(magic, remainder));
-    EXPECT_EQ(magic, s_magic);
-    EXPECT_EQ(remainder, 0_u8);
+    VerifyHeader(0_u8);
 
     m_inputStream.str(m_outputStream.str());
     {
@@ -235,8 +232,8 @@ TEST_F(BitStreamTest, MultiBufferTest)
     {
         fly::BitStreamWriter stream(m_outputStream);
         EXPECT_TRUE(stream.WriteBits(0xae1ae1ae1ae1ae1a_u64, length));
+        EXPECT_TRUE(stream.WriteBits(0x1f_u8, 5));
         EXPECT_TRUE(stream.WriteBits(0xbc9bc9bc9bc9bc9b_u64, length));
-        EXPECT_TRUE(stream.WriteBits(0x1f_u8, 6));
     }
 
     // A 1-byte header, 2 full internal byte buffers, and a 1-byte buffer should
@@ -245,11 +242,8 @@ TEST_F(BitStreamTest, MultiBufferTest)
         m_outputStream.str().size(),
         2_u64 + ((length * 2) / std::numeric_limits<fly::byte_type>::digits));
 
-    // The header should be the magic value and 2 remainder bits.
-    fly::byte_type magic = 0, remainder = 0;
-    EXPECT_TRUE(ReadHeader(magic, remainder));
-    EXPECT_EQ(magic, s_magic);
-    EXPECT_EQ(remainder, 2_u8);
+    // The header should be the magic value and 3 remainder bits.
+    VerifyHeader(3_u8);
 
     m_inputStream.str(m_outputStream.str());
     {
@@ -259,19 +253,87 @@ TEST_F(BitStreamTest, MultiBufferTest)
         // The 1-byte header should have been read.
         EXPECT_EQ(m_inputStream.gcount(), 1);
 
-        // Reading each full buffer should succeed.
-        EXPECT_TRUE(stream.ReadBits(length, buffer));
+        // Reading all written bits should succeed.
+        EXPECT_EQ(stream.ReadBits(64, buffer), 64_u8);
         EXPECT_EQ(buffer, 0xae1ae1ae1ae1ae1a_u64);
 
-        EXPECT_TRUE(stream.ReadBits(length, buffer));
-        EXPECT_EQ(buffer, 0xbc9bc9bc9bc9bc9b_u64);
+        EXPECT_EQ(stream.ReadBits(15, buffer), 15_u8);
+        EXPECT_EQ(buffer, 0x7ef2);
 
-        // Reading the last bits should succeed.
-        EXPECT_TRUE(stream.ReadBits(6, buffer));
-        EXPECT_EQ(buffer, 0x1f);
+        EXPECT_EQ(stream.ReadBits(54, buffer), 54_u8);
+        EXPECT_EQ(buffer, 0x1bc9bc9bc9bc9b_u64);
 
         // No further reads should succeed.
         EXPECT_EQ(stream.ReadBits(1, buffer), 0_u8);
+        EXPECT_TRUE(stream.FullyConsumed());
+    }
+}
+
+//==============================================================================
+TEST_F(BitStreamTest, PeekTest)
+{
+    {
+        fly::BitStreamWriter stream(m_outputStream);
+        EXPECT_TRUE(stream.WriteByte(0xa));
+    }
+
+    // A 1-byte header and a 1-byte buffer should have been written.
+    EXPECT_EQ(m_outputStream.str().size(), 2_u64);
+
+    // The header should be the magic value and 0 remainder bits.
+    VerifyHeader(0_u8);
+
+    m_inputStream.str(m_outputStream.str());
+    {
+        fly::BitStreamReader stream(m_inputStream);
+        fly::byte_type byte;
+
+        // The 1-byte header should have been read.
+        EXPECT_EQ(m_inputStream.gcount(), 1);
+
+        // Peeking a single byte multiple times should succeed.
+        for (std::uint8_t i = 0; i < 10; ++i)
+        {
+            EXPECT_EQ(stream.PeekBits(8_u8, byte), 8_u8);
+            EXPECT_EQ(byte, 0xa);
+        }
+
+        // After discarding the peeked bits, no further reads should succeed.
+        stream.DiscardBits(8_u8);
+        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+        EXPECT_TRUE(stream.FullyConsumed());
+    }
+}
+
+//==============================================================================
+TEST_F(BitStreamTest, OverPeekTest)
+{
+    {
+        fly::BitStreamWriter stream(m_outputStream);
+        EXPECT_TRUE(stream.WriteBits(0x7f_u8, 7_u8));
+    }
+
+    // A 1-byte header and a 1-byte buffer should have been written.
+    EXPECT_EQ(m_outputStream.str().size(), 2_u64);
+
+    // The header should be the magic value and 1 remainder bit.
+    VerifyHeader(1_u8);
+
+    m_inputStream.str(m_outputStream.str());
+    {
+        fly::BitStreamReader stream(m_inputStream);
+        fly::byte_type byte;
+
+        // The 1-byte header should have been read.
+        EXPECT_EQ(m_inputStream.gcount(), 1);
+
+        // Trying to peek 8 bits should result in 7 bits being peeked.
+        EXPECT_EQ(stream.PeekBits(8_u8, byte), 7_u8);
+        EXPECT_EQ(byte, 0x7f << 1);
+
+        // After discarding the peeked bits, no further reads should succeed.
+        stream.DiscardBits(7_u8);
+        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
         EXPECT_TRUE(stream.FullyConsumed());
     }
 }
@@ -317,10 +379,7 @@ TEST_F(BitStreamTest, FailedWriterStreamTest)
     EXPECT_EQ(m_outputStream.str().size(), 1_u64);
 
     // The header should be the magic value and 0 remainder bits.
-    fly::byte_type magic = 0, remainder = 0;
-    EXPECT_TRUE(ReadHeader(magic, remainder));
-    EXPECT_EQ(magic, s_magic);
-    EXPECT_EQ(remainder, 0_u8);
+    VerifyHeader(0_u8);
 
     m_inputStream.str(m_outputStream.str());
     {
@@ -348,10 +407,7 @@ TEST_F(BitStreamTest, InvalidReaderStreamTest)
     EXPECT_EQ(m_outputStream.str().size(), 2_u64);
 
     // The header should be the magic value and 0 remainder bits.
-    fly::byte_type magic = 0, remainder = 0;
-    EXPECT_TRUE(ReadHeader(magic, remainder));
-    EXPECT_EQ(magic, s_magic);
-    EXPECT_EQ(remainder, 0_u8);
+    VerifyHeader(0_u8);
 
     // Close the stream before handing it to BitStreamReader.
     m_inputStream.setstate(std::ios::failbit);
@@ -379,10 +435,7 @@ TEST_F(BitStreamTest, FailedReaderStreamTest)
     EXPECT_EQ(m_outputStream.str().size(), 2_u64);
 
     // The header should be the magic value and 0 remainder bits.
-    fly::byte_type magic = 0, remainder = 0;
-    EXPECT_TRUE(ReadHeader(magic, remainder));
-    EXPECT_EQ(magic, s_magic);
-    EXPECT_EQ(remainder, 0_u8);
+    VerifyHeader(0_u8);
 
     m_inputStream.str(m_outputStream.str());
     {

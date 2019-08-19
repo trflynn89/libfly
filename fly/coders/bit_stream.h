@@ -62,7 +62,7 @@ protected:
      * @return DataType The created mask.
      */
     template <typename DataType>
-    inline static DataType GenerateMask(const DataType);
+    constexpr inline static DataType GenerateMask(const DataType);
 
     byte_type m_position;
     buffer_type m_buffer;
@@ -123,8 +123,9 @@ public:
 
     /**
      * Write a number of bits to the byte buffer. The least-significant bits in
-     * the provided data type will be written. Flush the buffer to the stream if
-     * it is filled during this operation.
+     * the provided data type will be written, starting from the position
+     * pointed to by the provided number of bits. Flush the buffer to the stream
+     * if it is filled during this operation.
      *
      * @tparam DataType The data type storing the bits to write.
      *
@@ -216,9 +217,10 @@ public:
     bool ReadByte(byte_type &) noexcept;
 
     /**
-     * Read a number of bits from the byte buffer. The most-significant bits in
-     * the provided data type will be written. Fill the buffer from the stream
-     * if the number of bits to read exceeds the number of bits available.
+     * Read a number of bits from the byte buffer. The least-significant bits in
+     * the provided data type will be filled, starting from the position pointed
+     * to by the provided number of bits. Fill the buffer from the stream if the
+     * number of bits to read exceeds the number of bits available.
      *
      * @tparam DataType The data type of the location to store the read bits.
      *
@@ -232,8 +234,9 @@ public:
 
     /**
      * Read a number of bits from the byte buffer without discarding those bits.
-     * The most-significant bits in the provided data type will be written. Fill
-     * the buffer from the stream if the number of bits to peek exceeds the
+     * The least-significant bits in the provided data type will be filled,
+     * starting from the position pointed to by the provided number of bits.
+     * Fill the buffer from the stream if the number of bits to peek exceeds the
      * number of bits available.
      *
      * @tparam DataType The data type of the location to store the peeked bits.
@@ -305,22 +308,27 @@ struct BitStreamTraits
         !std::is_same_v<bool, std::decay_t<T>>>;
 
     template <typename T>
-    inline static constexpr bool is_unsigned_integer_v =
+    constexpr inline static bool is_unsigned_integer_v =
         is_unsigned_integer<T>::value;
+
+    /**
+     * Define a trait for testing if type T is buffer_type.
+     */
+    template <typename T>
+    using is_buffer_type =
+        std::bool_constant<std::is_same_v<buffer_type, std::decay_t<T>>>;
+
+    template <typename T>
+    constexpr inline static bool is_buffer_type_v = is_buffer_type<T>::value;
 };
 
 //==============================================================================
 template <typename DataType>
-inline DataType BitStream::GenerateMask(const DataType bits)
+constexpr inline DataType BitStream::GenerateMask(const DataType bits)
 {
     static_assert(
         BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
-
-    if (bits == 0)
-    {
-        return 0;
-    }
 
     constexpr auto filledMask = std::numeric_limits<DataType>::max();
     constexpr auto numberOfBits = std::numeric_limits<DataType>::digits;
@@ -391,10 +399,29 @@ byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
         BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    const byte_type sizeRead = PeekBits(size, bits);
-    DiscardBits(sizeRead);
+    if constexpr (BitStreamTraits::is_buffer_type_v<DataType>)
+    {
+        // See PeekBits for why 64-bit read operations must be split.
+        const byte_type sizeHigh = size / 2;
+        const byte_type sizeLow = size - sizeHigh;
+        std::uint32_t bitsHigh, bitsLow;
 
-    return sizeRead;
+        const byte_type bitsReadHigh = PeekBits(sizeHigh, bitsHigh);
+        DiscardBits(bitsReadHigh);
+
+        const byte_type bitsReadLow = PeekBits(sizeLow, bitsLow);
+        DiscardBits(bitsReadLow);
+
+        bits = (static_cast<DataType>(bitsHigh) << sizeLow) | bitsLow;
+        return bitsReadHigh + bitsReadLow;
+    }
+    else
+    {
+        const byte_type bitsRead = PeekBits(size, bits);
+        DiscardBits(bitsRead);
+
+        return bitsRead;
+    }
 }
 
 //==============================================================================
@@ -404,6 +431,20 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
     static_assert(
         BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
+
+    // 64-bit peek operations not fully supported because the byte buffer could
+    // be in a state where it cannot be refilled. For example, consider reading
+    // 6 bits and then 64 bits. After the 6-bit read, there will be 58 bits left
+    // in the buffer - not enough for the 64 bit read. The buffer must then be
+    // refilled, but it cannot because there is less than 1 byte available.
+    //
+    // Ideally, that operation could be split into two peeks (fill the given
+    // bits with the 58 available, then refill the entire byte buffer). But this
+    // would invalidate the PeekBits/DiscardBits semantic. Would need to support
+    // putting bits back onto the stream.
+    static_assert(
+        !BitStreamTraits::is_buffer_type_v<DataType>,
+        "PeekBits only supports types smaller than buffer_type");
 
     if ((size > m_position) && !refillBuffer())
     {
