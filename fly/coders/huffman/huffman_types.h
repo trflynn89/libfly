@@ -43,14 +43,6 @@ struct HuffmanNode
     HuffmanNode(const HuffmanNode &) = delete;
 
     /**
-     * Move constructor. Move all member variables from the given HuffmanNode
-     * instance into this instance.
-     *
-     * @param HuffmanNode The HuffmanNode instance to move.
-     */
-    HuffmanNode(HuffmanNode &&) noexcept;
-
-    /**
      * Deleted assignment operator.
      */
     HuffmanNode &operator=(const HuffmanNode &) = delete;

@@ -12,15 +12,6 @@ HuffmanNode::HuffmanNode() noexcept :
 }
 
 //==============================================================================
-HuffmanNode::HuffmanNode(HuffmanNode &&node) noexcept :
-    m_symbol(std::move(node.m_symbol)),
-    m_frequency(std::move(node.m_frequency)),
-    m_left(node.m_left),
-    m_right(node.m_right)
-{
-}
-
-//==============================================================================
 HuffmanNode &HuffmanNode::operator=(HuffmanNode &&node) noexcept
 {
     m_symbol = std::move(node.m_symbol);
