@@ -71,20 +71,15 @@ bool BitStreamWriter::WriteByte(byte_type byte) noexcept
 //==============================================================================
 bool BitStreamWriter::flushHeader(byte_type remainder) noexcept
 {
-    if (m_stream.good())
-    {
-        // Always write the header in the first byte position. Because this is
-        // currently only called during construction and destruction, don't
-        // bother resetting the position back to where it was originally.
-        m_stream.seekp(0);
+    // Always write the header in the first byte position. Because this is
+    // currently only called during construction and destruction, don't bother
+    // resetting the position back to where it was originally.
+    m_stream.seekp(0);
 
-        const byte_type header =
-            (s_magic << s_magicShift) | (remainder << s_remainderShift);
+    const byte_type header =
+        (s_magic << s_magicShift) | (remainder << s_remainderShift);
 
-        return flush(header, s_byteTypeSize);
-    }
-
-    return false;
+    return flush(header, s_byteTypeSize);
 }
 
 //==============================================================================
@@ -146,7 +141,7 @@ void BitStreamReader::DiscardBits(byte_type size) noexcept
 //==============================================================================
 bool BitStreamReader::FullyConsumed() const noexcept
 {
-    if (m_stream.eof() || (m_stream.good() && (m_stream.peek() == EOF)))
+    if (m_stream.eof() || (m_stream.peek() == EOF))
     {
         return m_position == 0;
     }

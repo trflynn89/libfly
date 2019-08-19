@@ -379,16 +379,11 @@ bool BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
         BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    if (m_stream.good())
-    {
-        const DataType data = byte_swap(buffer);
-        m_stream.write(
-            reinterpret_cast<const std::ios::char_type *>(&data), bytes);
+    const DataType data = byte_swap(buffer);
+    m_stream.write(
+        reinterpret_cast<const std::ios::char_type *>(&data), bytes);
 
-        return m_stream.good();
-    }
-
-    return false;
+    return m_stream.good();
 }
 
 //==============================================================================
@@ -479,15 +474,10 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
         BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    if (m_stream.good())
-    {
-        m_stream.read(reinterpret_cast<std::ios::char_type *>(&buffer), bytes);
-        buffer = byte_swap(buffer);
+    m_stream.read(reinterpret_cast<std::ios::char_type *>(&buffer), bytes);
+    buffer = byte_swap(buffer);
 
-        return static_cast<byte_type>(m_stream.gcount());
-    }
-
-    return 0;
+    return static_cast<byte_type>(m_stream.gcount());
 }
 
 } // namespace fly
