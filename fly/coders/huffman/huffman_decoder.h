@@ -125,6 +125,9 @@ private:
     // Will be sized to fit the maximum Huffman code length used by the encoder.
     // The size will be 2^L, were L is the maximum code length.
     std::unique_ptr<HuffmanCode[]> m_prefixTable;
+
+    // Friend class for unit testing.
+    friend class HuffmanCoderTest;
 };
 
 } // namespace fly

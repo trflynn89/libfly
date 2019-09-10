@@ -1,14 +1,17 @@
 #include "fly/coders/huffman/huffman_config.h"
 #include "fly/coders/huffman/huffman_decoder.h"
 #include "fly/coders/huffman/huffman_encoder.h"
+#include "fly/literals.h"
 #include "fly/types/string.h"
 #include "test/util/path_util.h"
 
 #include <gtest/gtest.h>
 
+#include <cstdint>
 #include <filesystem>
 #include <limits>
 #include <string>
+#include <vector>
 
 namespace {
 
@@ -25,7 +28,21 @@ public:
     }
 };
 
+/**
+ * Subclass of the Huffman coder config to reduce Huffman code lengths.
+ */
+class SmallCodeLengthConfig : public fly::HuffmanConfig
+{
+public:
+    SmallCodeLengthConfig() noexcept : fly::HuffmanConfig()
+    {
+        m_defaultEncoderMaxCodeLength = 3;
+    }
+};
+
 } // namespace
+
+namespace fly {
 
 //==============================================================================
 class HuffmanCoderTest : public ::testing::Test
@@ -38,6 +55,19 @@ public:
     }
 
 protected:
+    std::vector<HuffmanCode> GetDecodedHuffmanCodes()
+    {
+        std::vector<HuffmanCode> codes;
+
+        for (std::uint16_t i = 0; i < m_decoder.m_huffmanCodesSize; ++i)
+        {
+            const HuffmanCode &code = m_decoder.m_huffmanCodes[i];
+            codes.emplace_back(code.m_symbol, code.m_code, code.m_length);
+        }
+
+        return codes;
+    }
+
     std::shared_ptr<fly::HuffmanConfig> m_spConfig;
     fly::HuffmanEncoder m_encoder;
     fly::HuffmanDecoder m_decoder;
@@ -111,6 +141,33 @@ TEST_F(HuffmanCoderTest, MirrorTest)
     ASSERT_TRUE(m_decoder.DecodeString(enc, dec));
 
     EXPECT_EQ(raw, dec);
+}
+
+//==============================================================================
+TEST_F(HuffmanCoderTest, LengthLimitedTest)
+{
+    const std::string raw = "abcdefabcbbb";
+    std::string enc, dec;
+
+    auto spConfig = std::make_shared<SmallCodeLengthConfig>();
+    fly::HuffmanEncoder encoder(spConfig);
+
+    ASSERT_TRUE(encoder.EncodeString(raw, enc));
+    ASSERT_TRUE(m_decoder.DecodeString(enc, dec));
+
+    EXPECT_EQ(raw, dec);
+
+    // Validate the Kraft–McMillan inequality.
+    const std::uint16_t maxAllowedKraft =
+        (1_u16 << spConfig->EncoderMaxCodeLength()) - 1;
+    std::uint16_t kraft = 0_u16;
+
+    for (const HuffmanCode &code : GetDecodedHuffmanCodes())
+    {
+        kraft += 1_u16 << (spConfig->EncoderMaxCodeLength() - code.m_length);
+    }
+
+    EXPECT_LE(kraft, maxAllowedKraft);
 }
 
 //==============================================================================
@@ -230,3 +287,5 @@ TEST_F(HuffmanCoderFileTest, Enwik8FileTest)
         std::filesystem::file_size(m_encodedFile));
     EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decodedFile));
 }
+
+} // namespace fly
