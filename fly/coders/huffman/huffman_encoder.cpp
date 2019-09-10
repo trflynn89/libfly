@@ -35,7 +35,7 @@ bool HuffmanEncoder::EncodeInternal(
     {
         LOGW(
             "Maximum Huffman code length %u is too large for code_type",
-            m_maxCodeLength);
+            static_cast<std::uint32_t>(m_maxCodeLength));
         return false;
     }
     else if (!encodeHeader(output))

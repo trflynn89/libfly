@@ -78,7 +78,7 @@ bool Encoder::EncodeString(
         logEncoderStats(start, decoded.length(), encoded.length());
     }
 
-    return true;
+    return successful;
 }
 
 //==============================================================================

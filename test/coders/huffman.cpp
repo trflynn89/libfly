@@ -7,7 +7,25 @@
 #include <gtest/gtest.h>
 
 #include <filesystem>
+#include <limits>
 #include <string>
+
+namespace {
+
+/**
+ * Subclass of the Huffman coder config to contain invalid values.
+ */
+class BadHuffmanConfig : public fly::HuffmanConfig
+{
+public:
+    BadHuffmanConfig() noexcept : fly::HuffmanConfig()
+    {
+        m_defaultEncoderMaxCodeLength =
+            std::numeric_limits<decltype(m_defaultEncoderMaxCodeLength)>::max();
+    }
+};
+
+} // namespace
 
 //==============================================================================
 class HuffmanCoderTest : public ::testing::Test
@@ -24,6 +42,30 @@ protected:
     fly::HuffmanEncoder m_encoder;
     fly::HuffmanDecoder m_decoder;
 };
+
+//==============================================================================
+TEST_F(HuffmanCoderTest, BadConfigTest)
+{
+    const std::string raw;
+    std::string enc;
+
+    auto spConfig = std::make_shared<BadHuffmanConfig>();
+    fly::HuffmanEncoder encoder(spConfig);
+
+    ASSERT_FALSE(encoder.EncodeString(raw, enc));
+}
+
+//==============================================================================
+TEST_F(HuffmanCoderTest, BadHeaderTest)
+{
+    const std::string raw;
+    std::string enc;
+
+    auto spConfig = std::make_shared<BadHuffmanConfig>();
+    fly::HuffmanEncoder encoder(spConfig);
+
+    ASSERT_FALSE(encoder.EncodeString(raw, enc));
+}
 
 //==============================================================================
 TEST_F(HuffmanCoderTest, EmptyTest)

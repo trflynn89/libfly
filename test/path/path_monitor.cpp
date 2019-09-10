@@ -15,7 +15,7 @@
 #include <sstream>
 #include <string>
 
-#ifdef FLY_LINUX
+#if defined(FLY_LINUX)
 #    include "test/mock/mock_system.h"
 #endif
 
@@ -214,7 +214,7 @@ TEST_F(PathMonitorTest, WrongTypeTest)
     ASSERT_FALSE(m_spMonitor->AddPath(m_file1, m_callback));
 }
 
-#ifdef FLY_LINUX
+#if defined(FLY_LINUX)
 
 //==============================================================================
 TEST_F(PathMonitorTest, MockFailedStartMonitorTest)
@@ -385,7 +385,7 @@ TEST_F(PathMonitorTest, ChangeTest_FileLevel)
     EXPECT_EQ(m_numOtherEvents[m_file1], 0);
 }
 
-#ifdef FLY_LINUX
+#if defined(FLY_LINUX)
 
 //==============================================================================
 TEST_F(PathMonitorTest, MockFailedPollTest)
