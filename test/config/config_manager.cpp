@@ -1,7 +1,7 @@
 #include "fly/config/config_manager.h"
 
 #include "fly/config/config.h"
-#include "fly/fly.h"
+#include "fly/literals.h"
 #include "fly/path/path_config.h"
 #include "fly/task/task_manager.h"
 #include "fly/types/string.h"
@@ -26,7 +26,7 @@ class TestPathConfig : public fly::PathConfig
 public:
     TestPathConfig() noexcept : fly::PathConfig()
     {
-        m_defaultPollInterval = I64(10);
+        m_defaultPollInterval = 10_u64;
     }
 };
 

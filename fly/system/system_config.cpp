@@ -1,11 +1,11 @@
 #include "fly/system/system_config.h"
 
-#include "fly/fly.h"
+#include "fly/literals.h"
 
 namespace fly {
 
 //==============================================================================
-SystemConfig::SystemConfig() noexcept : m_defaultPollInterval(I64(1000))
+SystemConfig::SystemConfig() noexcept : m_defaultPollInterval(1000_i64)
 {
 }
 //==============================================================================

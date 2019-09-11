@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\fly.h" />
+    <ClInclude Include="..\..\..\fly\literals.h" />
     <ClInclude Include="..\..\..\fly\config\config.h">
       <Filter>config</Filter>
     </ClInclude>

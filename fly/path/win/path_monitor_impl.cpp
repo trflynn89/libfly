@@ -1,6 +1,6 @@
 #include "fly/path/win/path_monitor_impl.h"
 
-#include "fly/fly.h"
+#include "fly/literals.h"
 #include "fly/logger/logger.h"
 #include "fly/task/task_runner.h"
 
@@ -146,7 +146,7 @@ void PathMonitorImpl::handleEvents(
             }
         }
 
-        if (pInfo->NextEntryOffset == U64(0))
+        if (pInfo->NextEntryOffset == 0_u64)
         {
             pInfo = NULL;
         }

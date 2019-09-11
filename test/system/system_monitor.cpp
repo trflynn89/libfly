@@ -1,6 +1,6 @@
 #include "fly/system/system_monitor.h"
 
-#include "fly/fly.h"
+#include "fly/literals.h"
 #include "fly/system/system_config.h"
 #include "fly/task/task_manager.h"
 
@@ -29,7 +29,7 @@ class TestSystemConfig : public fly::SystemConfig
 public:
     TestSystemConfig() noexcept : fly::SystemConfig()
     {
-        m_defaultPollInterval = I64(100);
+        m_defaultPollInterval = 100_i64;
     }
 };
 
@@ -110,7 +110,7 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
     result.get();
 
     ASSERT_EQ(countBefore, countAfter);
-    ASSERT_GT(systemAfter, U64(0));
+    ASSERT_GT(systemAfter, 0_u64);
     ASSERT_LT(processBefore, processAfter);
 }
 
@@ -179,8 +179,8 @@ TEST_F(SystemMonitorTest, MemoryUsageTest)
     std::uint64_t processAfter = m_spMonitor->GetProcessMemoryUsage();
 
     ASSERT_EQ(totalBefore, totalAfter);
-    ASSERT_GT(systemBefore, U64(0));
-    ASSERT_GT(systemAfter, U64(0));
+    ASSERT_GT(systemBefore, 0_u64);
+    ASSERT_GT(systemAfter, 0_u64);
     ASSERT_LT(processBefore, processAfter);
 }
 
