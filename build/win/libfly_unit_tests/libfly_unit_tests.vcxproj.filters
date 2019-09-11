@@ -7,6 +7,9 @@
     <Filter Include="googletest">
       <UniqueIdentifier>{096b28ab-f8d6-40ee-a560-5ec9f8da812d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="literals">
+      <UniqueIdentifier>{ea90a94a-8e8e-44ff-a3cc-ab8e30e8feb7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="logger">
       <UniqueIdentifier>{7ecf1fbd-e9f8-430f-aa13-4ddb9e46dbd8}</UniqueIdentifier>
     </Filter>
@@ -47,6 +50,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest_main.cc">
       <Filter>googletest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\literals\literals.cpp">
+      <Filter>literals</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\logger\logger.cpp">
       <Filter>logger</Filter>
