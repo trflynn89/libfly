@@ -20,7 +20,7 @@ Json Parser::ParseString(const std::string &contents) noexcept(false)
 //==============================================================================
 Json Parser::ParseFile(const std::filesystem::path &path) noexcept(false)
 {
-    std::ifstream stream(path, std::ios::in);
+    std::ifstream stream(path);
 
     m_line = 1;
     m_column = 0;

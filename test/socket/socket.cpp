@@ -19,7 +19,7 @@
 #include <string>
 #include <thread>
 
-#ifdef FLY_LINUX
+#if defined(FLY_LINUX)
 #    include "test/mock/mock_system.h"
 #endif
 
@@ -114,7 +114,7 @@ protected:
     std::string m_message;
 };
 
-#ifdef FLY_LINUX
+#if defined(FLY_LINUX)
 
 /**
  * Test handling for when socket creation fails due to ::socket() system call.
