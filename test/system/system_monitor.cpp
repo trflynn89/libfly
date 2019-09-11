@@ -12,7 +12,7 @@
 #include <string>
 #include <thread>
 
-#ifdef FLY_LINUX
+#if defined(FLY_LINUX)
 #    include "test/mock/mock_system.h"
 #endif
 
@@ -114,7 +114,7 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
     ASSERT_LT(processBefore, processAfter);
 }
 
-#ifdef FLY_LINUX
+#if defined(FLY_LINUX)
 
 //==============================================================================
 TEST_F(SystemMonitorTest, MockCpuUsageTest)
@@ -184,7 +184,7 @@ TEST_F(SystemMonitorTest, MemoryUsageTest)
     ASSERT_LT(processBefore, processAfter);
 }
 
-#ifdef FLY_LINUX
+#if defined(FLY_LINUX)
 
 //==============================================================================
 TEST_F(SystemMonitorTest, MockMemoryUsageTest)

@@ -1,7 +1,11 @@
 #include "fly/types/string.h"
 
+#include "fly/fly.h"
+
 #include <gtest/gtest.h>
 
+#include <cmath>
+#include <limits>
 #include <regex>
 #include <string>
 #include <vector>
@@ -515,13 +519,13 @@ TYPED_TEST(BasicStringTest, FormatTest)
     EXPECT_EQ(expected, StringClass::Format(format));
     EXPECT_EQ(expected, StringClass::Format(format, 1));
 
-    expected = FLY_STR(streamed_char, "%%");
+    expected = FLY_STR(streamed_char, "%");
     format = FLY_STR(char_type, "%%");
     EXPECT_EQ(expected, StringClass::Format(format));
 
-    format = FLY_STR(char_type, "%d");
-    EXPECT_EQ(FLY_STR(streamed_char, "%d"), StringClass::Format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "1"), StringClass::Format(format, 1));
+    expected = FLY_STR(streamed_char, "2.100000% 1");
+    format = FLY_STR(char_type, "%f%% %d");
+    EXPECT_EQ(expected, StringClass::Format(format, 2.1f, 1));
 
     expected = FLY_STR(streamed_char, "This is a test");
     format = FLY_STR(char_type, "This is a test");
@@ -542,6 +546,219 @@ TYPED_TEST(BasicStringTest, FormatTest)
     EXPECT_EQ(
         expected,
         StringClass::Format(format, 1, true, 2.1f, false, 123.0, 255));
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTest, FormatTest_d)
+{
+    using string_type = typename TestFixture::string_type;
+    using StringClass = fly::BasicString<string_type>;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
+
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
+
+    const char_type *format;
+
+    format = FLY_STR(char_type, "%d");
+    EXPECT_EQ(FLY_STR(streamed_char, "%d"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "1"), StringClass::Format(format, 1));
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTest, FormatTest_i)
+{
+    using string_type = typename TestFixture::string_type;
+    using StringClass = fly::BasicString<string_type>;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
+
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
+
+    const char_type *format;
+
+    format = FLY_STR(char_type, "%i");
+    EXPECT_EQ(FLY_STR(streamed_char, "%i"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "1"), StringClass::Format(format, 1));
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTest, FormatTest_x)
+{
+    using string_type = typename TestFixture::string_type;
+    using StringClass = fly::BasicString<string_type>;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
+
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
+
+    const char_type *format;
+
+    format = FLY_STR(char_type, "%x");
+    EXPECT_EQ(FLY_STR(streamed_char, "%x"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "0xff"), StringClass::Format(format, 255));
+
+    format = FLY_STR(char_type, "%X");
+    EXPECT_EQ(FLY_STR(streamed_char, "%X"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "0XFF"), StringClass::Format(format, 255));
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTest, FormatTest_o)
+{
+    using string_type = typename TestFixture::string_type;
+    using StringClass = fly::BasicString<string_type>;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
+
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
+
+    const char_type *format;
+
+    format = FLY_STR(char_type, "%o");
+    EXPECT_EQ(FLY_STR(streamed_char, "%o"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "0377"), StringClass::Format(format, 255));
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTest, FormatTest_a)
+{
+    using string_type = typename TestFixture::string_type;
+    using StringClass = fly::BasicString<string_type>;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
+
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
+
+    const char_type *format;
+
+    format = FLY_STR(char_type, "%a");
+    EXPECT_EQ(FLY_STR(streamed_char, "%a"), StringClass::Format(format));
+#if defined(FLY_WINDOWS)
+    // Windows 0-pads std::hexfloat to match the stream precision, Linux does
+    // not. This discrepency should be fixed when length modifiers are added.
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "0x1.600000p+2"),
+        StringClass::Format(format, 5.5));
+#else
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "0x1.6p+2"), StringClass::Format(format, 5.5));
+#endif
+
+    format = FLY_STR(char_type, "%A");
+    EXPECT_EQ(FLY_STR(streamed_char, "%A"), StringClass::Format(format));
+#if defined(FLY_WINDOWS)
+    // Windows 0-pads std::hexfloat to match the stream precision, Linux does
+    // not. This discrepency should be fixed when length modifiers are added.
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "0X1.600000P+2"),
+        StringClass::Format(format, 5.5));
+#else
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "0X1.6P+2"), StringClass::Format(format, 5.5));
+#endif
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTest, FormatTest_f)
+{
+    using string_type = typename TestFixture::string_type;
+    using StringClass = fly::BasicString<string_type>;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
+
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
+
+    const char_type *format;
+
+    format = FLY_STR(char_type, "%f");
+    EXPECT_EQ(FLY_STR(streamed_char, "%f"), StringClass::Format(format));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "nan"),
+        StringClass::Format(format, std::nan("")));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "inf"),
+        StringClass::Format(format, std::numeric_limits<float>::infinity()));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "2.100000"), StringClass::Format(format, 2.1f));
+
+    // Note: std::uppercase has no effect on std::fixed :(
+    format = FLY_STR(char_type, "%F");
+    EXPECT_EQ(FLY_STR(streamed_char, "%F"), StringClass::Format(format));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "nan"),
+        StringClass::Format(format, std::nan("")));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "inf"),
+        StringClass::Format(format, std::numeric_limits<float>::infinity()));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "2.100000"), StringClass::Format(format, 2.1f));
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTest, FormatTest_g)
+{
+    using string_type = typename TestFixture::string_type;
+    using StringClass = fly::BasicString<string_type>;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
+
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
+
+    const char_type *format;
+
+    format = FLY_STR(char_type, "%g");
+    EXPECT_EQ(FLY_STR(streamed_char, "%g"), StringClass::Format(format));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "nan"),
+        StringClass::Format(format, std::nan("")));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "inf"),
+        StringClass::Format(format, std::numeric_limits<float>::infinity()));
+    EXPECT_EQ(FLY_STR(streamed_char, "2.1"), StringClass::Format(format, 2.1f));
+
+    format = FLY_STR(char_type, "%G");
+    EXPECT_EQ(FLY_STR(streamed_char, "%G"), StringClass::Format(format));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "NAN"),
+        StringClass::Format(format, std::nan("")));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "INF"),
+        StringClass::Format(format, std::numeric_limits<float>::infinity()));
+    EXPECT_EQ(FLY_STR(streamed_char, "2.1"), StringClass::Format(format, 2.1f));
+}
+
+//==============================================================================
+TYPED_TEST(BasicStringTest, FormatTest_e)
+{
+    using string_type = typename TestFixture::string_type;
+    using StringClass = fly::BasicString<string_type>;
+    using traits = typename fly::BasicStringTraits<string_type>;
+    using char_type = typename traits::char_type;
+
+    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_char = typename streamed_type::value_type;
+
+    const char_type *format;
+
+    format = FLY_STR(char_type, "%e");
+    EXPECT_EQ(FLY_STR(streamed_char, "%e"), StringClass::Format(format));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "1.230000e+02"),
+        StringClass::Format(format, 123.0));
+
+    format = FLY_STR(char_type, "%E");
+    EXPECT_EQ(FLY_STR(streamed_char, "%E"), StringClass::Format(format));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "1.230000E+02"),
+        StringClass::Format(format, 123.0));
 }
 
 //==============================================================================

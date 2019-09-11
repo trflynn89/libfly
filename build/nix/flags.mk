@@ -21,20 +21,17 @@ ifeq ($(arch), x86)
 endif
 
 # Unit tests include Google test
+# TODO: should be moved to //test/files.mk, but first must implement inheriting
+# parent directory CFLAGS.
 CF_ALL += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
 CF_ALL += -I$(SOURCE_ROOT)/test/googletest/googletest
 
 # Optimize release builds, and add debug symbols / use address sanitizer for
-# debug builds - but only use address sanitizer on 64-bit builds:
-# https://github.com/google/sanitizers/issues/954
+# debug builds
 ifeq ($(release), 1)
     CF_ALL += -O2
 else
-    CF_ALL += -O0 -g --coverage
-
-    ifeq ($(arch), x64)
-        CF_ALL += -fsanitize=address -fno-omit-frame-pointer
-    endif
+    CF_ALL += -O0 -g --coverage -fsanitize=address -fno-omit-frame-pointer
 endif
 
 # C and C++ specific flags
