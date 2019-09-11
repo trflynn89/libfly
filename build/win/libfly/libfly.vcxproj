@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\fly.h" />
+    <ClInclude Include="..\..\..\fly\literals.h" />
     <ClInclude Include="..\..\..\fly\config\config.h" />
     <ClInclude Include="..\..\..\fly\config\config_manager.h" />
     <ClInclude Include="..\..\..\fly\logger\log.h" />

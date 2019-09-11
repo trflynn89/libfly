@@ -1,11 +1,11 @@
 #include "fly/path/path_config.h"
 
-#include "fly/fly.h"
+#include "fly/literals.h"
 
 namespace fly {
 
 //==============================================================================
-PathConfig::PathConfig() noexcept : m_defaultPollInterval(I64(1000))
+PathConfig::PathConfig() noexcept : m_defaultPollInterval(1000_i64)
 {
 }
 
