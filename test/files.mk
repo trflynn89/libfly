@@ -14,6 +14,7 @@ SRC_DIRS_$(d) := \
 # Include the directories containing the unit tests
 SRC_DIRS_$(d) += \
     test/config \
+    test/literals \
     test/logger \
     test/parser \
     test/path \
