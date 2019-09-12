@@ -8,37 +8,37 @@
 //==============================================================================
 TEST(LiteralsTest, Signed8BitTest)
 {
-    auto value = 1_u8;
+    auto value = 1_i8;
     EXPECT_TRUE(std::is_signed_v<decltype(value)>);
     EXPECT_TRUE(std::is_integral_v<decltype(value)>);
-    EXPECT_TRUE((std::is_same_v<decltype(value), std::uint8_t>));
+    EXPECT_TRUE((std::is_same_v<decltype(value), std::int8_t>));
 }
 
 //==============================================================================
 TEST(LiteralsTest, Signed16BitTest)
 {
-    auto value = 1_u16;
+    auto value = 1_i16;
     EXPECT_TRUE(std::is_signed_v<decltype(value)>);
     EXPECT_TRUE(std::is_integral_v<decltype(value)>);
-    EXPECT_TRUE((std::is_same_v<decltype(value), std::uint16_t>));
+    EXPECT_TRUE((std::is_same_v<decltype(value), std::int16_t>));
 }
 
 //==============================================================================
 TEST(LiteralsTest, Signed32BitTest)
 {
-    auto value = 1_u32;
+    auto value = 1_i32;
     EXPECT_TRUE(std::is_signed_v<decltype(value)>);
     EXPECT_TRUE(std::is_integral_v<decltype(value)>);
-    EXPECT_TRUE((std::is_same_v<decltype(value), std::uint32_t>));
+    EXPECT_TRUE((std::is_same_v<decltype(value), std::int32_t>));
 }
 
 //==============================================================================
 TEST(LiteralsTest, Signed64BitTest)
 {
-    auto value = 1_u64;
+    auto value = 1_i64;
     EXPECT_TRUE(std::is_signed_v<decltype(value)>);
     EXPECT_TRUE(std::is_integral_v<decltype(value)>);
-    EXPECT_TRUE((std::is_same_v<decltype(value), std::uint64_t>));
+    EXPECT_TRUE((std::is_same_v<decltype(value), std::int64_t>));
 }
 
 //==============================================================================
