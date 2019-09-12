@@ -207,6 +207,7 @@
     <ClCompile Include="..\..\..\test\config\config_manager.cpp" />
     <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest-all.cc" />
     <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest_main.cc" />
+    <ClCompile Include="..\..\..\test\literals\literals.cpp" />
     <ClCompile Include="..\..\..\test\logger\logger.cpp" />
     <ClCompile Include="..\..\..\test\parser\exceptions.cpp" />
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp" />
