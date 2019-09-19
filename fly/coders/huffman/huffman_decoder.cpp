@@ -27,14 +27,16 @@ bool HuffmanDecoder::DecodeInternal(
 
     while (!input.FullyConsumed())
     {
-        if (!decodeCodes(input, maxCodeLength))
+        length_type localMaxCodeLength = 0;
+
+        if (!decodeCodes(input, maxCodeLength, localMaxCodeLength))
         {
             LOGW(
                 "Error decoding codes from stream (maximum code length = %u)",
-                maxCodeLength);
+                static_cast<std::uint32_t>(maxCodeLength));
             return false;
         }
-        else if (!decodeSymbols(input, maxCodeLength, chunkSize, output))
+        else if (!decodeSymbols(input, localMaxCodeLength, chunkSize, output))
         {
             LOGW(
                 "Error decoding %u symbols from stream (fully consumed = %d)",
@@ -44,7 +46,7 @@ bool HuffmanDecoder::DecodeInternal(
         }
     }
 
-    return true;
+    return output.good();
 }
 
 //==============================================================================
@@ -68,6 +70,9 @@ bool HuffmanDecoder::decodeHeader(
             return decodeHeaderVersion1(input, chunkSize, maxCodeLength);
 
         default:
+            LOGW(
+                "Decoded invalid Huffman version %u",
+                static_cast<std::uint32_t>(huffmanVersion));
             break;
     }
 
@@ -87,12 +92,28 @@ bool HuffmanDecoder::decodeHeaderVersion1(
         LOGW("Could not decode chunk size");
         return false;
     }
+    else if (encodedChunkSizeKB == 0)
+    {
+        LOGW(
+            "Decoded invalid chunk size %u",
+            static_cast<std::uint32_t>(encodedChunkSizeKB));
+        return false;
+    }
 
     // Decode the maximum Huffman code length.
     byte_type encodedMaxCodeLength;
     if (!input.ReadByte(encodedMaxCodeLength))
     {
         LOGW("Could not decode maximum code length");
+        return false;
+    }
+    else if (
+        (encodedMaxCodeLength == 0) ||
+        (encodedMaxCodeLength >= std::numeric_limits<code_type>::digits))
+    {
+        LOGW(
+            "Decoded invalid maximum code length %u",
+            static_cast<std::uint32_t>(encodedMaxCodeLength));
         return false;
     }
 
@@ -105,21 +126,29 @@ bool HuffmanDecoder::decodeHeaderVersion1(
 //==============================================================================
 bool HuffmanDecoder::decodeCodes(
     BitStreamReader &input,
-    length_type &maxCodeLength) noexcept
+    length_type globalMaxCodeLength,
+    length_type &localMaxCodeLength) noexcept
 {
     m_huffmanCodesSize = 0;
 
-    // Decode the number of code length counts. This number must be at least 1.
+    // Decode the number of code length counts.
     byte_type countsSize;
-    if (!input.ReadByte(countsSize) || (countsSize == 0))
+    if (!input.ReadByte(countsSize))
     {
         LOGW("Could not decode number of code length counts");
+        return false;
+    }
+    else if ((countsSize == 0) || (countsSize > (globalMaxCodeLength + 1)))
+    {
+        LOGW(
+            "Decoded invalid number of code length counts %u",
+            static_cast<std::uint32_t>(countsSize));
         return false;
     }
 
     // The first code length is 0, so the actual maximum code length is 1 less
     // than the number of length counts.
-    maxCodeLength = countsSize - 1;
+    localMaxCodeLength = countsSize - 1;
 
     // Decode the code length counts.
     std::vector<std::uint16_t> counts(countsSize);
@@ -141,7 +170,9 @@ bool HuffmanDecoder::decodeCodes(
             byte_type symbol;
             if (!input.ReadByte(symbol))
             {
-                LOGW("Could not decode code symbol of length %u bits", length);
+                LOGW(
+                    "Could not decode symbol of length %u bits",
+                    static_cast<std::uint32_t>(length));
                 return false;
             }
 
@@ -170,7 +201,7 @@ bool HuffmanDecoder::decodeCodes(
         }
     }
 
-    convertToPrefixTable(maxCodeLength);
+    convertToPrefixTable(localMaxCodeLength);
     return true;
 }
 

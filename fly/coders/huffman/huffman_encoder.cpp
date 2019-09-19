@@ -31,7 +31,7 @@ bool HuffmanEncoder::EncodeInternal(
     std::istream &input,
     BitStreamWriter &output) noexcept
 {
-    if (m_maxCodeLength > std::numeric_limits<code_type>::digits)
+    if (m_maxCodeLength >= std::numeric_limits<code_type>::digits)
     {
         LOGW(
             "Maximum Huffman code length %u is too large for code_type",
@@ -76,11 +76,6 @@ std::uint32_t HuffmanEncoder::readStream(std::istream &input) const noexcept
                 static_cast<std::streamsize>(m_chunkSizeKB << 10)));
 
         bytesRead = static_cast<std::uint32_t>(input.gcount());
-
-        if (bytesRead == 0)
-        {
-            LOGW("Could not read any bytes from stream");
-        }
     }
 
     return bytesRead;

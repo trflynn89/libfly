@@ -59,7 +59,8 @@ private:
      *
      * @param BitStreamReader Stream storing the encoded header.
      * @param uint32_t Location to store the maximum chunk size (in bytes).
-     * @param length_type Location to store the maximum Huffman code length.
+     * @param length_type Location to store the global maximum Huffman code
+     *                    length.
      *
      * @return bool True if the header was successfully decoded.
      */
@@ -68,11 +69,12 @@ private:
 
     /**
      * Decode version 1 of the header. Extract the maximum chunk length and the
-     * maximum Huffman code length the encoder used.
+     * global maximum Huffman code length the encoder used.
      *
      * @param BitStreamWriter Stream to store the encoded header.
      * @param uint32_t Location to store the maximum chunk size (in bytes).
-     * @param length_type Location to store the maximum Huffman code length.
+     * @param length_type Location to store the global maximum Huffman code
+     *                    length.
      *
      * @return bool True if the header was successfully encoded.
      */
@@ -84,16 +86,18 @@ private:
      * be stored as a prefix table.
      *
      * @param BitStreamReader Stream storing the encoded codes.
-     * @param length_type Location to store the maximum Huffman code length.
+     * @param length_type The global maximum Huffman code length.
+     * @param length_type Location to store the local maximum Huffman code
+     *                    length.
      *
      * @return bool True if the Huffman codes were successfully decoded.
      */
-    bool decodeCodes(BitStreamReader &, length_type &) noexcept;
+    bool decodeCodes(BitStreamReader &, length_type, length_type &) noexcept;
 
     /**
      * Convert the decoded list of Huffman codes into a prefix table.
      *
-     * @param length_type The maximum length of the decoded Huffman codes.
+     * @param length_type The local maximum length of the decoded Huffman codes.
      *
      * @return bool True if the prefix table was successfully created.
      */
@@ -106,7 +110,7 @@ private:
      * to the real output stream.
      *
      * @param BitStreamReader Stream holding the symbols to decode.
-     * @param length_type The maximum length of the decoded Huffman codes.
+     * @param length_type The local maximum length of the decoded Huffman codes.
      * @param uint32_t The number of bytes the chunk buffer can hold.
      * @param ostream Stream to store the decoded symbols.
      *
@@ -122,8 +126,8 @@ private:
     std::array<HuffmanCode, 1 << 8> m_huffmanCodes;
     std::uint16_t m_huffmanCodesSize;
 
-    // Will be sized to fit the maximum Huffman code length used by the encoder.
-    // The size will be 2^L, were L is the maximum code length.
+    // Will be sized to fit the global maximum Huffman code length used by the
+    // encoder. The size will be 2^L, were L is the maximum code length.
     std::unique_ptr<HuffmanCode[]> m_prefixTable;
 
     // Friend class for unit testing.
