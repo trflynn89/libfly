@@ -143,19 +143,15 @@ private:
      * Encode the header to the output stream.
      *
      * @param BitStreamWriter Stream to store the encoded header.
-     *
-     * @return bool True if the header was successfully encoded.
      */
-    bool encodeHeader(BitStreamWriter &) const noexcept;
+    void encodeHeader(BitStreamWriter &) const noexcept;
 
     /**
      * Encode the generated Huffman codes to the output stream.
      *
      * @param BitStreamWriter Stream to store the encoded codes.
-     *
-     * @return bool True if the Huffman codes were successfully encoded.
      */
-    bool encodeCodes(BitStreamWriter &) const noexcept;
+    void encodeCodes(BitStreamWriter &) const noexcept;
 
     /**
      * Encode symbols from the current chunk buffer with the generated list of
@@ -164,10 +160,8 @@ private:
      *
      * @param uint32_t The number of bytes the chunk buffer holds.
      * @param BitStreamWriter Stream to store the encoded symbols.
-     *
-     * @return bool True if the input stream was successfully encoded.
      */
-    bool encodeSymbols(std::uint32_t, BitStreamWriter &) noexcept;
+    void encodeSymbols(std::uint32_t, BitStreamWriter &) noexcept;
 
     // Configuration.
     const std::uint16_t m_chunkSizeKB;

@@ -72,9 +72,9 @@ protected:
  * Implementation of the BitStream interface for writing to a binary stream.
  *
  * Bits are written to an in-memory byte buffer until that buffer is full, at
- * which point that buffer is flushed to the stream. At destruction, if the byte
- * buffer contains a partially-filled byte, that byte is zero-filled and flushed
- * to the stream.
+ * which point that buffer is flushed to the stream. When done writing, callers
+ * should invoke the Finish() method to flush the BitStream header and any bytes
+ * remaining in the buffer.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 7, 2019
@@ -92,12 +92,6 @@ public:
      * @param iostream The stream to write binary data into.
      */
     BitStreamWriter(std::iostream &) noexcept;
-
-    /**
-     * Destructor. If needed, zero-fill the byte buffer, flush it to the stream,
-     * and update the header byte.
-     */
-    ~BitStreamWriter() noexcept override;
 
     /**
      * Write a multibyte word to the byte buffer. Flush the buffer to the stream
@@ -130,11 +124,12 @@ public:
     void WriteBits(DataType, byte_type) noexcept;
 
     /**
-     * Check if the stream is healthy and in a good state.
+     * If needed, zero-fill the byte buffer, flush it to the stream, and update
+     * the header byte.
      *
-     * @return bool True if the stream is healthy.
+     * @return bool True if the stream remains in a good state.
      */
-    bool IsHealthy() const noexcept;
+    bool Finish() noexcept;
 
 private:
     /**

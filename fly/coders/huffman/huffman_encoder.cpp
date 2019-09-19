@@ -38,11 +38,8 @@ bool HuffmanEncoder::EncodeInternal(
             static_cast<std::uint32_t>(m_maxCodeLength));
         return false;
     }
-    else if (!encodeHeader(output))
-    {
-        LOGW("Error encoding header onto stream");
-        return false;
-    }
+
+    encodeHeader(output);
 
     m_chunkBuffer = std::make_unique<symbol_type[]>(m_chunkSizeKB << 10);
     std::uint32_t chunkSize = 0;
@@ -52,30 +49,20 @@ bool HuffmanEncoder::EncodeInternal(
         createTree(chunkSize);
         createCodes();
 
-        if (!encodeCodes(output))
-        {
-            LOGW("Error encoding codes onto stream");
-            return false;
-        }
-        else if (!encodeSymbols(chunkSize, output))
-        {
-            LOGW(
-                "Error encoding symbols onto stream (chunk size = %u)",
-                chunkSize);
-            return false;
-        }
+        encodeCodes(output);
+        encodeSymbols(chunkSize, output);
     }
 
-    return true;
+    return output.Finish();
 }
 
 //==============================================================================
 std::uint32_t HuffmanEncoder::readStream(std::istream &input) const noexcept
 {
-    const std::istream::pos_type start = input.tellg();
+    const std::ios::pos_type start = input.tellg();
     input.seekg(0, std::ios::end);
 
-    const std::istream::pos_type length = input.tellg() - start;
+    const std::ios::pos_type length = input.tellg() - start;
     input.seekg(start, std::ios::beg);
 
     std::uint32_t bytesRead = 0;
@@ -295,7 +282,7 @@ void HuffmanEncoder::convertToCanonicalForm() noexcept
 }
 
 //==============================================================================
-bool HuffmanEncoder::encodeHeader(BitStreamWriter &output) const noexcept
+void HuffmanEncoder::encodeHeader(BitStreamWriter &output) const noexcept
 {
     // Encode the Huffman coder version.
     output.WriteByte(static_cast<byte_type>(s_huffmanVersion));
@@ -305,12 +292,10 @@ bool HuffmanEncoder::encodeHeader(BitStreamWriter &output) const noexcept
 
     // Encode the maximum Huffman code length.
     output.WriteByte(static_cast<byte_type>(m_maxCodeLength));
-
-    return output.IsHealthy();
 }
 
 //==============================================================================
-bool HuffmanEncoder::encodeCodes(BitStreamWriter &output) const noexcept
+void HuffmanEncoder::encodeCodes(BitStreamWriter &output) const noexcept
 {
     // At the least, encode that there were zero Huffman codes of length zero.
     std::vector<std::uint16_t> counts(1);
@@ -342,12 +327,10 @@ bool HuffmanEncoder::encodeCodes(BitStreamWriter &output) const noexcept
         const HuffmanCode &code = m_huffmanCodes[i];
         output.WriteByte(static_cast<byte_type>(code.m_symbol));
     }
-
-    return output.IsHealthy();
 }
 
 //==============================================================================
-bool HuffmanEncoder::encodeSymbols(
+void HuffmanEncoder::encodeSymbols(
     std::uint32_t inputSize,
     BitStreamWriter &output) noexcept
 {
@@ -366,8 +349,6 @@ bool HuffmanEncoder::encodeSymbols(
 
         output.WriteBits(code.m_code, length);
     }
-
-    return output.IsHealthy();
 }
 
 } // namespace fly

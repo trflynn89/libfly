@@ -44,21 +44,6 @@ BitStreamWriter::BitStreamWriter(std::iostream &stream) noexcept :
 }
 
 //==============================================================================
-BitStreamWriter::~BitStreamWriter() noexcept
-{
-    const byte_type bitsInBuffer = s_mostSignificantBitPosition - m_position;
-    const byte_type bitsToFlush = bitsInBuffer + (m_position % s_bitsPerByte);
-
-    if (bitsInBuffer > 0)
-    {
-        flush(m_buffer, bitsToFlush / s_bitsPerByte);
-
-        const byte_type remainder = (bitsToFlush - bitsInBuffer);
-        flushHeader(remainder);
-    }
-}
-
-//==============================================================================
 void BitStreamWriter::WriteWord(word_type word) noexcept
 {
     WriteBits(word, s_bitsPerWord);
@@ -71,22 +56,34 @@ void BitStreamWriter::WriteByte(byte_type byte) noexcept
 }
 
 //==============================================================================
-bool BitStreamWriter::IsHealthy() const noexcept
+bool BitStreamWriter::Finish() noexcept
 {
+    const byte_type bitsInBuffer = s_mostSignificantBitPosition - m_position;
+    const byte_type bitsToFlush = bitsInBuffer + (m_position % s_bitsPerByte);
+
+    if (bitsInBuffer > 0)
+    {
+        flush(m_buffer, bitsToFlush / s_bitsPerByte);
+        m_position = s_mostSignificantBitPosition;
+        m_buffer = 0;
+
+        const byte_type remainder = (bitsToFlush - bitsInBuffer);
+        flushHeader(remainder);
+    }
+
     return m_stream.good();
 }
 
 //==============================================================================
 void BitStreamWriter::flushHeader(byte_type remainder) noexcept
 {
-    // Always write the header in the first byte position. Because this is
-    // currently only called during construction and destruction, don't bother
-    // resetting the position back to where it was originally.
     m_stream.seekp(0);
 
     const byte_type header =
         (s_magic << s_magicShift) | (remainder << s_remainderShift);
     flush(header, s_byteTypeSize);
+
+    m_stream.seekp(0, std::ios::end);
 }
 
 //==============================================================================
