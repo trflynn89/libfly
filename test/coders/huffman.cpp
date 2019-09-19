@@ -118,6 +118,15 @@ TEST_F(HuffmanCoderTest, InvalidConfigTest)
 }
 
 //==============================================================================
+TEST_F(HuffmanCoderTest, HeaderMissingVersionTest)
+{
+    const std::string enc;
+    std::string dec;
+
+    EXPECT_FALSE(m_decoder.DecodeString(enc, dec));
+}
+
+//==============================================================================
 TEST_F(HuffmanCoderTest, HeaderInvalidVersionTest)
 {
     std::vector<fly::byte_type> bytes = {
