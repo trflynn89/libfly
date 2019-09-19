@@ -2,7 +2,7 @@
 
 #include "fly/logger/logger_config.h"
 #include "fly/task/task_manager.h"
-#include "fly/types/string.h"
+#include "fly/types/string/string.h"
 #include "test/util/capture_stream.h"
 #include "test/util/path_util.h"
 #include "test/util/waitable_task_runner.h"

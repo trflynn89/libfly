@@ -37,6 +37,15 @@
     <Filter Include="types">
       <UniqueIdentifier>{2fe9b6ce-cbdc-485c-bd1c-37fe9ef648d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="types\concurrency">
+      <UniqueIdentifier>{da7b9fca-b0f4-4025-bc7e-4eee7e176b36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="types\json">
+      <UniqueIdentifier>{bfa6bd3d-8450-44d6-a6bc-6698efb4b424}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="types\string">
+      <UniqueIdentifier>{56316664-18ad-4ca4-819d-e81532ac2df6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\fly.h" />
@@ -125,32 +134,35 @@
     <ClInclude Include="..\..\..\fly\traits\traits.h">
       <Filter>traits</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\concurrent_container.h">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_container.h">
+      <Filter>types\concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\concurrent_queue.h">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.h">
+      <Filter>types\concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\concurrent_stack.h">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_stack.h">
+      <Filter>types\concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\json.h">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\fly\types\json\json.h">
+      <Filter>types\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string.h">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\fly\types\json\json_traits.h">
+      <Filter>types\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string_converter.h">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\fly\types\string\string.h">
+      <Filter>types\string</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string_literal.h">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\fly\types\string\string_converter.h">
+      <Filter>types\string</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string_streamer.h">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\fly\types\string\string_literal.h">
+      <Filter>types\string</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string_traits.h">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\fly\types\string\string_streamer.h">
+      <Filter>types\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\string_traits.h">
+      <Filter>types\string</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -229,8 +241,8 @@
     <ClCompile Include="..\..\..\fly\task\task_runner.cpp">
       <Filter>task</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\types\json.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\fly\types\json\json.cpp">
+      <Filter>types\json</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

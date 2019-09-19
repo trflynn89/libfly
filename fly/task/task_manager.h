@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/concurrent_queue.h"
+#include "fly/types/concurrency/concurrent_queue.h"
 
 #include <atomic>
 #include <chrono>

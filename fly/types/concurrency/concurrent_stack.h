@@ -1,19 +1,19 @@
 #pragma once
 
-#include "fly/types/concurrent_container.h"
+#include "fly/types/concurrency/concurrent_container.h"
 
-#include <queue>
+#include <stack>
 
 namespace fly {
 
 /**
- * Wrapper around a std::queue to provide thread safe access.
+ * Wrapper around a std::stack to provide thread safe access.
  *
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 27, 2016
  */
 template <typename T>
-class ConcurrentQueue : public ConcurrentContainer<T, std::queue<T>>
+class ConcurrentStack : public ConcurrentContainer<T, std::stack<T>>
 {
 protected:
     void push(T &&) noexcept override;
@@ -22,16 +22,16 @@ protected:
 
 //==============================================================================
 template <typename T>
-void ConcurrentQueue<T>::push(T &&item) noexcept
+void ConcurrentStack<T>::push(T &&item) noexcept
 {
     this->m_container.push(std::move(item));
 }
 
 //==============================================================================
 template <typename T>
-void ConcurrentQueue<T>::pop(T &item) noexcept
+void ConcurrentStack<T>::pop(T &item) noexcept
 {
-    item = std::move(this->m_container.front());
+    item = std::move(this->m_container.top());
     this->m_container.pop();
 }
 

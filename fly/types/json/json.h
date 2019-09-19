@@ -1,8 +1,8 @@
 #pragma once
 
 #include "fly/traits/traits.h"
-#include "fly/types/json_traits.h"
-#include "fly/types/string.h"
+#include "fly/types/json/json_traits.h"
+#include "fly/types/string/string.h"
 
 #include <cstddef>
 #include <cstdint>

@@ -4,8 +4,8 @@
 #include "fly/logger/log.h"
 #include "fly/system/system.h"
 #include "fly/task/task.h"
-#include "fly/types/concurrent_queue.h"
-#include "fly/types/string.h"
+#include "fly/types/concurrency/concurrent_queue.h"
+#include "fly/types/string/string.h"
 
 #include <chrono>
 #include <cstdarg>

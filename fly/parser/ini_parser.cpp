@@ -1,7 +1,7 @@
 #include "fly/parser/ini_parser.h"
 
 #include "fly/parser/exceptions.h"
-#include "fly/types/string.h"
+#include "fly/types/string/string.h"
 
 #include <vector>
 
