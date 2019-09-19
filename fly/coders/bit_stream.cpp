@@ -49,27 +49,35 @@ BitStreamWriter::~BitStreamWriter() noexcept
     const byte_type bitsInBuffer = s_mostSignificantBitPosition - m_position;
     const byte_type bitsToFlush = bitsInBuffer + (m_position % s_bitsPerByte);
 
-    if ((bitsInBuffer > 0) && flush(m_buffer, bitsToFlush / s_bitsPerByte))
+    if (bitsInBuffer > 0)
     {
+        flush(m_buffer, bitsToFlush / s_bitsPerByte);
+
         const byte_type remainder = (bitsToFlush - bitsInBuffer);
         flushHeader(remainder);
     }
 }
 
 //==============================================================================
-bool BitStreamWriter::WriteWord(word_type word) noexcept
+void BitStreamWriter::WriteWord(word_type word) noexcept
 {
-    return WriteBits(word, s_bitsPerWord);
+    WriteBits(word, s_bitsPerWord);
 }
 
 //==============================================================================
-bool BitStreamWriter::WriteByte(byte_type byte) noexcept
+void BitStreamWriter::WriteByte(byte_type byte) noexcept
 {
-    return WriteBits(byte, s_bitsPerByte);
+    WriteBits(byte, s_bitsPerByte);
 }
 
 //==============================================================================
-bool BitStreamWriter::flushHeader(byte_type remainder) noexcept
+bool BitStreamWriter::IsHealthy() const noexcept
+{
+    return m_stream.good();
+}
+
+//==============================================================================
+void BitStreamWriter::flushHeader(byte_type remainder) noexcept
 {
     // Always write the header in the first byte position. Because this is
     // currently only called during construction and destruction, don't bother
@@ -78,22 +86,16 @@ bool BitStreamWriter::flushHeader(byte_type remainder) noexcept
 
     const byte_type header =
         (s_magic << s_magicShift) | (remainder << s_remainderShift);
-
-    return flush(header, s_byteTypeSize);
+    flush(header, s_byteTypeSize);
 }
 
 //==============================================================================
-bool BitStreamWriter::flushBuffer() noexcept
+void BitStreamWriter::flushBuffer() noexcept
 {
-    if (flush(m_buffer, s_bufferTypeSize))
-    {
-        m_position = s_mostSignificantBitPosition;
-        m_buffer = 0;
+    flush(m_buffer, s_bufferTypeSize);
 
-        return true;
-    }
-
-    return false;
+    m_position = s_mostSignificantBitPosition;
+    m_buffer = 0;
 }
 
 //==============================================================================

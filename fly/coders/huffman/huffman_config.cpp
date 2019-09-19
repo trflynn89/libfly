@@ -1,5 +1,6 @@
-#include "fly/literals.h"
 #include "fly/coders/huffman/huffman_config.h"
+
+#include "fly/literals.h"
 
 namespace fly {
 

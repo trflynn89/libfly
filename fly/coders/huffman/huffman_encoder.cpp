@@ -298,27 +298,15 @@ void HuffmanEncoder::convertToCanonicalForm() noexcept
 bool HuffmanEncoder::encodeHeader(BitStreamWriter &output) const noexcept
 {
     // Encode the Huffman coder version.
-    if (!output.WriteByte(static_cast<byte_type>(s_huffmanVersion)))
-    {
-        LOGW("Could not encode Huffman version %u", s_huffmanVersion);
-        return false;
-    }
+    output.WriteByte(static_cast<byte_type>(s_huffmanVersion));
 
     // Encode the chunk size.
-    if (!output.WriteWord(static_cast<word_type>(m_chunkSizeKB)))
-    {
-        LOGW("Could not encode chunk size %u", m_chunkSizeKB);
-        return false;
-    }
+    output.WriteWord(static_cast<word_type>(m_chunkSizeKB));
 
     // Encode the maximum Huffman code length.
-    if (!output.WriteByte(static_cast<byte_type>(m_maxCodeLength)))
-    {
-        LOGW("Could not encode maximum code length %u", m_maxCodeLength);
-        return false;
-    }
+    output.WriteByte(static_cast<byte_type>(m_maxCodeLength));
 
-    return true;
+    return output.IsHealthy();
 }
 
 //==============================================================================
@@ -340,35 +328,22 @@ bool HuffmanEncoder::encodeCodes(BitStreamWriter &output) const noexcept
     }
 
     // Encode the number of code length counts.
-    if (!output.WriteByte(static_cast<byte_type>(counts.size())))
-    {
-        LOGW("Could not encode number of code length counts %u", counts.size());
-        return false;
-    }
+    output.WriteByte(static_cast<byte_type>(counts.size()));
 
     // Encode the code length counts.
     for (const std::uint16_t &length : counts)
     {
-        if (!output.WriteWord(static_cast<word_type>(length)))
-        {
-            LOGW("Could not encode code length count %u", length);
-            return false;
-        }
+        output.WriteWord(static_cast<word_type>(length));
     }
 
     // Encode the symbols.
     for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
     {
         const HuffmanCode &code = m_huffmanCodes[i];
-
-        if (!output.WriteByte(static_cast<byte_type>(code.m_symbol)))
-        {
-            LOGW("Could not encode code symbol %x", code.m_symbol);
-            return false;
-        }
+        output.WriteByte(static_cast<byte_type>(code.m_symbol));
     }
 
-    return true;
+    return output.IsHealthy();
 }
 
 //==============================================================================
@@ -389,17 +364,10 @@ bool HuffmanEncoder::encodeSymbols(
         const HuffmanCode &code = symbols[m_chunkBuffer[i]];
         const auto length = static_cast<byte_type>(code.m_length);
 
-        if (!output.WriteBits(code.m_code, length))
-        {
-            LOGW(
-                "Could not encode code %x of length %u",
-                code.m_code,
-                code.m_length);
-            return false;
-        }
+        output.WriteBits(code.m_code, length);
     }
 
-    return true;
+    return output.IsHealthy();
 }
 
 } // namespace fly

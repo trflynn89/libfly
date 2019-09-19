@@ -50,18 +50,18 @@ enum class Endian : std::uint16_t
  * @return T The swapped byte.
  */
 template <typename T>
-inline T byte_swap(const T &) noexcept;
+inline T byte_swap(T) noexcept;
 
 //==============================================================================
 template <>
-inline std::uint8_t byte_swap(const std::uint8_t &byte) noexcept
+inline std::uint8_t byte_swap(std::uint8_t byte) noexcept
 {
     return byte;
 }
 
 //==============================================================================
 template <>
-inline std::uint16_t byte_swap(const std::uint16_t &byte) noexcept
+inline std::uint16_t byte_swap(std::uint16_t byte) noexcept
 {
     if constexpr (Endian::Native == Endian::Little)
     {
@@ -75,7 +75,7 @@ inline std::uint16_t byte_swap(const std::uint16_t &byte) noexcept
 
 //==============================================================================
 template <>
-inline std::uint32_t byte_swap(const std::uint32_t &byte) noexcept
+inline std::uint32_t byte_swap(std::uint32_t byte) noexcept
 {
     if constexpr (Endian::Native == Endian::Little)
     {
@@ -89,7 +89,7 @@ inline std::uint32_t byte_swap(const std::uint32_t &byte) noexcept
 
 //==============================================================================
 template <>
-inline std::uint64_t byte_swap(const std::uint64_t &byte) noexcept
+inline std::uint64_t byte_swap(std::uint64_t byte) noexcept
 {
     if constexpr (Endian::Native == Endian::Little)
     {

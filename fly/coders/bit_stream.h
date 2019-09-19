@@ -104,22 +104,16 @@ public:
      * if it is filled during this operation.
      *
      * @param word_type The word to write.
-     *
-     * @return bool True if the word was successfully written and flushing the
-     *              byte buffer was successful (if needed).
      */
-    bool WriteWord(word_type) noexcept;
+    void WriteWord(word_type) noexcept;
 
     /**
      * Write a full byte to the byte buffer. Flush the buffer to the stream if
      * it is filled during this operation.
      *
      * @param byte_type The byte to write.
-     *
-     * @return bool True if the byte was successfully written and flushing the
-     *              byte buffer was successful (if needed).
      */
-    bool WriteByte(byte_type) noexcept;
+    void WriteByte(byte_type) noexcept;
 
     /**
      * Write a number of bits to the byte buffer. The least-significant bits in
@@ -131,29 +125,29 @@ public:
      *
      * @param DataType The bits to write.
      * @param byte_type The number of bits to write.
-     *
-     * @return bool True if the bits were successfully written and flushing the
-     *              byte buffer was successful (if needed).
      */
     template <typename DataType>
-    bool WriteBits(DataType, byte_type) noexcept;
+    void WriteBits(DataType, byte_type) noexcept;
+
+    /**
+     * Check if the stream is healthy and in a good state.
+     *
+     * @return bool True if the stream is healthy.
+     */
+    bool IsHealthy() const noexcept;
 
 private:
     /**
      * Flush the header byte onto the stream.
      *
      * @param byte_type The number of zero-filled bits in the byte buffer.
-     *
-     * @return bool True if the header byte was successfully flushed.
      */
-    bool flushHeader(byte_type) noexcept;
+    void flushHeader(byte_type) noexcept;
 
     /**
      * Flush the byte buffer onto the stream.
-     *
-     * @return bool True if the byte buffer was successfully flushed.
      */
-    bool flushBuffer() noexcept;
+    void flushBuffer() noexcept;
 
     /**
      * Flush a byte buffer to the stream.
@@ -162,12 +156,9 @@ private:
      *
      * @param DataType The byte buffer to flush.
      * @param byte_type The number of bytes to flush.
-     *
-     * @return bool True if the byte buffer was sucessfully flushed and the
-     *              stream remains in a good state.
      */
     template <typename DataType>
-    bool flush(const DataType &, byte_type) noexcept;
+    void flush(const DataType &, byte_type) noexcept;
 
     std::iostream &m_stream;
 };
@@ -338,7 +329,7 @@ constexpr inline DataType BitStream::GenerateMask(const DataType bits)
 
 //==============================================================================
 template <typename DataType>
-bool BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
+void BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
 {
     static_assert(
         BitStreamTraits::is_unsigned_integer_v<DataType>,
@@ -353,11 +344,7 @@ bool BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
         // Fill the remainder of the byte buffer with as many bits as are
         // available, and flush it onto the stream.
         m_buffer |= (static_cast<buffer_type>(bits) >> diff);
-
-        if (!flushBuffer())
-        {
-            return false;
-        }
+        flushBuffer();
 
         // Then update the input bits to retain only those bits that have not
         // been written yet.
@@ -365,25 +352,22 @@ bool BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
         size = diff;
     }
 
-    m_buffer |= (static_cast<buffer_type>(bits) << (m_position - size));
-    m_position -= size;
+    const byte_type diff = m_position - size;
 
-    return (m_position == 0) ? flushBuffer() : true;
+    m_buffer |= static_cast<buffer_type>(bits) << diff;
+    m_position = diff;
 }
 
 //==============================================================================
 template <typename DataType>
-bool BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
+void BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
 {
     static_assert(
         BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
     const DataType data = byte_swap(buffer);
-    m_stream.write(
-        reinterpret_cast<const std::ios::char_type *>(&data), bytes);
-
-    return m_stream.good();
+    m_stream.write(reinterpret_cast<const std::ios::char_type *>(&data), bytes);
 }
 
 //==============================================================================

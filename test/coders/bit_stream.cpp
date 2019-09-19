@@ -134,7 +134,8 @@ TEST_F(BitStreamTest, SingleBitTest)
 {
     {
         fly::BitStreamWriter stream(m_outputStream);
-        EXPECT_TRUE(stream.WriteBits(1_u8, 1));
+        stream.WriteBits(1_u8, 1);
+        EXPECT_TRUE(stream.IsHealthy());
     }
 
     // A 1-byte header and a 1-byte buffer should have been written.
@@ -166,7 +167,8 @@ TEST_F(BitStreamTest, SingleByteTest)
 {
     {
         fly::BitStreamWriter stream(m_outputStream);
-        EXPECT_TRUE(stream.WriteByte(0xa));
+        stream.WriteByte(0xa);
+        EXPECT_TRUE(stream.IsHealthy());
     }
 
     // A 1-byte header and a 1-byte buffer should have been written.
@@ -198,7 +200,8 @@ TEST_F(BitStreamTest, SingleWordTest)
 {
     {
         fly::BitStreamWriter stream(m_outputStream);
-        EXPECT_TRUE(stream.WriteWord(0xae));
+        stream.WriteWord(0xae);
+        EXPECT_TRUE(stream.IsHealthy());
     }
 
     // A 1-byte header and a 2-byte buffer should have been written.
@@ -231,9 +234,10 @@ TEST_F(BitStreamTest, MultiBufferTest)
     constexpr auto length = std::numeric_limits<fly::buffer_type>::digits;
     {
         fly::BitStreamWriter stream(m_outputStream);
-        EXPECT_TRUE(stream.WriteBits(0xae1ae1ae1ae1ae1a_u64, length));
-        EXPECT_TRUE(stream.WriteBits(0x1f_u8, 5));
-        EXPECT_TRUE(stream.WriteBits(0xbc9bc9bc9bc9bc9b_u64, length));
+        stream.WriteBits(0xae1ae1ae1ae1ae1a_u64, length);
+        stream.WriteBits(0x1f_u8, 5);
+        stream.WriteBits(0xbc9bc9bc9bc9bc9b_u64, length);
+        EXPECT_TRUE(stream.IsHealthy());
     }
 
     // A 1-byte header, 2 full internal byte buffers, and a 1-byte buffer should
@@ -274,7 +278,8 @@ TEST_F(BitStreamTest, PeekTest)
 {
     {
         fly::BitStreamWriter stream(m_outputStream);
-        EXPECT_TRUE(stream.WriteByte(0xa));
+        stream.WriteByte(0xa);
+        EXPECT_TRUE(stream.IsHealthy());
     }
 
     // A 1-byte header and a 1-byte buffer should have been written.
@@ -310,7 +315,8 @@ TEST_F(BitStreamTest, OverPeekTest)
 {
     {
         fly::BitStreamWriter stream(m_outputStream);
-        EXPECT_TRUE(stream.WriteBits(0x7f_u8, 7_u8));
+        stream.WriteBits(0x7f_u8, 7_u8);
+        EXPECT_TRUE(stream.IsHealthy());
     }
 
     // A 1-byte header and a 1-byte buffer should have been written.
@@ -348,10 +354,12 @@ TEST_F(BitStreamTest, InvalidWriterStreamTest)
     constexpr auto length = std::numeric_limits<fly::buffer_type>::digits;
     {
         fly::BitStreamWriter stream(m_outputStream);
+        EXPECT_FALSE(stream.IsHealthy());
 
         // Fill the internal byte buffer. BitStreamWriter will try to flush the
         // stream, which will fail.
-        EXPECT_FALSE(stream.WriteBits(buffer, length));
+        stream.WriteBits(buffer, length);
+        EXPECT_FALSE(stream.IsHealthy());
     }
 
     // The 1-byte should not have been written.
@@ -367,12 +375,14 @@ TEST_F(BitStreamTest, FailedWriterStreamTest)
         fly::BitStreamWriter stream(m_outputStream);
 
         // Fill the internal byte buffer with all but one bit.
-        EXPECT_TRUE(stream.WriteBits(buffer, length));
+        stream.WriteBits(buffer, length);
+        EXPECT_TRUE(stream.IsHealthy());
 
         // Close the stream and write more bits. BitStreamWriter will try to
         // flush the stream, which will fail.
         m_outputStream.setstate(std::ios::failbit);
-        EXPECT_FALSE(stream.WriteBits(3_u8, 2));
+        stream.WriteBits(3_u8, 2);
+        EXPECT_FALSE(stream.IsHealthy());
     }
 
     // A 1-byte header should have been written. Buffer bytes will be dropped.
@@ -400,7 +410,8 @@ TEST_F(BitStreamTest, InvalidReaderStreamTest)
 {
     {
         fly::BitStreamWriter stream(m_outputStream);
-        EXPECT_TRUE(stream.WriteByte(0xa));
+        stream.WriteByte(0xa);
+        EXPECT_TRUE(stream.IsHealthy());
     }
 
     // A 1-byte header and a 1-byte buffer should have been written.
@@ -428,7 +439,8 @@ TEST_F(BitStreamTest, FailedReaderStreamTest)
 {
     {
         fly::BitStreamWriter stream(m_outputStream);
-        EXPECT_TRUE(stream.WriteByte(0xa));
+        stream.WriteByte(0xa);
+        EXPECT_TRUE(stream.IsHealthy());
     }
 
     // A 1-byte header and a 1-byte buffer should have been written.
