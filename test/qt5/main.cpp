@@ -15,7 +15,7 @@ extern "C"
         )";
     }
 
-    // And do not print that suppressions.
+    // And do not print suppressions from that library.
     const char *__asan_default_options()
     {
         return R"(
