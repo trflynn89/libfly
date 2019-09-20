@@ -30,7 +30,7 @@ t := $$(strip $(1))
 OBJ_DIR_$(d) := $(OBJ_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
 GEN_DIR_$(d) := $(GEN_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
 
-GEN_$$(t) += $$(addprefix $$(GEN_DIR_$(d))/, $$(addsuffix .uic.h, $(3)))
+OBJ_$$(t) += $$(addprefix $$(GEN_DIR_$(d))/, $$(addsuffix .uic.h, $(3)))
 OBJ_$$(t) += $$(addprefix $$(OBJ_DIR_$(d))/, $$(addsuffix .moc.o, $(4)))
 OBJ_$$(t) += $$(addprefix $$(OBJ_DIR_$(d))/, $$(addsuffix .rcc.o, $(5)))
 
