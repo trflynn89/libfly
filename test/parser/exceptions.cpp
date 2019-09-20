@@ -1,6 +1,6 @@
 #include "fly/parser/exceptions.h"
 
-#include "fly/types/string.h"
+#include "fly/types/string/string.h"
 
 #include <gtest/gtest.h>
 

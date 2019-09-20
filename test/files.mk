@@ -9,7 +9,7 @@ SRC_DIRS_$(d) := \
     fly/socket \
     fly/system \
     fly/task \
-    fly/types \
+    fly/types/json \
     test/mock \
     test/util
 

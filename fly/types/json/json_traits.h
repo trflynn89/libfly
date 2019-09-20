@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/string_traits.h"
+#include "fly/types/string/string_traits.h"
 
 #include <array>
 #include <deque>

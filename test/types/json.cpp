@@ -1,7 +1,7 @@
-#include "fly/types/json.h"
+#include "fly/types/json/json.h"
 
 #include "fly/fly.h"
-#include "fly/types/string.h"
+#include "fly/types/string/string.h"
 
 #include <gtest/gtest.h>
 

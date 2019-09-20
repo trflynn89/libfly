@@ -1,9 +1,9 @@
 #pragma once
 
-#include "fly/types/string_converter.h"
-#include "fly/types/string_literal.h"
-#include "fly/types/string_streamer.h"
-#include "fly/types/string_traits.h"
+#include "fly/types/string/string_converter.h"
+#include "fly/types/string/string_literal.h"
+#include "fly/types/string/string_streamer.h"
+#include "fly/types/string/string_traits.h"
 
 #include <algorithm>
 #include <array>

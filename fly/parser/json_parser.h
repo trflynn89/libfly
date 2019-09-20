@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/parser/parser.h"
-#include "fly/types/json.h"
+#include "fly/types/json/json.h"
 
 #include <cstdint>
 #include <istream>
