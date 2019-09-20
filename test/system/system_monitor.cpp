@@ -1,8 +1,8 @@
 #include "fly/system/system_monitor.h"
 
-#include "fly/literals.h"
 #include "fly/system/system_config.h"
 #include "fly/task/task_manager.h"
+#include "fly/types/literals.h"
 
 #include <gtest/gtest.h>
 

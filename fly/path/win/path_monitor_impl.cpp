@@ -1,8 +1,8 @@
 #include "fly/path/win/path_monitor_impl.h"
 
-#include "fly/literals.h"
 #include "fly/logger/logger.h"
 #include "fly/task/task_runner.h"
+#include "fly/types/literals.h"
 
 #include <string>
 

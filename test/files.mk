@@ -19,7 +19,6 @@ SRC_DIRS_$(d) := \
 SRC_DIRS_$(d) += \
     test/coders \
     test/config \
-    test/literals \
     test/logger \
     test/parser \
     test/path \

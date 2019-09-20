@@ -156,7 +156,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\fly.h" />
-    <ClInclude Include="..\..\..\fly\literals.h" />
     <ClInclude Include="..\..\..\fly\coders\coder.h" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.h" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.h" />
@@ -202,6 +201,7 @@
     <ClInclude Include="..\..\..\fly\types\concurrency\detail\concurrent_container.h" />
     <ClInclude Include="..\..\..\fly\types\json\json.h" />
     <ClInclude Include="..\..\..\fly\types\json\json_traits.h" />
+    <ClInclude Include="..\..\..\fly\types\literals.h" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.h" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer.h" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.h" />
