@@ -1,5 +1,7 @@
 #pragma once
 
+#include "fly/types/string/string.h"
+
 #include <array>
 #include <deque>
 #include <forward_list>
@@ -41,18 +43,11 @@ struct JsonTraits
     using array_type = std::vector<Json>;
 
     /**
-     * Aliases for helper types.
-     */
-    using char_type = typename string_type::value_type;
-
-    /**
      * Define a trait for testing if type T is a JSON string.
      */
     template <typename T>
-    using is_string = std::bool_constant<
-        std::is_same_v<char_type *, std::decay_t<T>> ||
-        std::is_same_v<char_type const *, std::decay_t<T>> ||
-        std::is_same_v<string_type, std::decay_t<T>>>;
+    using is_string =
+        typename BasicString<string_type>::traits::template is_string_like<T>;
 
     template <typename T>
     inline static constexpr bool is_string_v = is_string<T>::value;
