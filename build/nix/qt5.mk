@@ -3,7 +3,7 @@
 
 # Qt5 flags
 QT5_DIR := /opt/Qt5
-QT5_VERSION := 5.11.2
+QT5_VERSION := 5.12.5
 
 QT5_BIN := $(QT5_DIR)/$(QT5_VERSION)/gcc_64/bin
 QT5_INC := $(QT5_DIR)/$(QT5_VERSION)/gcc_64/include
@@ -25,9 +25,9 @@ QT5_INSTALLER_URL := http://qt.mirror.constant.com/official_releases/online_inst
 # selections in the installer.
 define QT5_INSTALL
 
-    curl -O $(QT5_INSTALLER_URL); \
+    (cd /tmp && curl -O $(QT5_INSTALLER_URL)); \
     if [[ $$? -ne 0 ]] ; then \
-        $(RM) $(QT5_INSTALLER); \
+        $(RM) /tmp/$(QT5_INSTALLER); \
         exit 1; \
     fi; \
     \
@@ -112,9 +112,9 @@ define QT5_INSTALL
     } \
     " >> $$QT5_SCRIPT; \
     \
-    chmod +x $(QT5_INSTALLER); \
-    sudo ./$(QT5_INSTALLER) --script $$QT5_SCRIPT; \
+    chmod +x /tmp/$(QT5_INSTALLER); \
+    sudo /tmp/$(QT5_INSTALLER) --script $$QT5_SCRIPT; \
     \
-    $(RM) $(QT5_INSTALLER) $$QT5_SCRIPT
+    $(RM) /tmp/$(QT5_INSTALLER) $$QT5_SCRIPT
 
 endef
