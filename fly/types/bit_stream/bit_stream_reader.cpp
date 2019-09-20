@@ -1,7 +1,7 @@
 #include "fly/types/bit_stream/bit_stream_reader.h"
 
 #include "fly/literals.h"
-#include "fly/types/bit_stream/bit_stream_constants.h"
+#include "fly/types/bit_stream/detail/bit_stream_constants.h"
 
 namespace fly {
 
@@ -15,15 +15,16 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
     byte_type magic = 0;
 
     // Cannot use ReadByte because the remainder bits are not known yet.
-    const byte_type bytesRead = fill(header, s_byteTypeSize);
+    const byte_type bytesRead = fill(header, detail::s_byteTypeSize);
 
     if (bytesRead == 1_u8)
     {
-        magic = (header >> s_magicShift) & s_magicMask;
-        m_remainder = (header >> s_remainderShift) & s_remainderMask;
+        magic = (header >> detail::s_magicShift) & detail::s_magicMask;
+        m_remainder =
+            (header >> detail::s_remainderShift) & detail::s_remainderMask;
     }
 
-    if (magic != s_magic)
+    if (magic != detail::s_magic)
     {
         m_stream.setstate(std::ios::failbit);
     }
@@ -32,13 +33,13 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
 //==============================================================================
 bool BitStreamReader::ReadWord(word_type &word) noexcept
 {
-    return ReadBits(s_bitsPerWord, word) == s_bitsPerWord;
+    return ReadBits(detail::s_bitsPerWord, word) == detail::s_bitsPerWord;
 }
 
 //==============================================================================
 bool BitStreamReader::ReadByte(byte_type &byte) noexcept
 {
-    return ReadBits(s_bitsPerByte, byte) == s_bitsPerByte;
+    return ReadBits(detail::s_bitsPerByte, byte) == detail::s_bitsPerByte;
 }
 
 //==============================================================================
@@ -61,11 +62,13 @@ bool BitStreamReader::FullyConsumed() const noexcept
 //==============================================================================
 bool BitStreamReader::refillBuffer() noexcept
 {
-    const byte_type bitsToFill = s_mostSignificantBitPosition - m_position;
+    const byte_type bitsToFill =
+        detail::s_mostSignificantBitPosition - m_position;
     buffer_type buffer = 0;
 
-    const byte_type bytesRead = fill(buffer, bitsToFill / s_bitsPerByte);
-    const byte_type bitsRead = bytesRead * s_bitsPerByte;
+    const byte_type bytesRead =
+        fill(buffer, bitsToFill / detail::s_bitsPerByte);
+    const byte_type bitsRead = bytesRead * detail::s_bitsPerByte;
 
     if (bitsRead == 0)
     {
@@ -76,11 +79,11 @@ bool BitStreamReader::refillBuffer() noexcept
         m_position += bitsRead;
 
         // It is undefined behavior to bit-shift by the size of the value being
-        // shifted, i.e. when bitsRead == s_mostSignificantBitPosition. Because
-        // bitsRead is at least 1 here, the left-shift can be broken into two
-        // operations in order to avoid that undefined behavior.
+        // shifted, i.e. when bitsRead == detail::s_mostSignificantBitPosition.
+        // Because bitsRead is at least 1 here, the left-shift can be broken
+        // into two operations in order to avoid that undefined behavior.
         m_buffer = (m_buffer << 1) << (bitsRead - 1);
-        m_buffer |= buffer >> (s_mostSignificantBitPosition - bitsRead);
+        m_buffer |= buffer >> (detail::s_mostSignificantBitPosition - bitsRead);
     }
 
     if (m_stream.peek() == EOF)

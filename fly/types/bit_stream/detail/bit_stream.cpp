@@ -1,6 +1,6 @@
-#include "fly/types/bit_stream/bit_stream.h"
+#include "fly/types/bit_stream/detail/bit_stream.h"
 
-namespace fly {
+namespace fly::detail {
 
 //==============================================================================
 BitStream::BitStream(byte_type startingPosition) noexcept :
@@ -9,4 +9,4 @@ BitStream::BitStream(byte_type startingPosition) noexcept :
 {
 }
 
-} // namespace fly
+} // namespace fly::detail

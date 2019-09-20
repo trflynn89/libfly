@@ -190,13 +190,13 @@
     <ClInclude Include="..\..\..\fly\task\task_manager.h" />
     <ClInclude Include="..\..\..\fly\task\task_runner.h" />
     <ClInclude Include="..\..\..\fly\traits\traits.h" />
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream.h" />
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_constants.h" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.h" />
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_traits.h" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.h" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_writer.h" />
-    <ClInclude Include="..\..\..\fly\types\bit_stream\endian.h" />
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream.h" />
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.h" />
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_traits.h" />
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\endian.h" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_container.h" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.h" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_stack.h" />
@@ -239,9 +239,9 @@
     <ClCompile Include="..\..\..\fly\system\win\system_monitor_impl.cpp" />
     <ClCompile Include="..\..\..\fly\task\task_manager.cpp" />
     <ClCompile Include="..\..\..\fly\task\task_runner.cpp" />
-    <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream.cpp" />
     <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream_reader.cpp" />
     <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream_writer.cpp" />
+    <ClCompile Include="..\..\..\fly\types\bit_stream\detail\bit_stream.cpp" />
     <ClCompile Include="..\..\..\fly\types\json\json.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

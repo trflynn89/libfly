@@ -1,7 +1,7 @@
 #include "fly/literals.h"
-#include "fly/types/bit_stream/bit_stream_constants.h"
 #include "fly/types/bit_stream/bit_stream_reader.h"
 #include "fly/types/bit_stream/bit_stream_writer.h"
+#include "fly/types/bit_stream/detail/bit_stream_constants.h"
 
 #include <gtest/gtest.h>
 
@@ -42,8 +42,11 @@ protected:
         }
 
         const fly::byte_type header = static_cast<fly::byte_type>(buffer[0]);
-        magic = (header >> fly::s_magicShift) & fly::s_magicMask;
-        remainder = (header >> fly::s_remainderShift) & fly::s_remainderMask;
+
+        magic =
+            (header >> fly::detail::s_magicShift) & fly::detail::s_magicMask;
+        remainder = (header >> fly::detail::s_remainderShift) &
+            fly::detail::s_remainderMask;
 
         return true;
     }
@@ -53,7 +56,7 @@ protected:
         fly::byte_type magic = 0, actualRemainder = 0;
         EXPECT_TRUE(ReadHeader(magic, actualRemainder));
 
-        EXPECT_EQ(magic, fly::s_magic);
+        EXPECT_EQ(magic, fly::detail::s_magic);
         EXPECT_EQ(actualRemainder, expectedRemainder);
     }
 
@@ -106,7 +109,8 @@ TEST_F(BitStreamTest, HeaderTest)
 //==============================================================================
 TEST_F(BitStreamTest, BadHeaderTest)
 {
-    fly::byte_type header = (fly::s_magic - 1) << fly::s_magicShift;
+    fly::byte_type header = (fly::detail::s_magic - 1)
+        << fly::detail::s_magicShift;
     m_outputStream << static_cast<std::ios::char_type>(header);
     m_outputStream << "data";
 

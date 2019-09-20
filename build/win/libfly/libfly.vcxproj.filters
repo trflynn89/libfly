@@ -55,6 +55,9 @@
     <Filter Include="types\string">
       <UniqueIdentifier>{56316664-18ad-4ca4-819d-e81532ac2df6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="types\bit_stream\detail">
+      <UniqueIdentifier>{f909badb-67e1-4b89-85c6-5091c983456a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\fly.h" />
@@ -158,25 +161,10 @@
     <ClInclude Include="..\..\..\fly\traits\traits.h">
       <Filter>traits</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream.h">
-      <Filter>types\bit_stream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_constants.h">
-      <Filter>types\bit_stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.h">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_traits.h">
-      <Filter>types\bit_stream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.h">
-      <Filter>types\bit_stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_writer.h">
-      <Filter>types\bit_stream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\endian.h">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_container.h">
@@ -208,6 +196,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\string_traits.h">
       <Filter>types\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream.h">
+      <Filter>types\bit_stream\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.h">
+      <Filter>types\bit_stream\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_traits.h">
+      <Filter>types\bit_stream\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\endian.h">
+      <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -301,9 +304,6 @@
     <ClCompile Include="..\..\..\fly\task\task_runner.cpp">
       <Filter>task</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream.cpp">
-      <Filter>types\bit_stream</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream_reader.cpp">
       <Filter>types\bit_stream</Filter>
     </ClCompile>
@@ -312,6 +312,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\types\json\json.cpp">
       <Filter>types\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\types\bit_stream\detail\bit_stream.cpp">
+      <Filter>types\bit_stream\detail</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

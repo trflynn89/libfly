@@ -15,7 +15,7 @@
 #    error Unknown byte swapping methods.
 #endif
 
-namespace fly {
+namespace fly::detail {
 
 /**
  * Enumeration to detect system endianness. Can be replaced by std::endian when
@@ -101,4 +101,4 @@ inline std::uint64_t byte_swap(std::uint64_t byte) noexcept
     }
 }
 
-} // namespace fly
+} // namespace fly::detail
