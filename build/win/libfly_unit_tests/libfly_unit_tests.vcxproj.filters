@@ -42,9 +42,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\coders\bit_stream.cpp">
-      <Filter>coders</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\test\coders\huffman.cpp">
       <Filter>coders</Filter>
     </ClCompile>
@@ -95,6 +92,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\test\traits\traits.cpp">
       <Filter>traits</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\bit_stream.cpp">
+      <Filter>types</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\concurrent_container.cpp">
       <Filter>types</Filter>

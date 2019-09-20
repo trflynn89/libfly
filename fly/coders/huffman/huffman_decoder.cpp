@@ -1,8 +1,8 @@
 #include "fly/coders/huffman/huffman_decoder.h"
 
-#include "fly/coders/bit_stream.h"
 #include "fly/literals.h"
 #include "fly/logger/logger.h"
+#include "fly/types/bit_stream/bit_stream.h"
 
 #include <vector>
 

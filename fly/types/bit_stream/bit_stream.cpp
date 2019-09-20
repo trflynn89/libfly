@@ -1,4 +1,4 @@
-#include "fly/coders/bit_stream.h"
+#include "fly/types/bit_stream/bit_stream.h"
 
 #include "fly/literals.h"
 

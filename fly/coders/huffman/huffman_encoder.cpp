@@ -1,9 +1,9 @@
 #include "fly/coders/huffman/huffman_encoder.h"
 
-#include "fly/coders/bit_stream.h"
 #include "fly/coders/huffman/huffman_config.h"
 #include "fly/literals.h"
 #include "fly/logger/logger.h"
+#include "fly/types/bit_stream/bit_stream.h"
 
 #include <algorithm>
 #include <limits>

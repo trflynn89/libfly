@@ -1,4 +1,4 @@
-#include "fly/coders/bit_stream.h"
+#include "fly/types/bit_stream/bit_stream.h"
 
 #include "fly/literals.h"
 
@@ -18,7 +18,7 @@ constexpr const std::ios::openmode s_outputMode =
 constexpr const std::ios::openmode s_bidrectionalMode =
     s_inputMode | s_outputMode;
 
-// Keep in sync with //fly/coders/bit_stream.cpp.
+// Keep in sync with //fly/types/bit_stream/bit_stream.cpp.
 constexpr const fly::byte_type s_magic = 0x1a;
 constexpr const fly::byte_type s_magicMask = 0x1f;
 constexpr const fly::byte_type s_magicShift = 0x03;
