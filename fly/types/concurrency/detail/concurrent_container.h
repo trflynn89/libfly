@@ -4,7 +4,7 @@
 #include <condition_variable>
 #include <mutex>
 
-namespace fly {
+namespace fly::detail {
 
 /**
  * Wrapper around an STL container to provide thread safe access.
@@ -144,4 +144,4 @@ auto ConcurrentContainer<T, Container>::Size() const noexcept -> size_type
     return m_container.size();
 }
 
-} // namespace fly
+} // namespace fly::detail

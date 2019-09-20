@@ -1,9 +1,9 @@
 #include "fly/path/path_monitor.h"
 
-#include "fly/literals.h"
 #include "fly/path/path_config.h"
 #include "fly/task/task_manager.h"
 #include "fly/types/concurrency/concurrent_queue.h"
+#include "fly/types/literals.h"
 #include "fly/types/string/string.h"
 
 #include <gtest/gtest.h>

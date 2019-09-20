@@ -1,9 +1,9 @@
 #pragma once
 
-#include "fly/types/bit_stream/bit_stream.h"
-#include "fly/types/bit_stream/bit_stream_traits.h"
 #include "fly/types/bit_stream/bit_stream_types.h"
-#include "fly/types/bit_stream/endian.h"
+#include "fly/types/bit_stream/detail/bit_stream.h"
+#include "fly/types/bit_stream/detail/bit_stream_traits.h"
+#include "fly/types/bit_stream/detail/endian.h"
 
 #include <cstdint>
 #include <istream>
@@ -21,7 +21,7 @@ namespace fly {
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 7, 2019
  */
-class BitStreamReader : public BitStream
+class BitStreamReader : public detail::BitStream
 {
 public:
     /**
@@ -133,10 +133,10 @@ template <typename DataType>
 byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
 {
     static_assert(
-        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    if constexpr (BitStreamTraits::is_buffer_type_v<DataType>)
+    if constexpr (detail::BitStreamTraits::is_buffer_type_v<DataType>)
     {
         // See PeekBits for why 64-bit read operations must be split.
         const byte_type sizeHigh = size / 2;
@@ -166,7 +166,7 @@ template <typename DataType>
 byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
 {
     static_assert(
-        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
     // 64-bit peek operations not fully supported because the byte buffer could
@@ -180,7 +180,7 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
     // would invalidate the PeekBits/DiscardBits semantic. Would need to support
     // putting bits back onto the stream.
     static_assert(
-        !BitStreamTraits::is_buffer_type_v<DataType>,
+        !detail::BitStreamTraits::is_buffer_type_v<DataType>,
         "PeekBits only supports types smaller than buffer_type");
 
     if ((size > m_position) && !refillBuffer())
@@ -213,11 +213,11 @@ template <typename DataType>
 byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
 {
     static_assert(
-        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
     m_stream.read(reinterpret_cast<std::ios::char_type *>(&buffer), bytes);
-    buffer = byte_swap(buffer);
+    buffer = detail::byte_swap(buffer);
 
     return static_cast<byte_type>(m_stream.gcount());
 }

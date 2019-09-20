@@ -10,6 +10,7 @@ SRC_DIRS_$(d) := \
     fly/system \
     fly/task \
     fly/types/bit_stream \
+    fly/types/bit_stream/detail \
     fly/types/json
 
 # Add libfly.so to release package

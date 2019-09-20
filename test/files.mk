@@ -10,6 +10,7 @@ SRC_DIRS_$(d) := \
     fly/system \
     fly/task \
     fly/types/bit_stream \
+    fly/types/bit_stream/detail \
     fly/types/json \
     test/mock \
     test/util
@@ -18,7 +19,6 @@ SRC_DIRS_$(d) := \
 SRC_DIRS_$(d) += \
     test/coders \
     test/config \
-    test/literals \
     test/logger \
     test/parser \
     test/path \

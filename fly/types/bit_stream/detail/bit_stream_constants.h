@@ -4,7 +4,7 @@
 
 #include <limits>
 
-namespace fly {
+namespace fly::detail {
 
 constexpr const byte_type s_magic = 0x1a;
 constexpr const byte_type s_magicMask = 0x1f;
@@ -26,4 +26,4 @@ constexpr const byte_type s_bitsPerByte =
 constexpr const byte_type s_mostSignificantBitPosition =
     s_bufferTypeSize * s_bitsPerByte;
 
-} // namespace fly
+} // namespace fly::detail

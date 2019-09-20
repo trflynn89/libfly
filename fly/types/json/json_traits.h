@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/string/string_traits.h"
+#include "fly/types/string/string.h"
 
 #include <array>
 #include <deque>
@@ -47,7 +47,7 @@ struct JsonTraits
      */
     template <typename T>
     using is_string =
-        typename BasicStringTraits<string_type>::template is_string_like<T>;
+        typename BasicString<string_type>::traits::template is_string_like<T>;
 
     template <typename T>
     inline static constexpr bool is_string_v = is_string<T>::value;

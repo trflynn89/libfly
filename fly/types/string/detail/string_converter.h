@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace fly {
+namespace fly::detail {
 
 /**
  * Helper struct to convert a std::basic_string<> type to a plain-old-data type,
@@ -149,4 +149,4 @@ struct BasicStringConverter<StringType, long double>
     }
 };
 
-} // namespace fly
+} // namespace fly::detail

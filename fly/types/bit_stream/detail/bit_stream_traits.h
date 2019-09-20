@@ -4,7 +4,7 @@
 
 #include <type_traits>
 
-namespace fly {
+namespace fly::detail {
 
 /**
  * Traits for type safety in the BitStream template methods.
@@ -38,4 +38,4 @@ struct BitStreamTraits
     constexpr inline static bool is_buffer_type_v = is_buffer_type<T>::value;
 };
 
-} // namespace fly
+} // namespace fly::detail

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "fly/types/bit_stream/bit_stream_traits.h"
 #include "fly/types/bit_stream/bit_stream_types.h"
-#include "fly/types/bit_stream/endian.h"
+#include "fly/types/bit_stream/detail/bit_stream_traits.h"
+#include "fly/types/bit_stream/detail/endian.h"
 
 #include <limits>
 
-namespace fly {
+namespace fly::detail {
 
 /**
  * Base class for writing to and reading from a binary stream. The first byte of
@@ -77,4 +77,4 @@ constexpr inline DataType BitStream::GenerateMask(const DataType bits)
     return filledMask >> (numberOfBits - bits);
 }
 
-} // namespace fly
+} // namespace fly::detail

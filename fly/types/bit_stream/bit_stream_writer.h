@@ -1,9 +1,9 @@
 #pragma once
 
-#include "fly/types/bit_stream/bit_stream.h"
-#include "fly/types/bit_stream/bit_stream_traits.h"
 #include "fly/types/bit_stream/bit_stream_types.h"
-#include "fly/types/bit_stream/endian.h"
+#include "fly/types/bit_stream/detail/bit_stream.h"
+#include "fly/types/bit_stream/detail/bit_stream_traits.h"
+#include "fly/types/bit_stream/detail/endian.h"
 
 #include <iostream>
 
@@ -20,7 +20,7 @@ namespace fly {
  * @author Timothy Flynn (trflynn89@gmail.com)
  * @version July 7, 2019
  */
-class BitStreamWriter : public BitStream
+class BitStreamWriter : public detail::BitStream
 {
 public:
     /**
@@ -104,7 +104,7 @@ template <typename DataType>
 void BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
 {
     static_assert(
-        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
     // If there are more bits to write than are available in the byte buffer,
@@ -135,10 +135,10 @@ template <typename DataType>
 void BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
 {
     static_assert(
-        BitStreamTraits::is_unsigned_integer_v<DataType>,
+        detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    const DataType data = byte_swap(buffer);
+    const DataType data = detail::byte_swap(buffer);
     m_stream.write(reinterpret_cast<const std::ios::char_type *>(&data), bytes);
 }
 
