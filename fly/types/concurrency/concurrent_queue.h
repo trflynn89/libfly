@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/concurrency/concurrent_container.h"
+#include "fly/types/concurrency/detail/concurrent_container.h"
 
 #include <queue>
 
@@ -13,7 +13,7 @@ namespace fly {
  * @version July 27, 2016
  */
 template <typename T>
-class ConcurrentQueue : public ConcurrentContainer<T, std::queue<T>>
+class ConcurrentQueue : public detail::ConcurrentContainer<T, std::queue<T>>
 {
 protected:
     void push(T &&) noexcept override;

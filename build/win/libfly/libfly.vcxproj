@@ -197,9 +197,9 @@
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.h" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_traits.h" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\endian.h" />
-    <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_container.h" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.h" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_stack.h" />
+    <ClInclude Include="..\..\..\fly\types\concurrency\detail\concurrent_container.h" />
     <ClInclude Include="..\..\..\fly\types\json\json.h" />
     <ClInclude Include="..\..\..\fly\types\json\json_traits.h" />
     <ClInclude Include="..\..\..\fly\types\string\string.h" />
