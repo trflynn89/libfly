@@ -27,7 +27,7 @@ typedef std::priority_queue<
  * frequency, or the node is a junction storing the sum total of the frequencies
  * of each node in its subtree.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 struct HuffmanNode
@@ -83,7 +83,7 @@ struct HuffmanNode
  * Comparator for HuffmanNode to be sorted such that the node with the lowest
  * frequency has the highest priority.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 struct HuffmanNodeComparator
@@ -94,7 +94,7 @@ struct HuffmanNodeComparator
 /**
  * Struct to store data for a Huffman code.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 struct HuffmanCode

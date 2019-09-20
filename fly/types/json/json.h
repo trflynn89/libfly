@@ -52,7 +52,7 @@ namespace fly {
  *        std::vector<int> vector;
  *        vector = json; // You could do "vector = decltype(vector)(json);"
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version September 24, 2017
  */
 class Json
@@ -568,7 +568,7 @@ private:
  * Exception to be raised if an error was encountered creating, accessing, or
  * modifying a Json instance.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version September 24, 2017
  */
 class JsonException : public std::exception

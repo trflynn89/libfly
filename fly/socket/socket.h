@@ -16,7 +16,7 @@ class SocketConfig;
  * Virtual interface to represent a network socket. This interface is platform
  * independent - OS dependent implementations should inherit from this class.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version November 11, 2013
  */
 class Socket

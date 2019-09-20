@@ -34,7 +34,7 @@ using String32 = BasicString<std::u32string>;
 /**
  * Static class to provide string utilities not provided by the STL.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 21, 2019
  */
 template <typename StringType>

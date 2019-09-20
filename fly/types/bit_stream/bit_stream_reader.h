@@ -18,7 +18,7 @@ namespace fly {
  * by the size of buffer_type. That buffer is stored in-memory until it has been
  * entirely consumed by the caller, at which point it is refilled.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 class BitStreamReader : public detail::BitStream

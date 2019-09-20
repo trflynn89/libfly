@@ -6,7 +6,7 @@
  * Helper macros to choose the correct string literal to use for either a given
  * type or the char type used on the compiling system.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 23, 2019
  */
 #define FLY_STR(type, str)                                                     \

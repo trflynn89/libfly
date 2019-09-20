@@ -14,7 +14,7 @@ class BitStreamWriter;
  * Virtual interface to encode a file or string. Coders for specific algorithms
  * should inherit from this class to perform encoding.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 class Encoder
@@ -63,7 +63,7 @@ protected:
  * Virtual interface to decode a file or string. Coders for specific algorithms
  * should inherit from this class to perform decoding.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 class Decoder

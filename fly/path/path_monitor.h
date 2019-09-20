@@ -22,7 +22,7 @@ class SequencedTaskRunner;
  * This interface is platform independent - OS dependent implementations should
  * inherit from this class.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version May 14, 2017
  */
 class PathMonitor : public std::enable_shared_from_this<PathMonitor>
@@ -200,7 +200,7 @@ private:
 /**
  * Task to be executed to check for changes to the monitored paths.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class PathMonitorTask : public Task

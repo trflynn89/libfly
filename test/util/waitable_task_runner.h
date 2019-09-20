@@ -18,7 +18,7 @@ class TaskManager;
  * running tasks. But the implementations below extend this class for common
  * functionality. Only meant to be used by unit tests.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class WaitableTaskRunner
@@ -66,7 +66,7 @@ private:
  * but also to allow waiting for a specific task to be complete. Only meant to
  * be used by unit tests.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class WaitableParallelTaskRunner :
@@ -92,7 +92,7 @@ protected:
  * but also to allow waiting for a specific task to be complete. Only meant to
  * be used by unit tests.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class WaitableSequencedTaskRunner :

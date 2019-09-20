@@ -17,7 +17,7 @@ namespace fly {
  * should invoke the Finish() method to flush the BitStream header and any bytes
  * remaining in the buffer.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 class BitStreamWriter : public detail::BitStream

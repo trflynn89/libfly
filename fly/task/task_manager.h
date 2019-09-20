@@ -25,7 +25,7 @@ class TaskRunner;
  * task runner may hold on to a task in accordance with its defined behavior
  * until it is ready for the task manager to execute the task.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class TaskManager : public std::enable_shared_from_this<TaskManager>

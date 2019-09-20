@@ -10,7 +10,7 @@ namespace fly {
 /**
  * Simple QMainWindow implementation to create an empty window.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version October 4, 2018
  */
 class MainWindow : public QMainWindow

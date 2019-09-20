@@ -9,7 +9,7 @@ namespace fly {
  * Utility class to perform IO operations on paths. Only meant to be used by
  * unit tests.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class PathUtil

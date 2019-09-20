@@ -11,7 +11,7 @@ namespace fly::detail {
 /**
  * Traits for basic properties of standard std::basic_string<> specializations.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 23, 2019
  */
 template <typename StringType>

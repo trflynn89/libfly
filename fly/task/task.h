@@ -7,7 +7,7 @@ class TaskManager;
 /**
  * Virtual class to represent a task to be run by the task system.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class Task

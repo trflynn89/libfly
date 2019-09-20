@@ -18,7 +18,7 @@ class SystemMonitorTask;
  * memory monitoring. This interface is platform independent - OS dependent
  * implementations should inherit from this class.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version September 15, 2017
  */
 class SystemMonitor : public std::enable_shared_from_this<SystemMonitor>
@@ -146,7 +146,7 @@ private:
 /**
  * Task to be executed to update system-level resources.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class SystemMonitorTask : public Task

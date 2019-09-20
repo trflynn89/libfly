@@ -18,7 +18,7 @@ namespace fly::detail {
  * It is recommended that outside callers use BasicString<>::Convert<> instead
  * of using this struct directly.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 21, 2019
  */
 template <typename StringType, typename T>

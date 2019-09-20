@@ -22,7 +22,7 @@ class Json;
 /**
  * Traits for basic properties of JSON types defined by https://www.json.org.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 23, 2019
  */
 struct JsonTraits

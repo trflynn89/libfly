@@ -8,7 +8,7 @@ namespace fly {
 /**
  * Static class to provide interface to system calls.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 2, 2016
  */
 class System

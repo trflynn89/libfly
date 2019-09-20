@@ -17,7 +17,7 @@ class SequencedTaskRunner;
  * Linux implementation of the PathMonitor interface. Uses the inotify API to
  * detect path changes.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 19, 2017
  */
 class PathMonitorImpl : public PathMonitor

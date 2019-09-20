@@ -9,7 +9,7 @@ namespace fly {
 /**
  * Class to hold networking-related configuration values.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 19, 2016
  */
 class SocketConfig : public Config

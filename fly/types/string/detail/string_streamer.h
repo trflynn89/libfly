@@ -24,7 +24,7 @@ namespace fly::detail {
  * character is ASCII, it is first casted to std::string::value_type, and then
  * streamed. Otherwise, it is streamed as a hexadecimal.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 21, 2019
  */
 template <typename StringType>
