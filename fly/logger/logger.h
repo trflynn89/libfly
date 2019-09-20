@@ -73,7 +73,7 @@ class SequencedTaskRunner;
  * is also provided for console logging without acquiring the console lock while
  * inside, e.g., a signal handler.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 21, 2016
  */
 class Logger : public std::enable_shared_from_this<Logger>
@@ -195,7 +195,7 @@ private:
 /**
  * Task to be executed to check for new log entries.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class LoggerTask : public Task

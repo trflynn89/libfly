@@ -10,7 +10,7 @@ namespace fly {
 /**
  * Class to hold configuration values related to the logger.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 18, 2016
  */
 class LoggerConfig : public Config

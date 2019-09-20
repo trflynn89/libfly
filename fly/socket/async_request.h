@@ -10,7 +10,7 @@ namespace fly {
 /**
  * An asynchronous read/write request.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version December 28, 2014
  */
 class AsyncRequest

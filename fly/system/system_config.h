@@ -9,7 +9,7 @@ namespace fly {
 /**
  * Class to hold configuration values related to the system interface.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class SystemConfig : public Config

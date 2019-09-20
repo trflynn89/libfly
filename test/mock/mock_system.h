@@ -25,7 +25,7 @@ using MockCalls = std::map<MockCall, bool>;
  * This class is only meant for unit testing. It does not safety check for
  * things like the same mocked system call being enabled multiple times.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version April 7, 2018
  */
 class MockSystem

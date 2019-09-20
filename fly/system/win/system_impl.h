@@ -8,7 +8,7 @@ namespace fly {
 /**
  * Windows declaration of the SystemImpl interface.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 2, 2016
  */
 class SystemImpl

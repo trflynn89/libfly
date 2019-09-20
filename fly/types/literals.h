@@ -6,7 +6,7 @@
 /**
  * Fixed-width integer literal suffixes not provided by the STL.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 

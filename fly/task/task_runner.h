@@ -16,7 +16,7 @@ class TaskManager;
 /**
  * Base class for controlling the execution of tasks.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class TaskRunner : public std::enable_shared_from_this<TaskRunner>
@@ -96,7 +96,7 @@ private:
  * Task runner implementation for executing tasks in parallel. Tasks posted to
  * this task runner may be executed in any order.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class ParallelTaskRunner : public TaskRunner
@@ -127,7 +127,7 @@ protected:
  * task B is posted with no delay, task B will be posted for execution first.
  * Task A will only be posted for execution once its delay has expired.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class SequencedTaskRunner : public TaskRunner

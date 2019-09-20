@@ -8,7 +8,7 @@ namespace fly {
 /**
  * Exception to be raised if an error was encountered while parsing.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version April 21, 2018
  */
 class ParserException : public std::exception
@@ -43,7 +43,7 @@ private:
 /**
  * Exception to be raised if an unexpected character was encountered.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version April 21, 2018
  */
 class UnexpectedCharacterException : public ParserException
@@ -62,7 +62,7 @@ public:
 /**
  * Exception to be raised if a value could not be converted as expected.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version April 21, 2018
  */
 class BadConversionException : public ParserException

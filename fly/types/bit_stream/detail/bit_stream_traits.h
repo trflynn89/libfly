@@ -9,7 +9,7 @@ namespace fly::detail {
 /**
  * Traits for type safety in the BitStream template methods.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 struct BitStreamTraits

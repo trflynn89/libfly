@@ -15,7 +15,7 @@ class SocketConfig;
 /**
  * Linux implementation of the SocketManager interface.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 21, 2016
  */
 class SocketManagerImpl : public SocketManager

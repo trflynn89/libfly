@@ -20,7 +20,7 @@ class LoggerConfig;
  * 6. The line number the log is on.
  * 7. The message being logged.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 18, 2016
  */
 struct Log

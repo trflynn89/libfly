@@ -11,7 +11,7 @@ namespace fly {
 /**
  * Class to hold configuration values related to the Huffman coder.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 class HuffmanConfig : public Config

@@ -16,7 +16,7 @@ class HuffmanConfig;
  * Implementation of the Encoder interface for Huffman coding. Forms length-
  * limted, canonical Huffman codes to encode symbols.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 class HuffmanEncoder : public Encoder

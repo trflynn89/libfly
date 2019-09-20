@@ -12,7 +12,7 @@ namespace fly {
  * Virtual interface to parse a file or string. Parsers for specific formats
  * should inherit from this class.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 18, 2016
  */
 class Parser

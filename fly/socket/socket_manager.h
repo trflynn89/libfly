@@ -24,7 +24,7 @@ enum class Protocol : uint8_t;
  * sockets. A single thread is created to perform all IO. Completed IO is
  * pushed onto queues, which other threads may read from.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 19, 2016
  */
 class SocketManager : public std::enable_shared_from_this<SocketManager>
@@ -158,7 +158,7 @@ private:
 /**
  * Task to be executed to check for available asynchronous sockets.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class SocketManagerTask : public Task

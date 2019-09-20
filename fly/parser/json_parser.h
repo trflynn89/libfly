@@ -15,7 +15,7 @@ namespace fly {
 /**
  * Implementation of the Parser interface for the .json format.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 19, 2017
  */
 class JsonParser : public Parser

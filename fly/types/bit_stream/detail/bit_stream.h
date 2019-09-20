@@ -27,7 +27,7 @@ namespace fly::detail {
  * already existing std::istream or std::ostream. It is expected that the
  * pre-existing stream outlive the wrapper BitStream instance.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 class BitStream

@@ -13,7 +13,7 @@ class SocketConfig;
 /**
  * Windows implementation of the Socket interface.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version December 12, 2012
  */
 class SocketImpl : public Socket

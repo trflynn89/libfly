@@ -21,7 +21,7 @@ namespace fly::detail {
  * Enumeration to detect system endianness. Can be replaced by std::endian when
  * available in C++20.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 enum class Endian : std::uint16_t

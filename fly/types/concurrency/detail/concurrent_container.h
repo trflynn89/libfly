@@ -9,7 +9,7 @@ namespace fly::detail {
 /**
  * Wrapper around an STL container to provide thread safe access.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 27, 2016
  */
 template <typename T, typename Container>

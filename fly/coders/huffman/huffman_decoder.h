@@ -14,7 +14,7 @@ class BitStreamReader;
 /**
  * Implementation of the Decoder interface for Huffman coding.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
 class HuffmanDecoder : public Decoder

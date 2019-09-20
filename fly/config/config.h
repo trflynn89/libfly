@@ -14,7 +14,7 @@ namespace fly {
  * functions for each of its config values. Any derived class must define a
  * constexpr C-string named "identifier" to uniquely identify that class.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 18, 2016
  */
 class Config

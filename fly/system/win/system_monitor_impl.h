@@ -14,7 +14,7 @@ class SystemConfig;
  * Windows implementation of the SystemMonitor interface. Uses the Windows, PDH,
  * and PSAPI libraries to gather system resource information.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version September 17, 2017
  */
 class SystemMonitorImpl : public SystemMonitor

@@ -23,7 +23,7 @@ class SequencedTaskRunner;
 /**
  * Class to create and manage a set of configurations.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 21, 2016
  */
 class ConfigManager : public std::enable_shared_from_this<ConfigManager>
@@ -110,7 +110,7 @@ private:
 /**
  * Task to be executed when the configuration file changes.
  *
- * @author Timothy Flynn (trflynn89@gmail.com)
+ * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
 class ConfigUpdateTask : public Task
