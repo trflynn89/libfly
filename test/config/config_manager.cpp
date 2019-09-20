@@ -1,6 +1,7 @@
 #include "fly/config/config_manager.h"
 
 #include "fly/config/config.h"
+#include "fly/fly.h"
 #include "fly/literals.h"
 #include "fly/path/path_config.h"
 #include "fly/task/task_manager.h"
@@ -277,6 +278,16 @@ TEST_F(ConfigManagerTest, FileChangeTest)
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents2));
     m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+
+#if defined(FLY_WINDOWS)
+    // On Windows, multiple FILE_ACTION_MODIFIED events may be triggered even
+    // though only a single write occurs. If needed, wait for a second event.
+    // https://stackoverflow.com/a/1765094
+    if (spConfig->GetValue<std::string>("name", "").empty())
+    {
+        m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    }
+#endif
 
     EXPECT_EQ(spConfig->GetValue<std::string>("name", ""), "Jane Doe");
     EXPECT_EQ(spConfig->GetValue<std::string>("address", ""), "");

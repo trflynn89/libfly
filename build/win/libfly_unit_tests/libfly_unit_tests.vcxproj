@@ -201,6 +201,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\test\coders\huffman.cpp" />
     <ClCompile Include="..\..\..\test\config\config.cpp" />
     <ClCompile Include="..\..\..\test\config\config_manager.cpp" />
     <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest-all.cc" />
@@ -217,6 +218,7 @@
     <ClCompile Include="..\..\..\test\system\system_monitor.cpp" />
     <ClCompile Include="..\..\..\test\task\task.cpp" />
     <ClCompile Include="..\..\..\test\traits\traits.cpp" />
+    <ClCompile Include="..\..\..\test\types\bit_stream.cpp" />
     <ClCompile Include="..\..\..\test\types\concurrent_container.cpp" />
     <ClCompile Include="..\..\..\test\types\json.cpp" />
     <ClCompile Include="..\..\..\test\types\json_traits.cpp" />

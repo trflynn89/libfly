@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="coders">
+      <UniqueIdentifier>{c63b5aa5-4f36-4425-b00e-a823e8ed55fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="coders\huffman">
+      <UniqueIdentifier>{c8372ac9-d455-4467-9414-627cb49690f0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="config">
       <UniqueIdentifier>{7bfc9b93-2ef1-48fd-9eb8-ccb630757af9}</UniqueIdentifier>
     </Filter>
@@ -37,6 +43,9 @@
     <Filter Include="types">
       <UniqueIdentifier>{2fe9b6ce-cbdc-485c-bd1c-37fe9ef648d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="types\bit_stream">
+      <UniqueIdentifier>{26d077f8-908f-4dac-8192-00c488fec96a}</UniqueIdentifier>
+    </Filter>
     <Filter Include="types\concurrency">
       <UniqueIdentifier>{da7b9fca-b0f4-4025-bc7e-4eee7e176b36}</UniqueIdentifier>
     </Filter>
@@ -50,6 +59,21 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\fly.h" />
     <ClInclude Include="..\..\..\fly\literals.h" />
+    <ClInclude Include="..\..\..\fly\coders\coder.h">
+      <Filter>coders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.h">
+      <Filter>coders\huffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.h">
+      <Filter>coders\huffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.h">
+      <Filter>coders\huffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.h">
+      <Filter>coders\huffman</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\config\config.h">
       <Filter>config</Filter>
     </ClInclude>
@@ -134,6 +158,27 @@
     <ClInclude Include="..\..\..\fly\traits\traits.h">
       <Filter>traits</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_constants.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_traits.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_writer.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\endian.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_container.h">
       <Filter>types\concurrency</Filter>
     </ClInclude>
@@ -166,6 +211,21 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\fly\coders\coder.cpp">
+      <Filter>coders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_config.cpp">
+      <Filter>coders\huffman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_decoder.cpp">
+      <Filter>coders\huffman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_encoder.cpp">
+      <Filter>coders\huffman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_types.cpp">
+      <Filter>coders\huffman</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\fly\config\config.cpp">
       <Filter>config</Filter>
     </ClCompile>
@@ -240,6 +300,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\task\task_runner.cpp">
       <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream.cpp">
+      <Filter>types\bit_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream_reader.cpp">
+      <Filter>types\bit_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream_writer.cpp">
+      <Filter>types\bit_stream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\types\json\json.cpp">
       <Filter>types\json</Filter>

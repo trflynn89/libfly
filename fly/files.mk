@@ -1,5 +1,7 @@
 # Define the directories to include and compile
 SRC_DIRS_$(d) := \
+    fly/coders \
+    fly/coders/huffman \
     fly/config \
     fly/logger \
     fly/parser \
@@ -7,6 +9,7 @@ SRC_DIRS_$(d) := \
     fly/socket \
     fly/system \
     fly/task \
+    fly/types/bit_stream \
     fly/types/json
 
 # Add libfly.so to release package
