@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/socket/socket_types.h"
-#include "fly/types/concurrent_queue.h"
+#include "fly/types/concurrency/concurrent_queue.h"
 
 #include <string>
 

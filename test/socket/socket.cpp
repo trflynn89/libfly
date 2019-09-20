@@ -8,8 +8,8 @@
 #include "fly/socket/socket_types.h"
 #include "fly/task/task_manager.h"
 #include "fly/task/task_runner.h"
-#include "fly/types/concurrent_queue.h"
-#include "fly/types/string.h"
+#include "fly/types/concurrency/concurrent_queue.h"
+#include "fly/types/string/string.h"
 
 #include <gtest/gtest.h>
 

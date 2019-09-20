@@ -2,7 +2,7 @@
 
 #include "fly/task/task_manager.h"
 #include "fly/task/task_runner.h"
-#include "fly/types/concurrent_queue.h"
+#include "fly/types/concurrency/concurrent_queue.h"
 #include "test/util/waitable_task_runner.h"
 
 #include <gtest/gtest.h>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/task/task_runner.h"
-#include "fly/types/concurrent_queue.h"
+#include "fly/types/concurrency/concurrent_queue.h"
 
 #include <chrono>
 #include <memory>

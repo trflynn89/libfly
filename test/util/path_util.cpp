@@ -1,6 +1,6 @@
 #include "test/util/path_util.h"
 
-#include "fly/types/string.h"
+#include "fly/types/string/string.h"
 
 #include <filesystem>
 #include <fstream>

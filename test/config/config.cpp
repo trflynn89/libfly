@@ -1,6 +1,6 @@
 #include "fly/config/config.h"
 
-#include "fly/types/json.h"
+#include "fly/types/json/json.h"
 #include "test/config/test_config.h"
 
 #include <gtest/gtest.h>
