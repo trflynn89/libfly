@@ -1,7 +1,8 @@
 #include "fly/coders/coder.h"
 
 #include "fly/logger/logger.h"
-#include "fly/types/bit_stream/bit_stream.h"
+#include "fly/types/bit_stream/bit_stream_reader.h"
+#include "fly/types/bit_stream/bit_stream_writer.h"
 
 #include <chrono>
 #include <fstream>

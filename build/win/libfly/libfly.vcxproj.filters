@@ -161,6 +161,21 @@
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream.h">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_constants.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_traits.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_writer.h">
+      <Filter>types\bit_stream</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\bit_stream\endian.h">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
@@ -287,6 +302,12 @@
       <Filter>task</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream.cpp">
+      <Filter>types\bit_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream_reader.cpp">
+      <Filter>types\bit_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream_writer.cpp">
       <Filter>types\bit_stream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\types\json\json.cpp">
