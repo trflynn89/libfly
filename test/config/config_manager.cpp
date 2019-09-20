@@ -283,7 +283,7 @@ TEST_F(ConfigManagerTest, FileChangeTest)
     // On Windows, multiple FILE_ACTION_MODIFIED events may be triggered even
     // though only a single write occurs. If needed, wait for a second event.
     // https://stackoverflow.com/a/1765094
-    if (spConfig->GetValue<std::string>("name", "") == "")
+    if (spConfig->GetValue<std::string>("name", "").empty())
     {
         m_spTaskRunner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
     }
