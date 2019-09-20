@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-namespace fly {
+namespace fly::detail {
 
 /**
  * Helper struct to stream a std::basic_string<> to a std::basic_ostream<>, and
@@ -194,4 +194,4 @@ struct BasicStringStreamer<std::u32string>
     }
 };
 
-} // namespace fly
+} // namespace fly::detail

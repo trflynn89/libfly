@@ -1,4 +1,4 @@
-#include "fly/types/string/string_traits.h"
+#include "fly/types/string/detail/string_traits.h"
 
 #include "fly/traits/traits.h"
 #include "fly/types/string/string_literal.h"
@@ -14,7 +14,7 @@ template <typename StringType>
 class Streamable
 {
 public:
-    using ostream_type = typename fly::BasicStringTraits<
+    using ostream_type = typename fly::detail::BasicStringTraits<
         StringType>::streamer_type::ostream_type;
 
     friend ostream_type &operator<<(ostream_type &, const Streamable &)
@@ -31,10 +31,10 @@ class NotStreamable
 template <
     typename T,
     fly::enable_if_any<
-        fly::BasicStringTraits<std::string>::is_string_like<T>,
-        fly::BasicStringTraits<std::wstring>::is_string_like<T>,
-        fly::BasicStringTraits<std::u16string>::is_string_like<T>,
-        fly::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
+        fly::detail::BasicStringTraits<std::string>::is_string_like<T>,
+        fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
+        fly::detail::BasicStringTraits<std::u16string>::is_string_like<T>,
+        fly::detail::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
 constexpr bool isStringLike(const T &) noexcept
 {
     return true;
@@ -44,10 +44,10 @@ constexpr bool isStringLike(const T &) noexcept
 template <
     typename T,
     fly::enable_if_none<
-        fly::BasicStringTraits<std::string>::is_string_like<T>,
-        fly::BasicStringTraits<std::wstring>::is_string_like<T>,
-        fly::BasicStringTraits<std::u16string>::is_string_like<T>,
-        fly::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
+        fly::detail::BasicStringTraits<std::string>::is_string_like<T>,
+        fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
+        fly::detail::BasicStringTraits<std::u16string>::is_string_like<T>,
+        fly::detail::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
 constexpr bool isStringLike(const T &) noexcept
 {
     return false;
@@ -56,8 +56,8 @@ constexpr bool isStringLike(const T &) noexcept
 //==============================================================================
 template <
     typename StringType,
-    fly::enable_if_all<
-        typename fly::BasicStringTraits<StringType>::has_stoi_family> = 0>
+    fly::enable_if_all<typename fly::detail::BasicStringTraits<
+        StringType>::has_stoi_family> = 0>
 constexpr int callStoi(const StringType &str) noexcept
 {
     return std::stoi(str);
@@ -66,8 +66,8 @@ constexpr int callStoi(const StringType &str) noexcept
 //==============================================================================
 template <
     typename StringType,
-    fly::enable_if_not_all<
-        typename fly::BasicStringTraits<StringType>::has_stoi_family> = 0>
+    fly::enable_if_not_all<typename fly::detail::BasicStringTraits<
+        StringType>::has_stoi_family> = 0>
 constexpr int callStoi(const StringType &) noexcept
 {
     return -1;
@@ -91,7 +91,7 @@ TYPED_TEST_CASE(BasicStringTraitsTest, StringTypes);
 TYPED_TEST(BasicStringTraitsTest, StoiFamilyTest)
 {
     using string_type = typename TestFixture::string_type;
-    using traits = typename fly::BasicStringTraits<string_type>;
+    using traits = typename fly::detail::BasicStringTraits<string_type>;
 
     constexpr bool is_string = std::is_same_v<string_type, std::string>;
     constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
@@ -125,7 +125,7 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAETest)
 TYPED_TEST(BasicStringTraitsTest, StringLikeTest)
 {
     using string_type = typename TestFixture::string_type;
-    using traits = typename fly::BasicStringTraits<string_type>;
+    using traits = typename fly::detail::BasicStringTraits<string_type>;
 
     constexpr bool is_string = std::is_same_v<string_type, std::string>;
     constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
@@ -265,7 +265,7 @@ TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAETest)
 TYPED_TEST(BasicStringTraitsTest, OstreamTraitsTest)
 {
     using string_type = typename TestFixture::string_type;
-    using traits = typename fly::BasicStringTraits<string_type>;
+    using traits = typename fly::detail::BasicStringTraits<string_type>;
     using streamed_type = typename traits::streamer_type::streamed_type;
 
     const Streamable<streamed_type> obj1;

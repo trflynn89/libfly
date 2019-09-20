@@ -61,6 +61,9 @@
     <Filter Include="types\concurrency\detail">
       <UniqueIdentifier>{51dd92aa-dbbf-43b7-bcba-06e5f729efe8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="types\string\detail">
+      <UniqueIdentifier>{ef4fd861-fce3-4e05-8189-9d7f7e42f4c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\fly.h" />
@@ -185,18 +188,6 @@
     <ClInclude Include="..\..\..\fly\types\string\string.h">
       <Filter>types\string</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\string_converter.h">
-      <Filter>types\string</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\string_literal.h">
-      <Filter>types\string</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\string_streamer.h">
-      <Filter>types\string</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\string_traits.h">
-      <Filter>types\string</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.h">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
@@ -214,6 +205,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\concurrency\detail\concurrent_container.h">
       <Filter>types\concurrency\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.h">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer.h">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.h">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\string_literal.h">
+      <Filter>types\string</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "fly/types/string/string_converter.h"
+#include "fly/types/string/detail/string_converter.h"
+#include "fly/types/string/detail/string_streamer.h"
+#include "fly/types/string/detail/string_traits.h"
 #include "fly/types/string/string_literal.h"
-#include "fly/types/string/string_streamer.h"
-#include "fly/types/string/string_traits.h"
 
 #include <algorithm>
 #include <array>
@@ -40,15 +40,14 @@ using String32 = BasicString<std::u32string>;
 template <typename StringType>
 class BasicString
 {
-    using traits = BasicStringTraits<StringType>;
-
-    // Forward some aliases from BasicStringTraits<> for convenience.
+public:
+    // Forward some aliases from detail::BasicStringTraits<> for convenience.
+    using traits = detail::BasicStringTraits<StringType>;
     using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
     using ostream_type = typename traits::ostream_type;
     using streamed_type = typename traits::streamer_type::streamed_type;
 
-public:
     /**
      * Split a string into a vector of strings.
      *
@@ -730,7 +729,7 @@ void BasicString<StringType>::stream(
         std::is_same_v<char_type, std::decay_t<T>> ||
         traits::template is_string_like_v<T>)
     {
-        BasicStringStreamer<StringType>::Stream(ostream, value);
+        detail::BasicStringStreamer<StringType>::Stream(ostream, value);
     }
     else if constexpr (traits::OstreamTraits::template is_declared_v<T>)
     {
@@ -754,14 +753,15 @@ T BasicString<StringType>::Convert(const StringType &value) noexcept(
     }
     else if constexpr (traits::has_stoi_family_v)
     {
-        return BasicStringConverter<StringType, T>::Convert(value);
+        return detail::BasicStringConverter<StringType, T>::Convert(value);
     }
     else
     {
         typename traits::ostringstream_type ostream;
         stream(ostream, value);
 
-        return BasicStringConverter<streamed_type, T>::Convert(ostream.str());
+        return detail::BasicStringConverter<streamed_type, T>::Convert(
+            ostream.str());
     }
 }
 
