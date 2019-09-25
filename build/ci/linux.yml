@@ -36,9 +36,10 @@ jobs:
           failOnStderr: true
 
         - script: |
-            make -j -C build/nix release=0 arch=${{ parameters.arch }} libfly_qt_example
+            make -j -C build/nix release=0 arch=${{ parameters.arch }} qt=1 libfly_qt_example
             make -j -C test/build release=0 arch=${{ parameters.arch }} libfly_build_test
           displayName: 'Examples'
+          failOnStderr: true
 
       - ${{ if eq(parameters.arch, 'x86') }}:
         - script: |
@@ -49,6 +50,7 @@ jobs:
         - script: |
             make -j -C test/build release=0 arch=${{ parameters.arch }} libfly_build_test
           displayName: 'Examples'
+          failOnStderr: true
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |
