@@ -36,8 +36,8 @@ jobs:
           failOnStderr: true
 
         - script: |
-            make -j -C build/nix release=0 arch=${{ parameters.arch }} qt=1 libfly_qt_example
-            make -j -C test/build release=0 arch=${{ parameters.arch }} libfly_build_test
+            make -j -C examples/qt5 release=0 arch=${{ parameters.arch }} libfly_qt_example
+            make -j -C examples/build release=0 arch=${{ parameters.arch }} libfly_build_test
           displayName: 'Examples'
           failOnStderr: true
 

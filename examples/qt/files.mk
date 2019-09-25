@@ -1,7 +1,3 @@
-# Define the directories to include and compile
-SRC_DIRS_$(d) := \
-    fly/sanitizer
-
 # Define source files
 SRC_$(d) := \
     $(d)/main.cpp \
