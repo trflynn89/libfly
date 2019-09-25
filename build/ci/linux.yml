@@ -13,7 +13,10 @@ jobs:
       options: --cap-add SYS_PTRACE
 
     variables:
-      release: ${{ eq(parameters.configuration, 'Release') }}
+      - ${{ if eq(parameters.configuration, 'Debug') }}:
+        release: 0
+      - ${{ if eq(parameters.configuration, 'Release') }}:
+        release: 1
 
     steps:
     - template: setup.yml
