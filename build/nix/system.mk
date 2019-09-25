@@ -1,6 +1,7 @@
 # Define system dependent variables.
 
 SYSTEM := $(shell gcc -dumpmachine)
+SUDO := $(shell which sudo)
 
 # Determine default architecture
 SUPPORTED_ARCH := x64 x86
@@ -28,9 +29,4 @@ ifneq ($(wildcard /etc/debian_version),)
     HOST := DEBIAN
 else
     $(error Could not determine host operating system, check system.mk)
-endif
-
-# Determine if root
-ifneq ($(EUID), 0)
-    SUDO := sudo
 endif
