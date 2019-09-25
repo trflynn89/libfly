@@ -11,7 +11,7 @@ TEST_TARGETS :=
 #
 # $(1) = The target's name.
 # $(2) = The target's source directory.
-# $(3) = The target's type (BIN, QT5, LIB, or TEST).
+# $(3) = The target's type (BIN, QT, LIB, or TEST).
 define ADD_TARGET
 
 TARGETS += $(1)

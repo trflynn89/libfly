@@ -33,9 +33,9 @@ BUILD_ROOT := $(patsubst %/,%,$(BUILD_ROOT))
 all: $(TARGETS)
 
 # Import the build system
-include $(BUILD_ROOT)/qt5.mk
 include $(BUILD_ROOT)/system.mk
 include $(BUILD_ROOT)/config.mk
+include $(BUILD_ROOT)/qt.mk
 include $(BUILD_ROOT)/release.mk
 include $(BUILD_ROOT)/flags.mk
 include $(BUILD_ROOT)/files.mk
@@ -78,7 +78,7 @@ install: $(TARGET_PACKAGES)
 	$(Q)failed=0; \
 	for pkg in $(TARGET_PACKAGES) ; do \
 		if [[ -f $$pkg ]] ; then \
-			sudo tar -C / $(TAR_EXTRACT_FLAGS) $$pkg; \
+			$(SUDO) tar -C / $(TAR_EXTRACT_FLAGS) $$pkg; \
 			if [[ $$? -ne 0 ]] ; then \
 				failed=$$((failed+1)); \
 			fi; \
@@ -89,11 +89,14 @@ install: $(TARGET_PACKAGES)
 # Install dependencies
 setup:
 ifeq ($(HOST), DEBIAN)
-	$(Q)sudo apt-get install -y git make gcc g++ gcc-multilib g++-multilib clang llvm clang-format
+	$(Q)$(SUDO) apt-get install -y git make gcc g++ clang llvm clang-format
+ifeq ($(arch), x86)
+	$(Q)$(SUDO) apt-get install -y gcc-multilib g++-multilib
+endif
 
-ifeq ($(qt5), 1)
-	$(Q)sudo apt-get install -y mesa-common-dev
-	$(Q)$(QT5_INSTALL)
+ifeq ($(qt), 1)
+	$(Q)$(SUDO) apt-get install -y mesa-common-dev
+	$(Q)$(QT_INSTALL)
 endif
 else
 	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"

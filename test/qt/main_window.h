@@ -1,6 +1,6 @@
 #pragma once
 
-#include "test/qt5/main_window.uic.h"
+#include "test/qt/main_window.uic.h"
 
 #include <QMainWindow>
 #include <memory>

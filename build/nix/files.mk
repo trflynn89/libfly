@@ -16,14 +16,14 @@ DEP_$(d) := $$(o_$(d):%.o=%.d)
 
 endef
 
-# Define output files for QT5 targets.
+# Define output files for Qt targets.
 #
 # $(1) = The target's name.
 # $(2) = The C/C++ files to be compiled.
-# $(3) = The QT5 UIC source files.
-# $(4) = The QT5 MOC source files.
-# $(5) = The QT5 RCC source files.
-define QT5_OUT_FILES
+# $(3) = The Qt UIC source files.
+# $(4) = The Qt MOC source files.
+# $(5) = The Qt RCC source files.
+define QT_OUT_FILES
 
 t := $$(strip $(1))
 

@@ -1,4 +1,4 @@
-#include "test/qt5/main_window.h"
+#include "test/qt/main_window.h"
 
 #include <QApplication>
 #include <QLabel>

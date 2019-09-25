@@ -21,3 +21,4 @@ $(eval $(call ADD_REL_INC, libfly, $(d), *.h, fly))
 
 # Add make system files to release package
 $(eval $(call ADD_REL_SRC, libfly, $(BUILD_ROOT), *.mk, fly))
+$(eval $(call ADD_REL_SRC, libfly, $(BUILD_ROOT), *.js, fly))

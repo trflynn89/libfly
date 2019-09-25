@@ -9,7 +9,7 @@ jobs:
       vmImage: 'Ubuntu-16.04'
 
     container:
-      image: trflynn89/libfly:ubuntu1904_gcc9
+      image: trflynn89/libfly:ubuntu1904_gcc9_qt513
       options: --cap-add SYS_PTRACE
 
     steps:
@@ -28,6 +28,21 @@ jobs:
           bash <(curl -s https://codecov.io/bash) -f coverage
         displayName: 'Coverage'
 
+      - script: |
+          make -j -C build/nix release=0 arch=${{ parameters.arch }} install
+        displayName: 'Install'
+
+      - ${{ if eq(parameters.arch, 'x64') }}:
+        - script: |
+            make -j -C build/nix release=0 arch=${{ parameters.arch }} libfly_qt_example
+            make -j -C test/build release=0 arch=${{ parameters.arch }} libfly_build_test
+          displayName: 'Examples'
+
+      - ${{ if eq(parameters.arch, 'x86') }}:
+        - script: |
+            make -j -C test/build release=0 arch=${{ parameters.arch }} libfly_build_test
+          displayName: 'Examples'
+
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |
           make -j -C build/nix release=1 arch=${{ parameters.arch }} libfly
@@ -36,3 +51,5 @@ jobs:
       - template: package.yml
         parameters:
           contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
+
+

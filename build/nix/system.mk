@@ -29,3 +29,8 @@ ifneq ($(wildcard /etc/debian_version),)
 else
     $(error Could not determine host operating system, check system.mk)
 endif
+
+# Determine if root
+ifneq ($(EUID), 0)
+    SUDO := sudo
+endif
