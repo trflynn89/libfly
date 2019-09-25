@@ -60,7 +60,7 @@ jobs:
         failOnStderr: true
 
       - script: |
-          make -j -C test/build release=$(release) arch=${{ parameters.arch }} libfly_build_example
+          make -j -C examples/build release=$(release) arch=${{ parameters.arch }} libfly_build_example
         displayName: 'Examples'
         failOnStderr: true
 
