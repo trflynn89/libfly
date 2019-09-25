@@ -34,6 +34,7 @@ jobs:
 
       - ${{ if eq(parameters.arch, 'x64') }}:
         - script: |
+            (cd /opt && tar -xzf Qt.tar.gz)
             make -j -C build/nix release=0 arch=${{ parameters.arch }} libfly_qt_example
             make -j -C test/build release=0 arch=${{ parameters.arch }} libfly_build_test
           displayName: 'Examples'

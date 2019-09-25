@@ -28,6 +28,7 @@ RUN apt-get update && \
         lcov \
         make \
         rsync \
+        sudo \
         \
         # Install Qt dependencies
         libdbus-1-dev \
@@ -48,13 +49,14 @@ RUN apt-get update && \
     (cd lcov && git reset --hard 75fbae1cfc5027f818a0bb865bf6f96fab3202da) && \
     (cd lcov && make install) && \
     \
-    # Install Qt
+    # Install and compress Qt
     (cd /tmp && curl -O $QT_URL/$QT_INSTALLER) && \
     chmod +x /tmp/$QT_INSTALLER && \
     /tmp/$QT_INSTALLER --platform minimal --script /tmp/qt.js && \
+    (cd /opt && tar -czf Qt.tar.gz Qt) && \
     \
     # Cleanup
     apt-get clean -y && \
     apt-get autoremove -y && \
     apt-get purge -y && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* lcov
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /opt/Qt lcov
