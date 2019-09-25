@@ -2,9 +2,6 @@ parameters:
   configuration: 'Debug'
   arch: 'x64'
 
-variables:
-  release: ${{ eq(parameters.configuration, 'Release') }}
-
 jobs:
   - job: 'Linux_${{ parameters.configuration }}_${{ parameters.arch }}'
 
@@ -14,6 +11,9 @@ jobs:
     container:
       image: trflynn89/libfly:ubuntu1904_gcc9_qt513
       options: --cap-add SYS_PTRACE
+
+    variables:
+      release: ${{ eq(parameters.configuration, 'Release') }}
 
     steps:
     - template: setup.yml
