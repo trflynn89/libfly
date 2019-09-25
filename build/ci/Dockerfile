@@ -34,6 +34,7 @@ RUN apt-get update && \
         libdbus-1-dev \
         libglib2.0-0 \
         libx11-xcb1 \
+        mesa-common-dev \
         \
         # Temporary until more recent LCOV is available in apt
         git \
