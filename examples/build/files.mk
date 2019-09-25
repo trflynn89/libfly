@@ -3,7 +3,9 @@ SRC_DIRS_$(d) := \
     some_lib
 
 # Define libraries to link
-LDLIBS_$(d) := -lfly -lpthread
+LDLIBS_$(d) := \
+    -lfly \
+    -lpthread
 
 # Define source files
 SRC_$(d) := \

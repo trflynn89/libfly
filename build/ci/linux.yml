@@ -2,6 +2,9 @@ parameters:
   configuration: 'Debug'
   arch: 'x64'
 
+variables:
+  release: ${{ eq(parameters.configuration, 'Release') }}
+
 jobs:
   - job: 'Linux_${{ parameters.configuration }}_${{ parameters.arch }}'
 
@@ -17,7 +20,7 @@ jobs:
 
     - ${{ if eq(parameters.configuration, 'Debug') }}:
       - script: |
-          make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
+          make -j -C build/nix release=$(release) arch=${{ parameters.arch }} tests
         displayName: 'Test'
 
       - script: |
@@ -28,37 +31,37 @@ jobs:
           bash <(curl -s https://codecov.io/bash) -f coverage
         displayName: 'Coverage'
 
-      - ${{ if eq(parameters.arch, 'x64') }}:
-        - script: |
-            make -j -C build/nix release=0 arch=${{ parameters.arch }} install
-            (cd /opt && sudo tar -xzf Qt.tar.gz)
-          displayName: 'Install'
-          failOnStderr: true
-
-        - script: |
-            make -j -C examples/qt5 release=0 arch=${{ parameters.arch }} libfly_qt_example
-            make -j -C examples/build release=0 arch=${{ parameters.arch }} libfly_build_test
-          displayName: 'Examples'
-          failOnStderr: true
-
-      - ${{ if eq(parameters.arch, 'x86') }}:
-        - script: |
-            make -j -C build/nix release=0 arch=${{ parameters.arch }} install
-          displayName: 'Install'
-          failOnStderr: true
-
-        - script: |
-            make -j -C test/build release=0 arch=${{ parameters.arch }} libfly_build_test
-          displayName: 'Examples'
-          failOnStderr: true
-
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |
-          make -j -C build/nix release=1 arch=${{ parameters.arch }} libfly
+          make -j -C build/nix release=$(release) arch=${{ parameters.arch }} libfly
         displayName: 'Build'
 
       - template: package.yml
         parameters:
           contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
+
+    - ${{ if eq(parameters.arch, 'x64') }}:
+      - script: |
+          make -j -C build/nix release=$(release) arch=${{ parameters.arch }} install
+          (cd /opt && sudo tar -xzf Qt.tar.gz)
+        displayName: 'Install'
+        failOnStderr: true
+
+      - script: |
+          make -j -C examples/qt release=$(release) arch=${{ parameters.arch }} libfly_qt_example
+          make -j -C examples/build release=$(release) arch=${{ parameters.arch }} libfly_build_example
+        displayName: 'Examples'
+        failOnStderr: true
+
+    - ${{ if eq(parameters.arch, 'x86') }}:
+      - script: |
+          make -j -C build/nix release=$(release) arch=${{ parameters.arch }} install
+        displayName: 'Install'
+        failOnStderr: true
+
+      - script: |
+          make -j -C test/build release=$(release) arch=${{ parameters.arch }} libfly_build_example
+        displayName: 'Examples'
+        failOnStderr: true
 
 

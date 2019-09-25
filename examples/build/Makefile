@@ -10,7 +10,7 @@ VERSION = 1.0.0
 include /usr/src/fly/api.mk
 
 # Main targets
-$(eval $(call ADD_TARGET, libfly_build_test, ., BIN))
+$(eval $(call ADD_TARGET, libfly_build_example, ., BIN))
 
 # Import the build system
 include /usr/src/fly/build.mk
