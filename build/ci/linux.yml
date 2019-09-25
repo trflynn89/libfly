@@ -28,18 +28,24 @@ jobs:
           bash <(curl -s https://codecov.io/bash) -f coverage
         displayName: 'Coverage'
 
-      - script: |
-          make -j -C build/nix release=0 arch=${{ parameters.arch }} install
-        displayName: 'Install'
-
       - ${{ if eq(parameters.arch, 'x64') }}:
         - script: |
-            (cd /opt && tar -xzf Qt.tar.gz)
+            make -j -C build/nix release=0 arch=${{ parameters.arch }} install
+            (cd /opt && sudo tar -xzf Qt.tar.gz)
+          displayName: 'Install'
+          failOnStderr: true
+
+        - script: |
             make -j -C build/nix release=0 arch=${{ parameters.arch }} libfly_qt_example
             make -j -C test/build release=0 arch=${{ parameters.arch }} libfly_build_test
           displayName: 'Examples'
 
       - ${{ if eq(parameters.arch, 'x86') }}:
+        - script: |
+            make -j -C build/nix release=0 arch=${{ parameters.arch }} install
+          displayName: 'Install'
+          failOnStderr: true
+
         - script: |
             make -j -C test/build release=0 arch=${{ parameters.arch }} libfly_build_test
           displayName: 'Examples'
