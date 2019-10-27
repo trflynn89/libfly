@@ -12,12 +12,8 @@ jobs:
       image: trflynn89/libfly:ubuntu1904_gcc9_qt513
       options: --cap-add SYS_PTRACE
 
-    - ${{ if eq(parameters.configuration, 'Debug') }}:
-      variables:
-          release: 0
-    - ${{ if eq(parameters.configuration, 'Release') }}:
-      variables:
-          release: 1
+    variables:
+      release: ${{ eq(parameters.configuration, 'Release') }}
 
     steps:
     - template: setup.yml
