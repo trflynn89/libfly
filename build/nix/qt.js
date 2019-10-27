@@ -3,6 +3,7 @@
 var QT_VERSION_MAJOR = '5';
 var QT_VERSION_MINOR = '13';
 var QT_VERSION_PATCH = '1';
+var QT_INSTALL_POINT = '/opt/Qt';
 
 var QT_VERSION = QT_VERSION_MAJOR + QT_VERSION_MINOR + QT_VERSION_PATCH;
 
@@ -44,6 +45,7 @@ Controller.prototype.DynamicTelemetryPluginFormCallback = function() {
 
 Controller.prototype.TargetDirectoryPageCallback = function()
 {
+    gui.currentPageWidget().TargetDirectoryLineEdit.setText(QT_INSTALL_POINT);
     gui.clickButton(buttons.NextButton);
 }
 
