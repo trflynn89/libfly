@@ -31,6 +31,18 @@ Controller.prototype.IntroductionPageCallback = function()
     gui.clickButton(buttons.NextButton);
 }
 
+Controller.prototype.DynamicTelemetryPluginFormCallback = function() {
+    var widget = gui.currentPageWidget();
+
+    if (widget)
+    {
+        var group = widget.TelemetryPluginForm.statisticGroupBox;
+        group.disableStatisticRadioButton.setChecked(true);
+    }
+
+    gui.clickButton(buttons.NextButton);
+}
+
 Controller.prototype.TargetDirectoryPageCallback = function()
 {
     gui.currentPageWidget().TargetDirectoryLineEdit.setText(QT_INSTALL_POINT);
@@ -39,6 +51,14 @@ Controller.prototype.TargetDirectoryPageCallback = function()
 
 Controller.prototype.ComponentSelectionPageCallback = function()
 {
+    // First enable installation of the latest Qt versions.
+    var page = gui.pageWidgetByObjectName('ComponentSelectionPage');
+
+    gui.findChild(page, 'Archive').click();
+    gui.findChild(page, 'Latest releases').click();
+    gui.findChild(page, 'FetchCategoryButton').click();
+
+    // Then select the desired version.
     var component = 'qt.qt' + QT_VERSION_MAJOR + '.' + QT_VERSION + '.gcc_64';
     var widget = gui.currentPageWidget();
 
