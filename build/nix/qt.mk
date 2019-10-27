@@ -1,7 +1,7 @@
 # Define build flags for Qt projects and define a script to automate installing
 # the Qt SDK.
 
-QT_SCRIPT := $(BUILD_ROOT)/qt.js
+QT_SCRIPT := $(BUILD_ROOT)/../ci/qt.js
 
 QT_VERSION_MAJOR := $(shell grep -oP "(?<=MAJOR = ')(\d+)(?=')" $(QT_SCRIPT))
 QT_VERSION_MINOR := $(shell grep -oP "(?<=MINOR = ')(\d+)(?=')" $(QT_SCRIPT))
