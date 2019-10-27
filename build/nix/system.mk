@@ -1,6 +1,7 @@
 # Define system dependent variables.
 
 SYSTEM := $(shell gcc -dumpmachine)
+SUDO := $(shell which sudo)
 
 # Determine default architecture
 SUPPORTED_ARCH := x64 x86

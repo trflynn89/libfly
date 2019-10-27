@@ -15,9 +15,9 @@ SHARED_CXX := $(Q)$(CXX) $$(CXXFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS)
 
 STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
 
-UIC := $(Q)$(QT5_UIC) $$< -o $$@
-MOC := $(Q)$(QT5_MOC) $$< -o $$@
-RCC := $(Q)$(QT5_RCC) $$< -o $$@
+UIC := $(Q)$(QT_UIC) $$< -o $$@
+MOC := $(Q)$(QT_MOC) $$< -o $$@
+RCC := $(Q)$(QT_RCC) $$< -o $$@
 
 STRIP := $(Q)strip $$@
 
@@ -50,11 +50,11 @@ endif
 
 endef
 
-# Compile source files to QT5 files.
+# Compile source files to Qt files.
 #
 # $(1) = Path to directory where object files should be placed.
 # $(2) = Path to directory where generated files should be placed.
-define QT5_RULES
+define QT_RULES
 
 .PRECIOUS: $(2)/%.uic.h $(2)/%.moc.cpp $(2)/%.rcc.cpp
 
@@ -206,42 +206,42 @@ $$(eval $$(call POP_DIR))
 
 endef
 
-# Define the rules to build a QT5 target. The files.mk should define:
+# Define the rules to build a QT target. The files.mk should define:
 #
 #     SRC_DIRS_$(d) = The source directories to include in the build.
 #     LDLIBS_$(d) = The libraries to be linked in the target binary.
 #     SRC_$(d) = The sources to be built in the target binary.
-#     QT5_UIC_$(d) = The QT5 UIC source files.
-#     QT5_MOC_$(d) = The QT5 MOC source files.
-#     QT5_RCC_$(d) = The QT5 RCC source files.
+#     QT_UIC_$(d) = The QT UIC source files.
+#     QT_MOC_$(d) = The QT MOC source files.
+#     QT_RCC_$(d) = The QT RCC source files.
 #
 # $(1) = The target's name.
 # $(2) = The path to the target root directory.
 # $(3) = The path to the target output libraries.
 # $(4) = The path to the target release package.
-define DEFINE_QT5_RULES
+define DEFINE_QT_RULES
 
 # Push current dir to stack
 $$(eval $$(call PUSH_DIR, $(2)))
 
 # Define source, object, dependency, and binary files
 include $$(d)/files.mk
-$$(eval $$(call QT5_OUT_FILES, $(1), $$(SRC_$$(d)), \
-    $$(QT5_UIC_$$(d)), $$(QT5_MOC_$$(d)), $$(QT5_RCC_$$(d))))
+$$(eval $$(call QT_OUT_FILES, $(1), $$(SRC_$$(d)), \
+    $$(QT_UIC_$$(d)), $$(QT_MOC_$$(d)), $$(QT_RCC_$$(d))))
 
 # Include the source directories
 $$(foreach dir, $$(SRC_DIRS_$$(d)), \
     $$(eval $$(call DEFINE_SRC_RULES, $(1), $$(dir))))
 
-# Add build flags needed for Qt5 projects
-CFLAGS_$$(d) += $(QT5_CFLAGS)
-CXXFLAGS_$$(d) += $(QT5_CFLAGS)
-LDFLAGS_$$(d) += $(QT5_LDFLAGS)
-LDLIBS_$$(d) += $(QT5_LDLIBS)
+# Add build flags needed for Qt projects
+CFLAGS_$$(d) += $(QT_CFLAGS)
+CXXFLAGS_$$(d) += $(QT_CFLAGS)
+LDFLAGS_$$(d) += $(QT_LDFLAGS)
+LDLIBS_$$(d) += $(QT_LDLIBS)
 
 # Define the compile rules
 $$(eval $$(call BIN_RULES, $(1), $(3)))
-$$(eval $$(call QT5_RULES, $$(OBJ_DIR_$$(d)), $$(GEN_DIR_$$(d))))
+$$(eval $$(call QT_RULES, $$(OBJ_DIR_$$(d)), $$(GEN_DIR_$$(d))))
 $$(eval $$(call PKG_RULES, $(1), $(3), $(4)))
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 

@@ -1,4 +1,4 @@
-#include "test/qt5/main_window.h"
+#include "main_window.h"
 
 namespace fly {
 

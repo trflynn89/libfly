@@ -20,7 +20,7 @@ ifeq ($$(TARGET_TYPE_$$(t)), BIN)
     ifneq ($$(filter $(TEST_TARGETS), $$(t)),)
         TEST_BINARIES += $$(TARGET_FILE_$$(t))
     endif
-else ifeq ($$(TARGET_TYPE_$$(t)), QT5)
+else ifeq ($$(TARGET_TYPE_$$(t)), QT)
     TARGET_FILE_$$(t) := $(BIN_DIR)/$$(t)
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
     TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).so.$(VERSION)
@@ -40,8 +40,8 @@ $$(t): $$(TARGET_FILE_$$(t)) $$(TARGET_PACKAGE_$$(t))
 ifeq ($$(TARGET_TYPE_$$(t)), BIN)
     $(call DEFINE_BIN_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
         $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
-else ifeq ($$(TARGET_TYPE_$$(t)), QT5)
-    $(call DEFINE_QT5_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
+else ifeq ($$(TARGET_TYPE_$$(t)), QT)
+    $(call DEFINE_QT_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
         $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
     $(call DEFINE_LIB_RULES, $$(t), $$(TARGET_PATH_$$(t)), \

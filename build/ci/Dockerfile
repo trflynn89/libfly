@@ -1,6 +1,9 @@
-# docker image rm "trflynn89/libfly:ubuntu1904_gcc9"
-# docker build --tag "trflynn89/libfly:ubuntu1904_gcc9" .
-# docker push "trflynn89/libfly:ubuntu1904_gcc9"
+# docker image rm "trflynn89/libfly:ubuntu1904_gcc9_qt513"
+# docker build --tag "trflynn89/libfly:ubuntu1904_gcc9_qt513" -f ../ci/Dockerfile .
+# docker push "trflynn89/libfly:ubuntu1904_gcc9_qt513"
+#
+# docker run --cap-add SYS_PTRACE --name libfly -it trflynn89/libfly:ubuntu1904_gcc9_qt513
+# docker rm libfly
 FROM ubuntu:19.04
 
 MAINTAINER Timothy Flynn <trflynn89@pm.me>
@@ -9,9 +12,14 @@ ENV CC gcc-9
 ENV CXX g++-9
 ENV GCOV gcov-9
 
+ARG QT_INSTALLER=qt-unified-linux-x64-online.run
+ARG QT_URL=http://qt.mirror.constant.com/official_releases/online_installers
+
+COPY qt.js /tmp/qt.js
+
 RUN apt-get update && \
-    # Install build dependencies
     apt-get install -y \
+        # Install build dependencies
         $CC \
         $CC-multilib \
         $CXX \
@@ -20,6 +28,13 @@ RUN apt-get update && \
         lcov \
         make \
         rsync \
+        sudo \
+        \
+        # Install Qt dependencies
+        libdbus-1-dev \
+        libglib2.0-0 \
+        libx11-xcb1 \
+        mesa-common-dev \
         \
         # Temporary until more recent LCOV is available in apt
         git \
@@ -35,8 +50,14 @@ RUN apt-get update && \
     (cd lcov && git reset --hard 75fbae1cfc5027f818a0bb865bf6f96fab3202da) && \
     (cd lcov && make install) && \
     \
+    # Install and compress Qt
+    (cd /tmp && curl -O $QT_URL/$QT_INSTALLER) && \
+    chmod +x /tmp/$QT_INSTALLER && \
+    /tmp/$QT_INSTALLER --platform minimal --script /tmp/qt.js && \
+    (cd /opt && tar -czf Qt.tar.gz Qt) && \
+    \
     # Cleanup
     apt-get clean -y && \
     apt-get autoremove -y && \
     apt-get purge -y && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* lcov
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /opt/Qt lcov

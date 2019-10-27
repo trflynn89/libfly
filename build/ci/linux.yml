@@ -9,7 +9,7 @@ jobs:
       vmImage: 'Ubuntu-16.04'
 
     container:
-      image: trflynn89/libfly:ubuntu1904_gcc9
+      image: trflynn89/libfly:ubuntu1904_gcc9_qt513
       options: --cap-add SYS_PTRACE
 
     steps:
@@ -17,6 +17,7 @@ jobs:
 
     - ${{ if eq(parameters.configuration, 'Debug') }}:
       - script: |
+          echo "##vso[task.setvariable variable=release]0"
           make -j -C build/nix release=0 arch=${{ parameters.arch }} tests
         displayName: 'Test'
 
@@ -30,9 +31,31 @@ jobs:
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
       - script: |
+          echo "##vso[task.setvariable variable=release]1"
           make -j -C build/nix release=1 arch=${{ parameters.arch }} libfly
         displayName: 'Build'
 
       - template: package.yml
         parameters:
           contents: 'build/nix/release-*/etc/libfly-*.tar.bz2'
+
+    - script: |
+        make -j -C build/nix release=$(release) arch=${{ parameters.arch }} install
+      displayName: 'Install'
+      failOnStderr: true
+
+    - ${{ if eq(parameters.arch, 'x64') }}:
+      - script: |
+          (cd /opt && sudo tar -xzf Qt.tar.gz)
+          make -j -C examples/qt release=$(release) arch=${{ parameters.arch }} libfly_qt_example
+          make -j -C examples/build release=$(release) arch=${{ parameters.arch }} libfly_build_example
+        displayName: 'Examples'
+        failOnStderr: true
+
+    - ${{ if eq(parameters.arch, 'x86') }}:
+      - script: |
+          make -j -C examples/build release=$(release) arch=${{ parameters.arch }} libfly_build_example
+        displayName: 'Examples'
+        failOnStderr: true
+
+

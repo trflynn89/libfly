@@ -10,7 +10,7 @@
 *.h++ text eol=lf diff=cpp
 *.json text eol=lf
 
-# Qt5 files
+# Qt files
 *.creator text eol=lf
 *.files text eol=lf
 *.qrc text eol=lf

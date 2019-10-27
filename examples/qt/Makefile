@@ -1,4 +1,4 @@
-# Example usage of the build system.
+# Example usage of the build system's Qt support.
 
 # Define the path to the source directory
 SOURCE_ROOT := $(CURDIR)
@@ -10,7 +10,7 @@ VERSION = 1.0.0
 include /usr/src/fly/api.mk
 
 # Main targets
-$(eval $(call ADD_TARGET, libfly_build_test, ., BIN))
+$(eval $(call ADD_TARGET, libfly_qt_example, ., QT))
 
 # Import the build system
 include /usr/src/fly/build.mk
