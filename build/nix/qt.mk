@@ -6,7 +6,7 @@ QT_SCRIPT := $(BUILD_ROOT)/../ci/qt.js
 QT_VERSION_MAJOR := $(shell grep -oP "(?<=MAJOR = ')(\d+)(?=')" $(QT_SCRIPT))
 QT_VERSION_MINOR := $(shell grep -oP "(?<=MINOR = ')(\d+)(?=')" $(QT_SCRIPT))
 QT_VERSION_PATCH := $(shell grep -oP "(?<=PATCH = ')(\d+)(?=')" $(QT_SCRIPT))
-QT_INSTALL_POINT := $(shell grep -oP "(?<=POINT = ')(\S+)(?=')" $(QT_SCRIPT))
+QT_INSTALL_POINT := /opt/Qt
 
 QT_VERSION := $(QT_VERSION_MAJOR).$(QT_VERSION_MINOR).$(QT_VERSION_PATCH)
 
