@@ -1,7 +1,7 @@
 $QT_INSTALLER = "qt-unified-windows-x86-online.exe"
 $QT_INSTALLER_URL = "http://qt.mirror.constant.com/official_releases/online_installers/" + $QT_INSTALLER
 $QT_INSTALLER_PATH = ${Env:USERPROFILE} + "\Downloads\" + $QT_INSTALLER
-$QT_INSTALLER_SCRIPT = $PSScriptRoot + "\..\ci\qt.js"
+$QT_INSTALLER_SCRIPT = $PSScriptRoot + "\..\common\qt.js"
 
 # Delete a path regardless of whether it is a directory or file.
 function Remove-Path($path)

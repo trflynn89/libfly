@@ -1,8 +1,8 @@
-#include "main_window.h"
-
 #include <QtGui/QtGui>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
+
+#include "main_window.h"
 
 #if defined(_WIN32)
 // Requires "Qt Visual Studio Tools" extension:
@@ -22,16 +22,17 @@
 #elif defined(__linux__)
 extern "C"
 {
-    // AddressSanitizer reports leaks in libfontconfig. Override the default
-    // suppressions to disable leak checking in that library.
+    // AddressSanitizer reports leaks from some system libraries. Override the
+    // default suppressions to disable leak checking in that library.
     const char *__lsan_default_suppressions()
     {
         return R"(
             leak:libfontconfig
+            leak:libGLX_mesa
         )";
     }
 
-    // And do not print suppressions from that library.
+    // And do not print suppressions from those libraries.
     const char *__asan_default_options()
     {
         return R"(

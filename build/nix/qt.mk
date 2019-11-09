@@ -1,7 +1,11 @@
 # Define build flags for Qt projects and define a script to automate installing
 # the Qt SDK.
 
-QT_SCRIPT := $(BUILD_ROOT)/../ci/qt.js
+ifeq ($(wildcard $(BUILD_ROOT)/qt.js),)
+    QT_SCRIPT := $(BUILD_ROOT)/../common/qt.js
+else
+    QT_SCRIPT := $(BUILD_ROOT)/qt.js
+endif
 
 QT_VERSION_MAJOR := $(shell grep -oP "(?<=MAJOR = ')(\d+)(?=')" $(QT_SCRIPT))
 QT_VERSION_MINOR := $(shell grep -oP "(?<=MINOR = ')(\d+)(?=')" $(QT_SCRIPT))
@@ -20,10 +24,7 @@ QT_RCC := $(QT_BIN)/rcc
 
 QT_CFLAGS := \
     -fPIC \
-    -I$(QT_INC) \
-    -I$(QT_INC)/QtWidgets \
-    -I$(QT_INC)/QtGui \
-    -I$(QT_INC)/QtCore
+    -I$(QT_INC)
 
 QT_LDFLAGS := -Wl,-rpath,$(QT_LIB) -L$(QT_LIB)
 QT_LDLIBS := \
