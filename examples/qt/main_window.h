@@ -2,7 +2,7 @@
 
 #include "main_window.uic.h"
 
-#include <QMainWindow>
+#include <QtWidgets/QMainWindow>
 #include <memory>
 
 namespace fly {

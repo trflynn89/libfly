@@ -1,5 +1,5 @@
 # docker image rm "trflynn89/libfly:ubuntu1904_gcc9_qt513"
-# docker build --tag "trflynn89/libfly:ubuntu1904_gcc9_qt513" -f ../ci/Dockerfile .
+# docker build --tag "trflynn89/libfly:ubuntu1904_gcc9_qt513" -f Dockerfile .
 # docker push "trflynn89/libfly:ubuntu1904_gcc9_qt513"
 #
 # docker run --cap-add SYS_PTRACE --name libfly -it trflynn89/libfly:ubuntu1904_gcc9_qt513

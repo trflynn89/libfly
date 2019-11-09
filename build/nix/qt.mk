@@ -1,12 +1,12 @@
 # Define build flags for Qt projects and define a script to automate installing
 # the Qt SDK.
 
-QT_SCRIPT := $(BUILD_ROOT)/qt.js
+QT_SCRIPT := $(BUILD_ROOT)/../ci/qt.js
 
 QT_VERSION_MAJOR := $(shell grep -oP "(?<=MAJOR = ')(\d+)(?=')" $(QT_SCRIPT))
 QT_VERSION_MINOR := $(shell grep -oP "(?<=MINOR = ')(\d+)(?=')" $(QT_SCRIPT))
 QT_VERSION_PATCH := $(shell grep -oP "(?<=PATCH = ')(\d+)(?=')" $(QT_SCRIPT))
-QT_INSTALL_POINT := $(shell grep -oP "(?<=POINT = ')(\S+)(?=')" $(QT_SCRIPT))
+QT_INSTALL_POINT := $(shell grep -oP "(?<=POINT_LINUX = ')(\S+)(?=')" $(QT_SCRIPT))
 
 QT_VERSION := $(QT_VERSION_MAJOR).$(QT_VERSION_MINOR).$(QT_VERSION_PATCH)
 
@@ -48,9 +48,7 @@ else
     QT_INSTALL_FLAGS := --platform minimal
 endif
 
-# Script to install Qt without any user interaction. Downloads the Qt
-# installation binary and creates a javascript file to facilitate desired
-# selections in the installer.
+# Script to install Qt without any user interaction.
 define QT_INSTALL
 
     (cd /tmp && curl -O $(QT_INSTALLER_URL)); \

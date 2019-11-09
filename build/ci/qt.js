@@ -1,11 +1,15 @@
-// Control script to install Qt without any user interaction into /opt/Qt.
+// Control script to install Qt without any user interaction.
 // https://doc.qt.io/qtinstallerframework/noninteractive.html
 var QT_VERSION_MAJOR = '5';
 var QT_VERSION_MINOR = '13';
 var QT_VERSION_PATCH = '1';
-var QT_INSTALL_POINT = '/opt/Qt';
-
 var QT_VERSION = QT_VERSION_MAJOR + QT_VERSION_MINOR + QT_VERSION_PATCH;
+
+var QT_INSTALL_POINT_WINDOWS = 'C:\\Qt';
+var QT_INSTALL_POINT_LINUX = '/opt/Qt';
+var QT_INSTALL_POINT = null;
+
+var QT_COMPONENTS = null;
 
 function Controller()
 {
@@ -14,6 +18,17 @@ function Controller()
     {
         gui.clickButton(buttons.NextButton);
     });
+
+    if (installer.fileExists('C:'))
+    {
+        QT_INSTALL_POINT = QT_INSTALL_POINT_WINDOWS;
+        QT_COMPONENTS = ['win32_msvc2017', 'win64_msvc2017_64'];
+    }
+    else
+    {
+        QT_INSTALL_POINT = QT_INSTALL_POINT_LINUX;
+        QT_COMPONENTS = ['gcc_64'];
+    }
 }
 
 Controller.prototype.WelcomePageCallback = function()
@@ -58,14 +73,19 @@ Controller.prototype.ComponentSelectionPageCallback = function()
     gui.findChild(page, 'Latest releases').click();
     gui.findChild(page, 'FetchCategoryButton').click();
 
-    // Then select the desired version.
-    var component = 'qt.qt' + QT_VERSION_MAJOR + '.' + QT_VERSION + '.gcc_64';
+    // Then select the desired components.
     var widget = gui.currentPageWidget();
 
     if (widget)
     {
+        var component_filter = 'qt.qt' + QT_VERSION_MAJOR + '.' + QT_VERSION;
         widget.deselectAll();
-        widget.selectComponent(component);
+
+        QT_COMPONENTS.forEach(function(component)
+        {
+            component = component_filter + '.' + component;
+            widget.selectComponent(component);
+        });
     }
 
     gui.clickButton(buttons.NextButton);
