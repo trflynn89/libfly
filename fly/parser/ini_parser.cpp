@@ -33,7 +33,8 @@ Json IniParser::ParseInternal(std::istream &stream) noexcept(false)
         else
         {
             throw ParserException(
-                m_line, "A section must be defined before name=value pairs");
+                m_line,
+                "A section must be defined before name=value pairs");
         }
     }
 
@@ -81,7 +82,8 @@ void IniParser::onValue(Json &section, const std::string &line) noexcept(false)
     else
     {
         throw ParserException(
-            m_line, "Require name/value pairs of the form name=value");
+            m_line,
+            "Require name/value pairs of the form name=value");
     }
 }
 
@@ -107,7 +109,9 @@ bool IniParser::trimValue(std::string &str, char start, char end) const
         throw ParserException(
             m_line,
             String::Format(
-                "Imbalanced characters: \"%c\" and \"%c\"", start, end));
+                "Imbalanced characters: \"%c\" and \"%c\"",
+                start,
+                end));
     }
 
     return startsWithChar && endsWithChar;

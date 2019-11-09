@@ -196,7 +196,9 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     m_watchDescriptor(-1)
 {
     m_watchDescriptor = ::inotify_add_watch(
-        m_monitorDescriptor, path.string().c_str(), s_changeFlags);
+        m_monitorDescriptor,
+        path.string().c_str(),
+        s_changeFlags);
 
     if (m_watchDescriptor == -1)
     {

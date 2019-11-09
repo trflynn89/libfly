@@ -75,7 +75,8 @@ bool ConfigManager::Start() noexcept
     if (m_spParser)
     {
         m_spMonitor = std::make_shared<PathMonitorImpl>(
-            m_spTaskRunner, CreateConfig<PathConfig>());
+            m_spTaskRunner,
+            CreateConfig<PathConfig>());
 
         if (m_spMonitor->Start())
         {

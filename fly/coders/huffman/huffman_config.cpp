@@ -15,14 +15,16 @@ HuffmanConfig::HuffmanConfig() noexcept :
 std::uint16_t HuffmanConfig::EncoderChunkSizeKB() const noexcept
 {
     return GetValue<std::uint16_t>(
-        "encoder_chunk_size_kb", m_defaultEncoderChunkSizeKB);
+        "encoder_chunk_size_kb",
+        m_defaultEncoderChunkSizeKB);
 }
 
 //==============================================================================
 length_type HuffmanConfig::EncoderMaxCodeLength() const noexcept
 {
     return GetValue<length_type>(
-        "encoder_max_code_length", m_defaultEncoderMaxCodeLength);
+        "encoder_max_code_length",
+        m_defaultEncoderMaxCodeLength);
 }
 
 } // namespace fly

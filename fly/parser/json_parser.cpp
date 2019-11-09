@@ -97,7 +97,9 @@ Json JsonParser::ParseInternal(std::istream &stream) noexcept(false)
     if (m_states.top() != State::NoState)
     {
         throw ParserException(
-            m_line, m_column, "Finished parsing with incomplete JSON object");
+            m_line,
+            m_column,
+            "Finished parsing with incomplete JSON object");
     }
 
     return values;

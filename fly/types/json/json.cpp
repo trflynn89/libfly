@@ -168,9 +168,8 @@ Json &Json::operator[](
 }
 
 //==============================================================================
-const Json &Json::
-operator[](const typename JsonTraits::object_type::key_type &key) const
-    noexcept(false)
+const Json &Json::operator[](
+    const typename JsonTraits::object_type::key_type &key) const noexcept(false)
 {
     if (IsObject())
     {
@@ -182,7 +181,8 @@ operator[](const typename JsonTraits::object_type::key_type &key) const
         if (it == value.end())
         {
             throw JsonException(
-                *this, String::Format("Given key (%s) not found", key));
+                *this,
+                String::Format("Given key (%s) not found", key));
         }
 
         return it->second;
@@ -216,8 +216,8 @@ Json &Json::operator[](
 }
 
 //==============================================================================
-const Json &Json::
-operator[](const typename JsonTraits::array_type::size_type &index) const
+const Json &Json::operator[](
+    const typename JsonTraits::array_type::size_type &index) const
     noexcept(false)
 {
     if (IsArray())
@@ -227,7 +227,8 @@ operator[](const typename JsonTraits::array_type::size_type &index) const
         if (index >= value.size())
         {
             throw JsonException(
-                *this, String::Format("Given index (%d) not found", index));
+                *this,
+                String::Format("Given index (%d) not found", index));
         }
 
         return value.at(index);
@@ -426,7 +427,9 @@ void Json::readEscapedCharacter(
 
         default:
             throw JsonException(String::Format(
-                "Invalid escape character '%c' (%x)", *it, int(*it)));
+                "Invalid escape character '%c' (%x)",
+                *it,
+                int(*it)));
     }
 }
 
@@ -451,7 +454,8 @@ void Json::readUnicodeCharacter(
         if (((++it == end) || (*it != '\\')) || ((++it == end) || (*it != 'u')))
         {
             throw JsonException(String::Format(
-                "Expected \\u to follow high surrogate %x", highSurrogate));
+                "Expected \\u to follow high surrogate %x",
+                highSurrogate));
         }
 
         const int lowSurrogate = readUnicodeCodepoint(it, end);
@@ -518,7 +522,8 @@ int Json::readUnicodeCodepoint(
         if (++it == end)
         {
             throw JsonException(String::Format(
-                "Expected exactly 4 hexadecimals after \\u, only found %d", i));
+                "Expected exactly 4 hexadecimals after \\u, only found %d",
+                i));
         }
 
         const int shift = (4 * (3 - i));
@@ -538,7 +543,9 @@ int Json::readUnicodeCodepoint(
         else
         {
             throw JsonException(String::Format(
-                "Expected '%c' (%x) to be a hexadecimal", *it, int(*it)));
+                "Expected '%c' (%x) to be a hexadecimal",
+                *it,
+                int(*it)));
         }
     }
 
@@ -568,7 +575,9 @@ void Json::validateCharacter(
 
     auto invalid = [&c](int location) {
         throw JsonException(String::Format(
-            "Invalid control character '%x' (location %d)", int(c), location));
+            "Invalid control character '%x' (location %d)",
+            int(c),
+            location));
     };
 
     // Invalid control characters

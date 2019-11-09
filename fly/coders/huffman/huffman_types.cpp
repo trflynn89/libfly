@@ -45,8 +45,9 @@ void HuffmanNode::BecomeIntermediate(
 }
 
 //==============================================================================
-bool HuffmanNodeComparator::
-operator()(const HuffmanNode *left, const HuffmanNode *right) noexcept
+bool HuffmanNodeComparator::operator()(
+    const HuffmanNode *left,
+    const HuffmanNode *right) noexcept
 {
     return left->m_frequency > right->m_frequency;
 }

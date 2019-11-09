@@ -40,7 +40,9 @@ protected:
         if (!m_chars.empty())
         {
             throw fly::UnexpectedCharacterException(
-                m_line, m_column, m_chars[0]);
+                m_line,
+                m_column,
+                m_chars[0]);
         }
 
         return fly::Json();
@@ -120,7 +122,8 @@ TEST_F(ParserTest, Utf16LittleEndianByteOrderMarkTest)
 TEST_F(ParserTest, Utf32BigEndianByteOrderMarkTest)
 {
     EXPECT_THROW(
-        m_spParser->ParseString(std::string("\x00", 1)), fly::ParserException);
+        m_spParser->ParseString(std::string("\x00", 1)),
+        fly::ParserException);
     m_spParser->CompareParsed({0x00});
 
     EXPECT_THROW(

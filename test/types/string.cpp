@@ -629,7 +629,8 @@ TYPED_TEST(BasicStringTest, FormatTest_a)
         StringClass::Format(format, 5.5));
 #else
     EXPECT_EQ(
-        FLY_STR(streamed_char, "0x1.6p+2"), StringClass::Format(format, 5.5));
+        FLY_STR(streamed_char, "0x1.6p+2"),
+        StringClass::Format(format, 5.5));
 #endif
 
     format = FLY_STR(char_type, "%A");
@@ -642,7 +643,8 @@ TYPED_TEST(BasicStringTest, FormatTest_a)
         StringClass::Format(format, 5.5));
 #else
     EXPECT_EQ(
-        FLY_STR(streamed_char, "0X1.6P+2"), StringClass::Format(format, 5.5));
+        FLY_STR(streamed_char, "0X1.6P+2"),
+        StringClass::Format(format, 5.5));
 #endif
 }
 
@@ -667,7 +669,8 @@ TYPED_TEST(BasicStringTest, FormatTest_f)
         FLY_STR(streamed_char, "inf"),
         StringClass::Format(format, std::numeric_limits<float>::infinity()));
     EXPECT_EQ(
-        FLY_STR(streamed_char, "2.100000"), StringClass::Format(format, 2.1f));
+        FLY_STR(streamed_char, "2.100000"),
+        StringClass::Format(format, 2.1f));
 
     // Note: std::uppercase has no effect on std::fixed :(
     format = FLY_STR(char_type, "%F");
@@ -679,7 +682,8 @@ TYPED_TEST(BasicStringTest, FormatTest_f)
         FLY_STR(streamed_char, "inf"),
         StringClass::Format(format, std::numeric_limits<float>::infinity()));
     EXPECT_EQ(
-        FLY_STR(streamed_char, "2.100000"), StringClass::Format(format, 2.1f));
+        FLY_STR(streamed_char, "2.100000"),
+        StringClass::Format(format, 2.1f));
 }
 
 //==============================================================================
@@ -779,12 +783,14 @@ TYPED_TEST(BasicStringTest, JoinTest)
     EXPECT_EQ(FLY_STR(streamed_char, "d,c"), StringClass::Join(',', chr, arr));
     EXPECT_EQ(FLY_STR(streamed_char, "d,d"), StringClass::Join(',', chr, chr));
     EXPECT_EQ(
-        FLY_STR(streamed_char, "[hi beef]"), StringClass::Join('.', obj1));
+        FLY_STR(streamed_char, "[hi beef]"),
+        StringClass::Join('.', obj1));
     EXPECT_EQ(
         FLY_STR(streamed_char, "a:[hi beef]:c:d"),
         StringClass::Join(':', str, obj1, arr, chr));
     EXPECT_EQ(
-        FLY_STR(streamed_char, "a:c:d"), StringClass::Join(':', str, arr, chr));
+        FLY_STR(streamed_char, "a:c:d"),
+        StringClass::Join(':', str, arr, chr));
 
     std::basic_regex<streamed_char> test(
         FLY_STR(streamed_char, "\\[(0x)?[0-9a-fA-F]+\\]:2:\\[hi beef\\]"));
@@ -856,18 +862,21 @@ TYPED_TEST(BasicStringTest, ConvertCharTest)
     s = FLY_STR(char_type, "65");
     EXPECT_EQ(StringClass::template Convert<streamed_char>(s), 'A');
     EXPECT_EQ(
-        StringClass::template Convert<ustreamed_char>(s), (ustreamed_char)65);
+        StringClass::template Convert<ustreamed_char>(s),
+        (ustreamed_char)65);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<streamed_char>(s), std::invalid_argument);
+        StringClass::template Convert<streamed_char>(s),
+        std::invalid_argument);
     EXPECT_THROW(
         StringClass::template Convert<ustreamed_char>(s),
         std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<streamed_char>(s), std::invalid_argument);
+        StringClass::template Convert<streamed_char>(s),
+        std::invalid_argument);
     EXPECT_THROW(
         StringClass::template Convert<ustreamed_char>(s),
         std::invalid_argument);
@@ -910,24 +919,30 @@ TYPED_TEST(BasicStringTest, ConvertInt8Test)
     s = FLY_STR(char_type, "100");
     EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), (std::int8_t)100);
     EXPECT_EQ(
-        StringClass::template Convert<std::uint8_t>(s), (std::uint8_t)100);
+        StringClass::template Convert<std::uint8_t>(s),
+        (std::uint8_t)100);
 
     s = FLY_STR(char_type, "-100");
     EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), (std::int8_t)-100);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint8_t>(s), std::out_of_range);
+        StringClass::template Convert<std::uint8_t>(s),
+        std::out_of_range);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<std::int8_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::int8_t>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint8_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::uint8_t>(s),
+        std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<std::int8_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::int8_t>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint8_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::uint8_t>(s),
+        std::invalid_argument);
 
     if constexpr (StringClass::traits::has_stoi_family_v)
     {
@@ -963,31 +978,40 @@ TYPED_TEST(BasicStringTest, ConvertInt16Test)
     s = FLY_STR(char_type, "0");
     EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), (std::int16_t)0);
     EXPECT_EQ(
-        StringClass::template Convert<std::uint16_t>(s), (std::uint16_t)0);
+        StringClass::template Convert<std::uint16_t>(s),
+        (std::uint16_t)0);
 
     s = FLY_STR(char_type, "100");
     EXPECT_EQ(
-        StringClass::template Convert<std::int16_t>(s), (std::int16_t)100);
+        StringClass::template Convert<std::int16_t>(s),
+        (std::int16_t)100);
     EXPECT_EQ(
-        StringClass::template Convert<std::uint16_t>(s), (std::uint16_t)100);
+        StringClass::template Convert<std::uint16_t>(s),
+        (std::uint16_t)100);
 
     s = FLY_STR(char_type, "-100");
     EXPECT_EQ(
-        StringClass::template Convert<std::int16_t>(s), (std::int16_t)-100);
+        StringClass::template Convert<std::int16_t>(s),
+        (std::int16_t)-100);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint16_t>(s), std::out_of_range);
+        StringClass::template Convert<std::uint16_t>(s),
+        std::out_of_range);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<std::int16_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::int16_t>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint16_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::uint16_t>(s),
+        std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<std::int16_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::int16_t>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint16_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::uint16_t>(s),
+        std::invalid_argument);
 
     if constexpr (StringClass::traits::has_stoi_family_v)
     {
@@ -1023,31 +1047,40 @@ TYPED_TEST(BasicStringTest, ConvertInt32Test)
     s = FLY_STR(char_type, "0");
     EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), (std::int32_t)0);
     EXPECT_EQ(
-        StringClass::template Convert<std::uint32_t>(s), (std::uint32_t)0);
+        StringClass::template Convert<std::uint32_t>(s),
+        (std::uint32_t)0);
 
     s = FLY_STR(char_type, "100");
     EXPECT_EQ(
-        StringClass::template Convert<std::int32_t>(s), (std::int32_t)100);
+        StringClass::template Convert<std::int32_t>(s),
+        (std::int32_t)100);
     EXPECT_EQ(
-        StringClass::template Convert<std::uint32_t>(s), (std::uint32_t)100);
+        StringClass::template Convert<std::uint32_t>(s),
+        (std::uint32_t)100);
 
     s = FLY_STR(char_type, "-100");
     EXPECT_EQ(
-        StringClass::template Convert<std::int32_t>(s), (std::int32_t)-100);
+        StringClass::template Convert<std::int32_t>(s),
+        (std::int32_t)-100);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint32_t>(s), std::out_of_range);
+        StringClass::template Convert<std::uint32_t>(s),
+        std::out_of_range);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<std::int32_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::int32_t>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint32_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::uint32_t>(s),
+        std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<std::int32_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::int32_t>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint32_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::uint32_t>(s),
+        std::invalid_argument);
 
     if constexpr (StringClass::traits::has_stoi_family_v)
     {
@@ -1083,29 +1116,37 @@ TYPED_TEST(BasicStringTest, ConvertInt64Test)
     s = FLY_STR(char_type, "0");
     EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), (std::int64_t)0);
     EXPECT_EQ(
-        StringClass::template Convert<std::uint64_t>(s), (std::uint64_t)0);
+        StringClass::template Convert<std::uint64_t>(s),
+        (std::uint64_t)0);
 
     s = FLY_STR(char_type, "100");
     EXPECT_EQ(
-        StringClass::template Convert<std::int64_t>(s), (std::int64_t)100);
+        StringClass::template Convert<std::int64_t>(s),
+        (std::int64_t)100);
     EXPECT_EQ(
-        StringClass::template Convert<std::uint64_t>(s), (std::uint64_t)100);
+        StringClass::template Convert<std::uint64_t>(s),
+        (std::uint64_t)100);
 
     s = FLY_STR(char_type, "-100");
     EXPECT_EQ(
-        StringClass::template Convert<std::int64_t>(s), (std::int64_t)-100);
+        StringClass::template Convert<std::int64_t>(s),
+        (std::int64_t)-100);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<std::int64_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::int64_t>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint64_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::uint64_t>(s),
+        std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<std::int64_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::int64_t>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint64_t>(s), std::invalid_argument);
+        StringClass::template Convert<std::uint64_t>(s),
+        std::invalid_argument);
 }
 
 //==============================================================================
@@ -1129,19 +1170,25 @@ TYPED_TEST(BasicStringTest, ConvertDecimalTest)
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<float>(s), std::invalid_argument);
+        StringClass::template Convert<float>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<double>(s), std::invalid_argument);
+        StringClass::template Convert<double>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<long double>(s), std::invalid_argument);
+        StringClass::template Convert<long double>(s),
+        std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<float>(s), std::invalid_argument);
+        StringClass::template Convert<float>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<double>(s), std::invalid_argument);
+        StringClass::template Convert<double>(s),
+        std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<long double>(s), std::invalid_argument);
+        StringClass::template Convert<long double>(s),
+        std::invalid_argument);
 }
 
 //==============================================================================

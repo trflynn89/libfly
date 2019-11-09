@@ -91,7 +91,10 @@ void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
     }
 
     status = ::PdhGetFormattedCounterValue(
-        m_cpuCounter, PDH_FMT_DOUBLE, NULL, &value);
+        m_cpuCounter,
+        PDH_FMT_DOUBLE,
+        NULL,
+        &value);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not format CPU counter (%x)", status);

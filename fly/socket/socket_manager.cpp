@@ -97,7 +97,9 @@ void SocketManager::HandleNewAndClosedSockets(
 {
     // Add new sockets to the socket system
     m_aioSockets.insert(
-        m_aioSockets.end(), newSockets.begin(), newSockets.end());
+        m_aioSockets.end(),
+        newSockets.begin(),
+        newSockets.end());
 
     // Remove closed sockets from the socket system
     for (const std::shared_ptr<Socket> &spSocket : closedSockets)

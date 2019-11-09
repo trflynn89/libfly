@@ -190,45 +190,59 @@ TYPED_TEST(BasicStringTraitsTest, StringLikeTest)
 
     EXPECT_EQ(traits::template is_string_like_v<std::wstring>, is_wstring);
     EXPECT_EQ(
-        traits::template is_string_like_v<const std::wstring>, is_wstring);
+        traits::template is_string_like_v<const std::wstring>,
+        is_wstring);
     EXPECT_EQ(
-        traits::template is_string_like_v<std::wstring const>, is_wstring);
+        traits::template is_string_like_v<std::wstring const>,
+        is_wstring);
 
     EXPECT_EQ(traits::template is_string_like_v<std::u16string>, is_string16);
     EXPECT_EQ(
-        traits::template is_string_like_v<const std::u16string>, is_string16);
+        traits::template is_string_like_v<const std::u16string>,
+        is_string16);
     EXPECT_EQ(
-        traits::template is_string_like_v<std::u16string const>, is_string16);
+        traits::template is_string_like_v<std::u16string const>,
+        is_string16);
 
     EXPECT_EQ(traits::template is_string_like_v<std::u32string>, is_string32);
     EXPECT_EQ(
-        traits::template is_string_like_v<const std::u32string>, is_string32);
+        traits::template is_string_like_v<const std::u32string>,
+        is_string32);
     EXPECT_EQ(
-        traits::template is_string_like_v<std::u32string const>, is_string32);
+        traits::template is_string_like_v<std::u32string const>,
+        is_string32);
 
     EXPECT_EQ(traits::template is_string_like_v<std::string &>, is_string);
     EXPECT_EQ(
-        traits::template is_string_like_v<const std::string &>, is_string);
+        traits::template is_string_like_v<const std::string &>,
+        is_string);
     EXPECT_EQ(
-        traits::template is_string_like_v<std::string const &>, is_string);
+        traits::template is_string_like_v<std::string const &>,
+        is_string);
 
     EXPECT_EQ(traits::template is_string_like_v<std::wstring &>, is_wstring);
     EXPECT_EQ(
-        traits::template is_string_like_v<const std::wstring &>, is_wstring);
+        traits::template is_string_like_v<const std::wstring &>,
+        is_wstring);
     EXPECT_EQ(
-        traits::template is_string_like_v<std::wstring const &>, is_wstring);
+        traits::template is_string_like_v<std::wstring const &>,
+        is_wstring);
 
     EXPECT_EQ(traits::template is_string_like_v<std::u16string &>, is_string16);
     EXPECT_EQ(
-        traits::template is_string_like_v<const std::u16string &>, is_string16);
+        traits::template is_string_like_v<const std::u16string &>,
+        is_string16);
     EXPECT_EQ(
-        traits::template is_string_like_v<std::u16string const &>, is_string16);
+        traits::template is_string_like_v<std::u16string const &>,
+        is_string16);
 
     EXPECT_EQ(traits::template is_string_like_v<std::u32string &>, is_string32);
     EXPECT_EQ(
-        traits::template is_string_like_v<const std::u32string &>, is_string32);
+        traits::template is_string_like_v<const std::u32string &>,
+        is_string32);
     EXPECT_EQ(
-        traits::template is_string_like_v<std::u32string const &>, is_string32);
+        traits::template is_string_like_v<std::u32string const &>,
+        is_string32);
 
     EXPECT_FALSE(traits::template is_string_like_v<std::string *>);
     EXPECT_FALSE(traits::template is_string_like_v<const std::string *>);
