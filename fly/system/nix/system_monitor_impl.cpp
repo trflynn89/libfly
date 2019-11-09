@@ -85,7 +85,12 @@ void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
     if (stream.good() && std::getline(stream, line))
     {
         scanned = std::sscanf(
-            line.c_str(), s_procStatFormat, &user, &nice, &sys, &idle);
+            line.c_str(),
+            s_procStatFormat,
+            &user,
+            &nice,
+            &sys,
+            &idle);
     }
 
     if (scanned != 4)

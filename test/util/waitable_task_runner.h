@@ -118,7 +118,8 @@ template <typename TaskType>
 void WaitableTaskRunner::WaitForTaskTypeToComplete() noexcept
 {
     static_assert(
-        std::is_base_of<Task, TaskType>::value, "Given type is not a task");
+        std::is_base_of<Task, TaskType>::value,
+        "Given type is not a task");
 
     static std::size_t expected_hash = typeid(TaskType).hash_code();
     std::size_t completed_hash = 0;
@@ -135,7 +136,8 @@ bool WaitableTaskRunner::WaitForTaskTypeToComplete(
     std::chrono::duration<R, P> duration) noexcept
 {
     static_assert(
-        std::is_base_of<Task, TaskType>::value, "Given type is not a task");
+        std::is_base_of<Task, TaskType>::value,
+        "Given type is not a task");
 
     auto deadline = std::chrono::high_resolution_clock::now() + duration;
 

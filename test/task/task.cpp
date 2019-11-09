@@ -180,7 +180,8 @@ TEST_F(TaskTest, ImmediateAndDelayTaskTest)
     auto spTask3(std::make_shared<MarkerTask>(&ordering, 3));
 
     EXPECT_TRUE(spTaskRunner->PostTaskWithDelay(
-        spTask1, std::chrono::milliseconds(10)));
+        spTask1,
+        std::chrono::milliseconds(10)));
     EXPECT_TRUE(spTaskRunner->PostTask(spTask2));
     EXPECT_TRUE(spTaskRunner->PostTask(spTask3));
 
@@ -209,7 +210,8 @@ TEST_F(TaskTest, CancelTaskTest)
         EXPECT_EQ(spTask->GetCount(), 0);
 
         EXPECT_TRUE(spTaskRunner->PostTaskWithDelay(
-            spTask, std::chrono::milliseconds(10)));
+            spTask,
+            std::chrono::milliseconds(10)));
     }
 
     EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
@@ -230,7 +232,8 @@ TEST_F(TaskTest, ImmediateAndDelayCancelTaskTest)
         EXPECT_EQ(spTask1->GetCount(), 0);
 
         EXPECT_TRUE(spTaskRunner->PostTaskWithDelay(
-            spTask1, std::chrono::milliseconds(10)));
+            spTask1,
+            std::chrono::milliseconds(10)));
     }
 
     auto spTask2(std::make_shared<MarkerTask>(&ordering, 2));

@@ -103,14 +103,18 @@ TEST_F(ConfigManagerTest, AllFileTypesTest)
 {
     {
         m_spConfigManager = std::make_shared<fly::ConfigManager>(
-            m_spTaskRunner, fly::ConfigManager::ConfigFileType::Ini, m_file);
+            m_spTaskRunner,
+            fly::ConfigManager::ConfigFileType::Ini,
+            m_file);
         m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
         EXPECT_TRUE(m_spConfigManager->Start());
     }
     {
         m_spConfigManager = std::make_shared<fly::ConfigManager>(
-            m_spTaskRunner, fly::ConfigManager::ConfigFileType::Json, m_file);
+            m_spTaskRunner,
+            fly::ConfigManager::ConfigFileType::Json,
+            m_file);
         m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
         EXPECT_TRUE(m_spConfigManager->Start());
@@ -338,7 +342,9 @@ TEST_F(ConfigManagerTest, BadUpdateTest)
 TEST_F(ConfigManagerTest, BadObjectTest)
 {
     m_spConfigManager = std::make_shared<fly::ConfigManager>(
-        m_spTaskRunner, fly::ConfigManager::ConfigFileType::Json, m_file);
+        m_spTaskRunner,
+        fly::ConfigManager::ConfigFileType::Json,
+        m_file);
     m_spPathConfig = m_spConfigManager->CreateConfig<TestPathConfig>();
 
     EXPECT_TRUE(m_spConfigManager->Start());

@@ -16,7 +16,8 @@ SocketConfig::SocketConfig() noexcept :
 std::chrono::microseconds SocketConfig::IoWaitTime() const noexcept
 {
     return std::chrono::microseconds(GetValue<std::chrono::microseconds::rep>(
-        "io_wait_time", m_defaultIoWaitTime));
+        "io_wait_time",
+        m_defaultIoWaitTime));
 }
 
 //==============================================================================

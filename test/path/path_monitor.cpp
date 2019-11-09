@@ -222,7 +222,8 @@ TEST_F(PathMonitorTest, MockFailedStartMonitorTest)
     fly::MockSystem mock(fly::MockCall::InotifyInit1);
 
     m_spMonitor = std::make_shared<fly::PathMonitorImpl>(
-        m_spTaskRunner, std::make_shared<fly::PathConfig>());
+        m_spTaskRunner,
+        std::make_shared<fly::PathConfig>());
 
     ASSERT_FALSE(m_spMonitor->Start());
 

@@ -123,7 +123,8 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
         fly::MockSystem mock(fly::MockCall::Read);
 
         m_spMonitor = std::make_shared<fly::SystemMonitorImpl>(
-            m_spTaskRunner, std::make_shared<fly::SystemConfig>());
+            m_spTaskRunner,
+            std::make_shared<fly::SystemConfig>());
 
         ASSERT_FALSE(m_spMonitor->Start());
         ASSERT_EQ(m_spMonitor->GetSystemCpuCount(), 0);
@@ -131,7 +132,8 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
 
     {
         m_spMonitor = std::make_shared<fly::SystemMonitorImpl>(
-            m_spTaskRunner, std::make_shared<fly::SystemConfig>());
+            m_spTaskRunner,
+            std::make_shared<fly::SystemConfig>());
 
         ASSERT_TRUE(m_spMonitor->Start());
         m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
@@ -143,7 +145,9 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
         double processBefore = m_spMonitor->GetProcessCpuUsage();
 
         std::future<void> result = std::async(
-            std::launch::async, &SystemMonitorTest::SpinThread, this);
+            std::launch::async,
+            &SystemMonitorTest::SpinThread,
+            this);
 
         m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
 

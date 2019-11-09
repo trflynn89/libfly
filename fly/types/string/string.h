@@ -368,7 +368,8 @@ void BasicString<StringType>::Trim(StringType &str) noexcept
 
     // Remove trailing whitespace
     str.erase(
-        std::find_if(str.rbegin(), str.rend(), is_non_space).base(), str.end());
+        std::find_if(str.rbegin(), str.rend(), is_non_space).base(),
+        str.end());
 }
 
 //==============================================================================

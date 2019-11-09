@@ -35,7 +35,9 @@ protected:
     ValidatePass(const std::string &test, const fly::Json &expected) noexcept
     {
         ValidatePassRaw(
-            fly::String::Format("{ \"a\" : %s }", test), "a", expected);
+            fly::String::Format("{ \"a\" : %s }", test),
+            "a",
+            expected);
     }
 
     void ValidatePassRaw(
@@ -91,7 +93,8 @@ TEST_F(JsonParserTest, JsonCheckerTest)
         else if (fly::String::StartsWith(file.string(), "fail"))
         {
             EXPECT_THROW(
-                m_spParser->ParseFile(it.path()), fly::ParserException);
+                m_spParser->ParseFile(it.path()),
+                fly::ParserException);
         }
         else
         {
@@ -153,7 +156,8 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
         else if (fly::String::StartsWith(file.string(), 'n'))
         {
             EXPECT_THROW(
-                m_spParser->ParseFile(it.path()), fly::ParserException);
+                m_spParser->ParseFile(it.path()),
+                fly::ParserException);
         }
         else if (fly::String::StartsWith(file.string(), 'i'))
         {
@@ -164,7 +168,8 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsingTest)
             else
             {
                 EXPECT_THROW(
-                    m_spParser->ParseFile(it.path()), fly::ParserException);
+                    m_spParser->ParseFile(it.path()),
+                    fly::ParserException);
             }
         }
         else

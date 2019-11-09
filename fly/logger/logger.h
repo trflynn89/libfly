@@ -36,7 +36,9 @@
     _LOG(                                                                      \
         fly::Log::Level::Warn,                                                 \
         fly::String::Format(                                                   \
-            format ": %s", ##__VA_ARGS__, fly::System::GetErrorString()))
+            format ": %s",                                                     \
+            ##__VA_ARGS__,                                                     \
+            fly::System::GetErrorString()))
 
 //==============================================================================
 #define LOGE(format, ...)                                                      \

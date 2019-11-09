@@ -34,11 +34,15 @@ bool TaskManager::Start() noexcept
         for (int i = 0; i < m_numWorkers; ++i)
         {
             m_futures.push_back(std::async(
-                std::launch::async, &TaskManager::workerThread, spTaskManager));
+                std::launch::async,
+                &TaskManager::workerThread,
+                spTaskManager));
         }
 
         m_futures.push_back(std::async(
-            std::launch::async, &TaskManager::timerThread, spTaskManager));
+            std::launch::async,
+            &TaskManager::timerThread,
+            spTaskManager));
 
         return true;
     }

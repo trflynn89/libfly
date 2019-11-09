@@ -35,7 +35,8 @@ TEST_F(ConfigTest, NonCovertibleTest)
 
     EXPECT_EQ(m_spConfig->GetValue<int>("name", 12), 12);
     EXPECT_EQ(
-        m_spConfig->GetValue<std::nullptr_t>("address", nullptr), nullptr);
+        m_spConfig->GetValue<std::nullptr_t>("address", nullptr),
+        nullptr);
 }
 
 //==============================================================================

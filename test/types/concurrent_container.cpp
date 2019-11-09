@@ -71,7 +71,9 @@ protected:
         for (unsigned int i = 0; i < numWriters; ++i)
         {
             auto func = std::bind(
-                &ConcurrencyTest::WriterThread, this, std::ref(objectQueue));
+                &ConcurrencyTest::WriterThread,
+                this,
+                std::ref(objectQueue));
             writerFutures.push_back(std::async(std::launch::async, func));
         }
 

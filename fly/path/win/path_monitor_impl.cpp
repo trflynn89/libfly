@@ -127,7 +127,8 @@ void PathMonitorImpl::handleEvents(
         if (event != PathMonitor::PathEvent::None)
         {
             const std::wstring wFile(
-                pInfo->FileName, pInfo->FileNameLength / sizeof(wchar_t));
+                pInfo->FileName,
+                pInfo->FileNameLength / sizeof(wchar_t));
 
             const std::filesystem::path file(wFile);
             auto callback = spInfo->m_fileHandlers[file];

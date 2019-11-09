@@ -16,7 +16,8 @@ LoggerConfig::LoggerConfig() noexcept :
 std::uintmax_t LoggerConfig::MaxLogFileSize() const noexcept
 {
     return GetValue<std::uintmax_t>(
-        "max_log_file_size", m_defaultMaxLogFileSize);
+        "max_log_file_size",
+        m_defaultMaxLogFileSize);
 }
 
 //==============================================================================
@@ -29,7 +30,8 @@ std::uint32_t LoggerConfig::MaxMessageSize() const noexcept
 std::chrono::milliseconds LoggerConfig::QueueWaitTime() const noexcept
 {
     return std::chrono::milliseconds(GetValue<std::chrono::milliseconds::rep>(
-        "queue_wait_time", m_defaultQueueWaitTime));
+        "queue_wait_time",
+        m_defaultQueueWaitTime));
 }
 
 } // namespace fly
