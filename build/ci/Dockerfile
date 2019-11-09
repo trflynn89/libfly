@@ -1,10 +1,10 @@
-# docker image rm "trflynn89/libfly:ubuntu1904_gcc9_qt513"
-# docker build --tag "trflynn89/libfly:ubuntu1904_gcc9_qt513" -f ../ci/Dockerfile .
-# docker push "trflynn89/libfly:ubuntu1904_gcc9_qt513"
+# docker image rm "trflynn89/libfly:ubuntu1910_gcc9_qt513"
+# docker build --tag "trflynn89/libfly:ubuntu1910_gcc9_qt513" -f Dockerfile .
+# docker push "trflynn89/libfly:ubuntu1910_gcc9_qt513"
 #
-# docker run --cap-add SYS_PTRACE --name libfly -it trflynn89/libfly:ubuntu1904_gcc9_qt513
+# docker run --cap-add SYS_PTRACE --name libfly -it trflynn89/libfly:ubuntu1910_gcc9_qt513
 # docker rm libfly
-FROM ubuntu:19.04
+FROM ubuntu:19.10
 
 MAINTAINER Timothy Flynn <trflynn89@pm.me>
 

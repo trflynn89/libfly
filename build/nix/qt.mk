@@ -2,7 +2,7 @@
 # the Qt SDK.
 
 ifeq ($(wildcard $(BUILD_ROOT)/qt.js),)
-    QT_SCRIPT := $(BUILD_ROOT)/../common/qt.js
+    QT_SCRIPT := $(BUILD_ROOT)/../ci/qt.js
 else
     QT_SCRIPT := $(BUILD_ROOT)/qt.js
 endif
