@@ -1,9 +1,9 @@
 #pragma once
 
-#include "main_window.uic.h"
-
-#include <QMainWindow>
+#include <QtWidgets/QMainWindow>
 #include <memory>
+
+#include "main_window.uic.h"
 
 namespace fly {
 
