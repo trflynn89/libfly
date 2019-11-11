@@ -59,7 +59,7 @@ class Json
 {
 public:
     /**
-     * Alias for the std::variant holding the above JSON types.
+     * Alias for the std::variant holding the JSON types.
      */
     using json_type = std::variant<
         JsonTraits::null_type,
@@ -202,6 +202,12 @@ public:
      * @param std::initializer_list The initializer list.
      */
     Json(const std::initializer_list<Json> &) noexcept;
+
+    /**
+     * Destructor. Iteratively destroy nested Json instances to alleviate stack
+     * stack overflow on destruction of deeply-nested Json objects and arrays.
+     */
+    ~Json();
 
     /**
      * Copy assignment operator. Intializes the Json instance with the type and
