@@ -205,7 +205,7 @@ public:
 
     /**
      * Destructor. Iteratively destroy nested Json instances to alleviate stack
-     * stack overflow on destruction of deeply-nested Json objects and arrays.
+     * overflow on destruction of deeply-nested Json objects and arrays.
      */
     ~Json();
 
