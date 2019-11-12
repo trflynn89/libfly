@@ -63,17 +63,15 @@ Json::~Json()
 
     if (IsObject())
     {
-        for (auto &&child : std::get<JsonTraits::object_type>(m_value))
+        for (auto &&json : std::get<JsonTraits::object_type>(m_value))
         {
-            stack.push_back(std::move(child.second));
+            stack.push_back(std::move(json.second));
         }
     }
     else if (IsArray())
     {
-        std::move(
-            std::get<JsonTraits::array_type>(m_value).begin(),
-            std::get<JsonTraits::array_type>(m_value).end(),
-            std::back_inserter(stack));
+        auto &&json = std::get<JsonTraits::array_type>(m_value);
+        std::move(json.begin(), json.end(), std::back_inserter(stack));
     }
 
     while (!stack.empty())
@@ -85,19 +83,16 @@ Json::~Json()
 
         if (json.IsObject())
         {
-            for (auto &&child : std::get<JsonTraits::object_type>(m_value))
+            for (auto &&child : std::get<JsonTraits::object_type>(json.m_value))
             {
                 stack.push_back(std::move(child.second));
             }
         }
         else if (json.IsArray())
         {
-            std::move(
-                std::get<JsonTraits::array_type>(json.m_value).begin(),
-                std::get<JsonTraits::array_type>(json.m_value).end(),
-                std::back_inserter(stack));
-
-            std::get<JsonTraits::array_type>(json.m_value).clear();
+            auto &&child = std::get<JsonTraits::array_type>(json.m_value);
+            std::move(child.begin(), child.end(), std::back_inserter(stack));
+            child.clear();
         }
     }
 }
