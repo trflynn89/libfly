@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <ios>
+#include <iterator>
 #include <utility>
 
 namespace fly {
@@ -50,6 +51,48 @@ Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
         {
             std::get<JsonTraits::array_type>(m_value).push_back(std::move(*it));
+        }
+    }
+}
+
+//==============================================================================
+Json::~Json()
+{
+    std::vector<Json> stack;
+    stack.reserve(Size());
+
+    if (IsObject())
+    {
+        for (auto &&json : std::get<JsonTraits::object_type>(m_value))
+        {
+            stack.push_back(std::move(json.second));
+        }
+    }
+    else if (IsArray())
+    {
+        auto &&json = std::get<JsonTraits::array_type>(m_value);
+        std::move(json.begin(), json.end(), std::back_inserter(stack));
+    }
+
+    while (!stack.empty())
+    {
+        Json json(std::move(stack.back()));
+        stack.pop_back();
+
+        stack.reserve(stack.size() + json.Size());
+
+        if (json.IsObject())
+        {
+            for (auto &&child : std::get<JsonTraits::object_type>(json.m_value))
+            {
+                stack.push_back(std::move(child.second));
+            }
+        }
+        else if (json.IsArray())
+        {
+            auto &&child = std::get<JsonTraits::array_type>(json.m_value);
+            std::move(child.begin(), child.end(), std::back_inserter(stack));
+            child.clear();
         }
     }
 }
