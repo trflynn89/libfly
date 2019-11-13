@@ -99,9 +99,8 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout) noexcept
 }
 
 //==============================================================================
-std::shared_ptr<PathMonitor::PathInfo>
-PathMonitorImpl::CreatePathInfo(const std::filesystem::path &path) const
-    noexcept
+std::shared_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
+    const std::filesystem::path &path) const noexcept
 {
     std::shared_ptr<PathMonitor::PathInfo> spInfo;
 
@@ -160,8 +159,8 @@ void PathMonitorImpl::handleEvents(
 }
 
 //==============================================================================
-PathMonitor::PathEvent PathMonitorImpl::convertToEvent(DWORD action) const
-    noexcept
+PathMonitor::PathEvent
+PathMonitorImpl::convertToEvent(DWORD action) const noexcept
 {
     PathMonitor::PathEvent event = PathMonitor::PathEvent::None;
 
