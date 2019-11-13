@@ -75,9 +75,8 @@ void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout) noexcept
 }
 
 //==============================================================================
-std::shared_ptr<PathMonitor::PathInfo>
-PathMonitorImpl::CreatePathInfo(const std::filesystem::path &path) const
-    noexcept
+std::shared_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
+    const std::filesystem::path &path) const noexcept
 {
     std::shared_ptr<PathMonitor::PathInfo> spInfo;
 
@@ -129,8 +128,8 @@ bool PathMonitorImpl::readEvents() const noexcept
 }
 
 //==============================================================================
-void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
-    noexcept
+void PathMonitorImpl::handleEvent(
+    const struct inotify_event *pEvent) const noexcept
 {
     auto it = std::find_if(
         m_pathInfo.begin(),

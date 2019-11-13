@@ -243,8 +243,8 @@ std::shared_ptr<Socket> SocketImpl::Accept() const noexcept
 }
 
 //==============================================================================
-std::size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
-    noexcept
+std::size_t
+SocketImpl::Send(const std::string &message, bool &wouldBlock) const noexcept
 {
     static const std::string eom(1, m_socketEoM);
     std::string toSend = message + eom;
@@ -386,8 +386,8 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const noexcept
 }
 
 //==============================================================================
-std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
-    noexcept
+std::string
+SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const noexcept
 {
     std::string ret;
 

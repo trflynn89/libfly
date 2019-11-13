@@ -1,5 +1,5 @@
-﻿# Clang-Format 9.0.0
-# https://releases.llvm.org/9.0.0/tools/clang/docs/ClangFormatStyleOptions.html
+﻿# Clang-Format 10.0.0
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 #
 # Upstream issues to track for better formatting:
 #     Newlines before brackets after lambdas https://reviews.llvm.org/D44609
@@ -31,7 +31,7 @@ BreakBeforeBraces: Custom
 BraceWrapping:
     AfterCaseLabel: true
     AfterClass: true
-    AfterControlStatement: true
+    AfterControlStatement: Always
     AfterEnum: true
     AfterFunction: true
     AfterNamespace: false
@@ -71,6 +71,7 @@ IncludeCategories:
   - Regex: '<[[:alnum:]./_]+>'
     Priority: 5
 IndentCaseLabels: true
+IndentGotoLabels: false
 IndentPPDirectives: AfterHash
 IndentWidth: 4
 IndentWrappedFunctionNames: false
@@ -96,6 +97,7 @@ SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyBlock: true
 SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 1
 SpacesInAngles: false
@@ -103,7 +105,7 @@ SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-Standard: Cpp11
+Standard: Latest
 TabWidth: 4
 UseTab: Never
 ...
