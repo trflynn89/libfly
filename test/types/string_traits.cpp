@@ -85,7 +85,7 @@ struct BasicStringTraitsTest : public ::testing::Test
 using StringTypes =
     ::testing::Types<std::string, std::wstring, std::u16string, std::u32string>;
 
-TYPED_TEST_CASE(BasicStringTraitsTest, StringTypes);
+TYPED_TEST_SUITE(BasicStringTraitsTest, StringTypes);
 
 //==============================================================================
 TYPED_TEST(BasicStringTraitsTest, StoiFamilyTest)

@@ -96,7 +96,7 @@ struct BasicStringTest : public ::testing::Test
 using StringTypes =
     ::testing::Types<std::string, std::wstring, std::u16string, std::u32string>;
 
-TYPED_TEST_CASE(BasicStringTest, StringTypes);
+TYPED_TEST_SUITE(BasicStringTest, StringTypes);
 
 //==============================================================================
 TYPED_TEST(BasicStringTest, SplitTest)
