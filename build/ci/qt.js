@@ -2,7 +2,7 @@
 // https://doc.qt.io/qtinstallerframework/noninteractive.html
 var QT_VERSION_MAJOR = '5';
 var QT_VERSION_MINOR = '13';
-var QT_VERSION_PATCH = '1';
+var QT_VERSION_PATCH = '2';
 var QT_VERSION = QT_VERSION_MAJOR + QT_VERSION_MINOR + QT_VERSION_PATCH;
 
 var QT_INSTALL_POINT_WINDOWS = 'C:\\Qt';

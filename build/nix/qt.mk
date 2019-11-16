@@ -18,19 +18,15 @@ QT_BIN := $(QT_INSTALL_POINT)/$(QT_VERSION)/gcc_64/bin
 QT_INC := $(QT_INSTALL_POINT)/$(QT_VERSION)/gcc_64/include
 QT_LIB := $(QT_INSTALL_POINT)/$(QT_VERSION)/gcc_64/lib
 
-QT_UIC := $(QT_BIN)/uic
-QT_MOC := $(QT_BIN)/moc
 QT_RCC := $(QT_BIN)/rcc
 
 QT_CFLAGS := \
     -fPIC \
     -I$(QT_INC)
 
-QT_LDFLAGS := -Wl,-rpath,$(QT_LIB) -L$(QT_LIB)
-QT_LDLIBS := \
-    -lQt$(QT_VERSION_MAJOR)Widgets \
-    -lQt$(QT_VERSION_MAJOR)Gui \
-    -lQt$(QT_VERSION_MAJOR)Core
+QT_LDFLAGS := \
+    -Wl,-rpath,$(QT_LIB) \
+    -L$(QT_LIB)
 
 ifeq ($(qt), 1)
 
