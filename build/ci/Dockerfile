@@ -1,8 +1,8 @@
-# docker image rm "trflynn89/libfly:ubuntu1910_gcc9_qt513"
-# docker build --tag "trflynn89/libfly:ubuntu1910_gcc9_qt513" -f Dockerfile .
-# docker push "trflynn89/libfly:ubuntu1910_gcc9_qt513"
+# docker image rm "trflynn89/libfly:ubuntu1910_gcc9_qt5132"
+# docker build --tag "trflynn89/libfly:ubuntu1910_gcc9_qt5132" .
+# docker push "trflynn89/libfly:ubuntu1910_gcc9_qt5132"
 #
-# docker run --cap-add SYS_PTRACE --name libfly -it trflynn89/libfly:ubuntu1910_gcc9_qt513
+# docker run --cap-add SYS_PTRACE --name libfly -it trflynn89/libfly:ubuntu1910_gcc9_qt5132
 # docker rm libfly
 FROM ubuntu:19.10
 
