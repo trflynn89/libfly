@@ -19,20 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="..\main_window.ui" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtRcc Include="..\example.qrc" />
+    <None Include="..\clocks.qml" />
+    <None Include="..\components\Clock.qml" />
+    <None Include="..\components\Hand.qml" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
-    <ClCompile Include="..\main_window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="..\main_window.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\green.png" />
+    <QtRcc Include="..\clocks.qrc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B12702AD-ABFB-343A-A199-8E24837244A3}</ProjectGuid>
@@ -65,20 +60,20 @@
     <QtMsBuild>$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <OutDir>$(ProjectDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
+    <IntDir>$(ProjectDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <OutDir>$(ProjectDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
+    <IntDir>$(ProjectDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <OutDir>$(ProjectDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
+    <IntDir>$(ProjectDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <OutDir>$(ProjectDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</OutDir>
+    <IntDir>$(ProjectDir)$(Configuration)-$(PlatformTarget)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
     <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
@@ -102,20 +97,20 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtModules>core;gui;widgets</QtModules>
-    <QtInstall>Qt_5.13.1_$(PlatformTarget)</QtInstall>
+    <QtModules>core;gui;qml</QtModules>
+    <QtInstall>Qt_5.13.2_$(PlatformTarget)</QtInstall>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="QtSettings">
-    <QtModules>core;gui;widgets</QtModules>
-    <QtInstall>Qt_5.13.1_$(PlatformTarget)</QtInstall>
+    <QtModules>core;gui;qml</QtModules>
+    <QtInstall>Qt_5.13.2_$(PlatformTarget)</QtInstall>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtModules>core;gui;widgets</QtModules>
-    <QtInstall>Qt_5.13.1_$(PlatformTarget)</QtInstall>
+    <QtModules>core;gui;qml</QtModules>
+    <QtInstall>Qt_5.13.2_$(PlatformTarget)</QtInstall>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="QtSettings">
-    <QtModules>core;gui;widgets</QtModules>
-    <QtInstall>Qt_5.13.1_$(PlatformTarget)</QtInstall>
+    <QtModules>core;gui;qml</QtModules>
+    <QtInstall>Qt_5.13.2_$(PlatformTarget)</QtInstall>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />
@@ -134,15 +129,6 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <QtUic>
-      <QtUicFileName>%(Filename).uic.h</QtUicFileName>
-    </QtUic>
-    <QtMoc>
-      <QtMocFileName>%(Filename).moc.cpp</QtMocFileName>
-    </QtMoc>
-    <QtRcc>
-      <QtRccFileName>%(Filename).rcc.cpp</QtRccFileName>
-    </QtRcc>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -158,15 +144,6 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <QtUic>
-      <QtUicFileName>%(Filename).uic.h</QtUicFileName>
-    </QtUic>
-    <QtMoc>
-      <QtMocFileName>%(Filename).moc.cpp</QtMocFileName>
-    </QtMoc>
-    <QtRcc>
-      <QtRccFileName>%(Filename).rcc.cpp</QtRccFileName>
-    </QtRcc>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -181,15 +158,6 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
-    <QtUic>
-      <QtUicFileName>%(Filename).uic.h</QtUicFileName>
-    </QtUic>
-    <QtMoc>
-      <QtMocFileName>%(Filename).moc.cpp</QtMocFileName>
-    </QtMoc>
-    <QtRcc>
-      <QtRccFileName>%(Filename).rcc.cpp</QtRccFileName>
-    </QtRcc>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -205,15 +173,6 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
-    <QtUic>
-      <QtUicFileName>%(Filename).uic.h</QtUicFileName>
-    </QtUic>
-    <QtMoc>
-      <QtMocFileName>%(Filename).moc.cpp</QtMocFileName>
-    </QtMoc>
-    <QtRcc>
-      <QtRccFileName>%(Filename).rcc.cpp</QtRccFileName>
-    </QtRcc>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -13,7 +13,6 @@
 // In new Qt projects, change the following project properties:
 //      Qt Project Settings > Qt Installation = Qt_5.13.2_$(PlatformTarget)
 //      Qt Project Settings > Qt Modules = core;gui;qml
-//      Qt Resource Compiler > Output File Name = %(Filename).qrc.cpp
 #elif defined(__linux__)
 extern "C"
 {
