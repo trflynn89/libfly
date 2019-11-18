@@ -205,8 +205,8 @@ $$(foreach dir, $$(SRC_DIRS_$$(d)), \
 # Define the compile rules
 $$(eval $$(call BIN_RULES, $(1), $(3)))
 $$(eval $$(call PKG_RULES, $(1), $(3), $(4)))
-$$(eval $$(call QT_RULES, $$(OBJ_DIR_$$(d)), $$(GEN_DIR_$$(d))))
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
+$$(eval $$(call QT_RULES, $$(OBJ_DIR_$$(d)), $$(GEN_DIR_$$(d))))
 
 # Include dependency files
 -include $$(DEP_$$(d))
