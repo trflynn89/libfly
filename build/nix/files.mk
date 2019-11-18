@@ -15,6 +15,9 @@ o_$(d) := $$(addprefix $$(OBJ_DIR_$(d)), $$(o_$(d)))
 OBJ_$$(strip $(1)) += $$(o_$(d))
 DEP_$(d) := $$(o_$(d):%.o=%.d)
 
+CFLAGS_$$(d) += -I$$(GEN_DIR_$(d))
+CXXFLAGS_$$(d) += -I$$(GEN_DIR_$(d))
+
 endef
 
 # Define output files for Qt targets.
