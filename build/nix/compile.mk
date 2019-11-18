@@ -13,6 +13,8 @@ LINK_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 SHARED_CC := $(Q)$(CC) $$(CFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
 SHARED_CXX := $(Q)$(CXX) $$(CXXFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
 
+UIC := $(Q)$(QT_UIC) $$< -o $$@
+MOC := $(Q)$(QT_MOC) $$< -o $$@
 RCC := $(Q)$(QT_RCC) $$< -o $$@
 
 STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
@@ -136,14 +138,32 @@ endef
 # $(2) = Path to directory where generated files should be placed.
 define QT_RULES
 
-.PRECIOUS: $(2)/%.qrc.cpp
+.PRECIOUS: $(2)/%.ui.h $(2)/%.moc.cpp $(2)/%.rcc.cpp
 
-$(1)/%.qrc.o: $(2)/%.qrc.cpp
+# UI files
+$(2)/%.uic.h: $(d)/%.ui $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
+	@echo "[UIC $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	$(UIC)
+
+# MOC files
+$(1)/%.moc.o: $(2)/%.moc.cpp
 	@mkdir -p $$(@D)
 	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
 
-$(2)/%.qrc.cpp: $(d)/%.qrc $$(MAKEFILES_$(d))
+$(2)/%.moc.cpp: $(d)/%.h $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
+	@echo "[MOC $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	$(MOC)
+
+# QRC files
+$(1)/%.rcc.o: $(2)/%.rcc.cpp
+	@mkdir -p $$(@D)
+	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	$(COMP_CXX)
+
+$(2)/%.rcc.cpp: $(d)/%.qrc $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo "[RCC $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(RCC)
@@ -156,6 +176,13 @@ endef
 #     LDLIBS_$(d) = The libraries to be linked in the target binary.
 #     SRC_$(d) = The sources to be built in the target binary.
 #
+# If the binary target is a Qt binary, the files.mk should also define:
+#
+#     QT_UI_$(d) = Any Qt user interface files.
+#     QT_MOC_$(d) = Any Qt meta-object header files.
+#     QT_QRC_$(d) = Any Qt resource collection files.
+#     QT_MODULES_$(d) = Any Qt modules to link.
+#
 # $(1) = The target's name.
 # $(2) = The path to the target root directory.
 # $(3) = The path to the target output libraries.
@@ -167,6 +194,8 @@ $$(eval $$(call PUSH_DIR, $(2)))
 
 # Define source, object, dependency, and binary files
 include $$(d)/files.mk
+$$(eval $$(call QT_OUT_FILES, $(1), \
+    $$(QT_UI_$$(d)), $$(QT_MOC_$$(d)), $$(QT_QRC_$$(d)), $$(QT_MODULES_$$(d))))
 $$(eval $$(call OBJ_OUT_FILES, $(1), $$(SRC_$$(d))))
 
 # Include the source directories
@@ -176,46 +205,7 @@ $$(foreach dir, $$(SRC_DIRS_$$(d)), \
 # Define the compile rules
 $$(eval $$(call BIN_RULES, $(1), $(3)))
 $$(eval $$(call PKG_RULES, $(1), $(3), $(4)))
-$$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
-
-# Include dependency files
--include $$(DEP_$$(d))
-
-# Pop current dir from stack
-$$(eval $$(call POP_DIR))
-
-endef
-
-# Define the rules to build a Qt target. The files.mk should define:
-#
-#     SRC_DIRS_$(d) = The source directories to include in the build.
-#     LDLIBS_$(d) = The libraries to be linked in the target binary.
-#     SRC_$(d) = The sources to be built in the target binary.
-#     QRC_$(d) = The Qt resource collection files.
-#     QT_MODULES_$(d) = The Qt modules to link.
-#
-# $(1) = The target's name.
-# $(2) = The path to the target root directory.
-# $(3) = The path to the target output libraries.
-# $(4) = The path to the target release package.
-define DEFINE_QT_RULES
-
-# Push current dir to stack
-$$(eval $$(call PUSH_DIR, $(2)))
-
-# Define source, object, dependency, and binary files
-include $$(d)/files.mk
-$$(eval $$(call OBJ_OUT_FILES, $(1), $$(SRC_$$(d))))
-$$(eval $$(call QT_OUT_FILES, $(1), $$(QRC_$$(d)), $$(QT_MODULES_$$(d))))
-
-# Include the source directories
-$$(foreach dir, $$(SRC_DIRS_$$(d)), \
-    $$(eval $$(call DEFINE_SRC_RULES, $(1), $$(dir))))
-
-# Define the compile rules
-$$(eval $$(call BIN_RULES, $(1), $(3)))
 $$(eval $$(call QT_RULES, $$(OBJ_DIR_$$(d)), $$(GEN_DIR_$$(d))))
-$$(eval $$(call PKG_RULES, $(1), $(3), $(4)))
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 
 # Include dependency files

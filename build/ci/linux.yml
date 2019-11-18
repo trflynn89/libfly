@@ -47,14 +47,14 @@ jobs:
     - ${{ if eq(parameters.arch, 'x64') }}:
       - script: |
           (cd /opt && sudo tar -xzf Qt.tar.gz)
-          make -j -C examples/qt release=$(release) arch=${{ parameters.arch }} libfly_qt_example
-          make -j -C examples/build release=$(release) arch=${{ parameters.arch }} libfly_build_example
+          make -j -C examples/qt release=$(release) arch=${{ parameters.arch }}
+          make -j -C examples/build release=$(release) arch=${{ parameters.arch }}
         displayName: 'Examples'
         failOnStderr: true
 
     - ${{ if eq(parameters.arch, 'x86') }}:
       - script: |
-          make -j -C examples/build release=$(release) arch=${{ parameters.arch }} libfly_build_example
+          make -j -C examples/build release=$(release) arch=${{ parameters.arch }}
         displayName: 'Examples'
         failOnStderr: true
 

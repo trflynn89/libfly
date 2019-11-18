@@ -18,6 +18,8 @@ QT_BIN := $(QT_INSTALL_POINT)/$(QT_VERSION)/gcc_64/bin
 QT_INC := $(QT_INSTALL_POINT)/$(QT_VERSION)/gcc_64/include
 QT_LIB := $(QT_INSTALL_POINT)/$(QT_VERSION)/gcc_64/lib
 
+QT_UIC := $(QT_BIN)/uic
+QT_MOC := $(QT_BIN)/moc
 QT_RCC := $(QT_BIN)/rcc
 
 QT_CFLAGS := \

@@ -10,7 +10,8 @@ VERSION = 1.0.0
 include /usr/src/fly/api.mk
 
 # Main targets
-$(eval $(call ADD_TARGET, libfly_qt_example, ., QT))
+$(eval $(call ADD_TARGET, libfly_qt_quick_example, qt_quick, BIN))
+$(eval $(call ADD_TARGET, libfly_qt_widget_example, qt_widget, BIN))
 
 # Import the build system
 include /usr/src/fly/build.mk

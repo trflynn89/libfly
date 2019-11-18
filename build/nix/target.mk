@@ -20,8 +20,6 @@ ifeq ($$(TARGET_TYPE_$$(t)), BIN)
     ifneq ($$(filter $(TEST_TARGETS), $$(t)),)
         TEST_BINARIES += $$(TARGET_FILE_$$(t))
     endif
-else ifeq ($$(TARGET_TYPE_$$(t)), QT)
-    TARGET_FILE_$$(t) := $(BIN_DIR)/$$(t)
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
     TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).so.$(VERSION)
     TARGET_FILE_$$(t) += $(LIB_DIR)/$$(t).a
@@ -39,9 +37,6 @@ $$(t): $$(TARGET_FILE_$$(t)) $$(TARGET_PACKAGE_$$(t))
 # Define the compilation goals for the target
 ifeq ($$(TARGET_TYPE_$$(t)), BIN)
     $(call DEFINE_BIN_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
-        $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
-else ifeq ($$(TARGET_TYPE_$$(t)), QT)
-    $(call DEFINE_QT_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
         $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
     $(call DEFINE_LIB_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
