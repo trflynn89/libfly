@@ -9,7 +9,7 @@ jobs:
       vmImage: ubuntu-latest
 
     container:
-      image: trflynn89/libfly:ubuntu1910_gcc9_qt513
+      image: trflynn89/libfly:ubuntu1910_gcc9_qt5132
       options: --cap-add SYS_PTRACE
 
     steps:
@@ -47,14 +47,14 @@ jobs:
     - ${{ if eq(parameters.arch, 'x64') }}:
       - script: |
           (cd /opt && sudo tar -xzf Qt.tar.gz)
-          make -j -C examples/qt release=$(release) arch=${{ parameters.arch }} libfly_qt_example
-          make -j -C examples/build release=$(release) arch=${{ parameters.arch }} libfly_build_example
+          make -j -C examples/qt release=$(release) arch=${{ parameters.arch }}
+          make -j -C examples/build release=$(release) arch=${{ parameters.arch }}
         displayName: 'Examples'
         failOnStderr: true
 
     - ${{ if eq(parameters.arch, 'x86') }}:
       - script: |
-          make -j -C examples/build release=$(release) arch=${{ parameters.arch }} libfly_build_example
+          make -j -C examples/build release=$(release) arch=${{ parameters.arch }}
         displayName: 'Examples'
         failOnStderr: true
 

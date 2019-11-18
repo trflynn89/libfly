@@ -26,11 +26,9 @@ QT_CFLAGS := \
     -fPIC \
     -I$(QT_INC)
 
-QT_LDFLAGS := -Wl,-rpath,$(QT_LIB) -L$(QT_LIB)
-QT_LDLIBS := \
-    -lQt$(QT_VERSION_MAJOR)Widgets \
-    -lQt$(QT_VERSION_MAJOR)Gui \
-    -lQt$(QT_VERSION_MAJOR)Core
+QT_LDFLAGS := \
+    -Wl,-rpath,$(QT_LIB) \
+    -L$(QT_LIB)
 
 ifeq ($(qt), 1)
 
