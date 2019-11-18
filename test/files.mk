@@ -45,5 +45,4 @@ LDFLAGS_$(d) += \
 # Define libraries to link
 LDLIBS_$(d) := \
     -latomic \
-    -lpthread \
-    -lstdc++fs
+    -lpthread
