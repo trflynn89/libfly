@@ -54,6 +54,7 @@ RUN apt-get update && \
     (cd /tmp && curl -O $QT_URL/$QT_INSTALLER) && \
     chmod +x /tmp/$QT_INSTALLER && \
     /tmp/$QT_INSTALLER --platform minimal --script /tmp/qt.js && \
+    rm -rf /opt/Qt/Docs /opt/Qt/Examples /opt/Qt/Licenses /opt/Qt/Tools && \
     (cd /opt && tar -czf Qt.tar.gz Qt) && \
     \
     # Cleanup
