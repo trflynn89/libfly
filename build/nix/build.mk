@@ -93,14 +93,25 @@ ifeq ($(HOST), DEBIAN)
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) apt-get install -y gcc-multilib g++-multilib
 endif
-
 ifeq ($(qt), 1)
 	$(Q)$(SUDO) apt-get install -y mesa-common-dev
-	$(Q)$(QT_INSTALL)
 endif
+
+else ifeq ($(HOST), REDHAT)
+	$(Q)$(SUDO) dnf install -y git make gcc gcc-c++ clang llvm \
+		libstdc++-static libasan libatomic
+ifeq ($(arch), x86)
+	$(Q)$(SUDO) dnf install -y glibc-devel.i686 \
+		libstdc++-static.i686 libasan.i686 libatomic.i686
+endif
+
 else
 	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"
 	$(Q)exit 1
+endif
+
+ifeq ($(qt), 1)
+	$(Q)$(QT_INSTALL)
 endif
 
 # Style enforcement

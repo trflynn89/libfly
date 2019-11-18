@@ -27,6 +27,8 @@ INSTALL_LIB_DIR := /usr/lib
 # Determine host operating system
 ifneq ($(wildcard /etc/debian_version),)
     HOST := DEBIAN
+else ifneq ($(wildcard /etc/redhat-release),)
+    HOST := REDHAT
 else
     $(error Could not determine host operating system, check system.mk)
 endif
