@@ -22,7 +22,7 @@ function Controller()
     if (installer.fileExists('C:'))
     {
         QT_INSTALL_POINT = QT_INSTALL_POINT_WINDOWS;
-        QT_COMPONENTS = ['win32_msvc2017', 'win64_msvc2017_64'];
+        QT_COMPONENTS = ['win64_msvc2017_64'];
     }
     else
     {

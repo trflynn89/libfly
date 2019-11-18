@@ -3,7 +3,7 @@
 #include <QtWidgets/QMainWindow>
 #include <memory>
 
-#include "qt_widget/main_window.uic.h"
+#include "main_window.uic.h"
 
 namespace fly {
 
