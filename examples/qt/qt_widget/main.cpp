@@ -12,7 +12,7 @@
 //
 // In new Qt projects, change the following project properties:
 //      Qt Project Settings > Qt Installation = Qt_5.13.2
-//      Qt Project Settings > Qt Modules = core;gui;widgets
+//      Qt Project Settings > Qt Modules = core;gui;printsupport;widgets
 //      Qt Meta-Object Compiler > Output File Name = %(Filename).moc.cpp
 //      Qt Resource Compiler > Output File Name = %(Filename).rcc.cpp
 //      Qt User Interface Compiler > Output File Name = %(Filename).uic.h

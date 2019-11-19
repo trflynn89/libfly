@@ -15,6 +15,9 @@
       <Extensions>qrc;*</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
+    <Filter Include="Source Files\components">
+      <UniqueIdentifier>{015c68f8-21a0-4627-94bf-f72bbc265232}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="clocks.qrc">
@@ -29,6 +32,12 @@
   <ItemGroup>
     <None Include="clocks.qml">
       <Filter>Source Files</Filter>
+    </None>
+    <None Include="components\Clock.qml">
+      <Filter>Source Files\components</Filter>
+    </None>
+    <None Include="components\Hand.qml">
+      <Filter>Source Files\components</Filter>
     </None>
   </ItemGroup>
 </Project>

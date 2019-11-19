@@ -11,17 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="example.qrc" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="main_window.cpp" />
+    <ClCompile Include="notepad.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="main_window.h" />
+    <QtMoc Include="notepad.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="main_window.ui" />
+    <QtRcc Include="notepad.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="notepad.ui" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7BE2B141-BEE8-48DC-9D65-07CA5F04E4AE}</ProjectGuid>
@@ -66,11 +66,11 @@
   </ImportGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <QtInstall>Qt_5.13.2</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;printsupport;widgets</QtModules>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <QtInstall>Qt_5.13.2</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;printsupport;widgets</QtModules>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />
