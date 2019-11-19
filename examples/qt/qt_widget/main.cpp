@@ -1,8 +1,6 @@
-#include <QtGui/QtGui>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QLabel>
 
-#include "main_window.h"
+#include "notepad.h"
 
 #if defined(_WIN32)
 // Requires "Qt Visual Studio Tools" extension:
@@ -14,7 +12,7 @@
 //
 // In new Qt projects, change the following project properties:
 //      Qt Project Settings > Qt Installation = Qt_5.13.2
-//      Qt Project Settings > Qt Modules = core;gui;widgets
+//      Qt Project Settings > Qt Modules = core;gui;printsupport;widgets
 //      Qt Meta-Object Compiler > Output File Name = %(Filename).moc.cpp
 //      Qt Resource Compiler > Output File Name = %(Filename).rcc.cpp
 //      Qt User Interface Compiler > Output File Name = %(Filename).uic.h
@@ -27,6 +25,7 @@ extern "C"
     {
         return R"(
             leak:libfontconfig
+            leak:libglib
             leak:libGLX_mesa
         )";
     }
@@ -45,12 +44,9 @@ extern "C"
 int main(int argc, char **argv)
 {
     QApplication application(argc, argv);
-    fly::MainWindow window;
 
-    QLabel label(&window);
-    label.setPixmap(QPixmap(":/green.png"));
-
-    window.show();
+    Notepad notepad;
+    notepad.show();
 
     return application.exec();
 }

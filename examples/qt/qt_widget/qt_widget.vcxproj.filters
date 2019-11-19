@@ -25,25 +25,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="example.qrc">
-      <Filter>Resource Files</Filter>
-    </QtRcc>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main_window.cpp">
+    <ClCompile Include="notepad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="main_window.h">
+    <QtMoc Include="notepad.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="main_window.ui">
+    <QtRcc Include="notepad.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="notepad.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

@@ -62,14 +62,16 @@ DisableFormat: false
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '^"(fly|test)/'
+  - Regex: '^(<|")(fly|test)/'
     Priority: 2
-  - Regex: '^((<|")(gtest|gmock)/)'
+  - Regex: '^(<|")(Qt[[:alnum:]]+)/'
     Priority: 3
-  - Regex: '<[[:alnum:]./_]+\.h>'
+  - Regex: '^(<|")(gtest|gmock)/'
     Priority: 4
-  - Regex: '<[[:alnum:]./_]+>'
+  - Regex: '<[[:alnum:]./_]+\.h>'
     Priority: 5
+  - Regex: '<[[:alnum:]./_]+>'
+    Priority: 6
 IndentCaseLabels: true
 IndentGotoLabels: false
 IndentPPDirectives: AfterHash

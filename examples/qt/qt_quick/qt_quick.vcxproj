@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="clocks.qml" />
+    <None Include="components\Clock.qml" />
+    <None Include="components\Hand.qml" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="clocks.qrc" />
