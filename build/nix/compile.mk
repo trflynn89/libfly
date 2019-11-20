@@ -96,8 +96,12 @@ $(3): REL_LIB_DIR := $$(REL_LIB_DIR_$$(t))
 $(3): REL_INC_DIR := $$(REL_INC_DIR_$$(t))
 $(3): REL_SRC_DIR := $$(REL_SRC_DIR_$$(t))
 
+ifeq ($$(REL_CMDS_$$(t)), )
+$(3):
+else
 $(3): $(2) $$(MAKEFILES_$(d))
 	$(Q)$$(BUILD_REL)
+endif
 
 endef
 
