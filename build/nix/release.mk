@@ -38,9 +38,9 @@ define BUILD_REL
     echo "#!/usr/bin/env bash" > $(REL_BIN_DIR)/uninstall_$(REL_NAME); \
     chmod 755 $(REL_BIN_DIR)/uninstall_$(REL_NAME); \
     \
-    for f in `find . ! -type d` ; do \
-        echo $(RM) $${f:1} >> $(REL_BIN_DIR)/uninstall_$(REL_NAME); \
-    done; \
+    files="$(subst $(ETC_TMP_DIR),,$(REL_UNINSTALL))"; \
+    files="$$files $(INSTALL_BIN_DIR)/uninstall_$(REL_NAME)"; \
+    echo $(RM) -r $$files >> $(REL_BIN_DIR)/uninstall_$(REL_NAME); \
     \
     tar $(TAR_CREATE_FLAGS) $@ *; \
     $(RM) -r $(ETC_TMP_DIR)
@@ -88,6 +88,8 @@ $(eval $(call ADD_REL_CMD, $(1), cp -f $(BIN_DIR)/$(t) $(REL_BIN_DIR_$(t))))
 $(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_BIN_DIR_$(t))/$(t)))
 $(eval $(call ADD_REL_CMD, $(1), chmod 755 $(REL_BIN_DIR_$(t))/$(t)))
 
+REL_UNINSTALL_$(t) += $(REL_BIN_DIR_$(t))/$(t)
+
 endef
 
 # Add a shared library file to release package. The file will have its symbols
@@ -102,6 +104,8 @@ $(eval $(call SET_REL_VAR, $(1)))
 $(eval $(call ADD_REL_CMD, $(1), cp -f $(LIB_DIR)/$(t).* $(REL_LIB_DIR_$(t))))
 $(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_LIB_DIR_$(t))/$(t).*))
 
+REL_UNINSTALL_$(t) += $(REL_LIB_DIR_$(t))/$(t)*
+
 endef
 
 # Add all header files under a directory to the release package.
@@ -112,8 +116,14 @@ endef
 # $(4) = Header file destination.
 define ADD_REL_INC
 
+t := $(strip $(1))
+
 $(eval $(call SET_REL_VAR, $(1)))
-$(eval $(call ADD_REL_CMD, $(1), rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' $(2)/ $(REL_INC_DIR_$(t))/$(strip $(4))))
+$(eval $(call ADD_REL_CMD, $(1), \
+    rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' \
+    $(2)/ $(REL_INC_DIR_$(t))/$(strip $(4))))
+
+REL_UNINSTALL_$(t) += $(REL_INC_DIR_$(t))/$(strip $(4))
 
 endef
 
@@ -125,7 +135,13 @@ endef
 # $(4) = Source file destination.
 define ADD_REL_SRC
 
+t := $(strip $(1))
+
 $(eval $(call SET_REL_VAR, $(1)))
-$(eval $(call ADD_REL_CMD, $(1), rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' $(2)/ $(REL_SRC_DIR_$(t))/$(strip $(4))))
+$(eval $(call ADD_REL_CMD, $(1), \
+    rsync -am --include='$(strip $(3))' -f 'hide$(COMMA)! */' \
+    $(2)/ $(REL_SRC_DIR_$(t))/$(strip $(4))))
+
+REL_UNINSTALL_$(t) += $(REL_SRC_DIR_$(t))/$(strip $(4))
 
 endef

@@ -12,13 +12,11 @@ LINK_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 
 SHARED_CC := $(Q)$(CC) $$(CFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
 SHARED_CXX := $(Q)$(CXX) $$(CXXFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
+STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
 
 UIC := $(Q)$(QT_UIC) $$< -o $$@
 MOC := $(Q)$(QT_MOC) $$< -o $$@
 RCC := $(Q)$(QT_RCC) $$< -o $$@
-
-STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
-STRIP := $(Q)strip $$@
 
 # Link a binary target from a set of object files.
 #
@@ -41,11 +39,6 @@ $(2): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 
 	@echo "[Link $$(subst $(CURDIR)/,,$$@)]"
 	$(LINK_CXX)
-
-ifeq ($(release),1)
-	@echo "[Strip $$(subst $(CURDIR)/,,$$@)]"
-	$(STRIP)
-endif
 
 endef
 
@@ -85,6 +78,12 @@ define PKG_RULES
 
 t := $$(strip $(1))
 
+ifeq ($$(REL_CMDS_$$(t)),)
+
+$(3):
+
+else
+
 # Force repackaging if any build files change
 MAKEFILES_$(d) := $(BUILD_ROOT)/*.mk
 
@@ -95,12 +94,11 @@ $(3): REL_BIN_DIR := $$(REL_BIN_DIR_$$(t))
 $(3): REL_LIB_DIR := $$(REL_LIB_DIR_$$(t))
 $(3): REL_INC_DIR := $$(REL_INC_DIR_$$(t))
 $(3): REL_SRC_DIR := $$(REL_SRC_DIR_$$(t))
+$(3): REL_UNINSTALL := $$(REL_UNINSTALL_$$(t))
 
-ifeq ($$(REL_CMDS_$$(t)), )
-$(3):
-else
 $(3): $(2) $$(MAKEFILES_$(d))
 	$(Q)$$(BUILD_REL)
+
 endif
 
 endef
@@ -142,7 +140,7 @@ endef
 # $(2) = Path to directory where generated files should be placed.
 define QT_RULES
 
-.PRECIOUS: $(2)/%.ui.h $(2)/%.moc.cpp $(2)/%.rcc.cpp
+.PRECIOUS: $(2)/%.uic.h $(2)/%.moc.cpp $(2)/%.rcc.cpp
 
 # UI files
 $(2)/%.uic.h: $(d)/%.ui $$(MAKEFILES_$(d))
