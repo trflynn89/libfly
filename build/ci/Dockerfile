@@ -36,19 +36,10 @@ RUN apt-get update && \
         libx11-xcb1 \
         mesa-common-dev \
         \
-        # Temporary until more recent LCOV is available in apt
-        git \
-        libperlio-gzip-perl \
-        libjson-perl \
         && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/$CC 1 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/$CXX 1 && \
     update-alternatives --install /usr/bin/gcov gcov /usr/bin/$GCOV 1 && \
-    \
-    # Replace LCOV with a more recent version that supports GCC 9
-    git clone https://github.com/linux-test-project/lcov.git && \
-    (cd lcov && git reset --hard 75fbae1cfc5027f818a0bb865bf6f96fab3202da) && \
-    (cd lcov && make install) && \
     \
     # Install and compress Qt
     (cd /tmp && curl -O $QT_URL/$QT_INSTALLER) && \
@@ -61,4 +52,4 @@ RUN apt-get update && \
     apt-get clean -y && \
     apt-get autoremove -y && \
     apt-get purge -y && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /opt/Qt lcov
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /opt/Qt
