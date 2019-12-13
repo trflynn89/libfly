@@ -10,6 +10,7 @@ extern "C"
     {
         return R"(
             leak:libfontconfig
+            leak:libGLX_mesa
             leak:libQt5Core
             leak:libQt5Qml
             leak:libQt5QuickTemplates2
