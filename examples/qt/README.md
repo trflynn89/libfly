@@ -30,8 +30,8 @@ extension. Once installed, open Extensions > Qt VS Tools > Qt Options and add
 the Qt installation with the following options (adapted for the version actually
 installed):
 
-    Name: Qt_5.13.2
-    Path: C:\Qt\5.13.2\msvc2017_64
+    Name: Qt_5.14.0
+    Path: C:\Qt\5.14.0\msvc2017_64
 
 ## qt_quick
 
