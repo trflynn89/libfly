@@ -10,9 +10,6 @@ arch := $(arch)
 # Enable verbose builds
 verbose := 0
 
-# Whether to install Qt during setup
-qt := 0
-
 # Define the output directories
 ifeq ($(release), 1)
     OUT_DIR := $(CURDIR)/release-$(arch)

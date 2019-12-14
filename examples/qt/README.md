@@ -14,10 +14,7 @@ located [here](../build/ci/qt.js).
 
 Automated installation of Qt on Linux is provided by the command:
 
-    make -C libfly/build/nix qt=1 setup
-
-By default, Qt is not installed with `make setup`. Adding `qt=1` to the `setup`
-target enables Qt.
+    make -C libfly/build/nix qt
 
 ### Windows
 
