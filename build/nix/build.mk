@@ -9,6 +9,7 @@
 .PHONY: gcov
 .PHONY: install
 .PHONY: setup
+.PHONY: qt
 .PHONY: style
 .PHONY: $(TARGETS)
 
@@ -93,9 +94,6 @@ ifeq ($(HOST), DEBIAN)
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) apt-get install -y gcc-multilib g++-multilib
 endif
-ifeq ($(qt), 1)
-	$(Q)$(SUDO) apt-get install -y mesa-common-dev
-endif
 
 else ifeq ($(HOST), REDHAT)
 	$(Q)$(SUDO) dnf install -y git make gcc gcc-c++ clang llvm \
@@ -110,9 +108,18 @@ else
 	$(Q)exit 1
 endif
 
-ifeq ($(qt), 1)
-	$(Q)$(QT_INSTALL)
+# Install Qt
+qt:
+# The x86 Qt installer has not been updated since 2017, and only supports up to
+# Qt 5.5. But Qt 5.13+ is needed for C++17, so only x64 Qt projects are allowed.
+ifeq ($(arch), x86)
+	$(error Architecture $(arch) not supported, check qt.mk)
 endif
+
+ifeq ($(HOST), DEBIAN)
+	$(Q)$(SUDO) apt-get install -y mesa-common-dev
+endif
+	$(Q)$(QT_INSTALL)
 
 # Style enforcement
 style:
