@@ -46,7 +46,8 @@ Controller.prototype.IntroductionPageCallback = function()
     gui.clickButton(buttons.NextButton);
 }
 
-Controller.prototype.DynamicTelemetryPluginFormCallback = function() {
+Controller.prototype.DynamicTelemetryPluginFormCallback = function()
+{
     var widget = gui.currentPageWidget();
 
     if (widget)

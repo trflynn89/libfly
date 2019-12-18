@@ -2,7 +2,7 @@
 #include "fly/coders/huffman/huffman_decoder.h"
 #include "fly/coders/huffman/huffman_encoder.h"
 #include "fly/types/bit_stream/bit_stream_writer.h"
-#include "fly/types/literals.h"
+#include "fly/types/literals/literals.h"
 #include "fly/types/string/string.h"
 #include "test/util/path_util.h"
 
