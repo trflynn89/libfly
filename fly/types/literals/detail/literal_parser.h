@@ -6,7 +6,7 @@
 namespace fly::detail {
 
 /**
- * Structure to recursively aggregate the value of an integer literal as it is
+ * Structures to recursively aggregate the value of an integer literal as it is
  * being parsed.
  *
  * @tparam T The desired integer literal type.
@@ -78,7 +78,7 @@ struct aggregator<T, Base>
 };
 
 /**
- * Structure to parse a sequence of characters and convert the result to an
+ * Structures to parse a sequence of characters and convert the result to an
  * integer literal of a desired type.
  *
  * Parsing occurs in two phases. First, any base-specifying prefix is parsed.
@@ -87,63 +87,50 @@ struct aggregator<T, Base>
  * converted to the desired type.
  *
  * @tparam T The desired integer literal type.
+ * @tparam Base The base of the integer literal being parsed.
  * @tparam Literals Variadic list of characters to parse.
  */
-template <typename T, char... Literals>
-struct parser
+template <typename T, T Base, char... Literals>
+struct parser_base
 {
     static constexpr T parse()
     {
-        return aggregator<T, 10, Literals...>::aggregate(0);
+        return aggregator<T, Base, Literals...>::aggregate(static_cast<T>(0));
     }
+};
+
+// Decimal specializations.
+template <typename T, char... Literals>
+struct parser : parser_base<T, 10, Literals...>
+{
 };
 
 // Binary specializations.
 template <typename T, char... Literals>
-struct parser<T, '0', 'b', Literals...>
+struct parser<T, '0', 'b', Literals...> : parser_base<T, 2, Literals...>
 {
-    static constexpr T parse()
-    {
-        return aggregator<T, 2, Literals...>::aggregate(0);
-    }
 };
 
 template <typename T, char... Literals>
-struct parser<T, '0', 'B', Literals...>
+struct parser<T, '0', 'B', Literals...> : parser_base<T, 2, Literals...>
 {
-    static constexpr T parse()
-    {
-        return aggregator<T, 2, Literals...>::aggregate(0);
-    }
 };
 
 // Octal specializations.
 template <typename T, char... Literals>
-struct parser<T, '0', Literals...>
+struct parser<T, '0', Literals...> : parser_base<T, 8, Literals...>
 {
-    static constexpr T parse()
-    {
-        return aggregator<T, 8, Literals...>::aggregate(0);
-    }
 };
 
 // Hexadecimal specializations.
 template <typename T, char... Literals>
-struct parser<T, '0', 'x', Literals...>
+struct parser<T, '0', 'x', Literals...> : parser_base<T, 16, Literals...>
 {
-    static constexpr T parse()
-    {
-        return aggregator<T, 16, Literals...>::aggregate(0);
-    }
 };
 
 template <typename T, char... Literals>
-struct parser<T, '0', 'X', Literals...>
+struct parser<T, '0', 'X', Literals...> : parser_base<T, 16, Literals...>
 {
-    static constexpr T parse()
-    {
-        return aggregator<T, 16, Literals...>::aggregate(0);
-    }
 };
 
 /**

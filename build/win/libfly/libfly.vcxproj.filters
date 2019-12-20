@@ -58,6 +58,12 @@
     <Filter Include="types\json">
       <UniqueIdentifier>{bfa6bd3d-8450-44d6-a6bc-6698efb4b424}</UniqueIdentifier>
     </Filter>
+    <Filter Include="types\literals">
+      <UniqueIdentifier>{cfc77282-c027-488a-913f-a1b9df5289ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="types\literals\detail">
+      <UniqueIdentifier>{36bd2c09-4512-489f-81e5-9bbec6d07e6e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="types\string">
       <UniqueIdentifier>{56316664-18ad-4ca4-819d-e81532ac2df6}</UniqueIdentifier>
     </Filter>
@@ -202,8 +208,11 @@
     <ClInclude Include="..\..\..\fly\types\json\json_traits.h">
       <Filter>types\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\literals.h">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\fly\types\literals\detail\literal_parser.h">
+      <Filter>types\literals\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\literals\literals.h">
+      <Filter>types\literals</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\string.h">
       <Filter>types\string</Filter>
