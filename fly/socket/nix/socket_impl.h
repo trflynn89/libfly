@@ -44,8 +44,8 @@ public:
 
 protected:
     size_t Send(const std::string &, bool &) const noexcept override;
-    size_t SendTo(const std::string &, address_type, port_type, bool &)
-        const noexcept override;
+    size_t SendTo(const std::string &, address_type, port_type, bool &) const
+        noexcept override;
 
     std::string Recv(bool &, bool &) const noexcept override;
     std::string RecvFrom(bool &, bool &) const noexcept override;
