@@ -8,8 +8,9 @@
 namespace fly {
 
 //==============================================================================
-ParserException::ParserException(int line, const std::string &message) noexcept
-    :
+ParserException::ParserException(
+    int line,
+    const std::string &message) noexcept :
     m_message(String::Format(
         "ParserException: Error parsing at [line %d]: %s",
         line,

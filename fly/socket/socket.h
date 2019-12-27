@@ -238,8 +238,8 @@ public:
      *
      * @return The number of bytes sent.
      */
-    std::size_t
-    SendTo(const std::string &, address_type, port_type) const noexcept;
+    std::size_t SendTo(const std::string &, address_type, port_type) const
+        noexcept;
 
     /**
      * Write data on the socket.
@@ -340,8 +340,8 @@ protected:
      * @return The number of bytes sent.
      */
     virtual std::size_t
-    SendTo(const std::string &, address_type, port_type, bool &)
-        const noexcept = 0;
+    SendTo(const std::string &, address_type, port_type, bool &) const
+        noexcept = 0;
 
     /**
      * Write data on the socket.
@@ -354,8 +354,8 @@ protected:
      * @return The number of bytes sent.
      */
     std::size_t
-    SendTo(const std::string &, const std::string &, port_type, bool &)
-        const noexcept;
+    SendTo(const std::string &, const std::string &, port_type, bool &) const
+        noexcept;
 
     /**
      * Read data on this socket until the end-of-message character is received.
