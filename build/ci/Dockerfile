@@ -35,6 +35,7 @@ RUN apt-get update && \
         \
         # Install Qt dependencies
         libdbus-1-dev \
+        libgl1 \
         libglib2.0-0 \
         libx11-xcb1 \
         mesa-common-dev \
