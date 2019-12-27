@@ -1,29 +1,32 @@
-# docker image rm "trflynn89/libfly:ubuntu1910_gcc9_qt5140"
-# docker build --tag "trflynn89/libfly:ubuntu1910_gcc9_qt5140" .
-# docker push "trflynn89/libfly:ubuntu1910_gcc9_qt5140"
+# docker image rm "trflynn89/libfly:ubuntu1910_clang9_gcc9_qt5140"
+# docker build --tag "trflynn89/libfly:ubuntu1910_clang9_gcc9_qt5140" .
+# docker push "trflynn89/libfly:ubuntu1910_clang9_gcc9_qt5140"
 #
-# docker run --cap-add SYS_PTRACE --name libfly -it trflynn89/libfly:ubuntu1910_gcc9_qt5140
+# docker run --cap-add SYS_PTRACE --name libfly -it trflynn89/libfly:ubuntu1910_clang9_gcc9_qt5140
 # docker rm libfly
 FROM ubuntu:19.10
 
 MAINTAINER Timothy Flynn <trflynn89@pm.me>
 
-ENV CC gcc-9
-ENV CXX g++-9
-ENV GCOV gcov-9
+ARG CLANG_VERSION=9
+ARG GCC_VERSION=9
 
-ARG QT_INSTALLER=qt-unified-linux-x64-online.run
 ARG QT_URL=http://qt.mirror.constant.com/official_releases/online_installers
+ARG QT_INSTALLER=qt-unified-linux-x64-online.run
 
 COPY qt.js /tmp/qt.js
 
 RUN apt-get update && \
     apt-get install -y \
         # Install build dependencies
-        $CC \
-        $CC-multilib \
-        $CXX \
-        $CXX-multilib \
+        clang-$CLANG_VERSION \
+        llvm-$CLANG_VERSION \
+        \
+        gcc-$GCC_VERSION \
+        gcc-$GCC_VERSION-multilib \
+        g++-$GCC_VERSION \
+        g++-$GCC_VERSION-multilib \
+        \
         curl \
         lcov \
         make \
@@ -37,9 +40,18 @@ RUN apt-get update && \
         mesa-common-dev \
         \
         && \
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/$CC 1 && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/$CXX 1 && \
-    update-alternatives --install /usr/bin/gcov gcov /usr/bin/$GCOV 1 && \
+    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-$CLANG_VERSION 1 && \
+    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-$CLANG_VERSION 1 && \
+    update-alternatives --install /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-$CLANG_VERSION 1 && \
+    \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GCC_VERSION 1 && \
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-$GCC_VERSION 1 && \
+    update-alternatives --install /usr/bin/gcc-gcov gcov /usr/bin/gcov-$GCC_VERSION 1 && \
+    \
+    # Create lcov wrapper script for clang
+    echo '#!/usr/bin/env sh' > /usr/bin/clang-gcov && \
+    echo 'exec llvm-cov gcov "$@"' >> /usr/bin/clang-gcov && \
+    chmod +x /usr/bin/clang-gcov && \
     \
     # Install and compress Qt
     (cd /tmp && curl -O $QT_URL/$QT_INSTALLER) && \

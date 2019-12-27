@@ -65,7 +65,6 @@ MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 	@mkdir -p $$(@D)
 	@echo "[Shared $$(subst $(CURDIR)/,,$$@)]"
 	$(SHARED_CXX)
-	$(STRIP)
 
 endef
 

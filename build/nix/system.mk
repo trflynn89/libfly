@@ -8,7 +8,7 @@ SUPPORTED_ARCH := x64 x86
 
 ifneq ($(findstring x86_64, $(SYSTEM)),)
     arch := x64
-else ifeq ($(arch),x64)
+else ifeq ($(arch), x64)
     $(error Cannot build 64-bit architecture on 32-bit machine)
 else
     arch := x86

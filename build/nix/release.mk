@@ -85,7 +85,7 @@ t := $(strip $(1))
 
 $(eval $(call SET_REL_VAR, $(1)))
 $(eval $(call ADD_REL_CMD, $(1), cp -f $(BIN_DIR)/$(t) $(REL_BIN_DIR_$(t))))
-$(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_BIN_DIR_$(t))/$(t)))
+$(eval $(call ADD_REL_CMD, $(1), $(STRIP) -s $(REL_BIN_DIR_$(t))/$(t)))
 $(eval $(call ADD_REL_CMD, $(1), chmod 755 $(REL_BIN_DIR_$(t))/$(t)))
 
 REL_UNINSTALL_$(t) += $(REL_BIN_DIR_$(t))/$(t)
@@ -102,7 +102,7 @@ t := $(strip $(1))
 
 $(eval $(call SET_REL_VAR, $(1)))
 $(eval $(call ADD_REL_CMD, $(1), cp -f $(LIB_DIR)/$(t).* $(REL_LIB_DIR_$(t))))
-$(eval $(call ADD_REL_CMD, $(1), strip -s $(REL_LIB_DIR_$(t))/$(t).*))
+$(eval $(call ADD_REL_CMD, $(1), $(STRIP) -s $(REL_LIB_DIR_$(t))/$(t).*))
 
 REL_UNINSTALL_$(t) += $(REL_LIB_DIR_$(t))/$(t)*
 
