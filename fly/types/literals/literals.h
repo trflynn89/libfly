@@ -23,56 +23,56 @@
  * @version December 15, 2019
  */
 
-template <char... Digits>
+template <char... Literals>
 constexpr inline std::int8_t operator"" _i8()
 {
-    return fly::detail::literal<std::int8_t, Digits...>();
+    return fly::detail::literal<std::int8_t, Literals...>();
 }
 
-template <char... Digits>
+template <char... Literals>
 constexpr inline std::int16_t operator"" _i16()
 {
-    return fly::detail::literal<std::int16_t, Digits...>();
+    return fly::detail::literal<std::int16_t, Literals...>();
 }
 
-template <char... Digits>
+template <char... Literals>
 constexpr inline std::int32_t operator"" _i32()
 {
-    return fly::detail::literal<std::int32_t, Digits...>();
+    return fly::detail::literal<std::int32_t, Literals...>();
 }
 
-template <char... Digits>
+template <char... Literals>
 constexpr inline std::int64_t operator"" _i64()
 {
-    return fly::detail::literal<std::int64_t, Digits...>();
+    return fly::detail::literal<std::int64_t, Literals...>();
 }
 
-template <char... Digits>
+template <char... Literals>
 constexpr inline std::uint8_t operator"" _u8()
 {
-    return fly::detail::literal<std::uint8_t, Digits...>();
+    return fly::detail::literal<std::uint8_t, Literals...>();
 }
 
-template <char... Digits>
+template <char... Literals>
 constexpr inline std::uint16_t operator"" _u16()
 {
-    return fly::detail::literal<std::uint16_t, Digits...>();
+    return fly::detail::literal<std::uint16_t, Literals...>();
 }
 
-template <char... Digits>
+template <char... Literals>
 constexpr inline std::uint32_t operator"" _u32()
 {
-    return fly::detail::literal<std::uint32_t, Digits...>();
+    return fly::detail::literal<std::uint32_t, Literals...>();
 }
 
-template <char... Digits>
+template <char... Literals>
 constexpr inline std::uint64_t operator"" _u64()
 {
-    return fly::detail::literal<std::uint64_t, Digits...>();
+    return fly::detail::literal<std::uint64_t, Literals...>();
 }
 
-template <char... Digits>
+template <char... Literals>
 constexpr inline std::size_t operator"" _zu()
 {
-    return fly::detail::literal<std::size_t, Digits...>();
+    return fly::detail::literal<std::size_t, Literals...>();
 }

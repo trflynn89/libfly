@@ -23,22 +23,28 @@ struct aggregator<T, Base, Digit, Literals...>
 {
     constexpr static T aggregate(T aggregated)
     {
-        constexpr T digit = parse_and_validate_literal();
-        static_assert(digit < Base, "Invalid literal for base");
-
         return aggregator<T, Base, Literals...>::aggregate(
-            aggregated * Base + digit);
+            aggregated * Base + parse_and_validate_literal());
     }
 
 private:
     /**
      * Convert the current character being parsed to an integer literal.
-     * Validate that the character is valid.
+     * Validate that the character fits within its base.
      *
      * @return T The result of conversion.
      */
     constexpr static T parse_and_validate_literal()
     {
+        constexpr bool literal_is_valid_for_base =
+            ((Base == 2) && ((Digit >= '0') && (Digit <= '1'))) ||
+            ((Base == 8) && ((Digit >= '0') && (Digit <= '7'))) ||
+            ((Base == 10) && ((Digit >= '0') && (Digit <= '9'))) ||
+            ((Base == 16) && ((Digit >= '0') && (Digit <= '9'))) ||
+            ((Base == 16) && ((Digit >= 'A') && (Digit <= 'F'))) ||
+            ((Base == 16) && ((Digit >= 'a') && (Digit <= 'f')));
+        static_assert(literal_is_valid_for_base, "Invalid literal for base");
+
         if constexpr ((Digit >= 'A') && (Digit <= 'F'))
         {
             return static_cast<T>(Digit) - static_cast<T>('A') + 0xA;
@@ -49,7 +55,6 @@ private:
         }
         else
         {
-            static_assert((Digit >= '0') && (Digit <= '9'), "Invalid literal");
             return static_cast<T>(Digit) - static_cast<T>('0');
         }
     }
@@ -82,7 +87,7 @@ struct aggregator<T, Base>
  * integer literal of a desired type.
  *
  * Parsing occurs in two phases. First, any base-specifying prefix is parsed.
- * By default, base-10 is assumed. Specializations are used for other bases.
+ * By default, base-10 is assumed, and specializations are used for other bases.
  * Next, the remaining characters are parsed base on the determined base and
  * converted to the desired type.
  *
@@ -99,7 +104,7 @@ struct parser_base
     }
 };
 
-// Decimal specializations.
+// Decimal default.
 template <typename T, char... Literals>
 struct parser : parser_base<T, 10, Literals...>
 {
