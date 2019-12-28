@@ -45,22 +45,18 @@ RUN apt-get update && \
     update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-$CLANG_VERSION 1 && \
     update-alternatives --install /usr/bin/llvm-ar llvm-ar /usr/bin/llvm-ar-$CLANG_VERSION 1 && \
     update-alternatives --install /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-$CLANG_VERSION 1 && \
+    update-alternatives --install /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-$CLANG_VERSION 1 && \
     update-alternatives --install /usr/bin/llvm-strip llvm-strip /usr/bin/llvm-strip-$CLANG_VERSION 1 && \
     \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GCC_VERSION 1 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-$GCC_VERSION 1 && \
-    update-alternatives --install /usr/bin/gcc-gcov gcov /usr/bin/gcov-$GCC_VERSION 1 && \
-    \
-    # Create lcov wrapper script for clang
-    echo '#!/usr/bin/env sh' > /usr/bin/clang-gcov && \
-    echo 'exec llvm-cov gcov "$@"' >> /usr/bin/clang-gcov && \
-    chmod +x /usr/bin/clang-gcov && \
+    update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-$GCC_VERSION 1 && \
     \
     # Install and compress Qt
     (cd /tmp && curl -O $QT_URL/$QT_INSTALLER) && \
     chmod +x /tmp/$QT_INSTALLER && \
     /tmp/$QT_INSTALLER --platform minimal --script /tmp/qt.js && \
-    rm -rf /opt/Qt/Docs /opt/Qt/Examples /opt/Qt/Licenses /opt/Qt/Tools && \
+    rm -rf /opt/Qt/Docs /opt/Qt/Examples /opt/Qt/Tools && \
     (cd /opt && tar -czf Qt.tar.gz Qt) && \
     \
     # Cleanup

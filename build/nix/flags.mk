@@ -32,7 +32,13 @@ ifeq ($(release), 1)
     CF_ALL += -O2
     LDFLAGS += -fuse-ld=gold
 else
-    CF_ALL += -O0 -g --coverage -fsanitize=address -fno-omit-frame-pointer
+    CF_ALL += -O0 -g -fsanitize=address -fno-omit-frame-pointer
+
+    ifeq ($(toolchain), clang)
+        CF_ALL += -fprofile-instr-generate -fcoverage-mapping
+    else ifeq ($(toolchain), gcc)
+        CF_ALL += --coverage
+    endif
 
     # When using address sanitizer, use gold linker with non-clang compilers.
     # With clang and address sanitizer, gold produces the following warning:

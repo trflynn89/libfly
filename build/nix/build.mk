@@ -53,7 +53,12 @@ clean:
 tests: $(TEST_BINARIES)
 	$(Q)failed=0; \
 	for tgt in $(TEST_BINARIES) ; do \
+		if [[ $(toolchain) == "clang" ]] ; then \
+			export LLVM_PROFILE_FILE="$$tgt.profraw"; \
+		fi; \
+		\
 		$$tgt; \
+		\
 		if [[ $$? -ne 0 ]] ; then \
 			failed=$$((failed+1)); \
 		fi; \
