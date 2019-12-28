@@ -20,6 +20,7 @@ RUN apt-get update && \
     apt-get install -y \
         # Install build dependencies
         clang-$CLANG_VERSION \
+        lld-$CLANG_VERSION \
         llvm-$CLANG_VERSION \
         \
         gcc-$GCC_VERSION \
@@ -43,6 +44,7 @@ RUN apt-get update && \
         && \
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-$CLANG_VERSION 1 && \
     update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-$CLANG_VERSION 1 && \
+    update-alternatives --install /usr/bin/lld lld /usr/bin/lld-$CLANG_VERSION 1 && \
     update-alternatives --install /usr/bin/llvm-ar llvm-ar /usr/bin/llvm-ar-$CLANG_VERSION 1 && \
     update-alternatives --install /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-$CLANG_VERSION 1 && \
     update-alternatives --install /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-$CLANG_VERSION 1 && \
