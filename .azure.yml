@@ -12,21 +12,37 @@ jobs:
   - template: build/ci/linux.yml
     parameters:
       configuration: 'Debug'
+      toolchain: 'clang'
       arch: 'x86'
 
   - template: build/ci/linux.yml
     parameters:
       configuration: 'Debug'
+      toolchain: 'clang'
+      arch: 'x64'
+
+  - template: build/ci/linux.yml
+    parameters:
+      configuration: 'Debug'
+      toolchain: 'gcc'
+      arch: 'x86'
+
+  - template: build/ci/linux.yml
+    parameters:
+      configuration: 'Debug'
+      toolchain: 'gcc'
       arch: 'x64'
 
   - template: build/ci/linux.yml
     parameters:
       configuration: 'Release'
+      toolchain: 'clang'
       arch: 'x86'
 
   - template: build/ci/linux.yml
     parameters:
       configuration: 'Release'
+      toolchain: 'clang'
       arch: 'x64'
 
   #### Windows ####

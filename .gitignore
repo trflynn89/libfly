@@ -1,15 +1,16 @@
 # TODO: Create a "performance test" for enwik8
 enwik8
 
+#### Build
+
+release/
+debug/
+
 #### General
 
 *.db
 *.psd
 *.log
-release-*
-debug-*
-libfly-*x86.zip
-libfly-*x64.zip
 
 #### C++
 

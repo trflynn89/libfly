@@ -1,6 +1,9 @@
 # Define the default make configuration. Not all defaults are defined here, but
 # all command line options are listed here for convenience.
 
+# Toolchain to compile with
+toolchain := clang
+
 # Define debug vs. release
 release := 0
 
@@ -10,11 +13,26 @@ arch := $(arch)
 # Enable verbose builds
 verbose := 0
 
+# Define the toolchain binaries
+ifeq ($(toolchain), clang)
+    CC := clang
+    CXX := clang++
+    AR := llvm-ar
+    STRIP := llvm-strip
+else ifeq ($(toolchain), gcc)
+    CC := gcc
+    CXX := g++
+    AR := ar
+    STRIP := strip
+else
+    $(error Unrecognized toolchain $(toolchain), check config.mk)
+endif
+
 # Define the output directories
 ifeq ($(release), 1)
-    OUT_DIR := $(CURDIR)/release-$(arch)
+    OUT_DIR := $(CURDIR)/release/$(toolchain)/$(arch)
 else
-    OUT_DIR := $(CURDIR)/debug-$(arch)
+    OUT_DIR := $(CURDIR)/debug/$(toolchain)/$(arch)
 endif
 
 BIN_DIR := $(OUT_DIR)/bin

@@ -34,7 +34,7 @@ $(2): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
 $(2): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 $(2): LDLIBS := $(LDLIBS_$(d)) $(LDLIBS)
 
-$(2): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
+$(2): $$(GEN_$$(t)) $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 	@echo "[Link $$(subst $(CURDIR)/,,$$@)]"
@@ -56,16 +56,15 @@ MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 %.a %.so.$(VERSION): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
 %.a %.so.$(VERSION): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 
-%.a: $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
+%.a: $$(GEN_$$(t)) $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo "[Static $$(subst $(CURDIR)/,,$$@)]"
 	$(STATIC)
 
-%.so.$(VERSION): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
+%.so.$(VERSION): $$(GEN_$$(t)) $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo "[Shared $$(subst $(CURDIR)/,,$$@)]"
 	$(SHARED_CXX)
-	$(STRIP)
 
 endef
 

@@ -33,16 +33,28 @@ OBJ_DIR_$(d) := $(OBJ_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
 GEN_DIR_$(d) := $(GEN_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
 
 ifneq ($(5),)
-    u_$(d) := $$(addsuffix .uic.h, $$(subst $(d),,$$(basename $(2))))
-    u_$(d) := $$(addprefix $$(GEN_DIR_$(d)), $$(u_$(d)))
+    # Generated UI header files
+    gu_$(d) := $$(addsuffix .uic.h, $$(subst $(d),,$$(basename $(2))))
+    gu_$(d) := $$(addprefix $$(GEN_DIR_$(d)), $$(gu_$(d)))
 
-    m_$(d) := $$(addsuffix .moc.o, $$(subst $(d),,$$(basename $(3))))
-    m_$(d) := $$(addprefix $$(OBJ_DIR_$(d)), $$(m_$(d)))
+    # Generated MOC source files
+    gm_$(d) := $$(addsuffix .moc.cpp, $$(subst $(d),,$$(basename $(3))))
+    gm_$(d) := $$(addprefix $$(GEN_DIR_$(d)), $$(gm_$(d)))
 
-    q_$(d) := $$(addsuffix .rcc.o, $$(subst $(d),,$$(basename $(4))))
-    q_$(d) := $$(addprefix $$(OBJ_DIR_$(d)), $$(q_$(d)))
+    # Compiled MOC object files
+    om_$(d) := $$(addsuffix .moc.o, $$(subst $(d),,$$(basename $(3))))
+    om_$(d) := $$(addprefix $$(OBJ_DIR_$(d)), $$(om_$(d)))
 
-    OBJ_$$(strip $(1)) += $$(u_$(d)) $$(m_$(d)) $$(q_$(d))
+    # Generated QRC source files
+    gq_$(d) := $$(addsuffix .rcc.cpp, $$(subst $(d),,$$(basename $(4))))
+    gq_$(d) := $$(addprefix $$(GEN_DIR_$(d)), $$(gq_$(d)))
+
+    # Generated QRC object files
+    oq_$(d) := $$(addsuffix .rcc.o, $$(subst $(d),,$$(basename $(4))))
+    oq_$(d) := $$(addprefix $$(OBJ_DIR_$(d)), $$(oq_$(d)))
+
+    GEN_$$(strip $(1)) += $$(gu_$(d)) $$(gm_$(d)) $$(gq_$(d))
+    OBJ_$$(strip $(1)) += $$(om_$(d)) $$(oq_$(d))
 
     CFLAGS_$$(d) += $(QT_CFLAGS)
     CXXFLAGS_$$(d) += $(QT_CFLAGS)

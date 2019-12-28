@@ -32,4 +32,4 @@ jobs:
 
     - template: package.yml
       parameters:
-        contents: 'build\win\libfly-*.zip'
+        contents: 'build\win\Release\msvc\libfly-*.zip'

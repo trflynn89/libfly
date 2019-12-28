@@ -10,8 +10,8 @@ function Create-Libfly-Package($arch)
     $version = Get-Content -Path ($PSScriptRoot + "\..\..\VERSION.md")
 
     $package_src_path = $PSScriptRoot + "\..\..\fly"
-    $package_lib_path = $PSScriptRoot + "\Release-" + $arch + "\libfly"
-    $package_tmp_path = $PSScriptRoot + "\libfly-win-" + $version + "." + $arch
+    $package_lib_path = $PSScriptRoot + "\Release\msvc\" + $arch + "\libfly"
+    $package_tmp_path = $PSScriptRoot + "\Release\msvc\libfly-win-" + $version + "." + $arch
     $package_zip_path = $package_tmp_path + ".zip"
 
     Remove-Item -Path $package_tmp_path -Recurse -ErrorAction SilentlyContinue
