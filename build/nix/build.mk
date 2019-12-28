@@ -95,13 +95,13 @@ install: $(TARGET_PACKAGES)
 # Install dependencies
 setup:
 ifeq ($(HOST), DEBIAN)
-	$(Q)$(SUDO) apt-get install -y git make gcc g++ clang llvm clang-format
+	$(Q)$(SUDO) apt-get install -y git make gcc g++ clang lld llvm clang-format
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) apt-get install -y gcc-multilib g++-multilib
 endif
 
 else ifeq ($(HOST), REDHAT)
-	$(Q)$(SUDO) dnf install -y git make gcc gcc-c++ clang llvm \
+	$(Q)$(SUDO) dnf install -y git make gcc gcc-c++ clang lld llvm \
 		libstdc++-static libasan libatomic
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) dnf install -y glibc-devel.i686 \

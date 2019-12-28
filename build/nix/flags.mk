@@ -30,7 +30,6 @@ CF_ALL += -I$(SOURCE_ROOT)/test/googletest/googletest
 # debug builds
 ifeq ($(release), 1)
     CF_ALL += -O2
-    LDFLAGS += -fuse-ld=gold
 else
     CF_ALL += -O0 -g -fsanitize=address -fno-omit-frame-pointer
 
@@ -39,18 +38,18 @@ else
     else ifeq ($(toolchain), gcc)
         CF_ALL += --coverage
     endif
-
-    # When using address sanitizer, use gold linker with non-clang compilers.
-    # With clang and address sanitizer, gold produces the following warning:
-    # Cannot export local symbol '__asan_extra_spill_area'
-    ifneq ($(toolchain), clang)
-        LDFLAGS += -fuse-ld=gold
-    endif
 endif
 
 # C and C++ specific flags
 CFLAGS := -std=c17 $(CF_ALL)
 CXXFLAGS := -std=c++17 $(CF_ALL)
+
+# Use LLD linker with clang toolchain. Use gold linker with gcc toolchain.
+ifeq ($(toolchain), clang)
+    LDFLAGS += -fuse-ld=lld
+else ifeq ($(toolchain), gcc)
+    LDFLAGS += -fuse-ld=gold
+endif
 
 # gcov flags
 GCOV_FLAGS := -l
