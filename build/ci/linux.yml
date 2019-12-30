@@ -25,8 +25,7 @@ jobs:
           make -j -C build/nix $(config) tests
         displayName: 'Test'
 
-      # For now, only emit LCOV reports for gcc.
-      - ${{ if eq(parameters.toolchain, 'gcc') }}:
+      - ${{ if eq(parameters.toolchain, 'clang') }}:
         - script: |
             make -C build/nix $(config) coverage upload=1
           displayName: 'Coverage'
