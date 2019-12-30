@@ -50,6 +50,7 @@ else
     $(info Gen dir = $(GEN_DIR))
     $(info Obj dir = $(OBJ_DIR))
     $(info Etc dir = $(ETC_DIR))
+    $(info Toolchain = $(toolchain) ($(CC)))
     $(info Release = $(release))
     $(info Arch = $(arch))
 endif

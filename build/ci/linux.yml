@@ -10,7 +10,7 @@ jobs:
       vmImage: ubuntu-latest
 
     container:
-      image: trflynn89/libfly:ubuntu1910_clang9_gcc9_qt5140
+      image: trflynn89/libfly:${{ parameters.toolchain }}
       options: --cap-add SYS_PTRACE
 
     steps:

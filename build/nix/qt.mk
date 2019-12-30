@@ -30,8 +30,8 @@ QT_LDFLAGS := \
     -Wl,-rpath,$(QT_LIB) \
     -L$(QT_LIB)
 
-QT_INSTALLER := qt-unified-linux-$(arch)-online.run
-QT_INSTALLER_URL := http://qt.mirror.constant.com/official_releases/online_installers/$(QT_INSTALLER)
+QT_INSTALLER_URL := http://qt.mirror.constant.com/official_releases/online_installers
+QT_INSTALLER_EXE := qt-unified-linux-$(arch)-online.run
 
 ifeq ($(verbose), 1)
     QT_INSTALL_FLAGS := --verbose
@@ -42,16 +42,16 @@ endif
 # Script to install Qt without any user interaction.
 define QT_INSTALL
 
-    (cd /tmp && curl -O $(QT_INSTALLER_URL)); \
+    (cd /tmp && curl -O $(QT_INSTALLER_URL)/$(QT_INSTALLER_EXE)); \
     if [[ $$? -ne 0 ]] ; then \
-        $(RM) /tmp/$(QT_INSTALLER); \
+        $(RM) /tmp/$(QT_INSTALLER_EXE); \
         exit 1; \
     fi; \
     \
-    chmod +x /tmp/$(QT_INSTALLER); \
+    chmod +x /tmp/$(QT_INSTALLER_EXE); \
     $(SUDO) $(RM) -r $(QT_INSTALL_POINT); \
-    $(SUDO) /tmp/$(QT_INSTALLER) $(QT_INSTALL_FLAGS) --script $(QT_SCRIPT); \
+    $(SUDO) /tmp/$(QT_INSTALLER_EXE) $(QT_INSTALL_FLAGS) --script $(QT_SCRIPT); \
     \
-    $(RM) /tmp/$(QT_INSTALLER)
+    $(RM) /tmp/$(QT_INSTALLER_EXE)
 
 endef

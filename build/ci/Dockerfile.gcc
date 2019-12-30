@@ -1,0 +1,27 @@
+FROM trflynn89/libfly:base
+
+MAINTAINER Timothy Flynn <trflynn89@pm.me>
+
+ARG TOOLCHAIN_VERSION
+
+# Install gcc
+RUN apt-get install -y \
+        gcc-$TOOLCHAIN_VERSION \
+        gcc-$TOOLCHAIN_VERSION-multilib \
+        g++-$TOOLCHAIN_VERSION \
+        g++-$TOOLCHAIN_VERSION-multilib \
+        \
+        lcov \
+    && \
+    \
+    for tool in gcc g++ gcov; \
+    do \
+        update-alternatives --install \
+            /usr/bin/$tool $tool /usr/bin/$tool-$TOOLCHAIN_VERSION 1; \
+    done
+
+# Cleanup
+RUN apt-get clean -y && \
+    apt-get autoremove -y && \
+    apt-get purge -y && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

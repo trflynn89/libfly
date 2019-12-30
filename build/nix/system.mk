@@ -1,6 +1,6 @@
 # Define system dependent variables.
 
-SYSTEM := $(shell gcc -dumpmachine)
+SYSTEM := $(shell uname -m)
 SUDO := $(shell which sudo)
 
 # Determine default architecture
