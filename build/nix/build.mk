@@ -93,10 +93,6 @@ else
 	$(Q)exit 1
 endif
 
-ifeq ($(upload), 1)
-	$(Q)bash <(curl -s https://codecov.io/bash) -f $(report)
-endif
-
 # Install the target
 install: $(TARGET_PACKAGES)
 	$(Q)failed=0; \
