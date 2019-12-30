@@ -89,6 +89,11 @@ else ifeq ($(toolchain), gcc)
 	$(Q)lcov --list $(report)
 endif
 
+else
+	$(Q)echo "No coverage rules for toolchain $(toolchain), check build.mk"
+	$(Q)exit 1
+endif
+
 ifeq ($(upload), 1)
 	$(Q)bash <(curl -s https://codecov.io/bash) -f $(report)
 endif
@@ -120,10 +125,10 @@ else ifeq ($(HOST), REDHAT)
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) dnf install -y glibc-devel.i686 \
 		libstdc++-static.i686 libasan.i686 libatomic.i686
-endif
+endifd
 
 else
-	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"
+	$(Q)echo "No setup rules for host $(HOST), check build.mk"
 	$(Q)exit 1
 endif
 
