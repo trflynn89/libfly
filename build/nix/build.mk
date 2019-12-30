@@ -87,7 +87,6 @@ else ifeq ($(toolchain), gcc)
 	$(Q)lcov --capture --directory $(OUT_DIR) --output-file $(report)
 	$(Q)lcov --remove $(report) '/usr/*' '*/test/*' --output-file $(report)
 	$(Q)lcov --list $(report)
-endif
 
 else
 	$(Q)echo "No coverage rules for toolchain $(toolchain), check build.mk"
