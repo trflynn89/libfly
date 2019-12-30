@@ -124,7 +124,7 @@ else ifeq ($(HOST), REDHAT)
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) dnf install -y glibc-devel.i686 \
 		libstdc++-static.i686 libasan.i686 libatomic.i686
-endifd
+endif
 
 else
 	$(Q)echo "No setup rules for host $(HOST), check build.mk"
