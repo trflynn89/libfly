@@ -2,6 +2,7 @@
 
 USER="trflynn89"
 REPO="libfly"
+BASE=$(grep -oP "(?<=FROM )(\S+)" Dockerfile | tr -cd '[:alnum:]')
 
 MAKE_VARS=$(make -C ../nix -qp)
 
@@ -16,108 +17,76 @@ QT_INSTALLER_EXE=$(grep -oP "(?<=QT_INSTALLER_EXE := )(\S+)" <<< $MAKE_VARS)
 CLANG_VERSION=9
 GCC_VERSION=9
 
+TAG="${BASE}_clang${CLANG_VERSION}_gcc${GCC_VERSION}_qt${QT_VERSION}"
+
 usage()
 {
-    echo "Build, run, or push a $REPO container for a specific toolchain"
-    echo "Supported toolchains: clang, gcc"
-    echo
-    echo "Usage: $0 [-b <toolchain>] [-r <toolchain>] [-p <toolchain>]"
+    echo "Build, run, or push a $REPO container"
+    echo "Usage: $0 [-b] [-r] [-p]"
 }
 
-# Really simple hashtable implementation
-hput()
-{
-    eval "$1""$2"='$3'
-}
-
-hget()
-{
-    eval echo '${'"$1$2"'}'
-}
-
-# Build the base container with Qt and the container with the desired toolchain.
-#
-# $1 = The desired toolchain.
-# $2 = The toolchain version.
 build()
 {
-    local toolchain=$1
-    local version=$2
-
     docker build \
-        --tag "$USER/$REPO:base" \
+        --tag "${USER}/${REPO}:${TAG}" \
         --build-arg QT_INSTALLER_URL=$QT_INSTALLER_URL \
         --build-arg QT_INSTALLER_EXE=$QT_INSTALLER_EXE \
-        --file Dockerfile.base .
+        --build-arg CLANG_VERSION=$CLANG_VERSION \
+        --build-arg GCC_VERSION=$GCC_VERSION \
+        .
 
     if [[ $? -ne 0 ]] ; then
-        echo "Failed to build base Qt container"
-        exit 1
-    fi
-
-    docker build \
-        --tag "$USER/$REPO:${toolchain}" \
-        --build-arg TOOLCHAIN_VERSION=$version \
-        --file Dockerfile.${toolchain} .
-
-    if [[ $? -ne 0 ]] ; then
-        echo "Failed to build ${toolchain} Qt container"
+        echo "Failed to build $REPO Qt container"
         exit 1
     fi
 }
 
-# Create and run an image from the container with the desired toolchain.
-#
-# $1 = The desired toolchain.
 run()
 {
-    local toolchain=$1
-
     docker rm $REPO > /dev/null 2>&1
 
     docker run -it \
         --name $REPO \
         --cap-add SYS_PTRACE \
-        "$USER/$REPO:${toolchain}"
+        "${USER}/${REPO}:${TAG}"
 }
 
-# Push the container with the desired toolchain to Docker Hub.
-#
-# $1 = The desired toolchain.
 push()
 {
-    local toolchain=$1
-
-    docker push "$USER/$REPO:${toolchain}"
+    docker push "${USER}/${REPO}:${TAG}"
 }
 
-# Map of toolchain versions
-hput TOOLCHAINS clang 9
-hput TOOLCHAINS gcc 9
+main()
+{
+    declare -a commands
 
-while getopts ":b:r:p:" opt ; do
-    case "$opt" in
-        b)
-            method=build
-            toolchain=${OPTARG}
-            version=$(hget TOOLCHAINS $toolchain)
-            ;;
-        r)
-            method=run
-            toolchain=${OPTARG}
-            version=$(hget TOOLCHAINS $toolchain)
-            ;;
-        p)
-            method=push
-            toolchain=${OPTARG}
-            version=$(hget TOOLCHAINS $toolchain)
-            ;;
-    esac
-done
+    while getopts ":brph" opt ; do
+        case $opt in
+            b)
+                commands+=(build)
+                ;;
+            r)
+                commands+=(run)
+                ;;
+            p)
+                commands+=(push)
+                ;;
+            h)
+                commands+=(usage)
+                ;;
+            \?)
+                echo -e "Invalid option: -$OPTARG\n" >&2
+        esac
+    done
 
-if [[ -z "$toolchain" ]] || [[ -z "$version" ]] ; then
-    usage
-    exit 1
-fi
+    if [[ ${#commands[@]} -eq 0 ]] ; then
+        usage
+        exit 1
+    fi
 
-$method $toolchain $version
+    for command in "${commands[@]}" ; do
+        $command
+    done
+}
+
+main $@
