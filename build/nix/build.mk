@@ -6,7 +6,7 @@
 .PHONY: all
 .PHONY: clean
 .PHONY: tests
-.PHONY: gcov
+.PHONY: coverage
 .PHONY: install
 .PHONY: setup
 .PHONY: qt
@@ -53,7 +53,7 @@ clean:
 tests: $(TEST_BINARIES)
 	$(Q)failed=0; \
 	for tgt in $(TEST_BINARIES) ; do \
-		if [[ $(toolchain) == "clang" ]] ; then \
+		if [[ $(toolchain) == "clang" ]] && [[ $(release) -eq 0 ]] ; then \
 			export LLVM_PROFILE_FILE="$$tgt.profraw"; \
 		fi; \
 		\
@@ -66,18 +66,32 @@ tests: $(TEST_BINARIES)
 	exit $$failed
 
 # Create coverage reports
-gcov: tests
-	$(Q)for obj in $$(find $(OBJ_DIR) -name "*.o" -print) ; do \
-		path=$$(dirname "$$obj"); \
-		file=$$(basename "$$obj"); \
-		\
-		pushd $$path > /dev/null; \
-		gcov $(GCOV_FLAGS) $$file; \
-		\
-		popd > /dev/null; \
-	done; \
-	\
-	find . -name "*\#\#*.gcov" | xargs grep -l "/usr/include" | xargs -I {} $(RM) {}
+coverage: report := $(OUT_DIR)/coverage
+coverage:
+ifeq ($(toolchain), clang)
+	$(Q)llvm-profdata merge \
+		--output $(report).prodata \
+		$(addsuffix .profraw, $(TEST_BINARIES))
+
+	$(Q)llvm-cov show \
+		--instr-profile=$(report).prodata \
+		--ignore-filename-regex="test/.*" \
+		$(TEST_BINARIES) > $(report)
+
+	$(Q)llvm-cov report \
+		--instr-profile=$(report).prodata \
+		--ignore-filename-regex="test/.*" \
+		$(TEST_BINARIES)
+
+else ifeq ($(toolchain), gcc)
+	$(Q)lcov --capture --directory $(OUT_DIR) --output-file $(report)
+	$(Q)lcov --remove $(report) '/usr/*' '*/test/*' --output-file $(report)
+	$(Q)lcov --list $(report)
+
+else
+	$(Q)echo "No coverage rules for toolchain $(toolchain), check build.mk"
+	$(Q)exit 1
+endif
 
 # Install the target
 install: $(TARGET_PACKAGES)
@@ -95,13 +109,13 @@ install: $(TARGET_PACKAGES)
 # Install dependencies
 setup:
 ifeq ($(HOST), DEBIAN)
-	$(Q)$(SUDO) apt-get install -y git make gcc g++ clang lld llvm clang-format
+	$(Q)$(SUDO) apt install -y git make clang clang-format lld llvm gcc g++ lcov
 ifeq ($(arch), x86)
-	$(Q)$(SUDO) apt-get install -y gcc-multilib g++-multilib
+	$(Q)$(SUDO) apt install -y gcc-multilib g++-multilib
 endif
 
 else ifeq ($(HOST), REDHAT)
-	$(Q)$(SUDO) dnf install -y git make gcc gcc-c++ clang lld llvm \
+	$(Q)$(SUDO) dnf install -y git make clang lld llvm gcc gcc-c++ lcov \
 		libstdc++-static libasan libatomic
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) dnf install -y glibc-devel.i686 \
@@ -109,7 +123,7 @@ ifeq ($(arch), x86)
 endif
 
 else
-	$(Q)echo "No setup rules defined for host $(HOST), check build.mk"
+	$(Q)echo "No setup rules for host $(HOST), check build.mk"
 	$(Q)exit 1
 endif
 
@@ -122,7 +136,7 @@ ifeq ($(arch), x86)
 endif
 
 ifeq ($(HOST), DEBIAN)
-	$(Q)$(SUDO) apt-get install -y mesa-common-dev
+	$(Q)$(SUDO) apt install -y mesa-common-dev
 endif
 	$(Q)$(QT_INSTALL)
 
