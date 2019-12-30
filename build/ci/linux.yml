@@ -25,21 +25,10 @@ jobs:
           make -j -C build/nix $(config) tests
         displayName: 'Test'
 
-      # For now, only emit LCOV reports for gcc. With clang, llvm-cov reports
-      # lines containing only a closing curly brace as uncovered. See:
-      #     https://libcellml.readthedocs.io/en/latest/coverage_statistics.html
-      #
-      # Alternatively, should be able to upload clang coverage reports that are
-      # non-GCOV-formatted. Something like:
-      #     llvm-profdata merge -sparse default.profraw -o default.prodata
-      #     llvm-cov show libfly_unit_tests -instr-profile=default.prodata --ignore-filename-regex="test/.*" > /tmp/coverage
+      # For now, only emit LCOV reports for gcc.
       - ${{ if eq(parameters.toolchain, 'gcc') }}:
         - script: |
-            lcov --capture --directory build/nix --output-file coverage
-            lcov --remove coverage '/usr/*' '*/test/*' --output-file coverage
-            lcov --list coverage
-
-            bash <(curl -s https://codecov.io/bash) -f coverage
+            make -C build/nix $(config) coverage upload=1
           displayName: 'Coverage'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
