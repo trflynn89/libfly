@@ -28,7 +28,7 @@ jobs:
       # For now, only emit LCOV reports for gcc.
       - ${{ if eq(parameters.toolchain, 'gcc') }}:
         - script: |
-            make -C build/nix $(config) coverage
+            make -C build/nix $(config) coverage upload=1
           displayName: 'Coverage'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
