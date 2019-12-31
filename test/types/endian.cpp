@@ -1,5 +1,6 @@
 #include "fly/types/numeric/endian.h"
 
+#include "fly/traits/traits.h"
 #include "fly/types/numeric/literals.h"
 
 #include <gtest/gtest.h>
@@ -9,19 +10,24 @@
 
 namespace {
 
-template <typename T>
-T swap(T);
-
-template <>
-std::uint8_t swap(std::uint8_t x)
+template <
+    typename T,
+    fly::enable_if_any<
+        std::is_same<std::int8_t, T>,
+        std::is_same<std::uint8_t, T>> = 0>
+T swap(T x)
 {
     return x;
 }
 
-template <>
-std::uint16_t swap(std::uint16_t x)
+template <
+    typename T,
+    fly::enable_if_any<
+        std::is_same<std::int16_t, T>,
+        std::is_same<std::uint16_t, T>> = 0>
+T swap(T x)
 {
-    std::uint32_t result = 0;
+    T result = 0;
 
     result |= (x & 0xff00_u16) >> 8;
     result |= (x & 0x00ff_u16) << 8;
@@ -29,10 +35,14 @@ std::uint16_t swap(std::uint16_t x)
     return result;
 }
 
-template <>
-std::uint32_t swap(std::uint32_t x)
+template <
+    typename T,
+    fly::enable_if_any<
+        std::is_same<std::int32_t, T>,
+        std::is_same<std::uint32_t, T>> = 0>
+T swap(T x)
 {
-    std::uint32_t result = 0;
+    T result = 0;
 
     result |= (x & 0xff000000_u32) >> 24;
     result |= (x & 0x00ff0000_u32) >> 8;
@@ -42,10 +52,14 @@ std::uint32_t swap(std::uint32_t x)
     return result;
 }
 
-template <>
-std::uint64_t swap(std::uint64_t x)
+template <
+    typename T,
+    fly::enable_if_any<
+        std::is_same<std::int64_t, T>,
+        std::is_same<std::uint64_t, T>> = 0>
+T swap(T x)
 {
-    std::uint64_t result = 0;
+    T result = 0;
 
     result |= (x & 0xff00000000000000_u64) >> 56;
     result |= (x & 0x00ff000000000000_u64) >> 40;
@@ -87,8 +101,15 @@ protected:
     }
 };
 
-using DataTypes =
-    ::testing::Types<std::uint8_t, std::uint16_t, std::uint32_t, std::uint64_t>;
+using DataTypes = ::testing::Types<
+    std::int8_t,
+    std::int16_t,
+    std::int32_t,
+    std::int64_t,
+    std::uint8_t,
+    std::uint16_t,
+    std::uint32_t,
+    std::uint64_t>;
 
 TYPED_TEST_SUITE(EndianTest, DataTypes);
 

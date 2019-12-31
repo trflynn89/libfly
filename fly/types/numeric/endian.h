@@ -56,26 +56,22 @@ template <Endian endianness, typename T>
 inline T endian_swap(T value) noexcept
 {
     static_assert(
-        detail::EndianTraits::is_unsigned_integer_v<T>,
-        "Value must be an unsigned numeric type");
+        detail::EndianTraits::is_supported_integer_v<T>,
+        "Value must be an integer type of size 1, 2, 4, or 8 bytes");
 
-    if constexpr (endianness == Endian::Native)
+    if constexpr ((endianness == Endian::Native) || (sizeof(T) == 1))
     {
         return value;
     }
-    else if constexpr (std::is_same_v<T, std::uint8_t>)
-    {
-        return value;
-    }
-    else if constexpr (std::is_same_v<T, std::uint16_t>)
+    else if constexpr (sizeof(T) == 2)
     {
         return bswap_16(value);
     }
-    else if constexpr (std::is_same_v<T, std::uint32_t>)
+    else if constexpr (sizeof(T) == 4)
     {
         return bswap_32(value);
     }
-    else if constexpr (std::is_same_v<T, std::uint64_t>)
+    else if constexpr (sizeof(T) == 8)
     {
         return bswap_64(value);
     }
