@@ -43,23 +43,23 @@ enum class Endian : std::uint16_t
 
 /**
  * Templated wrapper around platform built-in byte swapping macros to convert a
- * value to or from a desired endianness.
+ * value between system endianness and a desired endianness.
  *
  * @tparam T The type of the value to swap.
- * @tparam Endian The desired endianness to swap to or from.
+ * @tparam Endian The desired endianness to swap between.
  *
  * @param T The value to swap.
  *
  * @return T The swapped value.
  */
-template <Endian desired, typename T>
+template <Endian endianness, typename T>
 inline T endian_swap(T value) noexcept
 {
     static_assert(
         detail::EndianTraits::is_unsigned_integer_v<T>,
         "Value must be an unsigned numeric type");
 
-    if constexpr (desired == Endian::Native)
+    if constexpr (endianness == Endian::Native)
     {
         return value;
     }

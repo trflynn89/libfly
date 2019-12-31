@@ -103,3 +103,9 @@ TYPED_TEST(EndianTest, LittleEndianTest)
 {
     TestFixture::template RunTest<fly::Endian::Little>();
 }
+
+//==============================================================================
+TYPED_TEST(EndianTest, NativeEndianTest)
+{
+    TestFixture::template RunTest<fly::Endian::Native>();
+}
