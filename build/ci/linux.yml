@@ -25,8 +25,8 @@ jobs:
           make -j -C build/nix $(config) tests
         displayName: 'Test'
 
-      # For now, only create coverage reports for clang.
-      - ${{ if eq(parameters.toolchain, 'clang') }}:
+      # For now, only create coverage reports for gcc.
+      - ${{ if eq(parameters.toolchain, 'gcc') }}:
         - script: |
             make -C build/nix $(config) coverage report=/tmp/coverage
             bash <(curl -s https://codecov.io/bash) -f /tmp/coverage

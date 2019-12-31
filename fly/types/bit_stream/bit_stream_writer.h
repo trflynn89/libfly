@@ -3,7 +3,7 @@
 #include "fly/types/bit_stream/bit_stream_types.h"
 #include "fly/types/bit_stream/detail/bit_stream.h"
 #include "fly/types/bit_stream/detail/bit_stream_traits.h"
-#include "fly/types/bit_stream/detail/endian.h"
+#include "fly/types/numeric/endian.h"
 
 #include <iostream>
 
@@ -138,7 +138,7 @@ void BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    const DataType data = detail::byte_swap(buffer);
+    const DataType data = byte_swap<Endian::Big>(buffer);
     m_stream.write(reinterpret_cast<const std::ios::char_type *>(&data), bytes);
 }
 

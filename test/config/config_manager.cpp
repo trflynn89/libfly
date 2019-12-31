@@ -3,7 +3,7 @@
 #include "fly/config/config.h"
 #include "fly/path/path_config.h"
 #include "fly/task/task_manager.h"
-#include "fly/types/literals/literals.h"
+#include "fly/types/numeric/literals.h"
 #include "fly/types/string/string.h"
 #include "test/config/test_config.h"
 #include "test/util/path_util.h"

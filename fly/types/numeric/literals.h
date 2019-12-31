@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/literals/detail/literal_parser.h"
+#include "fly/types/numeric/detail/literal_parser.h"
 
 #include <cstddef>
 #include <cstdint>

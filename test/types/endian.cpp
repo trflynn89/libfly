@@ -1,6 +1,6 @@
-#include "fly/types/bit_stream/detail/endian.h"
+#include "fly/types/numeric/endian.h"
 
-#include "fly/types/literals/literals.h"
+#include "fly/types/numeric/literals.h"
 
 #include <gtest/gtest.h>
 
@@ -8,20 +8,6 @@
 #include <limits>
 
 namespace {
-
-enum class BigEndian : std::uint16_t
-{
-    Little = 0,
-    Big = 1,
-    Native = Big
-};
-
-enum class LittleEndian : std::uint16_t
-{
-    Little = 0,
-    Big = 1,
-    Native = Little
-};
 
 template <typename T>
 T swap(T);
@@ -80,7 +66,7 @@ template <typename DataType>
 struct EndianTest : public ::testing::Test
 {
 protected:
-    template <typename EndianType>
+    template <fly::Endian desired>
     void RunTest()
     {
         const DataType iterations = std::numeric_limits<std::uint8_t>::max();
@@ -89,9 +75,9 @@ protected:
         for (DataType data = 0, i = 0; i++ < iterations; data += step)
         {
             DataType expected = data;
-            DataType actual = fly::detail::byte_swap<EndianType>(data);
+            DataType actual = fly::byte_swap<desired>(data);
 
-            if (std::is_same_v<EndianType, LittleEndian>)
+            if constexpr (desired != fly::Endian::Native)
             {
                 expected = swap(expected);
             }
@@ -109,11 +95,11 @@ TYPED_TEST_SUITE(EndianTest, DataTypes);
 //==============================================================================
 TYPED_TEST(EndianTest, BigEndianTest)
 {
-    TestFixture::template RunTest<BigEndian>();
+    TestFixture::template RunTest<fly::Endian::Big>();
 }
 
 //==============================================================================
 TYPED_TEST(EndianTest, LittleEndianTest)
 {
-    TestFixture::template RunTest<LittleEndian>();
+    TestFixture::template RunTest<fly::Endian::Little>();
 }
