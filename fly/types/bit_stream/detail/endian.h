@@ -44,26 +44,27 @@ enum class Endian : std::uint16_t
  * byte to network-order.
  *
  * @tparam T The type of the byte to swap.
+ * @tparam EndianProvider Type defining endianness, defaults to system native.
  *
  * @param T The byte to swap.
  *
  * @return T The swapped byte.
  */
-template <typename T>
+template <typename T, typename EndianProvider>
 inline T byte_swap(T) noexcept;
 
 //==============================================================================
-template <>
+template <typename EndianProvider = Endian>
 inline std::uint8_t byte_swap(std::uint8_t byte) noexcept
 {
     return byte;
 }
 
 //==============================================================================
-template <>
+template <typename EndianProvider = Endian>
 inline std::uint16_t byte_swap(std::uint16_t byte) noexcept
 {
-    if constexpr (Endian::Native == Endian::Little)
+    if constexpr (EndianProvider::Native == EndianProvider::Little)
     {
         return bswap_16(byte);
     }
@@ -74,10 +75,10 @@ inline std::uint16_t byte_swap(std::uint16_t byte) noexcept
 }
 
 //==============================================================================
-template <>
+template <typename EndianProvider = Endian>
 inline std::uint32_t byte_swap(std::uint32_t byte) noexcept
 {
-    if constexpr (Endian::Native == Endian::Little)
+    if constexpr (EndianProvider::Native == EndianProvider::Little)
     {
         return bswap_32(byte);
     }
@@ -88,10 +89,10 @@ inline std::uint32_t byte_swap(std::uint32_t byte) noexcept
 }
 
 //==============================================================================
-template <>
+template <typename EndianProvider = Endian>
 inline std::uint64_t byte_swap(std::uint64_t byte) noexcept
 {
-    if constexpr (Endian::Native == Endian::Little)
+    if constexpr (EndianProvider::Native == EndianProvider::Little)
     {
         return bswap_64(byte);
     }
