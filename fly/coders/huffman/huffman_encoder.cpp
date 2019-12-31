@@ -3,7 +3,7 @@
 #include "fly/coders/huffman/huffman_config.h"
 #include "fly/logger/logger.h"
 #include "fly/types/bit_stream/bit_stream_writer.h"
-#include "fly/types/literals/literals.h"
+#include "fly/types/numeric/literals.h"
 
 #include <algorithm>
 #include <limits>

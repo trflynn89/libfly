@@ -3,7 +3,7 @@
 #include "fly/types/bit_stream/bit_stream_types.h"
 #include "fly/types/bit_stream/detail/bit_stream.h"
 #include "fly/types/bit_stream/detail/bit_stream_traits.h"
-#include "fly/types/bit_stream/detail/endian.h"
+#include "fly/types/numeric/endian.h"
 
 #include <cstdint>
 #include <istream>
@@ -217,7 +217,7 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
         "DataType must be an unsigned integer type");
 
     m_stream.read(reinterpret_cast<std::ios::char_type *>(&buffer), bytes);
-    buffer = detail::byte_swap(buffer);
+    buffer = endian_swap<Endian::Big>(buffer);
 
     return static_cast<byte_type>(m_stream.gcount());
 }

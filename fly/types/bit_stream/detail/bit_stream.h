@@ -2,7 +2,6 @@
 
 #include "fly/types/bit_stream/bit_stream_types.h"
 #include "fly/types/bit_stream/detail/bit_stream_traits.h"
-#include "fly/types/bit_stream/detail/endian.h"
 
 #include <limits>
 

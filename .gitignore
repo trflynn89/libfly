@@ -24,9 +24,11 @@ debug/
 *.d
 
 # Coverage files
-*.gcov
 *.gcda
 *.gcno
+*.gcov
+*.prodata
+*.profraw
 
 # Precompiled Headers
 *.gch

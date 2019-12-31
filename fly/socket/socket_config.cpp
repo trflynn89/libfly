@@ -1,6 +1,6 @@
 #include "fly/socket/socket_config.h"
 
-#include "fly/types/literals/literals.h"
+#include "fly/types/numeric/literals.h"
 
 namespace fly {
 
