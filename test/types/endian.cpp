@@ -75,7 +75,7 @@ protected:
         for (DataType data = 0, i = 0; i++ < iterations; data += step)
         {
             DataType expected = data;
-            DataType actual = fly::byte_swap<desired>(data);
+            DataType actual = fly::endian_swap<desired>(data);
 
             if constexpr (desired != fly::Endian::Native)
             {

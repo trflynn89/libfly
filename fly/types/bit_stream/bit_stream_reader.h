@@ -217,7 +217,7 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
         "DataType must be an unsigned integer type");
 
     m_stream.read(reinterpret_cast<std::ios::char_type *>(&buffer), bytes);
-    buffer = byte_swap<Endian::Big>(buffer);
+    buffer = endian_swap<Endian::Big>(buffer);
 
     return static_cast<byte_type>(m_stream.gcount());
 }

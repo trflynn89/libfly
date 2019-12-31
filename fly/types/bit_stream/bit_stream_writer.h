@@ -138,7 +138,7 @@ void BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    const DataType data = byte_swap<Endian::Big>(buffer);
+    const DataType data = endian_swap<Endian::Big>(buffer);
     m_stream.write(reinterpret_cast<const std::ios::char_type *>(&data), bytes);
 }
 

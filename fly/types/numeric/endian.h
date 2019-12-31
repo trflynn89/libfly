@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/fly.h"
+#include "fly/types/numeric/detail/endian_traits.h"
 
 #include <cstdint>
 #include <type_traits>
@@ -42,24 +43,20 @@ enum class Endian : std::uint16_t
 
 /**
  * Templated wrapper around platform built-in byte swapping macros to convert a
- * value to or from a desired byte-order.
+ * value to or from a desired endianness.
  *
  * @tparam T The type of the value to swap.
- * @tparam Endian The desired byte-order to swap to or from.
+ * @tparam Endian The desired endianness to swap to or from.
  *
  * @param T The value to swap.
  *
  * @return T The swapped value.
  */
 template <Endian desired, typename T>
-inline T byte_swap(T value) noexcept
+inline T endian_swap(T value) noexcept
 {
-    using is_unsigned_integer = std::bool_constant<
-        std::is_integral_v<T> && std::is_unsigned_v<T> &&
-        !std::is_same_v<bool, T>>;
-
     static_assert(
-        is_unsigned_integer::value,
+        detail::EndianTraits::is_unsigned_integer_v<T>,
         "Value must be an unsigned numeric type");
 
     if constexpr (desired == Endian::Native)
