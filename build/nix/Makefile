@@ -13,5 +13,12 @@ $(eval $(call ADD_TARGET, libfly, fly, LIB))
 # Test targets
 $(eval $(call ADD_TARGET, libfly_unit_tests, test, TEST))
 
+# Paths to ignore during code coverage reporting
+# 1. Ignore test files
+# 2. Ignore literal_parser.h - this file is entirely constexpr functions that
+#    cannot execute at runtime, which llvm-cov doesn't seem to recognize
+$(eval $(call IGNORE_FOR_COVERAGE, test/))
+$(eval $(call IGNORE_FOR_COVERAGE, fly/types/numeric/detail/literal_parser.h))
+
 # Import the build system
 include build.mk

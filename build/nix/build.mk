@@ -13,19 +13,6 @@
 .PHONY: style
 .PHONY: $(TARGETS)
 
-# Verify expected variables
-ifeq ($(SOURCE_ROOT),)
-    $(error SOURCE_ROOT must be defined)
-else ifeq ($(wildcard $(SOURCE_ROOT)/.*),)
-    $(error SOURCE_ROOT $(SOURCE_ROOT) does not exist)
-endif
-
-ifeq ($(VERSION),)
-    $(error VERSION must be defined)
-else ifneq ($(words $(subst ., ,$(VERSION))), 3)
-    $(error VERSION $(VERSION) must be of the form X.Y.Z)
-endif
-
 # Get the path to this file
 BUILD_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 BUILD_ROOT := $(patsubst %/,%,$(BUILD_ROOT))
@@ -75,17 +62,24 @@ ifeq ($(toolchain), clang)
 
 	$(Q)llvm-cov show \
 		--instr-profile=$(report).prodata \
-		--ignore-filename-regex="test/.*" \
+		$(addprefix --ignore-filename-regex=, $(COVERAGE_BLACKLIST)) \
 		$(TEST_BINARIES) > $(report)
 
 	$(Q)llvm-cov report \
 		--instr-profile=$(report).prodata \
-		--ignore-filename-regex="test/.*" \
+		$(addprefix --ignore-filename-regex=, $(COVERAGE_BLACKLIST)) \
 		$(TEST_BINARIES)
 
 else ifeq ($(toolchain), gcc)
-	$(Q)lcov --capture --directory $(OUT_DIR) --output-file $(report)
-	$(Q)lcov --remove $(report) '/usr/*' '*/test/*' --output-file $(report)
+	$(Q)lcov --capture \
+		--directory $(OUT_DIR) \
+		--output-file $(report)
+
+	$(Q)lcov --remove \
+		$(report) \
+		'/usr/*' $(addprefix *, $(addsuffix *, $(COVERAGE_BLACKLIST))) \
+		--output-file $(report)
+
 	$(Q)lcov --list $(report)
 
 else
