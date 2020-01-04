@@ -109,8 +109,9 @@ define OBJ_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
-$(1)/%.o: CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
-$(1)/%.o: CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
+# Use = instead of := because $$(@) would become an empty string if expanded now
+$(1)/%.o: CFLAGS = $(CFLAGS_$(d)) $(CFLAGS) -MF $$(@:%.o=%.d)
+$(1)/%.o: CXXFLAGS = $(CXXFLAGS_$(d)) $(CXXFLAGS) -MF $$(@:%.o=%.d)
 
 # C files
 $(1)/%.o: $(d)/%.c $$(MAKEFILES_$(d))

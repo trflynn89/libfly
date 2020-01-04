@@ -4,6 +4,9 @@
 # Toolchain to compile with
 toolchain := clang
 
+# Compile caching system
+cacher :=
+
 # Define debug vs. release
 release := 0
 
@@ -26,6 +29,12 @@ else ifeq ($(toolchain), gcc)
     STRIP := strip
 else
     $(error Unrecognized toolchain $(toolchain), check config.mk)
+endif
+
+# Use a compiler cache if requested
+ifneq ($(cacher), )
+    CC := $(cacher) $(CC)
+    CXX := $(cacher) $(CXX)
 endif
 
 # Define the output directories
@@ -51,6 +60,7 @@ else
     $(info Obj dir = $(OBJ_DIR))
     $(info Etc dir = $(ETC_DIR))
     $(info Toolchain = $(toolchain))
+    $(info Cacher = $(cacher))
     $(info Release = $(release))
     $(info Arch = $(arch))
 endif
