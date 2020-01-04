@@ -4,6 +4,9 @@
 # Toolchain to compile with
 toolchain := clang
 
+# Compile caching system
+cacher :=
+
 # Define debug vs. release
 release := 0
 
@@ -15,13 +18,13 @@ verbose := 0
 
 # Define the toolchain binaries
 ifeq ($(toolchain), clang)
-    CC := clang
-    CXX := clang++
+    CC := $(cacher) clang
+    CXX := $(cacher) clang++
     AR := llvm-ar
     STRIP := llvm-strip
 else ifeq ($(toolchain), gcc)
-    CC := gcc
-    CXX := g++
+    CC := $(cacher) gcc
+    CXX := $(cacher) g++
     AR := ar
     STRIP := strip
 else
