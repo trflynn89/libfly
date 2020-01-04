@@ -7,16 +7,12 @@
 define OBJ_OUT_FILES
 
 OBJ_DIR_$(d) := $(OBJ_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
-GEN_DIR_$(d) := $(GEN_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))
 
 o_$(d) := $$(addsuffix .o, $$(subst $(d),,$$(basename $(2))))
 o_$(d) := $$(addprefix $$(OBJ_DIR_$(d)), $$(o_$(d)))
 
 OBJ_$$(strip $(1)) += $$(o_$(d))
 DEP_$(d) := $$(o_$(d):%.o=%.d)
-
-CFLAGS_$$(d) += -I$$(GEN_DIR_$(d))
-CXXFLAGS_$$(d) += -I$$(GEN_DIR_$(d))
 
 endef
 
@@ -56,9 +52,9 @@ ifneq ($(5),)
     GEN_$$(strip $(1)) += $$(gu_$(d)) $$(gm_$(d)) $$(gq_$(d))
     OBJ_$$(strip $(1)) += $$(om_$(d)) $$(oq_$(d))
 
-    CFLAGS_$$(d) += $(QT_CFLAGS)
-    CXXFLAGS_$$(d) += $(QT_CFLAGS)
-    LDFLAGS_$$(d) += $(QT_LDFLAGS)
+    CFLAGS_$(d) += $(QT_CFLAGS) -I$$(GEN_DIR_$(d))
+    CXXFLAGS_$(d) += $(QT_CFLAGS) -I$$(GEN_DIR_$(d))
+    LDFLAGS_$(d) += $(QT_LDFLAGS)
     LDLIBS_$(d) += $$(addprefix -lQt$(QT_VERSION_MAJOR), $(5))
 endif
 

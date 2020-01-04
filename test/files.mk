@@ -37,12 +37,16 @@ SRC_$(d) := \
 SYSTEM_CALLS_$(d) := \
     ${shell grep -ohP "(?<=__wrap_)[a-zA-Z0-9_]+" "$(d)/mock/nix/mock_calls.cpp"}
 
+# Define compiler flags
+CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
+CXXFLAGS_$(d) += -I$(SOURCE_ROOT)/test/googletest/googletest
+
 # Define linker flags
 LDFLAGS_$(d) += \
     -static-libstdc++ \
     $(foreach mock, $(SYSTEM_CALLS_$(d)), -Wl,--wrap=$(mock))
 
 # Define libraries to link
-LDLIBS_$(d) := \
+LDLIBS_$(d) += \
     -latomic \
     -lpthread

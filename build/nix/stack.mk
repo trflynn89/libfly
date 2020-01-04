@@ -13,7 +13,8 @@
 # we need to be able to include subdirectories without the current directory
 # forgetting the previous directory.
 
-# Push a directory to the stack.
+# Push a directory to the stack. Default compiler and linker flags to the parent
+# directory's flag values.
 #
 # $(1) = The path to the target root directory.
 define PUSH_DIR
@@ -22,6 +23,13 @@ sp := $$(sp).x
 pd_$$(sp) := $$(d)
 
 d := $(SOURCE_ROOT)/$$(strip $(1))
+
+_$$(d) := $$(strip $$(patsubst %/, %, $$(dir $$(d))))
+
+CFLAGS_$$(d) := $$(CFLAGS_$$(_$$(d)))
+CXXFLAGS_$$(d) := $$(CXXFLAGS_$$(_$$(d)))
+LDFLAGS_$$(d) := $$(LDFLAGS_$$(_$$(d)))
+LDLIBS_$$(d) := $$(LDLIBS_$$(_$$(d)))
 
 endef
 
