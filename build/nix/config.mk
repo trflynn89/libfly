@@ -18,17 +18,23 @@ verbose := 0
 
 # Define the toolchain binaries
 ifeq ($(toolchain), clang)
-    CC := $(cacher) clang
-    CXX := $(cacher) clang++
+    CC := clang
+    CXX := clang++
     AR := llvm-ar
     STRIP := llvm-strip
 else ifeq ($(toolchain), gcc)
-    CC := $(cacher) gcc
-    CXX := $(cacher) g++
+    CC := gcc
+    CXX := g++
     AR := ar
     STRIP := strip
 else
     $(error Unrecognized toolchain $(toolchain), check config.mk)
+endif
+
+# Use a compiler cache if requested
+ifneq ($(cacher), )
+    CC := $(cacher) $(CC)
+    CXX := $(cacher) $(CXX)
 endif
 
 # Define the output directories
@@ -54,6 +60,7 @@ else
     $(info Obj dir = $(OBJ_DIR))
     $(info Etc dir = $(ETC_DIR))
     $(info Toolchain = $(toolchain))
+    $(info Cacher = $(cacher))
     $(info Release = $(release))
     $(info Arch = $(arch))
 endif
