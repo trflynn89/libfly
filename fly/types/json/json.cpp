@@ -1,8 +1,10 @@
 #include "fly/types/json/json.h"
 
 #include <algorithm>
+#include <cmath>
 #include <ios>
 #include <iterator>
+#include <limits>
 #include <utility>
 
 namespace fly {
@@ -284,16 +286,16 @@ const Json &Json::operator[](
 std::size_t Json::Size() const noexcept
 {
     auto visitor = [](const auto &value) -> std::size_t {
-        using U = std::decay_t<decltype(value)>;
+        using T = std::decay_t<decltype(value)>;
 
-        if constexpr (std::is_same_v<U, JsonTraits::null_type>)
+        if constexpr (std::is_same_v<T, JsonTraits::null_type>)
         {
             return 0;
         }
         else if constexpr (
-            std::is_same_v<U, JsonTraits::string_type> ||
-            std::is_same_v<U, JsonTraits::object_type> ||
-            std::is_same_v<U, JsonTraits::array_type>)
+            std::is_same_v<T, JsonTraits::string_type> ||
+            std::is_same_v<T, JsonTraits::object_type> ||
+            std::is_same_v<T, JsonTraits::array_type>)
         {
             return value.size();
         }
@@ -309,26 +311,39 @@ std::size_t Json::Size() const noexcept
 //==============================================================================
 bool operator==(const Json &json1, const Json &json2) noexcept
 {
-    auto is_numeric = [](const Json &json) {
-        return json.IsSignedInteger() || json.IsUnsignedInteger() ||
-            json.IsFloat();
+    // Formatter badly handles hanging indent in lambda parameters
+    // clang-format off
+    auto visitor = [&json1, &json2](
+        const auto &value1, const auto &value2) -> bool
+    {
+        using F = JsonTraits::float_type;
+        using T = std::decay_t<decltype(value1)>;
+        using U = std::decay_t<decltype(value2)>;
+
+        if constexpr (
+            (std::is_same_v<T, F> && JsonTraits::is_number_v<U>) ||
+            (std::is_same_v<U, F> && JsonTraits::is_number_v<T>))
+        {
+            constexpr auto epsilon = std::numeric_limits<T>::epsilon();
+
+            const auto fvalue1 = static_cast<F>(value1);
+            const auto fvalue2 = static_cast<F>(value2);
+
+            return std::abs(fvalue1 - fvalue2) <= epsilon;
+        }
+        else if constexpr (
+            JsonTraits::is_number_v<T> && JsonTraits::is_number_v<U>)
+        {
+            return value1 == static_cast<T>(value2);
+        }
+        else
+        {
+            return json1.m_value == json2.m_value;
+        }
     };
+    // clang-format on
 
-    if (json1.m_value.index() == json2.m_value.index())
-    {
-        return json1.m_value == json2.m_value;
-    }
-    else if (is_numeric(json1) && is_numeric(json2))
-    {
-        auto visitor = [&json2](const auto &value) -> bool {
-            using U = std::decay_t<decltype(value)>;
-            return value == U(json2);
-        };
-
-        return std::visit(visitor, json1.m_value);
-    }
-
-    return false;
+    return std::visit(visitor, json1.m_value, json2.m_value);
 }
 
 //==============================================================================
@@ -341,17 +356,17 @@ bool operator!=(const Json &json1, const Json &json2) noexcept
 std::ostream &operator<<(std::ostream &stream, const Json &json) noexcept
 {
     auto visitor = [&stream](const auto &value) {
-        using U = std::decay_t<decltype(value)>;
+        using T = std::decay_t<decltype(value)>;
 
-        if constexpr (std::is_same_v<U, JsonTraits::null_type>)
+        if constexpr (std::is_same_v<T, JsonTraits::null_type>)
         {
             stream << "null";
         }
-        else if constexpr (std::is_same_v<U, JsonTraits::string_type>)
+        else if constexpr (std::is_same_v<T, JsonTraits::string_type>)
         {
             stream << '"' << value << '"';
         }
-        else if constexpr (std::is_same_v<U, JsonTraits::object_type>)
+        else if constexpr (std::is_same_v<T, JsonTraits::object_type>)
         {
             stream << '{';
 
@@ -367,7 +382,7 @@ std::ostream &operator<<(std::ostream &stream, const Json &json) noexcept
 
             stream << '}';
         }
-        else if constexpr (std::is_same_v<U, JsonTraits::array_type>)
+        else if constexpr (std::is_same_v<T, JsonTraits::array_type>)
         {
             stream << '[';
 
@@ -383,7 +398,7 @@ std::ostream &operator<<(std::ostream &stream, const Json &json) noexcept
 
             stream << ']';
         }
-        else if constexpr (std::is_same_v<U, JsonTraits::boolean_type>)
+        else if constexpr (std::is_same_v<T, JsonTraits::boolean_type>)
         {
             stream << std::boolalpha << value;
         }
@@ -601,7 +616,7 @@ void Json::validateCharacter(
     JsonTraits::string_type::const_iterator &it,
     const JsonTraits::string_type::const_iterator &end) const noexcept(false)
 {
-    unsigned char c = *it;
+    auto c = static_cast<unsigned char>(*it);
 
     auto next = [&stream, &c, &it, &end]() -> bool {
         stream << *it;
@@ -611,8 +626,7 @@ void Json::validateCharacter(
             return false;
         }
 
-        c = *it;
-
+        c = static_cast<unsigned char>(*it);
         return true;
     };
 

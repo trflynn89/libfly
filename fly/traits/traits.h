@@ -117,8 +117,9 @@ private:
 
 public:
     template <typename T>
-    using is_declared = std::negation<
-        std::is_same<decltype(__test__::template test<T>(0)), std::false_type>>;
+    using is_declared = std::negation<std::is_same<
+        decltype(__test__::template test<T>(nullptr)),
+        std::false_type>>;
 
     template <typename T>
     inline static constexpr bool is_declared_v = is_declared<T>::value;

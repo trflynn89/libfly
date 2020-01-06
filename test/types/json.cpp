@@ -122,7 +122,7 @@ TEST_F(JsonTest, StringConstructorTest)
     const char *cstr1 = "c";
     EXPECT_TRUE(fly::Json(cstr1).IsString());
 
-    char *cstr2 = (char *)"d";
+    char *cstr2 = const_cast<char *>("d");
     EXPECT_TRUE(fly::Json(cstr2).IsString());
 
     const char arr1[] = {'g', '\0'};

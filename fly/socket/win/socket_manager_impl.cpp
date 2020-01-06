@@ -52,7 +52,7 @@ void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout) noexcept
     if (anyMasksSet)
     {
         // First argument of ::select() is ignored in Windows
-        if (::select(0, &readFd, &writeFd, NULL, &tv) > 0)
+        if (::select(0, &readFd, &writeFd, nullptr, &tv) > 0)
         {
             std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
             handleSocketIO(&readFd, &writeFd);

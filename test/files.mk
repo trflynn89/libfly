@@ -39,7 +39,7 @@ SYSTEM_CALLS_$(d) := \
 
 # Define compiler flags
 CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
-CXXFLAGS_$(d) += -I$(SOURCE_ROOT)/test/googletest/googletest
+CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest
 
 # Define linker flags
 LDFLAGS_$(d) += \

@@ -33,9 +33,9 @@ PathMonitorImpl::PathMonitorImpl(
     const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
     const std::shared_ptr<PathConfig> &spConfig) noexcept :
     PathMonitor(spTaskRunner, spConfig),
-    m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0))
+    m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0))
 {
-    if (m_iocp == NULL)
+    if (m_iocp == nullptr)
     {
         LOGS("Could not initialize IOCP");
     }
@@ -44,25 +44,25 @@ PathMonitorImpl::PathMonitorImpl(
 //==============================================================================
 PathMonitorImpl::~PathMonitorImpl()
 {
-    if (m_iocp != NULL)
+    if (m_iocp != nullptr)
     {
         ::CloseHandle(m_iocp);
-        m_iocp = NULL;
+        m_iocp = nullptr;
     }
 }
 
 //==============================================================================
 bool PathMonitorImpl::IsValid() const noexcept
 {
-    return m_iocp != NULL;
+    return m_iocp != nullptr;
 }
 
 //==============================================================================
 void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout) noexcept
 {
     DWORD bytes = 0;
-    ULONG_PTR pKey = NULL;
-    LPOVERLAPPED pOverlapped = NULL;
+    ULONG_PTR pKey = nullptr;
+    LPOVERLAPPED pOverlapped = nullptr;
     DWORD delay = static_cast<DWORD>(timeout.count());
 
     std::filesystem::path pathToRemove;
@@ -120,7 +120,7 @@ void PathMonitorImpl::handleEvents(
 {
     PFILE_NOTIFY_INFORMATION pInfo = spInfo->m_pInfo;
 
-    while (pInfo != NULL)
+    while (pInfo != nullptr)
     {
         PathMonitor::PathEvent event = convertToEvent(pInfo->Action);
 
@@ -149,7 +149,7 @@ void PathMonitorImpl::handleEvents(
 
         if (pInfo->NextEntryOffset == 0_u64)
         {
-            pInfo = NULL;
+            pInfo = nullptr;
         }
         else
         {
@@ -203,10 +203,10 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
         path.string().c_str(),
         s_accessFlags,
         s_shareFlags,
-        NULL,
+        nullptr,
         s_dispositionFlags,
         s_attributeFlags,
-        NULL);
+        nullptr);
 
     if (m_handle == INVALID_HANDLE_VALUE)
     {
@@ -217,7 +217,7 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     HANDLE port =
         ::CreateIoCompletionPort(m_handle, iocp, (ULONG_PTR)m_handle, 0);
 
-    if (port == NULL)
+    if (port == nullptr)
     {
         LOGS("Could not create IOCP info for \"%s\"", path);
         return;
@@ -229,10 +229,10 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
 //==============================================================================
 PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 {
-    if (m_pInfo != NULL)
+    if (m_pInfo != nullptr)
     {
         delete[] m_pInfo;
-        m_pInfo = NULL;
+        m_pInfo = nullptr;
     }
 
     if (m_handle != INVALID_HANDLE_VALUE)
@@ -264,7 +264,7 @@ bool PathMonitorImpl::PathInfoImpl::Refresh(
         s_changeFlags,
         &bytes,
         &m_overlapped,
-        NULL);
+        nullptr);
 
     if (success == FALSE)
     {

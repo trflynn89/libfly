@@ -15,6 +15,8 @@
 #include <mutex>
 #include <string>
 
+#define COMMA_IF(...) ,
+
 //==============================================================================
 #define _LOG(level, format)                                                    \
     fly::Logger::AddLog(level, __FILE__, __FUNCTION__, __LINE__, format)

@@ -13,11 +13,49 @@ LDLIBS :=
 
 # Compiler flags for both C and C++ files
 CF_ALL := -MMD -MP -fPIC
-CF_ALL += -Wall -Wextra -Werror
 CF_ALL += -I$(SOURCE_ROOT) -I$(GEN_DIR)
 
 ifeq ($(arch), x86)
     CF_ALL += -m32
+endif
+
+# Warning flags
+CF_ALL += \
+    -Wall \
+    -Wextra \
+    \
+    -Werror \
+    \
+    -Wcast-align \
+    -Wcast-qual \
+    -Wctor-dtor-privacy \
+    -Wdisabled-optimization \
+    -Wfloat-equal \
+    -Winline \
+    -Winvalid-pch \
+    -Wmissing-declarations \
+    -Wnon-virtual-dtor \
+    -Wold-style-cast \
+    -Woverloaded-virtual \
+    -Wredundant-decls \
+    -Wshadow \
+    -Wsign-conversion \
+    -Wstrict-overflow=5 \
+    -Wundef \
+    -Wunused \
+    -Wzero-as-null-pointer-constant
+
+ifeq ($(toolchain), clang)
+    CF_ALL += \
+        -Wnewline-eof
+else ifeq ($(toolchain), gcc)
+    CF_ALL += \
+        -Wlogical-op \
+        -Wnoexcept \
+        -Wsign-promo \
+        -Wsuggest-final-methods \
+        -Wsuggest-final-types \
+        -Wsuggest-override
 endif
 
 # Optimize release builds, and add debug symbols / use address sanitizer for

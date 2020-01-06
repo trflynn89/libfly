@@ -1,6 +1,7 @@
 #include "fly/types/string/string.h"
 
 #include "fly/fly.h"
+#include "fly/types/numeric/literals.h"
 
 #include <gtest/gtest.h>
 
@@ -810,7 +811,7 @@ TYPED_TEST(BasicStringTest, ConvertStringTest)
     const char_type *c = FLY_STR(char_type, "def");
     EXPECT_EQ(StringClass::template Convert<string_type>(c), c);
 
-    char_type *d = (char_type *)FLY_STR(char_type, "ghi");
+    char_type *d = const_cast<char_type *>(FLY_STR(char_type, "ghi"));
     EXPECT_EQ(StringClass::template Convert<string_type>(d), d);
 }
 
@@ -863,7 +864,7 @@ TYPED_TEST(BasicStringTest, ConvertCharTest)
     EXPECT_EQ(StringClass::template Convert<streamed_char>(s), 'A');
     EXPECT_EQ(
         StringClass::template Convert<ustreamed_char>(s),
-        (ustreamed_char)65);
+        static_cast<ustreamed_char>(65));
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
@@ -913,17 +914,15 @@ TYPED_TEST(BasicStringTest, ConvertInt8Test)
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), (std::int8_t)0);
-    EXPECT_EQ(StringClass::template Convert<std::uint8_t>(s), (std::uint8_t)0);
+    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), 0_i8);
+    EXPECT_EQ(StringClass::template Convert<std::uint8_t>(s), 0_u8);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), (std::int8_t)100);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint8_t>(s),
-        (std::uint8_t)100);
+    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), 100_i8);
+    EXPECT_EQ(StringClass::template Convert<std::uint8_t>(s), 100_u8);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), (std::int8_t)-100);
+    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), -100_i8);
     EXPECT_THROW(
         StringClass::template Convert<std::uint8_t>(s),
         std::out_of_range);
@@ -976,23 +975,15 @@ TYPED_TEST(BasicStringTest, ConvertInt16Test)
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), (std::int16_t)0);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint16_t>(s),
-        (std::uint16_t)0);
+    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), 0_i16);
+    EXPECT_EQ(StringClass::template Convert<std::uint16_t>(s), 0_u16);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int16_t>(s),
-        (std::int16_t)100);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint16_t>(s),
-        (std::uint16_t)100);
+    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), 100_i16);
+    EXPECT_EQ(StringClass::template Convert<std::uint16_t>(s), 100_u16);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int16_t>(s),
-        (std::int16_t)-100);
+    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), -100_i16);
     EXPECT_THROW(
         StringClass::template Convert<std::uint16_t>(s),
         std::out_of_range);
@@ -1045,23 +1036,15 @@ TYPED_TEST(BasicStringTest, ConvertInt32Test)
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), (std::int32_t)0);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint32_t>(s),
-        (std::uint32_t)0);
+    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), 0_i32);
+    EXPECT_EQ(StringClass::template Convert<std::uint32_t>(s), 0_u32);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int32_t>(s),
-        (std::int32_t)100);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint32_t>(s),
-        (std::uint32_t)100);
+    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), 100_i32);
+    EXPECT_EQ(StringClass::template Convert<std::uint32_t>(s), 100_u32);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int32_t>(s),
-        (std::int32_t)-100);
+    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), -100_i32);
     EXPECT_THROW(
         StringClass::template Convert<std::uint32_t>(s),
         std::out_of_range);
@@ -1114,23 +1097,15 @@ TYPED_TEST(BasicStringTest, ConvertInt64Test)
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), (std::int64_t)0);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint64_t>(s),
-        (std::uint64_t)0);
+    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), 0_i64);
+    EXPECT_EQ(StringClass::template Convert<std::uint64_t>(s), 0_u64);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int64_t>(s),
-        (std::int64_t)100);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint64_t>(s),
-        (std::uint64_t)100);
+    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), 100_i64);
+    EXPECT_EQ(StringClass::template Convert<std::uint64_t>(s), 100_u64);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int64_t>(s),
-        (std::int64_t)-100);
+    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), -100_i64);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(

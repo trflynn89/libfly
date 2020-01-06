@@ -98,18 +98,6 @@ struct JsonTraits
         is_floating_point<T>::value;
 
     /**
-     * Define a trait for testing if type T is any JSON number type.
-     */
-    template <typename T>
-    using is_number = std::bool_constant<
-        is_signed_integer_v<std::decay_t<T>> ||
-        is_unsigned_integer_v<std::decay_t<T>> ||
-        is_floating_point_v<std::decay_t<T>>>;
-
-    template <typename T>
-    inline static constexpr bool is_number_v = is_number<T>::value;
-
-    /**
      * Helper SFINAE struct to determine whether a type is a JSON object.
      */
     struct __object__

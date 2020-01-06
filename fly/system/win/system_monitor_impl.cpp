@@ -22,20 +22,20 @@ SystemMonitorImpl::SystemMonitorImpl(
     const std::shared_ptr<SystemConfig> &spConfig) noexcept :
     SystemMonitor(spTaskRunner, spConfig),
     m_process(::GetCurrentProcess()),
-    m_cpuQuery(NULL),
-    m_cpuCounter(NULL),
+    m_cpuQuery(nullptr),
+    m_cpuCounter(nullptr),
     m_prevProcessSystemTime(0),
     m_prevProcessUserTime(0),
     m_prevTime(0)
 {
-    PDH_STATUS status = ::PdhOpenQuery(NULL, NULL, &m_cpuQuery);
+    PDH_STATUS status = ::PdhOpenQuery(nullptr, nullptr, &m_cpuQuery);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not open CPU query (%x)", status);
         return;
     }
 
-    status = ::PdhAddCounter(m_cpuQuery, s_cpuPath, NULL, &m_cpuCounter);
+    status = ::PdhAddCounter(m_cpuQuery, s_cpuPath, nullptr, &m_cpuCounter);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not add CPU counter (%x)", status);
@@ -55,10 +55,10 @@ SystemMonitorImpl::SystemMonitorImpl(
 //==============================================================================
 SystemMonitorImpl::~SystemMonitorImpl()
 {
-    if (m_cpuQuery != NULL)
+    if (m_cpuQuery != nullptr)
     {
         ::PdhCloseQuery(m_cpuQuery);
-        m_cpuQuery = NULL;
+        m_cpuQuery = nullptr;
     }
 }
 
@@ -93,7 +93,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
     status = ::PdhGetFormattedCounterValue(
         m_cpuCounter,
         PDH_FMT_DOUBLE,
-        NULL,
+        nullptr,
         &value);
     if (status != ERROR_SUCCESS)
     {

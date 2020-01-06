@@ -184,7 +184,7 @@ bool HuffmanDecoder::decodeCodes(
             if (m_huffmanCodesSize != 0)
             {
                 const HuffmanCode &last =
-                    m_huffmanCodes[m_huffmanCodesSize - 1];
+                    m_huffmanCodes[m_huffmanCodesSize - 1_u16];
 
                 const length_type shift = length - last.m_length;
                 code = (last.m_code + 1) << shift;

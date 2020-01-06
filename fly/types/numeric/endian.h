@@ -65,15 +65,15 @@ inline T endian_swap(T value) noexcept
     }
     else if constexpr (sizeof(T) == 2)
     {
-        return bswap_16(value);
+        return static_cast<T>(bswap_16(static_cast<std::uint16_t>(value)));
     }
     else if constexpr (sizeof(T) == 4)
     {
-        return bswap_32(value);
+        return static_cast<T>(bswap_32(static_cast<std::uint32_t>(value)));
     }
     else if constexpr (sizeof(T) == 8)
     {
-        return bswap_64(value);
+        return static_cast<T>(bswap_64(static_cast<std::uint64_t>(value)));
     }
 }
 

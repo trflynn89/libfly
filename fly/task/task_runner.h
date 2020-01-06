@@ -74,7 +74,7 @@ protected:
      * Completion notification triggered by the task manager that a task has
      * finished execution (or was skipped).
      *
-     * @param Task The (possibly NULL) task that was executed or skipped.
+     * @param Task The (possibly null) task that was executed or skipped.
      */
     virtual void TaskComplete(const std::shared_ptr<Task> &) noexcept = 0;
 
@@ -112,7 +112,7 @@ protected:
     /**
      * This implementation does nothing.
      *
-     * @param Task The (possibly NULL) task that was executed or skipped.
+     * @param Task The (possibly null) task that was executed or skipped.
      */
     void TaskComplete(const std::shared_ptr<Task> &) noexcept override;
 };
@@ -143,7 +143,7 @@ protected:
     /**
      * When a task is complete, post the next task in the pending queue.
      *
-     * @param Task The (possibly NULL) task that was executed or skipped.
+     * @param Task The (possibly null) task that was executed or skipped.
      */
     void TaskComplete(const std::shared_ptr<Task> &) noexcept override;
 
