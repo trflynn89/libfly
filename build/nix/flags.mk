@@ -34,6 +34,7 @@ CF_ALL += \
     -Winline \
     -Winvalid-pch \
     -Wmissing-declarations \
+    -Wpointer-arith \
     -Wnon-virtual-dtor \
     -Wold-style-cast \
     -Woverloaded-virtual \
@@ -42,8 +43,11 @@ CF_ALL += \
     -Wsign-conversion \
     -Wstrict-overflow=5 \
     -Wundef \
+    -Wunreachable-code \
     -Wunused \
-    -Wzero-as-null-pointer-constant
+    -Wzero-as-null-pointer-constant \
+    \
+    -pedantic
 
 ifeq ($(toolchain), clang)
     CF_ALL += \
@@ -52,6 +56,7 @@ else ifeq ($(toolchain), gcc)
     CF_ALL += \
         -Wlogical-op \
         -Wnoexcept \
+        -Wredundant-decls \
         -Wsign-promo \
         -Wsuggest-final-methods \
         -Wsuggest-final-types \
