@@ -9,11 +9,40 @@
 #    include <WinSock.h>
 #endif
 
-#define SLOGD(handle, format, ...) LOGD("[%d] " format, handle, ##__VA_ARGS__)
-#define SLOGI(handle, format, ...) LOGI("[%d] " format, handle, ##__VA_ARGS__)
-#define SLOGW(handle, format, ...) LOGW("[%d] " format, handle, ##__VA_ARGS__)
-#define SLOGS(handle, format, ...) LOGS("[%d] " format, handle, ##__VA_ARGS__)
-#define SLOGE(handle, format, ...) LOGE("[%d] " format, handle, ##__VA_ARGS__)
+/**
+ * Wrapper logging macros to format logs with socket handles in a consistent
+ * manner.
+ *
+ * The private macros used internally insert commas only if one is needed, which
+ * the formatter doesn't handle.
+ */
+// clang-format off
+#define SLOGD(handle, ...)                                                     \
+    LOGD(                                                                      \
+        "[%d] " _GET_FORMAT_STRING(__VA_ARGS__),                               \
+        handle                                                                 \
+        _GET_FORMAT_ARGS(__VA_ARGS__))
+#define SLOGI(handle, ...)                                                     \
+    LOGI(                                                                      \
+        "[%d] " _GET_FORMAT_STRING(__VA_ARGS__),                               \
+        handle                                                                 \
+        _GET_FORMAT_ARGS(__VA_ARGS__))
+#define SLOGW(handle, ...)                                                     \
+    LOGW(                                                                      \
+        "[%d] " _GET_FORMAT_STRING(__VA_ARGS__),                               \
+        handle                                                                 \
+        _GET_FORMAT_ARGS(__VA_ARGS__))
+#define SLOGS(handle, ...)                                                     \
+    LOGS(                                                                      \
+        "[%d] " _GET_FORMAT_STRING(__VA_ARGS__),                               \
+        handle                                                                 \
+        _GET_FORMAT_ARGS(__VA_ARGS__))
+#define SLOGE(handle, ...)                                                     \
+    LOGE(                                                                      \
+        "[%d] " _GET_FORMAT_STRING(__VA_ARGS__),                               \
+        handle                                                                 \
+        _GET_FORMAT_ARGS(__VA_ARGS__))
+// clang-format on
 
 namespace fly {
 

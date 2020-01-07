@@ -111,7 +111,7 @@ using DataTypes = ::testing::Types<
     std::uint32_t,
     std::uint64_t>;
 
-TYPED_TEST_SUITE(EndianTest, DataTypes);
+TYPED_TEST_SUITE(EndianTest, DataTypes, );
 
 //==============================================================================
 TYPED_TEST(EndianTest, BigEndianTest)

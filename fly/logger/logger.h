@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/fly.h"
+#include "fly/logger/detail/logger_macros.h"
 #include "fly/logger/log.h"
 #include "fly/system/system.h"
 #include "fly/task/task.h"
@@ -15,44 +16,38 @@
 #include <mutex>
 #include <string>
 
-#define COMMA_IF(...) ,
+//==============================================================================
+#define LOGD(...) _LOG(fly::Log::Level::Debug, fly::String::Format(__VA_ARGS__))
 
 //==============================================================================
-#define _LOG(level, format)                                                    \
-    fly::Logger::AddLog(level, __FILE__, __FUNCTION__, __LINE__, format)
+#define LOGI(...) _LOG(fly::Log::Level::Info, fly::String::Format(__VA_ARGS__))
 
 //==============================================================================
-#define LOGD(format, ...)                                                      \
-    _LOG(fly::Log::Level::Debug, fly::String::Format(format, ##__VA_ARGS__))
+#define LOGW(...) _LOG(fly::Log::Level::Warn, fly::String::Format(__VA_ARGS__))
 
 //==============================================================================
-#define LOGI(format, ...)                                                      \
-    _LOG(fly::Log::Level::Info, fly::String::Format(format, ##__VA_ARGS__))
-
-//==============================================================================
-#define LOGW(format, ...)                                                      \
-    _LOG(fly::Log::Level::Warn, fly::String::Format(format, ##__VA_ARGS__))
-
-//==============================================================================
-#define LOGS(format, ...)                                                      \
+// The private macros used internally insert commas only if one is needed, which
+// the formatter doesn't handle.
+// clang-format off
+#define LOGS(...)                                                              \
     _LOG(                                                                      \
         fly::Log::Level::Warn,                                                 \
         fly::String::Format(                                                   \
-            format ": %s",                                                     \
-            ##__VA_ARGS__,                                                     \
+            _GET_FORMAT_STRING(__VA_ARGS__) ": %s"                             \
+            _GET_FORMAT_ARGS(__VA_ARGS__),                                     \
             fly::System::GetErrorString()))
+// clang-format on
 
 //==============================================================================
-#define LOGE(format, ...)                                                      \
-    _LOG(fly::Log::Level::Error, fly::String::Format(format, ##__VA_ARGS__))
+#define LOGE(...) _LOG(fly::Log::Level::Error, fly::String::Format(__VA_ARGS__))
 
 //==============================================================================
-#define LOGC(format, ...)                                                      \
-    fly::Logger::ConsoleLog(true, fly::String::Format(format, ##__VA_ARGS__))
+#define LOGC(...)                                                              \
+    fly::Logger::ConsoleLog(true, fly::String::Format(__VA_ARGS__))
 
 //==============================================================================
-#define LOGC_NO_LOCK(format, ...)                                              \
-    fly::Logger::ConsoleLog(false, fly::String::Format(format, ##__VA_ARGS__))
+#define LOGC_NO_LOCK(...)                                                      \
+    fly::Logger::ConsoleLog(false, fly::String::Format(__VA_ARGS__))
 
 namespace fly {
 
