@@ -16,38 +16,68 @@
 #include <mutex>
 #include <string>
 
-//==============================================================================
-#define LOGD(...) _LOG(fly::Log::Level::Debug, fly::String::Format(__VA_ARGS__))
-
-//==============================================================================
-#define LOGI(...) _LOG(fly::Log::Level::Info, fly::String::Format(__VA_ARGS__))
-
-//==============================================================================
-#define LOGW(...) _LOG(fly::Log::Level::Warn, fly::String::Format(__VA_ARGS__))
-
-//==============================================================================
 // The private macros used internally insert commas only if one is needed, which
 // the formatter doesn't handle.
 // clang-format off
-#define LOGS(...)                                                              \
-    _LOG(                                                                      \
-        fly::Log::Level::Warn,                                                 \
-        fly::String::Format(                                                   \
-            _GET_FORMAT_STRING(__VA_ARGS__) ": %s"                             \
-            _GET_FORMAT_ARGS(__VA_ARGS__),                                     \
-            fly::System::GetErrorString()))
-// clang-format on
 
 //==============================================================================
-#define LOGE(...) _LOG(fly::Log::Level::Error, fly::String::Format(__VA_ARGS__))
+#define LOGD(...)                                                              \
+    _FLY_LOG(                                                                  \
+        fly::Log::Level::Debug,                                                \
+        fly::String::Format(                                                   \
+            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
+            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+
+//==============================================================================
+#define LOGI(...)                                                              \
+    _FLY_LOG(                                                                  \
+        fly::Log::Level::Info,                                                 \
+        fly::String::Format(                                                   \
+            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
+            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+
+//==============================================================================
+#define LOGW(...)                                                              \
+    _FLY_LOG(                                                                  \
+        fly::Log::Level::Warn,                                                 \
+        fly::String::Format(                                                   \
+            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
+            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+
+//==============================================================================
+#define LOGS(...)                                                              \
+    _FLY_LOG(                                                                  \
+        fly::Log::Level::Warn,                                                 \
+        fly::String::Format(                                                   \
+            _FLY_FORMAT_STRING(__VA_ARGS__) ": %s"                             \
+            _FLY_FORMAT_ARGS(__VA_ARGS__),                                     \
+            fly::System::GetErrorString()))
+
+//==============================================================================
+#define LOGE(...)                                                              \
+    _FLY_LOG(                                                                  \
+        fly::Log::Level::Error,                                                \
+        fly::String::Format(                                                   \
+            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
+            _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
 //==============================================================================
 #define LOGC(...)                                                              \
-    fly::Logger::ConsoleLog(true, fly::String::Format(__VA_ARGS__))
+    fly::Logger::ConsoleLog(                                                   \
+        true,                                                                  \
+        fly::String::Format(                                                   \
+            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
+            _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
 //==============================================================================
 #define LOGC_NO_LOCK(...)                                                      \
-    fly::Logger::ConsoleLog(false, fly::String::Format(__VA_ARGS__))
+    fly::Logger::ConsoleLog(                                                   \
+        false,                                                                 \
+        fly::String::Format(                                                   \
+            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
+            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+
+// clang-format on
 
 namespace fly {
 
@@ -68,9 +98,15 @@ class SequencedTaskRunner;
  *   LOGD(message, message arguments)
  *   For example, LOGD(1, "This is message number %d", 10)
  *
+ * THE LOGS macro is provided for system error logging. It produces a warning-
+ * level log point with the last system error appended to the given message.
+ *
  * The LOGC macro is also provided for thread-safe console logging. LOGC_NO_LOCK
  * is also provided for console logging without acquiring the console lock while
  * inside, e.g., a signal handler.
+ *
+ * The logging macros support up to and including 50 format arguments. If more
+ * are needed, invoke Logger::AddLog directly.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 21, 2016

@@ -4,14 +4,14 @@
  * Helper macro to add a log, so all of the public logging macros do not have to
  * insert the file, function, and line macros.
  */
-#define _LOG(level, message)                                                   \
+#define _FLY_LOG(level, message)                                               \
     fly::Logger::AddLog(level, __FILE__, __FUNCTION__, __LINE__, message)
 
 /**
  * Return the first argument in a list of variadic arguments, expected to be the
  * logging format string.
  */
-#define _GET_FORMAT_STRING(...) _GET_FORMAT_STRING_HELPER(__VA_ARGS__, _)
+#define _FLY_FORMAT_STRING(...) _FLY_FORMAT_STRING_HELPER(__VA_ARGS__, _)
 
 /**
  * Return all but the first argument in a list of variadic arguments, expected
@@ -23,27 +23,28 @@
  * If there is more than one argument, this macro expands to a comma followed by
  * all but the first argument.
  *
- * Currently supports up to 49 arguments.
+ * Currently supports up to and including 50 arguments.
  */
-#define _GET_FORMAT_ARGS(...)                                                  \
-    _GET_FORMAT_ARGS_HELPER(_GET_FORMAT_ARGS_LABEL(__VA_ARGS__), __VA_ARGS__)
+#define _FLY_FORMAT_ARGS(...)                                                  \
+    _FLY_FORMAT_ARGS_HELPER(_FLY_FORMAT_ARGS_LABEL(__VA_ARGS__), __VA_ARGS__)
 
 //==============================================================================
-#define _GET_FORMAT_STRING_HELPER(F, ...) F
+#define _FLY_FORMAT_STRING_HELPER(F, ...) F
 
-#define _GET_FORMAT_ARGS_HELPER(LABEL, ...)                                    \
-    _GET_FORMAT_ARGS_HELPER2(LABEL, __VA_ARGS__)
+#define _FLY_FORMAT_ARGS_HELPER(LABEL, ...)                                    \
+    _FLY_FORMAT_ARGS_HELPER2(LABEL, __VA_ARGS__)
 
-#define _GET_FORMAT_ARGS_HELPER2(LABEL, ...)                                   \
-    _GET_FORMAT_ARGS_HELPER_##LABEL(__VA_ARGS__)
+#define _FLY_FORMAT_ARGS_HELPER2(LABEL, ...)                                   \
+    _FLY_FORMAT_ARGS_HELPER_##LABEL(__VA_ARGS__)
 
-#define _GET_FORMAT_ARGS_HELPER_SINGLE(first)
+#define _FLY_FORMAT_ARGS_HELPER_SINGLE(first)
 
-#define _GET_FORMAT_ARGS_HELPER_MULTIPLE(first, ...) , __VA_ARGS__
+#define _FLY_FORMAT_ARGS_HELPER_MULTIPLE(first, ...) , __VA_ARGS__
 
-#define _GET_FORMAT_ARGS_LABEL(...)                                            \
-    _GET_FORMAT_ARGS_LABEL_HELPER(                                             \
+#define _FLY_FORMAT_ARGS_LABEL(...)                                            \
+    _FLY_FORMAT_ARGS_LABEL_HELPER(                                             \
         __VA_ARGS__,                                                           \
+        MULTIPLE,                                                              \
         MULTIPLE,                                                              \
         MULTIPLE,                                                              \
         MULTIPLE,                                                              \
@@ -95,7 +96,7 @@
         SINGLE,                                                                \
         _)
 
-#define _GET_FORMAT_ARGS_LABEL_HELPER(                                         \
+#define _FLY_FORMAT_ARGS_LABEL_HELPER(                                         \
     ARG_01,                                                                    \
     ARG_02,                                                                    \
     ARG_03,                                                                    \
@@ -146,5 +147,6 @@
     ARG_48,                                                                    \
     ARG_49,                                                                    \
     ARG_50,                                                                    \
+    ARG_51,                                                                    \
     ...)                                                                       \
-    ARG_50
+    ARG_51
