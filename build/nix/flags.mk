@@ -19,7 +19,7 @@ ifeq ($(arch), x86)
     CF_ALL += -m32
 endif
 
-# Warning flags
+# Error and warning flags
 CF_ALL += \
     -Wall \
     -Wextra \
