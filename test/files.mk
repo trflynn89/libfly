@@ -12,7 +12,6 @@ SRC_DIRS_$(d) := \
     fly/types/bit_stream \
     fly/types/bit_stream/detail \
     fly/types/json \
-    test/googletest \
     test/mock \
     test/util
 
