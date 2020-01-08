@@ -11,7 +11,7 @@
  * Return the first argument in a list of variadic arguments, expected to be the
  * logging format string.
  */
-#define _FLY_FORMAT_STRING(...) _FLY_FORMAT_STRING_HELPER(__VA_ARGS__, _)
+#define _FLY_FORMAT_STRING(args) _FLY_FORMAT_STRING_HELPER args
 
 /**
  * Return all but the first argument in a list of variadic arguments, expected
@@ -29,8 +29,9 @@
     _FLY_FORMAT_ARGS_HELPER(_FLY_FORMAT_ARGS_LABEL(__VA_ARGS__), __VA_ARGS__)
 
 //==============================================================================
-#define _FLY_FORMAT_STRING_HELPER(F, ...) F
+#define _FLY_FORMAT_STRING_HELPER(N, ...) N
 
+//==============================================================================
 #define _FLY_FORMAT_ARGS_HELPER(LABEL, ...)                                    \
     _FLY_FORMAT_ARGS_HELPER2(LABEL, __VA_ARGS__)
 
