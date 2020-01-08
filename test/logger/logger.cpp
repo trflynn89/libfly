@@ -105,7 +105,7 @@ protected:
             fly::PathUtil::ReadFile(m_spLogger->GetLogFilePath());
         ASSERT_FALSE(contents.empty());
 
-        std::uintmax_t count = 0;
+        std::size_t count = 0;
         double lastTime = 0.0;
 
         for (const std::string &log : fly::String::Split(contents, '\n'))
@@ -115,7 +115,7 @@ protected:
             ASSERT_EQ(sections.size(), 7_zu);
 
             const auto index =
-                fly::String::Convert<std::uintmax_t>(sections[0]);
+                fly::String::Convert<std::size_t>(sections[0]);
             const auto level = static_cast<fly::Log::Level>(
                 fly::String::Convert<std::uint8_t>(sections[1]));
             const auto time = fly::String::Convert<double>(sections[2]);
@@ -129,7 +129,7 @@ protected:
             EXPECT_GE(time, lastTime);
             EXPECT_EQ(file, __FILE__);
             EXPECT_EQ(function, expectedFunction);
-            EXPECT_GT(line, 0);
+            EXPECT_GT(line, 0_u32);
             EXPECT_TRUE(
                 fly::String::StartsWith(message, expectedMessages[count]));
 
