@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <cstdarg>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -154,14 +155,14 @@ public:
      * @param Level The level (debug, info, etc.) of the log.
      * @param const char * Name of the file storing the log.
      * @param const char * Name of the function storing the log.
-     * @param unsigned int The line number the log point occurs.
+     * @param uint32_t The line number the log point occurs.
      * @param string The message to log.
      */
     static void AddLog(
         Log::Level,
         const char *,
         const char *,
-        unsigned int,
+        std::uint32_t,
         const std::string &) noexcept;
 
     /**
@@ -191,14 +192,14 @@ private:
      * @param Level The level (debug, info, etc.) of the log.
      * @param const char * Name of the file storing the log.
      * @param const char * Name of the function storing the log.
-     * @param unsigned int The line number the log point occurs.
+     * @param uint32_t The line number the log point occurs.
      * @param string The message to log.
      */
     void addLog(
         Log::Level,
         const char *,
         const char *,
-        unsigned int,
+        std::uint32_t,
         const std::string &) noexcept;
 
     /**
