@@ -79,7 +79,7 @@ constexpr int callStoi(const StringType &) noexcept
 template <typename T>
 struct BasicStringTraitsTest : public ::testing::Test
 {
-    using string_type = T;
+    using string_base_type = T;
 };
 
 using StringTypes =
@@ -90,7 +90,7 @@ TYPED_TEST_SUITE(BasicStringTraitsTest, StringTypes, );
 //==============================================================================
 TYPED_TEST(BasicStringTraitsTest, StoiFamilyTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using traits = typename fly::detail::BasicStringTraits<string_type>;
 
     constexpr bool is_string = std::is_same_v<string_type, std::string>;
@@ -102,7 +102,7 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamilyTest)
 //==============================================================================
 TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAETest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using char_type = typename string_type::value_type;
 
     constexpr bool is_string = std::is_same_v<string_type, std::string>;
@@ -124,7 +124,7 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAETest)
 //==============================================================================
 TYPED_TEST(BasicStringTraitsTest, StringLikeTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using traits = typename fly::detail::BasicStringTraits<string_type>;
 
     constexpr bool is_string = std::is_same_v<string_type, std::string>;
@@ -264,7 +264,7 @@ TYPED_TEST(BasicStringTraitsTest, StringLikeTest)
 //==============================================================================
 TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAETest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using char_type = typename string_type::value_type;
     using char_pointer_type = typename std::add_pointer<char_type>::type;
 
@@ -278,7 +278,7 @@ TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAETest)
 //==============================================================================
 TYPED_TEST(BasicStringTraitsTest, OstreamTraitsTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using traits = typename fly::detail::BasicStringTraits<string_type>;
     using streamed_type = typename traits::streamer_type::streamed_type;
 

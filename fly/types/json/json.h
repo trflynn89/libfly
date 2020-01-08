@@ -710,7 +710,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
 Json::operator T() const noexcept(false)
 {
-    auto visitor = [](const auto &value) -> T {
+    auto visitor = [](const auto &value) noexcept -> T {
         using U = std::decay_t<decltype(value)>;
 
         if constexpr (

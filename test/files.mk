@@ -12,6 +12,7 @@ SRC_DIRS_$(d) := \
     fly/types/bit_stream \
     fly/types/bit_stream/detail \
     fly/types/json \
+    test/googletest \
     test/mock \
     test/util
 
@@ -28,18 +29,19 @@ SRC_DIRS_$(d) += \
     test/traits \
     test/types
 
-# Define source files
-SRC_$(d) := \
-    $(d)/googletest/googletest/src/gtest-all.cc \
-    $(d)/googletest/googletest/src/gtest_main.cc
-
 # Define the list of available mocked system calls
 SYSTEM_CALLS_$(d) := \
     ${shell grep -ohP "(?<=__wrap_)[a-zA-Z0-9_]+" "$(d)/mock/nix/mock_calls.cpp"}
 
 # Define compiler flags
-CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
-CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest
+CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/src/googletest/include
+CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/src/googletest
+
+# Tests that use TYPED_TEST_SUITE cannot compile with -Wsuggest-override because
+# googletest does not mark some overriden methods with the override attribute.
+ifeq ($(toolchain), gcc)
+    CXXFLAGS_$(d) += -Wno-suggest-override
+endif
 
 # Define linker flags
 LDFLAGS_$(d) += \

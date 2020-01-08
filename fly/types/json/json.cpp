@@ -285,7 +285,7 @@ const Json &Json::operator[](
 //==============================================================================
 std::size_t Json::Size() const noexcept
 {
-    auto visitor = [](const auto &value) -> std::size_t {
+    auto visitor = [](const auto &value) noexcept -> std::size_t {
         using T = std::decay_t<decltype(value)>;
 
         if constexpr (std::is_same_v<T, JsonTraits::null_type>)
@@ -314,7 +314,7 @@ bool operator==(const Json &json1, const Json &json2) noexcept
     // Formatter badly handles hanging indent in lambda parameters
     // clang-format off
     auto visitor = [&json1, &json2](
-        const auto &value1, const auto &value2) -> bool
+        const auto &value1, const auto &value2) noexcept -> bool
     {
         using F = JsonTraits::float_type;
         using T = std::decay_t<decltype(value1)>;

@@ -40,7 +40,6 @@ CF_ALL += \
     -Woverloaded-virtual \
     -Wredundant-decls \
     -Wshadow \
-    -Wsign-conversion \
     -Wstrict-overflow=5 \
     -Wundef \
     -Wunreachable-code \
@@ -51,7 +50,8 @@ CF_ALL += \
 
 ifeq ($(toolchain), clang)
     CF_ALL += \
-        -Wnewline-eof
+        -Wnewline-eof \
+        -Wsign-conversion
 else ifeq ($(toolchain), gcc)
     CF_ALL += \
         -Wlogical-op \
