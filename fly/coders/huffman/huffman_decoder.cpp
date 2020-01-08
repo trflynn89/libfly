@@ -244,7 +244,7 @@ bool HuffmanDecoder::decodeSymbols(
     {
         output.write(
             reinterpret_cast<const std::ios::char_type *>(m_chunkBuffer.get()),
-            bytes);
+            static_cast<std::streamsize>(bytes));
     }
 
     return (bytes == chunkSize) || input.FullyConsumed();
