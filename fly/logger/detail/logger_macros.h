@@ -26,26 +26,31 @@
  * Currently supports up to and including 50 arguments.
  */
 #define _FLY_FORMAT_ARGS(...)                                                  \
-    _FLY_FORMAT_ARGS_HELPER(_FLY_FORMAT_ARGS_LABEL(__VA_ARGS__), __VA_ARGS__)
+    _FLY_FORMAT_ARGS_HELPER(_FLY_FORMAT_ARGS_LABEL(__VA_ARGS__), (__VA_ARGS__))
 
 //==============================================================================
 #define _FLY_FORMAT_STRING_HELPER(args) _FLY_FORMAT_STRING_HELPER2 args
 
-#define _FLY_FORMAT_STRING_HELPER2(N, ...) N
+#define _FLY_FORMAT_STRING_HELPER2(first, ...) first
 
 //==============================================================================
-#define _FLY_FORMAT_ARGS_HELPER(LABEL, ...)                                    \
-    _FLY_FORMAT_ARGS_HELPER2(LABEL, __VA_ARGS__)
+#define _FLY_FORMAT_ARGS_HELPER(label, args)                                   \
+    _FLY_FORMAT_ARGS_HELPER2(label, args)
 
-#define _FLY_FORMAT_ARGS_HELPER2(LABEL, ...)                                   \
-    _FLY_FORMAT_ARGS_HELPER_##LABEL(__VA_ARGS__)
+#define _FLY_FORMAT_ARGS_HELPER2(label, args)                                  \
+    _FLY_FORMAT_ARGS_HELPER_##label(args)
 
 #define _FLY_FORMAT_ARGS_HELPER_SINGLE(first)
 
-#define _FLY_FORMAT_ARGS_HELPER_MULTIPLE(first, ...) , __VA_ARGS__
+#define _FLY_FORMAT_ARGS_HELPER_MULTIPLE(args)                                 \
+    _FLY_FORMAT_ARGS_HELPER_MULTIPLE2 args
+
+#define _FLY_FORMAT_ARGS_HELPER_MULTIPLE2(first, ...) , __VA_ARGS__
+
+#define _FLY_FORMAT_ARGS_EXPAND(x) x
 
 #define _FLY_FORMAT_ARGS_LABEL(...)                                            \
-    _FLY_FORMAT_ARGS_LABEL_HELPER(                                             \
+    _FLY_FORMAT_ARGS_EXPAND(_FLY_FORMAT_ARGS_LABEL_HELPER(                     \
         __VA_ARGS__,                                                           \
         MULTIPLE,                                                              \
         MULTIPLE,                                                              \
@@ -97,7 +102,7 @@
         MULTIPLE,                                                              \
         MULTIPLE,                                                              \
         SINGLE,                                                                \
-        _)
+        _))
 
 #define _FLY_FORMAT_ARGS_LABEL_HELPER(                                         \
     ARG_01,                                                                    \
