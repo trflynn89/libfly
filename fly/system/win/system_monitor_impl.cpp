@@ -28,14 +28,14 @@ SystemMonitorImpl::SystemMonitorImpl(
     m_prevProcessUserTime(0),
     m_prevTime(0)
 {
-    PDH_STATUS status = ::PdhOpenQuery(nullptr, nullptr, &m_cpuQuery);
+    PDH_STATUS status = ::PdhOpenQuery(nullptr, 0, &m_cpuQuery);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not open CPU query (%x)", status);
         return;
     }
 
-    status = ::PdhAddCounter(m_cpuQuery, s_cpuPath, nullptr, &m_cpuCounter);
+    status = ::PdhAddCounter(m_cpuQuery, s_cpuPath, 0, &m_cpuCounter);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not add CPU counter (%x)", status);

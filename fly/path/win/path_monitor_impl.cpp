@@ -61,7 +61,7 @@ bool PathMonitorImpl::IsValid() const noexcept
 void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout) noexcept
 {
     DWORD bytes = 0;
-    ULONG_PTR pKey = nullptr;
+    ULONG_PTR pKey = 0;
     LPOVERLAPPED pOverlapped = nullptr;
     DWORD delay = static_cast<DWORD>(timeout.count());
 
