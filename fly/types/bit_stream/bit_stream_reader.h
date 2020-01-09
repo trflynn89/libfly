@@ -218,12 +218,10 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
 
     byte_type bytesRead = 0;
 
-    if (bytes <= sizeof(buffer))
-    {
-        m_stream.read(
+    if (m_stream.read(
             reinterpret_cast<std::ios::char_type *>(&buffer),
-            static_cast<std::streamsize>(bytes));
-
+            static_cast<std::streamsize>(bytes)))
+    {
         buffer = endian_swap<Endian::Big>(buffer);
 
         bytesRead = static_cast<byte_type>(m_stream.gcount());
