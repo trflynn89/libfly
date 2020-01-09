@@ -39,7 +39,13 @@ SYSTEM_CALLS_$(d) := \
 
 # Define compiler flags
 CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
-CXXFLAGS_$(d) += -I$(SOURCE_ROOT)/test/googletest/googletest
+CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest
+
+# Tests that use TYPED_TEST_SUITE cannot compile with -Wsuggest-override because
+# googletest does not mark some overriden methods with the override attribute.
+ifeq ($(toolchain), gcc)
+    CXXFLAGS_$(d) += -Wno-suggest-override
+endif
 
 # Define linker flags
 LDFLAGS_$(d) += \

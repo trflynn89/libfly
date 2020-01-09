@@ -164,7 +164,7 @@ private:
     void encodeSymbols(std::uint32_t, BitStreamWriter &) noexcept;
 
     // Configuration.
-    const std::uint16_t m_chunkSizeKB;
+    const std::uint32_t m_chunkSize;
     const length_type m_maxCodeLength;
 
     std::unique_ptr<symbol_type[]> m_chunkBuffer;

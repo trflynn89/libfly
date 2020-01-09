@@ -53,7 +53,7 @@ bool PathMonitorImpl::IsValid() const noexcept
 //==============================================================================
 void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout) noexcept
 {
-    struct pollfd pollFd;
+    pollfd pollFd;
 
     pollFd.fd = m_monitorDescriptor;
     pollFd.events = POLLIN;
@@ -92,14 +92,13 @@ PathMonitorImpl::CreatePathInfo(const std::filesystem::path &path) const
 //==============================================================================
 bool PathMonitorImpl::readEvents() const noexcept
 {
-    static const std::size_t eventSize = sizeof(struct inotify_event);
+    static const std::size_t eventSize = sizeof(inotify_event);
 
     // Some systems cannot read integer variables if they are not properly
     // aligned. On other systems, incorrect alignment may decrease performance.
     // Hence, the buffer used for reading from the inotify file descriptor
-    // should have the same alignment as struct inotify_event.
-    char buff[8 << 10]
-        __attribute__((aligned(__alignof__(struct inotify_event))));
+    // should have the same alignment as inotify_event.
+    char buff[8 << 10] __attribute__((aligned(__alignof__(inotify_event))));
 
     ssize_t len = ::read(m_monitorDescriptor, buff, sizeof(buff));
 
@@ -112,11 +111,11 @@ bool PathMonitorImpl::readEvents() const noexcept
     }
     else
     {
-        const struct inotify_event *pEvent;
+        const inotify_event *pEvent;
 
         for (char *ptr = buff; ptr < buff + len; ptr += eventSize + pEvent->len)
         {
-            pEvent = (struct inotify_event *)ptr;
+            pEvent = reinterpret_cast<inotify_event *>(ptr);
 
             if (pEvent->len > 0)
             {
@@ -129,8 +128,7 @@ bool PathMonitorImpl::readEvents() const noexcept
 }
 
 //==============================================================================
-void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
-    noexcept
+void PathMonitorImpl::handleEvent(const inotify_event *pEvent) const noexcept
 {
     auto it = std::find_if(
         m_pathInfo.begin(),
@@ -167,7 +165,8 @@ void PathMonitorImpl::handleEvent(const struct inotify_event *pEvent) const
 }
 
 //==============================================================================
-PathMonitor::PathEvent PathMonitorImpl::convertToEvent(int mask) const noexcept
+PathMonitor::PathEvent PathMonitorImpl::convertToEvent(std::uint32_t mask) const
+    noexcept
 {
     PathMonitor::PathEvent event = PathMonitor::PathEvent::None;
 

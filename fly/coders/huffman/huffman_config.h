@@ -25,9 +25,9 @@ public:
     HuffmanConfig() noexcept;
 
     /**
-     * @return Huffman encoder chunk size (in kilobytes).
+     * @return Huffman encoder chunk size (in bytes).
      */
-    std::uint16_t EncoderChunkSizeKB() const noexcept;
+    std::uint32_t EncoderChunkSize() const noexcept;
 
     /**
      * @return Maximum Huffman code length (in bits) for encoding.

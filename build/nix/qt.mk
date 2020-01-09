@@ -24,7 +24,7 @@ QT_RCC := $(QT_BIN)/rcc
 
 QT_CFLAGS := \
     -fPIC \
-    -I$(QT_INC)
+    -isystem $(QT_INC)
 
 QT_LDFLAGS := \
     -Wl,-rpath,$(QT_LIB) \

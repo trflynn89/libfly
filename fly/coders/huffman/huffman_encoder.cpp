@@ -21,7 +21,7 @@ namespace {
 //==============================================================================
 HuffmanEncoder::HuffmanEncoder(
     const std::shared_ptr<HuffmanConfig> &spConfig) noexcept :
-    m_chunkSizeKB(spConfig->EncoderChunkSizeKB()),
+    m_chunkSize(spConfig->EncoderChunkSize()),
     m_maxCodeLength(spConfig->EncoderMaxCodeLength())
 {
 }
@@ -41,7 +41,7 @@ bool HuffmanEncoder::EncodeInternal(
 
     encodeHeader(output);
 
-    m_chunkBuffer = std::make_unique<symbol_type[]>(m_chunkSizeKB << 10);
+    m_chunkBuffer = std::make_unique<symbol_type[]>(m_chunkSize);
     std::uint32_t chunkSize = 0;
 
     while ((chunkSize = readStream(input)) > 0)
@@ -73,7 +73,7 @@ std::uint32_t HuffmanEncoder::readStream(std::istream &input) const noexcept
             reinterpret_cast<std::ios::char_type *>(m_chunkBuffer.get()),
             std::min(
                 static_cast<std::streamsize>(length),
-                static_cast<std::streamsize>(m_chunkSizeKB << 10)));
+                static_cast<std::streamsize>(m_chunkSize)));
 
         bytesRead = static_cast<std::uint32_t>(input.gcount());
     }
@@ -190,9 +190,9 @@ void HuffmanEncoder::insertCode(HuffmanCode &&code) noexcept
 {
     std::uint16_t pos = m_huffmanCodesSize++;
 
-    for (; (pos > 0) && (code < m_huffmanCodes[pos - 1]); --pos)
+    for (; (pos > 0) && (code < m_huffmanCodes[pos - 1_u16]); --pos)
     {
-        m_huffmanCodes[pos] = std::move(m_huffmanCodes[pos - 1]);
+        m_huffmanCodes[pos] = std::move(m_huffmanCodes[pos - 1_u16]);
     }
 
     m_huffmanCodes[pos] = std::move(code);
@@ -266,7 +266,7 @@ void HuffmanEncoder::convertToCanonicalForm() noexcept
 
     for (std::uint16_t i = 1; i < m_huffmanCodesSize; ++i)
     {
-        const HuffmanCode &previous = m_huffmanCodes[i - 1];
+        const HuffmanCode &previous = m_huffmanCodes[i - 1_u16];
         HuffmanCode &code = m_huffmanCodes[i];
 
         // Subsequent codes are one greater than the previous code, but also
@@ -283,7 +283,7 @@ void HuffmanEncoder::encodeHeader(BitStreamWriter &output) const noexcept
     output.WriteByte(static_cast<byte_type>(s_huffmanVersion));
 
     // Encode the chunk size.
-    output.WriteWord(static_cast<word_type>(m_chunkSizeKB));
+    output.WriteWord(static_cast<word_type>(m_chunkSize >> 10));
 
     // Encode the maximum Huffman code length.
     output.WriteByte(static_cast<byte_type>(m_maxCodeLength));
@@ -301,7 +301,7 @@ void HuffmanEncoder::encodeCodes(BitStreamWriter &output) const noexcept
 
         if (counts.size() <= code.m_length)
         {
-            counts.resize(code.m_length + 1);
+            counts.resize(code.m_length + 1_u8);
         }
 
         ++counts[code.m_length];

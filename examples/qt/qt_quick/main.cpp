@@ -4,6 +4,9 @@
 #if defined(__linux__)
 extern "C"
 {
+    const char *__lsan_default_suppressions();
+    const char *__asan_default_options();
+
     // AddressSanitizer reports leaks from some system libraries. Override the
     // default suppressions to disable leak checking in that library.
     const char *__lsan_default_suppressions()

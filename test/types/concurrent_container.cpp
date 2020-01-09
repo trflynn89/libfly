@@ -1,4 +1,5 @@
 #include "fly/types/concurrency/concurrent_queue.h"
+#include "fly/types/numeric/literals.h"
 
 #include <gtest/gtest.h>
 
@@ -12,7 +13,7 @@
 class ConcurrencyTest : public ::testing::Test
 {
 public:
-    typedef int Object;
+    typedef unsigned int Object;
     typedef fly::ConcurrentQueue<Object> ObjectQueue;
 
     unsigned int WriterThread(ObjectQueue &objectQueue) noexcept
@@ -147,7 +148,7 @@ TEST_F(ConcurrencyTest, PopFromEmptyQueueTest)
     ObjectQueue objectQueue;
 
     Object obj1;
-    Object obj2(1);
+    Object obj2(1_u32);
 
     // Make sure pop is initially invalid
     ASSERT_FALSE(objectQueue.Pop(obj1, std::chrono::milliseconds(0)));
@@ -166,9 +167,9 @@ TEST_F(ConcurrencyTest, SingleThreadedTest)
     ObjectQueue objectQueue;
     ObjectQueue::size_type size = 0;
 
-    Object obj1(1);
-    Object obj2(2);
-    Object obj3(3);
+    Object obj1(1_u32);
+    Object obj2(2_u32);
+    Object obj3(3_u32);
 
     DoQueuePush(objectQueue, obj1, ++size);
     DoQueuePush(objectQueue, obj1, ++size);
@@ -193,7 +194,7 @@ TEST_F(ConcurrencyTest, MultiThreadedTest)
 TEST_F(ConcurrencyTest, InfiniteWaitReaderTest)
 {
     ObjectQueue objectQueue;
-    Object obj(123);
+    Object obj(123_u32);
 
     auto func = std::bind(
         &ConcurrencyTest::InfiniteWaitReaderThread,

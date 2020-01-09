@@ -461,10 +461,15 @@ public:
      * Equality operator. Compares two Json instances for equality. They are
      * equal if one of the following is true:
      *
-     * 1. The two Json instances are of the same type and have the same value.
-     * 2. The two Json instances are of a numeric type (signed, unsigned, or
-     *    float) and have the same value after converting the second Json value
-     *    to the same type as the first Json value.
+     * 1. One of the two JSON types are floating point, the other is a numeric
+     *    type (signed, unsigned, or float) and have approximately the same
+     *    value after converting both types to floating point. Approximation is
+     *    determined by comparing the difference between the two values to the
+     *    machine epsilon.
+     * 2. The two Json instances are an integer type (signed or unsigned) and
+     *    have the same value after converting the second Json value to the same
+     *    type as the first Json value.
+     * 3. The two Json instances are of the same type and have the same value.
      *
      * @return bool True if the two Json instances are equal.
      */
@@ -598,7 +603,7 @@ public:
     /**
      * @return A C-string representing this exception.
      */
-    virtual const char *what() const noexcept;
+    virtual const char *what() const noexcept override;
 
 private:
     const std::string m_message;
@@ -705,7 +710,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
 Json::operator T() const noexcept(false)
 {
-    auto visitor = [](const auto &value) -> T {
+    auto visitor = [](const auto &value) noexcept -> T {
         using U = std::decay_t<decltype(value)>;
 
         if constexpr (
@@ -718,10 +723,13 @@ Json::operator T() const noexcept(false)
         else if constexpr (
             std::is_same_v<U, JsonTraits::boolean_type> ||
             std::is_same_v<U, JsonTraits::signed_type> ||
-            std::is_same_v<U, JsonTraits::unsigned_type> ||
-            std::is_same_v<U, JsonTraits::float_type>)
+            std::is_same_v<U, JsonTraits::unsigned_type>)
         {
             return value != static_cast<U>(0);
+        }
+        else if constexpr (std::is_same_v<U, JsonTraits::float_type>)
+        {
+            return std::abs(value) > static_cast<U>(0);
         }
         else
         {

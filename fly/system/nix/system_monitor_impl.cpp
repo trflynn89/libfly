@@ -18,11 +18,7 @@ namespace fly {
 namespace {
 
     const char *s_procStatFile = "/proc/stat";
-    const char *s_procStatFormat =
-        "cpu %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64;
-
     const char *s_selfStatusFile = "/proc/self/status";
-    const char *s_selfStatusFormat = "VmRSS: %" SCNu64 " kB";
 
 } // namespace
 
@@ -86,7 +82,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
     {
         scanned = std::sscanf(
             line.c_str(),
-            s_procStatFormat,
+            "cpu %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64,
             &user,
             &nice,
             &sys,
@@ -131,7 +127,7 @@ void SystemMonitorImpl::UpdateProcessCpuUsage() noexcept
     if ((now > m_prevTime) && (sample.tms_stime >= m_prevProcessSystemTime) &&
         (sample.tms_utime >= m_prevProcessUserTime))
     {
-        std::uint64_t cpu = (sample.tms_stime - m_prevProcessSystemTime) +
+        std::int64_t cpu = (sample.tms_stime - m_prevProcessSystemTime) +
             (sample.tms_utime - m_prevProcessUserTime);
 
         clock_t time = now - m_prevTime;
@@ -176,8 +172,10 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage() noexcept
 
     while (stream.good() && std::getline(stream, line) && (count != 1))
     {
-        count =
-            std::sscanf(line.c_str(), s_selfStatusFormat, &processMemoryUsage);
+        count = std::sscanf(
+            line.c_str(),
+            "VmRSS: %" SCNu64 " kB",
+            &processMemoryUsage);
         contents += line + "\\n";
     }
 

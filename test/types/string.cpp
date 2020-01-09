@@ -1,6 +1,7 @@
 #include "fly/types/string/string.h"
 
 #include "fly/fly.h"
+#include "fly/types/numeric/literals.h"
 
 #include <gtest/gtest.h>
 
@@ -90,18 +91,18 @@ StringType maxstr() noexcept
 template <typename T>
 struct BasicStringTest : public ::testing::Test
 {
-    using string_type = T;
+    using string_base_type = T;
 };
 
 using StringTypes =
     ::testing::Types<std::string, std::wstring, std::u16string, std::u32string>;
 
-TYPED_TEST_SUITE(BasicStringTest, StringTypes);
+TYPED_TEST_SUITE(BasicStringTest, StringTypes, );
 
 //==============================================================================
 TYPED_TEST(BasicStringTest, SplitTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -131,7 +132,7 @@ TYPED_TEST(BasicStringTest, SplitTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, MaxSplitTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -170,7 +171,7 @@ TYPED_TEST(BasicStringTest, MaxSplitTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, TrimTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -207,7 +208,7 @@ TYPED_TEST(BasicStringTest, TrimTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ReplaceAllTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -222,7 +223,7 @@ TYPED_TEST(BasicStringTest, ReplaceAllTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ReplaceAllWithCharTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -237,7 +238,7 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithCharTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ReplaceAllWithEmptyTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -251,7 +252,7 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithEmptyTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, RemoveAllTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -265,7 +266,7 @@ TYPED_TEST(BasicStringTest, RemoveAllTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, RemoveAllWithEmptyTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -278,7 +279,7 @@ TYPED_TEST(BasicStringTest, RemoveAllWithEmptyTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, StartsWithTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -333,7 +334,7 @@ TYPED_TEST(BasicStringTest, StartsWithTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, EndsWithTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -385,7 +386,7 @@ TYPED_TEST(BasicStringTest, EndsWithTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, WildcardTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -475,7 +476,7 @@ TYPED_TEST(BasicStringTest, WildcardTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, GenerateRandomStringTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using size_type = typename StringClass::size_type;
 
@@ -488,7 +489,7 @@ TYPED_TEST(BasicStringTest, GenerateRandomStringTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -538,7 +539,7 @@ TYPED_TEST(BasicStringTest, FormatTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_d)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -555,7 +556,7 @@ TYPED_TEST(BasicStringTest, FormatTest_d)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_i)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -572,7 +573,7 @@ TYPED_TEST(BasicStringTest, FormatTest_i)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_x)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -593,7 +594,7 @@ TYPED_TEST(BasicStringTest, FormatTest_x)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_o)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -610,7 +611,7 @@ TYPED_TEST(BasicStringTest, FormatTest_o)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_a)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -651,7 +652,7 @@ TYPED_TEST(BasicStringTest, FormatTest_a)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_f)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -689,7 +690,7 @@ TYPED_TEST(BasicStringTest, FormatTest_f)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_g)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -722,7 +723,7 @@ TYPED_TEST(BasicStringTest, FormatTest_g)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_e)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -747,7 +748,7 @@ TYPED_TEST(BasicStringTest, FormatTest_e)
 //==============================================================================
 TYPED_TEST(BasicStringTest, JoinTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -800,7 +801,7 @@ TYPED_TEST(BasicStringTest, JoinTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertStringTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -810,14 +811,14 @@ TYPED_TEST(BasicStringTest, ConvertStringTest)
     const char_type *c = FLY_STR(char_type, "def");
     EXPECT_EQ(StringClass::template Convert<string_type>(c), c);
 
-    char_type *d = (char_type *)FLY_STR(char_type, "ghi");
+    char_type *d = const_cast<char_type *>(FLY_STR(char_type, "ghi"));
     EXPECT_EQ(StringClass::template Convert<string_type>(d), d);
 }
 
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertBoolTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -845,7 +846,7 @@ TYPED_TEST(BasicStringTest, ConvertBoolTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertCharTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -863,7 +864,7 @@ TYPED_TEST(BasicStringTest, ConvertCharTest)
     EXPECT_EQ(StringClass::template Convert<streamed_char>(s), 'A');
     EXPECT_EQ(
         StringClass::template Convert<ustreamed_char>(s),
-        (ustreamed_char)65);
+        static_cast<ustreamed_char>(65));
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
@@ -906,24 +907,22 @@ TYPED_TEST(BasicStringTest, ConvertCharTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertInt8Test)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), (std::int8_t)0);
-    EXPECT_EQ(StringClass::template Convert<std::uint8_t>(s), (std::uint8_t)0);
+    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), 0_i8);
+    EXPECT_EQ(StringClass::template Convert<std::uint8_t>(s), 0_u8);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), (std::int8_t)100);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint8_t>(s),
-        (std::uint8_t)100);
+    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), 100_i8);
+    EXPECT_EQ(StringClass::template Convert<std::uint8_t>(s), 100_u8);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), (std::int8_t)-100);
+    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), -100_i8);
     EXPECT_THROW(
         StringClass::template Convert<std::uint8_t>(s),
         std::out_of_range);
@@ -969,30 +968,22 @@ TYPED_TEST(BasicStringTest, ConvertInt8Test)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertInt16Test)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), (std::int16_t)0);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint16_t>(s),
-        (std::uint16_t)0);
+    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), 0_i16);
+    EXPECT_EQ(StringClass::template Convert<std::uint16_t>(s), 0_u16);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int16_t>(s),
-        (std::int16_t)100);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint16_t>(s),
-        (std::uint16_t)100);
+    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), 100_i16);
+    EXPECT_EQ(StringClass::template Convert<std::uint16_t>(s), 100_u16);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int16_t>(s),
-        (std::int16_t)-100);
+    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), -100_i16);
     EXPECT_THROW(
         StringClass::template Convert<std::uint16_t>(s),
         std::out_of_range);
@@ -1038,30 +1029,22 @@ TYPED_TEST(BasicStringTest, ConvertInt16Test)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertInt32Test)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), (std::int32_t)0);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint32_t>(s),
-        (std::uint32_t)0);
+    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), 0_i32);
+    EXPECT_EQ(StringClass::template Convert<std::uint32_t>(s), 0_u32);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int32_t>(s),
-        (std::int32_t)100);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint32_t>(s),
-        (std::uint32_t)100);
+    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), 100_i32);
+    EXPECT_EQ(StringClass::template Convert<std::uint32_t>(s), 100_u32);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int32_t>(s),
-        (std::int32_t)-100);
+    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), -100_i32);
     EXPECT_THROW(
         StringClass::template Convert<std::uint32_t>(s),
         std::out_of_range);
@@ -1107,30 +1090,22 @@ TYPED_TEST(BasicStringTest, ConvertInt32Test)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertInt64Test)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), (std::int64_t)0);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint64_t>(s),
-        (std::uint64_t)0);
+    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), 0_i64);
+    EXPECT_EQ(StringClass::template Convert<std::uint64_t>(s), 0_u64);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int64_t>(s),
-        (std::int64_t)100);
-    EXPECT_EQ(
-        StringClass::template Convert<std::uint64_t>(s),
-        (std::uint64_t)100);
+    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), 100_i64);
+    EXPECT_EQ(StringClass::template Convert<std::uint64_t>(s), 100_u64);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(
-        StringClass::template Convert<std::int64_t>(s),
-        (std::int64_t)-100);
+    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), -100_i64);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
@@ -1152,7 +1127,7 @@ TYPED_TEST(BasicStringTest, ConvertInt64Test)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertDecimalTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
@@ -1194,7 +1169,7 @@ TYPED_TEST(BasicStringTest, ConvertDecimalTest)
 //==============================================================================
 TYPED_TEST(BasicStringTest, BasicStringStreamerTest)
 {
-    using string_type = typename TestFixture::string_type;
+    using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 

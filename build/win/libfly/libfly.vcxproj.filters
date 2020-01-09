@@ -13,6 +13,9 @@
     <Filter Include="logger">
       <UniqueIdentifier>{2b39b732-ea13-4003-8f0b-a98682d27bfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="logger\detail">
+      <UniqueIdentifier>{4a45a7a0-b4f3-47a0-95f2-b3e876cb1ac0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="parser">
       <UniqueIdentifier>{e39571b7-e6c1-48ea-917e-08c233c64755}</UniqueIdentifier>
     </Filter>
@@ -102,6 +105,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\logger\logger_config.h">
       <Filter>logger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.h">
+      <Filter>logger\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\exceptions.h">
       <Filter>parser</Filter>

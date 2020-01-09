@@ -166,6 +166,7 @@
     <ClInclude Include="..\..\..\fly\logger\log.h" />
     <ClInclude Include="..\..\..\fly\logger\logger.h" />
     <ClInclude Include="..\..\..\fly\logger\logger_config.h" />
+    <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.h" />
     <ClInclude Include="..\..\..\fly\parser\exceptions.h" />
     <ClInclude Include="..\..\..\fly\parser\ini_parser.h" />
     <ClInclude Include="..\..\..\fly\parser\json_parser.h" />

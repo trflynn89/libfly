@@ -65,7 +65,7 @@ struct Log
     double m_time;
     char m_file[100];
     char m_function[100];
-    unsigned int m_line;
+    std::uint32_t m_line;
     std::string m_message;
 
     friend std::ostream &operator<<(std::ostream &, const Log &) noexcept;

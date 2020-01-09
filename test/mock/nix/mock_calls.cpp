@@ -208,7 +208,7 @@ extern "C"
         if (fly::MockSystem::MockEnabled(fly::MockCall::Gethostbyname))
         {
             errno = 0;
-            return NULL;
+            return nullptr;
         }
 
         return __real_gethostbyname(name);

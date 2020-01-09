@@ -149,7 +149,7 @@ TEST(JsonTraitsTest, StringTest)
     string_type str2(FLY_STR(char_type, "b"));
 
     const char_type *cstr1 = "c";
-    char_type *cstr2 = (char_type *)"d";
+    char_type *cstr2 = const_cast<char_type *>("d");
 
     const char_type chr1 = 'e';
     char_type chr2 = 'f';

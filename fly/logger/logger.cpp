@@ -4,7 +4,6 @@
 #include "fly/task/task_runner.h"
 
 #include <algorithm>
-#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <system_error>
@@ -59,7 +58,7 @@ void Logger::AddLog(
     Log::Level level,
     const char *file,
     const char *func,
-    unsigned int line,
+    std::uint32_t line,
     const std::string &message) noexcept
 {
     std::shared_ptr<Logger> spLogger = GetInstance();
@@ -124,7 +123,7 @@ void Logger::addLog(
     Log::Level level,
     const char *file,
     const char *func,
-    unsigned int line,
+    std::uint32_t line,
     const std::string &message) noexcept
 {
     auto now = std::chrono::high_resolution_clock::now();

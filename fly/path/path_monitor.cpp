@@ -48,7 +48,7 @@ bool PathMonitor::AddPath(
 
     if (callback == nullptr)
     {
-        LOGW("Ignoring NULL callback for %s", path);
+        LOGW("Ignoring null callback for %s", path);
     }
     else if (!std::filesystem::is_directory(path, error))
     {
@@ -107,7 +107,7 @@ bool PathMonitor::AddFile(
 
     if (callback == nullptr)
     {
-        LOGW("Ignoring NULL callback for %s", file);
+        LOGW("Ignoring null callback for %s", file);
     }
     else if (std::filesystem::is_directory(file, error))
     {
