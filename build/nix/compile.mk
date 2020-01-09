@@ -29,10 +29,10 @@ t := $$(strip $(1))
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
 $(2): OBJS := $$(OBJ_$$(t))
-$(2): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
-$(2): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
-$(2): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
-$(2): LDLIBS := $(LDLIBS_$(d)) $(LDLIBS)
+$(2): CFLAGS := $(CFLAGS) $(CFLAGS_$(d))
+$(2): CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_$(d))
+$(2): LDFLAGS := $(LDFLAGS) $(LDFLAGS_$(d))
+$(2): LDLIBS := $(LDLIBS) $(LDLIBS_$(d))
 
 $(2): $$(GEN_$$(t)) $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
@@ -110,8 +110,8 @@ define OBJ_RULES
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
 # Use = instead of := because $$(@) would become an empty string if expanded now
-$(1)/%.o: CFLAGS = $(CFLAGS_$(d)) $(CFLAGS) -MF $$(@:%.o=%.d)
-$(1)/%.o: CXXFLAGS = $(CXXFLAGS_$(d)) $(CXXFLAGS) -MF $$(@:%.o=%.d)
+$(1)/%.o: CFLAGS = $(CFLAGS) $(CFLAGS_$(d)) -MF $$(@:%.o=%.d)
+$(1)/%.o: CXXFLAGS = $(CXXFLAGS) $(CXXFLAGS_$(d)) -MF $$(@:%.o=%.d)
 
 # C files
 $(1)/%.o: $(d)/%.c $$(MAKEFILES_$(d))

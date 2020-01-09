@@ -26,7 +26,7 @@ std::string SystemImpl::LocalTime(const std::string &fmt) noexcept
     struct tm timeVal;
     std::string ret;
 
-    if (::localtime_r(&now, &timeVal) != NULL)
+    if (::localtime_r(&now, &timeVal) != nullptr)
     {
         char timeStr[32];
 

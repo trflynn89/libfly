@@ -29,8 +29,8 @@ T swap(T x)
 {
     T result = 0;
 
-    result |= (x & 0xff00_u16) >> 8;
-    result |= (x & 0x00ff_u16) << 8;
+    result |= (x & static_cast<T>(0xff00)) >> 8;
+    result |= (x & static_cast<T>(0x00ff)) << 8;
 
     return result;
 }
@@ -44,10 +44,10 @@ T swap(T x)
 {
     T result = 0;
 
-    result |= (x & 0xff000000_u32) >> 24;
-    result |= (x & 0x00ff0000_u32) >> 8;
-    result |= (x & 0x0000ff00_u32) << 8;
-    result |= (x & 0x000000ff_u32) << 24;
+    result |= (x & static_cast<T>(0xff000000)) >> 24;
+    result |= (x & static_cast<T>(0x00ff0000)) >> 8;
+    result |= (x & static_cast<T>(0x0000ff00)) << 8;
+    result |= (x & static_cast<T>(0x000000ff)) << 24;
 
     return result;
 }
@@ -61,14 +61,14 @@ T swap(T x)
 {
     T result = 0;
 
-    result |= (x & 0xff00000000000000_u64) >> 56;
-    result |= (x & 0x00ff000000000000_u64) >> 40;
-    result |= (x & 0x0000ff0000000000_u64) >> 24;
-    result |= (x & 0x000000ff00000000_u64) >> 8;
-    result |= (x & 0x00000000ff000000_u64) << 8;
-    result |= (x & 0x0000000000ff0000_u64) << 24;
-    result |= (x & 0x000000000000ff00_u64) << 40;
-    result |= (x & 0x00000000000000ff_u64) << 56;
+    result |= (x & static_cast<T>(0xff00000000000000)) >> 56;
+    result |= (x & static_cast<T>(0x00ff000000000000)) >> 40;
+    result |= (x & static_cast<T>(0x0000ff0000000000)) >> 24;
+    result |= (x & static_cast<T>(0x000000ff00000000)) >> 8;
+    result |= (x & static_cast<T>(0x00000000ff000000)) << 8;
+    result |= (x & static_cast<T>(0x0000000000ff0000)) << 24;
+    result |= (x & static_cast<T>(0x000000000000ff00)) << 40;
+    result |= (x & static_cast<T>(0x00000000000000ff)) << 56;
 
     return result;
 }
@@ -83,7 +83,7 @@ protected:
     template <fly::Endian desired>
     void RunTest()
     {
-        const DataType iterations = std::numeric_limits<std::uint8_t>::max();
+        constexpr DataType iterations = 100;
         const DataType step = std::numeric_limits<DataType>::max() / iterations;
 
         for (DataType data = 0, i = 0; i++ < iterations; data += step)
@@ -111,7 +111,7 @@ using DataTypes = ::testing::Types<
     std::uint32_t,
     std::uint64_t>;
 
-TYPED_TEST_SUITE(EndianTest, DataTypes);
+TYPED_TEST_SUITE(EndianTest, DataTypes, );
 
 //==============================================================================
 TYPED_TEST(EndianTest, BigEndianTest)

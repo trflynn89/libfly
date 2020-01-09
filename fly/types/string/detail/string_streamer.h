@@ -140,7 +140,9 @@ struct BasicStringStreamer<std::u16string>
         }
         else
         {
-            stream << "[0x" << std::hex << value << ']';
+            stream << "[0x";
+            stream << std::hex << static_cast<std::uint16_t>(value) << std::dec;
+            stream << ']';
         }
     }
 };
@@ -189,7 +191,9 @@ struct BasicStringStreamer<std::u32string>
         }
         else
         {
-            stream << "[0x" << std::hex << value << ']';
+            stream << "[0x";
+            stream << std::hex << static_cast<std::uint32_t>(value) << std::dec;
+            stream << ']';
         }
     }
 };

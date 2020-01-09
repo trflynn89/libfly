@@ -25,7 +25,7 @@ namespace {
 void SystemImpl::PrintBacktrace() noexcept
 {
     void *trace[10];
-    const USHORT traceSize = ::CaptureStackBackTrace(0, 10, trace, NULL);
+    const USHORT traceSize = ::CaptureStackBackTrace(0, 10, trace, nullptr);
 
     for (USHORT i = 0; i < traceSize; ++i)
     {
@@ -64,12 +64,19 @@ int SystemImpl::GetErrorCode() noexcept
 //==============================================================================
 std::string SystemImpl::GetErrorString(int code) noexcept
 {
-    LPTSTR str = NULL;
+    LPTSTR str = nullptr;
     std::string ret;
 
-    ::FormatMessage(s_formatFlags, NULL, code, s_langId, (LPTSTR)&str, 0, NULL);
+    ::FormatMessage(
+        s_formatFlags,
+        nullptr,
+        code,
+        s_langId,
+        (LPTSTR)&str,
+        0,
+        nullptr);
 
-    if (str == NULL)
+    if (str == nullptr)
     {
         ret = std::to_string(code);
     }

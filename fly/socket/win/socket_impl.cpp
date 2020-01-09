@@ -57,13 +57,17 @@ bool SocketImpl::HostnameToAddress(
 {
     struct hostent *ipAddress = ::gethostbyname(hostname.c_str());
 
-    if (ipAddress == NULL)
+    if (ipAddress == nullptr)
     {
         LOGS("Error resolving %s", hostname);
         return false;
     }
 
-    memcpy((char *)&address, ipAddress->h_addr, ipAddress->h_length);
+    memcpy(
+        reinterpret_cast<void *>(&address),
+        reinterpret_cast<void *>(ipAddress->h_addr_list[0]),
+        static_cast<std::size_t>(ipAddress->h_length));
+
     address = ntohl(address);
 
     LOGD("Converted hostname %s to %d", hostname, address);
@@ -251,32 +255,36 @@ std::size_t SocketImpl::Send(const std::string &message, bool &wouldBlock) const
 
     while (keepSending)
     {
-        // Window's ::send() takes string size as an integer, but std::string's
-        // length is std::size_t - send at most MAX_INT bytes at a time
-        static constexpr std::size_t intMax = std::numeric_limits<int>::max();
-        int toSendSize = static_cast<int>(std::min(toSend.size(), intMax));
+        // Windows's ::send() takes string size as an integer, but std::string's
+        // length is std::size_t - send at most MAX_INT bytes at a time.
+        constexpr static std::size_t intMax = std::numeric_limits<int>::max();
+        const int toSendSize =
+            static_cast<int>(std::min(toSend.size(), intMax));
 
-        int currSent = ::send(m_socketHandle, toSend.c_str(), toSendSize, 0);
+        const int status =
+            ::send(m_socketHandle, toSend.c_str(), toSendSize, 0);
 
-        if (currSent > 0)
+        if (status > 0)
         {
-            if (toSend[currSent - 1] == m_socketEoM)
+            const auto bytes = static_cast<std::size_t>(status);
+
+            if (toSend[bytes - 1] == m_socketEoM)
             {
-                bytesSent += currSent - 1;
+                bytesSent += bytes - 1;
             }
             else
             {
-                bytesSent += currSent;
+                bytesSent += bytes;
             }
 
-            toSend = toSend.substr(currSent, std::string::npos);
+            toSend = toSend.substr(bytes, std::string::npos);
             keepSending = !toSend.empty();
         }
         else
         {
             keepSending = false;
 
-            if (currSent == SOCKET_ERROR)
+            if (status == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error sending");
@@ -306,7 +314,7 @@ std::size_t SocketImpl::SendTo(
 
     while (keepSending)
     {
-        int currSent = ::sendto(
+        int status = ::sendto(
             m_socketHandle,
             toSend.c_str(),
             static_cast<int>(std::min(m_packetSize, toSend.size())),
@@ -314,25 +322,27 @@ std::size_t SocketImpl::SendTo(
             pSocketAddress,
             sizeof(socketAddress));
 
-        if (currSent > 0)
+        if (status > 0)
         {
-            if (toSend[currSent - 1] == m_socketEoM)
+            const auto bytes = static_cast<std::size_t>(status);
+
+            if (toSend[bytes - 1] == m_socketEoM)
             {
-                bytesSent += currSent - 1;
+                bytesSent += bytes - 1;
             }
             else
             {
-                bytesSent += currSent;
+                bytesSent += bytes;
             }
 
-            toSend = toSend.substr(currSent, std::string::npos);
+            toSend = toSend.substr(bytes, std::string::npos);
             keepSending = !toSend.empty();
         }
         else
         {
             keepSending = false;
 
-            if (currSent == SOCKET_ERROR)
+            if (status == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error sending");
@@ -356,32 +366,32 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const noexcept
 
     while (keepReading)
     {
-        char *buff = (char *)calloc(1, m_packetSize * sizeof(char));
-        int bytesRead = ::recv(m_socketHandle, buff, packetSize, 0);
+        auto buff = std::make_unique<char[]>(m_packetSize * sizeof(char));
+        int status = ::recv(m_socketHandle, buff.get(), packetSize, 0);
 
-        if (bytesRead > 0)
+        if (status > 0)
         {
-            if (buff[bytesRead - 1] == m_socketEoM)
+            auto bytes = static_cast<std::size_t>(status);
+
+            if (buff[bytes - 1] == m_socketEoM)
             {
                 keepReading = false;
                 isComplete = true;
-                --bytesRead;
+                --bytes;
             }
 
-            ret.append(buff, bytesRead);
+            ret.append(buff.get(), bytes);
         }
         else
         {
             keepReading = false;
 
-            if (bytesRead == SOCKET_ERROR)
+            if (status == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error receiving");
             }
         }
-
-        free(buff);
     }
 
     return ret;
@@ -405,39 +415,39 @@ std::string SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const
 
     while (keepReading)
     {
-        char *buff = (char *)calloc(1, m_packetSize * sizeof(char));
+        auto buff = std::make_unique<char[]>(m_packetSize * sizeof(char));
 
-        int bytesRead = ::recvfrom(
+        int status = ::recvfrom(
             m_socketHandle,
-            buff,
+            buff.get(),
             packetSize,
             0,
             pSocketAddress,
             &socketAddressLength);
 
-        if (bytesRead > 0)
+        if (status > 0)
         {
-            if (buff[bytesRead - 1] == m_socketEoM)
+            auto bytes = static_cast<std::size_t>(status);
+
+            if (buff[bytes - 1] == m_socketEoM)
             {
                 keepReading = false;
                 isComplete = true;
-                --bytesRead;
+                --bytes;
             }
 
-            ret.append(buff, bytesRead);
+            ret.append(buff.get(), bytes);
         }
         else
         {
             keepReading = false;
 
-            if (bytesRead == SOCKET_ERROR)
+            if (status == SOCKET_ERROR)
             {
                 wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error receiving");
             }
         }
-
-        free(buff);
     }
 
     return ret;

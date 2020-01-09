@@ -45,7 +45,7 @@ void System::SetSignalHandler(SignalHandler handler) noexcept
     static std::vector<int> signals = SystemImpl::GetSignals();
 
     auto ppHandler = handler.target<void (*)(int)>();
-    auto pHandler = (ppHandler == NULL) ? SIG_DFL : *ppHandler;
+    auto pHandler = (ppHandler == nullptr) ? SIG_DFL : *ppHandler;
 
     for (auto it = signals.begin(); it != signals.end(); ++it)
     {

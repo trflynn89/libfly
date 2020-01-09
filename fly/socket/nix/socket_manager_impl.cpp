@@ -32,7 +32,7 @@ void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout) noexcept
 
     if (maxFd > 0)
     {
-        if (::select(maxFd + 1, &readFd, &writeFd, NULL, &tv) > 0)
+        if (::select(maxFd + 1, &readFd, &writeFd, nullptr, &tv) > 0)
         {
             std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
             handleSocketIO(&readFd, &writeFd);

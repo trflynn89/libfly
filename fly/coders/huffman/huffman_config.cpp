@@ -12,11 +12,13 @@ HuffmanConfig::HuffmanConfig() noexcept :
 }
 
 //==============================================================================
-std::uint16_t HuffmanConfig::EncoderChunkSizeKB() const noexcept
+std::uint32_t HuffmanConfig::EncoderChunkSize() const noexcept
 {
-    return GetValue<std::uint16_t>(
+    auto encoderChunkSizeKB = GetValue<std::uint16_t>(
         "encoder_chunk_size_kb",
         m_defaultEncoderChunkSizeKB);
+
+    return static_cast<std::uint32_t>(encoderChunkSizeKB << 10);
 }
 
 //==============================================================================

@@ -86,16 +86,16 @@ private:
      * to the event and trigger its callback. If no path was found, drop the
      * event.
      */
-    void handleEvent(const struct inotify_event *) const noexcept;
+    void handleEvent(const inotify_event *) const noexcept;
 
     /**
      * Convert an inotify event mask to a PathEvent.
      *
-     * @param int The inotify event mask.
+     * @param uint32_t The inotify event mask.
      *
      * @return PathEvent A PathEvent that matches the event mask.
      */
-    PathMonitor::PathEvent convertToEvent(int) const noexcept;
+    PathMonitor::PathEvent convertToEvent(std::uint32_t) const noexcept;
 
     int m_monitorDescriptor;
 };
