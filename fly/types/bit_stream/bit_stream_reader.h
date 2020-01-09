@@ -216,18 +216,16 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    byte_type bytesRead = 0;
+    const std::streamsize bytesRead = m_stream.readsome(
+        reinterpret_cast<std::ios::char_type *>(&buffer),
+        static_cast<std::streamsize>(bytes));
 
-    if (m_stream.read(
-            reinterpret_cast<std::ios::char_type *>(&buffer),
-            static_cast<std::streamsize>(bytes)))
+    if (bytesRead > 0)
     {
         buffer = endian_swap<Endian::Big>(buffer);
-
-        bytesRead = static_cast<byte_type>(m_stream.gcount());
     }
 
-    return bytesRead;
+    return static_cast<byte_type>(bytesRead);
 }
 
 } // namespace fly
