@@ -226,7 +226,7 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
 
         buffer = endian_swap<Endian::Big>(buffer);
 
-        bytesRead static_cast<byte_type>(m_stream.gcount());
+        bytesRead = static_cast<byte_type>(m_stream.gcount());
     }
 
     return bytesRead;
