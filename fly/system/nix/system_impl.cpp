@@ -46,12 +46,6 @@ int SystemImpl::GetErrorCode() noexcept
 }
 
 //==============================================================================
-std::string SystemImpl::GetErrorString(int code) noexcept
-{
-    return "(" + std::to_string(code) + ") " + ::strerror(code);
-}
-
-//==============================================================================
 std::vector<int> SystemImpl::GetSignals() noexcept
 {
     return {SIGINT, SIGTERM, SIGSYS, SIGBUS, SIGILL, SIGFPE, SIGABRT, SIGSEGV};

@@ -1,25 +1,12 @@
 #include "fly/system/win/system_impl.h"
 
-#include "fly/logger/logger.h"
-#include "fly/types/string/string.h"
-
 #include <Windows.h>
 
-#include <atomic>
 #include <chrono>
 #include <csignal>
 #include <cstdio>
 
 namespace fly {
-
-namespace {
-
-    const DWORD s_formatFlags = FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS;
-
-    const DWORD s_langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
-
-} // namespace
 
 //==============================================================================
 void SystemImpl::PrintBacktrace() noexcept
@@ -58,37 +45,7 @@ std::string SystemImpl::LocalTime(const std::string &fmt) noexcept
 //==============================================================================
 int SystemImpl::GetErrorCode() noexcept
 {
-    return ::WSAGetLastError();
-}
-
-//==============================================================================
-std::string SystemImpl::GetErrorString(int code) noexcept
-{
-    LPTSTR str = nullptr;
-    std::string ret;
-
-    ::FormatMessage(
-        s_formatFlags,
-        nullptr,
-        code,
-        s_langId,
-        (LPTSTR)&str,
-        0,
-        nullptr);
-
-    if (str == nullptr)
-    {
-        ret = std::to_string(code);
-    }
-    else
-    {
-        ret = "(" + std::to_string(code) + ") " + str;
-        String::Trim(ret);
-
-        ::LocalFree(str);
-    }
-
-    return ret;
+    return ::GetLastError();
 }
 
 //==============================================================================

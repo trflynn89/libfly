@@ -17,7 +17,6 @@ public:
     static void PrintBacktrace() noexcept;
     static std::string LocalTime(const std::string &) noexcept;
     static int GetErrorCode() noexcept;
-    static std::string GetErrorString(int) noexcept;
     static std::vector<int> GetSignals() noexcept;
 };
 
