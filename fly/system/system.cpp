@@ -1,8 +1,10 @@
 #include "fly/system/system.h"
 
 #include "fly/fly.h"
+#include "fly/types/string/string.h"
 
 #include <csignal>
+#include <system_error>
 #include <vector>
 
 #include FLY_OS_IMPL_PATH(system, system)
@@ -36,7 +38,10 @@ std::string System::GetErrorString() noexcept
 //==============================================================================
 std::string System::GetErrorString(int code) noexcept
 {
-    return SystemImpl::GetErrorString(code);
+    return fly::String::Format(
+        "(%d) %s",
+        code,
+        std::system_category().message(code));
 }
 
 //==============================================================================
