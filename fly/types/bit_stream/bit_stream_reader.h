@@ -217,20 +217,11 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    const std::ios::pos_type start = m_stream.tellg();
-    m_stream.seekg(0, std::ios::end);
-
-    const std::ios::pos_type length = m_stream.tellg() - start;
-    m_stream.seekg(start, std::ios::beg);
-
     byte_type bytesRead = 0;
 
-    if (m_stream.read(
-            reinterpret_cast<std::ios::char_type *>(&buffer),
-            std::min(
-                static_cast<std::streamsize>(length),
-                static_cast<std::streamsize>(bytes))))
+    if ((bytes > 0) && (bytes <= sizeof(buffer)))
     {
+        m_stream.read(reinterpret_cast<std::ios::char_type *>(&buffer), bytes);
         bytesRead = static_cast<byte_type>(m_stream.gcount());
         buffer = endian_swap<Endian::Big>(buffer);
     }
