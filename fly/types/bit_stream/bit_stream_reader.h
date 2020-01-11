@@ -219,7 +219,7 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
 
     byte_type bytesRead = 0;
 
-    if ((bytes > 0) && (bytes <= sizeof(buffer)))
+    if (m_stream)
     {
         m_stream.read(reinterpret_cast<std::ios::char_type *>(&buffer), bytes);
         bytesRead = static_cast<byte_type>(m_stream.gcount());
