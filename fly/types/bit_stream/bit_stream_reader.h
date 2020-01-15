@@ -154,23 +154,25 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
     bits = 0;
 
     // If there are more bits to peek than are available in the byte buffer,
-    // break the peek into two.
+    // break the peek into two peeks.
     if (size > m_position)
     {
         const DataType mask = BitMask<DataType>(m_position);
         const byte_type diff = size - m_position;
 
-        // Fill the input buffer with the remainder of byte buffer.
-        bits = (static_cast<DataType>(m_buffer) & mask) << diff;
+        // Fill the input buffer with the remainder of byte buffer and refill
+        // the byte buffer from the stream.
+        bits = static_cast<DataType>(m_buffer) & mask;
         peeked = m_position;
-
-        // Then update the input to only peek remaining bits later.
-        size = diff;
 
         if (!refillBuffer())
         {
             return peeked;
         }
+
+        // Then update the input to only peek remaining bits next.
+        size = std::min(diff, m_position);
+        bits <<= size;
     }
 
     const byte_type diff = m_position - peeked - size;

@@ -115,7 +115,7 @@ void BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
 
         // Fill the remainder of the byte buffer with as many bits as are
         // available, and flush it onto the stream.
-        m_buffer |= (static_cast<buffer_type>(bits) >> diff);
+        m_buffer |= static_cast<buffer_type>(bits) >> diff;
         flushBuffer();
 
         // Then update the input bits to retain only those bits that have not
