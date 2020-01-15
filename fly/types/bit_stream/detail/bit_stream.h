@@ -56,7 +56,7 @@ protected:
      * @return DataType The created mask.
      */
     template <typename DataType>
-    constexpr inline static DataType GenerateMask(const DataType);
+    constexpr inline static DataType BitMask(const DataType);
 
     byte_type m_position;
     buffer_type m_buffer;
@@ -64,16 +64,16 @@ protected:
 
 //==============================================================================
 template <typename DataType>
-constexpr inline DataType BitStream::GenerateMask(const DataType bits)
+constexpr inline DataType BitStream::BitMask(const DataType bits)
 {
     static_assert(
         BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    constexpr auto filledMask = std::numeric_limits<DataType>::max();
-    constexpr auto numberOfBits = std::numeric_limits<DataType>::digits;
+    constexpr auto filled = std::numeric_limits<DataType>::max();
+    constexpr auto digits = std::numeric_limits<DataType>::digits;
 
-    return filledMask >> (numberOfBits - bits);
+    return static_cast<DataType>(-(bits != 0)) & (filled >> (digits - bits));
 }
 
 } // namespace fly::detail

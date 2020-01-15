@@ -59,26 +59,11 @@ bool HuffmanEncoder::EncodeInternal(
 //==============================================================================
 std::uint32_t HuffmanEncoder::readStream(std::istream &input) const noexcept
 {
-    const std::ios::pos_type start = input.tellg();
-    input.seekg(0, std::ios::end);
+    input.read(
+        reinterpret_cast<std::ios::char_type *>(m_chunkBuffer.get()),
+        static_cast<std::streamsize>(m_chunkSize));
 
-    const std::ios::pos_type length = input.tellg() - start;
-    input.seekg(start, std::ios::beg);
-
-    std::uint32_t bytesRead = 0;
-
-    if (length > 0)
-    {
-        input.read(
-            reinterpret_cast<std::ios::char_type *>(m_chunkBuffer.get()),
-            std::min(
-                static_cast<std::streamsize>(length),
-                static_cast<std::streamsize>(m_chunkSize)));
-
-        bytesRead = static_cast<std::uint32_t>(input.gcount());
-    }
-
-    return bytesRead;
+    return static_cast<std::uint32_t>(input.gcount());
 }
 
 //==============================================================================

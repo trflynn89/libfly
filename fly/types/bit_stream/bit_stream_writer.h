@@ -120,7 +120,7 @@ void BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
 
         // Then update the input bits to retain only those bits that have not
         // been written yet.
-        bits &= GenerateMask<DataType>(diff);
+        bits &= BitMask<DataType>(diff);
         size = diff;
     }
 

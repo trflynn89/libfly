@@ -87,6 +87,7 @@ bool HuffmanDecoder::decodeHeaderVersion1(
 {
     // Decode the chunk size.
     word_type encodedChunkSizeKB;
+
     if (!input.ReadWord(encodedChunkSizeKB))
     {
         LOGW("Could not decode chunk size");
@@ -102,6 +103,7 @@ bool HuffmanDecoder::decodeHeaderVersion1(
 
     // Decode the maximum Huffman code length.
     byte_type encodedMaxCodeLength;
+
     if (!input.ReadByte(encodedMaxCodeLength))
     {
         LOGW("Could not decode maximum code length");
@@ -133,6 +135,7 @@ bool HuffmanDecoder::decodeCodes(
 
     // Decode the number of code length counts.
     byte_type countsSize;
+
     if (!input.ReadByte(countsSize))
     {
         LOGW("Could not decode number of code length counts");
