@@ -15,7 +15,7 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
     byte_type magic = 0;
 
     // Cannot use ReadByte because the remainder bits are not known yet.
-    const byte_type bytesRead = fill(detail::s_byteTypeSize, header);
+    const byte_type bytesRead = fill(header, detail::s_byteTypeSize);
 
     if (bytesRead == 1_u8)
     {
@@ -33,13 +33,13 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
 //==============================================================================
 bool BitStreamReader::ReadWord(word_type &word) noexcept
 {
-    return ReadBits(detail::s_bitsPerWord, word) == detail::s_bitsPerWord;
+    return ReadBits(word, detail::s_bitsPerWord) == detail::s_bitsPerWord;
 }
 
 //==============================================================================
 bool BitStreamReader::ReadByte(byte_type &byte) noexcept
 {
-    return ReadBits(detail::s_bitsPerByte, byte) == detail::s_bitsPerByte;
+    return ReadBits(byte, detail::s_bitsPerByte) == detail::s_bitsPerByte;
 }
 
 //==============================================================================
@@ -67,7 +67,7 @@ bool BitStreamReader::refillBuffer() noexcept
     buffer_type buffer = 0;
 
     const byte_type bytesRead =
-        fill(bitsToFill / detail::s_bitsPerByte, buffer);
+        fill(buffer, bitsToFill / detail::s_bitsPerByte);
     const byte_type bitsRead = bytesRead * detail::s_bitsPerByte;
 
     if (bitsRead == 0)

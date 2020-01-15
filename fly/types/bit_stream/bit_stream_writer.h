@@ -35,16 +35,18 @@ public:
     BitStreamWriter(std::iostream &) noexcept;
 
     /**
-     * Write a multibyte word to the byte buffer. Flush the buffer to the stream
-     * if it is filled during this operation.
+     * Write a multibyte word to the byte buffer.
+     *
+     * Flush the buffer to the stream if it is filled during this operation.
      *
      * @param word_type The word to write.
      */
     void WriteWord(word_type) noexcept;
 
     /**
-     * Write a full byte to the byte buffer. Flush the buffer to the stream if
-     * it is filled during this operation.
+     * Write a full byte to the byte buffer.
+     *
+     * Flush the buffer to the stream if it is filled during this operation.
      *
      * @param byte_type The byte to write.
      */
@@ -53,8 +55,9 @@ public:
     /**
      * Write a number of bits to the byte buffer. The least-significant bits in
      * the provided data type will be written, starting from the position
-     * pointed to by the provided number of bits. Flush the buffer to the stream
-     * if it is filled during this operation.
+     * pointed to by the provided number of bits.
+     *
+     * Flush the buffer to the stream if it is filled during this operation.
      *
      * @tparam DataType The data type storing the bits to write.
      *

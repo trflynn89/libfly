@@ -171,6 +171,7 @@ bool HuffmanDecoder::decodeCodes(
         for (std::uint16_t i = 0; i < counts[length]; ++i)
         {
             byte_type symbol;
+
             if (!input.ReadByte(symbol))
             {
                 LOGW(
@@ -235,7 +236,7 @@ bool HuffmanDecoder::decodeSymbols(
     std::uint32_t bytes = 0;
     code_type index;
 
-    while ((bytes < chunkSize) && (input.PeekBits(maxCodeLength, index) != 0))
+    while ((bytes < chunkSize) && (input.PeekBits(index, maxCodeLength) != 0))
     {
         const HuffmanCode &code = m_prefixTable[index];
 

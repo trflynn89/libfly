@@ -74,7 +74,7 @@ TEST_F(BitStreamTest, EmptyStreamTest)
     EXPECT_EQ(m_inputStream.gcount(), 0);
 
     // No further reads should succeed.
-    EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+    EXPECT_EQ(stream.ReadBits(byte, 1), 0_u8);
     EXPECT_TRUE(m_inputStream.fail());
 }
 
@@ -101,7 +101,7 @@ TEST_F(BitStreamTest, HeaderTest)
         EXPECT_EQ(m_inputStream.gcount(), 1);
 
         // No further reads should succeed.
-        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+        EXPECT_EQ(stream.ReadBits(byte, 1), 0_u8);
         EXPECT_TRUE(stream.FullyConsumed());
     }
 }
@@ -123,7 +123,7 @@ TEST_F(BitStreamTest, BadHeaderTest)
         EXPECT_EQ(m_inputStream.gcount(), 1);
 
         // No further reads should succeed.
-        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+        EXPECT_EQ(stream.ReadBits(byte, 1), 0_u8);
         EXPECT_TRUE(m_inputStream.fail());
     }
 }
@@ -152,11 +152,11 @@ TEST_F(BitStreamTest, SingleBitTest)
         EXPECT_EQ(m_inputStream.gcount(), 1);
 
         // Reading a single bit should succeed.
-        EXPECT_EQ(stream.ReadBits(1, byte), 1_u8);
+        EXPECT_EQ(stream.ReadBits(byte, 1), 1_u8);
         EXPECT_EQ(byte, 1_u8);
 
         // No further reads should succeed.
-        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+        EXPECT_EQ(stream.ReadBits(byte, 1), 0_u8);
         EXPECT_TRUE(stream.FullyConsumed());
     }
 }
@@ -189,7 +189,7 @@ TEST_F(BitStreamTest, SingleByteTest)
         EXPECT_EQ(byte, 0xa);
 
         // No further reads should succeed.
-        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+        EXPECT_EQ(stream.ReadBits(byte, 1), 0_u8);
         EXPECT_TRUE(stream.FullyConsumed());
     }
 }
@@ -222,7 +222,7 @@ TEST_F(BitStreamTest, SingleWordTest)
         EXPECT_EQ(word, 0xae);
 
         // No further reads should succeed.
-        EXPECT_EQ(stream.ReadBits(1, word), 0_u8);
+        EXPECT_EQ(stream.ReadBits(word, 1), 0_u8);
         EXPECT_TRUE(stream.FullyConsumed());
     }
 }
@@ -257,17 +257,17 @@ TEST_F(BitStreamTest, MultiBufferTest)
         EXPECT_EQ(m_inputStream.gcount(), 1);
 
         // Reading all written bits should succeed.
-        EXPECT_EQ(stream.ReadBits(64, buffer), 64_u8);
+        EXPECT_EQ(stream.ReadBits(buffer, 64), 64_u8);
         EXPECT_EQ(buffer, 0xae1ae1ae1ae1ae1a_u64);
 
-        EXPECT_EQ(stream.ReadBits(15, buffer), 15_u8);
+        EXPECT_EQ(stream.ReadBits(buffer, 15), 15_u8);
         EXPECT_EQ(buffer, 0x7ef2);
 
-        EXPECT_EQ(stream.ReadBits(54, buffer), 54_u8);
+        EXPECT_EQ(stream.ReadBits(buffer, 54), 54_u8);
         EXPECT_EQ(buffer, 0x1bc9bc9bc9bc9b_u64);
 
         // No further reads should succeed.
-        EXPECT_EQ(stream.ReadBits(1, buffer), 0_u8);
+        EXPECT_EQ(stream.ReadBits(buffer, 1), 0_u8);
         EXPECT_TRUE(stream.FullyConsumed());
     }
 }
@@ -298,13 +298,13 @@ TEST_F(BitStreamTest, PeekTest)
         // Peeking a single byte multiple times should succeed.
         for (std::uint8_t i = 0; i < 10; ++i)
         {
-            EXPECT_EQ(stream.PeekBits(8_u8, byte), 8_u8);
+            EXPECT_EQ(stream.PeekBits(byte, 8_u8), 8_u8);
             EXPECT_EQ(byte, 0xa);
         }
 
         // After discarding the peeked bits, no further reads should succeed.
         stream.DiscardBits(8_u8);
-        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+        EXPECT_EQ(stream.ReadBits(byte, 1), 0_u8);
         EXPECT_TRUE(stream.FullyConsumed());
     }
 }
@@ -333,12 +333,12 @@ TEST_F(BitStreamTest, OverPeekTest)
         EXPECT_EQ(m_inputStream.gcount(), 1);
 
         // Trying to peek 8 bits should result in 7 bits being peeked.
-        EXPECT_EQ(stream.PeekBits(8_u8, byte), 7_u8);
-        EXPECT_EQ(byte, 0x7f << 1);
+        EXPECT_EQ(stream.PeekBits(byte, 8_u8), 7_u8);
+        EXPECT_EQ(byte, 0x7f);
 
         // After discarding the peeked bits, no further reads should succeed.
         stream.DiscardBits(7_u8);
-        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+        EXPECT_EQ(stream.ReadBits(byte, 1), 0_u8);
         EXPECT_TRUE(stream.FullyConsumed());
     }
 }
@@ -397,7 +397,7 @@ TEST_F(BitStreamTest, FailedWriterStreamTest)
         EXPECT_EQ(m_inputStream.gcount(), 1);
 
         // No further reads should succeed.
-        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+        EXPECT_EQ(stream.ReadBits(byte, 1), 0_u8);
         EXPECT_TRUE(stream.FullyConsumed());
     }
 }
@@ -427,7 +427,7 @@ TEST_F(BitStreamTest, InvalidReaderStreamTest)
         EXPECT_EQ(m_inputStream.gcount(), 0);
 
         // No further reads should succeed.
-        EXPECT_EQ(stream.ReadBits(1, byte), 0_u8);
+        EXPECT_EQ(stream.ReadBits(byte, 1), 0_u8);
     }
 }
 

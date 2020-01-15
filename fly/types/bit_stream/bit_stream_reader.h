@@ -33,8 +33,10 @@ public:
     BitStreamReader(std::istream &) noexcept;
 
     /**
-     * Read a multibyte word from the byte buffer. Fill the buffer from the
-     * stream if it is fully consumed during this operation.
+     * Read a multibyte word from the byte buffer.
+     *
+     * Fill the buffer from the stream if the number of bits to read exceeds the
+     * number of bits available.
      *
      * @param word_type The location to store the read word.
      *
@@ -44,8 +46,10 @@ public:
     bool ReadWord(word_type &) noexcept;
 
     /**
-     * Read a full byte from the byte buffer. Fill the buffer from the stream if
-     * it is fully consumed during this operation.
+     * Read a full byte from the byte buffer.
+     *
+     * Fill the buffer from the stream if the number of bits to read exceeds the
+     * number of bits available.
      *
      * @param byte_type The location to store the read byte.
      *
@@ -55,37 +59,44 @@ public:
     bool ReadByte(byte_type &) noexcept;
 
     /**
-     * Read a number of bits from the byte buffer. The least-significant bits in
-     * the provided data type will be filled, starting from the position pointed
-     * to by the provided number of bits. Fill the buffer from the stream if the
-     * number of bits to read exceeds the number of bits available.
+     * Read a number of bits from the byte buffer. There is no guarantee that
+     * the requested number of bits will actually be read, as there may be less
+     * than that number available between the byte buffer and stream. If any
+     * bits were read, the least-significant bits in the provided data type will
+     * be filled, starting from the position pointed to by the read number of
+     * bits.
+     *
+     * Fill the buffer from the stream if the number of bits to read exceeds the
+     * number of bits available.
      *
      * @tparam DataType The data type of the location to store the read bits.
      *
-     * @param byte_type The number of bits to read.
      * @param DataType The location to store the read bits.
+     * @param byte_type The number of bits to read.
      *
      * @return byte_type The number of bits successfully read.
      */
     template <typename DataType>
-    byte_type ReadBits(byte_type, DataType &) noexcept;
+    byte_type ReadBits(DataType &, byte_type) noexcept;
 
     /**
      * Read a number of bits from the byte buffer without discarding those bits.
-     * The least-significant bits in the provided data type will be filled,
-     * starting from the position pointed to by the provided number of bits.
+     * There is no guarantee that the requested number of bits will actually be
+     * peeked, as there may be less than that number available between the byte
+     * buffer and stream. If any bits were peeked, the least-significant bits in
+     * the provided data type will be filled, starting from the position pointed
+     * to by the peeked number of bits.
+     *
      * Fill the buffer from the stream if the number of bits to peek exceeds the
      * number of bits available.
      *
-     * @tparam DataType The data type of the location to store the peeked bits.
-     *
-     * @param byte_type The number of bits to peek.
      * @param DataType The location to store the peeked bits.
+     * @param byte_type The number of bits to peek.
      *
      * @return byte_type The number of bits successfully peeked.
      */
     template <typename DataType>
-    byte_type PeekBits(byte_type, DataType &) noexcept;
+    byte_type PeekBits(DataType &, byte_type) noexcept;
 
     /**
      * Discard a number of bits from the byte buffer. Should only be used after
@@ -116,13 +127,13 @@ private:
      *
      * @tparam DataType The type of the byte buffer to fill.
      *
-     * @param byte_type The number of bytes to read.
      * @param DataType The byte buffer to fill.
+     * @param byte_type The number of bytes to read.
      *
      * @return byte_type The number of bytes actually read.
      */
     template <typename DataType>
-    byte_type fill(byte_type, DataType &) noexcept;
+    byte_type fill(DataType &, byte_type) noexcept;
 
     std::istream &m_stream;
     byte_type m_remainder;
@@ -130,13 +141,13 @@ private:
 
 //==============================================================================
 template <typename DataType>
-byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
+byte_type BitStreamReader::ReadBits(DataType &bits, byte_type size) noexcept
 {
     static_assert(
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    const byte_type bitsRead = PeekBits(size, bits);
+    const byte_type bitsRead = PeekBits(bits, size);
     DiscardBits(bitsRead);
 
     return bitsRead;
@@ -144,7 +155,7 @@ byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
 
 //==============================================================================
 template <typename DataType>
-byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
+byte_type BitStreamReader::PeekBits(DataType &bits, byte_type size) noexcept
 {
     static_assert(
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
@@ -160,8 +171,8 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
         const DataType mask = BitMask<DataType>(m_position);
         const byte_type diff = size - m_position;
 
-        // Fill the input buffer with the remainder of byte buffer and refill
-        // the byte buffer from the stream.
+        // Fill the input bits with the remainder of byte buffer and refill the
+        // buffer from the stream.
         bits = static_cast<DataType>(m_buffer) & mask;
         peeked = m_position;
 
@@ -170,7 +181,7 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
             return peeked;
         }
 
-        // Then update the input to only peek remaining bits next.
+        // Then update the input to only peek any remaining bits next.
         size = std::min(diff, m_position);
         bits <<= size;
     }
@@ -185,7 +196,7 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
 
 //==============================================================================
 template <typename DataType>
-byte_type BitStreamReader::fill(byte_type bytes, DataType &buffer) noexcept
+byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
 {
     static_assert(
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
