@@ -136,29 +136,10 @@ byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    if constexpr (detail::BitStreamTraits::is_buffer_type_v<DataType>)
-    {
-        // See PeekBits for why 64-bit read operations must be split.
-        const byte_type sizeHigh = size / 2;
-        const byte_type sizeLow = size - sizeHigh;
-        std::uint32_t bitsHigh, bitsLow;
+    const byte_type bitsRead = PeekBits(size, bits);
+    DiscardBits(bitsRead);
 
-        const byte_type bitsReadHigh = PeekBits(sizeHigh, bitsHigh);
-        DiscardBits(bitsReadHigh);
-
-        const byte_type bitsReadLow = PeekBits(sizeLow, bitsLow);
-        DiscardBits(bitsReadLow);
-
-        bits = (static_cast<DataType>(bitsHigh) << sizeLow) | bitsLow;
-        return bitsReadHigh + bitsReadLow;
-    }
-    else
-    {
-        const byte_type bitsRead = PeekBits(size, bits);
-        DiscardBits(bitsRead);
-
-        return bitsRead;
-    }
+    return bitsRead;
 }
 
 //==============================================================================
@@ -169,22 +150,6 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    // Peek operations the site of the byte buffer are not supported because the
-    // byte buffer could be in a state where it cannot be refilled.
-    //
-    // For example, consider a 64-bit byte buffer, and reading 6 bits and then
-    // 64 bits. After the 6-bit read, there will be 58 bits left in the buffer;
-    // not enough for the next 64 bit read. The buffer must then be refilled,
-    // but it cannot because there is less than 1 byte free in the byte buffer.
-    //
-    // Ideally, that operation could be split into two peeks (fill the given
-    // bits with the 58 available, then refill the entire byte buffer). But this
-    // would invalidate the PeekBits/DiscardBits semantic. Would need to support
-    // putting bits back onto the stream.
-    static_assert(
-        !detail::BitStreamTraits::is_buffer_type_v<DataType>,
-        "PeekBits only supports types smaller than buffer_type");
-
     byte_type peeked = 0;
     bits = 0;
 
@@ -192,15 +157,15 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
     // break the peek into two.
     if (size > m_position)
     {
-        // Fill the remainder of the byte buffer with as many bits as are
-        // available, and flush it onto the stream.
-        bits = static_cast<DataType>(m_buffer) & BitMask<DataType>(m_position);
+        const DataType mask = BitMask<DataType>(m_position);
+        const byte_type diff = size - m_position;
+
+        // Fill the input buffer with the remainder of byte buffer.
+        bits = (static_cast<DataType>(m_buffer) & mask) << diff;
         peeked = m_position;
 
-        // Then update the input bits to retain only those bits that have not
-        // been written yet.
-        size -= m_position;
-        bits <<= size;
+        // Then update the input to only peek remaining bits later.
+        size = diff;
 
         if (!refillBuffer())
         {
@@ -210,7 +175,6 @@ byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
 
     const byte_type diff = m_position - peeked - size;
 
-    // bits |= (m_buffer & BitMask<buffer_type>(position)) >> diff;
     bits |= static_cast<DataType>(m_buffer >> diff) & BitMask<DataType>(size);
     peeked += size;
 
