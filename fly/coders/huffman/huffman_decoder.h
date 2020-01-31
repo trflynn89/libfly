@@ -71,7 +71,7 @@ private:
      * Decode version 1 of the header. Extract the maximum chunk length and the
      * global maximum Huffman code length the encoder used.
      *
-     * @param BitStreamWriter Stream to store the encoded header.
+     * @param BitStreamWriter Stream storing the encoded header.
      * @param uint32_t Location to store the maximum chunk size (in bytes).
      * @param length_type Location to store the global maximum Huffman code
      *                    length.
