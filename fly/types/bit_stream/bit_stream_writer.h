@@ -35,16 +35,18 @@ public:
     BitStreamWriter(std::iostream &) noexcept;
 
     /**
-     * Write a multibyte word to the byte buffer. Flush the buffer to the stream
-     * if it is filled during this operation.
+     * Write a multibyte word to the byte buffer.
+     *
+     * Flush the buffer to the stream if it is filled during this operation.
      *
      * @param word_type The word to write.
      */
     void WriteWord(word_type) noexcept;
 
     /**
-     * Write a full byte to the byte buffer. Flush the buffer to the stream if
-     * it is filled during this operation.
+     * Write a full byte to the byte buffer.
+     *
+     * Flush the buffer to the stream if it is filled during this operation.
      *
      * @param byte_type The byte to write.
      */
@@ -53,8 +55,9 @@ public:
     /**
      * Write a number of bits to the byte buffer. The least-significant bits in
      * the provided data type will be written, starting from the position
-     * pointed to by the provided number of bits. Flush the buffer to the stream
-     * if it is filled during this operation.
+     * pointed to by the provided number of bits.
+     *
+     * Flush the buffer to the stream if it is filled during this operation.
      *
      * @tparam DataType The data type storing the bits to write.
      *
@@ -111,23 +114,23 @@ void BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
     // break the bits into two chunks.
     if (size > m_position)
     {
-        const byte_type diff = size - m_position;
+        const byte_type rshift = size - m_position;
 
         // Fill the remainder of the byte buffer with as many bits as are
         // available, and flush it onto the stream.
-        m_buffer |= (static_cast<buffer_type>(bits) >> diff);
+        m_buffer |= static_cast<buffer_type>(bits) >> rshift;
         flushBuffer();
 
         // Then update the input bits to retain only those bits that have not
         // been written yet.
-        bits &= GenerateMask<DataType>(diff);
-        size = diff;
+        bits &= BitMask<DataType>(rshift);
+        size = rshift;
     }
 
-    const byte_type diff = m_position - size;
+    const byte_type lshift = m_position - size;
 
-    m_buffer |= static_cast<buffer_type>(bits) << diff;
-    m_position = diff;
+    m_buffer |= static_cast<buffer_type>(bits) << lshift;
+    m_position = lshift;
 }
 
 //==============================================================================

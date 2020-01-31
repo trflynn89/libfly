@@ -87,6 +87,7 @@ bool HuffmanDecoder::decodeHeaderVersion1(
 {
     // Decode the chunk size.
     word_type encodedChunkSizeKB;
+
     if (!input.ReadWord(encodedChunkSizeKB))
     {
         LOGW("Could not decode chunk size");
@@ -102,6 +103,7 @@ bool HuffmanDecoder::decodeHeaderVersion1(
 
     // Decode the maximum Huffman code length.
     byte_type encodedMaxCodeLength;
+
     if (!input.ReadByte(encodedMaxCodeLength))
     {
         LOGW("Could not decode maximum code length");
@@ -133,6 +135,7 @@ bool HuffmanDecoder::decodeCodes(
 
     // Decode the number of code length counts.
     byte_type countsSize;
+
     if (!input.ReadByte(countsSize))
     {
         LOGW("Could not decode number of code length counts");
@@ -168,6 +171,7 @@ bool HuffmanDecoder::decodeCodes(
         for (std::uint16_t i = 0; i < counts[length]; ++i)
         {
             byte_type symbol;
+
             if (!input.ReadByte(symbol))
             {
                 LOGW(
@@ -232,7 +236,7 @@ bool HuffmanDecoder::decodeSymbols(
     std::uint32_t bytes = 0;
     code_type index;
 
-    while ((bytes < chunkSize) && (input.PeekBits(maxCodeLength, index) != 0))
+    while ((bytes < chunkSize) && (input.PeekBits(index, maxCodeLength) != 0))
     {
         const HuffmanCode &code = m_prefixTable[index];
 

@@ -45,8 +45,8 @@ enum class Endian : std::uint16_t
  * Templated wrapper around platform built-in byte swapping macros to convert a
  * value between system endianness and a desired endianness.
  *
- * @tparam T The type of the value to swap.
  * @tparam Endian The desired endianness to swap between.
+ * @tparam T The type of the value to swap.
  *
  * @param T The value to swap.
  *

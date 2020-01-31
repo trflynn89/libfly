@@ -114,8 +114,7 @@ protected:
                 fly::String::Split(log, '\t');
             ASSERT_EQ(sections.size(), 7_zu);
 
-            const auto index =
-                fly::String::Convert<std::size_t>(sections[0]);
+            const auto index = fly::String::Convert<std::size_t>(sections[0]);
             const auto level = static_cast<fly::Log::Level>(
                 fly::String::Convert<std::uint8_t>(sections[1]));
             const auto time = fly::String::Convert<double>(sections[2]);

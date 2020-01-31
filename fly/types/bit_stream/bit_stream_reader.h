@@ -5,6 +5,7 @@
 #include "fly/types/bit_stream/detail/bit_stream_traits.h"
 #include "fly/types/numeric/endian.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <istream>
 
@@ -33,8 +34,10 @@ public:
     BitStreamReader(std::istream &) noexcept;
 
     /**
-     * Read a multibyte word from the byte buffer. Fill the buffer from the
-     * stream if it is fully consumed during this operation.
+     * Read a multibyte word from the byte buffer.
+     *
+     * Fill the buffer from the stream if the number of bits to read exceeds the
+     * number of bits available.
      *
      * @param word_type The location to store the read word.
      *
@@ -44,8 +47,10 @@ public:
     bool ReadWord(word_type &) noexcept;
 
     /**
-     * Read a full byte from the byte buffer. Fill the buffer from the stream if
-     * it is fully consumed during this operation.
+     * Read a full byte from the byte buffer.
+     *
+     * Fill the buffer from the stream if the number of bits to read exceeds the
+     * number of bits available.
      *
      * @param byte_type The location to store the read byte.
      *
@@ -55,37 +60,44 @@ public:
     bool ReadByte(byte_type &) noexcept;
 
     /**
-     * Read a number of bits from the byte buffer. The least-significant bits in
-     * the provided data type will be filled, starting from the position pointed
-     * to by the provided number of bits. Fill the buffer from the stream if the
-     * number of bits to read exceeds the number of bits available.
+     * Read a number of bits from the byte buffer. There is no guarantee that
+     * the requested number of bits will actually be read, as there may be less
+     * than that number available between the byte buffer and stream. If any
+     * bits were read, the least-significant bits in the provided data type will
+     * be filled, starting from the position pointed to by the requested number
+     * of bits.
+     *
+     * Fill the buffer from the stream if the number of bits to read exceeds the
+     * number of bits available.
      *
      * @tparam DataType The data type of the location to store the read bits.
      *
-     * @param byte_type The number of bits to read.
      * @param DataType The location to store the read bits.
+     * @param byte_type The number of bits to read.
      *
      * @return byte_type The number of bits successfully read.
      */
     template <typename DataType>
-    byte_type ReadBits(byte_type, DataType &) noexcept;
+    byte_type ReadBits(DataType &, byte_type) noexcept;
 
     /**
      * Read a number of bits from the byte buffer without discarding those bits.
-     * The least-significant bits in the provided data type will be filled,
-     * starting from the position pointed to by the provided number of bits.
+     * There is no guarantee that the requested number of bits will actually be
+     * peeked, as there may be less than that number available between the byte
+     * buffer and stream. If any bits were peeked, the least-significant bits in
+     * the provided data type will be filled, starting from the position pointed
+     * to by the requested number of bits.
+     *
      * Fill the buffer from the stream if the number of bits to peek exceeds the
      * number of bits available.
      *
-     * @tparam DataType The data type of the location to store the peeked bits.
-     *
-     * @param byte_type The number of bits to peek.
      * @param DataType The location to store the peeked bits.
+     * @param byte_type The number of bits to peek.
      *
      * @return byte_type The number of bits successfully peeked.
      */
     template <typename DataType>
-    byte_type PeekBits(byte_type, DataType &) noexcept;
+    byte_type PeekBits(DataType &, byte_type) noexcept;
 
     /**
      * Discard a number of bits from the byte buffer. Should only be used after
@@ -106,10 +118,8 @@ public:
 private:
     /**
      * Read from the stream to fill the byte buffer.
-     *
-     * @return bool True if any bits were actually read
      */
-    bool refillBuffer() noexcept;
+    void refillBuffer() noexcept;
 
     /**
      * Read from the stream to fill a byte buffer.
@@ -130,7 +140,7 @@ private:
 
 //==============================================================================
 template <typename DataType>
-byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
+byte_type BitStreamReader::ReadBits(DataType &bits, byte_type size) noexcept
 {
     static_assert(
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
@@ -138,15 +148,15 @@ byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
 
     if constexpr (detail::BitStreamTraits::is_buffer_type_v<DataType>)
     {
-        // See PeekBits for why 64-bit read operations must be split.
+        // See PeekBits for why buffer_type reads must be split.
         const byte_type sizeHigh = size / 2;
         const byte_type sizeLow = size - sizeHigh;
         std::uint32_t bitsHigh, bitsLow;
 
-        const byte_type bitsReadHigh = PeekBits(sizeHigh, bitsHigh);
+        const byte_type bitsReadHigh = PeekBits(bitsHigh, sizeHigh);
         DiscardBits(bitsReadHigh);
 
-        const byte_type bitsReadLow = PeekBits(sizeLow, bitsLow);
+        const byte_type bitsReadLow = PeekBits(bitsLow, sizeLow);
         DiscardBits(bitsReadLow);
 
         bits = (static_cast<DataType>(bitsHigh) << sizeLow) | bitsLow;
@@ -154,7 +164,7 @@ byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
     }
     else
     {
-        const byte_type bitsRead = PeekBits(size, bits);
+        const byte_type bitsRead = PeekBits(bits, size);
         DiscardBits(bitsRead);
 
         return bitsRead;
@@ -163,49 +173,58 @@ byte_type BitStreamReader::ReadBits(byte_type size, DataType &bits) noexcept
 
 //==============================================================================
 template <typename DataType>
-byte_type BitStreamReader::PeekBits(byte_type size, DataType &bits) noexcept
+byte_type BitStreamReader::PeekBits(DataType &bits, byte_type size) noexcept
 {
     static_assert(
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    // 64-bit peek operations not fully supported because the byte buffer could
-    // be in a state where it cannot be refilled. For example, consider reading
-    // 6 bits and then 64 bits. After the 6-bit read, there will be 58 bits left
-    // in the buffer - not enough for the 64 bit read. The buffer must then be
-    // refilled, but it cannot because there is less than 1 byte available.
+    // Peek operations the site of the byte buffer are not supported because the
+    // byte buffer could be in a state where it cannot be refilled.
     //
-    // Ideally, that operation could be split into two peeks (fill the given
-    // bits with the 58 available, then refill the entire byte buffer). But this
-    // would invalidate the PeekBits/DiscardBits semantic. Would need to support
-    // putting bits back onto the stream.
+    // For example, consider a 64-bit byte buffer, and reading 6 bits and then
+    // 64 bits. After the 6-bit read, there will be 58 bits left in the buffer;
+    // not enough for the next 64 bit read. The buffer must then be refilled,
+    // but it cannot because there is less than 1 byte free in the byte buffer.
+    //
+    // Ideally, given the split peek operations below, the given bits could be
+    // filled with the 58 available, then the byte buffer entirely refilled.
+    // But the caller then cannot discard more than 6 bits, which invalidates
+    // the whole PeekBits/DiscardBits semantic. BitStreamReader would need to
+    // support putting bits back onto the stream.
     static_assert(
         !detail::BitStreamTraits::is_buffer_type_v<DataType>,
         "PeekBits only supports types smaller than buffer_type");
 
-    if ((size > m_position) && !refillBuffer())
-    {
-        return 0;
-    }
+    byte_type peeked = 0, lshift = 0;
+    bits = 0;
 
     // If there are more bits to peek than are available in the byte buffer,
-    // then only the remaining bits can be returned.
+    // break the peek into two peeks.
     if (size > m_position)
     {
-        const byte_type shift = size - m_position;
+        peeked = m_position;
+
         const DataType buffer = static_cast<DataType>(m_buffer);
+        lshift = size - m_position;
 
-        bits = (buffer & GenerateMask<DataType>(m_position)) << shift;
-        return m_position;
-    }
-    else
-    {
-        const byte_type shift = m_position - size;
-        const DataType buffer = static_cast<DataType>(m_buffer >> shift);
+        // Fill the input bits with the remainder of byte buffer and refill the
+        // buffer from the stream.
+        bits = (buffer & BitMask<DataType>(m_position)) << lshift;
+        refillBuffer();
 
-        bits = buffer & GenerateMask<DataType>(size);
-        return size;
+        // Then update the input to only peek any remaining bits next.
+        size = std::min(lshift, static_cast<byte_type>(m_position - peeked));
+        lshift -= size;
     }
+
+    const byte_type rshift = m_position - peeked - size;
+    const DataType buffer = static_cast<DataType>(m_buffer >> rshift);
+
+    bits |= (buffer & BitMask<DataType>(size)) << lshift;
+    peeked += size;
+
+    return peeked;
 }
 
 //==============================================================================
