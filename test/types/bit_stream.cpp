@@ -273,6 +273,53 @@ TEST_F(BitStreamTest, MultiBufferTest)
 }
 
 //==============================================================================
+TEST_F(BitStreamTest, MultiBufferSplitTest)
+{
+    constexpr auto length = std::numeric_limits<fly::buffer_type>::digits;
+    {
+        fly::BitStreamWriter stream(m_outputStream);
+        stream.WriteBits(0xae1ae1ae1ae1ae1a_u64, length);
+        stream.WriteBits(0x1f_u8, 5);
+        stream.WriteBits(0xbc9bc9bc9bc9bc9b_u64, length);
+        EXPECT_TRUE(stream.Finish());
+    }
+
+    // A 1-byte header, 2 full internal byte buffers, and a 1-byte buffer should
+    // have been written.
+    EXPECT_EQ(
+        m_outputStream.str().size(),
+        2_u64 + ((length * 2) / std::numeric_limits<fly::byte_type>::digits));
+
+    // The header should be the magic value and 3 remainder bits.
+    VerifyHeader(3_u8);
+
+    m_inputStream.str(m_outputStream.str());
+    {
+        fly::BitStreamReader stream(m_inputStream);
+        fly::buffer_type buffer;
+
+        // The 1-byte header should have been read.
+        EXPECT_EQ(m_inputStream.gcount(), 1);
+
+        // Reading all written bits should succeed. Here, the bits are read in
+        // an order such that the second and third read must be split because
+        // they each read more than is available in the internal byte buffer.
+        EXPECT_EQ(stream.ReadBits(buffer, 6), 6_u8);
+        EXPECT_EQ(buffer, 0x2b);
+
+        EXPECT_EQ(stream.ReadBits(buffer, 64), 64_u8);
+        EXPECT_EQ(buffer, 0x86b86b86b86b86bf_u64);
+
+        EXPECT_EQ(stream.ReadBits(buffer, 63), 63_u8);
+        EXPECT_EQ(buffer, 0x3c9bc9bc9bc9bc9b_u64);
+
+        // No further reads should succeed.
+        EXPECT_EQ(stream.ReadBits(buffer, 1), 0_u8);
+        EXPECT_TRUE(stream.FullyConsumed());
+    }
+}
+
+//==============================================================================
 TEST_F(BitStreamTest, PeekTest)
 {
     {
@@ -332,9 +379,9 @@ TEST_F(BitStreamTest, OverPeekTest)
         // The 1-byte header should have been read.
         EXPECT_EQ(m_inputStream.gcount(), 1);
 
-        // Trying to peek 8 bits should result in 7 bits being peeked.
+        // Trying to peek 8 bits now should result in only 7 bits being peeked.
         EXPECT_EQ(stream.PeekBits(byte, 8_u8), 7_u8);
-        EXPECT_EQ(byte, 0x7f);
+        EXPECT_EQ(byte, 0x7f << 1);
 
         // After discarding the peeked bits, no further reads should succeed.
         stream.DiscardBits(7_u8);

@@ -114,23 +114,23 @@ void BitStreamWriter::WriteBits(DataType bits, byte_type size) noexcept
     // break the bits into two chunks.
     if (size > m_position)
     {
-        const byte_type diff = size - m_position;
+        const byte_type rshift = size - m_position;
 
         // Fill the remainder of the byte buffer with as many bits as are
         // available, and flush it onto the stream.
-        m_buffer |= static_cast<buffer_type>(bits) >> diff;
+        m_buffer |= static_cast<buffer_type>(bits) >> rshift;
         flushBuffer();
 
         // Then update the input bits to retain only those bits that have not
         // been written yet.
-        bits &= BitMask<DataType>(diff);
-        size = diff;
+        bits &= BitMask<DataType>(rshift);
+        size = rshift;
     }
 
-    const byte_type diff = m_position - size;
+    const byte_type lshift = m_position - size;
 
-    m_buffer |= static_cast<buffer_type>(bits) << diff;
-    m_position = diff;
+    m_buffer |= static_cast<buffer_type>(bits) << lshift;
+    m_position = lshift;
 }
 
 //==============================================================================

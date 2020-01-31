@@ -60,7 +60,7 @@ bool BitStreamReader::FullyConsumed() const noexcept
 }
 
 //==============================================================================
-bool BitStreamReader::refillBuffer() noexcept
+void BitStreamReader::refillBuffer() noexcept
 {
     const byte_type bitsToFill =
         detail::s_mostSignificantBitPosition - m_position;
@@ -68,14 +68,10 @@ bool BitStreamReader::refillBuffer() noexcept
 
     const byte_type bytesRead =
         fill(buffer, bitsToFill / detail::s_bitsPerByte);
-    const byte_type bitsRead = bytesRead * detail::s_bitsPerByte;
 
-    if (bitsRead == 0)
+    if (bytesRead > 0)
     {
-        return m_position > 0;
-    }
-    else
-    {
+        const byte_type bitsRead = bytesRead * detail::s_bitsPerByte;
         m_position += bitsRead;
 
         // It is undefined behavior to bit-shift by the size of the value being
@@ -84,16 +80,14 @@ bool BitStreamReader::refillBuffer() noexcept
         // into two operations in order to avoid that undefined behavior.
         m_buffer = (m_buffer << 1) << (bitsRead - 1);
         m_buffer |= buffer >> (detail::s_mostSignificantBitPosition - bitsRead);
-    }
 
-    if (m_stream.peek() == EOF)
-    {
-        // At end-of-file, discard any encoded zero-filled bits.
-        m_position -= m_remainder;
-        m_buffer >>= m_remainder;
+        if (m_stream.peek() == EOF)
+        {
+            // At end-of-file, discard any encoded zero-filled bits.
+            m_position -= m_remainder;
+            m_buffer >>= m_remainder;
+        }
     }
-
-    return true;
 }
 
 } // namespace fly
