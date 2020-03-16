@@ -10,7 +10,7 @@ jobs:
       vmImage: ubuntu-latest
 
     container:
-      image: trflynn89/libfly:ubuntu1910_clang9_gcc9_qt5140
+      image: trflynn89/libfly:ubuntu1910_clang9_gcc9
       options: --cap-add SYS_PTRACE
 
     steps:
@@ -50,18 +50,7 @@ jobs:
       displayName: 'Install'
       failOnStderr: true
 
-    - ${{ if eq(parameters.arch, 'x64') }}:
-      - script: |
-          (cd /opt && sudo tar -xzf Qt.tar.gz)
-          make -j -C examples/qt $(config)
-          make -j -C examples/build $(config)
-        displayName: 'Examples'
-        failOnStderr: true
-
-    - ${{ if eq(parameters.arch, 'x86') }}:
-      - script: |
-          make -j -C examples/build $(config)
-        displayName: 'Examples'
-        failOnStderr: true
-
-
+    - script: |
+        make -j -C examples/build $(config)
+      displayName: 'Examples'
+      failOnStderr: true

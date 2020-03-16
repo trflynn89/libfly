@@ -9,7 +9,6 @@
 .PHONY: coverage
 .PHONY: install
 .PHONY: setup
-.PHONY: qt
 .PHONY: style
 .PHONY: $(TARGETS)
 
@@ -23,7 +22,6 @@ all: $(TARGETS)
 # Import the build system
 include $(BUILD_ROOT)/system.mk
 include $(BUILD_ROOT)/config.mk
-include $(BUILD_ROOT)/qt.mk
 include $(BUILD_ROOT)/release.mk
 include $(BUILD_ROOT)/flags.mk
 include $(BUILD_ROOT)/files.mk
@@ -120,19 +118,6 @@ else
 	$(Q)echo "No setup rules for host $(HOST), check build.mk"
 	$(Q)exit 1
 endif
-
-# Install Qt
-qt:
-# The x86 Qt installer has not been updated since 2017, and only supports up to
-# Qt 5.5. But Qt 5.13+ is needed for C++17, so only x64 Qt projects are allowed.
-ifeq ($(arch), x86)
-	$(error Architecture $(arch) not supported, check qt.mk)
-endif
-
-ifeq ($(HOST), DEBIAN)
-	$(Q)$(SUDO) apt install -y mesa-common-dev
-endif
-	$(Q)$(QT_INSTALL)
 
 # Style enforcement
 style:
