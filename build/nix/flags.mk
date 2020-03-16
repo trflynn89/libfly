@@ -13,7 +13,7 @@ LDLIBS :=
 
 # Compiler flags for both C and C++ files
 CF_ALL := -MMD -MP -fPIC
-CF_ALL += -I$(SOURCE_ROOT) -I$(GEN_DIR)
+CF_ALL += -I$(SOURCE_ROOT)
 
 ifeq ($(arch), x86)
     CF_ALL += -m32

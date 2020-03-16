@@ -46,7 +46,6 @@ endif
 
 BIN_DIR := $(OUT_DIR)/bin
 LIB_DIR := $(OUT_DIR)/lib
-GEN_DIR := $(OUT_DIR)/gen
 OBJ_DIR := $(OUT_DIR)/obj
 ETC_DIR := $(OUT_DIR)/etc
 
@@ -56,7 +55,6 @@ ifeq ($(verbose),0)
 else
     $(info Bin dir = $(BIN_DIR))
     $(info Lib dir = $(LIB_DIR))
-    $(info Gen dir = $(GEN_DIR))
     $(info Obj dir = $(OBJ_DIR))
     $(info Etc dir = $(ETC_DIR))
     $(info Toolchain = $(toolchain))
