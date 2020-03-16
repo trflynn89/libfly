@@ -81,6 +81,7 @@ else
 
     ifeq ($(toolchain), clang)
         CF_ALL += -fprofile-instr-generate -fcoverage-mapping
+        LDFLAGS += -fprofile-instr-generate
     else ifeq ($(toolchain), gcc)
         CF_ALL += --coverage
     endif
