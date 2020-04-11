@@ -75,7 +75,7 @@ endif
 # Optimize release builds, and add debug symbols / use address sanitizer for
 # debug builds
 ifeq ($(release), 1)
-    CF_ALL += -O2 -D_FORTIFY_SOURCE=2
+    CF_ALL += -O2
 else
     CF_ALL += -O0 -g -fsanitize=address -fno-omit-frame-pointer
 
