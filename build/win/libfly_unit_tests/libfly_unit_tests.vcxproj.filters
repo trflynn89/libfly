@@ -119,16 +119,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\test\config\test_config.h">
+    <ClInclude Include="..\..\..\test\config\test_config.hpp">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\test\util\capture_stream.h">
+    <ClInclude Include="..\..\..\test\util\capture_stream.hpp">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\test\util\path_util.h">
+    <ClInclude Include="..\..\..\test\util\path_util.hpp">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\test\util\waitable_task_runner.h">
+    <ClInclude Include="..\..\..\test\util\waitable_task_runner.hpp">
       <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>

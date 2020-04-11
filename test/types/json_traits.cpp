@@ -1,7 +1,7 @@
-#include "fly/types/json/json_traits.h"
+#include "fly/types/json/json_traits.hpp"
 
-#include "fly/traits/traits.h"
-#include "fly/types/string/string_literal.h"
+#include "fly/traits/traits.hpp"
+#include "fly/types/string/string_literal.hpp"
 
 #include <gtest/gtest.h>
 

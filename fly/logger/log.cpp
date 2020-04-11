@@ -1,6 +1,6 @@
-#include "fly/logger/log.h"
+#include "fly/logger/log.hpp"
 
-#include "fly/logger/logger_config.h"
+#include "fly/logger/logger_config.hpp"
 
 #include <cstring>
 

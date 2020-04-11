@@ -1,4 +1,4 @@
-#include "fly/coders/huffman/huffman_types.h"
+#include "fly/coders/huffman/huffman_types.hpp"
 
 namespace fly {
 

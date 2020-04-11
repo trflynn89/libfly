@@ -225,10 +225,10 @@
     <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\test\config\test_config.h" />
-    <ClInclude Include="..\..\..\test\util\capture_stream.h" />
-    <ClInclude Include="..\..\..\test\util\path_util.h" />
-    <ClInclude Include="..\..\..\test\util\waitable_task_runner.h" />
+    <ClInclude Include="..\..\..\test\config\test_config.hpp" />
+    <ClInclude Include="..\..\..\test\util\capture_stream.hpp" />
+    <ClInclude Include="..\..\..\test\util\path_util.hpp" />
+    <ClInclude Include="..\..\..\test\util\waitable_task_runner.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

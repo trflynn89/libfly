@@ -75,164 +75,164 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\fly\fly.h" />
-    <ClInclude Include="..\..\..\fly\coders\coder.h">
+    <ClInclude Include="..\..\..\fly\fly.hpp" />
+    <ClInclude Include="..\..\..\fly\coders\coder.hpp">
       <Filter>coders</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.h">
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.hpp">
       <Filter>coders\huffman</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.h">
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.hpp">
       <Filter>coders\huffman</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.h">
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.hpp">
       <Filter>coders\huffman</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.h">
+    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.hpp">
       <Filter>coders\huffman</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\config\config.h">
+    <ClInclude Include="..\..\..\fly\config\config.hpp">
       <Filter>config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\config\config_manager.h">
+    <ClInclude Include="..\..\..\fly\config\config_manager.hpp">
       <Filter>config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\logger\log.h">
+    <ClInclude Include="..\..\..\fly\logger\log.hpp">
       <Filter>logger</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\logger\logger.h">
+    <ClInclude Include="..\..\..\fly\logger\logger.hpp">
       <Filter>logger</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\logger\logger_config.h">
+    <ClInclude Include="..\..\..\fly\logger\logger_config.hpp">
       <Filter>logger</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.h">
+    <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.hpp">
       <Filter>logger\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\parser\exceptions.h">
+    <ClInclude Include="..\..\..\fly\parser\exceptions.hpp">
       <Filter>parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\parser\ini_parser.h">
+    <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp">
       <Filter>parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\parser\json_parser.h">
+    <ClInclude Include="..\..\..\fly\parser\json_parser.hpp">
       <Filter>parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\parser\parser.h">
+    <ClInclude Include="..\..\..\fly\parser\parser.hpp">
       <Filter>parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\path\path_config.h">
+    <ClInclude Include="..\..\..\fly\path\path_config.hpp">
       <Filter>path</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\path\path_monitor.h">
+    <ClInclude Include="..\..\..\fly\path\path_monitor.hpp">
       <Filter>path</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.h">
+    <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.hpp">
       <Filter>path\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\async_request.h">
+    <ClInclude Include="..\..\..\fly\socket\async_request.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket.h">
+    <ClInclude Include="..\..\..\fly\socket\socket.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket_config.h">
+    <ClInclude Include="..\..\..\fly\socket\socket_config.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket_manager.h">
+    <ClInclude Include="..\..\..\fly\socket\socket_manager.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket_types.h">
+    <ClInclude Include="..\..\..\fly\socket\socket_types.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\win\socket_impl.h">
+    <ClInclude Include="..\..\..\fly\socket\win\socket_impl.hpp">
       <Filter>socket\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\win\socket_manager_impl.h">
+    <ClInclude Include="..\..\..\fly\socket\win\socket_manager_impl.hpp">
       <Filter>socket\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\system\system.h">
+    <ClInclude Include="..\..\..\fly\system\system.hpp">
       <Filter>system</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\system\system_config.h">
+    <ClInclude Include="..\..\..\fly\system\system_config.hpp">
       <Filter>system</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\system\system_monitor.h">
+    <ClInclude Include="..\..\..\fly\system\system_monitor.hpp">
       <Filter>system</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\system\win\system_impl.h">
+    <ClInclude Include="..\..\..\fly\system\win\system_impl.hpp">
       <Filter>system\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.h">
+    <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.hpp">
       <Filter>system\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\task\task.h">
+    <ClInclude Include="..\..\..\fly\task\task.hpp">
       <Filter>task</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\task\task_manager.h">
+    <ClInclude Include="..\..\..\fly\task\task_manager.hpp">
       <Filter>task</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\task\task_runner.h">
+    <ClInclude Include="..\..\..\fly\task\task_runner.hpp">
       <Filter>task</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\traits\traits.h">
+    <ClInclude Include="..\..\..\fly\traits\traits.hpp">
       <Filter>traits</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.h">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.hpp">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.h">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.hpp">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_writer.h">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_writer.hpp">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream.h">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.h">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_traits.h">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_traits.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\endian.h">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\endian.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.h">
+    <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.hpp">
       <Filter>types\concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_stack.h">
+    <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_stack.hpp">
       <Filter>types\concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\concurrency\detail\concurrent_container.h">
+    <ClInclude Include="..\..\..\fly\types\concurrency\detail\concurrent_container.hpp">
       <Filter>types\concurrency\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\json\json.h">
+    <ClInclude Include="..\..\..\fly\types\json\json.hpp">
       <Filter>types\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\json\json_traits.h">
+    <ClInclude Include="..\..\..\fly\types\json\json_traits.hpp">
       <Filter>types\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\literals\detail\literal_parser.h">
+    <ClInclude Include="..\..\..\fly\types\literals\detail\literal_parser.hpp">
       <Filter>types\literals\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\literals\literals.h">
+    <ClInclude Include="..\..\..\fly\types\literals\literals.hpp">
       <Filter>types\literals</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\string.h">
+    <ClInclude Include="..\..\..\fly\types\string\string.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\string_literal.h">
+    <ClInclude Include="..\..\..\fly\types\string\string_literal.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.h">
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer.h">
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.h">
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
   </ItemGroup>

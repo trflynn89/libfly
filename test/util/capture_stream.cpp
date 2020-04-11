@@ -1,6 +1,6 @@
-#include "test/util/capture_stream.h"
+#include "test/util/capture_stream.hpp"
 
-#include "fly/fly.h"
+#include "fly/fly.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -16,7 +16,7 @@
 #    include <unistd.h>
 #endif
 
-#include "test/util/path_util.h"
+#include "test/util/path_util.hpp"
 
 namespace fly {
 

@@ -1,8 +1,8 @@
-#include "fly/parser/json_parser.h"
+#include "fly/parser/json_parser.hpp"
 
-#include "fly/parser/exceptions.h"
-#include "fly/types/json/json.h"
-#include "fly/types/string/string.h"
+#include "fly/parser/exceptions.hpp"
+#include "fly/types/json/json.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <gtest/gtest.h>
 

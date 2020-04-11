@@ -1,7 +1,7 @@
-#include "fly/system/system_monitor.h"
+#include "fly/system/system_monitor.hpp"
 
-#include "fly/system/system_config.h"
-#include "fly/task/task_runner.h"
+#include "fly/system/system_config.hpp"
+#include "fly/task/task_runner.hpp"
 
 #include <chrono>
 #include <thread>

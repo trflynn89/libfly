@@ -1,15 +1,15 @@
-#include "fly/socket/socket.h"
+#include "fly/socket/socket.hpp"
 
-#include "fly/fly.h"
-#include "fly/logger/logger.h"
-#include "fly/socket/async_request.h"
-#include "fly/socket/socket_config.h"
-#include "fly/socket/socket_manager.h"
-#include "fly/socket/socket_types.h"
-#include "fly/task/task_manager.h"
-#include "fly/task/task_runner.h"
-#include "fly/types/concurrency/concurrent_queue.h"
-#include "fly/types/string/string.h"
+#include "fly/fly.hpp"
+#include "fly/logger/logger.hpp"
+#include "fly/socket/async_request.hpp"
+#include "fly/socket/socket_config.hpp"
+#include "fly/socket/socket_manager.hpp"
+#include "fly/socket/socket_types.hpp"
+#include "fly/task/task_manager.hpp"
+#include "fly/task/task_runner.hpp"
+#include "fly/types/concurrency/concurrent_queue.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <gtest/gtest.h>
 
@@ -20,7 +20,7 @@
 #include <thread>
 
 #if defined(FLY_LINUX)
-#    include "test/mock/mock_system.h"
+#    include "test/mock/mock_system.hpp"
 #endif
 
 //==============================================================================

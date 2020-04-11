@@ -1,6 +1,6 @@
-#include "fly/parser/ini_parser.h"
+#include "fly/parser/ini_parser.hpp"
 
-#include "fly/parser/exceptions.h"
+#include "fly/parser/exceptions.hpp"
 
 #include <gtest/gtest.h>
 

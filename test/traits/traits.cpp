@@ -1,4 +1,4 @@
-#include "fly/traits/traits.h"
+#include "fly/traits/traits.hpp"
 
 #include <gtest/gtest.h>
 

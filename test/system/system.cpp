@@ -1,6 +1,6 @@
-#include "fly/system/system.h"
+#include "fly/system/system.hpp"
 
-#include "test/util/capture_stream.h"
+#include "test/util/capture_stream.hpp"
 
 #include <gtest/gtest.h>
 

@@ -1,10 +1,10 @@
-#include "fly/path/path_monitor.h"
+#include "fly/path/path_monitor.hpp"
 
-#include "fly/path/path_config.h"
-#include "fly/task/task_manager.h"
-#include "fly/types/concurrency/concurrent_queue.h"
-#include "fly/types/numeric/literals.h"
-#include "fly/types/string/string.h"
+#include "fly/path/path_config.hpp"
+#include "fly/task/task_manager.hpp"
+#include "fly/types/concurrency/concurrent_queue.hpp"
+#include "fly/types/numeric/literals.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <gtest/gtest.h>
 
@@ -16,11 +16,11 @@
 #include <string>
 
 #if defined(FLY_LINUX)
-#    include "test/mock/mock_system.h"
+#    include "test/mock/mock_system.hpp"
 #endif
 
-#include "test/util/path_util.h"
-#include "test/util/waitable_task_runner.h"
+#include "test/util/path_util.hpp"
+#include "test/util/waitable_task_runner.hpp"
 
 namespace {
 

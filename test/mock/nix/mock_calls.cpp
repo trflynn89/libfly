@@ -1,6 +1,6 @@
-#include "test/mock/nix/mock_calls.h"
+#include "test/mock/nix/mock_calls.hpp"
 
-#include "test/mock/mock_system.h"
+#include "test/mock/mock_system.hpp"
 
 #include <netdb.h>
 #include <poll.h>

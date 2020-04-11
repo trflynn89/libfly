@@ -18,7 +18,7 @@ $(eval $(call ADD_TARGET, libfly_unit_tests, test, TEST))
 # 2. Ignore literal_parser.h - this file is entirely constexpr functions that
 #    cannot execute at runtime, which llvm-cov doesn't seem to recognize
 $(eval $(call IGNORE_FOR_COVERAGE, test/))
-$(eval $(call IGNORE_FOR_COVERAGE, fly/types/numeric/detail/literal_parser.h))
+$(eval $(call IGNORE_FOR_COVERAGE, fly/types/numeric/detail/literal_parser.hpp))
 
 # Import the build system
 include build.mk

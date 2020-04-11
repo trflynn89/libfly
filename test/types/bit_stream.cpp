@@ -1,7 +1,7 @@
-#include "fly/types/bit_stream/bit_stream_reader.h"
-#include "fly/types/bit_stream/bit_stream_writer.h"
-#include "fly/types/bit_stream/detail/bit_stream_constants.h"
-#include "fly/types/numeric/literals.h"
+#include "fly/types/bit_stream/bit_stream_reader.hpp"
+#include "fly/types/bit_stream/bit_stream_writer.hpp"
+#include "fly/types/bit_stream/detail/bit_stream_constants.hpp"
+#include "fly/types/numeric/literals.hpp"
 
 #include <gtest/gtest.h>
 

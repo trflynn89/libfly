@@ -1,6 +1,6 @@
-#include "fly/logger/logger_config.h"
+#include "fly/logger/logger_config.hpp"
 
-#include "fly/types/numeric/literals.h"
+#include "fly/types/numeric/literals.hpp"
 
 namespace fly {
 

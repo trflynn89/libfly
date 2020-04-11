@@ -1,8 +1,8 @@
-#include "fly/socket/nix/socket_manager_impl.h"
+#include "fly/socket/nix/socket_manager_impl.hpp"
 
-#include "fly/socket/socket.h"
-#include "fly/socket/socket_config.h"
-#include "fly/task/task_runner.h"
+#include "fly/socket/socket.hpp"
+#include "fly/socket/socket_config.hpp"
+#include "fly/task/task_runner.hpp"
 
 #include <algorithm>
 

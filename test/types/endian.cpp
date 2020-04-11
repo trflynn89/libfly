@@ -1,7 +1,7 @@
-#include "fly/types/numeric/endian.h"
+#include "fly/types/numeric/endian.hpp"
 
-#include "fly/traits/traits.h"
-#include "fly/types/numeric/literals.h"
+#include "fly/traits/traits.hpp"
+#include "fly/types/numeric/literals.hpp"
 
 #include <gtest/gtest.h>
 
