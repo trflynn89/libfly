@@ -1,12 +1,12 @@
-#include "fly/logger/logger.h"
+#include "fly/logger/logger.hpp"
 
-#include "fly/logger/logger_config.h"
-#include "fly/task/task_manager.h"
-#include "fly/types/numeric/literals.h"
-#include "fly/types/string/string.h"
-#include "test/util/capture_stream.h"
-#include "test/util/path_util.h"
-#include "test/util/waitable_task_runner.h"
+#include "fly/logger/logger_config.hpp"
+#include "fly/task/task_manager.hpp"
+#include "fly/types/numeric/literals.hpp"
+#include "fly/types/string/string.hpp"
+#include "test/util/capture_stream.hpp"
+#include "test/util/path_util.hpp"
+#include "test/util/waitable_task_runner.hpp"
 
 #include <gtest/gtest.h>
 

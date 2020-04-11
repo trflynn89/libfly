@@ -1,6 +1,6 @@
-#include "test/mock/mock_system.h"
+#include "test/mock/mock_system.hpp"
 
-#include "fly/logger/logger.h"
+#include "fly/logger/logger.hpp"
 
 namespace fly {
 

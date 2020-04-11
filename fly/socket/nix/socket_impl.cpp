@@ -1,8 +1,8 @@
-#include "fly/socket/nix/socket_impl.h"
+#include "fly/socket/nix/socket_impl.hpp"
 
-#include "fly/logger/logger.h"
-#include "fly/socket/socket_config.h"
-#include "fly/system/system.h"
+#include "fly/logger/logger.hpp"
+#include "fly/socket/socket_config.hpp"
+#include "fly/system/system.hpp"
 
 #include <fcntl.h>
 #include <netdb.h>

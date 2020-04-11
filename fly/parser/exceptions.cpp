@@ -1,7 +1,7 @@
-#include "fly/parser/exceptions.h"
+#include "fly/parser/exceptions.hpp"
 
-#include "fly/logger/logger.h"
-#include "fly/types/string/string.h"
+#include "fly/logger/logger.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <cctype>
 

@@ -1,10 +1,10 @@
-#include "fly/coders/huffman/huffman_config.h"
-#include "fly/coders/huffman/huffman_decoder.h"
-#include "fly/coders/huffman/huffman_encoder.h"
-#include "fly/types/bit_stream/bit_stream_writer.h"
-#include "fly/types/numeric/literals.h"
-#include "fly/types/string/string.h"
-#include "test/util/path_util.h"
+#include "fly/coders/huffman/huffman_config.hpp"
+#include "fly/coders/huffman/huffman_decoder.hpp"
+#include "fly/coders/huffman/huffman_encoder.hpp"
+#include "fly/types/bit_stream/bit_stream_writer.hpp"
+#include "fly/types/numeric/literals.hpp"
+#include "fly/types/string/string.hpp"
+#include "test/util/path_util.hpp"
 
 #include <gtest/gtest.h>
 

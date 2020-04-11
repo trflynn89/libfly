@@ -1,4 +1,4 @@
-#include "fly/parser/parser.h"
+#include "fly/parser/parser.hpp"
 
 #include <fstream>
 #include <sstream>

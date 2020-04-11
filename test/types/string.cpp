@@ -1,7 +1,7 @@
-#include "fly/types/string/string.h"
+#include "fly/types/string/string.hpp"
 
-#include "fly/fly.h"
-#include "fly/types/numeric/literals.h"
+#include "fly/fly.hpp"
+#include "fly/types/numeric/literals.hpp"
 
 #include <gtest/gtest.h>
 

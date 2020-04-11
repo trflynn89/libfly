@@ -1,7 +1,7 @@
-#include "fly/parser/json_parser.h"
+#include "fly/parser/json_parser.hpp"
 
-#include "fly/parser/exceptions.h"
-#include "fly/types/string/string.h"
+#include "fly/parser/exceptions.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <cctype>
 #include <cstdio>

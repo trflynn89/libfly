@@ -1,8 +1,8 @@
-#include "fly/socket/socket.h"
+#include "fly/socket/socket.hpp"
 
-#include "fly/logger/logger.h"
-#include "fly/socket/socket_config.h"
-#include "fly/types/string/string.h"
+#include "fly/logger/logger.hpp"
+#include "fly/socket/socket_config.hpp"
+#include "fly/types/string/string.hpp"
 
 namespace fly {
 

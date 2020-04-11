@@ -1,8 +1,8 @@
-#include "fly/system/system_monitor.h"
+#include "fly/system/system_monitor.hpp"
 
-#include "fly/system/system_config.h"
-#include "fly/task/task_manager.h"
-#include "fly/types/numeric/literals.h"
+#include "fly/system/system_config.hpp"
+#include "fly/task/task_manager.hpp"
+#include "fly/types/numeric/literals.hpp"
 
 #include <gtest/gtest.h>
 
@@ -13,10 +13,10 @@
 #include <thread>
 
 #if defined(FLY_LINUX)
-#    include "test/mock/mock_system.h"
+#    include "test/mock/mock_system.hpp"
 #endif
 
-#include "test/util/waitable_task_runner.h"
+#include "test/util/waitable_task_runner.hpp"
 
 namespace {
 

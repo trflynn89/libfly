@@ -1,5 +1,5 @@
-#include "fly/types/concurrency/concurrent_queue.h"
-#include "fly/types/numeric/literals.h"
+#include "fly/types/concurrency/concurrent_queue.hpp"
+#include "fly/types/numeric/literals.hpp"
 
 #include <gtest/gtest.h>
 

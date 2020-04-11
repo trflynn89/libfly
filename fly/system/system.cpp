@@ -1,7 +1,7 @@
-#include "fly/system/system.h"
+#include "fly/system/system.hpp"
 
-#include "fly/fly.h"
-#include "fly/types/string/string.h"
+#include "fly/fly.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <csignal>
 #include <system_error>

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "some_lib/some_lib.h"
+#include "some_lib/some_lib.hpp"
 
 int main()
 {
