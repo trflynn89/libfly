@@ -63,6 +63,14 @@ ifeq ($(toolchain), clang)
 		$(addprefix --ignore-filename-regex=, $(COVERAGE_BLACKLIST)) \
 		$(TEST_BINARIES) > $(report)
 
+ifeq ($(verbose), 1)
+	$(Q)llvm-cov show \
+		--instr-profile=$(report).prodata \
+		--format=html -Xdemangler=llvm-cxxfilt \
+		$(addprefix --ignore-filename-regex=, $(COVERAGE_BLACKLIST)) \
+		$(TEST_BINARIES) > $(report).html
+endif
+
 	$(Q)llvm-cov report \
 		--instr-profile=$(report).prodata \
 		$(addprefix --ignore-filename-regex=, $(COVERAGE_BLACKLIST)) \
