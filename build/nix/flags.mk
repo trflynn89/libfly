@@ -31,7 +31,6 @@ CF_ALL += \
     -Wctor-dtor-privacy \
     -Wdisabled-optimization \
     -Wfloat-equal \
-    -Winline \
     -Winvalid-pch \
     -Wmissing-declarations \
     -Wpointer-arith \
@@ -48,6 +47,11 @@ CF_ALL += \
     \
     -pedantic
 
+ifeq ($(release), 0)
+    CF_ALL += \
+        -Winline
+endif
+
 ifeq ($(toolchain), clang)
     CF_ALL += \
         -Wnewline-eof \
@@ -56,17 +60,22 @@ else ifeq ($(toolchain), gcc)
     CF_ALL += \
         -Wlogical-op \
         -Wnoexcept \
+        -Wnull-dereference \
         -Wredundant-decls \
         -Wsign-promo \
-        -Wsuggest-final-methods \
-        -Wsuggest-final-types \
         -Wsuggest-override
+
+    ifeq ($(release), 0)
+        CF_ALL += \
+            -Wsuggest-final-methods \
+            -Wsuggest-final-types
+    endif
 endif
 
 # Optimize release builds, and add debug symbols / use address sanitizer for
 # debug builds
 ifeq ($(release), 1)
-    CF_ALL += -O2
+    CF_ALL += -O2 -D_FORTIFY_SOURCE=2
 else
     CF_ALL += -O0 -g -fsanitize=address -fno-omit-frame-pointer
 
