@@ -33,7 +33,7 @@ help:
 	$(Q)echo "    clang $(CLANG_VERSION)"
 	$(Q)echo "    gcc $(GCC_VERSION)"
 	$(Q)echo
-	$(Q)echo "Usage: make [build] [push] [run]"
+	$(Q)echo "Usage: make [build] [push] [run] [clean]"
 
 build:
 	$(Q)docker build \
@@ -52,3 +52,7 @@ run: build
 		--name $(REPO) \
 		--cap-add SYS_PTRACE \
 		$(USER)/$(REPO):$(TAG)
+
+clean:
+	$(Q)docker rm $(REPO) > /dev/null 2>&1 || true
+	$(Q)docker image rm $(shell docker images -q) > /dev/null 2>&1 || true
