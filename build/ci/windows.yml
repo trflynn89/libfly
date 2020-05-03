@@ -4,7 +4,7 @@ parameters:
 jobs:
   - job: 'Windows_${{ parameters.arch }}'
     pool:
-      vmImage: windows-latest
+      vmImage: windows-2019
 
     steps:
     - template: setup.yml

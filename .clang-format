@@ -1,5 +1,5 @@
-# Clang-Format 9.0.0
-# https://releases.llvm.org/9.0.0/tools/clang/docs/ClangFormatStyleOptions.html
+# Clang-Format 10.0.0
+# https://releases.llvm.org/10.0.0/tools/clang/docs/ClangFormatStyleOptions.html
 #
 # Upstream issues to track for better formatting:
 #     Newlines before brackets after lambdas https://reviews.llvm.org/D44609
@@ -31,7 +31,7 @@ BreakBeforeBraces: Custom
 BraceWrapping:
     AfterCaseLabel: true
     AfterClass: true
-    AfterControlStatement: true # clang-format-10: Always
+    AfterControlStatement: Always
     AfterEnum: true
     AfterFunction: true
     AfterNamespace: false
@@ -107,7 +107,7 @@ SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-Standard: Cpp11 # clang-format-10: Latest
+Standard: Latest
 TabWidth: 4
 UseTab: Never
 ...

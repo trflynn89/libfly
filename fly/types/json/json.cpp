@@ -213,8 +213,9 @@ Json &Json::operator[](
 }
 
 //==============================================================================
-const Json &Json::operator[](
-    const typename JsonTraits::object_type::key_type &key) const noexcept(false)
+const Json &
+Json::operator[](const typename JsonTraits::object_type::key_type &key) const
+    noexcept(false)
 {
     if (IsObject())
     {
@@ -261,8 +262,8 @@ Json &Json::operator[](
 }
 
 //==============================================================================
-const Json &Json::operator[](
-    const typename JsonTraits::array_type::size_type &index) const
+const Json &
+Json::operator[](const typename JsonTraits::array_type::size_type &index) const
     noexcept(false)
 {
     if (IsArray())
