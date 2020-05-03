@@ -17,7 +17,7 @@ class BitStreamReader;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
-class HuffmanDecoder : public Decoder
+class HuffmanDecoder : public BinaryDecoder
 {
 protected:
     /**

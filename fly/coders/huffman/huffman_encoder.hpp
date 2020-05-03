@@ -19,7 +19,7 @@ class HuffmanConfig;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
-class HuffmanEncoder : public Encoder
+class HuffmanEncoder : public BinaryEncoder
 {
 public:
     /**

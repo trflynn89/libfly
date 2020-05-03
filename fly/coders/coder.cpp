@@ -18,9 +18,6 @@ namespace {
     constexpr const std::ios::openmode s_outputMode =
         std::ios::out | std::ios::binary | std::ios::trunc;
 
-    constexpr const std::ios::openmode s_bidrectionalMode =
-        s_inputMode | s_outputMode;
-
     template <typename SizeType>
     void logEncoderStats(
         std::chrono::time_point<std::chrono::system_clock> start,
@@ -65,12 +62,11 @@ bool Encoder::EncodeString(
     bool successful = false;
 
     std::istringstream input(decoded, s_inputMode);
-    std::stringstream output(s_bidrectionalMode);
+    std::ostringstream output(s_outputMode);
 
     if (input && output)
     {
-        BitStreamWriter stream(output);
-        successful = EncodeInternal(input, stream);
+        successful = EncodeInternal(input, output);
     }
 
     if (successful)
@@ -91,12 +87,11 @@ bool Encoder::EncodeFile(
     bool successful = false;
     {
         std::ifstream input(decoded, s_inputMode);
-        std::fstream output(encoded, s_bidrectionalMode);
+        std::ofstream output(encoded, s_outputMode);
 
         if (input && output)
         {
-            BitStreamWriter stream(output);
-            successful = EncodeInternal(input, stream);
+            successful = EncodeInternal(input, output);
         }
     }
 
@@ -112,6 +107,16 @@ bool Encoder::EncodeFile(
 }
 
 //==============================================================================
+bool BinaryEncoder::EncodeInternal(
+    std::istream &input,
+    std::ostream &output) noexcept
+{
+    BitStreamWriter stream(output);
+
+    return EncodeInternal(input, stream);
+}
+
+//==============================================================================
 bool Decoder::DecodeString(
     const std::string &encoded,
     std::string &decoded) noexcept
@@ -124,8 +129,7 @@ bool Decoder::DecodeString(
 
     if (input && output)
     {
-        BitStreamReader stream(input);
-        successful = DecodeInternal(stream, output);
+        successful = DecodeInternal(input, output);
     }
 
     if (successful)
@@ -150,8 +154,7 @@ bool Decoder::DecodeFile(
 
         if (input && output)
         {
-            BitStreamReader stream(input);
-            successful = DecodeInternal(stream, output);
+            successful = DecodeInternal(input, output);
         }
     }
 
@@ -164,6 +167,15 @@ bool Decoder::DecodeFile(
     }
 
     return successful;
+}
+
+//==============================================================================
+bool BinaryDecoder::DecodeInternal(
+    std::istream &input,
+    std::ostream &output) noexcept
+{
+    BitStreamReader stream(input);
+    return DecodeInternal(stream, output);
 }
 
 } // namespace fly

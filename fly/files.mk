@@ -1,6 +1,7 @@
 # Define the directories to include and compile
 SRC_DIRS_$(d) := \
     fly/coders \
+    fly/coders/base64 \
     fly/coders/huffman \
     fly/config \
     fly/logger \

@@ -29,7 +29,7 @@ public:
      * Constructor. Decode the header byte from the stream. If the header byte
      * is invalid, the stream's fail bit is set.
      *
-     * @param iostream The stream to read binary data from.
+     * @param istream The stream to read binary data from.
      */
     BitStreamReader(std::istream &) noexcept;
 
