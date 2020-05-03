@@ -64,8 +64,8 @@ private:
      *
      * @return bool True if the header was successfully decoded.
      */
-    bool decodeHeader(BitStreamReader &, std::uint32_t &, length_type &) const
-        noexcept;
+    bool decodeHeader(BitStreamReader &, std::uint32_t &, length_type &)
+        const noexcept;
 
     /**
      * Decode version 1 of the header. Extract the maximum chunk length and the
