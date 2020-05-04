@@ -42,10 +42,11 @@ TEST_F(ConfigTest, NonCovertibleTest)
 //==============================================================================
 TEST_F(ConfigTest, MultipleValueTypeTest)
 {
-    const fly::Json values = {{"name", "John Doe"},
-                              {"address", "123"},
-                              {"employed", "1"},
-                              {"age", "26.2"}};
+    const fly::Json values = {
+        {"name", "John Doe"},
+        {"address", "123"},
+        {"employed", "1"},
+        {"age", "26.2"}};
 
     m_spConfig->Update(values);
 

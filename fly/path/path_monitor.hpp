@@ -206,7 +206,7 @@ private:
 class PathMonitorTask : public Task
 {
 public:
-    PathMonitorTask(std::weak_ptr<PathMonitor>) noexcept;
+    explicit PathMonitorTask(std::weak_ptr<PathMonitor>) noexcept;
 
 protected:
     /**

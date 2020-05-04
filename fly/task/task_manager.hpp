@@ -38,7 +38,7 @@ public:
      *
      * @param int Number of worker threads to create.
      */
-    TaskManager(int) noexcept;
+    explicit TaskManager(int) noexcept;
 
     /**
      * Create the worker threads and timer thread.

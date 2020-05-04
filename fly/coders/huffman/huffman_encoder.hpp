@@ -19,7 +19,7 @@ class HuffmanConfig;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
-class HuffmanEncoder : public Encoder
+class HuffmanEncoder : public BinaryEncoder
 {
 public:
     /**
@@ -27,7 +27,7 @@ public:
      *
      * @param HuffmanConfig Reference to Huffman configuration.
      */
-    HuffmanEncoder(const std::shared_ptr<HuffmanConfig> &) noexcept;
+    explicit HuffmanEncoder(const std::shared_ptr<HuffmanConfig> &) noexcept;
 
 protected:
     /**
@@ -90,7 +90,7 @@ protected:
      *
      * @return bool True if the input stream was successfully encoded.
      */
-    bool EncodeInternal(std::istream &, BitStreamWriter &) noexcept override;
+    bool EncodeBinary(std::istream &, BitStreamWriter &) noexcept override;
 
 private:
     /**
