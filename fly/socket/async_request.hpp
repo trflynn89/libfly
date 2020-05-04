@@ -27,7 +27,7 @@ public:
     /**
      * Move constructor. The moved request is invalidated.
      */
-    explicit AsyncRequest(AsyncRequest &&) noexcept;
+    AsyncRequest(AsyncRequest &&) noexcept;
 
     /**
      * Constructor to set the ID of the owning socket and the request message.
