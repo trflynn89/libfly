@@ -83,7 +83,7 @@ public:
      *
      * @param Features The extra features to allow.
      */
-    JsonParser(Features) noexcept;
+    explicit JsonParser(Features) noexcept;
 
 protected:
     /**

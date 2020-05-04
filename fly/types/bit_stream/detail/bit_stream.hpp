@@ -41,9 +41,9 @@ protected:
     /**
      * Protected constructor to prevent instantiating this class directly.
      *
-     * @param byte_type Initial position to store.
+     * @param byte_type Initial cursor position.
      */
-    BitStream(byte_type) noexcept;
+    explicit BitStream(byte_type) noexcept;
 
     /**
      * Create a bit-mask with the least-significant bits set. The size of the
