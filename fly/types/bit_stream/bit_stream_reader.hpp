@@ -31,7 +31,7 @@ public:
      *
      * @param istream The stream to read binary data from.
      */
-    BitStreamReader(std::istream &) noexcept;
+    explicit BitStreamReader(std::istream &) noexcept;
 
     /**
      * Read a multibyte word from the byte buffer.

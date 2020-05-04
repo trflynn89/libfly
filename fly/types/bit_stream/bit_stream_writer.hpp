@@ -28,7 +28,7 @@ public:
      *
      * @param ostream The stream to write binary data into.
      */
-    BitStreamWriter(std::ostream &) noexcept;
+    explicit BitStreamWriter(std::ostream &) noexcept;
 
     /**
      * Write a multibyte word to the byte buffer.
