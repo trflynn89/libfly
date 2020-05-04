@@ -16,18 +16,13 @@ constexpr const std::ios::openmode s_inputMode =
 constexpr const std::ios::openmode s_outputMode =
     std::ios::out | std::ios::binary | std::ios::trunc;
 
-constexpr const std::ios::openmode s_bidrectionalMode =
-    s_inputMode | s_outputMode;
-
 } // namespace
 
 //==============================================================================
 class BitStreamTest : public ::testing::Test
 {
 public:
-    BitStreamTest() :
-        m_inputStream(s_inputMode),
-        m_outputStream(s_bidrectionalMode)
+    BitStreamTest() : m_inputStream(s_inputMode), m_outputStream(s_outputMode)
     {
     }
 
@@ -61,7 +56,7 @@ protected:
     }
 
     std::istringstream m_inputStream;
-    std::stringstream m_outputStream;
+    std::ostringstream m_outputStream;
 };
 
 //==============================================================================

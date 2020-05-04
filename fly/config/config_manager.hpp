@@ -116,7 +116,7 @@ private:
 class ConfigUpdateTask : public Task
 {
 public:
-    ConfigUpdateTask(std::weak_ptr<ConfigManager>) noexcept;
+    explicit ConfigUpdateTask(std::weak_ptr<ConfigManager>) noexcept;
 
 protected:
     /**

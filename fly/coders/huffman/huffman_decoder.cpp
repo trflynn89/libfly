@@ -9,7 +9,7 @@
 namespace fly {
 
 //==============================================================================
-bool HuffmanDecoder::DecodeInternal(
+bool HuffmanDecoder::DecodeBinary(
     BitStreamReader &input,
     std::ostream &output) noexcept
 {

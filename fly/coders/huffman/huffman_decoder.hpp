@@ -17,7 +17,7 @@ class BitStreamReader;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
-class HuffmanDecoder : public Decoder
+class HuffmanDecoder : public BinaryDecoder
 {
 protected:
     /**
@@ -50,7 +50,7 @@ protected:
      *
      * @return bool True if the input stream was successfully decoded.
      */
-    bool DecodeInternal(BitStreamReader &, std::ostream &) noexcept override;
+    bool DecodeBinary(BitStreamReader &, std::ostream &) noexcept override;
 
 private:
     /**

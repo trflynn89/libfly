@@ -5,7 +5,7 @@
 #include "fly/types/bit_stream/detail/bit_stream_traits.hpp"
 #include "fly/types/numeric/endian.hpp"
 
-#include <iostream>
+#include <ostream>
 
 namespace fly {
 
@@ -26,13 +26,9 @@ public:
     /**
      * Constructor. Write the header byte onto the stream.
      *
-     * The wrapped stream must be both an input and output stream. This allows
-     * going back and rewriting the header byte to contain the number of
-     * zero-filled bits.
-     *
-     * @param iostream The stream to write binary data into.
+     * @param ostream The stream to write binary data into.
      */
-    BitStreamWriter(std::iostream &) noexcept;
+    explicit BitStreamWriter(std::ostream &) noexcept;
 
     /**
      * Write a multibyte word to the byte buffer.
@@ -99,7 +95,7 @@ private:
     template <typename DataType>
     void flush(const DataType &, byte_type) noexcept;
 
-    std::iostream &m_stream;
+    std::ostream &m_stream;
 };
 
 //==============================================================================
