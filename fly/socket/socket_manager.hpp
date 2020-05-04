@@ -164,7 +164,7 @@ private:
 class SocketManagerTask : public Task
 {
 public:
-    SocketManagerTask(std::weak_ptr<SocketManager>) noexcept;
+    explicit SocketManagerTask(std::weak_ptr<SocketManager>) noexcept;
 
 protected:
     /**

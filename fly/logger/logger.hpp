@@ -237,7 +237,7 @@ private:
 class LoggerTask : public Task
 {
 public:
-    LoggerTask(std::weak_ptr<Logger>) noexcept;
+    explicit LoggerTask(std::weak_ptr<Logger>) noexcept;
 
 protected:
     /**

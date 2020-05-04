@@ -46,7 +46,7 @@ struct Log
     /**
      * Move constructor.
      */
-    Log(Log &&) noexcept;
+    explicit Log(Log &&) noexcept;
 
     /**
      * Constructor. Initialize with a message.

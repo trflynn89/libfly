@@ -27,7 +27,7 @@ public:
      *
      * @param HuffmanConfig Reference to Huffman configuration.
      */
-    HuffmanEncoder(const std::shared_ptr<HuffmanConfig> &) noexcept;
+    explicit HuffmanEncoder(const std::shared_ptr<HuffmanConfig> &) noexcept;
 
 protected:
     /**

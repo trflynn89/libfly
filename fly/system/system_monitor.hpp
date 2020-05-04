@@ -152,7 +152,7 @@ private:
 class SystemMonitorTask : public Task
 {
 public:
-    SystemMonitorTask(std::weak_ptr<SystemMonitor>) noexcept;
+    explicit SystemMonitorTask(std::weak_ptr<SystemMonitor>) noexcept;
 
 protected:
     /**
