@@ -90,7 +90,7 @@ protected:
      *
      * @return bool True if the input stream was successfully encoded.
      */
-    bool EncodeInternal(std::istream &, BitStreamWriter &) noexcept override;
+    bool EncodeBinary(std::istream &, BitStreamWriter &) noexcept override;
 
 private:
     /**

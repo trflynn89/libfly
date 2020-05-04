@@ -88,11 +88,13 @@ bool Base64Coder::DecodeInternal(
     {
         input.read(chunk.data(), chunk.size());
 
-        if (input.gcount() == chunk.size())
+        const std::size_t bytes = static_cast<std::size_t>(input.gcount());
+
+        if (bytes == chunk.size())
         {
             decodeChunk(chunk, output);
         }
-        else if (input.gcount() > 0)
+        else if (bytes > 0)
         {
             output.setstate(std::ios::failbit);
         }

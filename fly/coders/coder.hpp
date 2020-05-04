@@ -79,7 +79,7 @@ protected:
      *
      * @return bool True if the input stream was successfully encoded.
      */
-    virtual bool EncodeInternal(std::istream &, BitStreamWriter &) noexcept = 0;
+    virtual bool EncodeBinary(std::istream &, BitStreamWriter &) noexcept = 0;
 };
 
 /**
@@ -151,7 +151,7 @@ protected:
      *
      * @return bool True if the input stream was successfully decoded.
      */
-    virtual bool DecodeInternal(BitStreamReader &, std::ostream &) noexcept = 0;
+    virtual bool DecodeBinary(BitStreamReader &, std::ostream &) noexcept = 0;
 };
 
 } // namespace fly

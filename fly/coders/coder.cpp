@@ -112,8 +112,7 @@ bool BinaryEncoder::EncodeInternal(
     std::ostream &output) noexcept
 {
     BitStreamWriter stream(output);
-
-    return EncodeInternal(input, stream);
+    return EncodeBinary(input, stream);
 }
 
 //==============================================================================
@@ -175,7 +174,7 @@ bool BinaryDecoder::DecodeInternal(
     std::ostream &output) noexcept
 {
     BitStreamReader stream(input);
-    return DecodeInternal(stream, output);
+    return DecodeBinary(stream, output);
 }
 
 } // namespace fly

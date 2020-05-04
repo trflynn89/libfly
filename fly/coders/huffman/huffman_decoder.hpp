@@ -50,7 +50,7 @@ protected:
      *
      * @return bool True if the input stream was successfully decoded.
      */
-    bool DecodeInternal(BitStreamReader &, std::ostream &) noexcept override;
+    bool DecodeBinary(BitStreamReader &, std::ostream &) noexcept override;
 
 private:
     /**
