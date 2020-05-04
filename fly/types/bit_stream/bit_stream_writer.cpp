@@ -6,7 +6,7 @@
 namespace fly {
 
 //==============================================================================
-BitStreamWriter::BitStreamWriter(std::iostream &stream) noexcept :
+BitStreamWriter::BitStreamWriter(std::ostream &stream) noexcept :
     BitStream(detail::s_mostSignificantBitPosition),
     m_stream(stream)
 {

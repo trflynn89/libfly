@@ -27,7 +27,7 @@ HuffmanEncoder::HuffmanEncoder(
 }
 
 //==============================================================================
-bool HuffmanEncoder::EncodeInternal(
+bool HuffmanEncoder::EncodeBinary(
     std::istream &input,
     BitStreamWriter &output) noexcept
 {

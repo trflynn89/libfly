@@ -39,7 +39,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\coders\huffman.cpp">
+    <ClCompile Include="..\..\..\test\coders\base64_coder.cpp">
+      <Filter>coders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\coders\huffman_coder.cpp">
       <Filter>coders</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\config\config.cpp">

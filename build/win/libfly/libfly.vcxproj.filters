@@ -4,6 +4,9 @@
     <Filter Include="coders">
       <UniqueIdentifier>{c63b5aa5-4f36-4425-b00e-a823e8ed55fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="coders\base64">
+      <UniqueIdentifier>{d6500eca-8325-4b0c-9c2b-a2223312b4d4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="coders\huffman">
       <UniqueIdentifier>{c8372ac9-d455-4467-9414-627cb49690f0}</UniqueIdentifier>
     </Filter>
@@ -78,6 +81,9 @@
     <ClInclude Include="..\..\..\fly\fly.hpp" />
     <ClInclude Include="..\..\..\fly\coders\coder.hpp">
       <Filter>coders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\base64\base64_coder.hpp">
+      <Filter>coders\base64</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.hpp">
       <Filter>coders\huffman</Filter>
@@ -239,6 +245,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\coders\coder.cpp">
       <Filter>coders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\base64\base64_coder.cpp">
+      <Filter>coders\base64</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_config.cpp">
       <Filter>coders\huffman</Filter>
