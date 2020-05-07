@@ -20,7 +20,7 @@ BASE := $(shell grep -oP "(?<=FROM )(\S+)" Dockerfile)
 
 # Toolchain versions
 CLANG_VERSION := 10
-GCC_VERSION := 9
+GCC_VERSION := 10
 
 # Form the tag for the container
 TAG := $(subst :,,$(subst .,,$(BASE)))_clang$(CLANG_VERSION)_gcc$(GCC_VERSION)
