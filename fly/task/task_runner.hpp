@@ -107,7 +107,7 @@ public:
     bool PostTask(std::weak_ptr<Task>) noexcept override;
 
 protected:
-    ParallelTaskRunner(std::weak_ptr<TaskManager>) noexcept;
+    explicit ParallelTaskRunner(std::weak_ptr<TaskManager>) noexcept;
 
     /**
      * This implementation does nothing.
@@ -138,7 +138,7 @@ public:
     bool PostTask(std::weak_ptr<Task>) noexcept override;
 
 protected:
-    SequencedTaskRunner(std::weak_ptr<TaskManager>) noexcept;
+    explicit SequencedTaskRunner(std::weak_ptr<TaskManager>) noexcept;
 
     /**
      * When a task is complete, post the next task in the pending queue.

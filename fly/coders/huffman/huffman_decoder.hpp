@@ -19,6 +19,12 @@ class BitStreamReader;
  */
 class HuffmanDecoder : public BinaryDecoder
 {
+public:
+    /**
+     * Constructor.
+     */
+    HuffmanDecoder();
+
 protected:
     /**
      * Huffman decode a stream.
