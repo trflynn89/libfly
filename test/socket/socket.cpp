@@ -343,7 +343,8 @@ TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
         fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
-    auto callback([&](std::shared_ptr<fly::Socket>) { m_eventQueue.Push(1); });
+    auto callback(
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
     m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
@@ -417,7 +418,8 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
         fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
-    auto callback([&](std::shared_ptr<fly::Socket>) { m_eventQueue.Push(1); });
+    auto callback(
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
     m_spClientSocketManager->SetClientCallbacks(callback, callback);
 
     int item = 0;
@@ -457,7 +459,8 @@ TEST_F(SocketTest, Send_Async_MockSendBlock)
         fly::BindOption::AllowReuse));
     ASSERT_TRUE(spServerSocket->Listen());
 
-    auto callback([&](std::shared_ptr<fly::Socket>) { m_eventQueue.Push(1); });
+    auto callback(
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
     m_spClientSocketManager->SetClientCallbacks(callback, callback);
 
     int item = 0;
@@ -542,7 +545,8 @@ TEST_F(SocketTest, Send_Async_MockSendtoFail)
         m_port,
         fly::BindOption::AllowReuse));
 
-    auto callback([&](std::shared_ptr<fly::Socket>) { m_eventQueue.Push(1); });
+    auto callback(
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
     m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
@@ -650,12 +654,12 @@ TEST_F(SocketTest, Recv_Async_MockRecvFail)
 
     std::shared_ptr<fly::Socket> spRecvSocket;
 
-    auto connectCallback([&](std::shared_ptr<fly::Socket> spSocket) {
+    auto connectCallback([&](std::shared_ptr<fly::Socket> spSocket) noexcept {
         spRecvSocket = spSocket;
         m_eventQueue.Push(1);
     });
     auto disconnectCallback(
-        [&](std::shared_ptr<fly::Socket>) { m_eventQueue.Push(1); });
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
     m_spServerSocketManager->SetClientCallbacks(
         connectCallback,
         disconnectCallback);
@@ -709,7 +713,8 @@ TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
         m_port,
         fly::BindOption::AllowReuse));
 
-    auto callback([&](std::shared_ptr<fly::Socket>) { m_eventQueue.Push(1); });
+    auto callback(
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
     m_spServerSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
@@ -798,8 +803,9 @@ public:
         std::chrono::seconds waitTime(10);
         ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
 
-        auto callback(
-            [&](std::shared_ptr<fly::Socket>) { m_eventQueue.Push(1); });
+        auto callback([&](std::shared_ptr<fly::Socket>) noexcept {
+            m_eventQueue.Push(1);
+        });
         m_spClientSocketManager->SetClientCallbacks(callback, nullptr);
 
         if (doAsync)

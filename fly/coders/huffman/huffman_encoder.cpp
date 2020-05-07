@@ -22,7 +22,8 @@ namespace {
 HuffmanEncoder::HuffmanEncoder(
     const std::shared_ptr<HuffmanConfig> &spConfig) noexcept :
     m_chunkSize(spConfig->EncoderChunkSize()),
-    m_maxCodeLength(spConfig->EncoderMaxCodeLength())
+    m_maxCodeLength(spConfig->EncoderMaxCodeLength()),
+    m_huffmanCodesSize(0)
 {
 }
 

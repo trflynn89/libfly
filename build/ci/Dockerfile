@@ -1,4 +1,4 @@
-FROM ubuntu:19.10
+FROM ubuntu:20.04
 
 MAINTAINER Timothy Flynn <trflynn89@pm.me>
 
@@ -12,7 +12,10 @@ RUN apt-get update && \
         lcov \
         make \
         rsync \
-        sudo
+        sudo \
+    && \
+    \
+    echo "Set disable_coredump false" >> /etc/sudo.conf
 
 # Install gcc
 RUN apt-get install -y \
