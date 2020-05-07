@@ -10,7 +10,7 @@ jobs:
       vmImage: ubuntu-18.04
 
     container:
-      image: trflynn89/libfly:ubuntu2004_clang10_gcc9
+      image: trflynn89/libfly:ubuntu2004_clang10_gcc10
       options: --cap-add SYS_PTRACE
 
     steps:
