@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <stdexcept>
+#include <limits>
 #include <string>
 
 namespace fly::detail {
