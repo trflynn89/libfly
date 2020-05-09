@@ -4,8 +4,8 @@
 
 namespace fly {
 
-typedef std::uint8_t byte_type;
-typedef std::uint16_t word_type;
-typedef std::uint64_t buffer_type;
+using byte_type = std::uint8_t;
+using word_type = std::uint16_t;
+using buffer_type = std::uint64_t;
 
 } // namespace fly

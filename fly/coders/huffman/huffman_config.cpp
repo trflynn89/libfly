@@ -6,27 +6,27 @@ namespace fly {
 
 //==============================================================================
 HuffmanConfig::HuffmanConfig() noexcept :
-    m_defaultEncoderChunkSizeKB(1_u16 << 10),
-    m_defaultEncoderMaxCodeLength(11_u8)
+    m_default_encoder_chunk_size_kb(1_u16 << 10),
+    m_default_encoder_max_code_length(11_u8)
 {
 }
 
 //==============================================================================
-std::uint32_t HuffmanConfig::EncoderChunkSize() const noexcept
+std::uint32_t HuffmanConfig::encoder_chunk_size() const noexcept
 {
-    auto encoderChunkSizeKB = GetValue<std::uint16_t>(
+    auto encoder_chunk_size_kb = GetValue<std::uint16_t>(
         "encoder_chunk_size_kb",
-        m_defaultEncoderChunkSizeKB);
+        m_default_encoder_chunk_size_kb);
 
-    return static_cast<std::uint32_t>(encoderChunkSizeKB << 10);
+    return static_cast<std::uint32_t>(encoder_chunk_size_kb << 10);
 }
 
 //==============================================================================
-length_type HuffmanConfig::EncoderMaxCodeLength() const noexcept
+length_type HuffmanConfig::encoder_max_code_length() const noexcept
 {
     return GetValue<length_type>(
         "encoder_max_code_length",
-        m_defaultEncoderMaxCodeLength);
+        m_default_encoder_max_code_length);
 }
 
 } // namespace fly

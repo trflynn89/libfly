@@ -27,16 +27,16 @@ public:
     /**
      * @return Huffman encoder chunk size (in bytes).
      */
-    std::uint32_t EncoderChunkSize() const noexcept;
+    std::uint32_t encoder_chunk_size() const noexcept;
 
     /**
      * @return Maximum Huffman code length (in bits) for encoding.
      */
-    length_type EncoderMaxCodeLength() const noexcept;
+    length_type encoder_max_code_length() const noexcept;
 
 protected:
-    std::uint16_t m_defaultEncoderChunkSizeKB;
-    length_type m_defaultEncoderMaxCodeLength;
+    std::uint16_t m_default_encoder_chunk_size_kb;
+    length_type m_default_encoder_max_code_length;
 };
 
 } // namespace fly

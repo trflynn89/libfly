@@ -7,64 +7,64 @@ namespace fly {
 
 //==============================================================================
 BitStreamWriter::BitStreamWriter(std::ostream &stream) noexcept :
-    BitStream(detail::s_mostSignificantBitPosition),
+    BitStream(detail::s_most_significant_bit_position),
     m_stream(stream)
 {
-    flushHeader(0_u8);
+    flush_header(0_u8);
 }
 
 //==============================================================================
-void BitStreamWriter::WriteWord(word_type word) noexcept
+void BitStreamWriter::write_word(word_type word) noexcept
 {
-    WriteBits(word, detail::s_bitsPerWord);
+    write_bits(word, detail::s_bits_per_word);
 }
 
 //==============================================================================
-void BitStreamWriter::WriteByte(byte_type byte) noexcept
+void BitStreamWriter::write_byte(byte_type byte) noexcept
 {
-    WriteBits(byte, detail::s_bitsPerByte);
+    write_bits(byte, detail::s_bits_per_byte);
 }
 
 //==============================================================================
-bool BitStreamWriter::Finish() noexcept
+bool BitStreamWriter::finish() noexcept
 {
-    const byte_type bitsInBuffer =
-        detail::s_mostSignificantBitPosition - m_position;
+    const byte_type bits_in_buffer =
+        detail::s_most_significant_bit_position - m_position;
 
-    if (bitsInBuffer > 0)
+    if (bits_in_buffer > 0)
     {
-        const byte_type bitsToFlush =
-            bitsInBuffer + (m_position % detail::s_bitsPerByte);
+        const byte_type bits_to_flush =
+            bits_in_buffer + (m_position % detail::s_bits_per_byte);
 
-        flush(m_buffer, bitsToFlush / detail::s_bitsPerByte);
-        m_position = detail::s_mostSignificantBitPosition;
+        flush(m_buffer, bits_to_flush / detail::s_bits_per_byte);
+        m_position = detail::s_most_significant_bit_position;
         m_buffer = 0;
 
-        const byte_type remainder = (bitsToFlush - bitsInBuffer);
-        flushHeader(remainder);
+        const byte_type remainder = (bits_to_flush - bits_in_buffer);
+        flush_header(remainder);
     }
 
     return m_stream.good();
 }
 
 //==============================================================================
-void BitStreamWriter::flushHeader(byte_type remainder) noexcept
+void BitStreamWriter::flush_header(byte_type remainder) noexcept
 {
     m_stream.seekp(0);
 
-    const byte_type header = (detail::s_magic << detail::s_magicShift) |
-        (remainder << detail::s_remainderShift);
-    flush(header, detail::s_byteTypeSize);
+    const byte_type header = (detail::s_magic << detail::s_magic_shift) |
+        (remainder << detail::s_remainder_shift);
+    flush(header, detail::s_byte_type_size);
 
     m_stream.seekp(0, std::ios::end);
 }
 
 //==============================================================================
-void BitStreamWriter::flushBuffer() noexcept
+void BitStreamWriter::flush_buffer() noexcept
 {
-    flush(m_buffer, detail::s_bufferTypeSize);
+    flush(m_buffer, detail::s_buffer_type_size);
 
-    m_position = detail::s_mostSignificantBitPosition;
+    m_position = detail::s_most_significant_bit_position;
     m_buffer = 0;
 }
 

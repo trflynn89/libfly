@@ -9,75 +9,79 @@
 namespace fly {
 
 //==============================================================================
-HuffmanDecoder::HuffmanDecoder() : m_huffmanCodesSize(0)
+HuffmanDecoder::HuffmanDecoder() : m_huffman_codes_size(0)
 {
 }
 
 //==============================================================================
-bool HuffmanDecoder::DecodeBinary(
-    BitStreamReader &input,
-    std::ostream &output) noexcept
+bool HuffmanDecoder::decode_binary(
+    BitStreamReader &encoded,
+    std::ostream &decoded) noexcept
 {
-    std::uint32_t chunkSize;
-    length_type maxCodeLength;
+    std::uint32_t chunk_size;
+    length_type max_code_length;
 
-    if (!decodeHeader(input, chunkSize, maxCodeLength))
+    if (!decode_header(encoded, chunk_size, max_code_length))
     {
         LOGW("Error decoding header from stream");
         return false;
     }
 
-    m_chunkBuffer = std::make_unique<symbol_type[]>(chunkSize);
-    m_prefixTable = std::make_unique<HuffmanCode[]>(1_zu << maxCodeLength);
+    m_chunk_buffer = std::make_unique<symbol_type[]>(chunk_size);
+    m_prefix_table = std::make_unique<HuffmanCode[]>(1_zu << max_code_length);
 
-    while (!input.FullyConsumed())
+    while (!encoded.fully_consumed())
     {
-        length_type localMaxCodeLength = 0;
+        length_type local_max_code_length = 0;
 
-        if (!decodeCodes(input, maxCodeLength, localMaxCodeLength))
+        if (!decode_codes(encoded, max_code_length, local_max_code_length))
         {
             LOGW(
                 "Error decoding codes from stream (maximum code length = %u)",
-                static_cast<std::uint32_t>(maxCodeLength));
+                static_cast<std::uint32_t>(max_code_length));
             return false;
         }
-        else if (!decodeSymbols(input, localMaxCodeLength, chunkSize, output))
+        else if (!decode_symbols(
+                     encoded,
+                     local_max_code_length,
+                     chunk_size,
+                     decoded))
         {
             LOGW(
                 "Error decoding %u symbols from stream (fully consumed = %d)",
-                chunkSize,
-                input.FullyConsumed());
+                chunk_size,
+                encoded.fully_consumed());
             return false;
         }
     }
 
-    return output.good();
+    return decoded.good();
 }
 
 //==============================================================================
-bool HuffmanDecoder::decodeHeader(
-    BitStreamReader &input,
-    std::uint32_t &chunkSize,
-    length_type &maxCodeLength) const noexcept
+bool HuffmanDecoder::decode_header(
+    BitStreamReader &encoded,
+    std::uint32_t &chunk_size,
+    length_type &max_code_length) const noexcept
 {
     // Decode the Huffman coder version.
-    byte_type huffmanVersion;
+    byte_type huffman_version;
 
-    if (!input.ReadByte(huffmanVersion))
+    if (!encoded.read_byte(huffman_version))
     {
         LOGW("Could not decode Huffman coder version");
         return false;
     }
 
-    switch (huffmanVersion)
+    switch (huffman_version)
     {
         case 1:
-            return decodeHeaderVersion1(input, chunkSize, maxCodeLength);
+            return decode_header_version1(encoded, chunk_size, max_code_length);
 
         default:
             LOGW(
                 "Decoded invalid Huffman version %u",
-                static_cast<std::uint32_t>(huffmanVersion));
+                static_cast<std::uint32_t>(huffman_version));
             break;
     }
 
@@ -85,85 +89,85 @@ bool HuffmanDecoder::decodeHeader(
 }
 
 //==============================================================================
-bool HuffmanDecoder::decodeHeaderVersion1(
-    BitStreamReader &input,
-    std::uint32_t &chunkSize,
-    length_type &maxCodeLength) const noexcept
+bool HuffmanDecoder::decode_header_version1(
+    BitStreamReader &encoded,
+    std::uint32_t &chunk_size,
+    length_type &max_code_length) const noexcept
 {
     // Decode the chunk size.
-    word_type encodedChunkSizeKB;
+    word_type encoded_chunk_size_kb;
 
-    if (!input.ReadWord(encodedChunkSizeKB))
+    if (!encoded.read_word(encoded_chunk_size_kb))
     {
         LOGW("Could not decode chunk size");
         return false;
     }
-    else if (encodedChunkSizeKB == 0)
+    else if (encoded_chunk_size_kb == 0)
     {
         LOGW(
             "Decoded invalid chunk size %u",
-            static_cast<std::uint32_t>(encodedChunkSizeKB));
+            static_cast<std::uint32_t>(encoded_chunk_size_kb));
         return false;
     }
 
     // Decode the maximum Huffman code length.
-    byte_type encodedMaxCodeLength;
+    byte_type encoded_max_code_length;
 
-    if (!input.ReadByte(encodedMaxCodeLength))
+    if (!encoded.read_byte(encoded_max_code_length))
     {
         LOGW("Could not decode maximum code length");
         return false;
     }
     else if (
-        (encodedMaxCodeLength == 0) ||
-        (encodedMaxCodeLength >= std::numeric_limits<code_type>::digits))
+        (encoded_max_code_length == 0) ||
+        (encoded_max_code_length >= std::numeric_limits<code_type>::digits))
     {
         LOGW(
             "Decoded invalid maximum code length %u",
-            static_cast<std::uint32_t>(encodedMaxCodeLength));
+            static_cast<std::uint32_t>(encoded_max_code_length));
         return false;
     }
 
-    chunkSize = static_cast<std::uint32_t>(encodedChunkSizeKB) << 10;
-    maxCodeLength = static_cast<length_type>(encodedMaxCodeLength);
+    chunk_size = static_cast<std::uint32_t>(encoded_chunk_size_kb) << 10;
+    max_code_length = static_cast<length_type>(encoded_max_code_length);
 
     return true;
 }
 
 //==============================================================================
-bool HuffmanDecoder::decodeCodes(
-    BitStreamReader &input,
-    length_type globalMaxCodeLength,
-    length_type &localMaxCodeLength) noexcept
+bool HuffmanDecoder::decode_codes(
+    BitStreamReader &encoded,
+    length_type global_max_code_length,
+    length_type &local_max_code_length) noexcept
 {
-    m_huffmanCodesSize = 0;
+    m_huffman_codes_size = 0;
 
     // Decode the number of code length counts.
-    byte_type countsSize;
+    byte_type counts_size;
 
-    if (!input.ReadByte(countsSize))
+    if (!encoded.read_byte(counts_size))
     {
         LOGW("Could not decode number of code length counts");
         return false;
     }
-    else if ((countsSize == 0) || (countsSize > (globalMaxCodeLength + 1)))
+    else if ((counts_size == 0) || (counts_size > (global_max_code_length + 1)))
     {
         LOGW(
             "Decoded invalid number of code length counts %u",
-            static_cast<std::uint32_t>(countsSize));
+            static_cast<std::uint32_t>(counts_size));
         return false;
     }
 
     // The first code length is 0, so the actual maximum code length is 1 less
     // than the number of length counts.
-    localMaxCodeLength = countsSize - 1;
+    local_max_code_length = counts_size - 1;
 
     // Decode the code length counts.
-    std::vector<std::uint16_t> counts(countsSize);
+    std::vector<std::uint16_t> counts(counts_size);
 
     for (std::uint16_t &count : counts)
     {
-        if (!input.ReadWord(count))
+        if (!encoded.read_word(count))
         {
             LOGW("Could not decode code length counts");
             return false;
@@ -171,13 +175,13 @@ bool HuffmanDecoder::decodeCodes(
     }
 
     // Decode the symbols.
-    for (length_type length = 0; length < countsSize; ++length)
+    for (length_type length = 0; length < counts_size; ++length)
     {
         for (std::uint16_t i = 0; i < counts[length]; ++i)
         {
             byte_type symbol;
 
-            if (!input.ReadByte(symbol))
+            if (!encoded.read_byte(symbol))
             {
                 LOGW(
                     "Could not decode symbol of length %u bits",
@@ -190,73 +194,77 @@ bool HuffmanDecoder::decodeCodes(
 
             // Subsequent codes are one greater than the previous code, but also
             // bit-shifted left enough to maintain the right code length.
-            if (m_huffmanCodesSize != 0)
+            if (m_huffman_codes_size != 0)
             {
                 const HuffmanCode &last =
-                    m_huffmanCodes[m_huffmanCodesSize - 1_u16];
+                    m_huffman_codes[m_huffman_codes_size - 1_u16];
 
                 const length_type shift = length - last.m_length;
                 code = (last.m_code + 1) << shift;
             }
 
-            if (m_huffmanCodesSize == m_huffmanCodes.size())
+            if (m_huffman_codes_size == m_huffman_codes.size())
             {
-                LOGW("Exceeded maximum number of codes %u", m_huffmanCodesSize);
+                LOGW(
+                    "Exceeded maximum number of codes %u",
+                    m_huffman_codes_size);
                 return false;
             }
 
-            m_huffmanCodes[m_huffmanCodesSize++] =
+            m_huffman_codes[m_huffman_codes_size++] =
                 HuffmanCode(static_cast<symbol_type>(symbol), code, length);
         }
     }
 
-    convertToPrefixTable(localMaxCodeLength);
+    convert_to_prefix_table(local_max_code_length);
     return true;
 }
 
 //==============================================================================
-void HuffmanDecoder::convertToPrefixTable(length_type maxCodeLength) noexcept
+void HuffmanDecoder::convert_to_prefix_table(
+    length_type max_code_length) noexcept
 {
-    for (std::uint16_t i = 0; i < m_huffmanCodesSize; ++i)
+    for (std::uint16_t i = 0; i < m_huffman_codes_size; ++i)
     {
-        const HuffmanCode code = std::move(m_huffmanCodes[i]);
-        const length_type shift = maxCodeLength - code.m_length;
+        const HuffmanCode code = std::move(m_huffman_codes[i]);
+        const length_type shift = max_code_length - code.m_length;
 
         for (code_type j = 0; j < (1_u16 << shift); ++j)
         {
             const code_type index = (code.m_code << shift) + j;
-            m_prefixTable[index].m_symbol = code.m_symbol;
-            m_prefixTable[index].m_length = code.m_length;
+            m_prefix_table[index].m_symbol = code.m_symbol;
+            m_prefix_table[index].m_length = code.m_length;
         }
     }
 }
 
 //==============================================================================
-bool HuffmanDecoder::decodeSymbols(
-    BitStreamReader &input,
-    length_type maxCodeLength,
-    std::uint32_t chunkSize,
-    std::ostream &output) const noexcept
+bool HuffmanDecoder::decode_symbols(
+    BitStreamReader &encoded,
+    length_type max_code_length,
+    std::uint32_t chunk_size,
+    std::ostream &decoded) const noexcept
 {
     std::uint32_t bytes = 0;
     code_type index;
 
-    while ((bytes < chunkSize) && (input.PeekBits(index, maxCodeLength) != 0))
+    while ((bytes < chunk_size) &&
+           (encoded.peek_bits(index, max_code_length) != 0))
     {
-        const HuffmanCode &code = m_prefixTable[index];
+        const HuffmanCode &code = m_prefix_table[index];
 
-        m_chunkBuffer[bytes++] = code.m_symbol;
-        input.DiscardBits(code.m_length);
+        m_chunk_buffer[bytes++] = code.m_symbol;
+        encoded.discard_bits(code.m_length);
     }
 
     if (bytes > 0)
     {
-        output.write(
-            reinterpret_cast<const std::ios::char_type *>(m_chunkBuffer.get()),
+        decoded.write(
+            reinterpret_cast<const std::ios::char_type *>(m_chunk_buffer.get()),
             static_cast<std::streamsize>(bytes));
     }
 
-    return (bytes == chunkSize) || input.FullyConsumed();
+    return (bytes == chunk_size) || encoded.fully_consumed();
 }
 
 } // namespace fly

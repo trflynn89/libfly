@@ -14,83 +14,83 @@ protected:
 };
 
 //==============================================================================
-TEST_F(Base64CoderTest, EmptyTest)
+TEST_F(Base64CoderTest, Empty)
 {
     const std::string raw;
     std::string enc, dec;
 
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_coder.encode_string(raw, enc));
+    ASSERT_TRUE(m_coder.decode_string(enc, dec));
 
     EXPECT_TRUE(enc.empty());
     EXPECT_EQ(raw, dec);
 }
 
 //==============================================================================
-TEST_F(Base64CoderTest, ZeroPaddingTest)
+TEST_F(Base64CoderTest, ZeroPadding)
 {
     const std::string raw = "Man";
     std::string enc, dec;
 
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_coder.encode_string(raw, enc));
+    ASSERT_TRUE(m_coder.decode_string(enc, dec));
 
     EXPECT_EQ(enc, "TWFu");
     EXPECT_EQ(raw, dec);
 }
 
 //==============================================================================
-TEST_F(Base64CoderTest, SinglePaddingTest)
+TEST_F(Base64CoderTest, SinglePadding)
 {
     const std::string raw = "Ma";
     std::string enc, dec;
 
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_coder.encode_string(raw, enc));
+    ASSERT_TRUE(m_coder.decode_string(enc, dec));
 
     EXPECT_EQ(enc, "TWE=");
     EXPECT_EQ(raw, dec);
 }
 
 //==============================================================================
-TEST_F(Base64CoderTest, DoublePaddingTest)
+TEST_F(Base64CoderTest, DoublePadding)
 {
     const std::string raw = "M";
     std::string enc, dec;
 
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_coder.encode_string(raw, enc));
+    ASSERT_TRUE(m_coder.decode_string(enc, dec));
 
     EXPECT_EQ(enc, "TQ==");
     EXPECT_EQ(raw, dec);
 }
 
 //==============================================================================
-TEST_F(Base64CoderTest, InvalidSymbolTest)
+TEST_F(Base64CoderTest, InvalidSymbol)
 {
     std::string dec;
 
-    ASSERT_FALSE(m_coder.DecodeString("^", dec));
-    ASSERT_FALSE(m_coder.DecodeString("ab^", dec));
-    ASSERT_FALSE(m_coder.DecodeString("^ab", dec));
-    ASSERT_FALSE(m_coder.DecodeString("ab^ab", dec));
+    ASSERT_FALSE(m_coder.decode_string("^", dec));
+    ASSERT_FALSE(m_coder.decode_string("ab^", dec));
+    ASSERT_FALSE(m_coder.decode_string("^ab", dec));
+    ASSERT_FALSE(m_coder.decode_string("ab^ab", dec));
 }
 
 //==============================================================================
-TEST_F(Base64CoderTest, InvalidChunkSizeTest)
+TEST_F(Base64CoderTest, InvalidChunkSize)
 {
     std::string dec;
 
-    ASSERT_FALSE(m_coder.DecodeString("a", dec));
-    ASSERT_FALSE(m_coder.DecodeString("ab", dec));
-    ASSERT_FALSE(m_coder.DecodeString("abc", dec));
-    ASSERT_FALSE(m_coder.DecodeString("abcde", dec));
-    ASSERT_FALSE(m_coder.DecodeString("abcdef", dec));
-    ASSERT_FALSE(m_coder.DecodeString("abcdefg", dec));
+    ASSERT_FALSE(m_coder.decode_string("a", dec));
+    ASSERT_FALSE(m_coder.decode_string("ab", dec));
+    ASSERT_FALSE(m_coder.decode_string("abc", dec));
+    ASSERT_FALSE(m_coder.decode_string("abcde", dec));
+    ASSERT_FALSE(m_coder.decode_string("abcdef", dec));
+    ASSERT_FALSE(m_coder.decode_string("abcdefg", dec));
 }
 
 //==============================================================================
-TEST_F(Base64CoderTest, WikiExampleTest)
+TEST_F(Base64CoderTest, WikiExample)
 {
     // Example from: https://en.wikipedia.org/wiki/Base64#Examples
     const std::string raw =
@@ -100,8 +100,8 @@ TEST_F(Base64CoderTest, WikiExampleTest)
         "of knowledge, exceeds the short vehemence of any carnal pleasure.";
     std::string enc, dec;
 
-    ASSERT_TRUE(m_coder.EncodeString(raw, enc));
-    ASSERT_TRUE(m_coder.DecodeString(enc, dec));
+    ASSERT_TRUE(m_coder.encode_string(raw, enc));
+    ASSERT_TRUE(m_coder.decode_string(enc, dec));
 
     const std::string expected =
         "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieS"
@@ -122,8 +122,8 @@ public:
     Base64CoderFileTest() noexcept :
         Base64CoderTest(),
         m_path(fly::PathUtil::GenerateTempDirectory()),
-        m_encodedFile(m_path / "encoded.txt"),
-        m_decodedFile(m_path / "decoded.txt")
+        m_encoded_file(m_path / "encoded.txt"),
+        m_decoded_file(m_path / "decoded.txt")
     {
     }
 
@@ -145,59 +145,59 @@ public:
 
 protected:
     std::filesystem::path m_path;
-    std::filesystem::path m_encodedFile;
-    std::filesystem::path m_decodedFile;
+    std::filesystem::path m_encoded_file;
+    std::filesystem::path m_decoded_file;
 };
 
 //==============================================================================
-TEST_F(Base64CoderFileTest, AsciiFileTest)
+TEST_F(Base64CoderFileTest, AsciiFile)
 {
     // Generated with:
     // tr -dc '[:graph:]' </dev/urandom | head -c 4194304 > test.txt
     const auto here = std::filesystem::path(__FILE__).parent_path();
     const auto raw = here / "data" / "test.txt";
 
-    ASSERT_TRUE(m_coder.EncodeFile(raw, m_encodedFile));
-    ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
+    ASSERT_TRUE(m_coder.encode_file(raw, m_encoded_file));
+    ASSERT_TRUE(m_coder.decode_file(m_encoded_file, m_decoded_file));
 
     // Generated with:
     // base64 -w0 test.txt > test.txt.base64
     const auto expected = here / "data" / "test.txt.base64";
 
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(m_encodedFile, expected));
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decodedFile));
+    EXPECT_TRUE(fly::PathUtil::CompareFiles(m_encoded_file, expected));
+    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decoded_file));
 }
 
 //==============================================================================
-TEST_F(Base64CoderFileTest, PngFileTest)
+TEST_F(Base64CoderFileTest, PngFile)
 {
     const auto here = std::filesystem::path(__FILE__).parent_path();
     const auto raw = here / "data" / "test.png";
 
-    ASSERT_TRUE(m_coder.EncodeFile(raw, m_encodedFile));
-    ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
+    ASSERT_TRUE(m_coder.encode_file(raw, m_encoded_file));
+    ASSERT_TRUE(m_coder.decode_file(m_encoded_file, m_decoded_file));
 
     // Generated with:
     // base64 -w0 test.png > test.png.base64
     const auto expected = here / "data" / "test.png.base64";
 
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(m_encodedFile, expected));
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decodedFile));
+    EXPECT_TRUE(fly::PathUtil::CompareFiles(m_encoded_file, expected));
+    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decoded_file));
 }
 
 //==============================================================================
-TEST_F(Base64CoderFileTest, GifFileTest)
+TEST_F(Base64CoderFileTest, GifFile)
 {
     const auto here = std::filesystem::path(__FILE__).parent_path();
     const auto raw = here / "data" / "test.gif";
 
-    ASSERT_TRUE(m_coder.EncodeFile(raw, m_encodedFile));
-    ASSERT_TRUE(m_coder.DecodeFile(m_encodedFile, m_decodedFile));
+    ASSERT_TRUE(m_coder.encode_file(raw, m_encoded_file));
+    ASSERT_TRUE(m_coder.decode_file(m_encoded_file, m_decoded_file));
 
     // Generated with:
     // base64 -w0 test.gif > test.gif.base64
     const auto expected = here / "data" / "test.gif.base64";
 
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(m_encodedFile, expected));
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decodedFile));
+    EXPECT_TRUE(fly::PathUtil::CompareFiles(m_encoded_file, expected));
+    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decoded_file));
 }

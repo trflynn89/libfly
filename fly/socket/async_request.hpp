@@ -16,7 +16,7 @@ namespace fly {
 class AsyncRequest
 {
 public:
-    typedef fly::ConcurrentQueue<AsyncRequest> RequestQueue;
+    using RequestQueue = fly::ConcurrentQueue<AsyncRequest>;
 
     /**
      * Default constructor to set the socket ID to an invalid value and the

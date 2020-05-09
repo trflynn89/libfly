@@ -25,9 +25,10 @@ public:
     /**
      * Constructor.
      *
-     * @param HuffmanConfig Reference to Huffman configuration.
+     * @param config Reference to Huffman configuration.
      */
-    explicit HuffmanEncoder(const std::shared_ptr<HuffmanConfig> &) noexcept;
+    explicit HuffmanEncoder(
+        const std::shared_ptr<HuffmanConfig> &config) noexcept;
 
 protected:
     /**
@@ -85,43 +86,44 @@ protected:
      * Encoding the input stream (step 6) consists of reading each symbol from
      * the input stream and outputting that symbol's canonical Huffman code.
      *
-     * @param istream Stream holding the contents to encode.
-     * @param BitStreamWriter Stream to store the encoded contents.
+     * @param decoded Stream holding the contents to encode.
+     * @param encoded Stream to store the encoded contents.
      *
-     * @return bool True if the input stream was successfully encoded.
+     * @return True if the input stream was successfully encoded.
      */
-    bool EncodeBinary(std::istream &, BitStreamWriter &) noexcept override;
+    bool encode_binary(std::istream &decoded, BitStreamWriter &encoded) noexcept
+        override;
 
 private:
     /**
      * Read the stream into a buffer, up to a static maximum size, storing bytes
      * in the chunk buffer.
      *
-     * @param istream Stream holding the contents to read.
+     * @param decoded Stream holding the contents to encode.
      *
-     * @return uint32_t The number of bytes that were read.
+     * @return The number of bytes that were read.
      */
-    std::uint32_t readStream(std::istream &) const noexcept;
+    std::uint32_t read_stream(std::istream &decoded) const noexcept;
 
     /**
      * Create a Huffman tree from the current chunk buffer.
      *
-     * @param uint32_t The number of bytes the chunk buffer holds.
+     * @param chunk_size The number of bytes the chunk buffer holds.
      */
-    void createTree(std::uint32_t) noexcept;
+    void create_tree(std::uint32_t chunk_size) noexcept;
 
     /**
      * Create a list of Huffman codes from the generated Huffman tree. The list
      * of codes will be in canonical form.
      */
-    void createCodes() noexcept;
+    void create_codes() noexcept;
 
     /**
      * Insert a new Huffman code into the list of already sorted codes.
      *
-     * @param HuffmanCode The Huffman code to insert.
+     * @param code The Huffman code to insert.
      */
-    void insertCode(HuffmanCode &&) noexcept;
+    void insert_code(HuffmanCode &&code) noexcept;
 
     /**
      * Length-limit the generated Huffman codes to a static maximum size, using
@@ -130,52 +132,53 @@ private:
      *
      * https://cbloomrants.blogspot.com/2010/07/07-03-10-length-limitted-huffman-codes.html
      */
-    void limitCodeLengths() noexcept;
+    void limit_code_lengths() noexcept;
 
     /**
      * Convert the generated list of standard Huffman codes into canonical form.
      * It is assumed that the codes are already sorted in accordance with
      * canonical form.
      */
-    void convertToCanonicalForm() noexcept;
+    void convert_to_canonical_form() noexcept;
 
     /**
      * Encode the header to the output stream.
      *
-     * @param BitStreamWriter Stream to store the encoded header.
+     * @param encoded Stream to store the encoded header.
      */
-    void encodeHeader(BitStreamWriter &) const noexcept;
+    void encode_header(BitStreamWriter &encoded) const noexcept;
 
     /**
      * Encode the generated Huffman codes to the output stream.
      *
-     * @param BitStreamWriter Stream to store the encoded codes.
+     * @param encoded Stream to store the encoded codes.
      */
-    void encodeCodes(BitStreamWriter &) const noexcept;
+    void encode_codes(BitStreamWriter &encoded) const noexcept;
 
     /**
      * Encode symbols from the current chunk buffer with the generated list of
      * Huffman codes. The list of codes is effectively destroyed as its elements
      * are moved to a map for faster lookups.
      *
-     * @param uint32_t The number of bytes the chunk buffer holds.
-     * @param BitStreamWriter Stream to store the encoded symbols.
+     * @param chunk_size The number of bytes the chunk buffer holds.
+     * @param encoded Stream to store the encoded symbols.
      */
-    void encodeSymbols(std::uint32_t, BitStreamWriter &) noexcept;
+    void
+    encode_symbols(std::uint32_t chunk_size, BitStreamWriter &encoded) noexcept;
 
     // Configuration.
-    const std::uint32_t m_chunkSize;
-    const length_type m_maxCodeLength;
+    const std::uint32_t m_chunk_size;
+    const length_type m_max_code_length;
 
-    std::unique_ptr<symbol_type[]> m_chunkBuffer;
+    std::unique_ptr<symbol_type[]> m_chunk_buffer;
 
     // Sized to fit 8-bit ASCII symbols.
-    std::array<HuffmanCode, 1 << 8> m_huffmanCodes;
-    std::uint16_t m_huffmanCodesSize;
+    std::array<HuffmanCode, 1 << 8> m_huffman_codes;
+    std::uint16_t m_huffman_codes_size;
 
     // Sized to fit a complete Huffman tree. With 8-bit symbols, a complete tree
     // will have a height of 9, and 2^9 - 1 = 511 nodes (round to 512).
-    std::array<HuffmanNode, 1 << 9> m_huffmanTree;
+    std::array<HuffmanNode, 1 << 9> m_huffman_tree;
 };
 
 } // namespace fly

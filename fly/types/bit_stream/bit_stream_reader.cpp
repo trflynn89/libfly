@@ -14,14 +14,14 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
     byte_type header = 0;
     byte_type magic = 0;
 
-    // Cannot use ReadByte because the remainder bits are not known yet.
-    const byte_type bytesRead = fill(header, detail::s_byteTypeSize);
+    // Cannot use read_byte because the remainder bits are not known yet.
+    const byte_type bytes_read = fill(header, detail::s_byte_type_size);
 
-    if (bytesRead == 1_u8)
+    if (bytes_read == 1_u8)
     {
-        magic = (header >> detail::s_magicShift) & detail::s_magicMask;
+        magic = (header >> detail::s_magic_shift) & detail::s_magic_mask;
         m_remainder =
-            (header >> detail::s_remainderShift) & detail::s_remainderMask;
+            (header >> detail::s_remainder_shift) & detail::s_remainder_mask;
     }
 
     if (magic != detail::s_magic)
@@ -31,25 +31,25 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
 }
 
 //==============================================================================
-bool BitStreamReader::ReadWord(word_type &word) noexcept
+bool BitStreamReader::read_word(word_type &word) noexcept
 {
-    return ReadBits(word, detail::s_bitsPerWord) == detail::s_bitsPerWord;
+    return read_bits(word, detail::s_bits_per_word) == detail::s_bits_per_word;
 }
 
 //==============================================================================
-bool BitStreamReader::ReadByte(byte_type &byte) noexcept
+bool BitStreamReader::read_byte(byte_type &byte) noexcept
 {
-    return ReadBits(byte, detail::s_bitsPerByte) == detail::s_bitsPerByte;
+    return read_bits(byte, detail::s_bits_per_byte) == detail::s_bits_per_byte;
 }
 
 //==============================================================================
-void BitStreamReader::DiscardBits(byte_type size) noexcept
+void BitStreamReader::discard_bits(byte_type size) noexcept
 {
     m_position -= size;
 }
 
 //==============================================================================
-bool BitStreamReader::FullyConsumed() const noexcept
+bool BitStreamReader::fully_consumed() const noexcept
 {
     if (m_stream.eof() || (m_stream.peek() == EOF))
     {
@@ -60,26 +60,27 @@ bool BitStreamReader::FullyConsumed() const noexcept
 }
 
 //==============================================================================
-void BitStreamReader::refillBuffer() noexcept
+void BitStreamReader::refill_buffer() noexcept
 {
-    const byte_type bitsToFill =
-        detail::s_mostSignificantBitPosition - m_position;
+    const byte_type bits_to_fill =
+        detail::s_most_significant_bit_position - m_position;
     buffer_type buffer = 0;
 
-    const byte_type bytesRead =
-        fill(buffer, bitsToFill / detail::s_bitsPerByte);
+    const byte_type bytes_read =
+        fill(buffer, bits_to_fill / detail::s_bits_per_byte);
 
-    if (bytesRead > 0)
+    if (bytes_read > 0)
     {
-        const byte_type bitsRead = bytesRead * detail::s_bitsPerByte;
-        m_position += bitsRead;
+        const byte_type bits_read = bytes_read * detail::s_bits_per_byte;
+        m_position += bits_read;
 
         // It is undefined behavior to bit-shift by the size of the value being
         // shifted, i.e. when bitsRead == detail::s_mostSignificantBitPosition.
         // Because bitsRead is at least 1 here, the left-shift can be broken
         // into two operations in order to avoid that undefined behavior.
-        m_buffer = (m_buffer << 1) << (bitsRead - 1);
-        m_buffer |= buffer >> (detail::s_mostSignificantBitPosition - bitsRead);
+        m_buffer = (m_buffer << 1) << (bits_read - 1);
+        m_buffer |=
+            buffer >> (detail::s_most_significant_bit_position - bits_read);
 
         if (m_stream.peek() == EOF)
         {
