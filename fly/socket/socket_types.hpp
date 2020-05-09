@@ -47,15 +47,15 @@
 namespace fly {
 
 #if defined(FLY_WINDOWS)
-typedef SOCKET socket_type;
+using socket_type = SOCKET;
 #elif defined(FLY_LINUX)
-typedef int socket_type;
+using socket_type = int;
 #else
 #    error Unknown socket type.
 #endif
 
-typedef std::uint32_t address_type;
-typedef std::uint16_t port_type;
+using address_type = std::uint32_t;
+using port_type = std::uint16_t;
 
 /**
  * Types of supported sockets.

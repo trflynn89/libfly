@@ -14,7 +14,7 @@ namespace fly {
 class System
 {
 public:
-    typedef std::function<void(int)> SignalHandler;
+    using SignalHandler = std::function<void(int)>;
 
     /**
      * Print the backtrace to stderr.

@@ -32,9 +32,9 @@ class SocketManager : public std::enable_shared_from_this<SocketManager>
     friend class SocketManagerTask;
 
 public:
-    typedef std::function<void(std::shared_ptr<Socket>)> SocketCallback;
+    using SocketCallback = std::function<void(std::shared_ptr<Socket>)>;
 
-    typedef std::vector<std::shared_ptr<Socket>> SocketList;
+    using SocketList = std::vector<std::shared_ptr<Socket>>;
 
     /**
      * Constructor.

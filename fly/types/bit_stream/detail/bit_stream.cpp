@@ -3,8 +3,8 @@
 namespace fly::detail {
 
 //==============================================================================
-BitStream::BitStream(byte_type startingPosition) noexcept :
-    m_position(startingPosition),
+BitStream::BitStream(byte_type starting_position) noexcept :
+    m_position(starting_position),
     m_buffer(0)
 {
 }

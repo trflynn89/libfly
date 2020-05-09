@@ -12,92 +12,92 @@ namespace fly {
 
 namespace {
 
-    constexpr const std::ios::openmode s_inputMode =
+    constexpr const std::ios::openmode s_input_mode =
         std::ios::in | std::ios::binary;
 
-    constexpr const std::ios::openmode s_outputMode =
+    constexpr const std::ios::openmode s_output_mode =
         std::ios::out | std::ios::binary | std::ios::trunc;
 
     template <typename SizeType>
-    void logEncoderStats(
+    void log_encoder_stats(
         std::chrono::time_point<std::chrono::system_clock> start,
-        SizeType decodedSize,
-        SizeType encodedSize) noexcept
+        SizeType decoded_size,
+        SizeType encoded_size) noexcept
     {
         const auto end = std::chrono::system_clock::now();
         const auto ratio =
-            (static_cast<double>(decodedSize) - encodedSize) / decodedSize;
+            (static_cast<double>(decoded_size) - encoded_size) / decoded_size;
 
         LOGD(
             "Encoded %u bytes to %u bytes (%f%%) in %f seconds",
-            decodedSize,
-            encodedSize,
+            decoded_size,
+            encoded_size,
             ratio * 100.0,
             std::chrono::duration<double>(end - start).count());
     }
 
     template <typename SizeType>
-    void logDecoderStats(
+    void log_decoder_stats(
         std::chrono::time_point<std::chrono::system_clock> start,
-        SizeType encodedSize,
-        SizeType decodedSize) noexcept
+        SizeType encoded_size,
+        SizeType decoded_size) noexcept
     {
         const auto end = std::chrono::system_clock::now();
 
         LOGD(
             "Decoded %u bytes to %u bytes in %f seconds",
-            encodedSize,
-            decodedSize,
+            encoded_size,
+            decoded_size,
             std::chrono::duration<double>(end - start).count());
     }
 
 } // namespace
 
 //==============================================================================
-bool Encoder::EncodeString(
+bool Encoder::encode_string(
     const std::string &decoded,
     std::string &encoded) noexcept
 {
     const auto start = std::chrono::system_clock::now();
     bool successful = false;
 
-    std::istringstream input(decoded, s_inputMode);
-    std::ostringstream output(s_outputMode);
+    std::istringstream input(decoded, s_input_mode);
+    std::ostringstream output(s_output_mode);
 
     if (input && output)
     {
-        successful = EncodeInternal(input, output);
+        successful = encode_internal(input, output);
     }
 
     if (successful)
     {
         encoded = output.str();
-        logEncoderStats(start, decoded.length(), encoded.length());
+        log_encoder_stats(start, decoded.length(), encoded.length());
     }
 
     return successful;
 }
 
 //==============================================================================
-bool Encoder::EncodeFile(
+bool Encoder::encode_file(
     const std::filesystem::path &decoded,
     const std::filesystem::path &encoded) noexcept
 {
     const auto start = std::chrono::system_clock::now();
     bool successful = false;
     {
-        std::ifstream input(decoded, s_inputMode);
-        std::ofstream output(encoded, s_outputMode);
+        std::ifstream input(decoded, s_input_mode);
+        std::ofstream output(encoded, s_output_mode);
 
         if (input && output)
         {
-            successful = EncodeInternal(input, output);
+            successful = encode_internal(input, output);
         }
     }
 
     if (successful)
     {
-        logEncoderStats(
+        log_encoder_stats(
             start,
             std::filesystem::file_size(decoded),
             std::filesystem::file_size(encoded));
@@ -107,59 +107,59 @@ bool Encoder::EncodeFile(
 }
 
 //==============================================================================
-bool BinaryEncoder::EncodeInternal(
-    std::istream &input,
-    std::ostream &output) noexcept
+bool BinaryEncoder::encode_internal(
+    std::istream &decoded,
+    std::ostream &encoded) noexcept
 {
-    BitStreamWriter stream(output);
-    return EncodeBinary(input, stream);
+    BitStreamWriter stream(encoded);
+    return encode_binary(decoded, stream);
 }
 
 //==============================================================================
-bool Decoder::DecodeString(
+bool Decoder::decode_string(
     const std::string &encoded,
     std::string &decoded) noexcept
 {
     const auto start = std::chrono::system_clock::now();
     bool successful = false;
 
-    std::istringstream input(encoded, s_inputMode);
-    std::ostringstream output(s_outputMode);
+    std::istringstream input(encoded, s_input_mode);
+    std::ostringstream output(s_output_mode);
 
     if (input && output)
     {
-        successful = DecodeInternal(input, output);
+        successful = decode_internal(input, output);
     }
 
     if (successful)
     {
         decoded = output.str();
-        logDecoderStats(start, encoded.length(), decoded.length());
+        log_decoder_stats(start, encoded.length(), decoded.length());
     }
 
     return successful;
 }
 
 //==============================================================================
-bool Decoder::DecodeFile(
+bool Decoder::decode_file(
     const std::filesystem::path &encoded,
     const std::filesystem::path &decoded) noexcept
 {
     const auto start = std::chrono::system_clock::now();
     bool successful = false;
     {
-        std::ifstream input(encoded, s_inputMode);
-        std::ofstream output(decoded, s_outputMode);
+        std::ifstream input(encoded, s_input_mode);
+        std::ofstream output(decoded, s_output_mode);
 
         if (input && output)
         {
-            successful = DecodeInternal(input, output);
+            successful = decode_internal(input, output);
         }
     }
 
     if (successful)
     {
-        logDecoderStats(
+        log_decoder_stats(
             start,
             std::filesystem::file_size(encoded),
             std::filesystem::file_size(decoded));
@@ -169,12 +169,12 @@ bool Decoder::DecodeFile(
 }
 
 //==============================================================================
-bool BinaryDecoder::DecodeInternal(
-    std::istream &input,
-    std::ostream &output) noexcept
+bool BinaryDecoder::decode_internal(
+    std::istream &encoded,
+    std::ostream &decoded) noexcept
 {
-    BitStreamReader stream(input);
-    return DecodeBinary(stream, output);
+    BitStreamReader stream(encoded);
+    return decode_binary(stream, decoded);
 }
 
 } // namespace fly
