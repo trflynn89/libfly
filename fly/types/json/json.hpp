@@ -98,7 +98,7 @@ public:
      *
      * @param value The string-like value.
      *
-     *value throws JsonException If the string-like value is not valid.
+     * @throws JsonException If the string-like value is not valid.
      */
     template <typename T, enable_if_all<JsonTraits::is_string<T>> = 0>
     Json(const T &value) noexcept(false);
