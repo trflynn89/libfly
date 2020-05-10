@@ -5,7 +5,7 @@
  * insert the file, function, and line macros.
  */
 #define _FLY_LOG(level, message)                                               \
-    fly::Logger::AddLog(level, __FILE__, __FUNCTION__, __LINE__, message)
+    fly::Logger::add_log(level, __FILE__, __FUNCTION__, __LINE__, message)
 
 /**
  * Return the first argument in a list of variadic arguments, expected to be the

@@ -64,7 +64,7 @@
 
 //==============================================================================
 #define LOGC(...)                                                              \
-    fly::Logger::ConsoleLog(                                                   \
+    fly::Logger::console_log(                                                  \
         true,                                                                  \
         fly::String::Format(                                                   \
             _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
@@ -72,7 +72,7 @@
 
 //==============================================================================
 #define LOGC_NO_LOCK(...)                                                      \
-    fly::Logger::ConsoleLog(                                                   \
+    fly::Logger::console_log(                                                  \
         false,                                                                 \
         fly::String::Format(                                                   \
             _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
@@ -120,112 +120,108 @@ public:
     /**
      * Constructor.
      *
-     * @param TaskRunner Task runner for posting logger-related tasks onto.
-     * @param LoggerConfig Reference to logger configuration.
-     * @param path Path to store the log file.
+     * @param task_runner Task runner for posting logger-related tasks onto.
+     * @param config Reference to logger configuration.
+     * @param logger_directory Path to store the log file.
      */
     Logger(
-        const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<LoggerConfig> &,
-        const std::filesystem::path &) noexcept;
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        const std::shared_ptr<LoggerConfig> &config,
+        const std::filesystem::path &logger_directory) noexcept;
 
     /**
      * Set the logger instance so that the LOG* macros function.
      *
-     * @param Logger The logger instance.
+     * @param logger The logger instance.
      */
-    static void SetInstance(const std::shared_ptr<Logger> &) noexcept;
-
-    /**
-     * @return The logger instance.
-     */
-    static std::shared_ptr<Logger> GetInstance() noexcept;
+    static void set_instance(const std::shared_ptr<Logger> &logger) noexcept;
 
     /**
      * Log to the console in a thread-safe manner.
      *
-     * @param bool Whether to acquire lock before logging.
-     * @param string The message to log.
+     * @param acquire_lock Whether to acquire lock before logging.
+     * @param message The message to log.
      */
-    static void ConsoleLog(bool, const std::string &) noexcept;
+    static void
+    console_log(bool acquire_lock, const std::string &message) noexcept;
 
     /**
      * Add a log to the static logger instance.
      *
-     * @param Level The level (debug, info, etc.) of the log.
-     * @param const char * Name of the file storing the log.
-     * @param const char * Name of the function storing the log.
-     * @param uint32_t The line number the log point occurs.
-     * @param string The message to log.
+     * @param level The level (debug, info, etc.) of the log.
+     * @param file Name of the file storing the log.
+     * @param function Name of the function storing the log.
+     * @param line The line number the log point occurs.
+     * @param message The message to log.
      */
-    static void AddLog(
-        Log::Level,
-        const char *,
-        const char *,
-        std::uint32_t,
-        const std::string &) noexcept;
+    static void add_log(
+        Log::Level level,
+        const char *file,
+        const char *function,
+        std::uint32_t line,
+        const std::string &message) noexcept;
 
     /**
      * Create the logger's log file on disk and initialize the logger task.
      *
-     * @return bool True if the logger is in a valid state.
+     * @return True if the logger is in a valid state.
      */
-    bool Start() noexcept;
+    bool start() noexcept;
 
     /**
-     * @return path Path to the current log file.
+     * @return Path to the current log file.
      */
-    std::filesystem::path GetLogFilePath() const noexcept;
+    std::filesystem::path get_log_file_path() const noexcept;
 
 private:
     /**
      * Perform any IO operations. Wait for a log item to be available and write
      * it to disk.
      *
-     * @return bool True if the current log file is still open and healthy.
+     * @return True if the current log file is still open and healthy.
      */
     bool poll() noexcept;
 
     /**
      * Add a log to this logger instance.
      *
-     * @param Level The level (debug, info, etc.) of the log.
-     * @param const char * Name of the file storing the log.
-     * @param const char * Name of the function storing the log.
-     * @param uint32_t The line number the log point occurs.
-     * @param string The message to log.
+     * @param level The level (debug, info, etc.) of the log.
+     * @param file Name of the file storing the log.
+     * @param function Name of the function storing the log.
+     * @param line The line number the log point occurs.
+     * @param message The message to log.
      */
-    void addLog(
-        Log::Level,
-        const char *,
-        const char *,
-        std::uint32_t,
-        const std::string &) noexcept;
+    void add_log_internal(
+        Log::Level level,
+        const char *file,
+        const char *function,
+        std::uint32_t line,
+        const std::string &message) noexcept;
 
     /**
      * Create the log file. If a log file is already open, close it.
      *
      * @return True if the log file could be opened.
      */
-    bool createLogFile() noexcept;
+    bool create_log_file() noexcept;
 
-    static std::weak_ptr<Logger> s_wpInstance;
-    static std::mutex s_consoleMutex;
+    static std::weak_ptr<Logger> s_weak_instance;
+    static std::mutex s_console_mutex;
 
-    fly::ConcurrentQueue<Log> m_logQueue;
+    fly::ConcurrentQueue<Log> m_log_queue;
 
-    std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
-    std::shared_ptr<Task> m_spTask;
+    std::shared_ptr<SequencedTaskRunner> m_task_runner;
+    std::shared_ptr<Task> m_task;
 
-    std::shared_ptr<LoggerConfig> m_spConfig;
+    std::shared_ptr<LoggerConfig> m_config;
 
-    const std::filesystem::path m_logDirectory;
-    std::filesystem::path m_logFile;
-    std::ofstream m_logStream;
+    const std::filesystem::path m_log_directory;
+    std::filesystem::path m_log_file;
+    std::ofstream m_log_stream;
 
     std::uintmax_t m_index;
 
-    const std::chrono::high_resolution_clock::time_point m_startTime;
+    const std::chrono::high_resolution_clock::time_point m_start_time;
 };
 
 /**
@@ -237,7 +233,7 @@ private:
 class LoggerTask : public Task
 {
 public:
-    explicit LoggerTask(std::weak_ptr<Logger>) noexcept;
+    explicit LoggerTask(std::weak_ptr<Logger> weak_logger) noexcept;
 
 protected:
     /**
@@ -247,7 +243,7 @@ protected:
     void Run() noexcept override;
 
 private:
-    std::weak_ptr<Logger> m_wpLogger;
+    std::weak_ptr<Logger> m_weak_logger;
 };
 
 } // namespace fly
