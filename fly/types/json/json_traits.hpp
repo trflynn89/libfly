@@ -112,30 +112,30 @@ struct JsonTraits
     /**
      * Helper SFINAE struct to determine whether a type is a JSON object.
      */
-    struct __object__
+    struct ObjectType
     {
         template <typename>
-        struct is_object : std::false_type
+        struct IsObject : std::false_type
         {
         };
 
         template <typename... Args>
-        struct is_object<std::map<Args...>> : std::true_type
+        struct IsObject<std::map<Args...>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_object<std::multimap<Args...>> : std::true_type
+        struct IsObject<std::multimap<Args...>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_object<std::unordered_map<Args...>> : std::true_type
+        struct IsObject<std::unordered_map<Args...>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_object<std::unordered_multimap<Args...>> : std::true_type
+        struct IsObject<std::unordered_multimap<Args...>> : std::true_type
         {
         };
     };
@@ -144,7 +144,7 @@ struct JsonTraits
      * Define a trait for testing if type T is a JSON object.
      */
     template <typename T>
-    using is_object = __object__::is_object<T>;
+    using is_object = ObjectType::IsObject<T>;
 
     template <typename T>
     inline static constexpr bool is_object_v = is_object<T>::value;
@@ -152,55 +152,55 @@ struct JsonTraits
     /**
      * Helper SFINAE struct to determine whether a type is a JSON array.
      */
-    struct __array__
+    struct ArrayType
     {
         template <typename>
-        struct is_array : std::false_type
+        struct IsArray : std::false_type
         {
         };
 
         template <typename T, std::size_t N>
-        struct is_array<std::array<T, N>> : std::true_type
+        struct IsArray<std::array<T, N>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_array<std::deque<Args...>> : std::true_type
+        struct IsArray<std::deque<Args...>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_array<std::forward_list<Args...>> : std::true_type
+        struct IsArray<std::forward_list<Args...>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_array<std::list<Args...>> : std::true_type
+        struct IsArray<std::list<Args...>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_array<std::multiset<Args...>> : std::true_type
+        struct IsArray<std::multiset<Args...>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_array<std::set<Args...>> : std::true_type
+        struct IsArray<std::set<Args...>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_array<std::unordered_multiset<Args...>> : std::true_type
+        struct IsArray<std::unordered_multiset<Args...>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_array<std::unordered_set<Args...>> : std::true_type
+        struct IsArray<std::unordered_set<Args...>> : std::true_type
         {
         };
 
         template <typename... Args>
-        struct is_array<std::vector<Args...>> : std::true_type
+        struct IsArray<std::vector<Args...>> : std::true_type
         {
         };
     };
@@ -209,7 +209,7 @@ struct JsonTraits
      * Define a trait for testing if type T is a JSON array.
      */
     template <typename T>
-    using is_array = __array__::is_array<T>;
+    using is_array = ArrayType::IsArray<T>;
 
     template <typename T>
     inline static constexpr bool is_array_v = is_array<T>::value;

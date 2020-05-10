@@ -152,7 +152,7 @@ void JsonParser::onStartBraceOrBracket(Token token, int c) noexcept(false)
         case State::ParsingArray:
             m_states.push(State::ParsingValue);
 
-            m_pValue = &((*m_pValue)[m_pValue->Size()]);
+            m_pValue = &((*m_pValue)[m_pValue->size()]);
             m_pParents.push(m_pValue);
 
             break;
@@ -258,7 +258,7 @@ void JsonParser::onQuotation(int c) noexcept(false)
         case State::ParsingArray:
             m_states.push(State::ParsingValue);
 
-            m_pValue = &((*m_pValue)[m_pValue->Size()]);
+            m_pValue = &((*m_pValue)[m_pValue->size()]);
             m_pParents.push(m_pValue);
 
             break;
@@ -447,7 +447,7 @@ void JsonParser::onCharacter(Token token, int c, std::istream &stream) noexcept(
         case State::ParsingArray:
             m_states.push(State::ParsingValue);
 
-            m_pValue = &((*m_pValue)[m_pValue->Size()]);
+            m_pValue = &((*m_pValue)[m_pValue->size()]);
             m_pParents.push(m_pValue);
 
             pushValue(c);
