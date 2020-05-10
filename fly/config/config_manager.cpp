@@ -123,7 +123,7 @@ void ConfigManager::updateConfig() noexcept
         m_values = nullptr;
     }
 
-    if (m_values.IsObject() || m_values.IsNull())
+    if (m_values.is_object() || m_values.is_null())
     {
         for (auto it = m_configs.begin(); it != m_configs.end();)
         {
