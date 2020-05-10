@@ -29,7 +29,7 @@ class TestLoggerConfig : public fly::LoggerConfig
 public:
     TestLoggerConfig() noexcept : fly::LoggerConfig()
     {
-        m_defaultMaxLogFileSize = 1 << 10;
+        m_default_max_log_file_size = 1 << 10;
     }
 };
 
@@ -42,17 +42,17 @@ public:
     LoggerTest() noexcept :
         m_path(fly::PathUtil::GenerateTempDirectory()),
 
-        m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
+        m_task_manager(std::make_shared<fly::TaskManager>(1)),
 
-        m_spTaskRunner(
-            m_spTaskManager
+        m_task_runner(
+            m_task_manager
                 ->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()),
 
-        m_spLoggerConfig(std::make_shared<TestLoggerConfig>()),
+        m_logger_config(std::make_shared<TestLoggerConfig>()),
 
-        m_spLogger(std::make_shared<fly::Logger>(
-            m_spTaskRunner,
-            m_spLoggerConfig,
+        m_logger(std::make_shared<fly::Logger>(
+            m_task_runner,
+            m_logger_config,
             m_path))
     {
     }
@@ -64,10 +64,10 @@ public:
     {
         ASSERT_TRUE(std::filesystem::create_directories(m_path));
 
-        ASSERT_TRUE(m_spTaskManager->Start());
+        ASSERT_TRUE(m_task_manager->Start());
 
-        ASSERT_TRUE(m_spLogger->Start());
-        fly::Logger::SetInstance(m_spLogger);
+        ASSERT_TRUE(m_logger->start());
+        fly::Logger::set_instance(m_logger);
     }
 
     /**
@@ -75,10 +75,10 @@ public:
      */
     void TearDown() noexcept override
     {
-        ASSERT_TRUE(m_spTaskManager->Stop());
+        ASSERT_TRUE(m_task_manager->Stop());
 
-        fly::Logger::SetInstance(nullptr);
-        m_spLogger.reset();
+        fly::Logger::set_instance(nullptr);
+        m_logger.reset();
 
         std::filesystem::remove_all(m_path);
     }
@@ -87,26 +87,26 @@ protected:
     /**
      * Verify log points after calling one of the logging macros.
      *
-     * @param Level The level (debug, info, etc.) of the logs.
-     * @param string Name of the function that generated the logs.
-     * @param vector List of expected formatted messages to verify.
+     * @param expected_level The level (debug, info, etc.) of the logs.
+     * @param expected_function Name of the function that generated the logs.
+     * @param expected_messages List of expected formatted messages to verify.
      */
-    void RunLogTest(
-        fly::Log::Level expectedLevel,
-        const std::string &expectedFunction,
-        std::vector<std::string> expectedMessages)
+    void run_log_test(
+        fly::Log::Level expected_level,
+        const std::string &expected_function,
+        std::vector<std::string> expected_messages)
     {
-        for (std::size_t i = 0; i < expectedMessages.size(); ++i)
+        for (std::size_t i = 0; i < expected_messages.size(); ++i)
         {
-            m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
+            m_task_runner->WaitForTaskTypeToComplete<fly::LoggerTask>();
         }
 
         const std::string contents =
-            fly::PathUtil::ReadFile(m_spLogger->GetLogFilePath());
+            fly::PathUtil::ReadFile(m_logger->get_log_file_path());
         ASSERT_FALSE(contents.empty());
 
         std::size_t count = 0;
-        double lastTime = 0.0;
+        double last_time = 0.0;
 
         for (const std::string &log : fly::String::Split(contents, '\n'))
         {
@@ -124,19 +124,19 @@ protected:
             const auto message = sections[6];
 
             EXPECT_EQ(index, count);
-            EXPECT_EQ(level, expectedLevel);
-            EXPECT_GE(time, lastTime);
+            EXPECT_EQ(level, expected_level);
+            EXPECT_GE(time, last_time);
             EXPECT_EQ(file, __FILE__);
-            EXPECT_EQ(function, expectedFunction);
+            EXPECT_EQ(function, expected_function);
             EXPECT_GT(line, 0_u32);
             EXPECT_TRUE(
-                fly::String::StartsWith(message, expectedMessages[count]));
+                fly::String::StartsWith(message, expected_messages[count]));
 
             ++count;
-            lastTime = time;
+            last_time = time;
         }
 
-        EXPECT_EQ(count, expectedMessages.size());
+        EXPECT_EQ(count, expected_messages.size());
     }
 
     /**
@@ -146,7 +146,7 @@ protected:
      *
      * @return uintmax_t Size of the log point.
      */
-    std::uintmax_t LogSize(const std::string &message) noexcept
+    std::uintmax_t log_size(const std::string &message) noexcept
     {
         fly::Log log;
 
@@ -162,17 +162,17 @@ protected:
 
     std::filesystem::path m_path;
 
-    std::shared_ptr<fly::TaskManager> m_spTaskManager;
-    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_spTaskRunner;
+    std::shared_ptr<fly::TaskManager> m_task_manager;
+    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_task_runner;
 
-    std::shared_ptr<fly::LoggerConfig> m_spLoggerConfig;
-    std::shared_ptr<fly::Logger> m_spLogger;
+    std::shared_ptr<fly::LoggerConfig> m_logger_config;
+    std::shared_ptr<fly::Logger> m_logger;
 };
 
 //==============================================================================
-TEST_F(LoggerTest, FilePathTest)
+TEST_F(LoggerTest, GoodFilePath)
 {
-    std::filesystem::path path = m_spLogger->GetLogFilePath();
+    std::filesystem::path path = m_logger->get_log_file_path();
     EXPECT_TRUE(fly::String::StartsWith(path.string(), m_path.string()));
 
     std::ifstream stream(path, std::ios::in);
@@ -180,20 +180,20 @@ TEST_F(LoggerTest, FilePathTest)
 }
 
 //==============================================================================
-TEST_F(LoggerTest, BadFilePathTest)
+TEST_F(LoggerTest, BadFilePath)
 {
-    fly::Logger::SetInstance(nullptr);
+    fly::Logger::set_instance(nullptr);
 
-    m_spLogger = std::make_shared<fly::Logger>(
-        m_spTaskRunner,
-        m_spLoggerConfig,
+    m_logger = std::make_shared<fly::Logger>(
+        m_task_runner,
+        m_logger_config,
         fly::PathUtil::GenerateTempDirectory());
 
-    EXPECT_FALSE(m_spLogger->Start());
+    EXPECT_FALSE(m_logger->start());
 }
 
 //==============================================================================
-TEST_F(LoggerTest, ConsoleTest)
+TEST_F(LoggerTest, ConsoleLog)
 {
     fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
 
@@ -214,7 +214,7 @@ TEST_F(LoggerTest, ConsoleTest)
 }
 
 //==============================================================================
-TEST_F(LoggerTest, DebugTest)
+TEST_F(LoggerTest, DebugLog)
 {
     LOGD("Debug Log");
     LOGD("Debug Log: %d", 123);
@@ -224,11 +224,11 @@ TEST_F(LoggerTest, DebugTest)
         "Debug Log: 123",
     };
 
-    RunLogTest(fly::Log::Level::Debug, __FUNCTION__, std::move(expectations));
+    run_log_test(fly::Log::Level::Debug, __FUNCTION__, std::move(expectations));
 }
 
 //==============================================================================
-TEST_F(LoggerTest, InfoTest)
+TEST_F(LoggerTest, InfoLog)
 {
     LOGI("Info Log");
     LOGI("Info Log: %d", 123);
@@ -238,11 +238,11 @@ TEST_F(LoggerTest, InfoTest)
         "Info Log: 123",
     };
 
-    RunLogTest(fly::Log::Level::Info, __FUNCTION__, std::move(expectations));
+    run_log_test(fly::Log::Level::Info, __FUNCTION__, std::move(expectations));
 }
 
 //==============================================================================
-TEST_F(LoggerTest, WarningTest)
+TEST_F(LoggerTest, WarningLog)
 {
     LOGW("Warning Log");
     LOGW("Warning Log: %d", 123);
@@ -252,11 +252,11 @@ TEST_F(LoggerTest, WarningTest)
         "Warning Log: 123",
     };
 
-    RunLogTest(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
+    run_log_test(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
 }
 
 //==============================================================================
-TEST_F(LoggerTest, SystemTest)
+TEST_F(LoggerTest, SystemLog)
 {
     LOGS("System Log");
     LOGS("System Log: %d", 123);
@@ -266,11 +266,11 @@ TEST_F(LoggerTest, SystemTest)
         "System Log: 123",
     };
 
-    RunLogTest(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
+    run_log_test(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
 }
 
 //==============================================================================
-TEST_F(LoggerTest, ErrorTest)
+TEST_F(LoggerTest, ErrorLog)
 {
     LOGE("Error Log");
     LOGE("Error Log: %d", 123);
@@ -280,32 +280,32 @@ TEST_F(LoggerTest, ErrorTest)
         "Error Log: 123",
     };
 
-    RunLogTest(fly::Log::Level::Error, __FUNCTION__, std::move(expectations));
+    run_log_test(fly::Log::Level::Error, __FUNCTION__, std::move(expectations));
 }
 
 //==============================================================================
-TEST_F(LoggerTest, RolloverTest)
+TEST_F(LoggerTest, Rollover)
 {
-    std::filesystem::path path = m_spLogger->GetLogFilePath();
+    std::filesystem::path path = m_logger->get_log_file_path();
 
-    std::uintmax_t maxLogFileSize = m_spLoggerConfig->MaxLogFileSize();
-    std::uint32_t maxMessageSize = m_spLoggerConfig->MaxMessageSize();
+    std::uintmax_t max_log_file_size = m_logger_config->max_log_file_size();
+    std::uint32_t max_message_size = m_logger_config->max_message_size();
 
-    std::string random = fly::String::GenerateRandomString(maxMessageSize);
+    std::string random = fly::String::GenerateRandomString(max_message_size);
 
-    std::uintmax_t expectedSize = LogSize(random);
+    std::uintmax_t expected_size = log_size(random);
     std::uintmax_t count = 0;
 
     // Create enough log points to fill the log file, plus some extra to start
     // filling a second log file
-    while (++count < ((maxLogFileSize / expectedSize) + 10))
+    while (++count < ((max_log_file_size / expected_size) + 10))
     {
         LOGD("%s", random);
-        m_spTaskRunner->WaitForTaskTypeToComplete<fly::LoggerTask>();
+        m_task_runner->WaitForTaskTypeToComplete<fly::LoggerTask>();
     }
 
-    EXPECT_NE(path, m_spLogger->GetLogFilePath());
+    EXPECT_NE(path, m_logger->get_log_file_path());
 
-    std::uintmax_t actualSize = std::filesystem::file_size(path);
-    EXPECT_GE(actualSize, maxMessageSize);
+    std::uintmax_t actual_size = std::filesystem::file_size(path);
+    EXPECT_GE(actual_size, max_message_size);
 }

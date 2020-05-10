@@ -46,15 +46,16 @@ struct Log
     /**
      * Move constructor.
      */
-    Log(Log &&) noexcept;
+    Log(Log &&log) noexcept;
 
     /**
      * Constructor. Initialize with a message.
      *
-     * @param LoggerConfig Reference to the logger config.
-     * @param string Message to store.
+     * @param config Reference to the logger config.
+     * @param message Message to store.
      */
-    Log(const std::shared_ptr<LoggerConfig> &, const std::string &) noexcept;
+    Log(const std::shared_ptr<LoggerConfig> &config,
+        const std::string &message) noexcept;
 
     /**
      * Move assignment operator.
@@ -68,9 +69,11 @@ struct Log
     std::uint32_t m_line;
     std::string m_message;
 
-    friend std::ostream &operator<<(std::ostream &, const Log &) noexcept;
+    friend std::ostream &
+    operator<<(std::ostream &stream, const Log &log) noexcept;
 
-    friend std::ostream &operator<<(std::ostream &, const Level &) noexcept;
+    friend std::ostream &
+    operator<<(std::ostream &stream, const Level &level) noexcept;
 };
 
 } // namespace fly
