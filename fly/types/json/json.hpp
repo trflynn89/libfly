@@ -761,7 +761,7 @@ Json::operator T() const noexcept(false)
         {
             try
             {
-                return String::Convert<T>(value);
+                return String::convert<T>(value);
             }
             catch (...)
             {

@@ -549,15 +549,15 @@ bool JsonParser::store_value() noexcept(false)
         {
             if (is_float)
             {
-                *m_value = String::Convert<JsonTraits::float_type>(value);
+                *m_value = String::convert<JsonTraits::float_type>(value);
             }
             else if (is_signed)
             {
-                *m_value = String::Convert<JsonTraits::signed_type>(value);
+                *m_value = String::convert<JsonTraits::signed_type>(value);
             }
             else
             {
-                *m_value = String::Convert<JsonTraits::unsigned_type>(value);
+                *m_value = String::convert<JsonTraits::unsigned_type>(value);
             }
         }
         catch (...)

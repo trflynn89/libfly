@@ -63,7 +63,7 @@ void Logger::add_log(
     }
     else
     {
-        const std::string console = String::Format(
+        const std::string console = String::format(
             "%d %s:%s:%d %s",
             level,
             file,
@@ -105,7 +105,7 @@ bool Logger::poll() noexcept
     if (m_log_queue.pop(log, m_config->queue_wait_time()) &&
         m_log_stream.good())
     {
-        String::Format(m_log_stream, "%u\t%s", m_index++, log) << std::flush;
+        String::format(m_log_stream, "%u\t%s", m_index++, log) << std::flush;
         std::error_code error;
 
         if (std::filesystem::file_size(m_log_file, error) >
@@ -149,14 +149,14 @@ void Logger::add_log_internal(
 //==============================================================================
 bool Logger::create_log_file() noexcept
 {
-    const std::string rand_str = String::GenerateRandomString(10);
+    const std::string rand_str = String::generate_random_string(10);
     std::string time_str = System::LocalTime();
 
-    String::ReplaceAll(time_str, ":", "-");
-    String::ReplaceAll(time_str, " ", "_");
+    String::replace_all(time_str, ":", "-");
+    String::replace_all(time_str, " ", "_");
 
     const std::string file_name =
-        String::Format("Log_%s_%s.log", time_str, rand_str);
+        String::format("Log_%s_%s.log", time_str, rand_str);
     m_log_file = m_log_directory / file_name;
 
     if (m_log_stream.is_open())

@@ -10,7 +10,7 @@
  * @version March 23, 2019
  */
 #define FLY_STR(type, str)                                                     \
-    (fly::BasicStringLiteral<type>::Literal(str, L##str, u##str, U##str))
+    (fly::BasicStringLiteral<type>::literal(str, L##str, u##str, U##str))
 
 #define FLY_SYS_STR(str) FLY_STR(std::filesystem::path::value_type, str)
 
@@ -24,7 +24,7 @@ struct BasicStringLiteral;
 template <>
 struct BasicStringLiteral<char>
 {
-    static constexpr const char *Literal(
+    static constexpr const char *literal(
         const char *str,
         const wchar_t *,
         const char16_t *,
@@ -38,7 +38,7 @@ struct BasicStringLiteral<char>
 template <>
 struct BasicStringLiteral<wchar_t>
 {
-    static constexpr const wchar_t *Literal(
+    static constexpr const wchar_t *literal(
         const char *,
         const wchar_t *str,
         const char16_t *,
@@ -52,7 +52,7 @@ struct BasicStringLiteral<wchar_t>
 template <>
 struct BasicStringLiteral<char16_t>
 {
-    static constexpr const char16_t *Literal(
+    static constexpr const char16_t *literal(
         const char *,
         const wchar_t *,
         const char16_t *str,
@@ -66,7 +66,7 @@ struct BasicStringLiteral<char16_t>
 template <>
 struct BasicStringLiteral<char32_t>
 {
-    static constexpr const char32_t *Literal(
+    static constexpr const char32_t *literal(
         const char *,
         const wchar_t *,
         const char16_t *,

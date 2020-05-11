@@ -108,19 +108,19 @@ protected:
         std::size_t count = 0;
         double last_time = 0.0;
 
-        for (const std::string &log : fly::String::Split(contents, '\n'))
+        for (const std::string &log : fly::String::split(contents, '\n'))
         {
             const std::vector<std::string> sections =
-                fly::String::Split(log, '\t');
+                fly::String::split(log, '\t');
             ASSERT_EQ(sections.size(), 7_zu);
 
-            const auto index = fly::String::Convert<std::size_t>(sections[0]);
+            const auto index = fly::String::convert<std::size_t>(sections[0]);
             const auto level = static_cast<fly::Log::Level>(
-                fly::String::Convert<std::uint8_t>(sections[1]));
-            const auto time = fly::String::Convert<double>(sections[2]);
+                fly::String::convert<std::uint8_t>(sections[1]));
+            const auto time = fly::String::convert<double>(sections[2]);
             const auto file = sections[3];
             const auto function = sections[4];
-            const auto line = fly::String::Convert<std::uint32_t>(sections[5]);
+            const auto line = fly::String::convert<std::uint32_t>(sections[5]);
             const auto message = sections[6];
 
             EXPECT_EQ(index, count);
@@ -130,7 +130,7 @@ protected:
             EXPECT_EQ(function, expected_function);
             EXPECT_GT(line, 0_u32);
             EXPECT_TRUE(
-                fly::String::StartsWith(message, expected_messages[count]));
+                fly::String::starts_with(message, expected_messages[count]));
 
             ++count;
             last_time = time;
@@ -157,7 +157,7 @@ protected:
         ::snprintf(log.m_file, sizeof(log.m_file), "%s", __FILE__);
         ::snprintf(log.m_function, sizeof(log.m_function), "%s", __FUNCTION__);
 
-        return fly::String::Format("%d\t%s", 1, log).length();
+        return fly::String::format("%d\t%s", 1, log).length();
     }
 
     std::filesystem::path m_path;
@@ -173,7 +173,7 @@ protected:
 TEST_F(LoggerTest, GoodFilePath)
 {
     std::filesystem::path path = m_logger->get_log_file_path();
-    EXPECT_TRUE(fly::String::StartsWith(path.string(), m_path.string()));
+    EXPECT_TRUE(fly::String::starts_with(path.string(), m_path.string()));
 
     std::ifstream stream(path, std::ios::in);
     EXPECT_TRUE(stream.good());
@@ -291,7 +291,7 @@ TEST_F(LoggerTest, Rollover)
     std::uintmax_t max_log_file_size = m_logger_config->max_log_file_size();
     std::uint32_t max_message_size = m_logger_config->max_message_size();
 
-    std::string random = fly::String::GenerateRandomString(max_message_size);
+    std::string random = fly::String::generate_random_string(max_message_size);
 
     std::uintmax_t expected_size = log_size(random);
     std::uintmax_t count = 0;

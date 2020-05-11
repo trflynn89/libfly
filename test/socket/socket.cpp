@@ -42,7 +42,7 @@ public:
         m_address(0),
         m_port(12390),
 
-        m_message(fly::String::GenerateRandomString((1 << 10) - 1))
+        m_message(fly::String::generate_random_string((1 << 10) - 1))
     {
     }
 

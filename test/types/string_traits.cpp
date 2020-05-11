@@ -35,7 +35,7 @@ template <
         fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u16string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
-constexpr bool isStringLike(const T &) noexcept
+constexpr bool is_string_like(const T &) noexcept
 {
     return true;
 }
@@ -48,7 +48,7 @@ template <
         fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u16string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
-constexpr bool isStringLike(const T &) noexcept
+constexpr bool is_string_like(const T &) noexcept
 {
     return false;
 }
@@ -58,7 +58,7 @@ template <
     typename StringType,
     fly::enable_if_all<typename fly::detail::BasicStringTraits<
         StringType>::has_stoi_family> = 0>
-constexpr int callStoi(const StringType &str) noexcept
+constexpr int call_stoi(const StringType &str) noexcept
 {
     return std::stoi(str);
 }
@@ -68,7 +68,7 @@ template <
     typename StringType,
     fly::enable_if_not_all<typename fly::detail::BasicStringTraits<
         StringType>::has_stoi_family> = 0>
-constexpr int callStoi(const StringType &) noexcept
+constexpr int call_stoi(const StringType &) noexcept
 {
     return -1;
 }
@@ -88,7 +88,7 @@ using StringTypes =
 TYPED_TEST_SUITE(BasicStringTraitsTest, StringTypes, );
 
 //==============================================================================
-TYPED_TEST(BasicStringTraitsTest, StoiFamilyTest)
+TYPED_TEST(BasicStringTraitsTest, StoiFamily)
 {
     using string_type = typename TestFixture::string_base_type;
     using traits = typename fly::detail::BasicStringTraits<string_type>;
@@ -100,7 +100,7 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamilyTest)
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAETest)
+TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAE)
 {
     using string_type = typename TestFixture::string_base_type;
     using char_type = typename string_type::value_type;
@@ -109,7 +109,7 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAETest)
     constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
 
     const string_type s = FLY_STR(char_type, "123");
-    const int i = callStoi(s);
+    const int i = call_stoi(s);
 
     if constexpr (is_string || is_wstring)
     {
@@ -122,7 +122,7 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAETest)
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTraitsTest, StringLikeTest)
+TYPED_TEST(BasicStringTraitsTest, StringLike)
 {
     using string_type = typename TestFixture::string_base_type;
     using traits = typename fly::detail::BasicStringTraits<string_type>;
@@ -262,21 +262,21 @@ TYPED_TEST(BasicStringTraitsTest, StringLikeTest)
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAETest)
+TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAE)
 {
     using string_type = typename TestFixture::string_base_type;
     using char_type = typename string_type::value_type;
     using char_pointer_type = typename std::add_pointer<char_type>::type;
 
-    EXPECT_TRUE(isStringLike(string_type()));
-    EXPECT_TRUE(isStringLike(char_pointer_type()));
+    EXPECT_TRUE(is_string_like(string_type()));
+    EXPECT_TRUE(is_string_like(char_pointer_type()));
 
-    EXPECT_FALSE(isStringLike(int()));
-    EXPECT_FALSE(isStringLike(char_type()));
+    EXPECT_FALSE(is_string_like(int()));
+    EXPECT_FALSE(is_string_like(char_type()));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTraitsTest, OstreamTraitsTest)
+TYPED_TEST(BasicStringTraitsTest, OstreamTraits)
 {
     using string_type = typename TestFixture::string_base_type;
     using traits = typename fly::detail::BasicStringTraits<string_type>;

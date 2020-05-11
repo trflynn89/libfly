@@ -51,121 +51,133 @@ public:
     /**
      * Split a string into a vector of strings.
      *
-     * @param StringType The string to split.
-     * @param char_type The delimiter to split the string on.
+     * @param input The string to split.
+     * @param delimiter The delimiter to split the string on.
      *
      * @return A vector containing the split strings.
      */
     static std::vector<StringType>
-    Split(const StringType &, char_type) noexcept;
+    split(const StringType &input, char_type delimiter) noexcept;
 
     /**
      * Split a string into a vector of strings, up to a maximum size. If the max
      * size is reached, the rest of the string is appended to the last element
      * in the vector.
      *
-     * @param StringType The string to split.
-     * @param char_type The delimiter to split the string on.
-     * @param uint32_t The maximum return vector size. Zero implies unlimited.
+     * @param input The string to split.
+     * @param delimiter The delimiter to split the string on.
+     * @param count The maximum return vector size. Zero implies unlimited.
      *
      * @return A vector containing the split strings.
      */
-    static std::vector<StringType>
-    Split(const StringType &, char_type, std::uint32_t) noexcept;
+    static std::vector<StringType> split(
+        const StringType &input,
+        char_type delimiter,
+        std::uint32_t count) noexcept;
 
     /**
      * Remove leading and trailing whitespace from a string.
      *
-     * @param StringType The string to trim.
+     * @param target The string to trim.
      */
-    static void Trim(StringType &) noexcept;
+    static void trim(StringType &target) noexcept;
 
     /**
      * Replace all instances of a substring in a string with a character.
      *
-     * @param StringType The string container which will be modified.
-     * @param StringType The string to search for and replace.
-     * @param char_type The replacement character.
+     * @param target The string container which will be modified.
+     * @param search The string to search for and replace.
+     * @param replace The replacement character.
      */
-    static void
-    ReplaceAll(StringType &, const StringType &, const char_type &) noexcept;
+    static void replace_all(
+        StringType &target,
+        const StringType &search,
+        const char_type &replace) noexcept;
 
     /**
      * Replace all instances of a substring in a string with another string.
      *
-     * @param StringType The string container which will be modified.
-     * @param StringType The string to search for and replace.
-     * @param StringType The replacement string.
+     * @param target The string container which will be modified.
+     * @param search The string to search for and replace.
+     * @param replace The replacement string.
      */
-    static void
-    ReplaceAll(StringType &, const StringType &, const StringType &) noexcept;
+    static void replace_all(
+        StringType &target,
+        const StringType &search,
+        const StringType &replace) noexcept;
 
     /**
      * Remove all instances of a substring in a string.
      *
-     * @param StringType The string container which will be modified.
-     * @param StringType The string to search for and remove.
+     * @param target The string container which will be modified.
+     * @param search The string to search for and remove.
      */
-    static void RemoveAll(StringType &, const StringType &) noexcept;
+    static void
+    remove_all(StringType &target, const StringType &search) noexcept;
 
     /**
      * Check if a string begins with a character.
      *
-     * @param StringType The string to check.
-     * @param char_type The beginning to search for.
+     * @param source The string to check.
+     * @param search The beginning to search for.
      *
      * @return True if the string begins with the search character.
      */
-    static bool StartsWith(const StringType &, const char_type &) noexcept;
+    static bool
+    starts_with(const StringType &source, const char_type &search) noexcept;
 
     /**
      * Check if a string begins with another string.
      *
-     * @param StringType The string to check.
-     * @param StringType The beginning to search for.
+     * @param source The string to check.
+     * @param search The beginning to search for.
      *
      * @return True if the string begins with the search string.
      */
-    static bool StartsWith(const StringType &, const StringType &) noexcept;
+    static bool
+    starts_with(const StringType &source, const StringType &search) noexcept;
 
     /**
      * Check if a string ends with a character.
      *
-     * @param StringType The string to check.
-     * @param char_type The ending to search for.
+     * @param source The string to check.
+     * @param search The ending to search for.
      *
      * @return True if the string ends with the search character.
      */
-    static bool EndsWith(const StringType &, const char_type &) noexcept;
+    static bool
+    ends_with(const StringType &source, const char_type &search) noexcept;
 
     /**
      * Check if a string ends with another string.
      *
-     * @param StringType The string to check.
-     * @param StringType The ending to search for.
+     * @param source The string to check.
+     * @param search The ending to search for.
      *
      * @return True if the string ends with the search string.
      */
-    static bool EndsWith(const StringType &, const StringType &) noexcept;
+    static bool
+    ends_with(const StringType &source, const StringType &search) noexcept;
 
     /**
      * Check if a string matches another string with wildcard expansion.
      *
-     * @param StringType The source string to match against.
-     * @param StringType The wildcard string to search with.
+     * @param source The source string to match against.
+     * @param search The wildcard string to search with.
      *
      * @return True if the wildcard string matches the source string.
      */
-    static bool WildcardMatch(const StringType &, const StringType &) noexcept;
+    static bool
+    wildcard_match(const StringType &source, const StringType &search) noexcept;
 
     /**
      * Generate a random string of the given size.
      *
-     * @param size_type The length of the string to generate.
+     * @param size The length of the string to generate.
      *
      * @return The generated string.
      */
-    static StringType GenerateRandomString(const size_type) noexcept;
+    static StringType generate_random_string(size_type size) noexcept;
 
     /**
      * Format a string with variadic template arguments, returning the formatted
@@ -185,13 +197,14 @@ public:
      *
      * @tparam Args Variadic template arguments.
      *
-     * @param char_type* The string to format.
-     * @param Args The variadic list of arguments to be formatted.
+     * @param fmt The string to format.
+     * @param args The variadic list of arguments to be formatted.
      *
      * @return A string that has been formatted with the given arguments.
      */
     template <typename... Args>
-    static streamed_type Format(const char_type *, const Args &...) noexcept;
+    static streamed_type
+    format(const char_type *fmt, const Args &... args) noexcept;
 
     /**
      * Format a string with variadic template arguments, inserting the formatted
@@ -212,34 +225,37 @@ public:
      * @tparam Args Variadic template arguments.
      *
      * @param ostream The stream to insert the formatted string into.
-     * @param char* The string to format.
-     * @param Args The variadic list of arguments to be formatted.
+     * @param fmt The string to format.
+     * @param args The variadic list of arguments to be formatted.
      *
      * @return The same stream object.
      */
     template <typename... Args>
-    static ostream_type &
-    Format(ostream_type &, const char_type *, const Args &...) noexcept;
+    static ostream_type &format(
+        ostream_type &ostream,
+        const char_type *fmt,
+        const Args &... args) noexcept;
 
     /**
      * Concatenate a list of objects with the given separator.
      *
      * @tparam Args Variadic template arguments.
      *
-     * @param char_type Character to use as a separator.
-     * @param Args The variadic list of arguments to be joined.
+     * @param separator Character to use as a separator.
+     * @param args The variadic list of arguments to be joined.
      *
      * @return The resulting join of the given arguments.
      */
     template <typename... Args>
-    static streamed_type Join(const char_type &, const Args &...) noexcept;
+    static streamed_type
+    join(const char_type &separator, const Args &... args) noexcept;
 
     /**
      * Convert a string to a plain-old-data type, e.g. int or bool.
      *
      * @tparam T The desired plain-old-data type.
      *
-     * @param StringType The string to convert.
+     * @param value The string to convert.
      *
      * @return The string coverted to the specified type.
      *
@@ -247,7 +263,7 @@ public:
      * @throws std::out_of_range Converted value is out of range of result type.
      */
     template <typename T>
-    static T Convert(const StringType &) noexcept(
+    static T convert(const StringType &value) noexcept(
         std::is_same_v<StringType, std::decay_t<T>>);
 
 private:
@@ -256,72 +272,76 @@ private:
      * into the given ostream.
      */
     template <typename T, typename... Args>
-    static void format(
-        ostream_type &,
-        const char_type *,
-        const T &,
-        const Args &...) noexcept;
+    static void format_internal(
+        ostream_type &ostream,
+        const char_type *fmt,
+        const T &value,
+        const Args &... args) noexcept;
 
     /**
      * Terminator for the variadic template formatter. Stream the rest of the
      * string into the given ostream.
      */
-    static void format(ostream_type &, const char_type *) noexcept;
+    static void
+    format_internal(ostream_type &ostream, const char_type *fmt) noexcept;
 
     /**
      * Recursively join one argument into the given ostream.
      */
     template <typename T, typename... Args>
-    static void join(
-        ostream_type &,
-        const char_type &,
-        const T &,
-        const Args &...) noexcept;
+    static void join_internal(
+        ostream_type &ostream,
+        const char_type &separator,
+        const T &value,
+        const Args &... args) noexcept;
 
     /**
      * Terminator for the variadic template joiner. Join the last argument
      * into the given ostream.
      */
     template <typename T>
-    static void join(ostream_type &, const char_type &, const T &) noexcept;
+    static void join_internal(
+        ostream_type &ostream,
+        const char_type &separator,
+        const T &value) noexcept;
 
     /**
      * Stream the given value into the given stream.
      */
     template <typename T>
-    static void stream(ostream_type &, const T &) noexcept;
+    static void stream(ostream_type &ostream, const T &value) noexcept;
 
     /**
      * A list of alpha-numeric characters in the range [0-9A-Za-z].
      */
-    static constexpr const char_type *s_alphaNum = FLY_STR(
+    static constexpr const char_type *s_alpha_num = FLY_STR(
         char_type,
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz");
 
-    static constexpr std::size_t s_alphaNumLength =
-        std::char_traits<char_type>::length(s_alphaNum);
+    static constexpr std::size_t s_alpha_num_length =
+        std::char_traits<char_type>::length(s_alpha_num);
 };
 
 //==============================================================================
 template <typename StringType>
-std::vector<StringType> BasicString<StringType>::Split(
+std::vector<StringType> BasicString<StringType>::split(
     const StringType &input,
     char_type delimiter) noexcept
 {
-    return Split(input, delimiter, 0);
+    return split(input, delimiter, 0);
 }
 
 //==============================================================================
 template <typename StringType>
-std::vector<StringType> BasicString<StringType>::Split(
+std::vector<StringType> BasicString<StringType>::split(
     const StringType &input,
     char_type delimiter,
-    std::uint32_t max) noexcept
+    std::uint32_t count) noexcept
 {
-    std::vector<StringType> elems;
-    std::uint32_t numItems = 0;
+    std::vector<StringType> elements;
+    std::uint32_t num_items = 0;
     StringType item;
 
     size_type start = 0;
@@ -330,14 +350,14 @@ std::vector<StringType> BasicString<StringType>::Split(
     auto push_item = [&](const StringType &str) {
         if (!str.empty())
         {
-            if ((max > 0) && (++numItems > max))
+            if ((count > 0) && (++num_items > count))
             {
-                elems.back() += delimiter;
-                elems.back() += str;
+                elements.back() += delimiter;
+                elements.back() += str;
             }
             else
             {
-                elems.push_back(str);
+                elements.push_back(str);
             }
         }
     };
@@ -354,183 +374,185 @@ std::vector<StringType> BasicString<StringType>::Split(
     item = input.substr(start, end);
     push_item(item);
 
-    return elems;
+    return elements;
 }
 
 //==============================================================================
 template <typename StringType>
-void BasicString<StringType>::Trim(StringType &str) noexcept
+void BasicString<StringType>::trim(StringType &target) noexcept
 {
     auto is_non_space = [](int ch) { return !std::isspace(ch); };
 
     // Remove leading whitespace
-    str.erase(str.begin(), std::find_if(str.begin(), str.end(), is_non_space));
+    target.erase(
+        target.begin(),
+        std::find_if(target.begin(), target.end(), is_non_space));
 
     // Remove trailing whitespace
-    str.erase(
-        std::find_if(str.rbegin(), str.rend(), is_non_space).base(),
-        str.end());
+    target.erase(
+        std::find_if(target.rbegin(), target.rend(), is_non_space).base(),
+        target.end());
 }
 
 //==============================================================================
 template <typename StringType>
-void BasicString<StringType>::ReplaceAll(
+void BasicString<StringType>::replace_all(
     StringType &target,
     const StringType &search,
     const char_type &replace) noexcept
 {
-    size_type pos = target.find(search);
+    size_type index = target.find(search);
 
-    while (!search.empty() && (pos != StringType::npos))
+    while (!search.empty() && (index != StringType::npos))
     {
-        target.replace(pos, search.length(), 1, replace);
-        pos = target.find(search);
+        target.replace(index, search.length(), 1, replace);
+        index = target.find(search);
     }
 }
 
 //==============================================================================
 template <typename StringType>
-void BasicString<StringType>::ReplaceAll(
+void BasicString<StringType>::replace_all(
     StringType &target,
     const StringType &search,
     const StringType &replace) noexcept
 {
-    size_type pos = target.find(search);
+    size_type index = target.find(search);
 
-    while (!search.empty() && (pos != StringType::npos))
+    while (!search.empty() && (index != StringType::npos))
     {
-        target.replace(pos, search.length(), replace);
-        pos = target.find(search);
+        target.replace(index, search.length(), replace);
+        index = target.find(search);
     }
 }
 
 //==============================================================================
 template <typename StringType>
-void BasicString<StringType>::RemoveAll(
+void BasicString<StringType>::remove_all(
     StringType &target,
     const StringType &search) noexcept
 {
-    ReplaceAll(target, search, StringType());
+    replace_all(target, search, StringType());
 }
 
 //==============================================================================
 template <typename StringType>
-bool BasicString<StringType>::StartsWith(
+bool BasicString<StringType>::starts_with(
     const StringType &source,
     const char_type &search) noexcept
 {
-    bool ret = false;
+    bool result = false;
 
     if (!source.empty())
     {
-        ret = (source[0] == search);
+        result = source[0] == search;
     }
 
-    return ret;
+    return result;
 }
 
 //==============================================================================
 template <typename StringType>
-bool BasicString<StringType>::StartsWith(
+bool BasicString<StringType>::starts_with(
     const StringType &source,
     const StringType &search) noexcept
 {
-    bool ret = false;
+    bool result = false;
 
-    const size_type sourceSz = source.length();
-    const size_type searchSz = search.length();
+    const size_type source_sz = source.length();
+    const size_type search_sz = search.length();
 
-    if (sourceSz >= searchSz)
+    if (source_sz >= search_sz)
     {
-        ret = (source.compare(0, searchSz, search) == 0);
+        result = source.compare(0, search_sz, search) == 0;
     }
 
-    return ret;
+    return result;
 }
 
 //==============================================================================
 template <typename StringType>
-bool BasicString<StringType>::EndsWith(
+bool BasicString<StringType>::ends_with(
     const StringType &source,
     const char_type &search) noexcept
 {
-    bool ret = false;
+    bool result = false;
 
-    const size_type sourceSz = source.length();
+    const size_type source_sz = source.length();
 
-    if (sourceSz > 0)
+    if (source_sz > 0)
     {
-        ret = (source[sourceSz - 1] == search);
+        result = source[source_sz - 1] == search;
     }
 
-    return ret;
+    return result;
 }
 
 //==============================================================================
 template <typename StringType>
-bool BasicString<StringType>::EndsWith(
+bool BasicString<StringType>::ends_with(
     const StringType &source,
     const StringType &search) noexcept
 {
-    bool ret = false;
+    bool result = false;
 
-    const size_type sourceSz = source.length();
-    const size_type searchSz = search.length();
+    const size_type source_sz = source.length();
+    const size_type search_sz = search.length();
 
-    if (sourceSz >= searchSz)
+    if (source_sz >= search_sz)
     {
-        ret = (source.compare(sourceSz - searchSz, searchSz, search) == 0);
+        result = source.compare(source_sz - search_sz, search_sz, search) == 0;
     }
 
-    return ret;
+    return result;
 }
 
 //==============================================================================
 template <typename StringType>
-bool BasicString<StringType>::WildcardMatch(
+bool BasicString<StringType>::wildcard_match(
     const StringType &source,
     const StringType &search) noexcept
 {
-    static constexpr char_type wildcard = '*';
-    bool ret = !search.empty();
+    static constexpr char_type s_wildcard = '*';
+    bool result = !search.empty();
 
-    const std::vector<StringType> segments = Split(search, wildcard);
-    size_type pos = 0;
+    const std::vector<StringType> segments = split(search, s_wildcard);
+    size_type index = 0;
 
     if (!segments.empty())
     {
-        if (ret && (search.front() != wildcard))
+        if (result && (search.front() != s_wildcard))
         {
-            ret = StartsWith(source, segments.front());
+            result = starts_with(source, segments.front());
         }
-        if (ret && (search.back() != wildcard))
+        if (result && (search.back() != s_wildcard))
         {
-            ret = EndsWith(source, segments.back());
+            result = ends_with(source, segments.back());
         }
 
-        for (auto it = segments.begin(); ret && (it != segments.end()); ++it)
+        for (auto it = segments.begin(); result && (it != segments.end()); ++it)
         {
-            pos = source.find(*it, pos);
+            index = source.find(*it, index);
 
-            if (pos == StringType::npos)
+            if (index == StringType::npos)
             {
-                ret = false;
+                result = false;
             }
         }
     }
 
-    return ret;
+    return result;
 }
 
 //==============================================================================
 template <typename StringType>
 StringType
-BasicString<StringType>::GenerateRandomString(const size_type len) noexcept
+BasicString<StringType>::generate_random_string(size_type size) noexcept
 {
     using short_distribution = std::uniform_int_distribution<short>;
 
     constexpr auto limit =
-        static_cast<short_distribution::result_type>(s_alphaNumLength - 1);
+        static_cast<short_distribution::result_type>(s_alpha_num_length - 1);
     static_assert(limit > 0);
 
     short_distribution distribution(0, limit);
@@ -539,42 +561,42 @@ BasicString<StringType>::GenerateRandomString(const size_type len) noexcept
     const auto seed = static_cast<std::mt19937::result_type>(now.count());
     std::mt19937 engine(seed);
 
-    StringType ret;
-    ret.reserve(len);
+    StringType result;
+    result.reserve(size);
 
-    for (size_type i = 0; i < len; ++i)
+    while (size-- != 0)
     {
-        ret += s_alphaNum[distribution(engine)];
+        result += s_alpha_num[distribution(engine)];
     }
 
-    return ret;
+    return result;
 }
 
 //==============================================================================
 template <typename StringType>
 template <typename... Args>
-auto BasicString<StringType>::Format(
+auto BasicString<StringType>::format(
     const char_type *fmt,
     const Args &... args) noexcept -> streamed_type
 {
     typename traits::ostringstream_type ostream;
     ostream.precision(6);
 
-    Format(ostream, fmt, args...);
+    format(ostream, fmt, args...);
     return ostream.str();
 }
 
 //==============================================================================
 template <typename StringType>
 template <typename... Args>
-auto BasicString<StringType>::Format(
+auto BasicString<StringType>::format(
     ostream_type &ostream,
     const char_type *fmt,
     const Args &... args) noexcept -> ostream_type &
 {
     if (fmt != nullptr)
     {
-        format(ostream, fmt, args...);
+        format_internal(ostream, fmt, args...);
     }
 
     return ostream;
@@ -583,7 +605,7 @@ auto BasicString<StringType>::Format(
 //==============================================================================
 template <typename StringType>
 template <typename T, typename... Args>
-void BasicString<StringType>::format(
+void BasicString<StringType>::format_internal(
     ostream_type &ostream,
     const char_type *fmt,
     const T &value,
@@ -653,7 +675,7 @@ void BasicString<StringType>::format(
             stream(ostream, value);
             ostream.flags(flags);
 
-            format(ostream, fmt + 2, args...);
+            format_internal(ostream, fmt + 2, args...);
             return;
         }
 
@@ -663,7 +685,7 @@ void BasicString<StringType>::format(
 
 //==============================================================================
 template <typename StringType>
-void BasicString<StringType>::format(
+void BasicString<StringType>::format_internal(
     ostream_type &ostream,
     const char_type *fmt) noexcept
 {
@@ -683,12 +705,12 @@ void BasicString<StringType>::format(
 //==============================================================================
 template <typename StringType>
 template <typename... Args>
-auto BasicString<StringType>::Join(
+auto BasicString<StringType>::join(
     const char_type &separator,
     const Args &... args) noexcept -> streamed_type
 {
     typename traits::ostringstream_type ostream;
-    join(ostream, separator, args...);
+    join_internal(ostream, separator, args...);
 
     return ostream.str();
 }
@@ -696,7 +718,7 @@ auto BasicString<StringType>::Join(
 //==============================================================================
 template <typename StringType>
 template <typename T, typename... Args>
-void BasicString<StringType>::join(
+void BasicString<StringType>::join_internal(
     ostream_type &ostream,
     const char_type &separator,
     const T &value,
@@ -705,13 +727,13 @@ void BasicString<StringType>::join(
     stream(ostream, value);
     stream(ostream, separator);
 
-    join(ostream, separator, args...);
+    join_internal(ostream, separator, args...);
 }
 
 //==============================================================================
 template <typename StringType>
 template <typename T>
-void BasicString<StringType>::join(
+void BasicString<StringType>::join_internal(
     ostream_type &ostream,
     const char_type &,
     const T &value) noexcept
@@ -730,7 +752,7 @@ void BasicString<StringType>::stream(
         std::is_same_v<char_type, std::decay_t<T>> ||
         traits::template is_string_like_v<T>)
     {
-        detail::BasicStringStreamer<StringType>::Stream(ostream, value);
+        detail::BasicStringStreamer<StringType>::stream(ostream, value);
     }
     else if constexpr (traits::OstreamTraits::template is_declared_v<T>)
     {
@@ -745,7 +767,7 @@ void BasicString<StringType>::stream(
 //==============================================================================
 template <typename StringType>
 template <typename T>
-T BasicString<StringType>::Convert(const StringType &value) noexcept(
+T BasicString<StringType>::convert(const StringType &value) noexcept(
     std::is_same_v<StringType, std::decay_t<T>>)
 {
     if constexpr (std::is_same_v<StringType, std::decay_t<T>>)
@@ -754,14 +776,14 @@ T BasicString<StringType>::Convert(const StringType &value) noexcept(
     }
     else if constexpr (traits::has_stoi_family_v)
     {
-        return detail::BasicStringConverter<StringType, T>::Convert(value);
+        return detail::BasicStringConverter<StringType, T>::convert(value);
     }
     else
     {
         typename traits::ostringstream_type ostream;
         stream(ostream, value);
 
-        return detail::BasicStringConverter<streamed_type, T>::Convert(
+        return detail::BasicStringConverter<streamed_type, T>::convert(
             ostream.str());
     }
 }

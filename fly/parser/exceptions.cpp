@@ -10,7 +10,7 @@ namespace fly {
 //==============================================================================
 ParserException::ParserException(int line, const std::string &message) noexcept
     :
-    m_message(String::Format(
+    m_message(String::format(
         "ParserException: Error parsing at [line %d]: %s",
         line,
         message))
@@ -23,7 +23,7 @@ ParserException::ParserException(
     int line,
     int column,
     const std::string &message) noexcept :
-    m_message(String::Format(
+    m_message(String::format(
         "ParserException: Error parsing at [line %d, column %d]: %s",
         line,
         column,
@@ -47,8 +47,8 @@ UnexpectedCharacterException::UnexpectedCharacterException(
         line,
         column,
         std::isprint(ch) ?
-            String::Format("Unexpected character '%c' (%x)", char(ch), ch) :
-            String::Format("Unexpected character '%x'", ch))
+            String::format("Unexpected character '%c' (%x)", char(ch), ch) :
+            String::format("Unexpected character '%x'", ch))
 {
 }
 
@@ -60,7 +60,7 @@ BadConversionException::BadConversionException(
     ParserException(
         line,
         column,
-        String::Format("Could not convert '%s' to a value", value))
+        String::format("Could not convert '%s' to a value", value))
 {
 }
 

@@ -17,7 +17,7 @@ class JsonParserTest : public ::testing::Test
 protected:
     void validate_fail(const std::string &test) noexcept
     {
-        validate_fail_raw(fly::String::Format("{ \"a\" : %s }", test));
+        validate_fail_raw(fly::String::format("{ \"a\" : %s }", test));
     }
 
     void validate_fail_raw(const std::string &test) noexcept
@@ -30,7 +30,7 @@ protected:
     validate_pass(const std::string &test, const fly::Json &expected) noexcept
     {
         validate_pass_raw(
-            fly::String::Format("{ \"a\" : %s }", test),
+            fly::String::format("{ \"a\" : %s }", test),
             "a",
             expected);
     }
@@ -81,11 +81,11 @@ TEST_F(JsonParserTest, JsonChecker)
         const auto file = it.path().filename();
         SCOPED_TRACE(file);
 
-        if (fly::String::StartsWith(file.string(), "pass"))
+        if (fly::String::starts_with(file.string(), "pass"))
         {
             EXPECT_NO_THROW(m_parser.parse_file(it.path()));
         }
-        else if (fly::String::StartsWith(file.string(), "fail"))
+        else if (fly::String::starts_with(file.string(), "fail"))
         {
             EXPECT_THROW(m_parser.parse_file(it.path()), fly::ParserException);
         }
@@ -142,15 +142,15 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
         const auto file = it.path().filename();
         SCOPED_TRACE(file);
 
-        if (fly::String::StartsWith(file.string(), 'y'))
+        if (fly::String::starts_with(file.string(), 'y'))
         {
             EXPECT_NO_THROW(m_parser.parse_file(it.path()));
         }
-        else if (fly::String::StartsWith(file.string(), 'n'))
+        else if (fly::String::starts_with(file.string(), 'n'))
         {
             EXPECT_THROW(m_parser.parse_file(it.path()), fly::ParserException);
         }
-        else if (fly::String::StartsWith(file.string(), 'i'))
+        else if (fly::String::starts_with(file.string(), 'i'))
         {
             if (std::find(i_pass.begin(), i_pass.end(), file) != i_pass.end())
             {

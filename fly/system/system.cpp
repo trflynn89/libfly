@@ -38,7 +38,7 @@ std::string System::GetErrorString() noexcept
 //==============================================================================
 std::string System::GetErrorString(int code) noexcept
 {
-    return fly::String::Format(
+    return fly::String::format(
         "(%d) %s",
         code,
         std::system_category().message(code));

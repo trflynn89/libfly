@@ -15,7 +15,7 @@ namespace fly {
 std::filesystem::path PathUtil::GenerateTempDirectory() noexcept
 {
     return std::filesystem::temp_directory_path() /
-        fly::String::GenerateRandomString(10);
+        fly::String::generate_random_string(10);
 }
 
 //==============================================================================
