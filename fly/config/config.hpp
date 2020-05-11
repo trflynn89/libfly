@@ -39,29 +39,29 @@ protected:
      *
      * @tparam T The basic return type of the value.
      *
-     * @param string The name of the value.
-     * @param T Default value to use if needed.
+     * @param name The name of the value.
+     * @param def Default value to use if needed.
      *
      * @return The converted value or the default value.
      */
     template <typename T>
-    T GetValue(const std::string &, T) const noexcept;
+    T get_value(const std::string &name, T def) const noexcept;
 
     /**
      * Update this configuration with a new set of parsed values.
      */
-    void Update(const Json &) noexcept;
+    void update(const Json &) noexcept;
 
 private:
-    mutable std::shared_timed_mutex m_valuesMutex;
+    mutable std::shared_timed_mutex m_values_mutex;
     Json m_values;
 };
 
 //==============================================================================
 template <typename T>
-T Config::GetValue(const std::string &name, T def) const noexcept
+T Config::get_value(const std::string &name, T def) const noexcept
 {
-    std::shared_lock<std::shared_timed_mutex> lock(m_valuesMutex);
+    std::shared_lock<std::shared_timed_mutex> lock(m_values_mutex);
 
     try
     {
