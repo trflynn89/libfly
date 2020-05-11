@@ -240,7 +240,7 @@ protected:
      * Call back into the logger to check for new log entries. The task re-arms
      * itself.
      */
-    void Run() noexcept override;
+    void run() noexcept override;
 
 private:
     std::weak_ptr<Logger> m_weak_logger;

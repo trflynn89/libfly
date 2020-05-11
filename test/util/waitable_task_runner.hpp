@@ -35,7 +35,7 @@ public:
      * @tparam TaskType The task subclass to wait on.
      */
     template <typename TaskType>
-    void WaitForTaskTypeToComplete() noexcept;
+    void wait_for_task_to_complete() noexcept;
 
     /**
      * Wait for a specific task type to complete execution.
@@ -44,10 +44,11 @@ public:
      *
      * @param duration Time to wait for a completion.
      *
-     * @return bool True if a completed task was found in the given duration.
+     * @return True if a completed task was found in the given duration.
      */
     template <typename TaskType, typename R, typename P>
-    bool WaitForTaskTypeToComplete(std::chrono::duration<R, P>) noexcept;
+    bool
+    wait_for_task_to_complete(std::chrono::duration<R, P> duration) noexcept;
 
 protected:
     /**
@@ -55,10 +56,10 @@ protected:
      *
      * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    virtual void TaskComplete(const std::shared_ptr<Task> &) noexcept = 0;
+    virtual void task_complete(const std::shared_ptr<Task> &task) noexcept = 0;
 
 private:
-    ConcurrentQueue<std::size_t> m_completedTasks;
+    ConcurrentQueue<std::size_t> m_completed_tasks;
 };
 
 /**
@@ -76,7 +77,8 @@ class WaitableParallelTaskRunner :
     friend class TaskManager;
 
 protected:
-    WaitableParallelTaskRunner(std::weak_ptr<TaskManager>) noexcept;
+    WaitableParallelTaskRunner(
+        std::weak_ptr<TaskManager> task_manager) noexcept;
 
     /**
      * When a task is complete, perform the same operations as this runner's
@@ -84,7 +86,7 @@ protected:
      *
      * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    void TaskComplete(const std::shared_ptr<Task> &) noexcept override;
+    void task_complete(const std::shared_ptr<Task> &task) noexcept override;
 };
 
 /**
@@ -102,7 +104,8 @@ class WaitableSequencedTaskRunner :
     friend class TaskManager;
 
 protected:
-    WaitableSequencedTaskRunner(std::weak_ptr<TaskManager>) noexcept;
+    WaitableSequencedTaskRunner(
+        std::weak_ptr<TaskManager> task_manager) noexcept;
 
     /**
      * When a task is complete, perform the same operations as this runner's
@@ -110,12 +113,12 @@ protected:
      *
      * @param Task The (possibly NULL) task that was executed or skipped.
      */
-    void TaskComplete(const std::shared_ptr<Task> &) noexcept override;
+    void task_complete(const std::shared_ptr<Task> &task) noexcept override;
 };
 
 //==============================================================================
 template <typename TaskType>
-void WaitableTaskRunner::WaitForTaskTypeToComplete() noexcept
+void WaitableTaskRunner::wait_for_task_to_complete() noexcept
 {
     static_assert(
         std::is_base_of<Task, TaskType>::value,
@@ -126,20 +129,20 @@ void WaitableTaskRunner::WaitForTaskTypeToComplete() noexcept
 
     while (expected_hash != completed_hash)
     {
-        m_completedTasks.Pop(completed_hash);
+        m_completed_tasks.Pop(completed_hash);
     }
 }
 
 //==============================================================================
 template <typename TaskType, typename R, typename P>
-bool WaitableTaskRunner::WaitForTaskTypeToComplete(
+bool WaitableTaskRunner::wait_for_task_to_complete(
     std::chrono::duration<R, P> duration) noexcept
 {
     static_assert(
         std::is_base_of<Task, TaskType>::value,
         "Given type is not a task");
 
-    auto deadline = std::chrono::high_resolution_clock::now() + duration;
+    const auto deadline = std::chrono::high_resolution_clock::now() + duration;
 
     static std::size_t expected_hash = typeid(TaskType).hash_code();
     std::size_t completed_hash = 0;
@@ -147,7 +150,7 @@ bool WaitableTaskRunner::WaitForTaskTypeToComplete(
     while (expected_hash != completed_hash)
     {
         auto before = std::chrono::high_resolution_clock::now();
-        m_completedTasks.Pop(completed_hash, duration);
+        m_completed_tasks.Pop(completed_hash, duration);
         auto after = std::chrono::high_resolution_clock::now();
 
         if (after > deadline)

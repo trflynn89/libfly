@@ -50,7 +50,7 @@ public:
 
         m_spTaskRunner(
             m_spTaskManager
-                ->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()),
+                ->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
         m_spMonitor(std::make_shared<fly::PathMonitorImpl>(
             m_spTaskRunner,
@@ -81,7 +81,7 @@ public:
         ASSERT_TRUE(std::filesystem::create_directories(m_path1));
         ASSERT_TRUE(std::filesystem::create_directories(m_path2));
 
-        ASSERT_TRUE(m_spTaskManager->Start());
+        ASSERT_TRUE(m_spTaskManager->start());
         ASSERT_TRUE(m_spMonitor->Start());
 
         ASSERT_TRUE(m_spMonitor->AddPath(m_path0, m_callback));
@@ -98,7 +98,7 @@ public:
      */
     void TearDown() noexcept override
     {
-        ASSERT_TRUE(m_spTaskManager->Stop());
+        ASSERT_TRUE(m_spTaskManager->stop());
 
         m_spMonitor->RemoveAllPaths();
         std::filesystem::remove_all(m_path0);
@@ -247,7 +247,7 @@ TEST_F(PathMonitorTest, MockFailedAddPathTest)
 //==============================================================================
 TEST_F(PathMonitorTest, NoChangeTest_PathLevel)
 {
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_numCreatedFiles[m_file0], 0);
     EXPECT_EQ(m_numDeletedFiles[m_file0], 0);
@@ -258,7 +258,7 @@ TEST_F(PathMonitorTest, NoChangeTest_PathLevel)
 //==============================================================================
 TEST_F(PathMonitorTest, NoChangeTest_FileLevel)
 {
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 0);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 0);
@@ -392,7 +392,7 @@ TEST_F(PathMonitorTest, ChangeTest_FileLevel)
 TEST_F(PathMonitorTest, MockFailedPollTest)
 {
     fly::MockSystem mock(fly::MockCall::Poll);
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 0);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 0);
@@ -400,7 +400,7 @@ TEST_F(PathMonitorTest, MockFailedPollTest)
     EXPECT_EQ(m_numOtherEvents[m_file1], 0);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, "abcdefghi"));
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 0);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 0);
@@ -412,7 +412,7 @@ TEST_F(PathMonitorTest, MockFailedPollTest)
 TEST_F(PathMonitorTest, MockFailedReadTest)
 {
     fly::MockSystem mock(fly::MockCall::Read);
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 0);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 0);
@@ -420,7 +420,7 @@ TEST_F(PathMonitorTest, MockFailedReadTest)
     EXPECT_EQ(m_numOtherEvents[m_file1], 0);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, "abcdefghi"));
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 0);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 0);
@@ -441,7 +441,7 @@ TEST_F(PathMonitorTest, OtherFileTest)
     auto path = std::filesystem::path(m_file1).concat(".diff");
     ASSERT_TRUE(fly::PathUtil::WriteFile(path.string(), "abcdefghi"));
 
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 0);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 0);
@@ -452,7 +452,7 @@ TEST_F(PathMonitorTest, OtherFileTest)
         path.string().substr(0, path.string().length() - 8));
     ASSERT_TRUE(fly::PathUtil::WriteFile(path, "abcdefghi"));
 
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::PathMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 0);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 0);

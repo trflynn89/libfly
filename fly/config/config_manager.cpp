@@ -97,7 +97,7 @@ bool ConfigManager::start() noexcept
 
                 if (config_manager && task)
                 {
-                    config_manager->m_task_runner->PostTask(task);
+                    config_manager->m_task_runner->post_task(task);
                 }
             };
             // clang-format on
@@ -157,7 +157,7 @@ ConfigUpdateTask::ConfigUpdateTask(
 }
 
 //==============================================================================
-void ConfigUpdateTask::Run() noexcept
+void ConfigUpdateTask::run() noexcept
 {
     std::shared_ptr<ConfigManager> config_manager =
         m_weak_config_manager.lock();

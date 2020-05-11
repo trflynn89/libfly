@@ -46,7 +46,7 @@ public:
 
         m_task_runner(
             m_task_manager
-                ->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()),
+                ->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
         m_logger_config(std::make_shared<TestLoggerConfig>()),
 
@@ -64,7 +64,7 @@ public:
     {
         ASSERT_TRUE(std::filesystem::create_directories(m_path));
 
-        ASSERT_TRUE(m_task_manager->Start());
+        ASSERT_TRUE(m_task_manager->start());
 
         ASSERT_TRUE(m_logger->start());
         fly::Logger::set_instance(m_logger);
@@ -75,7 +75,7 @@ public:
      */
     void TearDown() noexcept override
     {
-        ASSERT_TRUE(m_task_manager->Stop());
+        ASSERT_TRUE(m_task_manager->stop());
 
         fly::Logger::set_instance(nullptr);
         m_logger.reset();
@@ -98,7 +98,7 @@ protected:
     {
         for (std::size_t i = 0; i < expected_messages.size(); ++i)
         {
-            m_task_runner->WaitForTaskTypeToComplete<fly::LoggerTask>();
+            m_task_runner->wait_for_task_to_complete<fly::LoggerTask>();
         }
 
         const std::string contents =
@@ -301,7 +301,7 @@ TEST_F(LoggerTest, Rollover)
     while (++count < ((max_log_file_size / expected_size) + 10))
     {
         LOGD("%s", random);
-        m_task_runner->WaitForTaskTypeToComplete<fly::LoggerTask>();
+        m_task_runner->wait_for_task_to_complete<fly::LoggerTask>();
     }
 
     EXPECT_NE(path, m_logger->get_log_file_path());

@@ -31,7 +31,7 @@ bool PathMonitor::Start() noexcept
         std::shared_ptr<PathMonitor> spPathMonitor = shared_from_this();
 
         m_spTask = std::make_shared<PathMonitorTask>(spPathMonitor);
-        m_spTaskRunner->PostTask(m_spTask);
+        m_spTaskRunner->post_task(m_spTask);
 
         return true;
     }
@@ -231,7 +231,7 @@ PathMonitorTask::PathMonitorTask(
 }
 
 //==============================================================================
-void PathMonitorTask::Run() noexcept
+void PathMonitorTask::run() noexcept
 {
     std::shared_ptr<PathMonitor> spPathMonitor = m_wpPathMonitor.lock();
 
@@ -241,7 +241,7 @@ void PathMonitorTask::Run() noexcept
 
         if (spPathMonitor->IsValid())
         {
-            spPathMonitor->m_spTaskRunner->PostTask(spPathMonitor->m_spTask);
+            spPathMonitor->m_spTaskRunner->post_task(spPathMonitor->m_spTask);
         }
     }
 }

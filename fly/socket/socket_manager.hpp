@@ -171,7 +171,7 @@ protected:
      * Call back into the socket manager to check if any asynchronous sockets
      * are available for IO. The task re-arms itself.
      */
-    void Run() noexcept override;
+    void run() noexcept override;
 
 private:
     std::weak_ptr<SocketManager> m_wpSocketManager;

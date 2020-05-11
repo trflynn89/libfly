@@ -6,44 +6,44 @@
 namespace fly {
 
 //==============================================================================
-void WaitableTaskRunner::TaskComplete(
-    const std::shared_ptr<Task> &spTask) noexcept
+void WaitableTaskRunner::task_complete(
+    const std::shared_ptr<Task> &task) noexcept
 {
-    if (spTask)
+    if (task)
     {
-        const auto &task = *(spTask.get());
-        m_completedTasks.Push(typeid(task).hash_code());
+        const auto &task_ref = *(task.get());
+        m_completed_tasks.Push(typeid(task_ref).hash_code());
     }
 }
 
 //==============================================================================
 WaitableParallelTaskRunner::WaitableParallelTaskRunner(
-    std::weak_ptr<TaskManager> wpTaskManager) noexcept :
-    ParallelTaskRunner(wpTaskManager)
+    std::weak_ptr<TaskManager> task_manager) noexcept :
+    ParallelTaskRunner(task_manager)
 {
 }
 
 //==============================================================================
-void WaitableParallelTaskRunner::TaskComplete(
-    const std::shared_ptr<Task> &spTask) noexcept
+void WaitableParallelTaskRunner::task_complete(
+    const std::shared_ptr<Task> &task) noexcept
 {
-    ParallelTaskRunner::TaskComplete(spTask);
-    WaitableTaskRunner::TaskComplete(spTask);
+    ParallelTaskRunner::task_complete(task);
+    WaitableTaskRunner::task_complete(task);
 }
 
 //==============================================================================
 WaitableSequencedTaskRunner::WaitableSequencedTaskRunner(
-    std::weak_ptr<TaskManager> wpTaskManager) noexcept :
-    SequencedTaskRunner(wpTaskManager)
+    std::weak_ptr<TaskManager> task_manager) noexcept :
+    SequencedTaskRunner(task_manager)
 {
 }
 
 //==============================================================================
-void WaitableSequencedTaskRunner::TaskComplete(
-    const std::shared_ptr<Task> &spTask) noexcept
+void WaitableSequencedTaskRunner::task_complete(
+    const std::shared_ptr<Task> &task) noexcept
 {
-    SequencedTaskRunner::TaskComplete(spTask);
-    WaitableTaskRunner::TaskComplete(spTask);
+    SequencedTaskRunner::task_complete(task);
+    WaitableTaskRunner::task_complete(task);
 }
 
 } // namespace fly

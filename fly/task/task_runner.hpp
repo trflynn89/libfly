@@ -36,11 +36,11 @@ public:
      * the task object or the task runner itself. This will only cancel the task
      * if the task manager has not yet begun executing the task.
      *
-     * @param Task Weak reference to the task the be executed.
+     * @param weak_task The task to be executed.
      *
-     * @return bool True if the task was posted for execution.
+     * @return True if the task was posted for execution.
      */
-    virtual bool PostTask(std::weak_ptr<Task>) noexcept = 0;
+    virtual bool post_task(std::weak_ptr<Task> weak_task) noexcept = 0;
 
     /**
      * Schedule a task to be posted after a delay. The task is given to the
@@ -52,44 +52,44 @@ public:
      * the task object or the task runner itself. This will only cancel the task
      * if the task manager has not yet begun executing the task.
      *
-     * @param Task Weak reference to the task the be executed.
-     * @param milliseconds Delay before posting the task.
+     * @param weak_task The task to be executed.
+     * @param delay Delay before posting the task.
      *
-     * @return bool True if the task was posted for delayed execution.
+     * @return True if the task was posted for delayed execution.
      */
-    bool PostTaskWithDelay(
-        std::weak_ptr<Task>,
-        std::chrono::milliseconds) noexcept;
+    bool post_task_with_delay(
+        std::weak_ptr<Task> weak_task,
+        std::chrono::milliseconds delay) noexcept;
 
 protected:
     /**
      * Private constructor. Task runners may only be created by the task
      * manager.
      *
-     * @param TaskManager Weak reference to the task manager.
+     * @param weak_task_manager The task manager.
      */
-    TaskRunner(std::weak_ptr<TaskManager>) noexcept;
+    TaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept;
 
     /**
      * Completion notification triggered by the task manager that a task has
      * finished execution (or was skipped).
      *
-     * @param Task The (possibly null) task that was executed or skipped.
+     * @param task The (possibly null) task that was executed or skipped.
      */
-    virtual void TaskComplete(const std::shared_ptr<Task> &) noexcept = 0;
+    virtual void task_complete(const std::shared_ptr<Task> &task) noexcept = 0;
 
     /**
      * Forward a task to the task manager to be executed as soon as a worker
      * thread is available.
      *
-     * @param Task Weak reference to the task the be executed.
+     * @param task The task to be executed.
      *
-     * @return bool True if the task was posted for execution.
+     * @return True if the task was posted for execution.
      */
-    bool PostTaskToTaskManager(std::weak_ptr<Task>) noexcept;
+    bool post_task_to_task_manager(std::weak_ptr<Task> task) noexcept;
 
 private:
-    std::weak_ptr<TaskManager> m_wpTaskManager;
+    std::weak_ptr<TaskManager> m_weak_task_manager;
 };
 
 /**
@@ -104,7 +104,7 @@ class ParallelTaskRunner : public TaskRunner
     friend class TaskManager;
 
 public:
-    bool PostTask(std::weak_ptr<Task>) noexcept override;
+    bool post_task(std::weak_ptr<Task>) noexcept override;
 
 protected:
     explicit ParallelTaskRunner(std::weak_ptr<TaskManager>) noexcept;
@@ -112,9 +112,9 @@ protected:
     /**
      * This implementation does nothing.
      *
-     * @param Task The (possibly null) task that was executed or skipped.
+     * @param task The (possibly null) task that was executed or skipped.
      */
-    void TaskComplete(const std::shared_ptr<Task> &) noexcept override;
+    void task_complete(const std::shared_ptr<Task> &task) noexcept override;
 };
 
 /**
@@ -135,7 +135,7 @@ class SequencedTaskRunner : public TaskRunner
     friend class TaskManager;
 
 public:
-    bool PostTask(std::weak_ptr<Task>) noexcept override;
+    bool post_task(std::weak_ptr<Task>) noexcept override;
 
 protected:
     explicit SequencedTaskRunner(std::weak_ptr<TaskManager>) noexcept;
@@ -143,22 +143,22 @@ protected:
     /**
      * When a task is complete, post the next task in the pending queue.
      *
-     * @param Task The (possibly null) task that was executed or skipped.
+     * @param task The (possibly null) task that was executed or skipped.
      */
-    void TaskComplete(const std::shared_ptr<Task> &) noexcept override;
+    void task_complete(const std::shared_ptr<Task> &task) noexcept override;
 
 private:
     /**
      * If no task has been posted for execution, post the first task in the
      * pending queue.
      *
-     * @return bool True if the task was posted for execution or added to the
-     *              pending queue.
+     * @return True if the task was posted for execution or added to the
+     *         pending queue.
      */
-    bool maybePostTask() noexcept;
+    bool maybe_post_task() noexcept;
 
-    ConcurrentQueue<std::weak_ptr<Task>> m_pendingTasks;
-    std::atomic_bool m_aHasRunningTask;
+    ConcurrentQueue<std::weak_ptr<Task>> m_pending_tasks;
+    std::atomic_bool m_has_running_task;
 };
 
 } // namespace fly

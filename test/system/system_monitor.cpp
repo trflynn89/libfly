@@ -44,7 +44,7 @@ public:
 
         m_spTaskRunner(
             m_spTaskManager
-                ->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()),
+                ->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
         m_spMonitor(std::make_shared<fly::SystemMonitorImpl>(
             m_spTaskRunner,
@@ -59,9 +59,9 @@ public:
      */
     void SetUp() noexcept override
     {
-        ASSERT_TRUE(m_spTaskManager->Start());
+        ASSERT_TRUE(m_spTaskManager->start());
         ASSERT_TRUE(m_spMonitor->Start());
-        m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
+        m_spTaskRunner->wait_for_task_to_complete<fly::SystemMonitorTask>();
     }
 
     /**
@@ -69,7 +69,7 @@ public:
      */
     void TearDown() noexcept override
     {
-        ASSERT_TRUE(m_spTaskManager->Stop());
+        ASSERT_TRUE(m_spTaskManager->stop());
     }
 
     /**
@@ -99,7 +99,7 @@ TEST_F(SystemMonitorTest, CpuUsageTest)
     std::future<void> result =
         std::async(std::launch::async, &SystemMonitorTest::SpinThread, this);
 
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
     std::uint32_t countAfter = m_spMonitor->GetSystemCpuCount();
     double systemAfter = m_spMonitor->GetSystemCpuUsage();
@@ -136,7 +136,7 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
             std::make_shared<fly::SystemConfig>());
 
         ASSERT_TRUE(m_spMonitor->Start());
-        m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
+        m_spTaskRunner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
         fly::MockSystem mock1(fly::MockCall::Read);
         fly::MockSystem mock2(fly::MockCall::Times);
@@ -149,7 +149,7 @@ TEST_F(SystemMonitorTest, MockCpuUsageTest)
             &SystemMonitorTest::SpinThread,
             this);
 
-        m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
+        m_spTaskRunner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
         double systemAfter = m_spMonitor->GetSystemCpuUsage();
         double processAfter = m_spMonitor->GetProcessCpuUsage();
@@ -176,7 +176,7 @@ TEST_F(SystemMonitorTest, MemoryUsageTest)
         static_cast<std::string::size_type>((totalBefore - systemBefore) / 10);
 
     std::string consumed(size, '\0');
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
     std::uint64_t totalAfter = m_spMonitor->GetTotalSystemMemory();
     std::uint64_t systemAfter = m_spMonitor->GetSystemMemoryUsage();
@@ -201,7 +201,7 @@ TEST_F(SystemMonitorTest, MockMemoryUsageTest)
     std::uint64_t processBefore = m_spMonitor->GetProcessMemoryUsage();
 
     std::string consumed((totalBefore - systemBefore) / 10, '\0');
-    m_spTaskRunner->WaitForTaskTypeToComplete<fly::SystemMonitorTask>();
+    m_spTaskRunner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
     std::uint64_t totalAfter = m_spMonitor->GetTotalSystemMemory();
     std::uint64_t systemAfter = m_spMonitor->GetSystemMemoryUsage();

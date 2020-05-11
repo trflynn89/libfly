@@ -214,7 +214,7 @@ protected:
      * paths. If the path monitor implementation is still valid, the task
      * re-arms itself.
      */
-    void Run() noexcept override;
+    void run() noexcept override;
 
 private:
     std::weak_ptr<PathMonitor> m_wpPathMonitor;

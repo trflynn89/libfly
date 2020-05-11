@@ -44,7 +44,7 @@ public:
 
         m_task_runner(
             m_task_manager
-                ->CreateTaskRunner<fly::WaitableSequencedTaskRunner>()),
+                ->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
         m_config_manager(std::make_shared<fly::ConfigManager>(
             m_task_runner,
@@ -61,7 +61,7 @@ public:
     void SetUp() noexcept override
     {
         ASSERT_TRUE(std::filesystem::create_directories(m_path));
-        ASSERT_TRUE(m_task_manager->Start());
+        ASSERT_TRUE(m_task_manager->start());
         ASSERT_TRUE(m_config_manager->start());
 
         m_initial_size = m_config_manager->prune();
@@ -72,7 +72,7 @@ public:
      */
     void TearDown() noexcept override
     {
-        ASSERT_TRUE(m_task_manager->Stop());
+        ASSERT_TRUE(m_task_manager->stop());
         std::filesystem::remove_all(m_path);
     }
 
@@ -199,8 +199,8 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
         TestConfig::identifier);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
     {
         auto config = m_config_manager->create_config<TestConfig>();
@@ -211,7 +211,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
     }
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents + "\n"));
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(m_config_manager->prune(), m_initial_size);
 }
@@ -226,8 +226,8 @@ TEST_F(ConfigManagerTest, InitialFileFirst)
         TestConfig::identifier);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
     auto config = m_config_manager->create_config<TestConfig>();
 
@@ -247,8 +247,8 @@ TEST_F(ConfigManagerTest, InitialFileSecond)
         TestConfig::identifier);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(config->get_value<std::string>("name", ""), "John Doe");
     EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
@@ -266,8 +266,8 @@ TEST_F(ConfigManagerTest, FileChange)
         TestConfig::identifier);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents1));
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(config->get_value<std::string>("name", ""), "John Doe");
     EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
@@ -280,14 +280,14 @@ TEST_F(ConfigManagerTest, FileChange)
         TestConfig::identifier);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents2));
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
     // Multiple fly::PathMonitor::PathEvent::Changed events may be triggered
     // even though the above write happens as a single call. If needed, wait for
     // a second event.
     if (config->get_value<std::string>("name", "").empty())
     {
-        m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+        m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
     }
 
     EXPECT_EQ(config->get_value<std::string>("name", ""), "Jane Doe");
@@ -307,14 +307,14 @@ TEST_F(ConfigManagerTest, DeleteFile)
         TestConfig::identifier);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(config->get_value<std::string>("name", ""), "John Doe");
     EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
 
     std::filesystem::remove(m_file);
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(config->get_value<std::string>("name", ""), "");
     EXPECT_EQ(config->get_value<std::string>("address", ""), "");
@@ -331,8 +331,8 @@ TEST_F(ConfigManagerTest, BadUpdate)
         TestConfig::identifier);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(config->get_value<std::string>("name", ""), "");
     EXPECT_EQ(config->get_value<std::string>("address", ""), "");
@@ -354,8 +354,8 @@ TEST_F(ConfigManagerTest, BadObject)
     const std::string contents("[1, 2, 3]");
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents));
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
-    m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
     EXPECT_EQ(config->get_value<std::string>("name", ""), "");
     EXPECT_EQ(config->get_value<std::string>("address", ""), "");
