@@ -36,34 +36,34 @@ public:
     /**
      * Constructor.
      *
-     * @param int Number of worker threads to create.
+     * @param num_workers Number of worker threads to create.
      */
-    explicit TaskManager(int) noexcept;
+    explicit TaskManager(std::uint32_t num_workers) noexcept;
 
     /**
      * Create the worker threads and timer thread.
      *
-     * @return bool True if the threads were created in this invocation.
+     * @return True if the threads were created in this invocation.
      */
-    bool Start() noexcept;
+    bool start() noexcept;
 
     /**
      * Destroy the worker threads and timer thread, blocking until the threads
      * exit.
      *
-     * @return bool True if the threads were destroyed in this invocation.
+     * @return True if the threads were destroyed in this invocation.
      */
-    bool Stop() noexcept;
+    bool stop() noexcept;
 
     /**
      * Create a task runner, holding a weak reference to this task manager.
      *
      * @tparam TaskRunnerType The type of task runner to create.
      *
-     * @return SequencedTaskRunner The created task runner.
+     * @return The created task runner.
      */
     template <typename TaskRunnerType>
-    std::shared_ptr<TaskRunnerType> CreateTaskRunner() noexcept;
+    std::shared_ptr<TaskRunnerType> create_task_runner() noexcept;
 
 private:
     /**
@@ -72,61 +72,63 @@ private:
      */
     struct TaskHolder
     {
-        std::weak_ptr<Task> m_wpTask;
-        std::weak_ptr<TaskRunner> m_wpTaskRunner;
+        std::weak_ptr<Task> m_weak_task;
+        std::weak_ptr<TaskRunner> m_weak_task_runner;
         std::chrono::steady_clock::time_point m_schedule;
     };
 
     /**
      * Post a task to be executed as soon as a worker thread is available.
      *
-     * @param Task Weak reference to the task the be executed.
-     * @param TaskRunner Weak reference to the task runner posting the task.
+     * @param weak_task The task to be executed.
+     * @param weak_task_runner The task runner posting the task.
      */
-    void postTask(std::weak_ptr<Task>, std::weak_ptr<TaskRunner>) noexcept;
+    void post_task(
+        std::weak_ptr<Task> weak_task,
+        std::weak_ptr<TaskRunner> weak_task_runner) noexcept;
 
     /**
      * Schedule a task to be posted for execution after some delay.
      *
-     * @param Task Weak reference to the task the be executed.
-     * @param TaskRunner Weak reference to the task runner posting the task.
-     * @param milliseconds Delay before posting the task.
+     * @param weak_task The task to be executed.
+     * @param weak_task_runner The task runner posting the task.
+     * @param delay Delay before posting the task.
      */
-    void postTaskWithDelay(
-        std::weak_ptr<Task>,
-        std::weak_ptr<TaskRunner>,
-        std::chrono::milliseconds) noexcept;
+    void post_task_with_delay(
+        std::weak_ptr<Task> weak_task,
+        std::weak_ptr<TaskRunner> weak_task_runner,
+        std::chrono::milliseconds delay) noexcept;
 
     /**
      * Worker thread for executing tasks.
      */
-    void workerThread() noexcept;
+    void worker_thread() noexcept;
 
     /**
      * Timer thread for holding delayed tasks until their scheduled time.
      */
-    void timerThread() noexcept;
+    void timer_thread() noexcept;
 
     ConcurrentQueue<TaskHolder> m_tasks;
 
-    std::mutex m_delayedTasksMutex;
-    std::vector<TaskHolder> m_delayedTasks;
+    std::mutex m_delayed_tasks_mutex;
+    std::vector<TaskHolder> m_delayed_tasks;
 
-    std::atomic_bool m_aKeepRunning;
+    std::atomic_bool m_keep_running;
 
     std::vector<std::future<void>> m_futures;
 
-    int m_numWorkers;
+    std::uint32_t m_num_workers;
 };
 
 //==============================================================================
 template <typename TaskRunnerType>
-std::shared_ptr<TaskRunnerType> TaskManager::CreateTaskRunner() noexcept
+std::shared_ptr<TaskRunnerType> TaskManager::create_task_runner() noexcept
 {
     static_assert(std::is_base_of_v<TaskRunner, TaskRunnerType>);
 
-    const std::shared_ptr<TaskManager> spTaskManager = shared_from_this();
-    return std::shared_ptr<TaskRunnerType>(new TaskRunnerType(spTaskManager));
+    const std::shared_ptr<TaskManager> task_manager = shared_from_this();
+    return std::shared_ptr<TaskRunnerType>(new TaskRunnerType(task_manager));
 }
 
 } // namespace fly

@@ -5,7 +5,7 @@ namespace fly {
 class SomeClass
 {
 public:
-    SomeClass(int);
+    SomeClass(int value);
     int operator()() const;
 
 private:

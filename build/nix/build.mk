@@ -122,13 +122,6 @@ endif
 
 # Style enforcement
 style:
-	clang-tidy --fix --fix-errors \
-		$$(find $(SOURCE_ROOT)/fly/parser \
-		-not \( -path "*googletest*" -prune \) \
-		-name "*.h" -o -name "*.hh" -o -name "*.hpp" \
-		-o -name "*.c" -o -name "*.cc" -o -name "*.cpp") \
-		-- $(CXXFLAGS)
-
 	$(Q)clang-format -i $$(find $(SOURCE_ROOT) \
 		-not \( -path "*googletest*" -prune \) \
 		-name "*.h" -o -name "*.hh" -o -name "*.hpp" \

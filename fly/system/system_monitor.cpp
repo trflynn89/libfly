@@ -31,7 +31,7 @@ bool SystemMonitor::Start() noexcept
         std::shared_ptr<SystemMonitor> spSystemMonitor = shared_from_this();
 
         m_spTask = std::make_shared<SystemMonitorTask>(spSystemMonitor);
-        m_spTaskRunner->PostTask(m_spTask);
+        m_spTaskRunner->post_task(m_spTask);
 
         return true;
     }
@@ -101,7 +101,7 @@ SystemMonitorTask::SystemMonitorTask(
 }
 
 //==============================================================================
-void SystemMonitorTask::Run() noexcept
+void SystemMonitorTask::run() noexcept
 {
     std::shared_ptr<SystemMonitor> spSystemMonitor = m_wpSystemMonitor.lock();
 
@@ -111,7 +111,7 @@ void SystemMonitorTask::Run() noexcept
 
         if (spSystemMonitor->isValid())
         {
-            spSystemMonitor->m_spTaskRunner->PostTaskWithDelay(
+            spSystemMonitor->m_spTaskRunner->post_task_with_delay(
                 spSystemMonitor->m_spTask,
                 spSystemMonitor->m_spConfig->PollInterval());
         }

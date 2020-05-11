@@ -83,7 +83,7 @@ bool Logger::start() noexcept
         std::shared_ptr<Logger> logger = shared_from_this();
 
         m_task = std::make_shared<LoggerTask>(logger);
-        m_task_runner->PostTask(m_task);
+        m_task_runner->post_task(m_task);
 
         return true;
     }
@@ -178,13 +178,13 @@ LoggerTask::LoggerTask(std::weak_ptr<Logger> weak_logger) noexcept :
 }
 
 //==============================================================================
-void LoggerTask::Run() noexcept
+void LoggerTask::run() noexcept
 {
     std::shared_ptr<Logger> logger = m_weak_logger.lock();
 
     if (logger && logger->poll())
     {
-        logger->m_task_runner->PostTask(logger->m_task);
+        logger->m_task_runner->post_task(logger->m_task);
     }
 }
 

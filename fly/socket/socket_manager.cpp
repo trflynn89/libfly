@@ -35,7 +35,7 @@ void SocketManager::Start() noexcept
     std::shared_ptr<SocketManager> spSocketManager = shared_from_this();
 
     m_spTask = std::make_shared<SocketManagerTask>(spSocketManager);
-    m_spTaskRunner->PostTask(m_spTask);
+    m_spTaskRunner->post_task(m_spTask);
 }
 
 //==============================================================================
@@ -150,14 +150,14 @@ SocketManagerTask::SocketManagerTask(
 }
 
 //==============================================================================
-void SocketManagerTask::Run() noexcept
+void SocketManagerTask::run() noexcept
 {
     std::shared_ptr<SocketManager> spSocketManager = m_wpSocketManager.lock();
 
     if (spSocketManager)
     {
         spSocketManager->Poll(spSocketManager->m_spConfig->IoWaitTime());
-        spSocketManager->m_spTaskRunner->PostTask(spSocketManager->m_spTask);
+        spSocketManager->m_spTaskRunner->post_task(spSocketManager->m_spTask);
     }
 }
 

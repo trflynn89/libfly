@@ -15,34 +15,34 @@ namespace {
 } // namespace
 
 //==============================================================================
-TaskManager::TaskManager(int numWorkers) noexcept :
-    m_aKeepRunning(false),
-    m_numWorkers(numWorkers)
+TaskManager::TaskManager(std::uint32_t num_workers) noexcept :
+    m_keep_running(false),
+    m_num_workers(num_workers)
 {
 }
 
 //==============================================================================
-bool TaskManager::Start() noexcept
+bool TaskManager::start() noexcept
 {
     bool expected = false;
 
-    if (m_aKeepRunning.compare_exchange_strong(expected, true))
+    if (m_keep_running.compare_exchange_strong(expected, true))
     {
-        LOGI("Starting %d workers", m_numWorkers);
-        std::shared_ptr<TaskManager> spTaskManager = shared_from_this();
+        LOGI("Starting %d workers", m_num_workers);
+        std::shared_ptr<TaskManager> task_manager = shared_from_this();
 
-        for (int i = 0; i < m_numWorkers; ++i)
+        for (std::uint32_t i = 0; i < m_num_workers; ++i)
         {
             m_futures.push_back(std::async(
                 std::launch::async,
-                &TaskManager::workerThread,
-                spTaskManager));
+                &TaskManager::worker_thread,
+                task_manager));
         }
 
         m_futures.push_back(std::async(
             std::launch::async,
-            &TaskManager::timerThread,
-            spTaskManager));
+            &TaskManager::timer_thread,
+            task_manager));
 
         return true;
     }
@@ -51,13 +51,13 @@ bool TaskManager::Start() noexcept
 }
 
 //==============================================================================
-bool TaskManager::Stop() noexcept
+bool TaskManager::stop() noexcept
 {
     bool expected = true;
 
-    if (m_aKeepRunning.compare_exchange_strong(expected, false))
+    if (m_keep_running.compare_exchange_strong(expected, false))
     {
-        LOGI("Stopping %d workers", m_numWorkers);
+        LOGI("Stopping %d workers", m_num_workers);
 
         for (auto &future : m_futures)
         {
@@ -74,73 +74,76 @@ bool TaskManager::Stop() noexcept
 }
 
 //==============================================================================
-void TaskManager::postTask(
-    std::weak_ptr<Task> wpTask,
-    std::weak_ptr<TaskRunner> wpTaskRunner) noexcept
+void TaskManager::post_task(
+    std::weak_ptr<Task> weak_task,
+    std::weak_ptr<TaskRunner> weak_task_runner) noexcept
 {
-    TaskHolder task {wpTask, wpTaskRunner, std::chrono::steady_clock::now()};
+    const auto now = std::chrono::steady_clock::now();
+    TaskHolder task {weak_task, weak_task_runner, now};
+
     m_tasks.Push(std::move(task));
 }
 
 //==============================================================================
-void TaskManager::postTaskWithDelay(
-    std::weak_ptr<Task> wpTask,
-    std::weak_ptr<TaskRunner> wpTaskRunner,
+void TaskManager::post_task_with_delay(
+    std::weak_ptr<Task> weak_task,
+    std::weak_ptr<TaskRunner> weak_task_runner,
     std::chrono::milliseconds delay) noexcept
 {
-    auto schedule = std::chrono::steady_clock::now() + delay;
-    TaskHolder task {wpTask, wpTaskRunner, schedule};
+    const auto schedule = std::chrono::steady_clock::now() + delay;
+    TaskHolder task {weak_task, weak_task_runner, schedule};
 
-    std::unique_lock<std::mutex> lock(m_delayedTasksMutex);
-    m_delayedTasks.push_back(std::move(task));
+    std::unique_lock<std::mutex> lock(m_delayed_tasks_mutex);
+    m_delayed_tasks.push_back(std::move(task));
 }
 
 //==============================================================================
-void TaskManager::workerThread() noexcept
+void TaskManager::worker_thread() noexcept
 {
-    TaskHolder task;
+    TaskHolder task_holder;
 
-    while (m_aKeepRunning.load())
+    while (m_keep_running.load())
     {
-        if (m_tasks.Pop(task, s_delay) && m_aKeepRunning.load())
+        if (m_tasks.Pop(task_holder, s_delay) && m_keep_running.load())
         {
-            auto spTaskRunner = task.m_wpTaskRunner.lock();
-            auto spTask = task.m_wpTask.lock();
+            auto task_runner = task_holder.m_weak_task_runner.lock();
+            auto task = task_holder.m_weak_task.lock();
 
-            if (spTaskRunner)
+            if (task_runner)
             {
-                if (spTask)
+                if (task)
                 {
-                    spTask->Run();
+                    task->run();
                 }
 
-                spTaskRunner->TaskComplete(spTask);
+                task_runner->task_complete(task);
             }
         }
     }
 }
 
 //==============================================================================
-void TaskManager::timerThread() noexcept
+void TaskManager::timer_thread() noexcept
 {
-    while (m_aKeepRunning.load())
+    while (m_keep_running.load())
     {
         auto now = std::chrono::steady_clock::now();
         {
-            std::unique_lock<std::mutex> lock(m_delayedTasksMutex);
+            std::unique_lock<std::mutex> lock(m_delayed_tasks_mutex);
 
-            for (auto it = m_delayedTasks.begin(); it != m_delayedTasks.end();)
+            for (auto it = m_delayed_tasks.begin();
+                 it != m_delayed_tasks.end();)
             {
                 if (it->m_schedule <= now)
                 {
-                    auto spTaskRunner = it->m_wpTaskRunner.lock();
+                    auto task_runner = it->m_weak_task_runner.lock();
 
-                    if (spTaskRunner)
+                    if (task_runner)
                     {
-                        spTaskRunner->PostTask(it->m_wpTask);
+                        task_runner->post_task(it->m_weak_task);
                     }
 
-                    it = m_delayedTasks.erase(it);
+                    it = m_delayed_tasks.erase(it);
                 }
                 else
                 {

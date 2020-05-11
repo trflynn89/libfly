@@ -121,7 +121,7 @@ protected:
     /**
      * Call back into the config manager to re-parse the configuration file.
      */
-    void Run() noexcept override;
+    void run() noexcept override;
 
 private:
     std::weak_ptr<ConfigManager> m_weak_config_manager;

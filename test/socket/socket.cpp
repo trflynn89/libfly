@@ -31,11 +31,11 @@ public:
         m_spTaskManager(std::make_shared<fly::TaskManager>(1)),
 
         m_spServerSocketManager(std::make_shared<fly::SocketManagerImpl>(
-            m_spTaskManager->CreateTaskRunner<fly::SequencedTaskRunner>(),
+            m_spTaskManager->create_task_runner<fly::SequencedTaskRunner>(),
             std::make_shared<fly::SocketConfig>())),
 
         m_spClientSocketManager(std::make_shared<fly::SocketManagerImpl>(
-            m_spTaskManager->CreateTaskRunner<fly::SequencedTaskRunner>(),
+            m_spTaskManager->create_task_runner<fly::SequencedTaskRunner>(),
             std::make_shared<fly::SocketConfig>())),
 
         m_host("localhost"),
@@ -64,7 +64,7 @@ protected:
     {
         ASSERT_TRUE(fly::Socket::HostnameToAddress(m_host, m_address));
 
-        ASSERT_TRUE(m_spTaskManager->Start());
+        ASSERT_TRUE(m_spTaskManager->start());
         m_spServerSocketManager->Start();
         m_spClientSocketManager->Start();
     }
@@ -74,7 +74,7 @@ protected:
      */
     void TearDown() noexcept override
     {
-        ASSERT_TRUE(m_spTaskManager->Stop());
+        ASSERT_TRUE(m_spTaskManager->stop());
     }
 
     /**
