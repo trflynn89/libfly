@@ -58,7 +58,7 @@ public:
 
 protected:
     void
-    run_multithreaded_test(unsigned int writers, unsigned int readers) noexcept
+    run_multi_threaded_test(unsigned int writers, unsigned int readers) noexcept
     {
         ObjectQueue object_queue;
 
@@ -140,7 +140,7 @@ TEST_F(ConcurrencyTest, EmptyQueueUponCreation)
 }
 
 //==============================================================================
-TEST_F(ConcurrencyTest, popFromEmptyQueue)
+TEST_F(ConcurrencyTest, PopFromEmptyQueue)
 {
     ObjectQueue object_queue;
 
@@ -150,7 +150,7 @@ TEST_F(ConcurrencyTest, popFromEmptyQueue)
     // Make sure pop is initially invalid
     ASSERT_FALSE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 
-    // push an item onto the queue and immediately pop it
+    // Push an item onto the queue and immediately pop it
     object_queue.push(std::move(obj2));
     ASSERT_TRUE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 
@@ -181,10 +181,10 @@ TEST_F(ConcurrencyTest, SingleThreaded)
 //==============================================================================
 TEST_F(ConcurrencyTest, MultiThreaded)
 {
-    run_multithreaded_test(1, 1);
-    run_multithreaded_test(1, 100);
-    run_multithreaded_test(100, 1);
-    run_multithreaded_test(100, 100);
+    run_multi_threaded_test(1, 1);
+    run_multi_threaded_test(1, 100);
+    run_multi_threaded_test(100, 1);
+    run_multi_threaded_test(100, 100);
 }
 
 //==============================================================================
