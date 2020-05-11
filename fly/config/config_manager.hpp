@@ -49,7 +49,7 @@ public:
      * Constructor.
      *
      * @param task_runner Task runner for posting config-related tasks onto.
-     * @param ConfigFileType File format of the configuration file.
+     * @param file_type File format of the configuration file.
      * @param path Path to the configuration file.
      */
     ConfigManager(
