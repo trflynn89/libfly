@@ -81,7 +81,7 @@ void TaskManager::post_task(
     const auto now = std::chrono::steady_clock::now();
     TaskHolder task {weak_task, weak_task_runner, now};
 
-    m_tasks.Push(std::move(task));
+    m_tasks.push(std::move(task));
 }
 
 //==============================================================================
@@ -104,7 +104,7 @@ void TaskManager::worker_thread() noexcept
 
     while (m_keep_running.load())
     {
-        if (m_tasks.Pop(task_holder, s_delay) && m_keep_running.load())
+        if (m_tasks.pop(task_holder, s_delay) && m_keep_running.load())
         {
             auto task_runner = task_holder.m_weak_task_runner.lock();
             auto task = task_holder.m_weak_task.lock();

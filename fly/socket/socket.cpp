@@ -258,7 +258,7 @@ bool Socket::SendAsync(std::string &&message) noexcept
     if (IsTcp() && IsAsync())
     {
         AsyncRequest request(m_socketId, std::move(message));
-        m_pendingSends.Push(std::move(request));
+        m_pendingSends.push(std::move(request));
 
         return true;
     }
@@ -275,7 +275,7 @@ bool Socket::SendToAsync(
     if (IsUdp() && IsAsync())
     {
         AsyncRequest request(m_socketId, std::move(message), address, port);
-        m_pendingSends.Push(std::move(request));
+        m_pendingSends.push(std::move(request));
 
         return true;
     }
@@ -319,10 +319,10 @@ void Socket::ServiceSendRequests(
 {
     bool wouldBlock = false;
 
-    while (IsValid() && !m_pendingSends.IsEmpty() && !wouldBlock)
+    while (IsValid() && !m_pendingSends.empty() && !wouldBlock)
     {
         AsyncRequest request;
-        m_pendingSends.Pop(request);
+        m_pendingSends.pop(request);
 
         if (request.IsValid())
         {
@@ -347,7 +347,7 @@ void Socket::ServiceSendRequests(
             if (bytesSent == message.length())
             {
                 SLOGD(m_socketId, "Sent %zu bytes", bytesSent);
-                completedSends.Push(std::move(request));
+                completedSends.push(std::move(request));
             }
             else if (wouldBlock)
             {
@@ -359,7 +359,7 @@ void Socket::ServiceSendRequests(
                     message.length());
 
                 request.IncrementRequestOffset(bytesSent);
-                m_pendingSends.Push(std::move(request));
+                m_pendingSends.push(std::move(request));
             }
             else
             {
@@ -410,7 +410,7 @@ void Socket::ServiceRecvRequests(
                     m_receiveBuffer.length());
 
                 AsyncRequest request(m_socketId, std::move(m_receiveBuffer));
-                completedReceives.Push(std::move(request));
+                completedReceives.push(std::move(request));
                 m_receiveBuffer.clear();
             }
         }

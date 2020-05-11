@@ -16,20 +16,20 @@ template <typename T>
 class ConcurrentQueue : public detail::ConcurrentContainer<T, std::queue<T>>
 {
 protected:
-    void push(T &&) noexcept override;
-    void pop(T &) noexcept override;
+    void push_internal(T &&) noexcept override;
+    void pop_internal(T &) noexcept override;
 };
 
 //==============================================================================
 template <typename T>
-void ConcurrentQueue<T>::push(T &&item) noexcept
+void ConcurrentQueue<T>::push_internal(T &&item) noexcept
 {
     this->m_container.push(std::move(item));
 }
 
 //==============================================================================
 template <typename T>
-void ConcurrentQueue<T>::pop(T &item) noexcept
+void ConcurrentQueue<T>::pop_internal(T &item) noexcept
 {
     item = std::move(this->m_container.front());
     this->m_container.pop();

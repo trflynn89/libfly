@@ -183,7 +183,7 @@ bool SocketManager::WaitForCompletedReceive(
     AsyncRequest &request,
     std::chrono::duration<R, P> waitTime) noexcept
 {
-    return m_completedReceives.Pop(request, waitTime);
+    return m_completedReceives.pop(request, waitTime);
 }
 
 //==============================================================================
@@ -192,7 +192,7 @@ bool SocketManager::WaitForCompletedSend(
     AsyncRequest &request,
     std::chrono::duration<R, P> waitTime) noexcept
 {
-    return m_completedSends.Pop(request, waitTime);
+    return m_completedSends.pop(request, waitTime);
 }
 
 } // namespace fly

@@ -137,7 +137,7 @@ protected:
                 break;
         }
 
-        m_eventQueue.Push(std::move(event));
+        m_eventQueue.push(std::move(event));
     }
 
     std::shared_ptr<fly::TaskManager> m_spTaskManager;
@@ -277,7 +277,7 @@ TEST_F(PathMonitorTest, CreateTest_PathLevel)
     EXPECT_EQ(m_numOtherEvents[m_file0], 0);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file0, std::string()));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
 
     EXPECT_EQ(m_numCreatedFiles[m_file0], 1);
     EXPECT_EQ(m_numDeletedFiles[m_file0], 0);
@@ -296,7 +296,7 @@ TEST_F(PathMonitorTest, CreateTest_FileLevel)
     EXPECT_EQ(m_numOtherEvents[m_file1], 0);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, std::string()));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 1);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 0);
@@ -316,8 +316,8 @@ TEST_F(PathMonitorTest, DeleteTest_PathLevel)
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file0, std::string()));
     std::filesystem::remove(m_file0);
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
 
     EXPECT_EQ(m_numCreatedFiles[m_file0], 1);
     EXPECT_EQ(m_numDeletedFiles[m_file0], 1);
@@ -337,8 +337,8 @@ TEST_F(PathMonitorTest, DeleteTest_FileLevel)
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, std::string()));
     std::filesystem::remove(m_file1);
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 1);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 1);
@@ -357,8 +357,8 @@ TEST_F(PathMonitorTest, ChangeTest_PathLevel)
     EXPECT_EQ(m_numOtherEvents[m_file0], 0);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file0, "abcdefghi"));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
 
     EXPECT_EQ(m_numCreatedFiles[m_file0], 1);
     EXPECT_EQ(m_numDeletedFiles[m_file0], 0);
@@ -377,8 +377,8 @@ TEST_F(PathMonitorTest, ChangeTest_FileLevel)
     EXPECT_EQ(m_numOtherEvents[m_file1], 0);
 
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, "abcdefghi"));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 1);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 0);
@@ -496,18 +496,18 @@ TEST_F(PathMonitorTest, MultipleFileTest)
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file0, "abcdefghi"));
     std::filesystem::remove(m_file0);
 
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
 
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
 
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
 
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
-    ASSERT_TRUE(m_eventQueue.Pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(event, s_waitTime));
 
     EXPECT_EQ(m_numCreatedFiles[m_file1], 1);
     EXPECT_EQ(m_numDeletedFiles[m_file1], 0);

@@ -129,7 +129,7 @@ void WaitableTaskRunner::wait_for_task_to_complete() noexcept
 
     while (expected_hash != completed_hash)
     {
-        m_completed_tasks.Pop(completed_hash);
+        m_completed_tasks.pop(completed_hash);
     }
 }
 
@@ -150,7 +150,7 @@ bool WaitableTaskRunner::wait_for_task_to_complete(
     while (expected_hash != completed_hash)
     {
         auto before = std::chrono::high_resolution_clock::now();
-        m_completed_tasks.Pop(completed_hash, duration);
+        m_completed_tasks.pop(completed_hash, duration);
         auto after = std::chrono::high_resolution_clock::now();
 
         if (after > deadline)
