@@ -52,7 +52,7 @@
         fly::String::format(                                                   \
             _FLY_FORMAT_STRING(__VA_ARGS__) ": %s"                             \
             _FLY_FORMAT_ARGS(__VA_ARGS__),                                     \
-            fly::System::GetErrorString()))
+            fly::System::get_error_string()))
 
 //==============================================================================
 #define LOGE(...)                                                              \

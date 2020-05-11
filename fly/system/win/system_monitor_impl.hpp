@@ -25,8 +25,8 @@ public:
      * count.
      */
     SystemMonitorImpl(
-        const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SystemConfig> &) noexcept;
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        const std::shared_ptr<SystemConfig> &config) noexcept;
 
     /**
      * Destructor. Close the system monitor's CPU query.
@@ -34,22 +34,22 @@ public:
     ~SystemMonitorImpl() override;
 
 protected:
-    void UpdateSystemCpuCount() noexcept override;
-    void UpdateSystemCpuUsage() noexcept override;
-    void UpdateProcessCpuUsage() noexcept override;
+    void update_system_cpu_count() noexcept override;
+    void update_system_cpu_usage() noexcept override;
+    void update_process_cpu_usage() noexcept override;
 
-    void UpdateSystemMemoryUsage() noexcept override;
-    void UpdateProcessMemoryUsage() noexcept override;
+    void update_system_memory_usage() noexcept override;
+    void update_process_memory_usage() noexcept override;
 
 private:
     HANDLE m_process;
 
-    PDH_HQUERY m_cpuQuery;
-    PDH_HCOUNTER m_cpuCounter;
+    PDH_HQUERY m_cpu_query;
+    PDH_HCOUNTER m_cpu_counter;
 
-    ULONGLONG m_prevProcessSystemTime;
-    ULONGLONG m_prevProcessUserTime;
-    ULONGLONG m_prevTime;
+    ULONGLONG m_prev_process_system_time;
+    ULONGLONG m_prev_process_user_time;
+    ULONGLONG m_prev_time;
 };
 
 } // namespace fly

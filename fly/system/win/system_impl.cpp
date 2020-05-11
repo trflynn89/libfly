@@ -9,47 +9,47 @@
 namespace fly {
 
 //==============================================================================
-void SystemImpl::PrintBacktrace() noexcept
+void SystemImpl::print_backtrace() noexcept
 {
     void *trace[10];
-    const USHORT traceSize = ::CaptureStackBackTrace(0, 10, trace, nullptr);
+    const USHORT trace_size = ::CaptureStackBackTrace(0, 10, trace, nullptr);
 
-    for (USHORT i = 0; i < traceSize; ++i)
+    for (USHORT i = 0; i < trace_size; ++i)
     {
         fprintf(stderr, "[%3u] %p\n", i, trace[i]);
     }
 }
 
 //==============================================================================
-std::string SystemImpl::LocalTime(const std::string &fmt) noexcept
+std::string SystemImpl::local_time(const char *fmt) noexcept
 {
     auto sys = std::chrono::system_clock::now();
     time_t now = std::chrono::system_clock::to_time_t(sys);
 
-    struct tm timeVal;
-    std::string ret;
+    struct tm time_val;
+    std::string result;
 
-    if (::localtime_s(&timeVal, &now) == 0)
+    if (::localtime_s(&time_val, &now) == 0)
     {
-        char timeStr[32];
+        char time_str[32];
 
-        if (::strftime(timeStr, sizeof(timeStr), fmt.c_str(), &timeVal) != 0)
+        if (::strftime(time_str, sizeof(time_str), fmt, &time_val) != 0)
         {
-            ret = std::string(timeStr);
+            result = std::string(time_str);
         }
     }
 
-    return ret;
+    return result;
 }
 
 //==============================================================================
-int SystemImpl::GetErrorCode() noexcept
+int SystemImpl::get_error_code() noexcept
 {
     return ::GetLastError();
 }
 
 //==============================================================================
-std::vector<int> SystemImpl::GetSignals() noexcept
+std::vector<int> SystemImpl::get_signals() noexcept
 {
     return {SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV};
 }

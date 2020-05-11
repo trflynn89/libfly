@@ -127,7 +127,7 @@ bool is_class_or_pointer(const T &)
 } // namespace
 
 //==============================================================================
-TEST(TraitsTest, FooTest)
+TEST(TraitsTest, Foo)
 {
     const FooClass fc;
     const BarClass bc;
@@ -140,7 +140,7 @@ TEST(TraitsTest, FooTest)
 }
 
 //==============================================================================
-TEST(TraitsTest, StreamTest)
+TEST(TraitsTest, Stream)
 {
     std::stringstream stream;
 
@@ -171,7 +171,7 @@ TEST(TraitsTest, StreamTest)
 }
 
 //==============================================================================
-TEST(TraitsTest, EnableIfAllTest)
+TEST(TraitsTest, EnableIfAll)
 {
     const FooClass fc;
     const std::string str("a");
@@ -194,7 +194,7 @@ TEST(TraitsTest, EnableIfAllTest)
 }
 
 //==============================================================================
-TEST(TraitsTest, EnableIfAnyTest)
+TEST(TraitsTest, EnableIfAny)
 {
     const FooClass fc;
     const std::string str("a");

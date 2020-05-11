@@ -12,58 +12,56 @@ namespace fly {
 
 namespace {
 
-    const LPCSTR s_cpuPath = "\\Processor(_Total)\\% Processor Time";
+    const LPCSTR s_cpu_path = "\\Processor(_Total)\\% Processor Time";
 
 } // namespace
 
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SystemConfig> &spConfig) noexcept :
-    SystemMonitor(spTaskRunner, spConfig),
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<SystemConfig> &config) noexcept :
+    SystemMonitor(task_runner, config),
     m_process(::GetCurrentProcess()),
-    m_cpuQuery(nullptr),
-    m_cpuCounter(nullptr),
-    m_prevProcessSystemTime(0),
-    m_prevProcessUserTime(0),
-    m_prevTime(0)
+    m_cpu_query(nullptr),
+    m_cpu_counter(nullptr),
+    m_prev_process_system_time(0),
+    m_prev_process_user_time(0),
+    m_prev_time(0)
 {
-    PDH_STATUS status = ::PdhOpenQuery(nullptr, 0, &m_cpuQuery);
+    PDH_STATUS status = ::PdhOpenQuery(nullptr, 0, &m_cpu_query);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not open CPU query (%x)", status);
         return;
     }
 
-    status = ::PdhAddCounter(m_cpuQuery, s_cpuPath, 0, &m_cpuCounter);
+    status = ::PdhAddCounter(m_cpu_query, s_cpu_path, 0, &m_cpu_counter);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not add CPU counter (%x)", status);
         return;
     }
 
-    status = ::PdhCollectQueryData(m_cpuQuery);
+    status = ::PdhCollectQueryData(m_cpu_query);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not poll CPU counter (%x)", status);
         return;
     }
-
-    UpdateSystemCpuCount();
 }
 
 //==============================================================================
 SystemMonitorImpl::~SystemMonitorImpl()
 {
-    if (m_cpuQuery != nullptr)
+    if (m_cpu_query != nullptr)
     {
-        ::PdhCloseQuery(m_cpuQuery);
-        m_cpuQuery = nullptr;
+        ::PdhCloseQuery(m_cpu_query);
+        m_cpu_query = nullptr;
     }
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemCpuCount() noexcept
+void SystemMonitorImpl::update_system_cpu_count() noexcept
 {
     SYSTEM_INFO info;
     ::GetSystemInfo(&info);
@@ -74,16 +72,16 @@ void SystemMonitorImpl::UpdateSystemCpuCount() noexcept
     }
     else
     {
-        m_systemCpuCount.store(info.dwNumberOfProcessors);
+        m_system_cpu_count.store(info.dwNumberOfProcessors);
     }
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
+void SystemMonitorImpl::update_system_cpu_usage() noexcept
 {
     PDH_FMT_COUNTERVALUE value;
 
-    PDH_STATUS status = ::PdhCollectQueryData(m_cpuQuery);
+    PDH_STATUS status = ::PdhCollectQueryData(m_cpu_query);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not poll CPU counter (%x)", status);
@@ -91,7 +89,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
     }
 
     status = ::PdhGetFormattedCounterValue(
-        m_cpuCounter,
+        m_cpu_counter,
         PDH_FMT_DOUBLE,
         nullptr,
         &value);
@@ -101,11 +99,11 @@ void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
         return;
     }
 
-    m_systemCpuUsage.store(value.doubleValue);
+    m_system_cpu_usage.store(value.doubleValue);
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateProcessCpuUsage() noexcept
+void SystemMonitorImpl::update_process_cpu_usage() noexcept
 {
     ULARGE_INTEGER now, system, user;
     FILETIME fnow, fsystem, fuser;
@@ -118,16 +116,17 @@ void SystemMonitorImpl::UpdateProcessCpuUsage() noexcept
         ::memcpy(&system, &fsystem, sizeof(FILETIME));
         ::memcpy(&user, &fuser, sizeof(FILETIME));
 
-        ULONGLONG cpu = (system.QuadPart - m_prevProcessSystemTime) +
-            (user.QuadPart - m_prevProcessUserTime);
+        ULONGLONG cpu = (system.QuadPart - m_prev_process_system_time) +
+            (user.QuadPart - m_prev_process_user_time);
 
-        ULONGLONG time = now.QuadPart - m_prevTime;
+        ULONGLONG time = now.QuadPart - m_prev_time;
 
-        m_processCpuUsage.store(100.0 * cpu / time / m_systemCpuCount.load());
+        m_process_cpu_usage.store(
+            100.0 * cpu / time / m_system_cpu_count.load());
 
-        m_prevProcessSystemTime = system.QuadPart;
-        m_prevProcessUserTime = user.QuadPart;
-        m_prevTime = now.QuadPart;
+        m_prev_process_system_time = system.QuadPart;
+        m_prev_process_user_time = user.QuadPart;
+        m_prev_time = now.QuadPart;
     }
     else
     {
@@ -136,15 +135,15 @@ void SystemMonitorImpl::UpdateProcessCpuUsage() noexcept
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemMemoryUsage() noexcept
+void SystemMonitorImpl::update_system_memory_usage() noexcept
 {
     MEMORYSTATUSEX info;
     info.dwLength = sizeof(MEMORYSTATUSEX);
 
     if (::GlobalMemoryStatusEx(&info))
     {
-        m_totalSystemMemory.store(info.ullTotalPhys);
-        m_systemMemoryUsage.store(info.ullTotalPhys - info.ullAvailPhys);
+        m_total_system_memory.store(info.ullTotalPhys);
+        m_system_memory_usage.store(info.ullTotalPhys - info.ullAvailPhys);
     }
     else
     {
@@ -153,13 +152,13 @@ void SystemMonitorImpl::UpdateSystemMemoryUsage() noexcept
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateProcessMemoryUsage() noexcept
+void SystemMonitorImpl::update_process_memory_usage() noexcept
 {
     PROCESS_MEMORY_COUNTERS pmc;
 
     if (::GetProcessMemoryInfo(m_process, &pmc, sizeof(pmc)))
     {
-        m_processMemoryUsage.store(pmc.WorkingSetSize);
+        m_process_memory_usage.store(pmc.WorkingSetSize);
     }
     else
     {
