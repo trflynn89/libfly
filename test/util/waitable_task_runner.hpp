@@ -54,7 +54,7 @@ protected:
     /**
      * When a task is complete, track it if the task is still valid.
      *
-     * @param Task The (possibly NULL) task that was executed or skipped.
+     * @param task The (possibly NULL) task that was executed or skipped.
      */
     virtual void task_complete(const std::shared_ptr<Task> &task) noexcept = 0;
 
@@ -84,7 +84,7 @@ protected:
      * When a task is complete, perform the same operations as this runner's
      * parents.
      *
-     * @param Task The (possibly NULL) task that was executed or skipped.
+     * @param task The (possibly NULL) task that was executed or skipped.
      */
     void task_complete(const std::shared_ptr<Task> &task) noexcept override;
 };
@@ -111,7 +111,7 @@ protected:
      * When a task is complete, perform the same operations as this runner's
      * parents.
      *
-     * @param Task The (possibly NULL) task that was executed or skipped.
+     * @param task The (possibly NULL) task that was executed or skipped.
      */
     void task_complete(const std::shared_ptr<Task> &task) noexcept override;
 };

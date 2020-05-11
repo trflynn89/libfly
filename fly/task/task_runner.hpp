@@ -152,8 +152,8 @@ private:
      * If no task has been posted for execution, post the first task in the
      * pending queue.
      *
-     * @return True if the task was posted for execution or added to the
-     *         pending queue.
+     * @return True if the task was posted for execution or added to the pending
+     *         queue.
      */
     bool maybe_post_task() noexcept;
 

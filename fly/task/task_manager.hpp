@@ -56,7 +56,7 @@ public:
     bool stop() noexcept;
 
     /**
-     * Create a task runner, holding a This task manager.
+     * Create a task runner, holding a weak reference to this task manager.
      *
      * @tparam TaskRunnerType The type of task runner to create.
      *
@@ -127,8 +127,8 @@ std::shared_ptr<TaskRunnerType> TaskManager::create_task_runner() noexcept
 {
     static_assert(std::is_base_of_v<TaskRunner, TaskRunnerType>);
 
-    const std::shared_ptr<TaskManager> sp_task_manager = shared_from_this();
-    return std::shared_ptr<TaskRunnerType>(new TaskRunnerType(sp_task_manager));
+    const std::shared_ptr<TaskManager> task_manager = shared_from_this();
+    return std::shared_ptr<TaskRunnerType>(new TaskRunnerType(task_manager));
 }
 
 } // namespace fly
