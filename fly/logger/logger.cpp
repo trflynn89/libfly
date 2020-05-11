@@ -102,7 +102,7 @@ bool Logger::poll() noexcept
 {
     Log log;
 
-    if (m_log_queue.Pop(log, m_config->queue_wait_time()) &&
+    if (m_log_queue.pop(log, m_config->queue_wait_time()) &&
         m_log_stream.good())
     {
         String::Format(m_log_stream, "%u\t%s", m_index++, log) << std::flush;
@@ -142,7 +142,7 @@ void Logger::add_log_internal(
         snprintf(log.m_file, sizeof(log.m_file), "%s", file);
         snprintf(log.m_function, sizeof(log.m_function), "%s", function);
 
-        m_log_queue.Push(std::move(log));
+        m_log_queue.push(std::move(log));
     }
 }
 

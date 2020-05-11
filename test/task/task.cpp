@@ -48,7 +48,7 @@ public:
 protected:
     void run() noexcept override
     {
-        m_ordering->Push(std::move(m_marker));
+        m_ordering->push(std::move(m_marker));
     }
 
 private:
@@ -140,13 +140,13 @@ TEST_F(TaskTest, SequencedTaskRunner)
     task_runner->wait_for_task_to_complete<MarkerTask>();
     task_runner->wait_for_task_to_complete<MarkerTask>();
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 1);
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 2);
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 3);
 }
 
@@ -189,13 +189,13 @@ TEST_F(TaskTest, ImmediateAndDelayTask)
     task_runner->wait_for_task_to_complete<MarkerTask>();
     task_runner->wait_for_task_to_complete<MarkerTask>();
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 2);
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 3);
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 1);
 }
 
@@ -248,10 +248,10 @@ TEST_F(TaskTest, ImmediateAndDelayCancelTask)
     EXPECT_FALSE(task_runner->wait_for_task_to_complete<CountTask>(
         std::chrono::milliseconds(20)));
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 2);
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 3);
 }
 

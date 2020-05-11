@@ -13,199 +13,196 @@
 class ConcurrencyTest : public ::testing::Test
 {
 public:
-    typedef unsigned int Object;
-    typedef fly::ConcurrentQueue<Object> ObjectQueue;
+    using Object = unsigned int;
+    using ObjectQueue = fly::ConcurrentQueue<Object>;
 
-    unsigned int WriterThread(ObjectQueue &objectQueue) noexcept
+    unsigned int writer_thread(ObjectQueue &object_queue) noexcept
     {
-        unsigned int numWrites = 100;
+        unsigned int writes = 100;
 
-        for (unsigned int i = 0; i < numWrites; ++i)
+        for (unsigned int i = 0; i < writes; ++i)
         {
             Object object(i);
-            objectQueue.Push(std::move(object));
+            object_queue.push(std::move(object));
         }
 
-        return numWrites;
+        return writes;
     }
 
-    unsigned int ReaderThread(
-        ObjectQueue &objectQueue,
-        std::atomic_bool &finishedWrites) noexcept
+    unsigned int reader_thread(
+        ObjectQueue &object_queue,
+        std::atomic_bool &finished_writes) noexcept
     {
-        unsigned int numReads = 0;
+        unsigned int reads = 0;
 
-        while (!finishedWrites.load() || !objectQueue.IsEmpty())
+        while (!finished_writes.load() || !object_queue.empty())
         {
             Object object;
 
-            if (objectQueue.Pop(object, std::chrono::milliseconds(10)))
+            if (object_queue.pop(object, std::chrono::milliseconds(10)))
             {
-                ++numReads;
+                ++reads;
             }
         }
 
-        return numReads;
+        return reads;
     }
 
-    Object InfiniteWaitReaderThread(ObjectQueue &objectQueue) noexcept
+    Object infinite_wait_reader_thread(ObjectQueue &object_queue) noexcept
     {
         Object object;
-        objectQueue.Pop(object);
+        object_queue.pop(object);
 
         return object;
     }
 
 protected:
-    void RunMultiThreadedTest(
-        unsigned int numWriters,
-        unsigned int numReaders) noexcept
+    void
+    run_multithreaded_test(unsigned int writers, unsigned int readers) noexcept
     {
-        ObjectQueue objectQueue;
+        ObjectQueue object_queue;
 
-        std::vector<std::future<unsigned int>> writerFutures;
-        std::vector<std::future<unsigned int>> readerFutures;
+        std::vector<std::future<unsigned int>> writer_futures;
+        std::vector<std::future<unsigned int>> reader_futures;
 
-        std::atomic_bool finishedWrites(false);
+        std::atomic_bool finished_writes(false);
 
-        // Create numWriters writer threads
-        for (unsigned int i = 0; i < numWriters; ++i)
+        for (unsigned int i = 0; i < writers; ++i)
         {
             auto func = std::bind(
-                &ConcurrencyTest::WriterThread,
+                &ConcurrencyTest::writer_thread,
                 this,
-                std::ref(objectQueue));
-            writerFutures.push_back(std::async(std::launch::async, func));
+                std::ref(object_queue));
+            writer_futures.push_back(std::async(std::launch::async, func));
         }
 
-        // Create numReaders reader threads
-        for (unsigned int i = 0; i < numReaders; ++i)
+        for (unsigned int i = 0; i < readers; ++i)
         {
             auto func = std::bind(
-                &ConcurrencyTest::ReaderThread,
+                &ConcurrencyTest::reader_thread,
                 this,
-                std::ref(objectQueue),
-                std::ref(finishedWrites));
-            readerFutures.push_back(std::async(std::launch::async, func));
+                std::ref(object_queue),
+                std::ref(finished_writes));
+            reader_futures.push_back(std::async(std::launch::async, func));
         }
 
-        unsigned int numWrites = 0;
-        unsigned int numReads = 0;
+        unsigned int writes = 0;
+        unsigned int reads = 0;
 
-        for (auto &future : writerFutures)
+        for (auto &future : writer_futures)
         {
             ASSERT_TRUE(future.valid());
-            numWrites += future.get();
+            writes += future.get();
         }
 
-        finishedWrites.store(true);
+        finished_writes.store(true);
 
-        for (auto &future : readerFutures)
+        for (auto &future : reader_futures)
         {
             ASSERT_TRUE(future.valid());
-            numReads += future.get();
+            reads += future.get();
         }
 
-        ASSERT_EQ(numWrites, numReads);
+        ASSERT_EQ(writes, reads);
     }
 
-    void DoQueuePush(
-        ObjectQueue &objectQueue,
+    void do_queue_push(
+        ObjectQueue &object_queue,
         Object object,
-        ObjectQueue::size_type expectedSize) noexcept
+        ObjectQueue::size_type expected_size) noexcept
     {
-        objectQueue.Push(std::move(object));
+        object_queue.push(std::move(object));
 
-        ASSERT_EQ(objectQueue.Size(), expectedSize);
-        ASSERT_FALSE(objectQueue.IsEmpty());
+        ASSERT_EQ(object_queue.size(), expected_size);
+        ASSERT_FALSE(object_queue.empty());
     }
 
-    void DoQueuePop(
-        ObjectQueue &objectQueue,
-        const Object &expectedObject,
-        ObjectQueue::size_type expectedSize) noexcept
+    void do_queue_pop(
+        ObjectQueue &object_queue,
+        const Object &expected_object,
+        ObjectQueue::size_type expected_size) noexcept
     {
         Object object;
 
-        ASSERT_TRUE(objectQueue.Pop(object, std::chrono::milliseconds(0)));
-        ASSERT_EQ(objectQueue.Size(), expectedSize);
-        ASSERT_EQ(object, expectedObject);
+        ASSERT_TRUE(object_queue.pop(object, std::chrono::milliseconds(0)));
+        ASSERT_EQ(object_queue.size(), expected_size);
+        ASSERT_EQ(object, expected_object);
     }
 };
 
 //==============================================================================
-TEST_F(ConcurrencyTest, EmptyQueueUponCreationTest)
+TEST_F(ConcurrencyTest, EmptyQueueUponCreation)
 {
-    ObjectQueue objectQueue;
+    ObjectQueue object_queue;
 
-    ASSERT_TRUE(objectQueue.IsEmpty());
-    ASSERT_EQ(objectQueue.Size(), 0);
+    ASSERT_TRUE(object_queue.empty());
+    ASSERT_EQ(object_queue.size(), 0);
 }
 
 //==============================================================================
-TEST_F(ConcurrencyTest, PopFromEmptyQueueTest)
+TEST_F(ConcurrencyTest, popFromEmptyQueue)
 {
-    ObjectQueue objectQueue;
+    ObjectQueue object_queue;
 
     Object obj1;
     Object obj2(1_u32);
 
     // Make sure pop is initially invalid
-    ASSERT_FALSE(objectQueue.Pop(obj1, std::chrono::milliseconds(0)));
+    ASSERT_FALSE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 
-    // Push an item onto the queue and immediately pop it
-    objectQueue.Push(std::move(obj2));
-    ASSERT_TRUE(objectQueue.Pop(obj1, std::chrono::milliseconds(0)));
+    // push an item onto the queue and immediately pop it
+    object_queue.push(std::move(obj2));
+    ASSERT_TRUE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 
     // Make sure popping an item from the no-longer non-empty queue is invalid
-    ASSERT_FALSE(objectQueue.Pop(obj1, std::chrono::milliseconds(0)));
+    ASSERT_FALSE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 }
 
 //==============================================================================
-TEST_F(ConcurrencyTest, SingleThreadedTest)
+TEST_F(ConcurrencyTest, SingleThreaded)
 {
-    ObjectQueue objectQueue;
+    ObjectQueue object_queue;
     ObjectQueue::size_type size = 0;
 
     Object obj1(1_u32);
     Object obj2(2_u32);
     Object obj3(3_u32);
 
-    DoQueuePush(objectQueue, obj1, ++size);
-    DoQueuePush(objectQueue, obj1, ++size);
-    DoQueuePop(objectQueue, obj1, --size);
-    DoQueuePush(objectQueue, obj2, ++size);
-    DoQueuePush(objectQueue, obj3, ++size);
-    DoQueuePop(objectQueue, obj1, --size);
-    DoQueuePop(objectQueue, obj2, --size);
-    DoQueuePop(objectQueue, obj3, --size);
+    do_queue_push(object_queue, obj1, ++size);
+    do_queue_push(object_queue, obj1, ++size);
+    do_queue_pop(object_queue, obj1, --size);
+    do_queue_push(object_queue, obj2, ++size);
+    do_queue_push(object_queue, obj3, ++size);
+    do_queue_pop(object_queue, obj1, --size);
+    do_queue_pop(object_queue, obj2, --size);
+    do_queue_pop(object_queue, obj3, --size);
 }
 
 //==============================================================================
-TEST_F(ConcurrencyTest, MultiThreadedTest)
+TEST_F(ConcurrencyTest, MultiThreaded)
 {
-    RunMultiThreadedTest(1, 1);
-    RunMultiThreadedTest(1, 100);
-    RunMultiThreadedTest(100, 1);
-    RunMultiThreadedTest(100, 100);
+    run_multithreaded_test(1, 1);
+    run_multithreaded_test(1, 100);
+    run_multithreaded_test(100, 1);
+    run_multithreaded_test(100, 100);
 }
 
 //==============================================================================
-TEST_F(ConcurrencyTest, InfiniteWaitReaderTest)
+TEST_F(ConcurrencyTest, InfiniteWaitReader)
 {
-    ObjectQueue objectQueue;
+    ObjectQueue object_queue;
     Object obj(123_u32);
 
     auto func = std::bind(
-        &ConcurrencyTest::InfiniteWaitReaderThread,
+        &ConcurrencyTest::infinite_wait_reader_thread,
         this,
-        std::ref(objectQueue));
+        std::ref(object_queue));
     std::future<Object> future = std::async(std::launch::async, func);
 
     std::future_status status = future.wait_for(std::chrono::milliseconds(10));
     ASSERT_EQ(status, std::future_status::timeout);
 
-    objectQueue.Push(std::move(Object(obj)));
+    object_queue.push(std::move(Object(obj)));
 
     status = future.wait_for(std::chrono::milliseconds(10));
     ASSERT_EQ(status, std::future_status::ready);

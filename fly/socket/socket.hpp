@@ -65,7 +65,7 @@ public:
     /**
      * A socket is valid if it's handle has been properly set.
      *
-     * @return True if this is a valid socket, false otherwise.
+     * @return True if this is a valid socket.
      */
     bool IsValid() const noexcept;
 
@@ -107,17 +107,17 @@ public:
     int GetSocketId() const noexcept;
 
     /**
-     * @return True if this is a TCP socket, false otherwise.
+     * @return True if this is a TCP socket.
      */
     bool IsTcp() const noexcept;
 
     /**
-     * @return True if this is a UDP socket, false otherwise.
+     * @return True if this is a UDP socket.
      */
     bool IsUdp() const noexcept;
 
     /**
-     * @return True if this is an asynchronous socket, false otherwise.
+     * @return True if this is an asynchronous socket.
      */
     bool IsAsync() const noexcept;
 
@@ -167,7 +167,7 @@ public:
      * @param address_type The host-order IPv4 address to connect to.
      * @param port_type The port to connect to.
      *
-     * @param bool True if the connection was successful, false otherwise.
+     * @param bool True if the connection was successful.
      */
     virtual bool Connect(address_type, port_type) noexcept = 0;
 
@@ -177,7 +177,7 @@ public:
      * @param string The hostname or IPv4 address to connect to.
      * @param port_type The port to connect to.
      *
-     * @param bool True if the connection was successful, false otherwise.
+     * @param bool True if the connection was successful.
      */
     bool Connect(const std::string &, port_type) noexcept;
 

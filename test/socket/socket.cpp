@@ -344,7 +344,7 @@ TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
     ASSERT_TRUE(spServerSocket->Listen());
 
     auto callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.push(1); });
     m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
@@ -356,7 +356,7 @@ TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
     fly::ConnectedState state = spClientSocket->ConnectAsync(m_host, m_port);
     ASSERT_NE(state, fly::ConnectedState::Disconnected);
 
-    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(item, waitTime));
     ASSERT_FALSE(spClientSocket->IsConnected());
     ASSERT_FALSE(spClientSocket->IsValid());
 }
@@ -419,7 +419,7 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
     ASSERT_TRUE(spServerSocket->Listen());
 
     auto callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.push(1); });
     m_spClientSocketManager->SetClientCallbacks(callback, callback);
 
     int item = 0;
@@ -433,13 +433,13 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
 
     if (state == fly::ConnectedState::Connecting)
     {
-        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+        ASSERT_TRUE(m_eventQueue.pop(item, waitTime));
     }
 
     ASSERT_TRUE(spClientSocket->IsConnected());
     ASSERT_TRUE(spClientSocket->SendAsync(std::move(m_message)));
 
-    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(item, waitTime));
     ASSERT_FALSE(spClientSocket->IsValid());
 }
 
@@ -460,7 +460,7 @@ TEST_F(SocketTest, Send_Async_MockSendBlock)
     ASSERT_TRUE(spServerSocket->Listen());
 
     auto callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.push(1); });
     m_spClientSocketManager->SetClientCallbacks(callback, callback);
 
     int item = 0;
@@ -474,7 +474,7 @@ TEST_F(SocketTest, Send_Async_MockSendBlock)
 
     if (state == fly::ConnectedState::Connecting)
     {
-        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+        ASSERT_TRUE(m_eventQueue.pop(item, waitTime));
     }
 
     std::string message(m_message);
@@ -546,7 +546,7 @@ TEST_F(SocketTest, Send_Async_MockSendtoFail)
         fly::BindOption::AllowReuse));
 
     auto callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.push(1); });
     m_spClientSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
@@ -557,7 +557,7 @@ TEST_F(SocketTest, Send_Async_MockSendtoFail)
     ASSERT_TRUE(
         spClientSocket->SendToAsync(std::move(m_message), m_host, m_port));
 
-    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(item, waitTime));
     ASSERT_FALSE(spClientSocket->IsValid());
 }
 
@@ -656,10 +656,10 @@ TEST_F(SocketTest, Recv_Async_MockRecvFail)
 
     auto connectCallback([&](std::shared_ptr<fly::Socket> spSocket) noexcept {
         spRecvSocket = spSocket;
-        m_eventQueue.Push(1);
+        m_eventQueue.push(1);
     });
     auto disconnectCallback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.push(1); });
     m_spServerSocketManager->SetClientCallbacks(
         connectCallback,
         disconnectCallback);
@@ -670,11 +670,11 @@ TEST_F(SocketTest, Recv_Async_MockRecvFail)
     auto spClientSocket =
         CreateSocket(m_spClientSocketManager, fly::Protocol::TCP, false);
     ASSERT_TRUE(spClientSocket->Connect(m_host, m_port));
-    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(item, waitTime));
 
     ASSERT_EQ(spClientSocket->Send(m_message), m_message.size());
 
-    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(item, waitTime));
     ASSERT_FALSE(spRecvSocket->IsValid());
 }
 
@@ -714,7 +714,7 @@ TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
         fly::BindOption::AllowReuse));
 
     auto callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.Push(1); });
+        [&](std::shared_ptr<fly::Socket>) noexcept { m_eventQueue.push(1); });
     m_spServerSocketManager->SetClientCallbacks(nullptr, callback);
 
     int item = 0;
@@ -726,7 +726,7 @@ TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
         spClientSocket->SendTo(m_message, m_host, m_port),
         m_message.size());
 
-    ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+    ASSERT_TRUE(m_eventQueue.pop(item, waitTime));
     ASSERT_FALSE(spServerSocket->IsValid());
 }
 
@@ -756,7 +756,7 @@ public:
             m_port,
             fly::BindOption::AllowReuse));
         ASSERT_TRUE(spAcceptSocket->Listen());
-        m_eventQueue.Push(1);
+        m_eventQueue.push(1);
 
         if (doAsync)
         {
@@ -801,10 +801,10 @@ public:
 
         int item = 0;
         std::chrono::seconds waitTime(10);
-        ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+        ASSERT_TRUE(m_eventQueue.pop(item, waitTime));
 
         auto callback([&](std::shared_ptr<fly::Socket>) noexcept {
-            m_eventQueue.Push(1);
+            m_eventQueue.push(1);
         });
         m_spClientSocketManager->SetClientCallbacks(callback, nullptr);
 
@@ -815,7 +815,7 @@ public:
 
             if (state == fly::ConnectedState::Connecting)
             {
-                ASSERT_TRUE(m_eventQueue.Pop(item, waitTime));
+                ASSERT_TRUE(m_eventQueue.pop(item, waitTime));
                 ASSERT_TRUE(spSendSocket->IsConnected());
             }
 
@@ -961,7 +961,7 @@ public:
 
         ASSERT_TRUE(
             spRecvSocket->Bind("0.0.0.0", m_port, fly::BindOption::AllowReuse));
-        m_eventQueue.Push(1);
+        m_eventQueue.push(1);
 
         if (doAsync)
         {
@@ -1000,7 +1000,7 @@ public:
 
         int item = 0;
         std::chrono::seconds waitTime(10);
-        m_eventQueue.Pop(item, waitTime);
+        m_eventQueue.pop(item, waitTime);
 
         if (doAsync)
         {

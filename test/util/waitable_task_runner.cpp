@@ -12,7 +12,7 @@ void WaitableTaskRunner::task_complete(
     if (task)
     {
         const auto &task_ref = *(task.get());
-        m_completed_tasks.Push(typeid(task_ref).hash_code());
+        m_completed_tasks.push(typeid(task_ref).hash_code());
     }
 }
 

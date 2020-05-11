@@ -76,7 +76,7 @@ SequencedTaskRunner::SequencedTaskRunner(
 //==============================================================================
 bool SequencedTaskRunner::post_task(std::weak_ptr<Task> weak_task) noexcept
 {
-    m_pending_tasks.Push(std::move(weak_task));
+    m_pending_tasks.push(std::move(weak_task));
     return maybe_post_task();
 }
 
@@ -98,7 +98,7 @@ bool SequencedTaskRunner::maybe_post_task() noexcept
         bool posted = false;
         std::weak_ptr<Task> weak_task;
 
-        if (m_pending_tasks.Pop(weak_task, s_wait))
+        if (m_pending_tasks.pop(weak_task, s_wait))
         {
             posted = post_task_to_task_manager(weak_task);
         }
