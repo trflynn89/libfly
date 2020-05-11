@@ -48,7 +48,7 @@ ConfigManager::~ConfigManager()
 }
 
 //==============================================================================
-ConfigManager::ConfigMap::size_type ConfigManager::get_size() noexcept
+ConfigManager::ConfigMap::size_type ConfigManager::prune() noexcept
 {
     std::lock_guard<std::mutex> lock(m_configs_mutex);
 
@@ -116,7 +116,7 @@ void ConfigManager::update_config() noexcept
 
     try
     {
-        m_values = m_parser->ParseFile(m_path);
+        m_values = m_parser->parse_file(m_path);
     }
     catch (const ParserException &)
     {

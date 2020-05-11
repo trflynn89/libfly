@@ -81,180 +81,182 @@ public:
     /**
      * Constructor. Create a parser with the specific features.
      *
-     * @param Features The extra features to allow.
+     * @param features The extra features to allow.
      */
-    explicit JsonParser(Features) noexcept;
+    explicit JsonParser(Features features) noexcept;
 
 protected:
     /**
      * Parse a stream and retrieve the parsed values.
      *
-     * @param istream Stream holding the contents to parse.
+     * @param stream Stream holding the contents to parse.
      *
-     * @return Json The parsed values.
+     * @return The parsed values.
      *
      * @throws ParserException If an error occurs parsing the stream.
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      * @throws BadConversionException A parsed object was invalid.
      */
-    Json ParseInternal(std::istream &) noexcept(false) override;
+    Json parse_internal(std::istream &stream) noexcept(false) override;
 
 private:
     /**
      * Handle a whitespace character.
      *
-     * @param Token The current parsed token.
-     * @param int The current parsed character.
+     * @param token The current parsed token.
+     * @param c The current parsed character.
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onWhitespace(Token, int) noexcept(false);
+    void on_whitespace(Token token, int c) noexcept(false);
 
     /**
      * Handle the start of an object or array.
      *
-     * @param Token The current parsed token.
-     * @param int The current parsed character ({ or [).
+     * @param token The current parsed token.
+     * @param c The current parsed character ({ or [).
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onStartBraceOrBracket(Token, int) noexcept(false);
+    void on_start_brace_or_bracket(Token token, int c) noexcept(false);
 
     /**
      * Handle the end of an object or array.
      *
-     * @param Token The current parsed token.
-     * @param int The current parsed character (} or ]).
+     * @param token The current parsed token.
+     * @param c The current parsed character (} or ]).
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      * @throws BadConversionException A parsed object was invalid.
      */
-    void onCloseBraceOrBracket(Token, int) noexcept(false);
+    void on_close_brace_or_bracket(Token token, int c) noexcept(false);
 
     /**
      * Handle the start or end of a string, for either a name or value.
      *
-     * @param int The current parsed character (").
+     * @param c The current parsed character (").
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onQuotation(int) noexcept(false);
+    void on_quotation(int c) noexcept(false);
 
     /**
      * Handle a colon between name-value pairs.
      *
-     * @param int The current parsed character (:).
+     * @param c The current parsed character (:).
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onColon(int) noexcept(false);
+    void on_colon(int c) noexcept(false);
 
     /**
      * Handle a comma, either in an array or after an object.
      *
-     * @param int The current parsed character (,).
+     * @param c The current parsed character (,).
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      * @throws BadConversionException A parsed object was invalid.
      */
-    void onComma(int) noexcept(false);
+    void on_comma(int c) noexcept(false);
 
     /**
      * Handle the start of a comment, if comments are allowed. Consumes the
      * stream until the end of the comment.
      *
-     * @param int The current parsed character.
-     * @param istream Stream holding the contents to parse.
+     * @param c The current parsed character.
+     * @param stream Stream holding the contents to parse.
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onSolidus(int, std::istream &) noexcept(false);
+    void on_solidus(int c, std::istream &stream) noexcept(false);
 
     /**
      * Handle any other character. If the character is a reverse solidus, accept
      * the next character as well.
      *
-     * @param Token The current parsed token.
-     * @param int The current parsed character.
-     * @param istream Stream holding the contents to parse.
+     * @param token The current parsed token.
+     * @param c The current parsed character.
+     * @param stream Stream holding the contents to parse.
      *
      * @throws UnexpectedCharacterException A parsed character was unexpected.
      */
-    void onCharacter(Token, int, std::istream &) noexcept(false);
+    void on_character(Token token, int c, std::istream &stream) noexcept(false);
 
     /**
      * Push a parsed character onto the parsing stream.
      *
-     * @param int The current parsed character.
+     * @param c The current parsed character.
      *
      * @throws UnexpectedCharacterException Any character was unexpected.
      */
-    void pushValue(int) noexcept(false);
+    void push_value(int c) noexcept(false);
 
     /**
      * Retrieve and clear the current value of the parsing stream.
      *
-     * @return string The current value of the parsing stream.
+     * @return The current value of the parsing stream.
      */
-    std::string popValue() noexcept;
+    std::string pop_value() noexcept;
 
     /**
      * Store the current value of the parsing stream as a JSON object. Ensures
      * that the syntax of the value is compliant with https://www.json.org.
      *
-     * @return bool True if a value was stored.
+     * @return True if a value was stored.
      *
      * @throws BadConversionException A parsed object was invalid.
      */
-    bool storeValue() noexcept(false);
+    bool store_value() noexcept(false);
 
     /**
      * Validate that a parsed number is compliant with https://www.json.org.
      *
-     * @param string The parsed number to validate.
-     * @param bool Set to true if the parsed number is a floating point.
-     * @param bool Set to true if the parsed number is signed.
+     * @param value The parsed number to validate.
+     * @param is_float Set to true if the parsed number is a floating point.
+     * @param is_signed Set to true if the parsed number is signed.
      *
      * @throws BadConversionException A parsed number was invalid.
      */
-    void validateNumber(const std::string &, bool &, bool &) const
-        noexcept(false);
+    void validate_number(
+        const std::string &value,
+        bool &is_float,
+        bool &is_signed) const noexcept(false);
 
     /**
      * Check if a feature has been allowed.
      *
-     * @param Features The feature to check.
+     * @param feature The feature to check.
      *
      * @return True if the feature is allowed.
      */
-    bool isFeatureAllowed(Features) const noexcept(false);
+    bool is_feature_allowed(Features feature) const noexcept(false);
 
     Features m_features;
 
     std::stack<State> m_states;
 
-    Json *m_pValue;
-    std::stack<Json *> m_pParents;
+    Json *m_value;
+    std::stack<Json *> m_parents;
 
     Json::stream_type m_parsing;
 
-    bool m_parsingStarted;
-    bool m_parsingComplete;
-    bool m_parsingString;
-    bool m_parsedString;
-    bool m_expectingValue;
+    bool m_parsing_started;
+    bool m_parsing_complete;
+    bool m_parsing_string;
+    bool m_parsed_string;
+    bool m_expecting_value;
 };
 
 /**
  * Combine two Features instances into a single instance via bitwise-and.
  */
 JsonParser::Features
-operator&(JsonParser::Features, JsonParser::Features) noexcept;
+operator&(JsonParser::Features a, JsonParser::Features b) noexcept;
 
 /**
  * Combine two Features instances into a single instance via bitwise-or.
  */
 JsonParser::Features
-operator|(JsonParser::Features, JsonParser::Features) noexcept;
+operator|(JsonParser::Features a, JsonParser::Features b) noexcept;
 
 } // namespace fly

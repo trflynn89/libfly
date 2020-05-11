@@ -64,7 +64,7 @@ public:
         ASSERT_TRUE(m_task_manager->Start());
         ASSERT_TRUE(m_config_manager->start());
 
-        m_initial_size = m_config_manager->get_size();
+        m_initial_size = m_config_manager->prune();
     }
 
     /**
@@ -135,13 +135,13 @@ TEST_F(ConfigManagerTest, BadFileType)
 //==============================================================================
 TEST_F(ConfigManagerTest, BadConfigType)
 {
-    EXPECT_EQ(m_config_manager->get_size(), m_initial_size);
+    EXPECT_EQ(m_config_manager->prune(), m_initial_size);
 
     auto config = m_config_manager->create_config<TestConfig>();
-    EXPECT_EQ(m_config_manager->get_size(), m_initial_size + 1);
+    EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
 
     auto config2 = m_config_manager->create_config<BadConfig>();
-    EXPECT_EQ(m_config_manager->get_size(), m_initial_size + 1);
+    EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
     EXPECT_FALSE(config2);
 }
 
@@ -149,34 +149,34 @@ TEST_F(ConfigManagerTest, BadConfigType)
 TEST_F(ConfigManagerTest, create_config)
 {
     auto config = m_config_manager->create_config<TestConfig>();
-    EXPECT_EQ(m_config_manager->get_size(), m_initial_size + 1);
+    EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
 }
 
 //==============================================================================
 TEST_F(ConfigManagerTest, DuplicateConfig)
 {
     auto config1 = m_config_manager->create_config<TestConfig>();
-    EXPECT_EQ(m_config_manager->get_size(), m_initial_size + 1);
+    EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
 
     auto config2 = m_config_manager->create_config<TestConfig>();
-    EXPECT_EQ(m_config_manager->get_size(), m_initial_size + 1);
+    EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
 }
 
 //==============================================================================
 TEST_F(ConfigManagerTest, DeletedConfig)
 {
-    EXPECT_EQ(m_config_manager->get_size(), m_initial_size);
+    EXPECT_EQ(m_config_manager->prune(), m_initial_size);
 
     {
         auto config = m_config_manager->create_config<TestConfig>();
-        EXPECT_EQ(m_config_manager->get_size(), m_initial_size + 1);
+        EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
     }
 
-    EXPECT_EQ(m_config_manager->get_size(), m_initial_size);
+    EXPECT_EQ(m_config_manager->prune(), m_initial_size);
 
     {
         auto config = m_config_manager->create_config<TestConfig>();
-        EXPECT_EQ(m_config_manager->get_size(), m_initial_size + 1);
+        EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
     }
 
     auto config = m_config_manager->create_config<TestConfig>();
@@ -190,7 +190,7 @@ TEST_F(ConfigManagerTest, DeletedConfig)
 //==============================================================================
 TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
 {
-    EXPECT_EQ(m_config_manager->get_size(), m_initial_size);
+    EXPECT_EQ(m_config_manager->prune(), m_initial_size);
 
     const std::string contents = fly::String::Format(
         "[%s]\n"
@@ -204,7 +204,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
 
     {
         auto config = m_config_manager->create_config<TestConfig>();
-        EXPECT_EQ(m_config_manager->get_size(), m_initial_size + 1);
+        EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
 
         EXPECT_EQ(config->get_value<std::string>("name", ""), "John Doe");
         EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
@@ -213,7 +213,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
     ASSERT_TRUE(fly::PathUtil::WriteFile(m_file, contents + "\n"));
     m_task_runner->WaitForTaskTypeToComplete<fly::ConfigUpdateTask>();
 
-    EXPECT_EQ(m_config_manager->get_size(), m_initial_size);
+    EXPECT_EQ(m_config_manager->prune(), m_initial_size);
 }
 
 //==============================================================================

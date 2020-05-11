@@ -42,13 +42,13 @@ const char *ParserException::what() const noexcept
 UnexpectedCharacterException::UnexpectedCharacterException(
     int line,
     int column,
-    int c) noexcept :
+    int ch) noexcept :
     ParserException(
         line,
         column,
-        std::isprint(c) ?
-            String::Format("Unexpected character '%c' (%x)", char(c), c) :
-            String::Format("Unexpected character '%x'", c))
+        std::isprint(ch) ?
+            String::Format("Unexpected character '%c' (%x)", char(ch), ch) :
+            String::Format("Unexpected character '%x'", ch))
 {
 }
 
