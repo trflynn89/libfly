@@ -12,35 +12,33 @@
 class ConfigTest : public ::testing::Test
 {
 public:
-    ConfigTest() noexcept : m_spConfig(std::make_shared<TestConfig>())
+    ConfigTest() noexcept : m_config(std::make_shared<TestConfig>())
     {
     }
 
 protected:
-    std::shared_ptr<TestConfig> m_spConfig;
+    std::shared_ptr<TestConfig> m_config;
 };
 
 //==============================================================================
-TEST_F(ConfigTest, NonExistingTest)
+TEST_F(ConfigTest, NonExisting)
 {
-    EXPECT_EQ(m_spConfig->GetValue<std::string>("bad-name", "def"), "def");
+    EXPECT_EQ(m_config->get_value<std::string>("bad-name", "def"), "def");
 }
 
 //==============================================================================
-TEST_F(ConfigTest, NonCovertibleTest)
+TEST_F(ConfigTest, NonCovertible)
 {
     const fly::Json values = {{"name", "John Doe"}, {"address", "USA"}};
 
-    m_spConfig->Update(values);
+    m_config->update(values);
 
-    EXPECT_EQ(m_spConfig->GetValue<int>("name", 12), 12);
-    EXPECT_EQ(
-        m_spConfig->GetValue<std::nullptr_t>("address", nullptr),
-        nullptr);
+    EXPECT_EQ(m_config->get_value<int>("name", 12), 12);
+    EXPECT_EQ(m_config->get_value<std::nullptr_t>("address", nullptr), nullptr);
 }
 
 //==============================================================================
-TEST_F(ConfigTest, MultipleValueTypeTest)
+TEST_F(ConfigTest, MultipleValueType)
 {
     const fly::Json values = {
         {"name", "John Doe"},
@@ -48,23 +46,23 @@ TEST_F(ConfigTest, MultipleValueTypeTest)
         {"employed", "1"},
         {"age", "26.2"}};
 
-    m_spConfig->Update(values);
+    m_config->update(values);
 
-    EXPECT_EQ(m_spConfig->GetValue<std::string>("name", ""), "John Doe");
+    EXPECT_EQ(m_config->get_value<std::string>("name", ""), "John Doe");
 
-    EXPECT_EQ(m_spConfig->GetValue<std::string>("address", ""), "123");
-    EXPECT_EQ(m_spConfig->GetValue<int>("address", 0), 123);
-    EXPECT_EQ(m_spConfig->GetValue<unsigned int>("address", 0), 123);
-    EXPECT_EQ(m_spConfig->GetValue<float>("address", 0.0f), 123.0f);
-    EXPECT_EQ(m_spConfig->GetValue<double>("address", 0.0), 123.0);
+    EXPECT_EQ(m_config->get_value<std::string>("address", ""), "123");
+    EXPECT_EQ(m_config->get_value<int>("address", 0), 123);
+    EXPECT_EQ(m_config->get_value<unsigned int>("address", 0), 123);
+    EXPECT_EQ(m_config->get_value<float>("address", 0.0f), 123.0f);
+    EXPECT_EQ(m_config->get_value<double>("address", 0.0), 123.0);
 
-    EXPECT_EQ(m_spConfig->GetValue<std::string>("age", ""), "26.2");
-    EXPECT_EQ(m_spConfig->GetValue<int>("age", 0), 0);
-    EXPECT_EQ(m_spConfig->GetValue<unsigned int>("age", 0), 0);
-    EXPECT_EQ(m_spConfig->GetValue<float>("age", 0.0f), 26.2f);
-    EXPECT_EQ(m_spConfig->GetValue<double>("age", 0.0), 26.2);
+    EXPECT_EQ(m_config->get_value<std::string>("age", ""), "26.2");
+    EXPECT_EQ(m_config->get_value<int>("age", 0), 0);
+    EXPECT_EQ(m_config->get_value<unsigned int>("age", 0), 0);
+    EXPECT_EQ(m_config->get_value<float>("age", 0.0f), 26.2f);
+    EXPECT_EQ(m_config->get_value<double>("age", 0.0), 26.2);
 
-    EXPECT_EQ(m_spConfig->GetValue<std::string>("employed", ""), "1");
-    EXPECT_EQ(m_spConfig->GetValue<bool>("employed", false), true);
-    EXPECT_EQ(m_spConfig->GetValue<int>("employed", 0), 1);
+    EXPECT_EQ(m_config->get_value<std::string>("employed", ""), "1");
+    EXPECT_EQ(m_config->get_value<bool>("employed", false), true);
+    EXPECT_EQ(m_config->get_value<int>("employed", 0), 1);
 }

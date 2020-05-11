@@ -15,7 +15,7 @@ SocketConfig::SocketConfig() noexcept :
 //==============================================================================
 std::chrono::microseconds SocketConfig::IoWaitTime() const noexcept
 {
-    return std::chrono::microseconds(GetValue<std::chrono::microseconds::rep>(
+    return std::chrono::microseconds(get_value<std::chrono::microseconds::rep>(
         "io_wait_time",
         m_defaultIoWaitTime));
 }
@@ -23,13 +23,13 @@ std::chrono::microseconds SocketConfig::IoWaitTime() const noexcept
 //==============================================================================
 char SocketConfig::EndOfMessage() const noexcept
 {
-    return GetValue<char>("end_of_message", m_defaultEndOfMessage);
+    return get_value<char>("end_of_message", m_defaultEndOfMessage);
 }
 
 //==============================================================================
 std::size_t SocketConfig::PacketSize() const noexcept
 {
-    return GetValue<std::size_t>("packet_size", m_defaultPacketSize);
+    return get_value<std::size_t>("packet_size", m_defaultPacketSize);
 }
 
 } // namespace fly
