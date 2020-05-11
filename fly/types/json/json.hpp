@@ -272,9 +272,9 @@ public:
     /**
      * Null conversion operator. Converts the Json instance to a null type.
      *
-     * @throws JsonException If the Json instance is not null.
-     *
      * @return The Json instance as a number.
+     *
+     * @throws JsonException If the Json instance is not null.
      */
     explicit operator JsonTraits::null_type() const noexcept(false);
 
@@ -295,9 +295,9 @@ public:
      *
      * @tparam T The object-like type.
      *
-     * @throws JsonException If the Json instance is not an object.
-     *
      * @return The Json instance as the object-like type.
+     *
+     * @throws JsonException If the Json instance is not an object.
      */
     template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
     explicit operator T() const noexcept(false);
@@ -311,9 +311,9 @@ public:
      *
      * @tparam T The array-like type.
      *
-     * @throws JsonException If the Json instance is not an array.
-     *
      * @return The Json instance as the array-like type.
+     *
+     * @throws JsonException If the Json instance is not an array.
      */
     template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
     explicit operator T() const noexcept(false);
@@ -327,9 +327,9 @@ public:
      * @tparam T The std::array value type.
      * @tparam N The std::array size.
      *
-     * @throws JsonException If the Json instance is not an array.
-     *
      * @return The Json instance as a std::array.
+     *
+     * @throws JsonException If the Json instance is not an array.
      */
     template <typename T, std::size_t N>
     explicit operator std::array<T, N>() const noexcept(false);
@@ -358,9 +358,9 @@ public:
      *
      * @tparam T The numeric type.
      *
-     * @throws JsonException If the Json instance is not numeric.
-     *
      * @return The Json instance as the numeric type.
+     *
+     * @throws JsonException If the Json instance is not numeric.
      */
     template <
         typename T,
@@ -381,10 +381,10 @@ public:
      *
      * @param key The key value to lookup.
      *
+     * @return A reference to the Json instance at the key value.
+     *
      * @throws JsonException If the Json instance is neither an object nor null,
      *         or the key value is invalid.
-     *
-     * @return A reference to the Json instance at the key value.
      */
     Json &operator[](
         const typename JsonTraits::object_type::key_type &key) noexcept(false);
@@ -397,10 +397,10 @@ public:
      *
      * @param key The key value to lookup.
      *
+     * @return A reference to the Json instance at the key value.
+     *
      * @throws JsonException If the Json instance is not an object, or the key
      *         value does not exist, or the key value is invalid.
-     *
-     * @return A reference to the Json instance at the key value.
      */
     const Json &
     operator[](const typename JsonTraits::object_type::key_type &key) const
@@ -417,9 +417,9 @@ public:
      *
      * @param index The index to lookup.
      *
-     * @throws JsonException If the Json instance is neither an array nor null.
-     *
      * @return A reference to the Json instance at the index.
+     *
+     * @throws JsonException If the Json instance is neither an array nor null.
      */
     Json &operator[](typename JsonTraits::array_type::size_type index) noexcept(
         false);
@@ -432,10 +432,10 @@ public:
      *
      * @param index The index to lookup.
      *
+     * @return A reference to the Json instance at the index.
+     *
      * @throws JsonException If the Json instance is not an array or the index
      *         does not exist.
-     *
-     * @return A reference to the Json instance at the index.
      */
     const Json &
     operator[](typename JsonTraits::array_type::size_type index) const

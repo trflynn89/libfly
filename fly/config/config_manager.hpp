@@ -74,12 +74,11 @@ public:
     std::shared_ptr<T> create_config() noexcept;
 
     /**
-     * Get the number of configuration objects currently created. Erases any
-     * expired configuration objects.
+     * Erase any expired configuration objects.
      *
-     * @return The number of configurations.
+     * @return The remaining number of configurations.
      */
-    ConfigMap::size_type get_size() noexcept;
+    ConfigMap::size_type prune() noexcept;
 
     /**
      * Start the configuration manager and underlying objects.

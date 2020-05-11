@@ -48,7 +48,7 @@ ConfigManager::~ConfigManager()
 }
 
 //==============================================================================
-ConfigManager::ConfigMap::size_type ConfigManager::get_size() noexcept
+ConfigManager::ConfigMap::size_type ConfigManager::prune() noexcept
 {
     std::lock_guard<std::mutex> lock(m_configs_mutex);
 
