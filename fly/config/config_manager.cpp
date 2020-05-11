@@ -116,7 +116,7 @@ void ConfigManager::update_config() noexcept
 
     try
     {
-        m_values = m_parser->ParseFile(m_path);
+        m_values = m_parser->parse_file(m_path);
     }
     catch (const ParserException &)
     {

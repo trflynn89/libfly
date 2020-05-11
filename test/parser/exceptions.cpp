@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 //==============================================================================
-TEST(ParserExceptionTest, ParserExceptionTest)
+TEST(ParserExceptionTest, ParserException)
 {
     int line = 123;
     int column = 456;

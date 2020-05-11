@@ -5,6 +5,7 @@
 
 #include <cctype>
 #include <cstdio>
+#include <string_view>
 
 namespace fly {
 
@@ -21,23 +22,23 @@ JsonParser::JsonParser(Features features) noexcept :
 }
 
 //==============================================================================
-Json JsonParser::ParseInternal(std::istream &stream) noexcept(false)
+Json JsonParser::parse_internal(std::istream &stream) noexcept(false)
 {
     m_states = decltype(m_states)();
     m_states.push(State::NoState);
 
     Json values;
-    m_pValue = &values;
+    m_value = &values;
 
-    m_pParents = decltype(m_pParents)();
-    m_pParents.push(m_pValue);
+    m_parents = decltype(m_parents)();
+    m_parents.push(m_value);
 
     m_parsing.str(std::string());
-    m_parsingStarted = false;
-    m_parsingComplete = false;
-    m_parsingString = false;
-    m_parsedString = false;
-    m_expectingValue = false;
+    m_parsing_started = false;
+    m_parsing_complete = false;
+    m_parsing_string = false;
+    m_parsed_string = false;
+    m_expecting_value = false;
 
     try
     {
@@ -54,37 +55,37 @@ Json JsonParser::ParseInternal(std::istream &stream) noexcept(false)
                 case Token::NewLine:
                 case Token::CarriageReturn:
                 case Token::Space:
-                    onWhitespace(token, c);
+                    on_whitespace(token, c);
                     break;
 
                 case Token::StartBrace:
                 case Token::StartBracket:
-                    onStartBraceOrBracket(token, c);
+                    on_start_brace_or_bracket(token, c);
                     break;
 
                 case Token::CloseBrace:
                 case Token::CloseBracket:
-                    onCloseBraceOrBracket(token, c);
+                    on_close_brace_or_bracket(token, c);
                     break;
 
                 case Token::Quote:
-                    onQuotation(c);
+                    on_quotation(c);
                     break;
 
                 case Token::Comma:
-                    onComma(c);
+                    on_comma(c);
                     break;
 
                 case Token::Colon:
-                    onColon(c);
+                    on_colon(c);
                     break;
 
                 case Token::Solidus:
-                    onSolidus(c, stream);
+                    on_solidus(c, stream);
                     break;
 
                 default:
-                    onCharacter(token, c, stream);
+                    on_character(token, c, stream);
                     break;
             }
         }
@@ -106,22 +107,22 @@ Json JsonParser::ParseInternal(std::istream &stream) noexcept(false)
 }
 
 //==============================================================================
-void JsonParser::onWhitespace(Token token, int c) noexcept(false)
+void JsonParser::on_whitespace(Token token, int c) noexcept(false)
 {
-    if (m_parsingString)
+    if (m_parsing_string)
     {
         if (token != Token::Space)
         {
             throw UnexpectedCharacterException(m_line, m_column, c);
         }
 
-        pushValue(c);
+        push_value(c);
     }
     else
     {
-        if (m_parsingStarted)
+        if (m_parsing_started)
         {
-            m_parsingComplete = true;
+            m_parsing_complete = true;
         }
 
         if (token == Token::NewLine)
@@ -133,12 +134,12 @@ void JsonParser::onWhitespace(Token token, int c) noexcept(false)
 }
 
 //==============================================================================
-void JsonParser::onStartBraceOrBracket(Token token, int c) noexcept(false)
+void JsonParser::on_start_brace_or_bracket(Token token, int c) noexcept(false)
 {
     switch (m_states.top())
     {
         case State::NoState:
-            if (m_pValue == nullptr)
+            if (m_value == nullptr)
             {
                 throw UnexpectedCharacterException(m_line, m_column, c);
             }
@@ -152,19 +153,19 @@ void JsonParser::onStartBraceOrBracket(Token token, int c) noexcept(false)
         case State::ParsingArray:
             m_states.push(State::ParsingValue);
 
-            m_pValue = &((*m_pValue)[m_pValue->size()]);
-            m_pParents.push(m_pValue);
+            m_value = &((*m_value)[m_value->size()]);
+            m_parents.push(m_value);
 
             break;
 
         case State::ParsingName:
         case State::ParsingValue:
-            if (m_parsingString)
+            if (m_parsing_string)
             {
-                pushValue(c);
+                push_value(c);
                 return;
             }
-            else if (m_parsingStarted)
+            else if (m_parsing_started)
             {
                 throw UnexpectedCharacterException(m_line, m_column, c);
             }
@@ -177,20 +178,20 @@ void JsonParser::onStartBraceOrBracket(Token token, int c) noexcept(false)
 
     if (token == Token::StartBrace)
     {
-        *m_pValue = JsonTraits::object_type();
+        *m_value = JsonTraits::object_type();
         m_states.push(State::ParsingObject);
     }
     else
     {
-        *m_pValue = JsonTraits::array_type();
+        *m_value = JsonTraits::array_type();
         m_states.push(State::ParsingArray);
     }
 
-    m_expectingValue = false;
+    m_expecting_value = false;
 }
 
 //==============================================================================
-void JsonParser::onCloseBraceOrBracket(Token token, int c) noexcept(false)
+void JsonParser::on_close_brace_or_bracket(Token token, int c) noexcept(false)
 {
     switch (m_states.top())
     {
@@ -200,9 +201,9 @@ void JsonParser::onCloseBraceOrBracket(Token token, int c) noexcept(false)
 
         case State::ParsingName:
         case State::ParsingValue:
-            if (m_parsingString)
+            if (m_parsing_string)
             {
-                pushValue(c);
+                push_value(c);
                 return;
             }
 
@@ -212,13 +213,13 @@ void JsonParser::onCloseBraceOrBracket(Token token, int c) noexcept(false)
             break;
     }
 
-    if ((!storeValue() && m_expectingValue) || m_pParents.empty())
+    if ((!store_value() && m_expecting_value) || m_parents.empty())
     {
         throw UnexpectedCharacterException(m_line, m_column, c);
     }
 
-    m_pParents.pop();
-    m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
+    m_parents.pop();
+    m_value = (m_parents.empty() ? nullptr : m_parents.top());
 
     // Formatter doesn't have options for hanging indent after ternary operator
     // clang-format off
@@ -247,7 +248,7 @@ void JsonParser::onCloseBraceOrBracket(Token token, int c) noexcept(false)
 }
 
 //==============================================================================
-void JsonParser::onQuotation(int c) noexcept(false)
+void JsonParser::on_quotation(int c) noexcept(false)
 {
     switch (m_states.top())
     {
@@ -258,8 +259,8 @@ void JsonParser::onQuotation(int c) noexcept(false)
         case State::ParsingArray:
             m_states.push(State::ParsingValue);
 
-            m_pValue = &((*m_pValue)[m_pValue->size()]);
-            m_pParents.push(m_pValue);
+            m_value = &((*m_value)[m_value->size()]);
+            m_parents.push(m_value);
 
             break;
 
@@ -267,23 +268,23 @@ void JsonParser::onQuotation(int c) noexcept(false)
             m_states.pop();
             m_states.push(State::ParsingColon);
 
-            m_pValue = &((*m_pValue)[popValue()]);
-            m_pParents.push(m_pValue);
+            m_value = &((*m_value)[pop_value()]);
+            m_parents.push(m_value);
 
-            m_expectingValue = false;
+            m_expecting_value = false;
 
             break;
 
         case State::ParsingValue:
-            if (m_parsingString)
+            if (m_parsing_string)
             {
-                m_parsingComplete = true;
-                m_parsedString = true;
+                m_parsing_complete = true;
+                m_parsed_string = true;
 
                 m_states.pop();
                 m_states.push(State::ParsingComma);
             }
-            else if (m_parsingStarted)
+            else if (m_parsing_started)
             {
                 throw UnexpectedCharacterException(m_line, m_column, c);
             }
@@ -294,11 +295,11 @@ void JsonParser::onQuotation(int c) noexcept(false)
             throw UnexpectedCharacterException(m_line, m_column, c);
     }
 
-    m_parsingString = !m_parsingString;
+    m_parsing_string = !m_parsing_string;
 }
 
 //==============================================================================
-void JsonParser::onColon(int c) noexcept(false)
+void JsonParser::on_colon(int c) noexcept(false)
 {
     switch (m_states.top())
     {
@@ -306,15 +307,15 @@ void JsonParser::onColon(int c) noexcept(false)
             m_states.pop();
             m_states.push(State::ParsingValue);
 
-            m_expectingValue = true;
+            m_expecting_value = true;
 
             break;
 
         case State::ParsingName:
         case State::ParsingValue:
-            if (m_parsingString)
+            if (m_parsing_string)
             {
-                pushValue(c);
+                push_value(c);
             }
             else
             {
@@ -328,24 +329,24 @@ void JsonParser::onColon(int c) noexcept(false)
 }
 
 //==============================================================================
-void JsonParser::onComma(int c) noexcept(false)
+void JsonParser::on_comma(int c) noexcept(false)
 {
     switch (m_states.top())
     {
         case State::ParsingName:
-            pushValue(c);
+            push_value(c);
             break;
 
         case State::ParsingValue:
-            if (m_parsingString)
+            if (m_parsing_string)
             {
-                pushValue(c);
+                push_value(c);
             }
-            else if (storeValue())
+            else if (store_value())
             {
                 m_states.pop();
             }
-            else if (m_expectingValue)
+            else if (m_expecting_value)
             {
                 throw UnexpectedCharacterException(m_line, m_column, c);
             }
@@ -353,7 +354,7 @@ void JsonParser::onComma(int c) noexcept(false)
             break;
 
         case State::ParsingComma:
-            storeValue();
+            store_value();
             m_states.pop();
 
             if (m_states.top() == State::ParsingValue)
@@ -367,24 +368,24 @@ void JsonParser::onComma(int c) noexcept(false)
             throw UnexpectedCharacterException(m_line, m_column, c);
     }
 
-    if (isFeatureAllowed(Features::AllowTrailingComma))
+    if (is_feature_allowed(Features::AllowTrailingComma))
     {
-        m_expectingValue = false;
+        m_expecting_value = false;
     }
     else
     {
-        m_expectingValue = !m_parsingString;
+        m_expecting_value = !m_parsing_string;
     }
 }
 
 //==============================================================================
-void JsonParser::onSolidus(int c, std::istream &stream) noexcept(false)
+void JsonParser::on_solidus(int c, std::istream &stream) noexcept(false)
 {
-    if (m_parsingString)
+    if (m_parsing_string)
     {
-        pushValue(c);
+        push_value(c);
     }
-    else if (isFeatureAllowed(Features::AllowComments))
+    else if (is_feature_allowed(Features::AllowComments))
     {
         Token token = static_cast<Token>(stream.get());
 
@@ -434,8 +435,10 @@ void JsonParser::onSolidus(int c, std::istream &stream) noexcept(false)
 }
 
 //==============================================================================
-void JsonParser::onCharacter(Token token, int c, std::istream &stream) noexcept(
-    false)
+void JsonParser::on_character(
+    Token token,
+    int c,
+    std::istream &stream) noexcept(false)
 {
     if (std::isspace(c))
     {
@@ -447,28 +450,28 @@ void JsonParser::onCharacter(Token token, int c, std::istream &stream) noexcept(
         case State::ParsingArray:
             m_states.push(State::ParsingValue);
 
-            m_pValue = &((*m_pValue)[m_pValue->size()]);
-            m_pParents.push(m_pValue);
+            m_value = &((*m_value)[m_value->size()]);
+            m_parents.push(m_value);
 
-            pushValue(c);
+            push_value(c);
             break;
 
         case State::ParsingValue:
         case State::ParsingName:
-            pushValue(c);
+            push_value(c);
 
             // Blindly ignore the escaped character, the Json class will
             // check whether it is valid. Just read at least one more
             // character to prevent the parser from failing if the next
             // character is a quote.
-            if (m_parsingString && (token == Token::ReverseSolidus))
+            if (m_parsing_string && (token == Token::ReverseSolidus))
             {
                 if ((c = stream.get()) == EOF)
                 {
                     throw UnexpectedCharacterException(m_line, m_column, c);
                 }
 
-                pushValue(c);
+                push_value(c);
             }
 
             break;
@@ -479,39 +482,39 @@ void JsonParser::onCharacter(Token token, int c, std::istream &stream) noexcept(
 }
 
 //==============================================================================
-void JsonParser::pushValue(int c) noexcept(false)
+void JsonParser::push_value(int c) noexcept(false)
 {
-    if (m_parsingComplete)
+    if (m_parsing_complete)
     {
         throw UnexpectedCharacterException(m_line, m_column, c);
     }
 
     m_parsing << static_cast<Json::stream_type::char_type>(c);
-    m_parsingStarted = true;
+    m_parsing_started = true;
 }
 
 //==============================================================================
-std::string JsonParser::popValue() noexcept
+std::string JsonParser::pop_value() noexcept
 {
     const std::string value = m_parsing.str();
 
     m_parsing.str(std::string());
-    m_parsingStarted = false;
-    m_parsingComplete = false;
+    m_parsing_started = false;
+    m_parsing_complete = false;
 
     return value;
 }
 
 //==============================================================================
-bool JsonParser::storeValue() noexcept(false)
+bool JsonParser::store_value() noexcept(false)
 {
-    const std::string value = popValue();
+    const std::string value = pop_value();
 
     // Parsed a string value
-    if (m_parsedString)
+    if (m_parsed_string)
     {
-        m_parsedString = false;
-        *m_pValue = value;
+        m_parsed_string = false;
+        *m_value = value;
     }
 
     // No parsed value
@@ -523,38 +526,38 @@ bool JsonParser::storeValue() noexcept(false)
     // Parsed a boolean value
     else if (value == "true")
     {
-        *m_pValue = true;
+        *m_value = true;
     }
     else if (value == "false")
     {
-        *m_pValue = false;
+        *m_value = false;
     }
 
     // Parsed a null value
     else if (value == "null")
     {
-        *m_pValue = nullptr;
+        *m_value = nullptr;
     }
 
     // Parsed a number
     else
     {
-        bool isFloat = false, isSigned = false;
-        validateNumber(value, isFloat, isSigned);
+        bool is_float = false, is_signed = false;
+        validate_number(value, is_float, is_signed);
 
         try
         {
-            if (isFloat)
+            if (is_float)
             {
-                *m_pValue = String::Convert<JsonTraits::float_type>(value);
+                *m_value = String::Convert<JsonTraits::float_type>(value);
             }
-            else if (isSigned)
+            else if (is_signed)
             {
-                *m_pValue = String::Convert<JsonTraits::signed_type>(value);
+                *m_value = String::Convert<JsonTraits::signed_type>(value);
             }
             else
             {
-                *m_pValue = String::Convert<JsonTraits::unsigned_type>(value);
+                *m_value = String::Convert<JsonTraits::unsigned_type>(value);
             }
         }
         catch (...)
@@ -563,68 +566,68 @@ bool JsonParser::storeValue() noexcept(false)
         }
     }
 
-    m_pParents.pop();
-    m_pValue = (m_pParents.empty() ? nullptr : m_pParents.top());
+    m_parents.pop();
+    m_value = (m_parents.empty() ? nullptr : m_parents.top());
 
-    m_expectingValue = false;
+    m_expecting_value = false;
 
     return true;
 }
 
 //==============================================================================
-void JsonParser::validateNumber(
+void JsonParser::validate_number(
     const std::string &value,
-    bool &isFloat,
-    bool &isSigned) const noexcept(false)
+    bool &is_float,
+    bool &is_signed) const noexcept(false)
 {
-    isSigned = (value[0] == '-');
+    is_signed = (value[0] == '-');
 
-    const std::string signless = (isSigned ? value.substr(1) : value);
+    const auto signless = std::string_view(value).substr(is_signed ? 1 : 0);
 
-    auto is_octal = [&signless]() -> bool {
+    auto octal_test = [&signless]() -> bool {
         return (signless.size() > 1) && (signless[0] == '0') &&
             std::isdigit(static_cast<unsigned char>(signless[1]));
     };
 
-    auto is_float = [this, &signless]() -> bool {
+    auto float_test = [this, &value, &signless]() -> bool {
         const std::string::size_type d = signless.find('.');
-        const std::string::size_type e = signless.find('e');
-        const std::string::size_type E = signless.find('E');
+        const std::string::size_type e1 = signless.find('e');
+        const std::string::size_type e2 = signless.find('E');
 
         if (d != std::string::npos)
         {
             std::string::size_type end = signless.size();
 
-            if ((e != std::string::npos) || (E != std::string::npos))
+            if ((e1 != std::string::npos) || (e2 != std::string::npos))
             {
-                end = std::min(e, E);
+                end = std::min(e1, e2);
             }
 
             if ((d + 1) >= end)
             {
-                throw BadConversionException(m_line, m_column, signless);
+                throw BadConversionException(m_line, m_column, value);
             }
 
             return true;
         }
 
-        return (e != std::string::npos) || (E != std::string::npos);
+        return (e1 != std::string::npos) || (e2 != std::string::npos);
     };
 
     if (!std::isdigit(static_cast<unsigned char>(signless[0])))
     {
         throw BadConversionException(m_line, m_column, value);
     }
-    else if (is_octal())
+    else if (octal_test())
     {
         throw BadConversionException(m_line, m_column, value);
     }
 
-    isFloat = is_float();
+    is_float = float_test();
 }
 
 //==============================================================================
-bool JsonParser::isFeatureAllowed(Features feature) const noexcept(false)
+bool JsonParser::is_feature_allowed(Features feature) const noexcept(false)
 {
     return (m_features & feature) != Features::Strict;
 }

@@ -17,19 +17,19 @@ public:
     /**
      * Constructor.
      *
-     * @param int Line number where error was encountered.
-     * @param string Message indicating what error was encountered.
+     * @param line Line number where error was encountered.
+     * @param message Message indicating what error was encountered.
      */
-    ParserException(int, const std::string &) noexcept;
+    ParserException(int line, const std::string &message) noexcept;
 
     /**
      * Constructor.
      *
-     * @param int Line number where error was encountered.
-     * @param int Column number in line where error was encountered.
-     * @param string Message indicating what error was encountered.
+     * @param line Line number where error was encountered.
+     * @param column Column number in line where error was encountered.
+     * @param message Message indicating what error was encountered.
      */
-    ParserException(int, int, const std::string &) noexcept;
+    ParserException(int line, int column, const std::string &message) noexcept;
 
     /**
      * @return A C-string representing this exception.
@@ -52,11 +52,11 @@ public:
     /**
      * Constructor.
      *
-     * @param int Line number where error was encountered.
-     * @param int Column number in line where error was encountered.
-     * @param int Unexpected character code.
+     * @param line Line number where error was encountered.
+     * @param column Column number in line where error was encountered.
+     * @param ch Unexpected character code.
      */
-    UnexpectedCharacterException(int, int, int) noexcept;
+    UnexpectedCharacterException(int line, int column, int ch) noexcept;
 };
 
 /**
@@ -71,11 +71,14 @@ public:
     /**
      * Constructor.
      *
-     * @param int Line number where error was encountered.
-     * @param int Column number in line where error was encountered.
-     * @param string The unconvertable value.
+     * @param line Line number where error was encountered.
+     * @param column Column number in line where error was encountered.
+     * @param value The unconvertable value.
      */
-    BadConversionException(int, int, const std::string &) noexcept;
+    BadConversionException(
+        int line,
+        int column,
+        const std::string &value) noexcept;
 };
 
 } // namespace fly

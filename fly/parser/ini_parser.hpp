@@ -20,66 +20,67 @@ protected:
     /**
      * Parse a stream and retrieve the parsed values.
      *
-     * @param istream Stream holding the contents to parse.
+     * @param stream Stream holding the contents to parse.
      *
-     * @return Json The parsed values.
+     * @return The parsed values.
      *
      * @throws ParserException Thrown if an error occurs parsing the stream.
      */
-    Json ParseInternal(std::istream &) noexcept(false) override;
+    Json parse_internal(std::istream &stream) noexcept(false) override;
 
 private:
     /**
      * Parse a line containing a section name.
      *
-     * @param string Line containing the section.
+     * @param line Line containing the section.
      *
      * @return The parsed section name.
      *
      * @throws ParserException Thrown if the section name is quoted.
      */
-    std::string onSection(const std::string &) noexcept(false);
+    std::string on_section(const std::string &line) noexcept(false);
 
     /**
      * Parse a line containing a name/value pair.
      *
-     * @param Json Section containing the pair.
-     * @param string Line containing the pair.
+     * @param section Section containing the pair.
+     * @param line Line containing the pair.
      *
      * @throws ParserException Thrown if the value name is quoted, or the line
-     *                         both a name and value are not found.
+     *         both a name and value are not found.
      */
-    void onValue(Json &, const std::string &) noexcept(false);
+    void on_value(Json &section, const std::string &line) noexcept(false);
 
     /**
      * If the given string begins and ends with the given character, remove that
      * character from each end of the string.
      *
-     * @param string The string the trim.
-     * @param char The character to look for.
+     * @param str The string the trim.
+     * @param ch The character to look for.
      *
      * @return True if the string was trimmed.
      *
      * @throws ParserException Thrown if the character was found at one end of
      *                         the string, but not the other.
      */
-    bool trimValue(std::string &, char) const noexcept(false);
+    bool trim_value(std::string &str, char ch) const noexcept(false);
 
     /**
      * If the given string begins with the first given character and ends with
      * the second given character, remove those characters from each end of the
      * string.
      *
-     * @param string The string the trim.
-     * @param char The character to look for at the beginning of the string.
-     * @param char The character to look for at the end of the string.
+     * @param str The string the trim.
+     * @param start The character to look for at the beginning of the string.
+     * @param end The character to look for at the end of the string.
      *
      * @return True if the string was trimmed.
      *
      * @throws ParserException Thrown if the one of the start/end characters
      *                         was found, but not the other.
      */
-    bool trimValue(std::string &, char, char) const noexcept(false);
+    bool trim_value(std::string &str, char start, char end) const
+        noexcept(false);
 };
 
 } // namespace fly
