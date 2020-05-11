@@ -17,8 +17,8 @@ namespace fly {
 
 namespace {
 
-    const char *s_s_proc_stat_file = "/proc/stat";
-    const char *s_s_self_status_file = "/proc/self/status";
+    const char *s_proc_stat_file = "/proc/stat";
+    const char *s_self_status_file = "/proc/self/status";
 
 } // namespace
 
@@ -40,7 +40,7 @@ SystemMonitorImpl::SystemMonitorImpl(
 //==============================================================================
 void SystemMonitorImpl::update_system_cpu_count() noexcept
 {
-    std::ifstream stream(s_s_proc_stat_file, std::ios::in);
+    std::ifstream stream(s_proc_stat_file, std::ios::in);
     std::string contents, line;
 
     std::uint32_t cpu_count = 0;
@@ -71,10 +71,10 @@ void SystemMonitorImpl::update_system_cpu_count() noexcept
 //==============================================================================
 void SystemMonitorImpl::update_system_cpu_usage() noexcept
 {
-    std::ifstream stream(s_s_proc_stat_file, std::ios::in);
+    std::ifstream stream(s_proc_stat_file, std::ios::in);
     std::string line;
 
-    std::uint64_t user = 0, nice = 0, sys = 0, idle = 0;
+    std::uint64_t user = 0, nice = 0, system = 0, idle = 0;
     int scanned = 0;
 
     if (stream.good() && std::getline(stream, line))
@@ -84,7 +84,7 @@ void SystemMonitorImpl::update_system_cpu_usage() noexcept
             "cpu %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64,
             &user,
             &nice,
-            &sys,
+            &system,
             &idle);
     }
 
@@ -96,11 +96,12 @@ void SystemMonitorImpl::update_system_cpu_usage() noexcept
 
     if ((user >= m_prev_system_user_time) &&
         (nice >= m_prev_system_nice_time) &&
-        (sys >= m_prev_system_system_time) && (idle >= m_prev_system_idle_time))
+        (system >= m_prev_system_system_time) &&
+        (idle >= m_prev_system_idle_time))
     {
         std::uint64_t active = (user - m_prev_system_user_time) +
             (nice - m_prev_system_nice_time) +
-            (sys - m_prev_system_system_time);
+            (system - m_prev_system_system_time);
 
         std::uint64_t total = active + (idle - m_prev_system_idle_time);
 
@@ -109,7 +110,7 @@ void SystemMonitorImpl::update_system_cpu_usage() noexcept
 
     m_prev_system_user_time = user;
     m_prev_system_nice_time = nice;
-    m_prev_system_system_time = sys;
+    m_prev_system_system_time = system;
     m_prev_system_idle_time = idle;
 }
 
@@ -167,7 +168,7 @@ void SystemMonitorImpl::update_system_memory_usage() noexcept
 //==============================================================================
 void SystemMonitorImpl::update_process_memory_usage() noexcept
 {
-    std::ifstream stream(s_s_self_status_file, std::ios::in);
+    std::ifstream stream(s_self_status_file, std::ios::in);
     std::string contents, line;
 
     std::uint64_t process_memory_usage = 0;

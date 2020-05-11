@@ -12,7 +12,7 @@ namespace fly {
 
 namespace {
 
-    const LPCSTR s_cpuPath = "\\Processor(_Total)\\% Processor Time";
+    const LPCSTR s_cpu_path = "\\Processor(_Total)\\% Processor Time";
 
 } // namespace
 
@@ -35,7 +35,7 @@ SystemMonitorImpl::SystemMonitorImpl(
         return;
     }
 
-    status = ::PdhAddCounter(m_cpu_query, s_cpuPath, 0, &m_cpu_counter);
+    status = ::PdhAddCounter(m_cpu_query, s_cpu_path, 0, &m_cpu_counter);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not add CPU counter (%x)", status);

@@ -29,13 +29,13 @@ std::string SystemImpl::local_time(const char *fmt) noexcept
     struct tm time_val;
     std::string result;
 
-    if (::localtime_s(&timeVal, &now) == 0)
+    if (::localtime_s(&time_val, &now) == 0)
     {
         char time_str[32];
 
         if (::strftime(time_str, sizeof(time_str), fmt, &time_val) != 0)
         {
-            result = std::string(timeStr);
+            result = std::string(time_str);
         }
     }
 
