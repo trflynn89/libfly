@@ -106,13 +106,13 @@ TYPED_TEST(BasicStringTest, Split)
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
-    static constexpr std::uint32_t numSectors = 10;
-    std::vector<string_type> input_split(numSectors);
+    static constexpr std::uint32_t size = 10;
+    std::vector<string_type> input_split(size);
 
     constexpr char_type delim = ' ';
     string_type input;
 
-    for (std::uint32_t i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < size; ++i)
     {
         const string_type curr = StringClass::generate_random_string(10);
 
@@ -123,7 +123,7 @@ TYPED_TEST(BasicStringTest, Split)
     const auto output_split = StringClass::split(input, delim);
     EXPECT_EQ(input_split.size(), output_split.size());
 
-    for (std::uint32_t i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < size; ++i)
     {
         EXPECT_EQ(input_split[i], output_split[i]);
     }
@@ -136,19 +136,19 @@ TYPED_TEST(BasicStringTest, MaxSplit)
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
-    static constexpr std::uint32_t numSectors = 10;
-    static constexpr std::uint32_t maxSectors = 6;
-    std::vector<string_type> input_split(maxSectors);
+    static constexpr std::uint32_t size = 10;
+    static constexpr std::uint32_t count = 6;
+    std::vector<string_type> input_split(count);
 
     constexpr char_type delim = ';';
     string_type input;
 
-    for (std::uint32_t i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < size; ++i)
     {
         const string_type curr = StringClass::generate_random_string(10);
         input += curr + delim;
 
-        if (i < maxSectors)
+        if (i < count)
         {
             input_split[i] = curr;
         }
@@ -159,10 +159,10 @@ TYPED_TEST(BasicStringTest, MaxSplit)
         }
     }
 
-    const auto output_split = StringClass::split(input, delim, maxSectors);
+    const auto output_split = StringClass::split(input, delim, count);
     EXPECT_EQ(input_split.size(), output_split.size());
 
-    for (std::uint32_t i = 0; i < maxSectors; ++i)
+    for (std::uint32_t i = 0; i < count; ++i)
     {
         EXPECT_EQ(input_split[i], output_split[i]);
     }
@@ -474,16 +474,16 @@ TYPED_TEST(BasicStringTest, Wildcard)
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, generate_random_string)
+TYPED_TEST(BasicStringTest, GenerateRandomString)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using size_type = typename StringClass::size_type;
 
-    static constexpr size_type length = (1 << 10);
+    static constexpr size_type size = (1 << 10);
 
-    const auto random = StringClass::generate_random_string(length);
-    EXPECT_EQ(length, random.length());
+    const auto random = StringClass::generate_random_string(size);
+    EXPECT_EQ(size, random.size());
 }
 
 //==============================================================================
@@ -1177,7 +1177,7 @@ TYPED_TEST(BasicStringTest, BasicStringStreamer)
     // std::u32string in detail::BasicStringStreamer is exercised correctly.
     if constexpr (!StringClass::traits::has_stoi_family_v)
     {
-        string_type s = FLY_STR(char_type, "\u00f0\u0178\u008d\u2022");
+        const string_type s = FLY_STR(char_type, "\u00f0\u0178\u008d\u2022");
 
         typename StringClass::traits::ostringstream_type stream;
         fly::detail::BasicStringStreamer<string_type>::stream(stream, s);
