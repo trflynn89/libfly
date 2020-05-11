@@ -14,10 +14,10 @@ namespace fly {
 class SystemImpl
 {
 public:
-    static void PrintBacktrace() noexcept;
-    static std::string LocalTime(const std::string &) noexcept;
-    static int GetErrorCode() noexcept;
-    static std::vector<int> GetSignals() noexcept;
+    static void print_backtrace() noexcept;
+    static std::string local_time(const char *fmt) noexcept;
+    static int get_error_code() noexcept;
+    static std::vector<int> get_signals() noexcept;
 };
 
 } // namespace fly

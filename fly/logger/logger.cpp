@@ -37,7 +37,7 @@ void Logger::set_instance(const std::shared_ptr<Logger> &logger) noexcept
 void Logger::console_log(bool acquire_lock, const std::string &message) noexcept
 {
     std::unique_lock<std::mutex> lock(s_console_mutex, std::defer_lock);
-    const std::string time_str = System::LocalTime();
+    const std::string time_str = System::local_time();
 
     if (acquire_lock)
     {
@@ -150,7 +150,7 @@ void Logger::add_log_internal(
 bool Logger::create_log_file() noexcept
 {
     const std::string rand_str = String::generate_random_string(10);
-    std::string time_str = System::LocalTime();
+    std::string time_str = System::local_time();
 
     String::replace_all(time_str, ":", "-");
     String::replace_all(time_str, " ", "_");

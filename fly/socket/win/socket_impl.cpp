@@ -194,7 +194,7 @@ bool SocketImpl::Connect(address_type address, port_type port) noexcept
     if (ret == SOCKET_ERROR)
     {
         SLOGS(m_socketHandle, "Error connecting");
-        int error = System::GetErrorCode();
+        int error = System::get_error_code();
 
         if ((error == WSAEWOULDBLOCK) || (error == WSAEINPROGRESS))
         {
@@ -286,7 +286,7 @@ SocketImpl::Send(const std::string &message, bool &wouldBlock) const noexcept
 
             if (status == SOCKET_ERROR)
             {
-                wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
+                wouldBlock = (System::get_error_code() == WSAEWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error sending");
             }
         }
@@ -344,7 +344,7 @@ std::size_t SocketImpl::SendTo(
 
             if (status == SOCKET_ERROR)
             {
-                wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
+                wouldBlock = (System::get_error_code() == WSAEWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error sending");
             }
         }
@@ -388,7 +388,7 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const noexcept
 
             if (status == SOCKET_ERROR)
             {
-                wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
+                wouldBlock = (System::get_error_code() == WSAEWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error receiving");
             }
         }
@@ -444,7 +444,7 @@ SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const noexcept
 
             if (status == SOCKET_ERROR)
             {
-                wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
+                wouldBlock = (System::get_error_code() == WSAEWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error receiving");
             }
         }

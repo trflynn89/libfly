@@ -198,7 +198,7 @@ bool SocketImpl::Connect(address_type address, port_type port) noexcept
     if (::connect(m_socketHandle, pSocketAddress, sizeof(socketAddress)) == -1)
     {
         SLOGS(m_socketHandle, "Error connecting");
-        int error = System::GetErrorCode();
+        int error = System::get_error_code();
 
         if ((error == EINTR) || (error == EINPROGRESS))
         {
@@ -284,7 +284,7 @@ SocketImpl::Send(const std::string &message, bool &wouldBlock) const noexcept
 
             if (status == -1)
             {
-                wouldBlock = (System::GetErrorCode() == EWOULDBLOCK);
+                wouldBlock = (System::get_error_code() == EWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error sending");
             }
         }
@@ -342,7 +342,7 @@ std::size_t SocketImpl::SendTo(
 
             if (status == -1)
             {
-                wouldBlock = (System::GetErrorCode() == EWOULDBLOCK);
+                wouldBlock = (System::get_error_code() == EWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error sending");
             }
         }
@@ -384,7 +384,7 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const noexcept
 
             if (status == -1)
             {
-                wouldBlock = (System::GetErrorCode() == EWOULDBLOCK);
+                wouldBlock = (System::get_error_code() == EWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error receiving");
             }
         }
@@ -438,7 +438,7 @@ SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const noexcept
 
             if (status == -1)
             {
-                wouldBlock = (System::GetErrorCode() == EWOULDBLOCK);
+                wouldBlock = (System::get_error_code() == EWOULDBLOCK);
                 SLOGS(m_socketHandle, "Error receiving");
             }
         }

@@ -103,7 +103,7 @@ bool PathMonitorImpl::readEvents() const noexcept
 
     if (len <= 0)
     {
-        if ((len == -1) && (System::GetErrorCode() != EAGAIN))
+        if ((len == -1) && (System::get_error_code() != EAGAIN))
         {
             LOGS("Could not read polled event");
         }

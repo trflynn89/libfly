@@ -29,12 +29,12 @@ public:
     /**
      * Constructor.
      *
-     * @param TaskRunner Task runner for posting monitor-related tasks onto.
-     * @param SystemConfig Reference to system configuration.
+     * @param task_runner Task runner for posting monitor-related tasks onto.
+     * @param config Reference to system configuration.
      */
     SystemMonitor(
-        const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SystemConfig> &) noexcept;
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        const std::shared_ptr<SystemConfig> &config) noexcept;
 
     /**
      * Destructor.
@@ -44,103 +44,103 @@ public:
     /**
      * Initialize the path monitor task.
      *
-     * @return bool True if the path monitor is in a valid state.
+     * @return True if the path monitor is in a valid state.
      */
-    bool Start() noexcept;
+    bool start() noexcept;
 
     /**
      * Get the system's CPU count.
      *
-     * @return uint32_t System CPU count.
+     * @return System CPU count.
      */
-    std::uint32_t GetSystemCpuCount() const noexcept;
+    std::uint32_t get_system_cpu_count() const noexcept;
 
     /**
      * Get the system's CPU usage percentage (0-100%) over the last second.
      *
-     * @return double Current system CPU usage.
+     * @return Current system CPU usage.
      */
-    double GetSystemCpuUsage() const noexcept;
+    double get_system_cpu_usage() const noexcept;
 
     /**
      * Get the process's CPU usage percentage (0-100%) over the last second.
      *
-     * @return double Current process CPU usage.
+     * @return Current process CPU usage.
      */
-    double GetProcessCpuUsage() const noexcept;
+    double get_process_cpu_usage() const noexcept;
 
     /**
      * Get the system's total physical memory available in bytes.
      *
-     * @return uint64_t Total system memory.
+     * @return Total system memory.
      */
-    std::uint64_t GetTotalSystemMemory() const noexcept;
+    std::uint64_t get_total_system_memory() const noexcept;
 
     /**
      * Get the system's physical memory usage in bytes.
      *
-     * @return uint64_t Current system memory usage.
+     * @return Current system memory usage.
      */
-    std::uint64_t GetSystemMemoryUsage() const noexcept;
+    std::uint64_t get_system_memory_usage() const noexcept;
 
     /**
      * Get the process's physical memory usage in bytes.
      *
-     * @return uint64_t Current process memory usage.
+     * @return Current process memory usage.
      */
-    std::uint64_t GetProcessMemoryUsage() const noexcept;
+    std::uint64_t get_process_memory_usage() const noexcept;
 
 protected:
     /**
      * Update the system's current CPU count.
      */
-    virtual void UpdateSystemCpuCount() noexcept = 0;
+    virtual void update_system_cpu_count() noexcept = 0;
 
     /**
      * Update the system's current CPU usage.
      */
-    virtual void UpdateSystemCpuUsage() noexcept = 0;
+    virtual void update_system_cpu_usage() noexcept = 0;
 
     /**
      * Update the process's current CPU usage.
      */
-    virtual void UpdateProcessCpuUsage() noexcept = 0;
+    virtual void update_process_cpu_usage() noexcept = 0;
 
     /**
      * Update the system's current memory usage.
      */
-    virtual void UpdateSystemMemoryUsage() noexcept = 0;
+    virtual void update_system_memory_usage() noexcept = 0;
 
     /**
      * Update the process's current memory usage.
      */
-    virtual void UpdateProcessMemoryUsage() noexcept = 0;
+    virtual void update_process_memory_usage() noexcept = 0;
 
-    std::atomic<std::uint32_t> m_systemCpuCount;
-    std::atomic<double> m_systemCpuUsage;
-    std::atomic<double> m_processCpuUsage;
+    std::atomic<std::uint32_t> m_system_cpu_count;
+    std::atomic<double> m_system_cpu_usage;
+    std::atomic<double> m_process_cpu_usage;
 
-    std::atomic<std::uint64_t> m_totalSystemMemory;
-    std::atomic<std::uint64_t> m_systemMemoryUsage;
-    std::atomic<std::uint64_t> m_processMemoryUsage;
+    std::atomic<std::uint64_t> m_total_system_memory;
+    std::atomic<std::uint64_t> m_system_memory_usage;
+    std::atomic<std::uint64_t> m_process_memory_usage;
 
 private:
     /**
      * Check if the system CPU count was successfully set.
      *
-     * @return bool True if the CPU count is valid.
+     * @return True if the CPU count is valid.
      */
-    bool isValid() const noexcept;
+    bool is_valid() const noexcept;
 
     /**
      * Update the system-level resources.
      */
     void poll() noexcept;
 
-    std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
-    std::shared_ptr<Task> m_spTask;
+    std::shared_ptr<SequencedTaskRunner> m_task_runner;
+    std::shared_ptr<Task> m_task;
 
-    std::shared_ptr<SystemConfig> m_spConfig;
+    std::shared_ptr<SystemConfig> m_config;
 };
 
 /**
@@ -152,7 +152,8 @@ private:
 class SystemMonitorTask : public Task
 {
 public:
-    explicit SystemMonitorTask(std::weak_ptr<SystemMonitor>) noexcept;
+    explicit SystemMonitorTask(
+        std::weak_ptr<SystemMonitor> weak_system_monitor) noexcept;
 
 protected:
     /**
@@ -163,7 +164,7 @@ protected:
     void run() noexcept override;
 
 private:
-    std::weak_ptr<SystemMonitor> m_wpSystemMonitor;
+    std::weak_ptr<SystemMonitor> m_weak_system_monitor;
 };
 
 } // namespace fly
