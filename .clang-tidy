@@ -23,7 +23,7 @@ CheckOptions:
     value: lower_case
 
   - key: readability-identifier-naming.ParameterPackCase
-    value: CamelCase
+    value: lower_case
   - key: readability-identifier-naming.TemplateParameterCase
     value: CamelCase
 

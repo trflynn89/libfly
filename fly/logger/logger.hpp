@@ -25,7 +25,7 @@
 #define LOGD(...)                                                              \
     _FLY_LOG(                                                                  \
         fly::Log::Level::Debug,                                                \
-        fly::String::Format(                                                   \
+        fly::String::format(                                                   \
             _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
             _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
@@ -33,7 +33,7 @@
 #define LOGI(...)                                                              \
     _FLY_LOG(                                                                  \
         fly::Log::Level::Info,                                                 \
-        fly::String::Format(                                                   \
+        fly::String::format(                                                   \
             _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
             _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
@@ -41,7 +41,7 @@
 #define LOGW(...)                                                              \
     _FLY_LOG(                                                                  \
         fly::Log::Level::Warn,                                                 \
-        fly::String::Format(                                                   \
+        fly::String::format(                                                   \
             _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
             _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
@@ -49,7 +49,7 @@
 #define LOGS(...)                                                              \
     _FLY_LOG(                                                                  \
         fly::Log::Level::Warn,                                                 \
-        fly::String::Format(                                                   \
+        fly::String::format(                                                   \
             _FLY_FORMAT_STRING(__VA_ARGS__) ": %s"                             \
             _FLY_FORMAT_ARGS(__VA_ARGS__),                                     \
             fly::System::GetErrorString()))
@@ -58,7 +58,7 @@
 #define LOGE(...)                                                              \
     _FLY_LOG(                                                                  \
         fly::Log::Level::Error,                                                \
-        fly::String::Format(                                                   \
+        fly::String::format(                                                   \
             _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
             _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
@@ -66,7 +66,7 @@
 #define LOGC(...)                                                              \
     fly::Logger::console_log(                                                  \
         true,                                                                  \
-        fly::String::Format(                                                   \
+        fly::String::format(                                                   \
             _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
             _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
@@ -74,7 +74,7 @@
 #define LOGC_NO_LOCK(...)                                                      \
     fly::Logger::console_log(                                                  \
         false,                                                                 \
-        fly::String::Format(                                                   \
+        fly::String::format(                                                   \
             _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
             _FLY_FORMAT_ARGS(__VA_ARGS__)))
 

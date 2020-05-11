@@ -102,7 +102,7 @@ TEST(JsonExceptionTest, Exception)
         std::string what(e.what());
 
         std::string expect("*some message*" + stream.str() + "*");
-        EXPECT_TRUE(fly::String::WildcardMatch(what, expect));
+        EXPECT_TRUE(fly::String::wildcard_match(what, expect));
 
         thrown = true;
     }

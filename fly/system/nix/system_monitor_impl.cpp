@@ -50,7 +50,7 @@ void SystemMonitorImpl::UpdateSystemCpuCount() noexcept
     {
         contents += line + "\\n";
 
-        if (String::StartsWith(line, "cpu"))
+        if (String::starts_with(line, "cpu"))
         {
             if ((line.size() > 3) && (line[3] != ' '))
             {

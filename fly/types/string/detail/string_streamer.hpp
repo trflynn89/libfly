@@ -47,19 +47,19 @@ struct BasicStringStreamer<std::string>
     using istringstream_type = std::istringstream;
     using ostringstream_type = std::ostringstream;
 
-    static void Stream(ostream_type &stream, const std::string &value) noexcept
+    static void stream(ostream_type &ostream, const std::string &value) noexcept
     {
-        stream << value;
+        ostream << value;
     }
 
-    static void Stream(ostream_type &stream, const char *value) noexcept
+    static void stream(ostream_type &ostream, const char *value) noexcept
     {
-        stream << value;
+        ostream << value;
     }
 
-    static void Stream(ostream_type &stream, const char value) noexcept
+    static void stream(ostream_type &ostream, const char value) noexcept
     {
-        stream << value;
+        ostream << value;
     }
 };
 
@@ -80,19 +80,20 @@ struct BasicStringStreamer<std::wstring>
     using istringstream_type = std::wistringstream;
     using ostringstream_type = std::wostringstream;
 
-    static void Stream(ostream_type &stream, const std::wstring &value) noexcept
+    static void
+    stream(ostream_type &ostream, const std::wstring &value) noexcept
     {
-        stream << value;
+        ostream << value;
     }
 
-    static void Stream(ostream_type &stream, const wchar_t *value) noexcept
+    static void stream(ostream_type &ostream, const wchar_t *value) noexcept
     {
-        stream << value;
+        ostream << value;
     }
 
-    static void Stream(ostream_type &stream, const wchar_t value) noexcept
+    static void stream(ostream_type &ostream, const wchar_t value) noexcept
     {
-        stream << value;
+        ostream << value;
     }
 };
 
@@ -114,35 +115,35 @@ struct BasicStringStreamer<std::u16string>
     using ostringstream_type = std::ostringstream;
 
     static void
-    Stream(ostream_type &stream, const std::u16string &value) noexcept
+    stream(ostream_type &ostream, const std::u16string &value) noexcept
     {
         for (const auto &ch : value)
         {
-            Stream(stream, ch);
+            stream(ostream, ch);
         }
     }
 
-    static void Stream(ostream_type &stream, const char16_t *value) noexcept
+    static void stream(ostream_type &ostream, const char16_t *value) noexcept
     {
         const std::size_t size = std::char_traits<char16_t>::length(value);
 
         for (std::size_t i = 0; i < size; ++i)
         {
-            Stream(stream, value[i]);
+            stream(ostream, value[i]);
         }
     }
 
-    static void Stream(ostream_type &stream, const char16_t value) noexcept
+    static void stream(ostream_type &ostream, const char16_t value) noexcept
     {
         if (value <= 127)
         {
-            stream << static_cast<ostream_type::char_type>(value);
+            ostream << static_cast<ostream_type::char_type>(value);
         }
         else
         {
-            stream << "[0x";
-            stream << std::hex << static_cast<std::uint16_t>(value) << std::dec;
-            stream << ']';
+            ostream << "[0x" << std::hex;
+            ostream << static_cast<std::uint16_t>(value);
+            ostream << std::dec << ']';
         }
     }
 };
@@ -165,35 +166,35 @@ struct BasicStringStreamer<std::u32string>
     using ostringstream_type = std::ostringstream;
 
     static void
-    Stream(ostream_type &stream, const std::u32string &value) noexcept
+    stream(ostream_type &ostream, const std::u32string &value) noexcept
     {
         for (const auto &ch : value)
         {
-            Stream(stream, ch);
+            stream(ostream, ch);
         }
     }
 
-    static void Stream(ostream_type &stream, const char32_t *value) noexcept
+    static void stream(ostream_type &ostream, const char32_t *value) noexcept
     {
         const std::size_t size = std::char_traits<char32_t>::length(value);
 
         for (std::size_t i = 0; i < size; ++i)
         {
-            Stream(stream, value[i]);
+            stream(ostream, value[i]);
         }
     }
 
-    static void Stream(ostream_type &stream, const char32_t value) noexcept
+    static void stream(ostream_type &ostream, const char32_t value) noexcept
     {
         if (value <= 127)
         {
-            stream << static_cast<ostream_type::char_type>(value);
+            ostream << static_cast<ostream_type::char_type>(value);
         }
         else
         {
-            stream << "[0x";
-            stream << std::hex << static_cast<std::uint32_t>(value) << std::dec;
-            stream << ']';
+            ostream << "[0x" << std::hex;
+            ostream << static_cast<std::uint32_t>(value);
+            ostream << std::dec << ']';
         }
     }
 };

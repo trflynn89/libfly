@@ -446,7 +446,7 @@ TEST_F(HuffmanCoderTest, LengthLimited)
 //==============================================================================
 TEST_F(HuffmanCoderTest, LargeMirror)
 {
-    const std::string raw = fly::String::GenerateRandomString(100 << 10);
+    const std::string raw = fly::String::generate_random_string(100 << 10);
     std::string enc, dec;
 
     ASSERT_TRUE(m_encoder.encode_string(raw, enc));

@@ -60,10 +60,10 @@ public:
         m_path1(fly::PathUtil::GenerateTempDirectory()),
         m_path2(fly::PathUtil::GenerateTempDirectory()),
 
-        m_file0(m_path0 / (fly::String::GenerateRandomString(10) + ".txt")),
-        m_file1(m_path1 / (fly::String::GenerateRandomString(10) + ".txt")),
-        m_file2(m_path1 / (fly::String::GenerateRandomString(10) + ".txt")),
-        m_file3(m_path2 / (fly::String::GenerateRandomString(10) + ".txt"))
+        m_file0(m_path0 / (fly::String::generate_random_string(10) + ".txt")),
+        m_file1(m_path1 / (fly::String::generate_random_string(10) + ".txt")),
+        m_file2(m_path1 / (fly::String::generate_random_string(10) + ".txt")),
+        m_file3(m_path2 / (fly::String::generate_random_string(10) + ".txt"))
     {
         m_callback = std::bind(
             &PathMonitorTest::HandleEvent,

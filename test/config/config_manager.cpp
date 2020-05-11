@@ -38,7 +38,7 @@ class ConfigManagerTest : public ::testing::Test
 public:
     ConfigManagerTest() noexcept :
         m_path(fly::PathUtil::GenerateTempDirectory()),
-        m_file(m_path / (fly::String::GenerateRandomString(10) + ".txt")),
+        m_file(m_path / (fly::String::generate_random_string(10) + ".txt")),
 
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
 
@@ -192,7 +192,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
 {
     EXPECT_EQ(m_config_manager->prune(), m_initial_size);
 
-    const std::string contents = fly::String::Format(
+    const std::string contents = fly::String::format(
         "[%s]\n"
         "name=John Doe\n"
         "address=USA",
@@ -219,7 +219,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
 //==============================================================================
 TEST_F(ConfigManagerTest, InitialFileFirst)
 {
-    const std::string contents = fly::String::Format(
+    const std::string contents = fly::String::format(
         "[%s]\n"
         "name=John Doe\n"
         "address=USA",
@@ -240,7 +240,7 @@ TEST_F(ConfigManagerTest, InitialFileSecond)
 {
     auto config = m_config_manager->create_config<TestConfig>();
 
-    const std::string contents = fly::String::Format(
+    const std::string contents = fly::String::format(
         "[%s]\n"
         "name=John Doe\n"
         "address=USA",
@@ -259,7 +259,7 @@ TEST_F(ConfigManagerTest, FileChange)
 {
     auto config = m_config_manager->create_config<TestConfig>();
 
-    const std::string contents1 = fly::String::Format(
+    const std::string contents1 = fly::String::format(
         "[%s]\n"
         "name=John Doe\n"
         "address=USA",
@@ -273,7 +273,7 @@ TEST_F(ConfigManagerTest, FileChange)
     EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
     EXPECT_EQ(config->get_value<int>("age", -1), -1);
 
-    const std::string contents2 = fly::String::Format(
+    const std::string contents2 = fly::String::format(
         "[%s]\n"
         "name=Jane Doe\n"
         "age=27",
@@ -300,7 +300,7 @@ TEST_F(ConfigManagerTest, DeleteFile)
 {
     auto config = m_config_manager->create_config<TestConfig>();
 
-    const std::string contents = fly::String::Format(
+    const std::string contents = fly::String::format(
         "[%s]\n"
         "name=John Doe\n"
         "address=USA",
@@ -325,7 +325,7 @@ TEST_F(ConfigManagerTest, BadUpdate)
 {
     auto config = m_config_manager->create_config<TestConfig>();
 
-    const std::string contents = fly::String::Format(
+    const std::string contents = fly::String::format(
         "[%s]\n"
         "name",
         TestConfig::identifier);
