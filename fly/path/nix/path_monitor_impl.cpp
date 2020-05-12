@@ -130,32 +130,38 @@ bool PathMonitorImpl::read_events() const noexcept
 //==============================================================================
 void PathMonitorImpl::handle_event(const inotify_event *event) const noexcept
 {
-    auto it = std::find_if(
+    auto path_it = std::find_if(
         m_path_info.begin(),
         m_path_info.end(),
         [&event](const PathInfoMap::value_type &value) -> bool {
-            auto *info = static_cast<PathInfoImpl *>(value.second.get());
+            const auto *info = static_cast<PathInfoImpl *>(value.second.get());
             return info->m_watch_descriptor == event->wd;
         });
 
-    if (it != m_path_info.end())
+    if (path_it != m_path_info.end())
     {
-        auto *info = static_cast<PathInfoImpl *>(it->second.get());
+        const auto *info = static_cast<PathInfoImpl *>(path_it->second.get());
         PathMonitor::PathEvent path_event = convert_to_event(event->mask);
 
         if (path_event != PathMonitor::PathEvent::None)
         {
             const std::filesystem::path file(event->name);
-            auto callback = info->m_file_handlers[file];
 
-            if (callback == nullptr)
+            auto file_it = info->m_file_handlers.find(file);
+            PathEventCallback callback = nullptr;
+
+            if (file_it == info->m_file_handlers.end())
             {
                 callback = info->m_path_handler;
+            }
+            else
+            {
+                callback = file_it->second;
             }
 
             if (callback != nullptr)
             {
-                auto path = std::filesystem::path(it->first) / file;
+                auto path = std::filesystem::path(path_it->first) / file;
 
                 LOGI("Handling event %d for %s", path_event, path);
                 callback(path, path_event);

@@ -75,7 +75,8 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
             m_path_info.begin(),
             m_path_info.end(),
             [&key](const PathInfoMap::value_type &value) -> bool {
-                auto *info = static_cast<PathInfoImpl *>(value.second.get());
+                const auto *info =
+                    static_cast<PathInfoImpl *>(value.second.get());
                 return ((ULONG_PTR)(info->m_handle)) == key;
             });
 
@@ -130,11 +131,17 @@ void PathMonitorImpl::handle_events(
                 file_info->FileNameLength / sizeof(wchar_t));
 
             const std::filesystem::path file(wide_file);
-            auto callback = info->m_file_handlers[file];
 
-            if (callback == nullptr)
+            auto it = info->m_file_handlers.find(file);
+            PathEventCallback callback = nullptr;
+
+            if (it == info->m_file_handlers.end())
             {
                 callback = info->m_path_handler;
+            }
+            else
+            {
+                callback = it->second;
             }
 
             if (callback != nullptr)
