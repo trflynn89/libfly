@@ -11,7 +11,7 @@ namespace {
 
 int s_last_signal = 0;
 
-void handleSignal(int signal)
+void handle_signal(int signal)
 {
     s_last_signal = signal;
 }
@@ -51,7 +51,7 @@ TEST(SystemTest, ErrorCode)
 //==============================================================================
 TEST(SystemTest, Signal)
 {
-    fly::System::SignalHandler handler(&handleSignal);
+    fly::System::SignalHandler handler(&handle_signal);
     fly::System::set_signal_handler(handler);
 
     std::raise(SIGINT);

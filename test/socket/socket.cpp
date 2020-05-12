@@ -987,7 +987,7 @@ public:
      */
     void client_thread(bool async) noexcept override
     {
-        static unsigned int call_count = 0;
+        static unsigned int s_call_count = 0;
 
         auto send_socket =
             create_socket(m_client_socket_manager, fly::Protocol::UDP, async);
@@ -1006,7 +1006,7 @@ public:
         {
             std::string message(m_message);
 
-            if ((call_count++ % 2) == 0)
+            if ((s_call_count++ % 2) == 0)
             {
                 ASSERT_TRUE(send_socket->send_to_async(
                     std::move(m_message),
@@ -1031,7 +1031,7 @@ public:
         }
         else
         {
-            if ((call_count++ % 2) == 0)
+            if ((s_call_count++ % 2) == 0)
             {
                 ASSERT_EQ(
                     send_socket->send_to(m_message, m_address, m_port),

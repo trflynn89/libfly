@@ -111,8 +111,8 @@ TEST_F(HuffmanCoderTest, InvalidConfig)
     const std::string raw;
     std::string enc;
 
-    auto spConfig = std::make_shared<BadHuffmanConfig>();
-    fly::HuffmanEncoder encoder(spConfig);
+    auto config = std::make_shared<BadHuffmanConfig>();
+    fly::HuffmanEncoder encoder(config);
 
     EXPECT_FALSE(encoder.encode_string(raw, enc));
 }
@@ -277,17 +277,17 @@ TEST_F(HuffmanCoderTest, InvalidCodeLengthCounts)
 //==============================================================================
 TEST_F(HuffmanCoderTest, MissingCodeLengthCount)
 {
-    fly::byte_type numberOfCodeLengthCounts = 5_u8;
+    fly::byte_type number_of_code_length_counts = 5_u8;
 
     std::vector<fly::byte_type> bytes = {
         1_u8, // Version
         0_u8, // Chunk size KB (high)
         1_u8, // Chunk size KB (low)
         4_u8, // Maximum Huffman code length
-        numberOfCodeLengthCounts, // Number of code length counts
+        number_of_code_length_counts, // Number of code length counts
     };
 
-    for (fly::byte_type i = 0; i < numberOfCodeLengthCounts; ++i)
+    for (fly::byte_type i = 0; i < number_of_code_length_counts; ++i)
     {
         const std::string enc = create_stream(bytes);
         std::string dec;
@@ -431,7 +431,7 @@ TEST_F(HuffmanCoderTest, LengthLimited)
     EXPECT_EQ(raw, dec);
 
     // Validate the Kraft–McMillan inequality.
-    const std::uint16_t maxAllowedKraft =
+    const std::uint16_t max_allowed_kraft =
         (1_u16 << config->encoder_max_code_length()) - 1;
     std::uint16_t kraft = 0_u16;
 
@@ -440,7 +440,7 @@ TEST_F(HuffmanCoderTest, LengthLimited)
         kraft += 1_u16 << (config->encoder_max_code_length() - code.m_length);
     }
 
-    EXPECT_LE(kraft, maxAllowedKraft);
+    EXPECT_LE(kraft, max_allowed_kraft);
 }
 
 //==============================================================================
