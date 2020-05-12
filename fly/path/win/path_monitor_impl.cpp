@@ -10,29 +10,29 @@ namespace fly {
 
 namespace {
 
-    const DWORD s_accessFlags = FILE_LIST_DIRECTORY;
+    const DWORD s_access_flags = FILE_LIST_DIRECTORY;
 
-    const DWORD s_shareFlags =
+    const DWORD s_share_flags =
         FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE;
 
-    const DWORD s_dispositionFlags = OPEN_EXISTING;
+    const DWORD s_disposition_flags = OPEN_EXISTING;
 
-    const DWORD s_attributeFlags =
+    const DWORD s_attribute_flags =
         FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED;
 
-    const DWORD s_changeFlags = FILE_NOTIFY_CHANGE_FILE_NAME |
+    const DWORD s_change_flags = FILE_NOTIFY_CHANGE_FILE_NAME |
         FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE |
         FILE_NOTIFY_CHANGE_CREATION;
 
-    const DWORD s_buffSize = 100;
+    const DWORD s_buff_size = 100;
 
 } // namespace
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<PathConfig> &spConfig) noexcept :
-    PathMonitor(spTaskRunner, spConfig),
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<PathConfig> &config) noexcept :
+    PathMonitor(task_runner, config),
     m_iocp(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0))
 {
     if (m_iocp == nullptr)
@@ -52,139 +52,140 @@ PathMonitorImpl::~PathMonitorImpl()
 }
 
 //==============================================================================
-bool PathMonitorImpl::IsValid() const noexcept
+bool PathMonitorImpl::is_valid() const noexcept
 {
     return m_iocp != nullptr;
 }
 
 //==============================================================================
-void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout) noexcept
+void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
 {
     DWORD bytes = 0;
-    ULONG_PTR pKey = 0;
-    LPOVERLAPPED pOverlapped = nullptr;
+    ULONG_PTR key = 0;
+    LPOVERLAPPED overlapped = nullptr;
     DWORD delay = static_cast<DWORD>(timeout.count());
 
-    std::filesystem::path pathToRemove;
+    std::filesystem::path path_to_remove;
 
-    if (::GetQueuedCompletionStatus(m_iocp, &bytes, &pKey, &pOverlapped, delay))
+    if (::GetQueuedCompletionStatus(m_iocp, &bytes, &key, &overlapped, delay))
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
         auto it = std::find_if(
-            m_pathInfo.begin(),
-            m_pathInfo.end(),
-            [&pKey](const PathInfoMap::value_type &val) -> bool {
-                auto spInfo(std::static_pointer_cast<PathInfoImpl>(val.second));
-                return ((ULONG_PTR)(spInfo->m_handle)) == pKey;
+            m_path_info.begin(),
+            m_path_info.end(),
+            [&key](const PathInfoMap::value_type &value) -> bool {
+                auto *info = static_cast<PathInfoImpl *>(value.second.get());
+                return ((ULONG_PTR)(info->m_handle)) == key;
             });
 
-        if (it != m_pathInfo.end())
+        if (it != m_path_info.end())
         {
-            auto spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
-            handleEvents(spInfo, it->first);
+            auto *info = static_cast<PathInfoImpl *>(value.second.get());
+            handle_events(info, it->first);
 
-            if (!spInfo->Refresh(it->first))
+            if (!info->refresh(it->first))
             {
                 // Hold onto the path to be removed until the mutex is released
-                pathToRemove = it->first;
+                path_to_remove = it->first;
             }
         }
     }
 
-    if (!pathToRemove.empty())
+    if (!path_to_remove.empty())
     {
-        RemovePath(pathToRemove);
+        remove_path(path_to_remove);
     }
 }
 
 //==============================================================================
-std::shared_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
+std::unique_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
     const std::filesystem::path &path) const noexcept
 {
-    std::shared_ptr<PathMonitor::PathInfo> spInfo;
+    std::unique_ptr<PathMonitor::PathInfo> info;
 
-    if (IsValid())
+    if (is_valid())
     {
-        spInfo = std::make_shared<PathInfoImpl>(m_iocp, path);
+        info = std::make_unique<PathInfoImpl>(m_iocp, path);
     }
 
-    return spInfo;
+    return info;
 }
 
 //==============================================================================
-void PathMonitorImpl::handleEvents(
-    const std::shared_ptr<PathInfoImpl> &spInfo,
+void PathMonitorImpl::handle_events(
+    const std::shared_ptr<PathInfoImpl> &info,
     const std::filesystem::path &path) const noexcept
 {
-    PFILE_NOTIFY_INFORMATION pInfo = spInfo->m_pInfo;
+    PFILE_NOTIFY_INFORMATION file_info = info->m_file_info;
 
-    while (pInfo != nullptr)
+    while (file_info != nullptr)
     {
-        PathMonitor::PathEvent event = convertToEvent(pInfo->Action);
+        PathMonitor::PathEvent path_event = convert_to_event(file_info->Action);
 
-        if (event != PathMonitor::PathEvent::None)
+        if (path_event != PathMonitor::PathEvent::None)
         {
-            const std::wstring wFile(
-                pInfo->FileName,
-                pInfo->FileNameLength / sizeof(wchar_t));
+            const std::wstring wide_file(
+                file_info->FileName,
+                file_info->FileNameLength / sizeof(wchar_t));
 
-            const std::filesystem::path file(wFile);
-            auto callback = spInfo->m_fileHandlers[file];
+            const std::filesystem::path file(wide_file);
+            auto callback = info->m_file_handlers[file];
 
             if (callback == nullptr)
             {
-                callback = spInfo->m_pathHandler;
+                callback = info->m_path_handler;
             }
 
             if (callback != nullptr)
             {
                 auto full = path / file;
 
-                LOGI("Handling event %d for %s", event, full);
-                callback(full, event);
+                LOGI("Handling event %d for %s", path_event, full);
+                callback(full, path_event);
             }
         }
 
-        if (pInfo->NextEntryOffset == 0_u64)
+        if (file_info->NextEntryOffset == 0_u64)
         {
-            pInfo = nullptr;
+            file_info = nullptr;
         }
         else
         {
-            pInfo = reinterpret_cast<PFILE_NOTIFY_INFORMATION>(
-                reinterpret_cast<LPBYTE>(pInfo) + pInfo->NextEntryOffset);
+            file_info = reinterpret_cast<PFILE_NOTIFY_INFORMATION>(
+                reinterpret_cast<LPBYTE>(file_info) +
+                file_info->NextEntryOffset);
         }
     }
 }
 
 //==============================================================================
 PathMonitor::PathEvent
-PathMonitorImpl::convertToEvent(DWORD action) const noexcept
+PathMonitorImpl::convert_to_event(DWORD action) const noexcept
 {
-    PathMonitor::PathEvent event = PathMonitor::PathEvent::None;
+    PathMonitor::PathEvent path_event = PathMonitor::PathEvent::None;
 
     switch (action)
     {
         case FILE_ACTION_ADDED:
         case FILE_ACTION_RENAMED_NEW_NAME:
-            event = PathMonitor::PathEvent::Created;
+            path_event = PathMonitor::PathEvent::Created;
             break;
 
         case FILE_ACTION_REMOVED:
         case FILE_ACTION_RENAMED_OLD_NAME:
-            event = PathMonitor::PathEvent::Deleted;
+            path_event = PathMonitor::PathEvent::Deleted;
             break;
 
         case FILE_ACTION_MODIFIED:
-            event = PathMonitor::PathEvent::Changed;
+            path_event = PathMonitor::PathEvent::Changed;
             break;
 
         default:
             break;
     }
 
-    return event;
+    return path_event;
 }
 
 //==============================================================================
@@ -194,17 +195,17 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     PathMonitorImpl::PathInfo(),
     m_valid(false),
     m_handle(INVALID_HANDLE_VALUE),
-    m_pInfo(new FILE_NOTIFY_INFORMATION[s_buffSize])
+    m_file_info(new FILE_NOTIFY_INFORMATION[s_buff_size])
 {
     ::memset(&m_overlapped, 0, sizeof(m_overlapped));
 
     m_handle = ::CreateFile(
         path.string().c_str(),
-        s_accessFlags,
-        s_shareFlags,
+        s_access_flags,
+        s_share_flags,
         nullptr,
-        s_dispositionFlags,
-        s_attributeFlags,
+        s_disposition_flags,
+        s_attribute_flags,
         nullptr);
 
     if (m_handle == INVALID_HANDLE_VALUE)
@@ -222,16 +223,16 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
         return;
     }
 
-    m_valid = Refresh(path);
+    m_valid = refresh(path);
 }
 
 //==============================================================================
 PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 {
-    if (m_pInfo != nullptr)
+    if (m_file_info != nullptr)
     {
-        delete[] m_pInfo;
-        m_pInfo = nullptr;
+        delete[] m_file_info;
+        m_file_info = nullptr;
     }
 
     if (m_handle != INVALID_HANDLE_VALUE)
@@ -243,21 +244,21 @@ PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 }
 
 //==============================================================================
-bool PathMonitorImpl::PathInfoImpl::IsValid() const noexcept
+bool PathMonitorImpl::PathInfoImpl::is_valid() const noexcept
 {
     return m_valid && (m_handle != INVALID_HANDLE_VALUE);
 }
 
 //==============================================================================
-bool PathMonitorImpl::PathInfoImpl::Refresh(
+bool PathMonitorImpl::PathInfoImpl::refresh(
     const std::filesystem::path &path) noexcept
 {
-    static const DWORD size = (s_buffSize * sizeof(FILE_NOTIFY_INFORMATION));
+    static const DWORD size = (s_buff_size * sizeof(FILE_NOTIFY_INFORMATION));
     DWORD bytes = 0;
 
     BOOL success = ::ReadDirectoryChangesW(
         m_handle,
-        m_pInfo,
+        m_file_info,
         size,
         FALSE,
         s_changeFlags,
