@@ -449,7 +449,7 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
  */
 TEST_F(SocketTest, Send_Async_MockSendBlock)
 {
-    fly::MockSystem mock(fly::MockCall::Send_Blocking);
+    fly::MockSystem mock(fly::MockCall::SendBlocking);
 
     auto spServerSocket =
         CreateSocket(m_spServerSocketManager, fly::Protocol::TCP, true);
@@ -567,7 +567,7 @@ TEST_F(SocketTest, Send_Async_MockSendtoFail)
  */
 TEST_F(SocketTest, Send_Async_MockSendtoBlock)
 {
-    fly::MockSystem mock(fly::MockCall::Sendto_Blocking);
+    fly::MockSystem mock(fly::MockCall::SendtoBlocking);
 
     auto spServerSocket =
         CreateSocket(m_spServerSocketManager, fly::Protocol::UDP, true);

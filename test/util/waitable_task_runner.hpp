@@ -124,10 +124,10 @@ void WaitableTaskRunner::wait_for_task_to_complete() noexcept
         std::is_base_of<Task, TaskType>::value,
         "Given type is not a task");
 
-    static std::size_t expected_hash = typeid(TaskType).hash_code();
+    static std::size_t s_expected_hash = typeid(TaskType).hash_code();
     std::size_t completed_hash = 0;
 
-    while (expected_hash != completed_hash)
+    while (s_expected_hash != completed_hash)
     {
         m_completed_tasks.pop(completed_hash);
     }
@@ -144,10 +144,10 @@ bool WaitableTaskRunner::wait_for_task_to_complete(
 
     const auto deadline = std::chrono::high_resolution_clock::now() + duration;
 
-    static std::size_t expected_hash = typeid(TaskType).hash_code();
+    static std::size_t s_expected_hash = typeid(TaskType).hash_code();
     std::size_t completed_hash = 0;
 
-    while (expected_hash != completed_hash)
+    while (s_expected_hash != completed_hash)
     {
         auto before = std::chrono::high_resolution_clock::now();
         m_completed_tasks.pop(completed_hash, duration);
@@ -162,7 +162,7 @@ bool WaitableTaskRunner::wait_for_task_to_complete(
             std::chrono::duration_cast<decltype(duration)>(after - before);
     }
 
-    return (expected_hash == completed_hash);
+    return (s_expected_hash == completed_hash);
 }
 
 } // namespace fly
