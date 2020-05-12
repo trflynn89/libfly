@@ -18,37 +18,49 @@ class SocketConfig;
  */
 class SocketImpl : public Socket
 {
-public:
-    SocketImpl(Protocol, const std::shared_ptr<SocketConfig> &) noexcept;
+    SocketImpl(
+        Protocol protocol,
+        const std::shared_ptr<SocketConfig> &config) noexcept;
     ~SocketImpl() override;
 
-    static bool HostnameToAddress(const std::string &, address_type &) noexcept;
+    static bool hostname_to_address(
+        const std::string &hostname,
+        address_type &address) noexcept;
 
-    static address_type InAddrAny() noexcept;
+    static address_type in_addr_any() noexcept;
 
-    static socket_type InvalidSocket() noexcept;
+    static socket_type invalid_socket() noexcept;
 
-    void Close() noexcept override;
+    void close() noexcept override;
 
-    bool IsErrorFree() noexcept override;
+    bool is_error_free() noexcept override;
 
-    bool SetAsync() noexcept override;
+    bool set_async() noexcept override;
 
-    bool Bind(address_type, port_type, BindOption) const noexcept override;
-
-    bool Listen() noexcept override;
-
-    bool Connect(address_type, port_type) noexcept override;
-
-    std::shared_ptr<Socket> Accept() const noexcept override;
-
-protected:
-    std::size_t Send(const std::string &, bool &) const noexcept override;
-    std::size_t SendTo(const std::string &, address_type, port_type, bool &)
+    bool bind(address_type address, port_type port, BindOption option)
         const noexcept override;
 
-    std::string Recv(bool &, bool &) const noexcept override;
-    std::string RecvFrom(bool &, bool &) const noexcept override;
+    bool listen() noexcept override;
+
+    bool connect(address_type address, port_type port) noexcept override;
+
+    std::shared_ptr<Socket> accept() const noexcept override;
+
+protected:
+    size_t
+    send(const std::string &message, bool &would_block) const noexcept override;
+
+    size_t send_to(
+        const std::string &message,
+        address_type address,
+        port_type port,
+        bool &would_block) const noexcept override;
+
+    std::string
+    recv(bool &would_block, bool &is_complete) const noexcept override;
+
+    std::string
+    recv_from(bool &would_block, bool &is_complete) const noexcept override;
 };
 
 } // namespace fly

@@ -11,131 +11,134 @@ namespace fly {
 
 //==============================================================================
 SocketManager::SocketManager(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SocketConfig> &spConfig) noexcept :
-    m_spTaskRunner(spTaskRunner),
-    m_spConfig(spConfig),
-    m_newClientCallback(nullptr),
-    m_closedClientCallback(nullptr)
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<SocketConfig> &config) noexcept :
+    m_task_runner(task_runner),
+    m_config(config),
+    m_new_client_callback(nullptr),
+    m_closed_client_callback(nullptr)
 {
 }
 
 //==============================================================================
 SocketManager::~SocketManager()
 {
-    ClearClientCallbacks();
+    clear_client_callbacks();
 
-    std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
-    m_aioSockets.clear();
+    std::lock_guard<std::mutex> lock(m_async_sockets_mutex);
+    m_async_sockets.clear();
 }
 
 //==============================================================================
-void SocketManager::Start() noexcept
+void SocketManager::start() noexcept
 {
-    std::shared_ptr<SocketManager> spSocketManager = shared_from_this();
+    std::shared_ptr<SocketManager> socket_manager = shared_from_this();
 
-    m_spTask = std::make_shared<SocketManagerTask>(spSocketManager);
-    m_spTaskRunner->post_task(m_spTask);
+    m_task = std::make_shared<SocketManagerTask>(socket_manager);
+    m_task_runner->post_task(m_task);
 }
 
 //==============================================================================
-void SocketManager::SetClientCallbacks(
-    SocketCallback newClient,
-    SocketCallback closedClient) noexcept
+void SocketManager::set_client_callbacks(
+    SocketCallback new_client,
+    SocketCallback closed_client) noexcept
 {
-    std::lock_guard<std::mutex> lock(m_callbackMutex);
+    std::lock_guard<std::mutex> lock(m_callback_mutex);
 
-    m_newClientCallback = newClient;
-    m_closedClientCallback = closedClient;
+    m_new_client_callback = new_client;
+    m_closed_client_callback = closed_client;
 }
 
 //==============================================================================
-void SocketManager::ClearClientCallbacks() noexcept
+void SocketManager::clear_client_callbacks() noexcept
 {
-    SetClientCallbacks(nullptr, nullptr);
+    set_client_callbacks(nullptr, nullptr);
 }
 
 //==============================================================================
-std::shared_ptr<Socket> SocketManager::CreateSocket(Protocol protocol) noexcept
+std::shared_ptr<Socket> SocketManager::create_socket(Protocol protocol) noexcept
 {
-    auto spSocket = std::make_shared<SocketImpl>(protocol, m_spConfig);
+    auto socket = std::make_shared<SocketImpl>(protocol, m_config);
 
-    if (!spSocket->IsValid())
+    if (!socket->is_valid())
     {
-        spSocket.reset();
+        socket.reset();
     }
 
-    return spSocket;
+    return socket;
 }
 
 //==============================================================================
 std::weak_ptr<Socket>
-SocketManager::CreateAsyncSocket(Protocol protocol) noexcept
+SocketManager::create_async_socket(Protocol protocol) noexcept
 {
-    auto spSocket = CreateSocket(protocol);
+    auto socket = create_socket(protocol);
 
-    if (spSocket)
+    if (socket)
     {
-        if (spSocket->SetAsync())
+        if (socket->set_async())
         {
-            std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
-            m_aioSockets.push_back(spSocket);
+            std::lock_guard<std::mutex> lock(m_async_sockets_mutex);
+            m_async_sockets.push_back(socket);
         }
         else
         {
-            spSocket.reset();
+            socket.reset();
         }
     }
 
-    return spSocket;
+    return socket;
 }
 
 //==============================================================================
-void SocketManager::HandleNewAndClosedSockets(
-    const SocketList &newSockets,
-    const SocketList &closedSockets) noexcept
+void SocketManager::handle_new_and_closed_sockets(
+    const SocketList &new_sockets,
+    const SocketList &closed_sockets) noexcept
 {
     // Add new sockets to the socket system
-    m_aioSockets.insert(
-        m_aioSockets.end(),
-        newSockets.begin(),
-        newSockets.end());
+    m_async_sockets.insert(
+        m_async_sockets.end(),
+        new_sockets.begin(),
+        new_sockets.end());
 
     // Remove closed sockets from the socket system
-    for (const std::shared_ptr<Socket> &spSocket : closedSockets)
+    for (const std::shared_ptr<Socket> &socket : closed_sockets)
     {
-        auto is_same = [&spSocket](const std::shared_ptr<Socket> &spClosed) {
-            return spSocket->GetSocketId() == spClosed->GetSocketId();
+        auto is_same_socket = [&socket](const std::shared_ptr<Socket> &closed) {
+            return socket->get_socket_id() == closed->get_socket_id();
         };
 
-        m_aioSockets.erase(
-            std::remove_if(m_aioSockets.begin(), m_aioSockets.end(), is_same),
-            m_aioSockets.end());
+        m_async_sockets.erase(
+            std::remove_if(
+                m_async_sockets.begin(),
+                m_async_sockets.end(),
+                is_same_socket),
+            m_async_sockets.end());
     }
 }
 
 //==============================================================================
-void SocketManager::TriggerCallbacks(
-    const SocketList &connectedClients,
-    const SocketList &closedClients) noexcept
+void SocketManager::trigger_callbacks(
+    const SocketList &connected_clients,
+    const SocketList &closed_clients) noexcept
 {
-    if (!connectedClients.empty() || !closedClients.empty())
+    if (!connected_clients.empty() || !closed_clients.empty())
     {
-        std::lock_guard<std::mutex> lock(m_callbackMutex);
+        std::lock_guard<std::mutex> lock(m_callback_mutex);
 
-        if (m_newClientCallback != nullptr)
+        if (m_new_client_callback != nullptr)
         {
-            for (const std::shared_ptr<Socket> &spSocket : connectedClients)
+            for (const std::shared_ptr<Socket> &socket : connected_clients)
             {
-                m_newClientCallback(spSocket);
+                m_new_client_callback(socket);
             }
         }
 
-        if (m_closedClientCallback != nullptr)
+        if (m_closed_client_callback != nullptr)
         {
-            for (const std::shared_ptr<Socket> &spSocket : closedClients)
+            for (const std::shared_ptr<Socket> &socket : closed_clients)
             {
-                m_closedClientCallback(spSocket);
+                m_closed_client_callback(socket);
             }
         }
     }
@@ -143,21 +146,22 @@ void SocketManager::TriggerCallbacks(
 
 //==============================================================================
 SocketManagerTask::SocketManagerTask(
-    std::weak_ptr<SocketManager> wpSocketManager) noexcept :
+    std::weak_ptr<SocketManager> weak_socket_manager) noexcept :
     Task(),
-    m_wpSocketManager(wpSocketManager)
+    m_weak_socket_manager(weak_socket_manager)
 {
 }
 
 //==============================================================================
 void SocketManagerTask::run() noexcept
 {
-    std::shared_ptr<SocketManager> spSocketManager = m_wpSocketManager.lock();
+    std::shared_ptr<SocketManager> socket_manager =
+        m_weak_socket_manager.lock();
 
-    if (spSocketManager)
+    if (socket_manager)
     {
-        spSocketManager->Poll(spSocketManager->m_spConfig->IoWaitTime());
-        spSocketManager->m_spTaskRunner->post_task(spSocketManager->m_spTask);
+        socket_manager->poll(socket_manager->m_config->io_wait_time());
+        socket_manager->m_task_runner->post_task(socket_manager->m_task);
     }
 }
 

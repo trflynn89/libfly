@@ -2,17 +2,16 @@
 
 namespace fly {
 
-//==============================================================================
 namespace {
 
-    const int s_invalidId = -1;
+    const int s_invalid_id = -1;
 
 } // namespace
 
 //==============================================================================
 AsyncRequest::AsyncRequest() noexcept :
-    m_socketId(s_invalidId),
-    m_requestOffset(0),
+    m_socket_id(s_invalid_id),
+    m_request_offset(0),
     m_request(),
     m_address(),
     m_port()
@@ -21,19 +20,19 @@ AsyncRequest::AsyncRequest() noexcept :
 
 //==============================================================================
 AsyncRequest::AsyncRequest(AsyncRequest &&request) noexcept :
-    m_socketId(std::move(request.m_socketId)),
-    m_requestOffset(std::move(request.m_requestOffset)),
+    m_socket_id(std::move(request.m_socket_id)),
+    m_request_offset(std::move(request.m_request_offset)),
     m_request(std::move(request.m_request)),
     m_address(std::move(request.m_address)),
     m_port(std::move(request.m_port))
 {
-    request.m_socketId = s_invalidId;
+    request.m_socket_id = s_invalid_id;
 }
 
 //==============================================================================
-AsyncRequest::AsyncRequest(int socketId, std::string &&request) noexcept :
-    m_socketId(socketId),
-    m_requestOffset(0),
+AsyncRequest::AsyncRequest(int socket_id, std::string &&request) noexcept :
+    m_socket_id(socket_id),
+    m_request_offset(0),
     m_request(request),
     m_address(),
     m_port()
@@ -42,12 +41,12 @@ AsyncRequest::AsyncRequest(int socketId, std::string &&request) noexcept :
 
 //==============================================================================
 AsyncRequest::AsyncRequest(
-    int socketId,
+    int socket_id,
     std::string &&request,
     address_type address,
     port_type port) noexcept :
-    m_socketId(socketId),
-    m_requestOffset(0),
+    m_socket_id(socket_id),
+    m_request_offset(0),
     m_request(request),
     m_address(address),
     m_port(port)
@@ -57,56 +56,56 @@ AsyncRequest::AsyncRequest(
 //==============================================================================
 AsyncRequest &AsyncRequest::operator=(AsyncRequest &&request) noexcept
 {
-    m_socketId = std::move(request.m_socketId);
-    m_requestOffset = std::move(request.m_requestOffset);
+    m_socket_id = std::move(request.m_socket_id);
+    m_request_offset = std::move(request.m_request_offset);
     m_request = std::move(request.m_request);
     m_address = std::move(request.m_address);
     m_port = std::move(request.m_port);
 
-    request.m_socketId = s_invalidId;
+    request.m_socket_id = s_invalid_id;
 
     return *this;
 }
 
 //==============================================================================
-bool AsyncRequest::IsValid() const noexcept
+bool AsyncRequest::is_valid() const noexcept
 {
-    return m_socketId != s_invalidId;
+    return m_socket_id != s_invalid_id;
 }
 
 //==============================================================================
-int AsyncRequest::GetSocketId() const noexcept
+int AsyncRequest::get_socket_id() const noexcept
 {
-    return m_socketId;
+    return m_socket_id;
 }
 
 //==============================================================================
-void AsyncRequest::IncrementRequestOffset(
+void AsyncRequest::increment_request_offset(
     std::string::size_type offset) noexcept
 {
-    m_requestOffset += offset;
+    m_request_offset += offset;
 }
 
 //==============================================================================
-const std::string &AsyncRequest::GetRequest() const noexcept
+const std::string &AsyncRequest::get_request() const noexcept
 {
     return m_request;
 }
 
 //==============================================================================
-std::string AsyncRequest::GetRequestRemaining() const noexcept
+std::string AsyncRequest::get_request_remaining() const noexcept
 {
-    return m_request.substr(m_requestOffset, std::string::npos);
+    return m_request.substr(m_request_offset, std::string::npos);
 }
 
 //==============================================================================
-address_type AsyncRequest::GetAddress() const noexcept
+address_type AsyncRequest::get_address() const noexcept
 {
     return m_address;
 }
 
 //==============================================================================
-port_type AsyncRequest::GetPort() const noexcept
+port_type AsyncRequest::get_port() const noexcept
 {
     return m_port;
 }

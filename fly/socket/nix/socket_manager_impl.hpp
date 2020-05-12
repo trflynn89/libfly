@@ -22,15 +22,17 @@ class SocketManagerImpl : public SocketManager
 {
 public:
     SocketManagerImpl(
-        const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SocketConfig> &) noexcept;
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        const std::shared_ptr<SocketConfig> &config) noexcept;
 
 protected:
-    void Poll(const std::chrono::microseconds &) noexcept override;
+    void poll(const std::chrono::microseconds &timeout) noexcept override;
 
 private:
-    socket_type setReadAndWriteMasks(fd_set *, fd_set *) noexcept;
-    void handleSocketIO(fd_set *, fd_set *) noexcept;
+    socket_type
+    set_read_and_write_masks(fd_set *read_fd, fd_set *write_fd) noexcept;
+
+    void handle_socket_io(fd_set *read_fd, fd_set *write_fd) noexcept;
 };
 
 } // namespace fly

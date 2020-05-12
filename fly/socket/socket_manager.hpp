@@ -39,12 +39,12 @@ public:
     /**
      * Constructor.
      *
-     * @param TaskRunner Task runner for posting socket-related tasks onto.
-     * @param LoggerConfig Reference to socket configuration.
+     * @param task_runner Task runner for posting socket-related tasks onto.
+     * @param config Reference to socket configuration.
      */
     SocketManager(
-        const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<SocketConfig> &) noexcept;
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        const std::shared_ptr<SocketConfig> &config) noexcept;
 
     /**
      * Destructor. Close all asynchronous sockets.
@@ -54,105 +54,111 @@ public:
     /**
      * Initialize the socket manager task.
      */
-    void Start() noexcept;
+    void start() noexcept;
 
     /**
      * Set callbacks for when a client connects or disconnects.
      *
-     * @param SocketCallback Callback for when a new client connects.
-     * @param SocketCallback Callback for when a client disconnects.
+     * @param new_client Callback for when a new client connects.
+     * @param closed_client Callback for when a client disconnects.
      */
-    void SetClientCallbacks(SocketCallback, SocketCallback) noexcept;
+    void set_client_callbacks(
+        SocketCallback new_client,
+        SocketCallback closed_client) noexcept;
 
     /**
      * Remove the callbacks for when a client connects or disconnects.
      */
-    void ClearClientCallbacks() noexcept;
+    void clear_client_callbacks() noexcept;
 
     /**
      * Create and initialize a synchronous socket.
      *
-     * @param Protocol The communication protocol of the socket.
+     * @param protocol The communication protocol of the socket.
      *
      * @return Shared pointer to the socket.
      */
-    std::shared_ptr<Socket> CreateSocket(Protocol) noexcept;
+    std::shared_ptr<Socket> create_socket(Protocol protocol) noexcept;
 
     /**
      * Create and initialize an asynchronous socket. The socket manager will own
      * this socket.
      *
-     * @param Protocol The communication protocol of the socket.
+     * @param protocol The communication protocol of the socket.
      *
      * @return Weak pointer to the socket.
      */
-    std::weak_ptr<Socket> CreateAsyncSocket(Protocol) noexcept;
+    std::weak_ptr<Socket> create_async_socket(Protocol protocol) noexcept;
 
     /**
      * Wait for an asynchronous read to complete.
      *
-     * @param AsyncRequest Structure to store the completion.
-     * @param duration Time to wait for a completion.
+     * @param request Structure to store the completion.
+     * @param wait_time Time to wait for a completion.
      *
      * @return True if a completed receive was found in the given duration.
      */
     template <typename R, typename P>
-    bool WaitForCompletedReceive(
-        AsyncRequest &,
-        std::chrono::duration<R, P>) noexcept;
+    bool wait_for_completed_receive(
+        AsyncRequest &request,
+        std::chrono::duration<R, P> wait_time) noexcept;
 
     /**
      * Wait for an asynchronous send to complete.
      *
-     * @param AsyncRequest Structure to store the completion.
-     * @param duration Time to wait for a completion.
+     * @param request Structure to store the completion.
+     * @param wait_time Time to wait for a completion.
      *
      * @return True if a completed send was found in the given duration.
      */
     template <typename R, typename P>
-    bool
-    WaitForCompletedSend(AsyncRequest &, std::chrono::duration<R, P>) noexcept;
+    bool wait_for_completed_send(
+        AsyncRequest &request,
+        std::chrono::duration<R, P> wait_time) noexcept;
 
 protected:
     /**
      * Check if any asynchronous sockets are available for IO.
      *
-     * @param microseconds Max time to allow for a socket to be available.
+     * @param timeout Max time to allow for a socket to be available.
      */
-    virtual void Poll(const std::chrono::microseconds &) noexcept = 0;
+    virtual void poll(const std::chrono::microseconds &timeout) noexcept = 0;
 
     /**
      * Add new sockets to and remove closed sockets from the socket system.
      *
-     * @param SocketList Newly added sockets.
-     * @param SocketList Newly closed sockets.
+     * @param closed_sockets Newly added sockets.
+     * @param closed_sockets Newly closed sockets.
      */
-    void
-    HandleNewAndClosedSockets(const SocketList &, const SocketList &) noexcept;
+    void handle_new_and_closed_sockets(
+        const SocketList &new_sockets,
+        const SocketList &closed_sockets) noexcept;
 
     /**
      * Trigger the connected and closed client callbacks.
      *
-     * @param SocketList Newly connected clients.
-     * @param SocketList Newly closed clients.
+     * @param connected_clients Newly connected clients.
+     * @param closed_clients Newly closed clients.
      */
-    void TriggerCallbacks(const SocketList &, const SocketList &) noexcept;
+    void trigger_callbacks(
+        const SocketList &connected_clients,
+        const SocketList &closed_clients) noexcept;
 
-    std::mutex m_aioSocketsMutex;
-    SocketList m_aioSockets;
+    std::mutex m_async_sockets_mutex;
+    SocketList m_async_sockets;
 
-    AsyncRequest::RequestQueue m_completedReceives;
-    AsyncRequest::RequestQueue m_completedSends;
+    AsyncRequest::RequestQueue m_completed_receives;
+    AsyncRequest::RequestQueue m_completed_sends;
 
 private:
-    std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
-    std::shared_ptr<Task> m_spTask;
+    std::shared_ptr<SequencedTaskRunner> m_task_runner;
+    std::shared_ptr<Task> m_task;
 
-    std::shared_ptr<SocketConfig> m_spConfig;
+    std::shared_ptr<SocketConfig> m_config;
 
-    std::mutex m_callbackMutex;
-    SocketCallback m_newClientCallback;
-    SocketCallback m_closedClientCallback;
+    std::mutex m_callback_mutex;
+    SocketCallback m_new_client_callback;
+    SocketCallback m_closed_client_callback;
 };
 
 /**
@@ -164,7 +170,8 @@ private:
 class SocketManagerTask : public Task
 {
 public:
-    explicit SocketManagerTask(std::weak_ptr<SocketManager>) noexcept;
+    explicit SocketManagerTask(
+        std::weak_ptr<SocketManager> weak_socket_manager) noexcept;
 
 protected:
     /**
@@ -174,25 +181,25 @@ protected:
     void run() noexcept override;
 
 private:
-    std::weak_ptr<SocketManager> m_wpSocketManager;
+    std::weak_ptr<SocketManager> m_weak_socket_manager;
 };
 
 //==============================================================================
 template <typename R, typename P>
-bool SocketManager::WaitForCompletedReceive(
+bool SocketManager::wait_for_completed_receive(
     AsyncRequest &request,
-    std::chrono::duration<R, P> waitTime) noexcept
+    std::chrono::duration<R, P> wait_time) noexcept
 {
-    return m_completedReceives.pop(request, waitTime);
+    return m_completed_receives.pop(request, wait_time);
 }
 
 //==============================================================================
 template <typename R, typename P>
-bool SocketManager::WaitForCompletedSend(
+bool SocketManager::wait_for_completed_send(
     AsyncRequest &request,
-    std::chrono::duration<R, P> waitTime) noexcept
+    std::chrono::duration<R, P> wait_time) noexcept
 {
-    return m_completedSends.pop(request, waitTime);
+    return m_completed_sends.pop(request, wait_time);
 }
 
 } // namespace fly
