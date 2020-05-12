@@ -57,15 +57,15 @@ class NotStreamable
 template <typename StringType, typename T>
 StringType minstr() noexcept
 {
-    static constexpr std::intmax_t min = std::numeric_limits<T>::min();
+    static constexpr std::intmax_t s_min = std::numeric_limits<T>::min();
 
     if constexpr (std::is_same_v<StringType, std::string>)
     {
-        return std::to_string(min - 1);
+        return std::to_string(s_min - 1);
     }
     else if constexpr (std::is_same_v<StringType, std::wstring>)
     {
-        return std::to_wstring(min - 1);
+        return std::to_wstring(s_min - 1);
     }
 }
 
@@ -73,15 +73,15 @@ StringType minstr() noexcept
 template <typename StringType, typename T>
 StringType maxstr() noexcept
 {
-    static constexpr std::uintmax_t max = std::numeric_limits<T>::max();
+    static constexpr std::uintmax_t s_max = std::numeric_limits<T>::max();
 
     if constexpr (std::is_same_v<StringType, std::string>)
     {
-        return std::to_string(max + 1);
+        return std::to_string(s_max + 1);
     }
     else if constexpr (std::is_same_v<StringType, std::wstring>)
     {
-        return std::to_wstring(max + 1);
+        return std::to_wstring(s_max + 1);
     }
 }
 
@@ -106,13 +106,13 @@ TYPED_TEST(BasicStringTest, Split)
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
-    static constexpr std::uint32_t size = 10;
-    std::vector<string_type> input_split(size);
+    static constexpr std::uint32_t s_size = 10;
+    std::vector<string_type> input_split(s_size);
 
     constexpr char_type delim = ' ';
     string_type input;
 
-    for (std::uint32_t i = 0; i < size; ++i)
+    for (std::uint32_t i = 0; i < s_size; ++i)
     {
         const string_type curr = StringClass::generate_random_string(10);
 
@@ -123,7 +123,7 @@ TYPED_TEST(BasicStringTest, Split)
     const auto output_split = StringClass::split(input, delim);
     EXPECT_EQ(input_split.size(), output_split.size());
 
-    for (std::uint32_t i = 0; i < size; ++i)
+    for (std::uint32_t i = 0; i < s_size; ++i)
     {
         EXPECT_EQ(input_split[i], output_split[i]);
     }
@@ -136,19 +136,19 @@ TYPED_TEST(BasicStringTest, MaxSplit)
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
-    static constexpr std::uint32_t size = 10;
-    static constexpr std::uint32_t count = 6;
-    std::vector<string_type> input_split(count);
+    static constexpr std::uint32_t s_size = 10;
+    static constexpr std::uint32_t s_count = 6;
+    std::vector<string_type> input_split(s_count);
 
     constexpr char_type delim = ';';
     string_type input;
 
-    for (std::uint32_t i = 0; i < size; ++i)
+    for (std::uint32_t i = 0; i < s_size; ++i)
     {
         const string_type curr = StringClass::generate_random_string(10);
         input += curr + delim;
 
-        if (i < count)
+        if (i < s_count)
         {
             input_split[i] = curr;
         }
@@ -159,10 +159,10 @@ TYPED_TEST(BasicStringTest, MaxSplit)
         }
     }
 
-    const auto output_split = StringClass::split(input, delim, count);
+    const auto output_split = StringClass::split(input, delim, s_count);
     EXPECT_EQ(input_split.size(), output_split.size());
 
-    for (std::uint32_t i = 0; i < count; ++i)
+    for (std::uint32_t i = 0; i < s_count; ++i)
     {
         EXPECT_EQ(input_split[i], output_split[i]);
     }
@@ -480,10 +480,10 @@ TYPED_TEST(BasicStringTest, GenerateRandomString)
     using StringClass = fly::BasicString<string_type>;
     using size_type = typename StringClass::size_type;
 
-    static constexpr size_type size = (1 << 10);
+    static constexpr size_type s_size = (1 << 10);
 
-    const auto random = StringClass::generate_random_string(size);
-    EXPECT_EQ(size, random.size());
+    const auto random = StringClass::generate_random_string(s_size);
+    EXPECT_EQ(s_size, random.size());
 }
 
 //==============================================================================
