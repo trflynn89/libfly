@@ -8,15 +8,15 @@
 namespace fly {
 
 //==============================================================================
-std::atomic_int SocketManagerImpl::s_socketManagerCount(0);
+std::atomic_int SocketManagerImpl::s_socket_manager_count(0);
 
 //==============================================================================
 SocketManagerImpl::SocketManagerImpl(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SocketConfig> &spConfig) noexcept :
-    SocketManager(spTaskRunner, spConfig)
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<SocketConfig> &config) noexcept :
+    SocketManager(task_runner, config)
 {
-    if (s_socketManagerCount.fetch_add(1) == 0)
+    if (s_socket_manager_count.fetch_add(1) == 0)
     {
         WORD version = MAKEWORD(2, 2);
         WSADATA wsadata;
@@ -31,122 +31,118 @@ SocketManagerImpl::SocketManagerImpl(
 //==============================================================================
 SocketManagerImpl::~SocketManagerImpl()
 {
-    if (s_socketManagerCount.fetch_sub(1) == 1)
+    if (s_socket_manager_count.fetch_sub(1) == 1)
     {
         WSACleanup();
     }
 }
 
 //==============================================================================
-void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout) noexcept
+void SocketManagerImpl::poll(const std::chrono::microseconds &timeout) noexcept
 {
-    fd_set readFd, writeFd;
+    fd_set read_fd, write_fd;
     struct timeval tv = {0, static_cast<long>(timeout.count())};
 
-    bool anyMasksSet = false;
+    bool any_masks_set = false;
     {
-        std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
-        anyMasksSet = setReadAndWriteMasks(&readFd, &writeFd);
+        std::lock_guard<std::mutex> lock(m_async_sockets_mutex);
+        any_masks_set = set_read_and_write_masks(&read_fd, &write_fd);
     }
 
-    if (anyMasksSet)
+    if (any_masks_set)
     {
         // First argument of ::select() is ignored in Windows
-        if (::select(0, &readFd, &writeFd, nullptr, &tv) > 0)
+        if (::select(0, &read_fd, &write_fd, nullptr, &tv) > 0)
         {
-            std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
-            handleSocketIO(&readFd, &writeFd);
+            std::lock_guard<std::mutex> lock(m_async_sockets_mutex);
+            handle_socket_io(&read_fd, &write_fd);
         }
     }
 }
 
 //==============================================================================
-bool SocketManagerImpl::setReadAndWriteMasks(
-    fd_set *readFd,
-    fd_set *writeFd) noexcept
+bool SocketManagerImpl::set_read_and_write_masks(
+    fd_set *read_fd,
+    fd_set *write_fd) noexcept
 {
-    bool anyMasksSet = false;
+    bool any_masks_set = false;
 
-    FD_ZERO(readFd);
-    FD_ZERO(writeFd);
+    FD_ZERO(read_fd);
+    FD_ZERO(write_fd);
 
-    for (const std::shared_ptr<Socket> &spSocket : m_aioSockets)
+    for (const std::shared_ptr<Socket> &socket : m_async_sockets)
     {
-        if (spSocket->IsValid())
+        if (socket->is_valid())
         {
-            socket_type fd = spSocket->GetHandle();
+            socket_type fd = socket->get_handle();
 
-            FD_SET(fd, readFd);
-            FD_SET(fd, writeFd);
+            FD_SET(fd, read_fd);
+            FD_SET(fd, write_fd);
 
-            anyMasksSet = true;
+            any_masks_set = true;
         }
     }
 
-    return anyMasksSet;
+    return any_masks_set;
 }
 
 //==============================================================================
-void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd) noexcept
+void SocketManagerImpl::handle_socket_io(
+    fd_set *read_fd,
+    fd_set *write_fd) noexcept
 {
-    SocketList newClients, connectedClients, closedClients;
+    SocketList new_clients, connected_clients, closed_clients;
 
-    for (auto it = m_aioSockets.begin(); it != m_aioSockets.end(); ++it)
+    for (const std::shared_ptr<Socket> &socket : m_async_sockets)
     {
-        std::shared_ptr<Socket> &spSocket = *it;
-
-        if (spSocket->IsValid())
+        if (socket->is_valid())
         {
-            socket_type handle = spSocket->GetHandle();
+            socket_type handle = socket->get_handle();
 
             // Handle socket accepts and reads
-            if (FD_ISSET(handle, readFd))
+            if (FD_ISSET(handle, read_fd))
             {
-                if (spSocket->IsListening())
+                if (socket->is_listening())
                 {
-                    std::shared_ptr<Socket> spNewClient = spSocket->Accept();
+                    std::shared_ptr<Socket> new_client = socket->accept();
 
-                    if (spNewClient && spNewClient->SetAsync())
+                    if (new_client && new_client->set_async())
                     {
-                        connectedClients.push_back(spNewClient);
-                        newClients.push_back(spNewClient);
+                        connected_clients.push_back(new_client);
+                        new_clients.push_back(new_client);
                     }
                 }
-                else if (spSocket->IsConnected() || spSocket->IsUdp())
+                else if (socket->is_connected() || socket->is_udp())
                 {
-                    spSocket->ServiceRecvRequests(m_completedReceives);
+                    socket->service_recv_requests(m_completed_receives);
                 }
             }
 
             // Handle socket connects and writes
-            if (FD_ISSET(handle, writeFd))
+            if (FD_ISSET(handle, write_fd))
             {
-                if (spSocket->IsConnecting())
+                if (socket->is_connecting())
                 {
-                    if (spSocket->FinishConnect())
+                    if (socket->finish_connect())
                     {
-                        connectedClients.push_back(spSocket);
-                    }
-                    else
-                    {
-                        closedClients.push_back(spSocket);
+                        connected_clients.push_back(socket);
                     }
                 }
-                else if (spSocket->IsConnected() || spSocket->IsUdp())
+                else if (socket->is_connected() || socket->is_udp())
                 {
-                    spSocket->ServiceSendRequests(m_completedSends);
+                    socket->service_send_requests(m_completed_sends);
                 }
             }
         }
 
-        if (!spSocket->IsValid())
+        if (!socket->is_valid())
         {
-            closedClients.push_back(spSocket);
+            closed_clients.push_back(socket);
         }
     }
 
-    HandleNewAndClosedSockets(newClients, closedClients);
-    TriggerCallbacks(connectedClients, closedClients);
+    handle_new_and_closed_sockets(new_clients, closed_clients);
+    trigger_callbacks(connected_clients, closed_clients);
 }
 
 } // namespace fly
