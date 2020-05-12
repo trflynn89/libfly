@@ -18,6 +18,7 @@ class SocketConfig;
  */
 class SocketImpl : public Socket
 {
+public:
     SocketImpl(
         Protocol protocol,
         const std::shared_ptr<SocketConfig> &config) noexcept;

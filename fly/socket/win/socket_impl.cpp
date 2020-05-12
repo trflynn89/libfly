@@ -65,8 +65,8 @@ bool SocketImpl::hostname_to_address(
 
     memcpy(
         reinterpret_cast<void *>(&address),
-        reinterpret_cast<void *>(ipAddress->h_addr_list[0]),
-        static_cast<std::size_t>(ipAddress->h_length));
+        reinterpret_cast<void *>(ip_address->h_addr_list[0]),
+        static_cast<std::size_t>(ip_address->h_length));
 
     address = ntohl(address);
 
@@ -118,7 +118,7 @@ bool SocketImpl::set_async() noexcept
 {
     unsigned long non_zero = 1;
 
-    if (::ioctlsocket(m_socket_handle, FIONBIO, &nonZero) == SOCKET_ERROR)
+    if (::ioctlsocket(m_socket_handle, FIONBIO, &non_zero) == SOCKET_ERROR)
     {
         SLOGS(m_socket_handle, "Error setting async flag");
         return false;
@@ -149,8 +149,8 @@ bool SocketImpl::bind(address_type address, port_type port, BindOption option)
                     m_socket_handle,
                     SOL_SOCKET,
                     SO_REUSEADDR,
-                    &bindForReuseOption,
-                    bindForReuseOptionLength) == SOCKET_ERROR)
+                    &s_bind_for_reuse_option,
+                    s_bind_for_reuse_option_length) == SOCKET_ERROR)
             {
                 SLOGS(m_socket_handle, "Error setting reuse flag");
                 return false;
@@ -263,7 +263,7 @@ SocketImpl::send(const std::string &message, bool &would_block) const noexcept
             static_cast<int>(std::min(to_send.size(), s_int_max));
 
         const int status =
-            ::send(m_socket_handle, to_send.c_str(), to_sendSize, 0);
+            ::send(m_socket_handle, to_send.c_str(), to_send_size, 0);
 
         if (status > 0)
         {
