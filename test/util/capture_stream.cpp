@@ -22,7 +22,7 @@ namespace fly {
 
 //==============================================================================
 CaptureStream::CaptureStream(Stream stream) noexcept :
-    m_path(fly::PathUtil::GenerateTempDirectory()),
+    m_path(fly::PathUtil::generate_temp_directory()),
     m_stdio(-1),
     m_original(-1)
 {
@@ -36,7 +36,7 @@ CaptureStream::CaptureStream(Stream stream) noexcept :
 
     if (target != nullptr)
     {
-        int targetfd = ::fileno(target);
+        int target_fd = ::fileno(target);
 
         switch (stream)
         {
@@ -50,7 +50,7 @@ CaptureStream::CaptureStream(Stream stream) noexcept :
         }
 
         m_original = ::dup(m_stdio);
-        ::dup2(targetfd, m_stdio);
+        ::dup2(target_fd, m_stdio);
 
         ::fclose(target);
     }
@@ -80,7 +80,7 @@ std::string CaptureStream::restore(bool read) noexcept
 
         if (read)
         {
-            contents = fly::PathUtil::ReadFile(m_path);
+            contents = fly::PathUtil::read_file(m_path);
         }
 
         std::filesystem::remove(m_path);

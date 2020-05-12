@@ -56,9 +56,9 @@ public:
             m_task_runner,
             std::make_shared<TestPathConfig>())),
 
-        m_path0(fly::PathUtil::GenerateTempDirectory()),
-        m_path1(fly::PathUtil::GenerateTempDirectory()),
-        m_path2(fly::PathUtil::GenerateTempDirectory()),
+        m_path0(fly::PathUtil::generate_temp_directory()),
+        m_path1(fly::PathUtil::generate_temp_directory()),
+        m_path2(fly::PathUtil::generate_temp_directory()),
 
         m_file0(m_path0 / (fly::String::generate_random_string(10) + ".txt")),
         m_file1(m_path1 / (fly::String::generate_random_string(10) + ".txt")),
@@ -275,7 +275,7 @@ TEST_F(PathMonitorTest, CreateTest_PathLevel)
     EXPECT_EQ(m_changed_files[m_file0], 0);
     EXPECT_EQ(m_other_files[m_file0], 0);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file0, std::string()));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file0, std::string()));
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
 
     EXPECT_EQ(m_created_files[m_file0], 1);
@@ -294,7 +294,7 @@ TEST_F(PathMonitorTest, CreateTest_FileLevel)
     EXPECT_EQ(m_changed_files[m_file1], 0);
     EXPECT_EQ(m_other_files[m_file1], 0);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, std::string()));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, std::string()));
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
 
     EXPECT_EQ(m_created_files[m_file1], 1);
@@ -313,7 +313,7 @@ TEST_F(PathMonitorTest, DeleteTest_PathLevel)
     EXPECT_EQ(m_changed_files[m_file0], 0);
     EXPECT_EQ(m_other_files[m_file0], 0);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file0, std::string()));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file0, std::string()));
     std::filesystem::remove(m_file0);
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
@@ -334,7 +334,7 @@ TEST_F(PathMonitorTest, DeleteTest_FileLevel)
     EXPECT_EQ(m_changed_files[m_file1], 0);
     EXPECT_EQ(m_other_files[m_file1], 0);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, std::string()));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, std::string()));
     std::filesystem::remove(m_file1);
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
@@ -355,7 +355,7 @@ TEST_F(PathMonitorTest, ChangeTest_PathLevel)
     EXPECT_EQ(m_changed_files[m_file0], 0);
     EXPECT_EQ(m_other_files[m_file0], 0);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file0, "abcdefghi"));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file0, "abcdefghi"));
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
 
@@ -375,7 +375,7 @@ TEST_F(PathMonitorTest, ChangeTest_FileLevel)
     EXPECT_EQ(m_changed_files[m_file1], 0);
     EXPECT_EQ(m_other_files[m_file1], 0);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, "abcdefghi"));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, "abcdefghi"));
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
 
@@ -398,7 +398,7 @@ TEST_F(PathMonitorTest, MockFailedPoll)
     EXPECT_EQ(m_changed_files[m_file1], 0);
     EXPECT_EQ(m_other_files[m_file1], 0);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, "abcdefghi"));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, "abcdefghi"));
     m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_created_files[m_file1], 0);
@@ -418,7 +418,7 @@ TEST_F(PathMonitorTest, MockFailedRead)
     EXPECT_EQ(m_changed_files[m_file1], 0);
     EXPECT_EQ(m_other_files[m_file1], 0);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, "abcdefghi"));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, "abcdefghi"));
     m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
     EXPECT_EQ(m_created_files[m_file1], 0);
@@ -438,7 +438,7 @@ TEST_F(PathMonitorTest, OtherFile)
     EXPECT_EQ(m_other_files[m_file1], 0);
 
     auto path = std::filesystem::path(m_file1).concat(".diff");
-    ASSERT_TRUE(fly::PathUtil::WriteFile(path.string(), "abcdefghi"));
+    ASSERT_TRUE(fly::PathUtil::write_file(path.string(), "abcdefghi"));
 
     m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
@@ -449,7 +449,7 @@ TEST_F(PathMonitorTest, OtherFile)
 
     path = std::filesystem::path(
         path.string().substr(0, path.string().length() - 8));
-    ASSERT_TRUE(fly::PathUtil::WriteFile(path, "abcdefghi"));
+    ASSERT_TRUE(fly::PathUtil::write_file(path, "abcdefghi"));
 
     m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
@@ -484,15 +484,15 @@ TEST_F(PathMonitorTest, MultipleFile)
     EXPECT_EQ(m_changed_files[m_file0], 0);
     EXPECT_EQ(m_other_files[m_file0], 0);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file1, std::string()));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, std::string()));
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file2, std::string()));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file2, std::string()));
     std::filesystem::remove(m_file2);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file3, "abcdefghi"));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file3, "abcdefghi"));
     std::filesystem::remove(m_file3);
 
-    ASSERT_TRUE(fly::PathUtil::WriteFile(m_file0, "abcdefghi"));
+    ASSERT_TRUE(fly::PathUtil::write_file(m_file0, "abcdefghi"));
     std::filesystem::remove(m_file0);
 
     ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));

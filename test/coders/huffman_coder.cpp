@@ -480,7 +480,7 @@ class HuffmanCoderFileTest : public HuffmanCoderTest
 public:
     HuffmanCoderFileTest() noexcept :
         HuffmanCoderTest(),
-        m_path(fly::PathUtil::GenerateTempDirectory()),
+        m_path(fly::PathUtil::generate_temp_directory()),
         m_encoded_file(m_path / "encoded.txt"),
         m_decoded_file(m_path / "decoded.txt")
     {
@@ -522,7 +522,7 @@ TEST_F(HuffmanCoderFileTest, AsciiFile)
     EXPECT_GT(
         std::filesystem::file_size(raw),
         std::filesystem::file_size(m_encoded_file));
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decoded_file));
+    EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }
 
 //==============================================================================
@@ -536,7 +536,7 @@ TEST_F(HuffmanCoderFileTest, BinaryFile)
     ASSERT_TRUE(m_encoder.encode_file(raw, m_encoded_file));
     ASSERT_TRUE(m_decoder.decode_file(m_encoded_file, m_decoded_file));
 
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decoded_file));
+    EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }
 
 //==============================================================================
@@ -560,7 +560,7 @@ TEST_F(HuffmanCoderFileTest, Enwik8File)
     EXPECT_GT(
         std::filesystem::file_size(raw),
         std::filesystem::file_size(m_encoded_file));
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decoded_file));
+    EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }
 
 } // namespace fly

@@ -40,7 +40,7 @@ class LoggerTest : public ::testing::Test
 {
 public:
     LoggerTest() noexcept :
-        m_path(fly::PathUtil::GenerateTempDirectory()),
+        m_path(fly::PathUtil::generate_temp_directory()),
 
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
 
@@ -102,7 +102,7 @@ protected:
         }
 
         const std::string contents =
-            fly::PathUtil::ReadFile(m_logger->get_log_file_path());
+            fly::PathUtil::read_file(m_logger->get_log_file_path());
         ASSERT_FALSE(contents.empty());
 
         std::size_t count = 0;
@@ -187,7 +187,7 @@ TEST_F(LoggerTest, BadFilePath)
     m_logger = std::make_shared<fly::Logger>(
         m_task_runner,
         m_logger_config,
-        fly::PathUtil::GenerateTempDirectory());
+        fly::PathUtil::generate_temp_directory());
 
     EXPECT_FALSE(m_logger->start());
 }

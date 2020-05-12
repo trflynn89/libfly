@@ -12,14 +12,14 @@
 namespace fly {
 
 //==============================================================================
-std::filesystem::path PathUtil::GenerateTempDirectory() noexcept
+std::filesystem::path PathUtil::generate_temp_directory() noexcept
 {
     return std::filesystem::temp_directory_path() /
         fly::String::generate_random_string(10);
 }
 
 //==============================================================================
-bool PathUtil::WriteFile(
+bool PathUtil::write_file(
     const std::filesystem::path &path,
     const std::string &contents) noexcept
 {
@@ -34,7 +34,7 @@ bool PathUtil::WriteFile(
 }
 
 //==============================================================================
-std::string PathUtil::ReadFile(const std::filesystem::path &path) noexcept
+std::string PathUtil::read_file(const std::filesystem::path &path) noexcept
 {
     std::ifstream stream(path, std::ios::in);
     std::stringstream sstream;
@@ -48,7 +48,7 @@ std::string PathUtil::ReadFile(const std::filesystem::path &path) noexcept
 }
 
 //==============================================================================
-bool PathUtil::CompareFiles(
+bool PathUtil::compare_files(
     const std::filesystem::path &path1,
     const std::filesystem::path &path2)
 {

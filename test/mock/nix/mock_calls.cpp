@@ -22,8 +22,8 @@ namespace {
 // The socket_test unit test will test SetAsync() twice. In the first test,
 // fcntl() will fail on its first invocation. In the second test, fcntl()
 // will behave normally on its first invocation, and fail on the second.
-int s_fcntlCallCount = 0;
-int s_fcntlNextCall = 1;
+int s_fcntl_call_count = 0;
+int s_fcntl_next_call = 1;
 
 // This is a hack to be able to test send() being called multiple times in
 // SocketTest::Send_Async_MockSendBlock.
@@ -33,7 +33,7 @@ int s_fcntlNextCall = 1;
 // bytes and set errno to EWOULDBLOCK to make SocketImpl break out of its
 // send loop after the packet fragmentation. On the third call, send the
 // remaining bytes, completing the send.
-int s_sendCallCount = 0;
+int s_send_call_count = 0;
 
 // This is a hack to be able to test sendto() being called multiple times in
 // SocketTest::Send_Async_MockSendtoBlock.
@@ -43,7 +43,7 @@ int s_sendCallCount = 0;
 // 0 bytes and set errno to EWOULDBLOCK to make SocketImpl break out of its
 // send loop after the packet fragmentation. On the third call, send the
 // remaining bytes, completing the send.
-int s_sendtoCallCount = 0;
+int s_sendto_call_count = 0;
 
 } // namespace
 
@@ -96,13 +96,13 @@ std::ostream &operator<<(std::ostream &stream, MockCall call)
         case MockCall::Send:
             stream << "send";
             break;
-        case MockCall::Send_Blocking:
+        case MockCall::SendBlocking:
             stream << "send (blocking)";
             break;
         case MockCall::Sendto:
             stream << "sendto";
             break;
-        case MockCall::Sendto_Blocking:
+        case MockCall::SendtoBlocking:
             stream << "sendto (blocking)";
             break;
         case MockCall::Setsockopt:
@@ -134,7 +134,7 @@ extern "C"
 
     int __wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Accept))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Accept))
         {
             errno = 0;
             return -1;
@@ -148,7 +148,7 @@ extern "C"
 
     int __wrap_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Bind))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Bind))
         {
             errno = 0;
             return -1;
@@ -166,7 +166,7 @@ extern "C"
     {
         bool fail;
 
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Connect, fail))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Connect, fail))
         {
             errno = 0;
             return (fail ? -1 : 0);
@@ -180,12 +180,12 @@ extern "C"
 
     int __wrap_fcntl(int fd, int cmd, int args)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Fcntl))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Fcntl))
         {
-            if (++s_fcntlCallCount == s_fcntlNextCall)
+            if (++s_fcntl_call_count == s_fcntl_next_call)
             {
-                s_fcntlCallCount = 0;
-                ++s_fcntlNextCall;
+                s_fcntl_call_count = 0;
+                ++s_fcntl_next_call;
 
                 errno = 0;
                 return -1;
@@ -193,8 +193,8 @@ extern "C"
         }
         else
         {
-            s_fcntlCallCount = 0;
-            s_fcntlNextCall = 1;
+            s_fcntl_call_count = 0;
+            s_fcntl_next_call = 1;
         }
 
         return __real_fcntl(fd, cmd, args);
@@ -205,7 +205,7 @@ extern "C"
 
     struct hostent *__wrap_gethostbyname(const char *name)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Gethostbyname))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Gethostbyname))
         {
             errno = 0;
             return nullptr;
@@ -229,7 +229,7 @@ extern "C"
         void *optval,
         socklen_t *optlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Getsockopt))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Getsockopt))
         {
             errno = 0;
             return -1;
@@ -243,7 +243,7 @@ extern "C"
 
     int __wrap_inotify_add_watch(int fd, const char *pathname, uint32_t mask)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::InotifyAddWatch))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::InotifyAddWatch))
         {
             errno = 0;
             return -1;
@@ -257,7 +257,7 @@ extern "C"
 
     int __wrap_inotify_init1(int flags)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::InotifyInit1))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::InotifyInit1))
         {
             errno = 0;
             return -1;
@@ -271,7 +271,7 @@ extern "C"
 
     int __wrap_listen(int sockfd, int backlog)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Listen))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Listen))
         {
             errno = 0;
             return -1;
@@ -285,7 +285,7 @@ extern "C"
 
     int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Poll))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Poll))
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
             errno = 0;
@@ -300,7 +300,7 @@ extern "C"
 
     ssize_t __wrap_read(int fd, void *buf, size_t count)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Read))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Read))
         {
             errno = 0;
             return -1;
@@ -314,7 +314,7 @@ extern "C"
 
     ssize_t __wrap_recv(int sockfd, void *buf, size_t len, int flags)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Recv))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Recv))
         {
             errno = 0;
             return -1;
@@ -340,7 +340,7 @@ extern "C"
         struct sockaddr *src_addr,
         socklen_t *addrlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Recvfrom))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Recvfrom))
         {
             errno = 0;
             return -1;
@@ -354,14 +354,14 @@ extern "C"
 
     ssize_t __wrap_send(int sockfd, const void *buf, size_t len, int flags)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Send))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Send))
         {
             errno = 0;
             return -1;
         }
-        else if (fly::MockSystem::MockEnabled(fly::MockCall::Send_Blocking))
+        else if (fly::MockSystem::mock_enabled(fly::MockCall::SendBlocking))
         {
-            switch (s_sendCallCount++)
+            switch (s_send_call_count++)
             {
                 case 0:
                     len /= 2;
@@ -372,7 +372,7 @@ extern "C"
                     return -1;
 
                 case 2:
-                    s_sendCallCount = 0;
+                    s_send_call_count = 0;
                     break;
             }
         }
@@ -397,14 +397,14 @@ extern "C"
         const struct sockaddr *dest_addr,
         socklen_t addrlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Sendto))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Sendto))
         {
             errno = 0;
             return -1;
         }
-        else if (fly::MockSystem::MockEnabled(fly::MockCall::Sendto_Blocking))
+        else if (fly::MockSystem::mock_enabled(fly::MockCall::SendtoBlocking))
         {
-            switch (s_sendtoCallCount++)
+            switch (s_sendto_call_count++)
             {
                 case 0:
                     len /= 2;
@@ -415,7 +415,7 @@ extern "C"
                     return -1;
 
                 case 2:
-                    s_sendtoCallCount = 0;
+                    s_sendto_call_count = 0;
                     break;
             }
         }
@@ -438,7 +438,7 @@ extern "C"
         const void *optval,
         socklen_t optlen)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Setsockopt))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Setsockopt))
         {
             errno = 0;
             return -1;
@@ -452,7 +452,7 @@ extern "C"
 
     int __wrap_socket(int domain, int type, int protocol)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Socket))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Socket))
         {
             errno = 0;
             return -1;
@@ -466,7 +466,7 @@ extern "C"
 
     int __wrap_sysinfo(struct sysinfo *info)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Sysinfo))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Sysinfo))
         {
             errno = 0;
             return -1;
@@ -480,7 +480,7 @@ extern "C"
 
     clock_t __wrap_times(struct tms *buf)
     {
-        if (fly::MockSystem::MockEnabled(fly::MockCall::Times))
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Times))
         {
             errno = 0;
             return static_cast<clock_t>(-1);

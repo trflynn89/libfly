@@ -121,7 +121,7 @@ class Base64CoderFileTest : public Base64CoderTest
 public:
     Base64CoderFileTest() noexcept :
         Base64CoderTest(),
-        m_path(fly::PathUtil::GenerateTempDirectory()),
+        m_path(fly::PathUtil::generate_temp_directory()),
         m_encoded_file(m_path / "encoded.txt"),
         m_decoded_file(m_path / "decoded.txt")
     {
@@ -164,8 +164,8 @@ TEST_F(Base64CoderFileTest, AsciiFile)
     // base64 -w0 test.txt > test.txt.base64
     const auto expected = here / "data" / "test.txt.base64";
 
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(m_encoded_file, expected));
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decoded_file));
+    EXPECT_TRUE(fly::PathUtil::compare_files(m_encoded_file, expected));
+    EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }
 
 //==============================================================================
@@ -181,8 +181,8 @@ TEST_F(Base64CoderFileTest, PngFile)
     // base64 -w0 test.png > test.png.base64
     const auto expected = here / "data" / "test.png.base64";
 
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(m_encoded_file, expected));
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decoded_file));
+    EXPECT_TRUE(fly::PathUtil::compare_files(m_encoded_file, expected));
+    EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }
 
 //==============================================================================
@@ -198,6 +198,6 @@ TEST_F(Base64CoderFileTest, GifFile)
     // base64 -w0 test.gif > test.gif.base64
     const auto expected = here / "data" / "test.gif.base64";
 
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(m_encoded_file, expected));
-    EXPECT_TRUE(fly::PathUtil::CompareFiles(raw, m_decoded_file));
+    EXPECT_TRUE(fly::PathUtil::compare_files(m_encoded_file, expected));
+    EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }

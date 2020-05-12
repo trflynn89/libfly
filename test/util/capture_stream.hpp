@@ -26,9 +26,9 @@ public:
     /**
      * Constructor. Redirect the given standard stream to a file.
      *
-     * @param Stream The standard stream to redirect.
+     * @param stream The standard stream to redirect.
      */
-    CaptureStream(Stream) noexcept;
+    CaptureStream(Stream stream) noexcept;
 
     /**
      * Destructor. Restore the redirected stream and delete the redirect file.
@@ -39,7 +39,7 @@ public:
      * Restore the redirected stream, read the contents of the redirect file,
      * and delete the file.
      *
-     * @return string The contents of the redirected stream.
+     * @return The contents of the redirected stream.
      */
     std::string operator()() noexcept;
 
@@ -48,11 +48,11 @@ private:
      * Restore the redirected stream, read the contents of the redirect file if
      * specified, and delete the file.
      *
-     * @param bool True if the file should be read before deletion.
+     * @param read True if the file should be read before deletion.
      *
-     * @return string The contents of the redirected stream.
+     * @return The contents of the redirected stream.
      */
-    std::string restore(bool) noexcept;
+    std::string restore(bool read) noexcept;
 
     std::filesystem::path m_path;
 
