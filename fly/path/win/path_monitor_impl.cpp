@@ -81,7 +81,7 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
 
         if (it != m_path_info.end())
         {
-            auto *info = static_cast<PathInfoImpl *>(value.second.get());
+            auto *info = static_cast<PathInfoImpl *>(it->second.get());
             handle_events(info, it->first);
 
             if (!info->refresh(it->first))
@@ -99,7 +99,7 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
 }
 
 //==============================================================================
-std::unique_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
+std::unique_ptr<PathMonitor::PathInfo> PathMonitorImpl::create_path_info(
     const std::filesystem::path &path) const noexcept
 {
     std::unique_ptr<PathMonitor::PathInfo> info;
@@ -114,7 +114,7 @@ std::unique_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
 
 //==============================================================================
 void PathMonitorImpl::handle_events(
-    const std::shared_ptr<PathInfoImpl> &info,
+    const PathInfoImpl *info,
     const std::filesystem::path &path) const noexcept
 {
     PFILE_NOTIFY_INFORMATION file_info = info->m_file_info;
@@ -261,7 +261,7 @@ bool PathMonitorImpl::PathInfoImpl::refresh(
         m_file_info,
         size,
         FALSE,
-        s_changeFlags,
+        s_change_flags,
         &bytes,
         &m_overlapped,
         nullptr);

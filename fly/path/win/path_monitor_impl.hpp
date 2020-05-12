@@ -92,7 +92,7 @@ private:
      * @param path Name of the path.
      */
     void handle_events(
-        const std::shared_ptr<PathInfoImpl> &info,
+        const PathInfoImpl *info,
         const std::filesystem::path &path) const noexcept;
 
     /**
