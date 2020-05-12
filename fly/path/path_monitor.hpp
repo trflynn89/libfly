@@ -155,7 +155,7 @@ protected:
      *
      * @param path The path to be monitored.
      *
-     * @return Up-casted shared pointer to the PathInfo struct.
+     * @return Up-casted pointer to the PathInfo struct.
      */
     virtual std::unique_ptr<PathInfo>
     create_path_info(const std::filesystem::path &path) const noexcept = 0;

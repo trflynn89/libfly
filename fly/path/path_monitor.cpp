@@ -140,25 +140,25 @@ bool PathMonitor::remove_file(const std::filesystem::path &file) noexcept
     bool prune_path = false;
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        auto it = m_path_info.find(file.parent_path());
+        auto path_it = m_path_info.find(file.parent_path());
 
-        if (it == m_path_info.end())
+        if (path_it == m_path_info.end())
         {
             LOGW("Wasn't monitoring %s", file);
             return false;
         }
 
-        PathInfo *info = it->second.get();
-        auto it2 = info->m_file_handlers.find(file.filename());
+        PathInfo *info = path_it->second.get();
+        auto file_it = info->m_file_handlers.find(file.filename());
 
-        if (it2 == info->m_file_handlers.end())
+        if (file_it == info->m_file_handlers.end())
         {
             LOGW("Wasn't monitoring %s", file);
             return false;
         }
 
         LOGD("Stopped monitoring %s", file);
-        info->m_file_handlers.erase(it2);
+        info->m_file_handlers.erase(file_it);
 
         prune_path = info->m_file_handlers.empty() && !(info->m_path_handler);
     }
