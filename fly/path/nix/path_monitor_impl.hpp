@@ -27,8 +27,8 @@ public:
      * Constructor. Create the path monitor's inotify handle.
      */
     PathMonitorImpl(
-        const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<PathConfig> &) noexcept;
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        const std::shared_ptr<PathConfig> &config) noexcept;
 
     /**
      * Destructor. Close the path monitor's inotify handle.
@@ -39,20 +39,20 @@ protected:
     /**
      * Check if the path monitor's inotify handle was successfully created.
      *
-     * @return bool True if the inotify handle is valid.
+     * @return True if the inotify handle is valid.
      */
-    bool IsValid() const noexcept override;
+    bool is_valid() const noexcept override;
 
     /**
      * Check if the path monitor's inotify handle has any events to be read,
      * and handle any that are readable.
      *
-     * @param milliseconds Max time allow for an event to be readable.
+     * @param timeout Max time allow for an event to be readable.
      */
-    void Poll(const std::chrono::milliseconds &) noexcept override;
+    void poll(const std::chrono::milliseconds &timeout) noexcept override;
 
-    std::shared_ptr<PathMonitor::PathInfo>
-    CreatePathInfo(const std::filesystem::path &) const noexcept override;
+    std::unique_ptr<PathMonitor::PathInfo>
+    create_path_info(const std::filesystem::path &path) const noexcept override;
 
 private:
     /**
@@ -62,42 +62,44 @@ private:
      */
     struct PathInfoImpl : PathMonitor::PathInfo
     {
-        PathInfoImpl(int, const std::filesystem::path &) noexcept;
+        PathInfoImpl(
+            int monitor_descriptor,
+            const std::filesystem::path &path) noexcept;
         ~PathInfoImpl() override;
 
         /**
-         * @return bool True if initialization was sucessful.
+         * @return True if initialization was sucessful.
          */
-        bool IsValid() const noexcept override;
+        bool is_valid() const noexcept override;
 
-        int m_monitorDescriptor;
-        int m_watchDescriptor;
+        int m_monitor_descriptor;
+        int m_watch_descriptor;
     };
 
     /**
      * Read the inotify path monitor handle for any events.
      *
-     * @return bool True if any events were read.
+     * @return True if any events were read.
      */
-    bool readEvents() const noexcept;
+    bool read_events() const noexcept;
 
     /**
      * Handle a single inotify event. Find a monitored path that corresponds
      * to the event and trigger its callback. If no path was found, drop the
      * event.
      */
-    void handleEvent(const inotify_event *) const noexcept;
+    void handle_event(const inotify_event *event) const noexcept;
 
     /**
      * Convert an inotify event mask to a PathEvent.
      *
-     * @param uint32_t The inotify event mask.
+     * @param mask The inotify event mask.
      *
-     * @return PathEvent A PathEvent that matches the event mask.
+     * @return A PathEvent that matches the event mask.
      */
-    PathMonitor::PathEvent convertToEvent(std::uint32_t) const noexcept;
+    PathMonitor::PathEvent convert_to_event(std::uint32_t mask) const noexcept;
 
-    int m_monitorDescriptor;
+    int m_monitor_descriptor;
 };
 
 } // namespace fly

@@ -26,7 +26,7 @@ class TestPathConfig : public fly::PathConfig
 public:
     TestPathConfig() noexcept : fly::PathConfig()
     {
-        m_defaultPollInterval = 10_u64;
+        m_default_poll_interval = 10_u64;
     }
 };
 

@@ -43,7 +43,7 @@ ConfigManager::~ConfigManager()
 {
     if (m_monitor)
     {
-        m_monitor->RemoveFile(m_path);
+        m_monitor->remove_file(m_path);
     }
 }
 
@@ -78,7 +78,7 @@ bool ConfigManager::start() noexcept
             m_task_runner,
             create_config<PathConfig>());
 
-        if (m_monitor->Start())
+        if (m_monitor->start())
         {
             std::weak_ptr<ConfigManager> weak_config_manager =
                 shared_from_this();
@@ -102,7 +102,7 @@ bool ConfigManager::start() noexcept
             };
             // clang-format on
 
-            return m_monitor->AddFile(m_path, callback);
+            return m_monitor->add_file(m_path, callback);
         }
     }
 
