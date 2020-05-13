@@ -15,7 +15,7 @@ using OstreamTraits = fly::DeclarationTraits<OstreamDeclaration>;
 
 //==========================================================================
 template <typename T>
-using FooDeclaration = decltype(std::declval<T>().Foo());
+using FooDeclaration = decltype(std::declval<T>().foo());
 
 using FooTraits = fly::DeclarationTraits<FooDeclaration>;
 
@@ -27,7 +27,7 @@ public:
     {
     }
 
-    bool Foo() const noexcept
+    bool foo() const noexcept
     {
         return true;
     }
@@ -57,27 +57,27 @@ std::ostream &operator<<(std::ostream &stream, const BarClass &bar)
 
 //==========================================================================
 template <typename T, fly::enable_if_all<FooTraits::is_declared<T>> = 0>
-bool callFoo(const T &arg) noexcept
+bool call_foo(const T &arg) noexcept
 {
-    return arg.Foo();
+    return arg.foo();
 }
 
 template <typename T, fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
-bool callFoo(const T &) noexcept
+bool call_foo(const T &) noexcept
 {
     return false;
 }
 
 //==========================================================================
 template <typename T, fly::enable_if_all<OstreamTraits::is_declared<T>> = 0>
-bool isStreamable(std::ostream &stream, const T &arg) noexcept
+bool is_streamable(std::ostream &stream, const T &arg) noexcept
 {
     stream << arg;
     return true;
 }
 
 template <typename T, fly::enable_if_not_all<OstreamTraits::is_declared<T>> = 0>
-bool isStreamable(std::ostream &, const T &) noexcept
+bool is_streamable(std::ostream &, const T &) noexcept
 {
     return false;
 }
@@ -88,7 +88,7 @@ template <
     fly::enable_if_all<
         std::is_pointer<T>,
         std::is_class<std::remove_pointer_t<T>>>...>
-bool isClassPointer(const T &)
+bool is_class_pointer(const T &)
 {
     return true;
 }
@@ -98,7 +98,7 @@ template <
     fly::enable_if_not_all<
         std::is_pointer<T>,
         std::is_class<std::remove_pointer_t<T>>>...>
-bool isClassPointer(const T &)
+bool is_class_pointer(const T &)
 {
     return false;
 }
@@ -109,7 +109,7 @@ template <
     fly::enable_if_any<
         std::is_pointer<T>,
         std::is_class<std::remove_pointer_t<T>>>...>
-bool isClassOrPointer(const T &)
+bool is_class_or_pointer(const T &)
 {
     return true;
 }
@@ -119,7 +119,7 @@ template <
     fly::enable_if_none<
         std::is_pointer<T>,
         std::is_class<std::remove_pointer_t<T>>>...>
-bool isClassOrPointer(const T &)
+bool is_class_or_pointer(const T &)
 {
     return false;
 }
@@ -127,20 +127,20 @@ bool isClassOrPointer(const T &)
 } // namespace
 
 //==============================================================================
-TEST(TraitsTest, FooTest)
+TEST(TraitsTest, Foo)
 {
     const FooClass fc;
     const BarClass bc;
 
-    EXPECT_TRUE(callFoo(fc));
+    EXPECT_TRUE(call_foo(fc));
     EXPECT_TRUE(FooTraits::is_declared_v<FooClass>);
 
-    EXPECT_FALSE(callFoo(bc));
+    EXPECT_FALSE(call_foo(bc));
     EXPECT_FALSE(FooTraits::is_declared_v<BarClass>);
 }
 
 //==============================================================================
-TEST(TraitsTest, StreamTest)
+TEST(TraitsTest, Stream)
 {
     std::stringstream stream;
 
@@ -149,29 +149,29 @@ TEST(TraitsTest, StreamTest)
 
     const std::string str("a");
 
-    EXPECT_TRUE(isStreamable(stream, bc));
+    EXPECT_TRUE(is_streamable(stream, bc));
     EXPECT_TRUE(OstreamTraits::is_declared_v<BarClass>);
     EXPECT_EQ(stream.str(), bc());
     stream.str(std::string());
 
-    EXPECT_TRUE(isStreamable(stream, str));
+    EXPECT_TRUE(is_streamable(stream, str));
     EXPECT_TRUE(OstreamTraits::is_declared_v<std::string>);
     EXPECT_EQ(stream.str(), str);
     stream.str(std::string());
 
-    EXPECT_TRUE(isStreamable(stream, 1));
+    EXPECT_TRUE(is_streamable(stream, 1));
     EXPECT_TRUE(OstreamTraits::is_declared_v<int>);
     EXPECT_EQ(stream.str(), "1");
     stream.str(std::string());
 
-    EXPECT_FALSE(isStreamable(stream, fc));
+    EXPECT_FALSE(is_streamable(stream, fc));
     EXPECT_FALSE(OstreamTraits::is_declared_v<FooClass>);
     EXPECT_EQ(stream.str(), std::string());
     stream.str(std::string());
 }
 
 //==============================================================================
-TEST(TraitsTest, EnableIfAllTest)
+TEST(TraitsTest, EnableIfAll)
 {
     const FooClass fc;
     const std::string str("a");
@@ -180,21 +180,21 @@ TEST(TraitsTest, EnableIfAllTest)
     bool b = false;
     float f = 3.14159f;
 
-    EXPECT_FALSE(isClassPointer(fc));
-    EXPECT_FALSE(isClassPointer(str));
-    EXPECT_TRUE(isClassPointer(&fc));
-    EXPECT_TRUE(isClassPointer(&str));
+    EXPECT_FALSE(is_class_pointer(fc));
+    EXPECT_FALSE(is_class_pointer(str));
+    EXPECT_TRUE(is_class_pointer(&fc));
+    EXPECT_TRUE(is_class_pointer(&str));
 
-    EXPECT_FALSE(isClassPointer(i));
-    EXPECT_FALSE(isClassPointer(b));
-    EXPECT_FALSE(isClassPointer(f));
-    EXPECT_FALSE(isClassPointer(&i));
-    EXPECT_FALSE(isClassPointer(&b));
-    EXPECT_FALSE(isClassPointer(&f));
+    EXPECT_FALSE(is_class_pointer(i));
+    EXPECT_FALSE(is_class_pointer(b));
+    EXPECT_FALSE(is_class_pointer(f));
+    EXPECT_FALSE(is_class_pointer(&i));
+    EXPECT_FALSE(is_class_pointer(&b));
+    EXPECT_FALSE(is_class_pointer(&f));
 }
 
 //==============================================================================
-TEST(TraitsTest, EnableIfAnyTest)
+TEST(TraitsTest, EnableIfAny)
 {
     const FooClass fc;
     const std::string str("a");
@@ -203,15 +203,15 @@ TEST(TraitsTest, EnableIfAnyTest)
     bool b = false;
     float f = 3.14159f;
 
-    EXPECT_TRUE(isClassOrPointer(fc));
-    EXPECT_TRUE(isClassOrPointer(str));
-    EXPECT_TRUE(isClassOrPointer(&fc));
-    EXPECT_TRUE(isClassOrPointer(&str));
+    EXPECT_TRUE(is_class_or_pointer(fc));
+    EXPECT_TRUE(is_class_or_pointer(str));
+    EXPECT_TRUE(is_class_or_pointer(&fc));
+    EXPECT_TRUE(is_class_or_pointer(&str));
 
-    EXPECT_FALSE(isClassOrPointer(i));
-    EXPECT_FALSE(isClassOrPointer(b));
-    EXPECT_FALSE(isClassOrPointer(f));
-    EXPECT_TRUE(isClassOrPointer(&i));
-    EXPECT_TRUE(isClassOrPointer(&b));
-    EXPECT_TRUE(isClassOrPointer(&f));
+    EXPECT_FALSE(is_class_or_pointer(i));
+    EXPECT_FALSE(is_class_or_pointer(b));
+    EXPECT_FALSE(is_class_or_pointer(f));
+    EXPECT_TRUE(is_class_or_pointer(&i));
+    EXPECT_TRUE(is_class_or_pointer(&b));
+    EXPECT_TRUE(is_class_or_pointer(&f));
 }

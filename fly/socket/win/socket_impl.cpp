@@ -12,16 +12,16 @@ namespace fly {
 namespace {
 
     struct sockaddr_in
-    CreateSocketAddress(address_type address, port_type port) noexcept
+    create_socket_address(address_type address, port_type port) noexcept
     {
-        struct sockaddr_in socketAddress;
-        memset(&socketAddress, 0, sizeof(socketAddress));
+        struct sockaddr_in socket_address;
+        memset(&socket_address, 0, sizeof(socket_address));
 
-        socketAddress.sin_family = AF_INET;
-        socketAddress.sin_addr.s_addr = htonl(address);
-        socketAddress.sin_port = htons(port);
+        socket_address.sin_family = AF_INET;
+        socket_address.sin_addr.s_addr = htonl(address);
+        socket_address.sin_port = htons(port);
 
-        return socketAddress;
+        return socket_address;
     }
 
 } // namespace
@@ -29,17 +29,17 @@ namespace {
 //==============================================================================
 SocketImpl::SocketImpl(
     Protocol protocol,
-    const std::shared_ptr<SocketConfig> &spConfig) noexcept :
-    Socket(protocol, spConfig)
+    const std::shared_ptr<SocketConfig> &config) noexcept :
+    Socket(protocol, config)
 {
     switch (m_protocol)
     {
         case Protocol::TCP:
-            m_socketHandle = ::socket(AF_INET, SOCK_STREAM, 0);
+            m_socket_handle = ::socket(AF_INET, SOCK_STREAM, 0);
             break;
 
         case Protocol::UDP:
-            m_socketHandle = ::socket(AF_INET, SOCK_DGRAM, 0);
+            m_socket_handle = ::socket(AF_INET, SOCK_DGRAM, 0);
             break;
     }
 }
@@ -47,17 +47,17 @@ SocketImpl::SocketImpl(
 //==============================================================================
 SocketImpl::~SocketImpl()
 {
-    Close();
+    close();
 }
 
 //==============================================================================
-bool SocketImpl::HostnameToAddress(
+bool SocketImpl::hostname_to_address(
     const std::string &hostname,
     address_type &address) noexcept
 {
-    struct hostent *ipAddress = ::gethostbyname(hostname.c_str());
+    struct hostent *ip_address = ::gethostbyname(hostname.c_str());
 
-    if (ipAddress == nullptr)
+    if (ip_address == nullptr)
     {
         LOGS("Error resolving %s", hostname);
         return false;
@@ -65,8 +65,8 @@ bool SocketImpl::HostnameToAddress(
 
     memcpy(
         reinterpret_cast<void *>(&address),
-        reinterpret_cast<void *>(ipAddress->h_addr_list[0]),
-        static_cast<std::size_t>(ipAddress->h_length));
+        reinterpret_cast<void *>(ip_address->h_addr_list[0]),
+        static_cast<std::size_t>(ip_address->h_length));
 
     address = ntohl(address);
 
@@ -75,69 +75,69 @@ bool SocketImpl::HostnameToAddress(
 }
 
 //==============================================================================
-address_type SocketImpl::InAddrAny() noexcept
+address_type SocketImpl::in_addr_any() noexcept
 {
     return INADDR_ANY;
 }
 
 //==============================================================================
-socket_type SocketImpl::InvalidSocket() noexcept
+socket_type SocketImpl::invalid_socket() noexcept
 {
     return INVALID_SOCKET;
 }
 
 //==============================================================================
-void SocketImpl::Close() noexcept
+void SocketImpl::close() noexcept
 {
-    if (IsValid())
+    if (is_valid())
     {
-        ::closesocket(m_socketHandle);
-        m_socketHandle = InvalidSocket();
+        ::closesocket(m_socket_handle);
+        m_socket_handle = invalid_socket();
     }
 }
 
 //==============================================================================
-bool SocketImpl::IsErrorFree() noexcept
+bool SocketImpl::is_error_free() noexcept
 {
     int opt = 0;
     int len = sizeof(opt);
 
     int ret =
-        ::getsockopt(m_socketHandle, SOL_SOCKET, SO_ERROR, (char *)&opt, &len);
+        ::getsockopt(m_socket_handle, SOL_SOCKET, SO_ERROR, (char *)&opt, &len);
 
     if (ret == SOCKET_ERROR)
     {
-        SLOGS(m_socketHandle, "Error getting error flag");
+        SLOGS(m_socket_handle, "Error getting error flag");
     }
 
     return opt == 0;
 }
 
 //==============================================================================
-bool SocketImpl::SetAsync() noexcept
+bool SocketImpl::set_async() noexcept
 {
-    unsigned long nonZero = 1;
+    unsigned long non_zero = 1;
 
-    if (::ioctlsocket(m_socketHandle, FIONBIO, &nonZero) == SOCKET_ERROR)
+    if (::ioctlsocket(m_socket_handle, FIONBIO, &non_zero) == SOCKET_ERROR)
     {
-        SLOGS(m_socketHandle, "Error setting async flag");
+        SLOGS(m_socket_handle, "Error setting async flag");
         return false;
     }
 
-    m_isAsync = true;
-    return m_isAsync;
+    m_is_async = true;
+    return m_is_async;
 }
 
 //==============================================================================
-bool SocketImpl::Bind(address_type address, port_type port, BindOption option)
+bool SocketImpl::bind(address_type address, port_type port, BindOption option)
     const noexcept
 {
-    static const char bindForReuseOption = 1;
-    static const int bindForReuseOptionLength =
-        static_cast<int>(sizeof(bindForReuseOption));
+    static const char s_bind_for_reuse_option = 1;
+    static const int s_bind_for_reuse_option_length =
+        static_cast<int>(sizeof(s_bind_for_reuse_option));
 
-    struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
-    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    struct sockaddr_in socket_address = create_socket_address(address, port);
+    auto *p_socket_address = reinterpret_cast<sockaddr *>(&socket_address);
 
     switch (option)
     {
@@ -146,24 +146,24 @@ bool SocketImpl::Bind(address_type address, port_type port, BindOption option)
 
         case BindOption::AllowReuse:
             if (::setsockopt(
-                    m_socketHandle,
+                    m_socket_handle,
                     SOL_SOCKET,
                     SO_REUSEADDR,
-                    &bindForReuseOption,
-                    bindForReuseOptionLength) == SOCKET_ERROR)
+                    &s_bind_for_reuse_option,
+                    s_bind_for_reuse_option_length) == SOCKET_ERROR)
             {
-                SLOGS(m_socketHandle, "Error setting reuse flag");
+                SLOGS(m_socket_handle, "Error setting reuse flag");
                 return false;
             }
 
             break;
     }
 
-    int ret = ::bind(m_socketHandle, pSocketAddress, sizeof(socketAddress));
+    int ret = ::bind(m_socket_handle, p_socket_address, sizeof(socket_address));
 
     if (ret == SOCKET_ERROR)
     {
-        SLOGS(m_socketHandle, "Error binding to %d", port);
+        SLOGS(m_socket_handle, "Error binding to %d", port);
         return false;
     }
 
@@ -171,72 +171,73 @@ bool SocketImpl::Bind(address_type address, port_type port, BindOption option)
 }
 
 //==============================================================================
-bool SocketImpl::Listen() noexcept
+bool SocketImpl::listen() noexcept
 {
-    if (::listen(m_socketHandle, 100) == SOCKET_ERROR)
+    if (::listen(m_socket_handle, 100) == SOCKET_ERROR)
     {
-        SLOGS(m_socketHandle, "Error listening");
+        SLOGS(m_socket_handle, "Error listening");
         return false;
     }
 
-    m_isListening = true;
-    return m_isListening;
+    m_is_listening = true;
+    return m_is_listening;
 }
 
 //==============================================================================
-bool SocketImpl::Connect(address_type address, port_type port) noexcept
+bool SocketImpl::connect(address_type address, port_type port) noexcept
 {
-    struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
-    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    struct sockaddr_in socket_address = create_socket_address(address, port);
+    auto *p_socket_address = reinterpret_cast<sockaddr *>(&socket_address);
 
-    int ret = ::connect(m_socketHandle, pSocketAddress, sizeof(socketAddress));
+    int ret =
+        ::connect(m_socket_handle, p_socket_address, sizeof(socket_address));
 
     if (ret == SOCKET_ERROR)
     {
-        SLOGS(m_socketHandle, "Error connecting");
-        int error = System::GetErrorCode();
+        SLOGS(m_socket_handle, "Error connecting");
+        int error = System::get_error_code();
 
         if ((error == WSAEWOULDBLOCK) || (error == WSAEINPROGRESS))
         {
-            m_aConnectedState.store(ConnectedState::Connecting);
+            m_connected_state.store(ConnectedState::Connecting);
         }
 
         return false;
     }
 
-    m_aConnectedState.store(ConnectedState::Connected);
+    m_connected_state.store(ConnectedState::Connected);
     return true;
 }
 
 //==============================================================================
-std::shared_ptr<Socket> SocketImpl::Accept() const noexcept
+std::shared_ptr<Socket> SocketImpl::accept() const noexcept
 {
-    auto ret = std::make_shared<SocketImpl>(m_protocol, m_spConfig);
+    auto ret = std::make_shared<SocketImpl>(m_protocol, m_config);
 
-    struct sockaddr_in socketAddress;
-    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
-    int socketAddressLength = static_cast<int>(sizeof(socketAddress));
+    struct sockaddr_in socket_address;
+    auto *p_socket_address = reinterpret_cast<sockaddr *>(&socket_address);
+    int socket_address_length = static_cast<int>(sizeof(socket_address));
 
     socket_type skt =
-        ::accept(m_socketHandle, pSocketAddress, &socketAddressLength);
+        ::accept(m_socket_handle, p_socket_address, &socket_address_length);
 
-    if (skt == InvalidSocket())
+    if (skt == invalid_socket())
     {
-        SLOGS(m_socketHandle, "Error accepting");
+        SLOGS(m_socket_handle, "Error accepting");
         ret.reset();
     }
     else
     {
         SLOGD(
-            m_socketHandle,
+            m_socket_handle,
             "Accepted new socket: %d (%d)",
-            ret->GetSocketId(),
+            ret->get_socket_id(),
             skt);
 
-        ret->m_socketHandle = skt;
-        ret->m_clientIp = ntohl(socketAddress.sin_addr.s_addr);
-        ret->m_clientPort = ntohs(socketAddress.sin_port);
-        ret->m_aConnectedState.store(ConnectedState::Connected);
+        ret->m_socket_handle = skt;
+        ret->m_client_ip = ntohl(socket_address.sin_addr.s_addr);
+        ret->m_client_port = ntohs(socket_address.sin_port);
+        ret->m_connected_state.store(ConnectedState::Connected);
     }
 
     return ret;
@@ -244,139 +245,139 @@ std::shared_ptr<Socket> SocketImpl::Accept() const noexcept
 
 //==============================================================================
 std::size_t
-SocketImpl::Send(const std::string &message, bool &wouldBlock) const noexcept
+SocketImpl::send(const std::string &message, bool &would_block) const noexcept
 {
-    static const std::string eom(1, m_socketEoM);
-    std::string toSend = message + eom;
+    std::string to_send = message + std::string(1, m_socket_eom);
 
-    bool keepSending = !toSend.empty();
-    std::size_t bytesSent = 0;
-    wouldBlock = false;
+    bool keep_sending = !to_send.empty();
+    std::size_t bytes_sent = 0;
+    would_block = false;
 
-    while (keepSending)
+    while (keep_sending)
     {
         // Windows's ::send() takes string size as an integer, but std::string's
         // length is std::size_t - send at most MAX_INT bytes at a time.
-        constexpr static std::size_t intMax = std::numeric_limits<int>::max();
-        const int toSendSize =
-            static_cast<int>(std::min(toSend.size(), intMax));
+        constexpr static std::size_t s_int_max =
+            std::numeric_limits<int>::max();
+        const int to_send_size =
+            static_cast<int>(std::min(to_send.size(), s_int_max));
 
         const int status =
-            ::send(m_socketHandle, toSend.c_str(), toSendSize, 0);
+            ::send(m_socket_handle, to_send.c_str(), to_send_size, 0);
 
         if (status > 0)
         {
             const auto bytes = static_cast<std::size_t>(status);
 
-            if (toSend[bytes - 1] == m_socketEoM)
+            if (to_send[bytes - 1] == m_socket_eom)
             {
-                bytesSent += bytes - 1;
+                bytes_sent += bytes - 1;
             }
             else
             {
-                bytesSent += bytes;
+                bytes_sent += bytes;
             }
 
-            toSend = toSend.substr(bytes, std::string::npos);
-            keepSending = !toSend.empty();
+            to_send = to_send.substr(bytes, std::string::npos);
+            keep_sending = !to_send.empty();
         }
         else
         {
-            keepSending = false;
+            keep_sending = false;
 
             if (status == SOCKET_ERROR)
             {
-                wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
-                SLOGS(m_socketHandle, "Error sending");
+                would_block = (System::get_error_code() == WSAEWOULDBLOCK);
+                SLOGS(m_socket_handle, "Error sending");
             }
         }
     }
 
-    return bytesSent;
+    return bytes_sent;
 }
 
 //==============================================================================
-std::size_t SocketImpl::SendTo(
+std::size_t SocketImpl::send_to(
     const std::string &message,
     address_type address,
     port_type port,
-    bool &wouldBlock) const noexcept
+    bool &would_block) const noexcept
 {
-    static const std::string eom(1, m_socketEoM);
-    std::string toSend = message + eom;
+    std::string to_send = message + std::string(1, m_socket_eom);
 
-    bool keepSending = !toSend.empty();
-    std::size_t bytesSent = 0;
-    wouldBlock = false;
+    bool keep_sending = !to_send.empty();
+    std::size_t bytes_sent = 0;
+    would_block = false;
 
-    struct sockaddr_in socketAddress = CreateSocketAddress(address, port);
-    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
+    struct sockaddr_in socket_address = create_socket_address(address, port);
+    auto *p_socket_address = reinterpret_cast<sockaddr *>(&socket_address);
 
-    while (keepSending)
+    while (keep_sending)
     {
         int status = ::sendto(
-            m_socketHandle,
-            toSend.c_str(),
-            static_cast<int>(std::min(m_packetSize, toSend.size())),
+            m_socket_handle,
+            to_send.c_str(),
+            static_cast<int>(std::min(m_packet_size, to_send.size())),
             0,
-            pSocketAddress,
-            sizeof(socketAddress));
+            p_socket_address,
+            sizeof(socket_address));
 
         if (status > 0)
         {
             const auto bytes = static_cast<std::size_t>(status);
 
-            if (toSend[bytes - 1] == m_socketEoM)
+            if (to_send[bytes - 1] == m_socket_eom)
             {
-                bytesSent += bytes - 1;
+                bytes_sent += bytes - 1;
             }
             else
             {
-                bytesSent += bytes;
+                bytes_sent += bytes;
             }
 
-            toSend = toSend.substr(bytes, std::string::npos);
-            keepSending = !toSend.empty();
+            to_send = to_send.substr(bytes, std::string::npos);
+            keep_sending = !to_send.empty();
         }
         else
         {
-            keepSending = false;
+            keep_sending = false;
 
             if (status == SOCKET_ERROR)
             {
-                wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
-                SLOGS(m_socketHandle, "Error sending");
+                would_block = (System::get_error_code() == WSAEWOULDBLOCK);
+                SLOGS(m_socket_handle, "Error sending");
             }
         }
     }
 
-    return bytesSent;
+    return bytes_sent;
 }
 
 //==============================================================================
-std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const noexcept
+std::string
+SocketImpl::recv(bool &would_block, bool &is_complete) const noexcept
 {
     std::string ret;
 
-    bool keepReading = true;
-    wouldBlock = false;
-    isComplete = false;
+    bool keep_reading = true;
+    would_block = false;
+    is_complete = false;
 
-    const int packetSize = static_cast<int>(m_packetSize);
+    const int packet_size = static_cast<int>(m_packet_size);
 
-    while (keepReading)
+    while (keep_reading)
     {
-        auto buff = std::make_unique<char[]>(m_packetSize * sizeof(char));
-        int status = ::recv(m_socketHandle, buff.get(), packetSize, 0);
+        auto buff = std::make_unique<char[]>(m_packet_size * sizeof(char));
+        int status = ::recv(m_socket_handle, buff.get(), packet_size, 0);
 
         if (status > 0)
         {
             auto bytes = static_cast<std::size_t>(status);
 
-            if (buff[bytes - 1] == m_socketEoM)
+            if (buff[bytes - 1] == m_socket_eom)
             {
-                keepReading = false;
-                isComplete = true;
+                keep_reading = false;
+                is_complete = true;
                 --bytes;
             }
 
@@ -384,12 +385,12 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const noexcept
         }
         else
         {
-            keepReading = false;
+            keep_reading = false;
 
             if (status == SOCKET_ERROR)
             {
-                wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
-                SLOGS(m_socketHandle, "Error receiving");
+                would_block = (System::get_error_code() == WSAEWOULDBLOCK);
+                SLOGS(m_socket_handle, "Error receiving");
             }
         }
     }
@@ -399,40 +400,40 @@ std::string SocketImpl::Recv(bool &wouldBlock, bool &isComplete) const noexcept
 
 //==============================================================================
 std::string
-SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const noexcept
+SocketImpl::recv_from(bool &would_block, bool &is_complete) const noexcept
 {
     std::string ret;
 
-    bool keepReading = true;
-    wouldBlock = false;
-    isComplete = false;
+    bool keep_reading = true;
+    would_block = false;
+    is_complete = false;
 
-    struct sockaddr_in socketAddress;
-    auto *pSocketAddress = reinterpret_cast<sockaddr *>(&socketAddress);
-    int socketAddressLength = static_cast<int>(sizeof(socketAddress));
+    struct sockaddr_in socket_address;
+    auto *p_socket_address = reinterpret_cast<sockaddr *>(&socket_address);
+    int socket_address_length = static_cast<int>(sizeof(socket_address));
 
-    const int packetSize = static_cast<int>(m_packetSize);
+    const int packet_size = static_cast<int>(m_packet_size);
 
-    while (keepReading)
+    while (keep_reading)
     {
-        auto buff = std::make_unique<char[]>(m_packetSize * sizeof(char));
+        auto buff = std::make_unique<char[]>(m_packet_size * sizeof(char));
 
         int status = ::recvfrom(
-            m_socketHandle,
+            m_socket_handle,
             buff.get(),
-            packetSize,
+            packet_size,
             0,
-            pSocketAddress,
-            &socketAddressLength);
+            p_socket_address,
+            &socket_address_length);
 
         if (status > 0)
         {
             auto bytes = static_cast<std::size_t>(status);
 
-            if (buff[bytes - 1] == m_socketEoM)
+            if (buff[bytes - 1] == m_socket_eom)
             {
-                keepReading = false;
-                isComplete = true;
+                keep_reading = false;
+                is_complete = true;
                 --bytes;
             }
 
@@ -440,12 +441,12 @@ SocketImpl::RecvFrom(bool &wouldBlock, bool &isComplete) const noexcept
         }
         else
         {
-            keepReading = false;
+            keep_reading = false;
 
             if (status == SOCKET_ERROR)
             {
-                wouldBlock = (System::GetErrorCode() == WSAEWOULDBLOCK);
-                SLOGS(m_socketHandle, "Error receiving");
+                would_block = (System::get_error_code() == WSAEWOULDBLOCK);
+                SLOGS(m_socket_handle, "Error receiving");
             }
         }
     }

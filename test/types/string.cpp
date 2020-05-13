@@ -24,12 +24,12 @@ public:
     {
     }
 
-    StringType GetStr() const noexcept
+    StringType str() const noexcept
     {
         return m_str;
     };
 
-    int GetNum() const noexcept
+    int num() const noexcept
     {
         return m_num;
     };
@@ -37,7 +37,7 @@ public:
     friend ostream_type &operator<<(ostream_type &stream, const Streamable &obj)
     {
         stream << '[';
-        stream << obj.GetStr() << ' ' << std::hex << obj.GetNum() << std::dec;
+        stream << obj.str() << ' ' << std::hex << obj.num() << std::dec;
         stream << ']';
 
         return stream;
@@ -57,15 +57,15 @@ class NotStreamable
 template <typename StringType, typename T>
 StringType minstr() noexcept
 {
-    static constexpr std::intmax_t min = std::numeric_limits<T>::min();
+    static constexpr std::intmax_t s_min = std::numeric_limits<T>::min();
 
     if constexpr (std::is_same_v<StringType, std::string>)
     {
-        return std::to_string(min - 1);
+        return std::to_string(s_min - 1);
     }
     else if constexpr (std::is_same_v<StringType, std::wstring>)
     {
-        return std::to_wstring(min - 1);
+        return std::to_wstring(s_min - 1);
     }
 }
 
@@ -73,15 +73,15 @@ StringType minstr() noexcept
 template <typename StringType, typename T>
 StringType maxstr() noexcept
 {
-    static constexpr std::uintmax_t max = std::numeric_limits<T>::max();
+    static constexpr std::uintmax_t s_max = std::numeric_limits<T>::max();
 
     if constexpr (std::is_same_v<StringType, std::string>)
     {
-        return std::to_string(max + 1);
+        return std::to_string(s_max + 1);
     }
     else if constexpr (std::is_same_v<StringType, std::wstring>)
     {
-        return std::to_wstring(max + 1);
+        return std::to_wstring(s_max + 1);
     }
 }
 
@@ -100,76 +100,76 @@ using StringTypes =
 TYPED_TEST_SUITE(BasicStringTest, StringTypes, );
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, SplitTest)
+TYPED_TEST(BasicStringTest, Split)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
-    static constexpr std::uint32_t numSectors = 10;
-    std::vector<string_type> inputSplit(numSectors);
+    static constexpr std::uint32_t s_size = 10;
+    std::vector<string_type> input_split(s_size);
 
     constexpr char_type delim = ' ';
     string_type input;
 
-    for (std::uint32_t i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < s_size; ++i)
     {
-        const string_type curr = StringClass::GenerateRandomString(10);
+        const string_type curr = StringClass::generate_random_string(10);
 
         input += curr + delim;
-        inputSplit[i] = curr;
+        input_split[i] = curr;
     }
 
-    const auto outputSplit = StringClass::Split(input, delim);
-    EXPECT_EQ(inputSplit.size(), outputSplit.size());
+    const auto output_split = StringClass::split(input, delim);
+    EXPECT_EQ(input_split.size(), output_split.size());
 
-    for (std::uint32_t i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < s_size; ++i)
     {
-        EXPECT_EQ(inputSplit[i], outputSplit[i]);
+        EXPECT_EQ(input_split[i], output_split[i]);
     }
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, MaxSplitTest)
+TYPED_TEST(BasicStringTest, MaxSplit)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
-    static constexpr std::uint32_t numSectors = 10;
-    static constexpr std::uint32_t maxSectors = 6;
-    std::vector<string_type> inputSplit(maxSectors);
+    static constexpr std::uint32_t s_size = 10;
+    static constexpr std::uint32_t s_count = 6;
+    std::vector<string_type> input_split(s_count);
 
     constexpr char_type delim = ';';
     string_type input;
 
-    for (std::uint32_t i = 0; i < numSectors; ++i)
+    for (std::uint32_t i = 0; i < s_size; ++i)
     {
-        const string_type curr = StringClass::GenerateRandomString(10);
+        const string_type curr = StringClass::generate_random_string(10);
         input += curr + delim;
 
-        if (i < maxSectors)
+        if (i < s_count)
         {
-            inputSplit[i] = curr;
+            input_split[i] = curr;
         }
         else
         {
-            inputSplit.back() += delim;
-            inputSplit.back() += curr;
+            input_split.back() += delim;
+            input_split.back() += curr;
         }
     }
 
-    const auto outputSplit = StringClass::Split(input, delim, maxSectors);
-    EXPECT_EQ(inputSplit.size(), outputSplit.size());
+    const auto output_split = StringClass::split(input, delim, s_count);
+    EXPECT_EQ(input_split.size(), output_split.size());
 
-    for (std::uint32_t i = 0; i < maxSectors; ++i)
+    for (std::uint32_t i = 0; i < s_count; ++i)
     {
-        EXPECT_EQ(inputSplit[i], outputSplit[i]);
+        EXPECT_EQ(input_split[i], output_split[i]);
     }
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, TrimTest)
+TYPED_TEST(BasicStringTest, Trim)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -188,13 +188,13 @@ TYPED_TEST(BasicStringTest, TrimTest)
     const string_type expected3 = FLY_STR(char_type, "a   c");
     const string_type expected4 = FLY_STR(char_type, "a\n \tc");
 
-    StringClass::Trim(test1);
-    StringClass::Trim(test2);
-    StringClass::Trim(test3);
-    StringClass::Trim(test4);
-    StringClass::Trim(test5);
-    StringClass::Trim(test6);
-    StringClass::Trim(test7);
+    StringClass::trim(test1);
+    StringClass::trim(test2);
+    StringClass::trim(test3);
+    StringClass::trim(test4);
+    StringClass::trim(test5);
+    StringClass::trim(test6);
+    StringClass::trim(test7);
 
     EXPECT_EQ(test1, expected1);
     EXPECT_EQ(test2, expected2);
@@ -206,7 +206,7 @@ TYPED_TEST(BasicStringTest, TrimTest)
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ReplaceAllTest)
+TYPED_TEST(BasicStringTest, ReplaceAll)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -216,12 +216,12 @@ TYPED_TEST(BasicStringTest, ReplaceAllTest)
     const string_type search = FLY_STR(char_type, "Be Replaced");
     const string_type replace = FLY_STR(char_type, "new value");
 
-    StringClass::ReplaceAll(source, search, replace);
+    StringClass::replace_all(source, search, replace);
     EXPECT_EQ(source, FLY_STR(char_type, "To new value! To new value!"));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ReplaceAllWithCharTest)
+TYPED_TEST(BasicStringTest, ReplaceAllWithChar)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -231,12 +231,12 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithCharTest)
     const string_type search = FLY_STR(char_type, "Be Replaced");
     const char_type replace('x');
 
-    StringClass::ReplaceAll(source, search, replace);
+    StringClass::replace_all(source, search, replace);
     EXPECT_EQ(source, FLY_STR(char_type, "To x! To x!"));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ReplaceAllWithEmptyTest)
+TYPED_TEST(BasicStringTest, ReplaceAllWithEmpty)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -245,12 +245,12 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithEmptyTest)
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
     const string_type replace = FLY_STR(char_type, "new value");
 
-    StringClass::ReplaceAll(source, string_type(), replace);
+    StringClass::replace_all(source, string_type(), replace);
     EXPECT_EQ(source, FLY_STR(char_type, "To Be Replaced! To Be Replaced!"));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, RemoveAllTest)
+TYPED_TEST(BasicStringTest, RemoveAll)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -259,12 +259,12 @@ TYPED_TEST(BasicStringTest, RemoveAllTest)
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
     const string_type search = FLY_STR(char_type, "Be Rep");
 
-    StringClass::RemoveAll(source, search);
+    StringClass::remove_all(source, search);
     EXPECT_EQ(source, FLY_STR(char_type, "To laced! To laced!"));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, RemoveAllWithEmptyTest)
+TYPED_TEST(BasicStringTest, RemoveAllWithEmpty)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -272,12 +272,12 @@ TYPED_TEST(BasicStringTest, RemoveAllWithEmptyTest)
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
 
-    StringClass::RemoveAll(source, string_type());
+    StringClass::remove_all(source, string_type());
     EXPECT_EQ(source, FLY_STR(char_type, "To Be Replaced! To Be Replaced!"));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, StartsWithTest)
+TYPED_TEST(BasicStringTest, StartsWith)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -287,52 +287,52 @@ TYPED_TEST(BasicStringTest, StartsWithTest)
 
     test1 = FLY_STR(char_type, "");
     test2 = FLY_STR(char_type, "");
-    EXPECT_TRUE(StringClass::StartsWith(test1, test2));
+    EXPECT_TRUE(StringClass::starts_with(test1, test2));
 
     test1 = FLY_STR(char_type, "a");
     test2 = FLY_STR(char_type, "");
-    EXPECT_TRUE(StringClass::StartsWith(test1, test2));
+    EXPECT_TRUE(StringClass::starts_with(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
-    EXPECT_TRUE(StringClass::StartsWith(test1, 'a'));
+    EXPECT_TRUE(StringClass::starts_with(test1, 'a'));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "a");
-    EXPECT_TRUE(StringClass::StartsWith(test1, test2));
+    EXPECT_TRUE(StringClass::starts_with(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "ab");
-    EXPECT_TRUE(StringClass::StartsWith(test1, test2));
+    EXPECT_TRUE(StringClass::starts_with(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "abc");
-    EXPECT_TRUE(StringClass::StartsWith(test1, test2));
+    EXPECT_TRUE(StringClass::starts_with(test1, test2));
 
     test1 = FLY_STR(char_type, "");
-    EXPECT_FALSE(StringClass::StartsWith(test1, 'a'));
+    EXPECT_FALSE(StringClass::starts_with(test1, 'a'));
 
     test1 = FLY_STR(char_type, "");
     test2 = FLY_STR(char_type, "a");
-    EXPECT_FALSE(StringClass::StartsWith(test1, test2));
+    EXPECT_FALSE(StringClass::starts_with(test1, test2));
 
     test1 = FLY_STR(char_type, "b");
-    EXPECT_FALSE(StringClass::StartsWith(test1, 'a'));
+    EXPECT_FALSE(StringClass::starts_with(test1, 'a'));
 
     test1 = FLY_STR(char_type, "a");
     test2 = FLY_STR(char_type, "ab");
-    EXPECT_FALSE(StringClass::StartsWith(test1, test2));
+    EXPECT_FALSE(StringClass::starts_with(test1, test2));
 
     test1 = FLY_STR(char_type, "ab");
     test2 = FLY_STR(char_type, "abc");
-    EXPECT_FALSE(StringClass::StartsWith(test1, test2));
+    EXPECT_FALSE(StringClass::starts_with(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "abd");
-    EXPECT_FALSE(StringClass::StartsWith(test1, test2));
+    EXPECT_FALSE(StringClass::starts_with(test1, test2));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, EndsWithTest)
+TYPED_TEST(BasicStringTest, EndsWith)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -342,49 +342,49 @@ TYPED_TEST(BasicStringTest, EndsWithTest)
 
     test1 = FLY_STR(char_type, "");
     test2 = FLY_STR(char_type, "");
-    EXPECT_TRUE(StringClass::EndsWith(test1, test2));
+    EXPECT_TRUE(StringClass::ends_with(test1, test2));
 
     test1 = FLY_STR(char_type, "a");
     test2 = FLY_STR(char_type, "");
-    EXPECT_TRUE(StringClass::EndsWith(test1, test2));
+    EXPECT_TRUE(StringClass::ends_with(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
-    EXPECT_TRUE(StringClass::EndsWith(test1, 'c'));
+    EXPECT_TRUE(StringClass::ends_with(test1, 'c'));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "c");
-    EXPECT_TRUE(StringClass::EndsWith(test1, test2));
+    EXPECT_TRUE(StringClass::ends_with(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "bc");
-    EXPECT_TRUE(StringClass::EndsWith(test1, test2));
+    EXPECT_TRUE(StringClass::ends_with(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "abc");
-    EXPECT_TRUE(StringClass::EndsWith(test1, test2));
+    EXPECT_TRUE(StringClass::ends_with(test1, test2));
 
     test1 = FLY_STR(char_type, "");
     test2 = FLY_STR(char_type, "a");
-    EXPECT_FALSE(StringClass::EndsWith(test1, test2));
+    EXPECT_FALSE(StringClass::ends_with(test1, test2));
 
     test1 = FLY_STR(char_type, "a");
     test2 = FLY_STR(char_type, "ba");
-    EXPECT_FALSE(StringClass::EndsWith(test1, test2));
+    EXPECT_FALSE(StringClass::ends_with(test1, test2));
 
     test1 = FLY_STR(char_type, "ab");
     test2 = FLY_STR(char_type, "a");
-    EXPECT_FALSE(StringClass::EndsWith(test1, test2));
+    EXPECT_FALSE(StringClass::ends_with(test1, test2));
 
     test1 = FLY_STR(char_type, "ab");
-    EXPECT_FALSE(StringClass::EndsWith(test1, 'a'));
+    EXPECT_FALSE(StringClass::ends_with(test1, 'a'));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "dbc");
-    EXPECT_FALSE(StringClass::EndsWith(test1, test2));
+    EXPECT_FALSE(StringClass::ends_with(test1, test2));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, WildcardTest)
+TYPED_TEST(BasicStringTest, Wildcard)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -394,100 +394,100 @@ TYPED_TEST(BasicStringTest, WildcardTest)
 
     test1 = FLY_STR(char_type, "");
     test2 = FLY_STR(char_type, "*");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "");
     test2 = FLY_STR(char_type, "**");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "a");
     test2 = FLY_STR(char_type, "a");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "b");
     test2 = FLY_STR(char_type, "*");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "c");
     test2 = FLY_STR(char_type, "**");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "a*");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "a*c");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "a*");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "*b*");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "*bc");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "*c");
-    EXPECT_TRUE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_TRUE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "");
     test2 = FLY_STR(char_type, "");
-    EXPECT_FALSE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_FALSE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "a");
     test2 = FLY_STR(char_type, "");
-    EXPECT_FALSE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_FALSE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "a");
     test2 = FLY_STR(char_type, "b");
-    EXPECT_FALSE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_FALSE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "a");
     test2 = FLY_STR(char_type, "b*");
-    EXPECT_FALSE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_FALSE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "a");
     test2 = FLY_STR(char_type, "*b");
-    EXPECT_FALSE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_FALSE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "a");
-    EXPECT_FALSE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_FALSE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "b*");
-    EXPECT_FALSE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_FALSE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "*b");
-    EXPECT_FALSE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_FALSE(StringClass::wildcard_match(test1, test2));
 
     test1 = FLY_STR(char_type, "abc");
     test2 = FLY_STR(char_type, "*d*");
-    EXPECT_FALSE(StringClass::WildcardMatch(test1, test2));
+    EXPECT_FALSE(StringClass::wildcard_match(test1, test2));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, GenerateRandomStringTest)
+TYPED_TEST(BasicStringTest, GenerateRandomString)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using size_type = typename StringClass::size_type;
 
-    static constexpr size_type length = (1 << 10);
+    static constexpr size_type s_size = (1 << 10);
 
-    const auto random = StringClass::GenerateRandomString(length);
-    EXPECT_EQ(length, random.length());
+    const auto random = StringClass::generate_random_string(s_size);
+    EXPECT_EQ(s_size, random.size());
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, FormatTest)
+TYPED_TEST(BasicStringTest, Format)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -500,40 +500,40 @@ TYPED_TEST(BasicStringTest, FormatTest)
     const char_type *format;
     string_type arg;
 
-    EXPECT_EQ(streamed_type(), StringClass::Format(FLY_STR(char_type, "")));
+    EXPECT_EQ(streamed_type(), StringClass::format(FLY_STR(char_type, "")));
 
     expected = FLY_STR(streamed_char, "%");
     format = FLY_STR(char_type, "%");
-    EXPECT_EQ(expected, StringClass::Format(format));
-    EXPECT_EQ(expected, StringClass::Format(format, 1));
+    EXPECT_EQ(expected, StringClass::format(format));
+    EXPECT_EQ(expected, StringClass::format(format, 1));
 
     expected = FLY_STR(streamed_char, "%");
     format = FLY_STR(char_type, "%%");
-    EXPECT_EQ(expected, StringClass::Format(format));
+    EXPECT_EQ(expected, StringClass::format(format));
 
     expected = FLY_STR(streamed_char, "2.100000% 1");
     format = FLY_STR(char_type, "%f%% %d");
-    EXPECT_EQ(expected, StringClass::Format(format, 2.1f, 1));
+    EXPECT_EQ(expected, StringClass::format(format, 2.1f, 1));
 
     expected = FLY_STR(streamed_char, "This is a test");
     format = FLY_STR(char_type, "This is a test");
-    EXPECT_EQ(expected, StringClass::Format(format));
+    EXPECT_EQ(expected, StringClass::format(format));
 
     expected = FLY_STR(streamed_char, "there are no formatters");
     format = FLY_STR(char_type, "there are no formatters");
-    EXPECT_EQ(expected, StringClass::Format(format, 1, 2, 3, 4));
+    EXPECT_EQ(expected, StringClass::format(format, 1, 2, 3, 4));
 
     expected = FLY_STR(streamed_char, "test some string s");
     format = FLY_STR(char_type, "test %s %c");
     arg = FLY_STR(char_type, "some string");
-    EXPECT_EQ(expected, StringClass::Format(format, arg, 's'));
+    EXPECT_EQ(expected, StringClass::format(format, arg, 's'));
 
     expected =
         FLY_STR(streamed_char, "test 1 true 2.100000 false 1.230000e+02 0xff");
     format = FLY_STR(char_type, "test %d %d %f %d %e %x");
     EXPECT_EQ(
         expected,
-        StringClass::Format(format, 1, true, 2.1f, false, 123.0, 255));
+        StringClass::format(format, 1, true, 2.1f, false, 123.0, 255));
 }
 
 //==============================================================================
@@ -549,8 +549,8 @@ TYPED_TEST(BasicStringTest, FormatTest_d)
     const char_type *format;
 
     format = FLY_STR(char_type, "%d");
-    EXPECT_EQ(FLY_STR(streamed_char, "%d"), StringClass::Format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "1"), StringClass::Format(format, 1));
+    EXPECT_EQ(FLY_STR(streamed_char, "%d"), StringClass::format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "1"), StringClass::format(format, 1));
 }
 
 //==============================================================================
@@ -566,8 +566,8 @@ TYPED_TEST(BasicStringTest, FormatTest_i)
     const char_type *format;
 
     format = FLY_STR(char_type, "%i");
-    EXPECT_EQ(FLY_STR(streamed_char, "%i"), StringClass::Format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "1"), StringClass::Format(format, 1));
+    EXPECT_EQ(FLY_STR(streamed_char, "%i"), StringClass::format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "1"), StringClass::format(format, 1));
 }
 
 //==============================================================================
@@ -583,12 +583,12 @@ TYPED_TEST(BasicStringTest, FormatTest_x)
     const char_type *format;
 
     format = FLY_STR(char_type, "%x");
-    EXPECT_EQ(FLY_STR(streamed_char, "%x"), StringClass::Format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "0xff"), StringClass::Format(format, 255));
+    EXPECT_EQ(FLY_STR(streamed_char, "%x"), StringClass::format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "0xff"), StringClass::format(format, 255));
 
     format = FLY_STR(char_type, "%X");
-    EXPECT_EQ(FLY_STR(streamed_char, "%X"), StringClass::Format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "0XFF"), StringClass::Format(format, 255));
+    EXPECT_EQ(FLY_STR(streamed_char, "%X"), StringClass::format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "0XFF"), StringClass::format(format, 255));
 }
 
 //==============================================================================
@@ -604,8 +604,8 @@ TYPED_TEST(BasicStringTest, FormatTest_o)
     const char_type *format;
 
     format = FLY_STR(char_type, "%o");
-    EXPECT_EQ(FLY_STR(streamed_char, "%o"), StringClass::Format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "0377"), StringClass::Format(format, 255));
+    EXPECT_EQ(FLY_STR(streamed_char, "%o"), StringClass::format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "0377"), StringClass::format(format, 255));
 }
 
 //==============================================================================
@@ -621,31 +621,31 @@ TYPED_TEST(BasicStringTest, FormatTest_a)
     const char_type *format;
 
     format = FLY_STR(char_type, "%a");
-    EXPECT_EQ(FLY_STR(streamed_char, "%a"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "%a"), StringClass::format(format));
 #if defined(FLY_WINDOWS)
     // Windows 0-pads std::hexfloat to match the stream precision, Linux does
     // not. This discrepency should be fixed when length modifiers are added.
     EXPECT_EQ(
         FLY_STR(streamed_char, "0x1.600000p+2"),
-        StringClass::Format(format, 5.5));
+        StringClass::format(format, 5.5));
 #else
     EXPECT_EQ(
         FLY_STR(streamed_char, "0x1.6p+2"),
-        StringClass::Format(format, 5.5));
+        StringClass::format(format, 5.5));
 #endif
 
     format = FLY_STR(char_type, "%A");
-    EXPECT_EQ(FLY_STR(streamed_char, "%A"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "%A"), StringClass::format(format));
 #if defined(FLY_WINDOWS)
     // Windows 0-pads std::hexfloat to match the stream precision, Linux does
     // not. This discrepency should be fixed when length modifiers are added.
     EXPECT_EQ(
         FLY_STR(streamed_char, "0X1.600000P+2"),
-        StringClass::Format(format, 5.5));
+        StringClass::format(format, 5.5));
 #else
     EXPECT_EQ(
         FLY_STR(streamed_char, "0X1.6P+2"),
-        StringClass::Format(format, 5.5));
+        StringClass::format(format, 5.5));
 #endif
 }
 
@@ -662,29 +662,29 @@ TYPED_TEST(BasicStringTest, FormatTest_f)
     const char_type *format;
 
     format = FLY_STR(char_type, "%f");
-    EXPECT_EQ(FLY_STR(streamed_char, "%f"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "%f"), StringClass::format(format));
     EXPECT_EQ(
         FLY_STR(streamed_char, "nan"),
-        StringClass::Format(format, std::nan("")));
+        StringClass::format(format, std::nan("")));
     EXPECT_EQ(
         FLY_STR(streamed_char, "inf"),
-        StringClass::Format(format, std::numeric_limits<float>::infinity()));
+        StringClass::format(format, std::numeric_limits<float>::infinity()));
     EXPECT_EQ(
         FLY_STR(streamed_char, "2.100000"),
-        StringClass::Format(format, 2.1f));
+        StringClass::format(format, 2.1f));
 
     // Note: std::uppercase has no effect on std::fixed :(
     format = FLY_STR(char_type, "%F");
-    EXPECT_EQ(FLY_STR(streamed_char, "%F"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "%F"), StringClass::format(format));
     EXPECT_EQ(
         FLY_STR(streamed_char, "nan"),
-        StringClass::Format(format, std::nan("")));
+        StringClass::format(format, std::nan("")));
     EXPECT_EQ(
         FLY_STR(streamed_char, "inf"),
-        StringClass::Format(format, std::numeric_limits<float>::infinity()));
+        StringClass::format(format, std::numeric_limits<float>::infinity()));
     EXPECT_EQ(
         FLY_STR(streamed_char, "2.100000"),
-        StringClass::Format(format, 2.1f));
+        StringClass::format(format, 2.1f));
 }
 
 //==============================================================================
@@ -700,24 +700,24 @@ TYPED_TEST(BasicStringTest, FormatTest_g)
     const char_type *format;
 
     format = FLY_STR(char_type, "%g");
-    EXPECT_EQ(FLY_STR(streamed_char, "%g"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "%g"), StringClass::format(format));
     EXPECT_EQ(
         FLY_STR(streamed_char, "nan"),
-        StringClass::Format(format, std::nan("")));
+        StringClass::format(format, std::nan("")));
     EXPECT_EQ(
         FLY_STR(streamed_char, "inf"),
-        StringClass::Format(format, std::numeric_limits<float>::infinity()));
-    EXPECT_EQ(FLY_STR(streamed_char, "2.1"), StringClass::Format(format, 2.1f));
+        StringClass::format(format, std::numeric_limits<float>::infinity()));
+    EXPECT_EQ(FLY_STR(streamed_char, "2.1"), StringClass::format(format, 2.1f));
 
     format = FLY_STR(char_type, "%G");
-    EXPECT_EQ(FLY_STR(streamed_char, "%G"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "%G"), StringClass::format(format));
     EXPECT_EQ(
         FLY_STR(streamed_char, "NAN"),
-        StringClass::Format(format, std::nan("")));
+        StringClass::format(format, std::nan("")));
     EXPECT_EQ(
         FLY_STR(streamed_char, "INF"),
-        StringClass::Format(format, std::numeric_limits<float>::infinity()));
-    EXPECT_EQ(FLY_STR(streamed_char, "2.1"), StringClass::Format(format, 2.1f));
+        StringClass::format(format, std::numeric_limits<float>::infinity()));
+    EXPECT_EQ(FLY_STR(streamed_char, "2.1"), StringClass::format(format, 2.1f));
 }
 
 //==============================================================================
@@ -733,20 +733,20 @@ TYPED_TEST(BasicStringTest, FormatTest_e)
     const char_type *format;
 
     format = FLY_STR(char_type, "%e");
-    EXPECT_EQ(FLY_STR(streamed_char, "%e"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "%e"), StringClass::format(format));
     EXPECT_EQ(
         FLY_STR(streamed_char, "1.230000e+02"),
-        StringClass::Format(format, 123.0));
+        StringClass::format(format, 123.0));
 
     format = FLY_STR(char_type, "%E");
-    EXPECT_EQ(FLY_STR(streamed_char, "%E"), StringClass::Format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "%E"), StringClass::format(format));
     EXPECT_EQ(
         FLY_STR(streamed_char, "1.230000E+02"),
-        StringClass::Format(format, 123.0));
+        StringClass::format(format, 123.0));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, JoinTest)
+TYPED_TEST(BasicStringTest, Join)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -763,60 +763,60 @@ TYPED_TEST(BasicStringTest, JoinTest)
     const Streamable<streamed_type> obj1(FLY_STR(streamed_char, "hi"), 0xbeef);
     const NotStreamable obj2;
 
-    EXPECT_EQ(FLY_STR(streamed_char, "a"), StringClass::Join('.', str));
-    EXPECT_EQ(FLY_STR(streamed_char, "b"), StringClass::Join('.', ctr));
-    EXPECT_EQ(FLY_STR(streamed_char, "c"), StringClass::Join('.', arr));
-    EXPECT_EQ(FLY_STR(streamed_char, "d"), StringClass::Join('.', chr));
-    EXPECT_EQ(FLY_STR(streamed_char, "a,a"), StringClass::Join(',', str, str));
-    EXPECT_EQ(FLY_STR(streamed_char, "a,b"), StringClass::Join(',', str, ctr));
-    EXPECT_EQ(FLY_STR(streamed_char, "a,c"), StringClass::Join(',', str, arr));
-    EXPECT_EQ(FLY_STR(streamed_char, "a,d"), StringClass::Join(',', str, chr));
-    EXPECT_EQ(FLY_STR(streamed_char, "b,a"), StringClass::Join(',', ctr, str));
-    EXPECT_EQ(FLY_STR(streamed_char, "b,b"), StringClass::Join(',', ctr, ctr));
-    EXPECT_EQ(FLY_STR(streamed_char, "b,c"), StringClass::Join(',', ctr, arr));
-    EXPECT_EQ(FLY_STR(streamed_char, "b,d"), StringClass::Join(',', ctr, chr));
-    EXPECT_EQ(FLY_STR(streamed_char, "c,a"), StringClass::Join(',', arr, str));
-    EXPECT_EQ(FLY_STR(streamed_char, "c,b"), StringClass::Join(',', arr, ctr));
-    EXPECT_EQ(FLY_STR(streamed_char, "c,c"), StringClass::Join(',', arr, arr));
-    EXPECT_EQ(FLY_STR(streamed_char, "c,d"), StringClass::Join(',', arr, chr));
-    EXPECT_EQ(FLY_STR(streamed_char, "d,a"), StringClass::Join(',', chr, str));
-    EXPECT_EQ(FLY_STR(streamed_char, "d,b"), StringClass::Join(',', chr, ctr));
-    EXPECT_EQ(FLY_STR(streamed_char, "d,c"), StringClass::Join(',', chr, arr));
-    EXPECT_EQ(FLY_STR(streamed_char, "d,d"), StringClass::Join(',', chr, chr));
+    EXPECT_EQ(FLY_STR(streamed_char, "a"), StringClass::join('.', str));
+    EXPECT_EQ(FLY_STR(streamed_char, "b"), StringClass::join('.', ctr));
+    EXPECT_EQ(FLY_STR(streamed_char, "c"), StringClass::join('.', arr));
+    EXPECT_EQ(FLY_STR(streamed_char, "d"), StringClass::join('.', chr));
+    EXPECT_EQ(FLY_STR(streamed_char, "a,a"), StringClass::join(',', str, str));
+    EXPECT_EQ(FLY_STR(streamed_char, "a,b"), StringClass::join(',', str, ctr));
+    EXPECT_EQ(FLY_STR(streamed_char, "a,c"), StringClass::join(',', str, arr));
+    EXPECT_EQ(FLY_STR(streamed_char, "a,d"), StringClass::join(',', str, chr));
+    EXPECT_EQ(FLY_STR(streamed_char, "b,a"), StringClass::join(',', ctr, str));
+    EXPECT_EQ(FLY_STR(streamed_char, "b,b"), StringClass::join(',', ctr, ctr));
+    EXPECT_EQ(FLY_STR(streamed_char, "b,c"), StringClass::join(',', ctr, arr));
+    EXPECT_EQ(FLY_STR(streamed_char, "b,d"), StringClass::join(',', ctr, chr));
+    EXPECT_EQ(FLY_STR(streamed_char, "c,a"), StringClass::join(',', arr, str));
+    EXPECT_EQ(FLY_STR(streamed_char, "c,b"), StringClass::join(',', arr, ctr));
+    EXPECT_EQ(FLY_STR(streamed_char, "c,c"), StringClass::join(',', arr, arr));
+    EXPECT_EQ(FLY_STR(streamed_char, "c,d"), StringClass::join(',', arr, chr));
+    EXPECT_EQ(FLY_STR(streamed_char, "d,a"), StringClass::join(',', chr, str));
+    EXPECT_EQ(FLY_STR(streamed_char, "d,b"), StringClass::join(',', chr, ctr));
+    EXPECT_EQ(FLY_STR(streamed_char, "d,c"), StringClass::join(',', chr, arr));
+    EXPECT_EQ(FLY_STR(streamed_char, "d,d"), StringClass::join(',', chr, chr));
     EXPECT_EQ(
         FLY_STR(streamed_char, "[hi beef]"),
-        StringClass::Join('.', obj1));
+        StringClass::join('.', obj1));
     EXPECT_EQ(
         FLY_STR(streamed_char, "a:[hi beef]:c:d"),
-        StringClass::Join(':', str, obj1, arr, chr));
+        StringClass::join(':', str, obj1, arr, chr));
     EXPECT_EQ(
         FLY_STR(streamed_char, "a:c:d"),
-        StringClass::Join(':', str, arr, chr));
+        StringClass::join(':', str, arr, chr));
 
     std::basic_regex<streamed_char> test(
         FLY_STR(streamed_char, "\\[(0x)?[0-9a-fA-F]+\\]:2:\\[hi beef\\]"));
-    EXPECT_TRUE(std::regex_match(StringClass::Join(':', obj2, 2, obj1), test));
+    EXPECT_TRUE(std::regex_match(StringClass::join(':', obj2, 2, obj1), test));
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ConvertStringTest)
+TYPED_TEST(BasicStringTest, ConvertString)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
     using char_type = typename StringClass::char_type;
 
     string_type s = FLY_STR(char_type, "abc");
-    EXPECT_EQ(StringClass::template Convert<string_type>(s), s);
+    EXPECT_EQ(StringClass::template convert<string_type>(s), s);
 
     const char_type *c = FLY_STR(char_type, "def");
-    EXPECT_EQ(StringClass::template Convert<string_type>(c), c);
+    EXPECT_EQ(StringClass::template convert<string_type>(c), c);
 
     char_type *d = const_cast<char_type *>(FLY_STR(char_type, "ghi"));
-    EXPECT_EQ(StringClass::template Convert<string_type>(d), d);
+    EXPECT_EQ(StringClass::template convert<string_type>(d), d);
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ConvertBoolTest)
+TYPED_TEST(BasicStringTest, ConvertBool)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -825,26 +825,26 @@ TYPED_TEST(BasicStringTest, ConvertBoolTest)
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<bool>(s), false);
+    EXPECT_EQ(StringClass::template convert<bool>(s), false);
 
     s = FLY_STR(char_type, "1");
-    EXPECT_EQ(StringClass::template Convert<bool>(s), true);
+    EXPECT_EQ(StringClass::template convert<bool>(s), true);
 
     s = FLY_STR(char_type, "-1");
-    EXPECT_THROW(StringClass::template Convert<bool>(s), std::out_of_range);
+    EXPECT_THROW(StringClass::template convert<bool>(s), std::out_of_range);
 
     s = FLY_STR(char_type, "2");
-    EXPECT_THROW(StringClass::template Convert<bool>(s), std::out_of_range);
+    EXPECT_THROW(StringClass::template convert<bool>(s), std::out_of_range);
 
     s = FLY_STR(char_type, "abc");
-    EXPECT_THROW(StringClass::template Convert<bool>(s), std::invalid_argument);
+    EXPECT_THROW(StringClass::template convert<bool>(s), std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
-    EXPECT_THROW(StringClass::template Convert<bool>(s), std::invalid_argument);
+    EXPECT_THROW(StringClass::template convert<bool>(s), std::invalid_argument);
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ConvertCharTest)
+TYPED_TEST(BasicStringTest, ConvertChar)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -857,55 +857,55 @@ TYPED_TEST(BasicStringTest, ConvertCharTest)
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<streamed_char>(s), '\0');
-    EXPECT_EQ(StringClass::template Convert<ustreamed_char>(s), '\0');
+    EXPECT_EQ(StringClass::template convert<streamed_char>(s), '\0');
+    EXPECT_EQ(StringClass::template convert<ustreamed_char>(s), '\0');
 
     s = FLY_STR(char_type, "65");
-    EXPECT_EQ(StringClass::template Convert<streamed_char>(s), 'A');
+    EXPECT_EQ(StringClass::template convert<streamed_char>(s), 'A');
     EXPECT_EQ(
-        StringClass::template Convert<ustreamed_char>(s),
+        StringClass::template convert<ustreamed_char>(s),
         static_cast<ustreamed_char>(65));
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<streamed_char>(s),
+        StringClass::template convert<streamed_char>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<ustreamed_char>(s),
+        StringClass::template convert<ustreamed_char>(s),
         std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<streamed_char>(s),
+        StringClass::template convert<streamed_char>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<ustreamed_char>(s),
+        StringClass::template convert<ustreamed_char>(s),
         std::invalid_argument);
 
     if constexpr (StringClass::traits::has_stoi_family_v)
     {
         EXPECT_THROW(
-            StringClass::template Convert<streamed_char>(
+            StringClass::template convert<streamed_char>(
                 minstr<string_type, streamed_char>()),
             std::out_of_range);
         EXPECT_THROW(
-            StringClass::template Convert<streamed_char>(
+            StringClass::template convert<streamed_char>(
                 maxstr<string_type, streamed_char>()),
             std::out_of_range);
 
         EXPECT_THROW(
-            StringClass::template Convert<ustreamed_char>(
+            StringClass::template convert<ustreamed_char>(
                 minstr<string_type, ustreamed_char>()),
             std::out_of_range);
         EXPECT_THROW(
-            StringClass::template Convert<ustreamed_char>(
+            StringClass::template convert<ustreamed_char>(
                 maxstr<string_type, ustreamed_char>()),
             std::out_of_range);
     }
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ConvertInt8Test)
+TYPED_TEST(BasicStringTest, ConvertInt8)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -914,59 +914,59 @@ TYPED_TEST(BasicStringTest, ConvertInt8Test)
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), 0_i8);
-    EXPECT_EQ(StringClass::template Convert<std::uint8_t>(s), 0_u8);
+    EXPECT_EQ(StringClass::template convert<std::int8_t>(s), 0_i8);
+    EXPECT_EQ(StringClass::template convert<std::uint8_t>(s), 0_u8);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), 100_i8);
-    EXPECT_EQ(StringClass::template Convert<std::uint8_t>(s), 100_u8);
+    EXPECT_EQ(StringClass::template convert<std::int8_t>(s), 100_i8);
+    EXPECT_EQ(StringClass::template convert<std::uint8_t>(s), 100_u8);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(StringClass::template Convert<std::int8_t>(s), -100_i8);
+    EXPECT_EQ(StringClass::template convert<std::int8_t>(s), -100_i8);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint8_t>(s),
+        StringClass::template convert<std::uint8_t>(s),
         std::out_of_range);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<std::int8_t>(s),
+        StringClass::template convert<std::int8_t>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint8_t>(s),
+        StringClass::template convert<std::uint8_t>(s),
         std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<std::int8_t>(s),
+        StringClass::template convert<std::int8_t>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint8_t>(s),
+        StringClass::template convert<std::uint8_t>(s),
         std::invalid_argument);
 
     if constexpr (StringClass::traits::has_stoi_family_v)
     {
         EXPECT_THROW(
-            StringClass::template Convert<std::int8_t>(
+            StringClass::template convert<std::int8_t>(
                 minstr<string_type, std::int8_t>()),
             std::out_of_range);
         EXPECT_THROW(
-            StringClass::template Convert<std::int8_t>(
+            StringClass::template convert<std::int8_t>(
                 maxstr<string_type, std::int8_t>()),
             std::out_of_range);
 
         EXPECT_THROW(
-            StringClass::template Convert<std::uint8_t>(
+            StringClass::template convert<std::uint8_t>(
                 minstr<string_type, std::uint8_t>()),
             std::out_of_range);
         EXPECT_THROW(
-            StringClass::template Convert<std::uint8_t>(
+            StringClass::template convert<std::uint8_t>(
                 maxstr<string_type, std::uint8_t>()),
             std::out_of_range);
     }
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ConvertInt16Test)
+TYPED_TEST(BasicStringTest, ConvertInt16)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -975,59 +975,59 @@ TYPED_TEST(BasicStringTest, ConvertInt16Test)
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), 0_i16);
-    EXPECT_EQ(StringClass::template Convert<std::uint16_t>(s), 0_u16);
+    EXPECT_EQ(StringClass::template convert<std::int16_t>(s), 0_i16);
+    EXPECT_EQ(StringClass::template convert<std::uint16_t>(s), 0_u16);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), 100_i16);
-    EXPECT_EQ(StringClass::template Convert<std::uint16_t>(s), 100_u16);
+    EXPECT_EQ(StringClass::template convert<std::int16_t>(s), 100_i16);
+    EXPECT_EQ(StringClass::template convert<std::uint16_t>(s), 100_u16);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(StringClass::template Convert<std::int16_t>(s), -100_i16);
+    EXPECT_EQ(StringClass::template convert<std::int16_t>(s), -100_i16);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint16_t>(s),
+        StringClass::template convert<std::uint16_t>(s),
         std::out_of_range);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<std::int16_t>(s),
+        StringClass::template convert<std::int16_t>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint16_t>(s),
+        StringClass::template convert<std::uint16_t>(s),
         std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<std::int16_t>(s),
+        StringClass::template convert<std::int16_t>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint16_t>(s),
+        StringClass::template convert<std::uint16_t>(s),
         std::invalid_argument);
 
     if constexpr (StringClass::traits::has_stoi_family_v)
     {
         EXPECT_THROW(
-            StringClass::template Convert<std::int16_t>(
+            StringClass::template convert<std::int16_t>(
                 minstr<string_type, std::int16_t>()),
             std::out_of_range);
         EXPECT_THROW(
-            StringClass::template Convert<std::int16_t>(
+            StringClass::template convert<std::int16_t>(
                 maxstr<string_type, std::int16_t>()),
             std::out_of_range);
 
         EXPECT_THROW(
-            StringClass::template Convert<std::uint16_t>(
+            StringClass::template convert<std::uint16_t>(
                 minstr<string_type, std::uint16_t>()),
             std::out_of_range);
         EXPECT_THROW(
-            StringClass::template Convert<std::uint16_t>(
+            StringClass::template convert<std::uint16_t>(
                 maxstr<string_type, std::uint16_t>()),
             std::out_of_range);
     }
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ConvertInt32Test)
+TYPED_TEST(BasicStringTest, ConvertInt32)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -1036,59 +1036,59 @@ TYPED_TEST(BasicStringTest, ConvertInt32Test)
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), 0_i32);
-    EXPECT_EQ(StringClass::template Convert<std::uint32_t>(s), 0_u32);
+    EXPECT_EQ(StringClass::template convert<std::int32_t>(s), 0_i32);
+    EXPECT_EQ(StringClass::template convert<std::uint32_t>(s), 0_u32);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), 100_i32);
-    EXPECT_EQ(StringClass::template Convert<std::uint32_t>(s), 100_u32);
+    EXPECT_EQ(StringClass::template convert<std::int32_t>(s), 100_i32);
+    EXPECT_EQ(StringClass::template convert<std::uint32_t>(s), 100_u32);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(StringClass::template Convert<std::int32_t>(s), -100_i32);
+    EXPECT_EQ(StringClass::template convert<std::int32_t>(s), -100_i32);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint32_t>(s),
+        StringClass::template convert<std::uint32_t>(s),
         std::out_of_range);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<std::int32_t>(s),
+        StringClass::template convert<std::int32_t>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint32_t>(s),
+        StringClass::template convert<std::uint32_t>(s),
         std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<std::int32_t>(s),
+        StringClass::template convert<std::int32_t>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint32_t>(s),
+        StringClass::template convert<std::uint32_t>(s),
         std::invalid_argument);
 
     if constexpr (StringClass::traits::has_stoi_family_v)
     {
         EXPECT_THROW(
-            StringClass::template Convert<std::int32_t>(
+            StringClass::template convert<std::int32_t>(
                 minstr<string_type, std::int32_t>()),
             std::out_of_range);
         EXPECT_THROW(
-            StringClass::template Convert<std::int32_t>(
+            StringClass::template convert<std::int32_t>(
                 maxstr<string_type, std::int32_t>()),
             std::out_of_range);
 
         EXPECT_THROW(
-            StringClass::template Convert<std::uint32_t>(
+            StringClass::template convert<std::uint32_t>(
                 minstr<string_type, std::uint32_t>()),
             std::out_of_range);
         EXPECT_THROW(
-            StringClass::template Convert<std::uint32_t>(
+            StringClass::template convert<std::uint32_t>(
                 maxstr<string_type, std::uint32_t>()),
             std::out_of_range);
     }
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ConvertInt64Test)
+TYPED_TEST(BasicStringTest, ConvertInt64)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -1097,35 +1097,35 @@ TYPED_TEST(BasicStringTest, ConvertInt64Test)
     string_type s;
 
     s = FLY_STR(char_type, "0");
-    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), 0_i64);
-    EXPECT_EQ(StringClass::template Convert<std::uint64_t>(s), 0_u64);
+    EXPECT_EQ(StringClass::template convert<std::int64_t>(s), 0_i64);
+    EXPECT_EQ(StringClass::template convert<std::uint64_t>(s), 0_u64);
 
     s = FLY_STR(char_type, "100");
-    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), 100_i64);
-    EXPECT_EQ(StringClass::template Convert<std::uint64_t>(s), 100_u64);
+    EXPECT_EQ(StringClass::template convert<std::int64_t>(s), 100_i64);
+    EXPECT_EQ(StringClass::template convert<std::uint64_t>(s), 100_u64);
 
     s = FLY_STR(char_type, "-100");
-    EXPECT_EQ(StringClass::template Convert<std::int64_t>(s), -100_i64);
+    EXPECT_EQ(StringClass::template convert<std::int64_t>(s), -100_i64);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<std::int64_t>(s),
+        StringClass::template convert<std::int64_t>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint64_t>(s),
+        StringClass::template convert<std::uint64_t>(s),
         std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<std::int64_t>(s),
+        StringClass::template convert<std::int64_t>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<std::uint64_t>(s),
+        StringClass::template convert<std::uint64_t>(s),
         std::invalid_argument);
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, ConvertDecimalTest)
+TYPED_TEST(BasicStringTest, ConvertDecimal)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -1134,40 +1134,40 @@ TYPED_TEST(BasicStringTest, ConvertDecimalTest)
     string_type s;
 
     s = FLY_STR(char_type, "-400.123");
-    EXPECT_EQ(StringClass::template Convert<float>(s), -400.123f);
-    EXPECT_EQ(StringClass::template Convert<double>(s), -400.123);
-    EXPECT_EQ(StringClass::template Convert<long double>(s), -400.123L);
+    EXPECT_EQ(StringClass::template convert<float>(s), -400.123f);
+    EXPECT_EQ(StringClass::template convert<double>(s), -400.123);
+    EXPECT_EQ(StringClass::template convert<long double>(s), -400.123L);
 
     s = FLY_STR(char_type, "400.456");
-    EXPECT_EQ(StringClass::template Convert<float>(s), 400.456f);
-    EXPECT_EQ(StringClass::template Convert<double>(s), 400.456);
-    EXPECT_EQ(StringClass::template Convert<long double>(s), 400.456L);
+    EXPECT_EQ(StringClass::template convert<float>(s), 400.456f);
+    EXPECT_EQ(StringClass::template convert<double>(s), 400.456);
+    EXPECT_EQ(StringClass::template convert<long double>(s), 400.456L);
 
     s = FLY_STR(char_type, "abc");
     EXPECT_THROW(
-        StringClass::template Convert<float>(s),
+        StringClass::template convert<float>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<double>(s),
+        StringClass::template convert<double>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<long double>(s),
+        StringClass::template convert<long double>(s),
         std::invalid_argument);
 
     s = FLY_STR(char_type, "2a");
     EXPECT_THROW(
-        StringClass::template Convert<float>(s),
+        StringClass::template convert<float>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<double>(s),
+        StringClass::template convert<double>(s),
         std::invalid_argument);
     EXPECT_THROW(
-        StringClass::template Convert<long double>(s),
+        StringClass::template convert<long double>(s),
         std::invalid_argument);
 }
 
 //==============================================================================
-TYPED_TEST(BasicStringTest, BasicStringStreamerTest)
+TYPED_TEST(BasicStringTest, BasicStringStreamer)
 {
     using string_type = typename TestFixture::string_base_type;
     using StringClass = fly::BasicString<string_type>;
@@ -1177,10 +1177,10 @@ TYPED_TEST(BasicStringTest, BasicStringStreamerTest)
     // std::u32string in detail::BasicStringStreamer is exercised correctly.
     if constexpr (!StringClass::traits::has_stoi_family_v)
     {
-        string_type s = FLY_STR(char_type, "\u00f0\u0178\u008d\u2022");
+        const string_type s = FLY_STR(char_type, "\u00f0\u0178\u008d\u2022");
 
         typename StringClass::traits::ostringstream_type stream;
-        fly::detail::BasicStringStreamer<string_type>::Stream(stream, s);
+        fly::detail::BasicStringStreamer<string_type>::stream(stream, s);
 
         EXPECT_EQ("[0xf0][0x178][0x8d][0x2022]", stream.str());
     }

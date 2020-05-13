@@ -14,43 +14,43 @@ namespace fly {
 class System
 {
 public:
-    typedef std::function<void(int)> SignalHandler;
+    using SignalHandler = std::function<void(int)>;
 
     /**
      * Print the backtrace to stderr.
      */
-    static void PrintBacktrace() noexcept;
+    static void print_backtrace() noexcept;
 
     /**
      * @return The local time formatted as a string.
      */
-    static std::string LocalTime() noexcept;
+    static std::string local_time() noexcept;
 
     /**
      * @return The last system error code.
      */
-    static int GetErrorCode() noexcept;
+    static int get_error_code() noexcept;
 
     /**
      * @return The last system error code as a string.
      */
-    static std::string GetErrorString() noexcept;
+    static std::string get_error_string() noexcept;
 
     /**
      * Convert a system error code to a string.
      *
-     * @param int The system error code to convert.
+     * @param code The system error code to convert.
      *
      * @return The given system error code as a string.
      */
-    static std::string GetErrorString(int) noexcept;
+    static std::string get_error_string(int code) noexcept;
 
     /**
      * Set a signal handler for all terminal signals.
      *
-     * @param SignalHandler The signal handler function to set.
+     * @param handler The signal handler function to set.
      */
-    static void SetSignalHandler(SignalHandler) noexcept;
+    static void set_signal_handler(SignalHandler handler) noexcept;
 };
 
 } // namespace fly

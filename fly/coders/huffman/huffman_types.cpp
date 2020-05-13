@@ -23,7 +23,7 @@ HuffmanNode &HuffmanNode::operator=(HuffmanNode &&node) noexcept
 }
 
 //==============================================================================
-void HuffmanNode::BecomeSymbol(
+void HuffmanNode::become_symbol(
     symbol_type symbol,
     frequency_type frequency) noexcept
 {
@@ -34,7 +34,7 @@ void HuffmanNode::BecomeSymbol(
 }
 
 //==============================================================================
-void HuffmanNode::BecomeIntermediate(
+void HuffmanNode::become_intermediate(
     HuffmanNode *left,
     HuffmanNode *right) noexcept
 {
@@ -59,9 +59,9 @@ HuffmanCode::HuffmanCode() noexcept : m_symbol(0), m_code(0), m_length(0)
 
 //==============================================================================
 HuffmanCode::HuffmanCode(
-    const symbol_type symbol,
-    const code_type code,
-    const length_type length) noexcept :
+    symbol_type symbol,
+    code_type code,
+    length_type length) noexcept :
     m_symbol(symbol),
     m_code(code),
     m_length(length)
@@ -87,14 +87,14 @@ HuffmanCode &HuffmanCode::operator=(HuffmanCode &&code) noexcept
 }
 
 //==============================================================================
-bool operator<(const HuffmanCode &a, const HuffmanCode &b)
+bool operator<(const HuffmanCode &left, const HuffmanCode &right)
 {
-    if (a.m_length == b.m_length)
+    if (left.m_length == right.m_length)
     {
-        return a.m_symbol < b.m_symbol;
+        return left.m_symbol < right.m_symbol;
     }
 
-    return a.m_length < b.m_length;
+    return left.m_length < right.m_length;
 }
 
 } // namespace fly

@@ -17,65 +17,64 @@ namespace fly {
 
 namespace {
 
-    const char *s_procStatFile = "/proc/stat";
-    const char *s_selfStatusFile = "/proc/self/status";
+    const char *s_proc_stat_file = "/proc/stat";
+    const char *s_self_status_file = "/proc/self/status";
 
 } // namespace
 
 //==============================================================================
 SystemMonitorImpl::SystemMonitorImpl(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SystemConfig> &spConfig) noexcept :
-    SystemMonitor(spTaskRunner, spConfig),
-    m_prevSystemUserTime(0),
-    m_prevSystemNiceTime(0),
-    m_prevSystemSystemTime(0),
-    m_prevSystemIdleTime(0),
-    m_prevProcessSystemTime(0),
-    m_prevProcessUserTime(0),
-    m_prevTime(0)
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<SystemConfig> &config) noexcept :
+    SystemMonitor(task_runner, config),
+    m_prev_system_user_time(0),
+    m_prev_system_nice_time(0),
+    m_prev_system_system_time(0),
+    m_prev_system_idle_time(0),
+    m_prev_process_system_time(0),
+    m_prev_process_user_time(0),
+    m_prev_time(0)
 {
-    UpdateSystemCpuCount();
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemCpuCount() noexcept
+void SystemMonitorImpl::update_system_cpu_count() noexcept
 {
-    std::ifstream stream(s_procStatFile, std::ios::in);
+    std::ifstream stream(s_proc_stat_file, std::ios::in);
     std::string contents, line;
 
-    std::uint32_t cpuCount = 0;
+    std::uint32_t cpu_count = 0;
 
     while (stream.good() && std::getline(stream, line))
     {
         contents += line + "\\n";
 
-        if (String::StartsWith(line, "cpu"))
+        if (String::starts_with(line, "cpu"))
         {
             if ((line.size() > 3) && (line[3] != ' '))
             {
-                ++cpuCount;
+                ++cpu_count;
             }
         }
     }
 
-    if (cpuCount == 0)
+    if (cpu_count == 0)
     {
         LOGS("Could not poll system CPU count (%s)", contents);
     }
     else
     {
-        m_systemCpuCount.store(cpuCount);
+        m_system_cpu_count.store(cpu_count);
     }
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
+void SystemMonitorImpl::update_system_cpu_usage() noexcept
 {
-    std::ifstream stream(s_procStatFile, std::ios::in);
+    std::ifstream stream(s_proc_stat_file, std::ios::in);
     std::string line;
 
-    std::uint64_t user = 0, nice = 0, sys = 0, idle = 0;
+    std::uint64_t user = 0, nice = 0, system = 0, idle = 0;
     int scanned = 0;
 
     if (stream.good() && std::getline(stream, line))
@@ -85,7 +84,7 @@ void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
             "cpu %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64,
             &user,
             &nice,
-            &sys,
+            &system,
             &idle);
     }
 
@@ -95,25 +94,28 @@ void SystemMonitorImpl::UpdateSystemCpuUsage() noexcept
         return;
     }
 
-    if ((user >= m_prevSystemUserTime) && (nice >= m_prevSystemNiceTime) &&
-        (sys >= m_prevSystemSystemTime) && (idle >= m_prevSystemIdleTime))
+    if ((user >= m_prev_system_user_time) &&
+        (nice >= m_prev_system_nice_time) &&
+        (system >= m_prev_system_system_time) &&
+        (idle >= m_prev_system_idle_time))
     {
-        std::uint64_t active = (user - m_prevSystemUserTime) +
-            (nice - m_prevSystemNiceTime) + (sys - m_prevSystemSystemTime);
+        std::uint64_t active = (user - m_prev_system_user_time) +
+            (nice - m_prev_system_nice_time) +
+            (system - m_prev_system_system_time);
 
-        std::uint64_t total = active + (idle - m_prevSystemIdleTime);
+        std::uint64_t total = active + (idle - m_prev_system_idle_time);
 
-        m_systemCpuUsage.store(100.0 * active / total);
+        m_system_cpu_usage.store(100.0 * active / total);
     }
 
-    m_prevSystemUserTime = user;
-    m_prevSystemNiceTime = nice;
-    m_prevSystemSystemTime = sys;
-    m_prevSystemIdleTime = idle;
+    m_prev_system_user_time = user;
+    m_prev_system_nice_time = nice;
+    m_prev_system_system_time = system;
+    m_prev_system_idle_time = idle;
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateProcessCpuUsage() noexcept
+void SystemMonitorImpl::update_process_cpu_usage() noexcept
 {
     struct tms sample;
     clock_t now = ::times(&sample);
@@ -124,36 +126,38 @@ void SystemMonitorImpl::UpdateProcessCpuUsage() noexcept
         return;
     }
 
-    if ((now > m_prevTime) && (sample.tms_stime >= m_prevProcessSystemTime) &&
-        (sample.tms_utime >= m_prevProcessUserTime))
+    if ((now > m_prev_time) &&
+        (sample.tms_stime >= m_prev_process_system_time) &&
+        (sample.tms_utime >= m_prev_process_user_time))
     {
-        std::int64_t cpu = (sample.tms_stime - m_prevProcessSystemTime) +
-            (sample.tms_utime - m_prevProcessUserTime);
+        std::int64_t cpu = (sample.tms_stime - m_prev_process_system_time) +
+            (sample.tms_utime - m_prev_process_user_time);
 
-        clock_t time = now - m_prevTime;
+        clock_t time = now - m_prev_time;
 
-        m_processCpuUsage.store(100.0 * cpu / time / m_systemCpuCount.load());
+        m_process_cpu_usage.store(
+            100.0 * cpu / time / m_system_cpu_count.load());
     }
 
-    m_prevProcessSystemTime = sample.tms_stime;
-    m_prevProcessUserTime = sample.tms_utime;
-    m_prevTime = now;
+    m_prev_process_system_time = sample.tms_stime;
+    m_prev_process_user_time = sample.tms_utime;
+    m_prev_time = now;
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateSystemMemoryUsage() noexcept
+void SystemMonitorImpl::update_system_memory_usage() noexcept
 {
     struct sysinfo info;
 
     if (::sysinfo(&info) == 0)
     {
-        auto totalMemory =
+        auto total_memory =
             static_cast<std::uint64_t>(info.totalram) * info.mem_unit;
-        auto freeMemory =
+        auto free_memory =
             static_cast<std::uint64_t>(info.freeram) * info.mem_unit;
 
-        m_totalSystemMemory.store(totalMemory);
-        m_systemMemoryUsage.store(totalMemory - freeMemory);
+        m_total_system_memory.store(total_memory);
+        m_system_memory_usage.store(total_memory - free_memory);
     }
     else
     {
@@ -162,12 +166,12 @@ void SystemMonitorImpl::UpdateSystemMemoryUsage() noexcept
 }
 
 //==============================================================================
-void SystemMonitorImpl::UpdateProcessMemoryUsage() noexcept
+void SystemMonitorImpl::update_process_memory_usage() noexcept
 {
-    std::ifstream stream(s_selfStatusFile, std::ios::in);
+    std::ifstream stream(s_self_status_file, std::ios::in);
     std::string contents, line;
 
-    std::uint64_t processMemoryUsage = 0;
+    std::uint64_t process_memory_usage = 0;
     int count = 0;
 
     while (stream.good() && std::getline(stream, line) && (count != 1))
@@ -175,18 +179,18 @@ void SystemMonitorImpl::UpdateProcessMemoryUsage() noexcept
         count = std::sscanf(
             line.c_str(),
             "VmRSS: %" SCNu64 " kB",
-            &processMemoryUsage);
+            &process_memory_usage);
         contents += line + "\\n";
     }
 
-    if (processMemoryUsage == 0)
+    if (process_memory_usage == 0)
     {
         LOGS("Could not poll process memory (%s)", contents);
     }
     else
     {
         // Value stored in status file is in KB
-        m_processMemoryUsage.store(processMemoryUsage << 10);
+        m_process_memory_usage.store(process_memory_usage << 10);
     }
 }
 

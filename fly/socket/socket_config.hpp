@@ -25,22 +25,22 @@ public:
     /**
      * @return Sleep time for socket IO thread.
      */
-    std::chrono::microseconds IoWaitTime() const noexcept;
+    std::chrono::microseconds io_wait_time() const noexcept;
 
     /**
      * @return Character signifying the end of a message received over a socket.
      */
-    char EndOfMessage() const noexcept;
+    char end_of_message() const noexcept;
 
     /**
      * Size of packet to use for send/receive operations.
      */
-    std::size_t PacketSize() const noexcept;
+    std::size_t packet_size() const noexcept;
 
 protected:
-    std::chrono::microseconds::rep m_defaultIoWaitTime;
-    char m_defaultEndOfMessage;
-    std::size_t m_defaultPacketSize;
+    std::chrono::microseconds::rep m_default_io_wait_time;
+    char m_default_end_of_message;
+    std::size_t m_default_packet_size;
 };
 
 } // namespace fly

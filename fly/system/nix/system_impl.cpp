@@ -10,43 +10,43 @@
 namespace fly {
 
 //==============================================================================
-void SystemImpl::PrintBacktrace() noexcept
+void SystemImpl::print_backtrace() noexcept
 {
     void *trace[10];
-    int traceSize = ::backtrace(trace, 10);
-    ::backtrace_symbols_fd(trace, traceSize, STDERR_FILENO);
+    int trace_size = ::backtrace(trace, 10);
+    ::backtrace_symbols_fd(trace, trace_size, STDERR_FILENO);
 }
 
 //==============================================================================
-std::string SystemImpl::LocalTime(const std::string &fmt) noexcept
+std::string SystemImpl::local_time(const char *fmt) noexcept
 {
     auto sys = std::chrono::system_clock::now();
     time_t now = std::chrono::system_clock::to_time_t(sys);
 
-    struct tm timeVal;
-    std::string ret;
+    struct tm time_val;
+    std::string result;
 
-    if (::localtime_r(&now, &timeVal) != nullptr)
+    if (::localtime_r(&now, &time_val) != nullptr)
     {
-        char timeStr[32];
+        char time_str[32];
 
-        if (::strftime(timeStr, sizeof(timeStr), fmt.c_str(), &timeVal) != 0)
+        if (::strftime(time_str, sizeof(time_str), fmt, &time_val) != 0)
         {
-            ret = std::string(timeStr);
+            result = std::string(time_str);
         }
     }
 
-    return ret;
+    return result;
 }
 
 //==============================================================================
-int SystemImpl::GetErrorCode() noexcept
+int SystemImpl::get_error_code() noexcept
 {
     return errno;
 }
 
 //==============================================================================
-std::vector<int> SystemImpl::GetSignals() noexcept
+std::vector<int> SystemImpl::get_signals() noexcept
 {
     return {SIGINT, SIGTERM, SIGSYS, SIGBUS, SIGILL, SIGFPE, SIGABRT, SIGSEGV};
 }

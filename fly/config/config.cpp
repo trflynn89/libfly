@@ -3,9 +3,9 @@
 namespace fly {
 
 //==============================================================================
-void Config::Update(const Json &values) noexcept
+void Config::update(const Json &values) noexcept
 {
-    std::unique_lock<std::shared_timed_mutex> lock(m_valuesMutex);
+    std::unique_lock<std::shared_timed_mutex> lock(m_values_mutex);
     m_values = values;
 }
 

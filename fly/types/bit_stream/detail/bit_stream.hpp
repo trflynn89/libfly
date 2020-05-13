@@ -41,9 +41,9 @@ protected:
     /**
      * Protected constructor to prevent instantiating this class directly.
      *
-     * @param byte_type Initial cursor position.
+     * @param starting_position Initial cursor position.
      */
-    explicit BitStream(byte_type) noexcept;
+    explicit BitStream(byte_type starting_position) noexcept;
 
     /**
      * Create a bit-mask with the least-significant bits set. The size of the
@@ -51,12 +51,12 @@ protected:
      *
      * @tparam DataType The data type storing the number of bits to set.
      *
-     * @param DataType The number of bits to set.
+     * @param starting_position The number of bits to set.
      *
-     * @return DataType The created mask.
+     * @return The created mask.
      */
     template <typename DataType>
-    constexpr inline static DataType BitMask(const DataType);
+    constexpr inline static DataType bit_mask(const DataType bits);
 
     byte_type m_position;
     buffer_type m_buffer;
@@ -64,7 +64,7 @@ protected:
 
 //==============================================================================
 template <typename DataType>
-constexpr inline DataType BitStream::BitMask(const DataType bits)
+constexpr inline DataType BitStream::bit_mask(const DataType bits)
 {
     static_assert(
         BitStreamTraits::is_unsigned_integer_v<DataType>,

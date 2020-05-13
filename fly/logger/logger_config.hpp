@@ -26,22 +26,22 @@ public:
     /**
      * @return Max log file size (in bytes) before rotating the log file.
      */
-    std::uintmax_t MaxLogFileSize() const noexcept;
+    std::uintmax_t max_log_file_size() const noexcept;
 
     /**
      * @return Max message size (in bytes) per log.
      */
-    std::uint32_t MaxMessageSize() const noexcept;
+    std::uint32_t max_message_size() const noexcept;
 
     /**
      * @return Sleep time for logger IO thread.
      */
-    std::chrono::milliseconds QueueWaitTime() const noexcept;
+    std::chrono::milliseconds queue_wait_time() const noexcept;
 
 protected:
-    std::uintmax_t m_defaultMaxLogFileSize;
-    std::uint32_t m_defaultMaxMessageSize;
-    std::chrono::milliseconds::rep m_defaultQueueWaitTime;
+    std::uintmax_t m_default_max_log_file_size;
+    std::uint32_t m_default_max_message_size;
+    std::chrono::milliseconds::rep m_default_queue_wait_time;
 };
 
 } // namespace fly

@@ -28,35 +28,37 @@ public:
     /**
      * Encode a string.
      *
-     * @param string String holding the contents to encode.
-     * @param string String to store the encoded contents.
+     * @param decoded String holding the contents to encode.
+     * @param encoded String to store the encoded contents.
      *
-     * @return bool True if the input string was successfully encoded.
+     * @return True if the input string was successfully encoded.
      */
-    virtual bool EncodeString(const std::string &, std::string &) noexcept;
+    virtual bool
+    encode_string(const std::string &decoded, std::string &encoded) noexcept;
 
     /**
      * Encode a file.
      *
-     * @param path Path holding the contents to encode.
-     * @param path Path to store the encoded contents.
+     * @param decoded Path holding the contents to encode.
+     * @param encoded Path to store the encoded contents.
      *
-     * @return bool True if the input file was successfully encoded.
+     * @return True if the input file was successfully encoded.
      */
-    virtual bool EncodeFile(
-        const std::filesystem::path &,
-        const std::filesystem::path &) noexcept;
+    virtual bool encode_file(
+        const std::filesystem::path &decoded,
+        const std::filesystem::path &encoded) noexcept;
 
 protected:
     /**
      * Encode a stream.
      *
-     * @param istream Stream holding the contents to encode.
-     * @param ostream Stream to store the encoded contents.
+     * @param decoded Stream holding the contents to encode.
+     * @param encoded Stream to store the encoded contents.
      *
-     * @return bool True if the input stream was successfully encoded.
+     * @return True if the input stream was successfully encoded.
      */
-    virtual bool EncodeInternal(std::istream &, std::ostream &) noexcept = 0;
+    virtual bool
+    encode_internal(std::istream &decoded, std::ostream &encoded) noexcept = 0;
 };
 
 /**
@@ -69,17 +71,19 @@ protected:
 class BinaryEncoder : public Encoder
 {
 protected:
-    bool EncodeInternal(std::istream &, std::ostream &) noexcept final;
+    bool encode_internal(std::istream &decoded, std::ostream &encoded) noexcept
+        final;
 
     /**
      * Encode a stream.
      *
-     * @param istream Stream holding the contents to encode.
-     * @param BitStreamWriter Stream to store the encoded contents.
+     * @param decoded Stream holding the contents to encode.
+     * @param encoded Stream to store the encoded contents.
      *
-     * @return bool True if the input stream was successfully encoded.
+     * @return True if the input stream was successfully encoded.
      */
-    virtual bool EncodeBinary(std::istream &, BitStreamWriter &) noexcept = 0;
+    virtual bool
+    encode_binary(std::istream &decoded, BitStreamWriter &encoded) noexcept = 0;
 };
 
 /**
@@ -100,35 +104,37 @@ public:
     /**
      * Decode a string.
      *
-     * @param string String holding the contents to decode.
-     * @param string String to store the decoded contents.
+     * @param encoded String holding the contents to decode.
+     * @param decoded String to store the decoded contents.
      *
-     * @return bool True if the input string was successfully decoded.
+     * @return True if the input string was successfully decoded.
      */
-    bool DecodeString(const std::string &, std::string &) noexcept;
+    bool
+    decode_string(const std::string &encoded, std::string &decoded) noexcept;
 
     /**
      * Decode a file.
      *
-     * @param path Path holding the contents to decode.
-     * @param path Path to store the decoded contents.
+     * @param encoded Path holding the contents to decode.
+     * @param decoded Path to store the decoded contents.
      *
-     * @return bool True if the input file was successfully decoded.
+     * @return True if the input file was successfully decoded.
      */
-    bool DecodeFile(
-        const std::filesystem::path &,
-        const std::filesystem::path &) noexcept;
+    bool decode_file(
+        const std::filesystem::path &encoded,
+        const std::filesystem::path &decoded) noexcept;
 
 protected:
     /**
      * Decode a stream.
      *
-     * @param istream Stream holding the contents to decode.
-     * @param ostream Stream to store the decoded contents.
+     * @param encoded Stream holding the contents to decode.
+     * @param decoded Stream to store the decoded contents.
      *
      * @return bool True if the input stream was successfully decoded.
      */
-    virtual bool DecodeInternal(std::istream &, std::ostream &) noexcept = 0;
+    virtual bool
+    decode_internal(std::istream &encoded, std::ostream &decoded) noexcept = 0;
 };
 
 /**
@@ -141,17 +147,19 @@ protected:
 class BinaryDecoder : public Decoder
 {
 protected:
-    bool DecodeInternal(std::istream &, std::ostream &) noexcept final;
+    bool decode_internal(std::istream &encoded, std::ostream &decoded) noexcept
+        final;
 
     /**
      * Decode a stream.
      *
-     * @param BitStreamReader Stream holding the contents to decode.
-     * @param ostream Stream to store the decoded contents.
+     * @param encoded Stream holding the contents to decode.
+     * @param decoded Stream to store the decoded contents.
      *
-     * @return bool True if the input stream was successfully decoded.
+     * @return True if the input stream was successfully decoded.
      */
-    virtual bool DecodeBinary(BitStreamReader &, std::ostream &) noexcept = 0;
+    virtual bool
+    decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept = 0;
 };
 
 } // namespace fly

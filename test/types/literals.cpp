@@ -6,7 +6,7 @@
 #include <type_traits>
 
 //==============================================================================
-TEST(LiteralsTest, Signed8BitTest)
+TEST(LiteralsTest, Signed8Bit)
 {
     {
         auto value = 1_i8;
@@ -60,7 +60,7 @@ TEST(LiteralsTest, Signed8BitTest)
 }
 
 //==============================================================================
-TEST(LiteralsTest, Signed16BitTest)
+TEST(LiteralsTest, Signed16Bit)
 {
     {
         auto value = 1_i16;
@@ -114,7 +114,7 @@ TEST(LiteralsTest, Signed16BitTest)
 }
 
 //==============================================================================
-TEST(LiteralsTest, Signed32BitTest)
+TEST(LiteralsTest, Signed32Bit)
 {
     {
         auto value = 1_i32;
@@ -168,7 +168,7 @@ TEST(LiteralsTest, Signed32BitTest)
 }
 
 //==============================================================================
-TEST(LiteralsTest, Signed64BitTest)
+TEST(LiteralsTest, Signed64Bit)
 {
     {
         auto value = 1_i64;
@@ -222,7 +222,7 @@ TEST(LiteralsTest, Signed64BitTest)
 }
 
 //==============================================================================
-TEST(LiteralsTest, Unsigned8BitTest)
+TEST(LiteralsTest, Unsigned8Bit)
 {
     {
         auto value = 1_u8;
@@ -276,7 +276,7 @@ TEST(LiteralsTest, Unsigned8BitTest)
 }
 
 //==============================================================================
-TEST(LiteralsTest, Unsigned16BitTest)
+TEST(LiteralsTest, Unsigned16Bit)
 {
     {
         auto value = 1_u16;
@@ -330,7 +330,7 @@ TEST(LiteralsTest, Unsigned16BitTest)
 }
 
 //==============================================================================
-TEST(LiteralsTest, Unsigned32BitTest)
+TEST(LiteralsTest, Unsigned32Bit)
 {
     {
         auto value = 1_u32;
@@ -384,7 +384,7 @@ TEST(LiteralsTest, Unsigned32BitTest)
 }
 
 //==============================================================================
-TEST(LiteralsTest, Unsigned64BitTest)
+TEST(LiteralsTest, Unsigned64Bit)
 {
     {
         auto value = 1_u64;
@@ -438,7 +438,7 @@ TEST(LiteralsTest, Unsigned64BitTest)
 }
 
 //==============================================================================
-TEST(LiteralsTest, SizeTTest)
+TEST(LiteralsTest, SizeT)
 {
     {
         auto value = 1_zu;

@@ -6,20 +6,19 @@
 
 namespace fly {
 
-typedef std::uint8_t symbol_type;
-typedef std::uint64_t frequency_type;
+using symbol_type = std::uint8_t;
+using frequency_type = std::uint64_t;
 
-typedef std::uint16_t code_type;
-typedef std::uint8_t length_type;
+using code_type = std::uint16_t;
+using length_type = std::uint8_t;
 
 struct HuffmanNode;
 struct HuffmanNodeComparator;
 
-typedef std::priority_queue<
+using HuffmanNodeQueue = std::priority_queue<
     HuffmanNode *,
     std::vector<HuffmanNode *>,
-    HuffmanNodeComparator>
-    HuffmanNodeQueue;
+    HuffmanNodeComparator>;
 
 /**
  * Struct to store data for a single node in a Huffman tree. Huffman trees are
@@ -51,26 +50,26 @@ struct HuffmanNode
      * Move assignment operator. Move all member variables from the given
      * HuffmanNode instance into this instance.
      *
-     * @param HuffmanNode The HuffmanNode instance to move.
+     * @param node The HuffmanNode instance to move.
      */
-    HuffmanNode &operator=(HuffmanNode &&) noexcept;
+    HuffmanNode &operator=(HuffmanNode &&node) noexcept;
 
     /**
      * Change this node to represent a symbol from the input stream.
      *
-     * @param symbol_type The symbol from the input stream.
-     * @param frequency_type The frequency of the symbol in the input stream.
+     * @param symbol The symbol from the input stream.
+     * @param frequency The frequency of the symbol in the input stream.
      */
-    void BecomeSymbol(symbol_type, frequency_type) noexcept;
+    void become_symbol(symbol_type symbol, frequency_type frequency) noexcept;
 
     /**
      * Change this node to represent an intermediate, non-symbol. Its frequency
      * is set to the sum of its children's frequencies.
      *
-     * @param HuffmanNode Pointer to the intermediate's left child.
-     * @param HuffmanNode Pointer to the intermediate's right child.
+     * @param left Pointer to the intermediate's left child.
+     * @param right Pointer to the intermediate's right child.
      */
-    void BecomeIntermediate(HuffmanNode *, HuffmanNode *) noexcept;
+    void become_intermediate(HuffmanNode *left, HuffmanNode *right) noexcept;
 
     symbol_type m_symbol;
     frequency_type m_frequency;
@@ -107,11 +106,14 @@ struct HuffmanCode
     /**
      * Constructor.
      *
-     * @param symbol_type The symbol from the input stream.
-     * @param code_type The Huffman code for the symbol.
-     * @param length_type The number of bits in the Huffman code.
+     * @param symbol The symbol from the input stream.
+     * @param code The Huffman code for the symbol.
+     * @param length The number of bits in the Huffman code.
      */
-    HuffmanCode(const symbol_type, const code_type, const length_type) noexcept;
+    HuffmanCode(
+        symbol_type symbol,
+        code_type code,
+        length_type length) noexcept;
 
     /**
      * Deleted copy constructor.
@@ -122,9 +124,9 @@ struct HuffmanCode
      * Move constructor. Move all member variables from the given HuffmanCode
      * instance into this instance.
      *
-     * @param HuffmanCode The HuffmanCode instance to move.
+     * @param code The HuffmanCode instance to move.
      */
-    HuffmanCode(HuffmanCode &&) noexcept;
+    HuffmanCode(HuffmanCode &&code) noexcept;
 
     /**
      * Deleted assignment operator.
@@ -135,20 +137,20 @@ struct HuffmanCode
      * Move assignment operator. Move all member variables from the given
      * HuffmanCode instance into this instance.
      *
-     * @param HuffmanCode The HuffmanCode instance to move.
+     * @param code The HuffmanCode instance to move.
      */
-    HuffmanCode &operator=(HuffmanCode &&) noexcept;
+    HuffmanCode &operator=(HuffmanCode &&code) noexcept;
 
     /**
      * Less-than operator. Huffman codes are first compared by code length, and
      * then by symbol value.
      *
-     * @param HuffmanCode The first Huffman code to compare.
-     * @param HuffmanCode The second Huffman code to compare.
+     * @param left The first Huffman code to compare.
+     * @param right The second Huffman code to compare.
      *
-     * @return bool True if the first Huffman code is less than the second.
+     * @return True if the first Huffman code is less than the second.
      */
-    friend bool operator<(const HuffmanCode &, const HuffmanCode &);
+    friend bool operator<(const HuffmanCode &left, const HuffmanCode &right);
 
     symbol_type m_symbol;
     code_type m_code;

@@ -50,12 +50,12 @@ public:
     /**
      * Constructor.
      *
-     * @param TaskRunner Task runner for posting path-related tasks onto.
-     * @param PathConfig Reference to path configuration.
+     * @param task_runner Task runner for posting path-related tasks onto.
+     * @param config Reference to path configuration.
      */
     PathMonitor(
-        const std::shared_ptr<SequencedTaskRunner> &,
-        const std::shared_ptr<PathConfig> &) noexcept;
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        const std::shared_ptr<PathConfig> &config) noexcept;
 
     /**
      * Destructor. Remove all paths from the path monitor.
@@ -65,56 +65,60 @@ public:
     /**
      * Initialize the path monitor task.
      *
-     * @return bool True if the path monitor is in a valid state.
+     * @return True if the path monitor is in a valid state.
      */
-    bool Start() noexcept;
+    bool start() noexcept;
 
     /**
      * Monitor for changes to all files under a directory. Callbacks registered
      * with AddFile take precendence over callbacks registered with AddPath.
      *
      * @param path Path to the directory to start monitoring.
-     * @param PathEventCallback Callback to trigger when a file changes.
+     * @param callback Callback to trigger when a file changes.
      *
-     * @return bool True if the directory could be added.
+     * @return True if the directory could be added.
      */
-    bool AddPath(const std::filesystem::path &, PathEventCallback) noexcept;
+    bool add_path(
+        const std::filesystem::path &path,
+        PathEventCallback callback) noexcept;
 
     /**
      * Stop monitoring for changes to all files under a directory.
      *
      * @param path Path to the directory to stop monitoring.
      *
-     * @return bool True if the directory was removed.
+     * @return True if the directory was removed.
      */
-    bool RemovePath(const std::filesystem::path &) noexcept;
+    bool remove_path(const std::filesystem::path &path) noexcept;
 
     /**
      * Stop monitoring all paths.
      */
-    void RemoveAllPaths() noexcept;
+    void remove_all_paths() noexcept;
 
     /**
      * Monitor for changes to a single file. Callbacks registered with AddFile
      * take precendence over callbacks registered with AddPath.
      *
-     * @param path Path to the file to start monitoring.
-     * @param PathEventCallback Callback to trigger when the file changes.
+     * @param file Path to the file to start monitoring.
+     * @param callback Callback to trigger when the file changes.
      *
-     * @return bool True if the file could be added.
+     * @return True if the file could be added.
      */
-    bool AddFile(const std::filesystem::path &, PathEventCallback) noexcept;
+    bool add_file(
+        const std::filesystem::path &file,
+        PathEventCallback callback) noexcept;
 
     /**
      * Stop monitoring for changes to a single file. If there are no more files
      * monitored in the file's directory, and there is no callback registered
      * for that directory, the directory itself is removed from the monitor.
      *
-     * @param path Path to the file to stop monitoring.
+     * @param file Path to the file to stop monitoring.
      *
-     * @return bool True if the file was removed.
+     * @return True if the file was removed.
      */
-    bool RemoveFile(const std::filesystem::path &) noexcept;
+    bool remove_file(const std::filesystem::path &file) noexcept;
 
 protected:
     /**
@@ -132,47 +136,47 @@ protected:
         /**
          * Check if the monitored path is in a good state.
          *
-         * @return bool True if the monitored path is healthy.
+         * @return True if the monitored path is healthy.
          */
-        virtual bool IsValid() const noexcept = 0;
+        virtual bool is_valid() const noexcept = 0;
 
-        PathEventCallback m_pathHandler;
-        std::map<std::filesystem::path, PathEventCallback> m_fileHandlers;
+        PathEventCallback m_path_handler;
+        std::map<std::filesystem::path, PathEventCallback> m_file_handlers;
     };
 
     /**
      * Map of monitored paths to their path information.
      */
     using PathInfoMap =
-        std::map<std::filesystem::path, std::shared_ptr<PathInfo>>;
+        std::map<std::filesystem::path, std::unique_ptr<PathInfo>>;
 
     /**
      * Create an instance of the OS dependent PathInfo struct.
      *
      * @param path The path to be monitored.
      *
-     * @return PathInfo Up-casted shared pointer to the PathInfo struct.
+     * @return Up-casted pointer to the PathInfo struct.
      */
-    virtual std::shared_ptr<PathInfo>
-    CreatePathInfo(const std::filesystem::path &) const noexcept = 0;
+    virtual std::unique_ptr<PathInfo>
+    create_path_info(const std::filesystem::path &path) const noexcept = 0;
 
     /**
      * Check if the path monitor implementation is valid.
      *
-     * @return bool True if the implementation is valid.
+     * @return True if the implementation is valid.
      */
-    virtual bool IsValid() const noexcept = 0;
+    virtual bool is_valid() const noexcept = 0;
 
     /**
      * Check the path monitor implementation for any changes to the monitored
      * paths.
      *
-     * @param milliseconds Max time allow for an event to be occur.
+     * @param timeout Max time allow for an event to be occur.
      */
-    virtual void Poll(const std::chrono::milliseconds &) noexcept = 0;
+    virtual void poll(const std::chrono::milliseconds &timeout) noexcept = 0;
 
     mutable std::mutex m_mutex;
-    PathInfoMap m_pathInfo;
+    PathInfoMap m_path_info;
 
 private:
     /**
@@ -181,20 +185,21 @@ private:
      *
      * @param path The path to be monitored.
      *
-     * @return PathInfo Shared pointer to the PathInfo struct.
+     * @return Shared pointer to the PathInfo struct.
      */
-    std::shared_ptr<PathInfo>
-    getOrCreatePathInfo(const std::filesystem::path &) noexcept;
+    PathInfo *
+    get_or_create_path_info(const std::filesystem::path &path) noexcept;
 
     /**
-     * Stream the name of a Json instance's type.
+     * Stream the name of a PathEvent instance.
      */
-    friend std::ostream &operator<<(std::ostream &, PathEvent) noexcept;
+    friend std::ostream &
+    operator<<(std::ostream &stream, PathEvent event) noexcept;
 
-    std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
-    std::shared_ptr<Task> m_spTask;
+    std::shared_ptr<SequencedTaskRunner> m_task_runner;
+    std::shared_ptr<Task> m_task;
 
-    std::shared_ptr<PathConfig> m_spConfig;
+    std::shared_ptr<PathConfig> m_config;
 };
 
 /**
@@ -206,7 +211,8 @@ private:
 class PathMonitorTask : public Task
 {
 public:
-    explicit PathMonitorTask(std::weak_ptr<PathMonitor>) noexcept;
+    explicit PathMonitorTask(
+        std::weak_ptr<PathMonitor> weak_path_monitor) noexcept;
 
 protected:
     /**
@@ -214,10 +220,10 @@ protected:
      * paths. If the path monitor implementation is still valid, the task
      * re-arms itself.
      */
-    void Run() noexcept override;
+    void run() noexcept override;
 
 private:
-    std::weak_ptr<PathMonitor> m_wpPathMonitor;
+    std::weak_ptr<PathMonitor> m_weak_path_monitor;
 };
 
 } // namespace fly

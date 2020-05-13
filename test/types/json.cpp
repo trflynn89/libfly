@@ -18,7 +18,7 @@
 
 #if defined(FLY_WINDOWS)
 #    include <Windows.h>
-#    define utf8(str) ConvertToUTF8(L##str)
+#    define utf8(str) convert_to_utf8(L##str)
 #else
 #    define utf8(str) str
 #endif
@@ -26,7 +26,7 @@
 namespace {
 
 #if defined(FLY_WINDOWS)
-const char *ConvertToUTF8(const wchar_t *str)
+const char *convert_to_utf8(const wchar_t *str)
 {
     static char buff[1024];
 
@@ -43,14 +43,14 @@ class JsonTest : public ::testing::Test
 {
 protected:
     template <typename T>
-    void ValidateThrow(const fly::Json &json) noexcept(false)
+    void validate_throw(const fly::Json &json) noexcept(false)
     {
         SCOPED_TRACE(json);
 
         EXPECT_THROW((void)(T(json)), fly::JsonException);
     }
 
-    void ValidateFail(const std::string &test) noexcept(false)
+    void validate_fail(const std::string &test) noexcept(false)
     {
         SCOPED_TRACE(test);
 
@@ -59,12 +59,12 @@ protected:
         EXPECT_THROW({ actual = test; }, fly::JsonException);
     }
 
-    void ValidatePass(const std::string &test) noexcept(false)
+    void validate_pass(const std::string &test) noexcept(false)
     {
-        ValidatePass(test, test);
+        validate_pass(test, test);
     }
 
-    void ValidatePass(
+    void validate_pass(
         const std::string &test,
         const std::string &expected) noexcept(false)
     {
@@ -85,7 +85,7 @@ protected:
 };
 
 //==============================================================================
-TEST(JsonExceptionTest, ExceptionTest)
+TEST(JsonExceptionTest, Exception)
 {
     std::stringstream stream;
     fly::Json string = "abc";
@@ -102,7 +102,7 @@ TEST(JsonExceptionTest, ExceptionTest)
         std::string what(e.what());
 
         std::string expect("*some message*" + stream.str() + "*");
-        EXPECT_TRUE(fly::String::WildcardMatch(what, expect));
+        EXPECT_TRUE(fly::String::wildcard_match(what, expect));
 
         thrown = true;
     }
@@ -111,161 +111,164 @@ TEST(JsonExceptionTest, ExceptionTest)
 }
 
 //==============================================================================
-TEST_F(JsonTest, StringConstructorTest)
+TEST_F(JsonTest, StringConstructor)
 {
     const std::string str1("a");
-    EXPECT_TRUE(fly::Json(str1).IsString());
+    EXPECT_TRUE(fly::Json(str1).is_string());
 
     std::string str2("b");
-    EXPECT_TRUE(fly::Json(str2).IsString());
+    EXPECT_TRUE(fly::Json(str2).is_string());
 
     const char *cstr1 = "c";
-    EXPECT_TRUE(fly::Json(cstr1).IsString());
+    EXPECT_TRUE(fly::Json(cstr1).is_string());
 
     char *cstr2 = const_cast<char *>("d");
-    EXPECT_TRUE(fly::Json(cstr2).IsString());
+    EXPECT_TRUE(fly::Json(cstr2).is_string());
 
     const char arr1[] = {'g', '\0'};
-    EXPECT_TRUE(fly::Json(arr1).IsString());
+    EXPECT_TRUE(fly::Json(arr1).is_string());
 
     char arr2[] = {'h', '\0'};
-    EXPECT_TRUE(fly::Json(arr2).IsString());
+    EXPECT_TRUE(fly::Json(arr2).is_string());
 }
 
 //==============================================================================
-TEST_F(JsonTest, ObjectConstructorTest)
+TEST_F(JsonTest, ObjectConstructor)
 {
     std::map<std::string, int> map = {{"a", 1}, {"b", 2}};
-    EXPECT_TRUE(fly::Json(map).IsObject());
+    EXPECT_TRUE(fly::Json(map).is_object());
 
     std::multimap<std::string, int> multimap = {{"c", 3}, {"d", 4}};
-    EXPECT_TRUE(fly::Json(multimap).IsObject());
+    EXPECT_TRUE(fly::Json(multimap).is_object());
 
     std::unordered_map<std::string, int> umap = {{"e", 5}, {"f", 6}};
-    EXPECT_TRUE(fly::Json(umap).IsObject());
+    EXPECT_TRUE(fly::Json(umap).is_object());
 
     std::unordered_multimap<std::string, int> umultimap = {{"h", 7}, {"i", 8}};
-    EXPECT_TRUE(fly::Json(umultimap).IsObject());
+    EXPECT_TRUE(fly::Json(umultimap).is_object());
 }
 
 //==============================================================================
-TEST_F(JsonTest, ArrayConstructorTest)
+TEST_F(JsonTest, ArrayConstructor)
 {
     std::array<int, 4> array = {10, 20, 30, 40};
-    EXPECT_TRUE(fly::Json(array).IsArray());
-    EXPECT_FALSE(fly::Json(array).IsObjectLike());
+    EXPECT_TRUE(fly::Json(array).is_array());
+    EXPECT_FALSE(fly::Json(array).is_object_like());
 
     std::deque<int> deque = {50, 60, 70, 80};
-    EXPECT_TRUE(fly::Json(deque).IsArray());
-    EXPECT_FALSE(fly::Json(deque).IsObjectLike());
+    EXPECT_TRUE(fly::Json(deque).is_array());
+    EXPECT_FALSE(fly::Json(deque).is_object_like());
 
     std::forward_list<int> forward_list = {90, 100, 110, 120};
-    EXPECT_TRUE(fly::Json(forward_list).IsArray());
-    EXPECT_FALSE(fly::Json(forward_list).IsObjectLike());
+    EXPECT_TRUE(fly::Json(forward_list).is_array());
+    EXPECT_FALSE(fly::Json(forward_list).is_object_like());
 
     std::list<int> list = {130, 140, 150, 160};
-    EXPECT_TRUE(fly::Json(list).IsArray());
-    EXPECT_FALSE(fly::Json(list).IsObjectLike());
+    EXPECT_TRUE(fly::Json(list).is_array());
+    EXPECT_FALSE(fly::Json(list).is_object_like());
 
     std::multiset<std::string> multiset = {"a", "b", "c"};
-    EXPECT_TRUE(fly::Json(multiset).IsArray());
-    EXPECT_FALSE(fly::Json(multiset).IsObjectLike());
+    EXPECT_TRUE(fly::Json(multiset).is_array());
+    EXPECT_FALSE(fly::Json(multiset).is_object_like());
 
     std::set<std::string> set = {"d", "e", "f"};
-    EXPECT_TRUE(fly::Json(set).IsArray());
-    EXPECT_FALSE(fly::Json(set).IsObjectLike());
+    EXPECT_TRUE(fly::Json(set).is_array());
+    EXPECT_FALSE(fly::Json(set).is_object_like());
 
     std::unordered_multiset<std::string> unordered_multiset = {"g", "h", "i"};
-    EXPECT_TRUE(fly::Json(unordered_multiset).IsArray());
-    EXPECT_FALSE(fly::Json(unordered_multiset).IsObjectLike());
+    EXPECT_TRUE(fly::Json(unordered_multiset).is_array());
+    EXPECT_FALSE(fly::Json(unordered_multiset).is_object_like());
 
     std::unordered_set<std::string> unordered_set = {"j", "k", "l"};
-    EXPECT_TRUE(fly::Json(unordered_set).IsArray());
-    EXPECT_FALSE(fly::Json(unordered_set).IsObjectLike());
+    EXPECT_TRUE(fly::Json(unordered_set).is_array());
+    EXPECT_FALSE(fly::Json(unordered_set).is_object_like());
 
     std::vector<int> vector = {170, 180, 190, 200};
-    EXPECT_TRUE(fly::Json(vector).IsArray());
-    EXPECT_FALSE(fly::Json(vector).IsObjectLike());
+    EXPECT_TRUE(fly::Json(vector).is_array());
+    EXPECT_FALSE(fly::Json(vector).is_object_like());
 
     std::array<std::string, 2> object = {"nine", "ten"};
-    EXPECT_TRUE(fly::Json(object).IsArray());
-    EXPECT_TRUE(fly::Json(object).IsObjectLike());
+    EXPECT_TRUE(fly::Json(object).is_array());
+    EXPECT_TRUE(fly::Json(object).is_object_like());
 }
 
 //==============================================================================
-TEST_F(JsonTest, BooleanConstructorTest)
+TEST_F(JsonTest, BooleanConstructor)
 {
-    EXPECT_TRUE(fly::Json(true).IsBoolean());
-    EXPECT_TRUE(fly::Json(false).IsBoolean());
+    EXPECT_TRUE(fly::Json(true).is_boolean());
+    EXPECT_TRUE(fly::Json(false).is_boolean());
 }
 
 //==============================================================================
-TEST_F(JsonTest, SignedIntegerConstructorTest)
+TEST_F(JsonTest, SignedIntegerConstructor)
 {
-    EXPECT_TRUE(fly::Json(static_cast<char>(1)).IsSignedInteger());
+    EXPECT_TRUE(fly::Json(static_cast<char>(1)).is_signed_integer());
 
-    EXPECT_TRUE(fly::Json(static_cast<short>(1)).IsSignedInteger());
+    EXPECT_TRUE(fly::Json(static_cast<short>(1)).is_signed_integer());
 
-    EXPECT_TRUE(fly::Json(static_cast<int>(1)).IsSignedInteger());
-    EXPECT_TRUE(fly::Json(static_cast<int>(-1)).IsSignedInteger());
+    EXPECT_TRUE(fly::Json(static_cast<int>(1)).is_signed_integer());
+    EXPECT_TRUE(fly::Json(static_cast<int>(-1)).is_signed_integer());
 
-    EXPECT_TRUE(fly::Json(static_cast<std::int32_t>(1)).IsSignedInteger());
-    EXPECT_TRUE(fly::Json(static_cast<std::int32_t>(-1)).IsSignedInteger());
+    EXPECT_TRUE(fly::Json(static_cast<std::int32_t>(1)).is_signed_integer());
+    EXPECT_TRUE(fly::Json(static_cast<std::int32_t>(-1)).is_signed_integer());
 
-    EXPECT_TRUE(fly::Json(static_cast<std::int64_t>(1)).IsSignedInteger());
-    EXPECT_TRUE(fly::Json(static_cast<std::int64_t>(-1)).IsSignedInteger());
+    EXPECT_TRUE(fly::Json(static_cast<std::int64_t>(1)).is_signed_integer());
+    EXPECT_TRUE(fly::Json(static_cast<std::int64_t>(-1)).is_signed_integer());
 }
 
 //==============================================================================
-TEST_F(JsonTest, UnsignedIntegerConstructorTest)
+TEST_F(JsonTest, UnsignedIntegerConstructor)
 {
-    EXPECT_TRUE(fly::Json(static_cast<unsigned char>(1)).IsUnsignedInteger());
+    EXPECT_TRUE(fly::Json(static_cast<unsigned char>(1)).is_unsigned_integer());
 
-    EXPECT_TRUE(fly::Json(static_cast<unsigned short>(1)).IsUnsignedInteger());
+    EXPECT_TRUE(
+        fly::Json(static_cast<unsigned short>(1)).is_unsigned_integer());
 
-    EXPECT_TRUE(fly::Json(static_cast<unsigned int>(1)).IsUnsignedInteger());
-    EXPECT_TRUE(fly::Json(static_cast<unsigned int>(-1)).IsUnsignedInteger());
+    EXPECT_TRUE(fly::Json(static_cast<unsigned int>(1)).is_unsigned_integer());
+    EXPECT_TRUE(fly::Json(static_cast<unsigned int>(-1)).is_unsigned_integer());
 
-    EXPECT_TRUE(fly::Json(static_cast<std::uint32_t>(1)).IsUnsignedInteger());
-    EXPECT_TRUE(fly::Json(static_cast<std::uint32_t>(-1)).IsUnsignedInteger());
+    EXPECT_TRUE(fly::Json(static_cast<std::uint32_t>(1)).is_unsigned_integer());
+    EXPECT_TRUE(
+        fly::Json(static_cast<std::uint32_t>(-1)).is_unsigned_integer());
 
-    EXPECT_TRUE(fly::Json(static_cast<std::uint64_t>(1)).IsUnsignedInteger());
-    EXPECT_TRUE(fly::Json(static_cast<std::uint64_t>(-1)).IsUnsignedInteger());
+    EXPECT_TRUE(fly::Json(static_cast<std::uint64_t>(1)).is_unsigned_integer());
+    EXPECT_TRUE(
+        fly::Json(static_cast<std::uint64_t>(-1)).is_unsigned_integer());
 }
 
 //==============================================================================
-TEST_F(JsonTest, FloatConstructorTest)
+TEST_F(JsonTest, FloatConstructor)
 {
-    EXPECT_TRUE(fly::Json(static_cast<float>(1.0)).IsFloat());
-    EXPECT_TRUE(fly::Json(static_cast<double>(1.0)).IsFloat());
-    EXPECT_TRUE(fly::Json(static_cast<long double>(1.0)).IsFloat());
+    EXPECT_TRUE(fly::Json(static_cast<float>(1.0)).is_float());
+    EXPECT_TRUE(fly::Json(static_cast<double>(1.0)).is_float());
+    EXPECT_TRUE(fly::Json(static_cast<long double>(1.0)).is_float());
 }
 
 //==============================================================================
-TEST_F(JsonTest, NullConstructorTest)
+TEST_F(JsonTest, NullConstructor)
 {
-    EXPECT_TRUE(fly::Json().IsNull());
-    EXPECT_TRUE(fly::Json(nullptr).IsNull());
+    EXPECT_TRUE(fly::Json().is_null());
+    EXPECT_TRUE(fly::Json(nullptr).is_null());
 }
 
 //==============================================================================
-TEST_F(JsonTest, InitializerListConstructorTest)
+TEST_F(JsonTest, InitializerListConstructor)
 {
     const fly::Json empty = {};
-    EXPECT_TRUE(fly::Json(empty).IsNull());
+    EXPECT_TRUE(fly::Json(empty).is_null());
 
     const fly::Json array = {'7', 8, "nine", 10};
-    EXPECT_TRUE(fly::Json(array).IsArray());
+    EXPECT_TRUE(fly::Json(array).is_array());
 
     const fly::Json object = {{"a", 1}, {"b", 2}};
-    EXPECT_TRUE(fly::Json(object).IsObject());
+    EXPECT_TRUE(fly::Json(object).is_object());
 
     const fly::Json almost = {{"a", 1}, {"b", 2}, 4};
-    EXPECT_TRUE(fly::Json(almost).IsArray());
+    EXPECT_TRUE(fly::Json(almost).is_array());
 }
 
 //==============================================================================
-TEST_F(JsonTest, CopyConstructorTest)
+TEST_F(JsonTest, CopyConstructor)
 {
     fly::Json string = "abc";
     EXPECT_EQ(fly::Json(string), string);
@@ -293,18 +296,18 @@ TEST_F(JsonTest, CopyConstructorTest)
 }
 
 //==============================================================================
-TEST_F(JsonTest, MoveConstructorTest)
+TEST_F(JsonTest, MoveConstructor)
 {
     fly::Json string = "abc";
-    fly::Json stringCopy(string);
-    fly::Json stringMove(std::move(stringCopy));
+    fly::Json string_copy(string);
+    fly::Json string_move(std::move(string_copy));
 
-    EXPECT_TRUE(stringCopy.IsNull());
-    EXPECT_EQ(stringMove, string);
+    EXPECT_TRUE(string_copy.is_null());
+    EXPECT_EQ(string_move, string);
 }
 
 //==============================================================================
-TEST_F(JsonTest, AssignmentTest)
+TEST_F(JsonTest, Assignment)
 {
     fly::Json json;
 
@@ -342,7 +345,7 @@ TEST_F(JsonTest, AssignmentTest)
 }
 
 //==============================================================================
-TEST_F(JsonTest, StringConversionTest)
+TEST_F(JsonTest, StringConversion)
 {
     fly::Json json;
 
@@ -372,12 +375,12 @@ TEST_F(JsonTest, StringConversionTest)
 }
 
 //==============================================================================
-TEST_F(JsonTest, ObjectConversionTest)
+TEST_F(JsonTest, ObjectConversion)
 {
     fly::Json json;
 
     json = "abc";
-    ValidateThrow<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::map<std::string, fly::Json>>(json);
 
     std::map<std::string, int> map = {};
     std::multimap<std::string, int> multimap(map.begin(), map.end());
@@ -402,36 +405,36 @@ TEST_F(JsonTest, ObjectConversionTest)
     EXPECT_EQ(decltype(umultimap)(json), umultimap);
 
     json = {'7', 8};
-    ValidateThrow<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::map<std::string, fly::Json>>(json);
 
     json = true;
-    ValidateThrow<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::map<std::string, fly::Json>>(json);
 
     json = 1;
-    ValidateThrow<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::map<std::string, fly::Json>>(json);
 
     json = static_cast<unsigned int>(1);
-    ValidateThrow<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::map<std::string, fly::Json>>(json);
 
     json = 1.0f;
-    ValidateThrow<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::map<std::string, fly::Json>>(json);
 
     json = nullptr;
-    ValidateThrow<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::map<std::string, fly::Json>>(json);
 }
 
 //==============================================================================
-TEST_F(JsonTest, ArrayConversionTest)
+TEST_F(JsonTest, ArrayConversion)
 {
     fly::Json json;
 
     json = "abc";
-    ValidateThrow<std::vector<int>>(json);
-    ValidateThrow<std::array<int, 1>>(json);
+    validate_throw<std::vector<int>>(json);
+    validate_throw<std::array<int, 1>>(json);
 
     json = {{"a", 1}, {"b", 2}};
-    ValidateThrow<std::vector<int>>(json);
-    ValidateThrow<std::array<int, 1>>(json);
+    validate_throw<std::vector<int>>(json);
+    validate_throw<std::array<int, 1>>(json);
 
     std::vector<int> vector = {7, 8};
     std::array<int, 1> array1 = {7};
@@ -454,28 +457,28 @@ TEST_F(JsonTest, ArrayConversionTest)
     EXPECT_EQ((std::array<int, 3>(json)), empty3);
 
     json = true;
-    ValidateThrow<std::vector<int>>(json);
-    ValidateThrow<std::array<int, 1>>(json);
+    validate_throw<std::vector<int>>(json);
+    validate_throw<std::array<int, 1>>(json);
 
     json = 1;
-    ValidateThrow<std::vector<int>>(json);
-    ValidateThrow<std::array<int, 1>>(json);
+    validate_throw<std::vector<int>>(json);
+    validate_throw<std::array<int, 1>>(json);
 
     json = static_cast<unsigned int>(1);
-    ValidateThrow<std::vector<int>>(json);
-    ValidateThrow<std::array<int, 1>>(json);
+    validate_throw<std::vector<int>>(json);
+    validate_throw<std::array<int, 1>>(json);
 
     json = 1.0f;
-    ValidateThrow<std::vector<int>>(json);
-    ValidateThrow<std::array<int, 1>>(json);
+    validate_throw<std::vector<int>>(json);
+    validate_throw<std::array<int, 1>>(json);
 
     json = nullptr;
-    ValidateThrow<std::vector<int>>(json);
-    ValidateThrow<std::array<int, 1>>(json);
+    validate_throw<std::vector<int>>(json);
+    validate_throw<std::array<int, 1>>(json);
 }
 
 //==============================================================================
-TEST_F(JsonTest, BooleanConversionTest)
+TEST_F(JsonTest, BooleanConversion)
 {
     fly::Json json;
 
@@ -519,24 +522,24 @@ TEST_F(JsonTest, BooleanConversionTest)
 }
 
 //==============================================================================
-TEST_F(JsonTest, SignedIntegerConversionTest)
+TEST_F(JsonTest, SignedIntegerConversion)
 {
     fly::Json json;
 
     json = "abc";
-    ValidateThrow<int>(json);
+    validate_throw<int>(json);
 
     json = "123";
     EXPECT_EQ(int(json), 123);
 
     json = {{"a", 1}, {"b", 2}};
-    ValidateThrow<int>(json);
+    validate_throw<int>(json);
 
     json = {7, 8};
-    ValidateThrow<int>(json);
+    validate_throw<int>(json);
 
     json = true;
-    ValidateThrow<int>(json);
+    validate_throw<int>(json);
 
     char ch = 'a';
     json = ch;
@@ -555,28 +558,28 @@ TEST_F(JsonTest, SignedIntegerConversionTest)
     EXPECT_EQ(int(json), int(floating));
 
     json = nullptr;
-    ValidateThrow<int>(json);
+    validate_throw<int>(json);
 }
 
 //==============================================================================
-TEST_F(JsonTest, UnsignedIntegerConversionTest)
+TEST_F(JsonTest, UnsignedIntegerConversion)
 {
     fly::Json json;
 
     json = "abc";
-    ValidateThrow<unsigned>(json);
+    validate_throw<unsigned>(json);
 
     json = "123";
     EXPECT_EQ(unsigned(json), unsigned(123));
 
     json = {{"a", 1}, {"b", 2}};
-    ValidateThrow<unsigned>(json);
+    validate_throw<unsigned>(json);
 
     json = {7, 8};
-    ValidateThrow<unsigned>(json);
+    validate_throw<unsigned>(json);
 
     json = true;
-    ValidateThrow<unsigned>(json);
+    validate_throw<unsigned>(json);
 
     char ch = 'a';
     json = ch;
@@ -595,28 +598,28 @@ TEST_F(JsonTest, UnsignedIntegerConversionTest)
     EXPECT_EQ(unsigned(json), unsigned(floating));
 
     json = nullptr;
-    ValidateThrow<unsigned>(json);
+    validate_throw<unsigned>(json);
 }
 
 //==============================================================================
-TEST_F(JsonTest, FloatConversionTest)
+TEST_F(JsonTest, FloatConversion)
 {
     fly::Json json;
 
     json = "abc";
-    ValidateThrow<float>(json);
+    validate_throw<float>(json);
 
     json = "123.5";
     EXPECT_EQ(float(json), 123.5f);
 
     json = {{"a", 1}, {"b", 2}};
-    ValidateThrow<float>(json);
+    validate_throw<float>(json);
 
     json = {7, 8};
-    ValidateThrow<float>(json);
+    validate_throw<float>(json);
 
     json = true;
-    ValidateThrow<float>(json);
+    validate_throw<float>(json);
 
     char ch = 'a';
     json = ch;
@@ -635,44 +638,44 @@ TEST_F(JsonTest, FloatConversionTest)
     EXPECT_EQ(float(json), floating);
 
     json = nullptr;
-    ValidateThrow<float>(json);
+    validate_throw<float>(json);
 }
 
 //==============================================================================
-TEST_F(JsonTest, NullConversionTest)
+TEST_F(JsonTest, NullConversion)
 {
     fly::Json json;
 
     json = "abc";
-    ValidateThrow<std::nullptr_t>(json);
+    validate_throw<std::nullptr_t>(json);
 
     json = {{"a", 1}, {"b", 2}};
-    ValidateThrow<std::nullptr_t>(json);
+    validate_throw<std::nullptr_t>(json);
 
     json = {7, 8};
-    ValidateThrow<std::nullptr_t>(json);
+    validate_throw<std::nullptr_t>(json);
 
     json = true;
-    ValidateThrow<std::nullptr_t>(json);
+    validate_throw<std::nullptr_t>(json);
 
     json = 'a';
-    ValidateThrow<std::nullptr_t>(json);
+    validate_throw<std::nullptr_t>(json);
 
     json = 12;
-    ValidateThrow<std::nullptr_t>(json);
+    validate_throw<std::nullptr_t>(json);
 
     json = static_cast<unsigned int>(12);
-    ValidateThrow<std::nullptr_t>(json);
+    validate_throw<std::nullptr_t>(json);
 
     json = 3.14f;
-    ValidateThrow<std::nullptr_t>(json);
+    validate_throw<std::nullptr_t>(json);
 
     json = nullptr;
     EXPECT_EQ((std::nullptr_t(json)), nullptr);
 }
 
 //==============================================================================
-TEST_F(JsonTest, ObjectAccessTest)
+TEST_F(JsonTest, ObjectAccess)
 {
     fly::Json string1 = "abc";
     EXPECT_THROW(string1["a"], fly::JsonException);
@@ -713,7 +716,6 @@ TEST_F(JsonTest, ObjectAccessTest)
     EXPECT_THROW(unsigned1["a"], fly::JsonException);
 
     const fly::Json unsigned2 = static_cast<unsigned int>(1);
-    ;
     EXPECT_THROW(unsigned2["a"], fly::JsonException);
 
     fly::Json float1 = 1.0f;
@@ -724,7 +726,7 @@ TEST_F(JsonTest, ObjectAccessTest)
 
     fly::Json null1 = nullptr;
     EXPECT_NO_THROW(null1["a"]);
-    EXPECT_TRUE(null1.IsObject());
+    EXPECT_TRUE(null1.is_object());
     EXPECT_EQ(null1["a"], nullptr);
 
     const fly::Json null2 = nullptr;
@@ -732,7 +734,7 @@ TEST_F(JsonTest, ObjectAccessTest)
 }
 
 //==============================================================================
-TEST_F(JsonTest, ArrayAccessTest)
+TEST_F(JsonTest, ArrayAccess)
 {
     fly::Json string1 = "abc";
     EXPECT_THROW(string1[0], fly::JsonException);
@@ -784,7 +786,7 @@ TEST_F(JsonTest, ArrayAccessTest)
 
     fly::Json null1 = nullptr;
     EXPECT_NO_THROW(null1[0]);
-    EXPECT_TRUE(null1.IsArray());
+    EXPECT_TRUE(null1.is_array());
     EXPECT_EQ(null1[0], nullptr);
 
     const fly::Json null2 = nullptr;
@@ -792,37 +794,37 @@ TEST_F(JsonTest, ArrayAccessTest)
 }
 
 //==============================================================================
-TEST_F(JsonTest, SizeTest)
+TEST_F(JsonTest, Size)
 {
     fly::Json json;
 
     json = "abcdef";
-    EXPECT_EQ(json.Size(), 6);
+    EXPECT_EQ(json.size(), 6);
 
     json = {{"a", 1}, {"b", 2}};
-    EXPECT_EQ(json.Size(), 2);
+    EXPECT_EQ(json.size(), 2);
 
     json = {'7', 8, 9, 10};
-    EXPECT_EQ(json.Size(), 4);
+    EXPECT_EQ(json.size(), 4);
 
     json = true;
-    EXPECT_EQ(json.Size(), 1);
+    EXPECT_EQ(json.size(), 1);
 
     json = 1;
-    EXPECT_EQ(json.Size(), 1);
+    EXPECT_EQ(json.size(), 1);
 
     json = static_cast<unsigned int>(1);
-    EXPECT_EQ(json.Size(), 1);
+    EXPECT_EQ(json.size(), 1);
 
     json = 1.0f;
-    EXPECT_EQ(json.Size(), 1);
+    EXPECT_EQ(json.size(), 1);
 
     json = nullptr;
-    EXPECT_EQ(json.Size(), 0);
+    EXPECT_EQ(json.size(), 0);
 }
 
 //==============================================================================
-TEST_F(JsonTest, EqualityTest)
+TEST_F(JsonTest, Equality)
 {
     fly::Json string1 = "abc";
     fly::Json string2 = "abc";
@@ -930,7 +932,7 @@ TEST_F(JsonTest, EqualityTest)
 }
 
 //==============================================================================
-TEST_F(JsonTest, StreamTest)
+TEST_F(JsonTest, Stream)
 {
     std::stringstream stream;
 
@@ -977,141 +979,141 @@ TEST_F(JsonTest, StreamTest)
 }
 
 //==============================================================================
-TEST_F(JsonTest, UnicodeConversionTest)
+TEST_F(JsonTest, UnicodeConversion)
 {
-    ValidateFail("\\u");
-    ValidateFail("\\u0");
-    ValidateFail("\\u00");
-    ValidateFail("\\u000");
-    ValidateFail("\\u000z");
+    validate_fail("\\u");
+    validate_fail("\\u0");
+    validate_fail("\\u00");
+    validate_fail("\\u000");
+    validate_fail("\\u000z");
 
-    ValidatePass("\\u0040", utf8("\u0040"));
-    ValidatePass("\\u007A", utf8("\u007A"));
-    ValidatePass("\\u007a", utf8("\u007a"));
-    ValidatePass("\\u00c4", utf8("\u00c4"));
-    ValidatePass("\\u00e4", utf8("\u00e4"));
-    ValidatePass("\\u0298", utf8("\u0298"));
-    ValidatePass("\\u0800", utf8("\u0800"));
-    ValidatePass("\\uffff", utf8("\uffff"));
+    validate_pass("\\u0040", utf8("\u0040"));
+    validate_pass("\\u007A", utf8("\u007A"));
+    validate_pass("\\u007a", utf8("\u007a"));
+    validate_pass("\\u00c4", utf8("\u00c4"));
+    validate_pass("\\u00e4", utf8("\u00e4"));
+    validate_pass("\\u0298", utf8("\u0298"));
+    validate_pass("\\u0800", utf8("\u0800"));
+    validate_pass("\\uffff", utf8("\uffff"));
 
-    ValidateFail("\\uDC00");
-    ValidateFail("\\uDFFF");
-    ValidateFail("\\uD800");
-    ValidateFail("\\uDBFF");
-    ValidateFail("\\uD800\\u");
-    ValidateFail("\\uD800\\z");
-    ValidateFail("\\uD800\\u0");
-    ValidateFail("\\uD800\\u00");
-    ValidateFail("\\uD800\\u000");
-    ValidateFail("\\uD800\\u0000");
-    ValidateFail("\\uD800\\u000z");
-    ValidateFail("\\uD800\\uDBFF");
-    ValidateFail("\\uD800\\uE000");
-    ValidateFail("\\uD800\\uFFFF");
+    validate_fail("\\uDC00");
+    validate_fail("\\uDFFF");
+    validate_fail("\\uD800");
+    validate_fail("\\uDBFF");
+    validate_fail("\\uD800\\u");
+    validate_fail("\\uD800\\z");
+    validate_fail("\\uD800\\u0");
+    validate_fail("\\uD800\\u00");
+    validate_fail("\\uD800\\u000");
+    validate_fail("\\uD800\\u0000");
+    validate_fail("\\uD800\\u000z");
+    validate_fail("\\uD800\\uDBFF");
+    validate_fail("\\uD800\\uE000");
+    validate_fail("\\uD800\\uFFFF");
 
-    ValidatePass("\\uD800\\uDC00", utf8("\U00010000"));
-    ValidatePass("\\uD803\\uDE6D", utf8("\U00010E6D"));
-    ValidatePass("\\uD834\\uDD1E", utf8("\U0001D11E"));
-    ValidatePass("\\uDBFF\\uDFFF", utf8("\U0010FFFF"));
+    validate_pass("\\uD800\\uDC00", utf8("\U00010000"));
+    validate_pass("\\uD803\\uDE6D", utf8("\U00010E6D"));
+    validate_pass("\\uD834\\uDD1E", utf8("\U0001D11E"));
+    validate_pass("\\uDBFF\\uDFFF", utf8("\U0010FFFF"));
 }
 
 //==============================================================================
-TEST_F(JsonTest, MarkusKuhnStressTest)
+TEST_F(JsonTest, MarkusKuhnStress)
 {
     // http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
     // 1  Some correct UTF-8 text
-    ValidatePass("κόσμε");
+    validate_pass("κόσμε");
 
     // 2  Boundary condition test cases
 
     // 2.1  First possible sequence of a certain length
 
     // 2.1.1  1 byte  (U-00000001)
-    ValidateFail("\x01");
+    validate_fail("\x01");
 
     // 2.1.2  2 bytes (U-00000080)
-    ValidatePass("\xc2\x80");
+    validate_pass("\xc2\x80");
 
     // 2.1.3  3 bytes (U-00000800)
-    ValidatePass("\xe0\xa0\x80");
+    validate_pass("\xe0\xa0\x80");
 
     // 2.1.4  4 bytes (U-00010000)
-    ValidatePass("\xf0\x90\x80\x80");
+    validate_pass("\xf0\x90\x80\x80");
 
     // 2.1.5  5 bytes (U-00200000)
-    ValidateFail("\xf8\x88\x80\x80\x80");
+    validate_fail("\xf8\x88\x80\x80\x80");
 
     // 2.1.6  6 bytes (U-04000000)
-    ValidateFail("\xfc\x84\x80\x80\x80\x80");
+    validate_fail("\xfc\x84\x80\x80\x80\x80");
 
     // 2.2  Last possible sequence of a certain length
 
     // 2.2.1  1 byte  (U-0000007F)
-    ValidatePass("\x7f");
+    validate_pass("\x7f");
 
     // 2.2.2  2 bytes (U-000007FF)
-    ValidatePass("\xdf\xbf");
+    validate_pass("\xdf\xbf");
 
     // 2.2.3  3 bytes (U-0000FFFF)
-    ValidatePass("\xef\xbf\xbf");
+    validate_pass("\xef\xbf\xbf");
 
     // 2.1.4  4 bytes (U-00200000)
-    ValidateFail("\xf7\xbf\xbf\xbf");
+    validate_fail("\xf7\xbf\xbf\xbf");
 
     // 2.1.5  5 bytes (U-03FFFFFF)
-    ValidateFail("\xfb\xbf\xbf\xbf\xbf");
+    validate_fail("\xfb\xbf\xbf\xbf\xbf");
 
     // 2.1.6  6 bytes (U-7FFFFFFF)
-    ValidateFail("\xfd\xbf\xbf\xbf\xbf\xbf");
+    validate_fail("\xfd\xbf\xbf\xbf\xbf\xbf");
 
     // 2.3  Other boundary conditions
 
     // 2.3.1  U-0000D7FF
-    ValidatePass("\xed\x9f\xbf");
+    validate_pass("\xed\x9f\xbf");
 
     // 2.3.2  U-0000E000
-    ValidatePass("\xee\x80\x80");
+    validate_pass("\xee\x80\x80");
 
     // 2.3.3  U-0000FFFD
-    ValidatePass("\xef\xbf\xbd");
+    validate_pass("\xef\xbf\xbd");
 
     // 2.3.4  U-0010FFFF
-    ValidatePass("\xf4\x8f\xbf\xbf");
+    validate_pass("\xf4\x8f\xbf\xbf");
 
     // 2.3.5  U-00110000
-    ValidateFail("\xf4\x90\x80\x80");
+    validate_fail("\xf4\x90\x80\x80");
 
     // 3  Malformed sequences
 
     // 3.1  Unexpected continuation bytes
 
     // 3.1.1  First continuation byte 0x80
-    ValidateFail("\x80");
+    validate_fail("\x80");
 
     // 3.1.2 Last  continuation byte 0xbf
-    ValidateFail("\xbf");
+    validate_fail("\xbf");
 
     // 3.1.3  2 continuation bytes
-    ValidateFail("\x80\xbf");
+    validate_fail("\x80\xbf");
 
     // 3.1.4  3 continuation bytes
-    ValidateFail("\x80\xbf\x80");
+    validate_fail("\x80\xbf\x80");
 
     // 3.1.5  4 continuation bytes
-    ValidateFail("\x80\xbf\x80\xbf");
+    validate_fail("\x80\xbf\x80\xbf");
 
     // 3.1.6  5 continuation bytes
-    ValidateFail("\x80\xbf\x80\xbf\x80");
+    validate_fail("\x80\xbf\x80\xbf\x80");
 
     // 3.1.7  6 continuation bytes
-    ValidateFail("\x80\xbf\x80\xbf\x80\xbf");
+    validate_fail("\x80\xbf\x80\xbf\x80\xbf");
 
     // 3.1.8  7 continuation bytes
-    ValidateFail("\x80\xbf\x80\xbf\x80\xbf\x80");
+    validate_fail("\x80\xbf\x80\xbf\x80\xbf\x80");
 
     // 3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf)
-    ValidateFail(
+    validate_fail(
         "\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90"
         "\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1"
         "\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2"
@@ -1121,325 +1123,325 @@ TEST_F(JsonTest, MarkusKuhnStressTest)
 
     // 3.2.1  All 32 first bytes of 2-byte sequences (0xc0-0xdf), each followed
     // by a space character
-    ValidateFail(
+    validate_fail(
         "\xc0 \xc1 \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc \xcd "
         "\xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb "
         "\xdc \xdd \xde \xdf");
-    ValidateFail("\xc0 ");
-    ValidateFail("\xc1 ");
-    ValidateFail("\xc2 ");
-    ValidateFail("\xc3 ");
-    ValidateFail("\xc4 ");
-    ValidateFail("\xc5 ");
-    ValidateFail("\xc6 ");
-    ValidateFail("\xc7 ");
-    ValidateFail("\xc8 ");
-    ValidateFail("\xc9 ");
-    ValidateFail("\xca ");
-    ValidateFail("\xcb ");
-    ValidateFail("\xcc ");
-    ValidateFail("\xcd ");
-    ValidateFail("\xce ");
-    ValidateFail("\xcf ");
-    ValidateFail("\xd0 ");
-    ValidateFail("\xd1 ");
-    ValidateFail("\xd2 ");
-    ValidateFail("\xd3 ");
-    ValidateFail("\xd4 ");
-    ValidateFail("\xd5 ");
-    ValidateFail("\xd6 ");
-    ValidateFail("\xd7 ");
-    ValidateFail("\xd8 ");
-    ValidateFail("\xd9 ");
-    ValidateFail("\xda ");
-    ValidateFail("\xdb ");
-    ValidateFail("\xdc ");
-    ValidateFail("\xdd ");
-    ValidateFail("\xde ");
-    ValidateFail("\xdf ");
+    validate_fail("\xc0 ");
+    validate_fail("\xc1 ");
+    validate_fail("\xc2 ");
+    validate_fail("\xc3 ");
+    validate_fail("\xc4 ");
+    validate_fail("\xc5 ");
+    validate_fail("\xc6 ");
+    validate_fail("\xc7 ");
+    validate_fail("\xc8 ");
+    validate_fail("\xc9 ");
+    validate_fail("\xca ");
+    validate_fail("\xcb ");
+    validate_fail("\xcc ");
+    validate_fail("\xcd ");
+    validate_fail("\xce ");
+    validate_fail("\xcf ");
+    validate_fail("\xd0 ");
+    validate_fail("\xd1 ");
+    validate_fail("\xd2 ");
+    validate_fail("\xd3 ");
+    validate_fail("\xd4 ");
+    validate_fail("\xd5 ");
+    validate_fail("\xd6 ");
+    validate_fail("\xd7 ");
+    validate_fail("\xd8 ");
+    validate_fail("\xd9 ");
+    validate_fail("\xda ");
+    validate_fail("\xdb ");
+    validate_fail("\xdc ");
+    validate_fail("\xdd ");
+    validate_fail("\xde ");
+    validate_fail("\xdf ");
 
     // 3.2.2  All 16 first bytes of 3-byte sequences (0xe0-0xef) each followed
     // by a space character
-    ValidateFail(
+    validate_fail(
         "\xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb \xec \xed "
         "\xee \xef");
-    ValidateFail("\xe0 ");
-    ValidateFail("\xe1 ");
-    ValidateFail("\xe2 ");
-    ValidateFail("\xe3 ");
-    ValidateFail("\xe4 ");
-    ValidateFail("\xe5 ");
-    ValidateFail("\xe6 ");
-    ValidateFail("\xe7 ");
-    ValidateFail("\xe8 ");
-    ValidateFail("\xe9 ");
-    ValidateFail("\xea ");
-    ValidateFail("\xeb ");
-    ValidateFail("\xec ");
-    ValidateFail("\xed ");
-    ValidateFail("\xee ");
-    ValidateFail("\xef ");
+    validate_fail("\xe0 ");
+    validate_fail("\xe1 ");
+    validate_fail("\xe2 ");
+    validate_fail("\xe3 ");
+    validate_fail("\xe4 ");
+    validate_fail("\xe5 ");
+    validate_fail("\xe6 ");
+    validate_fail("\xe7 ");
+    validate_fail("\xe8 ");
+    validate_fail("\xe9 ");
+    validate_fail("\xea ");
+    validate_fail("\xeb ");
+    validate_fail("\xec ");
+    validate_fail("\xed ");
+    validate_fail("\xee ");
+    validate_fail("\xef ");
 
     // 3.2.3  All 8 first bytes of 4-byte sequences (0xf0-0xf7), each followed
     // by a space character
-    ValidateFail("\xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7");
-    ValidateFail("\xf0 ");
-    ValidateFail("\xf1 ");
-    ValidateFail("\xf2 ");
-    ValidateFail("\xf3 ");
-    ValidateFail("\xf4 ");
-    ValidateFail("\xf5 ");
-    ValidateFail("\xf6 ");
-    ValidateFail("\xf7 ");
+    validate_fail("\xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7");
+    validate_fail("\xf0 ");
+    validate_fail("\xf1 ");
+    validate_fail("\xf2 ");
+    validate_fail("\xf3 ");
+    validate_fail("\xf4 ");
+    validate_fail("\xf5 ");
+    validate_fail("\xf6 ");
+    validate_fail("\xf7 ");
 
     // 3.2.4  All 4 first bytes of 5-byte sequences (0xf8-0xfb), each followed
     // by a space character
-    ValidateFail("\xf8 \xf9 \xfa \xfb");
-    ValidateFail("\xf8 ");
-    ValidateFail("\xf9 ");
-    ValidateFail("\xfa ");
-    ValidateFail("\xfb ");
+    validate_fail("\xf8 \xf9 \xfa \xfb");
+    validate_fail("\xf8 ");
+    validate_fail("\xf9 ");
+    validate_fail("\xfa ");
+    validate_fail("\xfb ");
 
     // 3.2.5  All 2 first bytes of 6-byte sequences (0xfc-0xfd), each followed
     // by a space character
-    ValidateFail("\xfc \xfd");
-    ValidateFail("\xfc ");
-    ValidateFail("\xfc ");
+    validate_fail("\xfc \xfd");
+    validate_fail("\xfc ");
+    validate_fail("\xfc ");
 
     // 3.3  Sequences with last continuation byte missing
 
     // 3.3.1  2-byte sequence with last byte missing (U+0000)
-    ValidateFail("\xc0");
+    validate_fail("\xc0");
 
     // 3.3.2  3-byte sequence with last byte missing (U+0000)
-    ValidateFail("\xe0\x80");
+    validate_fail("\xe0\x80");
 
     // 3.3.3  4-byte sequence with last byte missing (U+0000)
-    ValidateFail("\xf0\x80\x80");
+    validate_fail("\xf0\x80\x80");
 
     // 3.3.4  5-byte sequence with last byte missing (U+0000)
-    ValidateFail("\xf8\x80\x80\x80");
+    validate_fail("\xf8\x80\x80\x80");
 
     // 3.3.5  6-byte sequence with last byte missing (U+0000)
-    ValidateFail("\xfc\x80\x80\x80\x80");
+    validate_fail("\xfc\x80\x80\x80\x80");
 
     // 3.3.6  2-byte sequence with last byte missing (U-000007FF)
-    ValidateFail("\xdf");
+    validate_fail("\xdf");
 
     // 3.3.7  3-byte sequence with last byte missing (U-0000FFFF)
-    ValidateFail("\xef\xbf");
+    validate_fail("\xef\xbf");
 
     // 3.3.8  4-byte sequence with last byte missing (U-001FFFFF)
-    ValidateFail("\xf7\xbf\xbf");
+    validate_fail("\xf7\xbf\xbf");
 
     // 3.3.9  5-byte sequence with last byte missing (U-03FFFFFF)
-    ValidateFail("\xfb\xbf\xbf\xbf");
+    validate_fail("\xfb\xbf\xbf\xbf");
 
     // 3.3.10 6-byte sequence with last byte missing (U-7FFFFFFF)
-    ValidateFail("\xfd\xbf\xbf\xbf\xbf");
+    validate_fail("\xfd\xbf\xbf\xbf\xbf");
 
     // 3.4  Concatenation of incomplete sequences
 
     // All the 10 sequences of 3.3 concatenated
-    ValidateFail(
+    validate_fail(
         "\xc0\xe0\x80\xf0\x80\x80\xf8\x80\x80\x80\xfc\x80\x80\x80\x80\xdf\xef"
         "\xbf\xf7\xbf\xbf\xfb\xbf\xbf\xbf\xfd\xbf\xbf\xbf\xbf");
 
     // 3.5  Impossible bytes
 
     // 3.5.1  fe
-    ValidateFail("\xfe");
+    validate_fail("\xfe");
 
     // 3.5.2  ff
-    ValidateFail("\xff");
+    validate_fail("\xff");
 
     // 3.5.3  fe fe ff ff
-    ValidateFail("\xfe\xfe\xff\xff");
+    validate_fail("\xfe\xfe\xff\xff");
 
     // 4  Overlong sequences
 
     // 4.1  Examples of an overlong ASCII character
 
     // 4.1.1 U+002F = c0 af
-    ValidateFail("\xc0\xaf");
+    validate_fail("\xc0\xaf");
 
     // 4.1.2 U+002F = e0 80 af
-    ValidateFail("\xe0\x80\xaf");
+    validate_fail("\xe0\x80\xaf");
 
     // 4.1.3 U+002F = f0 80 80 af
-    ValidateFail("\xf0\x80\x80\xaf");
+    validate_fail("\xf0\x80\x80\xaf");
 
     // 4.1.4 U+002F = f8 80 80 80 af
-    ValidateFail("\xf8\x80\x80\x80\xaf");
+    validate_fail("\xf8\x80\x80\x80\xaf");
 
     // 4.1.5 U+002F = fc 80 80 80 80 af
-    ValidateFail("\xfc\x80\x80\x80\x80\xaf");
+    validate_fail("\xfc\x80\x80\x80\x80\xaf");
 
     // 4.2  Maximum overlong sequences
 
     // 4.2.1  U-0000007F = c1 bf
-    ValidateFail("\xc1\xbf");
+    validate_fail("\xc1\xbf");
 
     // 4.2.2  U-000007FF = e0 9f bf
-    ValidateFail("\xe0\x9f\xbf");
+    validate_fail("\xe0\x9f\xbf");
 
     // 4.2.3  U-0000FFFF = f0 8f bf bf
-    ValidateFail("\xf0\x8f\xbf\xbf");
+    validate_fail("\xf0\x8f\xbf\xbf");
 
     // 4.2.4  U-001FFFFF = f8 87 bf bf bf
-    ValidateFail("\xf8\x87\xbf\xbf\xbf");
+    validate_fail("\xf8\x87\xbf\xbf\xbf");
 
     // 4.2.5  U-03FFFFFF = fc 83 bf bf bf bf
-    ValidateFail("\xfc\x83\xbf\xbf\xbf\xbf");
+    validate_fail("\xfc\x83\xbf\xbf\xbf\xbf");
 
     // 4.3  Overlong representation of the NUL character
 
     // 4.3.1  U+0000 = c0 80
-    ValidateFail("\xc0\x80");
+    validate_fail("\xc0\x80");
 
     // 4.3.2  U+0000 = e0 80 80
-    ValidateFail("\xe0\x80\x80");
+    validate_fail("\xe0\x80\x80");
 
     // 4.3.3  U+0000 = f0 80 80 80
-    ValidateFail("\xf0\x80\x80\x80");
+    validate_fail("\xf0\x80\x80\x80");
 
     // 4.3.4  U+0000 = f8 80 80 80 80
-    ValidateFail("\xf8\x80\x80\x80\x80");
+    validate_fail("\xf8\x80\x80\x80\x80");
 
     // 4.3.5  U+0000 = fc 80 80 80 80 80
-    ValidateFail("\xfc\x80\x80\x80\x80\x80");
+    validate_fail("\xfc\x80\x80\x80\x80\x80");
 
     // 5  Illegal code positions
 
     // 5.1 Single UTF-16 surrogates
 
     // 5.1.1  U+D800 = ed a0 80
-    ValidateFail("\xed\xa0\x80");
+    validate_fail("\xed\xa0\x80");
 
     // 5.1.2  U+DB7F = ed ad bf
-    ValidateFail("\xed\xad\xbf");
+    validate_fail("\xed\xad\xbf");
 
     // 5.1.3  U+DB80 = ed ae 80
-    ValidateFail("\xed\xae\x80");
+    validate_fail("\xed\xae\x80");
 
     // 5.1.4  U+DBFF = ed af bf
-    ValidateFail("\xed\xaf\xbf");
+    validate_fail("\xed\xaf\xbf");
 
     // 5.1.5  U+DC00 = ed b0 80
-    ValidateFail("\xed\xb0\x80");
+    validate_fail("\xed\xb0\x80");
 
     // 5.1.6  U+DF80 = ed be 80
-    ValidateFail("\xed\xbe\x80");
+    validate_fail("\xed\xbe\x80");
 
     // 5.1.7  U+DFFF = ed bf bf
-    ValidateFail("\xed\xbf\xbf");
+    validate_fail("\xed\xbf\xbf");
 
     // 5.2 Paired UTF-16 surrogates
 
     // 5.2.1  U+D800 U+DC00 = ed a0 80 ed b0 80
-    ValidateFail("\xed\xa0\x80\xed\xb0\x80");
+    validate_fail("\xed\xa0\x80\xed\xb0\x80");
 
     // 5.2.2  U+D800 U+DFFF = ed a0 80 ed bf bf
-    ValidateFail("\xed\xa0\x80\xed\xbf\xbf");
+    validate_fail("\xed\xa0\x80\xed\xbf\xbf");
 
     // 5.2.3  U+DB7F U+DC00 = ed ad bf ed b0 80
-    ValidateFail("\xed\xad\xbf\xed\xb0\x80");
+    validate_fail("\xed\xad\xbf\xed\xb0\x80");
 
     // 5.2.4  U+DB7F U+DFFF = ed ad bf ed bf bf
-    ValidateFail("\xed\xad\xbf\xed\xbf\xbf");
+    validate_fail("\xed\xad\xbf\xed\xbf\xbf");
 
     // 5.2.5  U+DB80 U+DC00 = ed ae 80 ed b0 80
-    ValidateFail("\xed\xae\x80\xed\xb0\x80");
+    validate_fail("\xed\xae\x80\xed\xb0\x80");
 
     // 5.2.6  U+DB80 U+DFFF = ed ae 80 ed bf bf
-    ValidateFail("\xed\xae\x80\xed\xbf\xbf");
+    validate_fail("\xed\xae\x80\xed\xbf\xbf");
 
     // 5.2.7  U+DBFF U+DC00 = ed af bf ed b0 80
-    ValidateFail("\xed\xaf\xbf\xed\xb0\x80");
+    validate_fail("\xed\xaf\xbf\xed\xb0\x80");
 
     // 5.2.8  U+DBFF U+DFFF = ed af bf ed bf bf
-    ValidateFail("\xed\xaf\xbf\xed\xbf\xbf");
+    validate_fail("\xed\xaf\xbf\xed\xbf\xbf");
 
     // 5.3 Noncharacter code positions
 
     // 5.3.1  U+FFFE = ef bf be
-    ValidatePass("\xef\xbf\xbe");
+    validate_pass("\xef\xbf\xbe");
 
     // 5.3.2  U+FFFF = ef bf bf
-    ValidatePass("\xef\xbf\xbf");
+    validate_pass("\xef\xbf\xbf");
 
     // 5.3.3  U+FDD0 .. U+FDEF
-    ValidatePass("\xef\xb7\x90");
-    ValidatePass("\xef\xb7\x91");
-    ValidatePass("\xef\xb7\x92");
-    ValidatePass("\xef\xb7\x93");
-    ValidatePass("\xef\xb7\x94");
-    ValidatePass("\xef\xb7\x95");
-    ValidatePass("\xef\xb7\x96");
-    ValidatePass("\xef\xb7\x97");
-    ValidatePass("\xef\xb7\x98");
-    ValidatePass("\xef\xb7\x99");
-    ValidatePass("\xef\xb7\x9a");
-    ValidatePass("\xef\xb7\x9b");
-    ValidatePass("\xef\xb7\x9c");
-    ValidatePass("\xef\xb7\x9d");
-    ValidatePass("\xef\xb7\x9e");
-    ValidatePass("\xef\xb7\x9f");
-    ValidatePass("\xef\xb7\xa0");
-    ValidatePass("\xef\xb7\xa1");
-    ValidatePass("\xef\xb7\xa2");
-    ValidatePass("\xef\xb7\xa3");
-    ValidatePass("\xef\xb7\xa4");
-    ValidatePass("\xef\xb7\xa5");
-    ValidatePass("\xef\xb7\xa6");
-    ValidatePass("\xef\xb7\xa7");
-    ValidatePass("\xef\xb7\xa8");
-    ValidatePass("\xef\xb7\xa9");
-    ValidatePass("\xef\xb7\xaa");
-    ValidatePass("\xef\xb7\xab");
-    ValidatePass("\xef\xb7\xac");
-    ValidatePass("\xef\xb7\xad");
-    ValidatePass("\xef\xb7\xae");
-    ValidatePass("\xef\xb7\xaf");
+    validate_pass("\xef\xb7\x90");
+    validate_pass("\xef\xb7\x91");
+    validate_pass("\xef\xb7\x92");
+    validate_pass("\xef\xb7\x93");
+    validate_pass("\xef\xb7\x94");
+    validate_pass("\xef\xb7\x95");
+    validate_pass("\xef\xb7\x96");
+    validate_pass("\xef\xb7\x97");
+    validate_pass("\xef\xb7\x98");
+    validate_pass("\xef\xb7\x99");
+    validate_pass("\xef\xb7\x9a");
+    validate_pass("\xef\xb7\x9b");
+    validate_pass("\xef\xb7\x9c");
+    validate_pass("\xef\xb7\x9d");
+    validate_pass("\xef\xb7\x9e");
+    validate_pass("\xef\xb7\x9f");
+    validate_pass("\xef\xb7\xa0");
+    validate_pass("\xef\xb7\xa1");
+    validate_pass("\xef\xb7\xa2");
+    validate_pass("\xef\xb7\xa3");
+    validate_pass("\xef\xb7\xa4");
+    validate_pass("\xef\xb7\xa5");
+    validate_pass("\xef\xb7\xa6");
+    validate_pass("\xef\xb7\xa7");
+    validate_pass("\xef\xb7\xa8");
+    validate_pass("\xef\xb7\xa9");
+    validate_pass("\xef\xb7\xaa");
+    validate_pass("\xef\xb7\xab");
+    validate_pass("\xef\xb7\xac");
+    validate_pass("\xef\xb7\xad");
+    validate_pass("\xef\xb7\xae");
+    validate_pass("\xef\xb7\xaf");
 
     // 5.3.4  U+nFFFE U+nFFFF (for n = 1..10)
-    ValidatePass("\xf0\x9f\xbf\xbf");
-    ValidatePass("\xf0\xaf\xbf\xbf");
-    ValidatePass("\xf0\xbf\xbf\xbf");
-    ValidatePass("\xf1\x8f\xbf\xbf");
-    ValidatePass("\xf1\x9f\xbf\xbf");
-    ValidatePass("\xf1\xaf\xbf\xbf");
-    ValidatePass("\xf1\xbf\xbf\xbf");
-    ValidatePass("\xf2\x8f\xbf\xbf");
-    ValidatePass("\xf2\x9f\xbf\xbf");
-    ValidatePass("\xf2\xaf\xbf\xbf");
+    validate_pass("\xf0\x9f\xbf\xbf");
+    validate_pass("\xf0\xaf\xbf\xbf");
+    validate_pass("\xf0\xbf\xbf\xbf");
+    validate_pass("\xf1\x8f\xbf\xbf");
+    validate_pass("\xf1\x9f\xbf\xbf");
+    validate_pass("\xf1\xaf\xbf\xbf");
+    validate_pass("\xf1\xbf\xbf\xbf");
+    validate_pass("\xf2\x8f\xbf\xbf");
+    validate_pass("\xf2\x9f\xbf\xbf");
+    validate_pass("\xf2\xaf\xbf\xbf");
 }
 
 //==============================================================================
-TEST_F(JsonTest, MarkusKuhnExtendedTest)
+TEST_F(JsonTest, MarkusKuhnExtended)
 {
     // Exceptions not caught by Markus Kuhn's stress test
-    ValidateFail("\x22");
-    ValidateFail("\x5c");
+    validate_fail("\x22");
+    validate_fail("\x5c");
 
-    ValidateFail("\xe0\xa0\x79");
-    ValidateFail("\xe0\xa0\xff");
+    validate_fail("\xe0\xa0\x79");
+    validate_fail("\xe0\xa0\xff");
 
-    ValidateFail("\xed\x80\x79");
-    ValidateFail("\xed\x80\xff");
+    validate_fail("\xed\x80\x79");
+    validate_fail("\xed\x80\xff");
 
-    ValidateFail("\xf0\x90\x79");
-    ValidateFail("\xf0\x90\xff");
-    ValidateFail("\xf0\x90\x80\x79");
-    ValidateFail("\xf0\x90\x80\xff");
+    validate_fail("\xf0\x90\x79");
+    validate_fail("\xf0\x90\xff");
+    validate_fail("\xf0\x90\x80\x79");
+    validate_fail("\xf0\x90\x80\xff");
 
-    ValidateFail("\xf1\x80\x79");
-    ValidateFail("\xf1\x80\xff");
-    ValidateFail("\xf1\x80\x80\x79");
-    ValidateFail("\xf1\x80\x80\xff");
+    validate_fail("\xf1\x80\x79");
+    validate_fail("\xf1\x80\xff");
+    validate_fail("\xf1\x80\x80\x79");
+    validate_fail("\xf1\x80\x80\xff");
 
-    ValidateFail("\xf4\x80\x79");
-    ValidateFail("\xf4\x80\xff");
-    ValidateFail("\xf4\x80\x80\x79");
-    ValidateFail("\xf4\x80\x80\xff");
+    validate_fail("\xf4\x80\x79");
+    validate_fail("\xf4\x80\xff");
+    validate_fail("\xf4\x80\x80\x79");
+    validate_fail("\xf4\x80\x80\xff");
 }

@@ -9,39 +9,39 @@
 
 namespace {
 
-int s_lastSignal = 0;
+int s_last_signal = 0;
 
-void handleSignal(int signal)
+void handle_signal(int signal)
 {
-    s_lastSignal = signal;
+    s_last_signal = signal;
 }
 
 } // namespace
 
 //==============================================================================
-TEST(SystemTest, PrintBacktraceTest)
+TEST(SystemTest, PrintBacktrace)
 {
     fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
-    fly::System::PrintBacktrace();
+    fly::System::print_backtrace();
 
     std::string output = capture();
     EXPECT_FALSE(output.empty());
 }
 
 //==============================================================================
-TEST(SystemTest, LocalTimeTest)
+TEST(SystemTest, LocalTime)
 {
-    std::string time = fly::System::LocalTime();
+    std::string time = fly::System::local_time();
     EXPECT_FALSE(time.empty());
 }
 
 //==============================================================================
-TEST(SystemTest, ErrorCodeTest)
+TEST(SystemTest, ErrorCode)
 {
-    int code = fly::System::GetErrorCode();
+    int code = fly::System::get_error_code();
 
-    std::string error1 = fly::System::GetErrorString();
-    std::string error2 = fly::System::GetErrorString(code);
+    std::string error1 = fly::System::get_error_string();
+    std::string error2 = fly::System::get_error_string(code);
 
     EXPECT_FALSE(error1.empty());
     EXPECT_FALSE(error2.empty());
@@ -49,16 +49,16 @@ TEST(SystemTest, ErrorCodeTest)
 }
 
 //==============================================================================
-TEST(SystemTest, SignalTest)
+TEST(SystemTest, Signal)
 {
-    fly::System::SignalHandler handler(&handleSignal);
-    fly::System::SetSignalHandler(handler);
+    fly::System::SignalHandler handler(&handle_signal);
+    fly::System::set_signal_handler(handler);
 
     std::raise(SIGINT);
-    EXPECT_EQ(s_lastSignal, SIGINT);
+    EXPECT_EQ(s_last_signal, SIGINT);
 
     std::raise(SIGSEGV);
-    EXPECT_EQ(s_lastSignal, SIGSEGV);
+    EXPECT_EQ(s_last_signal, SIGSEGV);
 
-    fly::System::SetSignalHandler(nullptr);
+    fly::System::set_signal_handler(nullptr);
 }

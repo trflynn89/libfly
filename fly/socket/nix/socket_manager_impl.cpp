@@ -10,117 +10,119 @@ namespace fly {
 
 //==============================================================================
 SocketManagerImpl::SocketManagerImpl(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SocketConfig> &spConfig) noexcept :
-    SocketManager(spTaskRunner, spConfig)
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<SocketConfig> &config) noexcept :
+    SocketManager(task_runner, config)
 {
 }
 
 //==============================================================================
-void SocketManagerImpl::Poll(const std::chrono::microseconds &timeout) noexcept
+void SocketManagerImpl::poll(const std::chrono::microseconds &timeout) noexcept
 {
-    fd_set readFd, writeFd;
+    fd_set read_fd, write_fd;
 
     suseconds_t usec = static_cast<suseconds_t>(timeout.count());
     struct timeval tv = {0, usec};
 
-    socket_type maxFd = -1;
+    socket_type max_fd = -1;
     {
-        std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
-        maxFd = setReadAndWriteMasks(&readFd, &writeFd);
+        std::lock_guard<std::mutex> lock(m_async_sockets_mutex);
+        max_fd = set_read_and_write_masks(&read_fd, &write_fd);
     }
 
-    if (maxFd > 0)
+    if (max_fd > 0)
     {
-        if (::select(maxFd + 1, &readFd, &writeFd, nullptr, &tv) > 0)
+        if (::select(max_fd + 1, &read_fd, &write_fd, nullptr, &tv) > 0)
         {
-            std::lock_guard<std::mutex> lock(m_aioSocketsMutex);
-            handleSocketIO(&readFd, &writeFd);
+            std::lock_guard<std::mutex> lock(m_async_sockets_mutex);
+            handle_socket_io(&read_fd, &write_fd);
         }
     }
 }
 
 //==============================================================================
-socket_type SocketManagerImpl::setReadAndWriteMasks(
-    fd_set *readFd,
-    fd_set *writeFd) noexcept
+socket_type SocketManagerImpl::set_read_and_write_masks(
+    fd_set *read_fd,
+    fd_set *write_fd) noexcept
 {
-    socket_type maxFd = -1;
+    socket_type max_fd = -1;
 
-    FD_ZERO(readFd);
-    FD_ZERO(writeFd);
+    FD_ZERO(read_fd);
+    FD_ZERO(write_fd);
 
-    for (const std::shared_ptr<Socket> &spSocket : m_aioSockets)
+    for (const std::shared_ptr<Socket> &socket : m_async_sockets)
     {
-        if (spSocket->IsValid())
+        if (socket->is_valid())
         {
-            socket_type fd = spSocket->GetHandle();
+            socket_type fd = socket->get_handle();
 
-            FD_SET(fd, readFd);
-            FD_SET(fd, writeFd);
+            FD_SET(fd, read_fd);
+            FD_SET(fd, write_fd);
 
-            maxFd = std::max(maxFd, fd);
+            max_fd = std::max(max_fd, fd);
         }
     }
 
-    return maxFd;
+    return max_fd;
 }
 
 //==============================================================================
-void SocketManagerImpl::handleSocketIO(fd_set *readFd, fd_set *writeFd) noexcept
+void SocketManagerImpl::handle_socket_io(
+    fd_set *read_fd,
+    fd_set *write_fd) noexcept
 {
-    SocketList newClients, connectedClients, closedClients;
+    SocketList new_clients, connected_clients, closed_clients;
 
-    for (const std::shared_ptr<Socket> &spSocket : m_aioSockets)
+    for (const std::shared_ptr<Socket> &socket : m_async_sockets)
     {
-        if (spSocket->IsValid())
+        if (socket->is_valid())
         {
-            socket_type handle = spSocket->GetHandle();
+            socket_type handle = socket->get_handle();
 
             // Handle socket accepts and reads
-            if (FD_ISSET(handle, readFd))
+            if (FD_ISSET(handle, read_fd))
             {
-                if (spSocket->IsListening())
+                if (socket->is_listening())
                 {
-                    std::shared_ptr<Socket> spNewClient = spSocket->Accept();
+                    std::shared_ptr<Socket> new_client = socket->accept();
 
-                    if (spNewClient && spNewClient->SetAsync())
+                    if (new_client && new_client->set_async())
                     {
-                        connectedClients.push_back(spNewClient);
-                        newClients.push_back(spNewClient);
+                        connected_clients.push_back(new_client);
+                        new_clients.push_back(new_client);
                     }
                 }
-                else if (spSocket->IsConnected() || spSocket->IsUdp())
+                else if (socket->is_connected() || socket->is_udp())
                 {
-                    spSocket->ServiceRecvRequests(m_completedReceives);
+                    socket->service_recv_requests(m_completed_receives);
                 }
             }
 
             // Handle socket connects and writes
-            if (FD_ISSET(handle, writeFd))
+            if (FD_ISSET(handle, write_fd))
             {
-                if (spSocket->IsConnecting())
+                if (socket->is_connecting())
                 {
-                    if (spSocket->FinishConnect())
+                    if (socket->finish_connect())
                     {
-                        connectedClients.push_back(spSocket);
+                        connected_clients.push_back(socket);
                     }
                 }
-                else if (spSocket->IsConnected() || spSocket->IsUdp())
+                else if (socket->is_connected() || socket->is_udp())
                 {
-                    spSocket->ServiceSendRequests(m_completedSends);
+                    socket->service_send_requests(m_completed_sends);
                 }
             }
         }
 
-        if (!spSocket->IsValid())
+        if (!socket->is_valid())
         {
-            closedClients.push_back(spSocket);
+            closed_clients.push_back(socket);
         }
     }
 
-    HandleNewAndClosedSockets(newClients, closedClients);
-    TriggerCallbacks(connectedClients, closedClients);
+    handle_new_and_closed_sockets(new_clients, closed_clients);
+    trigger_callbacks(connected_clients, closed_clients);
 }
 
 } // namespace fly

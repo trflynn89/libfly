@@ -34,7 +34,7 @@ public:
     /**
      * Map of configuration group names to configuration objects.
      */
-    typedef std::map<const char *, std::weak_ptr<Config>> ConfigMap;
+    using ConfigMap = std::map<const char *, std::weak_ptr<Config>>;
 
     /**
      * Enumerated list of supported configuration file formats.
@@ -48,14 +48,14 @@ public:
     /**
      * Constructor.
      *
-     * @param TaskRunner Task runner for posting config-related tasks onto.
-     * @param ConfigFileType File format of the configuration file.
+     * @param task_runner Task runner for posting config-related tasks onto.
+     * @param file_type File format of the configuration file.
      * @param path Path to the configuration file.
      */
     ConfigManager(
-        const std::shared_ptr<SequencedTaskRunner> &,
-        ConfigFileType,
-        const std::filesystem::path &) noexcept;
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        ConfigFileType file_type,
+        const std::filesystem::path &path) noexcept;
 
     /**
      * Destructor. Stop the configuration manager and underlying objects.
@@ -71,39 +71,38 @@ public:
      * @return A reference to the created/found configuration.
      */
     template <typename T>
-    std::shared_ptr<T> CreateConfig() noexcept;
+    std::shared_ptr<T> create_config() noexcept;
 
     /**
-     * Get the number of configuration objects currently created. Erases any
-     * expired configuration objects.
+     * Erase any expired configuration objects.
      *
-     * @return The number of configurations.
+     * @return The remaining number of configurations.
      */
-    ConfigMap::size_type GetSize() noexcept;
+    ConfigMap::size_type prune() noexcept;
 
     /**
      * Start the configuration manager and underlying objects.
      *
      * @return True if the monitor could be started.
      */
-    bool Start() noexcept;
+    bool start() noexcept;
 
 private:
     /**
      * Parse the configuration file and store the parsed values in memory.
      */
-    void updateConfig() noexcept;
+    void update_config() noexcept;
 
-    std::shared_ptr<PathMonitor> m_spMonitor;
-    std::shared_ptr<Parser> m_spParser;
+    std::shared_ptr<PathMonitor> m_monitor;
+    std::unique_ptr<Parser> m_parser;
     Json m_values;
 
     const std::filesystem::path m_path;
 
-    std::shared_ptr<SequencedTaskRunner> m_spTaskRunner;
-    std::shared_ptr<Task> m_spTask;
+    std::shared_ptr<SequencedTaskRunner> m_task_runner;
+    std::shared_ptr<Task> m_task;
 
-    mutable std::mutex m_configsMutex;
+    mutable std::mutex m_configs_mutex;
     ConfigMap m_configs;
 };
 
@@ -122,53 +121,53 @@ protected:
     /**
      * Call back into the config manager to re-parse the configuration file.
      */
-    void Run() noexcept override;
+    void run() noexcept override;
 
 private:
-    std::weak_ptr<ConfigManager> m_wpConfigManager;
+    std::weak_ptr<ConfigManager> m_weak_config_manager;
 };
 
 //==============================================================================
 template <typename T>
-std::shared_ptr<T> ConfigManager::CreateConfig() noexcept
+std::shared_ptr<T> ConfigManager::create_config() noexcept
 {
     static_assert(std::is_base_of_v<Config, T>);
 
-    std::shared_ptr<T> spConfig;
+    std::shared_ptr<T> config;
 
-    std::lock_guard<std::mutex> lock(m_configsMutex);
+    std::lock_guard<std::mutex> lock(m_configs_mutex);
     ConfigMap::const_iterator it = m_configs.find(T::identifier);
 
     if (it == m_configs.end())
     {
-        spConfig = std::make_shared<T>();
-        m_configs[T::identifier] = spConfig;
+        config = std::make_shared<T>();
+        m_configs[T::identifier] = config;
     }
     else
     {
-        std::shared_ptr<Config> spBaseConfig = it->second.lock();
+        std::shared_ptr<Config> base_config = it->second.lock();
 
-        if (spBaseConfig)
+        if (base_config)
         {
-            spConfig = std::dynamic_pointer_cast<T>(spBaseConfig);
+            config = std::dynamic_pointer_cast<T>(base_config);
         }
         else
         {
-            spConfig = std::make_shared<T>();
-            m_configs[T::identifier] = spConfig;
+            config = std::make_shared<T>();
+            m_configs[T::identifier] = config;
         }
     }
 
-    if (spConfig)
+    if (config)
     {
-        spConfig->Update(m_values[T::identifier]);
+        config->update(m_values[T::identifier]);
     }
     else
     {
         LOGW("Could not create configuration for type %s", T::identifier);
     }
 
-    return spConfig;
+    return config;
 }
 
 } // namespace fly

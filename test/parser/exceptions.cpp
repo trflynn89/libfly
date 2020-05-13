@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 //==============================================================================
-TEST(ParserExceptionTest, ParserExceptionTest)
+TEST(ParserExceptionTest, ParserException)
 {
     int line = 123;
     int column = 456;
@@ -56,7 +56,7 @@ TEST(ParserExceptionTest, UnexpectedCharacterException)
     {
         std::string what(ex.what());
 
-        std::string hex = fly::String::Format("%x", c1);
+        std::string hex = fly::String::format("%x", c1);
 
         EXPECT_NE(what.find(std::to_string(line)), std::string::npos);
         EXPECT_NE(what.find(std::to_string(column)), std::string::npos);
@@ -73,8 +73,8 @@ TEST(ParserExceptionTest, UnexpectedCharacterException)
     {
         std::string what(ex.what());
 
-        std::string str = fly::String::Format("'%c'", char(c2));
-        std::string hex = fly::String::Format("%x", c2);
+        std::string str = fly::String::format("'%c'", char(c2));
+        std::string hex = fly::String::format("%x", c2);
 
         EXPECT_NE(what.find(std::to_string(line)), std::string::npos);
         EXPECT_NE(what.find(std::to_string(column)), std::string::npos);

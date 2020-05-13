@@ -14,21 +14,21 @@ namespace fly {
 
 namespace {
 
-    const int s_initFlags = IN_NONBLOCK;
+    const int s_init_flags = IN_NONBLOCK;
 
-    const int s_changeFlags =
+    const int s_change_flags =
         IN_CREATE | IN_DELETE | IN_MOVED_TO | IN_MOVED_FROM | IN_MODIFY;
 
 } // namespace
 
 //==============================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<PathConfig> &spConfig) noexcept :
-    PathMonitor(spTaskRunner, spConfig),
-    m_monitorDescriptor(::inotify_init1(s_initFlags))
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<PathConfig> &config) noexcept :
+    PathMonitor(task_runner, config),
+    m_monitor_descriptor(::inotify_init1(s_init_flags))
 {
-    if (m_monitorDescriptor == -1)
+    if (m_monitor_descriptor == -1)
     {
         LOGS("Could not initialize monitor");
     }
@@ -37,61 +37,61 @@ PathMonitorImpl::PathMonitorImpl(
 //==============================================================================
 PathMonitorImpl::~PathMonitorImpl()
 {
-    if (m_monitorDescriptor != -1)
+    if (m_monitor_descriptor != -1)
     {
-        ::close(m_monitorDescriptor);
-        m_monitorDescriptor = -1;
+        ::close(m_monitor_descriptor);
+        m_monitor_descriptor = -1;
     }
 }
 
 //==============================================================================
-bool PathMonitorImpl::IsValid() const noexcept
+bool PathMonitorImpl::is_valid() const noexcept
 {
-    return m_monitorDescriptor != -1;
+    return m_monitor_descriptor != -1;
 }
 
 //==============================================================================
-void PathMonitorImpl::Poll(const std::chrono::milliseconds &timeout) noexcept
+void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
 {
-    pollfd pollFd;
+    pollfd poll_fd;
 
-    pollFd.fd = m_monitorDescriptor;
-    pollFd.events = POLLIN;
+    poll_fd.fd = m_monitor_descriptor;
+    poll_fd.events = POLLIN;
 
-    int numEvents = ::poll(&pollFd, 1, timeout.count());
+    int events = ::poll(&poll_fd, 1, timeout.count());
 
-    if (numEvents == -1)
+    if (events == -1)
     {
         LOGS("Could not create poller");
     }
-    else if ((numEvents > 0) && (pollFd.revents & POLLIN))
+    else if ((events > 0) && (poll_fd.revents & POLLIN))
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        while (readEvents())
+        while (read_events())
         {
         }
     }
 }
 
 //==============================================================================
-std::shared_ptr<PathMonitor::PathInfo> PathMonitorImpl::CreatePathInfo(
+std::unique_ptr<PathMonitor::PathInfo> PathMonitorImpl::create_path_info(
     const std::filesystem::path &path) const noexcept
 {
-    std::shared_ptr<PathMonitor::PathInfo> spInfo;
+    std::unique_ptr<PathMonitor::PathInfo> info;
 
-    if (IsValid())
+    if (is_valid())
     {
-        spInfo = std::make_shared<PathInfoImpl>(m_monitorDescriptor, path);
+        info = std::make_unique<PathInfoImpl>(m_monitor_descriptor, path);
     }
 
-    return spInfo;
+    return info;
 }
 
 //==============================================================================
-bool PathMonitorImpl::readEvents() const noexcept
+bool PathMonitorImpl::read_events() const noexcept
 {
-    static const std::size_t eventSize = sizeof(inotify_event);
+    static constexpr const std::size_t s_event_size = sizeof(inotify_event);
 
     // Some systems cannot read integer variables if they are not properly
     // aligned. On other systems, incorrect alignment may decrease performance.
@@ -99,65 +99,72 @@ bool PathMonitorImpl::readEvents() const noexcept
     // should have the same alignment as inotify_event.
     char buff[8 << 10] __attribute__((aligned(__alignof__(inotify_event))));
 
-    ssize_t len = ::read(m_monitorDescriptor, buff, sizeof(buff));
+    ssize_t size = ::read(m_monitor_descriptor, buff, sizeof(buff));
 
-    if (len <= 0)
+    if (size <= 0)
     {
-        if ((len == -1) && (System::GetErrorCode() != EAGAIN))
+        if ((size == -1) && (System::get_error_code() != EAGAIN))
         {
             LOGS("Could not read polled event");
         }
     }
     else
     {
-        const inotify_event *pEvent;
+        const inotify_event *event;
 
-        for (char *ptr = buff; ptr < buff + len; ptr += eventSize + pEvent->len)
+        for (char *ptr = buff; ptr < buff + size;
+             ptr += s_event_size + event->len)
         {
-            pEvent = reinterpret_cast<inotify_event *>(ptr);
+            event = reinterpret_cast<inotify_event *>(ptr);
 
-            if (pEvent->len > 0)
+            if (event->len > 0)
             {
-                handleEvent(pEvent);
+                handle_event(event);
             }
         }
     }
 
-    return len > 0;
+    return size > 0;
 }
 
 //==============================================================================
-void PathMonitorImpl::handleEvent(const inotify_event *pEvent) const noexcept
+void PathMonitorImpl::handle_event(const inotify_event *event) const noexcept
 {
-    auto it = std::find_if(
-        m_pathInfo.begin(),
-        m_pathInfo.end(),
-        [&pEvent](const PathInfoMap::value_type &value) -> bool {
-            auto spInfo(std::static_pointer_cast<PathInfoImpl>(value.second));
-            return spInfo->m_watchDescriptor == pEvent->wd;
+    auto path_it = std::find_if(
+        m_path_info.begin(),
+        m_path_info.end(),
+        [&event](const PathInfoMap::value_type &value) -> bool {
+            const auto *info = static_cast<PathInfoImpl *>(value.second.get());
+            return info->m_watch_descriptor == event->wd;
         });
 
-    if (it != m_pathInfo.end())
+    if (path_it != m_path_info.end())
     {
-        auto spInfo(std::static_pointer_cast<PathInfoImpl>(it->second));
-        PathMonitor::PathEvent event = convertToEvent(pEvent->mask);
+        const auto *info = static_cast<PathInfoImpl *>(path_it->second.get());
+        PathMonitor::PathEvent path_event = convert_to_event(event->mask);
 
-        if (event != PathMonitor::PathEvent::None)
+        if (path_event != PathMonitor::PathEvent::None)
         {
-            const std::filesystem::path file(pEvent->name);
-            auto callback = spInfo->m_fileHandlers[file];
+            const std::filesystem::path file(event->name);
 
-            if (callback == nullptr)
+            auto file_it = info->m_file_handlers.find(file);
+            PathEventCallback callback = nullptr;
+
+            if (file_it == info->m_file_handlers.end())
             {
-                callback = spInfo->m_pathHandler;
+                callback = info->m_path_handler;
+            }
+            else
+            {
+                callback = file_it->second;
             }
 
             if (callback != nullptr)
             {
-                auto path = std::filesystem::path(it->first) / file;
+                auto path = std::filesystem::path(path_it->first) / file;
 
-                LOGI("Handling event %d for %s", event, path);
-                callback(path, event);
+                LOGI("Handling event %d for %s", path_event, path);
+                callback(path, path_event);
             }
         }
     }
@@ -165,40 +172,40 @@ void PathMonitorImpl::handleEvent(const inotify_event *pEvent) const noexcept
 
 //==============================================================================
 PathMonitor::PathEvent
-PathMonitorImpl::convertToEvent(std::uint32_t mask) const noexcept
+PathMonitorImpl::convert_to_event(std::uint32_t mask) const noexcept
 {
-    PathMonitor::PathEvent event = PathMonitor::PathEvent::None;
+    PathMonitor::PathEvent path_event = PathMonitor::PathEvent::None;
 
     if ((mask & IN_CREATE) || (mask & IN_MOVED_TO))
     {
-        event = PathMonitor::PathEvent::Created;
+        path_event = PathMonitor::PathEvent::Created;
     }
     else if ((mask & IN_DELETE) || (mask & IN_MOVED_FROM))
     {
-        event = PathMonitor::PathEvent::Deleted;
+        path_event = PathMonitor::PathEvent::Deleted;
     }
     else if (mask & IN_MODIFY)
     {
-        event = PathMonitor::PathEvent::Changed;
+        path_event = PathMonitor::PathEvent::Changed;
     }
 
-    return event;
+    return path_event;
 }
 
 //==============================================================================
 PathMonitorImpl::PathInfoImpl::PathInfoImpl(
-    int monitorDescriptor,
+    int monitor_descriptor,
     const std::filesystem::path &path) noexcept :
     PathMonitorImpl::PathInfo(),
-    m_monitorDescriptor(monitorDescriptor),
-    m_watchDescriptor(-1)
+    m_monitor_descriptor(monitor_descriptor),
+    m_watch_descriptor(-1)
 {
-    m_watchDescriptor = ::inotify_add_watch(
-        m_monitorDescriptor,
+    m_watch_descriptor = ::inotify_add_watch(
+        m_monitor_descriptor,
         path.string().c_str(),
-        s_changeFlags);
+        s_change_flags);
 
-    if (m_watchDescriptor == -1)
+    if (m_watch_descriptor == -1)
     {
         LOGS("Could not add watcher for %s", path);
     }
@@ -207,17 +214,17 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
 //==============================================================================
 PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 {
-    if (m_watchDescriptor != -1)
+    if (m_watch_descriptor != -1)
     {
-        ::inotify_rm_watch(m_monitorDescriptor, m_watchDescriptor);
-        m_watchDescriptor = -1;
+        ::inotify_rm_watch(m_monitor_descriptor, m_watch_descriptor);
+        m_watch_descriptor = -1;
     }
 }
 
 //==============================================================================
-bool PathMonitorImpl::PathInfoImpl::IsValid() const noexcept
+bool PathMonitorImpl::PathInfoImpl::is_valid() const noexcept
 {
-    return m_watchDescriptor != -1;
+    return m_watch_descriptor != -1;
 }
 
 } // namespace fly

@@ -109,7 +109,8 @@ install: $(TARGET_PACKAGES)
 # Install dependencies
 setup:
 ifeq ($(HOST), DEBIAN)
-	$(Q)$(SUDO) apt install -y git make clang clang-format lld llvm gcc g++ lcov
+	$(Q)$(SUDO) apt install -y git make clang clang-format clang-tidy lld llvm \
+		gcc g++ lcov
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) apt install -y gcc-multilib g++-multilib
 endif

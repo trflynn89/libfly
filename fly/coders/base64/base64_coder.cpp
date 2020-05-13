@@ -10,7 +10,7 @@ namespace fly {
 namespace {
 
     // The Base64 symbol table.
-    constexpr const std::array<std::ios::char_type, 64> s_base64Table = {
+    constexpr const std::array<std::ios::char_type, 64> s_base64_table = {
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
         'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 
@@ -24,7 +24,7 @@ namespace {
 
     // A mapping of ASCII codes to their indices in the Base64 symbol table.
     // Invalid values are marked with -1.
-    constexpr const std::array<std::ios::char_type, 256> s_base64Codes = {
+    constexpr const std::array<std::ios::char_type, 256> s_base64_codes = {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57,
@@ -48,96 +48,96 @@ namespace {
 } // namespace
 
 //==============================================================================
-bool Base64Coder::EncodeInternal(
-    std::istream &input,
-    std::ostream &output) noexcept
+bool Base64Coder::encode_internal(
+    std::istream &decoded,
+    std::ostream &encoded) noexcept
 {
     DecodedChunk chunk {};
 
-    while (input.read(chunk.data(), chunk.size()))
+    while (decoded.read(chunk.data(), chunk.size()))
     {
-        encodeChunk(chunk, std::tuple_size<EncodedChunk>::value, output);
+        encode_chunk(chunk, std::tuple_size<EncodedChunk>::value, encoded);
     }
 
     // If the input stream was not evenly split into 3-byte chunks, add padding
     // to the remaining chunk.
-    const std::size_t index = static_cast<size_t>(input.gcount());
+    const std::size_t index = static_cast<size_t>(decoded.gcount());
 
     if (index > 0)
     {
         ::memset(chunk.data() + index, '\0', chunk.size() - index);
-        encodeChunk(chunk, index + 1, output);
+        encode_chunk(chunk, index + 1, encoded);
 
         for (std::size_t i = index; i < chunk.size(); ++i)
         {
-            output.put(s_padding);
+            encoded.put(s_padding);
         }
     }
 
-    return input.eof() && output.good();
+    return decoded.eof() && encoded.good();
 }
 
 //==============================================================================
-bool Base64Coder::DecodeInternal(
-    std::istream &input,
-    std::ostream &output) noexcept
+bool Base64Coder::decode_internal(
+    std::istream &encoded,
+    std::ostream &decoded) noexcept
 {
     EncodedChunk chunk {};
 
     do
     {
-        input.read(chunk.data(), chunk.size());
+        encoded.read(chunk.data(), chunk.size());
 
-        const std::size_t bytes = static_cast<std::size_t>(input.gcount());
+        const std::size_t bytes = static_cast<std::size_t>(encoded.gcount());
 
         if (bytes == chunk.size())
         {
-            decodeChunk(chunk, output);
+            decode_chunk(chunk, decoded);
         }
         else if (bytes > 0)
         {
-            output.setstate(std::ios::failbit);
+            decoded.setstate(std::ios::failbit);
         }
-    } while (input);
+    } while (encoded);
 
-    return input.eof() && output.good();
+    return encoded.eof() && decoded.good();
 }
 
 //==============================================================================
-void Base64Coder::encodeChunk(
+void Base64Coder::encode_chunk(
     const DecodedChunk &chunk,
     std::size_t bytes,
-    std::ostream &output) const noexcept
+    std::ostream &encoded) const noexcept
 {
     const EncodedChunk data = {
         // Front 6 bits of the first symbol.
-        s_base64Table[static_cast<std::size_t>((chunk[0] & 0xfc) >> 2)],
+        s_base64_table[static_cast<std::size_t>((chunk[0] & 0xfc) >> 2)],
 
         // Last 2 bits of the first symbol, front 4 bits of the second symbol.
-        s_base64Table[static_cast<std::size_t>(
+        s_base64_table[static_cast<std::size_t>(
             ((chunk[0] & 0x03) << 4) | ((chunk[1] & 0xf0) >> 4))],
 
         // Last 4 bits of the second symbol, front 2 bits of the third symbol.
-        s_base64Table[static_cast<std::size_t>(
+        s_base64_table[static_cast<std::size_t>(
             ((chunk[1] & 0x0f) << 2) | ((chunk[2] & 0xc0) >> 6))],
 
         // Last 6 bits of the third symbol.
-        s_base64Table[static_cast<std::size_t>(chunk[2] & 0x3f)],
+        s_base64_table[static_cast<std::size_t>(chunk[2] & 0x3f)],
     };
 
-    output.write(data.data(), static_cast<std::streamsize>(bytes));
+    encoded.write(data.data(), static_cast<std::streamsize>(bytes));
 }
 
 //==============================================================================
-void Base64Coder::decodeChunk(EncodedChunk &chunk, std::ostream &output)
+void Base64Coder::decode_chunk(EncodedChunk &chunk, std::ostream &decoded)
     const noexcept
 {
     const std::size_t bytes =
-        std::tuple_size<DecodedChunk>::value - parseChunk(chunk);
+        std::tuple_size<DecodedChunk>::value - parse_chunk(chunk);
 
     if (bytes == 0)
     {
-        output.setstate(std::ios::failbit);
+        decoded.setstate(std::ios::failbit);
         return;
     }
 
@@ -154,17 +154,17 @@ void Base64Coder::decodeChunk(EncodedChunk &chunk, std::ostream &output)
         static_cast<std::ios::char_type>(((chunk[2] & 0x03) << 6) | chunk[3]),
     };
 
-    output.write(data.data(), static_cast<std::streamsize>(bytes));
+    decoded.write(data.data(), static_cast<std::streamsize>(bytes));
 }
 
 //==============================================================================
-std::size_t Base64Coder::parseChunk(EncodedChunk &chunk) const noexcept
+std::size_t Base64Coder::parse_chunk(EncodedChunk &chunk) const noexcept
 {
     for (std::size_t i = 0; i < chunk.size(); ++i)
     {
         const std::ios::char_type &symbol = chunk[i];
         const std::ios::char_type code =
-            s_base64Codes[static_cast<std::size_t>(symbol)];
+            s_base64_codes[static_cast<std::size_t>(symbol)];
 
         if (symbol == s_padding)
         {

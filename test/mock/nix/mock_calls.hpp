@@ -25,9 +25,9 @@ enum class MockCall : std::uint8_t
     Recv,
     Recvfrom,
     Send,
-    Send_Blocking,
+    SendBlocking,
     Sendto,
-    Sendto_Blocking,
+    SendtoBlocking,
     Setsockopt,
     Socket,
     Sysinfo,
@@ -37,6 +37,6 @@ enum class MockCall : std::uint8_t
 /**
  * Stream the name of a mocked system.
  */
-std::ostream &operator<<(std::ostream &, MockCall);
+std::ostream &operator<<(std::ostream &stream, MockCall call);
 
 } // namespace fly

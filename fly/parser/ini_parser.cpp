@@ -8,27 +8,27 @@
 namespace fly {
 
 //==============================================================================
-Json IniParser::ParseInternal(std::istream &stream) noexcept(false)
+Json IniParser::parse_internal(std::istream &stream) noexcept(false)
 {
     std::string line, section;
     Json values;
 
     while (stream.good() && std::getline(stream, line))
     {
-        String::Trim(line);
+        String::trim(line);
         ++m_line;
 
-        if (line.empty() || String::StartsWith(line, ';'))
+        if (line.empty() || String::starts_with(line, ';'))
         {
             // Ignore comments and blank lines
         }
-        else if (trimValue(line, '[', ']'))
+        else if (trim_value(line, '[', ']'))
         {
-            section = onSection(line);
+            section = on_section(line);
         }
         else if (!section.empty())
         {
-            onValue(values[section], line);
+            on_value(values[section], line);
         }
         else
         {
@@ -42,12 +42,12 @@ Json IniParser::ParseInternal(std::istream &stream) noexcept(false)
 }
 
 //==============================================================================
-std::string IniParser::onSection(const std::string &line) noexcept(false)
+std::string IniParser::on_section(const std::string &line) noexcept(false)
 {
     std::string section = line;
-    String::Trim(section);
+    String::trim(section);
 
-    if (trimValue(section, '\'') || trimValue(section, '\"'))
+    if (trim_value(section, '\'') || trim_value(section, '\"'))
     {
         throw ParserException(m_line, "Section names must not be quoted");
     }
@@ -56,26 +56,26 @@ std::string IniParser::onSection(const std::string &line) noexcept(false)
 }
 
 //==============================================================================
-void IniParser::onValue(Json &section, const std::string &line) noexcept(false)
+void IniParser::on_value(Json &section, const std::string &line) noexcept(false)
 {
-    static constexpr std::uint32_t size = 2;
+    static constexpr std::uint32_t s_size = 2;
 
-    std::vector<std::string> nameValue = String::Split(line, '=', size);
+    std::vector<std::string> name_value = String::split(line, '=', s_size);
 
-    if (nameValue.size() == size)
+    if (name_value.size() == s_size)
     {
-        std::string name(nameValue[0]), value(nameValue[1]);
+        std::string name(name_value[0]), value(name_value[1]);
 
-        String::Trim(name);
-        String::Trim(value);
+        String::trim(name);
+        String::trim(value);
 
-        if (trimValue(name, '\'') || trimValue(name, '\"'))
+        if (trim_value(name, '\'') || trim_value(name, '\"'))
         {
             throw ParserException(m_line, "Value names must not be quoted");
         }
 
-        trimValue(value, '\'');
-        trimValue(value, '\"');
+        trim_value(value, '\'');
+        trim_value(value, '\"');
 
         section[name] = value;
     }
@@ -88,33 +88,33 @@ void IniParser::onValue(Json &section, const std::string &line) noexcept(false)
 }
 
 //==============================================================================
-bool IniParser::trimValue(std::string &str, char ch) const noexcept(false)
+bool IniParser::trim_value(std::string &str, char ch) const noexcept(false)
 {
-    return trimValue(str, ch, ch);
+    return trim_value(str, ch, ch);
 }
 
 //==============================================================================
-bool IniParser::trimValue(std::string &str, char start, char end) const
+bool IniParser::trim_value(std::string &str, char start, char end) const
     noexcept(false)
 {
-    bool startsWithChar = String::StartsWith(str, start);
-    bool endsWithChar = String::EndsWith(str, end);
+    bool starts_with_char = String::starts_with(str, start);
+    bool ends_with_char = String::ends_with(str, end);
 
-    if (startsWithChar && endsWithChar)
+    if (starts_with_char && ends_with_char)
     {
         str = str.substr(1, str.size() - 2);
     }
-    else if (startsWithChar || endsWithChar)
+    else if (starts_with_char || ends_with_char)
     {
         throw ParserException(
             m_line,
-            String::Format(
+            String::format(
                 "Imbalanced characters: \"%c\" and \"%c\"",
                 start,
                 end));
     }
 
-    return startsWithChar && endsWithChar;
+    return starts_with_char && ends_with_char;
 }
 
 } // namespace fly

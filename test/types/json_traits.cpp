@@ -19,106 +19,50 @@
 namespace {
 
 //==========================================================================
-template <typename T, fly::enable_if_all<fly::JsonTraits::is_string<T>> = 0>
-bool isString(const T &) noexcept
-{
-    return fly::JsonTraits::is_string_v<T>;
-}
-
-template <typename T, fly::enable_if_not_all<fly::JsonTraits::is_string<T>> = 0>
-bool isString(const T &) noexcept
+template <typename T>
+bool is_string(const T &) noexcept
 {
     return fly::JsonTraits::is_string_v<T>;
 }
 
 //==========================================================================
-template <typename T, fly::enable_if_all<fly::JsonTraits::is_boolean<T>> = 0>
-bool isBool(const T &) noexcept
-{
-    return fly::JsonTraits::is_boolean_v<T>;
-}
-
-template <
-    typename T,
-    fly::enable_if_not_all<fly::JsonTraits::is_boolean<T>> = 0>
-bool isBool(const T &) noexcept
+template <typename T>
+bool is_bool(const T &) noexcept
 {
     return fly::JsonTraits::is_boolean_v<T>;
 }
 
 //==========================================================================
-template <
-    typename T,
-    fly::enable_if_all<fly::JsonTraits::is_signed_integer<T>> = 0>
-bool isSignedInteger(const T &) noexcept
-{
-    return fly::JsonTraits::is_signed_integer_v<T>;
-}
-
-template <
-    typename T,
-    fly::enable_if_not_all<fly::JsonTraits::is_signed_integer<T>> = 0>
-bool isSignedInteger(const T &) noexcept
+template <typename T>
+bool is_signed_integer(const T &) noexcept
 {
     return fly::JsonTraits::is_signed_integer_v<T>;
 }
 
 //==========================================================================
-template <
-    typename T,
-    fly::enable_if_all<fly::JsonTraits::is_unsigned_integer<T>> = 0>
-bool isUnsignedInteger(const T &) noexcept
-{
-    return fly::JsonTraits::is_unsigned_integer_v<T>;
-}
-
-template <
-    typename T,
-    fly::enable_if_not_all<fly::JsonTraits::is_unsigned_integer<T>> = 0>
-bool isUnsignedInteger(const T &) noexcept
+template <typename T>
+bool is_unsigned_integer(const T &) noexcept
 {
     return fly::JsonTraits::is_unsigned_integer_v<T>;
 }
 
 //==========================================================================
-template <
-    typename T,
-    fly::enable_if_all<fly::JsonTraits::is_floating_point<T>> = 0>
-bool isFloat(const T &) noexcept
-{
-    return fly::JsonTraits::is_floating_point_v<T>;
-}
-
-template <
-    typename T,
-    fly::enable_if_not_all<fly::JsonTraits::is_floating_point<T>> = 0>
-bool isFloat(const T &) noexcept
+template <typename T>
+bool is_floating_point(const T &) noexcept
 {
     return fly::JsonTraits::is_floating_point_v<T>;
 }
 
 //==========================================================================
-template <typename T, fly::enable_if_all<fly::JsonTraits::is_object<T>> = 0>
-bool isObject(const T &) noexcept
-{
-    return fly::JsonTraits::is_object_v<T>;
-}
-
-template <typename T, fly::enable_if_not_all<fly::JsonTraits::is_object<T>> = 0>
-bool isObject(const T &) noexcept
+template <typename T>
+bool is_object(const T &) noexcept
 {
     return fly::JsonTraits::is_object_v<T>;
 }
 
 //==========================================================================
-template <typename T, fly::enable_if_all<fly::JsonTraits::is_array<T>> = 0>
-bool isArray(const T &) noexcept
-{
-    return fly::JsonTraits::is_array_v<T>;
-}
-
-template <typename T, fly::enable_if_not_all<fly::JsonTraits::is_array<T>> = 0>
-bool isArray(const T &) noexcept
+template <typename T>
+bool is_array(const T &) noexcept
 {
     return fly::JsonTraits::is_array_v<T>;
 }
@@ -140,7 +84,7 @@ const auto s_vector = std::vector<int>();
 } // namespace
 
 //==============================================================================
-TEST(JsonTraitsTest, StringTest)
+TEST(JsonTraitsTest, String)
 {
     using string_type = typename fly::JsonTraits::string_type;
     using char_type = typename string_type::value_type;
@@ -157,187 +101,187 @@ TEST(JsonTraitsTest, StringTest)
     const char_type arr1[] = {'g', '\0'};
     char_type arr2[] = {'h', '\0'};
 
-    EXPECT_TRUE(isString(str1));
-    EXPECT_TRUE(isString(str2));
-    EXPECT_TRUE(isString(cstr1));
-    EXPECT_TRUE(isString(cstr2));
-    EXPECT_TRUE(isString(arr1));
-    EXPECT_TRUE(isString(arr2));
+    EXPECT_TRUE(is_string(str1));
+    EXPECT_TRUE(is_string(str2));
+    EXPECT_TRUE(is_string(cstr1));
+    EXPECT_TRUE(is_string(cstr2));
+    EXPECT_TRUE(is_string(arr1));
+    EXPECT_TRUE(is_string(arr2));
 
-    EXPECT_FALSE(isString(s_array));
-    EXPECT_FALSE(isString(s_deque));
-    EXPECT_FALSE(isString(s_forward_list));
-    EXPECT_FALSE(isString(s_list));
-    EXPECT_FALSE(isString(s_map));
-    EXPECT_FALSE(isString(s_multimap));
-    EXPECT_FALSE(isString(s_multiset));
-    EXPECT_FALSE(isString(s_set));
-    EXPECT_FALSE(isString(s_unordered_map));
-    EXPECT_FALSE(isString(s_unordered_multimap));
-    EXPECT_FALSE(isString(s_unordered_multiset));
-    EXPECT_FALSE(isString(s_unordered_set));
-    EXPECT_FALSE(isString(s_vector));
+    EXPECT_FALSE(is_string(s_array));
+    EXPECT_FALSE(is_string(s_deque));
+    EXPECT_FALSE(is_string(s_forward_list));
+    EXPECT_FALSE(is_string(s_list));
+    EXPECT_FALSE(is_string(s_map));
+    EXPECT_FALSE(is_string(s_multimap));
+    EXPECT_FALSE(is_string(s_multiset));
+    EXPECT_FALSE(is_string(s_set));
+    EXPECT_FALSE(is_string(s_unordered_map));
+    EXPECT_FALSE(is_string(s_unordered_multimap));
+    EXPECT_FALSE(is_string(s_unordered_multiset));
+    EXPECT_FALSE(is_string(s_unordered_set));
+    EXPECT_FALSE(is_string(s_vector));
 
-    EXPECT_FALSE(isString(1));
-    EXPECT_FALSE(isString(true));
-    EXPECT_FALSE(isString(3.14159f));
-    EXPECT_FALSE(isString(3.14159f));
-    EXPECT_FALSE(isString(chr1));
-    EXPECT_FALSE(isString(chr2));
+    EXPECT_FALSE(is_string(1));
+    EXPECT_FALSE(is_string(true));
+    EXPECT_FALSE(is_string(3.14159f));
+    EXPECT_FALSE(is_string(3.14159f));
+    EXPECT_FALSE(is_string(chr1));
+    EXPECT_FALSE(is_string(chr2));
 }
 
 //==============================================================================
-TEST(JsonTraitsTest, BoolTest)
+TEST(JsonTraitsTest, Bool)
 {
-    EXPECT_TRUE(isBool(true));
-    EXPECT_TRUE(isBool(false));
+    EXPECT_TRUE(is_bool(true));
+    EXPECT_TRUE(is_bool(false));
 
-    EXPECT_FALSE(isBool(s_array));
-    EXPECT_FALSE(isBool(s_deque));
-    EXPECT_FALSE(isBool(s_forward_list));
-    EXPECT_FALSE(isBool(s_list));
-    EXPECT_FALSE(isBool(s_map));
-    EXPECT_FALSE(isBool(s_multimap));
-    EXPECT_FALSE(isBool(s_multiset));
-    EXPECT_FALSE(isBool(s_set));
-    EXPECT_FALSE(isBool(s_unordered_map));
-    EXPECT_FALSE(isBool(s_unordered_multimap));
-    EXPECT_FALSE(isBool(s_unordered_multiset));
-    EXPECT_FALSE(isBool(s_unordered_set));
-    EXPECT_FALSE(isBool(s_vector));
+    EXPECT_FALSE(is_bool(s_array));
+    EXPECT_FALSE(is_bool(s_deque));
+    EXPECT_FALSE(is_bool(s_forward_list));
+    EXPECT_FALSE(is_bool(s_list));
+    EXPECT_FALSE(is_bool(s_map));
+    EXPECT_FALSE(is_bool(s_multimap));
+    EXPECT_FALSE(is_bool(s_multiset));
+    EXPECT_FALSE(is_bool(s_set));
+    EXPECT_FALSE(is_bool(s_unordered_map));
+    EXPECT_FALSE(is_bool(s_unordered_multimap));
+    EXPECT_FALSE(is_bool(s_unordered_multiset));
+    EXPECT_FALSE(is_bool(s_unordered_set));
+    EXPECT_FALSE(is_bool(s_vector));
 
-    EXPECT_FALSE(isBool(1));
-    EXPECT_FALSE(isBool(-1));
-    EXPECT_FALSE(isBool("foo"));
-    EXPECT_FALSE(isBool(3.14));
+    EXPECT_FALSE(is_bool(1));
+    EXPECT_FALSE(is_bool(-1));
+    EXPECT_FALSE(is_bool("foo"));
+    EXPECT_FALSE(is_bool(3.14));
 }
 
 //==============================================================================
-TEST(JsonTraitsTest, SignedIntegerTest)
+TEST(JsonTraitsTest, SignedInteger)
 {
-    EXPECT_TRUE(isSignedInteger(1));
-    EXPECT_TRUE(isSignedInteger(-1));
+    EXPECT_TRUE(is_signed_integer(1));
+    EXPECT_TRUE(is_signed_integer(-1));
 
-    EXPECT_FALSE(isSignedInteger(s_array));
-    EXPECT_FALSE(isSignedInteger(s_deque));
-    EXPECT_FALSE(isSignedInteger(s_forward_list));
-    EXPECT_FALSE(isSignedInteger(s_list));
-    EXPECT_FALSE(isSignedInteger(s_map));
-    EXPECT_FALSE(isSignedInteger(s_multimap));
-    EXPECT_FALSE(isSignedInteger(s_multiset));
-    EXPECT_FALSE(isSignedInteger(s_set));
-    EXPECT_FALSE(isSignedInteger(s_unordered_map));
-    EXPECT_FALSE(isSignedInteger(s_unordered_multimap));
-    EXPECT_FALSE(isSignedInteger(s_unordered_multiset));
-    EXPECT_FALSE(isSignedInteger(s_unordered_set));
-    EXPECT_FALSE(isSignedInteger(s_vector));
+    EXPECT_FALSE(is_signed_integer(s_array));
+    EXPECT_FALSE(is_signed_integer(s_deque));
+    EXPECT_FALSE(is_signed_integer(s_forward_list));
+    EXPECT_FALSE(is_signed_integer(s_list));
+    EXPECT_FALSE(is_signed_integer(s_map));
+    EXPECT_FALSE(is_signed_integer(s_multimap));
+    EXPECT_FALSE(is_signed_integer(s_multiset));
+    EXPECT_FALSE(is_signed_integer(s_set));
+    EXPECT_FALSE(is_signed_integer(s_unordered_map));
+    EXPECT_FALSE(is_signed_integer(s_unordered_multimap));
+    EXPECT_FALSE(is_signed_integer(s_unordered_multiset));
+    EXPECT_FALSE(is_signed_integer(s_unordered_set));
+    EXPECT_FALSE(is_signed_integer(s_vector));
 
-    EXPECT_FALSE(isSignedInteger("foo"));
-    EXPECT_FALSE(isSignedInteger(3.14));
-    EXPECT_FALSE(isSignedInteger(true));
-    EXPECT_FALSE(isSignedInteger(static_cast<unsigned int>(1)));
+    EXPECT_FALSE(is_signed_integer("foo"));
+    EXPECT_FALSE(is_signed_integer(3.14));
+    EXPECT_FALSE(is_signed_integer(true));
+    EXPECT_FALSE(is_signed_integer(static_cast<unsigned int>(1)));
 }
 
 //==============================================================================
-TEST(JsonTraitsTest, UnsignedIntegerTest)
+TEST(JsonTraitsTest, UnsignedInteger)
 {
-    EXPECT_TRUE(isUnsignedInteger(static_cast<unsigned int>(1)));
-    EXPECT_TRUE(isUnsignedInteger(static_cast<unsigned int>(-1)));
+    EXPECT_TRUE(is_unsigned_integer(static_cast<unsigned int>(1)));
+    EXPECT_TRUE(is_unsigned_integer(static_cast<unsigned int>(-1)));
 
-    EXPECT_FALSE(isUnsignedInteger(s_array));
-    EXPECT_FALSE(isUnsignedInteger(s_deque));
-    EXPECT_FALSE(isUnsignedInteger(s_forward_list));
-    EXPECT_FALSE(isUnsignedInteger(s_list));
-    EXPECT_FALSE(isUnsignedInteger(s_map));
-    EXPECT_FALSE(isUnsignedInteger(s_multimap));
-    EXPECT_FALSE(isUnsignedInteger(s_multiset));
-    EXPECT_FALSE(isUnsignedInteger(s_set));
-    EXPECT_FALSE(isUnsignedInteger(s_unordered_map));
-    EXPECT_FALSE(isUnsignedInteger(s_unordered_multimap));
-    EXPECT_FALSE(isUnsignedInteger(s_unordered_multiset));
-    EXPECT_FALSE(isUnsignedInteger(s_unordered_set));
-    EXPECT_FALSE(isUnsignedInteger(s_vector));
+    EXPECT_FALSE(is_unsigned_integer(s_array));
+    EXPECT_FALSE(is_unsigned_integer(s_deque));
+    EXPECT_FALSE(is_unsigned_integer(s_forward_list));
+    EXPECT_FALSE(is_unsigned_integer(s_list));
+    EXPECT_FALSE(is_unsigned_integer(s_map));
+    EXPECT_FALSE(is_unsigned_integer(s_multimap));
+    EXPECT_FALSE(is_unsigned_integer(s_multiset));
+    EXPECT_FALSE(is_unsigned_integer(s_set));
+    EXPECT_FALSE(is_unsigned_integer(s_unordered_map));
+    EXPECT_FALSE(is_unsigned_integer(s_unordered_multimap));
+    EXPECT_FALSE(is_unsigned_integer(s_unordered_multiset));
+    EXPECT_FALSE(is_unsigned_integer(s_unordered_set));
+    EXPECT_FALSE(is_unsigned_integer(s_vector));
 
-    EXPECT_FALSE(isUnsignedInteger(1));
-    EXPECT_FALSE(isUnsignedInteger(-1));
-    EXPECT_FALSE(isUnsignedInteger("foo"));
-    EXPECT_FALSE(isUnsignedInteger(3.14));
-    EXPECT_FALSE(isUnsignedInteger(true));
+    EXPECT_FALSE(is_unsigned_integer(1));
+    EXPECT_FALSE(is_unsigned_integer(-1));
+    EXPECT_FALSE(is_unsigned_integer("foo"));
+    EXPECT_FALSE(is_unsigned_integer(3.14));
+    EXPECT_FALSE(is_unsigned_integer(true));
 }
 
 //==============================================================================
-TEST(JsonTraitsTest, FloatTest)
+TEST(JsonTraitsTest, Float)
 {
-    EXPECT_TRUE(isFloat(3.14f));
-    EXPECT_TRUE(isFloat(3.14));
-    EXPECT_TRUE(isFloat(static_cast<long double>(3.14)));
+    EXPECT_TRUE(is_floating_point(3.14f));
+    EXPECT_TRUE(is_floating_point(3.14));
+    EXPECT_TRUE(is_floating_point(static_cast<long double>(3.14)));
 
-    EXPECT_FALSE(isFloat(s_array));
-    EXPECT_FALSE(isFloat(s_deque));
-    EXPECT_FALSE(isFloat(s_forward_list));
-    EXPECT_FALSE(isFloat(s_list));
-    EXPECT_FALSE(isFloat(s_map));
-    EXPECT_FALSE(isFloat(s_multimap));
-    EXPECT_FALSE(isFloat(s_multiset));
-    EXPECT_FALSE(isFloat(s_set));
-    EXPECT_FALSE(isFloat(s_unordered_map));
-    EXPECT_FALSE(isFloat(s_unordered_multimap));
-    EXPECT_FALSE(isFloat(s_unordered_multiset));
-    EXPECT_FALSE(isFloat(s_unordered_set));
-    EXPECT_FALSE(isFloat(s_vector));
+    EXPECT_FALSE(is_floating_point(s_array));
+    EXPECT_FALSE(is_floating_point(s_deque));
+    EXPECT_FALSE(is_floating_point(s_forward_list));
+    EXPECT_FALSE(is_floating_point(s_list));
+    EXPECT_FALSE(is_floating_point(s_map));
+    EXPECT_FALSE(is_floating_point(s_multimap));
+    EXPECT_FALSE(is_floating_point(s_multiset));
+    EXPECT_FALSE(is_floating_point(s_set));
+    EXPECT_FALSE(is_floating_point(s_unordered_map));
+    EXPECT_FALSE(is_floating_point(s_unordered_multimap));
+    EXPECT_FALSE(is_floating_point(s_unordered_multiset));
+    EXPECT_FALSE(is_floating_point(s_unordered_set));
+    EXPECT_FALSE(is_floating_point(s_vector));
 
-    EXPECT_FALSE(isFloat(1));
-    EXPECT_FALSE(isFloat(-1));
-    EXPECT_FALSE(isFloat("foo"));
-    EXPECT_FALSE(isFloat(true));
+    EXPECT_FALSE(is_floating_point(1));
+    EXPECT_FALSE(is_floating_point(-1));
+    EXPECT_FALSE(is_floating_point("foo"));
+    EXPECT_FALSE(is_floating_point(true));
 }
 
 //==============================================================================
-TEST(JsonTraitsTest, ObjectTest)
+TEST(JsonTraitsTest, Object)
 {
-    EXPECT_TRUE(isObject(s_map));
-    EXPECT_TRUE(isObject(s_multimap));
-    EXPECT_TRUE(isObject(s_unordered_map));
-    EXPECT_TRUE(isObject(s_unordered_multimap));
+    EXPECT_TRUE(is_object(s_map));
+    EXPECT_TRUE(is_object(s_multimap));
+    EXPECT_TRUE(is_object(s_unordered_map));
+    EXPECT_TRUE(is_object(s_unordered_multimap));
 
-    EXPECT_FALSE(isObject(s_array));
-    EXPECT_FALSE(isObject(s_deque));
-    EXPECT_FALSE(isObject(s_forward_list));
-    EXPECT_FALSE(isObject(s_list));
-    EXPECT_FALSE(isObject(s_multiset));
-    EXPECT_FALSE(isObject(s_set));
-    EXPECT_FALSE(isObject(s_unordered_multiset));
-    EXPECT_FALSE(isObject(s_unordered_set));
-    EXPECT_FALSE(isObject(s_vector));
+    EXPECT_FALSE(is_object(s_array));
+    EXPECT_FALSE(is_object(s_deque));
+    EXPECT_FALSE(is_object(s_forward_list));
+    EXPECT_FALSE(is_object(s_list));
+    EXPECT_FALSE(is_object(s_multiset));
+    EXPECT_FALSE(is_object(s_set));
+    EXPECT_FALSE(is_object(s_unordered_multiset));
+    EXPECT_FALSE(is_object(s_unordered_set));
+    EXPECT_FALSE(is_object(s_vector));
 
-    EXPECT_FALSE(isObject(1));
-    EXPECT_FALSE(isObject(-1));
-    EXPECT_FALSE(isObject("foo"));
-    EXPECT_FALSE(isObject(3.14));
-    EXPECT_FALSE(isObject(true));
+    EXPECT_FALSE(is_object(1));
+    EXPECT_FALSE(is_object(-1));
+    EXPECT_FALSE(is_object("foo"));
+    EXPECT_FALSE(is_object(3.14));
+    EXPECT_FALSE(is_object(true));
 }
 
 //==============================================================================
-TEST(JsonTraitsTest, ArrayTest)
+TEST(JsonTraitsTest, Array)
 {
-    EXPECT_TRUE(isArray(s_array));
-    EXPECT_TRUE(isArray(s_deque));
-    EXPECT_TRUE(isArray(s_forward_list));
-    EXPECT_TRUE(isArray(s_list));
-    EXPECT_TRUE(isArray(s_multiset));
-    EXPECT_TRUE(isArray(s_set));
-    EXPECT_TRUE(isArray(s_unordered_multiset));
-    EXPECT_TRUE(isArray(s_unordered_set));
-    EXPECT_TRUE(isArray(s_vector));
+    EXPECT_TRUE(is_array(s_array));
+    EXPECT_TRUE(is_array(s_deque));
+    EXPECT_TRUE(is_array(s_forward_list));
+    EXPECT_TRUE(is_array(s_list));
+    EXPECT_TRUE(is_array(s_multiset));
+    EXPECT_TRUE(is_array(s_set));
+    EXPECT_TRUE(is_array(s_unordered_multiset));
+    EXPECT_TRUE(is_array(s_unordered_set));
+    EXPECT_TRUE(is_array(s_vector));
 
-    EXPECT_FALSE(isArray(s_map));
-    EXPECT_FALSE(isArray(s_multimap));
-    EXPECT_FALSE(isArray(s_unordered_map));
-    EXPECT_FALSE(isArray(s_unordered_multimap));
+    EXPECT_FALSE(is_array(s_map));
+    EXPECT_FALSE(is_array(s_multimap));
+    EXPECT_FALSE(is_array(s_unordered_map));
+    EXPECT_FALSE(is_array(s_unordered_multimap));
 
-    EXPECT_FALSE(isArray(1));
-    EXPECT_FALSE(isArray(-1));
-    EXPECT_FALSE(isArray("foo"));
-    EXPECT_FALSE(isArray(3.14));
-    EXPECT_FALSE(isArray(true));
+    EXPECT_FALSE(is_array(1));
+    EXPECT_FALSE(is_array(-1));
+    EXPECT_FALSE(is_array("foo"));
+    EXPECT_FALSE(is_array(3.14));
+    EXPECT_FALSE(is_array(true));
 }

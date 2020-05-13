@@ -10,28 +10,28 @@ namespace fly {
 
 //==============================================================================
 PathMonitor::PathMonitor(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<PathConfig> &spConfig) noexcept :
-    m_spTaskRunner(spTaskRunner),
-    m_spConfig(spConfig)
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<PathConfig> &config) noexcept :
+    m_task_runner(task_runner),
+    m_config(config)
 {
 }
 
 //==============================================================================
 PathMonitor::~PathMonitor()
 {
-    RemoveAllPaths();
+    remove_all_paths();
 }
 
 //==============================================================================
-bool PathMonitor::Start() noexcept
+bool PathMonitor::start() noexcept
 {
-    if (IsValid())
+    if (is_valid())
     {
-        std::shared_ptr<PathMonitor> spPathMonitor = shared_from_this();
+        std::shared_ptr<PathMonitor> path_monitor = shared_from_this();
 
-        m_spTask = std::make_shared<PathMonitorTask>(spPathMonitor);
-        m_spTaskRunner->PostTask(m_spTask);
+        m_task = std::make_shared<PathMonitorTask>(path_monitor);
+        m_task_runner->post_task(m_task);
 
         return true;
     }
@@ -40,7 +40,7 @@ bool PathMonitor::Start() noexcept
 }
 
 //==============================================================================
-bool PathMonitor::AddPath(
+bool PathMonitor::add_path(
     const std::filesystem::path &path,
     PathEventCallback callback) noexcept
 {
@@ -57,12 +57,12 @@ bool PathMonitor::AddPath(
     else
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        std::shared_ptr<PathInfo> spInfo = getOrCreatePathInfo(path);
+        PathInfo *info = get_or_create_path_info(path);
 
-        if (spInfo)
+        if (info != nullptr)
         {
             LOGD("Monitoring all files in %s", path);
-            spInfo->m_pathHandler = callback;
+            info->m_path_handler = callback;
 
             return true;
         }
@@ -72,34 +72,34 @@ bool PathMonitor::AddPath(
 }
 
 //==============================================================================
-bool PathMonitor::RemovePath(const std::filesystem::path &path) noexcept
+bool PathMonitor::remove_path(const std::filesystem::path &path) noexcept
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_pathInfo.find(path);
+    auto it = m_path_info.find(path);
 
-    if (it == m_pathInfo.end())
+    if (it == m_path_info.end())
     {
         LOGW("Wasn't monitoring %s", path);
         return false;
     }
 
     LOGI("Removed monitor for %s", path);
-    m_pathInfo.erase(it);
+    m_path_info.erase(it);
 
     return true;
 }
 
 //==============================================================================
-void PathMonitor::RemoveAllPaths() noexcept
+void PathMonitor::remove_all_paths() noexcept
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     LOGI("Removed all monitors");
-    m_pathInfo.clear();
+    m_path_info.clear();
 }
 
 //==============================================================================
-bool PathMonitor::AddFile(
+bool PathMonitor::add_file(
     const std::filesystem::path &file,
     PathEventCallback callback) noexcept
 {
@@ -120,13 +120,12 @@ bool PathMonitor::AddFile(
     else
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        std::shared_ptr<PathInfo> spInfo =
-            getOrCreatePathInfo(file.parent_path());
+        PathInfo *info = get_or_create_path_info(file.parent_path());
 
-        if (spInfo)
+        if (info != nullptr)
         {
             LOGD("Monitoring file %s", file);
-            spInfo->m_fileHandlers[file.filename()] = callback;
+            info->m_file_handlers[file.filename()] = callback;
 
             return true;
         }
@@ -136,64 +135,61 @@ bool PathMonitor::AddFile(
 }
 
 //==============================================================================
-bool PathMonitor::RemoveFile(const std::filesystem::path &file) noexcept
+bool PathMonitor::remove_file(const std::filesystem::path &file) noexcept
 {
-    bool removePath = false;
+    bool prune_path = false;
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        auto it = m_pathInfo.find(file.parent_path());
+        auto path_it = m_path_info.find(file.parent_path());
 
-        if (it == m_pathInfo.end())
+        if (path_it == m_path_info.end())
         {
             LOGW("Wasn't monitoring %s", file);
             return false;
         }
 
-        std::shared_ptr<PathInfo> spInfo(it->second);
-        auto it2 = spInfo->m_fileHandlers.find(file.filename());
+        PathInfo *info = path_it->second.get();
+        auto file_it = info->m_file_handlers.find(file.filename());
 
-        if (it2 == spInfo->m_fileHandlers.end())
+        if (file_it == info->m_file_handlers.end())
         {
             LOGW("Wasn't monitoring %s", file);
             return false;
         }
 
         LOGD("Stopped monitoring %s", file);
-        spInfo->m_fileHandlers.erase(it2);
+        info->m_file_handlers.erase(file_it);
 
-        removePath = spInfo->m_fileHandlers.empty() && !(spInfo->m_pathHandler);
+        prune_path = info->m_file_handlers.empty() && !(info->m_path_handler);
     }
 
-    return removePath ? RemovePath(file.parent_path()) : true;
+    return prune_path ? remove_path(file.parent_path()) : true;
 }
 
 //==============================================================================
-std::shared_ptr<PathMonitor::PathInfo>
-PathMonitor::getOrCreatePathInfo(const std::filesystem::path &path) noexcept
+PathMonitor::PathInfo *
+PathMonitor::get_or_create_path_info(const std::filesystem::path &path) noexcept
 {
-    std::shared_ptr<PathInfo> spInfo;
+    PathInfo *info = nullptr;
 
-    auto it = m_pathInfo.find(path);
+    auto it = m_path_info.find(path);
 
-    if (it == m_pathInfo.end())
+    if (it == m_path_info.end())
     {
-        spInfo = CreatePathInfo(path);
+        std::unique_ptr<PathInfo> created_info = create_path_info(path);
 
-        if (spInfo && spInfo->IsValid())
+        if (created_info && created_info->is_valid())
         {
-            m_pathInfo[path] = spInfo;
-        }
-        else
-        {
-            spInfo.reset();
+            info = created_info.get();
+            m_path_info[path] = std::move(created_info);
         }
     }
     else
     {
-        spInfo = it->second;
+        info = it->second.get();
     }
 
-    return spInfo;
+    return info;
 }
 
 //==============================================================================
@@ -224,24 +220,24 @@ operator<<(std::ostream &stream, PathMonitor::PathEvent event) noexcept
 
 //==============================================================================
 PathMonitorTask::PathMonitorTask(
-    std::weak_ptr<PathMonitor> wpPathMonitor) noexcept :
+    std::weak_ptr<PathMonitor> weak_path_monitor) noexcept :
     Task(),
-    m_wpPathMonitor(wpPathMonitor)
+    m_weak_path_monitor(weak_path_monitor)
 {
 }
 
 //==============================================================================
-void PathMonitorTask::Run() noexcept
+void PathMonitorTask::run() noexcept
 {
-    std::shared_ptr<PathMonitor> spPathMonitor = m_wpPathMonitor.lock();
+    std::shared_ptr<PathMonitor> path_monitor = m_weak_path_monitor.lock();
 
-    if (spPathMonitor && spPathMonitor->IsValid())
+    if (path_monitor && path_monitor->is_valid())
     {
-        spPathMonitor->Poll(spPathMonitor->m_spConfig->PollInterval());
+        path_monitor->poll(path_monitor->m_config->poll_interval());
 
-        if (spPathMonitor->IsValid())
+        if (path_monitor->is_valid())
         {
-            spPathMonitor->m_spTaskRunner->PostTask(spPathMonitor->m_spTask);
+            path_monitor->m_task_runner->post_task(path_monitor->m_task);
         }
     }
 }

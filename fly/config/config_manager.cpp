@@ -14,26 +14,26 @@ namespace fly {
 
 //==============================================================================
 ConfigManager::ConfigManager(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    ConfigFileType fileType,
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    ConfigFileType file_type,
     const std::filesystem::path &path) noexcept :
     m_path(path),
-    m_spTaskRunner(spTaskRunner)
+    m_task_runner(task_runner)
 {
-    switch (fileType)
+    switch (file_type)
     {
         case ConfigFileType::Ini:
-            m_spParser = std::make_shared<IniParser>();
+            m_parser = std::make_unique<IniParser>();
             break;
 
         case ConfigFileType::Json:
-            m_spParser = std::make_shared<JsonParser>();
+            m_parser = std::make_unique<JsonParser>();
             break;
 
         default:
             LOGE(
                 "Unrecognized configuration type: %d",
-                static_cast<int>(fileType));
+                static_cast<int>(file_type));
             break;
     }
 }
@@ -41,22 +41,22 @@ ConfigManager::ConfigManager(
 //==============================================================================
 ConfigManager::~ConfigManager()
 {
-    if (m_spMonitor)
+    if (m_monitor)
     {
-        m_spMonitor->RemoveFile(m_path);
+        m_monitor->remove_file(m_path);
     }
 }
 
 //==============================================================================
-ConfigManager::ConfigMap::size_type ConfigManager::GetSize() noexcept
+ConfigManager::ConfigMap::size_type ConfigManager::prune() noexcept
 {
-    std::lock_guard<std::mutex> lock(m_configsMutex);
+    std::lock_guard<std::mutex> lock(m_configs_mutex);
 
     for (auto it = m_configs.begin(); it != m_configs.end();)
     {
-        std::shared_ptr<Config> spConfig = it->second.lock();
+        std::shared_ptr<Config> config = it->second.lock();
 
-        if (spConfig)
+        if (config)
         {
             ++it;
         }
@@ -70,38 +70,39 @@ ConfigManager::ConfigMap::size_type ConfigManager::GetSize() noexcept
 }
 
 //==============================================================================
-bool ConfigManager::Start() noexcept
+bool ConfigManager::start() noexcept
 {
-    if (m_spParser)
+    if (m_parser)
     {
-        m_spMonitor = std::make_shared<PathMonitorImpl>(
-            m_spTaskRunner,
-            CreateConfig<PathConfig>());
+        m_monitor = std::make_shared<PathMonitorImpl>(
+            m_task_runner,
+            create_config<PathConfig>());
 
-        if (m_spMonitor->Start())
+        if (m_monitor->start())
         {
-            std::weak_ptr<ConfigManager> wpConfigManager = shared_from_this();
+            std::weak_ptr<ConfigManager> weak_config_manager =
+                shared_from_this();
 
-            m_spTask = std::make_shared<ConfigUpdateTask>(wpConfigManager);
-            std::weak_ptr<Task> wpTask = m_spTask;
+            m_task = std::make_shared<ConfigUpdateTask>(weak_config_manager);
+            std::weak_ptr<Task> weak_task = m_task;
 
             // Formatter badly handles hanging indent in lambda parameters
             // clang-format off
-            auto callback = [wpConfigManager, wpTask](
+            auto callback = [weak_config_manager, weak_task](
                 const std::filesystem::path &,
                 PathMonitor::PathEvent)
             {
-                auto spConfigManager = wpConfigManager.lock();
-                auto spTask = wpTask.lock();
+                auto config_manager = weak_config_manager.lock();
+                auto task = weak_task.lock();
 
-                if (spConfigManager && spTask)
+                if (config_manager && task)
                 {
-                    spConfigManager->m_spTaskRunner->PostTask(spTask);
+                    config_manager->m_task_runner->post_task(task);
                 }
             };
             // clang-format on
 
-            return m_spMonitor->AddFile(m_path, callback);
+            return m_monitor->add_file(m_path, callback);
         }
     }
 
@@ -109,13 +110,13 @@ bool ConfigManager::Start() noexcept
 }
 
 //==============================================================================
-void ConfigManager::updateConfig() noexcept
+void ConfigManager::update_config() noexcept
 {
-    std::lock_guard<std::mutex> lock(m_configsMutex);
+    std::lock_guard<std::mutex> lock(m_configs_mutex);
 
     try
     {
-        m_values = m_spParser->ParseFile(m_path);
+        m_values = m_parser->parse_file(m_path);
     }
     catch (const ParserException &)
     {
@@ -123,15 +124,15 @@ void ConfigManager::updateConfig() noexcept
         m_values = nullptr;
     }
 
-    if (m_values.IsObject() || m_values.IsNull())
+    if (m_values.is_object() || m_values.is_null())
     {
         for (auto it = m_configs.begin(); it != m_configs.end();)
         {
-            std::shared_ptr<Config> spConfig = it->second.lock();
+            std::shared_ptr<Config> config = it->second.lock();
 
-            if (spConfig)
+            if (config)
             {
-                spConfig->Update(m_values[it->first]);
+                config->update(m_values[it->first]);
                 ++it;
             }
             else
@@ -149,20 +150,21 @@ void ConfigManager::updateConfig() noexcept
 
 //==============================================================================
 ConfigUpdateTask::ConfigUpdateTask(
-    std::weak_ptr<ConfigManager> wpConfigManager) noexcept :
+    std::weak_ptr<ConfigManager> weak_config_manager) noexcept :
     Task(),
-    m_wpConfigManager(wpConfigManager)
+    m_weak_config_manager(weak_config_manager)
 {
 }
 
 //==============================================================================
-void ConfigUpdateTask::Run() noexcept
+void ConfigUpdateTask::run() noexcept
 {
-    std::shared_ptr<ConfigManager> spConfigManager = m_wpConfigManager.lock();
+    std::shared_ptr<ConfigManager> config_manager =
+        m_weak_config_manager.lock();
 
-    if (spConfigManager)
+    if (config_manager)
     {
-        spConfigManager->updateConfig();
+        config_manager->update_config();
     }
 }
 

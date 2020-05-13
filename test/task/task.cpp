@@ -20,13 +20,13 @@ public:
     {
     }
 
-    int GetCount() const noexcept
+    int get_count() const noexcept
     {
         return m_count.load();
     }
 
 protected:
-    void Run() noexcept override
+    void run() noexcept override
     {
         ++m_count;
     }
@@ -39,20 +39,20 @@ private:
 class MarkerTask : public fly::Task
 {
 public:
-    MarkerTask(fly::ConcurrentQueue<int> *pOrdering, int marker) noexcept :
-        m_pOrdering(pOrdering),
+    MarkerTask(fly::ConcurrentQueue<int> *ordering, int marker) noexcept :
+        m_ordering(ordering),
         m_marker(marker)
     {
     }
 
 protected:
-    void Run() noexcept override
+    void run() noexcept override
     {
-        m_pOrdering->Push(std::move(m_marker));
+        m_ordering->push(std::move(m_marker));
     }
 
 private:
-    fly::ConcurrentQueue<int> *m_pOrdering;
+    fly::ConcurrentQueue<int> *m_ordering;
     int m_marker;
 };
 
@@ -62,7 +62,7 @@ private:
 class TaskTest : public ::testing::Test
 {
 public:
-    TaskTest() noexcept : m_spTaskManager(std::make_shared<fly::TaskManager>(1))
+    TaskTest() noexcept : m_task_manager(std::make_shared<fly::TaskManager>(1))
     {
     }
 
@@ -71,7 +71,7 @@ public:
      */
     void SetUp() noexcept override
     {
-        ASSERT_TRUE(m_spTaskManager->Start());
+        ASSERT_TRUE(m_task_manager->start());
     }
 
     /**
@@ -79,252 +79,252 @@ public:
      */
     void TearDown() noexcept override
     {
-        ASSERT_TRUE(m_spTaskManager->Stop());
+        ASSERT_TRUE(m_task_manager->stop());
     }
 
 protected:
-    std::shared_ptr<fly::TaskManager> m_spTaskManager;
+    std::shared_ptr<fly::TaskManager> m_task_manager;
 };
 
 //==============================================================================
-TEST_F(TaskTest, MultipleStartTest)
+TEST_F(TaskTest, MultipleStart)
 {
-    ASSERT_FALSE(m_spTaskManager->Start());
+    ASSERT_FALSE(m_task_manager->start());
 }
 
 //==============================================================================
-TEST_F(TaskTest, MultipleStopTest)
+TEST_F(TaskTest, MultipleStop)
 {
-    auto spTaskManager(std::make_shared<fly::TaskManager>(1));
-    ASSERT_TRUE(spTaskManager->Start());
+    auto task_manager = std::make_shared<fly::TaskManager>(1);
+    ASSERT_TRUE(task_manager->start());
 
-    ASSERT_TRUE(spTaskManager->Stop());
-    ASSERT_FALSE(spTaskManager->Stop());
+    ASSERT_TRUE(task_manager->stop());
+    ASSERT_FALSE(task_manager->stop());
 }
 
 //==============================================================================
-TEST_F(TaskTest, ParallelTaskRunnerTest)
+TEST_F(TaskTest, ParallelTaskRunner)
 {
-    auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableParallelTaskRunner>());
+    auto task_runner =
+        m_task_manager->create_task_runner<fly::WaitableParallelTaskRunner>();
 
-    auto spTask(std::make_shared<CountTask>());
+    auto task = std::make_shared<CountTask>();
 
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask));
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask));
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask));
+    EXPECT_TRUE(task_runner->post_task(task));
+    EXPECT_TRUE(task_runner->post_task(task));
+    EXPECT_TRUE(task_runner->post_task(task));
 
-    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
-    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
-    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
+    task_runner->wait_for_task_to_complete<CountTask>();
+    task_runner->wait_for_task_to_complete<CountTask>();
+    task_runner->wait_for_task_to_complete<CountTask>();
 }
 
 //==============================================================================
-TEST_F(TaskTest, SequencedTaskRunnerTest)
+TEST_F(TaskTest, SequencedTaskRunner)
 {
-    auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
+    auto task_runner =
+        m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
 
     int marker = 0;
     fly::ConcurrentQueue<int> ordering;
 
-    auto spTask1(std::make_shared<MarkerTask>(&ordering, 1));
-    auto spTask2(std::make_shared<MarkerTask>(&ordering, 2));
-    auto spTask3(std::make_shared<MarkerTask>(&ordering, 3));
+    auto task1 = std::make_shared<MarkerTask>(&ordering, 1);
+    auto task2 = std::make_shared<MarkerTask>(&ordering, 2);
+    auto task3 = std::make_shared<MarkerTask>(&ordering, 3);
 
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask1));
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask2));
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask3));
+    EXPECT_TRUE(task_runner->post_task(task1));
+    EXPECT_TRUE(task_runner->post_task(task2));
+    EXPECT_TRUE(task_runner->post_task(task3));
 
-    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
-    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
-    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+    task_runner->wait_for_task_to_complete<MarkerTask>();
+    task_runner->wait_for_task_to_complete<MarkerTask>();
+    task_runner->wait_for_task_to_complete<MarkerTask>();
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 1);
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 2);
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 3);
 }
 
 //==============================================================================
-TEST_F(TaskTest, DelayTaskTest)
+TEST_F(TaskTest, DelayTask)
 {
-    auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
+    auto task_runner =
+        m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
 
-    auto spTask(std::make_shared<CountTask>());
-    EXPECT_EQ(spTask->GetCount(), 0);
+    auto task = std::make_shared<CountTask>();
+    EXPECT_EQ(task->get_count(), 0);
 
     EXPECT_TRUE(
-        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10)));
+        task_runner->post_task_with_delay(task, std::chrono::milliseconds(10)));
 
-    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
-    EXPECT_EQ(spTask->GetCount(), 1);
+    task_runner->wait_for_task_to_complete<CountTask>();
+    EXPECT_EQ(task->get_count(), 1);
 }
 
 //==============================================================================
-TEST_F(TaskTest, ImmediateAndDelayTaskTest)
+TEST_F(TaskTest, ImmediateAndDelayTask)
 {
-    auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
+    auto task_runner =
+        m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
 
     int marker = 0;
     fly::ConcurrentQueue<int> ordering;
 
-    auto spTask1(std::make_shared<MarkerTask>(&ordering, 1));
-    auto spTask2(std::make_shared<MarkerTask>(&ordering, 2));
-    auto spTask3(std::make_shared<MarkerTask>(&ordering, 3));
+    auto task1 = std::make_shared<MarkerTask>(&ordering, 1);
+    auto task2 = std::make_shared<MarkerTask>(&ordering, 2);
+    auto task3 = std::make_shared<MarkerTask>(&ordering, 3);
 
-    EXPECT_TRUE(spTaskRunner->PostTaskWithDelay(
-        spTask1,
+    EXPECT_TRUE(task_runner->post_task_with_delay(
+        task1,
         std::chrono::milliseconds(10)));
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask2));
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask3));
+    EXPECT_TRUE(task_runner->post_task(task2));
+    EXPECT_TRUE(task_runner->post_task(task3));
 
-    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
-    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
-    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+    task_runner->wait_for_task_to_complete<MarkerTask>();
+    task_runner->wait_for_task_to_complete<MarkerTask>();
+    task_runner->wait_for_task_to_complete<MarkerTask>();
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 2);
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 3);
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 1);
 }
 
 //==============================================================================
-TEST_F(TaskTest, CancelTaskTest)
+TEST_F(TaskTest, CancelTask)
 {
-    auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
+    auto task_runner =
+        m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
 
     {
-        auto spTask(std::make_shared<CountTask>());
-        EXPECT_EQ(spTask->GetCount(), 0);
+        auto task = std::make_shared<CountTask>();
+        EXPECT_EQ(task->get_count(), 0);
 
-        EXPECT_TRUE(spTaskRunner->PostTaskWithDelay(
-            spTask,
+        EXPECT_TRUE(task_runner->post_task_with_delay(
+            task,
             std::chrono::milliseconds(10)));
     }
 
-    EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
+    EXPECT_FALSE(task_runner->wait_for_task_to_complete<CountTask>(
         std::chrono::milliseconds(20)));
 }
 
 //==============================================================================
-TEST_F(TaskTest, ImmediateAndDelayCancelTaskTest)
+TEST_F(TaskTest, ImmediateAndDelayCancelTask)
 {
-    auto spTaskRunner(
-        m_spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
+    auto task_runner =
+        m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
 
     int marker = 0;
     fly::ConcurrentQueue<int> ordering;
 
     {
-        auto spTask1(std::make_shared<CountTask>());
-        EXPECT_EQ(spTask1->GetCount(), 0);
+        auto task1 = std::make_shared<CountTask>();
+        EXPECT_EQ(task1->get_count(), 0);
 
-        EXPECT_TRUE(spTaskRunner->PostTaskWithDelay(
-            spTask1,
+        EXPECT_TRUE(task_runner->post_task_with_delay(
+            task1,
             std::chrono::milliseconds(10)));
     }
 
-    auto spTask2(std::make_shared<MarkerTask>(&ordering, 2));
-    auto spTask3(std::make_shared<MarkerTask>(&ordering, 3));
+    auto task2 = std::make_shared<MarkerTask>(&ordering, 2);
+    auto task3 = std::make_shared<MarkerTask>(&ordering, 3);
 
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask2));
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask3));
+    EXPECT_TRUE(task_runner->post_task(task2));
+    EXPECT_TRUE(task_runner->post_task(task3));
 
-    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
-    spTaskRunner->WaitForTaskTypeToComplete<MarkerTask>();
+    task_runner->wait_for_task_to_complete<MarkerTask>();
+    task_runner->wait_for_task_to_complete<MarkerTask>();
 
-    EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
+    EXPECT_FALSE(task_runner->wait_for_task_to_complete<CountTask>(
         std::chrono::milliseconds(20)));
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 2);
 
-    ordering.Pop(marker);
+    ordering.pop(marker);
     EXPECT_EQ(marker, 3);
 }
 
 //==============================================================================
-TEST_F(TaskTest, RunnerBeforeManagerStartedTest)
+TEST_F(TaskTest, RunnerBeforeManagerStarted)
 {
-    auto spTask(std::make_shared<CountTask>());
-    EXPECT_EQ(spTask->GetCount(), 0);
+    auto task = std::make_shared<CountTask>();
+    EXPECT_EQ(task->get_count(), 0);
 
-    auto spTaskManager(std::make_shared<fly::TaskManager>(1));
-    auto spTaskRunner(
-        spTaskManager->CreateTaskRunner<fly::WaitableSequencedTaskRunner>());
+    auto task_manager = std::make_shared<fly::TaskManager>(1);
+    auto task_runner =
+        task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
 
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask));
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask));
-    EXPECT_TRUE(spTaskRunner->PostTask(spTask));
+    EXPECT_TRUE(task_runner->post_task(task));
+    EXPECT_TRUE(task_runner->post_task(task));
+    EXPECT_TRUE(task_runner->post_task(task));
 
-    EXPECT_FALSE(spTaskRunner->WaitForTaskTypeToComplete<CountTask>(
+    EXPECT_FALSE(task_runner->wait_for_task_to_complete<CountTask>(
         std::chrono::milliseconds(20)));
 
-    EXPECT_EQ(spTask->GetCount(), 0);
+    EXPECT_EQ(task->get_count(), 0);
 
-    ASSERT_TRUE(spTaskManager->Start());
+    ASSERT_TRUE(task_manager->start());
 
-    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
-    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
-    spTaskRunner->WaitForTaskTypeToComplete<CountTask>();
+    task_runner->wait_for_task_to_complete<CountTask>();
+    task_runner->wait_for_task_to_complete<CountTask>();
+    task_runner->wait_for_task_to_complete<CountTask>();
 
-    EXPECT_EQ(spTask->GetCount(), 3);
+    EXPECT_EQ(task->get_count(), 3);
 
-    ASSERT_TRUE(spTaskManager->Stop());
+    ASSERT_TRUE(task_manager->stop());
 }
 
 //==============================================================================
-TEST_F(TaskTest, ParallelRunnerAfterManagerDeletedTest)
+TEST_F(TaskTest, ParallelRunnerAfterManagerDeleted)
 {
-    auto spTask(std::make_shared<CountTask>());
-    EXPECT_EQ(spTask->GetCount(), 0);
+    auto task = std::make_shared<CountTask>();
+    EXPECT_EQ(task->get_count(), 0);
 
-    auto spTaskManager(std::make_shared<fly::TaskManager>(1));
-    ASSERT_TRUE(spTaskManager->Start());
+    auto task_manager = std::make_shared<fly::TaskManager>(1);
+    ASSERT_TRUE(task_manager->start());
 
-    auto spTaskRunner(
-        spTaskManager->CreateTaskRunner<fly::ParallelTaskRunner>());
+    auto task_runner =
+        task_manager->create_task_runner<fly::ParallelTaskRunner>();
 
-    ASSERT_TRUE(spTaskManager->Stop());
-    spTaskManager.reset();
+    ASSERT_TRUE(task_manager->stop());
+    task_manager.reset();
 
-    EXPECT_FALSE(spTaskRunner->PostTask(spTask));
+    EXPECT_FALSE(task_runner->post_task(task));
     EXPECT_FALSE(
-        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10)));
+        task_runner->post_task_with_delay(task, std::chrono::milliseconds(10)));
 
-    EXPECT_EQ(spTask->GetCount(), 0);
+    EXPECT_EQ(task->get_count(), 0);
 }
 
 //==============================================================================
-TEST_F(TaskTest, SequencedRunnerAfterManagerDeletedTest)
+TEST_F(TaskTest, SequencedRunnerAfterManagerDeleted)
 {
-    auto spTask(std::make_shared<CountTask>());
-    EXPECT_EQ(spTask->GetCount(), 0);
+    auto task = std::make_shared<CountTask>();
+    EXPECT_EQ(task->get_count(), 0);
 
-    auto spTaskManager(std::make_shared<fly::TaskManager>(1));
-    ASSERT_TRUE(spTaskManager->Start());
+    auto task_manager = std::make_shared<fly::TaskManager>(1);
+    ASSERT_TRUE(task_manager->start());
 
-    auto spTaskRunner(
-        spTaskManager->CreateTaskRunner<fly::SequencedTaskRunner>());
+    auto task_runner =
+        task_manager->create_task_runner<fly::SequencedTaskRunner>();
 
-    ASSERT_TRUE(spTaskManager->Stop());
-    spTaskManager.reset();
+    ASSERT_TRUE(task_manager->stop());
+    task_manager.reset();
 
-    EXPECT_FALSE(spTaskRunner->PostTask(spTask));
+    EXPECT_FALSE(task_runner->post_task(task));
     EXPECT_FALSE(
-        spTaskRunner->PostTaskWithDelay(spTask, std::chrono::milliseconds(10)));
+        task_runner->post_task_with_delay(task, std::chrono::milliseconds(10)));
 
-    EXPECT_EQ(spTask->GetCount(), 0);
+    EXPECT_EQ(task->get_count(), 0);
 }

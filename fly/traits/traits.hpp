@@ -106,7 +106,7 @@ template <template <typename> class Declaration>
 struct DeclarationTraits
 {
 private:
-    struct __test__
+    struct Test
     {
         template <typename T>
         static constexpr auto test(T *) -> Declaration<T>;
@@ -118,7 +118,7 @@ private:
 public:
     template <typename T>
     using is_declared = std::negation<std::is_same<
-        decltype(__test__::template test<T>(nullptr)),
+        decltype(Test::template test<T>(nullptr)),
         std::false_type>>;
 
     template <typename T>

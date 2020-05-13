@@ -26,121 +26,121 @@ public:
     /**
      * Move an item onto the container.
      *
-     * @param T Reference to an object of type T to push onto the container.
+     * @param item Item to push onto the container.
      */
-    void Push(T &&) noexcept;
+    void push(T &&item) noexcept;
 
     /**
      * Pop an item from the container. If the container is empty, wait
      * indefinitely for item to be available.
      *
-     * @param T Reference to an object of type T where the item will be stored.
+     * @param item Location to store the popped item.
      */
-    void Pop(T &) noexcept;
+    void pop(T &item) noexcept;
 
     /**
      * Pop an item from the container. If the container is empty, wait (at most)
      * for the specified amount of time for an item to be available.
      *
-     * @param T Reference to an object of type T where the item will be stored.
+     * @param item Location to store the popped item.
      * @param duration The amount of time to wait.
      *
      * @return True if an object was popped in the given duration.
      */
     template <typename R, typename P>
-    bool Pop(T &, std::chrono::duration<R, P>) noexcept;
+    bool pop(T &item, std::chrono::duration<R, P> duration) noexcept;
 
     /**
-     * @return True if the container is empty, false otherwise.
+     * @return True if the container is empty.
      */
-    bool IsEmpty() const noexcept;
+    bool empty() const noexcept;
 
     /**
      * @return The number of items in the container.
      */
-    size_type Size() const noexcept;
+    size_type size() const noexcept;
 
 protected:
     /**
      * Implementation-specific method to move an item onto the container.
      *
-     * @param T Reference to an object of type T to push onto the container.
+     * @param item Item to push onto the container.
      */
-    virtual void push(T &&) noexcept = 0;
+    virtual void push_internal(T &&item) noexcept = 0;
 
     /**
      * Implementation-specific method to pop an item from the container.
      *
-     * @param T Reference to an object of type T where the item will be stored.
+     * @param item Location to store the popped item.
      */
-    virtual void pop(T &) noexcept = 0;
+    virtual void pop_internal(T &item) noexcept = 0;
 
-    mutable std::mutex m_containerMutex;
+    mutable std::mutex m_container_mutex;
     Container m_container;
 
 private:
-    std::condition_variable m_pushCondition;
+    std::condition_variable m_push_condition;
 };
 
 //==============================================================================
 template <typename T, typename Container>
-void ConcurrentContainer<T, Container>::Push(T &&item) noexcept
+void ConcurrentContainer<T, Container>::push(T &&item) noexcept
 {
     {
-        std::unique_lock<std::mutex> lock(m_containerMutex);
-        push(std::move(item));
+        std::unique_lock<std::mutex> lock(m_container_mutex);
+        push_internal(std::move(item));
     }
 
-    m_pushCondition.notify_one();
+    m_push_condition.notify_one();
 }
 
 //==============================================================================
 template <typename T, typename Container>
-void ConcurrentContainer<T, Container>::Pop(T &item) noexcept
+void ConcurrentContainer<T, Container>::pop(T &item) noexcept
 {
-    std::unique_lock<std::mutex> lock(m_containerMutex);
+    std::unique_lock<std::mutex> lock(m_container_mutex);
 
     while (m_container.empty())
     {
-        m_pushCondition.wait(lock);
+        m_push_condition.wait(lock);
     }
 
-    pop(item);
+    pop_internal(item);
 }
 
 //==============================================================================
 template <typename T, typename Container>
 template <typename R, typename P>
-bool ConcurrentContainer<T, Container>::Pop(
+bool ConcurrentContainer<T, Container>::pop(
     T &item,
-    std::chrono::duration<R, P> waitTime) noexcept
+    std::chrono::duration<R, P> wait_time) noexcept
 {
-    std::unique_lock<std::mutex> lock(m_containerMutex);
+    std::unique_lock<std::mutex> lock(m_container_mutex);
 
     auto empty_test = [&] { return !m_container.empty(); };
-    bool itemPopped = m_pushCondition.wait_for(lock, waitTime, empty_test);
+    bool item_popped = m_push_condition.wait_for(lock, wait_time, empty_test);
 
-    if (itemPopped)
+    if (item_popped)
     {
-        pop(item);
+        pop_internal(item);
     }
 
-    return itemPopped;
+    return item_popped;
 }
 
 //==============================================================================
 template <typename T, typename Container>
-bool ConcurrentContainer<T, Container>::IsEmpty() const noexcept
+bool ConcurrentContainer<T, Container>::empty() const noexcept
 {
-    std::unique_lock<std::mutex> lock(m_containerMutex);
+    std::unique_lock<std::mutex> lock(m_container_mutex);
     return m_container.empty();
 }
 
 //==============================================================================
 template <typename T, typename Container>
-auto ConcurrentContainer<T, Container>::Size() const noexcept -> size_type
+auto ConcurrentContainer<T, Container>::size() const noexcept -> size_type
 {
-    std::unique_lock<std::mutex> lock(m_containerMutex);
+    std::unique_lock<std::mutex> lock(m_container_mutex);
     return m_container.size();
 }
 

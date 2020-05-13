@@ -14,16 +14,16 @@ namespace fly::detail {
  * @tparam Literals Variadic list of characters to parse.
  */
 template <typename T, T Base, char... Literals>
-struct aggregator;
+struct Aggregator;
 
 // Specialization to convert the current character being parsed to an integer
 // and recurse on the remainder of the characters.
 template <typename T, T Base, char Digit, char... Literals>
-struct aggregator<T, Base, Digit, Literals...>
+struct Aggregator<T, Base, Digit, Literals...>
 {
     constexpr static T aggregate(T aggregated)
     {
-        return aggregator<T, Base, Literals...>::aggregate(
+        return Aggregator<T, Base, Literals...>::aggregate(
             aggregated * Base + parse_and_validate_literal());
     }
 
@@ -32,7 +32,7 @@ private:
      * Convert the current character being parsed to an integer literal.
      * Validate that the character fits within its base.
      *
-     * @return T The result of conversion.
+     * @return The result of conversion.
      */
     constexpr static T parse_and_validate_literal()
     {
@@ -63,18 +63,18 @@ private:
 // Specialization to simply ignore a separator character and recurse on the
 // remainder of the characters.
 template <typename T, T Base, char... Literals>
-struct aggregator<T, Base, '\'', Literals...>
+struct Aggregator<T, Base, '\'', Literals...>
 {
     constexpr static T aggregate(T aggregated)
     {
-        return aggregator<T, Base, Literals...>::aggregate(aggregated);
+        return Aggregator<T, Base, Literals...>::aggregate(aggregated);
     }
 };
 
 // Specialization to terminate agregation when there are no more characters to
 // be parsed.
 template <typename T, T Base>
-struct aggregator<T, Base>
+struct Aggregator<T, Base>
 {
     constexpr static T aggregate(T aggregated)
     {
@@ -96,45 +96,45 @@ struct aggregator<T, Base>
  * @tparam Literals Variadic list of characters to parse.
  */
 template <typename T, T Base, char... Literals>
-struct parser_base
+struct ParserBase
 {
     static constexpr T parse()
     {
-        return aggregator<T, Base, Literals...>::aggregate(static_cast<T>(0));
+        return Aggregator<T, Base, Literals...>::aggregate(static_cast<T>(0));
     }
 };
 
 // Decimal default.
 template <typename T, char... Literals>
-struct parser : parser_base<T, 10, Literals...>
+struct Parser : ParserBase<T, 10, Literals...>
 {
 };
 
 // Binary specializations.
 template <typename T, char... Literals>
-struct parser<T, '0', 'b', Literals...> : parser_base<T, 2, Literals...>
+struct Parser<T, '0', 'b', Literals...> : ParserBase<T, 2, Literals...>
 {
 };
 
 template <typename T, char... Literals>
-struct parser<T, '0', 'B', Literals...> : parser_base<T, 2, Literals...>
+struct Parser<T, '0', 'B', Literals...> : ParserBase<T, 2, Literals...>
 {
 };
 
 // Octal specializations.
 template <typename T, char... Literals>
-struct parser<T, '0', Literals...> : parser_base<T, 8, Literals...>
+struct Parser<T, '0', Literals...> : ParserBase<T, 8, Literals...>
 {
 };
 
 // Hexadecimal specializations.
 template <typename T, char... Literals>
-struct parser<T, '0', 'x', Literals...> : parser_base<T, 16, Literals...>
+struct Parser<T, '0', 'x', Literals...> : ParserBase<T, 16, Literals...>
 {
 };
 
 template <typename T, char... Literals>
-struct parser<T, '0', 'X', Literals...> : parser_base<T, 16, Literals...>
+struct Parser<T, '0', 'X', Literals...> : ParserBase<T, 16, Literals...>
 {
 };
 
@@ -145,8 +145,8 @@ struct parser<T, '0', 'X', Literals...> : parser_base<T, 16, Literals...>
  * @tparam From The current integer literal type.
  * @tparam To The desired integer literal type.
  * @tparam Value The value to convert.
-
- * @return T The converted integer literal.
+ *
+ * @return The converted integer literal.
  */
 template <typename From, typename To, From Value>
 constexpr To validate_and_convert()
@@ -164,19 +164,19 @@ constexpr To validate_and_convert()
  * @tparam T The desired integer literal type.
  * @tparam Literals Variadic list of characters to parse.
  *
- * @return T The parsed integer literal.
+ * @return The parsed integer literal.
  */
 template <typename T, char... Literals>
 constexpr T literal()
 {
     if constexpr (std::is_signed_v<T>)
     {
-        constexpr auto value = parser<long long, Literals...>::parse();
+        constexpr auto value = Parser<long long, Literals...>::parse();
         return validate_and_convert<decltype(value), T, value>();
     }
     else
     {
-        constexpr auto value = parser<unsigned long long, Literals...>::parse();
+        constexpr auto value = Parser<unsigned long long, Literals...>::parse();
         return validate_and_convert<decltype(value), T, value>();
     }
 }

@@ -80,8 +80,8 @@ template <typename DataType>
 struct EndianTest : public ::testing::Test
 {
 protected:
-    template <fly::Endian desired>
-    void RunTest()
+    template <fly::Endian Desired>
+    void run_test()
     {
         constexpr DataType iterations = 100;
         const DataType step = std::numeric_limits<DataType>::max() / iterations;
@@ -89,9 +89,9 @@ protected:
         for (DataType data = 0, i = 0; i++ < iterations; data += step)
         {
             DataType expected = data;
-            DataType actual = fly::endian_swap<desired>(data);
+            DataType actual = fly::endian_swap<Desired>(data);
 
-            if constexpr (desired != fly::Endian::Native)
+            if constexpr (Desired != fly::Endian::Native)
             {
                 expected = swap(expected);
             }
@@ -114,19 +114,19 @@ using DataTypes = ::testing::Types<
 TYPED_TEST_SUITE(EndianTest, DataTypes, );
 
 //==============================================================================
-TYPED_TEST(EndianTest, BigEndianTest)
+TYPED_TEST(EndianTest, BigEndian)
 {
-    TestFixture::template RunTest<fly::Endian::Big>();
+    TestFixture::template run_test<fly::Endian::Big>();
 }
 
 //==============================================================================
-TYPED_TEST(EndianTest, LittleEndianTest)
+TYPED_TEST(EndianTest, LittleEndian)
 {
-    TestFixture::template RunTest<fly::Endian::Little>();
+    TestFixture::template run_test<fly::Endian::Little>();
 }
 
 //==============================================================================
-TYPED_TEST(EndianTest, NativeEndianTest)
+TYPED_TEST(EndianTest, NativeEndian)
 {
-    TestFixture::template RunTest<fly::Endian::Native>();
+    TestFixture::template run_test<fly::Endian::Native>();
 }

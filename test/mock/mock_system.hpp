@@ -34,17 +34,17 @@ public:
     /**
      * Enable a mocked system call, indicating the call should fail.
      *
-     * @param MockCall Mocked system call to enable.
+     * @param mock Mocked system call to enable.
      */
-    MockSystem(MockCall) noexcept;
+    MockSystem(MockCall mock) noexcept;
 
     /**
      * Enable a mocked system call, specifying whether the call should fail.
      *
-     * @param MockCall Mocked system call to enable.
-     * @param bool Whether the system call should fail.
+     * @param mock Mocked system call to enable.
+     * @param fail Whether the system call should fail.
      */
-    MockSystem(MockCall, bool) noexcept;
+    MockSystem(MockCall mock, bool fail) noexcept;
 
     /**
      * Disable the mocked system call.
@@ -54,26 +54,26 @@ public:
     /**
      * Check if a mocked system call is enabled.
      *
-     * @param MockCall Mocked system call to check.
+     * @param mock Mocked system call to check.
      *
-     * @return bool True if the mocked system call is enabled.
+     * @return True if the mocked system call is enabled.
      */
-    static bool MockEnabled(MockCall) noexcept;
+    static bool mock_enabled(MockCall mock) noexcept;
 
     /**
      * Check if a mocked system call is enabled.
      *
-     * @param MockCall Mocked system call to check.
-     * @param bool Reference to store whether the system call should fail.
+     * @param mock Mocked system call to check.
+     * @param fail Reference to store whether the system call should fail.
      *
-     * @return bool True if the mocked system call is enabled.
+     * @return True if the mocked system call is enabled.
      */
-    static bool MockEnabled(MockCall, bool &) noexcept;
+    static bool mock_enabled(MockCall mock, bool &fail) noexcept;
 
 private:
-    static std::mutex s_mockSystemMutex;
-    static bool s_mockSystemEnabled;
-    static MockCalls s_mockedCalls;
+    static std::mutex s_mock_system_mutex;
+    static bool s_mock_system_enabled;
+    static MockCalls s_mocked_calls;
 
     const MockCall m_mock;
 };

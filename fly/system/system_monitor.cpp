@@ -10,28 +10,30 @@ namespace fly {
 
 //==============================================================================
 SystemMonitor::SystemMonitor(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<SystemConfig> &spConfig) noexcept :
-    m_systemCpuCount(0),
-    m_systemCpuUsage(0.0),
-    m_processCpuUsage(0.0),
-    m_totalSystemMemory(0),
-    m_systemMemoryUsage(0),
-    m_processMemoryUsage(0),
-    m_spTaskRunner(spTaskRunner),
-    m_spConfig(spConfig)
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<SystemConfig> &config) noexcept :
+    m_system_cpu_count(0),
+    m_system_cpu_usage(0.0),
+    m_process_cpu_usage(0.0),
+    m_total_system_memory(0),
+    m_system_memory_usage(0),
+    m_process_memory_usage(0),
+    m_task_runner(task_runner),
+    m_config(config)
 {
 }
 
 //==============================================================================
-bool SystemMonitor::Start() noexcept
+bool SystemMonitor::start() noexcept
 {
-    if (isValid())
-    {
-        std::shared_ptr<SystemMonitor> spSystemMonitor = shared_from_this();
+    update_system_cpu_count();
 
-        m_spTask = std::make_shared<SystemMonitorTask>(spSystemMonitor);
-        m_spTaskRunner->PostTask(m_spTask);
+    if (is_valid())
+    {
+        std::shared_ptr<SystemMonitor> system_monitor = shared_from_this();
+
+        m_task = std::make_shared<SystemMonitorTask>(system_monitor);
+        m_task_runner->post_task(m_task);
 
         return true;
     }
@@ -40,80 +42,81 @@ bool SystemMonitor::Start() noexcept
 }
 
 //==============================================================================
-std::uint32_t SystemMonitor::GetSystemCpuCount() const noexcept
+std::uint32_t SystemMonitor::get_system_cpu_count() const noexcept
 {
-    return m_systemCpuCount.load();
+    return m_system_cpu_count.load();
 }
 
 //==============================================================================
-double SystemMonitor::GetSystemCpuUsage() const noexcept
+double SystemMonitor::get_system_cpu_usage() const noexcept
 {
-    return m_systemCpuUsage.load();
+    return m_system_cpu_usage.load();
 }
 
 //==============================================================================
-double SystemMonitor::GetProcessCpuUsage() const noexcept
+double SystemMonitor::get_process_cpu_usage() const noexcept
 {
-    return m_processCpuUsage.load();
+    return m_process_cpu_usage.load();
 }
 
 //==============================================================================
-std::uint64_t SystemMonitor::GetTotalSystemMemory() const noexcept
+std::uint64_t SystemMonitor::get_total_system_memory() const noexcept
 {
-    return m_totalSystemMemory.load();
+    return m_total_system_memory.load();
 }
 
 //==============================================================================
-std::uint64_t SystemMonitor::GetSystemMemoryUsage() const noexcept
+std::uint64_t SystemMonitor::get_system_memory_usage() const noexcept
 {
-    return m_systemMemoryUsage.load();
+    return m_system_memory_usage.load();
 }
 
 //==============================================================================
-std::uint64_t SystemMonitor::GetProcessMemoryUsage() const noexcept
+std::uint64_t SystemMonitor::get_process_memory_usage() const noexcept
 {
-    return m_processMemoryUsage.load();
+    return m_process_memory_usage.load();
 }
 
 //==============================================================================
-bool SystemMonitor::isValid() const noexcept
+bool SystemMonitor::is_valid() const noexcept
 {
-    return GetSystemCpuCount() > 0;
+    return get_system_cpu_count() > 0;
 }
 
 //==============================================================================
 void SystemMonitor::poll() noexcept
 {
-    UpdateSystemCpuCount();
-    UpdateSystemCpuUsage();
-    UpdateProcessCpuUsage();
+    update_system_cpu_count();
+    update_system_cpu_usage();
+    update_process_cpu_usage();
 
-    UpdateSystemMemoryUsage();
-    UpdateProcessMemoryUsage();
+    update_system_memory_usage();
+    update_process_memory_usage();
 }
 
 //==============================================================================
 SystemMonitorTask::SystemMonitorTask(
-    std::weak_ptr<SystemMonitor> wpSystemMonitor) noexcept :
+    std::weak_ptr<SystemMonitor> weak_system_monitor) noexcept :
     Task(),
-    m_wpSystemMonitor(wpSystemMonitor)
+    m_weak_system_monitor(weak_system_monitor)
 {
 }
 
 //==============================================================================
-void SystemMonitorTask::Run() noexcept
+void SystemMonitorTask::run() noexcept
 {
-    std::shared_ptr<SystemMonitor> spSystemMonitor = m_wpSystemMonitor.lock();
+    std::shared_ptr<SystemMonitor> system_monitor =
+        m_weak_system_monitor.lock();
 
-    if (spSystemMonitor && spSystemMonitor->isValid())
+    if (system_monitor && system_monitor->is_valid())
     {
-        spSystemMonitor->poll();
+        system_monitor->poll();
 
-        if (spSystemMonitor->isValid())
+        if (system_monitor->is_valid())
         {
-            spSystemMonitor->m_spTaskRunner->PostTaskWithDelay(
-                spSystemMonitor->m_spTask,
-                spSystemMonitor->m_spConfig->PollInterval());
+            system_monitor->m_task_runner->post_task_with_delay(
+                system_monitor->m_task,
+                system_monitor->m_config->poll_interval());
         }
     }
 }

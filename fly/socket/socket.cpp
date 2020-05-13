@@ -7,136 +7,136 @@
 namespace fly {
 
 //==============================================================================
-std::atomic_int Socket::s_aNumSockets(0);
+std::atomic_int Socket::s_num_sockets(0);
 
 //==============================================================================
 Socket::Socket(
     Protocol protocol,
-    const std::shared_ptr<SocketConfig> &spConfig) noexcept :
+    const std::shared_ptr<SocketConfig> &config) noexcept :
     m_protocol(protocol),
-    m_spConfig(spConfig),
-    m_socketEoM(spConfig->EndOfMessage()),
-    m_packetSize(spConfig->PacketSize()),
-    m_socketHandle(InvalidSocket()),
-    m_clientIp(0),
-    m_clientPort(0),
-    m_isAsync(false),
-    m_isListening(false),
-    m_aConnectedState(ConnectedState::Disconnected),
-    m_socketId(s_aNumSockets.fetch_add(1))
+    m_config(config),
+    m_socket_eom(config->end_of_message()),
+    m_packet_size(config->packet_size()),
+    m_socket_handle(invalid_socket()),
+    m_client_ip(0),
+    m_client_port(0),
+    m_is_async(false),
+    m_is_listening(false),
+    m_connected_state(ConnectedState::Disconnected),
+    m_socket_id(s_num_sockets.fetch_add(1))
 {
 }
 
 //==============================================================================
-bool Socket::HostnameToAddress(
+bool Socket::hostname_to_address(
     const std::string &hostname,
     address_type &address) noexcept
 {
-    return SocketImpl::HostnameToAddress(hostname, address);
+    return SocketImpl::hostname_to_address(hostname, address);
 }
 
 //==============================================================================
-address_type Socket::InAddrAny() noexcept
+address_type Socket::in_addr_any() noexcept
 {
-    return SocketImpl::InAddrAny();
+    return SocketImpl::in_addr_any();
 }
 
 //==============================================================================
-socket_type Socket::InvalidSocket() noexcept
+socket_type Socket::invalid_socket() noexcept
 {
-    return SocketImpl::InvalidSocket();
+    return SocketImpl::invalid_socket();
 }
 
 //==============================================================================
-bool Socket::IsValid() const noexcept
+bool Socket::is_valid() const noexcept
 {
-    return m_socketHandle != InvalidSocket();
+    return m_socket_handle != invalid_socket();
 }
 
 //==============================================================================
-socket_type Socket::GetHandle() const noexcept
+socket_type Socket::get_handle() const noexcept
 {
-    return m_socketHandle;
+    return m_socket_handle;
 }
 
 //==============================================================================
-address_type Socket::GetClientIp() const noexcept
+address_type Socket::get_client_ip() const noexcept
 {
-    return m_clientIp;
+    return m_client_ip;
 }
 
 //==============================================================================
-port_type Socket::GetClientPort() const noexcept
+port_type Socket::get_client_port() const noexcept
 {
-    return m_clientPort;
+    return m_client_port;
 }
 
 //==============================================================================
-int Socket::GetSocketId() const noexcept
+int Socket::get_socket_id() const noexcept
 {
-    return m_socketId;
+    return m_socket_id;
 }
 
 //==============================================================================
-bool Socket::IsTcp() const noexcept
+bool Socket::is_tcp() const noexcept
 {
     return m_protocol == Protocol::TCP;
 }
 
 //==============================================================================
-bool Socket::IsUdp() const noexcept
+bool Socket::is_udp() const noexcept
 {
     return m_protocol == Protocol::UDP;
 }
 
 //==============================================================================
-bool Socket::IsAsync() const noexcept
+bool Socket::is_async() const noexcept
 {
-    return m_isAsync;
+    return m_is_async;
 }
 
 //==============================================================================
-bool Socket::IsListening() const noexcept
+bool Socket::is_listening() const noexcept
 {
-    return m_isListening;
+    return m_is_listening;
 }
 
 //==============================================================================
-bool Socket::IsConnecting() const noexcept
+bool Socket::is_connecting() const noexcept
 {
-    return m_aConnectedState.load() == ConnectedState::Connecting;
+    return m_connected_state.load() == ConnectedState::Connecting;
 }
 
 //==============================================================================
-bool Socket::IsConnected() const noexcept
+bool Socket::is_connected() const noexcept
 {
-    return m_aConnectedState.load() == ConnectedState::Connected;
+    return m_connected_state.load() == ConnectedState::Connected;
 }
 
 //==============================================================================
-bool Socket::Bind(
+bool Socket::bind(
     const std::string &hostname,
     port_type port,
     BindOption option) const noexcept
 {
     address_type address = 0;
 
-    if (HostnameToAddress(hostname, address))
+    if (hostname_to_address(hostname, address))
     {
-        return Bind(address, port, option);
+        return bind(address, port, option);
     }
 
     return false;
 }
 
 //==============================================================================
-bool Socket::Connect(const std::string &hostname, port_type port) noexcept
+bool Socket::connect(const std::string &hostname, port_type port) noexcept
 {
     address_type address = 0;
 
-    if (HostnameToAddress(hostname, address))
+    if (hostname_to_address(hostname, address))
     {
-        return Connect(address, port);
+        return connect(address, port);
     }
 
     return false;
@@ -144,31 +144,31 @@ bool Socket::Connect(const std::string &hostname, port_type port) noexcept
 
 //==============================================================================
 ConnectedState
-Socket::ConnectAsync(address_type address, port_type port) noexcept
+Socket::connect_async(address_type address, port_type port) noexcept
 {
     ConnectedState state = ConnectedState::Disconnected;
 
-    if (IsTcp() && IsAsync())
+    if (is_tcp() && is_async())
     {
-        if (Connect(address, port))
+        if (connect(address, port))
         {
-            SLOGD(m_socketId, "Connected to %d:%d", address, port);
+            SLOGD(m_socket_id, "Connected to %d:%d", address, port);
             state = ConnectedState::Connected;
         }
-        else if (IsConnecting())
+        else if (is_connecting())
         {
-            SLOGD(m_socketId, "Connect to %d:%d in progress", address, port);
+            SLOGD(m_socket_id, "Connect to %d:%d in progress", address, port);
             state = ConnectedState::Connecting;
         }
         else
         {
             SLOGW(
-                m_socketId,
+                m_socket_id,
                 "Could not connect to %d:%d, closing socket",
                 address,
                 port);
 
-            Close();
+            close();
         }
     }
 
@@ -177,88 +177,88 @@ Socket::ConnectAsync(address_type address, port_type port) noexcept
 
 //==============================================================================
 ConnectedState
-Socket::ConnectAsync(const std::string &hostname, port_type port) noexcept
+Socket::connect_async(const std::string &hostname, port_type port) noexcept
 {
     address_type address = 0;
 
-    if (HostnameToAddress(hostname, address))
+    if (hostname_to_address(hostname, address))
     {
-        return ConnectAsync(address, port);
+        return connect_async(address, port);
     }
 
     return ConnectedState::Disconnected;
 }
 
 //==============================================================================
-bool Socket::FinishConnect() noexcept
+bool Socket::finish_connect() noexcept
 {
-    if (IsValid() & IsConnecting() && IsErrorFree())
+    if (is_valid() & is_connecting() && is_error_free())
     {
-        SLOGD(m_socketId, "Connection completed");
-        m_aConnectedState.store(ConnectedState::Connected);
+        SLOGD(m_socket_id, "Connection completed");
+        m_connected_state.store(ConnectedState::Connected);
     }
     else
     {
-        SLOGW(m_socketId, "Could not connect, closing socket");
-        m_aConnectedState.store(ConnectedState::Disconnected);
+        SLOGW(m_socket_id, "Could not connect, closing socket");
+        m_connected_state.store(ConnectedState::Disconnected);
 
-        Close();
+        close();
     }
 
-    return IsValid() && IsConnected();
+    return is_valid() && is_connected();
 }
 
 //==============================================================================
-size_t Socket::Send(const std::string &message) const noexcept
+size_t Socket::send(const std::string &message) const noexcept
 {
-    bool wouldBlock = false;
-    return Send(message, wouldBlock);
+    bool would_block = false;
+    return send(message, would_block);
 }
 
 //==============================================================================
-size_t Socket::SendTo(
+size_t Socket::send_to(
     const std::string &message,
     address_type address,
     port_type port) const noexcept
 {
-    bool wouldBlock = false;
-    return SendTo(message, address, port, wouldBlock);
+    bool would_block = false;
+    return send_to(message, address, port, would_block);
 }
 
 //==============================================================================
-size_t Socket::SendTo(
+size_t Socket::send_to(
     const std::string &message,
     const std::string &hostname,
     port_type port) const noexcept
 {
-    bool wouldBlock = false;
-    return SendTo(message, hostname, port, wouldBlock);
+    bool would_block = false;
+    return send_to(message, hostname, port, would_block);
 }
 
 //==============================================================================
-size_t Socket::SendTo(
+size_t Socket::send_to(
     const std::string &message,
     const std::string &hostname,
     port_type port,
-    bool &wouldBlock) const noexcept
+    bool &would_block) const noexcept
 {
     address_type address = 0;
 
-    if (HostnameToAddress(hostname, address))
+    if (hostname_to_address(hostname, address))
     {
-        return SendTo(message, address, port, wouldBlock);
+        return send_to(message, address, port, would_block);
     }
 
     return 0;
 }
 
 //==============================================================================
-bool Socket::SendAsync(std::string &&message) noexcept
+bool Socket::send_async(std::string &&message) noexcept
 {
-    if (IsTcp() && IsAsync())
+    if (is_tcp() && is_async())
     {
-        AsyncRequest request(m_socketId, std::move(message));
-        m_pendingSends.Push(std::move(request));
+        AsyncRequest request(m_socket_id, std::move(message));
+        m_pending_sends.push(std::move(request));
 
         return true;
     }
@@ -267,15 +267,15 @@ bool Socket::SendAsync(std::string &&message) noexcept
 }
 
 //==============================================================================
-bool Socket::SendToAsync(
+bool Socket::send_to_async(
     std::string &&message,
     address_type address,
     port_type port) noexcept
 {
-    if (IsUdp() && IsAsync())
+    if (is_udp() && is_async())
     {
-        AsyncRequest request(m_socketId, std::move(message), address, port);
-        m_pendingSends.Push(std::move(request));
+        AsyncRequest request(m_socket_id, std::move(message), address, port);
+        m_pending_sends.push(std::move(request));
 
         return true;
     }
@@ -284,148 +284,146 @@ bool Socket::SendToAsync(
 }
 
 //==============================================================================
-bool Socket::SendToAsync(
+bool Socket::send_to_async(
     std::string &&message,
     const std::string &hostname,
     port_type port) noexcept
 {
     address_type address = 0;
 
-    if (HostnameToAddress(hostname, address))
+    if (hostname_to_address(hostname, address))
     {
-        return SendToAsync(std::move(message), address, port);
+        return send_to_async(std::move(message), address, port);
     }
 
     return false;
 }
 
 //==============================================================================
-std::string Socket::Recv() const noexcept
+std::string Socket::recv() const noexcept
 {
-    bool wouldBlock = false, isComplete = false;
-    return Recv(wouldBlock, isComplete);
+    bool would_block = false, is_complete = false;
+    return recv(would_block, is_complete);
 }
 
 //==============================================================================
-std::string Socket::RecvFrom() const noexcept
+std::string Socket::recv_from() const noexcept
 {
-    bool wouldBlock = false, isComplete = false;
-    return RecvFrom(wouldBlock, isComplete);
+    bool would_block = false, is_complete = false;
+    return recv_from(would_block, is_complete);
 }
 
 //==============================================================================
-void Socket::ServiceSendRequests(
-    AsyncRequest::RequestQueue &completedSends) noexcept
+void Socket::service_send_requests(
+    AsyncRequest::RequestQueue &completed_sends) noexcept
 {
-    bool wouldBlock = false;
+    bool would_block = false;
 
-    while (IsValid() && !m_pendingSends.IsEmpty() && !wouldBlock)
+    while (is_valid() && !m_pending_sends.empty() && !would_block)
     {
         AsyncRequest request;
-        m_pendingSends.Pop(request);
+        m_pending_sends.pop(request);
 
-        if (request.IsValid())
+        if (request.is_valid())
         {
-            const std::string &message = request.GetRequestRemaining();
-            size_t bytesSent = 0;
+            const std::string message = request.get_request_remaining();
+            size_t bytes_sent = 0;
 
             switch (m_protocol)
             {
                 case Protocol::TCP:
-                    bytesSent = Send(message, wouldBlock);
+                    bytes_sent = send(message, would_block);
                     break;
 
                 case Protocol::UDP:
-                    bytesSent = SendTo(
+                    bytes_sent = send_to(
                         message,
-                        request.GetAddress(),
-                        request.GetPort(),
-                        wouldBlock);
+                        request.get_address(),
+                        request.get_port(),
+                        would_block);
                     break;
             }
 
-            if (bytesSent == message.length())
+            if (bytes_sent == message.length())
             {
-                SLOGD(m_socketId, "Sent %zu bytes", bytesSent);
-                completedSends.Push(std::move(request));
+                SLOGD(m_socket_id, "Sent %u bytes", bytes_sent);
+                completed_sends.push(std::move(request));
             }
-            else if (wouldBlock)
+            else if (would_block)
             {
                 SLOGI(
-                    m_socketId,
-                    "Send would block - sent %zu of %zu bytes, "
-                    "will finish later",
-                    bytesSent,
+                    m_socket_id,
+                    "Send would block - sent %u of %u bytes, will finish later",
+                    bytes_sent,
                     message.length());
 
-                request.IncrementRequestOffset(bytesSent);
-                m_pendingSends.Push(std::move(request));
+                request.increment_request_offset(bytes_sent);
+                m_pending_sends.push(std::move(request));
             }
             else
             {
-                SLOGW(m_socketId, "Can't send, closing socket");
-                Close();
+                SLOGW(m_socket_id, "Can't send, closing socket");
+                close();
             }
         }
     }
 }
 
 //==============================================================================
-void Socket::ServiceRecvRequests(
-    AsyncRequest::RequestQueue &completedReceives) noexcept
+void Socket::service_recv_requests(
+    AsyncRequest::RequestQueue &completed_reads) noexcept
 {
-    bool wouldBlock = false;
-    bool isComplete = false;
+    bool would_block = false;
+    bool is_complete = false;
 
-    while (IsValid() && !wouldBlock)
+    while (is_valid() && !would_block)
     {
         std::string received;
 
         switch (m_protocol)
         {
             case Protocol::TCP:
-                received = Recv(wouldBlock, isComplete);
+                received = recv(would_block, is_complete);
                 break;
 
             case Protocol::UDP:
-                received = RecvFrom(wouldBlock, isComplete);
+                received = recv_from(would_block, is_complete);
                 break;
         }
 
-        if ((received.length() > 0) || isComplete)
+        if ((received.length() > 0) || is_complete)
         {
             SLOGD(
-                m_socketId,
+                m_socket_id,
                 "Received %u bytes, %u in buffer",
                 received.length(),
-                m_receiveBuffer.length());
+                m_receive_buffer.length());
 
-            m_receiveBuffer += received;
+            m_receive_buffer += received;
 
-            if (isComplete)
+            if (is_complete)
             {
                 SLOGD(
-                    m_socketId,
+                    m_socket_id,
                     "Completed message, %u bytes",
-                    m_receiveBuffer.length());
+                    m_receive_buffer.length());
 
-                AsyncRequest request(m_socketId, std::move(m_receiveBuffer));
-                completedReceives.Push(std::move(request));
-                m_receiveBuffer.clear();
+                AsyncRequest request(m_socket_id, std::move(m_receive_buffer));
+                completed_reads.push(std::move(request));
+                m_receive_buffer.clear();
             }
         }
-        else if (wouldBlock)
+        else if (would_block)
         {
             SLOGI(
-                m_socketId,
-                "Receive would block - received %u bytes, "
-                "will finish later",
-                m_receiveBuffer.length());
+                m_socket_id,
+                "Receive would block - received %u bytes, will finish later",
+                m_receive_buffer.length());
         }
         else
         {
-            SLOGW(m_socketId, "Can't receive, closing socket");
-            Close();
+            SLOGW(m_socket_id, "Can't receive, closing socket");
+            close();
         }
     }
 }

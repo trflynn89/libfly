@@ -11,80 +11,79 @@
 namespace fly {
 
 //==============================================================================
-std::weak_ptr<Logger> Logger::s_wpInstance;
-std::mutex Logger::s_consoleMutex;
+std::weak_ptr<Logger> Logger::s_weak_instance;
+std::mutex Logger::s_console_mutex;
 
 //==============================================================================
 Logger::Logger(
-    const std::shared_ptr<SequencedTaskRunner> &spTaskRunner,
-    const std::shared_ptr<LoggerConfig> &spConfig,
-    const std::filesystem::path &loggerDirectory) noexcept :
-    m_spTaskRunner(spTaskRunner),
-    m_spConfig(spConfig),
-    m_logDirectory(loggerDirectory),
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<LoggerConfig> &config,
+    const std::filesystem::path &logger_directory) noexcept :
+    m_task_runner(task_runner),
+    m_config(config),
+    m_log_directory(logger_directory),
     m_index(0),
-    m_startTime(std::chrono::high_resolution_clock::now())
+    m_start_time(std::chrono::high_resolution_clock::now())
 {
 }
 
 //==============================================================================
-void Logger::SetInstance(const std::shared_ptr<Logger> &spLogger) noexcept
+void Logger::set_instance(const std::shared_ptr<Logger> &logger) noexcept
 {
-    s_wpInstance = spLogger;
+    s_weak_instance = logger;
 }
 
 //==============================================================================
-std::shared_ptr<Logger> Logger::GetInstance() noexcept
+void Logger::console_log(bool acquire_lock, const std::string &message) noexcept
 {
-    return s_wpInstance.lock();
-}
+    std::unique_lock<std::mutex> lock(s_console_mutex, std::defer_lock);
+    const std::string time_str = System::local_time();
 
-//==============================================================================
-void Logger::ConsoleLog(bool acquireLock, const std::string &message) noexcept
-{
-    std::unique_lock<std::mutex> lock(s_consoleMutex, std::defer_lock);
-    std::string timeStr = System::LocalTime();
-
-    if (acquireLock)
+    if (acquire_lock)
     {
         lock.lock();
     }
 
-    std::cout << timeStr << ": " << message << std::endl;
+    std::cout << time_str << ": " << message << std::endl;
 }
 
 //==============================================================================
-void Logger::AddLog(
+void Logger::add_log(
     Log::Level level,
     const char *file,
-    const char *func,
+    const char *function,
     std::uint32_t line,
     const std::string &message) noexcept
 {
-    std::shared_ptr<Logger> spLogger = GetInstance();
+    std::shared_ptr<Logger> logger = s_weak_instance.lock();
 
-    if (spLogger)
+    if (logger)
     {
-        spLogger->addLog(level, file, func, line, message);
+        logger->add_log_internal(level, file, function, line, message);
     }
     else
     {
-        const std::string console =
-            String::Format("%d %s:%s:%d %s", level, file, func, line, message);
+        const std::string console = String::format(
+            "%d %s:%s:%d %s",
+            level,
+            file,
+            function,
+            line,
+            message);
 
-        ConsoleLog(true, console);
+        console_log(true, console);
     }
 }
 
 //==============================================================================
-bool Logger::Start() noexcept
+bool Logger::start() noexcept
 {
-    if (createLogFile())
+    if (create_log_file())
     {
-        std::shared_ptr<Logger> spLogger = shared_from_this();
+        std::shared_ptr<Logger> logger = shared_from_this();
 
-        m_spTask = std::make_shared<LoggerTask>(spLogger);
-        m_spTaskRunner->PostTask(m_spTask);
+        m_task = std::make_shared<LoggerTask>(logger);
+        m_task_runner->post_task(m_task);
 
         return true;
     }
@@ -93,9 +92,9 @@ bool Logger::Start() noexcept
 }
 
 //==============================================================================
-std::filesystem::path Logger::GetLogFilePath() const noexcept
+std::filesystem::path Logger::get_log_file_path() const noexcept
 {
-    return m_logFile;
+    return m_log_file;
 }
 
 //==============================================================================
@@ -103,88 +102,89 @@ bool Logger::poll() noexcept
 {
     Log log;
 
-    if (m_logQueue.Pop(log, m_spConfig->QueueWaitTime()) && m_logStream.good())
+    if (m_log_queue.pop(log, m_config->queue_wait_time()) &&
+        m_log_stream.good())
     {
-        String::Format(m_logStream, "%u\t%s", m_index++, log) << std::flush;
+        String::format(m_log_stream, "%u\t%s", m_index++, log) << std::flush;
         std::error_code error;
 
-        if (std::filesystem::file_size(m_logFile, error) >
-            m_spConfig->MaxLogFileSize())
+        if (std::filesystem::file_size(m_log_file, error) >
+            m_config->max_log_file_size())
         {
-            createLogFile();
+            create_log_file();
         }
     }
 
-    return m_logStream.good();
+    return m_log_stream.good();
 }
 
 //==============================================================================
-void Logger::addLog(
+void Logger::add_log_internal(
     Log::Level level,
     const char *file,
-    const char *func,
+    const char *function,
     std::uint32_t line,
     const std::string &message) noexcept
 {
     auto now = std::chrono::high_resolution_clock::now();
 
-    auto logTime = std::chrono::duration_cast<std::chrono::duration<double>>(
-        now - m_startTime);
+    auto log_time = std::chrono::duration_cast<std::chrono::duration<double>>(
+        now - m_start_time);
 
     if ((level >= Log::Level::Debug) && (level < Log::Level::NumLevels))
     {
-        Log log(m_spConfig, message);
+        Log log(m_config, message);
 
         log.m_level = level;
-        log.m_time = logTime.count();
+        log.m_time = log_time.count();
         log.m_line = line;
 
         snprintf(log.m_file, sizeof(log.m_file), "%s", file);
-        snprintf(log.m_function, sizeof(log.m_function), "%s", func);
+        snprintf(log.m_function, sizeof(log.m_function), "%s", function);
 
-        m_logQueue.Push(std::move(log));
+        m_log_queue.push(std::move(log));
     }
 }
 
 //==============================================================================
-bool Logger::createLogFile() noexcept
+bool Logger::create_log_file() noexcept
 {
-    std::string randStr = String::GenerateRandomString(10);
-    std::string timeStr = System::LocalTime();
+    const std::string rand_str = String::generate_random_string(10);
+    std::string time_str = System::local_time();
 
-    String::ReplaceAll(timeStr, ":", "-");
-    String::ReplaceAll(timeStr, " ", "_");
+    String::replace_all(time_str, ":", "-");
+    String::replace_all(time_str, " ", "_");
 
-    const std::string fileName =
-        String::Format("Log_%s_%s.log", timeStr, randStr);
-    m_logFile = m_logDirectory / fileName;
+    const std::string file_name =
+        String::format("Log_%s_%s.log", time_str, rand_str);
+    m_log_file = m_log_directory / file_name;
 
-    if (m_logStream.is_open())
+    if (m_log_stream.is_open())
     {
-        m_logStream.close();
+        m_log_stream.close();
     }
 
-    LOGC("Creating logger file: %s", m_logFile);
-    m_logStream.open(m_logFile, std::ios::out);
+    LOGC("Creating logger file: %s", m_log_file);
+    m_log_stream.open(m_log_file, std::ios::out);
 
-    return m_logStream.good();
+    return m_log_stream.good();
 }
 
 //==============================================================================
-LoggerTask::LoggerTask(std::weak_ptr<Logger> wpLogger) noexcept :
+LoggerTask::LoggerTask(std::weak_ptr<Logger> weak_logger) noexcept :
     Task(),
-    m_wpLogger(wpLogger)
+    m_weak_logger(weak_logger)
 {
 }
 
 //==============================================================================
-void LoggerTask::Run() noexcept
+void LoggerTask::run() noexcept
 {
-    std::shared_ptr<Logger> spLogger = m_wpLogger.lock();
+    std::shared_ptr<Logger> logger = m_weak_logger.lock();
 
-    if (spLogger && spLogger->poll())
+    if (logger && logger->poll())
     {
-        spLogger->m_spTaskRunner->PostTask(spLogger->m_spTask);
+        logger->m_task_runner->post_task(logger->m_task);
     }
 }
 

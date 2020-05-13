@@ -48,18 +48,18 @@ enum class Endian : std::uint16_t
  * @tparam Endian The desired endianness to swap between.
  * @tparam T The type of the value to swap.
  *
- * @param T The value to swap.
+ * @param value The value to swap.
  *
- * @return T The swapped value.
+ * @return The swapped value.
  */
-template <Endian endianness, typename T>
+template <Endian Endianness, typename T>
 inline T endian_swap(T value) noexcept
 {
     static_assert(
         detail::EndianTraits::is_supported_integer_v<T>,
         "Value must be an integer type of size 1, 2, 4, or 8 bytes");
 
-    if constexpr ((endianness == Endian::Native) || (sizeof(T) == 1))
+    if constexpr ((Endianness == Endian::Native) || (sizeof(T) == 1))
     {
         return value;
     }
