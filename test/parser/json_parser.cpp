@@ -202,33 +202,23 @@ TEST_F(JsonParserTest, AllUnicode)
 //==============================================================================
 TEST_F(JsonParserTest, NonExistingPath)
 {
-    fly::Json values;
-
-    ASSERT_NO_THROW(
-        values =
-            m_parser.parse_file(std::filesystem::path("foo_abc") / "a.json"));
-    EXPECT_TRUE(values.is_null());
+    EXPECT_THROW(
+        m_parser.parse_file(std::filesystem::path("foo_abc") / "a.json"),
+        fly::ParserException);
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, NonExistingFile)
 {
-    fly::Json values;
-
-    ASSERT_NO_THROW(
-        values = m_parser.parse_file(
-            std::filesystem::temp_directory_path() / "a.json"));
-    EXPECT_TRUE(values.is_null());
+    EXPECT_THROW(
+        m_parser.parse_file(std::filesystem::temp_directory_path() / "a.json"),
+        fly::ParserException);
 }
 
 //==============================================================================
 TEST_F(JsonParserTest, EmptyFile)
 {
-    const std::string contents;
-    fly::Json values;
-
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
-    EXPECT_TRUE(values.is_null());
+    validate_fail_raw("");
 }
 
 //==============================================================================
@@ -446,7 +436,9 @@ TEST_F(JsonParserTest, NumericConversion)
     validate_fail("1.2e2e2");
     validate_fail("1.2E2e2");
     validate_fail("1.2E2E2");
-    validate_fail("01.1");
+    validate_fail("0b1");
+    validate_fail("01");
+    validate_fail("0x1");
     validate_fail(".1");
     validate_fail("e5");
     validate_fail("E5");
