@@ -2,7 +2,6 @@
 
 #include "fly/types/string/string.hpp"
 
-#include <iostream>
 #include <string_view>
 
 namespace fly {
@@ -81,7 +80,7 @@ Json JsonParser::parse_object(std::istream &stream) noexcept(false)
     Json object = JsonTraits::object_type();
     consume_token(stream, Token::StartBrace);
 
-    auto stop_parsing = [&stream, this]() {
+    auto stop_parsing = [&stream, this]() noexcept {
         consume_whitespace(stream);
         const Token token = peek(stream);
 
@@ -116,7 +115,7 @@ Json JsonParser::parse_array(std::istream &stream) noexcept(false)
     Json array = JsonTraits::array_type();
     consume_token(stream, Token::StartBracket);
 
-    auto stop_parsing = [&stream, this]() {
+    auto stop_parsing = [&stream, this]() noexcept {
         consume_whitespace(stream);
         const Token token = peek(stream);
 
@@ -179,9 +178,10 @@ Json JsonParser::parse_value(std::istream &stream) noexcept(false)
         }
         catch (...)
         {
-            throw BadConversionException(m_line, m_column, value);
         }
     }
+
+    throw BadConversionException(m_line, m_column, value);
 }
 
 //==============================================================================
@@ -191,7 +191,7 @@ JsonParser::consume_value(std::istream &stream, bool for_string) noexcept(false)
     Json::stream_type parsing;
     Token token;
 
-    auto stop_parsing = [&token, &for_string, this]() {
+    auto stop_parsing = [&token, &for_string, this]() noexcept {
         if (for_string)
         {
             return token == Token::Quote;
@@ -357,12 +357,12 @@ JsonParser::validate_number(const JsonTraits::string_type &value) const
         std::basic_string_view<JsonTraits::string_type::value_type>(value)
             .substr(is_signed ? 1 : 0);
 
-    auto is_octal = [&signless]() -> bool {
+    auto is_octal = [&signless]() noexcept -> bool {
         return (signless.size() > 1) && (signless[0] == '0') &&
             std::isdigit(static_cast<unsigned char>(signless[1]));
     };
 
-    auto is_float = [this, &value, &signless]() -> bool {
+    auto is_float = [this, &value, &signless]() noexcept(false) -> bool {
         const JsonTraits::string_type::size_type d = signless.find('.');
         const JsonTraits::string_type::size_type e1 = signless.find('e');
         const JsonTraits::string_type::size_type e2 = signless.find('E');
