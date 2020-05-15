@@ -8,10 +8,11 @@
 namespace fly {
 
 //==============================================================================
-ParserException::ParserException(int line, const std::string &message) noexcept
-    :
+ParserException::ParserException(
+    std::uint32_t line,
+    const std::string &message) noexcept :
     m_message(String::format(
-        "ParserException: Error parsing at [line %d]: %s",
+        "ParserException: Error parsing at [line %u]: %s",
         line,
         message))
 {
@@ -20,11 +21,11 @@ ParserException::ParserException(int line, const std::string &message) noexcept
 
 //==============================================================================
 ParserException::ParserException(
-    int line,
-    int column,
+    std::uint32_t line,
+    std::uint32_t column,
     const std::string &message) noexcept :
     m_message(String::format(
-        "ParserException: Error parsing at [line %d, column %d]: %s",
+        "ParserException: Error parsing at [line %u, column %u]: %s",
         line,
         column,
         message))
@@ -40,8 +41,8 @@ const char *ParserException::what() const noexcept
 
 //==============================================================================
 UnexpectedCharacterException::UnexpectedCharacterException(
-    int line,
-    int column,
+    std::uint32_t line,
+    std::uint32_t column,
     int ch) noexcept :
     ParserException(
         line,
@@ -54,8 +55,8 @@ UnexpectedCharacterException::UnexpectedCharacterException(
 
 //==============================================================================
 BadConversionException::BadConversionException(
-    int line,
-    int column,
+    std::uint32_t line,
+    std::uint32_t column,
     const std::string &value) noexcept :
     ParserException(
         line,

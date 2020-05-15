@@ -7,8 +7,8 @@
 //==============================================================================
 TEST(ParserExceptionTest, ParserException)
 {
-    int line = 123;
-    int column = 456;
+    std::uint32_t line = 123;
+    std::uint32_t column = 456;
     std::string message("Bad file!");
 
     try
@@ -43,8 +43,8 @@ TEST(ParserExceptionTest, ParserException)
 //==============================================================================
 TEST(ParserExceptionTest, UnexpectedCharacterException)
 {
-    int line = 123;
-    int column = 456;
+    std::uint32_t line = 123;
+    std::uint32_t column = 456;
     int c1 = '\0';
     int c2 = 'A';
 
@@ -88,8 +88,8 @@ TEST(ParserExceptionTest, UnexpectedCharacterException)
 //==============================================================================
 TEST(ParserExceptionTest, BadConversionException)
 {
-    int line = 123;
-    int column = 456;
+    std::uint32_t line = 123;
+    std::uint32_t column = 456;
     std::string value("789");
 
     try

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <exception>
 #include <string>
 
@@ -20,7 +21,7 @@ public:
      * @param line Line number where error was encountered.
      * @param message Message indicating what error was encountered.
      */
-    ParserException(int line, const std::string &message) noexcept;
+    ParserException(std::uint32_t line, const std::string &message) noexcept;
 
     /**
      * Constructor.
@@ -29,7 +30,10 @@ public:
      * @param column Column number in line where error was encountered.
      * @param message Message indicating what error was encountered.
      */
-    ParserException(int line, int column, const std::string &message) noexcept;
+    ParserException(
+        std::uint32_t line,
+        std::uint32_t column,
+        const std::string &message) noexcept;
 
     /**
      * @return A C-string representing this exception.
@@ -56,7 +60,10 @@ public:
      * @param column Column number in line where error was encountered.
      * @param ch Unexpected character code.
      */
-    UnexpectedCharacterException(int line, int column, int ch) noexcept;
+    UnexpectedCharacterException(
+        std::uint32_t line,
+        std::uint32_t column,
+        int ch) noexcept;
 };
 
 /**
@@ -76,8 +83,8 @@ public:
      * @param value The unconvertable value.
      */
     BadConversionException(
-        int line,
-        int column,
+        std::uint32_t line,
+        std::uint32_t column,
         const std::string &value) noexcept;
 };
 
