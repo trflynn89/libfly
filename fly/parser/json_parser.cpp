@@ -32,7 +32,7 @@ Json JsonParser::parse_internal(std::istream &stream) noexcept(false)
         throw ParserException(m_line, m_column, ex.what());
     }
 
-    consume_whitespace(stream);
+    consume_whitespace_and_comments(stream);
 
     if (!stream.eof())
     {
@@ -55,7 +55,7 @@ Json JsonParser::parse_internal(std::istream &stream) noexcept(false)
 //==============================================================================
 Json JsonParser::parse_json(std::istream &stream) noexcept(false)
 {
-    consume_whitespace(stream);
+    consume_whitespace_and_comments(stream);
 
     switch (peek(stream))
     {
@@ -64,10 +64,6 @@ Json JsonParser::parse_json(std::istream &stream) noexcept(false)
 
         case Token::StartBracket:
             return parse_array(stream);
-
-        case Token::Solidus:
-            consume_comment(stream);
-            return parse_json(stream);
 
         default:
             return parse_value(stream);
@@ -80,8 +76,8 @@ Json JsonParser::parse_object(std::istream &stream) noexcept(false)
     Json object = JsonTraits::object_type();
     consume_token(stream, Token::StartBrace);
 
-    auto stop_parsing = [&stream, this]() noexcept {
-        consume_whitespace(stream);
+    auto stop_parsing = [&stream, this]() noexcept(false) {
+        consume_whitespace_and_comments(stream);
         const Token token = peek(stream);
 
         return (token == Token::EndOfFile) || (token == Token::CloseBrace);
@@ -99,7 +95,7 @@ Json JsonParser::parse_object(std::istream &stream) noexcept(false)
             consume_comment(stream);
         }
 
-        JsonTraits::string_type key = consume_value(stream, true);
+        JsonTraits::string_type key = consume_value(stream, JsonType::String);
         consume_token(stream, Token::Colon);
 
         object[std::move(key)] = parse_json(stream);
@@ -115,8 +111,8 @@ Json JsonParser::parse_array(std::istream &stream) noexcept(false)
     Json array = JsonTraits::array_type();
     consume_token(stream, Token::StartBracket);
 
-    auto stop_parsing = [&stream, this]() noexcept {
-        consume_whitespace(stream);
+    auto stop_parsing = [&stream, this]() noexcept(false) {
+        consume_whitespace_and_comments(stream);
         const Token token = peek(stream);
 
         return (token == Token::EndOfFile) || (token == Token::CloseBracket);
@@ -140,11 +136,13 @@ Json JsonParser::parse_array(std::istream &stream) noexcept(false)
 Json JsonParser::parse_value(std::istream &stream) noexcept(false)
 {
     const bool is_string = peek(stream) == Token::Quote;
-    const JsonTraits::string_type value = consume_value(stream, is_string);
 
-    if (is_string)
+    const JsonType json_type = is_string ? JsonType::String : JsonType::Other;
+    JsonTraits::string_type value = consume_value(stream, json_type);
+
+    if (json_type == JsonType::String)
     {
-        return value;
+        return std::move(value);
     }
     else if (value == "true")
     {
@@ -160,11 +158,11 @@ Json JsonParser::parse_value(std::istream &stream) noexcept(false)
     }
     else
     {
-        const NumericType number_type = validate_number(value);
+        const NumericType numeric_type = validate_number(value);
 
         try
         {
-            switch (number_type)
+            switch (numeric_type)
             {
                 case NumericType::SignedInteger:
                     return String::convert<JsonTraits::signed_type>(value);
@@ -185,55 +183,6 @@ Json JsonParser::parse_value(std::istream &stream) noexcept(false)
 }
 
 //==============================================================================
-JsonTraits::string_type
-JsonParser::consume_value(std::istream &stream, bool for_string) noexcept(false)
-{
-    Json::stream_type parsing;
-    Token token;
-
-    auto stop_parsing = [&token, &for_string, this]() noexcept {
-        if (for_string)
-        {
-            return token == Token::Quote;
-        }
-
-        return is_whitespace(token) || (token == Token::Comma) ||
-            (token == Token::CloseBracket) || (token == Token::CloseBrace);
-    };
-
-    if (for_string)
-    {
-        consume_token(stream, Token::Quote);
-    }
-
-    while (((token = peek(stream)) != Token::EndOfFile) && !stop_parsing())
-    {
-        parsing << static_cast<Json::stream_type::char_type>(token);
-        discard(stream);
-
-        // Blindly ignore escaped symbols, the Json class will check whether
-        // they are valid. Just read at least one more symbol to prevent
-        // breaking out of the loop too early if the next symbol is a quote.
-        if (for_string && (token == Token::ReverseSolidus))
-        {
-            if ((token = consume(stream)) == Token::EndOfFile)
-            {
-                throw UnexpectedTokenException(m_line, m_column, token);
-            }
-
-            parsing << static_cast<Json::stream_type::char_type>(token);
-        }
-    }
-
-    if (for_string)
-    {
-        consume_token(stream, Token::Quote);
-    }
-
-    return parsing.str();
-}
-
-//==============================================================================
 void JsonParser::consume_token(
     std::istream &stream,
     const Token &token) noexcept(false)
@@ -245,23 +194,6 @@ void JsonParser::consume_token(
     if (parsed != token)
     {
         throw UnexpectedTokenException(m_line, m_column, parsed);
-    }
-}
-
-//==============================================================================
-void JsonParser::consume_whitespace(std::istream &stream) noexcept
-{
-    Token token;
-
-    while (((token = peek(stream)) != Token::EndOfFile) && is_whitespace(token))
-    {
-        discard(stream);
-
-        if (token == Token::NewLine)
-        {
-            m_column = 0;
-            ++m_line;
-        }
     }
 }
 
@@ -286,6 +218,86 @@ bool JsonParser::consume_comma(
 }
 
 //==============================================================================
+JsonTraits::string_type
+JsonParser::consume_value(std::istream &stream, JsonType type) noexcept(false)
+{
+    Json::stream_type parsing;
+    Token token;
+
+    auto stop_parsing = [&token, &type, this]() noexcept {
+        if (type == JsonType::String)
+        {
+            return token == Token::Quote;
+        }
+
+        const bool is_comment = is_feature_allowed(Features::AllowComments) &&
+            (token == Token::Solidus);
+
+        return is_whitespace(token) || (token == Token::Comma) ||
+            (token == Token::CloseBracket) || (token == Token::CloseBrace) ||
+            is_comment;
+    };
+
+    if (type == JsonType::String)
+    {
+        consume_token(stream, Token::Quote);
+    }
+
+    while (((token = peek(stream)) != Token::EndOfFile) && !stop_parsing())
+    {
+        parsing << static_cast<Json::stream_type::char_type>(token);
+        discard(stream);
+
+        // Blindly ignore escaped symbols, the Json class will check whether
+        // they are valid. Just read at least one more symbol to prevent
+        // breaking out of the loop too early if the next symbol is a quote.
+        if ((type == JsonType::String) && (token == Token::ReverseSolidus))
+        {
+            if ((token = consume(stream)) == Token::EndOfFile)
+            {
+                throw UnexpectedTokenException(m_line, m_column, token);
+            }
+
+            parsing << static_cast<Json::stream_type::char_type>(token);
+        }
+    }
+
+    if (type == JsonType::String)
+    {
+        consume_token(stream, Token::Quote);
+    }
+
+    return parsing.str();
+}
+
+//==============================================================================
+void JsonParser::consume_whitespace_and_comments(std::istream &stream) noexcept(
+    false)
+{
+    consume_whitespace(stream);
+
+    if (is_feature_allowed(Features::AllowComments))
+    {
+        while (peek(stream) == Token::Solidus)
+        {
+            consume_comment(stream);
+            consume_whitespace(stream);
+        }
+    }
+}
+
+//==============================================================================
+void JsonParser::consume_whitespace(std::istream &stream) noexcept
+{
+    Token token;
+
+    while (((token = peek(stream)) != Token::EndOfFile) && is_whitespace(token))
+    {
+        discard(stream);
+    }
+}
+
+//==============================================================================
 void JsonParser::consume_comment(std::istream &stream) noexcept(false)
 {
     if (!is_feature_allowed(Features::AllowComments))
@@ -296,7 +308,7 @@ void JsonParser::consume_comment(std::istream &stream) noexcept(false)
     consume_token(stream, Token::Solidus);
     Token token;
 
-    switch (consume(stream))
+    switch (token = consume(stream))
     {
         case Token::Solidus:
             do
@@ -322,7 +334,7 @@ void JsonParser::consume_comment(std::istream &stream) noexcept(false)
             break;
 
         default:
-            throw UnexpectedTokenException(m_line, m_column, Token::Solidus);
+            throw UnexpectedTokenException(m_line, m_column, token);
     }
 }
 
@@ -335,15 +347,25 @@ JsonParser::Token JsonParser::peek(std::istream &stream) noexcept
 //==============================================================================
 JsonParser::Token JsonParser::consume(std::istream &stream) noexcept
 {
-    ++m_column;
-    return static_cast<Token>(stream.get());
+    const Token token = static_cast<Token>(stream.get());
+
+    if (token == Token::NewLine)
+    {
+        m_column = 1;
+        ++m_line;
+    }
+    else
+    {
+        ++m_column;
+    }
+
+    return token;
 }
 
 //==============================================================================
 void JsonParser::discard(std::istream &stream) noexcept
 {
-    ++m_column;
-    (void)stream.get();
+    (void)consume(stream);
 }
 
 //==============================================================================

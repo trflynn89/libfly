@@ -449,6 +449,53 @@ TEST_F(JsonParserTest, SingleLineComment)
 {
     fly::JsonParser parser(fly::JsonParser::Features::AllowComments);
     {
+        std::string str = R"(
+        // here is a comment1
+        // here is a comment2
+        {
+            "a" : 12,
+            "b" : 13
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_EQ(json.size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"(
+        {
+            "a" : 12,
+            "b" : 13
+        }
+        // here is a comment1
+        // here is a comment2
+        )";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_EQ(json.size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"({
+            "a" : 12 // here is a comment
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_EQ(json.size(), 1);
+        EXPECT_EQ(json["a"], 12);
+    }
+    {
         std::string str = R"({
             "a" : 12, // here is a comment
             "b" : 13
@@ -492,20 +539,6 @@ TEST_F(JsonParserTest, SingleLineComment)
         EXPECT_EQ(json["a"], "abdc // here is a comment efgh");
         EXPECT_EQ(json["b"], 13);
     }
-    {
-        std::string str = R"({
-            "a" : 12 / here is a bad comment
-        })";
-
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
-    }
-    {
-        std::string str = R"({"a" : 12 /)";
-
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
-    }
 }
 
 //==============================================================================
@@ -513,8 +546,57 @@ TEST_F(JsonParserTest, MultiLineComment)
 {
     fly::JsonParser parser(fly::JsonParser::Features::AllowComments);
     {
+        std::string str = R"(
+        /* here is a comment1 */
+        /* here is a comment2 */
+        {
+            "a" : 12,
+            "b" : 13
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_EQ(json.size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"(
+        {
+            "a" : 12,
+            "b" : 13
+        }
+        /* here is a comment1 */
+        /* here is a comment2 */
+        )";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_EQ(json.size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
         std::string str = R"({
             "a" : 12, /* here is a comment */
+            "b" : 13
+        })";
+
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_EQ(json.size(), 2);
+        EXPECT_EQ(json["a"], 12);
+        EXPECT_EQ(json["b"], 13);
+    }
+    {
+        std::string str = R"({
+            "a" : 12/* here is a comment */,
             "b" : 13
         })";
 
@@ -577,6 +659,26 @@ TEST_F(JsonParserTest, MultiLineComment)
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], "abdc /* here is a comment */ efgh");
         EXPECT_EQ(json["b"], 13);
+    }
+}
+
+//==============================================================================
+TEST_F(JsonParserTest, InvalidComment)
+{
+    fly::JsonParser parser(fly::JsonParser::Features::AllowComments);
+    {
+        std::string str = R"({
+            "a" : 12 / here is a bad comment
+        })";
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+    }
+    {
+        std::string str = R"({"a" : 12 /)";
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
     }
     {
         std::string str = R"({

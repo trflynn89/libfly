@@ -100,6 +100,15 @@ private:
     };
 
     /**
+     * Helper enumeration to indicate the type of a JSON value.
+     */
+    enum class JsonType : std::uint8_t
+    {
+        String,
+        Other,
+    };
+
+    /**
      * Helper enumeration to indicate the numeric type of a JSON number.
      */
     enum class NumericType : std::uint8_t
@@ -176,20 +185,6 @@ private:
     Json parse_value(std::istream &stream) noexcept(false);
 
     /**
-     * Extract a string, number, boolean, or null value from a stream. If
-     * parsing a string, escaped symbols are preserved in that string, and the
-     * returned value does not contain its surrounding quotes.
-     *
-     * @param stream Stream holding the contents to parse.
-     *
-     * @return The parsed value as a string.
-     *
-     * @throws UnexpectedCharacterException A parsed symbol was unexpected.
-     */
-    JsonTraits::string_type
-    consume_value(std::istream &stream, bool for_string) noexcept(false);
-
-    /**
      * Extract a single symbol from a stream. Ensure that symbol is equal to an
      * expected token.
      *
@@ -199,15 +194,6 @@ private:
      */
     void
     consume_token(std::istream &stream, const Token &token) noexcept(false);
-
-    /**
-     * Extract all consecutive whitespace symbols from a stream until a non-
-     * whitespace symbol is encountered. The non-whitespace symbol is left on
-     * the stream.
-     *
-     * @param stream Stream holding the contents to parse.
-     */
-    void consume_whitespace(std::istream &stream) noexcept;
 
     /**
      * Extract a comma from a stream. Handles any trailing commas, allowing a
@@ -227,13 +213,48 @@ private:
         const std::function<bool()> &stop_parsing) noexcept(false);
 
     /**
+     * Extract a string, number, boolean, or null value from a stream. If
+     * parsing a string, escaped symbols are preserved in that string, and the
+     * returned value does not contain its surrounding quotes.
+     *
+     * @param stream Stream holding the contents to parse.
+     * @param type The JSON value type to consume.
+     *
+     * @return The parsed value as a string.
+     *
+     * @throws UnexpectedCharacterException A parsed symbol was unexpected.
+     */
+    JsonTraits::string_type
+    consume_value(std::istream &stream, JsonType type) noexcept(false);
+
+    /**
+     * Extract all consecutive whitespace symbols and comments (if enabled in
+     * the feature set) from a stream. The first non-whitespace, non-comment
+     * symbol is left on the stream.
+     *
+     * @param stream Stream holding the contents to parse.
+     *
+     * @throws UnexpectedCharacterException A parsed symbol was unexpected.
+     */
+    void consume_whitespace_and_comments(std::istream &stream) noexcept(false);
+
+    /**
+     * Extract all consecutive whitespace symbols from a stream until a non-
+     * whitespace symbol is encountered. The non-whitespace symbol is left on
+     * the stream.
+     *
+     * @param stream Stream holding the contents to parse.
+     */
+    void consume_whitespace(std::istream &stream) noexcept;
+
+    /**
      * Extract a single- or multi-line comment from a stream, if enabled in the
      * feature set.
      *
      * @param stream Stream holding the contents to parse.
      *
      * @throws UnexpectedCharacterException A parsed symbol was unexpected, or
-     *         the comment feature is not enabled,
+     *         the comment feature is not enabled.
      */
     void consume_comment(std::istream &stream) noexcept(false);
 
