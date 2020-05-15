@@ -44,10 +44,13 @@ Json JsonParser::parse_internal(std::istream &stream) noexcept(false)
     }
     else if (!json.is_object() && !json.is_array())
     {
-        throw ParserException(
-            m_line,
-            m_column,
-            "JSON value must be an object or array");
+        if (!is_feature_allowed(Features::AllowAnyType))
+        {
+            throw ParserException(
+                m_line,
+                m_column,
+                "JSON value must be an object or array");
+        }
     }
 
     return json;
