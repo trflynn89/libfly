@@ -10,7 +10,7 @@
 #endif
 
 // Define macro to convert a macro parameter to a string
-#define _FLY_STRINGIZE(a) #a
+#define _FLY_STRINGIZE(s) #s
 
 // Define macros to include OS dependent implementation headers. Formatter is
 // disabled because it would put a space before and after each solidus.
@@ -26,3 +26,6 @@
 #else
 #    error Unknown implementation header.
 #endif
+
+// Mark an expression or value as unused.
+#define FLY_UNUSED(expr) (void)(expr)

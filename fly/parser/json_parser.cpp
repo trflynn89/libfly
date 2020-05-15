@@ -1,5 +1,6 @@
 #include "fly/parser/json_parser.hpp"
 
+#include "fly/fly.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <string_view>
@@ -95,7 +96,7 @@ Json JsonParser::parse_object(std::istream &stream) noexcept(false)
             consume_comment(stream);
         }
 
-        JsonTraits::string_type key = consume_value(stream, JsonType::String);
+        auto key = consume_value(stream, JsonType::JsonString);
         consume_token(stream, Token::Colon);
 
         object[std::move(key)] = parse_json(stream);
@@ -137,12 +138,12 @@ Json JsonParser::parse_value(std::istream &stream) noexcept(false)
 {
     const bool is_string = peek(stream) == Token::Quote;
 
-    const JsonType json_type = is_string ? JsonType::String : JsonType::Other;
-    JsonTraits::string_type value = consume_value(stream, json_type);
+    const auto json_type = is_string ? JsonType::JsonString : JsonType::Other;
+    const JsonTraits::string_type value = consume_value(stream, json_type);
 
-    if (json_type == JsonType::String)
+    if (is_string)
     {
-        return std::move(value);
+        return value;
     }
     else if (value == "true")
     {
@@ -225,7 +226,7 @@ JsonParser::consume_value(std::istream &stream, JsonType type) noexcept(false)
     Token token;
 
     auto stop_parsing = [&token, &type, this]() noexcept {
-        if (type == JsonType::String)
+        if (type == JsonType::JsonString)
         {
             return token == Token::Quote;
         }
@@ -238,7 +239,7 @@ JsonParser::consume_value(std::istream &stream, JsonType type) noexcept(false)
             is_comment;
     };
 
-    if (type == JsonType::String)
+    if (type == JsonType::JsonString)
     {
         consume_token(stream, Token::Quote);
     }
@@ -251,7 +252,7 @@ JsonParser::consume_value(std::istream &stream, JsonType type) noexcept(false)
         // Blindly ignore escaped symbols, the Json class will check whether
         // they are valid. Just read at least one more symbol to prevent
         // breaking out of the loop too early if the next symbol is a quote.
-        if ((type == JsonType::String) && (token == Token::ReverseSolidus))
+        if ((type == JsonType::JsonString) && (token == Token::ReverseSolidus))
         {
             if ((token = consume(stream)) == Token::EndOfFile)
             {
@@ -262,7 +263,7 @@ JsonParser::consume_value(std::istream &stream, JsonType type) noexcept(false)
         }
     }
 
-    if (type == JsonType::String)
+    if (type == JsonType::JsonString)
     {
         consume_token(stream, Token::Quote);
     }
@@ -365,7 +366,7 @@ JsonParser::Token JsonParser::consume(std::istream &stream) noexcept
 //==============================================================================
 void JsonParser::discard(std::istream &stream) noexcept
 {
-    (void)consume(stream);
+    FLY_UNUSED(consume(stream));
 }
 
 //==============================================================================

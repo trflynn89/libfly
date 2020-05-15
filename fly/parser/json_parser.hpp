@@ -104,7 +104,7 @@ private:
      */
     enum class JsonType : std::uint8_t
     {
-        String,
+        JsonString,
         Other,
     };
 
