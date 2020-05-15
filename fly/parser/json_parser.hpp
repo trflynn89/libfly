@@ -33,10 +33,13 @@ public:
         // Allows single-line (//) and multi-line (/* */) comments.
         AllowComments = 1 << 0,
 
-        // Allows the last element in an object/array to have one trailing comma
+        // Allows the last value in an object/array to have one trailing comma.
         AllowTrailingComma = 1 << 1,
 
-        // Allows all of the above features
+        // Allow parsing any JSON type, rather than only objects and arrays.
+        AllowAnyType = 1 << 2,
+
+        // Allows all of the above features.
         AllFeatures =
             std::numeric_limits<std::underlying_type_t<Features>>::max()
     };

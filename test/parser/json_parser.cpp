@@ -776,8 +776,84 @@ TEST_F(JsonParserTest, TrailingCommaArray)
 }
 
 //==============================================================================
+TEST_F(JsonParserTest, AnyType)
+{
+    fly::JsonParser parser(fly::JsonParser::Features::AllowAnyType);
+    {
+        std::string str = "this is a string without quotes";
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+    }
+    {
+        std::string str = "\"this is a string\"";
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_TRUE(json.is_string());
+        EXPECT_EQ(json, str.substr(1, str.size() - 2));
+    }
+    {
+        std::string str = "true";
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_TRUE(json.is_boolean());
+        EXPECT_EQ(json, true);
+    }
+    {
+        std::string str = "false";
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_TRUE(json.is_boolean());
+        EXPECT_EQ(json, false);
+    }
+    {
+        std::string str = "null";
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_TRUE(json.is_null());
+        EXPECT_EQ(json, nullptr);
+    }
+    {
+        std::string str = "12389";
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_TRUE(json.is_unsigned_integer());
+        EXPECT_EQ(json, 12389);
+    }
+    {
+        std::string str = "-12389";
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_TRUE(json.is_signed_integer());
+        EXPECT_EQ(json, -12389);
+    }
+    {
+        std::string str = "123.89";
+        fly::Json json;
+
+        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
+        EXPECT_NO_THROW(json = parser.parse_string(str));
+        EXPECT_TRUE(json.is_float());
+        EXPECT_DOUBLE_EQ(double(json), 123.89);
+    }
+}
+
+//==============================================================================
 TEST(JsonParserFeatures, CombinedFeatures)
 {
+    // Strict
     {
         auto features = fly::JsonParser::Features::Strict;
         EXPECT_EQ(
@@ -786,8 +862,12 @@ TEST(JsonParserFeatures, CombinedFeatures)
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
             fly::JsonParser::Features::Strict);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowAnyType,
+            fly::JsonParser::Features::Strict);
     }
 
+    // AllowComments
     {
         auto features = fly::JsonParser::Features::AllowComments;
         EXPECT_EQ(
@@ -796,6 +876,9 @@ TEST(JsonParserFeatures, CombinedFeatures)
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
             fly::JsonParser::Features::Strict);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowAnyType,
+            fly::JsonParser::Features::Strict);
     }
     {
         auto features = fly::JsonParser::Features::Strict;
@@ -806,8 +889,12 @@ TEST(JsonParserFeatures, CombinedFeatures)
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
             fly::JsonParser::Features::Strict);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowAnyType,
+            fly::JsonParser::Features::Strict);
     }
 
+    // AllowTrailingComma
     {
         auto features = fly::JsonParser::Features::AllowTrailingComma;
         EXPECT_EQ(
@@ -816,6 +903,9 @@ TEST(JsonParserFeatures, CombinedFeatures)
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
             fly::JsonParser::Features::AllowTrailingComma);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowAnyType,
+            fly::JsonParser::Features::Strict);
     }
     {
         auto features = fly::JsonParser::Features::Strict;
@@ -826,8 +916,39 @@ TEST(JsonParserFeatures, CombinedFeatures)
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
             fly::JsonParser::Features::AllowTrailingComma);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowAnyType,
+            fly::JsonParser::Features::Strict);
     }
 
+    // AllowAnyType
+    {
+        auto features = fly::JsonParser::Features::AllowAnyType;
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowComments,
+            fly::JsonParser::Features::Strict);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowTrailingComma,
+            fly::JsonParser::Features::Strict);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowAnyType,
+            fly::JsonParser::Features::AllowAnyType);
+    }
+    {
+        auto features = fly::JsonParser::Features::Strict;
+        features = features | fly::JsonParser::Features::AllowAnyType;
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowComments,
+            fly::JsonParser::Features::Strict);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowTrailingComma,
+            fly::JsonParser::Features::Strict);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowAnyType,
+            fly::JsonParser::Features::AllowAnyType);
+    }
+
+    // AllFeatures
     {
         auto features = fly::JsonParser::Features::AllFeatures;
         EXPECT_EQ(
@@ -836,16 +957,23 @@ TEST(JsonParserFeatures, CombinedFeatures)
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
             fly::JsonParser::Features::AllowTrailingComma);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowAnyType,
+            fly::JsonParser::Features::AllowAnyType);
     }
     {
         auto features = fly::JsonParser::Features::Strict;
         features = features | fly::JsonParser::Features::AllowComments;
         features = features | fly::JsonParser::Features::AllowTrailingComma;
+        features = features | fly::JsonParser::Features::AllowAnyType;
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowComments,
             fly::JsonParser::Features::AllowComments);
         EXPECT_EQ(
             features & fly::JsonParser::Features::AllowTrailingComma,
             fly::JsonParser::Features::AllowTrailingComma);
+        EXPECT_EQ(
+            features & fly::JsonParser::Features::AllowAnyType,
+            fly::JsonParser::Features::AllowAnyType);
     }
 }
