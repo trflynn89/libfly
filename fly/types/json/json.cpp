@@ -312,11 +312,7 @@ std::size_t Json::size() const noexcept
 //==============================================================================
 bool operator==(const Json &json1, const Json &json2) noexcept
 {
-    // Formatter badly handles hanging indent in lambda parameters
-    // clang-format off
-    auto visitor = [&json1, &json2](
-        const auto &value1, const auto &value2) noexcept -> bool
-    {
+    auto visitor = [](const auto &value1, const auto &value2) noexcept -> bool {
         using F = JsonTraits::float_type;
         using T = std::decay_t<decltype(value1)>;
         using U = std::decay_t<decltype(value2)>;
@@ -337,12 +333,13 @@ bool operator==(const Json &json1, const Json &json2) noexcept
         {
             return value1 == static_cast<T>(value2);
         }
-        else
+        else if constexpr (std::is_same_v<T, U>)
         {
-            return json1.m_value == json2.m_value;
+            return value1 == value2;
         }
+
+        return false;
     };
-    // clang-format on
 
     return std::visit(visitor, json1.m_value, json2.m_value);
 }
@@ -356,7 +353,18 @@ bool operator!=(const Json &json1, const Json &json2) noexcept
 //==============================================================================
 std::ostream &operator<<(std::ostream &stream, const Json &json) noexcept
 {
-    auto visitor = [&stream](const auto &value) {
+    auto serialize_string = [&stream](const JsonTraits::string_type &value) {
+        stream << '"';
+
+        for (const auto &ch : value)
+        {
+            Json::write_escaped_charater(stream, ch);
+        }
+
+        stream << '"';
+    };
+
+    auto visitor = [&stream, &serialize_string](const auto &value) {
         using T = std::decay_t<decltype(value)>;
 
         if constexpr (std::is_same_v<T, JsonTraits::null_type>)
@@ -365,7 +373,7 @@ std::ostream &operator<<(std::ostream &stream, const Json &json) noexcept
         }
         else if constexpr (std::is_same_v<T, JsonTraits::string_type>)
         {
-            stream << '"' << value << '"';
+            serialize_string(value);
         }
         else if constexpr (std::is_same_v<T, JsonTraits::object_type>)
         {
@@ -373,7 +381,8 @@ std::ostream &operator<<(std::ostream &stream, const Json &json) noexcept
 
             for (auto it = value.begin(); it != value.end();)
             {
-                stream << '"' << it->first << '"' << ':' << it->second;
+                serialize_string(it->first);
+                stream << ':' << it->second;
 
                 if (++it != value.end())
                 {
@@ -401,7 +410,7 @@ std::ostream &operator<<(std::ostream &stream, const Json &json) noexcept
         }
         else if constexpr (std::is_same_v<T, JsonTraits::boolean_type>)
         {
-            stream << std::boolalpha << value;
+            stream << (value ? "true" : "false");
         }
         else
         {
@@ -415,7 +424,7 @@ std::ostream &operator<<(std::ostream &stream, const Json &json) noexcept
 
 //==============================================================================
 JsonTraits::string_type
-Json::validate_string(const JsonTraits::string_type &str) const noexcept(false)
+Json::validate_string(const JsonTraits::string_type &str) noexcept(false)
 {
     stream_type stream;
 
@@ -445,7 +454,7 @@ Json::validate_string(const JsonTraits::string_type &str) const noexcept(false)
 void Json::read_escaped_character(
     stream_type &stream,
     JsonTraits::string_type::const_iterator &it,
-    const JsonTraits::string_type::const_iterator &end) const noexcept(false)
+    const JsonTraits::string_type::const_iterator &end) noexcept(false)
 {
     if (++it == end)
     {
@@ -493,10 +502,52 @@ void Json::read_escaped_character(
 }
 
 //==============================================================================
+void Json::write_escaped_charater(
+    std::ostream &stream,
+    JsonTraits::string_type::value_type ch) noexcept(false)
+{
+    switch (ch)
+    {
+        case '\"':
+            stream << "\\\"";
+            break;
+
+        case '\\':
+            stream << "\\\\";
+            break;
+
+        case '\b':
+            stream << "\\b";
+            break;
+
+        case '\f':
+            stream << "\\f";
+            break;
+
+        case '\n':
+            stream << "\\n";
+            break;
+
+        case '\r':
+            stream << "\\r";
+            break;
+
+        case '\t':
+            stream << "\\t";
+            break;
+
+        default:
+            // TODO unicode should also be escaped.
+            stream << ch;
+            break;
+    }
+}
+
+//==============================================================================
 void Json::read_unicode_character(
     stream_type &stream,
     JsonTraits::string_type::const_iterator &it,
-    const JsonTraits::string_type::const_iterator &end) const noexcept(false)
+    const JsonTraits::string_type::const_iterator &end) noexcept(false)
 {
     auto is_high_surrogate = [](int c) -> bool {
         return (c >= 0xd800) && (c <= 0xdbff);
@@ -572,7 +623,7 @@ void Json::read_unicode_character(
 //==============================================================================
 int Json::read_unicode_codepoint(
     JsonTraits::string_type::const_iterator &it,
-    const JsonTraits::string_type::const_iterator &end) const noexcept(false)
+    const JsonTraits::string_type::const_iterator &end) noexcept(false)
 {
     int codepoint = 0;
 
@@ -615,7 +666,7 @@ int Json::read_unicode_codepoint(
 void Json::validate_character(
     stream_type &stream,
     JsonTraits::string_type::const_iterator &it,
-    const JsonTraits::string_type::const_iterator &end) const noexcept(false)
+    const JsonTraits::string_type::const_iterator &end) noexcept(false)
 {
     auto c = static_cast<unsigned char>(*it);
 

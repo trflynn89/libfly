@@ -979,6 +979,74 @@ TEST_F(JsonTest, Stream)
 }
 
 //==============================================================================
+TEST_F(JsonTest, StreamWithEscapedSymbols)
+{
+    {
+        fly::Json json = "abc\\\"def";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\\"def\"");
+    }
+    {
+        fly::Json json = "abc\\\\def";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\\\def\"");
+    }
+    {
+        fly::Json json = "abc\\bdef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\bdef\"");
+    }
+    {
+        fly::Json json = "abc\\fdef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\fdef\"");
+    }
+    {
+        fly::Json json = "abc\\ndef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\ndef\"");
+    }
+    {
+        fly::Json json = "abc\\rdef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\rdef\"");
+    }
+    {
+        fly::Json json = "abc\\tdef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\tdef\"");
+    }
+}
+
+//==============================================================================
 TEST_F(JsonTest, UnicodeConversion)
 {
     validate_fail("\\u");

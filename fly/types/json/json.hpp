@@ -506,8 +506,8 @@ private:
      *
      * @throws JsonException If the string value is not valid.
      */
-    JsonTraits::string_type
-    validate_string(const JsonTraits::string_type &str) const noexcept(false);
+    static JsonTraits::string_type
+    validate_string(const JsonTraits::string_type &str) noexcept(false);
 
     /**
      * After reading a reverse solidus character, read the escaped character
@@ -521,11 +521,14 @@ private:
      * @throws JsonException If the interpreted escaped character is not valid
      *         or there weren't enough available bytes.
      */
-    void read_escaped_character(
+    static void read_escaped_character(
         stream_type &stream,
         JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end) const
-        noexcept(false);
+        const JsonTraits::string_type::const_iterator &end) noexcept(false);
+
+    static void write_escaped_charater(
+        std::ostream &stream,
+        JsonTraits::string_type::value_type ch) noexcept(false);
 
     /**
      * After determining the escaped character is a unicode encoding, read the
@@ -540,11 +543,10 @@ private:
      * @throws JsonException If the interpreted unicode character is not valid
      *         or there weren't enough available bytes.
      */
-    void read_unicode_character(
+    static void read_unicode_character(
         stream_type &stream,
         JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end) const
-        noexcept(false);
+        const JsonTraits::string_type::const_iterator &end) noexcept(false);
 
     /**
      * Read a single 4-byte unicode encoding.
@@ -557,10 +559,9 @@ private:
      * @throws JsonException If any of the 4 read bytes were non-hexadecimal or
      *         there weren't enough available bytes.
      */
-    int read_unicode_codepoint(
+    static int read_unicode_codepoint(
         JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end) const
-        noexcept(false);
+        const JsonTraits::string_type::const_iterator &end) noexcept(false);
 
     /**
      * Validate a single non-escaped character is compliant.
@@ -571,11 +572,10 @@ private:
      *
      * @throws JsonException If the character value is not valid.
      */
-    void validate_character(
+    static void validate_character(
         stream_type &stream,
         JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end) const
-        noexcept(false);
+        const JsonTraits::string_type::const_iterator &end) noexcept(false);
 
     json_type m_value;
 };
