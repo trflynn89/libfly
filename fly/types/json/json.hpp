@@ -72,6 +72,19 @@ public:
         JsonTraits::float_type>;
 
     /**
+     * Aliases for canonical STL container member types.
+     */
+    using value_type = Json;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using allocator_type = std::allocator<value_type>;
+    using reference = value_type &;
+    using const_reference = const value_type &;
+    using pointer = typename std::allocator_traits<allocator_type>::pointer;
+    using const_pointer =
+        typename std::allocator_traits<allocator_type>::const_pointer;
+
+    /**
      * Alias for a basic_stringstream with the JSON string type.
      */
     using stream_type =
@@ -182,7 +195,7 @@ public:
      *
      * @param json The Json instance to copy.
      */
-    Json(const Json &json) noexcept;
+    Json(const_reference json) noexcept;
 
     /**
      * Move constructor. Intializes the Json instance with the type and value
@@ -217,7 +230,7 @@ public:
      *
      * @return A reference to this Json instance.
      */
-    Json &operator=(Json json) noexcept;
+    reference operator=(Json json) noexcept;
 
     /**
      * @return True if the Json instance is null.
@@ -386,7 +399,7 @@ public:
      * @throws JsonException If the Json instance is neither an object nor null,
      *         or the key value is invalid.
      */
-    Json &operator[](
+    reference operator[](
         const typename JsonTraits::object_type::key_type &key) noexcept(false);
 
     /**
@@ -402,7 +415,7 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key
      *         value does not exist, or the key value is invalid.
      */
-    const Json &
+    const_reference
     operator[](const typename JsonTraits::object_type::key_type &key) const
         noexcept(false);
 
@@ -421,8 +434,7 @@ public:
      *
      * @throws JsonException If the Json instance is neither an array nor null.
      */
-    Json &operator[](typename JsonTraits::array_type::size_type index) noexcept(
-        false);
+    reference operator[](size_type index) noexcept(false);
 
     /**
      * Array read-only access operator.
@@ -437,12 +449,87 @@ public:
      * @throws JsonException If the Json instance is not an array or the index
      *         does not exist.
      */
-    const Json &
-    operator[](typename JsonTraits::array_type::size_type index) const
+    const_reference operator[](size_type index) const noexcept(false);
+
+    /**
+     * Object read-only accessor.
+     *
+     * If the Json instance is an object, perform a lookup on the object with a
+     * key value.
+     *
+     * @param key The key value to lookup.
+     *
+     * @return A reference to the Json instance at the key value.
+     *
+     * @throws JsonException If the Json instance is not an object, or the key
+     *         value does not exist, or the key value is invalid.
+     */
+    reference
+    at(const typename JsonTraits::object_type::key_type &key) noexcept(false);
+
+    /**
+     * Object read-only accessor.
+     *
+     * If the Json instance is an object, perform a lookup on the object with a
+     * key value.
+     *
+     * @param key The key value to lookup.
+     *
+     * @return A reference to the Json instance at the key value.
+     *
+     * @throws JsonException If the Json instance is not an object, or the key
+     *         value does not exist, or the key value is invalid.
+     */
+    const_reference
+    at(const typename JsonTraits::object_type::key_type &key) const
         noexcept(false);
 
     /**
-     * Get the size of the Json instance.
+     * Array read-only accessor.
+     *
+     * If the Json instance is an array, perform a lookup on the array with an
+     * index.
+     *
+     * @param index The index to lookup.
+     *
+     * @return A reference to the Json instance at the index.
+     *
+     * @throws JsonException If the Json instance is not an array or the index
+     *         does not exist.
+     */
+    reference at(size_type index) noexcept(false);
+
+    /**
+     * Array read-only accessor.
+     *
+     * If the Json instance is an array, perform a lookup on the array with an
+     * index.
+     *
+     * @param index The index to lookup.
+     *
+     * @return A reference to the Json instance at the index.
+     *
+     * @throws JsonException If the Json instance is not an array or the index
+     *         does not exist.
+     */
+    const_reference at(size_type index) const noexcept(false);
+
+    /**
+     * Check if the Json instance contains zero elements.
+     *
+     * If the Json instance is an object, array, or string, return whether the
+     * stored container is empty.
+     *
+     * If the Json instance is null, return true.
+     *
+     * If the Json instance is a boolean or numeric, return false.
+     *
+     * @return True if the instance is empty.
+     */
+    bool empty() const noexcept;
+
+    /**
+     * Get the number of elements in the Json instance.
      *
      * If the Json instance is an object or array, return the number of elements
      * stored in the object or array.
@@ -455,7 +542,56 @@ public:
      *
      * @return The size of the Json instance.
      */
-    std::size_t size() const noexcept;
+    size_type size() const noexcept;
+
+    /**
+     * Clear the contents of the Json instance.
+     *
+     * If the Json instance is an object, array, or string, clears the stored
+     * container.
+     *
+     * If the Json instance is a boolean, sets to false.
+     *
+     * If the Json instance is numeric, sets to zero.
+     */
+    void clear() noexcept;
+
+    /**
+     * Exchange the contents of the Json instance with another instance.
+     *
+     * @param json The Json instance to swap with.
+     */
+    void swap(reference json) noexcept;
+
+    /**
+     * Exchange the contents of the Json instance with another string. Only
+     * valid if the Json instance is a string.
+     *
+     * @param json The string to swap with.
+     *
+     * @throws JsonException If the Json instance is not a string.
+     */
+    void swap(JsonTraits::string_type &other) noexcept(false);
+
+    /**
+     * Exchange the contents of the Json instance with another object. Only
+     * valid if the Json instance is an object.
+     *
+     * @param json The object to swap with.
+     *
+     * @throws JsonException If the Json instance is not an object.
+     */
+    void swap(JsonTraits::object_type &other) noexcept(false);
+
+    /**
+     * Exchange the contents of the Json instance with another array. Only
+     * valid if the Json instance is an array.
+     *
+     * @param json The array to swap with.
+     *
+     * @throws JsonException If the Json instance is not an array.
+     */
+    void swap(JsonTraits::array_type &other) noexcept(false);
 
     /**
      * Equality operator. Compares two Json instances for equality. They are
@@ -473,7 +609,8 @@ public:
      *
      * @return True if the two Json instances are equal.
      */
-    friend bool operator==(const Json &json1, const Json &json2) noexcept;
+    friend bool
+    operator==(const_reference json1, const_reference json2) noexcept;
 
     /**
      * Unequality operator. Compares two Json instances for unequality. They are
@@ -481,7 +618,8 @@ public:
      *
      * @return True if the two Json instances are unequal.
      */
-    friend bool operator!=(const Json &json1, const Json &json2) noexcept;
+    friend bool
+    operator!=(const_reference json1, const_reference json2) noexcept;
 
     /**
      * Stream operator. Stream the Json instance into an output stream.
@@ -492,7 +630,7 @@ public:
      * @return A reference to the output stream.
      */
     friend std::ostream &
-    operator<<(std::ostream &stream, const Json &json) noexcept;
+    operator<<(std::ostream &stream, const_reference json) noexcept;
 
 private:
     /**
@@ -526,9 +664,16 @@ private:
         JsonTraits::string_type::const_iterator &it,
         const JsonTraits::string_type::const_iterator &end) noexcept(false);
 
+    /**
+     * Write a character to a stream, handling any value that should be escaped.
+     * For those characters, an extra reverse solidus is inserted.
+     *
+     * @param stream Stream to pipe the escaped character into.
+     * @param ch Character to escape.
+     */
     static void write_escaped_charater(
         std::ostream &stream,
-        JsonTraits::string_type::value_type ch) noexcept(false);
+        JsonTraits::string_type::value_type ch) noexcept;
 
     /**
      * After determining the escaped character is a unicode encoding, read the
@@ -603,7 +748,9 @@ public:
      * @param json The Json instance for which the error was encountered.
      * @param message Message indicating what error was encountered.
      */
-    JsonException(const Json &json, const std::string &message) noexcept;
+    JsonException(
+        Json::const_reference json,
+        const std::string &message) noexcept;
 
     /**
      * @return C-string representing this exception.

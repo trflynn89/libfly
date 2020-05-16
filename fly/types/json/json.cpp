@@ -20,7 +20,7 @@ Json::Json(const JsonTraits::null_type &value) noexcept : m_value(value)
 }
 
 //==============================================================================
-Json::Json(const Json &json) noexcept : m_value(json.m_value)
+Json::Json(const_reference json) noexcept : m_value(json.m_value)
 {
 }
 
@@ -33,7 +33,9 @@ Json::Json(Json &&json) noexcept : m_value(std::move(json.m_value))
 //==============================================================================
 Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
 {
-    auto object_test = [](const Json &json) { return json.is_object_like(); };
+    auto object_test = [](const_reference json) {
+        return json.is_object_like();
+    };
 
     if (std::all_of(initializer.begin(), initializer.end(), object_test))
     {
@@ -100,9 +102,9 @@ Json::~Json()
 }
 
 //==============================================================================
-Json &Json::operator=(Json json) noexcept
+Json::reference Json::operator=(Json json) noexcept
 {
-    std::swap(m_value, json.m_value);
+    swap(json);
     return *this;
 }
 
@@ -193,7 +195,7 @@ Json::operator JsonTraits::string_type() const noexcept(false)
 }
 
 //==============================================================================
-Json &Json::operator[](
+Json::reference Json::operator[](
     const typename JsonTraits::object_type::key_type &key) noexcept(false)
 {
     if (is_null())
@@ -213,33 +215,15 @@ Json &Json::operator[](
 }
 
 //==============================================================================
-const Json &
+Json::const_reference
 Json::operator[](const typename JsonTraits::object_type::key_type &key) const
     noexcept(false)
 {
-    if (is_object())
-    {
-        const Json json(key);
-        const auto &value = std::get<JsonTraits::object_type>(m_value);
-
-        auto it = value.find(JsonTraits::object_type::key_type(json));
-
-        if (it == value.end())
-        {
-            throw JsonException(
-                *this,
-                String::format("Given key (%s) not found", key));
-        }
-
-        return it->second;
-    }
-
-    throw JsonException(*this, "JSON type invalid for operator[key]");
+    return at(key);
 }
 
 //==============================================================================
-Json &Json::operator[](
-    typename JsonTraits::array_type::size_type index) noexcept(false)
+Json::reference Json::operator[](size_type index) noexcept(false)
 {
     if (is_null())
     {
@@ -262,9 +246,82 @@ Json &Json::operator[](
 }
 
 //==============================================================================
-const Json &
-Json::operator[](typename JsonTraits::array_type::size_type index) const
+Json::const_reference Json::operator[](size_type index) const noexcept(false)
+{
+    return at(index);
+}
+
+//==============================================================================
+Json::reference
+Json::at(const typename JsonTraits::object_type::key_type &key) noexcept(false)
+{
+    if (is_object())
+    {
+        const Json json(key);
+        auto &value = std::get<JsonTraits::object_type>(m_value);
+
+        auto it = value.find(JsonTraits::object_type::key_type(json));
+
+        if (it == value.end())
+        {
+            throw JsonException(
+                *this,
+                String::format("Given key (%s) not found", key));
+        }
+
+        return it->second;
+    }
+
+    throw JsonException(*this, "JSON type invalid for operator[key]");
+}
+
+//==============================================================================
+Json::const_reference
+Json::at(const typename JsonTraits::object_type::key_type &key) const
     noexcept(false)
+{
+    if (is_object())
+    {
+        const Json json(key);
+        const auto &value = std::get<JsonTraits::object_type>(m_value);
+
+        const auto it = value.find(JsonTraits::object_type::key_type(json));
+
+        if (it == value.end())
+        {
+            throw JsonException(
+                *this,
+                String::format("Given key (%s) not found", key));
+        }
+
+        return it->second;
+    }
+
+    throw JsonException(*this, "JSON type invalid for operator[key]");
+}
+
+//==============================================================================
+Json::reference Json::at(size_type index) noexcept(false)
+{
+    if (is_array())
+    {
+        auto &value = std::get<JsonTraits::array_type>(m_value);
+
+        if (index >= value.size())
+        {
+            throw JsonException(
+                *this,
+                String::format("Given index (%d) not found", index));
+        }
+
+        return value.at(index);
+    }
+
+    throw JsonException(*this, "JSON type invalid for operator[index]");
+}
+
+//==============================================================================
+Json::const_reference Json::at(size_type index) const noexcept(false)
 {
     if (is_array())
     {
@@ -284,9 +341,35 @@ Json::operator[](typename JsonTraits::array_type::size_type index) const
 }
 
 //==============================================================================
-std::size_t Json::size() const noexcept
+bool Json::empty() const noexcept
 {
-    auto visitor = [](const auto &value) noexcept -> std::size_t {
+    auto visitor = [](const auto &value) noexcept -> bool {
+        using T = std::decay_t<decltype(value)>;
+
+        if constexpr (std::is_same_v<T, JsonTraits::null_type>)
+        {
+            return true;
+        }
+        else if constexpr (
+            std::is_same_v<T, JsonTraits::string_type> ||
+            std::is_same_v<T, JsonTraits::object_type> ||
+            std::is_same_v<T, JsonTraits::array_type>)
+        {
+            return value.empty();
+        }
+        else
+        {
+            return false;
+        }
+    };
+
+    return std::visit(visitor, m_value);
+}
+
+//==============================================================================
+Json::size_type Json::size() const noexcept
+{
+    auto visitor = [](const auto &value) noexcept -> size_type {
         using T = std::decay_t<decltype(value)>;
 
         if constexpr (std::is_same_v<T, JsonTraits::null_type>)
@@ -310,7 +393,86 @@ std::size_t Json::size() const noexcept
 }
 
 //==============================================================================
-bool operator==(const Json &json1, const Json &json2) noexcept
+void Json::clear() noexcept
+{
+    auto visitor = [](auto &value) noexcept {
+        using T = std::decay_t<decltype(value)>;
+
+        if constexpr (
+            std::is_same_v<T, JsonTraits::string_type> ||
+            std::is_same_v<T, JsonTraits::object_type> ||
+            std::is_same_v<T, JsonTraits::array_type>)
+        {
+            value.clear();
+        }
+        else if constexpr (std::is_same_v<T, JsonTraits::boolean_type>)
+        {
+            value = false;
+        }
+        else if constexpr (
+            std::is_same_v<T, JsonTraits::signed_type> ||
+            std::is_same_v<T, JsonTraits::unsigned_type> ||
+            std::is_same_v<T, JsonTraits::float_type>)
+        {
+            value = static_cast<T>(0);
+        }
+    };
+
+    std::visit(visitor, m_value);
+}
+
+//==============================================================================
+void Json::swap(reference json) noexcept
+{
+    std::swap(m_value, json.m_value);
+}
+
+//==============================================================================
+void Json::swap(JsonTraits::string_type &other) noexcept(false)
+{
+    if (is_string())
+    {
+        auto &value = std::get<JsonTraits::string_type>(m_value);
+        std::swap(value, other);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON type invalid for swap(string)");
+    }
+}
+
+//==============================================================================
+void Json::swap(JsonTraits::object_type &other) noexcept(false)
+{
+    if (is_object())
+    {
+        auto &value = std::get<JsonTraits::object_type>(m_value);
+        std::swap(value, other);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON type invalid for swap(object)");
+    }
+}
+
+//==============================================================================
+void Json::swap(JsonTraits::array_type &other) noexcept(false)
+{
+    if (is_array())
+    {
+        auto &value = std::get<JsonTraits::array_type>(m_value);
+        std::swap(value, other);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON type invalid for swap(array)");
+    }
+}
+
+//==============================================================================
+bool operator==(
+    Json::const_reference json1,
+    Json::const_reference json2) noexcept
 {
     auto visitor = [](const auto &value1, const auto &value2) noexcept -> bool {
         using F = JsonTraits::float_type;
@@ -345,13 +507,16 @@ bool operator==(const Json &json1, const Json &json2) noexcept
 }
 
 //==============================================================================
-bool operator!=(const Json &json1, const Json &json2) noexcept
+bool operator!=(
+    Json::const_reference json1,
+    Json::const_reference json2) noexcept
 {
     return !(json1 == json2);
 }
 
 //==============================================================================
-std::ostream &operator<<(std::ostream &stream, const Json &json) noexcept
+std::ostream &
+operator<<(std::ostream &stream, Json::const_reference json) noexcept
 {
     auto serialize_string = [&stream](const JsonTraits::string_type &value) {
         stream << '"';
@@ -504,7 +669,7 @@ void Json::read_escaped_character(
 //==============================================================================
 void Json::write_escaped_charater(
     std::ostream &stream,
-    JsonTraits::string_type::value_type ch) noexcept(false)
+    JsonTraits::string_type::value_type ch) noexcept
 {
     switch (ch)
     {
@@ -823,7 +988,7 @@ JsonException::JsonException(const std::string &message) noexcept :
 
 //==============================================================================
 JsonException::JsonException(
-    const Json &json,
+    Json::const_reference json,
     const std::string &message) noexcept :
     m_message(String::format("JsonException: %s (%s)", message, json))
 {
