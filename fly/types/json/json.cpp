@@ -442,34 +442,6 @@ void Json::swap(JsonTraits::string_type &other) noexcept(false)
 }
 
 //==============================================================================
-void Json::swap(JsonTraits::object_type &other) noexcept(false)
-{
-    if (is_object())
-    {
-        auto &value = std::get<JsonTraits::object_type>(m_value);
-        std::swap(value, other);
-    }
-    else
-    {
-        throw JsonException(*this, "JSON type invalid for swap(object)");
-    }
-}
-
-//==============================================================================
-void Json::swap(JsonTraits::array_type &other) noexcept(false)
-{
-    if (is_array())
-    {
-        auto &value = std::get<JsonTraits::array_type>(m_value);
-        std::swap(value, other);
-    }
-    else
-    {
-        throw JsonException(*this, "JSON type invalid for swap(array)");
-    }
-}
-
-//==============================================================================
 bool operator==(
     Json::const_reference json1,
     Json::const_reference json2) noexcept
