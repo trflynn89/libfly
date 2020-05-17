@@ -585,7 +585,8 @@ public:
      *
      * @throws JsonException If the Json instance is not an object.
      */
-    void swap(JsonTraits::object_type &other) noexcept(false);
+    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
+    void swap(T &other) noexcept(false);
 
     /**
      * Exchange the contents of the Json instance with another array. Only
@@ -595,7 +596,8 @@ public:
      *
      * @throws JsonException If the Json instance is not an array.
      */
-    void swap(JsonTraits::array_type &other) noexcept(false);
+    template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
+    void swap(T &other) noexcept(false);
 
     /**
      * Equality operator. Compares two Json instances for equality. They are
@@ -897,7 +899,6 @@ Json::operator T() const noexcept
             return false;
         }
     };
-
     return std::visit(visitor, m_value);
 }
 
@@ -935,6 +936,40 @@ Json::operator T() const noexcept(false)
     };
 
     return std::visit(visitor, m_value);
+}
+
+//==============================================================================
+template <typename T, enable_if_all<JsonTraits::is_object<T>>>
+void Json::swap(T &other) noexcept(false)
+{
+    if (is_object())
+    {
+        T object = static_cast<T>(*this);
+        *this = other;
+
+        std::swap(object, other);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON type invalid for swap(object)");
+    }
+}
+
+//==============================================================================
+template <typename T, enable_if_all<JsonTraits::is_array<T>>>
+void Json::swap(T &other) noexcept(false)
+{
+    if (is_array())
+    {
+        T array = static_cast<T>(*this);
+        *this = other;
+
+        std::swap(array, other);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON type invalid for swap(array)");
+    }
 }
 
 } // namespace fly
