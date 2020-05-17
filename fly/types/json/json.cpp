@@ -179,7 +179,7 @@ Json::operator JsonTraits::null_type() const noexcept(false)
 }
 
 //==============================================================================
-Json::operator JsonTraits::string_type() const noexcept(false)
+Json::operator JsonTraits::string_type() const noexcept
 {
     if (is_string())
     {

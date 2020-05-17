@@ -299,7 +299,7 @@ public:
      *
      * @return The Json instance as a string.
      */
-    explicit operator JsonTraits::string_type() const noexcept(false);
+    explicit operator JsonTraits::string_type() const noexcept;
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The
@@ -310,7 +310,8 @@ public:
      *
      * @return The Json instance as the object-like type.
      *
-     * @throws JsonException If the Json instance is not an object.
+     * @throws JsonException If the Json instance is not an object, or a stored
+     *         element could not be converted to the target object's value type.
      */
     template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
     explicit operator T() const noexcept(false);
@@ -326,7 +327,8 @@ public:
      *
      * @return The Json instance as the array-like type.
      *
-     * @throws JsonException If the Json instance is not an array.
+     * @throws JsonException If the Json instance is not an array, or a stored
+     *         element could not be converted to the target array's value type.
      */
     template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
     explicit operator T() const noexcept(false);
@@ -342,7 +344,8 @@ public:
      *
      * @return The Json instance as a std::array.
      *
-     * @throws JsonException If the Json instance is not an array.
+     * @throws JsonException If the Json instance is not an array, or a stored
+     *         element could not be converted to the target array's value type.
      */
     template <typename T, std::size_t N>
     explicit operator std::array<T, N>() const noexcept(false);
@@ -359,7 +362,7 @@ public:
      * @return The Json instance as a boolean.
      */
     template <typename T, enable_if_all<JsonTraits::is_boolean<T>> = 0>
-    explicit operator T() const noexcept(false);
+    explicit operator T() const noexcept;
 
     /**
      * Numeric conversion operator. Converts the Json instance to a numeric
@@ -373,7 +376,8 @@ public:
      *
      * @return The Json instance as the numeric type.
      *
-     * @throws JsonException If the Json instance is not numeric.
+     * @throws JsonException If the Json instance is not numeric, or the stored
+     *         value could not be converted to the target numeric type.
      */
     template <
         typename T,
@@ -815,8 +819,7 @@ Json::operator T() const noexcept(false)
 {
     if (is_object())
     {
-        const JsonTraits::object_type &value =
-            std::get<JsonTraits::object_type>(m_value);
+        const auto &value = std::get<JsonTraits::object_type>(m_value);
         return T(value.begin(), value.end());
     }
 
@@ -829,9 +832,16 @@ Json::operator T() const noexcept(false)
 {
     if (is_array())
     {
-        const JsonTraits::array_type &value =
-            std::get<JsonTraits::array_type>(m_value);
-        return T(value.begin(), value.end());
+        const auto &value = std::get<JsonTraits::array_type>(m_value);
+        T array {};
+
+        for (const auto &it : value)
+        {
+            auto copy = static_cast<typename T::value_type>(it);
+            JsonTraits::ArrayTraits::append(array, std::move(copy));
+        }
+
+        return array;
     }
 
     throw JsonException(*this, "JSON type is not an array");
@@ -843,8 +853,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 {
     if (is_array())
     {
-        const JsonTraits::array_type &value =
-            std::get<JsonTraits::array_type>(m_value);
+        const auto &value = std::get<JsonTraits::array_type>(m_value);
         std::array<T, N> array {};
 
         for (std::size_t i = 0; i < std::min(N, value.size()); ++i)
@@ -860,7 +869,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 
 //==============================================================================
 template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
-Json::operator T() const noexcept(false)
+Json::operator T() const noexcept
 {
     auto visitor = [](const auto &value) noexcept -> T {
         using U = std::decay_t<decltype(value)>;

@@ -73,7 +73,7 @@ IncludeCategories:
   - Regex: '<[[:alnum:]./_]+>'
     Priority: 6
 IndentCaseLabels: true
-# IndentGotoLabels: false
+IndentGotoLabels: false
 IndentPPDirectives: AfterHash
 IndentWidth: 4
 IndentWrappedFunctionNames: false
@@ -99,7 +99,7 @@ SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: true
-# SpaceInEmptyBlock: true
+SpaceInEmptyBlock: true
 SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 1
 SpacesInAngles: false
