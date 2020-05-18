@@ -1,6 +1,8 @@
 #pragma once
 
 #include "fly/traits/traits.hpp"
+#include "fly/types/json/detail/json_iterator.hpp"
+#include "fly/types/json/json_exception.hpp"
 #include "fly/types/json/json_traits.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -83,6 +85,8 @@ public:
     using pointer = typename std::allocator_traits<allocator_type>::pointer;
     using const_pointer =
         typename std::allocator_traits<allocator_type>::const_pointer;
+    using iterator = detail::JsonIterator<Json>;
+    using const_iterator = detail::JsonIterator<const Json>;
 
     /**
      * Alias for a basic_stringstream with the JSON string type.
@@ -600,6 +604,36 @@ public:
     void swap(T &other) noexcept(false);
 
     /**
+     *
+     */
+    iterator begin() noexcept;
+
+    /**
+     *
+     */
+    const_iterator begin() const noexcept;
+
+    /**
+     *
+     */
+    const_iterator cbegin() const noexcept;
+
+    /**
+     *
+     */
+    iterator end() noexcept;
+
+    /**
+     *
+     */
+    const_iterator end() const noexcept;
+
+    /**
+     *
+     */
+    const_iterator cend() const noexcept;
+
+    /**
      * Equality operator. Compares two Json instances for equality. They are
      * equal if one of the following is true:
      *
@@ -729,42 +763,6 @@ private:
         const JsonTraits::string_type::const_iterator &end) noexcept(false);
 
     json_type m_value;
-};
-
-/**
- * Exception to be raised if an error was encountered creating, accessing, or
- * modifying a Json instance.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version September 24, 2017
- */
-class JsonException : public std::exception
-{
-public:
-    /**
-     * Constructor.
-     *
-     * @param message Message indicating what error was encountered.
-     */
-    JsonException(const std::string &message) noexcept;
-
-    /**
-     * Constructor.
-     *
-     * @param json The Json instance for which the error was encountered.
-     * @param message Message indicating what error was encountered.
-     */
-    JsonException(
-        Json::const_reference json,
-        const std::string &message) noexcept;
-
-    /**
-     * @return C-string representing this exception.
-     */
-    virtual const char *what() const noexcept override;
-
-private:
-    const std::string m_message;
 };
 
 //==============================================================================

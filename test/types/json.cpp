@@ -1760,6 +1760,131 @@ TEST_F(JsonTest, ArraySwap)
 }
 
 //==============================================================================
+TEST_F(JsonTest, IteratorBegin)
+{
+    std::cout << std::boolalpha;
+
+    fly::Json json1 {1, nullptr, 3};
+    auto it1 = json1.begin();
+    std::cout << json1 << std::endl;
+    std::cout << "it1 " << (*it1) << std::endl;
+    auto now1a = it1++;
+    EXPECT_FALSE(now1a == it1);
+    EXPECT_TRUE(now1a != it1);
+    EXPECT_TRUE(now1a < it1);
+    EXPECT_TRUE(now1a <= it1);
+    EXPECT_FALSE(it1 < now1a);
+    EXPECT_FALSE(it1 <= now1a);
+    EXPECT_FALSE(now1a > it1);
+    EXPECT_FALSE(now1a >= it1);
+    EXPECT_TRUE(it1 > now1a);
+    EXPECT_TRUE(it1 >= now1a);
+    std::cout << "now1a " << (*now1a) << std::endl;
+    std::cout << "it1 " << (*it1) << std::endl;
+    auto now1b = it1--;
+    std::cout << "now1b " << (*now1b) << std::endl;
+    std::cout << "it1 " << (*it1) << std::endl;
+    it1 += 2;
+    std::cout << "it1 " << (*it1) << std::endl;
+    it1 -= 2;
+    std::cout << "it1 " << (*it1) << std::endl;
+    auto now1c = it1 + 2;
+    std::cout << "now1c " << (*now1c) << std::endl;
+    auto now1d = now1c - 2;
+    std::cout << "now1d " << (*now1d) << std::endl;
+    auto now1e = 2 + it1;
+    std::cout << "now1e " << (*now1e) << std::endl;
+    auto diff1a = now1e - now1d;
+    std::cout << "diff1a " << diff1a << std::endl;
+    auto diff1b = now1d - now1e;
+    std::cout << "diff1b " << diff1b << std::endl;
+    auto index1a = now1d[2];
+    std::cout << "index1a " << index1a << std::endl;
+    auto index1b = now1e[-2];
+    std::cout << "index1b " << index1b << std::endl;
+
+    for (fly::Json &json : json1)
+    {
+        std::cout << json << ' ';
+    }
+    std::cout << std::endl;
+
+    std::cout << std::endl;
+
+    const fly::Json json2 {4, true, 6};
+    auto it2 = json2.begin();
+    std::cout << json2 << std::endl;
+    std::cout << "it2 " << (*it2) << std::endl;
+    auto now2a = ++it2;
+    EXPECT_TRUE(now2a == it2);
+    EXPECT_FALSE(now2a != it2);
+    EXPECT_FALSE(now2a < it2);
+    EXPECT_TRUE(now2a <= it2);
+    EXPECT_FALSE(it2 < now2a);
+    EXPECT_TRUE(it2 <= now2a);
+    EXPECT_FALSE(now2a > it2);
+    EXPECT_TRUE(now2a >= it2);
+    EXPECT_FALSE(it2 > now2a);
+    EXPECT_TRUE(it2 >= now2a);
+    std::cout << "now2a " << (*now2a) << std::endl;
+    std::cout << "it2 " << (*it2) << std::endl;
+    auto now2b = --it2;
+    std::cout << "now2b " << (*now2b) << std::endl;
+    std::cout << "it2 " << (*it2) << std::endl;
+    it2 += 2;
+    std::cout << "it2 " << (*it2) << std::endl;
+    it2 -= 2;
+    std::cout << "it2 " << (*it2) << std::endl;
+    auto now2c = it2 + 2;
+    std::cout << "now2c " << (*now2c) << std::endl;
+    auto now2d = now2c - 2;
+    std::cout << "now2d " << (*now2d) << std::endl;
+    auto now2e = 2 + it2;
+    std::cout << "now2e " << (*now2e) << std::endl;
+    auto diff2a = now2e - now2d;
+    std::cout << "diff2a " << diff2a << std::endl;
+    auto diff2b = now2d - now2e;
+    std::cout << "diff2b " << diff2b << std::endl;
+    auto index2a = now2d[2];
+    std::cout << "index2a " << index2a << std::endl;
+    auto index2b = now2e[-2];
+    std::cout << "index2b " << index2b << std::endl;
+
+    for (const fly::Json &json : json2)
+    {
+        std::cout << json << ' ';
+    }
+    std::cout << std::endl;
+
+    fly::Json json3 = json1;
+    EXPECT_THROW(
+        FLY_UNUSED(json1.begin() == json3.begin()),
+        fly::JsonException);
+    EXPECT_THROW(
+        FLY_UNUSED(json1.begin() != json3.begin()),
+        fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(json1.begin() < json3.begin()), fly::JsonException);
+    EXPECT_THROW(
+        FLY_UNUSED(json1.begin() <= json3.begin()),
+        fly::JsonException);
+
+    fly::Json json4 {{"a", 1}};
+    EXPECT_THROW(FLY_UNUSED(json4.begin() < json4.begin()), fly::JsonException);
+    EXPECT_THROW(
+        FLY_UNUSED(json4.begin() <= json4.begin()),
+        fly::JsonException);
+
+    fly::Json::iterator it;
+    EXPECT_THROW(FLY_UNUSED(++it), fly::JsonException);
+
+    fly::Json::iterator it3 = json1.begin();
+    fly::Json::const_iterator it4(it3);
+    std::cout << "it4 " << (*it4) << std::endl;
+    fly::Json::const_iterator it5 = it3;
+    std::cout << "it5 " << (*it5) << std::endl;
+}
+
+//==============================================================================
 TEST_F(JsonTest, Equality)
 {
     fly::Json string1 = "abc";
