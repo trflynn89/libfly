@@ -96,7 +96,16 @@
     <ClCompile Include="..\..\..\test\types\concurrent_container.cpp">
       <Filter>types</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\types\endian.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\types\json.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\json_exception.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\json_iterator.cpp">
       <Filter>types</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\json_traits.cpp">
@@ -123,7 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\config\test_config.hpp">
-      <Filter>util</Filter>
+      <Filter>config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\test\util\capture_stream.hpp">
       <Filter>util</Filter>

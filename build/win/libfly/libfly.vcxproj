@@ -156,18 +156,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\fly.hpp" />
-    <ClInclude Include="..\..\..\fly\coders\coder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\base64\base64_coder.hpp" />
+    <ClInclude Include="..\..\..\fly\coders\coder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.hpp" />
     <ClInclude Include="..\..\..\fly\config\config.hpp" />
     <ClInclude Include="..\..\..\fly\config\config_manager.hpp" />
+    <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.hpp" />
     <ClInclude Include="..\..\..\fly\logger\log.hpp" />
     <ClInclude Include="..\..\..\fly\logger\logger.hpp" />
     <ClInclude Include="..\..\..\fly\logger\logger_config.hpp" />
-    <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.hpp" />
     <ClInclude Include="..\..\..\fly\parser\exceptions.hpp" />
     <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp" />
     <ClInclude Include="..\..\..\fly\parser\json_parser.hpp" />
@@ -201,7 +201,9 @@
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_stack.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\detail\concurrent_container.hpp" />
+    <ClInclude Include="..\..\..\fly\types\json\detail\json_iterator.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\json.hpp" />
+    <ClInclude Include="..\..\..\fly\types\json\json_exception.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\json_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\literals\detail\literal_parser.hpp" />
     <ClInclude Include="..\..\..\fly\types\literals\literals.hpp" />
@@ -212,8 +214,8 @@
     <ClInclude Include="..\..\..\fly\types\string\string_literal.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\fly\coders\coder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\base64\base64_coder.cpp" />
+    <ClCompile Include="..\..\..\fly\coders\coder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_config.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_decoder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_encoder.cpp" />
@@ -247,6 +249,7 @@
     <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream_writer.cpp" />
     <ClCompile Include="..\..\..\fly\types\bit_stream\detail\bit_stream.cpp" />
     <ClCompile Include="..\..\..\fly\types\json\json.cpp" />
+    <ClCompile Include="..\..\..\fly\types\json\json_exception.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
