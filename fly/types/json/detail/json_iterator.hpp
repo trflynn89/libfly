@@ -32,8 +32,8 @@ namespace fly::detail {
  * iterator from a non-const iterator (and to forbid the other direction). To
  * achieve this, the standard copy constructor and assignment operator are left
  * implicitly defined. Overloads are explictly defined which accept non-const
- * iterators. These allow constructing const iterators from const iterators;
- * non-const iterators from non-const iterators; and const iterators from non-
+ * iterators. These allow constructing const iterators from const iterators,
+ * non-const iterators from non-const iterators, and const iterators from non-
  * const iterators.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
@@ -89,7 +89,7 @@ public:
      * Aliases for canonical STL iterator member types.
      */
     using iterator_category = std::bidirectional_iterator_tag;
-    using value_type = typename JsonType::value_type;
+    using value_type = JsonType;
     using difference_type = typename JsonType::difference_type;
     using reference = std::conditional_t<
         is_const_iterator,
@@ -101,9 +101,29 @@ public:
         typename JsonType::pointer>;
 
     /**
+     * Enumeration to indicate the initial position of the iterator.
+     */
+    enum class Position : std::uint8_t
+    {
+        Begin,
+        End,
+    };
+
+    /**
      * Default constructor. Initializes the iterator to a null value.
      */
     JsonIterator() noexcept;
+
+    /**
+     * Constructor to initialize the iterator to be pointed at the beginning or
+     * end of a Json instance.
+     *
+     * @param value A pointer to the Json instance.
+     * @param position The initial position of the iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    JsonIterator(pointer value, Position position) noexcept(false);
 
     /**
      * Conversion copy constructor. Allows constructing a const or non-const
@@ -362,32 +382,6 @@ private:
         NonConstJsonIterator,
         JsonIterator<const JsonType>>;
 
-    friend JsonType;
-
-    /**
-     * Enumeration to indicate the initial position of the iterator.
-     */
-    enum class Position : std::uint8_t
-    {
-        Begin,
-        End,
-    };
-
-    /**
-     * Private constructor for a Json instance to initialize the iterator to be
-     * pointed at the beginning or end of the instance.
-     *
-     * @param value A pointer to the Json instance itself.
-     * @param json A reference to the Json instances underlying storage.
-     * @param position The initial position of the iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    explicit JsonIterator(
-        pointer value,
-        json_type &json,
-        Position position) noexcept(false);
-
     /**
      * Verify that this iterator is not null.
      *
@@ -423,35 +417,36 @@ JsonIterator<JsonType>::JsonIterator() noexcept : m_value(nullptr)
 
 //==============================================================================
 template <typename JsonType>
-JsonIterator<JsonType>::JsonIterator(
-    pointer value,
-    json_type &json,
-    Position position) noexcept(false) :
+JsonIterator<JsonType>::JsonIterator(pointer value, Position position) noexcept(
+    false) :
     m_value(value)
 {
-    auto set_position = [this, &position](auto &value) noexcept {
-        switch (position)
+    auto visitor = [this, &position](auto &value) noexcept(false) {
+        using T = std::decay_t<decltype(value)>;
+
+        if constexpr (
+            std::is_same_v<T, JsonTraits::object_type> ||
+            std::is_same_v<T, JsonTraits::array_type>)
         {
-            case Position::Begin:
-                m_iterator = value.begin();
-                break;
-            case Position::End:
-                m_iterator = value.end();
-                break;
+            switch (position)
+            {
+                case Position::Begin:
+                    m_iterator = value.begin();
+                    break;
+                case Position::End:
+                    m_iterator = value.end();
+                    break;
+            }
+        }
+        else
+        {
+            throw JsonException(*m_value, "JSON type invalid for iteration");
         }
     };
 
-    if (m_value->is_object())
+    if (m_value != nullptr)
     {
-        set_position(std::get<JsonTraits::object_type>(json));
-    }
-    else if (m_value->is_array())
-    {
-        set_position(std::get<JsonTraits::array_type>(json));
-    }
-    else
-    {
-        throw JsonException(*m_value, "JSON type invalid for iteration");
+        std::visit(visitor, m_value->m_value);
     }
 }
 

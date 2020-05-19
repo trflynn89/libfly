@@ -1733,6 +1733,106 @@ TEST_F(JsonTest, ArraySwap)
 }
 
 //==============================================================================
+TEST_F(JsonTest, IteratorBegin)
+{
+    fly::Json json1 {1, 2, 3};
+    const fly::Json json2 {4, 5, 6};
+
+    auto begin1 = json1.begin();
+    EXPECT_EQ(*begin1, 1);
+    EXPECT_FALSE(std::is_const_v<decltype(begin1)::value_type>);
+
+    auto cbegin1 = json1.cbegin();
+    EXPECT_EQ(*cbegin1, 1);
+    EXPECT_TRUE(std::is_const_v<decltype(cbegin1)::value_type>);
+
+    auto begin2 = json2.begin();
+    EXPECT_EQ(*begin2, 4);
+    EXPECT_TRUE(std::is_const_v<decltype(begin2)::value_type>);
+
+    auto cbegin2 = json2.cbegin();
+    EXPECT_EQ(*cbegin2, 4);
+    EXPECT_EQ(begin2, cbegin2);
+    EXPECT_TRUE(std::is_const_v<decltype(cbegin2)::value_type>);
+}
+
+//==============================================================================
+TEST_F(JsonTest, IteratorEnd)
+{
+    fly::Json json1 {1, 2, 3};
+    const fly::Json json2 {4, 5, 6};
+
+    auto end1 = json1.end();
+    EXPECT_EQ(*(end1 - 1), 3);
+    EXPECT_FALSE(std::is_const_v<decltype(end1)::value_type>);
+
+    auto cend1 = json1.cend();
+    EXPECT_EQ(*(cend1 - 1), 3);
+    EXPECT_TRUE(std::is_const_v<decltype(cend1)::value_type>);
+
+    auto end2 = json2.end();
+    EXPECT_EQ(*(end2 - 1), 6);
+    EXPECT_TRUE(std::is_const_v<decltype(end2)::value_type>);
+
+    auto cend2 = json2.cend();
+    EXPECT_EQ(*(cend2 - 1), 6);
+    EXPECT_EQ(end2, cend2);
+    EXPECT_TRUE(std::is_const_v<decltype(cend2)::value_type>);
+}
+
+//==============================================================================
+TEST_F(JsonTest, IteratorIterate)
+{
+    fly::Json json {1, 2, 3};
+    {
+        fly::Json::size_type size = 0;
+
+        for (auto it = json.begin(); it < json.end(); ++it, ++size)
+        {
+            EXPECT_EQ(*it, json[size]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+    {
+        fly::Json::size_type size = 0;
+
+        for (auto it = json.cbegin(); it < json.cend(); ++it, ++size)
+        {
+            EXPECT_EQ(*it, json[size]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+}
+
+//==============================================================================
+TEST_F(JsonTest, IteratorRangeBasedFor)
+{
+    fly::Json json {1, 2, 3};
+    {
+        fly::Json::size_type size = 0;
+
+        for (fly::Json &value : json)
+        {
+            EXPECT_EQ(value, json[size++]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+    {
+        fly::Json::size_type size = 0;
+
+        for (const fly::Json &value : json)
+        {
+            EXPECT_EQ(value, json[size++]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+}
+
+//==============================================================================
 TEST_F(JsonTest, Equality)
 {
     fly::Json string1 = "abc";

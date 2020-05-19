@@ -697,6 +697,9 @@ public:
     operator<<(std::ostream &stream, const_reference json) noexcept;
 
 private:
+    friend iterator;
+    friend const_iterator;
+
     /**
      * Validate the string for compliance according to https://www.json.org.
      * Validation includes handling escaped and unicode characters.
