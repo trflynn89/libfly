@@ -428,6 +428,42 @@ void Json::swap(reference json) noexcept
 }
 
 //==============================================================================
+Json::iterator Json::begin() noexcept(false)
+{
+    return iterator(this, iterator::Position::Begin);
+}
+
+//==============================================================================
+Json::const_iterator Json::begin() const noexcept(false)
+{
+    return cbegin();
+}
+
+//==============================================================================
+Json::const_iterator Json::cbegin() const noexcept(false)
+{
+    return const_iterator(this, const_iterator::Position::Begin);
+}
+
+//==============================================================================
+Json::iterator Json::end() noexcept(false)
+{
+    return iterator(this, iterator::Position::End);
+}
+
+//==============================================================================
+Json::const_iterator Json::end() const noexcept(false)
+{
+    return cend();
+}
+
+//==============================================================================
+Json::const_iterator Json::cend() const noexcept(false)
+{
+    return const_iterator(this, const_iterator::Position::End);
+}
+
+//==============================================================================
 void Json::swap(JsonTraits::string_type &other) noexcept(false)
 {
     if (is_string())
@@ -950,26 +986,6 @@ void Json::validate_character(
     }
 
     stream << *it;
-}
-
-//==============================================================================
-JsonException::JsonException(const std::string &message) noexcept :
-    m_message(String::format("JsonException: %s", message))
-{
-}
-
-//==============================================================================
-JsonException::JsonException(
-    Json::const_reference json,
-    const std::string &message) noexcept :
-    m_message(String::format("JsonException: %s (%s)", message, json))
-{
-}
-
-//==============================================================================
-const char *JsonException::what() const noexcept
-{
-    return m_message.c_str();
 }
 
 } // namespace fly

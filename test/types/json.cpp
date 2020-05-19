@@ -1,7 +1,6 @@
 #include "fly/types/json/json.hpp"
 
 #include "fly/fly.hpp"
-#include "fly/types/string/string.hpp"
 
 #include <gtest/gtest.h>
 
@@ -47,7 +46,7 @@ protected:
     {
         SCOPED_TRACE(json);
 
-        EXPECT_THROW((void)(T(json)), fly::JsonException);
+        EXPECT_THROW(FLY_UNUSED(T(json)), fly::JsonException);
     }
 
     void validate_fail(const std::string &test) noexcept(false)
@@ -83,32 +82,6 @@ protected:
         EXPECT_EQ(actual, repeat);
     }
 };
-
-//==============================================================================
-TEST(JsonExceptionTest, Exception)
-{
-    std::stringstream stream;
-    fly::Json string = "abc";
-    stream << string;
-
-    bool thrown = false;
-
-    try
-    {
-        throw fly::JsonException(string, "some message");
-    }
-    catch (const fly::JsonException &e)
-    {
-        std::string what(e.what());
-
-        std::string expect("*some message*" + stream.str() + "*");
-        EXPECT_TRUE(fly::String::wildcard_match(what, expect));
-
-        thrown = true;
-    }
-
-    EXPECT_TRUE(thrown);
-}
 
 //==============================================================================
 TEST_F(JsonTest, StringConstructor)
@@ -1757,6 +1730,106 @@ TEST_F(JsonTest, ArraySwap)
     EXPECT_THROW(json.swap(u_multiset), fly::JsonException);
     EXPECT_THROW(json.swap(u_set), fly::JsonException);
     EXPECT_THROW(json.swap(vector), fly::JsonException);
+}
+
+//==============================================================================
+TEST_F(JsonTest, IteratorBegin)
+{
+    fly::Json json1 {1, 2, 3};
+    const fly::Json json2 {4, 5, 6};
+
+    auto begin1 = json1.begin();
+    EXPECT_EQ(*begin1, 1);
+    EXPECT_FALSE(std::is_const_v<decltype(begin1)::value_type>);
+
+    auto cbegin1 = json1.cbegin();
+    EXPECT_EQ(*cbegin1, 1);
+    EXPECT_TRUE(std::is_const_v<decltype(cbegin1)::value_type>);
+
+    auto begin2 = json2.begin();
+    EXPECT_EQ(*begin2, 4);
+    EXPECT_TRUE(std::is_const_v<decltype(begin2)::value_type>);
+
+    auto cbegin2 = json2.cbegin();
+    EXPECT_EQ(*cbegin2, 4);
+    EXPECT_EQ(begin2, cbegin2);
+    EXPECT_TRUE(std::is_const_v<decltype(cbegin2)::value_type>);
+}
+
+//==============================================================================
+TEST_F(JsonTest, IteratorEnd)
+{
+    fly::Json json1 {1, 2, 3};
+    const fly::Json json2 {4, 5, 6};
+
+    auto end1 = json1.end();
+    EXPECT_EQ(*(end1 - 1), 3);
+    EXPECT_FALSE(std::is_const_v<decltype(end1)::value_type>);
+
+    auto cend1 = json1.cend();
+    EXPECT_EQ(*(cend1 - 1), 3);
+    EXPECT_TRUE(std::is_const_v<decltype(cend1)::value_type>);
+
+    auto end2 = json2.end();
+    EXPECT_EQ(*(end2 - 1), 6);
+    EXPECT_TRUE(std::is_const_v<decltype(end2)::value_type>);
+
+    auto cend2 = json2.cend();
+    EXPECT_EQ(*(cend2 - 1), 6);
+    EXPECT_EQ(end2, cend2);
+    EXPECT_TRUE(std::is_const_v<decltype(cend2)::value_type>);
+}
+
+//==============================================================================
+TEST_F(JsonTest, IteratorIterate)
+{
+    fly::Json json {1, 2, 3};
+    {
+        fly::Json::size_type size = 0;
+
+        for (auto it = json.begin(); it < json.end(); ++it, ++size)
+        {
+            EXPECT_EQ(*it, json[size]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+    {
+        fly::Json::size_type size = 0;
+
+        for (auto it = json.cbegin(); it < json.cend(); ++it, ++size)
+        {
+            EXPECT_EQ(*it, json[size]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+}
+
+//==============================================================================
+TEST_F(JsonTest, IteratorRangeBasedFor)
+{
+    fly::Json json {1, 2, 3};
+    {
+        fly::Json::size_type size = 0;
+
+        for (fly::Json &value : json)
+        {
+            EXPECT_EQ(value, json[size++]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+    {
+        fly::Json::size_type size = 0;
+
+        for (const fly::Json &value : json)
+        {
+            EXPECT_EQ(value, json[size++]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
 }
 
 //==============================================================================

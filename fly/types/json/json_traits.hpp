@@ -305,6 +305,16 @@ struct JsonTraits
 
     template <typename T>
     inline static constexpr bool is_array_v = is_array<T>::value;
+
+    /**
+     * Define a trait for testing if type T is an iterable JSON type.
+     */
+    template <typename T>
+    using is_iterable = std::bool_constant<
+        is_object_v<std::decay_t<T>> || is_array_v<std::decay_t<T>>>;
+
+    template <typename T>
+    inline static constexpr bool is_iterable_v = is_iterable<T>::value;
 };
 
 } // namespace fly

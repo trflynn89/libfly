@@ -216,7 +216,10 @@
     <ClCompile Include="..\..\..\test\traits\traits.cpp" />
     <ClCompile Include="..\..\..\test\types\bit_stream.cpp" />
     <ClCompile Include="..\..\..\test\types\concurrent_container.cpp" />
+    <ClCompile Include="..\..\..\test\types\endian.cpp" />
     <ClCompile Include="..\..\..\test\types\json.cpp" />
+    <ClCompile Include="..\..\..\test\types\json_exception.cpp" />
+    <ClCompile Include="..\..\..\test\types\json_iterator.cpp" />
     <ClCompile Include="..\..\..\test\types\json_traits.cpp" />
     <ClCompile Include="..\..\..\test\types\literals.cpp" />
     <ClCompile Include="..\..\..\test\types\string.cpp" />
