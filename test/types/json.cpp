@@ -1781,15 +1781,17 @@ TEST_F(JsonTest, IteratorEnd)
 }
 
 //==============================================================================
-TEST_F(JsonTest, IteratorIterate)
+TEST_F(JsonTest, ObjectIteratorIterate)
 {
-    fly::Json json {1, 2, 3};
+    fly::Json json {{"a", 1}, {"b", 2}};
     {
         fly::Json::size_type size = 0;
 
-        for (auto it = json.begin(); it < json.end(); ++it, ++size)
+        for (auto it = json.begin(); it != json.end(); ++it, ++size)
         {
-            EXPECT_EQ(*it, json[size]);
+            EXPECT_EQ(*it, size == 0 ? 1 : 2);
+            EXPECT_EQ(it.key(), size == 0 ? "a" : "b");
+            EXPECT_EQ(it.value(), size == 0 ? 1 : 2);
         }
 
         EXPECT_EQ(size, json.size());
@@ -1797,9 +1799,11 @@ TEST_F(JsonTest, IteratorIterate)
     {
         fly::Json::size_type size = 0;
 
-        for (auto it = json.cbegin(); it < json.cend(); ++it, ++size)
+        for (auto it = json.cbegin(); it != json.cend(); ++it, ++size)
         {
-            EXPECT_EQ(*it, json[size]);
+            EXPECT_EQ(*it, size == 0 ? 1 : 2);
+            EXPECT_EQ(it.key(), size == 0 ? "a" : "b");
+            EXPECT_EQ(it.value(), size == 0 ? 1 : 2);
         }
 
         EXPECT_EQ(size, json.size());
@@ -1807,7 +1811,61 @@ TEST_F(JsonTest, IteratorIterate)
 }
 
 //==============================================================================
-TEST_F(JsonTest, IteratorRangeBasedFor)
+TEST_F(JsonTest, ObjectIteratorRangeBasedFor)
+{
+    fly::Json json {{"a", 1}, {"b", 2}};
+    {
+        fly::Json::size_type size = 0;
+
+        for (fly::Json &value : json)
+        {
+            EXPECT_EQ(value, size++ == 0 ? 1 : 2);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+    {
+        fly::Json::size_type size = 0;
+
+        for (const fly::Json &value : json)
+        {
+            EXPECT_EQ(value, size++ == 0 ? 1 : 2);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+}
+
+//==============================================================================
+TEST_F(JsonTest, ArrayIteratorIterate)
+{
+    fly::Json json {1, 2, 3};
+    {
+        fly::Json::size_type size = 0;
+
+        for (auto it = json.begin(); it != json.end(); ++it, ++size)
+        {
+            EXPECT_EQ(*it, json[size]);
+            EXPECT_EQ(it.value(), json[size]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+    {
+        fly::Json::size_type size = 0;
+
+        for (auto it = json.cbegin(); it != json.cend(); ++it, ++size)
+        {
+            EXPECT_EQ(*it, json[size]);
+            EXPECT_EQ(it.value(), json[size]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+}
+
+//==============================================================================
+TEST_F(JsonTest, ArrayIteratorRangeBasedFor)
 {
     fly::Json json {1, 2, 3};
     {
