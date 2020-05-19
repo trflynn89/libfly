@@ -144,13 +144,14 @@ public:
     /**
      * Retrieve a reference to the Json instance at some offset earlier or later
      * than the instance pointed to by this iterator. Invoking operator[0] is
-     * equivalent to invoking operator*.
+     * equivalent to invoking operator*. Invalid for Json object types.
      *
      * @param offset The offset to retrieve.
      *
      * @return A reference to the Json instance.
      *
-     * @throws JsonException If the iterator is null.
+     * @throws JsonException If either iterator is null, or if the Json instance
+     *         is an object.
      */
     reference operator[](difference_type offset) const noexcept(false);
 
@@ -410,7 +411,7 @@ private:
     validate_iterator(const char *function, const JsonIterator &iterator) const
         noexcept(false);
 
-    const pointer m_value;
+    pointer m_value;
     iterator_type m_iterator;
 };
 
@@ -460,18 +461,11 @@ JsonIterator<JsonType>::JsonIterator(
     const NonConstJsonIterator &iterator) noexcept :
     m_value(iterator.m_value)
 {
-    if (m_value->is_object())
-    {
-        m_iterator = std::get<typename JsonIterator<
-            typename std::remove_const_t<JsonType>>::object_iterator_type>(
-            iterator.m_iterator);
-    }
-    else if (m_value->is_array())
-    {
-        m_iterator = std::get<typename JsonIterator<
-            typename std::remove_const_t<JsonType>>::array_iterator_type>(
-            iterator.m_iterator);
-    }
+    auto visitor = [this](const auto &iterator) noexcept {
+        m_iterator = iterator;
+    };
+
+    std::visit(visitor, iterator.m_iterator);
 }
 
 //==============================================================================
@@ -479,20 +473,12 @@ template <typename JsonType>
 JsonIterator<JsonType> &
 JsonIterator<JsonType>::operator=(const NonConstJsonIterator &iterator) noexcept
 {
-    m_value = iterator.m_value;
+    auto visitor = [this](const auto &iterator) noexcept {
+        m_iterator = iterator;
+    };
 
-    if (m_value->is_object())
-    {
-        m_iterator = std::get<typename JsonIterator<
-            typename std::remove_const_t<JsonType>>::object_iterator_type>(
-            iterator.m_iterator);
-    }
-    else if (m_value->is_array())
-    {
-        m_iterator = std::get<typename JsonIterator<
-            typename std::remove_const_t<JsonType>>::array_iterator_type>(
-            iterator.m_iterator);
-    }
+    m_value = iterator.m_value;
+    std::visit(visitor, iterator.m_iterator);
 
     return *this;
 }
