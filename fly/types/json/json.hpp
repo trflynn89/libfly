@@ -604,34 +604,58 @@ public:
     void swap(T &other) noexcept(false);
 
     /**
+     * Retrieve an iterator to the beginning of the Json instance.
      *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
      */
-    iterator begin() noexcept;
+    iterator begin() noexcept(false);
 
     /**
+     * Retrieve a constant iterator to the beginning of the Json instance.
      *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
      */
-    const_iterator begin() const noexcept;
+    const_iterator begin() const noexcept(false);
 
     /**
+     * Retrieve a constant iterator to the beginning of the Json instance.
      *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
      */
-    const_iterator cbegin() const noexcept;
+    const_iterator cbegin() const noexcept(false);
 
     /**
+     * Retrieve an iterator to the end of the Json instance.
      *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
      */
-    iterator end() noexcept;
+    iterator end() noexcept(false);
 
     /**
+     * Retrieve a constant iterator to the end of the Json instance.
      *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
      */
-    const_iterator end() const noexcept;
+    const_iterator end() const noexcept(false);
 
     /**
+     * Retrieve a constant iterator to the end of the Json instance.
      *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
      */
-    const_iterator cend() const noexcept;
+    const_iterator cend() const noexcept(false);
 
     /**
      * Equality operator. Compares two Json instances for equality. They are

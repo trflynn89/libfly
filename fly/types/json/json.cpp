@@ -428,37 +428,37 @@ void Json::swap(reference json) noexcept
 }
 
 //==============================================================================
-Json::iterator Json::begin() noexcept
+Json::iterator Json::begin() noexcept(false)
 {
     return iterator(this, m_value, iterator::Position::Begin);
 }
 
 //==============================================================================
-Json::const_iterator Json::begin() const noexcept
+Json::const_iterator Json::begin() const noexcept(false)
 {
     return cbegin();
 }
 
 //==============================================================================
-Json::const_iterator Json::cbegin() const noexcept
+Json::const_iterator Json::cbegin() const noexcept(false)
 {
     return const_iterator(this, m_value, const_iterator::Position::Begin);
 }
 
 //==============================================================================
-Json::iterator Json::end() noexcept
+Json::iterator Json::end() noexcept(false)
 {
     return iterator(this, m_value, iterator::Position::End);
 }
 
 //==============================================================================
-Json::const_iterator Json::end() const noexcept
+Json::const_iterator Json::end() const noexcept(false)
 {
     return cend();
 }
 
 //==============================================================================
-Json::const_iterator Json::cend() const noexcept
+Json::const_iterator Json::cend() const noexcept(false)
 {
     return const_iterator(this, m_value, const_iterator::Position::End);
 }
