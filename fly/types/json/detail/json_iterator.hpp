@@ -376,6 +376,27 @@ public:
     difference_type operator-(const JsonIterator &iterator) const
         noexcept(false);
 
+    /**
+     * Retrieve a reference to the key of the Json instance pointed to by this
+     * iterator. Only valid for Json object types.
+     *
+     * @return A reference to the Json object's key.
+     *
+     * @throws JsonException If the iterator is null, or if the Json instance is
+     *         not an object.
+     */
+    const typename JsonTraits::object_type::key_type &key() const
+        noexcept(false);
+
+    /**
+     * Retrieve a reference to the Json instance pointed to by this iterator.
+     *
+     * @return A reference to the Json instance.
+     *
+     * @throws JsonException If the iterator is null.
+     */
+    reference value() const noexcept(false);
+
 private:
     friend std::conditional_t<
         is_const_iterator,
@@ -406,6 +427,28 @@ private:
         noexcept(false);
 
     /**
+     * A trait for testing if type T is an object iterator.
+     */
+    template <typename T>
+    using is_object_iterator = std::bool_constant<
+        std::is_same_v<std::decay_t<T>, object_iterator_type>>;
+
+    template <typename T>
+    inline static constexpr bool is_object_iterator_v =
+        is_object_iterator<T>::value;
+
+    /**
+     * A trait for testing if type T is an array iterator.
+     */
+    template <typename T>
+    using is_array_iterator = std::bool_constant<
+        std::is_same_v<std::decay_t<T>, array_iterator_type>>;
+
+    template <typename T>
+    inline static constexpr bool is_array_iterator_v =
+        is_array_iterator<T>::value;
+
+    /**
      * A trait for testing if a list of types are all random access iterators.
      */
     template <typename Iterator, typename... Iterators>
@@ -418,8 +461,7 @@ private:
     template <typename Iterator>
     struct is_random_access<Iterator>
     {
-        static constexpr bool value =
-            std::is_same_v<std::decay_t<Iterator>, array_iterator_type>;
+        static constexpr bool value = is_array_iterator_v<Iterator>;
     };
 
     template <typename... Iterators>
@@ -502,13 +544,11 @@ auto JsonIterator<JsonType>::operator*() const noexcept(false) -> reference
     validate_iterator(__func__);
 
     auto visitor = [](const auto &it) noexcept -> reference {
-        using T = std::decay_t<decltype(it)>;
-
-        if constexpr (std::is_same_v<T, object_iterator_type>)
+        if constexpr (is_object_iterator_v<decltype(it)>)
         {
             return it->second;
         }
-        else if constexpr (std::is_same_v<T, array_iterator_type>)
+        else if constexpr (is_array_iterator_v<decltype(it)>)
         {
             return *it;
         }
@@ -524,13 +564,11 @@ auto JsonIterator<JsonType>::operator->() const noexcept(false) -> pointer
     validate_iterator(__func__);
 
     auto visitor = [](const auto &it) noexcept -> pointer {
-        using T = std::decay_t<decltype(it)>;
-
-        if constexpr (std::is_same_v<T, object_iterator_type>)
+        if constexpr (is_object_iterator_v<decltype(it)>)
         {
             return &(it->second);
         }
-        else if constexpr (std::is_same_v<T, array_iterator_type>)
+        else if constexpr (is_array_iterator_v<decltype(it)>)
         {
             return &(*it);
         }
@@ -777,6 +815,40 @@ auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const
     // clang-format on
 
     return std::visit(visitor, m_iterator, iterator.m_iterator);
+}
+
+//==============================================================================
+template <typename JsonType>
+const typename JsonTraits::object_type::key_type &
+JsonIterator<JsonType>::key() const noexcept(false)
+{
+    validate_iterator(__func__);
+
+    // Formatter badly handles hanging indent in lambda parameters
+    // clang-format off
+    auto visitor = [this](const auto &it)
+        noexcept(is_object_iterator_v<decltype(it)>)
+        -> const typename JsonTraits::object_type::key_type &
+    {
+        if constexpr (is_object_iterator_v<decltype(it)>)
+        {
+            return it->first;
+        }
+        else
+        {
+            throw JsonException(*m_json, "JSON type is not keyed");
+        }
+    };
+    // clang-format on
+
+    return std::visit(visitor, m_iterator);
+}
+
+//==============================================================================
+template <typename JsonType>
+auto JsonIterator<JsonType>::value() const noexcept(false) -> reference
+{
+    return *(*this);
 }
 
 //==============================================================================

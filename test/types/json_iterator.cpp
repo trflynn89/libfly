@@ -66,6 +66,8 @@ TEST(JsonIteratorTest, NullIterator)
     EXPECT_THROW(FLY_UNUSED(it1 + 1), fly::JsonException);
     EXPECT_THROW(FLY_UNUSED(1 + it1), fly::JsonException);
     EXPECT_THROW(FLY_UNUSED(it1 - 1), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1.key()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1.value()), fly::JsonException);
 
     EXPECT_NO_THROW((fly::Json::iterator(it1)));
     EXPECT_NO_THROW(it2 = it1);
@@ -89,6 +91,8 @@ TEST(JsonIteratorTest, NullIteratorFromNullJson)
     EXPECT_THROW(FLY_UNUSED(it1 + 1), fly::JsonException);
     EXPECT_THROW(FLY_UNUSED(1 + it1), fly::JsonException);
     EXPECT_THROW(FLY_UNUSED(it1 - 1), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1.key()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1.value()), fly::JsonException);
 
     EXPECT_NO_THROW((fly::Json::iterator(it1)));
     EXPECT_NO_THROW(it2 = it1);
@@ -188,6 +192,8 @@ TEST(JsonIteratorTest, OperationsOnObjects)
     EXPECT_THROW(FLY_UNUSED(1 + it1), fly::JsonException);
     EXPECT_THROW(FLY_UNUSED(it1 - 1), fly::JsonException);
     EXPECT_THROW(FLY_UNUSED(it1 - it2), fly::JsonException);
+    EXPECT_NO_THROW(FLY_UNUSED(it1.key()));
+    EXPECT_NO_THROW(FLY_UNUSED(it1.value()));
 }
 
 //==============================================================================
@@ -217,6 +223,8 @@ TEST(JsonIteratorTest, OperationsOnArrays)
     EXPECT_NO_THROW(FLY_UNUSED(1 + it1));
     EXPECT_NO_THROW(FLY_UNUSED(it1 - 1));
     EXPECT_NO_THROW(FLY_UNUSED(it1 - it2));
+    EXPECT_THROW(FLY_UNUSED(it1.key()), fly::JsonException);
+    EXPECT_NO_THROW(FLY_UNUSED(it1.value()));
 }
 
 //==============================================================================
@@ -442,4 +450,37 @@ TEST(JsonIteratorTest, DifferenceOperator)
 
     EXPECT_NE(json2.begin() - json1.begin(), 0);
     EXPECT_NE(json1.begin() - json2.begin(), 0);
+}
+
+//==============================================================================
+TEST(JsonIteratorTest, IteratorKey)
+{
+    fly::Json json {{"a", 1}, {"b", 2}};
+
+    fly::Json::iterator it2 = json.begin();
+    fly::Json::iterator it1 = it2++;
+
+    EXPECT_EQ(it1.key(), "a");
+    EXPECT_EQ(it2.key(), "b");
+}
+
+//==============================================================================
+TEST(JsonIteratorTest, IteratorValue)
+{
+    fly::Json json1 {{"a", 1}, {"b", 2}};
+    fly::Json json2 {4, 5, 6};
+
+    fly::Json::iterator it2 = json1.begin();
+    fly::Json::iterator it1 = it2++;
+
+    fly::Json::iterator it3 = json2.begin();
+    fly::Json::iterator it4 = it3 + 1;
+    fly::Json::iterator it5 = it4 + 1;
+
+    EXPECT_EQ(it1.value(), 1);
+    EXPECT_EQ(it2.value(), 2);
+
+    EXPECT_EQ(it3.value(), 4);
+    EXPECT_EQ(it4.value(), 5);
+    EXPECT_EQ(it5.value(), 6);
 }
