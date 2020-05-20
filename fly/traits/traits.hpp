@@ -5,54 +5,81 @@
 namespace fly {
 
 /**
- * Wrapper around std::enable_if for testing that all coditions in a sequence of
- * traits are true. Example:
+ * Wrapper around std::enable_if for testing that all conditions in a sequence
+ * of traits are true. Example:
  *
- *      template <
- *          typename T,
- *          fly::enable_if_all<std::is_class<T>, std::is_empty<T>> = 0>
- *      void func(const T &) { }
+ *     template <
+ *         typename T,
+ *         fly::enable_if_all<std::is_class<T>, std::is_empty<T>> = 0>
+ *     void func(const T &) { }
  */
 template <typename... Conditions>
 using enable_if_all = std::enable_if_t<std::conjunction_v<Conditions...>, bool>;
 
 /**
- * Wrapper around std::enable_if for testing that any codition in a sequence of
+ * Wrapper around std::enable_if for testing that any condition in a sequence of
  * traits is true. Example:
  *
- *      template <
- *          typename T,
- *          fly::enable_if_any<std::is_class<T>, std::is_empty<T>> = 0>
- *      void func(const T &) { }
+ *     template <
+ *         typename T,
+ *         fly::enable_if_any<std::is_class<T>, std::is_empty<T>> = 0>
+ *     void func(const T &) { }
  */
 template <typename... Conditions>
 using enable_if_any = std::enable_if_t<std::disjunction_v<Conditions...>, bool>;
 
 /**
- * Wrapper around std::enable_if for testing that all coditions in a sequence of
- * traits are false. Example:
+ * Wrapper around std::enable_if for testing that all conditions in a sequence
+ * of traits are false. Example:
  *
- *      template <
- *          typename T,
- *          fly::enable_if_none<std::is_class<T>, std::is_empty<T>> = 0>
- *      void func(const T &) { }
+ *     template <
+ *         typename T,
+ *         fly::enable_if_none<std::is_class<T>, std::is_empty<T>> = 0>
+ *     void func(const T &) { }
  */
 template <typename... Conditions>
 using enable_if_none =
     std::enable_if_t<std::negation_v<std::disjunction<Conditions...>>, bool>;
 
 /**
- * Wrapper around std::enable_if for testing that any codition in a sequence of
+ * Wrapper around std::enable_if for testing that any condition in a sequence of
  * traits is false. Example:
  *
- *      template <
- *          typename T,
- *          fly::enable_if_not_all<std::is_class<T>, std::is_empty<T>> = 0>
- *      void func(const T &) { }
+ *     template <
+ *         typename T,
+ *         fly::enable_if_not_all<std::is_class<T>, std::is_empty<T>> = 0>
+ *     void func(const T &) { }
  */
 template <typename... Conditions>
 using enable_if_not_all =
     std::enable_if_t<std::negation_v<std::conjunction<Conditions...>>, bool>;
+
+/**
+ * Wrapper around std::is_same for testing that all types in a sequence of types
+ * are the same as a specific type. Example:
+ *
+ *     constexpr bool same = fly::all_same_v<int, int, int>; // = true
+ *     constexpr bool same = fly::all_same_v<int, int, bool>; // = false
+ */
+template <typename T, typename A, typename... As>
+using all_same = std::conjunction<std::is_same<T, A>, std::is_same<T, As>...>;
+
+template <typename T, typename A, typename... As>
+inline constexpr bool all_same_v = all_same<T, A, As...>::value;
+
+/**
+ * Wrapper around std::is_same for testing that any type in a sequence of types
+ * are the same as a specific type. Example:
+ *
+ *     constexpr bool same = fly::any_same_v<int, int, int>; // = true
+ *     constexpr bool same = fly::any_same_v<int, int, bool>; // = true
+ *     constexpr bool same = fly::any_same_v<int, bool, bool>; // = false
+ */
+template <typename T, typename A, typename... As>
+using any_same = std::disjunction<std::is_same<T, A>, std::is_same<T, As>...>;
+
+template <typename T, typename A, typename... As>
+inline constexpr bool any_same_v = any_same<T, A, As...>::value;
 
 /**
  * Define SFINAE tests for whether a function is declared for a type.
