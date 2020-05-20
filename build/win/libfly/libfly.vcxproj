@@ -197,7 +197,6 @@
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_traits.hpp" />
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\endian.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_stack.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\detail\concurrent_container.hpp" />
@@ -205,8 +204,10 @@
     <ClInclude Include="..\..\..\fly\types\json\json.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\json_exception.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\json_traits.hpp" />
-    <ClInclude Include="..\..\..\fly\types\literals\detail\literal_parser.hpp" />
-    <ClInclude Include="..\..\..\fly\types\literals\literals.hpp" />
+    <ClInclude Include="..\..\..\fly\types\numeric\detail\endian_traits.hpp" />
+    <ClInclude Include="..\..\..\fly\types\numeric\detail\literal_parser.hpp" />
+    <ClInclude Include="..\..\..\fly\types\numeric\endian.hpp" />
+    <ClInclude Include="..\..\..\fly\types\numeric\literals.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp" />

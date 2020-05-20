@@ -67,10 +67,10 @@
     <Filter Include="types\json\detail">
       <UniqueIdentifier>{10153303-508d-4ac1-bf4c-9b8d11ea6860}</UniqueIdentifier>
     </Filter>
-    <Filter Include="types\literals">
+    <Filter Include="types\numeric">
       <UniqueIdentifier>{cfc77282-c027-488a-913f-a1b9df5289ed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="types\literals\detail">
+    <Filter Include="types\numeric\detail">
       <UniqueIdentifier>{36bd2c09-4512-489f-81e5-9bbec6d07e6e}</UniqueIdentifier>
     </Filter>
     <Filter Include="types\string">
@@ -205,9 +205,6 @@
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_traits.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\endian.hpp">
-      <Filter>types\bit_stream\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.hpp">
       <Filter>types\concurrency</Filter>
     </ClInclude>
@@ -229,11 +226,17 @@
     <ClInclude Include="..\..\..\fly\types\json\json_traits.hpp">
       <Filter>types\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\literals\detail\literal_parser.hpp">
-      <Filter>types\literals\detail</Filter>
+    <ClInclude Include="..\..\..\fly\types\numeric\endian.hpp">
+      <Filter>types\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\literals\literals.hpp">
-      <Filter>types\literals</Filter>
+    <ClInclude Include="..\..\..\fly\types\numeric\literals.hpp">
+      <Filter>types\numeric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\numeric\detail\endian_traits.hpp">
+      <Filter>types\numeric\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\numeric\detail\literal_parser.hpp">
+      <Filter>types\numeric\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\string.hpp">
       <Filter>types\string</Filter>
