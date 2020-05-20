@@ -220,12 +220,37 @@ TEST(TraitsTest, EnableIfAny)
 TEST(TraitsTest, AllSame)
 {
     EXPECT_TRUE((fly::all_same_v<int, int>));
+    EXPECT_TRUE((fly::all_same_v<int, const int>));
+    EXPECT_TRUE((fly::all_same_v<const int, int>));
+    EXPECT_TRUE((fly::all_same_v<const int, const int>));
+
+    EXPECT_TRUE((fly::all_same_v<int, int>));
+    EXPECT_TRUE((fly::all_same_v<int, int &>));
+    EXPECT_TRUE((fly::all_same_v<int &, int>));
+    EXPECT_TRUE((fly::all_same_v<int &, int &>));
+
+    EXPECT_TRUE((fly::all_same_v<int, int>));
+    EXPECT_TRUE((fly::all_same_v<int, const int &>));
+    EXPECT_TRUE((fly::all_same_v<const int &, int>));
+    EXPECT_TRUE((fly::all_same_v<const int &, const int &>));
+
+    EXPECT_TRUE((fly::all_same_v<int, int, int>));
+    EXPECT_TRUE((fly::all_same_v<int, int, const int>));
+    EXPECT_TRUE((fly::all_same_v<int, const int, int>));
+    EXPECT_TRUE((fly::all_same_v<int, const int, const int>));
+
+    EXPECT_TRUE((fly::all_same_v<const int, int, int>));
+    EXPECT_TRUE((fly::all_same_v<const int, int, const int>));
+    EXPECT_TRUE((fly::all_same_v<const int, const int, int>));
+    EXPECT_TRUE((fly::all_same_v<const int, const int, const int>));
+
     EXPECT_TRUE((fly::all_same_v<bool, bool, bool>));
     EXPECT_TRUE((fly::all_same_v<float, float, float, float>));
     EXPECT_TRUE((fly::all_same_v<FooClass, FooClass, FooClass>));
     EXPECT_TRUE((fly::all_same_v<std::string, std::string, std::string>));
 
     EXPECT_FALSE((fly::all_same_v<int, char>));
+    EXPECT_FALSE((fly::all_same_v<int *, int>));
     EXPECT_FALSE((fly::all_same_v<bool, bool, char>));
     EXPECT_FALSE((fly::all_same_v<FooClass, FooClass, std::string>));
 }
@@ -234,6 +259,30 @@ TEST(TraitsTest, AllSame)
 TEST(TraitsTest, AnySame)
 {
     EXPECT_TRUE((fly::any_same_v<int, int>));
+    EXPECT_TRUE((fly::any_same_v<int, const int>));
+    EXPECT_TRUE((fly::any_same_v<const int, int>));
+    EXPECT_TRUE((fly::any_same_v<const int, const int>));
+
+    EXPECT_TRUE((fly::any_same_v<int, int>));
+    EXPECT_TRUE((fly::any_same_v<int, int &>));
+    EXPECT_TRUE((fly::any_same_v<int &, int>));
+    EXPECT_TRUE((fly::any_same_v<int &, int &>));
+
+    EXPECT_TRUE((fly::any_same_v<int, int>));
+    EXPECT_TRUE((fly::any_same_v<int, const int &>));
+    EXPECT_TRUE((fly::any_same_v<const int &, int>));
+    EXPECT_TRUE((fly::any_same_v<const int &, const int &>));
+
+    EXPECT_TRUE((fly::any_same_v<int, int, int>));
+    EXPECT_TRUE((fly::any_same_v<int, int, const int>));
+    EXPECT_TRUE((fly::any_same_v<int, const int, int>));
+    EXPECT_TRUE((fly::any_same_v<int, const int, const int>));
+
+    EXPECT_TRUE((fly::any_same_v<const int, int, int>));
+    EXPECT_TRUE((fly::any_same_v<const int, int, const int>));
+    EXPECT_TRUE((fly::any_same_v<const int, const int, int>));
+    EXPECT_TRUE((fly::any_same_v<const int, const int, const int>));
+
     EXPECT_TRUE((fly::any_same_v<bool, bool, bool>));
     EXPECT_TRUE((fly::any_same_v<float, float, float, float>));
     EXPECT_TRUE((fly::any_same_v<FooClass, FooClass, FooClass>));
@@ -243,6 +292,7 @@ TEST(TraitsTest, AnySame)
     EXPECT_TRUE((fly::any_same_v<FooClass, FooClass, std::string>));
 
     EXPECT_FALSE((fly::any_same_v<int, char>));
+    EXPECT_FALSE((fly::any_same_v<int *, int>));
     EXPECT_FALSE((fly::any_same_v<bool, char>));
     EXPECT_FALSE((fly::any_same_v<FooClass, std::string>));
 }
