@@ -59,10 +59,17 @@ using enable_if_not_all =
  * are the same as a specific type. Example:
  *
  *     constexpr bool same = fly::all_same_v<int, int, int>; // = true
+ *     constexpr bool same = fly::all_same_v<int, int, const int &>; // = true
  *     constexpr bool same = fly::all_same_v<int, int, bool>; // = false
+ *     constexpr bool same = fly::all_same_v<int, bool, bool>; // = false
  */
 template <typename T, typename A, typename... As>
-using all_same = std::conjunction<std::is_same<T, A>, std::is_same<T, As>...>;
+struct all_same :
+    std::conjunction<
+        std::is_same<std::decay_t<T>, std::decay_t<A>>,
+        std::is_same<std::decay_t<T>, std::decay_t<As>>...>
+{
+};
 
 template <typename T, typename A, typename... As>
 inline constexpr bool all_same_v = all_same<T, A, As...>::value;
@@ -72,11 +79,17 @@ inline constexpr bool all_same_v = all_same<T, A, As...>::value;
  * are the same as a specific type. Example:
  *
  *     constexpr bool same = fly::any_same_v<int, int, int>; // = true
+ *     constexpr bool same = fly::any_same_v<int, int, const int &>; // = true
  *     constexpr bool same = fly::any_same_v<int, int, bool>; // = true
  *     constexpr bool same = fly::any_same_v<int, bool, bool>; // = false
  */
 template <typename T, typename A, typename... As>
-using any_same = std::disjunction<std::is_same<T, A>, std::is_same<T, As>...>;
+struct any_same :
+    std::disjunction<
+        std::is_same<std::decay_t<T>, std::decay_t<A>>,
+        std::is_same<std::decay_t<T>, std::decay_t<As>>...>
+{
+};
 
 template <typename T, typename A, typename... As>
 inline constexpr bool any_same_v = any_same<T, A, As...>::value;
