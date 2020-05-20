@@ -307,9 +307,9 @@ TEST(TraitsTest, Visitation)
         1,
         std::visit(
             fly::visitation {
-                [](int) -> int { return 1; },
-                [](bool) -> int { return 2; },
-                [](std::string) -> int { return 3; },
+                [](int) noexcept -> int { return 1; },
+                [](bool) noexcept -> int { return 2; },
+                [](std::string) noexcept -> int { return 3; },
             },
             TestVariant {int()}));
 
@@ -317,9 +317,9 @@ TEST(TraitsTest, Visitation)
         2,
         std::visit(
             fly::visitation {
-                [](int) -> int { return 1; },
-                [](bool) -> int { return 2; },
-                [](std::string) -> int { return 3; },
+                [](int) noexcept -> int { return 1; },
+                [](bool) noexcept -> int { return 2; },
+                [](std::string) noexcept -> int { return 3; },
             },
             TestVariant {bool()}));
 
@@ -327,9 +327,9 @@ TEST(TraitsTest, Visitation)
         3,
         std::visit(
             fly::visitation {
-                [](int) -> int { return 1; },
-                [](bool) -> int { return 2; },
-                [](std::string) -> int { return 3; },
+                [](int) noexcept -> int { return 1; },
+                [](bool) noexcept -> int { return 2; },
+                [](std::string) noexcept -> int { return 3; },
             },
             TestVariant {std::string()}));
 
@@ -337,8 +337,8 @@ TEST(TraitsTest, Visitation)
         1,
         std::visit(
             fly::visitation {
-                [](int) -> int { return 1; },
-                [](auto) -> int { return 2; },
+                [](int) noexcept -> int { return 1; },
+                [](auto) noexcept -> int { return 2; },
             },
             TestVariant {int()}));
 
@@ -346,8 +346,8 @@ TEST(TraitsTest, Visitation)
         2,
         std::visit(
             fly::visitation {
-                [](int) -> int { return 1; },
-                [](auto) -> int { return 2; },
+                [](int) noexcept -> int { return 1; },
+                [](auto) noexcept -> int { return 2; },
             },
             TestVariant {std::string()}));
 }
