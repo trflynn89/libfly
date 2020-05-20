@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <sstream>
+#include <variant>
 
 namespace {
 
@@ -295,4 +296,58 @@ TEST(TraitsTest, AnySame)
     EXPECT_FALSE((fly::any_same_v<int *, int>));
     EXPECT_FALSE((fly::any_same_v<bool, char>));
     EXPECT_FALSE((fly::any_same_v<FooClass, std::string>));
+}
+
+//==============================================================================
+TEST(TraitsTest, Visitation)
+{
+    using TestVariant = std::variant<int, bool, std::string>;
+
+    EXPECT_EQ(
+        1,
+        std::visit(
+            fly::visitation {
+                [](int) noexcept -> int { return 1; },
+                [](bool) noexcept -> int { return 2; },
+                [](std::string) noexcept -> int { return 3; },
+            },
+            TestVariant {int()}));
+
+    EXPECT_EQ(
+        2,
+        std::visit(
+            fly::visitation {
+                [](int) noexcept -> int { return 1; },
+                [](bool) noexcept -> int { return 2; },
+                [](std::string) noexcept -> int { return 3; },
+            },
+            TestVariant {bool()}));
+
+    EXPECT_EQ(
+        3,
+        std::visit(
+            fly::visitation {
+                [](int) noexcept -> int { return 1; },
+                [](bool) noexcept -> int { return 2; },
+                [](std::string) noexcept -> int { return 3; },
+            },
+            TestVariant {std::string()}));
+
+    EXPECT_EQ(
+        1,
+        std::visit(
+            fly::visitation {
+                [](int) noexcept -> int { return 1; },
+                [](auto) noexcept -> int { return 2; },
+            },
+            TestVariant {int()}));
+
+    EXPECT_EQ(
+        2,
+        std::visit(
+            fly::visitation {
+                [](int) noexcept -> int { return 1; },
+                [](auto) noexcept -> int { return 2; },
+            },
+            TestVariant {std::string()}));
 }

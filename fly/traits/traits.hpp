@@ -95,6 +95,30 @@ template <typename T, typename A, typename... As>
 inline constexpr bool any_same_v = any_same<T, A, As...>::value;
 
 /**
+ * Overloaded visitation pattern for std::visit. Allows providing a variadic
+ * list of lambdas for overload resolution in a call to std::visit. Example:
+ *
+ *
+ *     std::variant<int, bool, std::string> variant {std::string()};
+ *
+ *     std::visit(
+ *         fly::visitation {
+ *             [](int) { std::cout << "int\n"; },
+ *             [](bool) { std::cout << "bool\n"; },
+ *             [](auto) { std::cout << "auto\n"; }, // This one will be entered
+ *         },
+ *         variant);
+ */
+template <class... Ts>
+struct visitation : Ts...
+{
+    using Ts::operator()...;
+};
+
+template <class... Ts>
+visitation(Ts...) -> visitation<Ts...>;
+
+/**
  * Define SFINAE tests for whether a function is declared for a type.
  *
  * For example, to test if a class of type T declares a method called Foo, first
