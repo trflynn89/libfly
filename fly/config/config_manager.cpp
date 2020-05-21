@@ -86,7 +86,7 @@ bool ConfigManager::start() noexcept
             m_task = std::make_shared<ConfigUpdateTask>(weak_config_manager);
             std::weak_ptr<Task> weak_task = m_task;
 
-            // Formatter badly handles hanging indent in lambda parameters
+            // Formatter badly handles hanging indent in lambdas
             // clang-format off
             auto callback = [weak_config_manager, weak_task](
                 const std::filesystem::path &,
