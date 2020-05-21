@@ -2,6 +2,7 @@
 
 #include "fly/types/json/json.hpp"
 
+#include <cstdint>
 #include <filesystem>
 #include <istream>
 #include <string>
@@ -57,8 +58,8 @@ protected:
      */
     virtual Json parse_internal(std::istream &stream) noexcept(false) = 0;
 
-    int m_line;
-    int m_column;
+    std::uint32_t m_line;
+    std::uint32_t m_column;
 
 private:
     /**

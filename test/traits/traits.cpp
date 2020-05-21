@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <sstream>
+#include <variant>
 
 namespace {
 
@@ -214,4 +215,139 @@ TEST(TraitsTest, EnableIfAny)
     EXPECT_TRUE(is_class_or_pointer(&i));
     EXPECT_TRUE(is_class_or_pointer(&b));
     EXPECT_TRUE(is_class_or_pointer(&f));
+}
+
+//==============================================================================
+TEST(TraitsTest, AllSame)
+{
+    EXPECT_TRUE((fly::all_same_v<int, int>));
+    EXPECT_TRUE((fly::all_same_v<int, const int>));
+    EXPECT_TRUE((fly::all_same_v<const int, int>));
+    EXPECT_TRUE((fly::all_same_v<const int, const int>));
+
+    EXPECT_TRUE((fly::all_same_v<int, int>));
+    EXPECT_TRUE((fly::all_same_v<int, int &>));
+    EXPECT_TRUE((fly::all_same_v<int &, int>));
+    EXPECT_TRUE((fly::all_same_v<int &, int &>));
+
+    EXPECT_TRUE((fly::all_same_v<int, int>));
+    EXPECT_TRUE((fly::all_same_v<int, const int &>));
+    EXPECT_TRUE((fly::all_same_v<const int &, int>));
+    EXPECT_TRUE((fly::all_same_v<const int &, const int &>));
+
+    EXPECT_TRUE((fly::all_same_v<int, int, int>));
+    EXPECT_TRUE((fly::all_same_v<int, int, const int>));
+    EXPECT_TRUE((fly::all_same_v<int, const int, int>));
+    EXPECT_TRUE((fly::all_same_v<int, const int, const int>));
+
+    EXPECT_TRUE((fly::all_same_v<const int, int, int>));
+    EXPECT_TRUE((fly::all_same_v<const int, int, const int>));
+    EXPECT_TRUE((fly::all_same_v<const int, const int, int>));
+    EXPECT_TRUE((fly::all_same_v<const int, const int, const int>));
+
+    EXPECT_TRUE((fly::all_same_v<bool, bool, bool>));
+    EXPECT_TRUE((fly::all_same_v<float, float, float, float>));
+    EXPECT_TRUE((fly::all_same_v<FooClass, FooClass, FooClass>));
+    EXPECT_TRUE((fly::all_same_v<std::string, std::string, std::string>));
+
+    EXPECT_FALSE((fly::all_same_v<int, char>));
+    EXPECT_FALSE((fly::all_same_v<int *, int>));
+    EXPECT_FALSE((fly::all_same_v<bool, bool, char>));
+    EXPECT_FALSE((fly::all_same_v<FooClass, FooClass, std::string>));
+}
+
+//==============================================================================
+TEST(TraitsTest, AnySame)
+{
+    EXPECT_TRUE((fly::any_same_v<int, int>));
+    EXPECT_TRUE((fly::any_same_v<int, const int>));
+    EXPECT_TRUE((fly::any_same_v<const int, int>));
+    EXPECT_TRUE((fly::any_same_v<const int, const int>));
+
+    EXPECT_TRUE((fly::any_same_v<int, int>));
+    EXPECT_TRUE((fly::any_same_v<int, int &>));
+    EXPECT_TRUE((fly::any_same_v<int &, int>));
+    EXPECT_TRUE((fly::any_same_v<int &, int &>));
+
+    EXPECT_TRUE((fly::any_same_v<int, int>));
+    EXPECT_TRUE((fly::any_same_v<int, const int &>));
+    EXPECT_TRUE((fly::any_same_v<const int &, int>));
+    EXPECT_TRUE((fly::any_same_v<const int &, const int &>));
+
+    EXPECT_TRUE((fly::any_same_v<int, int, int>));
+    EXPECT_TRUE((fly::any_same_v<int, int, const int>));
+    EXPECT_TRUE((fly::any_same_v<int, const int, int>));
+    EXPECT_TRUE((fly::any_same_v<int, const int, const int>));
+
+    EXPECT_TRUE((fly::any_same_v<const int, int, int>));
+    EXPECT_TRUE((fly::any_same_v<const int, int, const int>));
+    EXPECT_TRUE((fly::any_same_v<const int, const int, int>));
+    EXPECT_TRUE((fly::any_same_v<const int, const int, const int>));
+
+    EXPECT_TRUE((fly::any_same_v<bool, bool, bool>));
+    EXPECT_TRUE((fly::any_same_v<float, float, float, float>));
+    EXPECT_TRUE((fly::any_same_v<FooClass, FooClass, FooClass>));
+    EXPECT_TRUE((fly::any_same_v<std::string, std::string, std::string>));
+
+    EXPECT_TRUE((fly::any_same_v<bool, bool, char>));
+    EXPECT_TRUE((fly::any_same_v<FooClass, FooClass, std::string>));
+
+    EXPECT_FALSE((fly::any_same_v<int, char>));
+    EXPECT_FALSE((fly::any_same_v<int *, int>));
+    EXPECT_FALSE((fly::any_same_v<bool, char>));
+    EXPECT_FALSE((fly::any_same_v<FooClass, std::string>));
+}
+
+//==============================================================================
+TEST(TraitsTest, Visitation)
+{
+    using TestVariant = std::variant<int, bool, std::string>;
+
+    EXPECT_EQ(
+        1,
+        std::visit(
+            fly::visitation {
+                [](int) noexcept -> int { return 1; },
+                [](bool) noexcept -> int { return 2; },
+                [](std::string) noexcept -> int { return 3; },
+            },
+            TestVariant {int()}));
+
+    EXPECT_EQ(
+        2,
+        std::visit(
+            fly::visitation {
+                [](int) noexcept -> int { return 1; },
+                [](bool) noexcept -> int { return 2; },
+                [](std::string) noexcept -> int { return 3; },
+            },
+            TestVariant {bool()}));
+
+    EXPECT_EQ(
+        3,
+        std::visit(
+            fly::visitation {
+                [](int) noexcept -> int { return 1; },
+                [](bool) noexcept -> int { return 2; },
+                [](std::string) noexcept -> int { return 3; },
+            },
+            TestVariant {std::string()}));
+
+    EXPECT_EQ(
+        1,
+        std::visit(
+            fly::visitation {
+                [](int) noexcept -> int { return 1; },
+                [](auto) noexcept -> int { return 2; },
+            },
+            TestVariant {int()}));
+
+    EXPECT_EQ(
+        2,
+        std::visit(
+            fly::visitation {
+                [](int) noexcept -> int { return 1; },
+                [](auto) noexcept -> int { return 2; },
+            },
+            TestVariant {std::string()}));
 }

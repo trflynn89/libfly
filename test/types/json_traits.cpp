@@ -67,6 +67,13 @@ bool is_array(const T &) noexcept
     return fly::JsonTraits::is_array_v<T>;
 }
 
+//==========================================================================
+template <typename T>
+bool is_iterable(const T &) noexcept
+{
+    return fly::JsonTraits::is_iterable_v<T>;
+}
+
 const auto s_array = std::array<int, 4>();
 const auto s_deque = std::deque<int>();
 const auto s_forward_list = std::forward_list<int>();
@@ -284,4 +291,30 @@ TEST(JsonTraitsTest, Array)
     EXPECT_FALSE(is_array("foo"));
     EXPECT_FALSE(is_array(3.14));
     EXPECT_FALSE(is_array(true));
+}
+
+
+//==============================================================================
+TEST(JsonTraitsTest, Iterable)
+{
+    EXPECT_TRUE(is_iterable(s_array));
+    EXPECT_TRUE(is_iterable(s_deque));
+    EXPECT_TRUE(is_iterable(s_forward_list));
+    EXPECT_TRUE(is_iterable(s_list));
+    EXPECT_TRUE(is_iterable(s_multiset));
+    EXPECT_TRUE(is_iterable(s_set));
+    EXPECT_TRUE(is_iterable(s_unordered_multiset));
+    EXPECT_TRUE(is_iterable(s_unordered_set));
+    EXPECT_TRUE(is_iterable(s_vector));
+
+    EXPECT_TRUE(is_iterable(s_map));
+    EXPECT_TRUE(is_iterable(s_multimap));
+    EXPECT_TRUE(is_iterable(s_unordered_map));
+    EXPECT_TRUE(is_iterable(s_unordered_multimap));
+
+    EXPECT_FALSE(is_iterable(1));
+    EXPECT_FALSE(is_iterable(-1));
+    EXPECT_FALSE(is_iterable("foo"));
+    EXPECT_FALSE(is_iterable(3.14));
+    EXPECT_FALSE(is_iterable(true));
 }

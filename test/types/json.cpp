@@ -1,7 +1,6 @@
 #include "fly/types/json/json.hpp"
 
 #include "fly/fly.hpp"
-#include "fly/types/string/string.hpp"
 
 #include <gtest/gtest.h>
 
@@ -47,7 +46,7 @@ protected:
     {
         SCOPED_TRACE(json);
 
-        EXPECT_THROW((void)(T(json)), fly::JsonException);
+        EXPECT_THROW(FLY_UNUSED(T(json)), fly::JsonException);
     }
 
     void validate_fail(const std::string &test) noexcept(false)
@@ -83,32 +82,6 @@ protected:
         EXPECT_EQ(actual, repeat);
     }
 };
-
-//==============================================================================
-TEST(JsonExceptionTest, Exception)
-{
-    std::stringstream stream;
-    fly::Json string = "abc";
-    stream << string;
-
-    bool thrown = false;
-
-    try
-    {
-        throw fly::JsonException(string, "some message");
-    }
-    catch (const fly::JsonException &e)
-    {
-        std::string what(e.what());
-
-        std::string expect("*some message*" + stream.str() + "*");
-        EXPECT_TRUE(fly::String::wildcard_match(what, expect));
-
-        thrown = true;
-    }
-
-    EXPECT_TRUE(thrown);
-}
 
 //==============================================================================
 TEST_F(JsonTest, StringConstructor)
@@ -381,46 +354,123 @@ TEST_F(JsonTest, ObjectConversion)
 
     json = "abc";
     validate_throw<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::multimap<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_map<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_multimap<std::string, fly::Json>>(json);
 
-    std::map<std::string, int> map = {};
-    std::multimap<std::string, int> multimap(map.begin(), map.end());
-    json = map;
-    EXPECT_EQ(decltype(map)(json), map);
-    EXPECT_EQ(decltype(multimap)(json), multimap);
+    std::map<std::string, int> map1 = {{"a", 2}, {"b", 4}};
+    std::map<std::string, std::string> map2 = {{"a", "2"}, {"b", "4"}};
+    std::map<std::string, fly::Json> map3 = {{"a", 2}, {"b", "4"}};
+    json = map1;
+    EXPECT_EQ((decltype(map1)(json)), map1);
+    EXPECT_EQ((decltype(map2)(json)), map2);
+    json = map2;
+    EXPECT_EQ((decltype(map1)(json)), map1);
+    EXPECT_EQ((decltype(map2)(json)), map2);
+    json = map3;
+    EXPECT_EQ((decltype(map1)(json)), map1);
+    EXPECT_EQ((decltype(map2)(json)), map2);
+    EXPECT_EQ((decltype(map3)(json)), map3);
+    json = {{"a", true}};
+    validate_throw<std::map<std::string, int>>(json);
+    json = {{"a", "string"}};
+    validate_throw<std::map<std::string, int>>(json);
 
-    map = {{"a", 1}, {"b", 2}};
-    multimap = decltype(multimap)(map.begin(), map.end());
-    json = map;
-    EXPECT_EQ(decltype(map)(json), map);
-    EXPECT_EQ(decltype(multimap)(json), multimap);
+    std::multimap<std::string, int> mmap1 = {{"a", 2}, {"b", 4}};
+    std::multimap<std::string, std::string> mmap2 = {{"a", "2"}, {"b", "4"}};
+    std::multimap<std::string, fly::Json> mmap3 = {{"a", 2}, {"b", "4"}};
+    json = mmap1;
+    EXPECT_EQ((decltype(mmap1)(json)), mmap1);
+    EXPECT_EQ((decltype(mmap2)(json)), mmap2);
+    json = mmap2;
+    EXPECT_EQ((decltype(mmap1)(json)), mmap1);
+    EXPECT_EQ((decltype(mmap2)(json)), mmap2);
+    json = mmap3;
+    EXPECT_EQ((decltype(mmap1)(json)), mmap1);
+    EXPECT_EQ((decltype(mmap2)(json)), mmap2);
+    EXPECT_EQ((decltype(mmap3)(json)), mmap3);
+    json = {{"a", true}};
+    validate_throw<std::multimap<std::string, int>>(json);
+    json = {{"a", "string"}};
+    validate_throw<std::multimap<std::string, int>>(json);
 
-    std::unordered_map<std::string, int> umap(map.begin(), map.end());
-    json = umap;
-    EXPECT_EQ(decltype(map)(json), map);
-    EXPECT_EQ(decltype(umap)(json), umap);
+    std::unordered_map<std::string, int> u_map1 = {{"a", 2}, {"b", 4}};
+    std::unordered_map<std::string, std::string> u_map2 = {
+        {"a", "2"},
+        {"b", "4"}};
+    std::unordered_map<std::string, fly::Json> u_map3 = {{"a", 2}, {"b", "4"}};
+    json = u_map1;
+    EXPECT_EQ((decltype(u_map1)(json)), u_map1);
+    EXPECT_EQ((decltype(u_map2)(json)), u_map2);
+    json = u_map2;
+    EXPECT_EQ((decltype(u_map1)(json)), u_map1);
+    EXPECT_EQ((decltype(u_map2)(json)), u_map2);
+    json = u_map3;
+    EXPECT_EQ((decltype(u_map1)(json)), u_map1);
+    EXPECT_EQ((decltype(u_map2)(json)), u_map2);
+    EXPECT_EQ((decltype(u_map3)(json)), u_map3);
+    json = {{"a", true}};
+    validate_throw<std::unordered_map<std::string, int>>(json);
+    json = {{"a", "string"}};
+    validate_throw<std::unordered_map<std::string, int>>(json);
 
-    std::unordered_multimap<std::string, int> umultimap(map.begin(), map.end());
-    json = umap;
-    EXPECT_EQ(decltype(map)(json), map);
-    EXPECT_EQ(decltype(umultimap)(json), umultimap);
+    std::unordered_multimap<std::string, int> u_mmap1 = {{"a", 2}, {"b", 4}};
+    std::unordered_multimap<std::string, std::string> u_mmap2 = {
+        {"a", "2"},
+        {"b", "4"}};
+    std::unordered_multimap<std::string, fly::Json> u_mmap3 = {
+        {"a", 2},
+        {"b", "4"}};
+    json = u_mmap1;
+    EXPECT_EQ((decltype(u_mmap1)(json)), u_mmap1);
+    EXPECT_EQ((decltype(u_mmap2)(json)), u_mmap2);
+    json = u_mmap2;
+    EXPECT_EQ((decltype(u_mmap1)(json)), u_mmap1);
+    EXPECT_EQ((decltype(u_mmap2)(json)), u_mmap2);
+    json = u_mmap3;
+    EXPECT_EQ((decltype(u_mmap1)(json)), u_mmap1);
+    EXPECT_EQ((decltype(u_mmap2)(json)), u_mmap2);
+    EXPECT_EQ((decltype(u_mmap3)(json)), u_mmap3);
+    json = {{"a", true}};
+    validate_throw<std::unordered_multimap<std::string, int>>(json);
+    json = {{"a", "string"}};
+    validate_throw<std::unordered_multimap<std::string, int>>(json);
 
     json = {'7', 8};
     validate_throw<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::multimap<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_map<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_multimap<std::string, fly::Json>>(json);
 
     json = true;
     validate_throw<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::multimap<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_map<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_multimap<std::string, fly::Json>>(json);
 
     json = 1;
     validate_throw<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::multimap<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_map<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_multimap<std::string, fly::Json>>(json);
 
     json = static_cast<unsigned int>(1);
     validate_throw<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::multimap<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_map<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_multimap<std::string, fly::Json>>(json);
 
     json = 1.0f;
     validate_throw<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::multimap<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_map<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_multimap<std::string, fly::Json>>(json);
 
     json = nullptr;
     validate_throw<std::map<std::string, fly::Json>>(json);
+    validate_throw<std::multimap<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_map<std::string, fly::Json>>(json);
+    validate_throw<std::unordered_multimap<std::string, fly::Json>>(json);
 }
 
 //==============================================================================
@@ -429,52 +479,251 @@ TEST_F(JsonTest, ArrayConversion)
     fly::Json json;
 
     json = "abc";
-    validate_throw<std::vector<int>>(json);
     validate_throw<std::array<int, 1>>(json);
+    validate_throw<std::deque<int>>(json);
+    validate_throw<std::forward_list<int>>(json);
+    validate_throw<std::list<int>>(json);
+    validate_throw<std::multiset<int>>(json);
+    validate_throw<std::set<int>>(json);
+    validate_throw<std::unordered_multiset<int>>(json);
+    validate_throw<std::unordered_set<int>>(json);
+    validate_throw<std::vector<int>>(json);
 
     json = {{"a", 1}, {"b", 2}};
+    validate_throw<std::array<int, 1>>(json);
+    validate_throw<std::deque<int>>(json);
+    validate_throw<std::forward_list<int>>(json);
+    validate_throw<std::list<int>>(json);
+    validate_throw<std::multiset<int>>(json);
+    validate_throw<std::set<int>>(json);
+    validate_throw<std::unordered_multiset<int>>(json);
+    validate_throw<std::unordered_set<int>>(json);
     validate_throw<std::vector<int>>(json);
+
+    std::array<int, 4> array1 = {50, 60, 70, 80};
+    std::array<std::string, 4> array2 = {"50", "60", "70", "80"};
+    std::array<fly::Json, 4> array3 = {50, "60", 70, "80"};
+    json = array1;
+    EXPECT_EQ((decltype(array1)(json)), array1);
+    EXPECT_EQ((decltype(array2)(json)), array2);
+    json = array2;
+    EXPECT_EQ((decltype(array1)(json)), array1);
+    EXPECT_EQ((decltype(array2)(json)), array2);
+    json = array3;
+    EXPECT_EQ((decltype(array1)(json)), array1);
+    EXPECT_EQ((decltype(array2)(json)), array2);
+    EXPECT_EQ((decltype(array3)(json)), array3);
+    json = {true};
+    validate_throw<std::array<int, 1>>(json);
+    json = {"string"};
     validate_throw<std::array<int, 1>>(json);
 
-    std::vector<int> vector = {7, 8};
-    std::array<int, 1> array1 = {7};
-    std::array<int, 2> array2 = {7, 8};
-    std::array<int, 3> array3 = {7, 8, 0};
-    json = vector;
-    EXPECT_EQ((std::vector<int>(json)), vector);
-    EXPECT_EQ((std::array<int, 1>(json)), array1);
-    EXPECT_EQ((std::array<int, 2>(json)), array2);
-    EXPECT_EQ((std::array<int, 3>(json)), array3);
+    std::array<int, 1> array4 = {7};
+    std::array<int, 2> array5 = {7, 8};
+    std::array<int, 3> array6 = {7, 8, 0};
+    json = array5;
+    EXPECT_EQ((decltype(array4)(json)), array4);
+    EXPECT_EQ((decltype(array5)(json)), array5);
+    EXPECT_EQ((decltype(array6)(json)), array6);
 
-    std::vector<int> empty = {};
-    std::array<int, 1> empty1 = {};
-    std::array<int, 2> empty2 = {};
-    std::array<int, 3> empty3 = {};
-    json = empty;
-    EXPECT_EQ((std::vector<int>(json)), empty);
-    EXPECT_EQ((std::array<int, 1>(json)), empty1);
-    EXPECT_EQ((std::array<int, 2>(json)), empty2);
-    EXPECT_EQ((std::array<int, 3>(json)), empty3);
+    std::deque<int> deque1 = {50, 60, 70, 80};
+    std::deque<std::string> deque2 = {"50", "60", "70", "80"};
+    std::deque<fly::Json> deque3 = {50, "60", 70, "80"};
+    json = deque1;
+    EXPECT_EQ((decltype(deque1)(json)), deque1);
+    EXPECT_EQ((decltype(deque2)(json)), deque2);
+    json = deque2;
+    EXPECT_EQ((decltype(deque1)(json)), deque1);
+    EXPECT_EQ((decltype(deque2)(json)), deque2);
+    json = deque3;
+    EXPECT_EQ((decltype(deque1)(json)), deque1);
+    EXPECT_EQ((decltype(deque2)(json)), deque2);
+    EXPECT_EQ((decltype(deque3)(json)), deque3);
+    json = {true};
+    validate_throw<std::deque<int>>(json);
+    json = {"string"};
+    validate_throw<std::deque<int>>(json);
+
+    std::forward_list<int> forward_list1 = {50, 60, 70, 80};
+    std::forward_list<std::string> forward_list2 = {"50", "60", "70", "80"};
+    std::forward_list<fly::Json> forward_list3 = {50, "60", 70, "80"};
+    json = forward_list1;
+    EXPECT_EQ((decltype(forward_list1)(json)), forward_list1);
+    EXPECT_EQ((decltype(forward_list2)(json)), forward_list2);
+    json = forward_list2;
+    EXPECT_EQ((decltype(forward_list1)(json)), forward_list1);
+    EXPECT_EQ((decltype(forward_list2)(json)), forward_list2);
+    json = forward_list3;
+    EXPECT_EQ((decltype(forward_list1)(json)), forward_list1);
+    EXPECT_EQ((decltype(forward_list2)(json)), forward_list2);
+    EXPECT_EQ((decltype(forward_list3)(json)), forward_list3);
+    json = {true};
+    validate_throw<std::forward_list<int>>(json);
+    json = {"string"};
+    validate_throw<std::forward_list<int>>(json);
+
+    std::list<int> list1 = {50, 60, 70, 80};
+    std::list<std::string> list2 = {"50", "60", "70", "80"};
+    std::list<fly::Json> list3 = {50, "60", 70, "80"};
+    json = list1;
+    EXPECT_EQ((decltype(list1)(json)), list1);
+    EXPECT_EQ((decltype(list2)(json)), list2);
+    json = list2;
+    EXPECT_EQ((decltype(list1)(json)), list1);
+    EXPECT_EQ((decltype(list2)(json)), list2);
+    json = list3;
+    EXPECT_EQ((decltype(list1)(json)), list1);
+    EXPECT_EQ((decltype(list2)(json)), list2);
+    EXPECT_EQ((decltype(list3)(json)), list3);
+    json = {true};
+    validate_throw<std::list<int>>(json);
+    json = {"string"};
+    validate_throw<std::list<int>>(json);
+
+    std::multiset<int> multiset1 = {50, 60, 70, 80};
+    std::multiset<std::string> multiset2 = {"50", "60", "70", "80"};
+    // std::multiset<fly::Json> multiset3 = {50, "60", 70, "80"};
+    json = multiset1;
+    EXPECT_EQ((decltype(multiset1)(json)), multiset1);
+    EXPECT_EQ((decltype(multiset2)(json)), multiset2);
+    json = multiset2;
+    EXPECT_EQ((decltype(multiset1)(json)), multiset1);
+    EXPECT_EQ((decltype(multiset2)(json)), multiset2);
+    // json = multiset3;
+    // EXPECT_EQ((decltype(multiset1)(json)), multiset1);
+    // EXPECT_EQ((decltype(multiset2)(json)), multiset2);
+    // EXPECT_EQ((decltype(multiset3)(json)), multiset3);
+    json = {true};
+    validate_throw<std::multiset<int>>(json);
+    json = {"string"};
+    validate_throw<std::multiset<int>>(json);
+
+    std::set<int> set1 = {50, 60, 70, 80};
+    std::set<std::string> set2 = {"50", "60", "70", "80"};
+    // std::set<fly::Json> set3 = {50, "60", 70, "80"};
+    json = set1;
+    EXPECT_EQ((decltype(set1)(json)), set1);
+    EXPECT_EQ((decltype(set2)(json)), set2);
+    json = set2;
+    EXPECT_EQ((decltype(set1)(json)), set1);
+    EXPECT_EQ((decltype(set2)(json)), set2);
+    // json = set3;
+    // EXPECT_EQ((decltype(set1)(json)), set1);
+    // EXPECT_EQ((decltype(set2)(json)), set2);
+    // EXPECT_EQ((decltype(set3)(json)), set3);
+    json = {true};
+    validate_throw<std::set<int>>(json);
+    json = {"string"};
+    validate_throw<std::set<int>>(json);
+
+    std::unordered_multiset<int> u_multiset1 = {50, 60, 70, 80};
+    std::unordered_multiset<std::string> u_multiset2 = {"50", "60", "70", "80"};
+    // std::unordered_multiset<fly::Json> u_multiset3 = {50, "60", 70, "80"};
+    json = u_multiset1;
+    EXPECT_EQ((decltype(u_multiset1)(json)), u_multiset1);
+    EXPECT_EQ((decltype(u_multiset2)(json)), u_multiset2);
+    json = u_multiset2;
+    EXPECT_EQ((decltype(u_multiset1)(json)), u_multiset1);
+    EXPECT_EQ((decltype(u_multiset2)(json)), u_multiset2);
+    // json = u_multiset3;
+    // EXPECT_EQ((decltype(u_multiset1)(json)), u_multiset1);
+    // EXPECT_EQ((decltype(u_multiset2)(json)), u_multiset2);
+    // EXPECT_EQ((decltype(u_multiset3)(json)), u_multiset3);
+    json = {true};
+    validate_throw<std::unordered_multiset<int>>(json);
+    json = {"string"};
+    validate_throw<std::unordered_multiset<int>>(json);
+
+    std::unordered_set<int> u_set1 = {50, 60, 70, 80};
+    std::unordered_set<std::string> u_set2 = {"50", "60", "70", "80"};
+    // std::unordered_set<fly::Json> u_set3 = {50, "60", 70, "80"};
+    json = u_set1;
+    EXPECT_EQ((decltype(u_set1)(json)), u_set1);
+    EXPECT_EQ((decltype(u_set2)(json)), u_set2);
+    json = u_set2;
+    EXPECT_EQ((decltype(u_set1)(json)), u_set1);
+    EXPECT_EQ((decltype(u_set2)(json)), u_set2);
+    // json = u_set3;
+    // EXPECT_EQ((decltype(u_set1)(json)), u_set1);
+    // EXPECT_EQ((decltype(u_set2)(json)), u_set2);
+    // EXPECT_EQ((decltype(u_set3)(json)), u_set3);
+    json = {true};
+    validate_throw<std::unordered_set<int>>(json);
+    json = {"string"};
+    validate_throw<std::unordered_set<int>>(json);
+
+    std::vector<int> vector1 = {50, 60, 70, 80};
+    std::vector<std::string> vector2 = {"50", "60", "70", "80"};
+    std::vector<fly::Json> vector3 = {50, "60", 70, "80"};
+    json = vector1;
+    EXPECT_EQ((decltype(vector1)(json)), vector1);
+    EXPECT_EQ((decltype(vector2)(json)), vector2);
+    json = vector2;
+    EXPECT_EQ((decltype(vector1)(json)), vector1);
+    EXPECT_EQ((decltype(vector2)(json)), vector2);
+    json = vector3;
+    EXPECT_EQ((decltype(vector1)(json)), vector1);
+    EXPECT_EQ((decltype(vector2)(json)), vector2);
+    EXPECT_EQ((decltype(vector3)(json)), vector3);
+    json = {true};
+    validate_throw<std::vector<int>>(json);
+    json = {"string"};
+    validate_throw<std::vector<int>>(json);
 
     json = true;
-    validate_throw<std::vector<int>>(json);
     validate_throw<std::array<int, 1>>(json);
+    validate_throw<std::deque<int>>(json);
+    validate_throw<std::forward_list<int>>(json);
+    validate_throw<std::list<int>>(json);
+    validate_throw<std::multiset<int>>(json);
+    validate_throw<std::set<int>>(json);
+    validate_throw<std::unordered_multiset<int>>(json);
+    validate_throw<std::unordered_set<int>>(json);
+    validate_throw<std::vector<int>>(json);
 
     json = 1;
-    validate_throw<std::vector<int>>(json);
     validate_throw<std::array<int, 1>>(json);
+    validate_throw<std::deque<int>>(json);
+    validate_throw<std::forward_list<int>>(json);
+    validate_throw<std::list<int>>(json);
+    validate_throw<std::multiset<int>>(json);
+    validate_throw<std::set<int>>(json);
+    validate_throw<std::unordered_multiset<int>>(json);
+    validate_throw<std::unordered_set<int>>(json);
+    validate_throw<std::vector<int>>(json);
 
     json = static_cast<unsigned int>(1);
-    validate_throw<std::vector<int>>(json);
     validate_throw<std::array<int, 1>>(json);
+    validate_throw<std::deque<int>>(json);
+    validate_throw<std::forward_list<int>>(json);
+    validate_throw<std::list<int>>(json);
+    validate_throw<std::multiset<int>>(json);
+    validate_throw<std::set<int>>(json);
+    validate_throw<std::unordered_multiset<int>>(json);
+    validate_throw<std::unordered_set<int>>(json);
+    validate_throw<std::vector<int>>(json);
 
     json = 1.0f;
-    validate_throw<std::vector<int>>(json);
     validate_throw<std::array<int, 1>>(json);
+    validate_throw<std::deque<int>>(json);
+    validate_throw<std::forward_list<int>>(json);
+    validate_throw<std::list<int>>(json);
+    validate_throw<std::multiset<int>>(json);
+    validate_throw<std::set<int>>(json);
+    validate_throw<std::unordered_multiset<int>>(json);
+    validate_throw<std::unordered_set<int>>(json);
+    validate_throw<std::vector<int>>(json);
 
     json = nullptr;
-    validate_throw<std::vector<int>>(json);
     validate_throw<std::array<int, 1>>(json);
+    validate_throw<std::deque<int>>(json);
+    validate_throw<std::forward_list<int>>(json);
+    validate_throw<std::list<int>>(json);
+    validate_throw<std::multiset<int>>(json);
+    validate_throw<std::set<int>>(json);
+    validate_throw<std::unordered_multiset<int>>(json);
+    validate_throw<std::unordered_set<int>>(json);
+    validate_throw<std::vector<int>>(json);
 }
 
 //==============================================================================
@@ -734,6 +983,62 @@ TEST_F(JsonTest, ObjectAccess)
 }
 
 //==============================================================================
+TEST_F(JsonTest, ObjectAt)
+{
+    fly::Json string1 = "abc";
+    EXPECT_THROW(string1.at("a"), fly::JsonException);
+
+    const fly::Json string2 = "abc";
+    EXPECT_THROW(string2.at("a"), fly::JsonException);
+
+    fly::Json object1 = {{"a", 1}, {"b", 2}};
+    EXPECT_EQ(object1.at("a"), 1);
+    EXPECT_EQ(object1.at("b"), 2);
+    EXPECT_THROW(object1.at("c"), fly::JsonException);
+
+    const fly::Json object2 = {{"a", 1}, {"b", 2}};
+    EXPECT_EQ(object2.at("a"), 1);
+    EXPECT_EQ(object2.at("b"), 2);
+    EXPECT_THROW(object2.at("c"), fly::JsonException);
+
+    fly::Json array1 = {'7', 8};
+    EXPECT_THROW(array1.at("a"), fly::JsonException);
+
+    const fly::Json array2 = {'7', 8};
+    EXPECT_THROW(array2.at("a"), fly::JsonException);
+
+    fly::Json bool1 = true;
+    EXPECT_THROW(bool1.at("a"), fly::JsonException);
+
+    const fly::Json bool2 = true;
+    EXPECT_THROW(bool2.at("a"), fly::JsonException);
+
+    fly::Json signed1 = 1;
+    EXPECT_THROW(signed1.at("a"), fly::JsonException);
+
+    const fly::Json signed2 = 1;
+    EXPECT_THROW(signed2.at("a"), fly::JsonException);
+
+    fly::Json unsigned1 = static_cast<unsigned int>(1);
+    EXPECT_THROW(unsigned1.at("a"), fly::JsonException);
+
+    const fly::Json unsigned2 = static_cast<unsigned int>(1);
+    EXPECT_THROW(unsigned2.at("a"), fly::JsonException);
+
+    fly::Json float1 = 1.0f;
+    EXPECT_THROW(float1.at("a"), fly::JsonException);
+
+    const fly::Json float2 = 1.0f;
+    EXPECT_THROW(float2.at("a"), fly::JsonException);
+
+    fly::Json null1 = nullptr;
+    EXPECT_THROW(null1.at("a"), fly::JsonException);
+
+    const fly::Json null2 = nullptr;
+    EXPECT_THROW(null2.at("a"), fly::JsonException);
+}
+
+//==============================================================================
 TEST_F(JsonTest, ArrayAccess)
 {
     fly::Json string1 = "abc";
@@ -775,7 +1080,6 @@ TEST_F(JsonTest, ArrayAccess)
     EXPECT_THROW(unsigned1[0], fly::JsonException);
 
     const fly::Json unsigned2 = static_cast<unsigned int>(1);
-    ;
     EXPECT_THROW(unsigned2[0], fly::JsonException);
 
     fly::Json float1 = 1.0f;
@@ -791,6 +1095,101 @@ TEST_F(JsonTest, ArrayAccess)
 
     const fly::Json null2 = nullptr;
     EXPECT_THROW(null2[0], fly::JsonException);
+}
+
+//==============================================================================
+TEST_F(JsonTest, ArrayAt)
+{
+    fly::Json string1 = "abc";
+    EXPECT_THROW(string1.at(0), fly::JsonException);
+
+    const fly::Json string2 = "abc";
+    EXPECT_THROW(string2.at(0), fly::JsonException);
+
+    fly::Json object1 = {{"a", 1}, {"b", 2}};
+    EXPECT_THROW(object1.at(0), fly::JsonException);
+
+    const fly::Json object2 = {{"a", 1}, {"b", 2}};
+    EXPECT_THROW(object2.at(0), fly::JsonException);
+
+    fly::Json array1 = {'7', 8};
+    EXPECT_EQ(array1.at(0), '7');
+    EXPECT_EQ(array1.at(1), 8);
+    EXPECT_THROW(array1.at(2), fly::JsonException);
+
+    const fly::Json array2 = {'7', 8};
+    EXPECT_EQ(array2.at(0), '7');
+    EXPECT_EQ(array2.at(1), 8);
+    EXPECT_THROW(array2.at(2), fly::JsonException);
+
+    fly::Json bool1 = true;
+    EXPECT_THROW(bool1.at(0), fly::JsonException);
+
+    const fly::Json bool2 = true;
+    EXPECT_THROW(bool2.at(0), fly::JsonException);
+
+    fly::Json signed1 = 1;
+    EXPECT_THROW(signed1.at(0), fly::JsonException);
+
+    const fly::Json signed2 = 1;
+    EXPECT_THROW(signed2.at(0), fly::JsonException);
+
+    fly::Json unsigned1 = static_cast<unsigned int>(1);
+    EXPECT_THROW(unsigned1.at(0), fly::JsonException);
+
+    const fly::Json unsigned2 = static_cast<unsigned int>(1);
+    EXPECT_THROW(unsigned2.at(0), fly::JsonException);
+
+    fly::Json float1 = 1.0f;
+    EXPECT_THROW(float1.at(0), fly::JsonException);
+
+    const fly::Json float2 = 1.0f;
+    EXPECT_THROW(float2.at(0), fly::JsonException);
+
+    fly::Json null1 = nullptr;
+    EXPECT_THROW(null1.at(0), fly::JsonException);
+
+    const fly::Json null2 = nullptr;
+    EXPECT_THROW(null2.at(0), fly::JsonException);
+}
+
+//==============================================================================
+TEST_F(JsonTest, Empty)
+{
+    fly::Json json;
+
+    json = "abcdef";
+    EXPECT_FALSE(json.empty());
+
+    json = {{"a", 1}, {"b", 2}};
+    EXPECT_FALSE(json.empty());
+
+    json = {'7', 8, 9, 10};
+    EXPECT_FALSE(json.empty());
+
+    json = true;
+    EXPECT_FALSE(json.empty());
+
+    json = 1;
+    EXPECT_FALSE(json.empty());
+
+    json = static_cast<unsigned int>(1);
+    EXPECT_FALSE(json.empty());
+
+    json = 1.0f;
+    EXPECT_FALSE(json.empty());
+
+    json = nullptr;
+    EXPECT_TRUE(json.empty());
+
+    json = "";
+    EXPECT_TRUE(json.empty());
+
+    json = fly::JsonTraits::object_type();
+    EXPECT_TRUE(json.empty());
+
+    json = fly::JsonTraits::array_type();
+    EXPECT_TRUE(json.empty());
 }
 
 //==============================================================================
@@ -821,6 +1220,674 @@ TEST_F(JsonTest, Size)
 
     json = nullptr;
     EXPECT_EQ(json.size(), 0);
+}
+
+//==============================================================================
+TEST_F(JsonTest, Clear)
+{
+    fly::Json json;
+
+    json = "abcdef";
+    EXPECT_EQ(json.size(), 6);
+    json.clear();
+    EXPECT_TRUE(json.empty());
+
+    json = {{"a", 1}, {"b", 2}};
+    EXPECT_EQ(json.size(), 2);
+    json.clear();
+    EXPECT_TRUE(json.empty());
+
+    json = {'7', 8, 9, 10};
+    EXPECT_EQ(json.size(), 4);
+    json.clear();
+    EXPECT_TRUE(json.empty());
+
+    json = true;
+    EXPECT_TRUE(json);
+    json.clear();
+    EXPECT_FALSE(json);
+
+    json = 1;
+    EXPECT_EQ(json, 1);
+    json.clear();
+    EXPECT_EQ(json, 0);
+
+    json = static_cast<unsigned int>(1);
+    EXPECT_EQ(json, 1);
+    json.clear();
+    EXPECT_EQ(json, 0);
+
+    json = 1.0f;
+    EXPECT_DOUBLE_EQ(double(json), 1.0);
+    json.clear();
+    EXPECT_DOUBLE_EQ(double(json), 0.0);
+
+    json = nullptr;
+    EXPECT_EQ(json, nullptr);
+    json.clear();
+    EXPECT_EQ(json, nullptr);
+}
+
+//==============================================================================
+TEST_F(JsonTest, JsonSwap)
+{
+    fly::Json json1 = 12389;
+    fly::Json json2 = "string";
+    fly::Json json3 = {1, 2, 3, 8, 9};
+
+    json1.swap(json2);
+    EXPECT_EQ(json1, "string");
+    EXPECT_EQ(json2, 12389);
+
+    json2.swap(json3);
+    EXPECT_EQ(json2, fly::Json({1, 2, 3, 8, 9}));
+    EXPECT_EQ(json3, 12389);
+
+    json3.swap(json1);
+    EXPECT_EQ(json1, 12389);
+    EXPECT_EQ(json3, "string");
+}
+
+//==============================================================================
+TEST_F(JsonTest, StringSwap)
+{
+    fly::Json json;
+    std::string str;
+
+    json = "abcdef";
+    str = "ghijkl";
+    EXPECT_NO_THROW(json.swap(str));
+    EXPECT_EQ(json, "ghijkl");
+    EXPECT_EQ(str, "abcdef");
+
+    json = {{"a", 1}, {"b", 2}};
+    EXPECT_THROW(json.swap(str), fly::JsonException);
+
+    json = {'7', 8, 9, 10};
+    EXPECT_THROW(json.swap(str), fly::JsonException);
+
+    json = true;
+    EXPECT_THROW(json.swap(str), fly::JsonException);
+
+    json = 1;
+    EXPECT_THROW(json.swap(str), fly::JsonException);
+
+    json = static_cast<unsigned int>(1);
+    EXPECT_THROW(json.swap(str), fly::JsonException);
+
+    json = 1.0f;
+    EXPECT_THROW(json.swap(str), fly::JsonException);
+
+    json = nullptr;
+    EXPECT_THROW(json.swap(str), fly::JsonException);
+}
+
+//==============================================================================
+TEST_F(JsonTest, ObjectSwap)
+{
+    fly::Json json;
+    std::map<std::string, fly::Json> map;
+    std::multimap<std::string, fly::Json> mmap;
+    std::unordered_map<std::string, fly::Json> u_map;
+    std::unordered_multimap<std::string, fly::Json> u_mmap;
+
+    json = "abcdef";
+    EXPECT_THROW(json.swap(map), fly::JsonException);
+    EXPECT_THROW(json.swap(mmap), fly::JsonException);
+    EXPECT_THROW(json.swap(u_map), fly::JsonException);
+    EXPECT_THROW(json.swap(u_mmap), fly::JsonException);
+
+    std::map<std::string, int> map1 = {{"a", 2}, {"b", 4}};
+    std::map<std::string, std::string> map2 = {{"a", "2"}, {"b", "4"}};
+    std::map<std::string, fly::Json> map3 = {{"a", 5}, {"b", "6"}};
+    json = {{"c", 100}, {"d", 200}};
+    EXPECT_NO_THROW(json.swap(map1));
+    EXPECT_EQ(json, (decltype(map1)({{"a", 2}, {"b", 4}})));
+    EXPECT_EQ(map1, (decltype(map1)({{"c", 100}, {"d", 200}})));
+    json = {{"c", 100}, {"d", 200}};
+    EXPECT_NO_THROW(json.swap(map2));
+    EXPECT_EQ(json, (decltype(map2)({{"a", "2"}, {"b", "4"}})));
+    EXPECT_EQ(map2, (decltype(map2)({{"c", "100"}, {"d", "200"}})));
+    json = {{"c", nullptr}, {"d", true}};
+    EXPECT_NO_THROW(json.swap(map3));
+    EXPECT_EQ(json, (decltype(map3)({{"a", 5}, {"b", "6"}})));
+    EXPECT_EQ(map3, (decltype(map3)({{"c", nullptr}, {"d", true}})));
+    json = {{"c", 100}, {"d", "200"}};
+    EXPECT_NO_THROW(json.swap(map1));
+    EXPECT_EQ(json, (decltype(map1)({{"c", 100}, {"d", 200}})));
+    EXPECT_EQ(map1, (decltype(map1)({{"c", 100}, {"d", 200}})));
+
+    std::multimap<std::string, int> mmap1 = {{"a", 2}, {"b", 4}};
+    std::multimap<std::string, std::string> mmap2 = {{"a", "2"}, {"b", "4"}};
+    std::multimap<std::string, fly::Json> mmap3 = {{"a", 5}, {"b", "6"}};
+    json = {{"c", 100}, {"d", 200}};
+    EXPECT_NO_THROW(json.swap(mmap1));
+    EXPECT_EQ(json, (decltype(mmap1)({{"a", 2}, {"b", 4}})));
+    EXPECT_EQ(mmap1, (decltype(mmap1)({{"c", 100}, {"d", 200}})));
+    json = {{"c", 100}, {"d", 200}};
+    EXPECT_NO_THROW(json.swap(mmap2));
+    EXPECT_EQ(json, (decltype(mmap2)({{"a", "2"}, {"b", "4"}})));
+    EXPECT_EQ(mmap2, (decltype(mmap2)({{"c", "100"}, {"d", "200"}})));
+    json = {{"c", nullptr}, {"d", true}};
+    EXPECT_NO_THROW(json.swap(mmap3));
+    EXPECT_EQ(json, (decltype(mmap3)({{"a", 5}, {"b", "6"}})));
+    EXPECT_EQ(mmap3, (decltype(mmap3)({{"c", nullptr}, {"d", true}})));
+    json = {{"c", 100}, {"d", "200"}};
+    EXPECT_NO_THROW(json.swap(mmap1));
+    EXPECT_EQ(json, (decltype(mmap1)({{"c", 100}, {"d", 200}})));
+    EXPECT_EQ(mmap1, (decltype(mmap1)({{"c", 100}, {"d", 200}})));
+
+    std::unordered_map<std::string, int> u_map1 = {{"a", 2}, {"b", 4}};
+    std::unordered_map<std::string, std::string> u_map2 = {
+        {"a", "2"},
+        {"b", "4"}};
+    std::unordered_map<std::string, fly::Json> u_map3 = {{"a", 5}, {"b", "6"}};
+    json = {{"c", 100}, {"d", 200}};
+    EXPECT_NO_THROW(json.swap(u_map1));
+    EXPECT_EQ(json, (decltype(u_map1)({{"a", 2}, {"b", 4}})));
+    EXPECT_EQ(u_map1, (decltype(u_map1)({{"c", 100}, {"d", 200}})));
+    json = {{"c", 100}, {"d", 200}};
+    EXPECT_NO_THROW(json.swap(u_map2));
+    EXPECT_EQ(json, (decltype(u_map2)({{"a", "2"}, {"b", "4"}})));
+    EXPECT_EQ(u_map2, (decltype(u_map2)({{"c", "100"}, {"d", "200"}})));
+    json = {{"c", nullptr}, {"d", true}};
+    EXPECT_NO_THROW(json.swap(u_map3));
+    EXPECT_EQ(json, (decltype(u_map3)({{"a", 5}, {"b", "6"}})));
+    EXPECT_EQ(u_map3, (decltype(u_map3)({{"c", nullptr}, {"d", true}})));
+    json = {{"c", 100}, {"d", "200"}};
+    EXPECT_NO_THROW(json.swap(u_map1));
+    EXPECT_EQ(json, (decltype(u_map1)({{"c", 100}, {"d", 200}})));
+    EXPECT_EQ(u_map1, (decltype(u_map1)({{"c", 100}, {"d", 200}})));
+
+    std::unordered_multimap<std::string, int> u_mmap1 = {{"a", 2}, {"b", 4}};
+    std::unordered_multimap<std::string, std::string> u_mmap2 = {
+        {"a", "2"},
+        {"b", "4"}};
+    std::unordered_multimap<std::string, fly::Json> u_mmap3 = {
+        {"a", 5},
+        {"b", "6"}};
+    json = {{"c", 100}, {"d", 200}};
+    EXPECT_NO_THROW(json.swap(u_mmap1));
+    EXPECT_EQ(json, (decltype(u_mmap1)({{"a", 2}, {"b", 4}})));
+    EXPECT_EQ(u_mmap1, (decltype(u_mmap1)({{"c", 100}, {"d", 200}})));
+    json = {{"c", 100}, {"d", 200}};
+    EXPECT_NO_THROW(json.swap(u_mmap2));
+    EXPECT_EQ(json, (decltype(u_mmap2)({{"a", "2"}, {"b", "4"}})));
+    EXPECT_EQ(u_mmap2, (decltype(u_mmap2)({{"c", "100"}, {"d", "200"}})));
+    json = {{"c", nullptr}, {"d", true}};
+    EXPECT_NO_THROW(json.swap(u_mmap3));
+    EXPECT_EQ(json, (decltype(u_mmap3)({{"a", 5}, {"b", "6"}})));
+    EXPECT_EQ(u_mmap3, (decltype(u_mmap3)({{"c", nullptr}, {"d", true}})));
+    json = {{"c", 100}, {"d", "200"}};
+    EXPECT_NO_THROW(json.swap(u_mmap1));
+    EXPECT_EQ(json, (decltype(u_mmap1)({{"c", 100}, {"d", 200}})));
+    EXPECT_EQ(u_mmap1, (decltype(u_mmap1)({{"c", 100}, {"d", 200}})));
+
+    json = {'7', 8, 9, 10};
+    EXPECT_THROW(json.swap(map), fly::JsonException);
+    EXPECT_THROW(json.swap(mmap), fly::JsonException);
+    EXPECT_THROW(json.swap(u_map), fly::JsonException);
+    EXPECT_THROW(json.swap(u_mmap), fly::JsonException);
+
+    json = true;
+    EXPECT_THROW(json.swap(map), fly::JsonException);
+    EXPECT_THROW(json.swap(mmap), fly::JsonException);
+    EXPECT_THROW(json.swap(u_map), fly::JsonException);
+    EXPECT_THROW(json.swap(u_mmap), fly::JsonException);
+
+    json = 1;
+    EXPECT_THROW(json.swap(map), fly::JsonException);
+    EXPECT_THROW(json.swap(mmap), fly::JsonException);
+    EXPECT_THROW(json.swap(u_map), fly::JsonException);
+    EXPECT_THROW(json.swap(u_mmap), fly::JsonException);
+
+    json = static_cast<unsigned int>(1);
+    EXPECT_THROW(json.swap(map), fly::JsonException);
+    EXPECT_THROW(json.swap(mmap), fly::JsonException);
+    EXPECT_THROW(json.swap(u_map), fly::JsonException);
+    EXPECT_THROW(json.swap(u_mmap), fly::JsonException);
+
+    json = 1.0f;
+    EXPECT_THROW(json.swap(map), fly::JsonException);
+    EXPECT_THROW(json.swap(mmap), fly::JsonException);
+    EXPECT_THROW(json.swap(u_map), fly::JsonException);
+    EXPECT_THROW(json.swap(u_mmap), fly::JsonException);
+
+    json = nullptr;
+    EXPECT_THROW(json.swap(map), fly::JsonException);
+    EXPECT_THROW(json.swap(mmap), fly::JsonException);
+    EXPECT_THROW(json.swap(u_map), fly::JsonException);
+    EXPECT_THROW(json.swap(u_mmap), fly::JsonException);
+}
+
+//==============================================================================
+TEST_F(JsonTest, ArraySwap)
+{
+    fly::Json json;
+    std::array<int, 4> array;
+    std::deque<int> deque;
+    std::forward_list<int> forward_list;
+    std::list<int> list;
+    std::multiset<int> multiset;
+    std::set<int> set;
+    std::unordered_multiset<int> u_multiset;
+    std::unordered_set<int> u_set;
+    std::vector<int> vector;
+
+    json = "abcdef";
+    EXPECT_THROW(json.swap(array), fly::JsonException);
+    EXPECT_THROW(json.swap(deque), fly::JsonException);
+    EXPECT_THROW(json.swap(forward_list), fly::JsonException);
+    EXPECT_THROW(json.swap(list), fly::JsonException);
+    EXPECT_THROW(json.swap(multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(set), fly::JsonException);
+    EXPECT_THROW(json.swap(u_multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(u_set), fly::JsonException);
+    EXPECT_THROW(json.swap(vector), fly::JsonException);
+
+    json = {{"a", 1}, {"b", 2}};
+    EXPECT_THROW(json.swap(array), fly::JsonException);
+    EXPECT_THROW(json.swap(deque), fly::JsonException);
+    EXPECT_THROW(json.swap(forward_list), fly::JsonException);
+    EXPECT_THROW(json.swap(list), fly::JsonException);
+    EXPECT_THROW(json.swap(multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(set), fly::JsonException);
+    EXPECT_THROW(json.swap(u_multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(u_set), fly::JsonException);
+    EXPECT_THROW(json.swap(vector), fly::JsonException);
+
+    std::array<int, 4> array1 = {50, 60, 70, 80};
+    std::array<std::string, 4> array2 = {"50", "60", "70", "80"};
+    std::array<fly::Json, 4> array3 = {"a", 90, "b", 100};
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(array1));
+    EXPECT_EQ(json, (decltype(array1)({50, 60, 70, 80})));
+    EXPECT_EQ(array1, (decltype(array1)({1, 2, 0, 0})));
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(array2));
+    EXPECT_EQ(json, (decltype(array2)({"50", "60", "70", "80"})));
+    EXPECT_EQ(array2, (decltype(array2)({"1", "2"})));
+    json = {nullptr, true};
+    EXPECT_NO_THROW(json.swap(array3));
+    EXPECT_EQ(json, (decltype(array3)({"a", 90, "b", 100})));
+    EXPECT_EQ(array3, (decltype(array3)({nullptr, true})));
+    json = {50, "60", 70, "80"};
+    EXPECT_NO_THROW(json.swap(array1));
+    EXPECT_EQ(json, (decltype(array1)({1, 2})));
+    EXPECT_EQ(array1, (decltype(array1)({50, 60, 70, 80})));
+
+    std::deque<int> deque1 = {50, 60, 70, 80};
+    std::deque<std::string> deque2 = {"50", "60", "70", "80"};
+    std::deque<fly::Json> deque3 = {"a", 90, "b", 100};
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(deque1));
+    EXPECT_EQ(json, (decltype(deque1)({50, 60, 70, 80})));
+    EXPECT_EQ(deque1, (decltype(deque1)({1, 2})));
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(deque2));
+    EXPECT_EQ(json, (decltype(deque2)({"50", "60", "70", "80"})));
+    EXPECT_EQ(deque2, (decltype(deque2)({"1", "2"})));
+    json = {nullptr, true};
+    EXPECT_NO_THROW(json.swap(deque3));
+    EXPECT_EQ(json, (decltype(deque3)({"a", 90, "b", 100})));
+    EXPECT_EQ(deque3, (decltype(deque3)({nullptr, true})));
+    json = {50, "60", 70, "80"};
+    EXPECT_NO_THROW(json.swap(deque1));
+    EXPECT_EQ(json, (decltype(deque1)({1, 2})));
+    EXPECT_EQ(deque1, (decltype(deque1)({50, 60, 70, 80})));
+
+    std::forward_list<int> forward_list1 = {50, 60, 70, 80};
+    std::forward_list<std::string> forward_list2 = {"50", "60", "70", "80"};
+    std::forward_list<fly::Json> forward_list3 = {"a", 90, "b", 100};
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(forward_list1));
+    EXPECT_EQ(json, (decltype(forward_list1)({50, 60, 70, 80})));
+    EXPECT_EQ(forward_list1, (decltype(forward_list1)({1, 2})));
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(forward_list2));
+    EXPECT_EQ(json, (decltype(forward_list2)({"50", "60", "70", "80"})));
+    EXPECT_EQ(forward_list2, (decltype(forward_list2)({"1", "2"})));
+    json = {nullptr, true};
+    EXPECT_NO_THROW(json.swap(forward_list3));
+    EXPECT_EQ(json, (decltype(forward_list3)({"a", 90, "b", 100})));
+    EXPECT_EQ(forward_list3, (decltype(forward_list3)({nullptr, true})));
+    json = {50, "60", 70, "80"};
+    EXPECT_NO_THROW(json.swap(forward_list1));
+    EXPECT_EQ(json, (decltype(forward_list1)({1, 2})));
+    EXPECT_EQ(forward_list1, (decltype(forward_list1)({50, 60, 70, 80})));
+
+    std::list<int> list1 = {50, 60, 70, 80};
+    std::list<std::string> list2 = {"50", "60", "70", "80"};
+    std::list<fly::Json> list3 = {"a", 90, "b", 100};
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(list1));
+    EXPECT_EQ(json, (decltype(list1)({50, 60, 70, 80})));
+    EXPECT_EQ(list1, (decltype(list1)({1, 2})));
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(list2));
+    EXPECT_EQ(json, (decltype(list2)({"50", "60", "70", "80"})));
+    EXPECT_EQ(list2, (decltype(list2)({"1", "2"})));
+    json = {nullptr, true};
+    EXPECT_NO_THROW(json.swap(list3));
+    EXPECT_EQ(json, (decltype(list3)({"a", 90, "b", 100})));
+    EXPECT_EQ(list3, (decltype(list3)({nullptr, true})));
+    json = {50, "60", 70, "80"};
+    EXPECT_NO_THROW(json.swap(list1));
+    EXPECT_EQ(json, (decltype(list1)({1, 2})));
+    EXPECT_EQ(list1, (decltype(list1)({50, 60, 70, 80})));
+
+    std::multiset<int> multiset1 = {50, 60, 70, 80};
+    std::multiset<std::string> multiset2 = {"50", "60", "70", "80"};
+    // std::multiset<fly::Json> multiset3 = {"a", 90, "b", 100};
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(multiset1));
+    EXPECT_EQ(json, (decltype(multiset1)({50, 60, 70, 80})));
+    EXPECT_EQ(multiset1, (decltype(multiset1)({1, 2})));
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(multiset2));
+    EXPECT_EQ(json, (decltype(multiset2)({"50", "60", "70", "80"})));
+    EXPECT_EQ(multiset2, (decltype(multiset2)({"1", "2"})));
+    // json = {nullptr, true};
+    // EXPECT_NO_THROW(json.swap(multiset3));
+    // EXPECT_EQ(json, (decltype(multiset3)({"a", 90, "b", 100})));
+    // EXPECT_EQ(multiset3, (decltype(multiset3)({nullptr, true})));
+    json = {50, "60", 70, "80"};
+    EXPECT_NO_THROW(json.swap(multiset1));
+    EXPECT_EQ(json, (decltype(multiset1)({1, 2})));
+    EXPECT_EQ(multiset1, (decltype(multiset1)({50, 60, 70, 80})));
+
+    std::set<int> set1 = {50, 60, 70, 80};
+    std::set<std::string> set2 = {"50", "60", "70", "80"};
+    // std::set<fly::Json> set3 = {"a", 90, "b", 100};
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(set1));
+    EXPECT_EQ(json, (decltype(set1)({50, 60, 70, 80})));
+    EXPECT_EQ(set1, (decltype(set1)({1, 2})));
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(set2));
+    EXPECT_EQ(json, (decltype(set2)({"50", "60", "70", "80"})));
+    EXPECT_EQ(set2, (decltype(set2)({"1", "2"})));
+    // json = {nullptr, true};
+    // EXPECT_NO_THROW(json.swap(set3));
+    // EXPECT_EQ(json, (decltype(set3)({"a", 90, "b", 100})));
+    // EXPECT_EQ(set3, (decltype(set3)({nullptr, true})));
+    json = {50, "60", 70, "80"};
+    EXPECT_NO_THROW(json.swap(set1));
+    EXPECT_EQ(json, (decltype(set1)({1, 2})));
+    EXPECT_EQ(set1, (decltype(set1)({50, 60, 70, 80})));
+
+    std::unordered_multiset<int> u_multiset1 = {50, 60, 70, 80};
+    std::unordered_multiset<std::string> u_multiset2 = {"50", "60", "70", "80"};
+    // std::unordered_multiset<fly::Json> u_multiset3 = {"a", 90, "b", 100};
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(u_multiset1));
+    EXPECT_EQ(json, (decltype(u_multiset1)({50, 60, 70, 80})));
+    EXPECT_EQ(u_multiset1, (decltype(u_multiset1)({1, 2})));
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(u_multiset2));
+    EXPECT_EQ(json, (decltype(u_multiset2)({"50", "60", "70", "80"})));
+    EXPECT_EQ(u_multiset2, (decltype(u_multiset2)({"1", "2"})));
+    // json = {nullptr, true};
+    // EXPECT_NO_THROW(json.swap(u_multiset3));
+    // EXPECT_EQ(json, (decltype(u_multiset3)({"a", 90, "b", 100})));
+    // EXPECT_EQ(u_multiset3, (decltype(u_multiset3)({nullptr, true})));
+    json = {50, "60", 70, "80"};
+    EXPECT_NO_THROW(json.swap(u_multiset1));
+    EXPECT_EQ(json, (decltype(u_multiset1)({1, 2})));
+    EXPECT_EQ(u_multiset1, (decltype(u_multiset1)({50, 60, 70, 80})));
+
+    std::unordered_set<int> u_set1 = {50, 60, 70, 80};
+    std::unordered_set<std::string> u_set2 = {"50", "60", "70", "80"};
+    // std::unordered_set<fly::Json> u_set3 = {"a", 90, "b", 100};
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(u_set1));
+    EXPECT_EQ(json, (decltype(u_set1)({50, 60, 70, 80})));
+    EXPECT_EQ(u_set1, (decltype(u_set1)({1, 2})));
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(u_set2));
+    EXPECT_EQ(json, (decltype(u_set2)({"50", "60", "70", "80"})));
+    EXPECT_EQ(u_set2, (decltype(u_set2)({"1", "2"})));
+    // json = {nullptr, true};
+    // EXPECT_NO_THROW(json.swap(u_set3));
+    // EXPECT_EQ(json, (decltype(u_set3)({"a", 90, "b", 100})));
+    // EXPECT_EQ(u_set3, (decltype(u_set3)({nullptr, true})));
+    json = {50, "60", 70, "80"};
+    EXPECT_NO_THROW(json.swap(u_set1));
+    EXPECT_EQ(json, (decltype(u_set1)({1, 2})));
+    EXPECT_EQ(u_set1, (decltype(u_set1)({50, 60, 70, 80})));
+
+    std::vector<int> vector1 = {50, 60, 70, 80};
+    std::vector<std::string> vector2 = {"50", "60", "70", "80"};
+    std::vector<fly::Json> vector3 = {"a", 90, "b", 100};
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(vector1));
+    EXPECT_EQ(json, (decltype(vector1)({50, 60, 70, 80})));
+    EXPECT_EQ(vector1, (decltype(vector1)({1, 2})));
+    json = {1, 2};
+    EXPECT_NO_THROW(json.swap(vector2));
+    EXPECT_EQ(json, (decltype(vector2)({"50", "60", "70", "80"})));
+    EXPECT_EQ(vector2, (decltype(vector2)({"1", "2"})));
+    json = {nullptr, true};
+    EXPECT_NO_THROW(json.swap(vector3));
+    EXPECT_EQ(json, (decltype(vector3)({"a", 90, "b", 100})));
+    EXPECT_EQ(vector3, (decltype(vector3)({nullptr, true})));
+    json = {50, "60", 70, "80"};
+    EXPECT_NO_THROW(json.swap(vector1));
+    EXPECT_EQ(json, (decltype(vector1)({1, 2})));
+    EXPECT_EQ(vector1, (decltype(vector1)({50, 60, 70, 80})));
+
+    json = true;
+    EXPECT_THROW(json.swap(array), fly::JsonException);
+    EXPECT_THROW(json.swap(deque), fly::JsonException);
+    EXPECT_THROW(json.swap(forward_list), fly::JsonException);
+    EXPECT_THROW(json.swap(list), fly::JsonException);
+    EXPECT_THROW(json.swap(multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(set), fly::JsonException);
+    EXPECT_THROW(json.swap(u_multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(u_set), fly::JsonException);
+    EXPECT_THROW(json.swap(vector), fly::JsonException);
+
+    json = 1;
+    EXPECT_THROW(json.swap(array), fly::JsonException);
+    EXPECT_THROW(json.swap(deque), fly::JsonException);
+    EXPECT_THROW(json.swap(forward_list), fly::JsonException);
+    EXPECT_THROW(json.swap(list), fly::JsonException);
+    EXPECT_THROW(json.swap(multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(set), fly::JsonException);
+    EXPECT_THROW(json.swap(u_multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(u_set), fly::JsonException);
+    EXPECT_THROW(json.swap(vector), fly::JsonException);
+
+    json = static_cast<unsigned int>(1);
+    EXPECT_THROW(json.swap(array), fly::JsonException);
+    EXPECT_THROW(json.swap(deque), fly::JsonException);
+    EXPECT_THROW(json.swap(forward_list), fly::JsonException);
+    EXPECT_THROW(json.swap(list), fly::JsonException);
+    EXPECT_THROW(json.swap(multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(set), fly::JsonException);
+    EXPECT_THROW(json.swap(u_multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(u_set), fly::JsonException);
+    EXPECT_THROW(json.swap(vector), fly::JsonException);
+
+    json = 1.0f;
+    EXPECT_THROW(json.swap(array), fly::JsonException);
+    EXPECT_THROW(json.swap(deque), fly::JsonException);
+    EXPECT_THROW(json.swap(forward_list), fly::JsonException);
+    EXPECT_THROW(json.swap(list), fly::JsonException);
+    EXPECT_THROW(json.swap(multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(set), fly::JsonException);
+    EXPECT_THROW(json.swap(u_multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(u_set), fly::JsonException);
+    EXPECT_THROW(json.swap(vector), fly::JsonException);
+
+    json = nullptr;
+    EXPECT_THROW(json.swap(array), fly::JsonException);
+    EXPECT_THROW(json.swap(deque), fly::JsonException);
+    EXPECT_THROW(json.swap(forward_list), fly::JsonException);
+    EXPECT_THROW(json.swap(list), fly::JsonException);
+    EXPECT_THROW(json.swap(multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(set), fly::JsonException);
+    EXPECT_THROW(json.swap(u_multiset), fly::JsonException);
+    EXPECT_THROW(json.swap(u_set), fly::JsonException);
+    EXPECT_THROW(json.swap(vector), fly::JsonException);
+}
+
+//==============================================================================
+TEST_F(JsonTest, IteratorBegin)
+{
+    fly::Json json1 {1, 2, 3};
+    const fly::Json json2 {4, 5, 6};
+
+    auto begin1 = json1.begin();
+    EXPECT_EQ(*begin1, 1);
+    EXPECT_FALSE(std::is_const_v<decltype(begin1)::value_type>);
+
+    auto cbegin1 = json1.cbegin();
+    EXPECT_EQ(*cbegin1, 1);
+    EXPECT_TRUE(std::is_const_v<decltype(cbegin1)::value_type>);
+
+    auto begin2 = json2.begin();
+    EXPECT_EQ(*begin2, 4);
+    EXPECT_TRUE(std::is_const_v<decltype(begin2)::value_type>);
+
+    auto cbegin2 = json2.cbegin();
+    EXPECT_EQ(*cbegin2, 4);
+    EXPECT_EQ(begin2, cbegin2);
+    EXPECT_TRUE(std::is_const_v<decltype(cbegin2)::value_type>);
+}
+
+//==============================================================================
+TEST_F(JsonTest, IteratorEnd)
+{
+    fly::Json json1 {1, 2, 3};
+    const fly::Json json2 {4, 5, 6};
+
+    auto end1 = json1.end();
+    EXPECT_EQ(*(end1 - 1), 3);
+    EXPECT_FALSE(std::is_const_v<decltype(end1)::value_type>);
+
+    auto cend1 = json1.cend();
+    EXPECT_EQ(*(cend1 - 1), 3);
+    EXPECT_TRUE(std::is_const_v<decltype(cend1)::value_type>);
+
+    auto end2 = json2.end();
+    EXPECT_EQ(*(end2 - 1), 6);
+    EXPECT_TRUE(std::is_const_v<decltype(end2)::value_type>);
+
+    auto cend2 = json2.cend();
+    EXPECT_EQ(*(cend2 - 1), 6);
+    EXPECT_EQ(end2, cend2);
+    EXPECT_TRUE(std::is_const_v<decltype(cend2)::value_type>);
+}
+
+//==============================================================================
+TEST_F(JsonTest, ObjectIteratorIterate)
+{
+    fly::Json json {{"a", 1}, {"b", 2}};
+    {
+        fly::Json::size_type size = 0;
+
+        for (auto it = json.begin(); it != json.end(); ++it, ++size)
+        {
+            EXPECT_EQ(*it, size == 0 ? 1 : 2);
+            EXPECT_EQ(it.key(), size == 0 ? "a" : "b");
+            EXPECT_EQ(it.value(), size == 0 ? 1 : 2);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+    {
+        fly::Json::size_type size = 0;
+
+        for (auto it = json.cbegin(); it != json.cend(); ++it, ++size)
+        {
+            EXPECT_EQ(*it, size == 0 ? 1 : 2);
+            EXPECT_EQ(it.key(), size == 0 ? "a" : "b");
+            EXPECT_EQ(it.value(), size == 0 ? 1 : 2);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+}
+
+//==============================================================================
+TEST_F(JsonTest, ObjectIteratorRangeBasedFor)
+{
+    fly::Json json {{"a", 1}, {"b", 2}};
+    {
+        fly::Json::size_type size = 0;
+
+        for (fly::Json &value : json)
+        {
+            EXPECT_EQ(value, size++ == 0 ? 1 : 2);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+    {
+        fly::Json::size_type size = 0;
+
+        for (const fly::Json &value : json)
+        {
+            EXPECT_EQ(value, size++ == 0 ? 1 : 2);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+}
+
+//==============================================================================
+TEST_F(JsonTest, ArrayIteratorIterate)
+{
+    fly::Json json {1, 2, 3};
+    {
+        fly::Json::size_type size = 0;
+
+        for (auto it = json.begin(); it != json.end(); ++it, ++size)
+        {
+            EXPECT_EQ(*it, json[size]);
+            EXPECT_EQ(it.value(), json[size]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+    {
+        fly::Json::size_type size = 0;
+
+        for (auto it = json.cbegin(); it != json.cend(); ++it, ++size)
+        {
+            EXPECT_EQ(*it, json[size]);
+            EXPECT_EQ(it.value(), json[size]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+}
+
+//==============================================================================
+TEST_F(JsonTest, ArrayIteratorRangeBasedFor)
+{
+    fly::Json json {1, 2, 3};
+    {
+        fly::Json::size_type size = 0;
+
+        for (fly::Json &value : json)
+        {
+            EXPECT_EQ(value, json[size++]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
+    {
+        fly::Json::size_type size = 0;
+
+        for (const fly::Json &value : json)
+        {
+            EXPECT_EQ(value, json[size++]);
+        }
+
+        EXPECT_EQ(size, json.size());
+    }
 }
 
 //==============================================================================
@@ -976,6 +2043,74 @@ TEST_F(JsonTest, Stream)
     stream << null;
     EXPECT_EQ(stream.str(), "null");
     stream.str(std::string());
+}
+
+//==============================================================================
+TEST_F(JsonTest, StreamWithEscapedSymbols)
+{
+    {
+        fly::Json json = "abc\\\"def";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\\"def\"");
+    }
+    {
+        fly::Json json = "abc\\\\def";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\\\def\"");
+    }
+    {
+        fly::Json json = "abc\\bdef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\bdef\"");
+    }
+    {
+        fly::Json json = "abc\\fdef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\fdef\"");
+    }
+    {
+        fly::Json json = "abc\\ndef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\ndef\"");
+    }
+    {
+        fly::Json json = "abc\\rdef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\rdef\"");
+    }
+    {
+        fly::Json json = "abc\\tdef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\tdef\"");
+    }
 }
 
 //==============================================================================

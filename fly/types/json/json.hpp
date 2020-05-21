@@ -1,6 +1,8 @@
 #pragma once
 
 #include "fly/traits/traits.hpp"
+#include "fly/types/json/detail/json_iterator.hpp"
+#include "fly/types/json/json_exception.hpp"
 #include "fly/types/json/json_traits.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -70,6 +72,21 @@ public:
         JsonTraits::signed_type,
         JsonTraits::unsigned_type,
         JsonTraits::float_type>;
+
+    /**
+     * Aliases for canonical STL container member types.
+     */
+    using value_type = Json;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using allocator_type = std::allocator<value_type>;
+    using reference = value_type &;
+    using const_reference = const value_type &;
+    using pointer = typename std::allocator_traits<allocator_type>::pointer;
+    using const_pointer =
+        typename std::allocator_traits<allocator_type>::const_pointer;
+    using iterator = detail::JsonIterator<Json>;
+    using const_iterator = detail::JsonIterator<const Json>;
 
     /**
      * Alias for a basic_stringstream with the JSON string type.
@@ -182,7 +199,7 @@ public:
      *
      * @param json The Json instance to copy.
      */
-    Json(const Json &json) noexcept;
+    Json(const_reference json) noexcept;
 
     /**
      * Move constructor. Intializes the Json instance with the type and value
@@ -217,7 +234,7 @@ public:
      *
      * @return A reference to this Json instance.
      */
-    Json &operator=(Json json) noexcept;
+    reference operator=(Json json) noexcept;
 
     /**
      * @return True if the Json instance is null.
@@ -286,7 +303,7 @@ public:
      *
      * @return The Json instance as a string.
      */
-    explicit operator JsonTraits::string_type() const noexcept(false);
+    explicit operator JsonTraits::string_type() const noexcept;
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The
@@ -297,7 +314,8 @@ public:
      *
      * @return The Json instance as the object-like type.
      *
-     * @throws JsonException If the Json instance is not an object.
+     * @throws JsonException If the Json instance is not an object, or a stored
+     *         element could not be converted to the target object's value type.
      */
     template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
     explicit operator T() const noexcept(false);
@@ -313,7 +331,8 @@ public:
      *
      * @return The Json instance as the array-like type.
      *
-     * @throws JsonException If the Json instance is not an array.
+     * @throws JsonException If the Json instance is not an array, or a stored
+     *         element could not be converted to the target array's value type.
      */
     template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
     explicit operator T() const noexcept(false);
@@ -329,7 +348,8 @@ public:
      *
      * @return The Json instance as a std::array.
      *
-     * @throws JsonException If the Json instance is not an array.
+     * @throws JsonException If the Json instance is not an array, or a stored
+     *         element could not be converted to the target array's value type.
      */
     template <typename T, std::size_t N>
     explicit operator std::array<T, N>() const noexcept(false);
@@ -346,7 +366,7 @@ public:
      * @return The Json instance as a boolean.
      */
     template <typename T, enable_if_all<JsonTraits::is_boolean<T>> = 0>
-    explicit operator T() const noexcept(false);
+    explicit operator T() const noexcept;
 
     /**
      * Numeric conversion operator. Converts the Json instance to a numeric
@@ -360,7 +380,8 @@ public:
      *
      * @return The Json instance as the numeric type.
      *
-     * @throws JsonException If the Json instance is not numeric.
+     * @throws JsonException If the Json instance is not numeric, or the stored
+     *         value could not be converted to the target numeric type.
      */
     template <
         typename T,
@@ -386,7 +407,7 @@ public:
      * @throws JsonException If the Json instance is neither an object nor null,
      *         or the key value is invalid.
      */
-    Json &operator[](
+    reference operator[](
         const typename JsonTraits::object_type::key_type &key) noexcept(false);
 
     /**
@@ -402,7 +423,7 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key
      *         value does not exist, or the key value is invalid.
      */
-    const Json &
+    const_reference
     operator[](const typename JsonTraits::object_type::key_type &key) const
         noexcept(false);
 
@@ -421,8 +442,7 @@ public:
      *
      * @throws JsonException If the Json instance is neither an array nor null.
      */
-    Json &operator[](typename JsonTraits::array_type::size_type index) noexcept(
-        false);
+    reference operator[](size_type index) noexcept(false);
 
     /**
      * Array read-only access operator.
@@ -437,12 +457,87 @@ public:
      * @throws JsonException If the Json instance is not an array or the index
      *         does not exist.
      */
-    const Json &
-    operator[](typename JsonTraits::array_type::size_type index) const
+    const_reference operator[](size_type index) const noexcept(false);
+
+    /**
+     * Object read-only accessor.
+     *
+     * If the Json instance is an object, perform a lookup on the object with a
+     * key value.
+     *
+     * @param key The key value to lookup.
+     *
+     * @return A reference to the Json instance at the key value.
+     *
+     * @throws JsonException If the Json instance is not an object, or the key
+     *         value does not exist, or the key value is invalid.
+     */
+    reference
+    at(const typename JsonTraits::object_type::key_type &key) noexcept(false);
+
+    /**
+     * Object read-only accessor.
+     *
+     * If the Json instance is an object, perform a lookup on the object with a
+     * key value.
+     *
+     * @param key The key value to lookup.
+     *
+     * @return A reference to the Json instance at the key value.
+     *
+     * @throws JsonException If the Json instance is not an object, or the key
+     *         value does not exist, or the key value is invalid.
+     */
+    const_reference
+    at(const typename JsonTraits::object_type::key_type &key) const
         noexcept(false);
 
     /**
-     * Get the size of the Json instance.
+     * Array read-only accessor.
+     *
+     * If the Json instance is an array, perform a lookup on the array with an
+     * index.
+     *
+     * @param index The index to lookup.
+     *
+     * @return A reference to the Json instance at the index.
+     *
+     * @throws JsonException If the Json instance is not an array or the index
+     *         does not exist.
+     */
+    reference at(size_type index) noexcept(false);
+
+    /**
+     * Array read-only accessor.
+     *
+     * If the Json instance is an array, perform a lookup on the array with an
+     * index.
+     *
+     * @param index The index to lookup.
+     *
+     * @return A reference to the Json instance at the index.
+     *
+     * @throws JsonException If the Json instance is not an array or the index
+     *         does not exist.
+     */
+    const_reference at(size_type index) const noexcept(false);
+
+    /**
+     * Check if the Json instance contains zero elements.
+     *
+     * If the Json instance is an object, array, or string, return whether the
+     * stored container is empty.
+     *
+     * If the Json instance is null, return true.
+     *
+     * If the Json instance is a boolean or numeric, return false.
+     *
+     * @return True if the instance is empty.
+     */
+    bool empty() const noexcept;
+
+    /**
+     * Get the number of elements in the Json instance.
      *
      * If the Json instance is an object or array, return the number of elements
      * stored in the object or array.
@@ -455,7 +550,112 @@ public:
      *
      * @return The size of the Json instance.
      */
-    std::size_t size() const noexcept;
+    size_type size() const noexcept;
+
+    /**
+     * Clear the contents of the Json instance.
+     *
+     * If the Json instance is an object, array, or string, clears the stored
+     * container.
+     *
+     * If the Json instance is a boolean, sets to false.
+     *
+     * If the Json instance is numeric, sets to zero.
+     */
+    void clear() noexcept;
+
+    /**
+     * Exchange the contents of the Json instance with another instance.
+     *
+     * @param json The Json instance to swap with.
+     */
+    void swap(reference json) noexcept;
+
+    /**
+     * Exchange the contents of the Json instance with another string. Only
+     * valid if the Json instance is a string.
+     *
+     * @param json The string to swap with.
+     *
+     * @throws JsonException If the Json instance is not a string.
+     */
+    void swap(JsonTraits::string_type &other) noexcept(false);
+
+    /**
+     * Exchange the contents of the Json instance with another object. Only
+     * valid if the Json instance is an object.
+     *
+     * @param json The object to swap with.
+     *
+     * @throws JsonException If the Json instance is not an object.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
+    void swap(T &other) noexcept(false);
+
+    /**
+     * Exchange the contents of the Json instance with another array. Only
+     * valid if the Json instance is an array.
+     *
+     * @param json The array to swap with.
+     *
+     * @throws JsonException If the Json instance is not an array.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
+    void swap(T &other) noexcept(false);
+
+    /**
+     * Retrieve an iterator to the beginning of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    iterator begin() noexcept(false);
+
+    /**
+     * Retrieve a constant iterator to the beginning of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_iterator begin() const noexcept(false);
+
+    /**
+     * Retrieve a constant iterator to the beginning of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_iterator cbegin() const noexcept(false);
+
+    /**
+     * Retrieve an iterator to the end of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    iterator end() noexcept(false);
+
+    /**
+     * Retrieve a constant iterator to the end of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_iterator end() const noexcept(false);
+
+    /**
+     * Retrieve a constant iterator to the end of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_iterator cend() const noexcept(false);
 
     /**
      * Equality operator. Compares two Json instances for equality. They are
@@ -473,7 +673,8 @@ public:
      *
      * @return True if the two Json instances are equal.
      */
-    friend bool operator==(const Json &json1, const Json &json2) noexcept;
+    friend bool
+    operator==(const_reference json1, const_reference json2) noexcept;
 
     /**
      * Unequality operator. Compares two Json instances for unequality. They are
@@ -481,7 +682,8 @@ public:
      *
      * @return True if the two Json instances are unequal.
      */
-    friend bool operator!=(const Json &json1, const Json &json2) noexcept;
+    friend bool
+    operator!=(const_reference json1, const_reference json2) noexcept;
 
     /**
      * Stream operator. Stream the Json instance into an output stream.
@@ -492,9 +694,12 @@ public:
      * @return A reference to the output stream.
      */
     friend std::ostream &
-    operator<<(std::ostream &stream, const Json &json) noexcept;
+    operator<<(std::ostream &stream, const_reference json) noexcept;
 
 private:
+    friend iterator;
+    friend const_iterator;
+
     /**
      * Validate the string for compliance according to https://www.json.org.
      * Validation includes handling escaped and unicode characters.
@@ -506,8 +711,8 @@ private:
      *
      * @throws JsonException If the string value is not valid.
      */
-    JsonTraits::string_type
-    validate_string(const JsonTraits::string_type &str) const noexcept(false);
+    static JsonTraits::string_type
+    validate_string(const JsonTraits::string_type &str) noexcept(false);
 
     /**
      * After reading a reverse solidus character, read the escaped character
@@ -521,11 +726,21 @@ private:
      * @throws JsonException If the interpreted escaped character is not valid
      *         or there weren't enough available bytes.
      */
-    void read_escaped_character(
+    static void read_escaped_character(
         stream_type &stream,
         JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end) const
-        noexcept(false);
+        const JsonTraits::string_type::const_iterator &end) noexcept(false);
+
+    /**
+     * Write a character to a stream, handling any value that should be escaped.
+     * For those characters, an extra reverse solidus is inserted.
+     *
+     * @param stream Stream to pipe the escaped character into.
+     * @param ch Character to escape.
+     */
+    static void write_escaped_charater(
+        std::ostream &stream,
+        JsonTraits::string_type::value_type ch) noexcept;
 
     /**
      * After determining the escaped character is a unicode encoding, read the
@@ -540,11 +755,10 @@ private:
      * @throws JsonException If the interpreted unicode character is not valid
      *         or there weren't enough available bytes.
      */
-    void read_unicode_character(
+    static void read_unicode_character(
         stream_type &stream,
         JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end) const
-        noexcept(false);
+        const JsonTraits::string_type::const_iterator &end) noexcept(false);
 
     /**
      * Read a single 4-byte unicode encoding.
@@ -557,10 +771,9 @@ private:
      * @throws JsonException If any of the 4 read bytes were non-hexadecimal or
      *         there weren't enough available bytes.
      */
-    int read_unicode_codepoint(
+    static int read_unicode_codepoint(
         JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end) const
-        noexcept(false);
+        const JsonTraits::string_type::const_iterator &end) noexcept(false);
 
     /**
      * Validate a single non-escaped character is compliant.
@@ -571,47 +784,12 @@ private:
      *
      * @throws JsonException If the character value is not valid.
      */
-    void validate_character(
+    static void validate_character(
         stream_type &stream,
         JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end) const
-        noexcept(false);
+        const JsonTraits::string_type::const_iterator &end) noexcept(false);
 
     json_type m_value;
-};
-
-/**
- * Exception to be raised if an error was encountered creating, accessing, or
- * modifying a Json instance.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version September 24, 2017
- */
-class JsonException : public std::exception
-{
-public:
-    /**
-     * Constructor.
-     *
-     * @param message Message indicating what error was encountered.
-     */
-    JsonException(const std::string &message) noexcept;
-
-    /**
-     * Constructor.
-     *
-     * @param json The Json instance for which the error was encountered.
-     * @param message Message indicating what error was encountered.
-     */
-    JsonException(const Json &json, const std::string &message) noexcept;
-
-    /**
-     * @return C-string representing this exception.
-     */
-    virtual const char *what() const noexcept override;
-
-private:
-    const std::string m_message;
 };
 
 //==============================================================================
@@ -668,8 +846,7 @@ Json::operator T() const noexcept(false)
 {
     if (is_object())
     {
-        const JsonTraits::object_type &value =
-            std::get<JsonTraits::object_type>(m_value);
+        const auto &value = std::get<JsonTraits::object_type>(m_value);
         return T(value.begin(), value.end());
     }
 
@@ -682,9 +859,16 @@ Json::operator T() const noexcept(false)
 {
     if (is_array())
     {
-        const JsonTraits::array_type &value =
-            std::get<JsonTraits::array_type>(m_value);
-        return T(value.begin(), value.end());
+        const auto &value = std::get<JsonTraits::array_type>(m_value);
+        T array {};
+
+        for (const auto &it : value)
+        {
+            auto copy = static_cast<typename T::value_type>(it);
+            JsonTraits::ArrayTraits::append(array, std::move(copy));
+        }
+
+        return array;
     }
 
     throw JsonException(*this, "JSON type is not an array");
@@ -696,8 +880,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 {
     if (is_array())
     {
-        const JsonTraits::array_type &value =
-            std::get<JsonTraits::array_type>(m_value);
+        const auto &value = std::get<JsonTraits::array_type>(m_value);
         std::array<T, N> array {};
 
         for (std::size_t i = 0; i < std::min(N, value.size()); ++i)
@@ -713,7 +896,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 
 //==============================================================================
 template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
-Json::operator T() const noexcept(false)
+Json::operator T() const noexcept
 {
     auto visitor = [](const auto &value) noexcept -> T {
         using U = std::decay_t<decltype(value)>;
@@ -741,7 +924,6 @@ Json::operator T() const noexcept(false)
             return false;
         }
     };
-
     return std::visit(visitor, m_value);
 }
 
@@ -779,6 +961,40 @@ Json::operator T() const noexcept(false)
     };
 
     return std::visit(visitor, m_value);
+}
+
+//==============================================================================
+template <typename T, enable_if_all<JsonTraits::is_object<T>>>
+void Json::swap(T &other) noexcept(false)
+{
+    if (is_object())
+    {
+        T object = static_cast<T>(*this);
+        *this = other;
+
+        std::swap(object, other);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON type invalid for swap(object)");
+    }
+}
+
+//==============================================================================
+template <typename T, enable_if_all<JsonTraits::is_array<T>>>
+void Json::swap(T &other) noexcept(false)
+{
+    if (is_array())
+    {
+        T array = static_cast<T>(*this);
+        *this = other;
+
+        std::swap(array, other);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON type invalid for swap(array)");
+    }
 }
 
 } // namespace fly

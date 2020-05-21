@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/fly.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <array>
@@ -112,7 +113,7 @@ struct JsonTraits
     /**
      * Helper SFINAE struct to determine whether a type is a JSON object.
      */
-    struct ObjectType
+    struct ObjectTraits
     {
         template <typename>
         struct IsObject : std::false_type
@@ -144,25 +145,30 @@ struct JsonTraits
      * Define a trait for testing if type T is a JSON object.
      */
     template <typename T>
-    using is_object = ObjectType::IsObject<T>;
+    using is_object = ObjectTraits::IsObject<T>;
 
     template <typename T>
     inline static constexpr bool is_object_v = is_object<T>::value;
 
     /**
-     * Helper SFINAE struct to determine whether a type is a JSON array.
+     * Helper SFINAE struct to determine whether a type is a JSON array, and
+     * wrapper methods to generically modify an array.
      */
-    struct ArrayType
+    struct ArrayTraits
     {
         template <typename>
         struct IsArray : std::false_type
         {
         };
 
+        // std::array
+
         template <typename T, std::size_t N>
         struct IsArray<std::array<T, N>> : std::true_type
         {
         };
+
+        // std::deque
 
         template <typename... Args>
         struct IsArray<std::deque<Args...>> : std::true_type
@@ -170,9 +176,37 @@ struct JsonTraits
         };
 
         template <typename... Args>
+        static void append(
+            std::deque<Args...> &array,
+            typename std::deque<Args...>::value_type &&value)
+        {
+            array.push_back(std::move(value));
+        }
+
+        // std::forward_list
+
+        template <typename... Args>
         struct IsArray<std::forward_list<Args...>> : std::true_type
         {
         };
+
+        template <typename... Args>
+        static void append(
+            std::forward_list<Args...> &array,
+            typename std::forward_list<Args...>::value_type &&value)
+        {
+            auto before_end = array.before_begin();
+
+            for (const auto &element : array)
+            {
+                FLY_UNUSED(element);
+                ++before_end;
+            }
+
+            array.insert_after(before_end, std::move(value));
+        }
+
+        // std::list
 
         template <typename... Args>
         struct IsArray<std::list<Args...>> : std::true_type
@@ -180,9 +214,29 @@ struct JsonTraits
         };
 
         template <typename... Args>
+        static void append(
+            std::list<Args...> &array,
+            typename std::list<Args...>::value_type &&value)
+        {
+            array.push_back(std::move(value));
+        }
+
+        // std::multiset
+
+        template <typename... Args>
         struct IsArray<std::multiset<Args...>> : std::true_type
         {
         };
+
+        template <typename... Args>
+        static void append(
+            std::multiset<Args...> &array,
+            typename std::multiset<Args...>::value_type &&value)
+        {
+            array.insert(std::move(value));
+        }
+
+        // std::set
 
         template <typename... Args>
         struct IsArray<std::set<Args...>> : std::true_type
@@ -190,9 +244,29 @@ struct JsonTraits
         };
 
         template <typename... Args>
+        static void append(
+            std::set<Args...> &array,
+            typename std::set<Args...>::value_type &&value)
+        {
+            array.insert(std::move(value));
+        }
+
+        // std::unordered_multiset
+
+        template <typename... Args>
         struct IsArray<std::unordered_multiset<Args...>> : std::true_type
         {
         };
+
+        template <typename... Args>
+        static void append(
+            std::unordered_multiset<Args...> &array,
+            typename std::unordered_multiset<Args...>::value_type &&value)
+        {
+            array.insert(std::move(value));
+        }
+
+        // std::unordered_set
 
         template <typename... Args>
         struct IsArray<std::unordered_set<Args...>> : std::true_type
@@ -200,19 +274,47 @@ struct JsonTraits
         };
 
         template <typename... Args>
+        static void append(
+            std::unordered_set<Args...> &array,
+            typename std::unordered_set<Args...>::value_type &&value)
+        {
+            array.insert(std::move(value));
+        }
+
+        // std::vector
+
+        template <typename... Args>
         struct IsArray<std::vector<Args...>> : std::true_type
         {
         };
+
+        template <typename... Args>
+        static void append(
+            std::vector<Args...> &array,
+            typename std::vector<Args...>::value_type &&value)
+        {
+            array.push_back(std::move(value));
+        }
     };
 
     /**
      * Define a trait for testing if type T is a JSON array.
      */
     template <typename T>
-    using is_array = ArrayType::IsArray<T>;
+    using is_array = ArrayTraits::IsArray<T>;
 
     template <typename T>
     inline static constexpr bool is_array_v = is_array<T>::value;
+
+    /**
+     * Define a trait for testing if type T is an iterable JSON type.
+     */
+    template <typename T>
+    using is_iterable = std::bool_constant<
+        is_object_v<std::decay_t<T>> || is_array_v<std::decay_t<T>>>;
+
+    template <typename T>
+    inline static constexpr bool is_iterable_v = is_iterable<T>::value;
 };
 
 } // namespace fly
