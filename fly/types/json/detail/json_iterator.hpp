@@ -910,24 +910,25 @@ void JsonIterator<JsonType>::validate_offset(
     const T &it,
     difference_type offset) const noexcept(false)
 {
-    auto visitor = [&](const T &begin, const T &end) noexcept(false) {
-        const auto distance =
-            (offset >= 0) ? std::distance(it, end) : std::distance(begin, it);
+    difference_type distance = 0;
 
-        if (std::abs(offset) > distance)
-        {
-            throw JsonException(
-                *m_json,
-                String::format(
-                    "Cannot offset iterator by distance of %d",
-                    offset));
-        }
-    };
+    if (offset >= 0)
+    {
+        const JsonIterator end = m_json->end();
+        distance = std::distance(it, std::get<T>(end.m_iterator));
+    }
+    else
+    {
+        const JsonIterator begin = m_json->begin();
+        distance = std::distance(std::get<T>(begin.m_iterator), it);
+    }
 
-    std::visit(
-        visitation {visitor, [](const auto &, const auto &) noexcept {}},
-        m_json->begin().m_iterator,
-        m_json->end().m_iterator);
+    if (std::abs(offset) > distance)
+    {
+        throw JsonException(
+            *m_json,
+            String::format("Cannot offset iterator by distance of %d", offset));
+    }
 }
 
 //==============================================================================
@@ -936,18 +937,14 @@ template <typename T>
 void JsonIterator<JsonType>::validate_dereference(const T &it) const
     noexcept(false)
 {
-    auto visitor = [this, &it](const T &end) noexcept(false) {
-        if (it == end)
-        {
-            throw JsonException(
-                *m_json,
-                "Cannot dereference on a past-the-end iterator");
-        }
-    };
+    const JsonIterator end = m_json->end();
 
-    std::visit(
-        visitation {visitor, [](const auto &) noexcept {}},
-        m_json->end().m_iterator);
+    if (it == std::get<T>(end.m_iterator))
+    {
+        throw JsonException(
+            *m_json,
+            "Cannot dereference a past-the-end iterator");
+    }
 }
 
 } // namespace fly::detail
