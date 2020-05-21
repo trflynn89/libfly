@@ -393,8 +393,8 @@ public:
      *
      * @return The distance between the two iterators.
      *
-     * @throws JsonException If either iterator is empty, or if the Json instance
-     *         is an object.
+     * @throws JsonException If either iterator is empty, or if the Json
+     *         instance is an object.
      */
     difference_type operator-(const JsonIterator &iterator) const
         noexcept(false);
