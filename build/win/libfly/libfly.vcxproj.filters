@@ -357,6 +357,9 @@
     <ClCompile Include="..\..\..\fly\types\bit_stream\detail\bit_stream.cpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\fly\types\json\detail\json_iterator.cpp">
+      <Filter>types\json\detail</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\fly\types\json\json.cpp">
       <Filter>types\json</Filter>
     </ClCompile>

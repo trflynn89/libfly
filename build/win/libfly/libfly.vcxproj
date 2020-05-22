@@ -249,6 +249,7 @@
     <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream_reader.cpp" />
     <ClCompile Include="..\..\..\fly\types\bit_stream\bit_stream_writer.cpp" />
     <ClCompile Include="..\..\..\fly\types\bit_stream\detail\bit_stream.cpp" />
+    <ClInclude Include="..\..\..\fly\types\json\detail\json_iterator.cpp" />
     <ClCompile Include="..\..\..\fly\types\json\json.cpp" />
     <ClCompile Include="..\..\..\fly\types\json\json_exception.cpp" />
   </ItemGroup>
