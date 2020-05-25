@@ -14,12 +14,12 @@ TEST(JsonIteratorTest, IteratorTypes)
     fly::Json null = nullptr;
     EXPECT_THROW(
         FLY_UNUSED(iterator(&null, iterator::Position::Begin)),
-        fly::JsonException);
+        fly::JsonIteratorException);
 
     fly::Json string = "abc";
     EXPECT_THROW(
         FLY_UNUSED(iterator(&string, iterator::Position::Begin)),
-        fly::JsonException);
+        fly::JsonIteratorException);
 
     fly::Json object = {{"a", 1}, {"b", 2}};
     EXPECT_NO_THROW(FLY_UNUSED(iterator(&object, iterator::Position::Begin)));
@@ -30,22 +30,22 @@ TEST(JsonIteratorTest, IteratorTypes)
     fly::Json boolean = true;
     EXPECT_THROW(
         FLY_UNUSED(iterator(&boolean, iterator::Position::Begin)),
-        fly::JsonException);
+        fly::JsonIteratorException);
 
     fly::Json sign = 1;
     EXPECT_THROW(
         FLY_UNUSED(iterator(&sign, iterator::Position::Begin)),
-        fly::JsonException);
+        fly::JsonIteratorException);
 
     fly::Json unsign = static_cast<unsigned int>(1);
     EXPECT_THROW(
         FLY_UNUSED(iterator(&unsign, iterator::Position::Begin)),
-        fly::JsonException);
+        fly::JsonIteratorException);
 
     fly::Json floatt = 1.0f;
     EXPECT_THROW(
         FLY_UNUSED(iterator(&floatt, iterator::Position::Begin)),
-        fly::JsonException);
+        fly::JsonIteratorException);
 }
 
 //==============================================================================
@@ -54,20 +54,20 @@ TEST(JsonIteratorTest, NullIterator)
     fly::Json::iterator it1;
     fly::Json::iterator it2;
 
-    EXPECT_THROW(FLY_UNUSED(*it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1->empty()), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1[0]), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(++it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1++), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(--it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1--), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 += 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 -= 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 + 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(1 + it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 - 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1.key()), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1.value()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(*it1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1->empty()), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1[0]), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(++it1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1++), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(--it1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1--), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 += 1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 -= 1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 + 1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(1 + it1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 - 1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1.key()), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1.value()), fly::NullJsonException);
 
     EXPECT_NO_THROW((fly::Json::iterator(it1)));
     EXPECT_NO_THROW(it2 = it1);
@@ -79,20 +79,20 @@ TEST(JsonIteratorTest, NullIteratorFromNullJson)
     fly::Json::iterator it1(nullptr, fly::Json::iterator::Position::Begin);
     fly::Json::iterator it2(nullptr, fly::Json::iterator::Position::Begin);
 
-    EXPECT_THROW(FLY_UNUSED(*it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1->empty()), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1[0]), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(++it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1++), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(--it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1--), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 += 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 -= 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 + 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(1 + it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 - 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1.key()), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1.value()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(*it1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1->empty()), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1[0]), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(++it1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1++), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(--it1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1--), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 += 1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 -= 1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 + 1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(1 + it1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 - 1), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1.key()), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1.value()), fly::NullJsonException);
 
     EXPECT_NO_THROW((fly::Json::iterator(it1)));
     EXPECT_NO_THROW(it2 = it1);
@@ -104,13 +104,13 @@ TEST(JsonIteratorTest, NullIteratorComparison)
     fly::Json::iterator it1;
     fly::Json::iterator it2;
 
-    EXPECT_THROW(FLY_UNUSED(it1 == it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 != it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 < it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 <= it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 > it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 >= it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 - it2), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 == it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 != it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 < it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 <= it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 > it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 >= it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 - it2), fly::NullJsonException);
 }
 
 //==============================================================================
@@ -121,13 +121,13 @@ TEST(JsonIteratorTest, NullIteratorLhsOnlyComparison)
     fly::Json::iterator it1;
     fly::Json::iterator it2 = json.begin();
 
-    EXPECT_THROW(FLY_UNUSED(it1 == it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 != it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 < it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 <= it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 > it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 >= it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 - it2), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 == it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 != it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 < it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 <= it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 > it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 >= it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 - it2), fly::NullJsonException);
 }
 
 //==============================================================================
@@ -138,13 +138,13 @@ TEST(JsonIteratorTest, NullIteratorRhsOnlyComparison)
     fly::Json::iterator it1 = json.begin();
     fly::Json::iterator it2;
 
-    EXPECT_THROW(FLY_UNUSED(it1 == it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 != it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 < it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 <= it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 > it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 >= it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 - it2), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 == it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 != it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 < it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 <= it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 > it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 >= it2), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 - it2), fly::NullJsonException);
 }
 
 //==============================================================================
@@ -156,12 +156,12 @@ TEST(JsonIteratorTest, DifferentJsonInstancesComparison)
     fly::Json::iterator it1 = json1.begin();
     fly::Json::iterator it2 = json2.begin();
 
-    EXPECT_THROW(FLY_UNUSED(it1 == it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 != it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 < it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 <= it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 > it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 >= it2), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 == it2), fly::BadJsonComparisonException);
+    EXPECT_THROW(FLY_UNUSED(it1 != it2), fly::BadJsonComparisonException);
+    EXPECT_THROW(FLY_UNUSED(it1 < it2), fly::BadJsonComparisonException);
+    EXPECT_THROW(FLY_UNUSED(it1 <= it2), fly::BadJsonComparisonException);
+    EXPECT_THROW(FLY_UNUSED(it1 > it2), fly::BadJsonComparisonException);
+    EXPECT_THROW(FLY_UNUSED(it1 >= it2), fly::BadJsonComparisonException);
     EXPECT_NO_THROW(FLY_UNUSED(it1 - it2));
 }
 
@@ -176,23 +176,23 @@ TEST(JsonIteratorTest, OperationsOnObjects)
 
     EXPECT_NO_THROW(FLY_UNUSED(*it1));
     EXPECT_NO_THROW(FLY_UNUSED(it1->empty()));
-    EXPECT_THROW(FLY_UNUSED(it1[0]), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1[0]), fly::JsonIteratorException);
     EXPECT_NO_THROW(FLY_UNUSED(it1 == it2));
     EXPECT_NO_THROW(FLY_UNUSED(it1 != it2));
-    EXPECT_THROW(FLY_UNUSED(it1 < it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 <= it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 > it2), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 >= it2), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 < it2), fly::JsonIteratorException);
+    EXPECT_THROW(FLY_UNUSED(it1 <= it2), fly::JsonIteratorException);
+    EXPECT_THROW(FLY_UNUSED(it1 > it2), fly::JsonIteratorException);
+    EXPECT_THROW(FLY_UNUSED(it1 >= it2), fly::JsonIteratorException);
     EXPECT_NO_THROW(FLY_UNUSED(++it1));
     EXPECT_NO_THROW(FLY_UNUSED(it1++));
     EXPECT_NO_THROW(FLY_UNUSED(--it3));
     EXPECT_NO_THROW(FLY_UNUSED(it3--));
-    EXPECT_THROW(FLY_UNUSED(it1 += 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it3 -= 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 + 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(1 + it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it3 - 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1 - it2), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1 += 1), fly::JsonIteratorException);
+    EXPECT_THROW(FLY_UNUSED(it3 -= 1), fly::JsonIteratorException);
+    EXPECT_THROW(FLY_UNUSED(it1 + 1), fly::JsonIteratorException);
+    EXPECT_THROW(FLY_UNUSED(1 + it1), fly::JsonIteratorException);
+    EXPECT_THROW(FLY_UNUSED(it3 - 1), fly::JsonIteratorException);
+    EXPECT_THROW(FLY_UNUSED(it1 - it2), fly::JsonIteratorException);
     EXPECT_NO_THROW(FLY_UNUSED(it1.key()));
     EXPECT_NO_THROW(FLY_UNUSED(it1.value()));
 }
@@ -225,7 +225,7 @@ TEST(JsonIteratorTest, OperationsOnArrays)
     EXPECT_NO_THROW(FLY_UNUSED(1 + it1));
     EXPECT_NO_THROW(FLY_UNUSED(it3 - 1));
     EXPECT_NO_THROW(FLY_UNUSED(it1 - it2));
-    EXPECT_THROW(FLY_UNUSED(it1.key()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it1.key()), fly::JsonIteratorException);
     EXPECT_NO_THROW(FLY_UNUSED(it1.value()));
 }
 
@@ -257,7 +257,7 @@ TEST(JsonIteratorTest, DereferenceToReference)
         EXPECT_EQ(&(*it), &json[size]);
     }
 
-    EXPECT_THROW(FLY_UNUSED(*it), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(*it), fly::NullJsonException);
 }
 
 //==============================================================================
@@ -276,7 +276,7 @@ TEST(JsonIteratorTest, DereferenceToPointer)
         EXPECT_EQ(pt, &json[size]);
     }
 
-    EXPECT_THROW(FLY_UNUSED(it.operator->()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(it.operator->()), fly::NullJsonException);
 }
 
 //==============================================================================
@@ -304,9 +304,9 @@ TEST(JsonIteratorTest, OffsetOperator)
         EXPECT_EQ(&it2[offset], &json[i]);
     }
 
-    EXPECT_THROW(it1[3], fly::JsonException);
-    EXPECT_THROW(it1[4], fly::JsonException);
-    EXPECT_THROW(it2[0], fly::JsonException);
+    EXPECT_THROW(it1[3], fly::NullJsonException);
+    EXPECT_THROW(it1[4], fly::OutOfRangeJsonException);
+    EXPECT_THROW(it2[0], fly::NullJsonException);
 }
 
 //==============================================================================
@@ -372,8 +372,8 @@ TEST(JsonIteratorTest, IncrementOperator)
     EXPECT_EQ(it1, it2 + 1);
 
     it1 = json.end();
-    EXPECT_THROW(FLY_UNUSED(++it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1++), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(++it1), fly::OutOfRangeJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1++), fly::OutOfRangeJsonException);
 }
 
 //==============================================================================
@@ -391,8 +391,8 @@ TEST(JsonIteratorTest, DecrementOperator)
     EXPECT_EQ(it1, it2 - 1);
 
     it1 = json.begin();
-    EXPECT_THROW(FLY_UNUSED(--it1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(it1--), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(--it1), fly::OutOfRangeJsonException);
+    EXPECT_THROW(FLY_UNUSED(it1--), fly::OutOfRangeJsonException);
 }
 
 //==============================================================================
@@ -427,17 +427,17 @@ TEST(JsonIteratorTest, AdditionOperator)
     EXPECT_EQ(2 + it1, it3);
     EXPECT_LT(it1, it3);
 
-    EXPECT_THROW(FLY_UNUSED(json.begin() + 4), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(json.end() + 1), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(json.begin() + 4), fly::OutOfRangeJsonException);
+    EXPECT_THROW(FLY_UNUSED(json.end() + 1), fly::OutOfRangeJsonException);
 
-    EXPECT_THROW(FLY_UNUSED(json.cbegin() + 4), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(json.cend() + 1), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(json.cbegin() + 4), fly::OutOfRangeJsonException);
+    EXPECT_THROW(FLY_UNUSED(json.cend() + 1), fly::OutOfRangeJsonException);
 
-    EXPECT_THROW(FLY_UNUSED(4 + json.begin()), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(1 + json.end()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(4 + json.begin()), fly::OutOfRangeJsonException);
+    EXPECT_THROW(FLY_UNUSED(1 + json.end()), fly::OutOfRangeJsonException);
 
-    EXPECT_THROW(FLY_UNUSED(4 + json.cbegin()), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(1 + json.cend()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(4 + json.cbegin()), fly::OutOfRangeJsonException);
+    EXPECT_THROW(FLY_UNUSED(1 + json.cend()), fly::OutOfRangeJsonException);
 }
 
 //==============================================================================
@@ -466,11 +466,11 @@ TEST(JsonIteratorTest, SubtractionOperator)
     EXPECT_EQ(it1 - 2, it3);
     EXPECT_GT(it1, it3);
 
-    EXPECT_THROW(FLY_UNUSED(json.begin() - 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(json.end() - 4), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(json.begin() - 1), fly::OutOfRangeJsonException);
+    EXPECT_THROW(FLY_UNUSED(json.end() - 4), fly::OutOfRangeJsonException);
 
-    EXPECT_THROW(FLY_UNUSED(json.cbegin() - 1), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(json.cend() - 4), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(json.cbegin() - 1), fly::OutOfRangeJsonException);
+    EXPECT_THROW(FLY_UNUSED(json.cend() - 4), fly::OutOfRangeJsonException);
 }
 
 //==============================================================================
@@ -503,8 +503,8 @@ TEST(JsonIteratorTest, IteratorKey)
     EXPECT_EQ(it1.key(), "a");
     EXPECT_EQ(it2.key(), "b");
 
-    EXPECT_THROW(FLY_UNUSED(json.end().key()), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(json.cend().key()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(json.end().key()), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(json.cend().key()), fly::NullJsonException);
 }
 
 //==============================================================================
@@ -527,9 +527,9 @@ TEST(JsonIteratorTest, IteratorValue)
     EXPECT_EQ(it4.value(), 5);
     EXPECT_EQ(it5.value(), 6);
 
-    EXPECT_THROW(FLY_UNUSED(json1.end().value()), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(json2.end().value()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(json1.end().value()), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(json2.end().value()), fly::NullJsonException);
 
-    EXPECT_THROW(FLY_UNUSED(json1.cend().value()), fly::JsonException);
-    EXPECT_THROW(FLY_UNUSED(json2.cend().value()), fly::JsonException);
+    EXPECT_THROW(FLY_UNUSED(json1.cend().value()), fly::NullJsonException);
+    EXPECT_THROW(FLY_UNUSED(json2.cend().value()), fly::NullJsonException);
 }
