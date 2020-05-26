@@ -74,7 +74,7 @@ NullJsonException::NullJsonException() noexcept :
 //==============================================================================
 OutOfRangeJsonException::OutOfRangeJsonException(
     const Json &json,
-    int offset) noexcept :
+    std::ptrdiff_t offset) noexcept :
     JsonException(
         "OutOfRangeJsonException",
         String::format("Offset %d is out-of-range: (%s)", offset, json))
