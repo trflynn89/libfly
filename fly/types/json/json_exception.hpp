@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <exception>
 #include <string>
 
@@ -114,7 +115,7 @@ public:
      * @param json The Json instance for which the error was encountered.
      * @param offset The iterator offset attempted to be accessed.
      */
-    OutOfRangeJsonException(const Json &json, int offset) noexcept;
+    OutOfRangeJsonException(const Json &json, std::ptrdiff_t offset) noexcept;
 };
 
 } // namespace fly
