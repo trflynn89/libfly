@@ -137,11 +137,14 @@ void BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    const DataType data = endian_swap<Endian::Big>(buffer);
+    if (m_stream)
+    {
+        const DataType data = endian_swap<Endian::Big>(buffer);
 
-    m_stream.write(
-        reinterpret_cast<const std::ios::char_type *>(&data),
-        static_cast<std::streamsize>(bytes));
+        m_stream_buffer->sputn(
+            reinterpret_cast<const std::ios::char_type *>(&data),
+            static_cast<std::streamsize>(bytes));
+    }
 }
 
 } // namespace fly

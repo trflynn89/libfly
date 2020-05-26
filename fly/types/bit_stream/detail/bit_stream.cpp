@@ -3,9 +3,12 @@
 namespace fly::detail {
 
 //==============================================================================
-BitStream::BitStream(byte_type starting_position) noexcept :
-    m_position(starting_position),
-    m_buffer(0)
+BitStream::BitStream(
+    std::streambuf *stream_buffer,
+    byte_type starting_position) noexcept :
+    m_stream_buffer(stream_buffer),
+    m_buffer(0),
+    m_position(starting_position)
 {
 }
 

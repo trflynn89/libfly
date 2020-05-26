@@ -29,6 +29,12 @@ public:
     }
 
 protected:
+    fly::byte_type create_header(fly::byte_type remainder)
+    {
+        return (fly::detail::s_magic << fly::detail::s_magic_shift) |
+            (remainder << fly::detail::s_remainder_shift);
+    }
+
     bool read_header(fly::byte_type &magic, fly::byte_type &remainder)
     {
         const std::string buffer = m_output_stream.str();
@@ -68,7 +74,7 @@ TEST_F(BitStreamTest, EmptyStream)
     fly::byte_type byte;
 
     // The 1-byte header doesn't exist thus should not have been read.
-    EXPECT_EQ(m_input_stream.gcount(), 0);
+    EXPECT_EQ(stream.header(), 0);
 
     // No further reads should succeed.
     EXPECT_EQ(stream.read_bits(byte, 1), 0_u8);
@@ -95,7 +101,7 @@ TEST_F(BitStreamTest, GoodHeader)
         fly::byte_type byte;
 
         // The 1-byte header should have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), create_header(0_u8));
 
         // No further reads should succeed.
         EXPECT_EQ(stream.read_bits(byte, 1), 0_u8);
@@ -117,7 +123,7 @@ TEST_F(BitStreamTest, BadHeader)
         fly::byte_type byte;
 
         // The 1-byte header should have been read, even though it's invalid.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), header);
 
         // No further reads should succeed.
         EXPECT_EQ(stream.read_bits(byte, 1), 0_u8);
@@ -146,7 +152,7 @@ TEST_F(BitStreamTest, SingleBit)
         fly::byte_type byte;
 
         // The 1-byte header should have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), create_header(7_u8));
 
         // Reading a single bit should succeed.
         EXPECT_EQ(stream.read_bits(byte, 1), 1_u8);
@@ -179,7 +185,7 @@ TEST_F(BitStreamTest, SingleByte)
         fly::byte_type byte;
 
         // The 1-byte header should have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), create_header(0_u8));
 
         // Reading a single byte should succeed.
         EXPECT_TRUE(stream.read_byte(byte));
@@ -212,7 +218,7 @@ TEST_F(BitStreamTest, SingleWord)
         fly::word_type word;
 
         // The 1-byte header should have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), create_header(0_u8));
 
         // Reading a single word should succeed.
         EXPECT_TRUE(stream.read_word(word));
@@ -251,7 +257,7 @@ TEST_F(BitStreamTest, MultiBuffer)
         fly::buffer_type buffer;
 
         // The 1-byte header should have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), create_header(3_u8));
 
         // Reading all written bits should succeed.
         EXPECT_EQ(stream.read_bits(buffer, 64), 64_u8);
@@ -296,7 +302,7 @@ TEST_F(BitStreamTest, MultiBufferSplit)
         fly::buffer_type buffer;
 
         // The 1-byte header should have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), create_header(3_u8));
 
         // Reading all written bits should succeed. Here, the bits are read in
         // an order such that the second and third read must be split because
@@ -337,7 +343,7 @@ TEST_F(BitStreamTest, Peek)
         fly::byte_type byte;
 
         // The 1-byte header should have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), create_header(0_u8));
 
         // Peeking a single byte multiple times should succeed.
         for (std::uint8_t i = 0; i < 10; ++i)
@@ -374,7 +380,7 @@ TEST_F(BitStreamTest, OverPeek)
         fly::byte_type byte;
 
         // The 1-byte header should have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), create_header(1_u8));
 
         // Trying to peek 8 bits now should result in only 7 bits being peeked.
         EXPECT_EQ(stream.peek_bits(byte, 8_u8), 7_u8);
@@ -438,7 +444,7 @@ TEST_F(BitStreamTest, FailedWriterStream)
         fly::byte_type byte;
 
         // The 1-byte header should have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), create_header(0_u8));
 
         // No further reads should succeed.
         EXPECT_EQ(stream.read_bits(byte, 1), 0_u8);
@@ -468,7 +474,7 @@ TEST_F(BitStreamTest, InvalidReaderStream)
         fly::byte_type byte;
 
         // The 1-byte header doesn't exist thus should not have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 0);
+        EXPECT_EQ(stream.header(), 0);
 
         // No further reads should succeed.
         EXPECT_EQ(stream.read_bits(byte, 1), 0_u8);
@@ -496,7 +502,7 @@ TEST_F(BitStreamTest, FailedReaderStream)
         fly::byte_type byte;
 
         // The 1-byte header should have been read.
-        EXPECT_EQ(m_input_stream.gcount(), 1);
+        EXPECT_EQ(stream.header(), create_header(0_u8));
 
         // Close the stream and read some bits. BitStreamReader will try to
         // fill the internal byte buffer, which will fail.
