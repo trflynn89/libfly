@@ -7,21 +7,21 @@ namespace fly {
 
 //==============================================================================
 BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
-    BitStream(0),
+    BitStream(stream.rdbuf(), 0),
     m_stream(stream),
+    m_header(0),
     m_remainder(0)
 {
-    byte_type header = 0;
     byte_type magic = 0;
 
     // Cannot use read_byte because the remainder bits are not known yet.
-    const byte_type bytes_read = fill(header, detail::s_byte_type_size);
+    const byte_type bytes_read = fill(m_header, detail::s_byte_type_size);
 
     if (bytes_read == 1_u8)
     {
-        magic = (header >> detail::s_magic_shift) & detail::s_magic_mask;
+        magic = (m_header >> detail::s_magic_shift) & detail::s_magic_mask;
         m_remainder =
-            (header >> detail::s_remainder_shift) & detail::s_remainder_mask;
+            (m_header >> detail::s_remainder_shift) & detail::s_remainder_mask;
     }
 
     if (magic != detail::s_magic)
@@ -51,12 +51,18 @@ void BitStreamReader::discard_bits(byte_type size) noexcept
 //==============================================================================
 bool BitStreamReader::fully_consumed() const noexcept
 {
-    if (m_stream.eof() || (m_stream.peek() == EOF))
+    if (m_stream_buffer->sgetc() == EOF)
     {
         return m_position == 0;
     }
 
     return false;
+}
+
+//==============================================================================
+byte_type BitStreamReader::header() const noexcept
+{
+    return m_header;
 }
 
 //==============================================================================
@@ -82,7 +88,7 @@ void BitStreamReader::refill_buffer() noexcept
         m_buffer |=
             buffer >> (detail::s_most_significant_bit_position - bits_read);
 
-        if (m_stream.peek() == EOF)
+        if (m_stream_buffer->sgetc() == EOF)
         {
             // At end-of-file, discard any encoded zero-filled bits.
             m_position -= m_remainder;

@@ -4,6 +4,7 @@
 #include "fly/types/bit_stream/detail/bit_stream_traits.hpp"
 
 #include <limits>
+#include <streambuf>
 
 namespace fly::detail {
 
@@ -41,9 +42,12 @@ protected:
     /**
      * Protected constructor to prevent instantiating this class directly.
      *
+     * @param stream_buffer Pointer to the stream's underlying stream buffer.
      * @param starting_position Initial cursor position.
      */
-    explicit BitStream(byte_type starting_position) noexcept;
+    BitStream(
+        std::streambuf *stream_buffer,
+        byte_type starting_position) noexcept;
 
     /**
      * Create a bit-mask with the least-significant bits set. The size of the
@@ -58,8 +62,10 @@ protected:
     template <typename DataType>
     constexpr inline static DataType bit_mask(const DataType bits);
 
-    byte_type m_position;
+    std::streambuf *m_stream_buffer;
+
     buffer_type m_buffer;
+    byte_type m_position;
 };
 
 //==============================================================================

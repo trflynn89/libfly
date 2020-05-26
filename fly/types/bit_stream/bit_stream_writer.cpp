@@ -7,7 +7,7 @@ namespace fly {
 
 //==============================================================================
 BitStreamWriter::BitStreamWriter(std::ostream &stream) noexcept :
-    BitStream(detail::s_most_significant_bit_position),
+    BitStream(stream.rdbuf(), detail::s_most_significant_bit_position),
     m_stream(stream)
 {
     flush_header(0_u8);
@@ -50,13 +50,11 @@ bool BitStreamWriter::finish() noexcept
 //==============================================================================
 void BitStreamWriter::flush_header(byte_type remainder) noexcept
 {
-    m_stream.seekp(0);
+    m_stream_buffer->pubseekpos(0);
 
     const byte_type header = (detail::s_magic << detail::s_magic_shift) |
         (remainder << detail::s_remainder_shift);
     flush(header, detail::s_byte_type_size);
-
-    m_stream.seekp(0, std::ios::end);
 }
 
 //==============================================================================

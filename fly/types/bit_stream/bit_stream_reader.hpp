@@ -115,6 +115,11 @@ public:
      */
     bool fully_consumed() const noexcept;
 
+    /**
+     * @return The header byte decoded from the stream.
+     */
+    byte_type header() const noexcept;
+
 private:
     /**
      * Read from the stream to fill the byte buffer.
@@ -135,6 +140,8 @@ private:
     byte_type fill(DataType &buffer, byte_type bytes) noexcept;
 
     std::istream &m_stream;
+
+    byte_type m_header;
     byte_type m_remainder;
 };
 
@@ -235,13 +242,17 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    m_stream.read(
-        reinterpret_cast<std::ios::char_type *>(&buffer),
-        static_cast<std::streamsize>(bytes));
+    if (m_stream)
+    {
+        const std::streamsize bytes_read = m_stream_buffer->sgetn(
+            reinterpret_cast<std::ios::char_type *>(&buffer),
+            static_cast<std::streamsize>(bytes));
 
-    buffer = endian_swap<Endian::Big>(buffer);
+        buffer = endian_swap<Endian::Big>(buffer);
+        return static_cast<byte_type>(bytes_read);
+    }
 
-    return static_cast<byte_type>(m_stream.gcount());
+    return 0;
 }
 
 } // namespace fly
