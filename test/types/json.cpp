@@ -391,9 +391,9 @@ TEST_F(JsonTest, ObjectConversionValid)
         using T2 = std::decay_t<decltype(test2)>;
         using T3 = std::decay_t<decltype(test3)>;
 
-        test1 = {{"a", 2}, {"b", 4}};
-        test2 = {{"a", "2"}, {"b", "4"}};
-        test3 = {{"a", 2}, {"b", "4"}};
+        test1 = T1 {{"a", 2}, {"b", 4}};
+        test2 = T2 {{"a", "2"}, {"b", "4"}};
+        test3 = T3 {{"a", 2}, {"b", "4"}};
 
         {
             fly::Json json = test1;
@@ -494,8 +494,8 @@ TEST_F(JsonTest, ArrayConversionValid)
         using T1 = std::decay_t<decltype(test1)>;
         using T2 = std::decay_t<decltype(test2)>;
 
-        test1 = {50, 60, 70, 80};
-        test2 = {"50", "60", "70", "80"};
+        test1 = T1 {50, 60, 70, 80};
+        test2 = T2 {"50", "60", "70", "80"};
 
         {
             fly::Json json = test1;
@@ -524,7 +524,7 @@ TEST_F(JsonTest, ArrayConversionValid)
         using T2 = std::decay_t<decltype(test2)>;
         using T3 = std::decay_t<decltype(test3)>;
 
-        test3 = {50, "60", 70, "80"};
+        test3 = T3 {50, "60", 70, "80"};
 
         fly::Json json = test3;
         EXPECT_EQ((T1(json)), test1);
