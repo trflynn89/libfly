@@ -970,9 +970,9 @@ void Json::swap(T &other) noexcept(false)
     if (is_object())
     {
         T object = static_cast<T>(*this);
-        *this = other;
 
-        std::swap(object, other);
+        *this = std::move(other);
+        other = std::move(object);
     }
     else
     {
@@ -987,9 +987,9 @@ void Json::swap(T &other) noexcept(false)
     if (is_array())
     {
         T array = static_cast<T>(*this);
-        *this = other;
 
-        std::swap(array, other);
+        *this = std::move(other);
+        other = std::move(array);
     }
     else
     {

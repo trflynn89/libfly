@@ -102,6 +102,9 @@
     <ClCompile Include="..\..\..\test\types\json.cpp">
       <Filter>types</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\types\json_conversion.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\types\json_exception.cpp">
       <Filter>types</Filter>
     </ClCompile>
@@ -109,6 +112,9 @@
       <Filter>types</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\json_traits.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\json_unicode.cpp">
       <Filter>types</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\literals.cpp">
