@@ -1336,8 +1336,6 @@ TEST_F(JsonTest, ArraySwapInvalid)
 //==============================================================================
 TEST_F(JsonTest, ArraySwapValid)
 {
-    fly::Json json;
-
     auto validate2 = [](auto *name, auto &test1, auto &test2) {
         SCOPED_TRACE(name);
 
