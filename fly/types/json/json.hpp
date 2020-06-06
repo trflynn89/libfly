@@ -743,39 +743,6 @@ private:
         JsonTraits::string_type::value_type ch) noexcept;
 
     /**
-     * After determining the escaped character is a unicode encoding, read the
-     * characters that follow. Replace the entire sequence of characters with
-     * with the unicode character. Accepts UTF-8 encodings and UTF-16 paired
-     * surrogate encodings.
-     *
-     * @param stream_type Stream to pipe the interpreted character into.
-     * @param it Pointer to the escaped character.
-     * @param end Pointer to the end of the original string value.
-     *
-     * @throws JsonException If the interpreted unicode character is not valid
-     *         or there weren't enough available bytes.
-     */
-    static void read_unicode_character(
-        stream_type &stream,
-        JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end) noexcept(false);
-
-    /**
-     * Read a single 4-byte unicode encoding.
-     *
-     * @param it Pointer to the escaped character.
-     * @param end Pointer to the end of the original string value.
-     *
-     * @return The read unicode codepoint.
-     *
-     * @throws JsonException If any of the 4 read bytes were non-hexadecimal or
-     *         there weren't enough available bytes.
-     */
-    static int read_unicode_codepoint(
-        JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end) noexcept(false);
-
-    /**
      * Validate a single non-escaped character is compliant.
      *
      * @param stream Stream to pipe the interpreted character into.

@@ -1,5 +1,7 @@
 #include "fly/types/json/json.hpp"
 
+#include "fly/types/string/string_exception.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <ios>
@@ -612,11 +614,11 @@ Json::validate_string(const JsonTraits::string_type &str) noexcept(false)
         else
         {
             validate_character(stream, it, end);
-        }
 
-        if (it != end)
-        {
-            ++it;
+            if (it != end)
+            {
+                ++it;
+            }
         }
     }
 
@@ -663,8 +665,20 @@ void Json::read_escaped_character(
             break;
 
         case 'u':
-            read_unicode_character(stream, it, end);
-            break;
+            try
+            {
+                // The input sequence is expected to begin with the reverse
+                // solidus character.
+                stream << String::parse_unicode_character(--it, end);
+            }
+            catch (const StringException &ex)
+            {
+                throw JsonException(ex.what());
+            }
+
+            // The iterator is already incremented past the escaped character
+            // sequence.
+            return;
 
         default:
             throw JsonException(String::format(
@@ -672,6 +686,8 @@ void Json::read_escaped_character(
                 *it,
                 int(*it)));
     }
+
+    ++it;
 }
 
 //==============================================================================
@@ -714,125 +730,6 @@ void Json::write_escaped_charater(
             stream << ch;
             break;
     }
-}
-
-//==============================================================================
-void Json::read_unicode_character(
-    stream_type &stream,
-    JsonTraits::string_type::const_iterator &it,
-    const JsonTraits::string_type::const_iterator &end) noexcept(false)
-{
-    auto is_high_surrogate = [](int c) -> bool {
-        return (c >= 0xd800) && (c <= 0xdbff);
-    };
-    auto is_low_surrogate = [](int c) -> bool {
-        return (c >= 0xdc00) && (c <= 0xdfff);
-    };
-
-    const int high_surrogate = read_unicode_codepoint(it, end);
-    int codepoint = high_surrogate;
-
-    if (is_high_surrogate(high_surrogate))
-    {
-        if (((++it == end) || (*it != '\\')) || ((++it == end) || (*it != 'u')))
-        {
-            throw JsonException(String::format(
-                "Expected \\u to follow high surrogate %x",
-                high_surrogate));
-        }
-
-        const int low_surrogate = read_unicode_codepoint(it, end);
-
-        if (is_low_surrogate(low_surrogate))
-        {
-            // The formula to convert a surrogate pair to a single
-            // codepoint is:
-            //
-            //     C = ((HS - 0xd800) * 0x400) + (LS - 0xdc00) + 0x10000
-            //
-            // Multiplying by 0x400 (1024) is the same as bit-shifting
-            // left by 10 bits. The formula then simplies to:
-            codepoint = (high_surrogate << 10) + low_surrogate - 0x35fdc00;
-        }
-        else
-        {
-            throw JsonException(String::format(
-                "Expected low surrogate to follow high surrogate %x, found %x",
-                high_surrogate,
-                low_surrogate));
-        }
-    }
-    else if (is_low_surrogate(high_surrogate))
-    {
-        throw JsonException(String::format(
-            "Expected high surrogate to preceed low surrogate %x",
-            high_surrogate));
-    }
-
-    if (codepoint < 0x80)
-    {
-        stream << char(codepoint);
-    }
-    else if (codepoint <= 0x7ff)
-    {
-        stream << char(0xc0 | (codepoint >> 6));
-        stream << char(0x80 | (codepoint & 0x3f));
-    }
-    else if (codepoint <= 0xffff)
-    {
-        stream << char(0xe0 | (codepoint >> 12));
-        stream << char(0x80 | ((codepoint >> 6) & 0x3f));
-        stream << char(0x80 | (codepoint & 0x3f));
-    }
-    else
-    {
-        stream << char(0xf0 | (codepoint >> 18));
-        stream << char(0x80 | ((codepoint >> 12) & 0x3f));
-        stream << char(0x80 | ((codepoint >> 6) & 0x3f));
-        stream << char(0x80 | (codepoint & 0x3f));
-    }
-}
-
-//==============================================================================
-int Json::read_unicode_codepoint(
-    JsonTraits::string_type::const_iterator &it,
-    const JsonTraits::string_type::const_iterator &end) noexcept(false)
-{
-    int codepoint = 0;
-
-    for (int i = 0; i < 4; ++i)
-    {
-        if (++it == end)
-        {
-            throw JsonException(String::format(
-                "Expected exactly 4 hexadecimals after \\u, only found %d",
-                i));
-        }
-
-        const int shift = (4 * (3 - i));
-
-        if ((*it >= '0') && (*it <= '9'))
-        {
-            codepoint += ((*it - 0x30) << shift);
-        }
-        else if ((*it >= 'A') && (*it <= 'F'))
-        {
-            codepoint += ((*it - 0x37) << shift);
-        }
-        else if ((*it >= 'a') && (*it <= 'f'))
-        {
-            codepoint += ((*it - 0x57) << shift);
-        }
-        else
-        {
-            throw JsonException(String::format(
-                "Expected '%c' (%x) to be a hexadecimal",
-                *it,
-                int(*it)));
-        }
-    }
-
-    return codepoint;
 }
 
 //==============================================================================

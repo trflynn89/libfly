@@ -1,29 +1,10 @@
-#include "fly/fly.hpp"
 #include "fly/types/json/json.hpp"
 
 #include <gtest/gtest.h>
 
 #include <sstream>
 
-#if defined(FLY_WINDOWS)
-#    include <Windows.h>
-#    define utf8(str) convert_to_utf8(L##str)
-#else
-#    define utf8(str) str
-#endif
-
 namespace {
-
-#if defined(FLY_WINDOWS)
-const char *convert_to_utf8(const wchar_t *str)
-{
-    static char buff[1024];
-
-    ::WideCharToMultiByte(CP_UTF8, 0, str, -1, buff, sizeof(buff), NULL, NULL);
-
-    return buff;
-}
-#endif
 
 void validate_fail(const std::string &test) noexcept(false)
 {
@@ -69,14 +50,14 @@ TEST(JsonTest, UnicodeConversion)
     validate_fail("\\u000");
     validate_fail("\\u000z");
 
-    validate_pass("\\u0040", utf8("\u0040"));
-    validate_pass("\\u007A", utf8("\u007A"));
-    validate_pass("\\u007a", utf8("\u007a"));
-    validate_pass("\\u00c4", utf8("\u00c4"));
-    validate_pass("\\u00e4", utf8("\u00e4"));
-    validate_pass("\\u0298", utf8("\u0298"));
-    validate_pass("\\u0800", utf8("\u0800"));
-    validate_pass("\\uffff", utf8("\uffff"));
+    validate_pass("\\u0040", u8"\u0040");
+    validate_pass("\\u007A", u8"\u007A");
+    validate_pass("\\u007a", u8"\u007a");
+    validate_pass("\\u00c4", u8"\u00c4");
+    validate_pass("\\u00e4", u8"\u00e4");
+    validate_pass("\\u0298", u8"\u0298");
+    validate_pass("\\u0800", u8"\u0800");
+    validate_pass("\\uffff", u8"\uffff");
 
     validate_fail("\\uDC00");
     validate_fail("\\uDFFF");
@@ -93,10 +74,10 @@ TEST(JsonTest, UnicodeConversion)
     validate_fail("\\uD800\\uE000");
     validate_fail("\\uD800\\uFFFF");
 
-    validate_pass("\\uD800\\uDC00", utf8("\U00010000"));
-    validate_pass("\\uD803\\uDE6D", utf8("\U00010E6D"));
-    validate_pass("\\uD834\\uDD1E", utf8("\U0001D11E"));
-    validate_pass("\\uDBFF\\uDFFF", utf8("\U0010FFFF"));
+    validate_pass("\\uD800\\uDC00", u8"\U00010000");
+    validate_pass("\\uD803\\uDE6D", u8"\U00010E6D");
+    validate_pass("\\uD834\\uDD1E", u8"\U0001D11E");
+    validate_pass("\\uDBFF\\uDFFF", u8"\U0010FFFF");
 }
 
 //==============================================================================

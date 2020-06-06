@@ -241,6 +241,9 @@
     <ClInclude Include="..\..\..\fly\types\string\string.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\string_exception.hpp">
+      <Filter>types\string</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\string_literal.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
@@ -251,6 +254,9 @@
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_unicode.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
   </ItemGroup>
@@ -362,6 +368,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\types\json\json_exception.cpp">
       <Filter>types\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\types\string\string_exception.cpp">
+      <Filter>types\string</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
