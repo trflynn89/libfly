@@ -215,20 +215,20 @@ public:
     static StringType generate_random_string(size_type size) noexcept;
 
     /**
-     * Format a string with variadic template arguments, returning the
-     * formatted string.
+     * Format a string with variadic template arguments, returning the formatted
+     * string.
      *
      * This is type safe in that argument types need not match the format
-     * specifier (i.e. there is no error if %s is given an integer).
-     * However, specifiers such as %x are still attempted to be handled.
-     * That is, if the matching argument for %x is numeric, then it will be
-     * converted to a hexadecimal representation.
+     * specifier (i.e. there is no error if %s is given an integer). However,
+     * specifiers such as %x are still attempted to be handled. That is, if the
+     * matching argument for %x is numeric, then it will be converted to a
+     * hexadecimal representation.
      *
      * There is also no checking done on the number of format specifiers and
-     * the number of arguments. The format specifiers will be replaced one
-     * at a time until all arguments are exhausted, then the rest of the
-     * string is taken as-is. Any extra specifiers will be in the string.
-     * Any extra arguments are dropped.
+     * the number of arguments. The format specifiers will be replaced one at a
+     * time until all arguments are exhausted, then the rest of the string is
+     * taken as-is. Any extra specifiers will be in the string. Any extra
+     * arguments are dropped.
      *
      * @tparam Args Variadic template arguments.
      *
