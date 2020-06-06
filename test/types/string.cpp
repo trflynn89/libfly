@@ -2,6 +2,7 @@
 
 #include "fly/fly.hpp"
 #include "fly/types/numeric/literals.hpp"
+#include "fly/types/string/string_exception.hpp"
 
 #include <gtest/gtest.h>
 
@@ -11,7 +12,37 @@
 #include <string>
 #include <vector>
 
+// #if defined(FLY_WINDOWS)
+// #    include <Windows.h>
+// #    define utf8(str) convert_to_utf8(L##str)
+// #else
+// #    define utf8(str) str
+// #endif
+
 namespace {
+
+// #if defined(FLY_WINDOWS)
+// const char *convert_to_utf8(const wchar_t *str)
+// {
+//     static char buff[1024];
+
+//     ::WideCharToMultiByte(CP_UTF8, 0, str, -1, buff, sizeof(buff), NULL,
+//     NULL);
+
+//     return buff;
+// }
+// #endif
+
+#define DECLARE_ALIASES                                                        \
+    using string_type [[maybe_unused]] =                                       \
+        typename TestFixture::string_base_type;                                \
+    using StringClass [[maybe_unused]] = fly::BasicString<string_type>;        \
+    using char_type [[maybe_unused]] = typename StringClass::char_type;        \
+    using size_type [[maybe_unused]] = typename StringClass::size_type;        \
+    using streamed_type [[maybe_unused]] =                                     \
+        typename StringClass::streamed_type;                                   \
+    using streamed_char [[maybe_unused]] = typename streamed_type::value_type; \
+    using ustreamed_char [[maybe_unused]] = std::make_unsigned_t<streamed_char>;
 
 //==============================================================================
 template <typename StringType>
@@ -102,9 +133,7 @@ TYPED_TEST_SUITE(BasicStringTest, StringTypes, );
 //==============================================================================
 TYPED_TEST(BasicStringTest, Split)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     static constexpr std::uint32_t s_size = 10;
     std::vector<string_type> input_split(s_size);
@@ -132,9 +161,7 @@ TYPED_TEST(BasicStringTest, Split)
 //==============================================================================
 TYPED_TEST(BasicStringTest, MaxSplit)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     static constexpr std::uint32_t s_size = 10;
     static constexpr std::uint32_t s_count = 6;
@@ -171,9 +198,7 @@ TYPED_TEST(BasicStringTest, MaxSplit)
 //==============================================================================
 TYPED_TEST(BasicStringTest, Trim)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type test1;
     string_type test2 = FLY_STR(char_type, "   abc");
@@ -208,9 +233,7 @@ TYPED_TEST(BasicStringTest, Trim)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ReplaceAll)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
     const string_type search = FLY_STR(char_type, "Be Replaced");
@@ -223,9 +246,7 @@ TYPED_TEST(BasicStringTest, ReplaceAll)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ReplaceAllWithChar)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
     const string_type search = FLY_STR(char_type, "Be Replaced");
@@ -238,9 +259,7 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithChar)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ReplaceAllWithEmpty)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
     const string_type replace = FLY_STR(char_type, "new value");
@@ -252,9 +271,7 @@ TYPED_TEST(BasicStringTest, ReplaceAllWithEmpty)
 //==============================================================================
 TYPED_TEST(BasicStringTest, RemoveAll)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
     const string_type search = FLY_STR(char_type, "Be Rep");
@@ -266,9 +283,7 @@ TYPED_TEST(BasicStringTest, RemoveAll)
 //==============================================================================
 TYPED_TEST(BasicStringTest, RemoveAllWithEmpty)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
 
@@ -279,9 +294,7 @@ TYPED_TEST(BasicStringTest, RemoveAllWithEmpty)
 //==============================================================================
 TYPED_TEST(BasicStringTest, StartsWith)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type test1, test2;
 
@@ -334,9 +347,7 @@ TYPED_TEST(BasicStringTest, StartsWith)
 //==============================================================================
 TYPED_TEST(BasicStringTest, EndsWith)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type test1, test2;
 
@@ -386,9 +397,7 @@ TYPED_TEST(BasicStringTest, EndsWith)
 //==============================================================================
 TYPED_TEST(BasicStringTest, Wildcard)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type test1, test2;
 
@@ -474,11 +483,74 @@ TYPED_TEST(BasicStringTest, Wildcard)
 }
 
 //==============================================================================
+TYPED_TEST(BasicStringTest, UnicodeConversion)
+{
+    DECLARE_ALIASES
+
+    auto validate_fail = [](const char_type *test) {
+        SCOPED_TRACE(test);
+
+        EXPECT_THROW(
+            StringClass::parse_unicode_character(test),
+            fly::UnicodeException);
+    };
+
+    auto validate_pass = [](const char_type *test, string_type &&expected) {
+        SCOPED_TRACE(test);
+
+        string_type actual;
+        EXPECT_NO_THROW(actual = StringClass::parse_unicode_character(test));
+        EXPECT_EQ(actual, expected);
+    };
+
+    validate_fail(FLY_STR(char_type, "\\u"));
+    validate_fail(FLY_STR(char_type, "\\u0"));
+    validate_fail(FLY_STR(char_type, "\\u00"));
+    validate_fail(FLY_STR(char_type, "\\u000"));
+    validate_fail(FLY_STR(char_type, "\\u000z"));
+
+    validate_pass(FLY_STR(char_type, "\\u0040"), FLY_STR(char_type, "\u0040"));
+    validate_pass(FLY_STR(char_type, "\\u007A"), FLY_STR(char_type, "\u007A"));
+    validate_pass(FLY_STR(char_type, "\\u007a"), FLY_STR(char_type, "\u007a"));
+    validate_pass(FLY_STR(char_type, "\\u00c4"), FLY_STR(char_type, "\u00c4"));
+    validate_pass(FLY_STR(char_type, "\\u00e4"), FLY_STR(char_type, "\u00e4"));
+    validate_pass(FLY_STR(char_type, "\\u0298"), FLY_STR(char_type, "\u0298"));
+    validate_pass(FLY_STR(char_type, "\\u0800"), FLY_STR(char_type, "\u0800"));
+    validate_pass(FLY_STR(char_type, "\\uffff"), FLY_STR(char_type, "\uffff"));
+
+    validate_fail(FLY_STR(char_type, "\\uDC00"));
+    validate_fail(FLY_STR(char_type, "\\uDFFF"));
+    validate_fail(FLY_STR(char_type, "\\uD800"));
+    validate_fail(FLY_STR(char_type, "\\uDBFF"));
+    validate_fail(FLY_STR(char_type, "\\uD800\\u"));
+    validate_fail(FLY_STR(char_type, "\\uD800\\z"));
+    validate_fail(FLY_STR(char_type, "\\uD800\\u0"));
+    validate_fail(FLY_STR(char_type, "\\uD800\\u00"));
+    validate_fail(FLY_STR(char_type, "\\uD800\\u000"));
+    validate_fail(FLY_STR(char_type, "\\uD800\\u0000"));
+    validate_fail(FLY_STR(char_type, "\\uD800\\u000z"));
+    validate_fail(FLY_STR(char_type, "\\uD800\\uDBFF"));
+    validate_fail(FLY_STR(char_type, "\\uD800\\uE000"));
+    validate_fail(FLY_STR(char_type, "\\uD800\\uFFFF"));
+
+    validate_pass(
+        FLY_STR(char_type, "\\uD800\\uDC00"),
+        FLY_STR(char_type, "\U00010000"));
+    validate_pass(
+        FLY_STR(char_type, "\\uD803\\uDE6D"),
+        FLY_STR(char_type, "\U00010E6D"));
+    validate_pass(
+        FLY_STR(char_type, "\\uD834\\uDD1E"),
+        FLY_STR(char_type, "\U0001D11E"));
+    validate_pass(
+        FLY_STR(char_type, "\\uDBFF\\uDFFF"),
+        FLY_STR(char_type, "\U0010FFFF"));
+}
+
+//==============================================================================
 TYPED_TEST(BasicStringTest, GenerateRandomString)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using size_type = typename StringClass::size_type;
+    DECLARE_ALIASES
 
     static constexpr size_type s_size = (1 << 10);
 
@@ -489,12 +561,7 @@ TYPED_TEST(BasicStringTest, GenerateRandomString)
 //==============================================================================
 TYPED_TEST(BasicStringTest, Format)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    DECLARE_ALIASES
 
     streamed_type expected;
     const char_type *format;
@@ -539,12 +606,7 @@ TYPED_TEST(BasicStringTest, Format)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_d)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    DECLARE_ALIASES
 
     const char_type *format;
 
@@ -556,12 +618,7 @@ TYPED_TEST(BasicStringTest, FormatTest_d)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_i)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    DECLARE_ALIASES
 
     const char_type *format;
 
@@ -573,12 +630,7 @@ TYPED_TEST(BasicStringTest, FormatTest_i)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_x)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    DECLARE_ALIASES
 
     const char_type *format;
 
@@ -594,12 +646,7 @@ TYPED_TEST(BasicStringTest, FormatTest_x)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_o)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    DECLARE_ALIASES
 
     const char_type *format;
 
@@ -611,12 +658,7 @@ TYPED_TEST(BasicStringTest, FormatTest_o)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_a)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    DECLARE_ALIASES
 
     const char_type *format;
 
@@ -652,12 +694,7 @@ TYPED_TEST(BasicStringTest, FormatTest_a)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_f)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    DECLARE_ALIASES
 
     const char_type *format;
 
@@ -690,12 +727,7 @@ TYPED_TEST(BasicStringTest, FormatTest_f)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_g)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    DECLARE_ALIASES
 
     const char_type *format;
 
@@ -723,12 +755,7 @@ TYPED_TEST(BasicStringTest, FormatTest_g)
 //==============================================================================
 TYPED_TEST(BasicStringTest, FormatTest_e)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    DECLARE_ALIASES
 
     const char_type *format;
 
@@ -748,12 +775,7 @@ TYPED_TEST(BasicStringTest, FormatTest_e)
 //==============================================================================
 TYPED_TEST(BasicStringTest, Join)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    DECLARE_ALIASES
 
     string_type str = FLY_STR(char_type, "a");
     const char_type *ctr = FLY_STR(char_type, "b");
@@ -801,9 +823,7 @@ TYPED_TEST(BasicStringTest, Join)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertString)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type s = FLY_STR(char_type, "abc");
     EXPECT_EQ(StringClass::template convert<string_type>(s), s);
@@ -818,9 +838,7 @@ TYPED_TEST(BasicStringTest, ConvertString)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertBool)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type s;
 
@@ -846,13 +864,7 @@ TYPED_TEST(BasicStringTest, ConvertBool)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertChar)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
-
-    using streamed_type = typename StringClass::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
-    using ustreamed_char = std::make_unsigned_t<streamed_char>;
+    DECLARE_ALIASES
 
     string_type s;
 
@@ -907,9 +919,7 @@ TYPED_TEST(BasicStringTest, ConvertChar)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertInt8)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type s;
 
@@ -968,9 +978,7 @@ TYPED_TEST(BasicStringTest, ConvertInt8)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertInt16)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type s;
 
@@ -1029,9 +1037,7 @@ TYPED_TEST(BasicStringTest, ConvertInt16)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertInt32)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type s;
 
@@ -1090,9 +1096,7 @@ TYPED_TEST(BasicStringTest, ConvertInt32)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertInt64)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type s;
 
@@ -1127,9 +1131,7 @@ TYPED_TEST(BasicStringTest, ConvertInt64)
 //==============================================================================
 TYPED_TEST(BasicStringTest, ConvertDecimal)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     string_type s;
 
@@ -1169,9 +1171,7 @@ TYPED_TEST(BasicStringTest, ConvertDecimal)
 //==============================================================================
 TYPED_TEST(BasicStringTest, BasicStringStreamer)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using StringClass = fly::BasicString<string_type>;
-    using char_type = typename StringClass::char_type;
+    DECLARE_ALIASES
 
     // Extra test to make sure the hexadecimal conversion for std::u16string and
     // std::u32string in detail::BasicStringStreamer is exercised correctly.

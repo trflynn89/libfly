@@ -3,6 +3,7 @@
 #include "fly/traits/traits.hpp"
 #include "fly/types/string/detail/string_streamer.hpp"
 
+#include <cstdint>
 #include <string>
 #include <type_traits>
 

@@ -3,6 +3,7 @@
 #include "fly/types/string/detail/string_converter.hpp"
 #include "fly/types/string/detail/string_streamer.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/detail/string_unicode.hpp"
 #include "fly/types/string/string_literal.hpp"
 
 #include <algorithm>
@@ -171,6 +172,40 @@ public:
     wildcard_match(const StringType &source, const StringType &search) noexcept;
 
     /**
+     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings
+     * and UTF-16 paired surrogate encodings.
+     *
+     * Input sequences must be of the form: (\u[0-9a-fA-F]{4}){1,2}
+     *
+     * @param source The string containing the escaped character sequence.
+     *
+     * @return The parsed unicode character.
+     *
+     * @throws UnicodeException If the interpreted unicode character is not
+     *         valid or there weren't enough available bytes.
+     */
+    static StringType
+    parse_unicode_character(const StringType &source) noexcept(false);
+
+    /**
+     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings
+     * and UTF-16 paired surrogate encodings.
+     *
+     * Input sequences must be of the form: (\u[0-9a-fA-F]{4}){1,2}
+     *
+     * @param it Pointer to the beginning of the escaped character sequence.
+     * @param end Pointer to the end of the escaped character sequence.
+     *
+     * @return The parsed unicode character.
+     *
+     * @throws UnicodeException If the interpreted unicode character is not
+     *         valid or there weren't enough available bytes.
+     */
+    static StringType parse_unicode_character(
+        typename StringType::const_iterator &it,
+        const typename StringType::const_iterator &end) noexcept(false);
+
+    /**
      * Generate a random string of the given size.
      *
      * @param size The length of the string to generate.
@@ -180,20 +215,20 @@ public:
     static StringType generate_random_string(size_type size) noexcept;
 
     /**
-     * Format a string with variadic template arguments, returning the formatted
-     * string.
+     * Format a string with variadic template arguments, returning the
+     * formatted string.
      *
      * This is type safe in that argument types need not match the format
-     * specifier (i.e. there is no error if %s is given an integer). However,
-     * specifiers such as %x are still attempted to be handled. That is, if the
-     * matching argument for %x is numeric, then it will be converted to a
-     * hexadecimal representation.
+     * specifier (i.e. there is no error if %s is given an integer).
+     * However, specifiers such as %x are still attempted to be handled.
+     * That is, if the matching argument for %x is numeric, then it will be
+     * converted to a hexadecimal representation.
      *
      * There is also no checking done on the number of format specifiers and
-     * the number of arguments. The format specifiers will be replaced one at a
-     * time until all arguments are exhausted, then the rest of the string is
-     * taken as-is. Any extra specifiers will be in the string. Any extra
-     * arguments are dropped.
+     * the number of arguments. The format specifiers will be replaced one
+     * at a time until all arguments are exhausted, then the rest of the
+     * string is taken as-is. Any extra specifiers will be in the string.
+     * Any extra arguments are dropped.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -542,6 +577,26 @@ bool BasicString<StringType>::wildcard_match(
     }
 
     return result;
+}
+
+//==============================================================================
+template <typename StringType>
+StringType BasicString<StringType>::parse_unicode_character(
+    const StringType &source) noexcept(false)
+{
+    auto begin = source.cbegin();
+    const auto end = source.cend();
+
+    return parse_unicode_character(begin, end);
+}
+
+//==============================================================================
+template <typename StringType>
+StringType BasicString<StringType>::parse_unicode_character(
+    typename StringType::const_iterator &it,
+    const typename StringType::const_iterator &end) noexcept(false)
+{
+    return detail::BasicStringUnicode<StringType>::parse_character(it, end);
 }
 
 //==============================================================================

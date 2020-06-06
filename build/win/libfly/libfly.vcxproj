@@ -211,7 +211,9 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp" />
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_unicode.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\string.hpp" />
+    <ClInclude Include="..\..\..\fly\types\string\string_exception.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\string_literal.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -251,6 +253,7 @@
     <ClCompile Include="..\..\..\fly\types\bit_stream\detail\bit_stream.cpp" />
     <ClCompile Include="..\..\..\fly\types\json\json.cpp" />
     <ClCompile Include="..\..\..\fly\types\json\json_exception.cpp" />
+    <ClInclude Include="..\..\..\fly\types\string\string_exception.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
