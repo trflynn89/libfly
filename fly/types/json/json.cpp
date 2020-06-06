@@ -614,11 +614,11 @@ Json::validate_string(const JsonTraits::string_type &str) noexcept(false)
         else
         {
             validate_character(stream, it, end);
-        }
 
-        if (it != end)
-        {
-            ++it;
+            if (it != end)
+            {
+                ++it;
+            }
         }
     }
 
@@ -667,6 +667,8 @@ void Json::read_escaped_character(
         case 'u':
             try
             {
+                // The input sequence is expected to begin with the reverse
+                // solidus character.
                 stream << String::parse_unicode_character(--it, end);
             }
             catch (const StringException &ex)
@@ -674,7 +676,9 @@ void Json::read_escaped_character(
                 throw JsonException(ex.what());
             }
 
-            break;
+            // The iterator is already incremented past the escaped character
+            // sequence.
+            return;
 
         default:
             throw JsonException(String::format(
@@ -682,6 +686,8 @@ void Json::read_escaped_character(
                 *it,
                 int(*it)));
     }
+
+    ++it;
 }
 
 //==============================================================================
