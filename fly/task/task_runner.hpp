@@ -57,9 +57,8 @@ public:
      *
      * @return True if the task was posted for delayed execution.
      */
-    bool post_task_with_delay(
-        std::weak_ptr<Task> weak_task,
-        std::chrono::milliseconds delay) noexcept;
+    bool
+    post_task_with_delay(std::weak_ptr<Task> weak_task, std::chrono::milliseconds delay) noexcept;
 
 protected:
     /**

@@ -30,7 +30,7 @@ namespace fly::detail {
 template <typename StringType>
 struct BasicStringStreamer;
 
-//==============================================================================
+//==================================================================================================
 template <>
 struct BasicStringStreamer<std::string>
 {
@@ -63,7 +63,7 @@ struct BasicStringStreamer<std::string>
     }
 };
 
-//==============================================================================
+//==================================================================================================
 template <>
 struct BasicStringStreamer<std::wstring>
 {
@@ -80,8 +80,7 @@ struct BasicStringStreamer<std::wstring>
     using istringstream_type = std::wistringstream;
     using ostringstream_type = std::wostringstream;
 
-    static void
-    stream(ostream_type &ostream, const std::wstring &value) noexcept
+    static void stream(ostream_type &ostream, const std::wstring &value) noexcept
     {
         ostream << value;
     }
@@ -97,7 +96,7 @@ struct BasicStringStreamer<std::wstring>
     }
 };
 
-//==============================================================================
+//==================================================================================================
 template <>
 struct BasicStringStreamer<std::u16string>
 {
@@ -114,8 +113,7 @@ struct BasicStringStreamer<std::u16string>
     using istringstream_type = std::istringstream;
     using ostringstream_type = std::ostringstream;
 
-    static void
-    stream(ostream_type &ostream, const std::u16string &value) noexcept
+    static void stream(ostream_type &ostream, const std::u16string &value) noexcept
     {
         for (const auto &ch : value)
         {
@@ -148,7 +146,7 @@ struct BasicStringStreamer<std::u16string>
     }
 };
 
-//==============================================================================
+//==================================================================================================
 template <>
 struct BasicStringStreamer<std::u32string>
 {
@@ -165,8 +163,7 @@ struct BasicStringStreamer<std::u32string>
     using istringstream_type = std::istringstream;
     using ostringstream_type = std::ostringstream;
 
-    static void
-    stream(ostream_type &ostream, const std::u32string &value) noexcept
+    static void stream(ostream_type &ostream, const std::u32string &value) noexcept
     {
         for (const auto &ch : value)
         {

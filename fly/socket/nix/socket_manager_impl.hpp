@@ -29,8 +29,7 @@ protected:
     void poll(const std::chrono::microseconds &timeout) noexcept override;
 
 private:
-    socket_type
-    set_read_and_write_masks(fd_set *read_fd, fd_set *write_fd) noexcept;
+    socket_type set_read_and_write_masks(fd_set *read_fd, fd_set *write_fd) noexcept;
 
     void handle_socket_io(fd_set *read_fd, fd_set *write_fd) noexcept;
 };

@@ -72,7 +72,7 @@ private:
     static StringType convert_codepoint(codepoint_type codepoint) noexcept;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename StringType>
 StringType BasicStringUnicode<StringType>::parse_character(
     typename StringType::const_iterator &it,
@@ -120,12 +120,11 @@ StringType BasicStringUnicode<StringType>::parse_character(
     return convert_codepoint(codepoint);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename StringType>
 auto BasicStringUnicode<StringType>::parse_codepoint(
     typename StringType::const_iterator &it,
-    const typename StringType::const_iterator &end) noexcept(false)
-    -> codepoint_type
+    const typename StringType::const_iterator &end) noexcept(false) -> codepoint_type
 {
     if ((it == end) || (*it != '\\') || (++it == end) || (*it != 'u'))
     {
@@ -162,18 +161,15 @@ auto BasicStringUnicode<StringType>::parse_codepoint(
 
     if (i != 4)
     {
-        throw UnicodeException(
-            "Expected exactly 4 hexadecimals after \\u, only found %u",
-            i);
+        throw UnicodeException("Expected exactly 4 hexadecimals after \\u, only found %u", i);
     }
 
     return codepoint;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename StringType>
-StringType BasicStringUnicode<StringType>::convert_codepoint(
-    codepoint_type codepoint) noexcept
+StringType BasicStringUnicode<StringType>::convert_codepoint(codepoint_type codepoint) noexcept
 {
     StringType result;
 

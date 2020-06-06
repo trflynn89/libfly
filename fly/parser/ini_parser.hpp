@@ -79,8 +79,7 @@ private:
      * @throws ParserException Thrown if the one of the start/end characters
      *                         was found, but not the other.
      */
-    bool trim_value(std::string &str, char start, char end) const
-        noexcept(false);
+    bool trim_value(std::string &str, char start, char end) const noexcept(false);
 };
 
 } // namespace fly

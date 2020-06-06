@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-//==============================================================================
+//==================================================================================================
 TEST(ParserExceptionTest, ParserException)
 {
     std::uint32_t line = 123;
@@ -40,7 +40,7 @@ TEST(ParserExceptionTest, ParserException)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(ParserExceptionTest, UnexpectedCharacterException)
 {
     std::uint32_t line = 123;
@@ -85,7 +85,7 @@ TEST(ParserExceptionTest, UnexpectedCharacterException)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(ParserExceptionTest, BadConversionException)
 {
     std::uint32_t line = 123;

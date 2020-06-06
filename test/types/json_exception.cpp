@@ -8,7 +8,7 @@
 #include <sstream>
 #include <string>
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonExceptionTest, Exception)
 {
     std::stringstream stream;
@@ -34,7 +34,7 @@ TEST(JsonExceptionTest, Exception)
     EXPECT_TRUE(thrown);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonExceptionTest, JsonIteratorException)
 {
     std::stringstream stream;
@@ -60,7 +60,7 @@ TEST(JsonExceptionTest, JsonIteratorException)
     EXPECT_TRUE(thrown);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonExceptionTest, BadJsonComparisonException)
 {
     std::stringstream stringstream;
@@ -81,8 +81,7 @@ TEST(JsonExceptionTest, BadJsonComparisonException)
     {
         const std::string what(e.what());
 
-        const std::string expect(
-            "*" + stringstream.str() + "*" + numberstream.str() + "*");
+        const std::string expect("*" + stringstream.str() + "*" + numberstream.str() + "*");
         EXPECT_TRUE(fly::String::wildcard_match(what, expect));
 
         thrown = true;
@@ -91,7 +90,7 @@ TEST(JsonExceptionTest, BadJsonComparisonException)
     EXPECT_TRUE(thrown);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonExceptionTest, NullJsonException)
 {
     std::stringstream stream;
@@ -117,7 +116,7 @@ TEST(JsonExceptionTest, NullJsonException)
     EXPECT_TRUE(thrown);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonExceptionTest, OutOfRangeJsonException)
 {
     std::stringstream stream;

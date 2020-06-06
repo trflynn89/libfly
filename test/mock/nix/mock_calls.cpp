@@ -49,7 +49,7 @@ int s_sendto_call_count = 0;
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 std::ostream &operator<<(std::ostream &stream, MockCall call)
 {
     switch (call)
@@ -129,7 +129,7 @@ extern "C"
 {
 #endif
 
-    //==========================================================================
+    //==============================================================================================
     int __real_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
     int __wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
@@ -143,7 +143,7 @@ extern "C"
         return __real_accept(sockfd, addr, addrlen);
     }
 
-    //==========================================================================
+    //==============================================================================================
     int __real_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
     int __wrap_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
@@ -157,12 +157,10 @@ extern "C"
         return __real_bind(sockfd, addr, addrlen);
     }
 
-    //==========================================================================
-    int
-    __real_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+    //==============================================================================================
+    int __real_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
-    int
-    __wrap_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+    int __wrap_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     {
         bool fail;
 
@@ -175,7 +173,7 @@ extern "C"
         return __real_connect(sockfd, addr, addrlen);
     }
 
-    //==========================================================================
+    //==============================================================================================
     int __real_fcntl(int fd, int cmd, int args);
 
     int __wrap_fcntl(int fd, int cmd, int args)
@@ -200,7 +198,7 @@ extern "C"
         return __real_fcntl(fd, cmd, args);
     }
 
-    //==========================================================================
+    //==============================================================================================
     struct hostent *__real_gethostbyname(const char *name);
 
     struct hostent *__wrap_gethostbyname(const char *name)
@@ -214,20 +212,10 @@ extern "C"
         return __real_gethostbyname(name);
     }
 
-    //==========================================================================
-    int __real_getsockopt(
-        int sockfd,
-        int level,
-        int optname,
-        void *optval,
-        socklen_t *optlen);
+    //==============================================================================================
+    int __real_getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen);
 
-    int __wrap_getsockopt(
-        int sockfd,
-        int level,
-        int optname,
-        void *optval,
-        socklen_t *optlen)
+    int __wrap_getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen)
     {
         if (fly::MockSystem::mock_enabled(fly::MockCall::Getsockopt))
         {
@@ -238,7 +226,7 @@ extern "C"
         return __real_getsockopt(sockfd, level, optname, optval, optlen);
     }
 
-    //==========================================================================
+    //==============================================================================================
     int __real_inotify_add_watch(int fd, const char *pathname, uint32_t mask);
 
     int __wrap_inotify_add_watch(int fd, const char *pathname, uint32_t mask)
@@ -252,7 +240,7 @@ extern "C"
         return __real_inotify_add_watch(fd, pathname, mask);
     }
 
-    //==========================================================================
+    //==============================================================================================
     int __real_inotify_init1(int flags);
 
     int __wrap_inotify_init1(int flags)
@@ -266,7 +254,7 @@ extern "C"
         return __real_inotify_init1(flags);
     }
 
-    //==========================================================================
+    //==============================================================================================
     int __real_listen(int sockfd, int backlog);
 
     int __wrap_listen(int sockfd, int backlog)
@@ -280,7 +268,7 @@ extern "C"
         return __real_listen(sockfd, backlog);
     }
 
-    //==========================================================================
+    //==============================================================================================
     int __real_poll(struct pollfd *fds, nfds_t nfds, int timeout);
 
     int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
@@ -295,7 +283,7 @@ extern "C"
         return __real_poll(fds, nfds, timeout);
     }
 
-    //==========================================================================
+    //==============================================================================================
     ssize_t __real_read(int fd, void *buf, size_t count);
 
     ssize_t __wrap_read(int fd, void *buf, size_t count)
@@ -309,7 +297,7 @@ extern "C"
         return __real_read(fd, buf, count);
     }
 
-    //==========================================================================
+    //==============================================================================================
     ssize_t __real_recv(int sockfd, void *buf, size_t len, int flags);
 
     ssize_t __wrap_recv(int sockfd, void *buf, size_t len, int flags)
@@ -323,7 +311,7 @@ extern "C"
         return __real_recv(sockfd, buf, len, flags);
     }
 
-    //==========================================================================
+    //==============================================================================================
     ssize_t __real_recvfrom(
         int sockfd,
         void *buf,
@@ -349,7 +337,7 @@ extern "C"
         return __real_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
     }
 
-    //==========================================================================
+    //==============================================================================================
     ssize_t __real_send(int sockfd, const void *buf, size_t len, int flags);
 
     ssize_t __wrap_send(int sockfd, const void *buf, size_t len, int flags)
@@ -380,7 +368,7 @@ extern "C"
         return __real_send(sockfd, buf, len, flags);
     }
 
-    //==========================================================================
+    //==============================================================================================
     ssize_t __real_sendto(
         int sockfd,
         const void *buf,
@@ -423,20 +411,10 @@ extern "C"
         return __real_sendto(sockfd, buf, len, flags, dest_addr, addrlen);
     }
 
-    //==========================================================================
-    int __real_setsockopt(
-        int sockfd,
-        int level,
-        int optname,
-        const void *optval,
-        socklen_t optlen);
+    //==============================================================================================
+    int __real_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
 
-    int __wrap_setsockopt(
-        int sockfd,
-        int level,
-        int optname,
-        const void *optval,
-        socklen_t optlen)
+    int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen)
     {
         if (fly::MockSystem::mock_enabled(fly::MockCall::Setsockopt))
         {
@@ -447,7 +425,7 @@ extern "C"
         return __real_setsockopt(sockfd, level, optname, optval, optlen);
     }
 
-    //==========================================================================
+    //==============================================================================================
     int __real_socket(int domain, int type, int protocol);
 
     int __wrap_socket(int domain, int type, int protocol)
@@ -461,7 +439,7 @@ extern "C"
         return __real_socket(domain, type, protocol);
     }
 
-    //==========================================================================
+    //==============================================================================================
     int __real_sysinfo(struct sysinfo *info);
 
     int __wrap_sysinfo(struct sysinfo *info)
@@ -475,7 +453,7 @@ extern "C"
         return __real_sysinfo(info);
     }
 
-    //==========================================================================
+    //==============================================================================================
     clock_t __real_times(struct tms *buf);
 
     clock_t __wrap_times(struct tms *buf)

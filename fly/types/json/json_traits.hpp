@@ -47,8 +47,7 @@ struct JsonTraits
      * Define a trait for testing if type T is a JSON string.
      */
     template <typename T>
-    using is_string =
-        typename BasicString<string_type>::traits::template is_string_like<T>;
+    using is_string = typename BasicString<string_type>::traits::template is_string_like<T>;
 
     template <typename T>
     inline static constexpr bool is_string_v = is_string<T>::value;
@@ -67,26 +66,22 @@ struct JsonTraits
      */
     template <typename T>
     using is_signed_integer = std::bool_constant<
-        std::is_integral_v<std::decay_t<T>> &&
-        std::is_signed_v<std::decay_t<T>> &&
+        std::is_integral_v<std::decay_t<T>> && std::is_signed_v<std::decay_t<T>> &&
         !std::is_same_v<bool, std::decay_t<T>>>;
 
     template <typename T>
-    inline static constexpr bool is_signed_integer_v =
-        is_signed_integer<T>::value;
+    inline static constexpr bool is_signed_integer_v = is_signed_integer<T>::value;
 
     /**
      * Define a trait for testing if type T is an unsigned JSON number.
      */
     template <typename T>
     using is_unsigned_integer = std::bool_constant<
-        std::is_integral_v<std::decay_t<T>> &&
-        std::is_unsigned_v<std::decay_t<T>> &&
+        std::is_integral_v<std::decay_t<T>> && std::is_unsigned_v<std::decay_t<T>> &&
         !std::is_same_v<bool, std::decay_t<T>>>;
 
     template <typename T>
-    inline static constexpr bool is_unsigned_integer_v =
-        is_unsigned_integer<T>::value;
+    inline static constexpr bool is_unsigned_integer_v = is_unsigned_integer<T>::value;
 
     /**
      * Define a trait for testing if type T is a floating-point JSON number.
@@ -95,16 +90,14 @@ struct JsonTraits
     using is_floating_point = std::is_floating_point<std::decay_t<T>>;
 
     template <typename T>
-    inline static constexpr bool is_floating_point_v =
-        is_floating_point<T>::value;
+    inline static constexpr bool is_floating_point_v = is_floating_point<T>::value;
 
     /**
      * Define a trait for testing if type T is any JSON number type.
      */
     template <typename T>
     using is_number = std::bool_constant<
-        is_signed_integer_v<std::decay_t<T>> ||
-        is_unsigned_integer_v<std::decay_t<T>> ||
+        is_signed_integer_v<std::decay_t<T>> || is_unsigned_integer_v<std::decay_t<T>> ||
         is_floating_point_v<std::decay_t<T>>>;
 
     template <typename T>
@@ -176,9 +169,8 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void append(
-            std::deque<Args...> &array,
-            typename std::deque<Args...>::value_type &&value)
+        static void
+        append(std::deque<Args...> &array, typename std::deque<Args...>::value_type &&value)
         {
             array.push_back(std::move(value));
         }
@@ -214,9 +206,8 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void append(
-            std::list<Args...> &array,
-            typename std::list<Args...>::value_type &&value)
+        static void
+        append(std::list<Args...> &array, typename std::list<Args...>::value_type &&value)
         {
             array.push_back(std::move(value));
         }
@@ -229,9 +220,8 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void append(
-            std::multiset<Args...> &array,
-            typename std::multiset<Args...>::value_type &&value)
+        static void
+        append(std::multiset<Args...> &array, typename std::multiset<Args...>::value_type &&value)
         {
             array.insert(std::move(value));
         }
@@ -244,9 +234,7 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void append(
-            std::set<Args...> &array,
-            typename std::set<Args...>::value_type &&value)
+        static void append(std::set<Args...> &array, typename std::set<Args...>::value_type &&value)
         {
             array.insert(std::move(value));
         }
@@ -289,9 +277,8 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void append(
-            std::vector<Args...> &array,
-            typename std::vector<Args...>::value_type &&value)
+        static void
+        append(std::vector<Args...> &array, typename std::vector<Args...>::value_type &&value)
         {
             array.push_back(std::move(value));
         }
@@ -310,8 +297,8 @@ struct JsonTraits
      * Define a trait for testing if type T is an iterable JSON type.
      */
     template <typename T>
-    using is_iterable = std::bool_constant<
-        is_object_v<std::decay_t<T>> || is_array_v<std::decay_t<T>>>;
+    using is_iterable =
+        std::bool_constant<is_object_v<std::decay_t<T>> || is_array_v<std::decay_t<T>>>;
 
     template <typename T>
     inline static constexpr bool is_iterable_v = is_iterable<T>::value;

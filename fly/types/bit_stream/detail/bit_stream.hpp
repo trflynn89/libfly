@@ -45,9 +45,7 @@ protected:
      * @param stream_buffer Pointer to the stream's underlying stream buffer.
      * @param starting_position Initial cursor position.
      */
-    BitStream(
-        std::streambuf *stream_buffer,
-        byte_type starting_position) noexcept;
+    BitStream(std::streambuf *stream_buffer, byte_type starting_position) noexcept;
 
     /**
      * Create a bit-mask with the least-significant bits set. The size of the
@@ -68,7 +66,7 @@ protected:
     byte_type m_position;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename DataType>
 constexpr inline DataType BitStream::bit_mask(const DataType bits)
 {

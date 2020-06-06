@@ -44,8 +44,7 @@ public:
     /**
      * Callback definition for function to be triggered on a path change.
      */
-    using PathEventCallback =
-        std::function<void(const std::filesystem::path &, PathEvent)>;
+    using PathEventCallback = std::function<void(const std::filesystem::path &, PathEvent)>;
 
     /**
      * Constructor.
@@ -78,9 +77,7 @@ public:
      *
      * @return True if the directory could be added.
      */
-    bool add_path(
-        const std::filesystem::path &path,
-        PathEventCallback callback) noexcept;
+    bool add_path(const std::filesystem::path &path, PathEventCallback callback) noexcept;
 
     /**
      * Stop monitoring for changes to all files under a directory.
@@ -105,9 +102,7 @@ public:
      *
      * @return True if the file could be added.
      */
-    bool add_file(
-        const std::filesystem::path &file,
-        PathEventCallback callback) noexcept;
+    bool add_file(const std::filesystem::path &file, PathEventCallback callback) noexcept;
 
     /**
      * Stop monitoring for changes to a single file. If there are no more files
@@ -147,8 +142,7 @@ protected:
     /**
      * Map of monitored paths to their path information.
      */
-    using PathInfoMap =
-        std::map<std::filesystem::path, std::unique_ptr<PathInfo>>;
+    using PathInfoMap = std::map<std::filesystem::path, std::unique_ptr<PathInfo>>;
 
     /**
      * Create an instance of the OS dependent PathInfo struct.
@@ -187,14 +181,12 @@ private:
      *
      * @return Shared pointer to the PathInfo struct.
      */
-    PathInfo *
-    get_or_create_path_info(const std::filesystem::path &path) noexcept;
+    PathInfo *get_or_create_path_info(const std::filesystem::path &path) noexcept;
 
     /**
      * Stream the name of a PathEvent instance.
      */
-    friend std::ostream &
-    operator<<(std::ostream &stream, PathEvent event) noexcept;
+    friend std::ostream &operator<<(std::ostream &stream, PathEvent event) noexcept;
 
     std::shared_ptr<SequencedTaskRunner> m_task_runner;
     std::shared_ptr<Task> m_task;
@@ -211,8 +203,7 @@ private:
 class PathMonitorTask : public Task
 {
 public:
-    explicit PathMonitorTask(
-        std::weak_ptr<PathMonitor> weak_path_monitor) noexcept;
+    explicit PathMonitorTask(std::weak_ptr<PathMonitor> weak_path_monitor) noexcept;
 
 protected:
     /**

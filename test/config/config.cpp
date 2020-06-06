@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <memory>
 
-//==============================================================================
+//==================================================================================================
 class ConfigTest : public ::testing::Test
 {
 public:
@@ -20,13 +20,13 @@ protected:
     std::shared_ptr<TestConfig> m_config;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigTest, NonExisting)
 {
     EXPECT_EQ(m_config->get_value<std::string>("bad-name", "def"), "def");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigTest, NonCovertible)
 {
     const fly::Json values = {{"name", "John Doe"}, {"address", "USA"}};
@@ -37,14 +37,11 @@ TEST_F(ConfigTest, NonCovertible)
     EXPECT_EQ(m_config->get_value<std::nullptr_t>("address", nullptr), nullptr);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigTest, MultipleValueType)
 {
-    const fly::Json values = {
-        {"name", "John Doe"},
-        {"address", "123"},
-        {"employed", "1"},
-        {"age", "26.2"}};
+    const fly::Json values =
+        {{"name", "John Doe"}, {"address", "123"}, {"employed", "1"}, {"age", "26.2"}};
 
     m_config->update(values);
 

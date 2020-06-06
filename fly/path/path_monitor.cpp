@@ -8,7 +8,7 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 PathMonitor::PathMonitor(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
     const std::shared_ptr<PathConfig> &config) noexcept :
@@ -17,13 +17,13 @@ PathMonitor::PathMonitor(
 {
 }
 
-//==============================================================================
+//==================================================================================================
 PathMonitor::~PathMonitor()
 {
     remove_all_paths();
 }
 
-//==============================================================================
+//==================================================================================================
 bool PathMonitor::start() noexcept
 {
     if (is_valid())
@@ -39,10 +39,8 @@ bool PathMonitor::start() noexcept
     return false;
 }
 
-//==============================================================================
-bool PathMonitor::add_path(
-    const std::filesystem::path &path,
-    PathEventCallback callback) noexcept
+//==================================================================================================
+bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback callback) noexcept
 {
     std::error_code error;
 
@@ -71,7 +69,7 @@ bool PathMonitor::add_path(
     return false;
 }
 
-//==============================================================================
+//==================================================================================================
 bool PathMonitor::remove_path(const std::filesystem::path &path) noexcept
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -89,7 +87,7 @@ bool PathMonitor::remove_path(const std::filesystem::path &path) noexcept
     return true;
 }
 
-//==============================================================================
+//==================================================================================================
 void PathMonitor::remove_all_paths() noexcept
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -98,10 +96,8 @@ void PathMonitor::remove_all_paths() noexcept
     m_path_info.clear();
 }
 
-//==============================================================================
-bool PathMonitor::add_file(
-    const std::filesystem::path &file,
-    PathEventCallback callback) noexcept
+//==================================================================================================
+bool PathMonitor::add_file(const std::filesystem::path &file, PathEventCallback callback) noexcept
 {
     std::error_code error;
 
@@ -134,7 +130,7 @@ bool PathMonitor::add_file(
     return false;
 }
 
-//==============================================================================
+//==================================================================================================
 bool PathMonitor::remove_file(const std::filesystem::path &file) noexcept
 {
     bool prune_path = false;
@@ -166,7 +162,7 @@ bool PathMonitor::remove_file(const std::filesystem::path &file) noexcept
     return prune_path ? remove_path(file.parent_path()) : true;
 }
 
-//==============================================================================
+//==================================================================================================
 PathMonitor::PathInfo *
 PathMonitor::get_or_create_path_info(const std::filesystem::path &path) noexcept
 {
@@ -192,9 +188,8 @@ PathMonitor::get_or_create_path_info(const std::filesystem::path &path) noexcept
     return info;
 }
 
-//==============================================================================
-std::ostream &
-operator<<(std::ostream &stream, PathMonitor::PathEvent event) noexcept
+//==================================================================================================
+std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event) noexcept
 {
     switch (event)
     {
@@ -218,15 +213,14 @@ operator<<(std::ostream &stream, PathMonitor::PathEvent event) noexcept
     return stream;
 }
 
-//==============================================================================
-PathMonitorTask::PathMonitorTask(
-    std::weak_ptr<PathMonitor> weak_path_monitor) noexcept :
+//==================================================================================================
+PathMonitorTask::PathMonitorTask(std::weak_ptr<PathMonitor> weak_path_monitor) noexcept :
     Task(),
     m_weak_path_monitor(weak_path_monitor)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 void PathMonitorTask::run() noexcept
 {
     std::shared_ptr<PathMonitor> path_monitor = m_weak_path_monitor.lock();

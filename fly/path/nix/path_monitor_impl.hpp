@@ -62,9 +62,7 @@ private:
      */
     struct PathInfoImpl : PathMonitor::PathInfo
     {
-        PathInfoImpl(
-            int monitor_descriptor,
-            const std::filesystem::path &path) noexcept;
+        PathInfoImpl(int monitor_descriptor, const std::filesystem::path &path) noexcept;
         ~PathInfoImpl() override;
 
         /**

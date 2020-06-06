@@ -38,8 +38,7 @@ using enable_if_any = std::enable_if_t<std::disjunction_v<Conditions...>, bool>;
  *     void func(const T &) { }
  */
 template <typename... Conditions>
-using enable_if_none =
-    std::enable_if_t<std::negation_v<std::disjunction<Conditions...>>, bool>;
+using enable_if_none = std::enable_if_t<std::negation_v<std::disjunction<Conditions...>>, bool>;
 
 /**
  * Wrapper around std::enable_if for testing that any condition in a sequence of
@@ -51,8 +50,7 @@ using enable_if_none =
  *     void func(const T &) { }
  */
 template <typename... Conditions>
-using enable_if_not_all =
-    std::enable_if_t<std::negation_v<std::conjunction<Conditions...>>, bool>;
+using enable_if_not_all = std::enable_if_t<std::negation_v<std::conjunction<Conditions...>>, bool>;
 
 /**
  * Wrapper around std::is_same for testing that all types in a sequence of types
@@ -181,9 +179,8 @@ private:
 
 public:
     template <typename T>
-    using is_declared = std::negation<std::is_same<
-        decltype(Test::template test<T>(nullptr)),
-        std::false_type>>;
+    using is_declared =
+        std::negation<std::is_same<decltype(Test::template test<T>(nullptr)), std::false_type>>;
 
     template <typename T>
     inline static constexpr bool is_declared_v = is_declared<T>::value;

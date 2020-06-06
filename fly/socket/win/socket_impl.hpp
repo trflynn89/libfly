@@ -19,14 +19,10 @@ class SocketConfig;
 class SocketImpl : public Socket
 {
 public:
-    SocketImpl(
-        Protocol protocol,
-        const std::shared_ptr<SocketConfig> &config) noexcept;
+    SocketImpl(Protocol protocol, const std::shared_ptr<SocketConfig> &config) noexcept;
     ~SocketImpl() override;
 
-    static bool hostname_to_address(
-        const std::string &hostname,
-        address_type &address) noexcept;
+    static bool hostname_to_address(const std::string &hostname, address_type &address) noexcept;
 
     static address_type in_addr_any() noexcept;
 
@@ -38,8 +34,7 @@ public:
 
     bool set_async() noexcept override;
 
-    bool bind(address_type address, port_type port, BindOption option)
-        const noexcept override;
+    bool bind(address_type address, port_type port, BindOption option) const noexcept override;
 
     bool listen() noexcept override;
 
@@ -48,20 +43,15 @@ public:
     std::shared_ptr<Socket> accept() const noexcept override;
 
 protected:
+    size_t send(const std::string &message, bool &would_block) const noexcept override;
+
     size_t
-    send(const std::string &message, bool &would_block) const noexcept override;
+    send_to(const std::string &message, address_type address, port_type port, bool &would_block)
+        const noexcept override;
 
-    size_t send_to(
-        const std::string &message,
-        address_type address,
-        port_type port,
-        bool &would_block) const noexcept override;
+    std::string recv(bool &would_block, bool &is_complete) const noexcept override;
 
-    std::string
-    recv(bool &would_block, bool &is_complete) const noexcept override;
-
-    std::string
-    recv_from(bool &would_block, bool &is_complete) const noexcept override;
+    std::string recv_from(bool &would_block, bool &is_complete) const noexcept override;
 };
 
 } // namespace fly

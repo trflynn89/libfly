@@ -4,12 +4,12 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 std::mutex MockSystem::s_mock_system_mutex;
 bool MockSystem::s_mock_system_enabled = false;
 MockCalls MockSystem::s_mocked_calls;
 
-//==============================================================================
+//==================================================================================================
 MockSystem::MockSystem(MockCall mock) noexcept : m_mock(mock)
 {
     std::lock_guard<std::mutex> lock(s_mock_system_mutex);
@@ -17,7 +17,7 @@ MockSystem::MockSystem(MockCall mock) noexcept : m_mock(mock)
     s_mocked_calls[m_mock] = true;
     s_mock_system_enabled = true;
 }
-//==============================================================================
+//==================================================================================================
 MockSystem::MockSystem(MockCall mock, bool fail) noexcept : m_mock(mock)
 {
     std::lock_guard<std::mutex> lock(s_mock_system_mutex);
@@ -26,7 +26,7 @@ MockSystem::MockSystem(MockCall mock, bool fail) noexcept : m_mock(mock)
     s_mock_system_enabled = true;
 }
 
-//==============================================================================
+//==================================================================================================
 MockSystem::~MockSystem()
 {
     std::lock_guard<std::mutex> lock(s_mock_system_mutex);
@@ -41,14 +41,14 @@ MockSystem::~MockSystem()
     s_mock_system_enabled = !s_mocked_calls.empty();
 }
 
-//==============================================================================
+//==================================================================================================
 bool MockSystem::mock_enabled(MockCall mock) noexcept
 {
     bool fail;
     return mock_enabled(mock, fail);
 }
 
-//==============================================================================
+//==================================================================================================
 bool MockSystem::mock_enabled(MockCall mock, bool &fail) noexcept
 {
     std::lock_guard<std::mutex> lock(s_mock_system_mutex);

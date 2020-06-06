@@ -12,9 +12,7 @@ namespace {
 
 template <
     typename T,
-    fly::enable_if_any<
-        std::is_same<std::int8_t, T>,
-        std::is_same<std::uint8_t, T>> = 0>
+    fly::enable_if_any<std::is_same<std::int8_t, T>, std::is_same<std::uint8_t, T>> = 0>
 T swap(T x)
 {
     return x;
@@ -22,9 +20,7 @@ T swap(T x)
 
 template <
     typename T,
-    fly::enable_if_any<
-        std::is_same<std::int16_t, T>,
-        std::is_same<std::uint16_t, T>> = 0>
+    fly::enable_if_any<std::is_same<std::int16_t, T>, std::is_same<std::uint16_t, T>> = 0>
 T swap(T x)
 {
     T result = 0;
@@ -37,9 +33,7 @@ T swap(T x)
 
 template <
     typename T,
-    fly::enable_if_any<
-        std::is_same<std::int32_t, T>,
-        std::is_same<std::uint32_t, T>> = 0>
+    fly::enable_if_any<std::is_same<std::int32_t, T>, std::is_same<std::uint32_t, T>> = 0>
 T swap(T x)
 {
     T result = 0;
@@ -54,9 +48,7 @@ T swap(T x)
 
 template <
     typename T,
-    fly::enable_if_any<
-        std::is_same<std::int64_t, T>,
-        std::is_same<std::uint64_t, T>> = 0>
+    fly::enable_if_any<std::is_same<std::int64_t, T>, std::is_same<std::uint64_t, T>> = 0>
 T swap(T x)
 {
     T result = 0;
@@ -75,7 +67,7 @@ T swap(T x)
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 template <typename DataType>
 struct EndianTest : public ::testing::Test
 {
@@ -113,19 +105,19 @@ using DataTypes = ::testing::Types<
 
 TYPED_TEST_SUITE(EndianTest, DataTypes, );
 
-//==============================================================================
+//==================================================================================================
 TYPED_TEST(EndianTest, BigEndian)
 {
     TestFixture::template run_test<fly::Endian::Big>();
 }
 
-//==============================================================================
+//==================================================================================================
 TYPED_TEST(EndianTest, LittleEndian)
 {
     TestFixture::template run_test<fly::Endian::Little>();
 }
 
-//==============================================================================
+//==================================================================================================
 TYPED_TEST(EndianTest, NativeEndian)
 {
     TestFixture::template run_test<fly::Endian::Native>();

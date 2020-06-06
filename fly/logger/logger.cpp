@@ -10,11 +10,11 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 std::weak_ptr<Logger> Logger::s_weak_instance;
 std::mutex Logger::s_console_mutex;
 
-//==============================================================================
+//==================================================================================================
 Logger::Logger(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
     const std::shared_ptr<LoggerConfig> &config,
@@ -27,13 +27,13 @@ Logger::Logger(
 {
 }
 
-//==============================================================================
+//==================================================================================================
 void Logger::set_instance(const std::shared_ptr<Logger> &logger) noexcept
 {
     s_weak_instance = logger;
 }
 
-//==============================================================================
+//==================================================================================================
 void Logger::console_log(bool acquire_lock, const std::string &message) noexcept
 {
     std::unique_lock<std::mutex> lock(s_console_mutex, std::defer_lock);
@@ -47,7 +47,7 @@ void Logger::console_log(bool acquire_lock, const std::string &message) noexcept
     std::cout << time_str << ": " << message << std::endl;
 }
 
-//==============================================================================
+//==================================================================================================
 void Logger::add_log(
     Log::Level level,
     const char *file,
@@ -63,19 +63,14 @@ void Logger::add_log(
     }
     else
     {
-        const std::string console = String::format(
-            "%d %s:%s:%d %s",
-            level,
-            file,
-            function,
-            line,
-            message);
+        const std::string console =
+            String::format("%d %s:%s:%d %s", level, file, function, line, message);
 
         console_log(true, console);
     }
 }
 
-//==============================================================================
+//==================================================================================================
 bool Logger::start() noexcept
 {
     if (create_log_file())
@@ -91,25 +86,23 @@ bool Logger::start() noexcept
     return false;
 }
 
-//==============================================================================
+//==================================================================================================
 std::filesystem::path Logger::get_log_file_path() const noexcept
 {
     return m_log_file;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Logger::poll() noexcept
 {
     Log log;
 
-    if (m_log_queue.pop(log, m_config->queue_wait_time()) &&
-        m_log_stream.good())
+    if (m_log_queue.pop(log, m_config->queue_wait_time()) && m_log_stream.good())
     {
         String::format(m_log_stream, "%u\t%s", m_index++, log) << std::flush;
         std::error_code error;
 
-        if (std::filesystem::file_size(m_log_file, error) >
-            m_config->max_log_file_size())
+        if (std::filesystem::file_size(m_log_file, error) > m_config->max_log_file_size())
         {
             create_log_file();
         }
@@ -118,7 +111,7 @@ bool Logger::poll() noexcept
     return m_log_stream.good();
 }
 
-//==============================================================================
+//==================================================================================================
 void Logger::add_log_internal(
     Log::Level level,
     const char *file,
@@ -128,8 +121,7 @@ void Logger::add_log_internal(
 {
     auto now = std::chrono::high_resolution_clock::now();
 
-    auto log_time = std::chrono::duration_cast<std::chrono::duration<double>>(
-        now - m_start_time);
+    auto log_time = std::chrono::duration_cast<std::chrono::duration<double>>(now - m_start_time);
 
     if ((level >= Log::Level::Debug) && (level < Log::Level::NumLevels))
     {
@@ -146,7 +138,7 @@ void Logger::add_log_internal(
     }
 }
 
-//==============================================================================
+//==================================================================================================
 bool Logger::create_log_file() noexcept
 {
     const std::string rand_str = String::generate_random_string(10);
@@ -155,8 +147,7 @@ bool Logger::create_log_file() noexcept
     String::replace_all(time_str, ":", "-");
     String::replace_all(time_str, " ", "_");
 
-    const std::string file_name =
-        String::format("Log_%s_%s.log", time_str, rand_str);
+    const std::string file_name = String::format("Log_%s_%s.log", time_str, rand_str);
     m_log_file = m_log_directory / file_name;
 
     if (m_log_stream.is_open())
@@ -170,14 +161,14 @@ bool Logger::create_log_file() noexcept
     return m_log_stream.good();
 }
 
-//==============================================================================
+//==================================================================================================
 LoggerTask::LoggerTask(std::weak_ptr<Logger> weak_logger) noexcept :
     Task(),
     m_weak_logger(weak_logger)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 void LoggerTask::run() noexcept
 {
     std::shared_ptr<Logger> logger = m_weak_logger.lock();

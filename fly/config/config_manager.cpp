@@ -12,7 +12,7 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 ConfigManager::ConfigManager(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
     ConfigFileType file_type,
@@ -31,14 +31,12 @@ ConfigManager::ConfigManager(
             break;
 
         default:
-            LOGE(
-                "Unrecognized configuration type: %d",
-                static_cast<int>(file_type));
+            LOGE("Unrecognized configuration type: %d", static_cast<int>(file_type));
             break;
     }
 }
 
-//==============================================================================
+//==================================================================================================
 ConfigManager::~ConfigManager()
 {
     if (m_monitor)
@@ -47,7 +45,7 @@ ConfigManager::~ConfigManager()
     }
 }
 
-//==============================================================================
+//==================================================================================================
 ConfigManager::ConfigMap::size_type ConfigManager::prune() noexcept
 {
     std::lock_guard<std::mutex> lock(m_configs_mutex);
@@ -69,19 +67,16 @@ ConfigManager::ConfigMap::size_type ConfigManager::prune() noexcept
     return m_configs.size();
 }
 
-//==============================================================================
+//==================================================================================================
 bool ConfigManager::start() noexcept
 {
     if (m_parser)
     {
-        m_monitor = std::make_shared<PathMonitorImpl>(
-            m_task_runner,
-            create_config<PathConfig>());
+        m_monitor = std::make_shared<PathMonitorImpl>(m_task_runner, create_config<PathConfig>());
 
         if (m_monitor->start())
         {
-            std::weak_ptr<ConfigManager> weak_config_manager =
-                shared_from_this();
+            std::weak_ptr<ConfigManager> weak_config_manager = shared_from_this();
 
             m_task = std::make_shared<ConfigUpdateTask>(weak_config_manager);
             std::weak_ptr<Task> weak_task = m_task;
@@ -109,7 +104,7 @@ bool ConfigManager::start() noexcept
     return false;
 }
 
-//==============================================================================
+//==================================================================================================
 void ConfigManager::update_config() noexcept
 {
     std::lock_guard<std::mutex> lock(m_configs_mutex);
@@ -148,19 +143,17 @@ void ConfigManager::update_config() noexcept
     }
 }
 
-//==============================================================================
-ConfigUpdateTask::ConfigUpdateTask(
-    std::weak_ptr<ConfigManager> weak_config_manager) noexcept :
+//==================================================================================================
+ConfigUpdateTask::ConfigUpdateTask(std::weak_ptr<ConfigManager> weak_config_manager) noexcept :
     Task(),
     m_weak_config_manager(weak_config_manager)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 void ConfigUpdateTask::run() noexcept
 {
-    std::shared_ptr<ConfigManager> config_manager =
-        m_weak_config_manager.lock();
+    std::shared_ptr<ConfigManager> config_manager = m_weak_config_manager.lock();
 
     if (config_manager)
     {

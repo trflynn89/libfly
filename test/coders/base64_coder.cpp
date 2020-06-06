@@ -6,14 +6,14 @@
 
 #include <filesystem>
 
-//==============================================================================
+//==================================================================================================
 class Base64CoderTest : public ::testing::Test
 {
 protected:
     fly::Base64Coder m_coder;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(Base64CoderTest, Empty)
 {
     const std::string raw;
@@ -26,7 +26,7 @@ TEST_F(Base64CoderTest, Empty)
     EXPECT_EQ(raw, dec);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(Base64CoderTest, ZeroPadding)
 {
     const std::string raw = "Man";
@@ -39,7 +39,7 @@ TEST_F(Base64CoderTest, ZeroPadding)
     EXPECT_EQ(raw, dec);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(Base64CoderTest, SinglePadding)
 {
     const std::string raw = "Ma";
@@ -52,7 +52,7 @@ TEST_F(Base64CoderTest, SinglePadding)
     EXPECT_EQ(raw, dec);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(Base64CoderTest, DoublePadding)
 {
     const std::string raw = "M";
@@ -65,7 +65,7 @@ TEST_F(Base64CoderTest, DoublePadding)
     EXPECT_EQ(raw, dec);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(Base64CoderTest, InvalidSymbol)
 {
     std::string dec;
@@ -76,7 +76,7 @@ TEST_F(Base64CoderTest, InvalidSymbol)
     ASSERT_FALSE(m_coder.decode_string("ab^ab", dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(Base64CoderTest, InvalidChunkSize)
 {
     std::string dec;
@@ -89,7 +89,7 @@ TEST_F(Base64CoderTest, InvalidChunkSize)
     ASSERT_FALSE(m_coder.decode_string("abcdefg", dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(Base64CoderTest, WikiExample)
 {
     // Example from: https://en.wikipedia.org/wiki/Base64#Examples
@@ -115,7 +115,7 @@ TEST_F(Base64CoderTest, WikiExample)
     EXPECT_EQ(raw, dec);
 }
 
-//==============================================================================
+//==================================================================================================
 class Base64CoderFileTest : public Base64CoderTest
 {
 public:
@@ -149,7 +149,7 @@ protected:
     std::filesystem::path m_decoded_file;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(Base64CoderFileTest, AsciiFile)
 {
     // Generated with:
@@ -168,7 +168,7 @@ TEST_F(Base64CoderFileTest, AsciiFile)
     EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(Base64CoderFileTest, PngFile)
 {
     const auto here = std::filesystem::path(__FILE__).parent_path();
@@ -185,7 +185,7 @@ TEST_F(Base64CoderFileTest, PngFile)
     EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(Base64CoderFileTest, GifFile)
 {
     const auto here = std::filesystem::path(__FILE__).parent_path();

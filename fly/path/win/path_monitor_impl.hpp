@@ -91,9 +91,7 @@ private:
      * @param info The path's entry in the PathInfo map.
      * @param path Name of the path.
      */
-    void handle_events(
-        const PathInfoImpl *info,
-        const std::filesystem::path &path) const noexcept;
+    void handle_events(const PathInfoImpl *info, const std::filesystem::path &path) const noexcept;
 
     /**
      * Convert a FILE_NOTIFY_INFORMATION event to a PathEvent.

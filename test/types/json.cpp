@@ -13,7 +13,7 @@
 #include <unordered_set>
 #include <vector>
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, StringConstructor)
 {
     const std::string str1("a");
@@ -35,7 +35,7 @@ TEST(JsonTest, StringConstructor)
     EXPECT_TRUE(fly::Json(arr2).is_string());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ObjectConstructor)
 {
     std::map<std::string, int> map = {{"a", 1}, {"b", 2}};
@@ -51,7 +51,7 @@ TEST(JsonTest, ObjectConstructor)
     EXPECT_TRUE(fly::Json(umultimap).is_object());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ArrayConstructor)
 {
     std::array<int, 4> array = {10, 20, 30, 40};
@@ -95,14 +95,14 @@ TEST(JsonTest, ArrayConstructor)
     EXPECT_TRUE(fly::Json(object).is_object_like());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, BooleanConstructor)
 {
     EXPECT_TRUE(fly::Json(true).is_boolean());
     EXPECT_TRUE(fly::Json(false).is_boolean());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, SignedIntegerConstructor)
 {
     EXPECT_TRUE(fly::Json(static_cast<char>(1)).is_signed_integer());
@@ -119,27 +119,24 @@ TEST(JsonTest, SignedIntegerConstructor)
     EXPECT_TRUE(fly::Json(static_cast<std::int64_t>(-1)).is_signed_integer());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, UnsignedIntegerConstructor)
 {
     EXPECT_TRUE(fly::Json(static_cast<unsigned char>(1)).is_unsigned_integer());
 
-    EXPECT_TRUE(
-        fly::Json(static_cast<unsigned short>(1)).is_unsigned_integer());
+    EXPECT_TRUE(fly::Json(static_cast<unsigned short>(1)).is_unsigned_integer());
 
     EXPECT_TRUE(fly::Json(static_cast<unsigned int>(1)).is_unsigned_integer());
     EXPECT_TRUE(fly::Json(static_cast<unsigned int>(-1)).is_unsigned_integer());
 
     EXPECT_TRUE(fly::Json(static_cast<std::uint32_t>(1)).is_unsigned_integer());
-    EXPECT_TRUE(
-        fly::Json(static_cast<std::uint32_t>(-1)).is_unsigned_integer());
+    EXPECT_TRUE(fly::Json(static_cast<std::uint32_t>(-1)).is_unsigned_integer());
 
     EXPECT_TRUE(fly::Json(static_cast<std::uint64_t>(1)).is_unsigned_integer());
-    EXPECT_TRUE(
-        fly::Json(static_cast<std::uint64_t>(-1)).is_unsigned_integer());
+    EXPECT_TRUE(fly::Json(static_cast<std::uint64_t>(-1)).is_unsigned_integer());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, FloatConstructor)
 {
     EXPECT_TRUE(fly::Json(static_cast<float>(1.0)).is_float());
@@ -147,14 +144,14 @@ TEST(JsonTest, FloatConstructor)
     EXPECT_TRUE(fly::Json(static_cast<long double>(1.0)).is_float());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, NullConstructor)
 {
     EXPECT_TRUE(fly::Json().is_null());
     EXPECT_TRUE(fly::Json(nullptr).is_null());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, InitializerListConstructor)
 {
     const fly::Json empty = {};
@@ -170,7 +167,7 @@ TEST(JsonTest, InitializerListConstructor)
     EXPECT_TRUE(fly::Json(almost).is_array());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, CopyConstructor)
 {
     fly::Json string = "abc";
@@ -198,7 +195,7 @@ TEST(JsonTest, CopyConstructor)
     EXPECT_EQ(fly::Json(null), null);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, MoveConstructor)
 {
     fly::Json string = "abc";
@@ -209,7 +206,7 @@ TEST(JsonTest, MoveConstructor)
     EXPECT_EQ(string_move, string);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, Assignment)
 {
     fly::Json json;
@@ -247,7 +244,7 @@ TEST(JsonTest, Assignment)
     EXPECT_EQ(json, null);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ObjectAccess)
 {
     fly::Json string1 = "abc";
@@ -306,7 +303,7 @@ TEST(JsonTest, ObjectAccess)
     EXPECT_THROW(null2["a"], fly::JsonException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ObjectAt)
 {
     fly::Json string1 = "abc";
@@ -362,7 +359,7 @@ TEST(JsonTest, ObjectAt)
     EXPECT_THROW(null2.at("a"), fly::JsonException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ArrayAccess)
 {
     fly::Json string1 = "abc";
@@ -421,7 +418,7 @@ TEST(JsonTest, ArrayAccess)
     EXPECT_THROW(null2[0], fly::JsonException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ArrayAt)
 {
     fly::Json string1 = "abc";
@@ -477,7 +474,7 @@ TEST(JsonTest, ArrayAt)
     EXPECT_THROW(null2.at(0), fly::JsonException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, Empty)
 {
     fly::Json json;
@@ -516,7 +513,7 @@ TEST(JsonTest, Empty)
     EXPECT_TRUE(json.empty());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, Size)
 {
     fly::Json json;
@@ -546,7 +543,7 @@ TEST(JsonTest, Size)
     EXPECT_EQ(json.size(), 0);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, Clear)
 {
     fly::Json json;
@@ -592,7 +589,7 @@ TEST(JsonTest, Clear)
     EXPECT_EQ(json, nullptr);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, JsonSwap)
 {
     fly::Json json1 = 12389;
@@ -612,7 +609,7 @@ TEST(JsonTest, JsonSwap)
     EXPECT_EQ(json3, "string");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, StringSwap)
 {
     fly::Json json;
@@ -646,7 +643,7 @@ TEST(JsonTest, StringSwap)
     EXPECT_THROW(json.swap(str), fly::JsonException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ObjectSwapValid)
 {
     auto validate = [](auto *name, auto &test1, auto &test2, auto &test3) {
@@ -704,14 +701,10 @@ TEST(JsonTest, ObjectSwapValid)
     std::unordered_multimap<std::string, int> unordered_multimap1;
     std::unordered_multimap<std::string, std::string> unordered_multimap2;
     std::unordered_multimap<std::string, fly::Json> unordered_multimap3;
-    validate(
-        "unordered_multimap",
-        unordered_multimap1,
-        unordered_multimap2,
-        unordered_multimap3);
+    validate("unordered_multimap", unordered_multimap1, unordered_multimap2, unordered_multimap3);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ObjectSwapInvalid)
 {
     std::map<std::string, fly::Json> map;
@@ -735,7 +728,7 @@ TEST(JsonTest, ObjectSwapInvalid)
     invalidate(nullptr);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ArraySwapValid)
 {
     auto validate2 = [](auto *name, auto &test1, auto &test2) {
@@ -825,7 +818,7 @@ TEST(JsonTest, ArraySwapValid)
     validate3("vector", vector1, vector2, vector3);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ArraySwapInvalid)
 {
     std::array<int, 4> array;
@@ -859,7 +852,7 @@ TEST(JsonTest, ArraySwapInvalid)
     invalidate(nullptr);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, IteratorBegin)
 {
     fly::Json json1 {1, 2, 3};
@@ -883,7 +876,7 @@ TEST(JsonTest, IteratorBegin)
     EXPECT_TRUE(std::is_const_v<decltype(cbegin2)::value_type>);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, IteratorEnd)
 {
     fly::Json json1 {1, 2, 3};
@@ -907,7 +900,7 @@ TEST(JsonTest, IteratorEnd)
     EXPECT_TRUE(std::is_const_v<decltype(cend2)::value_type>);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ObjectIteratorIterate)
 {
     fly::Json json {{"a", 1}, {"b", 2}};
@@ -937,7 +930,7 @@ TEST(JsonTest, ObjectIteratorIterate)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ObjectIteratorRangeBasedFor)
 {
     fly::Json json {{"a", 1}, {"b", 2}};
@@ -963,7 +956,7 @@ TEST(JsonTest, ObjectIteratorRangeBasedFor)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ArrayIteratorIterate)
 {
     fly::Json json {1, 2, 3};
@@ -991,7 +984,7 @@ TEST(JsonTest, ArrayIteratorIterate)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ArrayIteratorRangeBasedFor)
 {
     fly::Json json {1, 2, 3};
@@ -1017,7 +1010,7 @@ TEST(JsonTest, ArrayIteratorRangeBasedFor)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, Equality)
 {
     fly::Json string1 = "abc";
@@ -1125,7 +1118,7 @@ TEST(JsonTest, Equality)
     EXPECT_NE(float1, unsigned3);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, Stream)
 {
     std::stringstream stream;
@@ -1172,7 +1165,7 @@ TEST(JsonTest, Stream)
     stream.str(std::string());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, StreamWithEscapedSymbols)
 {
     {

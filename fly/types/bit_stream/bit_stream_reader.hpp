@@ -145,7 +145,7 @@ private:
     byte_type m_remainder;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename DataType>
 byte_type BitStreamReader::read_bits(DataType &bits, byte_type size) noexcept
 {
@@ -178,7 +178,7 @@ byte_type BitStreamReader::read_bits(DataType &bits, byte_type size) noexcept
     }
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename DataType>
 byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size) noexcept
 {
@@ -234,7 +234,7 @@ byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size) noexcept
     return peeked;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename DataType>
 byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
 {

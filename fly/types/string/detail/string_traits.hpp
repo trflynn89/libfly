@@ -38,8 +38,7 @@ struct BasicStringTraits
     using ostringstream_type = typename streamer_type::ostringstream_type;
 
     static_assert(
-        std::is_same_v<StringType, std::string> ||
-            std::is_same_v<StringType, std::wstring> ||
+        std::is_same_v<StringType, std::string> || std::is_same_v<StringType, std::wstring> ||
             std::is_same_v<StringType, std::u16string> ||
             std::is_same_v<StringType, std::u32string>,
         "StringType must be a standard std::basic_string<> specialization");
@@ -62,8 +61,7 @@ struct BasicStringTraits
      * of functions for StringType.
      */
     using has_stoi_family = std::bool_constant<
-        std::is_same_v<StringType, std::string> ||
-        std::is_same_v<StringType, std::wstring>>;
+        std::is_same_v<StringType, std::string> || std::is_same_v<StringType, std::wstring>>;
 
     inline static constexpr bool has_stoi_family_v = has_stoi_family::value;
 
@@ -72,8 +70,7 @@ struct BasicStringTraits
      * type used for StringType.
      */
     template <typename T>
-    using OstreamDeclaration =
-        decltype(std::declval<ostream_type &>() << std::declval<T>());
+    using OstreamDeclaration = decltype(std::declval<ostream_type &>() << std::declval<T>());
 
     using OstreamTraits = DeclarationTraits<OstreamDeclaration>;
 };

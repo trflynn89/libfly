@@ -62,9 +62,7 @@ public:
      * @param new_client Callback for when a new client connects.
      * @param closed_client Callback for when a client disconnects.
      */
-    void set_client_callbacks(
-        SocketCallback new_client,
-        SocketCallback closed_client) noexcept;
+    void set_client_callbacks(SocketCallback new_client, SocketCallback closed_client) noexcept;
 
     /**
      * Remove the callbacks for when a client connects or disconnects.
@@ -112,9 +110,8 @@ public:
      * @return True if a completed send was found in the given duration.
      */
     template <typename R, typename P>
-    bool wait_for_completed_send(
-        AsyncRequest &request,
-        std::chrono::duration<R, P> wait_time) noexcept;
+    bool
+    wait_for_completed_send(AsyncRequest &request, std::chrono::duration<R, P> wait_time) noexcept;
 
 protected:
     /**
@@ -170,8 +167,7 @@ private:
 class SocketManagerTask : public Task
 {
 public:
-    explicit SocketManagerTask(
-        std::weak_ptr<SocketManager> weak_socket_manager) noexcept;
+    explicit SocketManagerTask(std::weak_ptr<SocketManager> weak_socket_manager) noexcept;
 
 protected:
     /**
@@ -184,7 +180,7 @@ private:
     std::weak_ptr<SocketManager> m_weak_socket_manager;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename R, typename P>
 bool SocketManager::wait_for_completed_receive(
     AsyncRequest &request,
@@ -193,7 +189,7 @@ bool SocketManager::wait_for_completed_receive(
     return m_completed_receives.pop(request, wait_time);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename R, typename P>
 bool SocketManager::wait_for_completed_send(
     AsyncRequest &request,

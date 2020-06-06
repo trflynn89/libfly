@@ -31,9 +31,7 @@ public:
      *
      * @return True if the file was correctly created.
      */
-    static bool write_file(
-        const std::filesystem::path &path,
-        const std::string &contents) noexcept;
+    static bool write_file(const std::filesystem::path &path, const std::string &contents) noexcept;
 
     /**
      * Read the contents of a file.
@@ -53,9 +51,8 @@ public:
      *
      * @return True if the given files are equal.
      */
-    static bool compare_files(
-        const std::filesystem::path &path1,
-        const std::filesystem::path &path2);
+    static bool
+    compare_files(const std::filesystem::path &path1, const std::filesystem::path &path2);
 };
 
 } // namespace fly

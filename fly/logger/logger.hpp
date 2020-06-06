@@ -17,68 +17,49 @@
 #include <mutex>
 #include <string>
 
-// The private macros used internally insert commas only if one is needed, which
-// the formatter doesn't handle.
-// clang-format off
+//==================================================================================================
+#define LOGD(...)                                                                                  \
+    _FLY_LOG(                                                                                      \
+        fly::Log::Level::Debug,                                                                    \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
-//==============================================================================
-#define LOGD(...)                                                              \
-    _FLY_LOG(                                                                  \
-        fly::Log::Level::Debug,                                                \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+//==================================================================================================
+#define LOGI(...)                                                                                  \
+    _FLY_LOG(                                                                                      \
+        fly::Log::Level::Info,                                                                     \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
-//==============================================================================
-#define LOGI(...)                                                              \
-    _FLY_LOG(                                                                  \
-        fly::Log::Level::Info,                                                 \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+//==================================================================================================
+#define LOGW(...)                                                                                  \
+    _FLY_LOG(                                                                                      \
+        fly::Log::Level::Warn,                                                                     \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
-//==============================================================================
-#define LOGW(...)                                                              \
-    _FLY_LOG(                                                                  \
-        fly::Log::Level::Warn,                                                 \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
-
-//==============================================================================
-#define LOGS(...)                                                              \
-    _FLY_LOG(                                                                  \
-        fly::Log::Level::Warn,                                                 \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__) ": %s"                             \
-            _FLY_FORMAT_ARGS(__VA_ARGS__),                                     \
+//==================================================================================================
+#define LOGS(...)                                                                                  \
+    _FLY_LOG(                                                                                      \
+        fly::Log::Level::Warn,                                                                     \
+        fly::String::format(                                                                       \
+            _FLY_FORMAT_STRING(__VA_ARGS__) ": %s" _FLY_FORMAT_ARGS(__VA_ARGS__),                  \
             fly::System::get_error_string()))
 
-//==============================================================================
-#define LOGE(...)                                                              \
-    _FLY_LOG(                                                                  \
-        fly::Log::Level::Error,                                                \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+//==================================================================================================
+#define LOGE(...)                                                                                  \
+    _FLY_LOG(                                                                                      \
+        fly::Log::Level::Error,                                                                    \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
-//==============================================================================
-#define LOGC(...)                                                              \
-    fly::Logger::console_log(                                                  \
-        true,                                                                  \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+//==================================================================================================
+#define LOGC(...)                                                                                  \
+    fly::Logger::console_log(                                                                      \
+        true,                                                                                      \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
-//==============================================================================
-#define LOGC_NO_LOCK(...)                                                      \
-    fly::Logger::console_log(                                                  \
-        false,                                                                 \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
-
-// clang-format on
+//==================================================================================================
+#define LOGC_NO_LOCK(...)                                                                          \
+    fly::Logger::console_log(                                                                      \
+        false,                                                                                     \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
 namespace fly {
 
@@ -142,8 +123,7 @@ public:
      * @param acquire_lock Whether to acquire lock before logging.
      * @param message The message to log.
      */
-    static void
-    console_log(bool acquire_lock, const std::string &message) noexcept;
+    static void console_log(bool acquire_lock, const std::string &message) noexcept;
 
     /**
      * Add a log to the static logger instance.

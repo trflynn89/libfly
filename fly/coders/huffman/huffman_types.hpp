@@ -15,10 +15,8 @@ using length_type = std::uint8_t;
 struct HuffmanNode;
 struct HuffmanNodeComparator;
 
-using HuffmanNodeQueue = std::priority_queue<
-    HuffmanNode *,
-    std::vector<HuffmanNode *>,
-    HuffmanNodeComparator>;
+using HuffmanNodeQueue =
+    std::priority_queue<HuffmanNode *, std::vector<HuffmanNode *>, HuffmanNodeComparator>;
 
 /**
  * Struct to store data for a single node in a Huffman tree. Huffman trees are
@@ -110,10 +108,7 @@ struct HuffmanCode
      * @param code The Huffman code for the symbol.
      * @param length The number of bits in the Huffman code.
      */
-    HuffmanCode(
-        symbol_type symbol,
-        code_type code,
-        length_type length) noexcept;
+    HuffmanCode(symbol_type symbol, code_type code, length_type length) noexcept;
 
     /**
      * Deleted copy constructor.

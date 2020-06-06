@@ -83,16 +83,14 @@ public:
     using reference = value_type &;
     using const_reference = const value_type &;
     using pointer = typename std::allocator_traits<allocator_type>::pointer;
-    using const_pointer =
-        typename std::allocator_traits<allocator_type>::const_pointer;
+    using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
     using iterator = detail::JsonIterator<Json>;
     using const_iterator = detail::JsonIterator<const Json>;
 
     /**
      * Alias for a basic_stringstream with the JSON string type.
      */
-    using stream_type =
-        std::basic_stringstream<JsonTraits::string_type::value_type>;
+    using stream_type = std::basic_stringstream<JsonTraits::string_type::value_type>;
 
     /**
      * Default constructor. Intializes the Json instance to a null value.
@@ -407,8 +405,7 @@ public:
      * @throws JsonException If the Json instance is neither an object nor null,
      *         or the key value is invalid.
      */
-    reference operator[](
-        const typename JsonTraits::object_type::key_type &key) noexcept(false);
+    reference operator[](const typename JsonTraits::object_type::key_type &key) noexcept(false);
 
     /**
      * Object read-only access operator.
@@ -423,8 +420,7 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key
      *         value does not exist, or the key value is invalid.
      */
-    const_reference
-    operator[](const typename JsonTraits::object_type::key_type &key) const
+    const_reference operator[](const typename JsonTraits::object_type::key_type &key) const
         noexcept(false);
 
     /**
@@ -472,8 +468,7 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key
      *         value does not exist, or the key value is invalid.
      */
-    reference
-    at(const typename JsonTraits::object_type::key_type &key) noexcept(false);
+    reference at(const typename JsonTraits::object_type::key_type &key) noexcept(false);
 
     /**
      * Object read-only accessor.
@@ -488,9 +483,7 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key
      *         value does not exist, or the key value is invalid.
      */
-    const_reference
-    at(const typename JsonTraits::object_type::key_type &key) const
-        noexcept(false);
+    const_reference at(const typename JsonTraits::object_type::key_type &key) const noexcept(false);
 
     /**
      * Array read-only accessor.
@@ -673,8 +666,7 @@ public:
      *
      * @return True if the two Json instances are equal.
      */
-    friend bool
-    operator==(const_reference json1, const_reference json2) noexcept;
+    friend bool operator==(const_reference json1, const_reference json2) noexcept;
 
     /**
      * Unequality operator. Compares two Json instances for unequality. They are
@@ -682,8 +674,7 @@ public:
      *
      * @return True if the two Json instances are unequal.
      */
-    friend bool
-    operator!=(const_reference json1, const_reference json2) noexcept;
+    friend bool operator!=(const_reference json1, const_reference json2) noexcept;
 
     /**
      * Stream operator. Stream the Json instance into an output stream.
@@ -693,8 +684,7 @@ public:
      *
      * @return A reference to the output stream.
      */
-    friend std::ostream &
-    operator<<(std::ostream &stream, const_reference json) noexcept;
+    friend std::ostream &operator<<(std::ostream &stream, const_reference json) noexcept;
 
 private:
     friend iterator;
@@ -738,9 +728,8 @@ private:
      * @param stream Stream to pipe the escaped character into.
      * @param ch Character to escape.
      */
-    static void write_escaped_charater(
-        std::ostream &stream,
-        JsonTraits::string_type::value_type ch) noexcept;
+    static void
+    write_escaped_charater(std::ostream &stream, JsonTraits::string_type::value_type ch) noexcept;
 
     /**
      * Validate a single non-escaped character is compliant.
@@ -759,55 +748,49 @@ private:
     json_type m_value;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_string<T>>>
 Json::Json(const T &value) noexcept(false) : m_value(validate_string(value))
 {
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_object<T>>>
-Json::Json(const T &value) noexcept :
-    m_value(JsonTraits::object_type(value.begin(), value.end()))
+Json::Json(const T &value) noexcept : m_value(JsonTraits::object_type(value.begin(), value.end()))
 {
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_array<T>>>
-Json::Json(const T &value) noexcept :
-    m_value(JsonTraits::array_type(value.begin(), value.end()))
+Json::Json(const T &value) noexcept : m_value(JsonTraits::array_type(value.begin(), value.end()))
 {
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
-Json::Json(const T &value) noexcept :
-    m_value(static_cast<JsonTraits::boolean_type>(value))
+Json::Json(const T &value) noexcept : m_value(static_cast<JsonTraits::boolean_type>(value))
 {
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_signed_integer<T>>>
-Json::Json(const T &value) noexcept :
-    m_value(static_cast<JsonTraits::signed_type>(value))
+Json::Json(const T &value) noexcept : m_value(static_cast<JsonTraits::signed_type>(value))
 {
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_unsigned_integer<T>>>
-Json::Json(const T &value) noexcept :
-    m_value(static_cast<JsonTraits::unsigned_type>(value))
+Json::Json(const T &value) noexcept : m_value(static_cast<JsonTraits::unsigned_type>(value))
 {
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_floating_point<T>>>
-Json::Json(const T &value) noexcept :
-    m_value(static_cast<JsonTraits::float_type>(value))
+Json::Json(const T &value) noexcept : m_value(static_cast<JsonTraits::float_type>(value))
 {
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_object<T>>>
 Json::operator T() const noexcept(false)
 {
@@ -820,7 +803,7 @@ Json::operator T() const noexcept(false)
     throw JsonException(*this, "JSON type is not an object");
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_array<T>>>
 Json::operator T() const noexcept(false)
 {
@@ -841,7 +824,7 @@ Json::operator T() const noexcept(false)
     throw JsonException(*this, "JSON type is not an array");
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, std::size_t N>
 Json::operator std::array<T, N>() const noexcept(false)
 {
@@ -861,7 +844,7 @@ Json::operator std::array<T, N>() const noexcept(false)
     throw JsonException(*this, "JSON type is not an array");
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
 Json::operator T() const noexcept
 {
@@ -870,8 +853,7 @@ Json::operator T() const noexcept
 
         if constexpr (
             std::is_same_v<U, JsonTraits::string_type> ||
-            std::is_same_v<U, JsonTraits::object_type> ||
-            std::is_same_v<U, JsonTraits::array_type>)
+            std::is_same_v<U, JsonTraits::object_type> || std::is_same_v<U, JsonTraits::array_type>)
         {
             return !value.empty();
         }
@@ -894,7 +876,7 @@ Json::operator T() const noexcept
     return std::visit(visitor, m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 template <
     typename T,
     enable_if_any<
@@ -930,7 +912,7 @@ Json::operator T() const noexcept(false)
     return std::visit(visitor, m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_object<T>>>
 void Json::swap(T &other) noexcept(false)
 {
@@ -947,7 +929,7 @@ void Json::swap(T &other) noexcept(false)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_array<T>>>
 void Json::swap(T &other) noexcept(false)
 {

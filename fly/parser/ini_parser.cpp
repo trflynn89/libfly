@@ -7,7 +7,7 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 Json IniParser::parse_internal(std::istream &stream) noexcept(false)
 {
     std::string line, section;
@@ -32,16 +32,14 @@ Json IniParser::parse_internal(std::istream &stream) noexcept(false)
         }
         else
         {
-            throw ParserException(
-                m_line,
-                "A section must be defined before name=value pairs");
+            throw ParserException(m_line, "A section must be defined before name=value pairs");
         }
     }
 
     return values;
 }
 
-//==============================================================================
+//==================================================================================================
 std::string IniParser::on_section(const std::string &line) noexcept(false)
 {
     std::string section = line;
@@ -55,7 +53,7 @@ std::string IniParser::on_section(const std::string &line) noexcept(false)
     return section;
 }
 
-//==============================================================================
+//==================================================================================================
 void IniParser::on_value(Json &section, const std::string &line) noexcept(false)
 {
     static constexpr std::uint32_t s_size = 2;
@@ -81,21 +79,18 @@ void IniParser::on_value(Json &section, const std::string &line) noexcept(false)
     }
     else
     {
-        throw ParserException(
-            m_line,
-            "Require name/value pairs of the form name=value");
+        throw ParserException(m_line, "Require name/value pairs of the form name=value");
     }
 }
 
-//==============================================================================
+//==================================================================================================
 bool IniParser::trim_value(std::string &str, char ch) const noexcept(false)
 {
     return trim_value(str, ch, ch);
 }
 
-//==============================================================================
-bool IniParser::trim_value(std::string &str, char start, char end) const
-    noexcept(false)
+//==================================================================================================
+bool IniParser::trim_value(std::string &str, char start, char end) const noexcept(false)
 {
     bool starts_with_char = String::starts_with(str, start);
     bool ends_with_char = String::ends_with(str, end);
@@ -108,10 +103,7 @@ bool IniParser::trim_value(std::string &str, char start, char end) const
     {
         throw ParserException(
             m_line,
-            String::format(
-                "Imbalanced characters: \"%c\" and \"%c\"",
-                start,
-                end));
+            String::format("Imbalanced characters: \"%c\" and \"%c\"", start, end));
     }
 
     return starts_with_char && ends_with_char;

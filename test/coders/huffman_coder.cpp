@@ -24,8 +24,8 @@ class BadHuffmanConfig : public fly::HuffmanConfig
 public:
     BadHuffmanConfig() noexcept : fly::HuffmanConfig()
     {
-        m_default_encoder_max_code_length = std::numeric_limits<decltype(
-            m_default_encoder_max_code_length)>::max();
+        m_default_encoder_max_code_length =
+            std::numeric_limits<decltype(m_default_encoder_max_code_length)>::max();
     }
 };
 
@@ -45,23 +45,19 @@ public:
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 class HuffmanCoderTest : public ::testing::Test
 {
 public:
-    HuffmanCoderTest() :
-        m_config(std::make_shared<fly::HuffmanConfig>()),
-        m_encoder(m_config)
+    HuffmanCoderTest() : m_config(std::make_shared<fly::HuffmanConfig>()), m_encoder(m_config)
     {
     }
 
 protected:
-    std::string create_stream_with_remainder(
-        std::vector<fly::byte_type> bytes,
-        fly::byte_type remainder)
+    std::string
+    create_stream_with_remainder(std::vector<fly::byte_type> bytes, fly::byte_type remainder)
     {
-        std::stringstream stream(
-            std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
+        std::stringstream stream(std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
 
         fly::BitStreamWriter output(stream);
 
@@ -105,7 +101,7 @@ protected:
     fly::HuffmanDecoder m_decoder;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, InvalidConfig)
 {
     const std::string raw;
@@ -117,7 +113,7 @@ TEST_F(HuffmanCoderTest, InvalidConfig)
     EXPECT_FALSE(encoder.encode_string(raw, enc));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, HeaderMissingVersion)
 {
     const std::string enc;
@@ -126,7 +122,7 @@ TEST_F(HuffmanCoderTest, HeaderMissingVersion)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, HeaderInvalidVersion)
 {
     std::vector<fly::byte_type> bytes = {
@@ -140,7 +136,7 @@ TEST_F(HuffmanCoderTest, HeaderInvalidVersion)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, HeaderMissingChunkSize)
 {
     std::vector<fly::byte_type> bytes = {
@@ -154,7 +150,7 @@ TEST_F(HuffmanCoderTest, HeaderMissingChunkSize)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, HeaderZeroChunkSize)
 {
     std::vector<fly::byte_type> bytes = {
@@ -170,7 +166,7 @@ TEST_F(HuffmanCoderTest, HeaderZeroChunkSize)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, HeaderMissingMaxCodeLength)
 {
     std::vector<fly::byte_type> bytes = {
@@ -186,7 +182,7 @@ TEST_F(HuffmanCoderTest, HeaderMissingMaxCodeLength)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, HeaderZeroMaxCodeLength)
 {
     std::vector<fly::byte_type> bytes = {
@@ -203,7 +199,7 @@ TEST_F(HuffmanCoderTest, HeaderZeroMaxCodeLength)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, HeaderInvalidMaxCodeLength)
 {
     std::vector<fly::byte_type> bytes = {
@@ -220,7 +216,7 @@ TEST_F(HuffmanCoderTest, HeaderInvalidMaxCodeLength)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, IncompleteCodeLengthCounts)
 {
     std::vector<fly::byte_type> bytes = {
@@ -230,15 +226,14 @@ TEST_F(HuffmanCoderTest, IncompleteCodeLengthCounts)
         4_u8, // Maximum Huffman code length
     };
 
-    const std::string enc =
-        create_stream_with_remainder(std::move(bytes), 1_u8);
+    const std::string enc = create_stream_with_remainder(std::move(bytes), 1_u8);
     std::string dec;
 
     EXPECT_FALSE(enc.empty());
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, ZeroCodeLengthCounts)
 {
     std::vector<fly::byte_type> bytes = {
@@ -256,7 +251,7 @@ TEST_F(HuffmanCoderTest, ZeroCodeLengthCounts)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, InvalidCodeLengthCounts)
 {
     std::vector<fly::byte_type> bytes = {
@@ -274,7 +269,7 @@ TEST_F(HuffmanCoderTest, InvalidCodeLengthCounts)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, MissingCodeLengthCount)
 {
     fly::byte_type number_of_code_length_counts = 5_u8;
@@ -300,7 +295,7 @@ TEST_F(HuffmanCoderTest, MissingCodeLengthCount)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, MissingSymbol)
 {
     std::vector<fly::byte_type> bytes = {
@@ -322,7 +317,7 @@ TEST_F(HuffmanCoderTest, MissingSymbol)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, TooManyCodes)
 {
     std::vector<fly::byte_type> bytes = {
@@ -349,7 +344,7 @@ TEST_F(HuffmanCoderTest, TooManyCodes)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, MissingSymbols)
 {
     std::vector<fly::byte_type> bytes = {
@@ -370,7 +365,7 @@ TEST_F(HuffmanCoderTest, MissingSymbols)
     EXPECT_FALSE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, Empty)
 {
     const std::string raw;
@@ -380,7 +375,7 @@ TEST_F(HuffmanCoderTest, Empty)
     ASSERT_TRUE(m_decoder.decode_string(enc, dec));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, OneSymbol)
 {
     const std::string raw = "a";
@@ -392,7 +387,7 @@ TEST_F(HuffmanCoderTest, OneSymbol)
     EXPECT_EQ(raw, dec);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, OneUniqueSymbol)
 {
     const std::string raw = "aaaaaaaaaa";
@@ -404,7 +399,7 @@ TEST_F(HuffmanCoderTest, OneUniqueSymbol)
     EXPECT_EQ(raw, dec);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, Mirror)
 {
     const std::string raw = "abcdefabcbbb";
@@ -416,7 +411,7 @@ TEST_F(HuffmanCoderTest, Mirror)
     EXPECT_EQ(raw, dec);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, LengthLimited)
 {
     const std::string raw = "abcdefabcbbb";
@@ -431,8 +426,7 @@ TEST_F(HuffmanCoderTest, LengthLimited)
     EXPECT_EQ(raw, dec);
 
     // Validate the Kraft–McMillan inequality.
-    const std::uint16_t max_allowed_kraft =
-        (1_u16 << config->encoder_max_code_length()) - 1;
+    const std::uint16_t max_allowed_kraft = (1_u16 << config->encoder_max_code_length()) - 1;
     std::uint16_t kraft = 0_u16;
 
     for (const HuffmanCode &code : get_decoded_huffman_codes())
@@ -443,7 +437,7 @@ TEST_F(HuffmanCoderTest, LengthLimited)
     EXPECT_LE(kraft, max_allowed_kraft);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, LargeMirror)
 {
     const std::string raw = fly::String::generate_random_string(100 << 10);
@@ -456,7 +450,7 @@ TEST_F(HuffmanCoderTest, LargeMirror)
     EXPECT_EQ(raw, dec);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderTest, Unicode)
 {
     std::string raw = "🍕א😅😅🍕❤️א🍕";
@@ -474,7 +468,7 @@ TEST_F(HuffmanCoderTest, Unicode)
     EXPECT_EQ(raw, dec);
 }
 
-//==============================================================================
+//==================================================================================================
 class HuffmanCoderFileTest : public HuffmanCoderTest
 {
 public:
@@ -508,7 +502,7 @@ protected:
     std::filesystem::path m_decoded_file;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderFileTest, AsciiFile)
 {
     // Generated with:
@@ -519,13 +513,11 @@ TEST_F(HuffmanCoderFileTest, AsciiFile)
     ASSERT_TRUE(m_encoder.encode_file(raw, m_encoded_file));
     ASSERT_TRUE(m_decoder.decode_file(m_encoded_file, m_decoded_file));
 
-    EXPECT_GT(
-        std::filesystem::file_size(raw),
-        std::filesystem::file_size(m_encoded_file));
+    EXPECT_GT(std::filesystem::file_size(raw), std::filesystem::file_size(m_encoded_file));
     EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderFileTest, BinaryFile)
 {
     // Generated with:
@@ -539,7 +531,7 @@ TEST_F(HuffmanCoderFileTest, BinaryFile)
     EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(HuffmanCoderFileTest, Enwik8File)
 {
     // Downloaded from: http://mattmahoney.net/dc/enwik8.zip
@@ -557,9 +549,7 @@ TEST_F(HuffmanCoderFileTest, Enwik8File)
     ASSERT_TRUE(m_encoder.encode_file(raw, m_encoded_file));
     ASSERT_TRUE(m_decoder.decode_file(m_encoded_file, m_decoded_file));
 
-    EXPECT_GT(
-        std::filesystem::file_size(raw),
-        std::filesystem::file_size(m_encoded_file));
+    EXPECT_GT(std::filesystem::file_size(raw), std::filesystem::file_size(m_encoded_file));
     EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
 }
 

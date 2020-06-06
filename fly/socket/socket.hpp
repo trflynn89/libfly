@@ -28,9 +28,7 @@ public:
      * @param protocol The communication protocol of the socket.
      * @param config Reference to the socket configuration.
      */
-    Socket(
-        Protocol protocol,
-        const std::shared_ptr<SocketConfig> &config) noexcept;
+    Socket(Protocol protocol, const std::shared_ptr<SocketConfig> &config) noexcept;
 
     /**
      * Destructor.
@@ -46,9 +44,7 @@ public:
      *
      * @return True if the hostname/address string could be converted.
      */
-    static bool hostname_to_address(
-        const std::string &hostname,
-        address_type &address) noexcept;
+    static bool hostname_to_address(const std::string &hostname, address_type &address) noexcept;
 
     /**
      * INADDR_ANY may be different depending on the OS. This function will
@@ -149,8 +145,7 @@ public:
      *
      * @return True if the binding was successful.
      */
-    virtual bool bind(address_type address, port_type port, BindOption option)
-        const noexcept = 0;
+    virtual bool bind(address_type address, port_type port, BindOption option) const noexcept = 0;
 
     /**
      * Bind this socket to an address.
@@ -161,8 +156,7 @@ public:
      *
      * @return True if the binding was successful.
      */
-    bool bind(const std::string &hostname, port_type port, BindOption option)
-        const noexcept;
+    bool bind(const std::string &hostname, port_type port, BindOption option) const noexcept;
 
     /**
      * Allow socket to listen for incoming connections.
@@ -211,8 +205,7 @@ public:
      *
      * @return The connection state (not connected, connecting, or connected).
      */
-    ConnectedState
-    connect_async(const std::string &hostname, port_type port) noexcept;
+    ConnectedState connect_async(const std::string &hostname, port_type port) noexcept;
 
     /**
      * After an asynchronous socket in a connecting state becomes available for
@@ -247,10 +240,8 @@ public:
      *
      * @return The number of bytes sent.
      */
-    std::size_t send_to(
-        const std::string &message,
-        address_type address,
-        port_type port) const noexcept;
+    std::size_t
+    send_to(const std::string &message, address_type address, port_type port) const noexcept;
 
     /**
      * Write data on the socket.
@@ -261,10 +252,8 @@ public:
      *
      * @return The number of bytes sent.
      */
-    std::size_t send_to(
-        const std::string &message,
-        const std::string &hostname,
-        port_type port) const noexcept;
+    std::size_t
+    send_to(const std::string &message, const std::string &hostname, port_type port) const noexcept;
 
     /**
      * Request data to be written on the socket asynchronously. If this is not
@@ -286,10 +275,7 @@ public:
      *
      * @return True if the request was made.
      */
-    bool send_to_async(
-        std::string &&message,
-        address_type address,
-        port_type port) noexcept;
+    bool send_to_async(std::string &&message, address_type address, port_type port) noexcept;
 
     /**
      * Request data to be written on the socket asynchronously. If this is not
@@ -301,10 +287,7 @@ public:
      *
      * @return True if the request was made.
      */
-    bool send_to_async(
-        std::string &&message,
-        const std::string &hostname,
-        port_type port) noexcept;
+    bool send_to_async(std::string &&message, const std::string &hostname, port_type port) noexcept;
 
     /**
      * Read data on this socket until the end-of-message character is received.
@@ -327,8 +310,7 @@ public:
      *
      * @param completed_sends Queue of completed sends to post to on success.
      */
-    void
-    service_send_requests(AsyncRequest::RequestQueue &completed_sends) noexcept;
+    void service_send_requests(AsyncRequest::RequestQueue &completed_sends) noexcept;
 
     /**
      * Read on this socket until a read would block, or some other error occurs
@@ -336,8 +318,7 @@ public:
      *
      * @param completed_reads Queue of completed received to post to on success.
      */
-    void
-    service_recv_requests(AsyncRequest::RequestQueue &completed_reads) noexcept;
+    void service_recv_requests(AsyncRequest::RequestQueue &completed_reads) noexcept;
 
 protected:
     /**
@@ -348,8 +329,7 @@ protected:
      *
      * @return The number of bytes sent.
      */
-    virtual std::size_t
-    send(const std::string &message, bool &would_block) const noexcept = 0;
+    virtual std::size_t send(const std::string &message, bool &would_block) const noexcept = 0;
 
     /**
      * Write data on the socket.
@@ -361,11 +341,9 @@ protected:
      *
      * @return The number of bytes sent.
      */
-    virtual std::size_t send_to(
-        const std::string &message,
-        address_type address,
-        port_type port,
-        bool &would_block) const noexcept = 0;
+    virtual std::size_t
+    send_to(const std::string &message, address_type address, port_type port, bool &would_block)
+        const noexcept = 0;
 
     /**
      * Write data on the socket.
@@ -391,8 +369,7 @@ protected:
      *
      * @return The data received.
      */
-    virtual std::string
-    recv(bool &would_block, bool &is_complete) const noexcept = 0;
+    virtual std::string recv(bool &would_block, bool &is_complete) const noexcept = 0;
 
     /**
      * Read data on this socket until the end-of-message character is received.
@@ -402,8 +379,7 @@ protected:
      *
      * @return The data received.
      */
-    virtual std::string
-    recv_from(bool &would_block, bool &is_complete) const noexcept = 0;
+    virtual std::string recv_from(bool &would_block, bool &is_complete) const noexcept = 0;
 
     // Socket protocol
     Protocol m_protocol;

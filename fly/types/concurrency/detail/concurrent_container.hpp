@@ -82,7 +82,7 @@ private:
     std::condition_variable m_push_condition;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename T, typename Container>
 void ConcurrentContainer<T, Container>::push(T &&item) noexcept
 {
@@ -94,7 +94,7 @@ void ConcurrentContainer<T, Container>::push(T &&item) noexcept
     m_push_condition.notify_one();
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, typename Container>
 void ConcurrentContainer<T, Container>::pop(T &item) noexcept
 {
@@ -108,12 +108,10 @@ void ConcurrentContainer<T, Container>::pop(T &item) noexcept
     pop_internal(item);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, typename Container>
 template <typename R, typename P>
-bool ConcurrentContainer<T, Container>::pop(
-    T &item,
-    std::chrono::duration<R, P> wait_time) noexcept
+bool ConcurrentContainer<T, Container>::pop(T &item, std::chrono::duration<R, P> wait_time) noexcept
 {
     std::unique_lock<std::mutex> lock(m_container_mutex);
 
@@ -128,7 +126,7 @@ bool ConcurrentContainer<T, Container>::pop(
     return item_popped;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, typename Container>
 bool ConcurrentContainer<T, Container>::empty() const noexcept
 {
@@ -136,7 +134,7 @@ bool ConcurrentContainer<T, Container>::empty() const noexcept
     return m_container.empty();
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T, typename Container>
 auto ConcurrentContainer<T, Container>::size() const noexcept -> size_type
 {

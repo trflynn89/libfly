@@ -83,9 +83,8 @@ private:
      * @param weak_task The task to be executed.
      * @param weak_task_runner The task runner posting the task.
      */
-    void post_task(
-        std::weak_ptr<Task> weak_task,
-        std::weak_ptr<TaskRunner> weak_task_runner) noexcept;
+    void
+    post_task(std::weak_ptr<Task> weak_task, std::weak_ptr<TaskRunner> weak_task_runner) noexcept;
 
     /**
      * Schedule a task to be posted for execution after some delay.
@@ -121,7 +120,7 @@ private:
     std::uint32_t m_num_workers;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename TaskRunnerType>
 std::shared_ptr<TaskRunnerType> TaskManager::create_task_runner() noexcept
 {

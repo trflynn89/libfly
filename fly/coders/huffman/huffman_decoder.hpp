@@ -56,8 +56,7 @@ protected:
      *
      * @return True if the input stream was successfully decoded.
      */
-    bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept
-        override;
+    bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept override;
 
 private:
     /**

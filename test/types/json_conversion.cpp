@@ -26,7 +26,7 @@ void bad_conversion(const fly::Json &json)
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, StringConversion)
 {
     fly::Json json;
@@ -56,7 +56,7 @@ TEST(JsonTest, StringConversion)
     EXPECT_EQ(std::string(json), "null");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ObjectConversionValid)
 {
     auto validate = [](auto *name, auto &test1, auto &test2, auto &test3) {
@@ -114,14 +114,10 @@ TEST(JsonTest, ObjectConversionValid)
     std::unordered_multimap<std::string, int> unordered_multimap1;
     std::unordered_multimap<std::string, std::string> unordered_multimap2;
     std::unordered_multimap<std::string, fly::Json> unordered_multimap3;
-    validate(
-        "unordered_multimap",
-        unordered_multimap1,
-        unordered_multimap2,
-        unordered_multimap3);
+    validate("unordered_multimap", unordered_multimap1, unordered_multimap2, unordered_multimap3);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ObjectConversionInvalid)
 {
     auto invalidate = [&](fly::Json json) {
@@ -140,7 +136,7 @@ TEST(JsonTest, ObjectConversionInvalid)
     invalidate(nullptr);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ArrayConversionValid)
 {
     auto validate2 = [](auto *name, auto &test1, auto &test2) {
@@ -241,7 +237,7 @@ TEST(JsonTest, ArrayConversionValid)
     validate3("vector", vector1, vector2, vector3);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, ArrayConversionInvalid)
 {
     auto invalidate = [&](fly::Json json) {
@@ -265,7 +261,7 @@ TEST(JsonTest, ArrayConversionInvalid)
     invalidate(nullptr);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, BooleanConversion)
 {
     fly::Json json;
@@ -309,7 +305,7 @@ TEST(JsonTest, BooleanConversion)
     EXPECT_FALSE(bool(json));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, SignedIntegerConversion)
 {
     fly::Json json;
@@ -349,7 +345,7 @@ TEST(JsonTest, SignedIntegerConversion)
     bad_conversion<int>(json);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, UnsignedIntegerConversion)
 {
     fly::Json json;
@@ -389,7 +385,7 @@ TEST(JsonTest, UnsignedIntegerConversion)
     bad_conversion<unsigned>(json);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, FloatConversion)
 {
     fly::Json json;
@@ -429,7 +425,7 @@ TEST(JsonTest, FloatConversion)
     bad_conversion<float>(json);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, NullConversion)
 {
     fly::Json json;

@@ -10,21 +10,18 @@
 
 namespace {
 
-constexpr const std::ios::openmode s_input_mode =
-    std::ios::in | std::ios::binary;
+constexpr const std::ios::openmode s_input_mode = std::ios::in | std::ios::binary;
 
 constexpr const std::ios::openmode s_output_mode =
     std::ios::out | std::ios::binary | std::ios::trunc;
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 class BitStreamTest : public ::testing::Test
 {
 public:
-    BitStreamTest() :
-        m_input_stream(s_input_mode),
-        m_output_stream(s_output_mode)
+    BitStreamTest() : m_input_stream(s_input_mode), m_output_stream(s_output_mode)
     {
     }
 
@@ -46,10 +43,8 @@ protected:
 
         const fly::byte_type header = static_cast<fly::byte_type>(buffer[0]);
 
-        magic =
-            (header >> fly::detail::s_magic_shift) & fly::detail::s_magic_mask;
-        remainder = (header >> fly::detail::s_remainder_shift) &
-            fly::detail::s_remainder_mask;
+        magic = (header >> fly::detail::s_magic_shift) & fly::detail::s_magic_mask;
+        remainder = (header >> fly::detail::s_remainder_shift) & fly::detail::s_remainder_mask;
 
         return true;
     }
@@ -67,7 +62,7 @@ protected:
     std::ostringstream m_output_stream;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, EmptyStream)
 {
     fly::BitStreamReader stream(m_input_stream);
@@ -81,7 +76,7 @@ TEST_F(BitStreamTest, EmptyStream)
     EXPECT_TRUE(m_input_stream.fail());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, GoodHeader)
 {
     {
@@ -109,11 +104,10 @@ TEST_F(BitStreamTest, GoodHeader)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, BadHeader)
 {
-    fly::byte_type header = (fly::detail::s_magic - 1)
-        << fly::detail::s_magic_shift;
+    fly::byte_type header = (fly::detail::s_magic - 1) << fly::detail::s_magic_shift;
     m_output_stream << static_cast<std::ios::char_type>(header);
     m_output_stream << "data";
 
@@ -131,7 +125,7 @@ TEST_F(BitStreamTest, BadHeader)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, SingleBit)
 {
     {
@@ -164,7 +158,7 @@ TEST_F(BitStreamTest, SingleBit)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, SingleByte)
 {
     {
@@ -197,7 +191,7 @@ TEST_F(BitStreamTest, SingleByte)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, SingleWord)
 {
     {
@@ -230,7 +224,7 @@ TEST_F(BitStreamTest, SingleWord)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, MultiBuffer)
 {
     constexpr auto length = std::numeric_limits<fly::buffer_type>::digits;
@@ -275,7 +269,7 @@ TEST_F(BitStreamTest, MultiBuffer)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, MultiBufferSplit)
 {
     constexpr auto length = std::numeric_limits<fly::buffer_type>::digits;
@@ -322,7 +316,7 @@ TEST_F(BitStreamTest, MultiBufferSplit)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, Peek)
 {
     {
@@ -359,7 +353,7 @@ TEST_F(BitStreamTest, Peek)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, OverPeek)
 {
     {
@@ -393,7 +387,7 @@ TEST_F(BitStreamTest, OverPeek)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, InvalidWriterStream)
 {
     // Close the stream before handing it to BitStreamWriter.
@@ -414,7 +408,7 @@ TEST_F(BitStreamTest, InvalidWriterStream)
     EXPECT_TRUE(m_output_stream.str().empty());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, FailedWriterStream)
 {
     constexpr auto buffer = std::numeric_limits<fly::buffer_type>::max() >> 1;
@@ -452,7 +446,7 @@ TEST_F(BitStreamTest, FailedWriterStream)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, InvalidReaderStream)
 {
     {
@@ -481,7 +475,7 @@ TEST_F(BitStreamTest, InvalidReaderStream)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(BitStreamTest, FailedReaderStream)
 {
     {

@@ -18,7 +18,7 @@ void handle_signal(int signal)
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 TEST(SystemTest, PrintBacktrace)
 {
     fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
@@ -28,14 +28,14 @@ TEST(SystemTest, PrintBacktrace)
     EXPECT_FALSE(output.empty());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(SystemTest, LocalTime)
 {
     std::string time = fly::System::local_time();
     EXPECT_FALSE(time.empty());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(SystemTest, ErrorCode)
 {
     int code = fly::System::get_error_code();
@@ -48,7 +48,7 @@ TEST(SystemTest, ErrorCode)
     EXPECT_EQ(error1, error2);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(SystemTest, Signal)
 {
     fly::System::SignalHandler handler(&handle_signal);

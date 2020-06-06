@@ -98,7 +98,7 @@ private:
     std::ostream &m_stream;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename DataType>
 void BitStreamWriter::write_bits(DataType bits, byte_type size) noexcept
 {
@@ -129,7 +129,7 @@ void BitStreamWriter::write_bits(DataType bits, byte_type size) noexcept
     m_position = lshift;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename DataType>
 void BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
 {

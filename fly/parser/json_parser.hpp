@@ -40,8 +40,7 @@ public:
         AllowAnyType = 1 << 2,
 
         // Allows all of the above features.
-        AllFeatures =
-            std::numeric_limits<std::underlying_type_t<Features>>::max()
+        AllFeatures = std::numeric_limits<std::underlying_type_t<Features>>::max()
     };
 
     /**
@@ -78,8 +77,7 @@ private:
      */
     enum class Token : std::int16_t
     {
-        EndOfFile =
-            std::char_traits<JsonTraits::string_type::value_type>::eof(),
+        EndOfFile = std::char_traits<JsonTraits::string_type::value_type>::eof(),
 
         Tab = 0x09, // \t
         NewLine = 0x0a, // \n
@@ -128,10 +126,7 @@ private:
     class UnexpectedTokenException : public UnexpectedCharacterException
     {
     public:
-        UnexpectedTokenException(
-            std::uint32_t line,
-            std::uint32_t column,
-            JsonParser::Token token);
+        UnexpectedTokenException(std::uint32_t line, std::uint32_t column, JsonParser::Token token);
     };
 
     /**
@@ -195,8 +190,7 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
      */
-    void
-    consume_token(std::istream &stream, const Token &token) noexcept(false);
+    void consume_token(std::istream &stream, const Token &token) noexcept(false);
 
     /**
      * Extract a comma from a stream. Handles any trailing commas, allowing a
@@ -211,9 +205,8 @@ private:
      * @throws UnexpectedCharacterException A trailing comma was found, but the
      *         feature is not enabled.
      */
-    bool consume_comma(
-        std::istream &stream,
-        const std::function<bool()> &stop_parsing) noexcept(false);
+    bool
+    consume_comma(std::istream &stream, const std::function<bool()> &stop_parsing) noexcept(false);
 
     /**
      * Extract a string, number, boolean, or null value from a stream. If
@@ -227,8 +220,7 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
      */
-    JsonTraits::string_type
-    consume_value(std::istream &stream, JsonType type) noexcept(false);
+    JsonTraits::string_type consume_value(std::istream &stream, JsonType type) noexcept(false);
 
     /**
      * Extract all consecutive whitespace symbols and comments (if enabled in
@@ -296,8 +288,7 @@ private:
      *
      * @throws BadConversionException The parsed number is not valid.
      */
-    NumericType validate_number(const JsonTraits::string_type &value) const
-        noexcept(false);
+    NumericType validate_number(const JsonTraits::string_type &value) const noexcept(false);
 
     /**
      * Check if a symbol is a whitespace symbol.
@@ -323,13 +314,11 @@ private:
 /**
  * Combine two Features instances into a single instance via bitwise-and.
  */
-JsonParser::Features
-operator&(JsonParser::Features a, JsonParser::Features b) noexcept;
+JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b) noexcept;
 
 /**
  * Combine two Features instances into a single instance via bitwise-or.
  */
-JsonParser::Features
-operator|(JsonParser::Features a, JsonParser::Features b) noexcept;
+JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b) noexcept;
 
 } // namespace fly

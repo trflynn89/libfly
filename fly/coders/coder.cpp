@@ -12,8 +12,7 @@ namespace fly {
 
 namespace {
 
-    constexpr const std::ios::openmode s_input_mode =
-        std::ios::in | std::ios::binary;
+    constexpr const std::ios::openmode s_input_mode = std::ios::in | std::ios::binary;
 
     constexpr const std::ios::openmode s_output_mode =
         std::ios::out | std::ios::binary | std::ios::trunc;
@@ -25,8 +24,7 @@ namespace {
         SizeType encoded_size) noexcept
     {
         const auto end = std::chrono::system_clock::now();
-        const auto ratio =
-            (static_cast<double>(decoded_size) - encoded_size) / decoded_size;
+        const auto ratio = (static_cast<double>(decoded_size) - encoded_size) / decoded_size;
 
         LOGD(
             "Encoded %u bytes to %u bytes (%f%%) in %f seconds",
@@ -53,10 +51,8 @@ namespace {
 
 } // namespace
 
-//==============================================================================
-bool Encoder::encode_string(
-    const std::string &decoded,
-    std::string &encoded) noexcept
+//==================================================================================================
+bool Encoder::encode_string(const std::string &decoded, std::string &encoded) noexcept
 {
     const auto start = std::chrono::system_clock::now();
     bool successful = false;
@@ -78,7 +74,7 @@ bool Encoder::encode_string(
     return successful;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Encoder::encode_file(
     const std::filesystem::path &decoded,
     const std::filesystem::path &encoded) noexcept
@@ -106,19 +102,15 @@ bool Encoder::encode_file(
     return successful;
 }
 
-//==============================================================================
-bool BinaryEncoder::encode_internal(
-    std::istream &decoded,
-    std::ostream &encoded) noexcept
+//==================================================================================================
+bool BinaryEncoder::encode_internal(std::istream &decoded, std::ostream &encoded) noexcept
 {
     BitStreamWriter stream(encoded);
     return encode_binary(decoded, stream);
 }
 
-//==============================================================================
-bool Decoder::decode_string(
-    const std::string &encoded,
-    std::string &decoded) noexcept
+//==================================================================================================
+bool Decoder::decode_string(const std::string &encoded, std::string &decoded) noexcept
 {
     const auto start = std::chrono::system_clock::now();
     bool successful = false;
@@ -140,7 +132,7 @@ bool Decoder::decode_string(
     return successful;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Decoder::decode_file(
     const std::filesystem::path &encoded,
     const std::filesystem::path &decoded) noexcept
@@ -168,10 +160,8 @@ bool Decoder::decode_file(
     return successful;
 }
 
-//==============================================================================
-bool BinaryDecoder::decode_internal(
-    std::istream &encoded,
-    std::ostream &decoded) noexcept
+//==================================================================================================
+bool BinaryDecoder::decode_internal(std::istream &encoded, std::ostream &decoded) noexcept
 {
     BitStreamReader stream(encoded);
     return decode_binary(stream, decoded);

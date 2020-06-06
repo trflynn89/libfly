@@ -15,9 +15,7 @@ void validate_fail(const std::string &test) noexcept(false)
     EXPECT_THROW({ actual = test; }, fly::JsonException);
 }
 
-void validate_pass(
-    const std::string &test,
-    const std::string &expected) noexcept(false)
+void validate_pass(const std::string &test, const std::string &expected) noexcept(false)
 {
     SCOPED_TRACE(test);
 
@@ -41,7 +39,7 @@ void validate_pass(const std::string &test) noexcept(false)
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, UnicodeConversion)
 {
     validate_fail("\\u");
@@ -80,7 +78,7 @@ TEST(JsonTest, UnicodeConversion)
     validate_pass("\\uDBFF\\uDFFF", u8"\U0010FFFF");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, MarkusKuhnStress)
 {
     // http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
@@ -480,7 +478,7 @@ TEST(JsonTest, MarkusKuhnStress)
     validate_pass("\xf2\xaf\xbf\xbf");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, MarkusKuhnExtended)
 {
     // Exceptions not caught by Markus Kuhn's stress test

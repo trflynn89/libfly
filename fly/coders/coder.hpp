@@ -33,8 +33,7 @@ public:
      *
      * @return True if the input string was successfully encoded.
      */
-    virtual bool
-    encode_string(const std::string &decoded, std::string &encoded) noexcept;
+    virtual bool encode_string(const std::string &decoded, std::string &encoded) noexcept;
 
     /**
      * Encode a file.
@@ -57,8 +56,7 @@ protected:
      *
      * @return True if the input stream was successfully encoded.
      */
-    virtual bool
-    encode_internal(std::istream &decoded, std::ostream &encoded) noexcept = 0;
+    virtual bool encode_internal(std::istream &decoded, std::ostream &encoded) noexcept = 0;
 };
 
 /**
@@ -71,8 +69,7 @@ protected:
 class BinaryEncoder : public Encoder
 {
 protected:
-    bool encode_internal(std::istream &decoded, std::ostream &encoded) noexcept
-        final;
+    bool encode_internal(std::istream &decoded, std::ostream &encoded) noexcept final;
 
     /**
      * Encode a stream.
@@ -82,8 +79,7 @@ protected:
      *
      * @return True if the input stream was successfully encoded.
      */
-    virtual bool
-    encode_binary(std::istream &decoded, BitStreamWriter &encoded) noexcept = 0;
+    virtual bool encode_binary(std::istream &decoded, BitStreamWriter &encoded) noexcept = 0;
 };
 
 /**
@@ -109,8 +105,7 @@ public:
      *
      * @return True if the input string was successfully decoded.
      */
-    bool
-    decode_string(const std::string &encoded, std::string &decoded) noexcept;
+    bool decode_string(const std::string &encoded, std::string &decoded) noexcept;
 
     /**
      * Decode a file.
@@ -133,8 +128,7 @@ protected:
      *
      * @return bool True if the input stream was successfully decoded.
      */
-    virtual bool
-    decode_internal(std::istream &encoded, std::ostream &decoded) noexcept = 0;
+    virtual bool decode_internal(std::istream &encoded, std::ostream &decoded) noexcept = 0;
 };
 
 /**
@@ -147,8 +141,7 @@ protected:
 class BinaryDecoder : public Decoder
 {
 protected:
-    bool decode_internal(std::istream &encoded, std::ostream &decoded) noexcept
-        final;
+    bool decode_internal(std::istream &encoded, std::ostream &decoded) noexcept final;
 
     /**
      * Decode a stream.
@@ -158,8 +151,7 @@ protected:
      *
      * @return True if the input stream was successfully decoded.
      */
-    virtual bool
-    decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept = 0;
+    virtual bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept = 0;
 };
 
 } // namespace fly

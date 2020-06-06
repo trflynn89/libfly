@@ -127,7 +127,7 @@ private:
     std::weak_ptr<ConfigManager> m_weak_config_manager;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename T>
 std::shared_ptr<T> ConfigManager::create_config() noexcept
 {

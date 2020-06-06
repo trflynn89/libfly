@@ -27,8 +27,7 @@ public:
      *
      * @param config Reference to Huffman configuration.
      */
-    explicit HuffmanEncoder(
-        const std::shared_ptr<HuffmanConfig> &config) noexcept;
+    explicit HuffmanEncoder(const std::shared_ptr<HuffmanConfig> &config) noexcept;
 
 protected:
     /**
@@ -91,8 +90,7 @@ protected:
      *
      * @return True if the input stream was successfully encoded.
      */
-    bool encode_binary(std::istream &decoded, BitStreamWriter &encoded) noexcept
-        override;
+    bool encode_binary(std::istream &decoded, BitStreamWriter &encoded) noexcept override;
 
 private:
     /**
@@ -163,8 +161,7 @@ private:
      * @param chunk_size The number of bytes the chunk buffer holds.
      * @param encoded Stream to store the encoded symbols.
      */
-    void
-    encode_symbols(std::uint32_t chunk_size, BitStreamWriter &encoded) noexcept;
+    void encode_symbols(std::uint32_t chunk_size, BitStreamWriter &encoded) noexcept;
 
     // Configuration.
     const std::uint32_t m_chunk_size;

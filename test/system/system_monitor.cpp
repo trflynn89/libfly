@@ -35,16 +35,14 @@ public:
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 class SystemMonitorTest : public ::testing::Test
 {
 public:
     SystemMonitorTest() noexcept :
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
 
-        m_task_runner(
-            m_task_manager
-                ->create_task_runner<fly::WaitableSequencedTaskRunner>()),
+        m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
         m_monitor(std::make_shared<fly::SystemMonitorImpl>(
             m_task_runner,
@@ -90,7 +88,7 @@ protected:
     std::atomic_bool m_keep_running;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(SystemMonitorTest, CpuUsage)
 {
     std::uint32_t count_before = m_monitor->get_system_cpu_count();
@@ -116,7 +114,7 @@ TEST_F(SystemMonitorTest, CpuUsage)
 
 #if defined(FLY_LINUX)
 
-//==============================================================================
+//==================================================================================================
 TEST_F(SystemMonitorTest, MockCpuUsage)
 {
     {
@@ -144,10 +142,8 @@ TEST_F(SystemMonitorTest, MockCpuUsage)
         double system_before = m_monitor->get_system_cpu_usage();
         double process_before = m_monitor->get_process_cpu_usage();
 
-        std::future<void> result = std::async(
-            std::launch::async,
-            &SystemMonitorTest::spin_thread,
-            this);
+        std::future<void> result =
+            std::async(std::launch::async, &SystemMonitorTest::spin_thread, this);
 
         m_task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
@@ -165,15 +161,14 @@ TEST_F(SystemMonitorTest, MockCpuUsage)
 
 #endif
 
-//==============================================================================
+//==================================================================================================
 TEST_F(SystemMonitorTest, MemoryUsage)
 {
     std::uint64_t total_before = m_monitor->get_total_system_memory();
     std::uint64_t system_before = m_monitor->get_system_memory_usage();
     std::uint64_t process_before = m_monitor->get_process_memory_usage();
 
-    auto size = static_cast<std::string::size_type>(
-        (total_before - system_before) / 10);
+    auto size = static_cast<std::string::size_type>((total_before - system_before) / 10);
 
     std::string consumed(size, '\0');
     m_task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
@@ -190,7 +185,7 @@ TEST_F(SystemMonitorTest, MemoryUsage)
 
 #if defined(FLY_LINUX)
 
-//==============================================================================
+//==================================================================================================
 TEST_F(SystemMonitorTest, MockMemoryUsage)
 {
     fly::MockSystem mock1(fly::MockCall::Sysinfo);
