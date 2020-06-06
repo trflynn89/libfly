@@ -253,7 +253,7 @@
     <ClCompile Include="..\..\..\fly\types\bit_stream\detail\bit_stream.cpp" />
     <ClCompile Include="..\..\..\fly\types\json\json.cpp" />
     <ClCompile Include="..\..\..\fly\types\json\json_exception.cpp" />
-    <ClInclude Include="..\..\..\fly\types\string\string_exception.cpp" />
+    <ClCompile Include="..\..\..\fly\types\string\string_exception.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

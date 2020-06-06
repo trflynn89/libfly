@@ -12,26 +12,7 @@
 #include <string>
 #include <vector>
 
-// #if defined(FLY_WINDOWS)
-// #    include <Windows.h>
-// #    define utf8(str) convert_to_utf8(L##str)
-// #else
-// #    define utf8(str) str
-// #endif
-
 namespace {
-
-// #if defined(FLY_WINDOWS)
-// const char *convert_to_utf8(const wchar_t *str)
-// {
-//     static char buff[1024];
-
-//     ::WideCharToMultiByte(CP_UTF8, 0, str, -1, buff, sizeof(buff), NULL,
-//     NULL);
-
-//     return buff;
-// }
-// #endif
 
 #define DECLARE_ALIASES                                                        \
     using string_type [[maybe_unused]] =                                       \

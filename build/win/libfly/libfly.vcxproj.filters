@@ -369,8 +369,8 @@
     <ClCompile Include="..\..\..\fly\types\json\json_exception.cpp">
       <Filter>types\json</Filter>
     </ClCompile>
-    <ClInclude Include="..\..\..\fly\types\string\string_exception.cpp">
+    <ClCompile Include="..\..\..\fly\types\string\string_exception.cpp">
       <Filter>types\string</Filter>
-    </ClInclude>
+    </ClCompile>
   </ItemGroup>
 </Project>

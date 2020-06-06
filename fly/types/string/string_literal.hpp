@@ -10,7 +10,7 @@
  * @version March 23, 2019
  */
 #define FLY_STR(type, str)                                                     \
-    (fly::BasicStringLiteral<type>::literal(str, L##str, u##str, U##str))
+    (fly::BasicStringLiteral<type>::literal(u8##str, L##str, u##str, U##str))
 
 #define FLY_SYS_STR(str) FLY_STR(std::filesystem::path::value_type, str)
 
