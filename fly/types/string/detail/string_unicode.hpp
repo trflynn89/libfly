@@ -3,6 +3,7 @@
 #include "fly/types/string/detail/string_formatter.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/string_exception.hpp"
+#include "fly/types/string/string_literal.hpp"
 
 #include <string>
 
@@ -32,18 +33,20 @@ class BasicStringUnicode
 
 public:
     /**
-     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
-     * surrogate encodings.
+     * Parse an escaped sequence of unicode characters. Accepts the following unicode encodings:
      *
-     * Input sequences must be of the form: (\u[0-9a-fA-F]{4}){1,2}
+     *     UTF-8 encodings of the form: \unnnn
+     *     UTF-16 paried surrogate encodings of the form: \unnnn\unnnn
+     *     UTF-32 encodings of the form: \Unnnnnnnn
+     *
+     * Where each character n is a hexadecimal digit.
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
      * @return The parsed unicode character.
      *
-     * @throws UnicodeException If the interpreted unicode character is not valid or there weren't
-     *         enough available bytes.
+     * @throws UnicodeException If the escaped sequence is not a valid unicode character.
      */
     static StringType parse_character(
         typename StringType::const_iterator &it,
@@ -51,16 +54,47 @@ public:
 
 private:
     /**
+     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
+     * surrogate encodings.
+     *
+     * @param it Pointer to the beginning of the escaped character sequence.
+     * @param end Pointer to the end of the escaped character sequence.
+     *
+     * @return The parsed unicode character.
+     *
+     * @throws UnicodeException If the escaped sequence is not a valid unicode character.
+     */
+    static StringType parse_utf8_or_utf16(
+        typename StringType::const_iterator &it,
+        const typename StringType::const_iterator &end) noexcept(false);
+
+    /**
+     * Parse an escaped sequence of unicode characters. Accepts UTF-32 encodings.
+     *
+     * @param it Pointer to the beginning of the escaped character sequence.
+     * @param end Pointer to the end of the escaped character sequence.
+     *
+     * @return The parsed unicode character.
+     *
+     * @throws UnicodeException If the escaped sequence is not a valid unicode character.
+     */
+    static StringType parse_utf32(
+        typename StringType::const_iterator &it,
+        const typename StringType::const_iterator &end) noexcept(false);
+
+    /**
      * Parse a single escaped unicode character. Convert the character to a 32-bit codepoint.
+     *
+     * @tparam UnicodePrefix The escaped unicode prefix character ('u' or 'U').
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
      * @return The parsed unicode codepoint.
      *
-     * @throws UnicodeException If the interpreted unicode character is not valid or there weren't
-     *         enough available bytes.
+     * @throws UnicodeException If the escaped sequence is not a valid unicode character.
      */
+    template <char_type UnicodePrefix>
     static codepoint_type parse_codepoint(
         typename StringType::const_iterator &it,
         const typename StringType::const_iterator &end) noexcept(false);
@@ -73,11 +107,49 @@ private:
      * @return The converted unicode character.
      */
     static StringType convert_codepoint(codepoint_type codepoint) noexcept;
+
+    static constexpr char_type utf8 = FLY_CHR(char_type, 'u');
+    static constexpr char_type utf32 = FLY_CHR(char_type, 'U');
+
+    static constexpr char_type ch_0 = FLY_CHR(char_type, '0');
+    static constexpr char_type ch_9 = FLY_CHR(char_type, '9');
+    static constexpr char_type ch_a = FLY_CHR(char_type, 'a');
+    static constexpr char_type ch_A = FLY_CHR(char_type, 'A');
+    static constexpr char_type ch_f = FLY_CHR(char_type, 'f');
+    static constexpr char_type ch_F = FLY_CHR(char_type, 'F');
 };
 
 //==================================================================================================
 template <typename StringType>
 StringType BasicStringUnicode<StringType>::parse_character(
+    typename StringType::const_iterator &it,
+    const typename StringType::const_iterator &end) noexcept(false)
+{
+    auto begins_with = [&it, &end](const char_type ch) -> bool {
+        if ((it == end) || ((it + 1) == end))
+        {
+            return false;
+        }
+
+        return (*it == '\\') && (*(it + 1) == ch);
+    };
+
+    if (begins_with(utf8))
+    {
+        return parse_utf8_or_utf16(it, end);
+    }
+    else if (begins_with(utf32))
+    {
+        return parse_utf32(it, end);
+    }
+
+    throw UnicodeException(
+        StringFormatter::format("Escaped unicode must begin with \\%c or \\%c", utf8, utf32));
+}
+
+//==================================================================================================
+template <typename StringType>
+StringType BasicStringUnicode<StringType>::parse_utf8_or_utf16(
     typename StringType::const_iterator &it,
     const typename StringType::const_iterator &end) noexcept(false)
 {
@@ -88,12 +160,12 @@ StringType BasicStringUnicode<StringType>::parse_character(
         return (c >= low_surrogate_min) && (c <= low_surrogate_max);
     };
 
-    const codepoint_type high_surrogate = parse_codepoint(it, end);
+    const codepoint_type high_surrogate = parse_codepoint<utf8>(it, end);
     codepoint_type codepoint = high_surrogate;
 
     if (is_high_surrogate(high_surrogate))
     {
-        const codepoint_type low_surrogate = parse_codepoint(it, end);
+        const codepoint_type low_surrogate = parse_codepoint<utf8>(it, end);
 
         if (is_low_surrogate(low_surrogate))
         {
@@ -124,34 +196,50 @@ StringType BasicStringUnicode<StringType>::parse_character(
 
 //==================================================================================================
 template <typename StringType>
+StringType BasicStringUnicode<StringType>::parse_utf32(
+    typename StringType::const_iterator &it,
+    const typename StringType::const_iterator &end) noexcept(false)
+{
+    const codepoint_type codepoint = parse_codepoint<utf32>(it, end);
+    return convert_codepoint(codepoint);
+}
+
+//==================================================================================================
+template <typename StringType>
+template <typename BasicStringUnicode<StringType>::char_type UnicodePrefix>
 auto BasicStringUnicode<StringType>::parse_codepoint(
     typename StringType::const_iterator &it,
     const typename StringType::const_iterator &end) noexcept(false) -> codepoint_type
 {
-    if ((it == end) || (*it != '\\') || (++it == end) || (*it != 'u'))
+    static_assert((UnicodePrefix == utf8) || (UnicodePrefix == utf32));
+
+    if ((it == end) || (*it != '\\') || (++it == end) || (*it != UnicodePrefix))
     {
-        throw UnicodeException("Expected codepoint to begin with \\u");
+        throw UnicodeException(
+            StringFormatter::format("Expected codepoint to begin with \\%c", UnicodePrefix));
     }
 
     codepoint_type codepoint = 0;
-    codepoint_type i = 0;
     ++it;
 
-    for (i = 0; (i < 4) && (it != end); ++i, ++it)
-    {
-        const codepoint_type shift = (4 * (3 - i));
+    static constexpr const codepoint_type expected_digits = (UnicodePrefix == utf8) ? 4 : 8;
+    codepoint_type i = 0;
 
-        if ((*it >= '0') && (*it <= '9'))
+    for (i = 0; (i < expected_digits) && (it != end); ++i, ++it)
+    {
+        const codepoint_type shift = (4 * (expected_digits - i - 1));
+
+        if ((*it >= ch_0) && (*it <= ch_9))
         {
-            codepoint += static_cast<codepoint_type>((*it - 0x30) << shift);
+            codepoint += static_cast<codepoint_type>(*it - 0x30) << shift;
         }
-        else if ((*it >= 'A') && (*it <= 'F'))
+        else if ((*it >= ch_A) && (*it <= ch_F))
         {
-            codepoint += static_cast<codepoint_type>((*it - 0x37) << shift);
+            codepoint += static_cast<codepoint_type>(*it - 0x37) << shift;
         }
-        else if ((*it >= 'a') && (*it <= 'f'))
+        else if ((*it >= ch_a) && (*it <= ch_f))
         {
-            codepoint += static_cast<codepoint_type>((*it - 0x57) << shift);
+            codepoint += static_cast<codepoint_type>(*it - 0x57) << shift;
         }
         else
         {
@@ -161,10 +249,13 @@ auto BasicStringUnicode<StringType>::parse_codepoint(
         }
     }
 
-    if (i != 4)
+    if (i != expected_digits)
     {
-        throw UnicodeException(
-            StringFormatter::format("Expected exactly 4 hexadecimals after \\u, only found %u", i));
+        throw UnicodeException(StringFormatter::format(
+            "Expected exactly %u hexadecimals after \\%c, only found %u",
+            expected_digits,
+            UnicodePrefix,
+            i));
     }
 
     return codepoint;
@@ -176,47 +267,49 @@ StringType BasicStringUnicode<StringType>::convert_codepoint(codepoint_type code
 {
     StringType result;
 
+    static_assert((sizeof(char_type) == 1) || (sizeof(char_type) == 2) || (sizeof(char_type) == 4));
+
     if constexpr (sizeof(char_type) == 1)
     {
         if (codepoint < 0x80)
         {
-            result += char_type(codepoint);
+            result += static_cast<char_type>(codepoint);
         }
         else if (codepoint < 0x800)
         {
-            result += char_type(0xc0 | (codepoint >> 6));
-            result += char_type(0x80 | (codepoint & 0x3f));
+            result += static_cast<char_type>(0xc0 | (codepoint >> 6));
+            result += static_cast<char_type>(0x80 | (codepoint & 0x3f));
         }
         else if (codepoint < 0x10000)
         {
-            result += char_type(0xe0 | (codepoint >> 12));
-            result += char_type(0x80 | ((codepoint >> 6) & 0x3f));
-            result += char_type(0x80 | (codepoint & 0x3f));
+            result += static_cast<char_type>(0xe0 | (codepoint >> 12));
+            result += static_cast<char_type>(0x80 | ((codepoint >> 6) & 0x3f));
+            result += static_cast<char_type>(0x80 | (codepoint & 0x3f));
         }
         else
         {
-            result += char_type(0xf0 | (codepoint >> 18));
-            result += char_type(0x80 | ((codepoint >> 12) & 0x3f));
-            result += char_type(0x80 | ((codepoint >> 6) & 0x3f));
-            result += char_type(0x80 | (codepoint & 0x3f));
+            result += static_cast<char_type>(0xf0 | (codepoint >> 18));
+            result += static_cast<char_type>(0x80 | ((codepoint >> 12) & 0x3f));
+            result += static_cast<char_type>(0x80 | ((codepoint >> 6) & 0x3f));
+            result += static_cast<char_type>(0x80 | (codepoint & 0x3f));
         }
     }
     else if constexpr (sizeof(char_type) == 2)
     {
         if (codepoint < 0x10000)
         {
-            result += char_type(codepoint);
+            result += static_cast<char_type>(codepoint);
         }
         else
         {
             codepoint -= 0x10000;
-            result += char_type(high_surrogate_min | (codepoint >> 10));
-            result += char_type(low_surrogate_min | (codepoint & 0x3ff));
+            result += static_cast<char_type>(high_surrogate_min | (codepoint >> 10));
+            result += static_cast<char_type>(low_surrogate_min | (codepoint & 0x3ff));
         }
     }
-    else if constexpr (sizeof(char_type) == 4)
+    else
     {
-        result += char_type(codepoint);
+        result += static_cast<char_type>(codepoint);
     }
 
     return result;

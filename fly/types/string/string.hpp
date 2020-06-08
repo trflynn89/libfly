@@ -159,17 +159,19 @@ public:
     static bool wildcard_match(const StringType &source, const StringType &search) noexcept;
 
     /**
-     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
-     * surrogate encodings.
+     * Parse an escaped sequence of unicode characters. Accepts the following unicode encodings:
      *
-     * Input sequences must be of the form: (\u[0-9a-fA-F]{4}){1,2}
+     *     UTF-8 encodings of the form: \unnnn
+     *     UTF-16 paried surrogate encodings of the form: \unnnn\unnnn
+     *     UTF-32 encodings of the form: \Unnnnnnnn
+     *
+     * Where each character n is a hexadecimal digit.
      *
      * @param source The string containing the escaped character sequence.
      *
      * @return The parsed unicode character.
      *
-     * @throws UnicodeException If the interpreted unicode character is not valid or there weren't
-     *         enough available bytes.
+     * @throws UnicodeException If the escaped sequence is not a valid unicode character.
      */
     static StringType parse_unicode_character(const StringType &source) noexcept(false);
 
