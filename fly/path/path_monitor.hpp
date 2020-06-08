@@ -17,10 +17,9 @@ class PathMonitorTask;
 class SequencedTaskRunner;
 
 /**
- * Virtual interface to monitor a local path. Provides monitoring of either all
- * files or user-specified files under a path for addition, deletion, or change.
- * This interface is platform independent - OS dependent implementations should
- * inherit from this class.
+ * Virtual interface to monitor a local path. Provides monitoring of either all files or
+ * user-specified files under a path for addition, deletion, or change. This interface is platform
+ * independent - OS dependent implementations should inherit from this class.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version May 14, 2017
@@ -44,8 +43,7 @@ public:
     /**
      * Callback definition for function to be triggered on a path change.
      */
-    using PathEventCallback =
-        std::function<void(const std::filesystem::path &, PathEvent)>;
+    using PathEventCallback = std::function<void(const std::filesystem::path &, PathEvent)>;
 
     /**
      * Constructor.
@@ -70,17 +68,15 @@ public:
     bool start() noexcept;
 
     /**
-     * Monitor for changes to all files under a directory. Callbacks registered
-     * with AddFile take precendence over callbacks registered with AddPath.
+     * Monitor for changes to all files under a directory. Callbacks registered with AddFile take
+     * precendence over callbacks registered with AddPath.
      *
      * @param path Path to the directory to start monitoring.
      * @param callback Callback to trigger when a file changes.
      *
      * @return True if the directory could be added.
      */
-    bool add_path(
-        const std::filesystem::path &path,
-        PathEventCallback callback) noexcept;
+    bool add_path(const std::filesystem::path &path, PathEventCallback callback) noexcept;
 
     /**
      * Stop monitoring for changes to all files under a directory.
@@ -97,22 +93,20 @@ public:
     void remove_all_paths() noexcept;
 
     /**
-     * Monitor for changes to a single file. Callbacks registered with AddFile
-     * take precendence over callbacks registered with AddPath.
+     * Monitor for changes to a single file. Callbacks registered with AddFile take precendence over
+     * callbacks registered with AddPath.
      *
      * @param file Path to the file to start monitoring.
      * @param callback Callback to trigger when the file changes.
      *
      * @return True if the file could be added.
      */
-    bool add_file(
-        const std::filesystem::path &file,
-        PathEventCallback callback) noexcept;
+    bool add_file(const std::filesystem::path &file, PathEventCallback callback) noexcept;
 
     /**
-     * Stop monitoring for changes to a single file. If there are no more files
-     * monitored in the file's directory, and there is no callback registered
-     * for that directory, the directory itself is removed from the monitor.
+     * Stop monitoring for changes to a single file. If there are no more files monitored in the
+     * file's directory, and there is no callback registered for that directory, the directory
+     * itself is removed from the monitor.
      *
      * @param file Path to the file to stop monitoring.
      *
@@ -122,9 +116,8 @@ public:
 
 protected:
     /**
-     * Struct to store information about a monitored path. OS dependent
-     * implementations of PathMonitor should also have a concrete defintion
-     * of this struct.
+     * Struct to store information about a monitored path. OS dependent implementations of
+     * PathMonitor should also have a concrete defintion of this struct.
      */
     struct PathInfo
     {
@@ -147,8 +140,7 @@ protected:
     /**
      * Map of monitored paths to their path information.
      */
-    using PathInfoMap =
-        std::map<std::filesystem::path, std::unique_ptr<PathInfo>>;
+    using PathInfoMap = std::map<std::filesystem::path, std::unique_ptr<PathInfo>>;
 
     /**
      * Create an instance of the OS dependent PathInfo struct.
@@ -168,8 +160,7 @@ protected:
     virtual bool is_valid() const noexcept = 0;
 
     /**
-     * Check the path monitor implementation for any changes to the monitored
-     * paths.
+     * Check the path monitor implementation for any changes to the monitored paths.
      *
      * @param timeout Max time allow for an event to be occur.
      */
@@ -180,21 +171,19 @@ protected:
 
 private:
     /**
-     * Search for a path to be monitored in the PathInfo map. If the map does
-     * not contain the path, create an entry.
+     * Search for a path to be monitored in the PathInfo map. If the map does not contain the path,
+     * create an entry.
      *
      * @param path The path to be monitored.
      *
      * @return Shared pointer to the PathInfo struct.
      */
-    PathInfo *
-    get_or_create_path_info(const std::filesystem::path &path) noexcept;
+    PathInfo *get_or_create_path_info(const std::filesystem::path &path) noexcept;
 
     /**
      * Stream the name of a PathEvent instance.
      */
-    friend std::ostream &
-    operator<<(std::ostream &stream, PathEvent event) noexcept;
+    friend std::ostream &operator<<(std::ostream &stream, PathEvent event) noexcept;
 
     std::shared_ptr<SequencedTaskRunner> m_task_runner;
     std::shared_ptr<Task> m_task;
@@ -211,14 +200,12 @@ private:
 class PathMonitorTask : public Task
 {
 public:
-    explicit PathMonitorTask(
-        std::weak_ptr<PathMonitor> weak_path_monitor) noexcept;
+    explicit PathMonitorTask(std::weak_ptr<PathMonitor> weak_path_monitor) noexcept;
 
 protected:
     /**
-     * Call back into the path monitor to check for any changes to the monitored
-     * paths. If the path monitor implementation is still valid, the task
-     * re-arms itself.
+     * Call back into the path monitor to check for any changes to the monitored paths. If the path
+     * monitor implementation is still valid, the task re-arms itself.
      */
     void run() noexcept override;
 

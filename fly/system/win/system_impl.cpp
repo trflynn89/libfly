@@ -8,7 +8,7 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 void SystemImpl::print_backtrace() noexcept
 {
     void *trace[10];
@@ -20,7 +20,7 @@ void SystemImpl::print_backtrace() noexcept
     }
 }
 
-//==============================================================================
+//==================================================================================================
 std::string SystemImpl::local_time(const char *fmt) noexcept
 {
     auto sys = std::chrono::system_clock::now();
@@ -42,13 +42,13 @@ std::string SystemImpl::local_time(const char *fmt) noexcept
     return result;
 }
 
-//==============================================================================
+//==================================================================================================
 int SystemImpl::get_error_code() noexcept
 {
     return ::GetLastError();
 }
 
-//==============================================================================
+//==================================================================================================
 std::vector<int> SystemImpl::get_signals() noexcept
 {
     return {SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV};

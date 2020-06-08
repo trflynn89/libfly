@@ -9,7 +9,7 @@
 #include <future>
 #include <vector>
 
-//==============================================================================
+//==================================================================================================
 class ConcurrencyTest : public ::testing::Test
 {
 public:
@@ -29,9 +29,8 @@ public:
         return writes;
     }
 
-    unsigned int reader_thread(
-        ObjectQueue &object_queue,
-        std::atomic_bool &finished_writes) noexcept
+    unsigned int
+    reader_thread(ObjectQueue &object_queue, std::atomic_bool &finished_writes) noexcept
     {
         unsigned int reads = 0;
 
@@ -57,8 +56,7 @@ public:
     }
 
 protected:
-    void
-    run_multi_threaded_test(unsigned int writers, unsigned int readers) noexcept
+    void run_multi_threaded_test(unsigned int writers, unsigned int readers) noexcept
     {
         ObjectQueue object_queue;
 
@@ -69,10 +67,7 @@ protected:
 
         for (unsigned int i = 0; i < writers; ++i)
         {
-            auto func = std::bind(
-                &ConcurrencyTest::writer_thread,
-                this,
-                std::ref(object_queue));
+            auto func = std::bind(&ConcurrencyTest::writer_thread, this, std::ref(object_queue));
             writer_futures.push_back(std::async(std::launch::async, func));
         }
 
@@ -130,7 +125,7 @@ protected:
     }
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConcurrencyTest, EmptyQueueUponCreation)
 {
     ObjectQueue object_queue;
@@ -139,7 +134,7 @@ TEST_F(ConcurrencyTest, EmptyQueueUponCreation)
     ASSERT_EQ(object_queue.size(), 0);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConcurrencyTest, PopFromEmptyQueue)
 {
     ObjectQueue object_queue;
@@ -147,18 +142,18 @@ TEST_F(ConcurrencyTest, PopFromEmptyQueue)
     Object obj1;
     Object obj2(1_u32);
 
-    // Make sure pop is initially invalid
+    // Make sure pop is initially invalid.
     ASSERT_FALSE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 
-    // Push an item onto the queue and immediately pop it
+    // Push an item onto the queue and immediately pop it.
     object_queue.push(std::move(obj2));
     ASSERT_TRUE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 
-    // Make sure popping an item from the no-longer non-empty queue is invalid
+    // Make sure popping an item from the no-longer non-empty queue is invalid.
     ASSERT_FALSE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConcurrencyTest, SingleThreaded)
 {
     ObjectQueue object_queue;
@@ -178,7 +173,7 @@ TEST_F(ConcurrencyTest, SingleThreaded)
     do_queue_pop(object_queue, obj3, --size);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConcurrencyTest, MultiThreaded)
 {
     run_multi_threaded_test(1, 1);
@@ -187,16 +182,14 @@ TEST_F(ConcurrencyTest, MultiThreaded)
     run_multi_threaded_test(100, 100);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConcurrencyTest, InfiniteWaitReader)
 {
     ObjectQueue object_queue;
     Object obj(123_u32);
 
-    auto func = std::bind(
-        &ConcurrencyTest::infinite_wait_reader_thread,
-        this,
-        std::ref(object_queue));
+    auto func =
+        std::bind(&ConcurrencyTest::infinite_wait_reader_thread, this, std::ref(object_queue));
     std::future<Object> future = std::async(std::launch::async, func);
 
     std::future_status status = future.wait_for(std::chrono::milliseconds(10));

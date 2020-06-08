@@ -30,10 +30,7 @@ public:
      * @param column Column number in line where error was encountered.
      * @param message Message indicating what error was encountered.
      */
-    ParserException(
-        std::uint32_t line,
-        std::uint32_t column,
-        const std::string &message) noexcept;
+    ParserException(std::uint32_t line, std::uint32_t column, const std::string &message) noexcept;
 
     /**
      * @return A C-string representing this exception.
@@ -60,10 +57,7 @@ public:
      * @param column Column number in line where error was encountered.
      * @param ch Unexpected character code.
      */
-    UnexpectedCharacterException(
-        std::uint32_t line,
-        std::uint32_t column,
-        int ch) noexcept;
+    UnexpectedCharacterException(std::uint32_t line, std::uint32_t column, int ch) noexcept;
 };
 
 /**

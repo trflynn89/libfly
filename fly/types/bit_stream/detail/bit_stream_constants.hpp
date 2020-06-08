@@ -18,12 +18,9 @@ constexpr const byte_type s_remainder_shift = 0x00;
 constexpr const byte_type s_byte_type_size = sizeof(byte_type);
 constexpr const byte_type s_buffer_type_size = sizeof(buffer_type);
 
-constexpr const byte_type s_bits_per_word =
-    std::numeric_limits<word_type>::digits;
-constexpr const byte_type s_bits_per_byte =
-    std::numeric_limits<byte_type>::digits;
+constexpr const byte_type s_bits_per_word = std::numeric_limits<word_type>::digits;
+constexpr const byte_type s_bits_per_byte = std::numeric_limits<byte_type>::digits;
 
-constexpr const byte_type s_most_significant_bit_position =
-    s_buffer_type_size * s_bits_per_byte;
+constexpr const byte_type s_most_significant_bit_position = s_buffer_type_size * s_bits_per_byte;
 
 } // namespace fly::detail

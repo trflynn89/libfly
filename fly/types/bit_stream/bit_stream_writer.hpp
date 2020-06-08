@@ -12,10 +12,9 @@ namespace fly {
 /**
  * Implementation of the BitStream interface for writing to a binary stream.
  *
- * Bits are written to an in-memory byte buffer until that buffer is full, at
- * which point that buffer is flushed to the stream. When done writing, callers
- * should invoke the finish() method to flush the BitStream header and any bytes
- * remaining in the buffer.
+ * Bits are written to an in-memory byte buffer until that buffer is full, at which point that
+ * buffer is flushed to the stream. When done writing, callers should invoke the finish() method to
+ * flush the BitStream header and any bytes remaining in the buffer.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
@@ -49,9 +48,8 @@ public:
     void write_byte(byte_type byte) noexcept;
 
     /**
-     * Write a number of bits to the byte buffer. The least-significant bits in
-     * the provided data type will be written, starting from the position
-     * pointed to by the provided number of bits.
+     * Write a number of bits to the byte buffer. The least-significant bits in the provided data
+     * type will be written, starting from the position pointed to by the provided number of bits.
      *
      * Flush the buffer to the stream if it is filled during this operation.
      *
@@ -64,8 +62,7 @@ public:
     void write_bits(DataType bits, byte_type size) noexcept;
 
     /**
-     * If needed, zero-fill the byte buffer, flush it to the stream, and update
-     * the header byte.
+     * If needed, zero-fill the byte buffer, flush it to the stream, and update the header byte.
      *
      * @return True if the stream remains in a good state.
      */
@@ -98,7 +95,7 @@ private:
     std::ostream &m_stream;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename DataType>
 void BitStreamWriter::write_bits(DataType bits, byte_type size) noexcept
 {
@@ -106,19 +103,18 @@ void BitStreamWriter::write_bits(DataType bits, byte_type size) noexcept
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    // If there are more bits to write than are available in the byte buffer,
-    // break the bits into two chunks.
+    // If there are more bits to write than are available in the byte buffer, break the bits into
+    // two chunks.
     if (size > m_position)
     {
         const byte_type rshift = size - m_position;
 
-        // Fill the remainder of the byte buffer with as many bits as are
-        // available, and flush it onto the stream.
+        // Fill the remainder of the byte buffer with as many bits as are available, and flush it
+        // onto the stream.
         m_buffer |= static_cast<buffer_type>(bits) >> rshift;
         flush_buffer();
 
-        // Then update the input bits to retain only those bits that have not
-        // been written yet.
+        // Then update the input bits to retain only those bits that have not been written yet.
         bits &= bit_mask<DataType>(rshift);
         size = rshift;
     }
@@ -129,7 +125,7 @@ void BitStreamWriter::write_bits(DataType bits, byte_type size) noexcept
     m_position = lshift;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename DataType>
 void BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
 {
@@ -137,11 +133,14 @@ void BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    const DataType data = endian_swap<Endian::Big>(buffer);
+    if (m_stream)
+    {
+        const DataType data = endian_swap<Endian::Big>(buffer);
 
-    m_stream.write(
-        reinterpret_cast<const std::ios::char_type *>(&data),
-        static_cast<std::streamsize>(bytes));
+        m_stream_buffer->sputn(
+            reinterpret_cast<const std::ios::char_type *>(&data),
+            static_cast<std::streamsize>(bytes));
+    }
 }
 
 } // namespace fly

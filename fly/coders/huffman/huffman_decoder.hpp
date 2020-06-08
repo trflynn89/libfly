@@ -29,10 +29,9 @@ protected:
     /**
      * Huffman decode a stream.
      *
-     * Because large input streams are encoded in chunks, they must also be
-     * decoded in chunks. The input stream is decoded until either the end of
-     * the stream or the chunk size is reached. The decoding sequence is then
-     * repeated for each chunk.
+     * Because large input streams are encoded in chunks, they must also be decoded in chunks. The
+     * input stream is decoded until either the end of the stream or the chunk size is reached. The
+     * decoding sequence is then repeated for each chunk.
      *
      * The sequence to decode a stream is:
      *
@@ -40,34 +39,30 @@ protected:
      *     2. Convert the canonical codes to a prefix table.
      *     3. Decode the input stream using the table.
      *
-     * Prefix tables (step 2) function via the property that no Huffman code is
-     * a prefix of any other code. Thus, a table can be formed as an array,
-     * whose indices are integers where the most-significant bits are Huffman
-     * codes.
+     * Prefix tables (step 2) function via the property that no Huffman code is a prefix of any
+     * other code. Thus, a table can be formed as an array, whose indices are integers where the
+     * most-significant bits are Huffman codes.
      *
-     * Decoding a symbol from the input stream (step 3) consists of peeking N
-     * bits from the input stream, where N is maximum length of the decoded
-     * Huffman codes. These bits are the index into the prefix table; a single
-     * lookup is performed to find the corresponding Huffman code. The actual
-     * length of the code is then discarded from the input stream.
+     * Decoding a symbol from the input stream (step 3) consists of peeking N bits from the input
+     * stream, where N is maximum length of the decoded Huffman codes. These bits are the index into
+     * the prefix table; a single lookup is performed to find the corresponding Huffman code. The
+     * actual length of the code is then discarded from the input stream.
      *
      * @param encoded Stream holding the contents to decode.
      * @param decoded Stream to store the decoded contents.
      *
      * @return True if the input stream was successfully decoded.
      */
-    bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept
-        override;
+    bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept override;
 
 private:
     /**
-     * Decode the version of the encoder used to encode the stream, and invoke
-     * the header decoder associated with that version.
+     * Decode the version of the encoder used to encode the stream, and invoke the header decoder
+     * associated with that version.
      *
      * @param encoded Stream storing the encoded header.
      * @param chunk_size Location to store the maximum chunk size (in bytes).
-     * @param max_code_length Location to store the global maximum Huffman code
-     *        length.
+     * @param max_code_length Location to store the global maximum Huffman code length.
      *
      * @return True if the header was successfully decoded.
      */
@@ -77,13 +72,12 @@ private:
         length_type &max_code_length) const noexcept;
 
     /**
-     * Decode version 1 of the header. Extract the maximum chunk length and the
-     * global maximum Huffman code length the encoder used.
+     * Decode version 1 of the header. Extract the maximum chunk length and the global maximum
+     * Huffman code length the encoder used.
      *
      * @param encoded Stream storing the encoded header.
      * @param chunk_size Location to store the maximum chunk size (in bytes).
-     * @param max_code_length Location to store the global maximum Huffman code
-     *        length.
+     * @param max_code_length Location to store the global maximum Huffman code length.
      *
      * @return True if the header was successfully encoded.
      */
@@ -93,13 +87,12 @@ private:
         length_type &max_code_length) const noexcept;
 
     /**
-     * Decode Huffman codes from an encoded input stream. The list of codes will
-     * be stored as a prefix table.
+     * Decode Huffman codes from an encoded input stream. The list of codes will be stored as a
+     * prefix table.
      *
      * @param encoded Stream storing the encoded codes.
      * @param global_max_code_length The global maximum Huffman code length.
-     * @param local_max_code_length Location to store the local maximum Huffman
-     *        code length.
+     * @param local_max_code_length Location to store the local maximum Huffman code length.
      *
      * @return True if the Huffman codes were successfully decoded.
      */
@@ -116,10 +109,9 @@ private:
     void convert_to_prefix_table(length_type max_code_length) noexcept;
 
     /**
-     * Decode symbols from an encoded input stream with a Huffman tree. Store
-     * decoded data into a chunk buffer until the decoded chunk size is reached,
-     * or the end of the encoded input stream is reached. Then flush those bytes
-     * to the real output stream.
+     * Decode symbols from an encoded input stream with a Huffman tree. Store decoded data into a
+     * chunk buffer until the decoded chunk size is reached, or the end of the encoded input stream
+     * is reached. Then flush those bytes to the real output stream.
      *
      * @param encoded Stream holding the symbols to decode.
      * @param max_code_length The maximum length of the decoded Huffman codes.
@@ -140,8 +132,8 @@ private:
     std::array<HuffmanCode, 1 << 8> m_huffman_codes;
     std::uint16_t m_huffman_codes_size;
 
-    // Will be sized to fit the global maximum Huffman code length used by the
-    // encoder. The size will be 2^L, were L is the maximum code length.
+    // Will be sized to fit the global maximum Huffman code length used by the encoder. The size
+    // will be 2^L, were L is the maximum code length.
     std::unique_ptr<HuffmanCode[]> m_prefix_table;
 
     // Friend class for unit testing.

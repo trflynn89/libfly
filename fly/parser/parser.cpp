@@ -5,7 +5,7 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 Json Parser::parse_string(const std::string &contents) noexcept(false)
 {
     std::istringstream stream(contents);
@@ -17,7 +17,7 @@ Json Parser::parse_string(const std::string &contents) noexcept(false)
     return parse_internal(stream);
 }
 
-//==============================================================================
+//==================================================================================================
 Json Parser::parse_file(const std::filesystem::path &path) noexcept(false)
 {
     std::ifstream stream(path);
@@ -29,7 +29,7 @@ Json Parser::parse_file(const std::filesystem::path &path) noexcept(false)
     return parse_internal(stream);
 }
 
-//==============================================================================
+//==================================================================================================
 void Parser::consume_byte_order_mark(std::istream &stream) const noexcept
 {
     if (stream && (stream.peek() != EOF))

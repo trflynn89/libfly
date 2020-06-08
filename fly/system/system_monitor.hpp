@@ -14,9 +14,8 @@ class SystemConfig;
 class SystemMonitorTask;
 
 /**
- * Virtual interface for monitoring system-level resources. Provides CPU and
- * memory monitoring. This interface is platform independent - OS dependent
- * implementations should inherit from this class.
+ * Virtual interface for monitoring system-level resources. Provides CPU and memory monitoring. This
+ * interface is platform independent - OS dependent implementations should inherit from this class.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version September 15, 2017
@@ -152,14 +151,12 @@ private:
 class SystemMonitorTask : public Task
 {
 public:
-    explicit SystemMonitorTask(
-        std::weak_ptr<SystemMonitor> weak_system_monitor) noexcept;
+    explicit SystemMonitorTask(std::weak_ptr<SystemMonitor> weak_system_monitor) noexcept;
 
 protected:
     /**
-     * Call back into the system monitor to update system-level resources. If
-     * the system monitor implementation is still valid, the task re-arms
-     * itself.
+     * Call back into the system monitor to update system-level resources. If the system monitor
+     * implementation is still valid, the task re-arms itself.
      */
     void run() noexcept override;
 

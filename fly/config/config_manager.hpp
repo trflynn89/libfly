@@ -63,8 +63,7 @@ public:
     ~ConfigManager();
 
     /**
-     * Create a configuration object, or if one with the given type's name
-     * exists, fetch it.
+     * Create a configuration object, or if one with the given type's name exists, fetch it.
      *
      * @tparam T Config type (must derive from or be fly::Config).
      *
@@ -127,7 +126,7 @@ private:
     std::weak_ptr<ConfigManager> m_weak_config_manager;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename T>
 std::shared_ptr<T> ConfigManager::create_config() noexcept
 {

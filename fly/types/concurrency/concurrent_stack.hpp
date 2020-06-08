@@ -20,14 +20,14 @@ protected:
     void pop_internal(T &) noexcept override;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename T>
 void ConcurrentStack<T>::push_internal(T &&item) noexcept
 {
     this->m_container.push(std::move(item));
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename T>
 void ConcurrentStack<T>::pop_internal(T &item) noexcept
 {

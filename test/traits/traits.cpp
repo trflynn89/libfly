@@ -7,20 +7,19 @@
 
 namespace {
 
-//==========================================================================
+//==================================================================================================
 template <typename T>
-using OstreamDeclaration =
-    decltype(std::declval<std::ostream &>() << std::declval<T>());
+using OstreamDeclaration = decltype(std::declval<std::ostream &>() << std::declval<T>());
 
 using OstreamTraits = fly::DeclarationTraits<OstreamDeclaration>;
 
-//==========================================================================
+//==================================================================================================
 template <typename T>
 using FooDeclaration = decltype(std::declval<T>().foo());
 
 using FooTraits = fly::DeclarationTraits<FooDeclaration>;
 
-//==========================================================================
+//==================================================================================================
 class FooClass
 {
 public:
@@ -34,7 +33,7 @@ public:
     }
 };
 
-//==========================================================================
+//==================================================================================================
 class BarClass
 {
 public:
@@ -56,7 +55,7 @@ std::ostream &operator<<(std::ostream &stream, const BarClass &bar)
     return (stream << bar());
 }
 
-//==========================================================================
+//==================================================================================================
 template <typename T, fly::enable_if_all<FooTraits::is_declared<T>> = 0>
 bool call_foo(const T &arg) noexcept
 {
@@ -69,7 +68,7 @@ bool call_foo(const T &) noexcept
     return false;
 }
 
-//==========================================================================
+//==================================================================================================
 template <typename T, fly::enable_if_all<OstreamTraits::is_declared<T>> = 0>
 bool is_streamable(std::ostream &stream, const T &arg) noexcept
 {
@@ -83,12 +82,10 @@ bool is_streamable(std::ostream &, const T &) noexcept
     return false;
 }
 
-//==========================================================================
+//==================================================================================================
 template <
     typename T,
-    fly::enable_if_all<
-        std::is_pointer<T>,
-        std::is_class<std::remove_pointer_t<T>>>...>
+    fly::enable_if_all<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>>...>
 bool is_class_pointer(const T &)
 {
     return true;
@@ -96,20 +93,16 @@ bool is_class_pointer(const T &)
 
 template <
     typename T,
-    fly::enable_if_not_all<
-        std::is_pointer<T>,
-        std::is_class<std::remove_pointer_t<T>>>...>
+    fly::enable_if_not_all<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>>...>
 bool is_class_pointer(const T &)
 {
     return false;
 }
 
-//==========================================================================
+//==================================================================================================
 template <
     typename T,
-    fly::enable_if_any<
-        std::is_pointer<T>,
-        std::is_class<std::remove_pointer_t<T>>>...>
+    fly::enable_if_any<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>>...>
 bool is_class_or_pointer(const T &)
 {
     return true;
@@ -117,9 +110,7 @@ bool is_class_or_pointer(const T &)
 
 template <
     typename T,
-    fly::enable_if_none<
-        std::is_pointer<T>,
-        std::is_class<std::remove_pointer_t<T>>>...>
+    fly::enable_if_none<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>>...>
 bool is_class_or_pointer(const T &)
 {
     return false;
@@ -127,7 +118,7 @@ bool is_class_or_pointer(const T &)
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 TEST(TraitsTest, Foo)
 {
     const FooClass fc;
@@ -140,7 +131,7 @@ TEST(TraitsTest, Foo)
     EXPECT_FALSE(FooTraits::is_declared_v<BarClass>);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(TraitsTest, Stream)
 {
     std::stringstream stream;
@@ -171,7 +162,7 @@ TEST(TraitsTest, Stream)
     stream.str(std::string());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(TraitsTest, EnableIfAll)
 {
     const FooClass fc;
@@ -194,7 +185,7 @@ TEST(TraitsTest, EnableIfAll)
     EXPECT_FALSE(is_class_pointer(&f));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(TraitsTest, EnableIfAny)
 {
     const FooClass fc;
@@ -217,7 +208,7 @@ TEST(TraitsTest, EnableIfAny)
     EXPECT_TRUE(is_class_or_pointer(&f));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(TraitsTest, AllSame)
 {
     EXPECT_TRUE((fly::all_same_v<int, int>));
@@ -256,7 +247,7 @@ TEST(TraitsTest, AllSame)
     EXPECT_FALSE((fly::all_same_v<FooClass, FooClass, std::string>));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(TraitsTest, AnySame)
 {
     EXPECT_TRUE((fly::any_same_v<int, int>));
@@ -298,7 +289,7 @@ TEST(TraitsTest, AnySame)
     EXPECT_FALSE((fly::any_same_v<FooClass, std::string>));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(TraitsTest, Visitation)
 {
     using TestVariant = std::variant<int, bool, std::string>;

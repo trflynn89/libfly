@@ -18,36 +18,29 @@ class Json;
 namespace fly::detail {
 
 /**
- * Class to provide iterator access to a Json instance. Both const and non-const
- * iterators are supported.
+ * Class to provide iterator access to a Json instance. Both const and non-const iterators are
+ * supported.
  *
- * For Json object instances, this class satisfies the requirements of a
- * BidirectionalIterator.
+ * For Json object instances, this class satisfies the requirements of a BidirectionalIterator. For
+ * Json array instances, this class satisfies the requirements of a RandomAccessIterator. All other
+ * Json types are not supported.
  *
- * For Json array instances, this class satisfies the requirements of a
- * RandomAccessIterator.
+ * Iterators may be default constructed, copy constructed, or constructed from a Json instance. A
+ * requirement of iterators is to allow constructing a const iterator from a non-const iterator (and
+ * to forbid the other direction). To achieve this, the standard copy constructor and assignment
+ * operator are left implicitly defined. Overloads are explictly defined which accept non-const
+ * iterators. These allow constructing const iterators from const iterators, non-const iterators
+ * from non-const iterators, and const iterators from non- const iterators.
  *
- * All other Json types are not supported.
- *
- * Iterators may be default constructed, copy constructed, or constructed from
- * a Json instance. A requirement of iterators is to allow constructing a const
- * iterator from a non-const iterator (and to forbid the other direction). To
- * achieve this, the standard copy constructor and assignment operator are left
- * implicitly defined. Overloads are explictly defined which accept non-const
- * iterators. These allow constructing const iterators from const iterators,
- * non-const iterators from non-const iterators, and const iterators from non-
- * const iterators.
- *
- * Iterators are protected against some classes of undefined behavior. If any
- * of the below conditions are met, an exception will be raised:
+ * Iterators are protected against some classes of undefined behavior. If any of the below
+ * conditions are met, an exception will be raised:
  *
  *     1. Dereferencing an empty or past-the-end iterator.
- *     2. Creating an iterator which escapes the range [begin, end] of the Json
- *        instance.
+ *     2. Creating an iterator which escapes the range [begin, end] of the Json instance.
  *     3. Performing RandomAccessIterator operations on a BidirectionalIterator.
  *
- * There is not yet protection against an iterator-invalidating operation on the
- * Json instance. For example, the following will not raise an exception:
+ * There is not yet protection against an iterator-invalidating operation on the Json instance. For
+ * example, the following will not raise an exception:
  *
  *     fly::Json json {1, 2, 3};
  *     auto it = json.begin();
@@ -85,14 +78,12 @@ class JsonIterator
     /**
      * Alias for the std::variant holding the iterator.
      */
-    using iterator_type =
-        std::variant<object_iterator_type, array_iterator_type>;
+    using iterator_type = std::variant<object_iterator_type, array_iterator_type>;
 
     /**
      * Alias for this iterator type with constness removed.
      */
-    using NonConstJsonIterator =
-        JsonIterator<typename std::remove_const_t<JsonType>>;
+    using NonConstJsonIterator = JsonIterator<typename std::remove_const_t<JsonType>>;
 
 public:
     /**
@@ -125,27 +116,27 @@ public:
     JsonIterator() noexcept;
 
     /**
-     * Constructor to initialize the iterator to be pointed at the beginning or
-     * end of a Json instance.
+     * Constructor to initialize the iterator to be pointed at the beginning or end of a Json
+     * instance.
      *
      * @param json A pointer to the Json instance.
      * @param position The initial position of the iterator.
      *
-     * @throws JsonException If the Json instance is not an object or array.
+     * @throws JsonIteratorException If the Json instance is not iterable.
      */
     JsonIterator(pointer json, Position position) noexcept(false);
 
     /**
-     * Conversion copy constructor. Allows constructing a const or non-const
-     * iterator from a non-const iterator.
+     * Conversion copy constructor. Allows constructing a const or non-const iterator from a
+     * non-const iterator.
      *
      * @param iterator The iterator instance to copy.
      */
     JsonIterator(const NonConstJsonIterator &iterator) noexcept;
 
     /**
-     * Conversion assignment operator. Allows initializing a const or non-const
-     * iterator from a non-const iterator.
+     * Conversion assignment operator. Allows initializing a const or non-const iterator from a
+     * non-const iterator.
      *
      * @param iterator The iterator instance to copy.
      *
@@ -158,7 +149,7 @@ public:
      *
      * @return A reference to the Json instance.
      *
-     * @throws JsonException If the iterator is empty or past-the-end.
+     * @throws NullJsonException If the iterator is empty or past-the-end.
      */
     reference operator*() const noexcept(false);
 
@@ -167,22 +158,23 @@ public:
      *
      * @return A pointer to the Json instance.
      *
-     * @throws JsonException If the iterator is empty or past-the-end.
+     * @throws NullJsonException If the iterator is empty or past-the-end.
      */
     pointer operator->() const noexcept(false);
 
     /**
-     * Retrieve a reference to the Json instance at some offset earlier or later
-     * than the instance pointed to by this iterator. Invoking operator[0] is
-     * equivalent to invoking operator*. Invalid for Json object types.
+     * Retrieve a reference to the Json instance at some offset earlier or later than the instance
+     * pointed to by this iterator. Invoking operator[0] is equivalent to invoking operator*.
+     * Invalid for Json object types.
      *
      * @param offset The offset to retrieve.
      *
      * @return A reference to the Json instance.
      *
-     * @throws JsonException If the iterator is empty, if the iterator at the
-     *         offset escapes the Json instance's valid range, or if the Json
-     *         instance is an object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws NullJsonException If the iterator at the offset is empty or past-the-end.
+     * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
+     *         valid range.
      */
     reference operator[](difference_type offset) const noexcept(false);
 
@@ -193,8 +185,8 @@ public:
      *
      * @return True if the two iterators are equivalent.
      *
-     * @throws JsonException If either iterator is empty, or if the two
-     *         iterators are not for the same Json instance.
+     * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
+     * @throws NullJsonException If either iterator is empty.
      */
     bool operator==(const JsonIterator &iterator) const noexcept(false);
 
@@ -205,8 +197,8 @@ public:
      *
      * @return True if the two iterators are unequivalent.
      *
-     * @throws JsonException If either iterator is empty, or if the two
-     *         iterators are not for the same Json instance.
+     * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
+     * @throws NullJsonException If either iterator is empty.
      */
     bool operator!=(const JsonIterator &iterator) const noexcept(false);
 
@@ -217,9 +209,9 @@ public:
      *
      * @return True if this iterator is less than the given iterator.
      *
-     * @throws JsonException If either iterator is empty, if the two iterators
-     *         are not for the same Json instance, or if the Json instance is an
-     *         object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
+     * @throws NullJsonException If either iterator is empty.
      */
     bool operator<(const JsonIterator &iterator) const noexcept(false);
 
@@ -231,9 +223,9 @@ public:
      * @return True if this iterator is less than or equal to the given
      *         iterator.
      *
-     * @throws JsonException If either iterator is empty, if the two iterators
-     *         are not for the same Json instance, or if the Json instance is an
-     *         object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
+     * @throws NullJsonException If either iterator is empty.
      */
     bool operator<=(const JsonIterator &iterator) const noexcept(false);
 
@@ -244,126 +236,129 @@ public:
      *
      * @return True if this iterator is greater than the given iterator.
      *
-     * @throws JsonException If either iterator is empty, if the two iterators
-     *         are not for the same Json instance, or if the Json instance is an
-     *         object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
+     * @throws NullJsonException If either iterator is empty.
      */
     bool operator>(const JsonIterator &iterator) const noexcept(false);
 
     /**
-     * Greater-than-or-equal-to comparison operator. Invalid for Json object
-     * types.
+     * Greater-than-or-equal-to comparison operator. Invalid for Json object types.
      *
      * @param iterator The iterator instance to compare.
      *
      * @return True if this iterator is greater than or equal to the given
      *         iterator.
      *
-     * @throws JsonException If either iterator is empty, if the two iterators
-     *         are not for the same Json instance, or if the Json instance is an
-     *         object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
+     * @throws NullJsonException If either iterator is empty.
      */
     bool operator>=(const JsonIterator &iterator) const noexcept(false);
 
     /**
-     * Pre-increment operator. Sets the instance pointed to by this iterator
-     * to the next instance in the sequence.
+     * Pre-increment operator. Sets the instance pointed to by this iterator to the next instance in
+     * the sequence.
      *
      * @return A copy of the iterator before the increment.
      *
-     * @throws JsonException If the iterator is empty, or if the next iterator
-     *         escapes the Json instance's valid range.
+     * @throws NullJsonException If the iterator is empty.
+     * @throws OutOfRangeJsonException If the next iterator escapes the Json instance's valid range.
      */
     JsonIterator operator++(int) noexcept(false);
 
     /**
-     * Post-increment operator. Sets the instance pointed to by this iterator
-     * to the next instance in the sequence.
+     * Post-increment operator. Sets the instance pointed to by this iterator to the next instance
+     * in the sequence.
      *
      * @return A reference to this iterator instance.
      *
-     * @throws JsonException If the iterator is empty, or if the next iterator
-     *         escapes the Json instance's valid range.
+     * @throws NullJsonException If the iterator is empty.
+     * @throws OutOfRangeJsonException If the next iterator escapes the Json instance's valid range.
      */
     JsonIterator &operator++() noexcept(false);
 
     /**
-     * Pre-decrement operator. Sets the instance pointed to by this iterator
-     * to the previous instance in the sequence.
+     * Pre-decrement operator. Sets the instance pointed to by this iterator to the previous
+     * instance in the sequence.
      *
      * @return A copy of the iterator before the decrement.
      *
-     * @throws JsonException If the iterator is empty, or if the previous
-     *         iterator escapes the Json instance's valid range.
+     * @throws NullJsonException If the iterator is empty.
+     * @throws OutOfRangeJsonException If the previous iterator escapes the Json instance's valid
+     *         range.
      */
     JsonIterator operator--(int) noexcept(false);
 
     /**
-     * Post-decrement operator. Sets the instance pointed to by this iterator
-     * to the previous instance in the sequence.
+     * Post-decrement operator. Sets the instance pointed to by this iterator to the previous
+     * instance in the sequence.
      *
      * @return A reference to this iterator instance.
      *
-     * @throws JsonException If the iterator is empty, or if the previous
-     *         iterator escapes the Json instance's valid range.
+     * @throws NullJsonException If the iterator is empty.
+     * @throws OutOfRangeJsonException If the previous iterator escapes the Json instance's valid
+     *         range.
      */
     JsonIterator &operator--() noexcept(false);
 
     /**
-     * Addition operator. Sets the Json instance pointed to by this iterator to
-     * some offset earlier or later in the sequence. Invalid for Json object
-     * types.
+     * Addition operator. Sets the Json instance pointed to by this iterator to some offset earlier
+     * or later in the sequence. Invalid for Json object types.
      *
      * @param offset The offset by which to increment the iterator.
      *
      * @return A reference to this iterator instance.
      *
-     * @throws JsonException If the iterator is empty, if the iterator at the
-     *         offset escapes the Json instance's valid range, or if the Json
-     *         instance is an object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws NullJsonException If the iterator is empty.
+     * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
+     *         valid range.
      */
     JsonIterator &operator+=(difference_type offset) noexcept(false);
 
     /**
-     * Subtraction operator. Sets the Json instance pointed to by this iterator
-     * to some offset earlier or later in the sequence. Invalid for Json object
-     * types.
+     * Subtraction operator. Sets the Json instance pointed to by this iterator to some offset
+     * earlier or later in the sequence. Invalid for Json object types.
      *
      * @param offset The offset by which to decrement the iterator.
      *
      * @return A reference to this iterator instance.
      *
-     * @throws JsonException If the iterator is empty, if the iterator at the
-     *         offset escapes the Json instance's valid range, or if the Json
-     *         instance is an object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws NullJsonException If the iterator is empty.
+     * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
+     *         valid range.
      */
     JsonIterator &operator-=(difference_type offset) noexcept(false);
 
     /**
-     * Addition operator. Retrieve an iterator pointed at the Json instance some
-     * offset earlier or later in the sequence. Invalid for Json object types.
+     * Addition operator. Retrieve an iterator pointed at the Json instance some offset earlier or
+     * later in the sequence. Invalid for Json object types.
      *
      * @param offset The offset to retrieve.
      *
      * @return An iterator pointed at the Json instance.
      *
-     * @throws JsonException If the iterator is empty, if the iterator at the
-     *         offset escapes the Json instance's valid range, or if the Json
-     *         instance is an object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws NullJsonException If the iterator is empty.
+     * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
+     *         valid range.
      */
     JsonIterator operator+(difference_type offset) const noexcept(false);
 
     /**
-     * Addition operator. Retrieve an iterator pointed at the Json instance some
-     * offset earlier or later in the sequence. Invalid for Json object types.
+     * Addition operator. Retrieve an iterator pointed at the Json instance some offset earlier or
+     * later in the sequence. Invalid for Json object types.
      *
      * @param offset The offset to retrieve.
      *
      * @return An iterator pointed at the Json instance.
      *
-     * @throws JsonException If the iterator is empty, if the iterator at the
-     *         offset escapes the Json instance's valid range, or if the Json
-     *         instance is an object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws NullJsonException If the iterator is empty.
+     * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
+     *         valid range.
      */
     template <typename J>
     friend JsonIterator<J> operator+(
@@ -371,108 +366,100 @@ public:
         const JsonIterator<J> &iterator) noexcept(false);
 
     /**
-     * Subtraction operator. Retrieve an iterator pointed at the Json instance
-     * some offset earlier or later in the sequence. Invalid for Json object
-     * types.
+     * Subtraction operator. Retrieve an iterator pointed at the Json instance some offset earlier
+     * or later in the sequence. Invalid for Json object types.
      *
      * @param offset The offset to retrieve.
      *
      * @return An iterator pointed at the Json instance.
      *
-     * @throws JsonException If the iterator is empty, if the iterator at the
-     *         offset escapes the Json instance's valid range, or if the Json
-     *         instance is an object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws NullJsonException If the iterator is empty.
+     * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
+     *         valid range.
      */
     JsonIterator operator-(difference_type offset) const noexcept(false);
 
     /**
-     * Difference operator. Compute the distance between this iterator and
-     * another. Invalid for Json object types.
+     * Difference operator. Compute the distance between this iterator and another. Invalid for Json
+     * object types.
      *
      * @param iterator The iterator instance to compare.
      *
      * @return The distance between the two iterators.
      *
-     * @throws JsonException If either iterator is empty, or if the Json
-     *         instance is an object.
+     * @throws JsonIteratorException If the Json instance is an object.
+     * @throws NullJsonException If either iterator is empty.
      */
-    difference_type operator-(const JsonIterator &iterator) const
-        noexcept(false);
+    difference_type operator-(const JsonIterator &iterator) const noexcept(false);
 
     /**
-     * Retrieve a reference to the key of the Json instance pointed to by this
-     * iterator. Only valid for Json object types.
+     * Retrieve a reference to the key of the Json instance pointed to by this iterator. Only valid
+     * for Json object types.
      *
      * @return A reference to the Json object's key.
      *
-     * @throws JsonException If the iterator is empty or past-the-end, or if the
-     *         Json instance is not an object.
+     * @throws JsonIteratorException If the Json instance is not an object.
+     * @throws NullJsonException If the iterator is empty or past-the-end.
      */
-    const typename JsonTraits::object_type::key_type &key() const
-        noexcept(false);
+    const typename JsonTraits::object_type::key_type &key() const noexcept(false);
 
     /**
      * Retrieve a reference to the Json instance pointed to by this iterator.
      *
      * @return A reference to the Json instance.
      *
-     * @throws JsonException If the iterator is empty or past-the-end.
+     * @throws NullJsonException If the iterator is empty or past-the-end.
      */
     reference value() const noexcept(false);
 
 private:
-    friend std::conditional_t<
-        is_const_iterator,
-        NonConstJsonIterator,
-        JsonIterator<const JsonType>>;
+    friend std::
+        conditional_t<is_const_iterator, NonConstJsonIterator, JsonIterator<const JsonType>>;
 
     /**
      * A trait for testing if all types Ts are object iterators.
      */
     template <typename... Ts>
-    inline static constexpr bool is_object_iterator =
-        all_same_v<object_iterator_type, Ts...>;
+    inline static constexpr bool is_object_iterator = all_same_v<object_iterator_type, Ts...>;
 
     /**
      * A trait for testing if all types Ts are array iterators.
      */
     template <typename... Ts>
-    inline static constexpr bool is_array_iterator =
-        all_same_v<array_iterator_type, Ts...>;
+    inline static constexpr bool is_array_iterator = all_same_v<array_iterator_type, Ts...>;
 
     /**
      * Verify that this iterator is not empty.
      *
-     * @throws JsonException If the iterator is empty.
+     * @throws JsonIteratorException If the iterator is empty.
      */
     void validate_iterator() const noexcept(false);
 
     /**
-     * Verify that this and another iterator are not empty and are for the same
-     * Json instance.
+     * Verify that this and another iterator are not empty and are for the same Json instance.
      *
      * @param iterator The iterator instance to compare.
      *
-     * @throws JsonException If either iterator is empty, or if the two
-     *         iterators are not for the same Json instance.
+     * @throws JsonIteratorException If either iterator is empty, or if the two iterators are not
+     *         for the same Json instance.
      */
     void validate_iterator(const JsonIterator &iterator) const noexcept(false);
 
     /**
-     * Verify that the iterator at some offset earlier or later than this
-     * iterator does not escape the range [begin, end] for the Json instance.
+     * Verify that the iterator at some offset earlier or later than this iterator does not escape
+     * the range [begin, end] for the Json instance.
      *
      * @tparam T The type of the iterator to check (a variant of iterator_type).
      *
      * @param it The iterator instance to check.
      * @param offset The offset to check.
      *
-     * @throws JsonException If the iterator is empty, if the iterator at the
-     *         offset escapes the Json instance's valid range.
+     * @throws JsonIteratorException If the iterator is empty, if the iterator at the offset escapes
+     *         the Json instance's valid range.
      */
     template <typename T>
-    void validate_offset(const T &it, difference_type offset) const
-        noexcept(false);
+    void validate_offset(const T &it, difference_type offset) const noexcept(false);
 
     /**
      * Verify that the provided iterator may be dereferenced.
@@ -481,7 +468,7 @@ private:
      *
      * @param it The iterator instance to check.
      *
-     * @throws JsonException If the iterator cannot be dereferenced.
+     * @throws JsonIteratorException If the iterator is empty or past-the-end.
      */
     template <typename T>
     void validate_dereference(const T &it) const noexcept(false);
@@ -490,17 +477,15 @@ private:
     iterator_type m_iterator;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 JsonIterator<JsonType>::JsonIterator() noexcept : m_json(nullptr)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-JsonIterator<JsonType>::JsonIterator(pointer json, Position position) noexcept(
-    false) :
-    m_json(json)
+JsonIterator<JsonType>::JsonIterator(pointer json, Position position) noexcept(false) : m_json(json)
 {
     // Formatter badly handles hanging indent in lambdas
     // clang-format off
@@ -521,7 +506,7 @@ JsonIterator<JsonType>::JsonIterator(pointer json, Position position) noexcept(
         }
         else
         {
-            throw JsonException(*m_json, "JSON type invalid for iteration");
+            throw JsonIteratorException(*m_json, "JSON type invalid for iteration");
         }
     };
     // clang-format on
@@ -532,17 +517,16 @@ JsonIterator<JsonType>::JsonIterator(pointer json, Position position) noexcept(
     }
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-JsonIterator<JsonType>::JsonIterator(
-    const NonConstJsonIterator &iterator) noexcept :
+JsonIterator<JsonType>::JsonIterator(const NonConstJsonIterator &iterator) noexcept :
     m_json(iterator.m_json)
 {
     auto visitor = [this](const auto &it) noexcept { m_iterator = it; };
     std::visit(visitor, iterator.m_iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 JsonIterator<JsonType> &
 JsonIterator<JsonType>::operator=(const NonConstJsonIterator &iterator) noexcept
@@ -555,7 +539,7 @@ JsonIterator<JsonType>::operator=(const NonConstJsonIterator &iterator) noexcept
     return *this;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 auto JsonIterator<JsonType>::operator*() const noexcept(false) -> reference
 {
@@ -577,7 +561,7 @@ auto JsonIterator<JsonType>::operator*() const noexcept(false) -> reference
     return std::visit(visitor, m_iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 auto JsonIterator<JsonType>::operator->() const noexcept(false) -> pointer
 {
@@ -599,10 +583,9 @@ auto JsonIterator<JsonType>::operator->() const noexcept(false) -> pointer
     return std::visit(visitor, m_iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator[](difference_type offset) const
-    noexcept(false) -> reference
+auto JsonIterator<JsonType>::operator[](difference_type offset) const noexcept(false) -> reference
 {
     validate_iterator();
 
@@ -618,36 +601,31 @@ auto JsonIterator<JsonType>::operator[](difference_type offset) const
         }
         else
         {
-            throw JsonException(
-                *m_json,
-                "JSON type invalid for offset operator");
+            throw JsonIteratorException(*m_json, "JSON type invalid for offset operator");
         }
     };
 
     return std::visit(visitor, m_iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator==(const JsonIterator &iterator) const
-    noexcept(false)
+bool JsonIterator<JsonType>::operator==(const JsonIterator &iterator) const noexcept(false)
 {
     validate_iterator(iterator);
     return m_iterator == iterator.m_iterator;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator!=(const JsonIterator &iterator) const
-    noexcept(false)
+bool JsonIterator<JsonType>::operator!=(const JsonIterator &iterator) const noexcept(false)
 {
     return !(*this == iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator<(const JsonIterator &iterator) const
-    noexcept(false)
+bool JsonIterator<JsonType>::operator<(const JsonIterator &iterator) const noexcept(false)
 {
     validate_iterator(iterator);
 
@@ -662,9 +640,7 @@ bool JsonIterator<JsonType>::operator<(const JsonIterator &iterator) const
         }
         else
         {
-            throw JsonException(
-                *m_json,
-                "JSON type invalid for comparison operator");
+            throw JsonIteratorException(*m_json, "JSON type invalid for comparison operator");
         }
     };
     // clang-format on
@@ -672,31 +648,28 @@ bool JsonIterator<JsonType>::operator<(const JsonIterator &iterator) const
     return std::visit(visitor, m_iterator, iterator.m_iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator<=(const JsonIterator &iterator) const
-    noexcept(false)
+bool JsonIterator<JsonType>::operator<=(const JsonIterator &iterator) const noexcept(false)
 {
     return !(iterator < *this);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator>(const JsonIterator &iterator) const
-    noexcept(false)
+bool JsonIterator<JsonType>::operator>(const JsonIterator &iterator) const noexcept(false)
 {
     return !(*this <= iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator>=(const JsonIterator &iterator) const
-    noexcept(false)
+bool JsonIterator<JsonType>::operator>=(const JsonIterator &iterator) const noexcept(false)
 {
     return !(*this < iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 auto JsonIterator<JsonType>::operator++(int) noexcept(false) -> JsonIterator
 {
@@ -706,7 +679,7 @@ auto JsonIterator<JsonType>::operator++(int) noexcept(false) -> JsonIterator
     return result;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 auto JsonIterator<JsonType>::operator++() noexcept(false) -> JsonIterator &
 {
@@ -722,7 +695,7 @@ auto JsonIterator<JsonType>::operator++() noexcept(false) -> JsonIterator &
     return std::visit(visitor, m_iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 auto JsonIterator<JsonType>::operator--(int) noexcept(false) -> JsonIterator
 {
@@ -732,7 +705,7 @@ auto JsonIterator<JsonType>::operator--(int) noexcept(false) -> JsonIterator
     return result;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 auto JsonIterator<JsonType>::operator--() noexcept(false) -> JsonIterator &
 {
@@ -748,10 +721,9 @@ auto JsonIterator<JsonType>::operator--() noexcept(false) -> JsonIterator &
     return std::visit(visitor, m_iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator+=(difference_type offset) noexcept(false)
-    -> JsonIterator &
+auto JsonIterator<JsonType>::operator+=(difference_type offset) noexcept(false) -> JsonIterator &
 {
     validate_iterator();
 
@@ -763,9 +735,7 @@ auto JsonIterator<JsonType>::operator+=(difference_type offset) noexcept(false)
         }
         else
         {
-            throw JsonException(
-                *m_json,
-                "JSON type invalid for iterator offset");
+            throw JsonIteratorException(*m_json, "JSON type invalid for iterator offset");
         }
     };
 
@@ -773,18 +743,16 @@ auto JsonIterator<JsonType>::operator+=(difference_type offset) noexcept(false)
     return *this;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator-=(difference_type offset) noexcept(false)
-    -> JsonIterator &
+auto JsonIterator<JsonType>::operator-=(difference_type offset) noexcept(false) -> JsonIterator &
 {
     return *this += -offset;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator+(difference_type offset) const
-    noexcept(false) -> JsonIterator
+auto JsonIterator<JsonType>::operator+(difference_type offset) const noexcept(false) -> JsonIterator
 {
     auto result = *this;
     result += offset;
@@ -792,7 +760,7 @@ auto JsonIterator<JsonType>::operator+(difference_type offset) const
     return result;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 JsonIterator<JsonType> operator+(
     typename JsonIterator<JsonType>::difference_type offset,
@@ -804,10 +772,9 @@ JsonIterator<JsonType> operator+(
     return result;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator-(difference_type offset) const
-    noexcept(false) -> JsonIterator
+auto JsonIterator<JsonType>::operator-(difference_type offset) const noexcept(false) -> JsonIterator
 {
     auto result = *this;
     result -= offset;
@@ -815,10 +782,10 @@ auto JsonIterator<JsonType>::operator-(difference_type offset) const
     return result;
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const
-    noexcept(false) -> difference_type
+auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const noexcept(false)
+    -> difference_type
 {
     validate_iterator();
     iterator.validate_iterator();
@@ -834,9 +801,7 @@ auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const
         }
         else
         {
-            throw JsonException(
-                *m_json,
-                "JSON type invalid for iterator difference");
+            throw JsonIteratorException(*m_json, "JSON type invalid for iterator difference");
         }
     };
     // clang-format on
@@ -844,10 +809,10 @@ auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const
     return std::visit(visitor, m_iterator, iterator.m_iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-const typename JsonTraits::object_type::key_type &
-JsonIterator<JsonType>::key() const noexcept(false)
+const typename JsonTraits::object_type::key_type &JsonIterator<JsonType>::key() const
+    noexcept(false)
 {
     validate_iterator();
 
@@ -863,7 +828,7 @@ JsonIterator<JsonType>::key() const noexcept(false)
         }
         else
         {
-            throw JsonException(*m_json, "JSON type is not keyed");
+            throw JsonIteratorException(*m_json, "JSON type is not keyed");
         }
     };
     // clang-format on
@@ -871,44 +836,41 @@ JsonIterator<JsonType>::key() const noexcept(false)
     return std::visit(visitor, m_iterator);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 auto JsonIterator<JsonType>::value() const noexcept(false) -> reference
 {
     return *(*this);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 void JsonIterator<JsonType>::validate_iterator() const noexcept(false)
 {
     if (m_json == nullptr)
     {
-        throw JsonException("Cannot operate on empty iterator");
+        throw NullJsonException();
     }
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
-void JsonIterator<JsonType>::validate_iterator(
-    const JsonIterator &iterator) const noexcept(false)
+void JsonIterator<JsonType>::validate_iterator(const JsonIterator &iterator) const noexcept(false)
 {
     validate_iterator();
     iterator.validate_iterator();
 
     if (m_json != iterator.m_json)
     {
-        throw JsonException(
-            "Cannot compare iterators of different JSON instances");
+        throw BadJsonComparisonException(*m_json, *iterator.m_json);
     }
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 template <typename T>
-void JsonIterator<JsonType>::validate_offset(
-    const T &it,
-    difference_type offset) const noexcept(false)
+void JsonIterator<JsonType>::validate_offset(const T &it, difference_type offset) const
+    noexcept(false)
 {
     difference_type distance = 0;
 
@@ -925,25 +887,20 @@ void JsonIterator<JsonType>::validate_offset(
 
     if (std::abs(offset) > distance)
     {
-        throw JsonException(
-            *m_json,
-            String::format("Cannot offset iterator by distance of %d", offset));
+        throw OutOfRangeJsonException(*m_json, offset);
     }
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename JsonType>
 template <typename T>
-void JsonIterator<JsonType>::validate_dereference(const T &it) const
-    noexcept(false)
+void JsonIterator<JsonType>::validate_dereference(const T &it) const noexcept(false)
 {
     const JsonIterator end = m_json->end();
 
     if (it == std::get<T>(end.m_iterator))
     {
-        throw JsonException(
-            *m_json,
-            "Cannot dereference a past-the-end iterator");
+        throw NullJsonException(*m_json);
     }
 }
 

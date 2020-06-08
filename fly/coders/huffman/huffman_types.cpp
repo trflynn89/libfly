@@ -2,16 +2,12 @@
 
 namespace fly {
 
-//==============================================================================
-HuffmanNode::HuffmanNode() noexcept :
-    m_symbol(0),
-    m_frequency(0),
-    m_left(nullptr),
-    m_right(nullptr)
+//==================================================================================================
+HuffmanNode::HuffmanNode() noexcept : m_symbol(0), m_frequency(0), m_left(nullptr), m_right(nullptr)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 HuffmanNode &HuffmanNode::operator=(HuffmanNode &&node) noexcept
 {
     m_symbol = std::move(node.m_symbol);
@@ -22,10 +18,8 @@ HuffmanNode &HuffmanNode::operator=(HuffmanNode &&node) noexcept
     return *this;
 }
 
-//==============================================================================
-void HuffmanNode::become_symbol(
-    symbol_type symbol,
-    frequency_type frequency) noexcept
+//==================================================================================================
+void HuffmanNode::become_symbol(symbol_type symbol, frequency_type frequency) noexcept
 {
     m_symbol = symbol;
     m_frequency = frequency;
@@ -33,10 +27,8 @@ void HuffmanNode::become_symbol(
     m_right = nullptr;
 }
 
-//==============================================================================
-void HuffmanNode::become_intermediate(
-    HuffmanNode *left,
-    HuffmanNode *right) noexcept
+//==================================================================================================
+void HuffmanNode::become_intermediate(HuffmanNode *left, HuffmanNode *right) noexcept
 {
     m_symbol = 0;
     m_frequency = left->m_frequency + right->m_frequency;
@@ -44,31 +36,26 @@ void HuffmanNode::become_intermediate(
     m_right = right;
 }
 
-//==============================================================================
-bool HuffmanNodeComparator::operator()(
-    const HuffmanNode *left,
-    const HuffmanNode *right) noexcept
+//==================================================================================================
+bool HuffmanNodeComparator::operator()(const HuffmanNode *left, const HuffmanNode *right) noexcept
 {
     return left->m_frequency > right->m_frequency;
 }
 
-//==============================================================================
+//==================================================================================================
 HuffmanCode::HuffmanCode() noexcept : m_symbol(0), m_code(0), m_length(0)
 {
 }
 
-//==============================================================================
-HuffmanCode::HuffmanCode(
-    symbol_type symbol,
-    code_type code,
-    length_type length) noexcept :
+//==================================================================================================
+HuffmanCode::HuffmanCode(symbol_type symbol, code_type code, length_type length) noexcept :
     m_symbol(symbol),
     m_code(code),
     m_length(length)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 HuffmanCode::HuffmanCode(HuffmanCode &&code) noexcept :
     m_symbol(std::move(code.m_symbol)),
     m_code(std::move(code.m_code)),
@@ -76,7 +63,7 @@ HuffmanCode::HuffmanCode(HuffmanCode &&code) noexcept :
 {
 }
 
-//==============================================================================
+//==================================================================================================
 HuffmanCode &HuffmanCode::operator=(HuffmanCode &&code) noexcept
 {
     m_symbol = std::move(code.m_symbol);
@@ -86,7 +73,7 @@ HuffmanCode &HuffmanCode::operator=(HuffmanCode &&code) noexcept
     return *this;
 }
 
-//==============================================================================
+//==================================================================================================
 bool operator<(const HuffmanCode &left, const HuffmanCode &right)
 {
     if (left.m_length == right.m_length)

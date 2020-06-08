@@ -14,8 +14,8 @@ class PathConfig;
 class SequencedTaskRunner;
 
 /**
- * Windows implementation of the PathMonitor interface. Uses an IOCP with the
- * ReadDirectoryChangesW API to detect path changes.
+ * Windows implementation of the PathMonitor interface. Uses an IOCP with the ReadDirectoryChangesW
+ * API to detect path changes.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 19, 2017
@@ -44,8 +44,8 @@ protected:
     bool is_valid() const noexcept override;
 
     /**
-     * Check if the path monitor's IOCP has any posted completions, and handle
-     * any that have been posted.
+     * Check if the path monitor's IOCP has any posted completions, and handle any that have been
+     * posted.
      *
      * @param timeout Max time allow for a completion to be posted.
      */
@@ -56,9 +56,9 @@ protected:
 
 private:
     /**
-     * Windows implementation of the PathInfo interface. Stores a handle to the
-     * monitored path, as well as an array to store changes found by the
-     * ReadDirectoryChangesW API for the monitored path.
+     * Windows implementation of the PathInfo interface. Stores a handle to the monitored path, as
+     * well as an array to store changes found by the ReadDirectoryChangesW API for the monitored
+     * path.
      */
     struct PathInfoImpl : public PathMonitor::PathInfo
     {
@@ -71,9 +71,8 @@ private:
         bool is_valid() const noexcept override;
 
         /**
-         * Call the ReadDirectoryChangesW API for this path. Should be called
-         * after initialization and each time an IOCP completion occurs for
-         * this path.
+         * Call the ReadDirectoryChangesW API for this path. Should be called after initialization
+         * and each time an IOCP completion occurs for this path.
          *
          * @param path Name of the monitored path.
          */
@@ -91,9 +90,7 @@ private:
      * @param info The path's entry in the PathInfo map.
      * @param path Name of the path.
      */
-    void handle_events(
-        const PathInfoImpl *info,
-        const std::filesystem::path &path) const noexcept;
+    void handle_events(const PathInfoImpl *info, const std::filesystem::path &path) const noexcept;
 
     /**
      * Convert a FILE_NOTIFY_INFORMATION event to a PathEvent.

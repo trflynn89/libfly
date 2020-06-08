@@ -5,9 +5,8 @@
 
 namespace fly {
 
-//==============================================================================
-void WaitableTaskRunner::task_complete(
-    const std::shared_ptr<Task> &task) noexcept
+//==================================================================================================
+void WaitableTaskRunner::task_complete(const std::shared_ptr<Task> &task) noexcept
 {
     if (task)
     {
@@ -16,31 +15,29 @@ void WaitableTaskRunner::task_complete(
     }
 }
 
-//==============================================================================
+//==================================================================================================
 WaitableParallelTaskRunner::WaitableParallelTaskRunner(
     std::weak_ptr<TaskManager> task_manager) noexcept :
     ParallelTaskRunner(task_manager)
 {
 }
 
-//==============================================================================
-void WaitableParallelTaskRunner::task_complete(
-    const std::shared_ptr<Task> &task) noexcept
+//==================================================================================================
+void WaitableParallelTaskRunner::task_complete(const std::shared_ptr<Task> &task) noexcept
 {
     ParallelTaskRunner::task_complete(task);
     WaitableTaskRunner::task_complete(task);
 }
 
-//==============================================================================
+//==================================================================================================
 WaitableSequencedTaskRunner::WaitableSequencedTaskRunner(
     std::weak_ptr<TaskManager> task_manager) noexcept :
     SequencedTaskRunner(task_manager)
 {
 }
 
-//==============================================================================
-void WaitableSequencedTaskRunner::task_complete(
-    const std::shared_ptr<Task> &task) noexcept
+//==================================================================================================
+void WaitableSequencedTaskRunner::task_complete(const std::shared_ptr<Task> &task) noexcept
 {
     SequencedTaskRunner::task_complete(task);
     WaitableTaskRunner::task_complete(task);

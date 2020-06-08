@@ -16,7 +16,7 @@ namespace {
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 SystemMonitorImpl::SystemMonitorImpl(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
     const std::shared_ptr<SystemConfig> &config) noexcept :
@@ -50,7 +50,7 @@ SystemMonitorImpl::SystemMonitorImpl(
     }
 }
 
-//==============================================================================
+//==================================================================================================
 SystemMonitorImpl::~SystemMonitorImpl()
 {
     if (m_cpu_query != nullptr)
@@ -60,7 +60,7 @@ SystemMonitorImpl::~SystemMonitorImpl()
     }
 }
 
-//==============================================================================
+//==================================================================================================
 void SystemMonitorImpl::update_system_cpu_count() noexcept
 {
     SYSTEM_INFO info;
@@ -76,7 +76,7 @@ void SystemMonitorImpl::update_system_cpu_count() noexcept
     }
 }
 
-//==============================================================================
+//==================================================================================================
 void SystemMonitorImpl::update_system_cpu_usage() noexcept
 {
     PDH_FMT_COUNTERVALUE value;
@@ -88,11 +88,7 @@ void SystemMonitorImpl::update_system_cpu_usage() noexcept
         return;
     }
 
-    status = ::PdhGetFormattedCounterValue(
-        m_cpu_counter,
-        PDH_FMT_DOUBLE,
-        nullptr,
-        &value);
+    status = ::PdhGetFormattedCounterValue(m_cpu_counter, PDH_FMT_DOUBLE, nullptr, &value);
     if (status != ERROR_SUCCESS)
     {
         LOGS("Could not format CPU counter (%x)", status);
@@ -102,7 +98,7 @@ void SystemMonitorImpl::update_system_cpu_usage() noexcept
     m_system_cpu_usage.store(value.doubleValue);
 }
 
-//==============================================================================
+//==================================================================================================
 void SystemMonitorImpl::update_process_cpu_usage() noexcept
 {
     ULARGE_INTEGER now, system, user;
@@ -121,8 +117,7 @@ void SystemMonitorImpl::update_process_cpu_usage() noexcept
 
         ULONGLONG time = now.QuadPart - m_prev_time;
 
-        m_process_cpu_usage.store(
-            100.0 * cpu / time / m_system_cpu_count.load());
+        m_process_cpu_usage.store(100.0 * cpu / time / m_system_cpu_count.load());
 
         m_prev_process_system_time = system.QuadPart;
         m_prev_process_user_time = user.QuadPart;
@@ -134,7 +129,7 @@ void SystemMonitorImpl::update_process_cpu_usage() noexcept
     }
 }
 
-//==============================================================================
+//==================================================================================================
 void SystemMonitorImpl::update_system_memory_usage() noexcept
 {
     MEMORYSTATUSEX info;
@@ -151,7 +146,7 @@ void SystemMonitorImpl::update_system_memory_usage() noexcept
     }
 }
 
-//==============================================================================
+//==================================================================================================
 void SystemMonitorImpl::update_process_memory_usage() noexcept
 {
     PROCESS_MEMORY_COUNTERS pmc;

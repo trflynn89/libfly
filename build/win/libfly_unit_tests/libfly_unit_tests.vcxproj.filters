@@ -60,9 +60,6 @@
     <ClCompile Include="..\..\..\test\logger\logger.cpp">
       <Filter>logger</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\parser\exceptions.cpp">
-      <Filter>parser</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp">
       <Filter>parser</Filter>
     </ClCompile>
@@ -70,6 +67,9 @@
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\parser\parser.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\parser\parser_exception.cpp">
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\path\path_monitor.cpp">
@@ -102,6 +102,9 @@
     <ClCompile Include="..\..\..\test\types\json.cpp">
       <Filter>types</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\types\json_conversion.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\types\json_exception.cpp">
       <Filter>types</Filter>
     </ClCompile>
@@ -109,6 +112,9 @@
       <Filter>types</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\json_traits.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\json_unicode.cpp">
       <Filter>types</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\literals.cpp">

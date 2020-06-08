@@ -12,7 +12,8 @@ SRC_DIRS_$(d) := \
     fly/task \
     fly/types/bit_stream \
     fly/types/bit_stream/detail \
-    fly/types/json
+    fly/types/json \
+    fly/types/string
 
 # Add libfly.so to release package
 $(eval $(call ADD_REL_LIB, libfly))

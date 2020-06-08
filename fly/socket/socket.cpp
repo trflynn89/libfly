@@ -6,13 +6,11 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 std::atomic_int Socket::s_num_sockets(0);
 
-//==============================================================================
-Socket::Socket(
-    Protocol protocol,
-    const std::shared_ptr<SocketConfig> &config) noexcept :
+//==================================================================================================
+Socket::Socket(Protocol protocol, const std::shared_ptr<SocketConfig> &config) noexcept :
     m_protocol(protocol),
     m_config(config),
     m_socket_eom(config->end_of_message()),
@@ -27,97 +25,92 @@ Socket::Socket(
 {
 }
 
-//==============================================================================
-bool Socket::hostname_to_address(
-    const std::string &hostname,
-    address_type &address) noexcept
+//==================================================================================================
+bool Socket::hostname_to_address(const std::string &hostname, address_type &address) noexcept
 {
     return SocketImpl::hostname_to_address(hostname, address);
 }
 
-//==============================================================================
+//==================================================================================================
 address_type Socket::in_addr_any() noexcept
 {
     return SocketImpl::in_addr_any();
 }
 
-//==============================================================================
+//==================================================================================================
 socket_type Socket::invalid_socket() noexcept
 {
     return SocketImpl::invalid_socket();
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::is_valid() const noexcept
 {
     return m_socket_handle != invalid_socket();
 }
 
-//==============================================================================
+//==================================================================================================
 socket_type Socket::get_handle() const noexcept
 {
     return m_socket_handle;
 }
 
-//==============================================================================
+//==================================================================================================
 address_type Socket::get_client_ip() const noexcept
 {
     return m_client_ip;
 }
 
-//==============================================================================
+//==================================================================================================
 port_type Socket::get_client_port() const noexcept
 {
     return m_client_port;
 }
 
-//==============================================================================
+//==================================================================================================
 int Socket::get_socket_id() const noexcept
 {
     return m_socket_id;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::is_tcp() const noexcept
 {
     return m_protocol == Protocol::TCP;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::is_udp() const noexcept
 {
     return m_protocol == Protocol::UDP;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::is_async() const noexcept
 {
     return m_is_async;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::is_listening() const noexcept
 {
     return m_is_listening;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::is_connecting() const noexcept
 {
     return m_connected_state.load() == ConnectedState::Connecting;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::is_connected() const noexcept
 {
     return m_connected_state.load() == ConnectedState::Connected;
 }
 
-//==============================================================================
-bool Socket::bind(
-    const std::string &hostname,
-    port_type port,
-    BindOption option) const noexcept
+//==================================================================================================
+bool Socket::bind(const std::string &hostname, port_type port, BindOption option) const noexcept
 {
     address_type address = 0;
 
@@ -129,7 +122,7 @@ bool Socket::bind(
     return false;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::connect(const std::string &hostname, port_type port) noexcept
 {
     address_type address = 0;
@@ -142,9 +135,8 @@ bool Socket::connect(const std::string &hostname, port_type port) noexcept
     return false;
 }
 
-//==============================================================================
-ConnectedState
-Socket::connect_async(address_type address, port_type port) noexcept
+//==================================================================================================
+ConnectedState Socket::connect_async(address_type address, port_type port) noexcept
 {
     ConnectedState state = ConnectedState::Disconnected;
 
@@ -162,11 +154,7 @@ Socket::connect_async(address_type address, port_type port) noexcept
         }
         else
         {
-            SLOGW(
-                m_socket_id,
-                "Could not connect to %d:%d, closing socket",
-                address,
-                port);
+            SLOGW(m_socket_id, "Could not connect to %d:%d, closing socket", address, port);
 
             close();
         }
@@ -175,9 +163,8 @@ Socket::connect_async(address_type address, port_type port) noexcept
     return state;
 }
 
-//==============================================================================
-ConnectedState
-Socket::connect_async(const std::string &hostname, port_type port) noexcept
+//==================================================================================================
+ConnectedState Socket::connect_async(const std::string &hostname, port_type port) noexcept
 {
     address_type address = 0;
 
@@ -189,7 +176,7 @@ Socket::connect_async(const std::string &hostname, port_type port) noexcept
     return ConnectedState::Disconnected;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::finish_connect() noexcept
 {
     if (is_valid() & is_connecting() && is_error_free())
@@ -208,34 +195,30 @@ bool Socket::finish_connect() noexcept
     return is_valid() && is_connected();
 }
 
-//==============================================================================
+//==================================================================================================
 size_t Socket::send(const std::string &message) const noexcept
 {
     bool would_block = false;
     return send(message, would_block);
 }
 
-//==============================================================================
-size_t Socket::send_to(
-    const std::string &message,
-    address_type address,
-    port_type port) const noexcept
+//==================================================================================================
+size_t
+Socket::send_to(const std::string &message, address_type address, port_type port) const noexcept
 {
     bool would_block = false;
     return send_to(message, address, port, would_block);
 }
 
-//==============================================================================
-size_t Socket::send_to(
-    const std::string &message,
-    const std::string &hostname,
-    port_type port) const noexcept
+//==================================================================================================
+size_t Socket::send_to(const std::string &message, const std::string &hostname, port_type port)
+    const noexcept
 {
     bool would_block = false;
     return send_to(message, hostname, port, would_block);
 }
 
-//==============================================================================
+//==================================================================================================
 size_t Socket::send_to(
     const std::string &message,
     const std::string &hostname,
@@ -252,7 +235,7 @@ size_t Socket::send_to(
     return 0;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::send_async(std::string &&message) noexcept
 {
     if (is_tcp() && is_async())
@@ -266,11 +249,8 @@ bool Socket::send_async(std::string &&message) noexcept
     return false;
 }
 
-//==============================================================================
-bool Socket::send_to_async(
-    std::string &&message,
-    address_type address,
-    port_type port) noexcept
+//==================================================================================================
+bool Socket::send_to_async(std::string &&message, address_type address, port_type port) noexcept
 {
     if (is_udp() && is_async())
     {
@@ -283,7 +263,7 @@ bool Socket::send_to_async(
     return false;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Socket::send_to_async(
     std::string &&message,
     const std::string &hostname,
@@ -299,23 +279,22 @@ bool Socket::send_to_async(
     return false;
 }
 
-//==============================================================================
+//==================================================================================================
 std::string Socket::recv() const noexcept
 {
     bool would_block = false, is_complete = false;
     return recv(would_block, is_complete);
 }
 
-//==============================================================================
+//==================================================================================================
 std::string Socket::recv_from() const noexcept
 {
     bool would_block = false, is_complete = false;
     return recv_from(would_block, is_complete);
 }
 
-//==============================================================================
-void Socket::service_send_requests(
-    AsyncRequest::RequestQueue &completed_sends) noexcept
+//==================================================================================================
+void Socket::service_send_requests(AsyncRequest::RequestQueue &completed_sends) noexcept
 {
     bool would_block = false;
 
@@ -336,11 +315,8 @@ void Socket::service_send_requests(
                     break;
 
                 case Protocol::UDP:
-                    bytes_sent = send_to(
-                        message,
-                        request.get_address(),
-                        request.get_port(),
-                        would_block);
+                    bytes_sent =
+                        send_to(message, request.get_address(), request.get_port(), would_block);
                     break;
             }
 
@@ -369,9 +345,8 @@ void Socket::service_send_requests(
     }
 }
 
-//==============================================================================
-void Socket::service_recv_requests(
-    AsyncRequest::RequestQueue &completed_reads) noexcept
+//==================================================================================================
+void Socket::service_recv_requests(AsyncRequest::RequestQueue &completed_reads) noexcept
 {
     bool would_block = false;
     bool is_complete = false;
@@ -403,10 +378,7 @@ void Socket::service_recv_requests(
 
             if (is_complete)
             {
-                SLOGD(
-                    m_socket_id,
-                    "Completed message, %u bytes",
-                    m_receive_buffer.length());
+                SLOGD(m_socket_id, "Completed message, %u bytes", m_receive_buffer.length());
 
                 AsyncRequest request(m_socket_id, std::move(m_receive_buffer));
                 completed_reads.push(std::move(request));

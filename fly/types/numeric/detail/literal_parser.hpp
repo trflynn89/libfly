@@ -6,8 +6,7 @@
 namespace fly::detail {
 
 /**
- * Structures to recursively aggregate the value of an integer literal as it is
- * being parsed.
+ * Structures to recursively aggregate the value of an integer literal as it is being parsed.
  *
  * @tparam T The desired integer literal type.
  * @tparam Base The base of the integer literal being parsed.
@@ -16,8 +15,8 @@ namespace fly::detail {
 template <typename T, T Base, char... Literals>
 struct Aggregator;
 
-// Specialization to convert the current character being parsed to an integer
-// and recurse on the remainder of the characters.
+// Specialization to convert the current character being parsed to an integer and recurse on the
+// remainder of the characters.
 template <typename T, T Base, char Digit, char... Literals>
 struct Aggregator<T, Base, Digit, Literals...>
 {
@@ -29,8 +28,8 @@ struct Aggregator<T, Base, Digit, Literals...>
 
 private:
     /**
-     * Convert the current character being parsed to an integer literal.
-     * Validate that the character fits within its base.
+     * Convert the current character being parsed to an integer literal. Validate that the character
+     * fits within its base.
      *
      * @return The result of conversion.
      */
@@ -60,8 +59,8 @@ private:
     }
 };
 
-// Specialization to simply ignore a separator character and recurse on the
-// remainder of the characters.
+// Specialization to simply ignore a separator character and recurse on the remainder of the
+// characters.
 template <typename T, T Base, char... Literals>
 struct Aggregator<T, Base, '\'', Literals...>
 {
@@ -71,8 +70,7 @@ struct Aggregator<T, Base, '\'', Literals...>
     }
 };
 
-// Specialization to terminate agregation when there are no more characters to
-// be parsed.
+// Specialization to terminate agregation when there are no more characters to be parsed.
 template <typename T, T Base>
 struct Aggregator<T, Base>
 {
@@ -83,13 +81,12 @@ struct Aggregator<T, Base>
 };
 
 /**
- * Structures to parse a sequence of characters and convert the result to an
- * integer literal of a desired type.
+ * Structures to parse a sequence of characters and convert the result to an integer literal of a
+ * desired type.
  *
- * Parsing occurs in two phases. First, any base-specifying prefix is parsed.
- * By default, base-10 is assumed, and specializations are used for other bases.
- * Next, the remaining characters are parsed base on the determined base and
- * converted to the desired type.
+ * Parsing occurs in two phases. First, any base-specifying prefix is parsed. By default, base-10 is
+ * assumed, and specializations are used for other bases. Next, the remaining characters are parsed
+ * base on the determined base and converted to the desired type.
  *
  * @tparam T The desired integer literal type.
  * @tparam Base The base of the integer literal being parsed.
@@ -139,8 +136,7 @@ struct Parser<T, '0', 'X', Literals...> : ParserBase<T, 16, Literals...>
 };
 
 /**
- * Validate that a value can be converted to a desired type and perform that
- * conversion
+ * Validate that a value can be converted to a desired type and perform that conversion
  *
  * @tparam From The current integer literal type.
  * @tparam To The desired integer literal type.
@@ -158,8 +154,7 @@ constexpr To validate_and_convert()
 }
 
 /**
- * Parse a sequence of characters and convert the result to an integer literal
- * of a desired type.
+ * Parse a sequence of characters and convert the result to an integer literal of a desired type.
  *
  * @tparam T The desired integer literal type.
  * @tparam Literals Variadic list of characters to parse.

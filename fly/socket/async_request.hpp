@@ -19,8 +19,8 @@ public:
     using RequestQueue = fly::ConcurrentQueue<AsyncRequest>;
 
     /**
-     * Default constructor to set the socket ID to an invalid value and the
-     * request message to an empty string.
+     * Default constructor to set the socket ID to an invalid value and the request message to an
+     * empty string.
      */
     AsyncRequest() noexcept;
 
@@ -35,8 +35,8 @@ public:
     AsyncRequest(int socket_id, std::string &&request) noexcept;
 
     /**
-     * Constructor to set the ID of the owning socket, the request message, and
-     * the address and port of the owning socket.
+     * Constructor to set the ID of the owning socket, the request message, and the address and port
+     * of the owning socket.
      */
     AsyncRequest(
         int socket_id,
@@ -60,8 +60,7 @@ public:
     int get_socket_id() const noexcept;
 
     /**
-     * Increase the current offset into the request message to mark how much
-     * data has been sent.
+     * Increase the current offset into the request message to mark how much data has been sent.
      *
      * @param offset The offset to set.
      */
