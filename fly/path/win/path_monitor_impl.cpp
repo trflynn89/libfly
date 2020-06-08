@@ -62,6 +62,7 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
     LPOVERLAPPED overlapped = nullptr;
     DWORD delay = static_cast<DWORD>(timeout.count());
 
+    // Hold onto the path to be removed until the mutex is released
     std::filesystem::path path_to_remove;
 
     if (::GetQueuedCompletionStatus(m_iocp, &bytes, &key, &overlapped, delay))
@@ -83,7 +84,6 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
 
             if (!info->refresh(it->first))
             {
-                // Hold onto the path to be removed until the mutex is released
                 path_to_remove = it->first;
             }
         }

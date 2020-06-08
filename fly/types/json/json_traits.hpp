@@ -29,10 +29,9 @@ class Json;
 struct JsonTraits
 {
     /**
-     * Aliases for JSON types. These could be specified as template parameters
-     * to the JsonTraits class to allow callers to override the types. But these
-     * are reasonable default types for now, and the Json class constructors
-     * allow for type flexibility.
+     * Aliases for JSON types. These could be specified as template parameters to the JsonTraits
+     * class to allow callers to override the types. But these are reasonable default types for now,
+     * and the Json class constructors allow for type flexibility.
      */
     using null_type = std::nullptr_t;
     using string_type = std::string;
@@ -144,8 +143,8 @@ struct JsonTraits
     inline static constexpr bool is_object_v = is_object<T>::value;
 
     /**
-     * Helper SFINAE struct to determine whether a type is a JSON array, and
-     * wrapper methods to generically modify an array.
+     * Helper SFINAE struct to determine whether a type is a JSON array, and wrapper methods to
+     * generically modify an array.
      */
     struct ArrayTraits
     {

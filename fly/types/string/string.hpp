@@ -60,9 +60,8 @@ public:
     static std::vector<StringType> split(const StringType &input, char_type delimiter) noexcept;
 
     /**
-     * Split a string into a vector of strings, up to a maximum size. If the max
-     * size is reached, the rest of the string is appended to the last element
-     * in the vector.
+     * Split a string into a vector of strings, up to a maximum size. If the max size is reached,
+     * the rest of the string is appended to the last element in the vector.
      *
      * @param input The string to split.
      * @param delimiter The delimiter to split the string on.
@@ -159,8 +158,8 @@ public:
     static bool wildcard_match(const StringType &source, const StringType &search) noexcept;
 
     /**
-     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings
-     * and UTF-16 paired surrogate encodings.
+     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
+     * surrogate encodings.
      *
      * Input sequences must be of the form: (\u[0-9a-fA-F]{4}){1,2}
      *
@@ -168,14 +167,14 @@ public:
      *
      * @return The parsed unicode character.
      *
-     * @throws UnicodeException If the interpreted unicode character is not
-     *         valid or there weren't enough available bytes.
+     * @throws UnicodeException If the interpreted unicode character is not valid or there weren't
+     *         enough available bytes.
      */
     static StringType parse_unicode_character(const StringType &source) noexcept(false);
 
     /**
-     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings
-     * and UTF-16 paired surrogate encodings.
+     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
+     * surrogate encodings.
      *
      * Input sequences must be of the form: (\u[0-9a-fA-F]{4}){1,2}
      *
@@ -184,8 +183,8 @@ public:
      *
      * @return The parsed unicode character.
      *
-     * @throws UnicodeException If the interpreted unicode character is not
-     *         valid or there weren't enough available bytes.
+     * @throws UnicodeException If the interpreted unicode character is not valid or there weren't
+     *         enough available bytes.
      */
     static StringType parse_unicode_character(
         typename StringType::const_iterator &it,
@@ -201,20 +200,17 @@ public:
     static StringType generate_random_string(size_type size) noexcept;
 
     /**
-     * Format a string with variadic template arguments, returning the formatted
-     * string.
+     * Format a string with variadic template arguments, returning the formatted string.
      *
-     * This is type safe in that argument types need not match the format
-     * specifier (i.e. there is no error if %s is given an integer). However,
-     * specifiers such as %x are still attempted to be handled. That is, if the
-     * matching argument for %x is numeric, then it will be converted to a
+     * This is type safe in that argument types need not match the format specifier (i.e. there is
+     * no error if %s is given an integer). However, specifiers such as %x are still attempted to be
+     * handled. That is, if the matching argument for %x is numeric, then it will be converted to a
      * hexadecimal representation.
      *
-     * There is also no checking done on the number of format specifiers and
-     * the number of arguments. The format specifiers will be replaced one at a
-     * time until all arguments are exhausted, then the rest of the string is
-     * taken as-is. Any extra specifiers will be in the string. Any extra
-     * arguments are dropped.
+     * There is also no checking done on the number of format specifiers and the number of
+     * arguments. The format specifiers will be replaced one at a time until all arguments are
+     * exhausted, then the rest of the string is taken as-is. Any extra specifiers will be in the
+     * string. Any extra arguments are dropped.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -227,20 +223,18 @@ public:
     static streamed_type format(const char_type *fmt, const Args &... args) noexcept;
 
     /**
-     * Format a string with variadic template arguments, inserting the formatted
-     * string into a stream.
+     * Format a string with variadic template arguments, inserting the formatted string into a
+     * stream.
      *
-     * This is type safe in that argument types need not match the format
-     * specifier (i.e. there is no error if %s is given an integer). However,
-     * specifiers such as %x are still attempted to be handled. That is, if the
-     * matching argument for %x is numeric, then it will be converted to a
+     * This is type safe in that argument types need not match the format specifier (i.e. there is
+     * no error if %s is given an integer). However, specifiers such as %x are still attempted to be
+     * handled. That is, if the matching argument for %x is numeric, then it will be converted to a
      * hexadecimal representation.
      *
-     * There is also no checking done on the number of format specifiers and
-     * the number of arguments. The format specifiers will be replaced one at a
-     * time until all arguments are exhausted, then the rest of the string is
-     * taken as-is. Any extra specifiers will be in the string. Any extra
-     * arguments are dropped.
+     * There is also no checking done on the number of format specifiers and the number of
+     * arguments. The format specifiers will be replaced one at a time until all arguments are
+     * exhausted, then the rest of the string is taken as-is. Any extra specifiers will be in the
+     * string. Any extra arguments are dropped.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -284,8 +278,7 @@ public:
 
 private:
     /**
-     * Recursively format a string with one argument. The result is streamed
-     * into the given ostream.
+     * Recursively format a string with one argument. The result is streamed into the given ostream.
      */
     template <typename T, typename... Args>
     static void format_internal(
@@ -295,8 +288,8 @@ private:
         const Args &... args) noexcept;
 
     /**
-     * Terminator for the variadic template formatter. Stream the rest of the
-     * string into the given ostream.
+     * Terminator for the variadic template formatter. Stream the rest of the string into the given
+     * ostream.
      */
     static void format_internal(ostream_type &ostream, const char_type *fmt) noexcept;
 
@@ -311,8 +304,7 @@ private:
         const Args &... args) noexcept;
 
     /**
-     * Terminator for the variadic template joiner. Join the last argument
-     * into the given ostream.
+     * Terminator for the variadic template joiner. Join the last argument into the given ostream.
      */
     template <typename T>
     static void
@@ -395,10 +387,10 @@ void BasicString<StringType>::trim(StringType &target) noexcept
 {
     auto is_non_space = [](int ch) { return !std::isspace(ch); };
 
-    // Remove leading whitespace
+    // Remove leading whitespace.
     target.erase(target.begin(), std::find_if(target.begin(), target.end(), is_non_space));
 
-    // Remove trailing whitespace
+    // Remove trailing whitespace.
     target.erase(std::find_if(target.rbegin(), target.rend(), is_non_space).base(), target.end());
 }
 

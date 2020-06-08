@@ -540,9 +540,9 @@ TEST_F(HuffmanCoderFileTest, Enwik8File)
 
     if (!std::filesystem::exists(raw))
     {
-        // TODO: The enwik8 file is 100MB. Instead of checking it into git and
-        // encoding/decoding it with debug mode unit tests, a performance test
-        // should be created that downloads the file and runs in release mode.
+        // TODO: The enwik8 file is 100MB. Instead of checking it into git and encoding/decoding it
+        // with debug mode unit tests, a performance test should be created that downloads the file
+        // and runs in release mode.
         return;
     }
 

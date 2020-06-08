@@ -63,10 +63,7 @@ void Logger::add_log(
     }
     else
     {
-        const std::string console =
-            String::format("%d %s:%s:%d %s", level, file, function, line, message);
-
-        console_log(true, console);
+        console_log(true, String::format("%d %s:%s:%d %s", level, file, function, line, message));
     }
 }
 
@@ -120,7 +117,6 @@ void Logger::add_log_internal(
     const std::string &message) noexcept
 {
     auto now = std::chrono::high_resolution_clock::now();
-
     auto log_time = std::chrono::duration_cast<std::chrono::duration<double>>(now - m_start_time);
 
     if ((level >= Log::Level::Debug) && (level < Log::Level::NumLevels))

@@ -18,8 +18,7 @@
 namespace {
 
 /**
- * Subclass of the path config to decrease the poll interval for faster
- * testing.
+ * Subclass of the path config to decrease the poll interval for faster testing.
  */
 class TestPathConfig : public fly::PathConfig
 {
@@ -41,14 +40,12 @@ public:
         m_file(m_path / (fly::String::generate_random_string(10) + ".txt")),
 
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
-
         m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
         m_config_manager(std::make_shared<fly::ConfigManager>(
             m_task_runner,
             fly::ConfigManager::ConfigFileType::Ini,
             m_file)),
-
         m_path_config(m_config_manager->create_config<TestPathConfig>())
     {
     }
@@ -280,9 +277,8 @@ TEST_F(ConfigManagerTest, FileChange)
     ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents2));
     m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
-    // Multiple fly::PathMonitor::PathEvent::Changed events may be triggered
-    // even though the above write happens as a single call. If needed, wait for
-    // a second event.
+    // Multiple fly::PathMonitor::PathEvent::Changed events may be triggered even though the above
+    // write happens as a single call. If needed, wait for a second event.
     if (config->get_value<std::string>("name", "").empty())
     {
         m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();

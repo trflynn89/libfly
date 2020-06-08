@@ -9,8 +9,8 @@ namespace fly {
 class Json;
 
 /**
- * Generic exception to be raised if an error was encountered creating,
- * accessing, or modifying a Json instance.
+ * Generic exception to be raised if an error was encountered creating, accessing, or modifying a
+ * Json instance.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version September 24, 2017
@@ -67,8 +67,7 @@ public:
 };
 
 /**
- * Exception to be raised for illegally comparing iterators of two different
- * Json instances.
+ * Exception to be raised for illegally comparing iterators of two different Json instances.
  */
 class BadJsonComparisonException : public JsonException
 {
@@ -83,8 +82,7 @@ public:
 };
 
 /**
- * Exception to be raised trying to dereference an empty or past-the-end
- * JsonIterator instance.
+ * Exception to be raised trying to dereference an empty or past-the-end JsonIterator instance.
  */
 class NullJsonException : public JsonException
 {
@@ -103,8 +101,8 @@ public:
 };
 
 /**
- * Exception to be raised trying to create an iterator that escapes the range
- * [begin, end] of a Json instance.
+ * Exception to be raised trying to create an iterator that escapes the range [begin, end] of a Json
+ * instance.
  */
 class OutOfRangeJsonException : public JsonException
 {

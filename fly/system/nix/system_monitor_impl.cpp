@@ -179,7 +179,7 @@ void SystemMonitorImpl::update_process_memory_usage() noexcept
     }
     else
     {
-        // Value stored in status file is in KB
+        // Value stored in status file is in KB.
         m_process_memory_usage.store(process_memory_usage << 10);
     }
 }

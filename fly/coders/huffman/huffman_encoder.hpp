@@ -13,8 +13,8 @@ class BitStreamWriter;
 class HuffmanConfig;
 
 /**
- * Implementation of the Encoder interface for Huffman coding. Forms length-
- * limted, canonical Huffman codes to encode symbols.
+ * Implementation of the Encoder interface for Huffman coding. Forms length-limted, canonical
+ * Huffman codes to encode symbols.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
@@ -33,15 +33,14 @@ protected:
     /**
      * Huffman encode a stream.
      *
-     * If the input stream is large, in order to limit memory usage, the stream
-     * is encoded in chunks. Each chunk is treated as its own input stream, and
-     * the encoding sequence is repeated for each chunk.
+     * If the input stream is large, in order to limit memory usage, the stream is encoded in
+     * chunks. Each chunk is treated as its own input stream, and the encoding sequence is repeated
+     * for each chunk.
      *
-     * The first bytes of the output stream are reserved as a header. Currently,
-     * the header contains: the incurred BitStream header, the version of the
-     * Huffman coder used to encode the stream, the maximum chunk length used to
-     * to split large streams (in kilobytes), and the maximum allowed Huffman
-     * code length:
+     * The first bytes of the output stream are reserved as a header. Currently, the header
+     * contains: the incurred BitStream header, the version of the Huffman coder used to encode the
+     * stream, the maximum chunk length used to to split large streams (in kilobytes), and the
+     * maximum allowed Huffman code length:
      *
      *     |      8 bits      |  8 bits |      16 bits      |      8 bits     |
      *     --------------------------------------------------------------------
@@ -56,24 +55,21 @@ protected:
      *     5. Encode the canonical codes.
      *     6. Encode the input stream using the canonical codes.
      *
-     * This sequence involves iterating over the entire input stream twice (to
-     * create the Huffman tree and to encode the stream).
+     * This sequence involves iterating over the entire input stream twice (to create the Huffman
+     * tree and to encode the stream).
      *
-     * The coder does not assume the Huffman codes are retained between calls.
-     * Thus, the codes are encoded before the input stream (step 5) so that they
-     * may be learned during decoding.
+     * The coder does not assume the Huffman codes are retained between calls. Thus, the codes are
+     * encoded before the input stream (step 5) so that they may be learned during decoding.
      *
-     * Length-limiting is performed on the generated Huffman codes to improve
-     * decoder performance. Worst-case, a Huffman code could have the same
-     * length as the maximum number of symbols. Limiting the length of Huffman
-     * codes awards a significant decoder performance improvement, while only
-     * incurring a small cost in compression ratio.
+     * Length-limiting is performed on the generated Huffman codes to improve decoder performance.
+     * Worst-case, a Huffman code could have the same length as the maximum number of symbols.
+     * Limiting the length of Huffman codes awards a significant decoder performance improvement,
+     * while only incurring a small cost in compression ratio.
      *
-     * Canonical form is used for its property of generally being describable in
-     * fewer bits than standard form. When in canonical form, the Huffman codes
-     * are sorted by code length. With this sorting, the count of the number of
-     * symbols for each code length is computed: (N0, N1, N2, ..., Nn), where
-     * N<n> is the number of symbols of code length <n>. Call the length of this
+     * Canonical form is used for its property of generally being describable in fewer bits than
+     * standard form. When in canonical form, the Huffman codes are sorted by code length. With this
+     * sorting, the count of the number of symbols for each code length is computed: (N0, N1, N2,
+     * ..., Nn), where N<n> is the number of symbols of code length <n>. Call the length of this
      * list NN.
      *
      * The encoding of canonical Huffman codes then becomes:
@@ -82,8 +78,8 @@ protected:
      *
      * Where S<n> is all symbols of code length <n>.
      *
-     * Encoding the input stream (step 6) consists of reading each symbol from
-     * the input stream and outputting that symbol's canonical Huffman code.
+     * Encoding the input stream (step 6) consists of reading each symbol from the input stream and
+     * outputting that symbol's canonical Huffman code.
      *
      * @param decoded Stream holding the contents to encode.
      * @param encoded Stream to store the encoded contents.
@@ -94,8 +90,8 @@ protected:
 
 private:
     /**
-     * Read the stream into a buffer, up to a static maximum size, storing bytes
-     * in the chunk buffer.
+     * Read the stream into a buffer, up to a static maximum size, storing bytes in the chunk
+     * buffer.
      *
      * @param decoded Stream holding the contents to encode.
      *
@@ -111,8 +107,8 @@ private:
     void create_tree(std::uint32_t chunk_size) noexcept;
 
     /**
-     * Create a list of Huffman codes from the generated Huffman tree. The list
-     * of codes will be in canonical form.
+     * Create a list of Huffman codes from the generated Huffman tree. The list of codes will be in
+     * canonical form.
      */
     void create_codes() noexcept;
 
@@ -124,18 +120,16 @@ private:
     void insert_code(HuffmanCode &&code) noexcept;
 
     /**
-     * Length-limit the generated Huffman codes to a static maximum size, using
-     * a method described in Charles Bloom's blog, which is based around the
-     * Kraft–McMillan inequality:
+     * Length-limit the generated Huffman codes to a static maximum size, using a method described
+     * in Charles Bloom's blog, which is based around the Kraft–McMillan inequality:
      *
      * https://cbloomrants.blogspot.com/2010/07/07-03-10-length-limitted-huffman-codes.html
      */
     void limit_code_lengths() noexcept;
 
     /**
-     * Convert the generated list of standard Huffman codes into canonical form.
-     * It is assumed that the codes are already sorted in accordance with
-     * canonical form.
+     * Convert the generated list of standard Huffman codes into canonical form. It is assumed that
+     * the codes are already sorted in accordance with canonical form.
      */
     void convert_to_canonical_form() noexcept;
 
@@ -154,9 +148,8 @@ private:
     void encode_codes(BitStreamWriter &encoded) const noexcept;
 
     /**
-     * Encode symbols from the current chunk buffer with the generated list of
-     * Huffman codes. The list of codes is effectively destroyed as its elements
-     * are moved to a map for faster lookups.
+     * Encode symbols from the current chunk buffer with the generated list of Huffman codes. The
+     * list of codes is effectively destroyed as its elements are moved to a map for faster lookups.
      *
      * @param chunk_size The number of bytes the chunk buffer holds.
      * @param encoded Stream to store the encoded symbols.

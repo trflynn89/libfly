@@ -75,7 +75,7 @@ void SocketManagerImpl::handle_socket_io(fd_set *read_fd, fd_set *write_fd) noex
         {
             socket_type handle = socket->get_handle();
 
-            // Handle socket accepts and reads
+            // Handle socket accepts and reads.
             if (FD_ISSET(handle, read_fd))
             {
                 if (socket->is_listening())
@@ -94,7 +94,7 @@ void SocketManagerImpl::handle_socket_io(fd_set *read_fd, fd_set *write_fd) noex
                 }
             }
 
-            // Handle socket connects and writes
+            // Handle socket connects and writes.
             if (FD_ISSET(handle, write_fd))
             {
                 if (socket->is_connecting())

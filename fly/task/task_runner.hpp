@@ -32,9 +32,9 @@ public:
     /**
      * Post a task for execution.
      *
-     * Once a task is posted, it may be attempted to be cancelled by deleting
-     * the task object or the task runner itself. This will only cancel the task
-     * if the task manager has not yet begun executing the task.
+     * Once a task is posted, it may be attempted to be cancelled by deleting the task object or the
+     * task runner itself. This will only cancel the task if the task manager has not yet begun
+     * executing the task.
      *
      * @param weak_task The task to be executed.
      *
@@ -43,14 +43,13 @@ public:
     virtual bool post_task(std::weak_ptr<Task> weak_task) noexcept = 0;
 
     /**
-     * Schedule a task to be posted after a delay. The task is given to the
-     * task manager immediately to be stored by its timer thread. Once the given
-     * delay has expired, the task will be handed back to the task runner to
-     * govern when the task will be posted from there.
+     * Schedule a task to be posted after a delay. The task is given to the task manager immediately
+     * to be stored by its timer thread. Once the given delay has expired, the task will be handed
+     * back to the task runner to govern when the task will be posted from there.
      *
-     * Once a task is posted, it may be attempted to be cancelled by deleting
-     * the task object or the task runner itself. This will only cancel the task
-     * if the task manager has not yet begun executing the task.
+     * Once a task is posted, it may be attempted to be cancelled by deleting the task object or the
+     * task runner itself. This will only cancel the task if the task manager has not yet begun
+     * executing the task.
      *
      * @param weak_task The task to be executed.
      * @param delay Delay before posting the task.
@@ -62,24 +61,22 @@ public:
 
 protected:
     /**
-     * Private constructor. Task runners may only be created by the task
-     * manager.
+     * Private constructor. Task runners may only be created by the task manager.
      *
      * @param weak_task_manager The task manager.
      */
     TaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept;
 
     /**
-     * Completion notification triggered by the task manager that a task has
-     * finished execution (or was skipped).
+     * Completion notification triggered by the task manager that a task has finished execution (or
+     * was skipped).
      *
      * @param task The (possibly null) task that was executed or skipped.
      */
     virtual void task_complete(const std::shared_ptr<Task> &task) noexcept = 0;
 
     /**
-     * Forward a task to the task manager to be executed as soon as a worker
-     * thread is available.
+     * Forward a task to the task manager to be executed as soon as a worker thread is available.
      *
      * @param task The task to be executed.
      *
@@ -92,8 +89,8 @@ private:
 };
 
 /**
- * Task runner implementation for executing tasks in parallel. Tasks posted to
- * this task runner may be executed in any order.
+ * Task runner implementation for executing tasks in parallel. Tasks posted to this task runner may
+ * be executed in any order.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
@@ -117,14 +114,13 @@ protected:
 };
 
 /**
- * Task runner implementation for executing tasks in sequence. Only one task
- * posted to this task runner will execute at a time. Tasks are executed in a
- * FIFO manner; once one task completes, the next task in line will be posted
- * for execution.
+ * Task runner implementation for executing tasks in sequence. Only one task posted to this task
+ * runner will execute at a time. Tasks are executed in a FIFO manner; once one task completes, the
+ * next task in line will be posted for execution.
  *
- * The caveat is with delayed tasks. If task A is posted with some delay, then
- * task B is posted with no delay, task B will be posted for execution first.
- * Task A will only be posted for execution once its delay has expired.
+ * The caveat is with delayed tasks. If task A is posted with some delay, then task B is posted with
+ * no delay, task B will be posted for execution first. Task A will only be posted for execution
+ * once its delay has expired.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
@@ -148,11 +144,9 @@ protected:
 
 private:
     /**
-     * If no task has been posted for execution, post the first task in the
-     * pending queue.
+     * If no task has been posted for execution, post the first task in the pending queue.
      *
-     * @return True if the task was posted for execution or added to the pending
-     *         queue.
+     * @return True if the task was posted for execution or added to the pending queue.
      */
     bool maybe_post_task() noexcept;
 

@@ -6,8 +6,7 @@
 namespace fly::detail {
 
 /**
- * Helper class to parse escaped unicode character sequences in a
- * std::basic_string<>.
+ * Helper class to parse escaped unicode character sequences in a std::basic_string<>.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version June 6, 2020
@@ -28,8 +27,8 @@ class BasicStringUnicode
 
 public:
     /**
-     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings
-     * and UTF-16 paired surrogate encodings.
+     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
+     * surrogate encodings.
      *
      * Input sequences must be of the form: (\u[0-9a-fA-F]{4}){1,2}
      *
@@ -38,8 +37,8 @@ public:
      *
      * @return The parsed unicode character.
      *
-     * @throws UnicodeException If the interpreted unicode character is not
-     *         valid or there weren't enough available bytes.
+     * @throws UnicodeException If the interpreted unicode character is not valid or there weren't
+     *         enough available bytes.
      */
     static StringType parse_character(
         typename StringType::const_iterator &it,
@@ -47,16 +46,15 @@ public:
 
 private:
     /**
-     * Parse a single escaped unicode character. Convert the character to a
-     * 32-bit codepoint.
+     * Parse a single escaped unicode character. Convert the character to a 32-bit codepoint.
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
      * @return The parsed unicode codepoint.
      *
-     * @throws UnicodeException If the interpreted unicode character is not
-     *         valid or there weren't enough available bytes.
+     * @throws UnicodeException If the interpreted unicode character is not valid or there weren't
+     *         enough available bytes.
      */
     static codepoint_type parse_codepoint(
         typename StringType::const_iterator &it,
@@ -98,8 +96,7 @@ StringType BasicStringUnicode<StringType>::parse_character(
             //
             //     C = ((HS - 0xd800) * 0x400) + (LS - 0xdc00) + 0x10000
             //
-            // Multiplying by 0x400 (1024) is the same as bit-shifting left by
-            // 10 bits. The formula then simplifies to:
+            // Multiplying by 0x400 is the same as left-shifting 10 bits. The formula then becomes:
             codepoint = (high_surrogate << 10) + low_surrogate - 0x35fdc00;
         }
         else

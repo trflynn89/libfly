@@ -67,7 +67,6 @@ std::uint32_t HuffmanEncoder::read_stream(std::istream &decoded) const noexcept
 //==================================================================================================
 void HuffmanEncoder::create_tree(std::uint32_t chunk_size) noexcept
 {
-    // Lambda to retrieve the next available HuffmanNode
     std::uint16_t index = 0;
 
     // Create a frequency map of each input symbol.
@@ -78,8 +77,7 @@ void HuffmanEncoder::create_tree(std::uint32_t chunk_size) noexcept
         ++counts[m_chunk_buffer[i]];
     }
 
-    // Create a priority queue of HuffmanNode, sorted such that the least common
-    // symbol is always on top.
+    // Create a priority queue of HuffmanNode, sorted such that the least common symbol is on top.
     HuffmanNodeQueue queue;
     symbol_type symbol = 0;
 
@@ -93,9 +91,9 @@ void HuffmanEncoder::create_tree(std::uint32_t chunk_size) noexcept
         }
     } while (++symbol != 0);
 
-    // Convert the priority queue to a Huffman tree. Remove the two least common
-    // symbols, combining their frequencies into a new node, and insert the new
-    // node back into the priority queue. Continue until only the root remains.
+    // Convert the priority queue to a Huffman tree. Remove the two least common symbols, combining
+    // their frequencies into a new node, and insert the new node back into the priority queue.
+    // Continue until only the root remains.
     while (queue.size() > 1)
     {
         auto *left = queue.top();
@@ -191,9 +189,8 @@ void HuffmanEncoder::limit_code_lengths() noexcept
     const code_type max_allowed_kraft = (1_u16 << m_max_code_length) - 1;
     code_type kraft = 0;
 
-    // Limit all Huffman codes to not be larger than the maximum code length.
-    // Compute the Kraft number, which will no longer satisfy the Kraft–McMillan
-    // inequality.
+    // Limit all Huffman codes to not be larger than the maximum code length. Compute the Kraft
+    // number, which will no longer satisfy the Kraft–McMillan inequality.
     for (std::uint16_t i = 0; i < m_huffman_codes_size; ++i)
     {
         HuffmanCode &code = m_huffman_codes[i];
@@ -202,9 +199,8 @@ void HuffmanEncoder::limit_code_lengths() noexcept
         kraft += compute_kraft(code);
     }
 
-    // The code lengths must now be corrected to satisfy the Kraft–McMillan
-    // inequality. Starting from the largest code, increase the code lengths
-    // until the inequality is satisfied again.
+    // The code lengths must now be corrected to satisfy the Kraft–McMillan inequality. Starting
+    // from the largest code, increase the code lengths until the inequality is satisfied again.
     for (std::uint16_t i = m_huffman_codes_size; (i-- > 0) && (kraft > max_allowed_kraft);)
     {
         HuffmanCode &code = m_huffman_codes[i];
@@ -216,9 +212,8 @@ void HuffmanEncoder::limit_code_lengths() noexcept
         }
     }
 
-    // The Kraft–McMillan inequality is now satisfied, but possibly overly so.
-    // Starting from the shortest code, decrease code lengths just until the
-    // inequality would no longer be satisfied.
+    // The Kraft–McMillan inequality is now satisfied, but possibly overly so. Starting from the
+    // shortest code, decrease code lengths just until the inequality would no longer be satisfied.
     for (std::uint16_t i = 0; i < m_huffman_codes_size; ++i)
     {
         HuffmanCode &code = m_huffman_codes[i];
@@ -240,9 +235,8 @@ void HuffmanEncoder::convert_to_canonical_form() noexcept
 
     if (m_huffman_codes_size == 1)
     {
-        // Single-node Huffman trees occur when the input stream contains only
-        // one unique symbol. Set its length to one so a single bit is encoded
-        // for each occurrence of that symbol.
+        // Single-node Huffman trees occur when the input stream contains only one unique symbol.
+        // Set its length to one so a single bit is encoded for each occurrence of that symbol.
         m_huffman_codes[0].m_length = 1;
     }
 
@@ -251,8 +245,8 @@ void HuffmanEncoder::convert_to_canonical_form() noexcept
         const HuffmanCode &previous = m_huffman_codes[i - 1_u16];
         HuffmanCode &code = m_huffman_codes[i];
 
-        // Subsequent codes are one greater than the previous code, but also
-        // bit-shifted left enough times to maintain the same code length.
+        // Subsequent codes are one greater than the previous code, but also bit-shifted left enough
+        // times to maintain the same code length.
         code.m_code = previous.m_code + 1;
         code.m_code <<= code.m_length - previous.m_length;
     }

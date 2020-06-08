@@ -21,8 +21,7 @@
 namespace {
 
 /**
- * Subclass of the system config to decrease the poll interval for faster
- * testing.
+ * Subclass of the system config to decrease the poll interval for faster testing.
  */
 class TestSystemConfig : public fly::SystemConfig
 {
@@ -41,13 +40,11 @@ class SystemMonitorTest : public ::testing::Test
 public:
     SystemMonitorTest() noexcept :
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
-
         m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
         m_monitor(std::make_shared<fly::SystemMonitorImpl>(
             m_task_runner,
             std::make_shared<TestSystemConfig>())),
-
         m_keep_running(true)
     {
     }

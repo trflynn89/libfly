@@ -20,9 +20,9 @@ class SocketManagerTask;
 enum class Protocol : uint8_t;
 
 /**
- * Class to manage the creation of sockets and IO operations over asynchronous
- * sockets. A single thread is created to perform all IO. Completed IO is
- * pushed onto queues, which other threads may read from.
+ * Class to manage the creation of sockets and IO operations over asynchronous sockets. A single
+ * thread is created to perform all IO. Completed IO is pushed onto queues, which other threads may
+ * read from.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 19, 2016
@@ -79,8 +79,7 @@ public:
     std::shared_ptr<Socket> create_socket(Protocol protocol) noexcept;
 
     /**
-     * Create and initialize an asynchronous socket. The socket manager will own
-     * this socket.
+     * Create and initialize an asynchronous socket. The socket manager will own this socket.
      *
      * @param protocol The communication protocol of the socket.
      *
@@ -171,8 +170,8 @@ public:
 
 protected:
     /**
-     * Call back into the socket manager to check if any asynchronous sockets
-     * are available for IO. The task re-arms itself.
+     * Call back into the socket manager to check if any asynchronous sockets are available for IO.
+     * The task re-arms itself.
      */
     void run() noexcept override;
 

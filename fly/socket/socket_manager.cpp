@@ -94,10 +94,10 @@ void SocketManager::handle_new_and_closed_sockets(
     const SocketList &new_sockets,
     const SocketList &closed_sockets) noexcept
 {
-    // Add new sockets to the socket system
+    // Add new sockets to the socket system.
     m_async_sockets.insert(m_async_sockets.end(), new_sockets.begin(), new_sockets.end());
 
-    // Remove closed sockets from the socket system
+    // Remove closed sockets from the socket system.
     for (const std::shared_ptr<Socket> &socket : closed_sockets)
     {
         auto is_same_socket = [&socket](const std::shared_ptr<Socket> &closed) {

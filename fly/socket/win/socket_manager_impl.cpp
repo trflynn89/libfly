@@ -51,7 +51,7 @@ void SocketManagerImpl::poll(const std::chrono::microseconds &timeout) noexcept
 
     if (any_masks_set)
     {
-        // First argument of ::select() is ignored in Windows
+        // First argument of ::select() is ignored in Windows.
         if (::select(0, &read_fd, &write_fd, nullptr, &tv) > 0)
         {
             std::lock_guard<std::mutex> lock(m_async_sockets_mutex);
@@ -95,7 +95,7 @@ void SocketManagerImpl::handle_socket_io(fd_set *read_fd, fd_set *write_fd) noex
         {
             socket_type handle = socket->get_handle();
 
-            // Handle socket accepts and reads
+            // Handle socket accepts and reads.
             if (FD_ISSET(handle, read_fd))
             {
                 if (socket->is_listening())
@@ -114,7 +114,7 @@ void SocketManagerImpl::handle_socket_io(fd_set *read_fd, fd_set *write_fd) noex
                 }
             }
 
-            // Handle socket connects and writes
+            // Handle socket connects and writes.
             if (FD_ISSET(handle, write_fd))
             {
                 if (socket->is_connecting())

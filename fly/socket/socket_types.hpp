@@ -10,8 +10,7 @@
 #endif
 
 /**
- * Wrapper logging macros to format logs with socket handles in a consistent
- * manner.
+ * Wrapper logging macros to format logs with socket handles in a consistent manner.
  */
 #define SLOGD(handle, ...)                                                                         \
     LOGD("[%d] " _FLY_FORMAT_STRING(__VA_ARGS__), handle _FLY_FORMAT_ARGS(__VA_ARGS__))

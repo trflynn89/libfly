@@ -22,8 +22,7 @@ namespace {
         '+', '/',
     };
 
-    // A mapping of ASCII codes to their indices in the Base64 symbol table.
-    // Invalid values are marked with -1.
+    // A mapping of ASCII codes to their indices in the Base64 symbol table. Invalid values are -1.
     constexpr const std::array<std::ios::char_type, 256> s_base64_codes = {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62,
@@ -54,8 +53,8 @@ bool Base64Coder::encode_internal(std::istream &decoded, std::ostream &encoded) 
         encode_chunk(chunk, std::tuple_size<EncodedChunk>::value, encoded);
     }
 
-    // If the input stream was not evenly split into 3-byte chunks, add padding
-    // to the remaining chunk.
+    // If the input stream was not evenly split into 3-byte chunks, add padding to the remaining
+    // chunk.
     const std::size_t index = static_cast<size_t>(decoded.gcount());
 
     if (index > 0)

@@ -45,7 +45,9 @@ std::string PathUtil::read_file(const std::filesystem::path &path) noexcept
 }
 
 //==================================================================================================
-bool PathUtil::compare_files(const std::filesystem::path &path1, const std::filesystem::path &path2)
+bool PathUtil::compare_files(
+    const std::filesystem::path &path1,
+    const std::filesystem::path &path2) noexcept
 {
     if (std::filesystem::file_size(path1) != std::filesystem::file_size(path2))
     {

@@ -13,10 +13,9 @@ class Task;
 class TaskManager;
 
 /**
- * A pseudo task runner to allow waiting for a specific task to be complete. It
- * is not a valid test runner in itself, in that it doesn't allow actually
- * running tasks. But the implementations below extend this class for common
- * functionality. Only meant to be used by unit tests.
+ * A pseudo task runner to allow waiting for a specific task to be complete. It is not a valid test
+ * runner in itself, in that it doesn't allow actually running tasks. But the implementations below
+ * extend this class for common functionality. Only meant to be used by unit tests.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
@@ -62,9 +61,8 @@ private:
 };
 
 /**
- * Subclass of the parallel task runner to provide the same parllel behavior,
- * but also to allow waiting for a specific task to be complete. Only meant to
- * be used by unit tests.
+ * Subclass of the parallel task runner to provide the same parllel behavior, but also to allow
+ * waiting for a specific task to be complete. Only meant to be used by unit tests.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
@@ -86,9 +84,8 @@ protected:
 };
 
 /**
- * Subclass of the sequenced task runner to provide the same sequenced behavior,
- * but also to allow waiting for a specific task to be complete. Only meant to
- * be used by unit tests.
+ * Subclass of the sequenced task runner to provide the same sequenced behavior, but also to allow
+ * waiting for a specific task to be complete. Only meant to be used by unit tests.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
@@ -101,8 +98,7 @@ protected:
     WaitableSequencedTaskRunner(std::weak_ptr<TaskManager> task_manager) noexcept;
 
     /**
-     * When a task is complete, perform the same operations as this runner's
-     * parents.
+     * When a task is complete, perform the same operations as this runner's parents.
      *
      * @param task The (possibly NULL) task that was executed or skipped.
      */

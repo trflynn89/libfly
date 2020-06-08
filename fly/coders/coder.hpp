@@ -11,8 +11,8 @@ class BitStreamReader;
 class BitStreamWriter;
 
 /**
- * Virtual interface to encode a string or file with a plaintext encoder. Coders
- * for specific algorithms should inherit from this class to perform encoding.
+ * Virtual interface to encode a string or file with a plaintext encoder. Coders for specific
+ * algorithms should inherit from this class to perform encoding.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
@@ -60,8 +60,8 @@ protected:
 };
 
 /**
- * Virtual interface to encode a string or file with a binary encoder. Coders
- * for specific algorithms should inherit from this class to perform encoding.
+ * Virtual interface to encode a string or file with a binary encoder. Coders for specific
+ * algorithms should inherit from this class to perform encoding.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version May 3, 2020
@@ -83,8 +83,8 @@ protected:
 };
 
 /**
- * Virtual interface to decode a string or file with a plaintext decoder. Coders
- * for specific algorithms should inherit from this class to perform decoding.
+ * Virtual interface to decode a string or file with a plaintext decoder. Coders for specific
+ * algorithms should inherit from this class to perform decoding.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
@@ -132,8 +132,8 @@ protected:
 };
 
 /**
- * Virtual interface to decode a string or file with a binary decoder. Coders
- * for specific algorithms should inherit from this class to perform decoding.
+ * Virtual interface to decode a string or file with a binary decoder. Coders for specific
+ * algorithms should inherit from this class to perform decoding.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version May 3, 2020

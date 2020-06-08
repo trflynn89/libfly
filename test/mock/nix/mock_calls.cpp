@@ -19,29 +19,27 @@ namespace {
 // This is a hack to be able to test fcntl() being called multiple times in
 // socket/nix/socket_impl.cpp::SetAsync().
 //
-// The socket_test unit test will test SetAsync() twice. In the first test,
-// fcntl() will fail on its first invocation. In the second test, fcntl()
-// will behave normally on its first invocation, and fail on the second.
+// The socket_test unit test will test SetAsync() twice. In the first test, fcntl() will fail on its
+// first invocation. In the second test, fcntl() will behave normally on its first invocation, and
+// fail on the second.
 int s_fcntl_call_count = 0;
 int s_fcntl_next_call = 1;
 
 // This is a hack to be able to test send() being called multiple times in
 // SocketTest::Send_Async_MockSendBlock.
 //
-// On the first call to send() when mocked blocking is enabled, send half of
-// the bytes, simulating packet fragmentation.  On the second call, send 0
-// bytes and set errno to EWOULDBLOCK to make SocketImpl break out of its
-// send loop after the packet fragmentation. On the third call, send the
+// On the first call to send() when mocked blocking is enabled, send half of the bytes, simulating
+// packet fragmentation.  On the second call, send 0 bytes and set errno to EWOULDBLOCK to make
+// SocketImpl break out of its send loop after the packet fragmentation. On the third call, send the
 // remaining bytes, completing the send.
 int s_send_call_count = 0;
 
 // This is a hack to be able to test sendto() being called multiple times in
 // SocketTest::Send_Async_MockSendtoBlock.
 //
-// On the first call to sendto() when mocked blocking is enabled, send half
-// of the bytes, simulating packet fragmentation.  On the second call, send
-// 0 bytes and set errno to EWOULDBLOCK to make SocketImpl break out of its
-// send loop after the packet fragmentation. On the third call, send the
+// On the first call to sendto() when mocked blocking is enabled, send half of the bytes, simulating
+// packet fragmentation.  On the second call, send 0 bytes and set errno to EWOULDBLOCK to make
+// SocketImpl break out of its send loop after the packet fragmentation. On the third call, send the
 // remaining bytes, completing the send.
 int s_sendto_call_count = 0;
 

@@ -1,6 +1,6 @@
 #include "fly/parser/json_parser.hpp"
 
-#include "fly/parser/exceptions.hpp"
+#include "fly/parser/parser_exception.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -67,11 +67,11 @@ TEST_F(JsonParserTest, JsonChecker)
     // The following files are excluded from this test:
     // - fail18.json: The parser has no max-depth
 
-    // Get the path to the JSON checker directory
+    // Get the path to the JSON checker directory.
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "json_checker";
 
-    // Validate each JSON file in the JSON checker directory
+    // Validate each JSON file in the JSON checker directory.
     for (const auto &it : std::filesystem::directory_iterator(path))
     {
         const auto file = it.path().filename();
@@ -128,11 +128,11 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
         "i_structure_UTF-8_BOM_empty_object.json", // Byte order mark ignored
     };
 
-    // Get the path to the JSONTestSuite directory
+    // Get the path to the JSONTestSuite directory.
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "nst_json_test_suite";
 
-    // Validate each JSON file in the JSONTestSuite directory
+    // Validate each JSON file in the JSONTestSuite directory.
     for (const auto &it : std::filesystem::directory_iterator(path))
     {
         const auto file = it.path().filename();

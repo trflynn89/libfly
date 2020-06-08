@@ -142,14 +142,14 @@ TEST_F(ConcurrencyTest, PopFromEmptyQueue)
     Object obj1;
     Object obj2(1_u32);
 
-    // Make sure pop is initially invalid
+    // Make sure pop is initially invalid.
     ASSERT_FALSE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 
-    // Push an item onto the queue and immediately pop it
+    // Push an item onto the queue and immediately pop it.
     object_queue.push(std::move(obj2));
     ASSERT_TRUE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 
-    // Make sure popping an item from the no-longer non-empty queue is invalid
+    // Make sure popping an item from the no-longer non-empty queue is invalid.
     ASSERT_FALSE(object_queue.pop(obj1, std::chrono::milliseconds(0)));
 }
 

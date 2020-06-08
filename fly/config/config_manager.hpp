@@ -63,8 +63,7 @@ public:
     ~ConfigManager();
 
     /**
-     * Create a configuration object, or if one with the given type's name
-     * exists, fetch it.
+     * Create a configuration object, or if one with the given type's name exists, fetch it.
      *
      * @tparam T Config type (must derive from or be fly::Config).
      *

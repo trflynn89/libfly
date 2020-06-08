@@ -236,8 +236,7 @@ TEST_F(BitStreamTest, MultiBuffer)
         EXPECT_TRUE(stream.finish());
     }
 
-    // A 1-byte header, 2 full internal byte buffers, and a 1-byte buffer should
-    // have been written.
+    // A 1-byte header, 2 full internal byte buffers, and a 1-byte buffer should have been written.
     EXPECT_EQ(
         m_output_stream.str().size(),
         2_u64 + ((length * 2) / std::numeric_limits<fly::byte_type>::digits));
@@ -281,8 +280,7 @@ TEST_F(BitStreamTest, MultiBufferSplit)
         EXPECT_TRUE(stream.finish());
     }
 
-    // A 1-byte header, 2 full internal byte buffers, and a 1-byte buffer should
-    // have been written.
+    // A 1-byte header, 2 full internal byte buffers, and a 1-byte buffer should have been written.
     EXPECT_EQ(
         m_output_stream.str().size(),
         2_u64 + ((length * 2) / std::numeric_limits<fly::byte_type>::digits));
@@ -298,9 +296,9 @@ TEST_F(BitStreamTest, MultiBufferSplit)
         // The 1-byte header should have been read.
         EXPECT_EQ(stream.header(), create_header(3_u8));
 
-        // Reading all written bits should succeed. Here, the bits are read in
-        // an order such that the second and third read must be split because
-        // they each read more than is available in the internal byte buffer.
+        // Reading all written bits should succeed. Here, the bits are read in an order such that
+        // the second and third read must be split because they each read more than is available in
+        // the internal byte buffer.
         EXPECT_EQ(stream.read_bits(buffer, 6), 6_u8);
         EXPECT_EQ(buffer, 0x2b);
 
@@ -398,8 +396,8 @@ TEST_F(BitStreamTest, InvalidWriterStream)
     {
         fly::BitStreamWriter stream(m_output_stream);
 
-        // Fill the internal byte buffer. BitStreamWriter will try to flush the
-        // stream, which will fail.
+        // Fill the internal byte buffer. BitStreamWriter will try to flush the stream, which will
+        // fail.
         stream.write_bits(buffer, length);
         EXPECT_FALSE(stream.finish());
     }
@@ -419,8 +417,8 @@ TEST_F(BitStreamTest, FailedWriterStream)
         // Fill the internal byte buffer with all but one bit.
         stream.write_bits(buffer, length);
 
-        // Close the stream and write more bits. BitStreamWriter will try to
-        // flush the stream, which will fail.
+        // Close the stream and write more bits. BitStreamWriter will try to flush the stream, which
+        // will fail.
         m_output_stream.setstate(std::ios::failbit);
         stream.write_bits(3_u8, 2);
         EXPECT_FALSE(stream.finish());
@@ -498,8 +496,8 @@ TEST_F(BitStreamTest, FailedReaderStream)
         // The 1-byte header should have been read.
         EXPECT_EQ(stream.header(), create_header(0_u8));
 
-        // Close the stream and read some bits. BitStreamReader will try to
-        // fill the internal byte buffer, which will fail.
+        // Close the stream and read some bits. BitStreamReader will try to fill the internal byte
+        // buffer, which will fail.
         m_input_stream.setstate(std::ios::failbit);
         EXPECT_FALSE(stream.read_byte(byte));
     }

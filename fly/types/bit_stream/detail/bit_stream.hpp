@@ -9,13 +9,13 @@
 namespace fly::detail {
 
 /**
- * Base class for writing to and reading from a binary stream. The first byte of
- * the binary stream is reserved as a header for internal use.
+ * Base class for writing to and reading from a binary stream. The first byte of the binary stream
+ * is reserved as a header for internal use.
  *
- * The BitStream implementations allow reading and writing content bit-by-bit.
- * Of course, files cannot contain partial bytes. If a BitStream is closed with
- * a partial byte remaining to be written, that byte is zero-filled, and the
- * number of extra bits written is encoded into the header.
+ * The BitStream implementations allow reading and writing content bit-by-bit. Of course, files
+ * cannot contain partial bytes. If a BitStream is closed with a partial byte remaining to be
+ * written, that byte is zero-filled, and the number of extra bits written is encoded into the
+ * header.
  *
  * The format of the header byte is then:
  *
@@ -23,9 +23,9 @@ namespace fly::detail {
  *     ---------------------------------------------
  *     | Magic number | Number of zero-filled bits |
  *
- * Each BitStream implementation essentially serves as a wrapper around an
- * already existing std::istream or std::ostream. It is expected that the
- * pre-existing stream outlive the wrapper BitStream instance.
+ * Each BitStream implementation essentially serves as a wrapper around an already existing
+ * std::istream or std::ostream. It is expected that the pre-existing stream outlive the wrapper
+ * BitStream instance.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
@@ -48,8 +48,8 @@ protected:
     BitStream(std::streambuf *stream_buffer, byte_type starting_position) noexcept;
 
     /**
-     * Create a bit-mask with the least-significant bits set. The size of the
-     * mask is determined by the template DataType parameter.
+     * Create a bit-mask with the least-significant bits set. The size of the mask is determined by
+     * the template DataType parameter.
      *
      * @tparam DataType The data type storing the number of bits to set.
      *

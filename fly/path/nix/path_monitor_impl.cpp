@@ -92,10 +92,9 @@ bool PathMonitorImpl::read_events() const noexcept
 {
     static constexpr const std::size_t s_event_size = sizeof(inotify_event);
 
-    // Some systems cannot read integer variables if they are not properly
-    // aligned. On other systems, incorrect alignment may decrease performance.
-    // Hence, the buffer used for reading from the inotify file descriptor
-    // should have the same alignment as inotify_event.
+    // Some systems cannot read integer variables if they are not properly aligned. On other
+    // systems, incorrect alignment may decrease performance. Hence, the buffer used for reading
+    // from the inotify file descriptor should have the same alignment as inotify_event.
     char buff[8 << 10] __attribute__((aligned(__alignof__(inotify_event))));
 
     ssize_t size = ::read(m_monitor_descriptor, buff, sizeof(buff));

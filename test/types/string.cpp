@@ -630,8 +630,8 @@ TYPED_TEST(BasicStringTest, FormatTest_a)
     format = FLY_STR(char_type, "%a");
     EXPECT_EQ(FLY_STR(streamed_char, "%a"), StringClass::format(format));
 #if defined(FLY_WINDOWS)
-    // Windows 0-pads std::hexfloat to match the stream precision, Linux does
-    // not. This discrepency should be fixed when length modifiers are added.
+    // Windows 0-pads std::hexfloat to match the stream precision, Linux does not. This discrepency
+    // should be fixed when length modifiers are added.
     EXPECT_EQ(FLY_STR(streamed_char, "0x1.600000p+2"), StringClass::format(format, 5.5));
 #else
     EXPECT_EQ(FLY_STR(streamed_char, "0x1.6p+2"), StringClass::format(format, 5.5));
@@ -640,8 +640,8 @@ TYPED_TEST(BasicStringTest, FormatTest_a)
     format = FLY_STR(char_type, "%A");
     EXPECT_EQ(FLY_STR(streamed_char, "%A"), StringClass::format(format));
 #if defined(FLY_WINDOWS)
-    // Windows 0-pads std::hexfloat to match the stream precision, Linux does
-    // not. This discrepency should be fixed when length modifiers are added.
+    // Windows 0-pads std::hexfloat to match the stream precision, Linux does not. This discrepency
+    // should be fixed when length modifiers are added.
     EXPECT_EQ(FLY_STR(streamed_char, "0X1.600000P+2"), StringClass::format(format, 5.5));
 #else
     EXPECT_EQ(FLY_STR(streamed_char, "0X1.6P+2"), StringClass::format(format, 5.5));
@@ -1034,8 +1034,8 @@ TYPED_TEST(BasicStringTest, BasicStringStreamer)
 {
     DECLARE_ALIASES
 
-    // Extra test to make sure the hexadecimal conversion for std::u16string and
-    // std::u32string in detail::BasicStringStreamer is exercised correctly.
+    // Extra test to make sure the hexadecimal conversion for std::u16string and std::u32string in
+    // detail::BasicStringStreamer is exercised correctly.
     if constexpr (!StringClass::traits::has_stoi_family_v)
     {
         const string_type s = FLY_STR(char_type, "\u00f0\u0178\u008d\u2022");

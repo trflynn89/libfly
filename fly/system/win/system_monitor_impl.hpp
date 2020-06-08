@@ -11,8 +11,8 @@ class SequencedTaskRunner;
 class SystemConfig;
 
 /**
- * Windows implementation of the SystemMonitor interface. Uses the Windows, PDH,
- * and PSAPI libraries to gather system resource information.
+ * Windows implementation of the SystemMonitor interface. Uses the Windows, PDH, and PSAPI libraries
+ * to gather system resource information.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version September 17, 2017
@@ -21,8 +21,7 @@ class SystemMonitorImpl : public SystemMonitor
 {
 public:
     /**
-     * Constructor. Open the system monitor's CPU query and set the system CPU
-     * count.
+     * Constructor. Open the system monitor's CPU query and set the system CPU count.
      */
     SystemMonitorImpl(
         const std::shared_ptr<SequencedTaskRunner> &task_runner,

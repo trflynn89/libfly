@@ -1,42 +1,39 @@
 #pragma once
 
 /**
- * Helper macro to add a log, so all of the public logging macros do not have to
- * insert the file, function, and line macros.
+ * Helper macro to add a log, so all of the public logging macros do not have to insert the file,
+ * function, and line macros.
  */
 #define _FLY_LOG(level, message)                                                                   \
     fly::Logger::add_log(level, __FILE__, __FUNCTION__, __LINE__, message)
 
 /**
- * Return the first argument in a list of variadic arguments, expected to be the
- * logging format string.
+ * Return the first argument in a list of variadic arguments, expected to be the logging format
+ * string.
  *
- * Note that __VA_ARGS__ is wrapped in parentheses. MSVC apparently parses
- * __VA_ARGS__ in a way that is not standards compliant. See:
+ * Note that __VA_ARGS__ is wrapped in parentheses. MSVC apparently parses __VA_ARGS__ in a way that
+ * is not standards compliant. See:
  *
  *     https://stackoverflow.com/q/5134523
  *
- * The macros used here are still standards compliant, but are unfortunately
- * quite a bit messier than they need to be. The basic trick is to pass
- * (__VA_ARGS__) into a helper macro, which in turn uses that to form a call
- * to a second helper macro that can actually parse __VA_ARGS__.
+ * The macros used here are still standards compliant, but are unfortunately quite a bit messier
+ * than they need to be. The basic trick is to pass (__VA_ARGS__) into a helper macro, which in turn
+ * uses that to form a call to a second helper macro that can actually parse __VA_ARGS__.
  */
 #define _FLY_FORMAT_STRING(...) _FLY_FORMAT_STRING_HELPER((__VA_ARGS__, _))
 
 /**
- * Return all but the first argument in a list of variadic arguments, expected
- * to be the arguments to be formatted.
+ * Return all but the first argument in a list of variadic arguments, expected to be the arguments
+ * to be formatted.
  *
- * If there is only one argument (just the format string), this macro expands to
- * nothing.
+ * If there is only one argument (just the format string), this macro expands to nothing.
  *
- * If there is more than one argument, this macro expands to a comma followed by
- * all but the first argument.
+ * If there is more than one argument, this macro expands to a comma followed by all but the first
+ * argument.
  *
  * Currently supports up to and including 50 arguments.
  *
- * Note that the same __VA_ARGS__ mess described in _FLY_FORMAT_STRING is used
- * here.
+ * Note that the same __VA_ARGS__ mess described in _FLY_FORMAT_STRING is used here.
  */
 #define _FLY_FORMAT_ARGS(...)                                                                      \
     _FLY_FORMAT_ARGS_HELPER(_FLY_FORMAT_ARGS_LABEL(__VA_ARGS__), (__VA_ARGS__))

@@ -241,8 +241,8 @@ std::size_t SocketImpl::send(const std::string &message, bool &would_block) cons
 
     while (keep_sending)
     {
-        // Windows's ::send() takes string size as an integer, but std::string's
-        // length is std::size_t - send at most MAX_INT bytes at a time.
+        // Windows's ::send() takes string size as an integer, but std::string's length is
+        // std::size_t. Send at most MAX_INT bytes at a time.
         constexpr static std::size_t s_int_max = std::numeric_limits<int>::max();
         const int to_send_size = static_cast<int>(std::min(to_send.size(), s_int_max));
 

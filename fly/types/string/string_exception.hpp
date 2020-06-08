@@ -36,8 +36,7 @@ private:
 };
 
 /**
- * Exception to be raised for errors encountered parsing escaped unicode
- * sequences.
+ * Exception to be raised for errors encountered parsing escaped unicode sequences.
  */
 class UnicodeException : public StringException
 {

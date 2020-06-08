@@ -241,9 +241,9 @@ JsonParser::consume_value(std::istream &stream, JsonType type) noexcept(false)
         parsing << static_cast<Json::stream_type::char_type>(token);
         discard(stream);
 
-        // Blindly ignore escaped symbols, the Json class will check whether
-        // they are valid. Just read at least one more symbol to prevent
-        // breaking out of the loop too early if the next symbol is a quote.
+        // Blindly ignore escaped symbols, the Json class will check whether they are valid. Just
+        // read at least one more symbol to prevent breaking out of the loop too early if the next
+        // symbol is a quote.
         if ((type == JsonType::JsonString) && (token == Token::ReverseSolidus))
         {
             if ((token = consume(stream)) == Token::EndOfFile)
@@ -406,7 +406,8 @@ JsonParser::NumericType JsonParser::validate_number(const JsonTraits::string_typ
     {
         throw BadConversionException(m_line, m_column, value);
     }
-    else if (is_float())
+
+    if (is_float())
     {
         return NumericType::FloatingPoint;
     }

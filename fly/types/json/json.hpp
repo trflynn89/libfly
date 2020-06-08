@@ -21,33 +21,29 @@
 namespace fly {
 
 /**
- * Class to represent JSON values defined by https://www.json.org. The class
- * provides various user-friendly accessors and initializers to create a JSON
- * value, and to convert the JSON value back its underlying type.
+ * Class to represent JSON values defined by https://www.json.org. The class provides various
+ * user-friendly accessors and initializers to create a JSON value, and to convert the JSON value
+ * back its underlying type.
  *
- * However, there are some restrictions converting a JSON value back to its
- * underlying type:
+ * However, there are some restrictions converting a JSON value back to its underlying type:
  *
- * 1. While creating a JSON value from a char array is allowed, converting a
- *    JSON value back to a char array is not allowed. There is no straight-
- *    forward way to do the following without dynamically allocating memory
- *    that the caller must remember to free:
+ * 1. While creating a JSON value from a char array is allowed, converting a JSON value back to a
+ *    char array is not allowed. There is no straight- forward way to do the following without
+ *    dynamically allocating memory that the caller must remember to free:
  *
  *        fly::Json json = "string";
  *        char *string = json;
  *
- * 2. Conversions back to the underlying type must be explicit. To define the
- *    conversion operators implicitly could introduce ambiguity in which
- *    operator should be called. For example:
+ * 2. Conversions back to the underlying type must be explicit. To define the conversion operators
+ *    implicitly could introduce ambiguity in which operator should be called. For example:
  *
  *        fly::Json json = { 1, 2, 3, 4 };
  *        std::vector<int> vector(json);
  *
- *    Which JSON conversion operator should be called in the vector constructor?
- *    Conversions to std::vector and std::size_t are defined, creating ambiguity
- *    in which std::vector constructor would be called (copy constructor or
- *    count constructor), even though the std::size_t converter would actually
- *    throw an exception. Making the conversion operators explicit removes this
+ *    Which JSON conversion operator should be called in the vector constructor? Conversions to
+ *    std::vector and std::size_t are defined, creating ambiguity in which std::vector constructor
+ *    would be called (copy constructor or count constructor), even though the std::size_t converter
+ *    would actually throw an exception. Making the conversion operators explicit removes this
  *    ambiguity, at the cost of not being able to do something like:
  *
  *        fly::Json json = { 1, 2, 3, 4 };
@@ -105,9 +101,8 @@ public:
     Json(const JsonTraits::null_type &value) noexcept;
 
     /**
-     * String constructor. Intializes the Json instance to a string value. The
-     * SFINAE declaration allows construction of a string value from any
-     * string-like type (e.g. std::string, char *).
+     * String constructor. Intializes the Json instance to a string value. The SFINAE declaration
+     * allows construction of a string value from any string-like type (e.g. std::string, char *).
      *
      * @tparam T The string-like type.
      *
@@ -119,9 +114,9 @@ public:
     Json(const T &value) noexcept(false);
 
     /**
-     * Object constructor. Intializes the Json instance to an object's values.
-     * The SFINAE declaration allows construction of an object value from any
-     * object-like type (e.g. std::map, std::multimap).
+     * Object constructor. Intializes the Json instance to an object's values. The SFINAE
+     * declaration allows construction of an object value from any object-like type (e.g. std::map,
+     * std::multimap).
      *
      * @tparam T The object-like type.
      *
@@ -131,9 +126,8 @@ public:
     Json(const T &value) noexcept;
 
     /**
-     * Array constructor. Intializes the Json instance to an array's values. The
-     * SFINAE declaration allows construction of an array value from any
-     * array-like type (e.g. std::list, std::vector).
+     * Array constructor. Intializes the Json instance to an array's values. The SFINAE declaration
+     * allows construction of an array value from any array-like type (e.g. std::list, std::vector).
      *
      * @tparam T The array-like type.
      *
@@ -143,9 +137,9 @@ public:
     Json(const T &value) noexcept;
 
     /**
-     * Boolean constructor. Intializes the Json instance to a boolean value. The
-     * SFINAE declaration forbids construction of a boolean value from any
-     * non-boolean type (e.g. int could be implicitly cast to bool).
+     * Boolean constructor. Intializes the Json instance to a boolean value. The SFINAE declaration
+     * forbids construction of a boolean value from any non-boolean type (e.g. int could be
+     * implicitly cast to bool).
      *
      * @tparam T The boolean type.
      *
@@ -155,9 +149,9 @@ public:
     Json(const T &value) noexcept;
 
     /**
-     * Signed integer constructor. Intializes the Json instance to a signed
-     * integer value. The SFINAE declaration allows construction of a signed
-     * integer value from any signed type (e.g. char, int, int64_t).
+     * Signed integer constructor. Intializes the Json instance to a signed integer value. The
+     * SFINAE declaration allows construction of a signed integer value from any signed type (e.g.
+     * char, int, int64_t).
      *
      * @tparam T The signed type.
      *
@@ -167,10 +161,9 @@ public:
     Json(const T &value) noexcept;
 
     /**
-     * Unsigned integer constructor. Intializes the Json instance to an unsigned
-     * integer value. The SFINAE declaration allows construction of an unsigned
-     * integer value from any unsigned type (e.g. unsigned char, unsigned int,
-     * uint64_t).
+     * Unsigned integer constructor. Intializes the Json instance to an unsigned integer value. The
+     * SFINAE declaration allows construction of an unsigned integer value from any unsigned type
+     * (e.g. unsigned char, unsigned int, uint64_t).
      *
      * @tparam T The unsigned type.
      *
@@ -180,9 +173,9 @@ public:
     Json(const T &value) noexcept;
 
     /**
-     * Floating point constructor. Intializes the Json instance to a floating
-     * point value. The SFINAE declaration allows construction of a floating
-     * point value from any floating point type (e.g. float, double).
+     * Floating point constructor. Intializes the Json instance to a floating point value. The
+     * SFINAE declaration allows construction of a floating point value from any floating point type
+     * (e.g. float, double).
      *
      * @tparam T The floating point type.
      *
@@ -192,41 +185,40 @@ public:
     Json(const T &value) noexcept;
 
     /**
-     * Copy constructor. Intializes the Json instance with the type and value
-     * of another Json instance.
+     * Copy constructor. Intializes the Json instance with the type and value of another Json
+     * instance.
      *
      * @param json The Json instance to copy.
      */
     Json(const_reference json) noexcept;
 
     /**
-     * Move constructor. Intializes the Json instance with the type and value
-     * of another Json instance. The other Json instance is set to a null value.
+     * Move constructor. Intializes the Json instance with the type and value of another Json
+     * instance. The other Json instance is set to a null value.
      *
      * @param json The Json instance to move.
      */
     Json(Json &&json) noexcept;
 
     /**
-     * Initializer list constructor. Intializes the Json instance with an
-     * initializer list. Creates either an object or an array instance. If all
-     * values in the initializer list are object-like (see IsObjectLike()),
-     * then the Json instance is created as an object. Otherwise, it is created
-     * as an array.
+     * Initializer list constructor. Intializes the Json instance with an initializer list. Creates
+     * either an object or an array instance. If all values in the initializer list are object-like
+     * (see IsObjectLike()), then the Json instance is created as an object. Otherwise, it is
+     * created as an array.
      *
      * @param initializer The initializer list.
      */
     Json(const std::initializer_list<Json> &initializer) noexcept;
 
     /**
-     * Destructor. Iteratively destroy nested Json instances to alleviate stack
-     * overflow on destruction of deeply-nested Json objects and arrays.
+     * Destructor. Iteratively destroy nested Json instances to alleviate stack overflow on
+     * destruction of deeply-nested Json objects and arrays.
      */
     ~Json();
 
     /**
-     * Copy assignment operator. Intializes the Json instance with the type and
-     * value of another Json instance, using the copy-and-swap idiom.
+     * Copy assignment operator. Intializes the Json instance with the type and value of another
+     * Json instance, using the copy-and-swap idiom.
      *
      * @param json The Json instance to copy-and-swap.
      *
@@ -250,10 +242,9 @@ public:
     bool is_object() const noexcept;
 
     /**
-     * Determine if the Json instance is object-like. This is mostly useful for
-     * constructing a Json instance from an initializer list. If this instance
-     * is an array with two elements, and the first element is a string, then
-     * this instance is object-like.
+     * Determine if the Json instance is object-like. This is mostly useful for constructing a Json
+     * instance from an initializer list. If this instance is an array with two elements, and the
+     * first element is a string, then this instance is object-like.
      *
      * @return True if the Json instance is object-like.
      */
@@ -294,70 +285,67 @@ public:
     explicit operator JsonTraits::null_type() const noexcept(false);
 
     /**
-     * String conversion operator. Converts the Json instance to a string. Note
-     * that although a Json instance can be constructed from a char array, it is
-     * not allowed to directly convert a Json instance into a char array. If
-     * this is needed, first convert to a string, then into a char array.
+     * String conversion operator. Converts the Json instance to a string. Note that although a Json
+     * instance can be constructed from a char array, it is not allowed to directly convert a Json
+     * instance into a char array. If this is needed, first convert to a string, then into a char
+     * array.
      *
      * @return The Json instance as a string.
      */
     explicit operator JsonTraits::string_type() const noexcept;
 
     /**
-     * Object conversion operator. Converts the Json instance to an object. The
-     * SFINAE declaration allows construction of any object-like type (e.g.
-     * std::map, std::multimap) from the Json instance.
+     * Object conversion operator. Converts the Json instance to an object. The SFINAE declaration
+     * allows construction of any object-like type (e.g. std::map, std::multimap) from the Json
+     * instance.
      *
      * @tparam T The object-like type.
      *
      * @return The Json instance as the object-like type.
      *
-     * @throws JsonException If the Json instance is not an object, or a stored
-     *         element could not be converted to the target object's value type.
+     * @throws JsonException If the Json instance is not an object, or a stored element could not be
+     *         converted to the target object's value type.
      */
     template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
     explicit operator T() const noexcept(false);
 
     /**
-     * Array conversion operator. Converts the Json instance to an array. The
-     * SFINAE declaration allows construction of any array-like type (e.g.
-     * std::list, std::vector) from the Json instance, except for std::array,
-     * which due to being an aggregate type, has its own explicit conversion
-     * operator.
+     * Array conversion operator. Converts the Json instance to an array. The SFINAE declaration
+     * allows construction of any array-like type (e.g. std::list, std::vector) from the Json
+     * instance, except for std::array, which due to being an aggregate type, has its own explicit
+     * conversion operator.
      *
      * @tparam T The array-like type.
      *
      * @return The Json instance as the array-like type.
      *
-     * @throws JsonException If the Json instance is not an array, or a stored
-     *         element could not be converted to the target array's value type.
+     * @throws JsonException If the Json instance is not an array, or a stored element could not be
+     *         converted to the target array's value type.
      */
     template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
     explicit operator T() const noexcept(false);
 
     /**
-     * Array conversion operator. Converts the Json instance to a std::array. If
-     * the Json instance has more values than the std::array can hold, the
-     * values are dropped. If the Json instance has less values than the
-     * std::array can hold, the remainder is value-initialized.
+     * Array conversion operator. Converts the Json instance to a std::array. If the Json instance
+     * has more values than the std::array can hold, the values are dropped. If the Json instance
+     * has less values than the std::array can hold, the remainder is value-initialized.
      *
      * @tparam T The std::array value type.
      * @tparam N The std::array size.
      *
      * @return The Json instance as a std::array.
      *
-     * @throws JsonException If the Json instance is not an array, or a stored
-     *         element could not be converted to the target array's value type.
+     * @throws JsonException If the Json instance is not an array, or a stored element could not be
+     *         converted to the target array's value type.
      */
     template <typename T, std::size_t N>
     explicit operator std::array<T, N>() const noexcept(false);
 
     /**
-     * Boolean conversion operator. Converts the Json instance to a boolean. For
-     * strings, objects, and arrays, returns true if the value is non-empty. For
-     * signed integers, unsigned integers, and floats, returns true if the value
-     * is non-zero. For booleans, returns the boolean value. For null, returns
-     * false.
+     * Boolean conversion operator. Converts the Json instance to a boolean. For strings, objects,
+     * and arrays, returns true if the value is non-empty. For signed integers, unsigned integers,
+     * and floats, returns true if the value is non-zero. For booleans, returns the boolean value.
+     * For null, returns false.
      *
      * @tparam T The boolean type.
      *
@@ -367,19 +355,17 @@ public:
     explicit operator T() const noexcept;
 
     /**
-     * Numeric conversion operator. Converts the Json instance to a numeric
-     * type. The SFINAE declaration allows construction of any numeric type
-     * type (e.g. char, uint64_t, float) from the Json instance. Allows for
-     * converting between signed integers, unsigned integers, and floats. Also
-     * allows for converting from a numeric-like string (e.g. "123") to a
-     * numeric type.
+     * Numeric conversion operator. Converts the Json instance to a numeric type. The SFINAE
+     * declaration allows construction of any numeric type type (e.g. char, uint64_t, float) from
+     * the Json instance. Allows for converting between signed integers, unsigned integers, and
+     * floats. Also allows for converting from a numeric-like string (e.g. "123") to a numeric type.
      *
      * @tparam T The numeric type.
      *
      * @return The Json instance as the numeric type.
      *
-     * @throws JsonException If the Json instance is not numeric, or the stored
-     *         value could not be converted to the target numeric type.
+     * @throws JsonException If the Json instance is not numeric, or the stored value could not be
+     *         converted to the target numeric type.
      */
     template <
         typename T,
@@ -392,9 +378,8 @@ public:
     /**
      * Object access operator.
      *
-     * If the Json instance is an object, perform a lookup on the object with a
-     * key value. If the key value is not found, a null Json instance will be
-     * created for that key.
+     * If the Json instance is an object, perform a lookup on the object with a key value. If the
+     * key value is not found, a null Json instance will be created for that key.
      *
      * If the Json instance is null, it is first converted to an object.
      *
@@ -402,23 +387,22 @@ public:
      *
      * @return A reference to the Json instance at the key value.
      *
-     * @throws JsonException If the Json instance is neither an object nor null,
-     *         or the key value is invalid.
+     * @throws JsonException If the Json instance is neither an object nor null, or the key value is
+     *         invalid.
      */
     reference operator[](const typename JsonTraits::object_type::key_type &key) noexcept(false);
 
     /**
      * Object read-only access operator.
      *
-     * If the Json instance is an object, perform a lookup on the object with a
-     * key value.
+     * If the Json instance is an object, perform a lookup on the object with a key value.
      *
      * @param key The key value to lookup.
      *
      * @return A reference to the Json instance at the key value.
      *
-     * @throws JsonException If the Json instance is not an object, or the key
-     *         value does not exist, or the key value is invalid.
+     * @throws JsonException If the Json instance is not an object, or the key value does not exist,
+     *         or the key value is invalid.
      */
     const_reference operator[](const typename JsonTraits::object_type::key_type &key) const
         noexcept(false);
@@ -426,9 +410,8 @@ public:
     /**
      * Array access operator.
      *
-     * If the Json instance is an array, perform a lookup on the array with an
-     * index. If the index is not found, the array is filled with null values up
-     * to and including the index.
+     * If the Json instance is an array, perform a lookup on the array with an index. If the index
+     * is not found, the array is filled with null values up to and including the index.
      *
      * If the Json instance is null, it is first converted to an array.
      *
@@ -443,83 +426,75 @@ public:
     /**
      * Array read-only access operator.
      *
-     * If the Json instance is an array, perform a lookup on the array with an
-     * index.
+     * If the Json instance is an array, perform a lookup on the array with an index.
      *
      * @param index The index to lookup.
      *
      * @return A reference to the Json instance at the index.
      *
-     * @throws JsonException If the Json instance is not an array or the index
-     *         does not exist.
+     * @throws JsonException If the Json instance is not an array or the index does not exist.
      */
     const_reference operator[](size_type index) const noexcept(false);
 
     /**
      * Object read-only accessor.
      *
-     * If the Json instance is an object, perform a lookup on the object with a
-     * key value.
+     * If the Json instance is an object, perform a lookup on the object with a key value.
      *
      * @param key The key value to lookup.
      *
      * @return A reference to the Json instance at the key value.
      *
-     * @throws JsonException If the Json instance is not an object, or the key
-     *         value does not exist, or the key value is invalid.
+     * @throws JsonException If the Json instance is not an object, or the key value does not exist,
+     *         or the key value is invalid.
      */
     reference at(const typename JsonTraits::object_type::key_type &key) noexcept(false);
 
     /**
      * Object read-only accessor.
      *
-     * If the Json instance is an object, perform a lookup on the object with a
-     * key value.
+     * If the Json instance is an object, perform a lookup on the object with a key value.
      *
      * @param key The key value to lookup.
      *
      * @return A reference to the Json instance at the key value.
      *
-     * @throws JsonException If the Json instance is not an object, or the key
-     *         value does not exist, or the key value is invalid.
+     * @throws JsonException If the Json instance is not an object, or the key value does not exist,
+     *         or the key value is invalid.
      */
     const_reference at(const typename JsonTraits::object_type::key_type &key) const noexcept(false);
 
     /**
      * Array read-only accessor.
      *
-     * If the Json instance is an array, perform a lookup on the array with an
-     * index.
+     * If the Json instance is an array, perform a lookup on the array with an index.
      *
      * @param index The index to lookup.
      *
      * @return A reference to the Json instance at the index.
      *
-     * @throws JsonException If the Json instance is not an array or the index
-     *         does not exist.
+     * @throws JsonException If the Json instance is not an array or the index does not exist.
      */
     reference at(size_type index) noexcept(false);
 
     /**
      * Array read-only accessor.
      *
-     * If the Json instance is an array, perform a lookup on the array with an
-     * index.
+     * If the Json instance is an array, perform a lookup on the array with an index.
      *
      * @param index The index to lookup.
      *
      * @return A reference to the Json instance at the index.
      *
-     * @throws JsonException If the Json instance is not an array or the index
-     *         does not exist.
+     * @throws JsonException If the Json instance is not an array or the index does not exist.
      */
     const_reference at(size_type index) const noexcept(false);
 
     /**
      * Check if the Json instance contains zero elements.
      *
-     * If the Json instance is an object, array, or string, return whether the
-     * stored container is empty.
+     * If the Json instance is an object, array, or string, return whether the stored container is
+     * empty.
      *
      * If the Json instance is null, return true.
      *
@@ -532,8 +507,8 @@ public:
     /**
      * Get the number of elements in the Json instance.
      *
-     * If the Json instance is an object or array, return the number of elements
-     * stored in the object or array.
+     * If the Json instance is an object or array, return the number of elements stored in the
+     * object or array.
      *
      * If the Json instance is null, return 0.
      *
@@ -548,8 +523,7 @@ public:
     /**
      * Clear the contents of the Json instance.
      *
-     * If the Json instance is an object, array, or string, clears the stored
-     * container.
+     * If the Json instance is an object, array, or string, clears the stored container.
      *
      * If the Json instance is a boolean, sets to false.
      *
@@ -565,8 +539,8 @@ public:
     void swap(reference json) noexcept;
 
     /**
-     * Exchange the contents of the Json instance with another string. Only
-     * valid if the Json instance is a string.
+     * Exchange the contents of the Json instance with another string. Only valid if the Json
+     * instance is a string.
      *
      * @param json The string to swap with.
      *
@@ -575,8 +549,8 @@ public:
     void swap(JsonTraits::string_type &other) noexcept(false);
 
     /**
-     * Exchange the contents of the Json instance with another object. Only
-     * valid if the Json instance is an object.
+     * Exchange the contents of the Json instance with another object. Only valid if the Json
+     * instance is an object.
      *
      * @param json The object to swap with.
      *
@@ -586,8 +560,8 @@ public:
     void swap(T &other) noexcept(false);
 
     /**
-     * Exchange the contents of the Json instance with another array. Only
-     * valid if the Json instance is an array.
+     * Exchange the contents of the Json instance with another array. Only valid if the Json
+     * instance is an array.
      *
      * @param json The array to swap with.
      *
@@ -651,17 +625,15 @@ public:
     const_iterator cend() const noexcept(false);
 
     /**
-     * Equality operator. Compares two Json instances for equality. They are
-     * equal if one of the following is true:
+     * Equality operator. Compares two Json instances for equality. They are equal if one of the
+     * following is true:
      *
-     * 1. One of the two JSON types are floating point, the other is a numeric
-     *    type (signed, unsigned, or float) and have approximately the same
-     *    value after converting both types to floating point. Approximation is
-     *    determined by comparing the difference between the two values to the
-     *    machine epsilon.
-     * 2. The two Json instances are an integer type (signed or unsigned) and
-     *    have the same value after converting the second Json value to the same
-     *    type as the first Json value.
+     * 1. One of the two JSON types are floating point, the other is a numeric type (signed,
+     *    unsigned, or float) and have approximately the same value after converting both types to
+     *    floating point. Approximation is determined by comparing the difference between the two
+     *    values to the machine epsilon.
+     * 2. The two Json instances are an integer type (signed or unsigned) and have the same value
+     *    after converting the second Json value to the same type as the first Json value.
      * 3. The two Json instances are of the same type and have the same value.
      *
      * @return True if the two Json instances are equal.
@@ -669,8 +641,8 @@ public:
     friend bool operator==(const_reference json1, const_reference json2) noexcept;
 
     /**
-     * Unequality operator. Compares two Json instances for unequality. They are
-     * unequal if none of the conditions of the equality operator are met.
+     * Unequality operator. Compares two Json instances for unequality. They are unequal if none of
+     * the conditions of the equality operator are met.
      *
      * @return True if the two Json instances are unequal.
      */
@@ -691,13 +663,12 @@ private:
     friend const_iterator;
 
     /**
-     * Validate the string for compliance according to https://www.json.org.
-     * Validation includes handling escaped and unicode characters.
+     * Validate the string for compliance according to https://www.json.org. Validation includes
+     * handling escaped and unicode characters.
      *
      * @param str The string value to validate.
      *
-     * @return The modified input string value, with escaped and unicode
-     *         characters handled.
+     * @return The modified input string value, with escaped and unicode characters handled.
      *
      * @throws JsonException If the string value is not valid.
      */
@@ -705,16 +676,15 @@ private:
     validate_string(const JsonTraits::string_type &str) noexcept(false);
 
     /**
-     * After reading a reverse solidus character, read the escaped character
-     * that follows. Replace the reverse solidus and escaped character with the
-     * interpreted control or unicode character.
+     * After reading a reverse solidus character, read the escaped character that follows. Replace
+     * the reverse solidus and escaped character with the interpreted control or unicode character.
      *
      * @param stream Stream to pipe the interpreted character into.
      * @param it Pointer to the escaped character.
      * @param end Pointer to the end of the original string value.
      *
-     * @throws JsonException If the interpreted escaped character is not valid
-     *         or there weren't enough available bytes.
+     * @throws JsonException If the interpreted escaped character is not valid or there weren't
+     *         enough available bytes.
      */
     static void read_escaped_character(
         stream_type &stream,
@@ -722,8 +692,8 @@ private:
         const JsonTraits::string_type::const_iterator &end) noexcept(false);
 
     /**
-     * Write a character to a stream, handling any value that should be escaped.
-     * For those characters, an extra reverse solidus is inserted.
+     * Write a character to a stream, handling any value that should be escaped. For those
+     * characters, an extra reverse solidus is inserted.
      *
      * @param stream Stream to pipe the escaped character into.
      * @param ch Character to escape.

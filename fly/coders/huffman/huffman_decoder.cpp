@@ -148,8 +148,8 @@ bool HuffmanDecoder::decode_codes(
         return false;
     }
 
-    // The first code length is 0, so the actual maximum code length is 1 less
-    // than the number of length counts.
+    // The first code length is 0, so the actual maximum code length is 1 less than the number of
+    // length counts.
     local_max_code_length = counts_size - 1;
 
     // Decode the code length counts.
@@ -182,8 +182,8 @@ bool HuffmanDecoder::decode_codes(
             // First code is always set to zero.
             code_type code = 0;
 
-            // Subsequent codes are one greater than the previous code, but also
-            // bit-shifted left enough to maintain the right code length.
+            // Subsequent codes are one greater than the previous code, but also bit-shifted left
+            // enough to maintain the right code length.
             if (m_huffman_codes_size != 0)
             {
                 const HuffmanCode &last = m_huffman_codes[m_huffman_codes_size - 1_u16];

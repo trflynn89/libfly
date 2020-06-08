@@ -1,6 +1,6 @@
 #include "fly/parser/ini_parser.hpp"
 
-#include "fly/parser/exceptions.hpp"
+#include "fly/parser/parser_exception.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <vector>

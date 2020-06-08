@@ -21,8 +21,7 @@
 namespace {
 
 /**
- * Subclass of the logger config to decrease the default log file size for
- * faster testing.
+ * Subclass of the logger config to decrease the default log file size for faster testing.
  */
 class TestLoggerConfig : public fly::LoggerConfig
 {
@@ -41,13 +40,9 @@ class LoggerTest : public ::testing::Test
 public:
     LoggerTest() noexcept :
         m_path(fly::PathUtil::generate_temp_directory()),
-
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
-
         m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
-
         m_logger_config(std::make_shared<TestLoggerConfig>()),
-
         m_logger(std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_path))
     {
     }
@@ -288,8 +283,8 @@ TEST_F(LoggerTest, Rollover)
     std::uintmax_t expected_size = log_size(random);
     std::uintmax_t count = 0;
 
-    // Create enough log points to fill the log file, plus some extra to start
-    // filling a second log file
+    // Create enough log points to fill the log file, plus some extra to start filling a second log
+    // file.
     while (++count < ((max_log_file_size / expected_size) + 10))
     {
         LOGD("%s", random);

@@ -31,16 +31,16 @@ public:
     void push(T &&item) noexcept;
 
     /**
-     * Pop an item from the container. If the container is empty, wait
-     * indefinitely for item to be available.
+     * Pop an item from the container. If the container is empty, wait indefinitely for item to be
+     * available.
      *
      * @param item Location to store the popped item.
      */
     void pop(T &item) noexcept;
 
     /**
-     * Pop an item from the container. If the container is empty, wait (at most)
-     * for the specified amount of time for an item to be available.
+     * Pop an item from the container. If the container is empty, wait (at most) for the specified
+     * amount of time for an item to be available.
      *
      * @param item Location to store the popped item.
      * @param duration The amount of time to wait.

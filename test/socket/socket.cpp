@@ -157,8 +157,7 @@ TEST_F(SocketTest, Bind_MockBindFail)
 }
 
 /**
- * Test handling for when socket binding fails due to ::setsockopt() system
- * call.
+ * Test handling for when socket binding fails due to ::setsockopt() system call.
  */
 TEST_F(SocketTest, Bind_MockSetsockoptFail)
 {
@@ -169,8 +168,7 @@ TEST_F(SocketTest, Bind_MockSetsockoptFail)
 }
 
 /**
- * Test handling for when socket binding fails due to ::gethostbyname() system
- * call.
+ * Test handling for when socket binding fails due to ::gethostbyname() system call.
  */
 TEST_F(SocketTest, Bind_Sync_MockGethostbynameFail)
 {
@@ -193,8 +191,7 @@ TEST_F(SocketTest, Listen_MockListenFail)
 }
 
 /**
- * Test handling for when socket connecting fails due to ::connect() system
- * call.
+ * Test handling for when socket connecting fails due to ::connect() system call.
  */
 TEST_F(SocketTest, Connect_Sync_MockConnectFail)
 {
@@ -210,8 +207,7 @@ TEST_F(SocketTest, Connect_Sync_MockConnectFail)
 }
 
 /**
- * Test handling for when socket connecting fails due to ::gethostbyname()
- * system call.
+ * Test handling for when socket connecting fails due to ::gethostbyname() system call.
  */
 TEST_F(SocketTest, Connect_Sync_MockGethostbynameFail)
 {
@@ -227,8 +223,7 @@ TEST_F(SocketTest, Connect_Sync_MockGethostbynameFail)
 }
 
 /**
- * Test handling for when socket connecting fails due to ::gethostbyname()
- * system call.
+ * Test handling for when socket connecting fails due to ::gethostbyname() system call.
  */
 TEST_F(SocketTest, Connect_Async_MockGethostbynameFail)
 {
@@ -244,8 +239,7 @@ TEST_F(SocketTest, Connect_Async_MockGethostbynameFail)
 }
 
 /**
- * Test handling for when socket connecting fails due to ::connect() system
- * call.
+ * Test handling for when socket connecting fails due to ::connect() system call.
  */
 TEST_F(SocketTest, Connect_Async_MockConnectFail)
 {
@@ -281,8 +275,7 @@ TEST_F(SocketTest, Connect_Async_MockConnectImmediateSuccess)
 }
 
 /**
- * Test handling for when socket connecting fails due to ::getsockopt() system
- * call.
+ * Test handling for when socket connecting fails due to ::getsockopt() system call.
  */
 TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
 {
@@ -324,8 +317,7 @@ TEST_F(SocketTest, Accept_MockAcceptFail)
 }
 
 /**
- * Test handling for when socket sending (TCP) fails due to ::send() system
- * call.
+ * Test handling for when socket sending (TCP) fails due to ::send() system call.
  */
 TEST_F(SocketTest, Send_Sync_MockSendFail)
 {
@@ -343,8 +335,7 @@ TEST_F(SocketTest, Send_Sync_MockSendFail)
 }
 
 /**
- * Test handling for when socket sending (TCP) fails due to ::send() system
- * call.
+ * Test handling for when socket sending (TCP) fails due to ::send() system call.
  */
 TEST_F(SocketTest, Send_Async_MockSendFail)
 {
@@ -379,8 +370,7 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
 }
 
 /**
- * Test handling for when socket sending (TCP) blocks due to ::send() system
- * call.
+ * Test handling for when socket sending (TCP) blocks due to ::send() system call.
  */
 TEST_F(SocketTest, Send_Async_MockSendBlock)
 {
@@ -420,8 +410,7 @@ TEST_F(SocketTest, Send_Async_MockSendBlock)
 }
 
 /**
- * Test handling for when socket sending (UDP) fails due to ::sendto() system
- * call.
+ * Test handling for when socket sending (UDP) fails due to ::sendto() system call.
  */
 TEST_F(SocketTest, Send_Sync_MockSendtoFail)
 {
@@ -436,8 +425,7 @@ TEST_F(SocketTest, Send_Sync_MockSendtoFail)
 }
 
 /**
- * Test handling for when socket sending (UDP) fails due to ::gethostbyname()
- * system call.
+ * Test handling for when socket sending (UDP) fails due to ::gethostbyname() system call.
  */
 TEST_F(SocketTest, Send_Sync_MockGethostbynameFail)
 {
@@ -452,8 +440,7 @@ TEST_F(SocketTest, Send_Sync_MockGethostbynameFail)
 }
 
 /**
- * Test handling for when socket sending (UDP) fails due to ::sendto() system
- * call.
+ * Test handling for when socket sending (UDP) fails due to ::sendto() system call.
  */
 TEST_F(SocketTest, Send_Async_MockSendtoFail)
 {
@@ -477,8 +464,7 @@ TEST_F(SocketTest, Send_Async_MockSendtoFail)
 }
 
 /**
- * Test handling for when socket sending (UDP) blocks due to ::sendto() system
- * call.
+ * Test handling for when socket sending (UDP) blocks due to ::sendto() system call.
  */
 TEST_F(SocketTest, Send_Async_MockSendtoBlock)
 {
@@ -504,8 +490,7 @@ TEST_F(SocketTest, Send_Async_MockSendtoBlock)
 }
 
 /**
- * Test handling for when socket sending (UDP) fails due to ::gethostbyname()
- * system call.
+ * Test handling for when socket sending (UDP) fails due to ::gethostbyname() system call.
  */
 TEST_F(SocketTest, Send_Async_MockGethostbynameFail)
 {
@@ -520,8 +505,7 @@ TEST_F(SocketTest, Send_Async_MockGethostbynameFail)
 }
 
 /**
- * Test handling for when socket receiving (TCP) fails due to ::recv() system
- * call.
+ * Test handling for when socket receiving (TCP) fails due to ::recv() system call.
  */
 TEST_F(SocketTest, Recv_Sync_MockRecvFail)
 {
@@ -537,8 +521,7 @@ TEST_F(SocketTest, Recv_Sync_MockRecvFail)
 }
 
 /**
- * Test handling for when socket receiving (TCP) fails due to ::recv() system
- * call.
+ * Test handling for when socket receiving (TCP) fails due to ::recv() system call.
  */
 TEST_F(SocketTest, Recv_Async_MockRecvFail)
 {
@@ -572,8 +555,7 @@ TEST_F(SocketTest, Recv_Async_MockRecvFail)
 }
 
 /**
- * Test handling for when socket receiving (UDP) fails due to ::recvfrom()
- * system call.
+ * Test handling for when socket receiving (UDP) fails due to ::recvfrom() system call.
  */
 TEST_F(SocketTest, Recv_Sync_MockRecvfromFail)
 {
@@ -588,8 +570,7 @@ TEST_F(SocketTest, Recv_Sync_MockRecvfromFail)
 }
 
 /**
- * Test handling for when socket receiving (UDP) fails due to ::recvfrom()
- * system call.
+ * Test handling for when socket receiving (UDP) fails due to ::recvfrom() system call.
  */
 TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
 {
@@ -619,8 +600,7 @@ class TcpSocketTest : public SocketTest
 {
 public:
     /**
-     * Thread to run server functions do handle accepting a client socket and
-     * receiving data from it.
+     * Thread to run server functions to accept a client socket and receive data.
      */
     void server_thread(bool async) noexcept override
     {
@@ -662,8 +642,7 @@ public:
     }
 
     /**
-     * Thread to run client functions to connect to the server socket and send
-     * data to it.
+     * Thread to run client functions to connect to the server socket and send data.
      */
     void client_thread(bool async) noexcept override
     {
@@ -782,8 +761,7 @@ class UdpSocketTest : public SocketTest
 {
 public:
     /**
-     * Thread to run server functions do handle accepting a client socket and
-     * receiving data from it.
+     * Thread to run server functions to accept a client socket and receive data.
      */
     void server_thread(bool async) noexcept override
     {
@@ -815,8 +793,7 @@ public:
     }
 
     /**
-     * Thread to run client functions to connect to the server socket and send
-     * data to it.
+     * Thread to run client functions to connect to the server socket and send data.
      */
     void client_thread(bool async) noexcept override
     {

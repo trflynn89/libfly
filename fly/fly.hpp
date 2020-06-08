@@ -1,6 +1,6 @@
 #pragma once
 
-// Determine operating system
+// Determine operating system.
 #if defined(_WIN32)
 #    define FLY_WINDOWS
 #elif defined(__linux__)
@@ -9,11 +9,11 @@
 #    error Unsupported operating system. Only Windows and Linux are supported.
 #endif
 
-// Define macro to convert a macro parameter to a string
+// Define macro to convert a macro parameter to a string.
 #define _FLY_STRINGIZE(s) #s
 
-// Define macros to include OS dependent implementation headers. Formatter is
-// disabled because it would put a space before and after each solidus.
+// Define macros to include OS dependent implementation headers. Formatter is disabled because it
+// would put a space before and after each solidus.
 // clang-format off
 #define _FLY_OS_IMPL_PATH(module, os, clss) _FLY_STRINGIZE(fly/module/os/clss##_impl.hpp)
 // clang-format on

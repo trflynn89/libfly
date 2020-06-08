@@ -3,8 +3,8 @@
 #include <filesystem>
 
 /**
- * Helper macros to choose the correct string literal to use for either a given
- * type or the char type used on the compiling system.
+ * Helper macros to choose the correct string literal to use for either a given type or the char
+ * type used on the compiling system.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 23, 2019

@@ -7,9 +7,8 @@
 namespace fly {
 
 /**
- * RAII helper class to redirect either stdout or stderr to a file for reading.
- * On destruction, the redirected stream is restored and the file is deleted.
- * Only meant to be used by unit tests.
+ * RAII helper class to redirect either stdout or stderr to a file for reading. On destruction, the
+ * redirected stream is restored and the file is deleted. Only meant to be used by unit tests.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
@@ -36,8 +35,7 @@ public:
     ~CaptureStream();
 
     /**
-     * Restore the redirected stream, read the contents of the redirect file,
-     * and delete the file.
+     * Restore the redirected stream, read the contents of the redirect file, and delete the file.
      *
      * @return The contents of the redirected stream.
      */
@@ -45,8 +43,8 @@ public:
 
 private:
     /**
-     * Restore the redirected stream, read the contents of the redirect file if
-     * specified, and delete the file.
+     * Restore the redirected stream, read the contents of the redirect file if specified, and
+     * delete the file.
      *
      * @param read True if the file should be read before deletion.
      *

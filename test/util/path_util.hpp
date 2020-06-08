@@ -6,8 +6,7 @@
 namespace fly {
 
 /**
- * Utility class to perform IO operations on paths. Only meant to be used by
- * unit tests.
+ * Utility class to perform IO operations on paths. Only meant to be used by unit tests.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
@@ -23,8 +22,8 @@ public:
     static std::filesystem::path generate_temp_directory() noexcept;
 
     /**
-     * Create a file with the given contents, verifying the file was correctly
-     * written after creation.
+     * Create a file with the given contents, verifying the file was correctly written after
+     * creation.
      *
      * @param path Path to the file to create.
      * @param string Contents of the file to create.
@@ -43,8 +42,8 @@ public:
     static std::string read_file(const std::filesystem::path &path) noexcept;
 
     /**
-     * Compare two files for equality. Two files are equal if they have the same
-     * size and the same contents.
+     * Compare two files for equality. Two files are equal if they have the same size and the same
+     * contents.
      *
      * @param path1 First file to compare.
      * @param path2 Second file to compare.
@@ -52,7 +51,7 @@ public:
      * @return True if the given files are equal.
      */
     static bool
-    compare_files(const std::filesystem::path &path1, const std::filesystem::path &path2);
+    compare_files(const std::filesystem::path &path1, const std::filesystem::path &path2) noexcept;
 };
 
 } // namespace fly

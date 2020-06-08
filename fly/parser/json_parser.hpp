@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fly/parser/exceptions.hpp"
 #include "fly/parser/parser.hpp"
+#include "fly/parser/parser_exception.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/json/json_traits.hpp"
 
@@ -63,11 +63,10 @@ protected:
      *
      * @return The parsed JSON value.
      *
-     * @throws ParserException The parsed JSON value is invalid, or the stream
-     *         contains more than a JSON value.
+     * @throws ParserException The parsed JSON value is invalid, or the stream contains more than a
+     *         JSON value.
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
-     * @throws BadConversionException A parsed value could not be converted to
-     *         a JSON type.
+     * @throws BadConversionException A parsed value could not be converted to a JSON type.
      */
     Json parse_internal(std::istream &stream) noexcept(false) override;
 
@@ -130,16 +129,14 @@ private:
     };
 
     /**
-     * Parse a complete JSON value from a stream. May be called recursively for
-     * nested values.
+     * Parse a complete JSON value from a stream. May be called recursively for nested values.
      *
      * @param stream Stream holding the contents to parse.
      *
      * @return The parsed JSON value.
      *
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
-     * @throws BadConversionException A parsed value could not be converted to
-     *         a JSON type.
+     * @throws BadConversionException A parsed value could not be converted to a JSON type.
      */
     Json parse_json(std::istream &stream) noexcept(false);
 
@@ -151,8 +148,7 @@ private:
      * @return The parsed JSON object.
      *
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
-     * @throws BadConversionException A parsed value could not be converted to
-     *         a JSON type.
+     * @throws BadConversionException A parsed value could not be converted to a JSON type.
      */
     Json parse_object(std::istream &stream) noexcept(false);
 
@@ -164,8 +160,7 @@ private:
      * @return The parsed JSON array.
      *
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
-     * @throws BadConversionException A parsed value could not be converted to
-     *         a JSON type.
+     * @throws BadConversionException A parsed value could not be converted to a JSON type.
      */
     Json parse_array(std::istream &stream) noexcept(false);
 
@@ -177,14 +172,12 @@ private:
      * @return The parsed JSON number, boolean, or null value.
      *
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
-     * @throws BadConversionException A parsed value could not be converted to
-     *         a JSON type.
+     * @throws BadConversionException A parsed value could not be converted to a JSON type.
      */
     Json parse_value(std::istream &stream) noexcept(false);
 
     /**
-     * Extract a single symbol from a stream. Ensure that symbol is equal to an
-     * expected token.
+     * Extract a single symbol from a stream. Ensure that symbol is equal to an expected token.
      *
      * @param stream Stream holding the contents to parse.
      *
@@ -193,25 +186,24 @@ private:
     void consume_token(std::istream &stream, const Token &token) noexcept(false);
 
     /**
-     * Extract a comma from a stream. Handles any trailing commas, allowing a
-     * single trailing comma if enabled in the feature set.
+     * Extract a comma from a stream. Handles any trailing commas, allowing a single trailing comma
+     * if enabled in the feature set.
      *
      * @param stream Stream holding the contents to parse.
-     * @param stop_parsing Callback to indicate whether the calling parser
-     *        should stop parsing.
+     * @param stop_parsing Callback to indicate whether the calling parser should stop parsing.
      *
      * @return True if the callback indicated parsing is complete.
      *
-     * @throws UnexpectedCharacterException A trailing comma was found, but the
-     *         feature is not enabled.
+     * @throws UnexpectedCharacterException A trailing comma was found, but the feature is not
+     *         enabled.
      */
     bool
     consume_comma(std::istream &stream, const std::function<bool()> &stop_parsing) noexcept(false);
 
     /**
-     * Extract a string, number, boolean, or null value from a stream. If
-     * parsing a string, escaped symbols are preserved in that string, and the
-     * returned value does not contain its surrounding quotes.
+     * Extract a string, number, boolean, or null value from a stream. If parsing a string, escaped
+     * symbols are preserved in that string, and the returned value does not contain its surrounding
+     * quotes.
      *
      * @param stream Stream holding the contents to parse.
      * @param type The JSON value type to consume.
@@ -223,9 +215,8 @@ private:
     JsonTraits::string_type consume_value(std::istream &stream, JsonType type) noexcept(false);
 
     /**
-     * Extract all consecutive whitespace symbols and comments (if enabled in
-     * the feature set) from a stream. The first non-whitespace, non-comment
-     * symbol is left on the stream.
+     * Extract all consecutive whitespace symbols and comments (if enabled in the feature set) from
+     * a stream. The first non-whitespace, non-comment symbol is left on the stream.
      *
      * @param stream Stream holding the contents to parse.
      *
@@ -234,22 +225,20 @@ private:
     void consume_whitespace_and_comments(std::istream &stream) noexcept(false);
 
     /**
-     * Extract all consecutive whitespace symbols from a stream until a non-
-     * whitespace symbol is encountered. The non-whitespace symbol is left on
-     * the stream.
+     * Extract all consecutive whitespace symbols from a stream until a non- whitespace symbol is
+     * encountered. The non-whitespace symbol is left on the stream.
      *
      * @param stream Stream holding the contents to parse.
      */
     void consume_whitespace(std::istream &stream) noexcept;
 
     /**
-     * Extract a single- or multi-line comment from a stream, if enabled in the
-     * feature set.
+     * Extract a single- or multi-line comment from a stream, if enabled in the feature set.
      *
      * @param stream Stream holding the contents to parse.
      *
-     * @throws UnexpectedCharacterException A parsed symbol was unexpected, or
-     *         the comment feature is not enabled.
+     * @throws UnexpectedCharacterException A parsed symbol was unexpected, or the comment feature
+     *         is not enabled.
      */
     void consume_comment(std::istream &stream) noexcept(false);
 
@@ -279,8 +268,7 @@ private:
     void discard(std::istream &stream) noexcept;
 
     /**
-     * Validate that a parsed number is valid and interpret its numeric JSON
-     * type.
+     * Validate that a parsed number is valid and interpret its numeric JSON type.
      *
      * @param value The parsed number to validate.
      *

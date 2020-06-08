@@ -643,8 +643,7 @@ void Json::read_escaped_character(
         case 'u':
             try
             {
-                // The input sequence is expected to begin with the reverse
-                // solidus character.
+                // The input sequence is expected to begin with the reverse solidus character.
                 stream << String::parse_unicode_character(--it, end);
             }
             catch (const StringException &ex)
@@ -652,8 +651,7 @@ void Json::read_escaped_character(
                 throw JsonException(ex.what());
             }
 
-            // The iterator is already incremented past the escaped character
-            // sequence.
+            // The iterator is already incremented past the escaped character sequence.
             return;
 
         default:

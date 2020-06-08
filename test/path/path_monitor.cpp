@@ -27,8 +27,7 @@ namespace {
 std::chrono::seconds s_wait_time(5);
 
 /**
- * Subclass of the path config to decrease the poll interval for faster
- * testing.
+ * Subclass of the path config to decrease the poll interval for faster testing.
  */
 class TestPathConfig : public fly::PathConfig
 {
@@ -47,7 +46,6 @@ class PathMonitorTest : public ::testing::Test
 public:
     PathMonitorTest() noexcept :
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
-
         m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
         m_monitor(std::make_shared<fly::PathMonitorImpl>(
@@ -526,31 +524,31 @@ TEST_F(PathMonitorTest, MultipleFile)
 //==================================================================================================
 TEST_F(PathMonitorTest, Remove)
 {
-    // Test removing files and paths that were not being monitored
+    // Test removing files and paths that were not being monitored.
     EXPECT_FALSE(m_monitor->remove_file(m_path1 / "was not"));
     EXPECT_FALSE(m_monitor->remove_path(m_path1 / "monitoring"));
     EXPECT_FALSE(m_monitor->remove_path("any of this"));
 
     // For the monitor with two monitored files and a monitored path:
-    // 1. Remove one of the files - should succeed
-    // 2. Remove the whole path - should succeed
-    // 3. Remove the second file - should fail, wasn't being monitored any more
-    // 4. Remove the whole path - should fail
+    // 1. Remove one of the files - should succeed.
+    // 2. Remove the whole path - should succeed.
+    // 3. Remove the second file - should fail, wasn't being monitored any more.
+    // 4. Remove the whole path - should fail.
     EXPECT_TRUE(m_monitor->remove_file(m_file1));
     EXPECT_TRUE(m_monitor->remove_path(m_path1));
     EXPECT_FALSE(m_monitor->remove_file(m_file2));
     EXPECT_FALSE(m_monitor->remove_path(m_path1));
 
     // For the monitor with one monitored file and a monitored path:
-    // 1. Remove the monitored file - should succeed
-    // 2. Remove the whole path - should succeed
+    // 1. Remove the monitored file - should succeed.
+    // 2. Remove the whole path - should succeed.
     EXPECT_TRUE(m_monitor->remove_file(m_file0));
     EXPECT_TRUE(m_monitor->remove_path(m_path0));
 
     // For the monitor with one monitored file and no monitored paths:
-    // 1. Remove the monitored file - should succeed
+    // 1. Remove the monitored file - should succeed.
     // 2. Remove the whole path - should fail, path will gets removed when the
-    //    last monitored file is removed
+    //    last monitored file is removed.
     EXPECT_TRUE(m_monitor->remove_file(m_file3));
     EXPECT_FALSE(m_monitor->remove_path(m_path2));
 }
