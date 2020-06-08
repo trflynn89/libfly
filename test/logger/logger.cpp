@@ -21,8 +21,7 @@
 namespace {
 
 /**
- * Subclass of the logger config to decrease the default log file size for
- * faster testing.
+ * Subclass of the logger config to decrease the default log file size for faster testing.
  */
 class TestLoggerConfig : public fly::LoggerConfig
 {
@@ -35,25 +34,16 @@ public:
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 class LoggerTest : public ::testing::Test
 {
 public:
     LoggerTest() noexcept :
         m_path(fly::PathUtil::generate_temp_directory()),
-
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
-
-        m_task_runner(
-            m_task_manager
-                ->create_task_runner<fly::WaitableSequencedTaskRunner>()),
-
+        m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
         m_logger_config(std::make_shared<TestLoggerConfig>()),
-
-        m_logger(std::make_shared<fly::Logger>(
-            m_task_runner,
-            m_logger_config,
-            m_path))
+        m_logger(std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_path))
     {
     }
 
@@ -101,8 +91,7 @@ protected:
             m_task_runner->wait_for_task_to_complete<fly::LoggerTask>();
         }
 
-        const std::string contents =
-            fly::PathUtil::read_file(m_logger->get_log_file_path());
+        const std::string contents = fly::PathUtil::read_file(m_logger->get_log_file_path());
         ASSERT_FALSE(contents.empty());
 
         std::size_t count = 0;
@@ -110,13 +99,12 @@ protected:
 
         for (const std::string &log : fly::String::split(contents, '\n'))
         {
-            const std::vector<std::string> sections =
-                fly::String::split(log, '\t');
+            const std::vector<std::string> sections = fly::String::split(log, '\t');
             ASSERT_EQ(sections.size(), 7_zu);
 
             const auto index = fly::String::convert<std::size_t>(sections[0]);
-            const auto level = static_cast<fly::Log::Level>(
-                fly::String::convert<std::uint8_t>(sections[1]));
+            const auto level =
+                static_cast<fly::Log::Level>(fly::String::convert<std::uint8_t>(sections[1]));
             const auto time = fly::String::convert<double>(sections[2]);
             const auto file = sections[3];
             const auto function = sections[4];
@@ -129,8 +117,7 @@ protected:
             EXPECT_EQ(file, __FILE__);
             EXPECT_EQ(function, expected_function);
             EXPECT_GT(line, 0_u32);
-            EXPECT_TRUE(
-                fly::String::starts_with(message, expected_messages[count]));
+            EXPECT_TRUE(fly::String::starts_with(message, expected_messages[count]));
 
             ++count;
             last_time = time;
@@ -169,7 +156,7 @@ protected:
     std::shared_ptr<fly::Logger> m_logger;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(LoggerTest, GoodFilePath)
 {
     std::filesystem::path path = m_logger->get_log_file_path();
@@ -179,7 +166,7 @@ TEST_F(LoggerTest, GoodFilePath)
     EXPECT_TRUE(stream.good());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(LoggerTest, BadFilePath)
 {
     fly::Logger::set_instance(nullptr);
@@ -192,7 +179,7 @@ TEST_F(LoggerTest, BadFilePath)
     EXPECT_FALSE(m_logger->start());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(LoggerTest, ConsoleLog)
 {
     fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
@@ -213,7 +200,7 @@ TEST_F(LoggerTest, ConsoleLog)
     EXPECT_EQ(std::count(contents.begin(), contents.end(), '\n'), 4);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(LoggerTest, DebugLog)
 {
     LOGD("Debug Log");
@@ -227,7 +214,7 @@ TEST_F(LoggerTest, DebugLog)
     run_log_test(fly::Log::Level::Debug, __FUNCTION__, std::move(expectations));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(LoggerTest, InfoLog)
 {
     LOGI("Info Log");
@@ -241,7 +228,7 @@ TEST_F(LoggerTest, InfoLog)
     run_log_test(fly::Log::Level::Info, __FUNCTION__, std::move(expectations));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(LoggerTest, WarningLog)
 {
     LOGW("Warning Log");
@@ -255,7 +242,7 @@ TEST_F(LoggerTest, WarningLog)
     run_log_test(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(LoggerTest, SystemLog)
 {
     LOGS("System Log");
@@ -269,7 +256,7 @@ TEST_F(LoggerTest, SystemLog)
     run_log_test(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(LoggerTest, ErrorLog)
 {
     LOGE("Error Log");
@@ -283,7 +270,7 @@ TEST_F(LoggerTest, ErrorLog)
     run_log_test(fly::Log::Level::Error, __FUNCTION__, std::move(expectations));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(LoggerTest, Rollover)
 {
     std::filesystem::path path = m_logger->get_log_file_path();
@@ -296,8 +283,8 @@ TEST_F(LoggerTest, Rollover)
     std::uintmax_t expected_size = log_size(random);
     std::uintmax_t count = 0;
 
-    // Create enough log points to fill the log file, plus some extra to start
-    // filling a second log file
+    // Create enough log points to fill the log file, plus some extra to start filling a second log
+    // file.
     while (++count < ((max_log_file_size / expected_size) + 10))
     {
         LOGD("%s", random);

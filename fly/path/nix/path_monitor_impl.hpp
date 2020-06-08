@@ -14,8 +14,7 @@ class PathConfig;
 class SequencedTaskRunner;
 
 /**
- * Linux implementation of the PathMonitor interface. Uses the inotify API to
- * detect path changes.
+ * Linux implementation of the PathMonitor interface. Uses the inotify API to detect path changes.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 19, 2017
@@ -44,8 +43,8 @@ protected:
     bool is_valid() const noexcept override;
 
     /**
-     * Check if the path monitor's inotify handle has any events to be read,
-     * and handle any that are readable.
+     * Check if the path monitor's inotify handle has any events to be read, and handle any that are
+     * readable.
      *
      * @param timeout Max time allow for an event to be readable.
      */
@@ -56,15 +55,12 @@ protected:
 
 private:
     /**
-     * Linux implementation of the PathInfo interface. Stores the path monitor's
-     * inotify handle for adding/removing the monitored path, as well as a
-     * handle to the added inotify watch.
+     * Linux implementation of the PathInfo interface. Stores the path monitor's inotify handle for
+     * adding/removing the monitored path, as well as a handle to the added inotify watch.
      */
     struct PathInfoImpl : PathMonitor::PathInfo
     {
-        PathInfoImpl(
-            int monitor_descriptor,
-            const std::filesystem::path &path) noexcept;
+        PathInfoImpl(int monitor_descriptor, const std::filesystem::path &path) noexcept;
         ~PathInfoImpl() override;
 
         /**

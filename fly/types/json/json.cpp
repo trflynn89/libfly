@@ -11,33 +11,31 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 Json::Json() noexcept : m_value()
 {
 }
 
-//==============================================================================
+//==================================================================================================
 Json::Json(const JsonTraits::null_type &value) noexcept : m_value(value)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 Json::Json(const_reference json) noexcept : m_value(json.m_value)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 Json::Json(Json &&json) noexcept : m_value(std::move(json.m_value))
 {
     json.m_value = nullptr;
 }
 
-//==============================================================================
+//==================================================================================================
 Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
 {
-    auto object_test = [](const_reference json) {
-        return json.is_object_like();
-    };
+    auto object_test = [](const_reference json) { return json.is_object_like(); };
 
     if (std::all_of(initializer.begin(), initializer.end(), object_test))
     {
@@ -61,7 +59,7 @@ Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
     }
 }
 
-//==============================================================================
+//==================================================================================================
 Json::~Json()
 {
     std::vector<Json> stack;
@@ -103,71 +101,70 @@ Json::~Json()
     }
 }
 
-//==============================================================================
+//==================================================================================================
 Json::reference Json::operator=(Json json) noexcept
 {
     swap(json);
     return *this;
 }
 
-//==============================================================================
+//==================================================================================================
 bool Json::is_null() const noexcept
 {
     return std::holds_alternative<JsonTraits::null_type>(m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 bool Json::is_string() const noexcept
 {
     return std::holds_alternative<JsonTraits::string_type>(m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 bool Json::is_object() const noexcept
 {
     return std::holds_alternative<JsonTraits::object_type>(m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 bool Json::is_object_like() const noexcept
 {
     const auto *value = std::get_if<JsonTraits::array_type>(&m_value);
 
-    return (value != nullptr) && (value->size() == 2) &&
-        value->at(0).is_string();
+    return (value != nullptr) && (value->size() == 2) && value->at(0).is_string();
 }
 
-//==============================================================================
+//==================================================================================================
 bool Json::is_array() const noexcept
 {
     return std::holds_alternative<JsonTraits::array_type>(m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 bool Json::is_boolean() const noexcept
 {
     return std::holds_alternative<JsonTraits::boolean_type>(m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 bool Json::is_signed_integer() const noexcept
 {
     return std::holds_alternative<JsonTraits::signed_type>(m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 bool Json::is_unsigned_integer() const noexcept
 {
     return std::holds_alternative<JsonTraits::unsigned_type>(m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 bool Json::is_float() const noexcept
 {
     return std::holds_alternative<JsonTraits::float_type>(m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 Json::operator JsonTraits::null_type() const noexcept(false)
 {
     if (is_null())
@@ -180,7 +177,7 @@ Json::operator JsonTraits::null_type() const noexcept(false)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 Json::operator JsonTraits::string_type() const noexcept
 {
     if (is_string())
@@ -196,9 +193,9 @@ Json::operator JsonTraits::string_type() const noexcept
     }
 }
 
-//==============================================================================
-Json::reference Json::operator[](
-    const typename JsonTraits::object_type::key_type &key) noexcept(false)
+//==================================================================================================
+Json::reference
+Json::operator[](const typename JsonTraits::object_type::key_type &key) noexcept(false)
 {
     if (is_null())
     {
@@ -216,15 +213,14 @@ Json::reference Json::operator[](
     throw JsonException(*this, "JSON type invalid for operator[key]");
 }
 
-//==============================================================================
-Json::const_reference
-Json::operator[](const typename JsonTraits::object_type::key_type &key) const
+//==================================================================================================
+Json::const_reference Json::operator[](const typename JsonTraits::object_type::key_type &key) const
     noexcept(false)
 {
     return at(key);
 }
 
-//==============================================================================
+//==================================================================================================
 Json::reference Json::operator[](size_type index) noexcept(false)
 {
     if (is_null())
@@ -247,15 +243,14 @@ Json::reference Json::operator[](size_type index) noexcept(false)
     throw JsonException(*this, "JSON type invalid for operator[index]");
 }
 
-//==============================================================================
+//==================================================================================================
 Json::const_reference Json::operator[](size_type index) const noexcept(false)
 {
     return at(index);
 }
 
-//==============================================================================
-Json::reference
-Json::at(const typename JsonTraits::object_type::key_type &key) noexcept(false)
+//==================================================================================================
+Json::reference Json::at(const typename JsonTraits::object_type::key_type &key) noexcept(false)
 {
     if (is_object())
     {
@@ -266,9 +261,7 @@ Json::at(const typename JsonTraits::object_type::key_type &key) noexcept(false)
 
         if (it == value.end())
         {
-            throw JsonException(
-                *this,
-                String::format("Given key (%s) not found", key));
+            throw JsonException(*this, String::format("Given key (%s) not found", key));
         }
 
         return it->second;
@@ -277,9 +270,8 @@ Json::at(const typename JsonTraits::object_type::key_type &key) noexcept(false)
     throw JsonException(*this, "JSON type invalid for operator[key]");
 }
 
-//==============================================================================
-Json::const_reference
-Json::at(const typename JsonTraits::object_type::key_type &key) const
+//==================================================================================================
+Json::const_reference Json::at(const typename JsonTraits::object_type::key_type &key) const
     noexcept(false)
 {
     if (is_object())
@@ -291,9 +283,7 @@ Json::at(const typename JsonTraits::object_type::key_type &key) const
 
         if (it == value.end())
         {
-            throw JsonException(
-                *this,
-                String::format("Given key (%s) not found", key));
+            throw JsonException(*this, String::format("Given key (%s) not found", key));
         }
 
         return it->second;
@@ -302,7 +292,7 @@ Json::at(const typename JsonTraits::object_type::key_type &key) const
     throw JsonException(*this, "JSON type invalid for operator[key]");
 }
 
-//==============================================================================
+//==================================================================================================
 Json::reference Json::at(size_type index) noexcept(false)
 {
     if (is_array())
@@ -311,9 +301,7 @@ Json::reference Json::at(size_type index) noexcept(false)
 
         if (index >= value.size())
         {
-            throw JsonException(
-                *this,
-                String::format("Given index (%d) not found", index));
+            throw JsonException(*this, String::format("Given index (%d) not found", index));
         }
 
         return value.at(index);
@@ -322,7 +310,7 @@ Json::reference Json::at(size_type index) noexcept(false)
     throw JsonException(*this, "JSON type invalid for operator[index]");
 }
 
-//==============================================================================
+//==================================================================================================
 Json::const_reference Json::at(size_type index) const noexcept(false)
 {
     if (is_array())
@@ -331,9 +319,7 @@ Json::const_reference Json::at(size_type index) const noexcept(false)
 
         if (index >= value.size())
         {
-            throw JsonException(
-                *this,
-                String::format("Given index (%d) not found", index));
+            throw JsonException(*this, String::format("Given index (%d) not found", index));
         }
 
         return value.at(index);
@@ -342,7 +328,7 @@ Json::const_reference Json::at(size_type index) const noexcept(false)
     throw JsonException(*this, "JSON type invalid for operator[index]");
 }
 
-//==============================================================================
+//==================================================================================================
 bool Json::empty() const noexcept
 {
     auto visitor = [](const auto &value) noexcept -> bool {
@@ -354,8 +340,7 @@ bool Json::empty() const noexcept
         }
         else if constexpr (
             std::is_same_v<T, JsonTraits::string_type> ||
-            std::is_same_v<T, JsonTraits::object_type> ||
-            std::is_same_v<T, JsonTraits::array_type>)
+            std::is_same_v<T, JsonTraits::object_type> || std::is_same_v<T, JsonTraits::array_type>)
         {
             return value.empty();
         }
@@ -368,7 +353,7 @@ bool Json::empty() const noexcept
     return std::visit(visitor, m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 Json::size_type Json::size() const noexcept
 {
     auto visitor = [](const auto &value) noexcept -> size_type {
@@ -380,8 +365,7 @@ Json::size_type Json::size() const noexcept
         }
         else if constexpr (
             std::is_same_v<T, JsonTraits::string_type> ||
-            std::is_same_v<T, JsonTraits::object_type> ||
-            std::is_same_v<T, JsonTraits::array_type>)
+            std::is_same_v<T, JsonTraits::object_type> || std::is_same_v<T, JsonTraits::array_type>)
         {
             return value.size();
         }
@@ -394,7 +378,7 @@ Json::size_type Json::size() const noexcept
     return std::visit(visitor, m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 void Json::clear() noexcept
 {
     auto visitor = [](auto &value) noexcept {
@@ -402,8 +386,7 @@ void Json::clear() noexcept
 
         if constexpr (
             std::is_same_v<T, JsonTraits::string_type> ||
-            std::is_same_v<T, JsonTraits::object_type> ||
-            std::is_same_v<T, JsonTraits::array_type>)
+            std::is_same_v<T, JsonTraits::object_type> || std::is_same_v<T, JsonTraits::array_type>)
         {
             value.clear();
         }
@@ -423,49 +406,49 @@ void Json::clear() noexcept
     std::visit(visitor, m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 void Json::swap(reference json) noexcept
 {
     std::swap(m_value, json.m_value);
 }
 
-//==============================================================================
+//==================================================================================================
 Json::iterator Json::begin() noexcept(false)
 {
     return iterator(this, iterator::Position::Begin);
 }
 
-//==============================================================================
+//==================================================================================================
 Json::const_iterator Json::begin() const noexcept(false)
 {
     return cbegin();
 }
 
-//==============================================================================
+//==================================================================================================
 Json::const_iterator Json::cbegin() const noexcept(false)
 {
     return const_iterator(this, const_iterator::Position::Begin);
 }
 
-//==============================================================================
+//==================================================================================================
 Json::iterator Json::end() noexcept(false)
 {
     return iterator(this, iterator::Position::End);
 }
 
-//==============================================================================
+//==================================================================================================
 Json::const_iterator Json::end() const noexcept(false)
 {
     return cend();
 }
 
-//==============================================================================
+//==================================================================================================
 Json::const_iterator Json::cend() const noexcept(false)
 {
     return const_iterator(this, const_iterator::Position::End);
 }
 
-//==============================================================================
+//==================================================================================================
 void Json::swap(JsonTraits::string_type &other) noexcept(false)
 {
     if (is_string())
@@ -479,10 +462,8 @@ void Json::swap(JsonTraits::string_type &other) noexcept(false)
     }
 }
 
-//==============================================================================
-bool operator==(
-    Json::const_reference json1,
-    Json::const_reference json2) noexcept
+//==================================================================================================
+bool operator==(Json::const_reference json1, Json::const_reference json2) noexcept
 {
     auto visitor = [](const auto &value1, const auto &value2) noexcept -> bool {
         using F = JsonTraits::float_type;
@@ -500,8 +481,7 @@ bool operator==(
 
             return std::abs(fvalue1 - fvalue2) <= epsilon;
         }
-        else if constexpr (
-            JsonTraits::is_number_v<T> && JsonTraits::is_number_v<U>)
+        else if constexpr (JsonTraits::is_number_v<T> && JsonTraits::is_number_v<U>)
         {
             return value1 == static_cast<T>(value2);
         }
@@ -516,17 +496,14 @@ bool operator==(
     return std::visit(visitor, json1.m_value, json2.m_value);
 }
 
-//==============================================================================
-bool operator!=(
-    Json::const_reference json1,
-    Json::const_reference json2) noexcept
+//==================================================================================================
+bool operator!=(Json::const_reference json1, Json::const_reference json2) noexcept
 {
     return !(json1 == json2);
 }
 
-//==============================================================================
-std::ostream &
-operator<<(std::ostream &stream, Json::const_reference json) noexcept
+//==================================================================================================
+std::ostream &operator<<(std::ostream &stream, Json::const_reference json) noexcept
 {
     auto serialize_string = [&stream](const JsonTraits::string_type &value) {
         stream << '"';
@@ -597,9 +574,8 @@ operator<<(std::ostream &stream, Json::const_reference json) noexcept
     return stream;
 }
 
-//==============================================================================
-JsonTraits::string_type
-Json::validate_string(const JsonTraits::string_type &str) noexcept(false)
+//==================================================================================================
+JsonTraits::string_type Json::validate_string(const JsonTraits::string_type &str) noexcept(false)
 {
     stream_type stream;
 
@@ -625,7 +601,7 @@ Json::validate_string(const JsonTraits::string_type &str) noexcept(false)
     return stream.str();
 }
 
-//==============================================================================
+//==================================================================================================
 void Json::read_escaped_character(
     stream_type &stream,
     JsonTraits::string_type::const_iterator &it,
@@ -667,8 +643,7 @@ void Json::read_escaped_character(
         case 'u':
             try
             {
-                // The input sequence is expected to begin with the reverse
-                // solidus character.
+                // The input sequence is expected to begin with the reverse solidus character.
                 stream << String::parse_unicode_character(--it, end);
             }
             catch (const StringException &ex)
@@ -676,21 +651,18 @@ void Json::read_escaped_character(
                 throw JsonException(ex.what());
             }
 
-            // The iterator is already incremented past the escaped character
-            // sequence.
+            // The iterator is already incremented past the escaped character sequence.
             return;
 
         default:
-            throw JsonException(String::format(
-                "Invalid escape character '%c' (%x)",
-                *it,
-                int(*it)));
+            throw JsonException(
+                String::format("Invalid escape character '%c' (%x)", *it, int(*it)));
     }
 
     ++it;
 }
 
-//==============================================================================
+//==================================================================================================
 void Json::write_escaped_charater(
     std::ostream &stream,
     JsonTraits::string_type::value_type ch) noexcept
@@ -732,7 +704,7 @@ void Json::write_escaped_charater(
     }
 }
 
-//==============================================================================
+//==================================================================================================
 void Json::validate_character(
     stream_type &stream,
     JsonTraits::string_type::const_iterator &it,
@@ -753,10 +725,8 @@ void Json::validate_character(
     };
 
     auto invalid = [&c](int location) {
-        throw JsonException(String::format(
-            "Invalid control character '%x' (location %d)",
-            int(c),
-            location));
+        throw JsonException(
+            String::format("Invalid control character '%x' (location %d)", int(c), location));
     };
 
     // Invalid control characters

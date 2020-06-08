@@ -20,9 +20,9 @@ class SocketManagerTask;
 enum class Protocol : uint8_t;
 
 /**
- * Class to manage the creation of sockets and IO operations over asynchronous
- * sockets. A single thread is created to perform all IO. Completed IO is
- * pushed onto queues, which other threads may read from.
+ * Class to manage the creation of sockets and IO operations over asynchronous sockets. A single
+ * thread is created to perform all IO. Completed IO is pushed onto queues, which other threads may
+ * read from.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 19, 2016
@@ -62,9 +62,7 @@ public:
      * @param new_client Callback for when a new client connects.
      * @param closed_client Callback for when a client disconnects.
      */
-    void set_client_callbacks(
-        SocketCallback new_client,
-        SocketCallback closed_client) noexcept;
+    void set_client_callbacks(SocketCallback new_client, SocketCallback closed_client) noexcept;
 
     /**
      * Remove the callbacks for when a client connects or disconnects.
@@ -81,8 +79,7 @@ public:
     std::shared_ptr<Socket> create_socket(Protocol protocol) noexcept;
 
     /**
-     * Create and initialize an asynchronous socket. The socket manager will own
-     * this socket.
+     * Create and initialize an asynchronous socket. The socket manager will own this socket.
      *
      * @param protocol The communication protocol of the socket.
      *
@@ -112,9 +109,8 @@ public:
      * @return True if a completed send was found in the given duration.
      */
     template <typename R, typename P>
-    bool wait_for_completed_send(
-        AsyncRequest &request,
-        std::chrono::duration<R, P> wait_time) noexcept;
+    bool
+    wait_for_completed_send(AsyncRequest &request, std::chrono::duration<R, P> wait_time) noexcept;
 
 protected:
     /**
@@ -170,13 +166,12 @@ private:
 class SocketManagerTask : public Task
 {
 public:
-    explicit SocketManagerTask(
-        std::weak_ptr<SocketManager> weak_socket_manager) noexcept;
+    explicit SocketManagerTask(std::weak_ptr<SocketManager> weak_socket_manager) noexcept;
 
 protected:
     /**
-     * Call back into the socket manager to check if any asynchronous sockets
-     * are available for IO. The task re-arms itself.
+     * Call back into the socket manager to check if any asynchronous sockets are available for IO.
+     * The task re-arms itself.
      */
     void run() noexcept override;
 
@@ -184,7 +179,7 @@ private:
     std::weak_ptr<SocketManager> m_weak_socket_manager;
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename R, typename P>
 bool SocketManager::wait_for_completed_receive(
     AsyncRequest &request,
@@ -193,7 +188,7 @@ bool SocketManager::wait_for_completed_receive(
     return m_completed_receives.pop(request, wait_time);
 }
 
-//==============================================================================
+//==================================================================================================
 template <typename R, typename P>
 bool SocketManager::wait_for_completed_send(
     AsyncRequest &request,

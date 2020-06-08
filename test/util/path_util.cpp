@@ -11,17 +11,14 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 std::filesystem::path PathUtil::generate_temp_directory() noexcept
 {
-    return std::filesystem::temp_directory_path() /
-        fly::String::generate_random_string(10);
+    return std::filesystem::temp_directory_path() / fly::String::generate_random_string(10);
 }
 
-//==============================================================================
-bool PathUtil::write_file(
-    const std::filesystem::path &path,
-    const std::string &contents) noexcept
+//==================================================================================================
+bool PathUtil::write_file(const std::filesystem::path &path, const std::string &contents) noexcept
 {
     std::ofstream stream(path, std::ios::out);
 
@@ -33,7 +30,7 @@ bool PathUtil::write_file(
     return stream.good();
 }
 
-//==============================================================================
+//==================================================================================================
 std::string PathUtil::read_file(const std::filesystem::path &path) noexcept
 {
     std::ifstream stream(path, std::ios::in);
@@ -47,10 +44,10 @@ std::string PathUtil::read_file(const std::filesystem::path &path) noexcept
     return sstream.str();
 }
 
-//==============================================================================
+//==================================================================================================
 bool PathUtil::compare_files(
     const std::filesystem::path &path1,
-    const std::filesystem::path &path2)
+    const std::filesystem::path &path2) noexcept
 {
     if (std::filesystem::file_size(path1) != std::filesystem::file_size(path2))
     {

@@ -23,7 +23,7 @@
 #    include "test/mock/mock_system.hpp"
 #endif
 
-//==============================================================================
+//==================================================================================================
 class SocketTest : public ::testing::Test
 {
 public:
@@ -123,15 +123,11 @@ TEST_F(SocketTest, Create_MockSocketFail)
 {
     fly::MockSystem mock(fly::MockCall::Socket);
 
-    ASSERT_FALSE(
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, false));
-    ASSERT_FALSE(
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, false));
+    ASSERT_FALSE(create_socket(m_server_socket_manager, fly::Protocol::TCP, false));
+    ASSERT_FALSE(create_socket(m_server_socket_manager, fly::Protocol::UDP, false));
 
-    ASSERT_FALSE(
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true));
-    ASSERT_FALSE(
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, true));
+    ASSERT_FALSE(create_socket(m_server_socket_manager, fly::Protocol::TCP, true));
+    ASSERT_FALSE(create_socket(m_server_socket_manager, fly::Protocol::UDP, true));
 }
 
 /**
@@ -141,15 +137,11 @@ TEST_F(SocketTest, Create_MockFcntlFail)
 {
     fly::MockSystem mock(fly::MockCall::Fcntl);
 
-    ASSERT_TRUE(
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, false));
-    ASSERT_TRUE(
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, false));
+    ASSERT_TRUE(create_socket(m_server_socket_manager, fly::Protocol::TCP, false));
+    ASSERT_TRUE(create_socket(m_server_socket_manager, fly::Protocol::UDP, false));
 
-    ASSERT_FALSE(
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true));
-    ASSERT_FALSE(
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, true));
+    ASSERT_FALSE(create_socket(m_server_socket_manager, fly::Protocol::TCP, true));
+    ASSERT_FALSE(create_socket(m_server_socket_manager, fly::Protocol::UDP, true));
 }
 
 /**
@@ -159,46 +151,31 @@ TEST_F(SocketTest, Bind_MockBindFail)
 {
     fly::MockSystem mock(fly::MockCall::Bind);
 
-    auto socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, false);
-    ASSERT_FALSE(socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
-    ASSERT_FALSE(socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::SingleUse));
+    auto socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, false);
+    ASSERT_FALSE(socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
+    ASSERT_FALSE(socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::SingleUse));
 }
 
 /**
- * Test handling for when socket binding fails due to ::setsockopt() system
- * call.
+ * Test handling for when socket binding fails due to ::setsockopt() system call.
  */
 TEST_F(SocketTest, Bind_MockSetsockoptFail)
 {
     fly::MockSystem mock(fly::MockCall::Setsockopt);
 
-    auto socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, false);
-    ASSERT_FALSE(socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, false);
+    ASSERT_FALSE(socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
 }
 
 /**
- * Test handling for when socket binding fails due to ::gethostbyname() system
- * call.
+ * Test handling for when socket binding fails due to ::gethostbyname() system call.
  */
 TEST_F(SocketTest, Bind_Sync_MockGethostbynameFail)
 {
     fly::MockSystem mock(fly::MockCall::Gethostbyname);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_FALSE(
-        listen_socket->bind("0.0.0.0", m_port, fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_FALSE(listen_socket->bind("0.0.0.0", m_port, fly::BindOption::AllowReuse));
 }
 
 /**
@@ -208,98 +185,72 @@ TEST_F(SocketTest, Listen_MockListenFail)
 {
     fly::MockSystem mock(fly::MockCall::Listen);
 
-    auto socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, false);
-    ASSERT_TRUE(socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, false);
+    ASSERT_TRUE(socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_FALSE(socket->listen());
 }
 
 /**
- * Test handling for when socket connecting fails due to ::connect() system
- * call.
+ * Test handling for when socket connecting fails due to ::connect() system call.
  */
 TEST_F(SocketTest, Connect_Sync_MockConnectFail)
 {
     fly::MockSystem mock(fly::MockCall::Connect);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, false);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, false);
     ASSERT_FALSE(client_socket->connect(m_host, m_port));
 }
 
 /**
- * Test handling for when socket connecting fails due to ::gethostbyname()
- * system call.
+ * Test handling for when socket connecting fails due to ::gethostbyname() system call.
  */
 TEST_F(SocketTest, Connect_Sync_MockGethostbynameFail)
 {
     fly::MockSystem mock(fly::MockCall::Gethostbyname);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, false);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, false);
     ASSERT_FALSE(client_socket->connect(m_host, m_port));
 }
 
 /**
- * Test handling for when socket connecting fails due to ::gethostbyname()
- * system call.
+ * Test handling for when socket connecting fails due to ::gethostbyname() system call.
  */
 TEST_F(SocketTest, Connect_Async_MockGethostbynameFail)
 {
     fly::MockSystem mock(fly::MockCall::Gethostbyname);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_EQ(
-        client_socket->connect_async(m_host, m_port),
-        fly::ConnectedState::Disconnected);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_EQ(client_socket->connect_async(m_host, m_port), fly::ConnectedState::Disconnected);
 }
 
 /**
- * Test handling for when socket connecting fails due to ::connect() system
- * call.
+ * Test handling for when socket connecting fails due to ::connect() system call.
  */
 TEST_F(SocketTest, Connect_Async_MockConnectFail)
 {
     fly::MockSystem mock(fly::MockCall::Connect);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
 
     fly::ConnectedState state = client_socket->connect_async(m_host, m_port);
     ASSERT_EQ(state, fly::ConnectedState::Disconnected);
@@ -312,46 +263,36 @@ TEST_F(SocketTest, Connect_Async_MockConnectImmediateSuccess)
 {
     fly::MockSystem mock(fly::MockCall::Connect, false);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
 
     fly::ConnectedState state = client_socket->connect_async(m_host, m_port);
     ASSERT_EQ(state, fly::ConnectedState::Connected);
 }
 
 /**
- * Test handling for when socket connecting fails due to ::getsockopt() system
- * call.
+ * Test handling for when socket connecting fails due to ::getsockopt() system call.
  */
 TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
 {
     fly::MockSystem mock(fly::MockCall::Getsockopt);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
     m_client_socket_manager->set_client_callbacks(nullptr, callback);
 
     int item = 0;
     std::chrono::milliseconds wait_time(100);
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
 
     fly::ConnectedState state = client_socket->connect_async(m_host, m_port);
     ASSERT_NE(state, fly::ConnectedState::Disconnected);
@@ -368,65 +309,50 @@ TEST_F(SocketTest, Accept_MockAcceptFail)
 {
     fly::MockSystem mock(fly::MockCall::Accept);
 
-    auto socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, false);
-    ASSERT_TRUE(socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, false);
+    ASSERT_TRUE(socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(socket->listen());
 
     ASSERT_FALSE(socket->accept());
 }
 
 /**
- * Test handling for when socket sending (TCP) fails due to ::send() system
- * call.
+ * Test handling for when socket sending (TCP) fails due to ::send() system call.
  */
 TEST_F(SocketTest, Send_Sync_MockSendFail)
 {
     fly::MockSystem mock(fly::MockCall::Send);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, false);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, false);
     ASSERT_TRUE(client_socket->connect(m_host, m_port));
 
     ASSERT_EQ(client_socket->send(m_message), 0U);
 }
 
 /**
- * Test handling for when socket sending (TCP) fails due to ::send() system
- * call.
+ * Test handling for when socket sending (TCP) fails due to ::send() system call.
  */
 TEST_F(SocketTest, Send_Async_MockSendFail)
 {
     fly::MockSystem mock(fly::MockCall::Send);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
     m_client_socket_manager->set_client_callbacks(callback, callback);
 
     int item = 0;
     std::chrono::milliseconds wait_time(100);
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
 
     fly::ConnectedState state = client_socket->connect_async(m_host, m_port);
     ASSERT_NE(state, fly::ConnectedState::Disconnected);
@@ -444,30 +370,24 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
 }
 
 /**
- * Test handling for when socket sending (TCP) blocks due to ::send() system
- * call.
+ * Test handling for when socket sending (TCP) blocks due to ::send() system call.
  */
 TEST_F(SocketTest, Send_Async_MockSendBlock)
 {
     fly::MockSystem mock(fly::MockCall::SendBlocking);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
     m_client_socket_manager->set_client_callbacks(callback, callback);
 
     int item = 0;
     std::chrono::milliseconds wait_time(100);
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, true);
 
     fly::ConnectedState state = client_socket->connect_async(m_host, m_port);
     ASSERT_NE(state, fly::ConnectedState::Disconnected);
@@ -482,8 +402,7 @@ TEST_F(SocketTest, Send_Async_MockSendBlock)
     ASSERT_TRUE(client_socket->send_async(std::move(m_message)));
 
     fly::AsyncRequest request;
-    ASSERT_TRUE(
-        m_client_socket_manager->wait_for_completed_send(request, wait_time));
+    ASSERT_TRUE(m_client_socket_manager->wait_for_completed_send(request, wait_time));
     ASSERT_EQ(message.size(), request.get_request().size());
     ASSERT_EQ(message, request.get_request());
 
@@ -491,103 +410,79 @@ TEST_F(SocketTest, Send_Async_MockSendBlock)
 }
 
 /**
- * Test handling for when socket sending (UDP) fails due to ::sendto() system
- * call.
+ * Test handling for when socket sending (UDP) fails due to ::sendto() system call.
  */
 TEST_F(SocketTest, Send_Sync_MockSendtoFail)
 {
     fly::MockSystem mock(fly::MockCall::Sendto);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::UDP, false);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::UDP, false);
     ASSERT_EQ(client_socket->send_to(m_message, m_host, m_port), 0U);
 }
 
 /**
- * Test handling for when socket sending (UDP) fails due to ::gethostbyname()
- * system call.
+ * Test handling for when socket sending (UDP) fails due to ::gethostbyname() system call.
  */
 TEST_F(SocketTest, Send_Sync_MockGethostbynameFail)
 {
     fly::MockSystem mock(fly::MockCall::Gethostbyname);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::UDP, false);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::UDP, false);
     ASSERT_EQ(client_socket->send_to(m_message, m_host, m_port), 0U);
 }
 
 /**
- * Test handling for when socket sending (UDP) fails due to ::sendto() system
- * call.
+ * Test handling for when socket sending (UDP) fails due to ::sendto() system call.
  */
 TEST_F(SocketTest, Send_Async_MockSendtoFail)
 {
     fly::MockSystem mock(fly::MockCall::Sendto);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
 
-    auto callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
     m_client_socket_manager->set_client_callbacks(nullptr, callback);
 
     int item = 0;
     std::chrono::milliseconds wait_time(100);
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(
-        client_socket->send_to_async(std::move(m_message), m_host, m_port));
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::UDP, true);
+    ASSERT_TRUE(client_socket->send_to_async(std::move(m_message), m_host, m_port));
 
     ASSERT_TRUE(m_event_queue.pop(item, wait_time));
     ASSERT_FALSE(client_socket->is_valid());
 }
 
 /**
- * Test handling for when socket sending (UDP) blocks due to ::sendto() system
- * call.
+ * Test handling for when socket sending (UDP) blocks due to ::sendto() system call.
  */
 TEST_F(SocketTest, Send_Async_MockSendtoBlock)
 {
     fly::MockSystem mock(fly::MockCall::SendtoBlocking);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::UDP, true);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::UDP, true);
 
     std::string message(m_message);
-    ASSERT_TRUE(
-        client_socket->send_to_async(std::move(m_message), m_host, m_port));
+    ASSERT_TRUE(client_socket->send_to_async(std::move(m_message), m_host, m_port));
 
     fly::AsyncRequest request;
     std::chrono::milliseconds wait_time(100);
 
-    ASSERT_TRUE(
-        m_client_socket_manager->wait_for_completed_send(request, wait_time));
+    ASSERT_TRUE(m_client_socket_manager->wait_for_completed_send(request, wait_time));
     ASSERT_EQ(message.size(), request.get_request().size());
     ASSERT_EQ(message, request.get_request());
 
@@ -595,61 +490,46 @@ TEST_F(SocketTest, Send_Async_MockSendtoBlock)
 }
 
 /**
- * Test handling for when socket sending (UDP) fails due to ::gethostbyname()
- * system call.
+ * Test handling for when socket sending (UDP) fails due to ::gethostbyname() system call.
  */
 TEST_F(SocketTest, Send_Async_MockGethostbynameFail)
 {
     fly::MockSystem mock(fly::MockCall::Gethostbyname);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::UDP, true);
-    ASSERT_FALSE(
-        client_socket->send_to_async(std::move(m_message), m_host, m_port));
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::UDP, true);
+    ASSERT_FALSE(client_socket->send_to_async(std::move(m_message), m_host, m_port));
 }
 
 /**
- * Test handling for when socket receiving (TCP) fails due to ::recv() system
- * call.
+ * Test handling for when socket receiving (TCP) fails due to ::recv() system call.
  */
 TEST_F(SocketTest, Recv_Sync_MockRecvFail)
 {
     fly::MockSystem mock(fly::MockCall::Recv);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, false);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, false);
     ASSERT_EQ(client_socket->recv(), std::string());
 }
 
 /**
- * Test handling for when socket receiving (TCP) fails due to ::recv() system
- * call.
+ * Test handling for when socket receiving (TCP) fails due to ::recv() system call.
  */
 TEST_F(SocketTest, Recv_Async_MockRecvFail)
 {
     fly::MockSystem mock(fly::MockCall::Recv);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
     std::shared_ptr<fly::Socket> server_socket;
@@ -658,17 +538,13 @@ TEST_F(SocketTest, Recv_Async_MockRecvFail)
         server_socket = socket;
         m_event_queue.push(1);
     });
-    auto disconnect_callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
-    m_server_socket_manager->set_client_callbacks(
-        connect_callback,
-        disconnect_callback);
+    auto disconnect_callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    m_server_socket_manager->set_client_callbacks(connect_callback, disconnect_callback);
 
     int item = 0;
     std::chrono::milliseconds wait_time(100);
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::TCP, false);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, false);
     ASSERT_TRUE(client_socket->connect(m_host, m_port));
     ASSERT_TRUE(m_event_queue.pop(item, wait_time));
 
@@ -679,52 +555,39 @@ TEST_F(SocketTest, Recv_Async_MockRecvFail)
 }
 
 /**
- * Test handling for when socket receiving (UDP) fails due to ::recvfrom()
- * system call.
+ * Test handling for when socket receiving (UDP) fails due to ::recvfrom() system call.
  */
 TEST_F(SocketTest, Recv_Sync_MockRecvfromFail)
 {
     fly::MockSystem mock(fly::MockCall::Recvfrom);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::UDP, false);
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::UDP, false);
     ASSERT_EQ(client_socket->recv_from(), std::string());
 }
 
 /**
- * Test handling for when socket receiving (UDP) fails due to ::recvfrom()
- * system call.
+ * Test handling for when socket receiving (UDP) fails due to ::recvfrom() system call.
  */
 TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
 {
     fly::MockSystem mock(fly::MockCall::Recvfrom);
 
-    auto listen_socket =
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
-    ASSERT_TRUE(listen_socket->bind(
-        fly::Socket::in_addr_any(),
-        m_port,
-        fly::BindOption::AllowReuse));
+    auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::UDP, true);
+    ASSERT_TRUE(
+        listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
 
-    auto callback(
-        [&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
     m_server_socket_manager->set_client_callbacks(nullptr, callback);
 
     int item = 0;
     std::chrono::milliseconds wait_time(100);
 
-    auto client_socket =
-        create_socket(m_client_socket_manager, fly::Protocol::UDP, false);
-    ASSERT_EQ(
-        client_socket->send_to(m_message, m_host, m_port),
-        m_message.size());
+    auto client_socket = create_socket(m_client_socket_manager, fly::Protocol::UDP, false);
+    ASSERT_EQ(client_socket->send_to(m_message, m_host, m_port), m_message.size());
 
     ASSERT_TRUE(m_event_queue.pop(item, wait_time));
     ASSERT_FALSE(listen_socket->is_valid());
@@ -732,18 +595,16 @@ TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
 
 #endif
 
-//==============================================================================
+//==================================================================================================
 class TcpSocketTest : public SocketTest
 {
 public:
     /**
-     * Thread to run server functions do handle accepting a client socket and
-     * receiving data from it.
+     * Thread to run server functions to accept a client socket and receive data.
      */
     void server_thread(bool async) noexcept override
     {
-        auto listen_socket =
-            create_socket(m_server_socket_manager, fly::Protocol::TCP, async);
+        auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, async);
 
         ASSERT_TRUE(listen_socket && listen_socket->is_valid());
         ASSERT_EQ(listen_socket->is_async(), async);
@@ -751,10 +612,8 @@ public:
         ASSERT_TRUE(listen_socket->is_tcp());
         ASSERT_FALSE(listen_socket->is_udp());
 
-        ASSERT_TRUE(listen_socket->bind(
-            fly::Socket::in_addr_any(),
-            m_port,
-            fly::BindOption::AllowReuse));
+        ASSERT_TRUE(
+            listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
         ASSERT_TRUE(listen_socket->listen());
         m_event_queue.push(1);
 
@@ -763,9 +622,7 @@ public:
             fly::AsyncRequest request;
             std::chrono::seconds wait_time(10);
 
-            ASSERT_TRUE(m_server_socket_manager->wait_for_completed_receive(
-                request,
-                wait_time));
+            ASSERT_TRUE(m_server_socket_manager->wait_for_completed_receive(request, wait_time));
             ASSERT_EQ(m_message.size(), request.get_request().size());
             ASSERT_EQ(m_message, request.get_request());
 
@@ -785,13 +642,11 @@ public:
     }
 
     /**
-     * Thread to run client functions to connect to the server socket and send
-     * data to it.
+     * Thread to run client functions to connect to the server socket and send data.
      */
     void client_thread(bool async) noexcept override
     {
-        auto send_socket =
-            create_socket(m_client_socket_manager, fly::Protocol::TCP, async);
+        auto send_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, async);
 
         ASSERT_TRUE(send_socket && send_socket->is_valid());
         ASSERT_EQ(send_socket->is_async(), async);
@@ -803,9 +658,7 @@ public:
         std::chrono::seconds wait_time(10);
         ASSERT_TRUE(m_event_queue.pop(item, wait_time));
 
-        auto callback([&](std::shared_ptr<fly::Socket>) noexcept {
-            m_event_queue.push(1);
-        });
+        auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
         m_client_socket_manager->set_client_callbacks(callback, nullptr);
 
         if (async)
@@ -823,9 +676,7 @@ public:
             ASSERT_TRUE(send_socket->send_async(std::move(m_message)));
 
             fly::AsyncRequest request;
-            ASSERT_TRUE(m_client_socket_manager->wait_for_completed_send(
-                request,
-                wait_time));
+            ASSERT_TRUE(m_client_socket_manager->wait_for_completed_send(request, wait_time));
             ASSERT_EQ(message.size(), request.get_request().size());
             ASSERT_EQ(message, request.get_request());
 
@@ -846,12 +697,9 @@ public:
  */
 TEST_F(TcpSocketTest, AsyncOperationsOnSyncSocket)
 {
-    auto socket =
-        create_socket(m_server_socket_manager, fly::Protocol::TCP, false);
+    auto socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, false);
 
-    ASSERT_EQ(
-        socket->connect_async(m_host, m_port),
-        fly::ConnectedState::Disconnected);
+    ASSERT_EQ(socket->connect_async(m_host, m_port), fly::ConnectedState::Disconnected);
     ASSERT_FALSE(socket->send_async("abc"));
     ASSERT_FALSE(socket->send_to_async("abc", m_host, m_port));
 }
@@ -861,16 +709,8 @@ TEST_F(TcpSocketTest, AsyncOperationsOnSyncSocket)
  */
 TEST_F(TcpSocketTest, SyncServer_SyncClient)
 {
-    auto server = std::async(
-        std::launch::async,
-        &TcpSocketTest::server_thread,
-        this,
-        false);
-    auto client = std::async(
-        std::launch::async,
-        &TcpSocketTest::client_thread,
-        this,
-        false);
+    auto server = std::async(std::launch::async, &TcpSocketTest::server_thread, this, false);
+    auto client = std::async(std::launch::async, &TcpSocketTest::client_thread, this, false);
 
     ASSERT_TRUE(server.valid() && client.valid());
     client.get();
@@ -882,16 +722,8 @@ TEST_F(TcpSocketTest, SyncServer_SyncClient)
  */
 TEST_F(TcpSocketTest, AsyncServer_SyncClient)
 {
-    auto server = std::async(
-        std::launch::async,
-        &TcpSocketTest::server_thread,
-        this,
-        true);
-    auto client = std::async(
-        std::launch::async,
-        &TcpSocketTest::client_thread,
-        this,
-        false);
+    auto server = std::async(std::launch::async, &TcpSocketTest::server_thread, this, true);
+    auto client = std::async(std::launch::async, &TcpSocketTest::client_thread, this, false);
 
     ASSERT_TRUE(server.valid() && client.valid());
     client.get();
@@ -903,16 +735,8 @@ TEST_F(TcpSocketTest, AsyncServer_SyncClient)
  */
 TEST_F(TcpSocketTest, SyncServer_AsyncClient)
 {
-    auto server = std::async(
-        std::launch::async,
-        &TcpSocketTest::server_thread,
-        this,
-        false);
-    auto client = std::async(
-        std::launch::async,
-        &TcpSocketTest::client_thread,
-        this,
-        true);
+    auto server = std::async(std::launch::async, &TcpSocketTest::server_thread, this, false);
+    auto client = std::async(std::launch::async, &TcpSocketTest::client_thread, this, true);
 
     ASSERT_TRUE(server.valid() && client.valid());
     client.get();
@@ -924,34 +748,24 @@ TEST_F(TcpSocketTest, SyncServer_AsyncClient)
  */
 TEST_F(TcpSocketTest, AsyncServer_AsyncClient)
 {
-    auto server = std::async(
-        std::launch::async,
-        &TcpSocketTest::server_thread,
-        this,
-        true);
-    auto client = std::async(
-        std::launch::async,
-        &TcpSocketTest::client_thread,
-        this,
-        true);
+    auto server = std::async(std::launch::async, &TcpSocketTest::server_thread, this, true);
+    auto client = std::async(std::launch::async, &TcpSocketTest::client_thread, this, true);
 
     ASSERT_TRUE(server.valid() && client.valid());
     client.get();
     server.get();
 }
 
-//==============================================================================
+//==================================================================================================
 class UdpSocketTest : public SocketTest
 {
 public:
     /**
-     * Thread to run server functions do handle accepting a client socket and
-     * receiving data from it.
+     * Thread to run server functions to accept a client socket and receive data.
      */
     void server_thread(bool async) noexcept override
     {
-        auto server_socket =
-            create_socket(m_server_socket_manager, fly::Protocol::UDP, async);
+        auto server_socket = create_socket(m_server_socket_manager, fly::Protocol::UDP, async);
 
         ASSERT_TRUE(server_socket && server_socket->is_valid());
         ASSERT_EQ(server_socket->is_async(), async);
@@ -959,8 +773,7 @@ public:
         ASSERT_FALSE(server_socket->is_tcp());
         ASSERT_TRUE(server_socket->is_udp());
 
-        ASSERT_TRUE(server_socket
-                        ->bind("0.0.0.0", m_port, fly::BindOption::AllowReuse));
+        ASSERT_TRUE(server_socket->bind("0.0.0.0", m_port, fly::BindOption::AllowReuse));
         m_event_queue.push(1);
 
         if (async)
@@ -968,9 +781,7 @@ public:
             fly::AsyncRequest request;
             std::chrono::seconds wait_time(10);
 
-            ASSERT_TRUE(m_server_socket_manager->wait_for_completed_receive(
-                request,
-                wait_time));
+            ASSERT_TRUE(m_server_socket_manager->wait_for_completed_receive(request, wait_time));
             ASSERT_EQ(m_message, request.get_request());
 
             ASSERT_EQ(request.get_socket_id(), server_socket->get_socket_id());
@@ -982,15 +793,13 @@ public:
     }
 
     /**
-     * Thread to run client functions to connect to the server socket and send
-     * data to it.
+     * Thread to run client functions to connect to the server socket and send data.
      */
     void client_thread(bool async) noexcept override
     {
         static unsigned int s_call_count = 0;
 
-        auto send_socket =
-            create_socket(m_client_socket_manager, fly::Protocol::UDP, async);
+        auto send_socket = create_socket(m_client_socket_manager, fly::Protocol::UDP, async);
 
         ASSERT_TRUE(send_socket && send_socket->is_valid());
         ASSERT_EQ(send_socket->is_async(), async);
@@ -1008,23 +817,15 @@ public:
 
             if ((s_call_count++ % 2) == 0)
             {
-                ASSERT_TRUE(send_socket->send_to_async(
-                    std::move(m_message),
-                    m_address,
-                    m_port));
+                ASSERT_TRUE(send_socket->send_to_async(std::move(m_message), m_address, m_port));
             }
             else
             {
-                ASSERT_TRUE(send_socket->send_to_async(
-                    std::move(m_message),
-                    m_host,
-                    m_port));
+                ASSERT_TRUE(send_socket->send_to_async(std::move(m_message), m_host, m_port));
             }
 
             fly::AsyncRequest request;
-            ASSERT_TRUE(m_client_socket_manager->wait_for_completed_send(
-                request,
-                wait_time));
+            ASSERT_TRUE(m_client_socket_manager->wait_for_completed_send(request, wait_time));
             ASSERT_EQ(message, request.get_request());
 
             ASSERT_EQ(request.get_socket_id(), send_socket->get_socket_id());
@@ -1033,15 +834,11 @@ public:
         {
             if ((s_call_count++ % 2) == 0)
             {
-                ASSERT_EQ(
-                    send_socket->send_to(m_message, m_address, m_port),
-                    m_message.size());
+                ASSERT_EQ(send_socket->send_to(m_message, m_address, m_port), m_message.size());
             }
             else
             {
-                ASSERT_EQ(
-                    send_socket->send_to(m_message, m_host, m_port),
-                    m_message.size());
+                ASSERT_EQ(send_socket->send_to(m_message, m_host, m_port), m_message.size());
             }
         }
     }
@@ -1052,12 +849,9 @@ public:
  */
 TEST_F(UdpSocketTest, AsyncOperationsOnSyncSocket)
 {
-    auto socket =
-        create_socket(m_server_socket_manager, fly::Protocol::UDP, false);
+    auto socket = create_socket(m_server_socket_manager, fly::Protocol::UDP, false);
 
-    ASSERT_EQ(
-        socket->connect_async(m_host, m_port),
-        fly::ConnectedState::Disconnected);
+    ASSERT_EQ(socket->connect_async(m_host, m_port), fly::ConnectedState::Disconnected);
     ASSERT_FALSE(socket->send_async("abc"));
     ASSERT_FALSE(socket->send_to_async("abc", m_host, m_port));
 }
@@ -1067,16 +861,8 @@ TEST_F(UdpSocketTest, AsyncOperationsOnSyncSocket)
  */
 TEST_F(UdpSocketTest, SyncServer_SyncClient)
 {
-    auto server = std::async(
-        std::launch::async,
-        &UdpSocketTest::server_thread,
-        this,
-        false);
-    auto client = std::async(
-        std::launch::async,
-        &UdpSocketTest::client_thread,
-        this,
-        false);
+    auto server = std::async(std::launch::async, &UdpSocketTest::server_thread, this, false);
+    auto client = std::async(std::launch::async, &UdpSocketTest::client_thread, this, false);
 
     ASSERT_TRUE(server.valid() && client.valid());
     client.get();
@@ -1088,16 +874,8 @@ TEST_F(UdpSocketTest, SyncServer_SyncClient)
  */
 TEST_F(UdpSocketTest, AsyncServer_SyncClient)
 {
-    auto server = std::async(
-        std::launch::async,
-        &UdpSocketTest::server_thread,
-        this,
-        true);
-    auto client = std::async(
-        std::launch::async,
-        &UdpSocketTest::client_thread,
-        this,
-        false);
+    auto server = std::async(std::launch::async, &UdpSocketTest::server_thread, this, true);
+    auto client = std::async(std::launch::async, &UdpSocketTest::client_thread, this, false);
 
     ASSERT_TRUE(server.valid() && client.valid());
     client.get();
@@ -1109,16 +887,8 @@ TEST_F(UdpSocketTest, AsyncServer_SyncClient)
  */
 TEST_F(UdpSocketTest, SyncServer_AsyncClient)
 {
-    auto server = std::async(
-        std::launch::async,
-        &UdpSocketTest::server_thread,
-        this,
-        false);
-    auto client = std::async(
-        std::launch::async,
-        &UdpSocketTest::client_thread,
-        this,
-        true);
+    auto server = std::async(std::launch::async, &UdpSocketTest::server_thread, this, false);
+    auto client = std::async(std::launch::async, &UdpSocketTest::client_thread, this, true);
 
     ASSERT_TRUE(server.valid() && client.valid());
     client.get();
@@ -1130,16 +900,8 @@ TEST_F(UdpSocketTest, SyncServer_AsyncClient)
  */
 TEST_F(UdpSocketTest, AsyncServer_AsyncClient)
 {
-    auto server = std::async(
-        std::launch::async,
-        &UdpSocketTest::server_thread,
-        this,
-        true);
-    auto client = std::async(
-        std::launch::async,
-        &UdpSocketTest::client_thread,
-        this,
-        true);
+    auto server = std::async(std::launch::async, &UdpSocketTest::server_thread, this, true);
+    auto client = std::async(std::launch::async, &UdpSocketTest::client_thread, this, true);
 
     ASSERT_TRUE(server.valid() && client.valid());
     client.get();

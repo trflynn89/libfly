@@ -8,16 +8,15 @@
 /**
  * Type-safe, fixed-width integer literal suffixes not provided by the STL.
  *
- * The expression that precedes the literal suffix is parsed and validated at
- * compile time. Compilation will fail if any of the following error conditions
- * are met:
+ * The expression that precedes the literal suffix is parsed and validated at compile time.
+ * Compilation will fail if any of the following error conditions are met:
  *
- * 1. The expression preceding the literal suffix is invalid. All standard
- *    integer literals are accepted.
- * 2. The value represented by the preceding expression does not fit in the type
- *    specified by the suffix.
- * 3. A character in the preceding expression does not match the corresponding
- *    base (e.g. 0b2 is an invalid expression).
+ * 1. The expression preceding the literal suffix is invalid. All standard integer literals are
+ *    accepted.
+ * 2. The value represented by the preceding expression does not fit in the type specified by the
+ *    suffix.
+ * 3. A character in the preceding expression does not match the corresponding base (e.g. 0b2 is an
+ *    invalid expression).
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version December 15, 2019

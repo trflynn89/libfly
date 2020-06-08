@@ -22,8 +22,8 @@ public:
 
 protected:
     /**
-     * Classes which inherit from this class should implement this method to
-     * perform the work required by the task.
+     * Classes which inherit from this class should implement this method to perform the work
+     * required by the task.
      */
     virtual void run() noexcept = 0;
 };

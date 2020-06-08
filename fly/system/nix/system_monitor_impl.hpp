@@ -11,8 +11,8 @@ class SequencedTaskRunner;
 class SystemConfig;
 
 /**
- * Linux implementation of the SystemMonitor interface. Uses the /proc file
- * system to gather system resource information.
+ * Linux implementation of the SystemMonitor interface. Uses the /proc file system to gather system
+ * resource information.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version September 15, 2017

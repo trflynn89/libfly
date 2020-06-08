@@ -5,8 +5,8 @@
 namespace fly {
 
 /**
- * Wrapper around std::enable_if for testing that all conditions in a sequence
- * of traits are true. Example:
+ * Wrapper around std::enable_if for testing that all conditions in a sequence of traits are true.
+ * Example:
  *
  *     template <
  *         typename T,
@@ -17,8 +17,8 @@ template <typename... Conditions>
 using enable_if_all = std::enable_if_t<std::conjunction_v<Conditions...>, bool>;
 
 /**
- * Wrapper around std::enable_if for testing that any condition in a sequence of
- * traits is true. Example:
+ * Wrapper around std::enable_if for testing that any condition in a sequence of traits is true.
+ * Example:
  *
  *     template <
  *         typename T,
@@ -29,8 +29,8 @@ template <typename... Conditions>
 using enable_if_any = std::enable_if_t<std::disjunction_v<Conditions...>, bool>;
 
 /**
- * Wrapper around std::enable_if for testing that all conditions in a sequence
- * of traits are false. Example:
+ * Wrapper around std::enable_if for testing that all conditions in a sequence of traits are false.
+ * Example:
  *
  *     template <
  *         typename T,
@@ -38,12 +38,11 @@ using enable_if_any = std::enable_if_t<std::disjunction_v<Conditions...>, bool>;
  *     void func(const T &) { }
  */
 template <typename... Conditions>
-using enable_if_none =
-    std::enable_if_t<std::negation_v<std::disjunction<Conditions...>>, bool>;
+using enable_if_none = std::enable_if_t<std::negation_v<std::disjunction<Conditions...>>, bool>;
 
 /**
- * Wrapper around std::enable_if for testing that any condition in a sequence of
- * traits is false. Example:
+ * Wrapper around std::enable_if for testing that any condition in a sequence of traits is false.
+ * Example:
  *
  *     template <
  *         typename T,
@@ -51,12 +50,11 @@ using enable_if_none =
  *     void func(const T &) { }
  */
 template <typename... Conditions>
-using enable_if_not_all =
-    std::enable_if_t<std::negation_v<std::conjunction<Conditions...>>, bool>;
+using enable_if_not_all = std::enable_if_t<std::negation_v<std::conjunction<Conditions...>>, bool>;
 
 /**
- * Wrapper around std::is_same for testing that all types in a sequence of types
- * are the same as a specific type. Example:
+ * Wrapper around std::is_same for testing that all types in a sequence of types are the same as a
+ * specific type. Example:
  *
  *     constexpr bool same = fly::all_same_v<int, int, int>; // = true
  *     constexpr bool same = fly::all_same_v<int, int, const int &>; // = true
@@ -75,8 +73,8 @@ template <typename T, typename A, typename... As>
 inline constexpr bool all_same_v = all_same<T, A, As...>::value;
 
 /**
- * Wrapper around std::is_same for testing that any type in a sequence of types
- * are the same as a specific type. Example:
+ * Wrapper around std::is_same for testing that any type in a sequence of types are the same as a
+ * specific type. Example:
  *
  *     constexpr bool same = fly::any_same_v<int, int, int>; // = true
  *     constexpr bool same = fly::any_same_v<int, int, const int &>; // = true
@@ -95,8 +93,8 @@ template <typename T, typename A, typename... As>
 inline constexpr bool any_same_v = any_same<T, A, As...>::value;
 
 /**
- * Overloaded visitation pattern for std::visit. Allows providing a variadic
- * list of lambdas for overload resolution in a call to std::visit. Example:
+ * Overloaded visitation pattern for std::visit. Allows providing a variadic list of lambdas for
+ * overload resolution in a call to std::visit. Example:
  *
  *
  *     std::variant<int, bool, std::string> variant {std::string()};
@@ -121,8 +119,8 @@ visitation(Ts...) -> visitation<Ts...>;
 /**
  * Define SFINAE tests for whether a function is declared for a type.
  *
- * For example, to test if a class of type T declares a method called Foo, first
- * define a templated decltype alias for the method:
+ * For example, to test if a class of type T declares a method called Foo, first define a templated
+ * decltype alias for the method:
  *
  *     template <typename T>
  *     using FooDeclaration = decltype(std::declval<T>().Foo());
@@ -139,8 +137,8 @@ visitation(Ts...) -> visitation<Ts...>;
  *     template <typename T>
  *     inline constexpr bool FooTraits::is_declared_v = is_declared<T>::value;
  *
- * Which may be used as SFINAE tests to, e.g., define a function depending on
- * whether or not Foo() is declared for a type:
+ * Which may be used as SFINAE tests to, e.g., define a function depending on whether or not Foo()
+ * is declared for a type:
  *
  *     template <
  *         typename T,
@@ -181,9 +179,8 @@ private:
 
 public:
     template <typename T>
-    using is_declared = std::negation<std::is_same<
-        decltype(Test::template test<T>(nullptr)),
-        std::false_type>>;
+    using is_declared =
+        std::negation<std::is_same<decltype(Test::template test<T>(nullptr)), std::false_type>>;
 
     template <typename T>
     inline static constexpr bool is_declared_v = is_declared<T>::value;

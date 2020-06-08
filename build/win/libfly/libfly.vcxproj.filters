@@ -118,9 +118,6 @@
     <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.hpp">
       <Filter>logger\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\parser\exceptions.hpp">
-      <Filter>parser</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp">
       <Filter>parser</Filter>
     </ClInclude>
@@ -128,6 +125,9 @@
       <Filter>parser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\parser.hpp">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\parser\parser_exception.hpp">
       <Filter>parser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\path\path_config.hpp">
@@ -294,9 +294,6 @@
     <ClCompile Include="..\..\..\fly\logger\logger_config.cpp">
       <Filter>logger</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\parser\exceptions.cpp">
-      <Filter>parser</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp">
       <Filter>parser</Filter>
     </ClCompile>
@@ -304,6 +301,9 @@
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\parser.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\parser\parser_exception.cpp">
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\path\path_config.cpp">

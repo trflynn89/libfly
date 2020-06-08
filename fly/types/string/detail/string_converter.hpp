@@ -25,7 +25,7 @@ namespace fly::detail {
 template <typename StringType, typename T>
 struct BasicStringConverter;
 
-//==============================================================================
+//==================================================================================================
 template <typename StringType, typename T>
 struct BasicStringConverter
 {
@@ -50,7 +50,7 @@ struct BasicStringConverter
     }
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename StringType>
 struct BasicStringConverter<StringType, std::int64_t>
 {
@@ -70,7 +70,7 @@ struct BasicStringConverter<StringType, std::int64_t>
     }
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename StringType>
 struct BasicStringConverter<StringType, std::uint64_t>
 {
@@ -90,7 +90,7 @@ struct BasicStringConverter<StringType, std::uint64_t>
     }
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename StringType>
 struct BasicStringConverter<StringType, float>
 {
@@ -110,7 +110,7 @@ struct BasicStringConverter<StringType, float>
     }
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename StringType>
 struct BasicStringConverter<StringType, double>
 {
@@ -130,7 +130,7 @@ struct BasicStringConverter<StringType, double>
     }
 };
 
-//==============================================================================
+//==================================================================================================
 template <typename StringType>
 struct BasicStringConverter<StringType, long double>
 {

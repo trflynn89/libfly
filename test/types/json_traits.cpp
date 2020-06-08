@@ -18,56 +18,56 @@
 
 namespace {
 
-//==========================================================================
+//==================================================================================================
 template <typename T>
 bool is_string(const T &) noexcept
 {
     return fly::JsonTraits::is_string_v<T>;
 }
 
-//==========================================================================
+//==================================================================================================
 template <typename T>
 bool is_bool(const T &) noexcept
 {
     return fly::JsonTraits::is_boolean_v<T>;
 }
 
-//==========================================================================
+//==================================================================================================
 template <typename T>
 bool is_signed_integer(const T &) noexcept
 {
     return fly::JsonTraits::is_signed_integer_v<T>;
 }
 
-//==========================================================================
+//==================================================================================================
 template <typename T>
 bool is_unsigned_integer(const T &) noexcept
 {
     return fly::JsonTraits::is_unsigned_integer_v<T>;
 }
 
-//==========================================================================
+//==================================================================================================
 template <typename T>
 bool is_floating_point(const T &) noexcept
 {
     return fly::JsonTraits::is_floating_point_v<T>;
 }
 
-//==========================================================================
+//==================================================================================================
 template <typename T>
 bool is_object(const T &) noexcept
 {
     return fly::JsonTraits::is_object_v<T>;
 }
 
-//==========================================================================
+//==================================================================================================
 template <typename T>
 bool is_array(const T &) noexcept
 {
     return fly::JsonTraits::is_array_v<T>;
 }
 
-//==========================================================================
+//==================================================================================================
 template <typename T>
 bool is_iterable(const T &) noexcept
 {
@@ -90,7 +90,7 @@ const auto s_vector = std::vector<int>();
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTraitsTest, String)
 {
     using string_type = typename fly::JsonTraits::string_type;
@@ -137,7 +137,7 @@ TEST(JsonTraitsTest, String)
     EXPECT_FALSE(is_string(chr2));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTraitsTest, Bool)
 {
     EXPECT_TRUE(is_bool(true));
@@ -163,7 +163,7 @@ TEST(JsonTraitsTest, Bool)
     EXPECT_FALSE(is_bool(3.14));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTraitsTest, SignedInteger)
 {
     EXPECT_TRUE(is_signed_integer(1));
@@ -189,7 +189,7 @@ TEST(JsonTraitsTest, SignedInteger)
     EXPECT_FALSE(is_signed_integer(static_cast<unsigned int>(1)));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTraitsTest, UnsignedInteger)
 {
     EXPECT_TRUE(is_unsigned_integer(static_cast<unsigned int>(1)));
@@ -216,7 +216,7 @@ TEST(JsonTraitsTest, UnsignedInteger)
     EXPECT_FALSE(is_unsigned_integer(true));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTraitsTest, Float)
 {
     EXPECT_TRUE(is_floating_point(3.14f));
@@ -243,7 +243,7 @@ TEST(JsonTraitsTest, Float)
     EXPECT_FALSE(is_floating_point(true));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTraitsTest, Object)
 {
     EXPECT_TRUE(is_object(s_map));
@@ -268,7 +268,7 @@ TEST(JsonTraitsTest, Object)
     EXPECT_FALSE(is_object(true));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTraitsTest, Array)
 {
     EXPECT_TRUE(is_array(s_array));
@@ -293,8 +293,7 @@ TEST(JsonTraitsTest, Array)
     EXPECT_FALSE(is_array(true));
 }
 
-
-//==============================================================================
+//==================================================================================================
 TEST(JsonTraitsTest, Iterable)
 {
     EXPECT_TRUE(is_iterable(s_array));

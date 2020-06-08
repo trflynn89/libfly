@@ -6,13 +6,13 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 TaskRunner::TaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
     m_weak_task_manager(weak_task_manager)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 bool TaskRunner::post_task_with_delay(
     std::weak_ptr<Task> weak_task,
     std::chrono::milliseconds delay) noexcept
@@ -30,9 +30,8 @@ bool TaskRunner::post_task_with_delay(
     return false;
 }
 
-//==============================================================================
-bool TaskRunner::post_task_to_task_manager(
-    std::weak_ptr<Task> weak_task) noexcept
+//==================================================================================================
+bool TaskRunner::post_task_to_task_manager(std::weak_ptr<Task> weak_task) noexcept
 {
     std::shared_ptr<TaskManager> task_manager = m_weak_task_manager.lock();
 
@@ -47,47 +46,45 @@ bool TaskRunner::post_task_to_task_manager(
     return false;
 }
 
-//==============================================================================
-ParallelTaskRunner::ParallelTaskRunner(
-    std::weak_ptr<TaskManager> weak_task_manager) noexcept :
+//==================================================================================================
+ParallelTaskRunner::ParallelTaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
     TaskRunner(weak_task_manager)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 bool ParallelTaskRunner::post_task(std::weak_ptr<Task> weak_task) noexcept
 {
     return post_task_to_task_manager(weak_task);
 }
 
-//==============================================================================
+//==================================================================================================
 void ParallelTaskRunner::task_complete(const std::shared_ptr<Task> &) noexcept
 {
 }
 
-//==============================================================================
-SequencedTaskRunner::SequencedTaskRunner(
-    std::weak_ptr<TaskManager> weak_task_manager) noexcept :
+//==================================================================================================
+SequencedTaskRunner::SequencedTaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
     TaskRunner(weak_task_manager),
     m_has_running_task(false)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 bool SequencedTaskRunner::post_task(std::weak_ptr<Task> weak_task) noexcept
 {
     m_pending_tasks.push(std::move(weak_task));
     return maybe_post_task();
 }
 
-//==============================================================================
+//==================================================================================================
 void SequencedTaskRunner::task_complete(const std::shared_ptr<Task> &) noexcept
 {
     m_has_running_task.store(false);
     maybe_post_task();
 }
 
-//==============================================================================
+//==================================================================================================
 bool SequencedTaskRunner::maybe_post_task() noexcept
 {
     static std::chrono::seconds s_wait(0);

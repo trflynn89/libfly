@@ -15,9 +15,7 @@ void validate_fail(const std::string &test) noexcept(false)
     EXPECT_THROW({ actual = test; }, fly::JsonException);
 }
 
-void validate_pass(
-    const std::string &test,
-    const std::string &expected) noexcept(false)
+void validate_pass(const std::string &test, const std::string &expected) noexcept(false)
 {
     SCOPED_TRACE(test);
 
@@ -41,7 +39,7 @@ void validate_pass(const std::string &test) noexcept(false)
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, UnicodeConversion)
 {
     validate_fail("\\u");
@@ -80,7 +78,7 @@ TEST(JsonTest, UnicodeConversion)
     validate_pass("\\uDBFF\\uDFFF", u8"\U0010FFFF");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, MarkusKuhnStress)
 {
     // http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
@@ -184,8 +182,7 @@ TEST(JsonTest, MarkusKuhnStress)
 
     // 3.2  Lonely start characters
 
-    // 3.2.1  All 32 first bytes of 2-byte sequences (0xc0-0xdf), each followed
-    // by a space character
+    // 3.2.1  All 32 first bytes of 2-byte sequences (0xc0-0xdf), each followed by a space character
     validate_fail(
         "\xc0 \xc1 \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc \xcd "
         "\xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb "
@@ -223,8 +220,7 @@ TEST(JsonTest, MarkusKuhnStress)
     validate_fail("\xde ");
     validate_fail("\xdf ");
 
-    // 3.2.2  All 16 first bytes of 3-byte sequences (0xe0-0xef) each followed
-    // by a space character
+    // 3.2.2  All 16 first bytes of 3-byte sequences (0xe0-0xef) each followed by a space character
     validate_fail(
         "\xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb \xec \xed "
         "\xee \xef");
@@ -245,8 +241,7 @@ TEST(JsonTest, MarkusKuhnStress)
     validate_fail("\xee ");
     validate_fail("\xef ");
 
-    // 3.2.3  All 8 first bytes of 4-byte sequences (0xf0-0xf7), each followed
-    // by a space character
+    // 3.2.3  All 8 first bytes of 4-byte sequences (0xf0-0xf7), each followed by a space character
     validate_fail("\xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7");
     validate_fail("\xf0 ");
     validate_fail("\xf1 ");
@@ -257,16 +252,14 @@ TEST(JsonTest, MarkusKuhnStress)
     validate_fail("\xf6 ");
     validate_fail("\xf7 ");
 
-    // 3.2.4  All 4 first bytes of 5-byte sequences (0xf8-0xfb), each followed
-    // by a space character
+    // 3.2.4  All 4 first bytes of 5-byte sequences (0xf8-0xfb), each followed by a space character
     validate_fail("\xf8 \xf9 \xfa \xfb");
     validate_fail("\xf8 ");
     validate_fail("\xf9 ");
     validate_fail("\xfa ");
     validate_fail("\xfb ");
 
-    // 3.2.5  All 2 first bytes of 6-byte sequences (0xfc-0xfd), each followed
-    // by a space character
+    // 3.2.5  All 2 first bytes of 6-byte sequences (0xfc-0xfd), each followed by a space character
     validate_fail("\xfc \xfd");
     validate_fail("\xfc ");
     validate_fail("\xfc ");
@@ -480,10 +473,10 @@ TEST(JsonTest, MarkusKuhnStress)
     validate_pass("\xf2\xaf\xbf\xbf");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonTest, MarkusKuhnExtended)
 {
-    // Exceptions not caught by Markus Kuhn's stress test
+    // Exceptions not caught by Markus Kuhn's stress test.
     validate_fail("\x22");
     validate_fail("\x5c");
 

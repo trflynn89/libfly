@@ -7,10 +7,10 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 std::atomic_int SocketManagerImpl::s_socket_manager_count(0);
 
-//==============================================================================
+//==================================================================================================
 SocketManagerImpl::SocketManagerImpl(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
     const std::shared_ptr<SocketConfig> &config) noexcept :
@@ -28,7 +28,7 @@ SocketManagerImpl::SocketManagerImpl(
     }
 }
 
-//==============================================================================
+//==================================================================================================
 SocketManagerImpl::~SocketManagerImpl()
 {
     if (s_socket_manager_count.fetch_sub(1) == 1)
@@ -37,7 +37,7 @@ SocketManagerImpl::~SocketManagerImpl()
     }
 }
 
-//==============================================================================
+//==================================================================================================
 void SocketManagerImpl::poll(const std::chrono::microseconds &timeout) noexcept
 {
     fd_set read_fd, write_fd;
@@ -51,7 +51,7 @@ void SocketManagerImpl::poll(const std::chrono::microseconds &timeout) noexcept
 
     if (any_masks_set)
     {
-        // First argument of ::select() is ignored in Windows
+        // First argument of ::select() is ignored in Windows.
         if (::select(0, &read_fd, &write_fd, nullptr, &tv) > 0)
         {
             std::lock_guard<std::mutex> lock(m_async_sockets_mutex);
@@ -60,10 +60,8 @@ void SocketManagerImpl::poll(const std::chrono::microseconds &timeout) noexcept
     }
 }
 
-//==============================================================================
-bool SocketManagerImpl::set_read_and_write_masks(
-    fd_set *read_fd,
-    fd_set *write_fd) noexcept
+//==================================================================================================
+bool SocketManagerImpl::set_read_and_write_masks(fd_set *read_fd, fd_set *write_fd) noexcept
 {
     bool any_masks_set = false;
 
@@ -86,10 +84,8 @@ bool SocketManagerImpl::set_read_and_write_masks(
     return any_masks_set;
 }
 
-//==============================================================================
-void SocketManagerImpl::handle_socket_io(
-    fd_set *read_fd,
-    fd_set *write_fd) noexcept
+//==================================================================================================
+void SocketManagerImpl::handle_socket_io(fd_set *read_fd, fd_set *write_fd) noexcept
 {
     SocketList new_clients, connected_clients, closed_clients;
 
@@ -99,7 +95,7 @@ void SocketManagerImpl::handle_socket_io(
         {
             socket_type handle = socket->get_handle();
 
-            // Handle socket accepts and reads
+            // Handle socket accepts and reads.
             if (FD_ISSET(handle, read_fd))
             {
                 if (socket->is_listening())
@@ -118,7 +114,7 @@ void SocketManagerImpl::handle_socket_io(
                 }
             }
 
-            // Handle socket connects and writes
+            // Handle socket connects and writes.
             if (FD_ISSET(handle, write_fd))
             {
                 if (socket->is_connecting())

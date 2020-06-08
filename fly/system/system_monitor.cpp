@@ -8,7 +8,7 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 SystemMonitor::SystemMonitor(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
     const std::shared_ptr<SystemConfig> &config) noexcept :
@@ -23,7 +23,7 @@ SystemMonitor::SystemMonitor(
 {
 }
 
-//==============================================================================
+//==================================================================================================
 bool SystemMonitor::start() noexcept
 {
     update_system_cpu_count();
@@ -41,49 +41,49 @@ bool SystemMonitor::start() noexcept
     return false;
 }
 
-//==============================================================================
+//==================================================================================================
 std::uint32_t SystemMonitor::get_system_cpu_count() const noexcept
 {
     return m_system_cpu_count.load();
 }
 
-//==============================================================================
+//==================================================================================================
 double SystemMonitor::get_system_cpu_usage() const noexcept
 {
     return m_system_cpu_usage.load();
 }
 
-//==============================================================================
+//==================================================================================================
 double SystemMonitor::get_process_cpu_usage() const noexcept
 {
     return m_process_cpu_usage.load();
 }
 
-//==============================================================================
+//==================================================================================================
 std::uint64_t SystemMonitor::get_total_system_memory() const noexcept
 {
     return m_total_system_memory.load();
 }
 
-//==============================================================================
+//==================================================================================================
 std::uint64_t SystemMonitor::get_system_memory_usage() const noexcept
 {
     return m_system_memory_usage.load();
 }
 
-//==============================================================================
+//==================================================================================================
 std::uint64_t SystemMonitor::get_process_memory_usage() const noexcept
 {
     return m_process_memory_usage.load();
 }
 
-//==============================================================================
+//==================================================================================================
 bool SystemMonitor::is_valid() const noexcept
 {
     return get_system_cpu_count() > 0;
 }
 
-//==============================================================================
+//==================================================================================================
 void SystemMonitor::poll() noexcept
 {
     update_system_cpu_count();
@@ -94,19 +94,17 @@ void SystemMonitor::poll() noexcept
     update_process_memory_usage();
 }
 
-//==============================================================================
-SystemMonitorTask::SystemMonitorTask(
-    std::weak_ptr<SystemMonitor> weak_system_monitor) noexcept :
+//==================================================================================================
+SystemMonitorTask::SystemMonitorTask(std::weak_ptr<SystemMonitor> weak_system_monitor) noexcept :
     Task(),
     m_weak_system_monitor(weak_system_monitor)
 {
 }
 
-//==============================================================================
+//==================================================================================================
 void SystemMonitorTask::run() noexcept
 {
-    std::shared_ptr<SystemMonitor> system_monitor =
-        m_weak_system_monitor.lock();
+    std::shared_ptr<SystemMonitor> system_monitor = m_weak_system_monitor.lock();
 
     if (system_monitor && system_monitor->is_valid())
     {

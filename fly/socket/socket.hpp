@@ -13,8 +13,8 @@ namespace fly {
 class SocketConfig;
 
 /**
- * Virtual interface to represent a network socket. This interface is platform
- * independent - OS dependent implementations should inherit from this class.
+ * Virtual interface to represent a network socket. This interface is platform independent - OS
+ * dependent implementations should inherit from this class.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version November 11, 2013
@@ -28,9 +28,7 @@ public:
      * @param protocol The communication protocol of the socket.
      * @param config Reference to the socket configuration.
      */
-    Socket(
-        Protocol protocol,
-        const std::shared_ptr<SocketConfig> &config) noexcept;
+    Socket(Protocol protocol, const std::shared_ptr<SocketConfig> &config) noexcept;
 
     /**
      * Destructor.
@@ -38,29 +36,26 @@ public:
     virtual ~Socket() = default;
 
     /**
-     * Convert a string hostname or IPv4 address to a host-order numeric IPv4
-     * address.
+     * Convert a string hostname or IPv4 address to a host-order numeric IPv4 address.
      *
      * @param hostname The hostname or IPv4 address to convert.
      * @param address The location to store the converted address.
      *
      * @return True if the hostname/address string could be converted.
      */
-    static bool hostname_to_address(
-        const std::string &hostname,
-        address_type &address) noexcept;
+    static bool hostname_to_address(const std::string &hostname, address_type &address) noexcept;
 
     /**
-     * INADDR_ANY may be different depending on the OS. This function will
-     * return the value for the compiled target's OS.
+     * INADDR_ANY may be different depending on the OS. This function will return the value for the
+     * compiled target's OS.
      *
      * @return INADDR_ANY for the target system.
      */
     static address_type in_addr_any() noexcept;
 
     /**
-     * Invalid socket handles may be different depending on the OS. This
-     * function will return the value for the compiled target's OS.
+     * Invalid socket handles may be different depending on the OS. This function will return the
+     * value for the compiled target's OS.
      *
      * @return Invalid socket handle for the target system.
      */
@@ -149,8 +144,7 @@ public:
      *
      * @return True if the binding was successful.
      */
-    virtual bool bind(address_type address, port_type port, BindOption option)
-        const noexcept = 0;
+    virtual bool bind(address_type address, port_type port, BindOption option) const noexcept = 0;
 
     /**
      * Bind this socket to an address.
@@ -161,8 +155,7 @@ public:
      *
      * @return True if the binding was successful.
      */
-    bool bind(const std::string &hostname, port_type port, BindOption option)
-        const noexcept;
+    bool bind(const std::string &hostname, port_type port, BindOption option) const noexcept;
 
     /**
      * Allow socket to listen for incoming connections.
@@ -190,9 +183,9 @@ public:
     bool connect(const std::string &hostname, port_type port) noexcept;
 
     /**
-     * Asynchronously connect to a listening socket. The connect may finish
-     * immediately, so the connection state is returned rather than a binary
-     * boolean. If this is not an asynchronous socket, nothing will occur.
+     * Asynchronously connect to a listening socket. The connect may finish immediately, so the
+     * connection state is returned rather than a binary boolean. If this is not an asynchronous
+     * socket, nothing will occur.
      *
      * @param address The host-order IPv4 address to connect to.
      * @param port The port to connect to.
@@ -202,21 +195,20 @@ public:
     ConnectedState connect_async(address_type address, port_type port) noexcept;
 
     /**
-     * Asynchronously connect to a listening socket. The connect may finish
-     * immediately, so the connection state is returned rather than a binary
-     * boolean. If this is not an asynchronous socket, nothing will occur.
+     * Asynchronously connect to a listening socket. The connect may finish immediately, so the
+     * connection state is returned rather than a binary boolean. If this is not an asynchronous
+     * socket, nothing will occur.
      *
      * @param hostname The hostname or IPv4 address to connect to.
      * @param port The port to connect to.
      *
      * @return The connection state (not connected, connecting, or connected).
      */
-    ConnectedState
-    connect_async(const std::string &hostname, port_type port) noexcept;
+    ConnectedState connect_async(const std::string &hostname, port_type port) noexcept;
 
     /**
-     * After an asynchronous socket in a connecting state becomes available for
-     * writing, verify the socket is healthy and store its state as connected.
+     * After an asynchronous socket in a connecting state becomes available for writing, verify the
+     * socket is healthy and store its state as connected.
      *
      * @return True if the socket is healthy and connected.
      */
@@ -247,10 +239,8 @@ public:
      *
      * @return The number of bytes sent.
      */
-    std::size_t send_to(
-        const std::string &message,
-        address_type address,
-        port_type port) const noexcept;
+    std::size_t
+    send_to(const std::string &message, address_type address, port_type port) const noexcept;
 
     /**
      * Write data on the socket.
@@ -261,14 +251,12 @@ public:
      *
      * @return The number of bytes sent.
      */
-    std::size_t send_to(
-        const std::string &message,
-        const std::string &hostname,
-        port_type port) const noexcept;
+    std::size_t
+    send_to(const std::string &message, const std::string &hostname, port_type port) const noexcept;
 
     /**
-     * Request data to be written on the socket asynchronously. If this is not
-     * an ansynchronous socket, nothing will occur.
+     * Request data to be written on the socket asynchronously. If this is not an ansynchronous
+     * socket, nothing will occur.
      *
      * @param message The data to send.
      *
@@ -277,8 +265,8 @@ public:
     bool send_async(std::string &&message) noexcept;
 
     /**
-     * Request data to be written on the socket asynchronously. If this is not
-     * an ansynchronous socket, nothing will occur.
+     * Request data to be written on the socket asynchronously. If this is not an ansynchronous
+     * socket, nothing will occur.
      *
      * @param message The data to send.
      * @param address The host-order IPv4 address to send data to.
@@ -286,14 +274,11 @@ public:
      *
      * @return True if the request was made.
      */
-    bool send_to_async(
-        std::string &&message,
-        address_type address,
-        port_type port) noexcept;
+    bool send_to_async(std::string &&message, address_type address, port_type port) noexcept;
 
     /**
-     * Request data to be written on the socket asynchronously. If this is not
-     * an ansynchronous socket, nothing will occur.
+     * Request data to be written on the socket asynchronously. If this is not an ansynchronous
+     * socket, nothing will occur.
      *
      * @param message The data to send.
      * @param hostname The hostname or IPv4 address to send data to.
@@ -301,10 +286,7 @@ public:
      *
      * @return True if the request was made.
      */
-    bool send_to_async(
-        std::string &&message,
-        const std::string &hostname,
-        port_type port) noexcept;
+    bool send_to_async(std::string &&message, const std::string &hostname, port_type port) noexcept;
 
     /**
      * Read data on this socket until the end-of-message character is received.
@@ -321,23 +303,20 @@ public:
     std::string recv_from() const noexcept;
 
     /**
-     * Iterate thru all pending asynchronous sends. Service each request until
-     * one would block, or if some other error occurred (in which case, this
-     * socket will be closed).
+     * Iterate thru all pending asynchronous sends. Service each request until one would block, or
+     * if some other error occurred (in which case, this socket will be closed).
      *
      * @param completed_sends Queue of completed sends to post to on success.
      */
-    void
-    service_send_requests(AsyncRequest::RequestQueue &completed_sends) noexcept;
+    void service_send_requests(AsyncRequest::RequestQueue &completed_sends) noexcept;
 
     /**
-     * Read on this socket until a read would block, or some other error occurs
-     * (in which case, this socket will be closed).
+     * Read on this socket until a read would block, or some other error occurs (in which case, this
+     * socket will be closed).
      *
      * @param completed_reads Queue of completed received to post to on success.
      */
-    void
-    service_recv_requests(AsyncRequest::RequestQueue &completed_reads) noexcept;
+    void service_recv_requests(AsyncRequest::RequestQueue &completed_reads) noexcept;
 
 protected:
     /**
@@ -348,8 +327,7 @@ protected:
      *
      * @return The number of bytes sent.
      */
-    virtual std::size_t
-    send(const std::string &message, bool &would_block) const noexcept = 0;
+    virtual std::size_t send(const std::string &message, bool &would_block) const noexcept = 0;
 
     /**
      * Write data on the socket.
@@ -361,11 +339,9 @@ protected:
      *
      * @return The number of bytes sent.
      */
-    virtual std::size_t send_to(
-        const std::string &message,
-        address_type address,
-        port_type port,
-        bool &would_block) const noexcept = 0;
+    virtual std::size_t
+    send_to(const std::string &message, address_type address, port_type port, bool &would_block)
+        const noexcept = 0;
 
     /**
      * Write data on the socket.
@@ -391,8 +367,7 @@ protected:
      *
      * @return The data received.
      */
-    virtual std::string
-    recv(bool &would_block, bool &is_complete) const noexcept = 0;
+    virtual std::string recv(bool &would_block, bool &is_complete) const noexcept = 0;
 
     /**
      * Read data on this socket until the end-of-message character is received.
@@ -402,35 +377,34 @@ protected:
      *
      * @return The data received.
      */
-    virtual std::string
-    recv_from(bool &would_block, bool &is_complete) const noexcept = 0;
+    virtual std::string recv_from(bool &would_block, bool &is_complete) const noexcept = 0;
 
-    // Socket protocol
+    // Socket protocol.
     Protocol m_protocol;
 
-    // Socket config
+    // Socket config.
     const std::shared_ptr<SocketConfig> &m_config;
 
-    // End of message character
+    // End of message character.
     const char m_socket_eom;
 
-    // Send/recv packet size
+    // Send/recv packet size.
     const std::size_t m_packet_size;
 
-    // File descriptor for this socket.
+    // File descriptor for this socket..
     socket_type m_socket_handle;
 
-    // Client IP and port this socket is connected to.
+    // Client IP and port this socket is connected to..
     address_type m_client_ip;
     port_type m_client_port;
 
-    // Whether this socket should allow asynchronous operations
+    // Whether this socket should allow asynchronous operations.
     bool m_is_async;
 
-    // Whether this socket is a listening socket
+    // Whether this socket is a listening socket.
     bool m_is_listening;
 
-    // Whether this socket is not connected, connecting, or connected
+    // Whether this socket is not connected, connecting, or connected.
     std::atomic<ConnectedState> m_connected_state;
 
 private:

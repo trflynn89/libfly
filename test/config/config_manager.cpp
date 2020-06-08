@@ -18,8 +18,7 @@
 namespace {
 
 /**
- * Subclass of the path config to decrease the poll interval for faster
- * testing.
+ * Subclass of the path config to decrease the poll interval for faster testing.
  */
 class TestPathConfig : public fly::PathConfig
 {
@@ -32,7 +31,7 @@ public:
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 class ConfigManagerTest : public ::testing::Test
 {
 public:
@@ -41,16 +40,12 @@ public:
         m_file(m_path / (fly::String::generate_random_string(10) + ".txt")),
 
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
-
-        m_task_runner(
-            m_task_manager
-                ->create_task_runner<fly::WaitableSequencedTaskRunner>()),
+        m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
         m_config_manager(std::make_shared<fly::ConfigManager>(
             m_task_runner,
             fly::ConfigManager::ConfigFileType::Ini,
             m_file)),
-
         m_path_config(m_config_manager->create_config<TestPathConfig>())
     {
     }
@@ -90,7 +85,7 @@ protected:
     fly::ConfigManager::ConfigMap::size_type m_initial_size;
 };
 
-//==============================================================================
+//==================================================================================================
 class BadConfig : public fly::Config
 {
 public:
@@ -98,7 +93,7 @@ public:
     static constexpr const char *identifier = TestConfig::identifier;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, AllFileTypes)
 {
     {
@@ -121,7 +116,7 @@ TEST_F(ConfigManagerTest, AllFileTypes)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, BadFileType)
 {
     m_config_manager = std::make_shared<fly::ConfigManager>(
@@ -132,7 +127,7 @@ TEST_F(ConfigManagerTest, BadFileType)
     EXPECT_FALSE(m_config_manager->start());
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, BadConfigType)
 {
     EXPECT_EQ(m_config_manager->prune(), m_initial_size);
@@ -145,14 +140,14 @@ TEST_F(ConfigManagerTest, BadConfigType)
     EXPECT_FALSE(config2);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, create_config)
 {
     auto config = m_config_manager->create_config<TestConfig>();
     EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, DuplicateConfig)
 {
     auto config1 = m_config_manager->create_config<TestConfig>();
@@ -162,7 +157,7 @@ TEST_F(ConfigManagerTest, DuplicateConfig)
     EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, DeletedConfig)
 {
     EXPECT_EQ(m_config_manager->prune(), m_initial_size);
@@ -187,7 +182,7 @@ TEST_F(ConfigManagerTest, DeletedConfig)
     EXPECT_FALSE(config.get() == NULL);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
 {
     EXPECT_EQ(m_config_manager->prune(), m_initial_size);
@@ -216,7 +211,7 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
     EXPECT_EQ(m_config_manager->prune(), m_initial_size);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, InitialFileFirst)
 {
     const std::string contents = fly::String::format(
@@ -235,7 +230,7 @@ TEST_F(ConfigManagerTest, InitialFileFirst)
     EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, InitialFileSecond)
 {
     auto config = m_config_manager->create_config<TestConfig>();
@@ -254,7 +249,7 @@ TEST_F(ConfigManagerTest, InitialFileSecond)
     EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, FileChange)
 {
     auto config = m_config_manager->create_config<TestConfig>();
@@ -282,9 +277,8 @@ TEST_F(ConfigManagerTest, FileChange)
     ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents2));
     m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
 
-    // Multiple fly::PathMonitor::PathEvent::Changed events may be triggered
-    // even though the above write happens as a single call. If needed, wait for
-    // a second event.
+    // Multiple fly::PathMonitor::PathEvent::Changed events may be triggered even though the above
+    // write happens as a single call. If needed, wait for a second event.
     if (config->get_value<std::string>("name", "").empty())
     {
         m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
@@ -295,7 +289,7 @@ TEST_F(ConfigManagerTest, FileChange)
     EXPECT_EQ(config->get_value<int>("age", -1), 27);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, DeleteFile)
 {
     auto config = m_config_manager->create_config<TestConfig>();
@@ -320,7 +314,7 @@ TEST_F(ConfigManagerTest, DeleteFile)
     EXPECT_EQ(config->get_value<std::string>("address", ""), "");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, BadUpdate)
 {
     auto config = m_config_manager->create_config<TestConfig>();
@@ -338,7 +332,7 @@ TEST_F(ConfigManagerTest, BadUpdate)
     EXPECT_EQ(config->get_value<std::string>("address", ""), "");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(ConfigManagerTest, BadObject)
 {
     m_config_manager = std::make_shared<fly::ConfigManager>(

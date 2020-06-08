@@ -17,68 +17,49 @@
 #include <mutex>
 #include <string>
 
-// The private macros used internally insert commas only if one is needed, which
-// the formatter doesn't handle.
-// clang-format off
+//==================================================================================================
+#define LOGD(...)                                                                                  \
+    _FLY_LOG(                                                                                      \
+        fly::Log::Level::Debug,                                                                    \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
-//==============================================================================
-#define LOGD(...)                                                              \
-    _FLY_LOG(                                                                  \
-        fly::Log::Level::Debug,                                                \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+//==================================================================================================
+#define LOGI(...)                                                                                  \
+    _FLY_LOG(                                                                                      \
+        fly::Log::Level::Info,                                                                     \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
-//==============================================================================
-#define LOGI(...)                                                              \
-    _FLY_LOG(                                                                  \
-        fly::Log::Level::Info,                                                 \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+//==================================================================================================
+#define LOGW(...)                                                                                  \
+    _FLY_LOG(                                                                                      \
+        fly::Log::Level::Warn,                                                                     \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
-//==============================================================================
-#define LOGW(...)                                                              \
-    _FLY_LOG(                                                                  \
-        fly::Log::Level::Warn,                                                 \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
-
-//==============================================================================
-#define LOGS(...)                                                              \
-    _FLY_LOG(                                                                  \
-        fly::Log::Level::Warn,                                                 \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__) ": %s"                             \
-            _FLY_FORMAT_ARGS(__VA_ARGS__),                                     \
+//==================================================================================================
+#define LOGS(...)                                                                                  \
+    _FLY_LOG(                                                                                      \
+        fly::Log::Level::Warn,                                                                     \
+        fly::String::format(                                                                       \
+            _FLY_FORMAT_STRING(__VA_ARGS__) ": %s" _FLY_FORMAT_ARGS(__VA_ARGS__),                  \
             fly::System::get_error_string()))
 
-//==============================================================================
-#define LOGE(...)                                                              \
-    _FLY_LOG(                                                                  \
-        fly::Log::Level::Error,                                                \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+//==================================================================================================
+#define LOGE(...)                                                                                  \
+    _FLY_LOG(                                                                                      \
+        fly::Log::Level::Error,                                                                    \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
-//==============================================================================
-#define LOGC(...)                                                              \
-    fly::Logger::console_log(                                                  \
-        true,                                                                  \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
+//==================================================================================================
+#define LOGC(...)                                                                                  \
+    fly::Logger::console_log(                                                                      \
+        true,                                                                                      \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
-//==============================================================================
-#define LOGC_NO_LOCK(...)                                                      \
-    fly::Logger::console_log(                                                  \
-        false,                                                                 \
-        fly::String::format(                                                   \
-            _FLY_FORMAT_STRING(__VA_ARGS__)                                    \
-            _FLY_FORMAT_ARGS(__VA_ARGS__)))
-
-// clang-format on
+//==================================================================================================
+#define LOGC_NO_LOCK(...)                                                                          \
+    fly::Logger::console_log(                                                                      \
+        false,                                                                                     \
+        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
 namespace fly {
 
@@ -88,26 +69,26 @@ class SequencedTaskRunner;
 
 /**
  * Provides thread safe instrumentation. There are 4 levels of instrumentation:
+ *
  * 1. Debug = Really common points.
  * 2. Info = Less common, event based points.
  * 3. Warning = Something went wrong, but the system is OK.
  * 4. Error = Something went wrong, and the sytem is not OK.
  *
- * The following macros should be used to add points to the log: LOGD, LOGI,
- * LOGW, LOGE. Usage is as follows:
+ * The following macros should be used to add points to the log: LOGD, LOGI, LOGW, LOGE. Usage is as
+ * follows:
  *
- *   LOGD(message, message arguments)
- *   For example, LOGD(1, "This is message number %d", 10)
+ *   LOGD(message, message arguments, ...)
+ *   For example, LOGD("This is message number %d", 10)
  *
- * THE LOGS macro is provided for system error logging. It produces a warning-
- * level log point with the last system error appended to the given message.
+ * The LOGS macro is provided for system error logging. It produces a warning-level log point with
+ * the last system error appended to the given message.
  *
- * The LOGC macro is also provided for thread-safe console logging. LOGC_NO_LOCK
- * is also provided for console logging without acquiring the console lock while
- * inside, e.g., a signal handler.
+ * The LOGC macro is provided for thread-safe console logging. LOGC_NO_LOCK is also provided for
+ * console logging without acquiring the console lock while inside, e.g., a signal handler.
  *
- * The logging macros support up to and including 50 format arguments. If more
- * are needed, invoke Logger::AddLog directly.
+ * The logging macros support up to and including 50 format arguments. If more are needed, invoke
+ * Logger::AddLog directly.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 21, 2016
@@ -142,8 +123,7 @@ public:
      * @param acquire_lock Whether to acquire lock before logging.
      * @param message The message to log.
      */
-    static void
-    console_log(bool acquire_lock, const std::string &message) noexcept;
+    static void console_log(bool acquire_lock, const std::string &message) noexcept;
 
     /**
      * Add a log to the static logger instance.
@@ -175,8 +155,7 @@ public:
 
 private:
     /**
-     * Perform any IO operations. Wait for a log item to be available and write
-     * it to disk.
+     * Perform any IO operations. Wait for a log item to be available and write it to disk.
      *
      * @return True if the current log file is still open and healthy.
      */
@@ -237,8 +216,7 @@ public:
 
 protected:
     /**
-     * Call back into the logger to check for new log entries. The task re-arms
-     * itself.
+     * Call back into the logger to check for new log entries. The task re-arms itself.
      */
     void run() noexcept override;
 

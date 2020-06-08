@@ -1,6 +1,6 @@
 #include "fly/parser/json_parser.hpp"
 
-#include "fly/parser/exceptions.hpp"
+#include "fly/parser/parser_exception.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -11,7 +11,7 @@
 #include <sstream>
 #include <vector>
 
-//==============================================================================
+//==================================================================================================
 class JsonParserTest : public ::testing::Test
 {
 protected:
@@ -26,13 +26,9 @@ protected:
         EXPECT_THROW(m_parser.parse_string(test), fly::ParserException);
     }
 
-    void
-    validate_pass(const std::string &test, const fly::Json &expected) noexcept
+    void validate_pass(const std::string &test, const fly::Json &expected) noexcept
     {
-        validate_pass_raw(
-            fly::String::format("{ \"a\" : %s }", test),
-            "a",
-            expected);
+        validate_pass_raw(fly::String::format("{ \"a\" : %s }", test), "a", expected);
     }
 
     void validate_pass_raw(
@@ -64,18 +60,18 @@ protected:
     fly::JsonParser m_parser;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, JsonChecker)
 {
     // https://www.json.org/JSON_checker/
     // The following files are excluded from this test:
     // - fail18.json: The parser has no max-depth
 
-    // Get the path to the JSON checker directory
+    // Get the path to the JSON checker directory.
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "json_checker";
 
-    // Validate each JSON file in the JSON checker directory
+    // Validate each JSON file in the JSON checker directory.
     for (const auto &it : std::filesystem::directory_iterator(path))
     {
         const auto file = it.path().filename();
@@ -96,7 +92,7 @@ TEST_F(JsonParserTest, JsonChecker)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, GoogleJsonTestSuite)
 {
     // https://code.google.com/archive/p/json-test-suite/
@@ -106,7 +102,7 @@ TEST_F(JsonParserTest, GoogleJsonTestSuite)
     EXPECT_NO_THROW(m_parser.parse_file(path / "sample.json"));
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
 {
     // https://github.com/nst/JSONTestSuite
@@ -132,11 +128,11 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
         "i_structure_UTF-8_BOM_empty_object.json", // Byte order mark ignored
     };
 
-    // Get the path to the JSONTestSuite directory
+    // Get the path to the JSONTestSuite directory.
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "nst_json_test_suite";
 
-    // Validate each JSON file in the JSONTestSuite directory
+    // Validate each JSON file in the JSONTestSuite directory.
     for (const auto &it : std::filesystem::directory_iterator(path))
     {
         const auto file = it.path().filename();
@@ -158,9 +154,7 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
             }
             else
             {
-                EXPECT_THROW(
-                    m_parser.parse_file(it.path()),
-                    fly::ParserException);
+                EXPECT_THROW(m_parser.parse_file(it.path()), fly::ParserException);
             }
         }
         else
@@ -170,13 +164,12 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, BigListOfNaughtyStrings)
 {
     // https://github.com/minimaxir/big-list-of-naughty-strings
     const auto here = std::filesystem::path(__FILE__);
-    const auto path =
-        here.parent_path() / "json" / "big_list_of_naughty_strings";
+    const auto path = here.parent_path() / "json" / "big_list_of_naughty_strings";
     fly::Json values;
 
     EXPECT_NO_THROW(values = m_parser.parse_file(path / "blns.json"));
@@ -188,7 +181,7 @@ TEST_F(JsonParserTest, BigListOfNaughtyStrings)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, AllUnicode)
 {
     const auto here = std::filesystem::path(__FILE__);
@@ -199,7 +192,7 @@ TEST_F(JsonParserTest, AllUnicode)
     EXPECT_EQ(values.size(), 1112064);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, NonExistingPath)
 {
     EXPECT_THROW(
@@ -207,7 +200,7 @@ TEST_F(JsonParserTest, NonExistingPath)
         fly::ParserException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, NonExistingFile)
 {
     EXPECT_THROW(
@@ -215,13 +208,13 @@ TEST_F(JsonParserTest, NonExistingFile)
         fly::ParserException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, EmptyFile)
 {
     validate_fail_raw("");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, EmptyObject)
 {
     const std::string contents("{}");
@@ -232,7 +225,7 @@ TEST_F(JsonParserTest, EmptyObject)
     EXPECT_EQ(values.size(), 0);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, EmptyArray)
 {
     const std::string contents("[]");
@@ -243,7 +236,7 @@ TEST_F(JsonParserTest, EmptyArray)
     EXPECT_EQ(values.size(), 0);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, EmptyNestedObjectArray)
 {
     fly::Json values;
@@ -271,7 +264,7 @@ TEST_F(JsonParserTest, EmptyNestedObjectArray)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, EmptyString)
 {
     fly::Json values;
@@ -301,7 +294,7 @@ TEST_F(JsonParserTest, EmptyString)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, NonObjectOrArray)
 {
     validate_fail_raw("\"\"");
@@ -312,7 +305,7 @@ TEST_F(JsonParserTest, NonObjectOrArray)
     validate_fail_raw("null");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, BadlyFormedObject)
 {
     validate_fail_raw(":");
@@ -360,7 +353,7 @@ TEST_F(JsonParserTest, BadlyFormedObject)
     validate_fail_raw("{ 1 : 1 }");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, BadlyFormedArray)
 {
     validate_fail_raw("[");
@@ -392,7 +385,7 @@ TEST_F(JsonParserTest, BadlyFormedArray)
     validate_fail_raw("[ \"a\", \"\x01\" ]");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, WhiteSpace)
 {
     validate_pass_raw("{ \"a\" : 1 }", "a", 1);
@@ -406,7 +399,7 @@ TEST_F(JsonParserTest, WhiteSpace)
     validate_fail_raw("{ \"a\" : \"b\t\" }");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, NumericConversion)
 {
     validate_pass("1", 1);
@@ -444,7 +437,7 @@ TEST_F(JsonParserTest, NumericConversion)
     validate_fail("E5");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, SingleLineComment)
 {
     fly::JsonParser parser(fly::JsonParser::Features::AllowComments);
@@ -541,7 +534,7 @@ TEST_F(JsonParserTest, SingleLineComment)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, MultiLineComment)
 {
     fly::JsonParser parser(fly::JsonParser::Features::AllowComments);
@@ -662,7 +655,7 @@ TEST_F(JsonParserTest, MultiLineComment)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, InvalidComment)
 {
     fly::JsonParser parser(fly::JsonParser::Features::AllowComments);
@@ -696,7 +689,7 @@ TEST_F(JsonParserTest, InvalidComment)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, TrailingCommaObject)
 {
     fly::JsonParser parser(fly::JsonParser::Features::AllowTrailingComma);
@@ -734,7 +727,7 @@ TEST_F(JsonParserTest, TrailingCommaObject)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, TrailingCommaArray)
 {
     fly::JsonParser parser(fly::JsonParser::Features::AllowTrailingComma);
@@ -775,7 +768,7 @@ TEST_F(JsonParserTest, TrailingCommaArray)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(JsonParserTest, AnyType)
 {
     fly::JsonParser parser(fly::JsonParser::Features::AllowAnyType);
@@ -850,7 +843,7 @@ TEST_F(JsonParserTest, AnyType)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TEST(JsonParserFeatures, CombinedFeatures)
 {
     // Strict

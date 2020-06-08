@@ -10,8 +10,8 @@
 namespace fly {
 
 /**
- * Virtual interface to parse a file or string. Parsers for specific formats
- * should inherit from this class.
+ * Virtual interface to parse a file or string. Parsers for specific formats should inherit from
+ * this class.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 18, 2016
@@ -63,8 +63,8 @@ protected:
 
 private:
     /**
-     * Before passing a stream to the parser implementation, discard any byte
-     * order marks (supports UTF-8, UTF-16, and UTF-32).
+     * Before passing a stream to the parser implementation, discard any byte order marks (supports
+     * UTF-8, UTF-16, and UTF-32).
      *
      * @param stream Stream holding the contents to parse.
      */

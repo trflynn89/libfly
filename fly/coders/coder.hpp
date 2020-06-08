@@ -11,8 +11,8 @@ class BitStreamReader;
 class BitStreamWriter;
 
 /**
- * Virtual interface to encode a string or file with a plaintext encoder. Coders
- * for specific algorithms should inherit from this class to perform encoding.
+ * Virtual interface to encode a string or file with a plaintext encoder. Coders for specific
+ * algorithms should inherit from this class to perform encoding.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
@@ -33,8 +33,7 @@ public:
      *
      * @return True if the input string was successfully encoded.
      */
-    virtual bool
-    encode_string(const std::string &decoded, std::string &encoded) noexcept;
+    virtual bool encode_string(const std::string &decoded, std::string &encoded) noexcept;
 
     /**
      * Encode a file.
@@ -57,13 +56,12 @@ protected:
      *
      * @return True if the input stream was successfully encoded.
      */
-    virtual bool
-    encode_internal(std::istream &decoded, std::ostream &encoded) noexcept = 0;
+    virtual bool encode_internal(std::istream &decoded, std::ostream &encoded) noexcept = 0;
 };
 
 /**
- * Virtual interface to encode a string or file with a binary encoder. Coders
- * for specific algorithms should inherit from this class to perform encoding.
+ * Virtual interface to encode a string or file with a binary encoder. Coders for specific
+ * algorithms should inherit from this class to perform encoding.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version May 3, 2020
@@ -71,8 +69,7 @@ protected:
 class BinaryEncoder : public Encoder
 {
 protected:
-    bool encode_internal(std::istream &decoded, std::ostream &encoded) noexcept
-        final;
+    bool encode_internal(std::istream &decoded, std::ostream &encoded) noexcept final;
 
     /**
      * Encode a stream.
@@ -82,13 +79,12 @@ protected:
      *
      * @return True if the input stream was successfully encoded.
      */
-    virtual bool
-    encode_binary(std::istream &decoded, BitStreamWriter &encoded) noexcept = 0;
+    virtual bool encode_binary(std::istream &decoded, BitStreamWriter &encoded) noexcept = 0;
 };
 
 /**
- * Virtual interface to decode a string or file with a plaintext decoder. Coders
- * for specific algorithms should inherit from this class to perform decoding.
+ * Virtual interface to decode a string or file with a plaintext decoder. Coders for specific
+ * algorithms should inherit from this class to perform decoding.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
@@ -109,8 +105,7 @@ public:
      *
      * @return True if the input string was successfully decoded.
      */
-    bool
-    decode_string(const std::string &encoded, std::string &decoded) noexcept;
+    bool decode_string(const std::string &encoded, std::string &decoded) noexcept;
 
     /**
      * Decode a file.
@@ -133,13 +128,12 @@ protected:
      *
      * @return bool True if the input stream was successfully decoded.
      */
-    virtual bool
-    decode_internal(std::istream &encoded, std::ostream &decoded) noexcept = 0;
+    virtual bool decode_internal(std::istream &encoded, std::ostream &decoded) noexcept = 0;
 };
 
 /**
- * Virtual interface to decode a string or file with a binary decoder. Coders
- * for specific algorithms should inherit from this class to perform decoding.
+ * Virtual interface to decode a string or file with a binary decoder. Coders for specific
+ * algorithms should inherit from this class to perform decoding.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version May 3, 2020
@@ -147,8 +141,7 @@ protected:
 class BinaryDecoder : public Decoder
 {
 protected:
-    bool decode_internal(std::istream &encoded, std::ostream &decoded) noexcept
-        final;
+    bool decode_internal(std::istream &encoded, std::ostream &decoded) noexcept final;
 
     /**
      * Decode a stream.
@@ -158,8 +151,7 @@ protected:
      *
      * @return True if the input stream was successfully decoded.
      */
-    virtual bool
-    decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept = 0;
+    virtual bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept = 0;
 };
 
 } // namespace fly

@@ -9,25 +9,25 @@
 
 namespace {
 
-//==============================================================================
+//==================================================================================================
 template <typename StringType>
 class Streamable
 {
 public:
-    using ostream_type = typename fly::detail::BasicStringTraits<
-        StringType>::streamer_type::ostream_type;
+    using ostream_type =
+        typename fly::detail::BasicStringTraits<StringType>::streamer_type::ostream_type;
 
     friend ostream_type &operator<<(ostream_type &, const Streamable &)
     {
     }
 };
 
-//==============================================================================
+//==================================================================================================
 class NotStreamable
 {
 };
 
-//==============================================================================
+//==================================================================================================
 template <
     typename T,
     fly::enable_if_any<
@@ -40,7 +40,7 @@ constexpr bool is_string_like(const T &) noexcept
     return true;
 }
 
-//==============================================================================
+//==================================================================================================
 template <
     typename T,
     fly::enable_if_none<
@@ -53,21 +53,20 @@ constexpr bool is_string_like(const T &) noexcept
     return false;
 }
 
-//==============================================================================
+//==================================================================================================
 template <
     typename StringType,
-    fly::enable_if_all<typename fly::detail::BasicStringTraits<
-        StringType>::has_stoi_family> = 0>
+    fly::enable_if_all<typename fly::detail::BasicStringTraits<StringType>::has_stoi_family> = 0>
 constexpr int call_stoi(const StringType &str) noexcept
 {
     return std::stoi(str);
 }
 
-//==============================================================================
+//==================================================================================================
 template <
     typename StringType,
-    fly::enable_if_not_all<typename fly::detail::BasicStringTraits<
-        StringType>::has_stoi_family> = 0>
+    fly::enable_if_not_all<typename fly::detail::BasicStringTraits<StringType>::has_stoi_family> =
+        0>
 constexpr int call_stoi(const StringType &) noexcept
 {
     return -1;
@@ -75,19 +74,18 @@ constexpr int call_stoi(const StringType &) noexcept
 
 } // namespace
 
-//==============================================================================
+//==================================================================================================
 template <typename T>
 struct BasicStringTraitsTest : public ::testing::Test
 {
     using string_base_type = T;
 };
 
-using StringTypes =
-    ::testing::Types<std::string, std::wstring, std::u16string, std::u32string>;
+using StringTypes = ::testing::Types<std::string, std::wstring, std::u16string, std::u32string>;
 
 TYPED_TEST_SUITE(BasicStringTraitsTest, StringTypes, );
 
-//==============================================================================
+//==================================================================================================
 TYPED_TEST(BasicStringTraitsTest, StoiFamily)
 {
     using string_type = typename TestFixture::string_base_type;
@@ -99,7 +97,7 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamily)
     EXPECT_EQ(traits::has_stoi_family_v, is_string || is_wstring);
 }
 
-//==============================================================================
+//==================================================================================================
 TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAE)
 {
     using string_type = typename TestFixture::string_base_type;
@@ -121,7 +119,7 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAE)
     }
 }
 
-//==============================================================================
+//==================================================================================================
 TYPED_TEST(BasicStringTraitsTest, StringLike)
 {
     using string_type = typename TestFixture::string_base_type;
@@ -189,60 +187,32 @@ TYPED_TEST(BasicStringTraitsTest, StringLike)
     EXPECT_EQ(traits::template is_string_like_v<std::string const>, is_string);
 
     EXPECT_EQ(traits::template is_string_like_v<std::wstring>, is_wstring);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::wstring>,
-        is_wstring);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::wstring const>,
-        is_wstring);
+    EXPECT_EQ(traits::template is_string_like_v<const std::wstring>, is_wstring);
+    EXPECT_EQ(traits::template is_string_like_v<std::wstring const>, is_wstring);
 
     EXPECT_EQ(traits::template is_string_like_v<std::u16string>, is_string16);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::u16string>,
-        is_string16);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::u16string const>,
-        is_string16);
+    EXPECT_EQ(traits::template is_string_like_v<const std::u16string>, is_string16);
+    EXPECT_EQ(traits::template is_string_like_v<std::u16string const>, is_string16);
 
     EXPECT_EQ(traits::template is_string_like_v<std::u32string>, is_string32);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::u32string>,
-        is_string32);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::u32string const>,
-        is_string32);
+    EXPECT_EQ(traits::template is_string_like_v<const std::u32string>, is_string32);
+    EXPECT_EQ(traits::template is_string_like_v<std::u32string const>, is_string32);
 
     EXPECT_EQ(traits::template is_string_like_v<std::string &>, is_string);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::string &>,
-        is_string);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::string const &>,
-        is_string);
+    EXPECT_EQ(traits::template is_string_like_v<const std::string &>, is_string);
+    EXPECT_EQ(traits::template is_string_like_v<std::string const &>, is_string);
 
     EXPECT_EQ(traits::template is_string_like_v<std::wstring &>, is_wstring);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::wstring &>,
-        is_wstring);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::wstring const &>,
-        is_wstring);
+    EXPECT_EQ(traits::template is_string_like_v<const std::wstring &>, is_wstring);
+    EXPECT_EQ(traits::template is_string_like_v<std::wstring const &>, is_wstring);
 
     EXPECT_EQ(traits::template is_string_like_v<std::u16string &>, is_string16);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::u16string &>,
-        is_string16);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::u16string const &>,
-        is_string16);
+    EXPECT_EQ(traits::template is_string_like_v<const std::u16string &>, is_string16);
+    EXPECT_EQ(traits::template is_string_like_v<std::u16string const &>, is_string16);
 
     EXPECT_EQ(traits::template is_string_like_v<std::u32string &>, is_string32);
-    EXPECT_EQ(
-        traits::template is_string_like_v<const std::u32string &>,
-        is_string32);
-    EXPECT_EQ(
-        traits::template is_string_like_v<std::u32string const &>,
-        is_string32);
+    EXPECT_EQ(traits::template is_string_like_v<const std::u32string &>, is_string32);
+    EXPECT_EQ(traits::template is_string_like_v<std::u32string const &>, is_string32);
 
     EXPECT_FALSE(traits::template is_string_like_v<std::string *>);
     EXPECT_FALSE(traits::template is_string_like_v<const std::string *>);
@@ -261,7 +231,7 @@ TYPED_TEST(BasicStringTraitsTest, StringLike)
     EXPECT_FALSE(traits::template is_string_like_v<std::u32string const *>);
 }
 
-//==============================================================================
+//==================================================================================================
 TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAE)
 {
     using string_type = typename TestFixture::string_base_type;
@@ -275,7 +245,7 @@ TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAE)
     EXPECT_FALSE(is_string_like(char_type()));
 }
 
-//==============================================================================
+//==================================================================================================
 TYPED_TEST(BasicStringTraitsTest, OstreamTraits)
 {
     using string_type = typename TestFixture::string_base_type;

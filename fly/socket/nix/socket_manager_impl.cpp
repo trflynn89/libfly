@@ -8,7 +8,7 @@
 
 namespace fly {
 
-//==============================================================================
+//==================================================================================================
 SocketManagerImpl::SocketManagerImpl(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
     const std::shared_ptr<SocketConfig> &config) noexcept :
@@ -16,7 +16,7 @@ SocketManagerImpl::SocketManagerImpl(
 {
 }
 
-//==============================================================================
+//==================================================================================================
 void SocketManagerImpl::poll(const std::chrono::microseconds &timeout) noexcept
 {
     fd_set read_fd, write_fd;
@@ -40,10 +40,8 @@ void SocketManagerImpl::poll(const std::chrono::microseconds &timeout) noexcept
     }
 }
 
-//==============================================================================
-socket_type SocketManagerImpl::set_read_and_write_masks(
-    fd_set *read_fd,
-    fd_set *write_fd) noexcept
+//==================================================================================================
+socket_type SocketManagerImpl::set_read_and_write_masks(fd_set *read_fd, fd_set *write_fd) noexcept
 {
     socket_type max_fd = -1;
 
@@ -66,10 +64,8 @@ socket_type SocketManagerImpl::set_read_and_write_masks(
     return max_fd;
 }
 
-//==============================================================================
-void SocketManagerImpl::handle_socket_io(
-    fd_set *read_fd,
-    fd_set *write_fd) noexcept
+//==================================================================================================
+void SocketManagerImpl::handle_socket_io(fd_set *read_fd, fd_set *write_fd) noexcept
 {
     SocketList new_clients, connected_clients, closed_clients;
 
@@ -79,7 +75,7 @@ void SocketManagerImpl::handle_socket_io(
         {
             socket_type handle = socket->get_handle();
 
-            // Handle socket accepts and reads
+            // Handle socket accepts and reads.
             if (FD_ISSET(handle, read_fd))
             {
                 if (socket->is_listening())
@@ -98,7 +94,7 @@ void SocketManagerImpl::handle_socket_io(
                 }
             }
 
-            // Handle socket connects and writes
+            // Handle socket connects and writes.
             if (FD_ISSET(handle, write_fd))
             {
                 if (socket->is_connecting())

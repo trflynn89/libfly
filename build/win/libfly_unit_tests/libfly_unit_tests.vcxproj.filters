@@ -60,9 +60,6 @@
     <ClCompile Include="..\..\..\test\logger\logger.cpp">
       <Filter>logger</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\parser\exceptions.cpp">
-      <Filter>parser</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp">
       <Filter>parser</Filter>
     </ClCompile>
@@ -70,6 +67,9 @@
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\parser\parser.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\parser\parser_exception.cpp">
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\path\path_monitor.cpp">

@@ -20,8 +20,7 @@
 namespace fly {
 
 /**
- * Enumeration to detect system endianness. Can be replaced by std::endian when
- * available in C++20.
+ * Enumeration to detect system endianness. Can be replaced by std::endian when available in C++20.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
@@ -42,8 +41,8 @@ enum class Endian : std::uint16_t
 };
 
 /**
- * Templated wrapper around platform built-in byte swapping macros to convert a
- * value between system endianness and a desired endianness.
+ * Templated wrapper around platform built-in byte swapping macros to convert a value between system
+ * endianness and a desired endianness.
  *
  * @tparam Endian The desired endianness to swap between.
  * @tparam T The type of the value to swap.

@@ -6,8 +6,8 @@
 #include <string>
 
 /**
- * A pseudo config class to provide public access to Config methods. Only meant
- * to be used by unit tests.
+ * A pseudo config class to provide public access to Config methods. Only meant to be used by unit
+ * tests.
  */
 class TestConfig : public fly::Config
 {

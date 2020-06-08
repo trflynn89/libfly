@@ -1,41 +1,38 @@
 #include "fly/parser/ini_parser.hpp"
 
-#include "fly/parser/exceptions.hpp"
+#include "fly/parser/parser_exception.hpp"
 
 #include <gtest/gtest.h>
 
 #include <filesystem>
 
-//==============================================================================
+//==================================================================================================
 class IniParserTest : public ::testing::Test
 {
 protected:
     fly::IniParser m_parser;
 };
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, NonExistingPath)
 {
     fly::Json values;
 
-    ASSERT_NO_THROW(
-        values =
-            m_parser.parse_file(std::filesystem::path("foo_abc") / "a.json"));
+    ASSERT_NO_THROW(values = m_parser.parse_file(std::filesystem::path("foo_abc") / "a.json"));
     EXPECT_EQ(values.size(), 0);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, NonExistingFile)
 {
     fly::Json values;
 
     ASSERT_NO_THROW(
-        values = m_parser.parse_file(
-            std::filesystem::temp_directory_path() / "a.json"));
+        values = m_parser.parse_file(std::filesystem::temp_directory_path() / "a.json"));
     EXPECT_EQ(values.size(), 0);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, EmptyFile)
 {
     const std::string contents;
@@ -45,7 +42,7 @@ TEST_F(IniParserTest, EmptyFile)
     EXPECT_EQ(values.size(), 0);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, EmptySection)
 {
     const std::string contents("[section]");
@@ -55,7 +52,7 @@ TEST_F(IniParserTest, EmptySection)
     EXPECT_EQ(values.size(), 0);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, NonEmptySection)
 {
     const std::string contents(
@@ -70,7 +67,7 @@ TEST_F(IniParserTest, NonEmptySection)
     EXPECT_EQ(values["section"].size(), 2);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, NonExisting)
 {
     const std::string contents(
@@ -86,7 +83,7 @@ TEST_F(IniParserTest, NonExisting)
     EXPECT_EQ(values["section-bad"].size(), 0);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, Comment)
 {
     const std::string contents(
@@ -103,7 +100,7 @@ TEST_F(IniParserTest, Comment)
     EXPECT_EQ(values["other-section"].size(), 0);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, ErrantSpaces)
 {
     const std::string contents(
@@ -118,7 +115,7 @@ TEST_F(IniParserTest, ErrantSpaces)
     EXPECT_EQ(values["section"].size(), 2);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, QuotedValue)
 {
     const std::string contents(
@@ -133,7 +130,7 @@ TEST_F(IniParserTest, QuotedValue)
     EXPECT_EQ(values["section"].size(), 2);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, MutlipleSectionType)
 {
     const std::string contents(
@@ -156,7 +153,7 @@ TEST_F(IniParserTest, MutlipleSectionType)
     EXPECT_EQ(values["section3"].size(), 2);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, DuplicateSection)
 {
     const std::string contents1(
@@ -183,7 +180,7 @@ TEST_F(IniParserTest, DuplicateSection)
     EXPECT_EQ(values["section"]["name"], "Jane Doe");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, DuplicateValue)
 {
     const std::string contents(
@@ -198,7 +195,7 @@ TEST_F(IniParserTest, DuplicateValue)
     EXPECT_EQ(values["section"]["name"], "Jane Doe");
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, ImbalancedBrace)
 {
     const std::string contents1(
@@ -213,7 +210,7 @@ TEST_F(IniParserTest, ImbalancedBrace)
     EXPECT_THROW(m_parser.parse_string(contents2), fly::ParserException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, ImbalancedQuote)
 {
     const std::string contents1(
@@ -247,7 +244,7 @@ TEST_F(IniParserTest, ImbalancedQuote)
     EXPECT_THROW(m_parser.parse_string(contents6), fly::ParserException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, MisplacedQuote)
 {
     const std::string contents1(
@@ -282,7 +279,7 @@ TEST_F(IniParserTest, MisplacedQuote)
     EXPECT_THROW(m_parser.parse_string(contents6), fly::ParserException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, MultipleAssignment)
 {
     const std::string contents1(
@@ -303,7 +300,7 @@ TEST_F(IniParserTest, MultipleAssignment)
     EXPECT_EQ(values["section"].size(), 1);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, MissingAssignment)
 {
     const std::string contents1(
@@ -318,7 +315,7 @@ TEST_F(IniParserTest, MissingAssignment)
     EXPECT_THROW(m_parser.parse_string(contents2), fly::ParserException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, EarlyAssignment)
 {
     const std::string contents1(
@@ -338,7 +335,7 @@ TEST_F(IniParserTest, EarlyAssignment)
     EXPECT_THROW(m_parser.parse_string(contents3), fly::ParserException);
 }
 
-//==============================================================================
+//==================================================================================================
 TEST_F(IniParserTest, MultipleParse)
 {
     const std::string contents(
