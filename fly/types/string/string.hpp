@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/types/string/detail/string_converter.hpp"
+#include "fly/types/string/detail/string_formatter.hpp"
 #include "fly/types/string/detail/string_streamer.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/string_unicode.hpp"
@@ -278,22 +279,6 @@ public:
 
 private:
     /**
-     * Recursively format a string with one argument. The result is streamed into the given ostream.
-     */
-    template <typename T, typename... Args>
-    static void format_internal(
-        ostream_type &ostream,
-        const char_type *fmt,
-        const T &value,
-        const Args &... args) noexcept;
-
-    /**
-     * Terminator for the variadic template formatter. Stream the rest of the string into the given
-     * ostream.
-     */
-    static void format_internal(ostream_type &ostream, const char_type *fmt) noexcept;
-
-    /**
      * Recursively join one argument into the given ostream.
      */
     template <typename T, typename... Args>
@@ -309,12 +294,6 @@ private:
     template <typename T>
     static void
     join_internal(ostream_type &ostream, const char_type &separator, const T &value) noexcept;
-
-    /**
-     * Stream the given value into the given stream.
-     */
-    template <typename T>
-    static void stream(ostream_type &ostream, const T &value) noexcept;
 
     /**
      * A list of alpha-numeric characters in the range [0-9A-Za-z].
@@ -590,11 +569,7 @@ template <typename... Args>
 auto BasicString<StringType>::format(const char_type *fmt, const Args &... args) noexcept
     -> streamed_type
 {
-    typename traits::ostringstream_type ostream;
-    ostream.precision(6);
-
-    format(ostream, fmt, args...);
-    return ostream.str();
+    return detail::BasicStringFormatter<StringType>::format(fmt, args...);
 }
 
 //==================================================================================================
@@ -605,110 +580,7 @@ auto BasicString<StringType>::format(
     const char_type *fmt,
     const Args &... args) noexcept -> ostream_type &
 {
-    if (fmt != nullptr)
-    {
-        format_internal(ostream, fmt, args...);
-    }
-
-    return ostream;
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename T, typename... Args>
-void BasicString<StringType>::format_internal(
-    ostream_type &ostream,
-    const char_type *fmt,
-    const T &value,
-    const Args &... args) noexcept
-{
-    const std::ios_base::fmtflags flags(ostream.flags());
-
-    for (; *fmt != '\0'; ++fmt)
-    {
-        if (*fmt == '%')
-        {
-            const char_type type = *(fmt + 1);
-
-            switch (type)
-            {
-                case '\0':
-                    stream(ostream, *fmt);
-                    return;
-
-                case '%':
-                    stream(ostream, *(++fmt));
-                    continue;
-
-                case 'x':
-                    ostream << "0x" << std::hex << std::nouppercase;
-                    break;
-                case 'X':
-                    ostream << "0X" << std::hex << std::uppercase;
-                    break;
-
-                case 'o':
-                    ostream << '0' << std::oct;
-                    break;
-
-                case 'a':
-                    ostream << std::hexfloat << std::nouppercase;
-                    break;
-                case 'A':
-                    ostream << std::hexfloat << std::uppercase;
-                    break;
-
-                case 'f':
-                    ostream << std::fixed << std::nouppercase;
-                    break;
-                case 'F':
-                    ostream << std::fixed << std::uppercase;
-                    break;
-
-                case 'g':
-                    ostream << std::nouppercase;
-                    break;
-                case 'G':
-                    ostream << std::uppercase;
-                    break;
-
-                case 'e':
-                    ostream << std::scientific << std::nouppercase;
-                    break;
-                case 'E':
-                    ostream << std::scientific << std::uppercase;
-                    break;
-
-                default:
-                    break;
-            }
-
-            stream(ostream, value);
-            ostream.flags(flags);
-
-            format_internal(ostream, fmt + 2, args...);
-            return;
-        }
-
-        stream(ostream, *fmt);
-    }
-}
-
-//==================================================================================================
-template <typename StringType>
-void BasicString<StringType>::format_internal(ostream_type &ostream, const char_type *fmt) noexcept
-{
-    for (; *fmt != '\0'; ++fmt)
-    {
-        if ((*fmt == '%') && (*(fmt + 1) == '%'))
-        {
-            stream(ostream, *(++fmt));
-        }
-        else
-        {
-            stream(ostream, *fmt);
-        }
-    }
+    return detail::BasicStringFormatter<StringType>::format(ostream, fmt, args...);
 }
 
 //==================================================================================================
@@ -732,8 +604,8 @@ void BasicString<StringType>::join_internal(
     const T &value,
     const Args &... args) noexcept
 {
-    stream(ostream, value);
-    stream(ostream, separator);
+    detail::BasicStringFormatter<StringType>::stream(ostream, value);
+    detail::BasicStringFormatter<StringType>::stream(ostream, separator);
 
     join_internal(ostream, separator, args...);
 }
@@ -746,27 +618,7 @@ void BasicString<StringType>::join_internal(
     const char_type &,
     const T &value) noexcept
 {
-    stream(ostream, value);
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename T>
-void BasicString<StringType>::stream(ostream_type &ostream, const T &value) noexcept
-{
-    if constexpr (
-        std::is_same_v<char_type, std::decay_t<T>> || traits::template is_string_like_v<T>)
-    {
-        detail::BasicStringStreamer<StringType>::stream(ostream, value);
-    }
-    else if constexpr (traits::OstreamTraits::template is_declared_v<T>)
-    {
-        ostream << std::boolalpha << value;
-    }
-    else
-    {
-        ostream << '[' << std::hex << &value << std::dec << ']';
-    }
+    detail::BasicStringFormatter<StringType>::stream(ostream, value);
 }
 
 //==================================================================================================
@@ -786,7 +638,7 @@ T BasicString<StringType>::convert(const StringType &value) noexcept(
     else
     {
         typename traits::ostringstream_type ostream;
-        stream(ostream, value);
+        detail::BasicStringFormatter<StringType>::stream(ostream, value);
 
         return detail::BasicStringConverter<streamed_type, T>::convert(ostream.str());
     }

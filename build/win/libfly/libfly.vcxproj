@@ -209,6 +209,7 @@
     <ClInclude Include="..\..\..\fly\types\numeric\endian.hpp" />
     <ClInclude Include="..\..\..\fly\types\numeric\literals.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.hpp" />
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_unicode.hpp" />

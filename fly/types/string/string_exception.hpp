@@ -46,24 +46,7 @@ public:
      *
      * @param message Message indicating what error was encountered.
      */
-    explicit UnicodeException(const char *message) noexcept;
-
-    /**
-     * Constructor.
-     *
-     * @param message Message indicating what error was encountered.
-     * @param arg1 First argument to format the exception message with.
-     */
-    UnicodeException(const char *message, std::uint32_t arg1) noexcept;
-
-    /**
-     * Constructor.
-     *
-     * @param message Message indicating what error was encountered.
-     * @param arg1 First argument to format the exception message with.
-     * @param arg2 Second argument to format the exception message with.
-     */
-    UnicodeException(const char *message, std::uint32_t arg1, std::uint32_t arg2) noexcept;
+    explicit UnicodeException(std::string &&message) noexcept;
 };
 
 } // namespace fly
