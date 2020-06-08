@@ -1,7 +1,10 @@
 #pragma once
 
+#include "fly/types/string/detail/string_formatter.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/string_exception.hpp"
+
+#include <string>
 
 namespace fly::detail {
 
@@ -16,6 +19,8 @@ class BasicStringUnicode
 {
     using traits = detail::BasicStringTraits<StringType>;
     using char_type = typename traits::char_type;
+
+    using StringFormatter = BasicStringFormatter<std::string>;
 
     using codepoint_type = std::uint32_t;
 
@@ -101,17 +106,17 @@ StringType BasicStringUnicode<StringType>::parse_character(
         }
         else
         {
-            throw UnicodeException(
+            throw UnicodeException(StringFormatter::format(
                 "Expected low surrogate to follow high surrogate %x, found %x",
                 high_surrogate,
-                low_surrogate);
+                low_surrogate));
         }
     }
     else if (is_low_surrogate(high_surrogate))
     {
-        throw UnicodeException(
+        throw UnicodeException(StringFormatter::format(
             "Expected high surrogate to preceed low surrogate %x",
-            high_surrogate);
+            high_surrogate));
     }
 
     return convert_codepoint(codepoint);
@@ -150,15 +155,16 @@ auto BasicStringUnicode<StringType>::parse_codepoint(
         }
         else
         {
-            throw UnicodeException(
+            throw UnicodeException(StringFormatter::format(
                 "Expected %x to be a hexadecimal digit",
-                static_cast<codepoint_type>(*it));
+                static_cast<codepoint_type>(*it)));
         }
     }
 
     if (i != 4)
     {
-        throw UnicodeException("Expected exactly 4 hexadecimals after \\u, only found %u", i);
+        throw UnicodeException(
+            StringFormatter::format("Expected exactly 4 hexadecimals after \\u, only found %u", i));
     }
 
     return codepoint;

@@ -17,23 +17,8 @@ const char *StringException::what() const noexcept
 }
 
 //==================================================================================================
-UnicodeException::UnicodeException(const char *message) noexcept :
-    StringException("UnicodeException", std::string(message))
-{
-}
-
-//==================================================================================================
-UnicodeException::UnicodeException(const char *message, std::uint32_t arg1) noexcept :
-    StringException("UnicodeException", String::format(message, arg1))
-{
-}
-
-//==================================================================================================
-UnicodeException::UnicodeException(
-    const char *message,
-    std::uint32_t arg1,
-    std::uint32_t arg2) noexcept :
-    StringException("UnicodeException", String::format(message, arg1, arg2))
+UnicodeException::UnicodeException(std::string &&message) noexcept :
+    StringException("UnicodeException", std::move(message))
 {
 }
 
