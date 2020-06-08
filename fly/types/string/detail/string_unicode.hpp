@@ -85,6 +85,26 @@ private:
     /**
      * Parse a single escaped unicode character. Convert the character to a 32-bit codepoint.
      *
+     * Note: the template type is StringType::value_type rather than char_type because of an MSVC
+     * bug. MSVC fails trying to match the following declaration/definition pair:
+     *
+     *    template <typename StringType>
+     *    class BasicStringUnicode
+     *    {
+     *        using char_type = typename traits::char_type;
+     *
+     *        template <char_type UnicodePrefix>
+     *        static codepoint_type parse_codepoint();
+     *    };
+     *
+     *    template <typename StringType>
+     *    template <typename BasicStringUnicode<StringType>::char_type UnicodePrefix>
+     *    auto BasicStringUnicode<StringType>::parse_codepoint() {}
+     *
+     * See:
+     * https://stackoverflow.com/questions/49521073/msvcerror-c2244-unable-to-match-function-definition-to-an-existing-declaratio
+     * https://developercommunity.visualstudio.com/content/problem/225941/error-c2244-unable-to-match-function-definition-to.html
+     *
      * @tparam UnicodePrefix The escaped unicode prefix character ('u' or 'U').
      *
      * @param it Pointer to the beginning of the escaped character sequence.
@@ -94,7 +114,7 @@ private:
      *
      * @throws UnicodeException If the escaped sequence is not a valid unicode character.
      */
-    template <char_type UnicodePrefix>
+    template <typename StringType::value_type UnicodePrefix>
     static codepoint_type parse_codepoint(
         typename StringType::const_iterator &it,
         const typename StringType::const_iterator &end) noexcept(false);
@@ -143,8 +163,10 @@ StringType BasicStringUnicode<StringType>::parse_character(
         return parse_utf32(it, end);
     }
 
-    throw UnicodeException(
-        StringFormatter::format("Escaped unicode must begin with \\%c or \\%c", utf8, utf32));
+    throw UnicodeException(StringFormatter::format(
+        "Escaped unicode must begin with \\%c or \\%c",
+        static_cast<char>(utf8),
+        static_cast<char>(utf32)));
 }
 
 //==================================================================================================
@@ -206,7 +228,7 @@ StringType BasicStringUnicode<StringType>::parse_utf32(
 
 //==================================================================================================
 template <typename StringType>
-template <typename BasicStringUnicode<StringType>::char_type UnicodePrefix>
+template <typename StringType::value_type UnicodePrefix>
 auto BasicStringUnicode<StringType>::parse_codepoint(
     typename StringType::const_iterator &it,
     const typename StringType::const_iterator &end) noexcept(false) -> codepoint_type
@@ -215,8 +237,9 @@ auto BasicStringUnicode<StringType>::parse_codepoint(
 
     if ((it == end) || (*it != '\\') || (++it == end) || (*it != UnicodePrefix))
     {
-        throw UnicodeException(
-            StringFormatter::format("Expected codepoint to begin with \\%c", UnicodePrefix));
+        throw UnicodeException(StringFormatter::format(
+            "Expected codepoint to begin with \\%c",
+            static_cast<char>(UnicodePrefix)));
     }
 
     codepoint_type codepoint = 0;
@@ -254,7 +277,7 @@ auto BasicStringUnicode<StringType>::parse_codepoint(
         throw UnicodeException(StringFormatter::format(
             "Expected exactly %u hexadecimals after \\%c, only found %u",
             expected_digits,
-            UnicodePrefix,
+            static_cast<char>(UnicodePrefix),
             i));
     }
 
