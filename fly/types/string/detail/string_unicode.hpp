@@ -32,53 +32,58 @@ class BasicStringUnicode
     static constexpr codepoint_type low_surrogate_max = 0xdfff;
 
 public:
+    static constexpr char_type utf8 = FLY_CHR(char_type, 'u');
+    static constexpr char_type utf32 = FLY_CHR(char_type, 'U');
+
     /**
-     * Parse an escaped sequence of unicode characters. Accepts the following unicode encodings:
+     * Unescape a single escaped sequence of unicode characters, starting at the provided iterator.
+     * If successful, after invoking this method, that iterator will point at the first character
+     * after the escaped sequence in the source string.
+     *
+     * Accepts the following unicode encodings, where each character n is a hexadecimal digit:
      *
      *     UTF-8 encodings of the form: \unnnn
      *     UTF-16 paried surrogate encodings of the form: \unnnn\unnnn
      *     UTF-32 encodings of the form: \Unnnnnnnn
      *
-     * Where each character n is a hexadecimal digit.
-     *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
-     * @return The parsed unicode character.
+     * @return A string containing the unescaped unicode character.
      *
      * @throws UnicodeException If the escaped sequence is not a valid unicode character.
      */
-    static StringType parse_character(
+    static StringType unescape_character(
         typename StringType::const_iterator &it,
         const typename StringType::const_iterator &end) noexcept(false);
 
 private:
     /**
-     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
+     * Unescape an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
      * surrogate encodings.
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
-     * @return The parsed unicode character.
+     * @return A string containing the unescaped unicode character.
      *
      * @throws UnicodeException If the escaped sequence is not a valid unicode character.
      */
-    static StringType parse_utf8_or_utf16(
+    static StringType unescape_utf8_or_utf16(
         typename StringType::const_iterator &it,
         const typename StringType::const_iterator &end) noexcept(false);
 
     /**
-     * Parse an escaped sequence of unicode characters. Accepts UTF-32 encodings.
+     * Unescape an escaped sequence of unicode characters. Accepts UTF-32 encodings.
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
-     * @return The parsed unicode character.
+     * @return A string containing the unescaped unicode character.
      *
      * @throws UnicodeException If the escaped sequence is not a valid unicode character.
      */
-    static StringType parse_utf32(
+    static StringType unescape_utf32(
         typename StringType::const_iterator &it,
         const typename StringType::const_iterator &end) noexcept(false);
 
@@ -128,9 +133,6 @@ private:
      */
     static StringType convert_codepoint(codepoint_type codepoint) noexcept;
 
-    static constexpr char_type utf8 = FLY_CHR(char_type, 'u');
-    static constexpr char_type utf32 = FLY_CHR(char_type, 'U');
-
     static constexpr char_type ch_0 = FLY_CHR(char_type, '0');
     static constexpr char_type ch_9 = FLY_CHR(char_type, '9');
     static constexpr char_type ch_a = FLY_CHR(char_type, 'a');
@@ -141,7 +143,7 @@ private:
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicStringUnicode<StringType>::parse_character(
+StringType BasicStringUnicode<StringType>::unescape_character(
     typename StringType::const_iterator &it,
     const typename StringType::const_iterator &end) noexcept(false)
 {
@@ -156,11 +158,11 @@ StringType BasicStringUnicode<StringType>::parse_character(
 
     if (begins_with(utf8))
     {
-        return parse_utf8_or_utf16(it, end);
+        return unescape_utf8_or_utf16(it, end);
     }
     else if (begins_with(utf32))
     {
-        return parse_utf32(it, end);
+        return unescape_utf32(it, end);
     }
 
     throw UnicodeException(StringFormatter::format(
@@ -171,7 +173,7 @@ StringType BasicStringUnicode<StringType>::parse_character(
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicStringUnicode<StringType>::parse_utf8_or_utf16(
+StringType BasicStringUnicode<StringType>::unescape_utf8_or_utf16(
     typename StringType::const_iterator &it,
     const typename StringType::const_iterator &end) noexcept(false)
 {
@@ -218,7 +220,7 @@ StringType BasicStringUnicode<StringType>::parse_utf8_or_utf16(
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicStringUnicode<StringType>::parse_utf32(
+StringType BasicStringUnicode<StringType>::unescape_utf32(
     typename StringType::const_iterator &it,
     const typename StringType::const_iterator &end) noexcept(false)
 {
