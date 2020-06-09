@@ -185,6 +185,7 @@ TYPED_TEST(BasicStringTest, UnicodeStringConversion)
 
     validate_pass(FLY_STR(char_type, "No unicode!"), FLY_STR(char_type, "No unicode!"));
     validate_pass(FLY_STR(char_type, "Other escape \t"), FLY_STR(char_type, "Other escape \t"));
+    validate_pass(FLY_STR(char_type, "Other escape \\t"), FLY_STR(char_type, "Other escape \\t"));
 
     validate_pass(FLY_STR(char_type, "\\U00010000"), FLY_STR(char_type, "\U00010000"));
     validate_pass(FLY_STR(char_type, "\\U00010E6D"), FLY_STR(char_type, "\U00010E6D"));
