@@ -159,37 +159,41 @@ public:
     static bool wildcard_match(const StringType &source, const StringType &search) noexcept;
 
     /**
-     * Parse an escaped sequence of unicode characters. Accepts the following unicode encodings:
+     * Unescape all escaped sequences of unicode characters in a string.
+     *
+     * Accepts the following unicode encodings, where each character n is a hexadecimal digit:
      *
      *     UTF-8 encodings of the form: \unnnn
      *     UTF-16 paried surrogate encodings of the form: \unnnn\unnnn
      *     UTF-32 encodings of the form: \Unnnnnnnn
      *
-     * Where each character n is a hexadecimal digit.
-     *
      * @param source The string containing the escaped character sequence.
      *
-     * @return The parsed unicode character.
+     * @return A copy of the source string with all sequences of unicode characters unescaped.
      *
-     * @throws UnicodeException If the escaped sequence is not a valid unicode character.
+     * @throws UnicodeException If any escaped sequence is not a valid unicode character.
      */
-    static StringType parse_unicode_character(const StringType &source) noexcept(false);
+    static StringType unescape_unicode_string(const StringType &source) noexcept(false);
 
     /**
-     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
-     * surrogate encodings.
+     * Unescape a single escaped sequence of unicode characters, starting at the provided iterator.
+     * If successful, after invoking this method, that iterator will point at the first character
+     * after the escaped sequence in the source string.
      *
-     * Input sequences must be of the form: (\u[0-9a-fA-F]{4}){1,2}
+     * Accepts the following unicode encodings, where each character n is a hexadecimal digit:
+     *
+     *     UTF-8 encodings of the form: \unnnn
+     *     UTF-16 paried surrogate encodings of the form: \unnnn\unnnn
+     *     UTF-32 encodings of the form: \Unnnnnnnn
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
-     * @return The parsed unicode character.
+     * @return A string containing the unescaped unicode character.
      *
-     * @throws UnicodeException If the interpreted unicode character is not valid or there weren't
-     *         enough available bytes.
+     * @throws UnicodeException If the escaped sequence is not a valid unicode character.
      */
-    static StringType parse_unicode_character(
+    static StringType unescape_unicode_character(
         typename StringType::const_iterator &it,
         const typename StringType::const_iterator &end) noexcept(false);
 
@@ -522,21 +526,45 @@ bool BasicString<StringType>::wildcard_match(
 //==================================================================================================
 template <typename StringType>
 StringType
-BasicString<StringType>::parse_unicode_character(const StringType &source) noexcept(false)
+BasicString<StringType>::unescape_unicode_string(const StringType &source) noexcept(false)
 {
-    auto begin = source.cbegin();
+    StringType result;
+    result.reserve(source.size());
+
     const auto end = source.cend();
 
-    return parse_unicode_character(begin, end);
+    for (auto it = source.cbegin(); it != end;)
+    {
+        if ((*it == '\\') && ((it + 1) != end))
+        {
+            switch (*(it + 1))
+            {
+                case detail::BasicStringUnicode<StringType>::utf8:
+                case detail::BasicStringUnicode<StringType>::utf32:
+                    result += unescape_unicode_character(it, end);
+                    break;
+
+                default:
+                    result += *(it++);
+                    break;
+            }
+        }
+        else
+        {
+            result += *(it++);
+        }
+    }
+
+    return result;
 }
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicString<StringType>::parse_unicode_character(
+StringType BasicString<StringType>::unescape_unicode_character(
     typename StringType::const_iterator &it,
     const typename StringType::const_iterator &end) noexcept(false)
 {
-    return detail::BasicStringUnicode<StringType>::parse_character(it, end);
+    return detail::BasicStringUnicode<StringType>::unescape_character(it, end);
 }
 
 //==================================================================================================

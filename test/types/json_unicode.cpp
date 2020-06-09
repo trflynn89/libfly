@@ -76,6 +76,11 @@ TEST(JsonTest, UnicodeConversion)
     validate_pass("\\uD803\\uDE6D", u8"\U00010E6D");
     validate_pass("\\uD834\\uDD1E", u8"\U0001D11E");
     validate_pass("\\uDBFF\\uDFFF", u8"\U0010FFFF");
+
+    validate_fail("\\U00010000");
+    validate_fail("\\U00010E6D");
+    validate_fail("\\U0001D11E");
+    validate_fail("\\U0010FFFF");
 }
 
 //==================================================================================================
