@@ -461,7 +461,7 @@ TYPED_TEST(BasicStringTest, Wildcard)
 }
 
 //==================================================================================================
-TYPED_TEST(BasicStringTest, UnicodeConversion)
+TYPED_TEST(BasicStringTest, Utf8Conversion)
 {
     DECLARE_ALIASES
 
@@ -475,9 +475,12 @@ TYPED_TEST(BasicStringTest, UnicodeConversion)
         SCOPED_TRACE(test);
 
         string_type actual;
-        EXPECT_NO_THROW(actual = StringClass::parse_unicode_character(test));
+        actual = StringClass::parse_unicode_character(test);
         EXPECT_EQ(actual, expected);
     };
+
+    validate_fail(FLY_STR(char_type, "f"));
+    validate_fail(FLY_STR(char_type, "\\f"));
 
     validate_fail(FLY_STR(char_type, "\\u"));
     validate_fail(FLY_STR(char_type, "\\u0"));
@@ -498,6 +501,27 @@ TYPED_TEST(BasicStringTest, UnicodeConversion)
     validate_fail(FLY_STR(char_type, "\\uDFFF"));
     validate_fail(FLY_STR(char_type, "\\uD800"));
     validate_fail(FLY_STR(char_type, "\\uDBFF"));
+}
+
+//==================================================================================================
+TYPED_TEST(BasicStringTest, Utf16Conversion)
+{
+    DECLARE_ALIASES
+
+    auto validate_fail = [](const char_type *test) {
+        SCOPED_TRACE(test);
+
+        EXPECT_THROW(StringClass::parse_unicode_character(test), fly::UnicodeException);
+    };
+
+    auto validate_pass = [](const char_type *test, string_type &&expected) {
+        SCOPED_TRACE(test);
+
+        string_type actual;
+        actual = StringClass::parse_unicode_character(test);
+        EXPECT_EQ(actual, expected);
+    };
+
     validate_fail(FLY_STR(char_type, "\\uD800\\u"));
     validate_fail(FLY_STR(char_type, "\\uD800\\z"));
     validate_fail(FLY_STR(char_type, "\\uD800\\u0"));
@@ -513,6 +537,41 @@ TYPED_TEST(BasicStringTest, UnicodeConversion)
     validate_pass(FLY_STR(char_type, "\\uD803\\uDE6D"), FLY_STR(char_type, "\U00010E6D"));
     validate_pass(FLY_STR(char_type, "\\uD834\\uDD1E"), FLY_STR(char_type, "\U0001D11E"));
     validate_pass(FLY_STR(char_type, "\\uDBFF\\uDFFF"), FLY_STR(char_type, "\U0010FFFF"));
+}
+
+//==================================================================================================
+TYPED_TEST(BasicStringTest, Utf32Conversion)
+{
+    DECLARE_ALIASES
+
+    auto validate_fail = [](const char_type *test) {
+        SCOPED_TRACE(test);
+
+        EXPECT_THROW(StringClass::parse_unicode_character(test), fly::UnicodeException);
+    };
+
+    auto validate_pass = [](const char_type *test, string_type &&expected) {
+        SCOPED_TRACE(test);
+
+        string_type actual;
+        actual = StringClass::parse_unicode_character(test);
+        EXPECT_EQ(actual, expected);
+    };
+
+    validate_fail(FLY_STR(char_type, "\\U"));
+    validate_fail(FLY_STR(char_type, "\\U0"));
+    validate_fail(FLY_STR(char_type, "\\U00"));
+    validate_fail(FLY_STR(char_type, "\\U000"));
+    validate_fail(FLY_STR(char_type, "\\U0000"));
+    validate_fail(FLY_STR(char_type, "\\U00000"));
+    validate_fail(FLY_STR(char_type, "\\U000000"));
+    validate_fail(FLY_STR(char_type, "\\U0000000"));
+    validate_fail(FLY_STR(char_type, "\\U0000000z"));
+
+    validate_pass(FLY_STR(char_type, "\\U00010000"), FLY_STR(char_type, "\U00010000"));
+    validate_pass(FLY_STR(char_type, "\\U00010E6D"), FLY_STR(char_type, "\U00010E6D"));
+    validate_pass(FLY_STR(char_type, "\\U0001D11E"), FLY_STR(char_type, "\U0001D11E"));
+    validate_pass(FLY_STR(char_type, "\\U0010FFFF"), FLY_STR(char_type, "\U0010FFFF"));
 }
 
 //==================================================================================================
