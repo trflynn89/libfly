@@ -12,7 +12,7 @@
 template <typename StringType>
 struct BasicStringTest : public ::testing::Test
 {
-    using string_type = StringType;
+    using basic_string_type = StringType;
 };
 
 using StringTypes = ::testing::Types<std::string, std::wstring, std::u16string, std::u32string>;
@@ -20,7 +20,7 @@ TYPED_TEST_SUITE(BasicStringTest, StringTypes, );
 
 // Helper macro to forward declare aliases used in tests.
 #define DECLARE_ALIASES                                                                            \
-    using string_type [[maybe_unused]] = typename TestFixture::string_type;                        \
+    using string_type [[maybe_unused]] = typename TestFixture::basic_string_type;                  \
     using StringClass [[maybe_unused]] = fly::BasicString<string_type>;                            \
     using traits [[maybe_unused]] = typename fly::detail::BasicStringTraits<string_type>;          \
     using char_type [[maybe_unused]] = typename StringClass::char_type;                            \
