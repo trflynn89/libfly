@@ -193,5 +193,5 @@ TYPED_TEST(BasicStringTest, UnicodeStringConversion)
 
     validate_pass(
         FLY_STR(char_type, "\\U0001f355 in the morning, \\U0001f355 in the evening"),
-        FLY_STR(char_type, "🍕 in the morning, 🍕 in the evening"));
+        FLY_STR(char_type, "\U0001f355 in the morning, \U0001f355 in the evening"));
 }
