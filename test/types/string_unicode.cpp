@@ -20,7 +20,7 @@ StringType to_hex(CharType ch, std::size_t length)
     }
 
     return hex;
-};
+}
 
 } // namespace
 
