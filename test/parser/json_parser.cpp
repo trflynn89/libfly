@@ -108,7 +108,7 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
     // https://github.com/nst/JSONTestSuite
     // The following files are excluded from this test:
     // - n_structure_100000_opening_arrays.json: Causes stack overflow
-    // - n_structure_open_array_object.json: Too nested, causes stack overflow
+    // - n_structure_open_array_object.json: Causes stack overflow
     // - i_number_double_huge_neg_exp.json: Platform dependent (fails Windows)
 
     // Indeterminate files expected to pass
