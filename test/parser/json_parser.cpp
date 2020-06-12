@@ -107,19 +107,8 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
 {
     // https://github.com/nst/JSONTestSuite
     // The following files are excluded from this test:
-    // - n_single_space.json: Empty files are allowed
     // - n_structure_100000_opening_arrays.json: Causes stack overflow
-    // - n_structure_no_data.json: Empty files are allowed
-    // - n_structure_open_array_object.json: Too nested, causes stack overflow
-    // - n_structure_UTF8_BOM_no_data.json: Empty files are allowed
-    // - y_string_space.json: Only allow objects and arrays
-    // - y_structure_lonely_false.json: Only allow objects and arrays
-    // - y_structure_lonely_int.json: Only allow objects and arrays
-    // - y_structure_lonely_negative_real.json: Only allow objects and arrays
-    // - y_structure_lonely_null.json: Only allow objects and arrays
-    // - y_structure_lonely_string.json: Only allow objects and arrays
-    // - y_structure_lonely_true.json: Only allow objects and arrays
-    // - y_structure_string_empty.json: Only allow objects and arrays
+    // - n_structure_open_array_object.json: Causes stack overflow
     // - i_number_double_huge_neg_exp.json: Platform dependent (fails Windows)
 
     // Indeterminate files expected to pass
@@ -127,6 +116,9 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
         "i_structure_500_nested_arrays.json", // No enforced depth limit
         "i_structure_UTF-8_BOM_empty_object.json", // Byte order mark ignored
     };
+
+    // JSONTestSuite contains test files that aren't only objects or arrays.
+    fly::JsonParser parser(fly::JsonParser::Features::AllowAnyType);
 
     // Get the path to the JSONTestSuite directory.
     const auto here = std::filesystem::path(__FILE__);
@@ -140,21 +132,21 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
 
         if (fly::String::starts_with(file.string(), 'y'))
         {
-            EXPECT_NO_THROW(m_parser.parse_file(it.path()));
+            EXPECT_NO_THROW(parser.parse_file(it.path()));
         }
         else if (fly::String::starts_with(file.string(), 'n'))
         {
-            EXPECT_THROW(m_parser.parse_file(it.path()), fly::ParserException);
+            EXPECT_THROW(parser.parse_file(it.path()), fly::ParserException);
         }
         else if (fly::String::starts_with(file.string(), 'i'))
         {
             if (std::find(i_pass.begin(), i_pass.end(), file) != i_pass.end())
             {
-                EXPECT_NO_THROW(m_parser.parse_file(it.path()));
+                EXPECT_NO_THROW(parser.parse_file(it.path()));
             }
             else
             {
-                EXPECT_THROW(m_parser.parse_file(it.path()), fly::ParserException);
+                EXPECT_THROW(parser.parse_file(it.path()), fly::ParserException);
             }
         }
         else
