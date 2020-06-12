@@ -159,39 +159,100 @@ public:
     static bool wildcard_match(const StringType &source, const StringType &search) noexcept;
 
     /**
-     * Unescape all escaped sequences of unicode characters in a string.
+     * Escape all unicode codepoints in a string.
      *
-     * Accepts the following unicode encodings, where each character n is a hexadecimal digit:
+     * If the unicode codepoint is an ASCII, non-control character (i.e. codepoints in the range
+     * [U+0020, U+007E]), that character is not escaped.
      *
-     *     UTF-8 encodings of the form: \unnnn
-     *     UTF-16 paried surrogate encodings of the form: \unnnn\unnnn
-     *     UTF-32 encodings of the form: \Unnnnnnnn
+     * If the unicode codepoint is non-ASCII or a control character (i.e. codepoints in the range
+     * [U+0000, U+001F] or [U+007F, U+10FFFF]), the codepoint is encoded as follows, taking into
+     * consideration the provided unicode prefix character:
+     *
+     *     1. If the unicode codepoint is in the range [U+0000, U+001F] or [U+007F, U+FFFF],
+     *        regardless of the prefix character, the encoding will be of the form \unnnn.
+     *     2. If the codepoint is in the range [U+10000, U+10FFFF], and the prefix character is 'u',
+     *        the encoding will be a surrogate pair of the form \unnnn\unnnn.
+     *     3. If the codepoint is in the range [U+10000, U+10FFFF], and the prefix character is 'U',
+     *        the encoding will of the form \Unnnnnnnn.
+     *
+     * @tparam UnicodePrefix The unicode prefix character ('u' or 'U').
+     *
+     * @param source The string to escape.
+     *
+     * @return A copy of the source string with all unicode codepoints escaped.
+     *
+     * @throws UnicodeException If any unicode codepoint could not be escaped.
+     */
+    template <char UnicodePrefix = 'U'>
+    static StringType escape_unicode_string(const StringType &source) noexcept(false);
+
+    /**
+     * Escape a single unicode codepoint, starting at the character pointed to by the provided
+     * iterator. If successful, after invoking this method, that iterator will point at the first
+     * character after the unicode codepoint in the source string.
+     *
+     * If the unicode codepoint is an ASCII, non-control character (i.e. codepoints in the range
+     * [U+0020, U+007E]), that character is not escaped.
+     *
+     * If the unicode codepoint is non-ASCII or a control character (i.e. codepoints in the range
+     * [U+0000, U+001F] or [U+007F, U+10FFFF]), the codepoint is encoded as follows, taking into
+     * consideration the provided unicode prefix character:
+     *
+     *     1. If the unicode codepoint is in the range [U+0000, U+001F] or [U+007F, U+FFFF],
+     *        regardless of the prefix character, the encoding will be of the form \unnnn.
+     *     2. If the codepoint is in the range [U+10000, U+10FFFF], and the prefix character is 'u',
+     *        the encoding will be a surrogate pair of the form \unnnn\unnnn.
+     *     3. If the codepoint is in the range [U+10000, U+10FFFF], and the prefix character is 'U',
+     *        the encoding will of the form \Unnnnnnnn.
+     *
+     * @tparam UnicodePrefix The unicode prefix character ('u' or 'U').
+     *
+     * @param it Pointer to the beginning of the unicode codepoint.
+     * @param end Pointer to the end of the unicode codepoint.
+     *
+     * @return A string containing the escaped unicode codepoint.
+     *
+     * @throws UnicodeException If the unicode codepoint could not be escaped.
+     */
+    template <char UnicodePrefix = 'U'>
+    static StringType escape_unicode_character(
+        typename StringType::const_iterator &it,
+        const typename StringType::const_iterator &end) noexcept(false);
+
+    /**
+     * Unescape all unicode codepoints in a string.
+     *
+     * Accepts escaped sequences of the following forms:
+     *
+     *     1. \unnnn for unicode codepoints in the range [U+0000, U+FFFF].
+     *     2. \unnnn\unnnn surrogate pairs for unicode codepoints in the range [U+10000, U+10FFFF].
+     *     3. \Unnnnnnnn for all unicode codepoints.
      *
      * @param source The string containing the escaped character sequence.
      *
-     * @return A copy of the source string with all sequences of unicode characters unescaped.
+     * @return A copy of the source string with all unicode codepoints unescaped.
      *
      * @throws UnicodeException If any escaped sequence is not a valid unicode character.
      */
     static StringType unescape_unicode_string(const StringType &source) noexcept(false);
 
     /**
-     * Unescape a single escaped sequence of unicode characters, starting at the provided iterator.
-     * If successful, after invoking this method, that iterator will point at the first character
-     * after the escaped sequence in the source string.
+     * Unescape a single unicode codepoint, starting at the character pointed to by provided
+     * iterator. If successful, after invoking this method, that iterator will point at the first
+     * character after the escaped sequence in the source string.
      *
-     * Accepts the following unicode encodings, where each character n is a hexadecimal digit:
+     * Accepts escaped sequences of the following forms:
      *
-     *     UTF-8 encodings of the form: \unnnn
-     *     UTF-16 paried surrogate encodings of the form: \unnnn\unnnn
-     *     UTF-32 encodings of the form: \Unnnnnnnn
+     *     1. \unnnn for unicode codepoints in the range [U+0000, U+FFFF].
+     *     2. \unnnn\unnnn surrogate pairs for unicode codepoints in the range [U+10000, U+10FFFF].
+     *     3. \Unnnnnnnn for all unicode codepoints.
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
-     * @return A string containing the unescaped unicode character.
+     * @return A string containing the unescaped unicode codepoint.
      *
-     * @throws UnicodeException If the escaped sequence is not a valid unicode character.
+     * @throws UnicodeException If the escaped sequence is not a valid unicode codepoint.
      */
     static StringType unescape_unicode_character(
         typename StringType::const_iterator &it,
@@ -525,6 +586,36 @@ bool BasicString<StringType>::wildcard_match(
 
 //==================================================================================================
 template <typename StringType>
+template <char UnicodePrefix>
+StringType BasicString<StringType>::escape_unicode_string(const StringType &source) noexcept(false)
+{
+    StringType result;
+    result.reserve(source.size());
+
+    const auto end = source.cend();
+
+    for (auto it = source.cbegin(); it != end;)
+    {
+        result += escape_unicode_character<UnicodePrefix>(it, end);
+    }
+
+    return result;
+}
+
+//==================================================================================================
+template <typename StringType>
+template <char UnicodePrefix>
+StringType BasicString<StringType>::escape_unicode_character(
+    typename StringType::const_iterator &it,
+    const typename StringType::const_iterator &end) noexcept(false)
+{
+    return detail::BasicStringUnicode<StringType>::template escape_character<UnicodePrefix>(
+        it,
+        end);
+}
+
+//==================================================================================================
+template <typename StringType>
 StringType
 BasicString<StringType>::unescape_unicode_string(const StringType &source) noexcept(false)
 {
@@ -539,8 +630,8 @@ BasicString<StringType>::unescape_unicode_string(const StringType &source) noexc
         {
             switch (*(it + 1))
             {
-                case detail::BasicStringUnicode<StringType>::utf8:
-                case detail::BasicStringUnicode<StringType>::utf32:
+                case FLY_CHR(char_type, 'u'):
+                case FLY_CHR(char_type, 'U'):
                     result += unescape_unicode_character(it, end);
                     break;
 
