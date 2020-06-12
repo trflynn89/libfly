@@ -77,6 +77,10 @@ TYPED_TEST(BasicStringTest, Utf8EncodingInvalidContinuationByte)
 
     if constexpr (sizeof(char_type) == 1)
     {
+        auto to_string = [](std::uint32_t ch) -> string_type {
+            return string_type(1, static_cast<char_type>(ch));
+        };
+
         auto validate_fail = [](string_type &&test) {
             SCOPED_TRACE(test.c_str());
 
@@ -88,13 +92,13 @@ TYPED_TEST(BasicStringTest, Utf8EncodingInvalidContinuationByte)
         };
 
         // Second byte of U+1f355 masked with 0b0011'1111.
-        validate_fail(u8"\xf0\x1f\x8d\x9f");
+        validate_fail(to_string(0xf0) + to_string(0x1f) + to_string(0x8d) + to_string(0x9f));
 
         // Third byte of U+1f355 masked with 0b0011'1111.
-        validate_fail(u8"\xf0\x9f\x0d\x9f");
+        validate_fail(to_string(0xf0) + to_string(0x9f) + to_string(0x0d) + to_string(0x9f));
 
         // Fourth byte of U+1f355 masked with 0b0011'1111.
-        validate_fail(u8"\xf0\x9f\x8d\x1f");
+        validate_fail(to_string(0xf0) + to_string(0x9f) + to_string(0x8d) + to_string(0x1f));
     }
 }
 
@@ -212,14 +216,18 @@ TYPED_TEST(BasicStringTest, EncodingNotEnoughData)
 
     if constexpr (sizeof(char_type) == 1)
     {
+        auto to_string = [](std::uint32_t ch) -> string_type {
+            return string_type(1, static_cast<char_type>(ch));
+        };
+
         // First byte of U+1f355.
-        validate_fail(u8"\xf0");
+        validate_fail(to_string(0xf0));
 
         // First two bytes of U+1f355.
-        validate_fail(u8"\xf0\x9f");
+        validate_fail(to_string(0xf0) + to_string(0x9f));
 
         // First three bytes of U+1f355.
-        validate_fail(u8"\xf0\x9f\x8d");
+        validate_fail(to_string(0xf0) + to_string(0x9f) + to_string(0x8d));
     }
     else if constexpr (sizeof(char_type) == 2)
     {
