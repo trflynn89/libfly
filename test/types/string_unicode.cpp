@@ -224,7 +224,7 @@ TYPED_TEST(BasicStringTest, EncodingNotEnoughData)
     else if constexpr (sizeof(char_type) == 2)
     {
         // High surrogate for U+1f355.
-        validate_fail(u"\xd83c");
+        validate_fail(string_type(1, 0xd83c));
     }
     else if constexpr (sizeof(char_type) == 4)
     {
