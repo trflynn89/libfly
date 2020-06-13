@@ -99,6 +99,34 @@ TYPED_TEST(BasicStringTest, Utf8EncodingInvalidContinuationByte)
 }
 
 //==================================================================================================
+TYPED_TEST(BasicStringTest, Utf8EncodingOverlong)
+{
+    DECLARE_ALIASES
+
+    if constexpr (sizeof(char_type) == 1)
+    {
+        auto validate_fail = [](string_type &&test) {
+            SCOPED_TRACE(test.c_str());
+
+            auto begin = test.cbegin();
+            const auto end = test.cend();
+
+            EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
+            EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
+        };
+
+        // U+0021 2-byte overlong encoding.
+        validate_fail("\xc0\xa1");
+
+        // U+0021 3-byte overlong encoding.
+        validate_fail("\xe0\x80\xa1");
+
+        // U+0021 4-byte overlong encoding.
+        validate_fail("\xf0\x80\x80\xa1");
+    }
+}
+
+//==================================================================================================
 TYPED_TEST(BasicStringTest, Utf16EncodingInvalidSurrogates)
 {
     DECLARE_ALIASES

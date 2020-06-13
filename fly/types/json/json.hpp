@@ -702,7 +702,7 @@ private:
     write_escaped_charater(std::ostream &stream, JsonTraits::string_type::value_type ch) noexcept;
 
     /**
-     * Validate a single non-escaped character is compliant.
+     * Validate a single non-escaped character is Unicode compliant.
      *
      * @param stream Stream to pipe the interpreted character into.
      * @param it Pointer to the escaped character.

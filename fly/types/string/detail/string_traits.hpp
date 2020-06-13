@@ -3,6 +3,7 @@
 #include "fly/traits/traits.hpp"
 #include "fly/types/string/detail/string_streamer.hpp"
 
+#include <cstdint>
 #include <string>
 #include <type_traits>
 
@@ -23,6 +24,7 @@ struct BasicStringTraits
      */
     using size_type = typename StringType::size_type;
     using char_type = typename StringType::value_type;
+    using codepoint_type = std::uint32_t;
 
     using streamer_type = BasicStringStreamer<StringType>;
 
