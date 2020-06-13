@@ -25,6 +25,7 @@ TYPED_TEST_SUITE(BasicStringTest, StringTypes, );
     using traits [[maybe_unused]] = typename fly::detail::BasicStringTraits<string_type>;          \
     using char_type [[maybe_unused]] = typename StringClass::char_type;                            \
     using char_pointer_type [[maybe_unused]] = typename std::add_pointer<char_type>::type;         \
+    using codepoint_type [[maybe_unused]] = typename StringClass::codepoint_type;                  \
     using size_type [[maybe_unused]] = typename StringClass::size_type;                            \
     using streamed_type [[maybe_unused]] = typename StringClass::streamed_type;                    \
     using streamed_char [[maybe_unused]] = typename streamed_type::value_type;                     \
