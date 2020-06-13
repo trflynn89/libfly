@@ -222,16 +222,18 @@
     <ClCompile Include="..\..\..\test\types\json_exception.cpp" />
     <ClCompile Include="..\..\..\test\types\json_iterator.cpp" />
     <ClCompile Include="..\..\..\test\types\json_traits.cpp" />
-    <ClCompile Include="..\..\..\test\types\json_unicode.cpp" />
     <ClCompile Include="..\..\..\test\types\literals.cpp" />
     <ClCompile Include="..\..\..\test\types\string.cpp" />
+    <ClCompile Include="..\..\..\test\types\string_formatter.cpp" />
     <ClCompile Include="..\..\..\test\types\string_traits.cpp" />
+    <ClCompile Include="..\..\..\test\types\string_unicode.cpp" />
     <ClCompile Include="..\..\..\test\util\capture_stream.cpp" />
     <ClCompile Include="..\..\..\test\util\path_util.cpp" />
     <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\config\test_config.hpp" />
+    <ClInclude Include="..\..\..\test\types\string_test.hpp" />
     <ClInclude Include="..\..\..\test\util\capture_stream.hpp" />
     <ClInclude Include="..\..\..\test\util\path_util.hpp" />
     <ClInclude Include="..\..\..\test\util\waitable_task_runner.hpp" />

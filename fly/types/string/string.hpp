@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/types/string/detail/string_converter.hpp"
+#include "fly/types/string/detail/string_formatter.hpp"
 #include "fly/types/string/detail/string_streamer.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/string_unicode.hpp"
@@ -48,6 +49,7 @@ public:
     using char_type = typename traits::char_type;
     using ostream_type = typename traits::ostream_type;
     using streamed_type = typename traits::streamer_type::streamed_type;
+    using codepoint_type = typename traits::codepoint_type;
 
     /**
      * Split a string into a vector of strings.
@@ -158,35 +160,118 @@ public:
     static bool wildcard_match(const StringType &source, const StringType &search) noexcept;
 
     /**
-     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
-     * surrogate encodings.
+     * Decode a single unicode codepoint, starting at the character pointed to by the provided
+     * iterator. If successful, after invoking this method, that iterator will point at the first
+     * character after the unicode codepoint in the source string.
      *
-     * Input sequences must be of the form: (\u[0-9a-fA-F]{4}){1,2}
+     * @param it Pointer to the beginning of the encoded unicode codepoint.
+     * @param end Pointer to the end of the encoded unicode codepoint.
+     *
+     * @return The decoded unicode codepoint.
+     *
+     * @throws UnicodeException If the encoded unicode codepoint is invalid.
+     */
+    static codepoint_type decode_unicode_character(
+        typename StringType::const_iterator &it,
+        const typename StringType::const_iterator &end) noexcept(false);
+
+    /**
+     * Escape all unicode codepoints in a string.
+     *
+     * If the unicode codepoint is an ASCII, non-control character (i.e. codepoints in the range
+     * [U+0020, U+007E]), that character is not escaped.
+     *
+     * If the unicode codepoint is non-ASCII or a control character (i.e. codepoints in the range
+     * [U+0000, U+001F] or [U+007F, U+10FFFF]), the codepoint is encoded as follows, taking into
+     * consideration the provided unicode prefix character:
+     *
+     *     1. If the unicode codepoint is in the range [U+0000, U+001F] or [U+007F, U+FFFF],
+     *        regardless of the prefix character, the encoding will be of the form \unnnn.
+     *     2. If the codepoint is in the range [U+10000, U+10FFFF], and the prefix character is 'u',
+     *        the encoding will be a surrogate pair of the form \unnnn\unnnn.
+     *     3. If the codepoint is in the range [U+10000, U+10FFFF], and the prefix character is 'U',
+     *        the encoding will of the form \Unnnnnnnn.
+     *
+     * @tparam UnicodePrefix The unicode prefix character ('u' or 'U').
+     *
+     * @param source The string to escape.
+     *
+     * @return A copy of the source string with all unicode codepoints escaped.
+     *
+     * @throws UnicodeException If any unicode codepoint could not be escaped.
+     */
+    template <char UnicodePrefix = 'U'>
+    static StringType escape_unicode_string(const StringType &source) noexcept(false);
+
+    /**
+     * Escape a single unicode codepoint, starting at the character pointed to by the provided
+     * iterator. If successful, after invoking this method, that iterator will point at the first
+     * character after the unicode codepoint in the source string.
+     *
+     * If the unicode codepoint is an ASCII, non-control character (i.e. codepoints in the range
+     * [U+0020, U+007E]), that character is not escaped.
+     *
+     * If the unicode codepoint is non-ASCII or a control character (i.e. codepoints in the range
+     * [U+0000, U+001F] or [U+007F, U+10FFFF]), the codepoint is encoded as follows, taking into
+     * consideration the provided unicode prefix character:
+     *
+     *     1. If the unicode codepoint is in the range [U+0000, U+001F] or [U+007F, U+FFFF],
+     *        regardless of the prefix character, the encoding will be of the form \unnnn.
+     *     2. If the codepoint is in the range [U+10000, U+10FFFF], and the prefix character is 'u',
+     *        the encoding will be a surrogate pair of the form \unnnn\unnnn.
+     *     3. If the codepoint is in the range [U+10000, U+10FFFF], and the prefix character is 'U',
+     *        the encoding will of the form \Unnnnnnnn.
+     *
+     * @tparam UnicodePrefix The unicode prefix character ('u' or 'U').
+     *
+     * @param it Pointer to the beginning of the encoded unicode codepoint.
+     * @param end Pointer to the end of the encoded unicode codepoint.
+     *
+     * @return A string containing the escaped unicode codepoint.
+     *
+     * @throws UnicodeException If the unicode codepoint could not be escaped.
+     */
+    template <char UnicodePrefix = 'U'>
+    static StringType escape_unicode_character(
+        typename StringType::const_iterator &it,
+        const typename StringType::const_iterator &end) noexcept(false);
+
+    /**
+     * Unescape all unicode codepoints in a string.
+     *
+     * Accepts escaped sequences of the following forms:
+     *
+     *     1. \unnnn for unicode codepoints in the range [U+0000, U+FFFF].
+     *     2. \unnnn\unnnn surrogate pairs for unicode codepoints in the range [U+10000, U+10FFFF].
+     *     3. \Unnnnnnnn for all unicode codepoints.
      *
      * @param source The string containing the escaped character sequence.
      *
-     * @return The parsed unicode character.
+     * @return A copy of the source string with all unicode codepoints unescaped.
      *
-     * @throws UnicodeException If the interpreted unicode character is not valid or there weren't
-     *         enough available bytes.
+     * @throws UnicodeException If any escaped sequence is not a valid unicode character.
      */
-    static StringType parse_unicode_character(const StringType &source) noexcept(false);
+    static StringType unescape_unicode_string(const StringType &source) noexcept(false);
 
     /**
-     * Parse an escaped sequence of unicode characters. Accepts UTF-8 encodings and UTF-16 paired
-     * surrogate encodings.
+     * Unescape a single unicode codepoint, starting at the character pointed to by provided
+     * iterator. If successful, after invoking this method, that iterator will point at the first
+     * character after the escaped sequence in the source string.
      *
-     * Input sequences must be of the form: (\u[0-9a-fA-F]{4}){1,2}
+     * Accepts escaped sequences of the following forms:
+     *
+     *     1. \unnnn for unicode codepoints in the range [U+0000, U+FFFF].
+     *     2. \unnnn\unnnn surrogate pairs for unicode codepoints in the range [U+10000, U+10FFFF].
+     *     3. \Unnnnnnnn for all unicode codepoints.
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
-     * @return The parsed unicode character.
+     * @return A string containing the unescaped unicode codepoint.
      *
-     * @throws UnicodeException If the interpreted unicode character is not valid or there weren't
-     *         enough available bytes.
+     * @throws UnicodeException If the escaped sequence is not a valid unicode codepoint.
      */
-    static StringType parse_unicode_character(
+    static StringType unescape_unicode_character(
         typename StringType::const_iterator &it,
         const typename StringType::const_iterator &end) noexcept(false);
 
@@ -278,22 +363,6 @@ public:
 
 private:
     /**
-     * Recursively format a string with one argument. The result is streamed into the given ostream.
-     */
-    template <typename T, typename... Args>
-    static void format_internal(
-        ostream_type &ostream,
-        const char_type *fmt,
-        const T &value,
-        const Args &... args) noexcept;
-
-    /**
-     * Terminator for the variadic template formatter. Stream the rest of the string into the given
-     * ostream.
-     */
-    static void format_internal(ostream_type &ostream, const char_type *fmt) noexcept;
-
-    /**
      * Recursively join one argument into the given ostream.
      */
     template <typename T, typename... Args>
@@ -309,12 +378,6 @@ private:
     template <typename T>
     static void
     join_internal(ostream_type &ostream, const char_type &separator, const T &value) noexcept;
-
-    /**
-     * Stream the given value into the given stream.
-     */
-    template <typename T>
-    static void stream(ostream_type &ostream, const T &value) noexcept;
 
     /**
      * A list of alpha-numeric characters in the range [0-9A-Za-z].
@@ -540,22 +603,85 @@ bool BasicString<StringType>::wildcard_match(
 
 //==================================================================================================
 template <typename StringType>
-StringType
-BasicString<StringType>::parse_unicode_character(const StringType &source) noexcept(false)
+auto BasicString<StringType>::decode_unicode_character(
+    typename StringType::const_iterator &it,
+    const typename StringType::const_iterator &end) noexcept(false) -> codepoint_type
 {
-    auto begin = source.cbegin();
-    const auto end = source.cend();
-
-    return parse_unicode_character(begin, end);
+    return detail::BasicStringUnicode<StringType>::decode_character(it, end);
 }
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicString<StringType>::parse_unicode_character(
+template <char UnicodePrefix>
+StringType BasicString<StringType>::escape_unicode_string(const StringType &source) noexcept(false)
+{
+    StringType result;
+    result.reserve(source.size());
+
+    const auto end = source.cend();
+
+    for (auto it = source.cbegin(); it != end;)
+    {
+        result += escape_unicode_character<UnicodePrefix>(it, end);
+    }
+
+    return result;
+}
+
+//==================================================================================================
+template <typename StringType>
+template <char UnicodePrefix>
+StringType BasicString<StringType>::escape_unicode_character(
     typename StringType::const_iterator &it,
     const typename StringType::const_iterator &end) noexcept(false)
 {
-    return detail::BasicStringUnicode<StringType>::parse_character(it, end);
+    return detail::BasicStringUnicode<StringType>::template escape_character<UnicodePrefix>(
+        it,
+        end);
+}
+
+//==================================================================================================
+template <typename StringType>
+StringType
+BasicString<StringType>::unescape_unicode_string(const StringType &source) noexcept(false)
+{
+    StringType result;
+    result.reserve(source.size());
+
+    const auto end = source.cend();
+
+    for (auto it = source.cbegin(); it != end;)
+    {
+        if ((*it == '\\') && ((it + 1) != end))
+        {
+            switch (*(it + 1))
+            {
+                case FLY_CHR(char_type, 'u'):
+                case FLY_CHR(char_type, 'U'):
+                    result += unescape_unicode_character(it, end);
+                    break;
+
+                default:
+                    result += *(it++);
+                    break;
+            }
+        }
+        else
+        {
+            result += *(it++);
+        }
+    }
+
+    return result;
+}
+
+//==================================================================================================
+template <typename StringType>
+StringType BasicString<StringType>::unescape_unicode_character(
+    typename StringType::const_iterator &it,
+    const typename StringType::const_iterator &end) noexcept(false)
+{
+    return detail::BasicStringUnicode<StringType>::unescape_character(it, end);
 }
 
 //==================================================================================================
@@ -590,11 +716,7 @@ template <typename... Args>
 auto BasicString<StringType>::format(const char_type *fmt, const Args &... args) noexcept
     -> streamed_type
 {
-    typename traits::ostringstream_type ostream;
-    ostream.precision(6);
-
-    format(ostream, fmt, args...);
-    return ostream.str();
+    return detail::BasicStringFormatter<StringType>::format(fmt, args...);
 }
 
 //==================================================================================================
@@ -605,110 +727,7 @@ auto BasicString<StringType>::format(
     const char_type *fmt,
     const Args &... args) noexcept -> ostream_type &
 {
-    if (fmt != nullptr)
-    {
-        format_internal(ostream, fmt, args...);
-    }
-
-    return ostream;
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename T, typename... Args>
-void BasicString<StringType>::format_internal(
-    ostream_type &ostream,
-    const char_type *fmt,
-    const T &value,
-    const Args &... args) noexcept
-{
-    const std::ios_base::fmtflags flags(ostream.flags());
-
-    for (; *fmt != '\0'; ++fmt)
-    {
-        if (*fmt == '%')
-        {
-            const char_type type = *(fmt + 1);
-
-            switch (type)
-            {
-                case '\0':
-                    stream(ostream, *fmt);
-                    return;
-
-                case '%':
-                    stream(ostream, *(++fmt));
-                    continue;
-
-                case 'x':
-                    ostream << "0x" << std::hex << std::nouppercase;
-                    break;
-                case 'X':
-                    ostream << "0X" << std::hex << std::uppercase;
-                    break;
-
-                case 'o':
-                    ostream << '0' << std::oct;
-                    break;
-
-                case 'a':
-                    ostream << std::hexfloat << std::nouppercase;
-                    break;
-                case 'A':
-                    ostream << std::hexfloat << std::uppercase;
-                    break;
-
-                case 'f':
-                    ostream << std::fixed << std::nouppercase;
-                    break;
-                case 'F':
-                    ostream << std::fixed << std::uppercase;
-                    break;
-
-                case 'g':
-                    ostream << std::nouppercase;
-                    break;
-                case 'G':
-                    ostream << std::uppercase;
-                    break;
-
-                case 'e':
-                    ostream << std::scientific << std::nouppercase;
-                    break;
-                case 'E':
-                    ostream << std::scientific << std::uppercase;
-                    break;
-
-                default:
-                    break;
-            }
-
-            stream(ostream, value);
-            ostream.flags(flags);
-
-            format_internal(ostream, fmt + 2, args...);
-            return;
-        }
-
-        stream(ostream, *fmt);
-    }
-}
-
-//==================================================================================================
-template <typename StringType>
-void BasicString<StringType>::format_internal(ostream_type &ostream, const char_type *fmt) noexcept
-{
-    for (; *fmt != '\0'; ++fmt)
-    {
-        if ((*fmt == '%') && (*(fmt + 1) == '%'))
-        {
-            stream(ostream, *(++fmt));
-        }
-        else
-        {
-            stream(ostream, *fmt);
-        }
-    }
+    return detail::BasicStringFormatter<StringType>::format(ostream, fmt, args...);
 }
 
 //==================================================================================================
@@ -732,8 +751,8 @@ void BasicString<StringType>::join_internal(
     const T &value,
     const Args &... args) noexcept
 {
-    stream(ostream, value);
-    stream(ostream, separator);
+    detail::BasicStringFormatter<StringType>::stream(ostream, value);
+    detail::BasicStringFormatter<StringType>::stream(ostream, separator);
 
     join_internal(ostream, separator, args...);
 }
@@ -746,27 +765,7 @@ void BasicString<StringType>::join_internal(
     const char_type &,
     const T &value) noexcept
 {
-    stream(ostream, value);
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename T>
-void BasicString<StringType>::stream(ostream_type &ostream, const T &value) noexcept
-{
-    if constexpr (
-        std::is_same_v<char_type, std::decay_t<T>> || traits::template is_string_like_v<T>)
-    {
-        detail::BasicStringStreamer<StringType>::stream(ostream, value);
-    }
-    else if constexpr (traits::OstreamTraits::template is_declared_v<T>)
-    {
-        ostream << std::boolalpha << value;
-    }
-    else
-    {
-        ostream << '[' << std::hex << &value << std::dec << ']';
-    }
+    detail::BasicStringFormatter<StringType>::stream(ostream, value);
 }
 
 //==================================================================================================
@@ -786,7 +785,7 @@ T BasicString<StringType>::convert(const StringType &value) noexcept(
     else
     {
         typename traits::ostringstream_type ostream;
-        stream(ostream, value);
+        detail::BasicStringFormatter<StringType>::stream(ostream, value);
 
         return detail::BasicStringConverter<streamed_type, T>::convert(ostream.str());
     }

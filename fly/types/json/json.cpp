@@ -590,11 +590,6 @@ JsonTraits::string_type Json::validate_string(const JsonTraits::string_type &str
         else
         {
             validate_character(stream, it, end);
-
-            if (it != end)
-            {
-                ++it;
-            }
         }
     }
 
@@ -644,7 +639,7 @@ void Json::read_escaped_character(
             try
             {
                 // The input sequence is expected to begin with the reverse solidus character.
-                stream << String::parse_unicode_character(--it, end);
+                stream << String::unescape_unicode_character(--it, end);
             }
             catch (const StringException &ex)
             {
@@ -710,149 +705,32 @@ void Json::validate_character(
     JsonTraits::string_type::const_iterator &it,
     const JsonTraits::string_type::const_iterator &end) noexcept(false)
 {
-    auto c = static_cast<unsigned char>(*it);
+    const std::uint8_t ch = static_cast<std::uint8_t>(*it);
+    auto start = it;
 
-    auto next = [&stream, &c, &it, &end]() -> bool {
-        stream << *it;
-
-        if (++it == end)
-        {
-            return false;
-        }
-
-        c = static_cast<unsigned char>(*it);
-        return true;
-    };
-
-    auto invalid = [&c](int location) {
-        throw JsonException(
-            String::format("Invalid control character '%x' (location %d)", int(c), location));
-    };
-
-    // Invalid control characters
-    if (c <= 0x1f)
+    if (ch <= 0x1f)
     {
-        invalid(1);
+        throw JsonException(String::format("Control character '%x' must be escaped", int(ch)));
+    }
+    else if ((ch == 0x22) || (ch == 0x5c))
+    {
+        throw JsonException(String::format("Quote character '%c' must be escaped", char(ch)));
     }
 
-    // Quote or reverse solidus
-    else if ((c == 0x22) || (c == 0x5c))
+    try
     {
-        invalid(2);
+        String::decode_unicode_character(it, end);
+    }
+    catch (const StringException &ex)
+    {
+        throw JsonException(ex.what());
     }
 
-    // Valid ASCII character
-    else if ((c >= 0x20) && (c <= 0x7f))
+    // The iterator is now incremented past the encoded unicode codepoint.
+    for (; start < it; ++start)
     {
+        stream << *start;
     }
-
-    // U+0080..U+07FF: bytes C2..DF 80..BF
-    else if ((c >= 0xc2) && (c <= 0xdf))
-    {
-        if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(3);
-        }
-    }
-
-    // U+0800..U+0FFF: bytes E0 A0..BF 80..BF
-    else if (c == 0xe0)
-    {
-        if (!next() || (c < 0xa0) || (c > 0xbf))
-        {
-            invalid(4);
-        }
-        else if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(5);
-        }
-    }
-
-    // U+1000..U+CFFF: bytes E1..EC 80..BF 80..BF
-    // U+E000..U+FFFF: bytes EE..EF 80..BF 80..BF
-    else if (((c >= 0xe1) && (c <= 0xec)) || (c == 0xee) || (c == 0xef))
-    {
-        if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(6);
-        }
-        else if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(7);
-        }
-    }
-
-    // U+D000..U+D7FF: bytes ED 80..9F 80..BF
-    else if (c == 0xed)
-    {
-        if (!next() || (c < 0x80) || (c > 0x9f))
-        {
-            invalid(8);
-        }
-        else if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(9);
-        }
-    }
-
-    // U+10000..U+3FFFF: bytes F0 90..BF 80..BF 80..BF
-    else if (c == 0xf0)
-    {
-        if (!next() || (c < 0x90) || (c > 0xbf))
-        {
-            invalid(10);
-        }
-        else if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(11);
-        }
-        else if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(12);
-        }
-    }
-
-    // U+40000..U+FFFFF: bytes F1..F3 80..BF 80..BF 80..BF
-    else if ((c >= 0xf1) && (c <= 0xf3))
-    {
-        if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(13);
-        }
-        else if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(14);
-        }
-        else if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(15);
-        }
-    }
-
-    // U+100000..U+10FFFF: bytes F4 80..8F 80..BF 80..BF
-    else if (c == 0xf4)
-    {
-        if (!next() || (c < 0x80) || (c > 0x8f))
-        {
-            invalid(16);
-        }
-        else if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(17);
-        }
-        else if (!next() || (c < 0x80) || (c > 0xbf))
-        {
-            invalid(18);
-        }
-    }
-
-    // Remaining bytes (80..C1 and F5..FF) are ill-formed
-    else
-    {
-        invalid(19);
-    }
-
-    stream << *it;
 }
 
 } // namespace fly

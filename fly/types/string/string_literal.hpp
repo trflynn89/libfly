@@ -9,15 +9,60 @@
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 23, 2019
  */
+#define FLY_CHR(type, ch) (fly::BasicCharacterLiteral<type>::literal(u8##ch, L##ch, u##ch, U##ch))
 #define FLY_STR(type, str) (fly::BasicStringLiteral<type>::literal(u8##str, L##str, u##str, U##str))
 
+#define FLY_SYS_CHR(str) FLY_CH(std::filesystem::path::value_type, str)
 #define FLY_SYS_STR(str) FLY_STR(std::filesystem::path::value_type, str)
 
 namespace fly {
 
 //==================================================================================================
 template <typename CharType>
+struct BasicCharacterLiteral;
+
+template <typename CharType>
 struct BasicStringLiteral;
+
+//==================================================================================================
+template <>
+struct BasicCharacterLiteral<char>
+{
+    static constexpr char literal(const char ch, const wchar_t, const char16_t, const char32_t)
+    {
+        return ch;
+    }
+};
+
+//==================================================================================================
+template <>
+struct BasicCharacterLiteral<wchar_t>
+{
+    static constexpr wchar_t literal(const char, const wchar_t ch, const char16_t, const char32_t)
+    {
+        return ch;
+    }
+};
+
+//==================================================================================================
+template <>
+struct BasicCharacterLiteral<char16_t>
+{
+    static constexpr char16_t literal(const char, const wchar_t, const char16_t ch, const char32_t)
+    {
+        return ch;
+    }
+};
+
+//==================================================================================================
+template <>
+struct BasicCharacterLiteral<char32_t>
+{
+    static constexpr char32_t literal(const char, const wchar_t, const char16_t, const char32_t ch)
+    {
+        return ch;
+    }
+};
 
 //==================================================================================================
 template <>

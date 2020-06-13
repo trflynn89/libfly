@@ -36,6 +36,27 @@ TEST(JsonTest, StringConstructor)
 }
 
 //==================================================================================================
+TEST(JsonTest, InvalidStringConstructor)
+{
+    // Reverse solidus must be followed by a valid escape symbol.
+    EXPECT_THROW(fly::Json("\\"), fly::JsonException);
+    EXPECT_THROW(fly::Json("\\U"), fly::JsonException);
+
+    // Quotes must be escaped.
+    EXPECT_THROW(fly::Json("\""), fly::JsonException);
+
+    // Control characters must be escaped.
+    for (fly::JsonTraits::string_type::value_type ch = 0; ch <= 0x1f; ++ch)
+    {
+        EXPECT_THROW(fly::Json(fly::JsonTraits::string_type(1, ch)), fly::JsonException);
+    }
+
+    // Characters must be valid Unicode.
+    EXPECT_THROW(fly::Json("\xed\xa0\x80"), fly::JsonException); // Reserved codepoint.
+    EXPECT_THROW(fly::Json("\xf4\x90\x80\x80"), fly::JsonException); // Out-of-range codepoint.
+}
+
+//==================================================================================================
 TEST(JsonTest, ObjectConstructor)
 {
     std::map<std::string, int> map = {{"a", 1}, {"b", 2}};

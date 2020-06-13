@@ -2,30 +2,14 @@
 
 #include "fly/traits/traits.hpp"
 #include "fly/types/string/string_literal.hpp"
+#include "test/types/string_test.hpp"
 
 #include <gtest/gtest.h>
 
 #include <string>
+#include <type_traits>
 
 namespace {
-
-//==================================================================================================
-template <typename StringType>
-class Streamable
-{
-public:
-    using ostream_type =
-        typename fly::detail::BasicStringTraits<StringType>::streamer_type::ostream_type;
-
-    friend ostream_type &operator<<(ostream_type &, const Streamable &)
-    {
-    }
-};
-
-//==================================================================================================
-class NotStreamable
-{
-};
 
 //==================================================================================================
 template <
@@ -75,21 +59,9 @@ constexpr int call_stoi(const StringType &) noexcept
 } // namespace
 
 //==================================================================================================
-template <typename T>
-struct BasicStringTraitsTest : public ::testing::Test
+TYPED_TEST(BasicStringTest, StoiFamily)
 {
-    using string_base_type = T;
-};
-
-using StringTypes = ::testing::Types<std::string, std::wstring, std::u16string, std::u32string>;
-
-TYPED_TEST_SUITE(BasicStringTraitsTest, StringTypes, );
-
-//==================================================================================================
-TYPED_TEST(BasicStringTraitsTest, StoiFamily)
-{
-    using string_type = typename TestFixture::string_base_type;
-    using traits = typename fly::detail::BasicStringTraits<string_type>;
+    DECLARE_ALIASES
 
     constexpr bool is_string = std::is_same_v<string_type, std::string>;
     constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
@@ -98,10 +70,9 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamily)
 }
 
 //==================================================================================================
-TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAE)
+TYPED_TEST(BasicStringTest, StoiFamilySFINAE)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using char_type = typename string_type::value_type;
+    DECLARE_ALIASES
 
     constexpr bool is_string = std::is_same_v<string_type, std::string>;
     constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
@@ -120,10 +91,9 @@ TYPED_TEST(BasicStringTraitsTest, StoiFamilySFINAE)
 }
 
 //==================================================================================================
-TYPED_TEST(BasicStringTraitsTest, StringLike)
+TYPED_TEST(BasicStringTest, StringLike)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using traits = typename fly::detail::BasicStringTraits<string_type>;
+    DECLARE_ALIASES
 
     constexpr bool is_string = std::is_same_v<string_type, std::string>;
     constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
@@ -232,11 +202,9 @@ TYPED_TEST(BasicStringTraitsTest, StringLike)
 }
 
 //==================================================================================================
-TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAE)
+TYPED_TEST(BasicStringTest, StringLikeSFINAE)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using char_type = typename string_type::value_type;
-    using char_pointer_type = typename std::add_pointer<char_type>::type;
+    DECLARE_ALIASES
 
     EXPECT_TRUE(is_string_like(string_type()));
     EXPECT_TRUE(is_string_like(char_pointer_type()));
@@ -246,13 +214,11 @@ TYPED_TEST(BasicStringTraitsTest, StringLikeSFINAE)
 }
 
 //==================================================================================================
-TYPED_TEST(BasicStringTraitsTest, OstreamTraits)
+TYPED_TEST(BasicStringTest, OstreamTraits)
 {
-    using string_type = typename TestFixture::string_base_type;
-    using traits = typename fly::detail::BasicStringTraits<string_type>;
-    using streamed_type = typename traits::streamer_type::streamed_type;
+    DECLARE_ALIASES
 
-    const Streamable<streamed_type> obj1;
+    const Streamable<streamed_type> obj1(FLY_STR(streamed_char, "hi"), 0xbeef);
     const NotStreamable obj2;
 
     EXPECT_TRUE(traits::OstreamTraits::template is_declared_v<int>);

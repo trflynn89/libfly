@@ -1,58 +1,17 @@
 #include "fly/types/string/string.hpp"
 
-#include "fly/fly.hpp"
 #include "fly/types/numeric/literals.hpp"
-#include "fly/types/string/string_exception.hpp"
+#include "test/types/string_test.hpp"
 
 #include <gtest/gtest.h>
 
-#include <cmath>
 #include <limits>
 #include <regex>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace {
-
-//==================================================================================================
-template <typename StringType>
-class Streamable
-{
-public:
-    using ostream_type = typename fly::BasicString<StringType>::ostream_type;
-
-    Streamable(const StringType &str, int num) noexcept : m_str(str), m_num(num)
-    {
-    }
-
-    StringType str() const noexcept
-    {
-        return m_str;
-    };
-
-    int num() const noexcept
-    {
-        return m_num;
-    };
-
-    friend ostream_type &operator<<(ostream_type &stream, const Streamable &obj)
-    {
-        stream << '[';
-        stream << obj.str() << ' ' << std::hex << obj.num() << std::dec;
-        stream << ']';
-
-        return stream;
-    }
-
-private:
-    StringType m_str;
-    int m_num;
-};
-
-//==================================================================================================
-class NotStreamable
-{
-};
 
 //==================================================================================================
 template <typename StringType, typename T>
@@ -87,26 +46,6 @@ StringType maxstr() noexcept
 }
 
 } // namespace
-
-//==================================================================================================
-template <typename T>
-struct BasicStringTest : public ::testing::Test
-{
-    using string_base_type = T;
-};
-
-using StringTypes = ::testing::Types<std::string, std::wstring, std::u16string, std::u32string>;
-
-TYPED_TEST_SUITE(BasicStringTest, StringTypes, );
-
-#define DECLARE_ALIASES                                                                            \
-    using string_type [[maybe_unused]] = typename TestFixture::string_base_type;                   \
-    using StringClass [[maybe_unused]] = fly::BasicString<string_type>;                            \
-    using char_type [[maybe_unused]] = typename StringClass::char_type;                            \
-    using size_type [[maybe_unused]] = typename StringClass::size_type;                            \
-    using streamed_type [[maybe_unused]] = typename StringClass::streamed_type;                    \
-    using streamed_char [[maybe_unused]] = typename streamed_type::value_type;                     \
-    using ustreamed_char [[maybe_unused]] = std::make_unsigned_t<streamed_char>;
 
 //==================================================================================================
 TYPED_TEST(BasicStringTest, Split)
@@ -461,61 +400,6 @@ TYPED_TEST(BasicStringTest, Wildcard)
 }
 
 //==================================================================================================
-TYPED_TEST(BasicStringTest, UnicodeConversion)
-{
-    DECLARE_ALIASES
-
-    auto validate_fail = [](const char_type *test) {
-        SCOPED_TRACE(test);
-
-        EXPECT_THROW(StringClass::parse_unicode_character(test), fly::UnicodeException);
-    };
-
-    auto validate_pass = [](const char_type *test, string_type &&expected) {
-        SCOPED_TRACE(test);
-
-        string_type actual;
-        EXPECT_NO_THROW(actual = StringClass::parse_unicode_character(test));
-        EXPECT_EQ(actual, expected);
-    };
-
-    validate_fail(FLY_STR(char_type, "\\u"));
-    validate_fail(FLY_STR(char_type, "\\u0"));
-    validate_fail(FLY_STR(char_type, "\\u00"));
-    validate_fail(FLY_STR(char_type, "\\u000"));
-    validate_fail(FLY_STR(char_type, "\\u000z"));
-
-    validate_pass(FLY_STR(char_type, "\\u0040"), FLY_STR(char_type, "\u0040"));
-    validate_pass(FLY_STR(char_type, "\\u007A"), FLY_STR(char_type, "\u007A"));
-    validate_pass(FLY_STR(char_type, "\\u007a"), FLY_STR(char_type, "\u007a"));
-    validate_pass(FLY_STR(char_type, "\\u00c4"), FLY_STR(char_type, "\u00c4"));
-    validate_pass(FLY_STR(char_type, "\\u00e4"), FLY_STR(char_type, "\u00e4"));
-    validate_pass(FLY_STR(char_type, "\\u0298"), FLY_STR(char_type, "\u0298"));
-    validate_pass(FLY_STR(char_type, "\\u0800"), FLY_STR(char_type, "\u0800"));
-    validate_pass(FLY_STR(char_type, "\\uffff"), FLY_STR(char_type, "\uffff"));
-
-    validate_fail(FLY_STR(char_type, "\\uDC00"));
-    validate_fail(FLY_STR(char_type, "\\uDFFF"));
-    validate_fail(FLY_STR(char_type, "\\uD800"));
-    validate_fail(FLY_STR(char_type, "\\uDBFF"));
-    validate_fail(FLY_STR(char_type, "\\uD800\\u"));
-    validate_fail(FLY_STR(char_type, "\\uD800\\z"));
-    validate_fail(FLY_STR(char_type, "\\uD800\\u0"));
-    validate_fail(FLY_STR(char_type, "\\uD800\\u00"));
-    validate_fail(FLY_STR(char_type, "\\uD800\\u000"));
-    validate_fail(FLY_STR(char_type, "\\uD800\\u0000"));
-    validate_fail(FLY_STR(char_type, "\\uD800\\u000z"));
-    validate_fail(FLY_STR(char_type, "\\uD800\\uDBFF"));
-    validate_fail(FLY_STR(char_type, "\\uD800\\uE000"));
-    validate_fail(FLY_STR(char_type, "\\uD800\\uFFFF"));
-
-    validate_pass(FLY_STR(char_type, "\\uD800\\uDC00"), FLY_STR(char_type, "\U00010000"));
-    validate_pass(FLY_STR(char_type, "\\uD803\\uDE6D"), FLY_STR(char_type, "\U00010E6D"));
-    validate_pass(FLY_STR(char_type, "\\uD834\\uDD1E"), FLY_STR(char_type, "\U0001D11E"));
-    validate_pass(FLY_STR(char_type, "\\uDBFF\\uDFFF"), FLY_STR(char_type, "\U0010FFFF"));
-}
-
-//==================================================================================================
 TYPED_TEST(BasicStringTest, GenerateRandomString)
 {
     DECLARE_ALIASES
@@ -524,193 +408,6 @@ TYPED_TEST(BasicStringTest, GenerateRandomString)
 
     const auto random = StringClass::generate_random_string(s_size);
     EXPECT_EQ(s_size, random.size());
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, Format)
-{
-    DECLARE_ALIASES
-
-    streamed_type expected;
-    const char_type *format;
-    string_type arg;
-
-    EXPECT_EQ(streamed_type(), StringClass::format(FLY_STR(char_type, "")));
-
-    expected = FLY_STR(streamed_char, "%");
-    format = FLY_STR(char_type, "%");
-    EXPECT_EQ(expected, StringClass::format(format));
-    EXPECT_EQ(expected, StringClass::format(format, 1));
-
-    expected = FLY_STR(streamed_char, "%");
-    format = FLY_STR(char_type, "%%");
-    EXPECT_EQ(expected, StringClass::format(format));
-
-    expected = FLY_STR(streamed_char, "2.100000% 1");
-    format = FLY_STR(char_type, "%f%% %d");
-    EXPECT_EQ(expected, StringClass::format(format, 2.1f, 1));
-
-    expected = FLY_STR(streamed_char, "This is a test");
-    format = FLY_STR(char_type, "This is a test");
-    EXPECT_EQ(expected, StringClass::format(format));
-
-    expected = FLY_STR(streamed_char, "there are no formatters");
-    format = FLY_STR(char_type, "there are no formatters");
-    EXPECT_EQ(expected, StringClass::format(format, 1, 2, 3, 4));
-
-    expected = FLY_STR(streamed_char, "test some string s");
-    format = FLY_STR(char_type, "test %s %c");
-    arg = FLY_STR(char_type, "some string");
-    EXPECT_EQ(expected, StringClass::format(format, arg, 's'));
-
-    expected = FLY_STR(streamed_char, "test 1 true 2.100000 false 1.230000e+02 0xff");
-    format = FLY_STR(char_type, "test %d %d %f %d %e %x");
-    EXPECT_EQ(expected, StringClass::format(format, 1, true, 2.1f, false, 123.0, 255));
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, FormatTest_d)
-{
-    DECLARE_ALIASES
-
-    const char_type *format;
-
-    format = FLY_STR(char_type, "%d");
-    EXPECT_EQ(FLY_STR(streamed_char, "%d"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "1"), StringClass::format(format, 1));
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, FormatTest_i)
-{
-    DECLARE_ALIASES
-
-    const char_type *format;
-
-    format = FLY_STR(char_type, "%i");
-    EXPECT_EQ(FLY_STR(streamed_char, "%i"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "1"), StringClass::format(format, 1));
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, FormatTest_x)
-{
-    DECLARE_ALIASES
-
-    const char_type *format;
-
-    format = FLY_STR(char_type, "%x");
-    EXPECT_EQ(FLY_STR(streamed_char, "%x"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "0xff"), StringClass::format(format, 255));
-
-    format = FLY_STR(char_type, "%X");
-    EXPECT_EQ(FLY_STR(streamed_char, "%X"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "0XFF"), StringClass::format(format, 255));
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, FormatTest_o)
-{
-    DECLARE_ALIASES
-
-    const char_type *format;
-
-    format = FLY_STR(char_type, "%o");
-    EXPECT_EQ(FLY_STR(streamed_char, "%o"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "0377"), StringClass::format(format, 255));
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, FormatTest_a)
-{
-    DECLARE_ALIASES
-
-    const char_type *format;
-
-    format = FLY_STR(char_type, "%a");
-    EXPECT_EQ(FLY_STR(streamed_char, "%a"), StringClass::format(format));
-#if defined(FLY_WINDOWS)
-    // Windows 0-pads std::hexfloat to match the stream precision, Linux does not. This discrepency
-    // should be fixed when length modifiers are added.
-    EXPECT_EQ(FLY_STR(streamed_char, "0x1.600000p+2"), StringClass::format(format, 5.5));
-#else
-    EXPECT_EQ(FLY_STR(streamed_char, "0x1.6p+2"), StringClass::format(format, 5.5));
-#endif
-
-    format = FLY_STR(char_type, "%A");
-    EXPECT_EQ(FLY_STR(streamed_char, "%A"), StringClass::format(format));
-#if defined(FLY_WINDOWS)
-    // Windows 0-pads std::hexfloat to match the stream precision, Linux does not. This discrepency
-    // should be fixed when length modifiers are added.
-    EXPECT_EQ(FLY_STR(streamed_char, "0X1.600000P+2"), StringClass::format(format, 5.5));
-#else
-    EXPECT_EQ(FLY_STR(streamed_char, "0X1.6P+2"), StringClass::format(format, 5.5));
-#endif
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, FormatTest_f)
-{
-    DECLARE_ALIASES
-
-    const char_type *format;
-
-    format = FLY_STR(char_type, "%f");
-    EXPECT_EQ(FLY_STR(streamed_char, "%f"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "nan"), StringClass::format(format, std::nan("")));
-    EXPECT_EQ(
-        FLY_STR(streamed_char, "inf"),
-        StringClass::format(format, std::numeric_limits<float>::infinity()));
-    EXPECT_EQ(FLY_STR(streamed_char, "2.100000"), StringClass::format(format, 2.1f));
-
-    // Note: std::uppercase has no effect on std::fixed :(
-    format = FLY_STR(char_type, "%F");
-    EXPECT_EQ(FLY_STR(streamed_char, "%F"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "nan"), StringClass::format(format, std::nan("")));
-    EXPECT_EQ(
-        FLY_STR(streamed_char, "inf"),
-        StringClass::format(format, std::numeric_limits<float>::infinity()));
-    EXPECT_EQ(FLY_STR(streamed_char, "2.100000"), StringClass::format(format, 2.1f));
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, FormatTest_g)
-{
-    DECLARE_ALIASES
-
-    const char_type *format;
-
-    format = FLY_STR(char_type, "%g");
-    EXPECT_EQ(FLY_STR(streamed_char, "%g"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "nan"), StringClass::format(format, std::nan("")));
-    EXPECT_EQ(
-        FLY_STR(streamed_char, "inf"),
-        StringClass::format(format, std::numeric_limits<float>::infinity()));
-    EXPECT_EQ(FLY_STR(streamed_char, "2.1"), StringClass::format(format, 2.1f));
-
-    format = FLY_STR(char_type, "%G");
-    EXPECT_EQ(FLY_STR(streamed_char, "%G"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "NAN"), StringClass::format(format, std::nan("")));
-    EXPECT_EQ(
-        FLY_STR(streamed_char, "INF"),
-        StringClass::format(format, std::numeric_limits<float>::infinity()));
-    EXPECT_EQ(FLY_STR(streamed_char, "2.1"), StringClass::format(format, 2.1f));
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, FormatTest_e)
-{
-    DECLARE_ALIASES
-
-    const char_type *format;
-
-    format = FLY_STR(char_type, "%e");
-    EXPECT_EQ(FLY_STR(streamed_char, "%e"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "1.230000e+02"), StringClass::format(format, 123.0));
-
-    format = FLY_STR(char_type, "%E");
-    EXPECT_EQ(FLY_STR(streamed_char, "%E"), StringClass::format(format));
-    EXPECT_EQ(FLY_STR(streamed_char, "1.230000E+02"), StringClass::format(format, 123.0));
 }
 
 //==================================================================================================
