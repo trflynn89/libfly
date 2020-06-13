@@ -726,6 +726,7 @@ void Json::validate_character(
         throw JsonException(ex.what());
     }
 
+    // The iterator is now incremented past the encoded unicode codepoint.
     for (; start < it; ++start)
     {
         stream << *start;
