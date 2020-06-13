@@ -114,9 +114,6 @@
     <ClCompile Include="..\..\..\test\types\json_traits.cpp">
       <Filter>types</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json_unicode.cpp">
-      <Filter>types</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\test\types\literals.cpp">
       <Filter>types</Filter>
     </ClCompile>

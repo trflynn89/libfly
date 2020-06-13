@@ -270,6 +270,19 @@ StringType BasicStringUnicode<StringType>::escape_character(
     };
 
     const codepoint_type codepoint = decode_codepoint(std::move(next_encoded_byte));
+
+    if ((codepoint >= high_surrogate_min) && (codepoint <= low_surrogate_max))
+    {
+        throw UnicodeException(
+            StringFormatter::format("Codepoint %x is reserved by the Unicode Standard", codepoint));
+    }
+    else if (codepoint > max_codepoint)
+    {
+        throw UnicodeException(StringFormatter::format(
+            "Codepoint %x exceeds the maxium codepoint U+10ffff",
+            codepoint));
+    }
+
     return escape_codepoint<UnicodePrefix>(codepoint);
 }
 
@@ -429,7 +442,7 @@ template <typename CharType, std::enable_if_t<(sizeof(CharType) == 1), bool>>
 auto BasicStringUnicode<StringType>::decode_codepoint(
     EncodedByteProvider next_encoded_byte) noexcept(false) -> codepoint_type
 {
-    const codepoint_type leading_byte = next_encoded_byte();
+    const codepoint_type leading_byte = next_encoded_byte() & 0xff;
 
     // First find the codepoint length by finding which leading byte matches the first encoded byte.
     auto utf8_it = std::find_if(
@@ -451,10 +464,16 @@ auto BasicStringUnicode<StringType>::decode_codepoint(
 
     // Then decode the encoded bytes using the leading and continuation byte masks.
     codepoint_type codepoint = (leading_byte & utf8_it->codepoint_mask) << shift;
+    codepoint_type first_continuation_byte = 0;
 
     for (std::size_t i = 1; i < bytes; ++i)
     {
-        const codepoint_type continuation_byte = next_encoded_byte();
+        const codepoint_type continuation_byte = next_encoded_byte() & 0xff;
+
+        if (i == 1)
+        {
+            first_continuation_byte = continuation_byte;
+        }
 
         if ((continuation_byte & utf8_continuation_byte.encoding_mask) !=
             utf8_continuation_byte.leading_byte)
@@ -466,6 +485,18 @@ auto BasicStringUnicode<StringType>::decode_codepoint(
 
         shift -= utf8_continuation_byte.codepoint_size;
         codepoint |= (continuation_byte & utf8_continuation_byte.codepoint_mask) << shift;
+    }
+
+    if ((bytes == 2) && ((leading_byte & 0xfe) == utf8_it->leading_byte))
+    {
+        throw UnicodeException("Encoded 2-byte UTF-8 codepoint is overlong");
+    }
+    else if (
+        (bytes > 2) && (leading_byte == utf8_it->leading_byte) &&
+        ((first_continuation_byte & utf8_it->leading_byte) == utf8_continuation_byte.leading_byte))
+    {
+        throw UnicodeException(
+            StringFormatter::format("Encoded %u-byte UTF-8 codepoint is overlong", bytes));
     }
 
     return codepoint;
@@ -486,21 +517,7 @@ template <typename CharType, std::enable_if_t<(sizeof(CharType) == 4), bool>>
 auto BasicStringUnicode<StringType>::decode_codepoint(
     EncodedByteProvider next_encoded_byte) noexcept(false) -> codepoint_type
 {
-    const codepoint_type codepoint = next_encoded_byte();
-
-    if ((codepoint >= high_surrogate_min) && (codepoint <= low_surrogate_max))
-    {
-        throw UnicodeException(
-            StringFormatter::format("Codepoint %x is reserved by the Unicode Standard", codepoint));
-    }
-    else if (codepoint > max_codepoint)
-    {
-        throw UnicodeException(StringFormatter::format(
-            "Codepoint %x exceeds the maxium codepoint U+10ffff",
-            codepoint));
-    }
-
-    return codepoint;
+    return next_encoded_byte();
 }
 
 //==================================================================================================

@@ -222,7 +222,6 @@
     <ClCompile Include="..\..\..\test\types\json_exception.cpp" />
     <ClCompile Include="..\..\..\test\types\json_iterator.cpp" />
     <ClCompile Include="..\..\..\test\types\json_traits.cpp" />
-    <ClCompile Include="..\..\..\test\types\json_unicode.cpp" />
     <ClCompile Include="..\..\..\test\types\literals.cpp" />
     <ClCompile Include="..\..\..\test\types\string.cpp" />
     <ClCompile Include="..\..\..\test\types\string_formatter.cpp" />
