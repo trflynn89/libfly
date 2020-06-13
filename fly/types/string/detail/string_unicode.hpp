@@ -29,11 +29,27 @@ class BasicStringUnicode
 {
     using traits = detail::BasicStringTraits<StringType>;
     using char_type = typename traits::char_type;
-    using codepoint_type = std::uint32_t;
+    using codepoint_type = typename traits::codepoint_type;
 
     using StringFormatter = BasicStringFormatter<std::string>;
 
 public:
+    /**
+     * Decode a single unicode codepoint, starting at the character pointed to by the provided
+     * iterator. If successful, after invoking this method, that iterator will point at the first
+     * character after the unicode codepoint in the source string.
+     *
+     * @param it Pointer to the beginning of the encoded unicode codepoint.
+     * @param end Pointer to the end of the encoded unicode codepoint.
+     *
+     * @return The decoded unicode codepoint.
+     *
+     * @throws UnicodeException If the encoded unicode codepoint is invalid.
+     */
+    static codepoint_type decode_character(
+        typename StringType::const_iterator &it,
+        const typename StringType::const_iterator &end) noexcept(false);
+
     /**
      * Escape a single unicode codepoint, starting at the character pointed to by the provided
      * iterator. If successful, after invoking this method, that iterator will point at the first
@@ -55,8 +71,8 @@ public:
      *
      * @tparam UnicodePrefix The unicode prefix character ('u' or 'U').
      *
-     * @param it Pointer to the beginning of the unicode codepoint.
-     * @param end Pointer to the end of the unicode codepoint.
+     * @param it Pointer to the beginning of the encoded unicode codepoint.
+     * @param end Pointer to the end of the encoded unicode codepoint.
      *
      * @return A string containing the escaped unicode codepoint.
      *
@@ -253,13 +269,10 @@ private:
 
 //==================================================================================================
 template <typename StringType>
-template <char UnicodePrefix>
-StringType BasicStringUnicode<StringType>::escape_character(
+auto BasicStringUnicode<StringType>::decode_character(
     typename StringType::const_iterator &it,
-    const typename StringType::const_iterator &end) noexcept(false)
+    const typename StringType::const_iterator &end) noexcept(false) -> codepoint_type
 {
-    static_assert((UnicodePrefix == 'u') || (UnicodePrefix == 'U'));
-
     auto next_encoded_byte = [&it, &end]() noexcept(false) -> codepoint_type {
         if (it == end)
         {
@@ -283,6 +296,19 @@ StringType BasicStringUnicode<StringType>::escape_character(
             codepoint));
     }
 
+    return codepoint;
+}
+
+//==================================================================================================
+template <typename StringType>
+template <char UnicodePrefix>
+StringType BasicStringUnicode<StringType>::escape_character(
+    typename StringType::const_iterator &it,
+    const typename StringType::const_iterator &end) noexcept(false)
+{
+    static_assert((UnicodePrefix == 'u') || (UnicodePrefix == 'U'));
+
+    const codepoint_type codepoint = decode_character(it, end);
     return escape_codepoint<UnicodePrefix>(codepoint);
 }
 
@@ -489,14 +515,17 @@ auto BasicStringUnicode<StringType>::decode_codepoint(
 
     if ((bytes == 2) && ((leading_byte & 0xfe) == utf8_it->leading_byte))
     {
-        throw UnicodeException("Encoded 2-byte UTF-8 codepoint is overlong");
+        throw UnicodeException(
+            StringFormatter::format("Encoded 2-byte UTF-8 codepoint %x is overlong", codepoint));
     }
     else if (
         (bytes > 2) && (leading_byte == utf8_it->leading_byte) &&
         ((first_continuation_byte & utf8_it->leading_byte) == utf8_continuation_byte.leading_byte))
     {
-        throw UnicodeException(
-            StringFormatter::format("Encoded %u-byte UTF-8 codepoint is overlong", bytes));
+        throw UnicodeException(StringFormatter::format(
+            "Encoded %u-byte UTF-8 codepoint %x is overlong",
+            bytes,
+            codepoint));
     }
 
     return codepoint;

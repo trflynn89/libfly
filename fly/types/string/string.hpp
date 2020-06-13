@@ -49,6 +49,7 @@ public:
     using char_type = typename traits::char_type;
     using ostream_type = typename traits::ostream_type;
     using streamed_type = typename traits::streamer_type::streamed_type;
+    using codepoint_type = typename traits::codepoint_type;
 
     /**
      * Split a string into a vector of strings.
@@ -159,6 +160,22 @@ public:
     static bool wildcard_match(const StringType &source, const StringType &search) noexcept;
 
     /**
+     * Decode a single unicode codepoint, starting at the character pointed to by the provided
+     * iterator. If successful, after invoking this method, that iterator will point at the first
+     * character after the unicode codepoint in the source string.
+     *
+     * @param it Pointer to the beginning of the encoded unicode codepoint.
+     * @param end Pointer to the end of the encoded unicode codepoint.
+     *
+     * @return The decoded unicode codepoint.
+     *
+     * @throws UnicodeException If the encoded unicode codepoint is invalid.
+     */
+    static codepoint_type decode_unicode_character(
+        typename StringType::const_iterator &it,
+        const typename StringType::const_iterator &end) noexcept(false);
+
+    /**
      * Escape all unicode codepoints in a string.
      *
      * If the unicode codepoint is an ASCII, non-control character (i.e. codepoints in the range
@@ -207,8 +224,8 @@ public:
      *
      * @tparam UnicodePrefix The unicode prefix character ('u' or 'U').
      *
-     * @param it Pointer to the beginning of the unicode codepoint.
-     * @param end Pointer to the end of the unicode codepoint.
+     * @param it Pointer to the beginning of the encoded unicode codepoint.
+     * @param end Pointer to the end of the encoded unicode codepoint.
      *
      * @return A string containing the escaped unicode codepoint.
      *
@@ -582,6 +599,15 @@ bool BasicString<StringType>::wildcard_match(
     }
 
     return result;
+}
+
+//==================================================================================================
+template <typename StringType>
+auto BasicString<StringType>::decode_unicode_character(
+    typename StringType::const_iterator &it,
+    const typename StringType::const_iterator &end) noexcept(false) -> codepoint_type
+{
+    return detail::BasicStringUnicode<StringType>::decode_character(it, end);
 }
 
 //==================================================================================================

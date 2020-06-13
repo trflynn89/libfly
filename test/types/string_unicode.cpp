@@ -99,6 +99,34 @@ TYPED_TEST(BasicStringTest, Utf8EncodingInvalidContinuationByte)
 }
 
 //==================================================================================================
+TYPED_TEST(BasicStringTest, Utf8EncodingOverlong)
+{
+    DECLARE_ALIASES
+
+    if constexpr (sizeof(char_type) == 1)
+    {
+        auto validate_fail = [](string_type &&test) {
+            SCOPED_TRACE(test.c_str());
+
+            auto begin = test.cbegin();
+            const auto end = test.cend();
+
+            EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
+            EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
+        };
+
+        // U+0021 2-byte overlong encoding.
+        validate_fail("\xc0\xa1");
+
+        // U+0021 3-byte overlong encoding.
+        validate_fail("\xe0\x80\xa1");
+
+        // U+0021 4-byte overlong encoding.
+        validate_fail("\xf0\x80\x80\xa1");
+    }
+}
+
+//==================================================================================================
 TYPED_TEST(BasicStringTest, Utf16EncodingInvalidSurrogates)
 {
     DECLARE_ALIASES
@@ -161,7 +189,7 @@ TYPED_TEST(BasicStringTest, ReservedCodepoint)
         EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
     };
 
-    for (std::uint32_t ch = 0xd800; ch <= 0xdfff; ++ch)
+    for (codepoint_type ch = 0xd800; ch <= 0xdfff; ++ch)
     {
         if constexpr (sizeof(char_type) == 1)
         {
@@ -197,7 +225,7 @@ TYPED_TEST(BasicStringTest, OutOfRangeCodepoint)
     };
 
     // Iterating all the way to numeric_limits<char_type>::max() takes way too long.
-    for (std::uint32_t ch = 0x110000; ch <= 0x1100ff; ++ch)
+    for (codepoint_type ch = 0x110000; ch <= 0x1100ff; ++ch)
     {
         if constexpr (sizeof(char_type) == 1)
         {
@@ -274,7 +302,7 @@ TYPED_TEST(BasicStringTest, EncodingPrintableASCIINotEncoded)
     DECLARE_ALIASES
 
     auto validate_pass = [](char_type ch) {
-        SCOPED_TRACE(static_cast<std::uint32_t>(ch));
+        SCOPED_TRACE(static_cast<codepoint_type>(ch));
 
         const string_type test(1, ch);
         auto begin = test.cbegin();
@@ -300,7 +328,7 @@ TYPED_TEST(BasicStringTest, EncodingNonPrintableASCIIEncodedWithLowerU)
     DECLARE_ALIASES
 
     auto validate_pass = [](char_type ch) {
-        SCOPED_TRACE(static_cast<std::uint32_t>(ch));
+        SCOPED_TRACE(static_cast<codepoint_type>(ch));
 
         // ASCII symbols should always be encoded with \u.
         const string_type expected = FLY_STR(char_type, "\\u") + to_hex<string_type>(ch, 4);
@@ -521,19 +549,19 @@ TYPED_TEST(BasicStringTest, DecodingInvalidSurrogates)
     };
 
     // Low surrogate only.
-    for (std::uint32_t ch = 0xdc00; ch <= 0xdfff; ++ch)
+    for (codepoint_type ch = 0xdc00; ch <= 0xdfff; ++ch)
     {
         validate_fail(FLY_STR(char_type, "\\u") + to_hex<string_type>(ch, 4));
     }
 
     // High surrogate only.
-    for (std::uint32_t ch = 0xd800; ch <= 0xdbff; ++ch)
+    for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
     {
         validate_fail(FLY_STR(char_type, "\\u") + to_hex<string_type>(ch, 4));
     }
 
     // High surrogate followed by non-surrogate.
-    for (std::uint32_t ch = 0xd800; ch <= 0xdbff; ++ch)
+    for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
     {
         string_type high_surrogate(FLY_STR(char_type, "\\u") + to_hex<string_type>(ch, 4));
         string_type low_surrogate(FLY_STR(char_type, "\\u0000"));
@@ -542,7 +570,7 @@ TYPED_TEST(BasicStringTest, DecodingInvalidSurrogates)
     }
 
     // High surrogate followed by high surrogate.
-    for (std::uint32_t ch = 0xd800; ch <= 0xdbff; ++ch)
+    for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
     {
         string_type high_surrogate(FLY_STR(char_type, "\\u") + to_hex<string_type>(ch, 4));
 
@@ -727,7 +755,7 @@ TYPED_TEST(BasicStringTest, MarkusKuhnStressTest)
         // 3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf)
         string_type test_3_1_9;
 
-        for (std::uint32_t ch = 0x80; ch <= 0xbf; ++ch)
+        for (codepoint_type ch = 0x80; ch <= 0xbf; ++ch)
         {
             validate_fail(string_type(1, ch));
             test_3_1_9 += ch;
@@ -737,10 +765,10 @@ TYPED_TEST(BasicStringTest, MarkusKuhnStressTest)
 
         // 3.2  Lonely start characters
 
-        auto validate_fail_sequence = [&validate_fail](std::uint32_t begin, std::uint32_t end) {
+        auto validate_fail_sequence = [&validate_fail](codepoint_type begin, codepoint_type end) {
             string_type test_3_2;
 
-            for (std::uint32_t ch = begin; ch <= end; ++ch)
+            for (codepoint_type ch = begin; ch <= end; ++ch)
             {
                 validate_fail(string_type(1, ch) + " ");
                 test_3_2 += ch;
