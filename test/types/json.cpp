@@ -36,7 +36,7 @@ TEST(JsonTest, StringConstructor)
 }
 
 //==================================================================================================
-TEST(JsonTest, InvalidStringConstructor)
+TEST(JsonTest, InvalidString)
 {
     // Reverse solidus must be followed by a valid escape symbol.
     EXPECT_THROW(fly::Json("\\"), fly::JsonException);
@@ -70,6 +70,35 @@ TEST(JsonTest, ObjectConstructor)
 
     std::unordered_multimap<std::string, int> umultimap = {{"h", 7}, {"i", 8}};
     EXPECT_TRUE(fly::Json(umultimap).is_object());
+}
+
+//==================================================================================================
+TEST(JsonTest, InvalidObjectKey)
+{
+    std::map<std::string, int> map;
+
+    // Reverse solidus must be followed by a valid escape symbol.
+    map = {{"\\", 1}};
+    EXPECT_THROW((fly::Json(map)), fly::JsonException);
+    map = {{"\\U", 1}};
+    EXPECT_THROW((fly::Json(map)), fly::JsonException);
+
+    // Quotes must be escaped.
+    map = {{"\"", 1}};
+    EXPECT_THROW((fly::Json(map)), fly::JsonException);
+
+    // Control characters must be escaped.
+    for (fly::JsonTraits::string_type::value_type ch = 0; ch <= 0x1f; ++ch)
+    {
+        map = {{fly::JsonTraits::string_type(1, ch), 1}};
+        EXPECT_THROW((fly::Json(map)), fly::JsonException);
+    }
+
+    // Characters must be valid Unicode.
+    map = {{"\xed\xa0\x80", 1}}; // Reserved codepoint.
+    EXPECT_THROW((fly::Json(map)), fly::JsonException);
+    map = {{"\xf4\x90\x80\x80", 1}}; // Out-of-range codepoint.
+    EXPECT_THROW((fly::Json(map)), fly::JsonException);
 }
 
 //==================================================================================================
@@ -114,6 +143,35 @@ TEST(JsonTest, ArrayConstructor)
     std::array<std::string, 2> object = {"nine", "ten"};
     EXPECT_TRUE(fly::Json(object).is_array());
     EXPECT_TRUE(fly::Json(object).is_object_like());
+}
+
+//==================================================================================================
+TEST(JsonTest, InvalidArrayString)
+{
+    std::vector<std::string> vector;
+
+    // Reverse solidus must be followed by a valid escape symbol.
+    vector = {"\\"};
+    EXPECT_THROW((fly::Json(vector)), fly::JsonException);
+    vector = {"\\U"};
+    EXPECT_THROW((fly::Json(vector)), fly::JsonException);
+
+    // Quotes must be escaped.
+    vector = {"\""};
+    EXPECT_THROW((fly::Json(vector)), fly::JsonException);
+
+    // Control characters must be escaped.
+    for (fly::JsonTraits::string_type::value_type ch = 0; ch <= 0x1f; ++ch)
+    {
+        vector = {fly::JsonTraits::string_type(1, ch)};
+        EXPECT_THROW((fly::Json(vector)), fly::JsonException);
+    }
+
+    // Characters must be valid Unicode.
+    vector = {"\xed\xa0\x80"}; // Reserved codepoint.
+    EXPECT_THROW((fly::Json(vector)), fly::JsonException);
+    vector = {"\xf4\x90\x80\x80"}; // Out-of-range codepoint.
+    EXPECT_THROW((fly::Json(vector)), fly::JsonException);
 }
 
 //==================================================================================================
@@ -1251,5 +1309,23 @@ TEST(JsonTest, StreamWithEscapedSymbols)
 
         const std::string str = stream.str();
         EXPECT_EQ(str, "\"abc\\tdef\"");
+    }
+    {
+        fly::Json json = "abc\xce\xa9zef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\u03a9zef\"");
+    }
+    {
+        fly::Json json = "abc\xf0\x9f\x8d\x95zef";
+
+        std::stringstream stream;
+        stream << json;
+
+        const std::string str = stream.str();
+        EXPECT_EQ(str, "\"abc\\ud83c\\udf55zef\"");
     }
 }

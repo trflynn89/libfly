@@ -506,11 +506,12 @@ bool operator!=(Json::const_reference json1, Json::const_reference json2) noexce
 std::ostream &operator<<(std::ostream &stream, Json::const_reference json) noexcept
 {
     auto serialize_string = [&stream](const JsonTraits::string_type &value) {
+        const auto end = value.cend();
         stream << '"';
 
-        for (const auto &ch : value)
+        for (auto it = value.cbegin(); it != end;)
         {
-            Json::write_escaped_charater(stream, ch);
+            Json::write_escaped_charater(stream, it, end);
         }
 
         stream << '"';
@@ -660,9 +661,10 @@ void Json::read_escaped_character(
 //==================================================================================================
 void Json::write_escaped_charater(
     std::ostream &stream,
-    JsonTraits::string_type::value_type ch) noexcept
+    JsonTraits::string_type::const_iterator &it,
+    const JsonTraits::string_type::const_iterator &end) noexcept
 {
-    switch (ch)
+    switch (*it)
     {
         case '\"':
             stream << "\\\"";
@@ -693,10 +695,11 @@ void Json::write_escaped_charater(
             break;
 
         default:
-            // TODO unicode should also be escaped.
-            stream << ch;
-            break;
+            stream << String::escape_unicode_character<'u'>(it, end);
+            return;
     }
+
+    ++it;
 }
 
 //==================================================================================================

@@ -251,6 +251,11 @@ TEST(JsonTraitsTest, Object)
     EXPECT_TRUE(is_object(s_unordered_map));
     EXPECT_TRUE(is_object(s_unordered_multimap));
 
+    EXPECT_FALSE(is_object(std::map<int, int>()));
+    EXPECT_FALSE(is_object(std::multimap<int, int>()));
+    EXPECT_FALSE(is_object(std::unordered_map<int, int>()));
+    EXPECT_FALSE(is_object(std::unordered_multimap<int, int>()));
+
     EXPECT_FALSE(is_object(s_array));
     EXPECT_FALSE(is_object(s_deque));
     EXPECT_FALSE(is_object(s_forward_list));

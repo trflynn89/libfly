@@ -107,28 +107,31 @@ struct JsonTraits
      */
     struct ObjectTraits
     {
+        template <typename Key>
+        using is_string_key = std::bool_constant<is_string_v<Key>>;
+
         template <typename>
         struct IsObject : std::false_type
         {
         };
 
-        template <typename... Args>
-        struct IsObject<std::map<Args...>> : std::true_type
+        template <typename Key, typename... Args>
+        struct IsObject<std::map<Key, Args...>> : is_string_key<Key>
         {
         };
 
-        template <typename... Args>
-        struct IsObject<std::multimap<Args...>> : std::true_type
+        template <typename Key, typename... Args>
+        struct IsObject<std::multimap<Key, Args...>> : is_string_key<Key>
         {
         };
 
-        template <typename... Args>
-        struct IsObject<std::unordered_map<Args...>> : std::true_type
+        template <typename Key, typename... Args>
+        struct IsObject<std::unordered_map<Key, Args...>> : is_string_key<Key>
         {
         };
 
-        template <typename... Args>
-        struct IsObject<std::unordered_multimap<Args...>> : std::true_type
+        template <typename Key, typename... Args>
+        struct IsObject<std::unordered_multimap<Key, Args...>> : is_string_key<Key>
         {
         };
     };
