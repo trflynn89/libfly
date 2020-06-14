@@ -61,7 +61,7 @@ SystemMonitorImpl::~SystemMonitorImpl()
 }
 
 //==================================================================================================
-void SystemMonitorImpl::update_system_cpu_count() noexcept
+void SystemMonitorImpl::update_system_cpu_count()
 {
     SYSTEM_INFO info;
     ::GetSystemInfo(&info);
@@ -77,7 +77,7 @@ void SystemMonitorImpl::update_system_cpu_count() noexcept
 }
 
 //==================================================================================================
-void SystemMonitorImpl::update_system_cpu_usage() noexcept
+void SystemMonitorImpl::update_system_cpu_usage()
 {
     PDH_FMT_COUNTERVALUE value;
 
@@ -99,7 +99,7 @@ void SystemMonitorImpl::update_system_cpu_usage() noexcept
 }
 
 //==================================================================================================
-void SystemMonitorImpl::update_process_cpu_usage() noexcept
+void SystemMonitorImpl::update_process_cpu_usage()
 {
     ULARGE_INTEGER now, system, user;
     FILETIME fnow, fsystem, fuser;
@@ -130,7 +130,7 @@ void SystemMonitorImpl::update_process_cpu_usage() noexcept
 }
 
 //==================================================================================================
-void SystemMonitorImpl::update_system_memory_usage() noexcept
+void SystemMonitorImpl::update_system_memory_usage()
 {
     MEMORYSTATUSEX info;
     info.dwLength = sizeof(MEMORYSTATUSEX);
@@ -147,7 +147,7 @@ void SystemMonitorImpl::update_system_memory_usage() noexcept
 }
 
 //==================================================================================================
-void SystemMonitorImpl::update_process_memory_usage() noexcept
+void SystemMonitorImpl::update_process_memory_usage()
 {
     PROCESS_MEMORY_COUNTERS pmc;
 

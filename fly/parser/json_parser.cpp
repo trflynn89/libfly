@@ -18,7 +18,7 @@ JsonParser::JsonParser(const Features features) noexcept : Parser(), m_features(
 }
 
 //==================================================================================================
-Json JsonParser::parse_internal(std::istream &stream) noexcept(false)
+Json JsonParser::parse_internal(std::istream &stream)
 {
     Json json;
 
@@ -49,7 +49,7 @@ Json JsonParser::parse_internal(std::istream &stream) noexcept(false)
 }
 
 //==================================================================================================
-Json JsonParser::parse_json(std::istream &stream) noexcept(false)
+Json JsonParser::parse_json(std::istream &stream)
 {
     consume_whitespace_and_comments(stream);
 
@@ -67,12 +67,12 @@ Json JsonParser::parse_json(std::istream &stream) noexcept(false)
 }
 
 //==================================================================================================
-Json JsonParser::parse_object(std::istream &stream) noexcept(false)
+Json JsonParser::parse_object(std::istream &stream)
 {
     Json object = JsonTraits::object_type();
     consume_token(stream, Token::StartBrace);
 
-    auto stop_parsing = [&stream, this]() noexcept(false) {
+    auto stop_parsing = [&stream, this]() {
         consume_whitespace_and_comments(stream);
         const Token token = peek(stream);
 
@@ -102,12 +102,12 @@ Json JsonParser::parse_object(std::istream &stream) noexcept(false)
 }
 
 //==================================================================================================
-Json JsonParser::parse_array(std::istream &stream) noexcept(false)
+Json JsonParser::parse_array(std::istream &stream)
 {
     Json array = JsonTraits::array_type();
     consume_token(stream, Token::StartBracket);
 
-    auto stop_parsing = [&stream, this]() noexcept(false) {
+    auto stop_parsing = [&stream, this]() {
         consume_whitespace_and_comments(stream);
         const Token token = peek(stream);
 
@@ -129,7 +129,7 @@ Json JsonParser::parse_array(std::istream &stream) noexcept(false)
 }
 
 //==================================================================================================
-Json JsonParser::parse_value(std::istream &stream) noexcept(false)
+Json JsonParser::parse_value(std::istream &stream)
 {
     const bool is_string = peek(stream) == Token::Quote;
 
@@ -179,7 +179,7 @@ Json JsonParser::parse_value(std::istream &stream) noexcept(false)
 }
 
 //==================================================================================================
-void JsonParser::consume_token(std::istream &stream, const Token &token) noexcept(false)
+void JsonParser::consume_token(std::istream &stream, const Token &token)
 {
     consume_whitespace(stream);
 
@@ -192,9 +192,7 @@ void JsonParser::consume_token(std::istream &stream, const Token &token) noexcep
 }
 
 //==================================================================================================
-bool JsonParser::consume_comma(
-    std::istream &stream,
-    const std::function<bool()> &stop_parsing) noexcept(false)
+bool JsonParser::consume_comma(std::istream &stream, const std::function<bool()> &stop_parsing)
 {
     consume_token(stream, Token::Comma);
 
@@ -212,13 +210,12 @@ bool JsonParser::consume_comma(
 }
 
 //==================================================================================================
-JsonTraits::string_type
-JsonParser::consume_value(std::istream &stream, JsonType type) noexcept(false)
+JsonTraits::string_type JsonParser::consume_value(std::istream &stream, JsonType type)
 {
     Json::stream_type parsing;
     Token token;
 
-    auto stop_parsing = [&token, &type, this]() noexcept {
+    auto stop_parsing = [&token, &type, this]() {
         if (type == JsonType::JsonString)
         {
             return token == Token::Quote;
@@ -264,7 +261,7 @@ JsonParser::consume_value(std::istream &stream, JsonType type) noexcept(false)
 }
 
 //==================================================================================================
-void JsonParser::consume_whitespace_and_comments(std::istream &stream) noexcept(false)
+void JsonParser::consume_whitespace_and_comments(std::istream &stream)
 {
     consume_whitespace(stream);
 
@@ -279,7 +276,7 @@ void JsonParser::consume_whitespace_and_comments(std::istream &stream) noexcept(
 }
 
 //==================================================================================================
-void JsonParser::consume_whitespace(std::istream &stream) noexcept
+void JsonParser::consume_whitespace(std::istream &stream)
 {
     Token token;
 
@@ -290,7 +287,7 @@ void JsonParser::consume_whitespace(std::istream &stream) noexcept
 }
 
 //==================================================================================================
-void JsonParser::consume_comment(std::istream &stream) noexcept(false)
+void JsonParser::consume_comment(std::istream &stream)
 {
     if (!is_feature_allowed(Features::AllowComments))
     {
@@ -330,13 +327,13 @@ void JsonParser::consume_comment(std::istream &stream) noexcept(false)
 }
 
 //==================================================================================================
-JsonParser::Token JsonParser::peek(std::istream &stream) noexcept
+JsonParser::Token JsonParser::peek(std::istream &stream)
 {
     return static_cast<Token>(stream.peek());
 }
 
 //==================================================================================================
-JsonParser::Token JsonParser::consume(std::istream &stream) noexcept
+JsonParser::Token JsonParser::consume(std::istream &stream)
 {
     const Token token = static_cast<Token>(stream.get());
 
@@ -354,26 +351,26 @@ JsonParser::Token JsonParser::consume(std::istream &stream) noexcept
 }
 
 //==================================================================================================
-void JsonParser::discard(std::istream &stream) noexcept
+void JsonParser::discard(std::istream &stream)
 {
     FLY_UNUSED(consume(stream));
 }
 
 //==================================================================================================
 JsonParser::NumericType JsonParser::validate_number(const JsonTraits::string_type &value) const
-    noexcept(false)
+
 {
     const bool is_signed = value[0] == '-';
 
     const auto signless = std::basic_string_view<JsonTraits::string_type::value_type>(value).substr(
         is_signed ? 1 : 0);
 
-    auto is_octal = [&signless]() noexcept -> bool {
+    auto is_octal = [&signless]() -> bool {
         return (signless.size() > 1) && (signless[0] == '0') &&
             std::isdigit(static_cast<unsigned char>(signless[1]));
     };
 
-    auto is_float = [this, &value, &signless]() noexcept(false) -> bool {
+    auto is_float = [this, &value, &signless]() -> bool {
         const JsonTraits::string_type::size_type d = signless.find('.');
         const JsonTraits::string_type::size_type e1 = signless.find('e');
         const JsonTraits::string_type::size_type e2 = signless.find('E');
@@ -422,7 +419,7 @@ JsonParser::NumericType JsonParser::validate_number(const JsonTraits::string_typ
 }
 
 //==================================================================================================
-bool JsonParser::is_whitespace(const Token &token) const noexcept
+bool JsonParser::is_whitespace(const Token &token) const
 {
     switch (token)
     {
@@ -439,13 +436,13 @@ bool JsonParser::is_whitespace(const Token &token) const noexcept
 }
 
 //==================================================================================================
-bool JsonParser::is_feature_allowed(Features feature) const noexcept
+bool JsonParser::is_feature_allowed(Features feature) const
 {
     return (m_features & feature) != Features::Strict;
 }
 
 //==================================================================================================
-JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b) noexcept
+JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b)
 {
     return static_cast<JsonParser::Features>(
         static_cast<std::underlying_type_t<JsonParser::Features>>(a) &
@@ -453,7 +450,7 @@ JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b) n
 }
 
 //==================================================================================================
-JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b) noexcept
+JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b)
 {
     return static_cast<JsonParser::Features>(
         static_cast<std::underlying_type_t<JsonParser::Features>>(a) |
@@ -464,7 +461,7 @@ JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b) n
 JsonParser::UnexpectedTokenException::UnexpectedTokenException(
     std::uint32_t line,
     std::uint32_t column,
-    JsonParser::Token token) :
+    JsonParser::Token token) noexcept :
     UnexpectedCharacterException(line, column, static_cast<int>(token))
 {
 }

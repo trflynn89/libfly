@@ -25,17 +25,17 @@ public:
     /**
      * @return Sleep time for socket IO thread.
      */
-    std::chrono::microseconds io_wait_time() const noexcept;
+    std::chrono::microseconds io_wait_time() const;
 
     /**
      * @return Character signifying the end of a message received over a socket.
      */
-    char end_of_message() const noexcept;
+    char end_of_message() const;
 
     /**
      * Size of packet to use for send/receive operations.
      */
-    std::size_t packet_size() const noexcept;
+    std::size_t packet_size() const;
 
 protected:
     std::chrono::microseconds::rep m_default_io_wait_time;

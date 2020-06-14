@@ -59,7 +59,6 @@ ifeq ($(toolchain), clang)
 else ifeq ($(toolchain), gcc)
     CF_ALL += \
         -Wlogical-op \
-        -Wnoexcept \
         -Wnull-dereference \
         -Wredundant-decls \
         -Wsign-promo \

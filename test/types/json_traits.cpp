@@ -20,56 +20,56 @@ namespace {
 
 //==================================================================================================
 template <typename T>
-bool is_string(const T &) noexcept
+bool is_string(const T &)
 {
     return fly::JsonTraits::is_string_v<T>;
 }
 
 //==================================================================================================
 template <typename T>
-bool is_bool(const T &) noexcept
+bool is_bool(const T &)
 {
     return fly::JsonTraits::is_boolean_v<T>;
 }
 
 //==================================================================================================
 template <typename T>
-bool is_signed_integer(const T &) noexcept
+bool is_signed_integer(const T &)
 {
     return fly::JsonTraits::is_signed_integer_v<T>;
 }
 
 //==================================================================================================
 template <typename T>
-bool is_unsigned_integer(const T &) noexcept
+bool is_unsigned_integer(const T &)
 {
     return fly::JsonTraits::is_unsigned_integer_v<T>;
 }
 
 //==================================================================================================
 template <typename T>
-bool is_floating_point(const T &) noexcept
+bool is_floating_point(const T &)
 {
     return fly::JsonTraits::is_floating_point_v<T>;
 }
 
 //==================================================================================================
 template <typename T>
-bool is_object(const T &) noexcept
+bool is_object(const T &)
 {
     return fly::JsonTraits::is_object_v<T>;
 }
 
 //==================================================================================================
 template <typename T>
-bool is_array(const T &) noexcept
+bool is_array(const T &)
 {
     return fly::JsonTraits::is_array_v<T>;
 }
 
 //==================================================================================================
 template <typename T>
-bool is_iterable(const T &) noexcept
+bool is_iterable(const T &)
 {
     return fly::JsonTraits::is_iterable_v<T>;
 }

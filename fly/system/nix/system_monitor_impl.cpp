@@ -38,7 +38,7 @@ SystemMonitorImpl::SystemMonitorImpl(
 }
 
 //==================================================================================================
-void SystemMonitorImpl::update_system_cpu_count() noexcept
+void SystemMonitorImpl::update_system_cpu_count()
 {
     std::ifstream stream(s_proc_stat_file, std::ios::in);
     std::string contents, line;
@@ -69,7 +69,7 @@ void SystemMonitorImpl::update_system_cpu_count() noexcept
 }
 
 //==================================================================================================
-void SystemMonitorImpl::update_system_cpu_usage() noexcept
+void SystemMonitorImpl::update_system_cpu_usage()
 {
     std::ifstream stream(s_proc_stat_file, std::ios::in);
     std::string line;
@@ -112,7 +112,7 @@ void SystemMonitorImpl::update_system_cpu_usage() noexcept
 }
 
 //==================================================================================================
-void SystemMonitorImpl::update_process_cpu_usage() noexcept
+void SystemMonitorImpl::update_process_cpu_usage()
 {
     struct tms sample;
     clock_t now = ::times(&sample);
@@ -140,7 +140,7 @@ void SystemMonitorImpl::update_process_cpu_usage() noexcept
 }
 
 //==================================================================================================
-void SystemMonitorImpl::update_system_memory_usage() noexcept
+void SystemMonitorImpl::update_system_memory_usage()
 {
     struct sysinfo info;
 
@@ -159,7 +159,7 @@ void SystemMonitorImpl::update_system_memory_usage() noexcept
 }
 
 //==================================================================================================
-void SystemMonitorImpl::update_process_memory_usage() noexcept
+void SystemMonitorImpl::update_process_memory_usage()
 {
     std::ifstream stream(s_self_status_file, std::ios::in);
     std::string contents, line;

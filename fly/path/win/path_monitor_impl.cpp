@@ -49,13 +49,13 @@ PathMonitorImpl::~PathMonitorImpl()
 }
 
 //==================================================================================================
-bool PathMonitorImpl::is_valid() const noexcept
+bool PathMonitorImpl::is_valid() const
 {
     return m_iocp != nullptr;
 }
 
 //==================================================================================================
-void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
+void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout)
 {
     DWORD bytes = 0;
     ULONG_PTR key = 0;
@@ -97,7 +97,7 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
 
 //==================================================================================================
 std::unique_ptr<PathMonitor::PathInfo>
-PathMonitorImpl::create_path_info(const std::filesystem::path &path) const noexcept
+PathMonitorImpl::create_path_info(const std::filesystem::path &path) const
 {
     std::unique_ptr<PathMonitor::PathInfo> info;
 
@@ -111,7 +111,7 @@ PathMonitorImpl::create_path_info(const std::filesystem::path &path) const noexc
 
 //==================================================================================================
 void PathMonitorImpl::handle_events(const PathInfoImpl *info, const std::filesystem::path &path)
-    const noexcept
+    const
 {
     PFILE_NOTIFY_INFORMATION file_info = info->m_file_info;
 
@@ -161,7 +161,7 @@ void PathMonitorImpl::handle_events(const PathInfoImpl *info, const std::filesys
 }
 
 //==================================================================================================
-PathMonitor::PathEvent PathMonitorImpl::convert_to_event(DWORD action) const noexcept
+PathMonitor::PathEvent PathMonitorImpl::convert_to_event(DWORD action) const
 {
     PathMonitor::PathEvent path_event = PathMonitor::PathEvent::None;
 
@@ -242,13 +242,13 @@ PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 }
 
 //==================================================================================================
-bool PathMonitorImpl::PathInfoImpl::is_valid() const noexcept
+bool PathMonitorImpl::PathInfoImpl::is_valid() const
 {
     return m_valid && (m_handle != INVALID_HANDLE_VALUE);
 }
 
 //==================================================================================================
-bool PathMonitorImpl::PathInfoImpl::refresh(const std::filesystem::path &path) noexcept
+bool PathMonitorImpl::PathInfoImpl::refresh(const std::filesystem::path &path)
 {
     static const DWORD size = (s_buff_size * sizeof(FILE_NOTIFY_INFORMATION));
     DWORD bytes = 0;

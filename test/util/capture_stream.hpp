@@ -39,7 +39,7 @@ public:
      *
      * @return The contents of the redirected stream.
      */
-    std::string operator()() noexcept;
+    std::string operator()();
 
 private:
     /**
@@ -50,7 +50,7 @@ private:
      *
      * @return The contents of the redirected stream.
      */
-    std::string restore(bool read) noexcept;
+    std::string restore(bool read);
 
     std::filesystem::path m_path;
 

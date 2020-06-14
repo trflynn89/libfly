@@ -47,17 +47,17 @@ struct BasicStringStreamer<std::string>
     using istringstream_type = std::istringstream;
     using ostringstream_type = std::ostringstream;
 
-    static void stream(ostream_type &ostream, const std::string &value) noexcept
+    static void stream(ostream_type &ostream, const std::string &value)
     {
         ostream << value;
     }
 
-    static void stream(ostream_type &ostream, const char *value) noexcept
+    static void stream(ostream_type &ostream, const char *value)
     {
         ostream << value;
     }
 
-    static void stream(ostream_type &ostream, const char value) noexcept
+    static void stream(ostream_type &ostream, const char value)
     {
         ostream << value;
     }
@@ -80,17 +80,17 @@ struct BasicStringStreamer<std::wstring>
     using istringstream_type = std::wistringstream;
     using ostringstream_type = std::wostringstream;
 
-    static void stream(ostream_type &ostream, const std::wstring &value) noexcept
+    static void stream(ostream_type &ostream, const std::wstring &value)
     {
         ostream << value;
     }
 
-    static void stream(ostream_type &ostream, const wchar_t *value) noexcept
+    static void stream(ostream_type &ostream, const wchar_t *value)
     {
         ostream << value;
     }
 
-    static void stream(ostream_type &ostream, const wchar_t value) noexcept
+    static void stream(ostream_type &ostream, const wchar_t value)
     {
         ostream << value;
     }
@@ -113,7 +113,7 @@ struct BasicStringStreamer<std::u16string>
     using istringstream_type = std::istringstream;
     using ostringstream_type = std::ostringstream;
 
-    static void stream(ostream_type &ostream, const std::u16string &value) noexcept
+    static void stream(ostream_type &ostream, const std::u16string &value)
     {
         for (const auto &ch : value)
         {
@@ -121,7 +121,7 @@ struct BasicStringStreamer<std::u16string>
         }
     }
 
-    static void stream(ostream_type &ostream, const char16_t *value) noexcept
+    static void stream(ostream_type &ostream, const char16_t *value)
     {
         const std::size_t size = std::char_traits<char16_t>::length(value);
 
@@ -131,7 +131,7 @@ struct BasicStringStreamer<std::u16string>
         }
     }
 
-    static void stream(ostream_type &ostream, const char16_t value) noexcept
+    static void stream(ostream_type &ostream, const char16_t value)
     {
         if (value <= 127)
         {
@@ -163,7 +163,7 @@ struct BasicStringStreamer<std::u32string>
     using istringstream_type = std::istringstream;
     using ostringstream_type = std::ostringstream;
 
-    static void stream(ostream_type &ostream, const std::u32string &value) noexcept
+    static void stream(ostream_type &ostream, const std::u32string &value)
     {
         for (const auto &ch : value)
         {
@@ -171,7 +171,7 @@ struct BasicStringStreamer<std::u32string>
         }
     }
 
-    static void stream(ostream_type &ostream, const char32_t *value) noexcept
+    static void stream(ostream_type &ostream, const char32_t *value)
     {
         const std::size_t size = std::char_traits<char32_t>::length(value);
 
@@ -181,7 +181,7 @@ struct BasicStringStreamer<std::u32string>
         }
     }
 
-    static void stream(ostream_type &ostream, const char32_t value) noexcept
+    static void stream(ostream_type &ostream, const char32_t value)
     {
         if (value <= 127)
         {

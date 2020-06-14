@@ -33,7 +33,7 @@ public:
      *
      * @throws ParserException Thrown if an error occurs parsing the string.
      */
-    Json parse_string(const std::string &contents) noexcept(false);
+    Json parse_string(const std::string &contents);
 
     /**
      * Parse a file and retrieve parsed values.
@@ -44,7 +44,7 @@ public:
      *
      * @throws ParserException Thrown if an error occurs parsing the file.
      */
-    Json parse_file(const std::filesystem::path &path) noexcept(false);
+    Json parse_file(const std::filesystem::path &path);
 
 protected:
     /**
@@ -56,7 +56,7 @@ protected:
      *
      * @throws ParserException Thrown if an error occurs parsing the stream.
      */
-    virtual Json parse_internal(std::istream &stream) noexcept(false) = 0;
+    virtual Json parse_internal(std::istream &stream) = 0;
 
     std::uint32_t m_line;
     std::uint32_t m_column;
@@ -68,7 +68,7 @@ private:
      *
      * @param stream Stream holding the contents to parse.
      */
-    void consume_byte_order_mark(std::istream &stream) const noexcept;
+    void consume_byte_order_mark(std::istream &stream) const;
 };
 
 } // namespace fly

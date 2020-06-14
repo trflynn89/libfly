@@ -25,7 +25,7 @@ public:
     /**
      * @return Delay between system monitor poll intervals.
      */
-    virtual std::chrono::milliseconds poll_interval() const noexcept;
+    virtual std::chrono::milliseconds poll_interval() const;
 
 protected:
     std::chrono::milliseconds::rep m_default_poll_interval;

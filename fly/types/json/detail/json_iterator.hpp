@@ -151,7 +151,7 @@ public:
      *
      * @throws NullJsonException If the iterator is empty or past-the-end.
      */
-    reference operator*() const noexcept(false);
+    reference operator*() const;
 
     /**
      * Retrieve a pointer to the Json instance pointed to by this iterator.
@@ -160,7 +160,7 @@ public:
      *
      * @throws NullJsonException If the iterator is empty or past-the-end.
      */
-    pointer operator->() const noexcept(false);
+    pointer operator->() const;
 
     /**
      * Retrieve a reference to the Json instance at some offset earlier or later than the instance
@@ -176,7 +176,7 @@ public:
      * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
      *         valid range.
      */
-    reference operator[](difference_type offset) const noexcept(false);
+    reference operator[](difference_type offset) const;
 
     /**
      * Equality comparison operator.
@@ -188,7 +188,7 @@ public:
      * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
      * @throws NullJsonException If either iterator is empty.
      */
-    bool operator==(const JsonIterator &iterator) const noexcept(false);
+    bool operator==(const JsonIterator &iterator) const;
 
     /**
      * Unequality comparison operator.
@@ -200,7 +200,7 @@ public:
      * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
      * @throws NullJsonException If either iterator is empty.
      */
-    bool operator!=(const JsonIterator &iterator) const noexcept(false);
+    bool operator!=(const JsonIterator &iterator) const;
 
     /**
      * Less-than comparison operator. Invalid for Json object types.
@@ -213,7 +213,7 @@ public:
      * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
      * @throws NullJsonException If either iterator is empty.
      */
-    bool operator<(const JsonIterator &iterator) const noexcept(false);
+    bool operator<(const JsonIterator &iterator) const;
 
     /**
      * Less-than-or-equal-to comparison operator. Invalid for Json object types.
@@ -227,7 +227,7 @@ public:
      * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
      * @throws NullJsonException If either iterator is empty.
      */
-    bool operator<=(const JsonIterator &iterator) const noexcept(false);
+    bool operator<=(const JsonIterator &iterator) const;
 
     /**
      * Greater-than comparison operator. Invalid for Json object types.
@@ -240,7 +240,7 @@ public:
      * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
      * @throws NullJsonException If either iterator is empty.
      */
-    bool operator>(const JsonIterator &iterator) const noexcept(false);
+    bool operator>(const JsonIterator &iterator) const;
 
     /**
      * Greater-than-or-equal-to comparison operator. Invalid for Json object types.
@@ -254,7 +254,7 @@ public:
      * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
      * @throws NullJsonException If either iterator is empty.
      */
-    bool operator>=(const JsonIterator &iterator) const noexcept(false);
+    bool operator>=(const JsonIterator &iterator) const;
 
     /**
      * Pre-increment operator. Sets the instance pointed to by this iterator to the next instance in
@@ -265,7 +265,7 @@ public:
      * @throws NullJsonException If the iterator is empty.
      * @throws OutOfRangeJsonException If the next iterator escapes the Json instance's valid range.
      */
-    JsonIterator operator++(int) noexcept(false);
+    JsonIterator operator++(int);
 
     /**
      * Post-increment operator. Sets the instance pointed to by this iterator to the next instance
@@ -276,7 +276,7 @@ public:
      * @throws NullJsonException If the iterator is empty.
      * @throws OutOfRangeJsonException If the next iterator escapes the Json instance's valid range.
      */
-    JsonIterator &operator++() noexcept(false);
+    JsonIterator &operator++();
 
     /**
      * Pre-decrement operator. Sets the instance pointed to by this iterator to the previous
@@ -288,7 +288,7 @@ public:
      * @throws OutOfRangeJsonException If the previous iterator escapes the Json instance's valid
      *         range.
      */
-    JsonIterator operator--(int) noexcept(false);
+    JsonIterator operator--(int);
 
     /**
      * Post-decrement operator. Sets the instance pointed to by this iterator to the previous
@@ -300,7 +300,7 @@ public:
      * @throws OutOfRangeJsonException If the previous iterator escapes the Json instance's valid
      *         range.
      */
-    JsonIterator &operator--() noexcept(false);
+    JsonIterator &operator--();
 
     /**
      * Addition operator. Sets the Json instance pointed to by this iterator to some offset earlier
@@ -315,7 +315,7 @@ public:
      * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
      *         valid range.
      */
-    JsonIterator &operator+=(difference_type offset) noexcept(false);
+    JsonIterator &operator+=(difference_type offset);
 
     /**
      * Subtraction operator. Sets the Json instance pointed to by this iterator to some offset
@@ -330,7 +330,7 @@ public:
      * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
      *         valid range.
      */
-    JsonIterator &operator-=(difference_type offset) noexcept(false);
+    JsonIterator &operator-=(difference_type offset);
 
     /**
      * Addition operator. Retrieve an iterator pointed at the Json instance some offset earlier or
@@ -345,7 +345,7 @@ public:
      * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
      *         valid range.
      */
-    JsonIterator operator+(difference_type offset) const noexcept(false);
+    JsonIterator operator+(difference_type offset) const;
 
     /**
      * Addition operator. Retrieve an iterator pointed at the Json instance some offset earlier or
@@ -361,9 +361,8 @@ public:
      *         valid range.
      */
     template <typename J>
-    friend JsonIterator<J> operator+(
-        typename JsonIterator<J>::difference_type offset,
-        const JsonIterator<J> &iterator) noexcept(false);
+    friend JsonIterator<J>
+    operator+(typename JsonIterator<J>::difference_type offset, const JsonIterator<J> &iterator);
 
     /**
      * Subtraction operator. Retrieve an iterator pointed at the Json instance some offset earlier
@@ -378,7 +377,7 @@ public:
      * @throws OutOfRangeJsonException If the iterator at the offset escapes the Json instance's
      *         valid range.
      */
-    JsonIterator operator-(difference_type offset) const noexcept(false);
+    JsonIterator operator-(difference_type offset) const;
 
     /**
      * Difference operator. Compute the distance between this iterator and another. Invalid for Json
@@ -391,7 +390,7 @@ public:
      * @throws JsonIteratorException If the Json instance is an object.
      * @throws NullJsonException If either iterator is empty.
      */
-    difference_type operator-(const JsonIterator &iterator) const noexcept(false);
+    difference_type operator-(const JsonIterator &iterator) const;
 
     /**
      * Retrieve a reference to the key of the Json instance pointed to by this iterator. Only valid
@@ -402,7 +401,7 @@ public:
      * @throws JsonIteratorException If the Json instance is not an object.
      * @throws NullJsonException If the iterator is empty or past-the-end.
      */
-    const typename JsonTraits::object_type::key_type &key() const noexcept(false);
+    const typename JsonTraits::object_type::key_type &key() const;
 
     /**
      * Retrieve a reference to the Json instance pointed to by this iterator.
@@ -411,7 +410,7 @@ public:
      *
      * @throws NullJsonException If the iterator is empty or past-the-end.
      */
-    reference value() const noexcept(false);
+    reference value() const;
 
 private:
     friend std::
@@ -434,7 +433,7 @@ private:
      *
      * @throws JsonIteratorException If the iterator is empty.
      */
-    void validate_iterator() const noexcept(false);
+    void validate_iterator() const;
 
     /**
      * Verify that this and another iterator are not empty and are for the same Json instance.
@@ -444,7 +443,7 @@ private:
      * @throws JsonIteratorException If either iterator is empty, or if the two iterators are not
      *         for the same Json instance.
      */
-    void validate_iterator(const JsonIterator &iterator) const noexcept(false);
+    void validate_iterator(const JsonIterator &iterator) const;
 
     /**
      * Verify that the iterator at some offset earlier or later than this iterator does not escape
@@ -459,7 +458,7 @@ private:
      *         the Json instance's valid range.
      */
     template <typename T>
-    void validate_offset(const T &it, difference_type offset) const noexcept(false);
+    void validate_offset(const T &it, difference_type offset) const;
 
     /**
      * Verify that the provided iterator may be dereferenced.
@@ -471,7 +470,7 @@ private:
      * @throws JsonIteratorException If the iterator is empty or past-the-end.
      */
     template <typename T>
-    void validate_dereference(const T &it) const noexcept(false);
+    void validate_dereference(const T &it) const;
 
     pointer m_json;
     iterator_type m_iterator;
@@ -541,11 +540,11 @@ JsonIterator<JsonType>::operator=(const NonConstJsonIterator &iterator) noexcept
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator*() const noexcept(false) -> reference
+auto JsonIterator<JsonType>::operator*() const -> reference
 {
     validate_iterator();
 
-    auto visitor = [this](const auto &it) noexcept(false) -> reference {
+    auto visitor = [this](const auto &it) -> reference {
         this->validate_dereference(it);
 
         if constexpr (is_object_iterator<decltype(it)>)
@@ -563,11 +562,11 @@ auto JsonIterator<JsonType>::operator*() const noexcept(false) -> reference
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator->() const noexcept(false) -> pointer
+auto JsonIterator<JsonType>::operator->() const -> pointer
 {
     validate_iterator();
 
-    auto visitor = [this](const auto &it) noexcept(false) -> pointer {
+    auto visitor = [this](const auto &it) -> pointer {
         this->validate_dereference(it);
 
         if constexpr (is_object_iterator<decltype(it)>)
@@ -585,11 +584,11 @@ auto JsonIterator<JsonType>::operator->() const noexcept(false) -> pointer
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator[](difference_type offset) const noexcept(false) -> reference
+auto JsonIterator<JsonType>::operator[](difference_type offset) const -> reference
 {
     validate_iterator();
 
-    auto visitor = [&](const auto &it) noexcept(false) -> reference {
+    auto visitor = [&](const auto &it) -> reference {
         if constexpr (is_array_iterator<decltype(it)>)
         {
             validate_offset(it, offset);
@@ -610,7 +609,7 @@ auto JsonIterator<JsonType>::operator[](difference_type offset) const noexcept(f
 
 //==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator==(const JsonIterator &iterator) const noexcept(false)
+bool JsonIterator<JsonType>::operator==(const JsonIterator &iterator) const
 {
     validate_iterator(iterator);
     return m_iterator == iterator.m_iterator;
@@ -618,22 +617,18 @@ bool JsonIterator<JsonType>::operator==(const JsonIterator &iterator) const noex
 
 //==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator!=(const JsonIterator &iterator) const noexcept(false)
+bool JsonIterator<JsonType>::operator!=(const JsonIterator &iterator) const
 {
     return !(*this == iterator);
 }
 
 //==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator<(const JsonIterator &iterator) const noexcept(false)
+bool JsonIterator<JsonType>::operator<(const JsonIterator &iterator) const
 {
     validate_iterator(iterator);
 
-    // Formatter badly handles hanging indent in lambdas
-    // clang-format off
-    auto visitor = [this](const auto &it1, const auto &it2)
-       noexcept(is_array_iterator<decltype(it1), decltype(it2)>) -> bool
-    {
+    auto visitor = [this](const auto &it1, const auto &it2) -> bool {
         if constexpr (is_array_iterator<decltype(it1), decltype(it2)>)
         {
             return it1 < it2;
@@ -643,35 +638,34 @@ bool JsonIterator<JsonType>::operator<(const JsonIterator &iterator) const noexc
             throw JsonIteratorException(*m_json, "JSON type invalid for comparison operator");
         }
     };
-    // clang-format on
 
     return std::visit(visitor, m_iterator, iterator.m_iterator);
 }
 
 //==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator<=(const JsonIterator &iterator) const noexcept(false)
+bool JsonIterator<JsonType>::operator<=(const JsonIterator &iterator) const
 {
     return !(iterator < *this);
 }
 
 //==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator>(const JsonIterator &iterator) const noexcept(false)
+bool JsonIterator<JsonType>::operator>(const JsonIterator &iterator) const
 {
     return !(*this <= iterator);
 }
 
 //==================================================================================================
 template <typename JsonType>
-bool JsonIterator<JsonType>::operator>=(const JsonIterator &iterator) const noexcept(false)
+bool JsonIterator<JsonType>::operator>=(const JsonIterator &iterator) const
 {
     return !(*this < iterator);
 }
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator++(int) noexcept(false) -> JsonIterator
+auto JsonIterator<JsonType>::operator++(int) -> JsonIterator
 {
     auto result = *this;
     ++(*this);
@@ -681,11 +675,11 @@ auto JsonIterator<JsonType>::operator++(int) noexcept(false) -> JsonIterator
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator++() noexcept(false) -> JsonIterator &
+auto JsonIterator<JsonType>::operator++() -> JsonIterator &
 {
     validate_iterator();
 
-    auto visitor = [this](auto &it) noexcept(false) -> JsonIterator & {
+    auto visitor = [this](auto &it) -> JsonIterator & {
         validate_offset(it, 1);
         std::advance(it, 1);
 
@@ -697,7 +691,7 @@ auto JsonIterator<JsonType>::operator++() noexcept(false) -> JsonIterator &
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator--(int) noexcept(false) -> JsonIterator
+auto JsonIterator<JsonType>::operator--(int) -> JsonIterator
 {
     auto result = *this;
     --(*this);
@@ -707,11 +701,11 @@ auto JsonIterator<JsonType>::operator--(int) noexcept(false) -> JsonIterator
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator--() noexcept(false) -> JsonIterator &
+auto JsonIterator<JsonType>::operator--() -> JsonIterator &
 {
     validate_iterator();
 
-    auto visitor = [this](auto &it) noexcept(false) -> JsonIterator & {
+    auto visitor = [this](auto &it) -> JsonIterator & {
         validate_offset(it, -1);
         std::advance(it, -1);
 
@@ -723,11 +717,11 @@ auto JsonIterator<JsonType>::operator--() noexcept(false) -> JsonIterator &
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator+=(difference_type offset) noexcept(false) -> JsonIterator &
+auto JsonIterator<JsonType>::operator+=(difference_type offset) -> JsonIterator &
 {
     validate_iterator();
 
-    auto visitor = [this, &offset](auto &it) noexcept(false) {
+    auto visitor = [this, &offset](auto &it) {
         if constexpr (is_array_iterator<decltype(it)>)
         {
             validate_offset(it, offset);
@@ -745,14 +739,14 @@ auto JsonIterator<JsonType>::operator+=(difference_type offset) noexcept(false) 
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator-=(difference_type offset) noexcept(false) -> JsonIterator &
+auto JsonIterator<JsonType>::operator-=(difference_type offset) -> JsonIterator &
 {
     return *this += -offset;
 }
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator+(difference_type offset) const noexcept(false) -> JsonIterator
+auto JsonIterator<JsonType>::operator+(difference_type offset) const -> JsonIterator
 {
     auto result = *this;
     result += offset;
@@ -764,7 +758,7 @@ auto JsonIterator<JsonType>::operator+(difference_type offset) const noexcept(fa
 template <typename JsonType>
 JsonIterator<JsonType> operator+(
     typename JsonIterator<JsonType>::difference_type offset,
-    const JsonIterator<JsonType> &iterator) noexcept(false)
+    const JsonIterator<JsonType> &iterator)
 {
     auto result = iterator;
     result += offset;
@@ -774,7 +768,7 @@ JsonIterator<JsonType> operator+(
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator-(difference_type offset) const noexcept(false) -> JsonIterator
+auto JsonIterator<JsonType>::operator-(difference_type offset) const -> JsonIterator
 {
     auto result = *this;
     result -= offset;
@@ -784,17 +778,12 @@ auto JsonIterator<JsonType>::operator-(difference_type offset) const noexcept(fa
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const noexcept(false)
-    -> difference_type
+auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const -> difference_type
 {
     validate_iterator();
     iterator.validate_iterator();
 
-    // Formatter badly handles hanging indent in lambdas
-    // clang-format off
-    auto visitor = [this](const auto &it1, const auto &it2) noexcept(
-       is_array_iterator<decltype(it1), decltype(it2)>) -> difference_type
-    {
+    auto visitor = [this](const auto &it1, const auto &it2) -> difference_type {
         if constexpr (is_array_iterator<decltype(it1), decltype(it2)>)
         {
             return std::distance(it2, it1);
@@ -804,7 +793,6 @@ auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const noexc
             throw JsonIteratorException(*m_json, "JSON type invalid for iterator difference");
         }
     };
-    // clang-format on
 
     return std::visit(visitor, m_iterator, iterator.m_iterator);
 }
@@ -812,15 +800,11 @@ auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const noexc
 //==================================================================================================
 template <typename JsonType>
 const typename JsonTraits::object_type::key_type &JsonIterator<JsonType>::key() const
-    noexcept(false)
+
 {
     validate_iterator();
 
-    // Formatter badly handles hanging indent in lambdas
-    // clang-format off
-    auto visitor = [this](const auto &it) noexcept(false)
-        -> const typename JsonTraits::object_type::key_type &
-    {
+    auto visitor = [this](const auto &it) -> const typename JsonTraits::object_type::key_type & {
         if constexpr (is_object_iterator<decltype(it)>)
         {
             validate_dereference(it);
@@ -831,21 +815,20 @@ const typename JsonTraits::object_type::key_type &JsonIterator<JsonType>::key() 
             throw JsonIteratorException(*m_json, "JSON type is not keyed");
         }
     };
-    // clang-format on
 
     return std::visit(visitor, m_iterator);
 }
 
 //==================================================================================================
 template <typename JsonType>
-auto JsonIterator<JsonType>::value() const noexcept(false) -> reference
+auto JsonIterator<JsonType>::value() const -> reference
 {
     return *(*this);
 }
 
 //==================================================================================================
 template <typename JsonType>
-void JsonIterator<JsonType>::validate_iterator() const noexcept(false)
+void JsonIterator<JsonType>::validate_iterator() const
 {
     if (m_json == nullptr)
     {
@@ -855,7 +838,7 @@ void JsonIterator<JsonType>::validate_iterator() const noexcept(false)
 
 //==================================================================================================
 template <typename JsonType>
-void JsonIterator<JsonType>::validate_iterator(const JsonIterator &iterator) const noexcept(false)
+void JsonIterator<JsonType>::validate_iterator(const JsonIterator &iterator) const
 {
     validate_iterator();
     iterator.validate_iterator();
@@ -870,7 +853,7 @@ void JsonIterator<JsonType>::validate_iterator(const JsonIterator &iterator) con
 template <typename JsonType>
 template <typename T>
 void JsonIterator<JsonType>::validate_offset(const T &it, difference_type offset) const
-    noexcept(false)
+
 {
     difference_type distance = 0;
 
@@ -894,7 +877,7 @@ void JsonIterator<JsonType>::validate_offset(const T &it, difference_type offset
 //==================================================================================================
 template <typename JsonType>
 template <typename T>
-void JsonIterator<JsonType>::validate_dereference(const T &it) const noexcept(false)
+void JsonIterator<JsonType>::validate_dereference(const T &it) const
 {
     const JsonIterator end = m_json->end();
 

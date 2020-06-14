@@ -68,43 +68,43 @@ AsyncRequest &AsyncRequest::operator=(AsyncRequest &&request) noexcept
 }
 
 //==================================================================================================
-bool AsyncRequest::is_valid() const noexcept
+bool AsyncRequest::is_valid() const
 {
     return m_socket_id != s_invalid_id;
 }
 
 //==================================================================================================
-int AsyncRequest::get_socket_id() const noexcept
+int AsyncRequest::get_socket_id() const
 {
     return m_socket_id;
 }
 
 //==================================================================================================
-void AsyncRequest::increment_request_offset(std::string::size_type offset) noexcept
+void AsyncRequest::increment_request_offset(std::string::size_type offset)
 {
     m_request_offset += offset;
 }
 
 //==================================================================================================
-const std::string &AsyncRequest::get_request() const noexcept
+const std::string &AsyncRequest::get_request() const
 {
     return m_request;
 }
 
 //==================================================================================================
-std::string AsyncRequest::get_request_remaining() const noexcept
+std::string AsyncRequest::get_request_remaining() const
 {
     return m_request.substr(m_request_offset, std::string::npos);
 }
 
 //==================================================================================================
-address_type AsyncRequest::get_address() const noexcept
+address_type AsyncRequest::get_address() const
 {
     return m_address;
 }
 
 //==================================================================================================
-port_type AsyncRequest::get_port() const noexcept
+port_type AsyncRequest::get_port() const
 {
     return m_port;
 }

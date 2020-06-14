@@ -57,7 +57,7 @@ public:
      *
      * @return True if the mocked system call is enabled.
      */
-    static bool mock_enabled(MockCall mock) noexcept;
+    static bool mock_enabled(MockCall mock);
 
     /**
      * Check if a mocked system call is enabled.
@@ -67,7 +67,7 @@ public:
      *
      * @return True if the mocked system call is enabled.
      */
-    static bool mock_enabled(MockCall mock, bool &fail) noexcept;
+    static bool mock_enabled(MockCall mock, bool &fail);
 
 private:
     static std::mutex s_mock_system_mutex;

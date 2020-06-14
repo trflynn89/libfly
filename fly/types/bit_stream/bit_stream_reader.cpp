@@ -30,25 +30,25 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
 }
 
 //==================================================================================================
-bool BitStreamReader::read_word(word_type &word) noexcept
+bool BitStreamReader::read_word(word_type &word)
 {
     return read_bits(word, detail::s_bits_per_word) == detail::s_bits_per_word;
 }
 
 //==================================================================================================
-bool BitStreamReader::read_byte(byte_type &byte) noexcept
+bool BitStreamReader::read_byte(byte_type &byte)
 {
     return read_bits(byte, detail::s_bits_per_byte) == detail::s_bits_per_byte;
 }
 
 //==================================================================================================
-void BitStreamReader::discard_bits(byte_type size) noexcept
+void BitStreamReader::discard_bits(byte_type size)
 {
     m_position -= size;
 }
 
 //==================================================================================================
-bool BitStreamReader::fully_consumed() const noexcept
+bool BitStreamReader::fully_consumed() const
 {
     if (m_stream_buffer->sgetc() == EOF)
     {
@@ -59,13 +59,13 @@ bool BitStreamReader::fully_consumed() const noexcept
 }
 
 //==================================================================================================
-byte_type BitStreamReader::header() const noexcept
+byte_type BitStreamReader::header() const
 {
     return m_header;
 }
 
 //==================================================================================================
-void BitStreamReader::refill_buffer() noexcept
+void BitStreamReader::refill_buffer()
 {
     const byte_type bits_to_fill = detail::s_most_significant_bit_position - m_position;
     buffer_type buffer = 0;

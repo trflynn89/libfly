@@ -3,7 +3,7 @@
 namespace fly {
 
 //==================================================================================================
-void Config::update(const Json &values) noexcept
+void Config::update(const Json &values)
 {
     std::unique_lock<std::shared_timed_mutex> lock(m_values_mutex);
     m_values = values;

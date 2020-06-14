@@ -53,7 +53,7 @@ public:
     /**
      * Create the file directory and start the task and config managers.
      */
-    void SetUp() noexcept override
+    void SetUp() override
     {
         ASSERT_TRUE(std::filesystem::create_directories(m_path));
         ASSERT_TRUE(m_task_manager->start());
@@ -65,7 +65,7 @@ public:
     /**
      * Delete the created directory and stop the task manager.
      */
-    void TearDown() noexcept override
+    void TearDown() override
     {
         ASSERT_TRUE(m_task_manager->stop());
         std::filesystem::remove_all(m_path);

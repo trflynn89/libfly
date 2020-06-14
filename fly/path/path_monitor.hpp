@@ -65,7 +65,7 @@ public:
      *
      * @return True if the path monitor is in a valid state.
      */
-    bool start() noexcept;
+    bool start();
 
     /**
      * Monitor for changes to all files under a directory. Callbacks registered with AddFile take
@@ -76,7 +76,7 @@ public:
      *
      * @return True if the directory could be added.
      */
-    bool add_path(const std::filesystem::path &path, PathEventCallback callback) noexcept;
+    bool add_path(const std::filesystem::path &path, PathEventCallback callback);
 
     /**
      * Stop monitoring for changes to all files under a directory.
@@ -85,12 +85,12 @@ public:
      *
      * @return True if the directory was removed.
      */
-    bool remove_path(const std::filesystem::path &path) noexcept;
+    bool remove_path(const std::filesystem::path &path);
 
     /**
      * Stop monitoring all paths.
      */
-    void remove_all_paths() noexcept;
+    void remove_all_paths();
 
     /**
      * Monitor for changes to a single file. Callbacks registered with AddFile take precendence over
@@ -101,7 +101,7 @@ public:
      *
      * @return True if the file could be added.
      */
-    bool add_file(const std::filesystem::path &file, PathEventCallback callback) noexcept;
+    bool add_file(const std::filesystem::path &file, PathEventCallback callback);
 
     /**
      * Stop monitoring for changes to a single file. If there are no more files monitored in the
@@ -112,7 +112,7 @@ public:
      *
      * @return True if the file was removed.
      */
-    bool remove_file(const std::filesystem::path &file) noexcept;
+    bool remove_file(const std::filesystem::path &file);
 
 protected:
     /**
@@ -131,7 +131,7 @@ protected:
          *
          * @return True if the monitored path is healthy.
          */
-        virtual bool is_valid() const noexcept = 0;
+        virtual bool is_valid() const = 0;
 
         PathEventCallback m_path_handler;
         std::map<std::filesystem::path, PathEventCallback> m_file_handlers;
@@ -149,22 +149,21 @@ protected:
      *
      * @return Up-casted pointer to the PathInfo struct.
      */
-    virtual std::unique_ptr<PathInfo>
-    create_path_info(const std::filesystem::path &path) const noexcept = 0;
+    virtual std::unique_ptr<PathInfo> create_path_info(const std::filesystem::path &path) const = 0;
 
     /**
      * Check if the path monitor implementation is valid.
      *
      * @return True if the implementation is valid.
      */
-    virtual bool is_valid() const noexcept = 0;
+    virtual bool is_valid() const = 0;
 
     /**
      * Check the path monitor implementation for any changes to the monitored paths.
      *
      * @param timeout Max time allow for an event to be occur.
      */
-    virtual void poll(const std::chrono::milliseconds &timeout) noexcept = 0;
+    virtual void poll(const std::chrono::milliseconds &timeout) = 0;
 
     mutable std::mutex m_mutex;
     PathInfoMap m_path_info;
@@ -178,12 +177,12 @@ private:
      *
      * @return Shared pointer to the PathInfo struct.
      */
-    PathInfo *get_or_create_path_info(const std::filesystem::path &path) noexcept;
+    PathInfo *get_or_create_path_info(const std::filesystem::path &path);
 
     /**
      * Stream the name of a PathEvent instance.
      */
-    friend std::ostream &operator<<(std::ostream &stream, PathEvent event) noexcept;
+    friend std::ostream &operator<<(std::ostream &stream, PathEvent event);
 
     std::shared_ptr<SequencedTaskRunner> m_task_runner;
     std::shared_ptr<Task> m_task;
@@ -207,7 +206,7 @@ protected:
      * Call back into the path monitor to check for any changes to the monitored paths. If the path
      * monitor implementation is still valid, the task re-arms itself.
      */
-    void run() noexcept override;
+    void run() override;
 
 private:
     std::weak_ptr<PathMonitor> m_weak_path_monitor;

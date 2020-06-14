@@ -21,7 +21,7 @@ namespace {
     void log_encoder_stats(
         std::chrono::time_point<std::chrono::system_clock> start,
         SizeType decoded_size,
-        SizeType encoded_size) noexcept
+        SizeType encoded_size)
     {
         const auto end = std::chrono::system_clock::now();
         const auto ratio = (static_cast<double>(decoded_size) - encoded_size) / decoded_size;
@@ -38,7 +38,7 @@ namespace {
     void log_decoder_stats(
         std::chrono::time_point<std::chrono::system_clock> start,
         SizeType encoded_size,
-        SizeType decoded_size) noexcept
+        SizeType decoded_size)
     {
         const auto end = std::chrono::system_clock::now();
 
@@ -52,7 +52,7 @@ namespace {
 } // namespace
 
 //==================================================================================================
-bool Encoder::encode_string(const std::string &decoded, std::string &encoded) noexcept
+bool Encoder::encode_string(const std::string &decoded, std::string &encoded)
 {
     const auto start = std::chrono::system_clock::now();
     bool successful = false;
@@ -77,7 +77,7 @@ bool Encoder::encode_string(const std::string &decoded, std::string &encoded) no
 //==================================================================================================
 bool Encoder::encode_file(
     const std::filesystem::path &decoded,
-    const std::filesystem::path &encoded) noexcept
+    const std::filesystem::path &encoded)
 {
     const auto start = std::chrono::system_clock::now();
     bool successful = false;
@@ -103,14 +103,14 @@ bool Encoder::encode_file(
 }
 
 //==================================================================================================
-bool BinaryEncoder::encode_internal(std::istream &decoded, std::ostream &encoded) noexcept
+bool BinaryEncoder::encode_internal(std::istream &decoded, std::ostream &encoded)
 {
     BitStreamWriter stream(encoded);
     return encode_binary(decoded, stream);
 }
 
 //==================================================================================================
-bool Decoder::decode_string(const std::string &encoded, std::string &decoded) noexcept
+bool Decoder::decode_string(const std::string &encoded, std::string &decoded)
 {
     const auto start = std::chrono::system_clock::now();
     bool successful = false;
@@ -135,7 +135,7 @@ bool Decoder::decode_string(const std::string &encoded, std::string &decoded) no
 //==================================================================================================
 bool Decoder::decode_file(
     const std::filesystem::path &encoded,
-    const std::filesystem::path &decoded) noexcept
+    const std::filesystem::path &decoded)
 {
     const auto start = std::chrono::system_clock::now();
     bool successful = false;
@@ -161,7 +161,7 @@ bool Decoder::decode_file(
 }
 
 //==================================================================================================
-bool BinaryDecoder::decode_internal(std::istream &encoded, std::ostream &decoded) noexcept
+bool BinaryDecoder::decode_internal(std::istream &encoded, std::ostream &decoded)
 {
     BitStreamReader stream(encoded);
     return decode_binary(stream, decoded);

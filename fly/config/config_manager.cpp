@@ -46,7 +46,7 @@ ConfigManager::~ConfigManager()
 }
 
 //==================================================================================================
-ConfigManager::ConfigMap::size_type ConfigManager::prune() noexcept
+ConfigManager::ConfigMap::size_type ConfigManager::prune()
 {
     std::lock_guard<std::mutex> lock(m_configs_mutex);
 
@@ -68,7 +68,7 @@ ConfigManager::ConfigMap::size_type ConfigManager::prune() noexcept
 }
 
 //==================================================================================================
-bool ConfigManager::start() noexcept
+bool ConfigManager::start()
 {
     if (m_parser)
     {
@@ -105,7 +105,7 @@ bool ConfigManager::start() noexcept
 }
 
 //==================================================================================================
-void ConfigManager::update_config() noexcept
+void ConfigManager::update_config()
 {
     std::lock_guard<std::mutex> lock(m_configs_mutex);
 
@@ -151,7 +151,7 @@ ConfigUpdateTask::ConfigUpdateTask(std::weak_ptr<ConfigManager> weak_config_mana
 }
 
 //==================================================================================================
-void ConfigUpdateTask::run() noexcept
+void ConfigUpdateTask::run()
 {
     std::shared_ptr<ConfigManager> config_manager = m_weak_config_manager.lock();
 

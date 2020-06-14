@@ -24,7 +24,7 @@ PathMonitor::~PathMonitor()
 }
 
 //==================================================================================================
-bool PathMonitor::start() noexcept
+bool PathMonitor::start()
 {
     if (is_valid())
     {
@@ -40,7 +40,7 @@ bool PathMonitor::start() noexcept
 }
 
 //==================================================================================================
-bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback callback) noexcept
+bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback callback)
 {
     std::error_code error;
 
@@ -70,7 +70,7 @@ bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback 
 }
 
 //==================================================================================================
-bool PathMonitor::remove_path(const std::filesystem::path &path) noexcept
+bool PathMonitor::remove_path(const std::filesystem::path &path)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_path_info.find(path);
@@ -88,7 +88,7 @@ bool PathMonitor::remove_path(const std::filesystem::path &path) noexcept
 }
 
 //==================================================================================================
-void PathMonitor::remove_all_paths() noexcept
+void PathMonitor::remove_all_paths()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -97,7 +97,7 @@ void PathMonitor::remove_all_paths() noexcept
 }
 
 //==================================================================================================
-bool PathMonitor::add_file(const std::filesystem::path &file, PathEventCallback callback) noexcept
+bool PathMonitor::add_file(const std::filesystem::path &file, PathEventCallback callback)
 {
     std::error_code error;
 
@@ -131,7 +131,7 @@ bool PathMonitor::add_file(const std::filesystem::path &file, PathEventCallback 
 }
 
 //==================================================================================================
-bool PathMonitor::remove_file(const std::filesystem::path &file) noexcept
+bool PathMonitor::remove_file(const std::filesystem::path &file)
 {
     bool prune_path = false;
     {
@@ -163,8 +163,7 @@ bool PathMonitor::remove_file(const std::filesystem::path &file) noexcept
 }
 
 //==================================================================================================
-PathMonitor::PathInfo *
-PathMonitor::get_or_create_path_info(const std::filesystem::path &path) noexcept
+PathMonitor::PathInfo *PathMonitor::get_or_create_path_info(const std::filesystem::path &path)
 {
     PathInfo *info = nullptr;
 
@@ -189,7 +188,7 @@ PathMonitor::get_or_create_path_info(const std::filesystem::path &path) noexcept
 }
 
 //==================================================================================================
-std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event) noexcept
+std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event)
 {
     switch (event)
     {
@@ -221,7 +220,7 @@ PathMonitorTask::PathMonitorTask(std::weak_ptr<PathMonitor> weak_path_monitor) n
 }
 
 //==================================================================================================
-void PathMonitorTask::run() noexcept
+void PathMonitorTask::run()
 {
     std::shared_ptr<PathMonitor> path_monitor = m_weak_path_monitor.lock();
 

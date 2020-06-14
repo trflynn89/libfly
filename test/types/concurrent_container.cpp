@@ -16,7 +16,7 @@ public:
     using Object = unsigned int;
     using ObjectQueue = fly::ConcurrentQueue<Object>;
 
-    unsigned int writer_thread(ObjectQueue &object_queue) noexcept
+    unsigned int writer_thread(ObjectQueue &object_queue)
     {
         unsigned int writes = 100;
 
@@ -29,8 +29,7 @@ public:
         return writes;
     }
 
-    unsigned int
-    reader_thread(ObjectQueue &object_queue, std::atomic_bool &finished_writes) noexcept
+    unsigned int reader_thread(ObjectQueue &object_queue, std::atomic_bool &finished_writes)
     {
         unsigned int reads = 0;
 
@@ -47,7 +46,7 @@ public:
         return reads;
     }
 
-    Object infinite_wait_reader_thread(ObjectQueue &object_queue) noexcept
+    Object infinite_wait_reader_thread(ObjectQueue &object_queue)
     {
         Object object;
         object_queue.pop(object);
@@ -56,7 +55,7 @@ public:
     }
 
 protected:
-    void run_multi_threaded_test(unsigned int writers, unsigned int readers) noexcept
+    void run_multi_threaded_test(unsigned int writers, unsigned int readers)
     {
         ObjectQueue object_queue;
 
@@ -101,10 +100,8 @@ protected:
         ASSERT_EQ(writes, reads);
     }
 
-    void do_queue_push(
-        ObjectQueue &object_queue,
-        Object object,
-        ObjectQueue::size_type expected_size) noexcept
+    void
+    do_queue_push(ObjectQueue &object_queue, Object object, ObjectQueue::size_type expected_size)
     {
         object_queue.push(std::move(object));
 
@@ -115,7 +112,7 @@ protected:
     void do_queue_pop(
         ObjectQueue &object_queue,
         const Object &expected_object,
-        ObjectQueue::size_type expected_size) noexcept
+        ObjectQueue::size_type expected_size)
     {
         Object object;
 

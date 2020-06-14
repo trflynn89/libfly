@@ -52,7 +52,7 @@ public:
     /**
      * Start the task manager and system monitor.
      */
-    void SetUp() noexcept override
+    void SetUp() override
     {
         ASSERT_TRUE(m_task_manager->start());
         ASSERT_TRUE(m_monitor->start());
@@ -62,7 +62,7 @@ public:
     /**
      * Stop the task manager.
      */
-    void TearDown() noexcept override
+    void TearDown() override
     {
         ASSERT_TRUE(m_task_manager->stop());
     }
@@ -70,7 +70,7 @@ public:
     /**
      * Thread to spin infinitely until signaled to stop.
      */
-    void spin_thread() noexcept
+    void spin_thread()
     {
         while (m_keep_running.load())
         {

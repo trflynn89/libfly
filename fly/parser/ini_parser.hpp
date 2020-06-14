@@ -26,7 +26,7 @@ protected:
      *
      * @throws ParserException Thrown if an error occurs parsing the stream.
      */
-    Json parse_internal(std::istream &stream) noexcept(false) override;
+    Json parse_internal(std::istream &stream) override;
 
 private:
     /**
@@ -38,7 +38,7 @@ private:
      *
      * @throws ParserException Thrown if the section name is quoted.
      */
-    std::string on_section(const std::string &line) noexcept(false);
+    std::string on_section(const std::string &line);
 
     /**
      * Parse a line containing a name/value pair.
@@ -49,7 +49,7 @@ private:
      * @throws ParserException Thrown if the value name is quoted, or the line both a name and value
      *         are not found.
      */
-    void on_value(Json &section, const std::string &line) noexcept(false);
+    void on_value(Json &section, const std::string &line);
 
     /**
      * If the given string begins and ends with the given character, remove that character from each
@@ -63,7 +63,7 @@ private:
      * @throws ParserException Thrown if the character was found at one end of the string, but not
      *         the other.
      */
-    bool trim_value(std::string &str, char ch) const noexcept(false);
+    bool trim_value(std::string &str, char ch) const;
 
     /**
      * If the given string begins with the first given character and ends with the second given
@@ -78,7 +78,7 @@ private:
      * @throws ParserException Thrown if the one of the start/end characters was found, but not the
      *         other.
      */
-    bool trim_value(std::string &str, char start, char end) const noexcept(false);
+    bool trim_value(std::string &str, char start, char end) const;
 };
 
 } // namespace fly

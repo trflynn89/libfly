@@ -52,7 +52,7 @@ enum class Endian : std::uint16_t
  * @return The swapped value.
  */
 template <Endian Endianness, typename T>
-inline T endian_swap(T value) noexcept
+inline T endian_swap(T value)
 {
     static_assert(
         detail::EndianTraits::is_supported_integer_v<T>,

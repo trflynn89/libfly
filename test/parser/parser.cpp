@@ -15,7 +15,7 @@ namespace {
 class EofParser : public fly::Parser
 {
 public:
-    void compare_parsed(std::vector<int> chars) const noexcept
+    void compare_parsed(std::vector<int> chars) const
     {
         EXPECT_EQ(m_chars, chars);
     }

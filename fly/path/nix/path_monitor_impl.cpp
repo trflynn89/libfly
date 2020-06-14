@@ -44,13 +44,13 @@ PathMonitorImpl::~PathMonitorImpl()
 }
 
 //==================================================================================================
-bool PathMonitorImpl::is_valid() const noexcept
+bool PathMonitorImpl::is_valid() const
 {
     return m_monitor_descriptor != -1;
 }
 
 //==================================================================================================
-void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
+void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout)
 {
     pollfd poll_fd;
 
@@ -75,7 +75,7 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout) noexcept
 
 //==================================================================================================
 std::unique_ptr<PathMonitor::PathInfo>
-PathMonitorImpl::create_path_info(const std::filesystem::path &path) const noexcept
+PathMonitorImpl::create_path_info(const std::filesystem::path &path) const
 {
     std::unique_ptr<PathMonitor::PathInfo> info;
 
@@ -88,7 +88,7 @@ PathMonitorImpl::create_path_info(const std::filesystem::path &path) const noexc
 }
 
 //==================================================================================================
-bool PathMonitorImpl::read_events() const noexcept
+bool PathMonitorImpl::read_events() const
 {
     static constexpr const std::size_t s_event_size = sizeof(inotify_event);
 
@@ -125,7 +125,7 @@ bool PathMonitorImpl::read_events() const noexcept
 }
 
 //==================================================================================================
-void PathMonitorImpl::handle_event(const inotify_event *event) const noexcept
+void PathMonitorImpl::handle_event(const inotify_event *event) const
 {
     auto path_it = std::find_if(
         m_path_info.begin(),
@@ -168,7 +168,7 @@ void PathMonitorImpl::handle_event(const inotify_event *event) const noexcept
 }
 
 //==================================================================================================
-PathMonitor::PathEvent PathMonitorImpl::convert_to_event(std::uint32_t mask) const noexcept
+PathMonitor::PathEvent PathMonitorImpl::convert_to_event(std::uint32_t mask) const
 {
     PathMonitor::PathEvent path_event = PathMonitor::PathEvent::None;
 
@@ -216,7 +216,7 @@ PathMonitorImpl::PathInfoImpl::~PathInfoImpl()
 }
 
 //==================================================================================================
-bool PathMonitorImpl::PathInfoImpl::is_valid() const noexcept
+bool PathMonitorImpl::PathInfoImpl::is_valid() const
 {
     return m_watch_descriptor != -1;
 }

@@ -23,7 +23,7 @@ public:
     /**
      * Constructor.
      */
-    HuffmanDecoder();
+    HuffmanDecoder() noexcept;
 
 protected:
     /**
@@ -53,7 +53,7 @@ protected:
      *
      * @return True if the input stream was successfully decoded.
      */
-    bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept override;
+    bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) override;
 
 private:
     /**
@@ -69,7 +69,7 @@ private:
     bool decode_header(
         BitStreamReader &encoded,
         std::uint32_t &chunk_size,
-        length_type &max_code_length) const noexcept;
+        length_type &max_code_length) const;
 
     /**
      * Decode version 1 of the header. Extract the maximum chunk length and the global maximum
@@ -84,7 +84,7 @@ private:
     bool decode_header_version1(
         BitStreamReader &encoded,
         std::uint32_t &chunk_size,
-        length_type &max_code_length) const noexcept;
+        length_type &max_code_length) const;
 
     /**
      * Decode Huffman codes from an encoded input stream. The list of codes will be stored as a
@@ -99,14 +99,14 @@ private:
     bool decode_codes(
         BitStreamReader &encoded,
         length_type global_max_code_length,
-        length_type &local_max_code_length) noexcept;
+        length_type &local_max_code_length);
 
     /**
      * Convert the decoded list of Huffman codes into a prefix table.
      *
      * @param max_code_length The maximum length of the decoded Huffman codes.
      */
-    void convert_to_prefix_table(length_type max_code_length) noexcept;
+    void convert_to_prefix_table(length_type max_code_length);
 
     /**
      * Decode symbols from an encoded input stream with a Huffman tree. Store decoded data into a
@@ -124,7 +124,7 @@ private:
         BitStreamReader &encoded,
         length_type max_code_length,
         std::uint32_t chunk_size,
-        std::ostream &decoded) const noexcept;
+        std::ostream &decoded) const;
 
     std::unique_ptr<symbol_type[]> m_chunk_buffer;
 

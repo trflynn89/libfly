@@ -19,7 +19,7 @@ HuffmanNode &HuffmanNode::operator=(HuffmanNode &&node) noexcept
 }
 
 //==================================================================================================
-void HuffmanNode::become_symbol(symbol_type symbol, frequency_type frequency) noexcept
+void HuffmanNode::become_symbol(symbol_type symbol, frequency_type frequency)
 {
     m_symbol = symbol;
     m_frequency = frequency;
@@ -28,7 +28,7 @@ void HuffmanNode::become_symbol(symbol_type symbol, frequency_type frequency) no
 }
 
 //==================================================================================================
-void HuffmanNode::become_intermediate(HuffmanNode *left, HuffmanNode *right) noexcept
+void HuffmanNode::become_intermediate(HuffmanNode *left, HuffmanNode *right)
 {
     m_symbol = 0;
     m_frequency = left->m_frequency + right->m_frequency;
@@ -37,7 +37,7 @@ void HuffmanNode::become_intermediate(HuffmanNode *left, HuffmanNode *right) noe
 }
 
 //==================================================================================================
-bool HuffmanNodeComparator::operator()(const HuffmanNode *left, const HuffmanNode *right) noexcept
+bool HuffmanNodeComparator::operator()(const HuffmanNode *left, const HuffmanNode *right)
 {
     return left->m_frequency > right->m_frequency;
 }

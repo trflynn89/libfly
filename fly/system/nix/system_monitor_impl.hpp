@@ -28,12 +28,12 @@ public:
         const std::shared_ptr<SystemConfig> &config) noexcept;
 
 protected:
-    void update_system_cpu_count() noexcept override;
-    void update_system_cpu_usage() noexcept override;
-    void update_process_cpu_usage() noexcept override;
+    void update_system_cpu_count() override;
+    void update_system_cpu_usage() override;
+    void update_process_cpu_usage() override;
 
-    void update_system_memory_usage() noexcept override;
-    void update_process_memory_usage() noexcept override;
+    void update_system_memory_usage() override;
+    void update_process_memory_usage() override;
 
 private:
     std::uint64_t m_prev_system_user_time;

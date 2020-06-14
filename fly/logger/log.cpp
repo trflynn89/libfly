@@ -49,7 +49,7 @@ Log &Log::operator=(Log &&log) noexcept
 }
 
 //==================================================================================================
-std::ostream &operator<<(std::ostream &stream, const Log &log) noexcept
+std::ostream &operator<<(std::ostream &stream, const Log &log)
 {
     stream << log.m_level << '\t';
     stream << log.m_time << '\t';
@@ -62,7 +62,7 @@ std::ostream &operator<<(std::ostream &stream, const Log &log) noexcept
 }
 
 //==================================================================================================
-std::ostream &operator<<(std::ostream &stream, const Log::Level &level) noexcept
+std::ostream &operator<<(std::ostream &stream, const Log::Level &level)
 {
     stream << static_cast<int>(level);
     return stream;

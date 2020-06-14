@@ -28,13 +28,13 @@ Logger::Logger(
 }
 
 //==================================================================================================
-void Logger::set_instance(const std::shared_ptr<Logger> &logger) noexcept
+void Logger::set_instance(const std::shared_ptr<Logger> &logger)
 {
     s_weak_instance = logger;
 }
 
 //==================================================================================================
-void Logger::console_log(bool acquire_lock, const std::string &message) noexcept
+void Logger::console_log(bool acquire_lock, const std::string &message)
 {
     std::unique_lock<std::mutex> lock(s_console_mutex, std::defer_lock);
     const std::string time_str = System::local_time();
@@ -53,7 +53,7 @@ void Logger::add_log(
     const char *file,
     const char *function,
     std::uint32_t line,
-    const std::string &message) noexcept
+    const std::string &message)
 {
     std::shared_ptr<Logger> logger = s_weak_instance.lock();
 
@@ -68,7 +68,7 @@ void Logger::add_log(
 }
 
 //==================================================================================================
-bool Logger::start() noexcept
+bool Logger::start()
 {
     if (create_log_file())
     {
@@ -84,13 +84,13 @@ bool Logger::start() noexcept
 }
 
 //==================================================================================================
-std::filesystem::path Logger::get_log_file_path() const noexcept
+std::filesystem::path Logger::get_log_file_path() const
 {
     return m_log_file;
 }
 
 //==================================================================================================
-bool Logger::poll() noexcept
+bool Logger::poll()
 {
     Log log;
 
@@ -114,7 +114,7 @@ void Logger::add_log_internal(
     const char *file,
     const char *function,
     std::uint32_t line,
-    const std::string &message) noexcept
+    const std::string &message)
 {
     auto now = std::chrono::high_resolution_clock::now();
     auto log_time = std::chrono::duration_cast<std::chrono::duration<double>>(now - m_start_time);
@@ -135,7 +135,7 @@ void Logger::add_log_internal(
 }
 
 //==================================================================================================
-bool Logger::create_log_file() noexcept
+bool Logger::create_log_file()
 {
     const std::string rand_str = String::generate_random_string(10);
     std::string time_str = System::local_time();
@@ -165,7 +165,7 @@ LoggerTask::LoggerTask(std::weak_ptr<Logger> weak_logger) noexcept :
 }
 
 //==================================================================================================
-void LoggerTask::run() noexcept
+void LoggerTask::run()
 {
     std::shared_ptr<Logger> logger = m_weak_logger.lock();
 

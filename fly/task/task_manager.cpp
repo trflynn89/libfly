@@ -22,7 +22,7 @@ TaskManager::TaskManager(std::uint32_t num_workers) noexcept :
 }
 
 //==================================================================================================
-bool TaskManager::start() noexcept
+bool TaskManager::start()
 {
     bool expected = false;
 
@@ -47,7 +47,7 @@ bool TaskManager::start() noexcept
 }
 
 //==================================================================================================
-bool TaskManager::stop() noexcept
+bool TaskManager::stop()
 {
     bool expected = true;
 
@@ -72,7 +72,7 @@ bool TaskManager::stop() noexcept
 //==================================================================================================
 void TaskManager::post_task(
     std::weak_ptr<Task> weak_task,
-    std::weak_ptr<TaskRunner> weak_task_runner) noexcept
+    std::weak_ptr<TaskRunner> weak_task_runner)
 {
     const auto now = std::chrono::steady_clock::now();
     TaskHolder task {weak_task, weak_task_runner, now};
@@ -84,7 +84,7 @@ void TaskManager::post_task(
 void TaskManager::post_task_with_delay(
     std::weak_ptr<Task> weak_task,
     std::weak_ptr<TaskRunner> weak_task_runner,
-    std::chrono::milliseconds delay) noexcept
+    std::chrono::milliseconds delay)
 {
     const auto schedule = std::chrono::steady_clock::now() + delay;
     TaskHolder task {weak_task, weak_task_runner, schedule};
@@ -94,7 +94,7 @@ void TaskManager::post_task_with_delay(
 }
 
 //==================================================================================================
-void TaskManager::worker_thread() noexcept
+void TaskManager::worker_thread()
 {
     TaskHolder task_holder;
 
@@ -119,7 +119,7 @@ void TaskManager::worker_thread() noexcept
 }
 
 //==================================================================================================
-void TaskManager::timer_thread() noexcept
+void TaskManager::timer_thread()
 {
     while (m_keep_running.load())
     {
