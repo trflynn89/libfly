@@ -1,4 +1,5 @@
 #include "fly/fly.hpp"
+#include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
 #include "fly/types/string/string_literal.hpp"
 #include "test/types/string_test.hpp"
@@ -190,4 +191,36 @@ TYPED_TEST(BasicStringTest, FormatTest_e)
     format = FLY_STR(char_type, "%E");
     EXPECT_EQ(FLY_STR(streamed_char, "%E"), StringClass::format(format));
     EXPECT_EQ(FLY_STR(streamed_char, "1.230000E+02"), StringClass::format(format, 123.0));
+}
+
+//==================================================================================================
+TYPED_TEST(BasicStringTest, FormatHex)
+{
+    DECLARE_ALIASES
+
+    for (char_type ch = 0; ch <= 0xf; ++ch)
+    {
+        if ((ch >= 0) && (ch <= 9))
+        {
+            EXPECT_EQ(string_type(1, '0' + ch), StringClass::create_hex_string(ch, 1));
+        }
+        else
+        {
+            EXPECT_EQ(string_type(1, 'a' + ch - 10), StringClass::create_hex_string(ch, 1));
+        }
+    }
+
+    EXPECT_EQ(FLY_STR(char_type, ""), StringClass::create_hex_string(0x1234, 0));
+    EXPECT_EQ(FLY_STR(char_type, "4"), StringClass::create_hex_string(0x1234, 1));
+    EXPECT_EQ(FLY_STR(char_type, "34"), StringClass::create_hex_string(0x1234, 2));
+    EXPECT_EQ(FLY_STR(char_type, "234"), StringClass::create_hex_string(0x1234, 3));
+    EXPECT_EQ(FLY_STR(char_type, "1234"), StringClass::create_hex_string(0x1234, 4));
+    EXPECT_EQ(FLY_STR(char_type, "01234"), StringClass::create_hex_string(0x1234, 5));
+    EXPECT_EQ(FLY_STR(char_type, "001234"), StringClass::create_hex_string(0x1234, 6));
+    EXPECT_EQ(FLY_STR(char_type, "0001234"), StringClass::create_hex_string(0x1234, 7));
+    EXPECT_EQ(FLY_STR(char_type, "00001234"), StringClass::create_hex_string(0x1234, 8));
+
+    EXPECT_EQ(
+        FLY_STR(char_type, "0123456789abcdef"),
+        StringClass::create_hex_string(0x0123456789abcdef_u64, 16));
 }

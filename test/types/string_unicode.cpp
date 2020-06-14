@@ -5,25 +5,6 @@
 
 #include <gtest/gtest.h>
 
-namespace {
-
-//==================================================================================================
-template <typename StringType, typename CharType>
-StringType to_hex(CharType ch, std::size_t length)
-{
-    static const auto *digits = FLY_STR(typename StringType::value_type, "0123456789abcdef");
-    StringType hex(length, FLY_CHR(typename StringType::value_type, '0'));
-
-    for (std::size_t i = 0, j = (length - 1) * 4; i < length; ++i, j -= 4)
-    {
-        hex[i] = digits[(ch >> j) & 0x0f];
-    }
-
-    return hex;
-}
-
-} // namespace
-
 //==================================================================================================
 TYPED_TEST(BasicStringTest, EmptyString)
 {
@@ -331,7 +312,8 @@ TYPED_TEST(BasicStringTest, EncodingNonPrintableASCIIEncodedWithLowerU)
         SCOPED_TRACE(static_cast<codepoint_type>(ch));
 
         // ASCII symbols should always be encoded with \u.
-        const string_type expected = FLY_STR(char_type, "\\u") + to_hex<string_type>(ch, 4);
+        const string_type expected =
+            FLY_STR(char_type, "\\u") + StringClass::create_hex_string(ch, 4);
         const string_type test(1, ch);
         {
             auto begin = test.cbegin();
@@ -551,19 +533,20 @@ TYPED_TEST(BasicStringTest, DecodingInvalidSurrogates)
     // Low surrogate only.
     for (codepoint_type ch = 0xdc00; ch <= 0xdfff; ++ch)
     {
-        validate_fail(FLY_STR(char_type, "\\u") + to_hex<string_type>(ch, 4));
+        validate_fail(FLY_STR(char_type, "\\u") + StringClass::create_hex_string(ch, 4));
     }
 
     // High surrogate only.
     for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
     {
-        validate_fail(FLY_STR(char_type, "\\u") + to_hex<string_type>(ch, 4));
+        validate_fail(FLY_STR(char_type, "\\u") + StringClass::create_hex_string(ch, 4));
     }
 
     // High surrogate followed by non-surrogate.
     for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
     {
-        string_type high_surrogate(FLY_STR(char_type, "\\u") + to_hex<string_type>(ch, 4));
+        string_type high_surrogate(
+            FLY_STR(char_type, "\\u") + StringClass::create_hex_string(ch, 4));
         string_type low_surrogate(FLY_STR(char_type, "\\u0000"));
 
         validate_fail(high_surrogate + low_surrogate);
@@ -572,7 +555,8 @@ TYPED_TEST(BasicStringTest, DecodingInvalidSurrogates)
     // High surrogate followed by high surrogate.
     for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
     {
-        string_type high_surrogate(FLY_STR(char_type, "\\u") + to_hex<string_type>(ch, 4));
+        string_type high_surrogate(
+            FLY_STR(char_type, "\\u") + StringClass::create_hex_string(ch, 4));
 
         validate_fail(high_surrogate + high_surrogate);
     }
