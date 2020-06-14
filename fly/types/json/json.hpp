@@ -121,9 +121,11 @@ public:
      * @tparam T The object-like type.
      *
      * @param value The object-like value.
+     *
+     * @throws JsonException If an object key is not a valid string.
      */
     template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
-    Json(const T &value) noexcept;
+    Json(const T &value) noexcept(false);
 
     /**
      * Array constructor. Intializes the Json instance to an array's values. The SFINAE declaration
@@ -132,9 +134,11 @@ public:
      * @tparam T The array-like type.
      *
      * @param value The array-like value.
+     *
+     * @throws JsonException If an string-like value in the array is not valid.
      */
     template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
-    Json(const T &value) noexcept;
+    Json(const T &value) noexcept(false);
 
     /**
      * Boolean constructor. Intializes the Json instance to a boolean value. The SFINAE declaration
@@ -696,10 +700,13 @@ private:
      * characters, an extra reverse solidus is inserted.
      *
      * @param stream Stream to pipe the escaped character into.
-     * @param ch Character to escape.
+     * @param it Pointer to the character to escape.
+     * @param end Pointer to the end of the original string value.
      */
-    static void
-    write_escaped_charater(std::ostream &stream, JsonTraits::string_type::value_type ch) noexcept;
+    static void write_escaped_charater(
+        std::ostream &stream,
+        JsonTraits::string_type::const_iterator &it,
+        const JsonTraits::string_type::const_iterator &end) noexcept;
 
     /**
      * Validate a non-escaped character is JSON and Unicode compliant. If so, write the character
@@ -727,13 +734,20 @@ Json::Json(const T &value) noexcept(false) : m_value(validate_string(value))
 
 //==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_object<T>>>
-Json::Json(const T &value) noexcept : m_value(JsonTraits::object_type(value.begin(), value.end()))
+Json::Json(const T &value) noexcept(false) : m_value(JsonTraits::object_type())
 {
+    auto &storage = std::get<JsonTraits::object_type>(m_value);
+
+    for (const auto &it : value)
+    {
+        storage[validate_string(it.first)] = Json(it.second);
+    }
 }
 
 //==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_array<T>>>
-Json::Json(const T &value) noexcept : m_value(JsonTraits::array_type(value.begin(), value.end()))
+Json::Json(const T &value) noexcept(false) :
+    m_value(JsonTraits::array_type(value.begin(), value.end()))
 {
 }
 
