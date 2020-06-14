@@ -2,7 +2,9 @@
 
 #include "fly/types/string/detail/string_streamer.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/string_literal.hpp"
 
+#include <limits>
 #include <ostream>
 
 namespace fly::detail {
@@ -17,6 +19,7 @@ template <typename StringType>
 class BasicStringFormatter
 {
     using traits = detail::BasicStringTraits<StringType>;
+    using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
     using ostream_type = typename traits::ostream_type;
     using streamed_type = typename traits::streamer_type::streamed_type;
@@ -69,6 +72,23 @@ public:
      */
     template <typename... Args>
     static ostream_type &format(ostream_type &ostream, const char_type *fmt, const Args &... args);
+
+    /**
+     * Format an integer as a hexadecimal string.
+     *
+     * If the number of bytes required for the string exceeds the provided length, only the least-
+     * significant bytes will be written. If the number of bytes required for the string is less
+     * than the provided length, the string will be zero-padded.
+     *
+     * @tparam The type of the integer to format.
+     *
+     * @param source The integer to format.
+     * @param length The length of the string to create.
+     *
+     * @return The created string with only hexacdemical digits.
+     */
+    template <typename IntegerType>
+    static StringType format_hex(IntegerType source, size_type length);
 
     /**
      * Stream the given value into the given stream. If the value is a string-like type, the string
@@ -127,6 +147,26 @@ auto BasicStringFormatter<StringType>::format(
     }
 
     return ostream;
+}
+
+//==================================================================================================
+template <typename StringType>
+template <typename IntegerType>
+StringType BasicStringFormatter<StringType>::format_hex(IntegerType source, size_type length)
+{
+    static_assert(
+        std::numeric_limits<IntegerType>::is_integer,
+        "Only integer types may be formatted as a hexadecimal string");
+
+    static constexpr const char_type *hexadecimal_digits = FLY_STR(char_type, "0123456789abcdef");
+    StringType hex(length, hexadecimal_digits[0]);
+
+    for (size_type i = 0, j = (length - 1) * 4; i < length; ++i, j -= 4)
+    {
+        hex[i] = hexadecimal_digits[(source >> j) & 0x0f];
+    }
+
+    return hex;
 }
 
 //==================================================================================================

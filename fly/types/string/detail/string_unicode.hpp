@@ -31,7 +31,8 @@ class BasicStringUnicode
     using char_type = typename traits::char_type;
     using codepoint_type = typename traits::codepoint_type;
 
-    using StringFormatter = BasicStringFormatter<std::string>;
+    using ExceptionFormatter = BasicStringFormatter<std::string>;
+    using StringFormatter = BasicStringFormatter<StringType>;
 
 public:
     /**
@@ -286,12 +287,13 @@ auto BasicStringUnicode<StringType>::decode_character(
 
     if ((codepoint >= high_surrogate_min) && (codepoint <= low_surrogate_max))
     {
-        throw UnicodeException(
-            StringFormatter::format("Codepoint %x is reserved by the Unicode Standard", codepoint));
+        throw UnicodeException(ExceptionFormatter::format(
+            "Codepoint %x is reserved by the Unicode Standard",
+            codepoint));
     }
     else if (codepoint > max_codepoint)
     {
-        throw UnicodeException(StringFormatter::format(
+        throw UnicodeException(ExceptionFormatter::format(
             "Codepoint %x exceeds the maxium codepoint U+10ffff",
             codepoint));
     }
@@ -343,7 +345,7 @@ StringType BasicStringUnicode<StringType>::unescape_character(
     }
     else
     {
-        throw UnicodeException(StringFormatter::format(
+        throw UnicodeException(ExceptionFormatter::format(
             "Escaped unicode must begin with \\%c or \\%c",
             static_cast<char>(ch_u),
             static_cast<char>(ch_U)));
@@ -359,25 +361,13 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
 {
     StringType result;
 
-    auto to_hex = [&codepoint](std::size_t length) -> StringType {
-        static const auto *digits = FLY_STR(char_type, "0123456789abcdef");
-        StringType hex(length, FLY_CHR(char_type, '0'));
-
-        for (std::size_t i = 0, j = (length - 1) * 4; i < length; ++i, j -= 4)
-        {
-            hex[i] = digits[(codepoint >> j) & 0x0f];
-        }
-
-        return hex;
-    };
-
     if ((codepoint <= 0x1f) || (codepoint >= 0x7f))
     {
         if (codepoint <= 0xffff)
         {
             result += FLY_CHR(char_type, '\\');
             result += ch_u;
-            result += to_hex(4);
+            result += StringFormatter::format_hex(codepoint, 4);
         }
         else
         {
@@ -393,7 +383,7 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
             {
                 result += FLY_CHR(char_type, '\\');
                 result += ch_U;
-                result += to_hex(8);
+                result += StringFormatter::format_hex(codepoint, 8);
             }
         }
     }
@@ -417,7 +407,7 @@ auto BasicStringUnicode<StringType>::unescape_codepoint(
     if ((it == end) || (*it != '\\') || (++it == end) || (*it != UnicodePrefix))
     {
         throw UnicodeException(
-            StringFormatter::format("Expected codepoint to begin with \\%c", UnicodePrefix));
+            ExceptionFormatter::format("Expected codepoint to begin with \\%c", UnicodePrefix));
     }
 
     codepoint_type codepoint = 0;
@@ -444,7 +434,7 @@ auto BasicStringUnicode<StringType>::unescape_codepoint(
         }
         else
         {
-            throw UnicodeException(StringFormatter::format(
+            throw UnicodeException(ExceptionFormatter::format(
                 "Expected %x to be a hexadecimal digit",
                 static_cast<codepoint_type>(*it)));
         }
@@ -452,7 +442,7 @@ auto BasicStringUnicode<StringType>::unescape_codepoint(
 
     if (i != expected_digits)
     {
-        throw UnicodeException(StringFormatter::format(
+        throw UnicodeException(ExceptionFormatter::format(
             "Expected exactly %u hexadecimals after \\%c, only found %u",
             expected_digits,
             UnicodePrefix,
@@ -480,7 +470,7 @@ auto BasicStringUnicode<StringType>::decode_codepoint(EncodedByteProvider next_e
 
     if (utf8_it == utf8_leading_bytes.end())
     {
-        throw UnicodeException(StringFormatter::format(
+        throw UnicodeException(ExceptionFormatter::format(
             "Leading byte %x is not a UTF-8 encoded leading byte",
             leading_byte));
     }
@@ -504,7 +494,7 @@ auto BasicStringUnicode<StringType>::decode_codepoint(EncodedByteProvider next_e
         if ((continuation_byte & utf8_continuation_byte.encoding_mask) !=
             utf8_continuation_byte.leading_byte)
         {
-            throw UnicodeException(StringFormatter::format(
+            throw UnicodeException(ExceptionFormatter::format(
                 "Continuation byte %x is not a UTF-8 encoded continuation byte",
                 continuation_byte));
         }
@@ -516,13 +506,13 @@ auto BasicStringUnicode<StringType>::decode_codepoint(EncodedByteProvider next_e
     if ((bytes == 2) && ((leading_byte & 0xfe) == utf8_it->leading_byte))
     {
         throw UnicodeException(
-            StringFormatter::format("Encoded 2-byte UTF-8 codepoint %x is overlong", codepoint));
+            ExceptionFormatter::format("Encoded 2-byte UTF-8 codepoint %x is overlong", codepoint));
     }
     else if (
         (bytes > 2) && (leading_byte == utf8_it->leading_byte) &&
         ((first_continuation_byte & utf8_it->leading_byte) == utf8_continuation_byte.leading_byte))
     {
-        throw UnicodeException(StringFormatter::format(
+        throw UnicodeException(ExceptionFormatter::format(
             "Encoded %u-byte UTF-8 codepoint %x is overlong",
             bytes,
             codepoint));
@@ -641,7 +631,7 @@ auto BasicStringUnicode<StringType>::create_codepoint(EncodedByteProvider next_e
         }
         else
         {
-            throw UnicodeException(StringFormatter::format(
+            throw UnicodeException(ExceptionFormatter::format(
                 "Expected low surrogate to follow high surrogate %x, found %x",
                 high_surrogate,
                 low_surrogate));
@@ -649,7 +639,7 @@ auto BasicStringUnicode<StringType>::create_codepoint(EncodedByteProvider next_e
     }
     else if (is_low_surrogate(high_surrogate))
     {
-        throw UnicodeException(StringFormatter::format(
+        throw UnicodeException(ExceptionFormatter::format(
             "Expected high surrogate to preceed low surrogate %x",
             high_surrogate));
     }

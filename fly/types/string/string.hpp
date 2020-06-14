@@ -72,7 +72,7 @@ public:
      * @return A vector containing the split strings.
      */
     static std::vector<StringType>
-    split(const StringType &input, char_type delimiter, std::uint32_t count);
+    split(const StringType &input, char_type delimiter, size_type count);
 
     /**
      * Remove leading and trailing whitespace from a string.
@@ -275,13 +275,30 @@ public:
         const typename StringType::const_iterator &end);
 
     /**
-     * Generate a random string of the given size.
+     * Format an integer as a hexadecimal string.
      *
-     * @param size The length of the string to generate.
+     * If the number of bytes required for the string exceeds the provided length, only the least-
+     * significant bytes will be written. If the number of bytes required for the string is less
+     * than the provided length, the string will be zero-padded.
+     *
+     * @tparam The type of the integer to format.
+     *
+     * @param source The integer to format.
+     * @param length The length of the string to create.
+     *
+     * @return The created string with only hexacdemical digits.
+     */
+    template <typename IntegerType>
+    static StringType create_hex_string(IntegerType source, size_type length);
+
+    /**
+     * Generate a random string of the given length.
+     *
+     * @param length The length of the string to generate.
      *
      * @return The generated string.
      */
-    static StringType generate_random_string(size_type size);
+    static StringType generate_random_string(size_type length);
 
     /**
      * Format a string with variadic template arguments, returning the formatted string.
@@ -385,7 +402,7 @@ private:
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz");
 
-    static constexpr std::size_t s_alpha_num_length =
+    static constexpr size_type s_alpha_num_length =
         std::char_traits<char_type>::length(s_alpha_num);
 };
 
@@ -399,10 +416,10 @@ std::vector<StringType> BasicString<StringType>::split(const StringType &input, 
 //==================================================================================================
 template <typename StringType>
 std::vector<StringType>
-BasicString<StringType>::split(const StringType &input, char_type delimiter, std::uint32_t count)
+BasicString<StringType>::split(const StringType &input, char_type delimiter, size_type count)
 {
     std::vector<StringType> elements;
-    std::uint32_t num_items = 0;
+    size_type num_items = 0;
     StringType item;
 
     size_type start = 0;
@@ -673,7 +690,15 @@ StringType BasicString<StringType>::unescape_unicode_character(
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicString<StringType>::generate_random_string(size_type size)
+template <typename IntegerType>
+StringType BasicString<StringType>::create_hex_string(IntegerType source, size_type length)
+{
+    return detail::BasicStringFormatter<StringType>::format_hex(source, length);
+}
+
+//==================================================================================================
+template <typename StringType>
+StringType BasicString<StringType>::generate_random_string(size_type length)
 {
     using short_distribution = std::uniform_int_distribution<short>;
 
@@ -687,9 +712,9 @@ StringType BasicString<StringType>::generate_random_string(size_type size)
     std::mt19937 engine(seed);
 
     StringType result;
-    result.reserve(size);
+    result.reserve(length);
 
-    while (size-- != 0)
+    while (length-- != 0)
     {
         result += s_alpha_num[distribution(engine)];
     }
