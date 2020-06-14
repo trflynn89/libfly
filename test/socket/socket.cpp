@@ -46,12 +46,12 @@ public:
     {
     }
 
-    virtual void server_thread(bool) noexcept
+    virtual void server_thread(bool)
     {
         ASSERT_TRUE(false);
     };
 
-    virtual void client_thread(bool) noexcept
+    virtual void client_thread(bool)
     {
         ASSERT_TRUE(false);
     };
@@ -60,7 +60,7 @@ protected:
     /**
      * Start the task and socket managers.
      */
-    void SetUp() noexcept override
+    void SetUp() override
     {
         ASSERT_TRUE(fly::Socket::hostname_to_address(m_host, m_address));
 
@@ -72,7 +72,7 @@ protected:
     /**
      * Stop the task manager.
      */
-    void TearDown() noexcept override
+    void TearDown() override
     {
         ASSERT_TRUE(m_task_manager->stop());
     }
@@ -286,7 +286,7 @@ TEST_F(SocketTest, Connect_Async_MockGetsockoptFail)
         listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto callback([&](std::shared_ptr<fly::Socket>) { m_event_queue.push(1); });
     m_client_socket_manager->set_client_callbacks(nullptr, callback);
 
     int item = 0;
@@ -346,7 +346,7 @@ TEST_F(SocketTest, Send_Async_MockSendFail)
         listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto callback([&](std::shared_ptr<fly::Socket>) { m_event_queue.push(1); });
     m_client_socket_manager->set_client_callbacks(callback, callback);
 
     int item = 0;
@@ -381,7 +381,7 @@ TEST_F(SocketTest, Send_Async_MockSendBlock)
         listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
     ASSERT_TRUE(listen_socket->listen());
 
-    auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto callback([&](std::shared_ptr<fly::Socket>) { m_event_queue.push(1); });
     m_client_socket_manager->set_client_callbacks(callback, callback);
 
     int item = 0;
@@ -450,7 +450,7 @@ TEST_F(SocketTest, Send_Async_MockSendtoFail)
     ASSERT_TRUE(
         listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
 
-    auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto callback([&](std::shared_ptr<fly::Socket>) { m_event_queue.push(1); });
     m_client_socket_manager->set_client_callbacks(nullptr, callback);
 
     int item = 0;
@@ -534,11 +534,11 @@ TEST_F(SocketTest, Recv_Async_MockRecvFail)
 
     std::shared_ptr<fly::Socket> server_socket;
 
-    auto connect_callback([&](std::shared_ptr<fly::Socket> socket) noexcept {
+    auto connect_callback([&](std::shared_ptr<fly::Socket> socket) {
         server_socket = socket;
         m_event_queue.push(1);
     });
-    auto disconnect_callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto disconnect_callback([&](std::shared_ptr<fly::Socket>) { m_event_queue.push(1); });
     m_server_socket_manager->set_client_callbacks(connect_callback, disconnect_callback);
 
     int item = 0;
@@ -580,7 +580,7 @@ TEST_F(SocketTest, Recv_Async_MockRecvfromFail)
     ASSERT_TRUE(
         listen_socket->bind(fly::Socket::in_addr_any(), m_port, fly::BindOption::AllowReuse));
 
-    auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+    auto callback([&](std::shared_ptr<fly::Socket>) { m_event_queue.push(1); });
     m_server_socket_manager->set_client_callbacks(nullptr, callback);
 
     int item = 0;
@@ -602,7 +602,7 @@ public:
     /**
      * Thread to run server functions to accept a client socket and receive data.
      */
-    void server_thread(bool async) noexcept override
+    void server_thread(bool async) override
     {
         auto listen_socket = create_socket(m_server_socket_manager, fly::Protocol::TCP, async);
 
@@ -644,7 +644,7 @@ public:
     /**
      * Thread to run client functions to connect to the server socket and send data.
      */
-    void client_thread(bool async) noexcept override
+    void client_thread(bool async) override
     {
         auto send_socket = create_socket(m_client_socket_manager, fly::Protocol::TCP, async);
 
@@ -658,7 +658,7 @@ public:
         std::chrono::seconds wait_time(10);
         ASSERT_TRUE(m_event_queue.pop(item, wait_time));
 
-        auto callback([&](std::shared_ptr<fly::Socket>) noexcept { m_event_queue.push(1); });
+        auto callback([&](std::shared_ptr<fly::Socket>) { m_event_queue.push(1); });
         m_client_socket_manager->set_client_callbacks(callback, nullptr);
 
         if (async)
@@ -763,7 +763,7 @@ public:
     /**
      * Thread to run server functions to accept a client socket and receive data.
      */
-    void server_thread(bool async) noexcept override
+    void server_thread(bool async) override
     {
         auto server_socket = create_socket(m_server_socket_manager, fly::Protocol::UDP, async);
 
@@ -795,7 +795,7 @@ public:
     /**
      * Thread to run client functions to connect to the server socket and send data.
      */
-    void client_thread(bool async) noexcept override
+    void client_thread(bool async) override
     {
         static unsigned int s_call_count = 0;
 

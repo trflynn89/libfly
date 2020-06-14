@@ -30,7 +30,7 @@ SocketManager::~SocketManager()
 }
 
 //==================================================================================================
-void SocketManager::start() noexcept
+void SocketManager::start()
 {
     std::shared_ptr<SocketManager> socket_manager = shared_from_this();
 
@@ -39,9 +39,7 @@ void SocketManager::start() noexcept
 }
 
 //==================================================================================================
-void SocketManager::set_client_callbacks(
-    SocketCallback new_client,
-    SocketCallback closed_client) noexcept
+void SocketManager::set_client_callbacks(SocketCallback new_client, SocketCallback closed_client)
 {
     std::lock_guard<std::mutex> lock(m_callback_mutex);
 
@@ -50,13 +48,13 @@ void SocketManager::set_client_callbacks(
 }
 
 //==================================================================================================
-void SocketManager::clear_client_callbacks() noexcept
+void SocketManager::clear_client_callbacks()
 {
     set_client_callbacks(nullptr, nullptr);
 }
 
 //==================================================================================================
-std::shared_ptr<Socket> SocketManager::create_socket(Protocol protocol) noexcept
+std::shared_ptr<Socket> SocketManager::create_socket(Protocol protocol)
 {
     auto socket = std::make_shared<SocketImpl>(protocol, m_config);
 
@@ -69,7 +67,7 @@ std::shared_ptr<Socket> SocketManager::create_socket(Protocol protocol) noexcept
 }
 
 //==================================================================================================
-std::weak_ptr<Socket> SocketManager::create_async_socket(Protocol protocol) noexcept
+std::weak_ptr<Socket> SocketManager::create_async_socket(Protocol protocol)
 {
     auto socket = create_socket(protocol);
 
@@ -92,7 +90,7 @@ std::weak_ptr<Socket> SocketManager::create_async_socket(Protocol protocol) noex
 //==================================================================================================
 void SocketManager::handle_new_and_closed_sockets(
     const SocketList &new_sockets,
-    const SocketList &closed_sockets) noexcept
+    const SocketList &closed_sockets)
 {
     // Add new sockets to the socket system.
     m_async_sockets.insert(m_async_sockets.end(), new_sockets.begin(), new_sockets.end());
@@ -113,7 +111,7 @@ void SocketManager::handle_new_and_closed_sockets(
 //==================================================================================================
 void SocketManager::trigger_callbacks(
     const SocketList &connected_clients,
-    const SocketList &closed_clients) noexcept
+    const SocketList &closed_clients)
 {
     if (!connected_clients.empty() || !closed_clients.empty())
     {
@@ -145,7 +143,7 @@ SocketManagerTask::SocketManagerTask(std::weak_ptr<SocketManager> weak_socket_ma
 }
 
 //==================================================================================================
-void SocketManagerTask::run() noexcept
+void SocketManagerTask::run()
 {
     std::shared_ptr<SocketManager> socket_manager = m_weak_socket_manager.lock();
 

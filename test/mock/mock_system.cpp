@@ -42,14 +42,14 @@ MockSystem::~MockSystem()
 }
 
 //==================================================================================================
-bool MockSystem::mock_enabled(MockCall mock) noexcept
+bool MockSystem::mock_enabled(MockCall mock)
 {
     bool fail;
     return mock_enabled(mock, fail);
 }
 
 //==================================================================================================
-bool MockSystem::mock_enabled(MockCall mock, bool &fail) noexcept
+bool MockSystem::mock_enabled(MockCall mock, bool &fail)
 {
     std::lock_guard<std::mutex> lock(s_mock_system_mutex);
 

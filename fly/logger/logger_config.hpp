@@ -26,17 +26,17 @@ public:
     /**
      * @return Max log file size (in bytes) before rotating the log file.
      */
-    std::uintmax_t max_log_file_size() const noexcept;
+    std::uintmax_t max_log_file_size() const;
 
     /**
      * @return Max message size (in bytes) per log.
      */
-    std::uint32_t max_message_size() const noexcept;
+    std::uint32_t max_message_size() const;
 
     /**
      * @return Sleep time for logger IO thread.
      */
-    std::chrono::milliseconds queue_wait_time() const noexcept;
+    std::chrono::milliseconds queue_wait_time() const;
 
 protected:
     std::uintmax_t m_default_max_log_file_size;

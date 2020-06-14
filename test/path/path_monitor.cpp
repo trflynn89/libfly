@@ -71,7 +71,7 @@ public:
     /**
      * Create and start the task manager and path monitor.
      */
-    void SetUp() noexcept override
+    void SetUp() override
     {
         ASSERT_TRUE(std::filesystem::create_directories(m_path0));
         ASSERT_TRUE(std::filesystem::create_directories(m_path1));
@@ -92,7 +92,7 @@ public:
     /**
      * Stop the task manager and delete the created directory.
      */
-    void TearDown() noexcept override
+    void TearDown() override
     {
         ASSERT_TRUE(m_task_manager->stop());
 
@@ -109,7 +109,7 @@ protected:
      * @param path Path to the changed file.
      * @param event The type of event that occurred.
      */
-    void handle_event(const std::filesystem::path &path, fly::PathMonitor::PathEvent event) noexcept
+    void handle_event(const std::filesystem::path &path, fly::PathMonitor::PathEvent event)
     {
         switch (event)
         {

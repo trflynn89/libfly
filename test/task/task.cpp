@@ -20,13 +20,13 @@ public:
     {
     }
 
-    int get_count() const noexcept
+    int get_count() const
     {
         return m_count.load();
     }
 
 protected:
-    void run() noexcept override
+    void run() override
     {
         ++m_count;
     }
@@ -46,7 +46,7 @@ public:
     }
 
 protected:
-    void run() noexcept override
+    void run() override
     {
         m_ordering->push(std::move(m_marker));
     }
@@ -69,7 +69,7 @@ public:
     /**
      * Start the task manager.
      */
-    void SetUp() noexcept override
+    void SetUp() override
     {
         ASSERT_TRUE(m_task_manager->start());
     }
@@ -77,7 +77,7 @@ public:
     /**
      * Stop the task manager.
      */
-    void TearDown() noexcept override
+    void TearDown() override
     {
         ASSERT_TRUE(m_task_manager->stop());
     }

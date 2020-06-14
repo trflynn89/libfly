@@ -15,7 +15,7 @@ namespace {
 
 //==================================================================================================
 template <typename StringType, typename T>
-StringType minstr() noexcept
+StringType minstr()
 {
     static constexpr std::intmax_t s_min = std::numeric_limits<T>::min();
 
@@ -31,7 +31,7 @@ StringType minstr() noexcept
 
 //==================================================================================================
 template <typename StringType, typename T>
-StringType maxstr() noexcept
+StringType maxstr()
 {
     static constexpr std::uintmax_t s_max = std::numeric_limits<T>::max();
 

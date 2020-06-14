@@ -41,7 +41,7 @@ protected:
      *
      * @return True if the IOCP is valid.
      */
-    bool is_valid() const noexcept override;
+    bool is_valid() const override;
 
     /**
      * Check if the path monitor's IOCP has any posted completions, and handle any that have been
@@ -49,10 +49,10 @@ protected:
      *
      * @param timeout Max time allow for a completion to be posted.
      */
-    void poll(const std::chrono::milliseconds &timeout) noexcept override;
+    void poll(const std::chrono::milliseconds &timeout) override;
 
     std::unique_ptr<PathMonitor::PathInfo>
-    create_path_info(const std::filesystem::path &path) const noexcept override;
+    create_path_info(const std::filesystem::path &path) const override;
 
 private:
     /**
@@ -68,7 +68,7 @@ private:
         /**
          * @return True if initialization was sucessful.
          */
-        bool is_valid() const noexcept override;
+        bool is_valid() const override;
 
         /**
          * Call the ReadDirectoryChangesW API for this path. Should be called after initialization
@@ -76,7 +76,7 @@ private:
          *
          * @param path Name of the monitored path.
          */
-        bool refresh(const std::filesystem::path &path) noexcept;
+        bool refresh(const std::filesystem::path &path);
 
         bool m_valid;
         HANDLE m_handle;
@@ -90,7 +90,7 @@ private:
      * @param info The path's entry in the PathInfo map.
      * @param path Name of the path.
      */
-    void handle_events(const PathInfoImpl *info, const std::filesystem::path &path) const noexcept;
+    void handle_events(const PathInfoImpl *info, const std::filesystem::path &path) const;
 
     /**
      * Convert a FILE_NOTIFY_INFORMATION event to a PathEvent.
@@ -99,7 +99,7 @@ private:
      *
      * @return A PathEvent that matches the given event.
      */
-    PathMonitor::PathEvent convert_to_event(DWORD action) const noexcept;
+    PathMonitor::PathEvent convert_to_event(DWORD action) const;
 
     HANDLE m_iocp;
 };

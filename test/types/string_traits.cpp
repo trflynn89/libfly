@@ -19,7 +19,7 @@ template <
         fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u16string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
-constexpr bool is_string_like(const T &) noexcept
+constexpr bool is_string_like(const T &)
 {
     return true;
 }
@@ -32,7 +32,7 @@ template <
         fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u16string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
-constexpr bool is_string_like(const T &) noexcept
+constexpr bool is_string_like(const T &)
 {
     return false;
 }
@@ -41,7 +41,7 @@ constexpr bool is_string_like(const T &) noexcept
 template <
     typename StringType,
     fly::enable_if_all<typename fly::detail::BasicStringTraits<StringType>::has_stoi_family> = 0>
-constexpr int call_stoi(const StringType &str) noexcept
+constexpr int call_stoi(const StringType &str)
 {
     return std::stoi(str);
 }
@@ -51,7 +51,7 @@ template <
     typename StringType,
     fly::enable_if_not_all<typename fly::detail::BasicStringTraits<StringType>::has_stoi_family> =
         0>
-constexpr int call_stoi(const StringType &) noexcept
+constexpr int call_stoi(const StringType &)
 {
     return -1;
 }

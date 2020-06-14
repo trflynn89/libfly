@@ -68,9 +68,9 @@ struct Log
     std::uint32_t m_line;
     std::string m_message;
 
-    friend std::ostream &operator<<(std::ostream &stream, const Log &log) noexcept;
+    friend std::ostream &operator<<(std::ostream &stream, const Log &log);
 
-    friend std::ostream &operator<<(std::ostream &stream, const Level &level) noexcept;
+    friend std::ostream &operator<<(std::ostream &stream, const Level &level);
 };
 
 } // namespace fly

@@ -52,39 +52,39 @@ public:
     /**
      * @return True if the socket ID is valid (i.e. has been explicitly set).
      */
-    bool is_valid() const noexcept;
+    bool is_valid() const;
 
     /**
      * @return The ID of the socket who owns this structure.
      */
-    int get_socket_id() const noexcept;
+    int get_socket_id() const;
 
     /**
      * Increase the current offset into the request message to mark how much data has been sent.
      *
      * @param offset The offset to set.
      */
-    void increment_request_offset(std::string::size_type offset) noexcept;
+    void increment_request_offset(std::string::size_type offset);
 
     /**
      * @return The request message - the message to be sent or received.
      */
-    const std::string &get_request() const noexcept;
+    const std::string &get_request() const;
 
     /**
      * @return The request message starting at its current offset.
      */
-    std::string get_request_remaining() const noexcept;
+    std::string get_request_remaining() const;
 
     /**
      * @return The request address (for UDP sockets).
      */
-    address_type get_address() const noexcept;
+    address_type get_address() const;
 
     /**
      * @return The request port (for UDP sockets).
      */
-    port_type get_port() const noexcept;
+    port_type get_port() const;
 
 private:
     int m_socket_id;

@@ -42,12 +42,12 @@ public:
     {
     }
 
-    StringType str() const noexcept
+    StringType str() const
     {
         return m_str;
     };
 
-    int num() const noexcept
+    int num() const
     {
         return m_num;
     };

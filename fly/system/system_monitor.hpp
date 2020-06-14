@@ -45,75 +45,75 @@ public:
      *
      * @return True if the path monitor is in a valid state.
      */
-    bool start() noexcept;
+    bool start();
 
     /**
      * Get the system's CPU count.
      *
      * @return System CPU count.
      */
-    std::uint32_t get_system_cpu_count() const noexcept;
+    std::uint32_t get_system_cpu_count() const;
 
     /**
      * Get the system's CPU usage percentage (0-100%) over the last second.
      *
      * @return Current system CPU usage.
      */
-    double get_system_cpu_usage() const noexcept;
+    double get_system_cpu_usage() const;
 
     /**
      * Get the process's CPU usage percentage (0-100%) over the last second.
      *
      * @return Current process CPU usage.
      */
-    double get_process_cpu_usage() const noexcept;
+    double get_process_cpu_usage() const;
 
     /**
      * Get the system's total physical memory available in bytes.
      *
      * @return Total system memory.
      */
-    std::uint64_t get_total_system_memory() const noexcept;
+    std::uint64_t get_total_system_memory() const;
 
     /**
      * Get the system's physical memory usage in bytes.
      *
      * @return Current system memory usage.
      */
-    std::uint64_t get_system_memory_usage() const noexcept;
+    std::uint64_t get_system_memory_usage() const;
 
     /**
      * Get the process's physical memory usage in bytes.
      *
      * @return Current process memory usage.
      */
-    std::uint64_t get_process_memory_usage() const noexcept;
+    std::uint64_t get_process_memory_usage() const;
 
 protected:
     /**
      * Update the system's current CPU count.
      */
-    virtual void update_system_cpu_count() noexcept = 0;
+    virtual void update_system_cpu_count() = 0;
 
     /**
      * Update the system's current CPU usage.
      */
-    virtual void update_system_cpu_usage() noexcept = 0;
+    virtual void update_system_cpu_usage() = 0;
 
     /**
      * Update the process's current CPU usage.
      */
-    virtual void update_process_cpu_usage() noexcept = 0;
+    virtual void update_process_cpu_usage() = 0;
 
     /**
      * Update the system's current memory usage.
      */
-    virtual void update_system_memory_usage() noexcept = 0;
+    virtual void update_system_memory_usage() = 0;
 
     /**
      * Update the process's current memory usage.
      */
-    virtual void update_process_memory_usage() noexcept = 0;
+    virtual void update_process_memory_usage() = 0;
 
     std::atomic<std::uint32_t> m_system_cpu_count;
     std::atomic<double> m_system_cpu_usage;
@@ -129,12 +129,12 @@ private:
      *
      * @return True if the CPU count is valid.
      */
-    bool is_valid() const noexcept;
+    bool is_valid() const;
 
     /**
      * Update the system-level resources.
      */
-    void poll() noexcept;
+    void poll();
 
     std::shared_ptr<SequencedTaskRunner> m_task_runner;
     std::shared_ptr<Task> m_task;
@@ -158,7 +158,7 @@ protected:
      * Call back into the system monitor to update system-level resources. If the system monitor
      * implementation is still valid, the task re-arms itself.
      */
-    void run() noexcept override;
+    void run() override;
 
 private:
     std::weak_ptr<SystemMonitor> m_weak_system_monitor;

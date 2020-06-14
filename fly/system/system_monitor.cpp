@@ -24,7 +24,7 @@ SystemMonitor::SystemMonitor(
 }
 
 //==================================================================================================
-bool SystemMonitor::start() noexcept
+bool SystemMonitor::start()
 {
     update_system_cpu_count();
 
@@ -42,49 +42,49 @@ bool SystemMonitor::start() noexcept
 }
 
 //==================================================================================================
-std::uint32_t SystemMonitor::get_system_cpu_count() const noexcept
+std::uint32_t SystemMonitor::get_system_cpu_count() const
 {
     return m_system_cpu_count.load();
 }
 
 //==================================================================================================
-double SystemMonitor::get_system_cpu_usage() const noexcept
+double SystemMonitor::get_system_cpu_usage() const
 {
     return m_system_cpu_usage.load();
 }
 
 //==================================================================================================
-double SystemMonitor::get_process_cpu_usage() const noexcept
+double SystemMonitor::get_process_cpu_usage() const
 {
     return m_process_cpu_usage.load();
 }
 
 //==================================================================================================
-std::uint64_t SystemMonitor::get_total_system_memory() const noexcept
+std::uint64_t SystemMonitor::get_total_system_memory() const
 {
     return m_total_system_memory.load();
 }
 
 //==================================================================================================
-std::uint64_t SystemMonitor::get_system_memory_usage() const noexcept
+std::uint64_t SystemMonitor::get_system_memory_usage() const
 {
     return m_system_memory_usage.load();
 }
 
 //==================================================================================================
-std::uint64_t SystemMonitor::get_process_memory_usage() const noexcept
+std::uint64_t SystemMonitor::get_process_memory_usage() const
 {
     return m_process_memory_usage.load();
 }
 
 //==================================================================================================
-bool SystemMonitor::is_valid() const noexcept
+bool SystemMonitor::is_valid() const
 {
     return get_system_cpu_count() > 0;
 }
 
 //==================================================================================================
-void SystemMonitor::poll() noexcept
+void SystemMonitor::poll()
 {
     update_system_cpu_count();
     update_system_cpu_usage();
@@ -102,7 +102,7 @@ SystemMonitorTask::SystemMonitorTask(std::weak_ptr<SystemMonitor> weak_system_mo
 }
 
 //==================================================================================================
-void SystemMonitorTask::run() noexcept
+void SystemMonitorTask::run()
 {
     std::shared_ptr<SystemMonitor> system_monitor = m_weak_system_monitor.lock();
 

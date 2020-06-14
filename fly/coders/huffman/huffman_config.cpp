@@ -12,7 +12,7 @@ HuffmanConfig::HuffmanConfig() noexcept :
 }
 
 //==================================================================================================
-std::uint32_t HuffmanConfig::encoder_chunk_size() const noexcept
+std::uint32_t HuffmanConfig::encoder_chunk_size() const
 {
     auto encoder_chunk_size_kb =
         get_value<std::uint16_t>("encoder_chunk_size_kb", m_default_encoder_chunk_size_kb);
@@ -21,7 +21,7 @@ std::uint32_t HuffmanConfig::encoder_chunk_size() const noexcept
 }
 
 //==================================================================================================
-length_type HuffmanConfig::encoder_max_code_length() const noexcept
+length_type HuffmanConfig::encoder_max_code_length() const
 {
     return get_value<length_type>("encoder_max_code_length", m_default_encoder_max_code_length);
 }

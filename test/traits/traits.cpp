@@ -27,7 +27,7 @@ public:
     {
     }
 
-    bool foo() const noexcept
+    bool foo() const
     {
         return true;
     }
@@ -41,7 +41,7 @@ public:
     {
     }
 
-    std::string operator()() const noexcept
+    std::string operator()() const
     {
         return "BarClass";
     }
@@ -57,27 +57,27 @@ std::ostream &operator<<(std::ostream &stream, const BarClass &bar)
 
 //==================================================================================================
 template <typename T, fly::enable_if_all<FooTraits::is_declared<T>> = 0>
-bool call_foo(const T &arg) noexcept
+bool call_foo(const T &arg)
 {
     return arg.foo();
 }
 
 template <typename T, fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
-bool call_foo(const T &) noexcept
+bool call_foo(const T &)
 {
     return false;
 }
 
 //==================================================================================================
 template <typename T, fly::enable_if_all<OstreamTraits::is_declared<T>> = 0>
-bool is_streamable(std::ostream &stream, const T &arg) noexcept
+bool is_streamable(std::ostream &stream, const T &arg)
 {
     stream << arg;
     return true;
 }
 
 template <typename T, fly::enable_if_not_all<OstreamTraits::is_declared<T>> = 0>
-bool is_streamable(std::ostream &, const T &) noexcept
+bool is_streamable(std::ostream &, const T &)
 {
     return false;
 }
@@ -298,9 +298,9 @@ TEST(TraitsTest, Visitation)
         1,
         std::visit(
             fly::visitation {
-                [](int) noexcept -> int { return 1; },
-                [](bool) noexcept -> int { return 2; },
-                [](std::string) noexcept -> int { return 3; },
+                [](int) -> int { return 1; },
+                [](bool) -> int { return 2; },
+                [](std::string) -> int { return 3; },
             },
             TestVariant {int()}));
 
@@ -308,9 +308,9 @@ TEST(TraitsTest, Visitation)
         2,
         std::visit(
             fly::visitation {
-                [](int) noexcept -> int { return 1; },
-                [](bool) noexcept -> int { return 2; },
-                [](std::string) noexcept -> int { return 3; },
+                [](int) -> int { return 1; },
+                [](bool) -> int { return 2; },
+                [](std::string) -> int { return 3; },
             },
             TestVariant {bool()}));
 
@@ -318,9 +318,9 @@ TEST(TraitsTest, Visitation)
         3,
         std::visit(
             fly::visitation {
-                [](int) noexcept -> int { return 1; },
-                [](bool) noexcept -> int { return 2; },
-                [](std::string) noexcept -> int { return 3; },
+                [](int) -> int { return 1; },
+                [](bool) -> int { return 2; },
+                [](std::string) -> int { return 3; },
             },
             TestVariant {std::string()}));
 
@@ -328,8 +328,8 @@ TEST(TraitsTest, Visitation)
         1,
         std::visit(
             fly::visitation {
-                [](int) noexcept -> int { return 1; },
-                [](auto) noexcept -> int { return 2; },
+                [](int) -> int { return 1; },
+                [](auto) -> int { return 2; },
             },
             TestVariant {int()}));
 
@@ -337,8 +337,8 @@ TEST(TraitsTest, Visitation)
         2,
         std::visit(
             fly::visitation {
-                [](int) noexcept -> int { return 1; },
-                [](auto) noexcept -> int { return 2; },
+                [](int) -> int { return 1; },
+                [](auto) -> int { return 2; },
             },
             TestVariant {std::string()}));
 }

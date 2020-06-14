@@ -63,13 +63,13 @@ CaptureStream::~CaptureStream()
 }
 
 //==================================================================================================
-std::string CaptureStream::operator()() noexcept
+std::string CaptureStream::operator()()
 {
     return restore(true);
 }
 
 //==================================================================================================
-std::string CaptureStream::restore(bool read) noexcept
+std::string CaptureStream::restore(bool read)
 {
     std::string contents;
 

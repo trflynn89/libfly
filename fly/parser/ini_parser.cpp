@@ -8,7 +8,7 @@
 namespace fly {
 
 //==================================================================================================
-Json IniParser::parse_internal(std::istream &stream) noexcept(false)
+Json IniParser::parse_internal(std::istream &stream)
 {
     std::string line, section;
     Json values;
@@ -40,7 +40,7 @@ Json IniParser::parse_internal(std::istream &stream) noexcept(false)
 }
 
 //==================================================================================================
-std::string IniParser::on_section(const std::string &line) noexcept(false)
+std::string IniParser::on_section(const std::string &line)
 {
     std::string section = line;
     String::trim(section);
@@ -54,7 +54,7 @@ std::string IniParser::on_section(const std::string &line) noexcept(false)
 }
 
 //==================================================================================================
-void IniParser::on_value(Json &section, const std::string &line) noexcept(false)
+void IniParser::on_value(Json &section, const std::string &line)
 {
     static constexpr std::uint32_t s_size = 2;
 
@@ -84,13 +84,13 @@ void IniParser::on_value(Json &section, const std::string &line) noexcept(false)
 }
 
 //==================================================================================================
-bool IniParser::trim_value(std::string &str, char ch) const noexcept(false)
+bool IniParser::trim_value(std::string &str, char ch) const
 {
     return trim_value(str, ch, ch);
 }
 
 //==================================================================================================
-bool IniParser::trim_value(std::string &str, char start, char end) const noexcept(false)
+bool IniParser::trim_value(std::string &str, char start, char end) const
 {
     bool starts_with_char = String::starts_with(str, start);
     bool ends_with_char = String::ends_with(str, end);

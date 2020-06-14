@@ -27,12 +27,12 @@ public:
     /**
      * @return Huffman encoder chunk size (in bytes).
      */
-    std::uint32_t encoder_chunk_size() const noexcept;
+    std::uint32_t encoder_chunk_size() const;
 
     /**
      * @return Maximum Huffman code length (in bits) for encoding.
      */
-    length_type encoder_max_code_length() const noexcept;
+    length_type encoder_max_code_length() const;
 
 protected:
     std::uint16_t m_default_encoder_chunk_size_kb;

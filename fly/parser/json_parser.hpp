@@ -68,7 +68,7 @@ protected:
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
      * @throws BadConversionException A parsed value could not be converted to a JSON type.
      */
-    Json parse_internal(std::istream &stream) noexcept(false) override;
+    Json parse_internal(std::istream &stream) override;
 
 private:
     /**
@@ -125,7 +125,10 @@ private:
     class UnexpectedTokenException : public UnexpectedCharacterException
     {
     public:
-        UnexpectedTokenException(std::uint32_t line, std::uint32_t column, JsonParser::Token token);
+        UnexpectedTokenException(
+            std::uint32_t line,
+            std::uint32_t column,
+            JsonParser::Token token) noexcept;
     };
 
     /**
@@ -138,7 +141,7 @@ private:
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
      * @throws BadConversionException A parsed value could not be converted to a JSON type.
      */
-    Json parse_json(std::istream &stream) noexcept(false);
+    Json parse_json(std::istream &stream);
 
     /**
      * Parse a JSON object from a stream.
@@ -150,7 +153,7 @@ private:
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
      * @throws BadConversionException A parsed value could not be converted to a JSON type.
      */
-    Json parse_object(std::istream &stream) noexcept(false);
+    Json parse_object(std::istream &stream);
 
     /**
      * Parse a JSON array from a stream.
@@ -162,7 +165,7 @@ private:
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
      * @throws BadConversionException A parsed value could not be converted to a JSON type.
      */
-    Json parse_array(std::istream &stream) noexcept(false);
+    Json parse_array(std::istream &stream);
 
     /**
      * Parse a JSON string, number, boolean, or null value from a stream.
@@ -174,7 +177,7 @@ private:
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
      * @throws BadConversionException A parsed value could not be converted to a JSON type.
      */
-    Json parse_value(std::istream &stream) noexcept(false);
+    Json parse_value(std::istream &stream);
 
     /**
      * Extract a single symbol from a stream. Ensure that symbol is equal to an expected token.
@@ -183,7 +186,7 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
      */
-    void consume_token(std::istream &stream, const Token &token) noexcept(false);
+    void consume_token(std::istream &stream, const Token &token);
 
     /**
      * Extract a comma from a stream. Handles any trailing commas, allowing a single trailing comma
@@ -197,8 +200,7 @@ private:
      * @throws UnexpectedCharacterException A trailing comma was found, but the feature is not
      *         enabled.
      */
-    bool
-    consume_comma(std::istream &stream, const std::function<bool()> &stop_parsing) noexcept(false);
+    bool consume_comma(std::istream &stream, const std::function<bool()> &stop_parsing);
 
     /**
      * Extract a string, number, boolean, or null value from a stream. If parsing a string, escaped
@@ -212,7 +214,7 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
      */
-    JsonTraits::string_type consume_value(std::istream &stream, JsonType type) noexcept(false);
+    JsonTraits::string_type consume_value(std::istream &stream, JsonType type);
 
     /**
      * Extract all consecutive whitespace symbols and comments (if enabled in the feature set) from
@@ -222,7 +224,7 @@ private:
      *
      * @throws UnexpectedCharacterException A parsed symbol was unexpected.
      */
-    void consume_whitespace_and_comments(std::istream &stream) noexcept(false);
+    void consume_whitespace_and_comments(std::istream &stream);
 
     /**
      * Extract all consecutive whitespace symbols from a stream until a non- whitespace symbol is
@@ -230,7 +232,7 @@ private:
      *
      * @param stream Stream holding the contents to parse.
      */
-    void consume_whitespace(std::istream &stream) noexcept;
+    void consume_whitespace(std::istream &stream);
 
     /**
      * Extract a single- or multi-line comment from a stream, if enabled in the feature set.
@@ -240,7 +242,7 @@ private:
      * @throws UnexpectedCharacterException A parsed symbol was unexpected, or the comment feature
      *         is not enabled.
      */
-    void consume_comment(std::istream &stream) noexcept(false);
+    void consume_comment(std::istream &stream);
 
     /**
      * Read the next symbol in a stream without extracting it.
@@ -249,7 +251,7 @@ private:
      *
      * @return The peeked symbol.
      */
-    Token peek(std::istream &stream) noexcept;
+    Token peek(std::istream &stream);
 
     /**
      * Extract the next symbol in a stream.
@@ -258,14 +260,14 @@ private:
      *
      * @return The extracted symbol.
      */
-    Token consume(std::istream &stream) noexcept;
+    Token consume(std::istream &stream);
 
     /**
      * Extract the next symbol in a stream and discard it.
      *
      * @param stream Stream holding the contents to parse.
      */
-    void discard(std::istream &stream) noexcept;
+    void discard(std::istream &stream);
 
     /**
      * Validate that a parsed number is valid and interpret its numeric JSON type.
@@ -276,7 +278,7 @@ private:
      *
      * @throws BadConversionException The parsed number is not valid.
      */
-    NumericType validate_number(const JsonTraits::string_type &value) const noexcept(false);
+    NumericType validate_number(const JsonTraits::string_type &value) const;
 
     /**
      * Check if a symbol is a whitespace symbol.
@@ -285,7 +287,7 @@ private:
      *
      * @return True if the symbol is whitespace.
      */
-    bool is_whitespace(const Token &token) const noexcept;
+    bool is_whitespace(const Token &token) const;
 
     /**
      * Check if a feature has been allowed.
@@ -294,7 +296,7 @@ private:
      *
      * @return True if the feature is allowed.
      */
-    bool is_feature_allowed(Features feature) const noexcept;
+    bool is_feature_allowed(Features feature) const;
 
     const Features m_features;
 };
@@ -302,11 +304,11 @@ private:
 /**
  * Combine two Features instances into a single instance via bitwise-and.
  */
-JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b) noexcept;
+JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b);
 
 /**
  * Combine two Features instances into a single instance via bitwise-or.
  */
-JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b) noexcept;
+JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b);
 
 } // namespace fly

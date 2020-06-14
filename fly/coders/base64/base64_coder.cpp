@@ -44,7 +44,7 @@ namespace {
 } // namespace
 
 //==================================================================================================
-bool Base64Coder::encode_internal(std::istream &decoded, std::ostream &encoded) noexcept
+bool Base64Coder::encode_internal(std::istream &decoded, std::ostream &encoded)
 {
     DecodedChunk chunk {};
 
@@ -72,7 +72,7 @@ bool Base64Coder::encode_internal(std::istream &decoded, std::ostream &encoded) 
 }
 
 //==================================================================================================
-bool Base64Coder::decode_internal(std::istream &encoded, std::ostream &decoded) noexcept
+bool Base64Coder::decode_internal(std::istream &encoded, std::ostream &decoded)
 {
     EncodedChunk chunk {};
 
@@ -97,7 +97,7 @@ bool Base64Coder::decode_internal(std::istream &encoded, std::ostream &decoded) 
 
 //==================================================================================================
 void Base64Coder::encode_chunk(const DecodedChunk &chunk, std::size_t bytes, std::ostream &encoded)
-    const noexcept
+    const
 {
     const EncodedChunk data = {
         // Front 6 bits of the first symbol.
@@ -119,7 +119,7 @@ void Base64Coder::encode_chunk(const DecodedChunk &chunk, std::size_t bytes, std
 }
 
 //==================================================================================================
-void Base64Coder::decode_chunk(EncodedChunk &chunk, std::ostream &decoded) const noexcept
+void Base64Coder::decode_chunk(EncodedChunk &chunk, std::ostream &decoded) const
 {
     const std::size_t bytes = std::tuple_size<DecodedChunk>::value - parse_chunk(chunk);
 
@@ -144,7 +144,7 @@ void Base64Coder::decode_chunk(EncodedChunk &chunk, std::ostream &decoded) const
 }
 
 //==================================================================================================
-std::size_t Base64Coder::parse_chunk(EncodedChunk &chunk) const noexcept
+std::size_t Base64Coder::parse_chunk(EncodedChunk &chunk) const
 {
     for (std::size_t i = 0; i < chunk.size(); ++i)
     {

@@ -21,7 +21,7 @@ constexpr const std::ios::openmode s_output_mode =
 class BitStreamTest : public ::testing::Test
 {
 public:
-    BitStreamTest() : m_input_stream(s_input_mode), m_output_stream(s_output_mode)
+    BitStreamTest() noexcept : m_input_stream(s_input_mode), m_output_stream(s_output_mode)
     {
     }
 

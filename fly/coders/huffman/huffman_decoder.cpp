@@ -9,12 +9,12 @@
 namespace fly {
 
 //==================================================================================================
-HuffmanDecoder::HuffmanDecoder() : m_huffman_codes_size(0)
+HuffmanDecoder::HuffmanDecoder() noexcept : m_huffman_codes_size(0)
 {
 }
 
 //==================================================================================================
-bool HuffmanDecoder::decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept
+bool HuffmanDecoder::decode_binary(BitStreamReader &encoded, std::ostream &decoded)
 {
     std::uint32_t chunk_size;
     length_type max_code_length;
@@ -56,7 +56,7 @@ bool HuffmanDecoder::decode_binary(BitStreamReader &encoded, std::ostream &decod
 bool HuffmanDecoder::decode_header(
     BitStreamReader &encoded,
     std::uint32_t &chunk_size,
-    length_type &max_code_length) const noexcept
+    length_type &max_code_length) const
 {
     // Decode the Huffman coder version.
     byte_type huffman_version;
@@ -84,7 +84,7 @@ bool HuffmanDecoder::decode_header(
 bool HuffmanDecoder::decode_header_version1(
     BitStreamReader &encoded,
     std::uint32_t &chunk_size,
-    length_type &max_code_length) const noexcept
+    length_type &max_code_length) const
 {
     // Decode the chunk size.
     word_type encoded_chunk_size_kb;
@@ -128,7 +128,7 @@ bool HuffmanDecoder::decode_header_version1(
 bool HuffmanDecoder::decode_codes(
     BitStreamReader &encoded,
     length_type global_max_code_length,
-    length_type &local_max_code_length) noexcept
+    length_type &local_max_code_length)
 {
     m_huffman_codes_size = 0;
 
@@ -208,7 +208,7 @@ bool HuffmanDecoder::decode_codes(
 }
 
 //==================================================================================================
-void HuffmanDecoder::convert_to_prefix_table(length_type max_code_length) noexcept
+void HuffmanDecoder::convert_to_prefix_table(length_type max_code_length)
 {
     for (std::uint16_t i = 0; i < m_huffman_codes_size; ++i)
     {
@@ -229,7 +229,7 @@ bool HuffmanDecoder::decode_symbols(
     BitStreamReader &encoded,
     length_type max_code_length,
     std::uint32_t chunk_size,
-    std::ostream &decoded) const noexcept
+    std::ostream &decoded) const
 {
     std::uint32_t bytes = 0;
     code_type index;

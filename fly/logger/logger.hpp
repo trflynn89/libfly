@@ -115,7 +115,7 @@ public:
      *
      * @param logger The logger instance.
      */
-    static void set_instance(const std::shared_ptr<Logger> &logger) noexcept;
+    static void set_instance(const std::shared_ptr<Logger> &logger);
 
     /**
      * Log to the console in a thread-safe manner.
@@ -123,7 +123,7 @@ public:
      * @param acquire_lock Whether to acquire lock before logging.
      * @param message The message to log.
      */
-    static void console_log(bool acquire_lock, const std::string &message) noexcept;
+    static void console_log(bool acquire_lock, const std::string &message);
 
     /**
      * Add a log to the static logger instance.
@@ -139,19 +139,19 @@ public:
         const char *file,
         const char *function,
         std::uint32_t line,
-        const std::string &message) noexcept;
+        const std::string &message);
 
     /**
      * Create the logger's log file on disk and initialize the logger task.
      *
      * @return True if the logger is in a valid state.
      */
-    bool start() noexcept;
+    bool start();
 
     /**
      * @return Path to the current log file.
      */
-    std::filesystem::path get_log_file_path() const noexcept;
+    std::filesystem::path get_log_file_path() const;
 
 private:
     /**
@@ -159,7 +159,7 @@ private:
      *
      * @return True if the current log file is still open and healthy.
      */
-    bool poll() noexcept;
+    bool poll();
 
     /**
      * Add a log to this logger instance.
@@ -175,14 +175,14 @@ private:
         const char *file,
         const char *function,
         std::uint32_t line,
-        const std::string &message) noexcept;
+        const std::string &message);
 
     /**
      * Create the log file. If a log file is already open, close it.
      *
      * @return True if the log file could be opened.
      */
-    bool create_log_file() noexcept;
+    bool create_log_file();
 
     static std::weak_ptr<Logger> s_weak_instance;
     static std::mutex s_console_mutex;
@@ -218,7 +218,7 @@ protected:
     /**
      * Call back into the logger to check for new log entries. The task re-arms itself.
      */
-    void run() noexcept override;
+    void run() override;
 
 private:
     std::weak_ptr<Logger> m_weak_logger;

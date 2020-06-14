@@ -70,27 +70,27 @@ public:
      * @return A reference to the created/found configuration.
      */
     template <typename T>
-    std::shared_ptr<T> create_config() noexcept;
+    std::shared_ptr<T> create_config();
 
     /**
      * Erase any expired configuration objects.
      *
      * @return The remaining number of configurations.
      */
-    ConfigMap::size_type prune() noexcept;
+    ConfigMap::size_type prune();
 
     /**
      * Start the configuration manager and underlying objects.
      *
      * @return True if the monitor could be started.
      */
-    bool start() noexcept;
+    bool start();
 
 private:
     /**
      * Parse the configuration file and store the parsed values in memory.
      */
-    void update_config() noexcept;
+    void update_config();
 
     std::shared_ptr<PathMonitor> m_monitor;
     std::unique_ptr<Parser> m_parser;
@@ -120,7 +120,7 @@ protected:
     /**
      * Call back into the config manager to re-parse the configuration file.
      */
-    void run() noexcept override;
+    void run() override;
 
 private:
     std::weak_ptr<ConfigManager> m_weak_config_manager;
@@ -128,7 +128,7 @@ private:
 
 //==================================================================================================
 template <typename T>
-std::shared_ptr<T> ConfigManager::create_config() noexcept
+std::shared_ptr<T> ConfigManager::create_config()
 {
     static_assert(std::is_base_of_v<Config, T>);
 

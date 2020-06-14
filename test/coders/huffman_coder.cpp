@@ -483,7 +483,7 @@ public:
     /**
      * Create the directory to contain test output files.
      */
-    void SetUp() noexcept override
+    void SetUp() override
     {
         ASSERT_TRUE(std::filesystem::create_directories(m_path));
     }
@@ -491,7 +491,7 @@ public:
     /**
      * Delete the created directory.
      */
-    void TearDown() noexcept override
+    void TearDown() override
     {
         std::filesystem::remove_all(m_path);
     }

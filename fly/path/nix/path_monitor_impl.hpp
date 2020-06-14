@@ -40,7 +40,7 @@ protected:
      *
      * @return True if the inotify handle is valid.
      */
-    bool is_valid() const noexcept override;
+    bool is_valid() const override;
 
     /**
      * Check if the path monitor's inotify handle has any events to be read, and handle any that are
@@ -48,10 +48,10 @@ protected:
      *
      * @param timeout Max time allow for an event to be readable.
      */
-    void poll(const std::chrono::milliseconds &timeout) noexcept override;
+    void poll(const std::chrono::milliseconds &timeout) override;
 
     std::unique_ptr<PathMonitor::PathInfo>
-    create_path_info(const std::filesystem::path &path) const noexcept override;
+    create_path_info(const std::filesystem::path &path) const override;
 
 private:
     /**
@@ -66,7 +66,7 @@ private:
         /**
          * @return True if initialization was sucessful.
          */
-        bool is_valid() const noexcept override;
+        bool is_valid() const override;
 
         int m_monitor_descriptor;
         int m_watch_descriptor;
@@ -77,14 +77,14 @@ private:
      *
      * @return True if any events were read.
      */
-    bool read_events() const noexcept;
+    bool read_events() const;
 
     /**
      * Handle a single inotify event. Find a monitored path that corresponds
      * to the event and trigger its callback. If no path was found, drop the
      * event.
      */
-    void handle_event(const inotify_event *event) const noexcept;
+    void handle_event(const inotify_event *event) const;
 
     /**
      * Convert an inotify event mask to a PathEvent.
@@ -93,7 +93,7 @@ private:
      *
      * @return A PathEvent that matches the event mask.
      */
-    PathMonitor::PathEvent convert_to_event(std::uint32_t mask) const noexcept;
+    PathMonitor::PathEvent convert_to_event(std::uint32_t mask) const;
 
     int m_monitor_descriptor;
 };

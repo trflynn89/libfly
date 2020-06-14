@@ -50,7 +50,7 @@ public:
     /**
      * Create the file directory and start the task manager and logger.
      */
-    void SetUp() noexcept override
+    void SetUp() override
     {
         ASSERT_TRUE(std::filesystem::create_directories(m_path));
 
@@ -63,7 +63,7 @@ public:
     /**
      * Delete the created directory and stop the task manager.
      */
-    void TearDown() noexcept override
+    void TearDown() override
     {
         ASSERT_TRUE(m_task_manager->stop());
 
@@ -133,7 +133,7 @@ protected:
      *
      * @return uintmax_t Size of the log point.
      */
-    std::uintmax_t log_size(const std::string &message) noexcept
+    std::uintmax_t log_size(const std::string &message)
     {
         fly::Log log;
 

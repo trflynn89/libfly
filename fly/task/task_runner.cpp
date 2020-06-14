@@ -15,7 +15,7 @@ TaskRunner::TaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
 //==================================================================================================
 bool TaskRunner::post_task_with_delay(
     std::weak_ptr<Task> weak_task,
-    std::chrono::milliseconds delay) noexcept
+    std::chrono::milliseconds delay)
 {
     std::shared_ptr<TaskManager> task_manager = m_weak_task_manager.lock();
 
@@ -31,7 +31,7 @@ bool TaskRunner::post_task_with_delay(
 }
 
 //==================================================================================================
-bool TaskRunner::post_task_to_task_manager(std::weak_ptr<Task> weak_task) noexcept
+bool TaskRunner::post_task_to_task_manager(std::weak_ptr<Task> weak_task)
 {
     std::shared_ptr<TaskManager> task_manager = m_weak_task_manager.lock();
 
@@ -53,13 +53,13 @@ ParallelTaskRunner::ParallelTaskRunner(std::weak_ptr<TaskManager> weak_task_mana
 }
 
 //==================================================================================================
-bool ParallelTaskRunner::post_task(std::weak_ptr<Task> weak_task) noexcept
+bool ParallelTaskRunner::post_task(std::weak_ptr<Task> weak_task)
 {
     return post_task_to_task_manager(weak_task);
 }
 
 //==================================================================================================
-void ParallelTaskRunner::task_complete(const std::shared_ptr<Task> &) noexcept
+void ParallelTaskRunner::task_complete(const std::shared_ptr<Task> &)
 {
 }
 
@@ -71,21 +71,21 @@ SequencedTaskRunner::SequencedTaskRunner(std::weak_ptr<TaskManager> weak_task_ma
 }
 
 //==================================================================================================
-bool SequencedTaskRunner::post_task(std::weak_ptr<Task> weak_task) noexcept
+bool SequencedTaskRunner::post_task(std::weak_ptr<Task> weak_task)
 {
     m_pending_tasks.push(std::move(weak_task));
     return maybe_post_task();
 }
 
 //==================================================================================================
-void SequencedTaskRunner::task_complete(const std::shared_ptr<Task> &) noexcept
+void SequencedTaskRunner::task_complete(const std::shared_ptr<Task> &)
 {
     m_has_running_task.store(false);
     maybe_post_task();
 }
 
 //==================================================================================================
-bool SequencedTaskRunner::maybe_post_task() noexcept
+bool SequencedTaskRunner::maybe_post_task()
 {
     static std::chrono::seconds s_wait(0);
     bool expected = false;

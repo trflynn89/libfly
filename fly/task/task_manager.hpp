@@ -43,14 +43,14 @@ public:
      *
      * @return True if the threads were created in this invocation.
      */
-    bool start() noexcept;
+    bool start();
 
     /**
      * Destroy the worker threads and timer thread, blocking until the threads exit.
      *
      * @return True if the threads were destroyed in this invocation.
      */
-    bool stop() noexcept;
+    bool stop();
 
     /**
      * Create a task runner, holding a weak reference to this task manager.
@@ -60,7 +60,7 @@ public:
      * @return The created task runner.
      */
     template <typename TaskRunnerType>
-    std::shared_ptr<TaskRunnerType> create_task_runner() noexcept;
+    std::shared_ptr<TaskRunnerType> create_task_runner();
 
 private:
     /**
@@ -80,8 +80,7 @@ private:
      * @param weak_task The task to be executed.
      * @param weak_task_runner The task runner posting the task.
      */
-    void
-    post_task(std::weak_ptr<Task> weak_task, std::weak_ptr<TaskRunner> weak_task_runner) noexcept;
+    void post_task(std::weak_ptr<Task> weak_task, std::weak_ptr<TaskRunner> weak_task_runner);
 
     /**
      * Schedule a task to be posted for execution after some delay.
@@ -93,17 +92,17 @@ private:
     void post_task_with_delay(
         std::weak_ptr<Task> weak_task,
         std::weak_ptr<TaskRunner> weak_task_runner,
-        std::chrono::milliseconds delay) noexcept;
+        std::chrono::milliseconds delay);
 
     /**
      * Worker thread for executing tasks.
      */
-    void worker_thread() noexcept;
+    void worker_thread();
 
     /**
      * Timer thread for holding delayed tasks until their scheduled time.
      */
-    void timer_thread() noexcept;
+    void timer_thread();
 
     ConcurrentQueue<TaskHolder> m_tasks;
 
@@ -119,7 +118,7 @@ private:
 
 //==================================================================================================
 template <typename TaskRunnerType>
-std::shared_ptr<TaskRunnerType> TaskManager::create_task_runner() noexcept
+std::shared_ptr<TaskRunnerType> TaskManager::create_task_runner()
 {
     static_assert(std::is_base_of_v<TaskRunner, TaskRunnerType>);
 
