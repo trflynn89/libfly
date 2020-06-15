@@ -13,7 +13,7 @@
 namespace fly::detail {
 
 /**
- * Helper class for decoding and encoding unicode codepoints in a std::basic_string<>. The exact
+ * Helper class for decoding and encoding Unicode codepoints in a std::basic_string<>. The exact
  * encoding depends on the template type StringType:
  *
  *     1. std::string - UTF-8 encoding.
@@ -36,48 +36,57 @@ class BasicStringUnicode
 
 public:
     /**
-     * Decode a single unicode codepoint, starting at the character pointed to by the provided
+     * Decode a single Unicode codepoint, starting at the character pointed to by the provided
      * iterator. If successful, after invoking this method, that iterator will point at the first
-     * character after the unicode codepoint in the source string.
+     * character after the Unicode codepoint in the source string.
      *
-     * @param it Pointer to the beginning of the encoded unicode codepoint.
-     * @param end Pointer to the end of the encoded unicode codepoint.
+     * @param it Pointer to the beginning of the encoded Unicode codepoint.
+     * @param end Pointer to the end of the encoded Unicode codepoint.
      *
-     * @return The decoded unicode codepoint.
+     * @return The decoded Unicode codepoint.
      *
-     * @throws UnicodeException If the encoded unicode codepoint is invalid.
+     * @throws UnicodeException If the encoded Unicode codepoint is invalid.
      */
     static codepoint_type decode_character(
         typename StringType::const_iterator &it,
         const typename StringType::const_iterator &end);
 
     /**
-     * Escape a single unicode codepoint, starting at the character pointed to by the provided
-     * iterator. If successful, after invoking this method, that iterator will point at the first
-     * character after the unicode codepoint in the source string.
+     * Encode a single Unicode codepoint.
      *
-     * If the unicode codepoint is an ASCII, non-control character (i.e. codepoints in the range
+     * @return The Unicode codepoint to encode.
+     *
+     * @return A string containing the encoded Unicode codepoint.
+     */
+    static StringType encode_character(codepoint_type codepoint);
+
+    /**
+     * Escape a single Unicode codepoint, starting at the character pointed to by the provided
+     * iterator. If successful, after invoking this method, that iterator will point at the first
+     * character after the Unicode codepoint in the source string.
+     *
+     * If the Unicode codepoint is an ASCII, non-control character (i.e. codepoints in the range
      * [U+0020, U+007E]), that character is not escaped.
      *
-     * If the unicode codepoint is non-ASCII or a control character (i.e. codepoints in the range
+     * If the Unicode codepoint is non-ASCII or a control character (i.e. codepoints in the range
      * [U+0000, U+001F] or [U+007F, U+10FFFF]), the codepoint is encoded as follows, taking into
-     * consideration the provided unicode prefix character:
+     * consideration the provided Unicode prefix character:
      *
-     *     1. If the unicode codepoint is in the range [U+0000, U+001F] or [U+007F, U+FFFF],
+     *     1. If the Unicode codepoint is in the range [U+0000, U+001F] or [U+007F, U+FFFF],
      *        regardless of the prefix character, the encoding will be of the form \unnnn.
      *     2. If the codepoint is in the range [U+10000, U+10FFFF], and the prefix character is 'u',
      *        the encoding will be a surrogate pair of the form \unnnn\unnnn.
      *     3. If the codepoint is in the range [U+10000, U+10FFFF], and the prefix character is 'U',
      *        the encoding will of the form \Unnnnnnnn.
      *
-     * @tparam UnicodePrefix The unicode prefix character ('u' or 'U').
+     * @tparam UnicodePrefix The Unicode prefix character ('u' or 'U').
      *
-     * @param it Pointer to the beginning of the encoded unicode codepoint.
-     * @param end Pointer to the end of the encoded unicode codepoint.
+     * @param it Pointer to the beginning of the encoded Unicode codepoint.
+     * @param end Pointer to the end of the encoded Unicode codepoint.
      *
-     * @return A string containing the escaped unicode codepoint.
+     * @return A string containing the escaped Unicode codepoint.
      *
-     * @throws UnicodeException If the unicode codepoint could not be escaped.
+     * @throws UnicodeException If the Unicode codepoint could not be escaped.
      */
     template <char UnicodePrefix>
     static StringType escape_character(
@@ -85,22 +94,22 @@ public:
         const typename StringType::const_iterator &end);
 
     /**
-     * Unescape a single unicode codepoint, starting at the character pointed to by provided
+     * Unescape a single Unicode codepoint, starting at the character pointed to by provided
      * iterator. If successful, after invoking this method, that iterator will point at the first
      * character after the escaped sequence in the source string.
      *
      * Accepts escaped sequences of the following forms:
      *
-     *     1. \unnnn for unicode codepoints in the range [U+0000, U+FFFF].
-     *     2. \unnnn\unnnn surrogate pairs for unicode codepoints in the range [U+10000, U+10FFFF].
-     *     3. \Unnnnnnnn for all unicode codepoints.
+     *     1. \unnnn for Unicode codepoints in the range [U+0000, U+FFFF].
+     *     2. \unnnn\unnnn surrogate pairs for Unicode codepoints in the range [U+10000, U+10FFFF].
+     *     3. \Unnnnnnnn for all Unicode codepoints.
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
-     * @return A string containing the unescaped unicode codepoint.
+     * @return A string containing the unescaped Unicode codepoint.
      *
-     * @throws UnicodeException If the escaped sequence is not a valid unicode codepoint.
+     * @throws UnicodeException If the escaped sequence is not a valid Unicode codepoint.
      */
     static StringType unescape_character(
         typename StringType::const_iterator &it,
@@ -110,28 +119,28 @@ private:
     using EncodedByteProvider = std::function<codepoint_type()>;
 
     /**
-     * Escape a single unicode codepoint.
+     * Escape a single Unicode codepoint.
      *
-     * @tparam UnicodePrefix The escaped unicode prefix character ('u' or 'U').
+     * @tparam UnicodePrefix The escaped Unicode prefix character ('u' or 'U').
      *
      * @param codepoint The codepoint to escape.
      *
-     * @return The escaped unicode codepoint.
+     * @return The escaped Unicode codepoint.
      */
     template <char UnicodePrefix>
     static StringType escape_codepoint(codepoint_type codepoint);
 
     /**
-     * Unescape a sequence of characters to form a single unicode codepoint.
+     * Unescape a sequence of characters to form a single Unicode codepoint.
      *
-     * @tparam UnicodePrefix The escaped unicode prefix character ('u' or 'U').
+     * @tparam UnicodePrefix The escaped Unicode prefix character ('u' or 'U').
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
-     * @return The parsed unicode codepoint.
+     * @return The parsed Unicode codepoint.
      *
-     * @throws UnicodeException If the escaped sequence is not a valid unicode codepoint.
+     * @throws UnicodeException If the escaped sequence is not a valid Unicode codepoint.
      */
     template <char UnicodePrefix>
     static codepoint_type unescape_codepoint(
@@ -139,71 +148,71 @@ private:
         const typename StringType::const_iterator &end);
 
     /**
-     * Decode a UTF-8 encoded unicode codepoint.
+     * Decode a UTF-8 encoded Unicode codepoint.
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return The decoded unicode codepoint.
+     * @return The decoded Unicode codepoint.
      *
-     * @throws UnicodeException If the unicode codepoint could not be decoded.
+     * @throws UnicodeException If the Unicode codepoint could not be decoded.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 1), bool> = 0>
     static codepoint_type decode_codepoint(EncodedByteProvider next_encoded_byte);
 
     /**
-     * Decode a UTF-16 encoded unicode codepoint.
+     * Decode a UTF-16 encoded Unicode codepoint.
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return The decoded unicode codepoint.
+     * @return The decoded Unicode codepoint.
      *
-     * @throws UnicodeException If the unicode codepoint could not be decoded.
+     * @throws UnicodeException If the Unicode codepoint could not be decoded.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 2), bool> = 0>
     static codepoint_type decode_codepoint(EncodedByteProvider next_encoded_byte);
 
     /**
-     * Decode a UTF-32 encoded unicode codepoint.
+     * Decode a UTF-32 encoded Unicode codepoint.
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return The decoded unicode codepoint.
+     * @return The decoded Unicode codepoint.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 4), bool> = 0>
     static codepoint_type decode_codepoint(EncodedByteProvider next_encoded_byte);
 
     /**
-     * Encode a unicode codepoint as UTF-8.
+     * Encode a Unicode codepoint as UTF-8.
      *
      * @param codepoint The codepoint to encode.
      *
-     * @return The encoded unicode codepoint.
+     * @return The encoded Unicode codepoint.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 1), bool> = 0>
     static StringType encode_codepoint(codepoint_type codepoint);
 
     /**
-     * Encode a unicode codepoint as UTF-16.
+     * Encode a Unicode codepoint as UTF-16.
      *
      * @param codepoint The codepoint to encode.
      *
-     * @return The encoded unicode codepoint.
+     * @return The encoded Unicode codepoint.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 2), bool> = 0>
     static StringType encode_codepoint(codepoint_type codepoint);
 
     /**
-     * Encode a unicode codepoint as UTF-32.
+     * Encode a Unicode codepoint as UTF-32.
      *
      * @param codepoint The codepoint to encode.
      *
-     * @return The encoded unicode codepoint.
+     * @return The encoded Unicode codepoint.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 4), bool> = 0>
     static StringType encode_codepoint(codepoint_type codepoint);
 
     /**
-     * Create a unicode codepoint from either one complete codepoint or two surrogate halves. The
+     * Create a Unicode codepoint from either one complete codepoint or two surrogate halves. The
      * surrogate provider is invoked at least once to retrieve the candidate complete codepoint from
      * the caller. If that codepoint falls in the high surrogate range, the callback is invoked
      * again to retrieve the low surrogate; those two surrogate halves are then combined to form a
@@ -211,14 +220,23 @@ private:
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return The created unicode codepoint.
+     * @return The created Unicode codepoint.
      *
-     * @throws UnicodeException If the unicode codepoint could not be created.
+     * @throws UnicodeException If the Unicode codepoint could not be created.
      */
     static codepoint_type create_codepoint(EncodedByteProvider next_encoded_byte);
 
     /**
-     * Structure to hold static data required for decoding UTF-8 encoded unicode codepoints.
+     * Validate a Unicode codepoint is not out-of-range or reserved by the Unicode Standard.
+     *
+     * @param codepoint The codepoint to validate.
+     *
+     * @throws UnicodeException If the Unicode codepoint is invalid.
+     */
+    static void validate_codepoint(codepoint_type codepoint);
+
+    /**
+     * Structure to hold static data required for decoding UTF-8 encoded Unicode codepoints.
      */
     struct Utf8Data
     {
@@ -284,21 +302,18 @@ auto BasicStringUnicode<StringType>::decode_character(
     };
 
     const codepoint_type codepoint = decode_codepoint(std::move(next_encoded_byte));
-
-    if ((codepoint >= high_surrogate_min) && (codepoint <= low_surrogate_max))
-    {
-        throw UnicodeException(ExceptionFormatter::format(
-            "Codepoint %x is reserved by the Unicode Standard",
-            codepoint));
-    }
-    else if (codepoint > max_codepoint)
-    {
-        throw UnicodeException(ExceptionFormatter::format(
-            "Codepoint %x exceeds the maxium codepoint U+10ffff",
-            codepoint));
-    }
+    validate_codepoint(codepoint);
 
     return codepoint;
+}
+
+//==================================================================================================
+template <typename StringType>
+StringType BasicStringUnicode<StringType>::encode_character(codepoint_type codepoint)
+{
+    validate_codepoint(codepoint);
+
+    return encode_codepoint(codepoint);
 }
 
 //==================================================================================================
@@ -346,12 +361,12 @@ StringType BasicStringUnicode<StringType>::unescape_character(
     else
     {
         throw UnicodeException(ExceptionFormatter::format(
-            "Escaped unicode must begin with \\%c or \\%c",
+            "Escaped Unicode must begin with \\%c or \\%c",
             static_cast<char>(ch_u),
             static_cast<char>(ch_U)));
     }
 
-    return encode_codepoint(codepoint);
+    return encode_character(codepoint);
 }
 
 //==================================================================================================
@@ -645,6 +660,24 @@ auto BasicStringUnicode<StringType>::create_codepoint(EncodedByteProvider next_e
     }
 
     return codepoint;
+}
+
+//==================================================================================================
+template <typename StringType>
+void BasicStringUnicode<StringType>::validate_codepoint(codepoint_type codepoint)
+{
+    if ((codepoint >= high_surrogate_min) && (codepoint <= low_surrogate_max))
+    {
+        throw UnicodeException(ExceptionFormatter::format(
+            "Codepoint %x is reserved by the Unicode Standard",
+            codepoint));
+    }
+    else if (codepoint > max_codepoint)
+    {
+        throw UnicodeException(ExceptionFormatter::format(
+            "Codepoint %x exceeds the maxium codepoint U+10ffff",
+            codepoint));
+    }
 }
 
 } // namespace fly::detail

@@ -5,6 +5,8 @@
 
 #include <gtest/gtest.h>
 
+#include <vector>
+
 //==================================================================================================
 TYPED_TEST(BasicStringTest, EmptyString)
 {
@@ -12,6 +14,11 @@ TYPED_TEST(BasicStringTest, EmptyString)
 
     string_type test;
     string_type actual;
+
+    auto begin = test.cend();
+    const auto end = test.cend();
+
+    EXPECT_THROW(StringClass::decode_unicode_character(begin, end), fly::UnicodeException);
 
     EXPECT_NO_THROW(actual = StringClass::escape_unicode_string(test));
     EXPECT_EQ(actual, test);
@@ -30,6 +37,7 @@ TYPED_TEST(BasicStringTest, PastTheEndIterators)
     auto begin = test.cend();
     const auto end = test.cend();
 
+    EXPECT_THROW(StringClass::decode_unicode_character(begin, end), fly::UnicodeException);
     EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
     EXPECT_THROW(StringClass::unescape_unicode_character(begin, end), fly::UnicodeException);
 }
@@ -160,12 +168,13 @@ TYPED_TEST(BasicStringTest, ReservedCodepoint)
 {
     DECLARE_ALIASES
 
-    auto validate_fail = [](string_type &&test) {
+    auto validate_fail = [](string_type &&test, codepoint_type codepoint) {
         SCOPED_TRACE(test.c_str());
 
         auto begin = test.cbegin();
         const auto end = test.cend();
 
+        EXPECT_THROW(StringClass::encode_unicode_character(codepoint), fly::UnicodeException);
         EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
         EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
     };
@@ -179,13 +188,13 @@ TYPED_TEST(BasicStringTest, ReservedCodepoint)
             test += static_cast<char_type>(0x80 | ((ch >> 6) & 0x3f));
             test += static_cast<char_type>(0x80 | (ch & 0x3f));
 
-            validate_fail(std::move(test));
+            validate_fail(std::move(test), ch);
         }
         else
         {
             // Note: UTF-16 doesn't actually hit the reserved codepoint exception because the
             // reserved codepoints are invalid alone, and thus fail earlier.
-            validate_fail(string_type(1, static_cast<char_type>(ch)));
+            validate_fail(string_type(1, static_cast<char_type>(ch)), ch);
         }
     }
 }
@@ -195,12 +204,13 @@ TYPED_TEST(BasicStringTest, OutOfRangeCodepoint)
 {
     DECLARE_ALIASES
 
-    auto validate_fail = [](string_type &&test) {
+    auto validate_fail = [](string_type &&test, codepoint_type codepoint) {
         SCOPED_TRACE(test.c_str());
 
         auto begin = test.cbegin();
         const auto end = test.cend();
 
+        EXPECT_THROW(StringClass::encode_unicode_character(codepoint), fly::UnicodeException);
         EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
         EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
     };
@@ -216,7 +226,7 @@ TYPED_TEST(BasicStringTest, OutOfRangeCodepoint)
             test += static_cast<char_type>(0x80 | ((ch >> 6) & 0x3f));
             test += static_cast<char_type>(0x80 | (ch & 0x3f));
 
-            validate_fail(std::move(test));
+            validate_fail(std::move(test), ch);
         }
         else if constexpr (sizeof(char_type) == 2)
         {
@@ -226,11 +236,11 @@ TYPED_TEST(BasicStringTest, OutOfRangeCodepoint)
             test += static_cast<char_type>(0xd800 | ((ch - 0x10000) >> 10));
             test += static_cast<char_type>(0xdc00 | ((ch - 0x10000) & 0x3ff));
 
-            validate_fail(std::move(test));
+            validate_fail(std::move(test), ch);
         }
         else if constexpr (sizeof(char_type) == 4)
         {
-            validate_fail(string_type(1, static_cast<char_type>(ch)));
+            validate_fail(string_type(1, static_cast<char_type>(ch)), ch);
         }
     }
 }
@@ -282,14 +292,18 @@ TYPED_TEST(BasicStringTest, EncodingPrintableASCIINotEncoded)
 {
     DECLARE_ALIASES
 
-    auto validate_pass = [](char_type ch) {
-        SCOPED_TRACE(static_cast<codepoint_type>(ch));
+    auto validate_pass = [](codepoint_type ch) {
+        SCOPED_TRACE(ch);
 
-        const string_type test(1, ch);
+        const string_type test(1, static_cast<char_type>(ch));
         auto begin = test.cbegin();
         const auto end = test.cend();
 
         string_type actual;
+
+        ASSERT_NO_THROW(actual = StringClass::encode_unicode_character(ch));
+        EXPECT_EQ(actual, test);
+
         ASSERT_NO_THROW(actual = StringClass::escape_unicode_character(begin, end));
         EXPECT_EQ(actual, test);
 
@@ -297,7 +311,7 @@ TYPED_TEST(BasicStringTest, EncodingPrintableASCIINotEncoded)
         EXPECT_EQ(actual, test);
     };
 
-    for (char_type ch = 0x20; ch < 0x7f; ++ch)
+    for (codepoint_type ch = 0x20; ch < 0x7f; ++ch)
     {
         validate_pass(ch);
     }
@@ -308,18 +322,22 @@ TYPED_TEST(BasicStringTest, EncodingNonPrintableASCIIEncodedWithLowerU)
 {
     DECLARE_ALIASES
 
-    auto validate_pass = [](char_type ch) {
-        SCOPED_TRACE(static_cast<codepoint_type>(ch));
+    auto validate_pass = [](codepoint_type ch) {
+        SCOPED_TRACE(ch);
 
         // ASCII symbols should always be encoded with \u.
         const string_type expected =
             FLY_STR(char_type, "\\u") + StringClass::create_hex_string(ch, 4);
-        const string_type test(1, ch);
+        const string_type test(1, static_cast<char_type>(ch));
+
+        string_type actual;
         {
             auto begin = test.cbegin();
             const auto end = test.cend();
 
-            string_type actual;
+            ASSERT_NO_THROW(actual = StringClass::encode_unicode_character(ch));
+            EXPECT_EQ(actual, test);
+
             ASSERT_NO_THROW(
                 actual = StringClass::template escape_unicode_character<'u'>(begin, end));
             EXPECT_EQ(actual, expected);
@@ -331,7 +349,9 @@ TYPED_TEST(BasicStringTest, EncodingNonPrintableASCIIEncodedWithLowerU)
             auto begin = test.cbegin();
             const auto end = test.cend();
 
-            string_type actual;
+            ASSERT_NO_THROW(actual = StringClass::encode_unicode_character(ch));
+            EXPECT_EQ(actual, test);
+
             ASSERT_NO_THROW(
                 actual = StringClass::template escape_unicode_character<'U'>(begin, end));
             EXPECT_EQ(actual, expected);
@@ -341,7 +361,7 @@ TYPED_TEST(BasicStringTest, EncodingNonPrintableASCIIEncodedWithLowerU)
         }
     };
 
-    for (char_type ch = 0; ch < 0x20; ++ch)
+    for (codepoint_type ch = 0; ch < 0x20; ++ch)
     {
         validate_pass(ch);
     }
@@ -387,6 +407,7 @@ TYPED_TEST(BasicStringTest, EncodingToUpperU)
         const auto end = test.cend();
 
         string_type actual;
+
         ASSERT_NO_THROW(actual = StringClass::template escape_unicode_character<'U'>(begin, end));
         EXPECT_EQ(actual, expected);
 
@@ -414,7 +435,7 @@ TYPED_TEST(BasicStringTest, EncodingStringToLowerU)
         EXPECT_EQ(actual, expected);
     };
 
-    validate_pass(FLY_STR(char_type, "No unicode!"), FLY_STR(char_type, "No unicode!"));
+    validate_pass(FLY_STR(char_type, "No Unicode!"), FLY_STR(char_type, "No Unicode!"));
 
     validate_pass(
         FLY_STR(char_type, "\U0001f355 in the morning, \U0001f355 in the evening"),
@@ -434,7 +455,7 @@ TYPED_TEST(BasicStringTest, EncodingStringToUpperU)
         EXPECT_EQ(actual, expected);
     };
 
-    validate_pass(FLY_STR(char_type, "No unicode!"), FLY_STR(char_type, "No unicode!"));
+    validate_pass(FLY_STR(char_type, "No Unicode!"), FLY_STR(char_type, "No Unicode!"));
 
     validate_pass(
         FLY_STR(char_type, "\U0001f355 in the morning, \U0001f355 in the evening"),
@@ -442,7 +463,7 @@ TYPED_TEST(BasicStringTest, EncodingStringToUpperU)
 }
 
 //==================================================================================================
-TYPED_TEST(BasicStringTest, InvalidEscapeSequences)
+TYPED_TEST(BasicStringTest, DecodingInvalidEscapeSequences)
 {
     DECLARE_ALIASES
 
@@ -614,7 +635,7 @@ TYPED_TEST(BasicStringTest, DecodingStringValid)
         EXPECT_EQ(actual, expected);
     };
 
-    validate_pass(FLY_STR(char_type, "No unicode!"), FLY_STR(char_type, "No unicode!"));
+    validate_pass(FLY_STR(char_type, "No Unicode!"), FLY_STR(char_type, "No Unicode!"));
     validate_pass(FLY_STR(char_type, "Other escape \t"), FLY_STR(char_type, "Other escape \t"));
     validate_pass(FLY_STR(char_type, "Other escape \\t"), FLY_STR(char_type, "Other escape \\t"));
 
@@ -630,374 +651,377 @@ TYPED_TEST(BasicStringTest, MarkusKuhnStressTest)
 
     // Markus Kuhn UTF-8 decoder capability and stress test
     // http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
+    //
+    // Note: Any test of 5- or 6-byte sequences have been removed here. BasicString only supports up
+    // to 4-byte UTF-8 sequences (Unicode planes 1 - 16). The 5- and 6- byte sequences indeed fail,
+    // but not for the reasons the stress test expects. See:
+    // https://unicode.org/mail-arch/unicode-ml/Archives-Old/UML018/0332.html
     if constexpr (sizeof(char_type) == 1)
     {
-        auto validate_pass = [](string_type &&test, string_type &&expected) {
+        auto validate_pass = [](string_type &&test, codepoint_type expected, int line) {
             SCOPED_TRACE(test.c_str());
+            SCOPED_TRACE(line);
 
-            string_type actual;
-            ASSERT_NO_THROW(actual = StringClass::escape_unicode_string(test));
+            auto it = test.cbegin();
+            const auto end = test.cend();
+
+            codepoint_type actual;
+            ASSERT_NO_THROW(actual = StringClass::decode_unicode_character(it, end));
             EXPECT_EQ(actual, expected);
         };
 
-        auto validate_fail = [](string_type &&test) {
-            SCOPED_TRACE(test.c_str());
+        auto validate_pass_all =
+            [](string_type &&test, std::vector<codepoint_type> expected, int line) {
+                SCOPED_TRACE(test.c_str());
+                SCOPED_TRACE(line);
 
-            EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
+                std::size_t index = 0;
+
+                auto it = test.cbegin();
+                const auto end = test.cend();
+
+                for (; (it != end) && (index < expected.size()); ++index)
+                {
+                    codepoint_type actual;
+                    ASSERT_NO_THROW(actual = StringClass::decode_unicode_character(it, end));
+                    EXPECT_EQ(actual, expected[index]);
+                }
+
+                EXPECT_EQ(index, expected.size());
+                EXPECT_EQ(it, end);
+            };
+
+        auto validate_fail = [](string_type &&test, std::size_t expected, int line) {
+            SCOPED_TRACE(test.c_str());
+            SCOPED_TRACE(line);
+
+            const auto end = test.cend();
+            std::size_t actual = 0;
+
+            for (auto it = test.cbegin(); it != end;)
+            {
+                try
+                {
+                    StringClass::decode_unicode_character(it, end);
+                }
+                catch (const fly::UnicodeException &)
+                {
+                    ++actual;
+                }
+            }
+
+            EXPECT_EQ(actual, expected);
         };
 
         // 1  Some correct UTF-8 text
-        validate_pass("κόσμε", "\\u03ba\\u1f79\\u03c3\\u03bc\\u03b5");
+        validate_pass_all("κόσμε", {0x03ba, 0x1f79, 0x03c3, 0x03bc, 0x03b5}, __LINE__);
 
         // 2  Boundary condition test cases
 
         // 2.1  First possible sequence of a certain length
 
         // 2.1.1  1 byte  (U-00000000)
-        validate_pass(string_type(1, 0x00), "\\u0000");
+        validate_pass(string_type(1, 0x00), 0x0000, __LINE__);
 
         // 2.1.2  2 bytes (U-00000080)
-        validate_pass("\xc2\x80", "\\u0080");
+        validate_pass("\xc2\x80", 0x0080, __LINE__);
 
         // 2.1.3  3 bytes (U-00000800)
-        validate_pass("\xe0\xa0\x80", "\\u0800");
+        validate_pass("\xe0\xa0\x80", 0x0800, __LINE__);
 
         // 2.1.4  4 bytes (U-00010000)
-        validate_pass("\xf0\x90\x80\x80", "\\U00010000");
-
-        // 2.1.5  5 bytes (U-00200000)
-        validate_fail("\xf8\x88\x80\x80\x80");
-
-        // 2.1.6  6 bytes (U-04000000)
-        validate_fail("\xfc\x84\x80\x80\x80\x80");
+        validate_pass("\xf0\x90\x80\x80", 0x10000, __LINE__);
 
         // 2.2  Last possible sequence of a certain length
 
         // 2.2.1  1 byte  (U-0000007F)
-        validate_pass("\x7f", "\\u007f");
+        validate_pass("\x7f", 0x007f, __LINE__);
 
         // 2.2.2  2 bytes (U-000007FF)
-        validate_pass("\xdf\xbf", "\\u07ff");
+        validate_pass("\xdf\xbf", 0x07ff, __LINE__);
 
         // 2.2.3  3 bytes (U-0000FFFF)
-        validate_pass("\xef\xbf\xbf", "\\uffff");
+        validate_pass("\xef\xbf\xbf", 0xffff, __LINE__);
 
         // 2.1.4  4 bytes (U-001FFFFF)
-        validate_fail("\xf7\xbf\xbf\xbf");
-
-        // 2.1.5  5 bytes (U-03FFFFFF)
-        validate_fail("\xfb\xbf\xbf\xbf\xbf");
-
-        // 2.1.6  6 bytes (U-7FFFFFFF)
-        validate_fail("\xfd\xbf\xbf\xbf\xbf\xbf");
+        validate_fail("\xf7\xbf\xbf\xbf", 1, __LINE__);
 
         // 2.3  Other boundary conditions
 
         // 2.3.1  U-0000D7FF = ed 9f bf
-        validate_pass("\xed\x9f\xbf", "\\ud7ff");
+        validate_pass("\xed\x9f\xbf", 0xd7ff, __LINE__);
 
         // 2.3.2  U-0000E000 = ee 80 80
-        validate_pass("\xee\x80\x80", "\\ue000");
+        validate_pass("\xee\x80\x80", 0xe000, __LINE__);
 
         // 2.3.3  U-0000FFFD = ef bf bd
-        validate_pass("\xef\xbf\xbd", "\\ufffd");
+        validate_pass("\xef\xbf\xbd", 0xfffd, __LINE__);
 
         // 2.3.4  U-0010FFFF = f4 8f bf bf
-        validate_pass("\xf4\x8f\xbf\xbf", "\\U0010ffff");
+        validate_pass("\xf4\x8f\xbf\xbf", 0x10ffff, __LINE__);
 
         // 2.3.5  U-00110000 = f4 90 80 80
-        validate_fail("\xf4\x90\x80\x80");
+        validate_fail("\xf4\x90\x80\x80", 1, __LINE__);
 
         // 3  Malformed sequences
 
         // 3.1  Unexpected continuation bytes
 
         // 3.1.1  First continuation byte 0x80
-        validate_fail("\x80");
+        validate_fail("\x80", 1, __LINE__);
 
         // 3.1.2 Last continuation byte 0xbf
-        validate_fail("\xbf");
+        validate_fail("\xbf", 1, __LINE__);
 
         // 3.1.3  2 continuation bytes
-        validate_fail("\x80\xbf");
+        validate_fail("\x80\xbf", 2, __LINE__);
 
         // 3.1.4  3 continuation bytes
-        validate_fail("\x80\xbf\x80");
+        validate_fail("\x80\xbf\x80", 3, __LINE__);
 
         // 3.1.5  4 continuation bytes
-        validate_fail("\x80\xbf\x80\xbf");
+        validate_fail("\x80\xbf\x80\xbf", 4, __LINE__);
 
         // 3.1.6  5 continuation bytes
-        validate_fail("\x80\xbf\x80\xbf\x80");
+        validate_fail("\x80\xbf\x80\xbf\x80", 5, __LINE__);
 
         // 3.1.7  6 continuation bytes
-        validate_fail("\x80\xbf\x80\xbf\x80\xbf");
+        validate_fail("\x80\xbf\x80\xbf\x80\xbf", 6, __LINE__);
 
         // 3.1.8  7 continuation bytes
-        validate_fail("\x80\xbf\x80\xbf\x80\xbf\x80");
+        validate_fail("\x80\xbf\x80\xbf\x80\xbf\x80", 7, __LINE__);
 
         // 3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf)
         string_type test_3_1_9;
 
         for (codepoint_type ch = 0x80; ch <= 0xbf; ++ch)
         {
-            validate_fail(string_type(1, ch));
+            validate_fail(string_type(1, ch), 1, __LINE__);
             test_3_1_9 += ch;
         }
 
-        validate_fail(std::move(test_3_1_9));
+        validate_fail(std::move(test_3_1_9), 64, __LINE__);
 
         // 3.2  Lonely start characters
 
-        auto validate_fail_sequence = [&validate_fail](codepoint_type begin, codepoint_type end) {
-            string_type test_3_2;
+        auto validate_fail_sequence =
+            [&validate_fail](codepoint_type begin, codepoint_type end, int line) {
+                string_type test_3_2;
 
-            for (codepoint_type ch = begin; ch <= end; ++ch)
-            {
-                validate_fail(string_type(1, ch) + " ");
-                test_3_2 += ch;
-                test_3_2 += ' ';
-            }
+                for (codepoint_type ch = begin; ch <= end; ++ch)
+                {
+                    validate_fail(string_type(1, ch) + " ", 1, line);
+                    test_3_2 += ch;
+                    test_3_2 += ' ';
+                }
 
-            validate_fail(std::move(test_3_2));
-        };
+                validate_fail(std::move(test_3_2), end - begin + 1, line);
+            };
 
         // 3.2.1  All 32 first bytes of 2-byte sequences (0xc0-0xdf), each followed by a space
         // character
-        validate_fail_sequence(0xc0, 0xdf);
+        validate_fail_sequence(0xc0, 0xdf, __LINE__);
 
         // 3.2.2  All 16 first bytes of 3-byte sequences (0xe0-0xef) each followed by a space
         // character
-        validate_fail_sequence(0xe0, 0xef);
+        validate_fail_sequence(0xe0, 0xef, __LINE__);
 
         // 3.2.3  All 8 first bytes of 4-byte sequences (0xf0-0xf7), each followed by a space
         // character
-        validate_fail_sequence(0xf0, 0xf7);
+        validate_fail_sequence(0xf0, 0xf7, __LINE__);
 
         // 3.2.4  All 4 first bytes of 5-byte sequences (0xf8-0xfb), each followed by a space
         // character
-        validate_fail_sequence(0xf8, 0xfb);
+        validate_fail_sequence(0xf8, 0xfb, __LINE__);
 
         // 3.2.5  All 2 first bytes of 6-byte sequences (0xfc-0xfd), each followed by a space
         // character
-        validate_fail_sequence(0xfc, 0xfd);
+        validate_fail_sequence(0xfc, 0xfd, __LINE__);
 
         // 3.3  Sequences with last continuation byte missing
 
         // 3.3.1  2-byte sequence with last byte missing (U+0000)
-        validate_fail("\xc0");
+        validate_fail("\xc0", 1, __LINE__);
 
         // 3.3.2  3-byte sequence with last byte missing (U+0000)
-        validate_fail("\xe0\x80");
+        validate_fail("\xe0\x80", 1, __LINE__);
 
         // 3.3.3  4-byte sequence with last byte missing (U+0000)
-        validate_fail("\xf0\x80\x80");
-
-        // 3.3.4  5-byte sequence with last byte missing (U+0000)
-        validate_fail("\xf8\x80\x80\x80");
-
-        // 3.3.5  6-byte sequence with last byte missing (U+0000)
-        validate_fail("\xfc\x80\x80\x80\x80");
+        validate_fail("\xf0\x80\x80", 1, __LINE__);
 
         // 3.3.6  2-byte sequence with last byte missing (U-000007FF)
-        validate_fail("\xdf");
+        validate_fail("\xdf", 1, __LINE__);
 
         // 3.3.7  3-byte sequence with last byte missing (U-0000FFFF)
-        validate_fail("\xef\xbf");
+        validate_fail("\xef\xbf", 1, __LINE__);
 
         // 3.3.8  4-byte sequence with last byte missing (U-001FFFFF)
-        validate_fail("\xf7\xbf\xbf");
-
-        // 3.3.9  5-byte sequence with last byte missing (U-03FFFFFF)
-        validate_fail("\xfb\xbf\xbf\xbf");
-
-        // 3.3.10 6-byte sequence with last byte missing (U-7FFFFFFF)
-        validate_fail("\xfd\xbf\xbf\xbf\xbf");
+        validate_fail("\xf7\xbf\xbf", 1, __LINE__);
 
         // 3.4  Concatenation of incomplete sequences
 
-        // All the 10 sequences of 3.3 concatenated
-        validate_fail(
-            "\xc0\xe0\x80\xf0\x80\x80\xf8\x80\x80\x80\xfc\x80\x80\x80\x80\xdf\xef\xbf\xf7\xbf\xbf"
-            "\xfb\xbf\xbf\xbf\xfd\xbf\xbf\xbf\xbf");
+        // All the 6 sequences of 3.3 concatenated
+        validate_fail("\xc0\xe0\x80\xf0\x80\x80\xdf\xef\xbf\xf7\xbf\xbf", 6, __LINE__);
 
         // 3.5  Impossible bytes
 
         // 3.5.1  fe
-        validate_fail("\xfe");
+        validate_fail("\xfe", 1, __LINE__);
 
         // 3.5.2  ff
-        validate_fail("\xff");
+        validate_fail("\xff", 1, __LINE__);
 
         // 3.5.3  fe fe ff ff
-        validate_fail("\xfe\xfe\xff\xff");
+        validate_fail("\xfe\xfe\xff\xff", 4, __LINE__);
 
         // 4  Overlong sequences
 
         // 4.1  Examples of an overlong ASCII character
 
         // 4.1.1 U+002F = c0 af
-        validate_fail("\xc0\xaf");
+        validate_fail("\xc0\xaf", 1, __LINE__);
 
         // 4.1.2 U+002F = e0 80 af
-        validate_fail("\xe0\x80\xaf");
+        validate_fail("\xe0\x80\xaf", 1, __LINE__);
 
         // 4.1.3 U+002F = f0 80 80 af
-        validate_fail("\xf0\x80\x80\xaf");
-
-        // 4.1.4 U+002F = f8 80 80 80 af
-        validate_fail("\xf8\x80\x80\x80\xaf");
-
-        // 4.1.5 U+002F = fc 80 80 80 80 af
-        validate_fail("\xfc\x80\x80\x80\x80\xaf");
+        validate_fail("\xf0\x80\x80\xaf", 1, __LINE__);
 
         // 4.2  Maximum overlong sequences
 
         // 4.2.1  U-0000007F = c1 bf
-        validate_fail("\xc1\xbf");
+        validate_fail("\xc1\xbf", 1, __LINE__);
 
         // 4.2.2  U-000007FF = e0 9f bf
-        validate_fail("\xe0\x9f\xbf");
+        validate_fail("\xe0\x9f\xbf", 1, __LINE__);
 
         // 4.2.3  U-0000FFFF = f0 8f bf bf
-        validate_fail("\xf0\x8f\xbf\xbf");
-
-        // 4.2.4  U-001FFFFF = f8 87 bf bf bf
-        validate_fail("\xf8\x87\xbf\xbf\xbf");
-
-        // 4.2.5  U-03FFFFFF = fc 83 bf bf bf bf
-        validate_fail("\xfc\x83\xbf\xbf\xbf\xbf");
+        validate_fail("\xf0\x8f\xbf\xbf", 1, __LINE__);
 
         // 4.3  Overlong representation of the NUL character
 
         // 4.3.1  U+0000 = c0 80
-        validate_fail("\xc0\x80");
+        validate_fail("\xc0\x80", 1, __LINE__);
 
         // 4.3.2  U+0000 = e0 80 80
-        validate_fail("\xe0\x80\x80");
+        validate_fail("\xe0\x80\x80", 1, __LINE__);
 
         // 4.3.3  U+0000 = f0 80 80 80
-        validate_fail("\xf0\x80\x80\x80");
-
-        // 4.3.4  U+0000 = f8 80 80 80 80
-        validate_fail("\xf8\x80\x80\x80\x80");
-
-        // 4.3.5  U+0000 = fc 80 80 80 80 80
-        validate_fail("\xfc\x80\x80\x80\x80\x80");
+        validate_fail("\xf0\x80\x80\x80", 1, __LINE__);
 
         // 5  Illegal code positions
 
         // 5.1 Single UTF-16 surrogates
 
         // 5.1.1  U+D800 = ed a0 80
-        validate_fail("\xed\xa0\x80");
+        validate_fail("\xed\xa0\x80", 1, __LINE__);
 
         // 5.1.2  U+DB7F = ed ad bf
-        validate_fail("\xed\xad\xbf");
+        validate_fail("\xed\xad\xbf", 1, __LINE__);
 
         // 5.1.3  U+DB80 = ed ae 80
-        validate_fail("\xed\xae\x80");
+        validate_fail("\xed\xae\x80", 1, __LINE__);
 
         // 5.1.4  U+DBFF = ed af bf
-        validate_fail("\xed\xaf\xbf");
+        validate_fail("\xed\xaf\xbf", 1, __LINE__);
 
         // 5.1.5  U+DC00 = ed b0 80
-        validate_fail("\xed\xb0\x80");
+        validate_fail("\xed\xb0\x80", 1, __LINE__);
 
         // 5.1.6  U+DF80 = ed be 80
-        validate_fail("\xed\xbe\x80");
+        validate_fail("\xed\xbe\x80", 1, __LINE__);
 
         // 5.1.7  U+DFFF = ed bf bf
-        validate_fail("\xed\xbf\xbf");
+        validate_fail("\xed\xbf\xbf", 1, __LINE__);
 
         // 5.2 Paired UTF-16 surrogates
 
         // 5.2.1  U+D800 U+DC00 = ed a0 80 ed b0 80
-        validate_fail("\xed\xa0\x80\xed\xb0\x80");
+        validate_fail("\xed\xa0\x80\xed\xb0\x80", 2, __LINE__);
 
         // 5.2.2  U+D800 U+DFFF = ed a0 80 ed bf bf
-        validate_fail("\xed\xa0\x80\xed\xbf\xbf");
+        validate_fail("\xed\xa0\x80\xed\xbf\xbf", 2, __LINE__);
 
         // 5.2.3  U+DB7F U+DC00 = ed ad bf ed b0 80
-        validate_fail("\xed\xad\xbf\xed\xb0\x80");
+        validate_fail("\xed\xad\xbf\xed\xb0\x80", 2, __LINE__);
 
         // 5.2.4  U+DB7F U+DFFF = ed ad bf ed bf bf
-        validate_fail("\xed\xad\xbf\xed\xbf\xbf");
+        validate_fail("\xed\xad\xbf\xed\xbf\xbf", 2, __LINE__);
 
         // 5.2.5  U+DB80 U+DC00 = ed ae 80 ed b0 80
-        validate_fail("\xed\xae\x80\xed\xb0\x80");
+        validate_fail("\xed\xae\x80\xed\xb0\x80", 2, __LINE__);
 
         // 5.2.6  U+DB80 U+DFFF = ed ae 80 ed bf bf
-        validate_fail("\xed\xae\x80\xed\xbf\xbf");
+        validate_fail("\xed\xae\x80\xed\xbf\xbf", 2, __LINE__);
 
         // 5.2.7  U+DBFF U+DC00 = ed af bf ed b0 80
-        validate_fail("\xed\xaf\xbf\xed\xb0\x80");
+        validate_fail("\xed\xaf\xbf\xed\xb0\x80", 2, __LINE__);
 
         // 5.2.8  U+DBFF U+DFFF = ed af bf ed bf bf
-        validate_fail("\xed\xaf\xbf\xed\xbf\xbf");
+        validate_fail("\xed\xaf\xbf\xed\xbf\xbf", 2, __LINE__);
 
         // 5.3 Noncharacter code positions
 
         // 5.3.1  U+FFFE = ef bf be
-        validate_pass("\xef\xbf\xbe", "\\ufffe");
+        validate_pass("\xef\xbf\xbe", 0xfffe, __LINE__);
 
         // 5.3.2  U+FFFF = ef bf bf
-        validate_pass("\xef\xbf\xbf", "\\uffff");
+        validate_pass("\xef\xbf\xbf", 0xffff, __LINE__);
 
         // 5.3.3  U+FDD0 .. U+FDEF
-        validate_pass("\xef\xb7\x90", "\\ufdd0");
-        validate_pass("\xef\xb7\x91", "\\ufdd1");
-        validate_pass("\xef\xb7\x92", "\\ufdd2");
-        validate_pass("\xef\xb7\x93", "\\ufdd3");
-        validate_pass("\xef\xb7\x94", "\\ufdd4");
-        validate_pass("\xef\xb7\x95", "\\ufdd5");
-        validate_pass("\xef\xb7\x96", "\\ufdd6");
-        validate_pass("\xef\xb7\x97", "\\ufdd7");
-        validate_pass("\xef\xb7\x98", "\\ufdd8");
-        validate_pass("\xef\xb7\x99", "\\ufdd9");
-        validate_pass("\xef\xb7\x9a", "\\ufdda");
-        validate_pass("\xef\xb7\x9b", "\\ufddb");
-        validate_pass("\xef\xb7\x9c", "\\ufddc");
-        validate_pass("\xef\xb7\x9d", "\\ufddd");
-        validate_pass("\xef\xb7\x9e", "\\ufdde");
-        validate_pass("\xef\xb7\x9f", "\\ufddf");
-        validate_pass("\xef\xb7\xa0", "\\ufde0");
-        validate_pass("\xef\xb7\xa1", "\\ufde1");
-        validate_pass("\xef\xb7\xa2", "\\ufde2");
-        validate_pass("\xef\xb7\xa3", "\\ufde3");
-        validate_pass("\xef\xb7\xa4", "\\ufde4");
-        validate_pass("\xef\xb7\xa5", "\\ufde5");
-        validate_pass("\xef\xb7\xa6", "\\ufde6");
-        validate_pass("\xef\xb7\xa7", "\\ufde7");
-        validate_pass("\xef\xb7\xa8", "\\ufde8");
-        validate_pass("\xef\xb7\xa9", "\\ufde9");
-        validate_pass("\xef\xb7\xaa", "\\ufdea");
-        validate_pass("\xef\xb7\xab", "\\ufdeb");
-        validate_pass("\xef\xb7\xac", "\\ufdec");
-        validate_pass("\xef\xb7\xad", "\\ufded");
-        validate_pass("\xef\xb7\xae", "\\ufdee");
-        validate_pass("\xef\xb7\xaf", "\\ufdef");
+        validate_pass("\xef\xb7\x90", 0xfdd0, __LINE__);
+        validate_pass("\xef\xb7\x91", 0xfdd1, __LINE__);
+        validate_pass("\xef\xb7\x92", 0xfdd2, __LINE__);
+        validate_pass("\xef\xb7\x93", 0xfdd3, __LINE__);
+        validate_pass("\xef\xb7\x94", 0xfdd4, __LINE__);
+        validate_pass("\xef\xb7\x95", 0xfdd5, __LINE__);
+        validate_pass("\xef\xb7\x96", 0xfdd6, __LINE__);
+        validate_pass("\xef\xb7\x97", 0xfdd7, __LINE__);
+        validate_pass("\xef\xb7\x98", 0xfdd8, __LINE__);
+        validate_pass("\xef\xb7\x99", 0xfdd9, __LINE__);
+        validate_pass("\xef\xb7\x9a", 0xfdda, __LINE__);
+        validate_pass("\xef\xb7\x9b", 0xfddb, __LINE__);
+        validate_pass("\xef\xb7\x9c", 0xfddc, __LINE__);
+        validate_pass("\xef\xb7\x9d", 0xfddd, __LINE__);
+        validate_pass("\xef\xb7\x9e", 0xfdde, __LINE__);
+        validate_pass("\xef\xb7\x9f", 0xfddf, __LINE__);
+        validate_pass("\xef\xb7\xa0", 0xfde0, __LINE__);
+        validate_pass("\xef\xb7\xa1", 0xfde1, __LINE__);
+        validate_pass("\xef\xb7\xa2", 0xfde2, __LINE__);
+        validate_pass("\xef\xb7\xa3", 0xfde3, __LINE__);
+        validate_pass("\xef\xb7\xa4", 0xfde4, __LINE__);
+        validate_pass("\xef\xb7\xa5", 0xfde5, __LINE__);
+        validate_pass("\xef\xb7\xa6", 0xfde6, __LINE__);
+        validate_pass("\xef\xb7\xa7", 0xfde7, __LINE__);
+        validate_pass("\xef\xb7\xa8", 0xfde8, __LINE__);
+        validate_pass("\xef\xb7\xa9", 0xfde9, __LINE__);
+        validate_pass("\xef\xb7\xaa", 0xfdea, __LINE__);
+        validate_pass("\xef\xb7\xab", 0xfdeb, __LINE__);
+        validate_pass("\xef\xb7\xac", 0xfdec, __LINE__);
+        validate_pass("\xef\xb7\xad", 0xfded, __LINE__);
+        validate_pass("\xef\xb7\xae", 0xfdee, __LINE__);
+        validate_pass("\xef\xb7\xaf", 0xfdef, __LINE__);
 
         // 5.3.4  U+nFFFE U+nFFFF (for n = 1..10)
-        validate_pass("\xf0\x9f\xbf\xbe", "\\U0001fffe");
-        validate_pass("\xf0\x9f\xbf\xbf", "\\U0001ffff");
-        validate_pass("\xf0\xaf\xbf\xbe", "\\U0002fffe");
-        validate_pass("\xf0\xaf\xbf\xbf", "\\U0002ffff");
-        validate_pass("\xf0\xbf\xbf\xbe", "\\U0003fffe");
-        validate_pass("\xf0\xbf\xbf\xbf", "\\U0003ffff");
-        validate_pass("\xf1\x8f\xbf\xbe", "\\U0004fffe");
-        validate_pass("\xf1\x8f\xbf\xbf", "\\U0004ffff");
-        validate_pass("\xf1\x9f\xbf\xbe", "\\U0005fffe");
-        validate_pass("\xf1\x9f\xbf\xbf", "\\U0005ffff");
-        validate_pass("\xf1\xaf\xbf\xbe", "\\U0006fffe");
-        validate_pass("\xf1\xaf\xbf\xbf", "\\U0006ffff");
-        validate_pass("\xf1\xbf\xbf\xbe", "\\U0007fffe");
-        validate_pass("\xf1\xbf\xbf\xbf", "\\U0007ffff");
-        validate_pass("\xf2\x8f\xbf\xbe", "\\U0008fffe");
-        validate_pass("\xf2\x8f\xbf\xbf", "\\U0008ffff");
-        validate_pass("\xf2\x9f\xbf\xbe", "\\U0009fffe");
-        validate_pass("\xf2\x9f\xbf\xbf", "\\U0009ffff");
-        validate_pass("\xf2\xaf\xbf\xbe", "\\U000afffe");
-        validate_pass("\xf2\xaf\xbf\xbf", "\\U000affff");
+        validate_pass("\xf0\x9f\xbf\xbe", 0x1fffe, __LINE__);
+        validate_pass("\xf0\x9f\xbf\xbf", 0x1ffff, __LINE__);
+        validate_pass("\xf0\xaf\xbf\xbe", 0x2fffe, __LINE__);
+        validate_pass("\xf0\xaf\xbf\xbf", 0x2ffff, __LINE__);
+        validate_pass("\xf0\xbf\xbf\xbe", 0x3fffe, __LINE__);
+        validate_pass("\xf0\xbf\xbf\xbf", 0x3ffff, __LINE__);
+        validate_pass("\xf1\x8f\xbf\xbe", 0x4fffe, __LINE__);
+        validate_pass("\xf1\x8f\xbf\xbf", 0x4ffff, __LINE__);
+        validate_pass("\xf1\x9f\xbf\xbe", 0x5fffe, __LINE__);
+        validate_pass("\xf1\x9f\xbf\xbf", 0x5ffff, __LINE__);
+        validate_pass("\xf1\xaf\xbf\xbe", 0x6fffe, __LINE__);
+        validate_pass("\xf1\xaf\xbf\xbf", 0x6ffff, __LINE__);
+        validate_pass("\xf1\xbf\xbf\xbe", 0x7fffe, __LINE__);
+        validate_pass("\xf1\xbf\xbf\xbf", 0x7ffff, __LINE__);
+        validate_pass("\xf2\x8f\xbf\xbe", 0x8fffe, __LINE__);
+        validate_pass("\xf2\x8f\xbf\xbf", 0x8ffff, __LINE__);
+        validate_pass("\xf2\x9f\xbf\xbe", 0x9fffe, __LINE__);
+        validate_pass("\xf2\x9f\xbf\xbf", 0x9ffff, __LINE__);
+        validate_pass("\xf2\xaf\xbf\xbe", 0xafffe, __LINE__);
+        validate_pass("\xf2\xaf\xbf\xbf", 0xaffff, __LINE__);
     }
 }
