@@ -18,12 +18,12 @@ TYPED_TEST(BasicStringTest, EmptyString)
     auto begin = test.cend();
     const auto end = test.cend();
 
-    EXPECT_THROW(StringClass::decode_unicode_character(begin, end), fly::UnicodeException);
+    EXPECT_THROW(StringClass::decode_codepoint(begin, end), fly::UnicodeException);
 
-    EXPECT_NO_THROW(actual = StringClass::escape_unicode_string(test));
+    EXPECT_NO_THROW(actual = StringClass::escape_all_codepoints(test));
     EXPECT_EQ(actual, test);
 
-    EXPECT_NO_THROW(actual = StringClass::unescape_unicode_string(test));
+    EXPECT_NO_THROW(actual = StringClass::unescape_all_codepoints(test));
     EXPECT_EQ(actual, test);
 }
 
@@ -37,9 +37,9 @@ TYPED_TEST(BasicStringTest, PastTheEndIterators)
     auto begin = test.cend();
     const auto end = test.cend();
 
-    EXPECT_THROW(StringClass::decode_unicode_character(begin, end), fly::UnicodeException);
-    EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
-    EXPECT_THROW(StringClass::unescape_unicode_character(begin, end), fly::UnicodeException);
+    EXPECT_THROW(StringClass::decode_codepoint(begin, end), fly::UnicodeException);
+    EXPECT_THROW(StringClass::escape_codepoint(begin, end), fly::UnicodeException);
+    EXPECT_THROW(StringClass::unescape_codepoint(begin, end), fly::UnicodeException);
 }
 
 //==================================================================================================
@@ -54,8 +54,8 @@ TYPED_TEST(BasicStringTest, Utf8EncodingInvalidLeadingByte)
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
-        EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
+        EXPECT_THROW(StringClass::escape_codepoint(begin, end), fly::UnicodeException);
+        EXPECT_THROW(StringClass::escape_all_codepoints(test), fly::UnicodeException);
     }
 }
 
@@ -72,8 +72,8 @@ TYPED_TEST(BasicStringTest, Utf8EncodingInvalidContinuationByte)
             auto begin = test.cbegin();
             const auto end = test.cend();
 
-            EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
-            EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
+            EXPECT_THROW(StringClass::escape_codepoint(begin, end), fly::UnicodeException);
+            EXPECT_THROW(StringClass::escape_all_codepoints(test), fly::UnicodeException);
         };
 
         // Second byte of U+1f355 masked with 0b0011'1111.
@@ -100,8 +100,8 @@ TYPED_TEST(BasicStringTest, Utf8EncodingOverlong)
             auto begin = test.cbegin();
             const auto end = test.cend();
 
-            EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
-            EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
+            EXPECT_THROW(StringClass::escape_codepoint(begin, end), fly::UnicodeException);
+            EXPECT_THROW(StringClass::escape_all_codepoints(test), fly::UnicodeException);
         };
 
         // U+0021 2-byte overlong encoding.
@@ -128,8 +128,8 @@ TYPED_TEST(BasicStringTest, Utf16EncodingInvalidSurrogates)
             auto begin = test.cbegin();
             const auto end = test.cend();
 
-            EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
-            EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
+            EXPECT_THROW(StringClass::escape_codepoint(begin, end), fly::UnicodeException);
+            EXPECT_THROW(StringClass::escape_all_codepoints(test), fly::UnicodeException);
         };
 
         // Low surrogate only.
@@ -174,9 +174,9 @@ TYPED_TEST(BasicStringTest, ReservedCodepoint)
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        EXPECT_THROW(StringClass::encode_unicode_character(codepoint), fly::UnicodeException);
-        EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
-        EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
+        EXPECT_THROW(StringClass::encode_codepoint(codepoint), fly::UnicodeException);
+        EXPECT_THROW(StringClass::escape_codepoint(begin, end), fly::UnicodeException);
+        EXPECT_THROW(StringClass::escape_all_codepoints(test), fly::UnicodeException);
     };
 
     for (codepoint_type ch = 0xd800; ch <= 0xdfff; ++ch)
@@ -210,9 +210,9 @@ TYPED_TEST(BasicStringTest, OutOfRangeCodepoint)
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        EXPECT_THROW(StringClass::encode_unicode_character(codepoint), fly::UnicodeException);
-        EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
-        EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
+        EXPECT_THROW(StringClass::encode_codepoint(codepoint), fly::UnicodeException);
+        EXPECT_THROW(StringClass::escape_codepoint(begin, end), fly::UnicodeException);
+        EXPECT_THROW(StringClass::escape_all_codepoints(test), fly::UnicodeException);
     };
 
     // Iterating all the way to numeric_limits<char_type>::max() takes way too long.
@@ -256,8 +256,8 @@ TYPED_TEST(BasicStringTest, EncodingNotEnoughData)
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
-        EXPECT_THROW(StringClass::escape_unicode_string(test), fly::UnicodeException);
+        EXPECT_THROW(StringClass::escape_codepoint(begin, end), fly::UnicodeException);
+        EXPECT_THROW(StringClass::escape_all_codepoints(test), fly::UnicodeException);
     };
 
     if constexpr (sizeof(char_type) == 1)
@@ -283,7 +283,7 @@ TYPED_TEST(BasicStringTest, EncodingNotEnoughData)
         auto begin = test.cend();
         const auto end = test.cend();
 
-        EXPECT_THROW(StringClass::escape_unicode_character(begin, end), fly::UnicodeException);
+        EXPECT_THROW(StringClass::escape_codepoint(begin, end), fly::UnicodeException);
     }
 }
 
@@ -301,13 +301,13 @@ TYPED_TEST(BasicStringTest, EncodingPrintableASCIINotEncoded)
 
         string_type actual;
 
-        ASSERT_NO_THROW(actual = StringClass::encode_unicode_character(ch));
+        ASSERT_NO_THROW(actual = StringClass::encode_codepoint(ch));
         EXPECT_EQ(actual, test);
 
-        ASSERT_NO_THROW(actual = StringClass::escape_unicode_character(begin, end));
+        ASSERT_NO_THROW(actual = StringClass::escape_codepoint(begin, end));
         EXPECT_EQ(actual, test);
 
-        ASSERT_NO_THROW(actual = StringClass::escape_unicode_string(test));
+        ASSERT_NO_THROW(actual = StringClass::escape_all_codepoints(test));
         EXPECT_EQ(actual, test);
     };
 
@@ -335,28 +335,26 @@ TYPED_TEST(BasicStringTest, EncodingNonPrintableASCIIEncodedWithLowerU)
             auto begin = test.cbegin();
             const auto end = test.cend();
 
-            ASSERT_NO_THROW(actual = StringClass::encode_unicode_character(ch));
+            ASSERT_NO_THROW(actual = StringClass::encode_codepoint(ch));
             EXPECT_EQ(actual, test);
 
-            ASSERT_NO_THROW(
-                actual = StringClass::template escape_unicode_character<'u'>(begin, end));
+            ASSERT_NO_THROW(actual = StringClass::template escape_codepoint<'u'>(begin, end));
             EXPECT_EQ(actual, expected);
 
-            ASSERT_NO_THROW(actual = StringClass::template escape_unicode_string<'u'>(test));
+            ASSERT_NO_THROW(actual = StringClass::template escape_all_codepoints<'u'>(test));
             EXPECT_EQ(actual, expected);
         }
         {
             auto begin = test.cbegin();
             const auto end = test.cend();
 
-            ASSERT_NO_THROW(actual = StringClass::encode_unicode_character(ch));
+            ASSERT_NO_THROW(actual = StringClass::encode_codepoint(ch));
             EXPECT_EQ(actual, test);
 
-            ASSERT_NO_THROW(
-                actual = StringClass::template escape_unicode_character<'U'>(begin, end));
+            ASSERT_NO_THROW(actual = StringClass::template escape_codepoint<'U'>(begin, end));
             EXPECT_EQ(actual, expected);
 
-            ASSERT_NO_THROW(actual = StringClass::template escape_unicode_string<'U'>(test));
+            ASSERT_NO_THROW(actual = StringClass::template escape_all_codepoints<'U'>(test));
             EXPECT_EQ(actual, expected);
         }
     };
@@ -381,10 +379,10 @@ TYPED_TEST(BasicStringTest, EncodingToLowerU)
         const auto end = test.cend();
 
         string_type actual;
-        ASSERT_NO_THROW(actual = StringClass::template escape_unicode_character<'u'>(begin, end));
+        ASSERT_NO_THROW(actual = StringClass::template escape_codepoint<'u'>(begin, end));
         EXPECT_EQ(actual, expected);
 
-        ASSERT_NO_THROW(actual = StringClass::template escape_unicode_string<'u'>(test));
+        ASSERT_NO_THROW(actual = StringClass::template escape_all_codepoints<'u'>(test));
         EXPECT_EQ(actual, expected);
     };
 
@@ -408,10 +406,10 @@ TYPED_TEST(BasicStringTest, EncodingToUpperU)
 
         string_type actual;
 
-        ASSERT_NO_THROW(actual = StringClass::template escape_unicode_character<'U'>(begin, end));
+        ASSERT_NO_THROW(actual = StringClass::template escape_codepoint<'U'>(begin, end));
         EXPECT_EQ(actual, expected);
 
-        ASSERT_NO_THROW(actual = StringClass::template escape_unicode_string<'U'>(test));
+        ASSERT_NO_THROW(actual = StringClass::template escape_all_codepoints<'U'>(test));
         EXPECT_EQ(actual, expected);
     };
 
@@ -431,7 +429,7 @@ TYPED_TEST(BasicStringTest, EncodingStringToLowerU)
         SCOPED_TRACE(test.c_str());
 
         string_type actual;
-        ASSERT_NO_THROW(actual = StringClass::template escape_unicode_string<'u'>(test));
+        ASSERT_NO_THROW(actual = StringClass::template escape_all_codepoints<'u'>(test));
         EXPECT_EQ(actual, expected);
     };
 
@@ -451,7 +449,7 @@ TYPED_TEST(BasicStringTest, EncodingStringToUpperU)
         SCOPED_TRACE(test.c_str());
 
         string_type actual;
-        ASSERT_NO_THROW(actual = StringClass::template escape_unicode_string<'U'>(test));
+        ASSERT_NO_THROW(actual = StringClass::template escape_all_codepoints<'U'>(test));
         EXPECT_EQ(actual, expected);
     };
 
@@ -473,7 +471,7 @@ TYPED_TEST(BasicStringTest, DecodingInvalidEscapeSequences)
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        EXPECT_THROW(StringClass::unescape_unicode_character(begin, end), fly::UnicodeException);
+        EXPECT_THROW(StringClass::unescape_codepoint(begin, end), fly::UnicodeException);
     };
 
     validate_fail(FLY_STR(char_type, ""));
@@ -492,8 +490,8 @@ TYPED_TEST(BasicStringTest, DecodingNotEnoughData)
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        EXPECT_THROW(StringClass::unescape_unicode_character(begin, end), fly::UnicodeException);
-        EXPECT_THROW(StringClass::unescape_unicode_string(test), fly::UnicodeException);
+        EXPECT_THROW(StringClass::unescape_codepoint(begin, end), fly::UnicodeException);
+        EXPECT_THROW(StringClass::unescape_all_codepoints(test), fly::UnicodeException);
     };
 
     validate_fail(FLY_STR(char_type, "\\u"));
@@ -527,8 +525,8 @@ TYPED_TEST(BasicStringTest, DecodingNonHexadecimal)
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        EXPECT_THROW(StringClass::unescape_unicode_character(begin, end), fly::UnicodeException);
-        EXPECT_THROW(StringClass::unescape_unicode_string(test), fly::UnicodeException);
+        EXPECT_THROW(StringClass::unescape_codepoint(begin, end), fly::UnicodeException);
+        EXPECT_THROW(StringClass::unescape_all_codepoints(test), fly::UnicodeException);
     };
 
     validate_fail(FLY_STR(char_type, "\\u000z"));
@@ -547,8 +545,8 @@ TYPED_TEST(BasicStringTest, DecodingInvalidSurrogates)
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        EXPECT_THROW(StringClass::unescape_unicode_character(begin, end), fly::UnicodeException);
-        EXPECT_THROW(StringClass::unescape_unicode_string(test), fly::UnicodeException);
+        EXPECT_THROW(StringClass::unescape_codepoint(begin, end), fly::UnicodeException);
+        EXPECT_THROW(StringClass::unescape_all_codepoints(test), fly::UnicodeException);
     };
 
     // Low surrogate only.
@@ -595,10 +593,10 @@ TYPED_TEST(BasicStringTest, DecodingValid)
         const auto end = test.cend();
 
         string_type actual;
-        ASSERT_NO_THROW(actual = StringClass::unescape_unicode_character(begin, end));
+        ASSERT_NO_THROW(actual = StringClass::unescape_codepoint(begin, end));
         EXPECT_EQ(actual, expected);
 
-        ASSERT_NO_THROW(actual = StringClass::unescape_unicode_string(test));
+        ASSERT_NO_THROW(actual = StringClass::unescape_all_codepoints(test));
         EXPECT_EQ(actual, expected);
     };
 
@@ -631,7 +629,7 @@ TYPED_TEST(BasicStringTest, DecodingStringValid)
         SCOPED_TRACE(test.c_str());
 
         string_type actual;
-        ASSERT_NO_THROW(actual = StringClass::unescape_unicode_string(test));
+        ASSERT_NO_THROW(actual = StringClass::unescape_all_codepoints(test));
         EXPECT_EQ(actual, expected);
     };
 
@@ -666,7 +664,7 @@ TYPED_TEST(BasicStringTest, MarkusKuhnStressTest)
             const auto end = test.cend();
 
             codepoint_type actual;
-            ASSERT_NO_THROW(actual = StringClass::decode_unicode_character(it, end));
+            ASSERT_NO_THROW(actual = StringClass::decode_codepoint(it, end));
             EXPECT_EQ(actual, expected);
         };
 
@@ -683,7 +681,7 @@ TYPED_TEST(BasicStringTest, MarkusKuhnStressTest)
                 for (; (it != end) && (index < expected.size()); ++index)
                 {
                     codepoint_type actual;
-                    ASSERT_NO_THROW(actual = StringClass::decode_unicode_character(it, end));
+                    ASSERT_NO_THROW(actual = StringClass::decode_codepoint(it, end));
                     EXPECT_EQ(actual, expected[index]);
                 }
 
@@ -702,7 +700,7 @@ TYPED_TEST(BasicStringTest, MarkusKuhnStressTest)
             {
                 try
                 {
-                    StringClass::decode_unicode_character(it, end);
+                    StringClass::decode_codepoint(it, end);
                 }
                 catch (const fly::UnicodeException &)
                 {

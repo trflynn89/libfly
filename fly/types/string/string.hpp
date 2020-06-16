@@ -47,9 +47,11 @@ public:
     using traits = detail::BasicStringTraits<StringType>;
     using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
+    using iterator = typename traits::iterator;
+    using const_iterator = typename traits::const_iterator;
+    using codepoint_type = typename traits::codepoint_type;
     using ostream_type = typename traits::ostream_type;
     using streamed_type = typename traits::streamer_type::streamed_type;
-    using codepoint_type = typename traits::codepoint_type;
 
     /**
      * Split a string into a vector of strings.
@@ -170,9 +172,7 @@ public:
      *
      * @throws UnicodeException If the encoded Unicode codepoint is invalid.
      */
-    static codepoint_type decode_unicode_character(
-        typename StringType::const_iterator &it,
-        const typename StringType::const_iterator &end);
+    static codepoint_type decode_codepoint(const_iterator &it, const const_iterator &end);
 
     /**
      * Encode a single Unicode codepoint.
@@ -181,7 +181,7 @@ public:
      *
      * @return A string containing the encoded Unicode codepoint.
      */
-    static StringType encode_unicode_character(codepoint_type codepoint);
+    static StringType encode_codepoint(codepoint_type codepoint);
 
     /**
      * Escape all Unicode codepoints in a string.
@@ -209,7 +209,7 @@ public:
      * @throws UnicodeException If any Unicode codepoint could not be escaped.
      */
     template <char UnicodePrefix = 'U'>
-    static StringType escape_unicode_string(const StringType &source);
+    static StringType escape_all_codepoints(const StringType &source);
 
     /**
      * Escape a single Unicode codepoint, starting at the character pointed to by the provided
@@ -240,9 +240,7 @@ public:
      * @throws UnicodeException If the Unicode codepoint could not be escaped.
      */
     template <char UnicodePrefix = 'U'>
-    static StringType escape_unicode_character(
-        typename StringType::const_iterator &it,
-        const typename StringType::const_iterator &end);
+    static StringType escape_codepoint(const_iterator &it, const const_iterator &end);
 
     /**
      * Unescape all Unicode codepoints in a string.
@@ -259,7 +257,7 @@ public:
      *
      * @throws UnicodeException If any escaped sequence is not a valid Unicode character.
      */
-    static StringType unescape_unicode_string(const StringType &source);
+    static StringType unescape_all_codepoints(const StringType &source);
 
     /**
      * Unescape a single Unicode codepoint, starting at the character pointed to by provided
@@ -279,9 +277,7 @@ public:
      *
      * @throws UnicodeException If the escaped sequence is not a valid Unicode codepoint.
      */
-    static StringType unescape_unicode_character(
-        typename StringType::const_iterator &it,
-        const typename StringType::const_iterator &end);
+    static StringType unescape_codepoint(const_iterator &it, const const_iterator &end);
 
     /**
      * Format an integer as a hexadecimal string.
@@ -617,24 +613,23 @@ bool BasicString<StringType>::wildcard_match(const StringType &source, const Str
 
 //==================================================================================================
 template <typename StringType>
-auto BasicString<StringType>::decode_unicode_character(
-    typename StringType::const_iterator &it,
-    const typename StringType::const_iterator &end) -> codepoint_type
+auto BasicString<StringType>::decode_codepoint(const_iterator &it, const const_iterator &end)
+    -> codepoint_type
 {
-    return detail::BasicStringUnicode<StringType>::decode_character(it, end);
+    return detail::BasicStringUnicode<StringType>::decode_codepoint(it, end);
 }
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicString<StringType>::encode_unicode_character(codepoint_type codepoint)
+StringType BasicString<StringType>::encode_codepoint(codepoint_type codepoint)
 {
-    return detail::BasicStringUnicode<StringType>::encode_character(codepoint);
+    return detail::BasicStringUnicode<StringType>::encode_codepoint(codepoint);
 }
 
 //==================================================================================================
 template <typename StringType>
 template <char UnicodePrefix>
-StringType BasicString<StringType>::escape_unicode_string(const StringType &source)
+StringType BasicString<StringType>::escape_all_codepoints(const StringType &source)
 {
     StringType result;
     result.reserve(source.size());
@@ -643,7 +638,7 @@ StringType BasicString<StringType>::escape_unicode_string(const StringType &sour
 
     for (auto it = source.cbegin(); it != end;)
     {
-        result += escape_unicode_character<UnicodePrefix>(it, end);
+        result += escape_codepoint<UnicodePrefix>(it, end);
     }
 
     return result;
@@ -652,18 +647,16 @@ StringType BasicString<StringType>::escape_unicode_string(const StringType &sour
 //==================================================================================================
 template <typename StringType>
 template <char UnicodePrefix>
-StringType BasicString<StringType>::escape_unicode_character(
-    typename StringType::const_iterator &it,
-    const typename StringType::const_iterator &end)
+StringType BasicString<StringType>::escape_codepoint(const_iterator &it, const const_iterator &end)
 {
-    return detail::BasicStringUnicode<StringType>::template escape_character<UnicodePrefix>(
+    return detail::BasicStringUnicode<StringType>::template escape_codepoint<UnicodePrefix>(
         it,
         end);
 }
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicString<StringType>::unescape_unicode_string(const StringType &source)
+StringType BasicString<StringType>::unescape_all_codepoints(const StringType &source)
 {
     StringType result;
     result.reserve(source.size());
@@ -678,7 +671,7 @@ StringType BasicString<StringType>::unescape_unicode_string(const StringType &so
             {
                 case FLY_CHR(char_type, 'u'):
                 case FLY_CHR(char_type, 'U'):
-                    result += unescape_unicode_character(it, end);
+                    result += unescape_codepoint(it, end);
                     break;
 
                 default:
@@ -697,11 +690,10 @@ StringType BasicString<StringType>::unescape_unicode_string(const StringType &so
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicString<StringType>::unescape_unicode_character(
-    typename StringType::const_iterator &it,
-    const typename StringType::const_iterator &end)
+StringType
+BasicString<StringType>::unescape_codepoint(const_iterator &it, const const_iterator &end)
 {
-    return detail::BasicStringUnicode<StringType>::unescape_character(it, end);
+    return detail::BasicStringUnicode<StringType>::unescape_codepoint(it, end);
 }
 
 //==================================================================================================

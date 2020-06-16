@@ -639,7 +639,7 @@ void Json::read_escaped_character(
             try
             {
                 // The input sequence is expected to begin with the reverse solidus character.
-                stream << String::unescape_unicode_character(--it, end);
+                stream << String::unescape_codepoint(--it, end);
             }
             catch (const StringException &ex)
             {
@@ -694,7 +694,7 @@ void Json::write_escaped_charater(
             break;
 
         default:
-            stream << String::escape_unicode_character<'u'>(it, end);
+            stream << String::escape_codepoint<'u'>(it, end);
             return;
     }
 
@@ -721,7 +721,7 @@ void Json::validate_character(
 
     try
     {
-        String::decode_unicode_character(it, end);
+        String::decode_codepoint(it, end);
     }
     catch (const StringException &ex)
     {
