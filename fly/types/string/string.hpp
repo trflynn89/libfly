@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/traits/traits.hpp"
 #include "fly/types/string/detail/string_converter.hpp"
 #include "fly/types/string/detail/string_formatter.hpp"
 #include "fly/types/string/detail/string_streamer.hpp"
@@ -367,16 +368,18 @@ public:
     static streamed_type join(const char_type &separator, const Args &... args);
 
     /**
-     * Convert a string to a plain-old-data type, e.g. int or bool.
+     * Convert a string to another type. The other type may be a Unicode string with a different
+     * encoding, or a plain-old-data type, e.g. int or bool.
      *
-     * @tparam T The desired plain-old-data type.
+     * @tparam T The desired type.
      *
      * @param value The string to convert.
      *
      * @return The string coverted to the specified type.
      *
-     * @throws std::invalid_argument Conversion could not be performed.
-     * @throws std::out_of_range Converted value is out of range of result type.
+     * @throws UnicodeException Conversion to a Unicode string could not be performed.
+     * @throws std::invalid_argument Conversion to a plain-old-data type could not be performed.
+     * @throws std::out_of_range Conversion to a plain-old-data type was out-of-range of that type.
      */
     template <typename T>
     static T convert(const StringType &value);
@@ -484,7 +487,7 @@ void BasicString<StringType>::replace_all(
 
     while (!search.empty() && (index != StringType::npos))
     {
-        target.replace(index, search.length(), 1, replace);
+        target.replace(index, search.size(), 1, replace);
         index = target.find(search);
     }
 }
@@ -500,7 +503,7 @@ void BasicString<StringType>::replace_all(
 
     while (!search.empty() && (index != StringType::npos))
     {
-        target.replace(index, search.length(), replace);
+        target.replace(index, search.size(), replace);
         index = target.find(search);
     }
 }
@@ -532,8 +535,8 @@ bool BasicString<StringType>::starts_with(const StringType &source, const String
 {
     bool result = false;
 
-    const size_type source_sz = source.length();
-    const size_type search_sz = search.length();
+    const size_type source_sz = source.size();
+    const size_type search_sz = search.size();
 
     if (source_sz >= search_sz)
     {
@@ -549,7 +552,7 @@ bool BasicString<StringType>::ends_with(const StringType &source, const char_typ
 {
     bool result = false;
 
-    const size_type source_sz = source.length();
+    const size_type source_sz = source.size();
 
     if (source_sz > 0)
     {
@@ -565,8 +568,8 @@ bool BasicString<StringType>::ends_with(const StringType &source, const StringTy
 {
     bool result = false;
 
-    const size_type source_sz = source.length();
-    const size_type search_sz = search.length();
+    const size_type source_sz = source.size();
+    const size_type search_sz = search.size();
 
     if (source_sz >= search_sz)
     {
@@ -792,9 +795,23 @@ template <typename StringType>
 template <typename T>
 T BasicString<StringType>::convert(const StringType &value)
 {
-    if constexpr (std::is_same_v<StringType, std::decay_t<T>>)
+    using U = std::decay_t<T>;
+
+    if constexpr (any_same_v<U, std::string, std::wstring, std::u16string, std::u32string>)
     {
-        return value;
+        U result;
+        result.reserve(value.size());
+
+        auto it = value.cbegin();
+        const auto end = value.cend();
+
+        while (it != end)
+        {
+            const codepoint_type codepoint = decode_codepoint(it, end);
+            result += BasicString<U>::encode_codepoint(codepoint);
+        }
+
+        return static_cast<T>(result);
     }
     else if constexpr (traits::has_stoi_family_v)
     {

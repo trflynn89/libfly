@@ -643,6 +643,78 @@ TYPED_TEST(BasicStringTest, DecodingStringValid)
 }
 
 //==================================================================================================
+TYPED_TEST(BasicStringTest, ConvertToUTF8)
+{
+    DECLARE_ALIASES
+
+    string_type test = FLY_STR(char_type, "\U0001f355 in the morning");
+    {
+        std::string utf8 = StringClass::template convert<std::string>(test);
+        EXPECT_EQ(utf8, FLY_STR(std::string::value_type, "\U0001f355 in the morning"));
+    }
+    {
+        const std::string utf8 = StringClass::template convert<const std::string>(test);
+        EXPECT_EQ(utf8, FLY_STR(std::string::value_type, "\U0001f355 in the morning"));
+    }
+}
+
+//==================================================================================================
+TYPED_TEST(BasicStringTest, ConvertToUTF16)
+{
+    DECLARE_ALIASES
+
+    string_type test = FLY_STR(char_type, "\U0001f355 in the morning");
+    {
+        std::u16string utf8 = StringClass::template convert<std::u16string>(test);
+        EXPECT_EQ(utf8, FLY_STR(std::u16string::value_type, "\U0001f355 in the morning"));
+    }
+    {
+        const std::u16string utf8 = StringClass::template convert<const std::u16string>(test);
+        EXPECT_EQ(utf8, FLY_STR(std::u16string::value_type, "\U0001f355 in the morning"));
+    }
+
+    if constexpr (sizeof(std::wstring::value_type) == 2)
+    {
+        {
+            std::wstring utf8 = StringClass::template convert<std::wstring>(test);
+            EXPECT_EQ(utf8, FLY_STR(std::wstring::value_type, "\U0001f355 in the morning"));
+        }
+        {
+            const std::wstring utf8 = StringClass::template convert<const std::wstring>(test);
+            EXPECT_EQ(utf8, FLY_STR(std::wstring::value_type, "\U0001f355 in the morning"));
+        }
+    }
+}
+
+//==================================================================================================
+TYPED_TEST(BasicStringTest, ConvertToUTF32)
+{
+    DECLARE_ALIASES
+
+    string_type test = FLY_STR(char_type, "\U0001f355 in the morning");
+    {
+        std::u32string utf8 = StringClass::template convert<std::u32string>(test);
+        EXPECT_EQ(utf8, FLY_STR(std::u32string::value_type, "\U0001f355 in the morning"));
+    }
+    {
+        const std::u32string utf8 = StringClass::template convert<const std::u32string>(test);
+        EXPECT_EQ(utf8, FLY_STR(std::u32string::value_type, "\U0001f355 in the morning"));
+    }
+
+    if constexpr (sizeof(std::wstring::value_type) == 4)
+    {
+        {
+            std::wstring utf8 = StringClass::template convert<std::wstring>(test);
+            EXPECT_EQ(utf8, FLY_STR(std::wstring::value_type, "\U0001f355 in the morning"));
+        }
+        {
+            const std::wstring utf8 = StringClass::template convert<const std::wstring>(test);
+            EXPECT_EQ(utf8, FLY_STR(std::wstring::value_type, "\U0001f355 in the morning"));
+        }
+    }
+}
+
+//==================================================================================================
 TYPED_TEST(BasicStringTest, MarkusKuhnStressTest)
 {
     DECLARE_ALIASES
