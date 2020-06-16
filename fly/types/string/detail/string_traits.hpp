@@ -24,6 +24,10 @@ struct BasicStringTraits
      */
     using size_type = typename StringType::size_type;
     using char_type = typename StringType::value_type;
+
+    using iterator = typename StringType::iterator;
+    using const_iterator = typename StringType::const_iterator;
+
     using codepoint_type = std::uint32_t;
 
     using streamer_type = BasicStringStreamer<StringType>;
