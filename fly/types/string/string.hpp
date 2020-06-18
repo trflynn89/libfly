@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <ios>
+#include <optional>
 #include <random>
 #include <string>
 #include <type_traits>
@@ -52,7 +53,7 @@ public:
     using const_iterator = typename traits::const_iterator;
     using codepoint_type = typename traits::codepoint_type;
     using ostream_type = typename traits::ostream_type;
-    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_type = typename traits::streamed_type;
 
     /**
      * Split a string into a vector of strings.
@@ -169,20 +170,20 @@ public:
      * @param it Pointer to the beginning of the encoded Unicode codepoint.
      * @param end Pointer to the end of the encoded Unicode codepoint.
      *
-     * @return The decoded Unicode codepoint.
-     *
-     * @throws UnicodeException If the encoded Unicode codepoint is invalid.
+     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized codepoint.
      */
-    static codepoint_type decode_codepoint(const_iterator &it, const const_iterator &end);
+    static std::optional<codepoint_type>
+    decode_codepoint(const_iterator &it, const const_iterator &end);
 
     /**
      * Encode a single Unicode codepoint.
      *
-     * @return The Unicode codepoint to encode.
+     * @param codepoint The Unicode codepoint to encode.
      *
-     * @return A string containing the encoded Unicode codepoint.
+     * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
+     *         unitialized string.
      */
-    static StringType encode_codepoint(codepoint_type codepoint);
+    static std::optional<StringType> encode_codepoint(codepoint_type codepoint);
 
     /**
      * Escape all Unicode codepoints in a string.
@@ -205,12 +206,11 @@ public:
      *
      * @param source The string to escape.
      *
-     * @return A copy of the source string with all Unicode codepoints escaped.
-     *
-     * @throws UnicodeException If any Unicode codepoint could not be escaped.
+     * @return If successful, a copy of the source string with all Unicode codepoints escaped.
+     *         Otherwise, an unitialized string.
      */
     template <char UnicodePrefix = 'U'>
-    static StringType escape_all_codepoints(const StringType &source);
+    static std::optional<StringType> escape_all_codepoints(const StringType &source);
 
     /**
      * Escape a single Unicode codepoint, starting at the character pointed to by the provided
@@ -236,12 +236,12 @@ public:
      * @param it Pointer to the beginning of the encoded Unicode codepoint.
      * @param end Pointer to the end of the encoded Unicode codepoint.
      *
-     * @return A string containing the escaped Unicode codepoint.
-     *
-     * @throws UnicodeException If the Unicode codepoint could not be escaped.
+     * @return If successful, a string containing the escaped Unicode codepoint. Otherwise, an
+     *         unitialized string.
      */
     template <char UnicodePrefix = 'U'>
-    static StringType escape_codepoint(const_iterator &it, const const_iterator &end);
+    static std::optional<StringType>
+    escape_codepoint(const_iterator &it, const const_iterator &end);
 
     /**
      * Unescape all Unicode codepoints in a string.
@@ -254,11 +254,10 @@ public:
      *
      * @param source The string containing the escaped character sequence.
      *
-     * @return A copy of the source string with all Unicode codepoints unescaped.
-     *
-     * @throws UnicodeException If any escaped sequence is not a valid Unicode character.
+     * @return If successful, a copy of the source string with all Unicode codepoints unescaped.
+     *         Otherwise, an unitialized string.
      */
-    static StringType unescape_all_codepoints(const StringType &source);
+    static std::optional<StringType> unescape_all_codepoints(const StringType &source);
 
     /**
      * Unescape a single Unicode codepoint, starting at the character pointed to by provided
@@ -274,11 +273,11 @@ public:
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
-     * @return A string containing the unescaped Unicode codepoint.
-     *
-     * @throws UnicodeException If the escaped sequence is not a valid Unicode codepoint.
+     * @return If successful, a string containing the unescaped Unicode codepoint. Otherwise, an
+     *         unitialized string.
      */
-    static StringType unescape_codepoint(const_iterator &it, const const_iterator &end);
+    static std::optional<StringType>
+    unescape_codepoint(const_iterator &it, const const_iterator &end);
 
     /**
      * Format an integer as a hexadecimal string.
@@ -368,21 +367,18 @@ public:
     static streamed_type join(const char_type &separator, const Args &... args);
 
     /**
-     * Convert a string to another type. The other type may be a Unicode string with a different
-     * encoding, or a plain-old-data type, e.g. int or bool.
+     * Convert a string to another type. The other type may be a string with a different Unicode
+     * encoding or a plain-old-data type, e.g. int or bool.
      *
      * @tparam T The desired type.
      *
      * @param value The string to convert.
      *
-     * @return The string coverted to the specified type.
-     *
-     * @throws UnicodeException Conversion to a Unicode string could not be performed.
-     * @throws std::invalid_argument Conversion to a plain-old-data type could not be performed.
-     * @throws std::out_of_range Conversion to a plain-old-data type was out-of-range of that type.
+     * @return If successful, the string coverted to the specified type. Otherwise, an unitialized
+     *         value.
      */
     template <typename T>
-    static T convert(const StringType &value);
+    static std::optional<T> convert(const StringType &value);
 
 private:
     /**
@@ -617,14 +613,14 @@ bool BasicString<StringType>::wildcard_match(const StringType &source, const Str
 //==================================================================================================
 template <typename StringType>
 auto BasicString<StringType>::decode_codepoint(const_iterator &it, const const_iterator &end)
-    -> codepoint_type
+    -> std::optional<codepoint_type>
 {
     return detail::BasicStringUnicode<StringType>::decode_codepoint(it, end);
 }
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicString<StringType>::encode_codepoint(codepoint_type codepoint)
+std::optional<StringType> BasicString<StringType>::encode_codepoint(codepoint_type codepoint)
 {
     return detail::BasicStringUnicode<StringType>::encode_codepoint(codepoint);
 }
@@ -632,7 +628,7 @@ StringType BasicString<StringType>::encode_codepoint(codepoint_type codepoint)
 //==================================================================================================
 template <typename StringType>
 template <char UnicodePrefix>
-StringType BasicString<StringType>::escape_all_codepoints(const StringType &source)
+std::optional<StringType> BasicString<StringType>::escape_all_codepoints(const StringType &source)
 {
     StringType result;
     result.reserve(source.size());
@@ -641,7 +637,16 @@ StringType BasicString<StringType>::escape_all_codepoints(const StringType &sour
 
     for (auto it = source.cbegin(); it != end;)
     {
-        result += escape_codepoint<UnicodePrefix>(it, end);
+        std::optional<StringType> escaped = escape_codepoint<UnicodePrefix>(it, end);
+
+        if (escaped)
+        {
+            result += std::move(escaped.value());
+        }
+        else
+        {
+            return std::nullopt;
+        }
     }
 
     return result;
@@ -650,7 +655,8 @@ StringType BasicString<StringType>::escape_all_codepoints(const StringType &sour
 //==================================================================================================
 template <typename StringType>
 template <char UnicodePrefix>
-StringType BasicString<StringType>::escape_codepoint(const_iterator &it, const const_iterator &end)
+std::optional<StringType>
+BasicString<StringType>::escape_codepoint(const_iterator &it, const const_iterator &end)
 {
     return detail::BasicStringUnicode<StringType>::template escape_codepoint<UnicodePrefix>(
         it,
@@ -659,7 +665,7 @@ StringType BasicString<StringType>::escape_codepoint(const_iterator &it, const c
 
 //==================================================================================================
 template <typename StringType>
-StringType BasicString<StringType>::unescape_all_codepoints(const StringType &source)
+std::optional<StringType> BasicString<StringType>::unescape_all_codepoints(const StringType &source)
 {
     StringType result;
     result.reserve(source.size());
@@ -674,8 +680,20 @@ StringType BasicString<StringType>::unescape_all_codepoints(const StringType &so
             {
                 case FLY_CHR(char_type, 'u'):
                 case FLY_CHR(char_type, 'U'):
-                    result += unescape_codepoint(it, end);
+                {
+                    std::optional<StringType> unescaped = unescape_codepoint(it, end);
+
+                    if (unescaped)
+                    {
+                        result += std::move(unescaped.value());
+                    }
+                    else
+                    {
+                        return std::nullopt;
+                    }
+
                     break;
+                }
 
                 default:
                     result += *(it++);
@@ -693,7 +711,7 @@ StringType BasicString<StringType>::unescape_all_codepoints(const StringType &so
 
 //==================================================================================================
 template <typename StringType>
-StringType
+std::optional<StringType>
 BasicString<StringType>::unescape_codepoint(const_iterator &it, const const_iterator &end)
 {
     return detail::BasicStringUnicode<StringType>::unescape_codepoint(it, end);
@@ -773,8 +791,8 @@ void BasicString<StringType>::join_internal(
     const T &value,
     const Args &... args)
 {
-    detail::BasicStringFormatter<StringType>::stream(ostream, value);
-    detail::BasicStringFormatter<StringType>::stream(ostream, separator);
+    detail::BasicStringStreamer<StringType>::stream(ostream, value);
+    detail::BasicStringStreamer<StringType>::stream(ostream, separator);
 
     join_internal(ostream, separator, args...);
 }
@@ -787,13 +805,13 @@ void BasicString<StringType>::join_internal(
     const char_type &,
     const T &value)
 {
-    detail::BasicStringFormatter<StringType>::stream(ostream, value);
+    detail::BasicStringStreamer<StringType>::stream(ostream, value);
 }
 
 //==================================================================================================
 template <typename StringType>
 template <typename T>
-T BasicString<StringType>::convert(const StringType &value)
+std::optional<T> BasicString<StringType>::convert(const StringType &value)
 {
     using U = std::decay_t<T>;
 
@@ -807,8 +825,19 @@ T BasicString<StringType>::convert(const StringType &value)
 
         while (it != end)
         {
-            const codepoint_type codepoint = decode_codepoint(it, end);
-            result += BasicString<U>::encode_codepoint(codepoint);
+            const std::optional<codepoint_type> codepoint = decode_codepoint(it, end);
+            if (!codepoint)
+            {
+                return std::nullopt;
+            }
+
+            std::optional<U> encoded = BasicString<U>::encode_codepoint(codepoint.value());
+            if (!encoded)
+            {
+                return std::nullopt;
+            }
+
+            result += std::move(encoded.value());
         }
 
         return static_cast<T>(result);
@@ -820,7 +849,7 @@ T BasicString<StringType>::convert(const StringType &value)
     else
     {
         typename traits::ostringstream_type ostream;
-        detail::BasicStringFormatter<StringType>::stream(ostream, value);
+        detail::BasicStringStreamer<StringType>::stream(ostream, value);
 
         return detail::BasicStringConverter<streamed_type, T>::convert(ostream.str());
     }
