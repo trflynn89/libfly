@@ -156,22 +156,28 @@ Json JsonParser::parse_value(std::istream &stream)
     {
         const NumericType numeric_type = validate_number(value);
 
-        try
+        switch (numeric_type)
         {
-            switch (numeric_type)
-            {
-                case NumericType::SignedInteger:
-                    return String::convert<JsonTraits::signed_type>(value);
+            case NumericType::SignedInteger:
+                if (auto number = String::convert<JsonTraits::signed_type>(value); number)
+                {
+                    return number.value();
+                }
+                break;
 
-                case NumericType::UnsignedInteger:
-                    return String::convert<JsonTraits::unsigned_type>(value);
+            case NumericType::UnsignedInteger:
+                if (auto number = String::convert<JsonTraits::unsigned_type>(value); number)
+                {
+                    return number.value();
+                }
+                break;
 
-                case NumericType::FloatingPoint:
-                    return String::convert<JsonTraits::float_type>(value);
-            }
-        }
-        catch (...)
-        {
+            case NumericType::FloatingPoint:
+                if (auto number = String::convert<JsonTraits::float_type>(value); number)
+                {
+                    return number.value();
+                }
+                break;
         }
     }
 
