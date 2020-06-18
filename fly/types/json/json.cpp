@@ -634,7 +634,6 @@ void Json::read_escaped_character(
             break;
 
         case 'u':
-        {
             // The input sequence is expected to begin with the reverse solidus character.
             if (auto value = String::unescape_codepoint(--it, end); value)
             {
@@ -647,7 +646,6 @@ void Json::read_escaped_character(
 
             // The iterator is already incremented past the escaped character sequence.
             return;
-        }
 
         default:
             throw JsonException(
@@ -719,7 +717,6 @@ void Json::validate_character(
         throw JsonException(String::format("Quote character '%c' must be escaped", char(ch)));
     }
 
-    // The input sequence is expected to begin with the reverse solidus character.
     if (!String::decode_codepoint(it, end))
     {
         throw JsonException("Could not decode Unicode character");

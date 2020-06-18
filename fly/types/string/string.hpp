@@ -53,7 +53,7 @@ public:
     using const_iterator = typename traits::const_iterator;
     using codepoint_type = typename traits::codepoint_type;
     using ostream_type = typename traits::ostream_type;
-    using streamed_type = typename traits::streamed_type;
+    using streamed_type = typename traits::streamer_type::streamed_type;
 
     /**
      * Split a string into a vector of strings.
@@ -637,9 +637,7 @@ std::optional<StringType> BasicString<StringType>::escape_all_codepoints(const S
 
     for (auto it = source.cbegin(); it != end;)
     {
-        std::optional<StringType> escaped = escape_codepoint<UnicodePrefix>(it, end);
-
-        if (escaped)
+        if (auto escaped = escape_codepoint<UnicodePrefix>(it, end); escaped)
         {
             result += std::move(escaped.value());
         }
@@ -681,9 +679,7 @@ std::optional<StringType> BasicString<StringType>::unescape_all_codepoints(const
                 case FLY_CHR(char_type, 'u'):
                 case FLY_CHR(char_type, 'U'):
                 {
-                    std::optional<StringType> unescaped = unescape_codepoint(it, end);
-
-                    if (unescaped)
+                    if (auto unescaped = unescape_codepoint(it, end); unescaped)
                     {
                         result += std::move(unescaped.value());
                     }
@@ -791,8 +787,8 @@ void BasicString<StringType>::join_internal(
     const T &value,
     const Args &... args)
 {
-    detail::BasicStringStreamer<StringType>::stream(ostream, value);
-    detail::BasicStringStreamer<StringType>::stream(ostream, separator);
+    detail::BasicStringFormatter<StringType>::stream(ostream, value);
+    detail::BasicStringFormatter<StringType>::stream(ostream, separator);
 
     join_internal(ostream, separator, args...);
 }
@@ -805,7 +801,7 @@ void BasicString<StringType>::join_internal(
     const char_type &,
     const T &value)
 {
-    detail::BasicStringStreamer<StringType>::stream(ostream, value);
+    detail::BasicStringFormatter<StringType>::stream(ostream, value);
 }
 
 //==================================================================================================
@@ -825,19 +821,16 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
 
         while (it != end)
         {
-            const std::optional<codepoint_type> codepoint = decode_codepoint(it, end);
-            if (!codepoint)
+            if (auto codepoint = decode_codepoint(it, end); codepoint)
             {
-                return std::nullopt;
+                if (auto encoded = BasicString<U>::encode_codepoint(codepoint.value()); encoded)
+                {
+                    result += std::move(encoded.value());
+                    continue;
+                }
             }
 
-            std::optional<U> encoded = BasicString<U>::encode_codepoint(codepoint.value());
-            if (!encoded)
-            {
-                return std::nullopt;
-            }
-
-            result += std::move(encoded.value());
+            return std::nullopt;
         }
 
         return static_cast<T>(result);
@@ -849,7 +842,7 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
     else
     {
         typename traits::ostringstream_type ostream;
-        detail::BasicStringStreamer<StringType>::stream(ostream, value);
+        detail::BasicStringFormatter<StringType>::stream(ostream, value);
 
         return detail::BasicStringConverter<streamed_type, T>::convert(ostream.str());
     }
