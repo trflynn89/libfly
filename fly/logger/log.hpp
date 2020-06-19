@@ -61,6 +61,7 @@ struct Log
      */
     Log &operator=(Log &&) noexcept;
 
+    std::uintmax_t m_index;
     Level m_level;
     double m_time;
     char m_file[100];
