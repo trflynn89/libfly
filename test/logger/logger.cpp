@@ -97,9 +97,9 @@ protected:
         std::size_t count = 0;
         double last_time = 0.0;
 
-        for (const std::string &log : fly::String::split(contents, '\n'))
+        for (const std::string &log : fly::String::split(contents, '\x1e'))
         {
-            const std::vector<std::string> sections = fly::String::split(log, '\t');
+            const std::vector<std::string> sections = fly::String::split(log, '\x1f');
             ASSERT_EQ(sections.size(), 7_zu);
 
             const auto index = fly::String::convert<std::size_t>(sections[0]).value();

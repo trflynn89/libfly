@@ -12,9 +12,9 @@ class LoggerConfig;
 /**
  * Struct to store data about single log. A log contains:
  *
- * 1. The log level.
- * 2. The time the log was made.
- * 3. A fixed argument.
+ * 1. The monotonically increasing index of the log.
+ * 2. The log level.
+ * 3. The time the log was made.
  * 4. The file name the log is in.
  * 5. The function name the log is in.
  * 6. The line number the log is on.
@@ -61,6 +61,7 @@ struct Log
      */
     Log &operator=(Log &&) noexcept;
 
+    std::uintmax_t m_index;
     Level m_level;
     double m_time;
     char m_file[100];
