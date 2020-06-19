@@ -1,7 +1,5 @@
 #include "fly/types/json/json.hpp"
 
-#include "fly/types/string/string_exception.hpp"
-
 #include <algorithm>
 #include <cmath>
 #include <ios>
@@ -579,9 +577,9 @@ JsonTraits::string_type Json::validate_string(const JsonTraits::string_type &str
 {
     stream_type stream;
 
-    const JsonTraits::string_type::const_iterator end = str.end();
+    const auto end = str.cend();
 
-    for (JsonTraits::string_type::const_iterator it = str.begin(); it != end;)
+    for (auto it = str.cbegin(); it != end;)
     {
         if (*it == '\\')
         {
@@ -636,14 +634,14 @@ void Json::read_escaped_character(
             break;
 
         case 'u':
-            try
+            // The input sequence is expected to begin with the reverse solidus character.
+            if (auto value = String::unescape_codepoint(--it, end); value)
             {
-                // The input sequence is expected to begin with the reverse solidus character.
-                stream << String::unescape_codepoint(--it, end);
+                stream << std::move(value.value());
             }
-            catch (const StringException &ex)
+            else
             {
-                throw JsonException(ex.what());
+                throw JsonException("Could not parse escaped Unicode sequence");
             }
 
             // The iterator is already incremented past the escaped character sequence.
@@ -694,7 +692,7 @@ void Json::write_escaped_charater(
             break;
 
         default:
-            stream << String::escape_codepoint<'u'>(it, end);
+            stream << String::escape_codepoint<'u'>(it, end).value();
             return;
     }
 
@@ -719,13 +717,9 @@ void Json::validate_character(
         throw JsonException(String::format("Quote character '%c' must be escaped", char(ch)));
     }
 
-    try
+    if (!String::decode_codepoint(it, end))
     {
-        String::decode_codepoint(it, end);
-    }
-    catch (const StringException &ex)
-    {
-        throw JsonException(ex.what());
+        throw JsonException("Could not decode Unicode character");
     }
 
     // The iterator is now incremented past the encoded unicode codepoint.

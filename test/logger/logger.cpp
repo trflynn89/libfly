@@ -102,13 +102,13 @@ protected:
             const std::vector<std::string> sections = fly::String::split(log, '\t');
             ASSERT_EQ(sections.size(), 7_zu);
 
-            const auto index = fly::String::convert<std::size_t>(sections[0]);
-            const auto level =
-                static_cast<fly::Log::Level>(fly::String::convert<std::uint8_t>(sections[1]));
-            const auto time = fly::String::convert<double>(sections[2]);
+            const auto index = fly::String::convert<std::size_t>(sections[0]).value();
+            const auto level = static_cast<fly::Log::Level>(
+                fly::String::convert<std::uint8_t>(sections[1]).value());
+            const auto time = fly::String::convert<double>(sections[2]).value();
             const auto file = sections[3];
             const auto function = sections[4];
-            const auto line = fly::String::convert<std::uint32_t>(sections[5]);
+            const auto line = fly::String::convert<std::uint32_t>(sections[5]).value();
             const auto message = sections[6];
 
             EXPECT_EQ(index, count);

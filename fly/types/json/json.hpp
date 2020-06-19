@@ -11,6 +11,7 @@
 #include <exception>
 #include <initializer_list>
 #include <map>
+#include <optional>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -873,12 +874,9 @@ Json::operator T() const noexcept(false)
 
         if constexpr (std::is_same_v<U, JsonTraits::string_type>)
         {
-            try
+            if (auto converted = String::convert<T>(value); converted)
             {
-                return String::convert<T>(value);
-            }
-            catch (...)
-            {
+                return std::move(converted.value());
             }
         }
         else if constexpr (
