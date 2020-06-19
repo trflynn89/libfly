@@ -429,6 +429,6 @@ TYPED_TEST(BasicStringTest, BasicStringStreamer)
         typename StringClass::traits::ostringstream_type stream;
         fly::detail::BasicStringStreamer<string_type>::stream(stream, s);
 
-        EXPECT_EQ("[0xf0][0x178][0x8d][0x2022]", stream.str());
+        EXPECT_EQ("\\u00f0\\u0178\\u008d\\u2022", stream.str());
     }
 }

@@ -75,6 +75,24 @@ TYPED_TEST(BasicStringTest, FormatTest_i)
 }
 
 //==================================================================================================
+TYPED_TEST(BasicStringTest, FormatTest_c)
+{
+    DECLARE_ALIASES
+
+    const char_type *format;
+
+    format = FLY_STR(char_type, "%c");
+    EXPECT_EQ(FLY_STR(streamed_char, "%c"), StringClass::format(format));
+    EXPECT_EQ(FLY_STR(streamed_char, "a"), StringClass::format(format, FLY_CHR(char_type, 'a')));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "\\x0a"),
+        StringClass::format(format, FLY_CHR(char_type, '\n')));
+    EXPECT_EQ(
+        FLY_STR(streamed_char, "[EOF]"),
+        StringClass::format(format, static_cast<char_type>(std::char_traits<char_type>::eof())));
+}
+
+//==================================================================================================
 TYPED_TEST(BasicStringTest, FormatTest_x)
 {
     DECLARE_ALIASES

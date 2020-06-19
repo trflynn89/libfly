@@ -22,7 +22,7 @@ class BasicStringFormatter
     using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
     using ostream_type = typename traits::ostream_type;
-    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_type = typename traits::streamed_type;
 
 public:
     /**
@@ -89,18 +89,6 @@ public:
      */
     template <typename IntegerType>
     static StringType format_hex(IntegerType source, size_type length);
-
-    /**
-     * Stream the given value into the given stream. If the value is a string-like type, the string
-     * is streamed using BasicStringStreamer<>. Or, it the type has an operator<< overload defined,
-     * the value is stream using that overload. Otherwise, the memory location of the value is
-     * streamed.
-     *
-     * @param ostream The stream to insert the value into.
-     * @param value The value to stream.
-     */
-    template <typename T>
-    static void stream(ostream_type &ostream, const T &value);
 
 private:
     /**
@@ -189,11 +177,11 @@ void BasicStringFormatter<StringType>::format_internal(
             switch (type)
             {
                 case '\0':
-                    stream(ostream, *fmt);
+                    detail::BasicStringStreamer<StringType>::stream(ostream, *fmt);
                     return;
 
                 case '%':
-                    stream(ostream, *(++fmt));
+                    detail::BasicStringStreamer<StringType>::stream(ostream, *(++fmt));
                     continue;
 
                 case 'x':
@@ -239,14 +227,14 @@ void BasicStringFormatter<StringType>::format_internal(
                     break;
             }
 
-            stream(ostream, value);
+            detail::BasicStringStreamer<StringType>::stream(ostream, value);
             ostream.flags(flags);
 
             format_internal(ostream, fmt + 2, args...);
             return;
         }
 
-        stream(ostream, *fmt);
+        detail::BasicStringStreamer<StringType>::stream(ostream, *fmt);
     }
 }
 
@@ -258,32 +246,12 @@ void BasicStringFormatter<StringType>::format_internal(ostream_type &ostream, co
     {
         if ((*fmt == '%') && (*(fmt + 1) == '%'))
         {
-            stream(ostream, *(++fmt));
+            detail::BasicStringStreamer<StringType>::stream(ostream, *(++fmt));
         }
         else
         {
-            stream(ostream, *fmt);
+            detail::BasicStringStreamer<StringType>::stream(ostream, *fmt);
         }
-    }
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename T>
-void BasicStringFormatter<StringType>::stream(ostream_type &ostream, const T &value)
-{
-    if constexpr (
-        std::is_same_v<char_type, std::decay_t<T>> || traits::template is_string_like_v<T>)
-    {
-        detail::BasicStringStreamer<StringType>::stream(ostream, value);
-    }
-    else if constexpr (traits::OstreamTraits::template is_declared_v<T>)
-    {
-        ostream << std::boolalpha << value;
-    }
-    else
-    {
-        ostream << '[' << std::hex << &value << std::dec << ']';
     }
 }
 
