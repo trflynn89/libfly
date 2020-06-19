@@ -33,6 +33,19 @@ class BasicStringUnicode
 
 public:
     /**
+     * Convert the Unicode encoding of a string to another encoding.
+     *
+     * @param it Pointer to the beginning of the encoded Unicode string.
+     * @param end Pointer to the end of the encoded Unicode string.
+     *
+     * @return If successful, a copy of the source string with the desired encoding. Otherwise, an
+     *         unitialized string.
+     */
+    template <typename DesiredStringType>
+    static std::optional<DesiredStringType>
+    convert_encoding(const_iterator &it, const const_iterator &end);
+
+    /**
      * Decode a single Unicode codepoint, starting at the character pointed to by the provided
      * iterator. If successful, after invoking this method, that iterator will point at the first
      * character after the Unicode codepoint in the source string.
@@ -82,7 +95,7 @@ public:
      * @return If successful, a string containing the escaped Unicode codepoint. Otherwise, an
      *         unitialized string.
      */
-    template <char UnicodePrefix>
+    template <char UnicodePrefix = 'U'>
     static std::optional<StringType>
     escape_codepoint(const_iterator &it, const const_iterator &end);
 
@@ -278,6 +291,34 @@ private:
 
 //==================================================================================================
 template <typename StringType>
+template <typename DesiredStringType>
+std::optional<DesiredStringType>
+BasicStringUnicode<StringType>::convert_encoding(const_iterator &it, const const_iterator &end)
+{
+    using DesiredUnicodeType = BasicStringUnicode<DesiredStringType>;
+
+    DesiredStringType result;
+    result.reserve(static_cast<typename StringType::size_type>(std::distance(it, end)));
+
+    while (it != end)
+    {
+        if (auto codepoint = decode_codepoint(it, end); codepoint)
+        {
+            if (auto encoded = DesiredUnicodeType::encode_codepoint(codepoint.value()); encoded)
+            {
+                result += std::move(encoded.value());
+                continue;
+            }
+        }
+
+        return std::nullopt;
+    }
+
+    return result;
+}
+
+//==================================================================================================
+template <typename StringType>
 auto BasicStringUnicode<StringType>::decode_codepoint(const_iterator &it, const const_iterator &end)
     -> std::optional<codepoint_type>
 {
@@ -320,9 +361,7 @@ BasicStringUnicode<StringType>::escape_codepoint(const_iterator &it, const const
 {
     static_assert((UnicodePrefix == 'u') || (UnicodePrefix == 'U'));
 
-    const std::optional<codepoint_type> codepoint = decode_codepoint(it, end);
-
-    if (codepoint)
+    if (auto codepoint = decode_codepoint(it, end); codepoint)
     {
         return escape_codepoint<UnicodePrefix>(codepoint.value());
     }

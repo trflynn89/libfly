@@ -3,6 +3,7 @@
 #include "fly/config/config.hpp"
 #include "fly/path/path_config.hpp"
 #include "fly/task/task_manager.hpp"
+#include "fly/types/json/json.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
 #include "test/config/test_config.hpp"
@@ -44,7 +45,7 @@ public:
 
         m_config_manager(std::make_shared<fly::ConfigManager>(
             m_task_runner,
-            fly::ConfigManager::ConfigFileType::Ini,
+            fly::ConfigManager::ConfigFileType::Json,
             m_file)),
         m_path_config(m_config_manager->create_config<TestPathConfig>())
     {
@@ -187,11 +188,8 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
 {
     EXPECT_EQ(m_config_manager->prune(), m_initial_size);
 
-    const std::string contents = fly::String::format(
-        "[%s]\n"
-        "name=John Doe\n"
-        "address=USA",
-        TestConfig::identifier);
+    const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "USA"}}}};
+    const std::string contents(json);
 
     ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
     m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
@@ -214,11 +212,8 @@ TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
 //==================================================================================================
 TEST_F(ConfigManagerTest, InitialFileFirst)
 {
-    const std::string contents = fly::String::format(
-        "[%s]\n"
-        "name=John Doe\n"
-        "address=USA",
-        TestConfig::identifier);
+    const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "USA"}}}};
+    const std::string contents(json);
 
     ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
     m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
@@ -235,11 +230,8 @@ TEST_F(ConfigManagerTest, InitialFileSecond)
 {
     auto config = m_config_manager->create_config<TestConfig>();
 
-    const std::string contents = fly::String::format(
-        "[%s]\n"
-        "name=John Doe\n"
-        "address=USA",
-        TestConfig::identifier);
+    const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "USA"}}}};
+    const std::string contents(json);
 
     ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
     m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
@@ -254,11 +246,8 @@ TEST_F(ConfigManagerTest, FileChange)
 {
     auto config = m_config_manager->create_config<TestConfig>();
 
-    const std::string contents1 = fly::String::format(
-        "[%s]\n"
-        "name=John Doe\n"
-        "address=USA",
-        TestConfig::identifier);
+    const fly::Json json1 {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "USA"}}}};
+    const std::string contents1(json1);
 
     ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents1));
     m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
@@ -268,11 +257,8 @@ TEST_F(ConfigManagerTest, FileChange)
     EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
     EXPECT_EQ(config->get_value<int>("age", -1), -1);
 
-    const std::string contents2 = fly::String::format(
-        "[%s]\n"
-        "name=Jane Doe\n"
-        "age=27",
-        TestConfig::identifier);
+    const fly::Json json2 {{TestConfig::identifier, {{"name", "Jane Doe"}, {"age", 27}}}};
+    const std::string contents2(json2);
 
     ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents2));
     m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
@@ -294,11 +280,8 @@ TEST_F(ConfigManagerTest, DeleteFile)
 {
     auto config = m_config_manager->create_config<TestConfig>();
 
-    const std::string contents = fly::String::format(
-        "[%s]\n"
-        "name=John Doe\n"
-        "address=USA",
-        TestConfig::identifier);
+    const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "USA"}}}};
+    const std::string contents(json);
 
     ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
     m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
@@ -319,10 +302,7 @@ TEST_F(ConfigManagerTest, BadUpdate)
 {
     auto config = m_config_manager->create_config<TestConfig>();
 
-    const std::string contents = fly::String::format(
-        "[%s]\n"
-        "name",
-        TestConfig::identifier);
+    const std::string contents(" ");
 
     ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
     m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();

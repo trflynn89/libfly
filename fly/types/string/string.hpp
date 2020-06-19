@@ -53,7 +53,7 @@ public:
     using const_iterator = typename traits::const_iterator;
     using codepoint_type = typename traits::codepoint_type;
     using ostream_type = typename traits::ostream_type;
-    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_type = typename traits::streamed_type;
 
     /**
      * Split a string into a vector of strings.
@@ -787,8 +787,8 @@ void BasicString<StringType>::join_internal(
     const T &value,
     const Args &... args)
 {
-    detail::BasicStringFormatter<StringType>::stream(ostream, value);
-    detail::BasicStringFormatter<StringType>::stream(ostream, separator);
+    detail::BasicStringStreamer<StringType>::stream(ostream, value);
+    detail::BasicStringStreamer<StringType>::stream(ostream, separator);
 
     join_internal(ostream, separator, args...);
 }
@@ -801,7 +801,7 @@ void BasicString<StringType>::join_internal(
     const char_type &,
     const T &value)
 {
-    detail::BasicStringFormatter<StringType>::stream(ostream, value);
+    detail::BasicStringStreamer<StringType>::stream(ostream, value);
 }
 
 //==================================================================================================
@@ -813,27 +813,17 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
 
     if constexpr (any_same_v<U, std::string, std::wstring, std::u16string, std::u32string>)
     {
-        U result;
-        result.reserve(value.size());
-
         auto it = value.cbegin();
         const auto end = value.cend();
 
-        while (it != end)
-        {
-            if (auto codepoint = decode_codepoint(it, end); codepoint)
-            {
-                if (auto encoded = BasicString<U>::encode_codepoint(codepoint.value()); encoded)
-                {
-                    result += std::move(encoded.value());
-                    continue;
-                }
-            }
+        auto result = detail::BasicStringUnicode<StringType>::template convert_encoding<U>(it, end);
 
-            return std::nullopt;
+        if (result)
+        {
+            return static_cast<T>(result.value());
         }
 
-        return static_cast<T>(result);
+        return std::nullopt;
     }
     else if constexpr (traits::has_stoi_family_v)
     {
@@ -842,7 +832,7 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
     else
     {
         typename traits::ostringstream_type ostream;
-        detail::BasicStringFormatter<StringType>::stream(ostream, value);
+        detail::BasicStringStreamer<StringType>::stream(ostream, value);
 
         return detail::BasicStringConverter<streamed_type, T>::convert(ostream.str());
     }
