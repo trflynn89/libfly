@@ -7,8 +7,10 @@
 namespace fly {
 
 namespace {
+
     constexpr const char s_record_separator = '\x1e';
     constexpr const char s_unit_separator = '\x1f';
+
 } // namespace
 
 //==================================================================================================
