@@ -12,6 +12,24 @@
 namespace {
 
 //==================================================================================================
+template <typename T, typename StringType>
+void validate_pass(StringType test, T expected)
+{
+    auto actual = fly::BasicString<StringType>::template convert<T>(std::move(test));
+    ASSERT_TRUE(actual.has_value());
+
+    EXPECT_EQ(actual.value(), expected);
+}
+
+//==================================================================================================
+template <typename T, typename StringType>
+void validate_fail(StringType test)
+{
+    auto actual = fly::BasicString<StringType>::template convert<T>(std::move(test));
+    EXPECT_FALSE(actual.has_value());
+}
+
+//==================================================================================================
 template <typename StringType, typename T>
 StringType minstr()
 {
@@ -44,21 +62,32 @@ StringType maxstr()
 }
 
 //==================================================================================================
-template <typename T, typename StringType>
-void validate_pass(StringType test, T expected)
+template <typename StringType>
+StringType out_of_range_codepoint()
 {
-    auto actual = fly::BasicString<StringType>::template convert<T>(std::move(test));
-    ASSERT_TRUE(actual.has_value());
+    using char_type = typename StringType::value_type;
 
-    EXPECT_EQ(actual.value(), expected);
-}
+    static constexpr const std::uint32_t out_of_range = 0x110000;
+    StringType result;
 
-//==================================================================================================
-template <typename T, typename StringType>
-void validate_fail(StringType test)
-{
-    auto actual = fly::BasicString<StringType>::template convert<T>(std::move(test));
-    EXPECT_FALSE(actual.has_value());
+    if constexpr (sizeof(char_type) == 1)
+    {
+        result += static_cast<char_type>(0xf0 | (out_of_range >> 18));
+        result += static_cast<char_type>(0x80 | ((out_of_range >> 12) & 0x3f));
+        result += static_cast<char_type>(0x80 | ((out_of_range >> 6) & 0x3f));
+        result += static_cast<char_type>(0x80 | (out_of_range & 0x3f));
+    }
+    else if constexpr (sizeof(char_type) == 2)
+    {
+        result += static_cast<char_type>(0xd800 | ((out_of_range - 0x10000) >> 10));
+        result += static_cast<char_type>(0xdc00 | ((out_of_range - 0x10000) & 0x3ff));
+    }
+    else if constexpr (sizeof(char_type) == 4)
+    {
+        result = StringType(1, static_cast<char_type>(out_of_range));
+    }
+
+    return result;
 }
 
 } // namespace
@@ -92,6 +121,8 @@ TYPED_TEST(BasicStringTest, ConvertToUTF8)
         const auto utf8 = FLY_STR(std::string::value_type, "\U0001f355 in the morning");
         validate_pass<std::string>(test, utf8);
     }
+
+    validate_fail<std::string>(out_of_range_codepoint<string_type>());
 }
 
 //==================================================================================================
@@ -109,6 +140,8 @@ TYPED_TEST(BasicStringTest, ConvertToUTF16)
         validate_pass<std::u16string>(test, utf16);
     }
 
+    validate_fail<std::u16string>(out_of_range_codepoint<string_type>());
+
     if constexpr (sizeof(std::wstring::value_type) == 2)
     {
         {
@@ -119,6 +152,8 @@ TYPED_TEST(BasicStringTest, ConvertToUTF16)
             const auto utf16 = FLY_STR(std::wstring::value_type, "\U0001f355 in the morning");
             validate_pass<std::wstring>(test, utf16);
         }
+
+        validate_fail<std::wstring>(out_of_range_codepoint<string_type>());
     }
 }
 
@@ -137,6 +172,8 @@ TYPED_TEST(BasicStringTest, ConvertToUTF32)
         validate_pass<std::u32string>(test, utf32);
     }
 
+    validate_fail<std::u32string>(out_of_range_codepoint<string_type>());
+
     if constexpr (sizeof(std::wstring::value_type) == 4)
     {
         {
@@ -147,6 +184,8 @@ TYPED_TEST(BasicStringTest, ConvertToUTF32)
             const auto utf32 = FLY_STR(std::wstring::value_type, "\U0001f355 in the morning");
             validate_pass<std::wstring>(test, utf32);
         }
+
+        validate_fail<std::wstring>(out_of_range_codepoint<string_type>());
     }
 }
 
