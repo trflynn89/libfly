@@ -96,7 +96,7 @@ bool Logger::poll()
 
     if (m_log_queue.pop(log, m_config->queue_wait_time()) && m_log_stream.good())
     {
-        String::format(m_log_stream, "%u\t%s", m_index++, log) << std::flush;
+        m_log_stream << log << std::flush;
         std::error_code error;
 
         if (std::filesystem::file_size(m_log_file, error) > m_config->max_log_file_size())
@@ -123,6 +123,7 @@ void Logger::add_log_internal(
     {
         Log log(m_config, message);
 
+        log.m_index = m_index++;
         log.m_level = level;
         log.m_time = log_time.count();
         log.m_line = line;
