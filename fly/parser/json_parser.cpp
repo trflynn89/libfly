@@ -87,10 +87,8 @@ std::optional<Json> JsonParser::parse_object(std::istream &stream)
 {
     Json object = JsonTraits::object_type();
 
-    if (consume_token(stream, Token::StartBrace) == ParseState::Invalid)
-    {
-        return std::nullopt;
-    }
+    // Discard the opening brace, which has already been peeked.
+    discard(stream);
 
     while (true)
     {
@@ -137,7 +135,7 @@ JsonParser::ParseState JsonParser::parse_object_loop(std::istream &stream, Json 
         }
     }
 
-    if ((peek(stream) == Token::Solidus) && (consume_comment(stream) == ParseState::Invalid))
+    if (consume_whitespace_and_comments(stream) == ParseState::Invalid)
     {
         return ParseState::Invalid;
     }
@@ -170,10 +168,8 @@ std::optional<Json> JsonParser::parse_array(std::istream &stream)
 {
     Json array = JsonTraits::array_type();
 
-    if (consume_token(stream, Token::StartBracket) == ParseState::Invalid)
-    {
-        return std::nullopt;
-    }
+    // Discard the opening bracket, which has already been peeked.
+    discard(stream);
 
     while (true)
     {
@@ -448,10 +444,8 @@ JsonParser::ParseState JsonParser::consume_comment(std::istream &stream)
         return ParseState::Invalid;
     }
 
-    if (consume_token(stream, Token::Solidus) == ParseState::Invalid)
-    {
-        return ParseState::Invalid;
-    }
+    // Discard the opening solidus, which has already been peeked.
+    discard(stream);
 
     Token token;
 
@@ -466,18 +460,28 @@ JsonParser::ParseState JsonParser::consume_comment(std::istream &stream)
             break;
 
         case Token::Asterisk:
+        {
+            bool parsing_comment = true;
+
             do
             {
                 token = consume(stream);
 
                 if ((token == Token::Asterisk) && (peek(stream) == Token::Solidus))
                 {
-                    FLY_UNUSED(consume_token(stream, Token::Solidus));
+                    parsing_comment = false;
+                    discard(stream);
                     break;
                 }
             } while (token != Token::EndOfFile);
 
+            if (parsing_comment)
+            {
+                return ParseState::Invalid;
+            }
+
             break;
+        }
 
         default:
             JLOG(

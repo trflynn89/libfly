@@ -713,6 +713,24 @@ TEST_F(JsonParserTest, InvalidComment)
 {
     fly::JsonParser parser(fly::JsonParser::Features::AllowComments);
     {
+        std::string str = R"(/* here is a bad comment
+        {
+            "a" : 12
+        })";
+
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
+    }
+    {
+        std::string str = R"({
+            "a" : 12
+        }  /* here is a bad comment
+        )";
+
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
+    }
+    {
         std::string str = R"({
             "a" : 12 / here is a bad comment
         })";
