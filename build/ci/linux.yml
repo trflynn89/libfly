@@ -22,7 +22,7 @@ jobs:
         displayName: 'Configure'
 
       - script: |
-          make -j -C build/nix $(config) tests
+          make -j $(nproc) -C build/nix $(config) tests
         displayName: 'Test'
 
       # For now, only create coverage reports for gcc x64.
@@ -38,7 +38,7 @@ jobs:
         displayName: 'Configure'
 
       - script: |
-          make -j -C build/nix $(config) libfly
+          make -j $(nproc) -C build/nix $(config) libfly
         displayName: 'Build'
 
       - template: package.yml
