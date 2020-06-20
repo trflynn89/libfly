@@ -135,11 +135,6 @@ JsonParser::ParseState JsonParser::parse_object_loop(std::istream &stream, Json 
         }
     }
 
-    if (consume_whitespace_and_comments(stream) == ParseState::Invalid)
-    {
-        return ParseState::Invalid;
-    }
-
     JsonTraits::string_type key;
     if (consume_value(stream, JsonType::JsonString, key) == JsonType::Invalid)
     {
@@ -316,8 +311,8 @@ JsonParser::ParseState JsonParser::consume_token(std::istream &stream, const Tok
     {
         JLOG(
             "Unexpected character '%c', was expecting '%c'",
-            static_cast<JsonTraits::string_type::value_type>(token),
-            static_cast<JsonTraits::string_type::value_type>(parsed));
+            static_cast<JsonTraits::string_type::value_type>(parsed),
+            static_cast<JsonTraits::string_type::value_type>(token));
 
         return ParseState::Invalid;
     }
