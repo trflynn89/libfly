@@ -39,7 +39,7 @@ public:
      * @param end Pointer to the end of the encoded Unicode string.
      *
      * @return If successful, a copy of the source string with the desired encoding. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     template <typename DesiredStringType>
     static std::optional<DesiredStringType>
@@ -53,7 +53,7 @@ public:
      * @param it Pointer to the beginning of the encoded Unicode codepoint.
      * @param end Pointer to the end of the encoded Unicode codepoint.
      *
-     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized codepoint.
+     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized value.
      */
     static std::optional<codepoint_type>
     decode_codepoint(const_iterator &it, const const_iterator &end);
@@ -64,7 +64,7 @@ public:
      * @return The Unicode codepoint to encode.
      *
      * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     static std::optional<StringType> encode_codepoint(codepoint_type codepoint);
 
@@ -93,7 +93,7 @@ public:
      * @param end Pointer to the end of the encoded Unicode codepoint.
      *
      * @return If successful, a string containing the escaped Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     template <char UnicodePrefix = 'U'>
     static std::optional<StringType>
@@ -114,7 +114,7 @@ public:
      * @param end Pointer to the end of the escaped character sequence.
      *
      * @return If successful, a string containing the unescaped Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     static std::optional<StringType>
     unescape_codepoint(const_iterator &it, const const_iterator &end);
@@ -130,7 +130,7 @@ private:
      * @param codepoint The codepoint to escape.
      *
      * @return If successful, a string containing the escaped Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     template <char UnicodePrefix>
     static StringType escape_codepoint(codepoint_type codepoint);
@@ -144,7 +144,7 @@ private:
      * @param end Pointer to the end of the escaped character sequence.
      *
      * @return If successful, a string containing the parsed Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     template <char UnicodePrefix>
     static std::optional<codepoint_type>
@@ -155,7 +155,7 @@ private:
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized codepoint.
+     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized value.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 1), bool> = 0>
     static std::optional<codepoint_type>
@@ -177,7 +177,7 @@ private:
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized codepoint.
+     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized value.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 4), bool> = 0>
     static std::optional<codepoint_type>
@@ -189,7 +189,7 @@ private:
      * @param codepoint The codepoint to encode.
      *
      * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 1), bool> = 0>
     static StringType codepoint_to_string(codepoint_type codepoint);
@@ -200,7 +200,7 @@ private:
      * @param codepoint The codepoint to encode.
      *
      * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 2), bool> = 0>
     static StringType codepoint_to_string(codepoint_type codepoint);
@@ -211,7 +211,7 @@ private:
      * @param codepoint The codepoint to encode.
      *
      * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 4), bool> = 0>
     static StringType codepoint_to_string(codepoint_type codepoint);
@@ -225,7 +225,7 @@ private:
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return If successful, the created Unicode codepoint. Otherwise, an unitialized codepoint.
+     * @return If successful, the created Unicode codepoint. Otherwise, an unitialized value.
      */
     static std::optional<codepoint_type> create_codepoint(EncodedByteProvider next_encoded_byte);
 

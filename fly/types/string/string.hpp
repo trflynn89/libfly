@@ -170,7 +170,7 @@ public:
      * @param it Pointer to the beginning of the encoded Unicode codepoint.
      * @param end Pointer to the end of the encoded Unicode codepoint.
      *
-     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized codepoint.
+     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized value.
      */
     static std::optional<codepoint_type>
     decode_codepoint(const_iterator &it, const const_iterator &end);
@@ -181,7 +181,7 @@ public:
      * @param codepoint The Unicode codepoint to encode.
      *
      * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     static std::optional<StringType> encode_codepoint(codepoint_type codepoint);
 
@@ -207,7 +207,7 @@ public:
      * @param source The string to escape.
      *
      * @return If successful, a copy of the source string with all Unicode codepoints escaped.
-     *         Otherwise, an unitialized string.
+     *         Otherwise, an unitialized value.
      */
     template <char UnicodePrefix = 'U'>
     static std::optional<StringType> escape_all_codepoints(const StringType &source);
@@ -237,7 +237,7 @@ public:
      * @param end Pointer to the end of the encoded Unicode codepoint.
      *
      * @return If successful, a string containing the escaped Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     template <char UnicodePrefix = 'U'>
     static std::optional<StringType>
@@ -255,7 +255,7 @@ public:
      * @param source The string containing the escaped character sequence.
      *
      * @return If successful, a copy of the source string with all Unicode codepoints unescaped.
-     *         Otherwise, an unitialized string.
+     *         Otherwise, an unitialized value.
      */
     static std::optional<StringType> unescape_all_codepoints(const StringType &source);
 
@@ -274,7 +274,7 @@ public:
      * @param end Pointer to the end of the escaped character sequence.
      *
      * @return If successful, a string containing the unescaped Unicode codepoint. Otherwise, an
-     *         unitialized string.
+     *         unitialized value.
      */
     static std::optional<StringType>
     unescape_codepoint(const_iterator &it, const const_iterator &end);

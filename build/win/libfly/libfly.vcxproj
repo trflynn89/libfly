@@ -171,7 +171,6 @@
     <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp" />
     <ClInclude Include="..\..\..\fly\parser\json_parser.hpp" />
     <ClInclude Include="..\..\..\fly\parser\parser.hpp" />
-    <ClInclude Include="..\..\..\fly\parser\parser_exception.hpp" />
     <ClInclude Include="..\..\..\fly\path\path_config.hpp" />
     <ClInclude Include="..\..\..\fly\path\path_monitor.hpp" />
     <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.hpp" />
@@ -231,7 +230,6 @@
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\json_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\parser.cpp" />
-    <ClCompile Include="..\..\..\fly\parser\parser_exception.cpp" />
     <ClCompile Include="..\..\..\fly\path\path_config.cpp" />
     <ClCompile Include="..\..\..\fly\path\path_monitor.cpp" />
     <ClCompile Include="..\..\..\fly\path\win\path_monitor_impl.cpp" />

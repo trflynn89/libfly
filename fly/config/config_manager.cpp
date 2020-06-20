@@ -2,7 +2,6 @@
 
 #include "fly/parser/ini_parser.hpp"
 #include "fly/parser/json_parser.hpp"
-#include "fly/parser/parser_exception.hpp"
 #include "fly/path/path_config.hpp"
 #include "fly/path/path_monitor.hpp"
 #include "fly/task/task_runner.hpp"
@@ -109,11 +108,11 @@ void ConfigManager::update_config()
 {
     std::lock_guard<std::mutex> lock(m_configs_mutex);
 
-    try
+    if (auto values = m_parser->parse_file(m_path); values)
     {
-        m_values = m_parser->parse_file(m_path);
+        m_values = std::move(values.value());
     }
-    catch (const ParserException &)
+    else
     {
         LOGW("Could not parse file, ignoring update");
         m_values = nullptr;

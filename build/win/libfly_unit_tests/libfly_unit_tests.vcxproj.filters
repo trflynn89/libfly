@@ -69,9 +69,6 @@
     <ClCompile Include="..\..\..\test\parser\parser.cpp">
       <Filter>parser</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\parser\parser_exception.cpp">
-      <Filter>parser</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\test\path\path_monitor.cpp">
       <Filter>path</Filter>
     </ClCompile>

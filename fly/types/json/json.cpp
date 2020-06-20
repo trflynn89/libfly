@@ -648,8 +648,7 @@ void Json::read_escaped_character(
             return;
 
         default:
-            throw JsonException(
-                String::format("Invalid escape character '%c' (%x)", *it, int(*it)));
+            throw JsonException(String::format("Invalid escape character '%c'", *it));
     }
 
     ++it;
@@ -708,16 +707,11 @@ void Json::validate_character(
     const std::uint8_t ch = static_cast<std::uint8_t>(*it);
     auto start = it;
 
-    if (ch <= 0x1f)
+    if ((ch <= 0x1f) || (ch == 0x22) || (ch == 0x5c))
     {
-        throw JsonException(String::format("Control character '%x' must be escaped", int(ch)));
+        throw JsonException(String::format("Character '%c' must be escaped", ch));
     }
-    else if ((ch == 0x22) || (ch == 0x5c))
-    {
-        throw JsonException(String::format("Quote character '%c' must be escaped", char(ch)));
-    }
-
-    if (!String::decode_codepoint(it, end))
+    else if (!String::decode_codepoint(it, end))
     {
         throw JsonException("Could not decode Unicode character");
     }
