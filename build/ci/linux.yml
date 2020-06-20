@@ -7,7 +7,7 @@ jobs:
   - job: 'Linux_${{ parameters.configuration }}_${{ parameters.toolchain }}_${{ parameters.arch }}'
 
     pool:
-      vmImage: ubuntu-18.04
+      vmImage: ubuntu-20.04
 
     container:
       image: trflynn89/libfly:ubuntu2004_clang10_gcc10
