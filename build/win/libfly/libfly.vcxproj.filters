@@ -127,9 +127,6 @@
     <ClInclude Include="..\..\..\fly\parser\parser.hpp">
       <Filter>parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\parser\parser_exception.hpp">
-      <Filter>parser</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\path\path_config.hpp">
       <Filter>path</Filter>
     </ClInclude>
@@ -301,9 +298,6 @@
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\parser.cpp">
-      <Filter>parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\parser\parser_exception.cpp">
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\path\path_config.cpp">

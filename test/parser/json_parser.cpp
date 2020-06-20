@@ -1,6 +1,5 @@
 #include "fly/parser/json_parser.hpp"
 
-#include "fly/parser/parser_exception.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -23,7 +22,7 @@ protected:
     void validate_fail_raw(const std::string &test)
     {
         SCOPED_TRACE(test);
-        EXPECT_THROW(m_parser.parse_string(test), fly::ParserException);
+        EXPECT_FALSE(m_parser.parse_string(test).has_value());
     }
 
     void validate_pass(const std::string &test, const fly::Json &expected)
@@ -34,25 +33,27 @@ protected:
     void
     validate_pass_raw(const std::string &test, const std::string &key, const fly::Json &expected)
     {
-        fly::Json actual, repeat;
-
         SCOPED_TRACE(test);
-        EXPECT_NO_THROW(actual = m_parser.parse_string(test));
+
+        std::optional<fly::Json> actual = m_parser.parse_string(test);
+        ASSERT_TRUE(actual.has_value());
 
         if (expected.is_float())
         {
-            EXPECT_DOUBLE_EQ(double(actual[key]), double(expected));
+            EXPECT_DOUBLE_EQ(double(actual->at(key)), double(expected));
         }
         else
         {
-            EXPECT_EQ(actual[key], expected);
+            EXPECT_EQ(actual->at(key), expected);
         }
 
         std::stringstream ss;
-        ss << actual;
+        ss << actual.value();
 
-        EXPECT_NO_THROW(repeat = m_parser.parse_string(ss.str()));
-        EXPECT_EQ(actual, repeat);
+        std::optional<fly::Json> repeat = m_parser.parse_string(ss.str());
+        ASSERT_TRUE(repeat.has_value());
+
+        EXPECT_EQ(actual.value(), repeat.value());
     }
 
     fly::JsonParser m_parser;
@@ -77,11 +78,11 @@ TEST_F(JsonParserTest, JsonChecker)
 
         if (fly::String::starts_with(file.string(), "pass"))
         {
-            EXPECT_NO_THROW(m_parser.parse_file(it.path()));
+            EXPECT_TRUE(m_parser.parse_file(it.path()).has_value());
         }
         else if (fly::String::starts_with(file.string(), "fail"))
         {
-            EXPECT_THROW(m_parser.parse_file(it.path()), fly::ParserException);
+            EXPECT_FALSE(m_parser.parse_file(it.path()).has_value());
         }
         else
         {
@@ -97,7 +98,7 @@ TEST_F(JsonParserTest, GoogleJsonTestSuite)
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "google_json_test_suite";
 
-    EXPECT_NO_THROW(m_parser.parse_file(path / "sample.json"));
+    EXPECT_TRUE(m_parser.parse_file(path / "sample.json").has_value());
 }
 
 //==================================================================================================
@@ -130,21 +131,21 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
 
         if (fly::String::starts_with(file.string(), 'y'))
         {
-            EXPECT_NO_THROW(parser.parse_file(it.path()));
+            EXPECT_TRUE(parser.parse_file(it.path()).has_value());
         }
         else if (fly::String::starts_with(file.string(), 'n'))
         {
-            EXPECT_THROW(parser.parse_file(it.path()), fly::ParserException);
+            EXPECT_FALSE(parser.parse_file(it.path()).has_value());
         }
         else if (fly::String::starts_with(file.string(), 'i'))
         {
             if (std::find(i_pass.begin(), i_pass.end(), file) != i_pass.end())
             {
-                EXPECT_NO_THROW(parser.parse_file(it.path()));
+                EXPECT_TRUE(parser.parse_file(it.path()).has_value());
             }
             else
             {
-                EXPECT_THROW(parser.parse_file(it.path()), fly::ParserException);
+                EXPECT_FALSE(parser.parse_file(it.path()).has_value());
             }
         }
         else
@@ -160,9 +161,11 @@ TEST_F(JsonParserTest, BigListOfNaughtyStrings)
     // https://github.com/minimaxir/big-list-of-naughty-strings
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "big_list_of_naughty_strings";
-    fly::Json values;
 
-    EXPECT_NO_THROW(values = m_parser.parse_file(path / "blns.json"));
+    auto parsed = m_parser.parse_file(path / "blns.json");
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 507);
 
     for (std::size_t i = 0; i < values.size(); ++i)
@@ -176,26 +179,25 @@ TEST_F(JsonParserTest, AllUnicode)
 {
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "unicode";
-    fly::Json values;
 
-    EXPECT_NO_THROW(values = m_parser.parse_file(path / "all_unicode.json"));
+    auto parsed = m_parser.parse_file(path / "all_unicode.json");
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 1112064);
 }
 
 //==================================================================================================
 TEST_F(JsonParserTest, NonExistingPath)
 {
-    EXPECT_THROW(
-        m_parser.parse_file(std::filesystem::path("foo_abc") / "a.json"),
-        fly::ParserException);
+    EXPECT_FALSE(m_parser.parse_file(std::filesystem::path("foo_abc") / "a.json").has_value());
 }
 
 //==================================================================================================
 TEST_F(JsonParserTest, NonExistingFile)
 {
-    EXPECT_THROW(
-        m_parser.parse_file(std::filesystem::temp_directory_path() / "a.json"),
-        fly::ParserException);
+    EXPECT_FALSE(
+        m_parser.parse_file(std::filesystem::temp_directory_path() / "a.json").has_value());
 }
 
 //==================================================================================================
@@ -208,9 +210,11 @@ TEST_F(JsonParserTest, EmptyFile)
 TEST_F(JsonParserTest, EmptyObject)
 {
     const std::string contents("{}");
-    fly::Json values;
 
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
     EXPECT_TRUE(values.is_object());
     EXPECT_EQ(values.size(), 0);
 }
@@ -219,9 +223,11 @@ TEST_F(JsonParserTest, EmptyObject)
 TEST_F(JsonParserTest, EmptyArray)
 {
     const std::string contents("[]");
-    fly::Json values;
 
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
     EXPECT_TRUE(values.is_array());
     EXPECT_EQ(values.size(), 0);
 }
@@ -229,11 +235,13 @@ TEST_F(JsonParserTest, EmptyArray)
 //==================================================================================================
 TEST_F(JsonParserTest, EmptyNestedObjectArray)
 {
-    fly::Json values;
     {
         const std::string contents("[{}]");
-        ASSERT_NO_THROW(values = m_parser.parse_string(contents));
 
+        auto parsed = m_parser.parse_string(contents);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json values = std::move(parsed.value());
         EXPECT_TRUE(values.is_array());
         EXPECT_EQ(values.size(), 1);
 
@@ -243,8 +251,11 @@ TEST_F(JsonParserTest, EmptyNestedObjectArray)
     }
     {
         const std::string contents("[[]]");
-        ASSERT_NO_THROW(values = m_parser.parse_string(contents));
 
+        auto parsed = m_parser.parse_string(contents);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json values = std::move(parsed.value());
         EXPECT_TRUE(values.is_array());
         EXPECT_EQ(values.size(), 1);
 
@@ -257,27 +268,35 @@ TEST_F(JsonParserTest, EmptyNestedObjectArray)
 //==================================================================================================
 TEST_F(JsonParserTest, EmptyString)
 {
-    fly::Json values;
     {
         const std::string contents("{\"a\" : \"\" }");
-        ASSERT_NO_THROW(values = m_parser.parse_string(contents));
 
+        auto parsed = m_parser.parse_string(contents);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json values = std::move(parsed.value());
         EXPECT_TRUE(values["a"].is_string());
         EXPECT_EQ(values["a"].size(), 0);
         EXPECT_EQ(values["a"], "");
     }
     {
         const std::string contents("{\"\" : \"a\" }");
-        ASSERT_NO_THROW(values = m_parser.parse_string(contents));
 
+        auto parsed = m_parser.parse_string(contents);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json values = std::move(parsed.value());
         EXPECT_TRUE(values[""].is_string());
         EXPECT_EQ(values[""].size(), 1);
         EXPECT_EQ(values[""], "a");
     }
     {
         const std::string contents("{\"\" : \"\" }");
-        ASSERT_NO_THROW(values = m_parser.parse_string(contents));
 
+        auto parsed = m_parser.parse_string(contents);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json values = std::move(parsed.value());
         EXPECT_TRUE(values[""].is_string());
         EXPECT_EQ(values[""].size(), 0);
         EXPECT_EQ(values[""], "");
@@ -440,10 +459,12 @@ TEST_F(JsonParserTest, SingleLineComment)
             "b" : 13
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -458,10 +479,12 @@ TEST_F(JsonParserTest, SingleLineComment)
         // here is a comment2
         )";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -471,10 +494,12 @@ TEST_F(JsonParserTest, SingleLineComment)
             "a" : 12 // here is a comment
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 1);
         EXPECT_EQ(json["a"], 12);
     }
@@ -484,10 +509,12 @@ TEST_F(JsonParserTest, SingleLineComment)
             "b" : 13
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -500,10 +527,12 @@ TEST_F(JsonParserTest, SingleLineComment)
             "b" : 13
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -514,13 +543,24 @@ TEST_F(JsonParserTest, SingleLineComment)
             "b" : 13
         })";
 
-        fly::Json json;
+        {
+            auto parsed = m_parser.parse_string(str);
+            ASSERT_TRUE(parsed.has_value());
 
-        EXPECT_NO_THROW(m_parser.parse_string(str));
-        EXPECT_NO_THROW(json = parser.parse_string(str));
-        EXPECT_EQ(json.size(), 2);
-        EXPECT_EQ(json["a"], "abdc // here is a comment efgh");
-        EXPECT_EQ(json["b"], 13);
+            fly::Json json = std::move(parsed.value());
+            EXPECT_EQ(json.size(), 2);
+            EXPECT_EQ(json["a"], "abdc // here is a comment efgh");
+            EXPECT_EQ(json["b"], 13);
+        }
+        {
+            auto parsed = parser.parse_string(str);
+            ASSERT_TRUE(parsed.has_value());
+
+            fly::Json json = std::move(parsed.value());
+            EXPECT_EQ(json.size(), 2);
+            EXPECT_EQ(json["a"], "abdc // here is a comment efgh");
+            EXPECT_EQ(json["b"], 13);
+        }
     }
 }
 
@@ -537,10 +577,12 @@ TEST_F(JsonParserTest, MultiLineComment)
             "b" : 13
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -555,10 +597,12 @@ TEST_F(JsonParserTest, MultiLineComment)
         /* here is a comment2 */
         )";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -569,10 +613,12 @@ TEST_F(JsonParserTest, MultiLineComment)
             "b" : 13
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -583,10 +629,12 @@ TEST_F(JsonParserTest, MultiLineComment)
             "b" : 13
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -599,10 +647,12 @@ TEST_F(JsonParserTest, MultiLineComment)
             "b" : 13
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -621,10 +671,12 @@ TEST_F(JsonParserTest, MultiLineComment)
             "b" : 13
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -635,13 +687,24 @@ TEST_F(JsonParserTest, MultiLineComment)
             "b" : 13
         })";
 
-        fly::Json json;
+        {
+            auto parsed = m_parser.parse_string(str);
+            ASSERT_TRUE(parsed.has_value());
 
-        EXPECT_NO_THROW(m_parser.parse_string(str));
-        EXPECT_NO_THROW(json = parser.parse_string(str));
-        EXPECT_EQ(json.size(), 2);
-        EXPECT_EQ(json["a"], "abdc /* here is a comment */ efgh");
-        EXPECT_EQ(json["b"], 13);
+            fly::Json json = std::move(parsed.value());
+            EXPECT_EQ(json.size(), 2);
+            EXPECT_EQ(json["a"], "abdc /* here is a comment */ efgh");
+            EXPECT_EQ(json["b"], 13);
+        }
+        {
+            auto parsed = parser.parse_string(str);
+            ASSERT_TRUE(parsed.has_value());
+
+            fly::Json json = std::move(parsed.value());
+            EXPECT_EQ(json.size(), 2);
+            EXPECT_EQ(json["a"], "abdc /* here is a comment */ efgh");
+            EXPECT_EQ(json["b"], 13);
+        }
     }
 }
 
@@ -654,28 +717,28 @@ TEST_F(JsonParserTest, InvalidComment)
             "a" : 12 / here is a bad comment
         })";
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
     }
     {
         std::string str = R"({"a" : 12 /)";
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
     }
     {
         std::string str = R"({
             "a" : 12 /* here is a bad comment
         })";
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
     }
     {
         std::string str = R"({"a" : 12 /*)";
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
     }
 }
 
@@ -689,10 +752,12 @@ TEST_F(JsonParserTest, TrailingCommaObject)
             "b" : 13,
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_EQ(json["b"], 13);
@@ -703,8 +768,8 @@ TEST_F(JsonParserTest, TrailingCommaObject)
             "b" : 13,
         })";
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
     }
     {
         std::string str = R"({
@@ -712,8 +777,8 @@ TEST_F(JsonParserTest, TrailingCommaObject)
             "b" : 13,,
         })";
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
     }
 }
 
@@ -727,10 +792,12 @@ TEST_F(JsonParserTest, TrailingCommaArray)
             "b" : [1, 2,],
         })";
 
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_EQ(json.size(), 2);
         EXPECT_EQ(json["a"], 12);
         EXPECT_TRUE(json["b"].is_array());
@@ -744,8 +811,8 @@ TEST_F(JsonParserTest, TrailingCommaArray)
             "b" : [1,, 2,],
         })";
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
     }
     {
         std::string str = R"({
@@ -753,8 +820,8 @@ TEST_F(JsonParserTest, TrailingCommaArray)
             "b" : [1, 2,,],
         })";
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
     }
 }
 
@@ -765,69 +832,83 @@ TEST_F(JsonParserTest, AnyType)
     {
         std::string str = "this is a string without quotes";
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_THROW(parser.parse_string(str), fly::ParserException);
+        EXPECT_FALSE(m_parser.parse_string(str).has_value());
+        EXPECT_FALSE(parser.parse_string(str).has_value());
     }
     {
         std::string str = "\"this is a string\"";
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_TRUE(json.is_string());
         EXPECT_EQ(json, str.substr(1, str.size() - 2));
     }
     {
         std::string str = "true";
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_TRUE(json.is_boolean());
         EXPECT_EQ(json, true);
     }
     {
         std::string str = "false";
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_TRUE(json.is_boolean());
         EXPECT_EQ(json, false);
     }
     {
         std::string str = "null";
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_TRUE(json.is_null());
         EXPECT_EQ(json, nullptr);
     }
     {
         std::string str = "12389";
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_TRUE(json.is_unsigned_integer());
         EXPECT_EQ(json, 12389);
     }
     {
         std::string str = "-12389";
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_TRUE(json.is_signed_integer());
         EXPECT_EQ(json, -12389);
     }
     {
         std::string str = "123.89";
-        fly::Json json;
+        validate_fail_raw(str);
 
-        EXPECT_THROW(m_parser.parse_string(str), fly::ParserException);
-        EXPECT_NO_THROW(json = parser.parse_string(str));
+        auto parsed = parser.parse_string(str);
+        ASSERT_TRUE(parsed.has_value());
+
+        fly::Json json = std::move(parsed.value());
         EXPECT_TRUE(json.is_float());
         EXPECT_DOUBLE_EQ(double(json), 123.89);
     }

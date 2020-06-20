@@ -62,7 +62,7 @@ struct BasicStringStreamer
      *
      * For all character types, any symbol which is not a printable ASCII character is escaped as
      * hexadecimal. For example, the line feed character will be streamed as "\x0c". The end-of-file
-     * character will be streamed as the string "EOF".
+     * character will be streamed as the string "[EOF]".
      *
      * For any other type which has an operator<< overload defined, the value is stream using that
      * overload. Otherwise, the memory location of the value is streamed.
@@ -210,7 +210,7 @@ void BasicStringStreamer<StringType>::stream_char(ostream_type &ostream, const c
 
             ostream << FLY_STR(streamed_char, "\\x");
             ostream << std::setfill(fill) << std::setw(2);
-            ostream << std::hex << value_as_int << std::dec;
+            ostream << std::hex << (value_as_int & 0xff) << std::dec;
         }
     }
 }

@@ -1,7 +1,5 @@
 #include "fly/parser/ini_parser.hpp"
 
-#include "fly/parser/parser_exception.hpp"
-
 #include <gtest/gtest.h>
 
 #include <filesystem>
@@ -16,19 +14,20 @@ protected:
 //==================================================================================================
 TEST_F(IniParserTest, NonExistingPath)
 {
-    fly::Json values;
+    auto parsed = m_parser.parse_file(std::filesystem::path("foo_abc") / "a.json");
+    ASSERT_TRUE(parsed.has_value());
 
-    ASSERT_NO_THROW(values = m_parser.parse_file(std::filesystem::path("foo_abc") / "a.json"));
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 0);
 }
 
 //==================================================================================================
 TEST_F(IniParserTest, NonExistingFile)
 {
-    fly::Json values;
+    auto parsed = m_parser.parse_file(std::filesystem::temp_directory_path() / "a.json");
+    ASSERT_TRUE(parsed.has_value());
 
-    ASSERT_NO_THROW(
-        values = m_parser.parse_file(std::filesystem::temp_directory_path() / "a.json"));
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 0);
 }
 
@@ -37,8 +36,10 @@ TEST_F(IniParserTest, EmptyFile)
 {
     const std::string contents;
 
-    fly::Json values;
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 0);
 }
 
@@ -47,8 +48,10 @@ TEST_F(IniParserTest, EmptySection)
 {
     const std::string contents("[section]");
 
-    fly::Json values;
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 0);
 }
 
@@ -60,24 +63,26 @@ TEST_F(IniParserTest, NonEmptySection)
         "name=John Doe\n"
         "address=USA");
 
-    fly::Json values;
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
 
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 1);
     EXPECT_EQ(values["section"].size(), 2);
 }
 
 //==================================================================================================
-TEST_F(IniParserTest, NonExisting)
+TEST_F(IniParserTest, NonExistingSection)
 {
     const std::string contents(
         "[section]\n"
         "name=John Doe\n"
         "address=USA");
 
-    fly::Json values;
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
 
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values["section"].size(), 2);
     EXPECT_EQ(values["bad-section"].size(), 0);
     EXPECT_EQ(values["section-bad"].size(), 0);
@@ -92,9 +97,10 @@ TEST_F(IniParserTest, Comment)
         "; [other-section]\n"
         "; name=Jane Doe\n");
 
-    fly::Json values;
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
 
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 1);
     EXPECT_EQ(values["section"].size(), 1);
     EXPECT_EQ(values["other-section"].size(), 0);
@@ -108,9 +114,10 @@ TEST_F(IniParserTest, ErrantSpaces)
         "\t\t\n   name=John Doe\t  \n"
         "\taddress  = USA\t \r \n");
 
-    fly::Json values;
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
 
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 1);
     EXPECT_EQ(values["section"].size(), 2);
 }
@@ -123,9 +130,10 @@ TEST_F(IniParserTest, QuotedValue)
         "name=\"  John Doe  \"\n"
         "address= \t '\\tUSA'");
 
-    fly::Json values;
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
 
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 1);
     EXPECT_EQ(values["section"].size(), 2);
 }
@@ -144,9 +152,10 @@ TEST_F(IniParserTest, MutlipleSectionType)
         "name=Joe Doe\n"
         "noage=1\n");
 
-    fly::Json values;
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
 
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 3);
     EXPECT_EQ(values["section1"].size(), 2);
     EXPECT_EQ(values["section2"].size(), 2);
@@ -162,11 +171,13 @@ TEST_F(IniParserTest, DuplicateSection)
         "[section]\n"
         "name=Jane Doe\n");
 
-    fly::Json values;
-    EXPECT_NO_THROW(values = m_parser.parse_string(contents1));
-    EXPECT_EQ(values.size(), 1);
-    EXPECT_EQ(values["section"].size(), 1);
-    EXPECT_EQ(values["section"]["name"], "Jane Doe");
+    auto parsed1 = m_parser.parse_string(contents1);
+    ASSERT_TRUE(parsed1.has_value());
+
+    fly::Json values1 = std::move(parsed1.value());
+    EXPECT_EQ(values1.size(), 1);
+    EXPECT_EQ(values1["section"].size(), 1);
+    EXPECT_EQ(values1["section"]["name"], "Jane Doe");
 
     const std::string contents2(
         "[  \tsection]\n"
@@ -174,10 +185,13 @@ TEST_F(IniParserTest, DuplicateSection)
         "[section  ]\n"
         "name=Jane Doe\n");
 
-    EXPECT_NO_THROW(values = m_parser.parse_string(contents2));
-    EXPECT_EQ(values.size(), 1);
-    EXPECT_EQ(values["section"].size(), 1);
-    EXPECT_EQ(values["section"]["name"], "Jane Doe");
+    auto parsed2 = m_parser.parse_string(contents1);
+    ASSERT_TRUE(parsed2.has_value());
+
+    fly::Json values2 = std::move(parsed2.value());
+    EXPECT_EQ(values2.size(), 1);
+    EXPECT_EQ(values2["section"].size(), 1);
+    EXPECT_EQ(values2["section"]["name"], "Jane Doe");
 }
 
 //==================================================================================================
@@ -188,8 +202,10 @@ TEST_F(IniParserTest, DuplicateValue)
         "name=John Doe\n"
         "name=Jane Doe\n");
 
-    fly::Json values;
-    EXPECT_NO_THROW(values = m_parser.parse_string(contents));
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 1);
     EXPECT_EQ(values["section"].size(), 1);
     EXPECT_EQ(values["section"]["name"], "Jane Doe");
@@ -206,8 +222,8 @@ TEST_F(IniParserTest, ImbalancedBrace)
         "section]\n"
         "name=John Doe\n");
 
-    EXPECT_THROW(m_parser.parse_string(contents1), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents2), fly::ParserException);
+    EXPECT_FALSE(m_parser.parse_string(contents1).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents2).has_value());
 }
 
 //==================================================================================================
@@ -236,12 +252,12 @@ TEST_F(IniParserTest, ImbalancedQuote)
         "[section]\n"
         "name='John Doe\"\n");
 
-    EXPECT_THROW(m_parser.parse_string(contents1), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents2), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents3), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents4), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents5), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents6), fly::ParserException);
+    EXPECT_FALSE(m_parser.parse_string(contents1).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents2).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents3).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents4).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents5).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents6).has_value());
 }
 
 //==================================================================================================
@@ -271,12 +287,12 @@ TEST_F(IniParserTest, MisplacedQuote)
         "\'[section]\'\n"
         "name=John Doe\n");
 
-    EXPECT_THROW(m_parser.parse_string(contents1), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents2), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents3), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents4), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents5), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents6), fly::ParserException);
+    EXPECT_FALSE(m_parser.parse_string(contents1).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents2).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents3).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents4).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents5).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents6).has_value());
 }
 
 //==================================================================================================
@@ -289,15 +305,19 @@ TEST_F(IniParserTest, MultipleAssignment)
         "[section]\n"
         "name=\"John=Doe\"\n");
 
-    fly::Json values;
+    auto parsed1 = m_parser.parse_string(contents1);
+    ASSERT_TRUE(parsed1.has_value());
 
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents1));
-    EXPECT_EQ(values.size(), 1);
-    EXPECT_EQ(values["section"].size(), 1);
+    fly::Json values1 = std::move(parsed1.value());
+    EXPECT_EQ(values1.size(), 1);
+    EXPECT_EQ(values1["section"].size(), 1);
 
-    ASSERT_NO_THROW(values = m_parser.parse_string(contents2));
-    EXPECT_EQ(values.size(), 1);
-    EXPECT_EQ(values["section"].size(), 1);
+    auto parsed2 = m_parser.parse_string(contents1);
+    ASSERT_TRUE(parsed2.has_value());
+
+    fly::Json values2 = std::move(parsed2.value());
+    EXPECT_EQ(values2.size(), 1);
+    EXPECT_EQ(values2["section"].size(), 1);
 }
 
 //==================================================================================================
@@ -311,8 +331,8 @@ TEST_F(IniParserTest, MissingAssignment)
         "[section]\n"
         "name=\n");
 
-    EXPECT_THROW(m_parser.parse_string(contents1), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents2), fly::ParserException);
+    EXPECT_FALSE(m_parser.parse_string(contents1).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents2).has_value());
 }
 
 //==================================================================================================
@@ -330,9 +350,9 @@ TEST_F(IniParserTest, EarlyAssignment)
         "name\n"
         "[section]\n");
 
-    EXPECT_THROW(m_parser.parse_string(contents1), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents2), fly::ParserException);
-    EXPECT_THROW(m_parser.parse_string(contents3), fly::ParserException);
+    EXPECT_FALSE(m_parser.parse_string(contents1).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents2).has_value());
+    EXPECT_FALSE(m_parser.parse_string(contents3).has_value());
 }
 
 //==================================================================================================
@@ -343,13 +363,24 @@ TEST_F(IniParserTest, MultipleParse)
         "name=John Doe\n"
         "address=USA");
 
-    fly::Json values;
-
     for (int i = 0; i < 5; ++i)
     {
-        ASSERT_NO_THROW(values = m_parser.parse_string(contents));
+        auto parsed = m_parser.parse_string(contents);
+        ASSERT_TRUE(parsed.has_value());
 
+        fly::Json values = std::move(parsed.value());
         EXPECT_EQ(values.size(), 1);
         EXPECT_EQ(values["section"].size(), 2);
     }
+}
+
+//==================================================================================================
+TEST_F(IniParserTest, BadValue)
+{
+    const std::string contents(
+        "[section]\n"
+        "name=John Doe\n"
+        "address=\xff");
+
+    EXPECT_FALSE(m_parser.parse_string(contents).has_value());
 }

@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <istream>
+#include <optional>
 #include <string>
 
 namespace fly {
@@ -29,22 +30,18 @@ public:
      *
      * @param contents String contents to parse.
      *
-     * @return The parsed values.
-     *
-     * @throws ParserException Thrown if an error occurs parsing the string.
+     * @return If successful, the parsed values. Otherwise, an unitialized value.
      */
-    Json parse_string(const std::string &contents);
+    std::optional<Json> parse_string(const std::string &contents);
 
     /**
      * Parse a file and retrieve parsed values.
      *
      * @param path Path to the file to parse.
      *
-     * @return The parsed values.
-     *
-     * @throws ParserException Thrown if an error occurs parsing the file.
+     * @return If successful, the parsed values. Otherwise, an unitialized value.
      */
-    Json parse_file(const std::filesystem::path &path);
+    std::optional<Json> parse_file(const std::filesystem::path &path);
 
 protected:
     /**
@@ -52,11 +49,9 @@ protected:
      *
      * @param stream Stream holding the contents to parse.
      *
-     * @return The parsed values.
-     *
-     * @throws ParserException Thrown if an error occurs parsing the stream.
+     * @return If successful, the parsed values. Otherwise, an unitialized value.
      */
-    virtual Json parse_internal(std::istream &stream) = 0;
+    virtual std::optional<Json> parse_internal(std::istream &stream) = 0;
 
     std::uint32_t m_line;
     std::uint32_t m_column;
@@ -65,6 +60,8 @@ private:
     /**
      * Before passing a stream to the parser implementation, discard any byte order marks (supports
      * UTF-8, UTF-16, and UTF-32).
+     *
+     * TODO Parser should actually respect the BOM instead of assuming UTF-8.
      *
      * @param stream Stream holding the contents to parse.
      */
