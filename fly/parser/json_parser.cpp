@@ -86,141 +86,79 @@ std::optional<Json> JsonParser::parse_json(std::istream &stream)
 std::optional<Json> JsonParser::parse_object(std::istream &stream)
 {
     Json object = JsonTraits::object_type();
+    ParseState state;
 
     // Discard the opening brace, which has already been peeked.
     discard(stream);
 
-    while (true)
-    {
-        const ParseState state = parse_object_loop(stream, object);
-
-        if (state == ParseState::Invalid)
-        {
-            return std::nullopt;
-        }
-        else if (state == ParseState::StopParsing)
-        {
-            break;
-        }
-    }
-
-    if (consume_token(stream, Token::CloseBrace) == ParseState::Invalid)
-    {
-        return std::nullopt;
-    }
-
-    return object;
-}
-
-//==================================================================================================
-JsonParser::ParseState JsonParser::parse_object_loop(std::istream &stream, Json &object)
-{
     auto parse_state = std::bind(
         &JsonParser::done_parsing_object_or_array,
         this,
         std::ref(stream),
         Token::CloseBrace);
 
-    ParseState state;
-
-    if (state = parse_state(); state != ParseState::KeepParsing)
+    while ((state = parse_state()) == ParseState::KeepParsing)
     {
-        return state;
-    }
-    else if (object)
-    {
-        if (state = consume_comma(stream, parse_state); state != ParseState::KeepParsing)
+        if (object && ((state = consume_comma(stream, parse_state)) != ParseState::KeepParsing))
         {
-            return state;
+            break;
+        }
+
+        JsonTraits::string_type key;
+        if (consume_value(stream, JsonType::JsonString, key) == JsonType::Invalid)
+        {
+            return std::nullopt;
+        }
+        else if (consume_token(stream, Token::Colon) == ParseState::Invalid)
+        {
+            return std::nullopt;
+        }
+        else if (std::optional<Json> value = parse_json(stream); value)
+        {
+            object[std::move(key)] = std::move(value.value());
+        }
+        else
+        {
+            return std::nullopt;
         }
     }
 
-    JsonTraits::string_type key;
-    if (consume_value(stream, JsonType::JsonString, key) == JsonType::Invalid)
-    {
-        return ParseState::Invalid;
-    }
-
-    if (consume_token(stream, Token::Colon) == ParseState::Invalid)
-    {
-        return ParseState::Invalid;
-    }
-
-    if (std::optional<Json> child = parse_json(stream); child)
-    {
-        object[std::move(key)] = std::move(child.value());
-    }
-    else
-    {
-        return ParseState::Invalid;
-    }
-
-    return ParseState::KeepParsing;
+    return (state == ParseState::Invalid) ? std::nullopt : std::optional<Json>(object);
 }
 
 //==================================================================================================
 std::optional<Json> JsonParser::parse_array(std::istream &stream)
 {
     Json array = JsonTraits::array_type();
+    ParseState state;
 
     // Discard the opening bracket, which has already been peeked.
     discard(stream);
 
-    while (true)
-    {
-        const ParseState state = parse_array_loop(stream, array);
-
-        if (state == ParseState::Invalid)
-        {
-            return std::nullopt;
-        }
-        else if (state == ParseState::StopParsing)
-        {
-            break;
-        }
-    }
-
-    if (consume_token(stream, Token::CloseBracket) == ParseState::Invalid)
-    {
-        return std::nullopt;
-    }
-
-    return array;
-}
-
-//==================================================================================================
-JsonParser::ParseState JsonParser::parse_array_loop(std::istream &stream, Json &array)
-{
     auto parse_state = std::bind(
         &JsonParser::done_parsing_object_or_array,
         this,
         std::ref(stream),
         Token::CloseBracket);
 
-    ParseState state;
-
-    if (state = parse_state(); state != ParseState::KeepParsing)
+    while ((state = parse_state()) == ParseState::KeepParsing)
     {
-        return state;
-    }
-    else if (array)
-    {
-        if (state = consume_comma(stream, parse_state); state != ParseState::KeepParsing)
+        if (array && ((state = consume_comma(stream, parse_state)) != ParseState::KeepParsing))
         {
-            return state;
+            break;
+        }
+
+        if (std::optional<Json> value = parse_json(stream); value)
+        {
+            array[array.size()] = std::move(value.value());
+        }
+        else
+        {
+            return std::nullopt;
         }
     }
 
-    if (std::optional<Json> child = parse_json(stream); child)
-    {
-        array[array.size()] = std::move(child.value());
-    }
-    else
-    {
-        return ParseState::Invalid;
-    }
-
-    return ParseState::KeepParsing;
+    return (state == ParseState::Invalid) ? std::nullopt : std::optional<Json>(array);
 }
 
 //==================================================================================================
@@ -234,9 +172,14 @@ JsonParser::done_parsing_object_or_array(std::istream &stream, const Token &end_
 
     const Token token = peek(stream);
 
-    if ((token == Token::EndOfFile) || (token == end_token))
+    if (token == end_token)
     {
+        discard(stream);
         return ParseState::StopParsing;
+    }
+    else if (token == Token::EndOfFile)
+    {
+        return ParseState::Invalid;
     }
 
     return ParseState::KeepParsing;

@@ -143,16 +143,6 @@ private:
     std::optional<Json> parse_object(std::istream &stream);
 
     /**
-     * Inner loop to parse a JSON object from a stream.
-     *
-     * @param stream Stream holding the contents to parse.
-     * @param object The location to store the parsed object.
-     *
-     * @return The new parsing state.
-     */
-    ParseState parse_object_loop(std::istream &stream, Json &object);
-
-    /**
      * Parse a JSON array from a stream.
      *
      * @param stream Stream holding the contents to parse.
@@ -160,16 +150,6 @@ private:
      * @return If successful, the parsed JSON array. Otherwise, an unitialized value.
      */
     std::optional<Json> parse_array(std::istream &stream);
-
-    /**
-     * Inner loop to parse a JSON array from a stream.
-     *
-     * @param stream Stream holding the contents to parse.
-     * @param array The location to store the parsed array.
-     *
-     * @return The new parsing state.
-     */
-    ParseState parse_array_loop(std::istream &stream, Json &array);
 
     /**
      * Determine whether parsing a JSON object or array is complete.
