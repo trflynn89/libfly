@@ -346,17 +346,14 @@ JsonParser::ParseState JsonParser::consume_whitespace_and_comments(std::istream 
 {
     consume_whitespace(stream);
 
-    if (is_feature_allowed(Features::AllowComments))
+    while (peek(stream) == Token::Solidus)
     {
-        while (peek(stream) == Token::Solidus)
+        if (consume_comment(stream) == ParseState::Invalid)
         {
-            if (consume_comment(stream) == ParseState::Invalid)
-            {
-                return ParseState::Invalid;
-            }
-
-            consume_whitespace(stream);
+            return ParseState::Invalid;
         }
+
+        consume_whitespace(stream);
     }
 
     return ParseState::KeepParsing;
