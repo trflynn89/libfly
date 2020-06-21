@@ -135,7 +135,7 @@ void BitStreamWriter::flush(const DataType &buffer, byte_type bytes)
 
     if (m_stream)
     {
-        const DataType data = endian_swap<Endian::Big>(buffer);
+        const DataType data = endian_swap_if_non_native<Endian::Big>(buffer);
 
         m_stream_buffer->sputn(
             reinterpret_cast<const std::ios::char_type *>(&data),

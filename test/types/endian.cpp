@@ -80,15 +80,23 @@ protected:
 
         for (DataType data = 0, i = 0; i++ < iterations; data += step)
         {
-            DataType expected = data;
-            DataType actual = fly::endian_swap<Desired>(data);
-
-            if constexpr (Desired != fly::Endian::Native)
             {
-                expected = swap(expected);
-            }
+                DataType expected = swap(data);
+                DataType actual = fly::endian_swap(data);
 
-            EXPECT_EQ(expected, actual);
+                EXPECT_EQ(expected, actual);
+            }
+            {
+                DataType expected = data;
+                DataType actual = fly::endian_swap_if_non_native<Desired>(data);
+
+                if constexpr (Desired != fly::Endian::Native)
+                {
+                    expected = swap(expected);
+                }
+
+                EXPECT_EQ(expected, actual);
+            }
         }
     }
 };
