@@ -1,5 +1,7 @@
 #include "fly/logger/logger.hpp"
 
+#include "fly/coders/huffman/huffman_config.hpp"
+#include "fly/coders/huffman/huffman_encoder.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/task/task_runner.hpp"
 
@@ -17,10 +19,12 @@ std::mutex Logger::s_console_mutex;
 //==================================================================================================
 Logger::Logger(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<LoggerConfig> &config,
+    const std::shared_ptr<LoggerConfig> &logger_config,
+    const std::shared_ptr<HuffmanConfig> &huffman_config,
     const std::filesystem::path &logger_directory) noexcept :
     m_task_runner(task_runner),
-    m_config(config),
+    m_logger_config(logger_config),
+    m_huffman_config(huffman_config),
     m_log_directory(logger_directory),
     m_index(0),
     m_start_time(std::chrono::high_resolution_clock::now())
@@ -94,12 +98,12 @@ bool Logger::poll()
 {
     Log log;
 
-    if (m_log_queue.pop(log, m_config->queue_wait_time()) && m_log_stream.good())
+    if (m_log_queue.pop(log, m_logger_config->queue_wait_time()) && m_log_stream.good())
     {
         m_log_stream << log << std::flush;
         std::error_code error;
 
-        if (std::filesystem::file_size(m_log_file, error) > m_config->max_log_file_size())
+        if (std::filesystem::file_size(m_log_file, error) > m_logger_config->max_log_file_size())
         {
             create_log_file();
         }
@@ -121,7 +125,7 @@ void Logger::add_log_internal(
 
     if ((level >= Log::Level::Debug) && (level < Log::Level::NumLevels))
     {
-        Log log(m_config, message);
+        Log log(m_logger_config, message);
 
         log.m_index = m_index++;
         log.m_level = level;
@@ -138,6 +142,29 @@ void Logger::add_log_internal(
 //==================================================================================================
 bool Logger::create_log_file()
 {
+    if (m_log_stream.is_open())
+    {
+        m_log_stream.close();
+
+        if (m_logger_config->compress_log_files())
+        {
+            std::filesystem::path compressed_log_file = m_log_file;
+            compressed_log_file.replace_extension(".log.enc");
+
+            HuffmanEncoder encoder(m_huffman_config);
+
+            if (encoder.encode_file(m_log_file, compressed_log_file))
+            {
+                LOGC("Log file compressed to: %s", compressed_log_file);
+                std::filesystem::remove(m_log_file);
+            }
+            else
+            {
+                LOGC("Failed to compress: %s", m_log_file);
+            }
+        }
+    }
+
     const std::string rand_str = String::generate_random_string(10);
     std::string time_str = System::local_time();
 
@@ -146,11 +173,6 @@ bool Logger::create_log_file()
 
     const std::string file_name = String::format("Log_%s_%s.log", time_str, rand_str);
     m_log_file = m_log_directory / file_name;
-
-    if (m_log_stream.is_open())
-    {
-        m_log_stream.close();
-    }
 
     LOGC("Creating logger file: %s", m_log_file);
     m_log_stream.open(m_log_file, std::ios::out);
