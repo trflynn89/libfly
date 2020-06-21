@@ -244,7 +244,7 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes)
             reinterpret_cast<std::ios::char_type *>(&buffer),
             static_cast<std::streamsize>(bytes));
 
-        buffer = endian_swap<Endian::Big>(buffer);
+        buffer = endian_swap_if_non_native<Endian::Big>(buffer);
         return static_cast<byte_type>(bytes_read);
     }
 
