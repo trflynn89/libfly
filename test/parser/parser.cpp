@@ -146,14 +146,11 @@ TEST_F(ParserTest, Utf32LittleEndianByteOrderMark)
 {
     std::optional<fly::Json> parsed;
 
-    EXPECT_FALSE(m_parser.parse_string("\xFF\xFE\xEE").has_value());
-    m_parser.compare_parsed({0xEE}); // 0xFF 0xFE is parsed as UTF-16
+    EXPECT_FALSE(m_parser.parse_string(std::string("\xFF\xFE\x61\x00", 4)).has_value());
+    m_parser.compare_parsed({0x61}); // 0xff 0xfe is interpreted as UTF-16 little endian
 
-    EXPECT_FALSE(m_parser.parse_string(std::string("\xFF\xFE\x00", 3)).has_value());
-    m_parser.compare_parsed({0x00}); // 0xFF 0xFE is parsed as UTF-16
-
-    EXPECT_FALSE(m_parser.parse_string(std::string("\xFF\xFE\x00\xEE", 4)).has_value());
-    m_parser.compare_parsed({0x00, 0xEE}); // 0xFF 0xFE is parsed as UTF-16
+    EXPECT_FALSE(m_parser.parse_string(std::string("\xFF\xFE\x00\x61", 4)).has_value());
+    m_parser.compare_parsed({0xE6, 0x84, 0x80}); // 0xff 0xfe is interpreted as UTF-16 little endian
 
     EXPECT_TRUE(m_parser.parse_string(std::string("\xFF\xFE\x00\x00", 4)).has_value());
     m_parser.compare_parsed({});

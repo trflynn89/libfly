@@ -9,41 +9,71 @@ namespace fly {
 std::optional<Json> Parser::parse_string(const std::string &contents)
 {
     std::istringstream stream(contents);
-
-    m_line = 1;
-    m_column = 0;
-
-    consume_byte_order_mark(stream);
-    return parse_internal(stream);
+    return parse_stream(stream);
 }
 
 //==================================================================================================
 std::optional<Json> Parser::parse_file(const std::filesystem::path &path)
 {
     std::ifstream stream(path);
-
-    m_line = 1;
-    m_column = 0;
-
-    consume_byte_order_mark(stream);
-    return parse_internal(stream);
+    return parse_stream(stream);
 }
 
 //==================================================================================================
-void Parser::consume_byte_order_mark(std::istream &stream) const
+std::optional<Json> Parser::parse_stream(std::istream &stream)
+{
+    m_line = 1;
+    m_column = 0;
+
+    Encoding encoding = parse_byte_order_mark(stream);
+    std::optional<std::string> utf8_contents;
+
+    switch (encoding)
+    {
+        case Encoding::UTF8:
+            return parse_internal(stream);
+
+        case Encoding::UTF16BigEndian:
+            utf8_contents = ensure_utf8<std::u16string, Endian::Big>(stream);
+            break;
+
+        case Encoding::UTF16LittleEndian:
+            utf8_contents = ensure_utf8<std::u16string, Endian::Little>(stream);
+            break;
+
+        case Encoding::UTF32BigEndian:
+            utf8_contents = ensure_utf8<std::u32string, Endian::Big>(stream);
+            break;
+
+        case Encoding::UTF32LittleEndian:
+            utf8_contents = ensure_utf8<std::u32string, Endian::Little>(stream);
+            break;
+    }
+
+    if (utf8_contents)
+    {
+        std::istringstream utf8_stream(std::move(utf8_contents.value()));
+        return parse_internal(utf8_stream);
+    }
+
+    return std::nullopt;
+}
+
+//==================================================================================================
+Parser::Encoding Parser::parse_byte_order_mark(std::istream &stream) const
 {
     if (stream && (stream.peek() != EOF))
     {
         int c = stream.get();
 
-        // UTF-8 byte order mark
+        // UTF-8 byte order mark.
         if ((c == 0xef) && (stream.peek() != EOF))
         {
             if ((stream.get() == 0xbb) && (stream.peek() != EOF))
             {
                 if (stream.get() == 0xbf)
                 {
-                    return;
+                    return Encoding::UTF8;
                 }
 
                 stream.unget();
@@ -52,30 +82,30 @@ void Parser::consume_byte_order_mark(std::istream &stream) const
             stream.unget();
         }
 
-        // UTF-16 big-endian byte order mark
+        // UTF-16 big-endian byte order mark.
         else if ((c == 0xfe) && (stream.peek() != EOF))
         {
             if (stream.get() == 0xff)
             {
-                return;
+                return Encoding::UTF16BigEndian;
             }
 
             stream.unget();
         }
 
-        // UTF-16 little-endian byte order mark
+        // UTF-16 little-endian byte order mark.
         else if ((c == 0xff) && (stream.peek() != EOF))
         {
             if (stream.get() == 0xfe)
             {
                 if (stream.peek() != EOF)
                 {
-                    // UTF-32 little-endian byte-order-mark
+                    // UTF-32 little-endian byte-order-mark.
                     if ((stream.get() == 0x00) && (stream.peek() != EOF))
                     {
                         if (stream.get() == 0x00)
                         {
-                            return;
+                            return Encoding::UTF32LittleEndian;
                         }
 
                         stream.unget();
@@ -84,13 +114,13 @@ void Parser::consume_byte_order_mark(std::istream &stream) const
                     stream.unget();
                 }
 
-                return;
+                return Encoding::UTF16LittleEndian;
             }
 
             stream.unget();
         }
 
-        // UTF-32 big-endian byte order mark
+        // UTF-32 big-endian byte order mark.
         else if ((c == 0x00) && (stream.peek() != EOF))
         {
             if ((stream.get() == 0x00) && (stream.peek() != EOF))
@@ -99,7 +129,7 @@ void Parser::consume_byte_order_mark(std::istream &stream) const
                 {
                     if (stream.get() == 0xff)
                     {
-                        return;
+                        return Encoding::UTF32BigEndian;
                     }
 
                     stream.unget();
@@ -111,9 +141,11 @@ void Parser::consume_byte_order_mark(std::istream &stream) const
             stream.unget();
         }
 
-        // Not a byte order mark
+        // Not a byte order mark.
         stream.unget();
     }
+
+    return Encoding::UTF8;
 }
 
 } // namespace fly
