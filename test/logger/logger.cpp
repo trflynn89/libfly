@@ -1,5 +1,7 @@
 #include "fly/logger/logger.hpp"
 
+#include "fly/coders/huffman/huffman_config.hpp"
+#include "fly/coders/huffman/huffman_decoder.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/task/task_manager.hpp"
 #include "fly/types/numeric/literals.hpp"
@@ -14,6 +16,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
@@ -26,9 +29,23 @@ namespace {
 class TestLoggerConfig : public fly::LoggerConfig
 {
 public:
-    TestLoggerConfig() noexcept : fly::LoggerConfig()
+    TestLoggerConfig(bool compress_log_files) noexcept : fly::LoggerConfig()
     {
+        m_default_compress_log_files = compress_log_files;
         m_default_max_log_file_size = 1 << 10;
+    }
+};
+
+/**
+ * Subclass of the Huffman coder config to contain invalid values.
+ */
+class BadHuffmanConfig : public fly::HuffmanConfig
+{
+public:
+    BadHuffmanConfig() noexcept : fly::HuffmanConfig()
+    {
+        m_default_encoder_max_code_length =
+            std::numeric_limits<decltype(m_default_encoder_max_code_length)>::max();
     }
 };
 
@@ -40,10 +57,15 @@ class LoggerTest : public ::testing::Test
 public:
     LoggerTest() noexcept :
         m_path(fly::PathUtil::generate_temp_directory()),
+
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
         m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
-        m_logger_config(std::make_shared<TestLoggerConfig>()),
-        m_logger(std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_path))
+
+        m_logger_config(std::make_shared<TestLoggerConfig>(false)),
+        m_huffman_config(std::make_shared<fly::HuffmanConfig>()),
+
+        m_logger(
+            std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_huffman_config, m_path))
     {
     }
 
@@ -153,6 +175,8 @@ protected:
     std::shared_ptr<fly::WaitableSequencedTaskRunner> m_task_runner;
 
     std::shared_ptr<fly::LoggerConfig> m_logger_config;
+    std::shared_ptr<fly::HuffmanConfig> m_huffman_config;
+
     std::shared_ptr<fly::Logger> m_logger;
 };
 
@@ -174,6 +198,7 @@ TEST_F(LoggerTest, BadFilePath)
     m_logger = std::make_shared<fly::Logger>(
         m_task_runner,
         m_logger_config,
+        m_huffman_config,
         fly::PathUtil::generate_temp_directory());
 
     EXPECT_FALSE(m_logger->start());
@@ -271,7 +296,7 @@ TEST_F(LoggerTest, ErrorLog)
 }
 
 //==================================================================================================
-TEST_F(LoggerTest, Rollover)
+TEST_F(LoggerTest, RolloverUncompressed)
 {
     std::filesystem::path path = m_logger->get_log_file_path();
 
@@ -283,8 +308,7 @@ TEST_F(LoggerTest, Rollover)
     std::uintmax_t expected_size = log_size(random);
     std::uintmax_t count = 0;
 
-    // Create enough log points to fill the log file, plus some extra to start filling a second log
-    // file.
+    // Create enough log points to fill the log file, plus some extra to start filling a second log.
     while (++count < ((max_log_file_size / expected_size) + 10))
     {
         LOGD("%s", random);
@@ -292,6 +316,84 @@ TEST_F(LoggerTest, Rollover)
     }
 
     EXPECT_NE(path, m_logger->get_log_file_path());
+    ASSERT_TRUE(std::filesystem::exists(path));
+
+    std::uintmax_t actual_size = std::filesystem::file_size(path);
+    EXPECT_GE(actual_size, max_message_size);
+}
+
+//==================================================================================================
+TEST_F(LoggerTest, RolloverCompressed)
+{
+    m_logger_config = std::make_shared<TestLoggerConfig>(true);
+
+    m_logger =
+        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_huffman_config, m_path);
+    ASSERT_TRUE(m_logger->start());
+    fly::Logger::set_instance(m_logger);
+
+    std::filesystem::path path = m_logger->get_log_file_path();
+
+    std::uintmax_t max_log_file_size = m_logger_config->max_log_file_size();
+    std::uint32_t max_message_size = m_logger_config->max_message_size();
+
+    std::string random = fly::String::generate_random_string(max_message_size);
+
+    std::uintmax_t expected_size = log_size(random);
+    std::uintmax_t count = 0;
+
+    // Create enough log points to fill the log file, plus some extra to start filling a second log.
+    while (++count < ((max_log_file_size / expected_size) + 10))
+    {
+        LOGD("%s", random);
+        m_task_runner->wait_for_task_to_complete<fly::LoggerTask>();
+    }
+
+    EXPECT_NE(path, m_logger->get_log_file_path());
+
+    std::filesystem::path compressed_path = path;
+    compressed_path.replace_extension(".log.enc");
+
+    ASSERT_FALSE(std::filesystem::exists(path));
+    ASSERT_TRUE(std::filesystem::exists(compressed_path));
+
+    fly::HuffmanDecoder decoder;
+    ASSERT_TRUE(decoder.decode_file(compressed_path, path));
+
+    std::uintmax_t actual_size = std::filesystem::file_size(path);
+    EXPECT_GE(actual_size, max_message_size);
+}
+
+//==================================================================================================
+TEST_F(LoggerTest, RolloverCompressedFailed)
+{
+    m_logger_config = std::make_shared<TestLoggerConfig>(true);
+    m_huffman_config = std::make_shared<BadHuffmanConfig>();
+
+    m_logger =
+        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_huffman_config, m_path);
+    ASSERT_TRUE(m_logger->start());
+    fly::Logger::set_instance(m_logger);
+
+    std::filesystem::path path = m_logger->get_log_file_path();
+
+    std::uintmax_t max_log_file_size = m_logger_config->max_log_file_size();
+    std::uint32_t max_message_size = m_logger_config->max_message_size();
+
+    std::string random = fly::String::generate_random_string(max_message_size);
+
+    std::uintmax_t expected_size = log_size(random);
+    std::uintmax_t count = 0;
+
+    // Create enough log points to fill the log file, plus some extra to start filling a second log.
+    while (++count < ((max_log_file_size / expected_size) + 10))
+    {
+        LOGD("%s", random);
+        m_task_runner->wait_for_task_to_complete<fly::LoggerTask>();
+    }
+
+    EXPECT_NE(path, m_logger->get_log_file_path());
+    ASSERT_TRUE(std::filesystem::exists(path));
 
     std::uintmax_t actual_size = std::filesystem::file_size(path);
     EXPECT_GE(actual_size, max_message_size);

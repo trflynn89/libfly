@@ -24,6 +24,11 @@ public:
     LoggerConfig() noexcept;
 
     /**
+     * @return True if log files should be compressed after reaching the max log file size.
+     */
+    bool compress_log_files() const;
+
+    /**
      * @return Max log file size (in bytes) before rotating the log file.
      */
     std::uintmax_t max_log_file_size() const;
@@ -39,6 +44,7 @@ public:
     std::chrono::milliseconds queue_wait_time() const;
 
 protected:
+    bool m_default_compress_log_files;
     std::uintmax_t m_default_max_log_file_size;
     std::uint32_t m_default_max_message_size;
     std::chrono::milliseconds::rep m_default_queue_wait_time;
