@@ -113,7 +113,8 @@ TEST_F(JsonParserTest, NstJsonTestSuiteParsing)
     // Indeterminate files expected to pass
     std::vector<std::string> i_pass = {
         "i_structure_500_nested_arrays.json", // No enforced depth limit
-        "i_structure_UTF-8_BOM_empty_object.json", // Byte order mark ignored
+        "i_structure_UTF-8_BOM_empty_object.json", // Byte order mark is handled
+        "i_string_UTF-16LE_with_BOM.json", // Byte order mark is handled
     };
 
     // JSONTestSuite contains test files that aren't only objects or arrays.
@@ -185,6 +186,98 @@ TEST_F(JsonParserTest, AllUnicode)
 
     fly::Json values = std::move(parsed.value());
     EXPECT_EQ(values.size(), 1112064);
+}
+
+//==================================================================================================
+TEST_F(JsonParserTest, UTF8)
+{
+    const auto here = std::filesystem::path(__FILE__);
+    const auto path = here.parent_path() / "json" / "unicode";
+
+    auto parsed = m_parser.parse_file(path / "utf_8.json");
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
+    ASSERT_EQ(values.size(), 1);
+
+    fly::Json encoded_encoding = values["encoding"];
+    EXPECT_EQ(encoded_encoding, "UTF-8");
+}
+
+//==================================================================================================
+TEST_F(JsonParserTest, UTF16BigEndian)
+{
+    const auto here = std::filesystem::path(__FILE__);
+    const auto path = here.parent_path() / "json" / "unicode";
+
+    auto parsed = m_parser.parse_file(path / "utf_16_big_endian.json");
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
+    ASSERT_EQ(values.size(), 1);
+
+    fly::Json encoded_encoding = values["encoding"];
+    EXPECT_EQ(encoded_encoding, "UTF-16 BE");
+
+    parsed = m_parser.parse_file(path / "utf_16_big_endian_invalid.json");
+    ASSERT_FALSE(parsed.has_value());
+}
+
+//==================================================================================================
+TEST_F(JsonParserTest, UTF16LittleEndian)
+{
+    const auto here = std::filesystem::path(__FILE__);
+    const auto path = here.parent_path() / "json" / "unicode";
+
+    auto parsed = m_parser.parse_file(path / "utf_16_little_endian.json");
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
+    ASSERT_EQ(values.size(), 1);
+
+    fly::Json encoded_encoding = values["encoding"];
+    EXPECT_EQ(encoded_encoding, "UTF-16 LE");
+
+    parsed = m_parser.parse_file(path / "utf_16_little_endian_invalid.json");
+    ASSERT_FALSE(parsed.has_value());
+}
+
+//==================================================================================================
+TEST_F(JsonParserTest, UTF32BigEndian)
+{
+    const auto here = std::filesystem::path(__FILE__);
+    const auto path = here.parent_path() / "json" / "unicode";
+
+    auto parsed = m_parser.parse_file(path / "utf_32_big_endian.json");
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
+    ASSERT_EQ(values.size(), 1);
+
+    fly::Json encoded_encoding = values["encoding"];
+    EXPECT_EQ(encoded_encoding, "UTF-32 BE");
+
+    parsed = m_parser.parse_file(path / "utf_32_big_endian_invalid.json");
+    ASSERT_FALSE(parsed.has_value());
+}
+
+//==================================================================================================
+TEST_F(JsonParserTest, UTF32LittleEndian)
+{
+    const auto here = std::filesystem::path(__FILE__);
+    const auto path = here.parent_path() / "json" / "unicode";
+
+    auto parsed = m_parser.parse_file(path / "utf_32_little_endian.json");
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
+    ASSERT_EQ(values.size(), 1);
+
+    fly::Json encoded_encoding = values["encoding"];
+    EXPECT_EQ(encoded_encoding, "UTF-32 LE");
+
+    parsed = m_parser.parse_file(path / "utf_32_big_endian_invalid.json");
+    ASSERT_FALSE(parsed.has_value());
 }
 
 //==================================================================================================
