@@ -158,7 +158,7 @@
     <ClInclude Include="..\..\..\fly\fly.hpp" />
     <ClInclude Include="..\..\..\fly\coders\base64\base64_coder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\coder.hpp" />
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.hpp" />
+    <ClInclude Include="..\..\..\fly\coders\coder_config.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.hpp" />
@@ -218,7 +218,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\coders\base64\base64_coder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\coder.cpp" />
-    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_config.cpp" />
+    <ClCompile Include="..\..\..\fly\coders\coder_config.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_decoder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_encoder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_types.cpp" />

@@ -1,6 +1,6 @@
 #include "fly/logger/logger.hpp"
 
-#include "fly/coders/huffman/huffman_config.hpp"
+#include "fly/coders/coder_config.hpp"
 #include "fly/coders/huffman/huffman_encoder.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/task/task_runner.hpp"
@@ -20,11 +20,11 @@ std::mutex Logger::s_console_mutex;
 Logger::Logger(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
     const std::shared_ptr<LoggerConfig> &logger_config,
-    const std::shared_ptr<HuffmanConfig> &huffman_config,
+    const std::shared_ptr<CoderConfig> &coder_config,
     const std::filesystem::path &logger_directory) noexcept :
     m_task_runner(task_runner),
     m_logger_config(logger_config),
-    m_huffman_config(huffman_config),
+    m_coder_config(coder_config),
     m_log_directory(logger_directory),
     m_index(0),
     m_start_time(std::chrono::high_resolution_clock::now())
@@ -151,7 +151,7 @@ bool Logger::create_log_file()
             std::filesystem::path compressed_log_file = m_log_file;
             compressed_log_file.replace_extension(".log.enc");
 
-            HuffmanEncoder encoder(m_huffman_config);
+            HuffmanEncoder encoder(m_coder_config);
 
             if (encoder.encode_file(m_log_file, compressed_log_file))
             {

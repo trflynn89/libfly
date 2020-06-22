@@ -10,7 +10,7 @@
 namespace fly {
 
 class BitStreamWriter;
-class HuffmanConfig;
+class CoderConfig;
 
 /**
  * Implementation of the Encoder interface for Huffman coding. Forms length-limted, canonical
@@ -25,9 +25,9 @@ public:
     /**
      * Constructor.
      *
-     * @param config Reference to Huffman configuration.
+     * @param config Reference to coder configuration.
      */
-    explicit HuffmanEncoder(const std::shared_ptr<HuffmanConfig> &config) noexcept;
+    explicit HuffmanEncoder(const std::shared_ptr<CoderConfig> &config) noexcept;
 
 protected:
     /**
