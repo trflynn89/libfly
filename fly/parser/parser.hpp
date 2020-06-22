@@ -16,19 +16,6 @@ namespace fly {
  * Virtual interface to parse a file or string. Parsers for specific formats should inherit from
  * this class.
  *
- * The parser will handle several encodings determined by the file's byte order mark (if present).
- * If a BOM is not present, the parser will assume UTF-8 encoding. The following encodings are
- * supported:
- *
- *     1. UTF-8
- *     2. UTF-16 big endian
- *     3. UTF-16 little endian
- *     4. UTF-32 big endian
- *     5. UTF-32 little endian
- *
- * Any file or string which is not encoded with UTF-8 will first be converted to a UTF-8 encoded
- * string before being passed to concrete parsers.
- *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 18, 2016
  */
@@ -41,16 +28,52 @@ public:
     virtual ~Parser() = default;
 
     /**
-     * Parse a string and retrieve parsed values.
+     * Parse a string and retrieve the parsed values.
+     *
+     * The encoding of the string is inferred from the templated string type:
+     *
+     *     1. std::string - UTF-8
+     *     2. std::wstring - UTF-16 on Windows, UTF-32 on Linux
+     *     3. std::u16string - UTF-16
+     *     4. std::u32string - UTF-32
+     *
+     * Further, all string types will be checked for the presence of a byte order mark. If a BOM is
+     * not present, the parser will assume UTF-8 encoding. If a BOM is present, the following BOM
+     * representations are supported:
+     *
+     *     1. UTF-8 (0xef 0xbb 0xbf)
+     *     2. UTF-16 big endian (0xfe 0xff)
+     *     3. UTF-16 little endian (0xff 0xfe)
+     *     4. UTF-32 big endian (0x00 0x00 0xfe 0xff)
+     *     5. UTF-32 little endian (0xff 0xfe 0x00 0x00)
+     *
+     * Any string which is not encoded with UTF-8 will first be converted to a UTF-8 encoded string
+     * before being passed to concrete parsers.
+     *
+     * @tparam StringType The type of string to parse.
      *
      * @param contents String contents to parse.
      *
      * @return If successful, the parsed values. Otherwise, an unitialized value.
      */
-    std::optional<Json> parse_string(const std::string &contents);
+    template <typename StringType>
+    std::optional<Json> parse_string(const StringType &contents);
 
     /**
-     * Parse a file and retrieve parsed values.
+     * Parse a file and retrieve the parsed values.
+     *
+     * The encoding of the file is inferred from the presence of a byte order mark. If a BOM is not
+     * present, the parser will assume UTF-8 encoding. If a BOM is present, the following BOM
+     * representations are supported:
+     *
+     *     1. UTF-8 (0xef 0xbb 0xbf)
+     *     2. UTF-16 big endian (0xfe 0xff)
+     *     3. UTF-16 little endian (0xff 0xfe)
+     *     4. UTF-32 big endian (0x00 0x00 0xfe 0xff)
+     *     5. UTF-32 little endian (0xff 0xfe 0x00 0x00)
+     *
+     * Any file which is not encoded with UTF-8 will first be converted to a UTF-8 encoded string
+     * before being passed to concrete parsers.
      *
      * @param path Path to the file to parse.
      *
@@ -60,7 +83,7 @@ public:
 
 protected:
     /**
-     * Parse a stream and retrieve the parsed values.
+     * Parse a UTF-8 encoded stream and retrieve the parsed values.
      *
      * @param stream Stream holding the contents to parse.
      *
@@ -72,6 +95,9 @@ protected:
     std::uint32_t m_column;
 
 private:
+    /**
+     * Enumeration of supported encodings as indicated by a byte order mark.
+     */
     enum class Encoding : std::uint8_t
     {
         UTF8,
@@ -82,7 +108,8 @@ private:
     };
 
     /**
-     * Parse a stream and retrieve the parsed values.
+     * Parse a stream and retrieve the parsed values. Check for the presence of a byte order mark,
+     * and convert the stream to a UTF-8 encoded string before parsing if needed.
      *
      * @param stream Stream holding the contents to parse.
      *
@@ -114,6 +141,29 @@ private:
      */
     Encoding parse_byte_order_mark(std::istream &stream) const;
 };
+
+//==================================================================================================
+template <typename StringType>
+std::optional<Json> Parser::parse_string(const StringType &contents)
+{
+    if constexpr (sizeof(typename StringType::value_type) == 1)
+    {
+        std::istringstream stream(contents);
+        return parse_stream(stream);
+    }
+    else
+    {
+        auto utf8_contents = BasicString<StringType>::template convert<std::string>(contents);
+
+        if (utf8_contents)
+        {
+            std::istringstream utf8_stream(std::move(utf8_contents.value()));
+            return parse_stream(utf8_stream);
+        }
+
+        return std::nullopt;
+    }
+}
 
 //==================================================================================================
 template <typename StringType, Endian Endianness>

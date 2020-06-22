@@ -189,7 +189,22 @@ TEST_F(JsonParserTest, AllUnicode)
 }
 
 //==================================================================================================
-TEST_F(JsonParserTest, UTF8)
+TEST_F(JsonParserTest, UTF8String)
+{
+    const std::string contents(u8"{\"encoding\": \"UTF-8\"}");
+
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
+    ASSERT_EQ(values.size(), 1);
+
+    fly::Json encoded_encoding = values["encoding"];
+    EXPECT_EQ(encoded_encoding, "UTF-8");
+}
+
+//==================================================================================================
+TEST_F(JsonParserTest, UTF8File)
 {
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "unicode";
@@ -205,7 +220,25 @@ TEST_F(JsonParserTest, UTF8)
 }
 
 //==================================================================================================
-TEST_F(JsonParserTest, UTF16BigEndian)
+TEST_F(JsonParserTest, UTF16String)
+{
+    const std::u16string contents(u"{\"encoding\": \"UTF-16\"}");
+
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
+    ASSERT_EQ(values.size(), 1);
+
+    fly::Json encoded_encoding = values["encoding"];
+    EXPECT_EQ(encoded_encoding, "UTF-16");
+
+    parsed = m_parser.parse_string(std::u16string(1, 0xd800));
+    ASSERT_FALSE(parsed.has_value());
+}
+
+//==================================================================================================
+TEST_F(JsonParserTest, UTF16BigEndianFile)
 {
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "unicode";
@@ -224,7 +257,7 @@ TEST_F(JsonParserTest, UTF16BigEndian)
 }
 
 //==================================================================================================
-TEST_F(JsonParserTest, UTF16LittleEndian)
+TEST_F(JsonParserTest, UTF16LittleEndianFile)
 {
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "unicode";
@@ -243,7 +276,25 @@ TEST_F(JsonParserTest, UTF16LittleEndian)
 }
 
 //==================================================================================================
-TEST_F(JsonParserTest, UTF32BigEndian)
+TEST_F(JsonParserTest, UTF32String)
+{
+    const std::u32string contents(U"{\"encoding\": \"UTF-32\"}");
+
+    auto parsed = m_parser.parse_string(contents);
+    ASSERT_TRUE(parsed.has_value());
+
+    fly::Json values = std::move(parsed.value());
+    ASSERT_EQ(values.size(), 1);
+
+    fly::Json encoded_encoding = values["encoding"];
+    EXPECT_EQ(encoded_encoding, "UTF-32");
+
+    parsed = m_parser.parse_string(std::u32string(1, 0xd800));
+    ASSERT_FALSE(parsed.has_value());
+}
+
+//==================================================================================================
+TEST_F(JsonParserTest, UTF32BigEndianFile)
 {
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "unicode";
@@ -262,7 +313,7 @@ TEST_F(JsonParserTest, UTF32BigEndian)
 }
 
 //==================================================================================================
-TEST_F(JsonParserTest, UTF32LittleEndian)
+TEST_F(JsonParserTest, UTF32LittleEndianFile)
 {
     const auto here = std::filesystem::path(__FILE__);
     const auto path = here.parent_path() / "json" / "unicode";

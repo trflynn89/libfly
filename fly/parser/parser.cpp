@@ -6,13 +6,6 @@
 namespace fly {
 
 //==================================================================================================
-std::optional<Json> Parser::parse_string(const std::string &contents)
-{
-    std::istringstream stream(contents);
-    return parse_stream(stream);
-}
-
-//==================================================================================================
 std::optional<Json> Parser::parse_file(const std::filesystem::path &path)
 {
     std::ifstream stream(path);
