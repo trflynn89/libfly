@@ -26,9 +26,10 @@ struct EndianTraits
      * Define a trait for testing if type T is an integral type.
      */
     template <typename T>
-    using is_supported_integer = std::bool_constant<
-        std::is_integral_v<std::decay_t<T>> && !std::is_same_v<bool, std::decay_t<T>> &&
-        is_supported_size_v<std::decay_t<T>>>;
+    using is_supported_integer = std::conjunction<
+        std::is_integral<std::decay_t<T>>,
+        std::negation<std::is_same<bool, std::decay_t<T>>>,
+        is_supported_size<std::decay_t<T>>>;
 
     template <typename T>
     constexpr inline static bool is_supported_integer_v = is_supported_integer<T>::value;

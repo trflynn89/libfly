@@ -64,9 +64,10 @@ struct JsonTraits
      * Define a trait for testing if type T is a signed JSON number.
      */
     template <typename T>
-    using is_signed_integer = std::bool_constant<
-        std::is_integral_v<std::decay_t<T>> && std::is_signed_v<std::decay_t<T>> &&
-        !std::is_same_v<bool, std::decay_t<T>>>;
+    using is_signed_integer = std::conjunction<
+        std::is_integral<std::decay_t<T>>,
+        std::is_signed<std::decay_t<T>>,
+        std::negation<std::is_same<bool, std::decay_t<T>>>>;
 
     template <typename T>
     inline static constexpr bool is_signed_integer_v = is_signed_integer<T>::value;
@@ -75,9 +76,10 @@ struct JsonTraits
      * Define a trait for testing if type T is an unsigned JSON number.
      */
     template <typename T>
-    using is_unsigned_integer = std::bool_constant<
-        std::is_integral_v<std::decay_t<T>> && std::is_unsigned_v<std::decay_t<T>> &&
-        !std::is_same_v<bool, std::decay_t<T>>>;
+    using is_unsigned_integer = std::conjunction<
+        std::is_integral<std::decay_t<T>>,
+        std::is_unsigned<std::decay_t<T>>,
+        std::negation<std::is_same<bool, std::decay_t<T>>>>;
 
     template <typename T>
     inline static constexpr bool is_unsigned_integer_v = is_unsigned_integer<T>::value;
@@ -95,9 +97,10 @@ struct JsonTraits
      * Define a trait for testing if type T is any JSON number type.
      */
     template <typename T>
-    using is_number = std::bool_constant<
-        is_signed_integer_v<std::decay_t<T>> || is_unsigned_integer_v<std::decay_t<T>> ||
-        is_floating_point_v<std::decay_t<T>>>;
+    using is_number = std::disjunction<
+        is_signed_integer<std::decay_t<T>>,
+        is_unsigned_integer<std::decay_t<T>>,
+        is_floating_point<std::decay_t<T>>>;
 
     template <typename T>
     inline static constexpr bool is_number_v = is_number<T>::value;
@@ -140,7 +143,7 @@ struct JsonTraits
      * Define a trait for testing if type T is a JSON object.
      */
     template <typename T>
-    using is_object = ObjectTraits::IsObject<T>;
+    using is_object = ObjectTraits::IsObject<std::decay_t<T>>;
 
     template <typename T>
     inline static constexpr bool is_object_v = is_object<T>::value;
@@ -290,7 +293,7 @@ struct JsonTraits
      * Define a trait for testing if type T is a JSON array.
      */
     template <typename T>
-    using is_array = ArrayTraits::IsArray<T>;
+    using is_array = ArrayTraits::IsArray<std::decay_t<T>>;
 
     template <typename T>
     inline static constexpr bool is_array_v = is_array<T>::value;
@@ -299,8 +302,7 @@ struct JsonTraits
      * Define a trait for testing if type T is an iterable JSON type.
      */
     template <typename T>
-    using is_iterable =
-        std::bool_constant<is_object_v<std::decay_t<T>> || is_array_v<std::decay_t<T>>>;
+    using is_iterable = std::disjunction<is_object<T>, is_array<T>>;
 
     template <typename T>
     inline static constexpr bool is_iterable_v = is_iterable<T>::value;

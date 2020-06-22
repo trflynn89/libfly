@@ -15,10 +15,10 @@ namespace fly::detail {
  * Helper class for decoding and encoding Unicode codepoints in a std::basic_string<>. The exact
  * encoding depends on the template type StringType:
  *
- *     1. std::string - UTF-8 encoding.
- *     2. std::wstring - UTF-16 on Windows, UTF-32 on Linux.
- *     3. std::u16string - UTF-16 encoding.
- *     4. std::u32string - UTF-32 encoding.
+ *     1. std::string - UTF-8
+ *     2. std::wstring - UTF-16 on Windows, UTF-32 on Linux
+ *     3. std::u16string - UTF-16
+ *     4. std::u32string - UTF-32
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version June 6, 2020
@@ -34,6 +34,8 @@ class BasicStringUnicode
 public:
     /**
      * Convert the Unicode encoding of a string to another encoding.
+     *
+     * @tparam DesiredStringType The type of string to convert to.
      *
      * @param it Pointer to the beginning of the encoded Unicode string.
      * @param end Pointer to the end of the encoded Unicode string.

@@ -45,9 +45,7 @@ struct BasicStringTraits
     using ostringstream_type = typename streamer_traits::ostringstream_type;
 
     static_assert(
-        std::is_same_v<StringType, std::string> || std::is_same_v<StringType, std::wstring> ||
-            std::is_same_v<StringType, std::u16string> ||
-            std::is_same_v<StringType, std::u32string>,
+        any_same_v<StringType, std::string, std::wstring, std::u16string, std::u32string>,
         "StringType must be a standard std::basic_string<> specialization");
 
     /**
@@ -55,10 +53,7 @@ struct BasicStringTraits
      * StringType.
      */
     template <typename T>
-    using is_string_like = std::bool_constant<
-        std::is_same_v<char_type *, std::decay_t<T>> ||
-        std::is_same_v<char_type const *, std::decay_t<T>> ||
-        std::is_same_v<StringType, std::decay_t<T>>>;
+    using is_string_like = any_same<T, char_type *, char_type const *, StringType>;
 
     template <typename T>
     inline static constexpr bool is_string_like_v = is_string_like<T>::value;
@@ -67,8 +62,7 @@ struct BasicStringTraits
      * Define a trait for testing if the STL has defined the std::stoi family
      * of functions for StringType.
      */
-    using has_stoi_family = std::bool_constant<
-        std::is_same_v<StringType, std::string> || std::is_same_v<StringType, std::wstring>>;
+    using has_stoi_family = any_same<StringType, std::string, std::wstring>;
 
     inline static constexpr bool has_stoi_family_v = has_stoi_family::value;
 
