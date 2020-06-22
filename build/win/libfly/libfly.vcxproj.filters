@@ -85,11 +85,11 @@
     <ClInclude Include="..\..\..\fly\coders\coder.hpp">
       <Filter>coders</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\coder_config.hpp">
+      <Filter>coders</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\coders\base64\base64_coder.hpp">
       <Filter>coders\base64</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.hpp">
-      <Filter>coders\huffman</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.hpp">
       <Filter>coders\huffman</Filter>
@@ -261,11 +261,11 @@
     <ClCompile Include="..\..\..\fly\coders\coder.cpp">
       <Filter>coders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\coder_config.cpp">
+      <Filter>coders</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\fly\coders\base64\base64_coder.cpp">
       <Filter>coders\base64</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_config.cpp">
-      <Filter>coders\huffman</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_decoder.cpp">
       <Filter>coders\huffman</Filter>

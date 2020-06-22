@@ -1,6 +1,6 @@
 #include "fly/logger/logger.hpp"
 
-#include "fly/coders/huffman/huffman_config.hpp"
+#include "fly/coders/coder_config.hpp"
 #include "fly/coders/huffman/huffman_decoder.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/task/task_manager.hpp"
@@ -37,15 +37,15 @@ public:
 };
 
 /**
- * Subclass of the Huffman coder config to contain invalid values.
+ * Subclass of the coder config to contain invalid values.
  */
-class BadHuffmanConfig : public fly::HuffmanConfig
+class BadCoderConfig : public fly::CoderConfig
 {
 public:
-    BadHuffmanConfig() noexcept : fly::HuffmanConfig()
+    BadCoderConfig() noexcept : fly::CoderConfig()
     {
-        m_default_encoder_max_code_length =
-            std::numeric_limits<decltype(m_default_encoder_max_code_length)>::max();
+        m_default_huffman_encoder_max_code_length =
+            std::numeric_limits<decltype(m_default_huffman_encoder_max_code_length)>::max();
     }
 };
 
@@ -62,10 +62,10 @@ public:
         m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
         m_logger_config(std::make_shared<TestLoggerConfig>(false)),
-        m_huffman_config(std::make_shared<fly::HuffmanConfig>()),
+        m_coder_config(std::make_shared<fly::CoderConfig>()),
 
         m_logger(
-            std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_huffman_config, m_path))
+            std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_coder_config, m_path))
     {
     }
 
@@ -175,7 +175,7 @@ protected:
     std::shared_ptr<fly::WaitableSequencedTaskRunner> m_task_runner;
 
     std::shared_ptr<fly::LoggerConfig> m_logger_config;
-    std::shared_ptr<fly::HuffmanConfig> m_huffman_config;
+    std::shared_ptr<fly::CoderConfig> m_coder_config;
 
     std::shared_ptr<fly::Logger> m_logger;
 };
@@ -198,7 +198,7 @@ TEST_F(LoggerTest, BadFilePath)
     m_logger = std::make_shared<fly::Logger>(
         m_task_runner,
         m_logger_config,
-        m_huffman_config,
+        m_coder_config,
         fly::PathUtil::generate_temp_directory());
 
     EXPECT_FALSE(m_logger->start());
@@ -328,7 +328,7 @@ TEST_F(LoggerTest, RolloverCompressed)
     m_logger_config = std::make_shared<TestLoggerConfig>(true);
 
     m_logger =
-        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_huffman_config, m_path);
+        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_coder_config, m_path);
     ASSERT_TRUE(m_logger->start());
     fly::Logger::set_instance(m_logger);
 
@@ -368,10 +368,10 @@ TEST_F(LoggerTest, RolloverCompressed)
 TEST_F(LoggerTest, RolloverCompressedFailed)
 {
     m_logger_config = std::make_shared<TestLoggerConfig>(true);
-    m_huffman_config = std::make_shared<BadHuffmanConfig>();
+    m_coder_config = std::make_shared<BadCoderConfig>();
 
     m_logger =
-        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_huffman_config, m_path);
+        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_coder_config, m_path);
     ASSERT_TRUE(m_logger->start());
     fly::Logger::set_instance(m_logger);
 

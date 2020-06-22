@@ -1,6 +1,6 @@
 #include "fly/coders/huffman/huffman_encoder.hpp"
 
-#include "fly/coders/huffman/huffman_config.hpp"
+#include "fly/coders/coder_config.hpp"
 #include "fly/logger/logger.hpp"
 #include "fly/types/bit_stream/bit_stream_writer.hpp"
 #include "fly/types/numeric/literals.hpp"
@@ -19,9 +19,9 @@ namespace {
 } // namespace
 
 //==================================================================================================
-HuffmanEncoder::HuffmanEncoder(const std::shared_ptr<HuffmanConfig> &config) noexcept :
-    m_chunk_size(config->encoder_chunk_size()),
-    m_max_code_length(config->encoder_max_code_length()),
+HuffmanEncoder::HuffmanEncoder(const std::shared_ptr<CoderConfig> &config) noexcept :
+    m_chunk_size(config->huffman_encoder_chunk_size()),
+    m_max_code_length(config->huffman_encoder_max_code_length()),
     m_huffman_codes_size(0)
 {
 }

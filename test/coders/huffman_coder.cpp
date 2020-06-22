@@ -1,4 +1,4 @@
-#include "fly/coders/huffman/huffman_config.hpp"
+#include "fly/coders/coder_config.hpp"
 #include "fly/coders/huffman/huffman_decoder.hpp"
 #include "fly/coders/huffman/huffman_encoder.hpp"
 #include "fly/types/bit_stream/bit_stream_writer.hpp"
@@ -17,27 +17,27 @@
 namespace {
 
 /**
- * Subclass of the Huffman coder config to contain invalid values.
+ * Subclass of the coder config to contain invalid values.
  */
-class BadHuffmanConfig : public fly::HuffmanConfig
+class BadCoderConfig : public fly::CoderConfig
 {
 public:
-    BadHuffmanConfig() noexcept : fly::HuffmanConfig()
+    BadCoderConfig() noexcept : fly::CoderConfig()
     {
-        m_default_encoder_max_code_length =
-            std::numeric_limits<decltype(m_default_encoder_max_code_length)>::max();
+        m_default_huffman_encoder_max_code_length =
+            std::numeric_limits<decltype(m_default_huffman_encoder_max_code_length)>::max();
     }
 };
 
 /**
  * Subclass of the Huffman coder config to reduce Huffman code lengths.
  */
-class SmallCodeLengthConfig : public fly::HuffmanConfig
+class SmallCodeLengthConfig : public fly::CoderConfig
 {
 public:
-    SmallCodeLengthConfig() noexcept : fly::HuffmanConfig()
+    SmallCodeLengthConfig() noexcept : fly::CoderConfig()
     {
-        m_default_encoder_max_code_length = 3;
+        m_default_huffman_encoder_max_code_length = 3;
     }
 };
 
@@ -49,7 +49,7 @@ namespace fly {
 class HuffmanCoderTest : public ::testing::Test
 {
 public:
-    HuffmanCoderTest() : m_config(std::make_shared<fly::HuffmanConfig>()), m_encoder(m_config)
+    HuffmanCoderTest() : m_config(std::make_shared<fly::CoderConfig>()), m_encoder(m_config)
     {
     }
 
@@ -96,7 +96,7 @@ protected:
         return codes;
     }
 
-    std::shared_ptr<fly::HuffmanConfig> m_config;
+    std::shared_ptr<fly::CoderConfig> m_config;
     fly::HuffmanEncoder m_encoder;
     fly::HuffmanDecoder m_decoder;
 };
@@ -107,7 +107,7 @@ TEST_F(HuffmanCoderTest, InvalidConfig)
     const std::string raw;
     std::string enc;
 
-    auto config = std::make_shared<BadHuffmanConfig>();
+    auto config = std::make_shared<BadCoderConfig>();
     fly::HuffmanEncoder encoder(config);
 
     EXPECT_FALSE(encoder.encode_string(raw, enc));
@@ -426,12 +426,12 @@ TEST_F(HuffmanCoderTest, LengthLimited)
     EXPECT_EQ(raw, dec);
 
     // Validate the Kraft–McMillan inequality.
-    const std::uint16_t max_allowed_kraft = (1_u16 << config->encoder_max_code_length()) - 1;
+    const auto max_allowed_kraft = (1_u16 << config->huffman_encoder_max_code_length()) - 1;
     std::uint16_t kraft = 0_u16;
 
     for (const HuffmanCode &code : get_decoded_huffman_codes())
     {
-        kraft += 1_u16 << (config->encoder_max_code_length() - code.m_length);
+        kraft += 1_u16 << (config->huffman_encoder_max_code_length() - code.m_length);
     }
 
     EXPECT_LE(kraft, max_allowed_kraft);
