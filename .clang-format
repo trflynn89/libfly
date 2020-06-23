@@ -64,14 +64,12 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: '^(<|")(fly|test)/'
     Priority: 2
-  - Regex: '^(<|")(Qt[[:alnum:]]+)/'
+  - Regex: '^(<|")(gtest|gmock|catch2)/'
     Priority: 3
-  - Regex: '^(<|")(gtest|gmock)/'
-    Priority: 4
   - Regex: '<[[:alnum:]./_]+\.h>'
-    Priority: 5
+    Priority: 4
   - Regex: '<[[:alnum:]./_]+>'
-    Priority: 6
+    Priority: 5
 IndentCaseLabels: true
 IndentGotoLabels: false
 IndentPPDirectives: AfterHash
