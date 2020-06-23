@@ -39,6 +39,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\test\main.cpp" />
     <ClCompile Include="..\..\..\test\coders\base64_coder.cpp">
       <Filter>coders</Filter>
     </ClCompile>
@@ -52,9 +53,6 @@
       <Filter>config</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest-all.cc">
-      <Filter>googletest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest_main.cc">
       <Filter>googletest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\logger\logger.cpp">

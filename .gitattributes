@@ -10,12 +10,6 @@
 *.h++ text eol=lf diff=cpp
 *.json text eol=lf
 
-# Qt files
-*.creator text eol=lf
-*.files text eol=lf
-*.qrc text eol=lf
-*.ui text eol=lf
-
 # Build files
 Makefile text eol=lf
 *.mk text eol=lf

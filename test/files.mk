@@ -33,13 +33,14 @@ SRC_DIRS_$(d) += \
 # Define source files
 SRC_$(d) := \
     $(d)/googletest/googletest/src/gtest-all.cc \
-    $(d)/googletest/googletest/src/gtest_main.cc
+    $(d)/main.cpp
 
 # Define the list of available mocked system calls
 SYSTEM_CALLS_$(d) := \
     ${shell grep -ohP "(?<=__wrap_)[a-zA-Z0-9_]+" "$(d)/mock/nix/mock_calls.cpp"}
 
 # Define compiler flags
+CXXFLAGS_$(d) += -I$(SOURCE_ROOT)/test/Catch2/single_include
 CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
 CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest
 
