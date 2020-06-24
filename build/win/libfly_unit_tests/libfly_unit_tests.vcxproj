@@ -232,7 +232,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\config\test_config.hpp" />
-    <ClInclude Include="..\..\..\test\types\string_test.hpp" />
     <ClInclude Include="..\..\..\test\util\capture_stream.hpp" />
     <ClInclude Include="..\..\..\test\util\path_util.hpp" />
     <ClInclude Include="..\..\..\test\util\waitable_task_runner.hpp" />
