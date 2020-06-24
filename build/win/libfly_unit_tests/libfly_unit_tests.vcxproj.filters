@@ -138,9 +138,6 @@
     <ClInclude Include="..\..\..\test\config\test_config.hpp">
       <Filter>config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\test\types\string_test.hpp">
-      <Filter>types</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\test\util\capture_stream.hpp">
       <Filter>util</Filter>
     </ClInclude>

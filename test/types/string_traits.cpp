@@ -2,16 +2,29 @@
 
 #include "fly/traits/traits.hpp"
 #include "fly/types/string/string_literal.hpp"
-#include "test/types/string_test.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include <string>
 #include <type_traits>
 
 namespace {
 
-//==================================================================================================
+template <typename StringType>
+struct Streamable
+{
+    using ostream_type = typename fly::detail::BasicStringTraits<StringType>::ostream_type;
+
+    friend ostream_type &operator<<(ostream_type &stream, const Streamable &)
+    {
+        return stream;
+    }
+};
+
+struct NotStreamable
+{
+};
+
 template <
     typename T,
     fly::enable_if_any<
@@ -24,7 +37,6 @@ constexpr bool is_string_like(const T &)
     return true;
 }
 
-//==================================================================================================
 template <
     typename T,
     fly::enable_if_none<
@@ -37,7 +49,6 @@ constexpr bool is_string_like(const T &)
     return false;
 }
 
-//==================================================================================================
 template <
     typename StringType,
     fly::enable_if_all<typename fly::detail::BasicStringTraits<StringType>::has_stoi_family> = 0>
@@ -46,7 +57,6 @@ constexpr int call_stoi(const StringType &str)
     return std::stoi(str);
 }
 
-//==================================================================================================
 template <
     typename StringType,
     fly::enable_if_not_all<typename fly::detail::BasicStringTraits<StringType>::has_stoi_family> =
@@ -58,172 +68,182 @@ constexpr int call_stoi(const StringType &)
 
 } // namespace
 
-//==================================================================================================
-TYPED_TEST(BasicStringTest, StoiFamily)
+TEMPLATE_TEST_CASE(
+    "BasicStringTraits",
+    "[string]",
+    std::string,
+    std::wstring,
+    std::u16string,
+    std::u32string)
 {
-    DECLARE_ALIASES
+    using StringType = TestType;
+    using traits = typename fly::detail::BasicStringTraits<StringType>;
+    using char_type = typename traits::char_type;
+    using char_pointer_type = typename std::add_pointer<char_type>::type;
+    using streamed_type = typename traits::streamed_type;
 
-    constexpr bool is_string = std::is_same_v<string_type, std::string>;
-    constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
+    constexpr bool is_string = std::is_same_v<StringType, std::string>;
+    constexpr bool is_wstring = std::is_same_v<StringType, std::wstring>;
+    constexpr bool is_string16 = std::is_same_v<StringType, std::u16string>;
+    constexpr bool is_string32 = std::is_same_v<StringType, std::u32string>;
 
-    EXPECT_EQ(traits::has_stoi_family_v, is_string || is_wstring);
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, StoiFamilySFINAE)
-{
-    DECLARE_ALIASES
-
-    constexpr bool is_string = std::is_same_v<string_type, std::string>;
-    constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
-
-    const string_type s = FLY_STR(char_type, "123");
-    const int i = call_stoi(s);
-
-    if constexpr (is_string || is_wstring)
+    SECTION("Check whether the STL defines the std::stoi family of functions via traits")
     {
-        EXPECT_EQ(i, 123);
+        CHECK(traits::has_stoi_family_v == (is_string || is_wstring));
     }
-    else
+
+    SECTION("Check whether the STL defines the std::stoi family of functions via SFINAE overloads")
     {
-        EXPECT_EQ(i, -1);
+        const StringType s = FLY_STR(char_type, "123");
+        const int i = call_stoi(s);
+
+        if constexpr (is_string || is_wstring)
+        {
+            CHECK(i == 123);
+        }
+        else
+        {
+            CHECK(i == -1);
+        }
     }
-}
 
-//==================================================================================================
-TYPED_TEST(BasicStringTest, StringLike)
-{
-    DECLARE_ALIASES
+    SECTION("Check whether types are string-like via traits")
+    {
+        SECTION("Plain data types")
+        {
+            CHECK_FALSE(traits::template is_string_like_v<int>);
+            CHECK_FALSE(traits::template is_string_like_v<const int>);
+            CHECK_FALSE(traits::template is_string_like_v<int const>);
 
-    constexpr bool is_string = std::is_same_v<string_type, std::string>;
-    constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
-    constexpr bool is_string16 = std::is_same_v<string_type, std::u16string>;
-    constexpr bool is_string32 = std::is_same_v<string_type, std::u32string>;
+            CHECK_FALSE(traits::template is_string_like_v<char>);
+            CHECK_FALSE(traits::template is_string_like_v<const char>);
+            CHECK_FALSE(traits::template is_string_like_v<char const>);
 
-    EXPECT_FALSE(traits::template is_string_like_v<int>);
-    EXPECT_FALSE(traits::template is_string_like_v<const int>);
-    EXPECT_FALSE(traits::template is_string_like_v<int const>);
+            CHECK_FALSE(traits::template is_string_like_v<wchar_t>);
+            CHECK_FALSE(traits::template is_string_like_v<const wchar_t>);
+            CHECK_FALSE(traits::template is_string_like_v<wchar_t const>);
 
-    EXPECT_FALSE(traits::template is_string_like_v<char>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char>);
-    EXPECT_FALSE(traits::template is_string_like_v<char const>);
+            CHECK_FALSE(traits::template is_string_like_v<char16_t>);
+            CHECK_FALSE(traits::template is_string_like_v<const char16_t>);
+            CHECK_FALSE(traits::template is_string_like_v<char16_t const>);
 
-    EXPECT_FALSE(traits::template is_string_like_v<wchar_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<const wchar_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<wchar_t const>);
+            CHECK_FALSE(traits::template is_string_like_v<char32_t>);
+            CHECK_FALSE(traits::template is_string_like_v<const char32_t>);
+            CHECK_FALSE(traits::template is_string_like_v<char32_t const>);
 
-    EXPECT_FALSE(traits::template is_string_like_v<char16_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char16_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<char16_t const>);
+            CHECK_FALSE(traits::template is_string_like_v<char &>);
+            CHECK_FALSE(traits::template is_string_like_v<const char &>);
+            CHECK_FALSE(traits::template is_string_like_v<char const &>);
 
-    EXPECT_FALSE(traits::template is_string_like_v<char32_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char32_t>);
-    EXPECT_FALSE(traits::template is_string_like_v<char32_t const>);
+            CHECK_FALSE(traits::template is_string_like_v<wchar_t &>);
+            CHECK_FALSE(traits::template is_string_like_v<const wchar_t &>);
+            CHECK_FALSE(traits::template is_string_like_v<wchar_t const &>);
 
-    EXPECT_FALSE(traits::template is_string_like_v<char &>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char &>);
-    EXPECT_FALSE(traits::template is_string_like_v<char const &>);
+            CHECK_FALSE(traits::template is_string_like_v<char16_t &>);
+            CHECK_FALSE(traits::template is_string_like_v<const char16_t &>);
+            CHECK_FALSE(traits::template is_string_like_v<char16_t const &>);
 
-    EXPECT_FALSE(traits::template is_string_like_v<wchar_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<const wchar_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<wchar_t const &>);
+            CHECK_FALSE(traits::template is_string_like_v<char32_t &>);
+            CHECK_FALSE(traits::template is_string_like_v<const char32_t &>);
+            CHECK_FALSE(traits::template is_string_like_v<char32_t const &>);
+        }
 
-    EXPECT_FALSE(traits::template is_string_like_v<char16_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char16_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<char16_t const &>);
+        SECTION("C-string types")
+        {
+            CHECK(traits::template is_string_like_v<char *> == is_string);
+            CHECK(traits::template is_string_like_v<const char *> == is_string);
+            CHECK(traits::template is_string_like_v<char const *> == is_string);
 
-    EXPECT_FALSE(traits::template is_string_like_v<char32_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<const char32_t &>);
-    EXPECT_FALSE(traits::template is_string_like_v<char32_t const &>);
+            CHECK(traits::template is_string_like_v<wchar_t *> == is_wstring);
+            CHECK(traits::template is_string_like_v<const wchar_t *> == is_wstring);
+            CHECK(traits::template is_string_like_v<wchar_t const *> == is_wstring);
 
-    EXPECT_EQ(traits::template is_string_like_v<char *>, is_string);
-    EXPECT_EQ(traits::template is_string_like_v<const char *>, is_string);
-    EXPECT_EQ(traits::template is_string_like_v<char const *>, is_string);
+            CHECK(traits::template is_string_like_v<char16_t *> == is_string16);
+            CHECK(traits::template is_string_like_v<const char16_t *> == is_string16);
+            CHECK(traits::template is_string_like_v<char16_t const *> == is_string16);
 
-    EXPECT_EQ(traits::template is_string_like_v<wchar_t *>, is_wstring);
-    EXPECT_EQ(traits::template is_string_like_v<const wchar_t *>, is_wstring);
-    EXPECT_EQ(traits::template is_string_like_v<wchar_t const *>, is_wstring);
+            CHECK(traits::template is_string_like_v<char32_t *> == is_string32);
+            CHECK(traits::template is_string_like_v<const char32_t *> == is_string32);
+            CHECK(traits::template is_string_like_v<char32_t const *> == is_string32);
+        }
 
-    EXPECT_EQ(traits::template is_string_like_v<char16_t *>, is_string16);
-    EXPECT_EQ(traits::template is_string_like_v<const char16_t *>, is_string16);
-    EXPECT_EQ(traits::template is_string_like_v<char16_t const *>, is_string16);
+        SECTION("C++-string types")
+        {
+            CHECK(traits::template is_string_like_v<std::string> == is_string);
+            CHECK(traits::template is_string_like_v<const std::string> == is_string);
+            CHECK(traits::template is_string_like_v<std::string const> == is_string);
 
-    EXPECT_EQ(traits::template is_string_like_v<char32_t *>, is_string32);
-    EXPECT_EQ(traits::template is_string_like_v<const char32_t *>, is_string32);
-    EXPECT_EQ(traits::template is_string_like_v<char32_t const *>, is_string32);
+            CHECK(traits::template is_string_like_v<std::wstring> == is_wstring);
+            CHECK(traits::template is_string_like_v<const std::wstring> == is_wstring);
+            CHECK(traits::template is_string_like_v<std::wstring const> == is_wstring);
 
-    EXPECT_EQ(traits::template is_string_like_v<std::string>, is_string);
-    EXPECT_EQ(traits::template is_string_like_v<const std::string>, is_string);
-    EXPECT_EQ(traits::template is_string_like_v<std::string const>, is_string);
+            CHECK(traits::template is_string_like_v<std::u16string> == is_string16);
+            CHECK(traits::template is_string_like_v<const std::u16string> == is_string16);
+            CHECK(traits::template is_string_like_v<std::u16string const> == is_string16);
 
-    EXPECT_EQ(traits::template is_string_like_v<std::wstring>, is_wstring);
-    EXPECT_EQ(traits::template is_string_like_v<const std::wstring>, is_wstring);
-    EXPECT_EQ(traits::template is_string_like_v<std::wstring const>, is_wstring);
+            CHECK(traits::template is_string_like_v<std::u32string> == is_string32);
+            CHECK(traits::template is_string_like_v<const std::u32string> == is_string32);
+            CHECK(traits::template is_string_like_v<std::u32string const> == is_string32);
+        }
 
-    EXPECT_EQ(traits::template is_string_like_v<std::u16string>, is_string16);
-    EXPECT_EQ(traits::template is_string_like_v<const std::u16string>, is_string16);
-    EXPECT_EQ(traits::template is_string_like_v<std::u16string const>, is_string16);
+        SECTION("C++-string type references")
+        {
+            CHECK(traits::template is_string_like_v<std::string &> == is_string);
+            CHECK(traits::template is_string_like_v<const std::string &> == is_string);
+            CHECK(traits::template is_string_like_v<std::string const &> == is_string);
 
-    EXPECT_EQ(traits::template is_string_like_v<std::u32string>, is_string32);
-    EXPECT_EQ(traits::template is_string_like_v<const std::u32string>, is_string32);
-    EXPECT_EQ(traits::template is_string_like_v<std::u32string const>, is_string32);
+            CHECK(traits::template is_string_like_v<std::wstring &> == is_wstring);
+            CHECK(traits::template is_string_like_v<const std::wstring &> == is_wstring);
+            CHECK(traits::template is_string_like_v<std::wstring const &> == is_wstring);
 
-    EXPECT_EQ(traits::template is_string_like_v<std::string &>, is_string);
-    EXPECT_EQ(traits::template is_string_like_v<const std::string &>, is_string);
-    EXPECT_EQ(traits::template is_string_like_v<std::string const &>, is_string);
+            CHECK(traits::template is_string_like_v<std::u16string &> == is_string16);
+            CHECK(traits::template is_string_like_v<const std::u16string &> == is_string16);
+            CHECK(traits::template is_string_like_v<std::u16string const &> == is_string16);
 
-    EXPECT_EQ(traits::template is_string_like_v<std::wstring &>, is_wstring);
-    EXPECT_EQ(traits::template is_string_like_v<const std::wstring &>, is_wstring);
-    EXPECT_EQ(traits::template is_string_like_v<std::wstring const &>, is_wstring);
+            CHECK(traits::template is_string_like_v<std::u32string &> == is_string32);
+            CHECK(traits::template is_string_like_v<const std::u32string &> == is_string32);
+            CHECK(traits::template is_string_like_v<std::u32string const &> == is_string32);
+        }
 
-    EXPECT_EQ(traits::template is_string_like_v<std::u16string &>, is_string16);
-    EXPECT_EQ(traits::template is_string_like_v<const std::u16string &>, is_string16);
-    EXPECT_EQ(traits::template is_string_like_v<std::u16string const &>, is_string16);
+        SECTION("C++-string type pointers")
+        {
+            CHECK_FALSE(traits::template is_string_like_v<std::string *>);
+            CHECK_FALSE(traits::template is_string_like_v<const std::string *>);
+            CHECK_FALSE(traits::template is_string_like_v<std::string const *>);
 
-    EXPECT_EQ(traits::template is_string_like_v<std::u32string &>, is_string32);
-    EXPECT_EQ(traits::template is_string_like_v<const std::u32string &>, is_string32);
-    EXPECT_EQ(traits::template is_string_like_v<std::u32string const &>, is_string32);
+            CHECK_FALSE(traits::template is_string_like_v<std::wstring *>);
+            CHECK_FALSE(traits::template is_string_like_v<const std::wstring *>);
+            CHECK_FALSE(traits::template is_string_like_v<std::wstring const *>);
 
-    EXPECT_FALSE(traits::template is_string_like_v<std::string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<const std::string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<std::string const *>);
+            CHECK_FALSE(traits::template is_string_like_v<std::u16string *>);
+            CHECK_FALSE(traits::template is_string_like_v<const std::u16string *>);
+            CHECK_FALSE(traits::template is_string_like_v<std::u16string const *>);
 
-    EXPECT_FALSE(traits::template is_string_like_v<std::wstring *>);
-    EXPECT_FALSE(traits::template is_string_like_v<const std::wstring *>);
-    EXPECT_FALSE(traits::template is_string_like_v<std::wstring const *>);
+            CHECK_FALSE(traits::template is_string_like_v<std::u32string *>);
+            CHECK_FALSE(traits::template is_string_like_v<const std::u32string *>);
+            CHECK_FALSE(traits::template is_string_like_v<std::u32string const *>);
+        }
+    }
 
-    EXPECT_FALSE(traits::template is_string_like_v<std::u16string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<const std::u16string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<std::u16string const *>);
+    SECTION("Check whether types are string-like via SFINAE overloads")
+    {
+        CHECK(is_string_like(StringType()));
+        CHECK(is_string_like(char_pointer_type()));
 
-    EXPECT_FALSE(traits::template is_string_like_v<std::u32string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<const std::u32string *>);
-    EXPECT_FALSE(traits::template is_string_like_v<std::u32string const *>);
-}
+        CHECK_FALSE(is_string_like(int()));
+        CHECK_FALSE(is_string_like(char_type()));
+    }
 
-//==================================================================================================
-TYPED_TEST(BasicStringTest, StringLikeSFINAE)
-{
-    DECLARE_ALIASES
+    SECTION("Check whether types are streamable")
+    {
+        const Streamable<streamed_type> obj1;
+        const NotStreamable obj2;
 
-    EXPECT_TRUE(is_string_like(string_type()));
-    EXPECT_TRUE(is_string_like(char_pointer_type()));
+        CHECK(traits::OstreamTraits::template is_declared_v<int>);
+        CHECK(traits::OstreamTraits::template is_declared_v<bool>);
+        CHECK(traits::OstreamTraits::template is_declared_v<streamed_type>);
+        CHECK(traits::OstreamTraits::template is_declared_v<decltype(obj1)>);
 
-    EXPECT_FALSE(is_string_like(int()));
-    EXPECT_FALSE(is_string_like(char_type()));
-}
-
-//==================================================================================================
-TYPED_TEST(BasicStringTest, OstreamTraits)
-{
-    DECLARE_ALIASES
-
-    const Streamable<streamed_type> obj1(FLY_STR(streamed_char, "hi"), 0xbeef);
-    const NotStreamable obj2;
-
-    EXPECT_TRUE(traits::OstreamTraits::template is_declared_v<int>);
-    EXPECT_TRUE(traits::OstreamTraits::template is_declared_v<bool>);
-    EXPECT_TRUE(traits::OstreamTraits::template is_declared_v<streamed_type>);
-    EXPECT_TRUE(traits::OstreamTraits::template is_declared_v<decltype(obj1)>);
-    EXPECT_FALSE(traits::OstreamTraits::template is_declared_v<decltype(obj2)>);
+        CHECK_FALSE(traits::OstreamTraits::template is_declared_v<decltype(obj2)>);
+    }
 }

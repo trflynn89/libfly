@@ -118,7 +118,7 @@ bool is_class_or_pointer(const T &)
 
 } // namespace
 
-TEST_CASE("Traits")
+TEST_CASE("Traits", "[traits]")
 {
     SECTION("DeclarationTraits for whether a class defines a method foo()")
     {
