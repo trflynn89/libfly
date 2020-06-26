@@ -1,14 +1,10 @@
 #include "fly/types/json/json_traits.hpp"
 
-#include "fly/traits/traits.hpp"
-#include "fly/types/string/string_literal.hpp"
-
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include <array>
 #include <deque>
 #include <forward_list>
-#include <iostream>
 #include <list>
 #include <map>
 #include <set>
@@ -16,309 +12,236 @@
 #include <unordered_set>
 #include <vector>
 
-namespace {
-
-//==================================================================================================
-template <typename T>
-bool is_string(const T &)
-{
-    return fly::JsonTraits::is_string_v<T>;
-}
-
-//==================================================================================================
-template <typename T>
-bool is_bool(const T &)
-{
-    return fly::JsonTraits::is_boolean_v<T>;
-}
-
-//==================================================================================================
-template <typename T>
-bool is_signed_integer(const T &)
-{
-    return fly::JsonTraits::is_signed_integer_v<T>;
-}
-
-//==================================================================================================
-template <typename T>
-bool is_unsigned_integer(const T &)
-{
-    return fly::JsonTraits::is_unsigned_integer_v<T>;
-}
-
-//==================================================================================================
-template <typename T>
-bool is_floating_point(const T &)
-{
-    return fly::JsonTraits::is_floating_point_v<T>;
-}
-
-//==================================================================================================
-template <typename T>
-bool is_object(const T &)
-{
-    return fly::JsonTraits::is_object_v<T>;
-}
-
-//==================================================================================================
-template <typename T>
-bool is_array(const T &)
-{
-    return fly::JsonTraits::is_array_v<T>;
-}
-
-//==================================================================================================
-template <typename T>
-bool is_iterable(const T &)
-{
-    return fly::JsonTraits::is_iterable_v<T>;
-}
-
-const auto s_array = std::array<int, 4>();
-const auto s_deque = std::deque<int>();
-const auto s_forward_list = std::forward_list<int>();
-const auto s_list = std::list<int>();
-const auto s_map = std::map<std::string, int>();
-const auto s_multimap = std::multimap<std::string, int>();
-const auto s_multiset = std::multiset<int>();
-const auto s_set = std::set<int>();
-const auto s_unordered_map = std::unordered_map<std::string, int>();
-const auto s_unordered_multimap = std::unordered_multimap<std::string, int>();
-const auto s_unordered_multiset = std::unordered_multiset<int>();
-const auto s_unordered_set = std::unordered_set<int>();
-const auto s_vector = std::vector<int>();
-
-} // namespace
-
-//==================================================================================================
-TEST(JsonTraitsTest, String)
+TEST_CASE("JsonTraits", "[json]")
 {
     using string_type = typename fly::JsonTraits::string_type;
     using char_type = typename string_type::value_type;
 
-    const string_type str1(FLY_STR(char_type, "a"));
-    string_type str2(FLY_STR(char_type, "b"));
+    using array_type = std::array<int, 4>;
+    using deque_type = std::deque<int>;
+    using forward_list_type = std::forward_list<int>;
+    using list_type = std::list<int>;
+    using multiset_type = std::multiset<int>;
+    using set_type = std::set<int>;
+    using unordered_multiset_type = std::unordered_multiset<int>;
+    using unordered_set_type = std::unordered_set<int>;
+    using vector_type = std::vector<int>;
 
-    const char_type *cstr1 = "c";
-    char_type *cstr2 = const_cast<char_type *>("d");
+    using map_type = std::map<std::string, int>;
+    using multimap_type = std::multimap<std::string, int>;
+    using unordered_map_type = std::unordered_map<std::string, int>;
+    using unordered_multimap_type = std::unordered_multimap<std::string, int>;
 
-    const char_type chr1 = 'e';
-    char_type chr2 = 'f';
+    using boolean_type = bool;
+    using signed_integer_type = int;
+    using unsigned_integer_type = unsigned int;
+    using float_type = float;
+    using double_type = double;
+    using long_double_type = long double;
 
-    const char_type arr1[] = {'g', '\0'};
-    char_type arr2[] = {'h', '\0'};
+    SECTION("Traits for string-like JSON types")
+    {
+        CHECK(fly::JsonTraits::is_string_v<const string_type>);
+        CHECK(fly::JsonTraits::is_string_v<string_type>);
+        CHECK(fly::JsonTraits::is_string_v<const char_type *>);
+        CHECK(fly::JsonTraits::is_string_v<char_type *>);
+        CHECK(fly::JsonTraits::is_string_v<const char_type[]>);
+        CHECK(fly::JsonTraits::is_string_v<char_type[]>);
 
-    EXPECT_TRUE(is_string(str1));
-    EXPECT_TRUE(is_string(str2));
-    EXPECT_TRUE(is_string(cstr1));
-    EXPECT_TRUE(is_string(cstr2));
-    EXPECT_TRUE(is_string(arr1));
-    EXPECT_TRUE(is_string(arr2));
+        CHECK_FALSE(fly::JsonTraits::is_string_v<array_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<deque_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<forward_list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<unordered_map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<unordered_multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<unordered_multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<unordered_set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<vector_type>);
 
-    EXPECT_FALSE(is_string(s_array));
-    EXPECT_FALSE(is_string(s_deque));
-    EXPECT_FALSE(is_string(s_forward_list));
-    EXPECT_FALSE(is_string(s_list));
-    EXPECT_FALSE(is_string(s_map));
-    EXPECT_FALSE(is_string(s_multimap));
-    EXPECT_FALSE(is_string(s_multiset));
-    EXPECT_FALSE(is_string(s_set));
-    EXPECT_FALSE(is_string(s_unordered_map));
-    EXPECT_FALSE(is_string(s_unordered_multimap));
-    EXPECT_FALSE(is_string(s_unordered_multiset));
-    EXPECT_FALSE(is_string(s_unordered_set));
-    EXPECT_FALSE(is_string(s_vector));
+        CHECK_FALSE(fly::JsonTraits::is_string_v<signed_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<boolean_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<float_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<double_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<const char_type>);
+        CHECK_FALSE(fly::JsonTraits::is_string_v<char_type>);
+    }
 
-    EXPECT_FALSE(is_string(1));
-    EXPECT_FALSE(is_string(true));
-    EXPECT_FALSE(is_string(3.14159f));
-    EXPECT_FALSE(is_string(3.14159f));
-    EXPECT_FALSE(is_string(chr1));
-    EXPECT_FALSE(is_string(chr2));
-}
+    SECTION("Traits for boolean-like JSON types")
+    {
+        CHECK(fly::JsonTraits::is_boolean_v<boolean_type>);
 
-//==================================================================================================
-TEST(JsonTraitsTest, Bool)
-{
-    EXPECT_TRUE(is_bool(true));
-    EXPECT_TRUE(is_bool(false));
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<array_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<deque_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<forward_list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<unordered_map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<unordered_multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<unordered_multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<unordered_set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<vector_type>);
 
-    EXPECT_FALSE(is_bool(s_array));
-    EXPECT_FALSE(is_bool(s_deque));
-    EXPECT_FALSE(is_bool(s_forward_list));
-    EXPECT_FALSE(is_bool(s_list));
-    EXPECT_FALSE(is_bool(s_map));
-    EXPECT_FALSE(is_bool(s_multimap));
-    EXPECT_FALSE(is_bool(s_multiset));
-    EXPECT_FALSE(is_bool(s_set));
-    EXPECT_FALSE(is_bool(s_unordered_map));
-    EXPECT_FALSE(is_bool(s_unordered_multimap));
-    EXPECT_FALSE(is_bool(s_unordered_multiset));
-    EXPECT_FALSE(is_bool(s_unordered_set));
-    EXPECT_FALSE(is_bool(s_vector));
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<signed_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<unsigned_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<string_type>);
+        CHECK_FALSE(fly::JsonTraits::is_boolean_v<double_type>);
+    }
 
-    EXPECT_FALSE(is_bool(1));
-    EXPECT_FALSE(is_bool(-1));
-    EXPECT_FALSE(is_bool("foo"));
-    EXPECT_FALSE(is_bool(3.14));
-}
+    SECTION("Traits for signed-integer-like JSON types")
+    {
+        CHECK(fly::JsonTraits::is_signed_integer_v<signed_integer_type>);
 
-//==================================================================================================
-TEST(JsonTraitsTest, SignedInteger)
-{
-    EXPECT_TRUE(is_signed_integer(1));
-    EXPECT_TRUE(is_signed_integer(-1));
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<array_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<deque_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<forward_list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<unordered_map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<unordered_multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<unordered_multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<unordered_set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<vector_type>);
 
-    EXPECT_FALSE(is_signed_integer(s_array));
-    EXPECT_FALSE(is_signed_integer(s_deque));
-    EXPECT_FALSE(is_signed_integer(s_forward_list));
-    EXPECT_FALSE(is_signed_integer(s_list));
-    EXPECT_FALSE(is_signed_integer(s_map));
-    EXPECT_FALSE(is_signed_integer(s_multimap));
-    EXPECT_FALSE(is_signed_integer(s_multiset));
-    EXPECT_FALSE(is_signed_integer(s_set));
-    EXPECT_FALSE(is_signed_integer(s_unordered_map));
-    EXPECT_FALSE(is_signed_integer(s_unordered_multimap));
-    EXPECT_FALSE(is_signed_integer(s_unordered_multiset));
-    EXPECT_FALSE(is_signed_integer(s_unordered_set));
-    EXPECT_FALSE(is_signed_integer(s_vector));
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<string_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<double_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<boolean_type>);
+        CHECK_FALSE(fly::JsonTraits::is_signed_integer_v<unsigned_integer_type>);
+    }
 
-    EXPECT_FALSE(is_signed_integer("foo"));
-    EXPECT_FALSE(is_signed_integer(3.14));
-    EXPECT_FALSE(is_signed_integer(true));
-    EXPECT_FALSE(is_signed_integer(static_cast<unsigned int>(1)));
-}
+    SECTION("Traits for unsigned-integer-like JSON types")
+    {
+        CHECK(fly::JsonTraits::is_unsigned_integer_v<unsigned_integer_type>);
 
-//==================================================================================================
-TEST(JsonTraitsTest, UnsignedInteger)
-{
-    EXPECT_TRUE(is_unsigned_integer(static_cast<unsigned int>(1)));
-    EXPECT_TRUE(is_unsigned_integer(static_cast<unsigned int>(-1)));
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<array_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<deque_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<forward_list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<unordered_map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<unordered_multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<unordered_multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<unordered_set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<vector_type>);
 
-    EXPECT_FALSE(is_unsigned_integer(s_array));
-    EXPECT_FALSE(is_unsigned_integer(s_deque));
-    EXPECT_FALSE(is_unsigned_integer(s_forward_list));
-    EXPECT_FALSE(is_unsigned_integer(s_list));
-    EXPECT_FALSE(is_unsigned_integer(s_map));
-    EXPECT_FALSE(is_unsigned_integer(s_multimap));
-    EXPECT_FALSE(is_unsigned_integer(s_multiset));
-    EXPECT_FALSE(is_unsigned_integer(s_set));
-    EXPECT_FALSE(is_unsigned_integer(s_unordered_map));
-    EXPECT_FALSE(is_unsigned_integer(s_unordered_multimap));
-    EXPECT_FALSE(is_unsigned_integer(s_unordered_multiset));
-    EXPECT_FALSE(is_unsigned_integer(s_unordered_set));
-    EXPECT_FALSE(is_unsigned_integer(s_vector));
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<signed_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<string_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<double_type>);
+        CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<boolean_type>);
+    }
 
-    EXPECT_FALSE(is_unsigned_integer(1));
-    EXPECT_FALSE(is_unsigned_integer(-1));
-    EXPECT_FALSE(is_unsigned_integer("foo"));
-    EXPECT_FALSE(is_unsigned_integer(3.14));
-    EXPECT_FALSE(is_unsigned_integer(true));
-}
+    SECTION("Traits for floating-point-like JSON types")
+    {
+        CHECK(fly::JsonTraits::is_floating_point_v<float_type>);
+        CHECK(fly::JsonTraits::is_floating_point_v<double_type>);
+        CHECK(fly::JsonTraits::is_floating_point_v<long_double_type>);
 
-//==================================================================================================
-TEST(JsonTraitsTest, Float)
-{
-    EXPECT_TRUE(is_floating_point(3.14f));
-    EXPECT_TRUE(is_floating_point(3.14));
-    EXPECT_TRUE(is_floating_point(static_cast<long double>(3.14)));
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<array_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<deque_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<forward_list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<unordered_map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<unordered_multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<unordered_multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<unordered_set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<vector_type>);
 
-    EXPECT_FALSE(is_floating_point(s_array));
-    EXPECT_FALSE(is_floating_point(s_deque));
-    EXPECT_FALSE(is_floating_point(s_forward_list));
-    EXPECT_FALSE(is_floating_point(s_list));
-    EXPECT_FALSE(is_floating_point(s_map));
-    EXPECT_FALSE(is_floating_point(s_multimap));
-    EXPECT_FALSE(is_floating_point(s_multiset));
-    EXPECT_FALSE(is_floating_point(s_set));
-    EXPECT_FALSE(is_floating_point(s_unordered_map));
-    EXPECT_FALSE(is_floating_point(s_unordered_multimap));
-    EXPECT_FALSE(is_floating_point(s_unordered_multiset));
-    EXPECT_FALSE(is_floating_point(s_unordered_set));
-    EXPECT_FALSE(is_floating_point(s_vector));
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<signed_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<unsigned_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<string_type>);
+        CHECK_FALSE(fly::JsonTraits::is_floating_point_v<boolean_type>);
+    }
 
-    EXPECT_FALSE(is_floating_point(1));
-    EXPECT_FALSE(is_floating_point(-1));
-    EXPECT_FALSE(is_floating_point("foo"));
-    EXPECT_FALSE(is_floating_point(true));
-}
+    SECTION("Traits for object-like JSON types")
+    {
+        CHECK(fly::JsonTraits::is_object_v<map_type>);
+        CHECK(fly::JsonTraits::is_object_v<multimap_type>);
+        CHECK(fly::JsonTraits::is_object_v<unordered_map_type>);
+        CHECK(fly::JsonTraits::is_object_v<unordered_multimap_type>);
 
-//==================================================================================================
-TEST(JsonTraitsTest, Object)
-{
-    EXPECT_TRUE(is_object(s_map));
-    EXPECT_TRUE(is_object(s_multimap));
-    EXPECT_TRUE(is_object(s_unordered_map));
-    EXPECT_TRUE(is_object(s_unordered_multimap));
+        CHECK_FALSE(fly::JsonTraits::is_object_v<std::map<int, int>>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<std::multimap<int, int>>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<std::unordered_map<int, int>>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<std::unordered_multimap<int, int>>);
 
-    EXPECT_FALSE(is_object(std::map<int, int>()));
-    EXPECT_FALSE(is_object(std::multimap<int, int>()));
-    EXPECT_FALSE(is_object(std::unordered_map<int, int>()));
-    EXPECT_FALSE(is_object(std::unordered_multimap<int, int>()));
+        CHECK_FALSE(fly::JsonTraits::is_object_v<array_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<deque_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<forward_list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<list_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<unordered_multiset_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<unordered_set_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<vector_type>);
 
-    EXPECT_FALSE(is_object(s_array));
-    EXPECT_FALSE(is_object(s_deque));
-    EXPECT_FALSE(is_object(s_forward_list));
-    EXPECT_FALSE(is_object(s_list));
-    EXPECT_FALSE(is_object(s_multiset));
-    EXPECT_FALSE(is_object(s_set));
-    EXPECT_FALSE(is_object(s_unordered_multiset));
-    EXPECT_FALSE(is_object(s_unordered_set));
-    EXPECT_FALSE(is_object(s_vector));
+        CHECK_FALSE(fly::JsonTraits::is_object_v<signed_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<unsigned_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<string_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<double_type>);
+        CHECK_FALSE(fly::JsonTraits::is_object_v<boolean_type>);
+    }
 
-    EXPECT_FALSE(is_object(1));
-    EXPECT_FALSE(is_object(-1));
-    EXPECT_FALSE(is_object("foo"));
-    EXPECT_FALSE(is_object(3.14));
-    EXPECT_FALSE(is_object(true));
-}
+    SECTION("Traits for array-like JSON types")
+    {
+        CHECK(fly::JsonTraits::is_array_v<array_type>);
+        CHECK(fly::JsonTraits::is_array_v<deque_type>);
+        CHECK(fly::JsonTraits::is_array_v<forward_list_type>);
+        CHECK(fly::JsonTraits::is_array_v<list_type>);
+        CHECK(fly::JsonTraits::is_array_v<multiset_type>);
+        CHECK(fly::JsonTraits::is_array_v<set_type>);
+        CHECK(fly::JsonTraits::is_array_v<unordered_multiset_type>);
+        CHECK(fly::JsonTraits::is_array_v<unordered_set_type>);
+        CHECK(fly::JsonTraits::is_array_v<vector_type>);
 
-//==================================================================================================
-TEST(JsonTraitsTest, Array)
-{
-    EXPECT_TRUE(is_array(s_array));
-    EXPECT_TRUE(is_array(s_deque));
-    EXPECT_TRUE(is_array(s_forward_list));
-    EXPECT_TRUE(is_array(s_list));
-    EXPECT_TRUE(is_array(s_multiset));
-    EXPECT_TRUE(is_array(s_set));
-    EXPECT_TRUE(is_array(s_unordered_multiset));
-    EXPECT_TRUE(is_array(s_unordered_set));
-    EXPECT_TRUE(is_array(s_vector));
+        CHECK_FALSE(fly::JsonTraits::is_array_v<map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_array_v<multimap_type>);
+        CHECK_FALSE(fly::JsonTraits::is_array_v<unordered_map_type>);
+        CHECK_FALSE(fly::JsonTraits::is_array_v<unordered_multimap_type>);
 
-    EXPECT_FALSE(is_array(s_map));
-    EXPECT_FALSE(is_array(s_multimap));
-    EXPECT_FALSE(is_array(s_unordered_map));
-    EXPECT_FALSE(is_array(s_unordered_multimap));
+        CHECK_FALSE(fly::JsonTraits::is_array_v<signed_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_array_v<unsigned_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_array_v<string_type>);
+        CHECK_FALSE(fly::JsonTraits::is_array_v<double_type>);
+        CHECK_FALSE(fly::JsonTraits::is_array_v<boolean_type>);
+    }
 
-    EXPECT_FALSE(is_array(1));
-    EXPECT_FALSE(is_array(-1));
-    EXPECT_FALSE(is_array("foo"));
-    EXPECT_FALSE(is_array(3.14));
-    EXPECT_FALSE(is_array(true));
-}
+    SECTION("Traits for iterable JSON types")
+    {
+        CHECK(fly::JsonTraits::is_iterable_v<array_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<deque_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<forward_list_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<list_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<multiset_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<set_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<unordered_multiset_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<unordered_set_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<vector_type>);
 
-//==================================================================================================
-TEST(JsonTraitsTest, Iterable)
-{
-    EXPECT_TRUE(is_iterable(s_array));
-    EXPECT_TRUE(is_iterable(s_deque));
-    EXPECT_TRUE(is_iterable(s_forward_list));
-    EXPECT_TRUE(is_iterable(s_list));
-    EXPECT_TRUE(is_iterable(s_multiset));
-    EXPECT_TRUE(is_iterable(s_set));
-    EXPECT_TRUE(is_iterable(s_unordered_multiset));
-    EXPECT_TRUE(is_iterable(s_unordered_set));
-    EXPECT_TRUE(is_iterable(s_vector));
+        CHECK(fly::JsonTraits::is_iterable_v<map_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<multimap_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<unordered_map_type>);
+        CHECK(fly::JsonTraits::is_iterable_v<unordered_multimap_type>);
 
-    EXPECT_TRUE(is_iterable(s_map));
-    EXPECT_TRUE(is_iterable(s_multimap));
-    EXPECT_TRUE(is_iterable(s_unordered_map));
-    EXPECT_TRUE(is_iterable(s_unordered_multimap));
-
-    EXPECT_FALSE(is_iterable(1));
-    EXPECT_FALSE(is_iterable(-1));
-    EXPECT_FALSE(is_iterable("foo"));
-    EXPECT_FALSE(is_iterable(3.14));
-    EXPECT_FALSE(is_iterable(true));
+        CHECK_FALSE(fly::JsonTraits::is_iterable_v<signed_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_iterable_v<unsigned_integer_type>);
+        CHECK_FALSE(fly::JsonTraits::is_iterable_v<string_type>);
+        CHECK_FALSE(fly::JsonTraits::is_iterable_v<double_type>);
+        CHECK_FALSE(fly::JsonTraits::is_iterable_v<boolean_type>);
+    }
 }
