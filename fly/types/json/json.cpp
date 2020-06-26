@@ -709,7 +709,7 @@ void Json::validate_character(
 
     if ((ch <= 0x1f) || (ch == 0x22) || (ch == 0x5c))
     {
-        throw JsonException(String::format("Character '%c' must be escaped", ch));
+        throw JsonException(String::format("Character '%c' must be escaped", *it));
     }
     else if (!String::decode_codepoint(it, end))
     {
