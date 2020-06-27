@@ -17,6 +17,7 @@ class ConcurrentContainer
 {
 public:
     using size_type = typename Container::size_type;
+    using value_type = T;
 
     /**
      * Destructor.
