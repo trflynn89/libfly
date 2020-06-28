@@ -46,7 +46,13 @@ public:
     bool start();
 
     /**
-     * Destroy the worker threads and timer thread, blocking until the threads exit.
+     * Destroy the worker threads and timer thread, blocking until the threads exit. This must be
+     * eplicitly called from the same thread that started the task manager.
+     *
+     * TODO: TaskManager should be created as a unique_ptr so it can be started and stopped in an
+     * RAII fashion. It cannot be stopped from the destructor because a task thread may be the last
+     * owner of a shared_ptr to this task manager. In that case, when that shared_ptr is destroyed,
+     * the destructor would call stop, resulting in the task thread trying to join itself.
      *
      * @return True if the threads were destroyed in this invocation.
      */
