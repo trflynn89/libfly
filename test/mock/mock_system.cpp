@@ -1,7 +1,5 @@
 #include "test/mock/mock_system.hpp"
 
-#include "fly/logger/logger.hpp"
-
 namespace fly {
 
 //==================================================================================================
@@ -59,7 +57,6 @@ bool MockSystem::mock_enabled(MockCall mock, bool &fail)
 
         if (it != s_mocked_calls.end())
         {
-            LOGC_NO_LOCK("Using mock for %s", mock);
             fail = it->second;
             return true;
         }
