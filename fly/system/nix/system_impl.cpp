@@ -14,7 +14,11 @@ void SystemImpl::print_backtrace()
 {
     void *trace[10];
     int trace_size = ::backtrace(trace, 10);
-    ::backtrace_symbols_fd(trace, trace_size, STDERR_FILENO);
+
+    if (trace_size > 0)
+    {
+        ::backtrace_symbols_fd(trace, trace_size, STDERR_FILENO);
+    }
 }
 
 //==================================================================================================

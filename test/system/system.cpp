@@ -1,8 +1,13 @@
 #include "fly/system/system.hpp"
 
+#include "fly/fly.hpp"
 #include "test/util/capture_stream.hpp"
 
-#include <gtest/gtest.h>
+#if defined(FLY_LINUX)
+#    include "test/mock/mock_system.hpp"
+#endif
+
+#include <catch2/catch.hpp>
 
 #include <csignal>
 #include <string>
@@ -18,47 +23,84 @@ void handle_signal(int signal)
 
 } // namespace
 
-//==================================================================================================
-TEST(SystemTest, PrintBacktrace)
+TEST_CASE("System", "[system]")
 {
-    fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
-    fly::System::print_backtrace();
+    SECTION("Print a backtrace to stderr")
+    {
+        fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+        fly::System::print_backtrace();
 
-    std::string output = capture();
-    EXPECT_FALSE(output.empty());
-}
+        std::string output = capture();
+        CHECK_FALSE(output.empty());
+    }
 
-//==================================================================================================
-TEST(SystemTest, LocalTime)
-{
-    std::string time = fly::System::local_time();
-    EXPECT_FALSE(time.empty());
-}
+#if defined(FLY_LINUX)
 
-//==================================================================================================
-TEST(SystemTest, ErrorCode)
-{
-    int code = fly::System::get_error_code();
+    SECTION("Printing a backtrace fails when ::backtrace() fails")
+    {
+        fly::MockSystem mock(fly::MockCall::Backtrace);
 
-    std::string error1 = fly::System::get_error_string();
-    std::string error2 = fly::System::get_error_string(code);
+        fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+        fly::System::print_backtrace();
 
-    EXPECT_FALSE(error1.empty());
-    EXPECT_FALSE(error2.empty());
-    EXPECT_EQ(error1, error2);
-}
+        std::string output = capture();
+        CHECK(output.empty());
+    }
 
-//==================================================================================================
-TEST(SystemTest, Signal)
-{
-    fly::System::SignalHandler handler(&handle_signal);
-    fly::System::set_signal_handler(handler);
+    SECTION("Printing a backtrace fails when ::backtrace_symbols_fd() fails")
+    {
+        fly::MockSystem mock(fly::MockCall::BacktraceSymbols);
 
-    std::raise(SIGINT);
-    EXPECT_EQ(s_last_signal, SIGINT);
+        fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+        fly::System::print_backtrace();
 
-    std::raise(SIGSEGV);
-    EXPECT_EQ(s_last_signal, SIGSEGV);
+        std::string output = capture();
+        CHECK(output.empty());
+    }
 
-    fly::System::set_signal_handler(nullptr);
+#endif
+
+    SECTION("Capture the system's local time")
+    {
+        std::string time = fly::System::local_time();
+        CHECK_FALSE(time.empty());
+    }
+
+#if defined(FLY_LINUX)
+
+    SECTION("Capturing the system's local time fails when ::localtime() fails")
+    {
+        fly::MockSystem mock(fly::MockCall::LocalTime);
+
+        std::string time = fly::System::local_time();
+        CHECK(time.empty());
+    }
+
+#endif
+
+    SECTION("Capture the system's last error code as an integer and string")
+    {
+        int code = fly::System::get_error_code();
+
+        std::string error1 = fly::System::get_error_string();
+        std::string error2 = fly::System::get_error_string(code);
+
+        CHECK_FALSE(error1.empty());
+        CHECK_FALSE(error2.empty());
+        CHECK(error1 == error2);
+    }
+
+    SECTION("Setup a custom signal handler for fatal signals")
+    {
+        fly::System::SignalHandler handler(&handle_signal);
+        fly::System::set_signal_handler(handler);
+
+        std::raise(SIGINT);
+        CHECK(s_last_signal == SIGINT);
+
+        std::raise(SIGSEGV);
+        CHECK(s_last_signal == SIGSEGV);
+
+        fly::System::set_signal_handler(nullptr);
+    }
 }
