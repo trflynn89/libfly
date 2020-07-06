@@ -5,7 +5,6 @@
 #include "fly/task/task_manager.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/numeric/literals.hpp"
-#include "fly/types/string/string.hpp"
 #include "test/config/test_config.hpp"
 #include "test/util/path_util.hpp"
 #include "test/util/waitable_task_runner.hpp"
@@ -37,8 +36,7 @@ class ConfigManagerTest : public ::testing::Test
 {
 public:
     ConfigManagerTest() noexcept :
-        m_path(fly::PathUtil::generate_temp_directory()),
-        m_file(m_path / (fly::String::generate_random_string(10) + ".txt")),
+        m_file(m_path.file()),
 
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
         m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
@@ -52,11 +50,10 @@ public:
     }
 
     /**
-     * Create the file directory and start the task and config managers.
+     * Start the task and config managers.
      */
     void SetUp() override
     {
-        ASSERT_TRUE(std::filesystem::create_directories(m_path));
         ASSERT_TRUE(m_task_manager->start());
         ASSERT_TRUE(m_config_manager->start());
 
@@ -64,16 +61,15 @@ public:
     }
 
     /**
-     * Delete the created directory and stop the task manager.
+     * Stop the task manager.
      */
     void TearDown() override
     {
         ASSERT_TRUE(m_task_manager->stop());
-        std::filesystem::remove_all(m_path);
     }
 
 protected:
-    std::filesystem::path m_path;
+    fly::PathUtil::ScopedTempDirectory m_path;
     std::filesystem::path m_file;
 
     std::shared_ptr<fly::TaskManager> m_task_manager;

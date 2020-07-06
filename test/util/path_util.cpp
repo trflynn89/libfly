@@ -2,6 +2,8 @@
 
 #include "fly/types/string/string.hpp"
 
+#include <gtest/gtest.h>
+
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -12,9 +14,28 @@
 namespace fly {
 
 //==================================================================================================
-std::filesystem::path PathUtil::generate_temp_directory()
+PathUtil::ScopedTempDirectory::ScopedTempDirectory() :
+    m_directory(std::filesystem::temp_directory_path() / fly::String::generate_random_string(10))
 {
-    return std::filesystem::temp_directory_path() / fly::String::generate_random_string(10);
+    EXPECT_TRUE(std::filesystem::create_directories(m_directory));
+}
+
+//==================================================================================================
+PathUtil::ScopedTempDirectory::~ScopedTempDirectory()
+{
+    EXPECT_TRUE(std::filesystem::remove_all(m_directory) > 0);
+}
+
+//==================================================================================================
+std::filesystem::path PathUtil::ScopedTempDirectory::operator()() const
+{
+    return m_directory;
+}
+
+//==================================================================================================
+std::filesystem::path PathUtil::ScopedTempDirectory::file() const
+{
+    return m_directory / (fly::String::generate_random_string(10) + ".txt");
 }
 
 //==================================================================================================

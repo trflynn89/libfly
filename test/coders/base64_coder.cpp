@@ -120,30 +120,13 @@ class Base64CoderFileTest : public Base64CoderTest
 public:
     Base64CoderFileTest() noexcept :
         Base64CoderTest(),
-        m_path(fly::PathUtil::generate_temp_directory()),
-        m_encoded_file(m_path / "encoded.txt"),
-        m_decoded_file(m_path / "decoded.txt")
+        m_encoded_file(m_path.file()),
+        m_decoded_file(m_path.file())
     {
-    }
-
-    /**
-     * Create the directory to contain test output files.
-     */
-    void SetUp() override
-    {
-        ASSERT_TRUE(std::filesystem::create_directories(m_path));
-    }
-
-    /**
-     * Delete the created directory.
-     */
-    void TearDown() override
-    {
-        std::filesystem::remove_all(m_path);
     }
 
 protected:
-    std::filesystem::path m_path;
+    fly::PathUtil::ScopedTempDirectory m_path;
     std::filesystem::path m_encoded_file;
     std::filesystem::path m_decoded_file;
 };

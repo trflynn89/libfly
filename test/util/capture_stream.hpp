@@ -1,5 +1,7 @@
 #pragma once
 
+#include "test/util/path_util.hpp"
+
 #include <cstdint>
 #include <filesystem>
 #include <string>
@@ -52,7 +54,8 @@ private:
      */
     std::string restore(bool read);
 
-    std::filesystem::path m_path;
+    fly::PathUtil::ScopedTempDirectory m_path;
+    std::filesystem::path m_file;
 
     int m_stdio;
     int m_original;

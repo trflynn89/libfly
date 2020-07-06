@@ -4,8 +4,8 @@
 #include "fly/task/task_manager.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/numeric/literals.hpp"
-#include "fly/types/string/string.hpp"
 
+#include <catch2/catch.hpp>
 #include <gtest/gtest.h>
 
 #include <filesystem>
@@ -52,14 +52,10 @@ public:
             m_task_runner,
             std::make_shared<TestPathConfig>())),
 
-        m_path0(fly::PathUtil::generate_temp_directory()),
-        m_path1(fly::PathUtil::generate_temp_directory()),
-        m_path2(fly::PathUtil::generate_temp_directory()),
-
-        m_file0(m_path0 / (fly::String::generate_random_string(10) + ".txt")),
-        m_file1(m_path1 / (fly::String::generate_random_string(10) + ".txt")),
-        m_file2(m_path1 / (fly::String::generate_random_string(10) + ".txt")),
-        m_file3(m_path2 / (fly::String::generate_random_string(10) + ".txt"))
+        m_file0(m_path0.file()),
+        m_file1(m_path1.file()),
+        m_file2(m_path1.file()),
+        m_file3(m_path2.file())
     {
         m_callback = std::bind(
             &PathMonitorTest::handle_event,
@@ -69,19 +65,15 @@ public:
     }
 
     /**
-     * Create and start the task manager and path monitor.
+     * Start the task and config managers.
      */
     void SetUp() override
     {
-        ASSERT_TRUE(std::filesystem::create_directories(m_path0));
-        ASSERT_TRUE(std::filesystem::create_directories(m_path1));
-        ASSERT_TRUE(std::filesystem::create_directories(m_path2));
-
         ASSERT_TRUE(m_task_manager->start());
         ASSERT_TRUE(m_monitor->start());
 
-        ASSERT_TRUE(m_monitor->add_path(m_path0, m_callback));
-        ASSERT_TRUE(m_monitor->add_path(m_path1, m_callback));
+        ASSERT_TRUE(m_monitor->add_path(m_path0(), m_callback));
+        ASSERT_TRUE(m_monitor->add_path(m_path1(), m_callback));
 
         ASSERT_TRUE(m_monitor->add_file(m_file0, m_callback));
         ASSERT_TRUE(m_monitor->add_file(m_file1, m_callback));
@@ -90,16 +82,12 @@ public:
     }
 
     /**
-     * Stop the task manager and delete the created directory.
+     * Stop the task manager and stop monitoring all paths.
      */
     void TearDown() override
     {
         ASSERT_TRUE(m_task_manager->stop());
-
         m_monitor->remove_all_paths();
-        std::filesystem::remove_all(m_path0);
-        std::filesystem::remove_all(m_path1);
-        std::filesystem::remove_all(m_path2);
     }
 
 protected:
@@ -139,9 +127,9 @@ protected:
     std::shared_ptr<fly::PathMonitor> m_monitor;
     fly::PathMonitor::PathEventCallback m_callback;
 
-    std::filesystem::path m_path0;
-    std::filesystem::path m_path1;
-    std::filesystem::path m_path2;
+    fly::PathUtil::ScopedTempDirectory m_path0;
+    fly::PathUtil::ScopedTempDirectory m_path1;
+    fly::PathUtil::ScopedTempDirectory m_path2;
 
     std::filesystem::path m_file0;
     std::filesystem::path m_file1;
@@ -189,21 +177,21 @@ TEST_F(PathMonitorTest, PathEventStream)
 //==================================================================================================
 TEST_F(PathMonitorTest, NonExistingPath)
 {
-    ASSERT_FALSE(m_monitor->add_path(m_path0 / "_", m_callback));
-    ASSERT_FALSE(m_monitor->add_file(m_path0 / "_" / "foo.txt", m_callback));
+    ASSERT_FALSE(m_monitor->add_path(m_path0() / "_", m_callback));
+    ASSERT_FALSE(m_monitor->add_file(m_path0() / "_" / "foo.txt", m_callback));
 }
 
 //==================================================================================================
 TEST_F(PathMonitorTest, NullCallback)
 {
-    ASSERT_FALSE(m_monitor->add_path(m_path0, nullptr));
+    ASSERT_FALSE(m_monitor->add_path(m_path0(), nullptr));
     ASSERT_FALSE(m_monitor->add_file(m_file1, nullptr));
 }
 
 //==================================================================================================
 TEST_F(PathMonitorTest, WrongType)
 {
-    ASSERT_FALSE(m_monitor->add_file(m_path0, m_callback));
+    ASSERT_FALSE(m_monitor->add_file(m_path0(), m_callback));
     ASSERT_FALSE(m_monitor->add_path(m_file1, m_callback));
 }
 
@@ -219,7 +207,7 @@ TEST_F(PathMonitorTest, MockFailedStartMonitor)
 
     ASSERT_FALSE(m_monitor->start());
 
-    ASSERT_FALSE(m_monitor->add_path(m_path0, m_callback));
+    ASSERT_FALSE(m_monitor->add_path(m_path0(), m_callback));
     ASSERT_FALSE(m_monitor->add_file(m_file1, m_callback));
 }
 
@@ -230,7 +218,7 @@ TEST_F(PathMonitorTest, MockFailedadd_path)
 
     fly::MockSystem mock(fly::MockCall::InotifyAddWatch);
 
-    ASSERT_FALSE(m_monitor->add_path(m_path0, m_callback));
+    ASSERT_FALSE(m_monitor->add_path(m_path0(), m_callback));
     ASSERT_FALSE(m_monitor->add_file(m_file1, m_callback));
 }
 
@@ -525,8 +513,8 @@ TEST_F(PathMonitorTest, MultipleFile)
 TEST_F(PathMonitorTest, Remove)
 {
     // Test removing files and paths that were not being monitored.
-    EXPECT_FALSE(m_monitor->remove_file(m_path1 / "was not"));
-    EXPECT_FALSE(m_monitor->remove_path(m_path1 / "monitoring"));
+    EXPECT_FALSE(m_monitor->remove_file(m_path1() / "was not"));
+    EXPECT_FALSE(m_monitor->remove_path(m_path1() / "monitoring"));
     EXPECT_FALSE(m_monitor->remove_path("any of this"));
 
     // For the monitor with two monitored files and a monitored path:
@@ -535,20 +523,20 @@ TEST_F(PathMonitorTest, Remove)
     // 3. Remove the second file - should fail, wasn't being monitored any more.
     // 4. Remove the whole path - should fail.
     EXPECT_TRUE(m_monitor->remove_file(m_file1));
-    EXPECT_TRUE(m_monitor->remove_path(m_path1));
+    EXPECT_TRUE(m_monitor->remove_path(m_path1()));
     EXPECT_FALSE(m_monitor->remove_file(m_file2));
-    EXPECT_FALSE(m_monitor->remove_path(m_path1));
+    EXPECT_FALSE(m_monitor->remove_path(m_path1()));
 
     // For the monitor with one monitored file and a monitored path:
     // 1. Remove the monitored file - should succeed.
     // 2. Remove the whole path - should succeed.
     EXPECT_TRUE(m_monitor->remove_file(m_file0));
-    EXPECT_TRUE(m_monitor->remove_path(m_path0));
+    EXPECT_TRUE(m_monitor->remove_path(m_path0()));
 
     // For the monitor with one monitored file and no monitored paths:
     // 1. Remove the monitored file - should succeed.
     // 2. Remove the whole path - should fail, path will gets removed when the
     //    last monitored file is removed.
     EXPECT_TRUE(m_monitor->remove_file(m_file3));
-    EXPECT_FALSE(m_monitor->remove_path(m_path2));
+    EXPECT_FALSE(m_monitor->remove_path(m_path2()));
 }
