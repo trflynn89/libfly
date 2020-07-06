@@ -15,11 +15,39 @@ class PathUtil
 {
 public:
     /**
-     * Generate a random directory under the system's temporary directory.
-     *
-     * @return The random directory path.
+     * Helper class to create and delete a random directory under the system's temporary directory.
      */
-    static std::filesystem::path generate_temp_directory();
+    class ScopedTempDirectory
+    {
+    public:
+        /**
+         * Constructor. Create the random directory.
+         */
+        ScopedTempDirectory();
+
+        /**
+         * Destructor. Delete the created directory.
+         */
+        ~ScopedTempDirectory();
+
+        /**
+         * @return The random directory's path.
+         */
+        std::filesystem::path operator()() const;
+
+        /**
+         * Generate the file name for a new file under the random directory.
+         *
+         * @return The full path to the file.
+         */
+        std::filesystem::path file() const;
+
+    private:
+        ScopedTempDirectory(const ScopedTempDirectory &) = delete;
+        ScopedTempDirectory &operator=(const ScopedTempDirectory &) = delete;
+
+        std::filesystem::path m_directory;
+    };
 
     /**
      * Create a file with the given contents, verifying the file was correctly written after

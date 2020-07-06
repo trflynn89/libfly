@@ -16,22 +16,20 @@
 #    include <unistd.h>
 #endif
 
-#include "test/util/path_util.hpp"
-
 namespace fly {
 
 //==================================================================================================
 CaptureStream::CaptureStream(Stream stream) noexcept :
-    m_path(fly::PathUtil::generate_temp_directory()),
+    m_file(m_path.file()),
     m_stdio(-1),
     m_original(-1)
 {
     FILE *target = nullptr;
 
 #if defined(FLY_WINDOWS)
-    ::fopen_s(&target, m_path.string().c_str(), "w");
+    ::fopen_s(&target, m_file.string().c_str(), "w");
 #elif defined(FLY_LINUX)
-    target = ::fopen(m_path.string().c_str(), "w");
+    target = ::fopen(m_file.string().c_str(), "w");
 #endif
 
     if (target != nullptr)
@@ -80,10 +78,9 @@ std::string CaptureStream::restore(bool read)
 
         if (read)
         {
-            contents = fly::PathUtil::read_file(m_path);
+            contents = fly::PathUtil::read_file(m_file);
         }
 
-        std::filesystem::remove(m_path);
         m_original = -1;
     }
 

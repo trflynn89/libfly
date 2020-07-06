@@ -56,8 +56,6 @@ class LoggerTest : public ::testing::Test
 {
 public:
     LoggerTest() noexcept :
-        m_path(fly::PathUtil::generate_temp_directory()),
-
         m_task_manager(std::make_shared<fly::TaskManager>(1)),
         m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
 
@@ -65,17 +63,15 @@ public:
         m_coder_config(std::make_shared<fly::CoderConfig>()),
 
         m_logger(
-            std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_coder_config, m_path))
+            std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_coder_config, m_path()))
     {
     }
 
     /**
-     * Create the file directory and start the task manager and logger.
+     * Start the task manager and logger.
      */
     void SetUp() override
     {
-        ASSERT_TRUE(std::filesystem::create_directories(m_path));
-
         ASSERT_TRUE(m_task_manager->start());
 
         ASSERT_TRUE(m_logger->start());
@@ -83,7 +79,7 @@ public:
     }
 
     /**
-     * Delete the created directory and stop the task manager.
+     * Stop the task manager and logger.
      */
     void TearDown() override
     {
@@ -91,8 +87,6 @@ public:
 
         fly::Logger::set_instance(nullptr);
         m_logger.reset();
-
-        std::filesystem::remove_all(m_path);
     }
 
 protected:
@@ -169,7 +163,7 @@ protected:
         return fly::String::format("%d\t%s", 1, log).length();
     }
 
-    std::filesystem::path m_path;
+    fly::PathUtil::ScopedTempDirectory m_path;
 
     std::shared_ptr<fly::TaskManager> m_task_manager;
     std::shared_ptr<fly::WaitableSequencedTaskRunner> m_task_runner;
@@ -184,7 +178,7 @@ protected:
 TEST_F(LoggerTest, GoodFilePath)
 {
     std::filesystem::path path = m_logger->get_log_file_path();
-    EXPECT_TRUE(fly::String::starts_with(path.string(), m_path.string()));
+    EXPECT_TRUE(fly::String::starts_with(path.string(), m_path().string()));
 
     std::ifstream stream(path, std::ios::in);
     EXPECT_TRUE(stream.good());
@@ -195,11 +189,8 @@ TEST_F(LoggerTest, BadFilePath)
 {
     fly::Logger::set_instance(nullptr);
 
-    m_logger = std::make_shared<fly::Logger>(
-        m_task_runner,
-        m_logger_config,
-        m_coder_config,
-        fly::PathUtil::generate_temp_directory());
+    m_logger =
+        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_coder_config, __FILE__);
 
     EXPECT_FALSE(m_logger->start());
 }
@@ -328,7 +319,7 @@ TEST_F(LoggerTest, RolloverCompressed)
     m_logger_config = std::make_shared<TestLoggerConfig>(true);
 
     m_logger =
-        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_coder_config, m_path);
+        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_coder_config, m_path());
     ASSERT_TRUE(m_logger->start());
     fly::Logger::set_instance(m_logger);
 
@@ -371,7 +362,7 @@ TEST_F(LoggerTest, RolloverCompressedFailed)
     m_coder_config = std::make_shared<BadCoderConfig>();
 
     m_logger =
-        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_coder_config, m_path);
+        std::make_shared<fly::Logger>(m_task_runner, m_logger_config, m_coder_config, m_path());
     ASSERT_TRUE(m_logger->start());
     fly::Logger::set_instance(m_logger);
 
