@@ -9,37 +9,49 @@
 namespace fly {
 
 //==================================================================================================
-HuffmanDecoder::HuffmanDecoder() noexcept : m_huffman_codes_size(0)
+HuffmanDecoder::HuffmanDecoder() noexcept : m_huffman_codes_size(0), m_max_code_length(0)
 {
+}
+
+//==================================================================================================
+code_type HuffmanDecoder::compute_kraft_mcmillan_constant() const
+{
+    code_type kraft = 0_u16;
+
+    for (std::uint16_t i = 0; i < m_huffman_codes_size; ++i)
+    {
+        kraft += 1_u16 << (m_max_code_length - m_huffman_codes[i].m_length);
+    }
+
+    return kraft;
 }
 
 //==================================================================================================
 bool HuffmanDecoder::decode_binary(BitStreamReader &encoded, std::ostream &decoded)
 {
     std::uint32_t chunk_size;
-    length_type max_code_length;
 
-    if (!decode_header(encoded, chunk_size, max_code_length))
+    if (!decode_header(encoded, chunk_size))
     {
         LOGW("Error decoding header from stream");
         return false;
     }
 
     m_chunk_buffer = std::make_unique<symbol_type[]>(chunk_size);
-    m_prefix_table = std::make_unique<HuffmanCode[]>(1_zu << max_code_length);
+    m_prefix_table = std::make_unique<HuffmanCode[]>(1_zu << m_max_code_length);
 
     while (!encoded.fully_consumed())
     {
-        length_type local_max_code_length = 0;
+        length_type max_code_length = 0;
 
-        if (!decode_codes(encoded, max_code_length, local_max_code_length))
+        if (!decode_codes(encoded, max_code_length))
         {
             LOGW(
                 "Error decoding codes from stream (maximum code length = %u)",
-                static_cast<std::uint32_t>(max_code_length));
+                static_cast<std::uint32_t>(m_max_code_length));
             return false;
         }
-        else if (!decode_symbols(encoded, local_max_code_length, chunk_size, decoded))
+        else if (!decode_symbols(encoded, max_code_length, chunk_size, decoded))
         {
             LOGW(
                 "Error decoding %u symbols from stream (fully consumed = %d)",
@@ -53,10 +65,7 @@ bool HuffmanDecoder::decode_binary(BitStreamReader &encoded, std::ostream &decod
 }
 
 //==================================================================================================
-bool HuffmanDecoder::decode_header(
-    BitStreamReader &encoded,
-    std::uint32_t &chunk_size,
-    length_type &max_code_length) const
+bool HuffmanDecoder::decode_header(BitStreamReader &encoded, std::uint32_t &chunk_size)
 {
     // Decode the Huffman coder version.
     byte_type huffman_version;
@@ -70,7 +79,7 @@ bool HuffmanDecoder::decode_header(
     switch (huffman_version)
     {
         case 1:
-            return decode_header_version1(encoded, chunk_size, max_code_length);
+            return decode_header_version1(encoded, chunk_size);
 
         default:
             LOGW("Decoded invalid Huffman version %u", static_cast<std::uint32_t>(huffman_version));
@@ -81,10 +90,7 @@ bool HuffmanDecoder::decode_header(
 }
 
 //==================================================================================================
-bool HuffmanDecoder::decode_header_version1(
-    BitStreamReader &encoded,
-    std::uint32_t &chunk_size,
-    length_type &max_code_length) const
+bool HuffmanDecoder::decode_header_version1(BitStreamReader &encoded, std::uint32_t &chunk_size)
 {
     // Decode the chunk size.
     word_type encoded_chunk_size_kb;
@@ -119,16 +125,13 @@ bool HuffmanDecoder::decode_header_version1(
     }
 
     chunk_size = static_cast<std::uint32_t>(encoded_chunk_size_kb) << 10;
-    max_code_length = static_cast<length_type>(encoded_max_code_length);
+    m_max_code_length = static_cast<length_type>(encoded_max_code_length);
 
     return true;
 }
 
 //==================================================================================================
-bool HuffmanDecoder::decode_codes(
-    BitStreamReader &encoded,
-    length_type global_max_code_length,
-    length_type &local_max_code_length)
+bool HuffmanDecoder::decode_codes(BitStreamReader &encoded, length_type &max_code_length)
 {
     m_huffman_codes_size = 0;
 
@@ -140,7 +143,7 @@ bool HuffmanDecoder::decode_codes(
         LOGW("Could not decode number of code length counts");
         return false;
     }
-    else if ((counts_size == 0) || (counts_size > (global_max_code_length + 1)))
+    else if ((counts_size == 0) || (counts_size > (m_max_code_length + 1)))
     {
         LOGW(
             "Decoded invalid number of code length counts %u",
@@ -150,7 +153,7 @@ bool HuffmanDecoder::decode_codes(
 
     // The first code length is 0, so the actual maximum code length is 1 less than the number of
     // length counts.
-    local_max_code_length = counts_size - 1;
+    max_code_length = counts_size - 1;
 
     // Decode the code length counts.
     std::vector<std::uint16_t> counts(counts_size);
@@ -194,7 +197,7 @@ bool HuffmanDecoder::decode_codes(
 
             if (m_huffman_codes_size == m_huffman_codes.size())
             {
-                LOGW("Exceeded maximum number of codes %u", m_huffman_codes_size);
+                LOGW("Exceeded maximum number of codes: %u", m_huffman_codes_size);
                 return false;
             }
 
@@ -203,7 +206,7 @@ bool HuffmanDecoder::decode_codes(
         }
     }
 
-    convert_to_prefix_table(local_max_code_length);
+    convert_to_prefix_table(max_code_length);
     return true;
 }
 
