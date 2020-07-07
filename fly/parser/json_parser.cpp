@@ -44,17 +44,21 @@ std::optional<Json> JsonParser::parse_internal(std::istream &stream)
         return std::nullopt;
     }
 
-    if (!stream.eof())
+    if (json)
     {
-        JLOG("Extraneous symbols found after JSON value");
-        return std::nullopt;
-    }
-    else if (json && (!json->is_object() && !json->is_array()))
-    {
-        if (!is_feature_allowed(Features::AllowAnyType))
+        if (!stream.eof())
         {
-            JLOG("Parsed non-object/non-array value, but Features::AllowAnyType is not enabled");
+            JLOG("Extraneous symbols found after JSON value");
             return std::nullopt;
+        }
+        else if (!json->is_object() && !json->is_array())
+        {
+            if (!is_feature_allowed(Features::AllowAnyType))
+            {
+                JLOG(
+                    "Parsed non-object/non-array value, but Features::AllowAnyType is not enabled");
+                return std::nullopt;
+            }
         }
     }
 
@@ -241,7 +245,6 @@ std::optional<Json> JsonParser::parse_value(std::istream &stream)
             break;
     }
 
-    JLOG("Could not convert %s to a JSON number", value);
     return std::nullopt;
 }
 

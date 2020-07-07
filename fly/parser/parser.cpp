@@ -9,7 +9,13 @@ namespace fly {
 std::optional<Json> Parser::parse_file(const std::filesystem::path &path)
 {
     std::ifstream stream(path);
-    return parse_stream(stream);
+
+    if (stream)
+    {
+        return parse_stream(stream);
+    }
+
+    return std::nullopt;
 }
 
 //==================================================================================================
