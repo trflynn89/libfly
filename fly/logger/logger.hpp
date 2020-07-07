@@ -126,7 +126,7 @@ public:
      * @param acquire_lock Whether to acquire lock before logging.
      * @param message The message to log.
      */
-    static void console_log(bool acquire_lock, const std::string &message);
+    static void console_log(bool acquire_lock, std::string &&message);
 
     /**
      * Add a log to the static logger instance.
@@ -142,7 +142,7 @@ public:
         const char *file,
         const char *function,
         std::uint32_t line,
-        const std::string &message);
+        std::string &&message);
 
     /**
      * Create the logger's log file on disk and initialize the logger task.
@@ -178,7 +178,7 @@ private:
         const char *file,
         const char *function,
         std::uint32_t line,
-        const std::string &message);
+        std::string &&message);
 
     /**
      * Create the log file. If a log file is already open, close it.
@@ -199,6 +199,7 @@ private:
     std::shared_ptr<CoderConfig> m_coder_config;
 
     const std::filesystem::path m_log_directory;
+    mutable std::mutex m_log_file_mutex;
     std::filesystem::path m_log_file;
     std::ofstream m_log_stream;
 

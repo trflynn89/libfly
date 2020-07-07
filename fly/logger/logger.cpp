@@ -38,7 +38,7 @@ void Logger::set_instance(const std::shared_ptr<Logger> &logger)
 }
 
 //==================================================================================================
-void Logger::console_log(bool acquire_lock, const std::string &message)
+void Logger::console_log(bool acquire_lock, std::string &&message)
 {
     std::unique_lock<std::mutex> lock(s_console_mutex, std::defer_lock);
     const std::string time_str = System::local_time();
@@ -57,17 +57,19 @@ void Logger::add_log(
     const char *file,
     const char *function,
     std::uint32_t line,
-    const std::string &message)
+    std::string &&message)
 {
     std::shared_ptr<Logger> logger = s_weak_instance.lock();
 
     if (logger)
     {
-        logger->add_log_internal(level, file, function, line, message);
+        logger->add_log_internal(level, file, function, line, std::move(message));
     }
     else
     {
-        console_log(true, String::format("%d %s:%s:%d %s", level, file, function, line, message));
+        console_log(
+            true,
+            String::format("%d %s:%s:%d %s", level, file, function, line, std::move(message)));
     }
 }
 
@@ -90,6 +92,7 @@ bool Logger::start()
 //==================================================================================================
 std::filesystem::path Logger::get_log_file_path() const
 {
+    std::unique_lock<std::mutex> lock(m_log_file_mutex);
     return m_log_file;
 }
 
@@ -102,6 +105,8 @@ bool Logger::poll()
     {
         m_log_stream << log << std::flush;
         std::error_code error;
+
+        std::unique_lock<std::mutex> lock(m_log_file_mutex);
 
         if (std::filesystem::file_size(m_log_file, error) > m_logger_config->max_log_file_size())
         {
@@ -118,14 +123,14 @@ void Logger::add_log_internal(
     const char *file,
     const char *function,
     std::uint32_t line,
-    const std::string &message)
+    std::string &&message)
 {
     auto now = std::chrono::high_resolution_clock::now();
     auto log_time = std::chrono::duration_cast<std::chrono::duration<double>>(now - m_start_time);
 
     if ((level >= Log::Level::Debug) && (level < Log::Level::NumLevels))
     {
-        Log log(m_logger_config, message);
+        Log log(m_logger_config, std::move(message));
 
         log.m_index = m_index++;
         log.m_level = level;

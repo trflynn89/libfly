@@ -33,12 +33,12 @@ Log::Log(Log &&log) noexcept :
 }
 
 //==================================================================================================
-Log::Log(const std::shared_ptr<LoggerConfig> &config, const std::string &message) noexcept :
+Log::Log(const std::shared_ptr<LoggerConfig> &config, std::string &&message) noexcept :
     m_index(0),
     m_level(Level::NumLevels),
     m_time(-1.0),
     m_line(0),
-    m_message(message, 0, config->max_message_size())
+    m_message(std::move(message), 0, config->max_message_size())
 {
     std::memset(m_file, 0, sizeof(m_file));
     std::memset(m_function, 0, sizeof(m_file));
