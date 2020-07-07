@@ -6,7 +6,7 @@
 #include "fly/types/string/string.hpp"
 #include "test/util/path_util.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include <cstdint>
 #include <filesystem>
@@ -41,499 +41,440 @@ public:
     }
 };
 
+/**
+ * Create a bitstream with the given bytes and number of remainder bits.
+ */
+std::string
+create_stream_with_remainder(std::vector<fly::byte_type> bytes, fly::byte_type remainder)
+{
+    std::ostringstream stream(std::ios::out | std::ios::binary);
+    fly::BitStreamWriter output(stream);
+
+    for (const fly::byte_type &byte : bytes)
+    {
+        output.write_byte(byte);
+    }
+    if (remainder > 0_u8)
+    {
+        output.write_bits(0_u8, remainder);
+    }
+
+    REQUIRE(output.finish());
+    return stream.str();
+}
+
+/**
+ * Create a bitstream with the given bytes and no remainder bits.
+ */
+std::string create_stream(std::vector<fly::byte_type> bytes)
+{
+    return create_stream_with_remainder(std::move(bytes), 0_u8);
+}
+
 } // namespace
 
 namespace fly {
 
-//==================================================================================================
-class HuffmanCoderTest : public ::testing::Test
+TEST_CASE("Huffman", "[coders]")
 {
-public:
-    HuffmanCoderTest() : m_config(std::make_shared<fly::CoderConfig>()), m_encoder(m_config)
-    {
-    }
+    auto config = std::make_shared<fly::CoderConfig>();
 
-protected:
-    std::string
-    create_stream_with_remainder(std::vector<fly::byte_type> bytes, fly::byte_type remainder)
-    {
-        std::stringstream stream(std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
-
-        fly::BitStreamWriter output(stream);
-
-        for (const fly::byte_type &byte : bytes)
-        {
-            output.write_byte(byte);
-        }
-        if (remainder > 0_u8)
-        {
-            output.write_bits(0_u8, remainder);
-        }
-
-        if (output.finish())
-        {
-            return stream.str();
-        }
-
-        return std::string();
-    }
-
-    std::string create_stream(std::vector<fly::byte_type> bytes)
-    {
-        return create_stream_with_remainder(std::move(bytes), 0_u8);
-    }
-
-    std::vector<HuffmanCode> get_decoded_huffman_codes()
-    {
-        std::vector<HuffmanCode> codes;
-
-        for (std::uint16_t i = 0; i < m_decoder.m_huffman_codes_size; ++i)
-        {
-            const HuffmanCode &code = m_decoder.m_huffman_codes[i];
-            codes.emplace_back(code.m_symbol, code.m_code, code.m_length);
-        }
-
-        return codes;
-    }
-
-    std::shared_ptr<fly::CoderConfig> m_config;
-    fly::HuffmanEncoder m_encoder;
-    fly::HuffmanDecoder m_decoder;
-};
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, InvalidConfig)
-{
-    const std::string raw;
-    std::string enc;
-
-    auto config = std::make_shared<BadCoderConfig>();
     fly::HuffmanEncoder encoder(config);
+    fly::HuffmanDecoder decoder;
 
-    EXPECT_FALSE(encoder.encode_string(raw, enc));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, HeaderMissingVersion)
-{
-    const std::string enc;
-    std::string dec;
-
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, HeaderInvalidVersion)
-{
-    std::vector<fly::byte_type> bytes = {
-        0_u8, // Version
-    };
-
-    const std::string enc = create_stream(std::move(bytes));
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, HeaderMissingChunkSize)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-    };
-
-    const std::string enc = create_stream(std::move(bytes));
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, HeaderZeroChunkSize)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        0_u8, // Chunk size KB (low)
-    };
-
-    const std::string enc = create_stream(std::move(bytes));
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, HeaderMissingMaxCodeLength)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        1_u8, // Chunk size KB (low)
-    };
-
-    const std::string enc = create_stream(std::move(bytes));
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, HeaderZeroMaxCodeLength)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        1_u8, // Chunk size KB (low)
-        0_u8, // Maximum Huffman code length
-    };
-
-    const std::string enc = create_stream(std::move(bytes));
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, HeaderInvalidMaxCodeLength)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        1_u8, // Chunk size KB (low)
-        255_u8, // Maximum Huffman code length
-    };
-
-    const std::string enc = create_stream(std::move(bytes));
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, IncompleteCodeLengthCounts)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        1_u8, // Chunk size KB (low)
-        4_u8, // Maximum Huffman code length
-    };
-
-    const std::string enc = create_stream_with_remainder(std::move(bytes), 1_u8);
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, ZeroCodeLengthCounts)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        1_u8, // Chunk size KB (low)
-        4_u8, // Maximum Huffman code length
-        0_u8, // Number of code length counts
-    };
-
-    const std::string enc = create_stream(std::move(bytes));
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, InvalidCodeLengthCounts)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        1_u8, // Chunk size KB (low)
-        4_u8, // Maximum Huffman code length
-        8_u8, // Number of code length counts
-    };
-
-    const std::string enc = create_stream(std::move(bytes));
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, MissingCodeLengthCount)
-{
-    fly::byte_type number_of_code_length_counts = 5_u8;
-
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        1_u8, // Chunk size KB (low)
-        4_u8, // Maximum Huffman code length
-        number_of_code_length_counts, // Number of code length counts
-    };
-
-    for (fly::byte_type i = 0; i < number_of_code_length_counts; ++i)
+    SECTION("Cannot encode stream using an invalid configuration")
     {
-        const std::string enc = create_stream(bytes);
+        const std::string raw;
+        std::string enc;
+
+        config = std::make_shared<BadCoderConfig>();
+        fly::HuffmanEncoder bad_encoder(config);
+
+        CHECK_FALSE(bad_encoder.encode_string(raw, enc));
+    }
+
+    SECTION("Cannot decode stream missing the encoder's version")
+    {
+        const std::string enc;
         std::string dec;
 
-        EXPECT_FALSE(enc.empty());
-        EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-
-        bytes.push_back(0_u8);
-        bytes.push_back(1_u8);
+        CHECK_FALSE(decoder.decode_string(enc, dec));
     }
-}
 
-//==================================================================================================
-TEST_F(HuffmanCoderTest, MissingSymbol)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        1_u8, // Chunk size KB (low)
-        4_u8, // Maximum Huffman code length
-        2_u8, // Number of code length counts
-        0_u8, // Code length count 1 (high)
-        0_u8, // Code length count 1 (low)
-        0_u8, // Code length count 2 (high)
-        1_u8, // Code length count 2 (low)
-    };
-
-    const std::string enc = create_stream(std::move(bytes));
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, TooManyCodes)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        1_u8, // Chunk size KB (low)
-        4_u8, // Maximum Huffman code length
-        2_u8, // Number of code length counts
-        0_u8, // Code length count 1 (high)
-        0_u8, // Code length count 1 (low)
-        std::numeric_limits<std::uint8_t>::max(), // Code length count 2 (high)
-        std::numeric_limits<std::uint8_t>::max(), // Code length count 2 (low)
-    };
-
-    for (auto i = 0; i < std::numeric_limits<std::uint16_t>::max(); ++i)
+    SECTION("Cannot decode stream with an invalid encoder version")
     {
-        bytes.push_back(1_u8);
+        std::vector<fly::byte_type> bytes = {
+            0_u8, // Version
+        };
+
+        const std::string enc = create_stream(std::move(bytes));
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
     }
 
-    const std::string enc = create_stream(std::move(bytes));
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, MissingSymbols)
-{
-    std::vector<fly::byte_type> bytes = {
-        1_u8, // Version
-        0_u8, // Chunk size KB (high)
-        1_u8, // Chunk size KB (low)
-        4_u8, // Maximum Huffman code length
-        1_u8, // Number of code length counts
-        0_u8, // Code length count 1 (high)
-        1_u8, // Code length count 1 (low),
-        0x41, // Single symbol (A)
-    };
-
-    const std::string enc = create_stream_with_remainder(std::move(bytes), 1);
-    std::string dec;
-
-    EXPECT_FALSE(enc.empty());
-    EXPECT_FALSE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, Empty)
-{
-    const std::string raw;
-    std::string enc, dec;
-
-    ASSERT_TRUE(m_encoder.encode_string(raw, enc));
-    ASSERT_TRUE(m_decoder.decode_string(enc, dec));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, OneSymbol)
-{
-    const std::string raw = "a";
-    std::string enc, dec;
-
-    ASSERT_TRUE(m_encoder.encode_string(raw, enc));
-    ASSERT_TRUE(m_decoder.decode_string(enc, dec));
-
-    EXPECT_EQ(raw, dec);
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, OneUniqueSymbol)
-{
-    const std::string raw = "aaaaaaaaaa";
-    std::string enc, dec;
-
-    ASSERT_TRUE(m_encoder.encode_string(raw, enc));
-    ASSERT_TRUE(m_decoder.decode_string(enc, dec));
-
-    EXPECT_EQ(raw, dec);
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, Mirror)
-{
-    const std::string raw = "abcdefabcbbb";
-    std::string enc, dec;
-
-    ASSERT_TRUE(m_encoder.encode_string(raw, enc));
-    ASSERT_TRUE(m_decoder.decode_string(enc, dec));
-
-    EXPECT_EQ(raw, dec);
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, LengthLimited)
-{
-    const std::string raw = "abcdefabcbbb";
-    std::string enc, dec;
-
-    auto config = std::make_shared<SmallCodeLengthConfig>();
-    fly::HuffmanEncoder encoder(config);
-
-    ASSERT_TRUE(encoder.encode_string(raw, enc));
-    ASSERT_TRUE(m_decoder.decode_string(enc, dec));
-
-    EXPECT_EQ(raw, dec);
-
-    // Validate the Kraft–McMillan inequality.
-    const auto max_allowed_kraft = (1_u16 << config->huffman_encoder_max_code_length()) - 1;
-    std::uint16_t kraft = 0_u16;
-
-    for (const HuffmanCode &code : get_decoded_huffman_codes())
+    SECTION("Cannot decode stream missing the encoder's configured chunk size")
     {
-        kraft += 1_u16 << (config->huffman_encoder_max_code_length() - code.m_length);
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+        };
+
+        const std::string enc = create_stream(std::move(bytes));
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
     }
 
-    EXPECT_LE(kraft, max_allowed_kraft);
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, LargeMirror)
-{
-    const std::string raw = fly::String::generate_random_string(100 << 10);
-    std::string enc, dec;
-
-    ASSERT_TRUE(m_encoder.encode_string(raw, enc));
-    ASSERT_TRUE(m_decoder.decode_string(enc, dec));
-
-    EXPECT_GT(raw.size(), enc.size());
-    EXPECT_EQ(raw, dec);
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderTest, Unicode)
-{
-    std::string raw = "🍕א😅😅🍕❤️א🍕";
-    std::string enc, dec;
-
-    for (int i = 0; i < 10; ++i)
+    SECTION("Cannot decode stream with an invalid encoder chunk size")
     {
-        raw += raw;
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            0_u8, // Chunk size KB (low)
+        };
+
+        const std::string enc = create_stream(std::move(bytes));
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
     }
 
-    ASSERT_TRUE(m_encoder.encode_string(raw, enc));
-    ASSERT_TRUE(m_decoder.decode_string(enc, dec));
-
-    EXPECT_GT(raw.size(), enc.size());
-    EXPECT_EQ(raw, dec);
-}
-
-//==================================================================================================
-class HuffmanCoderFileTest : public HuffmanCoderTest
-{
-public:
-    HuffmanCoderFileTest() noexcept :
-        HuffmanCoderTest(),
-        m_encoded_file(m_path.file()),
-        m_decoded_file(m_path.file())
+    SECTION("Cannot decode stream missing the encoder's configured maximum code length")
     {
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            1_u8, // Chunk size KB (low)
+        };
+
+        const std::string enc = create_stream(std::move(bytes));
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
     }
 
-protected:
-    fly::PathUtil::ScopedTempDirectory m_path;
-    std::filesystem::path m_encoded_file;
-    std::filesystem::path m_decoded_file;
-};
-
-//==================================================================================================
-TEST_F(HuffmanCoderFileTest, AsciiFile)
-{
-    // Generated with:
-    // tr -dc '[:graph:]' </dev/urandom | head -c 4194304 > test.txt
-    const auto here = std::filesystem::path(__FILE__).parent_path();
-    const auto raw = here / "data" / "test.txt";
-
-    ASSERT_TRUE(m_encoder.encode_file(raw, m_encoded_file));
-    ASSERT_TRUE(m_decoder.decode_file(m_encoded_file, m_decoded_file));
-
-    EXPECT_GT(std::filesystem::file_size(raw), std::filesystem::file_size(m_encoded_file));
-    EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderFileTest, BinaryFile)
-{
-    // Generated with:
-    // dd if=/dev/urandom of=test.bin count=1 bs=4194304
-    const auto here = std::filesystem::path(__FILE__).parent_path();
-    const auto raw = here / "data" / "test.bin";
-
-    ASSERT_TRUE(m_encoder.encode_file(raw, m_encoded_file));
-    ASSERT_TRUE(m_decoder.decode_file(m_encoded_file, m_decoded_file));
-
-    EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
-}
-
-//==================================================================================================
-TEST_F(HuffmanCoderFileTest, Enwik8File)
-{
-    // Downloaded from: http://mattmahoney.net/dc/enwik8.zip
-    const auto here = std::filesystem::path(__FILE__).parent_path();
-    const auto raw = here / "data" / "enwik8";
-
-    if (!std::filesystem::exists(raw))
+    SECTION("Cannot decode stream with an encoder maximum code length that is too small")
     {
-        // TODO: The enwik8 file is 100MB. Instead of checking it into git and encoding/decoding it
-        // with debug mode unit tests, a performance test should be created that downloads the file
-        // and runs in release mode.
-        return;
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            1_u8, // Chunk size KB (low)
+            0_u8, // Maximum Huffman code length
+        };
+
+        const std::string enc = create_stream(std::move(bytes));
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
     }
 
-    ASSERT_TRUE(m_encoder.encode_file(raw, m_encoded_file));
-    ASSERT_TRUE(m_decoder.decode_file(m_encoded_file, m_decoded_file));
+    SECTION("Cannot decode stream with an encoder maximum code length that is too large")
+    {
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            1_u8, // Chunk size KB (low)
+            255_u8, // Maximum Huffman code length
+        };
 
-    EXPECT_GT(std::filesystem::file_size(raw), std::filesystem::file_size(m_encoded_file));
-    EXPECT_TRUE(fly::PathUtil::compare_files(raw, m_decoded_file));
+        const std::string enc = create_stream(std::move(bytes));
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
+    }
+
+    SECTION("Cannot decode stream missing the encoder's code length count")
+    {
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            1_u8, // Chunk size KB (low)
+            4_u8, // Maximum Huffman code length
+        };
+
+        const std::string enc = create_stream_with_remainder(std::move(bytes), 1_u8);
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
+    }
+
+    SECTION("Cannot decode stream with an encoder code length count that is too small")
+    {
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            1_u8, // Chunk size KB (low)
+            4_u8, // Maximum Huffman code length
+            0_u8, // Number of code length counts
+        };
+
+        const std::string enc = create_stream(std::move(bytes));
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
+    }
+
+    SECTION("Cannot decode stream with an encoder code length count that is too large")
+    {
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            1_u8, // Chunk size KB (low)
+            4_u8, // Maximum Huffman code length
+            8_u8, // Number of code length counts
+        };
+
+        const std::string enc = create_stream(std::move(bytes));
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
+    }
+
+    SECTION("Cannot decode stream with less code lengths than the encoder's code length count")
+    {
+        fly::byte_type number_of_code_length_counts = 5_u8;
+
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            1_u8, // Chunk size KB (low)
+            4_u8, // Maximum Huffman code length
+            number_of_code_length_counts, // Number of code length counts
+        };
+
+        for (fly::byte_type i = 0; i < number_of_code_length_counts; ++i)
+        {
+            const std::string enc = create_stream(bytes);
+            std::string dec;
+
+            CHECK_FALSE(enc.empty());
+            CHECK_FALSE(decoder.decode_string(enc, dec));
+
+            bytes.push_back(0_u8);
+            bytes.push_back(1_u8);
+        }
+    }
+
+    SECTION("Cannot decode stream missing the encoder's symbols")
+    {
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            1_u8, // Chunk size KB (low)
+            4_u8, // Maximum Huffman code length
+            2_u8, // Number of code length counts
+            0_u8, // Code length count 1 (high)
+            0_u8, // Code length count 1 (low)
+            0_u8, // Code length count 2 (high)
+            1_u8, // Code length count 2 (low)
+        };
+
+        const std::string enc = create_stream(std::move(bytes));
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
+    }
+
+    SECTION("Cannot decode stream with too many encoded Huffman codes")
+    {
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            1_u8, // Chunk size KB (low)
+            4_u8, // Maximum Huffman code length
+            2_u8, // Number of code length counts
+            0_u8, // Code length count 1 (high)
+            0_u8, // Code length count 1 (low)
+            std::numeric_limits<std::uint8_t>::max(), // Code length count 2 (high)
+            std::numeric_limits<std::uint8_t>::max(), // Code length count 2 (low)
+        };
+
+        for (auto i = 0; i < std::numeric_limits<std::uint16_t>::max(); ++i)
+        {
+            bytes.push_back(1_u8);
+        }
+
+        const std::string enc = create_stream(std::move(bytes));
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
+    }
+
+    SECTION("Cannot decode stream with too few encoded symbols")
+    {
+        std::vector<fly::byte_type> bytes = {
+            1_u8, // Version
+            0_u8, // Chunk size KB (high)
+            1_u8, // Chunk size KB (low)
+            4_u8, // Maximum Huffman code length
+            1_u8, // Number of code length counts
+            0_u8, // Code length count 1 (high)
+            1_u8, // Code length count 1 (low),
+            0x41, // Single symbol (A)
+        };
+
+        const std::string enc = create_stream_with_remainder(std::move(bytes), 1);
+        std::string dec;
+
+        CHECK_FALSE(enc.empty());
+        CHECK_FALSE(decoder.decode_string(enc, dec));
+    }
+
+    SECTION("Encode and decode empty stream")
+    {
+        const std::string raw;
+        std::string enc, dec;
+
+        REQUIRE(encoder.encode_string(raw, enc));
+        REQUIRE(decoder.decode_string(enc, dec));
+
+        CHECK(raw == dec);
+    }
+
+    SECTION("Encode and decode a stream with a single symbol")
+    {
+        const std::string raw = "a";
+        std::string enc, dec;
+
+        REQUIRE(encoder.encode_string(raw, enc));
+        REQUIRE(decoder.decode_string(enc, dec));
+
+        CHECK(raw == dec);
+    }
+
+    SECTION("Encode and decode a stream with a single symbol repeated")
+    {
+        const std::string raw = "aaaaaaaaaa";
+        std::string enc, dec;
+
+        REQUIRE(encoder.encode_string(raw, enc));
+        REQUIRE(decoder.decode_string(enc, dec));
+
+        CHECK(raw == dec);
+    }
+
+    SECTION("Encode and decode a small stream")
+    {
+        const std::string raw = "abcdefabcbbb";
+        std::string enc, dec;
+
+        REQUIRE(encoder.encode_string(raw, enc));
+        REQUIRE(decoder.decode_string(enc, dec));
+
+        CHECK(raw == dec);
+    }
+
+    SECTION("Encode and decode a large stream")
+    {
+        const std::string raw = fly::String::generate_random_string(100 << 10);
+        std::string enc, dec;
+
+        REQUIRE(encoder.encode_string(raw, enc));
+        REQUIRE(decoder.decode_string(enc, dec));
+
+        CHECK(raw.size() > enc.size());
+        CHECK(raw == dec);
+    }
+
+    SECTION("Limit code lengths to a small value and validate the Kraft–McMillan inequality")
+    {
+        const std::string raw = "abcdefabcbbb";
+        std::string enc, dec;
+
+        config = std::make_shared<SmallCodeLengthConfig>();
+        fly::HuffmanEncoder limted_encoder(config);
+
+        REQUIRE(limted_encoder.encode_string(raw, enc));
+        REQUIRE(decoder.decode_string(enc, dec));
+
+        CHECK(raw == dec);
+
+        const auto max_allowed_kraft = (1_u16 << config->huffman_encoder_max_code_length()) - 1;
+        CHECK(decoder.compute_kraft_mcmillan_constant() <= max_allowed_kraft);
+    }
+
+    SECTION("Encode and decode a stream with non-ASCII Unicode characters")
+    {
+        std::string raw = "🍕א😅😅🍕❤️א🍕";
+        std::string enc, dec;
+
+        for (int i = 0; i < 10; ++i)
+        {
+            raw += raw;
+        }
+
+        REQUIRE(encoder.encode_string(raw, enc));
+        REQUIRE(decoder.decode_string(enc, dec));
+
+        CHECK(raw.size() > enc.size());
+        CHECK(raw == dec);
+    }
+
+    SECTION("File tests")
+    {
+        fly::PathUtil::ScopedTempDirectory path;
+        std::filesystem::path encoded_file = path.file();
+        std::filesystem::path decoded_file = path.file();
+
+        SECTION("Encode and decode a large file containing only ASCII symbols")
+        {
+            // Generated with:
+            // tr -dc '[:graph:]' </dev/urandom | head -c 4194304 > test.txt
+            const auto here = std::filesystem::path(__FILE__).parent_path();
+            const auto raw = here / "data" / "test.txt";
+
+            REQUIRE(encoder.encode_file(raw, encoded_file));
+            REQUIRE(decoder.decode_file(encoded_file, decoded_file));
+
+            CHECK(std::filesystem::file_size(raw) > std::filesystem::file_size(encoded_file));
+            CHECK(fly::PathUtil::compare_files(raw, decoded_file));
+        }
+
+        SECTION("Encode and decode a large file containing ASCII and non-ASCII symbols")
+        {
+            // Generated with:
+            // dd if=/dev/urandom of=test.bin count=1 bs=4194304
+            const auto here = std::filesystem::path(__FILE__).parent_path();
+            const auto raw = here / "data" / "test.bin";
+
+            REQUIRE(encoder.encode_file(raw, encoded_file));
+            REQUIRE(decoder.decode_file(encoded_file, decoded_file));
+
+            CHECK(fly::PathUtil::compare_files(raw, decoded_file));
+        }
+
+        SECTION("Encode and decode an extremely large file")
+        {
+            // Downloaded from: http://mattmahoney.net/dc/enwik8.zip
+            const auto here = std::filesystem::path(__FILE__).parent_path();
+            const auto raw = here / "data" / "enwik8";
+
+            if (!std::filesystem::exists(raw))
+            {
+                // TODO: The enwik8 file is 100MB. Instead of checking it into git and coding it
+                // with debug mode unit tests, a performance test should be created that downloads
+                // the file and runs in release mode.
+                return;
+            }
+
+            REQUIRE(encoder.encode_file(raw, encoded_file));
+            REQUIRE(decoder.decode_file(encoded_file, decoded_file));
+
+            CHECK(std::filesystem::file_size(raw) == std::filesystem::file_size(encoded_file));
+            CHECK(fly::PathUtil::compare_files(raw, decoded_file));
+        }
+    }
 }
 
 } // namespace fly
