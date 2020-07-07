@@ -3,63 +3,52 @@
 #include "fly/types/json/json.hpp"
 #include "test/config/test_config.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include <cstddef>
-#include <memory>
 
-//==================================================================================================
-class ConfigTest : public ::testing::Test
+TEST_CASE("Config", "[config]")
 {
-public:
-    ConfigTest() noexcept : m_config(std::make_shared<TestConfig>())
+    TestConfig config;
+
+    SECTION("Non-existing values fallback to provided default")
     {
+        CHECK(config.get_value<std::string>("bad-name", "def") == "def");
     }
 
-protected:
-    std::shared_ptr<TestConfig> m_config;
-};
+    SECTION("Values that can't convert to the desired type fallback to provided default")
+    {
+        const fly::Json values = {{"name", "John Doe"}, {"address", "USA"}};
 
-//==================================================================================================
-TEST_F(ConfigTest, NonExisting)
-{
-    EXPECT_EQ(m_config->get_value<std::string>("bad-name", "def"), "def");
-}
+        config.update(values);
 
-//==================================================================================================
-TEST_F(ConfigTest, NonCovertible)
-{
-    const fly::Json values = {{"name", "John Doe"}, {"address", "USA"}};
+        CHECK(config.get_value<int>("name", 12) == 12);
+        CHECK(config.get_value<std::nullptr_t>("address", nullptr) == nullptr);
+    }
 
-    m_config->update(values);
+    SECTION("Mixed conversion of value types")
+    {
+        const fly::Json values =
+            {{"name", "John Doe"}, {"address", "123"}, {"employed", "1"}, {"age", "26.2"}};
 
-    EXPECT_EQ(m_config->get_value<int>("name", 12), 12);
-    EXPECT_EQ(m_config->get_value<std::nullptr_t>("address", nullptr), nullptr);
-}
+        config.update(values);
 
-//==================================================================================================
-TEST_F(ConfigTest, MultipleValueType)
-{
-    const fly::Json values =
-        {{"name", "John Doe"}, {"address", "123"}, {"employed", "1"}, {"age", "26.2"}};
+        CHECK(config.get_value<std::string>("name", "") == "John Doe");
 
-    m_config->update(values);
+        CHECK(config.get_value<std::string>("address", "") == "123");
+        CHECK(config.get_value<int>("address", 0) == 123);
+        CHECK(config.get_value<unsigned int>("address", 0) == 123);
+        CHECK(config.get_value<float>("address", 0.0f) == Approx(123.0f));
+        CHECK(config.get_value<double>("address", 0.0) == Approx(123.0));
 
-    EXPECT_EQ(m_config->get_value<std::string>("name", ""), "John Doe");
+        CHECK(config.get_value<std::string>("age", "") == "26.2");
+        CHECK(config.get_value<int>("age", 0) == 0);
+        CHECK(config.get_value<unsigned int>("age", 0) == 0);
+        CHECK(config.get_value<float>("age", 0.0f) == Approx(26.2f));
+        CHECK(config.get_value<double>("age", 0.0) == Approx(26.2));
 
-    EXPECT_EQ(m_config->get_value<std::string>("address", ""), "123");
-    EXPECT_EQ(m_config->get_value<int>("address", 0), 123);
-    EXPECT_EQ(m_config->get_value<unsigned int>("address", 0), 123);
-    EXPECT_EQ(m_config->get_value<float>("address", 0.0f), 123.0f);
-    EXPECT_EQ(m_config->get_value<double>("address", 0.0), 123.0);
-
-    EXPECT_EQ(m_config->get_value<std::string>("age", ""), "26.2");
-    EXPECT_EQ(m_config->get_value<int>("age", 0), 0);
-    EXPECT_EQ(m_config->get_value<unsigned int>("age", 0), 0);
-    EXPECT_EQ(m_config->get_value<float>("age", 0.0f), 26.2f);
-    EXPECT_EQ(m_config->get_value<double>("age", 0.0), 26.2);
-
-    EXPECT_EQ(m_config->get_value<std::string>("employed", ""), "1");
-    EXPECT_EQ(m_config->get_value<bool>("employed", false), true);
-    EXPECT_EQ(m_config->get_value<int>("employed", 0), 1);
+        CHECK(config.get_value<std::string>("employed", "") == "1");
+        CHECK(config.get_value<bool>("employed", false) == true);
+        CHECK(config.get_value<int>("employed", 0) == 1);
+    }
 }

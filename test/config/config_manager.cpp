@@ -9,7 +9,7 @@
 #include "test/util/path_util.hpp"
 #include "test/util/waitable_task_runner.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include <filesystem>
 #include <memory>
@@ -29,304 +29,246 @@ public:
     }
 };
 
-} // namespace
-
-//==================================================================================================
-class ConfigManagerTest : public ::testing::Test
-{
-public:
-    ConfigManagerTest() noexcept :
-        m_file(m_path.file()),
-
-        m_task_manager(std::make_shared<fly::TaskManager>(1)),
-        m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
-
-        m_config_manager(std::make_shared<fly::ConfigManager>(
-            m_task_runner,
-            fly::ConfigManager::ConfigFileType::Json,
-            m_file)),
-        m_path_config(m_config_manager->create_config<TestPathConfig>())
-    {
-    }
-
-    /**
-     * Start the task and config managers.
-     */
-    void SetUp() override
-    {
-        ASSERT_TRUE(m_task_manager->start());
-        ASSERT_TRUE(m_config_manager->start());
-
-        m_initial_size = m_config_manager->prune();
-    }
-
-    /**
-     * Stop the task manager.
-     */
-    void TearDown() override
-    {
-        ASSERT_TRUE(m_task_manager->stop());
-    }
-
-protected:
-    fly::PathUtil::ScopedTempDirectory m_path;
-    std::filesystem::path m_file;
-
-    std::shared_ptr<fly::TaskManager> m_task_manager;
-    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_task_runner;
-
-    std::shared_ptr<fly::ConfigManager> m_config_manager;
-
-    std::shared_ptr<fly::PathConfig> m_path_config;
-
-    fly::ConfigManager::ConfigMap::size_type m_initial_size;
-};
-
-//==================================================================================================
+/**
+ * Badly written config class which uses the same identifier as TestConfig.
+ */
 class BadConfig : public fly::Config
 {
 public:
-    // Badly written config class which uses the same identifier as TestConfig.
     static constexpr const char *identifier = TestConfig::identifier;
 };
 
-//==================================================================================================
-TEST_F(ConfigManagerTest, AllFileTypes)
+} // namespace
+
+TEST_CASE("ConfigManager", "[config]")
 {
-    {
-        m_config_manager = std::make_shared<fly::ConfigManager>(
-            m_task_runner,
-            fly::ConfigManager::ConfigFileType::Ini,
-            m_file);
-        m_path_config = m_config_manager->create_config<TestPathConfig>();
+    auto task_manager = std::make_shared<fly::TaskManager>(1);
+    REQUIRE(task_manager->start());
 
-        EXPECT_TRUE(m_config_manager->start());
-    }
-    {
-        m_config_manager = std::make_shared<fly::ConfigManager>(
-            m_task_runner,
-            fly::ConfigManager::ConfigFileType::Json,
-            m_file);
-        m_path_config = m_config_manager->create_config<TestPathConfig>();
+    auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
 
-        EXPECT_TRUE(m_config_manager->start());
-    }
-}
+    fly::PathUtil::ScopedTempDirectory config_path;
+    std::filesystem::path config_file = config_path.file();
 
-//==================================================================================================
-TEST_F(ConfigManagerTest, BadFileType)
-{
-    m_config_manager = std::make_shared<fly::ConfigManager>(
-        m_task_runner,
-        static_cast<fly::ConfigManager::ConfigFileType>(-1),
-        m_file);
-
-    EXPECT_FALSE(m_config_manager->start());
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, BadConfigType)
-{
-    EXPECT_EQ(m_config_manager->prune(), m_initial_size);
-
-    auto config = m_config_manager->create_config<TestConfig>();
-    EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
-
-    auto config2 = m_config_manager->create_config<BadConfig>();
-    EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
-    EXPECT_FALSE(config2);
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, create_config)
-{
-    auto config = m_config_manager->create_config<TestConfig>();
-    EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, DuplicateConfig)
-{
-    auto config1 = m_config_manager->create_config<TestConfig>();
-    EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
-
-    auto config2 = m_config_manager->create_config<TestConfig>();
-    EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, DeletedConfig)
-{
-    EXPECT_EQ(m_config_manager->prune(), m_initial_size);
-
-    {
-        auto config = m_config_manager->create_config<TestConfig>();
-        EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
-    }
-
-    EXPECT_EQ(m_config_manager->prune(), m_initial_size);
-
-    {
-        auto config = m_config_manager->create_config<TestConfig>();
-        EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
-    }
-
-    auto config = m_config_manager->create_config<TestConfig>();
-    EXPECT_FALSE(config.get() == NULL);
-    config.reset();
-
-    config = m_config_manager->create_config<TestConfig>();
-    EXPECT_FALSE(config.get() == NULL);
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, DeletedConfigDetectedByPoller)
-{
-    EXPECT_EQ(m_config_manager->prune(), m_initial_size);
-
-    const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "USA"}}}};
-    const std::string contents(json);
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-
-    {
-        auto config = m_config_manager->create_config<TestConfig>();
-        EXPECT_EQ(m_config_manager->prune(), m_initial_size + 1);
-
-        EXPECT_EQ(config->get_value<std::string>("name", ""), "John Doe");
-        EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
-    }
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents + "\n"));
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-
-    EXPECT_EQ(m_config_manager->prune(), m_initial_size);
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, InitialFileFirst)
-{
-    const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "USA"}}}};
-    const std::string contents(json);
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-
-    auto config = m_config_manager->create_config<TestConfig>();
-
-    EXPECT_EQ(config->get_value<std::string>("name", ""), "John Doe");
-    EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, InitialFileSecond)
-{
-    auto config = m_config_manager->create_config<TestConfig>();
-
-    const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "USA"}}}};
-    const std::string contents(json);
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-
-    EXPECT_EQ(config->get_value<std::string>("name", ""), "John Doe");
-    EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, FileChange)
-{
-    auto config = m_config_manager->create_config<TestConfig>();
-
-    const fly::Json json1 {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "USA"}}}};
-    const std::string contents1(json1);
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents1));
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-
-    EXPECT_EQ(config->get_value<std::string>("name", ""), "John Doe");
-    EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
-    EXPECT_EQ(config->get_value<int>("age", -1), -1);
-
-    const fly::Json json2 {{TestConfig::identifier, {{"name", "Jane Doe"}, {"age", 27}}}};
-    const std::string contents2(json2);
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents2));
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-
-    // Multiple fly::PathMonitor::PathEvent::Changed events may be triggered even though the above
-    // write happens as a single call. If needed, wait for a second event.
-    if (config->get_value<std::string>("name", "").empty())
-    {
-        m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-    }
-
-    EXPECT_EQ(config->get_value<std::string>("name", ""), "Jane Doe");
-    EXPECT_EQ(config->get_value<std::string>("address", ""), "");
-    EXPECT_EQ(config->get_value<int>("age", -1), 27);
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, DeleteFile)
-{
-    auto config = m_config_manager->create_config<TestConfig>();
-
-    const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "USA"}}}};
-    const std::string contents(json);
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-
-    EXPECT_EQ(config->get_value<std::string>("name", ""), "John Doe");
-    EXPECT_EQ(config->get_value<std::string>("address", ""), "USA");
-
-    std::filesystem::remove(m_file);
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-
-    EXPECT_EQ(config->get_value<std::string>("name", ""), "");
-    EXPECT_EQ(config->get_value<std::string>("address", ""), "");
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, BadUpdate)
-{
-    auto config = m_config_manager->create_config<TestConfig>();
-
-    const std::string contents(" ");
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-
-    EXPECT_EQ(config->get_value<std::string>("name", ""), "");
-    EXPECT_EQ(config->get_value<std::string>("address", ""), "");
-}
-
-//==================================================================================================
-TEST_F(ConfigManagerTest, BadObject)
-{
-    m_config_manager = std::make_shared<fly::ConfigManager>(
-        m_task_runner,
+    auto config_manager = std::make_shared<fly::ConfigManager>(
+        task_runner,
         fly::ConfigManager::ConfigFileType::Json,
-        m_file);
-    m_path_config = m_config_manager->create_config<TestPathConfig>();
+        config_file);
+    auto path_config = config_manager->create_config<TestPathConfig>();
+    REQUIRE(config_manager->start());
 
-    EXPECT_TRUE(m_config_manager->start());
+    auto initial_size = config_manager->prune();
 
-    auto config = m_config_manager->create_config<TestConfig>();
+    SECTION("Config managers can be started for all file types")
+    {
+        config_manager = std::make_shared<fly::ConfigManager>(
+            task_runner,
+            fly::ConfigManager::ConfigFileType::Ini,
+            config_file);
+        CHECK(config_manager->start());
 
-    const std::string contents("[1, 2, 3]");
+        config_manager = std::make_shared<fly::ConfigManager>(
+            task_runner,
+            fly::ConfigManager::ConfigFileType::Json,
+            config_file);
+        CHECK(config_manager->start());
+    }
 
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file, contents));
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-    m_task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+    SECTION("Cannot start a config manager of an unsupported file type")
+    {
+        config_manager = std::make_shared<fly::ConfigManager>(
+            task_runner,
+            static_cast<fly::ConfigManager::ConfigFileType>(-1),
+            config_file);
+        CHECK_FALSE(config_manager->start());
+    }
 
-    EXPECT_EQ(config->get_value<std::string>("name", ""), "");
-    EXPECT_EQ(config->get_value<std::string>("address", ""), "");
+    SECTION("Cannot create a config with a duplicated identifier")
+    {
+        CHECK(config_manager->prune() == initial_size);
+
+        auto config = config_manager->create_config<TestConfig>();
+        CHECK(config_manager->prune() == initial_size + 1);
+
+        auto config2 = config_manager->create_config<BadConfig>();
+        CHECK(config_manager->prune() == initial_size + 1);
+        CHECK_FALSE(config2);
+    }
+
+    SECTION("Creating a config increases the config manager's stored configs by one")
+    {
+        auto config = config_manager->create_config<TestConfig>();
+        CHECK(config_manager->prune() == initial_size + 1);
+    }
+
+    SECTION("Creating an existing configuration does not actually recreate the config")
+    {
+        auto config1 = config_manager->create_config<TestConfig>();
+        CHECK(config_manager->prune() == initial_size + 1);
+
+        auto config2 = config_manager->create_config<TestConfig>();
+        CHECK(config_manager->prune() == initial_size + 1);
+    }
+
+    SECTION("Synchronously detecting deleted config objects")
+    {
+        CHECK(config_manager->prune() == initial_size);
+        {
+            auto config = config_manager->create_config<TestConfig>();
+            CHECK(config_manager->prune() == initial_size + 1);
+        }
+
+        CHECK(config_manager->prune() == initial_size);
+        {
+            auto config = config_manager->create_config<TestConfig>();
+            CHECK(config_manager->prune() == initial_size + 1);
+        }
+
+        auto config = config_manager->create_config<TestConfig>();
+        CHECK(config);
+
+        config.reset();
+
+        config = config_manager->create_config<TestConfig>();
+        CHECK(config);
+    }
+
+    SECTION("Asynchronously detecting deleted config objects")
+    {
+        CHECK(config_manager->prune() == initial_size);
+
+        const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
+        const std::string contents(json);
+
+        REQUIRE(fly::PathUtil::write_file(config_file, contents));
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+
+        {
+            auto config = config_manager->create_config<TestConfig>();
+            CHECK(config_manager->prune() == initial_size + 1);
+
+            CHECK(config->get_value<std::string>("name", "") == "John Doe");
+            CHECK(config->get_value<std::string>("address", "") == "MA");
+        }
+
+        REQUIRE(fly::PathUtil::write_file(config_file, contents + "\n"));
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+
+        CHECK(config_manager->prune() == initial_size);
+    }
+
+    SECTION("Config manager respects file created before config object")
+    {
+        const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
+        const std::string contents(json);
+
+        REQUIRE(fly::PathUtil::write_file(config_file, contents));
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+
+        auto config = config_manager->create_config<TestConfig>();
+
+        CHECK(config->get_value<std::string>("name", "") == "John Doe");
+        CHECK(config->get_value<std::string>("address", "") == "MA");
+    }
+
+    SECTION("Config manager respects file created after config object")
+    {
+        auto config = config_manager->create_config<TestConfig>();
+
+        const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
+        const std::string contents(json);
+
+        REQUIRE(fly::PathUtil::write_file(config_file, contents));
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+
+        CHECK(config->get_value<std::string>("name", "") == "John Doe");
+        CHECK(config->get_value<std::string>("address", "") == "MA");
+    }
+
+    SECTION("Config manager detects changes to config file")
+    {
+        auto config = config_manager->create_config<TestConfig>();
+
+        const fly::Json json1 {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
+        const std::string contents1(json1);
+
+        REQUIRE(fly::PathUtil::write_file(config_file, contents1));
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+
+        CHECK(config->get_value<std::string>("name", "") == "John Doe");
+        CHECK(config->get_value<std::string>("address", "") == "MA");
+        CHECK(config->get_value<int>("age", -1) == -1);
+
+        const fly::Json json2 {{TestConfig::identifier, {{"name", "Jane Doe"}, {"age", 27}}}};
+        const std::string contents2(json2);
+
+        REQUIRE(fly::PathUtil::write_file(config_file, contents2));
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+
+        // Multiple fly::PathMonitor::PathEvent::Changed events may be triggered even though the
+        // above write happens as a single call. If needed, wait for a second event.
+        if (config->get_value<std::string>("name", "").empty())
+        {
+            task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        }
+
+        CHECK(config->get_value<std::string>("name", "") == "Jane Doe");
+        CHECK(config->get_value<std::string>("address", "") == "");
+        CHECK(config->get_value<int>("age", -1) == 27);
+    }
+
+    SECTION("Config manager detects deleted config file and falls back to defaults")
+    {
+        auto config = config_manager->create_config<TestConfig>();
+
+        const fly::Json json {{TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
+        const std::string contents(json);
+
+        REQUIRE(fly::PathUtil::write_file(config_file, contents));
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+
+        CHECK(config->get_value<std::string>("name", "") == "John Doe");
+        CHECK(config->get_value<std::string>("address", "") == "MA");
+
+        std::filesystem::remove(config_file);
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+
+        CHECK(config->get_value<std::string>("name", "") == "");
+        CHECK(config->get_value<std::string>("address", "") == "");
+    }
+
+    SECTION("Bad config file causes config manager to fall back to defaults")
+    {
+        auto config = config_manager->create_config<TestConfig>();
+
+        const std::string contents(" ");
+
+        REQUIRE(fly::PathUtil::write_file(config_file, contents));
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+
+        CHECK(config->get_value<std::string>("name", "John Doe") == "John Doe");
+        CHECK(config->get_value<std::string>("address", "MA") == "MA");
+    }
+
+    SECTION("Config file with non-object type causes config manager to fall back to defaults")
+    {
+        auto config = config_manager->create_config<TestConfig>();
+
+        const std::string contents("[1, 2, 3]");
+
+        REQUIRE(fly::PathUtil::write_file(config_file, contents));
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+
+        CHECK(config->get_value<std::string>("name", "") == "");
+        CHECK(config->get_value<std::string>("address", "") == "");
+    }
+
+    REQUIRE(task_manager->stop());
 }
