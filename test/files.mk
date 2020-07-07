@@ -32,7 +32,6 @@ SRC_DIRS_$(d) += \
 
 # Define source files
 SRC_$(d) := \
-    $(d)/googletest/googletest/src/gtest-all.cc \
     $(d)/main.cpp
 
 # Define the list of available mocked system calls
@@ -42,15 +41,6 @@ SYSTEM_CALLS_$(d) := \
 # Define compiler flags
 CXXFLAGS_$(d) += -I$(SOURCE_ROOT)/test/Catch2/single_include
 CXXFLAGS_$(d) += -DCATCH_CONFIG_FAST_COMPILE -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER
-
-CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest/include
-CXXFLAGS_$(d) += -isystem $(SOURCE_ROOT)/test/googletest/googletest
-
-# Tests that use TYPED_TEST_SUITE cannot compile with -Wsuggest-override because
-# googletest does not mark some overriden methods with the override attribute.
-ifeq ($(toolchain), gcc)
-    CXXFLAGS_$(d) += -Wno-suggest-override
-endif
 
 # Define linker flags
 LDFLAGS_$(d) += \

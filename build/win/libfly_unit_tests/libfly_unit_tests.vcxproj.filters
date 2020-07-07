@@ -7,9 +7,6 @@
     <Filter Include="config">
       <UniqueIdentifier>{ee0c6b14-fa2b-4f87-a3b0-ccbf7c4c13c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="googletest">
-      <UniqueIdentifier>{096b28ab-f8d6-40ee-a560-5ec9f8da812d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="logger">
       <UniqueIdentifier>{7ecf1fbd-e9f8-430f-aa13-4ddb9e46dbd8}</UniqueIdentifier>
     </Filter>
@@ -51,9 +48,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\test\config\config_manager.cpp">
       <Filter>config</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest-all.cc">
-      <Filter>googletest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\logger\logger.cpp">
       <Filter>logger</Filter>
