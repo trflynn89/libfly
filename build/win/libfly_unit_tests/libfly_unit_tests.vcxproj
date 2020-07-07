@@ -79,7 +79,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..\test\googletest\googletest;$(SolutionDir)..\..\test\googletest\googletest\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetExt>.exe</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
@@ -87,7 +87,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..\test\googletest\googletest;$(SolutionDir)..\..\test\googletest\googletest\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetExt>.exe</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
@@ -95,7 +95,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..\test\googletest\googletest;$(SolutionDir)..\..\test\googletest\googletest\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetExt>.exe</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
@@ -103,7 +103,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..\test\googletest\googletest;$(SolutionDir)..\..\test\googletest\googletest\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetExt>.exe</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
@@ -202,7 +202,6 @@
     <ClCompile Include="..\..\..\test\coders\huffman_coder.cpp" />
     <ClCompile Include="..\..\..\test\config\config.cpp" />
     <ClCompile Include="..\..\..\test\config\config_manager.cpp" />
-    <ClCompile Include="..\..\..\test\googletest\googletest\src\gtest-all.cc" />
     <ClCompile Include="..\..\..\test\logger\logger.cpp" />
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\test\parser\json_parser.cpp" />
