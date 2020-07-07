@@ -17,7 +17,7 @@ SocketManagerImpl::SocketManagerImpl(
 }
 
 //==================================================================================================
-void SocketManagerImpl::poll(const std::chrono::microseconds &timeout) noexcept
+void SocketManagerImpl::poll(const std::chrono::microseconds &timeout)
 {
     fd_set read_fd, write_fd;
 
@@ -41,7 +41,7 @@ void SocketManagerImpl::poll(const std::chrono::microseconds &timeout) noexcept
 }
 
 //==================================================================================================
-socket_type SocketManagerImpl::set_read_and_write_masks(fd_set *read_fd, fd_set *write_fd) noexcept
+socket_type SocketManagerImpl::set_read_and_write_masks(fd_set *read_fd, fd_set *write_fd)
 {
     socket_type max_fd = -1;
 
@@ -65,7 +65,7 @@ socket_type SocketManagerImpl::set_read_and_write_masks(fd_set *read_fd, fd_set 
 }
 
 //==================================================================================================
-void SocketManagerImpl::handle_socket_io(fd_set *read_fd, fd_set *write_fd) noexcept
+void SocketManagerImpl::handle_socket_io(fd_set *read_fd, fd_set *write_fd)
 {
     SocketList new_clients, connected_clients, closed_clients;
 

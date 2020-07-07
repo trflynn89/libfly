@@ -1,5 +1,7 @@
 #include "fly/logger/logger.hpp"
 
+#include "fly/coders/coder_config.hpp"
+#include "fly/coders/huffman/huffman_encoder.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/task/task_runner.hpp"
 
@@ -17,10 +19,12 @@ std::mutex Logger::s_console_mutex;
 //==================================================================================================
 Logger::Logger(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<LoggerConfig> &config,
+    const std::shared_ptr<LoggerConfig> &logger_config,
+    const std::shared_ptr<CoderConfig> &coder_config,
     const std::filesystem::path &logger_directory) noexcept :
     m_task_runner(task_runner),
-    m_config(config),
+    m_logger_config(logger_config),
+    m_coder_config(coder_config),
     m_log_directory(logger_directory),
     m_index(0),
     m_start_time(std::chrono::high_resolution_clock::now())
@@ -28,13 +32,13 @@ Logger::Logger(
 }
 
 //==================================================================================================
-void Logger::set_instance(const std::shared_ptr<Logger> &logger) noexcept
+void Logger::set_instance(const std::shared_ptr<Logger> &logger)
 {
     s_weak_instance = logger;
 }
 
 //==================================================================================================
-void Logger::console_log(bool acquire_lock, const std::string &message) noexcept
+void Logger::console_log(bool acquire_lock, std::string &&message)
 {
     std::unique_lock<std::mutex> lock(s_console_mutex, std::defer_lock);
     const std::string time_str = System::local_time();
@@ -53,22 +57,24 @@ void Logger::add_log(
     const char *file,
     const char *function,
     std::uint32_t line,
-    const std::string &message) noexcept
+    std::string &&message)
 {
     std::shared_ptr<Logger> logger = s_weak_instance.lock();
 
     if (logger)
     {
-        logger->add_log_internal(level, file, function, line, message);
+        logger->add_log_internal(level, file, function, line, std::move(message));
     }
     else
     {
-        console_log(true, String::format("%d %s:%s:%d %s", level, file, function, line, message));
+        console_log(
+            true,
+            String::format("%d %s:%s:%d %s", level, file, function, line, std::move(message)));
     }
 }
 
 //==================================================================================================
-bool Logger::start() noexcept
+bool Logger::start()
 {
     if (create_log_file())
     {
@@ -84,22 +90,25 @@ bool Logger::start() noexcept
 }
 
 //==================================================================================================
-std::filesystem::path Logger::get_log_file_path() const noexcept
+std::filesystem::path Logger::get_log_file_path() const
 {
+    std::unique_lock<std::mutex> lock(m_log_file_mutex);
     return m_log_file;
 }
 
 //==================================================================================================
-bool Logger::poll() noexcept
+bool Logger::poll()
 {
     Log log;
 
-    if (m_log_queue.pop(log, m_config->queue_wait_time()) && m_log_stream.good())
+    if (m_log_queue.pop(log, m_logger_config->queue_wait_time()) && m_log_stream.good())
     {
-        String::format(m_log_stream, "%u\t%s", m_index++, log) << std::flush;
+        m_log_stream << log << std::flush;
         std::error_code error;
 
-        if (std::filesystem::file_size(m_log_file, error) > m_config->max_log_file_size())
+        std::unique_lock<std::mutex> lock(m_log_file_mutex);
+
+        if (std::filesystem::file_size(m_log_file, error) > m_logger_config->max_log_file_size())
         {
             create_log_file();
         }
@@ -114,15 +123,16 @@ void Logger::add_log_internal(
     const char *file,
     const char *function,
     std::uint32_t line,
-    const std::string &message) noexcept
+    std::string &&message)
 {
     auto now = std::chrono::high_resolution_clock::now();
     auto log_time = std::chrono::duration_cast<std::chrono::duration<double>>(now - m_start_time);
 
     if ((level >= Log::Level::Debug) && (level < Log::Level::NumLevels))
     {
-        Log log(m_config, message);
+        Log log(m_logger_config, std::move(message));
 
+        log.m_index = m_index++;
         log.m_level = level;
         log.m_time = log_time.count();
         log.m_line = line;
@@ -135,8 +145,31 @@ void Logger::add_log_internal(
 }
 
 //==================================================================================================
-bool Logger::create_log_file() noexcept
+bool Logger::create_log_file()
 {
+    if (m_log_stream.is_open())
+    {
+        m_log_stream.close();
+
+        if (m_logger_config->compress_log_files())
+        {
+            std::filesystem::path compressed_log_file = m_log_file;
+            compressed_log_file.replace_extension(".log.enc");
+
+            HuffmanEncoder encoder(m_coder_config);
+
+            if (encoder.encode_file(m_log_file, compressed_log_file))
+            {
+                LOGC("Log file compressed to: %s", compressed_log_file);
+                std::filesystem::remove(m_log_file);
+            }
+            else
+            {
+                LOGC("Failed to compress: %s", m_log_file);
+            }
+        }
+    }
+
     const std::string rand_str = String::generate_random_string(10);
     std::string time_str = System::local_time();
 
@@ -145,11 +178,6 @@ bool Logger::create_log_file() noexcept
 
     const std::string file_name = String::format("Log_%s_%s.log", time_str, rand_str);
     m_log_file = m_log_directory / file_name;
-
-    if (m_log_stream.is_open())
-    {
-        m_log_stream.close();
-    }
 
     LOGC("Creating logger file: %s", m_log_file);
     m_log_stream.open(m_log_file, std::ios::out);
@@ -165,7 +193,7 @@ LoggerTask::LoggerTask(std::weak_ptr<Logger> weak_logger) noexcept :
 }
 
 //==================================================================================================
-void LoggerTask::run() noexcept
+void LoggerTask::run()
 {
     std::shared_ptr<Logger> logger = m_weak_logger.lock();
 

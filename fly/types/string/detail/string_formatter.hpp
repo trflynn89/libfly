@@ -2,7 +2,9 @@
 
 #include "fly/types/string/detail/string_streamer.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/string_literal.hpp"
 
+#include <limits>
 #include <ostream>
 
 namespace fly::detail {
@@ -17,9 +19,10 @@ template <typename StringType>
 class BasicStringFormatter
 {
     using traits = detail::BasicStringTraits<StringType>;
+    using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
     using ostream_type = typename traits::ostream_type;
-    using streamed_type = typename traits::streamer_type::streamed_type;
+    using streamed_type = typename traits::streamed_type;
 
 public:
     /**
@@ -43,7 +46,7 @@ public:
      * @return A string that has been formatted with the given arguments.
      */
     template <typename... Args>
-    static streamed_type format(const char_type *fmt, const Args &... args) noexcept;
+    static streamed_type format(const char_type *fmt, const Args &... args);
 
     /**
      * Format a string with variadic template arguments, inserting the formatted string into a
@@ -68,20 +71,24 @@ public:
      * @return The same stream object.
      */
     template <typename... Args>
-    static ostream_type &
-    format(ostream_type &ostream, const char_type *fmt, const Args &... args) noexcept;
+    static ostream_type &format(ostream_type &ostream, const char_type *fmt, const Args &... args);
 
     /**
-     * Stream the given value into the given stream. If the value is a string-like type, the string
-     * is streamed using BasicStringStreamer<>. Or, it the type has an operator<< overload defined,
-     * the value is stream using that overload. Otherwise, the memory location of the value is
-     * streamed.
+     * Format an integer as a hexadecimal string.
      *
-     * @param ostream The stream to insert the value into.
-     * @param value The value to stream.
+     * If the number of bytes required for the string exceeds the provided length, only the least-
+     * significant bytes will be written. If the number of bytes required for the string is less
+     * than the provided length, the string will be zero-padded.
+     *
+     * @tparam The type of the integer to format.
+     *
+     * @param source The integer to format.
+     * @param length The length of the string to create.
+     *
+     * @return The created string with only hexacdemical digits.
      */
-    template <typename T>
-    static void stream(ostream_type &ostream, const T &value) noexcept;
+    template <typename IntegerType>
+    static StringType format_hex(IntegerType source, size_type length);
 
 private:
     /**
@@ -92,19 +99,19 @@ private:
         ostream_type &ostream,
         const char_type *fmt,
         const T &value,
-        const Args &... args) noexcept;
+        const Args &... args);
 
     /**
      * Terminator for the variadic template formatter. Stream the rest of the string into the given
      * ostream.
      */
-    static void format_internal(ostream_type &ostream, const char_type *fmt) noexcept;
+    static void format_internal(ostream_type &ostream, const char_type *fmt);
 };
 
 //==================================================================================================
 template <typename StringType>
 template <typename... Args>
-auto BasicStringFormatter<StringType>::format(const char_type *fmt, const Args &... args) noexcept
+auto BasicStringFormatter<StringType>::format(const char_type *fmt, const Args &... args)
     -> streamed_type
 {
     typename traits::ostringstream_type ostream;
@@ -120,7 +127,7 @@ template <typename... Args>
 auto BasicStringFormatter<StringType>::format(
     ostream_type &ostream,
     const char_type *fmt,
-    const Args &... args) noexcept -> ostream_type &
+    const Args &... args) -> ostream_type &
 {
     if (fmt != nullptr)
     {
@@ -132,12 +139,32 @@ auto BasicStringFormatter<StringType>::format(
 
 //==================================================================================================
 template <typename StringType>
+template <typename IntegerType>
+StringType BasicStringFormatter<StringType>::format_hex(IntegerType source, size_type length)
+{
+    static_assert(
+        std::numeric_limits<IntegerType>::is_integer,
+        "Only integer types may be formatted as a hexadecimal string");
+
+    static constexpr const char_type *hexadecimal_digits = FLY_STR(char_type, "0123456789abcdef");
+    StringType hex(length, hexadecimal_digits[0]);
+
+    for (size_type i = 0, j = (length - 1) * 4; i < length; ++i, j -= 4)
+    {
+        hex[i] = hexadecimal_digits[(source >> j) & 0x0f];
+    }
+
+    return hex;
+}
+
+//==================================================================================================
+template <typename StringType>
 template <typename T, typename... Args>
 void BasicStringFormatter<StringType>::format_internal(
     ostream_type &ostream,
     const char_type *fmt,
     const T &value,
-    const Args &... args) noexcept
+    const Args &... args)
 {
     const std::ios_base::fmtflags flags(ostream.flags());
 
@@ -150,11 +177,11 @@ void BasicStringFormatter<StringType>::format_internal(
             switch (type)
             {
                 case '\0':
-                    stream(ostream, *fmt);
+                    detail::BasicStringStreamer<StringType>::stream(ostream, *fmt);
                     return;
 
                 case '%':
-                    stream(ostream, *(++fmt));
+                    detail::BasicStringStreamer<StringType>::stream(ostream, *(++fmt));
                     continue;
 
                 case 'x':
@@ -200,53 +227,31 @@ void BasicStringFormatter<StringType>::format_internal(
                     break;
             }
 
-            stream(ostream, value);
+            detail::BasicStringStreamer<StringType>::stream(ostream, value);
             ostream.flags(flags);
 
             format_internal(ostream, fmt + 2, args...);
             return;
         }
 
-        stream(ostream, *fmt);
+        detail::BasicStringStreamer<StringType>::stream(ostream, *fmt);
     }
 }
 
 //==================================================================================================
 template <typename StringType>
-void BasicStringFormatter<StringType>::format_internal(
-    ostream_type &ostream,
-    const char_type *fmt) noexcept
+void BasicStringFormatter<StringType>::format_internal(ostream_type &ostream, const char_type *fmt)
 {
     for (; *fmt != '\0'; ++fmt)
     {
         if ((*fmt == '%') && (*(fmt + 1) == '%'))
         {
-            stream(ostream, *(++fmt));
+            detail::BasicStringStreamer<StringType>::stream(ostream, *(++fmt));
         }
         else
         {
-            stream(ostream, *fmt);
+            detail::BasicStringStreamer<StringType>::stream(ostream, *fmt);
         }
-    }
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename T>
-void BasicStringFormatter<StringType>::stream(ostream_type &ostream, const T &value) noexcept
-{
-    if constexpr (
-        std::is_same_v<char_type, std::decay_t<T>> || traits::template is_string_like_v<T>)
-    {
-        detail::BasicStringStreamer<StringType>::stream(ostream, value);
-    }
-    else if constexpr (traits::OstreamTraits::template is_declared_v<T>)
-    {
-        ostream << std::boolalpha << value;
-    }
-    else
-    {
-        ostream << '[' << std::hex << &value << std::dec << ']';
     }
 }
 

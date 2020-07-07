@@ -2,6 +2,8 @@
 
 #include "fly/types/string/string.hpp"
 
+#include <catch2/catch.hpp>
+
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -12,13 +14,32 @@
 namespace fly {
 
 //==================================================================================================
-std::filesystem::path PathUtil::generate_temp_directory() noexcept
+PathUtil::ScopedTempDirectory::ScopedTempDirectory() :
+    m_directory(std::filesystem::temp_directory_path() / fly::String::generate_random_string(10))
 {
-    return std::filesystem::temp_directory_path() / fly::String::generate_random_string(10);
+    REQUIRE(std::filesystem::create_directories(m_directory));
 }
 
 //==================================================================================================
-bool PathUtil::write_file(const std::filesystem::path &path, const std::string &contents) noexcept
+PathUtil::ScopedTempDirectory::~ScopedTempDirectory()
+{
+    REQUIRE(std::filesystem::remove_all(m_directory) > 0);
+}
+
+//==================================================================================================
+std::filesystem::path PathUtil::ScopedTempDirectory::operator()() const
+{
+    return m_directory;
+}
+
+//==================================================================================================
+std::filesystem::path PathUtil::ScopedTempDirectory::file() const
+{
+    return m_directory / (fly::String::generate_random_string(10) + ".txt");
+}
+
+//==================================================================================================
+bool PathUtil::write_file(const std::filesystem::path &path, const std::string &contents)
 {
     std::ofstream stream(path, std::ios::out);
 
@@ -31,7 +52,7 @@ bool PathUtil::write_file(const std::filesystem::path &path, const std::string &
 }
 
 //==================================================================================================
-std::string PathUtil::read_file(const std::filesystem::path &path) noexcept
+std::string PathUtil::read_file(const std::filesystem::path &path)
 {
     std::ifstream stream(path, std::ios::in);
     std::stringstream sstream;
@@ -45,9 +66,7 @@ std::string PathUtil::read_file(const std::filesystem::path &path) noexcept
 }
 
 //==================================================================================================
-bool PathUtil::compare_files(
-    const std::filesystem::path &path1,
-    const std::filesystem::path &path2) noexcept
+bool PathUtil::compare_files(const std::filesystem::path &path1, const std::filesystem::path &path2)
 {
     if (std::filesystem::file_size(path1) != std::filesystem::file_size(path2))
     {

@@ -1,26 +1,20 @@
 #include "fly/types/numeric/endian.hpp"
 
-#include "fly/traits/traits.hpp"
-#include "fly/types/numeric/literals.hpp"
-
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include <cstdint>
 #include <limits>
+#include <type_traits>
 
 namespace {
 
-template <
-    typename T,
-    fly::enable_if_any<std::is_same<std::int8_t, T>, std::is_same<std::uint8_t, T>> = 0>
+template <typename T, std::enable_if_t<sizeof(T) == 1, bool> = 0>
 T swap(T x)
 {
     return x;
 }
 
-template <
-    typename T,
-    fly::enable_if_any<std::is_same<std::int16_t, T>, std::is_same<std::uint16_t, T>> = 0>
+template <typename T, std::enable_if_t<sizeof(T) == 2, bool> = 0>
 T swap(T x)
 {
     T result = 0;
@@ -31,9 +25,7 @@ T swap(T x)
     return result;
 }
 
-template <
-    typename T,
-    fly::enable_if_any<std::is_same<std::int32_t, T>, std::is_same<std::uint32_t, T>> = 0>
+template <typename T, std::enable_if_t<sizeof(T) == 4, bool> = 0>
 T swap(T x)
 {
     T result = 0;
@@ -46,9 +38,7 @@ T swap(T x)
     return result;
 }
 
-template <
-    typename T,
-    fly::enable_if_any<std::is_same<std::int64_t, T>, std::is_same<std::uint64_t, T>> = 0>
+template <typename T, std::enable_if_t<sizeof(T) == 8, bool> = 0>
 T swap(T x)
 {
     T result = 0;
@@ -65,35 +55,39 @@ T swap(T x)
     return result;
 }
 
-} // namespace
-
-//==================================================================================================
-template <typename DataType>
-struct EndianTest : public ::testing::Test
+template <typename DataType, fly::Endian Desired>
+void run_test()
 {
-protected:
-    template <fly::Endian Desired>
-    void run_test()
-    {
-        constexpr DataType iterations = 100;
-        const DataType step = std::numeric_limits<DataType>::max() / iterations;
+    constexpr DataType iterations = 100;
+    const DataType step = std::numeric_limits<DataType>::max() / iterations;
 
-        for (DataType data = 0, i = 0; i++ < iterations; data += step)
+    for (DataType data = 0, i = 0; i++ < iterations; data += step)
+    {
+        {
+            DataType expected = swap(data);
+            DataType actual = fly::endian_swap(data);
+
+            CHECK(expected == actual);
+        }
         {
             DataType expected = data;
-            DataType actual = fly::endian_swap<Desired>(data);
+            DataType actual = fly::endian_swap_if_non_native<Desired>(data);
 
             if constexpr (Desired != fly::Endian::Native)
             {
                 expected = swap(expected);
             }
 
-            EXPECT_EQ(expected, actual);
+            CHECK(expected == actual);
         }
     }
-};
+}
 
-using DataTypes = ::testing::Types<
+} // namespace
+
+TEMPLATE_TEST_CASE(
+    "Endian",
+    "[numeric]",
     std::int8_t,
     std::int16_t,
     std::int32_t,
@@ -101,24 +95,20 @@ using DataTypes = ::testing::Types<
     std::uint8_t,
     std::uint16_t,
     std::uint32_t,
-    std::uint64_t>;
-
-TYPED_TEST_SUITE(EndianTest, DataTypes, );
-
-//==================================================================================================
-TYPED_TEST(EndianTest, BigEndian)
+    std::uint64_t)
 {
-    TestFixture::template run_test<fly::Endian::Big>();
-}
+    SECTION("Byte swap to big-endian")
+    {
+        run_test<TestType, fly::Endian::Big>();
+    }
 
-//==================================================================================================
-TYPED_TEST(EndianTest, LittleEndian)
-{
-    TestFixture::template run_test<fly::Endian::Little>();
-}
+    SECTION("Byte swap to little-endian")
+    {
+        run_test<TestType, fly::Endian::Little>();
+    }
 
-//==================================================================================================
-TYPED_TEST(EndianTest, NativeEndian)
-{
-    TestFixture::template run_test<fly::Endian::Native>();
+    SECTION("Byte swap to the system's native endianness")
+    {
+        run_test<TestType, fly::Endian::Native>();
+    }
 }

@@ -15,12 +15,12 @@ public:
     static constexpr const char *identifier = "config";
 
     template <typename T>
-    T get_value(const std::string &name, T def) const noexcept
+    T get_value(const std::string &name, T def) const
     {
         return fly::Config::get_value(name, def);
     }
 
-    void update(const fly::Json &values) noexcept
+    void update(const fly::Json &values)
     {
         fly::Config::update(values);
     }

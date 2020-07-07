@@ -55,6 +55,12 @@ std::ostream &operator<<(std::ostream &stream, MockCall call)
         case MockCall::Accept:
             stream << "accept";
             break;
+        case MockCall::Backtrace:
+            stream << "backtrace";
+            break;
+        case MockCall::BacktraceSymbols:
+            stream << "backtrace_symbols";
+            break;
         case MockCall::Bind:
             stream << "bind";
             break;
@@ -78,6 +84,9 @@ std::ostream &operator<<(std::ostream &stream, MockCall call)
             break;
         case MockCall::Listen:
             stream << "listen";
+            break;
+        case MockCall::LocalTime:
+            stream << "localtime";
             break;
         case MockCall::Poll:
             stream << "poll";
@@ -139,6 +148,34 @@ extern "C"
         }
 
         return __real_accept(sockfd, addr, addrlen);
+    }
+
+    //==============================================================================================
+    int __real_backtrace(void **buffer, int size);
+
+    int __wrap_backtrace(void **buffer, int size)
+    {
+        if (fly::MockSystem::mock_enabled(fly::MockCall::Backtrace))
+        {
+            errno = 0;
+            return 0;
+        }
+
+        return __real_backtrace(buffer, size);
+    }
+
+    //==============================================================================================
+    void __real_backtrace_symbols_fd(void *const *buffer, int size, int fd);
+
+    void __wrap_backtrace_symbols_fd(void *const *buffer, int size, int fd)
+    {
+        if (fly::MockSystem::mock_enabled(fly::MockCall::BacktraceSymbols))
+        {
+            errno = 0;
+            return;
+        }
+
+        return __real_backtrace_symbols_fd(buffer, size, fd);
     }
 
     //==============================================================================================
@@ -264,6 +301,20 @@ extern "C"
         }
 
         return __real_listen(sockfd, backlog);
+    }
+
+    //==============================================================================================
+    struct tm *__real_localtime_r(const time_t *timep, struct tm *result);
+
+    struct tm *__wrap_localtime_r(const time_t *timep, struct tm *result)
+    {
+        if (fly::MockSystem::mock_enabled(fly::MockCall::LocalTime))
+        {
+            errno = 0;
+            return nullptr;
+        }
+
+        return __real_localtime_r(timep, result);
     }
 
     //==============================================================================================

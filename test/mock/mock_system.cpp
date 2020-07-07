@@ -1,7 +1,5 @@
 #include "test/mock/mock_system.hpp"
 
-#include "fly/logger/logger.hpp"
-
 namespace fly {
 
 //==================================================================================================
@@ -42,14 +40,14 @@ MockSystem::~MockSystem()
 }
 
 //==================================================================================================
-bool MockSystem::mock_enabled(MockCall mock) noexcept
+bool MockSystem::mock_enabled(MockCall mock)
 {
     bool fail;
     return mock_enabled(mock, fail);
 }
 
 //==================================================================================================
-bool MockSystem::mock_enabled(MockCall mock, bool &fail) noexcept
+bool MockSystem::mock_enabled(MockCall mock, bool &fail)
 {
     std::lock_guard<std::mutex> lock(s_mock_system_mutex);
 
@@ -59,7 +57,6 @@ bool MockSystem::mock_enabled(MockCall mock, bool &fail) noexcept
 
         if (it != s_mocked_calls.end())
         {
-            LOGC_NO_LOCK("Using mock for %s", mock);
             fail = it->second;
             return true;
         }

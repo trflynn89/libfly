@@ -1,5 +1,7 @@
 #pragma once
 
+#include "test/util/path_util.hpp"
+
 #include <cstdint>
 #include <filesystem>
 #include <string>
@@ -39,7 +41,7 @@ public:
      *
      * @return The contents of the redirected stream.
      */
-    std::string operator()() noexcept;
+    std::string operator()();
 
 private:
     /**
@@ -50,9 +52,10 @@ private:
      *
      * @return The contents of the redirected stream.
      */
-    std::string restore(bool read) noexcept;
+    std::string restore(bool read);
 
-    std::filesystem::path m_path;
+    fly::PathUtil::ScopedTempDirectory m_path;
+    std::filesystem::path m_file;
 
     int m_stdio;
     int m_original;

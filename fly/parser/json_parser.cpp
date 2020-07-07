@@ -1,11 +1,18 @@
 #include "fly/parser/json_parser.hpp"
 
 #include "fly/fly.hpp"
+#include "fly/logger/logger.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <string_view>
 
 namespace fly {
+
+#define JLOG(...)                                                                                  \
+    LOGW(                                                                                          \
+        "[line %d, column %d]: " _FLY_FORMAT_STRING(__VA_ARGS__),                                  \
+        m_line,                                                                                    \
+        m_column _FLY_FORMAT_ARGS(__VA_ARGS__));
 
 //==================================================================================================
 JsonParser::JsonParser() noexcept : Parser(), m_features(Features::Strict)
@@ -18,9 +25,9 @@ JsonParser::JsonParser(const Features features) noexcept : Parser(), m_features(
 }
 
 //==================================================================================================
-Json JsonParser::parse_internal(std::istream &stream) noexcept(false)
+std::optional<Json> JsonParser::parse_internal(std::istream &stream)
 {
-    Json json;
+    std::optional<Json> json;
 
     try
     {
@@ -28,20 +35,30 @@ Json JsonParser::parse_internal(std::istream &stream) noexcept(false)
     }
     catch (const JsonException &ex)
     {
-        throw ParserException(m_line, m_column, ex.what());
+        JLOG("%s", ex.what());
+        return std::nullopt;
     }
 
-    consume_whitespace_and_comments(stream);
-
-    if (!stream.eof())
+    if (consume_whitespace_and_comments(stream) == ParseState::Invalid)
     {
-        throw ParserException(m_line, m_column, "Extraneous symbols found after JSON value");
+        return std::nullopt;
     }
-    else if (!json.is_object() && !json.is_array())
+
+    if (json)
     {
-        if (!is_feature_allowed(Features::AllowAnyType))
+        if (!stream.eof())
         {
-            throw ParserException(m_line, m_column, "JSON value must be an object or array");
+            JLOG("Extraneous symbols found after JSON value");
+            return std::nullopt;
+        }
+        else if (!json->is_object() && !json->is_array())
+        {
+            if (!is_feature_allowed(Features::AllowAnyType))
+            {
+                JLOG(
+                    "Parsed non-object/non-array value, but Features::AllowAnyType is not enabled");
+                return std::nullopt;
+            }
         }
     }
 
@@ -49,9 +66,12 @@ Json JsonParser::parse_internal(std::istream &stream) noexcept(false)
 }
 
 //==================================================================================================
-Json JsonParser::parse_json(std::istream &stream) noexcept(false)
+std::optional<Json> JsonParser::parse_json(std::istream &stream)
 {
-    consume_whitespace_and_comments(stream);
+    if (consume_whitespace_and_comments(stream) == ParseState::Invalid)
+    {
+        return std::nullopt;
+    }
 
     switch (peek(stream))
     {
@@ -67,76 +87,121 @@ Json JsonParser::parse_json(std::istream &stream) noexcept(false)
 }
 
 //==================================================================================================
-Json JsonParser::parse_object(std::istream &stream) noexcept(false)
+std::optional<Json> JsonParser::parse_object(std::istream &stream)
 {
     Json object = JsonTraits::object_type();
-    consume_token(stream, Token::StartBrace);
+    ParseState state;
 
-    auto stop_parsing = [&stream, this]() noexcept(false) {
-        consume_whitespace_and_comments(stream);
-        const Token token = peek(stream);
+    // Discard the opening brace, which has already been peeked.
+    discard(stream);
 
-        return (token == Token::EndOfFile) || (token == Token::CloseBrace);
-    };
+    auto parse_state = std::bind(
+        &JsonParser::done_parsing_object_or_array,
+        this,
+        std::ref(stream),
+        Token::CloseBrace);
 
-    while (!stop_parsing())
+    while ((state = parse_state()) == ParseState::KeepParsing)
     {
-        if (object && consume_comma(stream, stop_parsing))
+        if (object && ((state = consume_comma(stream, parse_state)) != ParseState::KeepParsing))
         {
             break;
         }
 
-        if (peek(stream) == Token::Solidus)
+        JsonTraits::string_type key;
+        if (consume_value(stream, JsonType::JsonString, key) == JsonType::Invalid)
         {
-            consume_comment(stream);
+            return std::nullopt;
         }
-
-        auto key = consume_value(stream, JsonType::JsonString);
-        consume_token(stream, Token::Colon);
-
-        object[std::move(key)] = parse_json(stream);
+        else if (consume_token(stream, Token::Colon) == ParseState::Invalid)
+        {
+            return std::nullopt;
+        }
+        else if (std::optional<Json> value = parse_json(stream); value)
+        {
+            object[std::move(key)] = std::move(value.value());
+        }
+        else
+        {
+            return std::nullopt;
+        }
     }
 
-    consume_token(stream, Token::CloseBrace);
-    return object;
+    return (state == ParseState::Invalid) ? std::nullopt : std::optional<Json>(object);
 }
 
 //==================================================================================================
-Json JsonParser::parse_array(std::istream &stream) noexcept(false)
+std::optional<Json> JsonParser::parse_array(std::istream &stream)
 {
     Json array = JsonTraits::array_type();
-    consume_token(stream, Token::StartBracket);
+    ParseState state;
 
-    auto stop_parsing = [&stream, this]() noexcept(false) {
-        consume_whitespace_and_comments(stream);
-        const Token token = peek(stream);
+    // Discard the opening bracket, which has already been peeked.
+    discard(stream);
 
-        return (token == Token::EndOfFile) || (token == Token::CloseBracket);
-    };
+    auto parse_state = std::bind(
+        &JsonParser::done_parsing_object_or_array,
+        this,
+        std::ref(stream),
+        Token::CloseBracket);
 
-    while (!stop_parsing())
+    while ((state = parse_state()) == ParseState::KeepParsing)
     {
-        if (array && consume_comma(stream, stop_parsing))
+        if (array && ((state = consume_comma(stream, parse_state)) != ParseState::KeepParsing))
         {
             break;
         }
 
-        array[array.size()] = parse_json(stream);
+        if (std::optional<Json> value = parse_json(stream); value)
+        {
+            array[array.size()] = std::move(value.value());
+        }
+        else
+        {
+            return std::nullopt;
+        }
     }
 
-    consume_token(stream, Token::CloseBracket);
-    return array;
+    return (state == ParseState::Invalid) ? std::nullopt : std::optional<Json>(array);
 }
 
 //==================================================================================================
-Json JsonParser::parse_value(std::istream &stream) noexcept(false)
+JsonParser::ParseState
+JsonParser::done_parsing_object_or_array(std::istream &stream, const Token &end_token)
+{
+    if (consume_whitespace_and_comments(stream) == ParseState::Invalid)
+    {
+        return ParseState::Invalid;
+    }
+
+    const Token token = peek(stream);
+
+    if (token == end_token)
+    {
+        discard(stream);
+        return ParseState::StopParsing;
+    }
+    else if (token == Token::EndOfFile)
+    {
+        return ParseState::Invalid;
+    }
+
+    return ParseState::KeepParsing;
+}
+
+//==================================================================================================
+std::optional<Json> JsonParser::parse_value(std::istream &stream)
 {
     const bool is_string = peek(stream) == Token::Quote;
 
-    const auto json_type = is_string ? JsonType::JsonString : JsonType::Other;
-    const JsonTraits::string_type value = consume_value(stream, json_type);
+    auto json_type = is_string ? JsonType::JsonString : JsonType::Other;
+    JsonTraits::string_type value;
 
-    if (is_string)
+    if (consume_value(stream, json_type, value) == JsonType::Invalid)
+    {
+        return std::nullopt;
+    }
+    else if (is_string)
     {
         return value;
     }
@@ -152,88 +217,102 @@ Json JsonParser::parse_value(std::istream &stream) noexcept(false)
     {
         return nullptr;
     }
-    else
+
+    switch (validate_number(value))
     {
-        const NumericType numeric_type = validate_number(value);
-
-        try
-        {
-            switch (numeric_type)
+        case JsonType::SignedInteger:
+            if (auto number = String::convert<JsonTraits::signed_type>(value); number)
             {
-                case NumericType::SignedInteger:
-                    return String::convert<JsonTraits::signed_type>(value);
-
-                case NumericType::UnsignedInteger:
-                    return String::convert<JsonTraits::unsigned_type>(value);
-
-                case NumericType::FloatingPoint:
-                    return String::convert<JsonTraits::float_type>(value);
+                return number.value();
             }
-        }
-        catch (...)
-        {
-        }
+            break;
+
+        case JsonType::UnsignedInteger:
+            if (auto number = String::convert<JsonTraits::unsigned_type>(value); number)
+            {
+                return number.value();
+            }
+            break;
+
+        case JsonType::FloatingPoint:
+            if (auto number = String::convert<JsonTraits::float_type>(value); number)
+            {
+                return number.value();
+            }
+            break;
+
+        default:
+            break;
     }
 
-    throw BadConversionException(m_line, m_column, value);
+    return std::nullopt;
 }
 
 //==================================================================================================
-void JsonParser::consume_token(std::istream &stream, const Token &token) noexcept(false)
+JsonParser::ParseState JsonParser::consume_token(std::istream &stream, const Token &token)
 {
     consume_whitespace(stream);
 
-    const Token parsed = consume(stream);
-
-    if (parsed != token)
+    if (const Token parsed = consume(stream); parsed != token)
     {
-        throw UnexpectedTokenException(m_line, m_column, parsed);
+        JLOG(
+            "Unexpected character '%c', was expecting '%c'",
+            static_cast<JsonTraits::string_type::value_type>(parsed),
+            static_cast<JsonTraits::string_type::value_type>(token));
+
+        return ParseState::Invalid;
     }
+
+    return ParseState::KeepParsing;
 }
 
 //==================================================================================================
-bool JsonParser::consume_comma(
-    std::istream &stream,
-    const std::function<bool()> &stop_parsing) noexcept(false)
+JsonParser::ParseState
+JsonParser::consume_comma(std::istream &stream, const ParseStateGetter &parse_state)
 {
-    consume_token(stream, Token::Comma);
+    if (consume_token(stream, Token::Comma) == ParseState::Invalid)
+    {
+        return ParseState::Invalid;
+    }
 
-    if (stop_parsing())
+    const ParseState state = parse_state();
+
+    if (state == ParseState::StopParsing)
     {
         if (is_feature_allowed(Features::AllowTrailingComma))
         {
-            return true;
+            return ParseState::StopParsing;
         }
 
-        throw UnexpectedTokenException(m_line, m_column, Token::Comma);
+        JLOG("Found trailing comma, but Features::AllowTrailingComma is not enabled");
+        return ParseState::Invalid;
     }
 
-    return false;
+    return state;
 }
 
 //==================================================================================================
-JsonTraits::string_type
-JsonParser::consume_value(std::istream &stream, JsonType type) noexcept(false)
+JsonParser::JsonType
+JsonParser::consume_value(std::istream &stream, JsonType type, JsonTraits::string_type &value)
 {
+    const bool is_string = type == JsonType::JsonString;
+
     Json::stream_type parsing;
     Token token;
 
-    auto stop_parsing = [&token, &type, this]() noexcept {
-        if (type == JsonType::JsonString)
+    auto stop_parsing = [&token, &is_string, this]() -> bool {
+        if (is_string)
         {
             return token == Token::Quote;
         }
 
-        const bool is_comment =
-            is_feature_allowed(Features::AllowComments) && (token == Token::Solidus);
-
-        return is_whitespace(token) || (token == Token::Comma) || (token == Token::CloseBracket) ||
-            (token == Token::CloseBrace) || is_comment;
+        return is_whitespace(token) || (token == Token::Comma) || (token == Token::Solidus) ||
+            (token == Token::CloseBracket) || (token == Token::CloseBrace);
     };
 
-    if (type == JsonType::JsonString)
+    if (is_string && (consume_token(stream, Token::Quote) == ParseState::Invalid))
     {
-        consume_token(stream, Token::Quote);
+        return JsonType::Invalid;
     }
 
     while (((token = peek(stream)) != Token::EndOfFile) && !stop_parsing())
@@ -244,42 +323,47 @@ JsonParser::consume_value(std::istream &stream, JsonType type) noexcept(false)
         // Blindly ignore escaped symbols, the Json class will check whether they are valid. Just
         // read at least one more symbol to prevent breaking out of the loop too early if the next
         // symbol is a quote.
-        if ((type == JsonType::JsonString) && (token == Token::ReverseSolidus))
+        if (is_string && (token == Token::ReverseSolidus))
         {
             if ((token = consume(stream)) == Token::EndOfFile)
             {
-                throw UnexpectedTokenException(m_line, m_column, token);
+                JLOG("Expected character after reverse solidus");
+                return JsonType::Invalid;
             }
 
             parsing << static_cast<Json::stream_type::char_type>(token);
         }
     }
 
-    if (type == JsonType::JsonString)
+    if (is_string && (consume_token(stream, Token::Quote) == ParseState::Invalid))
     {
-        consume_token(stream, Token::Quote);
+        return JsonType::Invalid;
     }
 
-    return parsing.str();
+    value = parsing.str();
+    return type;
 }
 
 //==================================================================================================
-void JsonParser::consume_whitespace_and_comments(std::istream &stream) noexcept(false)
+JsonParser::ParseState JsonParser::consume_whitespace_and_comments(std::istream &stream)
 {
     consume_whitespace(stream);
 
-    if (is_feature_allowed(Features::AllowComments))
+    while (peek(stream) == Token::Solidus)
     {
-        while (peek(stream) == Token::Solidus)
+        if (consume_comment(stream) == ParseState::Invalid)
         {
-            consume_comment(stream);
-            consume_whitespace(stream);
+            return ParseState::Invalid;
         }
+
+        consume_whitespace(stream);
     }
+
+    return ParseState::KeepParsing;
 }
 
 //==================================================================================================
-void JsonParser::consume_whitespace(std::istream &stream) noexcept
+void JsonParser::consume_whitespace(std::istream &stream)
 {
     Token token;
 
@@ -290,14 +374,17 @@ void JsonParser::consume_whitespace(std::istream &stream) noexcept
 }
 
 //==================================================================================================
-void JsonParser::consume_comment(std::istream &stream) noexcept(false)
+JsonParser::ParseState JsonParser::consume_comment(std::istream &stream)
 {
     if (!is_feature_allowed(Features::AllowComments))
     {
-        throw UnexpectedTokenException(m_line, m_column, Token::Solidus);
+        JLOG("Found comment, but Features::AllowComments is not enabled");
+        return ParseState::Invalid;
     }
 
-    consume_token(stream, Token::Solidus);
+    // Discard the opening solidus, which has already been peeked.
+    discard(stream);
+
     Token token;
 
     switch (token = consume(stream))
@@ -311,32 +398,47 @@ void JsonParser::consume_comment(std::istream &stream) noexcept(false)
             break;
 
         case Token::Asterisk:
+        {
+            bool parsing_comment = true;
+
             do
             {
                 token = consume(stream);
 
                 if ((token == Token::Asterisk) && (peek(stream) == Token::Solidus))
                 {
-                    consume_token(stream, Token::Solidus);
+                    parsing_comment = false;
+                    discard(stream);
                     break;
                 }
             } while (token != Token::EndOfFile);
 
+            if (parsing_comment)
+            {
+                return ParseState::Invalid;
+            }
+
             break;
+        }
 
         default:
-            throw UnexpectedTokenException(m_line, m_column, token);
+            JLOG(
+                "Invalid start sequence for comments: '/%c'",
+                static_cast<JsonTraits::string_type::value_type>(token));
+            return ParseState::Invalid;
     }
+
+    return ParseState::KeepParsing;
 }
 
 //==================================================================================================
-JsonParser::Token JsonParser::peek(std::istream &stream) noexcept
+JsonParser::Token JsonParser::peek(std::istream &stream)
 {
     return static_cast<Token>(stream.peek());
 }
 
 //==================================================================================================
-JsonParser::Token JsonParser::consume(std::istream &stream) noexcept
+JsonParser::Token JsonParser::consume(std::istream &stream)
 {
     const Token token = static_cast<Token>(stream.get());
 
@@ -354,75 +456,64 @@ JsonParser::Token JsonParser::consume(std::istream &stream) noexcept
 }
 
 //==================================================================================================
-void JsonParser::discard(std::istream &stream) noexcept
+void JsonParser::discard(std::istream &stream)
 {
     FLY_UNUSED(consume(stream));
 }
 
 //==================================================================================================
-JsonParser::NumericType JsonParser::validate_number(const JsonTraits::string_type &value) const
-    noexcept(false)
+JsonParser::JsonType JsonParser::validate_number(const JsonTraits::string_type &value) const
 {
     const bool is_signed = value[0] == '-';
 
     const auto signless = std::basic_string_view<JsonTraits::string_type::value_type>(value).substr(
         is_signed ? 1 : 0);
 
-    auto is_octal = [&signless]() noexcept -> bool {
-        return (signless.size() > 1) && (signless[0] == '0') &&
-            std::isdigit(static_cast<unsigned char>(signless[1]));
-    };
-
-    auto is_float = [this, &value, &signless]() noexcept(false) -> bool {
-        const JsonTraits::string_type::size_type d = signless.find('.');
-        const JsonTraits::string_type::size_type e1 = signless.find('e');
-        const JsonTraits::string_type::size_type e2 = signless.find('E');
-
-        if (d != JsonTraits::string_type::npos)
-        {
-            JsonTraits::string_type::size_type end = signless.size();
-
-            if ((e1 != JsonTraits::string_type::npos) || (e2 != JsonTraits::string_type::npos))
-            {
-                end = std::min(e1, e2);
-            }
-
-            if ((d + 1) >= end)
-            {
-                throw BadConversionException(m_line, m_column, value);
-            }
-
-            return true;
-        }
-
-        return (e1 != JsonTraits::string_type::npos) || (e2 != JsonTraits::string_type::npos);
-    };
+    const bool is_octal = (signless.size() > 1) && (signless[0] == '0') &&
+        std::isdigit(static_cast<unsigned char>(signless[1]));
 
     if (!std::isdigit(static_cast<unsigned char>(signless[0])))
     {
-        throw BadConversionException(m_line, m_column, value);
+        JLOG("Could not convert '%s' to a number", value);
+        return JsonType::Invalid;
     }
-    else if (is_octal())
+    else if (is_octal)
     {
-        throw BadConversionException(m_line, m_column, value);
+        JLOG("Octal value '%s' is not number", value);
+        return JsonType::Invalid;
     }
 
-    if (is_float())
+    const JsonTraits::string_type::size_type d = signless.find('.');
+    const JsonTraits::string_type::size_type e1 = signless.find('e');
+    const JsonTraits::string_type::size_type e2 = signless.find('E');
+
+    if (d != JsonTraits::string_type::npos)
     {
-        return NumericType::FloatingPoint;
+        JsonTraits::string_type::size_type end = signless.size();
+
+        if ((e1 != JsonTraits::string_type::npos) || (e2 != JsonTraits::string_type::npos))
+        {
+            end = std::min(e1, e2);
+        }
+
+        if ((d + 1) >= end)
+        {
+            JLOG("Float value '%s' is invalid", value);
+            return JsonType::Invalid;
+        }
+
+        return JsonType::FloatingPoint;
     }
-    else if (is_signed)
+    else if ((e1 != JsonTraits::string_type::npos) || (e2 != JsonTraits::string_type::npos))
     {
-        return NumericType::SignedInteger;
+        return JsonType::FloatingPoint;
     }
-    else
-    {
-        return NumericType::UnsignedInteger;
-    }
+
+    return is_signed ? JsonType::SignedInteger : JsonType::UnsignedInteger;
 }
 
 //==================================================================================================
-bool JsonParser::is_whitespace(const Token &token) const noexcept
+bool JsonParser::is_whitespace(const Token &token) const
 {
     switch (token)
     {
@@ -439,13 +530,13 @@ bool JsonParser::is_whitespace(const Token &token) const noexcept
 }
 
 //==================================================================================================
-bool JsonParser::is_feature_allowed(Features feature) const noexcept
+bool JsonParser::is_feature_allowed(Features feature) const
 {
     return (m_features & feature) != Features::Strict;
 }
 
 //==================================================================================================
-JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b) noexcept
+JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b)
 {
     return static_cast<JsonParser::Features>(
         static_cast<std::underlying_type_t<JsonParser::Features>>(a) &
@@ -453,20 +544,11 @@ JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b) n
 }
 
 //==================================================================================================
-JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b) noexcept
+JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b)
 {
     return static_cast<JsonParser::Features>(
         static_cast<std::underlying_type_t<JsonParser::Features>>(a) |
         static_cast<std::underlying_type_t<JsonParser::Features>>(b));
-}
-
-//==================================================================================================
-JsonParser::UnexpectedTokenException::UnexpectedTokenException(
-    std::uint32_t line,
-    std::uint32_t column,
-    JsonParser::Token token) :
-    UnexpectedCharacterException(line, column, static_cast<int>(token))
-{
 }
 
 } // namespace fly

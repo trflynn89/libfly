@@ -57,7 +57,7 @@ struct HuffmanNode
      * @param symbol The symbol from the input stream.
      * @param frequency The frequency of the symbol in the input stream.
      */
-    void become_symbol(symbol_type symbol, frequency_type frequency) noexcept;
+    void become_symbol(symbol_type symbol, frequency_type frequency);
 
     /**
      * Change this node to represent an intermediate, non-symbol. Its frequency is set to the sum of
@@ -66,7 +66,7 @@ struct HuffmanNode
      * @param left Pointer to the intermediate's left child.
      * @param right Pointer to the intermediate's right child.
      */
-    void become_intermediate(HuffmanNode *left, HuffmanNode *right) noexcept;
+    void become_intermediate(HuffmanNode *left, HuffmanNode *right);
 
     symbol_type m_symbol;
     frequency_type m_frequency;
@@ -84,7 +84,7 @@ struct HuffmanNode
  */
 struct HuffmanNodeComparator
 {
-    bool operator()(const HuffmanNode *left, const HuffmanNode *right) noexcept;
+    bool operator()(const HuffmanNode *left, const HuffmanNode *right);
 };
 
 /**

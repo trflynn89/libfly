@@ -12,37 +12,37 @@
 namespace fly {
 
 //==================================================================================================
-void System::print_backtrace() noexcept
+void System::print_backtrace()
 {
     SystemImpl::print_backtrace();
 }
 
 //==================================================================================================
-std::string System::local_time() noexcept
+std::string System::local_time()
 {
     return SystemImpl::local_time("%m-%d-%Y %H:%M:%S");
 }
 
 //==================================================================================================
-int System::get_error_code() noexcept
+int System::get_error_code()
 {
     return SystemImpl::get_error_code();
 }
 
 //==================================================================================================
-std::string System::get_error_string() noexcept
+std::string System::get_error_string()
 {
     return get_error_string(get_error_code());
 }
 
 //==================================================================================================
-std::string System::get_error_string(int code) noexcept
+std::string System::get_error_string(int code)
 {
     return fly::String::format("(%d) %s", code, std::system_category().message(code));
 }
 
 //==================================================================================================
-void System::set_signal_handler(SignalHandler handler) noexcept
+void System::set_signal_handler(SignalHandler handler)
 {
     static std::vector<int> s_signals = SystemImpl::get_signals();
 

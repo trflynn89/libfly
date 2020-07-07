@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
@@ -29,21 +30,26 @@ struct BasicStringConverter;
 template <typename StringType, typename T>
 struct BasicStringConverter
 {
-    static T convert(const StringType &value) noexcept(false)
+    static std::optional<T> convert(const StringType &value)
     {
         static constexpr long long s_min = std::numeric_limits<T>::min();
         static constexpr long long s_max = std::numeric_limits<T>::max();
 
         std::size_t index = 0;
-        long long result = std::stoll(value, &index);
+        long long result = 0;
 
-        if (index != value.length())
+        try
         {
-            throw std::invalid_argument("Entire string was not consumed");
+            result = std::stoll(value, &index);
         }
-        else if ((result < s_min) || (result > s_max))
+        catch (...)
         {
-            throw std::out_of_range("Conversion is out-of-range of given type");
+            return std::nullopt;
+        }
+
+        if ((index != value.length()) || (result < s_min) || (result > s_max))
+        {
+            return std::nullopt;
         }
 
         return static_cast<T>(result);
@@ -56,14 +62,23 @@ struct BasicStringConverter<StringType, std::int64_t>
 {
     using value_type = std::int64_t;
 
-    static value_type convert(const StringType &value) noexcept(false)
+    static std::optional<value_type> convert(const StringType &value)
     {
         std::size_t index = 0;
-        value_type result = std::stoll(value, &index);
+        value_type result = 0;
+
+        try
+        {
+            result = std::stoll(value, &index);
+        }
+        catch (...)
+        {
+            return std::nullopt;
+        }
 
         if (index != value.length())
         {
-            throw std::invalid_argument("Entire string was not consumed");
+            return std::nullopt;
         }
 
         return result;
@@ -76,14 +91,23 @@ struct BasicStringConverter<StringType, std::uint64_t>
 {
     using value_type = std::uint64_t;
 
-    static value_type convert(const StringType &value) noexcept(false)
+    static std::optional<value_type> convert(const StringType &value)
     {
         std::size_t index = 0;
-        value_type result = std::stoull(value, &index);
+        value_type result = 0;
+
+        try
+        {
+            result = std::stoull(value, &index);
+        }
+        catch (...)
+        {
+            return std::nullopt;
+        }
 
         if (index != value.length())
         {
-            throw std::invalid_argument("Entire string was not consumed");
+            return std::nullopt;
         }
 
         return result;
@@ -96,14 +120,23 @@ struct BasicStringConverter<StringType, float>
 {
     using value_type = float;
 
-    static value_type convert(const StringType &value) noexcept(false)
+    static std::optional<value_type> convert(const StringType &value)
     {
         std::size_t index = 0;
-        value_type result = std::stof(value, &index);
+        value_type result = 0;
+
+        try
+        {
+            result = std::stof(value, &index);
+        }
+        catch (...)
+        {
+            return std::nullopt;
+        }
 
         if (index != value.length())
         {
-            throw std::invalid_argument("Entire string was not consumed");
+            return std::nullopt;
         }
 
         return result;
@@ -116,14 +149,23 @@ struct BasicStringConverter<StringType, double>
 {
     using value_type = double;
 
-    static value_type convert(const StringType &value) noexcept(false)
+    static std::optional<value_type> convert(const StringType &value)
     {
         std::size_t index = 0;
-        value_type result = std::stod(value, &index);
+        value_type result = 0;
+
+        try
+        {
+            result = std::stod(value, &index);
+        }
+        catch (...)
+        {
+            return std::nullopt;
+        }
 
         if (index != value.length())
         {
-            throw std::invalid_argument("Entire string was not consumed");
+            return std::nullopt;
         }
 
         return result;
@@ -136,14 +178,23 @@ struct BasicStringConverter<StringType, long double>
 {
     using value_type = long double;
 
-    static value_type convert(const StringType &value) noexcept(false)
+    static std::optional<value_type> convert(const StringType &value)
     {
         std::size_t index = 0;
-        value_type result = std::stold(value, &index);
+        value_type result = 0;
+
+        try
+        {
+            result = std::stold(value, &index);
+        }
+        catch (...)
+        {
+            return std::nullopt;
+        }
 
         if (index != value.length())
         {
-            throw std::invalid_argument("Entire string was not consumed");
+            return std::nullopt;
         }
 
         return result;

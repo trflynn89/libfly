@@ -4,6 +4,7 @@
 #include "fly/types/json/json.hpp"
 
 #include <istream>
+#include <optional>
 #include <string>
 
 namespace fly {
@@ -22,23 +23,34 @@ protected:
      *
      * @param stream Stream holding the contents to parse.
      *
-     * @return The parsed values.
-     *
-     * @throws ParserException Thrown if an error occurs parsing the stream.
+     * @return If successful, the parsed values. Otherwise, an unitialized value.
      */
-    Json parse_internal(std::istream &stream) noexcept(false) override;
+    std::optional<Json> parse_internal(std::istream &stream) override;
 
 private:
+    /**
+     * Enumeration to indicate the result of a call to IniParser::trim.
+     */
+    enum class TrimResult
+    {
+        // The character to be trimmed was found at one end of the string but not the other.
+        Imbalanced,
+
+        // The string has been trimmed.
+        Trimmed,
+
+        // The character to be trimmed was not found at either end of the string.
+        Untrimmed,
+    };
+
     /**
      * Parse a line containing a section name.
      *
      * @param line Line containing the section.
      *
-     * @return The parsed section name.
-     *
-     * @throws ParserException Thrown if the section name is quoted.
+     * @return If successful, the parsed section name. Otherwise, an unitialized value.
      */
-    std::string on_section(const std::string &line) noexcept(false);
+    std::optional<std::string> on_section(const std::string &line);
 
     /**
      * Parse a line containing a name/value pair.
@@ -46,10 +58,9 @@ private:
      * @param section Section containing the pair.
      * @param line Line containing the pair.
      *
-     * @throws ParserException Thrown if the value name is quoted, or the line both a name and value
-     *         are not found.
+     * @return If successful, the parsed name/value pair. Otherwise, an unitialized value.
      */
-    void on_value(Json &section, const std::string &line) noexcept(false);
+    std::optional<std::pair<std::string, std::string>> on_value(const std::string &line);
 
     /**
      * If the given string begins and ends with the given character, remove that character from each
@@ -58,12 +69,9 @@ private:
      * @param str The string the trim.
      * @param ch The character to look for.
      *
-     * @return True if the string was trimmed.
-     *
-     * @throws ParserException Thrown if the character was found at one end of the string, but not
-     *         the other.
+     * @return The result of the trim operation.
      */
-    bool trim_value(std::string &str, char ch) const noexcept(false);
+    TrimResult trim_value(std::string &str, char ch) const;
 
     /**
      * If the given string begins with the first given character and ends with the second given
@@ -73,12 +81,9 @@ private:
      * @param start The character to look for at the beginning of the string.
      * @param end The character to look for at the end of the string.
      *
-     * @return True if the string was trimmed.
-     *
-     * @throws ParserException Thrown if the one of the start/end characters was found, but not the
-     *         other.
+     * @return The result of the trim operation.
      */
-    bool trim_value(std::string &str, char start, char end) const noexcept(false);
+    TrimResult trim_value(std::string &str, char start, char end) const;
 };
 
 } // namespace fly

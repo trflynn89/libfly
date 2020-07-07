@@ -36,7 +36,7 @@ public:
      *
      * @param word The word to write.
      */
-    void write_word(word_type word) noexcept;
+    void write_word(word_type word);
 
     /**
      * Write a full byte to the byte buffer.
@@ -45,7 +45,7 @@ public:
      *
      * @param byte The byte to write.
      */
-    void write_byte(byte_type byte) noexcept;
+    void write_byte(byte_type byte);
 
     /**
      * Write a number of bits to the byte buffer. The least-significant bits in the provided data
@@ -59,14 +59,14 @@ public:
      * @param size The number of bits to write.
      */
     template <typename DataType>
-    void write_bits(DataType bits, byte_type size) noexcept;
+    void write_bits(DataType bits, byte_type size);
 
     /**
      * If needed, zero-fill the byte buffer, flush it to the stream, and update the header byte.
      *
      * @return True if the stream remains in a good state.
      */
-    bool finish() noexcept;
+    bool finish();
 
 private:
     /**
@@ -74,12 +74,12 @@ private:
      *
      * @param remainder The number of zero-filled bits in the byte buffer.
      */
-    void flush_header(byte_type remainder) noexcept;
+    void flush_header(byte_type remainder);
 
     /**
      * Flush the byte buffer onto the stream.
      */
-    void flush_buffer() noexcept;
+    void flush_buffer();
 
     /**
      * Flush a byte buffer to the stream.
@@ -90,14 +90,14 @@ private:
      * @param bytes The number of bytes to flush.
      */
     template <typename DataType>
-    void flush(const DataType &buffer, byte_type bytes) noexcept;
+    void flush(const DataType &buffer, byte_type bytes);
 
     std::ostream &m_stream;
 };
 
 //==================================================================================================
 template <typename DataType>
-void BitStreamWriter::write_bits(DataType bits, byte_type size) noexcept
+void BitStreamWriter::write_bits(DataType bits, byte_type size)
 {
     static_assert(
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
@@ -127,7 +127,7 @@ void BitStreamWriter::write_bits(DataType bits, byte_type size) noexcept
 
 //==================================================================================================
 template <typename DataType>
-void BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
+void BitStreamWriter::flush(const DataType &buffer, byte_type bytes)
 {
     static_assert(
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
@@ -135,7 +135,7 @@ void BitStreamWriter::flush(const DataType &buffer, byte_type bytes) noexcept
 
     if (m_stream)
     {
-        const DataType data = endian_swap<Endian::Big>(buffer);
+        const DataType data = endian_swap_if_non_native<Endian::Big>(buffer);
 
         m_stream_buffer->sputn(
             reinterpret_cast<const std::ios::char_type *>(&data),

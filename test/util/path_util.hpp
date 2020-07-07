@@ -15,11 +15,39 @@ class PathUtil
 {
 public:
     /**
-     * Generate a random directory under the system's temporary directory.
-     *
-     * @return The random directory path.
+     * Helper class to create and delete a random directory under the system's temporary directory.
      */
-    static std::filesystem::path generate_temp_directory() noexcept;
+    class ScopedTempDirectory
+    {
+    public:
+        /**
+         * Constructor. Create the random directory.
+         */
+        ScopedTempDirectory();
+
+        /**
+         * Destructor. Delete the created directory.
+         */
+        ~ScopedTempDirectory();
+
+        /**
+         * @return The random directory's path.
+         */
+        std::filesystem::path operator()() const;
+
+        /**
+         * Generate the file name for a new file under the random directory.
+         *
+         * @return The full path to the file.
+         */
+        std::filesystem::path file() const;
+
+    private:
+        ScopedTempDirectory(const ScopedTempDirectory &) = delete;
+        ScopedTempDirectory &operator=(const ScopedTempDirectory &) = delete;
+
+        std::filesystem::path m_directory;
+    };
 
     /**
      * Create a file with the given contents, verifying the file was correctly written after
@@ -30,7 +58,7 @@ public:
      *
      * @return True if the file was correctly created.
      */
-    static bool write_file(const std::filesystem::path &path, const std::string &contents) noexcept;
+    static bool write_file(const std::filesystem::path &path, const std::string &contents);
 
     /**
      * Read the contents of a file.
@@ -39,7 +67,7 @@ public:
      *
      * @return Contents of the file.
      */
-    static std::string read_file(const std::filesystem::path &path) noexcept;
+    static std::string read_file(const std::filesystem::path &path);
 
     /**
      * Compare two files for equality. Two files are equal if they have the same size and the same
@@ -51,7 +79,7 @@ public:
      * @return True if the given files are equal.
      */
     static bool
-    compare_files(const std::filesystem::path &path1, const std::filesystem::path &path2) noexcept;
+    compare_files(const std::filesystem::path &path1, const std::filesystem::path &path2);
 };
 
 } // namespace fly

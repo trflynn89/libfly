@@ -1,6 +1,6 @@
 #include "fly/coders/huffman/huffman_encoder.hpp"
 
-#include "fly/coders/huffman/huffman_config.hpp"
+#include "fly/coders/coder_config.hpp"
 #include "fly/logger/logger.hpp"
 #include "fly/types/bit_stream/bit_stream_writer.hpp"
 #include "fly/types/numeric/literals.hpp"
@@ -19,15 +19,15 @@ namespace {
 } // namespace
 
 //==================================================================================================
-HuffmanEncoder::HuffmanEncoder(const std::shared_ptr<HuffmanConfig> &config) noexcept :
-    m_chunk_size(config->encoder_chunk_size()),
-    m_max_code_length(config->encoder_max_code_length()),
+HuffmanEncoder::HuffmanEncoder(const std::shared_ptr<CoderConfig> &config) noexcept :
+    m_chunk_size(config->huffman_encoder_chunk_size()),
+    m_max_code_length(config->huffman_encoder_max_code_length()),
     m_huffman_codes_size(0)
 {
 }
 
 //==================================================================================================
-bool HuffmanEncoder::encode_binary(std::istream &decoded, BitStreamWriter &encoded) noexcept
+bool HuffmanEncoder::encode_binary(std::istream &decoded, BitStreamWriter &encoded)
 {
     if (m_max_code_length >= std::numeric_limits<code_type>::digits)
     {
@@ -55,7 +55,7 @@ bool HuffmanEncoder::encode_binary(std::istream &decoded, BitStreamWriter &encod
 }
 
 //==================================================================================================
-std::uint32_t HuffmanEncoder::read_stream(std::istream &decoded) const noexcept
+std::uint32_t HuffmanEncoder::read_stream(std::istream &decoded) const
 {
     decoded.read(
         reinterpret_cast<std::ios::char_type *>(m_chunk_buffer.get()),
@@ -65,7 +65,7 @@ std::uint32_t HuffmanEncoder::read_stream(std::istream &decoded) const noexcept
 }
 
 //==================================================================================================
-void HuffmanEncoder::create_tree(std::uint32_t chunk_size) noexcept
+void HuffmanEncoder::create_tree(std::uint32_t chunk_size)
 {
     std::uint16_t index = 0;
 
@@ -112,7 +112,7 @@ void HuffmanEncoder::create_tree(std::uint32_t chunk_size) noexcept
 }
 
 //==================================================================================================
-void HuffmanEncoder::create_codes() noexcept
+void HuffmanEncoder::create_codes()
 {
     std::stack<const HuffmanNode *> pending;
     std::stack<const HuffmanNode *> path;
@@ -167,7 +167,7 @@ void HuffmanEncoder::create_codes() noexcept
 }
 
 //==================================================================================================
-void HuffmanEncoder::insert_code(HuffmanCode &&code) noexcept
+void HuffmanEncoder::insert_code(HuffmanCode &&code)
 {
     std::uint16_t pos = m_huffman_codes_size++;
 
@@ -180,7 +180,7 @@ void HuffmanEncoder::insert_code(HuffmanCode &&code) noexcept
 }
 
 //==================================================================================================
-void HuffmanEncoder::limit_code_lengths() noexcept
+void HuffmanEncoder::limit_code_lengths()
 {
     auto compute_kraft = [this](const HuffmanCode &code) -> code_type {
         return 1_u16 << (m_max_code_length - code.m_length);
@@ -228,7 +228,7 @@ void HuffmanEncoder::limit_code_lengths() noexcept
 }
 
 //==================================================================================================
-void HuffmanEncoder::convert_to_canonical_form() noexcept
+void HuffmanEncoder::convert_to_canonical_form()
 {
     // First code is always set to zero. Its length does not change.
     m_huffman_codes[0].m_code = 0;
@@ -253,7 +253,7 @@ void HuffmanEncoder::convert_to_canonical_form() noexcept
 }
 
 //==================================================================================================
-void HuffmanEncoder::encode_header(BitStreamWriter &encoded) const noexcept
+void HuffmanEncoder::encode_header(BitStreamWriter &encoded) const
 {
     // Encode the Huffman coder version.
     encoded.write_byte(static_cast<byte_type>(s_huffman_version));
@@ -266,7 +266,7 @@ void HuffmanEncoder::encode_header(BitStreamWriter &encoded) const noexcept
 }
 
 //==================================================================================================
-void HuffmanEncoder::encode_codes(BitStreamWriter &encoded) const noexcept
+void HuffmanEncoder::encode_codes(BitStreamWriter &encoded) const
 {
     // At the least, encode that there were zero Huffman codes of length zero.
     std::vector<std::uint16_t> counts(1);
@@ -301,7 +301,7 @@ void HuffmanEncoder::encode_codes(BitStreamWriter &encoded) const noexcept
 }
 
 //==================================================================================================
-void HuffmanEncoder::encode_symbols(std::uint32_t chunk_size, BitStreamWriter &encoded) noexcept
+void HuffmanEncoder::encode_symbols(std::uint32_t chunk_size, BitStreamWriter &encoded)
 {
     decltype(m_huffman_codes) symbols;
 

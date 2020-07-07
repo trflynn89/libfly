@@ -1,45 +1,41 @@
 #include "fly/parser/parser.hpp"
 
-#include "fly/parser/parser_exception.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/string/string.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
+#include <optional>
 #include <sstream>
 #include <vector>
 
 namespace {
 
-//==================================================================================================
 class EofParser : public fly::Parser
 {
 public:
-    void compare_parsed(std::vector<int> chars) const noexcept
+    void compare(std::vector<int> &&chars) const
     {
-        EXPECT_EQ(m_chars, chars);
+        CHECK(m_chars == chars);
     }
 
 protected:
     /**
      * Dummy parser to fail if the given stream contains any characters.
      */
-    fly::Json parse_internal(std::istream &stream) override
+    std::optional<fly::Json> parse_internal(std::istream &stream) override
     {
         m_chars.clear();
         int c = 0;
 
-        while (stream)
+        while ((c = stream.get()) != EOF)
         {
-            if ((c = stream.get()) != EOF)
-            {
-                m_chars.push_back(c);
-            }
+            m_chars.push_back(c);
         }
 
         if (!m_chars.empty())
         {
-            throw fly::UnexpectedCharacterException(m_line, m_column, m_chars[0]);
+            return std::nullopt;
         }
 
         return fly::Json();
@@ -51,102 +47,99 @@ private:
 
 } // namespace
 
-//==================================================================================================
-class ParserTest : public ::testing::Test
+TEST_CASE("Parser", "[parser]")
 {
-protected:
-    EofParser m_parser;
-};
+    EofParser parser;
 
-//==================================================================================================
-TEST_F(ParserTest, NonByteOrderMark)
-{
-    EXPECT_THROW(m_parser.parse_string("\xEE"), fly::ParserException);
-    m_parser.compare_parsed({0xEE});
-}
+    SECTION("Leading byte that is not a byte order mark is not consumed as such")
+    {
+        CHECK_FALSE(parser.parse_string(std::string("\xee")).has_value());
+        parser.compare({0xee});
+    }
 
-//==================================================================================================
-TEST_F(ParserTest, Utf8ByteOrderMark)
-{
-    EXPECT_THROW(m_parser.parse_string("\xEF"), fly::ParserException);
-    m_parser.compare_parsed({0xEF});
+    SECTION("UTF-8 byte order mark")
+    {
+        CHECK_FALSE(parser.parse_string(std::string("\xef")).has_value());
+        parser.compare({0xef});
 
-    EXPECT_THROW(m_parser.parse_string("\xEF\xEE"), fly::ParserException);
-    m_parser.compare_parsed({0xEF, 0xEE});
+        CHECK_FALSE(parser.parse_string(std::string("\xef\xee")).has_value());
+        parser.compare({0xef, 0xee});
 
-    EXPECT_THROW(m_parser.parse_string("\xEF\xBB"), fly::ParserException);
-    m_parser.compare_parsed({0xEF, 0xBB});
+        CHECK_FALSE(parser.parse_string(std::string("\xef\xbb")).has_value());
+        parser.compare({0xef, 0xbb});
 
-    EXPECT_THROW(m_parser.parse_string("\xEF\xBB\xEE"), fly::ParserException);
-    m_parser.compare_parsed({0xEF, 0xBB, 0xEE});
+        CHECK_FALSE(parser.parse_string(std::string("\xef\xbb\xee")).has_value());
+        parser.compare({0xef, 0xbb, 0xee});
 
-    EXPECT_NO_THROW(m_parser.parse_string("\xEF\xBB\xBF"));
-    m_parser.compare_parsed({});
-}
+        CHECK(parser.parse_string(std::string("\xef\xbb\xbf")).has_value());
+        parser.compare({});
+    }
 
-//==================================================================================================
-TEST_F(ParserTest, Utf16BigEndianByteOrderMark)
-{
-    EXPECT_THROW(m_parser.parse_string("\xFE"), fly::ParserException);
-    m_parser.compare_parsed({0xFE});
+    SECTION("UTF-16 big endian byte order mark")
+    {
+        std::optional<fly::Json> parsed;
 
-    EXPECT_THROW(m_parser.parse_string("\xFE\xEE"), fly::ParserException);
-    m_parser.compare_parsed({0xFE, 0xEE});
+        CHECK_FALSE(parser.parse_string(std::string("\xfe")).has_value());
+        parser.compare({0xfe});
 
-    EXPECT_NO_THROW(m_parser.parse_string("\xFE\xFF"));
-    m_parser.compare_parsed({});
-}
+        CHECK_FALSE(parser.parse_string(std::string("\xfe\xee")).has_value());
+        parser.compare({0xfe, 0xee});
 
-//==================================================================================================
-TEST_F(ParserTest, Utf16LittleEndianByteOrderMark)
-{
-    EXPECT_THROW(m_parser.parse_string("\xFF"), fly::ParserException);
-    m_parser.compare_parsed({0xFF});
+        CHECK(parser.parse_string(std::string("\xfe\xff")).has_value());
+        parser.compare({});
+    }
 
-    EXPECT_THROW(m_parser.parse_string("\xFF\xEE"), fly::ParserException);
-    m_parser.compare_parsed({0xFF, 0xEE});
+    SECTION("UTF-16 little endian byte order mark")
+    {
+        std::optional<fly::Json> parsed;
 
-    EXPECT_NO_THROW(m_parser.parse_string("\xFF\xFE"));
-    m_parser.compare_parsed({});
-}
+        CHECK_FALSE(parser.parse_string(std::string("\xff")).has_value());
+        parser.compare({0xff});
 
-//==================================================================================================
-TEST_F(ParserTest, Utf32BigEndianByteOrderMark)
-{
-    EXPECT_THROW(m_parser.parse_string(std::string("\x00", 1)), fly::ParserException);
-    m_parser.compare_parsed({0x00});
+        CHECK_FALSE(parser.parse_string(std::string("\xff\xee")).has_value());
+        parser.compare({0xff, 0xee});
 
-    EXPECT_THROW(m_parser.parse_string(std::string("\x00\xEE", 2)), fly::ParserException);
-    m_parser.compare_parsed({0x00, 0xEE});
+        CHECK(parser.parse_string(std::string("\xff\xfe")).has_value());
+        parser.compare({});
+    }
 
-    EXPECT_THROW(m_parser.parse_string(std::string("\x00\x00", 2)), fly::ParserException);
-    m_parser.compare_parsed({0x00, 0x00});
+    SECTION("UTF-32 big endian byte order mark")
+    {
+        std::optional<fly::Json> parsed;
 
-    EXPECT_THROW(m_parser.parse_string(std::string("\x00\x00\xEE", 3)), fly::ParserException);
-    m_parser.compare_parsed({0x00, 0x00, 0xEE});
+        CHECK_FALSE(parser.parse_string(std::string("\x00", 1)).has_value());
+        parser.compare({0x00});
 
-    EXPECT_THROW(m_parser.parse_string(std::string("\x00\x00\xFE", 3)), fly::ParserException);
-    m_parser.compare_parsed({0x00, 0x00, 0xFE});
+        CHECK_FALSE(parser.parse_string(std::string("\x00\xee", 2)).has_value());
+        parser.compare({0x00, 0xee});
 
-    EXPECT_THROW(m_parser.parse_string(std::string("\x00\x00\xFE\xEE", 4)), fly::ParserException);
-    m_parser.compare_parsed({0x00, 0x00, 0xFE, 0xEE});
+        CHECK_FALSE(parser.parse_string(std::string("\x00\x00", 2)).has_value());
+        parser.compare({0x00, 0x00});
 
-    EXPECT_NO_THROW(m_parser.parse_string(std::string("\x00\x00\xFE\xFF", 4)));
-    m_parser.compare_parsed({});
-}
+        CHECK_FALSE(parser.parse_string(std::string("\x00\x00\xee", 3)).has_value());
+        parser.compare({0x00, 0x00, 0xee});
 
-//==================================================================================================
-TEST_F(ParserTest, Utf32LittleEndianByteOrderMark)
-{
-    EXPECT_THROW(m_parser.parse_string("\xFF\xFE\xEE"), fly::ParserException);
-    m_parser.compare_parsed({0xEE}); // 0xFF 0xFE is parsed as UTF-16
+        CHECK_FALSE(parser.parse_string(std::string("\x00\x00\xfe", 3)).has_value());
+        parser.compare({0x00, 0x00, 0xfe});
 
-    EXPECT_THROW(m_parser.parse_string(std::string("\xFF\xFE\x00", 3)), fly::ParserException);
-    m_parser.compare_parsed({0x00}); // 0xFF 0xFE is parsed as UTF-16
+        CHECK_FALSE(parser.parse_string(std::string("\x00\x00\xfe\xee", 4)).has_value());
+        parser.compare({0x00, 0x00, 0xfe, 0xee});
 
-    EXPECT_THROW(m_parser.parse_string(std::string("\xFF\xFE\x00\xEE", 4)), fly::ParserException);
-    m_parser.compare_parsed({0x00, 0xEE}); // 0xFF 0xFE is parsed as UTF-16
+        CHECK(parser.parse_string(std::string("\x00\x00\xfe\xff", 4)).has_value());
+        parser.compare({});
+    }
 
-    EXPECT_NO_THROW(m_parser.parse_string(std::string("\xFF\xFE\x00\x00", 4)));
-    m_parser.compare_parsed({});
+    SECTION("UTF-32 little endian byte order mark")
+    {
+        std::optional<fly::Json> parsed;
+
+        CHECK_FALSE(parser.parse_string(std::string("\xff\xfe\x61\x00", 4)).has_value());
+        parser.compare({0x61}); // 0xff 0xfe is interpreted as UTF-16 little endian
+
+        CHECK_FALSE(parser.parse_string(std::string("\xff\xfe\x00\x61", 4)).has_value());
+        parser.compare({0xe6, 0x84, 0x80}); // 0xff 0xfe is interpreted as UTF-16 little endian
+
+        CHECK(parser.parse_string(std::string("\xff\xfe\x00\x00", 4)).has_value());
+        parser.compare({});
+    }
 }

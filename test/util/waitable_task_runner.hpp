@@ -34,7 +34,7 @@ public:
      * @tparam TaskType The task subclass to wait on.
      */
     template <typename TaskType>
-    void wait_for_task_to_complete() noexcept;
+    void wait_for_task_to_complete();
 
     /**
      * Wait for a specific task type to complete execution.
@@ -46,7 +46,7 @@ public:
      * @return True if a completed task was found in the given duration.
      */
     template <typename TaskType, typename R, typename P>
-    bool wait_for_task_to_complete(std::chrono::duration<R, P> duration) noexcept;
+    bool wait_for_task_to_complete(std::chrono::duration<R, P> duration);
 
 protected:
     /**
@@ -54,7 +54,7 @@ protected:
      *
      * @param task The (possibly NULL) task that was executed or skipped.
      */
-    virtual void task_complete(const std::shared_ptr<Task> &task) noexcept = 0;
+    virtual void task_complete(const std::shared_ptr<Task> &task) = 0;
 
 private:
     ConcurrentQueue<std::size_t> m_completed_tasks;
@@ -80,7 +80,7 @@ protected:
      *
      * @param task The (possibly NULL) task that was executed or skipped.
      */
-    void task_complete(const std::shared_ptr<Task> &task) noexcept override;
+    void task_complete(const std::shared_ptr<Task> &task) override;
 };
 
 /**
@@ -102,12 +102,12 @@ protected:
      *
      * @param task The (possibly NULL) task that was executed or skipped.
      */
-    void task_complete(const std::shared_ptr<Task> &task) noexcept override;
+    void task_complete(const std::shared_ptr<Task> &task) override;
 };
 
 //==================================================================================================
 template <typename TaskType>
-void WaitableTaskRunner::wait_for_task_to_complete() noexcept
+void WaitableTaskRunner::wait_for_task_to_complete()
 {
     static_assert(std::is_base_of<Task, TaskType>::value, "Given type is not a task");
 
@@ -122,7 +122,7 @@ void WaitableTaskRunner::wait_for_task_to_complete() noexcept
 
 //==================================================================================================
 template <typename TaskType, typename R, typename P>
-bool WaitableTaskRunner::wait_for_task_to_complete(std::chrono::duration<R, P> duration) noexcept
+bool WaitableTaskRunner::wait_for_task_to_complete(std::chrono::duration<R, P> duration)
 {
     static_assert(std::is_base_of<Task, TaskType>::value, "Given type is not a task");
 

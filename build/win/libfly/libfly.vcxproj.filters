@@ -85,11 +85,11 @@
     <ClInclude Include="..\..\..\fly\coders\coder.hpp">
       <Filter>coders</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\coders\coder_config.hpp">
+      <Filter>coders</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\coders\base64\base64_coder.hpp">
       <Filter>coders\base64</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.hpp">
-      <Filter>coders\huffman</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.hpp">
       <Filter>coders\huffman</Filter>
@@ -125,9 +125,6 @@
       <Filter>parser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\parser.hpp">
-      <Filter>parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\parser\parser_exception.hpp">
       <Filter>parser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\path\path_config.hpp">
@@ -241,9 +238,6 @@
     <ClInclude Include="..\..\..\fly\types\string\string.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\string_exception.hpp">
-      <Filter>types\string</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\string_literal.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
@@ -267,11 +261,11 @@
     <ClCompile Include="..\..\..\fly\coders\coder.cpp">
       <Filter>coders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\fly\coders\coder_config.cpp">
+      <Filter>coders</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\fly\coders\base64\base64_coder.cpp">
       <Filter>coders\base64</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_config.cpp">
-      <Filter>coders\huffman</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_decoder.cpp">
       <Filter>coders\huffman</Filter>
@@ -304,9 +298,6 @@
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\parser.cpp">
-      <Filter>parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\parser\parser_exception.cpp">
       <Filter>parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\path\path_config.cpp">
@@ -371,9 +362,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\types\json\json_exception.cpp">
       <Filter>types\json</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\types\string\string_exception.cpp">
-      <Filter>types\string</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

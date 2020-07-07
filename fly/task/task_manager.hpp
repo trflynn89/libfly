@@ -43,14 +43,20 @@ public:
      *
      * @return True if the threads were created in this invocation.
      */
-    bool start() noexcept;
+    bool start();
 
     /**
-     * Destroy the worker threads and timer thread, blocking until the threads exit.
+     * Destroy the worker threads and timer thread, blocking until the threads exit. This must be
+     * eplicitly called from the same thread that started the task manager.
+     *
+     * TODO: TaskManager should be created as a unique_ptr so it can be started and stopped in an
+     * RAII fashion. It cannot be stopped from the destructor because a task thread may be the last
+     * owner of a shared_ptr to this task manager. In that case, when that shared_ptr is destroyed,
+     * the destructor would call stop, resulting in the task thread trying to join itself.
      *
      * @return True if the threads were destroyed in this invocation.
      */
-    bool stop() noexcept;
+    bool stop();
 
     /**
      * Create a task runner, holding a weak reference to this task manager.
@@ -60,7 +66,7 @@ public:
      * @return The created task runner.
      */
     template <typename TaskRunnerType>
-    std::shared_ptr<TaskRunnerType> create_task_runner() noexcept;
+    std::shared_ptr<TaskRunnerType> create_task_runner();
 
 private:
     /**
@@ -80,8 +86,7 @@ private:
      * @param weak_task The task to be executed.
      * @param weak_task_runner The task runner posting the task.
      */
-    void
-    post_task(std::weak_ptr<Task> weak_task, std::weak_ptr<TaskRunner> weak_task_runner) noexcept;
+    void post_task(std::weak_ptr<Task> weak_task, std::weak_ptr<TaskRunner> weak_task_runner);
 
     /**
      * Schedule a task to be posted for execution after some delay.
@@ -93,17 +98,17 @@ private:
     void post_task_with_delay(
         std::weak_ptr<Task> weak_task,
         std::weak_ptr<TaskRunner> weak_task_runner,
-        std::chrono::milliseconds delay) noexcept;
+        std::chrono::milliseconds delay);
 
     /**
      * Worker thread for executing tasks.
      */
-    void worker_thread() noexcept;
+    void worker_thread();
 
     /**
      * Timer thread for holding delayed tasks until their scheduled time.
      */
-    void timer_thread() noexcept;
+    void timer_thread();
 
     ConcurrentQueue<TaskHolder> m_tasks;
 
@@ -119,7 +124,7 @@ private:
 
 //==================================================================================================
 template <typename TaskRunnerType>
-std::shared_ptr<TaskRunnerType> TaskManager::create_task_runner() noexcept
+std::shared_ptr<TaskRunnerType> TaskManager::create_task_runner()
 {
     static_assert(std::is_base_of_v<TaskRunner, TaskRunnerType>);
 

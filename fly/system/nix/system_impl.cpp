@@ -10,15 +10,19 @@
 namespace fly {
 
 //==================================================================================================
-void SystemImpl::print_backtrace() noexcept
+void SystemImpl::print_backtrace()
 {
     void *trace[10];
     int trace_size = ::backtrace(trace, 10);
-    ::backtrace_symbols_fd(trace, trace_size, STDERR_FILENO);
+
+    if (trace_size > 0)
+    {
+        ::backtrace_symbols_fd(trace, trace_size, STDERR_FILENO);
+    }
 }
 
 //==================================================================================================
-std::string SystemImpl::local_time(const char *fmt) noexcept
+std::string SystemImpl::local_time(const char *fmt)
 {
     auto sys = std::chrono::system_clock::now();
     time_t now = std::chrono::system_clock::to_time_t(sys);
@@ -40,13 +44,13 @@ std::string SystemImpl::local_time(const char *fmt) noexcept
 }
 
 //==================================================================================================
-int SystemImpl::get_error_code() noexcept
+int SystemImpl::get_error_code()
 {
     return errno;
 }
 
 //==================================================================================================
-std::vector<int> SystemImpl::get_signals() noexcept
+std::vector<int> SystemImpl::get_signals()
 {
     return {SIGINT, SIGTERM, SIGSYS, SIGBUS, SIGILL, SIGFPE, SIGABRT, SIGSEGV};
 }

@@ -27,11 +27,11 @@ public:
     ~SocketManagerImpl() override;
 
 protected:
-    void poll(const std::chrono::microseconds &timeout) noexcept override;
+    void poll(const std::chrono::microseconds &timeout) override;
 
 private:
-    bool set_read_and_write_masks(fd_set *read_fd, fd_set *write_fd) noexcept;
-    void handle_socket_io(fd_set *read_fd, fd_set *write_fd) noexcept;
+    bool set_read_and_write_masks(fd_set *read_fd, fd_set *write_fd);
+    void handle_socket_io(fd_set *read_fd, fd_set *write_fd);
 
     static std::atomic_int s_socket_manager_count;
 };

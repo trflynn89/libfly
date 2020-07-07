@@ -23,7 +23,15 @@ public:
     /**
      * Constructor.
      */
-    HuffmanDecoder();
+    HuffmanDecoder() noexcept;
+
+    /**
+     * Compute the Kraft–McMillan constant of the decoded Huffman codes. Primarily meant for unit
+     * testing.
+     *
+     * @return The Kraft–McMillan constant.
+     */
+    code_type compute_kraft_mcmillan_constant() const;
 
 protected:
     /**
@@ -53,7 +61,7 @@ protected:
      *
      * @return True if the input stream was successfully decoded.
      */
-    bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) noexcept override;
+    bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) override;
 
 private:
     /**
@@ -62,14 +70,10 @@ private:
      *
      * @param encoded Stream storing the encoded header.
      * @param chunk_size Location to store the maximum chunk size (in bytes).
-     * @param max_code_length Location to store the global maximum Huffman code length.
      *
      * @return True if the header was successfully decoded.
      */
-    bool decode_header(
-        BitStreamReader &encoded,
-        std::uint32_t &chunk_size,
-        length_type &max_code_length) const noexcept;
+    bool decode_header(BitStreamReader &encoded, std::uint32_t &chunk_size);
 
     /**
      * Decode version 1 of the header. Extract the maximum chunk length and the global maximum
@@ -77,36 +81,28 @@ private:
      *
      * @param encoded Stream storing the encoded header.
      * @param chunk_size Location to store the maximum chunk size (in bytes).
-     * @param max_code_length Location to store the global maximum Huffman code length.
      *
      * @return True if the header was successfully encoded.
      */
-    bool decode_header_version1(
-        BitStreamReader &encoded,
-        std::uint32_t &chunk_size,
-        length_type &max_code_length) const noexcept;
+    bool decode_header_version1(BitStreamReader &encoded, std::uint32_t &chunk_size);
 
     /**
      * Decode Huffman codes from an encoded input stream. The list of codes will be stored as a
      * prefix table.
      *
      * @param encoded Stream storing the encoded codes.
-     * @param global_max_code_length The global maximum Huffman code length.
-     * @param local_max_code_length Location to store the local maximum Huffman code length.
+     * @param max_code_length Location to store the local maximum Huffman code length.
      *
      * @return True if the Huffman codes were successfully decoded.
      */
-    bool decode_codes(
-        BitStreamReader &encoded,
-        length_type global_max_code_length,
-        length_type &local_max_code_length) noexcept;
+    bool decode_codes(BitStreamReader &encoded, length_type &max_code_length);
 
     /**
      * Convert the decoded list of Huffman codes into a prefix table.
      *
      * @param max_code_length The maximum length of the decoded Huffman codes.
      */
-    void convert_to_prefix_table(length_type max_code_length) noexcept;
+    void convert_to_prefix_table(length_type max_code_length);
 
     /**
      * Decode symbols from an encoded input stream with a Huffman tree. Store decoded data into a
@@ -124,20 +120,18 @@ private:
         BitStreamReader &encoded,
         length_type max_code_length,
         std::uint32_t chunk_size,
-        std::ostream &decoded) const noexcept;
+        std::ostream &decoded) const;
 
     std::unique_ptr<symbol_type[]> m_chunk_buffer;
 
     // Sized to fit 8-bit ASCII symbols.
     std::array<HuffmanCode, 1 << 8> m_huffman_codes;
     std::uint16_t m_huffman_codes_size;
+    length_type m_max_code_length;
 
     // Will be sized to fit the global maximum Huffman code length used by the encoder. The size
     // will be 2^L, were L is the maximum code length.
     std::unique_ptr<HuffmanCode[]> m_prefix_table;
-
-    // Friend class for unit testing.
-    friend class HuffmanCoderTest;
 };
 
 } // namespace fly

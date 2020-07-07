@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/traits/traits.hpp"
-#include "fly/types/string/detail/string_streamer.hpp"
+#include "fly/types/string/detail/string_streamer_traits.hpp"
 
 #include <cstdint>
 #include <string>
@@ -24,25 +24,28 @@ struct BasicStringTraits
      */
     using size_type = typename StringType::size_type;
     using char_type = typename StringType::value_type;
+
+    using iterator = typename StringType::iterator;
+    using const_iterator = typename StringType::const_iterator;
+
     using codepoint_type = std::uint32_t;
 
-    using streamer_type = BasicStringStreamer<StringType>;
+    using streamer_traits = BasicStringStreamerTraits<StringType>;
+    using streamed_type = typename streamer_traits::streamed_type;
 
-    using istream_type = typename streamer_type::istream_type;
-    using ostream_type = typename streamer_type::ostream_type;
+    using istream_type = typename streamer_traits::istream_type;
+    using ostream_type = typename streamer_traits::ostream_type;
 
-    using fstream_type = typename streamer_type::fstream_type;
-    using ifstream_type = typename streamer_type::ifstream_type;
-    using ofstream_type = typename streamer_type::ofstream_type;
+    using fstream_type = typename streamer_traits::fstream_type;
+    using ifstream_type = typename streamer_traits::ifstream_type;
+    using ofstream_type = typename streamer_traits::ofstream_type;
 
-    using stringstream_type = typename streamer_type::stringstream_type;
-    using istringstream_type = typename streamer_type::istringstream_type;
-    using ostringstream_type = typename streamer_type::ostringstream_type;
+    using stringstream_type = typename streamer_traits::stringstream_type;
+    using istringstream_type = typename streamer_traits::istringstream_type;
+    using ostringstream_type = typename streamer_traits::ostringstream_type;
 
     static_assert(
-        std::is_same_v<StringType, std::string> || std::is_same_v<StringType, std::wstring> ||
-            std::is_same_v<StringType, std::u16string> ||
-            std::is_same_v<StringType, std::u32string>,
+        any_same_v<StringType, std::string, std::wstring, std::u16string, std::u32string>,
         "StringType must be a standard std::basic_string<> specialization");
 
     /**
@@ -50,10 +53,7 @@ struct BasicStringTraits
      * StringType.
      */
     template <typename T>
-    using is_string_like = std::bool_constant<
-        std::is_same_v<char_type *, std::decay_t<T>> ||
-        std::is_same_v<char_type const *, std::decay_t<T>> ||
-        std::is_same_v<StringType, std::decay_t<T>>>;
+    using is_string_like = any_same<T, char_type *, char_type const *, StringType>;
 
     template <typename T>
     inline static constexpr bool is_string_like_v = is_string_like<T>::value;
@@ -62,8 +62,7 @@ struct BasicStringTraits
      * Define a trait for testing if the STL has defined the std::stoi family
      * of functions for StringType.
      */
-    using has_stoi_family = std::bool_constant<
-        std::is_same_v<StringType, std::string> || std::is_same_v<StringType, std::wstring>>;
+    using has_stoi_family = any_same<StringType, std::string, std::wstring>;
 
     inline static constexpr bool has_stoi_family_v = has_stoi_family::value;
 

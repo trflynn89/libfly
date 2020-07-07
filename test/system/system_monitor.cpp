@@ -4,7 +4,7 @@
 #include "fly/task/task_manager.hpp"
 #include "fly/types/numeric/literals.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include <functional>
 #include <future>
@@ -34,174 +34,171 @@ public:
 
 } // namespace
 
-//==================================================================================================
-class SystemMonitorTest : public ::testing::Test
+TEST_CASE("SystemMonitor", "[system]")
 {
-public:
-    SystemMonitorTest() noexcept :
-        m_task_manager(std::make_shared<fly::TaskManager>(1)),
-        m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
+    auto task_manager = std::make_shared<fly::TaskManager>(1);
+    REQUIRE(task_manager->start());
 
-        m_monitor(std::make_shared<fly::SystemMonitorImpl>(
-            m_task_runner,
-            std::make_shared<TestSystemConfig>())),
-        m_keep_running(true)
-    {
-    }
+    auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
 
-    /**
-     * Start the task manager and system monitor.
-     */
-    void SetUp() noexcept override
-    {
-        ASSERT_TRUE(m_task_manager->start());
-        ASSERT_TRUE(m_monitor->start());
-        m_task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
-    }
+    auto monitor =
+        std::make_shared<fly::SystemMonitorImpl>(task_runner, std::make_shared<TestSystemConfig>());
+    REQUIRE(monitor->start());
 
-    /**
-     * Stop the task manager.
-     */
-    void TearDown() noexcept override
-    {
-        ASSERT_TRUE(m_task_manager->stop());
-    }
+    // Wait for one poll to complete before proceeding.
+    task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
-    /**
-     * Thread to spin infinitely until signaled to stop.
-     */
-    void spin_thread() noexcept
-    {
-        while (m_keep_running.load())
+    // Thread to spin indefinitely until signaled to stop.
+    std::atomic_bool keep_running(true);
+
+    auto spin_thread = [&keep_running]() {
+        while (keep_running.load())
         {
         }
+    };
+
+    SECTION("Validate CPU usage increased while running a spin thread")
+    {
+        std::uint32_t count_before = monitor->get_system_cpu_count();
+        double process_before = monitor->get_process_cpu_usage();
+
+        std::future<void> result = std::async(std::launch::async, spin_thread);
+        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+
+        std::uint32_t count_after = monitor->get_system_cpu_count();
+        double system_after = monitor->get_system_cpu_usage();
+        double process_after = monitor->get_process_cpu_usage();
+
+        keep_running.store(false);
+        REQUIRE(result.valid());
+        result.get();
+
+        CHECK(count_before == count_after);
+        CHECK(system_after > 0_u64);
+        CHECK(process_before < process_after);
     }
-
-protected:
-    std::shared_ptr<fly::TaskManager> m_task_manager;
-    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_task_runner;
-
-    std::shared_ptr<fly::SystemMonitor> m_monitor;
-    std::atomic_bool m_keep_running;
-};
-
-//==================================================================================================
-TEST_F(SystemMonitorTest, CpuUsage)
-{
-    std::uint32_t count_before = m_monitor->get_system_cpu_count();
-    double process_before = m_monitor->get_process_cpu_usage();
-
-    std::future<void> result =
-        std::async(std::launch::async, &SystemMonitorTest::spin_thread, this);
-
-    m_task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
-
-    std::uint32_t count_after = m_monitor->get_system_cpu_count();
-    double system_after = m_monitor->get_system_cpu_usage();
-    double process_after = m_monitor->get_process_cpu_usage();
-
-    m_keep_running.store(false);
-    ASSERT_TRUE(result.valid());
-    result.get();
-
-    ASSERT_EQ(count_before, count_after);
-    ASSERT_GT(system_after, 0_u64);
-    ASSERT_LT(process_before, process_after);
-}
 
 #if defined(FLY_LINUX)
 
-//==================================================================================================
-TEST_F(SystemMonitorTest, MockCpuUsage)
-{
+    SECTION("Cannot start system manager when ::read() fails")
     {
         fly::MockSystem mock(fly::MockCall::Read);
 
-        m_monitor = std::make_shared<fly::SystemMonitorImpl>(
-            m_task_runner,
+        monitor = std::make_shared<fly::SystemMonitorImpl>(
+            task_runner,
             std::make_shared<fly::SystemConfig>());
 
-        ASSERT_FALSE(m_monitor->start());
-        ASSERT_EQ(m_monitor->get_system_cpu_count(), 0);
+        CHECK_FALSE(monitor->start());
+        CHECK(monitor->get_system_cpu_count() == 0);
     }
 
+    SECTION("Cannot update system CPU when ::read() fails")
     {
-        m_monitor = std::make_shared<fly::SystemMonitorImpl>(
-            m_task_runner,
+        monitor = std::make_shared<fly::SystemMonitorImpl>(
+            task_runner,
             std::make_shared<fly::SystemConfig>());
 
-        ASSERT_TRUE(m_monitor->start());
-        m_task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        CHECK(monitor->start());
+        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
-        fly::MockSystem mock1(fly::MockCall::Read);
-        fly::MockSystem mock2(fly::MockCall::Times);
+        fly::MockSystem mock(fly::MockCall::Read);
 
-        double system_before = m_monitor->get_system_cpu_usage();
-        double process_before = m_monitor->get_process_cpu_usage();
+        double system_before = monitor->get_system_cpu_usage();
 
-        std::future<void> result =
-            std::async(std::launch::async, &SystemMonitorTest::spin_thread, this);
+        std::future<void> result = std::async(std::launch::async, spin_thread);
+        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
-        m_task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        double system_after = monitor->get_system_cpu_usage();
 
-        double system_after = m_monitor->get_system_cpu_usage();
-        double process_after = m_monitor->get_process_cpu_usage();
-
-        m_keep_running.store(false);
-        ASSERT_TRUE(result.valid());
+        keep_running.store(false);
+        REQUIRE(result.valid());
         result.get();
 
-        ASSERT_EQ(system_before, system_after);
-        ASSERT_EQ(process_before, process_after);
+        CHECK(system_before == Approx(system_after));
     }
-}
+
+    SECTION("Cannot update process CPU when ::times() fails")
+    {
+        monitor = std::make_shared<fly::SystemMonitorImpl>(
+            task_runner,
+            std::make_shared<fly::SystemConfig>());
+
+        CHECK(monitor->start());
+        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+
+        fly::MockSystem mock(fly::MockCall::Times);
+
+        double process_before = monitor->get_process_cpu_usage();
+
+        std::future<void> result = std::async(std::launch::async, spin_thread);
+        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+
+        double process_after = monitor->get_process_cpu_usage();
+
+        keep_running.store(false);
+        REQUIRE(result.valid());
+        result.get();
+
+        CHECK(process_before == Approx(process_after));
+    }
 
 #endif
 
-//==================================================================================================
-TEST_F(SystemMonitorTest, MemoryUsage)
-{
-    std::uint64_t total_before = m_monitor->get_total_system_memory();
-    std::uint64_t system_before = m_monitor->get_system_memory_usage();
-    std::uint64_t process_before = m_monitor->get_process_memory_usage();
+    SECTION("Validate memory usage increased after allocating a large block")
+    {
+        std::uint64_t total_before = monitor->get_total_system_memory();
+        std::uint64_t system_before = monitor->get_system_memory_usage();
+        std::uint64_t process_before = monitor->get_process_memory_usage();
 
-    auto size = static_cast<std::string::size_type>((total_before - system_before) / 10);
+        auto size = static_cast<std::string::size_type>((total_before - system_before) / 10);
 
-    std::string consumed(size, '\0');
-    m_task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        std::string consumed(size, '\0');
+        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
-    std::uint64_t total_after = m_monitor->get_total_system_memory();
-    std::uint64_t system_after = m_monitor->get_system_memory_usage();
-    std::uint64_t process_after = m_monitor->get_process_memory_usage();
+        std::uint64_t total_after = monitor->get_total_system_memory();
+        std::uint64_t system_after = monitor->get_system_memory_usage();
+        std::uint64_t process_after = monitor->get_process_memory_usage();
 
-    ASSERT_EQ(total_before, total_after);
-    ASSERT_GT(system_before, 0_u64);
-    ASSERT_GT(system_after, 0_u64);
-    ASSERT_LT(process_before, process_after);
-}
+        CHECK(total_before == total_after);
+        CHECK(system_before > 0_u64);
+        CHECK(system_after > 0_u64);
+        CHECK(process_before < process_after);
+    }
 
 #if defined(FLY_LINUX)
 
-//==================================================================================================
-TEST_F(SystemMonitorTest, MockMemoryUsage)
-{
-    fly::MockSystem mock1(fly::MockCall::Sysinfo);
-    fly::MockSystem mock2(fly::MockCall::Read);
+    SECTION("Cannot update system memory when ::sysinfo() fails")
+    {
+        fly::MockSystem mock(fly::MockCall::Sysinfo);
 
-    std::uint64_t total_before = m_monitor->get_total_system_memory();
-    std::uint64_t system_before = m_monitor->get_system_memory_usage();
-    std::uint64_t process_before = m_monitor->get_process_memory_usage();
+        std::uint64_t total_before = monitor->get_total_system_memory();
+        std::uint64_t system_before = monitor->get_system_memory_usage();
 
-    std::string consumed((total_before - system_before) / 10, '\0');
-    m_task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        std::string consumed(1 << 10, '\0');
+        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
-    std::uint64_t total_after = m_monitor->get_total_system_memory();
-    std::uint64_t system_after = m_monitor->get_system_memory_usage();
-    std::uint64_t process_after = m_monitor->get_process_memory_usage();
+        std::uint64_t total_after = monitor->get_total_system_memory();
+        std::uint64_t system_after = monitor->get_system_memory_usage();
 
-    ASSERT_EQ(total_before, total_after);
-    ASSERT_EQ(system_before, system_after);
-    ASSERT_EQ(process_before, process_after);
-}
+        CHECK(total_before == total_after);
+        CHECK(system_before == system_after);
+    }
+
+    SECTION("Cannot update process memory when ::read() fails")
+    {
+        fly::MockSystem mock(fly::MockCall::Read);
+
+        std::uint64_t process_before = monitor->get_process_memory_usage();
+
+        std::string consumed(1 << 10, '\0');
+        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+
+        std::uint64_t process_after = monitor->get_process_memory_usage();
+
+        CHECK(process_before == process_after);
+    }
 
 #endif
+
+    CHECK(task_manager->stop());
+}

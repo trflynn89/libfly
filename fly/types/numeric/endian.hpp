@@ -41,24 +41,22 @@ enum class Endian : std::uint16_t
 };
 
 /**
- * Templated wrapper around platform built-in byte swapping macros to convert a value between system
- * endianness and a desired endianness.
+ * Templated wrapper around platform built-in byte swapping macros to change a value's endianness.
  *
- * @tparam Endian The desired endianness to swap between.
  * @tparam T The type of the value to swap.
  *
  * @param value The value to swap.
  *
  * @return The swapped value.
  */
-template <Endian Endianness, typename T>
-inline T endian_swap(T value) noexcept
+template <typename T>
+inline T endian_swap(T value)
 {
     static_assert(
         detail::EndianTraits::is_supported_integer_v<T>,
         "Value must be an integer type of size 1, 2, 4, or 8 bytes");
 
-    if constexpr ((Endianness == Endian::Native) || (sizeof(T) == 1))
+    if constexpr (sizeof(T) == 1)
     {
         return value;
     }
@@ -73,6 +71,30 @@ inline T endian_swap(T value) noexcept
     else if constexpr (sizeof(T) == 8)
     {
         return static_cast<T>(bswap_64(static_cast<std::uint64_t>(value)));
+    }
+}
+
+/**
+ * Templated wrapper around platform built-in byte swapping macros to convert a value between system
+ * endianness and a desired endianness.
+ *
+ * @tparam Endian The desired endianness to swap between.
+ * @tparam T The type of the value to swap.
+ *
+ * @param value The value to swap.
+ *
+ * @return The swapped value.
+ */
+template <Endian Endianness, typename T>
+inline T endian_swap_if_non_native(T value)
+{
+    if constexpr (Endianness == Endian::Native)
+    {
+        return value;
+    }
+    else
+    {
+        return endian_swap(value);
     }
 }
 

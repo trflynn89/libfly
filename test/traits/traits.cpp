@@ -1,6 +1,6 @@
 #include "fly/traits/traits.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include <sstream>
 #include <variant>
@@ -27,7 +27,7 @@ public:
     {
     }
 
-    bool foo() const noexcept
+    bool foo() const
     {
         return true;
     }
@@ -41,7 +41,7 @@ public:
     {
     }
 
-    std::string operator()() const noexcept
+    std::string operator()() const
     {
         return "BarClass";
     }
@@ -57,27 +57,27 @@ std::ostream &operator<<(std::ostream &stream, const BarClass &bar)
 
 //==================================================================================================
 template <typename T, fly::enable_if_all<FooTraits::is_declared<T>> = 0>
-bool call_foo(const T &arg) noexcept
+bool call_foo(const T &arg)
 {
     return arg.foo();
 }
 
 template <typename T, fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
-bool call_foo(const T &) noexcept
+bool call_foo(const T &)
 {
     return false;
 }
 
 //==================================================================================================
 template <typename T, fly::enable_if_all<OstreamTraits::is_declared<T>> = 0>
-bool is_streamable(std::ostream &stream, const T &arg) noexcept
+bool is_streamable(std::ostream &stream, const T &arg)
 {
     stream << arg;
     return true;
 }
 
 template <typename T, fly::enable_if_not_all<OstreamTraits::is_declared<T>> = 0>
-bool is_streamable(std::ostream &, const T &) noexcept
+bool is_streamable(std::ostream &, const T &)
 {
     return false;
 }
@@ -118,227 +118,219 @@ bool is_class_or_pointer(const T &)
 
 } // namespace
 
-//==================================================================================================
-TEST(TraitsTest, Foo)
+TEST_CASE("Traits", "[traits]")
 {
-    const FooClass fc;
-    const BarClass bc;
+    SECTION("DeclarationTraits for whether a class defines a method foo()")
+    {
+        const FooClass fc;
+        const BarClass bc;
 
-    EXPECT_TRUE(call_foo(fc));
-    EXPECT_TRUE(FooTraits::is_declared_v<FooClass>);
+        CHECK(call_foo(fc));
+        CHECK(FooTraits::is_declared_v<FooClass>);
 
-    EXPECT_FALSE(call_foo(bc));
-    EXPECT_FALSE(FooTraits::is_declared_v<BarClass>);
-}
+        CHECK_FALSE(call_foo(bc));
+        CHECK_FALSE(FooTraits::is_declared_v<BarClass>);
+    }
 
-//==================================================================================================
-TEST(TraitsTest, Stream)
-{
-    std::stringstream stream;
+    SECTION("DeclarationTraits for whether a class defines operator<<")
+    {
+        std::stringstream stream;
 
-    const FooClass fc;
-    const BarClass bc;
+        const FooClass fc;
+        const BarClass bc;
 
-    const std::string str("a");
+        const std::string str("a");
 
-    EXPECT_TRUE(is_streamable(stream, bc));
-    EXPECT_TRUE(OstreamTraits::is_declared_v<BarClass>);
-    EXPECT_EQ(stream.str(), bc());
-    stream.str(std::string());
+        CHECK(is_streamable(stream, bc));
+        CHECK(OstreamTraits::is_declared_v<BarClass>);
+        CHECK(stream.str() == bc());
+        stream.str(std::string());
 
-    EXPECT_TRUE(is_streamable(stream, str));
-    EXPECT_TRUE(OstreamTraits::is_declared_v<std::string>);
-    EXPECT_EQ(stream.str(), str);
-    stream.str(std::string());
+        CHECK(is_streamable(stream, str));
+        CHECK(OstreamTraits::is_declared_v<std::string>);
+        CHECK(stream.str() == str);
+        stream.str(std::string());
 
-    EXPECT_TRUE(is_streamable(stream, 1));
-    EXPECT_TRUE(OstreamTraits::is_declared_v<int>);
-    EXPECT_EQ(stream.str(), "1");
-    stream.str(std::string());
+        CHECK(is_streamable(stream, 1));
+        CHECK(OstreamTraits::is_declared_v<int>);
+        CHECK(stream.str() == "1");
+        stream.str(std::string());
 
-    EXPECT_FALSE(is_streamable(stream, fc));
-    EXPECT_FALSE(OstreamTraits::is_declared_v<FooClass>);
-    EXPECT_EQ(stream.str(), std::string());
-    stream.str(std::string());
-}
+        CHECK_FALSE(is_streamable(stream, fc));
+        CHECK_FALSE(OstreamTraits::is_declared_v<FooClass>);
+        CHECK(stream.str() == std::string());
+        stream.str(std::string());
+    }
 
-//==================================================================================================
-TEST(TraitsTest, EnableIfAll)
-{
-    const FooClass fc;
-    const std::string str("a");
+    SECTION("Combination of traits for enable_if_all and enable_if_not_all")
+    {
+        const FooClass fc;
+        const std::string str("a");
 
-    int i = 0;
-    bool b = false;
-    float f = 3.14159f;
+        int i = 0;
+        bool b = false;
+        float f = 3.14159f;
 
-    EXPECT_FALSE(is_class_pointer(fc));
-    EXPECT_FALSE(is_class_pointer(str));
-    EXPECT_TRUE(is_class_pointer(&fc));
-    EXPECT_TRUE(is_class_pointer(&str));
+        CHECK_FALSE(is_class_pointer(fc));
+        CHECK_FALSE(is_class_pointer(str));
+        CHECK(is_class_pointer(&fc));
+        CHECK(is_class_pointer(&str));
 
-    EXPECT_FALSE(is_class_pointer(i));
-    EXPECT_FALSE(is_class_pointer(b));
-    EXPECT_FALSE(is_class_pointer(f));
-    EXPECT_FALSE(is_class_pointer(&i));
-    EXPECT_FALSE(is_class_pointer(&b));
-    EXPECT_FALSE(is_class_pointer(&f));
-}
+        CHECK_FALSE(is_class_pointer(i));
+        CHECK_FALSE(is_class_pointer(b));
+        CHECK_FALSE(is_class_pointer(f));
+        CHECK_FALSE(is_class_pointer(&i));
+        CHECK_FALSE(is_class_pointer(&b));
+        CHECK_FALSE(is_class_pointer(&f));
+    }
 
-//==================================================================================================
-TEST(TraitsTest, EnableIfAny)
-{
-    const FooClass fc;
-    const std::string str("a");
+    SECTION("Combination of traits for enable_if_any and enable_if_none")
+    {
+        const FooClass fc;
+        const std::string str("a");
 
-    int i = 0;
-    bool b = false;
-    float f = 3.14159f;
+        int i = 0;
+        bool b = false;
+        float f = 3.14159f;
 
-    EXPECT_TRUE(is_class_or_pointer(fc));
-    EXPECT_TRUE(is_class_or_pointer(str));
-    EXPECT_TRUE(is_class_or_pointer(&fc));
-    EXPECT_TRUE(is_class_or_pointer(&str));
+        CHECK(is_class_or_pointer(fc));
+        CHECK(is_class_or_pointer(str));
+        CHECK(is_class_or_pointer(&fc));
+        CHECK(is_class_or_pointer(&str));
 
-    EXPECT_FALSE(is_class_or_pointer(i));
-    EXPECT_FALSE(is_class_or_pointer(b));
-    EXPECT_FALSE(is_class_or_pointer(f));
-    EXPECT_TRUE(is_class_or_pointer(&i));
-    EXPECT_TRUE(is_class_or_pointer(&b));
-    EXPECT_TRUE(is_class_or_pointer(&f));
-}
+        CHECK_FALSE(is_class_or_pointer(i));
+        CHECK_FALSE(is_class_or_pointer(b));
+        CHECK_FALSE(is_class_or_pointer(f));
+        CHECK(is_class_or_pointer(&i));
+        CHECK(is_class_or_pointer(&b));
+        CHECK(is_class_or_pointer(&f));
+    }
 
-//==================================================================================================
-TEST(TraitsTest, AllSame)
-{
-    EXPECT_TRUE((fly::all_same_v<int, int>));
-    EXPECT_TRUE((fly::all_same_v<int, const int>));
-    EXPECT_TRUE((fly::all_same_v<const int, int>));
-    EXPECT_TRUE((fly::all_same_v<const int, const int>));
+    SECTION("Variadic all_same trait")
+    {
+        CHECK(fly::all_same_v<int, int>);
+        CHECK(fly::all_same_v<int, const int>);
+        CHECK(fly::all_same_v<const int, int>);
+        CHECK(fly::all_same_v<const int, const int>);
 
-    EXPECT_TRUE((fly::all_same_v<int, int>));
-    EXPECT_TRUE((fly::all_same_v<int, int &>));
-    EXPECT_TRUE((fly::all_same_v<int &, int>));
-    EXPECT_TRUE((fly::all_same_v<int &, int &>));
+        CHECK(fly::all_same_v<int, int>);
+        CHECK(fly::all_same_v<int, int &>);
+        CHECK(fly::all_same_v<int &, int>);
+        CHECK(fly::all_same_v<int &, int &>);
 
-    EXPECT_TRUE((fly::all_same_v<int, int>));
-    EXPECT_TRUE((fly::all_same_v<int, const int &>));
-    EXPECT_TRUE((fly::all_same_v<const int &, int>));
-    EXPECT_TRUE((fly::all_same_v<const int &, const int &>));
+        CHECK(fly::all_same_v<int, int>);
+        CHECK(fly::all_same_v<int, const int &>);
+        CHECK(fly::all_same_v<const int &, int>);
+        CHECK(fly::all_same_v<const int &, const int &>);
 
-    EXPECT_TRUE((fly::all_same_v<int, int, int>));
-    EXPECT_TRUE((fly::all_same_v<int, int, const int>));
-    EXPECT_TRUE((fly::all_same_v<int, const int, int>));
-    EXPECT_TRUE((fly::all_same_v<int, const int, const int>));
+        CHECK(fly::all_same_v<int, int, int>);
+        CHECK(fly::all_same_v<int, int, const int>);
+        CHECK(fly::all_same_v<int, const int, int>);
+        CHECK(fly::all_same_v<int, const int, const int>);
 
-    EXPECT_TRUE((fly::all_same_v<const int, int, int>));
-    EXPECT_TRUE((fly::all_same_v<const int, int, const int>));
-    EXPECT_TRUE((fly::all_same_v<const int, const int, int>));
-    EXPECT_TRUE((fly::all_same_v<const int, const int, const int>));
+        CHECK(fly::all_same_v<const int, int, int>);
+        CHECK(fly::all_same_v<const int, int, const int>);
+        CHECK(fly::all_same_v<const int, const int, int>);
+        CHECK(fly::all_same_v<const int, const int, const int>);
 
-    EXPECT_TRUE((fly::all_same_v<bool, bool, bool>));
-    EXPECT_TRUE((fly::all_same_v<float, float, float, float>));
-    EXPECT_TRUE((fly::all_same_v<FooClass, FooClass, FooClass>));
-    EXPECT_TRUE((fly::all_same_v<std::string, std::string, std::string>));
+        CHECK(fly::all_same_v<bool, bool, bool>);
+        CHECK(fly::all_same_v<float, float, float, float>);
+        CHECK(fly::all_same_v<FooClass, FooClass, FooClass>);
+        CHECK(fly::all_same_v<std::string, std::string, std::string>);
 
-    EXPECT_FALSE((fly::all_same_v<int, char>));
-    EXPECT_FALSE((fly::all_same_v<int *, int>));
-    EXPECT_FALSE((fly::all_same_v<bool, bool, char>));
-    EXPECT_FALSE((fly::all_same_v<FooClass, FooClass, std::string>));
-}
+        CHECK_FALSE(fly::all_same_v<int, char>);
+        CHECK_FALSE(fly::all_same_v<int *, int>);
+        CHECK_FALSE(fly::all_same_v<bool, bool, char>);
+        CHECK_FALSE(fly::all_same_v<FooClass, FooClass, std::string>);
+    }
 
-//==================================================================================================
-TEST(TraitsTest, AnySame)
-{
-    EXPECT_TRUE((fly::any_same_v<int, int>));
-    EXPECT_TRUE((fly::any_same_v<int, const int>));
-    EXPECT_TRUE((fly::any_same_v<const int, int>));
-    EXPECT_TRUE((fly::any_same_v<const int, const int>));
+    SECTION("Variadic any_same trait")
+    {
+        CHECK(fly::any_same_v<int, int>);
+        CHECK(fly::any_same_v<int, const int>);
+        CHECK(fly::any_same_v<const int, int>);
+        CHECK(fly::any_same_v<const int, const int>);
 
-    EXPECT_TRUE((fly::any_same_v<int, int>));
-    EXPECT_TRUE((fly::any_same_v<int, int &>));
-    EXPECT_TRUE((fly::any_same_v<int &, int>));
-    EXPECT_TRUE((fly::any_same_v<int &, int &>));
+        CHECK(fly::any_same_v<int, int>);
+        CHECK(fly::any_same_v<int, int &>);
+        CHECK(fly::any_same_v<int &, int>);
+        CHECK(fly::any_same_v<int &, int &>);
 
-    EXPECT_TRUE((fly::any_same_v<int, int>));
-    EXPECT_TRUE((fly::any_same_v<int, const int &>));
-    EXPECT_TRUE((fly::any_same_v<const int &, int>));
-    EXPECT_TRUE((fly::any_same_v<const int &, const int &>));
+        CHECK(fly::any_same_v<int, int>);
+        CHECK(fly::any_same_v<int, const int &>);
+        CHECK(fly::any_same_v<const int &, int>);
+        CHECK(fly::any_same_v<const int &, const int &>);
 
-    EXPECT_TRUE((fly::any_same_v<int, int, int>));
-    EXPECT_TRUE((fly::any_same_v<int, int, const int>));
-    EXPECT_TRUE((fly::any_same_v<int, const int, int>));
-    EXPECT_TRUE((fly::any_same_v<int, const int, const int>));
+        CHECK(fly::any_same_v<int, int, int>);
+        CHECK(fly::any_same_v<int, int, const int>);
+        CHECK(fly::any_same_v<int, const int, int>);
+        CHECK(fly::any_same_v<int, const int, const int>);
 
-    EXPECT_TRUE((fly::any_same_v<const int, int, int>));
-    EXPECT_TRUE((fly::any_same_v<const int, int, const int>));
-    EXPECT_TRUE((fly::any_same_v<const int, const int, int>));
-    EXPECT_TRUE((fly::any_same_v<const int, const int, const int>));
+        CHECK(fly::any_same_v<const int, int, int>);
+        CHECK(fly::any_same_v<const int, int, const int>);
+        CHECK(fly::any_same_v<const int, const int, int>);
+        CHECK(fly::any_same_v<const int, const int, const int>);
 
-    EXPECT_TRUE((fly::any_same_v<bool, bool, bool>));
-    EXPECT_TRUE((fly::any_same_v<float, float, float, float>));
-    EXPECT_TRUE((fly::any_same_v<FooClass, FooClass, FooClass>));
-    EXPECT_TRUE((fly::any_same_v<std::string, std::string, std::string>));
+        CHECK(fly::any_same_v<bool, bool, bool>);
+        CHECK(fly::any_same_v<float, float, float, float>);
+        CHECK(fly::any_same_v<FooClass, FooClass, FooClass>);
+        CHECK(fly::any_same_v<std::string, std::string, std::string>);
 
-    EXPECT_TRUE((fly::any_same_v<bool, bool, char>));
-    EXPECT_TRUE((fly::any_same_v<FooClass, FooClass, std::string>));
+        CHECK(fly::any_same_v<bool, bool, char>);
+        CHECK(fly::any_same_v<FooClass, FooClass, std::string>);
 
-    EXPECT_FALSE((fly::any_same_v<int, char>));
-    EXPECT_FALSE((fly::any_same_v<int *, int>));
-    EXPECT_FALSE((fly::any_same_v<bool, char>));
-    EXPECT_FALSE((fly::any_same_v<FooClass, std::string>));
-}
+        CHECK_FALSE(fly::any_same_v<int, char>);
+        CHECK_FALSE(fly::any_same_v<int *, int>);
+        CHECK_FALSE(fly::any_same_v<bool, char>);
+        CHECK_FALSE(fly::any_same_v<FooClass, std::string>);
+    }
 
-//==================================================================================================
-TEST(TraitsTest, Visitation)
-{
-    using TestVariant = std::variant<int, bool, std::string>;
+    SECTION("Overloaded visitation pattern")
+    {
+        using TestVariant = std::variant<int, bool, std::string>;
+        int result;
 
-    EXPECT_EQ(
-        1,
-        std::visit(
+        result = std::visit(
             fly::visitation {
-                [](int) noexcept -> int { return 1; },
-                [](bool) noexcept -> int { return 2; },
-                [](std::string) noexcept -> int { return 3; },
+                [](int) -> int { return 1; },
+                [](bool) -> int { return 2; },
+                [](std::string) -> int { return 3; },
             },
-            TestVariant {int()}));
+            TestVariant {int()});
+        CHECK(1 == result);
 
-    EXPECT_EQ(
-        2,
-        std::visit(
+        result = std::visit(
             fly::visitation {
-                [](int) noexcept -> int { return 1; },
-                [](bool) noexcept -> int { return 2; },
-                [](std::string) noexcept -> int { return 3; },
+                [](int) -> int { return 1; },
+                [](bool) -> int { return 2; },
+                [](std::string) -> int { return 3; },
             },
-            TestVariant {bool()}));
+            TestVariant {bool()});
+        CHECK(2 == result);
 
-    EXPECT_EQ(
-        3,
-        std::visit(
+        result = std::visit(
             fly::visitation {
-                [](int) noexcept -> int { return 1; },
-                [](bool) noexcept -> int { return 2; },
-                [](std::string) noexcept -> int { return 3; },
+                [](int) -> int { return 1; },
+                [](bool) -> int { return 2; },
+                [](std::string) -> int { return 3; },
             },
-            TestVariant {std::string()}));
+            TestVariant {std::string()});
+        CHECK(3 == result);
 
-    EXPECT_EQ(
-        1,
-        std::visit(
+        result = std::visit(
             fly::visitation {
-                [](int) noexcept -> int { return 1; },
-                [](auto) noexcept -> int { return 2; },
+                [](int) -> int { return 1; },
+                [](auto) -> int { return 2; },
             },
-            TestVariant {int()}));
+            TestVariant {int()});
+        CHECK(1 == result);
 
-    EXPECT_EQ(
-        2,
-        std::visit(
+        result = std::visit(
             fly::visitation {
-                [](int) noexcept -> int { return 1; },
-                [](auto) noexcept -> int { return 2; },
+                [](int) -> int { return 1; },
+                [](auto) -> int { return 2; },
             },
-            TestVariant {std::string()}));
+            TestVariant {std::string()});
+        CHECK(2 == result);
+    }
 }

@@ -6,7 +6,7 @@
 namespace fly {
 
 //==================================================================================================
-void WaitableTaskRunner::task_complete(const std::shared_ptr<Task> &task) noexcept
+void WaitableTaskRunner::task_complete(const std::shared_ptr<Task> &task)
 {
     if (task)
     {
@@ -23,7 +23,7 @@ WaitableParallelTaskRunner::WaitableParallelTaskRunner(
 }
 
 //==================================================================================================
-void WaitableParallelTaskRunner::task_complete(const std::shared_ptr<Task> &task) noexcept
+void WaitableParallelTaskRunner::task_complete(const std::shared_ptr<Task> &task)
 {
     ParallelTaskRunner::task_complete(task);
     WaitableTaskRunner::task_complete(task);
@@ -37,7 +37,7 @@ WaitableSequencedTaskRunner::WaitableSequencedTaskRunner(
 }
 
 //==================================================================================================
-void WaitableSequencedTaskRunner::task_complete(const std::shared_ptr<Task> &task) noexcept
+void WaitableSequencedTaskRunner::task_complete(const std::shared_ptr<Task> &task)
 {
     SequencedTaskRunner::task_complete(task);
     WaitableTaskRunner::task_complete(task);

@@ -158,7 +158,7 @@
     <ClInclude Include="..\..\..\fly\fly.hpp" />
     <ClInclude Include="..\..\..\fly\coders\base64\base64_coder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\coder.hpp" />
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_config.hpp" />
+    <ClInclude Include="..\..\..\fly\coders\coder_config.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.hpp" />
@@ -171,7 +171,6 @@
     <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp" />
     <ClInclude Include="..\..\..\fly\parser\json_parser.hpp" />
     <ClInclude Include="..\..\..\fly\parser\parser.hpp" />
-    <ClInclude Include="..\..\..\fly\parser\parser_exception.hpp" />
     <ClInclude Include="..\..\..\fly\path\path_config.hpp" />
     <ClInclude Include="..\..\..\fly\path\path_monitor.hpp" />
     <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.hpp" />
@@ -214,13 +213,12 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_unicode.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\string.hpp" />
-    <ClInclude Include="..\..\..\fly\types\string\string_exception.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\string_literal.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\coders\base64\base64_coder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\coder.cpp" />
-    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_config.cpp" />
+    <ClCompile Include="..\..\..\fly\coders\coder_config.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_decoder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_encoder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_types.cpp" />
@@ -232,7 +230,6 @@
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\json_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\parser.cpp" />
-    <ClCompile Include="..\..\..\fly\parser\parser_exception.cpp" />
     <ClCompile Include="..\..\..\fly\path\path_config.cpp" />
     <ClCompile Include="..\..\..\fly\path\path_monitor.cpp" />
     <ClCompile Include="..\..\..\fly\path\win\path_monitor_impl.cpp" />
@@ -254,7 +251,6 @@
     <ClCompile Include="..\..\..\fly\types\bit_stream\detail\bit_stream.cpp" />
     <ClCompile Include="..\..\..\fly\types\json\json.cpp" />
     <ClCompile Include="..\..\..\fly\types\json\json_exception.cpp" />
-    <ClCompile Include="..\..\..\fly\types\string\string_exception.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

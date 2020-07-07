@@ -14,19 +14,19 @@ BitStreamWriter::BitStreamWriter(std::ostream &stream) noexcept :
 }
 
 //==================================================================================================
-void BitStreamWriter::write_word(word_type word) noexcept
+void BitStreamWriter::write_word(word_type word)
 {
     write_bits(word, detail::s_bits_per_word);
 }
 
 //==================================================================================================
-void BitStreamWriter::write_byte(byte_type byte) noexcept
+void BitStreamWriter::write_byte(byte_type byte)
 {
     write_bits(byte, detail::s_bits_per_byte);
 }
 
 //==================================================================================================
-bool BitStreamWriter::finish() noexcept
+bool BitStreamWriter::finish()
 {
     const byte_type bits_in_buffer = detail::s_most_significant_bit_position - m_position;
 
@@ -46,7 +46,7 @@ bool BitStreamWriter::finish() noexcept
 }
 
 //==================================================================================================
-void BitStreamWriter::flush_header(byte_type remainder) noexcept
+void BitStreamWriter::flush_header(byte_type remainder)
 {
     m_stream_buffer->pubseekpos(0);
 
@@ -56,7 +56,7 @@ void BitStreamWriter::flush_header(byte_type remainder) noexcept
 }
 
 //==================================================================================================
-void BitStreamWriter::flush_buffer() noexcept
+void BitStreamWriter::flush_buffer()
 {
     flush(m_buffer, detail::s_buffer_type_size);
 

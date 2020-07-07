@@ -4,9 +4,8 @@
 #include "fly/task/task_manager.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/numeric/literals.hpp"
-#include "fly/types/string/string.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include <filesystem>
 #include <functional>
@@ -40,515 +39,353 @@ public:
 
 } // namespace
 
-//==================================================================================================
-class PathMonitorTest : public ::testing::Test
+TEST_CASE("PathMonitor", "[path]")
 {
-public:
-    PathMonitorTest() noexcept :
-        m_task_manager(std::make_shared<fly::TaskManager>(1)),
-        m_task_runner(m_task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>()),
+    auto task_manager = std::make_shared<fly::TaskManager>(1);
+    REQUIRE(task_manager->start());
 
-        m_monitor(std::make_shared<fly::PathMonitorImpl>(
-            m_task_runner,
-            std::make_shared<TestPathConfig>())),
+    auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
 
-        m_path0(fly::PathUtil::generate_temp_directory()),
-        m_path1(fly::PathUtil::generate_temp_directory()),
-        m_path2(fly::PathUtil::generate_temp_directory()),
+    auto monitor =
+        std::make_shared<fly::PathMonitorImpl>(task_runner, std::make_shared<TestPathConfig>());
+    REQUIRE(monitor->start());
 
-        m_file0(m_path0 / (fly::String::generate_random_string(10) + ".txt")),
-        m_file1(m_path1 / (fly::String::generate_random_string(10) + ".txt")),
-        m_file2(m_path1 / (fly::String::generate_random_string(10) + ".txt")),
-        m_file3(m_path2 / (fly::String::generate_random_string(10) + ".txt"))
-    {
-        m_callback = std::bind(
-            &PathMonitorTest::handle_event,
-            this,
-            std::placeholders::_1,
-            std::placeholders::_2);
-    }
+    fly::PathUtil::ScopedTempDirectory path0;
+    fly::PathUtil::ScopedTempDirectory path1;
+    fly::PathUtil::ScopedTempDirectory path2;
 
-    /**
-     * Create and start the task manager and path monitor.
-     */
-    void SetUp() noexcept override
-    {
-        ASSERT_TRUE(std::filesystem::create_directories(m_path0));
-        ASSERT_TRUE(std::filesystem::create_directories(m_path1));
-        ASSERT_TRUE(std::filesystem::create_directories(m_path2));
+    std::filesystem::path file0 = path0.file();
+    std::filesystem::path file1 = path1.file();
+    std::filesystem::path file2 = path1.file();
+    std::filesystem::path file3 = path2.file();
 
-        ASSERT_TRUE(m_task_manager->start());
-        ASSERT_TRUE(m_monitor->start());
+    fly::ConcurrentQueue<fly::PathMonitor::PathEvent> event_queue;
 
-        ASSERT_TRUE(m_monitor->add_path(m_path0, m_callback));
-        ASSERT_TRUE(m_monitor->add_path(m_path1, m_callback));
+    std::map<std::filesystem::path, unsigned int> created_files;
+    std::map<std::filesystem::path, unsigned int> deleted_files;
+    std::map<std::filesystem::path, unsigned int> changed_files;
 
-        ASSERT_TRUE(m_monitor->add_file(m_file0, m_callback));
-        ASSERT_TRUE(m_monitor->add_file(m_file1, m_callback));
-        ASSERT_TRUE(m_monitor->add_file(m_file2, m_callback));
-        ASSERT_TRUE(m_monitor->add_file(m_file3, m_callback));
-    }
-
-    /**
-     * Stop the task manager and delete the created directory.
-     */
-    void TearDown() noexcept override
-    {
-        ASSERT_TRUE(m_task_manager->stop());
-
-        m_monitor->remove_all_paths();
-        std::filesystem::remove_all(m_path0);
-        std::filesystem::remove_all(m_path1);
-        std::filesystem::remove_all(m_path2);
-    }
-
-protected:
-    /**
-     * Handle a file change notification.
-     *
-     * @param path Path to the changed file.
-     * @param event The type of event that occurred.
-     */
-    void handle_event(const std::filesystem::path &path, fly::PathMonitor::PathEvent event) noexcept
-    {
+    auto handle_event = [&](const std::filesystem::path &path, fly::PathMonitor::PathEvent event) {
         switch (event)
         {
             case fly::PathMonitor::PathEvent::Created:
-                ++m_created_files[path];
+                ++created_files[path];
                 break;
 
             case fly::PathMonitor::PathEvent::Deleted:
-                ++m_deleted_files[path];
+                ++deleted_files[path];
                 break;
 
             case fly::PathMonitor::PathEvent::Changed:
-                ++m_changed_files[path];
+                ++changed_files[path];
                 break;
 
             default:
-                ++m_other_files[path];
+                FAIL("Unrecognized PathEvent: " << event);
                 break;
         }
 
-        m_event_queue.push(std::move(event));
-    }
+        event_queue.push(std::move(event));
+    };
 
-    std::shared_ptr<fly::TaskManager> m_task_manager;
-    std::shared_ptr<fly::WaitableSequencedTaskRunner> m_task_runner;
+    REQUIRE(monitor->add_path(path0(), handle_event));
+    REQUIRE(monitor->add_path(path1(), handle_event));
 
-    std::shared_ptr<fly::PathMonitor> m_monitor;
-    fly::PathMonitor::PathEventCallback m_callback;
+    REQUIRE(monitor->add_file(file0, handle_event));
+    REQUIRE(monitor->add_file(file1, handle_event));
+    REQUIRE(monitor->add_file(file2, handle_event));
+    REQUIRE(monitor->add_file(file3, handle_event));
 
-    std::filesystem::path m_path0;
-    std::filesystem::path m_path1;
-    std::filesystem::path m_path2;
-
-    std::filesystem::path m_file0;
-    std::filesystem::path m_file1;
-    std::filesystem::path m_file2;
-    std::filesystem::path m_file3;
-
-    fly::ConcurrentQueue<fly::PathMonitor::PathEvent> m_event_queue;
-
-    std::map<std::filesystem::path, unsigned int> m_created_files;
-    std::map<std::filesystem::path, unsigned int> m_deleted_files;
-    std::map<std::filesystem::path, unsigned int> m_changed_files;
-    std::map<std::filesystem::path, unsigned int> m_other_files;
-};
-
-//==================================================================================================
-TEST_F(PathMonitorTest, PathEventStream)
-{
+    SECTION("Verify streaming of path events")
     {
-        std::stringstream stream;
-        stream << static_cast<fly::PathMonitor::PathEvent>(-1);
-        EXPECT_TRUE(stream.str().empty());
+        {
+            std::stringstream stream;
+            stream << static_cast<fly::PathMonitor::PathEvent>(-1);
+            CHECK(stream.str().empty());
+        }
+        {
+            std::stringstream stream;
+            stream << fly::PathMonitor::PathEvent::None;
+            CHECK(stream.str() == "None");
+        }
+        {
+            std::stringstream stream;
+            stream << fly::PathMonitor::PathEvent::Created;
+            CHECK(stream.str() == "Created");
+        }
+        {
+            std::stringstream stream;
+            stream << fly::PathMonitor::PathEvent::Deleted;
+            CHECK(stream.str() == "Deleted");
+        }
+        {
+            std::stringstream stream;
+            stream << fly::PathMonitor::PathEvent::Changed;
+            CHECK(stream.str() == "Changed");
+        }
     }
-    {
-        std::stringstream stream;
-        stream << fly::PathMonitor::PathEvent::None;
-        EXPECT_EQ(stream.str(), "None");
-    }
-    {
-        std::stringstream stream;
-        stream << fly::PathMonitor::PathEvent::Created;
-        EXPECT_EQ(stream.str(), "Created");
-    }
-    {
-        std::stringstream stream;
-        stream << fly::PathMonitor::PathEvent::Deleted;
-        EXPECT_EQ(stream.str(), "Deleted");
-    }
-    {
-        std::stringstream stream;
-        stream << fly::PathMonitor::PathEvent::Changed;
-        EXPECT_EQ(stream.str(), "Changed");
-    }
-}
 
-//==================================================================================================
-TEST_F(PathMonitorTest, NonExistingPath)
-{
-    ASSERT_FALSE(m_monitor->add_path(m_path0 / "_", m_callback));
-    ASSERT_FALSE(m_monitor->add_file(m_path0 / "_" / "foo.txt", m_callback));
-}
+    SECTION("Cannot monitor paths that do not exist")
+    {
+        CHECK_FALSE(monitor->add_path(path0() / "_", handle_event));
+        CHECK_FALSE(monitor->add_file(path0() / "_" / "foo.txt", handle_event));
+    }
 
-//==================================================================================================
-TEST_F(PathMonitorTest, NullCallback)
-{
-    ASSERT_FALSE(m_monitor->add_path(m_path0, nullptr));
-    ASSERT_FALSE(m_monitor->add_file(m_file1, nullptr));
-}
+    SECTION("Cannot monitor without a valid callback")
+    {
+        CHECK_FALSE(monitor->add_path(path0(), nullptr));
+        CHECK_FALSE(monitor->add_file(file1, nullptr));
+    }
 
-//==================================================================================================
-TEST_F(PathMonitorTest, WrongType)
-{
-    ASSERT_FALSE(m_monitor->add_file(m_path0, m_callback));
-    ASSERT_FALSE(m_monitor->add_path(m_file1, m_callback));
-}
+    SECTION("Cannot monitor directories as files, nor files as directories")
+    {
+        CHECK_FALSE(monitor->add_file(path0(), handle_event));
+        CHECK_FALSE(monitor->add_path(file1, handle_event));
+    }
 
 #if defined(FLY_LINUX)
 
-//==================================================================================================
-TEST_F(PathMonitorTest, MockFailedStartMonitor)
-{
-    fly::MockSystem mock(fly::MockCall::InotifyInit1);
+    SECTION("Cannot start monitor when ::inotify_init1() fails")
+    {
+        fly::MockSystem mock(fly::MockCall::InotifyInit1);
 
-    m_monitor =
-        std::make_shared<fly::PathMonitorImpl>(m_task_runner, std::make_shared<fly::PathConfig>());
+        monitor = std::make_shared<fly::PathMonitorImpl>(
+            task_runner,
+            std::make_shared<fly::PathConfig>());
 
-    ASSERT_FALSE(m_monitor->start());
+        CHECK_FALSE(monitor->start());
 
-    ASSERT_FALSE(m_monitor->add_path(m_path0, m_callback));
-    ASSERT_FALSE(m_monitor->add_file(m_file1, m_callback));
-}
+        CHECK_FALSE(monitor->add_path(path0(), handle_event));
+        CHECK_FALSE(monitor->add_file(file1, handle_event));
+    }
 
-//==================================================================================================
-TEST_F(PathMonitorTest, MockFailedadd_path)
-{
-    m_monitor->remove_all_paths();
+    SECTION("Cannot monitor paths when ::inotify_add_watch() fails")
+    {
+        monitor->remove_all_paths();
 
-    fly::MockSystem mock(fly::MockCall::InotifyAddWatch);
+        fly::MockSystem mock(fly::MockCall::InotifyAddWatch);
 
-    ASSERT_FALSE(m_monitor->add_path(m_path0, m_callback));
-    ASSERT_FALSE(m_monitor->add_file(m_file1, m_callback));
-}
+        CHECK_FALSE(monitor->add_path(path0(), handle_event));
+        CHECK_FALSE(monitor->add_file(file1, handle_event));
+    }
 
 #endif
 
-//==================================================================================================
-TEST_F(PathMonitorTest, NoChangeTest_PathLevel)
-{
-    m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+    SECTION("No events triggered without path changes")
+    {
+        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
-    EXPECT_EQ(m_created_files[m_file0], 0);
-    EXPECT_EQ(m_deleted_files[m_file0], 0);
-    EXPECT_EQ(m_changed_files[m_file0], 0);
-    EXPECT_EQ(m_other_files[m_file0], 0);
-}
+        CHECK(created_files.empty());
+        CHECK(deleted_files.empty());
+        CHECK(changed_files.empty());
+    }
 
-//==================================================================================================
-TEST_F(PathMonitorTest, NoChangeTest_FileLevel)
-{
-    m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+    SECTION("Creating a file issues a PathEvent::Created event")
+    {
+        fly::PathMonitor::PathEvent event;
 
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
-}
+        CHECK(created_files[file0] == 0);
+        CHECK(deleted_files[file0] == 0);
+        CHECK(changed_files[file0] == 0);
 
-//==================================================================================================
-TEST_F(PathMonitorTest, CreateTest_PathLevel)
-{
-    fly::PathMonitor::PathEvent event;
+        REQUIRE(fly::PathUtil::write_file(file0, std::string()));
+        REQUIRE(event_queue.pop(event, s_wait_time));
 
-    EXPECT_EQ(m_created_files[m_file0], 0);
-    EXPECT_EQ(m_deleted_files[m_file0], 0);
-    EXPECT_EQ(m_changed_files[m_file0], 0);
-    EXPECT_EQ(m_other_files[m_file0], 0);
+        CHECK(created_files[file0] == 1);
+        CHECK(deleted_files[file0] == 0);
+        CHECK(changed_files[file0] == 0);
+    }
 
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file0, std::string()));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
+    SECTION("Deleting a file issues a PathEvent::Deleted event")
+    {
+        fly::PathMonitor::PathEvent event;
 
-    EXPECT_EQ(m_created_files[m_file0], 1);
-    EXPECT_EQ(m_deleted_files[m_file0], 0);
-    EXPECT_EQ(m_changed_files[m_file0], 0);
-    EXPECT_EQ(m_other_files[m_file0], 0);
-}
+        CHECK(created_files[file0] == 0);
+        CHECK(deleted_files[file0] == 0);
+        CHECK(changed_files[file0] == 0);
 
-//==================================================================================================
-TEST_F(PathMonitorTest, CreateTest_FileLevel)
-{
-    fly::PathMonitor::PathEvent event;
+        REQUIRE(fly::PathUtil::write_file(file0, std::string()));
+        std::filesystem::remove(file0);
+        REQUIRE(event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
 
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
+        CHECK(created_files[file0] == 1);
+        CHECK(deleted_files[file0] == 1);
+        CHECK(changed_files[file0] == 0);
+    }
 
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, std::string()));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
+    SECTION("Changing a file issues a PathEvent::Changed event")
+    {
+        fly::PathMonitor::PathEvent event;
 
-    EXPECT_EQ(m_created_files[m_file1], 1);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
-}
+        CHECK(created_files[file0] == 0);
+        CHECK(deleted_files[file0] == 0);
+        CHECK(changed_files[file0] == 0);
 
-//==================================================================================================
-TEST_F(PathMonitorTest, DeleteTest_PathLevel)
-{
-    fly::PathMonitor::PathEvent event;
+        REQUIRE(fly::PathUtil::write_file(file0, "abcdefghi"));
+        REQUIRE(event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
 
-    EXPECT_EQ(m_created_files[m_file0], 0);
-    EXPECT_EQ(m_deleted_files[m_file0], 0);
-    EXPECT_EQ(m_changed_files[m_file0], 0);
-    EXPECT_EQ(m_other_files[m_file0], 0);
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file0, std::string()));
-    std::filesystem::remove(m_file0);
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-
-    EXPECT_EQ(m_created_files[m_file0], 1);
-    EXPECT_EQ(m_deleted_files[m_file0], 1);
-    EXPECT_EQ(m_changed_files[m_file0], 0);
-    EXPECT_EQ(m_other_files[m_file0], 0);
-}
-
-//==================================================================================================
-TEST_F(PathMonitorTest, DeleteTest_FileLevel)
-{
-    fly::PathMonitor::PathEvent event;
-
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, std::string()));
-    std::filesystem::remove(m_file1);
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-
-    EXPECT_EQ(m_created_files[m_file1], 1);
-    EXPECT_EQ(m_deleted_files[m_file1], 1);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
-}
-
-//==================================================================================================
-TEST_F(PathMonitorTest, ChangeTest_PathLevel)
-{
-    fly::PathMonitor::PathEvent event;
-
-    EXPECT_EQ(m_created_files[m_file0], 0);
-    EXPECT_EQ(m_deleted_files[m_file0], 0);
-    EXPECT_EQ(m_changed_files[m_file0], 0);
-    EXPECT_EQ(m_other_files[m_file0], 0);
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file0, "abcdefghi"));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-
-    EXPECT_EQ(m_created_files[m_file0], 1);
-    EXPECT_EQ(m_deleted_files[m_file0], 0);
-    EXPECT_EQ(m_changed_files[m_file0], 1);
-    EXPECT_EQ(m_other_files[m_file0], 0);
-}
-
-//==================================================================================================
-TEST_F(PathMonitorTest, ChangeTest_FileLevel)
-{
-    fly::PathMonitor::PathEvent event;
-
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
-
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, "abcdefghi"));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-
-    EXPECT_EQ(m_created_files[m_file1], 1);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 1);
-    EXPECT_EQ(m_other_files[m_file1], 0);
-}
+        CHECK(created_files[file0] == 1);
+        CHECK(deleted_files[file0] == 0);
+        CHECK(changed_files[file0] == 1);
+    }
 
 #if defined(FLY_LINUX)
 
-//==================================================================================================
-TEST_F(PathMonitorTest, MockFailedPoll)
-{
-    fly::MockSystem mock(fly::MockCall::Poll);
-    m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+    SECTION("Cannot poll monitor when ::poll() fails")
+    {
+        fly::MockSystem mock(fly::MockCall::Poll);
+        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
+        CHECK(created_files[file1] == 0);
+        CHECK(deleted_files[file1] == 0);
+        CHECK(changed_files[file1] == 0);
 
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, "abcdefghi"));
-    m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        REQUIRE(fly::PathUtil::write_file(file1, "abcdefghi"));
+        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
-}
+        CHECK(created_files[file1] == 0);
+        CHECK(deleted_files[file1] == 0);
+        CHECK(changed_files[file1] == 0);
+    }
 
-//==================================================================================================
-TEST_F(PathMonitorTest, MockFailedRead)
-{
-    fly::MockSystem mock(fly::MockCall::Read);
-    m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+    SECTION("Cannot poll monitor when ::read() fails")
+    {
+        fly::MockSystem mock(fly::MockCall::Read);
+        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
+        CHECK(created_files[file1] == 0);
+        CHECK(deleted_files[file1] == 0);
+        CHECK(changed_files[file1] == 0);
 
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, "abcdefghi"));
-    m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        REQUIRE(fly::PathUtil::write_file(file1, "abcdefghi"));
+        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
-}
+        CHECK(created_files[file1] == 0);
+        CHECK(deleted_files[file1] == 0);
+        CHECK(changed_files[file1] == 0);
+    }
 
 #endif
 
-//==================================================================================================
-TEST_F(PathMonitorTest, OtherFile)
-{
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
+    SECTION("Unmonitored do not issue any event")
+    {
+        CHECK(created_files[file1] == 0);
+        CHECK(deleted_files[file1] == 0);
+        CHECK(changed_files[file1] == 0);
 
-    auto path = std::filesystem::path(m_file1).concat(".diff");
-    ASSERT_TRUE(fly::PathUtil::write_file(path.string(), "abcdefghi"));
+        auto path = std::filesystem::path(file1).concat(".diff");
+        REQUIRE(fly::PathUtil::write_file(path.string(), "abcdefghi"));
 
-    m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
+        CHECK(created_files[file1] == 0);
+        CHECK(deleted_files[file1] == 0);
+        CHECK(changed_files[file1] == 0);
 
-    path = std::filesystem::path(path.string().substr(0, path.string().length() - 8));
-    ASSERT_TRUE(fly::PathUtil::write_file(path, "abcdefghi"));
+        path = std::filesystem::path(path.string().substr(0, path.string().length() - 8));
+        REQUIRE(fly::PathUtil::write_file(path, "abcdefghi"));
 
-    m_task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
-}
+        CHECK(created_files[file1] == 0);
+        CHECK(deleted_files[file1] == 0);
+        CHECK(changed_files[file1] == 0);
+    }
 
-//==================================================================================================
-TEST_F(PathMonitorTest, MultipleFile)
-{
-    fly::PathMonitor::PathEvent event;
+    SECTION("Monitor can handle many events")
+    {
+        fly::PathMonitor::PathEvent event;
 
-    EXPECT_EQ(m_created_files[m_file1], 0);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
+        CHECK(created_files[file1] == 0);
+        CHECK(deleted_files[file1] == 0);
+        CHECK(changed_files[file1] == 0);
 
-    EXPECT_EQ(m_created_files[m_file2], 0);
-    EXPECT_EQ(m_deleted_files[m_file2], 0);
-    EXPECT_EQ(m_changed_files[m_file2], 0);
-    EXPECT_EQ(m_other_files[m_file2], 0);
+        CHECK(created_files[file2] == 0);
+        CHECK(deleted_files[file2] == 0);
+        CHECK(changed_files[file2] == 0);
 
-    EXPECT_EQ(m_created_files[m_file3], 0);
-    EXPECT_EQ(m_deleted_files[m_file3], 0);
-    EXPECT_EQ(m_changed_files[m_file3], 0);
-    EXPECT_EQ(m_other_files[m_file3], 0);
+        CHECK(created_files[file3] == 0);
+        CHECK(deleted_files[file3] == 0);
+        CHECK(changed_files[file3] == 0);
 
-    EXPECT_EQ(m_created_files[m_file0], 0);
-    EXPECT_EQ(m_deleted_files[m_file0], 0);
-    EXPECT_EQ(m_changed_files[m_file0], 0);
-    EXPECT_EQ(m_other_files[m_file0], 0);
+        CHECK(created_files[file0] == 0);
+        CHECK(deleted_files[file0] == 0);
+        CHECK(changed_files[file0] == 0);
 
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file1, std::string()));
+        REQUIRE(fly::PathUtil::write_file(file1, std::string()));
 
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file2, std::string()));
-    std::filesystem::remove(m_file2);
+        REQUIRE(fly::PathUtil::write_file(file2, std::string()));
+        std::filesystem::remove(file2);
 
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file3, "abcdefghi"));
-    std::filesystem::remove(m_file3);
+        REQUIRE(fly::PathUtil::write_file(file3, "abcdefghi"));
+        std::filesystem::remove(file3);
 
-    ASSERT_TRUE(fly::PathUtil::write_file(m_file0, "abcdefghi"));
-    std::filesystem::remove(m_file0);
+        REQUIRE(fly::PathUtil::write_file(file0, "abcdefghi"));
+        std::filesystem::remove(file0);
 
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
 
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
 
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
 
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
-    ASSERT_TRUE(m_event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
+        REQUIRE(event_queue.pop(event, s_wait_time));
 
-    EXPECT_EQ(m_created_files[m_file1], 1);
-    EXPECT_EQ(m_deleted_files[m_file1], 0);
-    EXPECT_EQ(m_changed_files[m_file1], 0);
-    EXPECT_EQ(m_other_files[m_file1], 0);
+        CHECK(created_files[file1] == 1);
+        CHECK(deleted_files[file1] == 0);
+        CHECK(changed_files[file1] == 0);
 
-    EXPECT_EQ(m_created_files[m_file2], 1);
-    EXPECT_EQ(m_deleted_files[m_file2], 1);
-    EXPECT_EQ(m_changed_files[m_file2], 0);
-    EXPECT_EQ(m_other_files[m_file2], 0);
+        CHECK(created_files[file2] == 1);
+        CHECK(deleted_files[file2] == 1);
+        CHECK(changed_files[file2] == 0);
 
-    EXPECT_EQ(m_created_files[m_file3], 1);
-    EXPECT_EQ(m_deleted_files[m_file3], 1);
-    EXPECT_EQ(m_changed_files[m_file3], 1);
-    EXPECT_EQ(m_other_files[m_file3], 0);
+        CHECK(created_files[file3] == 1);
+        CHECK(deleted_files[file3] == 1);
+        CHECK(changed_files[file3] == 1);
 
-    EXPECT_EQ(m_created_files[m_file0], 1);
-    EXPECT_EQ(m_deleted_files[m_file0], 1);
-    EXPECT_EQ(m_changed_files[m_file0], 1);
-    EXPECT_EQ(m_other_files[m_file0], 0);
-}
+        CHECK(created_files[file0] == 1);
+        CHECK(deleted_files[file0] == 1);
+        CHECK(changed_files[file0] == 1);
+    }
 
-//==================================================================================================
-TEST_F(PathMonitorTest, Remove)
-{
-    // Test removing files and paths that were not being monitored.
-    EXPECT_FALSE(m_monitor->remove_file(m_path1 / "was not"));
-    EXPECT_FALSE(m_monitor->remove_path(m_path1 / "monitoring"));
-    EXPECT_FALSE(m_monitor->remove_path("any of this"));
+    SECTION("Edge case removal of paths")
+    {
+        // Test removing files and paths that were not being monitored.
+        CHECK_FALSE(monitor->remove_file(path1() / "was not"));
+        CHECK_FALSE(monitor->remove_path(path1() / "monitoring"));
+        CHECK_FALSE(monitor->remove_path("any of this"));
 
-    // For the monitor with two monitored files and a monitored path:
-    // 1. Remove one of the files - should succeed.
-    // 2. Remove the whole path - should succeed.
-    // 3. Remove the second file - should fail, wasn't being monitored any more.
-    // 4. Remove the whole path - should fail.
-    EXPECT_TRUE(m_monitor->remove_file(m_file1));
-    EXPECT_TRUE(m_monitor->remove_path(m_path1));
-    EXPECT_FALSE(m_monitor->remove_file(m_file2));
-    EXPECT_FALSE(m_monitor->remove_path(m_path1));
+        // For the monitor with two monitored files and a monitored path:
+        // 1. Remove one of the files - should succeed.
+        // 2. Remove the whole path - should succeed.
+        // 3. Remove the second file - should fail, wasn't being monitored any more.
+        // 4. Remove the whole path - should fail.
+        CHECK(monitor->remove_file(file1));
+        CHECK(monitor->remove_path(path1()));
+        CHECK_FALSE(monitor->remove_file(file2));
+        CHECK_FALSE(monitor->remove_path(path1()));
 
-    // For the monitor with one monitored file and a monitored path:
-    // 1. Remove the monitored file - should succeed.
-    // 2. Remove the whole path - should succeed.
-    EXPECT_TRUE(m_monitor->remove_file(m_file0));
-    EXPECT_TRUE(m_monitor->remove_path(m_path0));
+        // For the monitor with one monitored file and a monitored path:
+        // 1. Remove the monitored file - should succeed.
+        // 2. Remove the whole path - should succeed.
+        CHECK(monitor->remove_file(file0));
+        CHECK(monitor->remove_path(path0()));
 
-    // For the monitor with one monitored file and no monitored paths:
-    // 1. Remove the monitored file - should succeed.
-    // 2. Remove the whole path - should fail, path will gets removed when the
-    //    last monitored file is removed.
-    EXPECT_TRUE(m_monitor->remove_file(m_file3));
-    EXPECT_FALSE(m_monitor->remove_path(m_path2));
+        // For the monitor with one monitored file and no monitored paths:
+        // 1. Remove the monitored file - should succeed.
+        // 2. Remove the whole path - should fail, path will gets removed when the last monitored
+        //    file is removed.
+        CHECK(monitor->remove_file(file3));
+        CHECK_FALSE(monitor->remove_path(path2()));
+    }
+
+    REQUIRE(task_manager->stop());
+    monitor->remove_all_paths();
 }

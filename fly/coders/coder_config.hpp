@@ -9,34 +9,34 @@
 namespace fly {
 
 /**
- * Class to hold configuration values related to the Huffman coder.
+ * Class to hold configuration values related to the coder implementations.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
-class HuffmanConfig : public Config
+class CoderConfig : public Config
 {
 public:
-    static constexpr const char *identifier = "huffman";
+    static constexpr const char *identifier = "coder";
 
     /**
      * Constructor.
      */
-    HuffmanConfig() noexcept;
+    CoderConfig() noexcept;
 
     /**
      * @return Huffman encoder chunk size (in bytes).
      */
-    std::uint32_t encoder_chunk_size() const noexcept;
+    std::uint32_t huffman_encoder_chunk_size() const;
 
     /**
      * @return Maximum Huffman code length (in bits) for encoding.
      */
-    length_type encoder_max_code_length() const noexcept;
+    length_type huffman_encoder_max_code_length() const;
 
 protected:
-    std::uint16_t m_default_encoder_chunk_size_kb;
-    length_type m_default_encoder_max_code_length;
+    std::uint16_t m_default_huffman_encoder_chunk_size_kb;
+    length_type m_default_huffman_encoder_max_code_length;
 };
 
 } // namespace fly

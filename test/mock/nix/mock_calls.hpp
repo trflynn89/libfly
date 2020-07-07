@@ -12,6 +12,8 @@ namespace fly {
 enum class MockCall : std::uint8_t
 {
     Accept,
+    Backtrace,
+    BacktraceSymbols,
     Bind,
     Connect,
     Fcntl,
@@ -20,6 +22,7 @@ enum class MockCall : std::uint8_t
     InotifyAddWatch,
     InotifyInit1,
     Listen,
+    LocalTime,
     Poll,
     Read,
     Recv,

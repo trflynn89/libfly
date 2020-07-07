@@ -44,7 +44,7 @@ public:
      * @return True if the word was successfully read and filling the byte buffer was successful (if
      *         needed).
      */
-    bool read_word(word_type &word) noexcept;
+    bool read_word(word_type &word);
 
     /**
      * Read a full byte from the byte buffer.
@@ -57,7 +57,7 @@ public:
      * @return True if the byte was successfully read and filling the byte buffer was successful (if
      *         needed).
      */
-    bool read_byte(byte_type &byte) noexcept;
+    bool read_byte(byte_type &byte);
 
     /**
      * Read a number of bits from the byte buffer. There is no guarantee that the requested number
@@ -77,7 +77,7 @@ public:
      * @return The number of bits successfully read.
      */
     template <typename DataType>
-    byte_type read_bits(DataType &bits, byte_type size) noexcept;
+    byte_type read_bits(DataType &bits, byte_type size);
 
     /**
      * Read a number of bits from the byte buffer without discarding those bits. There is no
@@ -95,7 +95,7 @@ public:
      * @return The number of bits successfully peeked.
      */
     template <typename DataType>
-    byte_type peek_bits(DataType &bits, byte_type size) noexcept;
+    byte_type peek_bits(DataType &bits, byte_type size);
 
     /**
      * Discard a number of bits from the byte buffer. Should only be used after a successful call to
@@ -103,25 +103,25 @@ public:
      *
      * @param size The number of bits to discard.
      */
-    void discard_bits(byte_type size) noexcept;
+    void discard_bits(byte_type size);
 
     /**
      * Check if the stream has reached end-of-file and the byte buffer has been fully consumed.
      *
      * @return True if the stream has been fully consumed.
      */
-    bool fully_consumed() const noexcept;
+    bool fully_consumed() const;
 
     /**
      * @return The header byte decoded from the stream.
      */
-    byte_type header() const noexcept;
+    byte_type header() const;
 
 private:
     /**
      * Read from the stream to fill the byte buffer.
      */
-    void refill_buffer() noexcept;
+    void refill_buffer();
 
     /**
      * Read from the stream to fill a byte buffer.
@@ -134,7 +134,7 @@ private:
      * @return The number of bytes actually read.
      */
     template <typename DataType>
-    byte_type fill(DataType &buffer, byte_type bytes) noexcept;
+    byte_type fill(DataType &buffer, byte_type bytes);
 
     std::istream &m_stream;
 
@@ -144,7 +144,7 @@ private:
 
 //==================================================================================================
 template <typename DataType>
-byte_type BitStreamReader::read_bits(DataType &bits, byte_type size) noexcept
+byte_type BitStreamReader::read_bits(DataType &bits, byte_type size)
 {
     static_assert(
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
@@ -177,7 +177,7 @@ byte_type BitStreamReader::read_bits(DataType &bits, byte_type size) noexcept
 
 //==================================================================================================
 template <typename DataType>
-byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size) noexcept
+byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size)
 {
     static_assert(
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
@@ -232,7 +232,7 @@ byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size) noexcept
 
 //==================================================================================================
 template <typename DataType>
-byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
+byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes)
 {
     static_assert(
         detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
@@ -244,7 +244,7 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes) noexcept
             reinterpret_cast<std::ios::char_type *>(&buffer),
             static_cast<std::streamsize>(bytes));
 
-        buffer = endian_swap<Endian::Big>(buffer);
+        buffer = endian_swap_if_non_native<Endian::Big>(buffer);
         return static_cast<byte_type>(bytes_read);
     }
 
