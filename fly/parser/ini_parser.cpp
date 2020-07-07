@@ -37,6 +37,16 @@ std::optional<Json> IniParser::parse_internal(std::istream &stream)
             if (maybe_section)
             {
                 section = std::move(maybe_section.value());
+
+                try
+                {
+                    values[section] = JsonTraits::object_type();
+                }
+                catch (const JsonException &ex)
+                {
+                    LOGW("[line %d]: %s", m_line, ex.what());
+                    return std::nullopt;
+                }
             }
             else
             {
@@ -73,7 +83,12 @@ std::optional<Json> IniParser::parse_internal(std::istream &stream)
         }
     }
 
-    return values;
+    if (values.is_object())
+    {
+        return values;
+    }
+
+    return std::nullopt;
 }
 
 //==================================================================================================
