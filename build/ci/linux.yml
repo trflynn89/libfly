@@ -25,11 +25,10 @@ jobs:
           make -j $(nproc) -C build/nix $(config) tests
         displayName: 'Test'
 
-      # For now, only create coverage reports for gcc x64.
       - script: |
           make -C build/nix $(config) coverage report=/tmp/coverage
           bash <(curl -s https://codecov.io/bash) -f /tmp/coverage
-        condition: and(eq('${{ parameters.toolchain }}', 'gcc'), eq('${{ parameters.arch }}', 'x64'))
+        condition: and(eq('${{ parameters.toolchain }}', 'clang'), eq('${{ parameters.arch }}', 'x64'))
         displayName: 'Coverage'
 
     - ${{ if eq(parameters.configuration, 'Release') }}:
