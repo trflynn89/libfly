@@ -2,7 +2,7 @@
 
 #include "fly/types/string/string.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include <algorithm>
 #include <filesystem>
@@ -17,13 +17,13 @@ namespace fly {
 PathUtil::ScopedTempDirectory::ScopedTempDirectory() :
     m_directory(std::filesystem::temp_directory_path() / fly::String::generate_random_string(10))
 {
-    EXPECT_TRUE(std::filesystem::create_directories(m_directory));
+    REQUIRE(std::filesystem::create_directories(m_directory));
 }
 
 //==================================================================================================
 PathUtil::ScopedTempDirectory::~ScopedTempDirectory()
 {
-    EXPECT_TRUE(std::filesystem::remove_all(m_directory) > 0);
+    REQUIRE(std::filesystem::remove_all(m_directory) > 0);
 }
 
 //==================================================================================================
