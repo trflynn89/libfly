@@ -463,18 +463,17 @@ void Json::swap(JsonTraits::string_type &other)
 bool operator==(Json::const_reference json1, Json::const_reference json2)
 {
     auto visitor = [](const auto &value1, const auto &value2) -> bool {
-        using F = JsonTraits::float_type;
         using T = std::decay_t<decltype(value1)>;
         using U = std::decay_t<decltype(value2)>;
 
         if constexpr (
-            (std::is_same_v<T, F> && JsonTraits::is_number_v<U>) ||
-            (std::is_same_v<U, F> && JsonTraits::is_number_v<T>))
+            (std::is_same_v<T, JsonTraits::float_type> && JsonTraits::is_number_v<U>) ||
+            (std::is_same_v<U, JsonTraits::float_type> && JsonTraits::is_number_v<T>))
         {
             constexpr auto epsilon = std::numeric_limits<T>::epsilon();
 
-            const auto fvalue1 = static_cast<F>(value1);
-            const auto fvalue2 = static_cast<F>(value2);
+            const auto fvalue1 = static_cast<JsonTraits::float_type>(value1);
+            const auto fvalue2 = static_cast<JsonTraits::float_type>(value2);
 
             return std::abs(fvalue1 - fvalue2) <= epsilon;
         }
@@ -486,8 +485,10 @@ bool operator==(Json::const_reference json1, Json::const_reference json2)
         {
             return value1 == value2;
         }
-
-        return false;
+        else
+        {
+            return false;
+        }
     };
 
     return std::visit(visitor, json1.m_value, json2.m_value);
