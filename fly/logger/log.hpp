@@ -54,7 +54,7 @@ struct Log
      * @param config Reference to the logger config.
      * @param message Message to store.
      */
-    Log(const std::shared_ptr<LoggerConfig> &config, const std::string &message) noexcept;
+    Log(const std::shared_ptr<LoggerConfig> &config, std::string &&message) noexcept;
 
     /**
      * Move assignment operator.
