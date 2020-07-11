@@ -64,7 +64,7 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: '^(<|")(fly|test)/'
     Priority: 2
-  - Regex: '^(<|")(gtest|gmock|catch2)/'
+  - Regex: '^(<|")catch2/'
     Priority: 3
   - Regex: '<[[:alnum:]./_]+\.h>'
     Priority: 4
