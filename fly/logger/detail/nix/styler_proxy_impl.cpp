@@ -59,7 +59,8 @@ StylerProxyImpl::StylerProxyImpl(
     std::ostream &stream,
     std::stack<Style> &&styles,
     std::stack<Color> &&colors) noexcept :
-    StylerProxy(stream)
+    StylerProxy(stream),
+    m_did_modify_stream(false)
 {
     const bool can_modify_stdout = ::isatty(STDOUT_FILENO) == 1;
     const bool can_modify_stderr = ::isatty(STDERR_FILENO) == 1;
