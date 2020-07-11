@@ -2,6 +2,7 @@
 
 #include "fly/coders/coder_config.hpp"
 #include "fly/coders/huffman/huffman_decoder.hpp"
+#include "fly/fly.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/task/task_manager.hpp"
 #include "fly/types/numeric/literals.hpp"
@@ -9,6 +10,10 @@
 #include "test/util/capture_stream.hpp"
 #include "test/util/path_util.hpp"
 #include "test/util/waitable_task_runner.hpp"
+
+#if defined(FLY_LINUX)
+#    include "test/mock/mock_system.hpp"
+#endif
 
 #include <catch2/catch.hpp>
 
@@ -149,7 +154,7 @@ TEST_CASE("Logger", "[logger]")
         CHECK_FALSE(logger->start());
     }
 
-    SECTION("Validate macros which log to stdout")
+    SECTION("Validate macros which log to console")
     {
         fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
 
@@ -168,6 +173,91 @@ TEST_CASE("Logger", "[logger]")
         CHECK(contents.find("456") != std::string::npos);
         CHECK(std::count(contents.begin(), contents.end(), '\n') == 4);
     }
+
+#if defined(FLY_LINUX)
+
+    SECTION("Validate style of console logs")
+    {
+        fly::MockSystem mock(fly::MockCall::IsATTY, false);
+
+        // Reset the logger so all logging macros log to console.
+        fly::Logger::set_instance(nullptr);
+
+        // Get the substring of a log point that should be styled.
+        auto styled_contents = [](const std::string &contents, std::string &&log) {
+            auto pos = contents.find(": " + log);
+            REQUIRE(pos != std::string::npos);
+
+            return contents.substr(0, pos);
+        };
+
+        SECTION("Validate style of standard console logs")
+        {
+            fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
+            LOGC("Console Log");
+
+            const std::string contents = capture();
+            REQUIRE_FALSE(contents.empty());
+
+            const std::string styled = styled_contents(contents, "Console Log");
+            CHECK(fly::String::starts_with(styled, "\x1b[0;38;5;2m"));
+            CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+        }
+
+        SECTION("Validate style of debug console logs")
+        {
+            fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
+            LOGD("Debug Log");
+
+            const std::string contents = capture();
+            REQUIRE_FALSE(contents.empty());
+
+            const std::string styled = styled_contents(contents, "Debug Log");
+            CHECK(fly::String::starts_with(styled, "\x1b[0m"));
+            CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+        }
+
+        SECTION("Validate style of informational console logs")
+        {
+            fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
+            LOGI("Info Log");
+
+            const std::string contents = capture();
+            REQUIRE_FALSE(contents.empty());
+
+            const std::string styled = styled_contents(contents, "Info Log");
+            CHECK(fly::String::starts_with(styled, "\x1b[0;38;5;2m"));
+            CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+        }
+
+        SECTION("Validate style of warning console logs")
+        {
+            fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+            LOGW("Warning Log");
+
+            const std::string contents = capture();
+            REQUIRE_FALSE(contents.empty());
+
+            const std::string styled = styled_contents(contents, "Warning Log");
+            CHECK(fly::String::starts_with(styled, "\x1b[0;38;5;3m"));
+            CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+        }
+
+        SECTION("Validate style of error console logs")
+        {
+            fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+            LOGE("Error Log");
+
+            const std::string contents = capture();
+            REQUIRE_FALSE(contents.empty());
+
+            const std::string styled = styled_contents(contents, "Error Log");
+            CHECK(fly::String::starts_with(styled, "\x1b[1;38;5;1m"));
+            CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+        }
+    }
+
+#endif
 
     SECTION("Validate debug logging macro")
     {

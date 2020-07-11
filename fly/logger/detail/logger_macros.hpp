@@ -4,8 +4,21 @@
  * Helper macro to add a log, so all of the public logging macros do not have to insert the file,
  * function, and line macros.
  */
-#define _FLY_LOG(level, message)                                                                   \
+#define _FLY_ADD_LOG(level, message)                                                               \
     fly::Logger::add_log(level, __FILE__, __FUNCTION__, __LINE__, message)
+
+/**
+ * Helper macro to log to the console, so all of the public logging macros do not have to insert the
+ * file, function, and line macros.
+ */
+#define _FLY_CONSOLE_LOG(acquire_lock, message)                                                    \
+    fly::Logger::console_log(                                                                      \
+        acquire_lock,                                                                              \
+        fly::Log::Level::Info,                                                                     \
+        __FILE__,                                                                                  \
+        __FUNCTION__,                                                                              \
+        __LINE__,                                                                                  \
+        message)
 
 /**
  * Return the first argument in a list of variadic arguments, expected to be the logging format
