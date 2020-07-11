@@ -2,6 +2,8 @@
 
 #include "fly/fly.hpp"
 
+#include <catch2/catch.hpp>
+
 #include <cstdio>
 #include <cstdlib>
 
@@ -21,6 +23,7 @@ namespace fly {
 //==================================================================================================
 CaptureStream::CaptureStream(Stream stream) noexcept :
     m_file(m_path.file()),
+    m_stream(stream),
     m_stdio(-1),
     m_original(-1)
 {
@@ -32,26 +35,26 @@ CaptureStream::CaptureStream(Stream stream) noexcept :
     target = ::fopen(m_file.string().c_str(), "w");
 #endif
 
-    if (target != nullptr)
+    REQUIRE(target != nullptr);
+    int target_fd = ::fileno(target);
+
+    switch (m_stream)
     {
-        int target_fd = ::fileno(target);
+        case Stream::Stdout:
+            m_stdio = ::fileno(stdout);
+            ::fflush(stdout);
+            break;
 
-        switch (stream)
-        {
-            case Stream::Stdout:
-                m_stdio = ::fileno(stdout);
-                break;
-
-            case Stream::Stderr:
-                m_stdio = ::fileno(stderr);
-                break;
-        }
-
-        m_original = ::dup(m_stdio);
-        ::dup2(target_fd, m_stdio);
-
-        ::fclose(target);
+        case Stream::Stderr:
+            m_stdio = ::fileno(stderr);
+            ::fflush(stderr);
+            break;
     }
+
+    m_original = ::dup(m_stdio);
+    ::dup2(target_fd, m_stdio);
+
+    ::fclose(target);
 }
 
 //==================================================================================================
@@ -73,6 +76,17 @@ std::string CaptureStream::restore(bool read)
 
     if (m_original != -1)
     {
+        switch (m_stream)
+        {
+            case Stream::Stdout:
+                ::fflush(stdout);
+                break;
+
+            case Stream::Stderr:
+                ::fflush(stderr);
+                break;
+        }
+
         ::dup2(m_original, m_stdio);
         ::close(m_original);
 
