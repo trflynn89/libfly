@@ -36,7 +36,7 @@ public:
     {
         if (info.name != m_current_test_case)
         {
-            stream << fly::Styler(fly::Style::Italic, fly::Color::Blue)
+            stream << fly::Styler(fly::Style::Italic, fly::Color::Cyan)
                    << fly::String::format("[ %s ]", info.name) << '\n';
         }
 
