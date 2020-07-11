@@ -33,7 +33,7 @@ $(2): LDLIBS := $(LDLIBS) $(LDLIBS_$(d))
 $(2): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
-	@echo "[Link $$(subst $(CURDIR)/,,$$@)]"
+	@echo -e "[$(RED)Link$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
 	$(LINK_CXX)
 
 endef
@@ -54,12 +54,12 @@ MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
 %.a: $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[Static $$(subst $(CURDIR)/,,$$@)]"
+	@echo -e "[$(GREEN)Static$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
 	$(STATIC)
 
 %.so.$(VERSION): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[Shared $$(subst $(CURDIR)/,,$$@)]"
+	@echo -e "[$(GREEN)Shared$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
 	$(SHARED_CXX)
 
 endef
@@ -112,19 +112,19 @@ $(1)/%.o: CXXFLAGS = $(CXXFLAGS) $(CXXFLAGS_$(d)) -MF $$(@:%.o=%.d)
 # C files
 $(1)/%.o: $(d)/%.c $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CC)
 
 # CC files
 $(1)/%.o: $(d)/%.cc $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
 
 # C++ files
 $(1)/%.o: $(d)/%.cpp $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
-	@echo "[Compile $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
 
 endef

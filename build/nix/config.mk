@@ -13,6 +13,9 @@ release := 0
 # Build 32-bit or 64-bit target
 arch := $(arch)
 
+# Enable stylized builds
+stylized := 1
+
 # Enable verbose builds
 verbose := 0
 
@@ -49,8 +52,21 @@ LIB_DIR := $(OUT_DIR)/lib
 OBJ_DIR := $(OUT_DIR)/obj
 ETC_DIR := $(OUT_DIR)/etc
 
+# ANSI escape sequences to use in stylized builds.
+ifeq ($(stylized), 1)
+    DEFAULT := \x1b[0m
+    BLACK := \x1b[1;30m
+    RED := \x1b[1;31m
+    GREEN := \x1b[1;32m
+    YELLOW := \x1b[1;33m
+    BLUE := \x1b[1;34m
+    MAGENTA := \x1b[1;35m
+    CYAN := \x1b[1;36m
+    WHITE := \x1b[1;37m
+endif
+
 # Use @ suppression in non-verbose builds
-ifeq ($(verbose),0)
+ifeq ($(verbose), 0)
     Q := @
 else
     $(info Bin dir = $(BIN_DIR))

@@ -9,7 +9,7 @@ define BUILD_REL
         exit 0; \
     fi; \
     \
-    echo "[Package $(subst $(CURDIR)/,,$@)]"; \
+    echo -e "[$(YELLOW)Package$(DEFAULT) $(subst $(CURDIR)/,,$@)]"; \
     \
     $(RM) -r $(ETC_TMP_DIR) && \
     mkdir -p $(REL_BIN_DIR) $(REL_LIB_DIR) $(REL_INC_DIR) $(REL_SRC_DIR) \
