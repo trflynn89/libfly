@@ -3,11 +3,13 @@
 #include "fly/coders/coder_config.hpp"
 #include "fly/coders/huffman/huffman_encoder.hpp"
 #include "fly/logger/logger_config.hpp"
+#include "fly/logger/styler.hpp"
 #include "fly/task/task_runner.hpp"
 
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <optional>
 #include <system_error>
 
 namespace fly {
@@ -38,17 +40,53 @@ void Logger::set_instance(const std::shared_ptr<Logger> &logger)
 }
 
 //==================================================================================================
-void Logger::console_log(bool acquire_lock, std::string &&message)
+void Logger::console_log(
+    bool acquire_lock,
+    Log::Level level,
+    const char *file,
+    const char *function,
+    std::uint32_t line,
+    std::string &&message)
 {
     std::unique_lock<std::mutex> lock(s_console_mutex, std::defer_lock);
-    const std::string time_str = System::local_time();
+    const std::string time = System::local_time();
 
     if (acquire_lock)
     {
         lock.lock();
     }
 
-    std::cout << time_str << ": " << message << std::endl;
+    std::ostream *stream = &std::cout;
+    Style style = Style::Default;
+    std::optional<Color> color;
+
+    switch (level)
+    {
+        case Log::Level::Info:
+            color.emplace(Color::Green);
+            break;
+
+        case Log::Level::Warn:
+            stream = &std::cerr;
+            color.emplace(Color::Yellow);
+            break;
+
+        case Log::Level::Error:
+            stream = &std::cerr;
+            style = Style::Bold;
+            color.emplace(Color::Red);
+            break;
+
+        default:
+            break;
+    }
+
+    {
+        auto styler = color ? Styler(std::move(style), std::move(*color)) : Styler(style);
+        String::format(*stream, "%s%s %s:%s:%d", styler, time, file, function, line);
+    }
+
+    *stream << ": " << message << std::endl;
 }
 
 //==================================================================================================
@@ -67,9 +105,7 @@ void Logger::add_log(
     }
     else
     {
-        console_log(
-            true,
-            String::format("%d %s:%s:%d %s", level, file, function, line, std::move(message)));
+        console_log(true, level, file, function, line, std::move(message));
     }
 }
 

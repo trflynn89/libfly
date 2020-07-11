@@ -19,25 +19,25 @@
 
 //==================================================================================================
 #define LOGD(...)                                                                                  \
-    _FLY_LOG(                                                                                      \
+    _FLY_ADD_LOG(                                                                                  \
         fly::Log::Level::Debug,                                                                    \
         fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
 //==================================================================================================
 #define LOGI(...)                                                                                  \
-    _FLY_LOG(                                                                                      \
+    _FLY_ADD_LOG(                                                                                  \
         fly::Log::Level::Info,                                                                     \
         fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
 //==================================================================================================
 #define LOGW(...)                                                                                  \
-    _FLY_LOG(                                                                                      \
+    _FLY_ADD_LOG(                                                                                  \
         fly::Log::Level::Warn,                                                                     \
         fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
 //==================================================================================================
 #define LOGS(...)                                                                                  \
-    _FLY_LOG(                                                                                      \
+    _FLY_ADD_LOG(                                                                                  \
         fly::Log::Level::Warn,                                                                     \
         fly::String::format(                                                                       \
             _FLY_FORMAT_STRING(__VA_ARGS__) ": %s" _FLY_FORMAT_ARGS(__VA_ARGS__),                  \
@@ -45,19 +45,19 @@
 
 //==================================================================================================
 #define LOGE(...)                                                                                  \
-    _FLY_LOG(                                                                                      \
+    _FLY_ADD_LOG(                                                                                  \
         fly::Log::Level::Error,                                                                    \
         fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
 //==================================================================================================
 #define LOGC(...)                                                                                  \
-    fly::Logger::console_log(                                                                      \
+    _FLY_CONSOLE_LOG(                                                                              \
         true,                                                                                      \
         fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
 //==================================================================================================
 #define LOGC_NO_LOCK(...)                                                                          \
-    fly::Logger::console_log(                                                                      \
+    _FLY_CONSOLE_LOG(                                                                              \
         false,                                                                                     \
         fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
@@ -124,9 +124,19 @@ public:
      * Log to the console in a thread-safe manner.
      *
      * @param acquire_lock Whether to acquire lock before logging.
+     * @param level The level (debug, info, etc.) of the log.
+     * @param file Name of the file storing the log.
+     * @param function Name of the function storing the log.
+     * @param line The line number the log point occurs.
      * @param message The message to log.
      */
-    static void console_log(bool acquire_lock, std::string &&message);
+    static void console_log(
+        bool acquire_lock,
+        Log::Level level,
+        const char *file,
+        const char *function,
+        std::uint32_t line,
+        std::string &&message);
 
     /**
      * Add a log to the static logger instance.
