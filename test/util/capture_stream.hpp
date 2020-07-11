@@ -37,7 +37,8 @@ public:
     ~CaptureStream();
 
     /**
-     * Restore the redirected stream, read the contents of the redirect file, and delete the file.
+     * Flush and restore the redirected stream, read the contents of the redirect file, and delete
+     * the file.
      *
      * @return The contents of the redirected stream.
      */
@@ -57,6 +58,7 @@ private:
     fly::PathUtil::ScopedTempDirectory m_path;
     std::filesystem::path m_file;
 
+    Stream m_stream;
     int m_stdio;
     int m_original;
 };
