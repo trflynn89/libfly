@@ -14,6 +14,8 @@ namespace fly {
 
 /**
  * Constants to modify the style of a std::ostream.
+ *
+ * Note: Windows only supports Bold and Underline.
  */
 enum class Style : std::uint8_t
 {
@@ -50,8 +52,10 @@ struct Color
     /**
      * Construct a Color as either a foreground or background color.
      *
-     * The color may be an integer in the range [0, 255]. The values correspond to the ANSI
-     * 256-color lookup table: https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+     * On Linux, the color may be an integer in the range [0, 255]. The values correspond to the
+     * ANSI 256-color lookup table: https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+     *
+     * On Windows, the color may only be one of the defined standard colors.
      *
      * @param color The 256-color value to apply.
      * @param plane Whether the color should apply as a foreground or background color.
@@ -70,6 +74,9 @@ struct Color
  *
  * Only standard output and error streams are supported, an only if those streams are directed to a
  * terminal. Any other streams will remain unmanipulated.
+ *
+ * Not all styles and colors are supported on all platforms. Unsupported styles and colors will be
+ * silently ignored.
  *
  * Callers may invoke and stream a Styler instance inline, or hold onto a Styler instance for as
  * long as desired (in which case, it will not take effect until streamed onto the std::ostream).

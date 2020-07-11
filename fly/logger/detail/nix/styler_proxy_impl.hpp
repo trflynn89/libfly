@@ -46,6 +46,8 @@ private:
      */
     template <typename Modifier>
     void stream_value(const Modifier &modifier);
+
+    bool m_did_modify_stream;
 };
 
 } // namespace fly::detail
