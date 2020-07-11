@@ -186,8 +186,8 @@ bool SocketImpl::connect(address_type address, port_type port)
 
     if (ret == SOCKET_ERROR)
     {
+        const int error = System::get_error_code();
         SLOGS(m_socket_handle, "Error connecting");
-        int error = System::get_error_code();
 
         if ((error == WSAEWOULDBLOCK) || (error == WSAEINPROGRESS))
         {

@@ -192,8 +192,8 @@ bool SocketImpl::connect(address_type address, port_type port)
 
     if (ret == -1)
     {
+        const int error = System::get_error_code();
         SLOGS(m_socket_handle, "Error connecting");
-        int error = System::get_error_code();
 
         if ((error == EINTR) || (error == EINPROGRESS))
         {
