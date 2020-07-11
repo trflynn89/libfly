@@ -1,17 +1,18 @@
 #define CATCH_CONFIG_MAIN
 #define CATCH_CONFIG_DEFAULT_REPORTER "libfly"
 
-#include <catch2/catch.hpp>
+#include "fly/logger/styler.hpp"
+#include "fly/types/string/string.hpp"
 
-namespace Catch {
+#include <catch2/catch.hpp>
 
 /**
  * A Catch2 test reporter for reporting colorful test and section names to console.
  */
-class FlyReporter : public ConsoleReporter
+class FlyReporter : public Catch::ConsoleReporter
 {
 public:
-    FlyReporter(const ReporterConfig &config) : ConsoleReporter(config)
+    FlyReporter(const Catch::ReporterConfig &config) : Catch::ConsoleReporter(config)
     {
     }
 
@@ -22,39 +23,42 @@ public:
         return "Catch2 test reporter for libfly";
     }
 
-    void testCaseStarting(const TestCaseInfo &info) override
+    void testCaseStarting(const Catch::TestCaseInfo &info) override
     {
-        stream << Colour(Colour::BrightGreen) << "[==== Test Case: " << info.name << " ====]\n";
+        stream << fly::Styler(fly::Style::Bold, fly::Color::Green)
+               << fly::String::format("[==== Test Case: %s ====]", info.name) << '\n';
 
-        ConsoleReporter::testCaseStarting(info);
+        Catch::ConsoleReporter::testCaseStarting(info);
         m_current_test_case = info.name;
     }
 
-    void sectionStarting(const SectionInfo &info) override
+    void sectionStarting(const Catch::SectionInfo &info) override
     {
         if (info.name != m_current_test_case)
         {
-            // Explicitly flush the stream so this output is not included in tests capturing stdout.
-            stream << Colour(Colour::Blue) << "[ " << info.name << " ]" << std::endl;
+            stream << fly::Styler(fly::Style::Italic, fly::Color::Blue)
+                   << fly::String::format("[ %s ]", info.name) << '\n';
         }
 
-        ConsoleReporter::sectionStarting(info);
+        Catch::ConsoleReporter::sectionStarting(info);
     }
 
-    void testCaseEnded(const TestCaseStats &stats) override
+    void testCaseEnded(const Catch::TestCaseStats &stats) override
     {
         const std::string &name = stats.testInfo.name;
 
         if (stats.totals.assertions.allOk())
         {
-            stream << Colour(Colour::ResultSuccess) << "[==== PASSED " << name << " ====]\n\n";
+            stream << fly::Styler(fly::Style::Bold, fly::Color::Green)
+                   << fly::String::format("[==== PASSED %s ====]", name) << "\n\n";
         }
         else
         {
-            stream << Colour(Colour::ResultError) << "[==== FAILED " << name << " ====]\n\n";
+            stream << fly::Styler(fly::Style::Bold, fly::Color::Red)
+                   << fly::String::format("[==== FAILED %s ====]", name) << "\n\n";
         }
 
-        ConsoleReporter::testCaseEnded(stats);
+        Catch::ConsoleReporter::testCaseEnded(stats);
         m_current_test_case.clear();
     }
 
@@ -63,5 +67,3 @@ private:
 };
 
 CATCH_REGISTER_REPORTER("libfly", FlyReporter)
-
-} // namespace Catch
