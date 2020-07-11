@@ -19,6 +19,9 @@
     <Filter Include="logger\detail">
       <UniqueIdentifier>{4a45a7a0-b4f3-47a0-95f2-b3e876cb1ac0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="logger\detail\win">
+      <UniqueIdentifier>{fb24379c-bda2-4c85-8a32-63b8e689821c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="parser">
       <UniqueIdentifier>{e39571b7-e6c1-48ea-917e-08c233c64755}</UniqueIdentifier>
     </Filter>
@@ -115,8 +118,17 @@
     <ClInclude Include="..\..\..\fly\logger\logger_config.hpp">
       <Filter>logger</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\styler.hpp">
+      <Filter>logger</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.hpp">
       <Filter>logger\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\detail\styler_proxy.hpp">
+      <Filter>logger\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\detail\win\styler_proxy_impl.hpp">
+      <Filter>logger\detail\win</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp">
       <Filter>parser</Filter>
@@ -288,8 +300,17 @@
     <ClCompile Include="..\..\..\fly\logger\logger.cpp">
       <Filter>logger</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\fly\logger\styler.cpp">
+      <Filter>logger</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\fly\logger\logger_config.cpp">
       <Filter>logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\logger\detail\styler_proxy.cpp">
+      <Filter>logger\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\logger\detail\win\styler_proxy_impl.cpp">
+      <Filter>logger\detail\win</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp">
       <Filter>parser</Filter>

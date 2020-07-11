@@ -165,9 +165,12 @@
     <ClInclude Include="..\..\..\fly\config\config.hpp" />
     <ClInclude Include="..\..\..\fly\config\config_manager.hpp" />
     <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.hpp" />
+    <ClInclude Include="..\..\..\fly\logger\detail\styler_proxy.hpp" />
+    <ClInclude Include="..\..\..\fly\logger\detail\win\styler_proxy_impl.hpp" />
     <ClInclude Include="..\..\..\fly\logger\log.hpp" />
     <ClInclude Include="..\..\..\fly\logger\logger.hpp" />
     <ClInclude Include="..\..\..\fly\logger\logger_config.hpp" />
+    <ClInclude Include="..\..\..\fly\logger\styler.hpp" />
     <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp" />
     <ClInclude Include="..\..\..\fly\parser\json_parser.hpp" />
     <ClInclude Include="..\..\..\fly\parser\parser.hpp" />
@@ -224,9 +227,12 @@
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_types.cpp" />
     <ClCompile Include="..\..\..\fly\config\config.cpp" />
     <ClCompile Include="..\..\..\fly\config\config_manager.cpp" />
+    <ClCompile Include="..\..\..\fly\logger\detail\styler_proxy.cpp" />
+    <ClCompile Include="..\..\..\fly\logger\detail\win\styler_proxy_impl.cpp" />
     <ClCompile Include="..\..\..\fly\logger\log.cpp" />
     <ClCompile Include="..\..\..\fly\logger\logger.cpp" />
     <ClCompile Include="..\..\..\fly\logger\logger_config.cpp" />
+    <ClCompile Include="..\..\..\fly\logger\styler.cpp" />
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\json_parser.cpp" />
     <ClCompile Include="..\..\..\fly\parser\parser.cpp" />
