@@ -21,6 +21,7 @@ enum class MockCall : std::uint8_t
     Getsockopt,
     InotifyAddWatch,
     InotifyInit1,
+    IsATTY,
     Listen,
     LocalTime,
     Poll,
@@ -36,10 +37,5 @@ enum class MockCall : std::uint8_t
     Sysinfo,
     Times,
 };
-
-/**
- * Stream the name of a mocked system.
- */
-std::ostream &operator<<(std::ostream &stream, MockCall call);
 
 } // namespace fly
