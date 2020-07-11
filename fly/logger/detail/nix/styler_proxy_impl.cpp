@@ -1,9 +1,5 @@
 #include "fly/logger/detail/nix/styler_proxy_impl.hpp"
 
-#include <unistd.h>
-
-#include <iostream>
-
 namespace fly::detail {
 
 //==================================================================================================
@@ -42,16 +38,30 @@ template <>
 void StylerProxyImpl::stream_value<Color>(const Color &modifier)
 {
     // https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
-    if (modifier.m_plane == Color::Plane::Foreground)
+    if (modifier.m_color <= Color::White)
     {
-        m_stream << "38";
+        if (modifier.m_plane == Color::Plane::Foreground)
+        {
+            m_stream << "3";
+        }
+        else
+        {
+            m_stream << "4";
+        }
     }
     else
     {
-        m_stream << "48";
+        if (modifier.m_plane == Color::Plane::Foreground)
+        {
+            m_stream << "38;5;";
+        }
+        else
+        {
+            m_stream << "48;5;";
+        }
     }
 
-    m_stream << ";5;" << static_cast<std::uint32_t>(modifier.m_color);
+    m_stream << static_cast<std::uint32_t>(modifier.m_color);
 }
 
 //==================================================================================================
@@ -62,13 +72,7 @@ StylerProxyImpl::StylerProxyImpl(
     StylerProxy(stream),
     m_did_modify_stream(false)
 {
-    const bool can_modify_stdout = ::isatty(STDOUT_FILENO) == 1;
-    const bool can_modify_stderr = ::isatty(STDERR_FILENO) == 1;
-
-    const bool stream_is_stdout = m_stream.rdbuf() == std::cout.rdbuf();
-    const bool stream_is_stderr = m_stream.rdbuf() == std::cerr.rdbuf();
-
-    if ((stream_is_stdout && can_modify_stdout) || (stream_is_stderr && can_modify_stderr))
+    if (m_stream_is_stdout || m_stream_is_stderr)
     {
         m_did_modify_stream = true;
         m_stream << "\x1b[";
