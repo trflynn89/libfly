@@ -11,10 +11,6 @@
 #include "test/util/path_util.hpp"
 #include "test/util/waitable_task_runner.hpp"
 
-#if defined(FLY_LINUX)
-#    include "test/mock/mock_system.hpp"
-#endif
-
 #include <catch2/catch.hpp>
 
 #include <algorithm>
@@ -178,8 +174,6 @@ TEST_CASE("Logger", "[logger]")
 
     SECTION("Validate style of console logs")
     {
-        fly::MockSystem mock(fly::MockCall::IsATTY, false);
-
         // Reset the logger so all logging macros log to console.
         fly::Logger::set_instance(nullptr);
 
@@ -200,7 +194,7 @@ TEST_CASE("Logger", "[logger]")
             REQUIRE_FALSE(contents.empty());
 
             const std::string styled = styled_contents(contents, "Console Log");
-            CHECK(fly::String::starts_with(styled, "\x1b[0;38;5;2m"));
+            CHECK(fly::String::starts_with(styled, "\x1b[0;32m"));
             CHECK(fly::String::ends_with(styled, "\x1b[0m"));
         }
 
@@ -226,7 +220,7 @@ TEST_CASE("Logger", "[logger]")
             REQUIRE_FALSE(contents.empty());
 
             const std::string styled = styled_contents(contents, "Info Log");
-            CHECK(fly::String::starts_with(styled, "\x1b[0;38;5;2m"));
+            CHECK(fly::String::starts_with(styled, "\x1b[0;32m"));
             CHECK(fly::String::ends_with(styled, "\x1b[0m"));
         }
 
@@ -239,7 +233,7 @@ TEST_CASE("Logger", "[logger]")
             REQUIRE_FALSE(contents.empty());
 
             const std::string styled = styled_contents(contents, "Warning Log");
-            CHECK(fly::String::starts_with(styled, "\x1b[0;38;5;3m"));
+            CHECK(fly::String::starts_with(styled, "\x1b[0;33m"));
             CHECK(fly::String::ends_with(styled, "\x1b[0m"));
         }
 
@@ -252,7 +246,7 @@ TEST_CASE("Logger", "[logger]")
             REQUIRE_FALSE(contents.empty());
 
             const std::string styled = styled_contents(contents, "Error Log");
-            CHECK(fly::String::starts_with(styled, "\x1b[1;38;5;1m"));
+            CHECK(fly::String::starts_with(styled, "\x1b[1;31m"));
             CHECK(fly::String::ends_with(styled, "\x1b[0m"));
         }
     }

@@ -72,8 +72,8 @@ struct Color
  * the std::ostream. Upon destruction, the styles and colors applied by this manipulator are
  * reverted.
  *
- * Only standard output and error streams are supported, an only if those streams are directed to a
- * terminal. Any other streams will remain unmanipulated.
+ * Only standard output and error streams are supported. Any other streams will remain
+ * unmanipulated.
  *
  * Not all styles and colors are supported on all platforms. Unsupported styles and colors will be
  * silently ignored.

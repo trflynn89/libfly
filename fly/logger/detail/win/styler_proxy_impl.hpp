@@ -22,7 +22,7 @@ class StylerProxyImpl : public StylerProxy
 public:
     /**
      * Constructor. Manipulate the provided stream with the Windows Console API if it is a standard
-     * output or error stream, and is directed to a terminal.
+     * output or error stream.
      *
      * @param stream The stream to manipulate.
      * @param styles The list of styles to apply to the stream.

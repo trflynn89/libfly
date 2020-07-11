@@ -1,7 +1,5 @@
 #include "fly/logger/detail/win/styler_proxy_impl.hpp"
 
-#include <iostream>
-
 namespace fly::detail {
 
 //==================================================================================================
@@ -89,15 +87,16 @@ StylerProxyImpl::StylerProxyImpl(
     m_handle(INVALID_HANDLE_VALUE),
     m_original_attributes(0)
 {
-    if (m_stream.rdbuf() == std::cout.rdbuf())
+    if (m_stream_is_stdout)
     {
         m_handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
     }
-    else if (m_stream.rdbuf() == std::cerr.rdbuf())
+    else if (m_stream_is_stderr)
     {
         m_handle = ::GetStdHandle(STD_ERROR_HANDLE);
     }
-    else
+
+    if (m_handle == INVALID_HANDLE_VALUE)
     {
         return;
     }

@@ -45,6 +45,9 @@ public:
 
 protected:
     std::ostream &m_stream;
+
+    const bool m_stream_is_stdout;
+    const bool m_stream_is_stderr;
 };
 
 } // namespace fly::detail
