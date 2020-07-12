@@ -8,9 +8,7 @@ namespace fly {
 //==================================================================================================
 BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
     BitStream(stream.rdbuf(), 0),
-    m_stream(stream),
-    m_header(0),
-    m_remainder(0)
+    m_stream(stream)
 {
     byte_type magic = 0;
 

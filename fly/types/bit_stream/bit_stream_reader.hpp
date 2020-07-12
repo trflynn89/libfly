@@ -138,8 +138,8 @@ private:
 
     std::istream &m_stream;
 
-    byte_type m_header;
-    byte_type m_remainder;
+    byte_type m_header {0};
+    byte_type m_remainder {0};
 };
 
 //==================================================================================================
