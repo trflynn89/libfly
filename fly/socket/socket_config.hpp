@@ -18,11 +18,6 @@ public:
     static constexpr const char *identifier = "socket";
 
     /**
-     * Constructor.
-     */
-    SocketConfig() noexcept;
-
-    /**
      * @return Sleep time for socket IO thread.
      */
     std::chrono::microseconds io_wait_time() const;
@@ -38,9 +33,9 @@ public:
     std::size_t packet_size() const;
 
 protected:
-    std::chrono::microseconds::rep m_default_io_wait_time;
-    char m_default_end_of_message;
-    std::size_t m_default_packet_size;
+    std::chrono::microseconds::rep m_default_io_wait_time {10000};
+    char m_default_end_of_message {0x04};
+    std::size_t m_default_packet_size {4096};
 };
 
 } // namespace fly

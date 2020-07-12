@@ -18,17 +18,12 @@ public:
     static constexpr const char *identifier = "path";
 
     /**
-     * Constructor.
-     */
-    PathConfig() noexcept;
-
-    /**
      * @return Delay between path monitor poll intervals.
      */
     virtual std::chrono::milliseconds poll_interval() const;
 
 protected:
-    std::chrono::milliseconds::rep m_default_poll_interval;
+    std::chrono::milliseconds::rep m_default_poll_interval {1000};
 };
 
 } // namespace fly
