@@ -65,8 +65,7 @@ void ParallelTaskRunner::task_complete(const std::shared_ptr<Task> &)
 
 //==================================================================================================
 SequencedTaskRunner::SequencedTaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
-    TaskRunner(weak_task_manager),
-    m_has_running_task(false)
+    TaskRunner(weak_task_manager)
 {
 }
 

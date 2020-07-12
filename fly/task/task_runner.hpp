@@ -150,7 +150,7 @@ private:
     bool maybe_post_task();
 
     ConcurrentQueue<std::weak_ptr<Task>> m_pending_tasks;
-    std::atomic_bool m_has_running_task;
+    std::atomic_bool m_has_running_task {false};
 };
 
 } // namespace fly
