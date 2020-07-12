@@ -65,10 +65,9 @@ std::uintmax_t log_size(const std::string &message)
 
     log.m_message = message;
     log.m_level = fly::Log::Level::Debug;
+    log.m_file = __FILE__;
+    log.m_function = __FUNCTION__;
     log.m_line = __LINE__;
-
-    ::snprintf(log.m_file, sizeof(log.m_file), "%s", __FILE__);
-    ::snprintf(log.m_function, sizeof(log.m_function), "%s", __FUNCTION__);
 
     return fly::String::format("%d\t%s", 1, log).length();
 }
