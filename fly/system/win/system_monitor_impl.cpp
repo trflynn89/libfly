@@ -23,10 +23,7 @@ SystemMonitorImpl::SystemMonitorImpl(
     SystemMonitor(task_runner, config),
     m_process(::GetCurrentProcess()),
     m_cpu_query(nullptr),
-    m_cpu_counter(nullptr),
-    m_prev_process_system_time(0),
-    m_prev_process_user_time(0),
-    m_prev_time(0)
+    m_cpu_counter(nullptr)
 {
     PDH_STATUS status = ::PdhOpenQuery(nullptr, 0, &m_cpu_query);
     if (status != ERROR_SUCCESS)

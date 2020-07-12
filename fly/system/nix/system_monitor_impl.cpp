@@ -26,14 +26,7 @@ namespace {
 SystemMonitorImpl::SystemMonitorImpl(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
     const std::shared_ptr<SystemConfig> &config) noexcept :
-    SystemMonitor(task_runner, config),
-    m_prev_system_user_time(0),
-    m_prev_system_nice_time(0),
-    m_prev_system_system_time(0),
-    m_prev_system_idle_time(0),
-    m_prev_process_system_time(0),
-    m_prev_process_user_time(0),
-    m_prev_time(0)
+    SystemMonitor(task_runner, config)
 {
 }
 
