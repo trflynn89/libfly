@@ -115,13 +115,13 @@ protected:
      */
     virtual void update_process_memory_usage() = 0;
 
-    std::atomic<std::uint32_t> m_system_cpu_count;
-    std::atomic<double> m_system_cpu_usage;
-    std::atomic<double> m_process_cpu_usage;
+    std::atomic<std::uint32_t> m_system_cpu_count {0};
+    std::atomic<double> m_system_cpu_usage {0.0};
+    std::atomic<double> m_process_cpu_usage {0.0};
 
-    std::atomic<std::uint64_t> m_total_system_memory;
-    std::atomic<std::uint64_t> m_system_memory_usage;
-    std::atomic<std::uint64_t> m_process_memory_usage;
+    std::atomic<std::uint64_t> m_total_system_memory {0};
+    std::atomic<std::uint64_t> m_system_memory_usage {0};
+    std::atomic<std::uint64_t> m_process_memory_usage {0};
 
 private:
     /**

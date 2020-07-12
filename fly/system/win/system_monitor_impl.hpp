@@ -46,9 +46,9 @@ private:
     PDH_HQUERY m_cpu_query;
     PDH_HCOUNTER m_cpu_counter;
 
-    ULONGLONG m_prev_process_system_time;
-    ULONGLONG m_prev_process_user_time;
-    ULONGLONG m_prev_time;
+    ULONGLONG m_prev_process_system_time {0};
+    ULONGLONG m_prev_process_user_time {0};
+    ULONGLONG m_prev_time {0};
 };
 
 } // namespace fly

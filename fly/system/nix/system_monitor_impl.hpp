@@ -36,14 +36,14 @@ protected:
     void update_process_memory_usage() override;
 
 private:
-    std::uint64_t m_prev_system_user_time;
-    std::uint64_t m_prev_system_nice_time;
-    std::uint64_t m_prev_system_system_time;
-    std::uint64_t m_prev_system_idle_time;
+    std::uint64_t m_prev_system_user_time {0};
+    std::uint64_t m_prev_system_nice_time {0};
+    std::uint64_t m_prev_system_system_time {0};
+    std::uint64_t m_prev_system_idle_time {0};
 
-    clock_t m_prev_process_system_time;
-    clock_t m_prev_process_user_time;
-    clock_t m_prev_time;
+    clock_t m_prev_process_system_time {0};
+    clock_t m_prev_process_user_time {0};
+    clock_t m_prev_time {0};
 };
 
 } // namespace fly

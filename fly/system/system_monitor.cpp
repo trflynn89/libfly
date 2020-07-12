@@ -12,12 +12,6 @@ namespace fly {
 SystemMonitor::SystemMonitor(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
     const std::shared_ptr<SystemConfig> &config) noexcept :
-    m_system_cpu_count(0),
-    m_system_cpu_usage(0.0),
-    m_process_cpu_usage(0.0),
-    m_total_system_memory(0),
-    m_system_memory_usage(0),
-    m_process_memory_usage(0),
     m_task_runner(task_runner),
     m_config(config)
 {
