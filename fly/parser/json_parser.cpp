@@ -15,11 +15,6 @@ namespace fly {
         m_column _FLY_FORMAT_ARGS(__VA_ARGS__));
 
 //==================================================================================================
-JsonParser::JsonParser() noexcept : Parser(), m_features(Features::Strict)
-{
-}
-
-//==================================================================================================
 JsonParser::JsonParser(const Features features) noexcept : Parser(), m_features(features)
 {
 }
