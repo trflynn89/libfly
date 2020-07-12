@@ -455,6 +455,8 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("TCP")
     {
+        std::string message_copy(message);
+
         // Thread to run server functions to accept a client socket and receive data.
         auto server_thread = [&](bool async) {
             auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, async);
@@ -477,15 +479,15 @@ TEST_CASE("Socket", "[socket]")
                 std::chrono::seconds wait_time(10);
 
                 CHECK(server_socket_manager->wait_for_completed_receive(request, wait_time));
-                REQUIRE(message.size() == request.get_request().size());
-                CHECK(message == request.get_request());
+                REQUIRE(message_copy.size() == request.get_request().size());
+                CHECK(message_copy == request.get_request());
 
                 CHECK(request.get_socket_id() > 0);
             }
             else
             {
                 auto server_socket = listen_socket->accept();
-                CHECK(server_socket->recv() == message);
+                CHECK(server_socket->recv() == message_copy);
 
                 CHECK(server_socket->get_client_ip() > 0U);
                 CHECK(server_socket->get_client_port() > 0U);
@@ -524,7 +526,6 @@ TEST_CASE("Socket", "[socket]")
                     CHECK(send_socket->is_connected());
                 }
 
-                std::string message_copy(message);
                 CHECK(send_socket->send_async(std::move(message)));
 
                 fly::AsyncRequest request;
@@ -603,6 +604,8 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("UDP")
     {
+        std::string message_copy(message);
+
         // Thread to run server functions to accept a client socket and receive data.
         auto server_thread = [&](bool async) {
             auto server_socket = create_socket(server_socket_manager, fly::Protocol::UDP, async);
@@ -623,14 +626,14 @@ TEST_CASE("Socket", "[socket]")
                 std::chrono::seconds wait_time(10);
 
                 CHECK(server_socket_manager->wait_for_completed_receive(request, wait_time));
-                REQUIRE(message.size() == request.get_request().size());
-                CHECK(message == request.get_request());
+                REQUIRE(message_copy.size() == request.get_request().size());
+                CHECK(message_copy == request.get_request());
 
                 CHECK(request.get_socket_id() == server_socket->get_socket_id());
             }
             else
             {
-                CHECK(server_socket->recv_from() == message);
+                CHECK(server_socket->recv_from() == message_copy);
             }
         };
 
@@ -653,8 +656,6 @@ TEST_CASE("Socket", "[socket]")
 
             if (async)
             {
-                std::string message_copy(message);
-
                 if ((s_call_count++ % 2) == 0)
                 {
                     CHECK(send_socket->send_to_async(std::move(message), address, port));

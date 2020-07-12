@@ -14,14 +14,7 @@ Socket::Socket(Protocol protocol, const std::shared_ptr<SocketConfig> &config) n
     m_protocol(protocol),
     m_config(config),
     m_socket_eom(config->end_of_message()),
-    m_packet_size(config->packet_size()),
-    m_socket_handle(invalid_socket()),
-    m_client_ip(0),
-    m_client_port(0),
-    m_is_async(false),
-    m_is_listening(false),
-    m_connected_state(ConnectedState::Disconnected),
-    m_socket_id(s_num_sockets.fetch_add(1))
+    m_packet_size(config->packet_size())
 {
 }
 

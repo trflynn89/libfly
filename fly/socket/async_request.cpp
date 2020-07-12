@@ -2,22 +2,6 @@
 
 namespace fly {
 
-namespace {
-
-    const int s_invalid_id = -1;
-
-} // namespace
-
-//==================================================================================================
-AsyncRequest::AsyncRequest() noexcept :
-    m_socket_id(s_invalid_id),
-    m_request_offset(0),
-    m_request(),
-    m_address(),
-    m_port()
-{
-}
-
 //==================================================================================================
 AsyncRequest::AsyncRequest(AsyncRequest &&request) noexcept :
     m_socket_id(std::move(request.m_socket_id)),
@@ -32,10 +16,7 @@ AsyncRequest::AsyncRequest(AsyncRequest &&request) noexcept :
 //==================================================================================================
 AsyncRequest::AsyncRequest(int socket_id, std::string &&request) noexcept :
     m_socket_id(socket_id),
-    m_request_offset(0),
-    m_request(request),
-    m_address(),
-    m_port()
+    m_request(std::move(request))
 {
 }
 
@@ -46,8 +27,7 @@ AsyncRequest::AsyncRequest(
     address_type address,
     port_type port) noexcept :
     m_socket_id(socket_id),
-    m_request_offset(0),
-    m_request(request),
+    m_request(std::move(request)),
     m_address(address),
     m_port(port)
 {
