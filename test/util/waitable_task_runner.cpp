@@ -3,7 +3,7 @@
 #include "fly/task/task.hpp"
 #include "fly/task/task_manager.hpp"
 
-namespace fly {
+namespace fly::test {
 
 //==================================================================================================
 void WaitableTaskRunner::task_complete(const std::shared_ptr<Task> &task)
@@ -18,7 +18,7 @@ void WaitableTaskRunner::task_complete(const std::shared_ptr<Task> &task)
 //==================================================================================================
 WaitableParallelTaskRunner::WaitableParallelTaskRunner(
     std::weak_ptr<TaskManager> task_manager) noexcept :
-    ParallelTaskRunner(task_manager)
+    fly::ParallelTaskRunner(task_manager)
 {
 }
 
@@ -32,7 +32,7 @@ void WaitableParallelTaskRunner::task_complete(const std::shared_ptr<Task> &task
 //==================================================================================================
 WaitableSequencedTaskRunner::WaitableSequencedTaskRunner(
     std::weak_ptr<TaskManager> task_manager) noexcept :
-    SequencedTaskRunner(task_manager)
+    fly::SequencedTaskRunner(task_manager)
 {
 }
 
@@ -43,4 +43,4 @@ void WaitableSequencedTaskRunner::task_complete(const std::shared_ptr<Task> &tas
     WaitableTaskRunner::task_complete(task);
 }
 
-} // namespace fly
+} // namespace fly::test

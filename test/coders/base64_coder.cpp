@@ -128,7 +128,7 @@ TEST_CASE("Base64", "[coders]")
 
     SECTION("File tests")
     {
-        fly::PathUtil::ScopedTempDirectory path;
+        fly::test::PathUtil::ScopedTempDirectory path;
         std::filesystem::path encoded_file = path.file();
         std::filesystem::path decoded_file = path.file();
 
@@ -146,8 +146,8 @@ TEST_CASE("Base64", "[coders]")
             // base64 -w0 test.txt > test.txt.base64
             const auto expected = here / "data" / "test.txt.base64";
 
-            CHECK(fly::PathUtil::compare_files(encoded_file, expected));
-            CHECK(fly::PathUtil::compare_files(raw, decoded_file));
+            CHECK(fly::test::PathUtil::compare_files(encoded_file, expected));
+            CHECK(fly::test::PathUtil::compare_files(raw, decoded_file));
         }
 
         SECTION("Encode and decode a PNG image file")
@@ -162,8 +162,8 @@ TEST_CASE("Base64", "[coders]")
             // base64 -w0 test.png > test.png.base64
             const auto expected = here / "data" / "test.png.base64";
 
-            CHECK(fly::PathUtil::compare_files(encoded_file, expected));
-            CHECK(fly::PathUtil::compare_files(raw, decoded_file));
+            CHECK(fly::test::PathUtil::compare_files(encoded_file, expected));
+            CHECK(fly::test::PathUtil::compare_files(raw, decoded_file));
         }
 
         SECTION("Encode and decode a GIF image file")
@@ -178,8 +178,8 @@ TEST_CASE("Base64", "[coders]")
             // base64 -w0 test.gif > test.gif.base64
             const auto expected = here / "data" / "test.gif.base64";
 
-            CHECK(fly::PathUtil::compare_files(encoded_file, expected));
-            CHECK(fly::PathUtil::compare_files(raw, decoded_file));
+            CHECK(fly::test::PathUtil::compare_files(encoded_file, expected));
+            CHECK(fly::test::PathUtil::compare_files(raw, decoded_file));
         }
     }
 }

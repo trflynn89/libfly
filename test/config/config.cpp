@@ -9,7 +9,7 @@
 
 TEST_CASE("Config", "[config]")
 {
-    TestConfig config;
+    fly::test::TestConfig config;
 
     SECTION("Non-existing values fallback to provided default")
     {

@@ -6,6 +6,8 @@
 
 #include <catch2/catch.hpp>
 
+namespace fly::test {
+
 /**
  * A Catch2 test reporter for reporting colorful test and section names to console.
  */
@@ -67,3 +69,5 @@ private:
 };
 
 CATCH_REGISTER_REPORTER("libfly", FlyReporter)
+
+} // namespace fly::test

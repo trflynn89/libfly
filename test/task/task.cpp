@@ -110,7 +110,8 @@ TEST_CASE("Task", "[task]")
 
     SECTION("Parallel task runner does not enforce execution order")
     {
-        auto task_runner = task_manager->create_task_runner<fly::WaitableParallelTaskRunner>();
+        auto task_runner =
+            task_manager->create_task_runner<fly::test::WaitableParallelTaskRunner>();
         auto task = std::make_shared<CountTask>();
 
         CHECK(task_runner->post_task(task));
@@ -124,7 +125,8 @@ TEST_CASE("Task", "[task]")
 
     SECTION("Sequenced task runner enforces execution order")
     {
-        auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
+        auto task_runner =
+            task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
         int marker = 0;
         fly::ConcurrentQueue<int> ordering;
@@ -153,7 +155,8 @@ TEST_CASE("Task", "[task]")
 
     SECTION("Delayed tasks execute no sooner than their specified delay")
     {
-        auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
+        auto task_runner =
+            task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
         auto task = std::make_shared<TimerTask>();
 
         const std::chrono::milliseconds delay(10);
@@ -165,7 +168,8 @@ TEST_CASE("Task", "[task]")
 
     SECTION("Delayed tasks execute after immediate tasks posted at the same time")
     {
-        auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
+        auto task_runner =
+            task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
         int marker = 0;
         fly::ConcurrentQueue<int> ordering;
@@ -194,7 +198,8 @@ TEST_CASE("Task", "[task]")
 
     SECTION("Cancelled tasks do not execute")
     {
-        auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
+        auto task_runner =
+            task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
         {
             auto task = std::make_shared<CountTask>();
@@ -209,7 +214,8 @@ TEST_CASE("Task", "[task]")
 
     SECTION("Cancelled tasks do not execute while immediate tasks do execute")
     {
-        auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
+        auto task_runner =
+            task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
         int marker = 0;
         fly::ConcurrentQueue<int> ordering;

@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <string>
 
-namespace fly {
+namespace fly::test {
 
 /**
  * RAII helper class to redirect either stdout or stderr to a file for reading. On destruction, the
@@ -25,14 +25,14 @@ public:
     };
 
     /**
-     * Constructor. Redirect the given standard stream to a file.
+     * Constructor. Flush and redirect the given standard stream to a file.
      *
      * @param stream The standard stream to redirect.
      */
     CaptureStream(Stream stream) noexcept;
 
     /**
-     * Destructor. Restore the redirected stream and delete the redirect file.
+     * Destructor. Flush and restore the redirected stream and delete the redirect file.
      */
     ~CaptureStream();
 
@@ -55,7 +55,7 @@ private:
      */
     std::string restore(bool read);
 
-    fly::PathUtil::ScopedTempDirectory m_path;
+    fly::test::PathUtil::ScopedTempDirectory m_path;
     std::filesystem::path m_file;
 
     Stream m_stream;
@@ -63,4 +63,4 @@ private:
     int m_original;
 };
 
-} // namespace fly
+} // namespace fly::test

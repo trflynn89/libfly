@@ -16,7 +16,7 @@ template <typename... Modifiers>
 void test_styler(std::string &&expected_escape, Modifiers &&... modifiers)
 {
     {
-        fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
+        fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
         std::cout << fly::Styler(modifiers...) << "stylized text";
 
         const std::string contents = capture();
@@ -26,7 +26,7 @@ void test_styler(std::string &&expected_escape, Modifiers &&... modifiers)
         CHECK(fly::String::ends_with(contents, "\x1b[0m"));
     }
     {
-        fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+        fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
         std::cerr << fly::Styler(modifiers...) << "stylized text";
 
         const std::string contents = capture();

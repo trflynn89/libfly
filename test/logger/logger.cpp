@@ -80,12 +80,12 @@ TEST_CASE("Logger", "[logger]")
     auto task_manager = std::make_shared<fly::TaskManager>(1);
     REQUIRE(task_manager->start());
 
-    auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
+    auto task_runner = task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
     auto logger_config = std::make_shared<MutableLoggerConfig>();
     auto coder_config = std::make_shared<MutableCoderConfig>();
 
-    fly::PathUtil::ScopedTempDirectory path;
+    fly::test::PathUtil::ScopedTempDirectory path;
 
     auto logger = std::make_shared<fly::Logger>(task_runner, logger_config, coder_config, path());
     fly::Logger::set_instance(logger);
@@ -101,7 +101,7 @@ TEST_CASE("Logger", "[logger]")
             task_runner->wait_for_task_to_complete<fly::LoggerTask>();
         }
 
-        const std::string contents = fly::PathUtil::read_file(logger->get_log_file_path());
+        const std::string contents = fly::test::PathUtil::read_file(logger->get_log_file_path());
         REQUIRE_FALSE(contents.empty());
 
         std::size_t count = 0;
@@ -152,7 +152,7 @@ TEST_CASE("Logger", "[logger]")
 
     SECTION("Validate macros which log to console")
     {
-        fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
+        fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
 
         LOGC("Console Log");
         LOGC("Console Log: %d", 123);
@@ -187,7 +187,7 @@ TEST_CASE("Logger", "[logger]")
 
         SECTION("Validate style of standard console logs")
         {
-            fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
+            fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
             LOGC("Console Log");
 
             const std::string contents = capture();
@@ -200,7 +200,7 @@ TEST_CASE("Logger", "[logger]")
 
         SECTION("Validate style of debug console logs")
         {
-            fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
+            fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
             LOGD("Debug Log");
 
             const std::string contents = capture();
@@ -213,7 +213,7 @@ TEST_CASE("Logger", "[logger]")
 
         SECTION("Validate style of informational console logs")
         {
-            fly::CaptureStream capture(fly::CaptureStream::Stream::Stdout);
+            fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
             LOGI("Info Log");
 
             const std::string contents = capture();
@@ -226,7 +226,7 @@ TEST_CASE("Logger", "[logger]")
 
         SECTION("Validate style of warning console logs")
         {
-            fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+            fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
             LOGW("Warning Log");
 
             const std::string contents = capture();
@@ -239,7 +239,7 @@ TEST_CASE("Logger", "[logger]")
 
         SECTION("Validate style of error console logs")
         {
-            fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+            fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
             LOGE("Error Log");
 
             const std::string contents = capture();

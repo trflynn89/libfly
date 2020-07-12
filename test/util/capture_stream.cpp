@@ -18,7 +18,7 @@
 #    include <unistd.h>
 #endif
 
-namespace fly {
+namespace fly::test {
 
 //==================================================================================================
 CaptureStream::CaptureStream(Stream stream) noexcept :
@@ -92,7 +92,7 @@ std::string CaptureStream::restore(bool read)
 
         if (read)
         {
-            contents = fly::PathUtil::read_file(m_file);
+            contents = fly::test::PathUtil::read_file(m_file);
         }
 
         m_original = -1;
@@ -101,4 +101,4 @@ std::string CaptureStream::restore(bool read)
     return contents;
 }
 
-} // namespace fly
+} // namespace fly::test

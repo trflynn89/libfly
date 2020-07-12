@@ -27,7 +27,7 @@ TEST_CASE("System", "[system]")
 {
     SECTION("Print a backtrace to stderr")
     {
-        fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+        fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
         fly::System::print_backtrace();
 
         std::string output = capture();
@@ -38,9 +38,9 @@ TEST_CASE("System", "[system]")
 
     SECTION("Printing a backtrace fails when ::backtrace() fails")
     {
-        fly::MockSystem mock(fly::MockCall::Backtrace);
+        fly::test::MockSystem mock(fly::test::MockCall::Backtrace);
 
-        fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+        fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
         fly::System::print_backtrace();
 
         std::string output = capture();
@@ -49,9 +49,9 @@ TEST_CASE("System", "[system]")
 
     SECTION("Printing a backtrace fails when ::backtrace_symbols_fd() fails")
     {
-        fly::MockSystem mock(fly::MockCall::BacktraceSymbols);
+        fly::test::MockSystem mock(fly::test::MockCall::BacktraceSymbols);
 
-        fly::CaptureStream capture(fly::CaptureStream::Stream::Stderr);
+        fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
         fly::System::print_backtrace();
 
         std::string output = capture();
@@ -70,7 +70,7 @@ TEST_CASE("System", "[system]")
 
     SECTION("Capturing the system's local time fails when ::localtime() fails")
     {
-        fly::MockSystem mock(fly::MockCall::LocalTime);
+        fly::test::MockSystem mock(fly::test::MockCall::LocalTime);
 
         std::string time = fly::System::local_time();
         CHECK(time.empty());

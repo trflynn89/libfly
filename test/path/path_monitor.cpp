@@ -44,15 +44,15 @@ TEST_CASE("PathMonitor", "[path]")
     auto task_manager = std::make_shared<fly::TaskManager>(1);
     REQUIRE(task_manager->start());
 
-    auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
+    auto task_runner = task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
     auto monitor =
         std::make_shared<fly::PathMonitorImpl>(task_runner, std::make_shared<TestPathConfig>());
     REQUIRE(monitor->start());
 
-    fly::PathUtil::ScopedTempDirectory path0;
-    fly::PathUtil::ScopedTempDirectory path1;
-    fly::PathUtil::ScopedTempDirectory path2;
+    fly::test::PathUtil::ScopedTempDirectory path0;
+    fly::test::PathUtil::ScopedTempDirectory path1;
+    fly::test::PathUtil::ScopedTempDirectory path2;
 
     std::filesystem::path file0 = path0.file();
     std::filesystem::path file1 = path1.file();
@@ -147,7 +147,7 @@ TEST_CASE("PathMonitor", "[path]")
 
     SECTION("Cannot start monitor when ::inotify_init1() fails")
     {
-        fly::MockSystem mock(fly::MockCall::InotifyInit1);
+        fly::test::MockSystem mock(fly::test::MockCall::InotifyInit1);
 
         monitor = std::make_shared<fly::PathMonitorImpl>(
             task_runner,
@@ -163,7 +163,7 @@ TEST_CASE("PathMonitor", "[path]")
     {
         monitor->remove_all_paths();
 
-        fly::MockSystem mock(fly::MockCall::InotifyAddWatch);
+        fly::test::MockSystem mock(fly::test::MockCall::InotifyAddWatch);
 
         CHECK_FALSE(monitor->add_path(path0(), handle_event));
         CHECK_FALSE(monitor->add_file(file1, handle_event));
@@ -188,7 +188,7 @@ TEST_CASE("PathMonitor", "[path]")
         CHECK(deleted_files[file0] == 0);
         CHECK(changed_files[file0] == 0);
 
-        REQUIRE(fly::PathUtil::write_file(file0, std::string()));
+        REQUIRE(fly::test::PathUtil::write_file(file0, std::string()));
         REQUIRE(event_queue.pop(event, s_wait_time));
 
         CHECK(created_files[file0] == 1);
@@ -204,7 +204,7 @@ TEST_CASE("PathMonitor", "[path]")
         CHECK(deleted_files[file0] == 0);
         CHECK(changed_files[file0] == 0);
 
-        REQUIRE(fly::PathUtil::write_file(file0, std::string()));
+        REQUIRE(fly::test::PathUtil::write_file(file0, std::string()));
         std::filesystem::remove(file0);
         REQUIRE(event_queue.pop(event, s_wait_time));
         REQUIRE(event_queue.pop(event, s_wait_time));
@@ -222,7 +222,7 @@ TEST_CASE("PathMonitor", "[path]")
         CHECK(deleted_files[file0] == 0);
         CHECK(changed_files[file0] == 0);
 
-        REQUIRE(fly::PathUtil::write_file(file0, "abcdefghi"));
+        REQUIRE(fly::test::PathUtil::write_file(file0, "abcdefghi"));
         REQUIRE(event_queue.pop(event, s_wait_time));
         REQUIRE(event_queue.pop(event, s_wait_time));
 
@@ -235,14 +235,14 @@ TEST_CASE("PathMonitor", "[path]")
 
     SECTION("Cannot poll monitor when ::poll() fails")
     {
-        fly::MockSystem mock(fly::MockCall::Poll);
+        fly::test::MockSystem mock(fly::test::MockCall::Poll);
         task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
         CHECK(created_files[file1] == 0);
         CHECK(deleted_files[file1] == 0);
         CHECK(changed_files[file1] == 0);
 
-        REQUIRE(fly::PathUtil::write_file(file1, "abcdefghi"));
+        REQUIRE(fly::test::PathUtil::write_file(file1, "abcdefghi"));
         task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
         CHECK(created_files[file1] == 0);
@@ -252,14 +252,14 @@ TEST_CASE("PathMonitor", "[path]")
 
     SECTION("Cannot poll monitor when ::read() fails")
     {
-        fly::MockSystem mock(fly::MockCall::Read);
+        fly::test::MockSystem mock(fly::test::MockCall::Read);
         task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
         CHECK(created_files[file1] == 0);
         CHECK(deleted_files[file1] == 0);
         CHECK(changed_files[file1] == 0);
 
-        REQUIRE(fly::PathUtil::write_file(file1, "abcdefghi"));
+        REQUIRE(fly::test::PathUtil::write_file(file1, "abcdefghi"));
         task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
         CHECK(created_files[file1] == 0);
@@ -276,7 +276,7 @@ TEST_CASE("PathMonitor", "[path]")
         CHECK(changed_files[file1] == 0);
 
         auto path = std::filesystem::path(file1).concat(".diff");
-        REQUIRE(fly::PathUtil::write_file(path.string(), "abcdefghi"));
+        REQUIRE(fly::test::PathUtil::write_file(path.string(), "abcdefghi"));
 
         task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
@@ -285,7 +285,7 @@ TEST_CASE("PathMonitor", "[path]")
         CHECK(changed_files[file1] == 0);
 
         path = std::filesystem::path(path.string().substr(0, path.string().length() - 8));
-        REQUIRE(fly::PathUtil::write_file(path, "abcdefghi"));
+        REQUIRE(fly::test::PathUtil::write_file(path, "abcdefghi"));
 
         task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
 
@@ -314,15 +314,15 @@ TEST_CASE("PathMonitor", "[path]")
         CHECK(deleted_files[file0] == 0);
         CHECK(changed_files[file0] == 0);
 
-        REQUIRE(fly::PathUtil::write_file(file1, std::string()));
+        REQUIRE(fly::test::PathUtil::write_file(file1, std::string()));
 
-        REQUIRE(fly::PathUtil::write_file(file2, std::string()));
+        REQUIRE(fly::test::PathUtil::write_file(file2, std::string()));
         std::filesystem::remove(file2);
 
-        REQUIRE(fly::PathUtil::write_file(file3, "abcdefghi"));
+        REQUIRE(fly::test::PathUtil::write_file(file3, "abcdefghi"));
         std::filesystem::remove(file3);
 
-        REQUIRE(fly::PathUtil::write_file(file0, "abcdefghi"));
+        REQUIRE(fly::test::PathUtil::write_file(file0, "abcdefghi"));
         std::filesystem::remove(file0);
 
         REQUIRE(event_queue.pop(event, s_wait_time));
