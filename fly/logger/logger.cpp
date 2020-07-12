@@ -171,10 +171,9 @@ void Logger::add_log_internal(
         log.m_index = m_index++;
         log.m_level = level;
         log.m_time = log_time.count();
+        log.m_file = file;
+        log.m_function = function;
         log.m_line = line;
-
-        snprintf(log.m_file, sizeof(log.m_file), "%s", file);
-        snprintf(log.m_function, sizeof(log.m_function), "%s", function);
 
         m_log_queue.push(std::move(log));
     }

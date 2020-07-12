@@ -41,7 +41,7 @@ struct Log
     /**
      * Default constructor.
      */
-    Log() noexcept;
+    Log() = default;
 
     /**
      * Move constructor.
@@ -59,14 +59,14 @@ struct Log
     /**
      * Move assignment operator.
      */
-    Log &operator=(Log &&) noexcept;
+    Log &operator=(Log &&log) noexcept;
 
-    std::uintmax_t m_index;
-    Level m_level;
-    double m_time;
-    char m_file[100];
-    char m_function[100];
-    std::uint32_t m_line;
+    std::uintmax_t m_index {0};
+    Level m_level {Level::NumLevels};
+    double m_time {-1.0};
+    const char *m_file;
+    const char *m_function;
+    std::uint32_t m_line {0};
     std::string m_message;
 
     friend std::ostream &operator<<(std::ostream &stream, const Log &log);
