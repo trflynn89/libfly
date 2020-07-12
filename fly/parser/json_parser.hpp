@@ -46,7 +46,7 @@ public:
     /**
      * Constructor. Create a parser with strict compliance.
      */
-    JsonParser() noexcept;
+    JsonParser() = default;
 
     /**
      * Constructor. Create a parser with the specified features.
@@ -283,7 +283,7 @@ private:
      */
     bool is_feature_allowed(Features feature) const;
 
-    const Features m_features;
+    const Features m_features {Features::Strict};
 };
 
 /**
