@@ -21,7 +21,7 @@ public:
      *
      * @param stream The stream to manipulate.
      */
-    StylerProxy(std::ostream &stream) noexcept;
+    explicit StylerProxy(std::ostream &stream) noexcept;
 
     /**
      * Destructor. Concrete implementations should use their destructor to reset the stream to its
