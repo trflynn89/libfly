@@ -20,11 +20,6 @@ public:
     static constexpr const char *identifier = "coder";
 
     /**
-     * Constructor.
-     */
-    CoderConfig() noexcept;
-
-    /**
      * @return Huffman encoder chunk size (in bytes).
      */
     std::uint32_t huffman_encoder_chunk_size() const;
@@ -35,8 +30,8 @@ public:
     length_type huffman_encoder_max_code_length() const;
 
 protected:
-    std::uint16_t m_default_huffman_encoder_chunk_size_kb;
-    length_type m_default_huffman_encoder_max_code_length;
+    std::uint16_t m_default_huffman_encoder_chunk_size_kb {1 << 10};
+    length_type m_default_huffman_encoder_max_code_length {11};
 };
 
 } // namespace fly

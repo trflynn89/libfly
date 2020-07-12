@@ -1,16 +1,6 @@
 #include "fly/socket/socket_config.hpp"
 
-#include "fly/types/numeric/literals.hpp"
-
 namespace fly {
-
-//==================================================================================================
-SocketConfig::SocketConfig() noexcept :
-    m_default_io_wait_time(10000_i64),
-    m_default_end_of_message(0x04),
-    m_default_packet_size(4096)
-{
-}
 
 //==================================================================================================
 std::chrono::microseconds SocketConfig::io_wait_time() const

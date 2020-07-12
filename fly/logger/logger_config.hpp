@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/config/config.hpp"
+#include "fly/types/numeric/literals.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -17,11 +18,6 @@ class LoggerConfig : public Config
 {
 public:
     static constexpr const char *identifier = "logger";
-
-    /**
-     * Constructor.
-     */
-    LoggerConfig() noexcept;
 
     /**
      * @return True if log files should be compressed after reaching the max log file size.
@@ -44,10 +40,10 @@ public:
     std::chrono::milliseconds queue_wait_time() const;
 
 protected:
-    bool m_default_compress_log_files;
-    std::uintmax_t m_default_max_log_file_size;
-    std::uint32_t m_default_max_message_size;
-    std::chrono::milliseconds::rep m_default_queue_wait_time;
+    bool m_default_compress_log_files {true};
+    std::uintmax_t m_default_max_log_file_size {20_u64 << 20};
+    std::uint32_t m_default_max_message_size {256};
+    std::chrono::milliseconds::rep m_default_queue_wait_time {100};
 };
 
 } // namespace fly

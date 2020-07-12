@@ -1,15 +1,6 @@
 #include "fly/coders/coder_config.hpp"
 
-#include "fly/types/numeric/literals.hpp"
-
 namespace fly {
-
-//==================================================================================================
-CoderConfig::CoderConfig() noexcept :
-    m_default_huffman_encoder_chunk_size_kb(1_u16 << 10),
-    m_default_huffman_encoder_max_code_length(11_u8)
-{
-}
 
 //==================================================================================================
 std::uint32_t CoderConfig::huffman_encoder_chunk_size() const

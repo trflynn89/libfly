@@ -1,17 +1,6 @@
 #include "fly/logger/logger_config.hpp"
 
-#include "fly/types/numeric/literals.hpp"
-
 namespace fly {
-
-//==================================================================================================
-LoggerConfig::LoggerConfig() noexcept :
-    m_default_compress_log_files(true),
-    m_default_max_log_file_size(20_u64 << 20),
-    m_default_max_message_size(256_u32),
-    m_default_queue_wait_time(100_i64)
-{
-}
 
 //==================================================================================================
 bool LoggerConfig::compress_log_files() const
