@@ -92,7 +92,7 @@ public:
     /**
      * Default constructor. Intializes the Json instance to a null value.
      */
-    Json() noexcept;
+    Json() = default;
 
     /**
      * Null constructor. Intializes the Json instance to a null value.
@@ -722,7 +722,7 @@ private:
         JsonTraits::string_type::const_iterator &it,
         const JsonTraits::string_type::const_iterator &end);
 
-    json_type m_value;
+    json_type m_value {nullptr};
 };
 
 //==================================================================================================

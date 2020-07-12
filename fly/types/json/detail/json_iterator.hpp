@@ -113,7 +113,7 @@ public:
     /**
      * Default constructor. Initializes the iterator to an empty value.
      */
-    JsonIterator() noexcept;
+    JsonIterator() = default;
 
     /**
      * Constructor to initialize the iterator to be pointed at the beginning or end of a Json
@@ -472,15 +472,9 @@ private:
     template <typename T>
     void validate_dereference(const T &it) const;
 
-    pointer m_json;
+    pointer m_json {nullptr};
     iterator_type m_iterator;
 };
-
-//==================================================================================================
-template <typename JsonType>
-JsonIterator<JsonType>::JsonIterator() noexcept : m_json(nullptr)
-{
-}
 
 //==================================================================================================
 template <typename JsonType>
