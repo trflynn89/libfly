@@ -62,8 +62,8 @@ protected:
 
     std::streambuf *m_stream_buffer;
 
-    buffer_type m_buffer;
-    byte_type m_position;
+    buffer_type m_buffer {0};
+    byte_type m_position {0};
 };
 
 //==================================================================================================
