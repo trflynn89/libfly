@@ -69,7 +69,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket creation fails due to ::socket() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Socket);
+        fly::test::MockSystem mock(fly::test::MockCall::Socket);
 
         CHECK_FALSE(create_socket(server_socket_manager, fly::Protocol::TCP, false));
         CHECK_FALSE(create_socket(server_socket_manager, fly::Protocol::UDP, false));
@@ -80,7 +80,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket creation fails due to ::fcntl() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Fcntl);
+        fly::test::MockSystem mock(fly::test::MockCall::Fcntl);
 
         CHECK(create_socket(server_socket_manager, fly::Protocol::TCP, false));
         CHECK(create_socket(server_socket_manager, fly::Protocol::UDP, false));
@@ -91,7 +91,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket binding fails due to ::bind() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Bind);
+        fly::test::MockSystem mock(fly::test::MockCall::Bind);
 
         auto socket = create_socket(server_socket_manager, fly::Protocol::TCP, false);
         CHECK_FALSE(socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -100,7 +100,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket binding fails due to ::setsockopt() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Setsockopt);
+        fly::test::MockSystem mock(fly::test::MockCall::Setsockopt);
 
         auto socket = create_socket(server_socket_manager, fly::Protocol::TCP, false);
         CHECK_FALSE(socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -108,7 +108,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket binding fails due to ::gethostbyname() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Gethostbyname);
+        fly::test::MockSystem mock(fly::test::MockCall::Gethostbyname);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK_FALSE(listen_socket->bind("0.0.0.0", port, fly::BindOption::AllowReuse));
@@ -116,7 +116,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket listening fails due to ::listen() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Listen);
+        fly::test::MockSystem mock(fly::test::MockCall::Listen);
 
         auto socket = create_socket(server_socket_manager, fly::Protocol::TCP, false);
         CHECK(socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -125,7 +125,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket connecting fails due to ::connect() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Connect);
+        fly::test::MockSystem mock(fly::test::MockCall::Connect);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -137,7 +137,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket connecting fails due to ::gethostbyname() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Gethostbyname);
+        fly::test::MockSystem mock(fly::test::MockCall::Gethostbyname);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -149,7 +149,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket connecting fails due to ::gethostbyname() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Gethostbyname);
+        fly::test::MockSystem mock(fly::test::MockCall::Gethostbyname);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -161,7 +161,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket connecting fails due to ::connect() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Connect);
+        fly::test::MockSystem mock(fly::test::MockCall::Connect);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -175,7 +175,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket connecting succeeds immediately")
     {
-        fly::MockSystem mock(fly::MockCall::Connect, false);
+        fly::test::MockSystem mock(fly::test::MockCall::Connect, false);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -189,7 +189,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket connecting fails due to ::getsockopt() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Getsockopt);
+        fly::test::MockSystem mock(fly::test::MockCall::Getsockopt);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -213,7 +213,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket accepting fails due to ::accept() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Accept);
+        fly::test::MockSystem mock(fly::test::MockCall::Accept);
 
         auto socket = create_socket(server_socket_manager, fly::Protocol::TCP, false);
         CHECK(socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -224,7 +224,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket sending (TCP) fails due to ::send() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Send);
+        fly::test::MockSystem mock(fly::test::MockCall::Send);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -238,7 +238,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket sending (TCP) fails due to ::send() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Send);
+        fly::test::MockSystem mock(fly::test::MockCall::Send);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -269,7 +269,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket sending (TCP) blocks due to ::send() system call")
     {
-        fly::MockSystem mock(fly::MockCall::SendBlocking);
+        fly::test::MockSystem mock(fly::test::MockCall::SendBlocking);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -305,7 +305,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket sending (UDP) fails due to ::sendto() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Sendto);
+        fly::test::MockSystem mock(fly::test::MockCall::Sendto);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::UDP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -316,7 +316,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket sending (UDP) fails due to ::gethostbyname() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Gethostbyname);
+        fly::test::MockSystem mock(fly::test::MockCall::Gethostbyname);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::UDP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -327,7 +327,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket sending (UDP) fails due to ::sendto() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Sendto);
+        fly::test::MockSystem mock(fly::test::MockCall::Sendto);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::UDP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -347,7 +347,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket sending (UDP) blocks due to ::sendto() system call")
     {
-        fly::MockSystem mock(fly::MockCall::SendtoBlocking);
+        fly::test::MockSystem mock(fly::test::MockCall::SendtoBlocking);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::UDP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -369,7 +369,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket sending (UDP) fails due to ::gethostbyname() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Gethostbyname);
+        fly::test::MockSystem mock(fly::test::MockCall::Gethostbyname);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::UDP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -380,7 +380,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket receiving (TCP) fails due to ::recv() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Recv);
+        fly::test::MockSystem mock(fly::test::MockCall::Recv);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -392,7 +392,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket receiving (TCP) fails due to ::recv() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Recv);
+        fly::test::MockSystem mock(fly::test::MockCall::Recv);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -422,7 +422,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket receiving (UDP) fails due to ::recvfrom() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Recvfrom);
+        fly::test::MockSystem mock(fly::test::MockCall::Recvfrom);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::UDP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
@@ -433,7 +433,7 @@ TEST_CASE("Socket", "[socket]")
 
     SECTION("Socket receiving (UDP) fails due to ::recvfrom() system call")
     {
-        fly::MockSystem mock(fly::MockCall::Recvfrom);
+        fly::test::MockSystem mock(fly::test::MockCall::Recvfrom);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::UDP, true);
         CHECK(listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));

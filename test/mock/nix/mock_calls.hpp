@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-namespace fly {
+namespace fly::test {
 
 /**
  * Enumerated list of mocked system calls.
@@ -38,4 +38,4 @@ enum class MockCall : std::uint8_t
     Times,
 };
 
-} // namespace fly
+} // namespace fly::test

@@ -1,6 +1,6 @@
 #include "test/mock/mock_system.hpp"
 
-namespace fly {
+namespace fly::test {
 
 //==================================================================================================
 std::mutex MockSystem::s_mock_system_mutex;
@@ -65,4 +65,4 @@ bool MockSystem::mock_enabled(MockCall mock, bool &fail)
     return false;
 }
 
-} // namespace fly
+} // namespace fly::test

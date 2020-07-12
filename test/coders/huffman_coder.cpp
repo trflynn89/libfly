@@ -73,8 +73,6 @@ std::string create_stream(std::vector<fly::byte_type> bytes)
 
 } // namespace
 
-namespace fly {
-
 TEST_CASE("Huffman", "[coders]")
 {
     auto config = std::make_shared<fly::CoderConfig>();
@@ -423,7 +421,7 @@ TEST_CASE("Huffman", "[coders]")
 
     SECTION("File tests")
     {
-        fly::PathUtil::ScopedTempDirectory path;
+        fly::test::PathUtil::ScopedTempDirectory path;
         std::filesystem::path encoded_file = path.file();
         std::filesystem::path decoded_file = path.file();
 
@@ -438,7 +436,7 @@ TEST_CASE("Huffman", "[coders]")
             REQUIRE(decoder.decode_file(encoded_file, decoded_file));
 
             CHECK(std::filesystem::file_size(raw) > std::filesystem::file_size(encoded_file));
-            CHECK(fly::PathUtil::compare_files(raw, decoded_file));
+            CHECK(fly::test::PathUtil::compare_files(raw, decoded_file));
         }
 
         SECTION("Encode and decode a large file containing ASCII and non-ASCII symbols")
@@ -451,7 +449,7 @@ TEST_CASE("Huffman", "[coders]")
             REQUIRE(encoder.encode_file(raw, encoded_file));
             REQUIRE(decoder.decode_file(encoded_file, decoded_file));
 
-            CHECK(fly::PathUtil::compare_files(raw, decoded_file));
+            CHECK(fly::test::PathUtil::compare_files(raw, decoded_file));
         }
 
         SECTION("Encode and decode an extremely large file")
@@ -472,9 +470,7 @@ TEST_CASE("Huffman", "[coders]")
             REQUIRE(decoder.decode_file(encoded_file, decoded_file));
 
             CHECK(std::filesystem::file_size(raw) == std::filesystem::file_size(encoded_file));
-            CHECK(fly::PathUtil::compare_files(raw, decoded_file));
+            CHECK(fly::test::PathUtil::compare_files(raw, decoded_file));
         }
     }
 }
-
-} // namespace fly

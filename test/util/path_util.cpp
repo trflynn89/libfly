@@ -11,7 +11,7 @@
 #include <limits>
 #include <sstream>
 
-namespace fly {
+namespace fly::test {
 
 //==================================================================================================
 PathUtil::ScopedTempDirectory::ScopedTempDirectory() :
@@ -82,4 +82,4 @@ bool PathUtil::compare_files(const std::filesystem::path &path1, const std::file
     return std::equal(begin1, std::istreambuf_iterator<char>(), begin2);
 }
 
-} // namespace fly
+} // namespace fly::test

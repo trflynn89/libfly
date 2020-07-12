@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <string>
 
-namespace fly {
+namespace fly::test {
 
 /**
  * Utility class to perform IO operations on paths. Only meant to be used by unit tests.
@@ -82,4 +82,4 @@ public:
     compare_files(const std::filesystem::path &path1, const std::filesystem::path &path2);
 };
 
-} // namespace fly
+} // namespace fly::test

@@ -39,7 +39,7 @@ TEST_CASE("SystemMonitor", "[system]")
     auto task_manager = std::make_shared<fly::TaskManager>(1);
     REQUIRE(task_manager->start());
 
-    auto task_runner = task_manager->create_task_runner<fly::WaitableSequencedTaskRunner>();
+    auto task_runner = task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
     auto monitor =
         std::make_shared<fly::SystemMonitorImpl>(task_runner, std::make_shared<TestSystemConfig>());
@@ -82,7 +82,7 @@ TEST_CASE("SystemMonitor", "[system]")
 
     SECTION("Cannot start system manager when ::read() fails")
     {
-        fly::MockSystem mock(fly::MockCall::Read);
+        fly::test::MockSystem mock(fly::test::MockCall::Read);
 
         monitor = std::make_shared<fly::SystemMonitorImpl>(
             task_runner,
@@ -101,7 +101,7 @@ TEST_CASE("SystemMonitor", "[system]")
         CHECK(monitor->start());
         task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
-        fly::MockSystem mock(fly::MockCall::Read);
+        fly::test::MockSystem mock(fly::test::MockCall::Read);
 
         double system_before = monitor->get_system_cpu_usage();
 
@@ -126,7 +126,7 @@ TEST_CASE("SystemMonitor", "[system]")
         CHECK(monitor->start());
         task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
 
-        fly::MockSystem mock(fly::MockCall::Times);
+        fly::test::MockSystem mock(fly::test::MockCall::Times);
 
         double process_before = monitor->get_process_cpu_usage();
 
@@ -169,7 +169,7 @@ TEST_CASE("SystemMonitor", "[system]")
 
     SECTION("Cannot update system memory when ::sysinfo() fails")
     {
-        fly::MockSystem mock(fly::MockCall::Sysinfo);
+        fly::test::MockSystem mock(fly::test::MockCall::Sysinfo);
 
         std::uint64_t total_before = monitor->get_total_system_memory();
         std::uint64_t system_before = monitor->get_system_memory_usage();
@@ -186,7 +186,7 @@ TEST_CASE("SystemMonitor", "[system]")
 
     SECTION("Cannot update process memory when ::read() fails")
     {
-        fly::MockSystem mock(fly::MockCall::Read);
+        fly::test::MockSystem mock(fly::test::MockCall::Read);
 
         std::uint64_t process_before = monitor->get_process_memory_usage();
 

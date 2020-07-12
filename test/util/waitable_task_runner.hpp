@@ -8,9 +8,11 @@
 #include <typeinfo>
 
 namespace fly {
-
 class Task;
 class TaskManager;
+} // namespace fly
+
+namespace fly::test {
 
 /**
  * A pseudo task runner to allow waiting for a specific task to be complete. It is not a valid test
@@ -57,7 +59,7 @@ protected:
     virtual void task_complete(const std::shared_ptr<Task> &task) = 0;
 
 private:
-    ConcurrentQueue<std::size_t> m_completed_tasks;
+    fly::ConcurrentQueue<std::size_t> m_completed_tasks;
 };
 
 /**
@@ -67,9 +69,9 @@ private:
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
-class WaitableParallelTaskRunner : public ParallelTaskRunner, public WaitableTaskRunner
+class WaitableParallelTaskRunner : public fly::ParallelTaskRunner, public WaitableTaskRunner
 {
-    friend class TaskManager;
+    friend class fly::TaskManager;
 
 protected:
     WaitableParallelTaskRunner(std::weak_ptr<TaskManager> task_manager) noexcept;
@@ -90,9 +92,9 @@ protected:
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
-class WaitableSequencedTaskRunner : public SequencedTaskRunner, public WaitableTaskRunner
+class WaitableSequencedTaskRunner : public fly::SequencedTaskRunner, public WaitableTaskRunner
 {
-    friend class TaskManager;
+    friend class fly::TaskManager;
 
 protected:
     WaitableSequencedTaskRunner(std::weak_ptr<TaskManager> task_manager) noexcept;
@@ -148,4 +150,4 @@ bool WaitableTaskRunner::wait_for_task_to_complete(std::chrono::duration<R, P> d
     return (s_expected_hash == completed_hash);
 }
 
-} // namespace fly
+} // namespace fly::test

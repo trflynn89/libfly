@@ -11,7 +11,7 @@
 #    include "test/mock/nix/mock_calls.hpp"
 #endif
 
-namespace fly {
+namespace fly::test {
 
 /**
  * Alias for mapping a MockCall to its enabled flag.
@@ -77,4 +77,4 @@ private:
     const MockCall m_mock;
 };
 
-} // namespace fly
+} // namespace fly::test
