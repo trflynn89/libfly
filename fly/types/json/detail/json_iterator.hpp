@@ -81,6 +81,11 @@ class JsonIterator
     using iterator_type = std::variant<object_iterator_type, array_iterator_type>;
 
     /**
+     * Alias for this iterator type with constness added.
+     */
+    using ConstJsonIterator = JsonIterator<typename std::add_const_t<JsonType>>;
+
+    /**
      * Alias for this iterator type with constness removed.
      */
     using NonConstJsonIterator = JsonIterator<typename std::remove_const_t<JsonType>>;
@@ -413,8 +418,7 @@ public:
     reference value() const;
 
 private:
-    friend std::
-        conditional_t<is_const_iterator, NonConstJsonIterator, JsonIterator<const JsonType>>;
+    friend std::conditional_t<is_const_iterator, NonConstJsonIterator, ConstJsonIterator>;
 
     /**
      * A trait for testing if all types Ts are object iterators.
