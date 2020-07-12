@@ -22,7 +22,7 @@ public:
      * Default constructor to set the socket ID to an invalid value and the request message to an
      * empty string.
      */
-    AsyncRequest() noexcept;
+    AsyncRequest() = default;
 
     /**
      * Move constructor. The moved request is invalidated.
@@ -87,13 +87,14 @@ public:
     port_type get_port() const;
 
 private:
-    int m_socket_id;
+    static constexpr int s_invalid_id = -1;
+    int m_socket_id {s_invalid_id};
 
-    std::string::size_type m_request_offset;
+    std::string::size_type m_request_offset {0};
     std::string m_request;
 
-    address_type m_address;
-    port_type m_port;
+    address_type m_address {0};
+    port_type m_port {0};
 };
 
 } // namespace fly

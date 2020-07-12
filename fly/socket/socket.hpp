@@ -390,25 +390,25 @@ protected:
     // Send/recv packet size.
     const std::size_t m_packet_size;
 
-    // File descriptor for this socket..
-    socket_type m_socket_handle;
+    // File descriptor for this socket.
+    socket_type m_socket_handle {invalid_socket()};
 
-    // Client IP and port this socket is connected to..
-    address_type m_client_ip;
-    port_type m_client_port;
+    // Client IP and port this socket is connected to.
+    address_type m_client_ip {0};
+    port_type m_client_port {0};
 
     // Whether this socket should allow asynchronous operations.
-    bool m_is_async;
+    bool m_is_async {false};
 
     // Whether this socket is a listening socket.
-    bool m_is_listening;
+    bool m_is_listening {false};
 
     // Whether this socket is not connected, connecting, or connected.
-    std::atomic<ConnectedState> m_connected_state;
+    std::atomic<ConnectedState> m_connected_state {ConnectedState::Disconnected};
 
 private:
     static std::atomic_int s_num_sockets;
-    int m_socket_id;
+    int m_socket_id {s_num_sockets.fetch_add(1)};
 
     AsyncRequest::RequestQueue m_pending_sends;
 
