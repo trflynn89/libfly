@@ -1,6 +1,7 @@
 #include "fly/logger/styler.hpp"
 
 #include "fly/fly.hpp"
+#include "fly/traits/traits.hpp"
 #include "fly/types/string/string.hpp"
 #include "test/util/capture_stream.hpp"
 
@@ -15,6 +16,9 @@
 template <typename... Modifiers>
 void test_styler(std::string &&expected_escape, Modifiers &&... modifiers)
 {
+    constexpr bool style_or_color =
+        fly::any_same_v<fly::Style, Modifiers...> || fly::any_same_v<fly::Color, Modifiers...>;
+
     {
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
         std::cout << fly::Styler(modifiers...) << "stylized text";
@@ -23,7 +27,11 @@ void test_styler(std::string &&expected_escape, Modifiers &&... modifiers)
         REQUIRE_FALSE(contents.empty());
 
         CHECK(fly::String::starts_with(contents, expected_escape));
-        CHECK(fly::String::ends_with(contents, "\x1b[0m"));
+
+        if constexpr (style_or_color)
+        {
+            CHECK(fly::String::ends_with(contents, "\x1b[0m"));
+        }
     }
     {
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
@@ -33,7 +41,11 @@ void test_styler(std::string &&expected_escape, Modifiers &&... modifiers)
         REQUIRE_FALSE(contents.empty());
 
         CHECK(fly::String::starts_with(contents, expected_escape));
-        CHECK(fly::String::ends_with(contents, "\x1b[0m"));
+
+        if constexpr (style_or_color)
+        {
+            CHECK(fly::String::ends_with(contents, "\x1b[0m"));
+        }
     }
 }
 
@@ -51,7 +63,7 @@ TEST_CASE("Styler", "[logger]")
         CHECK(contents == "non-stylized text");
     }
 
-    SECTION("Manipulated with single style")
+    SECTION("Manipulated with a single style")
     {
         test_styler("\x1b[1m", fly::Style::Bold);
         test_styler("\x1b[2m", fly::Style::Dim);
@@ -96,7 +108,7 @@ TEST_CASE("Styler", "[logger]")
             fly::Style::Bold);
     }
 
-    SECTION("Manipulate with single standard foreground color")
+    SECTION("Manipulate with a single standard foreground color")
     {
         test_styler("\x1b[30m", fly::Color::Black);
         test_styler("\x1b[31m", fly::Color::Red);
@@ -108,7 +120,7 @@ TEST_CASE("Styler", "[logger]")
         test_styler("\x1b[37m", fly::Color::White);
     }
 
-    SECTION("Manipulate with single standard background color")
+    SECTION("Manipulate with a single standard background color")
     {
         test_styler("\x1b[40m", fly::Color(fly::Color::Black, fly::Color::Plane::Background));
         test_styler("\x1b[41m", fly::Color(fly::Color::Red, fly::Color::Plane::Background));
@@ -120,7 +132,7 @@ TEST_CASE("Styler", "[logger]")
         test_styler("\x1b[47m", fly::Color(fly::Color::White, fly::Color::Plane::Background));
     }
 
-    SECTION("Manipulate with single 256-color foreground color")
+    SECTION("Manipulate with a single 256-color foreground color")
     {
         for (std::uint32_t color = fly::Color::White + 1; color <= 255; ++color)
         {
@@ -128,7 +140,7 @@ TEST_CASE("Styler", "[logger]")
         }
     }
 
-    SECTION("Manipulate with single 256-color background color")
+    SECTION("Manipulate with a single 256-color background color")
     {
         for (std::uint32_t color = fly::Color::White + 1; color <= 255; ++color)
         {
@@ -154,6 +166,36 @@ TEST_CASE("Styler", "[logger]")
             fly::Color::Black);
     }
 
+    SECTION("Manipulate with a single cursor position")
+    {
+        test_styler("\x1b[A", fly::Position::CursorUp);
+        test_styler("\x1b[B", fly::Position::CursorDown);
+        test_styler("\x1b[C", fly::Position::CursorForward);
+        test_styler("\x1b[D", fly::Position::CursorBackward);
+    }
+
+    SECTION("Manipulate with multiple cursor positions")
+    {
+        test_styler("\x1b[A\x1b[B", fly::Position::CursorUp, fly::Position::CursorDown);
+        test_styler(
+            "\x1b[A\x1b[B\x1b[C",
+            fly::Position::CursorUp,
+            fly::Position::CursorDown,
+            fly::Position::CursorForward);
+        test_styler(
+            "\x1b[A\x1b[B\x1b[C\x1b[D",
+            fly::Position::CursorUp,
+            fly::Position::CursorDown,
+            fly::Position::CursorForward,
+            fly::Position::CursorBackward);
+        test_styler(
+            "\x1b[D\x1b[C\x1b[B\x1b[A",
+            fly::Position::CursorBackward,
+            fly::Position::CursorForward,
+            fly::Position::CursorDown,
+            fly::Position::CursorUp);
+    }
+
     SECTION("Manipulate with styles and colors")
     {
         test_styler("\x1b[1;31m", fly::Style::Bold, fly::Color::Red);
@@ -162,6 +204,35 @@ TEST_CASE("Styler", "[logger]")
         test_styler("\x1b[1;9;31m", fly::Style::Bold, fly::Style::Strike, fly::Color::Red);
         test_styler("\x1b[1;9;31m", fly::Style::Bold, fly::Color::Red, fly::Style::Strike);
         test_styler("\x1b[1;9;31m", fly::Color::Red, fly::Style::Bold, fly::Style::Strike);
+
+        test_styler(
+            "\x1b[1;31;40m",
+            fly::Style::Bold,
+            fly::Color::Red,
+            fly::Color(fly::Color::Black, fly::Color::Plane::Background));
+        test_styler(
+            "\x1b[1;31;40m",
+            fly::Color::Red,
+            fly::Style::Bold,
+            fly::Color(fly::Color::Black, fly::Color::Plane::Background));
+        test_styler(
+            "\x1b[1;31;40m",
+            fly::Color::Red,
+            fly::Color(fly::Color::Black, fly::Color::Plane::Background),
+            fly::Style::Bold);
+    }
+
+    SECTION("Manipulate with styles, colors, and cursor positions")
+    {
+        test_styler("\x1b[1;31m", fly::Style::Bold, fly::Color::Red);
+        test_styler("\x1b[1;31m", fly::Color::Red, fly::Style::Bold);
+
+        test_styler("\x1b[1;9;31m", fly::Style::Bold, fly::Style::Strike, fly::Color::Red);
+        test_styler("\x1b[1;9;31m", fly::Style::Bold, fly::Color::Red, fly::Style::Strike);
+        test_styler("\x1b[1;9;31m", fly::Color::Red, fly::Style::Bold, fly::Style::Strike);
+
+        test_styler("\x1b[1;31m\x1b[A", fly::Style::Bold, fly::Color::Red, fly::Position::CursorUp);
+        test_styler("\x1b[1;31m\x1b[A", fly::Position::CursorUp, fly::Color::Red, fly::Style::Bold);
 
         test_styler(
             "\x1b[1;31;40m",

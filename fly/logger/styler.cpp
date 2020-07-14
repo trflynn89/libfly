@@ -26,7 +26,8 @@ detail::StylerProxy &operator<<(std::ostream &stream, const Styler &styler)
     mutable_styler.m_proxy = std::make_unique<detail::StylerProxyImpl>(
         stream,
         std::move(mutable_styler.m_styles),
-        std::move(mutable_styler.m_colors));
+        std::move(mutable_styler.m_colors),
+        std::move(mutable_styler.m_positions));
 
     return *(styler.m_proxy);
 }

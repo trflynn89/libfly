@@ -82,7 +82,8 @@ void StylerProxyImpl::apply_value<Color>(WORD &attributes, const Color &modifier
 StylerProxyImpl::StylerProxyImpl(
     std::ostream &stream,
     std::stack<Style> &&styles,
-    std::stack<Color> &&colors) noexcept :
+    std::stack<Color> &&colors,
+    std::stack<Position> &&) noexcept :
     StylerProxy(stream),
     m_handle(INVALID_HANDLE_VALUE),
     m_original_attributes(0)

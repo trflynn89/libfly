@@ -3,6 +3,38 @@
 namespace fly::detail {
 
 //==================================================================================================
+StylerProxyImpl::StylerProxyImpl(
+    std::ostream &stream,
+    std::stack<Style> &&styles,
+    std::stack<Color> &&colors,
+    std::stack<Position> &&positions) noexcept :
+    StylerProxy(stream)
+{
+    if (m_stream_is_stdout || m_stream_is_stderr)
+    {
+        if (!styles.empty() || !colors.empty())
+        {
+            apply_styles_and_colors(std::move(styles), std::move(colors));
+            m_did_apply_style_or_color = true;
+        }
+
+        if (!positions.empty())
+        {
+            apply_positions(std::move(positions));
+        }
+    }
+}
+
+//==================================================================================================
+StylerProxyImpl::~StylerProxyImpl()
+{
+    if (m_did_apply_style_or_color)
+    {
+        m_stream << "\x1b[0m";
+    }
+}
+
+//==================================================================================================
 template <>
 void StylerProxyImpl::stream_value<Style>(const Style &modifier)
 {
@@ -37,9 +69,9 @@ void StylerProxyImpl::stream_value<Style>(const Style &modifier)
 template <>
 void StylerProxyImpl::stream_value<Color>(const Color &modifier)
 {
-    // https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
     if (modifier.m_color <= Color::White)
     {
+        // https://en.wikipedia.org/wiki/ANSI_escape_code#3/4_bit
         if (modifier.m_plane == Color::Plane::Foreground)
         {
             m_stream << "3";
@@ -51,6 +83,7 @@ void StylerProxyImpl::stream_value<Color>(const Color &modifier)
     }
     else
     {
+        // https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
         if (modifier.m_plane == Color::Plane::Foreground)
         {
             m_stream << "38;5;";
@@ -65,50 +98,67 @@ void StylerProxyImpl::stream_value<Color>(const Color &modifier)
 }
 
 //==================================================================================================
-StylerProxyImpl::StylerProxyImpl(
-    std::ostream &stream,
-    std::stack<Style> &&styles,
-    std::stack<Color> &&colors) noexcept :
-    StylerProxy(stream),
-    m_did_modify_stream(false)
+template <>
+void StylerProxyImpl::stream_value<Position>(const Position &modifier)
 {
-    if (m_stream_is_stdout || m_stream_is_stderr)
+    // https://en.wikipedia.org/wiki/ANSI_escape_code#Terminal_output_sequences
+    m_stream << "\x1b[";
+
+    switch (modifier)
     {
-        m_did_modify_stream = true;
-        m_stream << "\x1b[";
-
-        bool first_modifier = true;
-
-        for (; !styles.empty(); styles.pop(), first_modifier = false)
-        {
-            if (!first_modifier)
-            {
-                m_stream << ';';
-            }
-
-            stream_value(styles.top());
-        }
-
-        for (; !colors.empty(); colors.pop(), first_modifier = false)
-        {
-            if (!first_modifier)
-            {
-                m_stream << ';';
-            }
-
-            stream_value(colors.top());
-        }
-
-        m_stream << 'm';
+        case Position::CursorUp:
+            m_stream << 'A';
+            break;
+        case Position::CursorDown:
+            m_stream << 'B';
+            break;
+        case Position::CursorForward:
+            m_stream << 'C';
+            break;
+        case Position::CursorBackward:
+            m_stream << 'D';
+            break;
     }
 }
 
 //==================================================================================================
-StylerProxyImpl::~StylerProxyImpl()
+void StylerProxyImpl::apply_styles_and_colors(
+    std::stack<Style> &&styles,
+    std::stack<Color> &&colors)
 {
-    if (m_did_modify_stream)
+    m_stream << "\x1b[";
+
+    bool first_modifier = true;
+
+    for (; !styles.empty(); styles.pop(), first_modifier = false)
     {
-        m_stream << "\x1b[0m";
+        if (!first_modifier)
+        {
+            m_stream << ';';
+        }
+
+        stream_value(styles.top());
+    }
+
+    for (; !colors.empty(); colors.pop(), first_modifier = false)
+    {
+        if (!first_modifier)
+        {
+            m_stream << ';';
+        }
+
+        stream_value(colors.top());
+    }
+
+    m_stream << 'm';
+}
+
+//==================================================================================================
+void StylerProxyImpl::apply_positions(std::stack<Position> &&positions)
+{
+    for (; !positions.empty(); positions.pop())
+    {
+        stream_value(positions.top());
     }
 }
 
