@@ -3,8 +3,9 @@ enwik8
 
 #### Build
 
-release/
 debug/
+release/
+profile/
 
 #### General
 
