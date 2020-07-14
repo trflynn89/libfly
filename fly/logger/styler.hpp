@@ -67,10 +67,23 @@ struct Color
 };
 
 /**
+ * Constants to modify the cursor position of a std::ostream.
+ */
+enum class Position
+{
+    CursorUp,
+    CursorDown,
+    CursorForward,
+    CursorBackward,
+};
+
+/**
  * IO manipulator to stylize a std::ostream with style and color. This manipulator allows for
  * applying any number of styles (e.g. bold, italic), a foreground color, and background color to
- * the std::ostream. Upon destruction, the styles and colors applied by this manipulator are
- * reverted.
+ * the std::ostream. It also allows for modifying the cursor position within the stream.
+ *
+ * Upon destruction, the styles and colors applied by this manipulator are reverted. Manipulations
+ * of the cursor position are not reverted.
  *
  * Only standard output and error streams are supported. Any other streams will remain
  * unmanipulated.
@@ -104,7 +117,7 @@ class Styler
 public:
     /**
      * Construct a Styler with a single modifier. The template modifier type must either be one of
-     * Style or Color, or be an integral type. Integral types are coverted to foreground Color
+     * [Style, Color, Position] or an integral type. Integral types are coverted to foreground Color
      * manipulators.
      *
      * @tparam Modifier The type of the modifier to apply to the std::ostream.
@@ -119,12 +132,12 @@ public:
 
     /**
      * Construct a Styler with multiple modifiers. The template modifier types must either be one of
-     * Style or Color, or be an integral type. Integral types are coverted to foreground Color
-     * manipulators.
+     * [Style, Color, Position] or an integral type. Integral types are coverted to foreground Color
+     * Color manipulators.
      *
-     * Any number of Style instances may be used and will be combined in the Styler. Only one
-     * foreground and one background color may be used; if more than one of each is provided, only
-     * the last color provided will take effect.
+     * Any number of Style and Position instances may be used and will be combined in the Styler.
+     * Only one foreground and one background Color instance may be used; if more than one of each
+     * is provided, only the last instance provided will take effect.
      *
      * @tparam Modifier The type of the modifier to apply to the std::ostream.
      * @tparam Modifiers Variadic types of the remaining modifiers to apply to the std::ostream.
@@ -153,9 +166,9 @@ public:
 
 private:
     /**
-     * Store a modifier as either a style or color. The template modifier type must either be one of
-     * Style or Color, or be an integral type. Integral types are coverted to foreground Color
-     * manipulators.
+     * Store a modifier as either a style, color, or position. The template modifier type must
+     * either be one of [Style, Color, Position] or an integral type. Integral types are coverted to
+     * foreground Color manipulators.
      *
      * @tparam Modifier The type of the modifier to apply to the std::ostream.
      *
@@ -167,7 +180,8 @@ private:
         using DecayedModifier = std::decay_t<Modifier>;
 
         static_assert(
-            any_same_v<DecayedModifier, Style, Color> || std::is_integral_v<DecayedModifier>,
+            any_same_v<DecayedModifier, Style, Color, Position> ||
+                std::is_integral_v<DecayedModifier>,
             "Styler can only be constructed with a valid modifier type");
 
         if constexpr (std::is_same_v<DecayedModifier, Style>)
@@ -179,12 +193,17 @@ private:
         {
             m_colors.emplace(std::move(modifier));
         }
+        else if constexpr (std::is_same_v<DecayedModifier, Position>)
+        {
+            m_positions.emplace(std::move(modifier));
+        }
     }
 
     // Store modifier instances in a stack, because the variadic constructor processes parameters
     // from right-to-left (due to the delegating constructor invocation).
     std::stack<Style> m_styles;
     std::stack<Color> m_colors;
+    std::stack<Position> m_positions;
 
     std::unique_ptr<detail::StylerProxy> m_proxy;
 };

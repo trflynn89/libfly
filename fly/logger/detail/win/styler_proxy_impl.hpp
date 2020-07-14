@@ -27,11 +27,13 @@ public:
      * @param stream The stream to manipulate.
      * @param styles The list of styles to apply to the stream.
      * @param colors The list of colors to apply to the stream.
+     * @param positions The list of cursor positions to apply to the stream.
      */
     StylerProxyImpl(
         std::ostream &stream,
         std::stack<Style> &&styles,
-        std::stack<Color> &&colors) noexcept;
+        std::stack<Color> &&colors,
+        std::stack<Position> &&positions) noexcept;
 
     /**
      * Destructor. Reset the stream to its original state.

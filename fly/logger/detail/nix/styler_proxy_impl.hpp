@@ -25,14 +25,16 @@ public:
      * @param stream The stream to manipulate.
      * @param styles The list of styles to apply to the stream.
      * @param colors The list of colors to apply to the stream.
+     * @param positions The list of cursor positions to apply to the stream.
      */
     StylerProxyImpl(
         std::ostream &stream,
         std::stack<Style> &&styles,
-        std::stack<Color> &&colors) noexcept;
+        std::stack<Color> &&colors,
+        std::stack<Position> &&positions) noexcept;
 
     /**
-     * Destructor. Reset the stream to its original state.
+     * Destructor. Reset the stream's style and color to its original state.
      */
     ~StylerProxyImpl() override;
 
@@ -47,7 +49,22 @@ private:
     template <typename Modifier>
     void stream_value(const Modifier &modifier);
 
-    bool m_did_modify_stream;
+    /**
+     * Manipulate the stream with ANSI escape sequences of the provided styles or colors.
+     *
+     * @param styles The list of styles to apply to the stream.
+     * @param colors The list of colors to apply to the stream.
+     */
+    void apply_styles_and_colors(std::stack<Style> &&styles, std::stack<Color> &&colors);
+
+    /**
+     * Manipulate the stream with ANSI escape sequences of the provided cursor positions.
+     *
+     * @param positions The list of cursor positions to apply to the stream.
+     */
+    void apply_positions(std::stack<Position> &&positions);
+
+    bool m_did_apply_style_or_color {false};
 };
 
 } // namespace fly::detail
