@@ -231,6 +231,12 @@ byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size)
 }
 
 //==================================================================================================
+inline void BitStreamReader::discard_bits(byte_type size)
+{
+    m_position -= size;
+}
+
+//==================================================================================================
 template <typename DataType>
 byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes)
 {
