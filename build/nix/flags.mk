@@ -71,9 +71,16 @@ else ifeq ($(toolchain), gcc)
     endif
 endif
 
-# Optimize release builds, and add debug symbols / use address sanitizer for
-# debug builds
-ifeq ($(release), 1)
+# Add profiling symbols for profile builds, optimize release builds, and add debug symbols & use
+# address sanitizer for debug builds.
+ifeq ($(profile), 1)
+    ifeq ($(toolchain), gcc)
+        CF_ALL += -O0 -g -pg
+        LDFLAGS += -pg
+    else
+        $(error Profiling not supported with toolchain $(toolchain), check flags.mk)
+    endif
+else ifeq ($(release), 1)
     CF_ALL += -O2
 else
     CF_ALL += -O0 -g -fsanitize=address -fno-omit-frame-pointer

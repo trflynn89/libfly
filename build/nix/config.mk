@@ -1,7 +1,7 @@
 # Define the default make configuration. Not all defaults are defined here, but
 # all command line options are listed here for convenience.
 
-# Toolchain to compile with
+# Toolchain to compile with (clang or gcc)
 toolchain := clang
 
 # Compile caching system
@@ -9,6 +9,9 @@ cacher :=
 
 # Define debug vs. release
 release := 0
+
+# Enable profiling (gcc only) (takes precedence over release)
+profile := 0
 
 # Build 32-bit or 64-bit target
 arch := $(arch)
@@ -41,7 +44,9 @@ ifneq ($(cacher), )
 endif
 
 # Define the output directories
-ifeq ($(release), 1)
+ifeq ($(profile), 1)
+    OUT_DIR := $(CURDIR)/profile/$(toolchain)/$(arch)
+else ifeq ($(release), 1)
     OUT_DIR := $(CURDIR)/release/$(toolchain)/$(arch)
 else
     OUT_DIR := $(CURDIR)/debug/$(toolchain)/$(arch)

@@ -7,6 +7,7 @@
 .PHONY: clean
 .PHONY: tests
 .PHONY: coverage
+.PHONY: profile
 .PHONY: install
 .PHONY: setup
 .PHONY: style
@@ -50,7 +51,7 @@ tests: $(TEST_BINARIES)
 	done; \
 	exit $$failed
 
-# Create coverage reports
+# Create coverage report
 coverage: report := $(OUT_DIR)/coverage
 coverage:
 ifeq ($(toolchain), clang)
@@ -90,6 +91,28 @@ else ifeq ($(toolchain), gcc)
 
 else
 	$(Q)echo "No coverage rules for toolchain $(toolchain), check build.mk"
+	$(Q)exit 1
+endif
+
+# Create profile report
+profile: report := $(OUT_DIR)/profile
+profile: args :=
+profile: $(TEST_BINARIES)
+ifeq ($(toolchain), gcc)
+	$(Q)failed=0; \
+	for tgt in $(TEST_BINARIES) ; do \
+		$$tgt $(args); \
+		\
+		if [[ $$? -ne 0 ]] ; then \
+			failed=$$((failed+1)); \
+		else \
+			gprof $$tgt > $(report); \
+			$(RM) gmon.out; \
+		fi; \
+	done; \
+	exit $$failed
+else
+	$(Q)echo "No profiling rules for toolchain $(toolchain), check build.mk"
 	$(Q)exit 1
 endif
 
