@@ -58,7 +58,7 @@ protected:
      * @return The created mask.
      */
     template <typename DataType>
-    constexpr inline static DataType bit_mask(const DataType bits);
+    DataType bit_mask(const DataType bits);
 
     std::streambuf *m_stream_buffer;
 
@@ -68,14 +68,14 @@ protected:
 
 //==================================================================================================
 template <typename DataType>
-constexpr inline DataType BitStream::bit_mask(const DataType bits)
+inline DataType BitStream::bit_mask(const DataType bits)
 {
     static_assert(
         BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    constexpr auto filled = std::numeric_limits<DataType>::max();
-    constexpr auto digits = std::numeric_limits<DataType>::digits;
+    static constexpr auto filled = std::numeric_limits<DataType>::max();
+    static constexpr auto digits = std::numeric_limits<DataType>::digits;
 
     return static_cast<DataType>(-(bits != 0)) & (filled >> (digits - bits));
 }

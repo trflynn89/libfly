@@ -469,7 +469,7 @@ TEST_CASE("Huffman", "[coders]")
             REQUIRE(encoder.encode_file(raw, encoded_file));
             REQUIRE(decoder.decode_file(encoded_file, decoded_file));
 
-            CHECK(std::filesystem::file_size(raw) == std::filesystem::file_size(encoded_file));
+            CHECK(std::filesystem::file_size(raw) > std::filesystem::file_size(encoded_file));
             CHECK(fly::test::PathUtil::compare_files(raw, decoded_file));
         }
     }

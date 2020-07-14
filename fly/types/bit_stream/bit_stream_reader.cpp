@@ -40,12 +40,6 @@ bool BitStreamReader::read_byte(byte_type &byte)
 }
 
 //==================================================================================================
-void BitStreamReader::discard_bits(byte_type size)
-{
-    m_position -= size;
-}
-
-//==================================================================================================
 bool BitStreamReader::fully_consumed() const
 {
     if (m_stream_buffer->sgetc() == EOF)
