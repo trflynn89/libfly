@@ -2,6 +2,7 @@
 
 #include "fly/logger/detail/styler_proxy.hpp"
 #include "fly/traits/traits.hpp"
+#include "fly/types/numeric/literals.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -34,17 +35,31 @@ enum class Style : std::uint8_t
  */
 struct Color
 {
-    // List of standard colors for convenience.
-    static constexpr const std::uint8_t Black = 0;
-    static constexpr const std::uint8_t Red = 1;
-    static constexpr const std::uint8_t Green = 2;
-    static constexpr const std::uint8_t Yellow = 3;
-    static constexpr const std::uint8_t Blue = 4;
-    static constexpr const std::uint8_t Magenta = 5;
-    static constexpr const std::uint8_t Cyan = 6;
-    static constexpr const std::uint8_t White = 7;
+    /**
+     * Constants for standard colors.
+     *
+     * On Linux, a color may be any value in the range [0, 255]. While only the 8 standard colors
+     * are listed here, any 8-bit integer value may be cast to a color. The color values correspond
+     * to the ANSI 256-color lookup table: https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit.
+     *
+     * On Windows, the color may only be one of the 8 standard colors listed here.
+     */
+    enum StandardColor
+    {
+        Black,
+        Red,
+        Green,
+        Yellow,
+        Blue,
+        Magenta,
+        Cyan,
+        White,
+    };
 
-    enum class Plane
+    /**
+     * Constants for the plane that should be modified.
+     */
+    enum Plane
     {
         Foreground,
         Background,
@@ -53,21 +68,16 @@ struct Color
     /**
      * Construct a Color as either a foreground or background color.
      *
-     * On Linux, the color may be an integer in the range [0, 255]. The values correspond to the
-     * ANSI 256-color lookup table: https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
-     *
-     * On Windows, the color may only be one of the defined standard colors.
-     *
      * @param color The 256-color value to apply.
-     * @param plane Whether the color should apply as a foreground or background color.
+     * @param plane The plane (default foreground) that should be modified.
      */
-    constexpr Color(std::uint8_t color, Plane plane = Plane::Foreground) noexcept :
-        m_color(static_cast<std::uint8_t>(color)),
+    constexpr Color(StandardColor color, Plane plane = Foreground) noexcept :
+        m_color(color),
         m_plane(plane)
     {
     }
 
-    const std::uint8_t m_color;
+    const StandardColor m_color;
     const Plane m_plane;
 };
 
@@ -76,7 +86,10 @@ struct Color
  */
 struct Cursor
 {
-    enum class Direction
+    /**
+     * Constants for the direction that the cursor should move.
+     */
+    enum Direction
     {
         Up,
         Down,
@@ -99,6 +112,28 @@ struct Cursor
     const Direction m_direction;
     const std::uint8_t m_distance;
 };
+
+inline namespace literals {
+    inline namespace styler_literals {
+
+        /**
+         * Type-safe integer literal suffix to construct a Color as a foreground color. The integer
+         * literal must be in the range [0, 255].
+         *
+         * @tparam Literals The numeric literals from which to construct a 256-color value.
+         *
+         * @return The constructed Color.
+         */
+        template <char... Literals>
+        constexpr inline Color operator"" _c()
+        {
+            // Convert to std::uint8_t via numeric literal to ensure the provided color is valid.
+            const std::uint8_t validated_color = operator"" _u8<Literals...>();
+            return Color(static_cast<Color::StandardColor>(validated_color));
+        }
+
+    } // namespace styler_literals
+} // namespace literals
 
 /**
  * IO manipulator to stylize a std::ostream with style and color. This manipulator allows for
@@ -139,9 +174,9 @@ class Styler
 {
 public:
     /**
-     * Construct a Styler with a single modifier. The template modifier type must either be one of
-     * [Style, Color, Cursor] or an integral type. Integral types are coverted to foreground Color
-     * manipulators.
+     * Construct a Styler with a single modifier. The template modifier type must be one of [Style,
+     * Color, Color::StandardColor, Cursor, Cursor::Direction]. The enumeration [Style are coverted
+     * to their parent structure types.
      *
      * @tparam Modifier The type of the modifier to apply to the std::ostream.
      *
@@ -154,9 +189,9 @@ public:
     }
 
     /**
-     * Construct a Styler with multiple modifiers. The template modifier types must either be one of
-     * [Style, Color, Cursor] or an integral type. Integral types are coverted to foreground Color
-     * Color manipulators.
+     * Construct a Styler with multiple modifiers. The template modifier types must be one of
+     * [Style, Color, Color::StandardColor, Cursor, Cursor::Direction]. The enumeration types are
+     * coverted to their parent structure types.
      *
      * Any number of Style and Cursor instances may be used and will be combined in the Styler. Only
      * one foreground and one background Color instance may be used; if more than one of each is
@@ -190,8 +225,8 @@ public:
 private:
     /**
      * Store a modifier as either a style, color, or position. The template modifier type must
-     * either be one of [Style, Color, Cursor] or an integral type. Integral types are coverted to
-     * foreground Color manipulators.
+     * be one of [Style, Color, Color::StandardColor, Cursor, Cursor::Direction]. The enumeration
+     * types are coverted to their parent structure types.
      *
      * @tparam Modifier The type of the modifier to apply to the std::ostream.
      *
@@ -203,16 +238,20 @@ private:
         using DecayedModifier = std::decay_t<Modifier>;
 
         static_assert(
-            any_same_v<DecayedModifier, Style, Color, Cursor, Cursor::Direction> ||
-                std::is_integral_v<DecayedModifier>,
+            any_same_v<
+                DecayedModifier,
+                Style,
+                Color,
+                Color::StandardColor,
+                Cursor,
+                Cursor::Direction>,
             "Styler can only be constructed with a valid modifier type");
 
         if constexpr (std::is_same_v<DecayedModifier, Style>)
         {
             m_styles.emplace(std::move(modifier));
         }
-        else if constexpr (
-            std::is_same_v<DecayedModifier, Color> || std::is_integral_v<DecayedModifier>)
+        else if constexpr (any_same_v<DecayedModifier, Color, Color::StandardColor>)
         {
             m_colors.emplace(std::move(modifier));
         }
