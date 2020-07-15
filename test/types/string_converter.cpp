@@ -7,6 +7,8 @@
 #include <string>
 #include <type_traits>
 
+using namespace fly::literals::numeric_literals;
+
 namespace {
 
 template <typename StringType, typename T>

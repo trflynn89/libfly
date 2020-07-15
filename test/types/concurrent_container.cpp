@@ -11,6 +11,8 @@
 #include <type_traits>
 #include <vector>
 
+using namespace fly::literals::numeric_literals;
+
 TEMPLATE_PRODUCT_TEST_CASE(
     "ConcurrentContainer",
     "[concurrency]",
