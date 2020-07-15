@@ -15,6 +15,8 @@
 #include <memory>
 #include <string>
 
+using namespace fly::literals::numeric_literals;
+
 namespace {
 
 /**

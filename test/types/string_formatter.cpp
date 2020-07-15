@@ -7,6 +7,8 @@
 
 #include <limits>
 
+using namespace fly::literals::numeric_literals;
+
 TEMPLATE_TEST_CASE(
     "BasicStringFormatter",
     "[string]",

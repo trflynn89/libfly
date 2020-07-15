@@ -8,6 +8,8 @@
 #include <limits>
 #include <sstream>
 
+using namespace fly::literals::numeric_literals;
+
 TEST_CASE("BitStream", "[bit_stream]")
 {
     std::istringstream input_stream(std::ios::in | std::ios::binary);

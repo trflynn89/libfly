@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <type_traits>
 
+using namespace fly::literals::numeric_literals;
+
 TEST_CASE("Literals", "[numeric]")
 {
     SECTION("Signed 8-bit integer literals")

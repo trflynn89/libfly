@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+using namespace fly::literals::numeric_literals;
+
 namespace {
 
 /**

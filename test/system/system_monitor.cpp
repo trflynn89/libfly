@@ -18,6 +18,8 @@
 
 #include "test/util/waitable_task_runner.hpp"
 
+using namespace fly::literals::numeric_literals;
+
 namespace {
 
 /**

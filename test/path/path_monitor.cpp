@@ -21,6 +21,8 @@
 #include "test/util/path_util.hpp"
 #include "test/util/waitable_task_runner.hpp"
 
+using namespace fly::literals::numeric_literals;
+
 namespace {
 
 std::chrono::seconds s_wait_time(5);
