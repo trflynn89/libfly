@@ -41,7 +41,7 @@ public:
         // ConsoleReporter prints a second newline above, so go up one line before logging the time.
         stream << fly::Styler(fly::Position::CursorUp, fly::Style::Bold, fly::Color::Cyan)
                << "Total time ";
-        stream << fly::String::format("%f seconds", duration.count()) << '\n';
+        stream << fly::String::format("%f seconds", duration.count()) << "\n\n";
     }
 
     void testCaseStarting(const Catch::TestCaseInfo &info) override

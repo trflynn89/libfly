@@ -36,7 +36,7 @@ public:
         std::stack<Position> &&positions) noexcept;
 
     /**
-     * Destructor. Reset the stream to its original state.
+     * Destructor. Reset the stream's style and color to its original state.
      */
     ~StylerProxyImpl() override;
 
@@ -44,16 +44,41 @@ private:
     /**
      * Apply a modifier value as a bitmask to a set of modifier attributes.
      *
+     * @tparam Attributes The type of the bitmask to modify.
      * @tparam Modifier The type of the modifier to apply.
      *
      * @param attributes The bitmask to apply the modifier to.
      * @param modifier The modifier to apply.
      */
-    template <typename Modifier>
-    void apply_value(WORD &attributes, const Modifier &modifier);
+    template <typename Attributes, typename Modifier>
+    void apply_value(Attributes &attributes, const Modifier &modifier);
 
-    HANDLE m_handle;
-    WORD m_original_attributes;
+    /**
+     * Apply the provided styles or colors to the stream.
+     *
+     * @param console_info Structure holding the current information about the console screen.
+     * @param styles The list of styles to apply to the stream.
+     * @param colors The list of colors to apply to the stream.
+     */
+    void apply_styles_and_colors(
+        const CONSOLE_SCREEN_BUFFER_INFO &console_info,
+        std::stack<Style> &&styles,
+        std::stack<Color> &&colors);
+
+    /**
+     * Apply the provided cursor positions to the stream.
+     *
+     * @param console_info Structure holding the current information about the console screen.
+     * @param positions The list of cursor positions to apply to the stream.
+     */
+    void apply_positions(
+        const CONSOLE_SCREEN_BUFFER_INFO &console_info,
+        std::stack<Position> &&positions);
+
+    HANDLE m_handle {INVALID_HANDLE_VALUE};
+    WORD m_original_attributes {0};
+
+    bool m_did_apply_style_or_color {false};
 };
 
 } // namespace fly::detail
