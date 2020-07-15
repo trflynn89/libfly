@@ -124,16 +124,16 @@ void StylerProxyImpl::apply_value<COORD, Position>(COORD &attributes, const Posi
 {
     switch (modifier)
     {
-        case Position::CursorUp:
+        case Position::Up:
             attributes.Y -= attributes.Y > 0 ? 1 : 0;
             break;
-        case Position::CursorDown:
+        case Position::Down:
             attributes.Y += 1;
             break;
-        case Position::CursorForward:
+        case Position::Forward:
             attributes.X += 1;
             break;
-        case Position::CursorBackward:
+        case Position::Backward:
             attributes.X -= attributes.X > 0 ? 1 : 0;
             break;
     }

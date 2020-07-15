@@ -106,16 +106,16 @@ void StylerProxyImpl::stream_value<Position>(const Position &modifier)
 
     switch (modifier)
     {
-        case Position::CursorUp:
+        case Position::Up:
             m_stream << 'A';
             break;
-        case Position::CursorDown:
+        case Position::Down:
             m_stream << 'B';
             break;
-        case Position::CursorForward:
+        case Position::Forward:
             m_stream << 'C';
             break;
-        case Position::CursorBackward:
+        case Position::Backward:
             m_stream << 'D';
             break;
     }

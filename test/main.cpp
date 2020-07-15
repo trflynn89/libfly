@@ -39,7 +39,7 @@ public:
         const auto duration = std::chrono::duration<double>(end - m_test_start);
 
         // ConsoleReporter prints a second newline above, so go up one line before logging the time.
-        stream << fly::Styler(fly::Position::CursorUp, fly::Style::Bold, fly::Color::Cyan)
+        stream << fly::Styler(fly::Position::Up, fly::Style::Bold, fly::Color::Cyan)
                << "Total time ";
         stream << fly::String::format("%f seconds", duration.count()) << "\n\n";
     }
