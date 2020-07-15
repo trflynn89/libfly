@@ -75,7 +75,7 @@ void StylerProxyImpl::apply_value<WORD, Color>(WORD &attributes, const Color &mo
 {
     // https://docs.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes
     auto apply_color = [&attributes, &modifier](bool red, bool green, bool blue) {
-        if (modifier.m_plane == Color::Plane::Foreground)
+        if (modifier.m_plane == Color::Foreground)
         {
             attributes = red ? (attributes | FOREGROUND_RED) : (attributes & ~FOREGROUND_RED);
             attributes = green ? (attributes | FOREGROUND_GREEN) : (attributes & ~FOREGROUND_GREEN);
@@ -126,16 +126,16 @@ void StylerProxyImpl::apply_value<COORD, Cursor>(COORD &attributes, const Cursor
 
     switch (modifier.m_direction)
     {
-        case Cursor::Direction::Up:
+        case Cursor::Up:
             attributes.Y = (attributes.Y > distance) ? (attributes.Y - distance) : 0;
             break;
-        case Cursor::Direction::Down:
+        case Cursor::Down:
             attributes.Y += distance;
             break;
-        case Cursor::Direction::Forward:
+        case Cursor::Forward:
             attributes.X += distance;
             break;
-        case Cursor::Direction::Backward:
+        case Cursor::Backward:
             attributes.X = (attributes.X > distance) ? (attributes.X - distance) : 0;
             break;
     }

@@ -72,7 +72,7 @@ void StylerProxyImpl::stream_value<Color>(const Color &modifier)
     if (modifier.m_color <= Color::White)
     {
         // https://en.wikipedia.org/wiki/ANSI_escape_code#3/4_bit
-        if (modifier.m_plane == Color::Plane::Foreground)
+        if (modifier.m_plane == Color::Foreground)
         {
             m_stream << "3";
         }
@@ -84,7 +84,7 @@ void StylerProxyImpl::stream_value<Color>(const Color &modifier)
     else
     {
         // https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
-        if (modifier.m_plane == Color::Plane::Foreground)
+        if (modifier.m_plane == Color::Foreground)
         {
             m_stream << "38;5;";
         }
@@ -106,16 +106,16 @@ void StylerProxyImpl::stream_value<Cursor>(const Cursor &modifier)
 
     switch (modifier.m_direction)
     {
-        case Cursor::Direction::Up:
+        case Cursor::Up:
             m_stream << 'A';
             break;
-        case Cursor::Direction::Down:
+        case Cursor::Down:
             m_stream << 'B';
             break;
-        case Cursor::Direction::Forward:
+        case Cursor::Forward:
             m_stream << 'C';
             break;
-        case Cursor::Direction::Backward:
+        case Cursor::Backward:
             m_stream << 'D';
             break;
     }
