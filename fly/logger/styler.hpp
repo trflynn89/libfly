@@ -15,7 +15,8 @@ namespace fly {
 /**
  * Constants to modify the style of a std::ostream.
  *
- * Note: Windows only supports Bold and Underline.
+ * Note: Windows only supports Bold and Underline, and Bold can more accurately be interpreted as
+ * higher intensity color.
  */
 enum class Style : std::uint8_t
 {
@@ -71,10 +72,10 @@ struct Color
  */
 enum class Position
 {
-    CursorUp,
-    CursorDown,
-    CursorForward,
-    CursorBackward,
+    Up,
+    Down,
+    Forward,
+    Backward,
 };
 
 /**
