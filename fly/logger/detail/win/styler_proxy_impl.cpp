@@ -7,7 +7,7 @@ StylerProxyImpl::StylerProxyImpl(
     std::ostream &stream,
     std::stack<Style> &&styles,
     std::stack<Color> &&colors,
-    std::stack<Position> &&positions) noexcept :
+    std::stack<Cursor> &&cursors) noexcept :
     StylerProxy(stream)
 {
     if (m_stream_is_stdout)
@@ -36,9 +36,9 @@ StylerProxyImpl::StylerProxyImpl(
         apply_styles_and_colors(console_info, std::move(styles), std::move(colors));
     }
 
-    if (!positions.empty())
+    if (!cursors.empty())
     {
-        apply_positions(console_info, std::move(positions));
+        apply_cursors(console_info, std::move(cursors));
     }
 }
 
@@ -120,21 +120,23 @@ void StylerProxyImpl::apply_value<WORD, Color>(WORD &attributes, const Color &mo
 
 //==================================================================================================
 template <>
-void StylerProxyImpl::apply_value<COORD, Position>(COORD &attributes, const Position &modifier)
+void StylerProxyImpl::apply_value<COORD, Cursor>(COORD &attributes, const Cursor &modifier)
 {
-    switch (modifier)
+    const std::uint8_t &distance = modifier.m_distance;
+
+    switch (modifier.m_direction)
     {
-        case Position::Up:
-            attributes.Y -= attributes.Y > 0 ? 1 : 0;
+        case Cursor::Direction::Up:
+            attributes.Y = (attributes.Y > distance) ? (attributes.Y - distance) : 0;
             break;
-        case Position::Down:
-            attributes.Y += 1;
+        case Cursor::Direction::Down:
+            attributes.Y += distance;
             break;
-        case Position::Forward:
-            attributes.X += 1;
+        case Cursor::Direction::Forward:
+            attributes.X += distance;
             break;
-        case Position::Backward:
-            attributes.X -= attributes.X > 0 ? 1 : 0;
+        case Cursor::Direction::Backward:
+            attributes.X = (attributes.X > distance) ? (attributes.X - distance) : 0;
             break;
     }
 }
@@ -162,15 +164,15 @@ void StylerProxyImpl::apply_styles_and_colors(
 }
 
 //==================================================================================================
-void StylerProxyImpl::apply_positions(
+void StylerProxyImpl::apply_cursors(
     const CONSOLE_SCREEN_BUFFER_INFO &console_info,
-    std::stack<Position> &&positions)
+    std::stack<Cursor> &&cursors)
 {
     COORD cursor_position = console_info.dwCursorPosition;
 
-    for (; !positions.empty(); positions.pop())
+    for (; !cursors.empty(); cursors.pop())
     {
-        apply_value(cursor_position, positions.top());
+        apply_value(cursor_position, cursors.top());
     }
 
     ::SetConsoleCursorPosition(m_handle, cursor_position);

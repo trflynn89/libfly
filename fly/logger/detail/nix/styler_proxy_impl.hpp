@@ -25,13 +25,13 @@ public:
      * @param stream The stream to manipulate.
      * @param styles The list of styles to apply to the stream.
      * @param colors The list of colors to apply to the stream.
-     * @param positions The list of cursor positions to apply to the stream.
+     * @param cursors The list of cursor positions to apply to the stream.
      */
     StylerProxyImpl(
         std::ostream &stream,
         std::stack<Style> &&styles,
         std::stack<Color> &&colors,
-        std::stack<Position> &&positions) noexcept;
+        std::stack<Cursor> &&cursors) noexcept;
 
     /**
      * Destructor. Reset the stream's style and color to its original state.
@@ -50,7 +50,7 @@ private:
     void stream_value(const Modifier &modifier);
 
     /**
-     * Manipulate the stream with ANSI escape sequences of the provided styles or colors.
+     * Manipulate the stream with ANSI escape sequences of the provided styles and colors.
      *
      * @param styles The list of styles to apply to the stream.
      * @param colors The list of colors to apply to the stream.
@@ -60,9 +60,9 @@ private:
     /**
      * Manipulate the stream with ANSI escape sequences of the provided cursor positions.
      *
-     * @param positions The list of cursor positions to apply to the stream.
+     * @param cursors The list of cursor positions to apply to the stream.
      */
-    void apply_positions(std::stack<Position> &&positions);
+    void apply_cursors(std::stack<Cursor> &&cursors);
 
     bool m_did_apply_style_or_color {false};
 };

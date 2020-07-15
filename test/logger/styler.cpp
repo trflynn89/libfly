@@ -168,32 +168,48 @@ TEST_CASE("Styler", "[logger]")
 
     SECTION("Manipulate with a single cursor position")
     {
-        test_styler("\x1b[A", fly::Position::Up);
-        test_styler("\x1b[B", fly::Position::Down);
-        test_styler("\x1b[C", fly::Position::Forward);
-        test_styler("\x1b[D", fly::Position::Backward);
+        test_styler("\x1b[1A", fly::Cursor::Direction::Up);
+        test_styler("\x1b[1B", fly::Cursor::Direction::Down);
+        test_styler("\x1b[1C", fly::Cursor::Direction::Forward);
+        test_styler("\x1b[1D", fly::Cursor::Direction::Backward);
+    }
+
+    SECTION("Manipulate with a single cursor position with explicit distance")
+    {
+        test_styler("\x1b[2A", fly::Cursor(fly::Cursor::Direction::Up, 2));
+        test_styler("\x1b[3B", fly::Cursor(fly::Cursor::Direction::Down, 3));
+        test_styler("\x1b[4C", fly::Cursor(fly::Cursor::Direction::Forward, 4));
+        test_styler("\x1b[5D", fly::Cursor(fly::Cursor::Direction::Backward, 5));
+    }
+
+    SECTION("Manipulate with a single cursor position with distance 0 becomes distance 1")
+    {
+        test_styler("\x1b[1A", fly::Cursor(fly::Cursor::Direction::Up, 0));
+        test_styler("\x1b[1B", fly::Cursor(fly::Cursor::Direction::Down, 0));
+        test_styler("\x1b[1C", fly::Cursor(fly::Cursor::Direction::Forward, 0));
+        test_styler("\x1b[1D", fly::Cursor(fly::Cursor::Direction::Backward, 0));
     }
 
     SECTION("Manipulate with multiple cursor positions")
     {
-        test_styler("\x1b[A\x1b[B", fly::Position::Up, fly::Position::Down);
+        test_styler("\x1b[1A\x1b[1B", fly::Cursor::Direction::Up, fly::Cursor::Direction::Down);
         test_styler(
-            "\x1b[A\x1b[B\x1b[C",
-            fly::Position::Up,
-            fly::Position::Down,
-            fly::Position::Forward);
+            "\x1b[1A\x1b[1B\x1b[1C",
+            fly::Cursor::Direction::Up,
+            fly::Cursor::Direction::Down,
+            fly::Cursor::Direction::Forward);
         test_styler(
-            "\x1b[A\x1b[B\x1b[C\x1b[D",
-            fly::Position::Up,
-            fly::Position::Down,
-            fly::Position::Forward,
-            fly::Position::Backward);
+            "\x1b[1A\x1b[1B\x1b[1C\x1b[1D",
+            fly::Cursor::Direction::Up,
+            fly::Cursor::Direction::Down,
+            fly::Cursor::Direction::Forward,
+            fly::Cursor::Direction::Backward);
         test_styler(
-            "\x1b[D\x1b[C\x1b[B\x1b[A",
-            fly::Position::Backward,
-            fly::Position::Forward,
-            fly::Position::Down,
-            fly::Position::Up);
+            "\x1b[1D\x1b[1C\x1b[1B\x1b[1A",
+            fly::Cursor::Direction::Backward,
+            fly::Cursor::Direction::Forward,
+            fly::Cursor::Direction::Down,
+            fly::Cursor::Direction::Up);
     }
 
     SECTION("Manipulate with styles and colors")
@@ -231,8 +247,16 @@ TEST_CASE("Styler", "[logger]")
         test_styler("\x1b[1;9;31m", fly::Style::Bold, fly::Color::Red, fly::Style::Strike);
         test_styler("\x1b[1;9;31m", fly::Color::Red, fly::Style::Bold, fly::Style::Strike);
 
-        test_styler("\x1b[1;31m\x1b[A", fly::Style::Bold, fly::Color::Red, fly::Position::Up);
-        test_styler("\x1b[1;31m\x1b[A", fly::Position::Up, fly::Color::Red, fly::Style::Bold);
+        test_styler(
+            "\x1b[1;31m\x1b[1A",
+            fly::Style::Bold,
+            fly::Color::Red,
+            fly::Cursor::Direction::Up);
+        test_styler(
+            "\x1b[1;31m\x1b[1A",
+            fly::Cursor::Direction::Up,
+            fly::Color::Red,
+            fly::Style::Bold);
 
         test_styler(
             "\x1b[1;31;40m",

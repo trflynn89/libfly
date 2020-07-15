@@ -35,14 +35,14 @@ enum class Style : std::uint8_t
 struct Color
 {
     // List of standard colors for convenience.
-    static constexpr std::uint8_t Black = 0;
-    static constexpr std::uint8_t Red = 1;
-    static constexpr std::uint8_t Green = 2;
-    static constexpr std::uint8_t Yellow = 3;
-    static constexpr std::uint8_t Blue = 4;
-    static constexpr std::uint8_t Magenta = 5;
-    static constexpr std::uint8_t Cyan = 6;
-    static constexpr std::uint8_t White = 7;
+    static constexpr const std::uint8_t Black = 0;
+    static constexpr const std::uint8_t Red = 1;
+    static constexpr const std::uint8_t Green = 2;
+    static constexpr const std::uint8_t Yellow = 3;
+    static constexpr const std::uint8_t Blue = 4;
+    static constexpr const std::uint8_t Magenta = 5;
+    static constexpr const std::uint8_t Cyan = 6;
+    static constexpr const std::uint8_t White = 7;
 
     enum class Plane
     {
@@ -61,21 +61,43 @@ struct Color
      * @param color The 256-color value to apply.
      * @param plane Whether the color should apply as a foreground or background color.
      */
-    Color(std::uint8_t color, Plane plane = Plane::Foreground) noexcept;
+    constexpr Color(std::uint8_t color, Plane plane = Plane::Foreground) noexcept :
+        m_color(static_cast<std::uint8_t>(color)),
+        m_plane(plane)
+    {
+    }
 
     const std::uint8_t m_color;
     const Plane m_plane;
 };
 
 /**
- * Constants to modify the cursor position of a std::ostream.
+ * Struct to modify the cursor position within a std::ostream.
  */
-enum class Position
+struct Cursor
 {
-    Up,
-    Down,
-    Forward,
-    Backward,
+    enum class Direction
+    {
+        Up,
+        Down,
+        Forward,
+        Backward,
+    };
+
+    /**
+     * Construct a Cursor instance with a direction and distance.
+     *
+     * @param direction The direction to move the cursor.
+     * @param distance The distance to move the cursor.
+     */
+    constexpr Cursor(Direction direction, std::uint8_t distance = 1) noexcept :
+        m_direction(direction),
+        m_distance(distance > 0 ? distance : 1)
+    {
+    }
+
+    const Direction m_direction;
+    const std::uint8_t m_distance;
 };
 
 /**
@@ -118,7 +140,7 @@ class Styler
 public:
     /**
      * Construct a Styler with a single modifier. The template modifier type must either be one of
-     * [Style, Color, Position] or an integral type. Integral types are coverted to foreground Color
+     * [Style, Color, Cursor] or an integral type. Integral types are coverted to foreground Color
      * manipulators.
      *
      * @tparam Modifier The type of the modifier to apply to the std::ostream.
@@ -133,12 +155,12 @@ public:
 
     /**
      * Construct a Styler with multiple modifiers. The template modifier types must either be one of
-     * [Style, Color, Position] or an integral type. Integral types are coverted to foreground Color
+     * [Style, Color, Cursor] or an integral type. Integral types are coverted to foreground Color
      * Color manipulators.
      *
-     * Any number of Style and Position instances may be used and will be combined in the Styler.
-     * Only one foreground and one background Color instance may be used; if more than one of each
-     * is provided, only the last instance provided will take effect.
+     * Any number of Style and Cursor instances may be used and will be combined in the Styler. Only
+     * one foreground and one background Color instance may be used; if more than one of each is
+     * provided, only the last instance provided will take effect.
      *
      * @tparam Modifier The type of the modifier to apply to the std::ostream.
      * @tparam Modifiers Variadic types of the remaining modifiers to apply to the std::ostream.
@@ -168,7 +190,7 @@ public:
 private:
     /**
      * Store a modifier as either a style, color, or position. The template modifier type must
-     * either be one of [Style, Color, Position] or an integral type. Integral types are coverted to
+     * either be one of [Style, Color, Cursor] or an integral type. Integral types are coverted to
      * foreground Color manipulators.
      *
      * @tparam Modifier The type of the modifier to apply to the std::ostream.
@@ -181,7 +203,7 @@ private:
         using DecayedModifier = std::decay_t<Modifier>;
 
         static_assert(
-            any_same_v<DecayedModifier, Style, Color, Position> ||
+            any_same_v<DecayedModifier, Style, Color, Cursor, Cursor::Direction> ||
                 std::is_integral_v<DecayedModifier>,
             "Styler can only be constructed with a valid modifier type");
 
@@ -194,17 +216,17 @@ private:
         {
             m_colors.emplace(std::move(modifier));
         }
-        else if constexpr (std::is_same_v<DecayedModifier, Position>)
+        else if constexpr (any_same_v<DecayedModifier, Cursor, Cursor::Direction>)
         {
-            m_positions.emplace(std::move(modifier));
+            m_cursors.emplace(std::move(modifier));
         }
     }
 
-    // Store modifier instances in a stack, because the variadic constructor processes parameters
+    // Store modifier instances in a stack because the variadic constructor processes parameters
     // from right-to-left (due to the delegating constructor invocation).
     std::stack<Style> m_styles;
     std::stack<Color> m_colors;
-    std::stack<Position> m_positions;
+    std::stack<Cursor> m_cursors;
 
     std::unique_ptr<detail::StylerProxy> m_proxy;
 };

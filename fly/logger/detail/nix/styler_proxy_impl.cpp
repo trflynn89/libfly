@@ -7,7 +7,7 @@ StylerProxyImpl::StylerProxyImpl(
     std::ostream &stream,
     std::stack<Style> &&styles,
     std::stack<Color> &&colors,
-    std::stack<Position> &&positions) noexcept :
+    std::stack<Cursor> &&cursors) noexcept :
     StylerProxy(stream)
 {
     if (m_stream_is_stdout || m_stream_is_stderr)
@@ -18,9 +18,9 @@ StylerProxyImpl::StylerProxyImpl(
             m_did_apply_style_or_color = true;
         }
 
-        if (!positions.empty())
+        if (!cursors.empty())
         {
-            apply_positions(std::move(positions));
+            apply_cursors(std::move(cursors));
         }
     }
 }
@@ -99,23 +99,23 @@ void StylerProxyImpl::stream_value<Color>(const Color &modifier)
 
 //==================================================================================================
 template <>
-void StylerProxyImpl::stream_value<Position>(const Position &modifier)
+void StylerProxyImpl::stream_value<Cursor>(const Cursor &modifier)
 {
     // https://en.wikipedia.org/wiki/ANSI_escape_code#Terminal_output_sequences
-    m_stream << "\x1b[";
+    m_stream << "\x1b[" << static_cast<std::uint32_t>(modifier.m_distance);
 
-    switch (modifier)
+    switch (modifier.m_direction)
     {
-        case Position::Up:
+        case Cursor::Direction::Up:
             m_stream << 'A';
             break;
-        case Position::Down:
+        case Cursor::Direction::Down:
             m_stream << 'B';
             break;
-        case Position::Forward:
+        case Cursor::Direction::Forward:
             m_stream << 'C';
             break;
-        case Position::Backward:
+        case Cursor::Direction::Backward:
             m_stream << 'D';
             break;
     }
@@ -154,11 +154,11 @@ void StylerProxyImpl::apply_styles_and_colors(
 }
 
 //==================================================================================================
-void StylerProxyImpl::apply_positions(std::stack<Position> &&positions)
+void StylerProxyImpl::apply_cursors(std::stack<Cursor> &&cursors)
 {
-    for (; !positions.empty(); positions.pop())
+    for (; !cursors.empty(); cursors.pop())
     {
-        stream_value(positions.top());
+        stream_value(cursors.top());
     }
 }
 
