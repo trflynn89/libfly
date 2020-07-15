@@ -10,13 +10,6 @@
 namespace fly {
 
 //==================================================================================================
-Color::Color(std::uint8_t color, Plane plane) noexcept :
-    m_color(static_cast<std::uint8_t>(color)),
-    m_plane(plane)
-{
-}
-
-//==================================================================================================
 detail::StylerProxy &operator<<(std::ostream &stream, const Styler &styler)
 {
     // The input styler parameter must be const in order to allow inline streaming of Styler
@@ -27,7 +20,7 @@ detail::StylerProxy &operator<<(std::ostream &stream, const Styler &styler)
         stream,
         std::move(mutable_styler.m_styles),
         std::move(mutable_styler.m_colors),
-        std::move(mutable_styler.m_positions));
+        std::move(mutable_styler.m_cursors));
 
     return *(styler.m_proxy);
 }

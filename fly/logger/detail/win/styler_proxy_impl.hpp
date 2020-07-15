@@ -27,13 +27,13 @@ public:
      * @param stream The stream to manipulate.
      * @param styles The list of styles to apply to the stream.
      * @param colors The list of colors to apply to the stream.
-     * @param positions The list of cursor positions to apply to the stream.
+     * @param cursors The list of cursor positions to apply to the stream.
      */
     StylerProxyImpl(
         std::ostream &stream,
         std::stack<Style> &&styles,
         std::stack<Color> &&colors,
-        std::stack<Position> &&positions) noexcept;
+        std::stack<Cursor> &&cursors) noexcept;
 
     /**
      * Destructor. Reset the stream's style and color to its original state.
@@ -54,7 +54,7 @@ private:
     void apply_value(Attributes &attributes, const Modifier &modifier);
 
     /**
-     * Apply the provided styles or colors to the stream.
+     * Apply the provided styles and colors to the stream.
      *
      * @param console_info Structure holding the current information about the console screen.
      * @param styles The list of styles to apply to the stream.
@@ -69,11 +69,10 @@ private:
      * Apply the provided cursor positions to the stream.
      *
      * @param console_info Structure holding the current information about the console screen.
-     * @param positions The list of cursor positions to apply to the stream.
+     * @param cursors The list of cursor positions to apply to the stream.
      */
-    void apply_positions(
-        const CONSOLE_SCREEN_BUFFER_INFO &console_info,
-        std::stack<Position> &&positions);
+    void
+    apply_cursors(const CONSOLE_SCREEN_BUFFER_INFO &console_info, std::stack<Cursor> &&cursors);
 
     HANDLE m_handle {INVALID_HANDLE_VALUE};
     WORD m_original_attributes {0};
