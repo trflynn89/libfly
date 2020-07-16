@@ -4,7 +4,9 @@
 
 #include <sys/inotify.h>
 
+#include <array>
 #include <chrono>
+#include <cstdint>
 #include <filesystem>
 #include <memory>
 
@@ -77,7 +79,7 @@ private:
      *
      * @return True if any events were read.
      */
-    bool read_events() const;
+    bool read_events();
 
     /**
      * Handle a single inotify event. Find a monitored path that corresponds
@@ -94,6 +96,13 @@ private:
      * @return A PathEvent that matches the event mask.
      */
     PathMonitor::PathEvent convert_to_event(std::uint32_t mask) const;
+
+    // Notes from INOTIFY(7) man page:
+    //
+    //     Some systems cannot read integer variables if they are not properly aligned. On other
+    //     systems, incorrect alignment may decrease performance. Hence, the buffer used for reading
+    //     from the inotify file descriptor should have the same alignment as inotify_event.
+    alignas(alignof(inotify_event)) std::array<std::uint8_t, 4 << 10> m_event_data;
 
     int m_monitor_descriptor;
 };

@@ -88,16 +88,9 @@ PathMonitorImpl::create_path_info(const std::filesystem::path &path) const
 }
 
 //==================================================================================================
-bool PathMonitorImpl::read_events() const
+bool PathMonitorImpl::read_events()
 {
-    static constexpr const std::size_t s_event_size = sizeof(inotify_event);
-
-    // Some systems cannot read integer variables if they are not properly aligned. On other
-    // systems, incorrect alignment may decrease performance. Hence, the buffer used for reading
-    // from the inotify file descriptor should have the same alignment as inotify_event.
-    char buff[8 << 10] __attribute__((aligned(__alignof__(inotify_event))));
-
-    ssize_t size = ::read(m_monitor_descriptor, buff, sizeof(buff));
+    ssize_t size = ::read(m_monitor_descriptor, m_event_data.data(), m_event_data.size());
 
     if (size <= 0)
     {
@@ -110,9 +103,11 @@ bool PathMonitorImpl::read_events() const
     {
         const inotify_event *event;
 
-        for (char *ptr = buff; ptr < buff + size; ptr += s_event_size + event->len)
+        for (std::uint8_t *event_data = m_event_data.data();
+             event_data < (m_event_data.data() + size);
+             event_data += sizeof(inotify_event) + event->len)
         {
-            event = reinterpret_cast<inotify_event *>(ptr);
+            event = reinterpret_cast<inotify_event *>(event_data);
 
             if (event->len > 0)
             {
