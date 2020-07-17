@@ -387,7 +387,7 @@ TEST_CASE("Huffman", "[coders]")
         CHECK(raw == dec);
     }
 
-    SECTION("Limit code lengths to a small value and validate the Kraft–McMillan inequality")
+    SECTION("Limit code lengths to a small value and validate the Kraft-McMillan inequality")
     {
         const std::string raw = "abcdefabcbbb";
         std::string enc, dec;
