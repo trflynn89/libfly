@@ -121,7 +121,7 @@ private:
 
     /**
      * Length-limit the generated Huffman codes to a static maximum size, using a method described
-     * in Charles Bloom's blog, which is based around the Kraft–McMillan inequality:
+     * in Charles Bloom's blog, which is based around the Kraft-McMillan inequality:
      *
      * https://cbloomrants.blogspot.com/2010/07/07-03-10-length-limitted-huffman-codes.html
      */

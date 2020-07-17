@@ -26,10 +26,10 @@ public:
     HuffmanDecoder() noexcept;
 
     /**
-     * Compute the Kraft–McMillan constant of the decoded Huffman codes. Primarily meant for unit
+     * Compute the Kraft-McMillan constant of the decoded Huffman codes. Primarily meant for unit
      * testing.
      *
-     * @return The Kraft–McMillan constant.
+     * @return The Kraft-McMillan constant.
      */
     code_type compute_kraft_mcmillan_constant() const;
 

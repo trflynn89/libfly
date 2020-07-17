@@ -190,7 +190,7 @@ void HuffmanEncoder::limit_code_lengths()
     code_type kraft = 0;
 
     // Limit all Huffman codes to not be larger than the maximum code length. Compute the Kraft
-    // number, which will no longer satisfy the Kraft–McMillan inequality.
+    // number, which will no longer satisfy the Kraft-McMillan inequality.
     for (std::uint16_t i = 0; i < m_huffman_codes_size; ++i)
     {
         HuffmanCode &code = m_huffman_codes[i];
@@ -199,7 +199,7 @@ void HuffmanEncoder::limit_code_lengths()
         kraft += compute_kraft(code);
     }
 
-    // The code lengths must now be corrected to satisfy the Kraft–McMillan inequality. Starting
+    // The code lengths must now be corrected to satisfy the Kraft-McMillan inequality. Starting
     // from the largest code, increase the code lengths until the inequality is satisfied again.
     for (std::uint16_t i = m_huffman_codes_size; (i-- > 0) && (kraft > max_allowed_kraft);)
     {
@@ -212,7 +212,7 @@ void HuffmanEncoder::limit_code_lengths()
         }
     }
 
-    // The Kraft–McMillan inequality is now satisfied, but possibly overly so. Starting from the
+    // The Kraft-McMillan inequality is now satisfied, but possibly overly so. Starting from the
     // shortest code, decrease code lengths just until the inequality would no longer be satisfied.
     for (std::uint16_t i = 0; i < m_huffman_codes_size; ++i)
     {
