@@ -30,7 +30,7 @@ public:
     length_type huffman_encoder_max_code_length() const;
 
 protected:
-    std::uint16_t m_default_huffman_encoder_chunk_size_kb {1 << 10};
+    std::uint16_t m_default_huffman_encoder_chunk_size_kb {256};
     length_type m_default_huffman_encoder_max_code_length {11};
 };
 
