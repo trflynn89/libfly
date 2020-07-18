@@ -47,9 +47,11 @@ CF_ALL += \
     \
     -pedantic
 
+ifeq ($(profile), 0)
 ifeq ($(release), 0)
     CF_ALL += \
         -Winline
+endif
 endif
 
 ifeq ($(toolchain), clang)
@@ -64,10 +66,12 @@ else ifeq ($(toolchain), gcc)
         -Wsign-promo \
         -Wsuggest-override
 
+    ifeq ($(profile), 0)
     ifeq ($(release), 0)
         CF_ALL += \
             -Wsuggest-final-methods \
             -Wsuggest-final-types
+    endif
     endif
 endif
 
@@ -75,7 +79,7 @@ endif
 # address sanitizer for debug builds.
 ifeq ($(profile), 1)
     ifeq ($(toolchain), gcc)
-        CF_ALL += -O0 -g -pg
+        CF_ALL += -O2 -g -pg
         LDFLAGS += -pg
     else
         $(error Profiling not supported with toolchain $(toolchain), check flags.mk)
