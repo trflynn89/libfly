@@ -745,9 +745,15 @@ Json::Json(const T &value) noexcept(false) : m_value(JsonTraits::object_type())
 
 //==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_array<T>>>
-Json::Json(const T &value) noexcept(false) :
-    m_value(JsonTraits::array_type(value.begin(), value.end()))
+Json::Json(const T &value) noexcept(false) : m_value(JsonTraits::array_type())
 {
+    auto &storage = std::get<JsonTraits::array_type>(m_value);
+
+    for (const auto &it : value)
+    {
+        auto copy = static_cast<typename T::value_type>(it);
+        JsonTraits::ArrayTraits::append(storage, std::move(copy));
+    }
 }
 
 //==================================================================================================
