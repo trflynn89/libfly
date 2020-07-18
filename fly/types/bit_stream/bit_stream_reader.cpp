@@ -42,9 +42,9 @@ bool BitStreamReader::read_byte(byte_type &byte)
 //==================================================================================================
 bool BitStreamReader::fully_consumed() const
 {
-    if (m_stream_buffer->sgetc() == EOF)
+    if (m_position == 0)
     {
-        return m_position == 0;
+        return m_stream_buffer->sgetc() == EOF;
     }
 
     return false;
@@ -70,10 +70,11 @@ void BitStreamReader::refill_buffer()
         m_position += bits_read;
 
         // It is undefined behavior to bit-shift by the size of the value being shifted, i.e. when
-        // bitsRead == detail::s_mostSignificantBitPosition. Because bitsRead is at least 1 here,
-        // the left-shift can be broken into two operations in order to avoid that undefined
-        // behavior.
-        m_buffer = (m_buffer << 1) << (bits_read - 1);
+        // bits_read == detail::s_most_significant_bit_position. Because bits_read is at least 1
+        // here, the left-shift can be broken into two operations in order to avoid that behavior.
+        m_buffer <<= bits_read - 1;
+        m_buffer <<= 1;
+
         m_buffer |= buffer >> (detail::s_most_significant_bit_position - bits_read);
 
         if (m_stream_buffer->sgetc() == EOF)

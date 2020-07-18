@@ -77,7 +77,7 @@ inline DataType BitStream::bit_mask(const DataType bits)
     static constexpr auto filled = std::numeric_limits<DataType>::max();
     static constexpr auto digits = std::numeric_limits<DataType>::digits;
 
-    return static_cast<DataType>(-(bits != 0)) & (filled >> (digits - bits));
+    return (bits == 0) ? 0 : filled >> (digits - bits);
 }
 
 } // namespace fly::detail
