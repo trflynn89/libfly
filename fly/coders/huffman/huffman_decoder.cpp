@@ -235,11 +235,11 @@ bool HuffmanDecoder::decode_symbols(
     std::ostream &decoded) const
 {
     std::uint32_t bytes = 0;
-    code_type index;
+    code_type prefix;
 
-    while ((bytes < chunk_size) && (encoded.peek_bits(index, max_code_length) != 0))
+    while ((bytes < chunk_size) && (encoded.peek_bits(prefix, max_code_length) != 0))
     {
-        const HuffmanCode &code = m_prefix_table[index];
+        const HuffmanCode &code = m_prefix_table[prefix];
 
         m_chunk_buffer[bytes++] = code.m_symbol;
         encoded.discard_bits(code.m_length);
