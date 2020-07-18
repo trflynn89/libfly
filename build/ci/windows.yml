@@ -1,9 +1,9 @@
 parameters:
-  configuration: 'Debug'
+  mode: 'Debug'
   arch: 'x64'
 
 jobs:
-  - job: 'Windows_${{ parameters.configuration }}_${{ parameters.arch }}'
+  - job: 'Windows_${{ parameters.mode }}_${{ parameters.arch }}'
     pool:
       vmImage: windows-2019
 
@@ -13,16 +13,16 @@ jobs:
     - task: VSBuild@1
       inputs:
         solution: 'build\win\libfly.sln'
-        configuration: ${{ parameters.configuration }}
+        configuration: ${{ parameters.mode }}
         platform: ${{ parameters.arch }}
         maximumCpuCount: true
       displayName: 'Build'
 
-    - ${{ if eq(parameters.configuration, 'Release') }}:
+    - ${{ if eq(parameters.mode, 'Release') }}:
       - task: PowerShell@2
         inputs:
           filePath: build\win\test.ps1
-          arguments: -configuration ${{ parameters.configuration }} -arch ${{ parameters.arch }}
+          arguments: -mode ${{ parameters.mode }} -arch ${{ parameters.arch }}
           failOnStderr: false
         displayName: 'Test'
 

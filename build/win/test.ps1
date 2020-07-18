@@ -1,14 +1,14 @@
 param (
-    [Parameter(Mandatory=$true)][string]$configuration,
+    [Parameter(Mandatory=$true)][string]$mode,
     [Parameter(Mandatory=$true)][string]$arch
 )
 
 # Run all unit tests for an architecture.
-function Run-Libfly-Test($configuration, $arch)
+function Run-Libfly-Test($mode, $arch)
 {
     Write-Output "Running $arch tests"
 
-    $full_path = $PSScriptRoot + "\" + $configuration + "\msvc\" + $arch
+    $full_path = $PSScriptRoot + "\" + $mode + "\msvc\" + $arch
     $tests_passed = 0
     $tests_failed = 0
 
@@ -33,4 +33,4 @@ function Run-Libfly-Test($configuration, $arch)
 }
 
 # Run the tests
-Run-Libfly-Test $configuration $arch
+Run-Libfly-Test $mode $arch
