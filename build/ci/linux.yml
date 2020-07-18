@@ -1,10 +1,10 @@
 parameters:
-  configuration: 'Debug'
   toolchain: 'clang'
+  mode: 'Debug'
   arch: 'x64'
 
 jobs:
-  - job: 'Linux_${{ parameters.configuration }}_${{ parameters.toolchain }}_${{ parameters.arch }}'
+  - job: 'Linux_${{ parameters.toolchain }}_${{ parameters.mode }}_${{ parameters.arch }}'
 
     pool:
       vmImage: ubuntu-20.04
@@ -16,7 +16,7 @@ jobs:
     steps:
     - template: setup.yml
 
-    - ${{ if eq(parameters.configuration, 'Debug') }}:
+    - ${{ if eq(parameters.mode, 'Debug') }}:
       - script: |
           echo "##vso[task.setvariable variable=config]mode=debug toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }}"
         displayName: 'Configure'
@@ -31,7 +31,7 @@ jobs:
         condition: and(eq('${{ parameters.toolchain }}', 'clang'), eq('${{ parameters.arch }}', 'x64'))
         displayName: 'Coverage'
 
-    - ${{ if eq(parameters.configuration, 'Release') }}:
+    - ${{ if eq(parameters.mode, 'Release') }}:
       - script: |
           echo "##vso[task.setvariable variable=config]mode=release toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }}"
         displayName: 'Configure'
@@ -40,9 +40,10 @@ jobs:
           make -j $(nproc) -C build/nix $(config) libfly
         displayName: 'Build'
 
-      - template: package.yml
-        parameters:
-          contents: 'build/nix/release/${{ parameters.toolchain }}/${{ parameters.arch }}/etc/libfly-*.tar.bz2'
+      - ${{ if eq(parameters.toolchain, 'clang') }}:
+        - template: package.yml
+          parameters:
+            contents: 'build/nix/release/${{ parameters.toolchain }}/${{ parameters.arch }}/etc/libfly-*.tar.bz2'
 
     - script: |
         make -j -C build/nix $(config) install

@@ -8,62 +8,76 @@ trigger:
     - '*'
 
 jobs:
-  #### Linux ####
+  #### Clang ####
 
   - template: build/ci/linux.yml
     parameters:
-      configuration: 'Debug'
       toolchain: 'clang'
+      mode: 'Debug'
       arch: 'x86'
 
   - template: build/ci/linux.yml
     parameters:
-      configuration: 'Debug'
       toolchain: 'clang'
+      mode: 'Debug'
       arch: 'x64'
 
   - template: build/ci/linux.yml
     parameters:
-      configuration: 'Debug'
-      toolchain: 'gcc'
+      toolchain: 'clang'
+      mode: 'Release'
       arch: 'x86'
 
   - template: build/ci/linux.yml
     parameters:
-      configuration: 'Debug'
+      toolchain: 'clang'
+      mode: 'Release'
+      arch: 'x64'
+
+  #### GCC ####
+
+  - template: build/ci/linux.yml
+    parameters:
       toolchain: 'gcc'
+      mode: 'Debug'
+      arch: 'x86'
+
+  - template: build/ci/linux.yml
+    parameters:
+      toolchain: 'gcc'
+      mode: 'Debug'
       arch: 'x64'
 
   - template: build/ci/linux.yml
     parameters:
-      configuration: 'Release'
-      toolchain: 'clang'
+      toolchain: 'gcc'
+      mode: 'Release'
       arch: 'x86'
 
   - template: build/ci/linux.yml
     parameters:
-      configuration: 'Release'
-      toolchain: 'clang'
+      toolchain: 'gcc'
+      mode: 'Release'
       arch: 'x64'
 
   #### Windows ####
 
   - template: build/ci/windows.yml
     parameters:
-      configuration: 'Debug'
+      mode: 'Debug'
       arch: 'x86'
 
   - template: build/ci/windows.yml
     parameters:
-      configuration: 'Debug'
+      mode: 'Debug'
       arch: 'x64'
 
   - template: build/ci/windows.yml
     parameters:
-      configuration: 'Release'
+      mode: 'Release'
       arch: 'x86'
 
   - template: build/ci/windows.yml
     parameters:
-      configuration: 'Release'
+      mode: 'Release'
       arch: 'x64'
