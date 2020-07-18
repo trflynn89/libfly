@@ -39,7 +39,7 @@ clean:
 tests: $(TEST_BINARIES)
 	$(Q)failed=0; \
 	for tgt in $(TEST_BINARIES) ; do \
-		if [[ $(toolchain) == "clang" ]] && [[ $(release) -eq 0 ]] ; then \
+		if [[ $(toolchain) == "clang" ]] && [[ $(mode) == "debug" ]] ; then \
 			export LLVM_PROFILE_FILE="$$tgt.profraw"; \
 		fi; \
 		\

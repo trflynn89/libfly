@@ -47,11 +47,9 @@ CF_ALL += \
     \
     -pedantic
 
-ifeq ($(profile), 0)
-ifeq ($(release), 0)
+ifeq ($(mode), debug)
     CF_ALL += \
         -Winline
-endif
 endif
 
 ifeq ($(toolchain), clang)
@@ -66,33 +64,31 @@ else ifeq ($(toolchain), gcc)
         -Wsign-promo \
         -Wsuggest-override
 
-    ifeq ($(profile), 0)
-    ifeq ($(release), 0)
+    ifeq ($(mode), debug)
         CF_ALL += \
             -Wsuggest-final-methods \
             -Wsuggest-final-types
     endif
-    endif
 endif
 
-# Add profiling symbols for profile builds, optimize release builds, and add debug symbols & use
-# address sanitizer for debug builds.
-ifeq ($(profile), 1)
-    ifeq ($(toolchain), gcc)
-        CF_ALL += -O2 -g -pg
-        LDFLAGS += -pg
-    else
-        $(error Profiling not supported with toolchain $(toolchain), check flags.mk)
-    endif
-else ifeq ($(release), 1)
-    CF_ALL += -O2
-else
+# Add debug symbols & use address sanitizer for debug builds, optimize release builds, and add
+# profiling symbols for profile builds.
+ifeq ($(mode), debug)
     CF_ALL += -O0 -g -fsanitize=address -fno-omit-frame-pointer
 
     ifeq ($(toolchain), clang)
         CF_ALL += -fprofile-instr-generate -fcoverage-mapping
     else ifeq ($(toolchain), gcc)
         CF_ALL += --coverage
+    endif
+else ifeq ($(mode), release)
+    CF_ALL += -O2
+else ifeq ($(mode), profile)
+    ifeq ($(toolchain), gcc)
+        CF_ALL += -O2 -g -pg
+        LDFLAGS += -pg
+    else
+        $(error Profiling not supported with toolchain $(toolchain), check flags.mk)
     endif
 endif
 

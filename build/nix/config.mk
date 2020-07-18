@@ -1,20 +1,17 @@
 # Define the default make configuration. Not all defaults are defined here, but
 # all command line options are listed here for convenience.
 
-# Toolchain to compile with (clang or gcc)
+# Compilation toolchain (clang, gcc)
 toolchain := clang
 
-# Compile caching system
-cacher :=
-
-# Define debug vs. release
-release := 0
-
-# Enable profiling (gcc only) (takes precedence over release)
-profile := 0
+# Compilation mode (debug, release, profile)
+mode := debug
 
 # Build 32-bit or 64-bit target
 arch := $(arch)
+
+# Compile caching system
+cacher :=
 
 # Enable stylized builds
 stylized := 1
@@ -37,6 +34,13 @@ else
     $(error Unrecognized toolchain $(toolchain), check config.mk)
 endif
 
+# Validate the provided compilation mode.
+SUPPORTED_MODES := debug release profile
+
+ifneq ($(mode), $(filter $(SUPPORTED_MODES), $(mode)))
+    $(error Compilation mode $(mode) not supported, check config.mk)
+endif
+
 # Use a compiler cache if requested
 ifneq ($(cacher), )
     CC := $(cacher) $(CC)
@@ -44,14 +48,7 @@ ifneq ($(cacher), )
 endif
 
 # Define the output directories
-ifeq ($(profile), 1)
-    OUT_DIR := $(CURDIR)/profile/$(toolchain)/$(arch)
-else ifeq ($(release), 1)
-    OUT_DIR := $(CURDIR)/release/$(toolchain)/$(arch)
-else
-    OUT_DIR := $(CURDIR)/debug/$(toolchain)/$(arch)
-endif
-
+OUT_DIR := $(CURDIR)/$(mode)/$(toolchain)/$(arch)
 BIN_DIR := $(OUT_DIR)/bin
 LIB_DIR := $(OUT_DIR)/lib
 OBJ_DIR := $(OUT_DIR)/obj
@@ -79,7 +76,7 @@ else
     $(info Obj dir = $(OBJ_DIR))
     $(info Etc dir = $(ETC_DIR))
     $(info Toolchain = $(toolchain))
-    $(info Cacher = $(cacher))
-    $(info Release = $(release))
+    $(info Mode = $(mode))
     $(info Arch = $(arch))
+    $(info Cacher = $(cacher))
 endif
