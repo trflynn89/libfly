@@ -51,14 +51,11 @@
 
 //==================================================================================================
 #define LOGC(...)                                                                                  \
-    _FLY_CONSOLE_LOG(                                                                              \
-        true,                                                                                      \
-        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
-
-//==================================================================================================
-#define LOGC_NO_LOCK(...)                                                                          \
-    _FLY_CONSOLE_LOG(                                                                              \
-        false,                                                                                     \
+    fly::Logger::console_log(                                                                      \
+        fly::Log::Level::Info,                                                                     \
+        __FILE__,                                                                                  \
+        __FUNCTION__,                                                                              \
+        __LINE__,                                                                                  \
         fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
 
 namespace fly {
@@ -123,7 +120,6 @@ public:
     /**
      * Log to the console in a thread-safe manner.
      *
-     * @param acquire_lock Whether to acquire lock before logging.
      * @param level The level (debug, info, etc.) of the log.
      * @param file Name of the file storing the log.
      * @param function Name of the function storing the log.
@@ -131,7 +127,6 @@ public:
      * @param message The message to log.
      */
     static void console_log(
-        bool acquire_lock,
         Log::Level level,
         const char *file,
         const char *function,
