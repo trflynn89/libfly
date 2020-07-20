@@ -51,6 +51,16 @@ public:
      * @param handler The signal handler function to set.
      */
     static void set_signal_handler(SignalHandler handler);
+
+private:
+    /**
+     * Signal handler to intercept raised signal and forward to the user specified signal handler.
+     *
+     * @param signal The signal that was raised.
+     */
+    static void handle_signal(int signal);
+
+    static SignalHandler s_signal_handler;
 };
 
 } // namespace fly

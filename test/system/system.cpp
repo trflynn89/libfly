@@ -21,6 +21,47 @@ void handle_signal(int signal)
     s_last_signal = signal;
 }
 
+class ScopedSignalHandler
+{
+public:
+    ScopedSignalHandler()
+    {
+        auto handler = std::bind(&ScopedSignalHandler::handle_signal, this, std::placeholders::_1);
+        fly::System::set_signal_handler(std::move(handler));
+    }
+
+    ~ScopedSignalHandler()
+    {
+        fly::System::set_signal_handler(nullptr);
+    }
+
+    int operator()() const
+    {
+        return m_last_signal;
+    }
+
+private:
+    void handle_signal(int signal)
+    {
+        m_last_signal = signal;
+    }
+
+    int m_last_signal {0};
+};
+
+class StaticSignalHandler
+{
+public:
+    static void handle_signal(int signal)
+    {
+        s_last_signal = signal;
+    }
+
+    static int s_last_signal;
+};
+
+int StaticSignalHandler::s_last_signal = 0;
+
 } // namespace
 
 TEST_CASE("System", "[system]")
@@ -90,16 +131,55 @@ TEST_CASE("System", "[system]")
         CHECK(error1 == error2);
     }
 
-    SECTION("Setup a custom signal handler for fatal signals")
+    SECTION("Setup a custom signal handler with global method")
     {
         fly::System::SignalHandler handler(&handle_signal);
-        fly::System::set_signal_handler(handler);
+        fly::System::set_signal_handler(std::move(handler));
 
         std::raise(SIGINT);
         CHECK(s_last_signal == SIGINT);
 
         std::raise(SIGSEGV);
         CHECK(s_last_signal == SIGSEGV);
+
+        fly::System::set_signal_handler(nullptr);
+    }
+
+    SECTION("Setup a custom signal handler with instance class method")
+    {
+        ScopedSignalHandler handler;
+
+        std::raise(SIGINT);
+        CHECK(handler() == SIGINT);
+
+        std::raise(SIGSEGV);
+        CHECK(handler() == SIGSEGV);
+    }
+
+    SECTION("Setup a custom signal handler with static class method")
+    {
+        auto handler = std::bind(&StaticSignalHandler::handle_signal, std::placeholders::_1);
+        fly::System::set_signal_handler(std::move(handler));
+
+        std::raise(SIGINT);
+        CHECK(StaticSignalHandler::s_last_signal == SIGINT);
+
+        std::raise(SIGSEGV);
+        CHECK(StaticSignalHandler::s_last_signal == SIGSEGV);
+
+        fly::System::set_signal_handler(nullptr);
+    }
+
+    SECTION("Setup a custom signal handler with lambda")
+    {
+        int last_signal = 0;
+        fly::System::set_signal_handler([&last_signal](int signal) { last_signal = signal; });
+
+        std::raise(SIGINT);
+        CHECK(last_signal == SIGINT);
+
+        std::raise(SIGSEGV);
+        CHECK(last_signal == SIGSEGV);
 
         fly::System::set_signal_handler(nullptr);
     }
