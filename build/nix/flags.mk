@@ -12,7 +12,7 @@ LDFLAGS := -L$(LIB_DIR)
 LDLIBS :=
 
 # Compiler flags for both C and C++ files
-CF_ALL := -MMD -MP -fPIC
+CF_ALL := -MD -MP -fPIC
 CF_ALL += -I$(SOURCE_ROOT)
 
 ifeq ($(arch), x86)
