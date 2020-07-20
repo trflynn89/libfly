@@ -41,21 +41,13 @@ void Logger::set_instance(const std::shared_ptr<Logger> &logger)
 
 //==================================================================================================
 void Logger::console_log(
-    bool acquire_lock,
     Log::Level level,
     const char *file,
     const char *function,
     std::uint32_t line,
     std::string &&message)
 {
-    std::unique_lock<std::mutex> lock(s_console_mutex, std::defer_lock);
     const std::string time = System::local_time();
-
-    if (acquire_lock)
-    {
-        lock.lock();
-    }
-
     std::ostream *stream = &std::cout;
     Style style = Style::Default;
     std::optional<Color> color;
@@ -81,6 +73,7 @@ void Logger::console_log(
             break;
     }
 
+    std::unique_lock<std::mutex> lock(s_console_mutex);
     {
         auto styler = color ? Styler(std::move(style), std::move(*color)) : Styler(style);
         String::format(*stream, "%s%s %s:%s:%d", styler, time, file, function, line);
@@ -105,7 +98,7 @@ void Logger::add_log(
     }
     else
     {
-        console_log(true, level, file, function, line, std::move(message));
+        console_log(level, file, function, line, std::move(message));
     }
 }
 

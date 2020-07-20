@@ -158,17 +158,12 @@ TEST_CASE("Logger", "[logger]")
         LOGC("Console Log");
         LOGC("Console Log: %d", 123);
 
-        LOGC_NO_LOCK("Lockless console Log");
-        LOGC_NO_LOCK("Lockless console Log: %d", 456);
-
         const std::string contents = capture();
         REQUIRE_FALSE(contents.empty());
 
         CHECK(contents.find("Console Log") != std::string::npos);
         CHECK(contents.find("123") != std::string::npos);
-        CHECK(contents.find("Lockless console Log") != std::string::npos);
-        CHECK(contents.find("456") != std::string::npos);
-        CHECK(std::count(contents.begin(), contents.end(), '\n') == 4);
+        CHECK(std::count(contents.begin(), contents.end(), '\n') == 2);
     }
 
 #if defined(FLY_LINUX)
