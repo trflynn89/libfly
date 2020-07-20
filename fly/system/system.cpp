@@ -11,6 +11,8 @@
 
 namespace fly {
 
+System::SignalHandler System::s_signal_handler;
+
 //==================================================================================================
 void System::print_backtrace()
 {
@@ -46,13 +48,19 @@ void System::set_signal_handler(SignalHandler handler)
 {
     static std::vector<int> s_signals = SystemImpl::get_signals();
 
-    auto pp_handler = handler.target<void (*)(int)>();
-    auto p_handler = (pp_handler == nullptr) ? SIG_DFL : *pp_handler;
+    auto handler_or_default = handler ? System::handle_signal : SIG_DFL;
+    s_signal_handler = std::move(handler);
 
     for (auto it = s_signals.begin(); it != s_signals.end(); ++it)
     {
-        std::signal(*it, p_handler);
+        std::signal(*it, handler_or_default);
     }
+}
+
+//==================================================================================================
+void System::handle_signal(int signal)
+{
+    s_signal_handler(signal);
 }
 
 } // namespace fly
