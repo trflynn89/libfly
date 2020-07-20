@@ -3,9 +3,9 @@
 #include "fly/fly.hpp"
 #include "fly/types/string/string.hpp"
 
+#include <array>
 #include <csignal>
 #include <system_error>
-#include <vector>
 
 #include FLY_OS_IMPL_PATH(system, system)
 
@@ -46,7 +46,7 @@ std::string System::get_error_string(int code)
 //==================================================================================================
 void System::set_signal_handler(SignalHandler handler)
 {
-    static std::vector<int> s_signals = SystemImpl::get_signals();
+    static constexpr const auto s_signals = SystemImpl::fatal_signals();
 
     auto handler_or_default = handler ? System::handle_signal : SIG_DFL;
     s_signal_handler = std::move(handler);

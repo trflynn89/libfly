@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 #include <chrono>
-#include <csignal>
 #include <cstring>
 
 namespace fly {
@@ -47,12 +46,6 @@ std::string SystemImpl::local_time(const char *fmt)
 int SystemImpl::get_error_code()
 {
     return errno;
-}
-
-//==================================================================================================
-std::vector<int> SystemImpl::get_signals()
-{
-    return {SIGINT, SIGTERM, SIGSYS, SIGBUS, SIGILL, SIGFPE, SIGABRT, SIGSEGV};
 }
 
 } // namespace fly

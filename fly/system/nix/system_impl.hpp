@@ -1,7 +1,8 @@
 #pragma once
 
+#include <array>
+#include <csignal>
 #include <string>
-#include <vector>
 
 namespace fly {
 
@@ -17,7 +18,11 @@ public:
     static void print_backtrace();
     static std::string local_time(const char *fmt);
     static int get_error_code();
-    static std::vector<int> get_signals();
+
+    static constexpr std::array<int, 8> fatal_signals()
+    {
+        return {SIGINT, SIGTERM, SIGSYS, SIGBUS, SIGILL, SIGFPE, SIGABRT, SIGSEGV};
+    }
 };
 
 } // namespace fly

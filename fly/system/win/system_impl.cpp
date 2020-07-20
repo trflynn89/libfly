@@ -3,7 +3,6 @@
 #include <Windows.h>
 
 #include <chrono>
-#include <csignal>
 #include <cstdio>
 
 namespace fly {
@@ -46,12 +45,6 @@ std::string SystemImpl::local_time(const char *fmt)
 int SystemImpl::get_error_code()
 {
     return ::GetLastError();
-}
-
-//==================================================================================================
-std::vector<int> SystemImpl::get_signals()
-{
-    return {SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV};
 }
 
 } // namespace fly
