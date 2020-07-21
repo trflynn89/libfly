@@ -4,6 +4,7 @@ MAINTAINER Timothy Flynn <trflynn89@pm.me>
 
 ARG CLANG_VERSION
 ARG GCC_VERSION
+ARG JDK_VERSION
 
 # Install base tools
 RUN apt-get update && \
@@ -43,6 +44,12 @@ RUN apt-get install -y \
         update-alternatives --install \
             /usr/bin/$tool $tool /usr/bin/$tool-$CLANG_VERSION 1; \
     done
+
+# Install OpenJDK
+RUN DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y \
+        openjdk-$JDK_VERSION-jdk \
+        maven
 
 # Cleanup
 RUN apt-get clean -y && \

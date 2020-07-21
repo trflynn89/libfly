@@ -23,6 +23,8 @@ ifeq ($$(TARGET_TYPE_$$(t)), BIN)
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
     TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).so.$(VERSION)
     TARGET_FILE_$$(t) += $(LIB_DIR)/$$(t).a
+else ifeq ($$(TARGET_TYPE_$$(t)), MVN)
+    TARGET_FILE_$$(t) := $(MVN_DIR)/$$(t)-$(VERSION).jar
 else
     $$(error Target type $$(TARGET_TYPE_$$(t)) not supported)
 endif
@@ -40,6 +42,9 @@ ifeq ($$(TARGET_TYPE_$$(t)), BIN)
         $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
     $(call DEFINE_LIB_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
+        $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
+else ifeq ($$(TARGET_TYPE_$$(t)), MVN)
+    $(call DEFINE_MVN_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
         $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 endif
 

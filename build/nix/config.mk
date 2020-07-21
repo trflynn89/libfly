@@ -25,11 +25,13 @@ ifeq ($(toolchain), clang)
     CXX := clang++
     AR := llvm-ar
     STRIP := llvm-strip
+    MVN := mvn
 else ifeq ($(toolchain), gcc)
     CC := gcc
     CXX := g++
     AR := ar
     STRIP := strip
+    MVN := mvn
 else
     $(error Unrecognized toolchain $(toolchain), check config.mk)
 endif
@@ -48,11 +50,15 @@ ifneq ($(cacher), )
 endif
 
 # Define the output directories
-OUT_DIR := $(CURDIR)/$(mode)/$(toolchain)/$(arch)
-BIN_DIR := $(OUT_DIR)/bin
-LIB_DIR := $(OUT_DIR)/lib
-OBJ_DIR := $(OUT_DIR)/obj
-ETC_DIR := $(OUT_DIR)/etc
+OUT_DIR := $(CURDIR)/$(mode)
+
+CPP_DIR := $(OUT_DIR)/$(toolchain)/$(arch)
+MVN_DIR := $(OUT_DIR)/$(MVN)
+
+BIN_DIR := $(CPP_DIR)/bin
+LIB_DIR := $(CPP_DIR)/lib
+OBJ_DIR := $(CPP_DIR)/obj
+ETC_DIR := $(CPP_DIR)/etc
 
 # ANSI escape sequences to use in stylized builds.
 ifeq ($(stylized), 1)
@@ -75,6 +81,7 @@ else
     $(info Lib dir = $(LIB_DIR))
     $(info Obj dir = $(OBJ_DIR))
     $(info Etc dir = $(ETC_DIR))
+    $(info Mvn dir = $(MVN_DIR))
     $(info Toolchain = $(toolchain))
     $(info Mode = $(mode))
     $(info Arch = $(arch))

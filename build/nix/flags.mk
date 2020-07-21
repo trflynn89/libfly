@@ -15,6 +15,9 @@ LDLIBS :=
 CF_ALL := -MD -MP -fPIC
 CF_ALL += -I$(SOURCE_ROOT)
 
+# Compiler flags for Maven projects
+MVN_FLAGS := -Doutput=$(MVN_DIR)
+
 ifeq ($(arch), x86)
     CF_ALL += -m32
 endif
@@ -75,6 +78,7 @@ endif
 # profiling symbols for profile builds.
 ifeq ($(mode), debug)
     CF_ALL += -O0 -g -fsanitize=address -fno-omit-frame-pointer
+    MVN_FLAGS += -Dmaven.compiler.debuglevel=lines,vars,source
 
     ifeq ($(toolchain), clang)
         CF_ALL += -fprofile-instr-generate -fcoverage-mapping
@@ -83,6 +87,7 @@ ifeq ($(mode), debug)
     endif
 else ifeq ($(mode), release)
     CF_ALL += -O2
+    MVN_FLAGS += -Dmaven.compiler.debuglevel=none
 else ifeq ($(mode), profile)
     ifeq ($(toolchain), gcc)
         CF_ALL += -O2 -g -pg
@@ -90,6 +95,11 @@ else ifeq ($(mode), profile)
     else
         $(error Profiling not supported with toolchain $(toolchain), check flags.mk)
     endif
+endif
+
+# Suppress output on Maven projects
+ifneq ($(verbose), 1)
+MVN_FLAGS += -q
 endif
 
 # C and C++ specific flags

@@ -21,17 +21,20 @@ BASE := $(shell grep -oP "(?<=FROM )(\S+)" Dockerfile)
 # Toolchain versions
 CLANG_VERSION := 10
 GCC_VERSION := 10
+JDK_VERSION := 14
 
 # Form the tag for the container
-TAG := $(subst :,,$(subst .,,$(BASE)))_clang$(CLANG_VERSION)_gcc$(GCC_VERSION)
+TAG := $(subst :,,$(subst .,,$(BASE)))_clang$(CLANG_VERSION)_gcc$(GCC_VERSION)_jdk$(JDK_VERSION)
 
 help:
 	$(Q)echo "Build, push, or run a $(REPO) container."
 	$(Q)echo
 	$(Q)echo "Container will be based on $(BASE), tagged $(TAG),"
 	$(Q)echo "and contain:"
-	$(Q)echo "    clang $(CLANG_VERSION)"
-	$(Q)echo "    gcc $(GCC_VERSION)"
+	$(Q)echo
+	$(Q)echo "    Clang $(CLANG_VERSION)"
+	$(Q)echo "    GCC $(GCC_VERSION)"
+	$(Q)echo "    JDK $(JDK_VERSION)"
 	$(Q)echo
 	$(Q)echo "Usage: make [build] [push] [run] [clean]"
 
@@ -40,6 +43,7 @@ build:
 		--tag $(USER)/$(REPO):$(TAG) \
 		--build-arg CLANG_VERSION=$(CLANG_VERSION) \
 		--build-arg GCC_VERSION=$(GCC_VERSION) \
+		--build-arg JDK_VERSION=$(JDK_VERSION) \
 		.
 
 push: build

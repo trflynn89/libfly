@@ -27,7 +27,7 @@ COVERAGE_BLACKLIST :=
 #
 # $(1) = The target's name.
 # $(2) = The target's source directory.
-# $(3) = The target's type (BIN, LIB, or TEST).
+# $(3) = The target's type (BIN, LIB, MVN, or TEST).
 define ADD_TARGET
 
 TARGETS += $(1)
