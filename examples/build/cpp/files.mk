@@ -1,6 +1,6 @@
 # Define the directories to include and compile
 SRC_DIRS_$(d) := \
-    some_lib
+    cpp/some_lib
 
 # Define libraries to link
 LDLIBS_$(d) := \

@@ -10,6 +10,8 @@ LINK_CC := $(Q)$(CC) $$(CFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 COMP_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ -c $$<
 LINK_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 
+COMP_MVN := $(Q)$(MVN) $(MVN_FLAGS) -f $$(POM) compile assembly:single
+
 SHARED_CC := $(Q)$(CC) $$(CFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
 SHARED_CXX := $(Q)$(CXX) $$(CXXFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
 STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
@@ -61,6 +63,25 @@ MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 	@mkdir -p $$(@D)
 	@echo -e "[$(GREEN)Shared$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
 	$(SHARED_CXX)
+
+endef
+
+# Build a JAR file for a Maven project.
+#
+# $(1) = The path to the target output JAR file.
+# $(2) = The path to the target release package.
+define MVN_RULES
+
+MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
+
+$(1): POM := $$(d)/pom.xml
+
+$(1): $$(MAKEFILES_$(d)) $$(SRC_$$(d))
+	@mkdir -p $$(@D)
+	@echo -e "[$(RED)Maven$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
+	$(COMP_MVN)
+
+$(2):
 
 endef
 
@@ -195,6 +216,35 @@ $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 
 # Include dependency files
 -include $$(DEP_$$(d))
+
+# Pop current dir from stack
+$$(eval $$(call POP_DIR))
+
+endef
+
+# Define the rules to build a JAR file for a Maven project. The files.mk
+# should define:
+#
+#     SRC_$(d) = The sources to be built in the target libraries.
+#
+# $(1) = The target's name.
+# $(2) = The path to the target root directory.
+# $(3) = The path to the target output libraries.
+# $(4) = The path to the target release package.
+define DEFINE_MVN_RULES
+
+# Push current dir to stack
+$$(eval $$(call PUSH_DIR, $(2)))
+
+# Define source files
+ifeq ($$(wildcard $$(d)/files.mk),)
+    SRC_$$(d) := $$(shell find $$(d) -type f -name "*.java")
+else
+    include $$(d)/files.mk
+endif
+
+# Define the compile rules
+$$(eval $$(call MVN_RULES, $(3), $(4)))
 
 # Pop current dir from stack
 $$(eval $$(call POP_DIR))

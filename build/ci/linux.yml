@@ -10,7 +10,7 @@ jobs:
       vmImage: ubuntu-20.04
 
     container:
-      image: trflynn89/libfly:ubuntu2004_clang10_gcc10
+      image: trflynn89/libfly:ubuntu2004_clang10_gcc10_jdk14
       options: --cap-add SYS_PTRACE
 
     steps:
@@ -53,4 +53,4 @@ jobs:
     - script: |
         make -j -C examples/build $(config)
       displayName: 'Examples'
-      failOnStderr: true
+      failOnStderr: false # Maven currently contains errant stderr messages

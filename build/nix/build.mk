@@ -52,8 +52,10 @@ tests: $(TEST_BINARIES)
 	exit $$failed
 
 # Create coverage report
-coverage: report := $(OUT_DIR)/coverage
+coverage: report := $(ETC_DIR)/coverage
 coverage:
+	$(Q)mkdir -p $(dir $(report))
+
 ifeq ($(toolchain), clang)
 	$(Q)llvm-profdata merge \
 		--output $(report).prodata \
@@ -79,7 +81,7 @@ endif
 
 else ifeq ($(toolchain), gcc)
 	$(Q)lcov --capture \
-		--directory $(OUT_DIR) \
+		--directory $(CPP_DIR) \
 		--output-file $(report)
 
 	$(Q)lcov --remove \
@@ -95,7 +97,7 @@ else
 endif
 
 # Create profile report
-profile: report := $(OUT_DIR)/profile
+profile: report := $(ETC_DIR)/profile
 profile: args :=
 profile: $(TEST_BINARIES)
 ifeq ($(toolchain), gcc)
@@ -132,18 +134,17 @@ install: $(TARGET_PACKAGES)
 # Install dependencies
 setup:
 ifeq ($(HOST), DEBIAN)
-	$(Q)$(SUDO) apt install -y git make clang clang-format clang-tidy lld llvm \
-		gcc g++ lcov
+	$(Q)$(SUDO) apt install -y git make clang clang-format clang-tidy lld llvm gcc g++ lcov \
+		openjdk-14-jdk maven
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) apt install -y gcc-multilib g++-multilib
 endif
 
 else ifeq ($(HOST), REDHAT)
-	$(Q)$(SUDO) dnf install -y git make clang lld llvm gcc gcc-c++ lcov \
-		libstdc++-static libasan libatomic
+	$(Q)$(SUDO) dnf install -y git make clang lld llvm gcc gcc-c++ lcov libstdc++-static libasan \
+		libatomic java-14-openjdk-devel maven
 ifeq ($(arch), x86)
-	$(Q)$(SUDO) dnf install -y glibc-devel.i686 \
-		libstdc++-static.i686 libasan.i686 libatomic.i686
+	$(Q)$(SUDO) dnf install -y glibc-devel.i686 libstdc++-static.i686 libasan.i686 libatomic.i686
 endif
 
 else
@@ -154,6 +155,7 @@ endif
 # Style enforcement
 style:
 	$(Q)clang-format -i $$(find $(SOURCE_ROOT) \
-		-not \( -path "*Catch2*" -prune \) \
+		-not \( -path "*Catch2*" -prune \) -type f \
 		-name "*.h" -o -name "*.hh" -o -name "*.hpp" \
-		-o -name "*.c" -o -name "*.cc" -o -name "*.cpp")
+		-o -name "*.c" -o -name "*.cc" -o -name "*.cpp" \
+		-o -name "*.java")
