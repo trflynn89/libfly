@@ -51,6 +51,7 @@ jobs:
       failOnStderr: true
 
     - script: |
-        make -j -C examples/build $(config)
+        make -j $(nproc) -C examples/build $(config)
+        make -j $(nproc) -C examples/build $(config) tests
       displayName: 'Examples'
       failOnStderr: false # Maven currently contains errant stderr messages

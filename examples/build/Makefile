@@ -13,5 +13,8 @@ include /usr/src/fly/api.mk
 $(eval $(call ADD_TARGET, libfly_cpp_example, cpp, BIN))
 $(eval $(call ADD_TARGET, libfly_mvn_example, mvn, MVN))
 
+# Test targets
+$(eval $(call ADD_TARGET, libfly_cpp_example_tests, cpp/test, TEST))
+
 # Import the build system
 include /usr/src/fly/build.mk
