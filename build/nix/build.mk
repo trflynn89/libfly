@@ -38,6 +38,7 @@ clean:
 # Run all unit tests
 tests: $(TEST_BINARIES)
 	$(Q)failed=0; \
+	\
 	for tgt in $(TEST_BINARIES) ; do \
 		if [[ $(toolchain) == "clang" ]] && [[ $(mode) == "debug" ]] ; then \
 			export LLVM_PROFILE_FILE="$$tgt.profraw"; \
@@ -49,6 +50,15 @@ tests: $(TEST_BINARIES)
 			failed=$$((failed+1)); \
 		fi; \
 	done; \
+	\
+	for tgt in $(TEST_MAVEN_PATHS) ; do \
+		$(MVN) $(MVN_FLAGS) -f $(SOURCE_ROOT)/$$tgt/pom.xml test; \
+		\
+		if [[ $$? -ne 0 ]] ; then \
+			failed=$$((failed+1)); \
+		fi; \
+	done; \
+	\
 	exit $$failed
 
 # Create coverage report
