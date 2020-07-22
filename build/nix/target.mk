@@ -6,6 +6,9 @@ TARGET_PACKAGES :=
 # List of all test target output binaries
 TEST_BINARIES :=
 
+# List of paths to all Maven targets to test
+TEST_MAVEN_PATHS :=
+
 # Verify a single target and, if valid, define a make goal to build that target.
 #
 # $(1) = The target's name.
@@ -25,6 +28,7 @@ else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
     TARGET_FILE_$$(t) += $(LIB_DIR)/$$(t).a
 else ifeq ($$(TARGET_TYPE_$$(t)), MVN)
     TARGET_FILE_$$(t) := $(MVN_DIR)/$$(t)-$(VERSION).jar
+    TEST_MAVEN_PATHS += $$(TARGET_PATH_$$(t))
 else
     $$(error Target type $$(TARGET_TYPE_$$(t)) not supported)
 endif
