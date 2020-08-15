@@ -7,7 +7,7 @@ SOURCE_ROOT := $(CURDIR)
 VERSION = 1.0.0
 
 # Import the build API
-include /usr/src/fly/api.mk
+include /usr/local/src/fly/api.mk
 
 # Main targets
 $(eval $(call ADD_TARGET, libfly_cpp_example, cpp, BIN))
@@ -17,4 +17,4 @@ $(eval $(call ADD_TARGET, libfly_mvn_example, mvn, MVN))
 $(eval $(call ADD_TARGET, libfly_cpp_example_tests, cpp/test, TEST))
 
 # Import the build system
-include /usr/src/fly/build.mk
+include /usr/local/src/fly/build.mk

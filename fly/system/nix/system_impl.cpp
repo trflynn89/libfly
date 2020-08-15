@@ -3,6 +3,7 @@
 #include <execinfo.h>
 #include <unistd.h>
 
+#include <cerrno>
 #include <chrono>
 #include <cstring>
 

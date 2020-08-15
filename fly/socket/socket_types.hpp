@@ -25,10 +25,10 @@
 
 namespace fly {
 
-#if defined(FLY_WINDOWS)
-using socket_type = SOCKET;
-#elif defined(FLY_LINUX)
+#if defined(FLY_LINUX) || defined(FLY_MACOS)
 using socket_type = int;
+#elif defined(FLY_WINDOWS)
+using socket_type = SOCKET;
 #else
 #    error Unknown socket type.
 #endif

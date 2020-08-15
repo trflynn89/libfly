@@ -6,13 +6,29 @@
 #include <cstdint>
 #include <type_traits>
 
-#if defined(FLY_WINDOWS)
-#    include <cstdlib>
-#    define bswap_16(b) _byteswap_ushort(b)
-#    define bswap_32(b) _byteswap_ulong(b)
-#    define bswap_64(b) _byteswap_uint64(b)
-#elif defined(FLY_LINUX)
+#if defined(FLY_LINUX)
 #    include <byteswap.h>
+#elif defined(FLY_MACOS)
+#    include <libkern/OSByteOrder.h>
+#    include <machine/endian.h>
+#elif defined(FLY_WINDOWS)
+#    include <cstdlib>
+#else
+#    error Unknown byte swapping includes.
+#endif
+
+#if defined(FLY_LINUX)
+#    define byte_swap_16(b) bswap_16(b)
+#    define byte_swap_32(b) bswap_32(b)
+#    define byte_swap_64(b) bswap_64(b)
+#elif defined(FLY_MACOS)
+#    define byte_swap_16(b) OSSwapInt16(b)
+#    define byte_swap_32(b) OSSwapInt32(b)
+#    define byte_swap_64(b) OSSwapInt64(b)
+#elif defined(FLY_WINDOWS)
+#    define byte_swap_16(b) _byteswap_ushort(b)
+#    define byte_swap_32(b) _byteswap_ulong(b)
+#    define byte_swap_64(b) _byteswap_uint64(b)
 #else
 #    error Unknown byte swapping methods.
 #endif
@@ -27,14 +43,18 @@ namespace fly {
  */
 enum class Endian : std::uint16_t
 {
-#if defined(FLY_WINDOWS)
-    Little = 0,
-    Big = 1,
-    Native = Little
-#elif defined(FLY_LINUX)
+#if defined(FLY_LINUX)
     Little = __ORDER_LITTLE_ENDIAN__,
     Big = __ORDER_BIG_ENDIAN__,
-    Native = __BYTE_ORDER__
+    Native = __BYTE_ORDER__,
+#elif defined(FLY_MACOS)
+    Little = LITTLE_ENDIAN,
+    Big = BIG_ENDIAN,
+    Native = BYTE_ORDER,
+#elif defined(FLY_WINDOWS)
+    Little = 0,
+    Big = 1,
+    Native = Little,
 #else
 #    error Unknown system endianness.
 #endif
@@ -62,15 +82,15 @@ inline T endian_swap(T value)
     }
     else if constexpr (sizeof(T) == 2)
     {
-        return static_cast<T>(bswap_16(static_cast<std::uint16_t>(value)));
+        return static_cast<T>(byte_swap_16(static_cast<std::uint16_t>(value)));
     }
     else if constexpr (sizeof(T) == 4)
     {
-        return static_cast<T>(bswap_32(static_cast<std::uint32_t>(value)));
+        return static_cast<T>(byte_swap_32(static_cast<std::uint32_t>(value)));
     }
     else if constexpr (sizeof(T) == 8)
     {
-        return static_cast<T>(bswap_64(static_cast<std::uint64_t>(value)));
+        return static_cast<T>(byte_swap_64(static_cast<std::uint64_t>(value)));
     }
 }
 

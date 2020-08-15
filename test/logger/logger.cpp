@@ -166,7 +166,7 @@ TEST_CASE("Logger", "[logger]")
         CHECK(std::count(contents.begin(), contents.end(), '\n') == 2);
     }
 
-#if defined(FLY_LINUX)
+#if defined(FLY_LINUX) || defined(FLY_MACOS)
 
     SECTION("Validate style of console logs")
     {

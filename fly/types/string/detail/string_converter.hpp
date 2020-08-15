@@ -5,6 +5,7 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 
 namespace fly::detail {
 
@@ -30,10 +31,11 @@ struct BasicStringConverter;
 template <typename StringType, typename T>
 struct BasicStringConverter
 {
+    template <typename V = T, std::enable_if_t<(sizeof(V) < 8), bool> = 0>
     static std::optional<T> convert(const StringType &value)
     {
-        static constexpr long long s_min = std::numeric_limits<T>::min();
-        static constexpr long long s_max = std::numeric_limits<T>::max();
+        static constexpr auto s_min = static_cast<long long>(std::numeric_limits<T>::min());
+        static constexpr auto s_max = static_cast<long long>(std::numeric_limits<T>::max());
 
         std::size_t index = 0;
         long long result = 0;
@@ -54,51 +56,23 @@ struct BasicStringConverter
 
         return static_cast<T>(result);
     }
-};
 
-//==================================================================================================
-template <typename StringType>
-struct BasicStringConverter<StringType, std::int64_t>
-{
-    using value_type = std::int64_t;
-
-    static std::optional<value_type> convert(const StringType &value)
+    template <typename V = T, std::enable_if_t<(sizeof(V) == 8), bool> = 0>
+    static std::optional<T> convert(const StringType &value)
     {
         std::size_t index = 0;
-        value_type result = 0;
+        T result = 0;
 
         try
         {
-            result = std::stoll(value, &index);
-        }
-        catch (...)
-        {
-            return std::nullopt;
-        }
-
-        if (index != value.length())
-        {
-            return std::nullopt;
-        }
-
-        return result;
-    }
-};
-
-//==================================================================================================
-template <typename StringType>
-struct BasicStringConverter<StringType, std::uint64_t>
-{
-    using value_type = std::uint64_t;
-
-    static std::optional<value_type> convert(const StringType &value)
-    {
-        std::size_t index = 0;
-        value_type result = 0;
-
-        try
-        {
-            result = std::stoull(value, &index);
+            if constexpr (std::is_signed_v<T>)
+            {
+                result = std::stoll(value, &index);
+            }
+            else
+            {
+                result = std::stoull(value, &index);
+            }
         }
         catch (...)
         {
