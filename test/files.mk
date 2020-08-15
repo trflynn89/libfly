@@ -51,15 +51,4 @@ ifeq ($(SYSTEM), LINUX)
     LDFLAGS_$(d) += \
         -static-libstdc++ \
         $(foreach mock, $(SYSTEM_CALLS_$(d)), -Wl,--wrap=$(mock))
-
-    # Define libraries to link
-    LDLIBS_$(d) += \
-        -latomic \
-        -lpthread
-else ifeq ($(SYSTEM), MACOS)
-    # Define libraries to link
-    LDLIBS_$(d) += \
-        -lpthread
-else
-    $(error Unrecognized system $(SYSTEM), check $(CURDIR)/files.mk)
 endif
