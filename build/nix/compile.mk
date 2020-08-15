@@ -12,9 +12,17 @@ LINK_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 
 COMP_MVN := $(Q)$(MVN) $(MVN_FLAGS) -f $$(POM) compile assembly:single
 
-SHARED_CC := $(Q)$(CC) $$(CFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
-SHARED_CXX := $(Q)$(CXX) $$(CXXFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
 STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
+
+ifeq ($(SYSTEM), LINUX)
+    SHARED_CC := $(Q)$(CC) $$(CFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
+    SHARED_CXX := $(Q)$(CXX) $$(CXXFLAGS) -shared -Wl,-soname,$$(@F) -o $$@ $$(OBJS) $$(LDFLAGS)
+else ifeq ($(SYSTEM), MACOS)
+    SHARED_CC := $(Q)$(CC) $$(CFLAGS) -dynamiclib -o $$@ $$(OBJS) $$(LDFLAGS)
+    SHARED_CXX := $(Q)$(CXX) $$(CXXFLAGS) -dynamiclib -o $$@ $$(OBJS) $$(LDFLAGS)
+else
+    $(error Unrecognized system $(SYSTEM), check compile.mk)
+endif
 
 # Link a binary target from a set of object files.
 #
@@ -49,17 +57,17 @@ t := $$(strip $(1))
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
-%.a %.so.$(VERSION): OBJS := $$(OBJ_$$(t))
-%.a %.so.$(VERSION): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
-%.a %.so.$(VERSION): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
-%.a %.so.$(VERSION): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
+%.a %.so.$(VERSION) %.dylib.$(VERSION): OBJS := $$(OBJ_$$(t))
+%.a %.so.$(VERSION) %.dylib.$(VERSION): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
+%.a %.so.$(VERSION) %.dylib.$(VERSION): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
+%.a %.so.$(VERSION) %.dylib.$(VERSION): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 
 %.a: $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo -e "[$(GREEN)Static$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
 	$(STATIC)
 
-%.so.$(VERSION): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
+%.so.$(VERSION) %.dylib.$(VERSION): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo -e "[$(GREEN)Shared$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
 	$(SHARED_CXX)

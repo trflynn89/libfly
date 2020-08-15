@@ -21,20 +21,31 @@ verbose := 0
 
 # Define the toolchain binaries
 ifeq ($(toolchain), clang)
-    CC := clang
-    CXX := clang++
-    AR := llvm-ar
-    STRIP := llvm-strip
-    MVN := mvn
+    ifeq ($(SYSTEM), LINUX)
+        CC := clang
+        CXX := clang++
+        AR := llvm-ar
+        STRIP := llvm-strip
+    else ifeq ($(SYSTEM), MACOS)
+        TOOLCHAIN := $(XCODE)/Toolchains/XcodeDefault.xctoolchain/usr/bin
+
+        CC := $(TOOLCHAIN)/clang
+        CXX := $(TOOLCHAIN)/clang++
+        AR := $(TOOLCHAIN)/ar
+        STRIP := $(TOOLCHAIN)/strip
+    else
+        $(error Unrecognized system $(SYSTEM), check config.mk)
+    endif
 else ifeq ($(toolchain), gcc)
     CC := gcc
     CXX := g++
     AR := ar
     STRIP := strip
-    MVN := mvn
 else
     $(error Unrecognized toolchain $(toolchain), check config.mk)
 endif
+
+MVN := mvn
 
 # Validate the provided compilation mode.
 SUPPORTED_MODES := debug release profile

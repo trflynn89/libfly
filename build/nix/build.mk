@@ -143,22 +143,27 @@ install: $(TARGET_PACKAGES)
 
 # Install dependencies
 setup:
-ifeq ($(HOST), DEBIAN)
+ifeq ($(SYSTEM), LINUX)
+ifeq ($(VENDOR), DEBIAN)
 	$(Q)$(SUDO) apt install -y git make clang clang-format clang-tidy lld llvm gcc g++ lcov \
 		openjdk-14-jdk maven
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) apt install -y gcc-multilib g++-multilib
 endif
-
-else ifeq ($(HOST), REDHAT)
+else ifeq ($(VENDOR), REDHAT)
 	$(Q)$(SUDO) dnf install -y git make clang lld llvm gcc gcc-c++ lcov libstdc++-static libasan \
 		libatomic java-14-openjdk-devel maven
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) dnf install -y glibc-devel.i686 libstdc++-static.i686 libasan.i686 libatomic.i686
 endif
-
 else
-	$(Q)echo "No setup rules for host $(HOST), check build.mk"
+	$(Q)echo "No setup rules for vendor $(VENDOR), check build.mk"
+	$(Q)exit 1
+endif
+else ifeq ($(SYSTEM), MACOS)
+	$(Q)xcode-select --install
+else
+	$(Q)echo "No setup rules for system $(SYSTEM), check build.mk"
 	$(Q)exit 1
 endif
 

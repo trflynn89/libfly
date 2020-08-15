@@ -7,15 +7,16 @@
 #include <cstdio>
 #include <cstdlib>
 
-#if defined(FLY_WINDOWS)
+#if defined(FLY_LINUX) || defined(FLY_MACOS)
+#    include <unistd.h>
+#elif defined(FLY_WINDOWS)
 #    include <io.h>
-
 #    define close _close
 #    define dup _dup
 #    define dup2 _dup2
 #    define fileno _fileno
-#elif defined(FLY_LINUX)
-#    include <unistd.h>
+#else
+#    error Unknown file IO include.
 #endif
 
 namespace fly::test {
@@ -29,10 +30,12 @@ CaptureStream::CaptureStream(Stream stream) noexcept :
 {
     FILE *target = nullptr;
 
-#if defined(FLY_WINDOWS)
-    ::fopen_s(&target, m_file.string().c_str(), "w");
-#elif defined(FLY_LINUX)
+#if defined(FLY_LINUX) || defined(FLY_MACOS)
     target = ::fopen(m_file.string().c_str(), "w");
+#elif defined(FLY_WINDOWS)
+    ::fopen_s(&target, m_file.string().c_str(), "w");
+#else
+#    error Unknown file open command.
 #endif
 
     REQUIRE(target != nullptr);

@@ -24,8 +24,15 @@ ifeq ($$(TARGET_TYPE_$$(t)), BIN)
         TEST_BINARIES += $$(TARGET_FILE_$$(t))
     endif
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
-    TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).so.$(VERSION)
-    TARGET_FILE_$$(t) += $(LIB_DIR)/$$(t).a
+    ifeq ($(SYSTEM), LINUX)
+        TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).so.$(VERSION)
+        TARGET_FILE_$$(t) += $(LIB_DIR)/$$(t).a
+    else ifeq ($(SYSTEM), MACOS)
+        TARGET_FILE_$$(t) := $(LIB_DIR)/$$(t).dylib.$(VERSION)
+        TARGET_FILE_$$(t) += $(LIB_DIR)/$$(t).a
+    else
+        $$(error Unrecognized system $(SYSTEM), check target.mk)
+    endif
 else ifeq ($$(TARGET_TYPE_$$(t)), MVN)
     TARGET_FILE_$$(t) := $(MVN_DIR)/$$(t)-$(VERSION).jar
     TEST_MAVEN_PATHS += $$(TARGET_PATH_$$(t))

@@ -13,7 +13,7 @@
 
 using namespace fly::literals::styler_literals;
 
-#if defined(FLY_LINUX)
+#if defined(FLY_LINUX) || defined(FLY_MACOS)
 
 template <typename... Modifiers>
 void test_styler(std::string &&expected_escape, Modifiers &&... modifiers)

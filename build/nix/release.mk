@@ -17,12 +17,12 @@ define BUILD_REL
     $(REL_CMDS) && \
     cd $(ETC_TMP_DIR) && \
     \
-    for f in `find .$(INSTALL_LIB_DIR) -type f -name "*\.so\.*\.*\.*"` ; do \
+    for f in `find .$(INSTALL_LIB_DIR) -type f -name "*\.so\.*\.*\.*" -o -name "*\.dylib\.*\.*\.*"` ; do \
         src=$${f:1}; \
         dst=$${src%.*}; \
         ext=$${src##*.}; \
         \
-        while [[ "$$ext" != "so" ]] ; do \
+        while [[ "$$ext" != "so" ]] && [[ "$$ext" != "dylib" ]] ; do \
             ln -sf $$src .$$dst; \
             \
             src=$$dst; \
@@ -85,7 +85,7 @@ t := $(strip $(1))
 
 $(eval $(call SET_REL_VAR, $(1)))
 $(eval $(call ADD_REL_CMD, $(1), cp -f $(BIN_DIR)/$(t) $(REL_BIN_DIR_$(t))))
-$(eval $(call ADD_REL_CMD, $(1), $(STRIP) -s $(REL_BIN_DIR_$(t))/$(t)))
+$(eval $(call ADD_REL_CMD, $(1), $(STRIP) $(STRIP_FLAGS) $(REL_BIN_DIR_$(t))/$(t)))
 $(eval $(call ADD_REL_CMD, $(1), chmod 755 $(REL_BIN_DIR_$(t))/$(t)))
 
 REL_UNINSTALL_$(t) += $(REL_BIN_DIR_$(t))/$(t)
@@ -102,7 +102,7 @@ t := $(strip $(1))
 
 $(eval $(call SET_REL_VAR, $(1)))
 $(eval $(call ADD_REL_CMD, $(1), cp -f $(LIB_DIR)/$(t).* $(REL_LIB_DIR_$(t))))
-$(eval $(call ADD_REL_CMD, $(1), $(STRIP) -s $(REL_LIB_DIR_$(t))/$(t).*))
+$(eval $(call ADD_REL_CMD, $(1), $(STRIP) $(STRIP_FLAGS) $(REL_LIB_DIR_$(t))/$(t).*))
 
 REL_UNINSTALL_$(t) += $(REL_LIB_DIR_$(t))/$(t)*
 

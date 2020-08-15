@@ -14,8 +14,12 @@ SRC_DIRS_$(d) := \
     fly/types/bit_stream/detail \
     fly/types/json \
     fly/types/string \
-    test/mock \
     test/util
+
+ifeq ($(SYSTEM), LINUX)
+    SRC_DIRS_$(d) += \
+        test/mock
+endif
 
 # Include the directories containing the unit tests
 SRC_DIRS_$(d) += \
@@ -34,20 +38,28 @@ SRC_DIRS_$(d) += \
 SRC_$(d) := \
     $(d)/main.cpp
 
-# Define the list of available mocked system calls
-SYSTEM_CALLS_$(d) := \
-    ${shell grep -ohP "(?<=__wrap_)[a-zA-Z0-9_]+" "$(d)/mock/nix/mock_calls.cpp"}
-
 # Define compiler flags
 CXXFLAGS_$(d) += -I$(SOURCE_ROOT)/test/Catch2/single_include
 CXXFLAGS_$(d) += -DCATCH_CONFIG_FAST_COMPILE -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER
 
-# Define linker flags
-LDFLAGS_$(d) += \
-    -static-libstdc++ \
-    $(foreach mock, $(SYSTEM_CALLS_$(d)), -Wl,--wrap=$(mock))
+ifeq ($(SYSTEM), LINUX)
+    # Define the list of available mocked system calls
+    SYSTEM_CALLS_$(d) := \
+        ${shell grep -ohP "(?<=__wrap_)[a-zA-Z0-9_]+" "$(d)/mock/nix/mock_calls.cpp"}
 
-# Define libraries to link
-LDLIBS_$(d) += \
-    -latomic \
-    -lpthread
+    # Define linker flags
+    LDFLAGS_$(d) += \
+        -static-libstdc++ \
+        $(foreach mock, $(SYSTEM_CALLS_$(d)), -Wl,--wrap=$(mock))
+
+    # Define libraries to link
+    LDLIBS_$(d) += \
+        -latomic \
+        -lpthread
+else ifeq ($(SYSTEM), MACOS)
+    # Define libraries to link
+    LDLIBS_$(d) += \
+        -lpthread
+else
+    $(error Unrecognized system $(SYSTEM), check $(CURDIR)/files.mk)
+endif

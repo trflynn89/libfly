@@ -150,13 +150,20 @@ TEMPLATE_TEST_CASE(
             BasicString::format(format, std::numeric_limits<float>::infinity()));
         CHECK(FLY_STR(streamed_char, "2.100000") == BasicString::format(format, 2.1f));
 
-        // Note: std::uppercase has no effect on std::fixed :(
         format = FLY_STR(char_type, "%F");
         CHECK(FLY_STR(streamed_char, "%F") == BasicString::format(format));
+#if defined(FLY_MACOS)
+        // Only macOS seems to support std::uppercase with std::fixed :(
+        CHECK(FLY_STR(streamed_char, "NAN") == BasicString::format(format, std::nan("")));
+        CHECK(
+            FLY_STR(streamed_char, "INF") ==
+            BasicString::format(format, std::numeric_limits<float>::infinity()));
+#else
         CHECK(FLY_STR(streamed_char, "nan") == BasicString::format(format, std::nan("")));
         CHECK(
             FLY_STR(streamed_char, "inf") ==
             BasicString::format(format, std::numeric_limits<float>::infinity()));
+#endif
         CHECK(FLY_STR(streamed_char, "2.100000") == BasicString::format(format, 2.1f));
     }
 

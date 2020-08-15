@@ -8,12 +8,16 @@ MAKEFLAGS += --no-builtin-rules --no-print-directory
 SHELL := /bin/bash
 
 # Linker flags
-LDFLAGS := -L$(LIB_DIR)
+LDFLAGS := -L$(LIB_DIR) -L$(INSTALL_LIB_DIR)
 LDLIBS :=
 
 # Compiler flags for both C and C++ files
 CF_ALL := -MD -MP -fPIC
 CF_ALL += -I$(SOURCE_ROOT)
+
+ifeq ($(SYSTEM), MACOS)
+    CF_ALL += -isysroot $(XCODE)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+endif
 
 # Compiler flags for Maven projects
 MVN_FLAGS := -Doutput=$(MVN_DIR)
@@ -61,16 +65,20 @@ ifeq ($(toolchain), clang)
         -Wsign-conversion
 else ifeq ($(toolchain), gcc)
     CF_ALL += \
-        -Wlogical-op \
         -Wnull-dereference \
         -Wredundant-decls \
-        -Wsign-promo \
-        -Wsuggest-override
+        -Wsign-promo
 
-    ifeq ($(mode), debug)
+    ifeq ($(SYSTEM), LINUX)
         CF_ALL += \
-            -Wsuggest-final-methods \
-            -Wsuggest-final-types
+            -Wlogical-op \
+            -Wsuggest-override
+
+        ifeq ($(mode), debug)
+            CF_ALL += \
+                -Wsuggest-final-methods \
+                -Wsuggest-final-types
+        endif
     endif
 endif
 
@@ -99,22 +107,34 @@ endif
 
 # Suppress output on Maven projects
 ifneq ($(verbose), 1)
-MVN_FLAGS += -q
+    MVN_FLAGS += -q
 endif
 
 # C and C++ specific flags
 CFLAGS := -std=c17 $(CF_ALL)
 CXXFLAGS := -std=c++17 $(CF_ALL)
 
-# Use LLD linker with clang toolchain. Use gold linker with gcc toolchain.
-ifeq ($(toolchain), clang)
-    LDFLAGS += -fuse-ld=lld
-else ifeq ($(toolchain), gcc)
-    LDFLAGS += -fuse-ld=gold
+# On Linux: Use LLD linker with clang toolchain. Use gold linker with gcc toolchain.
+ifeq ($(SYSTEM), LINUX)
+    ifeq ($(toolchain), clang)
+        LDFLAGS += -fuse-ld=lld
+    else ifeq ($(toolchain), gcc)
+        LDFLAGS += -fuse-ld=gold
+    endif
 endif
 
 # gcov flags
 GCOV_FLAGS := -l
+
+# strip flags
+ifeq ($(SYSTEM), LINUX)
+    STRIP_FLAGS := -s
+else ifeq ($(SYSTEM), MACOS)
+    STRIP_FLAGS := -rSx
+else
+    $(error Unrecognized system $(SYSTEM), check flags.mk)
+endif
+
 
 # tar flags
 ifeq ($(verbose), 1)
@@ -123,4 +143,8 @@ ifeq ($(verbose), 1)
 else
     TAR_EXTRACT_FLAGS := -xjf
     TAR_CREATE_FLAGS := -cjf
+endif
+
+ifeq ($(SYSTEM), MACOS)
+    TAR_EXTRACT_FLAGS := -mo $(TAR_EXTRACT_FLAGS)
 endif

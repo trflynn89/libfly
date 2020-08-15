@@ -1,10 +1,12 @@
 #pragma once
 
 // Determine operating system.
-#if defined(_WIN32)
-#    define FLY_WINDOWS
-#elif defined(__linux__)
+#if defined(__linux__)
 #    define FLY_LINUX
+#elif defined(__APPLE__)
+#    define FLY_MACOS
+#elif defined(_WIN32)
+#    define FLY_WINDOWS
 #else
 #    error Unsupported operating system. Only Windows and Linux are supported.
 #endif
@@ -18,10 +20,12 @@
 #define _FLY_OS_IMPL_PATH(module, os, clss) _FLY_STRINGIZE(fly/module/os/clss##_impl.hpp)
 // clang-format on
 
-#if defined(FLY_WINDOWS)
-#    define FLY_OS_IMPL_PATH(module, clss) _FLY_OS_IMPL_PATH(module, win, clss)
-#elif defined(FLY_LINUX)
+#if defined(FLY_LINUX)
 #    define FLY_OS_IMPL_PATH(module, clss) _FLY_OS_IMPL_PATH(module, nix, clss)
+#elif defined(FLY_MACOS)
+#    define FLY_OS_IMPL_PATH(module, clss) _FLY_OS_IMPL_PATH(module, mac, clss)
+#elif defined(FLY_WINDOWS)
+#    define FLY_OS_IMPL_PATH(module, clss) _FLY_OS_IMPL_PATH(module, win, clss)
 #else
 #    error Unknown implementation header.
 #endif
