@@ -9,7 +9,11 @@ SHELL := /bin/bash
 
 # Linker flags
 LDFLAGS := -L$(LIB_DIR) -L$(INSTALL_LIB_DIR)
-LDLIBS :=
+LDLIBS := -lpthread
+
+ifeq ($(SYSTEM), LINUX)
+    LDLIBS += -latomic
+endif
 
 # Compiler flags for both C and C++ files
 CF_ALL := -MD -MP -fPIC
@@ -134,7 +138,6 @@ else ifeq ($(SYSTEM), MACOS)
 else
     $(error Unrecognized system $(SYSTEM), check flags.mk)
 endif
-
 
 # tar flags
 ifeq ($(verbose), 1)

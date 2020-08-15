@@ -4,9 +4,7 @@ SRC_DIRS_$(d) := \
 
 # Define libraries to link
 LDLIBS_$(d) := \
-    -lfly \
-    -latomic \
-    -lpthread
+    -lfly
 
 # Define source files
 SRC_$(d) := \
