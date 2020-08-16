@@ -127,7 +127,7 @@ endif
 
 endef
 
-# Compile C/C++ files to object files.
+# Compile C/C++/Objective-C/Objective-C++ files to object files.
 #
 # $(1) = Path to directory where object files should be placed.
 define OBJ_RULES
@@ -152,6 +152,18 @@ $(1)/%.o: $(d)/%.cc $$(MAKEFILES_$(d))
 
 # C++ files
 $(1)/%.o: $(d)/%.cpp $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
+	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	$(COMP_CXX)
+
+# Objective-C files
+$(1)/%.o: $(d)/%.m $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D)
+	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
+	$(COMP_CC)
+
+# Objective-C++ files
+$(1)/%.o: $(d)/%.mm $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
@@ -277,7 +289,9 @@ ifeq ($$(wildcard $$(d)/files.mk),)
     SRC_$$(d) := \
         $$(wildcard $$(d)/*.c) \
         $$(wildcard $$(d)/*.cc) \
-        $$(wildcard $$(d)/*.cpp)
+        $$(wildcard $$(d)/*.cpp) \
+        $$(wildcard $$(d)/*.m) \
+        $$(wildcard $$(d)/*.mm)
 else
     include $$(d)/files.mk
 endif

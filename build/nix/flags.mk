@@ -127,6 +127,14 @@ ifeq ($(SYSTEM), LINUX)
     endif
 endif
 
+# On macOS: Link commonly used frameworks.
+ifeq ($(SYSTEM), MACOS)
+    LDFLAGS += \
+        -framework CoreFoundation \
+        -framework CoreServices \
+        -framework Foundation
+endif
+
 # gcov flags
 GCOV_FLAGS := -l
 

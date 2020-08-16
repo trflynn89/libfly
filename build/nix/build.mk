@@ -174,4 +174,5 @@ style:
 		-not \( -path "*Catch2*" -prune \) -type f \
 		-name "*.h" -o -name "*.hh" -o -name "*.hpp" \
 		-o -name "*.c" -o -name "*.cc" -o -name "*.cpp" \
+		-o -name "*.m" -o -name "*.mm" \
 		-o -name "*.java")
