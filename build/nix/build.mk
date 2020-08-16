@@ -36,6 +36,7 @@ clean:
 	$(Q)$(RM) -r $(OUT_DIR)
 
 # Run all unit tests
+tests: args :=
 tests: $(TEST_BINARIES)
 	$(Q)failed=0; \
 	\
@@ -44,7 +45,7 @@ tests: $(TEST_BINARIES)
 			export LLVM_PROFILE_FILE="$$tgt.profraw"; \
 		fi; \
 		\
-		$$tgt; \
+		$$tgt $(args); \
 		\
 		if [[ $$? -ne 0 ]] ; then \
 			failed=$$((failed+1)); \

@@ -8,7 +8,7 @@ trigger:
     - '*'
 
 jobs:
-  #### Clang ####
+  #### Linux Clang ####
 
   - template: build/ci/linux.yml
     parameters:
@@ -34,7 +34,7 @@ jobs:
       mode: 'Release'
       arch: 'x64'
 
-  #### GCC ####
+  #### Linux GCC ####
 
   - template: build/ci/linux.yml
     parameters:
@@ -59,6 +59,30 @@ jobs:
       toolchain: 'gcc'
       mode: 'Release'
       arch: 'x64'
+
+  #### macOS Clang ####
+
+  - template: build/ci/macos.yml
+    parameters:
+      toolchain: 'clang'
+      mode: 'Debug'
+
+  - template: build/ci/macos.yml
+    parameters:
+      toolchain: 'clang'
+      mode: 'Release'
+
+  #### macOS GCC ####
+
+  - template: build/ci/macos.yml
+    parameters:
+      toolchain: 'gcc'
+      mode: 'Debug'
+
+  - template: build/ci/macos.yml
+    parameters:
+      toolchain: 'gcc'
+      mode: 'Release'
 
   #### Windows ####
 
