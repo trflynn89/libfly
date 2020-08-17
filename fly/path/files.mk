@@ -8,5 +8,5 @@ ifeq ($(SYSTEM), LINUX)
         $(d)/nix/path_monitor_impl.cpp
 else ifeq ($(SYSTEM), MACOS)
     SRC_$(d) += \
-        $(d)/mac/path_monitor_impl.cpp
+        $(d)/mac/path_monitor_impl.mm
 endif
