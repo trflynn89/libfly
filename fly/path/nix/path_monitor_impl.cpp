@@ -155,7 +155,7 @@ void PathMonitorImpl::handle_event(const inotify_event *event) const
             {
                 auto path = std::filesystem::path(path_it->first) / file;
 
-                LOGI("Handling event %d for %s", path_event, path);
+                LOGI("Handling event %s for %s", path_event, path);
                 callback(path, path_event);
             }
         }

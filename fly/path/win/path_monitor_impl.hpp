@@ -47,7 +47,7 @@ protected:
      * Check if the path monitor's IOCP has any posted completions, and handle any that have been
      * posted.
      *
-     * @param timeout Max time allow for a completion to be posted.
+     * @param timeout Max time allowed to wait for a completion to be posted.
      */
     void poll(const std::chrono::milliseconds &timeout) override;
 

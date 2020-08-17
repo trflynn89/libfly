@@ -48,7 +48,7 @@ protected:
      * Check if the path monitor's inotify handle has any events to be read, and handle any that are
      * readable.
      *
-     * @param timeout Max time allow for an event to be readable.
+     * @param timeout Max time allowed to wait for an event to be readable.
      */
     void poll(const std::chrono::milliseconds &timeout) override;
 
@@ -82,9 +82,10 @@ private:
     bool read_events();
 
     /**
-     * Handle a single inotify event. Find a monitored path that corresponds
-     * to the event and trigger its callback. If no path was found, drop the
-     * event.
+     * Handle a single inotify event. Find a monitored path that corresponds to the event and
+     * trigger its callback. If no path was found, drop the event.
+     *
+     * @param event The inotify event to handle.
      */
     void handle_event(const inotify_event *event) const;
 

@@ -143,7 +143,7 @@ void PathMonitorImpl::handle_events(const PathInfoImpl *info, const std::filesys
             {
                 auto full = path / file;
 
-                LOGI("Handling event %d for %s", path_event, full);
+                LOGI("Handling event %s for %s", path_event, full);
                 callback(full, path_event);
             }
         }
