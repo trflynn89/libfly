@@ -10,5 +10,6 @@ ifeq ($(SYSTEM), LINUX)
         $(d)/nix/system_monitor_impl.cpp
 else ifeq ($(SYSTEM), MACOS)
     SRC_$(d) += \
-        $(d)/mac/system_monitor_impl.cpp
+        $(d)/mac/mach_api.mm \
+        $(d)/mac/system_monitor_impl.mm
 endif
