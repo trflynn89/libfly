@@ -11,10 +11,7 @@ include /usr/local/src/fly/api.mk
 
 # Main targets
 $(eval $(call ADD_TARGET, libfly_cpp_example, cpp, BIN))
-
-ifeq ($(SYSTEM), LINUX)
-    $(eval $(call ADD_TARGET, libfly_mvn_example, mvn, MVN))
-endif
+$(eval $(call ADD_TARGET, libfly_mvn_example, mvn, MVN))
 
 # Test targets
 $(eval $(call ADD_TARGET, libfly_cpp_example_tests, cpp/test, TEST))
