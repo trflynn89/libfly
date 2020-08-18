@@ -3,6 +3,12 @@
 ARCH := $(shell uname -m)
 SUDO := $(shell which sudo)
 
+# Determine installation directories
+INSTALL_BIN_DIR := /usr/local/bin
+INSTALL_INC_DIR := /usr/local/include
+INSTALL_SRC_DIR := /usr/local/src
+INSTALL_LIB_DIR := /usr/local/lib
+
 # Determine host operating system
 ifneq ($(wildcard /etc/debian_version),)
     SYSTEM := LINUX
@@ -37,19 +43,4 @@ endif
 
 ifneq ($(arch), $(filter $(SUPPORTED_ARCH), $(arch)))
     $(error Architecture $(arch) not supported, check system.mk)
-endif
-
-# Determine installation directories
-ifeq ($(SYSTEM), LINUX)
-    INSTALL_BIN_DIR := /usr/bin
-    INSTALL_INC_DIR := /usr/include
-    INSTALL_SRC_DIR := /usr/local/src
-    INSTALL_LIB_DIR := /usr/lib
-else ifeq ($(SYSTEM), MACOS)
-    INSTALL_BIN_DIR := /usr/local/bin
-    INSTALL_INC_DIR := /usr/local/include
-    INSTALL_SRC_DIR := /usr/local/src
-    INSTALL_LIB_DIR := /usr/local/lib
-else
-    $(error Unrecognized system $(SYSTEM), check system.mk)
 endif

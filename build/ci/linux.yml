@@ -47,6 +47,7 @@ jobs:
 
     - script: |
         make -j -C build/nix $(config) install
+        sudo ldconfig
       displayName: 'Install'
       failOnStderr: true
 

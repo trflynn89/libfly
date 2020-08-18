@@ -8,7 +8,7 @@ MAKEFLAGS += --no-builtin-rules --no-print-directory
 SHELL := /bin/bash
 
 # Linker flags
-LDFLAGS := -L$(LIB_DIR) -L$(INSTALL_LIB_DIR)
+LDFLAGS := -L$(INSTALL_LIB_DIR)
 LDLIBS := -lpthread
 
 ifeq ($(SYSTEM), LINUX)
@@ -17,7 +17,7 @@ endif
 
 # Compiler flags for both C and C++ files
 CF_ALL := -MD -MP -fPIC
-CF_ALL += -I$(SOURCE_ROOT)
+CF_ALL += -I$(SOURCE_ROOT) -I$(INSTALL_INC_DIR)
 
 ifeq ($(SYSTEM), MACOS)
     CF_ALL += -isysroot $(XCODE)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
