@@ -21,7 +21,7 @@ class SystemMonitorImpl : public SystemMonitor
 {
 public:
     /**
-     * Constructor. Open the system monitor's CPU query and set the system CPU count.
+     * Constructor. Open the system monitor's CPU query.
      */
     SystemMonitorImpl(
         const std::shared_ptr<SequencedTaskRunner> &task_runner,
