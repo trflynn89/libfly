@@ -90,10 +90,9 @@ void SystemMonitorImpl::update_system_cpu_usage()
     if ((user >= m_prev_system_user_time) && (nice >= m_prev_system_nice_time) &&
         (system >= m_prev_system_system_time) && (idle >= m_prev_system_idle_time))
     {
-        std::uint64_t active = (user - m_prev_system_user_time) + (nice - m_prev_system_nice_time) +
+        const auto active = (user - m_prev_system_user_time) + (nice - m_prev_system_nice_time) +
             (system - m_prev_system_system_time);
-
-        std::uint64_t total = active + (idle - m_prev_system_idle_time);
+        const auto total = active + (idle - m_prev_system_idle_time);
 
         m_system_cpu_usage.store(100.0 * active / total);
     }
@@ -119,10 +118,9 @@ void SystemMonitorImpl::update_process_cpu_usage()
     if ((now > m_prev_time) && (sample.tms_stime >= m_prev_process_system_time) &&
         (sample.tms_utime >= m_prev_process_user_time))
     {
-        std::int64_t cpu = (sample.tms_stime - m_prev_process_system_time) +
+        const auto cpu = (sample.tms_stime - m_prev_process_system_time) +
             (sample.tms_utime - m_prev_process_user_time);
-
-        clock_t time = now - m_prev_time;
+        const auto time = now - m_prev_time;
 
         m_process_cpu_usage.store(100.0 * cpu / time / m_system_cpu_count.load());
     }
@@ -139,8 +137,8 @@ void SystemMonitorImpl::update_system_memory_usage()
 
     if (::sysinfo(&info) == 0)
     {
-        auto total_memory = static_cast<std::uint64_t>(info.totalram) * info.mem_unit;
-        auto free_memory = static_cast<std::uint64_t>(info.freeram) * info.mem_unit;
+        const auto total_memory = static_cast<std::uint64_t>(info.totalram) * info.mem_unit;
+        const auto free_memory = static_cast<std::uint64_t>(info.freeram) * info.mem_unit;
 
         m_total_system_memory.store(total_memory);
         m_system_memory_usage.store(total_memory - free_memory);

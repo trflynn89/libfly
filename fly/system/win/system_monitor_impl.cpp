@@ -109,10 +109,9 @@ void SystemMonitorImpl::update_process_cpu_usage()
         ::memcpy(&system, &fsystem, sizeof(FILETIME));
         ::memcpy(&user, &fuser, sizeof(FILETIME));
 
-        ULONGLONG cpu = (system.QuadPart - m_prev_process_system_time) +
+        const ULONGLONG cpu = (system.QuadPart - m_prev_process_system_time) +
             (user.QuadPart - m_prev_process_user_time);
-
-        ULONGLONG time = now.QuadPart - m_prev_time;
+        const ULONGLONG time = now.QuadPart - m_prev_time;
 
         m_process_cpu_usage.store(100.0 * cpu / time / m_system_cpu_count.load());
 
