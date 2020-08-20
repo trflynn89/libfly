@@ -10,7 +10,8 @@ LINK_CC := $(Q)$(CC) $$(CFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 COMP_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ -c $$<
 LINK_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 
-COMP_MVN := $(Q)$(MVN) $(MVN_FLAGS) -f $$(POM) compile assembly:single
+COMP_JAVA := $(Q)$(JAVAC) $(JAVA_FLAGS) $$(CLASS_PATH) $$(SOURCES)
+LINK_JAVA := $(Q)$(JAR) $(JAR_CREATE_FLAGS) $$(MAIN_CLASS) $$@ $$(CONTENTS)
 
 STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
 
@@ -48,7 +49,7 @@ $(2): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 
 endef
 
-# Link static and shared libraries targets from a set of object files.
+# Link static and shared library targets from a set of object files.
 #
 # $(1) = The target's name.
 define LIB_RULES
@@ -74,22 +75,41 @@ MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
 endef
 
-# Build a JAR file for a Maven project.
+# Build an executable JAR file for a Java project.
 #
-# $(1) = The path to the target output JAR file.
-# $(2) = The path to the target release package.
-define MVN_RULES
+# $(1) = The target's name.
+# $(2) = The application entry point.
+# $(3) = The path to the target output JAR file.
+# $(4) = The path to the target release package.
+define JAR_RULES
+
+t := $$(strip $(1))
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
-$(1): POM := $$(d)/pom.xml
+$(3): SOURCES := $$(SOURCES_$$(t))
+$(3): CLASS_PATH := $$(CLASS_PATH_$$(t))
+$(3): MAIN_CLASS := $(2)
+$(3): CONTENTS := $$(CONTENTS_$$(t))
 
-$(1): $$(MAKEFILES_$(d)) $$(SRC_$$(d))
-	@mkdir -p $$(@D)
-	@echo -e "[$(RED)Maven$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
-	$(COMP_MVN)
+$(3): $$(SOURCES_$$(t)) $$(MAKEFILES_$(d))
+	@mkdir -p $$(@D) $(CLASS_DIR)
 
-$(2):
+	@# Compile the Java source files into class files.
+	@echo -e "[$(CYAN)Compile$(DEFAULT) $(strip $(2))]"
+	$(COMP_JAVA)
+
+	@# Iterate over every JAR file in the class path and extracts them for inclusion in the target.
+	$(Q)for jar in $$(CLASS_PATH_JAR_$$(t)) ; do \
+		unzip $(ZIP_EXTRACT_FLAGS) -o $$$$jar -d $(CLASS_DIR) "*.class" ; \
+	done
+
+	@# Create the JAR archive from the compiled set of class files, the contents of the extracted
+	@# dependent JARs, and the contents of any resource directories.
+	@echo -e "[$(RED)JAR$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
+	$(LINK_JAVA)
+
+$(4):
 
 endef
 
@@ -242,29 +262,34 @@ $$(eval $$(call POP_DIR))
 
 endef
 
-# Define the rules to build a JAR file for a Maven project. The files.mk
-# should define:
+# Define the rules to build an executable JAR file for a Java project. The files.mk should define:
 #
+#     SRC_DIRS_$(d) = The source directories to include in the build.
 #     SRC_$(d) = The sources to be built in the target libraries.
+#     MAIN_CLASS_$(d) = The application entry point for the executable JAR.
+#     CLASS_PATH_$(d) = The paths to any JARs or packages to reference for compilation.
+#     RESOURCES_$(d) = The paths to any resources to include in the executable JAR.
 #
 # $(1) = The target's name.
 # $(2) = The path to the target root directory.
 # $(3) = The path to the target output libraries.
 # $(4) = The path to the target release package.
-define DEFINE_MVN_RULES
+define DEFINE_JAR_RULES
 
 # Push current dir to stack
 $$(eval $$(call PUSH_DIR, $(2)))
 
-# Define source files
-ifeq ($$(wildcard $$(d)/files.mk),)
-    SRC_$$(d) := $$(shell find $$(d) -type f -name "*.java")
-else
-    include $$(d)/files.mk
-endif
+# Define source, class, and generated files
+include $$(d)/files.mk
+$$(eval $$(call JAVA_OUT_FILES, $(1), $$(SRC_$$(d))))
+$$(eval $$(call JAVA_JAR_FILES, $(1), $$(CLASS_PATH_$$(d)), $$(RESOURCES_$$(d))))
+
+# Include the source directories
+$$(foreach dir, $$(SRC_DIRS_$$(d)), \
+    $$(eval $$(call DEFINE_JAVA_RULES, $(1), $$(dir))))
 
 # Define the compile rules
-$$(eval $$(call MVN_RULES, $(3), $(4)))
+$$(eval $$(call JAR_RULES, $(1), $$(MAIN_CLASS_$$(d)), $(3), $(4)))
 
 # Pop current dir from stack
 $$(eval $$(call POP_DIR))
@@ -303,6 +328,34 @@ $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 
 # Include dependency files
 -include $$(DEP_$$(d))
+
+# Pop current dir from stack
+$$(eval $$(call POP_DIR))
+
+endef
+
+# Define the rules to build a source directory. The files.mk is optional for
+# source directories. If not found, all source files in the directory will be
+# built. If found, the files.mk should define:
+#
+#     SRC_$(d) = The sources to be built in the target.
+#
+# $(1) = The target's name.
+# $(2) = The path to the target root directory.
+define DEFINE_JAVA_RULES
+
+# Push current dir to stack
+$$(eval $$(call PUSH_DIR, $(2)))
+
+# Define source, object and dependency files
+ifeq ($$(wildcard $$(d)/files.mk),)
+    SRC_$$(d) := \
+        $$(wildcard $$(d)/*.java)
+else
+    include $$(d)/files.mk
+endif
+
+$$(eval $$(call JAVA_OUT_FILES, $(1), $$(SRC_$$(d))))
 
 # Pop current dir from stack
 $$(eval $$(call POP_DIR))

@@ -6,9 +6,6 @@ TARGET_PACKAGES :=
 # List of all test target output binaries
 TEST_BINARIES :=
 
-# List of paths to all Maven targets to test
-TEST_MAVEN_PATHS :=
-
 # Verify a single target and, if valid, define a make goal to build that target.
 #
 # $(1) = The target's name.
@@ -33,9 +30,8 @@ else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
     else
         $$(error Unrecognized system $(SYSTEM), check target.mk)
     endif
-else ifeq ($$(TARGET_TYPE_$$(t)), MVN)
-    TARGET_FILE_$$(t) := $(MVN_DIR)/$$(t)-$(VERSION).jar
-    TEST_MAVEN_PATHS += $$(TARGET_PATH_$$(t))
+else ifeq ($$(TARGET_TYPE_$$(t)), JAR)
+    TARGET_FILE_$$(t) := $(JAR_DIR)/$$(t)-$(VERSION).jar
 else
     $$(error Target type $$(TARGET_TYPE_$$(t)) not supported)
 endif
@@ -54,8 +50,8 @@ ifeq ($$(TARGET_TYPE_$$(t)), BIN)
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
     $(call DEFINE_LIB_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
         $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
-else ifeq ($$(TARGET_TYPE_$$(t)), MVN)
-    $(call DEFINE_MVN_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
+else ifeq ($$(TARGET_TYPE_$$(t)), JAR)
+    $(call DEFINE_JAR_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
         $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 endif
 

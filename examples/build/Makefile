@@ -11,7 +11,7 @@ include /usr/local/src/fly/api.mk
 
 # Main targets
 $(eval $(call ADD_TARGET, libfly_cpp_example, cpp, BIN))
-$(eval $(call ADD_TARGET, libfly_mvn_example, mvn, MVN))
+$(eval $(call ADD_TARGET, libfly_mvn_example, jar/src/main/java, JAR))
 
 # Test targets
 $(eval $(call ADD_TARGET, libfly_cpp_example_tests, cpp/test, TEST))

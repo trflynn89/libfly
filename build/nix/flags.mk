@@ -23,8 +23,8 @@ ifeq ($(SYSTEM), MACOS)
     CF_ALL += -isysroot $(XCODE)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 endif
 
-# Compiler flags for Maven projects
-MVN_FLAGS := -Doutput=$(MVN_DIR)
+# Compiler flags for Java projects
+JAVA_FLAGS := -deprecation -d $(CLASS_DIR)
 
 ifeq ($(arch), x86)
     CF_ALL += -m32
@@ -90,7 +90,7 @@ endif
 # profiling symbols for profile builds.
 ifeq ($(mode), debug)
     CF_ALL += -O0 -g -fsanitize=address -fno-omit-frame-pointer
-    MVN_FLAGS += -Dmaven.compiler.debuglevel=lines,vars,source
+    JAVA_FLAGS += -g:lines,vars,source
 
     ifeq ($(toolchain), clang)
         CF_ALL += -fprofile-instr-generate -fcoverage-mapping
@@ -99,7 +99,7 @@ ifeq ($(mode), debug)
     endif
 else ifeq ($(mode), release)
     CF_ALL += -O2
-    MVN_FLAGS += -Dmaven.compiler.debuglevel=none
+    JAVA_FLAGS += -g:none
 else ifeq ($(mode), profile)
     ifeq ($(toolchain), gcc)
         CF_ALL += -O2 -g -pg
@@ -109,9 +109,9 @@ else ifeq ($(mode), profile)
     endif
 endif
 
-# Suppress output on Maven projects
-ifneq ($(verbose), 1)
-    MVN_FLAGS += -q
+# Enable verbose Java output.
+ifeq ($(verbose), 1)
+    JAVA_FLAGS += -verbose
 endif
 
 # C and C++ specific flags
@@ -147,6 +147,13 @@ else
     $(error Unrecognized system $(SYSTEM), check flags.mk)
 endif
 
+# jar flags
+ifeq ($(verbose), 1)
+    JAR_CREATE_FLAGS := cvef
+else
+    JAR_CREATE_FLAGS := cef
+endif
+
 # tar flags
 ifeq ($(verbose), 1)
     TAR_EXTRACT_FLAGS := -xjvf
@@ -158,4 +165,9 @@ endif
 
 ifeq ($(SYSTEM), MACOS)
     TAR_EXTRACT_FLAGS := -mo $(TAR_EXTRACT_FLAGS)
+endif
+
+# zip flags
+ifeq ($(verbose), 0)
+    ZIP_EXTRACT_FLAGS := -q
 endif
