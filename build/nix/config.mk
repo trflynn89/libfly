@@ -45,7 +45,8 @@ else
     $(error Unrecognized toolchain $(toolchain), check config.mk)
 endif
 
-MVN := mvn
+JAVAC := javac
+JAR := jar
 
 # Validate the provided compilation mode.
 SUPPORTED_MODES := debug release profile
@@ -63,13 +64,15 @@ endif
 # Define the output directories
 OUT_DIR := $(CURDIR)/$(mode)
 
-CPP_DIR := $(OUT_DIR)/$(toolchain)/$(arch)
-MVN_DIR := $(OUT_DIR)/$(MVN)
+CXX_DIR := $(OUT_DIR)/$(toolchain)/$(arch)
+BIN_DIR := $(CXX_DIR)/bin
+LIB_DIR := $(CXX_DIR)/lib
+OBJ_DIR := $(CXX_DIR)/obj
+ETC_DIR := $(CXX_DIR)/etc
 
-BIN_DIR := $(CPP_DIR)/bin
-LIB_DIR := $(CPP_DIR)/lib
-OBJ_DIR := $(CPP_DIR)/obj
-ETC_DIR := $(CPP_DIR)/etc
+JAVA_DIR := $(OUT_DIR)/$(JAVAC)
+JAR_DIR := $(JAVA_DIR)/bin
+CLASS_DIR := $(JAVA_DIR)/classes
 
 # ANSI escape sequences to use in stylized builds.
 ifeq ($(stylized), 1)
@@ -92,7 +95,8 @@ else
     $(info Lib dir = $(LIB_DIR))
     $(info Obj dir = $(OBJ_DIR))
     $(info Etc dir = $(ETC_DIR))
-    $(info Mvn dir = $(MVN_DIR))
+    $(info JAR dir = $(JAR_DIR))
+    $(info Class dir = $(CLASS_DIR))
     $(info Toolchain = $(toolchain))
     $(info Mode = $(mode))
     $(info Arch = $(arch))

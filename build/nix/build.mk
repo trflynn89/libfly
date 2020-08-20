@@ -52,14 +52,6 @@ tests: $(TEST_BINARIES)
 		fi; \
 	done; \
 	\
-	for tgt in $(TEST_MAVEN_PATHS) ; do \
-		$(MVN) $(MVN_FLAGS) -f $(SOURCE_ROOT)/$$tgt/pom.xml test; \
-		\
-		if [[ $$? -ne 0 ]] ; then \
-			failed=$$((failed+1)); \
-		fi; \
-	done; \
-	\
 	exit $$failed
 
 # Create coverage report
@@ -92,7 +84,7 @@ endif
 
 else ifeq ($(toolchain), gcc)
 	$(Q)lcov --capture \
-		--directory $(CPP_DIR) \
+		--directory $(CXX_DIR) \
 		--output-file $(report)
 
 	$(Q)lcov --remove \
@@ -147,13 +139,13 @@ setup:
 ifeq ($(SYSTEM), LINUX)
 ifeq ($(VENDOR), DEBIAN)
 	$(Q)$(SUDO) apt install -y git make clang clang-format clang-tidy lld llvm gcc g++ lcov \
-		openjdk-14-jdk maven
+		openjdk-14-jdk
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) apt install -y gcc-multilib g++-multilib
 endif
 else ifeq ($(VENDOR), REDHAT)
 	$(Q)$(SUDO) dnf install -y git make clang lld llvm gcc gcc-c++ lcov libstdc++-static libasan \
-		libatomic java-14-openjdk-devel maven
+		libatomic java-14-openjdk-devel
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) dnf install -y glibc-devel.i686 libstdc++-static.i686 libasan.i686 libatomic.i686
 endif
