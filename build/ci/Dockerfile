@@ -48,8 +48,7 @@ RUN apt-get install -y \
 # Install OpenJDK
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get install -y \
-        openjdk-$JDK_VERSION-jdk \
-        maven
+        openjdk-$JDK_VERSION-jdk
 
 # Cleanup
 RUN apt-get clean -y && \
