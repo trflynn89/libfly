@@ -43,4 +43,4 @@ jobs:
         make -j $(sysctl -n hw.ncpu) -C examples/build $(config)
         make -j $(sysctl -n hw.ncpu) -C examples/build $(config) tests
       displayName: 'Examples'
-      failOnStderr: false # Maven currently contains errant stderr messages
+      failOnStderr: true
