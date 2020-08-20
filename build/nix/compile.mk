@@ -27,21 +27,18 @@ endif
 
 # Link a binary target from a set of object files.
 #
-# $(1) = The target's name.
-# $(2) = The path to the target output binary.
+# $(1) = The path to the target output binary.
 define BIN_RULES
-
-t := $$(strip $(1))
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
-$(2): OBJS := $$(OBJ_$$(t))
-$(2): CFLAGS := $(CFLAGS) $(CFLAGS_$(d))
-$(2): CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_$(d))
-$(2): LDFLAGS := $(LDFLAGS) $(LDFLAGS_$(d))
-$(2): LDLIBS := $(LDLIBS) $(LDLIBS_$(d))
+$(1): OBJS := $$(OBJ_$(t))
+$(1): CFLAGS := $(CFLAGS) $(CFLAGS_$(d))
+$(1): CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_$(d))
+$(1): LDFLAGS := $(LDFLAGS) $(LDFLAGS_$(d))
+$(1): LDLIBS := $(LDLIBS) $(LDLIBS_$(d))
 
-$(2): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
+$(1): $$(OBJ_$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 
 	@echo -e "[$(RED)Link$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
@@ -50,25 +47,21 @@ $(2): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
 endef
 
 # Link static and shared library targets from a set of object files.
-#
-# $(1) = The target's name.
 define LIB_RULES
-
-t := $$(strip $(1))
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
-%.a %.so.$(VERSION) %.dylib.$(VERSION): OBJS := $$(OBJ_$$(t))
+%.a %.so.$(VERSION) %.dylib.$(VERSION): OBJS := $$(OBJ_$(t))
 %.a %.so.$(VERSION) %.dylib.$(VERSION): CFLAGS := $(CFLAGS_$(d)) $(CFLAGS)
 %.a %.so.$(VERSION) %.dylib.$(VERSION): CXXFLAGS := $(CXXFLAGS_$(d)) $(CXXFLAGS)
 %.a %.so.$(VERSION) %.dylib.$(VERSION): LDFLAGS := $(LDFLAGS_$(d)) $(LDFLAGS)
 
-%.a: $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
+%.a: $$(OBJ_$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo -e "[$(GREEN)Static$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
 	$(STATIC)
 
-%.so.$(VERSION) %.dylib.$(VERSION): $$(OBJ_$$(t)) $$(MAKEFILES_$(d))
+%.so.$(VERSION) %.dylib.$(VERSION): $$(OBJ_$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo -e "[$(GREEN)Shared$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
 	$(SHARED_CXX)
@@ -77,30 +70,27 @@ endef
 
 # Build an executable JAR file for a Java project.
 #
-# $(1) = The target's name.
-# $(2) = The application entry point.
-# $(3) = The path to the target output JAR file.
-# $(4) = The path to the target release package.
+# $(1) = The application entry point.
+# $(2) = The path to the target output JAR file.
+# $(3) = The path to the target release package.
 define JAR_RULES
-
-t := $$(strip $(1))
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
-$(3): SOURCES := $$(SOURCES_$$(t))
-$(3): CLASS_PATH := $$(CLASS_PATH_$$(t))
-$(3): MAIN_CLASS := $(2)
-$(3): CONTENTS := $$(CONTENTS_$$(t))
+$(2): SOURCES := $$(SOURCES_$(t))
+$(2): CLASS_PATH := $$(CLASS_PATH_$(t))
+$(2): MAIN_CLASS := $(1)
+$(2): CONTENTS := $$(CONTENTS_$(t))
 
-$(3): $$(SOURCES_$$(t)) $$(MAKEFILES_$(d))
+$(2): $$(SOURCES_$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D) $(CLASS_DIR)
 
 	@# Compile the Java source files into class files.
-	@echo -e "[$(CYAN)Compile$(DEFAULT) $(strip $(2))]"
+	@echo -e "[$(CYAN)Compile$(DEFAULT) $(strip $(1))]"
 	$(COMP_JAVA)
 
 	@# Iterate over every JAR file in the class path and extracts them for inclusion in the target.
-	$(Q)for jar in $$(CLASS_PATH_JAR_$$(t)) ; do \
+	$(Q)for jar in $$(CLASS_PATH_JAR_$(t)) ; do \
 		unzip $(ZIP_EXTRACT_FLAGS) -o $$$$jar -d $(CLASS_DIR) "*.class" ; \
 	done
 
@@ -109,38 +99,35 @@ $(3): $$(SOURCES_$$(t)) $$(MAKEFILES_$(d))
 	@echo -e "[$(RED)JAR$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
 	$(LINK_JAVA)
 
-$(4):
+$(3):
 
 endef
 
 # Build a release package.
 #
-# $(1) = The target's name.
-# $(2) = The path to the target output binary or libraries.
-# $(3) = The path to the target release package.
+# $(1) = The path to the target output binary or libraries.
+# $(2) = The path to the target release package.
 define PKG_RULES
 
-t := $$(strip $(1))
+ifeq ($$(REL_CMDS_$(t)),)
 
-ifeq ($$(REL_CMDS_$$(t)),)
-
-$(3):
+$(2):
 
 else
 
 # Force repackaging if any build files change
 MAKEFILES_$(d) := $(BUILD_ROOT)/*.mk
 
-$(3): REL_CMDS := $$(REL_CMDS_$$(t))
-$(3): REL_NAME := $$(REL_NAME_$$(t))
-$(3): ETC_TMP_DIR := $$(ETC_TMP_DIR_$$(t))
-$(3): REL_BIN_DIR := $$(REL_BIN_DIR_$$(t))
-$(3): REL_LIB_DIR := $$(REL_LIB_DIR_$$(t))
-$(3): REL_INC_DIR := $$(REL_INC_DIR_$$(t))
-$(3): REL_SRC_DIR := $$(REL_SRC_DIR_$$(t))
-$(3): REL_UNINSTALL := $$(REL_UNINSTALL_$$(t))
+$(2): REL_CMDS := $$(REL_CMDS_$(t))
+$(2): REL_NAME := $$(REL_NAME_$(t))
+$(2): ETC_TMP_DIR := $$(ETC_TMP_DIR_$(t))
+$(2): REL_BIN_DIR := $$(REL_BIN_DIR_$(t))
+$(2): REL_LIB_DIR := $$(REL_LIB_DIR_$(t))
+$(2): REL_INC_DIR := $$(REL_INC_DIR_$(t))
+$(2): REL_SRC_DIR := $$(REL_SRC_DIR_$(t))
+$(2): REL_UNINSTALL := $$(REL_UNINSTALL_$(t))
 
-$(3): $(2) $$(MAKEFILES_$(d))
+$(2): $(1) $$(MAKEFILES_$(d))
 	$(Q)$$(BUILD_REL)
 
 endif
@@ -196,26 +183,24 @@ endef
 #     LDLIBS_$(d) = The libraries to be linked in the target binary.
 #     SRC_$(d) = The sources to be built in the target binary.
 #
-# $(1) = The target's name.
-# $(2) = The path to the target root directory.
-# $(3) = The path to the target output libraries.
-# $(4) = The path to the target release package.
+# $(1) = The path to the target root directory.
+# $(2) = The path to the target output libraries.
+# $(3) = The path to the target release package.
 define DEFINE_BIN_RULES
 
 # Push current dir to stack
-$$(eval $$(call PUSH_DIR, $(2)))
+$$(eval $$(call PUSH_DIR, $(1)))
 
 # Define source, object, dependency, and binary files
 include $$(d)/files.mk
-$$(eval $$(call OBJ_OUT_FILES, $(1), $$(SRC_$$(d))))
+$$(eval $$(call OBJ_OUT_FILES, $$(SRC_$$(d))))
 
 # Include the source directories
-$$(foreach dir, $$(SRC_DIRS_$$(d)), \
-    $$(eval $$(call DEFINE_SRC_RULES, $(1), $$(dir))))
+$$(foreach dir, $$(SRC_DIRS_$$(d)), $$(eval $$(call DEFINE_SRC_RULES, $$(dir))))
 
 # Define the compile rules
-$$(eval $$(call BIN_RULES, $(1), $(3)))
-$$(eval $$(call PKG_RULES, $(1), $(3), $(4)))
+$$(eval $$(call BIN_RULES, $(2)))
+$$(eval $$(call PKG_RULES, $(2), $(3)))
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 
 # Include dependency files
@@ -232,26 +217,24 @@ endef
 #     SRC_DIRS_$(d) = The source directories to include in the build.
 #     SRC_$(d) = The sources to be built in the target libraries.
 #
-# $(1) = The target's name.
-# $(2) = The path to the target root directory.
-# $(3) = The path to the target output libraries.
-# $(4) = The path to the target release package.
+# $(1) = The path to the target root directory.
+# $(2) = The path to the target output libraries.
+# $(3) = The path to the target release package.
 define DEFINE_LIB_RULES
 
 # Push current dir to stack
-$$(eval $$(call PUSH_DIR, $(2)))
+$$(eval $$(call PUSH_DIR, $(1)))
 
 # Define source, object, dependency, and binary files
 include $$(d)/files.mk
-$$(eval $$(call OBJ_OUT_FILES, $(1), $$(SRC_$$(d))))
+$$(eval $$(call OBJ_OUT_FILES, $$(SRC_$$(d))))
 
 # Include the source directories
-$$(foreach dir, $$(SRC_DIRS_$$(d)), \
-    $$(eval $$(call DEFINE_SRC_RULES, $(1), $$(dir))))
+$$(foreach dir, $$(SRC_DIRS_$$(d)), $$(eval $$(call DEFINE_SRC_RULES, $$(dir))))
 
 # Define the compile rules
-$$(eval $$(call LIB_RULES, $(1)))
-$$(eval $$(call PKG_RULES, $(1), $(3), $(4)))
+$$(eval $$(call LIB_RULES))
+$$(eval $$(call PKG_RULES, $(2), $(3)))
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 
 # Include dependency files
@@ -270,26 +253,24 @@ endef
 #     CLASS_PATH_$(d) = The paths to any JARs or packages to reference for compilation.
 #     RESOURCES_$(d) = The paths to any resources to include in the executable JAR.
 #
-# $(1) = The target's name.
-# $(2) = The path to the target root directory.
-# $(3) = The path to the target output libraries.
-# $(4) = The path to the target release package.
+# $(1) = The path to the target root directory.
+# $(2) = The path to the target output libraries.
+# $(3) = The path to the target release package.
 define DEFINE_JAR_RULES
 
 # Push current dir to stack
-$$(eval $$(call PUSH_DIR, $(2)))
+$$(eval $$(call PUSH_DIR, $(1)))
 
 # Define source, class, and generated files
 include $$(d)/files.mk
-$$(eval $$(call JAVA_OUT_FILES, $(1), $$(SRC_$$(d))))
-$$(eval $$(call JAVA_JAR_FILES, $(1), $$(CLASS_PATH_$$(d)), $$(RESOURCES_$$(d))))
+$$(eval $$(call JAVA_OUT_FILES, $$(SRC_$$(d))))
+$$(eval $$(call JAVA_JAR_FILES, $$(CLASS_PATH_$$(d)), $$(RESOURCES_$$(d))))
 
 # Include the source directories
-$$(foreach dir, $$(SRC_DIRS_$$(d)), \
-    $$(eval $$(call DEFINE_JAVA_RULES, $(1), $$(dir))))
+$$(foreach dir, $$(SRC_DIRS_$$(d)), $$(eval $$(call DEFINE_JAVA_RULES, $$(dir))))
 
 # Define the compile rules
-$$(eval $$(call JAR_RULES, $(1), $$(MAIN_CLASS_$$(d)), $(3), $(4)))
+$$(eval $$(call JAR_RULES, $$(MAIN_CLASS_$$(d)), $(2), $(3)))
 
 # Pop current dir from stack
 $$(eval $$(call POP_DIR))
@@ -302,12 +283,11 @@ endef
 #
 #     SRC_$(d) = The sources to be built in the target.
 #
-# $(1) = The target's name.
-# $(2) = The path to the target root directory.
+# $(1) = The path to the target root directory.
 define DEFINE_SRC_RULES
 
 # Push current dir to stack
-$$(eval $$(call PUSH_DIR, $(2)))
+$$(eval $$(call PUSH_DIR, $(1)))
 
 # Define source, object and dependency files
 ifeq ($$(wildcard $$(d)/files.mk),)
@@ -321,7 +301,7 @@ else
     include $$(d)/files.mk
 endif
 
-$$(eval $$(call OBJ_OUT_FILES, $(1), $$(SRC_$$(d))))
+$$(eval $$(call OBJ_OUT_FILES, $$(SRC_$$(d))))
 
 # Define the compile rules
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
@@ -340,12 +320,11 @@ endef
 #
 #     SRC_$(d) = The sources to be built in the target.
 #
-# $(1) = The target's name.
-# $(2) = The path to the target root directory.
+# $(1) = The path to the target root directory.
 define DEFINE_JAVA_RULES
 
 # Push current dir to stack
-$$(eval $$(call PUSH_DIR, $(2)))
+$$(eval $$(call PUSH_DIR, $(1)))
 
 # Define source, object and dependency files
 ifeq ($$(wildcard $$(d)/files.mk),)
@@ -355,7 +334,7 @@ else
     include $$(d)/files.mk
 endif
 
-$$(eval $$(call JAVA_OUT_FILES, $(1), $$(SRC_$$(d))))
+$$(eval $$(call JAVA_OUT_FILES, $$(SRC_$$(d))))
 
 # Pop current dir from stack
 $$(eval $$(call POP_DIR))
