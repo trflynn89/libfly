@@ -16,11 +16,10 @@ SRC_DIRS_$(d) := \
     fly/types/string
 
 # Add libfly.so to release package
-$(eval $(call ADD_REL_LIB, libfly))
+$(eval $(call ADD_REL_LIB))
 
 # Add all header files to release package
-$(eval $(call ADD_REL_INC, libfly, $(d), *.hpp, fly))
+$(eval $(call ADD_REL_INC, $(d), *.hpp, fly))
 
-# Add make system files to release package
-$(eval $(call ADD_REL_SRC, libfly, $(BUILD_ROOT), *.mk, fly))
-$(eval $(call ADD_REL_SRC, libfly, $(BUILD_ROOT)/../ci, *.js, fly))
+# Add build system files to release package
+$(eval $(call ADD_REL_SRC, $(BUILD_ROOT), *.mk, fly))

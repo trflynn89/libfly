@@ -11,6 +11,7 @@ TEST_BINARIES :=
 # $(1) = The target's name.
 define DEFINE_TARGET
 
+# Define the global variable $(t) to refer to the current target.
 t := $$(strip $(1))
 
 # Define the path to the target output binary/library
@@ -45,14 +46,11 @@ $$(t): $$(TARGET_FILE_$$(t)) $$(TARGET_PACKAGE_$$(t))
 
 # Define the compilation goals for the target
 ifeq ($$(TARGET_TYPE_$$(t)), BIN)
-    $(call DEFINE_BIN_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
-        $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
+    $(call DEFINE_BIN_RULES, $$(TARGET_PATH_$$(t)), $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 else ifeq ($$(TARGET_TYPE_$$(t)), LIB)
-    $(call DEFINE_LIB_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
-        $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
+    $(call DEFINE_LIB_RULES, $$(TARGET_PATH_$$(t)), $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 else ifeq ($$(TARGET_TYPE_$$(t)), JAR)
-    $(call DEFINE_JAR_RULES, $$(t), $$(TARGET_PATH_$$(t)), \
-        $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
+    $(call DEFINE_JAR_RULES, $$(TARGET_PATH_$$(t)), $$(TARGET_FILE_$$(t)), $$(TARGET_PACKAGE_$$(t)))
 endif
 
 endef
