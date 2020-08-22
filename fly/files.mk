@@ -1,4 +1,3 @@
-# Define the directories to include and compile
 SRC_DIRS_$(d) := \
     fly/coders \
     fly/coders/base64 \
@@ -15,11 +14,11 @@ SRC_DIRS_$(d) := \
     fly/types/json \
     fly/types/string
 
-# Add libfly.so to release package
+# Add libfly.a and libfly.so to the archived release package.
 $(eval $(call ADD_REL_LIB))
 
-# Add all header files to release package
+# Add all header files to the archived release package.
 $(eval $(call ADD_REL_INC, $(d), *.hpp, fly))
 
-# Add build system files to release package
+# Add build system files to thearchived release package.
 $(eval $(call ADD_REL_SRC, $(BUILD_ROOT), *.mk, fly))

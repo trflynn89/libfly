@@ -1,25 +1,25 @@
-# Define the default make configuration. Not all defaults are defined here, but
-# all command line options are listed here for convenience.
+# Define the default make configuration. Not all defaults are defined here, but all command line
+# options are listed here for convenience.
 
-# Compilation toolchain (clang, gcc)
+# Compilation toolchain (clang, gcc) for C-family targets.
 toolchain := clang
 
-# Compilation mode (debug, release, profile)
+# Compilation mode (debug, release, profile).
 mode := debug
 
-# Build 32-bit or 64-bit target
+# Build 32-bit or 64-bit target.
 arch := $(arch)
 
-# Compile caching system
+# Compile caching system.
 cacher :=
 
-# Enable stylized builds
+# Enable stylized build output.
 stylized := 1
 
-# Enable verbose builds
+# Enable verbose builds.
 verbose := 0
 
-# Define the toolchain binaries
+# Define the toolchain binaries.
 ifeq ($(toolchain), clang)
     ifeq ($(SYSTEM), LINUX)
         CC := clang
@@ -55,13 +55,13 @@ ifneq ($(mode), $(filter $(SUPPORTED_MODES), $(mode)))
     $(error Compilation mode $(mode) not supported, check config.mk)
 endif
 
-# Use a compiler cache if requested
+# Use a compiler cache if requested.
 ifneq ($(cacher), )
     CC := $(cacher) $(CC)
     CXX := $(cacher) $(CXX)
 endif
 
-# Define the output directories
+# Define the output directories.
 OUT_DIR := $(CURDIR)/$(mode)
 
 CXX_DIR := $(OUT_DIR)/$(toolchain)/$(arch)
@@ -87,7 +87,7 @@ ifeq ($(stylized), 1)
     WHITE := \x1b[1;37m
 endif
 
-# Use @ suppression in non-verbose builds
+# Use @ suppression in non-verbose builds.
 ifeq ($(verbose), 0)
     Q := @
 else

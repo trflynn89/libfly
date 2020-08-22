@@ -1,16 +1,45 @@
-# Define compilation functions for each object and binary target. Every source
-# directory should contain a files.mk file. Every binary target directory must
-# also contain a files.mk file, and include the source directorises it depends
-# upon. What each of the files.mk files must define is described below.
+# Define make goals for compiling for all supported target types and the intermediate files they
+# require. Each target source directory added via $(ADD_TARGET) must contain a file called files.mk.
+# The contents expected of that file depend on the target type. This files.mk file is also where
+# the APIs defined in release.mk may be used to create an archived release package.
+#
+# All variables defined in a files.mk file should be defined in terms of the special variable $(d):
+#
+#     d = The path to the directory containing the current files.mk file.
+#
+# This variable is defined and maintained by stack.mk. It is used to define variables of the same
+# meaning on a per-source-directory basis.
+#
+# The files.mk for all target types may contain:
+#
+#     SRC_DIRS_$(d) = The source directories relative to $(SOURCE_ROOT) to include in the build.
+#     SRC_$(d) = The sources in this directory to build.
+#
+# The files.mk for target type JAR may additionally contain:
+#
+#     MAIN_CLASS_$(d) = (Required) The application entry point for the executable JAR.
+#     CLASS_PATH_$(d) = The paths to any JARs or packages to reference for compilation.
+#     RESOURCES_$(d) = The paths to any runtime resources to include in the executable JAR.
+#
+# Each directory added to $(SRC_DIRS_$(d)) may optionally contain a files.mk file to define
+# variables specific to that directory:
+#
+#     SRC_$(d) = The sources in this directory to build.
+#
+# If a directory in $(SRC_DIRS_$(d)) does not contain a files.mk file, then $(SRC_$(d)) defaults to
+# every source file in that directory.
+#
+# Any of the files.mk files may contain the per-directory compiler/linker flag extensions described
+# in flags.mk.
 
-# Build tools
+# Define helper aliases for compiler/linker invocations.
 COMP_CC := $(Q)$(CC) $$(CFLAGS) -o $$@ -c $$<
 LINK_CC := $(Q)$(CC) $$(CFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 
 COMP_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ -c $$<
 LINK_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 
-COMP_JAVA := $(Q)$(JAVAC) $(JAVA_FLAGS) $$(CLASS_PATH) $$(SOURCES)
+COMP_JAVA := $(Q)$(JAVAC) $$(JFLAGS) $$(CLASS_PATH) $$(SOURCES)
 LINK_JAVA := $(Q)$(JAR) $(JAR_CREATE_FLAGS) $$(MAIN_CLASS) $$@ $$(CONTENTS)
 
 STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
@@ -25,7 +54,7 @@ else
     $(error Unrecognized system $(SYSTEM), check compile.mk)
 endif
 
-# Link a binary target from a set of object files.
+# Define the make goal to link a binary target from a set of object files.
 #
 # $(1) = The path to the target output binary.
 define BIN_RULES
@@ -46,7 +75,7 @@ $(1): $$(OBJ_$(t)) $$(MAKEFILES_$(d))
 
 endef
 
-# Link static and shared library targets from a set of object files.
+# Define the make goal to link static and shared targets from a set of object files.
 define LIB_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
@@ -68,25 +97,26 @@ MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
 endef
 
-# Build an executable JAR file for a Java project.
+# Define the make goal to compile Java files and link an executable JAR file from the compiled class
+# files.
 #
-# $(1) = The application entry point.
-# $(2) = The path to the target output JAR file.
-# $(3) = The path to the target release package.
+# $(1) = The path to the target output JAR file.
+# $(2) = The application entry point.
 define JAR_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
-$(2): SOURCES := $$(SOURCES_$(t))
-$(2): CLASS_PATH := $$(CLASS_PATH_$(t))
-$(2): MAIN_CLASS := $(1)
-$(2): CONTENTS := $$(CONTENTS_$(t))
+$(1): SOURCES := $$(SOURCES_$(t))
+$(1): JFLAGS := $(JFLAGS) $(JFLAGS_$(d))
+$(1): CLASS_PATH := $$(CLASS_PATH_$(t))
+$(1): MAIN_CLASS := $(2)
+$(1): CONTENTS := $$(CONTENTS_$(t))
 
-$(2): $$(SOURCES_$(t)) $$(MAKEFILES_$(d))
+$(1): $$(SOURCES_$(t)) $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D) $(CLASS_DIR)
 
 	@# Compile the Java source files into class files.
-	@echo -e "[$(CYAN)Compile$(DEFAULT) $(strip $(1))]"
+	@echo -e "[$(CYAN)Compile$(DEFAULT) $(strip $(2))]"
 	$(COMP_JAVA)
 
 	@# Iterate over every JAR file in the class path and extracts them for inclusion in the target.
@@ -99,13 +129,11 @@ $(2): $$(SOURCES_$(t)) $$(MAKEFILES_$(d))
 	@echo -e "[$(RED)JAR$(DEFAULT) $$(subst $(CURDIR)/,,$$@)]"
 	$(LINK_JAVA)
 
-$(3):
-
 endef
 
-# Build a release package.
+# Define the make goal to generate an archived release package.
 #
-# $(1) = The path to the target output binary or libraries.
+# $(1) = The path to the target output files.
 # $(2) = The path to the target release package.
 define PKG_RULES
 
@@ -115,7 +143,6 @@ $(2):
 
 else
 
-# Force repackaging if any build files change
 MAKEFILES_$(d) := $(BUILD_ROOT)/*.mk
 
 $(2): REL_CMDS := $$(REL_CMDS_$(t))
@@ -134,42 +161,42 @@ endif
 
 endef
 
-# Compile C/C++/Objective-C/Objective-C++ files to object files.
+# Define the make goal to compile C-family files to object files.
 #
-# $(1) = Path to directory where object files should be placed.
+# $(1) = Path to directory where object files should be created.
 define OBJ_RULES
 
 MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
-# Use = instead of := because $$(@) would become an empty string if expanded now
+# Use = instead of := because $$(@) would become an empty string if expanded now.
 $(1)/%.o: CFLAGS = $(CFLAGS) $(CFLAGS_$(d)) -MF $$(@:%.o=%.d)
 $(1)/%.o: CXXFLAGS = $(CXXFLAGS) $(CXXFLAGS_$(d)) -MF $$(@:%.o=%.d)
 
-# C files
+# C files.
 $(1)/%.o: $(d)/%.c $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CC)
 
-# CC files
+# CC files.
 $(1)/%.o: $(d)/%.cc $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
 
-# C++ files
+# C++ files.
 $(1)/%.o: $(d)/%.cpp $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CXX)
 
-# Objective-C files
+# Objective-C files.
 $(1)/%.o: $(d)/%.m $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
 	$(COMP_CC)
 
-# Objective-C++ files
+# Objective-C++ files.
 $(1)/%.o: $(d)/%.mm $$(MAKEFILES_$(d))
 	@mkdir -p $$(@D)
 	@echo -e "[$(CYAN)Compile$(DEFAULT) $$(subst $(SOURCE_ROOT)/,,$$<)]"
@@ -177,119 +204,102 @@ $(1)/%.o: $(d)/%.mm $$(MAKEFILES_$(d))
 
 endef
 
-# Define the rules to build a binary target. The files.mk should define:
-#
-#     SRC_DIRS_$(d) = The source directories to include in the build.
-#     LDLIBS_$(d) = The libraries to be linked in the target binary.
-#     SRC_$(d) = The sources to be built in the target binary.
+# Define all make goals required to build a target of type BIN (or TEST).
 #
 # $(1) = The path to the target root directory.
-# $(2) = The path to the target output libraries.
+# $(2) = The path to the target output binary.
 # $(3) = The path to the target release package.
 define DEFINE_BIN_RULES
 
-# Push current dir to stack
+# Push the current directory to the stack.
 $$(eval $$(call PUSH_DIR, $(1)))
 
-# Define source, object, dependency, and binary files
+# Define source, object, dependency, and binary files.
 include $$(d)/files.mk
 $$(eval $$(call OBJ_OUT_FILES, $$(SRC_$$(d))))
 
-# Include the source directories
-$$(foreach dir, $$(SRC_DIRS_$$(d)), $$(eval $$(call DEFINE_SRC_RULES, $$(dir))))
+# Include the source directories.
+$$(foreach dir, $$(SRC_DIRS_$$(d)), $$(eval $$(call DEFINE_OBJ_RULES, $$(dir))))
 
-# Define the compile rules
+# Define the compile rules.
 $$(eval $$(call BIN_RULES, $(2)))
 $$(eval $$(call PKG_RULES, $(2), $(3)))
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 
-# Include dependency files
+# Include dependency files.
 -include $$(DEP_$$(d))
 
-# Pop current dir from stack
+# Pop the current directory from the stack.
 $$(eval $$(call POP_DIR))
 
 endef
 
-# Define the rules to build static and shared library targets. The files.mk
-# should define:
-#
-#     SRC_DIRS_$(d) = The source directories to include in the build.
-#     SRC_$(d) = The sources to be built in the target libraries.
+# Define all make goals required to build a target of type LIB.
 #
 # $(1) = The path to the target root directory.
 # $(2) = The path to the target output libraries.
 # $(3) = The path to the target release package.
 define DEFINE_LIB_RULES
 
-# Push current dir to stack
+# Push the current directory to the stack.
 $$(eval $$(call PUSH_DIR, $(1)))
 
-# Define source, object, dependency, and binary files
+# Define source, object, dependency, and binary files.
 include $$(d)/files.mk
 $$(eval $$(call OBJ_OUT_FILES, $$(SRC_$$(d))))
 
-# Include the source directories
-$$(foreach dir, $$(SRC_DIRS_$$(d)), $$(eval $$(call DEFINE_SRC_RULES, $$(dir))))
+# Include the source directories.
+$$(foreach dir, $$(SRC_DIRS_$$(d)), $$(eval $$(call DEFINE_OBJ_RULES, $$(dir))))
 
-# Define the compile rules
+# Define the compile rules.
 $$(eval $$(call LIB_RULES))
 $$(eval $$(call PKG_RULES, $(2), $(3)))
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 
-# Include dependency files
+# Include dependency files.
 -include $$(DEP_$$(d))
 
-# Pop current dir from stack
+# Pop the current directory from the stack.
 $$(eval $$(call POP_DIR))
 
 endef
 
-# Define the rules to build an executable JAR file for a Java project. The files.mk should define:
-#
-#     SRC_DIRS_$(d) = The source directories to include in the build.
-#     SRC_$(d) = The sources to be built in the target libraries.
-#     MAIN_CLASS_$(d) = The application entry point for the executable JAR.
-#     CLASS_PATH_$(d) = The paths to any JARs or packages to reference for compilation.
-#     RESOURCES_$(d) = The paths to any resources to include in the executable JAR.
+# Define all make goals required to build a target of type JAR.
 #
 # $(1) = The path to the target root directory.
-# $(2) = The path to the target output libraries.
+# $(2) = The path to the target output JAR file.
 # $(3) = The path to the target release package.
 define DEFINE_JAR_RULES
 
-# Push current dir to stack
+# Push the current directory to the stack.
 $$(eval $$(call PUSH_DIR, $(1)))
 
-# Define source, class, and generated files
+# Define source, class, and generated files.
 include $$(d)/files.mk
 $$(eval $$(call JAVA_OUT_FILES, $$(SRC_$$(d))))
 $$(eval $$(call JAVA_JAR_FILES, $$(CLASS_PATH_$$(d)), $$(RESOURCES_$$(d))))
 
-# Include the source directories
+# Include the source directories.
 $$(foreach dir, $$(SRC_DIRS_$$(d)), $$(eval $$(call DEFINE_JAVA_RULES, $$(dir))))
 
-# Define the compile rules
-$$(eval $$(call JAR_RULES, $$(MAIN_CLASS_$$(d)), $(2), $(3)))
+# Define the compile rules.
+$$(eval $$(call JAR_RULES, $(2), $$(MAIN_CLASS_$$(d))))
+$$(eval $$(call PKG_RULES, $(2), $(3)))
 
-# Pop current dir from stack
+# Pop the current directory from the stack.
 $$(eval $$(call POP_DIR))
 
 endef
 
-# Define the rules to build a source directory. The files.mk is optional for
-# source directories. If not found, all source files in the directory will be
-# built. If found, the files.mk should define:
-#
-#     SRC_$(d) = The sources to be built in the target.
+# Define all make goals and intermediate files required to compile C-family files.
 #
 # $(1) = The path to the target root directory.
-define DEFINE_SRC_RULES
+define DEFINE_OBJ_RULES
 
-# Push current dir to stack
+# Push the current directory to the stack.
 $$(eval $$(call PUSH_DIR, $(1)))
 
-# Define source, object and dependency files
+# Define source, object and dependency files.
 ifeq ($$(wildcard $$(d)/files.mk),)
     SRC_$$(d) := \
         $$(wildcard $$(d)/*.c) \
@@ -303,30 +313,26 @@ endif
 
 $$(eval $$(call OBJ_OUT_FILES, $$(SRC_$$(d))))
 
-# Define the compile rules
+# Define the compile rules.
 $$(eval $$(call OBJ_RULES, $$(OBJ_DIR_$$(d))))
 
-# Include dependency files
+# Include dependency files.
 -include $$(DEP_$$(d))
 
-# Pop current dir from stack
+# Pop the current directory from the stack.
 $$(eval $$(call POP_DIR))
 
 endef
 
-# Define the rules to build a source directory. The files.mk is optional for
-# source directories. If not found, all source files in the directory will be
-# built. If found, the files.mk should define:
-#
-#     SRC_$(d) = The sources to be built in the target.
+# Define all make goals and intermediate files required to compile Java files.
 #
 # $(1) = The path to the target root directory.
 define DEFINE_JAVA_RULES
 
-# Push current dir to stack
+# Push the current directory to the stack.
 $$(eval $$(call PUSH_DIR, $(1)))
 
-# Define source, object and dependency files
+# Define source, object and dependency files.
 ifeq ($$(wildcard $$(d)/files.mk),)
     SRC_$$(d) := \
         $$(wildcard $$(d)/*.java)
@@ -336,7 +342,7 @@ endif
 
 $$(eval $$(call JAVA_OUT_FILES, $$(SRC_$$(d))))
 
-# Pop current dir from stack
+# Pop the current directory from the stack.
 $$(eval $$(call POP_DIR))
 
 endef

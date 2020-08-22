@@ -1,23 +1,30 @@
-# Import the build system and define make targets. Applications using this build
-# system should include this file last. Before including this file, applications
-# must define SOURCE_ROOT, the path to the application's source tree, and
-# VERSION, a version number of the form "X.Y.C".
-
+# Import the build system and generate all make targets. Applications using this build system should
+# include this file last in their Makefile. The following top-level targets are defined:
+#
+#     all = Build all targets added via $(ADD_TARGET) in the application Makefile.
+#     clean = Remove the build output directory for the current configuration.
+#     tests = Run all unit tests added via $(ADD_TARGET) with a target type of TEST.
+#     profile = Run all unit tests and generate a code profile report of the unit test execution.
+#     coverage = Generate a code coverage report of the last unit test execution.
+#     install = Extract any target installation package in the file system root directory.
+#     setup = Install the toolchain packages required to build libfly.
+#     style = Run clang-format on all source files.
+#
+# The above targets may be configured by a set of command line arguments defined in config.mk.
 .PHONY: all
 .PHONY: clean
 .PHONY: tests
-.PHONY: coverage
 .PHONY: profile
+.PHONY: coverage
 .PHONY: install
 .PHONY: setup
 .PHONY: style
-.PHONY: $(TARGETS)
 
-# Get the path to this file
+# Get the path to this file.
 BUILD_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 BUILD_ROOT := $(patsubst %/,%,$(BUILD_ROOT))
 
-# Define 'all' target before importing the build system
+# Define 'all' target before importing the build system.
 all: $(TARGETS)
 
 # Import the build system
@@ -30,12 +37,12 @@ include $(BUILD_ROOT)/compile.mk
 include $(BUILD_ROOT)/stack.mk
 include $(BUILD_ROOT)/target.mk
 
-# Clean up output files
+# Clean up output files.
 clean:
 	@echo -e "[$(RED)Clean$(DEFAULT) $(subst $(CURDIR)/,,$(OUT_DIR))]"
 	$(Q)$(RM) -r $(OUT_DIR)
 
-# Run all unit tests
+# Run all unit tests.
 tests: args :=
 tests: $(TEST_BINARIES)
 	$(Q)failed=0; \
@@ -54,7 +61,29 @@ tests: $(TEST_BINARIES)
 	\
 	exit $$failed
 
-# Create coverage report
+# Create profile report.
+profile: report := $(ETC_DIR)/profile
+profile: args :=
+profile: $(TEST_BINARIES)
+ifeq ($(toolchain), gcc)
+	$(Q)failed=0; \
+	for tgt in $(TEST_BINARIES) ; do \
+		$$tgt $(args); \
+		\
+		if [[ $$? -ne 0 ]] ; then \
+			failed=$$((failed+1)); \
+		else \
+			gprof $$tgt > $(report); \
+			$(RM) gmon.out; \
+		fi; \
+	done; \
+	exit $$failed
+else
+	$(Q)echo "No profiling rules for toolchain $(toolchain), check build.mk"
+	$(Q)exit 1
+endif
+
+# Create coverage report.
 coverage: report := $(ETC_DIR)/coverage
 coverage:
 	$(Q)mkdir -p $(dir $(report))
@@ -99,29 +128,7 @@ else
 	$(Q)exit 1
 endif
 
-# Create profile report
-profile: report := $(ETC_DIR)/profile
-profile: args :=
-profile: $(TEST_BINARIES)
-ifeq ($(toolchain), gcc)
-	$(Q)failed=0; \
-	for tgt in $(TEST_BINARIES) ; do \
-		$$tgt $(args); \
-		\
-		if [[ $$? -ne 0 ]] ; then \
-			failed=$$((failed+1)); \
-		else \
-			gprof $$tgt > $(report); \
-			$(RM) gmon.out; \
-		fi; \
-	done; \
-	exit $$failed
-else
-	$(Q)echo "No profiling rules for toolchain $(toolchain), check build.mk"
-	$(Q)exit 1
-endif
-
-# Install the target
+# Install the target.
 install: $(TARGET_PACKAGES)
 	$(Q)failed=0; \
 	for pkg in $(TARGET_PACKAGES) ; do \
@@ -134,7 +141,7 @@ install: $(TARGET_PACKAGES)
 	done; \
 	exit $$failed
 
-# Install dependencies
+# Install dependencies.
 setup:
 ifeq ($(SYSTEM), LINUX)
 ifeq ($(VENDOR), DEBIAN)
@@ -160,7 +167,7 @@ else
 	$(Q)exit 1
 endif
 
-# Style enforcement
+# Style enforcement.
 style:
 	$(Q)clang-format -i $$(find $(SOURCE_ROOT) \
 		-not \( -path "*Catch2*" -prune \) -type f \

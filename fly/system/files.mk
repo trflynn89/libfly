@@ -1,4 +1,3 @@
-# Define source files
 SRC_$(d) := \
     $(d)/system.cpp \
     $(d)/system_config.cpp \

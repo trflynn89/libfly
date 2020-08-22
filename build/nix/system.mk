@@ -1,15 +1,15 @@
-# Define system dependent variables.
+# Determine information about the host system environment and define system-dependent variables.
 
 ARCH := $(shell uname -m)
 SUDO := $(shell which sudo)
 
-# Determine installation directories
+# Define installation directories.
 INSTALL_BIN_DIR := /usr/local/bin
 INSTALL_INC_DIR := /usr/local/include
 INSTALL_SRC_DIR := /usr/local/src
 INSTALL_LIB_DIR := /usr/local/lib
 
-# Determine host operating system
+# Determine host operating system.
 ifneq ($(wildcard /etc/debian_version),)
     SYSTEM := LINUX
     VENDOR := DEBIAN
@@ -24,7 +24,7 @@ else
     $(error Could not determine operating system, check system.mk)
 endif
 
-# Determine default architecture
+# Determine default architecture.
 ifeq ($(SYSTEM), LINUX)
     SUPPORTED_ARCH := x64 x86
 else ifeq ($(SYSTEM), MACOS)
