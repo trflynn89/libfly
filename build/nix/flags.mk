@@ -1,13 +1,43 @@
-# Define build flags for C/C++ files.
+# Define flags to pass to the various compilation tools for the current build configuration and
+# host system environment.
+#
+# The following flags are defined:
+#
+#     CFLAGS = Compiler flags for C and Objective-C files.
+#     CXXFLAGS = Compiler flags for C++ and Objective-C++ files.
+#     LDFLAGS = Linker flags for C-family targets.
+#     LDLIBS = Linker libraries required by the STL for C-family targets.
+#
+#     JFLAGS = Compiler flags for Java files.
+#
+#     STRIP_FLAGS = Flags to be used when stripping symbols from a target.
+#     JAR_CREATE_FLAGS = Flags to be used when creating a JAR archive
+#     TAR_EXTRACT_FLAGS = Flags to be used when extracting a tar archive.
+#     TAR_CREATE_FLAGS = Flags to be used when creating a tar archive
+#     ZIP_EXTRACT_FLAGS = Flags to be used when extracting a zip archive.
+#
+# The application may define the following variables in any files.mk to define compiler/linker flags
+# on a per-directory level. These variables are defaulted to the values of the parent directory, so
+# generally these variables should be treated as append-only (+=). But this behavior may be avoided
+# by assigning values instead (:=).
+#
+#     CFLAGS_$(d)
+#     CXXFLAGS_$(d)
+#     LDFLAGS_$(d)
+#     LDLIBS_$(d)
+#     JFLAGS_$(d)
+#
+# The resulting flags used when compiling a directory are the global flags defined in this file
+# followed by any  _$(d) variants defined in the directory's files.mk.
 
-# Remove built-in rules
+# Remove built-in rules.
 MAKEFLAGS += --no-builtin-rules --no-print-directory
 .SUFFIXES:
 
-# Use bash instead of sh
+# Use bash instead of sh.
 SHELL := /bin/bash
 
-# Linker flags
+# Linker flags.
 LDFLAGS := -L$(INSTALL_LIB_DIR)
 LDLIBS := -lpthread
 
@@ -15,7 +45,7 @@ ifeq ($(SYSTEM), LINUX)
     LDLIBS += -latomic
 endif
 
-# Compiler flags for both C and C++ files
+# Compiler flags for all C-family files.
 CF_ALL := -MD -MP -fPIC
 CF_ALL += -I$(SOURCE_ROOT) -I$(INSTALL_INC_DIR)
 
@@ -23,14 +53,14 @@ ifeq ($(SYSTEM), MACOS)
     CF_ALL += -isysroot $(XCODE)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 endif
 
-# Compiler flags for Java projects
-JAVA_FLAGS := -deprecation -d $(CLASS_DIR)
+# Compiler flags for Java files.
+JFLAGS := -deprecation -d $(CLASS_DIR)
 
 ifeq ($(arch), x86)
     CF_ALL += -m32
 endif
 
-# Error and warning flags
+# Error and warning flags.
 CF_ALL += \
     -Wall \
     -Wextra \
@@ -90,7 +120,7 @@ endif
 # profiling symbols for profile builds.
 ifeq ($(mode), debug)
     CF_ALL += -O0 -g -fsanitize=address -fno-omit-frame-pointer
-    JAVA_FLAGS += -g:lines,vars,source
+    JFLAGS += -g:lines,vars,source
 
     ifeq ($(toolchain), clang)
         CF_ALL += -fprofile-instr-generate -fcoverage-mapping
@@ -99,7 +129,7 @@ ifeq ($(mode), debug)
     endif
 else ifeq ($(mode), release)
     CF_ALL += -O2
-    JAVA_FLAGS += -g:none
+    JFLAGS += -g:none
 else ifeq ($(mode), profile)
     ifeq ($(toolchain), gcc)
         CF_ALL += -O2 -g -pg
@@ -111,10 +141,10 @@ endif
 
 # Enable verbose Java output.
 ifeq ($(verbose), 1)
-    JAVA_FLAGS += -verbose
+    JFLAGS += -verbose
 endif
 
-# C and C++ specific flags
+# C and C++ specific flags.
 CFLAGS := -std=c17 $(CF_ALL)
 CXXFLAGS := -std=c++17 $(CF_ALL)
 
@@ -135,10 +165,7 @@ ifeq ($(SYSTEM), MACOS)
         -framework Foundation
 endif
 
-# gcov flags
-GCOV_FLAGS := -l
-
-# strip flags
+# strip flags.
 ifeq ($(SYSTEM), LINUX)
     STRIP_FLAGS := -s
 else ifeq ($(SYSTEM), MACOS)
@@ -147,14 +174,14 @@ else
     $(error Unrecognized system $(SYSTEM), check flags.mk)
 endif
 
-# jar flags
+# jar flags.
 ifeq ($(verbose), 1)
     JAR_CREATE_FLAGS := cvef
 else
     JAR_CREATE_FLAGS := cef
 endif
 
-# tar flags
+# tar flags.
 ifeq ($(verbose), 1)
     TAR_EXTRACT_FLAGS := -xjvf
     TAR_CREATE_FLAGS := -cjvf
@@ -167,7 +194,7 @@ ifeq ($(SYSTEM), MACOS)
     TAR_EXTRACT_FLAGS := -mo $(TAR_EXTRACT_FLAGS)
 endif
 
-# zip flags
+# zip flags.
 ifeq ($(verbose), 0)
     ZIP_EXTRACT_FLAGS := -q
 endif

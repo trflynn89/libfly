@@ -1,4 +1,3 @@
-# Define source files
 SRC_$(d) := \
     $(d)/async_request.cpp \
     $(d)/socket.cpp \

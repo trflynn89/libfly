@@ -1,4 +1,3 @@
-# Define the directories to include and compile
 SRC_DIRS_$(d) := \
     fly/coders \
     fly/coders/base64 \
@@ -21,7 +20,7 @@ ifeq ($(SYSTEM), LINUX)
         test/mock
 endif
 
-# Include the directories containing the unit tests
+# Include the directories containing the unit tests.
 SRC_DIRS_$(d) += \
     test/coders \
     test/config \
@@ -34,20 +33,18 @@ SRC_DIRS_$(d) += \
     test/traits \
     test/types
 
-# Define source files
 SRC_$(d) := \
     $(d)/main.cpp
 
-# Define compiler flags
+# All unit tests should have Catch2 on the include path.
 CXXFLAGS_$(d) += -I$(SOURCE_ROOT)/test/Catch2/single_include
 CXXFLAGS_$(d) += -DCATCH_CONFIG_FAST_COMPILE -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER
 
+# On Linux, define the list of available mocked system calls.
 ifeq ($(SYSTEM), LINUX)
-    # Define the list of available mocked system calls
     SYSTEM_CALLS_$(d) := \
         ${shell grep -ohP "(?<=__wrap_)[a-zA-Z0-9_]+" "$(d)/mock/nix/mock_calls.cpp"}
 
-    # Define linker flags
     LDFLAGS_$(d) += \
         -static-libstdc++ \
         $(foreach mock, $(SYSTEM_CALLS_$(d)), -Wl,--wrap=$(mock))

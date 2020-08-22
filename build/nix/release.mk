@@ -1,14 +1,23 @@
-# Define steps for making a release target.
+# Define steps for generating an archived release package for a target. The APIs defined below may
+# be used to add a file to the release package, or execute a command while creating the package. If
+# none of these APIs are used, no release package will be created.
+#
+# Any shared libraries added to the release package will also include a chain of symbolic links to
+# which resolve to the real, versioned library defined by the application's Makefile. For example,
+# if the Makefile defines $(VERSION) as "1.0.0" and invokes $(ADD_TARGET) for a LIB target with the
+# name "libfly", the following symbolic link chain will be created under $(INSTALL_LIB_DIR):
+#
+#     libfly.so -> libfly.so.1 -> libfly.so.1.0 -> libfly.so.1.0.0 (the real file)
+#
+# The release package will also include an uninstall script with a simple $(RM) command to remove
+# all files included in the release package.
 
+# A literal comma.
 COMMA := ,
 
-# Build the release package
+# Build the release package.
 define BUILD_REL
 
-    if [[ -z "$(REL_CMDS)" ]] ; then \
-        exit 0; \
-    fi; \
-    \
     echo -e "[$(YELLOW)Package$(DEFAULT) $(subst $(CURDIR)/,,$@)]"; \
     \
     $(RM) -r $(ETC_TMP_DIR) && \
@@ -59,35 +68,34 @@ REL_SRC_DIR_$(t) := $$(ETC_TMP_DIR_$(t))$(INSTALL_SRC_DIR)
 
 endef
 
-# Add a command to be run before building the release package.
+# Add a command to be run while building the release package.
 #
-# $(2) = The command to run.
+# $(1) = The command to run.
 define ADD_REL_CMD
 
-REL_CMDS_$(t) := $(REL_CMDS_$(t)) && $(2)
+REL_CMDS_$(t) := $(REL_CMDS_$(t)) && $(1)
 
 endef
 
-# Add a binary file to the release package. The file will be made executable and
-# have its symbols stripped.
+# Add a binary file to the release package. The file will be made executable and have its symbols
+# stripped.
 define ADD_REL_BIN
 
 $(eval $(call SET_REL_VAR, $(t)))
-$(eval $(call ADD_REL_CMD, $(t), cp -f $(BIN_DIR)/$(t) $(REL_BIN_DIR_$(t))))
-$(eval $(call ADD_REL_CMD, $(t), $(STRIP) $(STRIP_FLAGS) $(REL_BIN_DIR_$(t))/$(t)))
-$(eval $(call ADD_REL_CMD, $(t), chmod 755 $(REL_BIN_DIR_$(t))/$(t)))
+$(eval $(call ADD_REL_CMD, cp -f $(BIN_DIR)/$(t) $(REL_BIN_DIR_$(t))))
+$(eval $(call ADD_REL_CMD, $(STRIP) $(STRIP_FLAGS) $(REL_BIN_DIR_$(t))/$(t)))
+$(eval $(call ADD_REL_CMD, chmod 755 $(REL_BIN_DIR_$(t))/$(t)))
 
 REL_UNINSTALL_$(t) += $(REL_BIN_DIR_$(t))/$(t)
 
 endef
 
-# Add a shared library file to release package. The file will have its symbols
-# stripped.
+# Add a shared library file to release package. The file will have its symbols stripped.
 define ADD_REL_LIB
 
 $(eval $(call SET_REL_VAR, $(t)))
-$(eval $(call ADD_REL_CMD, $(t), cp -f $(LIB_DIR)/$(t).* $(REL_LIB_DIR_$(t))))
-$(eval $(call ADD_REL_CMD, $(t), $(STRIP) $(STRIP_FLAGS) $(REL_LIB_DIR_$(t))/$(t).*))
+$(eval $(call ADD_REL_CMD, cp -f $(LIB_DIR)/$(t).* $(REL_LIB_DIR_$(t))))
+$(eval $(call ADD_REL_CMD, $(STRIP) $(STRIP_FLAGS) $(REL_LIB_DIR_$(t))/$(t).*))
 
 REL_UNINSTALL_$(t) += $(REL_LIB_DIR_$(t))/$(t)*
 
@@ -97,11 +105,11 @@ endef
 #
 # $(1) = The path to the directory.
 # $(2) = Header file extension.
-# $(3) = Header file destination.
+# $(3) = Header file destination under $(INSTALL_INC_DIR).
 define ADD_REL_INC
 
 $(eval $(call SET_REL_VAR, $(t)))
-$(eval $(call ADD_REL_CMD, $(t), \
+$(eval $(call ADD_REL_CMD, \
     rsync -am --include='$(strip $(2))' -f 'hide$(COMMA)! */' \
     $(1)/ $(REL_INC_DIR_$(t))/$(strip $(3))))
 
@@ -113,11 +121,11 @@ endef
 #
 # $(1) = The path to the directory.
 # $(2) = Source file extension.
-# $(3) = Source file destination.
+# $(3) = Source file destination under $(INSTALL_SRC_DIR).
 define ADD_REL_SRC
 
 $(eval $(call SET_REL_VAR, $(t)))
-$(eval $(call ADD_REL_CMD, $(t), \
+$(eval $(call ADD_REL_CMD, \
     rsync -am --include='$(strip $(2))' -f 'hide$(COMMA)! */' \
     $(1)/ $(REL_SRC_DIR_$(t))/$(strip $(3))))
 

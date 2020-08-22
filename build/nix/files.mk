@@ -4,9 +4,9 @@
 SPACE :=
 SPACE +=
 
-# Define output files for compiled C/C++/Objective-C/Objective-C++ targets.
+# Define output files for compiled C-family targets.
 #
-# $(1) = The C/C++/Objective-C/Objective-C++ files to be compiled.
+# $(1) = The C-family files to be compiled.
 define OBJ_OUT_FILES
 
 OBJ_DIR_$(d) := $(OBJ_DIR)/$$(subst $(SOURCE_ROOT)/,,$(d))

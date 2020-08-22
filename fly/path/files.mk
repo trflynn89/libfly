@@ -1,4 +1,3 @@
-# Define source files
 SRC_$(d) := \
     $(d)/path_config.cpp \
     $(d)/path_monitor.cpp
