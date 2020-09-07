@@ -39,7 +39,7 @@ LINK_CC := $(Q)$(CC) $$(CFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 COMP_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ -c $$<
 LINK_CXX := $(Q)$(CXX) $$(CXXFLAGS) -o $$@ $$(OBJS) $$(LDFLAGS) $$(LDLIBS)
 
-COMP_JAVA := $(Q)$(JAVAC) $$(JFLAGS) $$(CLASS_PATH) $$(SOURCES)
+COMP_JAVA := $(Q)$(JAVAC) $$(JFLAGS) -d $$(CLASS_DIR) $$(CLASS_PATH) $$(SOURCES)
 LINK_JAVA := $(Q)$(JAR) $(JAR_CREATE_FLAGS) $$(MAIN_CLASS) $$@ $$(CONTENTS)
 
 STATIC := $(Q)$(AR) rcs $$@ $$(OBJS)
@@ -108,12 +108,16 @@ MAKEFILES_$(d) := $(BUILD_ROOT)/flags.mk $(wildcard $(d)/*.mk)
 
 $(1): SOURCES := $$(SOURCES_$(t))
 $(1): JFLAGS := $(JFLAGS) $(JFLAGS_$(d))
+$(1): CLASS_DIR := $$(CLASS_DIR_$(t))
 $(1): CLASS_PATH := $$(CLASS_PATH_$(t))
 $(1): MAIN_CLASS := $(2)
 $(1): CONTENTS := $$(CONTENTS_$(t))
 
 $(1): $$(SOURCES_$(t)) $$(MAKEFILES_$(d))
-	@mkdir -p $$(@D) $(CLASS_DIR)
+	@# Remove the target's class directory as a safe measure in case Java files have been deleted.
+	@$(RM) -r $$(CLASS_DIR)
+
+	@mkdir -p $$(@D) $$(CLASS_DIR)
 
 	@# Compile the Java source files into class files.
 	@echo -e "[$(CYAN)Compile$(DEFAULT) $(strip $(2))]"
@@ -121,7 +125,7 @@ $(1): $$(SOURCES_$(t)) $$(MAKEFILES_$(d))
 
 	@# Iterate over every JAR file in the class path and extracts them for inclusion in the target.
 	$(Q)for jar in $$(CLASS_PATH_JAR_$(t)) ; do \
-		unzip $(ZIP_EXTRACT_FLAGS) -o $$$$jar -d $(CLASS_DIR) "*.class" ; \
+		unzip $(ZIP_EXTRACT_FLAGS) -o $$$$jar -d $$(CLASS_DIR) "*.class" ; \
 	done
 
 	@# Create the JAR archive from the compiled set of class files, the contents of the extracted
@@ -276,7 +280,7 @@ $$(eval $$(call PUSH_DIR, $(1)))
 
 # Define source, class, and generated files.
 include $$(d)/files.mk
-$$(eval $$(call JAVA_OUT_FILES, $$(SRC_$$(d))))
+$$(eval $$(call JAVA_SRC_FILES, $$(SRC_$$(d))))
 $$(eval $$(call JAVA_JAR_FILES, $$(CLASS_PATH_$$(d)), $$(RESOURCES_$$(d))))
 
 # Include the source directories.
@@ -340,7 +344,7 @@ else
     include $$(d)/files.mk
 endif
 
-$$(eval $$(call JAVA_OUT_FILES, $$(SRC_$$(d))))
+$$(eval $$(call JAVA_SRC_FILES, $$(SRC_$$(d))))
 
 # Pop the current directory from the stack.
 $$(eval $$(call POP_DIR))
