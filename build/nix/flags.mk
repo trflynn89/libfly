@@ -54,7 +54,7 @@ ifeq ($(SYSTEM), MACOS)
 endif
 
 # Compiler flags for Java files.
-JFLAGS := -deprecation -d $(CLASS_DIR)
+JFLAGS :=
 
 ifeq ($(arch), x86)
     CF_ALL += -m32
@@ -115,6 +115,10 @@ else ifeq ($(toolchain), gcc)
         endif
     endif
 endif
+
+JFLAGS += \
+    -Werror \
+    -Xlint
 
 # Add debug symbols & use address sanitizer for debug builds, optimize release builds, and add
 # profiling symbols for profile builds.
