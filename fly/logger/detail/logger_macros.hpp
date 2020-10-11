@@ -1,26 +1,17 @@
 #pragma once
 
 /**
- * Helper macro to add a log, so all of the public logging macros do not have to insert the file,
- * function, and line macros.
- */
-#define _FLY_ADD_LOG(level, message)                                                               \
-    fly::Logger::add_log(level, __FILE__, __FUNCTION__, __LINE__, message)
-
-/**
  * Return the first argument in a list of variadic arguments, expected to be the logging format
  * string.
  *
  * Note that __VA_ARGS__ is wrapped in parentheses. MSVC apparently parses __VA_ARGS__ in a way that
- * is not standards compliant. See:
- *
- *     https://stackoverflow.com/q/5134523
+ * is not standards compliant. See: https://stackoverflow.com/q/5134523
  *
  * The macros used here are still standards compliant, but are unfortunately quite a bit messier
  * than they need to be. The basic trick is to pass (__VA_ARGS__) into a helper macro, which in turn
  * uses that to form a call to a second helper macro that can actually parse __VA_ARGS__.
  */
-#define _FLY_FORMAT_STRING(...) _FLY_FORMAT_STRING_HELPER((__VA_ARGS__, _))
+#define FLY_FORMAT_STRING(...) FLY_FORMAT_STRING_HELPER((__VA_ARGS__, _))
 
 /**
  * Return all but the first argument in a list of variadic arguments, expected to be the arguments
@@ -33,31 +24,31 @@
  *
  * Currently supports up to and including 50 arguments.
  *
- * Note that the same __VA_ARGS__ mess described in _FLY_FORMAT_STRING is used here.
+ * Note that the same __VA_ARGS__ mess described in FLY_FORMAT_STRING is used here.
  */
-#define _FLY_FORMAT_ARGS(...)                                                                      \
-    _FLY_FORMAT_ARGS_HELPER(_FLY_FORMAT_ARGS_LABEL(__VA_ARGS__), (__VA_ARGS__))
+#define FLY_FORMAT_ARGS(...)                                                                       \
+    FLY_FORMAT_ARGS_HELPER(FLY_FORMAT_ARGS_LABEL(__VA_ARGS__), (__VA_ARGS__))
 
 //==================================================================================================
-#define _FLY_FORMAT_STRING_HELPER(args) _FLY_FORMAT_STRING_HELPER2 args
+#define FLY_FORMAT_STRING_HELPER(args) FLY_FORMAT_STRING_HELPER2 args
 
-#define _FLY_FORMAT_STRING_HELPER2(first, ...) first
+#define FLY_FORMAT_STRING_HELPER2(first, ...) first
 
 //==================================================================================================
-#define _FLY_FORMAT_ARGS_HELPER(label, args) _FLY_FORMAT_ARGS_HELPER2(label, args)
+#define FLY_FORMAT_ARGS_HELPER(label, args) FLY_FORMAT_ARGS_HELPER2(label, args)
 
-#define _FLY_FORMAT_ARGS_HELPER2(label, args) _FLY_FORMAT_ARGS_HELPER_##label(args)
+#define FLY_FORMAT_ARGS_HELPER2(label, args) FLY_FORMAT_ARGS_HELPER_##label(args)
 
-#define _FLY_FORMAT_ARGS_HELPER_SINGLE(first)
+#define FLY_FORMAT_ARGS_HELPER_SINGLE(first)
 
-#define _FLY_FORMAT_ARGS_HELPER_MULTIPLE(args) _FLY_FORMAT_ARGS_HELPER_MULTIPLE2 args
+#define FLY_FORMAT_ARGS_HELPER_MULTIPLE(args) FLY_FORMAT_ARGS_HELPER_MULTIPLE2 args
 
-#define _FLY_FORMAT_ARGS_HELPER_MULTIPLE2(first, ...) , __VA_ARGS__
+#define FLY_FORMAT_ARGS_HELPER_MULTIPLE2(first, ...) , __VA_ARGS__
 
-#define _FLY_FORMAT_ARGS_EXPAND(x) x
+#define FLY_FORMAT_ARGS_EXPAND(x) x
 
-#define _FLY_FORMAT_ARGS_LABEL(...)                                                                \
-    _FLY_FORMAT_ARGS_EXPAND(_FLY_FORMAT_ARGS_LABEL_HELPER(                                         \
+#define FLY_FORMAT_ARGS_LABEL(...)                                                                 \
+    FLY_FORMAT_ARGS_EXPAND(FLY_FORMAT_ARGS_LABEL_HELPER(                                           \
         __VA_ARGS__,                                                                               \
         MULTIPLE,                                                                                  \
         MULTIPLE,                                                                                  \
@@ -111,7 +102,7 @@
         SINGLE,                                                                                    \
         _))
 
-#define _FLY_FORMAT_ARGS_LABEL_HELPER(                                                             \
+#define FLY_FORMAT_ARGS_LABEL_HELPER(                                                              \
     ARG_01,                                                                                        \
     ARG_02,                                                                                        \
     ARG_03,                                                                                        \

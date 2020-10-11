@@ -10,9 +10,9 @@ namespace fly {
 
 #define JLOG(...)                                                                                  \
     LOGW(                                                                                          \
-        "[line %d, column %d]: " _FLY_FORMAT_STRING(__VA_ARGS__),                                  \
+        "[line %d, column %d]: " FLY_FORMAT_STRING(__VA_ARGS__),                                   \
         m_line,                                                                                    \
-        m_column _FLY_FORMAT_ARGS(__VA_ARGS__));
+        m_column FLY_FORMAT_ARGS(__VA_ARGS__));
 
 //==================================================================================================
 JsonParser::JsonParser(const Features features) noexcept : Parser(), m_features(features)

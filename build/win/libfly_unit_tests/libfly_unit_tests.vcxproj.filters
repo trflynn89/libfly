@@ -49,6 +49,12 @@
     <ClCompile Include="..\..\..\test\config\config_manager.cpp">
       <Filter>config</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\logger\console_logger.cpp">
+      <Filter>logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\logger\file_logger.cpp">
+      <Filter>logger</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\logger\logger.cpp">
       <Filter>logger</Filter>
     </ClCompile>

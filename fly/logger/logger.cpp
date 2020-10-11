@@ -1,117 +1,113 @@
 #include "fly/logger/logger.hpp"
 
 #include "fly/coders/coder_config.hpp"
-#include "fly/coders/huffman/huffman_encoder.hpp"
+#include "fly/logger/detail/console_sink.hpp"
+#include "fly/logger/detail/file_sink.hpp"
+#include "fly/logger/detail/registry.hpp"
+#include "fly/logger/log_sink.hpp"
 #include "fly/logger/logger_config.hpp"
-#include "fly/logger/styler.hpp"
 #include "fly/task/task_runner.hpp"
-
-#include <algorithm>
-#include <cstdio>
-#include <cstring>
-#include <optional>
-#include <system_error>
 
 namespace fly {
 
 //==================================================================================================
-std::weak_ptr<Logger> Logger::s_weak_instance;
-std::mutex Logger::s_console_mutex;
-
-//==================================================================================================
 Logger::Logger(
     const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<LoggerConfig> &logger_config,
-    const std::shared_ptr<CoderConfig> &coder_config,
-    const std::filesystem::path &logger_directory) noexcept :
+    const std::shared_ptr<LoggerConfig> &config,
+    std::unique_ptr<LogSink> &&sink) noexcept :
+    m_config(config),
+    m_sink(std::move(sink)),
     m_task_runner(task_runner),
-    m_logger_config(logger_config),
-    m_coder_config(coder_config),
-    m_log_directory(logger_directory),
-    m_index(0),
     m_start_time(std::chrono::high_resolution_clock::now())
 {
 }
 
 //==================================================================================================
-void Logger::set_instance(const std::shared_ptr<Logger> &logger)
+std::shared_ptr<Logger> Logger::create_logger(
+    const std::shared_ptr<LoggerConfig> &logger_config,
+    std::unique_ptr<LogSink> &&sink)
 {
-    s_weak_instance = logger;
+    return create_logger(nullptr, logger_config, std::move(sink));
 }
 
 //==================================================================================================
-void Logger::console_log(
-    Log::Level level,
-    const char *file,
-    const char *function,
-    std::uint32_t line,
-    std::string &&message)
+std::shared_ptr<Logger> Logger::create_logger(
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<LoggerConfig> &logger_config,
+    std::unique_ptr<LogSink> &&sink)
 {
-    const std::string time = System::local_time();
-    std::ostream *stream = &std::cout;
-    Style style = Style::Default;
-    std::optional<Color> color;
+    auto logger = std::shared_ptr<Logger>(new Logger(task_runner, logger_config, std::move(sink)));
 
-    switch (level)
+    if (logger->initialize())
     {
-        case Log::Level::Info:
-            color.emplace(Color::Green);
-            break;
-
-        case Log::Level::Warn:
-            stream = &std::cerr;
-            color.emplace(Color::Yellow);
-            break;
-
-        case Log::Level::Error:
-            stream = &std::cerr;
-            style = Style::Bold;
-            color.emplace(Color::Red);
-            break;
-
-        default:
-            break;
+        return logger;
     }
 
-    std::unique_lock<std::mutex> lock(s_console_mutex);
-    {
-        auto styler = color ? Styler(std::move(style), std::move(*color)) : Styler(style);
-        String::format(*stream, "%s%s %s:%s:%d", styler, time, file, function, line);
-    }
-
-    *stream << ": " << message << std::endl;
+    return nullptr;
 }
 
 //==================================================================================================
-void Logger::add_log(
-    Log::Level level,
-    const char *file,
-    const char *function,
-    std::uint32_t line,
-    std::string &&message)
+std::shared_ptr<Logger> Logger::create_file_logger(
+    const std::shared_ptr<LoggerConfig> &logger_config,
+    const std::shared_ptr<CoderConfig> &coder_config,
+    const std::filesystem::path &logger_directory)
 {
-    std::shared_ptr<Logger> logger = s_weak_instance.lock();
-
-    if (logger)
-    {
-        logger->add_log_internal(level, file, function, line, std::move(message));
-    }
-    else
-    {
-        console_log(level, file, function, line, std::move(message));
-    }
+    return create_file_logger(nullptr, logger_config, coder_config, logger_directory);
 }
 
 //==================================================================================================
-bool Logger::start()
+std::shared_ptr<Logger> Logger::create_file_logger(
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<LoggerConfig> &logger_config,
+    const std::shared_ptr<CoderConfig> &coder_config,
+    const std::filesystem::path &logger_directory)
 {
-    if (create_log_file())
+    auto sink = std::make_unique<detail::FileSink>(logger_config, coder_config, logger_directory);
+    return create_logger(task_runner, logger_config, std::move(sink));
+}
+
+//==================================================================================================
+std::shared_ptr<Logger>
+Logger::create_console_logger(const std::shared_ptr<LoggerConfig> &logger_config)
+{
+    return create_console_logger(nullptr, logger_config);
+}
+
+//==================================================================================================
+std::shared_ptr<Logger> Logger::create_console_logger(
+    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    const std::shared_ptr<LoggerConfig> &logger_config)
+{
+    auto sink = std::make_unique<detail::ConsoleSink>();
+    return create_logger(task_runner, logger_config, std::move(sink));
+}
+
+//==================================================================================================
+void Logger::set_default_logger(const std::shared_ptr<Logger> &default_logger)
+{
+    detail::Registry::instance().set_default_logger(default_logger);
+}
+
+//==================================================================================================
+Logger *Logger::get_default_logger()
+{
+    return detail::Registry::instance().get_default_logger();
+}
+
+//==================================================================================================
+bool Logger::initialize()
+{
+    if (m_sink && m_sink->initialize())
     {
-        std::shared_ptr<Logger> logger = shared_from_this();
+        if (m_task_runner)
+        {
+            std::shared_ptr<Logger> logger = shared_from_this();
 
-        m_task = std::make_shared<LoggerTask>(logger);
-        m_task_runner->post_task(m_task);
+            m_task = std::make_shared<LoggerTask>(logger);
+            m_task_runner->post_task(m_task);
+        }
 
+        m_last_task_failed.store(false);
         return true;
     }
 
@@ -119,10 +115,30 @@ bool Logger::start()
 }
 
 //==================================================================================================
-std::filesystem::path Logger::get_log_file_path() const
+void Logger::log(Log::Level level, Log::Trace &&trace, std::string &&message)
 {
-    std::unique_lock<std::mutex> lock(m_log_file_mutex);
-    return m_log_file;
+    if (m_last_task_failed || (level < Log::Level::Debug) || (level >= Log::Level::NumLevels))
+    {
+        return;
+    }
+
+    const auto now = std::chrono::high_resolution_clock::now();
+    const auto log_time =
+        std::chrono::duration_cast<std::chrono::duration<double>>(now - m_start_time);
+
+    Log log(std::move(trace), std::move(message), m_config->max_message_size());
+    log.m_index = m_index++;
+    log.m_level = level;
+    log.m_time = log_time.count();
+
+    if (m_task_runner)
+    {
+        m_queue.push(std::move(log));
+    }
+    else if (!m_sink->stream(std::move(log)))
+    {
+        m_last_task_failed.store(true);
+    }
 }
 
 //==================================================================================================
@@ -130,87 +146,12 @@ bool Logger::poll()
 {
     Log log;
 
-    if (m_log_queue.pop(log, m_logger_config->queue_wait_time()) && m_log_stream.good())
+    if (m_queue.pop(log, m_config->queue_wait_time()))
     {
-        m_log_stream << log << std::flush;
-        std::error_code error;
-
-        std::unique_lock<std::mutex> lock(m_log_file_mutex);
-
-        if (std::filesystem::file_size(m_log_file, error) > m_logger_config->max_log_file_size())
-        {
-            create_log_file();
-        }
+        return m_sink->stream(std::move(log));
     }
 
-    return m_log_stream.good();
-}
-
-//==================================================================================================
-void Logger::add_log_internal(
-    Log::Level level,
-    const char *file,
-    const char *function,
-    std::uint32_t line,
-    std::string &&message)
-{
-    auto now = std::chrono::high_resolution_clock::now();
-    auto log_time = std::chrono::duration_cast<std::chrono::duration<double>>(now - m_start_time);
-
-    if ((level >= Log::Level::Debug) && (level < Log::Level::NumLevels))
-    {
-        Log log(m_logger_config, std::move(message));
-
-        log.m_index = m_index++;
-        log.m_level = level;
-        log.m_time = log_time.count();
-        log.m_file = file;
-        log.m_function = function;
-        log.m_line = line;
-
-        m_log_queue.push(std::move(log));
-    }
-}
-
-//==================================================================================================
-bool Logger::create_log_file()
-{
-    if (m_log_stream.is_open())
-    {
-        m_log_stream.close();
-
-        if (m_logger_config->compress_log_files())
-        {
-            std::filesystem::path compressed_log_file = m_log_file;
-            compressed_log_file.replace_extension(".log.enc");
-
-            HuffmanEncoder encoder(m_coder_config);
-
-            if (encoder.encode_file(m_log_file, compressed_log_file))
-            {
-                LOGC("Log file compressed to: %s", compressed_log_file);
-                std::filesystem::remove(m_log_file);
-            }
-            else
-            {
-                LOGC("Failed to compress: %s", m_log_file);
-            }
-        }
-    }
-
-    const std::string rand_str = String::generate_random_string(10);
-    std::string time_str = System::local_time();
-
-    String::replace_all(time_str, ":", "-");
-    String::replace_all(time_str, " ", "_");
-
-    const std::string file_name = String::format("Log_%s_%s.log", time_str, rand_str);
-    m_log_file = m_log_directory / file_name;
-
-    LOGC("Creating logger file: %s", m_log_file);
-    m_log_stream.open(m_log_file, std::ios::out);
-
-    return m_log_stream.good();
+    return true;
 }
 
 //==================================================================================================
@@ -225,9 +166,16 @@ void LoggerTask::run()
 {
     std::shared_ptr<Logger> logger = m_weak_logger.lock();
 
-    if (logger && logger->poll())
+    if (logger)
     {
-        logger->m_task_runner->post_task(logger->m_task);
+        if (logger->poll())
+        {
+            logger->m_task_runner->post_task(logger->m_task);
+        }
+        else
+        {
+            logger->m_last_task_failed.store(true);
+        }
     }
 }
 
