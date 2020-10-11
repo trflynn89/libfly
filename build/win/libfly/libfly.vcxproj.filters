@@ -118,10 +118,22 @@
     <ClInclude Include="..\..\..\fly\logger\logger_config.hpp">
       <Filter>logger</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\log_sink.hpp">
+      <Filter>logger</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\logger\styler.hpp">
       <Filter>logger</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\detail\console_sink.hpp">
+      <Filter>logger\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\detail\file_sink.hpp">
+      <Filter>logger\detail</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.hpp">
+      <Filter>logger\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\logger\detail\registry.hpp">
       <Filter>logger\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\logger\detail\styler_proxy.hpp">
@@ -305,6 +317,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\logger\logger_config.cpp">
       <Filter>logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\logger\detail\console_sink.cpp">
+      <Filter>logger\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\logger\detail\file_sink.cpp">
+      <Filter>logger\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\logger\detail\registry.cpp">
+      <Filter>logger\detail</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\logger\detail\styler_proxy.cpp">
       <Filter>logger\detail</Filter>

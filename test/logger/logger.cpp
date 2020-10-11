@@ -1,21 +1,15 @@
 #include "fly/logger/logger.hpp"
 
-#include "fly/coders/coder_config.hpp"
-#include "fly/coders/huffman/huffman_decoder.hpp"
-#include "fly/fly.hpp"
+#include "fly/logger/log_sink.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/task/task_manager.hpp"
+#include "fly/task/task_runner.hpp"
+#include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
-#include "test/util/capture_stream.hpp"
-#include "test/util/path_util.hpp"
-#include "test/util/waitable_task_runner.hpp"
 
 #include <catch2/catch.hpp>
 
-#include <algorithm>
-#include <cstring>
-#include <filesystem>
 #include <limits>
 #include <memory>
 #include <string>
@@ -26,390 +20,279 @@ using namespace fly::literals::numeric_literals;
 namespace {
 
 /**
- * Subclass of the logger config to decrease the default log file size for faster testing.
+ * Test log sink to store received logs in a queue for verification.
  */
-class MutableLoggerConfig : public fly::LoggerConfig
+class QueueSink : public fly::LogSink
 {
 public:
-    MutableLoggerConfig() noexcept : fly::LoggerConfig()
+    QueueSink(fly::ConcurrentQueue<fly::Log> &logs) : m_logs(logs)
     {
-        m_default_max_log_file_size = 1 << 10;
     }
 
-    void disable_compression()
+    bool initialize() override
     {
-        m_default_compress_log_files = false;
+        return true;
+    }
+
+    bool stream(fly::Log &&log) override
+    {
+        m_logs.push(std::move(log));
+        return true;
+    }
+
+private:
+    fly::ConcurrentQueue<fly::Log> &m_logs;
+};
+
+/**
+ * Test log sink to purposefully fail initialiation.
+ */
+class FailInitSink : public fly::LogSink
+{
+public:
+    bool initialize() override
+    {
+        return false;
+    }
+
+    bool stream(fly::Log &&) override
+    {
+        return true;
     }
 };
 
 /**
- * Subclass of the coder config to contain invalid values.
+ * Test log sink to purposefully fail streaming.
  */
-class MutableCoderConfig : public fly::CoderConfig
+class FailStreamSink : public QueueSink
 {
 public:
-    void invalidate_max_code_length()
+    FailStreamSink(fly::ConcurrentQueue<fly::Log> &logs) : QueueSink(logs)
     {
-        m_default_huffman_encoder_max_code_length = std::numeric_limits<fly::code_type>::digits;
+    }
+
+    bool stream(fly::Log &&log) override
+    {
+        return !QueueSink::stream(std::move(log));
     }
 };
-
-/**
- * Measure the size, in bytes, of a log point.
- *
- * @param string Message to store in the log.
- *
- * @return uintmax_t Size of the log point.
- */
-std::uintmax_t log_size(const std::string &message)
-{
-    fly::Log log;
-
-    log.m_message = message;
-    log.m_level = fly::Log::Level::Debug;
-    log.m_file = __FILE__;
-    log.m_function = __FUNCTION__;
-    log.m_line = __LINE__;
-
-    return fly::String::format("%d\t%s", 1, log).length();
-}
 
 } // namespace
 
 TEST_CASE("Logger", "[logger]")
 {
-    auto task_manager = std::make_shared<fly::TaskManager>(1);
-    REQUIRE(task_manager->start());
+    auto logger_config = std::make_shared<fly::LoggerConfig>();
+    fly::ConcurrentQueue<fly::Log> received_logs;
 
-    auto task_runner = task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
-
-    auto logger_config = std::make_shared<MutableLoggerConfig>();
-    auto coder_config = std::make_shared<MutableCoderConfig>();
-
-    fly::test::PathUtil::ScopedTempDirectory path;
-
-    auto logger = std::make_shared<fly::Logger>(task_runner, logger_config, coder_config, path());
-    fly::Logger::set_instance(logger);
-
-    REQUIRE(logger->start());
-
-    // Verify log points after calling one of the logging macros.
     auto validate_log_points = [&](fly::Log::Level expected_level,
-                                   std::string &&expected_function,
+                                   const char *expected_function,
                                    std::vector<std::string> &&expected_messages) {
-        for (std::size_t i = 0; i < expected_messages.size(); ++i)
-        {
-            task_runner->wait_for_task_to_complete<fly::LoggerTask>();
-        }
-
-        const std::string contents = fly::test::PathUtil::read_file(logger->get_log_file_path());
-        REQUIRE_FALSE(contents.empty());
-
-        std::size_t count = 0;
         double last_time = 0.0;
 
-        for (const std::string &log : fly::String::split(contents, '\x1e'))
+        for (std::size_t i = 0; i < expected_messages.size(); ++i)
         {
-            const std::vector<std::string> sections = fly::String::split(log, '\x1f');
-            REQUIRE(sections.size() == 7_zu);
+            fly::Log log;
+            received_logs.pop(log);
 
-            const auto index = fly::String::convert<std::size_t>(sections[0]).value();
-            const auto level = static_cast<fly::Log::Level>(
-                fly::String::convert<std::uint8_t>(sections[1]).value());
-            const auto time = fly::String::convert<double>(sections[2]).value();
-            const auto file = sections[3];
-            const auto function = sections[4];
-            const auto line = fly::String::convert<std::uint32_t>(sections[5]).value();
-            const auto message = sections[6];
+            CHECK(log.m_index == i);
+            CHECK(log.m_level == expected_level);
+            CHECK(log.m_time >= last_time);
+            CHECK(fly::String::starts_with(log.m_message, expected_messages[i]));
 
-            CHECK(index == count);
-            CHECK(level == expected_level);
-            CHECK(time >= last_time);
-            CHECK(file == __FILE__);
-            CHECK(function == expected_function);
-            CHECK(line > 0_u32);
-            CHECK(fly::String::starts_with(message, expected_messages[count]));
+            if (expected_function != nullptr)
+            {
+                CHECK(std::string(log.m_trace.m_file) == std::string(__FILE__));
+                CHECK(std::string(log.m_trace.m_function) == std::string(expected_function));
+                CHECK(log.m_trace.m_line > 0_u32);
+            }
 
-            ++count;
-            last_time = time;
+            last_time = log.m_time;
         }
 
-        CHECK(count == expected_messages.size());
+        CHECK(received_logs.empty());
     };
 
-    SECTION("Valid logger file paths should be created after starting logger")
+    SECTION("Cannot create logger with null sink")
     {
-        std::filesystem::path log_file = logger->get_log_file_path();
-        CHECK(fly::String::starts_with(log_file.string(), path().string()));
-
-        REQUIRE(std::filesystem::exists(log_file));
+        auto logger = fly::Logger::create_logger(logger_config, nullptr);
+        CHECK(logger == nullptr);
     }
 
-    SECTION("Cannot start logger with a bad file path")
+    SECTION("Cannot create logger with sink that fails initialization")
     {
-        logger = std::make_shared<fly::Logger>(task_runner, logger_config, coder_config, __FILE__);
-        CHECK_FALSE(logger->start());
+        auto logger = fly::Logger::create_logger(logger_config, std::make_unique<FailInitSink>());
+        CHECK(logger == nullptr);
     }
 
-    SECTION("Validate macros which log to console")
+    SECTION("Log points")
     {
-        fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
+        // Run all of the log point tests with both synchronous and asynchronous loggers.
+        const bool synchronous_logger = GENERATE(true, false);
 
-        LOGC("Console Log");
-        LOGC("Console Log: %d", 123);
+        auto task_manager = std::make_shared<fly::TaskManager>(1);
+        REQUIRE(task_manager->start());
 
-        const std::string contents = capture();
-        REQUIRE_FALSE(contents.empty());
+        auto task_runner = task_manager->create_task_runner<fly::SequencedTaskRunner>();
+        auto sink = std::make_unique<QueueSink>(received_logs);
 
-        CHECK(contents.find("Console Log") != std::string::npos);
-        CHECK(contents.find("123") != std::string::npos);
-        CHECK(std::count(contents.begin(), contents.end(), '\n') == 2);
-    }
+        auto logger = synchronous_logger ?
+            fly::Logger::create_logger(logger_config, std::move(sink)) :
+            fly::Logger::create_logger(task_runner, logger_config, std::move(sink));
 
-#if defined(FLY_LINUX) || defined(FLY_MACOS)
+        fly::Logger::set_default_logger(logger);
+        REQUIRE(fly::Logger::get_default_logger() == logger.get());
 
-    SECTION("Validate style of console logs")
-    {
-        // Reset the logger so all logging macros log to console.
-        fly::Logger::set_instance(nullptr);
-
-        // Get the substring of a log point that should be styled.
-        auto styled_contents = [](const std::string &contents, std::string &&log) {
-            auto pos = contents.find(": " + log);
-            REQUIRE(pos != std::string::npos);
-
-            return contents.substr(0, pos);
-        };
-
-        SECTION("Validate style of standard console logs")
+        SECTION("Logger that fails streaming stops accepting logs")
         {
-            fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
-            LOGC("Console Log");
+            auto fail_stream_sink = std::make_unique<FailStreamSink>(received_logs);
 
-            const std::string contents = capture();
-            REQUIRE_FALSE(contents.empty());
+            logger = synchronous_logger ?
+                fly::Logger::create_logger(logger_config, std::move(fail_stream_sink)) :
+                fly::Logger::create_logger(task_runner, logger_config, std::move(fail_stream_sink));
 
-            const std::string styled = styled_contents(contents, "Console Log");
-            CHECK(fly::String::starts_with(styled, "\x1b[0;32m"));
-            CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+            logger->debug("This log will be received");
+            logger->debug("This log will be rejected");
+
+            validate_log_points(fly::Log::Level::Debug, nullptr, {"This log will be received"});
         }
 
-        SECTION("Validate style of debug console logs")
+        SECTION("Debug log points")
         {
-            fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
-            LOGD("Debug Log");
+            std::vector<std::string> expectations = {
+                "Debug Log",
+                "Debug Log: 123",
+            };
 
-            const std::string contents = capture();
-            REQUIRE_FALSE(contents.empty());
+            SECTION("Without trace information")
+            {
+                logger->debug("Debug Log");
+                logger->debug("Debug Log: %d", 123);
 
-            const std::string styled = styled_contents(contents, "Debug Log");
-            CHECK(fly::String::starts_with(styled, "\x1b[0m"));
-            CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+                validate_log_points(fly::Log::Level::Debug, nullptr, std::move(expectations));
+            }
+
+            SECTION("With trace information")
+            {
+                logger->debug({__FILE__, __FUNCTION__, 123_u32}, "Debug Log");
+                logger->debug({__FILE__, __FUNCTION__, 123_u32}, "Debug Log: %d", 123);
+
+                validate_log_points(fly::Log::Level::Debug, __FUNCTION__, std::move(expectations));
+            }
+
+            SECTION("With macro invocation")
+            {
+                LOGD("Debug Log");
+                LOGD("Debug Log: %d", 123);
+
+                validate_log_points(fly::Log::Level::Debug, __FUNCTION__, std::move(expectations));
+            }
         }
 
-        SECTION("Validate style of informational console logs")
+        SECTION("Informational log points")
         {
-            fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
-            LOGI("Info Log");
+            std::vector<std::string> expectations = {
+                "Info Log",
+                "Info Log: 123",
+            };
 
-            const std::string contents = capture();
-            REQUIRE_FALSE(contents.empty());
+            SECTION("Without trace information")
+            {
+                logger->info("Info Log");
+                logger->info("Info Log: %d", 123);
 
-            const std::string styled = styled_contents(contents, "Info Log");
-            CHECK(fly::String::starts_with(styled, "\x1b[0;32m"));
-            CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+                validate_log_points(fly::Log::Level::Info, nullptr, std::move(expectations));
+            }
+
+            SECTION("With trace information")
+            {
+                logger->info({__FILE__, __FUNCTION__, 123_u32}, "Info Log");
+                logger->info({__FILE__, __FUNCTION__, 123_u32}, "Info Log: %d", 123);
+
+                validate_log_points(fly::Log::Level::Info, __FUNCTION__, std::move(expectations));
+            }
+
+            SECTION("With macro invocation")
+            {
+                LOGI("Info Log");
+                LOGI("Info Log: %d", 123);
+
+                validate_log_points(fly::Log::Level::Info, __FUNCTION__, std::move(expectations));
+            }
         }
 
-        SECTION("Validate style of warning console logs")
+        SECTION("Warning log points")
         {
-            fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
-            LOGW("Warning Log");
+            std::vector<std::string> expectations = {
+                "Warning Log",
+                "Warning Log: 123",
+            };
 
-            const std::string contents = capture();
-            REQUIRE_FALSE(contents.empty());
+            SECTION("Without trace information")
+            {
+                logger->warn("Warning Log");
+                logger->warn("Warning Log: %d", 123);
 
-            const std::string styled = styled_contents(contents, "Warning Log");
-            CHECK(fly::String::starts_with(styled, "\x1b[0;33m"));
-            CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+                validate_log_points(fly::Log::Level::Warn, nullptr, std::move(expectations));
+            }
+
+            SECTION("With trace information")
+            {
+                logger->warn({__FILE__, __FUNCTION__, 123_u32}, "Warning Log");
+                logger->warn({__FILE__, __FUNCTION__, 123_u32}, "Warning Log: %d", 123);
+
+                validate_log_points(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
+            }
+
+            SECTION("With macro invocation")
+            {
+                LOGW("Warning Log");
+                LOGW("Warning Log: %d", 123);
+
+                validate_log_points(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
+            }
+
+            SECTION("With system macro invocation")
+            {
+                LOGS("Warning Log");
+                LOGS("Warning Log: %d", 123);
+
+                validate_log_points(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
+            }
         }
 
-        SECTION("Validate style of error console logs")
+        SECTION("Error log points")
         {
-            fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
-            LOGE("Error Log");
+            std::vector<std::string> expectations = {
+                "Error Log",
+                "Error Log: 123",
+            };
 
-            const std::string contents = capture();
-            REQUIRE_FALSE(contents.empty());
+            SECTION("Without trace information")
+            {
+                logger->error("Error Log");
+                logger->error("Error Log: %d", 123);
 
-            const std::string styled = styled_contents(contents, "Error Log");
-            CHECK(fly::String::starts_with(styled, "\x1b[1;31m"));
-            CHECK(fly::String::ends_with(styled, "\x1b[0m"));
-        }
-    }
+                validate_log_points(fly::Log::Level::Error, nullptr, std::move(expectations));
+            }
 
-#endif
+            SECTION("With trace information")
+            {
+                logger->error({__FILE__, __FUNCTION__, 123_u32}, "Error Log");
+                logger->error({__FILE__, __FUNCTION__, 123_u32}, "Error Log: %d", 123);
 
-    SECTION("Validate debug logging macro")
-    {
-        LOGD("Debug Log");
-        LOGD("Debug Log: %d", 123);
+                validate_log_points(fly::Log::Level::Error, __FUNCTION__, std::move(expectations));
+            }
 
-        std::vector<std::string> expectations = {
-            "Debug Log",
-            "Debug Log: 123",
-        };
+            SECTION("With macro invocation")
+            {
+                LOGE("Error Log");
+                LOGE("Error Log: %d", 123);
 
-        validate_log_points(fly::Log::Level::Debug, __FUNCTION__, std::move(expectations));
-    }
-
-    SECTION("Validate informational logging macro")
-    {
-        LOGI("Info Log");
-        LOGI("Info Log: %d", 123);
-
-        std::vector<std::string> expectations = {
-            "Info Log",
-            "Info Log: 123",
-        };
-
-        validate_log_points(fly::Log::Level::Info, __FUNCTION__, std::move(expectations));
-    }
-
-    SECTION("Validate warning logging macro")
-    {
-        LOGW("Warning Log");
-        LOGW("Warning Log: %d", 123);
-
-        std::vector<std::string> expectations = {
-            "Warning Log",
-            "Warning Log: 123",
-        };
-
-        validate_log_points(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
-    }
-
-    SECTION("Validate system logging macro")
-    {
-        LOGS("System Log");
-        LOGS("System Log: %d", 123);
-
-        std::vector<std::string> expectations = {
-            "System Log",
-            "System Log: 123",
-        };
-
-        validate_log_points(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
-    }
-
-    SECTION("Validate error logging macro")
-    {
-        LOGE("Error Log");
-        LOGE("Error Log: %d", 123);
-
-        std::vector<std::string> expectations = {
-            "Error Log",
-            "Error Log: 123",
-        };
-
-        validate_log_points(fly::Log::Level::Error, __FUNCTION__, std::move(expectations));
-    }
-
-    SECTION("Logger should compress log files by default")
-    {
-        std::filesystem::path log_file = logger->get_log_file_path();
-
-        std::uintmax_t max_log_file_size = logger_config->max_log_file_size();
-        std::uint32_t max_message_size = logger_config->max_message_size();
-
-        std::string random = fly::String::generate_random_string(max_message_size);
-
-        std::uintmax_t expected_size = log_size(random);
-        std::uintmax_t count = 0;
-
-        // Create enough log points to fill the log file, plus some extra to start a second log.
-        while (++count < ((max_log_file_size / expected_size) + 10))
-        {
-            LOGD("%s", random);
-            task_runner->wait_for_task_to_complete<fly::LoggerTask>();
+                validate_log_points(fly::Log::Level::Error, __FUNCTION__, std::move(expectations));
+            }
         }
 
-        CHECK(log_file != logger->get_log_file_path());
-
-        std::filesystem::path compressed_path = log_file;
-        compressed_path.replace_extension(".log.enc");
-
-        REQUIRE_FALSE(std::filesystem::exists(log_file));
-        REQUIRE(std::filesystem::exists(compressed_path));
-
-        fly::HuffmanDecoder decoder;
-        REQUIRE(decoder.decode_file(compressed_path, log_file));
-
-        std::uintmax_t actual_size = std::filesystem::file_size(log_file);
-        CHECK(actual_size >= max_message_size);
+        fly::Logger::set_default_logger(nullptr);
+        task_manager->stop();
     }
-
-    SECTION("When compression is disabled, logger should produce uncompressed logs")
-    {
-        logger_config->disable_compression();
-
-        std::filesystem::path log_file = logger->get_log_file_path();
-
-        std::uintmax_t max_log_file_size = logger_config->max_log_file_size();
-        std::uint32_t max_message_size = logger_config->max_message_size();
-
-        std::string random = fly::String::generate_random_string(max_message_size);
-
-        std::uintmax_t expected_size = log_size(random);
-        std::uintmax_t count = 0;
-
-        // Create enough log points to fill the log file, plus some extra to start a second log.
-        while (++count < ((max_log_file_size / expected_size) + 10))
-        {
-            LOGD("%s", random);
-            task_runner->wait_for_task_to_complete<fly::LoggerTask>();
-        }
-
-        CHECK(log_file != logger->get_log_file_path());
-        REQUIRE(std::filesystem::exists(log_file));
-
-        fly::HuffmanDecoder decoder;
-        CHECK_FALSE(decoder.decode_file(log_file, path.file()));
-
-        std::uintmax_t actual_size = std::filesystem::file_size(log_file);
-        CHECK(actual_size >= max_message_size);
-    }
-
-    SECTION("When compression fails, logger should produce uncompressed logs")
-    {
-        coder_config->invalidate_max_code_length();
-
-        std::filesystem::path log_file = logger->get_log_file_path();
-
-        std::uintmax_t max_log_file_size = logger_config->max_log_file_size();
-        std::uint32_t max_message_size = logger_config->max_message_size();
-
-        std::string random = fly::String::generate_random_string(max_message_size);
-
-        std::uintmax_t expected_size = log_size(random);
-        std::uintmax_t count = 0;
-
-        // Create enough log points to fill the log file, plus some extra to start a second log.
-        while (++count < ((max_log_file_size / expected_size) + 10))
-        {
-            LOGD("%s", random);
-            task_runner->wait_for_task_to_complete<fly::LoggerTask>();
-        }
-
-        CHECK(log_file != logger->get_log_file_path());
-        REQUIRE(std::filesystem::exists(log_file));
-
-        fly::HuffmanDecoder decoder;
-        CHECK_FALSE(decoder.decode_file(log_file, path.file()));
-
-        std::uintmax_t actual_size = std::filesystem::file_size(log_file);
-        CHECK(actual_size >= max_message_size);
-    }
-
-    REQUIRE(task_manager->stop());
-    fly::Logger::set_instance(nullptr);
 }

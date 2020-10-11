@@ -1,6 +1,5 @@
 #pragma once
 
-#include "fly/fly.hpp"
 #include "fly/logger/detail/logger_macros.hpp"
 #include "fly/logger/log.hpp"
 #include "fly/system/system.hpp"
@@ -8,55 +7,99 @@
 #include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/string/string.hpp"
 
+#include <atomic>
 #include <chrono>
-#include <cstdarg>
 #include <cstdint>
 #include <filesystem>
-#include <fstream>
 #include <memory>
-#include <mutex>
 #include <string>
 
-//==================================================================================================
+/**
+ * Add a debug log point to the default logger with trace information.
+ *
+ * At minimum, a format string is required as the first argument. Subsequent arguments are used to
+ * format that string. For example:
+ *
+ *   LOGD("This is a message");
+ *   LOGD("This is message number %d", 10);
+ */
 #define LOGD(...)                                                                                  \
-    _FLY_ADD_LOG(                                                                                  \
-        fly::Log::Level::Debug,                                                                    \
-        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
+    do                                                                                             \
+    {                                                                                              \
+        fly::Logger::get_default_logger()->debug(                                                  \
+            {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
+            FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
+    } while (0)
 
-//==================================================================================================
+/**
+ * Add an informational log point to the default logger with trace information.
+ *
+ * At minimum, a format string is required as the first argument. Subsequent arguments are used to
+ * format that string. For example:
+ *
+ *   LOGI("This is a message");
+ *   LOGI("This is message number %d", 10);
+ */
 #define LOGI(...)                                                                                  \
-    _FLY_ADD_LOG(                                                                                  \
-        fly::Log::Level::Info,                                                                     \
-        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
+    do                                                                                             \
+    {                                                                                              \
+        fly::Logger::get_default_logger()->info(                                                   \
+            {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
+            FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
+    } while (0)
 
-//==================================================================================================
+/**
+ * Add a warning log point to the default logger with trace information.
+ *
+ * At minimum, a format string is required as the first argument. Subsequent arguments are used to
+ * format that string. For example:
+ *
+ *   LOGW("This is a message");
+ *   LOGW("This is message number %d", 10);
+ */
 #define LOGW(...)                                                                                  \
-    _FLY_ADD_LOG(                                                                                  \
-        fly::Log::Level::Warn,                                                                     \
-        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
+    do                                                                                             \
+    {                                                                                              \
+        fly::Logger::get_default_logger()->warn(                                                   \
+            {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
+            FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
+    } while (0)
 
-//==================================================================================================
+/**
+ * Add a system warning log point to the default logger with trace information. The log point will
+ * include the system's last error code and message.
+ *
+ * At minimum, a format string is required as the first argument. Subsequent arguments are used to
+ * format that string. For example:
+ *
+ *   LOGS("This is a message");
+ *   LOGS("This is message number %d", 10);
+ */
 #define LOGS(...)                                                                                  \
-    _FLY_ADD_LOG(                                                                                  \
-        fly::Log::Level::Warn,                                                                     \
-        fly::String::format(                                                                       \
-            _FLY_FORMAT_STRING(__VA_ARGS__) ": %s" _FLY_FORMAT_ARGS(__VA_ARGS__),                  \
-            fly::System::get_error_string()))
+    do                                                                                             \
+    {                                                                                              \
+        fly::Logger::get_default_logger()->warn(                                                   \
+            {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
+            FLY_FORMAT_STRING(__VA_ARGS__) ": %s" FLY_FORMAT_ARGS(__VA_ARGS__),                    \
+            fly::System::get_error_string());                                                      \
+    } while (0)
 
-//==================================================================================================
+/**
+ * Add an error log point to the default logger with trace information.
+ *
+ * At minimum, a format string is required as the first argument. Subsequent arguments are used to
+ * format that string. For example:
+ *
+ *   LOGE("This is a message");
+ *   LOGE("This is message number %d", 10);
+ */
 #define LOGE(...)                                                                                  \
-    _FLY_ADD_LOG(                                                                                  \
-        fly::Log::Level::Error,                                                                    \
-        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
-
-//==================================================================================================
-#define LOGC(...)                                                                                  \
-    fly::Logger::console_log(                                                                      \
-        fly::Log::Level::Info,                                                                     \
-        __FILE__,                                                                                  \
-        __FUNCTION__,                                                                              \
-        __LINE__,                                                                                  \
-        fly::String::format(_FLY_FORMAT_STRING(__VA_ARGS__) _FLY_FORMAT_ARGS(__VA_ARGS__)))
+    do                                                                                             \
+    {                                                                                              \
+        fly::Logger::get_default_logger()->error(                                                  \
+            {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
+            FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
+    } while (0)
 
 namespace fly {
 
@@ -64,157 +107,297 @@ class CoderConfig;
 class LoggerConfig;
 class LoggerTask;
 class SequencedTaskRunner;
+class LogSink;
 
 /**
- * Provides thread safe instrumentation. There are 4 levels of instrumentation:
+ * Logging class to provide configurable instrumentation. There are 4 levels of instrumentation:
  *
- * 1. Debug = Really common points.
- * 2. Info = Less common, event based points.
+ * 1. Debug = Common points.
+ * 2. Informational = Less common, event based points.
  * 3. Warning = Something went wrong, but the system is OK.
  * 4. Error = Something went wrong, and the sytem is not OK.
  *
- * The following macros should be used to add points to the log: LOGD, LOGI, LOGW, LOGE. Usage is as
- * follows:
+ * This class manages creating log points, but delegates the streaming of those log points to a log
+ * sink. Sinks may stream log points however they wish, for example to the console or to a file.
  *
- *   LOGD(message, message arguments, ...)
- *   For example, LOGD("This is message number %d", 10)
+ * Loggers may be created as synchronous or asynchronous loggers. With synchronous loggers, the
+ * log sink receives the log points immediately on the same thread they are created. Asynchronous
+ * loggers defer handing the log point to the sink to a dedicated thread sequence.
  *
- * The LOGS macro is provided for system error logging. It produces a warning-level log point with
- * the last system error appended to the given message.
+ * Any number of loggers may be created. By default, a synchronous console logger will be used, but
+ * callers may override the default logger.
  *
- * The LOGC macro is provided for thread-safe console logging. LOGC_NO_LOCK is also provided for
- * console logging without acquiring the console lock while inside, e.g., a signal handler.
- *
- * The logging macros support up to and including 50 format arguments. If more are needed, invoke
- * Logger::AddLog directly.
+ * The logging macros above may be used to add log points to the default logger. They are useful for
+ * providing trace information about the log point (e.g. file name, line number). The logging macros
+ * support up to and including 50 format arguments. If more are needed, invoke the logger's public
+ * logging methods directly.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 21, 2016
  */
 class Logger : public std::enable_shared_from_this<Logger>
 {
-    friend class LoggerTask;
-
 public:
     /**
-     * Constructor.
+     * Create a synchronous logger with the provided log sink.
      *
-     * @param task_runner Task runner for posting logger-related tasks onto.
-     * @param logger_config Reference to logger configuration.
-     * @param coder_config Reference to coder configuration.
-     * @param logger_directory Path to store the log file.
+     * @param logger_config Reference to the logger configuration.
+     * @param sink The log sink to receive log points for streaming.
+     *
+     * @return The created logger, or null if the logger could not be initialized.
      */
-    Logger(
+    static std::shared_ptr<Logger> create_logger(
+        const std::shared_ptr<LoggerConfig> &logger_config,
+        std::unique_ptr<LogSink> &&sink);
+
+    /**
+     * Create an asynchronous logger with the provided log sink.
+     *
+     * @param task_runner The sequence on which logs are streamed.
+     * @param logger_config Reference to the logger configuration.
+     * @param sink The log sink to receive log points for streaming.
+     *
+     * @return The created logger, or null if the logger could not be initialized.
+     */
+    static std::shared_ptr<Logger> create_logger(
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        const std::shared_ptr<LoggerConfig> &logger_config,
+        std::unique_ptr<LogSink> &&sink);
+
+    /**
+     * Create a synchronous file logger.
+     *
+     * @param logger_config Reference to the logger configuration.
+     * @param coder_config Reference to the coder configuration.
+     * @param logger_directory Path to store log files.
+     *
+     * @return The created logger, or null if the logger could not be initialized.
+     */
+    static std::shared_ptr<Logger> create_file_logger(
+        const std::shared_ptr<LoggerConfig> &logger_config,
+        const std::shared_ptr<CoderConfig> &coder_config,
+        const std::filesystem::path &logger_directory);
+
+    /**
+     * Create an asynchronous file logger.
+     *
+     * @param task_runner The sequence on which logs are streamed.
+     * @param logger_config Reference to the logger configuration.
+     * @param coder_config Reference to the coder configuration.
+     * @param logger_directory Path to store log files.
+     *
+     * @return The created logger, or null if the logger could not be initialized.
+     */
+    static std::shared_ptr<Logger> create_file_logger(
         const std::shared_ptr<SequencedTaskRunner> &task_runner,
         const std::shared_ptr<LoggerConfig> &logger_config,
         const std::shared_ptr<CoderConfig> &coder_config,
-        const std::filesystem::path &logger_directory) noexcept;
+        const std::filesystem::path &logger_directory);
 
     /**
-     * Set the logger instance so that the LOG* macros function.
+     * Create a synchronous console logger.
+     *
+     * @param logger_config Reference to the logger configuration.
+     *
+     * @return The created logger, or null if the logger could not be initialized.
+     */
+    static std::shared_ptr<Logger>
+    create_console_logger(const std::shared_ptr<LoggerConfig> &logger_config);
+
+    /**
+     * Create an asynchronous console logger.
+     *
+     * @param task_runner The sequence on which logs are streamed.
+     * @param logger_config Reference to the logger configuration.
+     *
+     * @return The created logger, or null if the logger could not be initialized.
+     */
+    static std::shared_ptr<Logger> create_console_logger(
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        const std::shared_ptr<LoggerConfig> &logger_config);
+
+    /**
+     * Set the default logger instance for the LOG* macro functions. If the provided logger is null,
+     * the default logger is reset to the initial synchronous console logger.
      *
      * @param logger The logger instance.
      */
-    static void set_instance(const std::shared_ptr<Logger> &logger);
+    static void set_default_logger(const std::shared_ptr<Logger> &default_logger);
 
     /**
-     * Log to the console in a thread-safe manner.
+     * @return The default logger instance for the LOG* macro functions.
+     */
+    static Logger *get_default_logger();
+
+    /**
+     * Add a debug log point to the default logger.
      *
-     * @param level The level (debug, info, etc.) of the log.
-     * @param file Name of the file storing the log.
-     * @param function Name of the function storing the log.
-     * @param line The line number the log point occurs.
-     * @param message The message to log.
-     */
-    static void console_log(
-        Log::Level level,
-        const char *file,
-        const char *function,
-        std::uint32_t line,
-        std::string &&message);
-
-    /**
-     * Add a log to the static logger instance.
+     * @tparam Args Variadic template arguments.
      *
-     * @param level The level (debug, info, etc.) of the log.
-     * @param file Name of the file storing the log.
-     * @param function Name of the function storing the log.
-     * @param line The line number the log point occurs.
-     * @param message The message to log.
+     * @param format The format string for the log point.
+     * @param args The variadic list of arguments to augment the format string with.
      */
-    static void add_log(
-        Log::Level level,
-        const char *file,
-        const char *function,
-        std::uint32_t line,
-        std::string &&message);
+    template <typename... Args>
+    void debug(const char *format, const Args &... args)
+    {
+        log(Log::Level::Debug, {}, String::format(format, args...));
+    }
 
     /**
-     * Create the logger's log file on disk and initialize the logger task.
+     * Add a debug log point to the default logger with trace information.
      *
-     * @return True if the logger is in a valid state.
+     * @tparam Args Variadic template arguments.
+     *
+     * @param trace The trace information for the log point.
+     * @param format The format string for the log point.
+     * @param args The variadic list of arguments to augment the format string with.
      */
-    bool start();
+    template <typename... Args>
+    void debug(Log::Trace &&trace, const char *format, const Args &... args)
+    {
+        log(Log::Level::Debug, std::move(trace), String::format(format, args...));
+    }
 
     /**
-     * @return Path to the current log file.
+     * Add an informational log point to the default logger.
+     *
+     * @tparam Args Variadic template arguments.
+     *
+     * @param format The format string for the log point.
+     * @param args The variadic list of arguments to augment the format string with.
      */
-    std::filesystem::path get_log_file_path() const;
+    template <typename... Args>
+    void info(const char *format, const Args &... args)
+    {
+        log(Log::Level::Info, {}, String::format(format, args...));
+    }
+
+    /**
+     * Add an informational log point to the default logger with trace information.
+     *
+     * @tparam Args Variadic template arguments.
+     *
+     * @param trace The trace information for the log point.
+     * @param format The format string for the log point.
+     * @param args The variadic list of arguments to augment the format string with.
+     */
+    template <typename... Args>
+    void info(Log::Trace &&trace, const char *format, const Args &... args)
+    {
+        log(Log::Level::Info, std::move(trace), String::format(format, args...));
+    }
+
+    /**
+     * Add a warning log point to the default logger.
+     *
+     * @tparam Args Variadic template arguments.
+     *
+     * @param format The format string for the log point.
+     * @param args The variadic list of arguments to augment the format string with.
+     */
+    template <typename... Args>
+    void warn(const char *format, const Args &... args)
+    {
+        log(Log::Level::Warn, {}, String::format(format, args...));
+    }
+
+    /**
+     * Add a warning log point to the default logger with trace information.
+     *
+     * @tparam Args Variadic template arguments.
+     *
+     * @param trace The trace information for the log point.
+     * @param format The format string for the log point.
+     * @param args The variadic list of arguments to augment the format string with.
+     */
+    template <typename... Args>
+    void warn(Log::Trace &&trace, const char *format, const Args &... args)
+    {
+        log(Log::Level::Warn, std::move(trace), String::format(format, args...));
+    }
+
+    /**
+     * Add an error log point to the default logger.
+     *
+     * @tparam Args Variadic template arguments.
+     *
+     * @param format The format string for the log point.
+     * @param args The variadic list of arguments to augment the format string with.
+     */
+    template <typename... Args>
+    void error(const char *format, const Args &... args)
+    {
+        log(Log::Level::Error, {}, String::format(format, args...));
+    }
+
+    /**
+     * Add an error log point to the default logger with trace information.
+     *
+     * @tparam Args Variadic template arguments.
+     *
+     * @param trace The trace information for the log point.
+     * @param format The format string for the log point.
+     * @param args The variadic list of arguments to augment the format string with.
+     */
+    template <typename... Args>
+    void error(Log::Trace &&trace, const char *format, const Args &... args)
+    {
+        log(Log::Level::Error, std::move(trace), String::format(format, args...));
+    }
 
 private:
+    friend class LoggerTask;
+
     /**
-     * Perform any IO operations. Wait for a log item to be available and write it to disk.
+     * Constructor. Creates a synchronous or an asynchronous logger, depending on whether the given
+     * task runner is null.
      *
-     * @return True if the current log file is still open and healthy.
+     * @param task_runner If not null, the sequence on which logs are streamed.
+     * @param config Reference to the logger configuration.
+     * @param sink The log sink to receive log points for streaming.
+     */
+    Logger(
+        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+        const std::shared_ptr<LoggerConfig> &config,
+        std::unique_ptr<LogSink> &&sink) noexcept;
+
+    /**
+     * Initialize the log sink and, for asynchronous loggers, the logger task.
+     *
+     * @return True if the logger could be initialized.
+     */
+    bool initialize();
+
+    /**
+     * Add a log point to the default logger, optionally with trace information.
+     *
+     * @param level The level of the log point.
+     * @param trace The trace information for the log point.
+     * @param message The message to log.
+     */
+    void log(Log::Level level, Log::Trace &&trace, std::string &&message);
+
+    /**
+     * For asynchronous loggers, wait for a log point to be available and hand it to the log sink.
+     *
+     * @return True if the sink accepted the log point.
      */
     bool poll();
 
-    /**
-     * Add a log to this logger instance.
-     *
-     * @param level The level (debug, info, etc.) of the log.
-     * @param file Name of the file storing the log.
-     * @param function Name of the function storing the log.
-     * @param line The line number the log point occurs.
-     * @param message The message to log.
-     */
-    void add_log_internal(
-        Log::Level level,
-        const char *file,
-        const char *function,
-        std::uint32_t line,
-        std::string &&message);
-
-    /**
-     * Create the log file. If a log file is already open, close it.
-     *
-     * @return True if the log file could be opened.
-     */
-    bool create_log_file();
-
-    static std::weak_ptr<Logger> s_weak_instance;
-    static std::mutex s_console_mutex;
-
-    fly::ConcurrentQueue<Log> m_log_queue;
+    std::shared_ptr<LoggerConfig> m_config;
+    std::unique_ptr<LogSink> m_sink;
 
     std::shared_ptr<SequencedTaskRunner> m_task_runner;
     std::shared_ptr<Task> m_task;
-
-    std::shared_ptr<LoggerConfig> m_logger_config;
-    std::shared_ptr<CoderConfig> m_coder_config;
-
-    const std::filesystem::path m_log_directory;
-    mutable std::mutex m_log_file_mutex;
-    std::filesystem::path m_log_file;
-    std::ofstream m_log_stream;
-
-    std::uintmax_t m_index;
+    std::atomic_bool m_last_task_failed {true};
+    fly::ConcurrentQueue<Log> m_queue;
 
     const std::chrono::high_resolution_clock::time_point m_start_time;
+    std::uintmax_t m_index {0};
 };
 
 /**
- * Task to be executed to check for new log entries.
+ * Task to be executed to check for new log entries on asynchronous loggers.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
@@ -226,7 +409,7 @@ public:
 
 protected:
     /**
-     * Call back into the logger to check for new log entries. The task re-arms itself.
+     * Call back into the logger to poll for new log entries. The task re-arms itself.
      */
     void run() override;
 

@@ -1,0 +1,275 @@
+#include "fly/coders/coder_config.hpp"
+#include "fly/coders/huffman/huffman_decoder.hpp"
+#include "fly/fly.hpp"
+#include "fly/logger/logger.hpp"
+#include "fly/logger/logger_config.hpp"
+#include "fly/types/numeric/literals.hpp"
+#include "fly/types/string/string.hpp"
+#include "test/util/path_util.hpp"
+
+#if defined(FLY_LINUX)
+#    include "test/mock/mock_system.hpp"
+#endif
+
+#include <catch2/catch.hpp>
+
+#include <cstdint>
+#include <filesystem>
+#include <memory>
+#include <vector>
+
+using namespace fly::literals::numeric_literals;
+
+namespace {
+
+/**
+ * Subclass of the logger config to decrease the default log file size for faster testing.
+ */
+class MutableLoggerConfig : public fly::LoggerConfig
+{
+public:
+    MutableLoggerConfig() noexcept : fly::LoggerConfig()
+    {
+        m_default_max_log_file_size = 1 << 10;
+    }
+
+    void disable_compression()
+    {
+        m_default_compress_log_files = false;
+    }
+};
+
+/**
+ * Subclass of the coder config to contain invalid values.
+ */
+class MutableCoderConfig : public fly::CoderConfig
+{
+public:
+    void invalidate_max_code_length()
+    {
+        m_default_huffman_encoder_max_code_length = std::numeric_limits<fly::code_type>::digits;
+    }
+};
+
+/**
+ * Find the current log file used by the file sink.
+ *
+ * @param path Directory containing the log file(s).
+ *
+ * @return The current log file.
+ */
+std::filesystem::path find_log_file(const fly::test::PathUtil::ScopedTempDirectory &path)
+{
+    std::uint32_t most_recent_log_index = 0_u32;
+    std::filesystem::path most_recent_log_file;
+
+    for (auto &it : std::filesystem::directory_iterator(path()))
+    {
+        std::vector<std::string> segments = fly::String::split(it.path().filename().string(), '_');
+        auto log_index = fly::String::convert<std::uint32_t>(segments[1]);
+
+        if (log_index.has_value() && (log_index.value() > most_recent_log_index))
+        {
+            most_recent_log_index = log_index.value();
+            most_recent_log_file = it.path();
+        }
+    }
+
+    return most_recent_log_file;
+}
+
+/**
+ * Measure the size, in bytes, of a log point.
+ *
+ * @param string Message to store in the log.
+ *
+ * @return uintmax_t Size of the log point.
+ */
+std::uintmax_t log_size(const std::string &message)
+{
+    fly::Log log;
+
+    log.m_message = message;
+    log.m_level = fly::Log::Level::Debug;
+    log.m_trace = {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)};
+
+    return fly::String::format("%d\t%s", 1, log).length();
+}
+
+} // namespace
+
+TEST_CASE("FileLogger", "[logger]")
+{
+    auto logger_config = std::make_shared<MutableLoggerConfig>();
+    auto coder_config = std::make_shared<MutableCoderConfig>();
+    fly::test::PathUtil::ScopedTempDirectory path;
+
+    auto logger = fly::Logger::create_file_logger(logger_config, coder_config, path());
+
+    SECTION("Valid logger file paths should be created after creating logger")
+    {
+        std::filesystem::path log_file = find_log_file(path);
+        CHECK(fly::String::starts_with(log_file.string(), path().string()));
+
+        REQUIRE(std::filesystem::exists(log_file));
+    }
+
+    SECTION("Cannot start logger with a bad file path")
+    {
+        logger = fly::Logger::create_file_logger(logger_config, coder_config, __FILE__);
+        CHECK(logger == nullptr);
+    }
+
+#if defined(FLY_LINUX)
+
+    SECTION("Writing to log file fails due to ::write() system call")
+    {
+        fly::test::MockSystem mock(fly::test::MockCall::Write);
+
+        logger->debug("This log will be received");
+        logger->debug("This log will be rejected");
+
+        std::filesystem::path log_file = find_log_file(path);
+        const std::string contents = fly::test::PathUtil::read_file(log_file);
+        REQUIRE(contents.empty());
+    }
+
+#endif
+
+    SECTION("Debug log points")
+    {
+        logger->debug("Debug Log");
+
+        std::filesystem::path log_file = find_log_file(path);
+        const std::string contents = fly::test::PathUtil::read_file(log_file);
+        REQUIRE_FALSE(contents.empty());
+
+        CHECK(contents.find("Debug Log") != std::string::npos);
+    }
+
+    SECTION("Informational log points")
+    {
+        logger->info("Info Log");
+
+        std::filesystem::path log_file = find_log_file(path);
+        const std::string contents = fly::test::PathUtil::read_file(log_file);
+        REQUIRE_FALSE(contents.empty());
+
+        CHECK(contents.find("Info Log") != std::string::npos);
+    }
+
+    SECTION("Warning log points")
+    {
+        logger->warn("Warning Log");
+
+        std::filesystem::path log_file = find_log_file(path);
+        const std::string contents = fly::test::PathUtil::read_file(log_file);
+        REQUIRE_FALSE(contents.empty());
+
+        CHECK(contents.find("Warning Log") != std::string::npos);
+    }
+
+    SECTION("Error log points")
+    {
+        logger->error("Error Log");
+
+        std::filesystem::path log_file = find_log_file(path);
+        const std::string contents = fly::test::PathUtil::read_file(log_file);
+        REQUIRE_FALSE(contents.empty());
+
+        CHECK(contents.find("Error Log") != std::string::npos);
+    }
+
+    SECTION("Logger should compress log files by default")
+    {
+        std::filesystem::path log_file = find_log_file(path);
+
+        std::uintmax_t max_log_file_size = logger_config->max_log_file_size();
+        std::uint32_t max_message_size = logger_config->max_message_size();
+
+        std::string random = fly::String::generate_random_string(max_message_size);
+
+        std::uintmax_t expected_size = log_size(random);
+        std::uintmax_t count = 0;
+
+        // Create enough log points to fill the log file, plus some extra to start a second log.
+        while (++count < ((max_log_file_size / expected_size) + 10))
+        {
+            logger->debug("%s", random);
+        }
+
+        CHECK(log_file != find_log_file(path));
+
+        std::filesystem::path compressed_path = log_file;
+        compressed_path.replace_extension(".log.enc");
+
+        REQUIRE_FALSE(std::filesystem::exists(log_file));
+        REQUIRE(std::filesystem::exists(compressed_path));
+
+        fly::HuffmanDecoder decoder;
+        REQUIRE(decoder.decode_file(compressed_path, log_file));
+
+        std::uintmax_t actual_size = std::filesystem::file_size(log_file);
+        CHECK(actual_size >= max_message_size);
+    }
+
+    SECTION("When compression is disabled, logger should produce uncompressed logs")
+    {
+        logger_config->disable_compression();
+
+        std::filesystem::path log_file = find_log_file(path);
+
+        std::uintmax_t max_log_file_size = logger_config->max_log_file_size();
+        std::uint32_t max_message_size = logger_config->max_message_size();
+
+        std::string random = fly::String::generate_random_string(max_message_size);
+
+        std::uintmax_t expected_size = log_size(random);
+        std::uintmax_t count = 0;
+
+        // Create enough log points to fill the log file, plus some extra to start a second log.
+        while (++count < ((max_log_file_size / expected_size) + 10))
+        {
+            logger->debug("%s", random);
+        }
+
+        CHECK(log_file != find_log_file(path));
+        REQUIRE(std::filesystem::exists(log_file));
+
+        fly::HuffmanDecoder decoder;
+        CHECK_FALSE(decoder.decode_file(log_file, path.file()));
+
+        std::uintmax_t actual_size = std::filesystem::file_size(log_file);
+        CHECK(actual_size >= max_message_size);
+    }
+
+    SECTION("When compression fails, logger should produce uncompressed logs")
+    {
+        coder_config->invalidate_max_code_length();
+
+        std::filesystem::path log_file = find_log_file(path);
+
+        std::uintmax_t max_log_file_size = logger_config->max_log_file_size();
+        std::uint32_t max_message_size = logger_config->max_message_size();
+
+        std::string random = fly::String::generate_random_string(max_message_size);
+
+        std::uintmax_t expected_size = log_size(random);
+        std::uintmax_t count = 0;
+
+        // Create enough log points to fill the log file, plus some extra to start a second log.
+        while (++count < ((max_log_file_size / expected_size) + 10))
+        {
+            logger->debug("%s", random);
+        }
+
+        CHECK(log_file != find_log_file(path));
+        REQUIRE(std::filesystem::exists(log_file));
+
+        fly::HuffmanDecoder decoder;
+        CHECK_FALSE(decoder.decode_file(log_file, path.file()));
+
+        std::uintmax_t actual_size = std::filesystem::file_size(log_file);
+        CHECK(actual_size >= max_message_size);
+    }
+}
