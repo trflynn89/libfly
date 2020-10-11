@@ -36,6 +36,7 @@ enum class MockCall : std::uint8_t
     Socket,
     Sysinfo,
     Times,
+    Write,
 };
 
 } // namespace fly::test

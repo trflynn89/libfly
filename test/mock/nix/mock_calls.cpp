@@ -446,6 +446,20 @@ extern "C"
         return __real_times(buf);
     }
 
+    //==============================================================================================
+    ssize_t __real_write(int fd, const void *buf, size_t count);
+
+    ssize_t __wrap_write(int fd, const void *buf, size_t count)
+    {
+        if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Write))
+        {
+            errno = 0;
+            return -1;
+        }
+
+        return __real_write(fd, buf, count);
+    }
+
 #ifdef __cplusplus
 }
 #endif
