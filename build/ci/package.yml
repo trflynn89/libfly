@@ -21,7 +21,7 @@ steps:
     action: 'edit'
     tag: $(Build.SourceBranchName)
     tagSource: 'Git tag'
-    gitHubConnection: libfly
+    gitHubConnection: trflynn89
     repositoryName: trflynn89/libfly
     assets: $(Build.ArtifactStagingDirectory)/*
     assetUploadMode: 'replace'
