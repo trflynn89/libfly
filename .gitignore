@@ -49,6 +49,12 @@ profile/
 *.a
 *.lib
 
+# Language servers
+.cache
+.clangd
+compile_commands.json
+compile_flags.txt
+
 # Gtags files
 GPATH
 GRTAGS
