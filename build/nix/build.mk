@@ -14,6 +14,7 @@
 .PHONY: all
 .PHONY: clean
 .PHONY: tests
+.PHONY: commands
 .PHONY: profile
 .PHONY: coverage
 .PHONY: install
@@ -60,6 +61,25 @@ tests: $(TEST_BINARIES)
 	done; \
 	\
 	exit $$failed
+
+# Create a compilation database for clangd.
+commands: database := $(SOURCE_ROOT)/compile_commands.json
+commands:
+	$(Q)echo "[" > $(database) ; \
+	\
+	commands=$$(make --always-make --dry-run | grep -wE -- "$(CC)|$(CXX)" | grep -w -- "-c"); \
+	\
+	echo "$$commands" | while read -r command ; do \
+		file=$$(echo "$$command" | rev | cut -d' ' -f1 | rev); \
+		\
+		echo -e "\t{" >> $(database); \
+		echo -e "\t\t\"file\": \"$$file\"," >> $(database); \
+		echo -e "\t\t\"directory\": \"$(CXX_DIR)\"," >> $(database); \
+		echo -e "\t\t\"command\": \"$$command\"," >> $(database); \
+		echo -e "\t}," >> $(database); \
+	done; \
+	\
+	echo "]" >> $(database)
 
 # Create profile report.
 profile: report := $(ETC_DIR)/profile
@@ -145,7 +165,7 @@ install: $(TARGET_PACKAGES)
 setup:
 ifeq ($(SYSTEM), LINUX)
 ifeq ($(VENDOR), DEBIAN)
-	$(Q)$(SUDO) apt install -y git make clang clang-format clang-tidy lld llvm gcc g++ lcov \
+	$(Q)$(SUDO) apt install -y git make clang clangd clang-format clang-tidy lld llvm gcc g++ lcov \
 		openjdk-14-jdk
 ifeq ($(arch), x86)
 	$(Q)$(SUDO) apt install -y gcc-multilib g++-multilib
