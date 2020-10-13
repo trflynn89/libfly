@@ -1,6 +1,9 @@
 #pragma once
 
+#include <map>
 #include <memory>
+#include <mutex>
+#include <string>
 
 namespace fly {
 class Logger;
@@ -9,10 +12,8 @@ class Logger;
 namespace fly::detail {
 
 /**
- * Singleton class to register and store created loggers. Currently is only used to manage the
- * default logger, but should be extended to manage all loggers.
- *
- * Upon creation, sets the default logger to a synchronous console logger.
+ * Singleton class to register and store created loggers. Upon creation, sets the default logger to
+ * a synchronous console logger.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version October 11, 2020
@@ -31,12 +32,39 @@ public:
      *
      * @param logger The logger instance.
      */
-    void set_default_logger(const std::shared_ptr<Logger> &default_logger);
+    void set_default_logger(const std::shared_ptr<fly::Logger> &default_logger);
 
     /**
      * @return The default logger instance for the LOG* macro functions.
      */
-    Logger *get_default_logger() const;
+    fly::Logger *get_default_logger() const;
+
+    /**
+     * Register a logger instance. If the given logger's name is already registered, this
+     * registration will fail.
+     *
+     * @param logger The logger instance to register.
+     *
+     * @return True if the logger could be registered.
+     */
+    bool register_logger(const std::shared_ptr<fly::Logger> &logger);
+
+    /**
+     * Remove a logger instance from the registry.
+     *
+     * @param name Name of the logger to unregister.
+     */
+    void unregister_logger(const std::string &name);
+
+    /**
+     * Retrieve a logger from the registry. If the logger is not found, or if the logger instance
+     * has been deleted since it was registered, returns null.
+     *
+     * @param name Name of the logger to retrieve.
+     *
+     * @return The logger instance, or null.
+     */
+    std::shared_ptr<fly::Logger> get_logger(const std::string &name);
 
 private:
     /**
@@ -44,8 +72,11 @@ private:
      */
     Registry();
 
-    std::shared_ptr<Logger> m_initial_default_logger;
-    std::shared_ptr<Logger> m_default_logger;
+    std::shared_ptr<fly::Logger> m_initial_default_logger;
+    std::shared_ptr<fly::Logger> m_default_logger;
+
+    std::mutex m_registry_mutex;
+    std::map<std::string, std::weak_ptr<fly::Logger>> m_registry;
 };
 
 } // namespace fly::detail
