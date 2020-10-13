@@ -45,6 +45,23 @@ private:
 };
 
 /**
+ * Test log sink to drop all received logs.
+ */
+class DropSink : public fly::LogSink
+{
+public:
+    bool initialize() override
+    {
+        return true;
+    }
+
+    bool stream(fly::Log &&) override
+    {
+        return true;
+    }
+};
+
+/**
  * Test log sink to purposefully fail initialiation.
  */
 class FailInitSink : public fly::LogSink
@@ -114,14 +131,57 @@ TEST_CASE("Logger", "[logger]")
 
     SECTION("Cannot create logger with null sink")
     {
-        auto logger = fly::Logger::create_logger(logger_config, nullptr);
-        CHECK(logger == nullptr);
+        auto logger = fly::Logger::create_logger("test", logger_config, nullptr);
+        CHECK(!logger);
     }
 
     SECTION("Cannot create logger with sink that fails initialization")
     {
-        auto logger = fly::Logger::create_logger(logger_config, std::make_unique<FailInitSink>());
-        CHECK(logger == nullptr);
+        auto logger =
+            fly::Logger::create_logger("test", logger_config, std::make_unique<FailInitSink>());
+        CHECK(!logger);
+    }
+
+    SECTION("Cannot create logger with duplicate name")
+    {
+        auto logger1 =
+            fly::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
+        CHECK(logger1 != nullptr);
+
+        auto logger2 =
+            fly::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
+        CHECK(!logger2);
+    }
+
+    SECTION("Cannot fetch logger that doesn't exist")
+    {
+        CHECK(!fly::Logger::get("test"));
+    }
+
+    SECTION("Logger automatically deregisters itself on destruction")
+    {
+        {
+            auto logger =
+                fly::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
+            CHECK(fly::Logger::get("test"));
+        }
+
+        CHECK(!fly::Logger::get("test"));
+    }
+
+    SECTION("Resetting default logger causes initial default logger to be set as default")
+    {
+        fly::Logger *default_logger = fly::Logger::get_default_logger();
+
+        auto logger =
+            fly::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
+        REQUIRE(logger);
+
+        fly::Logger::set_default_logger(logger);
+        CHECK(fly::Logger::get_default_logger() == logger.get());
+
+        fly::Logger::set_default_logger(nullptr);
+        CHECK(fly::Logger::get_default_logger() == default_logger);
     }
 
     SECTION("Log points")
@@ -136,19 +196,20 @@ TEST_CASE("Logger", "[logger]")
         auto sink = std::make_unique<QueueSink>(received_logs);
 
         auto logger = synchronous_logger ?
-            fly::Logger::create_logger(logger_config, std::move(sink)) :
-            fly::Logger::create_logger(task_runner, logger_config, std::move(sink));
+            fly::Logger::create_logger("test", logger_config, std::move(sink)) :
+            fly::Logger::create_logger("test", task_runner, logger_config, std::move(sink));
+        REQUIRE(logger);
 
         fly::Logger::set_default_logger(logger);
         REQUIRE(fly::Logger::get_default_logger() == logger.get());
 
         SECTION("Logger that fails streaming stops accepting logs")
         {
-            auto fail_stream_sink = std::make_unique<FailStreamSink>(received_logs);
+            auto fsink = std::make_unique<FailStreamSink>(received_logs);
 
             logger = synchronous_logger ?
-                fly::Logger::create_logger(logger_config, std::move(fail_stream_sink)) :
-                fly::Logger::create_logger(task_runner, logger_config, std::move(fail_stream_sink));
+                fly::Logger::create_logger("fail", logger_config, std::move(fsink)) :
+                fly::Logger::create_logger("fail", task_runner, logger_config, std::move(fsink));
 
             logger->debug("This log will be received");
             logger->debug("This log will be rejected");
