@@ -72,6 +72,11 @@ private:
      */
     Registry();
 
+    /**
+     * Destructor. Clear the registry.
+     */
+    ~Registry();
+
     std::shared_ptr<fly::Logger> m_initial_default_logger;
     std::shared_ptr<fly::Logger> m_default_logger;
 

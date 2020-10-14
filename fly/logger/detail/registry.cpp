@@ -25,6 +25,16 @@ Registry::Registry() :
 }
 
 //==================================================================================================
+Registry::~Registry()
+{
+    m_initial_default_logger.reset();
+    m_default_logger.reset();
+
+    std::lock_guard<std::mutex> lock(m_registry_mutex);
+    m_registry.clear();
+}
+
+//==================================================================================================
 Registry &Registry::instance()
 {
     static Registry s_singleton;
