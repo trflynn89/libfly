@@ -20,6 +20,18 @@ using namespace fly::literals::numeric_literals;
 namespace {
 
 /**
+ * Subclass of the logger config to decrease default log queue wait time for faster testing.
+ */
+class FastLoggerConfig : public fly::LoggerConfig
+{
+public:
+    FastLoggerConfig() noexcept : fly::LoggerConfig()
+    {
+        m_default_queue_wait_time = 1;
+    }
+};
+
+/**
  * Test log sink to store received logs in a queue for verification.
  */
 class QueueSink : public fly::LogSink
@@ -98,7 +110,7 @@ public:
 
 TEST_CASE("Logger", "[logger]")
 {
-    auto logger_config = std::make_shared<fly::LoggerConfig>();
+    auto logger_config = std::make_shared<FastLoggerConfig>();
     fly::ConcurrentQueue<fly::Log> received_logs;
 
     auto validate_log_points = [&](fly::Log::Level expected_level,
@@ -132,14 +144,14 @@ TEST_CASE("Logger", "[logger]")
     SECTION("Cannot create logger with null sink")
     {
         auto logger = fly::Logger::create_logger("test", logger_config, nullptr);
-        CHECK(!logger);
+        CHECK_FALSE(logger);
     }
 
     SECTION("Cannot create logger with sink that fails initialization")
     {
         auto logger =
             fly::Logger::create_logger("test", logger_config, std::make_unique<FailInitSink>());
-        CHECK(!logger);
+        CHECK_FALSE(logger);
     }
 
     SECTION("Cannot create logger with duplicate name")
@@ -150,12 +162,12 @@ TEST_CASE("Logger", "[logger]")
 
         auto logger2 =
             fly::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
-        CHECK(!logger2);
+        CHECK_FALSE(logger2);
     }
 
     SECTION("Cannot fetch logger that doesn't exist")
     {
-        CHECK(!fly::Logger::get("test"));
+        CHECK_FALSE(fly::Logger::get("test"));
     }
 
     SECTION("Logger automatically deregisters itself on destruction")
@@ -166,7 +178,7 @@ TEST_CASE("Logger", "[logger]")
             CHECK(fly::Logger::get("test"));
         }
 
-        CHECK(!fly::Logger::get("test"));
+        CHECK_FALSE(fly::Logger::get("test"));
     }
 
     SECTION("Resetting default logger causes initial default logger to be set as default")
