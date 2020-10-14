@@ -243,6 +243,10 @@ public:
      *
      * The default logger is retained until it is replaced or reset.
      *
+     * Warning: Setting the default logger is not thread-safe. Do not set the default logger on one
+     * thread while invoking a LOG* macro on another thread. The default logger should be set once
+     * during initialization.
+     *
      * @param logger The logger instance.
      */
     static void set_default_logger(const std::shared_ptr<Logger> &default_logger);
