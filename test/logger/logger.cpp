@@ -368,4 +368,16 @@ TEST_CASE("Logger", "[logger]")
         fly::Logger::set_default_logger(nullptr);
         task_manager->stop();
     }
+
+    // Keep this test last so the logger registry will go out-of-scope without the default logger
+    // having been reset to the initial default logger.
+    SECTION("Not resetting default logger is safe")
+    {
+        auto logger =
+            fly::Logger::create_logger("def", logger_config, std::make_unique<DropSink>());
+        REQUIRE(logger);
+
+        fly::Logger::set_default_logger(logger);
+        CHECK(fly::Logger::get_default_logger() == logger.get());
+    }
 }
