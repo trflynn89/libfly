@@ -3,7 +3,6 @@
 #include "fly/config/config.hpp"
 #include "fly/types/numeric/literals.hpp"
 
-#include <chrono>
 #include <cstdint>
 
 namespace fly {
@@ -34,16 +33,10 @@ public:
      */
     std::uint32_t max_message_size() const;
 
-    /**
-     * @return Sleep time for logger IO thread.
-     */
-    std::chrono::milliseconds queue_wait_time() const;
-
 protected:
     bool m_default_compress_log_files {true};
     std::uintmax_t m_default_max_log_file_size {20_u64 << 20};
     std::uint32_t m_default_max_message_size {256};
-    std::chrono::milliseconds::rep m_default_queue_wait_time {100};
 };
 
 } // namespace fly
