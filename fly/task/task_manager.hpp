@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/task/task_types.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 
 #include <atomic>
@@ -11,7 +12,6 @@
 
 namespace fly {
 
-class Task;
 class TaskRunner;
 
 /**
@@ -75,7 +75,8 @@ private:
      */
     struct TaskHolder
     {
-        std::weak_ptr<Task> m_weak_task;
+        TaskLocation m_location;
+        Task m_task;
         std::weak_ptr<TaskRunner> m_weak_task_runner;
         std::chrono::steady_clock::time_point m_schedule;
     };
@@ -83,20 +84,24 @@ private:
     /**
      * Post a task to be executed as soon as a worker thread is available.
      *
-     * @param weak_task The task to be executed.
+     * @param location The location from which the task was posted.
+     * @param task The task to be executed.
      * @param weak_task_runner The task runner posting the task.
      */
-    void post_task(std::weak_ptr<Task> weak_task, std::weak_ptr<TaskRunner> weak_task_runner);
+    void
+    post_task(TaskLocation &&location, Task &&task, std::weak_ptr<TaskRunner> weak_task_runner);
 
     /**
      * Schedule a task to be posted for execution after some delay.
      *
-     * @param weak_task The task to be executed.
+     * @param location The location from which the task was posted.
+     * @param task The task to be executed.
      * @param weak_task_runner The task runner posting the task.
      * @param delay Delay before posting the task.
      */
     void post_task_with_delay(
-        std::weak_ptr<Task> weak_task,
+        TaskLocation &&location,
+        Task &&task,
         std::weak_ptr<TaskRunner> weak_task_runner,
         std::chrono::milliseconds delay);
 

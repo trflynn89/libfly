@@ -22,6 +22,8 @@ using namespace fly::literals::numeric_literals;
 
 namespace {
 
+constexpr const char *s_system_monitor_file = "system_monitor.cpp";
+
 /**
  * Subclass of the system config to decrease the poll interval for faster testing.
  */
@@ -48,7 +50,7 @@ TEST_CASE("SystemMonitor", "[system]")
     REQUIRE(monitor->start());
 
     // Wait for one poll to complete before proceeding.
-    task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+    task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
     // Thread to spin indefinitely until signaled to stop.
     std::atomic_bool keep_running(true);
@@ -65,7 +67,7 @@ TEST_CASE("SystemMonitor", "[system]")
         double process_before = monitor->get_process_cpu_usage();
 
         std::future<void> result = std::async(std::launch::async, spin_thread);
-        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         std::uint32_t count_after = monitor->get_system_cpu_count();
         double system_after = monitor->get_system_cpu_usage();
@@ -101,14 +103,14 @@ TEST_CASE("SystemMonitor", "[system]")
             std::make_shared<fly::SystemConfig>());
 
         CHECK(monitor->start());
-        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         fly::test::MockSystem mock(fly::test::MockCall::Read);
 
         double system_before = monitor->get_system_cpu_usage();
 
         std::future<void> result = std::async(std::launch::async, spin_thread);
-        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         double system_after = monitor->get_system_cpu_usage();
 
@@ -126,14 +128,14 @@ TEST_CASE("SystemMonitor", "[system]")
             std::make_shared<fly::SystemConfig>());
 
         CHECK(monitor->start());
-        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         fly::test::MockSystem mock(fly::test::MockCall::Times);
 
         double process_before = monitor->get_process_cpu_usage();
 
         std::future<void> result = std::async(std::launch::async, spin_thread);
-        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         double process_after = monitor->get_process_cpu_usage();
 
@@ -155,7 +157,7 @@ TEST_CASE("SystemMonitor", "[system]")
         auto size = static_cast<std::string::size_type>((total_before - system_before) / 10);
 
         std::string consumed(size, '\0');
-        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         std::uint64_t total_after = monitor->get_total_system_memory();
         std::uint64_t system_after = monitor->get_system_memory_usage();
@@ -177,7 +179,7 @@ TEST_CASE("SystemMonitor", "[system]")
         std::uint64_t system_before = monitor->get_system_memory_usage();
 
         std::string consumed(1 << 10, '\0');
-        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         std::uint64_t total_after = monitor->get_total_system_memory();
         std::uint64_t system_after = monitor->get_system_memory_usage();
@@ -193,7 +195,7 @@ TEST_CASE("SystemMonitor", "[system]")
         std::uint64_t process_before = monitor->get_process_memory_usage();
 
         std::string consumed(1 << 10, '\0');
-        task_runner->wait_for_task_to_complete<fly::SystemMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         std::uint64_t process_after = monitor->get_process_memory_usage();
 

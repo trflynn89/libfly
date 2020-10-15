@@ -2,7 +2,6 @@
 
 #include "fly/config/config.hpp"
 #include "fly/logger/logger.hpp"
-#include "fly/task/task.hpp"
 #include "fly/types/json/json.hpp"
 
 #include <cstdint>
@@ -15,7 +14,6 @@
 
 namespace fly {
 
-class ConfigUpdateTask;
 class Parser;
 class PathMonitor;
 class SequencedTaskRunner;
@@ -28,8 +26,6 @@ class SequencedTaskRunner;
  */
 class ConfigManager : public std::enable_shared_from_this<ConfigManager>
 {
-    friend class ConfigUpdateTask;
-
 public:
     /**
      * Map of configuration group names to configuration objects.
@@ -63,6 +59,13 @@ public:
     ~ConfigManager();
 
     /**
+     * Start the configuration manager and underlying objects.
+     *
+     * @return True if the manager could be started.
+     */
+    bool start();
+
+    /**
      * Create a configuration object, or if one with the given type's name exists, fetch it.
      *
      * @tparam T Config type (must derive from or be fly::Config).
@@ -79,13 +82,6 @@ public:
      */
     ConfigMap::size_type prune();
 
-    /**
-     * Start the configuration manager and underlying objects.
-     *
-     * @return True if the monitor could be started.
-     */
-    bool start();
-
 private:
     /**
      * Parse the configuration file and store the parsed values in memory.
@@ -99,31 +95,9 @@ private:
     const std::filesystem::path m_path;
 
     std::shared_ptr<SequencedTaskRunner> m_task_runner;
-    std::shared_ptr<Task> m_task;
 
     mutable std::mutex m_configs_mutex;
     ConfigMap m_configs;
-};
-
-/**
- * Task to be executed when the configuration file changes.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version August 12, 2018
- */
-class ConfigUpdateTask : public Task
-{
-public:
-    explicit ConfigUpdateTask(std::weak_ptr<ConfigManager>) noexcept;
-
-protected:
-    /**
-     * Call back into the config manager to re-parse the configuration file.
-     */
-    void run() override;
-
-private:
-    std::weak_ptr<ConfigManager> m_weak_config_manager;
 };
 
 //==================================================================================================

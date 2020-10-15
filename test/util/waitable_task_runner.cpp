@@ -1,18 +1,24 @@
 #include "test/util/waitable_task_runner.hpp"
 
-#include "fly/task/task.hpp"
 #include "fly/task/task_manager.hpp"
 
 namespace fly::test {
 
 //==================================================================================================
-void WaitableTaskRunner::task_complete(const std::shared_ptr<Task> &task)
+void WaitableTaskRunner::task_complete(fly::TaskLocation &&location)
 {
-    if (task)
+    m_completed_tasks.push(location.m_file);
+}
+
+//==================================================================================================
+void WaitableTaskRunner::wait_for_task_to_complete(const std::string &location)
+{
+    std::string completed_location;
+
+    do
     {
-        const auto &task_ref = *(task.get());
-        m_completed_tasks.push(typeid(task_ref).hash_code());
-    }
+        m_completed_tasks.pop(completed_location);
+    } while (completed_location.find(location) == std::string::npos);
 }
 
 //==================================================================================================
@@ -23,10 +29,11 @@ WaitableParallelTaskRunner::WaitableParallelTaskRunner(
 }
 
 //==================================================================================================
-void WaitableParallelTaskRunner::task_complete(const std::shared_ptr<Task> &task)
+void WaitableParallelTaskRunner::task_complete(fly::TaskLocation &&location)
 {
-    ParallelTaskRunner::task_complete(task);
-    WaitableTaskRunner::task_complete(task);
+    fly::TaskLocation copy = location;
+    ParallelTaskRunner::task_complete(std::move(location));
+    WaitableTaskRunner::task_complete(std::move(copy));
 }
 
 //==================================================================================================
@@ -37,10 +44,11 @@ WaitableSequencedTaskRunner::WaitableSequencedTaskRunner(
 }
 
 //==================================================================================================
-void WaitableSequencedTaskRunner::task_complete(const std::shared_ptr<Task> &task)
+void WaitableSequencedTaskRunner::task_complete(fly::TaskLocation &&location)
 {
-    SequencedTaskRunner::task_complete(task);
-    WaitableTaskRunner::task_complete(task);
+    fly::TaskLocation copy = location;
+    SequencedTaskRunner::task_complete(std::move(location));
+    WaitableTaskRunner::task_complete(std::move(copy));
 }
 
 } // namespace fly::test

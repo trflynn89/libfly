@@ -1,7 +1,6 @@
 #include "fly/task/task_manager.hpp"
 
 #include "fly/logger/logger.hpp"
-#include "fly/task/task.hpp"
 #include "fly/task/task_runner.hpp"
 
 #include <thread>
@@ -71,26 +70,28 @@ bool TaskManager::stop()
 
 //==================================================================================================
 void TaskManager::post_task(
-    std::weak_ptr<Task> weak_task,
+    TaskLocation &&location,
+    Task &&task,
     std::weak_ptr<TaskRunner> weak_task_runner)
 {
     const auto now = std::chrono::steady_clock::now();
-    TaskHolder task {weak_task, weak_task_runner, now};
+    TaskHolder wrapped_task {std::move(location), std::move(task), weak_task_runner, now};
 
-    m_tasks.push(std::move(task));
+    m_tasks.push(std::move(wrapped_task));
 }
 
 //==================================================================================================
 void TaskManager::post_task_with_delay(
-    std::weak_ptr<Task> weak_task,
+    TaskLocation &&location,
+    Task &&task,
     std::weak_ptr<TaskRunner> weak_task_runner,
     std::chrono::milliseconds delay)
 {
     const auto schedule = std::chrono::steady_clock::now() + delay;
-    TaskHolder task {weak_task, weak_task_runner, schedule};
+    TaskHolder wrapped_task {std::move(location), std::move(task), weak_task_runner, schedule};
 
     std::unique_lock<std::mutex> lock(m_delayed_tasks_mutex);
-    m_delayed_tasks.push_back(std::move(task));
+    m_delayed_tasks.push_back(std::move(wrapped_task));
 }
 
 //==================================================================================================
@@ -102,17 +103,10 @@ void TaskManager::worker_thread()
     {
         if (m_tasks.pop(task_holder, s_delay) && m_keep_running.load())
         {
-            auto task_runner = task_holder.m_weak_task_runner.lock();
-            auto task = task_holder.m_weak_task.lock();
-
-            if (task_runner)
+            if (auto task_runner = task_holder.m_weak_task_runner.lock(); task_runner)
             {
-                if (task)
-                {
-                    task->run();
-                }
-
-                task_runner->task_complete(task);
+                std::move(task_holder.m_task)();
+                task_runner->task_complete(std::move(task_holder.m_location));
             }
         }
     }
@@ -131,11 +125,12 @@ void TaskManager::timer_thread()
             {
                 if (it->m_schedule <= now)
                 {
-                    auto task_runner = it->m_weak_task_runner.lock();
-
-                    if (task_runner)
+                    if (auto task_runner = it->m_weak_task_runner.lock(); task_runner)
                     {
-                        task_runner->post_task(it->m_weak_task);
+                        TaskLocation location = std::move(it->m_location);
+                        Task task = std::move(it->m_task);
+
+                        task_runner->post_task_internal(std::move(location), std::move(task));
                     }
 
                     it = m_delayed_tasks.erase(it);

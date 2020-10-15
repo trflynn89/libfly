@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fly/fly.hpp"
-#include "fly/task/task.hpp"
 
 #include <cstdint>
 #include <filesystem>
@@ -26,8 +25,6 @@ class SequencedTaskRunner;
  */
 class PathMonitor : public std::enable_shared_from_this<PathMonitor>
 {
-    friend class PathMonitorTask;
-
 public:
     /**
      * Enumerated list of path events.
@@ -61,7 +58,7 @@ public:
     virtual ~PathMonitor();
 
     /**
-     * Initialize the path monitor task.
+     * Queue a task to poll monitored paths.
      *
      * @return True if the path monitor is in a valid state.
      */
@@ -180,36 +177,20 @@ private:
     PathInfo *get_or_create_path_info(const std::filesystem::path &path);
 
     /**
+     * Queue a task to poll monitored paths. When the task is completed, it re-arms itself (if the
+     * path monitor is still in a valid state).
+     *
+     * @return True if task was able to be queued.
+     */
+    bool poll_paths_later();
+
+    /**
      * Stream the name of a PathEvent instance.
      */
     friend std::ostream &operator<<(std::ostream &stream, PathEvent event);
 
     std::shared_ptr<SequencedTaskRunner> m_task_runner;
-    std::shared_ptr<Task> m_task;
-
     std::shared_ptr<PathConfig> m_config;
-};
-
-/**
- * Task to be executed to check for changes to the monitored paths.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version August 12, 2018
- */
-class PathMonitorTask : public Task
-{
-public:
-    explicit PathMonitorTask(std::weak_ptr<PathMonitor> weak_path_monitor) noexcept;
-
-protected:
-    /**
-     * Call back into the path monitor to check for any changes to the monitored paths. If the path
-     * monitor implementation is still valid, the task re-arms itself.
-     */
-    void run() override;
-
-private:
-    std::weak_ptr<PathMonitor> m_weak_path_monitor;
 };
 
 } // namespace fly

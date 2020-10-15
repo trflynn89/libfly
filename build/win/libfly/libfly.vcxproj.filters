@@ -196,13 +196,13 @@
     <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.hpp">
       <Filter>system\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\task\task.hpp">
-      <Filter>task</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\task\task_manager.hpp">
       <Filter>task</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\task\task_runner.hpp">
+      <Filter>task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\task\task_types.hpp">
       <Filter>task</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\traits\traits.hpp">

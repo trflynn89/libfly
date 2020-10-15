@@ -21,18 +21,7 @@ SystemMonitor::SystemMonitor(
 bool SystemMonitor::start()
 {
     update_system_cpu_count();
-
-    if (is_valid())
-    {
-        std::shared_ptr<SystemMonitor> system_monitor = shared_from_this();
-
-        m_task = std::make_shared<SystemMonitorTask>(system_monitor);
-        m_task_runner->post_task(m_task);
-
-        return true;
-    }
-
-    return false;
+    return poll_system_later();
 }
 
 //==================================================================================================
@@ -78,39 +67,31 @@ bool SystemMonitor::is_valid() const
 }
 
 //==================================================================================================
-void SystemMonitor::poll()
+bool SystemMonitor::poll_system_later()
 {
-    update_system_cpu_count();
-    update_system_cpu_usage();
-    update_process_cpu_usage();
-
-    update_system_memory_usage();
-    update_process_memory_usage();
-}
-
-//==================================================================================================
-SystemMonitorTask::SystemMonitorTask(std::weak_ptr<SystemMonitor> weak_system_monitor) noexcept :
-    Task(),
-    m_weak_system_monitor(weak_system_monitor)
-{
-}
-
-//==================================================================================================
-void SystemMonitorTask::run()
-{
-    std::shared_ptr<SystemMonitor> system_monitor = m_weak_system_monitor.lock();
-
-    if (system_monitor && system_monitor->is_valid())
+    if (!is_valid())
     {
-        system_monitor->poll();
-
-        if (system_monitor->is_valid())
-        {
-            system_monitor->m_task_runner->post_task_with_delay(
-                system_monitor->m_task,
-                system_monitor->m_config->poll_interval());
-        }
+        return false;
     }
+
+    std::weak_ptr<SystemMonitor> weak_self = shared_from_this();
+
+    auto task = [weak_self]() {
+        if (auto self = weak_self.lock(); self && self->is_valid())
+        {
+            self->update_system_cpu_count();
+            self->update_system_cpu_usage();
+            self->update_process_cpu_usage();
+
+            self->update_system_memory_usage();
+            self->update_process_memory_usage();
+
+            self->poll_system_later();
+        }
+    };
+
+    m_task_runner->post_task_with_delay(FROM_HERE, std::move(task), m_config->poll_interval());
+    return true;
 }
 
 } // namespace fly
