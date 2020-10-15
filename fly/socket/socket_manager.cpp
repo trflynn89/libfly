@@ -135,17 +135,13 @@ void SocketManager::trigger_callbacks(
 //==================================================================================================
 void SocketManager::poll_sockets_later()
 {
-    std::weak_ptr<SocketManager> weak_self = shared_from_this();
-
-    auto task = [weak_self]() {
-        if (auto self = weak_self.lock(); self)
-        {
-            self->poll(self->m_config->io_wait_time());
-            self->poll_sockets_later();
-        }
+    auto task = [](std::shared_ptr<SocketManager> self) {
+        self->poll(self->m_config->io_wait_time());
+        self->poll_sockets_later();
     };
 
-    m_task_runner->post_task(FROM_HERE, std::move(task));
+    std::weak_ptr<SocketManager> weak_self = shared_from_this();
+    m_task_runner->post_task(FROM_HERE, std::move(task), std::move(weak_self));
 }
 
 } // namespace fly

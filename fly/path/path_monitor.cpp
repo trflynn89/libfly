@@ -185,17 +185,13 @@ bool PathMonitor::poll_paths_later()
         return false;
     }
 
-    std::weak_ptr<PathMonitor> weak_self = shared_from_this();
-
-    auto task = [weak_self]() {
-        if (auto self = weak_self.lock(); self && self->is_valid())
-        {
-            self->poll(self->m_config->poll_interval());
-            self->poll_paths_later();
-        }
+    auto task = [](std::shared_ptr<PathMonitor> self) {
+        self->poll(self->m_config->poll_interval());
+        self->poll_paths_later();
     };
 
-    return m_task_runner->post_task(FROM_HERE, std::move(task));
+    std::weak_ptr<PathMonitor> weak_self = shared_from_this();
+    return m_task_runner->post_task(FROM_HERE, std::move(task), std::move(weak_self));
 }
 
 //==================================================================================================

@@ -74,24 +74,23 @@ bool SystemMonitor::poll_system_later()
         return false;
     }
 
-    std::weak_ptr<SystemMonitor> weak_self = shared_from_this();
+    auto task = [](std::shared_ptr<SystemMonitor> self) {
+        self->update_system_cpu_count();
+        self->update_system_cpu_usage();
+        self->update_process_cpu_usage();
 
-    auto task = [weak_self]() {
-        if (auto self = weak_self.lock(); self && self->is_valid())
-        {
-            self->update_system_cpu_count();
-            self->update_system_cpu_usage();
-            self->update_process_cpu_usage();
+        self->update_system_memory_usage();
+        self->update_process_memory_usage();
 
-            self->update_system_memory_usage();
-            self->update_process_memory_usage();
-
-            self->poll_system_later();
-        }
+        self->poll_system_later();
     };
 
-    m_task_runner->post_task_with_delay(FROM_HERE, std::move(task), m_config->poll_interval());
-    return true;
+    std::weak_ptr<SystemMonitor> weak_self = shared_from_this();
+    return m_task_runner->post_task_with_delay(
+        FROM_HERE,
+        std::move(task),
+        std::move(weak_self),
+        m_config->poll_interval());
 }
 
 } // namespace fly
