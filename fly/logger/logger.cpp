@@ -146,20 +146,16 @@ void Logger::log(Log::Level level, Log::Trace &&trace, std::string &&message)
 
     if (m_task_runner)
     {
-        std::weak_ptr<Logger> weak_self = shared_from_this();
-
-        auto task = [weak_self,
-                     level,
-                     trace = std::move(trace),
-                     message = std::move(message),
-                     now]() mutable {
-            if (auto self = weak_self.lock(); self && !self->m_last_task_failed)
+        auto task = [level, trace = std::move(trace), message = std::move(message), now](
+                        std::shared_ptr<Logger> self) mutable {
+            if (!self->m_last_task_failed)
             {
                 self->log_to_sink(level, std::move(trace), std::move(message), now);
             }
         };
 
-        m_task_runner->post_task(FROM_HERE, std::move(task));
+        std::weak_ptr<Logger> weak_self = shared_from_this();
+        m_task_runner->post_task(FROM_HERE, std::move(task), std::move(weak_self));
     }
     else
     {

@@ -58,14 +58,14 @@ bool ConfigManager::start()
             auto callback = [weak_self](const std::filesystem::path &, PathMonitor::PathEvent) {
                 if (auto self = weak_self.lock(); self)
                 {
-                    auto task = [weak_self]() {
-                        if (auto nested_self = weak_self.lock(); nested_self)
-                        {
-                            nested_self->update_config();
-                        }
+                    auto task = [](std::shared_ptr<ConfigManager> nested_self) {
+                        nested_self->update_config();
                     };
 
-                    self->m_task_runner->post_task(FROM_HERE, std::move(task));
+                    self->m_task_runner->post_task(
+                        FROM_HERE,
+                        std::move(task),
+                        std::move(weak_self));
                 }
             };
 
