@@ -3,7 +3,6 @@
 #include "fly/logger/detail/logger_macros.hpp"
 #include "fly/logger/log.hpp"
 #include "fly/system/system.hpp"
-#include "fly/task/task.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -109,7 +108,6 @@ namespace fly {
 
 class CoderConfig;
 class LoggerConfig;
-class LoggerTask;
 class SequencedTaskRunner;
 class LogSink;
 
@@ -388,7 +386,6 @@ public:
     }
 
 private:
-    friend class LoggerTask;
     friend class detail::Registry;
 
     /**
@@ -407,7 +404,7 @@ private:
         std::unique_ptr<LogSink> &&sink) noexcept;
 
     /**
-     * Initialize the log sink and, for asynchronous loggers, the logger task.
+     * Initialize the log sink.
      *
      * @return True if the logger could be initialized.
      */
@@ -416,18 +413,14 @@ private:
     /**
      * Add a log point to the default logger, optionally with trace information.
      *
+     * Synchronous loggers will forward the log to the log sink immediately. Asynchronous loggers
+     * will post a task to forward the log later.
+     *
      * @param level The level of the log point.
      * @param trace The trace information for the log point.
      * @param message The message to log.
      */
     void log(Log::Level level, Log::Trace &&trace, std::string &&message);
-
-    /**
-     * For asynchronous loggers, wait for a log point to be available and hand it to the log sink.
-     *
-     * @return True if the sink accepted the log point.
-     */
-    bool poll();
 
     const std::string m_name;
 
@@ -435,33 +428,11 @@ private:
     std::unique_ptr<LogSink> m_sink;
 
     std::shared_ptr<SequencedTaskRunner> m_task_runner;
-    std::shared_ptr<Task> m_task;
     std::atomic_bool m_last_task_failed {true};
     fly::ConcurrentQueue<Log> m_queue;
 
     const std::chrono::high_resolution_clock::time_point m_start_time;
     std::uintmax_t m_index {0};
-};
-
-/**
- * Task to be executed to check for new log entries on asynchronous loggers.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version August 12, 2018
- */
-class LoggerTask : public Task
-{
-public:
-    explicit LoggerTask(std::weak_ptr<Logger> weak_logger) noexcept;
-
-protected:
-    /**
-     * Call back into the logger to poll for new log entries. The task re-arms itself.
-     */
-    void run() override;
-
-private:
-    std::weak_ptr<Logger> m_weak_logger;
 };
 
 } // namespace fly

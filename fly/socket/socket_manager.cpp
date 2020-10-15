@@ -32,10 +32,7 @@ SocketManager::~SocketManager()
 //==================================================================================================
 void SocketManager::start()
 {
-    std::shared_ptr<SocketManager> socket_manager = shared_from_this();
-
-    m_task = std::make_shared<SocketManagerTask>(socket_manager);
-    m_task_runner->post_task(m_task);
+    poll_sockets_later();
 }
 
 //==================================================================================================
@@ -136,22 +133,19 @@ void SocketManager::trigger_callbacks(
 }
 
 //==================================================================================================
-SocketManagerTask::SocketManagerTask(std::weak_ptr<SocketManager> weak_socket_manager) noexcept :
-    Task(),
-    m_weak_socket_manager(weak_socket_manager)
+void SocketManager::poll_sockets_later()
 {
-}
+    std::weak_ptr<SocketManager> weak_self = shared_from_this();
 
-//==================================================================================================
-void SocketManagerTask::run()
-{
-    std::shared_ptr<SocketManager> socket_manager = m_weak_socket_manager.lock();
+    auto task = [weak_self]() {
+        if (auto self = weak_self.lock(); self)
+        {
+            self->poll(self->m_config->io_wait_time());
+            self->poll_sockets_later();
+        }
+    };
 
-    if (socket_manager)
-    {
-        socket_manager->poll(socket_manager->m_config->io_wait_time());
-        socket_manager->m_task_runner->post_task(socket_manager->m_task);
-    }
+    m_task_runner->post_task(FROM_HERE, std::move(task));
 }
 
 } // namespace fly

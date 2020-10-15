@@ -127,14 +127,6 @@ bool Logger::initialize()
 {
     if (m_sink && m_sink->initialize())
     {
-        if (m_task_runner)
-        {
-            std::shared_ptr<Logger> logger = shared_from_this();
-
-            m_task = std::make_shared<LoggerTask>(logger);
-            m_task_runner->post_task(m_task);
-        }
-
         m_last_task_failed.store(false);
         return true;
     }
@@ -161,49 +153,28 @@ void Logger::log(Log::Level level, Log::Trace &&trace, std::string &&message)
 
     if (m_task_runner)
     {
+        std::weak_ptr<Logger> weak_self = shared_from_this();
         m_queue.push(std::move(log));
+
+        auto task = [weak_self]() {
+            if (auto self = weak_self.lock(); self && !self->m_last_task_failed)
+            {
+                Log queued_log;
+
+                if (self->m_queue.pop(queued_log, self->m_config->queue_wait_time()))
+                {
+                    const bool accepted = self->m_sink->stream(std::move(queued_log));
+                    self->m_last_task_failed.store(!accepted);
+                }
+            }
+        };
+
+        m_task_runner->post_task(FROM_HERE, std::move(task));
     }
-    else if (!m_sink->stream(std::move(log)))
+    else
     {
-        m_last_task_failed.store(true);
-    }
-}
-
-//==================================================================================================
-bool Logger::poll()
-{
-    Log log;
-
-    if (m_queue.pop(log, m_config->queue_wait_time()))
-    {
-        return m_sink->stream(std::move(log));
-    }
-
-    return true;
-}
-
-//==================================================================================================
-LoggerTask::LoggerTask(std::weak_ptr<Logger> weak_logger) noexcept :
-    Task(),
-    m_weak_logger(weak_logger)
-{
-}
-
-//==================================================================================================
-void LoggerTask::run()
-{
-    std::shared_ptr<Logger> logger = m_weak_logger.lock();
-
-    if (logger)
-    {
-        if (logger->poll())
-        {
-            logger->m_task_runner->post_task(logger->m_task);
-        }
-        else
-        {
-            logger->m_last_task_failed.store(true);
-        }
+        const bool accepted = m_sink->stream(std::move(log));
+        m_last_task_failed.store(!accepted);
     }
 }
 

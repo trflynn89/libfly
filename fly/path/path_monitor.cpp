@@ -26,17 +26,7 @@ PathMonitor::~PathMonitor()
 //==================================================================================================
 bool PathMonitor::start()
 {
-    if (is_valid())
-    {
-        std::shared_ptr<PathMonitor> path_monitor = shared_from_this();
-
-        m_task = std::make_shared<PathMonitorTask>(path_monitor);
-        m_task_runner->post_task(m_task);
-
-        return true;
-    }
-
-    return false;
+    return poll_paths_later();
 }
 
 //==================================================================================================
@@ -188,6 +178,27 @@ PathMonitor::PathInfo *PathMonitor::get_or_create_path_info(const std::filesyste
 }
 
 //==================================================================================================
+bool PathMonitor::poll_paths_later()
+{
+    if (!is_valid())
+    {
+        return false;
+    }
+
+    std::weak_ptr<PathMonitor> weak_self = shared_from_this();
+
+    auto task = [weak_self]() {
+        if (auto self = weak_self.lock(); self && self->is_valid())
+        {
+            self->poll(self->m_config->poll_interval());
+            self->poll_paths_later();
+        }
+    };
+
+    return m_task_runner->post_task(FROM_HERE, std::move(task));
+}
+
+//==================================================================================================
 std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event)
 {
     switch (event)
@@ -210,29 +221,6 @@ std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event)
     }
 
     return stream;
-}
-
-//==================================================================================================
-PathMonitorTask::PathMonitorTask(std::weak_ptr<PathMonitor> weak_path_monitor) noexcept :
-    Task(),
-    m_weak_path_monitor(weak_path_monitor)
-{
-}
-
-//==================================================================================================
-void PathMonitorTask::run()
-{
-    std::shared_ptr<PathMonitor> path_monitor = m_weak_path_monitor.lock();
-
-    if (path_monitor && path_monitor->is_valid())
-    {
-        path_monitor->poll(path_monitor->m_config->poll_interval());
-
-        if (path_monitor->is_valid())
-        {
-            path_monitor->m_task_runner->post_task(path_monitor->m_task);
-        }
-    }
 }
 
 } // namespace fly

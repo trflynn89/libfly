@@ -2,7 +2,6 @@
 
 #include "fly/fly.hpp"
 #include "fly/socket/async_request.hpp"
-#include "fly/task/task.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -16,7 +15,6 @@ namespace fly {
 class SequencedTaskRunner;
 class Socket;
 class SocketConfig;
-class SocketManagerTask;
 enum class Protocol : uint8_t;
 
 /**
@@ -29,11 +27,8 @@ enum class Protocol : uint8_t;
  */
 class SocketManager : public std::enable_shared_from_this<SocketManager>
 {
-    friend class SocketManagerTask;
-
 public:
     using SocketCallback = std::function<void(std::shared_ptr<Socket>)>;
-
     using SocketList = std::vector<std::shared_ptr<Socket>>;
 
     /**
@@ -52,7 +47,7 @@ public:
     virtual ~SocketManager();
 
     /**
-     * Initialize the socket manager task.
+     * Queue a task to poll aynchronous sockets.
      */
     void start();
 
@@ -141,36 +136,19 @@ protected:
     AsyncRequest::RequestQueue m_completed_sends;
 
 private:
-    std::shared_ptr<SequencedTaskRunner> m_task_runner;
-    std::shared_ptr<Task> m_task;
+    /**
+     * Queue a task to poll aynchronous sockets. When the task is completed, it re-arms itself.
+     *
+     * @return True if task was able to be queued.
+     */
+    void poll_sockets_later();
 
+    std::shared_ptr<SequencedTaskRunner> m_task_runner;
     std::shared_ptr<SocketConfig> m_config;
 
     std::mutex m_callback_mutex;
     SocketCallback m_new_client_callback;
     SocketCallback m_closed_client_callback;
-};
-
-/**
- * Task to be executed to check for available asynchronous sockets.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version August 12, 2018
- */
-class SocketManagerTask : public Task
-{
-public:
-    explicit SocketManagerTask(std::weak_ptr<SocketManager> weak_socket_manager) noexcept;
-
-protected:
-    /**
-     * Call back into the socket manager to check if any asynchronous sockets are available for IO.
-     * The task re-arms itself.
-     */
-    void run() override;
-
-private:
-    std::weak_ptr<SocketManager> m_weak_socket_manager;
 };
 
 //==================================================================================================

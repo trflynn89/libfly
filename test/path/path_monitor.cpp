@@ -25,7 +25,8 @@ using namespace fly::literals::numeric_literals;
 
 namespace {
 
-std::chrono::seconds s_wait_time(5);
+constexpr const char *s_path_monitor_file = "path_monitor.cpp";
+const std::chrono::seconds s_wait_time(5);
 
 /**
  * Subclass of the path config to decrease the poll interval for faster testing.
@@ -175,7 +176,7 @@ TEST_CASE("PathMonitor", "[path]")
 
     SECTION("No events triggered without path changes")
     {
-        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_path_monitor_file);
 
         CHECK(created_files.empty());
         CHECK(deleted_files.empty());
@@ -238,14 +239,14 @@ TEST_CASE("PathMonitor", "[path]")
     SECTION("Cannot poll monitor when ::poll() fails")
     {
         fly::test::MockSystem mock(fly::test::MockCall::Poll);
-        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_path_monitor_file);
 
         CHECK(created_files[file1] == 0);
         CHECK(deleted_files[file1] == 0);
         CHECK(changed_files[file1] == 0);
 
         REQUIRE(fly::test::PathUtil::write_file(file1, "abcdefghi"));
-        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_path_monitor_file);
 
         CHECK(created_files[file1] == 0);
         CHECK(deleted_files[file1] == 0);
@@ -255,14 +256,14 @@ TEST_CASE("PathMonitor", "[path]")
     SECTION("Cannot poll monitor when ::read() fails")
     {
         fly::test::MockSystem mock(fly::test::MockCall::Read);
-        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_path_monitor_file);
 
         CHECK(created_files[file1] == 0);
         CHECK(deleted_files[file1] == 0);
         CHECK(changed_files[file1] == 0);
 
         REQUIRE(fly::test::PathUtil::write_file(file1, "abcdefghi"));
-        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_path_monitor_file);
 
         CHECK(created_files[file1] == 0);
         CHECK(deleted_files[file1] == 0);
@@ -280,7 +281,7 @@ TEST_CASE("PathMonitor", "[path]")
         auto path = std::filesystem::path(file1).concat(".diff");
         REQUIRE(fly::test::PathUtil::write_file(path.string(), "abcdefghi"));
 
-        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_path_monitor_file);
 
         CHECK(created_files[file1] == 0);
         CHECK(deleted_files[file1] == 0);
@@ -289,7 +290,7 @@ TEST_CASE("PathMonitor", "[path]")
         path = std::filesystem::path(path.string().substr(0, path.string().length() - 8));
         REQUIRE(fly::test::PathUtil::write_file(path, "abcdefghi"));
 
-        task_runner->wait_for_task_to_complete<fly::PathMonitorTask>();
+        task_runner->wait_for_task_to_complete(s_path_monitor_file);
 
         CHECK(created_files[file1] == 0);
         CHECK(deleted_files[file1] == 0);

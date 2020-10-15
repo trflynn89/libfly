@@ -19,6 +19,8 @@ using namespace fly::literals::numeric_literals;
 
 namespace {
 
+constexpr const char *s_config_manager_file = "config_manager.cpp";
+
 /**
  * Subclass of the path config to decrease the poll interval for faster testing.
  */
@@ -144,8 +146,8 @@ TEST_CASE("ConfigManager", "[config]")
         const std::string contents(json);
 
         REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         {
             auto config = config_manager->create_config<fly::test::TestConfig>();
@@ -156,7 +158,7 @@ TEST_CASE("ConfigManager", "[config]")
         }
 
         REQUIRE(fly::test::PathUtil::write_file(config_file, contents + "\n"));
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         CHECK(config_manager->prune() == initial_size);
     }
@@ -168,8 +170,8 @@ TEST_CASE("ConfigManager", "[config]")
         const std::string contents(json);
 
         REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
@@ -186,8 +188,8 @@ TEST_CASE("ConfigManager", "[config]")
         const std::string contents(json);
 
         REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         CHECK(config->get_value<std::string>("name", "") == "John Doe");
         CHECK(config->get_value<std::string>("address", "") == "MA");
@@ -202,8 +204,8 @@ TEST_CASE("ConfigManager", "[config]")
         const std::string contents1(json1);
 
         REQUIRE(fly::test::PathUtil::write_file(config_file, contents1));
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         CHECK(config->get_value<std::string>("name", "") == "John Doe");
         CHECK(config->get_value<std::string>("address", "") == "MA");
@@ -214,13 +216,13 @@ TEST_CASE("ConfigManager", "[config]")
         const std::string contents2(json2);
 
         REQUIRE(fly::test::PathUtil::write_file(config_file, contents2));
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         // Multiple fly::PathMonitor::PathEvent::Changed events may be triggered even though the
         // above write happens as a single call. If needed, wait for a second event.
         if (config->get_value<std::string>("name", "").empty())
         {
-            task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+            task_runner->wait_for_task_to_complete(s_config_manager_file);
         }
 
         CHECK(config->get_value<std::string>("name", "") == "Jane Doe");
@@ -237,14 +239,14 @@ TEST_CASE("ConfigManager", "[config]")
         const std::string contents(json);
 
         REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         CHECK(config->get_value<std::string>("name", "") == "John Doe");
         CHECK(config->get_value<std::string>("address", "") == "MA");
 
         std::filesystem::remove(config_file);
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         CHECK(config->get_value<std::string>("name", "") == "");
         CHECK(config->get_value<std::string>("address", "") == "");
@@ -257,8 +259,8 @@ TEST_CASE("ConfigManager", "[config]")
         const std::string contents(" ");
 
         REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         CHECK(config->get_value<std::string>("name", "John Doe") == "John Doe");
         CHECK(config->get_value<std::string>("address", "MA") == "MA");
@@ -271,8 +273,8 @@ TEST_CASE("ConfigManager", "[config]")
         const std::string contents("[1, 2, 3]");
 
         REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
-        task_runner->wait_for_task_to_complete<fly::ConfigUpdateTask>();
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
+        task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         CHECK(config->get_value<std::string>("name", "") == "");
         CHECK(config->get_value<std::string>("address", "") == "");

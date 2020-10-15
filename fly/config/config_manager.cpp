@@ -45,6 +45,38 @@ ConfigManager::~ConfigManager()
 }
 
 //==================================================================================================
+bool ConfigManager::start()
+{
+    if (m_parser)
+    {
+        m_monitor = std::make_shared<PathMonitorImpl>(m_task_runner, create_config<PathConfig>());
+
+        if (m_monitor->start())
+        {
+            std::weak_ptr<ConfigManager> weak_self = shared_from_this();
+
+            auto callback = [weak_self](const std::filesystem::path &, PathMonitor::PathEvent) {
+                if (auto self = weak_self.lock(); self)
+                {
+                    auto task = [weak_self]() {
+                        if (auto nested_self = weak_self.lock(); nested_self)
+                        {
+                            nested_self->update_config();
+                        }
+                    };
+
+                    self->m_task_runner->post_task(FROM_HERE, std::move(task));
+                }
+            };
+
+            return m_monitor->add_file(m_path, callback);
+        }
+    }
+
+    return false;
+}
+
+//==================================================================================================
 ConfigManager::ConfigMap::size_type ConfigManager::prune()
 {
     std::lock_guard<std::mutex> lock(m_configs_mutex);
@@ -64,43 +96,6 @@ ConfigManager::ConfigMap::size_type ConfigManager::prune()
     }
 
     return m_configs.size();
-}
-
-//==================================================================================================
-bool ConfigManager::start()
-{
-    if (m_parser)
-    {
-        m_monitor = std::make_shared<PathMonitorImpl>(m_task_runner, create_config<PathConfig>());
-
-        if (m_monitor->start())
-        {
-            std::weak_ptr<ConfigManager> weak_config_manager = shared_from_this();
-
-            m_task = std::make_shared<ConfigUpdateTask>(weak_config_manager);
-            std::weak_ptr<Task> weak_task = m_task;
-
-            // Formatter badly handles hanging indent in lambdas
-            // clang-format off
-            auto callback = [weak_config_manager, weak_task](
-                const std::filesystem::path &,
-                PathMonitor::PathEvent)
-            {
-                auto config_manager = weak_config_manager.lock();
-                auto task = weak_task.lock();
-
-                if (config_manager && task)
-                {
-                    config_manager->m_task_runner->post_task(task);
-                }
-            };
-            // clang-format on
-
-            return m_monitor->add_file(m_path, callback);
-        }
-    }
-
-    return false;
 }
 
 //==================================================================================================
@@ -139,24 +134,6 @@ void ConfigManager::update_config()
     {
         LOGW("Parsed non key-value pairs file, ignoring update");
         m_values = nullptr;
-    }
-}
-
-//==================================================================================================
-ConfigUpdateTask::ConfigUpdateTask(std::weak_ptr<ConfigManager> weak_config_manager) noexcept :
-    Task(),
-    m_weak_config_manager(weak_config_manager)
-{
-}
-
-//==================================================================================================
-void ConfigUpdateTask::run()
-{
-    std::shared_ptr<ConfigManager> config_manager = m_weak_config_manager.lock();
-
-    if (config_manager)
-    {
-        config_manager->update_config();
     }
 }
 

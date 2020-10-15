@@ -1,20 +1,47 @@
 #pragma once
 
+#include "fly/fly.hpp"
+#include "fly/task/task_types.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 
 #include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <memory>
+
+/**
+ * Helper macro to create a TaskLocation from the current location.
+ */
+// clang-format off
+#define FROM_HERE fly::TaskLocation {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)}
+// clang-format on
 
 namespace fly {
 
-class ParallelTaskRunner;
-class SequencedTaskRunner;
-class Task;
 class TaskManager;
 
 /**
  * Base class for controlling the execution of tasks.
+ *
+ * Once a task is posted, it may be attempted to be cancelled in a number of ways:
+ *
+ * 1. Wrap the body of the task in a lambda and implement that lambda to check whether its owning
+ *    class has been deleted through the use of smart pointers. For example:
+ *
+ *        std::weak_ptr<MyClass> weak_self = shared_from_this();
+ *
+ *        auto task = [weak_self]()
+ *        {
+ *            if (auto self = weak_self.lock(); self)
+ *            {
+ *                // Task body here.
+ *            }
+ *        };
+ *
+ *        task_runner->post_task(std::move(task));
+ *
+ * 2. Deleting the task runner onto which the task was posted. This will only cancel the task if the
+ *    task manager has not yet instructed the task runner to execute the task.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
@@ -30,33 +57,42 @@ public:
     virtual ~TaskRunner() = default;
 
     /**
-     * Post a task for execution.
+     * Post a task for execution. The task may be any callable type (lambda, std::function, etc).
      *
-     * Once a task is posted, it may be attempted to be cancelled by deleting the task object or the
-     * task runner itself. This will only cancel the task if the task manager has not yet begun
-     * executing the task.
+     * @tparam TaskType Callable type of the task.
      *
-     * @param weak_task The task to be executed.
+     * @param location The location from which the task was posted (use FROM_HERE).
+     * @param task The task to be executed.
      *
      * @return True if the task was posted for execution.
      */
-    virtual bool post_task(std::weak_ptr<Task> weak_task) = 0;
+    template <class TaskType>
+    bool post_task(TaskLocation &&location, TaskType &&task)
+    {
+        return post_task_internal(std::move(location), wrap_task(std::move(task)));
+    }
 
     /**
-     * Schedule a task to be posted after a delay. The task is given to the task manager immediately
-     * to be stored by its timer thread. Once the given delay has expired, the task will be handed
-     * back to the task runner to govern when the task will be posted from there.
+     * Schedule a task to be posted after a delay. The task may be any callable type (lambda,
+     * std::function, etc).
      *
-     * Once a task is posted, it may be attempted to be cancelled by deleting the task object or the
-     * task runner itself. This will only cancel the task if the task manager has not yet begun
-     * executing the task.
+     * @tparam TaskType Callable type of the task.
      *
-     * @param weak_task The task to be executed.
+     * @param location The location from which the task was posted (use FROM_HERE).
+     * @param task The task to be executed.
      * @param delay Delay before posting the task.
      *
      * @return True if the task was posted for delayed execution.
      */
-    bool post_task_with_delay(std::weak_ptr<Task> weak_task, std::chrono::milliseconds delay);
+    template <class TaskType>
+    bool
+    post_task_with_delay(TaskLocation &&location, TaskType &&task, std::chrono::milliseconds delay)
+    {
+        return post_task_to_task_manager_with_delay(
+            std::move(location),
+            wrap_task(std::move(task)),
+            delay);
+    }
 
 protected:
     /**
@@ -67,23 +103,71 @@ protected:
     TaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept;
 
     /**
-     * Completion notification triggered by the task manager that a task has finished execution (or
-     * was skipped).
+     * Post a task for execution in accordance with the concrete task runner's policy.
      *
-     * @param task The (possibly null) task that was executed or skipped.
-     */
-    virtual void task_complete(const std::shared_ptr<Task> &task) = 0;
-
-    /**
-     * Forward a task to the task manager to be executed as soon as a worker thread is available.
-     *
+     * @param location The location from which the task was posted.
      * @param task The task to be executed.
      *
      * @return True if the task was posted for execution.
      */
-    bool post_task_to_task_manager(std::weak_ptr<Task> task);
+    virtual bool post_task_internal(TaskLocation &&location, Task &&task) = 0;
+
+    /**
+     * Completion notification triggered by the task manager that a task has finished execution.
+     *
+     * @param location The location from which the task was posted.
+     */
+    virtual void task_complete(TaskLocation &&location) = 0;
+
+    /**
+     * Forward a task to the task manager to be executed as soon as a worker thread is available.
+     *
+     * @param location The location from which the task was posted.
+     * @param task The task to be executed.
+     *
+     * @return True if the task was posted for execution.
+     */
+    bool post_task_to_task_manager(TaskLocation &&location, Task &&task);
+
+    /**
+     * Forward a task to the task manager to be scheduled for excution after a delay. The task will
+     * be stored on the task manager's timer thread. Once the given delay has expired, the task will
+     * be handed back to the task runner to govern when the task will be posted from there.
+     *
+     * @param location The location from which the task was posted.
+     * @param task The task to be executed.
+     * @param delay Delay before posting the task.
+     *
+     * @return True if the task was posted for delayed execution.
+     */
+    bool post_task_to_task_manager_with_delay(
+        TaskLocation &&location,
+        Task &&task,
+        std::chrono::milliseconds delay);
 
 private:
+    /**
+     * Wrap a task in a generic lambda to be agnostic to the return type of the task.
+     *
+     * @tparam TaskType Callable type of the task.
+     *
+     * @param task The task to be executed.
+     *
+     * @return The wrapped task.
+     */
+    template <class TaskType>
+    Task wrap_task(TaskType &&task)
+    {
+        static_assert(std::is_invocable_v<TaskType>, "Tasks must be invocable");
+
+        auto wrapped_task = [task = std::move(task)]() {
+            // TODO support supplying the result of the task to the owner of the task runner.
+            FLY_UNUSED(std::move(task)());
+        };
+
+        return wrapped_task;
+    }
+
     std::weak_ptr<TaskManager> m_weak_task_manager;
 };
 
@@ -98,18 +182,25 @@ class ParallelTaskRunner : public TaskRunner
 {
     friend class TaskManager;
 
-public:
-    bool post_task(std::weak_ptr<Task>) override;
-
 protected:
     explicit ParallelTaskRunner(std::weak_ptr<TaskManager>) noexcept;
 
     /**
+     * Post a task for execution immediately.
+     *
+     * @param location The location from which the task was posted.
+     * @param task The task to be executed.
+     *
+     * @return True if the task was posted for execution.
+     */
+    bool post_task_internal(TaskLocation &&location, Task &&task) override;
+
+    /**
      * This implementation does nothing.
      *
-     * @param task The (possibly null) task that was executed or skipped.
+     * @param location The location from which the task was posted.
      */
-    void task_complete(const std::shared_ptr<Task> &task) override;
+    void task_complete(TaskLocation &&location) override;
 };
 
 /**
@@ -128,20 +219,38 @@ class SequencedTaskRunner : public TaskRunner
 {
     friend class TaskManager;
 
-public:
-    bool post_task(std::weak_ptr<Task>) override;
-
 protected:
     explicit SequencedTaskRunner(std::weak_ptr<TaskManager>) noexcept;
 
     /**
+     * Post a task for execution within this sequence. If a task is not already running, the task is
+     * posted for execution immediately. Otherwise, the task is queued until the currently running
+     * task (and all tasks queued before it) have completed.
+     *
+     * @param location The location from which the task was posted.
+     * @param task The task to be executed.
+     *
+     * @return True if the task was posted for execution.
+     */
+    bool post_task_internal(TaskLocation &&location, Task &&task) override;
+
+    /**
      * When a task is complete, post the next task in the pending queue.
      *
-     * @param task The (possibly null) task that was executed or skipped.
+     * @param location The location from which the task was posted.
      */
-    void task_complete(const std::shared_ptr<Task> &task) override;
+    void task_complete(TaskLocation &&location) override;
 
 private:
+    /**
+     * Structure to hold a task until it is ready to be executed within its sequence.
+     */
+    struct PendingTask
+    {
+        TaskLocation m_location;
+        Task m_task;
+    };
+
     /**
      * If no task has been posted for execution, post the first task in the pending queue.
      *
@@ -149,7 +258,7 @@ private:
      */
     bool maybe_post_task();
 
-    ConcurrentQueue<std::weak_ptr<Task>> m_pending_tasks;
+    ConcurrentQueue<PendingTask> m_pending_tasks;
     std::atomic_bool m_has_running_task {false};
 };
 
