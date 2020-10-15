@@ -133,6 +133,9 @@
     <ClCompile Include="..\..\..\test\util\path_util.cpp">
       <Filter>util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\util\task_manager.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp">
       <Filter>util</Filter>
     </ClCompile>
@@ -145,6 +148,9 @@
       <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\test\util\path_util.hpp">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\test\util\task_manager.hpp">
       <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\test\util\waitable_task_runner.hpp">

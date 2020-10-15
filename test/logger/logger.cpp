@@ -7,6 +7,7 @@
 #include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
+#include "test/util/task_manager.hpp"
 
 #include <catch2/catch.hpp>
 
@@ -193,7 +194,8 @@ TEST_CASE("Logger", "[logger]")
         auto task_manager = std::make_shared<fly::TaskManager>(1);
         REQUIRE(task_manager->start());
 
-        auto task_runner = task_manager->create_task_runner<fly::SequencedTaskRunner>();
+        auto task_runner =
+            fly::test::task_manager()->create_task_runner<fly::SequencedTaskRunner>();
         auto sink = std::make_unique<QueueSink>(received_logs);
 
         auto logger = synchronous_logger ?
@@ -355,7 +357,6 @@ TEST_CASE("Logger", "[logger]")
         }
 
         fly::Logger::set_default_logger(nullptr);
-        task_manager->stop();
     }
 
     // Keep this test last so the logger registry will go out-of-scope without the default logger
