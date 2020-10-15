@@ -3,7 +3,6 @@
 #include "fly/logger/detail/logger_macros.hpp"
 #include "fly/logger/log.hpp"
 #include "fly/system/system.hpp"
-#include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <atomic>
@@ -270,7 +269,7 @@ public:
     const std::string &name() const;
 
     /**
-     * Add a debug log point to the default logger.
+     * Add a debug log point to the logger.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -284,7 +283,7 @@ public:
     }
 
     /**
-     * Add a debug log point to the default logger with trace information.
+     * Add a debug log point to the logger with trace information.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -299,7 +298,7 @@ public:
     }
 
     /**
-     * Add an informational log point to the default logger.
+     * Add an informational log point to the logger.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -313,7 +312,7 @@ public:
     }
 
     /**
-     * Add an informational log point to the default logger with trace information.
+     * Add an informational log point to the logger with trace information.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -328,7 +327,7 @@ public:
     }
 
     /**
-     * Add a warning log point to the default logger.
+     * Add a warning log point to the logger.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -342,7 +341,7 @@ public:
     }
 
     /**
-     * Add a warning log point to the default logger with trace information.
+     * Add a warning log point to the logger with trace information.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -357,7 +356,7 @@ public:
     }
 
     /**
-     * Add an error log point to the default logger.
+     * Add an error log point to the logger.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -371,7 +370,7 @@ public:
     }
 
     /**
-     * Add an error log point to the default logger with trace information.
+     * Add an error log point to the logger with trace information.
      *
      * @tparam Args Variadic template arguments.
      *
@@ -411,7 +410,7 @@ private:
     bool initialize();
 
     /**
-     * Add a log point to the default logger, optionally with trace information.
+     * Add a log point to the logger, optionally with trace information.
      *
      * Synchronous loggers will forward the log to the log sink immediately. Asynchronous loggers
      * will post a task to forward the log later.
@@ -422,6 +421,20 @@ private:
      */
     void log(Log::Level level, Log::Trace &&trace, std::string &&message);
 
+    /**
+     * Forward a log point to the log sink.
+     *
+     * @param level The level of the log point.
+     * @param trace The trace information for the log point.
+     * @param message The message to log.
+     * @param time The time the log point was made.
+     */
+    void log_to_sink(
+        Log::Level level,
+        Log::Trace &&trace,
+        std::string &&message,
+        std::chrono::high_resolution_clock::time_point time);
+
     const std::string m_name;
 
     std::shared_ptr<LoggerConfig> m_config;
@@ -429,7 +442,6 @@ private:
 
     std::shared_ptr<SequencedTaskRunner> m_task_runner;
     std::atomic_bool m_last_task_failed {true};
-    fly::ConcurrentQueue<Log> m_queue;
 
     const std::chrono::high_resolution_clock::time_point m_start_time;
     std::uintmax_t m_index {0};

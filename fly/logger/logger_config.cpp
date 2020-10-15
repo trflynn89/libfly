@@ -20,11 +20,4 @@ std::uint32_t LoggerConfig::max_message_size() const
     return get_value<std::uint32_t>("max_message_size", m_default_max_message_size);
 }
 
-//==================================================================================================
-std::chrono::milliseconds LoggerConfig::queue_wait_time() const
-{
-    return std::chrono::milliseconds(
-        get_value<std::chrono::milliseconds::rep>("queue_wait_time", m_default_queue_wait_time));
-}
-
 } // namespace fly

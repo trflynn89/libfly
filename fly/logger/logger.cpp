@@ -143,29 +143,19 @@ void Logger::log(Log::Level level, Log::Trace &&trace, std::string &&message)
     }
 
     const auto now = std::chrono::high_resolution_clock::now();
-    const auto log_time =
-        std::chrono::duration_cast<std::chrono::duration<double>>(now - m_start_time);
-
-    Log log(std::move(trace), std::move(message), m_config->max_message_size());
-    log.m_index = m_index++;
-    log.m_level = level;
-    log.m_time = log_time.count();
 
     if (m_task_runner)
     {
         std::weak_ptr<Logger> weak_self = shared_from_this();
-        m_queue.push(std::move(log));
 
-        auto task = [weak_self]() {
+        auto task = [weak_self,
+                     level,
+                     trace = std::move(trace),
+                     message = std::move(message),
+                     now]() mutable {
             if (auto self = weak_self.lock(); self && !self->m_last_task_failed)
             {
-                Log queued_log;
-
-                if (self->m_queue.pop(queued_log, self->m_config->queue_wait_time()))
-                {
-                    const bool accepted = self->m_sink->stream(std::move(queued_log));
-                    self->m_last_task_failed.store(!accepted);
-                }
+                self->log_to_sink(level, std::move(trace), std::move(message), now);
             }
         };
 
@@ -173,9 +163,26 @@ void Logger::log(Log::Level level, Log::Trace &&trace, std::string &&message)
     }
     else
     {
-        const bool accepted = m_sink->stream(std::move(log));
-        m_last_task_failed.store(!accepted);
+        log_to_sink(level, std::move(trace), std::move(message), now);
     }
+}
+
+//==================================================================================================
+void Logger::log_to_sink(
+    Log::Level level,
+    Log::Trace &&trace,
+    std::string &&message,
+    std::chrono::high_resolution_clock::time_point time)
+{
+    const std::chrono::duration<double, std::milli> elapsed = time - m_start_time;
+
+    Log log(std::move(trace), std::move(message), m_config->max_message_size());
+    log.m_index = m_index++;
+    log.m_level = level;
+    log.m_time = elapsed.count();
+
+    const bool accepted = m_sink->stream(std::move(log));
+    m_last_task_failed.store(!accepted);
 }
 
 } // namespace fly

@@ -20,18 +20,6 @@ using namespace fly::literals::numeric_literals;
 namespace {
 
 /**
- * Subclass of the logger config to decrease default log queue wait time for faster testing.
- */
-class FastLoggerConfig : public fly::LoggerConfig
-{
-public:
-    FastLoggerConfig() noexcept : fly::LoggerConfig()
-    {
-        m_default_queue_wait_time = 1;
-    }
-};
-
-/**
  * Test log sink to store received logs in a queue for verification.
  */
 class QueueSink : public fly::LogSink
@@ -110,7 +98,7 @@ public:
 
 TEST_CASE("Logger", "[logger]")
 {
-    auto logger_config = std::make_shared<FastLoggerConfig>();
+    auto logger_config = std::make_shared<fly::LoggerConfig>();
     fly::ConcurrentQueue<fly::Log> received_logs;
 
     auto validate_log_points = [&](fly::Log::Level expected_level,
@@ -122,6 +110,7 @@ TEST_CASE("Logger", "[logger]")
         {
             fly::Log log;
             received_logs.pop(log);
+            CAPTURE(log.m_message);
 
             CHECK(log.m_index == i);
             CHECK(log.m_level == expected_level);
