@@ -14,7 +14,7 @@ using namespace std::chrono_literals;
 namespace {
 
 /**
- * A simple task to track whether it was exected.
+ * A task to track whether it was exected.
  */
 void standalone_task(bool &task_was_called)
 {
@@ -22,7 +22,7 @@ void standalone_task(bool &task_was_called)
 }
 
 /**
- * A simple task to track whether it was exected.
+ * A task to track whether it was exected.
  */
 class TaskClass
 {
@@ -46,7 +46,7 @@ private:
 };
 
 /**
- * A simple task to count the number of times it is run.
+ * A task to count the number of times it is run.
  */
 class CountTask
 {
@@ -70,7 +70,7 @@ private:
 };
 
 /**
- * A simple task to track its execution order.
+ * A task to track its execution order.
  */
 class MarkerTask
 {
@@ -89,7 +89,7 @@ private:
 };
 
 /**
- * A simple task to track its start and end time.
+ * A task to track its start and end time.
  */
 class TimerTask : public fly::Task
 {
@@ -141,6 +141,25 @@ TEST_CASE("Task", "[task]")
 
         bool task_was_called = false;
         auto task = [&task_was_called]() { task_was_called = true; };
+
+        REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
+        task_runner->wait_for_task_to_complete(__FILE__);
+
+        CHECK(task_was_called);
+    }
+
+    SECTION("Tasks may be posted as mutable lambdas")
+    {
+        auto task_runner =
+            task_manager->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+        bool task_was_called = false;
+        std::string task_id = "not set";
+
+        auto task = [&task_was_called, task_id = std::move(task_id)]() mutable {
+            task_was_called = true;
+            task_id = "set";
+        };
 
         REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
         task_runner->wait_for_task_to_complete(__FILE__);

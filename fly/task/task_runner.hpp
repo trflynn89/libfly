@@ -160,7 +160,7 @@ private:
     {
         static_assert(std::is_invocable_v<TaskType>, "Tasks must be invocable");
 
-        auto wrapped_task = [task = std::move(task)]() {
+        auto wrapped_task = [task = std::move(task)]() mutable {
             // TODO support supplying the result of the task to the owner of the task runner.
             FLY_UNUSED(std::move(task)());
         };
