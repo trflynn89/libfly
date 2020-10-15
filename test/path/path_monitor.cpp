@@ -4,6 +4,7 @@
 #include "fly/task/task_manager.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/numeric/literals.hpp"
+#include "test/util/task_manager.hpp"
 
 #include <catch2/catch.hpp>
 
@@ -44,10 +45,8 @@ public:
 
 TEST_CASE("PathMonitor", "[path]")
 {
-    auto task_manager = std::make_shared<fly::TaskManager>(1);
-    REQUIRE(task_manager->start());
-
-    auto task_runner = task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+    auto task_runner =
+        fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
     auto monitor =
         std::make_shared<fly::PathMonitorImpl>(task_runner, std::make_shared<TestPathConfig>());
@@ -389,6 +388,5 @@ TEST_CASE("PathMonitor", "[path]")
         CHECK_FALSE(monitor->remove_path(path2()));
     }
 
-    REQUIRE(task_manager->stop());
     monitor->remove_all_paths();
 }

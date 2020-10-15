@@ -3,6 +3,7 @@
 #include "fly/system/system_config.hpp"
 #include "fly/task/task_manager.hpp"
 #include "fly/types/numeric/literals.hpp"
+#include "test/util/task_manager.hpp"
 
 #include <catch2/catch.hpp>
 
@@ -40,10 +41,8 @@ public:
 
 TEST_CASE("SystemMonitor", "[system]")
 {
-    auto task_manager = std::make_shared<fly::TaskManager>(1);
-    REQUIRE(task_manager->start());
-
-    auto task_runner = task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+    auto task_runner =
+        fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
     auto monitor =
         std::make_shared<fly::SystemMonitorImpl>(task_runner, std::make_shared<TestSystemConfig>());
@@ -203,6 +202,4 @@ TEST_CASE("SystemMonitor", "[system]")
     }
 
 #endif
-
-    CHECK(task_manager->stop());
 }

@@ -7,6 +7,7 @@
 #include "fly/types/numeric/literals.hpp"
 #include "test/config/test_config.hpp"
 #include "test/util/path_util.hpp"
+#include "test/util/task_manager.hpp"
 #include "test/util/waitable_task_runner.hpp"
 
 #include <catch2/catch.hpp>
@@ -46,10 +47,8 @@ public:
 
 TEST_CASE("ConfigManager", "[config]")
 {
-    auto task_manager = std::make_shared<fly::TaskManager>(1);
-    REQUIRE(task_manager->start());
-
-    auto task_runner = task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+    auto task_runner =
+        fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
     fly::test::PathUtil::ScopedTempDirectory config_path;
     std::filesystem::path config_file = config_path.file();
@@ -279,6 +278,4 @@ TEST_CASE("ConfigManager", "[config]")
         CHECK(config->get_value<std::string>("name", "") == "");
         CHECK(config->get_value<std::string>("address", "") == "");
     }
-
-    REQUIRE(task_manager->stop());
 }

@@ -1,6 +1,7 @@
 #include "fly/task/task_manager.hpp"
 #include "fly/task/task_runner.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
+#include "test/util/task_manager.hpp"
 #include "test/util/waitable_task_runner.hpp"
 
 #include <catch2/catch.hpp>
@@ -117,27 +118,10 @@ private:
 
 TEST_CASE("Task", "[task]")
 {
-    auto task_manager = std::make_shared<fly::TaskManager>(1);
-    REQUIRE(task_manager->start());
-
-    SECTION("Cannot start the task manager multiple times")
-    {
-        CHECK_FALSE(task_manager->start());
-    }
-
-    SECTION("Cannot stop the task manager multiple times")
-    {
-        REQUIRE(task_manager->stop());
-        CHECK_FALSE(task_manager->stop());
-
-        // Delete the task manager so the REQUIRE at the bottom doesn't fail.
-        task_manager.reset();
-    }
-
     SECTION("Tasks may be posted as lambdas")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
 
         bool task_was_called = false;
         auto task = [&task_was_called]() { task_was_called = true; };
@@ -151,7 +135,7 @@ TEST_CASE("Task", "[task]")
     SECTION("Tasks may be posted as mutable lambdas")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
 
         bool task_was_called = false;
         std::string task_id = "not set";
@@ -170,7 +154,7 @@ TEST_CASE("Task", "[task]")
     SECTION("Tasks may be posted as standalone functions")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
 
         bool task_was_called = false;
         auto task = std::bind(standalone_task, std::ref(task_was_called));
@@ -184,7 +168,7 @@ TEST_CASE("Task", "[task]")
     SECTION("Tasks may be posted as static class functions")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
 
         bool task_was_called = false;
         auto task = std::bind(TaskClass::static_task, std::ref(task_was_called));
@@ -198,7 +182,7 @@ TEST_CASE("Task", "[task]")
     SECTION("Tasks may be posted as member class functions")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
 
         bool task_was_called = false;
         TaskClass task_class(task_was_called);
@@ -214,7 +198,7 @@ TEST_CASE("Task", "[task]")
     SECTION("Tasks may be cancelled with weak pointers")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
 
         bool task_was_called = false;
         auto task_class = std::make_shared<TaskClass>(task_was_called);
@@ -238,7 +222,7 @@ TEST_CASE("Task", "[task]")
     SECTION("Cancelled tasks do not execute while other tasks do execute")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
         fly::ConcurrentQueue<int> ordering;
         MarkerTask marker_task(&ordering);
@@ -276,7 +260,7 @@ TEST_CASE("Task", "[task]")
     SECTION("Parallel task runner does not enforce execution order")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
 
         CountTask task;
         REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
@@ -291,7 +275,7 @@ TEST_CASE("Task", "[task]")
     SECTION("Sequenced task runner enforces execution order")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
         fly::ConcurrentQueue<int> ordering;
         MarkerTask task(&ordering);
@@ -318,7 +302,7 @@ TEST_CASE("Task", "[task]")
     SECTION("Delayed tasks execute no sooner than their specified delay")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
         TimerTask task;
         const std::chrono::milliseconds delay(10);
@@ -333,7 +317,7 @@ TEST_CASE("Task", "[task]")
     SECTION("Delayed tasks execute after immediate tasks posted at the same time")
     {
         auto task_runner =
-            task_manager->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
         fly::ConcurrentQueue<int> ordering;
         MarkerTask task(&ordering);
@@ -356,6 +340,24 @@ TEST_CASE("Task", "[task]")
 
         ordering.pop(marker);
         CHECK(marker == 1);
+    }
+}
+
+TEST_CASE("TaskManager", "[task]")
+{
+    auto task_manager = std::make_shared<fly::TaskManager>(1);
+    REQUIRE(task_manager->start());
+
+    SECTION("Cannot start the task manager multiple times")
+    {
+        CHECK_FALSE(task_manager->start());
+        REQUIRE(task_manager->stop());
+    }
+
+    SECTION("Cannot stop the task manager multiple times")
+    {
+        REQUIRE(task_manager->stop());
+        CHECK_FALSE(task_manager->stop());
     }
 
     SECTION("Parallel tasks cannot be posted after the task manager is deleted")
@@ -384,10 +386,5 @@ TEST_CASE("Task", "[task]")
             FROM_HERE,
             []() {},
             0ms));
-    }
-
-    if (task_manager)
-    {
-        REQUIRE(task_manager->stop());
     }
 }
