@@ -132,7 +132,7 @@ ifeq ($(mode), debug)
         CF_ALL += --coverage
     endif
 else ifeq ($(mode), release)
-    CF_ALL += -O2
+    CF_ALL += -O2 -DNDEBUG
     JFLAGS += -g:none
 else ifeq ($(mode), profile)
     ifeq ($(toolchain), gcc)
