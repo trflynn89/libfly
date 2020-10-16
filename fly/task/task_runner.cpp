@@ -6,7 +6,7 @@ namespace fly {
 
 //==================================================================================================
 TaskRunner::TaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
-    m_weak_task_manager(weak_task_manager)
+    m_weak_task_manager(std::move(weak_task_manager))
 {
 }
 
@@ -19,8 +19,8 @@ bool TaskRunner::post_task_to_task_manager(TaskLocation &&location, Task &&task)
         return false;
     }
 
-    std::shared_ptr<TaskRunner> task_runner = shared_from_this();
-    task_manager->post_task(std::move(location), std::move(task), task_runner);
+    std::weak_ptr<TaskRunner> task_runner = shared_from_this();
+    task_manager->post_task(std::move(location), std::move(task), std::move(task_runner));
 
     return true;
 }
@@ -37,15 +37,16 @@ bool TaskRunner::post_task_to_task_manager_with_delay(
         return false;
     }
 
-    std::shared_ptr<TaskRunner> task_runner = shared_from_this();
-    task_manager->post_task_with_delay(std::move(location), std::move(task), task_runner, delay);
+    std::weak_ptr<TaskRunner> task_runner = shared_from_this();
+    task_manager
+        ->post_task_with_delay(std::move(location), std::move(task), std::move(task_runner), delay);
 
     return true;
 }
 
 //==================================================================================================
 ParallelTaskRunner::ParallelTaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
-    TaskRunner(weak_task_manager)
+    TaskRunner(std::move(weak_task_manager))
 {
 }
 
@@ -62,7 +63,7 @@ void ParallelTaskRunner::task_complete(TaskLocation &&)
 
 //==================================================================================================
 SequencedTaskRunner::SequencedTaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
-    TaskRunner(weak_task_manager)
+    TaskRunner(std::move(weak_task_manager))
 {
 }
 
