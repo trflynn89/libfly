@@ -74,8 +74,11 @@ void TaskManager::post_task(
     Task &&task,
     std::weak_ptr<TaskRunner> weak_task_runner)
 {
-    const auto now = std::chrono::steady_clock::now();
-    TaskHolder wrapped_task {std::move(location), std::move(task), weak_task_runner, now};
+    TaskHolder wrapped_task {
+        std::move(location),
+        std::move(task),
+        std::move(weak_task_runner),
+        std::chrono::steady_clock::now()};
 
     m_tasks.push(std::move(wrapped_task));
 }
@@ -87,8 +90,11 @@ void TaskManager::post_task_with_delay(
     std::weak_ptr<TaskRunner> weak_task_runner,
     std::chrono::milliseconds delay)
 {
-    const auto schedule = std::chrono::steady_clock::now() + delay;
-    TaskHolder wrapped_task {std::move(location), std::move(task), weak_task_runner, schedule};
+    TaskHolder wrapped_task {
+        std::move(location),
+        std::move(task),
+        std::move(weak_task_runner),
+        std::chrono::steady_clock::now() + delay};
 
     std::unique_lock<std::mutex> lock(m_delayed_tasks_mutex);
     m_delayed_tasks.push_back(std::move(wrapped_task));
