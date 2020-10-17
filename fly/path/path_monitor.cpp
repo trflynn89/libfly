@@ -81,8 +81,6 @@ bool PathMonitor::remove_path(const std::filesystem::path &path)
 void PathMonitor::remove_all_paths()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-
-    LOGI("Removed all monitors");
     m_path_info.clear();
 }
 
