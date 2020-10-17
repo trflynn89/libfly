@@ -27,7 +27,6 @@ bool TaskManager::start()
 
     if (m_keep_running.compare_exchange_strong(expected, true))
     {
-        LOGI("Starting %d workers", m_num_workers);
         std::shared_ptr<TaskManager> task_manager = shared_from_this();
 
         for (std::uint32_t i = 0; i < m_num_workers; ++i)
@@ -52,8 +51,6 @@ bool TaskManager::stop()
 
     if (m_keep_running.compare_exchange_strong(expected, false))
     {
-        LOGI("Stopping %d workers", m_num_workers);
-
         for (auto &future : m_futures)
         {
             if (future.valid())
