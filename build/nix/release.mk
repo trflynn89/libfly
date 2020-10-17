@@ -15,6 +15,15 @@
 # A literal comma.
 COMMA := ,
 
+# System-dependent shared library extension.
+ifeq ($(SYSTEM), LINUX)
+    SHARED_LIB_EXT := so
+else ifeq ($(SYSTEM), MACOS)
+    SHARED_LIB_EXT := dylib
+else
+    $(error Unknown system $(SYSTEM), check release.mk)
+endif
+
 # Build the release package.
 define BUILD_REL
 
@@ -26,12 +35,12 @@ define BUILD_REL
     $(REL_CMDS) && \
     cd $(ETC_TMP_DIR) && \
     \
-    for f in `find .$(INSTALL_LIB_DIR) -type f -name "*\.so\.*\.*\.*" -o -name "*\.dylib\.*\.*\.*"` ; do \
+    for f in $$(find .$(INSTALL_LIB_DIR) -type f -name "*\.$(SHARED_LIB_EXT)\.$(VERSION)") ; do \
         src=$${f:1}; \
         dst=$${src%.*}; \
         ext=$${src##*.}; \
         \
-        while [[ "$$ext" != "so" ]] && [[ "$$ext" != "dylib" ]] ; do \
+        while [[ "$$ext" != "$(SHARED_LIB_EXT)" ]] ; do \
             ln -sf $$src .$$dst; \
             \
             src=$$dst; \
@@ -49,7 +58,7 @@ define BUILD_REL
     \
     files="$(subst $(ETC_TMP_DIR),,$(REL_UNINSTALL))"; \
     files="$$files $(INSTALL_BIN_DIR)/uninstall_$(REL_NAME)"; \
-    echo $(SUDO) $(RM) -r $$files >> $(REL_BIN_DIR)/uninstall_$(REL_NAME); \
+    echo $(SUDO) $(RM) -r "$$files" >> $(REL_BIN_DIR)/uninstall_$(REL_NAME); \
     \
     tar $(TAR_CREATE_FLAGS) $@ *; \
     $(RM) -r $(ETC_TMP_DIR)
@@ -94,10 +103,11 @@ endef
 define ADD_REL_LIB
 
 $(eval $(call SET_REL_VAR, $(t)))
-$(eval $(call ADD_REL_CMD, cp -f $(LIB_DIR)/$(t).* $(REL_LIB_DIR_$(t))))
+$(eval $(call ADD_REL_CMD, cp -f $(LIB_DIR)/$(t).a $(REL_LIB_DIR_$(t))))
+$(eval $(call ADD_REL_CMD, cp -f $(LIB_DIR)/$(t).$(SHARED_LIB_EXT).$(VERSION) $(REL_LIB_DIR_$(t))))
 $(eval $(call ADD_REL_CMD, $(STRIP) $(STRIP_FLAGS) $(REL_LIB_DIR_$(t))/$(t).*))
 
-REL_UNINSTALL_$(t) += $(REL_LIB_DIR_$(t))/$(t)*
+REL_UNINSTALL_$(t) += $(REL_LIB_DIR_$(t))/$(t).*
 
 endef
 
