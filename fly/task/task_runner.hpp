@@ -7,54 +7,81 @@
 #include <atomic>
 #include <chrono>
 #include <cstdint>
+#include <functional>
 #include <memory>
 
 /**
  * Helper macro to create a TaskLocation from the current location.
  */
-// clang-format off
-#define FROM_HERE fly::TaskLocation {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)}
-// clang-format on
+#define FROM_HERE fly::TaskLocation({__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)})
 
 namespace fly {
 
 class TaskManager;
 
 /**
- * Base class for controlling the execution of tasks.
+ * Base class for controlling the execution of tasks. Concrete task runners control the ordering and
+ * execution of tasks.
+ *
+ * Tasks may generally be any callable type (lambda, std::function, etc.). Specific posting methods
+ * may place restrictions on the callable type, on either the return type of the invocation or the
+ * arguments the task accepts.
+ *
+ * Tasks whose result is a non-void type may pass their result to a reply task. That reply task must
+ * accept the result of the task as an argument. For example:
+ *
+ *       auto task = []() -> int
+ *       {
+ *           // Task body here.
+ *           return 12389;
+ *       };
+ *
+ *       auto reply = [](int task_result)
+ *       {
+ *           // Reply body here.
+ *       };
+ *
+ *       task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply));
+ *
+ * The reply task is not executed immediately after the task is complete. Rather, it it posted for
+ * execution on the same task runner on which the task was posted.
  *
  * Once a task is posted, it may be attempted to be cancelled in a number of ways:
  *
- * 1. Use the API which accepts a weak pointer to the owner of the task. When the task is ready to
- *    be executed, if the weak pointer cannot be promoted to a strong pointer, the task is dropped.
- *    The task must accept a single argument, the shared pointer obtained from the weak pointer. For
- *    example:
+ * 1. Use one of the posting methods which accepts a weak pointer to the owner of the task. When the
+ *    task is ready to be executed, if the weak pointer cannot be promoted to a strong pointer, the
+ *    task is dropped. The task must accept a single argument, the shared pointer obtained from the
+ *    weak pointer. For example:
  *
- *        auto task = [](std::shared_ptr<MyClass> self)
- *        {
- *            // Task body here.
- *        };
+ *       auto task = [](std::shared_ptr<MyClass> self)
+ *       {
+ *           // Task body here.
+ *       };
  *
- *        std::weak_ptr<MyClass> weak_self = shared_from_this();
- *        task_runner->post_task(FROM_HERE, std::move(task), weak_self);
+ *       std::weak_ptr<MyClass> weak_self = shared_from_this();
+ *       task_runner->post_task(FROM_HERE, std::move(task), weak_self);
  *
- * 2. If the above API cannot be used for some reason, wrap the body of the task in a lambda and
- *    implement that lambda to check whether its owning class has been deleted through the use of
- *    smart pointers. For example:
+ *    Reply tasks may be cancelled in the same manner. The reply task must then accept the result of
+ *    the task and the shared pointer obtained from the weak pointer. If the task was dropped due to
+ *    being unable to promote the weak pointer, the reply is also dropped. If the task was executed,
+ *    when the reply is ready to be executed, if the weak pointer cannot be promoted to a strong
+ *    pointer, the reply is dropped. For example:
  *
- *        std::weak_ptr<MyClass> weak_self = shared_from_this();
+ *       auto task = [](std::shared_ptr<MyClass> self) -> int
+ *       {
+ *           // Task body here.
+ *           return 12389;
+ *       };
  *
- *        auto task = [weak_self]()
- *        {
- *            if (auto self = weak_self.lock(); self)
- *            {
- *                // Task body here.
- *            }
- *        };
+ *       auto reply = [](int task_result, std::shared_ptr<MyClass> self)
+ *       {
+ *           // Reply body here.
+ *       };
  *
- *        task_runner->post_task(FROM_HERE, std::move(task));
+ *       std::weak_ptr<MyClass> weak_self = shared_from_this();
+ *       task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply), weak_self);
  *
- * 3. Deleting the task runner onto which the task was posted. This will only cancel the task if the
+ * 2. Deleting the task runner onto which the task was posted. This will only cancel the task if the
  *    task manager has not yet instructed the task runner to execute the task.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
@@ -71,7 +98,7 @@ public:
     virtual ~TaskRunner() = default;
 
     /**
-     * Post a task for execution. The task may be any callable type (lambda, std::function, etc.).
+     * Post a task for execution. The task may be any callable type.
      *
      * @tparam TaskType Callable type of the task.
      *
@@ -81,16 +108,13 @@ public:
      * @return True if the task was posted for execution.
      */
     template <typename TaskType>
-    bool post_task(TaskLocation &&location, TaskType &&task)
-    {
-        return post_task_internal(std::move(location), wrap_task(std::move(task)));
-    }
+    bool post_task(TaskLocation &&location, TaskType &&task);
 
     /**
      * Post a task for execution with protection by the provided weak pointer. The task may be any
-     * callable type (lambda, std::function, etc.) which accepts a single argument, a locked shared
-     * pointer obtained from the weak pointer. When the task is ready to be executed, if the weak
-     * pointer fails to be locked, the task is dropped.
+     * callable type which accepts a single argument: a locked shared pointer obtained from the weak
+     * pointer. When the task is ready to be executed, if the weak pointer fails to be locked, the
+     * task is dropped.
      *
      * @tparam TaskType Callable type of the task.
      * @tparam OwnerType Type of the owner of the task.
@@ -102,16 +126,60 @@ public:
      * @return True if the task was posted for execution.
      */
     template <typename TaskType, typename OwnerType>
-    bool post_task(TaskLocation &&location, TaskType &&task, std::weak_ptr<OwnerType> weak_owner)
-    {
-        return post_task_internal(
-            std::move(location),
-            wrap_task(std::move(task), std::move(weak_owner)));
-    }
+    bool post_task(TaskLocation &&location, TaskType &&task, std::weak_ptr<OwnerType> weak_owner);
 
     /**
-     * Schedule a task to be posted after a delay. The task may be any callable type (lambda,
-     * std::function, etc.).
+     * Post a task for execution. The task may be any callable type that returns a value.
+     *
+     * When the task has been executed, the result of the task is bound to the provided reply task.
+     * The reply task is then posted for execution on this same task runner. The reply task may be
+     * any callable type which accepts a single argument: the type returned by the task.
+     *
+     * @tparam TaskType Callable type of the task.
+     * @tparam ReplyType Callable type of the reply.
+     *
+     * @param location The location from which the task was posted (use FROM_HERE).
+     * @param task The task to be executed.
+     * @param reply The reply to be executed with the result of the task.
+     *
+     * @return True if the task was posted for execution.
+     */
+    template <typename TaskType, typename ReplyType>
+    bool post_task_with_reply(TaskLocation &&location, TaskType &&task, ReplyType reply);
+
+    /**
+     * Post a task for execution with protection by the provided weak pointer. The task may be any
+     * callable type which accepts a single argument: a locked shared pointer obtained from the weak
+     * pointer, and returns a value. When the task is ready to be executed, if the weak pointer
+     * fails to be locked, the task is dropped.
+     *
+     * When the task has been executed, the result of the task is bound to the provided reply task.
+     * The reply task is then posted for execution on this same task runner with protection by the
+     * same weak pointer. The reply task may be any callable type which accepts two arguments: the
+     * type returned by the task and a locked shared pointer obtained from the weak pointer. When
+     * the reply is ready to be executed, if the weak pointer fails to be locked, the reply is
+     * dropped.
+     *
+     * @tparam TaskType Callable type of the task.
+     * @tparam ReplyType Callable type of the reply.
+     * @tparam OwnerType Type of the owner of the task.
+     *
+     * @param location The location from which the task was posted (use FROM_HERE).
+     * @param task The task to be executed.
+     * @param reply The reply to be executed with the result of the task.
+     * @param weak_owner A weak pointer to the owner of the task.
+     *
+     * @return True if the task was posted for execution.
+     */
+    template <typename TaskType, typename ReplyType, typename OwnerType>
+    bool post_task_with_reply(
+        TaskLocation &&location,
+        TaskType &&task,
+        ReplyType reply,
+        std::weak_ptr<OwnerType> weak_owner);
+
+    /**
+     * Schedule a task to be posted after a delay. The task may be any callable type.
      *
      * @tparam TaskType Callable type of the task.
      *
@@ -123,19 +191,13 @@ public:
      */
     template <typename TaskType>
     bool
-    post_task_with_delay(TaskLocation &&location, TaskType &&task, std::chrono::milliseconds delay)
-    {
-        return post_task_to_task_manager_with_delay(
-            std::move(location),
-            wrap_task(std::move(task)),
-            delay);
-    }
+    post_task_with_delay(TaskLocation &&location, TaskType &&task, std::chrono::milliseconds delay);
 
     /**
      * Schedule a task to be posted after a delay with protection by the provided weak pointer. The
-     * task may be any callable type (lambda, std::function, etc.) which accepts a single argument,
-     * a locked shared pointer obtained from the weak pointer. When the task is ready to be
-     * executed, if the weak pointer fails to be locked, the task is dropped.
+     * task may be any callable type which accepts a single argument: a locked shared pointer
+     * obtained from the weak pointer. When the task is ready to be executed, if the weak pointer
+     * fails to be locked, the task is dropped.
      *
      * @tparam TaskType Callable type of the task.
      * @tparam OwnerType Type of the owner of the task.
@@ -152,13 +214,66 @@ public:
         TaskLocation &&location,
         TaskType &&task,
         std::weak_ptr<OwnerType> weak_owner,
-        std::chrono::milliseconds delay)
-    {
-        return post_task_to_task_manager_with_delay(
-            std::move(location),
-            wrap_task(std::move(task), std::move(weak_owner)),
-            delay);
-    }
+        std::chrono::milliseconds delay);
+
+    /**
+     * Schedule a task to be posted after a delay. The task may be any callable type that returns a
+     * value.
+     *
+     * When the task has been executed, the result of the task is bound to the provided reply task.
+     * The reply task is then posted for execution on this same task runner (without delay). The
+     * reply task may be any callable type which accepts a single argument: the type returned by the
+     * task.
+     *
+     * @tparam TaskType Callable type of the task.
+     * @tparam ReplyType Callable type of the reply.
+     *
+     * @param location The location from which the task was posted (use FROM_HERE).
+     * @param task The task to be executed.
+     * @param reply The reply to be executed with the result of the task.
+     * @param delay Delay before posting the task.
+     *
+     * @return True if the task was posted for execution.
+     */
+    template <typename TaskType, typename ReplyType>
+    bool post_task_with_delay_and_reply(
+        TaskLocation &&location,
+        TaskType &&task,
+        ReplyType &&reply,
+        std::chrono::milliseconds delay);
+
+    /**
+     * Schedule a task to be posted after a delay with protection by the provided weak pointer. The
+     * task may be any callable type which accepts a single argument: a locked shared pointer
+     * obtained from the weak pointer, and returns a value. When the task is ready to be executed,
+     * if the weak pointer fails to be locked, the task is dropped.
+     *
+     * When the task has been executed, the result of the task is bound to the provided reply task.
+     * The reply task is then posted for execution on this same task runner (without delay) with
+     * protection by the same weak pointer. The reply task may be any callable type which accepts
+     * two arguments: the type returned by the task and a locked shared pointer obtained from the
+     * weak pointer. When the reply is ready to be executed, if the weak pointer fails to be locked,
+     * the reply is dropped.
+     *
+     * @tparam TaskType Callable type of the task.
+     * @tparam ReplyType Callable type of the reply.
+     * @tparam OwnerType Type of the owner of the task.
+     *
+     * @param location The location from which the task was posted (use FROM_HERE).
+     * @param task The task to be executed.
+     * @param reply The reply to be executed with the result of the task.
+     * @param weak_owner A weak pointer to the owner of the task.
+     * @param delay Delay before posting the task.
+     *
+     * @return True if the task was posted for execution.
+     */
+    template <typename TaskType, typename ReplyType, typename OwnerType>
+    bool post_task_with_delay_and_reply(
+        TaskLocation &&location,
+        TaskType &&task,
+        ReplyType &&reply,
+        std::weak_ptr<OwnerType> weak_owner,
+        std::chrono::milliseconds delay);
 
 protected:
     /**
@@ -222,17 +337,7 @@ private:
      * @return The wrapped task.
      */
     template <typename TaskType>
-    Task wrap_task(TaskType &&task)
-    {
-        static_assert(std::is_invocable_v<TaskType>, "Task must be invocable");
-
-        auto wrapped_task = [task = std::move(task)]() mutable {
-            // TODO support supplying the result of the task to the owner of the task runner.
-            FLY_UNUSED(std::move(task)());
-        };
-
-        return wrapped_task;
-    }
+    Task wrap_task(TaskType &&task);
 
     /**
      * Wrap a task in a generic lambda to be agnostic to the return type of the task. When the task
@@ -248,24 +353,54 @@ private:
      * @return The wrapped task.
      */
     template <typename TaskType, typename OwnerType>
-    Task wrap_task(TaskType &&task, std::weak_ptr<OwnerType> weak_owner)
-    {
-        static_assert(
-            std::is_invocable_v<TaskType, std::shared_ptr<OwnerType>>,
-            "Task must be invocable with a strong reference to its owner");
+    Task wrap_task(TaskType &&task, std::weak_ptr<OwnerType> weak_owner);
 
-        auto wrapped_task = [task = std::move(task), weak_owner = std::move(weak_owner)]() mutable {
-            std::shared_ptr<OwnerType> owner = weak_owner.lock();
+    /**
+     * Wrap a task in a generic lambda to be agnostic to the return type of the task.
+     *
+     * When the task has been executed, the result of the task is bound to the provided reply task.
+     * The reply task is then posted for execution on this same task runner.
+     *
+     * @tparam TaskType Callable type of the task.
+     * @tparam ReplyType Callable type of the reply.
+     *
+     * @param task The task to be executed.
+     * @param reply The reply to be executed with the result of the task.
+     *
+     * @return The wrapped task.
+     */
+    template <typename TaskType, typename ReplyType>
+    Task wrap_task(TaskType &&task, ReplyType &&reply);
 
-            if (owner)
-            {
-                // TODO support supplying the result of the task to the owner of the task runner.
-                FLY_UNUSED(std::move(task)(std::move(owner)));
-            }
-        };
+    /**
+     * Wrap a task in a generic lambda to be agnostic to the return type of the task. When the task
+     * is ready to be executed, if the provided weak pointer fails to be locked, the task is
+     * dropped.
+     *
+     * When the task has been executed, the result of the task is bound to the provided reply task.
+     * The reply task is then posted for execution on this same task runner with protection by the
+     * same weak pointer.
+     *
+     * @tparam TaskType Callable type of the task.
+     * @tparam ReplyType Callable type of the reply.
+     * @tparam OwnerType Type of the owner of the task.
+     *
+     * @param task The task to be executed.
+     * @param reply The reply to be executed with the result of the task.
+     * @param weak_owner A weak pointer to the owner of the task.
+     *
+     * @return The wrapped task.
+     */
+    template <typename TaskType, typename ReplyType, typename OwnerType>
+    Task wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<OwnerType> weak_owner);
 
-        return wrapped_task;
-    }
+    /**
+     * Execute a task.
+     *
+     * @param location The location from which the task was posted.
+     * @param task The task to be executed.
+     */
+    void execute(TaskLocation &&location, Task &&task);
 
     std::weak_ptr<TaskManager> m_weak_task_manager;
 };
@@ -360,5 +495,190 @@ private:
     ConcurrentQueue<PendingTask> m_pending_tasks;
     std::atomic_bool m_has_running_task {false};
 };
+
+//==================================================================================================
+template <typename TaskType>
+bool TaskRunner::post_task(TaskLocation &&location, TaskType &&task)
+{
+    return post_task_internal(std::move(location), wrap_task(std::move(task)));
+}
+
+//==================================================================================================
+template <typename TaskType, typename OwnerType>
+bool TaskRunner::post_task(
+    TaskLocation &&location,
+    TaskType &&task,
+    std::weak_ptr<OwnerType> weak_owner)
+{
+    return post_task_internal(
+        std::move(location),
+        wrap_task(std::move(task), std::move(weak_owner)));
+}
+
+//==================================================================================================
+template <typename TaskType, typename ReplyType>
+bool TaskRunner::post_task_with_reply(TaskLocation &&location, TaskType &&task, ReplyType reply)
+{
+    return post_task_internal(std::move(location), wrap_task(std::move(task), std::move(reply)));
+}
+
+//==================================================================================================
+template <typename TaskType, typename ReplyType, typename OwnerType>
+bool TaskRunner::post_task_with_reply(
+    TaskLocation &&location,
+    TaskType &&task,
+    ReplyType reply,
+    std::weak_ptr<OwnerType> weak_owner)
+{
+    return post_task_internal(
+        std::move(location),
+        wrap_task(std::move(task), std::move(reply), std::move(weak_owner)));
+}
+
+//==================================================================================================
+template <typename TaskType>
+bool TaskRunner::post_task_with_delay(
+    TaskLocation &&location,
+    TaskType &&task,
+    std::chrono::milliseconds delay)
+{
+    return post_task_to_task_manager_with_delay(
+        std::move(location),
+        wrap_task(std::move(task)),
+        delay);
+}
+
+//==================================================================================================
+template <typename TaskType, typename OwnerType>
+bool TaskRunner::post_task_with_delay(
+    TaskLocation &&location,
+    TaskType &&task,
+    std::weak_ptr<OwnerType> weak_owner,
+    std::chrono::milliseconds delay)
+{
+    return post_task_to_task_manager_with_delay(
+        std::move(location),
+        wrap_task(std::move(task), std::move(weak_owner)),
+        delay);
+}
+
+//==================================================================================================
+template <typename TaskType, typename ReplyType>
+bool TaskRunner::post_task_with_delay_and_reply(
+    TaskLocation &&location,
+    TaskType &&task,
+    ReplyType &&reply,
+    std::chrono::milliseconds delay)
+{
+    return post_task_to_task_manager_with_delay(
+        std::move(location),
+        wrap_task(std::move(task), std::move(reply)),
+        delay);
+}
+
+//==================================================================================================
+template <typename TaskType, typename ReplyType, typename OwnerType>
+bool TaskRunner::post_task_with_delay_and_reply(
+    TaskLocation &&location,
+    TaskType &&task,
+    ReplyType &&reply,
+    std::weak_ptr<OwnerType> weak_owner,
+    std::chrono::milliseconds delay)
+{
+    return post_task_to_task_manager_with_delay(
+        std::move(location),
+        wrap_task(std::move(task), std::move(reply), std::move(weak_owner)),
+        delay);
+}
+
+//==================================================================================================
+template <typename TaskType>
+Task TaskRunner::wrap_task(TaskType &&task)
+{
+    static_assert(std::is_invocable_v<TaskType>, "Task must be invocable");
+
+    return [task = std::move(task)](TaskRunner *, TaskLocation) mutable {
+        FLY_UNUSED(std::move(task)());
+    };
+}
+
+//==================================================================================================
+template <typename TaskType, typename OwnerType>
+Task TaskRunner::wrap_task(TaskType &&task, std::weak_ptr<OwnerType> weak_owner)
+{
+    using StrongOwnerType = std::shared_ptr<OwnerType>;
+
+    static_assert(
+        std::is_invocable_v<TaskType, StrongOwnerType>,
+        "Task must be invocable with a pointer to its owner");
+
+    return [task = std::move(task),
+            weak_owner = std::move(weak_owner)](TaskRunner *, TaskLocation) mutable {
+        StrongOwnerType owner = weak_owner.lock();
+
+        if (owner)
+        {
+            FLY_UNUSED(std::move(task)(std::move(owner)));
+        }
+    };
+}
+
+//==================================================================================================
+template <typename TaskType, typename ReplyType>
+Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply)
+{
+    static_assert(std::is_invocable_v<TaskType>, "Task must be invocable");
+    static_assert(
+        !std::is_void_v<std::invoke_result_t<TaskType>>,
+        "Task must return a non-void result");
+
+    static_assert(
+        std::is_invocable_v<ReplyType, std::invoke_result_t<TaskType>>,
+        "Reply must be invocable with the result of the task");
+
+    return [task = std::move(task),
+            reply = std::move(reply)](TaskRunner *runner, TaskLocation location) mutable {
+        auto result = std::move(task)();
+
+        runner->post_task(std::move(location), std::bind(std::move(reply), std::move(result)));
+    };
+}
+
+//==================================================================================================
+template <typename TaskType, typename ReplyType, typename OwnerType>
+Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<OwnerType> weak_owner)
+{
+    using StrongOwnerType = std::shared_ptr<OwnerType>;
+
+    static_assert(
+        std::is_invocable_v<TaskType, StrongOwnerType>,
+        "Task must be invocable with a pointer to its owner");
+    static_assert(
+        !std::is_void_v<std::invoke_result_t<TaskType, StrongOwnerType>>,
+        "Task must return a non-void result");
+
+    static_assert(
+        std::is_invocable_v<
+            ReplyType,
+            std::invoke_result_t<TaskType, StrongOwnerType>,
+            StrongOwnerType>,
+        "Reply must be invocable with a pointer to its owner and the result of the task");
+
+    return [task = std::move(task),
+            reply = std::move(reply),
+            weak_owner = std::move(weak_owner)](TaskRunner *runner, TaskLocation location) mutable {
+        StrongOwnerType owner = weak_owner.lock();
+
+        if (owner)
+        {
+            auto result = std::move(task)(std::move(owner));
+
+            runner->post_task(
+                std::move(location),
+                std::bind(std::move(reply), std::move(result), std::placeholders::_1),
+                std::move(weak_owner));
+        }
+    };
+}
 
 } // namespace fly
