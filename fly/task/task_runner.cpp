@@ -45,6 +45,13 @@ bool TaskRunner::post_task_to_task_manager_with_delay(
 }
 
 //==================================================================================================
+void TaskRunner::execute(TaskLocation &&location, Task &&task)
+{
+    std::move(task)(this, location);
+    task_complete(std::move(location));
+}
+
+//==================================================================================================
 ParallelTaskRunner::ParallelTaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
     TaskRunner(std::move(weak_task_manager))
 {

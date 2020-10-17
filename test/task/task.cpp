@@ -195,166 +195,26 @@ TEST_CASE("Task", "[task]")
         CHECK(task_was_called);
     }
 
-    SECTION("Tasks may be kept alive with strong pointers")
-    {
-        auto task_runner =
-            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
-
-        bool task_was_called = false;
-        auto task_class = std::make_shared<TaskClass>(task_was_called);
-
-        auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
-            strong_task_class->member_task();
-        };
-
-        std::weak_ptr<TaskClass> weak_task_class = task_class;
-        REQUIRE(task_runner->post_task(FROM_HERE, std::move(task), weak_task_class));
-        task_runner->wait_for_task_to_complete(__FILE__);
-
-        CHECK(task_was_called);
-    }
-
-    SECTION("Tasks may be cancelled with weak pointers")
-    {
-        auto task_runner =
-            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
-
-        bool task_was_called = false;
-        auto task_class = std::make_shared<TaskClass>(task_was_called);
-
-        auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
-            strong_task_class->member_task();
-        };
-
-        std::weak_ptr<TaskClass> weak_task_class = task_class;
-        task_class.reset();
-
-        REQUIRE(task_runner->post_task(FROM_HERE, std::move(task), weak_task_class));
-        task_runner->wait_for_task_to_complete(__FILE__);
-
-        CHECK_FALSE(task_was_called);
-    }
-
-    SECTION("Delayed tasks may be kept alive with strong pointers")
-    {
-        auto task_runner =
-            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
-
-        bool task_was_called = false;
-        auto task_class = std::make_shared<TaskClass>(task_was_called);
-
-        auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
-            strong_task_class->member_task();
-        };
-
-        std::weak_ptr<TaskClass> weak_task_class = task_class;
-        REQUIRE(
-            task_runner->post_task_with_delay(FROM_HERE, std::move(task), weak_task_class, 10ms));
-        task_runner->wait_for_task_to_complete(__FILE__);
-
-        CHECK(task_was_called);
-    }
-
-    SECTION("Delayed tasks may be cancelled with weak pointers")
-    {
-        auto task_runner =
-            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
-
-        bool task_was_called = false;
-        auto task_class = std::make_shared<TaskClass>(task_was_called);
-
-        auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
-            strong_task_class->member_task();
-        };
-
-        std::weak_ptr<TaskClass> weak_task_class = task_class;
-        task_class.reset();
-
-        REQUIRE(
-            task_runner->post_task_with_delay(FROM_HERE, std::move(task), weak_task_class, 10ms));
-        task_runner->wait_for_task_to_complete(__FILE__);
-
-        CHECK_FALSE(task_was_called);
-    }
-
-    SECTION("Cancelled tasks do not execute while other tasks do execute")
+    SECTION("Tasks may pass their result to a reply task")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
-        fly::ConcurrentQueue<int> ordering;
-        MarkerTask marker_task(&ordering);
-
         bool task_was_called = false;
-        auto task_class = std::make_shared<TaskClass>(task_was_called);
-        std::weak_ptr<TaskClass> weak_task_class = task_class;
+        bool reply_was_called = false;
 
-        auto task = [weak_task_class]() {
-            if (auto strong_task_class = weak_task_class.lock(); strong_task_class)
-            {
-                strong_task_class->member_task();
-            }
+        auto task = [&task_was_called]() -> bool {
+            task_was_called = true;
+            return task_was_called;
         };
+        auto reply = [&reply_was_called](bool result) { reply_was_called = result; };
 
-        task_class.reset();
-
-        REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &marker_task, 2)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &marker_task, 3)));
-
+        REQUIRE(task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply)));
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK_FALSE(task_was_called);
-
-        int marker = 0;
-        ordering.pop(marker);
-        CHECK(marker == 2);
-
-        ordering.pop(marker);
-        CHECK(marker == 3);
-    }
-
-    SECTION("Parallel task runner does not enforce execution order")
-    {
-        auto task_runner =
-            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
-
-        CountTask task;
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
-
-        task_runner->wait_for_task_to_complete(__FILE__);
-        task_runner->wait_for_task_to_complete(__FILE__);
-        task_runner->wait_for_task_to_complete(__FILE__);
-    }
-
-    SECTION("Sequenced task runner enforces execution order")
-    {
-        auto task_runner =
-            fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
-
-        fly::ConcurrentQueue<int> ordering;
-        MarkerTask task(&ordering);
-
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 1)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 2)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 3)));
-
-        task_runner->wait_for_task_to_complete(__FILE__);
-        task_runner->wait_for_task_to_complete(__FILE__);
-        task_runner->wait_for_task_to_complete(__FILE__);
-
-        int marker = 0;
-        ordering.pop(marker);
-        CHECK(marker == 1);
-
-        ordering.pop(marker);
-        CHECK(marker == 2);
-
-        ordering.pop(marker);
-        CHECK(marker == 3);
+        CHECK(task_was_called);
+        CHECK(reply_was_called);
     }
 
     SECTION("Delayed tasks execute no sooner than their specified delay")
@@ -398,6 +258,329 @@ TEST_CASE("Task", "[task]")
 
         ordering.pop(marker);
         CHECK(marker == 1);
+    }
+
+    SECTION("Delayed tasks may pass their result to a reply task")
+    {
+        auto task_runner =
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+
+        bool task_was_called = false;
+        bool reply_was_called = false;
+
+        auto task = [&task_was_called]() -> bool {
+            task_was_called = true;
+            return task_was_called;
+        };
+        auto reply = [&reply_was_called](bool result) { reply_was_called = result; };
+
+        REQUIRE(task_runner->post_task_with_delay_and_reply(
+            FROM_HERE,
+            std::move(task),
+            std::move(reply),
+            10ms));
+        task_runner->wait_for_task_to_complete(__FILE__);
+        task_runner->wait_for_task_to_complete(__FILE__);
+
+        CHECK(task_was_called);
+        CHECK(reply_was_called);
+    }
+
+    SECTION("Cancelled tasks")
+    {
+        SECTION("Tasks may be kept alive with strong pointers")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+                strong_task_class->member_task();
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+            REQUIRE(task_runner->post_task(FROM_HERE, std::move(task), weak_task_class));
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK(task_was_called);
+        }
+
+        SECTION("Tasks may be cancelled with weak pointers")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+                strong_task_class->member_task();
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+            task_class.reset();
+
+            REQUIRE(task_runner->post_task(FROM_HERE, std::move(task), weak_task_class));
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK_FALSE(task_was_called);
+        }
+
+        SECTION("Tasks with replies may be cancelled with weak pointers before task")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            bool reply_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class) -> bool {
+                strong_task_class->member_task();
+                return true;
+            };
+            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>) {
+                reply_was_called = result;
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+            task_class.reset();
+
+            REQUIRE(task_runner->post_task_with_reply(
+                FROM_HERE,
+                std::move(task),
+                std::move(reply),
+                weak_task_class));
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK_FALSE(task_was_called);
+            CHECK_FALSE(reply_was_called);
+        }
+
+        SECTION("Tasks with replies may be cancelled with weak pointers before reply")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            bool reply_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class) -> bool {
+                strong_task_class->member_task();
+                strong_task_class.reset();
+                task_class.reset();
+                return true;
+            };
+            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>) {
+                reply_was_called = result;
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+
+            REQUIRE(task_runner->post_task_with_reply(
+                FROM_HERE,
+                std::move(task),
+                std::move(reply),
+                weak_task_class));
+            task_runner->wait_for_task_to_complete(__FILE__);
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK(task_was_called);
+            CHECK_FALSE(reply_was_called);
+        }
+
+        SECTION("Delayed tasks may be kept alive with strong pointers")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+                strong_task_class->member_task();
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+            REQUIRE(task_runner
+                        ->post_task_with_delay(FROM_HERE, std::move(task), weak_task_class, 10ms));
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK(task_was_called);
+        }
+
+        SECTION("Delayed tasks may be cancelled with weak pointers")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+                strong_task_class->member_task();
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+            task_class.reset();
+
+            REQUIRE(task_runner
+                        ->post_task_with_delay(FROM_HERE, std::move(task), weak_task_class, 10ms));
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK_FALSE(task_was_called);
+        }
+
+        SECTION("Delayed tasks with replies may be cancelled with weak pointers before task")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            bool reply_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class) -> bool {
+                strong_task_class->member_task();
+                return true;
+            };
+            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>) {
+                reply_was_called = result;
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+            task_class.reset();
+
+            REQUIRE(task_runner->post_task_with_delay_and_reply(
+                FROM_HERE,
+                std::move(task),
+                std::move(reply),
+                weak_task_class,
+                10ms));
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK_FALSE(task_was_called);
+            CHECK_FALSE(reply_was_called);
+        }
+
+        SECTION("Delayed tasks with replies may be cancelled with weak pointers before reply")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            bool reply_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class) -> bool {
+                strong_task_class->member_task();
+                strong_task_class.reset();
+                task_class.reset();
+                return true;
+            };
+            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>) {
+                reply_was_called = result;
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+
+            REQUIRE(task_runner->post_task_with_delay_and_reply(
+                FROM_HERE,
+                std::move(task),
+                std::move(reply),
+                weak_task_class,
+                10ms));
+            task_runner->wait_for_task_to_complete(__FILE__);
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK(task_was_called);
+            CHECK_FALSE(reply_was_called);
+        }
+
+        SECTION("Cancelled tasks do not execute while other tasks do execute")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+
+            fly::ConcurrentQueue<int> ordering;
+            MarkerTask marker_task(&ordering);
+
+            bool task_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+
+            auto task = [weak_task_class]() {
+                if (auto strong_task_class = weak_task_class.lock(); strong_task_class)
+                {
+                    strong_task_class->member_task();
+                }
+            };
+
+            task_class.reset();
+
+            REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
+            REQUIRE(
+                task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &marker_task, 2)));
+            REQUIRE(
+                task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &marker_task, 3)));
+
+            task_runner->wait_for_task_to_complete(__FILE__);
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK_FALSE(task_was_called);
+
+            int marker = 0;
+            ordering.pop(marker);
+            CHECK(marker == 2);
+
+            ordering.pop(marker);
+            CHECK(marker == 3);
+        }
+    }
+
+    SECTION("Parallel task runner does not enforce execution order")
+    {
+        auto task_runner =
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+        CountTask task;
+        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
+        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
+        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
+
+        task_runner->wait_for_task_to_complete(__FILE__);
+        task_runner->wait_for_task_to_complete(__FILE__);
+        task_runner->wait_for_task_to_complete(__FILE__);
+    }
+
+    SECTION("Sequenced task runner enforces execution order")
+    {
+        auto task_runner =
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+
+        fly::ConcurrentQueue<int> ordering;
+        MarkerTask task(&ordering);
+
+        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 1)));
+        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 2)));
+        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 3)));
+
+        task_runner->wait_for_task_to_complete(__FILE__);
+        task_runner->wait_for_task_to_complete(__FILE__);
+        task_runner->wait_for_task_to_complete(__FILE__);
+
+        int marker = 0;
+        ordering.pop(marker);
+        CHECK(marker == 1);
+
+        ordering.pop(marker);
+        CHECK(marker == 2);
+
+        ordering.pop(marker);
+        CHECK(marker == 3);
     }
 }
 

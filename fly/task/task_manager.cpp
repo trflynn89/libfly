@@ -111,8 +111,10 @@ void TaskManager::worker_thread()
         {
             if (auto task_runner = task_holder.m_weak_task_runner.lock(); task_runner)
             {
-                std::move(task_holder.m_task)();
-                task_runner->task_complete(std::move(task_holder.m_location));
+                TaskLocation location = std::move(task_holder.m_location);
+                Task task = std::move(task_holder.m_task);
+
+                task_runner->execute(std::move(location), std::move(task));
             }
         }
     }
