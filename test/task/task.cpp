@@ -217,6 +217,25 @@ TEST_CASE("Task", "[task]")
         CHECK(reply_was_called);
     }
 
+    SECTION("Void tasks may indicate their completion to a reply task")
+    {
+        auto task_runner =
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+
+        bool task_was_called = false;
+        bool reply_was_called = false;
+
+        auto task = [&task_was_called]() { task_was_called = true; };
+        auto reply = [&reply_was_called]() { reply_was_called = true; };
+
+        REQUIRE(task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply)));
+        task_runner->wait_for_task_to_complete(__FILE__);
+        task_runner->wait_for_task_to_complete(__FILE__);
+
+        CHECK(task_was_called);
+        CHECK(reply_was_called);
+    }
+
     SECTION("Delayed tasks execute no sooner than their specified delay")
     {
         auto task_runner =
@@ -273,6 +292,29 @@ TEST_CASE("Task", "[task]")
             return task_was_called;
         };
         auto reply = [&reply_was_called](bool result) { reply_was_called = result; };
+
+        REQUIRE(task_runner->post_task_with_delay_and_reply(
+            FROM_HERE,
+            std::move(task),
+            std::move(reply),
+            10ms));
+        task_runner->wait_for_task_to_complete(__FILE__);
+        task_runner->wait_for_task_to_complete(__FILE__);
+
+        CHECK(task_was_called);
+        CHECK(reply_was_called);
+    }
+
+    SECTION("Delayed void tasks may indicate their completion to a reply task")
+    {
+        auto task_runner =
+            fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+
+        bool task_was_called = false;
+        bool reply_was_called = false;
+
+        auto task = [&task_was_called]() { task_was_called = true; };
+        auto reply = [&reply_was_called]() { reply_was_called = true; };
 
         REQUIRE(task_runner->post_task_with_delay_and_reply(
             FROM_HERE,
@@ -392,6 +434,68 @@ TEST_CASE("Task", "[task]")
             CHECK_FALSE(reply_was_called);
         }
 
+        SECTION("Void tasks with replies may be cancelled with weak pointers before task")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            bool reply_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+                strong_task_class->member_task();
+            };
+            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>) {
+                reply_was_called = true;
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+            task_class.reset();
+
+            REQUIRE(task_runner->post_task_with_reply(
+                FROM_HERE,
+                std::move(task),
+                std::move(reply),
+                weak_task_class));
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK_FALSE(task_was_called);
+            CHECK_FALSE(reply_was_called);
+        }
+
+        SECTION("Void tasks with replies may be cancelled with weak pointers before reply")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            bool reply_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class) {
+                strong_task_class->member_task();
+                strong_task_class.reset();
+                task_class.reset();
+            };
+            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>) {
+                reply_was_called = true;
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+
+            REQUIRE(task_runner->post_task_with_reply(
+                FROM_HERE,
+                std::move(task),
+                std::move(reply),
+                weak_task_class));
+            task_runner->wait_for_task_to_complete(__FILE__);
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK(task_was_called);
+            CHECK_FALSE(reply_was_called);
+        }
+
         SECTION("Delayed tasks may be kept alive with strong pointers")
         {
             auto task_runner = fly::test::task_manager()
@@ -483,6 +587,70 @@ TEST_CASE("Task", "[task]")
             };
             auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>) {
                 reply_was_called = result;
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+
+            REQUIRE(task_runner->post_task_with_delay_and_reply(
+                FROM_HERE,
+                std::move(task),
+                std::move(reply),
+                weak_task_class,
+                10ms));
+            task_runner->wait_for_task_to_complete(__FILE__);
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK(task_was_called);
+            CHECK_FALSE(reply_was_called);
+        }
+
+        SECTION("Delayed void tasks with replies may be cancelled with weak pointers before task")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            bool reply_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+                strong_task_class->member_task();
+            };
+            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>) {
+                reply_was_called = true;
+            };
+
+            std::weak_ptr<TaskClass> weak_task_class = task_class;
+            task_class.reset();
+
+            REQUIRE(task_runner->post_task_with_delay_and_reply(
+                FROM_HERE,
+                std::move(task),
+                std::move(reply),
+                weak_task_class,
+                10ms));
+            task_runner->wait_for_task_to_complete(__FILE__);
+
+            CHECK_FALSE(task_was_called);
+            CHECK_FALSE(reply_was_called);
+        }
+
+        SECTION("Delayed void tasks with replies may be cancelled with weak pointers before reply")
+        {
+            auto task_runner = fly::test::task_manager()
+                                   ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
+
+            bool task_was_called = false;
+            bool reply_was_called = false;
+            auto task_class = std::make_shared<TaskClass>(task_was_called);
+
+            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class) {
+                strong_task_class->member_task();
+                strong_task_class.reset();
+                task_class.reset();
+            };
+            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>) {
+                reply_was_called = true;
             };
 
             std::weak_ptr<TaskClass> weak_task_class = task_class;
