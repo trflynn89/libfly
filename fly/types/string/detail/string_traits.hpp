@@ -10,7 +10,7 @@
 namespace fly::detail {
 
 /**
- * Traits for basic properties of standard std::basic_string<> specializations.
+ * Traits for basic properties of standard std::basic_string specializations.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 23, 2019
@@ -19,8 +19,7 @@ template <typename StringType>
 struct BasicStringTraits
 {
     /**
-     * Aliases for STL types that use std::basic_string<> specializations as a
-     * template type.
+     * Aliases for STL types that use std::basic_string specializations as a template type.
      */
     using size_type = typename StringType::size_type;
     using char_type = typename StringType::value_type;
@@ -46,11 +45,10 @@ struct BasicStringTraits
 
     static_assert(
         any_same_v<StringType, std::string, std::wstring, std::u16string, std::u32string>,
-        "StringType must be a standard std::basic_string<> specialization");
+        "StringType must be a standard std::basic_string specialization");
 
     /**
-     * Define a trait for testing if type T is a string-like type analogous to
-     * StringType.
+     * Define a trait for testing if type T is a string-like type analogous to StringType.
      */
     template <typename T>
     using is_string_like = any_same<T, char_type *, char_type const *, StringType>;
@@ -59,16 +57,16 @@ struct BasicStringTraits
     inline static constexpr bool is_string_like_v = is_string_like<T>::value;
 
     /**
-     * Define a trait for testing if the STL has defined the std::stoi family
-     * of functions for StringType.
+     * Define a trait for testing if the STL has defined the std::stoi family of functions for
+     * StringType.
      */
     using has_stoi_family = any_same<StringType, std::string, std::wstring>;
 
     inline static constexpr bool has_stoi_family_v = has_stoi_family::value;
 
     /**
-     * Define a trait for whether operator<< is defined for a type on the stream
-     * type used for StringType.
+     * Define a trait for whether operator<< is defined for a type on the stream type used for
+     * StringType.
      */
     template <typename T>
     using OstreamDeclaration = decltype(std::declval<ostream_type &>() << std::declval<T>());

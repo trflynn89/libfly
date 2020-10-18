@@ -10,7 +10,7 @@
 namespace fly::detail {
 
 /**
- * Helper class to format and stream generic values into a std::basic_string<>'s output stream type.
+ * Helper class to format and stream generic values into a std::basic_string's output stream type.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version June 6, 2020
@@ -146,12 +146,12 @@ StringType BasicStringFormatter<StringType>::format_hex(IntegerType source, size
         std::numeric_limits<IntegerType>::is_integer,
         "Only integer types may be formatted as a hexadecimal string");
 
-    static constexpr const char_type *hexadecimal_digits = FLY_STR(char_type, "0123456789abcdef");
-    StringType hex(length, hexadecimal_digits[0]);
+    static constexpr const char_type *s_hexadecimal_digits = FLY_STR(char_type, "0123456789abcdef");
+    StringType hex(length, s_hexadecimal_digits[0]);
 
     for (size_type i = 0, j = (length - 1) * 4; i < length; ++i, j -= 4)
     {
-        hex[i] = hexadecimal_digits[(source >> j) & 0x0f];
+        hex[i] = s_hexadecimal_digits[(source >> j) & 0x0f];
     }
 
     return hex;

@@ -171,16 +171,16 @@ std::optional<std::string> Parser::ensure_utf8(std::istream &stream) const
 {
     using CharType = typename StringType::value_type;
 
-    static constexpr const std::uint8_t char_size = sizeof(CharType);
+    static constexpr const std::uint8_t s_char_size = sizeof(CharType);
     StringType contents;
 
     while (stream)
     {
         CharType character = 0;
 
-        for (std::uint8_t i = 0; stream && (i < char_size); ++i)
+        for (std::uint8_t i = 0; stream && (i < s_char_size); ++i)
         {
-            const std::uint8_t shift = 8 * (char_size - i - 1);
+            const std::uint8_t shift = 8 * (s_char_size - i - 1);
             character |= static_cast<CharType>(stream.get() & 0xff) << shift;
         }
 

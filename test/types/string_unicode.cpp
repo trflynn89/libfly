@@ -380,27 +380,27 @@ TEMPLATE_TEST_CASE(
 
         SECTION("Escape non-ASCII with 'U'")
         {
-            auto U = []() constexpr->char
+            auto u = []() constexpr->char
             {
                 return 'U';
             };
 
-            escaped_to(FLY_STR(char_type, "\U00010000"), FLY_STR(char_type, "\\U00010000"), U);
-            escaped_to(FLY_STR(char_type, "\U00010e6d"), FLY_STR(char_type, "\\U00010e6d"), U);
-            escaped_to(FLY_STR(char_type, "\U0001d11e"), FLY_STR(char_type, "\\U0001d11e"), U);
-            escaped_to(FLY_STR(char_type, "\U0001f355"), FLY_STR(char_type, "\\U0001f355"), U);
-            escaped_to(FLY_STR(char_type, "\U0010ffff"), FLY_STR(char_type, "\\U0010ffff"), U);
+            escaped_to(FLY_STR(char_type, "\U00010000"), FLY_STR(char_type, "\\U00010000"), u);
+            escaped_to(FLY_STR(char_type, "\U00010e6d"), FLY_STR(char_type, "\\U00010e6d"), u);
+            escaped_to(FLY_STR(char_type, "\U0001d11e"), FLY_STR(char_type, "\\U0001d11e"), u);
+            escaped_to(FLY_STR(char_type, "\U0001f355"), FLY_STR(char_type, "\\U0001f355"), u);
+            escaped_to(FLY_STR(char_type, "\U0010ffff"), FLY_STR(char_type, "\\U0010ffff"), u);
 
             escaped_to(
                 FLY_STR(char_type, "All ASCII!"),
                 FLY_STR(char_type, "All ASCII!"),
-                U,
+                u,
                 false);
 
             escaped_to(
                 FLY_STR(char_type, "\U0001f355 in the morning, \U0001f355 in the evening"),
                 FLY_STR(char_type, "\\U0001f355 in the morning, \\U0001f355 in the evening"),
-                U,
+                u,
                 false);
         }
     }

@@ -25,7 +25,7 @@
 namespace fly {
 
 /**
- * Forward declarations of the supported BasicString<> specializations.
+ * Forward declarations of the supported BasicString specializations.
  */
 template <typename StringType>
 class BasicString;
@@ -45,7 +45,7 @@ template <typename StringType>
 class BasicString
 {
 public:
-    // Forward some aliases from detail::BasicStringTraits<> for convenience.
+    // Forward some aliases from detail::BasicStringTraits for convenience.
     using traits = detail::BasicStringTraits<StringType>;
     using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;

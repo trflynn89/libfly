@@ -133,7 +133,7 @@ public:
 
     /**
      * Post a task for execution with protection by the provided weak pointer. The task may be any
-     * callable type which accepts a single argument: a locked shared pointer obtained from the weak
+     * callable type which accepts a single argument, a locked shared pointer obtained from the weak
      * pointer. When the task is ready to be executed, if the weak pointer fails to be locked, the
      * task is dropped.
      *
@@ -150,7 +150,7 @@ public:
     bool post_task(TaskLocation &&location, TaskType &&task, std::weak_ptr<OwnerType> weak_owner);
 
     /**
-     * Post a task for execution. The task may be any callable type that returns a value.
+     * Post a task for execution. The task may be any callable type.
      *
      * When the task has been executed, the reply task is then posted for execution on this same
      * task runner. The reply task may be any callable type that is invocable with the return type
@@ -170,9 +170,9 @@ public:
 
     /**
      * Post a task for execution with protection by the provided weak pointer. The task may be any
-     * callable type which accepts a single argument: a locked shared pointer obtained from the weak
-     * pointer, and returns a value. When the task is ready to be executed, if the weak pointer
-     * fails to be locked, the task is dropped.
+     * callable type which accepts a single argument, a locked shared pointer obtained from the weak
+     * pointer. When the task is ready to be executed, if the weak pointer fails to be locked, the
+     * task is dropped.
      *
      * When the task has been executed, the reply task is then posted for execution on this same
      * task runner with protection by the same weak pointer. The reply task may be any callable type
@@ -215,7 +215,7 @@ public:
 
     /**
      * Schedule a task to be posted after a delay with protection by the provided weak pointer. The
-     * task may be any callable type which accepts a single argument: a locked shared pointer
+     * task may be any callable type which accepts a single argument, a locked shared pointer
      * obtained from the weak pointer. When the task is ready to be executed, if the weak pointer
      * fails to be locked, the task is dropped.
      *
@@ -237,8 +237,7 @@ public:
         std::chrono::milliseconds delay);
 
     /**
-     * Schedule a task to be posted after a delay. The task may be any callable type that returns a
-     * value.
+     * Schedule a task to be posted after a delay. The task may be any callable type.
      *
      * When the task has been executed, the reply task is then posted for execution on this same
      * task runner. The reply task may be any callable type that is invocable with the return type
@@ -263,9 +262,9 @@ public:
 
     /**
      * Schedule a task to be posted after a delay with protection by the provided weak pointer. The
-     * task may be any callable type which accepts a single argument: a locked shared pointer
-     * obtained from the weak pointer, and returns a value. When the task is ready to be executed,
-     * if the weak pointer fails to be locked, the task is dropped.
+     * task may be any callable type which accepts a single argument, a locked shared pointer
+     * obtained from the weak pointer. When the task is ready to be executed, if the weak pointer
+     * fails to be locked, the task is dropped.
      *
      * When the task has been executed, the reply task is then posted for execution on this same
      * task runner with protection by the same weak pointer. The reply task may be any callable type
@@ -648,20 +647,18 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply)
     static_assert(std::is_invocable_v<TaskType>, "Task must be invocable without any arguments");
 
     using ResultType = std::invoke_result_t<TaskType>;
-    constexpr bool result_is_void = std::is_void_v<ResultType>;
+    static constexpr bool s_result_is_void = std::is_void_v<ResultType>;
 
     static_assert(
-        (result_is_void && std::is_invocable_v<ReplyType>) ||
-            (!result_is_void && std::is_invocable_v<ReplyType, ResultType>),
+        (s_result_is_void && std::is_invocable_v<ReplyType>) ||
+            (!s_result_is_void && std::is_invocable_v<ReplyType, ResultType>),
         "Either the task must return a non-void type and the reply must be invocable with only "
         "that type, or the task must return void and the reply must be invocable without any "
         "arguments");
 
     return [task = std::move(task),
             reply = std::move(reply)](TaskRunner *runner, TaskLocation location) mutable {
-        // N.B. It would be better to use |result_is_void| here, but GCC/Clang strongly disagree
-        // with MSVC on whether it should be in the lambda's capture group.
-        if constexpr (std::is_void_v<ResultType>)
+        if constexpr (s_result_is_void)
         {
             std::move(task)();
             runner->post_task(std::move(location), std::move(reply));
@@ -685,14 +682,14 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<Own
         "Task must be invocable with only a strong pointer to its owner");
 
     using ResultType = std::invoke_result_t<TaskType, StrongOwnerType>;
-    constexpr bool result_is_void = std::is_void_v<ResultType>;
+    static constexpr bool s_result_is_void = std::is_void_v<ResultType>;
 
     static_assert(
-        (result_is_void && std::is_invocable_v<ReplyType, StrongOwnerType>) ||
-            (!result_is_void && std::is_invocable_v<ReplyType, ResultType, StrongOwnerType>),
-        "Either the task must return a non-void type and the reply must be invocable that type and "
-        "a strong pointer to its owner, or the task must return void and the reply must be "
-        "invocable with only a strong pointer to its owner");
+        (s_result_is_void && std::is_invocable_v<ReplyType, StrongOwnerType>) ||
+            (!s_result_is_void && std::is_invocable_v<ReplyType, ResultType, StrongOwnerType>),
+        "Either the task must return a non-void type and the reply must be invocable with that "
+        "type and a strong pointer to its owner, or the task must return void and the reply must "
+        "be invocable with only a strong pointer to its owner");
 
     return [task = std::move(task),
             reply = std::move(reply),
@@ -703,9 +700,7 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<Own
             return;
         }
 
-        // N.B. It would be better to use |result_is_void| here, but GCC/Clang strongly disagree
-        // with MSVC on whether it should be in the lambda's capture group.
-        if constexpr (std::is_void_v<ResultType>)
+        if constexpr (s_result_is_void)
         {
             std::move(task)(std::move(owner));
             runner->post_task(std::move(location), std::move(reply), std::move(weak_owner));

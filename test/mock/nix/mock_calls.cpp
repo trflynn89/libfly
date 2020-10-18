@@ -51,8 +51,10 @@ extern "C"
 #endif
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Accept))
@@ -65,8 +67,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_backtrace(void **buffer, int size);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_backtrace(void **buffer, int size)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Backtrace))
@@ -79,8 +83,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     void __real_backtrace_symbols_fd(void *const *buffer, int size, int fd);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     void __wrap_backtrace_symbols_fd(void *const *buffer, int size, int fd)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::BacktraceSymbols))
@@ -93,8 +99,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Bind))
@@ -107,8 +115,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     {
         bool fail;
@@ -123,8 +133,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_fcntl(int fd, int cmd, int args);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_fcntl(int fd, int cmd, int args)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Fcntl))
@@ -148,8 +160,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     struct hostent *__real_gethostbyname(const char *name);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     struct hostent *__wrap_gethostbyname(const char *name)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Gethostbyname))
@@ -162,8 +176,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Getsockopt))
@@ -176,8 +192,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_inotify_add_watch(int fd, const char *pathname, uint32_t mask);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_inotify_add_watch(int fd, const char *pathname, uint32_t mask)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::InotifyAddWatch))
@@ -190,8 +208,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_inotify_init1(int flags);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_inotify_init1(int flags)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::InotifyInit1))
@@ -204,8 +224,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_isatty(int fd);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_isatty(int fd)
     {
         bool fail;
@@ -220,8 +242,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_listen(int sockfd, int backlog);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_listen(int sockfd, int backlog)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Listen))
@@ -234,8 +258,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     struct tm *__real_localtime_r(const time_t *timep, struct tm *result);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     struct tm *__wrap_localtime_r(const time_t *timep, struct tm *result)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::LocalTime))
@@ -248,8 +274,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_poll(struct pollfd *fds, nfds_t nfds, int timeout);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Poll))
@@ -263,8 +291,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __real_read(int fd, void *buf, size_t count);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __wrap_read(int fd, void *buf, size_t count)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Read))
@@ -277,8 +307,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __real_recv(int sockfd, void *buf, size_t len, int flags);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __wrap_recv(int sockfd, void *buf, size_t len, int flags)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Recv))
@@ -291,6 +323,7 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __real_recvfrom(
         int sockfd,
         void *buf,
@@ -299,6 +332,7 @@ extern "C"
         struct sockaddr *src_addr,
         socklen_t *addrlen);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __wrap_recvfrom(
         int sockfd,
         void *buf,
@@ -317,8 +351,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __real_send(int sockfd, const void *buf, size_t len, int flags);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __wrap_send(int sockfd, const void *buf, size_t len, int flags)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Send))
@@ -348,6 +384,7 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __real_sendto(
         int sockfd,
         const void *buf,
@@ -356,6 +393,7 @@ extern "C"
         const struct sockaddr *dest_addr,
         socklen_t addrlen);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __wrap_sendto(
         int sockfd,
         const void *buf,
@@ -391,8 +429,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Setsockopt))
@@ -405,8 +445,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_socket(int domain, int type, int protocol);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_socket(int domain, int type, int protocol)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Socket))
@@ -419,8 +461,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __real_sysinfo(struct sysinfo *info);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     int __wrap_sysinfo(struct sysinfo *info)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Sysinfo))
@@ -433,8 +477,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     clock_t __real_times(struct tms *buf);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     clock_t __wrap_times(struct tms *buf)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Times))
@@ -447,8 +493,10 @@ extern "C"
     }
 
     //==============================================================================================
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __real_write(int fd, const void *buf, size_t count);
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ssize_t __wrap_write(int fd, const void *buf, size_t count)
     {
         if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Write))

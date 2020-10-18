@@ -74,10 +74,10 @@ inline DataType BitStream::bit_mask(const DataType bits)
         BitStreamTraits::is_unsigned_integer_v<DataType>,
         "DataType must be an unsigned integer type");
 
-    static constexpr auto filled = std::numeric_limits<DataType>::max();
-    static constexpr auto digits = std::numeric_limits<DataType>::digits;
+    static constexpr auto s_filled = std::numeric_limits<DataType>::max();
+    static constexpr auto s_digits = std::numeric_limits<DataType>::digits;
 
-    return (bits == 0) ? 0 : filled >> (digits - bits);
+    return (bits == 0) ? 0 : s_filled >> (s_digits - bits);
 }
 
 } // namespace fly::detail

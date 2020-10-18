@@ -16,8 +16,8 @@
 namespace fly::detail {
 
 /**
- * Helper struct to stream a std::basic_string<> to a std::basic_ostream<>, and to define aliases
- * for what file/string stream types should be used for that std::basic_string<> type.
+ * Helper struct to stream a std::basic_string to a std::basic_ostream, and to define aliases for
+ * what file/string stream types should be used for that std::basic_string type.
  *
  * For std::string and std::wstring, the "normal" stream types are used (std::istream/std::ostream
  * and std::wistream/std::wostream, and their children, respectively).
@@ -206,10 +206,10 @@ void BasicStringStreamer<StringType>::stream_char(ostream_type &ostream, const c
         }
         else
         {
-            static constexpr const streamed_char fill(FLY_CHR(streamed_char, '0'));
+            static constexpr const streamed_char s_fill(FLY_CHR(streamed_char, '0'));
 
             ostream << FLY_STR(streamed_char, "\\x");
-            ostream << std::setfill(fill) << std::setw(2);
+            ostream << std::setfill(s_fill) << std::setw(2);
             ostream << std::hex << (value_as_int & 0xff) << std::dec;
         }
     }
