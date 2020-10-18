@@ -38,7 +38,10 @@ SRC_$(d) := \
 
 # All unit tests should have Catch2 on the include path.
 CXXFLAGS_$(d) += -I$(SOURCE_ROOT)/test/Catch2/single_include
-CXXFLAGS_$(d) += -DCATCH_CONFIG_FAST_COMPILE -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER
+CXXFLAGS_$(d) += \
+    -DCATCH_CONFIG_PREFIX_ALL \
+    -DCATCH_CONFIG_FAST_COMPILE \
+    -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER
 
 # On Linux, define the list of available mocked system calls.
 ifeq ($(SYSTEM), LINUX)

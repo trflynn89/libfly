@@ -4,43 +4,43 @@
 
 #include <filesystem>
 
-TEST_CASE("IniParser", "[parser]")
+CATCH_TEST_CASE("IniParser", "[parser]")
 {
     fly::IniParser parser;
 
-    SECTION("Non-existing directory cannot be parsed")
+    CATCH_SECTION("Non-existing directory cannot be parsed")
     {
         auto parsed = parser.parse_file(std::filesystem::path("foo_abc") / "a.json");
-        CHECK_FALSE(parsed.has_value());
+        CATCH_CHECK_FALSE(parsed.has_value());
     }
 
-    SECTION("Non-existing file cannot be parsed")
+    CATCH_SECTION("Non-existing file cannot be parsed")
     {
         auto parsed = parser.parse_file(std::filesystem::temp_directory_path() / "a.json");
-        CHECK_FALSE(parsed.has_value());
+        CATCH_CHECK_FALSE(parsed.has_value());
     }
 
-    SECTION("Empty file cannot be parsed")
+    CATCH_SECTION("Empty file cannot be parsed")
     {
         const std::string contents;
 
         auto parsed = parser.parse_string(contents);
-        CHECK_FALSE(parsed.has_value());
+        CATCH_CHECK_FALSE(parsed.has_value());
     }
 
-    SECTION("Empty section can be parsed")
+    CATCH_SECTION("Empty section can be parsed")
     {
         const std::string contents("[section]");
 
         auto parsed = parser.parse_string(contents);
-        REQUIRE(parsed.has_value());
+        CATCH_REQUIRE(parsed.has_value());
 
         const fly::Json values = std::move(parsed.value());
-        CHECK(values.size() == 1);
-        CHECK(values["section"].size() == 0);
+        CATCH_CHECK(values.size() == 1);
+        CATCH_CHECK(values["section"].size() == 0);
     }
 
-    SECTION("Single section with name-value pairs")
+    CATCH_SECTION("Single section with name-value pairs")
     {
         const std::string contents(
             "[section]\n"
@@ -48,16 +48,16 @@ TEST_CASE("IniParser", "[parser]")
             "address=USA");
 
         auto parsed = parser.parse_string(contents);
-        REQUIRE(parsed.has_value());
+        CATCH_REQUIRE(parsed.has_value());
 
         const fly::Json values = std::move(parsed.value());
-        CHECK(values.size() == 1);
-        CHECK(values["section"].size() == 2);
-        CHECK(values["section"]["name"] == "John Doe");
-        CHECK(values["section"]["address"] == "USA");
+        CATCH_CHECK(values.size() == 1);
+        CATCH_CHECK(values["section"].size() == 2);
+        CATCH_CHECK(values["section"]["name"] == "John Doe");
+        CATCH_CHECK(values["section"]["address"] == "USA");
     }
 
-    SECTION("Multiple section with name-value pairs")
+    CATCH_SECTION("Multiple section with name-value pairs")
     {
         const std::string contents(
             "[section1]\n"
@@ -71,25 +71,25 @@ TEST_CASE("IniParser", "[parser]")
             "noage=1\n");
 
         auto parsed = parser.parse_string(contents);
-        REQUIRE(parsed.has_value());
+        CATCH_REQUIRE(parsed.has_value());
 
         const fly::Json values = std::move(parsed.value());
-        CHECK(values.size() == 3);
+        CATCH_CHECK(values.size() == 3);
 
-        CHECK(values["section1"].size() == 2);
-        CHECK(values["section1"]["name"] == "John Doe");
-        CHECK(values["section1"]["age"] == "26");
+        CATCH_CHECK(values["section1"].size() == 2);
+        CATCH_CHECK(values["section1"]["name"] == "John Doe");
+        CATCH_CHECK(values["section1"]["age"] == "26");
 
-        CHECK(values["section2"].size() == 2);
-        CHECK(values["section2"]["name"] == "Jane Doe");
-        CHECK(values["section2"]["age"] == "30.12");
+        CATCH_CHECK(values["section2"].size() == 2);
+        CATCH_CHECK(values["section2"]["name"] == "Jane Doe");
+        CATCH_CHECK(values["section2"]["age"] == "30.12");
 
-        CHECK(values["section3"].size() == 2);
-        CHECK(values["section3"]["name"] == "Joe Doe");
-        CHECK(values["section3"]["noage"] == "1");
+        CATCH_CHECK(values["section3"].size() == 2);
+        CATCH_CHECK(values["section3"]["name"] == "Joe Doe");
+        CATCH_CHECK(values["section3"]["noage"] == "1");
     }
 
-    SECTION("Only existing section names are parsed")
+    CATCH_SECTION("Only existing section names are parsed")
     {
         const std::string contents(
             "[section]\n"
@@ -97,15 +97,15 @@ TEST_CASE("IniParser", "[parser]")
             "address=USA");
 
         auto parsed = parser.parse_string(contents);
-        REQUIRE(parsed.has_value());
+        CATCH_REQUIRE(parsed.has_value());
 
         const fly::Json values = std::move(parsed.value());
-        CHECK(values["section"].size() == 2);
-        CHECK_THROWS_AS(values["bad-section"], fly::JsonException);
-        CHECK_THROWS_AS(values["section-bad"], fly::JsonException);
+        CATCH_CHECK(values["section"].size() == 2);
+        CATCH_CHECK_THROWS_AS(values["bad-section"], fly::JsonException);
+        CATCH_CHECK_THROWS_AS(values["section-bad"], fly::JsonException);
     }
 
-    SECTION("Commented out sections are not parsed")
+    CATCH_SECTION("Commented out sections are not parsed")
     {
         const std::string contents(
             "[section]\n"
@@ -114,15 +114,15 @@ TEST_CASE("IniParser", "[parser]")
             "; name=Jane Doe\n");
 
         auto parsed = parser.parse_string(contents);
-        REQUIRE(parsed.has_value());
+        CATCH_REQUIRE(parsed.has_value());
 
         const fly::Json values = std::move(parsed.value());
-        CHECK(values.size() == 1);
-        CHECK(values["section"].size() == 1);
-        CHECK_THROWS_AS(values["other-section"], fly::JsonException);
+        CATCH_CHECK(values.size() == 1);
+        CATCH_CHECK(values["section"].size() == 1);
+        CATCH_CHECK_THROWS_AS(values["other-section"], fly::JsonException);
     }
 
-    SECTION("Extra whitespace is ignored")
+    CATCH_SECTION("Extra whitespace is ignored")
     {
         const std::string contents(
             "   [section   ]  \n"
@@ -130,16 +130,16 @@ TEST_CASE("IniParser", "[parser]")
             "\taddress  = USA\t \r \n");
 
         auto parsed = parser.parse_string(contents);
-        REQUIRE(parsed.has_value());
+        CATCH_REQUIRE(parsed.has_value());
 
         const fly::Json values = std::move(parsed.value());
-        CHECK(values.size() == 1);
-        CHECK(values["section"].size() == 2);
-        CHECK(values["section"]["name"] == "John Doe");
-        CHECK(values["section"]["address"] == "USA");
+        CATCH_CHECK(values.size() == 1);
+        CATCH_CHECK(values["section"].size() == 2);
+        CATCH_CHECK(values["section"]["name"] == "John Doe");
+        CATCH_CHECK(values["section"]["address"] == "USA");
     }
 
-    SECTION("Extra whitespace between quotes is not ignored")
+    CATCH_SECTION("Extra whitespace between quotes is not ignored")
     {
         const std::string contents(
             "[section]\n"
@@ -147,16 +147,16 @@ TEST_CASE("IniParser", "[parser]")
             "address= \t '\\tUSA'");
 
         auto parsed = parser.parse_string(contents);
-        REQUIRE(parsed.has_value());
+        CATCH_REQUIRE(parsed.has_value());
 
         const fly::Json values = std::move(parsed.value());
-        CHECK(values.size() == 1);
-        CHECK(values["section"].size() == 2);
-        CHECK(values["section"]["name"] == "  John Doe  ");
-        CHECK(values["section"]["address"] == "\\tUSA");
+        CATCH_CHECK(values.size() == 1);
+        CATCH_CHECK(values["section"].size() == 2);
+        CATCH_CHECK(values["section"]["name"] == "  John Doe  ");
+        CATCH_CHECK(values["section"]["address"] == "\\tUSA");
     }
 
-    SECTION("Duplicate sections override existing sections")
+    CATCH_SECTION("Duplicate sections override existing sections")
     {
         const std::string contents1(
             "[section]\n"
@@ -165,12 +165,12 @@ TEST_CASE("IniParser", "[parser]")
             "name=Jane Doe\n");
 
         auto parsed1 = parser.parse_string(contents1);
-        REQUIRE(parsed1.has_value());
+        CATCH_REQUIRE(parsed1.has_value());
 
         const fly::Json values1 = std::move(parsed1.value());
-        CHECK(values1.size() == 1);
-        CHECK(values1["section"].size() == 1);
-        CHECK(values1["section"]["name"] == "Jane Doe");
+        CATCH_CHECK(values1.size() == 1);
+        CATCH_CHECK(values1["section"].size() == 1);
+        CATCH_CHECK(values1["section"]["name"] == "Jane Doe");
 
         const std::string contents2(
             "[  \tsection]\n"
@@ -179,15 +179,15 @@ TEST_CASE("IniParser", "[parser]")
             "name=Jane Doe\n");
 
         auto parsed2 = parser.parse_string(contents1);
-        REQUIRE(parsed2.has_value());
+        CATCH_REQUIRE(parsed2.has_value());
 
         const fly::Json values2 = std::move(parsed2.value());
-        CHECK(values2.size() == 1);
-        CHECK(values2["section"].size() == 1);
-        CHECK(values2["section"]["name"] == "Jane Doe");
+        CATCH_CHECK(values2.size() == 1);
+        CATCH_CHECK(values2["section"].size() == 1);
+        CATCH_CHECK(values2["section"]["name"] == "Jane Doe");
     }
 
-    SECTION("Duplicate values override existing values")
+    CATCH_SECTION("Duplicate values override existing values")
     {
         const std::string contents(
             "[section]\n"
@@ -195,15 +195,15 @@ TEST_CASE("IniParser", "[parser]")
             "name=Jane Doe\n");
 
         auto parsed = parser.parse_string(contents);
-        REQUIRE(parsed.has_value());
+        CATCH_REQUIRE(parsed.has_value());
 
         const fly::Json values = std::move(parsed.value());
-        CHECK(values.size() == 1);
-        CHECK(values["section"].size() == 1);
-        CHECK(values["section"]["name"] == "Jane Doe");
+        CATCH_CHECK(values.size() == 1);
+        CATCH_CHECK(values["section"].size() == 1);
+        CATCH_CHECK(values["section"]["name"] == "Jane Doe");
     }
 
-    SECTION("Imbalanced braces on section names cannot be parsed")
+    CATCH_SECTION("Imbalanced braces on section names cannot be parsed")
     {
         const std::string contents1(
             "[section\n"
@@ -213,11 +213,11 @@ TEST_CASE("IniParser", "[parser]")
             "section]\n"
             "name=John Doe\n");
 
-        CHECK_FALSE(parser.parse_string(contents1).has_value());
-        CHECK_FALSE(parser.parse_string(contents2).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents1).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents2).has_value());
     }
 
-    SECTION("Imbalanced quotes on values cannot be parsed")
+    CATCH_SECTION("Imbalanced quotes on values cannot be parsed")
     {
         const std::string contents1(
             "[section]\n"
@@ -242,15 +242,15 @@ TEST_CASE("IniParser", "[parser]")
             "[section]\n"
             "name='John Doe\"\n");
 
-        CHECK_FALSE(parser.parse_string(contents1).has_value());
-        CHECK_FALSE(parser.parse_string(contents2).has_value());
-        CHECK_FALSE(parser.parse_string(contents3).has_value());
-        CHECK_FALSE(parser.parse_string(contents4).has_value());
-        CHECK_FALSE(parser.parse_string(contents5).has_value());
-        CHECK_FALSE(parser.parse_string(contents6).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents1).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents2).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents3).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents4).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents5).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents6).has_value());
     }
 
-    SECTION("Section names and values names cannot be quoted")
+    CATCH_SECTION("Section names and values names cannot be quoted")
     {
         const std::string contents1(
             "[section]\n"
@@ -276,15 +276,15 @@ TEST_CASE("IniParser", "[parser]")
             "\'[section]\'\n"
             "name=John Doe\n");
 
-        CHECK_FALSE(parser.parse_string(contents1).has_value());
-        CHECK_FALSE(parser.parse_string(contents2).has_value());
-        CHECK_FALSE(parser.parse_string(contents3).has_value());
-        CHECK_FALSE(parser.parse_string(contents4).has_value());
-        CHECK_FALSE(parser.parse_string(contents5).has_value());
-        CHECK_FALSE(parser.parse_string(contents6).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents1).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents2).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents3).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents4).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents5).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents6).has_value());
     }
 
-    SECTION("Secondary assignment operators are captured as part of the value")
+    CATCH_SECTION("Secondary assignment operators are captured as part of the value")
     {
         const std::string contents1(
             "[section]\n"
@@ -294,41 +294,41 @@ TEST_CASE("IniParser", "[parser]")
             "name=\"John=Doe\"\n");
 
         auto parsed1 = parser.parse_string(contents1);
-        REQUIRE(parsed1.has_value());
+        CATCH_REQUIRE(parsed1.has_value());
 
         const fly::Json values1 = std::move(parsed1.value());
-        CHECK(values1.size() == 1);
-        CHECK(values1["section"].size() == 1);
-        CHECK(values1["section"]["name"] == "John=Doe");
+        CATCH_CHECK(values1.size() == 1);
+        CATCH_CHECK(values1["section"].size() == 1);
+        CATCH_CHECK(values1["section"]["name"] == "John=Doe");
 
         auto parsed2 = parser.parse_string(contents2);
-        REQUIRE(parsed2.has_value());
+        CATCH_REQUIRE(parsed2.has_value());
 
         const fly::Json values2 = std::move(parsed2.value());
-        CHECK(values2.size() == 1);
-        CHECK(values2["section"].size() == 1);
-        CHECK(values2["section"]["name"] == "John=Doe");
+        CATCH_CHECK(values2.size() == 1);
+        CATCH_CHECK(values2["section"].size() == 1);
+        CATCH_CHECK(values2["section"]["name"] == "John=Doe");
     }
 
-    SECTION("Missing an assignment operator cannot be parsed")
+    CATCH_SECTION("Missing an assignment operator cannot be parsed")
     {
         const std::string contents(
             "[section]\n"
             "name\n");
 
-        CHECK_FALSE(parser.parse_string(contents).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents).has_value());
     }
 
-    SECTION("Empty values cannot be parsed")
+    CATCH_SECTION("Empty values cannot be parsed")
     {
         const std::string contents(
             "[section]\n"
             "name=\n");
 
-        CHECK_FALSE(parser.parse_string(contents).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents).has_value());
     }
 
-    SECTION("Assignments before a section name cannot be parsed")
+    CATCH_SECTION("Assignments before a section name cannot be parsed")
     {
         const std::string contents1(
             "name=John Doe\n"
@@ -342,42 +342,42 @@ TEST_CASE("IniParser", "[parser]")
             "name\n"
             "[section]\n");
 
-        CHECK_FALSE(parser.parse_string(contents1).has_value());
-        CHECK_FALSE(parser.parse_string(contents2).has_value());
-        CHECK_FALSE(parser.parse_string(contents3).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents1).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents2).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents3).has_value());
     }
 
-    SECTION("Section names with invalid JSON string contents cannot be parsed")
+    CATCH_SECTION("Section names with invalid JSON string contents cannot be parsed")
     {
         const std::string contents(
             "[\xff]\n"
             "name=John Doe\n"
             "address=USA");
 
-        CHECK_FALSE(parser.parse_string(contents).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents).has_value());
     }
 
-    SECTION("Value names with invalid JSON string contents cannot be parsed")
+    CATCH_SECTION("Value names with invalid JSON string contents cannot be parsed")
     {
         const std::string contents(
             "[section]\n"
             "\xff=John Doe\n"
             "address=USA");
 
-        CHECK_FALSE(parser.parse_string(contents).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents).has_value());
     }
 
-    SECTION("Values with invalid JSON string contents cannot be parsed")
+    CATCH_SECTION("Values with invalid JSON string contents cannot be parsed")
     {
         const std::string contents(
             "[section]\n"
             "name=John Doe\n"
             "address=\xff");
 
-        CHECK_FALSE(parser.parse_string(contents).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(contents).has_value());
     }
 
-    SECTION("The parser is re-entrant")
+    CATCH_SECTION("The parser is re-entrant")
     {
         const std::string contents(
             "[section]\n"
@@ -387,13 +387,13 @@ TEST_CASE("IniParser", "[parser]")
         for (int i = 0; i < 5; ++i)
         {
             auto parsed = parser.parse_string(contents);
-            REQUIRE(parsed.has_value());
+            CATCH_REQUIRE(parsed.has_value());
 
             const fly::Json values = std::move(parsed.value());
-            CHECK(values.size() == 1);
-            CHECK(values["section"].size() == 2);
-            CHECK(values["section"]["name"] == "John Doe");
-            CHECK(values["section"]["address"] == "USA");
+            CATCH_CHECK(values.size() == 1);
+            CATCH_CHECK(values["section"].size() == 2);
+            CATCH_CHECK(values["section"]["name"] == "John Doe");
+            CATCH_CHECK(values["section"]["address"] == "USA");
         }
     }
 }

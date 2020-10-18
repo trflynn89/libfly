@@ -34,12 +34,12 @@ namespace {
     private:
         ScopedTaskManager() : m_task_manager(std::make_shared<fly::TaskManager>(s_num_workers))
         {
-            REQUIRE(m_task_manager->start());
+            CATCH_REQUIRE(m_task_manager->start());
         }
 
         ~ScopedTaskManager()
         {
-            // Cannot wrap with REQUIRE because the Catch2 framework will have been torn down.
+            // Cannot wrap with CATCH_REQUIRE because the Catch2 framework will have been torn down.
             const bool stopped = m_task_manager->stop();
 
 #if defined(NDEBUG)

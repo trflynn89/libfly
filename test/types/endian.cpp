@@ -67,7 +67,7 @@ void run_test()
             DataType expected = swap(data);
             DataType actual = fly::endian_swap(data);
 
-            CHECK(expected == actual);
+            CATCH_CHECK(expected == actual);
         }
         {
             DataType expected = data;
@@ -78,14 +78,14 @@ void run_test()
                 expected = swap(expected);
             }
 
-            CHECK(expected == actual);
+            CATCH_CHECK(expected == actual);
         }
     }
 }
 
 } // namespace
 
-TEMPLATE_TEST_CASE(
+CATCH_TEMPLATE_TEST_CASE(
     "Endian",
     "[numeric]",
     std::int8_t,
@@ -97,17 +97,17 @@ TEMPLATE_TEST_CASE(
     std::uint32_t,
     std::uint64_t)
 {
-    SECTION("Byte swap to big-endian")
+    CATCH_SECTION("Byte swap to big-endian")
     {
         run_test<TestType, fly::Endian::Big>();
     }
 
-    SECTION("Byte swap to little-endian")
+    CATCH_SECTION("Byte swap to little-endian")
     {
         run_test<TestType, fly::Endian::Little>();
     }
 
-    SECTION("Byte swap to the system's native endianness")
+    CATCH_SECTION("Byte swap to the system's native endianness")
     {
         run_test<TestType, fly::Endian::Native>();
     }

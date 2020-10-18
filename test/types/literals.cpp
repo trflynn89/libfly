@@ -7,488 +7,488 @@
 
 using namespace fly::literals::numeric_literals;
 
-TEST_CASE("Literals", "[numeric]")
+CATCH_TEST_CASE("Literals", "[numeric]")
 {
-    SECTION("Signed 8-bit integer literals")
+    CATCH_SECTION("Signed 8-bit integer literals")
     {
         {
             auto value = 1_i8;
-            CHECK(value == decltype(value)(1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int8_t>));
+            CATCH_CHECK(value == decltype(value)(1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int8_t>));
         }
         {
             auto value = 0b1_i8;
-            CHECK(value == decltype(value)(0b1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int8_t>));
+            CATCH_CHECK(value == decltype(value)(0b1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int8_t>));
         }
         {
             auto value = 0B1_i8;
-            CHECK(value == decltype(value)(0B1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int8_t>));
+            CATCH_CHECK(value == decltype(value)(0B1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int8_t>));
         }
         {
             auto value = 01_i8;
-            CHECK(value == decltype(value)(01));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int8_t>));
+            CATCH_CHECK(value == decltype(value)(01));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int8_t>));
         }
         {
             auto value = 0x1_i8;
-            CHECK(value == decltype(value)(0x1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int8_t>));
+            CATCH_CHECK(value == decltype(value)(0x1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int8_t>));
         }
         {
             auto value = 0X1_i8;
-            CHECK(value == decltype(value)(0X1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int8_t>));
+            CATCH_CHECK(value == decltype(value)(0X1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int8_t>));
         }
         {
             auto value = 1'1'1_i8;
-            CHECK(value == decltype(value)(1'1'1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int8_t>));
+            CATCH_CHECK(value == decltype(value)(1'1'1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int8_t>));
         }
     }
 
-    SECTION("Signed 16-bit integer literals")
+    CATCH_SECTION("Signed 16-bit integer literals")
     {
         {
             auto value = 1_i16;
-            CHECK(value == decltype(value)(1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int16_t>));
+            CATCH_CHECK(value == decltype(value)(1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int16_t>));
         }
         {
             auto value = 0b1_i16;
-            CHECK(value == decltype(value)(0b1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int16_t>));
+            CATCH_CHECK(value == decltype(value)(0b1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int16_t>));
         }
         {
             auto value = 0B1_i16;
-            CHECK(value == decltype(value)(0B1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int16_t>));
+            CATCH_CHECK(value == decltype(value)(0B1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int16_t>));
         }
         {
             auto value = 01_i16;
-            CHECK(value == decltype(value)(01));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int16_t>));
+            CATCH_CHECK(value == decltype(value)(01));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int16_t>));
         }
         {
             auto value = 0x1_i16;
-            CHECK(value == decltype(value)(0x1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int16_t>));
+            CATCH_CHECK(value == decltype(value)(0x1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int16_t>));
         }
         {
             auto value = 0X1_i16;
-            CHECK(value == decltype(value)(0X1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int16_t>));
+            CATCH_CHECK(value == decltype(value)(0X1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int16_t>));
         }
         {
             auto value = 1'1'1_i16;
-            CHECK(value == decltype(value)(1'1'1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int16_t>));
+            CATCH_CHECK(value == decltype(value)(1'1'1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int16_t>));
         }
     }
 
-    SECTION("Signed 32-bit integer literals")
+    CATCH_SECTION("Signed 32-bit integer literals")
     {
         {
             auto value = 1_i32;
-            CHECK(value == decltype(value)(1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int32_t>));
+            CATCH_CHECK(value == decltype(value)(1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int32_t>));
         }
         {
             auto value = 0b1_i32;
-            CHECK(value == decltype(value)(0b1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int32_t>));
+            CATCH_CHECK(value == decltype(value)(0b1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int32_t>));
         }
         {
             auto value = 0B1_i32;
-            CHECK(value == decltype(value)(0B1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int32_t>));
+            CATCH_CHECK(value == decltype(value)(0B1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int32_t>));
         }
         {
             auto value = 01_i32;
-            CHECK(value == decltype(value)(01));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int32_t>));
+            CATCH_CHECK(value == decltype(value)(01));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int32_t>));
         }
         {
             auto value = 0x1_i32;
-            CHECK(value == decltype(value)(0x1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int32_t>));
+            CATCH_CHECK(value == decltype(value)(0x1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int32_t>));
         }
         {
             auto value = 0X1_i32;
-            CHECK(value == decltype(value)(0X1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int32_t>));
+            CATCH_CHECK(value == decltype(value)(0X1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int32_t>));
         }
         {
             auto value = 1'1'1_i32;
-            CHECK(value == decltype(value)(1'1'1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int32_t>));
+            CATCH_CHECK(value == decltype(value)(1'1'1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int32_t>));
         }
     }
 
-    SECTION("Signed 64-bit integer literals")
+    CATCH_SECTION("Signed 64-bit integer literals")
     {
         {
             auto value = 1_i64;
-            CHECK(value == decltype(value)(1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int64_t>));
+            CATCH_CHECK(value == decltype(value)(1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int64_t>));
         }
         {
             auto value = 0b1_i64;
-            CHECK(value == decltype(value)(0b1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int64_t>));
+            CATCH_CHECK(value == decltype(value)(0b1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int64_t>));
         }
         {
             auto value = 0B1_i64;
-            CHECK(value == decltype(value)(0B1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int64_t>));
+            CATCH_CHECK(value == decltype(value)(0B1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int64_t>));
         }
         {
             auto value = 01_i64;
-            CHECK(value == decltype(value)(01));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int64_t>));
+            CATCH_CHECK(value == decltype(value)(01));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int64_t>));
         }
         {
             auto value = 0x1_i64;
-            CHECK(value == decltype(value)(0x1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int64_t>));
+            CATCH_CHECK(value == decltype(value)(0x1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int64_t>));
         }
         {
             auto value = 0X1_i64;
-            CHECK(value == decltype(value)(0X1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int64_t>));
+            CATCH_CHECK(value == decltype(value)(0X1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int64_t>));
         }
         {
             auto value = 1'1'1_i64;
-            CHECK(value == decltype(value)(1'1'1));
-            CHECK(std::is_signed_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::int64_t>));
+            CATCH_CHECK(value == decltype(value)(1'1'1));
+            CATCH_CHECK(std::is_signed_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::int64_t>));
         }
     }
 
-    SECTION("Unsigned 8B-bit integer literals")
+    CATCH_SECTION("Unsigned 8B-bit integer literals")
     {
         {
             auto value = 1_u8;
-            CHECK(value == decltype(value)(1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint8_t>));
+            CATCH_CHECK(value == decltype(value)(1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint8_t>));
         }
         {
             auto value = 0b1_u8;
-            CHECK(value == decltype(value)(0b1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint8_t>));
+            CATCH_CHECK(value == decltype(value)(0b1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint8_t>));
         }
         {
             auto value = 0B1_u8;
-            CHECK(value == decltype(value)(0B1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint8_t>));
+            CATCH_CHECK(value == decltype(value)(0B1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint8_t>));
         }
         {
             auto value = 01_u8;
-            CHECK(value == decltype(value)(01));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint8_t>));
+            CATCH_CHECK(value == decltype(value)(01));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint8_t>));
         }
         {
             auto value = 0x1_u8;
-            CHECK(value == decltype(value)(0x1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint8_t>));
+            CATCH_CHECK(value == decltype(value)(0x1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint8_t>));
         }
         {
             auto value = 0X1_u8;
-            CHECK(value == decltype(value)(0X1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint8_t>));
+            CATCH_CHECK(value == decltype(value)(0X1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint8_t>));
         }
         {
             auto value = 1'1'1_u8;
-            CHECK(value == decltype(value)(1'1'1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint8_t>));
+            CATCH_CHECK(value == decltype(value)(1'1'1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint8_t>));
         }
     }
 
-    SECTION("Unsigned 16-bit integer literals")
+    CATCH_SECTION("Unsigned 16-bit integer literals")
     {
         {
             auto value = 1_u16;
-            CHECK(value == decltype(value)(1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint16_t>));
+            CATCH_CHECK(value == decltype(value)(1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint16_t>));
         }
         {
             auto value = 0b1_u16;
-            CHECK(value == decltype(value)(0b1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint16_t>));
+            CATCH_CHECK(value == decltype(value)(0b1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint16_t>));
         }
         {
             auto value = 0B1_u16;
-            CHECK(value == decltype(value)(0B1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint16_t>));
+            CATCH_CHECK(value == decltype(value)(0B1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint16_t>));
         }
         {
             auto value = 01_u16;
-            CHECK(value == decltype(value)(01));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint16_t>));
+            CATCH_CHECK(value == decltype(value)(01));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint16_t>));
         }
         {
             auto value = 0x1_u16;
-            CHECK(value == decltype(value)(0x1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint16_t>));
+            CATCH_CHECK(value == decltype(value)(0x1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint16_t>));
         }
         {
             auto value = 0X1_u16;
-            CHECK(value == decltype(value)(0X1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint16_t>));
+            CATCH_CHECK(value == decltype(value)(0X1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint16_t>));
         }
         {
             auto value = 1'1'1_u16;
-            CHECK(value == decltype(value)(1'1'1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint16_t>));
+            CATCH_CHECK(value == decltype(value)(1'1'1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint16_t>));
         }
     }
 
-    SECTION("Unsigned 32-bit integer literals")
+    CATCH_SECTION("Unsigned 32-bit integer literals")
     {
         {
             auto value = 1_u32;
-            CHECK(value == decltype(value)(1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint32_t>));
+            CATCH_CHECK(value == decltype(value)(1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint32_t>));
         }
         {
             auto value = 0b1_u32;
-            CHECK(value == decltype(value)(0b1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint32_t>));
+            CATCH_CHECK(value == decltype(value)(0b1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint32_t>));
         }
         {
             auto value = 0B1_u32;
-            CHECK(value == decltype(value)(0B1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint32_t>));
+            CATCH_CHECK(value == decltype(value)(0B1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint32_t>));
         }
         {
             auto value = 01_u32;
-            CHECK(value == decltype(value)(01));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint32_t>));
+            CATCH_CHECK(value == decltype(value)(01));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint32_t>));
         }
         {
             auto value = 0x1_u32;
-            CHECK(value == decltype(value)(0x1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint32_t>));
+            CATCH_CHECK(value == decltype(value)(0x1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint32_t>));
         }
         {
             auto value = 0X1_u32;
-            CHECK(value == decltype(value)(0X1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint32_t>));
+            CATCH_CHECK(value == decltype(value)(0X1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint32_t>));
         }
         {
             auto value = 1'1'1_u32;
-            CHECK(value == decltype(value)(1'1'1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint32_t>));
+            CATCH_CHECK(value == decltype(value)(1'1'1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint32_t>));
         }
     }
 
-    SECTION("Unsigned 64-bit integer literals")
+    CATCH_SECTION("Unsigned 64-bit integer literals")
     {
         {
             auto value = 1_u64;
-            CHECK(value == decltype(value)(1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint64_t>));
+            CATCH_CHECK(value == decltype(value)(1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint64_t>));
         }
         {
             auto value = 0b1_u64;
-            CHECK(value == decltype(value)(0b1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint64_t>));
+            CATCH_CHECK(value == decltype(value)(0b1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint64_t>));
         }
         {
             auto value = 0B1_u64;
-            CHECK(value == decltype(value)(0B1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint64_t>));
+            CATCH_CHECK(value == decltype(value)(0B1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint64_t>));
         }
         {
             auto value = 01_u64;
-            CHECK(value == decltype(value)(01));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint64_t>));
+            CATCH_CHECK(value == decltype(value)(01));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint64_t>));
         }
         {
             auto value = 0x1_u64;
-            CHECK(value == decltype(value)(0x1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint64_t>));
+            CATCH_CHECK(value == decltype(value)(0x1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint64_t>));
         }
         {
             auto value = 0X1_u64;
-            CHECK(value == decltype(value)(0X1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint64_t>));
+            CATCH_CHECK(value == decltype(value)(0X1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint64_t>));
         }
         {
             auto value = 1'1'1_u64;
-            CHECK(value == decltype(value)(1'1'1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::uint64_t>));
+            CATCH_CHECK(value == decltype(value)(1'1'1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::uint64_t>));
         }
     }
 
-    SECTION("Unsigned maximum-size integer literal")
+    CATCH_SECTION("Unsigned maximum-size integer literal")
     {
         {
             auto value = 1_zu;
-            CHECK(value == decltype(value)(1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::size_t>));
+            CATCH_CHECK(value == decltype(value)(1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::size_t>));
         }
         {
             auto value = 0b1_zu;
-            CHECK(value == decltype(value)(0b1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::size_t>));
+            CATCH_CHECK(value == decltype(value)(0b1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::size_t>));
         }
         {
             auto value = 0B1_zu;
-            CHECK(value == decltype(value)(0B1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::size_t>));
+            CATCH_CHECK(value == decltype(value)(0B1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::size_t>));
         }
         {
             auto value = 01_zu;
-            CHECK(value == decltype(value)(01));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::size_t>));
+            CATCH_CHECK(value == decltype(value)(01));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::size_t>));
         }
         {
             auto value = 0x1_zu;
-            CHECK(value == decltype(value)(0x1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::size_t>));
+            CATCH_CHECK(value == decltype(value)(0x1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::size_t>));
         }
         {
             auto value = 0X1_zu;
-            CHECK(value == decltype(value)(0X1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::size_t>));
+            CATCH_CHECK(value == decltype(value)(0X1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::size_t>));
         }
         {
             auto value = 1'1'1_zu;
-            CHECK(value == decltype(value)(1'1'1));
-            CHECK(std::is_unsigned_v<decltype(value)>);
-            CHECK(std::is_integral_v<decltype(value)>);
-            CHECK((std::is_same_v<decltype(value), std::size_t>));
+            CATCH_CHECK(value == decltype(value)(1'1'1));
+            CATCH_CHECK(std::is_unsigned_v<decltype(value)>);
+            CATCH_CHECK(std::is_integral_v<decltype(value)>);
+            CATCH_CHECK((std::is_same_v<decltype(value), std::size_t>));
         }
     }
 
 #if 0
 
-    SECTION("CompileFailures")
+    CATCH_SECTION("CompileFailures")
     {
         // Of course, expected compile failures cannot be tested in a unit test
         // binary. So these are here for manual testing.

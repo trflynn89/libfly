@@ -13,7 +13,7 @@
 
 using namespace fly::literals::numeric_literals;
 
-TEMPLATE_PRODUCT_TEST_CASE(
+CATCH_TEMPLATE_PRODUCT_TEST_CASE(
     "ConcurrentContainer",
     "[concurrency]",
     (fly::ConcurrentQueue, fly::ConcurrentStack),
@@ -24,29 +24,29 @@ TEMPLATE_PRODUCT_TEST_CASE(
 
     TestType container;
 
-    SECTION("Queues must be empty upon creation")
+    CATCH_SECTION("Queues must be empty upon creation")
     {
-        CHECK(container.empty());
-        CHECK(container.size() == 0);
+        CATCH_CHECK(container.empty());
+        CATCH_CHECK(container.size() == 0);
     }
 
-    SECTION("Cannot pop from an empty queue")
+    CATCH_SECTION("Cannot pop from an empty queue")
     {
         value_type obj1;
         value_type obj2(1_u32);
 
         // Make sure pop is initially invalid.
-        REQUIRE_FALSE(container.pop(obj1, std::chrono::milliseconds(0)));
+        CATCH_REQUIRE_FALSE(container.pop(obj1, std::chrono::milliseconds(0)));
 
         // Push an item onto the queue and immediately pop it.
         container.push(std::move(obj2));
-        REQUIRE(container.pop(obj1, std::chrono::milliseconds(0)));
+        CATCH_REQUIRE(container.pop(obj1, std::chrono::milliseconds(0)));
 
         // Make sure popping an item from the no-longer non-empty queue is invalid.
-        REQUIRE_FALSE(container.pop(obj1, std::chrono::milliseconds(0)));
+        CATCH_REQUIRE_FALSE(container.pop(obj1, std::chrono::milliseconds(0)));
     }
 
-    SECTION("Push onto and pop from a queue on a single thread")
+    CATCH_SECTION("Push onto and pop from a queue on a single thread")
     {
         size_type size = 0;
 
@@ -57,16 +57,16 @@ TEMPLATE_PRODUCT_TEST_CASE(
         auto push = [&container](value_type object, size_type expected_size) {
             container.push(std::move(object));
 
-            CHECK(container.size() == expected_size);
-            CHECK_FALSE(container.empty());
+            CATCH_CHECK(container.size() == expected_size);
+            CATCH_CHECK_FALSE(container.empty());
         };
 
         auto pop = [&container](value_type expected_object, size_type expected_size) {
             value_type object;
 
-            REQUIRE(container.pop(object, std::chrono::milliseconds(0)));
-            CHECK(container.size() == expected_size);
-            CHECK(object == expected_object);
+            CATCH_REQUIRE(container.pop(object, std::chrono::milliseconds(0)));
+            CATCH_CHECK(container.size() == expected_size);
+            CATCH_CHECK(object == expected_object);
         };
 
         push(obj1, ++size);
@@ -89,7 +89,7 @@ TEMPLATE_PRODUCT_TEST_CASE(
         }
     }
 
-    SECTION("Push onto and pop from a queue on multiple threads")
+    CATCH_SECTION("Push onto and pop from a queue on multiple threads")
     {
         auto run_multi_threaded_test = [&container](std::size_t writers, std::size_t readers) {
             auto writer_thread = [&container]() -> std::size_t {
@@ -141,7 +141,7 @@ TEMPLATE_PRODUCT_TEST_CASE(
 
             for (auto &future : writer_futures)
             {
-                REQUIRE(future.valid());
+                CATCH_REQUIRE(future.valid());
                 writes += future.get();
             }
 
@@ -149,11 +149,11 @@ TEMPLATE_PRODUCT_TEST_CASE(
 
             for (auto &future : reader_futures)
             {
-                REQUIRE(future.valid());
+                CATCH_REQUIRE(future.valid());
                 reads += future.get();
             }
 
-            CHECK(writes == reads);
+            CATCH_CHECK(writes == reads);
         };
 
         run_multi_threaded_test(1, 1);
@@ -162,7 +162,7 @@ TEMPLATE_PRODUCT_TEST_CASE(
         run_multi_threaded_test(4, 4);
     }
 
-    SECTION("Pop from a queue while blocking indefinitely")
+    CATCH_SECTION("Pop from a queue while blocking indefinitely")
     {
         auto infinite_wait_thread = [&container]() -> value_type {
             value_type value;
@@ -176,12 +176,12 @@ TEMPLATE_PRODUCT_TEST_CASE(
         std::future<value_type> future = std::async(std::launch::async, infinite_wait_thread);
 
         std::future_status status = future.wait_for(std::chrono::milliseconds(1));
-        REQUIRE(status == std::future_status::timeout);
+        CATCH_REQUIRE(status == std::future_status::timeout);
 
         container.push(std::move(value_type(obj)));
 
         status = future.wait_for(std::chrono::milliseconds(10));
-        REQUIRE(status == std::future_status::ready);
-        CHECK(future.get() == obj);
+        CATCH_REQUIRE(status == std::future_status::ready);
+        CATCH_CHECK(future.get() == obj);
     }
 }

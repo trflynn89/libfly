@@ -98,7 +98,7 @@ std::uintmax_t log_size(const std::string &message)
 
 } // namespace
 
-TEST_CASE("FileLogger", "[logger]")
+CATCH_TEST_CASE("FileLogger", "[logger]")
 {
     auto logger_config = std::make_shared<MutableLoggerConfig>();
     auto coder_config = std::make_shared<MutableCoderConfig>();
@@ -106,23 +106,23 @@ TEST_CASE("FileLogger", "[logger]")
 
     auto logger = fly::Logger::create_file_logger("test", logger_config, coder_config, path());
 
-    SECTION("Valid logger file paths should be created after creating logger")
+    CATCH_SECTION("Valid logger file paths should be created after creating logger")
     {
         std::filesystem::path log_file = find_log_file(path);
-        CHECK(fly::String::starts_with(log_file.string(), path().string()));
+        CATCH_CHECK(fly::String::starts_with(log_file.string(), path().string()));
 
-        REQUIRE(std::filesystem::exists(log_file));
+        CATCH_REQUIRE(std::filesystem::exists(log_file));
     }
 
-    SECTION("Cannot start logger with a bad file path")
+    CATCH_SECTION("Cannot start logger with a bad file path")
     {
         logger = fly::Logger::create_file_logger("test", logger_config, coder_config, __FILE__);
-        CHECK(logger == nullptr);
+        CATCH_CHECK(logger == nullptr);
     }
 
 #if defined(FLY_LINUX)
 
-    SECTION("Writing to log file fails due to ::write() system call")
+    CATCH_SECTION("Writing to log file fails due to ::write() system call")
     {
         fly::test::MockSystem mock(fly::test::MockCall::Write);
 
@@ -131,56 +131,56 @@ TEST_CASE("FileLogger", "[logger]")
 
         std::filesystem::path log_file = find_log_file(path);
         const std::string contents = fly::test::PathUtil::read_file(log_file);
-        REQUIRE(contents.empty());
+        CATCH_REQUIRE(contents.empty());
     }
 
 #endif
 
-    SECTION("Debug log points")
+    CATCH_SECTION("Debug log points")
     {
         logger->debug("Debug Log");
 
         std::filesystem::path log_file = find_log_file(path);
         const std::string contents = fly::test::PathUtil::read_file(log_file);
-        REQUIRE_FALSE(contents.empty());
+        CATCH_REQUIRE_FALSE(contents.empty());
 
-        CHECK(contents.find("Debug Log") != std::string::npos);
+        CATCH_CHECK(contents.find("Debug Log") != std::string::npos);
     }
 
-    SECTION("Informational log points")
+    CATCH_SECTION("Informational log points")
     {
         logger->info("Info Log");
 
         std::filesystem::path log_file = find_log_file(path);
         const std::string contents = fly::test::PathUtil::read_file(log_file);
-        REQUIRE_FALSE(contents.empty());
+        CATCH_REQUIRE_FALSE(contents.empty());
 
-        CHECK(contents.find("Info Log") != std::string::npos);
+        CATCH_CHECK(contents.find("Info Log") != std::string::npos);
     }
 
-    SECTION("Warning log points")
+    CATCH_SECTION("Warning log points")
     {
         logger->warn("Warning Log");
 
         std::filesystem::path log_file = find_log_file(path);
         const std::string contents = fly::test::PathUtil::read_file(log_file);
-        REQUIRE_FALSE(contents.empty());
+        CATCH_REQUIRE_FALSE(contents.empty());
 
-        CHECK(contents.find("Warning Log") != std::string::npos);
+        CATCH_CHECK(contents.find("Warning Log") != std::string::npos);
     }
 
-    SECTION("Error log points")
+    CATCH_SECTION("Error log points")
     {
         logger->error("Error Log");
 
         std::filesystem::path log_file = find_log_file(path);
         const std::string contents = fly::test::PathUtil::read_file(log_file);
-        REQUIRE_FALSE(contents.empty());
+        CATCH_REQUIRE_FALSE(contents.empty());
 
-        CHECK(contents.find("Error Log") != std::string::npos);
+        CATCH_CHECK(contents.find("Error Log") != std::string::npos);
     }
 
-    SECTION("Logger should compress log files by default")
+    CATCH_SECTION("Logger should compress log files by default")
     {
         std::filesystem::path log_file = find_log_file(path);
 
@@ -198,22 +198,22 @@ TEST_CASE("FileLogger", "[logger]")
             logger->debug("%s", random);
         }
 
-        CHECK(log_file != find_log_file(path));
+        CATCH_CHECK(log_file != find_log_file(path));
 
         std::filesystem::path compressed_path = log_file;
         compressed_path.replace_extension(".log.enc");
 
-        REQUIRE_FALSE(std::filesystem::exists(log_file));
-        REQUIRE(std::filesystem::exists(compressed_path));
+        CATCH_REQUIRE_FALSE(std::filesystem::exists(log_file));
+        CATCH_REQUIRE(std::filesystem::exists(compressed_path));
 
         fly::HuffmanDecoder decoder;
-        REQUIRE(decoder.decode_file(compressed_path, log_file));
+        CATCH_REQUIRE(decoder.decode_file(compressed_path, log_file));
 
         std::uintmax_t actual_size = std::filesystem::file_size(log_file);
-        CHECK(actual_size >= max_message_size);
+        CATCH_CHECK(actual_size >= max_message_size);
     }
 
-    SECTION("When compression is disabled, logger should produce uncompressed logs")
+    CATCH_SECTION("When compression is disabled, logger should produce uncompressed logs")
     {
         logger_config->disable_compression();
 
@@ -233,17 +233,17 @@ TEST_CASE("FileLogger", "[logger]")
             logger->debug("%s", random);
         }
 
-        CHECK(log_file != find_log_file(path));
-        REQUIRE(std::filesystem::exists(log_file));
+        CATCH_CHECK(log_file != find_log_file(path));
+        CATCH_REQUIRE(std::filesystem::exists(log_file));
 
         fly::HuffmanDecoder decoder;
-        CHECK_FALSE(decoder.decode_file(log_file, path.file()));
+        CATCH_CHECK_FALSE(decoder.decode_file(log_file, path.file()));
 
         std::uintmax_t actual_size = std::filesystem::file_size(log_file);
-        CHECK(actual_size >= max_message_size);
+        CATCH_CHECK(actual_size >= max_message_size);
     }
 
-    SECTION("When compression fails, logger should produce uncompressed logs")
+    CATCH_SECTION("When compression fails, logger should produce uncompressed logs")
     {
         coder_config->invalidate_max_code_length();
 
@@ -263,13 +263,13 @@ TEST_CASE("FileLogger", "[logger]")
             logger->debug("%s", random);
         }
 
-        CHECK(log_file != find_log_file(path));
-        REQUIRE(std::filesystem::exists(log_file));
+        CATCH_CHECK(log_file != find_log_file(path));
+        CATCH_REQUIRE(std::filesystem::exists(log_file));
 
         fly::HuffmanDecoder decoder;
-        CHECK_FALSE(decoder.decode_file(log_file, path.file()));
+        CATCH_CHECK_FALSE(decoder.decode_file(log_file, path.file()));
 
         std::uintmax_t actual_size = std::filesystem::file_size(log_file);
-        CHECK(actual_size >= max_message_size);
+        CATCH_CHECK(actual_size >= max_message_size);
     }
 }

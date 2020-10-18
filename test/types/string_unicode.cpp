@@ -6,7 +6,7 @@
 #include <optional>
 #include <vector>
 
-TEMPLATE_TEST_CASE(
+CATCH_TEMPLATE_TEST_CASE(
     "BasicStringUnicode",
     "[string]",
     std::string,
@@ -20,38 +20,38 @@ TEMPLATE_TEST_CASE(
     using codepoint_type = typename BasicString::codepoint_type;
 
     auto escape_should_fail = [](StringType &&test, int line) {
-        CAPTURE(test);
-        CAPTURE(line);
+        CATCH_CAPTURE(test);
+        CATCH_CAPTURE(line);
 
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        CHECK_FALSE(BasicString::escape_codepoint(begin, end));
-        CHECK_FALSE(BasicString::escape_all_codepoints(test));
+        CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
+        CATCH_CHECK_FALSE(BasicString::escape_all_codepoints(test));
     };
 
     auto encode_should_fail =
         [&escape_should_fail](StringType &&test, codepoint_type codepoint, int line) {
             escape_should_fail(std::move(test), line);
-            CHECK_FALSE(BasicString::encode_codepoint(codepoint));
+            CATCH_CHECK_FALSE(BasicString::encode_codepoint(codepoint));
         };
 
     auto unescape_should_fail = [](StringType &&test, int line, bool whole_string = true) {
-        CAPTURE(test);
-        CAPTURE(line);
+        CATCH_CAPTURE(test);
+        CATCH_CAPTURE(line);
 
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        CHECK_FALSE(BasicString::unescape_codepoint(begin, end));
+        CATCH_CHECK_FALSE(BasicString::unescape_codepoint(begin, end));
 
         if (whole_string)
         {
-            CHECK_FALSE(BasicString::unescape_all_codepoints(test));
+            CATCH_CHECK_FALSE(BasicString::unescape_all_codepoints(test));
         }
     };
 
-    SECTION("Empty strings as input")
+    CATCH_SECTION("Empty strings as input")
     {
         StringType test;
         std::optional<StringType> actual;
@@ -59,34 +59,34 @@ TEMPLATE_TEST_CASE(
         auto begin = test.cbegin();
         const auto end = test.cend();
 
-        CHECK_FALSE(BasicString::decode_codepoint(begin, end));
+        CATCH_CHECK_FALSE(BasicString::decode_codepoint(begin, end));
 
         actual = BasicString::escape_all_codepoints(test);
-        CHECK(actual == test);
+        CATCH_CHECK(actual == test);
 
         begin = test.cbegin();
-        CHECK_FALSE(BasicString::escape_codepoint(begin, end));
+        CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
 
         actual = BasicString::unescape_all_codepoints(test);
-        CHECK(actual == test);
+        CATCH_CHECK(actual == test);
 
         begin = test.cbegin();
-        CHECK_FALSE(BasicString::unescape_codepoint(begin, end));
+        CATCH_CHECK_FALSE(BasicString::unescape_codepoint(begin, end));
     }
 
-    SECTION("Past-the-end iterators as input")
+    CATCH_SECTION("Past-the-end iterators as input")
     {
         StringType test;
 
         auto begin = test.cend();
         const auto end = test.cend();
 
-        CHECK_FALSE(BasicString::decode_codepoint(begin, end));
-        CHECK_FALSE(BasicString::escape_codepoint(begin, end));
-        CHECK_FALSE(BasicString::unescape_codepoint(begin, end));
+        CATCH_CHECK_FALSE(BasicString::decode_codepoint(begin, end));
+        CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
+        CATCH_CHECK_FALSE(BasicString::unescape_codepoint(begin, end));
     }
 
-    SECTION("Not enough data to encode")
+    CATCH_SECTION("Not enough data to encode")
     {
         if constexpr (sizeof(char_type) == 1)
         {
@@ -111,11 +111,11 @@ TEMPLATE_TEST_CASE(
             auto begin = test.cend();
             const auto end = test.cend();
 
-            CHECK_FALSE(BasicString::escape_codepoint(begin, end));
+            CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
         }
     }
 
-    SECTION("Not enough data to decode")
+    CATCH_SECTION("Not enough data to decode")
     {
         unescape_should_fail(FLY_STR(char_type, "\\u"), __LINE__);
         unescape_should_fail(FLY_STR(char_type, "\\u0"), __LINE__);
@@ -139,20 +139,20 @@ TEMPLATE_TEST_CASE(
 
     if constexpr (sizeof(char_type) == 1)
     {
-        SECTION("UTF-8")
+        CATCH_SECTION("UTF-8")
         {
-            SECTION("Invalid leading byte")
+            CATCH_SECTION("Invalid leading byte")
             {
                 StringType test("\xff");
 
                 auto begin = test.cbegin();
                 const auto end = test.cend();
 
-                CHECK_FALSE(BasicString::escape_codepoint(begin, end));
-                CHECK_FALSE(BasicString::escape_all_codepoints(test));
+                CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
+                CATCH_CHECK_FALSE(BasicString::escape_all_codepoints(test));
             }
 
-            SECTION("Invalid continuation byte")
+            CATCH_SECTION("Invalid continuation byte")
             {
                 // Second byte of U+1f355 masked with 0b0011'1111.
                 escape_should_fail("\xf0\x1f\x8d\x9f", __LINE__);
@@ -164,7 +164,7 @@ TEMPLATE_TEST_CASE(
                 escape_should_fail("\xf0\x9f\x8d\x1f", __LINE__);
             }
 
-            SECTION("Overlong encoding")
+            CATCH_SECTION("Overlong encoding")
             {
                 // U+0021 2-byte overlong encoding.
                 escape_should_fail("\xc0\xa1", __LINE__);
@@ -180,9 +180,9 @@ TEMPLATE_TEST_CASE(
 
     if constexpr (sizeof(char_type) == 2)
     {
-        SECTION("UTF-16")
+        CATCH_SECTION("UTF-16")
         {
-            SECTION("Invalid surrogates")
+            CATCH_SECTION("Invalid surrogates")
             {
                 // Low surrogate only.
                 for (char_type ch = 0xdc00; ch <= 0xdfff; ++ch)
@@ -216,9 +216,9 @@ TEMPLATE_TEST_CASE(
         }
     }
 
-    SECTION("Invalid codepoints")
+    CATCH_SECTION("Invalid codepoints")
     {
-        SECTION("Reserved codepoints")
+        CATCH_SECTION("Reserved codepoints")
         {
             for (codepoint_type ch = 0xd800; ch <= 0xdfff; ++ch)
             {
@@ -240,7 +240,7 @@ TEMPLATE_TEST_CASE(
             }
         }
 
-        SECTION("Out-of-range codepoints")
+        CATCH_SECTION("Out-of-range codepoints")
         {
             // Iterating all the way to numeric_limits<char_type>::max() takes way too long.
             for (codepoint_type ch = 0x110000; ch <= 0x1100ff; ++ch)
@@ -273,40 +273,40 @@ TEMPLATE_TEST_CASE(
         }
     }
 
-    SECTION("ASCII")
+    CATCH_SECTION("ASCII")
     {
         auto encoded_to = [](codepoint_type ch, StringType &&expected) {
-            CAPTURE(ch);
+            CATCH_CAPTURE(ch);
 
             const StringType test(1, static_cast<char_type>(ch));
             std::optional<StringType> actual;
 
             actual = BasicString::encode_codepoint(ch);
-            CHECK(actual == test);
+            CATCH_CHECK(actual == test);
 
             {
                 auto begin = test.cbegin();
                 const auto end = test.cend();
 
                 actual = BasicString::template escape_codepoint<'u'>(begin, end);
-                CHECK(actual == expected);
+                CATCH_CHECK(actual == expected);
 
                 actual = BasicString::template escape_all_codepoints<'u'>(test);
-                CHECK(actual == expected);
+                CATCH_CHECK(actual == expected);
             }
             {
                 auto begin = test.cbegin();
                 const auto end = test.cend();
 
                 actual = BasicString::template escape_codepoint<'U'>(begin, end);
-                CHECK(actual == expected);
+                CATCH_CHECK(actual == expected);
 
                 actual = BasicString::template escape_all_codepoints<'U'>(test);
-                CHECK(actual == expected);
+                CATCH_CHECK(actual == expected);
             }
         };
 
-        SECTION("Printable ASCII never encoded")
+        CATCH_SECTION("Printable ASCII never encoded")
         {
             for (codepoint_type ch = 0x20; ch < 0x7f; ++ch)
             {
@@ -315,7 +315,7 @@ TEMPLATE_TEST_CASE(
             }
         }
 
-        SECTION("Non-printable ASCII always encoded")
+        CATCH_SECTION("Non-printable ASCII always encoded")
         {
             for (codepoint_type ch = 0; ch < 0x20; ++ch)
             {
@@ -330,29 +330,29 @@ TEMPLATE_TEST_CASE(
         }
     }
 
-    SECTION("Non-ASCII")
+    CATCH_SECTION("Non-ASCII")
     {
         auto escaped_to =
             [](StringType &&test, StringType &&expected, auto prefix, bool one_char = true) {
-                CAPTURE(test);
+                CATCH_CAPTURE(test);
 
                 auto begin = test.cbegin();
                 const auto end = test.cend();
-                CAPTURE(std::distance(begin, end));
+                CATCH_CAPTURE(std::distance(begin, end));
 
                 std::optional<StringType> actual;
 
                 if (one_char)
                 {
                     actual = BasicString::template escape_codepoint<prefix()>(begin, end);
-                    CHECK(actual == expected);
+                    CATCH_CHECK(actual == expected);
                 }
 
                 actual = BasicString::template escape_all_codepoints<prefix()>(test);
-                CHECK(actual == expected);
+                CATCH_CHECK(actual == expected);
             };
 
-        SECTION("Escape non-ASCII with 'u'")
+        CATCH_SECTION("Escape non-ASCII with 'u'")
         {
             auto u = []() constexpr->char
             {
@@ -378,7 +378,7 @@ TEMPLATE_TEST_CASE(
                 false);
         }
 
-        SECTION("Escape non-ASCII with 'U'")
+        CATCH_SECTION("Escape non-ASCII with 'U'")
         {
             auto u = []() constexpr->char
             {
@@ -405,22 +405,22 @@ TEMPLATE_TEST_CASE(
         }
     }
 
-    SECTION("Invalid escape sequences")
+    CATCH_SECTION("Invalid escape sequences")
     {
-        SECTION("Non-Unicode escape sequences")
+        CATCH_SECTION("Non-Unicode escape sequences")
         {
             unescape_should_fail(FLY_STR(char_type, "f"), __LINE__, false);
             unescape_should_fail(FLY_STR(char_type, "\\f"), __LINE__, false);
         }
 
-        SECTION("Non-hexadecimal escape sequences")
+        CATCH_SECTION("Non-hexadecimal escape sequences")
         {
             unescape_should_fail(FLY_STR(char_type, "\\u000z"), __LINE__);
             unescape_should_fail(FLY_STR(char_type, "\\ud800\\u000z"), __LINE__);
             unescape_should_fail(FLY_STR(char_type, "\\U0000000z"), __LINE__);
         }
 
-        SECTION("Invalid surrogates")
+        CATCH_SECTION("Invalid surrogates")
         {
             // Low surrogate only.
             for (codepoint_type ch = 0xdc00; ch <= 0xdfff; ++ch)
@@ -459,10 +459,10 @@ TEMPLATE_TEST_CASE(
         }
     }
 
-    SECTION("Valid escape sequences")
+    CATCH_SECTION("Valid escape sequences")
     {
         auto unescaped_to = [](StringType &&test, StringType &&expected, bool one_char = true) {
-            CAPTURE(test);
+            CATCH_CAPTURE(test);
 
             auto begin = test.cbegin();
             const auto end = test.cend();
@@ -472,14 +472,14 @@ TEMPLATE_TEST_CASE(
             if (one_char)
             {
                 actual = BasicString::unescape_codepoint(begin, end);
-                CHECK(actual == expected);
+                CATCH_CHECK(actual == expected);
             }
 
             actual = BasicString::unescape_all_codepoints(test);
-            CHECK(actual == expected);
+            CATCH_CHECK(actual == expected);
         };
 
-        SECTION("Single escaped codepoint")
+        CATCH_SECTION("Single escaped codepoint")
         {
             unescaped_to(FLY_STR(char_type, "\\u0040"), FLY_STR(char_type, "\u0040"));
             unescaped_to(FLY_STR(char_type, "\\u007a"), FLY_STR(char_type, "\u007a"));
@@ -501,7 +501,7 @@ TEMPLATE_TEST_CASE(
                 false);
         }
 
-        SECTION("Escaped surrogate pairs")
+        CATCH_SECTION("Escaped surrogate pairs")
         {
             unescaped_to(FLY_STR(char_type, "\\ud800\\udc00"), FLY_STR(char_type, "\U00010000"));
             unescaped_to(FLY_STR(char_type, "\\ud803\\ude6d"), FLY_STR(char_type, "\U00010e6d"));
@@ -514,7 +514,7 @@ TEMPLATE_TEST_CASE(
                 false);
         }
 
-        SECTION("Long form escaped codepoint")
+        CATCH_SECTION("Long form escaped codepoint")
         {
             unescaped_to(FLY_STR(char_type, "\\U00010000"), FLY_STR(char_type, "\U00010000"));
             unescaped_to(FLY_STR(char_type, "\\U00010e6d"), FLY_STR(char_type, "\U00010e6d"));
@@ -536,24 +536,24 @@ TEMPLATE_TEST_CASE(
         // supports up to 4-byte UTF-8 sequences (Unicode planes 1 - 16). The 5- and 6- byte
         // sequences indeed fail, but not for the reasons the stress test expects. See:
         // https://unicode.org/mail-arch/unicode-ml/Archives-Old/UML018/0332.html
-        SECTION("Markus Kuhn UTF-8 decoder capability and stress test")
+        CATCH_SECTION("Markus Kuhn UTF-8 decoder capability and stress test")
         {
             auto validate_pass = [](StringType &&test, codepoint_type expected, int line) {
-                CAPTURE(test);
-                CAPTURE(line);
+                CATCH_CAPTURE(test);
+                CATCH_CAPTURE(line);
 
                 auto it = test.cbegin();
                 const auto end = test.cend();
 
                 std::optional<codepoint_type> actual = BasicString::decode_codepoint(it, end);
-                CHECK(actual == expected);
+                CATCH_CHECK(actual == expected);
             };
 
             auto validate_pass_all = [](StringType &&test,
                                         std::vector<codepoint_type> expected,
                                         int line) {
-                CAPTURE(test);
-                CAPTURE(line);
+                CATCH_CAPTURE(test);
+                CATCH_CAPTURE(line);
 
                 std::size_t index = 0;
 
@@ -563,16 +563,16 @@ TEMPLATE_TEST_CASE(
                 for (; (it != end) && (index < expected.size()); ++index)
                 {
                     std::optional<codepoint_type> actual = BasicString::decode_codepoint(it, end);
-                    CHECK(actual == expected[index]);
+                    CATCH_CHECK(actual == expected[index]);
                 }
 
-                CHECK(index == expected.size());
-                CHECK(it == end);
+                CATCH_CHECK(index == expected.size());
+                CATCH_CHECK(it == end);
             };
 
             auto validate_fail = [](StringType &&test, std::size_t expected_failures, int line) {
-                CAPTURE(test);
-                CAPTURE(line);
+                CATCH_CAPTURE(test);
+                CATCH_CAPTURE(line);
 
                 const auto end = test.cend();
                 std::size_t actual = 0;
@@ -585,17 +585,17 @@ TEMPLATE_TEST_CASE(
                     }
                 }
 
-                CHECK(actual == expected_failures);
+                CATCH_CHECK(actual == expected_failures);
             };
 
-            SECTION("1  Some correct UTF-8 text")
+            CATCH_SECTION("1  Some correct UTF-8 text")
             {
                 validate_pass_all("κόσμε", {0x03ba, 0x1f79, 0x03c3, 0x03bc, 0x03b5}, __LINE__);
             }
 
-            SECTION("2  Boundary condition test cases")
+            CATCH_SECTION("2  Boundary condition test cases")
             {
-                SECTION("2.1  First possible sequence of a certain length")
+                CATCH_SECTION("2.1  First possible sequence of a certain length")
                 {
                     // 2.1.1  1 byte  (U-00000000)
                     validate_pass(StringType(1, 0x00), 0x0000, __LINE__);
@@ -610,7 +610,7 @@ TEMPLATE_TEST_CASE(
                     validate_pass("\xf0\x90\x80\x80", 0x10000, __LINE__);
                 }
 
-                SECTION("2.2  Last possible sequence of a certain length")
+                CATCH_SECTION("2.2  Last possible sequence of a certain length")
                 {
                     // 2.2.1  1 byte  (U-0000007F)
                     validate_pass("\x7f", 0x007f, __LINE__);
@@ -625,7 +625,7 @@ TEMPLATE_TEST_CASE(
                     validate_fail("\xf7\xbf\xbf\xbf", 1, __LINE__);
                 }
 
-                SECTION("2.3  Other boundary conditions")
+                CATCH_SECTION("2.3  Other boundary conditions")
                 {
                     // 2.3.1  U-0000D7FF = ed 9f bf
                     validate_pass("\xed\x9f\xbf", 0xd7ff, __LINE__);
@@ -644,9 +644,9 @@ TEMPLATE_TEST_CASE(
                 }
             }
 
-            SECTION("3  Malformed sequences")
+            CATCH_SECTION("3  Malformed sequences")
             {
-                SECTION("3.1  Unexpected continuation bytes")
+                CATCH_SECTION("3.1  Unexpected continuation bytes")
                 {
                     // 3.1.1  First continuation byte 0x80
                     validate_fail("\x80", 1, __LINE__);
@@ -684,7 +684,7 @@ TEMPLATE_TEST_CASE(
                     validate_fail(std::move(test_3_1_9), 64, __LINE__);
                 }
 
-                SECTION("3.2  Lonely start characters")
+                CATCH_SECTION("3.2  Lonely start characters")
                 {
                     auto validate_fail_sequence =
                         [&validate_fail](codepoint_type begin, codepoint_type end, int line) {
@@ -721,7 +721,7 @@ TEMPLATE_TEST_CASE(
                     validate_fail_sequence(0xfc, 0xfd, __LINE__);
                 }
 
-                SECTION("3.3  Sequences with last continuation byte missing")
+                CATCH_SECTION("3.3  Sequences with last continuation byte missing")
                 {
                     // 3.3.1  2-byte sequence with last byte missing (U+0000)
                     validate_fail("\xc0", 1, __LINE__);
@@ -742,13 +742,13 @@ TEMPLATE_TEST_CASE(
                     validate_fail("\xf7\xbf\xbf", 1, __LINE__);
                 }
 
-                SECTION("3.4  Concatenation of incomplete sequences")
+                CATCH_SECTION("3.4  Concatenation of incomplete sequences")
                 {
                     // All the 6 sequences of 3.3 concatenated
                     validate_fail("\xc0\xe0\x80\xf0\x80\x80\xdf\xef\xbf\xf7\xbf\xbf", 6, __LINE__);
                 }
 
-                SECTION("3.5  Impossible bytes")
+                CATCH_SECTION("3.5  Impossible bytes")
                 {
                     // 3.5.1  fe
                     validate_fail("\xfe", 1, __LINE__);
@@ -761,9 +761,9 @@ TEMPLATE_TEST_CASE(
                 }
             }
 
-            SECTION("4  Overlong sequences")
+            CATCH_SECTION("4  Overlong sequences")
             {
-                SECTION("4.1  Examples of an overlong ASCII character")
+                CATCH_SECTION("4.1  Examples of an overlong ASCII character")
                 {
                     // 4.1.1 U+002F = c0 af
                     validate_fail("\xc0\xaf", 1, __LINE__);
@@ -775,7 +775,7 @@ TEMPLATE_TEST_CASE(
                     validate_fail("\xf0\x80\x80\xaf", 1, __LINE__);
                 }
 
-                SECTION("4.2  Maximum overlong sequences")
+                CATCH_SECTION("4.2  Maximum overlong sequences")
                 {
                     // 4.2.1  U-0000007F = c1 bf
                     validate_fail("\xc1\xbf", 1, __LINE__);
@@ -787,7 +787,7 @@ TEMPLATE_TEST_CASE(
                     validate_fail("\xf0\x8f\xbf\xbf", 1, __LINE__);
                 }
 
-                SECTION("4.3  Overlong representation of the NUL character")
+                CATCH_SECTION("4.3  Overlong representation of the NUL character")
                 {
                     // 4.3.1  U+0000 = c0 80
                     validate_fail("\xc0\x80", 1, __LINE__);
@@ -800,9 +800,9 @@ TEMPLATE_TEST_CASE(
                 }
             }
 
-            SECTION("5  Illegal code positions")
+            CATCH_SECTION("5  Illegal code positions")
             {
-                SECTION("5.1 Single UTF-16 surrogates")
+                CATCH_SECTION("5.1 Single UTF-16 surrogates")
                 {
                     // 5.1.1  U+D800 = ed a0 80
                     validate_fail("\xed\xa0\x80", 1, __LINE__);
@@ -826,7 +826,7 @@ TEMPLATE_TEST_CASE(
                     validate_fail("\xed\xbf\xbf", 1, __LINE__);
                 }
 
-                SECTION("5.2 Paired UTF-16 surrogates")
+                CATCH_SECTION("5.2 Paired UTF-16 surrogates")
                 {
                     // 5.2.1  U+D800 U+DC00 = ed a0 80 ed b0 80
                     validate_fail("\xed\xa0\x80\xed\xb0\x80", 2, __LINE__);
@@ -853,7 +853,7 @@ TEMPLATE_TEST_CASE(
                     validate_fail("\xed\xaf\xbf\xed\xbf\xbf", 2, __LINE__);
                 }
 
-                SECTION("5.3 Noncharacter code positions")
+                CATCH_SECTION("5.3 Noncharacter code positions")
                 {
                     // 5.3.1  U+FFFE = ef bf be
                     validate_pass("\xef\xbf\xbe", 0xfffe, __LINE__);

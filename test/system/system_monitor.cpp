@@ -39,14 +39,14 @@ public:
 
 } // namespace
 
-TEST_CASE("SystemMonitor", "[system]")
+CATCH_TEST_CASE("SystemMonitor", "[system]")
 {
     auto task_runner =
         fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
 
     auto monitor =
         std::make_shared<fly::SystemMonitorImpl>(task_runner, std::make_shared<TestSystemConfig>());
-    REQUIRE(monitor->start());
+    CATCH_REQUIRE(monitor->start());
 
     // Wait for one poll to complete before proceeding.
     task_runner->wait_for_task_to_complete(s_system_monitor_file);
@@ -60,7 +60,7 @@ TEST_CASE("SystemMonitor", "[system]")
         }
     };
 
-    SECTION("Validate CPU usage increased while running a spin thread")
+    CATCH_SECTION("Validate CPU usage increased while running a spin thread")
     {
         std::uint32_t count_before = monitor->get_system_cpu_count();
         double process_before = monitor->get_process_cpu_usage();
@@ -73,17 +73,17 @@ TEST_CASE("SystemMonitor", "[system]")
         double process_after = monitor->get_process_cpu_usage();
 
         keep_running.store(false);
-        REQUIRE(result.valid());
+        CATCH_REQUIRE(result.valid());
         result.get();
 
-        CHECK(count_before == count_after);
-        CHECK(system_after > 0_u64);
-        CHECK(process_before < process_after);
+        CATCH_CHECK(count_before == count_after);
+        CATCH_CHECK(system_after > 0_u64);
+        CATCH_CHECK(process_before < process_after);
     }
 
 #if defined(FLY_LINUX)
 
-    SECTION("Cannot start system manager when ::read() fails")
+    CATCH_SECTION("Cannot start system manager when ::read() fails")
     {
         fly::test::MockSystem mock(fly::test::MockCall::Read);
 
@@ -91,17 +91,17 @@ TEST_CASE("SystemMonitor", "[system]")
             task_runner,
             std::make_shared<fly::SystemConfig>());
 
-        CHECK_FALSE(monitor->start());
-        CHECK(monitor->get_system_cpu_count() == 0);
+        CATCH_CHECK_FALSE(monitor->start());
+        CATCH_CHECK(monitor->get_system_cpu_count() == 0);
     }
 
-    SECTION("Cannot update system CPU when ::read() fails")
+    CATCH_SECTION("Cannot update system CPU when ::read() fails")
     {
         monitor = std::make_shared<fly::SystemMonitorImpl>(
             task_runner,
             std::make_shared<fly::SystemConfig>());
 
-        CHECK(monitor->start());
+        CATCH_CHECK(monitor->start());
         task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         fly::test::MockSystem mock(fly::test::MockCall::Read);
@@ -114,19 +114,19 @@ TEST_CASE("SystemMonitor", "[system]")
         double system_after = monitor->get_system_cpu_usage();
 
         keep_running.store(false);
-        REQUIRE(result.valid());
+        CATCH_REQUIRE(result.valid());
         result.get();
 
-        CHECK(system_before == Approx(system_after));
+        CATCH_CHECK(system_before == Approx(system_after));
     }
 
-    SECTION("Cannot update process CPU when ::times() fails")
+    CATCH_SECTION("Cannot update process CPU when ::times() fails")
     {
         monitor = std::make_shared<fly::SystemMonitorImpl>(
             task_runner,
             std::make_shared<fly::SystemConfig>());
 
-        CHECK(monitor->start());
+        CATCH_CHECK(monitor->start());
         task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         fly::test::MockSystem mock(fly::test::MockCall::Times);
@@ -139,15 +139,15 @@ TEST_CASE("SystemMonitor", "[system]")
         double process_after = monitor->get_process_cpu_usage();
 
         keep_running.store(false);
-        REQUIRE(result.valid());
+        CATCH_REQUIRE(result.valid());
         result.get();
 
-        CHECK(process_before == Approx(process_after));
+        CATCH_CHECK(process_before == Approx(process_after));
     }
 
 #endif
 
-    SECTION("Validate memory usage increased after allocating a large block")
+    CATCH_SECTION("Validate memory usage increased after allocating a large block")
     {
         std::uint64_t total_before = monitor->get_total_system_memory();
         std::uint64_t system_before = monitor->get_system_memory_usage();
@@ -162,15 +162,15 @@ TEST_CASE("SystemMonitor", "[system]")
         std::uint64_t system_after = monitor->get_system_memory_usage();
         std::uint64_t process_after = monitor->get_process_memory_usage();
 
-        CHECK(total_before == total_after);
-        CHECK(system_before > 0_u64);
-        CHECK(system_after > 0_u64);
-        CHECK(process_before < process_after);
+        CATCH_CHECK(total_before == total_after);
+        CATCH_CHECK(system_before > 0_u64);
+        CATCH_CHECK(system_after > 0_u64);
+        CATCH_CHECK(process_before < process_after);
     }
 
 #if defined(FLY_LINUX)
 
-    SECTION("Cannot update system memory when ::sysinfo() fails")
+    CATCH_SECTION("Cannot update system memory when ::sysinfo() fails")
     {
         fly::test::MockSystem mock(fly::test::MockCall::Sysinfo);
 
@@ -183,11 +183,11 @@ TEST_CASE("SystemMonitor", "[system]")
         std::uint64_t total_after = monitor->get_total_system_memory();
         std::uint64_t system_after = monitor->get_system_memory_usage();
 
-        CHECK(total_before == total_after);
-        CHECK(system_before == system_after);
+        CATCH_CHECK(total_before == total_after);
+        CATCH_CHECK(system_before == system_after);
     }
 
-    SECTION("Cannot update process memory when ::read() fails")
+    CATCH_SECTION("Cannot update process memory when ::read() fails")
     {
         fly::test::MockSystem mock(fly::test::MockCall::Read);
 
@@ -198,7 +198,7 @@ TEST_CASE("SystemMonitor", "[system]")
 
         std::uint64_t process_after = monitor->get_process_memory_usage();
 
-        CHECK(process_before == process_after);
+        CATCH_CHECK(process_before == process_after);
     }
 
 #endif

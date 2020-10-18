@@ -97,7 +97,7 @@ public:
 
 } // namespace
 
-TEST_CASE("Logger", "[logger]")
+CATCH_TEST_CASE("Logger", "[logger]")
 {
     auto logger_config = std::make_shared<fly::LoggerConfig>();
     fly::ConcurrentQueue<fly::Log> received_logs;
@@ -111,88 +111,88 @@ TEST_CASE("Logger", "[logger]")
         {
             fly::Log log;
             received_logs.pop(log);
-            CAPTURE(log.m_message);
+            CATCH_CAPTURE(log.m_message);
 
-            CHECK(log.m_index == i);
-            CHECK(log.m_level == expected_level);
-            CHECK(log.m_time >= last_time);
-            CHECK(fly::String::starts_with(log.m_message, expected_messages[i]));
+            CATCH_CHECK(log.m_index == i);
+            CATCH_CHECK(log.m_level == expected_level);
+            CATCH_CHECK(log.m_time >= last_time);
+            CATCH_CHECK(fly::String::starts_with(log.m_message, expected_messages[i]));
 
             if (expected_function != nullptr)
             {
-                CHECK(std::string(log.m_trace.m_file) == std::string(__FILE__));
-                CHECK(std::string(log.m_trace.m_function) == std::string(expected_function));
-                CHECK(log.m_trace.m_line > 0_u32);
+                CATCH_CHECK(std::string(log.m_trace.m_file) == std::string(__FILE__));
+                CATCH_CHECK(std::string(log.m_trace.m_function) == std::string(expected_function));
+                CATCH_CHECK(log.m_trace.m_line > 0_u32);
             }
 
             last_time = log.m_time;
         }
 
-        CHECK(received_logs.empty());
+        CATCH_CHECK(received_logs.empty());
     };
 
-    SECTION("Cannot create logger with null sink")
+    CATCH_SECTION("Cannot create logger with null sink")
     {
         auto logger = fly::Logger::create_logger("test", logger_config, nullptr);
-        CHECK_FALSE(logger);
+        CATCH_CHECK_FALSE(logger);
     }
 
-    SECTION("Cannot create logger with sink that fails initialization")
+    CATCH_SECTION("Cannot create logger with sink that fails initialization")
     {
         auto logger =
             fly::Logger::create_logger("test", logger_config, std::make_unique<FailInitSink>());
-        CHECK_FALSE(logger);
+        CATCH_CHECK_FALSE(logger);
     }
 
-    SECTION("Cannot create logger with duplicate name")
+    CATCH_SECTION("Cannot create logger with duplicate name")
     {
         auto logger1 =
             fly::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
-        CHECK(logger1 != nullptr);
+        CATCH_CHECK(logger1 != nullptr);
 
         auto logger2 =
             fly::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
-        CHECK_FALSE(logger2);
+        CATCH_CHECK_FALSE(logger2);
     }
 
-    SECTION("Cannot fetch logger that doesn't exist")
+    CATCH_SECTION("Cannot fetch logger that doesn't exist")
     {
-        CHECK_FALSE(fly::Logger::get("test"));
+        CATCH_CHECK_FALSE(fly::Logger::get("test"));
     }
 
-    SECTION("Logger automatically deregisters itself on destruction")
+    CATCH_SECTION("Logger automatically deregisters itself on destruction")
     {
         {
             auto logger =
                 fly::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
-            CHECK(fly::Logger::get("test"));
+            CATCH_CHECK(fly::Logger::get("test"));
         }
 
-        CHECK_FALSE(fly::Logger::get("test"));
+        CATCH_CHECK_FALSE(fly::Logger::get("test"));
     }
 
-    SECTION("Resetting default logger causes initial default logger to be set as default")
+    CATCH_SECTION("Resetting default logger causes initial default logger to be set as default")
     {
         fly::Logger *default_logger = fly::Logger::get_default_logger();
 
         auto logger =
             fly::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
-        REQUIRE(logger);
+        CATCH_REQUIRE(logger);
 
         fly::Logger::set_default_logger(logger);
-        CHECK(fly::Logger::get_default_logger() == logger.get());
+        CATCH_CHECK(fly::Logger::get_default_logger() == logger.get());
 
         fly::Logger::set_default_logger(nullptr);
-        CHECK(fly::Logger::get_default_logger() == default_logger);
+        CATCH_CHECK(fly::Logger::get_default_logger() == default_logger);
     }
 
-    SECTION("Log points")
+    CATCH_SECTION("Log points")
     {
         // Run all of the log point tests with both synchronous and asynchronous loggers.
         const bool synchronous_logger = GENERATE(true, false);
 
         auto task_manager = std::make_shared<fly::TaskManager>(1);
-        REQUIRE(task_manager->start());
+        CATCH_REQUIRE(task_manager->start());
 
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::SequencedTaskRunner>();
@@ -201,12 +201,12 @@ TEST_CASE("Logger", "[logger]")
         auto logger = synchronous_logger ?
             fly::Logger::create_logger("test", logger_config, std::move(sink)) :
             fly::Logger::create_logger("test", task_runner, logger_config, std::move(sink));
-        REQUIRE(logger);
+        CATCH_REQUIRE(logger);
 
         fly::Logger::set_default_logger(logger);
-        REQUIRE(fly::Logger::get_default_logger() == logger.get());
+        CATCH_REQUIRE(fly::Logger::get_default_logger() == logger.get());
 
-        SECTION("Logger that fails streaming stops accepting logs")
+        CATCH_SECTION("Logger that fails streaming stops accepting logs")
         {
             auto fsink = std::make_unique<FailStreamSink>(received_logs);
 
@@ -220,14 +220,14 @@ TEST_CASE("Logger", "[logger]")
             validate_log_points(fly::Log::Level::Debug, nullptr, {"This log will be received"});
         }
 
-        SECTION("Debug log points")
+        CATCH_SECTION("Debug log points")
         {
             std::vector<std::string> expectations = {
                 "Debug Log",
                 "Debug Log: 123",
             };
 
-            SECTION("Without trace information")
+            CATCH_SECTION("Without trace information")
             {
                 logger->debug("Debug Log");
                 logger->debug("Debug Log: %d", 123);
@@ -235,7 +235,7 @@ TEST_CASE("Logger", "[logger]")
                 validate_log_points(fly::Log::Level::Debug, nullptr, std::move(expectations));
             }
 
-            SECTION("With trace information")
+            CATCH_SECTION("With trace information")
             {
                 logger->debug({__FILE__, __FUNCTION__, 123_u32}, "Debug Log");
                 logger->debug({__FILE__, __FUNCTION__, 123_u32}, "Debug Log: %d", 123);
@@ -243,7 +243,7 @@ TEST_CASE("Logger", "[logger]")
                 validate_log_points(fly::Log::Level::Debug, __FUNCTION__, std::move(expectations));
             }
 
-            SECTION("With macro invocation")
+            CATCH_SECTION("With macro invocation")
             {
                 LOGD("Debug Log");
                 LOGD("Debug Log: %d", 123);
@@ -252,14 +252,14 @@ TEST_CASE("Logger", "[logger]")
             }
         }
 
-        SECTION("Informational log points")
+        CATCH_SECTION("Informational log points")
         {
             std::vector<std::string> expectations = {
                 "Info Log",
                 "Info Log: 123",
             };
 
-            SECTION("Without trace information")
+            CATCH_SECTION("Without trace information")
             {
                 logger->info("Info Log");
                 logger->info("Info Log: %d", 123);
@@ -267,7 +267,7 @@ TEST_CASE("Logger", "[logger]")
                 validate_log_points(fly::Log::Level::Info, nullptr, std::move(expectations));
             }
 
-            SECTION("With trace information")
+            CATCH_SECTION("With trace information")
             {
                 logger->info({__FILE__, __FUNCTION__, 123_u32}, "Info Log");
                 logger->info({__FILE__, __FUNCTION__, 123_u32}, "Info Log: %d", 123);
@@ -275,7 +275,7 @@ TEST_CASE("Logger", "[logger]")
                 validate_log_points(fly::Log::Level::Info, __FUNCTION__, std::move(expectations));
             }
 
-            SECTION("With macro invocation")
+            CATCH_SECTION("With macro invocation")
             {
                 LOGI("Info Log");
                 LOGI("Info Log: %d", 123);
@@ -284,14 +284,14 @@ TEST_CASE("Logger", "[logger]")
             }
         }
 
-        SECTION("Warning log points")
+        CATCH_SECTION("Warning log points")
         {
             std::vector<std::string> expectations = {
                 "Warning Log",
                 "Warning Log: 123",
             };
 
-            SECTION("Without trace information")
+            CATCH_SECTION("Without trace information")
             {
                 logger->warn("Warning Log");
                 logger->warn("Warning Log: %d", 123);
@@ -299,7 +299,7 @@ TEST_CASE("Logger", "[logger]")
                 validate_log_points(fly::Log::Level::Warn, nullptr, std::move(expectations));
             }
 
-            SECTION("With trace information")
+            CATCH_SECTION("With trace information")
             {
                 logger->warn({__FILE__, __FUNCTION__, 123_u32}, "Warning Log");
                 logger->warn({__FILE__, __FUNCTION__, 123_u32}, "Warning Log: %d", 123);
@@ -307,7 +307,7 @@ TEST_CASE("Logger", "[logger]")
                 validate_log_points(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
             }
 
-            SECTION("With macro invocation")
+            CATCH_SECTION("With macro invocation")
             {
                 LOGW("Warning Log");
                 LOGW("Warning Log: %d", 123);
@@ -315,7 +315,7 @@ TEST_CASE("Logger", "[logger]")
                 validate_log_points(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
             }
 
-            SECTION("With system macro invocation")
+            CATCH_SECTION("With system macro invocation")
             {
                 LOGS("Warning Log");
                 LOGS("Warning Log: %d", 123);
@@ -324,14 +324,14 @@ TEST_CASE("Logger", "[logger]")
             }
         }
 
-        SECTION("Error log points")
+        CATCH_SECTION("Error log points")
         {
             std::vector<std::string> expectations = {
                 "Error Log",
                 "Error Log: 123",
             };
 
-            SECTION("Without trace information")
+            CATCH_SECTION("Without trace information")
             {
                 logger->error("Error Log");
                 logger->error("Error Log: %d", 123);
@@ -339,7 +339,7 @@ TEST_CASE("Logger", "[logger]")
                 validate_log_points(fly::Log::Level::Error, nullptr, std::move(expectations));
             }
 
-            SECTION("With trace information")
+            CATCH_SECTION("With trace information")
             {
                 logger->error({__FILE__, __FUNCTION__, 123_u32}, "Error Log");
                 logger->error({__FILE__, __FUNCTION__, 123_u32}, "Error Log: %d", 123);
@@ -347,7 +347,7 @@ TEST_CASE("Logger", "[logger]")
                 validate_log_points(fly::Log::Level::Error, __FUNCTION__, std::move(expectations));
             }
 
-            SECTION("With macro invocation")
+            CATCH_SECTION("With macro invocation")
             {
                 LOGE("Error Log");
                 LOGE("Error Log: %d", 123);
@@ -361,13 +361,13 @@ TEST_CASE("Logger", "[logger]")
 
     // Keep this test last so the logger registry will go out-of-scope without the default logger
     // having been reset to the initial default logger.
-    SECTION("Not resetting default logger is safe")
+    CATCH_SECTION("Not resetting default logger is safe")
     {
         auto logger =
             fly::Logger::create_logger("def", logger_config, std::make_unique<DropSink>());
-        REQUIRE(logger);
+        CATCH_REQUIRE(logger);
 
         fly::Logger::set_default_logger(logger);
-        CHECK(fly::Logger::get_default_logger() == logger.get());
+        CATCH_CHECK(fly::Logger::get_default_logger() == logger.get());
     }
 }
