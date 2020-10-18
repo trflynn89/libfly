@@ -9,7 +9,7 @@
 namespace fly::detail {
 
 /**
- * Traits for streaming properties of standard std::basic_string<> specializations.
+ * Traits for streaming properties of standard std::basic_string specializations.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 21, 2019

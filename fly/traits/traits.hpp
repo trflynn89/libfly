@@ -62,6 +62,7 @@ using enable_if_not_all = std::enable_if_t<std::negation_v<std::conjunction<Cond
  *     constexpr bool same = fly::all_same_v<int, bool, bool>; // = false
  */
 template <typename T, typename A, typename... As>
+// NOLINTNEXTLINE(readability-identifier-naming)
 struct all_same :
     std::conjunction<
         std::is_same<std::decay_t<T>, std::decay_t<A>>,
@@ -70,6 +71,7 @@ struct all_same :
 };
 
 template <typename T, typename A, typename... As>
+// NOLINTNEXTLINE(readability-identifier-naming)
 inline constexpr bool all_same_v = all_same<T, A, As...>::value;
 
 /**
@@ -82,6 +84,7 @@ inline constexpr bool all_same_v = all_same<T, A, As...>::value;
  *     constexpr bool same = fly::any_same_v<int, bool, bool>; // = false
  */
 template <typename T, typename A, typename... As>
+// NOLINTNEXTLINE(readability-identifier-naming)
 struct any_same :
     std::disjunction<
         std::is_same<std::decay_t<T>, std::decay_t<A>>,
@@ -90,6 +93,7 @@ struct any_same :
 };
 
 template <typename T, typename A, typename... As>
+// NOLINTNEXTLINE(readability-identifier-naming)
 inline constexpr bool any_same_v = any_same<T, A, As...>::value;
 
 /**
@@ -108,6 +112,7 @@ inline constexpr bool any_same_v = any_same<T, A, As...>::value;
  *         variant);
  */
 template <class... Ts>
+// NOLINTNEXTLINE(readability-identifier-naming)
 struct visitation : Ts...
 {
     using Ts::operator()...;
@@ -129,7 +134,7 @@ visitation(Ts...) -> visitation<Ts...>;
  *
  *     using FooTraits = fly::DeclarationTraits<FooDeclaration>;
  *
- * This provides the following std::bool_constant<> (and constexpr bool):
+ * This provides the following std::bool_constant(and constexpr bool):
  *
  *     template <typename T>
  *     struct FooTraits::is_declared<T>;

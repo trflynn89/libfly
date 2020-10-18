@@ -60,24 +60,24 @@ TEMPLATE_TEST_CASE(
     using ustreamed_char = std::make_unsigned_t<streamed_char>;
 
     auto out_of_range_codepoint = []() -> StringType {
-        static constexpr const codepoint_type out_of_range = 0x110000;
+        static constexpr const codepoint_type s_out_of_range = 0x110000;
         StringType result;
 
         if constexpr (sizeof(char_type) == 1)
         {
-            result += static_cast<char_type>(0xf0 | (out_of_range >> 18));
-            result += static_cast<char_type>(0x80 | ((out_of_range >> 12) & 0x3f));
-            result += static_cast<char_type>(0x80 | ((out_of_range >> 6) & 0x3f));
-            result += static_cast<char_type>(0x80 | (out_of_range & 0x3f));
+            result += static_cast<char_type>(0xf0 | (s_out_of_range >> 18));
+            result += static_cast<char_type>(0x80 | ((s_out_of_range >> 12) & 0x3f));
+            result += static_cast<char_type>(0x80 | ((s_out_of_range >> 6) & 0x3f));
+            result += static_cast<char_type>(0x80 | (s_out_of_range & 0x3f));
         }
         else if constexpr (sizeof(char_type) == 2)
         {
-            result += static_cast<char_type>(0xd800 | ((out_of_range - 0x10000) >> 10));
-            result += static_cast<char_type>(0xdc00 | ((out_of_range - 0x10000) & 0x3ff));
+            result += static_cast<char_type>(0xd800 | ((s_out_of_range - 0x10000) >> 10));
+            result += static_cast<char_type>(0xdc00 | ((s_out_of_range - 0x10000) & 0x3ff));
         }
         else if constexpr (sizeof(char_type) == 4)
         {
-            result = StringType(1, static_cast<char_type>(out_of_range));
+            result = StringType(1, static_cast<char_type>(s_out_of_range));
         }
 
         return result;

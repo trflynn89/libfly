@@ -12,7 +12,7 @@
 namespace fly::detail {
 
 /**
- * Helper class for decoding and encoding Unicode codepoints in a std::basic_string<>. The exact
+ * Helper class for decoding and encoding Unicode codepoints in a std::basic_string. The exact
  * encoding depends on the template type StringType:
  *
  *     1. std::string - UTF-8
@@ -229,7 +229,8 @@ private:
      *
      * @return If successful, the created Unicode codepoint. Otherwise, an unitialized value.
      */
-    static std::optional<codepoint_type> create_codepoint(EncodedByteProvider next_encoded_byte);
+    static std::optional<codepoint_type>
+    create_codepoint_from_surrogates(EncodedByteProvider next_encoded_byte);
 
     /**
      * Validate a Unicode codepoint is not out-of-range or reserved by the Unicode Standard.
@@ -246,19 +247,19 @@ private:
     struct Utf8Data
     {
         // The value of the UTF-8 encoded leading byte.
-        const codepoint_type leading_byte;
+        const codepoint_type m_leading_byte;
 
         // A bit-mask of the bits in the UTF-8 encoded leading byte reserved for encoding.
-        const codepoint_type encoding_mask;
+        const codepoint_type m_encoding_mask;
 
         // A bit-mask of the bits in the UTF-8 encoded leading byte reserved for codepoint data.
-        const codepoint_type codepoint_mask;
+        const codepoint_type m_codepoint_mask;
 
         // The number of bytes required to decode the codepoint.
-        const codepoint_type codepoint_size;
+        const codepoint_type m_codepoint_size;
     };
 
-    static constexpr const std::array<Utf8Data, 4> utf8_leading_bytes = {{
+    static constexpr const std::array<Utf8Data, 4> s_utf8_leading_bytes = {{
         // Codepoint length 1, range [U+0000, U+007f], leading byte 0b0xxx'xxxx.
         {0b0000'0000, 0b1000'0000, 0b0111'1111, 1},
 
@@ -272,23 +273,23 @@ private:
         {0b1111'0000, 0b1111'1000, 0b0000'0111, 4},
     }};
 
-    static constexpr const Utf8Data utf8_continuation_byte =
+    static constexpr const Utf8Data s_utf8_continuation_byte =
         {0b1000'0000, 0b1100'0000, 0b0011'1111, 6};
 
-    static constexpr codepoint_type high_surrogate_min = 0xd800;
-    static constexpr codepoint_type high_surrogate_max = 0xdbff;
-    static constexpr codepoint_type low_surrogate_min = 0xdc00;
-    static constexpr codepoint_type low_surrogate_max = 0xdfff;
-    static constexpr codepoint_type max_codepoint = 0x10ffff;
+    static constexpr codepoint_type s_high_surrogate_min = 0xd800;
+    static constexpr codepoint_type s_high_surrogate_max = 0xdbff;
+    static constexpr codepoint_type s_low_surrogate_min = 0xdc00;
+    static constexpr codepoint_type s_low_surrogate_max = 0xdfff;
+    static constexpr codepoint_type s_max_codepoint = 0x10ffff;
 
-    static constexpr char_type ch_u = FLY_CHR(char_type, 'u');
-    static constexpr char_type ch_U = FLY_CHR(char_type, 'U');
-    static constexpr char_type ch_0 = FLY_CHR(char_type, '0');
-    static constexpr char_type ch_9 = FLY_CHR(char_type, '9');
-    static constexpr char_type ch_a = FLY_CHR(char_type, 'a');
-    static constexpr char_type ch_A = FLY_CHR(char_type, 'A');
-    static constexpr char_type ch_f = FLY_CHR(char_type, 'f');
-    static constexpr char_type ch_F = FLY_CHR(char_type, 'F');
+    static constexpr char_type s_zero = FLY_CHR(char_type, '0');
+    static constexpr char_type s_nine = FLY_CHR(char_type, '9');
+    static constexpr char_type s_lower_a = FLY_CHR(char_type, 'a');
+    static constexpr char_type s_upper_a = FLY_CHR(char_type, 'A');
+    static constexpr char_type s_lower_f = FLY_CHR(char_type, 'f');
+    static constexpr char_type s_upper_f = FLY_CHR(char_type, 'F');
+    static constexpr char_type s_lower_u = FLY_CHR(char_type, 'u');
+    static constexpr char_type s_upper_u = FLY_CHR(char_type, 'U');
 };
 
 //==================================================================================================
@@ -387,17 +388,17 @@ BasicStringUnicode<StringType>::unescape_codepoint(const_iterator &it, const con
 
     std::optional<codepoint_type> codepoint;
 
-    if (escaped_with(ch_u))
+    if (escaped_with(s_lower_u))
     {
         auto next_codepoint = [&it, &end]() -> std::optional<codepoint_type> {
-            return unescape_codepoint<ch_u>(it, end);
+            return unescape_codepoint<s_lower_u>(it, end);
         };
 
-        codepoint = create_codepoint(std::move(next_codepoint));
+        codepoint = create_codepoint_from_surrogates(std::move(next_codepoint));
     }
-    else if (escaped_with(ch_U))
+    else if (escaped_with(s_upper_u))
     {
-        codepoint = unescape_codepoint<ch_U>(it, end);
+        codepoint = unescape_codepoint<s_upper_u>(it, end);
     }
 
     if (codepoint)
@@ -418,12 +419,12 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
     // TODO replace this with String::create_hex_string without actually including string.hpp or
     // string_format.hpp.
     auto to_hex = [&codepoint](std::size_t length) -> StringType {
-        static const auto *digits = FLY_STR(char_type, "0123456789abcdef");
+        static const auto *s_digits = FLY_STR(char_type, "0123456789abcdef");
         StringType hex(length, FLY_CHR(char_type, '0'));
 
         for (std::size_t i = 0, j = (length - 1) * 4; i < length; ++i, j -= 4)
         {
-            hex[i] = digits[(codepoint >> j) & 0x0f];
+            hex[i] = s_digits[(codepoint >> j) & 0x0f];
         }
 
         return hex;
@@ -434,7 +435,7 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
         if (codepoint <= 0xffff)
         {
             result += FLY_CHR(char_type, '\\');
-            result += ch_u;
+            result += s_lower_u;
             result += to_hex(4);
         }
         else
@@ -450,7 +451,7 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
             else
             {
                 result += FLY_CHR(char_type, '\\');
-                result += ch_U;
+                result += s_upper_u;
                 result += to_hex(8);
             }
         }
@@ -480,22 +481,22 @@ auto BasicStringUnicode<StringType>::unescape_codepoint(
     codepoint_type codepoint = 0;
     ++it;
 
-    static constexpr const codepoint_type expected_digits = (UnicodePrefix == 'u') ? 4 : 8;
+    static constexpr const codepoint_type s_expected_digits = (UnicodePrefix == 'u') ? 4 : 8;
     codepoint_type i = 0;
 
-    for (i = 0; (i < expected_digits) && (it != end); ++i, ++it)
+    for (i = 0; (i < s_expected_digits) && (it != end); ++i, ++it)
     {
-        const codepoint_type shift = (4 * (expected_digits - i - 1));
+        const codepoint_type shift = (4 * (s_expected_digits - i - 1));
 
-        if ((*it >= ch_0) && (*it <= ch_9))
+        if ((*it >= s_zero) && (*it <= s_nine))
         {
             codepoint += static_cast<codepoint_type>(*it - 0x30) << shift;
         }
-        else if ((*it >= ch_A) && (*it <= ch_F))
+        else if ((*it >= s_upper_a) && (*it <= s_upper_f))
         {
             codepoint += static_cast<codepoint_type>(*it - 0x37) << shift;
         }
-        else if ((*it >= ch_a) && (*it <= ch_f))
+        else if ((*it >= s_lower_a) && (*it <= s_lower_f))
         {
             codepoint += static_cast<codepoint_type>(*it - 0x57) << shift;
         }
@@ -505,7 +506,7 @@ auto BasicStringUnicode<StringType>::unescape_codepoint(
         }
     }
 
-    if (i != expected_digits)
+    if (i != s_expected_digits)
     {
         return std::nullopt;
     }
@@ -529,22 +530,22 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider n
 
     // First find the codepoint length by finding which leading byte matches the first encoded byte.
     auto utf8_it = std::find_if(
-        utf8_leading_bytes.begin(),
-        utf8_leading_bytes.end(),
+        s_utf8_leading_bytes.begin(),
+        s_utf8_leading_bytes.end(),
         [&leading_byte](const auto &candidate) {
-            return (leading_byte & candidate.encoding_mask) == candidate.leading_byte;
+            return (leading_byte & candidate.m_encoding_mask) == candidate.m_leading_byte;
         });
 
-    if (utf8_it == utf8_leading_bytes.end())
+    if (utf8_it == s_utf8_leading_bytes.end())
     {
         return std::nullopt;
     }
 
-    const std::size_t bytes = utf8_it->codepoint_size;
-    std::size_t shift = utf8_continuation_byte.codepoint_size * (bytes - 1);
+    const std::size_t bytes = utf8_it->m_codepoint_size;
+    std::size_t shift = s_utf8_continuation_byte.m_codepoint_size * (bytes - 1);
 
     // Then decode the encoded bytes using the leading and continuation byte masks.
-    codepoint_type codepoint = (leading_byte & utf8_it->codepoint_mask) << shift;
+    codepoint_type codepoint = (leading_byte & utf8_it->m_codepoint_mask) << shift;
     codepoint_type first_continuation_byte = 0;
 
     for (std::size_t i = 1; i < bytes; ++i)
@@ -562,26 +563,29 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider n
             first_continuation_byte = continuation_byte & 0xff;
         }
 
-        if ((continuation_byte & utf8_continuation_byte.encoding_mask) !=
-            utf8_continuation_byte.leading_byte)
+        if ((continuation_byte & s_utf8_continuation_byte.m_encoding_mask) !=
+            s_utf8_continuation_byte.m_leading_byte)
         {
             return std::nullopt;
         }
 
-        shift -= utf8_continuation_byte.codepoint_size;
-        codepoint |= (continuation_byte & utf8_continuation_byte.codepoint_mask) << shift;
+        shift -= s_utf8_continuation_byte.m_codepoint_size;
+        codepoint |= (continuation_byte & s_utf8_continuation_byte.m_codepoint_mask) << shift;
     }
 
     // Make sure the encoding was not overlong.
-    if ((bytes == 2) && ((leading_byte & 0xfe) == utf8_it->leading_byte))
+    if ((bytes == 2) && ((leading_byte & 0xfe) == utf8_it->m_leading_byte))
     {
         return std::nullopt;
     }
-    else if (
-        (bytes > 2) && (leading_byte == utf8_it->leading_byte) &&
-        ((first_continuation_byte & utf8_it->leading_byte) == utf8_continuation_byte.leading_byte))
+    else if (bytes > 2)
     {
-        return std::nullopt;
+        if ((leading_byte == utf8_it->m_leading_byte) &&
+            ((first_continuation_byte & utf8_it->m_leading_byte) ==
+             s_utf8_continuation_byte.m_leading_byte))
+        {
+            return std::nullopt;
+        }
     }
 
     return codepoint;
@@ -593,7 +597,7 @@ template <typename CharType, std::enable_if_t<(sizeof(CharType) == 2), bool>>
 auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider next_encoded_byte)
     -> std::optional<codepoint_type>
 {
-    return create_codepoint(std::move(next_encoded_byte));
+    return create_codepoint_from_surrogates(std::move(next_encoded_byte));
 }
 
 //==================================================================================================
@@ -652,8 +656,8 @@ StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type co
     else
     {
         codepoint -= 0x10000;
-        result += static_cast<char_type>(high_surrogate_min | (codepoint >> 10));
-        result += static_cast<char_type>(low_surrogate_min | (codepoint & 0x3ff));
+        result += static_cast<char_type>(s_high_surrogate_min | (codepoint >> 10));
+        result += static_cast<char_type>(s_low_surrogate_min | (codepoint & 0x3ff));
     }
 
     return result;
@@ -669,14 +673,14 @@ StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type co
 
 //==================================================================================================
 template <typename StringType>
-auto BasicStringUnicode<StringType>::create_codepoint(EncodedByteProvider next_encoded_byte)
-    -> std::optional<codepoint_type>
+auto BasicStringUnicode<StringType>::create_codepoint_from_surrogates(
+    EncodedByteProvider next_encoded_byte) -> std::optional<codepoint_type>
 {
     auto is_high_surrogate = [](codepoint_type c) -> bool {
-        return (c >= high_surrogate_min) && (c <= high_surrogate_max);
+        return (c >= s_high_surrogate_min) && (c <= s_high_surrogate_max);
     };
     auto is_low_surrogate = [](codepoint_type c) -> bool {
-        return (c >= low_surrogate_min) && (c <= low_surrogate_max);
+        return (c >= s_low_surrogate_min) && (c <= s_low_surrogate_max);
     };
 
     const std::optional<codepoint_type> high_surrogate = next_encoded_byte();
@@ -721,12 +725,12 @@ auto BasicStringUnicode<StringType>::create_codepoint(EncodedByteProvider next_e
 template <typename StringType>
 bool BasicStringUnicode<StringType>::validate_codepoint(codepoint_type codepoint)
 {
-    if ((codepoint >= high_surrogate_min) && (codepoint <= low_surrogate_max))
+    if ((codepoint >= s_high_surrogate_min) && (codepoint <= s_low_surrogate_max))
     {
         // Reserved codepoint.
         return false;
     }
-    else if (codepoint > max_codepoint)
+    else if (codepoint > s_max_codepoint)
     {
         // Out-of-range codepoint.
         return false;
