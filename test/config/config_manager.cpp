@@ -45,7 +45,7 @@ public:
 
 } // namespace
 
-TEST_CASE("ConfigManager", "[config]")
+CATCH_TEST_CASE("ConfigManager", "[config]")
 {
     auto task_runner =
         fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
@@ -58,127 +58,127 @@ TEST_CASE("ConfigManager", "[config]")
         fly::ConfigManager::ConfigFileType::Json,
         config_file);
     auto path_config = config_manager->create_config<TestPathConfig>();
-    REQUIRE(config_manager->start());
+    CATCH_REQUIRE(config_manager->start());
 
     auto initial_size = config_manager->prune();
 
-    SECTION("Config managers can be started for all file types")
+    CATCH_SECTION("Config managers can be started for all file types")
     {
         config_manager = std::make_shared<fly::ConfigManager>(
             task_runner,
             fly::ConfigManager::ConfigFileType::Ini,
             config_file);
-        CHECK(config_manager->start());
+        CATCH_CHECK(config_manager->start());
 
         config_manager = std::make_shared<fly::ConfigManager>(
             task_runner,
             fly::ConfigManager::ConfigFileType::Json,
             config_file);
-        CHECK(config_manager->start());
+        CATCH_CHECK(config_manager->start());
     }
 
-    SECTION("Cannot start a config manager of an unsupported file type")
+    CATCH_SECTION("Cannot start a config manager of an unsupported file type")
     {
         config_manager = std::make_shared<fly::ConfigManager>(
             task_runner,
             static_cast<fly::ConfigManager::ConfigFileType>(-1),
             config_file);
-        CHECK_FALSE(config_manager->start());
+        CATCH_CHECK_FALSE(config_manager->start());
     }
 
-    SECTION("Cannot create a config with a duplicated identifier")
+    CATCH_SECTION("Cannot create a config with a duplicated identifier")
     {
-        CHECK(config_manager->prune() == initial_size);
+        CATCH_CHECK(config_manager->prune() == initial_size);
 
         auto config = config_manager->create_config<fly::test::TestConfig>();
-        CHECK(config_manager->prune() == initial_size + 1);
+        CATCH_CHECK(config_manager->prune() == initial_size + 1);
 
         auto config2 = config_manager->create_config<BadConfig>();
-        CHECK(config_manager->prune() == initial_size + 1);
-        CHECK_FALSE(config2);
+        CATCH_CHECK(config_manager->prune() == initial_size + 1);
+        CATCH_CHECK_FALSE(config2);
     }
 
-    SECTION("Creating a config increases the config manager's stored configs by one")
+    CATCH_SECTION("Creating a config increases the config manager's stored configs by one")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
-        CHECK(config_manager->prune() == initial_size + 1);
+        CATCH_CHECK(config_manager->prune() == initial_size + 1);
     }
 
-    SECTION("Creating an existing configuration does not actually recreate the config")
+    CATCH_SECTION("Creating an existing configuration does not actually recreate the config")
     {
         auto config1 = config_manager->create_config<fly::test::TestConfig>();
-        CHECK(config_manager->prune() == initial_size + 1);
+        CATCH_CHECK(config_manager->prune() == initial_size + 1);
 
         auto config2 = config_manager->create_config<fly::test::TestConfig>();
-        CHECK(config_manager->prune() == initial_size + 1);
+        CATCH_CHECK(config_manager->prune() == initial_size + 1);
     }
 
-    SECTION("Synchronously detecting deleted config objects")
+    CATCH_SECTION("Synchronously detecting deleted config objects")
     {
-        CHECK(config_manager->prune() == initial_size);
+        CATCH_CHECK(config_manager->prune() == initial_size);
         {
             auto config = config_manager->create_config<fly::test::TestConfig>();
-            CHECK(config_manager->prune() == initial_size + 1);
+            CATCH_CHECK(config_manager->prune() == initial_size + 1);
         }
 
-        CHECK(config_manager->prune() == initial_size);
+        CATCH_CHECK(config_manager->prune() == initial_size);
         {
             auto config = config_manager->create_config<fly::test::TestConfig>();
-            CHECK(config_manager->prune() == initial_size + 1);
+            CATCH_CHECK(config_manager->prune() == initial_size + 1);
         }
 
         auto config = config_manager->create_config<fly::test::TestConfig>();
-        CHECK(config);
+        CATCH_CHECK(config);
 
         config.reset();
 
         config = config_manager->create_config<fly::test::TestConfig>();
-        CHECK(config);
+        CATCH_CHECK(config);
     }
 
-    SECTION("Asynchronously detecting deleted config objects")
+    CATCH_SECTION("Asynchronously detecting deleted config objects")
     {
-        CHECK(config_manager->prune() == initial_size);
+        CATCH_CHECK(config_manager->prune() == initial_size);
 
         const fly::Json json {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
         const std::string contents(json);
 
-        REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         {
             auto config = config_manager->create_config<fly::test::TestConfig>();
-            CHECK(config_manager->prune() == initial_size + 1);
+            CATCH_CHECK(config_manager->prune() == initial_size + 1);
 
-            CHECK(config->get_value<std::string>("name", "") == "John Doe");
-            CHECK(config->get_value<std::string>("address", "") == "MA");
+            CATCH_CHECK(config->get_value<std::string>("name", "") == "John Doe");
+            CATCH_CHECK(config->get_value<std::string>("address", "") == "MA");
         }
 
-        REQUIRE(fly::test::PathUtil::write_file(config_file, contents + "\n"));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents + "\n"));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
-        CHECK(config_manager->prune() == initial_size);
+        CATCH_CHECK(config_manager->prune() == initial_size);
     }
 
-    SECTION("Config manager respects file created before config object")
+    CATCH_SECTION("Config manager respects file created before config object")
     {
         const fly::Json json {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
         const std::string contents(json);
 
-        REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
-        CHECK(config->get_value<std::string>("name", "") == "John Doe");
-        CHECK(config->get_value<std::string>("address", "") == "MA");
+        CATCH_CHECK(config->get_value<std::string>("name", "") == "John Doe");
+        CATCH_CHECK(config->get_value<std::string>("address", "") == "MA");
     }
 
-    SECTION("Config manager respects file created after config object")
+    CATCH_SECTION("Config manager respects file created after config object")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
@@ -186,15 +186,15 @@ TEST_CASE("ConfigManager", "[config]")
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
         const std::string contents(json);
 
-        REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
-        CHECK(config->get_value<std::string>("name", "") == "John Doe");
-        CHECK(config->get_value<std::string>("address", "") == "MA");
+        CATCH_CHECK(config->get_value<std::string>("name", "") == "John Doe");
+        CATCH_CHECK(config->get_value<std::string>("address", "") == "MA");
     }
 
-    SECTION("Config manager detects changes to config file")
+    CATCH_SECTION("Config manager detects changes to config file")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
@@ -202,19 +202,19 @@ TEST_CASE("ConfigManager", "[config]")
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
         const std::string contents1(json1);
 
-        REQUIRE(fly::test::PathUtil::write_file(config_file, contents1));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents1));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
-        CHECK(config->get_value<std::string>("name", "") == "John Doe");
-        CHECK(config->get_value<std::string>("address", "") == "MA");
-        CHECK(config->get_value<int>("age", -1) == -1);
+        CATCH_CHECK(config->get_value<std::string>("name", "") == "John Doe");
+        CATCH_CHECK(config->get_value<std::string>("address", "") == "MA");
+        CATCH_CHECK(config->get_value<int>("age", -1) == -1);
 
         const fly::Json json2 {
             {fly::test::TestConfig::identifier, {{"name", "Jane Doe"}, {"age", 27}}}};
         const std::string contents2(json2);
 
-        REQUIRE(fly::test::PathUtil::write_file(config_file, contents2));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents2));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         // Multiple fly::PathMonitor::PathEvent::Changed events may be triggered even though the
@@ -224,12 +224,12 @@ TEST_CASE("ConfigManager", "[config]")
             task_runner->wait_for_task_to_complete(s_config_manager_file);
         }
 
-        CHECK(config->get_value<std::string>("name", "") == "Jane Doe");
-        CHECK(config->get_value<std::string>("address", "") == "");
-        CHECK(config->get_value<int>("age", -1) == 27);
+        CATCH_CHECK(config->get_value<std::string>("name", "") == "Jane Doe");
+        CATCH_CHECK(config->get_value<std::string>("address", "") == "");
+        CATCH_CHECK(config->get_value<int>("age", -1) == 27);
     }
 
-    SECTION("Config manager detects deleted config file and falls back to defaults")
+    CATCH_SECTION("Config manager detects deleted config file and falls back to defaults")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
@@ -237,45 +237,45 @@ TEST_CASE("ConfigManager", "[config]")
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
         const std::string contents(json);
 
-        REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
-        CHECK(config->get_value<std::string>("name", "") == "John Doe");
-        CHECK(config->get_value<std::string>("address", "") == "MA");
+        CATCH_CHECK(config->get_value<std::string>("name", "") == "John Doe");
+        CATCH_CHECK(config->get_value<std::string>("address", "") == "MA");
 
         std::filesystem::remove(config_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
-        CHECK(config->get_value<std::string>("name", "") == "");
-        CHECK(config->get_value<std::string>("address", "") == "");
+        CATCH_CHECK(config->get_value<std::string>("name", "") == "");
+        CATCH_CHECK(config->get_value<std::string>("address", "") == "");
     }
 
-    SECTION("Bad config file causes config manager to fall back to defaults")
+    CATCH_SECTION("Bad config file causes config manager to fall back to defaults")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
         const std::string contents(" ");
 
-        REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
-        CHECK(config->get_value<std::string>("name", "John Doe") == "John Doe");
-        CHECK(config->get_value<std::string>("address", "MA") == "MA");
+        CATCH_CHECK(config->get_value<std::string>("name", "John Doe") == "John Doe");
+        CATCH_CHECK(config->get_value<std::string>("address", "MA") == "MA");
     }
 
-    SECTION("Config file with non-object type causes config manager to fall back to defaults")
+    CATCH_SECTION("Config file with non-object type causes config manager to fall back to defaults")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
         const std::string contents("[1, 2, 3]");
 
-        REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
-        CHECK(config->get_value<std::string>("name", "") == "");
-        CHECK(config->get_value<std::string>("address", "") == "");
+        CATCH_CHECK(config->get_value<std::string>("name", "") == "");
+        CATCH_CHECK(config->get_value<std::string>("address", "") == "");
     }
 }

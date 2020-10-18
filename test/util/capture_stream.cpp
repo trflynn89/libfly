@@ -38,7 +38,7 @@ CaptureStream::CaptureStream(Stream stream) noexcept :
 #    error Unknown file open command.
 #endif
 
-    REQUIRE(target != nullptr);
+    CATCH_REQUIRE(target != nullptr);
     int target_fd = ::fileno(target);
 
     switch (m_stream)

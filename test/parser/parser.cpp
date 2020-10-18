@@ -16,7 +16,7 @@ class EofParser : public fly::Parser
 public:
     void compare(std::vector<int> &&chars) const
     {
-        CHECK(m_chars == chars);
+        CATCH_CHECK(m_chars == chars);
     }
 
 protected:
@@ -47,99 +47,99 @@ private:
 
 } // namespace
 
-TEST_CASE("Parser", "[parser]")
+CATCH_TEST_CASE("Parser", "[parser]")
 {
     EofParser parser;
 
-    SECTION("Leading byte that is not a byte order mark is not consumed as such")
+    CATCH_SECTION("Leading byte that is not a byte order mark is not consumed as such")
     {
-        CHECK_FALSE(parser.parse_string(std::string("\xee")).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xee")).has_value());
         parser.compare({0xee});
     }
 
-    SECTION("UTF-8 byte order mark")
+    CATCH_SECTION("UTF-8 byte order mark")
     {
-        CHECK_FALSE(parser.parse_string(std::string("\xef")).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xef")).has_value());
         parser.compare({0xef});
 
-        CHECK_FALSE(parser.parse_string(std::string("\xef\xee")).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xef\xee")).has_value());
         parser.compare({0xef, 0xee});
 
-        CHECK_FALSE(parser.parse_string(std::string("\xef\xbb")).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xef\xbb")).has_value());
         parser.compare({0xef, 0xbb});
 
-        CHECK_FALSE(parser.parse_string(std::string("\xef\xbb\xee")).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xef\xbb\xee")).has_value());
         parser.compare({0xef, 0xbb, 0xee});
 
-        CHECK(parser.parse_string(std::string("\xef\xbb\xbf")).has_value());
+        CATCH_CHECK(parser.parse_string(std::string("\xef\xbb\xbf")).has_value());
         parser.compare({});
     }
 
-    SECTION("UTF-16 big endian byte order mark")
+    CATCH_SECTION("UTF-16 big endian byte order mark")
     {
         std::optional<fly::Json> parsed;
 
-        CHECK_FALSE(parser.parse_string(std::string("\xfe")).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xfe")).has_value());
         parser.compare({0xfe});
 
-        CHECK_FALSE(parser.parse_string(std::string("\xfe\xee")).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xfe\xee")).has_value());
         parser.compare({0xfe, 0xee});
 
-        CHECK(parser.parse_string(std::string("\xfe\xff")).has_value());
+        CATCH_CHECK(parser.parse_string(std::string("\xfe\xff")).has_value());
         parser.compare({});
     }
 
-    SECTION("UTF-16 little endian byte order mark")
+    CATCH_SECTION("UTF-16 little endian byte order mark")
     {
         std::optional<fly::Json> parsed;
 
-        CHECK_FALSE(parser.parse_string(std::string("\xff")).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xff")).has_value());
         parser.compare({0xff});
 
-        CHECK_FALSE(parser.parse_string(std::string("\xff\xee")).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xff\xee")).has_value());
         parser.compare({0xff, 0xee});
 
-        CHECK(parser.parse_string(std::string("\xff\xfe")).has_value());
+        CATCH_CHECK(parser.parse_string(std::string("\xff\xfe")).has_value());
         parser.compare({});
     }
 
-    SECTION("UTF-32 big endian byte order mark")
+    CATCH_SECTION("UTF-32 big endian byte order mark")
     {
         std::optional<fly::Json> parsed;
 
-        CHECK_FALSE(parser.parse_string(std::string("\x00", 1)).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\x00", 1)).has_value());
         parser.compare({0x00});
 
-        CHECK_FALSE(parser.parse_string(std::string("\x00\xee", 2)).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\x00\xee", 2)).has_value());
         parser.compare({0x00, 0xee});
 
-        CHECK_FALSE(parser.parse_string(std::string("\x00\x00", 2)).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\x00\x00", 2)).has_value());
         parser.compare({0x00, 0x00});
 
-        CHECK_FALSE(parser.parse_string(std::string("\x00\x00\xee", 3)).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\x00\x00\xee", 3)).has_value());
         parser.compare({0x00, 0x00, 0xee});
 
-        CHECK_FALSE(parser.parse_string(std::string("\x00\x00\xfe", 3)).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\x00\x00\xfe", 3)).has_value());
         parser.compare({0x00, 0x00, 0xfe});
 
-        CHECK_FALSE(parser.parse_string(std::string("\x00\x00\xfe\xee", 4)).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\x00\x00\xfe\xee", 4)).has_value());
         parser.compare({0x00, 0x00, 0xfe, 0xee});
 
-        CHECK(parser.parse_string(std::string("\x00\x00\xfe\xff", 4)).has_value());
+        CATCH_CHECK(parser.parse_string(std::string("\x00\x00\xfe\xff", 4)).has_value());
         parser.compare({});
     }
 
-    SECTION("UTF-32 little endian byte order mark")
+    CATCH_SECTION("UTF-32 little endian byte order mark")
     {
         std::optional<fly::Json> parsed;
 
-        CHECK_FALSE(parser.parse_string(std::string("\xff\xfe\x61\x00", 4)).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xff\xfe\x61\x00", 4)).has_value());
         parser.compare({0x61}); // 0xff 0xfe is interpreted as UTF-16 little endian
 
-        CHECK_FALSE(parser.parse_string(std::string("\xff\xfe\x00\x61", 4)).has_value());
+        CATCH_CHECK_FALSE(parser.parse_string(std::string("\xff\xfe\x00\x61", 4)).has_value());
         parser.compare({0xe6, 0x84, 0x80}); // 0xff 0xfe is interpreted as UTF-16 little endian
 
-        CHECK(parser.parse_string(std::string("\xff\xfe\x00\x00", 4)).has_value());
+        CATCH_CHECK(parser.parse_string(std::string("\xff\xfe\x00\x00", 4)).has_value());
         parser.compare({});
     }
 }

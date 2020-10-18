@@ -118,21 +118,21 @@ bool is_class_or_pointer(const T &)
 
 } // namespace
 
-TEST_CASE("Traits", "[traits]")
+CATCH_TEST_CASE("Traits", "[traits]")
 {
-    SECTION("DeclarationTraits for whether a class defines a method foo()")
+    CATCH_SECTION("DeclarationTraits for whether a class defines a method foo()")
     {
         const FooClass fc;
         const BarClass bc;
 
-        CHECK(call_foo(fc));
-        CHECK(FooTraits::is_declared_v<FooClass>);
+        CATCH_CHECK(call_foo(fc));
+        CATCH_CHECK(FooTraits::is_declared_v<FooClass>);
 
-        CHECK_FALSE(call_foo(bc));
-        CHECK_FALSE(FooTraits::is_declared_v<BarClass>);
+        CATCH_CHECK_FALSE(call_foo(bc));
+        CATCH_CHECK_FALSE(FooTraits::is_declared_v<BarClass>);
     }
 
-    SECTION("DeclarationTraits for whether a class defines operator<<")
+    CATCH_SECTION("DeclarationTraits for whether a class defines operator<<")
     {
         std::stringstream stream;
 
@@ -141,28 +141,28 @@ TEST_CASE("Traits", "[traits]")
 
         const std::string str("a");
 
-        CHECK(is_streamable(stream, bc));
-        CHECK(OstreamTraits::is_declared_v<BarClass>);
-        CHECK(stream.str() == bc());
+        CATCH_CHECK(is_streamable(stream, bc));
+        CATCH_CHECK(OstreamTraits::is_declared_v<BarClass>);
+        CATCH_CHECK(stream.str() == bc());
         stream.str(std::string());
 
-        CHECK(is_streamable(stream, str));
-        CHECK(OstreamTraits::is_declared_v<std::string>);
-        CHECK(stream.str() == str);
+        CATCH_CHECK(is_streamable(stream, str));
+        CATCH_CHECK(OstreamTraits::is_declared_v<std::string>);
+        CATCH_CHECK(stream.str() == str);
         stream.str(std::string());
 
-        CHECK(is_streamable(stream, 1));
-        CHECK(OstreamTraits::is_declared_v<int>);
-        CHECK(stream.str() == "1");
+        CATCH_CHECK(is_streamable(stream, 1));
+        CATCH_CHECK(OstreamTraits::is_declared_v<int>);
+        CATCH_CHECK(stream.str() == "1");
         stream.str(std::string());
 
-        CHECK_FALSE(is_streamable(stream, fc));
-        CHECK_FALSE(OstreamTraits::is_declared_v<FooClass>);
-        CHECK(stream.str() == std::string());
+        CATCH_CHECK_FALSE(is_streamable(stream, fc));
+        CATCH_CHECK_FALSE(OstreamTraits::is_declared_v<FooClass>);
+        CATCH_CHECK(stream.str() == std::string());
         stream.str(std::string());
     }
 
-    SECTION("Combination of traits for enable_if_all and enable_if_not_all")
+    CATCH_SECTION("Combination of traits for enable_if_all and enable_if_not_all")
     {
         const FooClass fc;
         const std::string str("a");
@@ -171,20 +171,20 @@ TEST_CASE("Traits", "[traits]")
         bool b = false;
         float f = 3.14159f;
 
-        CHECK_FALSE(is_class_pointer(fc));
-        CHECK_FALSE(is_class_pointer(str));
-        CHECK(is_class_pointer(&fc));
-        CHECK(is_class_pointer(&str));
+        CATCH_CHECK_FALSE(is_class_pointer(fc));
+        CATCH_CHECK_FALSE(is_class_pointer(str));
+        CATCH_CHECK(is_class_pointer(&fc));
+        CATCH_CHECK(is_class_pointer(&str));
 
-        CHECK_FALSE(is_class_pointer(i));
-        CHECK_FALSE(is_class_pointer(b));
-        CHECK_FALSE(is_class_pointer(f));
-        CHECK_FALSE(is_class_pointer(&i));
-        CHECK_FALSE(is_class_pointer(&b));
-        CHECK_FALSE(is_class_pointer(&f));
+        CATCH_CHECK_FALSE(is_class_pointer(i));
+        CATCH_CHECK_FALSE(is_class_pointer(b));
+        CATCH_CHECK_FALSE(is_class_pointer(f));
+        CATCH_CHECK_FALSE(is_class_pointer(&i));
+        CATCH_CHECK_FALSE(is_class_pointer(&b));
+        CATCH_CHECK_FALSE(is_class_pointer(&f));
     }
 
-    SECTION("Combination of traits for enable_if_any and enable_if_none")
+    CATCH_SECTION("Combination of traits for enable_if_any and enable_if_none")
     {
         const FooClass fc;
         const std::string str("a");
@@ -193,99 +193,99 @@ TEST_CASE("Traits", "[traits]")
         bool b = false;
         float f = 3.14159f;
 
-        CHECK(is_class_or_pointer(fc));
-        CHECK(is_class_or_pointer(str));
-        CHECK(is_class_or_pointer(&fc));
-        CHECK(is_class_or_pointer(&str));
+        CATCH_CHECK(is_class_or_pointer(fc));
+        CATCH_CHECK(is_class_or_pointer(str));
+        CATCH_CHECK(is_class_or_pointer(&fc));
+        CATCH_CHECK(is_class_or_pointer(&str));
 
-        CHECK_FALSE(is_class_or_pointer(i));
-        CHECK_FALSE(is_class_or_pointer(b));
-        CHECK_FALSE(is_class_or_pointer(f));
-        CHECK(is_class_or_pointer(&i));
-        CHECK(is_class_or_pointer(&b));
-        CHECK(is_class_or_pointer(&f));
+        CATCH_CHECK_FALSE(is_class_or_pointer(i));
+        CATCH_CHECK_FALSE(is_class_or_pointer(b));
+        CATCH_CHECK_FALSE(is_class_or_pointer(f));
+        CATCH_CHECK(is_class_or_pointer(&i));
+        CATCH_CHECK(is_class_or_pointer(&b));
+        CATCH_CHECK(is_class_or_pointer(&f));
     }
 
-    SECTION("Variadic all_same trait")
+    CATCH_SECTION("Variadic all_same trait")
     {
-        CHECK(fly::all_same_v<int, int>);
-        CHECK(fly::all_same_v<int, const int>);
-        CHECK(fly::all_same_v<const int, int>);
-        CHECK(fly::all_same_v<const int, const int>);
+        CATCH_CHECK(fly::all_same_v<int, int>);
+        CATCH_CHECK(fly::all_same_v<int, const int>);
+        CATCH_CHECK(fly::all_same_v<const int, int>);
+        CATCH_CHECK(fly::all_same_v<const int, const int>);
 
-        CHECK(fly::all_same_v<int, int>);
-        CHECK(fly::all_same_v<int, int &>);
-        CHECK(fly::all_same_v<int &, int>);
-        CHECK(fly::all_same_v<int &, int &>);
+        CATCH_CHECK(fly::all_same_v<int, int>);
+        CATCH_CHECK(fly::all_same_v<int, int &>);
+        CATCH_CHECK(fly::all_same_v<int &, int>);
+        CATCH_CHECK(fly::all_same_v<int &, int &>);
 
-        CHECK(fly::all_same_v<int, int>);
-        CHECK(fly::all_same_v<int, const int &>);
-        CHECK(fly::all_same_v<const int &, int>);
-        CHECK(fly::all_same_v<const int &, const int &>);
+        CATCH_CHECK(fly::all_same_v<int, int>);
+        CATCH_CHECK(fly::all_same_v<int, const int &>);
+        CATCH_CHECK(fly::all_same_v<const int &, int>);
+        CATCH_CHECK(fly::all_same_v<const int &, const int &>);
 
-        CHECK(fly::all_same_v<int, int, int>);
-        CHECK(fly::all_same_v<int, int, const int>);
-        CHECK(fly::all_same_v<int, const int, int>);
-        CHECK(fly::all_same_v<int, const int, const int>);
+        CATCH_CHECK(fly::all_same_v<int, int, int>);
+        CATCH_CHECK(fly::all_same_v<int, int, const int>);
+        CATCH_CHECK(fly::all_same_v<int, const int, int>);
+        CATCH_CHECK(fly::all_same_v<int, const int, const int>);
 
-        CHECK(fly::all_same_v<const int, int, int>);
-        CHECK(fly::all_same_v<const int, int, const int>);
-        CHECK(fly::all_same_v<const int, const int, int>);
-        CHECK(fly::all_same_v<const int, const int, const int>);
+        CATCH_CHECK(fly::all_same_v<const int, int, int>);
+        CATCH_CHECK(fly::all_same_v<const int, int, const int>);
+        CATCH_CHECK(fly::all_same_v<const int, const int, int>);
+        CATCH_CHECK(fly::all_same_v<const int, const int, const int>);
 
-        CHECK(fly::all_same_v<bool, bool, bool>);
-        CHECK(fly::all_same_v<float, float, float, float>);
-        CHECK(fly::all_same_v<FooClass, FooClass, FooClass>);
-        CHECK(fly::all_same_v<std::string, std::string, std::string>);
+        CATCH_CHECK(fly::all_same_v<bool, bool, bool>);
+        CATCH_CHECK(fly::all_same_v<float, float, float, float>);
+        CATCH_CHECK(fly::all_same_v<FooClass, FooClass, FooClass>);
+        CATCH_CHECK(fly::all_same_v<std::string, std::string, std::string>);
 
-        CHECK_FALSE(fly::all_same_v<int, char>);
-        CHECK_FALSE(fly::all_same_v<int *, int>);
-        CHECK_FALSE(fly::all_same_v<bool, bool, char>);
-        CHECK_FALSE(fly::all_same_v<FooClass, FooClass, std::string>);
+        CATCH_CHECK_FALSE(fly::all_same_v<int, char>);
+        CATCH_CHECK_FALSE(fly::all_same_v<int *, int>);
+        CATCH_CHECK_FALSE(fly::all_same_v<bool, bool, char>);
+        CATCH_CHECK_FALSE(fly::all_same_v<FooClass, FooClass, std::string>);
     }
 
-    SECTION("Variadic any_same trait")
+    CATCH_SECTION("Variadic any_same trait")
     {
-        CHECK(fly::any_same_v<int, int>);
-        CHECK(fly::any_same_v<int, const int>);
-        CHECK(fly::any_same_v<const int, int>);
-        CHECK(fly::any_same_v<const int, const int>);
+        CATCH_CHECK(fly::any_same_v<int, int>);
+        CATCH_CHECK(fly::any_same_v<int, const int>);
+        CATCH_CHECK(fly::any_same_v<const int, int>);
+        CATCH_CHECK(fly::any_same_v<const int, const int>);
 
-        CHECK(fly::any_same_v<int, int>);
-        CHECK(fly::any_same_v<int, int &>);
-        CHECK(fly::any_same_v<int &, int>);
-        CHECK(fly::any_same_v<int &, int &>);
+        CATCH_CHECK(fly::any_same_v<int, int>);
+        CATCH_CHECK(fly::any_same_v<int, int &>);
+        CATCH_CHECK(fly::any_same_v<int &, int>);
+        CATCH_CHECK(fly::any_same_v<int &, int &>);
 
-        CHECK(fly::any_same_v<int, int>);
-        CHECK(fly::any_same_v<int, const int &>);
-        CHECK(fly::any_same_v<const int &, int>);
-        CHECK(fly::any_same_v<const int &, const int &>);
+        CATCH_CHECK(fly::any_same_v<int, int>);
+        CATCH_CHECK(fly::any_same_v<int, const int &>);
+        CATCH_CHECK(fly::any_same_v<const int &, int>);
+        CATCH_CHECK(fly::any_same_v<const int &, const int &>);
 
-        CHECK(fly::any_same_v<int, int, int>);
-        CHECK(fly::any_same_v<int, int, const int>);
-        CHECK(fly::any_same_v<int, const int, int>);
-        CHECK(fly::any_same_v<int, const int, const int>);
+        CATCH_CHECK(fly::any_same_v<int, int, int>);
+        CATCH_CHECK(fly::any_same_v<int, int, const int>);
+        CATCH_CHECK(fly::any_same_v<int, const int, int>);
+        CATCH_CHECK(fly::any_same_v<int, const int, const int>);
 
-        CHECK(fly::any_same_v<const int, int, int>);
-        CHECK(fly::any_same_v<const int, int, const int>);
-        CHECK(fly::any_same_v<const int, const int, int>);
-        CHECK(fly::any_same_v<const int, const int, const int>);
+        CATCH_CHECK(fly::any_same_v<const int, int, int>);
+        CATCH_CHECK(fly::any_same_v<const int, int, const int>);
+        CATCH_CHECK(fly::any_same_v<const int, const int, int>);
+        CATCH_CHECK(fly::any_same_v<const int, const int, const int>);
 
-        CHECK(fly::any_same_v<bool, bool, bool>);
-        CHECK(fly::any_same_v<float, float, float, float>);
-        CHECK(fly::any_same_v<FooClass, FooClass, FooClass>);
-        CHECK(fly::any_same_v<std::string, std::string, std::string>);
+        CATCH_CHECK(fly::any_same_v<bool, bool, bool>);
+        CATCH_CHECK(fly::any_same_v<float, float, float, float>);
+        CATCH_CHECK(fly::any_same_v<FooClass, FooClass, FooClass>);
+        CATCH_CHECK(fly::any_same_v<std::string, std::string, std::string>);
 
-        CHECK(fly::any_same_v<bool, bool, char>);
-        CHECK(fly::any_same_v<FooClass, FooClass, std::string>);
+        CATCH_CHECK(fly::any_same_v<bool, bool, char>);
+        CATCH_CHECK(fly::any_same_v<FooClass, FooClass, std::string>);
 
-        CHECK_FALSE(fly::any_same_v<int, char>);
-        CHECK_FALSE(fly::any_same_v<int *, int>);
-        CHECK_FALSE(fly::any_same_v<bool, char>);
-        CHECK_FALSE(fly::any_same_v<FooClass, std::string>);
+        CATCH_CHECK_FALSE(fly::any_same_v<int, char>);
+        CATCH_CHECK_FALSE(fly::any_same_v<int *, int>);
+        CATCH_CHECK_FALSE(fly::any_same_v<bool, char>);
+        CATCH_CHECK_FALSE(fly::any_same_v<FooClass, std::string>);
     }
 
-    SECTION("Overloaded visitation pattern")
+    CATCH_SECTION("Overloaded visitation pattern")
     {
         using TestVariant = std::variant<int, bool, std::string>;
         int result;
@@ -297,7 +297,7 @@ TEST_CASE("Traits", "[traits]")
                 [](std::string) -> int { return 3; },
             },
             TestVariant {int()});
-        CHECK(1 == result);
+        CATCH_CHECK(1 == result);
 
         result = std::visit(
             fly::visitation {
@@ -306,7 +306,7 @@ TEST_CASE("Traits", "[traits]")
                 [](std::string) -> int { return 3; },
             },
             TestVariant {bool()});
-        CHECK(2 == result);
+        CATCH_CHECK(2 == result);
 
         result = std::visit(
             fly::visitation {
@@ -315,7 +315,7 @@ TEST_CASE("Traits", "[traits]")
                 [](std::string) -> int { return 3; },
             },
             TestVariant {std::string()});
-        CHECK(3 == result);
+        CATCH_CHECK(3 == result);
 
         result = std::visit(
             fly::visitation {
@@ -323,7 +323,7 @@ TEST_CASE("Traits", "[traits]")
                 [](auto) -> int { return 2; },
             },
             TestVariant {int()});
-        CHECK(1 == result);
+        CATCH_CHECK(1 == result);
 
         result = std::visit(
             fly::visitation {
@@ -331,6 +331,6 @@ TEST_CASE("Traits", "[traits]")
                 [](auto) -> int { return 2; },
             },
             TestVariant {std::string()});
-        CHECK(2 == result);
+        CATCH_CHECK(2 == result);
     }
 }

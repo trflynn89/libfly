@@ -116,9 +116,9 @@ private:
 
 } // namespace
 
-TEST_CASE("Task", "[task]")
+CATCH_TEST_CASE("Task", "[task]")
 {
-    SECTION("Tasks may be posted as lambdas")
+    CATCH_SECTION("Tasks may be posted as lambdas")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -126,13 +126,13 @@ TEST_CASE("Task", "[task]")
         bool task_was_called = false;
         auto task = [&task_was_called]() { task_was_called = true; };
 
-        REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK(task_was_called);
+        CATCH_CHECK(task_was_called);
     }
 
-    SECTION("Tasks may be posted as mutable lambdas")
+    CATCH_SECTION("Tasks may be posted as mutable lambdas")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -145,13 +145,13 @@ TEST_CASE("Task", "[task]")
             task_id = "set";
         };
 
-        REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK(task_was_called);
+        CATCH_CHECK(task_was_called);
     }
 
-    SECTION("Tasks may be posted as standalone functions")
+    CATCH_SECTION("Tasks may be posted as standalone functions")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -159,13 +159,13 @@ TEST_CASE("Task", "[task]")
         bool task_was_called = false;
         auto task = std::bind(standalone_task, std::ref(task_was_called));
 
-        REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK(task_was_called);
+        CATCH_CHECK(task_was_called);
     }
 
-    SECTION("Tasks may be posted as static class functions")
+    CATCH_SECTION("Tasks may be posted as static class functions")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -173,13 +173,13 @@ TEST_CASE("Task", "[task]")
         bool task_was_called = false;
         auto task = std::bind(TaskClass::static_task, std::ref(task_was_called));
 
-        REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK(task_was_called);
+        CATCH_CHECK(task_was_called);
     }
 
-    SECTION("Tasks may be posted as member class functions")
+    CATCH_SECTION("Tasks may be posted as member class functions")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -189,13 +189,13 @@ TEST_CASE("Task", "[task]")
 
         auto task = std::bind(&TaskClass::member_task, &task_class);
 
-        REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK(task_was_called);
+        CATCH_CHECK(task_was_called);
     }
 
-    SECTION("Tasks may pass their result to a reply task")
+    CATCH_SECTION("Tasks may pass their result to a reply task")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
@@ -209,15 +209,16 @@ TEST_CASE("Task", "[task]")
         };
         auto reply = [&reply_was_called](bool result) { reply_was_called = result; };
 
-        REQUIRE(task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply)));
+        CATCH_REQUIRE(
+            task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply)));
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK(task_was_called);
-        CHECK(reply_was_called);
+        CATCH_CHECK(task_was_called);
+        CATCH_CHECK(reply_was_called);
     }
 
-    SECTION("Void tasks may indicate their completion to a reply task")
+    CATCH_SECTION("Void tasks may indicate their completion to a reply task")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
@@ -228,15 +229,16 @@ TEST_CASE("Task", "[task]")
         auto task = [&task_was_called]() { task_was_called = true; };
         auto reply = [&reply_was_called]() { reply_was_called = true; };
 
-        REQUIRE(task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply)));
+        CATCH_REQUIRE(
+            task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply)));
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK(task_was_called);
-        CHECK(reply_was_called);
+        CATCH_CHECK(task_was_called);
+        CATCH_CHECK(reply_was_called);
     }
 
-    SECTION("Delayed tasks execute no sooner than their specified delay")
+    CATCH_SECTION("Delayed tasks execute no sooner than their specified delay")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
@@ -244,14 +246,14 @@ TEST_CASE("Task", "[task]")
         TimerTask task;
         const std::chrono::milliseconds delay(10);
 
-        REQUIRE(
+        CATCH_REQUIRE(
             task_runner->post_task_with_delay(FROM_HERE, std::bind(&TimerTask::run, &task), delay));
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK(task.time() >= delay);
+        CATCH_CHECK(task.time() >= delay);
     }
 
-    SECTION("Delayed tasks execute after immediate tasks posted at the same time")
+    CATCH_SECTION("Delayed tasks execute after immediate tasks posted at the same time")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
@@ -259,10 +261,12 @@ TEST_CASE("Task", "[task]")
         fly::ConcurrentQueue<int> ordering;
         MarkerTask task(&ordering);
 
-        REQUIRE(task_runner
-                    ->post_task_with_delay(FROM_HERE, std::bind(&MarkerTask::run, &task, 1), 10ms));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 2)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 3)));
+        CATCH_REQUIRE(task_runner->post_task_with_delay(
+            FROM_HERE,
+            std::bind(&MarkerTask::run, &task, 1),
+            10ms));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 2)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 3)));
 
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
@@ -270,16 +274,16 @@ TEST_CASE("Task", "[task]")
 
         int marker = 0;
         ordering.pop(marker);
-        CHECK(marker == 2);
+        CATCH_CHECK(marker == 2);
 
         ordering.pop(marker);
-        CHECK(marker == 3);
+        CATCH_CHECK(marker == 3);
 
         ordering.pop(marker);
-        CHECK(marker == 1);
+        CATCH_CHECK(marker == 1);
     }
 
-    SECTION("Delayed tasks may pass their result to a reply task")
+    CATCH_SECTION("Delayed tasks may pass their result to a reply task")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
@@ -293,7 +297,7 @@ TEST_CASE("Task", "[task]")
         };
         auto reply = [&reply_was_called](bool result) { reply_was_called = result; };
 
-        REQUIRE(task_runner->post_task_with_delay_and_reply(
+        CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
             FROM_HERE,
             std::move(task),
             std::move(reply),
@@ -301,11 +305,11 @@ TEST_CASE("Task", "[task]")
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK(task_was_called);
-        CHECK(reply_was_called);
+        CATCH_CHECK(task_was_called);
+        CATCH_CHECK(reply_was_called);
     }
 
-    SECTION("Delayed void tasks may indicate their completion to a reply task")
+    CATCH_SECTION("Delayed void tasks may indicate their completion to a reply task")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
@@ -316,7 +320,7 @@ TEST_CASE("Task", "[task]")
         auto task = [&task_was_called]() { task_was_called = true; };
         auto reply = [&reply_was_called]() { reply_was_called = true; };
 
-        REQUIRE(task_runner->post_task_with_delay_and_reply(
+        CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
             FROM_HERE,
             std::move(task),
             std::move(reply),
@@ -324,13 +328,13 @@ TEST_CASE("Task", "[task]")
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
 
-        CHECK(task_was_called);
-        CHECK(reply_was_called);
+        CATCH_CHECK(task_was_called);
+        CATCH_CHECK(reply_was_called);
     }
 
-    SECTION("Cancelled tasks")
+    CATCH_SECTION("Cancelled tasks")
     {
-        SECTION("Tasks may be kept alive with strong pointers")
+        CATCH_SECTION("Strong tasks may be ensured to execute")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -343,13 +347,13 @@ TEST_CASE("Task", "[task]")
             };
 
             std::weak_ptr<TaskClass> weak_task_class = task_class;
-            REQUIRE(task_runner->post_task(FROM_HERE, std::move(task), weak_task_class));
+            CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task), weak_task_class));
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK(task_was_called);
+            CATCH_CHECK(task_was_called);
         }
 
-        SECTION("Tasks may be cancelled with weak pointers")
+        CATCH_SECTION("Weak tasks may be cancelled")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -364,13 +368,13 @@ TEST_CASE("Task", "[task]")
             std::weak_ptr<TaskClass> weak_task_class = task_class;
             task_class.reset();
 
-            REQUIRE(task_runner->post_task(FROM_HERE, std::move(task), weak_task_class));
+            CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task), weak_task_class));
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK_FALSE(task_was_called);
+            CATCH_CHECK_FALSE(task_was_called);
         }
 
-        SECTION("Tasks with replies may be cancelled with weak pointers before task")
+        CATCH_SECTION("Weak tasks with replies may be cancelled before task")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -390,18 +394,18 @@ TEST_CASE("Task", "[task]")
             std::weak_ptr<TaskClass> weak_task_class = task_class;
             task_class.reset();
 
-            REQUIRE(task_runner->post_task_with_reply(
+            CATCH_REQUIRE(task_runner->post_task_with_reply(
                 FROM_HERE,
                 std::move(task),
                 std::move(reply),
                 weak_task_class));
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK_FALSE(task_was_called);
-            CHECK_FALSE(reply_was_called);
+            CATCH_CHECK_FALSE(task_was_called);
+            CATCH_CHECK_FALSE(reply_was_called);
         }
 
-        SECTION("Tasks with replies may be cancelled with weak pointers before reply")
+        CATCH_SECTION("Weak tasks with replies may be cancelled before reply")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -422,7 +426,7 @@ TEST_CASE("Task", "[task]")
 
             std::weak_ptr<TaskClass> weak_task_class = task_class;
 
-            REQUIRE(task_runner->post_task_with_reply(
+            CATCH_REQUIRE(task_runner->post_task_with_reply(
                 FROM_HERE,
                 std::move(task),
                 std::move(reply),
@@ -430,11 +434,11 @@ TEST_CASE("Task", "[task]")
             task_runner->wait_for_task_to_complete(__FILE__);
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK(task_was_called);
-            CHECK_FALSE(reply_was_called);
+            CATCH_CHECK(task_was_called);
+            CATCH_CHECK_FALSE(reply_was_called);
         }
 
-        SECTION("Void tasks with replies may be cancelled with weak pointers before task")
+        CATCH_SECTION("Weak void tasks with replies may be cancelled before task")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -453,18 +457,18 @@ TEST_CASE("Task", "[task]")
             std::weak_ptr<TaskClass> weak_task_class = task_class;
             task_class.reset();
 
-            REQUIRE(task_runner->post_task_with_reply(
+            CATCH_REQUIRE(task_runner->post_task_with_reply(
                 FROM_HERE,
                 std::move(task),
                 std::move(reply),
                 weak_task_class));
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK_FALSE(task_was_called);
-            CHECK_FALSE(reply_was_called);
+            CATCH_CHECK_FALSE(task_was_called);
+            CATCH_CHECK_FALSE(reply_was_called);
         }
 
-        SECTION("Void tasks with replies may be cancelled with weak pointers before reply")
+        CATCH_SECTION("Weak void tasks with replies may be cancelled before reply")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -484,7 +488,7 @@ TEST_CASE("Task", "[task]")
 
             std::weak_ptr<TaskClass> weak_task_class = task_class;
 
-            REQUIRE(task_runner->post_task_with_reply(
+            CATCH_REQUIRE(task_runner->post_task_with_reply(
                 FROM_HERE,
                 std::move(task),
                 std::move(reply),
@@ -492,11 +496,11 @@ TEST_CASE("Task", "[task]")
             task_runner->wait_for_task_to_complete(__FILE__);
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK(task_was_called);
-            CHECK_FALSE(reply_was_called);
+            CATCH_CHECK(task_was_called);
+            CATCH_CHECK_FALSE(reply_was_called);
         }
 
-        SECTION("Delayed tasks may be kept alive with strong pointers")
+        CATCH_SECTION("Strong delayed tasks may be ensured to execute")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -509,14 +513,15 @@ TEST_CASE("Task", "[task]")
             };
 
             std::weak_ptr<TaskClass> weak_task_class = task_class;
-            REQUIRE(task_runner
-                        ->post_task_with_delay(FROM_HERE, std::move(task), weak_task_class, 10ms));
+            CATCH_REQUIRE(
+                task_runner
+                    ->post_task_with_delay(FROM_HERE, std::move(task), weak_task_class, 10ms));
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK(task_was_called);
+            CATCH_CHECK(task_was_called);
         }
 
-        SECTION("Delayed tasks may be cancelled with weak pointers")
+        CATCH_SECTION("Weak delayed tasks may be cancelled")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -531,14 +536,15 @@ TEST_CASE("Task", "[task]")
             std::weak_ptr<TaskClass> weak_task_class = task_class;
             task_class.reset();
 
-            REQUIRE(task_runner
-                        ->post_task_with_delay(FROM_HERE, std::move(task), weak_task_class, 10ms));
+            CATCH_REQUIRE(
+                task_runner
+                    ->post_task_with_delay(FROM_HERE, std::move(task), weak_task_class, 10ms));
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK_FALSE(task_was_called);
+            CATCH_CHECK_FALSE(task_was_called);
         }
 
-        SECTION("Delayed tasks with replies may be cancelled with weak pointers before task")
+        CATCH_SECTION("Weak delayed tasks with replies may be cancelled before task")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -558,7 +564,7 @@ TEST_CASE("Task", "[task]")
             std::weak_ptr<TaskClass> weak_task_class = task_class;
             task_class.reset();
 
-            REQUIRE(task_runner->post_task_with_delay_and_reply(
+            CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
                 FROM_HERE,
                 std::move(task),
                 std::move(reply),
@@ -566,11 +572,11 @@ TEST_CASE("Task", "[task]")
                 10ms));
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK_FALSE(task_was_called);
-            CHECK_FALSE(reply_was_called);
+            CATCH_CHECK_FALSE(task_was_called);
+            CATCH_CHECK_FALSE(reply_was_called);
         }
 
-        SECTION("Delayed tasks with replies may be cancelled with weak pointers before reply")
+        CATCH_SECTION("Weak delayed tasks with replies may be cancelled before reply")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -591,7 +597,7 @@ TEST_CASE("Task", "[task]")
 
             std::weak_ptr<TaskClass> weak_task_class = task_class;
 
-            REQUIRE(task_runner->post_task_with_delay_and_reply(
+            CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
                 FROM_HERE,
                 std::move(task),
                 std::move(reply),
@@ -600,11 +606,11 @@ TEST_CASE("Task", "[task]")
             task_runner->wait_for_task_to_complete(__FILE__);
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK(task_was_called);
-            CHECK_FALSE(reply_was_called);
+            CATCH_CHECK(task_was_called);
+            CATCH_CHECK_FALSE(reply_was_called);
         }
 
-        SECTION("Delayed void tasks with replies may be cancelled with weak pointers before task")
+        CATCH_SECTION("Weak delayed void tasks with replies may be cancelled before task")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -623,7 +629,7 @@ TEST_CASE("Task", "[task]")
             std::weak_ptr<TaskClass> weak_task_class = task_class;
             task_class.reset();
 
-            REQUIRE(task_runner->post_task_with_delay_and_reply(
+            CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
                 FROM_HERE,
                 std::move(task),
                 std::move(reply),
@@ -631,11 +637,11 @@ TEST_CASE("Task", "[task]")
                 10ms));
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK_FALSE(task_was_called);
-            CHECK_FALSE(reply_was_called);
+            CATCH_CHECK_FALSE(task_was_called);
+            CATCH_CHECK_FALSE(reply_was_called);
         }
 
-        SECTION("Delayed void tasks with replies may be cancelled with weak pointers before reply")
+        CATCH_SECTION("Weak delayed void tasks with replies may be cancelled before reply")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableParallelTaskRunner>();
@@ -655,7 +661,7 @@ TEST_CASE("Task", "[task]")
 
             std::weak_ptr<TaskClass> weak_task_class = task_class;
 
-            REQUIRE(task_runner->post_task_with_delay_and_reply(
+            CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
                 FROM_HERE,
                 std::move(task),
                 std::move(reply),
@@ -664,11 +670,11 @@ TEST_CASE("Task", "[task]")
             task_runner->wait_for_task_to_complete(__FILE__);
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK(task_was_called);
-            CHECK_FALSE(reply_was_called);
+            CATCH_CHECK(task_was_called);
+            CATCH_CHECK_FALSE(reply_was_called);
         }
 
-        SECTION("Cancelled tasks do not execute while other tasks do execute")
+        CATCH_SECTION("Cancelled tasks do not execute while other tasks do execute")
         {
             auto task_runner = fly::test::task_manager()
                                    ->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
@@ -689,42 +695,42 @@ TEST_CASE("Task", "[task]")
 
             task_class.reset();
 
-            REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
-            REQUIRE(
+            CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
+            CATCH_REQUIRE(
                 task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &marker_task, 2)));
-            REQUIRE(
+            CATCH_REQUIRE(
                 task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &marker_task, 3)));
 
             task_runner->wait_for_task_to_complete(__FILE__);
             task_runner->wait_for_task_to_complete(__FILE__);
 
-            CHECK_FALSE(task_was_called);
+            CATCH_CHECK_FALSE(task_was_called);
 
             int marker = 0;
             ordering.pop(marker);
-            CHECK(marker == 2);
+            CATCH_CHECK(marker == 2);
 
             ordering.pop(marker);
-            CHECK(marker == 3);
+            CATCH_CHECK(marker == 3);
         }
     }
 
-    SECTION("Parallel task runner does not enforce execution order")
+    CATCH_SECTION("Parallel task runner does not enforce execution order")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
 
         CountTask task;
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&CountTask::run, &task)));
 
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
     }
 
-    SECTION("Sequenced task runner enforces execution order")
+    CATCH_SECTION("Sequenced task runner enforces execution order")
     {
         auto task_runner =
             fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
@@ -732,9 +738,9 @@ TEST_CASE("Task", "[task]")
         fly::ConcurrentQueue<int> ordering;
         MarkerTask task(&ordering);
 
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 1)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 2)));
-        REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 3)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 1)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 2)));
+        CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 3)));
 
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
@@ -742,56 +748,56 @@ TEST_CASE("Task", "[task]")
 
         int marker = 0;
         ordering.pop(marker);
-        CHECK(marker == 1);
+        CATCH_CHECK(marker == 1);
 
         ordering.pop(marker);
-        CHECK(marker == 2);
+        CATCH_CHECK(marker == 2);
 
         ordering.pop(marker);
-        CHECK(marker == 3);
+        CATCH_CHECK(marker == 3);
     }
 }
 
-TEST_CASE("TaskManager", "[task]")
+CATCH_TEST_CASE("TaskManager", "[task]")
 {
     auto task_manager = std::make_shared<fly::TaskManager>(1);
-    REQUIRE(task_manager->start());
+    CATCH_REQUIRE(task_manager->start());
 
-    SECTION("Cannot start the task manager multiple times")
+    CATCH_SECTION("Cannot start the task manager multiple times")
     {
-        CHECK_FALSE(task_manager->start());
-        REQUIRE(task_manager->stop());
+        CATCH_CHECK_FALSE(task_manager->start());
+        CATCH_REQUIRE(task_manager->stop());
     }
 
-    SECTION("Cannot stop the task manager multiple times")
+    CATCH_SECTION("Cannot stop the task manager multiple times")
     {
-        REQUIRE(task_manager->stop());
-        CHECK_FALSE(task_manager->stop());
+        CATCH_REQUIRE(task_manager->stop());
+        CATCH_CHECK_FALSE(task_manager->stop());
     }
 
-    SECTION("Parallel tasks cannot be posted after the task manager is deleted")
+    CATCH_SECTION("Parallel tasks cannot be posted after the task manager is deleted")
     {
         auto task_runner = task_manager->create_task_runner<fly::ParallelTaskRunner>();
 
-        REQUIRE(task_manager->stop());
+        CATCH_REQUIRE(task_manager->stop());
         task_manager.reset();
 
-        CHECK_FALSE(task_runner->post_task(FROM_HERE, []() {}));
-        CHECK_FALSE(task_runner->post_task_with_delay(
+        CATCH_CHECK_FALSE(task_runner->post_task(FROM_HERE, []() {}));
+        CATCH_CHECK_FALSE(task_runner->post_task_with_delay(
             FROM_HERE,
             []() {},
             0ms));
     }
 
-    SECTION("Sequenced tasks cannot be posted after the task manager is deleted")
+    CATCH_SECTION("Sequenced tasks cannot be posted after the task manager is deleted")
     {
         auto task_runner = task_manager->create_task_runner<fly::SequencedTaskRunner>();
 
-        REQUIRE(task_manager->stop());
+        CATCH_REQUIRE(task_manager->stop());
         task_manager.reset();
 
-        CHECK_FALSE(task_runner->post_task(FROM_HERE, []() {}));
-        CHECK_FALSE(task_runner->post_task_with_delay(
+        CATCH_CHECK_FALSE(task_runner->post_task(FROM_HERE, []() {}));
+        CATCH_CHECK_FALSE(task_runner->post_task_with_delay(
             FROM_HERE,
             []() {},
             0ms));

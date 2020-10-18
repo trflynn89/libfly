@@ -68,7 +68,7 @@ constexpr int call_stoi(const StringType &)
 
 } // namespace
 
-TEMPLATE_TEST_CASE(
+CATCH_TEMPLATE_TEST_CASE(
     "BasicStringTraits",
     "[string]",
     std::string,
@@ -87,163 +87,164 @@ TEMPLATE_TEST_CASE(
     constexpr bool is_string16 = std::is_same_v<StringType, std::u16string>;
     constexpr bool is_string32 = std::is_same_v<StringType, std::u32string>;
 
-    SECTION("Check whether the STL defines the std::stoi family of functions via traits")
+    CATCH_SECTION("Check whether the STL defines the std::stoi family of functions via traits")
     {
-        CHECK(traits::has_stoi_family_v == (is_string || is_wstring));
+        CATCH_CHECK(traits::has_stoi_family_v == (is_string || is_wstring));
     }
 
-    SECTION("Check whether the STL defines the std::stoi family of functions via SFINAE overloads")
+    CATCH_SECTION(
+        "Check whether the STL defines the std::stoi family of functions via SFINAE overloads")
     {
         const StringType s = FLY_STR(char_type, "123");
         const int i = call_stoi(s);
 
         if constexpr (is_string || is_wstring)
         {
-            CHECK(i == 123);
+            CATCH_CHECK(i == 123);
         }
         else
         {
-            CHECK(i == -1);
+            CATCH_CHECK(i == -1);
         }
     }
 
-    SECTION("Check whether types are string-like via traits")
+    CATCH_SECTION("Check whether types are string-like via traits")
     {
-        SECTION("Plain data types")
+        CATCH_SECTION("Plain data types")
         {
-            CHECK_FALSE(traits::template is_string_like_v<int>);
-            CHECK_FALSE(traits::template is_string_like_v<const int>);
-            CHECK_FALSE(traits::template is_string_like_v<int const>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<int>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const int>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<int const>);
 
-            CHECK_FALSE(traits::template is_string_like_v<char>);
-            CHECK_FALSE(traits::template is_string_like_v<const char>);
-            CHECK_FALSE(traits::template is_string_like_v<char const>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const char>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char const>);
 
-            CHECK_FALSE(traits::template is_string_like_v<wchar_t>);
-            CHECK_FALSE(traits::template is_string_like_v<const wchar_t>);
-            CHECK_FALSE(traits::template is_string_like_v<wchar_t const>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<wchar_t>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const wchar_t>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<wchar_t const>);
 
-            CHECK_FALSE(traits::template is_string_like_v<char16_t>);
-            CHECK_FALSE(traits::template is_string_like_v<const char16_t>);
-            CHECK_FALSE(traits::template is_string_like_v<char16_t const>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char16_t>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const char16_t>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char16_t const>);
 
-            CHECK_FALSE(traits::template is_string_like_v<char32_t>);
-            CHECK_FALSE(traits::template is_string_like_v<const char32_t>);
-            CHECK_FALSE(traits::template is_string_like_v<char32_t const>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char32_t>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const char32_t>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char32_t const>);
 
-            CHECK_FALSE(traits::template is_string_like_v<char &>);
-            CHECK_FALSE(traits::template is_string_like_v<const char &>);
-            CHECK_FALSE(traits::template is_string_like_v<char const &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const char &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char const &>);
 
-            CHECK_FALSE(traits::template is_string_like_v<wchar_t &>);
-            CHECK_FALSE(traits::template is_string_like_v<const wchar_t &>);
-            CHECK_FALSE(traits::template is_string_like_v<wchar_t const &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<wchar_t &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const wchar_t &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<wchar_t const &>);
 
-            CHECK_FALSE(traits::template is_string_like_v<char16_t &>);
-            CHECK_FALSE(traits::template is_string_like_v<const char16_t &>);
-            CHECK_FALSE(traits::template is_string_like_v<char16_t const &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char16_t &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const char16_t &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char16_t const &>);
 
-            CHECK_FALSE(traits::template is_string_like_v<char32_t &>);
-            CHECK_FALSE(traits::template is_string_like_v<const char32_t &>);
-            CHECK_FALSE(traits::template is_string_like_v<char32_t const &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char32_t &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const char32_t &>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<char32_t const &>);
         }
 
-        SECTION("C-string types")
+        CATCH_SECTION("C-string types")
         {
-            CHECK(traits::template is_string_like_v<char *> == is_string);
-            CHECK(traits::template is_string_like_v<const char *> == is_string);
-            CHECK(traits::template is_string_like_v<char const *> == is_string);
+            CATCH_CHECK(traits::template is_string_like_v<char *> == is_string);
+            CATCH_CHECK(traits::template is_string_like_v<const char *> == is_string);
+            CATCH_CHECK(traits::template is_string_like_v<char const *> == is_string);
 
-            CHECK(traits::template is_string_like_v<wchar_t *> == is_wstring);
-            CHECK(traits::template is_string_like_v<const wchar_t *> == is_wstring);
-            CHECK(traits::template is_string_like_v<wchar_t const *> == is_wstring);
+            CATCH_CHECK(traits::template is_string_like_v<wchar_t *> == is_wstring);
+            CATCH_CHECK(traits::template is_string_like_v<const wchar_t *> == is_wstring);
+            CATCH_CHECK(traits::template is_string_like_v<wchar_t const *> == is_wstring);
 
-            CHECK(traits::template is_string_like_v<char16_t *> == is_string16);
-            CHECK(traits::template is_string_like_v<const char16_t *> == is_string16);
-            CHECK(traits::template is_string_like_v<char16_t const *> == is_string16);
+            CATCH_CHECK(traits::template is_string_like_v<char16_t *> == is_string16);
+            CATCH_CHECK(traits::template is_string_like_v<const char16_t *> == is_string16);
+            CATCH_CHECK(traits::template is_string_like_v<char16_t const *> == is_string16);
 
-            CHECK(traits::template is_string_like_v<char32_t *> == is_string32);
-            CHECK(traits::template is_string_like_v<const char32_t *> == is_string32);
-            CHECK(traits::template is_string_like_v<char32_t const *> == is_string32);
+            CATCH_CHECK(traits::template is_string_like_v<char32_t *> == is_string32);
+            CATCH_CHECK(traits::template is_string_like_v<const char32_t *> == is_string32);
+            CATCH_CHECK(traits::template is_string_like_v<char32_t const *> == is_string32);
         }
 
-        SECTION("C++-string types")
+        CATCH_SECTION("C++-string types")
         {
-            CHECK(traits::template is_string_like_v<std::string> == is_string);
-            CHECK(traits::template is_string_like_v<const std::string> == is_string);
-            CHECK(traits::template is_string_like_v<std::string const> == is_string);
+            CATCH_CHECK(traits::template is_string_like_v<std::string> == is_string);
+            CATCH_CHECK(traits::template is_string_like_v<const std::string> == is_string);
+            CATCH_CHECK(traits::template is_string_like_v<std::string const> == is_string);
 
-            CHECK(traits::template is_string_like_v<std::wstring> == is_wstring);
-            CHECK(traits::template is_string_like_v<const std::wstring> == is_wstring);
-            CHECK(traits::template is_string_like_v<std::wstring const> == is_wstring);
+            CATCH_CHECK(traits::template is_string_like_v<std::wstring> == is_wstring);
+            CATCH_CHECK(traits::template is_string_like_v<const std::wstring> == is_wstring);
+            CATCH_CHECK(traits::template is_string_like_v<std::wstring const> == is_wstring);
 
-            CHECK(traits::template is_string_like_v<std::u16string> == is_string16);
-            CHECK(traits::template is_string_like_v<const std::u16string> == is_string16);
-            CHECK(traits::template is_string_like_v<std::u16string const> == is_string16);
+            CATCH_CHECK(traits::template is_string_like_v<std::u16string> == is_string16);
+            CATCH_CHECK(traits::template is_string_like_v<const std::u16string> == is_string16);
+            CATCH_CHECK(traits::template is_string_like_v<std::u16string const> == is_string16);
 
-            CHECK(traits::template is_string_like_v<std::u32string> == is_string32);
-            CHECK(traits::template is_string_like_v<const std::u32string> == is_string32);
-            CHECK(traits::template is_string_like_v<std::u32string const> == is_string32);
+            CATCH_CHECK(traits::template is_string_like_v<std::u32string> == is_string32);
+            CATCH_CHECK(traits::template is_string_like_v<const std::u32string> == is_string32);
+            CATCH_CHECK(traits::template is_string_like_v<std::u32string const> == is_string32);
         }
 
-        SECTION("C++-string type references")
+        CATCH_SECTION("C++-string type references")
         {
-            CHECK(traits::template is_string_like_v<std::string &> == is_string);
-            CHECK(traits::template is_string_like_v<const std::string &> == is_string);
-            CHECK(traits::template is_string_like_v<std::string const &> == is_string);
+            CATCH_CHECK(traits::template is_string_like_v<std::string &> == is_string);
+            CATCH_CHECK(traits::template is_string_like_v<const std::string &> == is_string);
+            CATCH_CHECK(traits::template is_string_like_v<std::string const &> == is_string);
 
-            CHECK(traits::template is_string_like_v<std::wstring &> == is_wstring);
-            CHECK(traits::template is_string_like_v<const std::wstring &> == is_wstring);
-            CHECK(traits::template is_string_like_v<std::wstring const &> == is_wstring);
+            CATCH_CHECK(traits::template is_string_like_v<std::wstring &> == is_wstring);
+            CATCH_CHECK(traits::template is_string_like_v<const std::wstring &> == is_wstring);
+            CATCH_CHECK(traits::template is_string_like_v<std::wstring const &> == is_wstring);
 
-            CHECK(traits::template is_string_like_v<std::u16string &> == is_string16);
-            CHECK(traits::template is_string_like_v<const std::u16string &> == is_string16);
-            CHECK(traits::template is_string_like_v<std::u16string const &> == is_string16);
+            CATCH_CHECK(traits::template is_string_like_v<std::u16string &> == is_string16);
+            CATCH_CHECK(traits::template is_string_like_v<const std::u16string &> == is_string16);
+            CATCH_CHECK(traits::template is_string_like_v<std::u16string const &> == is_string16);
 
-            CHECK(traits::template is_string_like_v<std::u32string &> == is_string32);
-            CHECK(traits::template is_string_like_v<const std::u32string &> == is_string32);
-            CHECK(traits::template is_string_like_v<std::u32string const &> == is_string32);
+            CATCH_CHECK(traits::template is_string_like_v<std::u32string &> == is_string32);
+            CATCH_CHECK(traits::template is_string_like_v<const std::u32string &> == is_string32);
+            CATCH_CHECK(traits::template is_string_like_v<std::u32string const &> == is_string32);
         }
 
-        SECTION("C++-string type pointers")
+        CATCH_SECTION("C++-string type pointers")
         {
-            CHECK_FALSE(traits::template is_string_like_v<std::string *>);
-            CHECK_FALSE(traits::template is_string_like_v<const std::string *>);
-            CHECK_FALSE(traits::template is_string_like_v<std::string const *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<std::string *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const std::string *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<std::string const *>);
 
-            CHECK_FALSE(traits::template is_string_like_v<std::wstring *>);
-            CHECK_FALSE(traits::template is_string_like_v<const std::wstring *>);
-            CHECK_FALSE(traits::template is_string_like_v<std::wstring const *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<std::wstring *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const std::wstring *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<std::wstring const *>);
 
-            CHECK_FALSE(traits::template is_string_like_v<std::u16string *>);
-            CHECK_FALSE(traits::template is_string_like_v<const std::u16string *>);
-            CHECK_FALSE(traits::template is_string_like_v<std::u16string const *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<std::u16string *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const std::u16string *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<std::u16string const *>);
 
-            CHECK_FALSE(traits::template is_string_like_v<std::u32string *>);
-            CHECK_FALSE(traits::template is_string_like_v<const std::u32string *>);
-            CHECK_FALSE(traits::template is_string_like_v<std::u32string const *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<std::u32string *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const std::u32string *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<std::u32string const *>);
         }
     }
 
-    SECTION("Check whether types are string-like via SFINAE overloads")
+    CATCH_SECTION("Check whether types are string-like via SFINAE overloads")
     {
-        CHECK(is_string_like(StringType()));
-        CHECK(is_string_like(char_pointer_type()));
+        CATCH_CHECK(is_string_like(StringType()));
+        CATCH_CHECK(is_string_like(char_pointer_type()));
 
-        CHECK_FALSE(is_string_like(int()));
-        CHECK_FALSE(is_string_like(char_type()));
+        CATCH_CHECK_FALSE(is_string_like(int()));
+        CATCH_CHECK_FALSE(is_string_like(char_type()));
     }
 
-    SECTION("Check whether types are streamable")
+    CATCH_SECTION("Check whether types are streamable")
     {
         const Streamable<streamed_type> obj1;
         const NotStreamable obj2;
 
-        CHECK(traits::OstreamTraits::template is_declared_v<int>);
-        CHECK(traits::OstreamTraits::template is_declared_v<bool>);
-        CHECK(traits::OstreamTraits::template is_declared_v<streamed_type>);
-        CHECK(traits::OstreamTraits::template is_declared_v<decltype(obj1)>);
+        CATCH_CHECK(traits::OstreamTraits::template is_declared_v<int>);
+        CATCH_CHECK(traits::OstreamTraits::template is_declared_v<bool>);
+        CATCH_CHECK(traits::OstreamTraits::template is_declared_v<streamed_type>);
+        CATCH_CHECK(traits::OstreamTraits::template is_declared_v<decltype(obj1)>);
 
-        CHECK_FALSE(traits::OstreamTraits::template is_declared_v<decltype(obj2)>);
+        CATCH_CHECK_FALSE(traits::OstreamTraits::template is_declared_v<decltype(obj2)>);
     }
 }

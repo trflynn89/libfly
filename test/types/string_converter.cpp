@@ -43,7 +43,7 @@ StringType maxstr()
 
 } // namespace
 
-TEMPLATE_TEST_CASE(
+CATCH_TEMPLATE_TEST_CASE(
     "BasicStringConverter",
     "[string]",
     std::string,
@@ -83,308 +83,311 @@ TEMPLATE_TEST_CASE(
         return result;
     };
 
-    SECTION("Convert a string-like type to a standard string type")
+    CATCH_SECTION("Convert a string-like type to a standard string type")
     {
         StringType s = FLY_STR(char_type, "abc");
-        CHECK(BasicString::template convert<StringType>(s) == s);
+        CATCH_CHECK(BasicString::template convert<StringType>(s) == s);
 
         const char_type *c = FLY_STR(char_type, "def");
-        CHECK(BasicString::template convert<StringType>(c) == c);
+        CATCH_CHECK(BasicString::template convert<StringType>(c) == c);
 
         char_type *d = const_cast<char_type *>(FLY_STR(char_type, "ghi"));
-        CHECK(BasicString::template convert<StringType>(d) == d);
+        CATCH_CHECK(BasicString::template convert<StringType>(d) == d);
     }
 
-    SECTION("Convert a string to a UTF-8 encoded string")
+    CATCH_SECTION("Convert a string to a UTF-8 encoded string")
     {
         StringType test = FLY_STR(char_type, "\U0001f355 in the morning");
         {
             auto utf8 = FLY_STR(std::string::value_type, "\U0001f355 in the morning");
-            CHECK(BasicString::template convert<std::string>(test) == utf8);
+            CATCH_CHECK(BasicString::template convert<std::string>(test) == utf8);
         }
         {
             const auto utf8 = FLY_STR(std::string::value_type, "\U0001f355 in the morning");
-            CHECK(BasicString::template convert<std::string>(test) == utf8);
+            CATCH_CHECK(BasicString::template convert<std::string>(test) == utf8);
         }
 
-        CHECK_FALSE(BasicString::template convert<std::string>(out_of_range_codepoint()));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::string>(out_of_range_codepoint()));
     }
 
-    SECTION("Convert a string to a UTF-16 encoded string")
+    CATCH_SECTION("Convert a string to a UTF-16 encoded string")
     {
         StringType test = FLY_STR(char_type, "\U0001f355 in the morning");
         {
             auto utf16 = FLY_STR(std::u16string::value_type, "\U0001f355 in the morning");
-            CHECK(BasicString::template convert<std::u16string>(test) == utf16);
+            CATCH_CHECK(BasicString::template convert<std::u16string>(test) == utf16);
         }
         {
             const auto utf16 = FLY_STR(std::u16string::value_type, "\U0001f355 in the morning");
-            CHECK(BasicString::template convert<std::u16string>(test) == utf16);
+            CATCH_CHECK(BasicString::template convert<std::u16string>(test) == utf16);
         }
 
-        CHECK_FALSE(BasicString::template convert<std::u16string>(out_of_range_codepoint()));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::u16string>(out_of_range_codepoint()));
 
         if constexpr (sizeof(std::wstring::value_type) == 2)
         {
             {
                 auto utf16 = FLY_STR(std::wstring::value_type, "\U0001f355 in the morning");
-                CHECK(BasicString::template convert<std::wstring>(test) == utf16);
+                CATCH_CHECK(BasicString::template convert<std::wstring>(test) == utf16);
             }
             {
                 const auto utf16 = FLY_STR(std::wstring::value_type, "\U0001f355 in the morning");
-                CHECK(BasicString::template convert<std::wstring>(test) == utf16);
+                CATCH_CHECK(BasicString::template convert<std::wstring>(test) == utf16);
             }
 
-            CHECK_FALSE(BasicString::template convert<std::wstring>(out_of_range_codepoint()));
+            CATCH_CHECK_FALSE(
+                BasicString::template convert<std::wstring>(out_of_range_codepoint()));
         }
     }
 
-    SECTION("Convert a string to a UTF-32 encoded string")
+    CATCH_SECTION("Convert a string to a UTF-32 encoded string")
     {
         StringType test = FLY_STR(char_type, "\U0001f355 in the morning");
         {
             auto utf32 = FLY_STR(std::u32string::value_type, "\U0001f355 in the morning");
-            CHECK(BasicString::template convert<std::u32string>(test) == utf32);
+            CATCH_CHECK(BasicString::template convert<std::u32string>(test) == utf32);
         }
         {
             const auto utf32 = FLY_STR(std::u32string::value_type, "\U0001f355 in the morning");
-            CHECK(BasicString::template convert<std::u32string>(test) == utf32);
+            CATCH_CHECK(BasicString::template convert<std::u32string>(test) == utf32);
         }
 
-        CHECK_FALSE(BasicString::template convert<std::u32string>(out_of_range_codepoint()));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::u32string>(out_of_range_codepoint()));
 
         if constexpr (sizeof(std::wstring::value_type) == 4)
         {
             {
                 auto utf32 = FLY_STR(std::wstring::value_type, "\U0001f355 in the morning");
-                CHECK(BasicString::template convert<std::wstring>(test) == utf32);
+                CATCH_CHECK(BasicString::template convert<std::wstring>(test) == utf32);
             }
             {
                 const auto utf32 = FLY_STR(std::wstring::value_type, "\U0001f355 in the morning");
-                CHECK(BasicString::template convert<std::wstring>(test) == utf32);
+                CATCH_CHECK(BasicString::template convert<std::wstring>(test) == utf32);
             }
 
-            CHECK_FALSE(BasicString::template convert<std::wstring>(out_of_range_codepoint()));
+            CATCH_CHECK_FALSE(
+                BasicString::template convert<std::wstring>(out_of_range_codepoint()));
         }
     }
 
-    SECTION("Convert a string to a Boolean")
+    CATCH_SECTION("Convert a string to a Boolean")
     {
         StringType s;
 
         s = FLY_STR(char_type, "0");
-        CHECK(BasicString::template convert<bool>(s) == false);
+        CATCH_CHECK(BasicString::template convert<bool>(s) == false);
 
         s = FLY_STR(char_type, "1");
-        CHECK(BasicString::template convert<bool>(s) == true);
+        CATCH_CHECK(BasicString::template convert<bool>(s) == true);
 
         s = FLY_STR(char_type, "-1");
-        CHECK_FALSE(BasicString::template convert<bool>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<bool>(s));
 
         s = FLY_STR(char_type, "2");
-        CHECK_FALSE(BasicString::template convert<bool>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<bool>(s));
 
         s = FLY_STR(char_type, "abc");
-        CHECK_FALSE(BasicString::template convert<bool>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<bool>(s));
 
         s = FLY_STR(char_type, "2a");
-        CHECK_FALSE(BasicString::template convert<bool>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<bool>(s));
     }
 
-    SECTION("Convert a string to a streamable character type")
+    CATCH_SECTION("Convert a string to a streamable character type")
     {
         StringType s;
 
         s = FLY_STR(char_type, "0");
-        CHECK(BasicString::template convert<streamed_char>(s) == '\0');
-        CHECK(BasicString::template convert<ustreamed_char>(s) == '\0');
+        CATCH_CHECK(BasicString::template convert<streamed_char>(s) == '\0');
+        CATCH_CHECK(BasicString::template convert<ustreamed_char>(s) == '\0');
 
         s = FLY_STR(char_type, "65");
-        CHECK(BasicString::template convert<streamed_char>(s) == 'A');
-        CHECK(BasicString::template convert<ustreamed_char>(s) == static_cast<ustreamed_char>(65));
+        CATCH_CHECK(BasicString::template convert<streamed_char>(s) == 'A');
+        CATCH_CHECK(
+            BasicString::template convert<ustreamed_char>(s) == static_cast<ustreamed_char>(65));
 
         s = FLY_STR(char_type, "abc");
-        CHECK_FALSE(BasicString::template convert<streamed_char>(s));
-        CHECK_FALSE(BasicString::template convert<ustreamed_char>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<streamed_char>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<ustreamed_char>(s));
 
         s = FLY_STR(char_type, "2a");
-        CHECK_FALSE(BasicString::template convert<streamed_char>(s));
-        CHECK_FALSE(BasicString::template convert<ustreamed_char>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<streamed_char>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<ustreamed_char>(s));
 
         if constexpr (BasicString::traits::has_stoi_family_v)
         {
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<streamed_char>(minstr<StringType, streamed_char>()));
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<streamed_char>(maxstr<StringType, streamed_char>()));
 
-            CHECK_FALSE(BasicString::template convert<ustreamed_char>(
+            CATCH_CHECK_FALSE(BasicString::template convert<ustreamed_char>(
                 minstr<StringType, ustreamed_char>()));
-            CHECK_FALSE(BasicString::template convert<ustreamed_char>(
+            CATCH_CHECK_FALSE(BasicString::template convert<ustreamed_char>(
                 maxstr<StringType, ustreamed_char>()));
         }
     }
 
-    SECTION("Convert a string to an 8-bit integer")
+    CATCH_SECTION("Convert a string to an 8-bit integer")
     {
         StringType s;
 
         s = FLY_STR(char_type, "0");
-        CHECK(BasicString::template convert<std::int8_t>(s) == 0_i8);
-        CHECK(BasicString::template convert<std::uint8_t>(s) == 0_u8);
+        CATCH_CHECK(BasicString::template convert<std::int8_t>(s) == 0_i8);
+        CATCH_CHECK(BasicString::template convert<std::uint8_t>(s) == 0_u8);
 
         s = FLY_STR(char_type, "100");
-        CHECK(BasicString::template convert<std::int8_t>(s) == 100_i8);
-        CHECK(BasicString::template convert<std::uint8_t>(s) == 100_u8);
+        CATCH_CHECK(BasicString::template convert<std::int8_t>(s) == 100_i8);
+        CATCH_CHECK(BasicString::template convert<std::uint8_t>(s) == 100_u8);
 
         s = FLY_STR(char_type, "-100");
-        CHECK(BasicString::template convert<std::int8_t>(s) == -100_i8);
-        CHECK_FALSE(BasicString::template convert<std::uint8_t>(s));
+        CATCH_CHECK(BasicString::template convert<std::int8_t>(s) == -100_i8);
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint8_t>(s));
 
         s = FLY_STR(char_type, "abc");
-        CHECK_FALSE(BasicString::template convert<std::int8_t>(s));
-        CHECK_FALSE(BasicString::template convert<std::uint8_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::int8_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint8_t>(s));
 
         s = FLY_STR(char_type, "2a");
-        CHECK_FALSE(BasicString::template convert<std::int8_t>(s));
-        CHECK_FALSE(BasicString::template convert<std::uint8_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::int8_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint8_t>(s));
 
         if constexpr (BasicString::traits::has_stoi_family_v)
         {
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int8_t>(minstr<StringType, std::int8_t>()));
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int8_t>(maxstr<StringType, std::int8_t>()));
 
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::uint8_t>(minstr<StringType, std::uint8_t>()));
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::uint8_t>(maxstr<StringType, std::uint8_t>()));
         }
     }
 
-    SECTION("Convert a string to a 16-bit integer")
+    CATCH_SECTION("Convert a string to a 16-bit integer")
     {
         StringType s;
 
         s = FLY_STR(char_type, "0");
-        CHECK(BasicString::template convert<std::int16_t>(s) == 0_i16);
-        CHECK(BasicString::template convert<std::uint16_t>(s) == 0_u16);
+        CATCH_CHECK(BasicString::template convert<std::int16_t>(s) == 0_i16);
+        CATCH_CHECK(BasicString::template convert<std::uint16_t>(s) == 0_u16);
 
         s = FLY_STR(char_type, "100");
-        CHECK(BasicString::template convert<std::int16_t>(s) == 100_i16);
-        CHECK(BasicString::template convert<std::uint16_t>(s) == 100_u16);
+        CATCH_CHECK(BasicString::template convert<std::int16_t>(s) == 100_i16);
+        CATCH_CHECK(BasicString::template convert<std::uint16_t>(s) == 100_u16);
 
         s = FLY_STR(char_type, "-100");
-        CHECK(BasicString::template convert<std::int16_t>(s) == -100_i16);
-        CHECK_FALSE(BasicString::template convert<std::uint16_t>(s));
+        CATCH_CHECK(BasicString::template convert<std::int16_t>(s) == -100_i16);
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint16_t>(s));
 
         s = FLY_STR(char_type, "abc");
-        CHECK_FALSE(BasicString::template convert<std::int16_t>(s));
-        CHECK_FALSE(BasicString::template convert<std::uint16_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::int16_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint16_t>(s));
 
         s = FLY_STR(char_type, "2a");
-        CHECK_FALSE(BasicString::template convert<std::int16_t>(s));
-        CHECK_FALSE(BasicString::template convert<std::uint16_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::int16_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint16_t>(s));
 
         if constexpr (BasicString::traits::has_stoi_family_v)
         {
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int16_t>(minstr<StringType, std::int16_t>()));
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int16_t>(maxstr<StringType, std::int16_t>()));
 
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::uint16_t>(minstr<StringType, std::uint16_t>()));
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::uint16_t>(maxstr<StringType, std::uint16_t>()));
         }
     }
 
-    SECTION("Convert a string to a 32-bit integer")
+    CATCH_SECTION("Convert a string to a 32-bit integer")
     {
         StringType s;
 
         s = FLY_STR(char_type, "0");
-        CHECK(BasicString::template convert<std::int32_t>(s) == 0_i32);
-        CHECK(BasicString::template convert<std::uint32_t>(s) == 0_u32);
+        CATCH_CHECK(BasicString::template convert<std::int32_t>(s) == 0_i32);
+        CATCH_CHECK(BasicString::template convert<std::uint32_t>(s) == 0_u32);
 
         s = FLY_STR(char_type, "100");
-        CHECK(BasicString::template convert<std::int32_t>(s) == 100_i32);
-        CHECK(BasicString::template convert<std::uint32_t>(s) == 100_u32);
+        CATCH_CHECK(BasicString::template convert<std::int32_t>(s) == 100_i32);
+        CATCH_CHECK(BasicString::template convert<std::uint32_t>(s) == 100_u32);
 
         s = FLY_STR(char_type, "-100");
-        CHECK(BasicString::template convert<std::int32_t>(s) == -100_i32);
-        CHECK_FALSE(BasicString::template convert<std::uint32_t>(s));
+        CATCH_CHECK(BasicString::template convert<std::int32_t>(s) == -100_i32);
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint32_t>(s));
 
         s = FLY_STR(char_type, "abc");
-        CHECK_FALSE(BasicString::template convert<std::int32_t>(s));
-        CHECK_FALSE(BasicString::template convert<std::uint32_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::int32_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint32_t>(s));
 
         s = FLY_STR(char_type, "2a");
-        CHECK_FALSE(BasicString::template convert<std::int32_t>(s));
-        CHECK_FALSE(BasicString::template convert<std::uint32_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::int32_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint32_t>(s));
 
         if constexpr (BasicString::traits::has_stoi_family_v)
         {
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int32_t>(minstr<StringType, std::int32_t>()));
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int32_t>(maxstr<StringType, std::int32_t>()));
 
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::uint32_t>(minstr<StringType, std::uint32_t>()));
-            CHECK_FALSE(
+            CATCH_CHECK_FALSE(
                 BasicString::template convert<std::uint32_t>(maxstr<StringType, std::uint32_t>()));
         }
     }
 
-    SECTION("Convert a string to a 64-bit integer")
+    CATCH_SECTION("Convert a string to a 64-bit integer")
     {
         StringType s;
 
         s = FLY_STR(char_type, "0");
-        CHECK(BasicString::template convert<std::int64_t>(s) == 0_i64);
-        CHECK(BasicString::template convert<std::uint64_t>(s) == 0_u64);
+        CATCH_CHECK(BasicString::template convert<std::int64_t>(s) == 0_i64);
+        CATCH_CHECK(BasicString::template convert<std::uint64_t>(s) == 0_u64);
 
         s = FLY_STR(char_type, "100");
-        CHECK(BasicString::template convert<std::int64_t>(s) == 100_i64);
-        CHECK(BasicString::template convert<std::uint64_t>(s) == 100_u64);
+        CATCH_CHECK(BasicString::template convert<std::int64_t>(s) == 100_i64);
+        CATCH_CHECK(BasicString::template convert<std::uint64_t>(s) == 100_u64);
 
         s = FLY_STR(char_type, "-100");
-        CHECK(BasicString::template convert<std::int64_t>(s) == -100_i64);
+        CATCH_CHECK(BasicString::template convert<std::int64_t>(s) == -100_i64);
 
         s = FLY_STR(char_type, "abc");
-        CHECK_FALSE(BasicString::template convert<std::int64_t>(s));
-        CHECK_FALSE(BasicString::template convert<std::uint64_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::int64_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint64_t>(s));
 
         s = FLY_STR(char_type, "2a");
-        CHECK_FALSE(BasicString::template convert<std::int64_t>(s));
-        CHECK_FALSE(BasicString::template convert<std::uint64_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::int64_t>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::uint64_t>(s));
     }
 
-    SECTION("Convert a string to a floating point decimal")
+    CATCH_SECTION("Convert a string to a floating point decimal")
     {
         StringType s;
 
         s = FLY_STR(char_type, "-400.123");
-        CHECK(BasicString::template convert<float>(s) == -400.123f);
-        CHECK(BasicString::template convert<double>(s) == -400.123);
-        CHECK(BasicString::template convert<long double>(s) == -400.123L);
+        CATCH_CHECK(BasicString::template convert<float>(s) == -400.123f);
+        CATCH_CHECK(BasicString::template convert<double>(s) == -400.123);
+        CATCH_CHECK(BasicString::template convert<long double>(s) == -400.123L);
 
         s = FLY_STR(char_type, "400.456");
-        CHECK(BasicString::template convert<float>(s) == 400.456f);
-        CHECK(BasicString::template convert<double>(s) == 400.456);
-        CHECK(BasicString::template convert<long double>(s) == 400.456L);
+        CATCH_CHECK(BasicString::template convert<float>(s) == 400.456f);
+        CATCH_CHECK(BasicString::template convert<double>(s) == 400.456);
+        CATCH_CHECK(BasicString::template convert<long double>(s) == 400.456L);
 
         s = FLY_STR(char_type, "abc");
-        CHECK_FALSE(BasicString::template convert<float>(s));
-        CHECK_FALSE(BasicString::template convert<double>(s));
-        CHECK_FALSE(BasicString::template convert<long double>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<float>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<double>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<long double>(s));
 
         s = FLY_STR(char_type, "2a");
-        CHECK_FALSE(BasicString::template convert<float>(s));
-        CHECK_FALSE(BasicString::template convert<double>(s));
-        CHECK_FALSE(BasicString::template convert<long double>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<float>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<double>(s));
+        CATCH_CHECK_FALSE(BasicString::template convert<long double>(s));
     }
 }

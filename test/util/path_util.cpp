@@ -17,13 +17,13 @@ namespace fly::test {
 PathUtil::ScopedTempDirectory::ScopedTempDirectory() :
     m_directory(std::filesystem::temp_directory_path() / fly::String::generate_random_string(10))
 {
-    REQUIRE(std::filesystem::create_directories(m_directory));
+    CATCH_REQUIRE(std::filesystem::create_directories(m_directory));
 }
 
 //==================================================================================================
 PathUtil::ScopedTempDirectory::~ScopedTempDirectory()
 {
-    REQUIRE(std::filesystem::remove_all(m_directory) > 0);
+    CATCH_REQUIRE(std::filesystem::remove_all(m_directory) > 0);
 }
 
 //==================================================================================================
