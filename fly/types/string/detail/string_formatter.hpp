@@ -46,7 +46,7 @@ public:
      * @return A string that has been formatted with the given arguments.
      */
     template <typename... Args>
-    static streamed_type format(const char_type *fmt, const Args &... args);
+    static streamed_type format(const char_type *fmt, const Args &...args);
 
     /**
      * Format a string with variadic template arguments, inserting the formatted string into a
@@ -71,7 +71,7 @@ public:
      * @return The same stream object.
      */
     template <typename... Args>
-    static ostream_type &format(ostream_type &ostream, const char_type *fmt, const Args &... args);
+    static ostream_type &format(ostream_type &ostream, const char_type *fmt, const Args &...args);
 
     /**
      * Format an integer as a hexadecimal string.
@@ -99,7 +99,7 @@ private:
         ostream_type &ostream,
         const char_type *fmt,
         const T &value,
-        const Args &... args);
+        const Args &...args);
 
     /**
      * Terminator for the variadic template formatter. Stream the rest of the string into the given
@@ -111,7 +111,7 @@ private:
 //==================================================================================================
 template <typename StringType>
 template <typename... Args>
-auto BasicStringFormatter<StringType>::format(const char_type *fmt, const Args &... args)
+auto BasicStringFormatter<StringType>::format(const char_type *fmt, const Args &...args)
     -> streamed_type
 {
     typename traits::ostringstream_type ostream;
@@ -127,7 +127,7 @@ template <typename... Args>
 auto BasicStringFormatter<StringType>::format(
     ostream_type &ostream,
     const char_type *fmt,
-    const Args &... args) -> ostream_type &
+    const Args &...args) -> ostream_type &
 {
     if (fmt != nullptr)
     {
@@ -164,7 +164,7 @@ void BasicStringFormatter<StringType>::format_internal(
     ostream_type &ostream,
     const char_type *fmt,
     const T &value,
-    const Args &... args)
+    const Args &...args)
 {
     const std::ios_base::fmtflags flags(ostream.flags());
 

@@ -204,7 +204,7 @@ public:
      * @param modifiers The remaining modifiers to apply to the std::ostream.
      */
     template <typename Modifier, typename... Modifiers>
-    Styler(Modifier &&modifier, Modifiers &&... modifiers) noexcept :
+    Styler(Modifier &&modifier, Modifiers &&...modifiers) noexcept :
         Styler(std::forward<Modifiers>(modifiers)...)
     {
         set_modifier(modifier);

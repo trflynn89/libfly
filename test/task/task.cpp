@@ -124,7 +124,10 @@ CATCH_TEST_CASE("Task", "[task]")
             fly::test::task_manager()->create_task_runner<fly::test::WaitableParallelTaskRunner>();
 
         bool task_was_called = false;
-        auto task = [&task_was_called]() { task_was_called = true; };
+        auto task = [&task_was_called]()
+        {
+            task_was_called = true;
+        };
 
         CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task)));
         task_runner->wait_for_task_to_complete(__FILE__);
@@ -140,7 +143,8 @@ CATCH_TEST_CASE("Task", "[task]")
         bool task_was_called = false;
         std::string task_id = "not set";
 
-        auto task = [&task_was_called, task_id = std::move(task_id)]() mutable {
+        auto task = [&task_was_called, task_id = std::move(task_id)]() mutable
+        {
             task_was_called = true;
             task_id = "set";
         };
@@ -203,11 +207,15 @@ CATCH_TEST_CASE("Task", "[task]")
         bool task_was_called = false;
         bool reply_was_called = false;
 
-        auto task = [&task_was_called]() -> bool {
+        auto task = [&task_was_called]() -> bool
+        {
             task_was_called = true;
             return task_was_called;
         };
-        auto reply = [&reply_was_called](bool result) { reply_was_called = result; };
+        auto reply = [&reply_was_called](bool result)
+        {
+            reply_was_called = result;
+        };
 
         CATCH_REQUIRE(
             task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply)));
@@ -226,8 +234,14 @@ CATCH_TEST_CASE("Task", "[task]")
         bool task_was_called = false;
         bool reply_was_called = false;
 
-        auto task = [&task_was_called]() { task_was_called = true; };
-        auto reply = [&reply_was_called]() { reply_was_called = true; };
+        auto task = [&task_was_called]()
+        {
+            task_was_called = true;
+        };
+        auto reply = [&reply_was_called]()
+        {
+            reply_was_called = true;
+        };
 
         CATCH_REQUIRE(
             task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply)));
@@ -291,11 +305,15 @@ CATCH_TEST_CASE("Task", "[task]")
         bool task_was_called = false;
         bool reply_was_called = false;
 
-        auto task = [&task_was_called]() -> bool {
+        auto task = [&task_was_called]() -> bool
+        {
             task_was_called = true;
             return task_was_called;
         };
-        auto reply = [&reply_was_called](bool result) { reply_was_called = result; };
+        auto reply = [&reply_was_called](bool result)
+        {
+            reply_was_called = result;
+        };
 
         CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
             FROM_HERE,
@@ -317,8 +335,14 @@ CATCH_TEST_CASE("Task", "[task]")
         bool task_was_called = false;
         bool reply_was_called = false;
 
-        auto task = [&task_was_called]() { task_was_called = true; };
-        auto reply = [&reply_was_called]() { reply_was_called = true; };
+        auto task = [&task_was_called]()
+        {
+            task_was_called = true;
+        };
+        auto reply = [&reply_was_called]()
+        {
+            reply_was_called = true;
+        };
 
         CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
             FROM_HERE,
@@ -342,7 +366,8 @@ CATCH_TEST_CASE("Task", "[task]")
             bool task_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class)
+            {
                 strong_task_class->member_task();
             };
 
@@ -361,7 +386,8 @@ CATCH_TEST_CASE("Task", "[task]")
             bool task_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class)
+            {
                 strong_task_class->member_task();
             };
 
@@ -383,11 +409,13 @@ CATCH_TEST_CASE("Task", "[task]")
             bool reply_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [](std::shared_ptr<TaskClass> strong_task_class) -> bool {
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class) -> bool
+            {
                 strong_task_class->member_task();
                 return true;
             };
-            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>) {
+            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>)
+            {
                 reply_was_called = result;
             };
 
@@ -414,13 +442,15 @@ CATCH_TEST_CASE("Task", "[task]")
             bool reply_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class) -> bool {
+            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class) -> bool
+            {
                 strong_task_class->member_task();
                 strong_task_class.reset();
                 task_class.reset();
                 return true;
             };
-            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>) {
+            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>)
+            {
                 reply_was_called = result;
             };
 
@@ -447,10 +477,12 @@ CATCH_TEST_CASE("Task", "[task]")
             bool reply_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class)
+            {
                 strong_task_class->member_task();
             };
-            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>) {
+            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>)
+            {
                 reply_was_called = true;
             };
 
@@ -477,12 +509,14 @@ CATCH_TEST_CASE("Task", "[task]")
             bool reply_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class) {
+            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class)
+            {
                 strong_task_class->member_task();
                 strong_task_class.reset();
                 task_class.reset();
             };
-            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>) {
+            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>)
+            {
                 reply_was_called = true;
             };
 
@@ -508,7 +542,8 @@ CATCH_TEST_CASE("Task", "[task]")
             bool task_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class)
+            {
                 strong_task_class->member_task();
             };
 
@@ -529,7 +564,8 @@ CATCH_TEST_CASE("Task", "[task]")
             bool task_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class)
+            {
                 strong_task_class->member_task();
             };
 
@@ -553,11 +589,13 @@ CATCH_TEST_CASE("Task", "[task]")
             bool reply_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [](std::shared_ptr<TaskClass> strong_task_class) -> bool {
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class) -> bool
+            {
                 strong_task_class->member_task();
                 return true;
             };
-            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>) {
+            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>)
+            {
                 reply_was_called = result;
             };
 
@@ -585,13 +623,15 @@ CATCH_TEST_CASE("Task", "[task]")
             bool reply_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class) -> bool {
+            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class) -> bool
+            {
                 strong_task_class->member_task();
                 strong_task_class.reset();
                 task_class.reset();
                 return true;
             };
-            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>) {
+            auto reply = [&reply_was_called](bool result, std::shared_ptr<TaskClass>)
+            {
                 reply_was_called = result;
             };
 
@@ -619,10 +659,12 @@ CATCH_TEST_CASE("Task", "[task]")
             bool reply_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [](std::shared_ptr<TaskClass> strong_task_class) {
+            auto task = [](std::shared_ptr<TaskClass> strong_task_class)
+            {
                 strong_task_class->member_task();
             };
-            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>) {
+            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>)
+            {
                 reply_was_called = true;
             };
 
@@ -650,12 +692,14 @@ CATCH_TEST_CASE("Task", "[task]")
             bool reply_was_called = false;
             auto task_class = std::make_shared<TaskClass>(task_was_called);
 
-            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class) {
+            auto task = [&task_class](std::shared_ptr<TaskClass> strong_task_class)
+            {
                 strong_task_class->member_task();
                 strong_task_class.reset();
                 task_class.reset();
             };
-            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>) {
+            auto reply = [&reply_was_called](std::shared_ptr<TaskClass>)
+            {
                 reply_was_called = true;
             };
 
@@ -686,7 +730,8 @@ CATCH_TEST_CASE("Task", "[task]")
             auto task_class = std::make_shared<TaskClass>(task_was_called);
             std::weak_ptr<TaskClass> weak_task_class = task_class;
 
-            auto task = [weak_task_class]() {
+            auto task = [weak_task_class]()
+            {
                 if (auto strong_task_class = weak_task_class.lock(); strong_task_class)
                 {
                     strong_task_class->member_task();

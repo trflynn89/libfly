@@ -60,7 +60,8 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
     CATCH_SECTION("Validate style of console logs")
     {
         // Get the substring of a log point that should be styled.
-        auto styled_contents = [](const std::string &contents, std::string &&log) {
+        auto styled_contents = [](const std::string &contents, std::string &&log)
+        {
             auto pos = contents.find(": " + log);
             CATCH_REQUIRE(pos != std::string::npos);
 

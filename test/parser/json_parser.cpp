@@ -14,41 +14,45 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 {
     fly::JsonParser parser;
 
-    auto validate_fail_raw = [&](const std::string &test) {
+    auto validate_fail_raw = [&](const std::string &test)
+    {
         CATCH_CAPTURE(test);
         CATCH_CHECK_FALSE(parser.parse_string(test).has_value());
     };
 
-    auto validate_fail = [&](const std::string &test) {
+    auto validate_fail = [&](const std::string &test)
+    {
         validate_fail_raw(fly::String::format("{ \"a\" : %s }", test));
     };
 
     auto validate_pass_raw =
-        [&](const std::string &test, const std::string &key, const fly::Json &expected) {
-            CATCH_CAPTURE(test);
+        [&](const std::string &test, const std::string &key, const fly::Json &expected)
+    {
+        CATCH_CAPTURE(test);
 
-            std::optional<fly::Json> actual = parser.parse_string(test);
-            CATCH_REQUIRE(actual.has_value());
+        std::optional<fly::Json> actual = parser.parse_string(test);
+        CATCH_REQUIRE(actual.has_value());
 
-            if (expected.is_float())
-            {
-                CATCH_CHECK(double(actual->at(key)) == Approx(double(expected)));
-            }
-            else
-            {
-                CATCH_CHECK(actual->at(key) == expected);
-            }
+        if (expected.is_float())
+        {
+            CATCH_CHECK(double(actual->at(key)) == Approx(double(expected)));
+        }
+        else
+        {
+            CATCH_CHECK(actual->at(key) == expected);
+        }
 
-            std::stringstream ss;
-            ss << actual.value();
+        std::stringstream ss;
+        ss << actual.value();
 
-            std::optional<fly::Json> repeat = parser.parse_string(ss.str());
-            CATCH_REQUIRE(repeat.has_value());
+        std::optional<fly::Json> repeat = parser.parse_string(ss.str());
+        CATCH_REQUIRE(repeat.has_value());
 
-            CATCH_CHECK(actual.value() == repeat.value());
-        };
+        CATCH_CHECK(actual.value() == repeat.value());
+    };
 
-    auto validate_pass = [&](const std::string &test, const fly::Json &expected) {
+    auto validate_pass = [&](const std::string &test, const fly::Json &expected)
+    {
         validate_pass_raw(fly::String::format("{ \"a\" : %s }", test), "a", expected);
     };
 

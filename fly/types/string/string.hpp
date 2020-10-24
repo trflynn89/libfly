@@ -326,7 +326,7 @@ public:
      * @return A string that has been formatted with the given arguments.
      */
     template <typename... Args>
-    static streamed_type format(const char_type *fmt, const Args &... args);
+    static streamed_type format(const char_type *fmt, const Args &...args);
 
     /**
      * Format a string with variadic template arguments, inserting the formatted string into a
@@ -351,7 +351,7 @@ public:
      * @return The same stream object.
      */
     template <typename... Args>
-    static ostream_type &format(ostream_type &ostream, const char_type *fmt, const Args &... args);
+    static ostream_type &format(ostream_type &ostream, const char_type *fmt, const Args &...args);
 
     /**
      * Concatenate a list of objects with the given separator.
@@ -364,7 +364,7 @@ public:
      * @return The resulting join of the given arguments.
      */
     template <typename... Args>
-    static streamed_type join(const char_type &separator, const Args &... args);
+    static streamed_type join(const char_type &separator, const Args &...args);
 
     /**
      * Convert a string to another type. The other type may be a string with a different Unicode
@@ -389,7 +389,7 @@ private:
         ostream_type &ostream,
         const char_type &separator,
         const T &value,
-        const Args &... args);
+        const Args &...args);
 
     /**
      * Terminator for the variadic template joiner. Join the last argument into the given ostream.
@@ -429,7 +429,8 @@ BasicString<StringType>::split(const StringType &input, char_type delimiter, siz
     size_type start = 0;
     size_type end = input.find(delimiter);
 
-    auto push_item = [&](const StringType &str) {
+    auto push_item = [&](const StringType &str)
+    {
         if (!str.empty())
         {
             if ((count > 0) && (++num_items > count))
@@ -463,7 +464,10 @@ BasicString<StringType>::split(const StringType &input, char_type delimiter, siz
 template <typename StringType>
 void BasicString<StringType>::trim(StringType &target)
 {
-    auto is_non_space = [](int ch) { return !std::isspace(ch); };
+    auto is_non_space = [](int ch)
+    {
+        return !std::isspace(ch);
+    };
 
     // Remove leading whitespace.
     target.erase(target.begin(), std::find_if(target.begin(), target.end(), is_non_space));
@@ -750,7 +754,7 @@ StringType BasicString<StringType>::generate_random_string(size_type length)
 //==================================================================================================
 template <typename StringType>
 template <typename... Args>
-auto BasicString<StringType>::format(const char_type *fmt, const Args &... args) -> streamed_type
+auto BasicString<StringType>::format(const char_type *fmt, const Args &...args) -> streamed_type
 {
     return detail::BasicStringFormatter<StringType>::format(fmt, args...);
 }
@@ -761,7 +765,7 @@ template <typename... Args>
 auto BasicString<StringType>::format(
     ostream_type &ostream,
     const char_type *fmt,
-    const Args &... args) -> ostream_type &
+    const Args &...args) -> ostream_type &
 {
     return detail::BasicStringFormatter<StringType>::format(ostream, fmt, args...);
 }
@@ -769,8 +773,7 @@ auto BasicString<StringType>::format(
 //==================================================================================================
 template <typename StringType>
 template <typename... Args>
-auto BasicString<StringType>::join(const char_type &separator, const Args &... args)
-    -> streamed_type
+auto BasicString<StringType>::join(const char_type &separator, const Args &...args) -> streamed_type
 {
     typename traits::ostringstream_type ostream;
     join_internal(ostream, separator, args...);
@@ -785,7 +788,7 @@ void BasicString<StringType>::join_internal(
     ostream_type &ostream,
     const char_type &separator,
     const T &value,
-    const Args &... args)
+    const Args &...args)
 {
     detail::BasicStringStreamer<StringType>::stream(ostream, value);
     detail::BasicStringStreamer<StringType>::stream(ostream, separator);

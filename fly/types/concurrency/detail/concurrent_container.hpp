@@ -116,8 +116,12 @@ bool ConcurrentContainer<T, Container>::pop(T &item, std::chrono::duration<R, P>
 {
     std::unique_lock<std::mutex> lock(m_container_mutex);
 
-    auto empty_test = [&] { return !m_container.empty(); };
-    bool item_popped = m_push_condition.wait_for(lock, wait_time, empty_test);
+    auto empty_test = [this]
+    {
+        return !m_container.empty();
+    };
+
+    bool item_popped = m_push_condition.wait_for(lock, wait_time, std::move(empty_test));
 
     if (item_popped)
     {

@@ -295,7 +295,8 @@ JsonParser::consume_value(std::istream &stream, JsonType type, JsonTraits::strin
     Json::stream_type parsing;
     Token token;
 
-    auto stop_parsing = [&token, &is_string, this]() -> bool {
+    auto stop_parsing = [&token, &is_string, this]() -> bool
+    {
         if (is_string)
         {
             return token == Token::Quote;

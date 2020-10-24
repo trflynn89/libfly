@@ -95,7 +95,8 @@ void SocketManager::handle_new_and_closed_sockets(
     // Remove closed sockets from the socket system.
     for (const std::shared_ptr<Socket> &socket : closed_sockets)
     {
-        auto is_same_socket = [&socket](const std::shared_ptr<Socket> &closed) {
+        auto is_same_socket = [&socket](const std::shared_ptr<Socket> &closed)
+        {
             return socket->get_socket_id() == closed->get_socket_id();
         };
 
@@ -135,7 +136,8 @@ void SocketManager::trigger_callbacks(
 //==================================================================================================
 void SocketManager::poll_sockets_later()
 {
-    auto task = [](std::shared_ptr<SocketManager> self) {
+    auto task = [](std::shared_ptr<SocketManager> self)
+    {
         self->poll(self->m_config->io_wait_time());
         self->poll_sockets_later();
     };
