@@ -67,7 +67,8 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
     std::map<std::filesystem::path, unsigned int> deleted_files;
     std::map<std::filesystem::path, unsigned int> changed_files;
 
-    auto handle_event = [&](const std::filesystem::path &path, fly::PathMonitor::PathEvent event) {
+    auto handle_event = [&](const std::filesystem::path &path, fly::PathMonitor::PathEvent event)
+    {
         switch (event)
         {
             case fly::PathMonitor::PathEvent::Created:

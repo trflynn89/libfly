@@ -16,7 +16,7 @@ using namespace fly::literals::styler_literals;
 #if defined(FLY_LINUX) || defined(FLY_MACOS)
 
 template <typename... Modifiers>
-void test_styler(std::string &&expected_escape, Modifiers &&... modifiers)
+void test_styler(std::string &&expected_escape, Modifiers &&...modifiers)
 {
     constexpr bool style_or_color = fly::any_same_v<fly::Style, Modifiers...> ||
         fly::any_same_v<fly::Color, Modifiers...> ||

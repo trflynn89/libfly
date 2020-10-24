@@ -325,7 +325,8 @@ template <typename StringType>
 auto BasicStringUnicode<StringType>::decode_codepoint(const_iterator &it, const const_iterator &end)
     -> std::optional<codepoint_type>
 {
-    auto next_encoded_byte = [&it, &end]() -> std::optional<codepoint_type> {
+    auto next_encoded_byte = [&it, &end]() -> std::optional<codepoint_type>
+    {
         if (it == end)
         {
             return std::nullopt;
@@ -377,7 +378,8 @@ template <typename StringType>
 std::optional<StringType>
 BasicStringUnicode<StringType>::unescape_codepoint(const_iterator &it, const const_iterator &end)
 {
-    auto escaped_with = [&it, &end](const char_type ch) -> bool {
+    auto escaped_with = [&it, &end](const char_type ch) -> bool
+    {
         if ((it == end) || ((it + 1) == end))
         {
             return false;
@@ -390,7 +392,8 @@ BasicStringUnicode<StringType>::unescape_codepoint(const_iterator &it, const con
 
     if (escaped_with(s_lower_u))
     {
-        auto next_codepoint = [&it, &end]() -> std::optional<codepoint_type> {
+        auto next_codepoint = [&it, &end]() -> std::optional<codepoint_type>
+        {
             return unescape_codepoint<s_lower_u>(it, end);
         };
 
@@ -418,7 +421,8 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
 
     // TODO replace this with String::create_hex_string without actually including string.hpp or
     // string_format.hpp.
-    auto to_hex = [&codepoint](std::size_t length) -> StringType {
+    auto to_hex = [&codepoint](std::size_t length) -> StringType
+    {
         static const auto *s_digits = FLY_STR(char_type, "0123456789abcdef");
         StringType hex(length, FLY_CHR(char_type, '0'));
 
@@ -532,7 +536,8 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider n
     auto utf8_it = std::find_if(
         s_utf8_leading_bytes.begin(),
         s_utf8_leading_bytes.end(),
-        [&leading_byte](const auto &candidate) {
+        [&leading_byte](const auto &candidate)
+        {
             return (leading_byte & candidate.m_encoding_mask) == candidate.m_leading_byte;
         });
 
@@ -676,10 +681,12 @@ template <typename StringType>
 auto BasicStringUnicode<StringType>::create_codepoint_from_surrogates(
     EncodedByteProvider next_encoded_byte) -> std::optional<codepoint_type>
 {
-    auto is_high_surrogate = [](codepoint_type c) -> bool {
+    auto is_high_surrogate = [](codepoint_type c) -> bool
+    {
         return (c >= s_high_surrogate_min) && (c <= s_high_surrogate_max);
     };
-    auto is_low_surrogate = [](codepoint_type c) -> bool {
+    auto is_low_surrogate = [](codepoint_type c) -> bool
+    {
         return (c >= s_low_surrogate_min) && (c <= s_low_surrogate_max);
     };
 

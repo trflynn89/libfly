@@ -277,7 +277,7 @@ public:
      * @param args The variadic list of arguments to augment the format string with.
      */
     template <typename... Args>
-    void debug(const char *format, const Args &... args)
+    void debug(const char *format, const Args &...args)
     {
         log(Log::Level::Debug, {}, String::format(format, args...));
     }
@@ -292,7 +292,7 @@ public:
      * @param args The variadic list of arguments to augment the format string with.
      */
     template <typename... Args>
-    void debug(Log::Trace &&trace, const char *format, const Args &... args)
+    void debug(Log::Trace &&trace, const char *format, const Args &...args)
     {
         log(Log::Level::Debug, std::move(trace), String::format(format, args...));
     }
@@ -306,7 +306,7 @@ public:
      * @param args The variadic list of arguments to augment the format string with.
      */
     template <typename... Args>
-    void info(const char *format, const Args &... args)
+    void info(const char *format, const Args &...args)
     {
         log(Log::Level::Info, {}, String::format(format, args...));
     }
@@ -321,7 +321,7 @@ public:
      * @param args The variadic list of arguments to augment the format string with.
      */
     template <typename... Args>
-    void info(Log::Trace &&trace, const char *format, const Args &... args)
+    void info(Log::Trace &&trace, const char *format, const Args &...args)
     {
         log(Log::Level::Info, std::move(trace), String::format(format, args...));
     }
@@ -335,7 +335,7 @@ public:
      * @param args The variadic list of arguments to augment the format string with.
      */
     template <typename... Args>
-    void warn(const char *format, const Args &... args)
+    void warn(const char *format, const Args &...args)
     {
         log(Log::Level::Warn, {}, String::format(format, args...));
     }
@@ -350,7 +350,7 @@ public:
      * @param args The variadic list of arguments to augment the format string with.
      */
     template <typename... Args>
-    void warn(Log::Trace &&trace, const char *format, const Args &... args)
+    void warn(Log::Trace &&trace, const char *format, const Args &...args)
     {
         log(Log::Level::Warn, std::move(trace), String::format(format, args...));
     }
@@ -364,7 +364,7 @@ public:
      * @param args The variadic list of arguments to augment the format string with.
      */
     template <typename... Args>
-    void error(const char *format, const Args &... args)
+    void error(const char *format, const Args &...args)
     {
         log(Log::Level::Error, {}, String::format(format, args...));
     }
@@ -379,7 +379,7 @@ public:
      * @param args The variadic list of arguments to augment the format string with.
      */
     template <typename... Args>
-    void error(Log::Trace &&trace, const char *format, const Args &... args)
+    void error(Log::Trace &&trace, const char *format, const Args &...args)
     {
         log(Log::Level::Error, std::move(trace), String::format(format, args...));
     }

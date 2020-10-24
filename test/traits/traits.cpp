@@ -292,43 +292,82 @@ CATCH_TEST_CASE("Traits", "[traits]")
 
         result = std::visit(
             fly::visitation {
-                [](int) -> int { return 1; },
-                [](bool) -> int { return 2; },
-                [](std::string) -> int { return 3; },
+                [](int) -> int
+                {
+                    return 1;
+                },
+                [](bool) -> int
+                {
+                    return 2;
+                },
+                [](std::string) -> int
+                {
+                    return 3;
+                },
             },
             TestVariant {int()});
         CATCH_CHECK(1 == result);
 
         result = std::visit(
             fly::visitation {
-                [](int) -> int { return 1; },
-                [](bool) -> int { return 2; },
-                [](std::string) -> int { return 3; },
+                [](int) -> int
+                {
+                    return 1;
+                },
+                [](bool) -> int
+                {
+                    return 2;
+                },
+                [](std::string) -> int
+                {
+                    return 3;
+                },
             },
             TestVariant {bool()});
         CATCH_CHECK(2 == result);
 
         result = std::visit(
             fly::visitation {
-                [](int) -> int { return 1; },
-                [](bool) -> int { return 2; },
-                [](std::string) -> int { return 3; },
+                [](int) -> int
+                {
+                    return 1;
+                },
+                [](bool) -> int
+                {
+                    return 2;
+                },
+                [](std::string) -> int
+                {
+                    return 3;
+                },
             },
             TestVariant {std::string()});
         CATCH_CHECK(3 == result);
 
         result = std::visit(
             fly::visitation {
-                [](int) -> int { return 1; },
-                [](auto) -> int { return 2; },
+                [](int) -> int
+                {
+                    return 1;
+                },
+                [](auto) -> int
+                {
+                    return 2;
+                },
             },
             TestVariant {int()});
         CATCH_CHECK(1 == result);
 
         result = std::visit(
             fly::visitation {
-                [](int) -> int { return 1; },
-                [](auto) -> int { return 2; },
+                [](int) -> int
+                {
+                    return 1;
+                },
+                [](auto) -> int
+                {
+                    return 2;
+                },
             },
             TestVariant {std::string()});
         CATCH_CHECK(2 == result);

@@ -74,7 +74,8 @@ template <>
 void StylerProxyImpl::apply_value<WORD, Color>(WORD &attributes, const Color &modifier)
 {
     // https://docs.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes
-    auto apply_color = [&attributes, &modifier](bool red, bool green, bool blue) {
+    auto apply_color = [&attributes, &modifier](bool red, bool green, bool blue)
+    {
         if (modifier.m_plane == Color::Foreground)
         {
             attributes = red ? (attributes | FOREGROUND_RED) : (attributes & ~FOREGROUND_RED);

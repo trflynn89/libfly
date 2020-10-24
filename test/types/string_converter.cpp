@@ -59,7 +59,8 @@ CATCH_TEMPLATE_TEST_CASE(
     using streamed_char = typename streamed_type::value_type;
     using ustreamed_char = std::make_unsigned_t<streamed_char>;
 
-    auto out_of_range_codepoint = []() -> StringType {
+    auto out_of_range_codepoint = []() -> StringType
+    {
         static constexpr const codepoint_type s_out_of_range = 0x110000;
         StringType result;
 

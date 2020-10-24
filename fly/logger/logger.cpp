@@ -147,7 +147,8 @@ void Logger::log(Log::Level level, Log::Trace &&trace, std::string &&message)
     if (m_task_runner)
     {
         auto task = [level, trace = std::move(trace), message = std::move(message), now](
-                        std::shared_ptr<Logger> self) mutable {
+                        std::shared_ptr<Logger> self) mutable
+        {
             if (!self->m_last_task_failed)
             {
                 self->log_to_sink(level, std::move(trace), std::move(message), now);

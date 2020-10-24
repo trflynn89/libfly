@@ -49,7 +49,8 @@ CATCH_TEST_CASE("Socket", "[socket]")
 
     auto create_socket = [](const std::shared_ptr<fly::SocketManager> &socket_manager,
                             fly::Protocol protocol,
-                            bool async) -> std::shared_ptr<fly::Socket> {
+                            bool async) -> std::shared_ptr<fly::Socket>
+    {
         std::shared_ptr<fly::Socket> socket;
 
         if (async)
@@ -204,7 +205,10 @@ CATCH_TEST_CASE("Socket", "[socket]")
             listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
         CATCH_CHECK(listen_socket->listen());
 
-        auto callback([&](std::shared_ptr<fly::Socket>) { event_queue.push(1); });
+        auto callback = [&](std::shared_ptr<fly::Socket>)
+        {
+            event_queue.push(1);
+        };
         client_socket_manager->set_client_callbacks(nullptr, callback);
 
         int item = 0;
@@ -255,7 +259,10 @@ CATCH_TEST_CASE("Socket", "[socket]")
             listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
         CATCH_CHECK(listen_socket->listen());
 
-        auto callback([&](std::shared_ptr<fly::Socket>) { event_queue.push(1); });
+        auto callback = [&](std::shared_ptr<fly::Socket>)
+        {
+            event_queue.push(1);
+        };
         client_socket_manager->set_client_callbacks(callback, callback);
 
         int item = 0;
@@ -287,7 +294,10 @@ CATCH_TEST_CASE("Socket", "[socket]")
             listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
         CATCH_CHECK(listen_socket->listen());
 
-        auto callback([&](std::shared_ptr<fly::Socket>) { event_queue.push(1); });
+        auto callback = [&](std::shared_ptr<fly::Socket>)
+        {
+            event_queue.push(1);
+        };
         client_socket_manager->set_client_callbacks(callback, callback);
 
         int item = 0;
@@ -347,7 +357,10 @@ CATCH_TEST_CASE("Socket", "[socket]")
         CATCH_CHECK(
             listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
 
-        auto callback([&](std::shared_ptr<fly::Socket>) { event_queue.push(1); });
+        auto callback = [&](std::shared_ptr<fly::Socket>)
+        {
+            event_queue.push(1);
+        };
         client_socket_manager->set_client_callbacks(nullptr, callback);
 
         int item = 0;
@@ -419,11 +432,15 @@ CATCH_TEST_CASE("Socket", "[socket]")
 
         std::shared_ptr<fly::Socket> server_socket;
 
-        auto connect_callback([&](std::shared_ptr<fly::Socket> socket) {
+        auto connect_callback = [&](std::shared_ptr<fly::Socket> socket)
+        {
             server_socket = socket;
             event_queue.push(1);
-        });
-        auto disconnect_callback([&](std::shared_ptr<fly::Socket>) { event_queue.push(1); });
+        };
+        auto disconnect_callback = [&](std::shared_ptr<fly::Socket>)
+        {
+            event_queue.push(1);
+        };
         server_socket_manager->set_client_callbacks(connect_callback, disconnect_callback);
 
         int item = 0;
@@ -459,7 +476,10 @@ CATCH_TEST_CASE("Socket", "[socket]")
         CATCH_CHECK(
             listen_socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
 
-        auto callback([&](std::shared_ptr<fly::Socket>) { event_queue.push(1); });
+        auto callback = [&](std::shared_ptr<fly::Socket>)
+        {
+            event_queue.push(1);
+        };
         server_socket_manager->set_client_callbacks(nullptr, callback);
 
         int item = 0;
@@ -479,7 +499,8 @@ CATCH_TEST_CASE("Socket", "[socket]")
         std::string message_copy(message);
 
         // Thread to run server functions to accept a client socket and receive data.
-        auto server_thread = [&](bool async) {
+        auto server_thread = [&](bool async)
+        {
             auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, async);
 
             CATCH_REQUIRE(listen_socket);
@@ -519,7 +540,8 @@ CATCH_TEST_CASE("Socket", "[socket]")
         };
 
         // Thread to run client functions to connect to the server socket and send data.
-        auto client_thread = [&](bool async) {
+        auto client_thread = [&](bool async)
+        {
             auto send_socket = create_socket(client_socket_manager, fly::Protocol::TCP, async);
 
             CATCH_REQUIRE(send_socket);
@@ -533,7 +555,10 @@ CATCH_TEST_CASE("Socket", "[socket]")
             std::chrono::seconds wait_time(10);
             CATCH_CHECK(event_queue.pop(item, wait_time));
 
-            auto callback([&](std::shared_ptr<fly::Socket>) { event_queue.push(1); });
+            auto callback = [&](std::shared_ptr<fly::Socket>)
+            {
+                event_queue.push(1);
+            };
             client_socket_manager->set_client_callbacks(callback, nullptr);
 
             if (async)
@@ -628,7 +653,8 @@ CATCH_TEST_CASE("Socket", "[socket]")
         std::string message_copy(message);
 
         // Thread to run server functions to accept a client socket and receive data.
-        auto server_thread = [&](bool async) {
+        auto server_thread = [&](bool async)
+        {
             auto server_socket = create_socket(server_socket_manager, fly::Protocol::UDP, async);
 
             CATCH_REQUIRE(server_socket);
@@ -659,7 +685,8 @@ CATCH_TEST_CASE("Socket", "[socket]")
         };
 
         // Thread to run client functions to connect to the server socket and send data.
-        auto client_thread = [&](bool async) {
+        auto client_thread = [&](bool async)
+        {
             static unsigned int s_call_count = 0;
 
             auto send_socket = create_socket(client_socket_manager, fly::Protocol::UDP, async);

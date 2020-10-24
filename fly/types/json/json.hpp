@@ -838,7 +838,8 @@ Json::operator std::array<T, N>() const noexcept(false)
 template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
 Json::operator T() const noexcept
 {
-    auto visitor = [](const auto &value) noexcept -> T {
+    auto visitor = [](const auto &value) noexcept -> T
+    {
         using U = std::decay_t<decltype(value)>;
 
         if constexpr (
@@ -863,7 +864,8 @@ Json::operator T() const noexcept
             return false;
         }
     };
-    return std::visit(visitor, m_value);
+
+    return std::visit(std::move(visitor), m_value);
 }
 
 //==================================================================================================
@@ -875,7 +877,8 @@ template <
         JsonTraits::is_floating_point<T>>>
 Json::operator T() const noexcept(false)
 {
-    auto visitor = [this](const auto &value) -> T {
+    auto visitor = [this](const auto &value) -> T
+    {
         using U = std::decay_t<decltype(value)>;
 
         if constexpr (std::is_same_v<U, JsonTraits::string_type>)
@@ -896,7 +899,7 @@ Json::operator T() const noexcept(false)
         throw JsonException(*this, "JSON type is not numeric");
     };
 
-    return std::visit(visitor, m_value);
+    return std::visit(std::move(visitor), m_value);
 }
 
 //==================================================================================================

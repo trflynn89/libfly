@@ -796,7 +796,8 @@ CATCH_TEST_CASE("Json", "[json]")
 
     CATCH_SECTION("Swap a JSON instance with an object-like type")
     {
-        auto validate = [](auto *name, auto &test1, auto &test2, auto &test3) {
+        auto validate = [](auto *name, auto &test1, auto &test2, auto &test3)
+        {
             CATCH_CAPTURE(name);
 
             using T1 = std::decay_t<decltype(test1)>;
@@ -865,7 +866,8 @@ CATCH_TEST_CASE("Json", "[json]")
         std::unordered_map<std::string, fly::Json> unordered_map;
         std::unordered_multimap<std::string, fly::Json> unordered_multimap;
 
-        auto invalidate = [&](fly::Json json) {
+        auto invalidate = [&](fly::Json json)
+        {
             CATCH_CHECK_THROWS_JSON(
                 json.swap(map),
                 "JSON type invalid for swap(object): (%s)",
@@ -895,7 +897,8 @@ CATCH_TEST_CASE("Json", "[json]")
 
     CATCH_SECTION("Swap a JSON instance with an array-like type")
     {
-        auto validate2 = [](auto *name, auto &test1, auto &test2) {
+        auto validate2 = [](auto *name, auto &test1, auto &test2)
+        {
             CATCH_CAPTURE(name);
 
             using T1 = std::decay_t<decltype(test1)>;
@@ -924,7 +927,8 @@ CATCH_TEST_CASE("Json", "[json]")
             }
         };
 
-        auto validate3 = [&](auto *name, auto &test1, auto &test2, auto &test3) {
+        auto validate3 = [&](auto *name, auto &test1, auto &test2, auto &test3)
+        {
             validate2(name, test1, test2);
 
             using T3 = std::decay_t<decltype(test3)>;
@@ -994,7 +998,8 @@ CATCH_TEST_CASE("Json", "[json]")
         std::unordered_set<int> unordered_set;
         std::vector<int> vector;
 
-        auto invalidate = [&](fly::Json json) {
+        auto invalidate = [&](fly::Json json)
+        {
             CATCH_CHECK_THROWS_JSON(
                 json.swap(array),
                 "JSON type invalid for swap(array): (%s)",

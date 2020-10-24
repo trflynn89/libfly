@@ -54,7 +54,8 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
 
     CATCH_SECTION("Convert a JSON instance to object-like types")
     {
-        auto validate = [](auto *name, auto &test1, auto &test2, auto &test3) {
+        auto validate = [](auto *name, auto &test1, auto &test2, auto &test3)
+        {
             CATCH_CAPTURE(name);
 
             using T1 = std::decay_t<decltype(test1)>;
@@ -118,7 +119,8 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
 
     CATCH_SECTION("Fail to convert a JSON instance to object-like types")
     {
-        auto invalidate = [](fly::Json json) {
+        auto invalidate = [](fly::Json json)
+        {
             CATCH_CHECK_THROWS_JSON(
                 FLY_UNUSED((std::map<std::string, fly::Json>(json))),
                 "JSON type is not an object: (%s)",
@@ -148,7 +150,8 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
 
     CATCH_SECTION("Convert a JSON instance to array-like types")
     {
-        auto validate2 = [](auto *name, auto &test1, auto &test2) {
+        auto validate2 = [](auto *name, auto &test1, auto &test2)
+        {
             CATCH_CAPTURE(name);
 
             using T1 = std::decay_t<decltype(test1)>;
@@ -183,7 +186,8 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
             }
         };
 
-        auto validate3 = [&](auto *name, auto &test1, auto &test2, auto &test3) {
+        auto validate3 = [&](auto *name, auto &test1, auto &test2, auto &test3)
+        {
             validate2(name, test1, test2);
 
             using T1 = std::decay_t<decltype(test1)>;
@@ -254,7 +258,8 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
 
     CATCH_SECTION("Fail to convert a JSON instance to array-like types")
     {
-        auto invalidate = [](fly::Json json) {
+        auto invalidate = [](fly::Json json)
+        {
             CATCH_CHECK_THROWS_JSON(
                 FLY_UNUSED((std::array<int, 1>(json))),
                 "JSON type is not an array: (%s)",

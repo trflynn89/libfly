@@ -28,7 +28,10 @@ Json::Json(Json &&json) noexcept : m_value(std::move(json.m_value))
 //==================================================================================================
 Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
 {
-    auto object_test = [](const_reference json) { return json.is_object_like(); };
+    auto object_test = [](const_reference json)
+    {
+        return json.is_object_like();
+    };
 
     if (std::all_of(initializer.begin(), initializer.end(), object_test))
     {
@@ -323,7 +326,8 @@ Json::const_reference Json::at(size_type index) const
 //==================================================================================================
 bool Json::empty() const
 {
-    auto visitor = [](const auto &value) -> bool {
+    auto visitor = [](const auto &value) -> bool
+    {
         using T = std::decay_t<decltype(value)>;
 
         if constexpr (std::is_same_v<T, JsonTraits::null_type>)
@@ -342,13 +346,14 @@ bool Json::empty() const
         }
     };
 
-    return std::visit(visitor, m_value);
+    return std::visit(std::move(visitor), m_value);
 }
 
 //==================================================================================================
 Json::size_type Json::size() const
 {
-    auto visitor = [](const auto &value) -> size_type {
+    auto visitor = [](const auto &value) -> size_type
+    {
         using T = std::decay_t<decltype(value)>;
 
         if constexpr (std::is_same_v<T, JsonTraits::null_type>)
@@ -367,13 +372,14 @@ Json::size_type Json::size() const
         }
     };
 
-    return std::visit(visitor, m_value);
+    return std::visit(std::move(visitor), m_value);
 }
 
 //==================================================================================================
 void Json::clear()
 {
-    auto visitor = [](auto &value) {
+    auto visitor = [](auto &value)
+    {
         using T = std::decay_t<decltype(value)>;
 
         if constexpr (
@@ -395,7 +401,7 @@ void Json::clear()
         }
     };
 
-    std::visit(visitor, m_value);
+    std::visit(std::move(visitor), m_value);
 }
 
 //==================================================================================================
@@ -457,7 +463,8 @@ void Json::swap(JsonTraits::string_type &other)
 //==================================================================================================
 bool operator==(Json::const_reference json1, Json::const_reference json2)
 {
-    auto visitor = [](const auto &value1, const auto &value2) -> bool {
+    auto visitor = [](const auto &value1, const auto &value2) -> bool
+    {
         using T = std::decay_t<decltype(value1)>;
         using U = std::decay_t<decltype(value2)>;
 
@@ -486,7 +493,7 @@ bool operator==(Json::const_reference json1, Json::const_reference json2)
         }
     };
 
-    return std::visit(visitor, json1.m_value, json2.m_value);
+    return std::visit(std::move(visitor), json1.m_value, json2.m_value);
 }
 
 //==================================================================================================
@@ -498,7 +505,8 @@ bool operator!=(Json::const_reference json1, Json::const_reference json2)
 //==================================================================================================
 std::ostream &operator<<(std::ostream &stream, Json::const_reference json)
 {
-    auto serialize_string = [&stream](const JsonTraits::string_type &value) {
+    auto serialize_string = [&stream](const JsonTraits::string_type &value)
+    {
         const auto end = value.cend();
         stream << '"';
 
@@ -510,7 +518,8 @@ std::ostream &operator<<(std::ostream &stream, Json::const_reference json)
         stream << '"';
     };
 
-    auto visitor = [&stream, &serialize_string](const auto &value) {
+    auto visitor = [&stream, &serialize_string](const auto &value)
+    {
         using T = std::decay_t<decltype(value)>;
 
         if constexpr (std::is_same_v<T, JsonTraits::null_type>)
@@ -564,7 +573,7 @@ std::ostream &operator<<(std::ostream &stream, Json::const_reference json)
         }
     };
 
-    std::visit(visitor, json.m_value);
+    std::visit(std::move(visitor), json.m_value);
     return stream;
 }
 

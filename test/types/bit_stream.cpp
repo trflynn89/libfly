@@ -15,12 +15,14 @@ CATCH_TEST_CASE("BitStream", "[bit_stream]")
     std::istringstream input_stream(std::ios::in | std::ios::binary);
     std::ostringstream output_stream(std::ios::out | std::ios::binary);
 
-    auto create_header = [](fly::byte_type remainder) -> fly::byte_type {
+    auto create_header = [](fly::byte_type remainder) -> fly::byte_type
+    {
         return (fly::detail::s_magic << fly::detail::s_magic_shift) |
             (remainder << fly::detail::s_remainder_shift);
     };
 
-    auto verify_header = [&output_stream](fly::byte_type expected_remainder) {
+    auto verify_header = [&output_stream](fly::byte_type expected_remainder)
+    {
         const std::string buffer = output_stream.str();
         CATCH_REQUIRE_FALSE(buffer.empty());
 

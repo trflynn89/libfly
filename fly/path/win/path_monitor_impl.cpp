@@ -72,7 +72,8 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout)
         auto it = std::find_if(
             m_path_info.begin(),
             m_path_info.end(),
-            [&key](const PathInfoMap::value_type &value) -> bool {
+            [&key](const PathInfoMap::value_type &value) -> bool
+            {
                 const auto *info = static_cast<PathInfoImpl *>(value.second.get());
                 return ((ULONG_PTR)(info->m_handle)) == key;
             });

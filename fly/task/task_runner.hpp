@@ -614,7 +614,8 @@ Task TaskRunner::wrap_task(TaskType &&task)
 {
     static_assert(std::is_invocable_v<TaskType>, "Task must be invocable without any arguments");
 
-    return [task = std::move(task)](TaskRunner *, TaskLocation) mutable {
+    return [task = std::move(task)](TaskRunner *, TaskLocation) mutable
+    {
         FLY_UNUSED(std::move(task)());
     };
 }
@@ -630,7 +631,8 @@ Task TaskRunner::wrap_task(TaskType &&task, std::weak_ptr<OwnerType> weak_owner)
         "Task must be invocable with only a strong pointer to its owner");
 
     return [task = std::move(task),
-            weak_owner = std::move(weak_owner)](TaskRunner *, TaskLocation) mutable {
+            weak_owner = std::move(weak_owner)](TaskRunner *, TaskLocation) mutable
+    {
         StrongOwnerType owner = weak_owner.lock();
 
         if (owner)
@@ -657,7 +659,8 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply)
         "arguments");
 
     return [task = std::move(task),
-            reply = std::move(reply)](TaskRunner *runner, TaskLocation location) mutable {
+            reply = std::move(reply)](TaskRunner *runner, TaskLocation location) mutable
+    {
         if constexpr (s_result_is_void)
         {
             std::move(task)();
@@ -693,7 +696,8 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<Own
 
     return [task = std::move(task),
             reply = std::move(reply),
-            weak_owner = std::move(weak_owner)](TaskRunner *runner, TaskLocation location) mutable {
+            weak_owner = std::move(weak_owner)](TaskRunner *runner, TaskLocation location) mutable
+    {
         StrongOwnerType owner = weak_owner.lock();
         if (!owner)
         {

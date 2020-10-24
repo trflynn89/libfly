@@ -125,7 +125,8 @@ void PathMonitorImpl::handle_event(const inotify_event *event) const
     auto path_it = std::find_if(
         m_path_info.begin(),
         m_path_info.end(),
-        [&event](const PathInfoMap::value_type &value) -> bool {
+        [&event](const PathInfoMap::value_type &value) -> bool
+        {
             const auto *info = static_cast<PathInfoImpl *>(value.second.get());
             return info->m_watch_descriptor == event->wd;
         });

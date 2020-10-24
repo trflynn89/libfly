@@ -19,7 +19,8 @@ CATCH_TEMPLATE_TEST_CASE(
     using char_type = typename BasicString::char_type;
     using codepoint_type = typename BasicString::codepoint_type;
 
-    auto escape_should_fail = [](StringType &&test, int line) {
+    auto escape_should_fail = [](StringType &&test, int line)
+    {
         CATCH_CAPTURE(test);
         CATCH_CAPTURE(line);
 
@@ -31,12 +32,14 @@ CATCH_TEMPLATE_TEST_CASE(
     };
 
     auto encode_should_fail =
-        [&escape_should_fail](StringType &&test, codepoint_type codepoint, int line) {
-            escape_should_fail(std::move(test), line);
-            CATCH_CHECK_FALSE(BasicString::encode_codepoint(codepoint));
-        };
+        [&escape_should_fail](StringType &&test, codepoint_type codepoint, int line)
+    {
+        escape_should_fail(std::move(test), line);
+        CATCH_CHECK_FALSE(BasicString::encode_codepoint(codepoint));
+    };
 
-    auto unescape_should_fail = [](StringType &&test, int line, bool whole_string = true) {
+    auto unescape_should_fail = [](StringType &&test, int line, bool whole_string = true)
+    {
         CATCH_CAPTURE(test);
         CATCH_CAPTURE(line);
 
@@ -275,7 +278,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("ASCII")
     {
-        auto encoded_to = [](codepoint_type ch, StringType &&expected) {
+        auto encoded_to = [](codepoint_type ch, StringType &&expected)
+        {
             CATCH_CAPTURE(ch);
 
             const StringType test(1, static_cast<char_type>(ch));
@@ -333,24 +337,25 @@ CATCH_TEMPLATE_TEST_CASE(
     CATCH_SECTION("Non-ASCII")
     {
         auto escaped_to =
-            [](StringType &&test, StringType &&expected, auto prefix, bool one_char = true) {
-                CATCH_CAPTURE(test);
+            [](StringType &&test, StringType &&expected, auto prefix, bool one_char = true)
+        {
+            CATCH_CAPTURE(test);
 
-                auto begin = test.cbegin();
-                const auto end = test.cend();
-                CATCH_CAPTURE(std::distance(begin, end));
+            auto begin = test.cbegin();
+            const auto end = test.cend();
+            CATCH_CAPTURE(std::distance(begin, end));
 
-                std::optional<StringType> actual;
+            std::optional<StringType> actual;
 
-                if (one_char)
-                {
-                    actual = BasicString::template escape_codepoint<prefix()>(begin, end);
-                    CATCH_CHECK(actual == expected);
-                }
-
-                actual = BasicString::template escape_all_codepoints<prefix()>(test);
+            if (one_char)
+            {
+                actual = BasicString::template escape_codepoint<prefix()>(begin, end);
                 CATCH_CHECK(actual == expected);
-            };
+            }
+
+            actual = BasicString::template escape_all_codepoints<prefix()>(test);
+            CATCH_CHECK(actual == expected);
+        };
 
         CATCH_SECTION("Escape non-ASCII with 'u'")
         {
@@ -461,7 +466,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Valid escape sequences")
     {
-        auto unescaped_to = [](StringType &&test, StringType &&expected, bool one_char = true) {
+        auto unescaped_to = [](StringType &&test, StringType &&expected, bool one_char = true)
+        {
             CATCH_CAPTURE(test);
 
             auto begin = test.cbegin();
@@ -538,7 +544,8 @@ CATCH_TEMPLATE_TEST_CASE(
         // https://unicode.org/mail-arch/unicode-ml/Archives-Old/UML018/0332.html
         CATCH_SECTION("Markus Kuhn UTF-8 decoder capability and stress test")
         {
-            auto validate_pass = [](StringType &&test, codepoint_type expected, int line) {
+            auto validate_pass = [](StringType &&test, codepoint_type expected, int line)
+            {
                 CATCH_CAPTURE(test);
                 CATCH_CAPTURE(line);
 
@@ -549,9 +556,9 @@ CATCH_TEMPLATE_TEST_CASE(
                 CATCH_CHECK(actual == expected);
             };
 
-            auto validate_pass_all = [](StringType &&test,
-                                        std::vector<codepoint_type> expected,
-                                        int line) {
+            auto validate_pass_all =
+                [](StringType &&test, std::vector<codepoint_type> expected, int line)
+            {
                 CATCH_CAPTURE(test);
                 CATCH_CAPTURE(line);
 
@@ -570,7 +577,8 @@ CATCH_TEMPLATE_TEST_CASE(
                 CATCH_CHECK(it == end);
             };
 
-            auto validate_fail = [](StringType &&test, std::size_t expected_failures, int line) {
+            auto validate_fail = [](StringType &&test, std::size_t expected_failures, int line)
+            {
                 CATCH_CAPTURE(test);
                 CATCH_CAPTURE(line);
 
@@ -687,18 +695,19 @@ CATCH_TEMPLATE_TEST_CASE(
                 CATCH_SECTION("3.2  Lonely start characters")
                 {
                     auto validate_fail_sequence =
-                        [&validate_fail](codepoint_type begin, codepoint_type end, int line) {
-                            StringType test_3_2;
+                        [&validate_fail](codepoint_type begin, codepoint_type end, int line)
+                    {
+                        StringType test_3_2;
 
-                            for (codepoint_type ch = begin; ch <= end; ++ch)
-                            {
-                                validate_fail(StringType(1, ch) + " ", 1, line);
-                                test_3_2 += ch;
-                                test_3_2 += ' ';
-                            }
+                        for (codepoint_type ch = begin; ch <= end; ++ch)
+                        {
+                            validate_fail(StringType(1, ch) + " ", 1, line);
+                            test_3_2 += ch;
+                            test_3_2 += ' ';
+                        }
 
-                            validate_fail(std::move(test_3_2), end - begin + 1, line);
-                        };
+                        validate_fail(std::move(test_3_2), end - begin + 1, line);
+                    };
 
                     // 3.2.1  All 32 first bytes of 2-byte sequences (0xc0-0xdf), each followed by a
                     // space character

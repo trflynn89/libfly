@@ -1,12 +1,10 @@
-# Clang-Format 10.0.0
-# https://releases.llvm.org/10.0.0/tools/clang/docs/ClangFormatStyleOptions.html
-#
-# Upstream issues to track for better formatting:
-#     Newlines before brackets after lambdas https://reviews.llvm.org/D44609
+# Clang-Format 11.0.0
+# https://releases.llvm.org/11.0.0/tools/clang/docs/ClangFormatStyleOptions.html
 ---
 AccessModifierOffset: -4
 AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveAssignments: false
+AlignConsecutiveBitFields: false
 AlignConsecutiveDeclarations: false
 AlignConsecutiveMacros: false
 AlignEscapedNewlines: Right
@@ -19,7 +17,7 @@ AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: false
-AllowShortLambdasOnASingleLine: All
+AllowShortLambdasOnASingleLine: Empty
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: true
@@ -38,6 +36,8 @@ BraceWrapping:
     AfterExternBlock: true
     BeforeCatch: true
     BeforeElse: true
+    BeforeLambdaBody: true
+    BeforeWhile: false
     IndentBraces: false
     SplitEmptyFunction: true
     SplitEmptyRecord: true
@@ -71,11 +71,14 @@ IncludeCategories:
     Priority: 5
   - Regex: '<[[:alnum:]./_]+>'
     Priority: 6
+IndentCaseBlocks: false
 IndentCaseLabels: true
+IndentExternBlock: NoIndent
 IndentGotoLabels: false
 IndentPPDirectives: AfterHash
 IndentWidth: 4
 IndentWrappedFunctionNames: false
+InsertTrailingCommas: Wrapped
 KeepEmptyLinesAtTheStartOfBlocks: false
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: Inner
@@ -114,6 +117,7 @@ BraceWrapping:
     AfterObjCDeclaration: true
 ObjCBinPackProtocolList: Never
 ObjCBlockIndentWidth: 4
+ObjCBreakBeforeNestedBlockParam: true
 ObjCSpaceAfterProperty: true
 ObjCSpaceBeforeProtocolList: true
 
