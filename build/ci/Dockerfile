@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.10
 
 MAINTAINER Timothy Flynn <trflynn89@pm.me>
 
