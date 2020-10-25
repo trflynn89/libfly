@@ -80,13 +80,15 @@ CF_ALL += \
     -Woverloaded-virtual \
     -Wredundant-decls \
     -Wshadow \
-    -Wstrict-overflow=5 \
+    -Wstrict-overflow=2 \
     -Wundef \
     -Wunreachable-code \
     -Wunused \
-    -Wzero-as-null-pointer-constant \
     \
     -pedantic
+
+# Disabled due to LLVM bug: https://bugs.llvm.org/show_bug.cgi?id=44325
+#    -Wzero-as-null-pointer-constant \
 
 ifeq ($(mode), debug)
     CF_ALL += \
@@ -149,8 +151,8 @@ ifeq ($(verbose), 1)
 endif
 
 # C and C++ specific flags.
-CFLAGS := -std=c17 $(CF_ALL)
-CXXFLAGS := -std=c++17 $(CF_ALL)
+CFLAGS := -std=c2x $(CF_ALL)
+CXXFLAGS := -std=c++2a $(CF_ALL)
 
 # On Linux: Use LLD linker with clang toolchain. Use gold linker with gcc toolchain.
 ifeq ($(SYSTEM), LINUX)

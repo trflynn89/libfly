@@ -9,8 +9,8 @@
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 23, 2019
  */
-#define FLY_CHR(type, ch) (fly::BasicCharacterLiteral<type>::literal(u8##ch, L##ch, u##ch, U##ch))
-#define FLY_STR(type, str) (fly::BasicStringLiteral<type>::literal(u8##str, L##str, u##str, U##str))
+#define FLY_CHR(type, ch) (fly::BasicCharacterLiteral<type>::literal(ch, L##ch, u##ch, U##ch))
+#define FLY_STR(type, str) (fly::BasicStringLiteral<type>::literal(str, L##str, u##str, U##str))
 
 #define FLY_SYS_CHR(str) FLY_CH(std::filesystem::path::value_type, str)
 #define FLY_SYS_STR(str) FLY_STR(std::filesystem::path::value_type, str)

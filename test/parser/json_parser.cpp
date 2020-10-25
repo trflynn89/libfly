@@ -182,7 +182,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("String with UTF-8 encoding is parsed as-is")
     {
-        const std::string contents(u8"{\"encoding\": \"UTF-8\"}");
+        const std::string contents("{\"encoding\": \"UTF-8\"}");
 
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());

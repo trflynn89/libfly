@@ -200,7 +200,7 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(HANDLE iocp, const std::filesystem::
     ::memset(&m_overlapped, 0, sizeof(m_overlapped));
 
     m_handle = ::CreateFile(
-        path.string().c_str(),
+        path.c_str(),
         s_access_flags,
         s_share_flags,
         nullptr,
