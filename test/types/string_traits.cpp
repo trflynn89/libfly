@@ -25,11 +25,24 @@ struct NotStreamable
 {
 };
 
+template <typename T, fly::enable_if_any<fly::detail::is_supported_string<T>> = 0>
+constexpr bool is_supported_string(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::enable_if_none<fly::detail::is_supported_string<T>> = 0>
+constexpr bool is_supported_string(const T &)
+{
+    return false;
+}
+
 template <
     typename T,
     fly::enable_if_any<
         fly::detail::BasicStringTraits<std::string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
+        fly::detail::BasicStringTraits<std::u8string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u16string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
 constexpr bool is_string_like(const T &)
@@ -42,6 +55,7 @@ template <
     fly::enable_if_none<
         fly::detail::BasicStringTraits<std::string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
+        fly::detail::BasicStringTraits<std::u8string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u16string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
 constexpr bool is_string_like(const T &)
@@ -73,6 +87,7 @@ CATCH_TEMPLATE_TEST_CASE(
     "[string]",
     std::string,
     std::wstring,
+    std::u8string,
     std::u16string,
     std::u32string)
 {
@@ -84,6 +99,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     constexpr bool is_string = std::is_same_v<StringType, std::string>;
     constexpr bool is_wstring = std::is_same_v<StringType, std::wstring>;
+    constexpr bool is_string8 = std::is_same_v<StringType, std::u8string>;
     constexpr bool is_string16 = std::is_same_v<StringType, std::u16string>;
     constexpr bool is_string32 = std::is_same_v<StringType, std::u32string>;
 
@@ -105,6 +121,140 @@ CATCH_TEMPLATE_TEST_CASE(
         else
         {
             CATCH_CHECK(i == -1);
+        }
+    }
+
+    CATCH_SECTION("Check whether types are supported strings via traits")
+    {
+        CATCH_SECTION("Plain data types")
+        {
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<int>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const int>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<int const>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const char>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char const>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<wchar_t>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const wchar_t>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<wchar_t const>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char16_t>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const char16_t>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char16_t const>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char32_t>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const char32_t>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char32_t const>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const char &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char const &>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<wchar_t &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const wchar_t &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<wchar_t const &>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char16_t &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const char16_t &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char16_t const &>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char32_t &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const char32_t &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char32_t const &>);
+        }
+
+        CATCH_SECTION("C-string types")
+        {
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const char *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<wchar_t *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const wchar_t *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<wchar_t const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char8_t *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const char8_t *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char8_t const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char16_t *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const char16_t *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char16_t const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char32_t *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const char32_t *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<char32_t const *>);
+        }
+
+        CATCH_SECTION("C++-string types")
+        {
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::string>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const std::string>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::string const>);
+
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::wstring>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const std::wstring>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::wstring const>);
+
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u8string>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const std::u8string>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u8string const>);
+
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u16string>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const std::u16string>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u16string const>);
+
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u32string>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const std::u32string>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u32string const>);
+        }
+
+        CATCH_SECTION("C++-string type references")
+        {
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::string &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const std::string &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::string const &>);
+
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::wstring &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const std::wstring &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::wstring const &>);
+
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u8string &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const std::u8string &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u8string const &>);
+
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u16string &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const std::u16string &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u16string const &>);
+
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u32string &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const std::u32string &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<std::u32string const &>);
+        }
+
+        CATCH_SECTION("C++-string type pointers")
+        {
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<std::string *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const std::string *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<std::string const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<std::wstring *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const std::wstring *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<std::wstring const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<std::u8string *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const std::u8string *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<std::u8string const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<std::u16string *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const std::u16string *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<std::u16string const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<std::u32string *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const std::u32string *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<std::u32string const *>);
         }
     }
 
@@ -159,6 +309,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(traits::template is_string_like_v<const wchar_t *> == is_wstring);
             CATCH_CHECK(traits::template is_string_like_v<wchar_t const *> == is_wstring);
 
+            CATCH_CHECK(traits::template is_string_like_v<char8_t *> == is_string8);
+            CATCH_CHECK(traits::template is_string_like_v<const char8_t *> == is_string8);
+            CATCH_CHECK(traits::template is_string_like_v<char8_t const *> == is_string8);
+
             CATCH_CHECK(traits::template is_string_like_v<char16_t *> == is_string16);
             CATCH_CHECK(traits::template is_string_like_v<const char16_t *> == is_string16);
             CATCH_CHECK(traits::template is_string_like_v<char16_t const *> == is_string16);
@@ -177,6 +331,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(traits::template is_string_like_v<std::wstring> == is_wstring);
             CATCH_CHECK(traits::template is_string_like_v<const std::wstring> == is_wstring);
             CATCH_CHECK(traits::template is_string_like_v<std::wstring const> == is_wstring);
+
+            CATCH_CHECK(traits::template is_string_like_v<std::u8string> == is_string8);
+            CATCH_CHECK(traits::template is_string_like_v<const std::u8string> == is_string8);
+            CATCH_CHECK(traits::template is_string_like_v<std::u8string const> == is_string8);
 
             CATCH_CHECK(traits::template is_string_like_v<std::u16string> == is_string16);
             CATCH_CHECK(traits::template is_string_like_v<const std::u16string> == is_string16);
@@ -197,6 +355,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(traits::template is_string_like_v<const std::wstring &> == is_wstring);
             CATCH_CHECK(traits::template is_string_like_v<std::wstring const &> == is_wstring);
 
+            CATCH_CHECK(traits::template is_string_like_v<std::u8string &> == is_string8);
+            CATCH_CHECK(traits::template is_string_like_v<const std::u8string &> == is_string8);
+            CATCH_CHECK(traits::template is_string_like_v<std::u8string const &> == is_string8);
+
             CATCH_CHECK(traits::template is_string_like_v<std::u16string &> == is_string16);
             CATCH_CHECK(traits::template is_string_like_v<const std::u16string &> == is_string16);
             CATCH_CHECK(traits::template is_string_like_v<std::u16string const &> == is_string16);
@@ -216,6 +378,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(traits::template is_string_like_v<const std::wstring *>);
             CATCH_CHECK_FALSE(traits::template is_string_like_v<std::wstring const *>);
 
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<std::u8string *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<const std::u8string *>);
+            CATCH_CHECK_FALSE(traits::template is_string_like_v<std::u8string const *>);
+
             CATCH_CHECK_FALSE(traits::template is_string_like_v<std::u16string *>);
             CATCH_CHECK_FALSE(traits::template is_string_like_v<const std::u16string *>);
             CATCH_CHECK_FALSE(traits::template is_string_like_v<std::u16string const *>);
@@ -224,6 +390,15 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(traits::template is_string_like_v<const std::u32string *>);
             CATCH_CHECK_FALSE(traits::template is_string_like_v<std::u32string const *>);
         }
+    }
+
+    CATCH_SECTION("Check whether types are supported strings via SFINAE overloads")
+    {
+        CATCH_CHECK(is_supported_string(StringType()));
+
+        CATCH_CHECK_FALSE(is_supported_string(int()));
+        CATCH_CHECK_FALSE(is_supported_string(char_type()));
+        CATCH_CHECK_FALSE(is_supported_string(char_pointer_type()));
     }
 
     CATCH_SECTION("Check whether types are string-like via SFINAE overloads")

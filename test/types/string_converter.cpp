@@ -48,11 +48,13 @@ CATCH_TEMPLATE_TEST_CASE(
     "[string]",
     std::string,
     std::wstring,
+    std::u8string,
     std::u16string,
     std::u32string)
 {
     using StringType = TestType;
     using BasicString = fly::BasicString<StringType>;
+    using BasicStringTraits = fly::detail::BasicStringTraits<StringType>;
     using char_type = typename BasicString::char_type;
     using codepoint_type = typename BasicString::codepoint_type;
     using streamed_type = typename BasicString::streamed_type;
@@ -107,8 +109,18 @@ CATCH_TEMPLATE_TEST_CASE(
             const auto utf8 = FLY_STR(std::string::value_type, "\U0001f355 in the morning");
             CATCH_CHECK(BasicString::template convert<std::string>(test) == utf8);
         }
+        {
+            auto utf8 = FLY_STR(std::u8string::value_type, "\U0001f355 in the morning");
+            CATCH_CHECK(BasicString::template convert<std::u8string>(test) == utf8);
+        }
+        {
+            const auto utf8 = FLY_STR(std::u8string::value_type, "\U0001f355 in the morning");
+            CATCH_CHECK(BasicString::template convert<std::u8string>(test) == utf8);
+        }
 
+        CATCH_CHECK_FALSE(BasicString::template convert<int>(out_of_range_codepoint()));
         CATCH_CHECK_FALSE(BasicString::template convert<std::string>(out_of_range_codepoint()));
+        CATCH_CHECK_FALSE(BasicString::template convert<std::u8string>(out_of_range_codepoint()));
     }
 
     CATCH_SECTION("Convert a string to a UTF-16 encoded string")
@@ -123,6 +135,7 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(BasicString::template convert<std::u16string>(test) == utf16);
         }
 
+        CATCH_CHECK_FALSE(BasicString::template convert<int>(out_of_range_codepoint()));
         CATCH_CHECK_FALSE(BasicString::template convert<std::u16string>(out_of_range_codepoint()));
 
         if constexpr (sizeof(std::wstring::value_type) == 2)
@@ -153,6 +166,7 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(BasicString::template convert<std::u32string>(test) == utf32);
         }
 
+        CATCH_CHECK_FALSE(BasicString::template convert<int>(out_of_range_codepoint()));
         CATCH_CHECK_FALSE(BasicString::template convert<std::u32string>(out_of_range_codepoint()));
 
         if constexpr (sizeof(std::wstring::value_type) == 4)
@@ -215,7 +229,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(BasicString::template convert<streamed_char>(s));
         CATCH_CHECK_FALSE(BasicString::template convert<ustreamed_char>(s));
 
-        if constexpr (BasicString::traits::has_stoi_family_v)
+        if constexpr (BasicStringTraits::has_stoi_family_v)
         {
             CATCH_CHECK_FALSE(
                 BasicString::template convert<streamed_char>(minstr<StringType, streamed_char>()));
@@ -253,7 +267,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(BasicString::template convert<std::int8_t>(s));
         CATCH_CHECK_FALSE(BasicString::template convert<std::uint8_t>(s));
 
-        if constexpr (BasicString::traits::has_stoi_family_v)
+        if constexpr (BasicStringTraits::has_stoi_family_v)
         {
             CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int8_t>(minstr<StringType, std::int8_t>()));
@@ -291,7 +305,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(BasicString::template convert<std::int16_t>(s));
         CATCH_CHECK_FALSE(BasicString::template convert<std::uint16_t>(s));
 
-        if constexpr (BasicString::traits::has_stoi_family_v)
+        if constexpr (BasicStringTraits::has_stoi_family_v)
         {
             CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int16_t>(minstr<StringType, std::int16_t>()));
@@ -329,7 +343,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(BasicString::template convert<std::int32_t>(s));
         CATCH_CHECK_FALSE(BasicString::template convert<std::uint32_t>(s));
 
-        if constexpr (BasicString::traits::has_stoi_family_v)
+        if constexpr (BasicStringTraits::has_stoi_family_v)
         {
             CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int32_t>(minstr<StringType, std::int32_t>()));

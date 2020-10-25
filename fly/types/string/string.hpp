@@ -32,6 +32,7 @@ class BasicString;
 
 using String = BasicString<std::string>;
 using WString = BasicString<std::wstring>;
+using String8 = BasicString<std::u8string>;
 using String16 = BasicString<std::u16string>;
 using String32 = BasicString<std::u32string>;
 
@@ -44,9 +45,12 @@ using String32 = BasicString<std::u32string>;
 template <typename StringType>
 class BasicString
 {
-public:
-    // Forward some aliases from detail::BasicStringTraits for convenience.
+    using formatter = detail::BasicStringFormatter<StringType>;
+    using streamer = detail::BasicStringStreamer<StringType>;
     using traits = detail::BasicStringTraits<StringType>;
+    using unicode = detail::BasicStringUnicode<StringType>;
+
+public:
     using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
     using iterator = typename traits::iterator;
@@ -400,11 +404,8 @@ private:
     /**
      * A list of alpha-numeric characters in the range [0-9A-Za-z].
      */
-    static constexpr const char_type *s_alpha_num = FLY_STR(
-        char_type,
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz");
+    static constexpr const char_type *s_alpha_num =
+        FLY_STR(char_type, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 
     static constexpr size_type s_alpha_num_length =
         std::char_traits<char_type>::length(s_alpha_num);
@@ -619,14 +620,14 @@ template <typename StringType>
 auto BasicString<StringType>::decode_codepoint(const_iterator &it, const const_iterator &end)
     -> std::optional<codepoint_type>
 {
-    return detail::BasicStringUnicode<StringType>::decode_codepoint(it, end);
+    return unicode::decode_codepoint(it, end);
 }
 
 //==================================================================================================
 template <typename StringType>
 std::optional<StringType> BasicString<StringType>::encode_codepoint(codepoint_type codepoint)
 {
-    return detail::BasicStringUnicode<StringType>::encode_codepoint(codepoint);
+    return unicode::encode_codepoint(codepoint);
 }
 
 //==================================================================================================
@@ -660,9 +661,7 @@ template <char UnicodePrefix>
 std::optional<StringType>
 BasicString<StringType>::escape_codepoint(const_iterator &it, const const_iterator &end)
 {
-    return detail::BasicStringUnicode<StringType>::template escape_codepoint<UnicodePrefix>(
-        it,
-        end);
+    return unicode::template escape_codepoint<UnicodePrefix>(it, end);
 }
 
 //==================================================================================================
@@ -714,7 +713,7 @@ template <typename StringType>
 std::optional<StringType>
 BasicString<StringType>::unescape_codepoint(const_iterator &it, const const_iterator &end)
 {
-    return detail::BasicStringUnicode<StringType>::unescape_codepoint(it, end);
+    return unicode::unescape_codepoint(it, end);
 }
 
 //==================================================================================================
@@ -722,7 +721,7 @@ template <typename StringType>
 template <typename IntegerType>
 StringType BasicString<StringType>::create_hex_string(IntegerType source, size_type length)
 {
-    return detail::BasicStringFormatter<StringType>::format_hex(source, length);
+    return formatter::format_hex(source, length);
 }
 
 //==================================================================================================
@@ -756,7 +755,7 @@ template <typename StringType>
 template <typename... Args>
 auto BasicString<StringType>::format(const char_type *fmt, const Args &...args) -> streamed_type
 {
-    return detail::BasicStringFormatter<StringType>::format(fmt, args...);
+    return formatter::format(fmt, args...);
 }
 
 //==================================================================================================
@@ -767,7 +766,7 @@ auto BasicString<StringType>::format(
     const char_type *fmt,
     const Args &...args) -> ostream_type &
 {
-    return detail::BasicStringFormatter<StringType>::format(ostream, fmt, args...);
+    return formatter::format(ostream, fmt, args...);
 }
 
 //==================================================================================================
@@ -790,8 +789,8 @@ void BasicString<StringType>::join_internal(
     const T &value,
     const Args &...args)
 {
-    detail::BasicStringStreamer<StringType>::stream(ostream, value);
-    detail::BasicStringStreamer<StringType>::stream(ostream, separator);
+    streamer::stream(ostream, value);
+    streamer::stream(ostream, separator);
 
     join_internal(ostream, separator, args...);
 }
@@ -804,7 +803,7 @@ void BasicString<StringType>::join_internal(
     const char_type &,
     const T &value)
 {
-    detail::BasicStringStreamer<StringType>::stream(ostream, value);
+    streamer::stream(ostream, value);
 }
 
 //==================================================================================================
@@ -814,14 +813,12 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
 {
     using U = std::decay_t<T>;
 
-    if constexpr (any_same_v<U, std::string, std::wstring, std::u16string, std::u32string>)
+    if constexpr (detail::is_supported_string_v<U>)
     {
         auto it = value.cbegin();
         const auto end = value.cend();
 
-        auto result = detail::BasicStringUnicode<StringType>::template convert_encoding<U>(it, end);
-
-        if (result)
+        if (auto result = unicode::template convert_encoding<U>(it, end); result)
         {
             return static_cast<T>(result.value());
         }
@@ -834,10 +831,15 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
     }
     else
     {
-        typename traits::ostringstream_type ostream;
-        detail::BasicStringStreamer<StringType>::stream(ostream, value);
+        auto it = value.cbegin();
+        const auto end = value.cend();
 
-        return detail::BasicStringConverter<streamed_type, T>::convert(ostream.str());
+        if (auto result = unicode::template convert_encoding<streamed_type>(it, end); result)
+        {
+            return detail::BasicStringConverter<streamed_type, T>::convert(result.value());
+        }
+
+        return std::nullopt;
     }
 }
 

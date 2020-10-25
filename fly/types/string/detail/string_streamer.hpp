@@ -22,9 +22,9 @@ namespace fly::detail {
  * For std::string and std::wstring, the "normal" stream types are used (std::istream/std::ostream
  * and std::wistream/std::wostream, and their children, respectively).
  *
- * For std::u16string and std::u32string, the STL does not provide stream types. For a general
- * solution, a copy of the input string is created with UTF-8 encoding for use with std::ostream/
- * std::istream.
+ * For std::u8string, std::u16string, and std::u32string, the STL does not provide stream types. For
+ * a general solution, a copy of the input string is created with UTF-8 encoding for use with
+ * std::ostream/std::istream.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 21, 2019
@@ -114,7 +114,7 @@ void BasicStringStreamer<StringType>::stream(ostream_type &ostream, const T &val
 {
     using U = std::decay_t<T>;
 
-    if constexpr (any_same_v<U, std::string, std::wstring, std::u16string, std::u32string>)
+    if constexpr (detail::is_supported_string_v<U>)
     {
         auto it = value.cbegin();
         const auto end = value.cend();
@@ -198,15 +198,16 @@ void BasicStringStreamer<StringType>::stream_char(ostream_type &ostream, const c
     }
     else
     {
-        const auto value_as_int = static_cast<typename char_traits::int_type>(value);
+        static constexpr const auto s_eof_as_char = static_cast<char_type>(char_traits::eof());
 
-        if (value_as_int == char_traits::eof())
+        if (value == s_eof_as_char)
         {
             ostream << FLY_STR(streamed_char, "[EOF]");
         }
         else
         {
             static constexpr const streamed_char s_fill(FLY_CHR(streamed_char, '0'));
+            const auto value_as_int = static_cast<typename char_traits::int_type>(value);
 
             ostream << FLY_STR(streamed_char, "\\x");
             ostream << std::setfill(s_fill) << std::setw(2);

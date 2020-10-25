@@ -13,8 +13,8 @@ namespace fly::detail {
  * Helper struct to convert a std::basic_string type to a plain-old-data type, e.g. int or bool.
  *
  * Internally, the std::stoi family of functions is used to handle conversions, so only std::string
- * and std::wstring may be directly used. For std::u16string and std::u32string, first use
- * BasicStringStreamer::stream to convert the string to std::string.
+ * and std::wstring may be directly used. For std::u8string, std::u16string, and std::u32string,
+ * first use BasicStringUnicode::convert_encoding to convert the string to std::string.
  *
  * It is recommended that outside callers use BasicString::convert instead of using this struct
  * directly.
