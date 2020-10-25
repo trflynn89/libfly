@@ -54,6 +54,7 @@ CATCH_TEMPLATE_TEST_CASE(
     "[string]",
     std::string,
     std::wstring,
+    std::u8string,
     std::u16string,
     std::u32string)
 {

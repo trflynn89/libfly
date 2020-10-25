@@ -17,8 +17,9 @@ namespace fly::detail {
  *
  *     1. std::string - UTF-8
  *     2. std::wstring - UTF-16 on Windows, UTF-32 on Linux
- *     3. std::u16string - UTF-16
- *     4. std::u32string - UTF-32
+ *     3. std::u8string - UTF-8
+ *     4. std::u16string - UTF-16
+ *     5. std::u32string - UTF-32
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version June 6, 2020

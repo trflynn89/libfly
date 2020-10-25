@@ -10,6 +10,17 @@
 namespace fly::detail {
 
 /**
+ * Define a trait for testing if StringType is a supported std::basic_string specialization.
+ */
+template <typename StringType>
+using is_supported_string =
+    any_same<StringType, std::string, std::wstring, std::u8string, std::u16string, std::u32string>;
+
+template <typename StringType>
+// NOLINTNEXTLINE(readability-identifier-naming)
+inline constexpr bool is_supported_string_v = is_supported_string<StringType>::value;
+
+/**
  * Traits for basic properties of standard std::basic_string specializations.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
@@ -18,6 +29,10 @@ namespace fly::detail {
 template <typename StringType>
 struct BasicStringTraits
 {
+    static_assert(
+        is_supported_string_v<StringType>,
+        "StringType must be a standard std::basic_string specialization");
+
     /**
      * Aliases for STL types that use std::basic_string specializations as a template type.
      */
@@ -42,10 +57,6 @@ struct BasicStringTraits
     using stringstream_type = typename streamer_traits::stringstream_type;
     using istringstream_type = typename streamer_traits::istringstream_type;
     using ostringstream_type = typename streamer_traits::ostringstream_type;
-
-    static_assert(
-        any_same_v<StringType, std::string, std::wstring, std::u16string, std::u32string>,
-        "StringType must be a standard std::basic_string specialization");
 
     /**
      * Define a trait for testing if type T is a string-like type analogous to StringType.
