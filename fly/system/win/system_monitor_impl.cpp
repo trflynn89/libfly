@@ -12,7 +12,7 @@ namespace fly {
 
 namespace {
 
-    const LPCSTR s_cpu_path = "\\Processor(_Total)\\% Processor Time";
+    const LPCWSTR s_cpu_path = L"\\Processor(_Total)\\% Processor Time";
 
 } // namespace
 

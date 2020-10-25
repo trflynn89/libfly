@@ -1,2 +1,2 @@
-# libfly, a C++17 utility library for Linux, macOS, and Windows
+# libfly, a C++20 utility library for Linux, macOS, and Windows
 [![Build Status](https://dev.azure.com/trflynn89/libfly/_apis/build/status/trflynn89.libfly?branchName=master)](https://dev.azure.com/trflynn89/libfly/_build/latest?definitionId=5&branchName=master) [![codecov](https://codecov.io/gh/trflynn89/libfly/branch/master/graph/badge.svg)](https://codecov.io/gh/trflynn89/libfly)  [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9de3533a8aef4358895a018f91e90bd4)](https://www.codacy.com/manual/trflynn89/libfly?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=trflynn89/libfly&amp;utm_campaign=Badge_Grade)
