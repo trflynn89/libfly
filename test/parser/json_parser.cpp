@@ -180,7 +180,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         CATCH_CHECK(values.size() == 1112064);
     }
 
-    CATCH_SECTION("String with UTF-8 encoding is parsed as-is")
+    CATCH_SECTION("String with UTF-8 encoding (std::string)")
     {
         const std::string contents("{\"encoding\": \"UTF-8\"}");
 
@@ -194,7 +194,21 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         CATCH_CHECK(encoded_encoding == "UTF-8");
     }
 
-    CATCH_SECTION("File with UTF-8 byte order mark is parsed as-is")
+    CATCH_SECTION("String with UTF-8 encoding (std::u8string)")
+    {
+        const std::u8string contents(u8"{\"encoding\": \"UTF-8\"}");
+
+        auto parsed = parser.parse_string(contents);
+        CATCH_REQUIRE(parsed.has_value());
+
+        fly::Json values = std::move(parsed.value());
+        CATCH_REQUIRE(values.size() == 1);
+
+        fly::Json encoded_encoding = values["encoding"];
+        CATCH_CHECK(encoded_encoding == "UTF-8");
+    }
+
+    CATCH_SECTION("File with UTF-8 byte order mark")
     {
         const auto here = std::filesystem::path(__FILE__);
         const auto path = here.parent_path() / "json" / "unicode";
@@ -209,7 +223,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         CATCH_CHECK(encoded_encoding == "UTF-8");
     }
 
-    CATCH_SECTION("String with UTF-16 encoding is converted to UTF-8")
+    CATCH_SECTION("String with UTF-16 encoding")
     {
         const std::u16string contents(u"{\"encoding\": \"UTF-16\"}");
 
@@ -226,7 +240,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         CATCH_CHECK_FALSE(parsed.has_value());
     }
 
-    CATCH_SECTION("File with UTF-16 big endian byte order mark is converted to UTF-8")
+    CATCH_SECTION("File with UTF-16 big endian byte order mark")
     {
         const auto here = std::filesystem::path(__FILE__);
         const auto path = here.parent_path() / "json" / "unicode";
@@ -244,7 +258,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         CATCH_CHECK_FALSE(parsed.has_value());
     }
 
-    CATCH_SECTION("File with UTF-16 little endian byte order mark is converted to UTF-8")
+    CATCH_SECTION("File with UTF-16 little endian byte order mark")
     {
         const auto here = std::filesystem::path(__FILE__);
         const auto path = here.parent_path() / "json" / "unicode";
@@ -262,7 +276,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         CATCH_CHECK_FALSE(parsed.has_value());
     }
 
-    CATCH_SECTION("String with UTF-32 encoding is converted to UTF-8")
+    CATCH_SECTION("String with UTF-32 encoding")
     {
         const std::u32string contents(U"{\"encoding\": \"UTF-32\"}");
 
@@ -279,7 +293,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         CATCH_CHECK_FALSE(parsed.has_value());
     }
 
-    CATCH_SECTION("File with UTF-32 big endian byte order mark is converted to UTF-8")
+    CATCH_SECTION("File with UTF-32 big endian byte order mark")
     {
         const auto here = std::filesystem::path(__FILE__);
         const auto path = here.parent_path() / "json" / "unicode";
@@ -297,7 +311,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         CATCH_CHECK_FALSE(parsed.has_value());
     }
 
-    CATCH_SECTION("File with UTF-32 little endian byte order mark is converted to UTF-8")
+    CATCH_SECTION("File with UTF-32 little endian byte order mark")
     {
         const auto here = std::filesystem::path(__FILE__);
         const auto path = here.parent_path() / "json" / "unicode";

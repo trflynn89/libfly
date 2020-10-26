@@ -35,8 +35,9 @@ public:
      *
      *     1. std::string - UTF-8
      *     2. std::wstring - UTF-16 on Windows, UTF-32 on Linux
-     *     3. std::u16string - UTF-16
-     *     4. std::u32string - UTF-32
+     *     3. std::u8string - UTF-8
+     *     4. std::u16string - UTF-16
+     *     5. std::u32string - UTF-32
      *
      * Further, all string types will be checked for the presence of a byte order mark. If a BOM is
      * not present, the parser will assume UTF-8 encoding. If a BOM is present, the following BOM
@@ -147,7 +148,7 @@ private:
 template <typename StringType>
 std::optional<Json> Parser::parse_string(const StringType &contents)
 {
-    if constexpr (sizeof(typename StringType::value_type) == 1)
+    if constexpr (std::is_same_v<StringType, std::string>)
     {
         std::istringstream stream(contents);
         return parse_stream(stream);
