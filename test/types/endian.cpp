@@ -2,6 +2,7 @@
 
 #include <catch2/catch.hpp>
 
+#include <bit>
 #include <cstdint>
 #include <limits>
 #include <type_traits>
@@ -55,7 +56,7 @@ T swap(T x)
     return result;
 }
 
-template <typename DataType, fly::Endian Desired>
+template <typename DataType, std::endian Desired>
 void run_test()
 {
     constexpr DataType iterations = 100;
@@ -73,7 +74,7 @@ void run_test()
             DataType expected = data;
             DataType actual = fly::endian_swap_if_non_native<Desired>(data);
 
-            if constexpr (Desired != fly::Endian::Native)
+            if constexpr (Desired != std::endian::native)
             {
                 expected = swap(expected);
             }
@@ -99,16 +100,16 @@ CATCH_TEMPLATE_TEST_CASE(
 {
     CATCH_SECTION("Byte swap to big-endian")
     {
-        run_test<TestType, fly::Endian::Big>();
+        run_test<TestType, std::endian::big>();
     }
 
     CATCH_SECTION("Byte swap to little-endian")
     {
-        run_test<TestType, fly::Endian::Little>();
+        run_test<TestType, std::endian::little>();
     }
 
     CATCH_SECTION("Byte swap to the system's native endianness")
     {
-        run_test<TestType, fly::Endian::Native>();
+        run_test<TestType, std::endian::native>();
     }
 }

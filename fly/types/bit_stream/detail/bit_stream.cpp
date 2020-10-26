@@ -9,4 +9,7 @@ BitStream::BitStream(std::streambuf *stream_buffer, byte_type starting_position)
 {
 }
 
+//==================================================================================================
+BitStream::~BitStream() = default;
+
 } // namespace fly::detail

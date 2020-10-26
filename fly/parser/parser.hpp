@@ -4,6 +4,7 @@
 #include "fly/types/numeric/endian.hpp"
 #include "fly/types/string/string.hpp"
 
+#include <bit>
 #include <cstdint>
 #include <filesystem>
 #include <istream>
@@ -128,7 +129,7 @@ private:
      * @return If successful, a copy of the stream with UTF-8 encoding. Otherwise, an unitialized
      *         value.
      */
-    template <typename StringType, Endian Endianness>
+    template <typename StringType, std::endian Endianness>
     std::optional<std::string> ensure_utf8(std::istream &stream) const;
 
     /**
@@ -166,7 +167,7 @@ std::optional<Json> Parser::parse_string(const StringType &contents)
 }
 
 //==================================================================================================
-template <typename StringType, Endian Endianness>
+template <typename StringType, std::endian Endianness>
 std::optional<std::string> Parser::ensure_utf8(std::istream &stream) const
 {
     using CharType = typename StringType::value_type;
@@ -186,7 +187,7 @@ std::optional<std::string> Parser::ensure_utf8(std::istream &stream) const
 
         if (stream)
         {
-            if constexpr (Endianness == Endian::Little)
+            if constexpr (Endianness == std::endian::little)
             {
                 character = endian_swap(character);
             }

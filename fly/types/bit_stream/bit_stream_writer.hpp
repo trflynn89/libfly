@@ -5,6 +5,7 @@
 #include "fly/types/bit_stream/detail/bit_stream_traits.hpp"
 #include "fly/types/numeric/endian.hpp"
 
+#include <bit>
 #include <ostream>
 
 namespace fly {
@@ -135,7 +136,7 @@ void BitStreamWriter::flush(const DataType &buffer, byte_type bytes)
 
     if (m_stream)
     {
-        const DataType data = endian_swap_if_non_native<Endian::Big>(buffer);
+        const DataType data = endian_swap_if_non_native<std::endian::big>(buffer);
 
         m_stream_buffer->sputn(
             reinterpret_cast<const std::ios::char_type *>(&data),

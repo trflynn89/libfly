@@ -33,19 +33,19 @@ std::optional<Json> Parser::parse_stream(std::istream &stream)
             return parse_internal(stream);
 
         case Encoding::UTF16BigEndian:
-            utf8_contents = ensure_utf8<std::u16string, Endian::Big>(stream);
+            utf8_contents = ensure_utf8<std::u16string, std::endian::big>(stream);
             break;
 
         case Encoding::UTF16LittleEndian:
-            utf8_contents = ensure_utf8<std::u16string, Endian::Little>(stream);
+            utf8_contents = ensure_utf8<std::u16string, std::endian::little>(stream);
             break;
 
         case Encoding::UTF32BigEndian:
-            utf8_contents = ensure_utf8<std::u32string, Endian::Big>(stream);
+            utf8_contents = ensure_utf8<std::u32string, std::endian::big>(stream);
             break;
 
         case Encoding::UTF32LittleEndian:
-            utf8_contents = ensure_utf8<std::u32string, Endian::Little>(stream);
+            utf8_contents = ensure_utf8<std::u32string, std::endian::little>(stream);
             break;
     }
 
