@@ -3,6 +3,7 @@
 #include "fly/fly.hpp"
 #include "fly/types/numeric/detail/endian_traits.hpp"
 
+#include <bit>
 #include <cstdint>
 #include <type_traits>
 
@@ -10,7 +11,6 @@
 #    include <byteswap.h>
 #elif defined(FLY_MACOS)
 #    include <libkern/OSByteOrder.h>
-#    include <machine/endian.h>
 #elif defined(FLY_WINDOWS)
 #    include <cstdlib>
 #else
@@ -34,31 +34,6 @@
 #endif
 
 namespace fly {
-
-/**
- * Enumeration to detect system endianness. Can be replaced by std::endian when available in C++20.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version July 7, 2019
- */
-enum class Endian : std::uint16_t
-{
-#if defined(FLY_LINUX)
-    Little = __ORDER_LITTLE_ENDIAN__,
-    Big = __ORDER_BIG_ENDIAN__,
-    Native = __BYTE_ORDER__,
-#elif defined(FLY_MACOS)
-    Little = LITTLE_ENDIAN,
-    Big = BIG_ENDIAN,
-    Native = BYTE_ORDER,
-#elif defined(FLY_WINDOWS)
-    Little = 0,
-    Big = 1,
-    Native = Little,
-#else
-#    error Unknown system endianness.
-#endif
-};
 
 /**
  * Templated wrapper around platform built-in byte swapping macros to change a value's endianness.
@@ -105,10 +80,10 @@ inline T endian_swap(T value)
  *
  * @return The swapped value.
  */
-template <Endian Endianness, typename T>
+template <std::endian Endianness, typename T>
 inline T endian_swap_if_non_native(T value)
 {
-    if constexpr (Endianness == Endian::Native)
+    if constexpr (Endianness == std::endian::native)
     {
         return value;
     }

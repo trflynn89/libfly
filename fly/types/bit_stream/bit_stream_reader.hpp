@@ -6,6 +6,7 @@
 #include "fly/types/numeric/endian.hpp"
 
 #include <algorithm>
+#include <bit>
 #include <cstdint>
 #include <istream>
 
@@ -250,7 +251,7 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes)
             reinterpret_cast<std::ios::char_type *>(&buffer),
             static_cast<std::streamsize>(bytes));
 
-        buffer = endian_swap_if_non_native<Endian::Big>(buffer);
+        buffer = endian_swap_if_non_native<std::endian::big>(buffer);
         return static_cast<byte_type>(bytes_read);
     }
 

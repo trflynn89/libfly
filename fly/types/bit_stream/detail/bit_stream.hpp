@@ -36,7 +36,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~BitStream() = default;
+    virtual ~BitStream();
 
 protected:
     /**
