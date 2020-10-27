@@ -38,9 +38,11 @@ struct Color
     /**
      * Constants for standard colors.
      *
-     * On Linux, a color may be any value in the range [0, 255]. While only the 8 standard colors
-     * are listed here, any 8-bit integer value may be cast to a color. The color values correspond
-     * to the ANSI 256-color lookup table: https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit.
+     * On Linux and macOS, a color may be any value in the range [0, 255]. While only the 8 standard
+     * colors are listed here, any 8-bit integer value may be cast to a color. The color values
+     * correspond to the ANSI 256-color lookup table:
+     *
+     *     https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit.
      *
      * On Windows, the color may only be one of the 8 standard colors listed here.
      */

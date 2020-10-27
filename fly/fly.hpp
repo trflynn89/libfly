@@ -8,7 +8,7 @@
 #elif defined(_WIN32)
 #    define FLY_WINDOWS
 #else
-#    error Unsupported operating system. Only Windows and Linux are supported.
+#    error Unsupported operating system. Only Linux, macOS, and Windows are supported.
 #endif
 
 // Define macro to convert a macro parameter to a string.
