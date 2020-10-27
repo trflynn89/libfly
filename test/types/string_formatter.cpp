@@ -126,7 +126,7 @@ CATCH_TEMPLATE_TEST_CASE(
         format = FLY_STR(char_type, "%a");
         CATCH_CHECK(FLY_STR(streamed_char, "%a") == BasicString::format(format));
 #if defined(FLY_WINDOWS)
-        // Windows 0-pads std::hexfloat to match the stream precision, Linux does not.
+        // Windows 0-pads std::hexfloat to match the stream precision, Linux and macOS do not.
         CATCH_CHECK(FLY_STR(streamed_char, "0x1.600000p+2") == BasicString::format(format, 5.5));
 #else
         CATCH_CHECK(FLY_STR(streamed_char, "0x1.6p+2") == BasicString::format(format, 5.5));
@@ -135,7 +135,7 @@ CATCH_TEMPLATE_TEST_CASE(
         format = FLY_STR(char_type, "%A");
         CATCH_CHECK(FLY_STR(streamed_char, "%A") == BasicString::format(format));
 #if defined(FLY_WINDOWS)
-        // Windows 0-pads std::hexfloat to match the stream precision, Linux does not.
+        // Windows 0-pads std::hexfloat to match the stream precision, Linux and macOS do not.
         CATCH_CHECK(FLY_STR(streamed_char, "0X1.600000P+2") == BasicString::format(format, 5.5));
 #else
         CATCH_CHECK(FLY_STR(streamed_char, "0X1.6P+2") == BasicString::format(format, 5.5));

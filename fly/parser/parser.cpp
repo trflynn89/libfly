@@ -1,28 +1,59 @@
 #include "fly/parser/parser.hpp"
 
+#include <cstring>
 #include <fstream>
 #include <sstream>
 
 namespace fly {
+
+namespace {
+
+    constexpr const std::istream::char_type *s_utf8_byte_order_mark = "\xef\xbb\xbf";
+    constexpr const std::size_t s_utf8_byte_order_mark_size = 3;
+
+    constexpr const std::istream::char_type *s_utf16_be_byte_order_mark = "\xfe\xff";
+    constexpr const std::size_t s_utf16_be_byte_order_mark_size = 2;
+
+    constexpr const std::istream::char_type *s_utf16_le_byte_order_mark = "\xff\xfe";
+    constexpr const std::size_t s_utf16_le_byte_order_mark_size = 2;
+
+    constexpr const std::istream::char_type *s_utf32_be_byte_order_mark = "\x00\x00\xfe\xff";
+    constexpr const std::size_t s_utf32_be_byte_order_mark_size = 4;
+
+    constexpr const std::istream::char_type *s_utf32_le_byte_order_mark = "\xff\xfe\x00\x00";
+    constexpr const std::size_t s_utf32_le_byte_order_mark_size = 4;
+
+    template <std::size_t Size>
+    bool check_bom(std::istream &stream, const std::istream::char_type *bom)
+    {
+        if (static_cast<std::istream::char_type>(stream.peek()) == bom[0])
+        {
+            std::istream::char_type data[Size];
+            stream.read(data, Size);
+
+            if (stream && (stream.gcount() == Size) && (::memcmp(data, bom, Size) == 0))
+            {
+                return true;
+            }
+
+            stream.clear();
+            stream.seekg(0);
+        }
+
+        return false;
+    }
+
+} // namespace
 
 //==================================================================================================
 std::optional<Json> Parser::parse_file(const std::filesystem::path &path)
 {
     std::ifstream stream(path);
 
-    if (stream)
+    if (!stream)
     {
-        return parse_stream(stream);
+        return std::nullopt;
     }
-
-    return std::nullopt;
-}
-
-//==================================================================================================
-std::optional<Json> Parser::parse_stream(std::istream &stream)
-{
-    m_line = 1;
-    m_column = 0;
 
     Encoding encoding = parse_byte_order_mark(stream);
     std::optional<std::string> utf8_contents;
@@ -30,7 +61,7 @@ std::optional<Json> Parser::parse_stream(std::istream &stream)
     switch (encoding)
     {
         case Encoding::UTF8:
-            return parse_internal(stream);
+            return parse_stream(stream);
 
         case Encoding::UTF16BigEndian:
             utf8_contents = ensure_utf8<std::u16string, std::endian::big>(stream);
@@ -52,96 +83,45 @@ std::optional<Json> Parser::parse_stream(std::istream &stream)
     if (utf8_contents)
     {
         std::istringstream utf8_stream(std::move(utf8_contents.value()));
-        return parse_internal(utf8_stream);
+        return parse_stream(utf8_stream);
     }
 
     return std::nullopt;
 }
 
 //==================================================================================================
+std::optional<Json> Parser::parse_stream(std::istream &stream)
+{
+    m_line = 1;
+    m_column = 0;
+
+    return parse_internal(stream);
+}
+
+//==================================================================================================
 Parser::Encoding Parser::parse_byte_order_mark(std::istream &stream) const
 {
-    if (stream && (stream.peek() != EOF))
+    // N.B. Check UTF-32 LE before UTF-16 LE because the latter BOM is a prefix of the former BOM.
+
+    if (check_bom<s_utf8_byte_order_mark_size>(stream, s_utf8_byte_order_mark))
     {
-        int c = stream.get();
-
-        // UTF-8 byte order mark.
-        if ((c == 0xef) && (stream.peek() != EOF))
-        {
-            if ((stream.get() == 0xbb) && (stream.peek() != EOF))
-            {
-                if (stream.get() == 0xbf)
-                {
-                    return Encoding::UTF8;
-                }
-
-                stream.unget();
-            }
-
-            stream.unget();
-        }
-
-        // UTF-16 big-endian byte order mark.
-        else if ((c == 0xfe) && (stream.peek() != EOF))
-        {
-            if (stream.get() == 0xff)
-            {
-                return Encoding::UTF16BigEndian;
-            }
-
-            stream.unget();
-        }
-
-        // UTF-16 little-endian byte order mark.
-        else if ((c == 0xff) && (stream.peek() != EOF))
-        {
-            if (stream.get() == 0xfe)
-            {
-                if (stream.peek() != EOF)
-                {
-                    // UTF-32 little-endian byte-order-mark.
-                    if ((stream.get() == 0x00) && (stream.peek() != EOF))
-                    {
-                        if (stream.get() == 0x00)
-                        {
-                            return Encoding::UTF32LittleEndian;
-                        }
-
-                        stream.unget();
-                    }
-
-                    stream.unget();
-                }
-
-                return Encoding::UTF16LittleEndian;
-            }
-
-            stream.unget();
-        }
-
-        // UTF-32 big-endian byte order mark.
-        else if ((c == 0x00) && (stream.peek() != EOF))
-        {
-            if ((stream.get() == 0x00) && (stream.peek() != EOF))
-            {
-                if ((stream.get() == 0xfe) && (stream.peek() != EOF))
-                {
-                    if (stream.get() == 0xff)
-                    {
-                        return Encoding::UTF32BigEndian;
-                    }
-
-                    stream.unget();
-                }
-
-                stream.unget();
-            }
-
-            stream.unget();
-        }
-
-        // Not a byte order mark.
-        stream.unget();
+        return Encoding::UTF8;
+    }
+    else if (check_bom<s_utf32_be_byte_order_mark_size>(stream, s_utf32_be_byte_order_mark))
+    {
+        return Encoding::UTF32BigEndian;
+    }
+    else if (check_bom<s_utf32_le_byte_order_mark_size>(stream, s_utf32_le_byte_order_mark))
+    {
+        return Encoding::UTF32LittleEndian;
+    }
+    else if (check_bom<s_utf16_be_byte_order_mark_size>(stream, s_utf16_be_byte_order_mark))
+    {
+        return Encoding::UTF16BigEndian;
+    }
+    else if (check_bom<s_utf16_le_byte_order_mark_size>(stream, s_utf16_le_byte_order_mark))
+    {
+        return Encoding::UTF16LittleEndian;
     }
 
     return Encoding::UTF8;

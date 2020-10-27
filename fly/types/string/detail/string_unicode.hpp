@@ -12,11 +12,11 @@
 namespace fly::detail {
 
 /**
- * Helper class for decoding and encoding Unicode codepoints in a std::basic_string. The exact
- * encoding depends on the template type StringType:
+ * Helper class for decoding and encoding Unicode codepoints in a std::basic_string. The assumed
+ * Unicode encoding depends on the template type StringType:
  *
  *     1. std::string - UTF-8
- *     2. std::wstring - UTF-16 on Windows, UTF-32 on Linux
+ *     2. std::wstring - UTF-16 on Windows, UTF-32 on Linux and macOS
  *     3. std::u8string - UTF-8
  *     4. std::u16string - UTF-16
  *     5. std::u32string - UTF-32

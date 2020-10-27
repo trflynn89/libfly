@@ -34,20 +34,10 @@ public:
      * The encoding of the string is inferred from the templated string type:
      *
      *     1. std::string - UTF-8
-     *     2. std::wstring - UTF-16 on Windows, UTF-32 on Linux
+     *     2. std::wstring - UTF-16 on Windows, UTF-32 on Linux and macOS
      *     3. std::u8string - UTF-8
      *     4. std::u16string - UTF-16
      *     5. std::u32string - UTF-32
-     *
-     * Further, all string types will be checked for the presence of a byte order mark. If a BOM is
-     * not present, the parser will assume UTF-8 encoding. If a BOM is present, the following BOM
-     * representations are supported:
-     *
-     *     1. UTF-8 (0xef 0xbb 0xbf)
-     *     2. UTF-16 big endian (0xfe 0xff)
-     *     3. UTF-16 little endian (0xff 0xfe)
-     *     4. UTF-32 big endian (0x00 0x00 0xfe 0xff)
-     *     5. UTF-32 little endian (0xff 0xfe 0x00 0x00)
      *
      * Any string which is not encoded with UTF-8 will first be converted to a UTF-8 encoded string
      * before being passed to concrete parsers.
