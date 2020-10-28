@@ -725,18 +725,15 @@ private:
 
     /**
      * Validate a non-escaped character is JSON and Unicode compliant. If so, write the character
-     * (which may be a multibyte codepoint) to the given stream.
+     * (which may be part of a multi-byte codepoint) to the given stream.
      *
      * @param stream Stream to pipe the interpreted character into.
      * @param it Pointer to the escaped character.
-     * @param end Pointer to the end of the original string value.
      *
      * @throws JsonException If the character value is not valid.
      */
-    static void validate_character(
-        stream_type &stream,
-        JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end);
+    static void
+    validate_character(stream_type &stream, const JsonTraits::string_type::const_iterator &it);
 
     json_type m_value {nullptr};
 };
@@ -960,7 +957,7 @@ JsonTraits::string_type Json::convert_to_string(const T &value)
 
     if constexpr (StringTraits::is_string_like_v<T>)
     {
-        converted = value;
+        converted = String::convert<JsonTraits::string_type>(value);
     }
     else if constexpr (WStringTraits::is_string_like_v<T>)
     {
