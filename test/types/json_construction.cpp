@@ -23,240 +23,246 @@ CATCH_TEST_CASE("JsonConstruction", "[json]")
 {
     CATCH_SECTION("Construct a JSON instance from string-like types")
     {
-        const std::string str1("a");
-        CATCH_CHECK(fly::Json(str1).is_string());
+        CATCH_SECTION("std::string-like types")
+        {
+            const std::string str1("a");
+            CATCH_CHECK(fly::Json(str1).is_string());
 
-        std::string str2("b");
-        CATCH_CHECK(fly::Json(str2).is_string());
+            std::string str2("b");
+            CATCH_CHECK(fly::Json(str2).is_string());
 
-        const char *cstr1 = "c";
-        CATCH_CHECK(fly::Json(cstr1).is_string());
+            const char *cstr1 = "c";
+            CATCH_CHECK(fly::Json(cstr1).is_string());
 
-        char *cstr2 = const_cast<char *>("d");
-        CATCH_CHECK(fly::Json(cstr2).is_string());
+            char *cstr2 = const_cast<char *>("d");
+            CATCH_CHECK(fly::Json(cstr2).is_string());
 
-        const char arr1[] = {'g', '\0'};
-        CATCH_CHECK(fly::Json(arr1).is_string());
+            const char arr1[] = {'g', '\0'};
+            CATCH_CHECK(fly::Json(arr1).is_string());
 
-        char arr2[] = {'h', '\0'};
-        CATCH_CHECK(fly::Json(arr2).is_string());
-    }
+            char arr2[] = {'h', '\0'};
+            CATCH_CHECK(fly::Json(arr2).is_string());
+        }
 
-    CATCH_SECTION("Construct a JSON instance from wstring-like types")
-    {
-        const std::wstring str1(L"a");
-        CATCH_CHECK(fly::Json(str1).is_string());
+        CATCH_SECTION("std::wstring-like types")
+        {
+            const std::wstring str1(L"a");
+            CATCH_CHECK(fly::Json(str1).is_string());
 
-        std::wstring str2(L"b");
-        CATCH_CHECK(fly::Json(str2).is_string());
+            std::wstring str2(L"b");
+            CATCH_CHECK(fly::Json(str2).is_string());
 
-        const wchar_t *cstr1 = L"c";
-        CATCH_CHECK(fly::Json(cstr1).is_string());
+            const wchar_t *cstr1 = L"c";
+            CATCH_CHECK(fly::Json(cstr1).is_string());
 
-        wchar_t *cstr2 = const_cast<wchar_t *>(L"d");
-        CATCH_CHECK(fly::Json(cstr2).is_string());
+            wchar_t *cstr2 = const_cast<wchar_t *>(L"d");
+            CATCH_CHECK(fly::Json(cstr2).is_string());
 
-        const wchar_t arr1[] = {L'g', L'\0'};
-        CATCH_CHECK(fly::Json(arr1).is_string());
+            const wchar_t arr1[] = {L'g', L'\0'};
+            CATCH_CHECK(fly::Json(arr1).is_string());
 
-        wchar_t arr2[] = {L'h', L'\0'};
-        CATCH_CHECK(fly::Json(arr2).is_string());
-    }
+            wchar_t arr2[] = {L'h', L'\0'};
+            CATCH_CHECK(fly::Json(arr2).is_string());
+        }
 
-    CATCH_SECTION("Construct a JSON instance from u8string-like types")
-    {
-        const std::u8string str1(u8"a");
-        CATCH_CHECK(fly::Json(str1).is_string());
+        CATCH_SECTION("std::u8string-like types")
+        {
+            const std::u8string str1(u8"a");
+            CATCH_CHECK(fly::Json(str1).is_string());
 
-        std::u8string str2(u8"b");
-        CATCH_CHECK(fly::Json(str2).is_string());
+            std::u8string str2(u8"b");
+            CATCH_CHECK(fly::Json(str2).is_string());
 
-        const char8_t *cstr1 = u8"c";
-        CATCH_CHECK(fly::Json(cstr1).is_string());
+            const char8_t *cstr1 = u8"c";
+            CATCH_CHECK(fly::Json(cstr1).is_string());
 
-        char8_t *cstr2 = const_cast<char8_t *>(u8"d");
-        CATCH_CHECK(fly::Json(cstr2).is_string());
+            char8_t *cstr2 = const_cast<char8_t *>(u8"d");
+            CATCH_CHECK(fly::Json(cstr2).is_string());
 
-        const char8_t arr1[] = {u8'g', u8'\0'};
-        CATCH_CHECK(fly::Json(arr1).is_string());
+            const char8_t arr1[] = {u8'g', u8'\0'};
+            CATCH_CHECK(fly::Json(arr1).is_string());
 
-        char8_t arr2[] = {u8'h', u8'\0'};
-        CATCH_CHECK(fly::Json(arr2).is_string());
-    }
+            char8_t arr2[] = {u8'h', u8'\0'};
+            CATCH_CHECK(fly::Json(arr2).is_string());
+        }
 
-    CATCH_SECTION("Construct a JSON instance from u16string-like types")
-    {
-        const std::u16string str1(u"a");
-        CATCH_CHECK(fly::Json(str1).is_string());
+        CATCH_SECTION("std::u16string-like types")
+        {
+            const std::u16string str1(u"a");
+            CATCH_CHECK(fly::Json(str1).is_string());
 
-        std::u16string str2(u"b");
-        CATCH_CHECK(fly::Json(str2).is_string());
+            std::u16string str2(u"b");
+            CATCH_CHECK(fly::Json(str2).is_string());
 
-        const char16_t *cstr1 = u"c";
-        CATCH_CHECK(fly::Json(cstr1).is_string());
+            const char16_t *cstr1 = u"c";
+            CATCH_CHECK(fly::Json(cstr1).is_string());
 
-        char16_t *cstr2 = const_cast<char16_t *>(u"d");
-        CATCH_CHECK(fly::Json(cstr2).is_string());
+            char16_t *cstr2 = const_cast<char16_t *>(u"d");
+            CATCH_CHECK(fly::Json(cstr2).is_string());
 
-        const char16_t arr1[] = {u'g', u'\0'};
-        CATCH_CHECK(fly::Json(arr1).is_string());
+            const char16_t arr1[] = {u'g', u'\0'};
+            CATCH_CHECK(fly::Json(arr1).is_string());
 
-        char16_t arr2[] = {u'h', u'\0'};
-        CATCH_CHECK(fly::Json(arr2).is_string());
-    }
+            char16_t arr2[] = {u'h', u'\0'};
+            CATCH_CHECK(fly::Json(arr2).is_string());
+        }
 
-    CATCH_SECTION("Construct a JSON instance from u32string-like types")
-    {
-        const std::u32string str1(U"a");
-        CATCH_CHECK(fly::Json(str1).is_string());
+        CATCH_SECTION("std::u32string-like types")
+        {
+            const std::u32string str1(U"a");
+            CATCH_CHECK(fly::Json(str1).is_string());
 
-        std::u32string str2(U"b");
-        CATCH_CHECK(fly::Json(str2).is_string());
+            std::u32string str2(U"b");
+            CATCH_CHECK(fly::Json(str2).is_string());
 
-        const char32_t *cstr1 = U"c";
-        CATCH_CHECK(fly::Json(cstr1).is_string());
+            const char32_t *cstr1 = U"c";
+            CATCH_CHECK(fly::Json(cstr1).is_string());
 
-        char32_t *cstr2 = const_cast<char32_t *>(U"d");
-        CATCH_CHECK(fly::Json(cstr2).is_string());
+            char32_t *cstr2 = const_cast<char32_t *>(U"d");
+            CATCH_CHECK(fly::Json(cstr2).is_string());
 
-        const char32_t arr1[] = {U'g', U'\0'};
-        CATCH_CHECK(fly::Json(arr1).is_string());
+            const char32_t arr1[] = {U'g', U'\0'};
+            CATCH_CHECK(fly::Json(arr1).is_string());
 
-        char32_t arr2[] = {U'h', U'\0'};
-        CATCH_CHECK(fly::Json(arr2).is_string());
+            char32_t arr2[] = {U'h', U'\0'};
+            CATCH_CHECK(fly::Json(arr2).is_string());
+        }
     }
 
     CATCH_SECTION("Fail to construct a JSON instance from string-like types")
     {
-        // Reverse solidus must be followed by a valid escape symbol.
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json("\\"),
-            "Expected escaped character after reverse solidus");
-        CATCH_CHECK_THROWS_JSON(fly::Json("\\U"), "Invalid escape character 'U'");
-
-        // Quotes must be escaped.
-        CATCH_CHECK_THROWS_JSON(fly::Json("\""), "Character '\"' must be escaped");
-
-        // Control characters must be escaped.
-        for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+        CATCH_SECTION("std::string-like types")
         {
+            // Reverse solidus must be followed by a valid escape symbol.
             CATCH_CHECK_THROWS_JSON(
-                fly::Json(std::string(1, static_cast<char>(ch))),
-                "Character '%c' must be escaped",
-                static_cast<char>(ch));
+                fly::Json("\\"),
+                "Expected escaped character after reverse solidus");
+            CATCH_CHECK_THROWS_JSON(fly::Json("\\U"), "Invalid escape character 'U'");
+
+            // Quotes must be escaped.
+            CATCH_CHECK_THROWS_JSON(fly::Json("\""), "Character '\"' must be escaped");
+
+            // Control characters must be escaped.
+            for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+            {
+                CATCH_CHECK_THROWS_JSON(
+                    fly::Json(std::string(1, static_cast<char>(ch))),
+                    "Character '%c' must be escaped",
+                    static_cast<char>(ch));
+            }
+
+            // Characters must be valid Unicode.
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json("\xed\xa0\x80"), // Reserved codepoint.
+                "Could not decode Unicode character");
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json("\xf4\x90\x80\x80"), // Out-of-range codepoint.
+                "Could not decode Unicode character");
         }
 
-        // Characters must be valid Unicode.
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json("\xed\xa0\x80"), // Reserved codepoint.
-            "Could not decode Unicode character");
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json("\xf4\x90\x80\x80"), // Out-of-range codepoint.
-            "Could not decode Unicode character");
-    }
-
-    CATCH_SECTION("Fail to construct a JSON instance from wstring-like types")
-    {
-        // Reverse solidus must be followed by a valid escape symbol.
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json(L"\\"),
-            "Expected escaped character after reverse solidus");
-        CATCH_CHECK_THROWS_JSON(fly::Json(L"\\U"), "Invalid escape character 'U'");
-
-        // Quotes must be escaped.
-        CATCH_CHECK_THROWS_JSON(fly::Json(L"\""), "Character '\"' must be escaped");
-
-        // Control characters must be escaped.
-        for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+        CATCH_SECTION("std::wstring-like types")
         {
+            // Reverse solidus must be followed by a valid escape symbol.
             CATCH_CHECK_THROWS_JSON(
-                fly::Json(std::wstring(1, static_cast<wchar_t>(ch))),
-                "Character '%c' must be escaped",
-                static_cast<char>(ch));
+                fly::Json(L"\\"),
+                "Expected escaped character after reverse solidus");
+            CATCH_CHECK_THROWS_JSON(fly::Json(L"\\U"), "Invalid escape character 'U'");
+
+            // Quotes must be escaped.
+            CATCH_CHECK_THROWS_JSON(fly::Json(L"\""), "Character '\"' must be escaped");
+
+            // Control characters must be escaped.
+            for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+            {
+                CATCH_CHECK_THROWS_JSON(
+                    fly::Json(std::wstring(1, static_cast<wchar_t>(ch))),
+                    "Character '%c' must be escaped",
+                    static_cast<char>(ch));
+            }
+
+            // Characters must be valid Unicode.
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(std::wstring(1, 0xd800)), // Reserved codepoint.
+                "Could not convert string-like type to a JSON string");
         }
 
-        // Characters must be valid Unicode.
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json(std::wstring(1, 0xd800)), // Reserved codepoint.
-            "Could not convert wstring-like type to a JSON string");
-    }
-
-    CATCH_SECTION("Fail to construct a JSON instance from u8string-like types")
-    {
-        // Reverse solidus must be followed by a valid escape symbol.
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json(u8"\\"),
-            "Expected escaped character after reverse solidus");
-        CATCH_CHECK_THROWS_JSON(fly::Json(u8"\\U"), "Invalid escape character 'U'");
-
-        // Quotes must be escaped.
-        CATCH_CHECK_THROWS_JSON(fly::Json(u8"\""), "Character '\"' must be escaped");
-
-        // Control characters must be escaped.
-        for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+        CATCH_SECTION("std::u8string-like types")
         {
+            // Reverse solidus must be followed by a valid escape symbol.
             CATCH_CHECK_THROWS_JSON(
-                fly::Json(std::u8string(1, static_cast<char8_t>(ch))),
-                "Character '%c' must be escaped",
-                static_cast<char>(ch));
+                fly::Json(u8"\\"),
+                "Expected escaped character after reverse solidus");
+            CATCH_CHECK_THROWS_JSON(fly::Json(u8"\\U"), "Invalid escape character 'U'");
+
+            // Quotes must be escaped.
+            CATCH_CHECK_THROWS_JSON(fly::Json(u8"\""), "Character '\"' must be escaped");
+
+            // Control characters must be escaped.
+            for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+            {
+                CATCH_CHECK_THROWS_JSON(
+                    fly::Json(std::u8string(1, static_cast<char8_t>(ch))),
+                    "Character '%c' must be escaped",
+                    static_cast<char>(ch));
+            }
+
+            // Characters must be valid Unicode.
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(std::u8string(1, 0xff)), // Invalid leading byte.
+                "Could not convert string-like type to a JSON string");
         }
 
-        // Characters must be valid Unicode.
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json(std::u8string(1, 0xff)), // Invalid leading byte.
-            "Could not convert u8string-like type to a JSON string");
-    }
-
-    CATCH_SECTION("Fail to construct a JSON instance from u16string-like types")
-    {
-        // Reverse solidus must be followed by a valid escape symbol.
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json(u"\\"),
-            "Expected escaped character after reverse solidus");
-        CATCH_CHECK_THROWS_JSON(fly::Json(u"\\U"), "Invalid escape character 'U'");
-
-        // Quotes must be escaped.
-        CATCH_CHECK_THROWS_JSON(fly::Json(u"\""), "Character '\"' must be escaped");
-
-        // Control characters must be escaped.
-        for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+        CATCH_SECTION("std::u16string-like types")
         {
+            // Reverse solidus must be followed by a valid escape symbol.
             CATCH_CHECK_THROWS_JSON(
-                fly::Json(std::u16string(1, static_cast<char16_t>(ch))),
-                "Character '%c' must be escaped",
-                static_cast<char>(ch));
+                fly::Json(u"\\"),
+                "Expected escaped character after reverse solidus");
+            CATCH_CHECK_THROWS_JSON(fly::Json(u"\\U"), "Invalid escape character 'U'");
+
+            // Quotes must be escaped.
+            CATCH_CHECK_THROWS_JSON(fly::Json(u"\""), "Character '\"' must be escaped");
+
+            // Control characters must be escaped.
+            for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+            {
+                CATCH_CHECK_THROWS_JSON(
+                    fly::Json(std::u16string(1, static_cast<char16_t>(ch))),
+                    "Character '%c' must be escaped",
+                    static_cast<char>(ch));
+            }
+
+            // Characters must be valid Unicode.
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(std::u16string(1, 0xd800)), // Reserved codepoint.
+                "Could not convert string-like type to a JSON string");
         }
 
-        // Characters must be valid Unicode.
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json(std::u16string(1, 0xd800)), // Reserved codepoint.
-            "Could not convert u16string-like type to a JSON string");
-    }
-
-    CATCH_SECTION("Fail to construct a JSON instance from u32string-like types")
-    {
-        // Reverse solidus must be followed by a valid escape symbol.
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json(U"\\"),
-            "Expected escaped character after reverse solidus");
-        CATCH_CHECK_THROWS_JSON(fly::Json(U"\\U"), "Invalid escape character 'U'");
-
-        // Quotes must be escaped.
-        CATCH_CHECK_THROWS_JSON(fly::Json(U"\""), "Character '\"' must be escaped");
-
-        // Control characters must be escaped.
-        for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+        CATCH_SECTION("std::u32string-like types")
         {
+            // Reverse solidus must be followed by a valid escape symbol.
             CATCH_CHECK_THROWS_JSON(
-                fly::Json(std::u32string(1, static_cast<char32_t>(ch))),
-                "Character '%c' must be escaped",
-                static_cast<char>(ch));
-        }
+                fly::Json(U"\\"),
+                "Expected escaped character after reverse solidus");
+            CATCH_CHECK_THROWS_JSON(fly::Json(U"\\U"), "Invalid escape character 'U'");
 
-        // Characters must be valid Unicode.
-        CATCH_CHECK_THROWS_JSON(
-            fly::Json(std::u32string(1, 0xd800)), // Reserved codepoint.
-            "Could not convert u32string-like type to a JSON string");
+            // Quotes must be escaped.
+            CATCH_CHECK_THROWS_JSON(fly::Json(U"\""), "Character '\"' must be escaped");
+
+            // Control characters must be escaped.
+            for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+            {
+                CATCH_CHECK_THROWS_JSON(
+                    fly::Json(std::u32string(1, static_cast<char32_t>(ch))),
+                    "Character '%c' must be escaped",
+                    static_cast<char>(ch));
+            }
+
+            // Characters must be valid Unicode.
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(std::u32string(1, 0xd800)), // Reserved codepoint.
+                "Could not convert string-like type to a JSON string");
+        }
     }
 
     CATCH_SECTION("Construct a JSON instance from object-like types")
