@@ -299,7 +299,8 @@ public:
      *
      * @return The Json instance as a string.
      */
-    explicit operator JsonTraits::string_type() const noexcept;
+    template <typename T, enable_if_all<detail::is_supported_string<T>> = 0>
+    explicit operator T() const noexcept;
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The SFINAE declaration
@@ -794,13 +795,44 @@ Json::Json(const T &value) noexcept : m_value(static_cast<JsonTraits::float_type
 }
 
 //==================================================================================================
+template <typename T, enable_if_all<detail::is_supported_string<T>>>
+Json::operator T() const noexcept
+{
+    JsonTraits::string_type value;
+
+    if (is_string())
+    {
+        value = std::get<JsonTraits::string_type>(m_value);
+    }
+    else
+    {
+        stream_type stream;
+        stream << *this;
+
+        value = stream.str();
+    }
+
+    // The JSON string will have been validated for Unicode compliance during construction.
+    return String::convert<T>(value).value();
+}
+
+//==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_object<T>>>
 Json::operator T() const noexcept(false)
 {
     if (is_object())
     {
         const auto &value = std::get<JsonTraits::object_type>(m_value);
-        return T(value.begin(), value.end());
+        T result;
+
+        for (const auto &it : value)
+        {
+            // The JSON string will have been validated for Unicode compliance during construction.
+            auto key = String::convert<typename T::key_type>(it.first).value();
+            result.emplace(std::move(key), it.second);
+        }
+
+        return result;
     }
 
     throw JsonException(*this, "JSON type is not an object");

@@ -36,21 +36,22 @@ Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
     if (std::all_of(initializer.begin(), initializer.end(), object_test))
     {
         m_value = JsonTraits::object_type();
+        auto &value = std::get<JsonTraits::object_type>(m_value);
 
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
         {
-            std::get<JsonTraits::object_type>(m_value).emplace(
-                std::move(std::get<JsonTraits::string_type>((*it)[0].m_value)),
-                std::move((*it)[1]));
+            auto key = std::move(std::get<JsonTraits::string_type>((*it)[0].m_value));
+            value.emplace(std::move(key), std::move((*it)[1]));
         }
     }
     else
     {
         m_value = JsonTraits::array_type();
+        auto &value = std::get<JsonTraits::array_type>(m_value);
 
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
         {
-            std::get<JsonTraits::array_type>(m_value).push_back(std::move(*it));
+            value.emplace_back(std::move(*it));
         }
     }
 }
@@ -100,7 +101,7 @@ Json::~Json()
 //==================================================================================================
 Json::reference Json::operator=(Json json) noexcept
 {
-    swap(json);
+    m_value = std::move(json.m_value);
     return *this;
 }
 
@@ -170,22 +171,6 @@ Json::operator JsonTraits::null_type() const noexcept(false)
     else
     {
         throw JsonException(*this, "JSON type is not null");
-    }
-}
-
-//==================================================================================================
-Json::operator JsonTraits::string_type() const noexcept
-{
-    if (is_string())
-    {
-        return std::get<JsonTraits::string_type>(m_value);
-    }
-    else
-    {
-        stream_type stream;
-        stream << *this;
-
-        return stream.str();
     }
 }
 
