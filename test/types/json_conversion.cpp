@@ -21,35 +21,60 @@
         Catch::Matchers::Exception::ExceptionMessageMatcher(                                       \
             fly::String::format("JsonException: " __VA_ARGS__)))
 
-CATCH_TEST_CASE("JsonConversion", "[json]")
+#define J_CHR(ch) FLY_CHR(char_type, ch)
+#define J_STR(str) FLY_STR(char_type, str)
+
+CATCH_TEMPLATE_TEST_CASE(
+    "JsonConversion",
+    "[json]",
+    std::string,
+    std::wstring,
+    std::u8string,
+    std::u16string,
+    std::u32string)
 {
+    using string_type = TestType;
+    using char_type = typename string_type::value_type;
+
     CATCH_SECTION("Convert a JSON instance to string-like types")
     {
         fly::Json json;
 
         json = "abc";
-        CATCH_CHECK(std::string(json) == "abc");
+        CATCH_CHECK(string_type(json) == J_STR("abc"));
 
-        json = {{"a", 1}, {"b", 2}};
-        CATCH_CHECK(std::string(json) == "{\"a\":1,\"b\":2}");
+        json = L"def";
+        CATCH_CHECK(string_type(json) == J_STR("def"));
 
-        json = {'7', 8};
-        CATCH_CHECK(std::string(json) == "[55,8]");
+        json = u8"ghi";
+        CATCH_CHECK(string_type(json) == J_STR("ghi"));
+
+        json = u"jkl";
+        CATCH_CHECK(string_type(json) == J_STR("jkl"));
+
+        json = U"mno";
+        CATCH_CHECK(string_type(json) == J_STR("mno"));
+
+        json = {{J_STR("a"), 1}, {J_STR("b"), 2}};
+        CATCH_CHECK(string_type(json) == J_STR("{\"a\":1,\"b\":2}"));
+
+        json = {J_CHR('7'), 8};
+        CATCH_CHECK(string_type(json) == J_STR("[55,8]"));
 
         json = true;
-        CATCH_CHECK(std::string(json) == "true");
+        CATCH_CHECK(string_type(json) == J_STR("true"));
 
         json = 1;
-        CATCH_CHECK(std::string(json) == "1");
+        CATCH_CHECK(string_type(json) == J_STR("1"));
 
         json = static_cast<unsigned int>(1);
-        CATCH_CHECK(std::string(json) == "1");
+        CATCH_CHECK(string_type(json) == J_STR("1"));
 
         json = 1.0f;
-        CATCH_CHECK(std::string(json) == "1");
+        CATCH_CHECK(string_type(json) == J_STR("1"));
 
         json = nullptr;
-        CATCH_CHECK(std::string(json) == "null");
+        CATCH_CHECK(string_type(json) == J_STR("null"));
     }
 
     CATCH_SECTION("Convert a JSON instance to object-like types")
@@ -62,9 +87,9 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
             using T2 = std::decay_t<decltype(test2)>;
             using T3 = std::decay_t<decltype(test3)>;
 
-            test1 = T1 {{"a", 2}, {"b", 4}};
-            test2 = T2 {{"a", "2"}, {"b", "4"}};
-            test3 = T3 {{"a", 2}, {"b", "4"}};
+            test1 = T1 {{J_STR("a"), 2}, {J_STR("b"), 4}};
+            test2 = T2 {{J_STR("a"), "2"}, {J_STR("b"), "4"}};
+            test3 = T3 {{J_STR("a"), 2}, {J_STR("b"), "4"}};
 
             {
                 fly::Json json = test1;
@@ -87,29 +112,29 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
                 CATCH_CHECK_THROWS_JSON(T1(json), "JSON type is not numeric: (%s)", json["a"]);
             }
             {
-                fly::Json json = {{"a", "string"}};
+                fly::Json json = {{"a", J_STR("string")}};
                 CATCH_CHECK_THROWS_JSON(T1(json), "JSON type is not numeric: (%s)", json["a"]);
             }
         };
 
-        std::map<std::string, int> map1;
-        std::map<std::string, std::string> map2;
-        std::map<std::string, fly::Json> map3;
+        std::map<string_type, int> map1;
+        std::map<string_type, std::string> map2;
+        std::map<string_type, fly::Json> map3;
         validate("map", map1, map2, map3);
 
-        std::multimap<std::string, int> multimap1;
-        std::multimap<std::string, std::string> multimap2;
-        std::multimap<std::string, fly::Json> multimap3;
+        std::multimap<string_type, int> multimap1;
+        std::multimap<string_type, std::string> multimap2;
+        std::multimap<string_type, fly::Json> multimap3;
         validate("multimap", multimap1, multimap2, multimap3);
 
-        std::unordered_map<std::string, int> unordered_map1;
-        std::unordered_map<std::string, std::string> unordered_map2;
-        std::unordered_map<std::string, fly::Json> unordered_map3;
+        std::unordered_map<string_type, int> unordered_map1;
+        std::unordered_map<string_type, std::string> unordered_map2;
+        std::unordered_map<string_type, fly::Json> unordered_map3;
         validate("unordered_map", unordered_map1, unordered_map2, unordered_map3);
 
-        std::unordered_multimap<std::string, int> unordered_multimap1;
-        std::unordered_multimap<std::string, std::string> unordered_multimap2;
-        std::unordered_multimap<std::string, fly::Json> unordered_multimap3;
+        std::unordered_multimap<string_type, int> unordered_multimap1;
+        std::unordered_multimap<string_type, std::string> unordered_multimap2;
+        std::unordered_multimap<string_type, fly::Json> unordered_multimap3;
         validate(
             "unordered_multimap",
             unordered_multimap1,
@@ -122,25 +147,25 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
         auto invalidate = [](fly::Json json)
         {
             CATCH_CHECK_THROWS_JSON(
-                FLY_UNUSED((std::map<std::string, fly::Json>(json))),
+                FLY_UNUSED((std::map<string_type, fly::Json>(json))),
                 "JSON type is not an object: (%s)",
                 json);
             CATCH_CHECK_THROWS_JSON(
-                FLY_UNUSED((std::multimap<std::string, fly::Json>(json))),
+                FLY_UNUSED((std::multimap<string_type, fly::Json>(json))),
                 "JSON type is not an object: (%s)",
                 json);
             CATCH_CHECK_THROWS_JSON(
-                FLY_UNUSED((std::unordered_map<std::string, fly::Json>(json))),
+                FLY_UNUSED((std::unordered_map<string_type, fly::Json>(json))),
                 "JSON type is not an object: (%s)",
                 json);
             CATCH_CHECK_THROWS_JSON(
-                FLY_UNUSED((std::unordered_multimap<std::string, fly::Json>(json))),
+                FLY_UNUSED((std::unordered_multimap<string_type, fly::Json>(json))),
                 "JSON type is not an object: (%s)",
                 json);
         };
 
-        invalidate("abc");
-        invalidate({'7', 8});
+        invalidate(J_STR("abc"));
+        invalidate({J_CHR('7'), 8});
         invalidate(true);
         invalidate(1);
         invalidate(static_cast<unsigned int>(1));
@@ -158,7 +183,7 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
             using T2 = std::decay_t<decltype(test2)>;
 
             test1 = T1 {50, 60, 70, 80};
-            test2 = T2 {"50", "60", "70", "80"};
+            test2 = T2 {J_STR("50"), J_STR("60"), J_STR("70"), J_STR("80")};
 
             {
                 fly::Json json = test1;
@@ -178,7 +203,7 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
                     json[0]);
             }
             {
-                fly::Json json = {"string"};
+                fly::Json json = {J_STR("string")};
                 CATCH_CHECK_THROWS_JSON(
                     FLY_UNUSED((std::array<int, 1>(json))),
                     "JSON type is not numeric: (%s)",
@@ -194,7 +219,7 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
             using T2 = std::decay_t<decltype(test2)>;
             using T3 = std::decay_t<decltype(test3)>;
 
-            test3 = T3 {50, "60", 70, "80"};
+            test3 = T3 {50, J_STR("60"), 70, J_STR("80")};
 
             fly::Json json = test3;
             CATCH_CHECK(T1(json) == test1);
@@ -203,7 +228,7 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
         };
 
         std::array<int, 4> array1;
-        std::array<std::string, 4> array2;
+        std::array<string_type, 4> array2;
         std::array<fly::Json, 4> array3;
         validate3("array", array1, array2, array3);
 
@@ -216,42 +241,42 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
         CATCH_CHECK(decltype(array6)(json) == array6);
 
         std::deque<int> deque1;
-        std::deque<std::string> deque2;
+        std::deque<string_type> deque2;
         std::deque<fly::Json> deque3;
         validate3("deque", deque1, deque2, deque3);
 
         std::forward_list<int> forward_list1;
-        std::forward_list<std::string> forward_list2;
+        std::forward_list<string_type> forward_list2;
         std::forward_list<fly::Json> forward_list3;
         validate3("forward_list", forward_list1, forward_list2, forward_list3);
 
         std::list<int> list1;
-        std::list<std::string> list2;
+        std::list<string_type> list2;
         std::list<fly::Json> list3;
         validate3("list", list1, list2, list3);
 
         std::multiset<int> multiset1;
-        std::multiset<std::string> multiset2;
+        std::multiset<string_type> multiset2;
         // std::multiset<fly::Json> multiset3;
         validate2("multiset", multiset1, multiset2);
 
         std::set<int> set1;
-        std::set<std::string> set2;
+        std::set<string_type> set2;
         // std::set<fly::Json> set3;
         validate2("set", set1, set2);
 
         std::unordered_multiset<int> unordered_multiset1;
-        std::unordered_multiset<std::string> unordered_multiset2;
+        std::unordered_multiset<string_type> unordered_multiset2;
         // std::unordered_multiset<fly::Json> unordered_multiset3;
         validate2("unordered_multiset", unordered_multiset1, unordered_multiset2);
 
         std::unordered_set<int> unordered_set1;
-        std::unordered_set<std::string> unordered_set2;
+        std::unordered_set<string_type> unordered_set2;
         // std::unordered_set<fly::Json> unordered_set3;
         validate2("unordered_set", unordered_set1, unordered_set2);
 
         std::vector<int> vector1;
-        std::vector<std::string> vector2;
+        std::vector<string_type> vector2;
         std::vector<fly::Json> vector3;
         validate3("vector", vector1, vector2, vector3);
     }
@@ -298,8 +323,8 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
                 json);
         };
 
-        invalidate("abc");
-        invalidate({{"a", 1}, {"b", 2}});
+        invalidate(J_STR("abc"));
+        invalidate({{J_STR("a"), 1}, {J_STR("b"), 2}});
         invalidate(true);
         invalidate(1);
         invalidate(static_cast<unsigned int>(1));
@@ -311,14 +336,14 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
     {
         fly::Json json;
 
-        json = "";
+        json = J_STR("");
         CATCH_CHECK_FALSE(bool(json));
-        json = "abc";
+        json = J_STR("abc");
         CATCH_CHECK(bool(json));
 
         json = std::map<std::string, int>();
         CATCH_CHECK_FALSE(bool(json));
-        json = {{"a", 1}, {"b", 2}};
+        json = {{J_STR("a"), 1}, {J_STR("b"), 2}};
         CATCH_CHECK(bool(json));
 
         json = std::vector<int>();
@@ -354,13 +379,13 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
     {
         fly::Json json;
 
-        json = "abc";
+        json = J_STR("abc");
         CATCH_CHECK_THROWS_JSON(int(json), "JSON type is not numeric: (%s)", json);
 
-        json = "123";
+        json = J_STR("123");
         CATCH_CHECK(int(json) == 123);
 
-        json = {{"a", 1}, {"b", 2}};
+        json = {{J_STR("a"), 1}, {J_STR("b"), 2}};
         CATCH_CHECK_THROWS_JSON(int(json), "JSON type is not numeric: (%s)", json);
 
         json = {7, 8};
@@ -369,9 +394,9 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
         json = true;
         CATCH_CHECK_THROWS_JSON(int(json), "JSON type is not numeric: (%s)", json);
 
-        char ch = 'a';
+        char_type ch = J_CHR('a');
         json = ch;
-        CATCH_CHECK(char(json) == ch);
+        CATCH_CHECK(char_type(json) == ch);
 
         int sign = 12;
         json = sign;
@@ -393,13 +418,13 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
     {
         fly::Json json;
 
-        json = "abc";
+        json = J_STR("abc");
         CATCH_CHECK_THROWS_JSON(unsigned(json), "JSON type is not numeric: (%s)", json);
 
-        json = "123";
+        json = J_STR("123");
         CATCH_CHECK(unsigned(json) == unsigned(123));
 
-        json = {{"a", 1}, {"b", 2}};
+        json = {{J_STR("a"), 1}, {J_STR("b"), 2}};
         CATCH_CHECK_THROWS_JSON(unsigned(json), "JSON type is not numeric: (%s)", json);
 
         json = {7, 8};
@@ -408,7 +433,7 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
         json = true;
         CATCH_CHECK_THROWS_JSON(unsigned(json), "JSON type is not numeric: (%s)", json);
 
-        char ch = 'a';
+        char_type ch = J_CHR('a');
         json = ch;
         CATCH_CHECK(static_cast<unsigned char>(json) == static_cast<unsigned char>(ch));
 
@@ -432,13 +457,13 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
     {
         fly::Json json;
 
-        json = "abc";
+        json = J_STR("abc");
         CATCH_CHECK_THROWS_JSON(float(json), "JSON type is not numeric: (%s)", json);
 
-        json = "123.5";
+        json = J_STR("123.5");
         CATCH_CHECK(float(json) == Approx(123.5f));
 
-        json = {{"a", 1}, {"b", 2}};
+        json = {{J_STR("a"), 1}, {J_STR("b"), 2}};
         CATCH_CHECK_THROWS_JSON(float(json), "JSON type is not numeric: (%s)", json);
 
         json = {7, 8};
@@ -447,7 +472,7 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
         json = true;
         CATCH_CHECK_THROWS_JSON(float(json), "JSON type is not numeric: (%s)", json);
 
-        char ch = 'a';
+        char_type ch = J_CHR('a');
         json = ch;
         CATCH_CHECK(float(json) == Approx(float(ch)));
 
@@ -471,10 +496,10 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
     {
         fly::Json json;
 
-        json = "abc";
+        json = J_STR("abc");
         CATCH_CHECK_THROWS_JSON(std::nullptr_t(json), "JSON type is not null: (%s)", json);
 
-        json = {{"a", 1}, {"b", 2}};
+        json = {{J_STR("a"), 1}, {J_STR("b"), 2}};
         CATCH_CHECK_THROWS_JSON(std::nullptr_t(json), "JSON type is not null: (%s)", json);
 
         json = {7, 8};
@@ -483,7 +508,7 @@ CATCH_TEST_CASE("JsonConversion", "[json]")
         json = true;
         CATCH_CHECK_THROWS_JSON(std::nullptr_t(json), "JSON type is not null: (%s)", json);
 
-        json = 'a';
+        json = J_CHR('a');
         CATCH_CHECK_THROWS_JSON(std::nullptr_t(json), "JSON type is not null: (%s)", json);
 
         json = 12;
