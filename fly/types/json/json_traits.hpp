@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/fly.hpp"
-#include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <array>
 #include <deque>
@@ -46,7 +46,12 @@ struct JsonTraits
      * Define a trait for testing if type T is a JSON string.
      */
     template <typename T>
-    using is_string = detail::BasicStringTraits<string_type>::template is_string_like<T>;
+    using is_string = std::disjunction<
+        StringTraits::is_string_like<T>,
+        WStringTraits::is_string_like<T>,
+        String8Traits::is_string_like<T>,
+        String16Traits::is_string_like<T>,
+        String32Traits::is_string_like<T>>;
 
     template <typename T>
     inline static constexpr bool is_string_v = is_string<T>::value;

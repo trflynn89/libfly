@@ -48,6 +48,41 @@ CATCH_TEST_CASE("JsonTraits", "[json]")
         CATCH_CHECK(fly::JsonTraits::is_string_v<const char_type[]>);
         CATCH_CHECK(fly::JsonTraits::is_string_v<char_type[]>);
 
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const std::string>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<std::string>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const char *>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<char *>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const char[]>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<char[]>);
+
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const std::wstring>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<std::wstring>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const wchar_t *>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<wchar_t *>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const wchar_t[]>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<wchar_t[]>);
+
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const std::u8string>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<std::u8string>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const char8_t *>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<char8_t *>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const char8_t[]>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<char8_t[]>);
+
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const std::u16string>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<std::u16string>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const char16_t *>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<char16_t *>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const char16_t[]>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<char16_t[]>);
+
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const std::u32string>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<std::u32string>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const char32_t *>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<char32_t *>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<const char32_t[]>);
+        CATCH_CHECK(fly::JsonTraits::is_string_v<char32_t[]>);
+
         CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<array_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<deque_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<forward_list_type>);
