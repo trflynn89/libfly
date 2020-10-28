@@ -111,7 +111,63 @@ public:
      *
      * @throws JsonException If the string-like value is not valid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string<T>> = 0>
+    template <typename T, enable_if_any<StringTraits::is_string_like<T>> = 0>
+    Json(const T &value) noexcept(false);
+
+    /**
+     * String constructor. Intializes the Json instance to a string value. The SFINAE declaration
+     * allows construction of a string value from any wide-string-like type (e.g. std::wstring,
+     * wchar_t *).
+     *
+     * @tparam T The wide-string-like type.
+     *
+     * @param value The wide-string-like value.
+     *
+     * @throws JsonException If the wide-string-like value is not valid.
+     */
+    template <typename T, enable_if_any<WStringTraits::is_string_like<T>> = 0>
+    Json(const T &value) noexcept(false);
+
+    /**
+     * String constructor. Intializes the Json instance to a string value. The SFINAE declaration
+     * allows construction of a string value from any 8-bit-string-like type (e.g. std::u8string,
+     * char8_t *).
+     *
+     * @tparam T The 8-bit-string-like type.
+     *
+     * @param value The 8-bit-string-like value.
+     *
+     * @throws JsonException If the 8-bit-string-like value is not valid.
+     */
+    template <typename T, enable_if_any<String8Traits::is_string_like<T>> = 0>
+    Json(const T &value) noexcept(false);
+
+    /**
+     * String constructor. Intializes the Json instance to a string value. The SFINAE declaration
+     * allows construction of a string value from any 16-bit-string-like type (e.g. std::u16string,
+     * char16_t *).
+     *
+     * @tparam T The 16-bit-string-like type.
+     *
+     * @param value The 16-bit-string-like value.
+     *
+     * @throws JsonException If the 16-bit-string-like value is not valid.
+     */
+    template <typename T, enable_if_any<String16Traits::is_string_like<T>> = 0>
+    Json(const T &value) noexcept(false);
+
+    /**
+     * String constructor. Intializes the Json instance to a string value. The SFINAE declaration
+     * allows construction of a string value from any 32-bit-string-like type (e.g. std::u32string,
+     * char32_t *).
+     *
+     * @tparam T The 32-bit-string-like type.
+     *
+     * @param value The 32-bit-string-like value.
+     *
+     * @throws JsonException If the 32-bit-string-like value is not valid.
+     */
+    template <typename T, enable_if_any<String32Traits::is_string_like<T>> = 0>
     Json(const T &value) noexcept(false);
 
     /**
@@ -726,9 +782,65 @@ private:
 };
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string<T>>>
+template <typename T, enable_if_any<StringTraits::is_string_like<T>>>
 Json::Json(const T &value) noexcept(false) : m_value(validate_string(value))
 {
+}
+
+//==================================================================================================
+template <typename T, enable_if_any<WStringTraits::is_string_like<T>>>
+Json::Json(const T &value) noexcept(false) : m_value(JsonTraits::string_type())
+{
+    if (auto converted = WString::convert<JsonTraits::string_type>(value); converted)
+    {
+        m_value = validate_string(converted.value());
+    }
+    else
+    {
+        throw JsonException("Could not convert wstring-like type to a JSON string");
+    }
+}
+
+//==================================================================================================
+template <typename T, enable_if_any<String8Traits::is_string_like<T>>>
+Json::Json(const T &value) noexcept(false) : m_value(JsonTraits::string_type())
+{
+    if (auto converted = String8::convert<JsonTraits::string_type>(value); converted)
+    {
+        m_value = validate_string(converted.value());
+    }
+    else
+    {
+        throw JsonException("Could not convert u8string-like type to a JSON string");
+    }
+}
+
+//==================================================================================================
+template <typename T, enable_if_any<String16Traits::is_string_like<T>>>
+Json::Json(const T &value) noexcept(false) : m_value(JsonTraits::string_type())
+{
+    if (auto converted = String16::convert<JsonTraits::string_type>(value); converted)
+    {
+        m_value = validate_string(converted.value());
+    }
+    else
+    {
+        throw JsonException("Could not convert u16string-like type to a JSON string");
+    }
+}
+
+//==================================================================================================
+template <typename T, enable_if_any<String32Traits::is_string_like<T>>>
+Json::Json(const T &value) noexcept(false) : m_value(JsonTraits::string_type())
+{
+    if (auto converted = String32::convert<JsonTraits::string_type>(value); converted)
+    {
+        m_value = validate_string(converted.value());
+    }
+    else
+    {
+        throw JsonException("Could not convert u32string-like type to a JSON string");
+    }
 }
 
 //==================================================================================================
