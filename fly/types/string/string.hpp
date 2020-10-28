@@ -36,6 +36,12 @@ using String8 = BasicString<std::u8string>;
 using String16 = BasicString<std::u16string>;
 using String32 = BasicString<std::u32string>;
 
+using StringTraits = detail::BasicStringTraits<std::string>;
+using WStringTraits = detail::BasicStringTraits<std::wstring>;
+using String8Traits = detail::BasicStringTraits<std::u8string>;
+using String16Traits = detail::BasicStringTraits<std::u16string>;
+using String32Traits = detail::BasicStringTraits<std::u32string>;
+
 /**
  * Static class to provide string utilities not provided by the STL.
  *
