@@ -669,12 +669,26 @@ private:
     friend const_iterator;
 
     /**
+     * Convert any string-like type to a JSON string and validate that string for compliance.
+     *
+     * @tparam T The string-like type.
+     *
+     * @param value The string-like value.
+     *
+     * @return The converted input string value, with escaped and Unicode characters handled.
+     *
+     * @throws JsonException If the string-like value is not valid.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_string<T>> = 0>
+    static JsonTraits::string_type convert_to_string(const T &value);
+
+    /**
      * Validate the string for compliance according to https://www.json.org. Validation includes
-     * handling escaped and unicode characters.
+     * handling escaped and Unicode characters.
      *
      * @param str The string value to validate.
      *
-     * @return The modified input string value, with escaped and unicode characters handled.
+     * @return The modified input string value, with escaped and Unicode characters handled.
      *
      * @throws JsonException If the string value is not valid.
      */
@@ -682,7 +696,7 @@ private:
 
     /**
      * After reading a reverse solidus character, read the escaped character that follows. Replace
-     * the reverse solidus and escaped character with the interpreted control or unicode character.
+     * the reverse solidus and escaped character with the interpreted control or Unicode character.
      *
      * @param stream Stream to pipe the interpreted character into.
      * @param it Pointer to the escaped character.
@@ -729,39 +743,8 @@ private:
 
 //==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_string<T>>>
-Json::Json(const T &value) noexcept(false) : m_value(JsonTraits::string_type())
+Json::Json(const T &value) noexcept(false) : m_value(convert_to_string(value))
 {
-    std::optional<JsonTraits::string_type> converted;
-
-    if constexpr (StringTraits::is_string_like_v<T>)
-    {
-        converted = value;
-    }
-    else if constexpr (WStringTraits::is_string_like_v<T>)
-    {
-        converted = WString::convert<JsonTraits::string_type>(value);
-    }
-    else if constexpr (String8Traits::is_string_like_v<T>)
-    {
-        converted = String8::convert<JsonTraits::string_type>(value);
-    }
-    else if constexpr (String16Traits::is_string_like_v<T>)
-    {
-        converted = String16::convert<JsonTraits::string_type>(value);
-    }
-    else if constexpr (String32Traits::is_string_like_v<T>)
-    {
-        converted = String32::convert<JsonTraits::string_type>(value);
-    }
-
-    if (converted)
-    {
-        m_value = validate_string(converted.value());
-    }
-    else
-    {
-        throw JsonException("Could not convert string-like type to a JSON string");
-    }
 }
 
 //==================================================================================================
@@ -772,7 +755,7 @@ Json::Json(const T &value) noexcept(false) : m_value(JsonTraits::object_type())
 
     for (const auto &it : value)
     {
-        storage[validate_string(it.first)] = Json(it.second);
+        storage[convert_to_string(it.first)] = Json(it.second);
     }
 }
 
@@ -967,6 +950,41 @@ void Json::swap(T &other)
     {
         throw JsonException(*this, "JSON type invalid for swap(array)");
     }
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string<T>>>
+JsonTraits::string_type Json::convert_to_string(const T &value)
+{
+    std::optional<JsonTraits::string_type> converted;
+
+    if constexpr (StringTraits::is_string_like_v<T>)
+    {
+        converted = value;
+    }
+    else if constexpr (WStringTraits::is_string_like_v<T>)
+    {
+        converted = WString::convert<JsonTraits::string_type>(value);
+    }
+    else if constexpr (String8Traits::is_string_like_v<T>)
+    {
+        converted = String8::convert<JsonTraits::string_type>(value);
+    }
+    else if constexpr (String16Traits::is_string_like_v<T>)
+    {
+        converted = String16::convert<JsonTraits::string_type>(value);
+    }
+    else if constexpr (String32Traits::is_string_like_v<T>)
+    {
+        converted = String32::convert<JsonTraits::string_type>(value);
+    }
+
+    if (!converted)
+    {
+        throw JsonException("Could not convert string-like type to a JSON string");
+    }
+
+    return validate_string(converted.value());
 }
 
 } // namespace fly
