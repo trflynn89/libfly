@@ -592,7 +592,7 @@ JsonTraits::string_type Json::validate_string(const JsonTraits::string_type &str
         }
         else
         {
-            validate_character(stream, it, end);
+            validate_character(stream, it++);
         }
     }
 
@@ -706,26 +706,16 @@ void Json::write_escaped_charater(
 //==================================================================================================
 void Json::validate_character(
     stream_type &stream,
-    JsonTraits::string_type::const_iterator &it,
-    const JsonTraits::string_type::const_iterator &end)
+    const JsonTraits::string_type::const_iterator &it)
 {
     const std::uint8_t ch = static_cast<std::uint8_t>(*it);
-    auto start = it;
 
     if ((ch <= 0x1f) || (ch == 0x22) || (ch == 0x5c))
     {
         throw JsonException(String::format("Character '%c' must be escaped", *it));
     }
-    else if (!String::decode_codepoint(it, end))
-    {
-        throw JsonException("Could not decode Unicode character");
-    }
 
-    // The iterator is now incremented past the encoded unicode codepoint.
-    for (; start < it; ++start)
-    {
-        stream << *start;
-    }
+    stream << *it;
 }
 
 } // namespace fly
