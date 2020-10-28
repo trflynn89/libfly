@@ -267,47 +267,254 @@ CATCH_TEST_CASE("JsonConstruction", "[json]")
 
     CATCH_SECTION("Construct a JSON instance from object-like types")
     {
-        std::map<std::string, int> map = {{"a", 1}, {"b", 2}};
-        CATCH_CHECK(fly::Json(map).is_object());
+        CATCH_SECTION("std::string keys")
+        {
+            std::map<std::string, int> map = {{"a", 1}, {"b", 2}};
+            CATCH_CHECK(fly::Json(map).is_object());
 
-        std::multimap<std::string, int> multimap = {{"c", 3}, {"d", 4}};
-        CATCH_CHECK(fly::Json(multimap).is_object());
+            std::multimap<std::string, int> multimap = {{"c", 3}, {"d", 4}};
+            CATCH_CHECK(fly::Json(multimap).is_object());
 
-        std::unordered_map<std::string, int> umap = {{"e", 5}, {"f", 6}};
-        CATCH_CHECK(fly::Json(umap).is_object());
+            std::unordered_map<std::string, int> umap = {{"e", 5}, {"f", 6}};
+            CATCH_CHECK(fly::Json(umap).is_object());
 
-        std::unordered_multimap<std::string, int> umultimap = {{"h", 7}, {"i", 8}};
-        CATCH_CHECK(fly::Json(umultimap).is_object());
+            std::unordered_multimap<std::string, int> umultimap = {{"h", 7}, {"i", 8}};
+            CATCH_CHECK(fly::Json(umultimap).is_object());
+        }
+
+        CATCH_SECTION("std::wstring keys")
+        {
+            std::map<std::wstring, int> map = {{L"a", 1}, {L"b", 2}};
+            CATCH_CHECK(fly::Json(map).is_object());
+
+            std::multimap<std::wstring, int> multimap = {{L"c", 3}, {L"d", 4}};
+            CATCH_CHECK(fly::Json(multimap).is_object());
+
+            std::unordered_map<std::wstring, int> umap = {{L"e", 5}, {L"f", 6}};
+            CATCH_CHECK(fly::Json(umap).is_object());
+
+            std::unordered_multimap<std::wstring, int> umultimap = {{L"h", 7}, {L"i", 8}};
+            CATCH_CHECK(fly::Json(umultimap).is_object());
+        }
+
+        CATCH_SECTION("std::u8string keys")
+        {
+            std::map<std::u8string, int> map = {{u8"a", 1}, {u8"b", 2}};
+            CATCH_CHECK(fly::Json(map).is_object());
+
+            std::multimap<std::u8string, int> multimap = {{u8"c", 3}, {u8"d", 4}};
+            CATCH_CHECK(fly::Json(multimap).is_object());
+
+            std::unordered_map<std::u8string, int> umap = {{u8"e", 5}, {u8"f", 6}};
+            CATCH_CHECK(fly::Json(umap).is_object());
+
+            std::unordered_multimap<std::u8string, int> umultimap = {{u8"h", 7}, {u8"i", 8}};
+            CATCH_CHECK(fly::Json(umultimap).is_object());
+        }
+
+        CATCH_SECTION("std::u16string keys")
+        {
+            std::map<std::u16string, int> map = {{u"a", 1}, {u"b", 2}};
+            CATCH_CHECK(fly::Json(map).is_object());
+
+            std::multimap<std::u16string, int> multimap = {{u"c", 3}, {u"d", 4}};
+            CATCH_CHECK(fly::Json(multimap).is_object());
+
+            std::unordered_map<std::u16string, int> umap = {{u"e", 5}, {u"f", 6}};
+            CATCH_CHECK(fly::Json(umap).is_object());
+
+            std::unordered_multimap<std::u16string, int> umultimap = {{u"h", 7}, {u"i", 8}};
+            CATCH_CHECK(fly::Json(umultimap).is_object());
+        }
+
+        CATCH_SECTION("std::u32string keys")
+        {
+            std::map<std::u32string, int> map = {{U"a", 1}, {U"b", 2}};
+            CATCH_CHECK(fly::Json(map).is_object());
+
+            std::multimap<std::u32string, int> multimap = {{U"c", 3}, {U"d", 4}};
+            CATCH_CHECK(fly::Json(multimap).is_object());
+
+            std::unordered_map<std::u32string, int> umap = {{U"e", 5}, {U"f", 6}};
+            CATCH_CHECK(fly::Json(umap).is_object());
+
+            std::unordered_multimap<std::u32string, int> umultimap = {{U"h", 7}, {U"i", 8}};
+            CATCH_CHECK(fly::Json(umultimap).is_object());
+        }
     }
 
     CATCH_SECTION("Fail to construct a JSON instance from object-like types")
     {
-        std::map<std::string, int> map;
-
-        // Reverse solidus must be followed by a valid escape symbol.
-        map = {{"\\", 1}};
-        CATCH_CHECK_THROWS_JSON(fly::Json(map), "Expected escaped character after reverse solidus");
-
-        map = {{"\\U", 1}};
-        CATCH_CHECK_THROWS_JSON(fly::Json(map), "Invalid escape character 'U'");
-
-        // Quotes must be escaped.
-        map = {{"\"", 1}};
-        CATCH_CHECK_THROWS_JSON(fly::Json(map), "Character '\"' must be escaped");
-
-        // Control characters must be escaped.
-        for (fly::JsonTraits::string_type::value_type ch = 0; ch <= 0x1f; ++ch)
+        CATCH_SECTION("std::string keys")
         {
-            map = {{fly::JsonTraits::string_type(1, ch), 1}};
-            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Character '%c' must be escaped", ch);
+            std::map<std::string, int> map;
+
+            // Reverse solidus must be followed by a valid escape symbol.
+            map = {{"\\", 1}};
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(map),
+                "Expected escaped character after reverse solidus");
+
+            map = {{"\\U", 1}};
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Invalid escape character 'U'");
+
+            // Quotes must be escaped.
+            map = {{"\"", 1}};
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Character '\"' must be escaped");
+
+            // Control characters must be escaped.
+            for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+            {
+                map = {{std::string(1, static_cast<char>(ch)), 1}};
+                CATCH_CHECK_THROWS_JSON(
+                    fly::Json(map),
+                    "Character '%c' must be escaped",
+                    static_cast<char>(ch));
+            }
+
+            // Characters must be valid Unicode.
+            map = {{"\xed\xa0\x80", 1}}; // Reserved codepoint.
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Could not decode Unicode character");
+
+            map = {{"\xf4\x90\x80\x80", 1}}; // Out-of-range codepoint.
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Could not decode Unicode character");
         }
 
-        // Characters must be valid Unicode.
-        map = {{"\xed\xa0\x80", 1}}; // Reserved codepoint.
-        CATCH_CHECK_THROWS_JSON(fly::Json(map), "Could not decode Unicode character");
+        CATCH_SECTION("std::wstring keys")
+        {
+            std::map<std::wstring, int> map;
 
-        map = {{"\xf4\x90\x80\x80", 1}}; // Out-of-range codepoint.
-        CATCH_CHECK_THROWS_JSON(fly::Json(map), "Could not decode Unicode character");
+            // Reverse solidus must be followed by a valid escape symbol.
+            map = {{L"\\", 1}};
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(map),
+                "Expected escaped character after reverse solidus");
+
+            map = {{L"\\U", 1}};
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Invalid escape character 'U'");
+
+            // Quotes must be escaped.
+            map = {{L"\"", 1}};
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Character '\"' must be escaped");
+
+            // Control characters must be escaped.
+            for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+            {
+                map = {{std::wstring(1, static_cast<wchar_t>(ch)), 1}};
+                CATCH_CHECK_THROWS_JSON(
+                    fly::Json(map),
+                    "Character '%c' must be escaped",
+                    static_cast<char>(ch));
+            }
+
+            // Characters must be valid Unicode.
+            map = {{std::wstring(1, 0xd800), 1}}; // Reserved codepoint.
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(map),
+                "Could not convert string-like type to a JSON string");
+        }
+
+        CATCH_SECTION("std::u8string keys")
+        {
+            std::map<std::u8string, int> map;
+
+            // Reverse solidus must be followed by a valid escape symbol.
+            map = {{u8"\\", 1}};
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(map),
+                "Expected escaped character after reverse solidus");
+
+            map = {{u8"\\U", 1}};
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Invalid escape character 'U'");
+
+            // Quotes must be escaped.
+            map = {{u8"\"", 1}};
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Character '\"' must be escaped");
+
+            // Control characters must be escaped.
+            for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+            {
+                map = {{std::u8string(1, static_cast<char8_t>(ch)), 1}};
+                CATCH_CHECK_THROWS_JSON(
+                    fly::Json(map),
+                    "Character '%c' must be escaped",
+                    static_cast<char>(ch));
+            }
+
+            // Characters must be valid Unicode.
+            map = {{std::u8string(1, 0xff), 1}}; // Invalid leading byte.
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(map),
+                "Could not convert string-like type to a JSON string");
+        }
+
+        CATCH_SECTION("std::u16string keys")
+        {
+            std::map<std::u16string, int> map;
+
+            // Reverse solidus must be followed by a valid escape symbol.
+            map = {{u"\\", 1}};
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(map),
+                "Expected escaped character after reverse solidus");
+
+            map = {{u"\\U", 1}};
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Invalid escape character 'U'");
+
+            // Quotes must be escaped.
+            map = {{u"\"", 1}};
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Character '\"' must be escaped");
+
+            // Control characters must be escaped.
+            for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+            {
+                map = {{std::u16string(1, static_cast<char16_t>(ch)), 1}};
+                CATCH_CHECK_THROWS_JSON(
+                    fly::Json(map),
+                    "Character '%c' must be escaped",
+                    static_cast<char>(ch));
+            }
+
+            // Characters must be valid Unicode.
+            map = {{std::u16string(1, 0xd800), 1}}; // Reserved codepoint.
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(map),
+                "Could not convert string-like type to a JSON string");
+        }
+
+        CATCH_SECTION("std::u32string keys")
+        {
+            std::map<std::u32string, int> map;
+
+            // Reverse solidus must be followed by a valid escape symbol.
+            map = {{U"\\", 1}};
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(map),
+                "Expected escaped character after reverse solidus");
+
+            map = {{U"\\U", 1}};
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Invalid escape character 'U'");
+
+            // Quotes must be escaped.
+            map = {{U"\"", 1}};
+            CATCH_CHECK_THROWS_JSON(fly::Json(map), "Character '\"' must be escaped");
+
+            // Control characters must be escaped.
+            for (std::uint32_t ch = 0; ch <= 0x1f; ++ch)
+            {
+                map = {{std::u32string(1, static_cast<char32_t>(ch)), 1}};
+                CATCH_CHECK_THROWS_JSON(
+                    fly::Json(map),
+                    "Character '%c' must be escaped",
+                    static_cast<char>(ch));
+            }
+
+            // Characters must be valid Unicode.
+            map = {{std::u32string(1, 0xd800), 1}}; // Reserved codepoint.
+            CATCH_CHECK_THROWS_JSON(
+                fly::Json(map),
+                "Could not convert string-like type to a JSON string");
+        }
     }
 
     CATCH_SECTION("Construct a JSON instance from array-like types")
@@ -371,9 +578,9 @@ CATCH_TEST_CASE("JsonConstruction", "[json]")
         CATCH_CHECK_THROWS_JSON(fly::Json(vector), "Character '\"' must be escaped");
 
         // Control characters must be escaped.
-        for (fly::JsonTraits::string_type::value_type ch = 0; ch <= 0x1f; ++ch)
+        for (char ch = 0; ch <= 0x1f; ++ch)
         {
-            vector = {fly::JsonTraits::string_type(1, ch)};
+            vector = {std::string(1, ch)};
             CATCH_CHECK_THROWS_JSON(fly::Json(vector), "Character '%c' must be escaped", ch);
         }
 
