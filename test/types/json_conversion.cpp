@@ -1,5 +1,6 @@
 #include "fly/fly.hpp"
 #include "fly/types/json/json.hpp"
+#include "test/types/json_macros.hpp"
 
 #include <catch2/catch.hpp>
 
@@ -13,16 +14,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
-#define CATCH_CHECK_THROWS_JSON(expression, ...)                                                   \
-    CATCH_CHECK_THROWS_MATCHES(                                                                    \
-        expression,                                                                                \
-        fly::JsonException,                                                                        \
-        Catch::Matchers::Exception::ExceptionMessageMatcher(                                       \
-            fly::String::format("JsonException: " __VA_ARGS__)))
-
-#define J_CHR(ch) FLY_CHR(char_type, ch)
-#define J_STR(str) FLY_STR(char_type, str)
 
 CATCH_TEMPLATE_TEST_CASE(
     "JsonConversion",

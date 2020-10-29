@@ -242,6 +242,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\config\test_config.hpp" />
+    <ClInclude Include="..\..\..\test\types\json_macros.hpp" />
     <ClInclude Include="..\..\..\test\util\capture_stream.hpp" />
     <ClInclude Include="..\..\..\test\util\path_util.hpp" />
     <ClInclude Include="..\..\..\test\util\task_manager.hpp" />
