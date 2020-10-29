@@ -54,155 +54,6 @@ CATCH_TEST_CASE("Json", "[json]")
         CATCH_CHECK(json == null);
     }
 
-    CATCH_SECTION("Access a JSON object's values via the access operator")
-    {
-        fly::Json string1 = "abc";
-        CATCH_CHECK_THROWS_JSON(string1["a"], "JSON type invalid for operator[key]: (%s)", string1);
-
-        const fly::Json string2 = "abc";
-        CATCH_CHECK_THROWS_JSON(string2["a"], "JSON type invalid for operator[key]: (%s)", string2);
-
-        fly::Json object1 = {{"a", 1}, {"b", 2}};
-        CATCH_CHECK(object1["a"] == 1);
-        CATCH_CHECK(object1["b"] == 2);
-        CATCH_CHECK_NOTHROW(object1["c"]);
-        CATCH_CHECK(object1["c"] == nullptr);
-
-        const fly::Json object2 = {{"a", 1}, {"b", 2}};
-        CATCH_CHECK(object2["a"] == 1);
-        CATCH_CHECK(object2["b"] == 2);
-        CATCH_CHECK_THROWS_JSON(object2["c"], "Given key (c) not found: (%s)", object2);
-
-        fly::Json array1 = {'7', 8};
-        CATCH_CHECK_THROWS_JSON(array1["a"], "JSON type invalid for operator[key]: (%s)", array1);
-
-        const fly::Json array2 = {'7', 8};
-        CATCH_CHECK_THROWS_JSON(array2["a"], "JSON type invalid for operator[key]: (%s)", array2);
-
-        fly::Json bool1 = true;
-        CATCH_CHECK_THROWS_JSON(bool1["a"], "JSON type invalid for operator[key]: (%s)", bool1);
-
-        const fly::Json bool2 = true;
-        CATCH_CHECK_THROWS_JSON(bool2["a"], "JSON type invalid for operator[key]: (%s)", bool2);
-
-        fly::Json signed1 = 1;
-        CATCH_CHECK_THROWS_JSON(signed1["a"], "JSON type invalid for operator[key]: (%s)", signed1);
-
-        const fly::Json signed2 = 1;
-        CATCH_CHECK_THROWS_JSON(signed2["a"], "JSON type invalid for operator[key]: (%s)", signed2);
-
-        fly::Json unsigned1 = static_cast<unsigned int>(1);
-        CATCH_CHECK_THROWS_JSON(
-            unsigned1["a"],
-            "JSON type invalid for operator[key]: (%s)",
-            unsigned1);
-
-        const fly::Json unsigned2 = static_cast<unsigned int>(1);
-        CATCH_CHECK_THROWS_JSON(
-            unsigned2["a"],
-            "JSON type invalid for operator[key]: (%s)",
-            unsigned2);
-
-        fly::Json float1 = 1.0f;
-        CATCH_CHECK_THROWS_JSON(float1["a"], "JSON type invalid for operator[key]: (%s)", float1);
-
-        const fly::Json float2 = 1.0f;
-        CATCH_CHECK_THROWS_JSON(float2["a"], "JSON type invalid for operator[key]: (%s)", float2);
-
-        fly::Json null1 = nullptr;
-        CATCH_CHECK_NOTHROW(null1["a"]);
-        CATCH_CHECK(null1.is_object());
-        CATCH_CHECK(null1["a"] == nullptr);
-
-        const fly::Json null2 = nullptr;
-        CATCH_CHECK_THROWS_JSON(null2["a"], "JSON type invalid for operator[key]: (%s)", null2);
-    }
-
-    CATCH_SECTION("Access a JSON object's values via the accessor 'at'")
-    {
-        fly::Json string1 = "abc";
-        CATCH_CHECK_THROWS_JSON(
-            string1.at("a"),
-            "JSON type invalid for operator[key]: (%s)",
-            string1);
-
-        const fly::Json string2 = "abc";
-        CATCH_CHECK_THROWS_JSON(
-            string2.at("a"),
-            "JSON type invalid for operator[key]: (%s)",
-            string2);
-
-        fly::Json object1 = {{"a", 1}, {"b", 2}};
-        CATCH_CHECK(object1.at("a") == 1);
-        CATCH_CHECK(object1.at("b") == 2);
-        CATCH_CHECK_THROWS_JSON(object1.at("c"), "Given key (c) not found: (%s)", object1);
-
-        const fly::Json object2 = {{"a", 1}, {"b", 2}};
-        CATCH_CHECK(object2.at("a") == 1);
-        CATCH_CHECK(object2.at("b") == 2);
-        CATCH_CHECK_THROWS_JSON(object2.at("c"), "Given key (c) not found: (%s)", object2);
-
-        fly::Json array1 = {'7', 8};
-        CATCH_CHECK_THROWS_JSON(
-            array1.at("a"),
-            "JSON type invalid for operator[key]: (%s)",
-            array1);
-
-        const fly::Json array2 = {'7', 8};
-        CATCH_CHECK_THROWS_JSON(
-            array2.at("a"),
-            "JSON type invalid for operator[key]: (%s)",
-            array2);
-
-        fly::Json bool1 = true;
-        CATCH_CHECK_THROWS_JSON(bool1.at("a"), "JSON type invalid for operator[key]: (%s)", bool1);
-
-        const fly::Json bool2 = true;
-        CATCH_CHECK_THROWS_JSON(bool2.at("a"), "JSON type invalid for operator[key]: (%s)", bool2);
-
-        fly::Json signed1 = 1;
-        CATCH_CHECK_THROWS_JSON(
-            signed1.at("a"),
-            "JSON type invalid for operator[key]: (%s)",
-            signed1);
-
-        const fly::Json signed2 = 1;
-        CATCH_CHECK_THROWS_JSON(
-            signed2.at("a"),
-            "JSON type invalid for operator[key]: (%s)",
-            signed2);
-
-        fly::Json unsigned1 = static_cast<unsigned int>(1);
-        CATCH_CHECK_THROWS_JSON(
-            unsigned1.at("a"),
-            "JSON type invalid for operator[key]: (%s)",
-            unsigned1);
-
-        const fly::Json unsigned2 = static_cast<unsigned int>(1);
-        CATCH_CHECK_THROWS_JSON(
-            unsigned2.at("a"),
-            "JSON type invalid for operator[key]: (%s)",
-            unsigned2);
-
-        fly::Json float1 = 1.0f;
-        CATCH_CHECK_THROWS_JSON(
-            float1.at("a"),
-            "JSON type invalid for operator[key]: (%s)",
-            float1);
-
-        const fly::Json float2 = 1.0f;
-        CATCH_CHECK_THROWS_JSON(
-            float2.at("a"),
-            "JSON type invalid for operator[key]: (%s)",
-            float2);
-
-        fly::Json null1 = nullptr;
-        CATCH_CHECK_THROWS_JSON(null1.at("a"), "JSON type invalid for operator[key]: (%s)", null1);
-
-        const fly::Json null2 = nullptr;
-        CATCH_CHECK_THROWS_JSON(null2.at("a"), "JSON type invalid for operator[key]: (%s)", null2);
-    }
-
     CATCH_SECTION("Access a JSON array's values via the access operator")
     {
         fly::Json string1 = "abc";
@@ -1157,5 +1008,212 @@ CATCH_TEST_CASE("Json", "[json]")
             const std::string str = stream.str();
             CATCH_CHECK(str == "\"abc\\ud83c\\udf55zef\"");
         }
+    }
+}
+
+CATCH_TEMPLATE_TEST_CASE(
+    "JsonObjectAccess",
+    "[json]",
+    std::string,
+    std::wstring,
+    std::u8string,
+    std::u16string,
+    std::u32string)
+{
+    using string_type = TestType;
+    using char_type = typename string_type::value_type;
+
+    CATCH_SECTION("Access a JSON object's values via the access operator")
+    {
+        fly::Json string1 = "abc";
+        CATCH_CHECK_THROWS_JSON(
+            string1[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            string1);
+
+        const fly::Json string2 = "abc";
+        CATCH_CHECK_THROWS_JSON(
+            string2[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            string2);
+
+        fly::Json object1 = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK(object1[J_STR("a")] == 1);
+        CATCH_CHECK(object1[J_STR("b")] == 2);
+        CATCH_CHECK_NOTHROW(object1[J_STR("c")]);
+        CATCH_CHECK(object1[J_STR("c")] == nullptr);
+
+        const fly::Json object2 = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK(object2[J_STR("a")] == 1);
+        CATCH_CHECK(object2[J_STR("b")] == 2);
+        CATCH_CHECK_THROWS_JSON(object2[J_STR("c")], "Given key (c) not found: (%s)", object2);
+
+        fly::Json array1 = {'7', 8};
+        CATCH_CHECK_THROWS_JSON(
+            array1[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            array1);
+
+        const fly::Json array2 = {'7', 8};
+        CATCH_CHECK_THROWS_JSON(
+            array2[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            array2);
+
+        fly::Json bool1 = true;
+        CATCH_CHECK_THROWS_JSON(
+            bool1[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            bool1);
+
+        const fly::Json bool2 = true;
+        CATCH_CHECK_THROWS_JSON(
+            bool2[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            bool2);
+
+        fly::Json signed1 = 1;
+        CATCH_CHECK_THROWS_JSON(
+            signed1[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            signed1);
+
+        const fly::Json signed2 = 1;
+        CATCH_CHECK_THROWS_JSON(
+            signed2[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            signed2);
+
+        fly::Json unsigned1 = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            unsigned1[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            unsigned1);
+
+        const fly::Json unsigned2 = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            unsigned2[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            unsigned2);
+
+        fly::Json float1 = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            float1[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            float1);
+
+        const fly::Json float2 = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            float2[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            float2);
+
+        fly::Json null1 = nullptr;
+        CATCH_CHECK_NOTHROW(null1[J_STR("a")]);
+        CATCH_CHECK(null1.is_object());
+        CATCH_CHECK(null1[J_STR("a")] == nullptr);
+
+        const fly::Json null2 = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            null2[J_STR("a")],
+            "JSON type invalid for operator[key]: (%s)",
+            null2);
+    }
+
+    CATCH_SECTION("Access a JSON object's values via the accessor 'at'")
+    {
+        fly::Json string1 = "abc";
+        CATCH_CHECK_THROWS_JSON(
+            string1.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            string1);
+
+        const fly::Json string2 = "abc";
+        CATCH_CHECK_THROWS_JSON(
+            string2.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            string2);
+
+        fly::Json object1 = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK(object1.at(J_STR("a")) == 1);
+        CATCH_CHECK(object1.at(J_STR("b")) == 2);
+        CATCH_CHECK_THROWS_JSON(object1.at(J_STR("c")), "Given key (c) not found: (%s)", object1);
+
+        const fly::Json object2 = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK(object2.at(J_STR("a")) == 1);
+        CATCH_CHECK(object2.at(J_STR("b")) == 2);
+        CATCH_CHECK_THROWS_JSON(object2.at(J_STR("c")), "Given key (c) not found: (%s)", object2);
+
+        fly::Json array1 = {'7', 8};
+        CATCH_CHECK_THROWS_JSON(
+            array1.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            array1);
+
+        const fly::Json array2 = {'7', 8};
+        CATCH_CHECK_THROWS_JSON(
+            array2.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            array2);
+
+        fly::Json bool1 = true;
+        CATCH_CHECK_THROWS_JSON(
+            bool1.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            bool1);
+
+        const fly::Json bool2 = true;
+        CATCH_CHECK_THROWS_JSON(
+            bool2.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            bool2);
+
+        fly::Json signed1 = 1;
+        CATCH_CHECK_THROWS_JSON(
+            signed1.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            signed1);
+
+        const fly::Json signed2 = 1;
+        CATCH_CHECK_THROWS_JSON(
+            signed2.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            signed2);
+
+        fly::Json unsigned1 = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            unsigned1.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            unsigned1);
+
+        const fly::Json unsigned2 = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            unsigned2.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            unsigned2);
+
+        fly::Json float1 = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            float1.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            float1);
+
+        const fly::Json float2 = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            float2.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            float2);
+
+        fly::Json null1 = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            null1.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            null1);
+
+        const fly::Json null2 = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            null2.at(J_STR("a")),
+            "JSON type invalid for operator[key]: (%s)",
+            null2);
     }
 }
