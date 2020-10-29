@@ -46,12 +46,10 @@ struct JsonTraits
      * Define a trait for testing if type T is a JSON string.
      */
     template <typename T>
-    using is_string = std::disjunction<
-        StringTraits::is_string_like<T>,
-        WStringTraits::is_string_like<T>,
-        String8Traits::is_string_like<T>,
-        String16Traits::is_string_like<T>,
-        String32Traits::is_string_like<T>>;
+    using is_string = detail::is_like_supported_string<T>;
+
+    template <typename T>
+    using is_string_t = typename is_string<T>::type;
 
     template <typename T>
     inline static constexpr bool is_string_v = is_string<T>::value;
