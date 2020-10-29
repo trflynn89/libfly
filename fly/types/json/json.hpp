@@ -985,35 +985,14 @@ void Json::swap(T &other)
 template <typename T, enable_if_all<JsonTraits::is_string<T>>>
 JsonTraits::string_type Json::convert_to_string(const T &value)
 {
-    std::optional<JsonTraits::string_type> converted;
+    using StringType = BasicString<JsonTraits::is_string_t<T>>;
 
-    if constexpr (StringTraits::is_string_like_v<T>)
+    if (auto converted = StringType::template convert<JsonTraits::string_type>(value); converted)
     {
-        converted = String::convert<JsonTraits::string_type>(value);
-    }
-    else if constexpr (WStringTraits::is_string_like_v<T>)
-    {
-        converted = WString::convert<JsonTraits::string_type>(value);
-    }
-    else if constexpr (String8Traits::is_string_like_v<T>)
-    {
-        converted = String8::convert<JsonTraits::string_type>(value);
-    }
-    else if constexpr (String16Traits::is_string_like_v<T>)
-    {
-        converted = String16::convert<JsonTraits::string_type>(value);
-    }
-    else if constexpr (String32Traits::is_string_like_v<T>)
-    {
-        converted = String32::convert<JsonTraits::string_type>(value);
+        return validate_string(converted.value());
     }
 
-    if (!converted)
-    {
-        throw JsonException("Could not convert string-like type to a JSON string");
-    }
-
-    return validate_string(converted.value());
+    throw JsonException("Could not convert string-like type to a JSON string");
 }
 
 } // namespace fly
