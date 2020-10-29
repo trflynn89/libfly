@@ -103,7 +103,7 @@ public:
 
     /**
      * String constructor. Intializes the Json instance to a string value. The SFINAE declaration
-     * allows construction of a string value from any string-like type (e.g. std::string / char[],
+     * allows construction of a string value from any string-like type (std::string / char[],
      * std::wstring / wchar_t[], std::u8string / char8_t[], std::u16string / char16_t[],
      * std::u32string / char32_t[]]).
      *
@@ -297,6 +297,8 @@ public:
      * instance into a char array. If this is needed, first convert to a string, then into a char
      * array.
      *
+     * @tparam T The string type.
+     *
      * @return The Json instance as a string.
      */
     template <typename T, enable_if_all<detail::is_supported_string<T>> = 0>
@@ -384,12 +386,16 @@ public:
     explicit operator T() const noexcept(false);
 
     /**
-     * Object access operator.
+     * Object access operator. The SFINAE declaration allows lookups with any string-like type
+     * (std::string / char[], std::wstring / wchar_t[], std::u8string / char8_t[], std::u16string /
+     * char16_t[], std::u32string / char32_t[]]).
      *
      * If the Json instance is an object, perform a lookup on the object with a key value. If the
      * key value is not found, a null Json instance will be created for that key.
      *
      * If the Json instance is null, it is first converted to an object.
+     *
+     * @tparam T The string-like key type.
      *
      * @param key The key value to lookup.
      *
@@ -398,10 +404,13 @@ public:
      * @throws JsonException If the Json instance is neither an object nor null, or the key value is
      *         invalid.
      */
-    reference operator[](const typename JsonTraits::object_type::key_type &key);
+    template <typename T, enable_if_all<JsonTraits::is_string<T>> = 0>
+    reference operator[](const T &key);
 
     /**
-     * Object read-only access operator.
+     * Object read-only access operator. The SFINAE declaration allows lookups with any string-like
+     * type (std::string / char[], std::wstring / wchar_t[], std::u8string / char8_t[],
+     * std::u16string / char16_t[], std::u32string / char32_t[]]).
      *
      * If the Json instance is an object, perform a lookup on the object with a key value.
      *
@@ -412,7 +421,8 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key value does not exist,
      *         or the key value is invalid.
      */
-    const_reference operator[](const typename JsonTraits::object_type::key_type &key) const;
+    template <typename T, enable_if_all<JsonTraits::is_string<T>> = 0>
+    const_reference operator[](const T &key) const;
 
     /**
      * Array access operator.
@@ -444,9 +454,13 @@ public:
     const_reference operator[](size_type index) const;
 
     /**
-     * Object read-only accessor.
+     * Object read-only accessor. The SFINAE declaration allows lookups with any string-like type
+     * (std::string / char[], std::wstring / wchar_t[], std::u8string / char8_t[], std::u16string /
+     * char16_t[], std::u32string / char32_t[]]).
      *
      * If the Json instance is an object, perform a lookup on the object with a key value.
+     *
+     * @tparam T The string-like key type.
      *
      * @param key The key value to lookup.
      *
@@ -455,10 +469,15 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key value does not exist,
      *         or the key value is invalid.
      */
-    reference at(const typename JsonTraits::object_type::key_type &key);
+    template <typename T, enable_if_all<JsonTraits::is_string<T>> = 0>
+    reference at(const T &key);
 
     /**
-     * Object read-only accessor.
+     * Object read-only accessor. The SFINAE declaration allows lookups with any string-like type
+     * (std::string / char[], std::wstring / wchar_t[], std::u8string / char8_t[], std::u16string /
+     * char16_t[], std::u32string / char32_t[]]).
+     *
+     * @tparam T The string-like key type.
      *
      * If the Json instance is an object, perform a lookup on the object with a key value.
      *
@@ -469,7 +488,8 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key value does not exist,
      *         or the key value is invalid.
      */
-    const_reference at(const typename JsonTraits::object_type::key_type &key) const;
+    template <typename T, enable_if_all<JsonTraits::is_string<T>> = 0>
+    const_reference at(const T &key) const;
 
     /**
      * Array read-only accessor.
@@ -945,6 +965,71 @@ Json::operator T() const noexcept(false)
     };
 
     return std::visit(std::move(visitor), m_value);
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string<T>>>
+Json::reference Json::operator[](const T &key)
+{
+    if (is_null())
+    {
+        m_value = JsonTraits::object_type();
+    }
+
+    if (is_object())
+    {
+        auto &value = std::get<JsonTraits::object_type>(m_value);
+        return value[convert_to_string(key)];
+    }
+
+    throw JsonException(*this, "JSON type invalid for operator[key]");
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string<T>>>
+Json::const_reference Json::operator[](const T &key) const
+{
+    return at(key);
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string<T>>>
+Json::reference Json::at(const T &key)
+{
+    if (is_object())
+    {
+        auto &value = std::get<JsonTraits::object_type>(m_value);
+        auto it = value.find(convert_to_string(key));
+
+        if (it == value.end())
+        {
+            throw JsonException(*this, String::format("Given key (%s) not found", key));
+        }
+
+        return it->second;
+    }
+
+    throw JsonException(*this, "JSON type invalid for operator[key]");
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string<T>>>
+Json::const_reference Json::at(const T &key) const
+{
+    if (is_object())
+    {
+        const auto &value = std::get<JsonTraits::object_type>(m_value);
+        const auto it = value.find(convert_to_string(key));
+
+        if (it == value.end())
+        {
+            throw JsonException(*this, String::format("Given key (%s) not found", key));
+        }
+
+        return it->second;
+    }
+
+    throw JsonException(*this, "JSON type invalid for operator[key]");
 }
 
 //==================================================================================================

@@ -175,32 +175,6 @@ Json::operator JsonTraits::null_type() const noexcept(false)
 }
 
 //==================================================================================================
-Json::reference Json::operator[](const typename JsonTraits::object_type::key_type &key)
-{
-    if (is_null())
-    {
-        m_value = JsonTraits::object_type();
-    }
-
-    if (is_object())
-    {
-        const Json json(key);
-        auto &value = std::get<JsonTraits::object_type>(m_value);
-
-        return value[JsonTraits::object_type::key_type(json)];
-    }
-
-    throw JsonException(*this, "JSON type invalid for operator[key]");
-}
-
-//==================================================================================================
-Json::const_reference Json::operator[](const typename JsonTraits::object_type::key_type &key) const
-
-{
-    return at(key);
-}
-
-//==================================================================================================
 Json::reference Json::operator[](size_type index)
 {
     if (is_null())
@@ -227,49 +201,6 @@ Json::reference Json::operator[](size_type index)
 Json::const_reference Json::operator[](size_type index) const
 {
     return at(index);
-}
-
-//==================================================================================================
-Json::reference Json::at(const typename JsonTraits::object_type::key_type &key)
-{
-    if (is_object())
-    {
-        const Json json(key);
-        auto &value = std::get<JsonTraits::object_type>(m_value);
-
-        auto it = value.find(JsonTraits::object_type::key_type(json));
-
-        if (it == value.end())
-        {
-            throw JsonException(*this, String::format("Given key (%s) not found", key));
-        }
-
-        return it->second;
-    }
-
-    throw JsonException(*this, "JSON type invalid for operator[key]");
-}
-
-//==================================================================================================
-Json::const_reference Json::at(const typename JsonTraits::object_type::key_type &key) const
-
-{
-    if (is_object())
-    {
-        const Json json(key);
-        const auto &value = std::get<JsonTraits::object_type>(m_value);
-
-        const auto it = value.find(JsonTraits::object_type::key_type(json));
-
-        if (it == value.end())
-        {
-            throw JsonException(*this, String::format("Given key (%s) not found", key));
-        }
-
-        return it->second;
-    }
-
-    throw JsonException(*this, "JSON type invalid for operator[key]");
 }
 
 //==================================================================================================
