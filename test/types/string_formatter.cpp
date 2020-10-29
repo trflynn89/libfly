@@ -101,6 +101,36 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK(
             FLY_STR(streamed_char, "\\u00f0\\u0178\\u008d\\u2022") ==
             BasicString::format(format, FLY_STR(char_type, "\u00f0\u0178\u008d\u2022")));
+
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::string") ==
+            BasicString::format(format, std::string("std::string")));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::wstring") ==
+            BasicString::format(format, std::wstring(L"std::wstring")));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::u8string") ==
+            BasicString::format(format, std::u8string(u8"std::u8string")));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::u16string") ==
+            BasicString::format(format, std::u16string(u"std::u16string")));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::u32string") ==
+            BasicString::format(format, std::u32string(U"std::u32string")));
+
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::string") == BasicString::format(format, "std::string"));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::wstring") == BasicString::format(format, L"std::wstring"));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::u8string") ==
+            BasicString::format(format, u8"std::u8string"));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::u16string") ==
+            BasicString::format(format, u"std::u16string"));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::u32string") ==
+            BasicString::format(format, U"std::u32string"));
     }
 
     CATCH_SECTION("Format as a hexadecimal integer (%x)")
