@@ -1,52 +1,9 @@
 #include "fly/types/json/detail/json_iterator.hpp"
 
 #include "fly/types/json/json.hpp"
-#include "fly/types/json/json_exception.hpp"
+#include "test/types/json_macros.hpp"
 
 #include <catch2/catch.hpp>
-
-#define CATCH_CHECK_THROWS_JSON(expression, ...)                                                   \
-    CATCH_CHECK_THROWS_MATCHES(                                                                    \
-        expression,                                                                                \
-        fly::JsonIteratorException,                                                                \
-        Catch::Matchers::Exception::ExceptionMessageMatcher(                                       \
-            fly::String::format("JsonIteratorException: " __VA_ARGS__)))
-
-#define CATCH_CHECK_THROWS_BAD_COMPARISON(expression, json1, json2)                                \
-    CATCH_CHECK_THROWS_MATCHES(                                                                    \
-        expression,                                                                                \
-        fly::BadJsonComparisonException,                                                           \
-        Catch::Matchers::Exception::ExceptionMessageMatcher(fly::String::format(                   \
-            "BadJsonComparisonException: Cannot compare iterators of different JSON instances: "   \
-            "(%s) (%s)",                                                                           \
-            json1,                                                                                 \
-            json2)))
-
-#define CATCH_CHECK_THROWS_NULL(expression)                                                        \
-    CATCH_CHECK_THROWS_MATCHES(                                                                    \
-        expression,                                                                                \
-        fly::NullJsonException,                                                                    \
-        Catch::Matchers::Exception::ExceptionMessageMatcher(                                       \
-            fly::String::format("NullJsonException: Cannot dereference an empty or past-the-end "  \
-                                "iterator")))
-
-#define CATCH_CHECK_THROWS_NULL_WITH(expression, json)                                             \
-    CATCH_CHECK_THROWS_MATCHES(                                                                    \
-        expression,                                                                                \
-        fly::NullJsonException,                                                                    \
-        Catch::Matchers::Exception::ExceptionMessageMatcher(fly::String::format(                   \
-            "NullJsonException: Cannot dereference an empty or past-the-end "                      \
-            "iterator: (%s)",                                                                      \
-            json)))
-
-#define CATCH_CHECK_THROWS_OUT_OF_RANGE(expression, offset, json)                                  \
-    CATCH_CHECK_THROWS_MATCHES(                                                                    \
-        expression,                                                                                \
-        fly::OutOfRangeJsonException,                                                              \
-        Catch::Matchers::Exception::ExceptionMessageMatcher(fly::String::format(                   \
-            "OutOfRangeJsonException: Offset %d is out-of-range: (%s)",                            \
-            offset,                                                                                \
-            json)))
 
 CATCH_TEST_CASE("JsonIterator", "[json]")
 {
@@ -55,13 +12,13 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
     CATCH_SECTION("Check JSON types that are allowed to provide iterators")
     {
         fly::Json null = nullptr;
-        CATCH_CHECK_THROWS_JSON(
+        CATCH_CHECK_THROWS_ITERATOR(
             iterator(&null, iterator::Position::Begin),
             "JSON type invalid for iteration: (%s)",
             null);
 
         fly::Json string = "abc";
-        CATCH_CHECK_THROWS_JSON(
+        CATCH_CHECK_THROWS_ITERATOR(
             iterator(&string, iterator::Position::Begin),
             "JSON type invalid for iteration: (%s)",
             string);
@@ -73,25 +30,25 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK_NOTHROW(iterator(&array, iterator::Position::Begin));
 
         fly::Json boolean = true;
-        CATCH_CHECK_THROWS_JSON(
+        CATCH_CHECK_THROWS_ITERATOR(
             iterator(&boolean, iterator::Position::Begin),
             "JSON type invalid for iteration: (%s)",
             boolean);
 
         fly::Json sign = 1;
-        CATCH_CHECK_THROWS_JSON(
+        CATCH_CHECK_THROWS_ITERATOR(
             iterator(&sign, iterator::Position::Begin),
             "JSON type invalid for iteration: (%s)",
             sign);
 
         fly::Json unsign = static_cast<unsigned int>(1);
-        CATCH_CHECK_THROWS_JSON(
+        CATCH_CHECK_THROWS_ITERATOR(
             iterator(&unsign, iterator::Position::Begin),
             "JSON type invalid for iteration: (%s)",
             unsign);
 
         fly::Json floatt = 1.0f;
-        CATCH_CHECK_THROWS_JSON(
+        CATCH_CHECK_THROWS_ITERATOR(
             iterator(&floatt, iterator::Position::Begin),
             "JSON type invalid for iteration: (%s)",
             floatt);
@@ -218,16 +175,22 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
 
         CATCH_CHECK_NOTHROW(*it1);
         CATCH_CHECK_NOTHROW(it1->empty());
-        CATCH_CHECK_THROWS_JSON(it1[0], "JSON type invalid for offset operator: (%s)", json);
+        CATCH_CHECK_THROWS_ITERATOR(it1[0], "JSON type invalid for offset operator: (%s)", json);
         CATCH_CHECK_NOTHROW(it1 == it2);
         CATCH_CHECK_NOTHROW(it1 != it2);
-        CATCH_CHECK_THROWS_JSON(it1 < it2, "JSON type invalid for comparison operator: (%s)", json);
-        CATCH_CHECK_THROWS_JSON(
+        CATCH_CHECK_THROWS_ITERATOR(
+            it1 < it2,
+            "JSON type invalid for comparison operator: (%s)",
+            json);
+        CATCH_CHECK_THROWS_ITERATOR(
             it1 <= it2,
             "JSON type invalid for comparison operator: (%s)",
             json);
-        CATCH_CHECK_THROWS_JSON(it1 > it2, "JSON type invalid for comparison operator: (%s)", json);
-        CATCH_CHECK_THROWS_JSON(
+        CATCH_CHECK_THROWS_ITERATOR(
+            it1 > it2,
+            "JSON type invalid for comparison operator: (%s)",
+            json);
+        CATCH_CHECK_THROWS_ITERATOR(
             it1 >= it2,
             "JSON type invalid for comparison operator: (%s)",
             json);
@@ -235,12 +198,15 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK_NOTHROW(it1++);
         CATCH_CHECK_NOTHROW(--it3);
         CATCH_CHECK_NOTHROW(it3--);
-        CATCH_CHECK_THROWS_JSON(it1 += 1, "JSON type invalid for iterator offset: (%s)", json);
-        CATCH_CHECK_THROWS_JSON(it3 -= 1, "JSON type invalid for iterator offset: (%s)", json);
-        CATCH_CHECK_THROWS_JSON(it1 + 1, "JSON type invalid for iterator offset: (%s)", json);
-        CATCH_CHECK_THROWS_JSON(1 + it1, "JSON type invalid for iterator offset: (%s)", json);
-        CATCH_CHECK_THROWS_JSON(it3 - 1, "JSON type invalid for iterator offset: (%s)", json);
-        CATCH_CHECK_THROWS_JSON(it1 - it2, "JSON type invalid for iterator difference: (%s)", json);
+        CATCH_CHECK_THROWS_ITERATOR(it1 += 1, "JSON type invalid for iterator offset: (%s)", json);
+        CATCH_CHECK_THROWS_ITERATOR(it3 -= 1, "JSON type invalid for iterator offset: (%s)", json);
+        CATCH_CHECK_THROWS_ITERATOR(it1 + 1, "JSON type invalid for iterator offset: (%s)", json);
+        CATCH_CHECK_THROWS_ITERATOR(1 + it1, "JSON type invalid for iterator offset: (%s)", json);
+        CATCH_CHECK_THROWS_ITERATOR(it3 - 1, "JSON type invalid for iterator offset: (%s)", json);
+        CATCH_CHECK_THROWS_ITERATOR(
+            it1 - it2,
+            "JSON type invalid for iterator difference: (%s)",
+            json);
         CATCH_CHECK_NOTHROW(it1.key());
         CATCH_CHECK_NOTHROW(it1.value());
     }
@@ -272,7 +238,7 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK_NOTHROW(1 + it1);
         CATCH_CHECK_NOTHROW(it3 - 1);
         CATCH_CHECK_NOTHROW(it1 - it2);
-        CATCH_CHECK_THROWS_JSON(it1.key(), "JSON type is not keyed: (%s)", json);
+        CATCH_CHECK_THROWS_ITERATOR(it1.key(), "JSON type is not keyed: (%s)", json);
         CATCH_CHECK_NOTHROW(it1.value());
     }
 
