@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/parser/utf8_stream.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/numeric/endian.hpp"
 #include "fly/types/string/string.hpp"
@@ -8,7 +9,9 @@
 #include <cstdint>
 #include <filesystem>
 #include <istream>
+#include <memory>
 #include <optional>
+#include <sstream>
 #include <string>
 
 namespace fly {
@@ -75,13 +78,15 @@ public:
 
 protected:
     /**
-     * Parse a UTF-8 encoded stream and retrieve the parsed values.
-     *
-     * @param stream Stream holding the contents to parse.
+     * Parse a UTF-8 encoded stream and retrieve the parsed values. Concrete parsers may access the
+     * underlying stream through m_stream.
      *
      * @return If successful, the parsed values. Otherwise, an unitialized value.
      */
-    virtual std::optional<Json> parse_internal(std::istream &stream) = 0;
+    virtual std::optional<Json> parse_internal() = 0;
+
+    // Wrapper around the stream being parsed. Only valid for the duration of parse_internal().
+    std::unique_ptr<UTF8Stream> m_stream;
 
     std::uint32_t m_line;
     std::uint32_t m_column;
@@ -107,7 +112,8 @@ private:
      *
      * @return If successful, the parsed values. Otherwise, an unitialized value.
      */
-    std::optional<Json> parse_stream(std::istream &stream);
+    template <typename CharType>
+    std::optional<Json> parse_stream(std::basic_istream<CharType> &&stream);
 
     /**
      * Parse a non-UTF-8 encoded stream and convert the result to a UTF-8 encoded string.
@@ -138,10 +144,12 @@ private:
 template <typename StringType>
 std::optional<Json> Parser::parse_string(const StringType &contents)
 {
-    if constexpr (std::is_same_v<StringType, std::string>)
+    using CharType = typename StringType::value_type;
+
+    if constexpr (UTF8Stream::supports_utf8_stream<CharType>())
     {
-        std::istringstream stream(contents);
-        return parse_stream(stream);
+        std::basic_istringstream<CharType> stream(contents);
+        return parse_stream(std::move(stream));
     }
     else
     {
@@ -149,12 +157,25 @@ std::optional<Json> Parser::parse_string(const StringType &contents)
 
         if (utf8_contents)
         {
-            std::istringstream utf8_stream(std::move(utf8_contents.value()));
-            return parse_stream(utf8_stream);
+            return parse_string(utf8_contents.value());
         }
 
         return std::nullopt;
     }
+}
+
+//==================================================================================================
+template <typename CharType>
+std::optional<Json> Parser::parse_stream(std::basic_istream<CharType> &&stream)
+{
+    m_line = 1;
+    m_column = 0;
+
+    m_stream = UTF8Stream::create(stream);
+    auto result = parse_internal();
+    m_stream.reset();
+
+    return result;
 }
 
 //==================================================================================================

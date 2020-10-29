@@ -25,12 +25,12 @@ protected:
     /**
      * Dummy parser to fail if the given stream contains any characters.
      */
-    std::optional<fly::Json> parse_internal(std::istream &stream) override
+    std::optional<fly::Json> parse_internal() override
     {
         m_chars.clear();
         int c = 0;
 
-        while ((c = stream.get()) != EOF)
+        while ((c = m_stream->get()) != EOF)
         {
             m_chars.push_back(c);
         }

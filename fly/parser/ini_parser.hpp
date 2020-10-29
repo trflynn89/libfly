@@ -21,11 +21,9 @@ protected:
     /**
      * Parse a stream and retrieve the parsed values.
      *
-     * @param stream Stream holding the contents to parse.
-     *
      * @return If successful, the parsed values. Otherwise, an unitialized value.
      */
-    std::optional<Json> parse_internal(std::istream &stream) override;
+    std::optional<Json> parse_internal() override;
 
 private:
     /**

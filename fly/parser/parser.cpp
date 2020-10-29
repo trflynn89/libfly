@@ -2,7 +2,6 @@
 
 #include <cstring>
 #include <fstream>
-#include <sstream>
 
 namespace fly {
 
@@ -61,7 +60,7 @@ std::optional<Json> Parser::parse_file(const std::filesystem::path &path)
     switch (encoding)
     {
         case Encoding::UTF8:
-            return parse_stream(stream);
+            return parse_stream(std::move(stream));
 
         case Encoding::UTF16BigEndian:
             utf8_contents = ensure_utf8<std::u16string, std::endian::big>(stream);
@@ -82,20 +81,10 @@ std::optional<Json> Parser::parse_file(const std::filesystem::path &path)
 
     if (utf8_contents)
     {
-        std::istringstream utf8_stream(std::move(utf8_contents.value()));
-        return parse_stream(utf8_stream);
+        return parse_string(utf8_contents.value());
     }
 
     return std::nullopt;
-}
-
-//==================================================================================================
-std::optional<Json> Parser::parse_stream(std::istream &stream)
-{
-    m_line = 1;
-    m_column = 0;
-
-    return parse_internal(stream);
 }
 
 //==================================================================================================
