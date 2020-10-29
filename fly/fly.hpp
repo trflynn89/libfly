@@ -32,3 +32,49 @@
 
 // Mark an expression or value as unused.
 #define FLY_UNUSED(expr) (void)(expr)
+
+namespace fly {
+
+/**
+ * Compile-time helper function to determine if the operating system is Linux.
+ *
+ * @return True if the operating system is Linux.
+ */
+inline constexpr bool is_linux()
+{
+#if defined(FLY_LINUX)
+    return true;
+#else
+    return false;
+#endif
+}
+
+/**
+ * Compile-time helper function to determine if the operating system is macOS.
+ *
+ * @return True if the operating system is macOS.
+ */
+inline constexpr bool is_macos()
+{
+#if defined(FLY_MACOS)
+    return true;
+#else
+    return false;
+#endif
+}
+
+/**
+ * Compile-time helper function to determine if the operating system is Windows.
+ *
+ * @return True if the operating system is Windows.
+ */
+inline constexpr bool is_windows()
+{
+#if defined(FLY_WINDOWS)
+    return true;
+#else
+    return false;
+#endif
+}
+
+} // namespace fly
