@@ -8,12 +8,12 @@
 namespace fly {
 
 //==================================================================================================
-std::optional<Json> IniParser::parse_internal(std::istream &stream)
+std::optional<Json> IniParser::parse_internal()
 {
     std::string line, section;
     Json values;
 
-    while (stream && std::getline(stream, line))
+    while (m_stream->getline(line))
     {
         String::trim(line);
         ++m_line;

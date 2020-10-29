@@ -57,13 +57,11 @@ public:
 
 protected:
     /**
-     * Parse a single complete JSON value from a stream.
-     *
-     * @param stream Stream holding the contents to parse.
+     * Parse a single complete JSON value from the stream.
      *
      * @return If successful, the parsed JSON value. Otherwise, an unitialized value.
      */
-    std::optional<Json> parse_internal(std::istream &stream) override;
+    std::optional<Json> parse_internal() override;
 
 private:
     /**
@@ -125,136 +123,104 @@ private:
     using ParseStateGetter = std::function<ParseState()>;
 
     /**
-     * Parse a complete JSON value from a stream. May be called recursively for nested values.
-     *
-     * @param stream Stream holding the contents to parse.
+     * Parse a complete JSON value from the stream. May be called recursively for nested values.
      *
      * @return If successful, the parsed JSON value. Otherwise, an unitialized value.
      */
-    std::optional<Json> parse_json(std::istream &stream);
+    std::optional<Json> parse_json();
 
     /**
-     * Parse a JSON object from a stream.
-     *
-     * @param stream Stream holding the contents to parse.
+     * Parse a JSON object from the stream.
      *
      * @return If successful, the parsed JSON object. Otherwise, an unitialized value.
      */
-    std::optional<Json> parse_object(std::istream &stream);
+    std::optional<Json> parse_object();
 
     /**
-     * Parse a JSON array from a stream.
-     *
-     * @param stream Stream holding the contents to parse.
+     * Parse a JSON array from the stream.
      *
      * @return If successful, the parsed JSON array. Otherwise, an unitialized value.
      */
-    std::optional<Json> parse_array(std::istream &stream);
+    std::optional<Json> parse_array();
 
     /**
      * Determine whether parsing a JSON object or array is complete.
      *
-     * @param stream Stream holding the contents to parse.
      * @param token Token indicating the end of the JSON object (}) or array (]).
      *
      * @return The new parsing state.
      */
-    ParseState done_parsing_object_or_array(std::istream &stream, const Token &end_token);
+    ParseState done_parsing_object_or_array(const Token &end_token);
 
     /**
-     * Parse a JSON string, number, boolean, or null value from a stream.
-     *
-     * @param stream Stream holding the contents to parse.
+     * Parse a JSON string, number, boolean, or null value from the stream.
      *
      * @return If successful, the parsed JSON value. Otherwise, an unitialized value.
      */
-    std::optional<Json> parse_value(std::istream &stream);
+    std::optional<Json> parse_value();
 
     /**
-     * Extract a single symbol from a stream. Ensure that symbol is equal to an expected token.
-     *
-     * @param stream Stream holding the contents to parse.
+     * Extract a single symbol from the stream. Ensure that symbol is equal to an expected token.
      *
      * @return The new parsing state.
      */
-    ParseState consume_token(std::istream &stream, const Token &token);
+    ParseState consume_token(const Token &token);
 
     /**
-     * Extract a comma from a stream. Handles any trailing commas, allowing a single trailing comma
-     * if enabled in the feature set.
+     * Extract a comma from the stream. Handles any trailing commas, allowing a single trailing
+     * comma if enabled in the feature set.
      *
-     * @param stream Stream holding the contents to parse.
      * @param parse_state Callback to indicate whether the calling parser should stop parsing.
      *
      * @return The new parsing state.
      */
-    ParseState consume_comma(std::istream &stream, const ParseStateGetter &parse_state);
+    ParseState consume_comma(const ParseStateGetter &parse_state);
 
     /**
-     * Extract a string, number, boolean, or null value from a stream. If parsing a string, escaped
-     * symbols are preserved in that string, and the returned value does not contain its surrounding
-     * quotes.
+     * Extract a string, number, boolean, or null value from the stream. If parsing a string,
+     * escaped symbols are preserved in that string, and the returned value does not contain its
+     * surrounding quotes.
      *
-     * @param stream Stream holding the contents to parse.
      * @param type The JSON value type to consume.
      * @param value The location to store the parsed value.
      *
      * @return The JSON value type that was parsed. Will be either the type that was provided or
      *         JsonType::Invalid if an error occurred.
      */
-    JsonType consume_value(std::istream &stream, JsonType type, JsonTraits::string_type &value);
+    JsonType consume_value(JsonType type, JsonTraits::string_type &value);
 
     /**
      * Extract all consecutive whitespace symbols and comments (if enabled in the feature set) from
-     * a stream. The first non-whitespace, non-comment symbol is left on the stream.
-     *
-     * @param stream Stream holding the contents to parse.
+     * the stream. The first non-whitespace, non-comment symbol is left on the stream.
      *
      * @return The new parsing state.
      */
-    ParseState consume_whitespace_and_comments(std::istream &stream);
+    ParseState consume_whitespace_and_comments();
 
     /**
-     * Extract all consecutive whitespace symbols from a stream until a non- whitespace symbol is
+     * Extract all consecutive whitespace symbols from the stream until a non- whitespace symbol is
      * encountered. The non-whitespace symbol is left on the stream.
-     *
-     * @param stream Stream holding the contents to parse.
      */
-    void consume_whitespace(std::istream &stream);
+    void consume_whitespace();
 
     /**
-     * Extract a single- or multi-line comment from a stream, if enabled in the feature set.
-     *
-     * @param stream Stream holding the contents to parse.
+     * Extract a single- or multi-line comment from the stream, if enabled in the feature set.
      *
      * @return The new parsing state.
      */
-    ParseState consume_comment(std::istream &stream);
+    ParseState consume_comment();
 
     /**
-     * Read the next symbol in a stream without extracting it.
-     *
-     * @param stream Stream holding the contents to parse.
-     *
-     * @return The peeked symbol.
-     */
-    Token peek(std::istream &stream);
-
-    /**
-     * Extract the next symbol in a stream.
-     *
-     * @param stream Stream holding the contents to parse.
+     * Extract the next symbol in the stream.
      *
      * @return The extracted symbol.
      */
-    Token consume(std::istream &stream);
+    Token consume();
 
     /**
-     * Extract and discard the next symbol in a stream.
-     *
-     * @param stream Stream holding the contents to parse.
+     * Extract and discard the next symbol in the stream.
      */
-    void discard(std::istream &stream);
+    void discard();
 
     /**
      * Validate that a parsed number is valid and interpret its numeric JSON type.
