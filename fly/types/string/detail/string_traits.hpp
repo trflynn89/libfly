@@ -21,6 +21,46 @@ template <typename StringType>
 inline constexpr bool is_supported_string_v = is_supported_string<StringType>::value;
 
 /**
+ * Define a trait for testing if StringType is like a supported std::basic_string specialization. A
+ * type is "like" a std::basic_string specialization if it is that specialization itself or a
+ * C-string equalivent.
+ *
+ * For types that are like a supported std::basic_string specialization, this trait also defines a
+ * type alias to that specialization. Other types are aliased to void and should not be used.
+ */
+template <typename StringType>
+// NOLINTNEXTLINE(readability-identifier-naming)
+struct is_like_supported_string
+{
+    using type = std::conditional_t<
+        fly::any_same_v<StringType, char *, char const *, std::string>,
+        std::string,
+        std::conditional_t<
+            fly::any_same_v<StringType, wchar_t *, wchar_t const *, std::wstring>,
+            std::wstring,
+            std::conditional_t<
+                fly::any_same_v<StringType, char8_t *, char8_t const *, std::u8string>,
+                std::u8string,
+                std::conditional_t<
+                    fly::any_same_v<StringType, char16_t *, char16_t const *, std::u16string>,
+                    std::u16string,
+                    std::conditional_t<
+                        fly::any_same_v<StringType, char32_t *, char32_t const *, std::u32string>,
+                        std::u32string,
+                        void>>>>>;
+
+    inline static constexpr bool value = std::negation_v<std::is_same<type, void>>;
+};
+
+template <typename StringType>
+// NOLINTNEXTLINE(readability-identifier-naming)
+using is_like_supported_string_t = typename is_like_supported_string<StringType>::type;
+
+template <typename StringType>
+// NOLINTNEXTLINE(readability-identifier-naming)
+inline constexpr bool is_like_supported_string_v = is_like_supported_string<StringType>::value;
+
+/**
  * Traits for basic properties of standard std::basic_string specializations.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
@@ -62,7 +102,7 @@ struct BasicStringTraits
      * Define a trait for testing if type T is a string-like type analogous to StringType.
      */
     template <typename T>
-    using is_string_like = any_same<T, char_type *, char_type const *, StringType>;
+    using is_string_like = std::is_same<is_like_supported_string_t<T>, StringType>;
 
     template <typename T>
     inline static constexpr bool is_string_like_v = is_string_like<T>::value;
