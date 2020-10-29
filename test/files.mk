@@ -34,6 +34,7 @@ SRC_DIRS_$(d) += \
     test/types
 
 SRC_$(d) := \
+    $(d)/fly.cpp \
     $(d)/main.cpp
 
 # All unit tests should have Catch2 on the include path.
