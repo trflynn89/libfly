@@ -37,27 +37,15 @@ struct BasicStringStreamer
     using char_type = typename traits::char_type;
     using char_traits = std::char_traits<char_type>;
 
-    using const_iterator = typename traits::const_iterator;
-
+    using ostream_type = typename traits::ostream_type;
     using streamed_type = typename traits::streamed_type;
     using streamed_char = typename streamed_type::value_type;
-
-    using istream_type = typename traits::istream_type;
-    using ostream_type = typename traits::ostream_type;
-
-    using fstream_type = typename traits::fstream_type;
-    using ifstream_type = typename traits::ifstream_type;
-    using ofstream_type = typename traits::ofstream_type;
-
-    using stringstream_type = typename traits::stringstream_type;
-    using istringstream_type = typename traits::istringstream_type;
-    using ostringstream_type = typename traits::ostringstream_type;
 
     /**
      * Stream the given value into the given stream.
      *
      * For all string-like types, any symbol which is not a printable ASCII character is escaped as
-     * a Unicode codepoint. For example, the line feed character will be streamed as "\U000c", and
+     * a Unicode codepoint. For example, the line feed character will be streamed as "\u000c", and
      * U+10f355 will be streamed as "\U0010f355".
      *
      * For all character types, any symbol which is not a printable ASCII character is escaped as
@@ -66,6 +54,8 @@ struct BasicStringStreamer
      *
      * For any other type which has an operator<< overload defined, the value is stream using that
      * overload. Otherwise, the memory location of the value is streamed.
+     *
+     * @tparam T The type of the value to stream.
      *
      * @param ostream The stream to insert the value into.
      * @param value The value to stream.
@@ -77,26 +67,24 @@ private:
     /**
      * Stream a string into the given stream.
      *
+     * @tparam T The type of the string to stream.
+     *
      * @param ostream The stream to insert the value into.
-     * @param it Pointer to the beginning of the string to stream.
-     * @param end Pointer to the end of the string to stream.
+     * @param value The string to stream.
      */
-    template <
-        typename StreamedType = StringType,
-        enable_if_all<std::is_same<StreamedType, streamed_type>> = 0>
-    static void stream_string(ostream_type &ostream, const_iterator &it, const const_iterator &end);
+    template <typename T, enable_if_all<std::is_same<T, streamed_type>> = 0>
+    static void stream_string(ostream_type &ostream, const T &value);
 
     /**
      * Convert a string value to UTF-8 and stream that value into the given stream.
      *
+     * @tparam T The type of the string to stream.
+     *
      * @param ostream The stream to insert the value into.
-     * @param it Pointer to the beginning of the string to stream.
-     * @param end Pointer to the end of the string to stream.
+     * @param value The string to stream.
      */
-    template <
-        typename StreamedType = StringType,
-        enable_if_none<std::is_same<StreamedType, streamed_type>> = 0>
-    static void stream_string(ostream_type &ostream, const_iterator &it, const const_iterator &end);
+    template <typename T, enable_if_none<std::is_same<T, streamed_type>> = 0>
+    static void stream_string(ostream_type &ostream, const T &value);
 
     /**
      * Stream a character into the given stream.
@@ -116,21 +104,17 @@ void BasicStringStreamer<StringType>::stream(ostream_type &ostream, const T &val
 
     if constexpr (detail::is_supported_string_v<U>)
     {
-        auto it = value.cbegin();
-        const auto end = value.cend();
-
-        stream_string(ostream, it, end);
+        stream_string(ostream, value);
     }
-    else if constexpr (traits::template is_string_like_v<U>)
+    else if constexpr (detail::is_like_supported_string_v<U>)
     {
+        using string_type = detail::is_like_supported_string_t<U>;
+        using string_traits = std::char_traits<typename string_type::value_type>;
+
         // TODO it would be better if this could be a std::string_view. The methods in
         // BasicStringUnicode just need to support any iterator type.
-        const StringType copy(value, char_traits::length(value));
-
-        auto it = copy.cbegin();
-        const auto end = copy.cend();
-
-        stream_string(ostream, it, end);
+        const string_type copy(value, string_traits::length(value));
+        stream_string(ostream, copy);
     }
     else if constexpr (std::is_same_v<U, char_type>)
     {
@@ -149,17 +133,16 @@ void BasicStringStreamer<StringType>::stream(ostream_type &ostream, const T &val
 //==================================================================================================
 template <typename StringType>
 template <
-    typename StreamedType,
-    enable_if_all<
-        std::is_same<StreamedType, typename BasicStringTraits<StringType>::streamed_type>>>
-void BasicStringStreamer<StringType>::stream_string(
-    ostream_type &ostream,
-    const_iterator &it,
-    const const_iterator &end)
+    typename T,
+    enable_if_all<std::is_same<T, typename BasicStringTraits<StringType>::streamed_type>>>
+void BasicStringStreamer<StringType>::stream_string(ostream_type &ostream, const T &value)
 {
+    auto it = value.cbegin();
+    const auto end = value.cend();
+
     while (it != end)
     {
-        auto escaped = BasicStringUnicode<StringType>::escape_codepoint(it, end);
+        auto escaped = BasicStringUnicode<T>::escape_codepoint(it, end);
 
         if (escaped)
         {
@@ -171,16 +154,14 @@ void BasicStringStreamer<StringType>::stream_string(
 //==================================================================================================
 template <typename StringType>
 template <
-    typename StreamedType,
-    enable_if_none<
-        std::is_same<StreamedType, typename BasicStringTraits<StringType>::streamed_type>>>
-void BasicStringStreamer<StringType>::stream_string(
-    ostream_type &ostream,
-    const_iterator &it,
-    const const_iterator &end)
+    typename T,
+    enable_if_none<std::is_same<T, typename BasicStringTraits<StringType>::streamed_type>>>
+void BasicStringStreamer<StringType>::stream_string(ostream_type &ostream, const T &value)
 {
-    auto converted =
-        BasicStringUnicode<StringType>::template convert_encoding<streamed_type>(it, end);
+    auto it = value.cbegin();
+    const auto end = value.cend();
+
+    auto converted = BasicStringUnicode<T>::template convert_encoding<streamed_type>(it, end);
 
     if (converted)
     {
