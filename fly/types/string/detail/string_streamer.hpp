@@ -34,9 +34,6 @@ struct BasicStringStreamer
 {
     using traits = BasicStringTraits<StringType>;
 
-    using char_type = typename traits::char_type;
-    using char_traits = std::char_traits<char_type>;
-
     using ostream_type = typename traits::ostream_type;
     using streamed_type = typename traits::streamed_type;
     using streamed_char = typename streamed_type::value_type;
@@ -89,10 +86,13 @@ private:
     /**
      * Stream a character into the given stream.
      *
+     * @tparam T The type of the character to stream.
+     *
      * @param ostream The stream to insert the value into.
      * @param value The character to stream.
      */
-    static void stream_char(ostream_type &ostream, const char_type value);
+    template <typename T>
+    static void stream_char(ostream_type &ostream, const T value);
 };
 
 //==================================================================================================
@@ -116,7 +116,7 @@ void BasicStringStreamer<StringType>::stream(ostream_type &ostream, const T &val
         const string_type copy(value, string_traits::length(value));
         stream_string(ostream, copy);
     }
-    else if constexpr (std::is_same_v<U, char_type>)
+    else if constexpr (detail::is_supported_character_v<U>)
     {
         stream_char(ostream, value);
     }
@@ -171,7 +171,8 @@ void BasicStringStreamer<StringType>::stream_string(ostream_type &ostream, const
 
 //==================================================================================================
 template <typename StringType>
-void BasicStringStreamer<StringType>::stream_char(ostream_type &ostream, const char_type value)
+template <typename T>
+void BasicStringStreamer<StringType>::stream_char(ostream_type &ostream, const T value)
 {
     if ((value > 0x1f) && (value < 0x7f))
     {
@@ -179,7 +180,7 @@ void BasicStringStreamer<StringType>::stream_char(ostream_type &ostream, const c
     }
     else
     {
-        static constexpr const auto s_eof_as_char = static_cast<char_type>(char_traits::eof());
+        static constexpr const auto s_eof_as_char = static_cast<T>(std::char_traits<T>::eof());
 
         if (value == s_eof_as_char)
         {
@@ -188,7 +189,7 @@ void BasicStringStreamer<StringType>::stream_char(ostream_type &ostream, const c
         else
         {
             static constexpr const streamed_char s_fill(FLY_CHR(streamed_char, '0'));
-            const auto value_as_int = static_cast<typename char_traits::int_type>(value);
+            const auto value_as_int = static_cast<typename std::char_traits<T>::int_type>(value);
 
             ostream << FLY_STR(streamed_char, "\\x");
             ostream << std::setfill(s_fill) << std::setw(2);
