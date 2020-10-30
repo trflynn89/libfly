@@ -92,6 +92,12 @@ CATCH_TEMPLATE_TEST_CASE(
             BasicString::format(
                 format,
                 static_cast<char_type>(std::char_traits<char_type>::eof())));
+
+        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::format(format, 'a'));
+        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::format(format, L'a'));
+        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::format(format, u8'a'));
+        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::format(format, u'a'));
+        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::format(format, U'a'));
     }
 
     CATCH_SECTION("Format as a string (%s)")
