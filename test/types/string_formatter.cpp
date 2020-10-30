@@ -125,6 +125,22 @@ CATCH_TEMPLATE_TEST_CASE(
             BasicString::format(format, std::u32string(U"std::u32string")));
 
         CATCH_CHECK(
+            FLY_STR(streamed_char, "std::string_view") ==
+            BasicString::format(format, std::string_view("std::string_view")));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::wstring_view") ==
+            BasicString::format(format, std::wstring_view(L"std::wstring_view")));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::u8string_view") ==
+            BasicString::format(format, std::u8string_view(u8"std::u8string_view")));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::u16string_view") ==
+            BasicString::format(format, std::u16string_view(u"std::u16string_view")));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "std::u32string_view") ==
+            BasicString::format(format, std::u32string_view(U"std::u32string_view")));
+
+        CATCH_CHECK(
             FLY_STR(streamed_char, "std::string") == BasicString::format(format, "std::string"));
         CATCH_CHECK(
             FLY_STR(streamed_char, "std::wstring") == BasicString::format(format, L"std::wstring"));
