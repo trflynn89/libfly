@@ -59,6 +59,7 @@ class BasicString
 public:
     using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
+    using view_type = typename traits::view_type;
     using iterator = typename traits::iterator;
     using const_iterator = typename traits::const_iterator;
     using codepoint_type = typename traits::codepoint_type;

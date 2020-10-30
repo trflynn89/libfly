@@ -120,6 +120,7 @@ CATCH_TEMPLATE_TEST_CASE(
     using char_type = typename traits::char_type;
     using char_pointer_type = typename std::add_pointer<char_type>::type;
     using streamed_type = typename traits::streamed_type;
+    using view_type = typename traits::view_type;
 
     constexpr bool is_string = std::is_same_v<StringType, std::string>;
     constexpr bool is_wstring = std::is_same_v<StringType, std::wstring>;
@@ -177,6 +178,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(fly::detail::is_supported_string_v<StringType>);
             CATCH_CHECK(fly::detail::is_supported_string_v<const StringType>);
             CATCH_CHECK(fly::detail::is_supported_string_v<StringType const>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type const>);
         }
 
         CATCH_SECTION("C++-string type references")
@@ -184,6 +189,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(fly::detail::is_supported_string_v<StringType &>);
             CATCH_CHECK(fly::detail::is_supported_string_v<const StringType &>);
             CATCH_CHECK(fly::detail::is_supported_string_v<StringType const &>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type const &>);
         }
 
         CATCH_SECTION("C++-string type pointers")
@@ -191,6 +200,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<StringType *>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const StringType *>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<StringType const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type const *>);
         }
     }
 
@@ -223,6 +236,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const StringType>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType const>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type const>);
         }
 
         CATCH_SECTION("C++-string type references")
@@ -230,6 +247,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType &>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const StringType &>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType const &>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type const &>);
         }
 
         CATCH_SECTION("C++-string type pointers")
@@ -237,6 +258,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType *>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const StringType *>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type const *>);
         }
     }
 
@@ -287,6 +312,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(std::is_same_v<
                         fly::detail::is_like_supported_string_t<StringType const>,
                         StringType>);
+
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<view_type>);
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<const view_type>);
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<view_type const>);
         }
 
         CATCH_SECTION("C++-string type references")
@@ -303,6 +332,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(std::is_same_v<
                         fly::detail::is_like_supported_string_t<StringType const &>,
                         StringType>);
+
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<view_type &>);
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<const view_type &>);
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<view_type const &>);
         }
 
         CATCH_SECTION("C++-string type pointers")
@@ -310,6 +343,10 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<StringType *>);
             CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<const StringType *>);
             CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<StringType const *>);
+
+            CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<view_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<const view_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<view_type const *>);
         }
     }
 

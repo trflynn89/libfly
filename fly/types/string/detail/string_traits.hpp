@@ -43,20 +43,30 @@ template <typename StringType>
 // NOLINTNEXTLINE(readability-identifier-naming)
 struct is_like_supported_string
 {
+private:
+    template <typename T, typename CharType>
+    inline static constexpr bool is_like_string_impl = fly::any_same_v<
+        T,
+        CharType *,
+        CharType const *,
+        std::basic_string<CharType>,
+        std::basic_string_view<CharType>>;
+
+public:
     using type = std::conditional_t<
-        fly::any_same_v<StringType, char *, char const *, std::string>,
+        is_like_string_impl<StringType, char>,
         std::string,
         std::conditional_t<
-            fly::any_same_v<StringType, wchar_t *, wchar_t const *, std::wstring>,
+            is_like_string_impl<StringType, wchar_t>,
             std::wstring,
             std::conditional_t<
-                fly::any_same_v<StringType, char8_t *, char8_t const *, std::u8string>,
+                is_like_string_impl<StringType, char8_t>,
                 std::u8string,
                 std::conditional_t<
-                    fly::any_same_v<StringType, char16_t *, char16_t const *, std::u16string>,
+                    is_like_string_impl<StringType, char16_t>,
                     std::u16string,
                     std::conditional_t<
-                        fly::any_same_v<StringType, char32_t *, char32_t const *, std::u32string>,
+                        is_like_string_impl<StringType, char32_t>,
                         std::u32string,
                         void>>>>>;
 
@@ -89,6 +99,7 @@ struct BasicStringTraits
      */
     using size_type = typename StringType::size_type;
     using char_type = typename StringType::value_type;
+    using view_type = std::basic_string_view<char_type>;
 
     using iterator = typename StringType::iterator;
     using const_iterator = typename StringType::const_iterator;
