@@ -555,8 +555,7 @@ void Json::read_escaped_character(
             return;
 
         default:
-            throw JsonException(
-                String::format("Invalid escape character '%c'", static_cast<char>(*it)));
+            throw JsonException(String::format("Invalid escape character '%c'", *it));
     }
 
     ++it;
@@ -615,8 +614,7 @@ void Json::validate_character(
 
     if ((ch <= 0x1f) || (ch == 0x22) || (ch == 0x5c))
     {
-        throw JsonException(
-            String::format("Character '%c' must be escaped", static_cast<char>(*it)));
+        throw JsonException(String::format("Character '%c' must be escaped", *it));
     }
 
     stream << *it;
