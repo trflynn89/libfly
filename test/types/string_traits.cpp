@@ -37,6 +37,18 @@ constexpr bool is_supported_string(const T &)
     return false;
 }
 
+template <typename T, fly::enable_if_any<fly::detail::is_supported_character<T>> = 0>
+constexpr bool is_supported_character(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::enable_if_none<fly::detail::is_supported_character<T>> = 0>
+constexpr bool is_supported_character(const T &)
+{
+    return false;
+}
+
 template <typename T, fly::enable_if_any<fly::detail::is_like_supported_string<T>> = 0>
 constexpr bool is_like_supported_string(const T &)
 {
@@ -179,6 +191,52 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<StringType *>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const StringType *>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<StringType const *>);
+        }
+    }
+
+    CATCH_SECTION("Check whether types are supported characters via traits")
+    {
+        CATCH_SECTION("Plain data types")
+        {
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<int>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const int>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<int const>);
+
+            CATCH_CHECK(fly::detail::is_supported_character_v<char_type>);
+            CATCH_CHECK(fly::detail::is_supported_character_v<const char_type>);
+            CATCH_CHECK(fly::detail::is_supported_character_v<char_type const>);
+
+            CATCH_CHECK(fly::detail::is_supported_character_v<char_type &>);
+            CATCH_CHECK(fly::detail::is_supported_character_v<const char_type &>);
+            CATCH_CHECK(fly::detail::is_supported_character_v<char_type const &>);
+        }
+
+        CATCH_SECTION("C-string types")
+        {
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<char_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const char_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<char_type const *>);
+        }
+
+        CATCH_SECTION("C++-string types")
+        {
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const StringType>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType const>);
+        }
+
+        CATCH_SECTION("C++-string type references")
+        {
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const StringType &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType const &>);
+        }
+
+        CATCH_SECTION("C++-string type pointers")
+        {
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const StringType *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType const *>);
         }
     }
 
@@ -396,6 +454,15 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(is_supported_string(int()));
         CATCH_CHECK_FALSE(is_supported_string(char_type()));
         CATCH_CHECK_FALSE(is_supported_string(char_pointer_type()));
+    }
+
+    CATCH_SECTION("Check whether types are supported characters via SFINAE overloads")
+    {
+        CATCH_CHECK(is_supported_character(char_type()));
+
+        CATCH_CHECK_FALSE(is_supported_character(StringType()));
+        CATCH_CHECK_FALSE(is_supported_character(int()));
+        CATCH_CHECK_FALSE(is_supported_character(char_pointer_type()));
     }
 
     CATCH_SECTION("Check whether types are like supported strings via SFINAE overloads")
