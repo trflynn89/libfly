@@ -21,6 +21,17 @@ template <typename StringType>
 inline constexpr bool is_supported_string_v = is_supported_string<StringType>::value;
 
 /**
+ * Define a trait for testing if CharType is a supported std::basic_string specialization's
+ * character type.
+ */
+template <typename CharType>
+using is_supported_character = any_same<CharType, char, wchar_t, char8_t, char16_t, char32_t>;
+
+template <typename CharType>
+// NOLINTNEXTLINE(readability-identifier-naming)
+inline constexpr bool is_supported_character_v = is_supported_character<CharType>::value;
+
+/**
  * Define a trait for testing if StringType is like a supported std::basic_string specialization. A
  * type is "like" a std::basic_string specialization if it is that specialization itself or a
  * C-string equalivent.
