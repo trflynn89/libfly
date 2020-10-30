@@ -419,6 +419,7 @@ public:
 
 private:
     friend std::conditional_t<is_const_iterator, NonConstJsonIterator, ConstJsonIterator>;
+    friend fly::Json;
 
     /**
      * A trait for testing if all types Ts are object iterators.
