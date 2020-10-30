@@ -642,7 +642,7 @@ CATCH_TEST_CASE("Json", "[json]")
             for (auto it = json.begin(); it != json.end(); ++it, ++size)
             {
                 CATCH_CHECK(*it == (size == 0 ? 1 : 2));
-                CATCH_CHECK(it.key() == (size == 0 ? "a" : "b"));
+                CATCH_CHECK(it.key() == (size == 0 ? FLY_JSON_STR("a") : FLY_JSON_STR("b")));
                 CATCH_CHECK(it.value() == (size == 0 ? 1 : 2));
             }
 
@@ -654,7 +654,7 @@ CATCH_TEST_CASE("Json", "[json]")
             for (auto it = json.cbegin(); it != json.cend(); ++it, ++size)
             {
                 CATCH_CHECK(*it == (size == 0 ? 1 : 2));
-                CATCH_CHECK(it.key() == (size == 0 ? "a" : "b"));
+                CATCH_CHECK(it.key() == (size == 0 ? FLY_JSON_STR("a") : FLY_JSON_STR("b")));
                 CATCH_CHECK(it.value() == (size == 0 ? 1 : 2));
             }
 

@@ -67,9 +67,9 @@ private:
     /**
      * ASCII codes for special JSON tokens.
      */
-    enum class Token : std::int16_t
+    enum class Token : std::char_traits<JsonTraits::char_type>::int_type
     {
-        EndOfFile = std::char_traits<JsonTraits::string_type::value_type>::eof(),
+        EndOfFile = std::char_traits<JsonTraits::char_type>::eof(),
 
         Tab = 0x09, // \t
         NewLine = 0x0a, // \n

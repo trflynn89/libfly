@@ -15,7 +15,7 @@
 CATCH_TEST_CASE("JsonTraits", "[json]")
 {
     using string_type = typename fly::JsonTraits::string_type;
-    using char_type = typename string_type::value_type;
+    using char_type = typename fly::JsonTraits::char_type;
 
     using array_type = std::array<int, 4>;
     using deque_type = std::deque<int>;

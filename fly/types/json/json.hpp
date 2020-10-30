@@ -19,6 +19,10 @@
 #include <variant>
 #include <vector>
 
+// Helper macros to choose the correct string literal prefix to use for JSON string types.
+#define FLY_JSON_CHR(ch) FLY_CHR(fly::JsonTraits::char_type, ch)
+#define FLY_JSON_STR(str) FLY_STR(fly::JsonTraits::char_type, str)
+
 namespace fly {
 
 /**
@@ -87,7 +91,7 @@ public:
     /**
      * Alias for a basic_stringstream with the JSON string type.
      */
-    using stream_type = std::basic_stringstream<JsonTraits::string_type::value_type>;
+    using stringstream_type = std::basic_stringstream<JsonTraits::char_type>;
 
     /**
      * Default constructor. Intializes the Json instance to a null value.
@@ -685,6 +689,11 @@ public:
     /**
      * Stream operator. Stream the Json instance into an output stream.
      *
+     * TODO This should be templated based on the std::basic_ostream character type. However, the
+     * C++ standard does not require std::basic_ostream specializations for character types other
+     * than char and wchar_t. It was empirically determined that e.g. char8_t doesn't work under
+     * both GCC and Clang. See: https://stackoverflow.com/a/57454958
+     *
      * @param stream A reference to the output stream.
      * @param json A reference to the Json instance to stream.
      *
@@ -734,7 +743,7 @@ private:
      *         enough available bytes.
      */
     static void read_escaped_character(
-        stream_type &stream,
+        stringstream_type &stream,
         JsonTraits::string_type::const_iterator &it,
         const JsonTraits::string_type::const_iterator &end);
 
@@ -760,8 +769,9 @@ private:
      *
      * @throws JsonException If the character value is not valid.
      */
-    static void
-    validate_character(stream_type &stream, const JsonTraits::string_type::const_iterator &it);
+    static void validate_character(
+        stringstream_type &stream,
+        const JsonTraits::string_type::const_iterator &it);
 
     json_type m_value {nullptr};
 };
@@ -833,14 +843,14 @@ Json::operator T() const noexcept
     }
     else
     {
-        stream_type stream;
+        stringstream_type stream;
         stream << *this;
 
         value = stream.str();
     }
 
     // The JSON string will have been validated for Unicode compliance during construction.
-    return String::convert<T>(value).value();
+    return JsonTraits::StringType::convert<T>(value).value();
 }
 
 //==================================================================================================
@@ -855,7 +865,7 @@ Json::operator T() const noexcept(false)
         for (const auto &it : value)
         {
             // The JSON string will have been validated for Unicode compliance during construction.
-            auto key = String::convert<typename T::key_type>(it.first).value();
+            auto key = JsonTraits::StringType::convert<typename T::key_type>(it.first).value();
             result.emplace(std::move(key), it.second);
         }
 
@@ -955,7 +965,7 @@ Json::operator T() const noexcept(false)
 
         if constexpr (std::is_same_v<U, JsonTraits::string_type>)
         {
-            if (auto converted = String::convert<T>(value); converted)
+            if (auto converted = JsonTraits::StringType::convert<T>(value); converted)
             {
                 return std::move(converted.value());
             }
