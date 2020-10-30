@@ -2,7 +2,6 @@
 
 #include "fly/fly.hpp"
 #include "fly/logger/logger.hpp"
-#include "fly/types/string/string.hpp"
 
 #include <string_view>
 
@@ -193,15 +192,15 @@ std::optional<Json> JsonParser::parse_value()
     {
         return value;
     }
-    else if (value == "true")
+    else if (value == FLY_JSON_STR("true"))
     {
         return true;
     }
-    else if (value == "false")
+    else if (value == FLY_JSON_STR("false"))
     {
         return false;
     }
-    else if (value == "null")
+    else if (value == FLY_JSON_STR("null"))
     {
         return nullptr;
     }
@@ -209,23 +208,23 @@ std::optional<Json> JsonParser::parse_value()
     switch (validate_number(value))
     {
         case JsonType::SignedInteger:
-            if (auto number = String::convert<JsonTraits::signed_type>(value); number)
+            if (auto num = JsonTraits::StringType::convert<JsonTraits::signed_type>(value); num)
             {
-                return number.value();
+                return num.value();
             }
             break;
 
         case JsonType::UnsignedInteger:
-            if (auto number = String::convert<JsonTraits::unsigned_type>(value); number)
+            if (auto num = JsonTraits::StringType::convert<JsonTraits::unsigned_type>(value); num)
             {
-                return number.value();
+                return num.value();
             }
             break;
 
         case JsonType::FloatingPoint:
-            if (auto number = String::convert<JsonTraits::float_type>(value); number)
+            if (auto num = JsonTraits::StringType::convert<JsonTraits::float_type>(value); num)
             {
-                return number.value();
+                return num.value();
             }
             break;
 
@@ -245,8 +244,8 @@ JsonParser::ParseState JsonParser::consume_token(const Token &token)
     {
         JLOG(
             "Unexpected character '%c', was expecting '%c'",
-            static_cast<JsonTraits::string_type::value_type>(parsed),
-            static_cast<JsonTraits::string_type::value_type>(token));
+            static_cast<char>(parsed),
+            static_cast<char>(token));
 
         return ParseState::Invalid;
     }
@@ -283,7 +282,7 @@ JsonParser::JsonType JsonParser::consume_value(JsonType type, JsonTraits::string
 {
     const bool is_string = type == JsonType::JsonString;
 
-    Json::stream_type parsing;
+    Json::stringstream_type parsing;
     Token token;
 
     auto stop_parsing = [&token, &is_string, this]() -> bool
@@ -304,7 +303,7 @@ JsonParser::JsonType JsonParser::consume_value(JsonType type, JsonTraits::string
 
     while (((token = m_stream->peek<Token>()) != Token::EndOfFile) && !stop_parsing())
     {
-        parsing << static_cast<Json::stream_type::char_type>(token);
+        parsing << static_cast<JsonTraits::char_type>(token);
         discard();
 
         // Blindly ignore escaped symbols, the Json class will check whether they are valid. Just
@@ -318,7 +317,7 @@ JsonParser::JsonType JsonParser::consume_value(JsonType type, JsonTraits::string
                 return JsonType::Invalid;
             }
 
-            parsing << static_cast<Json::stream_type::char_type>(token);
+            parsing << static_cast<JsonTraits::char_type>(token);
         }
     }
 
@@ -409,9 +408,7 @@ JsonParser::ParseState JsonParser::consume_comment()
         }
 
         default:
-            JLOG(
-                "Invalid start sequence for comments: '/%c'",
-                static_cast<JsonTraits::string_type::value_type>(token));
+            JLOG("Invalid start sequence for comments: '/%c'", static_cast<char>(token));
             return ParseState::Invalid;
     }
 
@@ -447,8 +444,8 @@ JsonParser::JsonType JsonParser::validate_number(const JsonTraits::string_type &
 {
     const bool is_signed = value[0] == '-';
 
-    const auto signless = std::basic_string_view<JsonTraits::string_type::value_type>(value).substr(
-        is_signed ? 1 : 0);
+    const auto signless =
+        std::basic_string_view<JsonTraits::char_type>(value).substr(is_signed ? 1 : 0);
 
     const bool is_octal = (signless.size() > 1) && (signless[0] == '0') &&
         std::isdigit(static_cast<unsigned char>(signless[1]));

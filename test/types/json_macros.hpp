@@ -55,5 +55,6 @@
             offset,                                                                                \
             json)))
 
+// These macros depend on the test defining a type named char_type for the string literals.
 #define J_CHR(ch) FLY_CHR(char_type, ch)
 #define J_STR(str) FLY_STR(char_type, str)

@@ -43,6 +43,17 @@ struct JsonTraits
     using array_type = std::vector<Json>;
 
     /**
+     * Alias for the fly::BasicString specialization for the JSON string type.
+     */
+    using StringType = BasicString<string_type>;
+
+    /**
+     * Alias for the JSON string character type. Though it is not a valid JSON type itself, knowing
+     * its type is often useful.
+     */
+    using char_type = typename string_type::value_type;
+
+    /**
      * Define a trait for testing if type T could be a JSON string.
      */
     template <typename T>

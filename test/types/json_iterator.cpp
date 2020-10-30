@@ -499,8 +499,8 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         iterator it2 = json.begin();
         iterator it1 = it2++;
 
-        CATCH_CHECK(it1.key() == "a");
-        CATCH_CHECK(it2.key() == "b");
+        CATCH_CHECK(it1.key() == FLY_JSON_STR("a"));
+        CATCH_CHECK(it2.key() == FLY_JSON_STR("b"));
 
         CATCH_CHECK_THROWS_NULL_WITH(json.end().key(), json);
         CATCH_CHECK_THROWS_NULL_WITH(json.cend().key(), json);

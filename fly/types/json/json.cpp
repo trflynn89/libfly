@@ -482,7 +482,7 @@ std::ostream &operator<<(std::ostream &stream, Json::const_reference json)
 //==================================================================================================
 JsonTraits::string_type Json::validate_string(const JsonTraits::string_type &str)
 {
-    stream_type stream;
+    stringstream_type stream;
 
     const auto end = str.cend();
 
@@ -503,7 +503,7 @@ JsonTraits::string_type Json::validate_string(const JsonTraits::string_type &str
 
 //==================================================================================================
 void Json::read_escaped_character(
-    stream_type &stream,
+    stringstream_type &stream,
     JsonTraits::string_type::const_iterator &it,
     const JsonTraits::string_type::const_iterator &end)
 {
@@ -542,7 +542,7 @@ void Json::read_escaped_character(
 
         case 'u':
             // The input sequence is expected to begin with the reverse solidus character.
-            if (auto value = String::unescape_codepoint(--it, end); value)
+            if (auto value = JsonTraits::StringType::unescape_codepoint(--it, end); value)
             {
                 stream << std::move(value.value());
             }
@@ -555,7 +555,8 @@ void Json::read_escaped_character(
             return;
 
         default:
-            throw JsonException(String::format("Invalid escape character '%c'", *it));
+            throw JsonException(
+                String::format("Invalid escape character '%c'", static_cast<char>(*it)));
     }
 
     ++it;
@@ -598,7 +599,7 @@ void Json::write_escaped_charater(
             break;
 
         default:
-            stream << String::escape_codepoint<'u'>(it, end).value();
+            stream << JsonTraits::StringType::escape_codepoint<'u'>(it, end).value();
             return;
     }
 
@@ -607,14 +608,15 @@ void Json::write_escaped_charater(
 
 //==================================================================================================
 void Json::validate_character(
-    stream_type &stream,
+    stringstream_type &stream,
     const JsonTraits::string_type::const_iterator &it)
 {
     const std::uint8_t ch = static_cast<std::uint8_t>(*it);
 
     if ((ch <= 0x1f) || (ch == 0x22) || (ch == 0x5c))
     {
-        throw JsonException(String::format("Character '%c' must be escaped", *it));
+        throw JsonException(
+            String::format("Character '%c' must be escaped", static_cast<char>(*it)));
     }
 
     stream << *it;
