@@ -29,7 +29,6 @@ class BasicStringUnicode
 {
     using traits = detail::BasicStringTraits<StringType>;
     using char_type = typename traits::char_type;
-    using const_iterator = typename traits::const_iterator;
     using codepoint_type = typename traits::codepoint_type;
 
 public:
@@ -37,6 +36,7 @@ public:
      * Convert the Unicode encoding of a string to another encoding.
      *
      * @tparam DesiredStringType The type of string to convert to.
+     * @tparam IteratorType The type of the encoded Unicode string's iterator.
      *
      * @param it Pointer to the beginning of the encoded Unicode string.
      * @param end Pointer to the end of the encoded Unicode string.
@@ -44,22 +44,25 @@ public:
      * @return If successful, a copy of the source string with the desired encoding. Otherwise, an
      *         unitialized value.
      */
-    template <typename DesiredStringType>
+    template <typename DesiredStringType, typename IteratorType>
     static std::optional<DesiredStringType>
-    convert_encoding(const_iterator &it, const const_iterator &end);
+    convert_encoding(IteratorType &it, const IteratorType &end);
 
     /**
      * Decode a single Unicode codepoint, starting at the character pointed to by the provided
      * iterator. If successful, after invoking this method, that iterator will point at the first
      * character after the Unicode codepoint in the source string.
      *
+     * @tparam IteratorType The type of the encoded Unicode codepoint's iterator.
+     *
      * @param it Pointer to the beginning of the encoded Unicode codepoint.
      * @param end Pointer to the end of the encoded Unicode codepoint.
      *
      * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized value.
      */
+    template <typename IteratorType>
     static std::optional<codepoint_type>
-    decode_codepoint(const_iterator &it, const const_iterator &end);
+    decode_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
      * Encode a single Unicode codepoint.
@@ -91,6 +94,7 @@ public:
      *        the encoding will of the form \Unnnnnnnn.
      *
      * @tparam UnicodePrefix The Unicode prefix character ('u' or 'U').
+     * @tparam IteratorType The type of the encoded Unicode codepoint's iterator.
      *
      * @param it Pointer to the beginning of the encoded Unicode codepoint.
      * @param end Pointer to the end of the encoded Unicode codepoint.
@@ -98,9 +102,8 @@ public:
      * @return If successful, a string containing the escaped Unicode codepoint. Otherwise, an
      *         unitialized value.
      */
-    template <char UnicodePrefix = 'U'>
-    static std::optional<StringType>
-    escape_codepoint(const_iterator &it, const const_iterator &end);
+    template <char UnicodePrefix = 'U', typename IteratorType>
+    static std::optional<StringType> escape_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
      * Unescape a single Unicode codepoint, starting at the character pointed to by provided
@@ -113,14 +116,16 @@ public:
      *     2. \unnnn\unnnn surrogate pairs for Unicode codepoints in the range [U+10000, U+10FFFF].
      *     3. \Unnnnnnnn for all Unicode codepoints.
      *
+     * @tparam IteratorType The type of the escaped Unicode string's iterator.
+     *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
      *
      * @return If successful, a string containing the unescaped Unicode codepoint. Otherwise, an
      *         unitialized value.
      */
-    static std::optional<StringType>
-    unescape_codepoint(const_iterator &it, const const_iterator &end);
+    template <typename IteratorType>
+    static std::optional<StringType> unescape_codepoint(IteratorType &it, const IteratorType &end);
 
 private:
     using EncodedByteProvider = std::function<std::optional<codepoint_type>()>;
@@ -142,6 +147,7 @@ private:
      * Unescape a sequence of characters to form a single Unicode codepoint.
      *
      * @tparam UnicodePrefix The escaped Unicode prefix character ('u' or 'U').
+     * @tparam IteratorType The type of the escaped Unicode string's iterator.
      *
      * @param it Pointer to the beginning of the escaped character sequence.
      * @param end Pointer to the end of the escaped character sequence.
@@ -149,9 +155,9 @@ private:
      * @return If successful, a string containing the parsed Unicode codepoint. Otherwise, an
      *         unitialized value.
      */
-    template <char UnicodePrefix>
+    template <char UnicodePrefix, typename IteratorType>
     static std::optional<codepoint_type>
-    unescape_codepoint(const_iterator &it, const const_iterator &end);
+    unescape_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
      * Decode a Unicode codepoint from a UTF-8 string.
@@ -295,9 +301,9 @@ private:
 
 //==================================================================================================
 template <typename StringType>
-template <typename DesiredStringType>
+template <typename DesiredStringType, typename IteratorType>
 std::optional<DesiredStringType>
-BasicStringUnicode<StringType>::convert_encoding(const_iterator &it, const const_iterator &end)
+BasicStringUnicode<StringType>::convert_encoding(IteratorType &it, const IteratorType &end)
 {
     using DesiredUnicodeType = BasicStringUnicode<DesiredStringType>;
 
@@ -323,7 +329,8 @@ BasicStringUnicode<StringType>::convert_encoding(const_iterator &it, const const
 
 //==================================================================================================
 template <typename StringType>
-auto BasicStringUnicode<StringType>::decode_codepoint(const_iterator &it, const const_iterator &end)
+template <typename IteratorType>
+auto BasicStringUnicode<StringType>::decode_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<codepoint_type>
 {
     auto next_encoded_byte = [&it, &end]() -> std::optional<codepoint_type>
@@ -360,9 +367,9 @@ std::optional<StringType> BasicStringUnicode<StringType>::encode_codepoint(codep
 
 //==================================================================================================
 template <typename StringType>
-template <char UnicodePrefix>
+template <char UnicodePrefix, typename IteratorType>
 std::optional<StringType>
-BasicStringUnicode<StringType>::escape_codepoint(const_iterator &it, const const_iterator &end)
+BasicStringUnicode<StringType>::escape_codepoint(IteratorType &it, const IteratorType &end)
 {
     static_assert((UnicodePrefix == 'u') || (UnicodePrefix == 'U'));
 
@@ -376,8 +383,9 @@ BasicStringUnicode<StringType>::escape_codepoint(const_iterator &it, const const
 
 //==================================================================================================
 template <typename StringType>
+template <typename IteratorType>
 std::optional<StringType>
-BasicStringUnicode<StringType>::unescape_codepoint(const_iterator &it, const const_iterator &end)
+BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
 {
     auto escaped_with = [&it, &end](const char_type ch) -> bool
     {
@@ -471,10 +479,9 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
 
 //==================================================================================================
 template <typename StringType>
-template <char UnicodePrefix>
-auto BasicStringUnicode<StringType>::unescape_codepoint(
-    const_iterator &it,
-    const const_iterator &end) -> std::optional<codepoint_type>
+template <char UnicodePrefix, typename IteratorType>
+auto BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
+    -> std::optional<codepoint_type>
 {
     static_assert((UnicodePrefix == 'u') || (UnicodePrefix == 'U'));
 
