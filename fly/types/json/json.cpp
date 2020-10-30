@@ -363,20 +363,6 @@ Json::const_iterator Json::cend() const
 }
 
 //==================================================================================================
-void Json::swap(JsonTraits::string_type &other)
-{
-    if (is_string())
-    {
-        auto &value = std::get<JsonTraits::string_type>(m_value);
-        std::swap(value, other);
-    }
-    else
-    {
-        throw JsonException(*this, "JSON type invalid for swap(string)");
-    }
-}
-
-//==================================================================================================
 bool operator==(Json::const_reference json1, Json::const_reference json2)
 {
     auto visitor = [](const auto &value1, const auto &value2) -> bool

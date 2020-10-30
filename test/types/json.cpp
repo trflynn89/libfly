@@ -334,39 +334,6 @@ CATCH_TEST_CASE("Json", "[json]")
         CATCH_CHECK(json3 == "string");
     }
 
-    CATCH_SECTION("Swap a JSON instance with a string-like type")
-    {
-        fly::Json json;
-        std::string str;
-
-        json = "abcdef";
-        str = "ghijkl";
-        CATCH_CHECK_NOTHROW(json.swap(str));
-        CATCH_CHECK(json == "ghijkl");
-        CATCH_CHECK(str == "abcdef");
-
-        json = {{"a", 1}, {"b", 2}};
-        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
-
-        json = {'7', 8, 9, 10};
-        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
-
-        json = true;
-        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
-
-        json = 1;
-        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
-
-        json = static_cast<unsigned int>(1);
-        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
-
-        json = 1.0f;
-        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
-
-        json = nullptr;
-        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
-    }
-
     CATCH_SECTION("Swap a JSON instance with an object-like type")
     {
         auto validate = [](auto *name, auto &test1, auto &test2, auto &test3)
@@ -1012,7 +979,7 @@ CATCH_TEST_CASE("Json", "[json]")
 }
 
 CATCH_TEMPLATE_TEST_CASE(
-    "JsonObjectAccess",
+    "JsonStringOperations",
     "[json]",
     std::string,
     std::wstring,
@@ -1215,5 +1182,36 @@ CATCH_TEMPLATE_TEST_CASE(
             null2.at(J_STR("a")),
             "JSON type invalid for operator[key]: (%s)",
             null2);
+    }
+
+    CATCH_SECTION("Swap a JSON instance with a string-like type")
+    {
+        fly::Json json = "abcdef";
+        string_type str = J_STR("ghijkl");
+
+        CATCH_CHECK_NOTHROW(json.swap(str));
+        CATCH_CHECK(json == "ghijkl");
+        CATCH_CHECK(str == J_STR("abcdef"));
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
     }
 }

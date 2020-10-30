@@ -569,15 +569,20 @@ public:
      * Exchange the contents of the Json instance with another string. Only valid if the Json
      * instance is a string.
      *
+     * @tparam T The string type to swap with.
+     *
      * @param json The string to swap with.
      *
      * @throws JsonException If the Json instance is not a string.
      */
-    void swap(JsonTraits::string_type &other);
+    template <typename T, enable_if_all<detail::is_supported_string<T>> = 0>
+    void swap(T &other);
 
     /**
      * Exchange the contents of the Json instance with another object. Only valid if the Json
      * instance is an object.
+     *
+     * @tparam T The object type to swap with.
      *
      * @param json The object to swap with.
      *
@@ -589,6 +594,8 @@ public:
     /**
      * Exchange the contents of the Json instance with another array. Only valid if the Json
      * instance is an array.
+     *
+     * @tparam T The array type to swap with.
      *
      * @param json The array to swap with.
      *
@@ -1030,6 +1037,23 @@ Json::const_reference Json::at(const T &key) const
     }
 
     throw JsonException(*this, "JSON type invalid for operator[key]");
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<detail::is_supported_string<T>>>
+void Json::swap(T &other)
+{
+    if (is_string())
+    {
+        T string = static_cast<T>(*this);
+
+        *this = std::move(other);
+        other = std::move(string);
+    }
+    else
+    {
+        throw JsonException(*this, "JSON type invalid for swap(string)");
+    }
 }
 
 //==================================================================================================
