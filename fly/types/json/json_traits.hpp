@@ -43,16 +43,25 @@ struct JsonTraits
     using array_type = std::vector<Json>;
 
     /**
-     * Define a trait for testing if type T is a JSON string.
+     * Define a trait for testing if type T could be a JSON string.
      */
     template <typename T>
-    using is_string = detail::is_like_supported_string<T>;
-
-    template <typename T>
-    using is_string_t = typename is_string<T>::type;
+    using is_string = detail::is_supported_string<T>;
 
     template <typename T>
     inline static constexpr bool is_string_v = is_string<T>::value;
+
+    /**
+     * Define a trait for testing if type T is like a JSON string.
+     */
+    template <typename T>
+    using is_string_like = detail::is_like_supported_string<T>;
+
+    template <typename T>
+    using is_string_like_t = typename is_string_like<T>::type;
+
+    template <typename T>
+    inline static constexpr bool is_string_like_v = is_string_like<T>::value;
 
     /**
      * Define a trait for testing if type T is a JSON boolean.
@@ -114,7 +123,7 @@ struct JsonTraits
     struct ObjectTraits
     {
         template <typename Key>
-        using is_string_key = std::bool_constant<is_string_v<Key>>;
+        using is_string_key = std::bool_constant<is_string_like_v<Key>>;
 
         template <typename>
         struct IsObject : std::false_type
