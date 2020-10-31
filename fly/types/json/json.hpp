@@ -107,9 +107,8 @@ public:
 
     /**
      * String constructor. Intializes the Json instance to a string value. The SFINAE declaration
-     * allows construction of a string value from any string-like type (std::string / char[],
-     * std::wstring / wchar_t[], std::u8string / char8_t[], std::u16string / char16_t[],
-     * std::u32string / char32_t[]]).
+     * allows construction of a string value from any string-like type (e.g. std::string, char8_t[],
+     * std::u16string_view).
      *
      * @tparam T The string-like type.
      *
@@ -296,10 +295,11 @@ public:
     explicit operator JsonTraits::null_type() const noexcept(false);
 
     /**
-     * String conversion operator. Converts the Json instance to a string. Note that although a Json
-     * instance can be constructed from a char array, it is not allowed to directly convert a Json
-     * instance into a char array. If this is needed, first convert to a string, then into a char
-     * array.
+     * String conversion operator. Converts the Json instance to a string. The SFINAE declaration
+     * allows conversion to any string type (e.g. std::string, std::u8string).
+     *
+     * Note that although a Json instance can be constructed from a character array, it is not
+     * allowed to directly convert a Json instance into a character array.
      *
      * @tparam T The string type.
      *
@@ -310,7 +310,7 @@ public:
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The SFINAE declaration
-     * allows construction of any object-like type (e.g. std::map, std::multimap) from the Json
+     * allows converstion to any object-like type (e.g. std::map, std::multimap) from the Json
      * instance.
      *
      * @tparam T The object-like type.
@@ -325,9 +325,9 @@ public:
 
     /**
      * Array conversion operator. Converts the Json instance to an array. The SFINAE declaration
-     * allows construction of any array-like type (e.g. std::list, std::vector) from the Json
-     * instance, except for std::array, which due to being an aggregate type, has its own explicit
-     * conversion operator.
+     * allows converstion to any array-like type (e.g. std::list, std::vector) from the Json
+     * instance. This excludes std::array, which due to being an aggregate type, has its own
+     * explicit conversion operator.
      *
      * @tparam T The array-like type.
      *
@@ -342,7 +342,7 @@ public:
     /**
      * Array conversion operator. Converts the Json instance to a std::array. If the Json instance
      * has more values than the std::array can hold, the values are dropped. If the Json instance
-     * has less values than the std::array can hold, the remainder is value-initialized.
+     * has less values than the std::array can hold, the remainder are value-initialized.
      *
      * @tparam T The std::array value type.
      * @tparam N The std::array size.
@@ -370,7 +370,7 @@ public:
 
     /**
      * Numeric conversion operator. Converts the Json instance to a numeric type. The SFINAE
-     * declaration allows construction of any numeric type type (e.g. char, uint64_t, float) from
+     * declaration allows conversion to any numeric type type (e.g. char, uint64_t, float) from
      * the Json instance. Allows for converting between signed integers, unsigned integers, and
      * floats. Also allows for converting from a numeric-like string (e.g. "123") to a numeric type.
      *
@@ -391,8 +391,7 @@ public:
 
     /**
      * Object access operator. The SFINAE declaration allows lookups with any string-like type
-     * (std::string / char[], std::wstring / wchar_t[], std::u8string / char8_t[], std::u16string /
-     * char16_t[], std::u32string / char32_t[]]).
+     * (e.g. std::string, char8_t[], std::u16string_view).
      *
      * If the Json instance is an object, perform a lookup on the object with a key value. If the
      * key value is not found, a null Json instance will be created for that key.
@@ -413,8 +412,7 @@ public:
 
     /**
      * Object read-only access operator. The SFINAE declaration allows lookups with any string-like
-     * type (std::string / char[], std::wstring / wchar_t[], std::u8string / char8_t[],
-     * std::u16string / char16_t[], std::u32string / char32_t[]]).
+     * type (e.g. std::string, char8_t[], std::u16string_view).
      *
      * If the Json instance is an object, perform a lookup on the object with a key value.
      *
@@ -459,8 +457,7 @@ public:
 
     /**
      * Object read-only accessor. The SFINAE declaration allows lookups with any string-like type
-     * (std::string / char[], std::wstring / wchar_t[], std::u8string / char8_t[], std::u16string /
-     * char16_t[], std::u32string / char32_t[]]).
+     * (e.g. std::string, char8_t[], std::u16string_view).
      *
      * If the Json instance is an object, perform a lookup on the object with a key value.
      *
@@ -478,12 +475,11 @@ public:
 
     /**
      * Object read-only accessor. The SFINAE declaration allows lookups with any string-like type
-     * (std::string / char[], std::wstring / wchar_t[], std::u8string / char8_t[], std::u16string /
-     * char16_t[], std::u32string / char32_t[]]).
-     *
-     * @tparam T The string-like key type.
+     * (e.g. std::string, char8_t[], std::u16string_view).
      *
      * If the Json instance is an object, perform a lookup on the object with a key value.
+     *
+     * @tparam T The string-like key type.
      *
      * @param key The key value to lookup.
      *
@@ -571,7 +567,11 @@ public:
 
     /**
      * Exchange the contents of the Json instance with another string. Only valid if the Json
-     * instance is a string.
+     * instance is a string. The SFINAE declaration allows swapping with any string type (e.g.
+     * std::string, std::u8string).
+     *
+     * Note that although a Json instance can be constructed from a character array, it is not
+     * allowed to directly swap a Json instance with a character array.
      *
      * @tparam T The string type to swap with.
      *
@@ -584,7 +584,8 @@ public:
 
     /**
      * Exchange the contents of the Json instance with another object. Only valid if the Json
-     * instance is an object.
+     * instance is an object.  The SFINAE declaration allows swapping with any object-like type
+     * (e.g. std::map, std::multimap).
      *
      * @tparam T The object type to swap with.
      *
@@ -597,7 +598,8 @@ public:
 
     /**
      * Exchange the contents of the Json instance with another array. Only valid if the Json
-     * instance is an array.
+     * instance is an array. The SFINAE declaration allows swapping with any array-like type (e.g.
+     * std::list, std::vector).
      *
      * @tparam T The array type to swap with.
      *
