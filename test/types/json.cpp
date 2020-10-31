@@ -1214,4 +1214,111 @@ CATCH_TEMPLATE_TEST_CASE(
         json = nullptr;
         CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
     }
+
+    CATCH_SECTION("Find a value with a key in a JSON object")
+    {
+        fly::Json string1 = "abc";
+        CATCH_CHECK_THROWS_JSON(
+            string1.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            string1);
+
+        const fly::Json string2 = "abc";
+        CATCH_CHECK_THROWS_JSON(
+            string2.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            string2);
+
+        fly::Json object1 = {{"a", 1}, {"b", 2}};
+        auto it1a = object1.find(J_STR("a"));
+        auto it1b = object1.find(J_STR("b"));
+        auto it1c = object1.find(J_STR("c"));
+        CATCH_REQUIRE(it1a != object1.end());
+        CATCH_REQUIRE(it1b != object1.end());
+        CATCH_CHECK(*it1a == 1);
+        CATCH_CHECK(*it1b == 2);
+        CATCH_CHECK(it1c == object1.end());
+
+        const fly::Json object2 = {{"a", 1}, {"b", 2}};
+        auto it2a = object2.find(J_STR("a"));
+        auto it2b = object2.find(J_STR("b"));
+        auto it2c = object2.find(J_STR("c"));
+        CATCH_REQUIRE(it2a != object2.end());
+        CATCH_REQUIRE(it2b != object2.end());
+        CATCH_CHECK(*it2a == 1);
+        CATCH_CHECK(*it2b == 2);
+        CATCH_CHECK(it2c == object2.end());
+
+        fly::Json array1 = {'7', 8};
+        CATCH_CHECK_THROWS_JSON(
+            array1.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            array1);
+
+        const fly::Json array2 = {'7', 8};
+        CATCH_CHECK_THROWS_JSON(
+            array2.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            array2);
+
+        fly::Json bool1 = true;
+        CATCH_CHECK_THROWS_JSON(
+            bool1.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            bool1);
+
+        const fly::Json bool2 = true;
+        CATCH_CHECK_THROWS_JSON(
+            bool2.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            bool2);
+
+        fly::Json signed1 = 1;
+        CATCH_CHECK_THROWS_JSON(
+            signed1.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            signed1);
+
+        const fly::Json signed2 = 1;
+        CATCH_CHECK_THROWS_JSON(
+            signed2.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            signed2);
+
+        fly::Json unsigned1 = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            unsigned1.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            unsigned1);
+
+        const fly::Json unsigned2 = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            unsigned2.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            unsigned2);
+
+        fly::Json float1 = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            float1.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            float1);
+
+        const fly::Json float2 = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            float2.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            float2);
+
+        fly::Json null1 = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            null1.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            null1);
+
+        const fly::Json null2 = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            null2.find(J_STR("a")),
+            "JSON type invalid for find(key): (%s)",
+            null2);
+    }
 }

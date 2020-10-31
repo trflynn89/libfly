@@ -611,6 +611,40 @@ public:
     void swap(T &other);
 
     /**
+     * Search for an element in the Json instance with a given key. Only valid if the Json instance
+     * is an object. The SFINAE declaration allows lookups with any string-like type (e.g.
+     * std::string, char8_t[], std::u16string_view).
+     *
+     * @tparam T The string-like key type.
+     *
+     * @param key The key value to lookup.
+     *
+     * @return If found, an iterator to the element at the key value. If not found, returns a
+     *         past-the-end iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or the key value is invalid.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    iterator find(const T &key);
+
+    /**
+     * Search for an element in the Json instance with a given key. Only valid if the Json instance
+     * is an object. The SFINAE declaration allows lookups with any string-like type (e.g.
+     * std::string, char8_t[], std::u16string_view).
+     *
+     * @tparam T The string-like key type.
+     *
+     * @param key The key value to lookup.
+     *
+     * @return If found, an iterator to the element at the key value. If not found, returns a
+     *         past-the-end iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or the key value is invalid.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    const_iterator find(const T &key) const;
+
+    /**
      * Retrieve an iterator to the beginning of the Json instance.
      *
      * @return The retrieved iterator.
@@ -1100,6 +1134,40 @@ void Json::swap(T &other)
     {
         throw JsonException(*this, "JSON type invalid for swap(array)");
     }
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+Json::iterator Json::find(const T &key)
+{
+    if (is_object())
+    {
+        auto &value = std::get<JsonTraits::object_type>(m_value);
+
+        auto it = end();
+        it.m_iterator = value.find(convert_to_string(key));
+
+        return it;
+    }
+
+    throw JsonException(*this, "JSON type invalid for find(key)");
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+Json::const_iterator Json::find(const T &key) const
+{
+    if (is_object())
+    {
+        const auto &value = std::get<JsonTraits::object_type>(m_value);
+
+        auto it = cend();
+        it.m_iterator = value.find(convert_to_string(key));
+
+        return it;
+    }
+
+    throw JsonException(*this, "JSON type invalid for find(key)");
 }
 
 //==================================================================================================
