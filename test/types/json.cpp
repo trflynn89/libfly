@@ -1381,4 +1381,64 @@ CATCH_TEMPLATE_TEST_CASE(
             "JSON type invalid for find(key): (%s)",
             null2);
     }
+
+    CATCH_SECTION("Check for the existence of a key in a JSON object")
+    {
+        fly::Json string1 = "abc";
+        CATCH_CHECK_THROWS_JSON(
+            string1.contains(J_STR("a")),
+            "JSON type invalid for contains(key): (%s)",
+            string1);
+
+        fly::Json object1 = fly::JsonTraits::object_type();
+        CATCH_CHECK_FALSE(object1.contains(J_STR("a")));
+        CATCH_CHECK_FALSE(object1.contains(J_STR("b")));
+        CATCH_CHECK_FALSE(object1.contains(J_STR("c")));
+
+        fly::Json object2 = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK(object2.contains(J_STR("a")));
+        CATCH_CHECK(object2.contains(J_STR("b")));
+        CATCH_CHECK_FALSE(object2.contains(J_STR("c")));
+
+        fly::Json object3 = {{"a", 1}, {"a", 2}};
+        CATCH_CHECK(object3.contains(J_STR("a")));
+        CATCH_CHECK_FALSE(object3.contains(J_STR("b")));
+        CATCH_CHECK_FALSE(object3.contains(J_STR("c")));
+
+        fly::Json array1 = {'7', 8};
+        CATCH_CHECK_THROWS_JSON(
+            array1.contains(J_STR("a")),
+            "JSON type invalid for contains(key): (%s)",
+            array1);
+
+        fly::Json bool1 = true;
+        CATCH_CHECK_THROWS_JSON(
+            bool1.contains(J_STR("a")),
+            "JSON type invalid for contains(key): (%s)",
+            bool1);
+
+        fly::Json signed1 = 1;
+        CATCH_CHECK_THROWS_JSON(
+            signed1.contains(J_STR("a")),
+            "JSON type invalid for contains(key): (%s)",
+            signed1);
+
+        fly::Json unsigned1 = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            unsigned1.contains(J_STR("a")),
+            "JSON type invalid for contains(key): (%s)",
+            unsigned1);
+
+        fly::Json float1 = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            float1.contains(J_STR("a")),
+            "JSON type invalid for contains(key): (%s)",
+            float1);
+
+        fly::Json null1 = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            null1.contains(J_STR("a")),
+            "JSON type invalid for contains(key): (%s)",
+            null1);
+    }
 }
