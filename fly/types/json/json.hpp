@@ -661,6 +661,22 @@ public:
     const_iterator find(const T &key) const;
 
     /**
+     * Check if there is an element in the Json instance with a given key. Only valid if the Json
+     * instance is an object. The SFINAE declaration allows lookups with any string-like type (e.g.
+     * std::string, char8_t[], std::u16string_view).
+     *
+     * @tparam T The string-like key type.
+     *
+     * @param key The key value to lookup.
+     *
+     * @return True if an element was found at the key value.
+     *
+     * @throws JsonException If the Json instance is not an object or the key value is invalid.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    bool contains(const T &key) const;
+
+    /**
      * Retrieve an iterator to the beginning of the Json instance.
      *
      * @return The retrieved iterator.
@@ -1197,6 +1213,19 @@ Json::const_iterator Json::find(const T &key) const
     }
 
     throw JsonException(*this, "JSON type invalid for find(key)");
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+bool Json::contains(const T &key) const
+{
+    if (is_object())
+    {
+        const auto &value = std::get<JsonTraits::object_type>(m_value);
+        return value.find(convert_to_string(key)) != value.end();
+    }
+
+    throw JsonException(*this, "JSON type invalid for contains(key)");
 }
 
 //==================================================================================================
