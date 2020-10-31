@@ -611,6 +611,22 @@ public:
     void swap(T &other);
 
     /**
+     * Count the number of elements in the Json instance with a given key. Only valid if the Json
+     * instance is an object. The SFINAE declaration allows lookups with any string-like type (e.g.
+     * std::string, char8_t[], std::u16string_view).
+     *
+     * @tparam T The string-like key type.
+     *
+     * @param key The key value to lookup.
+     *
+     * @return If found, number of elements at the key value. If not found, returns 0.
+     *
+     * @throws JsonException If the Json instance is not an object or the key value is invalid.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    size_type count(const T &key) const;
+
+    /**
      * Search for an element in the Json instance with a given key. Only valid if the Json instance
      * is an object. The SFINAE declaration allows lookups with any string-like type (e.g.
      * std::string, char8_t[], std::u16string_view).
@@ -1134,6 +1150,19 @@ void Json::swap(T &other)
     {
         throw JsonException(*this, "JSON type invalid for swap(array)");
     }
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+Json::size_type Json::count(const T &key) const
+{
+    if (is_object())
+    {
+        const auto &value = std::get<JsonTraits::object_type>(m_value);
+        return value.count(convert_to_string(key));
+    }
+
+    throw JsonException(*this, "JSON type invalid for count(key)");
 }
 
 //==================================================================================================
