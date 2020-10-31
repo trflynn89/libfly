@@ -559,6 +559,55 @@ public:
     void clear();
 
     /**
+     * Insert a copy of a key-value pair into the Json instance. Only valid if the Json instance is
+     * an object. The SFINAE declaration allows inserting a value with a key of any string-like type
+     * (e.g. std::string, char8_t[], std::u16string_view).
+     *
+     * @tparam Key The string-like type of the inserted value's key.
+     *
+     * @param value The key-value pair to insert.
+     *
+     * @return An iterator-boolean pair. The boolean indicates whether the insertion was successful.
+     *         If so, the iterator is that of the inserted element. If not, the iterator points to
+     *         the element which prevented the insertion.
+     *
+     * @throws JsonException If the Json instance is not an object or the key value is invalid.
+     */
+    template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
+    std::pair<iterator, bool> insert(const std::pair<Key, Json> &value);
+
+    /**
+     * Insert a moved key-value pair into the Json instance. Only valid if the Json instance is an
+     * object. The SFINAE declaration allows inserting a value with a key of any string-like type
+     * (e.g. std::string, char8_t[], std::u16string_view).
+     *
+     * @tparam Key The string-like type of the inserted value's key.
+     *
+     * @param value The key-value pair to insert.
+     *
+     * @return An iterator-boolean pair. The boolean indicates whether the insertion was successful.
+     *         If so, the iterator is that of the inserted element. If not, the iterator points to
+     *         the element which prevented the insertion.
+     *
+     * @throws JsonException If the Json instance is not an object or the key value is invalid.
+     */
+    template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
+    std::pair<iterator, bool> insert(std::pair<Key, Json> &&value);
+
+    /**
+     * Insert all values into the Json instance in the range [first, last). Only valid if the Json
+     * instance is an object.
+     *
+     * @param first The beginning of the range of values to insert.
+     * @param last The end of the range of values to insert.
+     *
+     * @throws JsonException If the Json instance is not an object, the key value is invalid, the
+     *         provided iterators are not for the same Json instance, or the provided iterators are
+     *         for non-object Json instances.
+     */
+    void insert(const_iterator first, const_iterator last);
+
+    /**
      * Exchange the contents of the Json instance with another instance.
      *
      * @param json The Json instance to swap with.
@@ -1115,6 +1164,42 @@ Json::const_reference Json::at(const T &key) const
     }
 
     throw JsonException(*this, "JSON type invalid for operator[key]");
+}
+
+//==================================================================================================
+template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
+std::pair<Json::iterator, bool> Json::insert(const std::pair<Key, Json> &value)
+{
+    if (is_object())
+    {
+        auto &storage = std::get<JsonTraits::object_type>(m_value);
+        auto it = end();
+
+        auto result = storage.insert({convert_to_string(value.first), value.second});
+        it.m_iterator = result.first;
+
+        return {it, result.second};
+    }
+
+    throw JsonException(*this, "JSON type invalid for insert(value &)");
+}
+
+//==================================================================================================
+template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
+std::pair<Json::iterator, bool> Json::insert(std::pair<Key, Json> &&value)
+{
+    if (is_object())
+    {
+        auto &storage = std::get<JsonTraits::object_type>(m_value);
+        auto it = end();
+
+        auto result = storage.insert({convert_to_string(value.first), std::move(value.second)});
+        it.m_iterator = result.first;
+
+        return {it, result.second};
+    }
+
+    throw JsonException(*this, "JSON type invalid for insert(value &&)");
 }
 
 //==================================================================================================

@@ -321,6 +321,31 @@ void Json::clear()
 }
 
 //==================================================================================================
+void Json::insert(const_iterator first, const_iterator last)
+{
+    if (!is_object())
+    {
+        throw JsonException(*this, "JSON type invalid for insert(first, last)");
+    }
+    else if (first.m_json != last.m_json)
+    {
+        throw JsonException("Provided iterators are for different Json instances");
+    }
+    else if ((first.m_json == nullptr) || !first.m_json->is_object())
+    {
+        throw JsonException("Provided iterators' JSON type invalid for insert(first, last)");
+    }
+
+    using object_iterator_type = typename const_iterator::object_iterator_type;
+
+    const auto &first_iterator = std::get<object_iterator_type>(first.m_iterator);
+    const auto &last_iterator = std::get<object_iterator_type>(last.m_iterator);
+
+    auto &value = std::get<JsonTraits::object_type>(m_value);
+    value.insert(first_iterator, last_iterator);
+}
+
+//==================================================================================================
 void Json::swap(reference json)
 {
     std::swap(m_value, json.m_value);
