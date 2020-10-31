@@ -1215,6 +1215,66 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_THROWS_JSON(json.swap(str), "JSON type invalid for swap(string): (%s)", json);
     }
 
+    CATCH_SECTION("Count the number of values with a key in a JSON object")
+    {
+        fly::Json string1 = "abc";
+        CATCH_CHECK_THROWS_JSON(
+            string1.count(J_STR("a")),
+            "JSON type invalid for count(key): (%s)",
+            string1);
+
+        fly::Json object1 = fly::JsonTraits::object_type();
+        CATCH_CHECK(object1.count(J_STR("a")) == 0);
+        CATCH_CHECK(object1.count(J_STR("b")) == 0);
+        CATCH_CHECK(object1.count(J_STR("c")) == 0);
+
+        fly::Json object2 = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK(object2.count(J_STR("a")) == 1);
+        CATCH_CHECK(object2.count(J_STR("b")) == 1);
+        CATCH_CHECK(object2.count(J_STR("c")) == 0);
+
+        fly::Json object3 = {{"a", 1}, {"a", 2}};
+        CATCH_CHECK(object3.count(J_STR("a")) == 1);
+        CATCH_CHECK(object3.count(J_STR("b")) == 0);
+        CATCH_CHECK(object3.count(J_STR("c")) == 0);
+
+        fly::Json array1 = {'7', 8};
+        CATCH_CHECK_THROWS_JSON(
+            array1.count(J_STR("a")),
+            "JSON type invalid for count(key): (%s)",
+            array1);
+
+        fly::Json bool1 = true;
+        CATCH_CHECK_THROWS_JSON(
+            bool1.count(J_STR("a")),
+            "JSON type invalid for count(key): (%s)",
+            bool1);
+
+        fly::Json signed1 = 1;
+        CATCH_CHECK_THROWS_JSON(
+            signed1.count(J_STR("a")),
+            "JSON type invalid for count(key): (%s)",
+            signed1);
+
+        fly::Json unsigned1 = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            unsigned1.count(J_STR("a")),
+            "JSON type invalid for count(key): (%s)",
+            unsigned1);
+
+        fly::Json float1 = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            float1.count(J_STR("a")),
+            "JSON type invalid for count(key): (%s)",
+            float1);
+
+        fly::Json null1 = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            null1.count(J_STR("a")),
+            "JSON type invalid for count(key): (%s)",
+            null1);
+    }
+
     CATCH_SECTION("Find a value with a key in a JSON object")
     {
         fly::Json string1 = "abc";
