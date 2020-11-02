@@ -720,6 +720,26 @@ public:
     Json::reference emplace_back(Args &&...args);
 
     /**
+     * Append a copy of a Json value to the end of the Json instance. Only valid if the Json
+     * instance is an array.
+     *
+     * @param value The Json value to append.
+     *
+     * @throws JsonException If the Json instance is not an array.
+     */
+    void push_back(const Json &value);
+
+    /**
+     * Append a moved Json value to the end of the Json instance. Only valid if the Json instance is
+     * an array.
+     *
+     * @param value The Json value to append.
+     *
+     * @throws JsonException If the Json instance is not an array.
+     */
+    void push_back(Json &&value);
+
+    /**
      * Exchange the contents of the Json instance with another instance.
      *
      * @param json The Json instance to swap with.
