@@ -705,6 +705,21 @@ public:
     std::pair<iterator, bool> emplace(Args &&...args);
 
     /**
+     * Construct an element in-place at the end of the Json instance. Only valid if the Json
+     * instance is an array.
+     *
+     * @tparam Args Variadic template arguments for value construction.
+     *
+     * @param args The list of arguments for value construction.
+     *
+     * @return An iterator pointed at the emplaced element.
+     *
+     * @throws JsonException If the Json instance is not an array.
+     */
+    template <typename... Args>
+    Json::reference emplace_back(Args &&...args);
+
+    /**
      * Exchange the contents of the Json instance with another instance.
      *
      * @param json The Json instance to swap with.
@@ -1339,6 +1354,19 @@ std::pair<Json::iterator, bool> Json::emplace(Args &&...args)
     it.m_iterator = result.first;
 
     return {it, result.second};
+}
+
+//==================================================================================================
+template <typename... Args>
+Json::reference Json::emplace_back(Args &&...args)
+{
+    if (!is_array())
+    {
+        throw JsonException(*this, "JSON type invalid for array emplacement");
+    }
+
+    auto &value = std::get<JsonTraits::array_type>(m_value);
+    return value.emplace_back(std::forward<Args>(args)...);
 }
 
 //==================================================================================================
