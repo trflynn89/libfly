@@ -401,6 +401,99 @@ void Json::push_back(Json &&value)
 }
 
 //==================================================================================================
+Json::iterator Json::erase(const_iterator position)
+{
+    auto visitor = [this, &position](auto &value) -> iterator
+    {
+        using T = std::decay_t<decltype(value)>;
+
+        if constexpr (any_same_v<T, JsonTraits::object_type, JsonTraits::array_type>)
+        {
+            using iterator_type = std::conditional_t<
+                std::is_same_v<T, JsonTraits::object_type>,
+                typename const_iterator::object_iterator_type,
+                typename const_iterator::array_iterator_type>;
+
+            auto it = end();
+
+            if (position.m_json != this)
+            {
+                throw JsonException("Provided iterator is for a different Json instance");
+            }
+            else if (position == it)
+            {
+                throw JsonException("Provided iterator must not be past-the-end");
+            }
+
+            const auto &position_iterator = std::get<iterator_type>(position.m_iterator);
+            it.m_iterator = value.erase(position_iterator);
+
+            return it;
+        }
+        else
+        {
+            throw JsonException(*this, "JSON type invalid for erasure");
+        }
+    };
+
+    return std::visit(std::move(visitor), m_value);
+}
+
+//==================================================================================================
+Json::iterator Json::erase(const_iterator first, const_iterator last)
+{
+    auto visitor = [this, &first, &last](auto &value) -> iterator
+    {
+        using T = std::decay_t<decltype(value)>;
+
+        if constexpr (any_same_v<T, JsonTraits::object_type, JsonTraits::array_type>)
+        {
+            using iterator_type = std::conditional_t<
+                std::is_same_v<T, JsonTraits::object_type>,
+                typename const_iterator::object_iterator_type,
+                typename const_iterator::array_iterator_type>;
+
+            auto it = end();
+
+            if ((first.m_json != this) || (first.m_json != last.m_json))
+            {
+                throw JsonException("Provided iterators are for a different Json instance");
+            }
+
+            const auto &first_iterator = std::get<iterator_type>(first.m_iterator);
+            const auto &last_iterator = std::get<iterator_type>(last.m_iterator);
+            it.m_iterator = value.erase(first_iterator, last_iterator);
+
+            return it;
+        }
+        else
+        {
+            throw JsonException(*this, "JSON type invalid for erasure");
+        }
+    };
+
+    return std::visit(std::move(visitor), m_value);
+}
+
+//==================================================================================================
+void Json::erase(size_type index)
+{
+    if (!is_array())
+    {
+        throw JsonException(*this, "JSON type invalid for erase(index)");
+    }
+
+    auto &value = std::get<JsonTraits::array_type>(m_value);
+
+    if (index >= value.size())
+    {
+        throw JsonException(*this, String::format("Given index (%d) not found", index));
+    }
+
+    value.erase(value.begin() + static_cast<difference_type>(index));
+}
+
+//==================================================================================================
 void Json::swap(reference json)
 {
     std::swap(m_value, json.m_value);
