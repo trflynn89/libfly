@@ -608,6 +608,82 @@ public:
     void insert(const_iterator first, const_iterator last);
 
     /**
+     * Insert a copy of a Json value into the Json instance before the provided position. Only valid
+     * if the Json instance is an array.
+     *
+     * @param position The iterator position before which the value should be inserted.
+     * @param value The Json value to insert.
+     *
+     * @return An iterator pointed at the inserted element.
+     *
+     * @throws JsonException If the Json instance is not an array or the provided position is not
+     *         for this Json instance.
+     */
+    iterator insert(const_iterator position, const Json &value);
+
+    /**
+     * Insert a moved Json value into the Json instance before the provided position. Only valid if
+     * if the Json instance is an array.
+     *
+     * @param position The iterator position before which the value should be inserted.
+     * @param value The Json value to insert.
+     *
+     * @return An iterator pointed at the inserted element.
+     *
+     * @throws JsonException If the Json instance is not an array or the provided position is not
+     *         for this Json instance.
+     */
+    iterator insert(const_iterator position, Json &&value);
+
+    /**
+     * Insert a number of copies of a Json value into the Json instance before the provided
+     * position. Only valid if the Json instance is an array.
+     *
+     * @param position The iterator position before which the value should be inserted.
+     * @param count The number of copies to insert.
+     * @param value The Json value to insert.
+     *
+     * @return An iterator pointed at the first element inserted.
+     *
+     * @throws JsonException If the Json instance is not an array or the provided position is not
+     *         for this Json instance.
+     */
+    iterator insert(const_iterator position, size_type count, const Json &value);
+
+    /**
+     * Insert all values into the Json instance in the range [first, last) before the provided
+     * position. Only valid if the Json instance is an array. The iterators in the range [first,
+     * last) may not be iterators into this Json instance; this limitation is due to otherwise
+     * undefined behavior of std::vector.
+     *
+     * @param position The iterator position before which the value should be inserted.
+     * @param first The beginning of the range of values to insert.
+     * @param last The end of the range of values to insert.
+     *
+     * @return An iterator pointed at the first element inserted.
+     *
+     * @throws JsonException If the Json instance is not an array, the provided position is not for
+     *         this Json instance, the provided iterators are not for the same Json instance, the
+     *         provided iterators are for non-array Json instances, or the provided iterators are
+     *         for this Json instance.
+     */
+    iterator insert(const_iterator position, const_iterator first, const_iterator last);
+
+    /**
+     * Insert all values into the Json instance from the provided initializer list before the
+     * provided position instance. Only valid if the Json instance is an array.
+     *
+     * @param position The iterator position before which the value should be inserted.
+     * @param initializer The list of values to insert.
+     *
+     * @return An iterator pointed at the first element inserted.
+     *
+     * @throws JsonException If the Json instance is not an array or the provided position is not
+     *         for this Json instance.
+     */
+    iterator insert(const_iterator position, std::initializer_list<Json> initializer);
+
+    /**
      * Exchange the contents of the Json instance with another instance.
      *
      * @param json The Json instance to swap with.
@@ -889,6 +965,23 @@ private:
     static void validate_character(
         stringstream_type &stream,
         const JsonTraits::string_type::const_iterator &it);
+
+    /**
+     * Helper to invoke an insert method on the underlying Json array storage with the provided
+     * arguments. Only valid if the Json instance is an array.
+     *
+     * @tparam Args Variadic template arguments to forward.
+     *
+     * @param position The iterator position before which value(s) should be inserted.
+     * @param args The list of arguments to forward.
+     *
+     * @return An iterator pointed at the first element inserted.
+     *
+     * @throws JsonException If the Json instance is not an array or the provided position is not
+     *         for this Json instance.
+     */
+    template <typename... Args>
+    iterator array_inserter(const_iterator position, Args &&...args);
 
     json_type m_value {nullptr};
 };
@@ -1325,6 +1418,30 @@ JsonTraits::string_type Json::convert_to_string(const T &value)
     }
 
     throw JsonException("Could not convert string-like type to a JSON string");
+}
+
+//==================================================================================================
+template <typename... Args>
+Json::iterator Json::array_inserter(const_iterator position, Args &&...args)
+{
+    if (!is_array())
+    {
+        throw JsonException(*this, "JSON type invalid for insert(position)");
+    }
+    else if (position.m_json != this)
+    {
+        throw JsonException("Provided iterator is for a different Json instance");
+    }
+
+    using array_iterator_type = typename const_iterator::array_iterator_type;
+
+    auto &value = std::get<JsonTraits::array_type>(m_value);
+    auto it = end();
+
+    const auto &position_iterator = std::get<array_iterator_type>(position.m_iterator);
+    it.m_iterator = value.insert(position_iterator, std::forward<Args>(args)...);
+
+    return it;
 }
 
 } // namespace fly

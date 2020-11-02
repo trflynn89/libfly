@@ -315,6 +315,400 @@ CATCH_TEST_CASE("Json", "[json]")
         CATCH_CHECK(json == nullptr);
     }
 
+    CATCH_SECTION("Insert a value into a JSON array")
+    {
+        const fly::Json array = {1, 2, 3, 4};
+        const fly::Json value = 1;
+
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value),
+            "Provided iterator is for a different Json instance");
+
+        json = {'7', 8, 9, 10};
+        auto result = json.insert(json.begin(), value);
+        CATCH_CHECK(json == fly::Json {1, '7', 8, 9, 10});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == value);
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.end(), value);
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 10, 1});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == value);
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.begin() + 3, value);
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 1, 10});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == value);
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+    }
+
+    CATCH_SECTION("Insert a moved value into a JSON array")
+    {
+        const fly::Json array = {1, 2, 3, 4};
+
+        auto value = []() -> fly::Json
+        {
+            return fly::Json(1);
+        };
+
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value()),
+            "Provided iterator is for a different Json instance");
+
+        json = {'7', 8, 9, 10};
+        auto result = json.insert(json.begin(), value());
+        CATCH_CHECK(json == fly::Json {1, '7', 8, 9, 10});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == value());
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.end(), value());
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 10, 1});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == value());
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.begin() + 3, value());
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 1, 10});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == value());
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), value()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+    }
+
+    CATCH_SECTION("Insert copies of a value into a JSON array")
+    {
+        const fly::Json array = {1, 2, 3, 4};
+        const fly::Json value = 1;
+
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), 1, value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), 1, value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), 1, value),
+            "Provided iterator is for a different Json instance");
+
+        json = {'7', 8, 9, 10};
+        auto result = json.insert(json.begin(), 0, value);
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 10});
+        CATCH_CHECK(result == json.begin());
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.begin(), 1, value);
+        CATCH_CHECK(json == fly::Json {1, '7', 8, 9, 10});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == value);
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.end(), 2, value);
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 10, 1, 1});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == value);
+        CATCH_REQUIRE((result + 1) != json.end());
+        CATCH_CHECK(*(result + 1) == value);
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.begin() + 3, 3, value);
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 1, 1, 1, 10});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == value);
+        CATCH_REQUIRE((result + 1) != json.end());
+        CATCH_CHECK(*(result + 1) == value);
+        CATCH_REQUIRE((result + 2) != json.end());
+        CATCH_CHECK(*(result + 2) == value);
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), 1, value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), 1, value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), 1, value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), 1, value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), 1, value),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+    }
+
+    CATCH_SECTION("Insert a range of values into a JSON array")
+    {
+        const fly::Json object = {
+            {"c", 3},
+            {"d", 4},
+        };
+
+        const fly::Json array = {5, 6};
+
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), array.begin(), array.end()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), array.begin(), array.end()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(json.begin(), json.begin(), array.end()),
+            "Provided iterators are for different Json instances");
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(json.begin(), object.begin(), object.end()),
+            "Provided iterators' JSON type invalid for insert(position)");
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(json.begin(), json.begin(), json.end()),
+            "Provided iterators may not belong to this Json instance: (%s)",
+            json);
+
+        json = {'7', 8, 9, 10};
+        auto result = json.insert(json.begin(), array.begin(), array.begin());
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 10});
+        CATCH_CHECK(result == json.begin());
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.begin(), array.begin(), array.end());
+        CATCH_CHECK(json == fly::Json {5, 6, '7', 8, 9, 10});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == fly::Json(5));
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.end(), array.begin(), array.end());
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 10, 5, 6});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == fly::Json(5));
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.begin() + 3, array.begin(), array.end());
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 5, 6, 10});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == fly::Json(5));
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), array.begin(), array.end()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), array.begin(), array.end()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), array.begin(), array.end()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), array.begin(), array.end()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), array.begin(), array.end()),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+    }
+
+    CATCH_SECTION("Insert a list of values into a JSON array")
+    {
+        const fly::Json object = {
+            {"c", 3},
+            {"d", 4},
+        };
+
+        const fly::Json array = {5, 6};
+
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), {1, 2, 3}),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), {1, 2, 3}),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = {'7', 8, 9, 10};
+        auto result = json.insert(json.begin(), {});
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 10});
+        CATCH_CHECK(result == json.begin());
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.begin(), {5, 6});
+        CATCH_CHECK(json == fly::Json {5, 6, '7', 8, 9, 10});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == fly::Json(5));
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.end(), {5, 6});
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 10, 5, 6});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == fly::Json(5));
+
+        json = {'7', 8, 9, 10};
+        result = json.insert(json.begin() + 3, {5, 6});
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 5, 6, 10});
+        CATCH_REQUIRE(result != json.end());
+        CATCH_CHECK(*result == fly::Json(5));
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), {1, 2, 3}),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), {1, 2, 3}),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), {1, 2, 3}),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), {1, 2, 3}),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            json.insert(array.begin(), {1, 2, 3}),
+            "JSON type invalid for insert(position): (%s)",
+            json);
+    }
+
     CATCH_SECTION("Swap a JSON instance with another JSON instance")
     {
         fly::Json json1 = 12389;
@@ -1303,7 +1697,7 @@ CATCH_TEMPLATE_TEST_CASE(
             json);
     }
 
-    CATCH_SECTION("Insert a range of iterators into a JSON object")
+    CATCH_SECTION("Insert a range of values into a JSON object")
     {
         const fly::Json object = {
             {J_STR("c"), fly::Json(3)},
