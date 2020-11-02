@@ -389,6 +389,18 @@ Json::iterator Json::insert(const_iterator position, std::initializer_list<Json>
 }
 
 //==================================================================================================
+void Json::push_back(const Json &value)
+{
+    array_inserter(cend(), value);
+}
+
+//==================================================================================================
+void Json::push_back(Json &&value)
+{
+    array_inserter(cend(), std::move(value));
+}
+
+//==================================================================================================
 void Json::swap(reference json)
 {
     std::swap(m_value, json.m_value);
