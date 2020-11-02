@@ -26,7 +26,7 @@ Json::Json(Json &&json) noexcept : m_value(std::move(json.m_value))
 }
 
 //==================================================================================================
-Json::Json(const std::initializer_list<Json> &initializer) noexcept : m_value()
+Json::Json(std::initializer_list<Json> initializer) noexcept : m_value()
 {
     auto object_test = [](const_reference json)
     {
