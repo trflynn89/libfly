@@ -770,6 +770,63 @@ CATCH_TEST_CASE("Json", "[json]")
             json);
     }
 
+    CATCH_SECTION("Emplace a value into a JSON array")
+    {
+        const fly::Json array = {1, 2, 3, 4};
+
+        auto value = []() -> fly::Json
+        {
+            return fly::Json(1);
+        };
+
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace_back(value()),
+            "JSON type invalid for array emplacement: (%s)",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace_back(value()),
+            "JSON type invalid for array emplacement: (%s)",
+            json);
+
+        json = {'7', 8, 9, 10};
+        auto &result = json.emplace_back(value());
+        CATCH_CHECK(json == fly::Json {'7', 8, 9, 10, 1});
+        CATCH_REQUIRE(result == value());
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace_back(value()),
+            "JSON type invalid for array emplacement: (%s)",
+            json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace_back(value()),
+            "JSON type invalid for array emplacement: (%s)",
+            json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace_back(value()),
+            "JSON type invalid for array emplacement: (%s)",
+            json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace_back(value()),
+            "JSON type invalid for array emplacement: (%s)",
+            json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace_back(value()),
+            "JSON type invalid for array emplacement: (%s)",
+            json);
+    }
+
     CATCH_SECTION("Swap a JSON instance with another JSON instance")
     {
         fly::Json json1 = 12389;
