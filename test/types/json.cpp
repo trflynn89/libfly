@@ -935,6 +935,218 @@ CATCH_TEST_CASE("Json", "[json]")
             json);
     }
 
+    CATCH_SECTION("Erase a value from a JSON instance")
+    {
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator()),
+            "Provided iterator is for a different Json instance",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(json.end()),
+            "Provided iterator must not be past-the-end",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        auto result = json.erase(json.begin());
+        CATCH_CHECK(json == fly::Json {{"b", 2}});
+        CATCH_CHECK(result == json.begin());
+
+        json = {{"a", 1}, {"b", 2}};
+        result = json.erase(json.find("b"));
+        CATCH_CHECK(json == fly::Json {{"a", 1}});
+        CATCH_CHECK(result == json.end());
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator()),
+            "Provided iterator is for a different Json instance",
+            json);
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(json.end()),
+            "Provided iterator must not be past-the-end",
+            json);
+
+        json = {'7', 8, 9, 10};
+        result = json.erase(json.begin());
+        CATCH_CHECK(json == fly::Json {8, 9, 10});
+        CATCH_CHECK(result == json.begin());
+
+        json = {'7', 8, 9, 10};
+        result = json.erase(json.begin() + 1);
+        CATCH_CHECK(json == fly::Json {'7', 9, 10});
+        CATCH_CHECK(result == (json.begin() + 1));
+
+        json = {'7', 8, 9, 10};
+        result = json.erase(json.begin() + 3);
+        CATCH_CHECK(json == fly::Json {'7', 8, 9});
+        CATCH_CHECK(result == json.end());
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+    }
+
+    CATCH_SECTION("Erase a range of values from a JSON instance")
+    {
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator(), fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator(), fly::Json::const_iterator()),
+            "Provided iterators are for a different Json instance",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        auto result = json.erase(json.begin(), json.end());
+        CATCH_CHECK(json == fly::JsonTraits::object_type());
+        CATCH_CHECK(result == json.end());
+
+        json = {{"a", 1}, {"b", 2}};
+        result = json.erase(json.begin(), json.find("b"));
+        CATCH_CHECK(json == fly::Json {{"b", 2}});
+        CATCH_CHECK(result == json.begin());
+
+        json = {{"a", 1}, {"b", 2}};
+        result = json.erase(json.find("b"), json.end());
+        CATCH_CHECK(json == fly::Json {{"a", 1}});
+        CATCH_CHECK(result == json.end());
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator(), fly::Json::const_iterator()),
+            "Provided iterators are for a different Json instance",
+            json);
+
+        json = {'7', 8, 9, 10};
+        result = json.erase(json.begin(), json.end());
+        CATCH_CHECK(json == fly::JsonTraits::array_type());
+        CATCH_CHECK(result == json.end());
+
+        json = {'7', 8, 9, 10};
+        result = json.erase(json.begin(), json.begin() + 2);
+        CATCH_CHECK(json == fly::Json {9, 10});
+        CATCH_CHECK(result == json.begin());
+
+        json = {'7', 8, 9, 10};
+        result = json.erase(json.begin() + 2, json.end());
+        CATCH_CHECK(json == fly::Json {'7', 8});
+        CATCH_CHECK(result == json.end());
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator(), fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator(), fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator(), fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator(), fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(fly::Json::const_iterator(), fly::Json::const_iterator()),
+            "JSON type invalid for erasure: (%s)",
+            json);
+    }
+
+    CATCH_SECTION("Erase a value from a JSON array")
+    {
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(json.erase(0), "JSON type invalid for erase(index): (%s)", json);
+
+        json = {{"a", 1}, {"b", 2}};
+        CATCH_CHECK_THROWS_JSON(json.erase(0), "JSON type invalid for erase(index): (%s)", json);
+
+        json = {'7', 8, 9, 10};
+        json.erase(0);
+        CATCH_CHECK(json == fly::Json {8, 9, 10});
+
+        json = {'7', 8, 9, 10};
+        json.erase(1);
+        CATCH_CHECK(json == fly::Json {'7', 9, 10});
+
+        json = {'7', 8, 9, 10};
+        json.erase(2);
+        CATCH_CHECK(json == fly::Json {'7', 8, 10});
+
+        json = {'7', 8, 9, 10};
+        json.erase(3);
+        CATCH_CHECK(json == fly::Json {'7', 8, 9});
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(json.erase(4), "Given index (4) not found: (%s)", json);
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(json.erase(0), "JSON type invalid for erase(index): (%s)", json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(json.erase(0), "JSON type invalid for erase(index): (%s)", json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(json.erase(0), "JSON type invalid for erase(index): (%s)", json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(json.erase(0), "JSON type invalid for erase(index): (%s)", json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(json.erase(0), "JSON type invalid for erase(index): (%s)", json);
+    }
+
     CATCH_SECTION("Swap a JSON instance with another JSON instance")
     {
         fly::Json json1 = 12389;
@@ -1991,6 +2203,66 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_THROWS_JSON(
             json.insert(object.begin(), object.end()),
             "JSON type invalid for object insertion: (%s)",
+            json);
+    }
+
+    CATCH_SECTION("Erase a value from a JSON object")
+    {
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(J_STR("a")),
+            "JSON type invalid for erase(key): (%s)",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        auto result = json.erase(J_STR("a"));
+        CATCH_CHECK(json == fly::Json {{"b", 2}});
+        CATCH_CHECK(result == 1);
+
+        json = {{"a", 1}, {"b", 2}};
+        result = json.erase(J_STR("b"));
+        CATCH_CHECK(json == fly::Json {{"a", 1}});
+        CATCH_CHECK(result == 1);
+
+        json = {{"a", 1}, {"b", 2}};
+        result = json.erase(J_STR("c"));
+        CATCH_CHECK(json == fly::Json {{"a", 1}, {"b", 2}});
+        CATCH_CHECK(result == 0);
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(J_STR("a")),
+            "JSON type invalid for erase(key): (%s)",
+            json);
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(J_STR("a")),
+            "JSON type invalid for erase(key): (%s)",
+            json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(J_STR("a")),
+            "JSON type invalid for erase(key): (%s)",
+            json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(J_STR("a")),
+            "JSON type invalid for erase(key): (%s)",
+            json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(J_STR("a")),
+            "JSON type invalid for erase(key): (%s)",
+            json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            json.erase(J_STR("a")),
+            "JSON type invalid for erase(key): (%s)",
             json);
     }
 

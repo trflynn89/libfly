@@ -740,6 +740,63 @@ public:
     void push_back(Json &&value);
 
     /**
+     * Remove a value from the Json instance with the provided key. Only valid if the Json instance
+     * is an object. The SFINAE declaration allows lookups with any string-like type (e.g.
+     * std::string, char8_t[], std::u16string_view).
+     *
+     * @tparam T The string-like key type.
+     *
+     * @param key The key value to remove.
+     *
+     * @return The number of elements removed.
+     *
+     * @throws JsonException If the Json instance is not an object or the key value is invalid.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    size_type erase(const T &key);
+
+    /**
+     * Remove a value from the Json instance at the provided index. Only valid if the Json instance
+     * is an array.
+     *
+     * @param index The index to remove.
+     *
+     * @throws JsonException If the Json instance is not an array or the index does not exist.
+     */
+    void erase(size_type index);
+
+    /**
+     * Remove a value from the Json instance at the provided position. Only valid if the Json
+     * instance is an object or array.
+     *
+     * The provided position must be valid and dereferenceable. Thus the past-the-end iterator
+     * (which is valid, but is not dereferenceable) cannot be used as a position.
+     *
+     * @param position The iterator position which should be removed.
+     *
+     * @return An iterator pointed at the element following the removed element.
+     *
+     * @throws JsonException If the Json instance is not an object or array, the provided position
+     *                       is not for this Json instance, or if the provided position is
+     *                       past-the-end.
+     */
+    iterator erase(const_iterator position);
+
+    /**
+     * Remove all values from the Json instance in the range [first, last). Only valid if the Json
+     * instance is an object or array.
+     *
+     * @param first The beginning of the range of values to remove.
+     * @param last The end of the range of values to remove.
+     *
+     * @return An iterator pointed at the element following the last removed element.
+     *
+     * @throws JsonException If the Json instance is not an object or array, or the provided
+     *                       iterators are not for this Json instance.
+     */
+    iterator erase(const_iterator first, const_iterator last);
+
+    /**
      * Exchange the contents of the Json instance with another instance.
      *
      * @param json The Json instance to swap with.
@@ -1387,6 +1444,19 @@ Json::reference Json::emplace_back(Args &&...args)
 
     auto &value = std::get<JsonTraits::array_type>(m_value);
     return value.emplace_back(std::forward<Args>(args)...);
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+Json::size_type Json::erase(const T &key)
+{
+    if (!is_object())
+    {
+        throw JsonException(*this, "JSON type invalid for erase(key)");
+    }
+
+    auto &value = std::get<JsonTraits::object_type>(m_value);
+    return value.erase(convert_to_string(key));
 }
 
 //==================================================================================================
