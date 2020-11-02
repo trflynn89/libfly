@@ -346,6 +346,54 @@ void Json::insert(const_iterator first, const_iterator last)
 }
 
 //==================================================================================================
+Json::iterator Json::insert(const_iterator position, const Json &value)
+{
+    return array_inserter(position, value);
+}
+
+//==================================================================================================
+Json::iterator Json::insert(const_iterator position, Json &&value)
+{
+    return array_inserter(position, std::move(value));
+}
+
+//==================================================================================================
+Json::iterator Json::insert(const_iterator position, size_type count, const Json &value)
+{
+    return array_inserter(position, count, value);
+}
+
+//==================================================================================================
+Json::iterator Json::insert(const_iterator position, const_iterator first, const_iterator last)
+{
+    if (first.m_json != last.m_json)
+    {
+        throw JsonException("Provided iterators are for different Json instances");
+    }
+    else if ((first.m_json == nullptr) || !first.m_json->is_array())
+    {
+        throw JsonException("Provided iterators' JSON type invalid for insert(position)");
+    }
+    else if (first.m_json == this)
+    {
+        throw JsonException(*this, "Provided iterators may not belong to this Json instance");
+    }
+
+    using array_iterator_type = typename const_iterator::array_iterator_type;
+
+    const auto &first_iterator = std::get<array_iterator_type>(first.m_iterator);
+    const auto &last_iterator = std::get<array_iterator_type>(last.m_iterator);
+
+    return array_inserter(position, first_iterator, last_iterator);
+}
+
+//==================================================================================================
+Json::iterator Json::insert(const_iterator position, std::initializer_list<Json> initializer)
+{
+    return array_inserter(position, initializer.begin(), initializer.end());
+}
+
+//==================================================================================================
 void Json::swap(reference json)
 {
     std::swap(m_value, json.m_value);
