@@ -709,6 +709,67 @@ CATCH_TEST_CASE("Json", "[json]")
             json);
     }
 
+    CATCH_SECTION("Emplace a value into a JSON object")
+    {
+        auto pair = []() -> std::pair<fly::JsonTraits::string_type, fly::Json>
+        {
+            return std::make_pair<fly::JsonTraits::string_type, fly::Json>("c", 3);
+        };
+
+        fly::Json json = "abcdef";
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace(pair()),
+            "JSON type invalid for object emplacement: (%s)",
+            json);
+
+        json = {{"a", 1}, {"b", 2}};
+        auto result = json.emplace(pair());
+        CATCH_CHECK(result.second);
+        CATCH_CHECK(result.first == json.find("c"));
+        CATCH_CHECK(*(result.first) == 3);
+
+        result = json.emplace(pair());
+        CATCH_CHECK_FALSE(result.second);
+        CATCH_CHECK(result.first == json.find("c"));
+        CATCH_CHECK(*(result.first) == 3);
+
+        json = {'7', 8, 9, 10};
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace(pair()),
+            "JSON type invalid for object emplacement: (%s)",
+            json);
+
+        json = true;
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace(pair()),
+            "JSON type invalid for object emplacement: (%s)",
+            json);
+
+        json = 1;
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace(pair()),
+            "JSON type invalid for object emplacement: (%s)",
+            json);
+
+        json = static_cast<unsigned int>(1);
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace(pair()),
+            "JSON type invalid for object emplacement: (%s)",
+            json);
+
+        json = 1.0f;
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace(pair()),
+            "JSON type invalid for object emplacement: (%s)",
+            json);
+
+        json = nullptr;
+        CATCH_CHECK_THROWS_JSON(
+            json.emplace(pair()),
+            "JSON type invalid for object emplacement: (%s)",
+            json);
+    }
+
     CATCH_SECTION("Swap a JSON instance with another JSON instance")
     {
         fly::Json json1 = 12389;
