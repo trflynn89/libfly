@@ -967,6 +967,35 @@ private:
         const JsonTraits::string_type::const_iterator &it);
 
     /**
+     * Helper trait to determine the return type of an object insertion method. If that method
+     * returns void, this type resolves to void. Otherwise, it resolves to an iterator-boolean pair.
+     */
+    template <typename... Args>
+    using object_insertion_result = std::conditional_t<
+        std::is_void_v<decltype(
+            std::declval<JsonTraits::object_type>().insert(std::declval<Args>()...))>,
+        void,
+        std::pair<iterator, bool>>;
+
+    /**
+     * Helper to invoke an insert method on the underlying Json object storage with the provided
+     * arguments. Only valid if the Json instance is an object.
+     *
+     * @tparam Args Variadic template arguments to forward.
+     *
+     * @param args The list of arguments to forward.
+     *
+     * @return If the return type of the underlying insertion method is void, this method returns
+     *         void. Otherwise, an iterator-boolean pair. The boolean indicates whether the
+     *         insertion was successful. If so, the iterator is that of the inserted element. If
+     *         not, the iterator points to the element which prevented the insertion.
+     *
+     * @throws JsonException If the Json instance is not an object.
+     */
+    template <typename... Args>
+    object_insertion_result<Args...> object_inserter(Args &&...args);
+
+    /**
      * Helper to invoke an insert method on the underlying Json array storage with the provided
      * arguments. Only valid if the Json instance is an array.
      *
@@ -1263,36 +1292,14 @@ Json::const_reference Json::at(const T &key) const
 template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
 std::pair<Json::iterator, bool> Json::insert(const std::pair<Key, Json> &value)
 {
-    if (is_object())
-    {
-        auto &storage = std::get<JsonTraits::object_type>(m_value);
-        auto it = end();
-
-        auto result = storage.insert({convert_to_string(value.first), value.second});
-        it.m_iterator = result.first;
-
-        return {it, result.second};
-    }
-
-    throw JsonException(*this, "JSON type invalid for insert(value &)");
+    return object_inserter(std::make_pair(convert_to_string(value.first), value.second));
 }
 
 //==================================================================================================
 template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
 std::pair<Json::iterator, bool> Json::insert(std::pair<Key, Json> &&value)
 {
-    if (is_object())
-    {
-        auto &storage = std::get<JsonTraits::object_type>(m_value);
-        auto it = end();
-
-        auto result = storage.insert({convert_to_string(value.first), std::move(value.second)});
-        it.m_iterator = result.first;
-
-        return {it, result.second};
-    }
-
-    throw JsonException(*this, "JSON type invalid for insert(value &&)");
+    return object_inserter(std::make_pair(convert_to_string(value.first), std::move(value.second)));
 }
 
 //==================================================================================================
@@ -1422,11 +1429,37 @@ JsonTraits::string_type Json::convert_to_string(const T &value)
 
 //==================================================================================================
 template <typename... Args>
+Json::object_insertion_result<Args...> Json::object_inserter(Args &&...args)
+{
+    if (!is_object())
+    {
+        throw JsonException(*this, "JSON type invalid for object insertion");
+    }
+
+    auto &value = std::get<JsonTraits::object_type>(m_value);
+
+    if constexpr (std::is_void_v<object_insertion_result<Args...>>)
+    {
+        value.insert(std::forward<Args>(args)...);
+    }
+    else
+    {
+        auto it = end();
+
+        auto result = value.insert(std::forward<Args>(args)...);
+        it.m_iterator = result.first;
+
+        return {it, result.second};
+    }
+}
+
+//==================================================================================================
+template <typename... Args>
 Json::iterator Json::array_inserter(const_iterator position, Args &&...args)
 {
     if (!is_array())
     {
-        throw JsonException(*this, "JSON type invalid for insert(position)");
+        throw JsonException(*this, "JSON type invalid for array insertion");
     }
     else if (position.m_json != this)
     {

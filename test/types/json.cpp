@@ -323,13 +323,13 @@ CATCH_TEST_CASE("Json", "[json]")
         fly::Json json = "abcdef";
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = {{"a", 1}, {"b", 2}};
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = {'7', 8, 9, 10};
@@ -358,31 +358,31 @@ CATCH_TEST_CASE("Json", "[json]")
         json = true;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = 1;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = static_cast<unsigned int>(1);
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = 1.0f;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = nullptr;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
     }
 
@@ -398,13 +398,13 @@ CATCH_TEST_CASE("Json", "[json]")
         fly::Json json = "abcdef";
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = {{"a", 1}, {"b", 2}};
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = {'7', 8, 9, 10};
@@ -433,31 +433,31 @@ CATCH_TEST_CASE("Json", "[json]")
         json = true;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = 1;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = static_cast<unsigned int>(1);
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = 1.0f;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = nullptr;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), value()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
     }
 
@@ -469,13 +469,13 @@ CATCH_TEST_CASE("Json", "[json]")
         fly::Json json = "abcdef";
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), 1, value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = {{"a", 1}, {"b", 2}};
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), 1, value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = {'7', 8, 9, 10};
@@ -515,31 +515,31 @@ CATCH_TEST_CASE("Json", "[json]")
         json = true;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), 1, value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = 1;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), 1, value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = static_cast<unsigned int>(1);
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), 1, value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = 1.0f;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), 1, value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = nullptr;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), 1, value),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
     }
 
@@ -555,13 +555,13 @@ CATCH_TEST_CASE("Json", "[json]")
         fly::Json json = "abcdef";
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), array.begin(), array.end()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = {{"a", 1}, {"b", 2}};
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), array.begin(), array.end()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = {'7', 8, 9, 10};
@@ -572,7 +572,7 @@ CATCH_TEST_CASE("Json", "[json]")
         json = {'7', 8, 9, 10};
         CATCH_CHECK_THROWS_JSON(
             json.insert(json.begin(), object.begin(), object.end()),
-            "Provided iterators' JSON type invalid for insert(position)");
+            "Provided iterators' JSON type invalid for array insertion");
 
         json = {'7', 8, 9, 10};
         CATCH_CHECK_THROWS_JSON(
@@ -606,31 +606,31 @@ CATCH_TEST_CASE("Json", "[json]")
         json = true;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), array.begin(), array.end()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = 1;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), array.begin(), array.end()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = static_cast<unsigned int>(1);
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), array.begin(), array.end()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = 1.0f;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), array.begin(), array.end()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = nullptr;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), array.begin(), array.end()),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
     }
 
@@ -646,13 +646,13 @@ CATCH_TEST_CASE("Json", "[json]")
         fly::Json json = "abcdef";
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), {1, 2, 3}),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = {{"a", 1}, {"b", 2}};
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), {1, 2, 3}),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = {'7', 8, 9, 10};
@@ -681,31 +681,31 @@ CATCH_TEST_CASE("Json", "[json]")
         json = true;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), {1, 2, 3}),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = 1;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), {1, 2, 3}),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = static_cast<unsigned int>(1);
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), {1, 2, 3}),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = 1.0f;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), {1, 2, 3}),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
 
         json = nullptr;
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), {1, 2, 3}),
-            "JSON type invalid for insert(position): (%s)",
+            "JSON type invalid for array insertion: (%s)",
             json);
     }
 
@@ -1585,7 +1585,7 @@ CATCH_TEMPLATE_TEST_CASE(
         fly::Json json = "abcdef";
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair),
-            "JSON type invalid for insert(value &): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = {{"a", 1}, {"b", 2}};
@@ -1602,37 +1602,37 @@ CATCH_TEMPLATE_TEST_CASE(
         json = {'7', 8, 9, 10};
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair),
-            "JSON type invalid for insert(value &): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = true;
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair),
-            "JSON type invalid for insert(value &): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = 1;
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair),
-            "JSON type invalid for insert(value &): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = static_cast<unsigned int>(1);
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair),
-            "JSON type invalid for insert(value &): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = 1.0f;
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair),
-            "JSON type invalid for insert(value &): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = nullptr;
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair),
-            "JSON type invalid for insert(value &): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
     }
 
@@ -1646,7 +1646,7 @@ CATCH_TEMPLATE_TEST_CASE(
         fly::Json json = "abcdef";
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair()),
-            "JSON type invalid for insert(value &&): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = {{"a", 1}, {"b", 2}};
@@ -1663,37 +1663,37 @@ CATCH_TEMPLATE_TEST_CASE(
         json = {'7', 8, 9, 10};
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair()),
-            "JSON type invalid for insert(value &&): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = true;
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair()),
-            "JSON type invalid for insert(value &&): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = 1;
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair()),
-            "JSON type invalid for insert(value &&): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = static_cast<unsigned int>(1);
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair()),
-            "JSON type invalid for insert(value &&): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = 1.0f;
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair()),
-            "JSON type invalid for insert(value &&): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = nullptr;
         CATCH_CHECK_THROWS_JSON(
             json.insert(pair()),
-            "JSON type invalid for insert(value &&): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
     }
 
@@ -1709,7 +1709,7 @@ CATCH_TEMPLATE_TEST_CASE(
         fly::Json json = "abcdef";
         CATCH_CHECK_THROWS_JSON(
             json.insert(object.begin(), object.end()),
-            "JSON type invalid for insert(first, last): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = {{"a", 1}, {"b", 2}};
@@ -1726,45 +1726,45 @@ CATCH_TEMPLATE_TEST_CASE(
             "Provided iterators are for different Json instances");
         CATCH_CHECK_THROWS_JSON(
             json.insert(fly::Json::const_iterator(), fly::Json::const_iterator()),
-            "Provided iterators' JSON type invalid for insert(first, last)");
+            "Provided iterators' JSON type invalid for object insertion");
         CATCH_CHECK_THROWS_JSON(
             json.insert(array.begin(), array.end()),
-            "Provided iterators' JSON type invalid for insert(first, last)");
+            "Provided iterators' JSON type invalid for object insertion");
 
         json = {'7', 8, 9, 10};
         CATCH_CHECK_THROWS_JSON(
             json.insert(object.begin(), object.end()),
-            "JSON type invalid for insert(first, last): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = true;
         CATCH_CHECK_THROWS_JSON(
             json.insert(object.begin(), object.end()),
-            "JSON type invalid for insert(first, last): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = 1;
         CATCH_CHECK_THROWS_JSON(
             json.insert(object.begin(), object.end()),
-            "JSON type invalid for insert(first, last): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = static_cast<unsigned int>(1);
         CATCH_CHECK_THROWS_JSON(
             json.insert(object.begin(), object.end()),
-            "JSON type invalid for insert(first, last): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = 1.0f;
         CATCH_CHECK_THROWS_JSON(
             json.insert(object.begin(), object.end()),
-            "JSON type invalid for insert(first, last): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
 
         json = nullptr;
         CATCH_CHECK_THROWS_JSON(
             json.insert(object.begin(), object.end()),
-            "JSON type invalid for insert(first, last): (%s)",
+            "JSON type invalid for object insertion: (%s)",
             json);
     }
 
