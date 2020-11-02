@@ -684,6 +684,27 @@ public:
     iterator insert(const_iterator position, std::initializer_list<Json> initializer);
 
     /**
+     * Construct an element in-place within the Json instance. Only valid if the Json instance is
+     * an object.
+     *
+     * Note that unlike the Json object insertion methods, this method does not allow for emplacing
+     * a value with a key of any string-like type. This is because the provided arguments are only
+     * forwarded to the underyling Json object value constructor.
+     *
+     * @tparam Args Variadic template arguments for value construction.
+     *
+     * @param args The list of arguments for value construction.
+     *
+     * @return An iterator-boolean pair. The boolean indicates whether the emplacement was
+     *         successful. If so, the iterator is that of the emplaced element. If not, the iterator
+     *         points to the element which prevented the emplacement.
+     *
+     * @throws JsonException If the Json instance is not an object.
+     */
+    template <typename... Args>
+    std::pair<iterator, bool> emplace(Args &&...args);
+
+    /**
      * Exchange the contents of the Json instance with another instance.
      *
      * @param json The Json instance to swap with.
@@ -1300,6 +1321,24 @@ template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
 std::pair<Json::iterator, bool> Json::insert(std::pair<Key, Json> &&value)
 {
     return object_inserter(std::make_pair(convert_to_string(value.first), std::move(value.second)));
+}
+
+//==================================================================================================
+template <typename... Args>
+std::pair<Json::iterator, bool> Json::emplace(Args &&...args)
+{
+    if (!is_object())
+    {
+        throw JsonException(*this, "JSON type invalid for object emplacement");
+    }
+
+    auto &value = std::get<JsonTraits::object_type>(m_value);
+    auto it = end();
+
+    auto result = value.emplace(std::forward<Args>(args)...);
+    it.m_iterator = result.first;
+
+    return {it, result.second};
 }
 
 //==================================================================================================
