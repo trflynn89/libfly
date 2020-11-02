@@ -323,17 +323,13 @@ void Json::clear()
 //==================================================================================================
 void Json::insert(const_iterator first, const_iterator last)
 {
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for insert(first, last)");
-    }
-    else if (first.m_json != last.m_json)
+    if (first.m_json != last.m_json)
     {
         throw JsonException("Provided iterators are for different Json instances");
     }
     else if ((first.m_json == nullptr) || !first.m_json->is_object())
     {
-        throw JsonException("Provided iterators' JSON type invalid for insert(first, last)");
+        throw JsonException("Provided iterators' JSON type invalid for object insertion");
     }
 
     using object_iterator_type = typename const_iterator::object_iterator_type;
@@ -341,8 +337,7 @@ void Json::insert(const_iterator first, const_iterator last)
     const auto &first_iterator = std::get<object_iterator_type>(first.m_iterator);
     const auto &last_iterator = std::get<object_iterator_type>(last.m_iterator);
 
-    auto &value = std::get<JsonTraits::object_type>(m_value);
-    value.insert(first_iterator, last_iterator);
+    object_inserter(first_iterator, last_iterator);
 }
 
 //==================================================================================================
@@ -372,7 +367,7 @@ Json::iterator Json::insert(const_iterator position, const_iterator first, const
     }
     else if ((first.m_json == nullptr) || !first.m_json->is_array())
     {
-        throw JsonException("Provided iterators' JSON type invalid for insert(position)");
+        throw JsonException("Provided iterators' JSON type invalid for array insertion");
     }
     else if (first.m_json == this)
     {
