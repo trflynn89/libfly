@@ -218,7 +218,7 @@ public:
      *
      * @param initializer The initializer list.
      */
-    Json(const std::initializer_list<Json> &initializer) noexcept;
+    Json(std::initializer_list<Json> initializer) noexcept;
 
     /**
      * Destructor. Iteratively destroy nested Json instances to alleviate stack overflow on
