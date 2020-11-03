@@ -12,10 +12,18 @@
 #include <unordered_set>
 #include <vector>
 
-CATCH_TEST_CASE("JsonTraits", "[json]")
+CATCH_TEMPLATE_TEST_CASE(
+    "JsonTraits",
+    "[json]",
+    std::string,
+    std::wstring,
+    std::u8string,
+    std::u16string,
+    std::u32string)
 {
-    using string_type = typename fly::JsonTraits::string_type;
-    using char_type = typename fly::JsonTraits::char_type;
+    using string_type = TestType;
+    using char_type = typename TestType::value_type;
+    using view_type = std::basic_string_view<char_type>;
 
     using array_type = std::array<int, 4>;
     using deque_type = std::deque<int>;
@@ -27,10 +35,10 @@ CATCH_TEST_CASE("JsonTraits", "[json]")
     using unordered_set_type = std::unordered_set<int>;
     using vector_type = std::vector<int>;
 
-    using map_type = std::map<std::string, int>;
-    using multimap_type = std::multimap<std::string, int>;
-    using unordered_map_type = std::unordered_map<std::string, int>;
-    using unordered_multimap_type = std::unordered_multimap<std::string, int>;
+    using map_type = std::map<string_type, int>;
+    using multimap_type = std::multimap<string_type, int>;
+    using unordered_map_type = std::unordered_map<string_type, int>;
+    using unordered_multimap_type = std::unordered_multimap<string_type, int>;
 
     using boolean_type = bool;
     using signed_integer_type = int;
@@ -47,6 +55,8 @@ CATCH_TEST_CASE("JsonTraits", "[json]")
         CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<char_type *>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const char_type[]>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<char_type[]>);
+        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const view_type>);
+        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<view_type>);
 
         CATCH_CHECK(fly::JsonTraits::is_string_like_v<const string_type>);
         CATCH_CHECK(fly::JsonTraits::is_string_like_v<string_type>);
@@ -54,76 +64,8 @@ CATCH_TEST_CASE("JsonTraits", "[json]")
         CATCH_CHECK(fly::JsonTraits::is_string_like_v<char_type *>);
         CATCH_CHECK(fly::JsonTraits::is_string_like_v<const char_type[]>);
         CATCH_CHECK(fly::JsonTraits::is_string_like_v<char_type[]>);
-
-        CATCH_CHECK(fly::JsonTraits::is_string_v<const std::string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_v<std::string>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const char *>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<char *>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const char[]>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<char[]>);
-
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const std::string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<std::string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const char *>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<char *>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const char[]>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<char[]>);
-
-        CATCH_CHECK(fly::JsonTraits::is_string_v<const std::wstring>);
-        CATCH_CHECK(fly::JsonTraits::is_string_v<std::wstring>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const wchar_t *>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<wchar_t *>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const wchar_t[]>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<wchar_t[]>);
-
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const std::wstring>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<std::wstring>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const wchar_t *>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<wchar_t *>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const wchar_t[]>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<wchar_t[]>);
-
-        CATCH_CHECK(fly::JsonTraits::is_string_v<const std::u8string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_v<std::u8string>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const char8_t *>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<char8_t *>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const char8_t[]>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<char8_t[]>);
-
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const std::u8string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<std::u8string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const char8_t *>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<char8_t *>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const char8_t[]>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<char8_t[]>);
-
-        CATCH_CHECK(fly::JsonTraits::is_string_v<const std::u16string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_v<std::u16string>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const char16_t *>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<char16_t *>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const char16_t[]>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<char16_t[]>);
-
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const std::u16string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<std::u16string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const char16_t *>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<char16_t *>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const char16_t[]>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<char16_t[]>);
-
-        CATCH_CHECK(fly::JsonTraits::is_string_v<const std::u32string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_v<std::u32string>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const char32_t *>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<char32_t *>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<const char32_t[]>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<char32_t[]>);
-
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const std::u32string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<std::u32string>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const char32_t *>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<char32_t *>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const char32_t[]>);
-        CATCH_CHECK(fly::JsonTraits::is_string_like_v<char32_t[]>);
+        CATCH_CHECK(fly::JsonTraits::is_string_like_v<const view_type>);
+        CATCH_CHECK(fly::JsonTraits::is_string_like_v<view_type>);
 
         CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<array_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_string_v<deque_type>);
@@ -186,9 +128,9 @@ CATCH_TEST_CASE("JsonTraits", "[json]")
         CATCH_CHECK_FALSE(fly::JsonTraits::is_boolean_v<unordered_set_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_boolean_v<vector_type>);
 
+        CATCH_CHECK_FALSE(fly::JsonTraits::is_boolean_v<string_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_boolean_v<signed_integer_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_boolean_v<unsigned_integer_type>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_boolean_v<string_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_boolean_v<double_type>);
     }
 
@@ -234,8 +176,8 @@ CATCH_TEST_CASE("JsonTraits", "[json]")
         CATCH_CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<unordered_set_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<vector_type>);
 
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<signed_integer_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<string_type>);
+        CATCH_CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<signed_integer_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<double_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_unsigned_integer_v<boolean_type>);
     }
@@ -260,9 +202,9 @@ CATCH_TEST_CASE("JsonTraits", "[json]")
         CATCH_CHECK_FALSE(fly::JsonTraits::is_floating_point_v<unordered_set_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_floating_point_v<vector_type>);
 
+        CATCH_CHECK_FALSE(fly::JsonTraits::is_floating_point_v<string_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_floating_point_v<signed_integer_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_floating_point_v<unsigned_integer_type>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_floating_point_v<string_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_floating_point_v<boolean_type>);
     }
 
@@ -288,9 +230,9 @@ CATCH_TEST_CASE("JsonTraits", "[json]")
         CATCH_CHECK_FALSE(fly::JsonTraits::is_object_v<unordered_set_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_object_v<vector_type>);
 
+        CATCH_CHECK_FALSE(fly::JsonTraits::is_object_v<string_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_object_v<signed_integer_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_object_v<unsigned_integer_type>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_object_v<string_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_object_v<double_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_object_v<boolean_type>);
     }
@@ -312,9 +254,9 @@ CATCH_TEST_CASE("JsonTraits", "[json]")
         CATCH_CHECK_FALSE(fly::JsonTraits::is_array_v<unordered_map_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_array_v<unordered_multimap_type>);
 
+        CATCH_CHECK_FALSE(fly::JsonTraits::is_array_v<string_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_array_v<signed_integer_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_array_v<unsigned_integer_type>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_array_v<string_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_array_v<double_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_array_v<boolean_type>);
     }
@@ -336,9 +278,9 @@ CATCH_TEST_CASE("JsonTraits", "[json]")
         CATCH_CHECK(fly::JsonTraits::is_iterable_v<unordered_map_type>);
         CATCH_CHECK(fly::JsonTraits::is_iterable_v<unordered_multimap_type>);
 
+        CATCH_CHECK_FALSE(fly::JsonTraits::is_iterable_v<string_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_iterable_v<signed_integer_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_iterable_v<unsigned_integer_type>);
-        CATCH_CHECK_FALSE(fly::JsonTraits::is_iterable_v<string_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_iterable_v<double_type>);
         CATCH_CHECK_FALSE(fly::JsonTraits::is_iterable_v<boolean_type>);
     }
