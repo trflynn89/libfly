@@ -224,6 +224,7 @@
     <ClCompile Include="..\..\..\test\types\concurrent_container.cpp" />
     <ClCompile Include="..\..\..\test\types\endian.cpp" />
     <ClCompile Include="..\..\..\test\types\json.cpp" />
+    <ClCompile Include="..\..\..\test\types\json_accessors.cpp" />
     <ClCompile Include="..\..\..\test\types\json_construction.cpp" />
     <ClCompile Include="..\..\..\test\types\json_conversion.cpp" />
     <ClCompile Include="..\..\..\test\types\json_exception.cpp" />
