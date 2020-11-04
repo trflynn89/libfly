@@ -722,21 +722,22 @@ public:
 
     /**
      * Append a copy of a Json value to the end of the Json instance. Only valid if the Json
-     * instance is an array.
+     * instance is an array or null. If the Json instance is null, it is first converted to an
+     * array.
      *
      * @param value The Json value to append.
      *
-     * @throws JsonException If the Json instance is not an array.
+     * @throws JsonException If the Json instance is neither an array nor null.
      */
     void push_back(const Json &value);
 
     /**
      * Append a moved Json value to the end of the Json instance. Only valid if the Json instance is
-     * an array.
+     * an array or null. If the Json instance is null, it is first converted to an array.
      *
      * @param value The Json value to append.
      *
-     * @throws JsonException If the Json instance is not an array.
+     * @throws JsonException If the Json instance is neither an array nor null.
      */
     void push_back(Json &&value);
 

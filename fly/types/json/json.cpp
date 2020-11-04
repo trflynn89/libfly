@@ -391,12 +391,22 @@ Json::iterator Json::insert(const_iterator position, std::initializer_list<Json>
 //==================================================================================================
 void Json::push_back(const Json &value)
 {
+    if (is_null())
+    {
+        m_value = JsonTraits::array_type();
+    }
+
     array_inserter(cend(), value);
 }
 
 //==================================================================================================
 void Json::push_back(Json &&value)
 {
+    if (is_null())
+    {
+        m_value = JsonTraits::array_type();
+    }
+
     array_inserter(cend(), std::move(value));
 }
 

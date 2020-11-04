@@ -307,17 +307,21 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
     {
         const fly::Json value = 1;
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
+        {
+            const auto size_before = json.size();
+            json.push_back(value);
+            const auto size_after = json.size();
+
+            CATCH_CHECK((size_after - size_before) == 1);
+            CATCH_CHECK(json[size_after - 1] == value);
+        }
+        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
         {
             CATCH_CHECK_THROWS_JSON(
                 json.push_back(value),
                 "JSON type invalid for array insertion: (%s)",
                 json);
-        }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
-        {
-            json.push_back(value);
-            CATCH_CHECK(json == fly::Json {'7', 8, 9, 10, 1});
         }
         else
         {
@@ -335,17 +339,21 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             return fly::Json(1);
         };
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
+        {
+            const auto size_before = json.size();
+            json.push_back(value());
+            const auto size_after = json.size();
+
+            CATCH_CHECK((size_after - size_before) == 1);
+            CATCH_CHECK(json[size_after - 1] == value());
+        }
+        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
         {
             CATCH_CHECK_THROWS_JSON(
                 json.push_back(value()),
                 "JSON type invalid for array insertion: (%s)",
                 json);
-        }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
-        {
-            json.push_back(value());
-            CATCH_CHECK(json == fly::Json {'7', 8, 9, 10, 1});
         }
         else
         {
