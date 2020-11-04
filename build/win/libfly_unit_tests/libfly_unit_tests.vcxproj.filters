@@ -159,7 +159,7 @@
     <ClInclude Include="..\..\..\test\config\test_config.hpp">
       <Filter>config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\test\types\json_macros.hpp">
+    <ClInclude Include="..\..\..\test\types\json_helpers.hpp">
       <Filter>types</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\test\util\capture_stream.hpp">
