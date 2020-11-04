@@ -685,7 +685,7 @@ public:
 
     /**
      * Construct an element in-place within the Json instance. Only valid if the Json instance is
-     * an object.
+     * an object or null. If the Json instance is null, it is first converted to an object.
      *
      * Note that unlike the Json object insertion methods, this method does not allow for emplacing
      * a value with a key of any string-like type. This is because the provided arguments are only
@@ -699,14 +699,15 @@ public:
      *         successful. If so, the iterator is that of the emplaced element. If not, the iterator
      *         points to the element which prevented the emplacement.
      *
-     * @throws JsonException If the Json instance is not an object.
+     * @throws JsonException If the Json instance is neither an object nor null.
      */
     template <typename... Args>
     std::pair<iterator, bool> emplace(Args &&...args);
 
     /**
      * Construct an element in-place at the end of the Json instance. Only valid if the Json
-     * instance is an array.
+     * instance is an array or null. If the Json instance is null, it is first converted to an
+     * array.
      *
      * @tparam Args Variadic template arguments for value construction.
      *
@@ -714,7 +715,7 @@ public:
      *
      * @return An iterator pointed at the emplaced element.
      *
-     * @throws JsonException If the Json instance is not an array.
+     * @throws JsonException If the Json instance is neither an array nor null.
      */
     template <typename... Args>
     Json::reference emplace_back(Args &&...args);
@@ -1419,6 +1420,11 @@ std::pair<Json::iterator, bool> Json::insert(std::pair<Key, Json> &&value)
 template <typename... Args>
 std::pair<Json::iterator, bool> Json::emplace(Args &&...args)
 {
+    if (is_null())
+    {
+        m_value = JsonTraits::object_type();
+    }
+
     if (!is_object())
     {
         throw JsonException(*this, "JSON type invalid for object emplacement");
@@ -1437,6 +1443,11 @@ std::pair<Json::iterator, bool> Json::emplace(Args &&...args)
 template <typename... Args>
 Json::reference Json::emplace_back(Args &&...args)
 {
+    if (is_null())
+    {
+        m_value = JsonTraits::array_type();
+    }
+
     if (!is_array())
     {
         throw JsonException(*this, "JSON type invalid for array emplacement");
