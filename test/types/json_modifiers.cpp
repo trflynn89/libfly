@@ -255,7 +255,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             return std::make_pair<fly::JsonTraits::string_type, fly::Json>("c", 3);
         };
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::object_type>)
         {
             auto result = json.emplace(pair());
             CATCH_CHECK(result.second);
@@ -285,10 +285,13 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             return fly::Json(1);
         };
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
         {
+            const auto size_before = json.size();
             auto &result = json.emplace_back(value());
-            CATCH_CHECK(json == fly::Json {'7', 8, 9, 10, 1});
+            const auto size_after = json.size();
+
+            CATCH_CHECK((size_after - size_before) == 1);
             CATCH_CHECK(result == value());
         }
         else
