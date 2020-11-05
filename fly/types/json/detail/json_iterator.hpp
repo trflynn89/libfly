@@ -262,8 +262,8 @@ public:
     bool operator>=(const JsonIterator &iterator) const;
 
     /**
-     * Pre-increment operator. Sets the instance pointed to by this iterator to the next instance in
-     * the sequence.
+     * Post-increment operator. Sets the instance pointed to by this iterator to the next instance
+     * in the sequence.
      *
      * @return A copy of the iterator before the increment.
      *
@@ -273,8 +273,8 @@ public:
     JsonIterator operator++(int);
 
     /**
-     * Post-increment operator. Sets the instance pointed to by this iterator to the next instance
-     * in the sequence.
+     * Pre-increment operator. Sets the instance pointed to by this iterator to the next instance in
+     * the sequence.
      *
      * @return A reference to this iterator instance.
      *
@@ -284,7 +284,7 @@ public:
     JsonIterator &operator++();
 
     /**
-     * Pre-decrement operator. Sets the instance pointed to by this iterator to the previous
+     * Post-decrement operator. Sets the instance pointed to by this iterator to the previous
      * instance in the sequence.
      *
      * @return A copy of the iterator before the decrement.
@@ -296,7 +296,7 @@ public:
     JsonIterator operator--(int);
 
     /**
-     * Post-decrement operator. Sets the instance pointed to by this iterator to the previous
+     * Pre-decrement operator. Sets the instance pointed to by this iterator to the previous
      * instance in the sequence.
      *
      * @return A reference to this iterator instance.
@@ -811,7 +811,6 @@ auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const -> di
 //==================================================================================================
 template <typename JsonType>
 const typename JsonTraits::object_type::key_type &JsonIterator<JsonType>::key() const
-
 {
     validate_iterator();
 
