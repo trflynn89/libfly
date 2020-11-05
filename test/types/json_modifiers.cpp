@@ -541,53 +541,6 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         CATCH_CHECK(json3 == "string");
     }
 
-    CATCH_SECTION("Swap a JSON instance with an object-like type")
-    {
-        auto validate = [&json](auto *name, auto &test1, auto &test2, auto &test3)
-        {
-            json = {{"c", 100}, {"d", 200}};
-            CATCH_CAPTURE(name);
-
-            using T1 = std::decay_t<decltype(test1)>;
-            using T2 = std::decay_t<decltype(test2)>;
-            using T3 = std::decay_t<decltype(test3)>;
-
-            test1 = T1 {{"a", 2}, {"b", 4}};
-            test2 = T2 {{"a", "2"}, {"b", "4"}};
-            test3 = T3 {{"a", 5}, {"b", "6"}};
-
-            CATCH_CHECK_NOTHROW(json.swap(test1));
-            CATCH_CHECK(json == T1 {{"a", 2}, {"b", 4}});
-            CATCH_CHECK(test1 == T1 {{"c", 100}, {"d", 200}});
-
-            CATCH_CHECK_NOTHROW(json.swap(test2));
-            CATCH_CHECK(json == T2 {{"a", "2"}, {"b", "4"}});
-            CATCH_CHECK(test2 == T2 {{"a", "2"}, {"b", "4"}});
-
-            CATCH_CHECK_NOTHROW(json.swap(test3));
-            CATCH_CHECK(json == T3 {{"a", 5}, {"b", "6"}});
-            CATCH_CHECK(test3 == T3 {{"a", "2"}, {"b", "4"}});
-
-            CATCH_CHECK_NOTHROW(json.swap(test1));
-            CATCH_CHECK(json == T1 {{"c", 100}, {"d", 200}});
-            CATCH_CHECK(test1 == T1 {{"a", 5}, {"b", 6}});
-        };
-
-        auto invalidate = [&json](auto *name, auto &test)
-        {
-            CATCH_CAPTURE(name);
-
-            CATCH_CHECK_THROWS_JSON(
-                json.swap(test),
-                "JSON type invalid for swap(object): (%s)",
-                json);
-        };
-
-        fly::test::run_test_for_object_types<json_type, fly::JsonTraits::string_type>(
-            std::move(validate),
-            std::move(invalidate));
-    }
-
     CATCH_SECTION("Swap a JSON instance with an array-like type")
     {
         auto validate2 = [&json](auto *name, auto &test1, auto &test2)
@@ -641,6 +594,65 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             std::move(validate2),
             std::move(validate3),
             std::move(invalidate));
+    }
+
+    CATCH_SECTION("Merge a JSON instance into another JSON instance")
+    {
+        fly::Json object1 = {{"c", 3}, {"d", 4}};
+        fly::Json object2 = {{"d", 5}, {"e", 6}};
+        fly::Json object3 = {{"f", 7}, {"g", 8}};
+
+        fly::Json int1 = fly::test::create_json<fly::JsonTraits::signed_type>();
+        fly::Json int2 = fly::test::create_json<fly::JsonTraits::signed_type>();
+
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::object_type>)
+        {
+            CATCH_CHECK_THROWS_JSON(
+                json.merge(int1),
+                "Other JSON type invalid for merging: (%s)",
+                int1);
+            CATCH_CHECK_THROWS_JSON(
+                json.merge(std::move(int2)),
+                "Other JSON type invalid for merging: (%s)",
+                fly::test::create_json<fly::JsonTraits::signed_type>());
+
+            CATCH_CHECK_NOTHROW(json.merge(object1));
+            CATCH_REQUIRE(json.contains("c"));
+            CATCH_CHECK(json["c"] == 3);
+            CATCH_REQUIRE(json.contains("d"));
+            CATCH_CHECK(json["d"] == 4);
+            CATCH_CHECK_FALSE(object1.contains("c"));
+            CATCH_CHECK_FALSE(object1.contains("d"));
+
+            CATCH_CHECK_NOTHROW(json.merge(object2));
+            CATCH_REQUIRE(json.contains("d"));
+            CATCH_CHECK(json["d"] == 4);
+            CATCH_REQUIRE(json.contains("e"));
+            CATCH_CHECK(json["e"] == 6);
+            CATCH_REQUIRE(object2.contains("d"));
+            CATCH_CHECK(object2["d"] == 5);
+            CATCH_CHECK_FALSE(object2.contains("e"));
+
+            // Reset the JSON instance to allow null types to promote to objects during merge(&&).
+            json = fly::test::create_json<json_type>();
+
+            CATCH_CHECK_NOTHROW(json.merge(std::move(object3)));
+            CATCH_REQUIRE(json.contains("f"));
+            CATCH_CHECK(json["f"] == 7);
+            CATCH_REQUIRE(json.contains("g"));
+            CATCH_CHECK(json["g"] == 8);
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                json.merge(object1),
+                "JSON type invalid for merging: (%s)",
+                json);
+            CATCH_CHECK_THROWS_JSON(
+                json.merge(std::move(object2)),
+                "JSON type invalid for merging: (%s)",
+                json);
+        }
     }
 }
 
@@ -782,5 +794,115 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
                 "JSON type invalid for swap(string): (%s)",
                 json);
         }
+    }
+
+    CATCH_SECTION("Swap a JSON instance with an object-like type")
+    {
+        auto validate = [&json](auto *name, auto &test1, auto &test2, auto &test3)
+        {
+            json = {{J_STR("c"), 100}, {J_STR("d"), 200}};
+            CATCH_CAPTURE(name);
+
+            using T1 = std::decay_t<decltype(test1)>;
+            using T2 = std::decay_t<decltype(test2)>;
+            using T3 = std::decay_t<decltype(test3)>;
+
+            test1 = T1 {{J_STR("a"), 2}, {J_STR("b"), 4}};
+            test2 = T2 {{J_STR("a"), "2"}, {J_STR("b"), "4"}};
+            test3 = T3 {{J_STR("a"), 5}, {J_STR("b"), "6"}};
+
+            CATCH_CHECK_NOTHROW(json.swap(test1));
+            CATCH_CHECK(json == T1 {{J_STR("a"), 2}, {J_STR("b"), 4}});
+            CATCH_CHECK(test1 == T1 {{J_STR("c"), 100}, {J_STR("d"), 200}});
+
+            CATCH_CHECK_NOTHROW(json.swap(test2));
+            CATCH_CHECK(json == T2 {{J_STR("a"), "2"}, {J_STR("b"), "4"}});
+            CATCH_CHECK(test2 == T2 {{J_STR("a"), "2"}, {J_STR("b"), "4"}});
+
+            CATCH_CHECK_NOTHROW(json.swap(test3));
+            CATCH_CHECK(json == T3 {{J_STR("a"), 5}, {J_STR("b"), "6"}});
+            CATCH_CHECK(test3 == T3 {{J_STR("a"), "2"}, {J_STR("b"), "4"}});
+
+            CATCH_CHECK_NOTHROW(json.swap(test1));
+            CATCH_CHECK(json == T1 {{J_STR("c"), 100}, {J_STR("d"), 200}});
+            CATCH_CHECK(test1 == T1 {{J_STR("a"), 5}, {J_STR("b"), 6}});
+        };
+
+        auto invalidate = [&json](auto *name, auto &test)
+        {
+            CATCH_CAPTURE(name);
+
+            CATCH_CHECK_THROWS_JSON(
+                json.swap(test),
+                "JSON type invalid for swap(object): (%s)",
+                json);
+        };
+
+        fly::test::run_test_for_object_types<json_type, string_type>(
+            std::move(validate),
+            std::move(invalidate));
+    }
+
+    CATCH_SECTION("Merge an object-like type into a JSON instance")
+    {
+        auto validate = [&json](auto *name, auto &test1, auto &test2, auto &test3)
+        {
+            json = fly::test::create_json<json_type, string_type>();
+            CATCH_CAPTURE(name);
+
+            using T1 = std::decay_t<decltype(test1)>;
+            using T2 = std::decay_t<decltype(test2)>;
+            using T3 = std::decay_t<decltype(test3)>;
+
+            test1 = T1 {{J_STR("c"), 3}, {J_STR("d"), 4}};
+            test2 = T2 {{J_STR("d"), "5"}, {J_STR("e"), "6"}};
+            test3 = T3 {{J_STR("f"), 7}, {J_STR("g"), "8"}};
+
+            CATCH_CHECK_NOTHROW(json.merge(test1));
+            CATCH_REQUIRE(json.contains(J_STR("c")));
+            CATCH_CHECK(json[J_STR("c")] == 3);
+            CATCH_REQUIRE(json.contains(J_STR("d")));
+            CATCH_CHECK(json[J_STR("d")] == 4);
+            CATCH_CHECK_FALSE(test1.contains(J_STR("c")));
+            CATCH_CHECK_FALSE(test1.contains(J_STR("d")));
+
+            CATCH_CHECK_NOTHROW(json.merge(test2));
+            CATCH_REQUIRE(json.contains(J_STR("d")));
+            CATCH_CHECK(json[J_STR("d")] == 4);
+            CATCH_REQUIRE(json.contains(J_STR("e")));
+            CATCH_CHECK(json[J_STR("e")] == "6");
+            CATCH_REQUIRE(test2.contains(J_STR("d")));
+            CATCH_CHECK(test2.find(J_STR("d"))->second == "5");
+            CATCH_CHECK_FALSE(test2.contains(J_STR("e")));
+
+            // Reset the JSON instance to allow null types to promote to objects during merge(&&).
+            json = fly::test::create_json<json_type, string_type>();
+
+            CATCH_CHECK_NOTHROW(json.merge(std::move(test3)));
+            CATCH_REQUIRE(json.contains(J_STR("f")));
+            CATCH_CHECK(json[J_STR("f")] == 7);
+            CATCH_REQUIRE(json.contains(J_STR("g")));
+            CATCH_CHECK(json[J_STR("g")] == "8");
+        };
+
+        auto invalidate = [&json](auto *name, auto &test)
+        {
+            CATCH_CAPTURE(name);
+
+            CATCH_CHECK_THROWS_JSON(json.merge(test), "JSON type invalid for merging: (%s)", json);
+            CATCH_CHECK_THROWS_JSON(
+                json.merge(std::move(test)),
+                "JSON type invalid for merging: (%s)",
+                json);
+        };
+
+        fly::test::run_test_for_object_types<
+            json_type,
+            string_type,
+            decltype(validate),
+            decltype(invalidate),
+            fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::object_type>>(
+            std::move(validate),
+            std::move(invalidate));
     }
 }

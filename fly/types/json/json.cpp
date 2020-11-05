@@ -558,6 +558,52 @@ void Json::swap(reference json)
 }
 
 //==================================================================================================
+void Json::merge(fly::Json &other)
+{
+    if (is_null())
+    {
+        m_value = JsonTraits::object_type();
+    }
+
+    if (!is_object())
+    {
+        throw JsonException(*this, "JSON type invalid for merging");
+    }
+    else if (!other.is_object())
+    {
+        throw JsonException(other, "Other JSON type invalid for merging");
+    }
+
+    auto &this_value = std::get<JsonTraits::object_type>(m_value);
+    auto &other_value = std::get<JsonTraits::object_type>(other.m_value);
+
+    this_value.merge(other_value);
+}
+
+//==================================================================================================
+void Json::merge(fly::Json &&other)
+{
+    if (is_null())
+    {
+        m_value = JsonTraits::object_type();
+    }
+
+    if (!is_object())
+    {
+        throw JsonException(*this, "JSON type invalid for merging");
+    }
+    else if (!other.is_object())
+    {
+        throw JsonException(other, "Other JSON type invalid for merging");
+    }
+
+    auto &this_value = std::get<JsonTraits::object_type>(m_value);
+    auto &&other_value = std::get<JsonTraits::object_type>(std::move(other.m_value));
+
+    this_value.merge(std::move(other_value));
+}
+
+//==================================================================================================
 Json::iterator Json::begin()
 {
     return iterator(this, iterator::Position::Begin);
