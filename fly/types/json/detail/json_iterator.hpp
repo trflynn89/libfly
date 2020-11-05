@@ -17,6 +17,9 @@ class Json;
 
 namespace fly::detail {
 
+template <typename JsonIterator>
+class JsonReverseIterator;
+
 /**
  * Class to provide iterator access to a Json instance. Both const and non-const iterators are
  * supported.
@@ -419,6 +422,7 @@ public:
 
 private:
     friend std::conditional_t<is_const_iterator, NonConstJsonIterator, ConstJsonIterator>;
+    friend JsonReverseIterator<JsonIterator>;
     friend fly::Json;
 
     /**

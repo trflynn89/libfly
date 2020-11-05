@@ -640,6 +640,42 @@ Json::const_iterator Json::cend() const
 }
 
 //==================================================================================================
+Json::reverse_iterator Json::rbegin()
+{
+    return reverse_iterator(end());
+}
+
+//==================================================================================================
+Json::const_reverse_iterator Json::rbegin() const
+{
+    return crbegin();
+}
+
+//==================================================================================================
+Json::const_reverse_iterator Json::crbegin() const
+{
+    return const_reverse_iterator(cend());
+}
+
+//==================================================================================================
+Json::reverse_iterator Json::rend()
+{
+    return reverse_iterator(begin());
+}
+
+//==================================================================================================
+Json::const_reverse_iterator Json::rend() const
+{
+    return crend();
+}
+
+//==================================================================================================
+Json::const_reverse_iterator Json::crend() const
+{
+    return const_reverse_iterator(begin());
+}
+
+//==================================================================================================
 bool operator==(Json::const_reference json1, Json::const_reference json2)
 {
     auto visitor = [](const auto &value1, const auto &value2) -> bool
