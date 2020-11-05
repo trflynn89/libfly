@@ -100,6 +100,52 @@ CATCH_TEST_CASE("Json", "[json]")
         CATCH_CHECK(std::is_const_v<decltype(cend2)::value_type>);
     }
 
+    CATCH_SECTION("Check the reverse iterator at the beginning of a JSON instance")
+    {
+        fly::Json json1 {1, 2, 3};
+        const fly::Json json2 {4, 5, 6};
+
+        auto begin1 = json1.rbegin();
+        CATCH_CHECK(*begin1 == 3);
+        CATCH_CHECK_FALSE(std::is_const_v<decltype(begin1)::value_type>);
+
+        auto cbegin1 = json1.crbegin();
+        CATCH_CHECK(*cbegin1 == 3);
+        CATCH_CHECK(std::is_const_v<decltype(cbegin1)::value_type>);
+
+        auto begin2 = json2.rbegin();
+        CATCH_CHECK(*begin2 == 6);
+        CATCH_CHECK(std::is_const_v<decltype(begin2)::value_type>);
+
+        auto cbegin2 = json2.crbegin();
+        CATCH_CHECK(*cbegin2 == 6);
+        CATCH_CHECK(begin2 == cbegin2);
+        CATCH_CHECK(std::is_const_v<decltype(cbegin2)::value_type>);
+    }
+
+    CATCH_SECTION("Check the reverse iterator at the end of a JSON instance")
+    {
+        fly::Json json1 {1, 2, 3};
+        const fly::Json json2 {4, 5, 6};
+
+        auto end1 = json1.rend();
+        CATCH_CHECK(*(end1 - 1) == 1);
+        CATCH_CHECK_FALSE(std::is_const_v<decltype(end1)::value_type>);
+
+        auto cend1 = json1.crend();
+        CATCH_CHECK(*(cend1 - 1) == 1);
+        CATCH_CHECK(std::is_const_v<decltype(cend1)::value_type>);
+
+        auto end2 = json2.rend();
+        CATCH_CHECK(*(end2 - 1) == 4);
+        CATCH_CHECK(std::is_const_v<decltype(end2)::value_type>);
+
+        auto cend2 = json2.crend();
+        CATCH_CHECK(*(cend2 - 1) == 4);
+        CATCH_CHECK(end2 == cend2);
+        CATCH_CHECK(std::is_const_v<decltype(cend2)::value_type>);
+    }
+
     CATCH_SECTION("Iterate over a JSON object using plain interators")
     {
         fly::Json json {{"a", 1}, {"b", 2}};

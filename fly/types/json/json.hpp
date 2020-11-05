@@ -2,6 +2,7 @@
 
 #include "fly/traits/traits.hpp"
 #include "fly/types/json/detail/json_iterator.hpp"
+#include "fly/types/json/detail/json_reverse_iterator.hpp"
 #include "fly/types/json/json_exception.hpp"
 #include "fly/types/json/json_traits.hpp"
 #include "fly/types/string/string.hpp"
@@ -87,6 +88,8 @@ public:
     using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
     using iterator = detail::JsonIterator<Json>;
     using const_iterator = detail::JsonIterator<const Json>;
+    using reverse_iterator = detail::JsonReverseIterator<iterator>;
+    using const_reverse_iterator = detail::JsonReverseIterator<const_iterator>;
 
     /**
      * Alias for a basic_stringstream with the JSON string type.
@@ -1094,6 +1097,60 @@ public:
      * @throws JsonException If the Json instance is not an object or array.
      */
     const_iterator cend() const;
+
+    /**
+     * Retrieve a reverse iterator to the beginning of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    reverse_iterator rbegin();
+
+    /**
+     * Retrieve a constant reverse iterator to the beginning of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_reverse_iterator rbegin() const;
+
+    /**
+     * Retrieve a constant reverse iterator to the beginning of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_reverse_iterator crbegin() const;
+
+    /**
+     * Retrieve a reverse iterator to the end of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    reverse_iterator rend();
+
+    /**
+     * Retrieve a constant reverse iterator to the end of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_reverse_iterator rend() const;
+
+    /**
+     * Retrieve a constant reverse iterator to the end of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_reverse_iterator crend() const;
 
     /**
      * Equality operator. Compares two Json instances for equality. They are equal if one of the
