@@ -453,6 +453,12 @@ void Json::push_back(Json &&value)
 }
 
 //==================================================================================================
+void Json::pop_back()
+{
+    erase(size() - 1);
+}
+
+//==================================================================================================
 Json::iterator Json::erase(const_iterator position)
 {
     auto visitor = [this, &position](auto &value) -> iterator

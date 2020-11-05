@@ -798,6 +798,13 @@ public:
     void push_back(Json &&value);
 
     /**
+     * Remove the last element from the Json instance. Only valid if the Json instance is an array.
+     *
+     * @throws JsonException If the Json instance is not an array or the array is empty.
+     */
+    void pop_back();
+
+    /**
      * Remove a value from the Json instance with the provided key. Only valid if the Json instance
      * is an object. The SFINAE declaration allows lookups with any string-like type (e.g.
      * std::string, char8_t[], std::u16string_view).

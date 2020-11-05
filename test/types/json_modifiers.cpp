@@ -364,6 +364,33 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         }
     }
 
+    CATCH_SECTION("Pop a value from a JSON array")
+    {
+        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        {
+            json.pop_back();
+            CATCH_CHECK(json == fly::Json {'7', 8, 9});
+
+            json.pop_back();
+            CATCH_CHECK(json == fly::Json {'7', 8});
+
+            json.pop_back();
+            CATCH_CHECK(json == fly::Json {'7'});
+
+            json.pop_back();
+            CATCH_CHECK(json == json_type());
+
+            CATCH_CHECK_THROWS_JSON(json.erase(0), "Given index (0) not found: (%s)", json);
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                json.pop_back(),
+                "JSON type invalid for erase(index): (%s)",
+                json);
+        }
+    }
+
     CATCH_SECTION("Erase a value from a JSON instance")
     {
         if constexpr (fly::JsonTraits::is_iterable_v<json_type>)
