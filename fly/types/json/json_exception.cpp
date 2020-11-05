@@ -67,8 +67,15 @@ NullJsonException::NullJsonException() noexcept :
 OutOfRangeJsonException::OutOfRangeJsonException(const Json &json, std::ptrdiff_t offset) noexcept :
     JsonException(
         "OutOfRangeJsonException",
-        String::format("Offset %d is out-of-range: (%s)", offset, json))
+        String::format("Offset %d is out-of-range: (%s)", offset, json)),
+    m_offset(offset)
 {
+}
+
+//==================================================================================================
+std::ptrdiff_t OutOfRangeJsonException::offset() const
+{
+    return m_offset;
 }
 
 } // namespace fly

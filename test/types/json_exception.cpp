@@ -49,5 +49,18 @@ CATCH_TEST_CASE("JsonException", "[json]")
             throw fly::OutOfRangeJsonException(string, 12389),
             Catch::StartsWith("OutOfRangeJsonException") && Catch::Contains(string) &&
                 Catch::Contains("12389"));
+
+        std::ptrdiff_t offset;
+
+        try
+        {
+            throw fly::OutOfRangeJsonException(string, 12389);
+        }
+        catch (const fly::OutOfRangeJsonException &ex)
+        {
+            offset = ex.offset();
+        }
+
+        CATCH_CHECK(offset == 12389);
     }
 }
