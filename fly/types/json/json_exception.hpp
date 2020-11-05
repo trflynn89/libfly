@@ -114,6 +114,14 @@ public:
      * @param offset The iterator offset attempted to be accessed.
      */
     OutOfRangeJsonException(const Json &json, std::ptrdiff_t offset) noexcept;
+
+    /**
+     * @return The iterator offset attempted to be accessed.
+     */
+    std::ptrdiff_t offset() const;
+
+private:
+    std::ptrdiff_t m_offset;
 };
 
 } // namespace fly
