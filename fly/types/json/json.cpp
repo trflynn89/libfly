@@ -240,6 +240,48 @@ Json::const_reference Json::at(size_type index) const
 }
 
 //==================================================================================================
+Json::reference Json::front()
+{
+    return *begin();
+}
+
+//==================================================================================================
+Json::const_reference Json::front() const
+{
+    return *cbegin();
+}
+
+//==================================================================================================
+Json::reference Json::back()
+{
+    auto it = end();
+
+    // This check isn't needed but it ensures invalid calls to back() result in the same exceptions
+    // thrown as invalid calls to front().
+    if (it != begin())
+    {
+        --it;
+    }
+
+    return *it;
+}
+
+//==================================================================================================
+Json::const_reference Json::back() const
+{
+    auto it = cend();
+
+    // This check isn't needed but it ensures invalid calls to back() result in the same exceptions
+    // thrown as invalid calls to front().
+    if (it != cbegin())
+    {
+        --it;
+    }
+
+    return *it;
+}
+
+//==================================================================================================
 bool Json::empty() const
 {
     auto visitor = [](const auto &value) -> bool

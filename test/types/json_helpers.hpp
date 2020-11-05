@@ -58,8 +58,7 @@
         expression,                                                                                \
         fly::NullJsonException,                                                                    \
         Catch::Matchers::Exception::ExceptionMessageMatcher(fly::String::format(                   \
-            "NullJsonException: Cannot dereference an empty or past-the-end "                      \
-            "iterator: (%s)",                                                                      \
+            "NullJsonException: Cannot dereference an empty or past-the-end iterator: (%s)",       \
             json)))
 
 #define CATCH_CHECK_THROWS_OUT_OF_RANGE(expression, offset, json)                                  \

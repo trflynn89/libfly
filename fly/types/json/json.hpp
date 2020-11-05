@@ -518,6 +518,62 @@ public:
     const_reference at(size_type index) const;
 
     /**
+     * Obtain a reference to the first element in the Json instance. Only valid if the Json instance
+     * is an object or an array.
+     *
+     * For JSON objects, the returned reference will be to the value part of the front element's
+     * key-value pair.
+     *
+     * @return A reference to the first element.
+     *
+     * @throws JsonException If the Json instance is not an object or array, or if the Json instance
+     *         is empty.
+     */
+    reference front();
+
+    /**
+     * Obtain a reference to the first element in the Json instance. Only valid if the Json instance
+     * is an object or an array.
+     *
+     * For JSON objects, the returned reference will be to the value part of the front element's
+     * key-value pair.
+     *
+     * @return A reference to the first element.
+     *
+     * @throws JsonException If the Json instance is not an object or array, or if the Json instance
+     *         is empty.
+     */
+    const_reference front() const;
+
+    /**
+     * Obtain a reference to the last element in the Json instance. Only valid if the Json instance
+     * is an object or an array.
+     *
+     * For JSON objects, the returned reference will be to the value part of the back element's
+     * key-value pair.
+     *
+     * @return A reference to the last element.
+     *
+     * @throws JsonException If the Json instance is not an object or array, or if the Json instance
+     *         is empty.
+     */
+    reference back();
+
+    /**
+     * Obtain a reference to the last element in the Json instance. Only valid if the Json instance
+     * is an object or an array.
+     *
+     * For JSON objects, the returned reference will be to the value part of the back element's
+     * key-value pair.
+     *
+     * @return A reference to the last element.
+     *
+     * @throws JsonException If the Json instance is not an object or array, or if the Json instance
+     *         is empty.
+     */
+    const_reference back() const;
+
+    /**
      * Check if the Json instance contains zero elements.
      *
      * If the Json instance is an object, array, or string, return whether the stored container is
