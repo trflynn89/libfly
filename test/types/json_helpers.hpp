@@ -187,10 +187,15 @@ fly::Json create_json()
     }
 }
 
-template <typename JsonType, typename StringType, typename Validator, typename Invalidator>
+template <
+    typename JsonType,
+    typename StringType,
+    typename Validator,
+    typename Invalidator,
+    bool AllowForType = std::is_same_v<JsonType, fly::JsonTraits::object_type>>
 void run_test_for_object_types(Validator validate, Invalidator invalidate)
 {
-    if constexpr (std::is_same_v<JsonType, fly::JsonTraits::object_type>)
+    if constexpr (AllowForType)
     {
         std::map<StringType, int> map1;
         std::map<StringType, std::string> map2;
@@ -237,10 +242,11 @@ template <
     typename StringType,
     typename Validator2,
     typename Validator3,
-    typename Invalidator>
+    typename Invalidator,
+    bool AllowForType = std::is_same_v<JsonType, fly::JsonTraits::array_type>>
 void run_test_for_array_types(Validator2 validate2, Validator3 validate3, Invalidator invalidate)
 {
-    if constexpr (std::is_same_v<JsonType, fly::JsonTraits::array_type>)
+    if constexpr (AllowForType)
     {
         std::array<int, 4> array1;
         std::array<StringType, 4> array2;
