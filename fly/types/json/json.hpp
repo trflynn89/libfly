@@ -887,7 +887,7 @@ public:
 
     /**
      * Exchange the contents of the Json instance with another object. Only valid if the Json
-     * instance is an object.  The SFINAE declaration allows swapping with any object-like type
+     * instance is an object. The SFINAE declaration allows swapping with any object-like type
      * (e.g. std::map, std::multimap).
      *
      * @tparam T The object type to swap with.
@@ -912,6 +912,68 @@ public:
      */
     template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
     void swap(T &other);
+
+    /**
+     * Extract each element from a Json instance into this Json instance. Only valid if this Json
+     * instance is an object or null, and the other Json instance is an object. If this Json
+     * instance is null, it is first converted to an object.
+     *
+     * If there is an element in the other Json instance with a key equivalent to a key of an
+     * element in this Json instance, that element is not merged.
+     *
+     * @param other The Json instance to merge into this Json instance.
+     *
+     * @throws JsonException If this Json instance is neither an object nor null, or the other Json
+     *                       instance is not an object.
+     */
+    void merge(Json &other);
+
+    /**
+     * Extract each element from a Json instance into this Json instance. Only valid if this Json
+     * instance is an object or null, and the other Json instance is an object. If this Json
+     * instance is null, it is first converted to an object.
+     *
+     * If there is an element in the other Json instance with a key equivalent to a key of an
+     * element in this Json instance, that element is not merged.
+     *
+     * @param other The Json instance to merge into this Json instance.
+     *
+     * @throws JsonException If this Json instance is neither an object nor null, or the other Json
+     *                       instance is not an object.
+     */
+    void merge(Json &&other);
+
+    /**
+     * Extract each element from an object-like type into the Json instance. Only valid if the Json
+     * instance is an object or null. If the Json instance is null, it is first converted to an
+     * object. The SFINAE declaration allows merging any object-like type (e.g. std::map,
+     * std::multimap).
+     *
+     * If there is an element in the object-like type with a key equivalent to a key of an element
+     * in the Json instance, that element is not merged.
+     *
+     * @param other The object to merge into this Json instance.
+     *
+     * @throws JsonException If this Json instance is neither an object nor null.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
+    void merge(T &other);
+
+    /**
+     * Extract each element from an object-like type into the Json instance. Only valid if the Json
+     * instance is an object or null. If the Json instance is null, it is first converted to an
+     * object. The SFINAE declaration allows merging any object-like type (e.g. std::map,
+     * std::multimap).
+     *
+     * If there is an element in the object-like type with a key equivalent to a key of an element
+     * in the Json instance, that element is not merged.
+     *
+     * @param other The object to merge into this Json instance.
+     *
+     * @throws JsonException If this Json instance is neither an object nor null.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
+    void merge(T &&other);
 
     /**
      * Count the number of elements in the Json instance with a given key. Only valid if the Json
@@ -1582,6 +1644,59 @@ void Json::swap(T &other)
     else
     {
         throw JsonException(*this, "JSON type invalid for swap(array)");
+    }
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_object<T>>>
+void Json::merge(T &other)
+{
+    if (is_null())
+    {
+        m_value = JsonTraits::object_type();
+    }
+
+    if (!is_object())
+    {
+        throw JsonException(*this, "JSON type invalid for merging");
+    }
+
+    // Manual implementation of fly::JsonTraits::object_type::merge(&) to allow unordered maps.
+    for (auto it = other.begin(); it != other.end();)
+    {
+        if (contains(it->first))
+        {
+            ++it;
+        }
+        else
+        {
+            insert(std::make_pair(it->first, fly::Json(it->second)));
+            it = other.erase(it);
+        }
+    }
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_object<T>>>
+void Json::merge(T &&other)
+{
+    if (is_null())
+    {
+        m_value = JsonTraits::object_type();
+    }
+
+    if (!is_object())
+    {
+        throw JsonException(*this, "JSON type invalid for merging");
+    }
+
+    // Manual implementation of fly::JsonTraits::object_type::merge(&&) to allow unordered maps.
+    for (auto &&it : other)
+    {
+        if (!contains(it.first))
+        {
+            insert(std::make_pair(it.first, fly::Json(it.second)));
+        }
     }
 }
 
