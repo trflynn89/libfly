@@ -77,6 +77,58 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
         }
     }
 
+    CATCH_SECTION("Access a JSON instance's front element")
+    {
+        if constexpr (fly::JsonTraits::is_iterable_v<json_type>)
+        {
+            auto &front1 = json1.front();
+            CATCH_CHECK(front1 == *(json1.begin()));
+
+            const auto &front2 = json2.front();
+            CATCH_CHECK(front2 == *(json2.begin()));
+
+            fly::Json empty = json_type();
+            CATCH_CHECK_THROWS_NULL_WITH(empty.front(), empty);
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_ITERATOR(
+                json1.front(),
+                "JSON type invalid for iteration: (%s)",
+                json1);
+            CATCH_CHECK_THROWS_ITERATOR(
+                json2.front(),
+                "JSON type invalid for iteration: (%s)",
+                json2);
+        }
+    }
+
+    CATCH_SECTION("Access a JSON instance's back element")
+    {
+        if constexpr (fly::JsonTraits::is_iterable_v<json_type>)
+        {
+            auto &back1 = json1.back();
+            CATCH_CHECK(back1 == *(--(json1.end())));
+
+            const auto &back2 = json2.back();
+            CATCH_CHECK(back2 == *(--(json2.end())));
+
+            fly::Json empty = json_type();
+            CATCH_CHECK_THROWS_NULL_WITH(empty.back(), empty);
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_ITERATOR(
+                json1.back(),
+                "JSON type invalid for iteration: (%s)",
+                json1);
+            CATCH_CHECK_THROWS_ITERATOR(
+                json2.back(),
+                "JSON type invalid for iteration: (%s)",
+                json2);
+        }
+    }
+
     CATCH_SECTION("Check a JSON instance for emptiness")
     {
         if constexpr (std::is_same_v<json_type, fly::JsonTraits::null_type>)
