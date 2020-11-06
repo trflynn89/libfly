@@ -10,6 +10,35 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
     fly::Json json1 = fly::test::create_json<json_type>();
     const fly::Json json2 = fly::test::create_json<json_type>();
 
+    CATCH_SECTION("Access a JSON array's values via the accessor 'at'")
+    {
+        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        {
+            CATCH_CHECK(json1.at(0) == '7');
+            CATCH_CHECK(json1.at(1) == 8);
+            CATCH_CHECK(json1.at(2) == 9);
+            CATCH_CHECK(json1.at(3) == 10);
+            CATCH_CHECK_THROWS_JSON(json1.at(4), "Given index (4) not found: (%s)", json1);
+
+            CATCH_CHECK(json2.at(0) == '7');
+            CATCH_CHECK(json2.at(1) == 8);
+            CATCH_CHECK(json2.at(2) == 9);
+            CATCH_CHECK(json2.at(3) == 10);
+            CATCH_CHECK_THROWS_JSON(json2.at(4), "Given index (4) not found: (%s)", json2);
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                json1.at(0),
+                "JSON type invalid for operator[index]: (%s)",
+                json1);
+            CATCH_CHECK_THROWS_JSON(
+                json2.at(0),
+                "JSON type invalid for operator[index]: (%s)",
+                json2);
+        }
+    }
+
     CATCH_SECTION("Access a JSON array's values via the access operator")
     {
         if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
@@ -45,35 +74,6 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
         {
             CATCH_CHECK_THROWS_JSON(json1[0], "JSON type invalid for operator[index]: (%s)", json1);
             CATCH_CHECK_THROWS_JSON(json2[0], "JSON type invalid for operator[index]: (%s)", json2);
-        }
-    }
-
-    CATCH_SECTION("Access a JSON array's values via the accessor 'at'")
-    {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
-        {
-            CATCH_CHECK(json1.at(0) == '7');
-            CATCH_CHECK(json1.at(1) == 8);
-            CATCH_CHECK(json1.at(2) == 9);
-            CATCH_CHECK(json1.at(3) == 10);
-            CATCH_CHECK_THROWS_JSON(json1.at(4), "Given index (4) not found: (%s)", json1);
-
-            CATCH_CHECK(json2.at(0) == '7');
-            CATCH_CHECK(json2.at(1) == 8);
-            CATCH_CHECK(json2.at(2) == 9);
-            CATCH_CHECK(json2.at(3) == 10);
-            CATCH_CHECK_THROWS_JSON(json2.at(4), "Given index (4) not found: (%s)", json2);
-        }
-        else
-        {
-            CATCH_CHECK_THROWS_JSON(
-                json1.at(0),
-                "JSON type invalid for operator[index]: (%s)",
-                json1);
-            CATCH_CHECK_THROWS_JSON(
-                json2.at(0),
-                "JSON type invalid for operator[index]: (%s)",
-                json2);
         }
     }
 
@@ -187,6 +187,31 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
     fly::Json json1 = fly::test::create_json<json_type, string_type>();
     const fly::Json json2 = fly::test::create_json<json_type, string_type>();
 
+    CATCH_SECTION("Access a JSON object's values via the accessor 'at'")
+    {
+        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        {
+            CATCH_CHECK(json1.at(J_STR("a")) == 1);
+            CATCH_CHECK(json1.at(J_STR("b")) == 2);
+            CATCH_CHECK_THROWS_JSON(json1.at(J_STR("c")), "Given key (c) not found: (%s)", json1);
+
+            CATCH_CHECK(json2.at(J_STR("a")) == 1);
+            CATCH_CHECK(json2.at(J_STR("b")) == 2);
+            CATCH_CHECK_THROWS_JSON(json2.at(J_STR("c")), "Given key (c) not found: (%s)", json2);
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                json1.at(J_STR("a")),
+                "JSON type invalid for operator[key]: (%s)",
+                json1);
+            CATCH_CHECK_THROWS_JSON(
+                json2.at(J_STR("a")),
+                "JSON type invalid for operator[key]: (%s)",
+                json2);
+        }
+    }
+
     CATCH_SECTION("Access a JSON object's values via the access operator")
     {
         if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::object_type>)
@@ -222,31 +247,6 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
                 json1);
             CATCH_CHECK_THROWS_JSON(
                 json2[J_STR("a")],
-                "JSON type invalid for operator[key]: (%s)",
-                json2);
-        }
-    }
-
-    CATCH_SECTION("Access a JSON object's values via the accessor 'at'")
-    {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
-        {
-            CATCH_CHECK(json1.at(J_STR("a")) == 1);
-            CATCH_CHECK(json1.at(J_STR("b")) == 2);
-            CATCH_CHECK_THROWS_JSON(json1.at(J_STR("c")), "Given key (c) not found: (%s)", json1);
-
-            CATCH_CHECK(json2.at(J_STR("a")) == 1);
-            CATCH_CHECK(json2.at(J_STR("b")) == 2);
-            CATCH_CHECK_THROWS_JSON(json2.at(J_STR("c")), "Given key (c) not found: (%s)", json2);
-        }
-        else
-        {
-            CATCH_CHECK_THROWS_JSON(
-                json1.at(J_STR("a")),
-                "JSON type invalid for operator[key]: (%s)",
-                json1);
-            CATCH_CHECK_THROWS_JSON(
-                json2.at(J_STR("a")),
                 "JSON type invalid for operator[key]: (%s)",
                 json2);
         }

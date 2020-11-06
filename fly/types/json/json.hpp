@@ -383,6 +383,12 @@ public:
      */
     bool is_float() const;
 
+    //==============================================================================================
+    //
+    // Conversion operators
+    //
+    //==============================================================================================
+
     /**
      * Null conversion operator. Converts the Json instance to a null type.
      *
@@ -487,6 +493,74 @@ public:
             JsonTraits::is_floating_point<T>> = 0>
     explicit operator T() const noexcept(false);
 
+    //==============================================================================================
+    //
+    // Element accessors
+    //
+    //==============================================================================================
+
+    /**
+     * Object read-only accessor. The SFINAE declaration allows lookups with any string-like type
+     * (e.g. std::string, char8_t[], std::u16string_view).
+     *
+     * If the Json instance is an object, perform a lookup on the object with a key value.
+     *
+     * @tparam T The string-like key type.
+     *
+     * @param key The key value to lookup.
+     *
+     * @return A reference to the Json instance at the key value.
+     *
+     * @throws JsonException If the Json instance is not an object, or the key value does not exist,
+     *         or the key value is invalid.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    reference at(const T &key);
+
+    /**
+     * Object read-only accessor. The SFINAE declaration allows lookups with any string-like type
+     * (e.g. std::string, char8_t[], std::u16string_view).
+     *
+     * If the Json instance is an object, perform a lookup on the object with a key value.
+     *
+     * @tparam T The string-like key type.
+     *
+     * @param key The key value to lookup.
+     *
+     * @return A reference to the Json instance at the key value.
+     *
+     * @throws JsonException If the Json instance is not an object, or the key value does not exist,
+     *         or the key value is invalid.
+     */
+    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    const_reference at(const T &key) const;
+
+    /**
+     * Array read-only accessor.
+     *
+     * If the Json instance is an array, perform a lookup on the array with an index.
+     *
+     * @param index The index to lookup.
+     *
+     * @return A reference to the Json instance at the index.
+     *
+     * @throws JsonException If the Json instance is not an array or the index does not exist.
+     */
+    reference at(size_type index);
+
+    /**
+     * Array read-only accessor.
+     *
+     * If the Json instance is an array, perform a lookup on the array with an index.
+     *
+     * @param index The index to lookup.
+     *
+     * @return A reference to the Json instance at the index.
+     *
+     * @throws JsonException If the Json instance is not an array or the index does not exist.
+     */
+    const_reference at(size_type index) const;
+
     /**
      * Object access operator. The SFINAE declaration allows lookups with any string-like type
      * (e.g. std::string, char8_t[], std::u16string_view).
@@ -554,68 +628,6 @@ public:
     const_reference operator[](size_type index) const;
 
     /**
-     * Object read-only accessor. The SFINAE declaration allows lookups with any string-like type
-     * (e.g. std::string, char8_t[], std::u16string_view).
-     *
-     * If the Json instance is an object, perform a lookup on the object with a key value.
-     *
-     * @tparam T The string-like key type.
-     *
-     * @param key The key value to lookup.
-     *
-     * @return A reference to the Json instance at the key value.
-     *
-     * @throws JsonException If the Json instance is not an object, or the key value does not exist,
-     *         or the key value is invalid.
-     */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
-    reference at(const T &key);
-
-    /**
-     * Object read-only accessor. The SFINAE declaration allows lookups with any string-like type
-     * (e.g. std::string, char8_t[], std::u16string_view).
-     *
-     * If the Json instance is an object, perform a lookup on the object with a key value.
-     *
-     * @tparam T The string-like key type.
-     *
-     * @param key The key value to lookup.
-     *
-     * @return A reference to the Json instance at the key value.
-     *
-     * @throws JsonException If the Json instance is not an object, or the key value does not exist,
-     *         or the key value is invalid.
-     */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
-    const_reference at(const T &key) const;
-
-    /**
-     * Array read-only accessor.
-     *
-     * If the Json instance is an array, perform a lookup on the array with an index.
-     *
-     * @param index The index to lookup.
-     *
-     * @return A reference to the Json instance at the index.
-     *
-     * @throws JsonException If the Json instance is not an array or the index does not exist.
-     */
-    reference at(size_type index);
-
-    /**
-     * Array read-only accessor.
-     *
-     * If the Json instance is an array, perform a lookup on the array with an index.
-     *
-     * @param index The index to lookup.
-     *
-     * @return A reference to the Json instance at the index.
-     *
-     * @throws JsonException If the Json instance is not an array or the index does not exist.
-     */
-    const_reference at(size_type index) const;
-
-    /**
      * Obtain a reference to the first element in the Json instance. Only valid if the Json instance
      * is an object or an array.
      *
@@ -671,6 +683,126 @@ public:
      */
     const_reference back() const;
 
+    //==============================================================================================
+    //
+    // Iterators
+    //
+    //==============================================================================================
+
+    /**
+     * Retrieve an iterator to the beginning of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    iterator begin();
+
+    /**
+     * Retrieve a constant iterator to the beginning of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_iterator begin() const;
+
+    /**
+     * Retrieve a constant iterator to the beginning of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_iterator cbegin() const;
+
+    /**
+     * Retrieve an iterator to the end of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    iterator end();
+
+    /**
+     * Retrieve a constant iterator to the end of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_iterator end() const;
+
+    /**
+     * Retrieve a constant iterator to the end of the Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_iterator cend() const;
+
+    /**
+     * Retrieve a reverse iterator to the beginning of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    reverse_iterator rbegin();
+
+    /**
+     * Retrieve a constant reverse iterator to the beginning of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_reverse_iterator rbegin() const;
+
+    /**
+     * Retrieve a constant reverse iterator to the beginning of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_reverse_iterator crbegin() const;
+
+    /**
+     * Retrieve a reverse iterator to the end of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    reverse_iterator rend();
+
+    /**
+     * Retrieve a constant reverse iterator to the end of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_reverse_iterator rend() const;
+
+    /**
+     * Retrieve a constant reverse iterator to the end of the reversed Json instance.
+     *
+     * @return The retrieved iterator.
+     *
+     * @throws JsonException If the Json instance is not an object or array.
+     */
+    const_reverse_iterator crend() const;
+
+    //==============================================================================================
+    //
+    // Capacity
+    //
+    //==============================================================================================
+
     /**
      * Check if the Json instance contains zero elements.
      *
@@ -700,6 +832,12 @@ public:
      * @return The size of the Json instance.
      */
     size_type size() const;
+
+    //==============================================================================================
+    //
+    // Modifiers
+    //
+    //==============================================================================================
 
     /**
      * Clear the contents of the Json instance.
@@ -1073,6 +1211,12 @@ public:
     template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
     void merge(T &&other);
 
+    //==============================================================================================
+    //
+    // Lookup
+    //
+    //==============================================================================================
+
     /**
      * Count the number of elements in the Json instance with a given key. Only valid if the Json
      * instance is an object. The SFINAE declaration allows lookups with any string-like type (e.g.
@@ -1139,113 +1283,11 @@ public:
     template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
     bool contains(const T &key) const;
 
-    /**
-     * Retrieve an iterator to the beginning of the Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    iterator begin();
-
-    /**
-     * Retrieve a constant iterator to the beginning of the Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    const_iterator begin() const;
-
-    /**
-     * Retrieve a constant iterator to the beginning of the Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    const_iterator cbegin() const;
-
-    /**
-     * Retrieve an iterator to the end of the Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    iterator end();
-
-    /**
-     * Retrieve a constant iterator to the end of the Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    const_iterator end() const;
-
-    /**
-     * Retrieve a constant iterator to the end of the Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    const_iterator cend() const;
-
-    /**
-     * Retrieve a reverse iterator to the beginning of the reversed Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    reverse_iterator rbegin();
-
-    /**
-     * Retrieve a constant reverse iterator to the beginning of the reversed Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    const_reverse_iterator rbegin() const;
-
-    /**
-     * Retrieve a constant reverse iterator to the beginning of the reversed Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    const_reverse_iterator crbegin() const;
-
-    /**
-     * Retrieve a reverse iterator to the end of the reversed Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    reverse_iterator rend();
-
-    /**
-     * Retrieve a constant reverse iterator to the end of the reversed Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    const_reverse_iterator rend() const;
-
-    /**
-     * Retrieve a constant reverse iterator to the end of the reversed Json instance.
-     *
-     * @return The retrieved iterator.
-     *
-     * @throws JsonException If the Json instance is not an object or array.
-     */
-    const_reverse_iterator crend() const;
+    //==============================================================================================
+    //
+    // Non-member functions
+    //
+    //==============================================================================================
 
     /**
      * Equality operator. Compares two Json instances for equality. They are equal if one of the
@@ -1617,31 +1659,6 @@ Json::operator T() const noexcept(false)
 
 //==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
-Json::reference Json::operator[](const T &key)
-{
-    if (is_null())
-    {
-        m_value = JsonTraits::object_type();
-    }
-
-    if (is_object())
-    {
-        auto &value = std::get<JsonTraits::object_type>(m_value);
-        return value[convert_to_string(key)];
-    }
-
-    throw JsonException(*this, "JSON type invalid for operator[key]");
-}
-
-//==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
-Json::const_reference Json::operator[](const T &key) const
-{
-    return at(key);
-}
-
-//==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
 Json::reference Json::at(const T &key)
 {
     if (is_object())
@@ -1678,6 +1695,31 @@ Json::const_reference Json::at(const T &key) const
     }
 
     throw JsonException(*this, "JSON type invalid for operator[key]");
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+Json::reference Json::operator[](const T &key)
+{
+    if (is_null())
+    {
+        m_value = JsonTraits::object_type();
+    }
+
+    if (is_object())
+    {
+        auto &value = std::get<JsonTraits::object_type>(m_value);
+        return value[convert_to_string(key)];
+    }
+
+    throw JsonException(*this, "JSON type invalid for operator[key]");
+}
+
+//==================================================================================================
+template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+Json::const_reference Json::operator[](const T &key) const
+{
+    return at(key);
 }
 
 //==================================================================================================
