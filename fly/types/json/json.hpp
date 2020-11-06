@@ -27,41 +27,135 @@
 namespace fly {
 
 /**
- * Class to represent JSON values defined by https://www.json.org. The class provides various
- * user-friendly accessors and initializers to create a JSON value, and to convert the JSON value
- * back its underlying type.
+ * Class to represent JSON values defined by https://www.json.org.
  *
- * However, there are some restrictions converting a JSON value back to its underlying type:
+ * This class is designed to treat JSON as a first-class container, and to feel as easy to use as
+ * a Python dictionary.
  *
- * 1. While creating a JSON value from a char array is allowed, converting a JSON value back to a
- *    char array is not allowed. There is no straight- forward way to do the following without
- *    dynamically allocating memory that the caller must remember to free:
+ * There are a myriad of user-friendly initializers to create a JON value from any compatible type:
  *
- *        fly::Json json = "string";
- *        char *string = json;
+ *     A JSON string is a Unicode string. Internally, strings are stored with UTF-8 encoding.
+ *     However, most methods that accept a JSON string will accept ASCII, UTF-8, UTF-16, and UTF-32
+ *     encoded strings (exceptions are noted in the documention of some methods). All strings are
+ *     validated for strict Unicode compliance and converted to UTF-8. Further, the provided string
+ *     type may be an STL string, a null-terminated character array, or a string view. For example:
  *
- * 2. Conversions back to the underlying type must be explicit. To define the conversion operators
- *    implicitly could introduce ambiguity in which operator should be called. For example:
+ *         fly::Json json = "This is an ASCII string";
+ *         fly::Json json = u8"This is a UTF-8 string";
+ *         fly::Json json = u"This is a UTF-16 string";
+ *         fly::Json json = U"This is a UTF-32 string";
+ *         fly::Json json = L"This is a wide string"; // UTF-16 on Windows, UTF-32 on Linux & macOS.
  *
- *        fly::Json json = { 1, 2, 3, 4 };
- *        std::vector<int> vector(json);
+ *         std::string string = "This is an ASCII string";
+ *         fly::Json json = string;
  *
- *    Which JSON conversion operator should be called in the vector constructor? Conversions to
- *    std::vector and std::size_t are defined, creating ambiguity in which std::vector constructor
- *    would be called (copy constructor or count constructor), even though the std::size_t converter
- *    would actually throw an exception. Making the conversion operators explicit removes this
- *    ambiguity, at the cost of not being able to do something like:
+ *         std::u32string string = "This is a UTF-32 string";
+ *         std::u32string_view view = string;
+ *         fly::Json json = view;
  *
- *        fly::Json json = { 1, 2, 3, 4 };
- *        std::vector<int> vector;
- *        vector = json; // You could do "vector = decltype(vector)(json);"
+ *     A JSON object may be created from a std::map, std::unordered_multimap, etc., as long as the
+ *     map key is a JSON string (where any of the above Unicode encodings are valid). Further,
+ *     initializer lists with mixed types are also valid. For example:
+ *
+ *         std::map<std::string, int> map = {{"key1", 1}, {"key2", 2}};
+ *         fly::Json json = map;
+ *
+ *         std::unordered_map<std::u16string, int> map = {{u"key1", 1}, {u"key2", 2}};
+ *         fly::Json json = map;
+ *
+ *         fly::Json json = {{"key1", nullptr}, {u8"key2", L"value2"}, {U"key3", 123.89f}};
+ *
+ *     A JSON array may be created from a std::vector, std::list, std::array, etc. Further,
+ *     initializer lists with mixed types are also valid. For example:
+ *
+ *         std::vector<std::string> array = {"value1", "value2"};
+ *         fly::Json json = array;
+ *
+ *         std::array<std::u8string, 2> array = {u8"value1", u8"value2"};
+ *         fly::Json json = array;
+ *
+ *         fly::Json json = {"value1", u8"value2", nullptr, 123.89f};
+ *
+ *     A JSON boolean, number, or null value may be created from analogous C++ plain-old-data types.
+ *     Internally, 64-bit integers are used for storing integer numbers and long doubles for
+ *     floating point numbers. The signedness of the 64-bit integer is the same as the integer from
+ *     which the JSON value is created. For example:
+ *
+ *         fly::Json json = true;
+ *         fly::Json json = -12389;
+ *         fly::Json json = 123.89f;
+ *         fly::Json json = nullptr;
+ *
+ * A JSON value may be converted to any compatible C++ type. Attempting to convert a JSON value to
+ * an incompatible type is considered exceptional. Further, conversions must be explicit. To define
+ * conversion operators implicitly would introduce ambiguity in which conversion operator the
+ * compiler should choose. For example:
+ *
+ *         fly::Json json = { 1, 2, 3, 4 };
+ *         std::vector<int> vector(json); // Would not compile if conversions were implicit.
+ *
+ * Which JSON conversion operator should be called for the std::vector constructor? Conversions from
+ * a JSON value to std::vector and std::size_t are defined, creating ambiguity in which std::vector
+ * constructor would be called (copy constructor or count constructor), even though the std::size_t
+ * converter would actually throw an exception. Explicit conversion operators remove this ambiguity.
+ *
+ *     Converting a JSON string to a string type permits the same Unicode flexibility as creating
+ *     the JSON string. For example:
+ *
+ *         fly::Json json = "This is an ASCII string";
+ *         std::string string(json);
+ *         std::u8string string(json);
+ *         std::wstring string(json);
+ *
+ *     A restriction is that while creating a JSON value from a character array is allowed,
+ *     converting a JSON value to a character array is not allowed. There is no safe way to do the
+ *     following without allocating memory that the caller must remember to free:
+ *
+ *         fly::Json json = "string";
+ *         char *string = json; // Will not compile.
+ *
+ *     Converting other JSON types works similarly. Like JSON strings, the keys of the C++ type may
+ *     be any compatible string type.
+ *
+ *         fly::Json json = {{"key1", 1}, {u8"key2", "2"}};
+ *         std::map<std::u32string, int> map(json); // map = {{U"key1", 1}, {U"key2", 2}}
+ *
+ *         fly::Json json = {"value1", u8"value2", nullptr, 123.89f};
+ *         std::vector<std::string> array(json); // array = {"value1", "value2", "null", "123.89"}
+ *
+ *         fly::Json json = true;
+ *         bool value(json);
+ *
+ *         fly::Json json = 12389;
+ *         std::uint16_t value(json);
+ *
+ *         fly::Json json = -123.89f;
+ *         float value(json);
+ *
+ *     Some leniency is allowed for converting a JSON value to a type which differs from the type
+ *     of the JSON value itself:
+ *
+ *         JSON strings may be converted to numeric values if the string represents a number. For
+ *         example, the string "12389" may be converted to an integer. The string "abc" may not.
+ *
+ *         All JSON types may be converted to a string type. Non-string JSON values will be
+ *         serialized to a string.
+ *
+ *         All JSON types may be converted to a boolean. String, object, and array JSON values will
+ *         convert based on whether the value is empty. JSON numbers will convert based on whether
+ *         the value is non-zero. Null JSON values always convert to false.
+ *
+ *         JSON numbers may be converted to any numeric type. For example, a floating point JSON
+ *         value may be converted to an integer.
+ *
+ * Lastly, this class defines the canonical interfaces of STL container types. This includes element
+ * accessor, iterator, modifier, and capacity/lookup operations.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version September 24, 2017
  */
 class Json
 {
-public:
     /**
      * Alias for the std::variant holding the JSON types.
      */
@@ -75,6 +169,7 @@ public:
         JsonTraits::unsigned_type,
         JsonTraits::float_type>;
 
+public:
     /**
      * Aliases for canonical STL container member types.
      */
