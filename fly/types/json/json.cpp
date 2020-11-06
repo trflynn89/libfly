@@ -175,35 +175,6 @@ Json::operator JsonTraits::null_type() const noexcept(false)
 }
 
 //==================================================================================================
-Json::reference Json::operator[](size_type index)
-{
-    if (is_null())
-    {
-        m_value = JsonTraits::array_type();
-    }
-
-    if (is_array())
-    {
-        auto &value = std::get<JsonTraits::array_type>(m_value);
-
-        if (index >= value.size())
-        {
-            value.resize(index + 1);
-        }
-
-        return value.at(index);
-    }
-
-    throw JsonException(*this, "JSON type invalid for operator[index]");
-}
-
-//==================================================================================================
-Json::const_reference Json::operator[](size_type index) const
-{
-    return at(index);
-}
-
-//==================================================================================================
 Json::reference Json::at(size_type index)
 {
     if (is_array())
@@ -237,6 +208,35 @@ Json::const_reference Json::at(size_type index) const
     }
 
     throw JsonException(*this, "JSON type invalid for operator[index]");
+}
+
+//==================================================================================================
+Json::reference Json::operator[](size_type index)
+{
+    if (is_null())
+    {
+        m_value = JsonTraits::array_type();
+    }
+
+    if (is_array())
+    {
+        auto &value = std::get<JsonTraits::array_type>(m_value);
+
+        if (index >= value.size())
+        {
+            value.resize(index + 1);
+        }
+
+        return value.at(index);
+    }
+
+    throw JsonException(*this, "JSON type invalid for operator[index]");
+}
+
+//==================================================================================================
+Json::const_reference Json::operator[](size_type index) const
+{
+    return at(index);
 }
 
 //==================================================================================================
@@ -279,6 +279,78 @@ Json::const_reference Json::back() const
     }
 
     return *it;
+}
+
+//==================================================================================================
+Json::iterator Json::begin()
+{
+    return iterator(this, iterator::Position::Begin);
+}
+
+//==================================================================================================
+Json::const_iterator Json::begin() const
+{
+    return cbegin();
+}
+
+//==================================================================================================
+Json::const_iterator Json::cbegin() const
+{
+    return const_iterator(this, const_iterator::Position::Begin);
+}
+
+//==================================================================================================
+Json::iterator Json::end()
+{
+    return iterator(this, iterator::Position::End);
+}
+
+//==================================================================================================
+Json::const_iterator Json::end() const
+{
+    return cend();
+}
+
+//==================================================================================================
+Json::const_iterator Json::cend() const
+{
+    return const_iterator(this, const_iterator::Position::End);
+}
+
+//==================================================================================================
+Json::reverse_iterator Json::rbegin()
+{
+    return reverse_iterator(end());
+}
+
+//==================================================================================================
+Json::const_reverse_iterator Json::rbegin() const
+{
+    return crbegin();
+}
+
+//==================================================================================================
+Json::const_reverse_iterator Json::crbegin() const
+{
+    return const_reverse_iterator(cend());
+}
+
+//==================================================================================================
+Json::reverse_iterator Json::rend()
+{
+    return reverse_iterator(begin());
+}
+
+//==================================================================================================
+Json::const_reverse_iterator Json::rend() const
+{
+    return crend();
+}
+
+//==================================================================================================
+Json::const_reverse_iterator Json::crend() const
+{
+    return const_reverse_iterator(begin());
 }
 
 //==================================================================================================
@@ -601,78 +673,6 @@ void Json::merge(fly::Json &&other)
     auto &&other_value = std::get<JsonTraits::object_type>(std::move(other.m_value));
 
     this_value.merge(std::move(other_value));
-}
-
-//==================================================================================================
-Json::iterator Json::begin()
-{
-    return iterator(this, iterator::Position::Begin);
-}
-
-//==================================================================================================
-Json::const_iterator Json::begin() const
-{
-    return cbegin();
-}
-
-//==================================================================================================
-Json::const_iterator Json::cbegin() const
-{
-    return const_iterator(this, const_iterator::Position::Begin);
-}
-
-//==================================================================================================
-Json::iterator Json::end()
-{
-    return iterator(this, iterator::Position::End);
-}
-
-//==================================================================================================
-Json::const_iterator Json::end() const
-{
-    return cend();
-}
-
-//==================================================================================================
-Json::const_iterator Json::cend() const
-{
-    return const_iterator(this, const_iterator::Position::End);
-}
-
-//==================================================================================================
-Json::reverse_iterator Json::rbegin()
-{
-    return reverse_iterator(end());
-}
-
-//==================================================================================================
-Json::const_reverse_iterator Json::rbegin() const
-{
-    return crbegin();
-}
-
-//==================================================================================================
-Json::const_reverse_iterator Json::crbegin() const
-{
-    return const_reverse_iterator(cend());
-}
-
-//==================================================================================================
-Json::reverse_iterator Json::rend()
-{
-    return reverse_iterator(begin());
-}
-
-//==================================================================================================
-Json::const_reverse_iterator Json::rend() const
-{
-    return crend();
-}
-
-//==================================================================================================
-Json::const_reverse_iterator Json::crend() const
-{
-    return const_reverse_iterator(begin());
 }
 
 //==================================================================================================
