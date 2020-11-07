@@ -77,42 +77,49 @@ SequencedTaskRunner::SequencedTaskRunner(std::weak_ptr<TaskManager> weak_task_ma
 //==================================================================================================
 bool SequencedTaskRunner::post_task_internal(TaskLocation &&location, Task &&task)
 {
-    m_pending_tasks.push({std::move(location), std::move(task)});
-    return maybe_post_task();
+    return maybe_post_task(std::move(location), std::move(task));
 }
 
 //==================================================================================================
 void SequencedTaskRunner::task_complete(TaskLocation &&)
 {
-    m_has_running_task.store(false);
-    maybe_post_task();
+    maybe_post_task({}, {});
 }
 
 //==================================================================================================
-bool SequencedTaskRunner::maybe_post_task()
+bool SequencedTaskRunner::maybe_post_task(TaskLocation &&location, Task &&task)
 {
-    static std::chrono::seconds s_wait(0);
-    bool expected = false;
+    bool posted_or_queued = false;
 
-    if (m_has_running_task.compare_exchange_strong(expected, true))
+    std::lock_guard<std::mutex> lock(m_pending_tasks_mutex);
+
+    if ((task == nullptr) || !m_has_running_task)
     {
-        bool posted = false;
-        PendingTask task;
-
-        if (m_pending_tasks.pop(task, s_wait))
+        if (!m_pending_tasks.empty())
         {
-            posted = post_task_to_task_manager(std::move(task.m_location), std::move(task.m_task));
+            PendingTask pending_task = std::move(m_pending_tasks.front());
+            m_pending_tasks.pop();
+
+            posted_or_queued = post_task_to_task_manager(
+                std::move(pending_task.m_location),
+                std::move(pending_task.m_task));
+        }
+        else if (task != nullptr)
+        {
+            posted_or_queued = post_task_to_task_manager(std::move(location), std::move(task));
+            task = nullptr;
         }
 
-        if (!posted)
-        {
-            m_has_running_task.store(false);
-        }
-
-        return posted;
+        m_has_running_task = posted_or_queued;
     }
 
-    return true;
+    if (task != nullptr)
+    {
+        m_pending_tasks.push({std::move(location), std::move(task)});
+        posted_or_queued = true;
+    }
+
+    return posted_or_queued;
 }
 
 } // namespace fly

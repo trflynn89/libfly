@@ -2,13 +2,13 @@
 
 #include "fly/fly.hpp"
 #include "fly/task/task_types.hpp"
-#include "fly/types/concurrency/concurrent_queue.hpp"
 
-#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <mutex>
+#include <queue>
 #include <type_traits>
 
 /**
@@ -503,14 +503,20 @@ private:
     };
 
     /**
-     * If no task has been posted for execution, post the first task in the pending queue.
+     * If no task has been posted for execution, post either the first task in the pending queue (if
+     * there is one) or the given task (if non-null). If a task is currently posted for execution,
+     * or if there was a task in the pending queue queue, add the given task to the queue.
+     *
+     * @param location The location from which the task was posted.
+     * @param task The task to be executed.
      *
      * @return True if the task was posted for execution or added to the pending queue.
      */
-    bool maybe_post_task();
+    bool maybe_post_task(TaskLocation &&location, Task &&task);
 
-    ConcurrentQueue<PendingTask> m_pending_tasks;
-    std::atomic_bool m_has_running_task {false};
+    std::mutex m_pending_tasks_mutex;
+    std::queue<PendingTask> m_pending_tasks;
+    bool m_has_running_task {false};
 };
 
 //==================================================================================================
