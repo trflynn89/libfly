@@ -248,56 +248,23 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         }
     }
 
-    CATCH_SECTION("Emplace a value into a JSON object")
-    {
-        auto pair = []() -> std::pair<fly::JsonTraits::string_type, fly::Json>
-        {
-            return std::make_pair<fly::JsonTraits::string_type, fly::Json>("c", 3);
-        };
-
-        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::object_type>)
-        {
-            auto result = json.emplace(pair());
-            CATCH_CHECK(result.second);
-            CATCH_REQUIRE(result.first != json.end());
-            CATCH_CHECK(result.first == json.find("c"));
-            CATCH_CHECK(*(result.first) == 3);
-
-            result = json.emplace(pair());
-            CATCH_CHECK_FALSE(result.second);
-            CATCH_REQUIRE(result.first != json.end());
-            CATCH_CHECK(result.first == json.find("c"));
-            CATCH_CHECK(*(result.first) == 3);
-        }
-        else
-        {
-            CATCH_CHECK_THROWS_JSON(
-                json.emplace(pair()),
-                "JSON type invalid for object emplacement: (%s)",
-                json);
-        }
-    }
-
     CATCH_SECTION("Emplace a value into a JSON array")
     {
-        auto value = []() -> fly::Json
-        {
-            return fly::Json(1);
-        };
+        fly::Json value = 3;
 
         if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
         {
             const auto size_before = json.size();
-            auto &result = json.emplace_back(value());
+            auto &result = json.emplace_back(std::move(value));
             const auto size_after = json.size();
 
             CATCH_CHECK((size_after - size_before) == 1);
-            CATCH_CHECK(result == value());
+            CATCH_CHECK(result == 3);
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
-                json.emplace_back(value()),
+                json.emplace_back(std::move(value)),
                 "JSON type invalid for array emplacement: (%s)",
                 json);
         }
@@ -305,7 +272,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Push a value into a JSON array")
     {
-        const fly::Json value = 1;
+        const fly::Json value = 3;
 
         if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
         {
@@ -334,31 +301,28 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Push a moved value into a JSON array")
     {
-        auto value = []() -> fly::Json
-        {
-            return fly::Json(1);
-        };
+        fly::Json value = 3;
 
         if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
         {
             const auto size_before = json.size();
-            json.push_back(value());
+            json.push_back(std::move(value));
             const auto size_after = json.size();
 
             CATCH_CHECK((size_after - size_before) == 1);
-            CATCH_CHECK(json[size_after - 1] == value());
+            CATCH_CHECK(json[size_after - 1] == 3);
         }
         else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
         {
             CATCH_CHECK_THROWS_JSON(
-                json.push_back(value()),
+                json.push_back(std::move(value)),
                 "JSON type invalid for array insertion: (%s)",
                 json);
         }
         else
         {
             CATCH_CHECK_THROWS_ITERATOR(
-                json.push_back(value()),
+                json.push_back(std::move(value)),
                 "JSON type invalid for iteration: (%s)",
                 json);
         }
@@ -663,27 +627,29 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
     using char_type = typename string_type::value_type;
 
     fly::Json json = fly::test::create_json<json_type, string_type>();
+    const string_type key = J_STR("k\\u0065y"); // "key"
 
     CATCH_SECTION("Insert a value into a JSON object")
     {
-        const auto pair = std::make_pair<string_type, fly::Json>(J_STR("c"), 3);
+        const fly::Json value1 = 3;
+        const fly::Json value2 = 4;
 
         if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
         {
-            auto result = json.insert(pair);
+            auto result = json.insert(key, value1);
             CATCH_CHECK(result.second);
-            CATCH_CHECK(result.first == json.find("c"));
-            CATCH_CHECK(*(result.first) == 3);
+            CATCH_CHECK(result.first == json.find("key"));
+            CATCH_CHECK(*(result.first) == value1);
 
-            result = json.insert(pair);
+            result = json.insert(key, value2);
             CATCH_CHECK_FALSE(result.second);
-            CATCH_CHECK(result.first == json.find("c"));
-            CATCH_CHECK(*(result.first) == 3);
+            CATCH_CHECK(result.first == json.find("key"));
+            CATCH_CHECK(*(result.first) == value1);
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
-                json.insert(pair),
+                json.insert(key, value1),
                 "JSON type invalid for object insertion: (%s)",
                 json);
         }
@@ -691,27 +657,25 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
 
     CATCH_SECTION("Insert a moved value into a JSON object")
     {
-        auto pair = []() -> std::pair<string_type, fly::Json>
-        {
-            return std::make_pair<string_type, fly::Json>(J_STR("c"), 3);
-        };
+        fly::Json value1 = 3;
+        fly::Json value2 = 4;
 
         if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
         {
-            auto result = json.insert(pair());
+            auto result = json.insert(key, std::move(value1));
             CATCH_CHECK(result.second);
-            CATCH_CHECK(result.first == json.find("c"));
+            CATCH_CHECK(result.first == json.find("key"));
             CATCH_CHECK(*(result.first) == 3);
 
-            result = json.insert(pair());
+            result = json.insert(key, std::move(value2));
             CATCH_CHECK_FALSE(result.second);
-            CATCH_CHECK(result.first == json.find("c"));
+            CATCH_CHECK(result.first == json.find("key"));
             CATCH_CHECK(*(result.first) == 3);
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
-                json.insert(pair()),
+                json.insert(key, std::move(value1)),
                 "JSON type invalid for object insertion: (%s)",
                 json);
         }
@@ -748,6 +712,34 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
             CATCH_CHECK_THROWS_JSON(
                 json.insert(object.begin(), object.end()),
                 "JSON type invalid for object insertion: (%s)",
+                json);
+        }
+    }
+
+    CATCH_SECTION("Emplace a value into a JSON object")
+    {
+        fly::Json value1 = 3;
+        fly::Json value2 = 4;
+
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::object_type>)
+        {
+            auto result = json.emplace(key, std::move(value1));
+            CATCH_CHECK(result.second);
+            CATCH_REQUIRE(result.first != json.end());
+            CATCH_CHECK(result.first == json.find("key"));
+            CATCH_CHECK(*(result.first) == 3);
+
+            result = json.emplace(key, std::move(value2));
+            CATCH_CHECK_FALSE(result.second);
+            CATCH_REQUIRE(result.first != json.end());
+            CATCH_CHECK(result.first == json.find("key"));
+            CATCH_CHECK(*(result.first) == 3);
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                json.emplace(key, std::move(value1)),
+                "JSON type invalid for object emplacement: (%s)",
                 json);
         }
     }

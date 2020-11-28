@@ -32,13 +32,13 @@ namespace fly {
  * This class is designed to treat JSON as a first-class container, and to feel as easy to use as
  * a Python dictionary.
  *
- * There are a myriad of user-friendly initializers to create a JON value from any compatible type:
+ * There are a myriad of user-friendly initializers to create a JSON value from any compatible type:
  *
  *     A JSON string is a Unicode string. Internally, strings are stored with UTF-8 encoding.
- *     However, most methods that accept a JSON string will accept ASCII, UTF-8, UTF-16, and UTF-32
- *     encoded strings (exceptions are noted in the documention of some methods). All strings are
- *     validated for strict Unicode compliance and converted to UTF-8. Further, the provided string
- *     type may be an STL string, a null-terminated character array, or a string view. For example:
+ *     However, all methods that accept a JSON string will accept ASCII, UTF-8, UTF-16, and UTF-32
+ *     encoded strings. All strings are validated for strict Unicode compliance and converted to
+ *     UTF-8. Further, the provided string type may be an STL string, a null-terminated character
+ *     array, or a string view. For example:
  *
  *         fly::Json json = "This is an ASCII string";
  *         fly::Json json = u8"This is a UTF-8 string";
@@ -857,7 +857,8 @@ public:
      *
      * @tparam Key The string-like type of the inserted value's key.
      *
-     * @param value The key-value pair to insert.
+     * @param key The key of the value to insert.
+     * @param value The value to insert at the given key.
      *
      * @return An iterator-boolean pair. The boolean indicates whether the insertion was successful.
      *         If so, the iterator is that of the inserted element. If not, the iterator points to
@@ -866,7 +867,7 @@ public:
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
     template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
-    std::pair<iterator, bool> insert(const std::pair<Key, Json> &value);
+    std::pair<iterator, bool> insert(const Key &key, const Json &value);
 
     /**
      * Insert a moved key-value pair into the Json instance. Only valid if the Json instance is an
@@ -875,7 +876,8 @@ public:
      *
      * @tparam Key The string-like type of the inserted value's key.
      *
-     * @param value The key-value pair to insert.
+     * @param key The key of the value to insert.
+     * @param value The value to insert at the given key.
      *
      * @return An iterator-boolean pair. The boolean indicates whether the insertion was successful.
      *         If so, the iterator is that of the inserted element. If not, the iterator points to
@@ -884,7 +886,7 @@ public:
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
     template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
-    std::pair<iterator, bool> insert(std::pair<Key, Json> &&value);
+    std::pair<iterator, bool> insert(const Key &key, Json &&value);
 
     /**
      * Insert all values into the Json instance in the range [first, last). Only valid if the Json
@@ -976,16 +978,16 @@ public:
     iterator insert(const_iterator position, std::initializer_list<Json> initializer);
 
     /**
-     * Construct an element in-place within the Json instance. Only valid if the Json instance is
-     * an object or null. If the Json instance is null, it is first converted to an object.
+     * Construct an element in-place within the Json instance. Only valid if the Json instance is an
+     * object or null. If the Json instance is null, it is first converted to an object. The SFINAE
+     * declaration allows inserting a value with a key of any string-like type (e.g. std::string,
+     * char8_t[], std::u16string_view).
      *
-     * Note that unlike the Json object insertion methods, this method does not allow for emplacing
-     * a value with a key of any string-like type. This is because the provided arguments are only
-     * forwarded to the underyling Json object value constructor.
+     * @tparam Key The string-like type of the emplaced value's key.
+     * @tparam Arg The type of the emplaced value.
      *
-     * @tparam Args Variadic template arguments for value construction.
-     *
-     * @param args The list of arguments for value construction.
+     * @param key The key of the value to emplace.
+     * @param value The value to emplace at the given key.
      *
      * @return An iterator-boolean pair. The boolean indicates whether the emplacement was
      *         successful. If so, the iterator is that of the emplaced element. If not, the iterator
@@ -993,8 +995,8 @@ public:
      *
      * @throws JsonException If the Json instance is neither an object nor null.
      */
-    template <typename... Args>
-    std::pair<iterator, bool> emplace(Args &&...args);
+    template <typename Key, typename Value, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
+    std::pair<iterator, bool> emplace(const Key &key, Value &&arg);
 
     /**
      * Construct an element in-place at the end of the Json instance. Only valid if the Json
@@ -1724,21 +1726,21 @@ Json::const_reference Json::operator[](const T &key) const
 
 //==================================================================================================
 template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
-std::pair<Json::iterator, bool> Json::insert(const std::pair<Key, Json> &value)
+std::pair<Json::iterator, bool> Json::insert(const Key &key, const Json &value)
 {
-    return object_inserter(std::make_pair(convert_to_string(value.first), value.second));
+    return object_inserter(std::make_pair(convert_to_string(key), value));
 }
 
 //==================================================================================================
 template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
-std::pair<Json::iterator, bool> Json::insert(std::pair<Key, Json> &&value)
+std::pair<Json::iterator, bool> Json::insert(const Key &key, Json &&value)
 {
-    return object_inserter(std::make_pair(convert_to_string(value.first), std::move(value.second)));
+    return object_inserter(std::make_pair(convert_to_string(key), std::move(value)));
 }
 
 //==================================================================================================
-template <typename... Args>
-std::pair<Json::iterator, bool> Json::emplace(Args &&...args)
+template <typename Key, typename Value, enable_if_all<JsonTraits::is_string_like<Key>>>
+std::pair<Json::iterator, bool> Json::emplace(const Key &key, Value &&value)
 {
     if (is_null())
     {
@@ -1750,10 +1752,10 @@ std::pair<Json::iterator, bool> Json::emplace(Args &&...args)
         throw JsonException(*this, "JSON type invalid for object emplacement");
     }
 
-    auto &value = std::get<JsonTraits::object_type>(m_value);
+    auto &storage = std::get<JsonTraits::object_type>(m_value);
     auto it = end();
 
-    auto result = value.emplace(std::forward<Args>(args)...);
+    auto result = storage.emplace(convert_to_string(key), std::forward<Value>(value));
     it.m_iterator = result.first;
 
     return {it, result.second};
@@ -1864,7 +1866,7 @@ void Json::merge(T &other)
         }
         else
         {
-            insert(std::make_pair(it->first, fly::Json(it->second)));
+            emplace(it->first, std::move(it->second));
             it = other.erase(it);
         }
     }
@@ -1889,7 +1891,7 @@ void Json::merge(T &&other)
     {
         if (!contains(it.first))
         {
-            insert(std::make_pair(it.first, fly::Json(it.second)));
+            emplace(it.first, std::move(it.second));
         }
     }
 }
