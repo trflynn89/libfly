@@ -978,6 +978,25 @@ public:
     iterator insert(const_iterator position, std::initializer_list<Json> initializer);
 
     /**
+     * Insert or update a moved key-value pair into the Json instance. If the provided key already
+     * exists, assigns the provided value to the key. Only valid if the Json instance is an object.
+     * The SFINAE declaration allows inserting a value with a key of any string-like type (e.g.
+     * std::string, char8_t[], std::u16string_view).
+     *
+     * @tparam Key The string-like type of the inserted value's key.
+     *
+     * @param key The key of the value to insert.
+     * @param value The value to insert at the given key.
+     *
+     * @return An iterator-boolean pair. The boolean will be true if insertion took place, or false
+     *         if assignment took place. The iterator points to the inserted or updated element.
+     *
+     * @throws JsonException If the Json instance is not an object or the key value is invalid.
+     */
+    template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
+    std::pair<iterator, bool> insert_or_assign(const Key &key, Json &&value);
+
+    /**
      * Construct an element in-place within the Json instance. Only valid if the Json instance is an
      * object or null. If the Json instance is null, it is first converted to an object. The SFINAE
      * declaration allows inserting a value with a key of any string-like type (e.g. std::string,
@@ -1736,6 +1755,21 @@ template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
 std::pair<Json::iterator, bool> Json::insert(const Key &key, Json &&value)
 {
     return object_inserter(std::make_pair(convert_to_string(key), std::move(value)));
+}
+
+//==================================================================================================
+template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
+std::pair<Json::iterator, bool> Json::insert_or_assign(const Key &key, Json &&value)
+{
+    auto result = insert(key, value);
+
+    if (!result.second)
+    {
+        auto &it = std::get<typename iterator::object_iterator_type>(result.first.m_iterator);
+        it->second.swap(value);
+    }
+
+    return result;
 }
 
 //==================================================================================================
