@@ -681,6 +681,32 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         }
     }
 
+    CATCH_SECTION("Insert a value into or assign a value in a JSON object")
+    {
+        fly::Json value1 = 3;
+        fly::Json value2 = 4;
+
+        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        {
+            auto result = json.insert_or_assign(key, std::move(value1));
+            CATCH_CHECK(result.second);
+            CATCH_CHECK(result.first == json.find("key"));
+            CATCH_CHECK(*(result.first) == 3);
+
+            result = json.insert_or_assign(key, std::move(value2));
+            CATCH_CHECK_FALSE(result.second);
+            CATCH_CHECK(result.first == json.find("key"));
+            CATCH_CHECK(*(result.first) == 4);
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                json.insert(key, std::move(value1)),
+                "JSON type invalid for object insertion: (%s)",
+                json);
+        }
+    }
+
     CATCH_SECTION("Insert a range of values into a JSON object")
     {
         const fly::Json object = {{J_STR("c"), fly::Json(3)}, {J_STR("d"), fly::Json(4)}};
