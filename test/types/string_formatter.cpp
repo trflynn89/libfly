@@ -178,8 +178,10 @@ CATCH_TEMPLATE_TEST_CASE(
         format = FLY_STR(char_type, "%a");
         CATCH_CHECK(FLY_STR(streamed_char, "%a") == BasicString::format(format));
 #if defined(FLY_WINDOWS)
-        // Windows 0-pads std::hexfloat to match the stream precision, Linux and macOS do not.
-        CATCH_CHECK(FLY_STR(streamed_char, "0x1.600000p+2") == BasicString::format(format, 5.5));
+        // MSVC will always 0-pad std::hexfloat formatted strings. Clang and GCC do not.
+        // https://github.com/microsoft/STL/blob/0b81475cc8087a7b615911d65b52b6a1fad87d7d/stl/inc/xlocnum#L1156
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "0x1.6000000000000p+2") == BasicString::format(format, 5.5));
 #else
         CATCH_CHECK(FLY_STR(streamed_char, "0x1.6p+2") == BasicString::format(format, 5.5));
 #endif
@@ -187,8 +189,10 @@ CATCH_TEMPLATE_TEST_CASE(
         format = FLY_STR(char_type, "%A");
         CATCH_CHECK(FLY_STR(streamed_char, "%A") == BasicString::format(format));
 #if defined(FLY_WINDOWS)
-        // Windows 0-pads std::hexfloat to match the stream precision, Linux and macOS do not.
-        CATCH_CHECK(FLY_STR(streamed_char, "0X1.600000P+2") == BasicString::format(format, 5.5));
+        // MSVC will always 0-pad std::hexfloat formatted strings. Clang and GCC do not.
+        // https://github.com/microsoft/STL/blob/0b81475cc8087a7b615911d65b52b6a1fad87d7d/stl/inc/xlocnum#L1156
+        CATCH_CHECK(
+            FLY_STR(streamed_char, "0X1.6000000000000P+2") == BasicString::format(format, 5.5));
 #else
         CATCH_CHECK(FLY_STR(streamed_char, "0X1.6P+2") == BasicString::format(format, 5.5));
 #endif
