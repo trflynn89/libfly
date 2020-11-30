@@ -110,7 +110,7 @@ std::optional<Json> JsonParser::parse_object()
         }
         else if (std::optional<Json> value = parse_json(); value)
         {
-            object[std::move(key)] = std::move(value.value());
+            object.insert_or_assign(key, std::move(value.value()));
         }
         else
         {
@@ -142,7 +142,7 @@ std::optional<Json> JsonParser::parse_array()
 
         if (std::optional<Json> value = parse_json(); value)
         {
-            array[array.size()] = std::move(value.value());
+            array.push_back(std::move(value.value()));
         }
         else
         {
