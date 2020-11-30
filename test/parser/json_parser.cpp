@@ -177,7 +177,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         CATCH_REQUIRE(parsed.has_value());
 
         fly::Json values = std::move(parsed.value());
-        CATCH_CHECK(values.size() == 1112064);
+        CATCH_CHECK(values.size() == 1'112'064);
     }
 
     CATCH_SECTION("String with UTF-8 encoding (std::string)")
