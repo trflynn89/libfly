@@ -60,41 +60,46 @@ Json::Json(std::initializer_list<Json> initializer) noexcept : m_value()
 Json::~Json()
 {
     std::vector<Json> stack;
-    stack.reserve(size());
 
-    if (is_object())
+    auto maybe_add_to_stack = [&stack](Json &&json)
     {
-        for (auto &&json : std::get<JsonTraits::object_type>(m_value))
+        if (json.is_object() || json.is_array())
         {
-            stack.push_back(std::move(json.second));
+            stack.push_back(std::move(json));
         }
-    }
-    else if (is_array())
+    };
+
+    auto visitor = [&stack, &maybe_add_to_stack](auto &&value) noexcept
     {
-        auto &&json = std::get<JsonTraits::array_type>(m_value);
-        std::move(json.begin(), json.end(), std::back_inserter(stack));
-    }
+        using U = std::decay_t<decltype(value)>;
+
+        if constexpr (
+            std::is_same_v<U, JsonTraits::object_type> || std::is_same_v<U, JsonTraits::array_type>)
+        {
+            stack.reserve(stack.size() + value.size());
+
+            for (auto &&child : value)
+            {
+                if constexpr (std::is_same_v<U, JsonTraits::object_type>)
+                {
+                    maybe_add_to_stack(std::move(child.second));
+                }
+                else
+                {
+                    maybe_add_to_stack(std::move(child));
+                }
+            }
+        }
+    };
+
+    std::visit(visitor, std::move(m_value));
 
     while (!stack.empty())
     {
         Json json(std::move(stack.back()));
         stack.pop_back();
 
-        stack.reserve(stack.size() + json.size());
-
-        if (json.is_object())
-        {
-            for (auto &&child : std::get<JsonTraits::object_type>(json.m_value))
-            {
-                stack.push_back(std::move(child.second));
-            }
-        }
-        else if (json.is_array())
-        {
-            auto &&child = std::get<JsonTraits::array_type>(json.m_value);
-            std::move(child.begin(), child.end(), std::back_inserter(stack));
-            child.clear();
-        }
+        std::visit(visitor, std::move(json.m_value));
     }
 }
 

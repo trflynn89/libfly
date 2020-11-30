@@ -414,7 +414,7 @@ public:
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The SFINAE declaration
-     * allows converstion to any object-like type (e.g. std::map, std::multimap) from the Json
+     * allows conversion to any object-like type (e.g. std::map, std::multimap) from the Json
      * instance.
      *
      * @tparam T The object-like type.
@@ -429,7 +429,7 @@ public:
 
     /**
      * Array conversion operator. Converts the Json instance to an array. The SFINAE declaration
-     * allows converstion to any array-like type (e.g. std::list, std::vector) from the Json
+     * allows conversion to any array-like type (e.g. std::list, std::vector) from the Json
      * instance. This excludes std::array, which due to being an aggregate type, has its own
      * explicit conversion operator.
      *
