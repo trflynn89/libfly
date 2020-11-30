@@ -5,6 +5,7 @@
 
 #include <istream>
 #include <memory>
+#include <streambuf>
 #include <string>
 #include <type_traits>
 
@@ -68,7 +69,7 @@ public:
      * @return The peeked character.
      */
     template <typename IntType = int>
-    IntType peek();
+    inline IntType peek();
 
     /**
      * Read the next character from the stream by extracting it.
@@ -78,7 +79,7 @@ public:
      * @return The read character.
      */
     template <typename IntType = int>
-    IntType get();
+    inline IntType get();
 
     /**
      * Read characters from the stream until a newline or end-of-file is reached.
@@ -93,14 +94,9 @@ public:
     bool getline(std::basic_string<CharType> &result);
 
     /**
-     * @return True if the stream is healthy.
-     */
-    virtual bool good() = 0;
-
-    /**
      * @return True if the stream has reached end-of-file.
      */
-    virtual bool eof() = 0;
+    bool eof();
 
 protected:
     /**
@@ -143,16 +139,13 @@ class UTF8CharStream : public UTF8Stream
 public:
     explicit UTF8CharStream(std::basic_istream<char> &stream);
 
-    bool good() override;
-    bool eof() override;
-
 protected:
     int peek_internal() override;
     int get_internal() override;
     bool is_eof(int ch) override;
 
 private:
-    std::basic_istream<char> &m_stream;
+    std::basic_streambuf<char> *m_stream_buffer;
 };
 
 /**
@@ -166,16 +159,13 @@ class UTF8Char8Stream : public UTF8Stream
 public:
     explicit UTF8Char8Stream(std::basic_istream<char8_t> &stream);
 
-    bool good() override;
-    bool eof() override;
-
 protected:
     int peek_internal() override;
     int get_internal() override;
     bool is_eof(int ch) override;
 
 private:
-    std::basic_istream<char8_t> &m_stream;
+    std::basic_streambuf<char8_t> *m_stream_buffer;
 };
 
 //==================================================================================================
@@ -195,17 +185,17 @@ std::unique_ptr<UTF8Stream> UTF8Stream::create(std::basic_istream<CharType> &str
 }
 
 //==================================================================================================
-template <typename TokenType>
-TokenType UTF8Stream::peek()
+template <typename IntType>
+IntType UTF8Stream::peek()
 {
-    return static_cast<TokenType>(peek_internal());
+    return static_cast<IntType>(peek_internal());
 }
 
 //==================================================================================================
-template <typename TokenType>
-TokenType UTF8Stream::get()
+template <typename IntType>
+IntType UTF8Stream::get()
 {
-    return static_cast<TokenType>(get_internal());
+    return static_cast<IntType>(get_internal());
 }
 
 //==================================================================================================
@@ -217,12 +207,12 @@ bool UTF8Stream::getline(std::basic_string<CharType> &result)
     result.clear();
     int ch;
 
-    while (good() && ((ch = get_internal()) != s_new_line) && !is_eof(ch))
+    while (!eof() && ((ch = get_internal()) != s_new_line))
     {
         result += ch;
     }
 
-    return good() || !result.empty();
+    return !eof() || !result.empty();
 }
 
 } // namespace fly
