@@ -85,6 +85,8 @@ commands:
 profile: report := $(ETC_DIR)/profile
 profile: args :=
 profile: $(TEST_BINARIES)
+	$(Q)mkdir -p $(dir $(report))
+
 ifeq ($(toolchain), gcc)
 	$(Q)failed=0; \
 	for tgt in $(TEST_BINARIES) ; do \
