@@ -118,7 +118,7 @@ std::optional<Json> JsonParser::parse_object()
         }
     }
 
-    return (state == ParseState::Invalid) ? std::nullopt : std::optional<Json>(object);
+    return (state == ParseState::Invalid) ? std::nullopt : std::optional<Json>(std::move(object));
 }
 
 //==================================================================================================
@@ -150,7 +150,7 @@ std::optional<Json> JsonParser::parse_array()
         }
     }
 
-    return (state == ParseState::Invalid) ? std::nullopt : std::optional<Json>(array);
+    return (state == ParseState::Invalid) ? std::nullopt : std::optional<Json>(std::move(array));
 }
 
 //==================================================================================================
