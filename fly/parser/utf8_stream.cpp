@@ -3,32 +3,28 @@
 namespace fly {
 
 //==================================================================================================
-UTF8CharStream::UTF8CharStream(std::basic_istream<char> &stream) : UTF8Stream(), m_stream(stream)
+bool UTF8Stream::eof()
 {
+    return is_eof(peek_internal());
 }
 
 //==================================================================================================
-bool UTF8CharStream::good()
+UTF8CharStream::UTF8CharStream(std::basic_istream<char> &stream) :
+    UTF8Stream(),
+    m_stream_buffer(stream.rdbuf())
 {
-    return m_stream.good();
-}
-
-//==================================================================================================
-bool UTF8CharStream::eof()
-{
-    return m_stream.eof();
 }
 
 //==================================================================================================
 int UTF8CharStream::peek_internal()
 {
-    return static_cast<int>(m_stream.peek());
+    return static_cast<int>(m_stream_buffer->sgetc());
 }
 
 //==================================================================================================
 int UTF8CharStream::get_internal()
 {
-    return static_cast<int>(m_stream.get());
+    return static_cast<int>(m_stream_buffer->sbumpc());
 }
 
 //==================================================================================================
@@ -42,32 +38,20 @@ bool UTF8CharStream::is_eof(int ch)
 //==================================================================================================
 UTF8Char8Stream::UTF8Char8Stream(std::basic_istream<char8_t> &stream) :
     UTF8Stream(),
-    m_stream(stream)
+    m_stream_buffer(stream.rdbuf())
 {
-}
-
-//==================================================================================================
-bool UTF8Char8Stream::good()
-{
-    return m_stream.good();
-}
-
-//==================================================================================================
-bool UTF8Char8Stream::eof()
-{
-    return m_stream.eof();
 }
 
 //==================================================================================================
 int UTF8Char8Stream::peek_internal()
 {
-    return static_cast<int>(m_stream.peek());
+    return static_cast<int>(m_stream_buffer->sgetc());
 }
 
 //==================================================================================================
 int UTF8Char8Stream::get_internal()
 {
-    return static_cast<int>(m_stream.get());
+    return static_cast<int>(m_stream_buffer->sbumpc());
 }
 
 //==================================================================================================
