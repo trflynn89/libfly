@@ -1966,9 +1966,19 @@ JsonTraits::string_type Json::convert_to_string(T value)
 {
     using StringType = BasicString<JsonTraits::is_string_like_t<T>>;
 
-    if (auto converted = StringType::template convert<JsonTraits::string_type>(value); converted)
+    if constexpr (std::is_same_v<typename StringType::string_type, JsonTraits::string_type>)
     {
-        return validate_string(std::move(converted.value()));
+        if (StringType::validate(value))
+        {
+            return validate_string(std::move(value));
+        }
+    }
+    else
+    {
+        if (auto result = StringType::template convert<JsonTraits::string_type>(value); result)
+        {
+            return validate_string(std::move(result.value()));
+        }
     }
 
     throw JsonException("Could not convert string-like type to a JSON string");
