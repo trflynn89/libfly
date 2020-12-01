@@ -798,85 +798,91 @@ std::ostream &operator<<(std::ostream &stream, Json::const_reference json)
 }
 
 //==================================================================================================
-JsonTraits::string_type Json::validate_string(const JsonTraits::string_type &str)
+JsonTraits::string_type Json::validate_string(JsonTraits::string_type &&value)
 {
-    stringstream_type stream;
-
-    const auto end = str.cend();
-
-    for (auto it = str.cbegin(); it != end;)
+    for (auto it = value.begin(); it != value.end(); ++it)
     {
         if (*it == '\\')
         {
-            read_escaped_character(stream, it, end);
+            read_escaped_character(value, it);
         }
         else
         {
-            validate_character(stream, it++);
+            const std::uint8_t ch = static_cast<std::uint8_t>(*it);
+
+            if ((ch <= 0x1f) || (ch == 0x22) || (ch == 0x5c))
+            {
+                throw JsonException(String::format("Character '%c' must be escaped", *it));
+            }
         }
     }
 
-    return stream.str();
+    return std::move(value);
 }
 
 //==================================================================================================
 void Json::read_escaped_character(
-    stringstream_type &stream,
-    JsonTraits::string_type::const_iterator &it,
-    const JsonTraits::string_type::const_iterator &end)
+    JsonTraits::string_type &value,
+    JsonTraits::string_type::iterator &it)
 {
-    if (++it == end)
+    const auto next = it + 1;
+
+    if (next == value.end())
     {
         throw JsonException("Expected escaped character after reverse solidus");
     }
 
-    switch (*it)
+    switch (*next)
     {
         case '\"':
         case '\\':
         case '/':
-            stream << *it;
+            it = value.erase(it);
             break;
 
         case 'b':
-            stream << '\b';
+            it = value.erase(it);
+            *it = '\b';
             break;
 
         case 'f':
-            stream << '\f';
+            it = value.erase(it);
+            *it = '\f';
             break;
 
         case 'n':
-            stream << '\n';
+            it = value.erase(it);
+            *it = '\n';
             break;
 
         case 'r':
-            stream << '\r';
+            it = value.erase(it);
+            *it = '\r';
             break;
 
         case 't':
-            stream << '\t';
+            it = value.erase(it);
+            *it = '\t';
             break;
 
         case 'u':
-            // The input sequence is expected to begin with the reverse solidus character.
-            if (auto value = JsonTraits::StringType::unescape_codepoint(--it, end); value)
+            if (auto result = JsonTraits::StringType::unescape_codepoint(it, value.end()); result)
             {
-                stream << std::move(value.value());
+                const auto distance = std::distance(it, value.end());
+
+                value.replace(next - 1, it, std::move(result.value()));
+                it = value.end() - distance - 1;
             }
             else
             {
                 throw JsonException("Could not parse escaped Unicode sequence");
             }
 
-            // The iterator is already incremented past the escaped character sequence.
-            return;
+            break;
 
         default:
-            throw JsonException(String::format("Invalid escape character '%c'", *it));
+            throw JsonException(String::format("Invalid escape character '%c'", *next));
     }
-
-    ++it;
 }
 
 //==================================================================================================
@@ -921,21 +927,6 @@ void Json::write_escaped_charater(
     }
 
     ++it;
-}
-
-//==================================================================================================
-void Json::validate_character(
-    stringstream_type &stream,
-    const JsonTraits::string_type::const_iterator &it)
-{
-    const std::uint8_t ch = static_cast<std::uint8_t>(*it);
-
-    if ((ch <= 0x1f) || (ch == 0x22) || (ch == 0x5c))
-    {
-        throw JsonException(String::format("Character '%c' must be escaped", *it));
-    }
-
-    stream << *it;
 }
 
 } // namespace fly
