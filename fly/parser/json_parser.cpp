@@ -75,6 +75,14 @@ std::optional<Json> JsonParser::parse_json()
         case Token::StartBracket:
             return parse_array();
 
+        case Token::Quote:
+            if (auto value = parse_quoted_string(); value)
+            {
+                return std::move(value.value());
+            }
+
+            return std::nullopt;
+
         default:
             return parse_value();
     }
@@ -99,18 +107,15 @@ std::optional<Json> JsonParser::parse_object()
             break;
         }
 
-        JsonTraits::string_type key;
-        if (consume_value(JsonType::JsonString, key) == JsonType::Invalid)
-        {
-            return std::nullopt;
-        }
-        else if (consume_token(Token::Colon) == ParseState::Invalid)
+        std::optional<JsonTraits::string_type> key = parse_quoted_string();
+
+        if (!key || (consume_token(Token::Colon) == ParseState::Invalid))
         {
             return std::nullopt;
         }
         else if (std::optional<Json> value = parse_json(); value)
         {
-            object.insert_or_assign(key, std::move(value.value()));
+            object.insert_or_assign(std::move(key.value()), std::move(value.value()));
         }
         else
         {
@@ -177,22 +182,55 @@ JsonParser::ParseState JsonParser::done_parsing_object_or_array(const Token &end
 }
 
 //==================================================================================================
-std::optional<Json> JsonParser::parse_value()
+std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
 {
-    const bool is_string = m_stream->peek<Token>() == Token::Quote;
+    auto stop_parsing = [](const Token &token) -> bool
+    {
+        return (token == Token::Quote) || (token == Token::EndOfFile);
+    };
 
-    auto json_type = is_string ? JsonType::JsonString : JsonType::Other;
-    JsonTraits::string_type value;
+    Json::stringstream_type parsing;
+    Token token;
 
-    if (consume_value(json_type, value) == JsonType::Invalid)
+    if (consume_token(Token::Quote) == ParseState::Invalid)
     {
         return std::nullopt;
     }
-    else if (is_string)
+
+    while (!stop_parsing(token = m_stream->peek<Token>()))
     {
-        return value;
+        parsing << static_cast<JsonTraits::char_type>(token);
+        discard();
+
+        // Blindly ignore escaped symbols, the Json class will check whether they are valid. Just
+        // read at least one more symbol to prevent breaking out of the loop too early if the next
+        // symbol is a quote.
+        if (token == Token::ReverseSolidus)
+        {
+            if ((token = consume()) == Token::EndOfFile)
+            {
+                JLOG("Expected character after reverse solidus");
+                return std::nullopt;
+            }
+
+            parsing << static_cast<JsonTraits::char_type>(token);
+        }
     }
-    else if (value == FLY_JSON_STR("true"))
+
+    if (consume_token(Token::Quote) == ParseState::Invalid)
+    {
+        return std::nullopt;
+    }
+
+    return parsing.str();
+}
+
+//==================================================================================================
+std::optional<Json> JsonParser::parse_value()
+{
+    const JsonTraits::string_type value = consume_value();
+
+    if (value == FLY_JSON_STR("true"))
     {
         return true;
     }
@@ -207,21 +245,21 @@ std::optional<Json> JsonParser::parse_value()
 
     switch (validate_number(value))
     {
-        case JsonType::SignedInteger:
+        case NumberType::SignedInteger:
             if (auto num = JsonTraits::StringType::convert<JsonTraits::signed_type>(value); num)
             {
                 return num.value();
             }
             break;
 
-        case JsonType::UnsignedInteger:
+        case NumberType::UnsignedInteger:
             if (auto num = JsonTraits::StringType::convert<JsonTraits::unsigned_type>(value); num)
             {
                 return num.value();
             }
             break;
 
-        case JsonType::FloatingPoint:
+        case NumberType::FloatingPoint:
             if (auto num = JsonTraits::StringType::convert<JsonTraits::float_type>(value); num)
             {
                 return num.value();
@@ -278,56 +316,25 @@ JsonParser::ParseState JsonParser::consume_comma(const ParseStateGetter &parse_s
 }
 
 //==================================================================================================
-JsonParser::JsonType JsonParser::consume_value(JsonType type, JsonTraits::string_type &value)
+JsonTraits::string_type JsonParser::consume_value()
 {
-    const bool is_string = type == JsonType::JsonString;
+    auto stop_parsing = [this](const Token &token) -> bool
+    {
+        return is_whitespace(token) || (token == Token::Comma) || (token == Token::Solidus) ||
+            (token == Token::CloseBracket) || (token == Token::CloseBrace) ||
+            (token == Token::EndOfFile);
+    };
 
     Json::stringstream_type parsing;
     Token token;
 
-    auto stop_parsing = [&token, &is_string, this]() -> bool
-    {
-        if (is_string)
-        {
-            return token == Token::Quote;
-        }
-
-        return is_whitespace(token) || (token == Token::Comma) || (token == Token::Solidus) ||
-            (token == Token::CloseBracket) || (token == Token::CloseBrace);
-    };
-
-    if (is_string && (consume_token(Token::Quote) == ParseState::Invalid))
-    {
-        return JsonType::Invalid;
-    }
-
-    while (((token = m_stream->peek<Token>()) != Token::EndOfFile) && !stop_parsing())
+    while (!stop_parsing(token = m_stream->peek<Token>()))
     {
         parsing << static_cast<JsonTraits::char_type>(token);
         discard();
-
-        // Blindly ignore escaped symbols, the Json class will check whether they are valid. Just
-        // read at least one more symbol to prevent breaking out of the loop too early if the next
-        // symbol is a quote.
-        if (is_string && (token == Token::ReverseSolidus))
-        {
-            if ((token = consume()) == Token::EndOfFile)
-            {
-                JLOG("Expected character after reverse solidus");
-                return JsonType::Invalid;
-            }
-
-            parsing << static_cast<JsonTraits::char_type>(token);
-        }
     }
 
-    if (is_string && (consume_token(Token::Quote) == ParseState::Invalid))
-    {
-        return JsonType::Invalid;
-    }
-
-    value = parsing.str();
-    return type;
+    return parsing.str();
 }
 
 //==================================================================================================
@@ -351,9 +358,7 @@ JsonParser::ParseState JsonParser::consume_whitespace_and_comments()
 //==================================================================================================
 void JsonParser::consume_whitespace()
 {
-    Token token;
-
-    while (((token = m_stream->peek<Token>()) != Token::EndOfFile) && is_whitespace(token))
+    while (is_whitespace(m_stream->peek<Token>()))
     {
         discard();
     }
@@ -440,7 +445,7 @@ void JsonParser::discard()
 }
 
 //==================================================================================================
-JsonParser::JsonType JsonParser::validate_number(const JsonTraits::string_type &value) const
+JsonParser::NumberType JsonParser::validate_number(const JsonTraits::string_type &value) const
 {
     const bool is_signed = value[0] == '-';
 
@@ -453,12 +458,12 @@ JsonParser::JsonType JsonParser::validate_number(const JsonTraits::string_type &
     if (!std::isdigit(static_cast<unsigned char>(signless[0])))
     {
         JLOG("Could not convert '%s' to a number", value);
-        return JsonType::Invalid;
+        return NumberType::Invalid;
     }
     else if (is_octal)
     {
         JLOG("Octal value '%s' is not number", value);
-        return JsonType::Invalid;
+        return NumberType::Invalid;
     }
 
     const JsonTraits::string_type::size_type d = signless.find('.');
@@ -477,17 +482,17 @@ JsonParser::JsonType JsonParser::validate_number(const JsonTraits::string_type &
         if ((d + 1) >= end)
         {
             JLOG("Float value '%s' is invalid", value);
-            return JsonType::Invalid;
+            return NumberType::Invalid;
         }
 
-        return JsonType::FloatingPoint;
+        return NumberType::FloatingPoint;
     }
     else if ((e1 != JsonTraits::string_type::npos) || (e2 != JsonTraits::string_type::npos))
     {
-        return JsonType::FloatingPoint;
+        return NumberType::FloatingPoint;
     }
 
-    return is_signed ? JsonType::SignedInteger : JsonType::UnsignedInteger;
+    return is_signed ? NumberType::SignedInteger : NumberType::UnsignedInteger;
 }
 
 //==================================================================================================
