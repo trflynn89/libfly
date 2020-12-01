@@ -272,28 +272,32 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Push a value into a JSON array")
     {
-        const fly::Json value = 3;
+        const fly::Json value1 = 3;
+        const fly::Json value2 = 4;
 
         if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
         {
-            const auto size_before = json.size();
-            json.push_back(value);
-            const auto size_after = json.size();
+            const auto starting_size = json.size();
 
-            CATCH_CHECK((size_after - size_before) == 1);
-            CATCH_CHECK(json[size_after - 1] == value);
+            json.push_back(value1);
+            CATCH_CHECK(json.size() == (starting_size + 1));
+            CATCH_CHECK(json.back() == 3);
+
+            json.push_back(value2);
+            CATCH_CHECK(json.size() == (starting_size + 2));
+            CATCH_CHECK(json.back() == 4);
         }
         else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
         {
             CATCH_CHECK_THROWS_JSON(
-                json.push_back(value),
+                json.push_back(value1),
                 "JSON type invalid for array insertion: (%s)",
                 json);
         }
         else
         {
             CATCH_CHECK_THROWS_ITERATOR(
-                json.push_back(value),
+                json.push_back(value1),
                 "JSON type invalid for iteration: (%s)",
                 json);
         }
@@ -301,28 +305,32 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Push a moved value into a JSON array")
     {
-        fly::Json value = 3;
+        fly::Json value1 = 3;
+        fly::Json value2 = 4;
 
         if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
         {
-            const auto size_before = json.size();
-            json.push_back(std::move(value));
-            const auto size_after = json.size();
+            const auto starting_size = json.size();
 
-            CATCH_CHECK((size_after - size_before) == 1);
-            CATCH_CHECK(json[size_after - 1] == 3);
+            json.push_back(std::move(value1));
+            CATCH_CHECK(json.size() == (starting_size + 1));
+            CATCH_CHECK(json.back() == 3);
+
+            json.push_back(std::move(value2));
+            CATCH_CHECK(json.size() == (starting_size + 2));
+            CATCH_CHECK(json.back() == 4);
         }
         else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
         {
             CATCH_CHECK_THROWS_JSON(
-                json.push_back(std::move(value)),
+                json.push_back(std::move(value1)),
                 "JSON type invalid for array insertion: (%s)",
                 json);
         }
         else
         {
             CATCH_CHECK_THROWS_ITERATOR(
-                json.push_back(std::move(value)),
+                json.push_back(std::move(value1)),
                 "JSON type invalid for iteration: (%s)",
                 json);
         }

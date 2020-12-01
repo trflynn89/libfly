@@ -10,7 +10,7 @@
 namespace fly {
 
 //==================================================================================================
-Json::Json(const JsonTraits::null_type &value) noexcept : m_value(value)
+Json::Json(JsonTraits::null_type value) noexcept : m_value(value)
 {
 }
 
@@ -169,50 +169,48 @@ bool Json::is_float() const
 //==================================================================================================
 Json::operator JsonTraits::null_type() const noexcept(false)
 {
-    if (is_null())
-    {
-        return std::get<JsonTraits::null_type>(m_value);
-    }
-    else
+    if (!is_null())
     {
         throw JsonException(*this, "JSON type is not null");
     }
+
+    return std::get<JsonTraits::null_type>(m_value);
 }
 
 //==================================================================================================
 Json::reference Json::at(size_type index)
 {
-    if (is_array())
+    if (!is_array())
     {
-        auto &value = std::get<JsonTraits::array_type>(m_value);
-
-        if (index >= value.size())
-        {
-            throw JsonException(*this, String::format("Given index (%d) not found", index));
-        }
-
-        return value.at(index);
+        throw JsonException(*this, "JSON type invalid for operator[index]");
     }
 
-    throw JsonException(*this, "JSON type invalid for operator[index]");
+    auto &value = std::get<JsonTraits::array_type>(m_value);
+
+    if (index >= value.size())
+    {
+        throw JsonException(*this, String::format("Given index (%d) not found", index));
+    }
+
+    return value.at(index);
 }
 
 //==================================================================================================
 Json::const_reference Json::at(size_type index) const
 {
-    if (is_array())
+    if (!is_array())
     {
-        const auto &value = std::get<JsonTraits::array_type>(m_value);
-
-        if (index >= value.size())
-        {
-            throw JsonException(*this, String::format("Given index (%d) not found", index));
-        }
-
-        return value.at(index);
+        throw JsonException(*this, "JSON type invalid for operator[index]");
     }
 
-    throw JsonException(*this, "JSON type invalid for operator[index]");
+    const auto &value = std::get<JsonTraits::array_type>(m_value);
+
+    if (index >= value.size())
+    {
+        throw JsonException(*this, String::format("Given index (%d) not found", index));
+    }
+
+    return value.at(index);
 }
 
 //==================================================================================================
@@ -222,20 +220,19 @@ Json::reference Json::operator[](size_type index)
     {
         m_value = JsonTraits::array_type();
     }
-
-    if (is_array())
+    else if (!is_array())
     {
-        auto &value = std::get<JsonTraits::array_type>(m_value);
-
-        if (index >= value.size())
-        {
-            value.resize(index + 1);
-        }
-
-        return value.at(index);
+        throw JsonException(*this, "JSON type invalid for operator[index]");
     }
 
-    throw JsonException(*this, "JSON type invalid for operator[index]");
+    auto &value = std::get<JsonTraits::array_type>(m_value);
+
+    if (index >= value.size())
+    {
+        value.resize(index + 1);
+    }
+
+    return value.at(index);
 }
 
 //==================================================================================================
