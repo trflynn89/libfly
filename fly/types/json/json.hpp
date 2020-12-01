@@ -1369,31 +1369,29 @@ private:
 
     /**
      * Validate the string for compliance according to https://www.json.org. Validation includes
-     * handling escaped and Unicode characters.
+     * replacing escaped control and Unicode characters.
      *
-     * @param str The string value to validate.
+     * @param value The string value to validate.
      *
-     * @return The modified input string value, with escaped and Unicode characters handled.
+     * @return The modified input string, with escaped control and Unicode characters handled.
      *
      * @throws JsonException If the string value is not valid.
      */
-    static JsonTraits::string_type validate_string(const JsonTraits::string_type &str);
+    static JsonTraits::string_type validate_string(JsonTraits::string_type &&value);
 
     /**
-     * After reading a reverse solidus character, read the escaped character that follows. Replace
-     * the reverse solidus and escaped character with the interpreted control or Unicode character.
+     * After reading a reverse solidus character, read the escaped character(s) that follow. Replace
+     * the reverse solidus and escaped character(s) with the interpreted control or Unicode
+     * character.
      *
-     * @param stream Stream to pipe the interpreted character into.
-     * @param it Pointer to the escaped character.
-     * @param end Pointer to the end of the original string value.
+     * @param value The string holding the escaped character to be replaced.
+     * @param it Pointer to the reverse solidus character.
      *
      * @throws JsonException If the interpreted escaped character is not valid or there weren't
      *         enough available bytes.
      */
-    static void read_escaped_character(
-        stringstream_type &stream,
-        JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end);
+    static void
+    read_escaped_character(JsonTraits::string_type &value, JsonTraits::string_type::iterator &it);
 
     /**
      * Write a character to a stream, handling any value that should be escaped. For those
@@ -1407,19 +1405,6 @@ private:
         std::ostream &stream,
         JsonTraits::string_type::const_iterator &it,
         const JsonTraits::string_type::const_iterator &end);
-
-    /**
-     * Validate a non-escaped character is JSON and Unicode compliant. If so, write the character
-     * (which may be part of a multi-byte codepoint) to the given stream.
-     *
-     * @param stream Stream to pipe the interpreted character into.
-     * @param it Pointer to the escaped character.
-     *
-     * @throws JsonException If the character value is not valid.
-     */
-    static void validate_character(
-        stringstream_type &stream,
-        const JsonTraits::string_type::const_iterator &it);
 
     /**
      * Helper trait to determine the return type of an object insertion method. If that method
@@ -1998,7 +1983,7 @@ JsonTraits::string_type Json::convert_to_string(const T &value)
 
     if (auto converted = StringType::template convert<JsonTraits::string_type>(value); converted)
     {
-        return validate_string(converted.value());
+        return validate_string(std::move(converted.value()));
     }
 
     throw JsonException("Could not convert string-like type to a JSON string");
