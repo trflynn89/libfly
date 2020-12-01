@@ -33,6 +33,19 @@ class BasicStringUnicode
 
 public:
     /**
+     * Validate that a string is strictly Unicode compliant.
+     *
+     * @tparam IteratorType The type of the encoded Unicode string's iterator.
+     *
+     * @param it Pointer to the beginning of the encoded Unicode string.
+     * @param end Pointer to the end of the encoded Unicode string.
+     *
+     * @return True if the string is Unicode compliant.
+     */
+    template <typename IteratorType>
+    static bool validate_encoding(IteratorType &it, const IteratorType &end);
+
+    /**
      * Convert the Unicode encoding of a string to another encoding.
      *
      * @tparam DesiredStringType The type of string to convert to.
@@ -298,6 +311,22 @@ private:
     static constexpr char_type s_lower_u = FLY_CHR(char_type, 'u');
     static constexpr char_type s_upper_u = FLY_CHR(char_type, 'U');
 };
+
+//==================================================================================================
+template <typename StringType>
+template <typename IteratorType>
+bool BasicStringUnicode<StringType>::validate_encoding(IteratorType &it, const IteratorType &end)
+{
+    while (it != end)
+    {
+        if (!decode_codepoint(it, end))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 //==================================================================================================
 template <typename StringType>

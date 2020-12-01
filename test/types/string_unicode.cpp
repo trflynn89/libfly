@@ -41,6 +41,7 @@ CATCH_TEMPLATE_TEST_CASE(
         auto begin = test.cbegin();
         const auto end = test.cend();
 
+        CATCH_CHECK_FALSE(BasicString::validate(test));
         CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
         CATCH_CHECK_FALSE(BasicString::escape_all_codepoints(test));
     };
@@ -75,6 +76,7 @@ CATCH_TEMPLATE_TEST_CASE(
         auto begin = test.cbegin();
         const auto end = test.cend();
 
+        CATCH_CHECK(BasicString::validate(test));
         CATCH_CHECK_FALSE(BasicString::decode_codepoint(begin, end));
 
         actual = BasicString::escape_all_codepoints(test);
@@ -164,6 +166,7 @@ CATCH_TEMPLATE_TEST_CASE(
                 auto begin = test.cbegin();
                 const auto end = test.cend();
 
+                CATCH_CHECK_FALSE(BasicString::validate(test));
                 CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
                 CATCH_CHECK_FALSE(BasicString::escape_all_codepoints(test));
             }
@@ -301,6 +304,8 @@ CATCH_TEMPLATE_TEST_CASE(
             const StringType test = make_string({ch});
             std::optional<StringType> actual;
 
+            CATCH_CHECK(BasicString::validate(test));
+
             actual = BasicString::encode_codepoint(ch);
             CATCH_CHECK(actual == test);
 
@@ -355,6 +360,9 @@ CATCH_TEMPLATE_TEST_CASE(
             [](StringType &&test, StringType &&expected, auto prefix, bool one_char = true)
         {
             CATCH_CAPTURE(test);
+
+            CATCH_CHECK(BasicString::validate(test));
+            CATCH_CHECK(BasicString::validate(expected));
 
             auto begin = test.cbegin();
             const auto end = test.cend();
@@ -485,6 +493,9 @@ CATCH_TEMPLATE_TEST_CASE(
         {
             CATCH_CAPTURE(test);
 
+            CATCH_CHECK(BasicString::validate(test));
+            CATCH_CHECK(BasicString::validate(expected));
+
             auto begin = test.cbegin();
             const auto end = test.cend();
 
@@ -567,6 +578,8 @@ CATCH_TEMPLATE_TEST_CASE(
                 CATCH_CAPTURE(test);
                 CATCH_CAPTURE(line);
 
+                CATCH_CHECK(BasicString::validate(test));
+
                 auto it = test.cbegin();
                 const auto end = test.cend();
 
@@ -579,6 +592,8 @@ CATCH_TEMPLATE_TEST_CASE(
             {
                 CATCH_CAPTURE(test);
                 CATCH_CAPTURE(line);
+
+                CATCH_CHECK(BasicString::validate(test));
 
                 std::size_t index = 0;
 
@@ -599,6 +614,8 @@ CATCH_TEMPLATE_TEST_CASE(
             {
                 CATCH_CAPTURE(test);
                 CATCH_CAPTURE(line);
+
+                CATCH_CHECK_FALSE(BasicString::validate(test));
 
                 const auto end = test.cend();
                 std::size_t actual = 0;
