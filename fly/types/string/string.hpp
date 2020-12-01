@@ -57,6 +57,7 @@ class BasicString
     using unicode = detail::BasicStringUnicode<StringType>;
 
 public:
+    using string_type = typename traits::string_type;
     using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
@@ -172,6 +173,15 @@ public:
     static bool wildcard_match(const StringType &source, const StringType &search);
 
     /**
+     * Validate that a string is strictly Unicode compliant.
+     *
+     * @param value The string to validate.
+     *
+     * @return True if the string is Unicode compliant.
+     */
+    static bool validate(const StringType &value);
+
+    /**
      * Decode a single Unicode codepoint, starting at the character pointed to by the provided
      * iterator. If successful, after invoking this method, that iterator will point at the first
      * character after the Unicode codepoint in the source string.
@@ -216,13 +226,13 @@ public:
      *
      * @tparam UnicodePrefix The Unicode prefix character ('u' or 'U').
      *
-     * @param source The string to escape.
+     * @param value The string to escape.
      *
      * @return If successful, a copy of the source string with all Unicode codepoints escaped.
      *         Otherwise, an unitialized value.
      */
     template <char UnicodePrefix = 'U'>
-    static std::optional<StringType> escape_all_codepoints(const StringType &source);
+    static std::optional<StringType> escape_all_codepoints(const StringType &value);
 
     /**
      * Escape a single Unicode codepoint, starting at the character pointed to by the provided
@@ -264,12 +274,12 @@ public:
      *     2. \unnnn\unnnn surrogate pairs for Unicode codepoints in the range [U+10000, U+10FFFF].
      *     3. \Unnnnnnnn for all Unicode codepoints.
      *
-     * @param source The string containing the escaped character sequence.
+     * @param value The string containing the escaped character sequence.
      *
      * @return If successful, a copy of the source string with all Unicode codepoints unescaped.
      *         Otherwise, an unitialized value.
      */
-    static std::optional<StringType> unescape_all_codepoints(const StringType &source);
+    static std::optional<StringType> unescape_all_codepoints(const StringType &value);
 
     /**
      * Unescape a single Unicode codepoint, starting at the character pointed to by provided
@@ -302,13 +312,13 @@ public:
      *
      * @tparam The type of the integer to format.
      *
-     * @param source The integer to format.
+     * @param value The integer to format.
      * @param length The length of the string to create.
      *
      * @return The created string with only hexacdemical digits.
      */
     template <typename IntegerType>
-    static StringType create_hex_string(IntegerType source, size_type length);
+    static StringType create_hex_string(IntegerType value, size_type length);
 
     /**
      * Generate a random string of the given length.
@@ -627,6 +637,16 @@ bool BasicString<StringType>::wildcard_match(const StringType &source, const Str
 
 //==================================================================================================
 template <typename StringType>
+bool BasicString<StringType>::validate(const StringType &value)
+{
+    auto it = value.cbegin();
+    const auto end = value.cend();
+
+    return unicode::validate_encoding(it, end);
+}
+
+//==================================================================================================
+template <typename StringType>
 template <typename IteratorType>
 auto BasicString<StringType>::decode_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<codepoint_type>
@@ -644,14 +664,14 @@ std::optional<StringType> BasicString<StringType>::encode_codepoint(codepoint_ty
 //==================================================================================================
 template <typename StringType>
 template <char UnicodePrefix>
-std::optional<StringType> BasicString<StringType>::escape_all_codepoints(const StringType &source)
+std::optional<StringType> BasicString<StringType>::escape_all_codepoints(const StringType &value)
 {
     StringType result;
-    result.reserve(source.size());
+    result.reserve(value.size());
 
-    const auto end = source.cend();
+    const auto end = value.cend();
 
-    for (auto it = source.cbegin(); it != end;)
+    for (auto it = value.cbegin(); it != end;)
     {
         if (auto escaped = escape_codepoint<UnicodePrefix>(it, end); escaped)
         {
@@ -677,14 +697,14 @@ BasicString<StringType>::escape_codepoint(IteratorType &it, const IteratorType &
 
 //==================================================================================================
 template <typename StringType>
-std::optional<StringType> BasicString<StringType>::unescape_all_codepoints(const StringType &source)
+std::optional<StringType> BasicString<StringType>::unescape_all_codepoints(const StringType &value)
 {
     StringType result;
-    result.reserve(source.size());
+    result.reserve(value.size());
 
-    const auto end = source.cend();
+    const auto end = value.cend();
 
-    for (auto it = source.cbegin(); it != end;)
+    for (auto it = value.cbegin(); it != end;)
     {
         if ((*it == '\\') && ((it + 1) != end))
         {
@@ -731,9 +751,9 @@ BasicString<StringType>::unescape_codepoint(IteratorType &it, const IteratorType
 //==================================================================================================
 template <typename StringType>
 template <typename IntegerType>
-StringType BasicString<StringType>::create_hex_string(IntegerType source, size_type length)
+StringType BasicString<StringType>::create_hex_string(IntegerType value, size_type length)
 {
-    return formatter::format_hex(source, length);
+    return formatter::format_hex(value, length);
 }
 
 //==================================================================================================

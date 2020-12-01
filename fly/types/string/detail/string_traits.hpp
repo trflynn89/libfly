@@ -97,6 +97,7 @@ struct BasicStringTraits
     /**
      * Aliases for STL types that use std::basic_string specializations as a template type.
      */
+    using string_type = StringType;
     using size_type = typename StringType::size_type;
     using char_type = typename StringType::value_type;
     using view_type = std::basic_string_view<char_type>;
