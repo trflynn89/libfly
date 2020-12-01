@@ -189,6 +189,12 @@ struct JsonTraits
         {
         };
 
+        template <typename T, std::size_t N>
+        static inline std::size_t size(const std::array<T, N> &array)
+        {
+            return array.size();
+        }
+
         // std::deque
 
         template <typename... Args>
@@ -197,10 +203,16 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void
+        static inline void
         append(std::deque<Args...> &array, typename std::deque<Args...>::value_type &&value)
         {
             array.push_back(std::move(value));
+        }
+
+        template <typename... Args>
+        static inline std::size_t size(const std::deque<Args...> &array)
+        {
+            return array.size();
         }
 
         // std::forward_list
@@ -211,7 +223,7 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void append(
+        static inline void append(
             std::forward_list<Args...> &array,
             typename std::forward_list<Args...>::value_type &&value)
         {
@@ -226,6 +238,20 @@ struct JsonTraits
             array.insert_after(before_end, std::move(value));
         }
 
+        template <typename... Args>
+        static inline std::size_t size(const std::forward_list<Args...> &array)
+        {
+            std::size_t elements = 0;
+
+            for (const auto &element : array)
+            {
+                FLY_UNUSED(element);
+                ++elements;
+            }
+
+            return elements;
+        }
+
         // std::list
 
         template <typename... Args>
@@ -234,10 +260,16 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void
+        static inline void
         append(std::list<Args...> &array, typename std::list<Args...>::value_type &&value)
         {
             array.push_back(std::move(value));
+        }
+
+        template <typename... Args>
+        static inline std::size_t size(const std::list<Args...> &array)
+        {
+            return array.size();
         }
 
         // std::multiset
@@ -248,10 +280,16 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void
+        static inline void
         append(std::multiset<Args...> &array, typename std::multiset<Args...>::value_type &&value)
         {
             array.insert(std::move(value));
+        }
+
+        template <typename... Args>
+        static inline std::size_t size(const std::multiset<Args...> &array)
+        {
+            return array.size();
         }
 
         // std::set
@@ -262,9 +300,16 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void append(std::set<Args...> &array, typename std::set<Args...>::value_type &&value)
+        static inline void
+        append(std::set<Args...> &array, typename std::set<Args...>::value_type &&value)
         {
             array.insert(std::move(value));
+        }
+
+        template <typename... Args>
+        static inline std::size_t size(const std::set<Args...> &array)
+        {
+            return array.size();
         }
 
         // std::unordered_multiset
@@ -275,11 +320,17 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void append(
+        static inline void append(
             std::unordered_multiset<Args...> &array,
             typename std::unordered_multiset<Args...>::value_type &&value)
         {
             array.insert(std::move(value));
+        }
+
+        template <typename... Args>
+        static inline std::size_t size(const std::unordered_multiset<Args...> &array)
+        {
+            return array.size();
         }
 
         // std::unordered_set
@@ -290,11 +341,17 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void append(
+        static inline void append(
             std::unordered_set<Args...> &array,
             typename std::unordered_set<Args...>::value_type &&value)
         {
             array.insert(std::move(value));
+        }
+
+        template <typename... Args>
+        static inline std::size_t size(const std::unordered_set<Args...> &array)
+        {
+            return array.size();
         }
 
         // std::vector
@@ -305,10 +362,16 @@ struct JsonTraits
         };
 
         template <typename... Args>
-        static void
+        static inline void
         append(std::vector<Args...> &array, typename std::vector<Args...>::value_type &&value)
         {
             array.push_back(std::move(value));
+        }
+
+        template <typename... Args>
+        static inline std::size_t size(const std::vector<Args...> &array)
+        {
+            return array.size();
         }
     };
 
