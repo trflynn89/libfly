@@ -36,8 +36,8 @@ struct JsonTraits
     using null_type = std::nullptr_t;
     using string_type = std::string;
     using boolean_type = bool;
-    using signed_type = std::intmax_t;
-    using unsigned_type = std::uintmax_t;
+    using signed_type = std::int64_t;
+    using unsigned_type = std::uint64_t;
     using float_type = long double;
     using object_type = std::map<string_type, Json>;
     using array_type = std::vector<Json>;
