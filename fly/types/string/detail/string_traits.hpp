@@ -101,9 +101,6 @@ struct BasicStringTraits
     using char_type = typename StringType::value_type;
     using view_type = std::basic_string_view<char_type>;
 
-    using iterator = typename StringType::iterator;
-    using const_iterator = typename StringType::const_iterator;
-
     using codepoint_type = std::uint32_t;
 
     using streamer_traits = BasicStringStreamerTraits<StringType>;
