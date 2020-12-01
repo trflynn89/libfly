@@ -93,16 +93,14 @@ private:
     };
 
     /**
-     * Enumeration to indicate the type of a JSON value to parse.
+     * Enumeration to indicate the type of a JSON number to parse.
      */
-    enum class JsonType : std::uint8_t
+    enum class NumberType : std::uint8_t
     {
         Invalid,
-        JsonString,
         SignedInteger,
         UnsignedInteger,
         FloatingPoint,
-        Other,
     };
 
     /**
@@ -110,13 +108,8 @@ private:
      */
     enum class ParseState : std::uint8_t
     {
-        // A parsing error has occurred and all parsing should stop.
         Invalid,
-
-        // Parsing is complete.
         StopParsing,
-
-        // Parsing is ongoing.
         KeepParsing,
     };
 
@@ -153,7 +146,18 @@ private:
     ParseState done_parsing_object_or_array(const Token &end_token);
 
     /**
-     * Parse a JSON string, number, boolean, or null value from the stream.
+     * Parse a JSON string from the stream. Escaped symbols are preserved in the string, and the
+     * returned value does not contain its surrounding quotes.
+     *
+     * This returns an actual string rather than a JSON value because some callers prefer the string
+     * type (e.g. to pass the string as the key of a JSON object).
+     *
+     * @return If successful, the parsed JSON string. Otherwise, an unitialized value.
+     */
+    std::optional<JsonTraits::string_type> parse_quoted_string();
+
+    /**
+     * Parse a JSON number, boolean, or null value from the stream.
      *
      * @return If successful, the parsed JSON value. Otherwise, an unitialized value.
      */
@@ -177,17 +181,11 @@ private:
     ParseState consume_comma(const ParseStateGetter &parse_state);
 
     /**
-     * Extract a string, number, boolean, or null value from the stream. If parsing a string,
-     * escaped symbols are preserved in that string, and the returned value does not contain its
-     * surrounding quotes.
+     * Extract a number, boolean, or null value from the stream.
      *
-     * @param type The JSON value type to consume.
-     * @param value The location to store the parsed value.
-     *
-     * @return The JSON value type that was parsed. Will be either the type that was provided or
-     *         JsonType::Invalid if an error occurred.
+     * @return The JSON value that was parsed as a string.
      */
-    JsonType consume_value(JsonType type, JsonTraits::string_type &value);
+    JsonTraits::string_type consume_value();
 
     /**
      * Extract all consecutive whitespace symbols and comments (if enabled in the feature set) from
@@ -229,7 +227,7 @@ private:
      *
      * @return The interpreted JSON value type.
      */
-    JsonType validate_number(const JsonTraits::string_type &value) const;
+    NumberType validate_number(const JsonTraits::string_type &value) const;
 
     /**
      * Check if a symbol is a whitespace symbol.
