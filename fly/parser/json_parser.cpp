@@ -189,7 +189,7 @@ std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
         return (token == Token::Quote) || (token == Token::EndOfFile);
     };
 
-    Json::stringstream_type parsing;
+    JsonTraits::string_type value;
     Token token;
 
     if (consume_token(Token::Quote) == ParseState::Invalid)
@@ -199,7 +199,7 @@ std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
 
     while (!stop_parsing(token = m_stream->peek<Token>()))
     {
-        parsing << static_cast<JsonTraits::char_type>(token);
+        value.push_back(static_cast<JsonTraits::char_type>(token));
         discard();
 
         // Blindly ignore escaped symbols, the Json class will check whether they are valid. Just
@@ -213,7 +213,7 @@ std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
                 return std::nullopt;
             }
 
-            parsing << static_cast<JsonTraits::char_type>(token);
+            value.push_back(static_cast<JsonTraits::char_type>(token));
         }
     }
 
@@ -222,7 +222,7 @@ std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
         return std::nullopt;
     }
 
-    return parsing.str();
+    return value;
 }
 
 //==================================================================================================
@@ -325,16 +325,16 @@ JsonTraits::string_type JsonParser::consume_value()
             (token == Token::EndOfFile);
     };
 
-    Json::stringstream_type parsing;
+    JsonTraits::string_type value;
     Token token;
 
     while (!stop_parsing(token = m_stream->peek<Token>()))
     {
-        parsing << static_cast<JsonTraits::char_type>(token);
+        value.push_back(static_cast<JsonTraits::char_type>(token));
         discard();
     }
 
-    return parsing.str();
+    return value;
 }
 
 //==================================================================================================

@@ -187,11 +187,6 @@ public:
     using const_reverse_iterator = detail::JsonReverseIterator<const_iterator>;
 
     /**
-     * Alias for a basic_stringstream with the JSON string type.
-     */
-    using stringstream_type = std::basic_stringstream<JsonTraits::char_type>;
-
-    /**
      * Default constructor. Intializes the Json instance to a null value.
      */
     Json() = default;
@@ -1518,7 +1513,7 @@ Json::operator T() const noexcept
     }
     else
     {
-        stringstream_type stream;
+        std::basic_stringstream<JsonTraits::char_type> stream;
         stream << *this;
 
         value = stream.str();
