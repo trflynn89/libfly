@@ -120,10 +120,8 @@ struct JsonTraits
      * Define a trait for testing if type T is any JSON number type.
      */
     template <typename T>
-    using is_number = std::disjunction<
-        is_signed_integer<std::decay_t<T>>,
-        is_unsigned_integer<std::decay_t<T>>,
-        is_floating_point<std::decay_t<T>>>;
+    using is_number =
+        std::disjunction<is_signed_integer<T>, is_unsigned_integer<T>, is_floating_point<T>>;
 
     template <typename T>
     inline static constexpr bool is_number_v = is_number<T>::value;
