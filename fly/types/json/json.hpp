@@ -480,12 +480,7 @@ public:
      * @throws JsonException If the Json instance is not numeric, or the stored value could not be
      *         converted to the target numeric type.
      */
-    template <
-        typename T,
-        enable_if_any<
-            JsonTraits::is_signed_integer<T>,
-            JsonTraits::is_unsigned_integer<T>,
-            JsonTraits::is_floating_point<T>> = 0>
+    template <typename T, enable_if_all<JsonTraits::is_number<T>> = 0>
     explicit operator T() const noexcept(false);
 
     //==============================================================================================
@@ -1527,89 +1522,89 @@ Json::operator T() const noexcept
 template <typename T, enable_if_all<JsonTraits::is_object<T>>>
 Json::operator T() const noexcept(false)
 {
-    if (is_object())
+    if (!is_object())
     {
-        const auto &value = std::get<JsonTraits::object_type>(m_value);
-        T result;
-
-        for (const auto &it : value)
-        {
-            // The JSON string will have been validated for Unicode compliance during construction.
-            auto key = JsonTraits::StringType::convert<typename T::key_type>(it.first).value();
-            result.emplace(std::move(key), it.second);
-        }
-
-        return result;
+        throw JsonException(*this, "JSON type is not an object");
     }
 
-    throw JsonException(*this, "JSON type is not an object");
+    const auto &storage = std::get<JsonTraits::object_type>(m_value);
+    T result;
+
+    for (const auto &it : storage)
+    {
+        // The JSON string will have been validated for Unicode compliance during construction.
+        auto key = JsonTraits::StringType::convert<typename T::key_type>(it.first).value();
+        result.emplace(std::move(key), it.second);
+    }
+
+    return result;
 }
 
 //==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_array<T>>>
 Json::operator T() const noexcept(false)
 {
-    if (is_array())
+    if (!is_array())
     {
-        const auto &value = std::get<JsonTraits::array_type>(m_value);
-        T array {};
-
-        for (const auto &it : value)
-        {
-            auto copy = static_cast<typename T::value_type>(it);
-            JsonTraits::ArrayTraits::append(array, std::move(copy));
-        }
-
-        return array;
+        throw JsonException(*this, "JSON type is not an array");
     }
 
-    throw JsonException(*this, "JSON type is not an array");
+    const auto &storage = std::get<JsonTraits::array_type>(m_value);
+    T array {};
+
+    for (const auto &it : storage)
+    {
+        auto copy = static_cast<typename T::value_type>(it);
+        JsonTraits::ArrayTraits::append(array, std::move(copy));
+    }
+
+    return array;
 }
 
 //==================================================================================================
 template <typename T, std::size_t N>
 Json::operator std::array<T, N>() const noexcept(false)
 {
-    if (is_array())
+    if (!is_array())
     {
-        const auto &value = std::get<JsonTraits::array_type>(m_value);
-        std::array<T, N> array {};
-
-        for (std::size_t i = 0; i < std::min(N, value.size()); ++i)
-        {
-            array[i] = T(value.at(i));
-        }
-
-        return array;
+        throw JsonException(*this, "JSON type is not an array");
     }
 
-    throw JsonException(*this, "JSON type is not an array");
+    const auto &storage = std::get<JsonTraits::array_type>(m_value);
+    std::array<T, N> array {};
+
+    for (std::size_t i = 0; i < std::min(N, storage.size()); ++i)
+    {
+        array[i] = T(storage.at(i));
+    }
+
+    return array;
 }
 
 //==================================================================================================
 template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
 Json::operator T() const noexcept
 {
-    auto visitor = [](const auto &value) noexcept -> T
+    auto visitor = [](const auto &storage) noexcept -> T
     {
-        using U = std::decay_t<decltype(value)>;
+        using U = std::decay_t<decltype(storage)>;
 
         if constexpr (
             std::is_same_v<U, JsonTraits::string_type> ||
             std::is_same_v<U, JsonTraits::object_type> || std::is_same_v<U, JsonTraits::array_type>)
         {
-            return !value.empty();
+            return !storage.empty();
         }
         else if constexpr (
             std::is_same_v<U, JsonTraits::boolean_type> ||
             std::is_same_v<U, JsonTraits::signed_type> ||
             std::is_same_v<U, JsonTraits::unsigned_type>)
         {
-            return value != static_cast<U>(0);
+            return storage != static_cast<U>(0);
         }
         else if constexpr (std::is_same_v<U, JsonTraits::float_type>)
         {
-            return std::abs(value) > static_cast<U>(0);
+            return std::abs(storage) > static_cast<U>(0);
         }
         else
         {
@@ -1621,21 +1616,16 @@ Json::operator T() const noexcept
 }
 
 //==================================================================================================
-template <
-    typename T,
-    enable_if_any<
-        JsonTraits::is_signed_integer<T>,
-        JsonTraits::is_unsigned_integer<T>,
-        JsonTraits::is_floating_point<T>>>
+template <typename T, enable_if_all<JsonTraits::is_number<T>>>
 Json::operator T() const noexcept(false)
 {
-    auto visitor = [this](const auto &value) -> T
+    auto visitor = [this](const auto &storage) -> T
     {
-        using U = std::decay_t<decltype(value)>;
+        using U = std::decay_t<decltype(storage)>;
 
         if constexpr (std::is_same_v<U, JsonTraits::string_type>)
         {
-            if (auto converted = JsonTraits::StringType::convert<T>(value); converted)
+            if (auto converted = JsonTraits::StringType::convert<T>(storage); converted)
             {
                 return std::move(converted.value());
             }
@@ -1645,7 +1635,7 @@ Json::operator T() const noexcept(false)
             std::is_same_v<U, JsonTraits::unsigned_type> ||
             std::is_same_v<U, JsonTraits::float_type>)
         {
-            return static_cast<T>(value);
+            return static_cast<T>(storage);
         }
 
         throw JsonException(*this, "JSON type is not numeric");
@@ -1663,10 +1653,10 @@ Json::reference Json::at(T key)
         throw JsonException(*this, "JSON type invalid for operator[key]");
     }
 
-    auto &value = std::get<JsonTraits::object_type>(m_value);
-    auto it = value.find(convert_to_string(std::move(key)));
+    auto &storage = std::get<JsonTraits::object_type>(m_value);
+    auto it = storage.find(convert_to_string(std::move(key)));
 
-    if (it == value.end())
+    if (it == storage.end())
     {
         throw JsonException(*this, String::format("Given key (%s) not found", key));
     }
@@ -1683,10 +1673,10 @@ Json::const_reference Json::at(T key) const
         throw JsonException(*this, "JSON type invalid for operator[key]");
     }
 
-    const auto &value = std::get<JsonTraits::object_type>(m_value);
-    const auto it = value.find(convert_to_string(std::move(key)));
+    const auto &storage = std::get<JsonTraits::object_type>(m_value);
+    const auto it = storage.find(convert_to_string(std::move(key)));
 
-    if (it == value.end())
+    if (it == storage.end())
     {
         throw JsonException(*this, String::format("Given key (%s) not found", key));
     }
@@ -1707,8 +1697,8 @@ Json::reference Json::operator[](T key)
         throw JsonException(*this, "JSON type invalid for operator[key]");
     }
 
-    auto &value = std::get<JsonTraits::object_type>(m_value);
-    return value[convert_to_string(std::move(key))];
+    auto &storage = std::get<JsonTraits::object_type>(m_value);
+    return storage[convert_to_string(std::move(key))];
 }
 
 //==================================================================================================
@@ -1782,8 +1772,8 @@ Json::reference Json::emplace_back(Args &&...args)
         throw JsonException(*this, "JSON type invalid for array emplacement");
     }
 
-    auto &value = std::get<JsonTraits::array_type>(m_value);
-    return value.emplace_back(std::forward<Args>(args)...);
+    auto &storage = std::get<JsonTraits::array_type>(m_value);
+    return storage.emplace_back(std::forward<Args>(args)...);
 }
 
 //==================================================================================================
@@ -1795,8 +1785,8 @@ Json::size_type Json::erase(T key)
         throw JsonException(*this, "JSON type invalid for erase(key)");
     }
 
-    auto &value = std::get<JsonTraits::object_type>(m_value);
-    return value.erase(convert_to_string(std::move(key)));
+    auto &storage = std::get<JsonTraits::object_type>(m_value);
+    return storage.erase(convert_to_string(std::move(key)));
 }
 
 //==================================================================================================
@@ -1904,8 +1894,8 @@ Json::size_type Json::count(T key) const
         throw JsonException(*this, "JSON type invalid for count(key)");
     }
 
-    const auto &value = std::get<JsonTraits::object_type>(m_value);
-    return value.count(convert_to_string(std::move(key)));
+    const auto &storage = std::get<JsonTraits::object_type>(m_value);
+    return storage.count(convert_to_string(std::move(key)));
 }
 
 //==================================================================================================
@@ -1917,10 +1907,10 @@ Json::iterator Json::find(T key)
         throw JsonException(*this, "JSON type invalid for find(key)");
     }
 
-    auto &value = std::get<JsonTraits::object_type>(m_value);
+    auto &storage = std::get<JsonTraits::object_type>(m_value);
 
     auto it = end();
-    it.m_iterator = value.find(convert_to_string(std::move(key)));
+    it.m_iterator = storage.find(convert_to_string(std::move(key)));
 
     return it;
 }
@@ -1934,10 +1924,10 @@ Json::const_iterator Json::find(T key) const
         throw JsonException(*this, "JSON type invalid for find(key)");
     }
 
-    const auto &value = std::get<JsonTraits::object_type>(m_value);
+    const auto &storage = std::get<JsonTraits::object_type>(m_value);
 
     auto it = cend();
-    it.m_iterator = value.find(convert_to_string(std::move(key)));
+    it.m_iterator = storage.find(convert_to_string(std::move(key)));
 
     return it;
 }
@@ -1951,8 +1941,8 @@ bool Json::contains(T key) const
         throw JsonException(*this, "JSON type invalid for contains(key)");
     }
 
-    const auto &value = std::get<JsonTraits::object_type>(m_value);
-    return value.find(convert_to_string(std::move(key))) != value.end();
+    const auto &storage = std::get<JsonTraits::object_type>(m_value);
+    return storage.find(convert_to_string(std::move(key))) != storage.end();
 }
 
 //==================================================================================================
@@ -1988,17 +1978,17 @@ Json::object_insertion_result<Args...> Json::object_inserter(Args &&...args)
         throw JsonException(*this, "JSON type invalid for object insertion");
     }
 
-    auto &value = std::get<JsonTraits::object_type>(m_value);
+    auto &storage = std::get<JsonTraits::object_type>(m_value);
 
     if constexpr (std::is_void_v<object_insertion_result<Args...>>)
     {
-        value.insert(std::forward<Args>(args)...);
+        storage.insert(std::forward<Args>(args)...);
     }
     else
     {
         auto it = end();
 
-        auto result = value.insert(std::forward<Args>(args)...);
+        auto result = storage.insert(std::forward<Args>(args)...);
         it.m_iterator = result.first;
 
         return {it, result.second};
@@ -2020,11 +2010,11 @@ Json::iterator Json::array_inserter(const_iterator position, Args &&...args)
 
     using array_iterator_type = typename const_iterator::array_iterator_type;
 
-    auto &value = std::get<JsonTraits::array_type>(m_value);
+    auto &storage = std::get<JsonTraits::array_type>(m_value);
     auto it = end();
 
     const auto &position_iterator = std::get<array_iterator_type>(position.m_iterator);
-    it.m_iterator = value.insert(position_iterator, std::forward<Args>(args)...);
+    it.m_iterator = storage.insert(position_iterator, std::forward<Args>(args)...);
 
     return it;
 }
