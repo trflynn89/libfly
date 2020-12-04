@@ -206,19 +206,27 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
         constexpr bool is_string_or_array =
             fly::any_same_v<json_type, fly::JsonTraits::string_type, fly::JsonTraits::array_type>;
 
-        if constexpr (is_string_or_array)
+        if constexpr (std::is_same_v<json_type, fly::JsonTraits::null_type>)
+        {
+            CATCH_CHECK(json1.capacity() == 0);
+            CATCH_CHECK(json2.capacity() == 0);
+        }
+        else if constexpr (is_string_or_array)
         {
             const auto capacity1 = json1.capacity();
             const auto capacity2 = json2.capacity();
             CATCH_CHECK(capacity1 == capacity2);
             CATCH_CHECK(capacity1 > 0);
         }
+        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        {
+            CATCH_CHECK(json1.capacity() == 2);
+            CATCH_CHECK(json2.capacity() == 2);
+        }
         else
         {
-            CATCH_CHECK_THROWS_JSON(
-                json1.capacity(),
-                "JSON type invalid for capacity operations: (%s)",
-                json1);
+            CATCH_CHECK(json1.capacity() == 1);
+            CATCH_CHECK(json2.capacity() == 1);
         }
     }
 
