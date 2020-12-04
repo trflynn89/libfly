@@ -1502,8 +1502,7 @@ Json::Json(T &&value) noexcept(false)
 template <typename T, enable_if_all<JsonTraits::is_array<T>>>
 Json::Json(T &&value) noexcept(false) : m_value(JsonTraits::array_type())
 {
-    auto &storage = std::get<JsonTraits::array_type>(m_value);
-    storage.reserve(JsonTraits::ArrayTraits::size(value));
+    reserve(JsonTraits::ArrayTraits::size(value));
 
     if constexpr (std::is_lvalue_reference_v<T>)
     {
