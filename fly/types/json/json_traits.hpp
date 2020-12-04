@@ -54,6 +54,15 @@ struct JsonTraits
     using char_type = typename string_type::value_type;
 
     /**
+     * Define a trait for testing if type T is a JSON null type.
+     */
+    template <typename T>
+    using is_null = std::is_same<null_type, std::decay_t<T>>;
+
+    template <typename T>
+    inline static constexpr bool is_null_v = is_null<T>::value;
+
+    /**
      * Define a trait for testing if type T could be a JSON string.
      */
     template <typename T>
@@ -78,7 +87,7 @@ struct JsonTraits
      * Define a trait for testing if type T is a JSON boolean.
      */
     template <typename T>
-    using is_boolean = std::is_same<bool, std::decay_t<T>>;
+    using is_boolean = std::is_same<boolean_type, std::decay_t<T>>;
 
     template <typename T>
     inline static constexpr bool is_boolean_v = is_boolean<T>::value;
@@ -90,7 +99,7 @@ struct JsonTraits
     using is_signed_integer = std::conjunction<
         std::is_integral<std::decay_t<T>>,
         std::is_signed<std::decay_t<T>>,
-        std::negation<std::is_same<bool, std::decay_t<T>>>>;
+        std::negation<std::is_same<boolean_type, std::decay_t<T>>>>;
 
     template <typename T>
     inline static constexpr bool is_signed_integer_v = is_signed_integer<T>::value;
@@ -102,7 +111,7 @@ struct JsonTraits
     using is_unsigned_integer = std::conjunction<
         std::is_integral<std::decay_t<T>>,
         std::is_unsigned<std::decay_t<T>>,
-        std::negation<std::is_same<bool, std::decay_t<T>>>>;
+        std::negation<std::is_same<boolean_type, std::decay_t<T>>>>;
 
     template <typename T>
     inline static constexpr bool is_unsigned_integer_v = is_unsigned_integer<T>::value;
@@ -381,6 +390,15 @@ struct JsonTraits
 
     template <typename T>
     inline static constexpr bool is_array_v = is_array<T>::value;
+
+    /**
+     * Define a trait for testing if type T is a container JSON type.
+     */
+    template <typename T>
+    using is_container = std::disjunction<is_string<T>, is_object<T>, is_array<T>>;
+
+    template <typename T>
+    inline static constexpr bool is_container_v = is_container<T>::value;
 
     /**
      * Define a trait for testing if type T is an iterable JSON type.
