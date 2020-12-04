@@ -66,6 +66,19 @@ public:
     using streamed_type = typename traits::streamed_type;
 
     /**
+     * Determine the length of any string-like value. Accepts character arrays, std::basic_string
+     * specializations, and std::basic_string_view specializations.
+     *
+     * @tparam T The string-like type.
+     *
+     * @param value The string-like value.
+     *
+     * @return The length of the string-like value.
+     */
+    template <typename T, enable_if_all<detail::is_like_supported_string<T>> = 0>
+    static size_type size(const T &value);
+
+    /**
      * Split a string into a vector of strings.
      *
      * @param input The string to split.
@@ -310,7 +323,7 @@ public:
      * significant bytes will be written. If the number of bytes required for the string is less
      * than the provided length, the string will be zero-padded.
      *
-     * @tparam The type of the integer to format.
+     * @tparam IntegerType The type of the integer to format.
      *
      * @param value The integer to format.
      * @param length The length of the string to create.
@@ -430,6 +443,23 @@ private:
     static constexpr size_type s_alpha_num_length =
         std::char_traits<char_type>::length(s_alpha_num);
 };
+
+//==================================================================================================
+template <typename StringType>
+template <typename T, enable_if_all<detail::is_like_supported_string<T>>>
+auto BasicString<StringType>::size(const T &value) -> size_type
+{
+    using U = std::decay_t<T>;
+
+    if constexpr (any_same_v<U, StringType, std::basic_string_view<char_type>>)
+    {
+        return value.size();
+    }
+    else
+    {
+        return std::char_traits<char_type>::length(value);
+    }
+}
 
 //==================================================================================================
 template <typename StringType>
