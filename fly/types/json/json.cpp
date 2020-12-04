@@ -71,16 +71,15 @@ Json::~Json()
 
     auto visitor = [&stack, &maybe_add_to_stack](auto &&storage) noexcept
     {
-        using U = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (
-            std::is_same_v<U, JsonTraits::object_type> || std::is_same_v<U, JsonTraits::array_type>)
+        if constexpr (any_same_v<S, JsonTraits::object_type, JsonTraits::array_type>)
         {
             stack.reserve(stack.size() + storage.size());
 
             for (auto &&child : storage)
             {
-                if constexpr (std::is_same_v<U, JsonTraits::object_type>)
+                if constexpr (JsonTraits::is_object_v<S>)
                 {
                     maybe_add_to_stack(std::move(child.second));
                 }
@@ -360,15 +359,13 @@ bool Json::empty() const
 {
     auto visitor = [](const auto &storage) -> bool
     {
-        using T = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (std::is_same_v<T, JsonTraits::null_type>)
+        if constexpr (JsonTraits::is_null_v<S>)
         {
             return true;
         }
-        else if constexpr (
-            std::is_same_v<T, JsonTraits::string_type> ||
-            std::is_same_v<T, JsonTraits::object_type> || std::is_same_v<T, JsonTraits::array_type>)
+        else if constexpr (JsonTraits::is_container_v<S>)
         {
             return storage.empty();
         }
@@ -386,15 +383,13 @@ Json::size_type Json::size() const
 {
     auto visitor = [](const auto &storage) -> size_type
     {
-        using T = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (std::is_same_v<T, JsonTraits::null_type>)
+        if constexpr (JsonTraits::is_null_v<S>)
         {
             return 0;
         }
-        else if constexpr (
-            std::is_same_v<T, JsonTraits::string_type> ||
-            std::is_same_v<T, JsonTraits::object_type> || std::is_same_v<T, JsonTraits::array_type>)
+        else if constexpr (JsonTraits::is_container_v<S>)
         {
             return storage.size();
         }
@@ -412,9 +407,9 @@ void Json::reserve(size_type capacity)
 {
     auto visitor = [this, &capacity](auto &storage)
     {
-        using T = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (any_same_v<T, JsonTraits::string_type, JsonTraits::array_type>)
+        if constexpr (any_same_v<S, JsonTraits::string_type, JsonTraits::array_type>)
         {
             // As of C++20, invoking std::string::reserve() with a value less than the current
             // capacity should not reduce the capacity of the string. Not all compilers seem to have
@@ -440,9 +435,9 @@ Json::size_type Json::capacity() const
 {
     auto visitor = [this](const auto &storage) -> size_type
     {
-        using T = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (any_same_v<T, JsonTraits::string_type, JsonTraits::array_type>)
+        if constexpr (any_same_v<S, JsonTraits::string_type, JsonTraits::array_type>)
         {
             return storage.capacity();
         }
@@ -460,24 +455,19 @@ void Json::clear()
 {
     auto visitor = [](auto &storage)
     {
-        using T = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (
-            std::is_same_v<T, JsonTraits::string_type> ||
-            std::is_same_v<T, JsonTraits::object_type> || std::is_same_v<T, JsonTraits::array_type>)
+        if constexpr (JsonTraits::is_container_v<S>)
         {
             storage.clear();
         }
-        else if constexpr (std::is_same_v<T, JsonTraits::boolean_type>)
+        else if constexpr (JsonTraits::is_boolean_v<S>)
         {
             storage = false;
         }
-        else if constexpr (
-            std::is_same_v<T, JsonTraits::signed_type> ||
-            std::is_same_v<T, JsonTraits::unsigned_type> ||
-            std::is_same_v<T, JsonTraits::float_type>)
+        else if constexpr (JsonTraits::is_number_v<S>)
         {
-            storage = static_cast<T>(0);
+            storage = static_cast<S>(0);
         }
     };
 
@@ -585,12 +575,12 @@ Json::iterator Json::erase(const_iterator position)
 {
     auto visitor = [this, &position](auto &storage) -> iterator
     {
-        using T = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (any_same_v<T, JsonTraits::object_type, JsonTraits::array_type>)
+        if constexpr (any_same_v<S, JsonTraits::object_type, JsonTraits::array_type>)
         {
             using iterator_type = std::conditional_t<
-                std::is_same_v<T, JsonTraits::object_type>,
+                JsonTraits::is_object_v<S>,
                 typename const_iterator::object_iterator_type,
                 typename const_iterator::array_iterator_type>;
 
@@ -624,12 +614,12 @@ Json::iterator Json::erase(const_iterator first, const_iterator last)
 {
     auto visitor = [this, &first, &last](auto &storage) -> iterator
     {
-        using T = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (any_same_v<T, JsonTraits::object_type, JsonTraits::array_type>)
+        if constexpr (any_same_v<S, JsonTraits::object_type, JsonTraits::array_type>)
         {
             using iterator_type = std::conditional_t<
-                std::is_same_v<T, JsonTraits::object_type>,
+                JsonTraits::is_object_v<S>,
                 typename const_iterator::object_iterator_type,
                 typename const_iterator::array_iterator_type>;
 
@@ -730,25 +720,25 @@ bool operator==(Json::const_reference json1, Json::const_reference json2)
 {
     auto visitor = [](const auto &value1, const auto &value2) -> bool
     {
-        using T = std::decay_t<decltype(value1)>;
-        using U = std::decay_t<decltype(value2)>;
+        using S1 = std::decay_t<decltype(value1)>;
+        using S2 = std::decay_t<decltype(value2)>;
 
         if constexpr (
-            (std::is_same_v<T, JsonTraits::float_type> && JsonTraits::is_number_v<U>) ||
-            (std::is_same_v<U, JsonTraits::float_type> && JsonTraits::is_number_v<T>))
+            (JsonTraits::is_floating_point_v<S1> && JsonTraits::is_number_v<S2>) ||
+            (JsonTraits::is_floating_point_v<S2> && JsonTraits::is_number_v<S1>))
         {
-            constexpr auto epsilon = std::numeric_limits<T>::epsilon();
+            constexpr auto epsilon = std::numeric_limits<S1>::epsilon();
 
             const auto fvalue1 = static_cast<JsonTraits::float_type>(value1);
             const auto fvalue2 = static_cast<JsonTraits::float_type>(value2);
 
             return std::abs(fvalue1 - fvalue2) <= epsilon;
         }
-        else if constexpr (JsonTraits::is_number_v<T> && JsonTraits::is_number_v<U>)
+        else if constexpr (JsonTraits::is_number_v<S1> && JsonTraits::is_number_v<S2>)
         {
-            return value1 == static_cast<T>(value2);
+            return value1 == static_cast<S1>(value2);
         }
-        else if constexpr (std::is_same_v<T, U>)
+        else if constexpr (std::is_same_v<S1, S2>)
         {
             return value1 == value2;
         }
@@ -785,17 +775,17 @@ std::ostream &operator<<(std::ostream &stream, Json::const_reference json)
 
     auto visitor = [&stream, &serialize_string](const auto &storage)
     {
-        using T = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (std::is_same_v<T, JsonTraits::null_type>)
+        if constexpr (JsonTraits::is_null_v<S>)
         {
             stream << "null";
         }
-        else if constexpr (std::is_same_v<T, JsonTraits::string_type>)
+        else if constexpr (JsonTraits::is_string_v<S>)
         {
             serialize_string(storage);
         }
-        else if constexpr (std::is_same_v<T, JsonTraits::object_type>)
+        else if constexpr (JsonTraits::is_object_v<S>)
         {
             stream << '{';
 
@@ -812,7 +802,7 @@ std::ostream &operator<<(std::ostream &stream, Json::const_reference json)
 
             stream << '}';
         }
-        else if constexpr (std::is_same_v<T, JsonTraits::array_type>)
+        else if constexpr (JsonTraits::is_array_v<S>)
         {
             stream << '[';
 
@@ -828,7 +818,7 @@ std::ostream &operator<<(std::ostream &stream, Json::const_reference json)
 
             stream << ']';
         }
-        else if constexpr (std::is_same_v<T, JsonTraits::boolean_type>)
+        else if constexpr (JsonTraits::is_boolean_v<S>)
         {
             stream << (storage ? "true" : "false");
         }

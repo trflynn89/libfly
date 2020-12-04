@@ -1635,28 +1635,23 @@ Json::operator T() const noexcept
 {
     auto visitor = [](const auto &storage) noexcept -> T
     {
-        using U = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (
-            std::is_same_v<U, JsonTraits::string_type> ||
-            std::is_same_v<U, JsonTraits::object_type> || std::is_same_v<U, JsonTraits::array_type>)
+        if constexpr (JsonTraits::is_container_v<S>)
         {
             return !storage.empty();
         }
-        else if constexpr (
-            std::is_same_v<U, JsonTraits::boolean_type> ||
-            std::is_same_v<U, JsonTraits::signed_type> ||
-            std::is_same_v<U, JsonTraits::unsigned_type>)
+        else if constexpr (JsonTraits::is_floating_point_v<S>)
         {
-            return storage != static_cast<U>(0);
+            return std::abs(storage) > static_cast<S>(0);
         }
-        else if constexpr (std::is_same_v<U, JsonTraits::float_type>)
+        else if constexpr (JsonTraits::is_null_v<S>)
         {
-            return std::abs(storage) > static_cast<U>(0);
+            return false;
         }
         else
         {
-            return false;
+            return storage != static_cast<S>(0);
         }
     };
 
@@ -1669,19 +1664,16 @@ Json::operator T() const noexcept(false)
 {
     auto visitor = [this](const auto &storage) -> T
     {
-        using U = std::decay_t<decltype(storage)>;
+        using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (std::is_same_v<U, JsonTraits::string_type>)
+        if constexpr (JsonTraits::is_string_v<S>)
         {
             if (auto converted = JsonTraits::StringType::convert<T>(storage); converted)
             {
                 return std::move(converted.value());
             }
         }
-        else if constexpr (
-            std::is_same_v<U, JsonTraits::signed_type> ||
-            std::is_same_v<U, JsonTraits::unsigned_type> ||
-            std::is_same_v<U, JsonTraits::float_type>)
+        else if constexpr (JsonTraits::is_number_v<S>)
         {
             return static_cast<T>(storage);
         }
