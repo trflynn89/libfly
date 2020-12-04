@@ -177,6 +177,51 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
         }
     }
 
+    CATCH_SECTION("Change the size of a JSON instance")
+    {
+        constexpr bool is_string_or_array =
+            fly::any_same_v<json_type, fly::JsonTraits::string_type, fly::JsonTraits::array_type>;
+
+        if constexpr (is_string_or_array)
+        {
+            const auto size_before = json1.size();
+
+            json1.resize(size_before * 2);
+            CATCH_CHECK(json1.size() == (size_before * 2));
+
+            json1.resize(size_before);
+            CATCH_CHECK(json1.size() == size_before);
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                json1.resize(1),
+                "JSON type invalid for capacity operations: (%s)",
+                json1);
+        }
+    }
+
+    CATCH_SECTION("Check the capacity of a JSON instance")
+    {
+        constexpr bool is_string_or_array =
+            fly::any_same_v<json_type, fly::JsonTraits::string_type, fly::JsonTraits::array_type>;
+
+        if constexpr (is_string_or_array)
+        {
+            const auto capacity1 = json1.capacity();
+            const auto capacity2 = json2.capacity();
+            CATCH_CHECK(capacity1 == capacity2);
+            CATCH_CHECK(capacity1 > 0);
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                json1.capacity(),
+                "JSON type invalid for capacity operations: (%s)",
+                json1);
+        }
+    }
+
     CATCH_SECTION("Change the capacity of a JSON instance")
     {
         constexpr bool is_string_or_array =
@@ -196,27 +241,6 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
         {
             CATCH_CHECK_THROWS_JSON(
                 json1.reserve(1),
-                "JSON type invalid for capacity operations: (%s)",
-                json1);
-        }
-    }
-
-    CATCH_SECTION("Query the capacity of a JSON instance")
-    {
-        constexpr bool is_string_or_array =
-            fly::any_same_v<json_type, fly::JsonTraits::string_type, fly::JsonTraits::array_type>;
-
-        if constexpr (is_string_or_array)
-        {
-            const auto capacity1 = json1.capacity();
-            const auto capacity2 = json2.capacity();
-            CATCH_CHECK(capacity1 == capacity2);
-            CATCH_CHECK(capacity1 > 0);
-        }
-        else
-        {
-            CATCH_CHECK_THROWS_JSON(
-                json1.capacity(),
                 "JSON type invalid for capacity operations: (%s)",
                 json1);
         }

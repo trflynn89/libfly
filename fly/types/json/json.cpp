@@ -403,23 +403,15 @@ Json::size_type Json::size() const
 }
 
 //==================================================================================================
-void Json::reserve(size_type capacity)
+void Json::resize(size_type size)
 {
-    auto visitor = [this, &capacity](auto &storage)
+    auto visitor = [this, &size](auto &storage)
     {
         using S = std::decay_t<decltype(storage)>;
 
         if constexpr (any_same_v<S, JsonTraits::string_type, JsonTraits::array_type>)
         {
-            // As of C++20, invoking std::string::reserve() with a value less than the current
-            // capacity should not reduce the capacity of the string. Not all compilers seem to have
-            // implemented this change yet. Once they do, this check can be removed.
-            //
-            // https://en.cppreference.com/w/cpp/string/basic_string/reserve
-            if (capacity > storage.capacity())
-            {
-                storage.reserve(capacity);
-            }
+            storage.resize(size);
         }
         else
         {
@@ -448,6 +440,34 @@ Json::size_type Json::capacity() const
     };
 
     return std::visit(std::move(visitor), m_value);
+}
+
+//==================================================================================================
+void Json::reserve(size_type capacity)
+{
+    auto visitor = [this, &capacity](auto &storage)
+    {
+        using S = std::decay_t<decltype(storage)>;
+
+        if constexpr (any_same_v<S, JsonTraits::string_type, JsonTraits::array_type>)
+        {
+            // As of C++20, invoking std::string::reserve() with a value less than the current
+            // capacity should not reduce the capacity of the string. Not all compilers seem to have
+            // implemented this change yet. Once they do, this check can be removed.
+            //
+            // https://en.cppreference.com/w/cpp/string/basic_string/reserve
+            if (capacity > storage.capacity())
+            {
+                storage.reserve(capacity);
+            }
+        }
+        else
+        {
+            throw JsonException(*this, "JSON type invalid for capacity operations");
+        }
+    };
+
+    std::visit(std::move(visitor), m_value);
 }
 
 //==================================================================================================
