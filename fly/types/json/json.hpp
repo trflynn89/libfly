@@ -796,12 +796,12 @@ public:
     /**
      * Check if the Json instance contains zero elements.
      *
-     * If the Json instance is an object, array, or string, return whether the stored container is
+     * If the Json instance is null, returns true.
+     *
+     * If the Json instance is a string, object, or array, returns whether the stored container is
      * empty.
      *
-     * If the Json instance is null, return true.
-     *
-     * If the Json instance is a boolean or numeric, return false.
+     * If the Json instance is a boolean or numeric, returns false.
      *
      * @return True if the instance is empty.
      */
@@ -810,14 +810,14 @@ public:
     /**
      * Get the number of elements in the Json instance.
      *
-     * If the Json instance is an object or array, return the number of elements stored in the
+     * If the Json instance is null, returns 0.
+     *
+     * If the Json instance is a string, returns the length of the string.
+     *
+     * If the Json instance is an object or array, returns the number of elements stored in the
      * object or array.
      *
-     * If the Json instance is null, return 0.
-     *
-     * If the Json instance is a string, return the length of the string.
-     *
-     * If the Json instance is a boolean or numeric, return 1.
+     * If the Json instance is a boolean or numeric, returns 1.
      *
      * @return The size of the Json instance.
      */
@@ -825,7 +825,7 @@ public:
 
     /**
      * Resize the Json instance to contain the provided number of elements. Only valid if the Json
-     * instance is a string or an array.
+     * instance is a string or array.
      *
      * @param size The new size of the Json instance.
      *
@@ -834,18 +834,25 @@ public:
     void resize(size_type size);
 
     /**
-     * Get the number of elements that the Json instance has currently allocated space for. Only
-     * valid if the Json instance is a string or an array.
+     * Get the number of elements that the Json instance has currently allocated space for.
+     *
+     * If the Json instance is null, returns 0.
+     *
+     * If the Json instance is a string or array, returns the number of elements allocated for the
+     * string or array.
+     *
+     * If the Json instance is an object, returns the number of elements stored in the object
+     * (effectively the same as invoking Json::size).
+     *
+     * If the Json instance is a boolean or numeric, returns 1.
      *
      * @return The capacity of the Json instance.
-     *
-     * @throws JsonException If the Json instance is not a string or array.
      */
     size_type capacity() const;
 
     /**
      * Increase the capacity of the Json instance to a value that's greater or equal to the provided
-     * capacity. Only valid if the Json instance is a string or an array.
+     * capacity. Only valid if the Json instance is a string or array.
      *
      * @param capacity The new capacity of the Json instance.
      *

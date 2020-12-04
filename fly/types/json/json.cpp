@@ -425,17 +425,25 @@ void Json::resize(size_type size)
 //==================================================================================================
 Json::size_type Json::capacity() const
 {
-    auto visitor = [this](const auto &storage) -> size_type
+    auto visitor = [](const auto &storage) -> size_type
     {
         using S = std::decay_t<decltype(storage)>;
 
-        if constexpr (any_same_v<S, JsonTraits::string_type, JsonTraits::array_type>)
+        if constexpr (JsonTraits::is_null_v<S>)
+        {
+            return 0;
+        }
+        else if constexpr (any_same_v<S, JsonTraits::string_type, JsonTraits::array_type>)
         {
             return storage.capacity();
         }
+        else if constexpr (JsonTraits::is_object_v<S>)
+        {
+            return storage.size();
+        }
         else
         {
-            throw JsonException(*this, "JSON type invalid for capacity operations");
+            return 1;
         }
     };
 
