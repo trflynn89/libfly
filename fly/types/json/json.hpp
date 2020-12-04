@@ -823,6 +823,26 @@ public:
      */
     size_type size() const;
 
+    /**
+     * Increase the capacity of the Json instance to a value that's greater or equal to the provided
+     * capacity. Only valid if the Json instance is a string or an array.
+     *
+     * @param capacity The capacity of the Json instance.
+     *
+     * @throws JsonException If the Json instance is not a string or array.
+     */
+    void reserve(size_type capacity);
+
+    /**
+     * Get the number of elements that the Json instance has currently allocated space for. Only
+     * valid if the Json instance is a string or an array.
+     *
+     * @return The capacity of the Json instance.
+     *
+     * @throws JsonException If the Json instance is not a string or array.
+     */
+    size_type capacity() const;
+
     //==============================================================================================
     //
     // Modifiers

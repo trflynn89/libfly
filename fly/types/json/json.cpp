@@ -408,6 +408,54 @@ Json::size_type Json::size() const
 }
 
 //==================================================================================================
+void Json::reserve(size_type capacity)
+{
+    auto visitor = [this, &capacity](auto &storage)
+    {
+        using T = std::decay_t<decltype(storage)>;
+
+        if constexpr (any_same_v<T, JsonTraits::string_type, JsonTraits::array_type>)
+        {
+            // As of C++20, invoking std::string::reserve() with a value less than the current
+            // capacity should not reduce the capacity of the string. Not all compilers seem to have
+            // implemented this change yet. Once they do, this check can be removed.
+            //
+            // https://en.cppreference.com/w/cpp/string/basic_string/reserve
+            if (capacity > storage.capacity())
+            {
+                storage.reserve(capacity);
+            }
+        }
+        else
+        {
+            throw JsonException(*this, "JSON type invalid for capacity operations");
+        }
+    };
+
+    std::visit(std::move(visitor), m_value);
+}
+
+//==================================================================================================
+Json::size_type Json::capacity() const
+{
+    auto visitor = [this](const auto &storage) -> size_type
+    {
+        using T = std::decay_t<decltype(storage)>;
+
+        if constexpr (any_same_v<T, JsonTraits::string_type, JsonTraits::array_type>)
+        {
+            return storage.capacity();
+        }
+        else
+        {
+            throw JsonException(*this, "JSON type invalid for capacity operations");
+        }
+    };
+
+    return std::visit(std::move(visitor), m_value);
+}
+
+//==================================================================================================
 void Json::clear()
 {
     auto visitor = [](auto &storage)
