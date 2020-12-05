@@ -141,7 +141,7 @@ public:
     static std::optional<StringType> unescape_codepoint(IteratorType &it, const IteratorType &end);
 
 private:
-    using EncodedByteProvider = std::function<std::optional<codepoint_type>()>;
+    using EncodedByteProvider = std::function<codepoint_type()>;
 
     /**
      * Escape a single Unicode codepoint.
@@ -166,52 +166,47 @@ private:
      * @param end Pointer to the end of the escaped character sequence.
      *
      * @return If successful, a string containing the parsed Unicode codepoint. Otherwise, an
-     *         unitialized value.
+     *         invalid codepoint.
      */
     template <char UnicodePrefix, typename IteratorType>
-    static std::optional<codepoint_type>
-    unescape_codepoint(IteratorType &it, const IteratorType &end);
+    static codepoint_type unescape_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
      * Decode a Unicode codepoint from a UTF-8 string.
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized value.
+     * @return If successful, the decoded Unicode codepoint. Otherwise, an invalid codepoint.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 1), bool> = 0>
-    static std::optional<codepoint_type>
-    codepoint_from_string(EncodedByteProvider next_encoded_byte);
+    static codepoint_type codepoint_from_string(EncodedByteProvider next_encoded_byte);
 
     /**
      * Decode a Unicode codepoint from a UTF-16 string.
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return The decoded Unicode codepoint.
+     * @return If successful, the decoded Unicode codepoint. Otherwise, an invalid codepoint.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 2), bool> = 0>
-    static std::optional<codepoint_type>
-    codepoint_from_string(EncodedByteProvider next_encoded_byte);
+    static codepoint_type codepoint_from_string(EncodedByteProvider next_encoded_byte);
 
     /**
      * Decode a Unicode codepoint from a UTF-32 string.
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized value.
+     * @return If successful, the decoded Unicode codepoint. Otherwise, an invalid codepoint.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 4), bool> = 0>
-    static std::optional<codepoint_type>
-    codepoint_from_string(EncodedByteProvider next_encoded_byte);
+    static codepoint_type codepoint_from_string(EncodedByteProvider next_encoded_byte);
 
     /**
      * Encode a Unicode codepoint into a UTF-8 string.
      *
      * @param codepoint The codepoint to encode.
      *
-     * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
-     *         unitialized value.
+     * @return A string containing the encoded Unicode codepoint.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 1), bool> = 0>
     static StringType codepoint_to_string(codepoint_type codepoint);
@@ -221,8 +216,7 @@ private:
      *
      * @param codepoint The codepoint to encode.
      *
-     * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
-     *         unitialized value.
+     * @return A string containing the encoded Unicode codepoint.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 2), bool> = 0>
     static StringType codepoint_to_string(codepoint_type codepoint);
@@ -232,8 +226,7 @@ private:
      *
      * @param codepoint The codepoint to encode.
      *
-     * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
-     *         unitialized value.
+     * @return A string containing the encoded Unicode codepoint.
      */
     template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 4), bool> = 0>
     static StringType codepoint_to_string(codepoint_type codepoint);
@@ -247,10 +240,9 @@ private:
      *
      * @param next_encoded_byte Callback for the method to invoke to retrieve the next encoded byte.
      *
-     * @return If successful, the created Unicode codepoint. Otherwise, an unitialized value.
+     * @return If successful, the created Unicode codepoint. Otherwise, an invalid codepoint.
      */
-    static std::optional<codepoint_type>
-    create_codepoint_from_surrogates(EncodedByteProvider next_encoded_byte);
+    static codepoint_type create_codepoint_from_surrogates(EncodedByteProvider next_encoded_byte);
 
     /**
      * Validate a Unicode codepoint is not out-of-range or reserved by the Unicode Standard.
@@ -296,20 +288,21 @@ private:
     static constexpr const Utf8Data s_utf8_continuation_byte =
         {0b1000'0000, 0b1100'0000, 0b0011'1111, 6};
 
-    static constexpr codepoint_type s_high_surrogate_min = 0xd800;
-    static constexpr codepoint_type s_high_surrogate_max = 0xdbff;
-    static constexpr codepoint_type s_low_surrogate_min = 0xdc00;
-    static constexpr codepoint_type s_low_surrogate_max = 0xdfff;
-    static constexpr codepoint_type s_max_codepoint = 0x10ffff;
+    static constexpr const codepoint_type s_high_surrogate_min = 0xd800;
+    static constexpr const codepoint_type s_high_surrogate_max = 0xdbff;
+    static constexpr const codepoint_type s_low_surrogate_min = 0xdc00;
+    static constexpr const codepoint_type s_low_surrogate_max = 0xdfff;
+    static constexpr const codepoint_type s_max_codepoint = 0x10ffff;
+    static constexpr const codepoint_type s_invalid_codepoint = 0xffffffff;
 
-    static constexpr char_type s_zero = FLY_CHR(char_type, '0');
-    static constexpr char_type s_nine = FLY_CHR(char_type, '9');
-    static constexpr char_type s_lower_a = FLY_CHR(char_type, 'a');
-    static constexpr char_type s_upper_a = FLY_CHR(char_type, 'A');
-    static constexpr char_type s_lower_f = FLY_CHR(char_type, 'f');
-    static constexpr char_type s_upper_f = FLY_CHR(char_type, 'F');
-    static constexpr char_type s_lower_u = FLY_CHR(char_type, 'u');
-    static constexpr char_type s_upper_u = FLY_CHR(char_type, 'U');
+    static constexpr const char_type s_zero = FLY_CHR(char_type, '0');
+    static constexpr const char_type s_nine = FLY_CHR(char_type, '9');
+    static constexpr const char_type s_lower_a = FLY_CHR(char_type, 'a');
+    static constexpr const char_type s_upper_a = FLY_CHR(char_type, 'A');
+    static constexpr const char_type s_lower_f = FLY_CHR(char_type, 'f');
+    static constexpr const char_type s_upper_f = FLY_CHR(char_type, 'F');
+    static constexpr const char_type s_lower_u = FLY_CHR(char_type, 'u');
+    static constexpr const char_type s_upper_u = FLY_CHR(char_type, 'U');
 };
 
 //==================================================================================================
@@ -362,19 +355,14 @@ template <typename IteratorType>
 auto BasicStringUnicode<StringType>::decode_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<codepoint_type>
 {
-    auto next_encoded_byte = [&it, &end]() -> std::optional<codepoint_type>
+    auto next_encoded_byte = [&it, &end]() -> codepoint_type
     {
-        if (it == end)
-        {
-            return std::nullopt;
-        }
-
-        return static_cast<codepoint_type>(*(it++));
+        return (it == end) ? s_invalid_codepoint : static_cast<codepoint_type>(*(it++));
     };
 
-    std::optional<codepoint_type> codepoint = codepoint_from_string(std::move(next_encoded_byte));
+    const codepoint_type codepoint = codepoint_from_string(std::move(next_encoded_byte));
 
-    if (codepoint && validate_codepoint(codepoint.value()))
+    if (validate_codepoint(codepoint))
     {
         return codepoint;
     }
@@ -426,11 +414,11 @@ BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const Itera
         return (*it == '\\') && (*(it + 1) == ch);
     };
 
-    std::optional<codepoint_type> codepoint;
+    codepoint_type codepoint = s_invalid_codepoint;
 
     if (escaped_with(s_lower_u))
     {
-        auto next_codepoint = [&it, &end]() -> std::optional<codepoint_type>
+        auto next_codepoint = [&it, &end]() -> codepoint_type
         {
             return unescape_codepoint<s_lower_u>(it, end);
         };
@@ -442,12 +430,7 @@ BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const Itera
         codepoint = unescape_codepoint<s_upper_u>(it, end);
     }
 
-    if (codepoint)
-    {
-        return encode_codepoint(codepoint.value());
-    }
-
-    return std::nullopt;
+    return encode_codepoint(codepoint);
 }
 
 //==================================================================================================
@@ -510,13 +493,13 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
 template <typename StringType>
 template <char UnicodePrefix, typename IteratorType>
 auto BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
-    -> std::optional<codepoint_type>
+    -> codepoint_type
 {
     static_assert((UnicodePrefix == 'u') || (UnicodePrefix == 'U'));
 
     if ((it == end) || (*it != '\\') || (++it == end) || (*it != UnicodePrefix))
     {
-        return std::nullopt;
+        return s_invalid_codepoint;
     }
 
     codepoint_type codepoint = 0;
@@ -543,31 +526,20 @@ auto BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const 
         }
         else
         {
-            return std::nullopt;
+            return s_invalid_codepoint;
         }
     }
 
-    if (i != s_expected_digits)
-    {
-        return std::nullopt;
-    }
-
-    return codepoint;
+    return (i == s_expected_digits) ? codepoint : s_invalid_codepoint;
 }
 
 //==================================================================================================
 template <typename StringType>
 template <typename CharType, std::enable_if_t<(sizeof(CharType) == 1), bool>>
 auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider next_encoded_byte)
-    -> std::optional<codepoint_type>
+    -> codepoint_type
 {
-    const std::optional<codepoint_type> maybe_leading_byte = next_encoded_byte();
-    if (!maybe_leading_byte)
-    {
-        return std::nullopt;
-    }
-
-    const codepoint_type leading_byte = maybe_leading_byte.value() & 0xff;
+    const codepoint_type leading_byte = next_encoded_byte();
 
     // First find the codepoint length by finding which leading byte matches the first encoded byte.
     auto utf8_it = std::find_if(
@@ -580,7 +552,7 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider n
 
     if (utf8_it == s_utf8_leading_bytes.end())
     {
-        return std::nullopt;
+        return s_invalid_codepoint;
     }
 
     const std::size_t bytes = utf8_it->m_codepoint_size;
@@ -588,46 +560,27 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider n
 
     // Then decode the encoded bytes using the leading and continuation byte masks.
     codepoint_type codepoint = (leading_byte & utf8_it->m_codepoint_mask) << shift;
-    codepoint_type first_continuation_byte = 0;
 
     for (std::size_t i = 1; i < bytes; ++i)
     {
-        const std::optional<codepoint_type> maybe_continuation_byte = next_encoded_byte();
-        if (!maybe_continuation_byte)
-        {
-            return std::nullopt;
-        }
-
-        const codepoint_type continuation_byte = maybe_continuation_byte.value() & 0xff;
-
-        if (i == 1)
-        {
-            first_continuation_byte = continuation_byte & 0xff;
-        }
+        const codepoint_type continuation_byte = next_encoded_byte();
 
         if ((continuation_byte & s_utf8_continuation_byte.m_encoding_mask) !=
             s_utf8_continuation_byte.m_leading_byte)
         {
-            return std::nullopt;
+            return s_invalid_codepoint;
         }
 
         shift -= s_utf8_continuation_byte.m_codepoint_size;
         codepoint |= (continuation_byte & s_utf8_continuation_byte.m_codepoint_mask) << shift;
     }
 
-    // Make sure the encoding was not overlong.
-    if ((bytes == 2) && ((leading_byte & 0xfe) == utf8_it->m_leading_byte))
+    // Finally, make sure the encoding was not overlong.
+    if (((codepoint < 0x80) && (bytes != 1)) ||
+        ((codepoint >= 0x80) && (codepoint < 0x800) && (bytes != 2)) ||
+        ((codepoint >= 0x800) && (codepoint < 0x10000) && (bytes != 3)))
     {
-        return std::nullopt;
-    }
-    else if (bytes > 2)
-    {
-        if ((leading_byte == utf8_it->m_leading_byte) &&
-            ((first_continuation_byte & utf8_it->m_leading_byte) ==
-             s_utf8_continuation_byte.m_leading_byte))
-        {
-            return std::nullopt;
-        }
+        return s_invalid_codepoint;
     }
 
     return codepoint;
@@ -637,7 +590,7 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider n
 template <typename StringType>
 template <typename CharType, std::enable_if_t<(sizeof(CharType) == 2), bool>>
 auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider next_encoded_byte)
-    -> std::optional<codepoint_type>
+    -> codepoint_type
 {
     return create_codepoint_from_surrogates(std::move(next_encoded_byte));
 }
@@ -646,7 +599,7 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider n
 template <typename StringType>
 template <typename CharType, std::enable_if_t<(sizeof(CharType) == 4), bool>>
 auto BasicStringUnicode<StringType>::codepoint_from_string(EncodedByteProvider next_encoded_byte)
-    -> std::optional<codepoint_type>
+    -> codepoint_type
 {
     return next_encoded_byte();
 }
@@ -716,7 +669,7 @@ StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type co
 //==================================================================================================
 template <typename StringType>
 auto BasicStringUnicode<StringType>::create_codepoint_from_surrogates(
-    EncodedByteProvider next_encoded_byte) -> std::optional<codepoint_type>
+    EncodedByteProvider next_encoded_byte) -> codepoint_type
 {
     auto is_high_surrogate = [](codepoint_type c) -> bool
     {
@@ -727,39 +680,29 @@ auto BasicStringUnicode<StringType>::create_codepoint_from_surrogates(
         return (c >= s_low_surrogate_min) && (c <= s_low_surrogate_max);
     };
 
-    const std::optional<codepoint_type> high_surrogate = next_encoded_byte();
-    if (!high_surrogate)
-    {
-        return std::nullopt;
-    }
-
-    codepoint_type codepoint = high_surrogate.value();
+    codepoint_type codepoint = next_encoded_byte();
 
     if (is_high_surrogate(codepoint))
     {
-        const std::optional<codepoint_type> low_surrogate = next_encoded_byte();
-        if (!low_surrogate)
-        {
-            return std::nullopt;
-        }
+        const codepoint_type low_surrogate = next_encoded_byte();
 
-        if (is_low_surrogate(low_surrogate.value()))
+        if (is_low_surrogate(low_surrogate))
         {
             // The formula to convert a surrogate pair to a single codepoint is:
             //
             //     C = ((HS - 0xd800) * 0x400) + (LS - 0xdc00) + 0x10000
             //
             // Multiplying by 0x400 is the same as left-shifting 10 bits. The formula then becomes:
-            codepoint = (high_surrogate.value() << 10) + low_surrogate.value() - 0x35fdc00;
+            codepoint = (codepoint << 10) + low_surrogate - 0x35fdc00;
         }
         else
         {
-            return std::nullopt;
+            return s_invalid_codepoint;
         }
     }
     else if (is_low_surrogate(codepoint))
     {
-        return std::nullopt;
+        return s_invalid_codepoint;
     }
 
     return codepoint;
