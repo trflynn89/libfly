@@ -1030,7 +1030,7 @@ public:
      * char8_t[], std::u16string_view).
      *
      * @tparam Key The string-like type of the emplaced value's key.
-     * @tparam Arg The type of the emplaced value.
+     * @tparam Value The type of the emplaced value.
      *
      * @param key The key of the value to emplace.
      * @param value The value to emplace at the given key.
@@ -1042,7 +1042,7 @@ public:
      * @throws JsonException If the Json instance is neither an object nor null.
      */
     template <typename Key, typename Value, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
-    std::pair<iterator, bool> emplace(Key key, Value &&arg);
+    std::pair<iterator, bool> emplace(Key key, Value &&value);
 
     /**
      * Construct an element in-place at the end of the Json instance. Only valid if the Json
@@ -1479,6 +1479,52 @@ private:
     template <typename... Args>
     iterator array_inserter(const_iterator position, Args &&...args);
 
+    /**
+     * Retrieve a reference to the Json instance's underlying storage if it holds the provided type.
+     * If another type is held, an exception is raised with the provided error message.
+     *
+     * @tparam T The expected type of the Json instance.
+     *
+     * @param error_message The message with which to raise any exception.
+     *
+     * @return A reference to the Json instance's underlying storage.
+     *
+     * @throws JsonException If this Json instance does not hold the provided type.
+     */
+    template <typename T>
+    T &get(const char *error_message);
+
+    /**
+     * Retrieve a reference to the Json instance's underlying storage if it holds the provided type.
+     * If the Json instance is null, it is converted to the provided type. If another type is held,
+     * an exception is raised with the provided error message.
+     *
+     * @tparam T The expected type of the Json instance.
+     *
+     * @param error_message The message with which to raise any exception.
+     *
+     * @return A reference to the Json instance's underlying storage.
+     *
+     * @throws JsonException If this Json instance holds neither the provided type nor null.
+     */
+    template <typename T>
+    T &get_or_promote(const char *error_message);
+
+    /**
+     * Retrieve a reference to the Json instance's underlying storage if it holds the provided type.
+     * If another type is held, an exception is raised with the provided error message.
+     *
+     * @tparam T The expected type of the Json instance.
+     *
+     * @param error_message The message with which to raise any exception.
+     *
+     * @return A reference to the Json instance's underlying storage.
+     *
+     * @throws JsonException If this Json instance does not hold the provided type.
+     */
+    template <typename T>
+    const T &get(const char *error_message) const;
+
     json_type m_value {nullptr};
 };
 
@@ -1502,7 +1548,7 @@ Json::Json(T &&value) noexcept(false)
 {
     if constexpr (std::is_lvalue_reference_v<T>)
     {
-        m_value = JsonTraits::object_type();
+        m_value.emplace<JsonTraits::object_type>();
 
         for (const auto &it : value)
         {
@@ -1587,12 +1633,7 @@ Json::operator T() const noexcept
 template <typename T, enable_if_all<JsonTraits::is_object<T>>>
 Json::operator T() const noexcept(false)
 {
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type is not an object");
-    }
-
-    const auto &storage = std::get<JsonTraits::object_type>(m_value);
+    const auto &storage = get<JsonTraits::object_type>("JSON type is not an object");
     T result;
 
     for (const auto &it : storage)
@@ -1609,41 +1650,31 @@ Json::operator T() const noexcept(false)
 template <typename T, enable_if_all<JsonTraits::is_array<T>>>
 Json::operator T() const noexcept(false)
 {
-    if (!is_array())
-    {
-        throw JsonException(*this, "JSON type is not an array");
-    }
-
-    const auto &storage = std::get<JsonTraits::array_type>(m_value);
-    T array {};
+    const auto &storage = get<JsonTraits::array_type>("JSON type is not an array");
+    T result {};
 
     for (const auto &it : storage)
     {
         auto copy = static_cast<typename T::value_type>(it);
-        JsonTraits::ArrayTraits::append(array, std::move(copy));
+        JsonTraits::ArrayTraits::append(result, std::move(copy));
     }
 
-    return array;
+    return result;
 }
 
 //==================================================================================================
 template <typename T, std::size_t N>
 Json::operator std::array<T, N>() const noexcept(false)
 {
-    if (!is_array())
-    {
-        throw JsonException(*this, "JSON type is not an array");
-    }
-
-    const auto &storage = std::get<JsonTraits::array_type>(m_value);
-    std::array<T, N> array {};
+    const auto &storage = get<JsonTraits::array_type>("JSON type is not an array");
+    std::array<T, N> result {};
 
     for (std::size_t i = 0; i < std::min(N, storage.size()); ++i)
     {
-        array[i] = T(storage.at(i));
+        result[i] = T(storage.at(i));
     }
 
-    return array;
+    return result;
 }
 
 //==================================================================================================
@@ -1705,12 +1736,7 @@ Json::operator T() const noexcept(false)
 template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
 Json::reference Json::at(T key)
 {
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for operator[key]");
-    }
-
-    auto &storage = std::get<JsonTraits::object_type>(m_value);
+    auto &storage = get<JsonTraits::object_type>("JSON type invalid for operator[key]");
     auto it = storage.find(convert_to_string(std::move(key)));
 
     if (it == storage.end())
@@ -1725,12 +1751,7 @@ Json::reference Json::at(T key)
 template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
 Json::const_reference Json::at(T key) const
 {
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for operator[key]");
-    }
-
-    const auto &storage = std::get<JsonTraits::object_type>(m_value);
+    const auto &storage = get<JsonTraits::object_type>("JSON type invalid for operator[key]");
     const auto it = storage.find(convert_to_string(std::move(key)));
 
     if (it == storage.end())
@@ -1745,16 +1766,7 @@ Json::const_reference Json::at(T key) const
 template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
 Json::reference Json::operator[](T key)
 {
-    if (is_null())
-    {
-        m_value = JsonTraits::object_type();
-    }
-    else if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for operator[key]");
-    }
-
-    auto &storage = std::get<JsonTraits::object_type>(m_value);
+    auto &storage = get_or_promote<JsonTraits::object_type>("JSON type invalid for operator[key]");
     return storage[convert_to_string(std::move(key))];
 }
 
@@ -1798,19 +1810,11 @@ std::pair<Json::iterator, bool> Json::insert_or_assign(Key key, Json &&value)
 template <typename Key, typename Value, enable_if_all<JsonTraits::is_string_like<Key>>>
 std::pair<Json::iterator, bool> Json::emplace(Key key, Value &&value)
 {
-    if (is_null())
-    {
-        m_value = JsonTraits::object_type();
-    }
-    else if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for object emplacement");
-    }
-
-    auto &storage = std::get<JsonTraits::object_type>(m_value);
-    auto it = end();
-
+    auto &storage =
+        get_or_promote<JsonTraits::object_type>("JSON type invalid for object emplacement");
     auto result = storage.emplace(convert_to_string(std::move(key)), std::forward<Value>(value));
+
+    auto it = end();
     it.m_iterator = result.first;
 
     return {it, result.second};
@@ -1820,16 +1824,8 @@ std::pair<Json::iterator, bool> Json::emplace(Key key, Value &&value)
 template <typename... Args>
 Json::reference Json::emplace_back(Args &&...args)
 {
-    if (is_null())
-    {
-        m_value = JsonTraits::array_type();
-    }
-    else if (!is_array())
-    {
-        throw JsonException(*this, "JSON type invalid for array emplacement");
-    }
-
-    auto &storage = std::get<JsonTraits::array_type>(m_value);
+    auto &storage =
+        get_or_promote<JsonTraits::array_type>("JSON type invalid for array emplacement");
     return storage.emplace_back(std::forward<Args>(args)...);
 }
 
@@ -1837,12 +1833,7 @@ Json::reference Json::emplace_back(Args &&...args)
 template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
 Json::size_type Json::erase(T key)
 {
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for erase(key)");
-    }
-
-    auto &storage = std::get<JsonTraits::object_type>(m_value);
+    auto &storage = get<JsonTraits::object_type>("JSON type invalid for erase(key)");
     return storage.erase(convert_to_string(std::move(key)));
 }
 
@@ -1895,14 +1886,7 @@ void Json::swap(T &other)
 template <typename T, enable_if_all<JsonTraits::is_object<T>>>
 void Json::merge(T &other)
 {
-    if (is_null())
-    {
-        m_value = JsonTraits::object_type();
-    }
-    else if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for merging");
-    }
+    get_or_promote<JsonTraits::object_type>("JSON type invalid for merging");
 
     // Manual implementation of fly::JsonTraits::object_type::merge(&) to allow unordered maps.
     for (auto it = other.begin(); it != other.end();)
@@ -1923,14 +1907,7 @@ void Json::merge(T &other)
 template <typename T, enable_if_all<JsonTraits::is_object<T>>>
 void Json::merge(T &&other)
 {
-    if (is_null())
-    {
-        m_value = JsonTraits::object_type();
-    }
-    else if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for merging");
-    }
+    get_or_promote<JsonTraits::object_type>("JSON type invalid for merging");
 
     // Manual implementation of fly::JsonTraits::object_type::merge(&&) to allow unordered maps.
     for (auto &&it : other)
@@ -1946,12 +1923,7 @@ void Json::merge(T &&other)
 template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
 Json::size_type Json::count(T key) const
 {
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for count(key)");
-    }
-
-    const auto &storage = std::get<JsonTraits::object_type>(m_value);
+    const auto &storage = get<JsonTraits::object_type>("JSON type invalid for count(key)");
     return storage.count(convert_to_string(std::move(key)));
 }
 
@@ -1959,12 +1931,7 @@ Json::size_type Json::count(T key) const
 template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
 Json::iterator Json::find(T key)
 {
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for find(key)");
-    }
-
-    auto &storage = std::get<JsonTraits::object_type>(m_value);
+    auto &storage = get<JsonTraits::object_type>("JSON type invalid for find(key)");
 
     auto it = end();
     it.m_iterator = storage.find(convert_to_string(std::move(key)));
@@ -1976,12 +1943,7 @@ Json::iterator Json::find(T key)
 template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
 Json::const_iterator Json::find(T key) const
 {
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for find(key)");
-    }
-
-    const auto &storage = std::get<JsonTraits::object_type>(m_value);
+    const auto &storage = get<JsonTraits::object_type>("JSON type invalid for find(key)");
 
     auto it = cend();
     it.m_iterator = storage.find(convert_to_string(std::move(key)));
@@ -1993,13 +1955,8 @@ Json::const_iterator Json::find(T key) const
 template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
 bool Json::contains(T key) const
 {
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for contains(key)");
-    }
-
-    const auto &storage = std::get<JsonTraits::object_type>(m_value);
-    return storage.find(convert_to_string(std::move(key))) != storage.end();
+    const auto &storage = get<JsonTraits::object_type>("JSON type invalid for contains(key)");
+    return storage.contains(convert_to_string(std::move(key)));
 }
 
 //==================================================================================================
@@ -2030,12 +1987,7 @@ JsonTraits::string_type Json::convert_to_string(T value)
 template <typename... Args>
 Json::object_insertion_result<Args...> Json::object_inserter(Args &&...args)
 {
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for object insertion");
-    }
-
-    auto &storage = std::get<JsonTraits::object_type>(m_value);
+    auto &storage = get<JsonTraits::object_type>("JSON type invalid for object insertion");
 
     if constexpr (std::is_void_v<object_insertion_result<Args...>>)
     {
@@ -2043,9 +1995,9 @@ Json::object_insertion_result<Args...> Json::object_inserter(Args &&...args)
     }
     else
     {
-        auto it = end();
-
         auto result = storage.insert(std::forward<Args>(args)...);
+
+        auto it = end();
         it.m_iterator = result.first;
 
         return {it, result.second};
@@ -2056,24 +2008,67 @@ Json::object_insertion_result<Args...> Json::object_inserter(Args &&...args)
 template <typename... Args>
 Json::iterator Json::array_inserter(const_iterator position, Args &&...args)
 {
-    if (!is_array())
-    {
-        throw JsonException(*this, "JSON type invalid for array insertion");
-    }
-    else if (position.m_json != this)
+    auto &storage = get<JsonTraits::array_type>("JSON type invalid for array insertion");
+
+    if (position.m_json != this)
     {
         throw JsonException("Provided iterator is for a different Json instance");
     }
 
-    using array_iterator_type = typename const_iterator::array_iterator_type;
+    const auto &position_iterator =
+        std::get<typename const_iterator::array_iterator_type>(position.m_iterator);
 
-    auto &storage = std::get<JsonTraits::array_type>(m_value);
     auto it = end();
-
-    const auto &position_iterator = std::get<array_iterator_type>(position.m_iterator);
     it.m_iterator = storage.insert(position_iterator, std::forward<Args>(args)...);
 
     return it;
+}
+
+//==================================================================================================
+template <typename T>
+inline T &Json::get(const char *error_message)
+{
+    auto *storage = std::get_if<T>(&m_value);
+
+    if (storage == nullptr)
+    {
+        throw JsonException(*this, error_message);
+    }
+
+    return *storage;
+}
+
+//==================================================================================================
+template <typename T>
+inline T &Json::get_or_promote(const char *error_message)
+{
+    auto *storage = std::get_if<T>(&m_value);
+
+    if (storage == nullptr)
+    {
+        if (is_null())
+        {
+            return m_value.emplace<T>();
+        }
+
+        throw JsonException(*this, error_message);
+    }
+
+    return *storage;
+}
+
+//==================================================================================================
+template <typename T>
+inline const T &Json::get(const char *error_message) const
+{
+    const auto *storage = std::get_if<T>(&m_value);
+
+    if (storage == nullptr)
+    {
+        throw JsonException(*this, error_message);
+    }
+
+    return *storage;
 }
 
 } // namespace fly

@@ -35,8 +35,7 @@ Json::Json(std::initializer_list<Json> initializer) noexcept : m_value()
 
     if (std::all_of(initializer.begin(), initializer.end(), object_test))
     {
-        m_value = JsonTraits::object_type();
-        auto &storage = std::get<JsonTraits::object_type>(m_value);
+        auto &storage = m_value.emplace<JsonTraits::object_type>();
 
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
         {
@@ -46,8 +45,7 @@ Json::Json(std::initializer_list<Json> initializer) noexcept : m_value()
     }
     else
     {
-        m_value = JsonTraits::array_type();
-        auto &storage = std::get<JsonTraits::array_type>(m_value);
+        auto &storage = m_value.emplace<JsonTraits::array_type>();
 
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
         {
@@ -168,23 +166,13 @@ bool Json::is_float() const
 //==================================================================================================
 Json::operator JsonTraits::null_type() const noexcept(false)
 {
-    if (!is_null())
-    {
-        throw JsonException(*this, "JSON type is not null");
-    }
-
-    return std::get<JsonTraits::null_type>(m_value);
+    return get<JsonTraits::null_type>("JSON type is not null");
 }
 
 //==================================================================================================
 Json::reference Json::at(size_type index)
 {
-    if (!is_array())
-    {
-        throw JsonException(*this, "JSON type invalid for operator[index]");
-    }
-
-    auto &storage = std::get<JsonTraits::array_type>(m_value);
+    auto &storage = get<JsonTraits::array_type>("JSON type invalid for operator[index]");
 
     if (index >= storage.size())
     {
@@ -197,12 +185,7 @@ Json::reference Json::at(size_type index)
 //==================================================================================================
 Json::const_reference Json::at(size_type index) const
 {
-    if (!is_array())
-    {
-        throw JsonException(*this, "JSON type invalid for operator[index]");
-    }
-
-    const auto &storage = std::get<JsonTraits::array_type>(m_value);
+    auto &storage = get<JsonTraits::array_type>("JSON type invalid for operator[index]");
 
     if (index >= storage.size())
     {
@@ -215,16 +198,7 @@ Json::const_reference Json::at(size_type index) const
 //==================================================================================================
 Json::reference Json::operator[](size_type index)
 {
-    if (is_null())
-    {
-        m_value = JsonTraits::array_type();
-    }
-    else if (!is_array())
-    {
-        throw JsonException(*this, "JSON type invalid for operator[index]");
-    }
-
-    auto &storage = std::get<JsonTraits::array_type>(m_value);
+    auto &storage = get_or_promote<JsonTraits::array_type>("JSON type invalid for operator[index]");
 
     if (index >= storage.size())
     {
@@ -575,7 +549,7 @@ void Json::push_back(const Json &value)
 {
     if (is_null())
     {
-        m_value = JsonTraits::array_type();
+        m_value.emplace<JsonTraits::array_type>();
     }
 
     array_inserter(cend(), value);
@@ -586,7 +560,7 @@ void Json::push_back(Json &&value)
 {
     if (is_null())
     {
-        m_value = JsonTraits::array_type();
+        m_value.emplace<JsonTraits::array_type>();
     }
 
     array_inserter(cend(), std::move(value));
@@ -676,12 +650,7 @@ Json::iterator Json::erase(const_iterator first, const_iterator last)
 //==================================================================================================
 void Json::erase(size_type index)
 {
-    if (!is_array())
-    {
-        throw JsonException(*this, "JSON type invalid for erase(index)");
-    }
-
-    auto &storage = std::get<JsonTraits::array_type>(m_value);
+    auto &storage = get<JsonTraits::array_type>("JSON type invalid for erase(index)");
 
     if (index >= storage.size())
     {
@@ -700,47 +669,19 @@ void Json::swap(reference json)
 //==================================================================================================
 void Json::merge(fly::Json &other)
 {
-    if (is_null())
-    {
-        m_value = JsonTraits::object_type();
-    }
+    auto &this_storage = get_or_promote<JsonTraits::object_type>("JSON type invalid for merging");
+    auto &other_storage = other.get<JsonTraits::object_type>("Other JSON type invalid for merging");
 
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for merging");
-    }
-    else if (!other.is_object())
-    {
-        throw JsonException(other, "Other JSON type invalid for merging");
-    }
-
-    auto &this_value = std::get<JsonTraits::object_type>(m_value);
-    auto &other_value = std::get<JsonTraits::object_type>(other.m_value);
-
-    this_value.merge(other_value);
+    this_storage.merge(other_storage);
 }
 
 //==================================================================================================
 void Json::merge(fly::Json &&other)
 {
-    if (is_null())
-    {
-        m_value = JsonTraits::object_type();
-    }
+    auto &this_storage = get_or_promote<JsonTraits::object_type>("JSON type invalid for merging");
+    auto &other_storage = other.get<JsonTraits::object_type>("Other JSON type invalid for merging");
 
-    if (!is_object())
-    {
-        throw JsonException(*this, "JSON type invalid for merging");
-    }
-    else if (!other.is_object())
-    {
-        throw JsonException(other, "Other JSON type invalid for merging");
-    }
-
-    auto &this_value = std::get<JsonTraits::object_type>(m_value);
-    auto &&other_value = std::get<JsonTraits::object_type>(std::move(other.m_value));
-
-    this_value.merge(std::move(other_value));
+    this_storage.merge(std::move(other_storage));
 }
 
 //==================================================================================================
