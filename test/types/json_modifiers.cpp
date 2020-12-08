@@ -287,18 +287,11 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             CATCH_CHECK(json.size() == (starting_size + 2));
             CATCH_CHECK(json.back() == 4);
         }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        else
         {
             CATCH_CHECK_THROWS_JSON(
                 json.push_back(value1),
                 "JSON type invalid for array insertion: (%s)",
-                json);
-        }
-        else
-        {
-            CATCH_CHECK_THROWS_ITERATOR(
-                json.push_back(value1),
-                "JSON type invalid for iteration: (%s)",
                 json);
         }
     }
@@ -320,18 +313,11 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             CATCH_CHECK(json.size() == (starting_size + 2));
             CATCH_CHECK(json.back() == 4);
         }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        else
         {
             CATCH_CHECK_THROWS_JSON(
                 json.push_back(std::move(value1)),
                 "JSON type invalid for array insertion: (%s)",
-                json);
-        }
-        else
-        {
-            CATCH_CHECK_THROWS_ITERATOR(
-                json.push_back(std::move(value1)),
-                "JSON type invalid for iteration: (%s)",
                 json);
         }
     }
