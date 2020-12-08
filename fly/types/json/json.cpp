@@ -547,23 +547,15 @@ Json::iterator Json::insert(const_iterator position, std::initializer_list<Json>
 //==================================================================================================
 void Json::push_back(const Json &value)
 {
-    if (is_null())
-    {
-        m_value.emplace<JsonTraits::array_type>();
-    }
-
-    array_inserter(cend(), value);
+    auto &storage = get_or_promote<JsonTraits::array_type>("JSON type invalid for array insertion");
+    storage.push_back(value);
 }
 
 //==================================================================================================
 void Json::push_back(Json &&value)
 {
-    if (is_null())
-    {
-        m_value.emplace<JsonTraits::array_type>();
-    }
-
-    array_inserter(cend(), std::move(value));
+    auto &storage = get_or_promote<JsonTraits::array_type>("JSON type invalid for array insertion");
+    storage.push_back(std::move(value));
 }
 
 //==================================================================================================
