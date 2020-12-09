@@ -5,7 +5,6 @@
 #include "fly/types/json/json_traits.hpp"
 
 #include <cstdint>
-#include <functional>
 #include <istream>
 #include <limits>
 #include <optional>
@@ -113,8 +112,6 @@ private:
         KeepParsing,
     };
 
-    using ParseStateGetter = std::function<ParseState()>;
-
     /**
      * Parse a complete JSON value from the stream. May be called recursively for nested values.
      *
@@ -139,11 +136,11 @@ private:
     /**
      * Determine whether parsing a JSON object or array is complete.
      *
-     * @param token Token indicating the end of the JSON object (}) or array (]).
+     * @param end_token Token indicating the end of the JSON object (}) or array (]).
      *
      * @return The new parsing state.
      */
-    ParseState done_parsing_object_or_array(const Token &end_token);
+    ParseState state_for_object_or_array(Token end_token);
 
     /**
      * Parse a JSON string from the stream. Escaped symbols are preserved in the string, and the
@@ -168,17 +165,17 @@ private:
      *
      * @return The new parsing state.
      */
-    ParseState consume_token(const Token &token);
+    ParseState consume_token(Token token);
 
     /**
      * Extract a comma from the stream. Handles any trailing commas, allowing a single trailing
      * comma if enabled in the feature set.
      *
-     * @param parse_state Callback to indicate whether the calling parser should stop parsing.
+     * @param end_token Token indicating the end of the JSON object (}) or array (]).
      *
      * @return The new parsing state.
      */
-    ParseState consume_comma(const ParseStateGetter &parse_state);
+    ParseState consume_comma(Token end_token);
 
     /**
      * Extract a number, boolean, or null value from the stream.
@@ -236,7 +233,7 @@ private:
      *
      * @return True if the symbol is whitespace.
      */
-    bool is_whitespace(const Token &token) const;
+    bool is_whitespace(Token token) const;
 
     /**
      * Check if a feature has been allowed.

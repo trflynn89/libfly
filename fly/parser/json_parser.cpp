@@ -37,22 +37,17 @@ std::optional<Json> JsonParser::parse_internal()
     {
         return std::nullopt;
     }
-
-    if (json)
+    else if (!m_stream->eof())
     {
-        if (!m_stream->eof())
+        JLOG("Extraneous symbols found after JSON value");
+        return std::nullopt;
+    }
+    else if (json && !json->is_object() && !json->is_array())
+    {
+        if (!is_feature_allowed(Features::AllowAnyType))
         {
-            JLOG("Extraneous symbols found after JSON value");
+            JLOG("Parsed non-object/non-array value, but Features::AllowAnyType is not enabled");
             return std::nullopt;
-        }
-        else if (!json->is_object() && !json->is_array())
-        {
-            if (!is_feature_allowed(Features::AllowAnyType))
-            {
-                JLOG(
-                    "Parsed non-object/non-array value, but Features::AllowAnyType is not enabled");
-                return std::nullopt;
-            }
         }
     }
 
@@ -91,18 +86,17 @@ std::optional<Json> JsonParser::parse_json()
 //==================================================================================================
 std::optional<Json> JsonParser::parse_object()
 {
+    static constexpr const Token s_end_token = Token::CloseBrace;
+
     Json object = JsonTraits::object_type();
     ParseState state;
 
     // Discard the opening brace, which has already been peeked.
     discard();
 
-    auto parse_state =
-        std::bind(&JsonParser::done_parsing_object_or_array, this, Token::CloseBrace);
-
-    while ((state = parse_state()) == ParseState::KeepParsing)
+    while ((state = state_for_object_or_array(s_end_token)) == ParseState::KeepParsing)
     {
-        if (object && ((state = consume_comma(parse_state)) != ParseState::KeepParsing))
+        if (object && ((state = consume_comma(s_end_token)) != ParseState::KeepParsing))
         {
             break;
         }
@@ -129,18 +123,17 @@ std::optional<Json> JsonParser::parse_object()
 //==================================================================================================
 std::optional<Json> JsonParser::parse_array()
 {
+    static constexpr const Token s_end_token = Token::CloseBracket;
+
     Json array = JsonTraits::array_type();
     ParseState state;
 
     // Discard the opening bracket, which has already been peeked.
     discard();
 
-    auto parse_state =
-        std::bind(&JsonParser::done_parsing_object_or_array, this, Token::CloseBracket);
-
-    while ((state = parse_state()) == ParseState::KeepParsing)
+    while ((state = state_for_object_or_array(s_end_token)) == ParseState::KeepParsing)
     {
-        if (array && ((state = consume_comma(parse_state)) != ParseState::KeepParsing))
+        if (array && ((state = consume_comma(s_end_token)) != ParseState::KeepParsing))
         {
             break;
         }
@@ -159,7 +152,7 @@ std::optional<Json> JsonParser::parse_array()
 }
 
 //==================================================================================================
-JsonParser::ParseState JsonParser::done_parsing_object_or_array(const Token &end_token)
+JsonParser::ParseState JsonParser::state_for_object_or_array(Token end_token)
 {
     if (consume_whitespace_and_comments() == ParseState::Invalid)
     {
@@ -184,7 +177,7 @@ JsonParser::ParseState JsonParser::done_parsing_object_or_array(const Token &end
 //==================================================================================================
 std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
 {
-    auto stop_parsing = [](const Token &token) -> bool
+    auto stop_parsing = [](Token token) -> bool
     {
         return (token == Token::Quote) || (token == Token::EndOfFile);
     };
@@ -274,7 +267,7 @@ std::optional<Json> JsonParser::parse_value()
 }
 
 //==================================================================================================
-JsonParser::ParseState JsonParser::consume_token(const Token &token)
+JsonParser::ParseState JsonParser::consume_token(Token token)
 {
     consume_whitespace();
 
@@ -292,16 +285,13 @@ JsonParser::ParseState JsonParser::consume_token(const Token &token)
 }
 
 //==================================================================================================
-JsonParser::ParseState JsonParser::consume_comma(const ParseStateGetter &parse_state)
+JsonParser::ParseState JsonParser::consume_comma(Token end_token)
 {
     if (consume_token(Token::Comma) == ParseState::Invalid)
     {
         return ParseState::Invalid;
     }
-
-    const ParseState state = parse_state();
-
-    if (state == ParseState::StopParsing)
+    else if (state_for_object_or_array(end_token) == ParseState::StopParsing)
     {
         if (is_feature_allowed(Features::AllowTrailingComma))
         {
@@ -312,26 +302,33 @@ JsonParser::ParseState JsonParser::consume_comma(const ParseStateGetter &parse_s
         return ParseState::Invalid;
     }
 
-    return state;
+    return ParseState::KeepParsing;
 }
 
 //==================================================================================================
 JsonTraits::string_type JsonParser::consume_value()
 {
-    auto stop_parsing = [this](const Token &token) -> bool
+    JsonTraits::string_type value;
+
+    auto keep_parsing = [this](Token token) -> bool
     {
-        return is_whitespace(token) || (token == Token::Comma) || (token == Token::Solidus) ||
-            (token == Token::CloseBracket) || (token == Token::CloseBrace) ||
-            (token == Token::EndOfFile);
+        switch (token)
+        {
+            case Token::Comma:
+            case Token::Solidus:
+            case Token::CloseBracket:
+            case Token::CloseBrace:
+            case Token::EndOfFile:
+                return false;
+
+            default:
+                return !is_whitespace(token);
+        }
     };
 
-    JsonTraits::string_type value;
-    Token token;
-
-    while (!stop_parsing(token = m_stream->peek<Token>()))
+    while (keep_parsing(m_stream->peek<Token>()))
     {
-        value.push_back(static_cast<JsonTraits::char_type>(token));
-        discard();
+        value.push_back(m_stream->get<JsonTraits::char_type>());
     }
 
     return value;
@@ -496,7 +493,7 @@ JsonParser::NumberType JsonParser::validate_number(const JsonTraits::string_type
 }
 
 //==================================================================================================
-bool JsonParser::is_whitespace(const Token &token) const
+bool JsonParser::is_whitespace(Token token) const
 {
     switch (token)
     {
