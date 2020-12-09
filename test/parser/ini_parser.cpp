@@ -35,7 +35,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        const fly::Json values = std::move(parsed.value());
+        const fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.size() == 1);
         CATCH_CHECK(values["section"].size() == 0);
     }
@@ -50,7 +50,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        const fly::Json values = std::move(parsed.value());
+        const fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.size() == 1);
         CATCH_CHECK(values["section"].size() == 2);
         CATCH_CHECK(values["section"]["name"] == "John Doe");
@@ -73,7 +73,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        const fly::Json values = std::move(parsed.value());
+        const fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.size() == 3);
 
         CATCH_CHECK(values["section1"].size() == 2);
@@ -99,7 +99,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        const fly::Json values = std::move(parsed.value());
+        const fly::Json values = *std::move(parsed);
         CATCH_CHECK(values["section"].size() == 2);
         CATCH_CHECK_THROWS_AS(values["bad-section"], fly::JsonException);
         CATCH_CHECK_THROWS_AS(values["section-bad"], fly::JsonException);
@@ -116,7 +116,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        const fly::Json values = std::move(parsed.value());
+        const fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.size() == 1);
         CATCH_CHECK(values["section"].size() == 1);
         CATCH_CHECK_THROWS_AS(values["other-section"], fly::JsonException);
@@ -132,7 +132,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        const fly::Json values = std::move(parsed.value());
+        const fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.size() == 1);
         CATCH_CHECK(values["section"].size() == 2);
         CATCH_CHECK(values["section"]["name"] == "John Doe");
@@ -149,7 +149,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        const fly::Json values = std::move(parsed.value());
+        const fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.size() == 1);
         CATCH_CHECK(values["section"].size() == 2);
         CATCH_CHECK(values["section"]["name"] == "  John Doe  ");
@@ -167,7 +167,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed1 = parser.parse_string(contents1);
         CATCH_REQUIRE(parsed1.has_value());
 
-        const fly::Json values1 = std::move(parsed1.value());
+        const fly::Json values1 = *std::move(parsed1);
         CATCH_CHECK(values1.size() == 1);
         CATCH_CHECK(values1["section"].size() == 1);
         CATCH_CHECK(values1["section"]["name"] == "Jane Doe");
@@ -181,7 +181,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed2 = parser.parse_string(contents1);
         CATCH_REQUIRE(parsed2.has_value());
 
-        const fly::Json values2 = std::move(parsed2.value());
+        const fly::Json values2 = *std::move(parsed2);
         CATCH_CHECK(values2.size() == 1);
         CATCH_CHECK(values2["section"].size() == 1);
         CATCH_CHECK(values2["section"]["name"] == "Jane Doe");
@@ -197,7 +197,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        const fly::Json values = std::move(parsed.value());
+        const fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.size() == 1);
         CATCH_CHECK(values["section"].size() == 1);
         CATCH_CHECK(values["section"]["name"] == "Jane Doe");
@@ -296,7 +296,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed1 = parser.parse_string(contents1);
         CATCH_REQUIRE(parsed1.has_value());
 
-        const fly::Json values1 = std::move(parsed1.value());
+        const fly::Json values1 = *std::move(parsed1);
         CATCH_CHECK(values1.size() == 1);
         CATCH_CHECK(values1["section"].size() == 1);
         CATCH_CHECK(values1["section"]["name"] == "John=Doe");
@@ -304,7 +304,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
         auto parsed2 = parser.parse_string(contents2);
         CATCH_REQUIRE(parsed2.has_value());
 
-        const fly::Json values2 = std::move(parsed2.value());
+        const fly::Json values2 = *std::move(parsed2);
         CATCH_CHECK(values2.size() == 1);
         CATCH_CHECK(values2["section"].size() == 1);
         CATCH_CHECK(values2["section"]["name"] == "John=Doe");
@@ -389,7 +389,7 @@ CATCH_TEST_CASE("IniParser", "[parser]")
             auto parsed = parser.parse_string(contents);
             CATCH_REQUIRE(parsed.has_value());
 
-            const fly::Json values = std::move(parsed.value());
+            const fly::Json values = *std::move(parsed);
             CATCH_CHECK(values.size() == 1);
             CATCH_CHECK(values["section"].size() == 2);
             CATCH_CHECK(values["section"]["name"] == "John Doe");

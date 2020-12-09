@@ -1626,7 +1626,7 @@ Json::operator T() const noexcept
     }
 
     // The JSON string will have been validated for Unicode compliance during construction.
-    return JsonTraits::StringType::convert<T>(value).value();
+    return *(JsonTraits::StringType::convert<T>(value));
 }
 
 //==================================================================================================
@@ -1639,7 +1639,7 @@ Json::operator T() const noexcept(false)
     for (const auto &it : storage)
     {
         // The JSON string will have been validated for Unicode compliance during construction.
-        auto key = JsonTraits::StringType::convert<typename T::key_type>(it.first).value();
+        auto key = *std::move(JsonTraits::StringType::convert<typename T::key_type>(it.first));
         result.emplace(std::move(key), it.second);
     }
 
@@ -1718,7 +1718,7 @@ Json::operator T() const noexcept(false)
         {
             if (auto converted = JsonTraits::StringType::convert<T>(storage); converted)
             {
-                return std::move(converted.value());
+                return *std::move(converted);
             }
         }
         else if constexpr (JsonTraits::is_number_v<S>)
@@ -1976,7 +1976,7 @@ JsonTraits::string_type Json::convert_to_string(T value)
     {
         if (auto result = StringType::template convert<JsonTraits::string_type>(value); result)
         {
-            return validate_string(std::move(result.value()));
+            return validate_string(*std::move(result));
         }
     }
 

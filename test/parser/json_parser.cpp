@@ -43,12 +43,12 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         }
 
         std::stringstream ss;
-        ss << actual.value();
+        ss << *actual;
 
         std::optional<fly::Json> repeat = parser.parse_string(ss.str());
         CATCH_REQUIRE(repeat.has_value());
 
-        CATCH_CHECK(actual.value() == repeat.value());
+        CATCH_CHECK(*actual == *repeat);
     };
 
     auto validate_pass = [&](const std::string &test, const fly::Json &expected)
@@ -159,7 +159,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_file(path / "blns.json");
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.size() == 507);
 
         for (std::size_t i = 0; i < values.size(); ++i)
@@ -176,7 +176,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_file(path / "all_unicode.json");
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.size() == 1'112'064);
     }
 
@@ -187,7 +187,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_REQUIRE(values.size() == 1);
 
         fly::Json encoded_encoding = values["encoding"];
@@ -201,7 +201,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_REQUIRE(values.size() == 1);
 
         fly::Json encoded_encoding = values["encoding"];
@@ -216,7 +216,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_file(path / "utf_8.json");
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_REQUIRE(values.size() == 1);
 
         fly::Json encoded_encoding = values["encoding"];
@@ -230,7 +230,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_REQUIRE(values.size() == 1);
 
         fly::Json encoded_encoding = values["encoding"];
@@ -248,7 +248,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_file(path / "utf_16_big_endian.json");
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_REQUIRE(values.size() == 1);
 
         fly::Json encoded_encoding = values["encoding"];
@@ -266,7 +266,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_file(path / "utf_16_little_endian.json");
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_REQUIRE(values.size() == 1);
 
         fly::Json encoded_encoding = values["encoding"];
@@ -283,7 +283,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_REQUIRE(values.size() == 1);
 
         fly::Json encoded_encoding = values["encoding"];
@@ -301,7 +301,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_file(path / "utf_32_big_endian.json");
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_REQUIRE(values.size() == 1);
 
         fly::Json encoded_encoding = values["encoding"];
@@ -319,7 +319,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_file(path / "utf_32_little_endian.json");
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_REQUIRE(values.size() == 1);
 
         fly::Json encoded_encoding = values["encoding"];
@@ -356,7 +356,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.is_object());
         CATCH_CHECK(values.size() == 0);
     }
@@ -368,7 +368,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.is_array());
         CATCH_CHECK(values.size() == 0);
     }
@@ -380,7 +380,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.is_array());
         CATCH_CHECK(values.size() == 1);
 
@@ -396,7 +396,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
 
-        fly::Json values = std::move(parsed.value());
+        fly::Json values = *std::move(parsed);
         CATCH_CHECK(values.is_array());
         CATCH_CHECK(values.size() == 1);
 
@@ -413,7 +413,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = parser.parse_string(contents);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json values = std::move(parsed.value());
+            fly::Json values = *std::move(parsed);
             CATCH_CHECK(values["a"].is_string());
             CATCH_CHECK(values["a"].size() == 0);
             CATCH_CHECK(values["a"] == "");
@@ -424,7 +424,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = parser.parse_string(contents);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json values = std::move(parsed.value());
+            fly::Json values = *std::move(parsed);
             CATCH_CHECK(values[""].is_string());
             CATCH_CHECK(values[""].size() == 1);
             CATCH_CHECK(values[""] == "a");
@@ -435,7 +435,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = parser.parse_string(contents);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json values = std::move(parsed.value());
+            fly::Json values = *std::move(parsed);
             CATCH_CHECK(values[""].is_string());
             CATCH_CHECK(values[""].size() == 0);
             CATCH_CHECK(values[""] == "");
@@ -600,7 +600,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -620,7 +620,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -635,7 +635,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 1);
             CATCH_CHECK(json["a"] == 12);
         }
@@ -650,7 +650,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -668,7 +668,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -683,7 +683,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
                 auto parsed = parser.parse_string(str);
                 CATCH_REQUIRE(parsed.has_value());
 
-                fly::Json json = std::move(parsed.value());
+                fly::Json json = *std::move(parsed);
                 CATCH_CHECK(json.size() == 2);
                 CATCH_CHECK(json["a"] == "abdc // here is a comment efgh");
                 CATCH_CHECK(json["b"] == 13);
@@ -692,7 +692,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
                 auto parsed = comment_parser.parse_string(str);
                 CATCH_REQUIRE(parsed.has_value());
 
-                fly::Json json = std::move(parsed.value());
+                fly::Json json = *std::move(parsed);
                 CATCH_CHECK(json.size() == 2);
                 CATCH_CHECK(json["a"] == "abdc // here is a comment efgh");
                 CATCH_CHECK(json["b"] == 13);
@@ -717,7 +717,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -737,7 +737,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -753,7 +753,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -769,7 +769,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -787,7 +787,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -811,7 +811,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comment_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -826,7 +826,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
                 auto parsed = parser.parse_string(str);
                 CATCH_REQUIRE(parsed.has_value());
 
-                fly::Json json = std::move(parsed.value());
+                fly::Json json = *std::move(parsed);
                 CATCH_CHECK(json.size() == 2);
                 CATCH_CHECK(json["a"] == "abdc /* here is a comment */ efgh");
                 CATCH_CHECK(json["b"] == 13);
@@ -835,7 +835,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
                 auto parsed = comment_parser.parse_string(str);
                 CATCH_REQUIRE(parsed.has_value());
 
-                fly::Json json = std::move(parsed.value());
+                fly::Json json = *std::move(parsed);
                 CATCH_CHECK(json.size() == 2);
                 CATCH_CHECK(json["a"] == "abdc /* here is a comment */ efgh");
                 CATCH_CHECK(json["b"] == 13);
@@ -908,7 +908,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comma_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"] == 13);
@@ -947,7 +947,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = comma_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.size() == 2);
             CATCH_CHECK(json["a"] == 12);
             CATCH_CHECK(json["b"].is_array());
@@ -991,7 +991,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = type_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.is_string());
             CATCH_CHECK(json == str.substr(1, str.size() - 2));
         }
@@ -1002,7 +1002,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = type_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.is_boolean());
             CATCH_CHECK(json == true);
         }
@@ -1013,7 +1013,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = type_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.is_boolean());
             CATCH_CHECK(json == false);
         }
@@ -1024,7 +1024,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = type_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.is_null());
             CATCH_CHECK(json == nullptr);
         }
@@ -1035,7 +1035,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = type_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.is_unsigned_integer());
             CATCH_CHECK(json == 12389);
         }
@@ -1046,7 +1046,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = type_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.is_signed_integer());
             CATCH_CHECK(json == -12389);
         }
@@ -1057,7 +1057,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             auto parsed = type_parser.parse_string(str);
             CATCH_REQUIRE(parsed.has_value());
 
-            fly::Json json = std::move(parsed.value());
+            fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.is_float());
             CATCH_CHECK(double(json) == Approx(123.89));
         }

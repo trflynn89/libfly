@@ -68,9 +68,9 @@ std::filesystem::path find_log_file(const fly::test::PathUtil::ScopedTempDirecto
         std::vector<std::string> segments = fly::String::split(it.path().filename().string(), '_');
         auto log_index = fly::String::convert<std::uint32_t>(segments[1]);
 
-        if (log_index.has_value() && (log_index.value() > most_recent_log_index))
+        if (log_index && (*log_index > most_recent_log_index))
         {
-            most_recent_log_index = log_index.value();
+            most_recent_log_index = *log_index;
             most_recent_log_file = it.path();
         }
     }

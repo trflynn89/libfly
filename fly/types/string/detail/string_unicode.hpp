@@ -336,9 +336,9 @@ BasicStringUnicode<StringType>::convert_encoding(IteratorType &it, const Iterato
     {
         if (auto codepoint = decode_codepoint(it, end); codepoint)
         {
-            if (auto encoded = DesiredUnicodeType::encode_codepoint(codepoint.value()); encoded)
+            if (auto encoded = DesiredUnicodeType::encode_codepoint(*codepoint); encoded)
             {
-                result += std::move(encoded.value());
+                result += *std::move(encoded);
                 continue;
             }
         }
@@ -392,7 +392,7 @@ BasicStringUnicode<StringType>::escape_codepoint(IteratorType &it, const Iterato
 
     if (auto codepoint = decode_codepoint(it, end); codepoint)
     {
-        return escape_codepoint<UnicodePrefix>(codepoint.value());
+        return escape_codepoint<UnicodePrefix>(*codepoint);
     }
 
     return std::nullopt;
