@@ -157,7 +157,7 @@ std::optional<Json> Parser::parse_string(const StringType &contents)
 
         if (utf8_contents)
         {
-            return parse_string(utf8_contents.value());
+            return parse_string(*utf8_contents);
         }
 
         return std::nullopt;

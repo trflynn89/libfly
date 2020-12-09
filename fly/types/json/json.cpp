@@ -866,7 +866,7 @@ void Json::read_escaped_character(
             {
                 const auto distance = std::distance(it, value.end());
 
-                value.replace(next - 1, it, std::move(result.value()));
+                value.replace(next - 1, it, *std::move(result));
                 it = value.end() - distance - 1;
             }
             else
@@ -918,7 +918,7 @@ void Json::write_escaped_charater(
             break;
 
         default:
-            stream << JsonTraits::StringType::escape_codepoint<'u'>(it, end).value();
+            stream << *(JsonTraits::StringType::escape_codepoint<'u'>(it, end));
             return;
     }
 

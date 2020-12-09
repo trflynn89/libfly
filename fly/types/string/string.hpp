@@ -705,7 +705,7 @@ std::optional<StringType> BasicString<StringType>::escape_all_codepoints(const S
     {
         if (auto escaped = escape_codepoint<UnicodePrefix>(it, end); escaped)
         {
-            result += std::move(escaped.value());
+            result += *std::move(escaped);
         }
         else
         {
@@ -745,7 +745,7 @@ std::optional<StringType> BasicString<StringType>::unescape_all_codepoints(const
                 {
                     if (auto unescaped = unescape_codepoint(it, end); unescaped)
                     {
-                        result += std::move(unescaped.value());
+                        result += *std::move(unescaped);
                     }
                     else
                     {
@@ -882,7 +882,7 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
 
         if (auto result = unicode::template convert_encoding<U>(it, end); result)
         {
-            return static_cast<T>(result.value());
+            return static_cast<T>(*result);
         }
 
         return std::nullopt;
@@ -898,7 +898,7 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
 
         if (auto result = unicode::template convert_encoding<streamed_type>(it, end); result)
         {
-            return detail::BasicStringConverter<streamed_type, T>::convert(result.value());
+            return detail::BasicStringConverter<streamed_type, T>::convert(*result);
         }
 
         return std::nullopt;

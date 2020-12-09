@@ -78,7 +78,7 @@ std::optional<Json> JsonParser::parse_json()
         case Token::Quote:
             if (auto value = parse_quoted_string(); value)
             {
-                return std::move(value.value());
+                return *std::move(value);
             }
 
             return std::nullopt;
@@ -115,7 +115,7 @@ std::optional<Json> JsonParser::parse_object()
         }
         else if (std::optional<Json> value = parse_json(); value)
         {
-            object.insert_or_assign(std::move(key.value()), std::move(value.value()));
+            object.insert_or_assign(*std::move(key), *std::move(value));
         }
         else
         {
@@ -147,7 +147,7 @@ std::optional<Json> JsonParser::parse_array()
 
         if (std::optional<Json> value = parse_json(); value)
         {
-            array.push_back(std::move(value.value()));
+            array.push_back(*std::move(value));
         }
         else
         {
@@ -248,21 +248,21 @@ std::optional<Json> JsonParser::parse_value()
         case NumberType::SignedInteger:
             if (auto num = JsonTraits::StringType::convert<JsonTraits::signed_type>(value); num)
             {
-                return num.value();
+                return *num;
             }
             break;
 
         case NumberType::UnsignedInteger:
             if (auto num = JsonTraits::StringType::convert<JsonTraits::unsigned_type>(value); num)
             {
-                return num.value();
+                return *num;
             }
             break;
 
         case NumberType::FloatingPoint:
             if (auto num = JsonTraits::StringType::convert<JsonTraits::float_type>(value); num)
             {
-                return num.value();
+                return *num;
             }
             break;
 

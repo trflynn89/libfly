@@ -81,7 +81,7 @@ std::optional<Json> Parser::parse_file(const std::filesystem::path &path)
 
     if (utf8_contents)
     {
-        return parse_string(utf8_contents.value());
+        return parse_string(*utf8_contents);
     }
 
     return std::nullopt;

@@ -107,7 +107,7 @@ void ConfigManager::update_config()
 
     if (auto values = m_parser->parse_file(m_path); values)
     {
-        m_values = std::move(values.value());
+        m_values = *std::move(values);
     }
     else
     {

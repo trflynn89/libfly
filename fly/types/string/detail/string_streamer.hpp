@@ -159,7 +159,7 @@ void BasicStringStreamer<StringType>::stream_string(ostream_type &ostream, const
 
         if (escaped)
         {
-            ostream << std::move(escaped.value());
+            ostream << *std::move(escaped);
         }
     }
 }
@@ -181,7 +181,7 @@ void BasicStringStreamer<StringType>::stream_string(ostream_type &ostream, const
 
     if (converted)
     {
-        BasicStringStreamer<streamed_type>::stream(ostream, converted.value());
+        BasicStringStreamer<streamed_type>::stream(ostream, *converted);
     }
 }
 

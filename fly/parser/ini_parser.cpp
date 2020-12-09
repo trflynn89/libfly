@@ -36,7 +36,7 @@ std::optional<Json> IniParser::parse_internal()
 
             if (maybe_section)
             {
-                section = std::move(maybe_section.value());
+                section = *std::move(maybe_section);
 
                 try
                 {
@@ -59,7 +59,7 @@ std::optional<Json> IniParser::parse_internal()
 
             if (maybe_value)
             {
-                std::pair<std::string, std::string> value = std::move(maybe_value.value());
+                std::pair<std::string, std::string> value = *std::move(maybe_value);
 
                 try
                 {
