@@ -69,7 +69,7 @@ public:
      * @return The peeked character.
      */
     template <typename IntType = int>
-    inline IntType peek();
+    IntType peek();
 
     /**
      * Read the next character from the stream by extracting it.
@@ -79,7 +79,7 @@ public:
      * @return The read character.
      */
     template <typename IntType = int>
-    inline IntType get();
+    IntType get();
 
     /**
      * Read characters from the stream until a newline or end-of-file is reached.
@@ -186,14 +186,14 @@ std::unique_ptr<UTF8Stream> UTF8Stream::create(std::basic_istream<CharType> &str
 
 //==================================================================================================
 template <typename IntType>
-IntType UTF8Stream::peek()
+inline IntType UTF8Stream::peek()
 {
     return static_cast<IntType>(peek_internal());
 }
 
 //==================================================================================================
 template <typename IntType>
-IntType UTF8Stream::get()
+inline IntType UTF8Stream::get()
 {
     return static_cast<IntType>(get_internal());
 }
@@ -213,6 +213,30 @@ bool UTF8Stream::getline(std::basic_string<CharType> &result)
     }
 
     return !eof() || !result.empty();
+}
+
+//==================================================================================================
+inline int UTF8CharStream::peek_internal()
+{
+    return static_cast<int>(m_stream_buffer->sgetc());
+}
+
+//==================================================================================================
+inline int UTF8CharStream::get_internal()
+{
+    return static_cast<int>(m_stream_buffer->sbumpc());
+}
+
+//==================================================================================================
+inline int UTF8Char8Stream::peek_internal()
+{
+    return static_cast<int>(m_stream_buffer->sgetc());
+}
+
+//==================================================================================================
+inline int UTF8Char8Stream::get_internal()
+{
+    return static_cast<int>(m_stream_buffer->sbumpc());
 }
 
 } // namespace fly
