@@ -223,16 +223,9 @@ private:
      */
     bool is_whitespace(Token token) const;
 
-    /**
-     * Check if a feature has been allowed.
-     *
-     * @param feature The feature to check.
-     *
-     * @return True if the feature is allowed.
-     */
-    bool is_feature_allowed(Features feature) const;
-
-    const Features m_features {Features::Strict};
+    const bool m_allow_comments {false};
+    const bool m_allow_trailing_comma {false};
+    const bool m_allow_any_type {false};
 };
 
 /**

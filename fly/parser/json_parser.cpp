@@ -13,8 +13,21 @@ namespace fly {
         line(),                                                                                    \
         column() FLY_FORMAT_ARGS(__VA_ARGS__));
 
+namespace {
+
+    bool is_feature_enabled(JsonParser::Features enabled_features, JsonParser::Features feature)
+    {
+        return (enabled_features & feature) != JsonParser::Features::Strict;
+    }
+
+} // namespace
+
 //==================================================================================================
-JsonParser::JsonParser(const Features features) noexcept : Parser(), m_features(features)
+JsonParser::JsonParser(const Features features) noexcept :
+    Parser(),
+    m_allow_comments(is_feature_enabled(features, Features::AllowComments)),
+    m_allow_trailing_comma(is_feature_enabled(features, Features::AllowTrailingComma)),
+    m_allow_any_type(is_feature_enabled(features, Features::AllowAnyType))
 {
 }
 
@@ -42,13 +55,10 @@ std::optional<Json> JsonParser::parse_internal()
         JLOG("Extraneous symbols found after JSON value");
         return std::nullopt;
     }
-    else if (json && !json->is_object() && !json->is_array())
+    else if (json && !json->is_object() && !json->is_array() && !m_allow_any_type)
     {
-        if (!is_feature_allowed(Features::AllowAnyType))
-        {
-            JLOG("Parsed non-object/non-array value, but Features::AllowAnyType is not enabled");
-            return std::nullopt;
-        }
+        JLOG("Parsed non-object/non-array value, but Features::AllowAnyType is not enabled");
+        return std::nullopt;
     }
 
     return json;
@@ -293,7 +303,7 @@ JsonParser::ParseState JsonParser::consume_comma(Token end_token)
     }
     else if (state_for_object_or_array(end_token) == ParseState::StopParsing)
     {
-        if (is_feature_allowed(Features::AllowTrailingComma))
+        if (m_allow_trailing_comma)
         {
             return ParseState::StopParsing;
         }
@@ -364,7 +374,7 @@ void JsonParser::consume_whitespace()
 //==================================================================================================
 JsonParser::ParseState JsonParser::consume_comment()
 {
-    if (!is_feature_allowed(Features::AllowComments))
+    if (!m_allow_comments)
     {
         JLOG("Found comment, but Features::AllowComments is not enabled");
         return ParseState::Invalid;
@@ -483,12 +493,6 @@ bool JsonParser::is_whitespace(Token token) const
         default:
             return false;
     }
-}
-
-//==================================================================================================
-bool JsonParser::is_feature_allowed(Features feature) const
-{
-    return (m_features & feature) != Features::Strict;
 }
 
 //==================================================================================================
