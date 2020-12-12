@@ -88,6 +88,19 @@ std::optional<Json> Parser::parse_file(const std::filesystem::path &path)
 }
 
 //==================================================================================================
+std::optional<Json> Parser::parse_stream(std::istream &&stream)
+{
+    m_line = 1;
+    m_column = 0;
+
+    m_stream_buffer = stream.rdbuf();
+    auto result = parse_internal();
+    m_stream_buffer = nullptr;
+
+    return result;
+}
+
+//==================================================================================================
 Parser::Encoding Parser::parse_byte_order_mark(std::istream &stream) const
 {
     // N.B. Check UTF-32 LE before UTF-16 LE because the latter BOM is a prefix of the former BOM.
@@ -114,6 +127,18 @@ Parser::Encoding Parser::parse_byte_order_mark(std::istream &stream) const
     }
 
     return Encoding::UTF8;
+}
+
+//==================================================================================================
+std::uint32_t Parser::line() const
+{
+    return m_line;
+}
+
+//==================================================================================================
+std::uint32_t Parser::column() const
+{
+    return m_column;
 }
 
 } // namespace fly

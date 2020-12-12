@@ -42,23 +42,33 @@ private:
     };
 
     /**
+     * Read symbols from the stream until a newline or end-of-file is reached.
+     *
+     * @param result The string to insert extracted symbols ito.
+     *
+     * @return True if any symbols were read.
+     */
+    bool getline(std::string &result);
+
+    /**
      * Parse a line containing a section name.
      *
-     * @param line Line containing the section.
+     * @param section Line containing the section.
      *
      * @return If successful, the parsed section name. Otherwise, an unitialized value.
      */
-    std::optional<std::string> on_section(const std::string &line);
+    std::optional<std::string> on_section(std::string &section);
 
     /**
      * Parse a line containing a name/value pair.
      *
      * @param section Section containing the pair.
-     * @param line Line containing the pair.
+     * @param name_value Line containing the pair.
      *
      * @return If successful, the parsed name/value pair. Otherwise, an unitialized value.
      */
-    std::optional<std::pair<std::string, std::string>> on_value(const std::string &line);
+    std::optional<std::pair<std::string, std::string>>
+    on_name_value_pair(const std::string &name_value);
 
     /**
      * If the given string begins and ends with the given character, remove that character from each

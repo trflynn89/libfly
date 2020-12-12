@@ -206,18 +206,6 @@ private:
     ParseState consume_comment();
 
     /**
-     * Extract the next symbol in the stream.
-     *
-     * @return The extracted symbol.
-     */
-    Token consume();
-
-    /**
-     * Extract and discard the next symbol in the stream.
-     */
-    void discard();
-
-    /**
      * Validate that a parsed number is valid and interpret its numeric JSON type.
      *
      * @param value String storing the parsed number to validate.

@@ -10,8 +10,8 @@ namespace fly {
 #define JLOG(...)                                                                                  \
     LOGW(                                                                                          \
         "[line %d, column %d]: " FLY_FORMAT_STRING(__VA_ARGS__),                                   \
-        m_line,                                                                                    \
-        m_column FLY_FORMAT_ARGS(__VA_ARGS__));
+        line(),                                                                                    \
+        column() FLY_FORMAT_ARGS(__VA_ARGS__));
 
 //==================================================================================================
 JsonParser::JsonParser(const Features features) noexcept : Parser(), m_features(features)
@@ -37,7 +37,7 @@ std::optional<Json> JsonParser::parse_internal()
     {
         return std::nullopt;
     }
-    else if (!m_stream->eof())
+    else if (!eof())
     {
         JLOG("Extraneous symbols found after JSON value");
         return std::nullopt;
@@ -62,7 +62,7 @@ std::optional<Json> JsonParser::parse_json()
         return std::nullopt;
     }
 
-    switch (m_stream->peek<Token>())
+    switch (peek<Token>())
     {
         case Token::StartBrace:
             return parse_object();
@@ -159,7 +159,7 @@ JsonParser::ParseState JsonParser::state_for_object_or_array(Token end_token)
         return ParseState::Invalid;
     }
 
-    const Token token = m_stream->peek<Token>();
+    const Token token = peek<Token>();
 
     if (token == end_token)
     {
@@ -190,7 +190,7 @@ std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
         return std::nullopt;
     }
 
-    while (!stop_parsing(token = m_stream->peek<Token>()))
+    while (!stop_parsing(token = peek<Token>()))
     {
         value.push_back(static_cast<JsonTraits::char_type>(token));
         discard();
@@ -200,7 +200,7 @@ std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
         // symbol is a quote.
         if (token == Token::ReverseSolidus)
         {
-            if ((token = consume()) == Token::EndOfFile)
+            if ((token = get<Token>()) == Token::EndOfFile)
             {
                 JLOG("Expected character after reverse solidus");
                 return std::nullopt;
@@ -271,7 +271,7 @@ JsonParser::ParseState JsonParser::consume_token(Token token)
 {
     consume_whitespace();
 
-    if (const Token parsed = consume(); parsed != token)
+    if (const Token parsed = get<Token>(); parsed != token)
     {
         JLOG(
             "Unexpected character '%c', was expecting '%c'",
@@ -326,9 +326,9 @@ JsonTraits::string_type JsonParser::consume_value()
         }
     };
 
-    while (keep_parsing(m_stream->peek<Token>()))
+    while (keep_parsing(peek<Token>()))
     {
-        value.push_back(m_stream->get<JsonTraits::char_type>());
+        value.push_back(get<JsonTraits::char_type>());
     }
 
     return value;
@@ -339,7 +339,7 @@ JsonParser::ParseState JsonParser::consume_whitespace_and_comments()
 {
     consume_whitespace();
 
-    while (m_stream->peek<Token>() == Token::Solidus)
+    while (peek<Token>() == Token::Solidus)
     {
         if (consume_comment() == ParseState::Invalid)
         {
@@ -355,7 +355,7 @@ JsonParser::ParseState JsonParser::consume_whitespace_and_comments()
 //==================================================================================================
 void JsonParser::consume_whitespace()
 {
-    while (is_whitespace(m_stream->peek<Token>()))
+    while (is_whitespace(peek<Token>()))
     {
         discard();
     }
@@ -375,12 +375,12 @@ JsonParser::ParseState JsonParser::consume_comment()
 
     Token token;
 
-    switch (token = consume())
+    switch (token = get<Token>())
     {
         case Token::Solidus:
             do
             {
-                token = consume();
+                token = get<Token>();
             } while ((token != Token::EndOfFile) && (token != Token::NewLine));
 
             break;
@@ -391,9 +391,9 @@ JsonParser::ParseState JsonParser::consume_comment()
 
             do
             {
-                token = consume();
+                token = get<Token>();
 
-                if ((token == Token::Asterisk) && (m_stream->peek<Token>() == Token::Solidus))
+                if ((token == Token::Asterisk) && (peek<Token>() == Token::Solidus))
                 {
                     parsing_comment = false;
                     discard();
@@ -415,30 +415,6 @@ JsonParser::ParseState JsonParser::consume_comment()
     }
 
     return ParseState::KeepParsing;
-}
-
-//==================================================================================================
-JsonParser::Token JsonParser::consume()
-{
-    const Token token = m_stream->get<Token>();
-
-    if (token == Token::NewLine)
-    {
-        m_column = 1;
-        ++m_line;
-    }
-    else
-    {
-        ++m_column;
-    }
-
-    return token;
-}
-
-//==================================================================================================
-void JsonParser::discard()
-{
-    FLY_UNUSED(consume());
 }
 
 //==================================================================================================

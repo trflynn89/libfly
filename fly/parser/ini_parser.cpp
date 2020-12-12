@@ -7,100 +7,111 @@
 
 namespace fly {
 
+#define ILOG(...)                                                                                  \
+    LOGW("[line %d]: " FLY_FORMAT_STRING(__VA_ARGS__), line() FLY_FORMAT_ARGS(__VA_ARGS__));
+
 //==================================================================================================
 std::optional<Json> IniParser::parse_internal()
 {
-    std::string line, section;
-    Json values;
+    Json values = JsonTraits::object_type();
+    Json::iterator current;
 
-    while (m_stream->getline(line))
+    std::string data;
+
+    while (getline(data))
     {
-        String::trim(line);
-        ++m_line;
+        String::trim(data);
 
-        if (line.empty() || String::starts_with(line, ';'))
+        if (data.empty() || String::starts_with(data, ';'))
         {
             // Ignore comments and blank lines.
             continue;
         }
 
-        const TrimResult result = trim_value(line, '[', ']');
-
-        if (result == TrimResult::Imbalanced)
+        switch (trim_value(data, '[', ']'))
         {
-            return std::nullopt;
-        }
-        else if (result == TrimResult::Trimmed)
-        {
-            std::optional<std::string> maybe_section = on_section(line);
+            case TrimResult::Imbalanced:
+                return std::nullopt;
 
-            if (maybe_section)
-            {
-                section = *std::move(maybe_section);
-
-                try
+            case TrimResult::Trimmed:
+                if (auto section = on_section(data); section)
                 {
-                    values[section] = JsonTraits::object_type();
+                    try
+                    {
+                        auto it =
+                            values.insert_or_assign(*std::move(section), JsonTraits::object_type());
+                        current = it.first;
+                    }
+                    catch (const JsonException &ex)
+                    {
+                        ILOG("%s", ex.what());
+                        return std::nullopt;
+                    }
                 }
-                catch (const JsonException &ex)
+                else
                 {
-                    LOGW("[line %d]: %s", m_line, ex.what());
                     return std::nullopt;
                 }
-            }
-            else
-            {
-                return std::nullopt;
-            }
-        }
-        else if (!section.empty())
-        {
-            std::optional<std::pair<std::string, std::string>> maybe_value = on_value(line);
 
-            if (maybe_value)
-            {
-                std::pair<std::string, std::string> value = *std::move(maybe_value);
+                break;
 
-                try
+            case TrimResult::Untrimmed:
+                if (values.empty())
                 {
-                    values[section][std::move(value.first)] = std::move(value.second);
-                }
-                catch (const JsonException &ex)
-                {
-                    LOGW("[line %d]: %s", m_line, ex.what());
+                    ILOG("A section must be defined before name=value pairs");
                     return std::nullopt;
                 }
-            }
-            else
-            {
-                return std::nullopt;
-            }
-        }
-        else
-        {
-            LOGW("[line %d]: A section must be defined before name=value pairs", m_line);
-            return std::nullopt;
+                else if (auto value = on_name_value_pair(data); value)
+                {
+                    try
+                    {
+                        current->insert_or_assign(
+                            std::move(value->first),
+                            std::move(value->second));
+                    }
+                    catch (const JsonException &ex)
+                    {
+                        ILOG("%s", ex.what());
+                        return std::nullopt;
+                    }
+                }
+                else
+                {
+                    return std::nullopt;
+                }
+
+                break;
         }
     }
 
-    if (values.is_object())
-    {
-        return values;
-    }
-
-    return std::nullopt;
+    return values.empty() ? std::nullopt : std::optional<Json>(std::move(values));
 }
 
 //==================================================================================================
-std::optional<std::string> IniParser::on_section(const std::string &line)
+bool IniParser::getline(std::string &result)
 {
-    std::string section = line;
+    static constexpr const int s_new_line = 0x0a;
+
+    result.clear();
+    int ch;
+
+    while (!eof() && ((ch = get()) != s_new_line))
+    {
+        result += ch;
+    }
+
+    return !eof() || !result.empty();
+}
+
+//==================================================================================================
+std::optional<std::string> IniParser::on_section(std::string &section)
+{
     String::trim(section);
 
     if ((trim_value(section, '\'') != TrimResult::Untrimmed) ||
         (trim_value(section, '\"') != TrimResult::Untrimmed))
     {
-        LOGW("[line %d]: Section names must not be quoted", m_line);
+        ILOG("Section names must not be quoted");
         return std::nullopt;
     }
 
@@ -108,15 +119,16 @@ std::optional<std::string> IniParser::on_section(const std::string &line)
 }
 
 //==================================================================================================
-std::optional<std::pair<std::string, std::string>> IniParser::on_value(const std::string &line)
+std::optional<std::pair<std::string, std::string>>
+IniParser::on_name_value_pair(const std::string &name_value)
 {
     static constexpr std::uint32_t s_size = 2;
 
-    std::vector<std::string> name_value = String::split(line, '=', s_size);
+    std::vector<std::string> pair = String::split(name_value, '=', s_size);
 
-    if (name_value.size() == s_size)
+    if (pair.size() == s_size)
     {
-        std::string name(name_value[0]), value(name_value[1]);
+        std::string name(std::move(pair[0])), value(std::move(pair[1]));
 
         String::trim(name);
         String::trim(value);
@@ -124,7 +136,7 @@ std::optional<std::pair<std::string, std::string>> IniParser::on_value(const std
         if ((trim_value(name, '\'') != TrimResult::Untrimmed) ||
             (trim_value(name, '\"') != TrimResult::Untrimmed))
         {
-            LOGW("[line %d]: Value names must not be quoted", m_line);
+            ILOG("Value names must not be quoted");
             return std::nullopt;
         }
         else if (
@@ -134,11 +146,11 @@ std::optional<std::pair<std::string, std::string>> IniParser::on_value(const std
             return std::nullopt;
         }
 
-        return {{name, value}};
+        return std::make_pair(std::move(name), std::move(value));
     }
     else
     {
-        LOGW("[line %d]: Require name/value pairs of the form name=value", m_line);
+        ILOG("Require name/value pairs of the form name=value");
         return std::nullopt;
     }
 }
@@ -162,7 +174,7 @@ IniParser::TrimResult IniParser::trim_value(std::string &str, char start, char e
     }
     else if (starts_with_char || ends_with_char)
     {
-        LOGW("[line %d]: Imbalanced characters: \"%c\" and \"%c\"", m_line, start, end);
+        ILOG("Imbalanced characters: \"%c\" and \"%c\"", start, end);
         return TrimResult::Imbalanced;
     }
 
