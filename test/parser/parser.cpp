@@ -30,7 +30,7 @@ protected:
         m_chars.clear();
         int c = 0;
 
-        while ((c = m_stream->get()) != EOF)
+        while ((c = get()) != EOF)
         {
             m_chars.push_back(c);
         }

@@ -213,7 +213,6 @@
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\test\parser\json_parser.cpp" />
     <ClCompile Include="..\..\..\test\parser\parser.cpp" />
-    <ClCompile Include="..\..\..\test\parser\utf8_stream.cpp" />
     <ClCompile Include="..\..\..\test\path\path_monitor.cpp" />
     <ClCompile Include="..\..\..\test\socket\socket.cpp" />
     <ClCompile Include="..\..\..\test\system\system.cpp" />

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/parser/utf8_stream.hpp"
+#include "fly/fly.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/numeric/endian.hpp"
 #include "fly/types/string/string.hpp"
@@ -13,6 +13,7 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 namespace fly {
 
@@ -78,18 +79,52 @@ public:
 
 protected:
     /**
-     * Parse a UTF-8 encoded stream and retrieve the parsed values. Concrete parsers may access the
-     * underlying stream through m_stream.
+     * Parse a UTF-8 encoded stream and retrieve the parsed values. Concrete parsers may read data
+     * from the underlyins string through the peek(), get(), discard(), and eof() methods.
      *
      * @return If successful, the parsed values. Otherwise, an unitialized value.
      */
     virtual std::optional<Json> parse_internal() = 0;
 
-    // Wrapper around the stream being parsed. Only valid for the duration of parse_internal().
-    std::unique_ptr<UTF8Stream> m_stream;
+    /**
+     * Read the next symbol from the stream without extracting it.
+     *
+     * @tparam SymbolType The type to cast the symbol to.
+     *
+     * @return The peeked symbol.
+     */
+    template <typename SymbolType = int>
+    SymbolType peek();
 
-    std::uint32_t m_line;
-    std::uint32_t m_column;
+    /**
+     * Read the next symbol from the stream by extracting it.
+     *
+     * @tparam SymbolType The type to cast the symbol to.
+     *
+     * @return The read symbol.
+     */
+    template <typename SymbolType = int>
+    SymbolType get();
+
+    /**
+     * Discard the next symbol from the stream by extracting it.
+     */
+    void discard();
+
+    /**
+     * @return True if the stream has reached end-of-file.
+     */
+    bool eof();
+
+    /**
+     * @return The current line number in the stream.
+     */
+    std::uint32_t line() const;
+
+    /**
+     * @return The current column number in the stream.
+     */
+    std::uint32_t column() const;
 
 private:
     /**
@@ -112,8 +147,7 @@ private:
      *
      * @return If successful, the parsed values. Otherwise, an unitialized value.
      */
-    template <typename CharType>
-    std::optional<Json> parse_stream(std::basic_istream<CharType> &&stream);
+    std::optional<Json> parse_stream(std::istream &&stream);
 
     /**
      * Parse a non-UTF-8 encoded stream and convert the result to a UTF-8 encoded string.
@@ -138,6 +172,11 @@ private:
      * @return The detected Unicode encoding.
      */
     Encoding parse_byte_order_mark(std::istream &stream) const;
+
+    std::streambuf *m_stream_buffer;
+
+    std::uint32_t m_line;
+    std::uint32_t m_column;
 };
 
 //==================================================================================================
@@ -146,7 +185,7 @@ std::optional<Json> Parser::parse_string(const StringType &contents)
 {
     using CharType = typename StringType::value_type;
 
-    if constexpr (UTF8Stream::supports_utf8_stream<CharType>())
+    if constexpr (std::is_same_v<CharType, char>)
     {
         std::basic_istringstream<CharType> stream(contents);
         return parse_stream(std::move(stream));
@@ -154,28 +193,8 @@ std::optional<Json> Parser::parse_string(const StringType &contents)
     else
     {
         auto utf8_contents = BasicString<StringType>::template convert<std::string>(contents);
-
-        if (utf8_contents)
-        {
-            return parse_string(*utf8_contents);
-        }
-
-        return std::nullopt;
+        return utf8_contents ? parse_string(*utf8_contents) : std::nullopt;
     }
-}
-
-//==================================================================================================
-template <typename CharType>
-std::optional<Json> Parser::parse_stream(std::basic_istream<CharType> &&stream)
-{
-    m_line = 1;
-    m_column = 0;
-
-    m_stream = UTF8Stream::create(stream);
-    auto result = parse_internal();
-    m_stream.reset();
-
-    return result;
 }
 
 //==================================================================================================
@@ -209,6 +228,46 @@ std::optional<std::string> Parser::ensure_utf8(std::istream &stream) const
     }
 
     return BasicString<StringType>::template convert<std::string>(contents);
+}
+
+//==================================================================================================
+template <typename SymbolType>
+inline SymbolType Parser::peek()
+{
+    return static_cast<SymbolType>(m_stream_buffer->sgetc());
+}
+
+//==================================================================================================
+template <typename SymbolType>
+inline SymbolType Parser::get()
+{
+    static constexpr const int s_new_line = 0x0a;
+
+    const int symbol = m_stream_buffer->sbumpc();
+
+    if (symbol == s_new_line)
+    {
+        m_column = 1;
+        ++m_line;
+    }
+    else
+    {
+        ++m_column;
+    }
+
+    return static_cast<SymbolType>(symbol);
+}
+
+//==================================================================================================
+inline void Parser::discard()
+{
+    FLY_UNUSED(get());
+}
+
+//==================================================================================================
+inline bool Parser::eof()
+{
+    return peek() == std::char_traits<char>::eof();
 }
 
 } // namespace fly

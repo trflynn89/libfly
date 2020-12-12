@@ -70,9 +70,6 @@
     <ClCompile Include="..\..\..\test\parser\parser.cpp">
       <Filter>parser</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\parser\utf8_stream.cpp">
-      <Filter>parser</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\test\path\path_monitor.cpp">
       <Filter>path</Filter>
     </ClCompile>
