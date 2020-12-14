@@ -50,15 +50,18 @@ std::optional<Json> JsonParser::parse_internal()
     {
         return std::nullopt;
     }
-    else if (!eof())
+    else if (json)
     {
-        JLOG("Extraneous symbols found after JSON value");
-        return std::nullopt;
-    }
-    else if (json && !json->is_object() && !json->is_array() && !m_allow_any_type)
-    {
-        JLOG("Parsed non-object/non-array value, but Features::AllowAnyType is not enabled");
-        return std::nullopt;
+        if (!eof())
+        {
+            JLOG("Extraneous symbols found after JSON value: %x", peek());
+            return std::nullopt;
+        }
+        else if (!json->is_object() && !json->is_array() && !m_allow_any_type)
+        {
+            JLOG("Parsed non-object/non-array value, but Features::AllowAnyType is not enabled");
+            return std::nullopt;
+        }
     }
 
     return json;
@@ -187,11 +190,6 @@ JsonParser::ParseState JsonParser::state_for_object_or_array(Token end_token)
 //==================================================================================================
 std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
 {
-    auto stop_parsing = [](Token token) -> bool
-    {
-        return (token == Token::Quote) || (token == Token::EndOfFile);
-    };
-
     JsonTraits::string_type value;
     Token token;
 
@@ -200,29 +198,21 @@ std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
         return std::nullopt;
     }
 
-    while (!stop_parsing(token = peek<Token>()))
+    while ((token = get<Token>()) != Token::Quote)
     {
         value.push_back(static_cast<JsonTraits::char_type>(token));
-        discard();
 
-        // Blindly ignore escaped symbols, the Json class will check whether they are valid. Just
-        // read at least one more symbol to prevent breaking out of the loop too early if the next
-        // symbol is a quote.
         if (token == Token::ReverseSolidus)
         {
-            if ((token = get<Token>()) == Token::EndOfFile)
-            {
-                JLOG("Expected character after reverse solidus");
-                return std::nullopt;
-            }
-
-            value.push_back(static_cast<JsonTraits::char_type>(token));
+            // Blindly ignore escaped symbols, the Json class will check whether they are valid.
+            // Just read at least one more symbol to prevent breaking out of the loop too early if
+            // the next symbol is a quote.
+            value.push_back(get<JsonTraits::char_type>());
         }
-    }
-
-    if (consume_token(Token::Quote) == ParseState::Invalid)
-    {
-        return std::nullopt;
+        else if (token == Token::EndOfFile)
+        {
+            return std::nullopt;
+        }
     }
 
     return value;
