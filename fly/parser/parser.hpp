@@ -93,7 +93,7 @@ protected:
      *
      * @return The peeked symbol.
      */
-    template <typename SymbolType = int>
+    template <typename SymbolType = std::ios::int_type>
     SymbolType peek();
 
     /**
@@ -103,7 +103,7 @@ protected:
      *
      * @return The read symbol.
      */
-    template <typename SymbolType = int>
+    template <typename SymbolType = std::ios::int_type>
     SymbolType get();
 
     /**
@@ -185,7 +185,7 @@ std::optional<Json> Parser::parse_string(const StringType &contents)
 {
     using CharType = typename StringType::value_type;
 
-    if constexpr (std::is_same_v<CharType, char>)
+    if constexpr (std::is_same_v<CharType, std::ios::char_type>)
     {
         std::basic_istringstream<CharType> stream(contents);
         return parse_stream(std::move(stream));
@@ -241,9 +241,9 @@ inline SymbolType Parser::peek()
 template <typename SymbolType>
 inline SymbolType Parser::get()
 {
-    static constexpr const int s_new_line = 0x0a;
+    static constexpr const std::ios::int_type s_new_line = 0x0a;
 
-    const int symbol = m_stream_buffer->sbumpc();
+    const std::ios::int_type symbol = m_stream_buffer->sbumpc();
 
     if (symbol == s_new_line)
     {
@@ -267,7 +267,7 @@ inline void Parser::discard()
 //==================================================================================================
 inline bool Parser::eof()
 {
-    return peek() == std::char_traits<char>::eof();
+    return peek() == std::char_traits<std::ios::char_type>::eof();
 }
 
 } // namespace fly
