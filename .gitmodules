@@ -1,3 +1,9 @@
+[submodule "bench/json/extern/boost"]
+	path = bench/json/extern/boost
+	url = https://github.com/boostorg/json.git
+[submodule "bench/json/extern/nlohmann"]
+	path = bench/json/extern/nlohmann
+	url = https://github.com/nlohmann/json.git
 [submodule "test/Catch2"]
 	path = test/Catch2
 	url = https://github.com/catchorg/Catch2.git
