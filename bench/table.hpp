@@ -2,6 +2,7 @@
 
 #include "bench/stream_util.hpp"
 #include "fly/logger/styler.hpp"
+#include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <array>
@@ -163,6 +164,19 @@ private:
      */
     RowSizedArray<std::size_t> column_widths_for_row(const Row &row);
 
+    /**
+     * Helper to determine if a numeric value is zero (if integral), or close enough to zero (if
+     * floating point).
+     *
+     * @tparam T The numeric type of the value to test.
+     *
+     * @param value The numeric value to test.
+     *
+     * @return True if the value is zero.
+     */
+    template <typename T>
+    static bool is_zero(T value);
+
     static constexpr const fly::Color s_border_color = fly::Color::Cyan;
     static constexpr const fly::Style s_border_style = fly::Style::Bold;
 
@@ -221,7 +235,7 @@ void Table<Args...>::print_table(std::ostream &stream) const
     // Compute the entire width of the table. There are 1 + the number of columns vertical
     // separators ('|'), plus the width of each column (with 2 padding spacers each).
     const std::size_t table_width = (m_column_widths.size() + 1) +
-        std::accumulate(m_column_widths.begin(), m_column_widths.end(), 0) +
+        std::accumulate(m_column_widths.begin(), m_column_widths.end(), 0_zu) +
         (2 * m_column_widths.size());
 
     print_title(stream, table_width);
@@ -346,7 +360,7 @@ auto Table<Args...>::column_widths_for_row(const Row &row) -> RowSizedArray<std:
         }
         else if constexpr (std::is_arithmetic_v<T>)
         {
-            if (value == 0)
+            if (is_zero(value))
             {
                 // Prevent std::log10(0), which is considered an error.
                 widths[index] = std::is_floating_point_v<T> ? s_precision + 2 : 1;
@@ -377,6 +391,31 @@ auto Table<Args...>::column_widths_for_row(const Row &row) -> RowSizedArray<std:
         row);
 
     return widths;
+}
+
+//==================================================================================================
+template <class... Args>
+template <typename T>
+bool Table<Args...>::is_zero(T value)
+{
+    static_assert(std::is_arithmetic_v<T>);
+
+    if constexpr (std::is_floating_point_v<T>)
+    {
+        if (std::abs(value) <= std::numeric_limits<T>::epsilon())
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if (value == static_cast<T>(0))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace fly::benchmark
