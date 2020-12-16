@@ -688,7 +688,7 @@ bool operator==(Json::const_reference json1, Json::const_reference json2)
             (JsonTraits::is_floating_point_v<S1> && JsonTraits::is_number_v<S2>) ||
             (JsonTraits::is_floating_point_v<S2> && JsonTraits::is_number_v<S1>))
         {
-            constexpr auto epsilon = std::numeric_limits<S1>::epsilon();
+            constexpr auto epsilon = std::numeric_limits<JsonTraits::float_type>::epsilon();
 
             const auto fvalue1 = static_cast<JsonTraits::float_type>(value1);
             const auto fvalue2 = static_cast<JsonTraits::float_type>(value2);
