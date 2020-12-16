@@ -1,5 +1,6 @@
 SRC_DIRS_$(d) := \
     fly/coders \
+    fly/coders/base64 \
     fly/coders/huffman \
     fly/logger \
     fly/parser \
@@ -13,6 +14,7 @@ SRC_DIRS_$(d) := \
 
 # Include the directories containing the benchmark tests.
 SRC_DIRS_$(d) += \
+    bench/coders \
     bench/json
 
 SRC_$(d) := \

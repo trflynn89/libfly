@@ -453,26 +453,5 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
             CATCH_CHECK(fly::test::PathUtil::compare_files(raw, decoded_file));
         }
-
-        CATCH_SECTION("Encode and decode an extremely large file")
-        {
-            // Downloaded from: http://mattmahoney.net/dc/enwik8.zip
-            const auto here = std::filesystem::path(__FILE__).parent_path();
-            const auto raw = here / "data" / "enwik8";
-
-            if (!std::filesystem::exists(raw))
-            {
-                // TODO: The enwik8 file is 100MB. Instead of checking it into git and coding it
-                // with debug mode unit tests, a performance test should be created that downloads
-                // the file and runs in release mode.
-                return;
-            }
-
-            CATCH_REQUIRE(encoder.encode_file(raw, encoded_file));
-            CATCH_REQUIRE(decoder.decode_file(encoded_file, decoded_file));
-
-            CATCH_CHECK(std::filesystem::file_size(raw) > std::filesystem::file_size(encoded_file));
-            CATCH_CHECK(fly::test::PathUtil::compare_files(raw, decoded_file));
-        }
     }
 }
