@@ -173,10 +173,10 @@ private:
      */
     Encoding parse_byte_order_mark(std::istream &stream) const;
 
-    std::streambuf *m_stream_buffer;
+    std::streambuf *m_stream_buffer {nullptr};
 
-    std::uint32_t m_line;
-    std::uint32_t m_column;
+    std::uint32_t m_line {0};
+    std::uint32_t m_column {0};
 };
 
 //==================================================================================================

@@ -2,9 +2,9 @@
 
 Benchmark of the libfly JSON parser against a couple of popular C++ JSON libraries:
 
-* [libfly](/fly/parser/json_parser.hpp)
-* [Boost.JSON](https://github.com/boostorg/json)
-* [JSON for Modern C++](https://github.com/nlohmann/json)
+*   [libfly](/fly/parser/json_parser.hpp)
+*   [Boost.JSON](https://github.com/boostorg/json)
+*   [JSON for Modern C++](https://github.com/nlohmann/json)
 
 ## Results
 
@@ -35,13 +35,12 @@ could use some work :)
 | boost    |        14.083 |      225.350 |
 | nlohmann |        32.914 |       96.423 |
 
-
 ## Profile
 
 A profile of parsing the all_unicode.json file indicates most time is spent in the `fly::Json` move
 constructor.
 
-```
+```bash
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total
  time   seconds   seconds    calls  ms/call  ms/call  name
