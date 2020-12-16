@@ -796,20 +796,22 @@ std::ostream &operator<<(std::ostream &stream, Json::const_reference json)
 //==================================================================================================
 JsonTraits::string_type Json::validate_string(JsonTraits::string_type &&value)
 {
+    static constexpr const auto s_null = FLY_JSON_CHR('\0');
+    static constexpr const auto s_space = FLY_JSON_CHR(' ');
+    static constexpr const auto s_quote = FLY_JSON_CHR('"');
+    static constexpr const auto s_reverse_solidus = FLY_JSON_CHR('\\');
+
     for (auto it = value.begin(); it != value.end(); ++it)
     {
-        if (*it == '\\')
+        const auto &ch = *it;
+
+        if (ch == '\\')
         {
             read_escaped_character(value, it);
         }
-        else
+        else if (((ch >= s_null) && (ch < s_space)) || (ch == s_quote) || (ch == s_reverse_solidus))
         {
-            const std::uint8_t ch = static_cast<std::uint8_t>(*it);
-
-            if ((ch <= 0x1f) || (ch == 0x22) || (ch == 0x5c))
-            {
-                throw JsonException(String::format("Character '%c' must be escaped", *it));
-            }
+            throw JsonException(String::format("Character '%c' must be escaped", ch));
         }
     }
 
