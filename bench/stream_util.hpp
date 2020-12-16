@@ -80,7 +80,7 @@ public:
      * @param width The width to center the text within.
      * @param value The text to be centered.
      */
-    Center(std::streamsize width, const StringType &value);
+    Center(std::size_t width, const StringType &value);
 
     /**
      * Print the centered text.
@@ -144,8 +144,8 @@ void ScopedStreamModifiers::manip(Manipulator &&manipulator)
 
 //==================================================================================================
 template <typename StringType>
-Center<StringType>::Center(std::streamsize width, const StringType &value) :
-    m_width(width),
+Center<StringType>::Center(std::size_t width, const StringType &value) :
+    m_width(static_cast<std::streamsize>(width)),
     m_value(value)
 {
 }
