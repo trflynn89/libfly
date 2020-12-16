@@ -1,5 +1,3 @@
-#include "bench/json/benchmark_json.hpp"
-
 #include "boost/json/src.hpp"
 #include "nlohmann/json.hpp"
 
@@ -9,71 +7,71 @@
 #include "fly/types/json/json.hpp"
 #include "test/util/path_util.hpp"
 
+#include <catch2/catch.hpp>
+
 #include <iostream>
 #include <map>
 #include <memory>
 #include <vector>
 
-namespace fly::benchmark {
-
 namespace {
 
-    using JsonTable = fly::benchmark::Table<std::string, double, double>;
+using JsonTable = fly::benchmark::Table<std::string, double, double>;
 
-    class JsonParserBase
+class JsonParserBase
+{
+public:
+    virtual ~JsonParserBase() = default;
+    virtual void parse(const std::filesystem::path &path) = 0;
+};
+
+// libfly - https://github.com/trflynn89/libfly
+class LibflyJsonParser : public JsonParserBase
+{
+public:
+    void parse(const std::filesystem::path &path) override
     {
-    public:
-        virtual ~JsonParserBase() = default;
-        virtual void parse(const std::filesystem::path &path) = 0;
-    };
+        FLY_UNUSED(m_parser.parse_file(path));
+    }
 
-    // libfly - https://github.com/trflynn89/libfly
-    class LibflyJsonParser : public JsonParserBase
+private:
+    fly::JsonParser m_parser;
+};
+
+// Boost.JSON - https://github.com/boostorg/json
+class BoostJsonParser : public JsonParserBase
+{
+public:
+    void parse(const std::filesystem::path &path) override
     {
-    public:
-        void parse(const std::filesystem::path &path) override
-        {
-            FLY_UNUSED(m_parser.parse_file(path));
-        }
+        boost::json::error_code error_code;
+        m_parser.reset();
 
-    private:
-        fly::JsonParser m_parser;
-    };
+        const std::string contents = fly::test::PathUtil::read_file(path);
+        m_parser.write(contents.data(), contents.size(), error_code);
 
-    // Boost.JSON - https://github.com/boostorg/json
-    class BoostJsonParser : public JsonParserBase
+        m_parser.finish(error_code);
+        FLY_UNUSED(m_parser.release());
+    }
+
+private:
+    boost::json::stream_parser m_parser;
+};
+
+// JSON for Modern C++ - https://github.com/nlohmann/json
+class NLohmannJsonParser : public JsonParserBase
+{
+public:
+    void parse(const std::filesystem::path &path) override
     {
-    public:
-        void parse(const std::filesystem::path &path) override
-        {
-            boost::json::error_code error_code;
-            m_parser.reset();
-
-            const std::string contents = fly::test::PathUtil::read_file(path);
-            m_parser.write(contents.data(), contents.size(), error_code);
-
-            m_parser.finish(error_code);
-            FLY_UNUSED(m_parser.release());
-        }
-
-    private:
-        boost::json::stream_parser m_parser;
-    };
-
-    // JSON for Modern C++ - https://github.com/nlohmann/json
-    class NLohmannJsonParser : public JsonParserBase
-    {
-    public:
-        void parse(const std::filesystem::path &path) override
-        {
-            std::ifstream stream(path);
-            FLY_UNUSED(nlohmann::json::parse(stream));
-        }
-    };
+        std::ifstream stream(path);
+        FLY_UNUSED(nlohmann::json::parse(stream));
+    }
+};
 
 } // namespace
 
-void benchmark_json_parsers()
+CATCH_TEST_CASE("JSON", "[bench]")
 {
     static constexpr std::size_t s_iterations = 11;
 
@@ -113,13 +111,12 @@ void benchmark_json_parsers()
             std::sort(results.rbegin(), results.rend());
 
             const auto size = std::filesystem::file_size(file);
-            const auto median = results[s_iterations / 2];
+            const auto duration = results[s_iterations / 2];
+            const auto speed = size / duration / 1024.0 / 1024.0;
 
-            table.append_row(parser.first, median * 1000, size / median / 1024.0 / 1024.0);
+            table.append_row(parser.first, duration * 1000, speed);
         }
 
         std::cout << table << '\n';
     }
 }
-
-} // namespace fly::benchmark
