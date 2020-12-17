@@ -16,9 +16,6 @@ namespace fly {
  */
 class Base64Coder : public Encoder, public Decoder
 {
-    using DecodedChunk = std::array<std::ios::char_type, 3>;
-    using EncodedChunk = std::array<std::ios::char_type, 4>;
-
 protected:
     /**
      * Base64 encode a stream.
@@ -44,30 +41,27 @@ private:
     /**
      * Encode a chunk of data into Base64 symbols.
      *
-     * @param chunk Buffer holding the contents to encode.
-     * @param bytes Number of bytes from the input buffer to encode.
-     * @param encoded Stream to store the encoded contents.
+     * @param decoded Buffer holding the contents to encode.
+     * @param encoded Buffer to store the encoded contents.
      */
-    void encode_chunk(const DecodedChunk &chunk, std::size_t bytes, std::ostream &encoded) const;
+    void encode_chunk(const std::ios::char_type *decoded, std::ios::char_type *encoded) const;
 
     /**
      * Decode a chunk of Base64 symbols.
      *
-     * @param chunk Buffer holding the contents to decode.
-     * @param encoded Stream to store the decoded contents.
+     * @param encoded Buffer holding the contents to decode.
+     * @param decoded Buffer to store the decoded contents.
+     *
+     * @return The number of valid, non-padding symbols decoded.
      */
-    void decode_chunk(EncodedChunk &chunk, std::ostream &decoded) const;
+    std::size_t
+    decode_chunk(const std::ios::char_type *encoded, std::ios::char_type *decoded) const;
 
-    /**
-     * Covert a buffer of Base64 symbols to ASCII codes, validating that each symbol is valid
-     * Base64. Coverts the symbols in place.
-     *
-     * @param chunk Buffer holding the contents to decode.
-     *
-     * @return The number of Base64 padding symbols in the buffer. If an invalid symbol is parsed,
-     *         returns a value as if every symbol was padding.
-     */
-    std::size_t parse_chunk(EncodedChunk &chunk) const;
+    static constexpr const std::size_t s_decoded_chunk_size = 3;
+    static constexpr const std::size_t s_encoded_chunk_size = 4;
+
+    std::array<std::ios::char_type, (64 * s_decoded_chunk_size) << 10> m_decoded;
+    std::array<std::ios::char_type, (64 * s_encoded_chunk_size) << 10> m_encoded;
 };
 
 } // namespace fly
