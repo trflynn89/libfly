@@ -12,8 +12,8 @@ All results below are the median of 11 iterations of encoding and decoding the e
 
 | Direction | Duration (ms) | Speed (MB/s) | Ratio (%) |
 | :--       |           --: |          --: |       --: |
-| Encode    |       556.264 |      171.443 |    64.893 |
-| Decode    |       807.207 |       76.668 |   154.099 |
+| Encode    |       548.727 |      173.798 |    64.893 |
+| Decode    |       809.182 |       76.481 |   154.099 |
 
 ### [Base64 Coder](/fly/coders/base64)
 
@@ -22,8 +22,8 @@ and 3/4 for decoding.
 
 | Direction | Duration (ms) | Speed (MB/s) | Ratio (%) |
 | :--       |           --: |          --: |       --: |
-| Encode    |     1,562.375 |       61.040 |   133.333 |
-| Decode    |     1,779.569 |       71.454 |    75.000 |
+| Encode    |       214.870 |      443.837 |   133.333 |
+| Decode    |       288.017 |      441.490 |    75.000 |
 
 ## Profile
 
@@ -82,14 +82,14 @@ A profile of the Base64 encoder:
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total
  time   seconds   seconds    calls  ms/call  ms/call  name
- 60.00      0.09     0.09 33333334     0.00     0.00  fly::Base64Coder::encode_chunk(std::array<char, 3ul> const&, unsigned long, std::ostream&) const
- 40.00      0.15     0.06        1    60.00   150.00  fly::Base64Coder::encode_internal(std::istream&, std::ostream&)
-  0.00      0.15     0.00     1194     0.00     0.00  std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release()
-  0.00      0.15     0.00     1159     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
-  0.00      0.15     0.00     1009     0.00     0.00  std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::vector(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)
-  0.00      0.15     0.00      140     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose()
-  0.00      0.15     0.00      117     0.00     0.00  void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag)
-  0.00      0.15     0.00       87     0.00     0.00  void fly::detail::BasicStringStreamer<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::stream_char<char>(std::ostream&, char)
+ 81.82      0.09     0.09 33333334     0.00     0.00  fly::Base64Coder::encode_chunk(char const*, char*) const
+ 18.18      0.11     0.02        1    20.00   110.00  fly::Base64Coder::encode_internal(std::istream&, std::ostream&)
+  0.00      0.11     0.00     1194     0.00     0.00  std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release()
+  0.00      0.11     0.00     1159     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+  0.00      0.11     0.00     1009     0.00     0.00  std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::vector(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)
+  0.00      0.11     0.00      140     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose()
+  0.00      0.11     0.00      117     0.00     0.00  void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag)
+  0.00      0.11     0.00       87     0.00     0.00  void fly::detail::BasicStringStreamer<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::stream_char<char>(std::ostream&, char)
 ```
 
 A profile of the Base64 decoder:
@@ -98,13 +98,12 @@ A profile of the Base64 decoder:
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total
  time   seconds   seconds    calls  ms/call  ms/call  name
- 50.00      0.12     0.12 33333334     0.00     0.00  fly::Base64Coder::parse_chunk(std::array<char, 4ul>&) const
- 37.50      0.21     0.09        1    90.00   240.00  fly::Base64Coder::decode_internal(std::istream&, std::ostream&)
- 12.50      0.24     0.03 33333334     0.00     0.00  fly::Base64Coder::decode_chunk(std::array<char, 4ul>&, std::ostream&) const
-  0.00      0.24     0.00     1194     0.00     0.00  std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release()
-  0.00      0.24     0.00     1159     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
-  0.00      0.24     0.00     1009     0.00     0.00  std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::vector(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)
-  0.00      0.24     0.00      140     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose()
-  0.00      0.24     0.00      117     0.00     0.00  void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag)
-  0.00      0.24     0.00       83     0.00     0.00  void fly::detail::BasicStringStreamer<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::stream_char<char>(std::ostream&, char)
+ 72.73      0.08     0.08 33333334     0.00     0.00  fly::Base64Coder::decode_chunk(char const*, char*) const
+ 27.27      0.11     0.03        1    30.00   110.00  fly::Base64Coder::decode_internal(std::istream&, std::ostream&)
+  0.00      0.11     0.00     1194     0.00     0.00  std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release()
+  0.00      0.11     0.00     1159     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+  0.00      0.11     0.00     1009     0.00     0.00  std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::vector(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)
+  0.00      0.11     0.00      140     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose()
+  0.00      0.11     0.00      117     0.00     0.00  void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag)
+  0.00      0.11     0.00       83     0.00     0.00  void fly::detail::BasicStringStreamer<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::stream_char<char>(std::ostream&, char)
 ```
