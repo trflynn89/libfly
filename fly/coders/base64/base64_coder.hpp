@@ -38,25 +38,6 @@ protected:
     bool decode_internal(std::istream &encoded, std::ostream &decoded) override;
 
 private:
-    /**
-     * Encode a chunk of data into Base64 symbols.
-     *
-     * @param decoded Buffer holding the contents to encode.
-     * @param encoded Buffer to store the encoded contents.
-     */
-    void encode_chunk(const std::ios::char_type *decoded, std::ios::char_type *encoded) const;
-
-    /**
-     * Decode a chunk of Base64 symbols.
-     *
-     * @param encoded Buffer holding the contents to decode.
-     * @param decoded Buffer to store the decoded contents.
-     *
-     * @return The number of valid, non-padding symbols decoded.
-     */
-    std::size_t
-    decode_chunk(const std::ios::char_type *encoded, std::ios::char_type *decoded) const;
-
     static constexpr const std::size_t s_decoded_chunk_size = 3;
     static constexpr const std::size_t s_encoded_chunk_size = 4;
 

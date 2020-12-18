@@ -7,6 +7,13 @@
 #include <cctype>
 #include <filesystem>
 
+namespace {
+
+// This must match the size of fly::Base64Coder::m_encoded
+constexpr const std::size_t s_large_string_size = 256 << 10;
+
+} // namespace
+
 CATCH_TEST_CASE("Base64", "[coders]")
 {
     fly::Base64Coder coder;
@@ -61,6 +68,8 @@ CATCH_TEST_CASE("Base64", "[coders]")
 
     CATCH_SECTION("Cannot decode streams with invalid symbols")
     {
+        std::string dec;
+
         for (char ch = 0x00; ch >= 0x00; ++ch)
         {
             if ((ch == '+') || (ch == '/') || (ch == '=') || std::isalnum(ch))
@@ -70,7 +79,6 @@ CATCH_TEST_CASE("Base64", "[coders]")
 
             const std::string test(1, ch);
             const std::string fill("a");
-            std::string dec;
 
             CATCH_CHECK_FALSE(coder.decode_string(test + test + test + test, dec));
             CATCH_CHECK_FALSE(coder.decode_string(test + test + test + fill, dec));
@@ -88,6 +96,9 @@ CATCH_TEST_CASE("Base64", "[coders]")
             CATCH_CHECK_FALSE(coder.decode_string(fill + fill + test + fill, dec));
             CATCH_CHECK_FALSE(coder.decode_string(fill + fill + fill + test, dec));
         }
+
+        // Also ensure the failure is handled in a multi-chunk sized input stream.
+        CATCH_CHECK_FALSE(coder.decode_string("abc^" + std::string(s_large_string_size, 'a'), dec));
     }
 
     CATCH_SECTION("Cannot decode streams with invalid chunk sizes")
@@ -101,6 +112,21 @@ CATCH_TEST_CASE("Base64", "[coders]")
         CATCH_CHECK_FALSE(coder.decode_string("abcde", dec));
         CATCH_CHECK_FALSE(coder.decode_string("abcdef", dec));
         CATCH_CHECK_FALSE(coder.decode_string("abcdefg", dec));
+
+        // Also ensure the failure is handled in a multi-chunk sized input stream.
+        CATCH_CHECK_FALSE(coder.decode_string("abc" + std::string(s_large_string_size, 'a'), dec));
+    }
+
+    CATCH_SECTION("Cannot decode streams with padding in invalid position")
+    {
+        std::string dec;
+
+        CATCH_CHECK_FALSE(coder.decode_string("=abc", dec));
+        CATCH_CHECK_FALSE(coder.decode_string("a=bc", dec));
+        CATCH_CHECK_FALSE(coder.decode_string("ab=c", dec));
+
+        // Also ensure the failure is handled in a multi-chunk sized input stream.
+        CATCH_CHECK_FALSE(coder.decode_string("ab=c" + std::string(s_large_string_size, 'a'), dec));
     }
 
     CATCH_SECTION("Example from Wikipedia: https://en.wikipedia.org/wiki/Base64#Examples")
