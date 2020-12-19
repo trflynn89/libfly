@@ -1,12 +1,13 @@
+#include "test/util/path_util.hpp"
+
 #include "fly/coders/coder_config.hpp"
 #include "fly/coders/huffman/huffman_decoder.hpp"
 #include "fly/coders/huffman/huffman_encoder.hpp"
 #include "fly/types/bit_stream/bit_stream_writer.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
-#include "test/util/path_util.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <cstdint>
 #include <filesystem>

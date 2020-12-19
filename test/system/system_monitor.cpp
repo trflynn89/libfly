@@ -1,11 +1,12 @@
 #include "fly/system/system_monitor.hpp"
 
+#include "test/util/task_manager.hpp"
+
 #include "fly/system/system_config.hpp"
 #include "fly/task/task_manager.hpp"
 #include "fly/types/numeric/literals.hpp"
-#include "test/util/task_manager.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <functional>
 #include <future>

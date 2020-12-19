@@ -1,9 +1,10 @@
 #include "fly/config/config.hpp"
 
-#include "fly/types/json/json.hpp"
 #include "test/config/test_config.hpp"
 
-#include <catch2/catch.hpp>
+#include "fly/types/json/json.hpp"
+
+#include "catch2/catch.hpp"
 
 #include <cstddef>
 

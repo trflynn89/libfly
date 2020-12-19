@@ -2,7 +2,7 @@
 #include "fly/types/concurrency/concurrent_stack.hpp"
 #include "fly/types/numeric/literals.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <atomic>
 #include <chrono>

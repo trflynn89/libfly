@@ -61,11 +61,11 @@ DisableFormat: false
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '^(<|")(fly|test|bench)/'
+  - Regex: '^(<|")(fly)/'
     Priority: 3
-  - Regex: '"[[:alnum:]/_]+\.(h|hh|hpp)"'
+  - Regex: '^(<|")(test|bench)/'
     Priority: 2
-  - Regex: '^(<|")catch2/'
+  - Regex: '"[[:alnum:]/_]+\.(h|hh|hpp)"'
     Priority: 4
   - Regex: '<[[:alnum:]/_]+\.h>'
     Priority: 5

@@ -1,10 +1,11 @@
+#include "test/util/capture_stream.hpp"
+
 #include "fly/fly.hpp"
 #include "fly/logger/logger.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/types/string/string.hpp"
-#include "test/util/capture_stream.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <memory>
 

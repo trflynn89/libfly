@@ -1,6 +1,6 @@
 #include "fly/types/numeric/endian.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <bit>
 #include <cstdint>

@@ -1,13 +1,13 @@
-#include "boost/json/src.hpp"
-#include "nlohmann/json.hpp"
-
 #include "bench/table.hpp"
+#include "test/util/path_util.hpp"
+
 #include "fly/fly.hpp"
 #include "fly/parser/json_parser.hpp"
 #include "fly/types/json/json.hpp"
-#include "test/util/path_util.hpp"
 
-#include <catch2/catch.hpp>
+#include "boost/json/src.hpp"
+#include "catch2/catch.hpp"
+#include "nlohmann/json.hpp"
 
 #include <iostream>
 #include <map>

@@ -1,7 +1,7 @@
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <limits>
 #include <string>

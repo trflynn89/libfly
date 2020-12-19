@@ -1,11 +1,12 @@
 #include "fly/logger/styler.hpp"
 
+#include "test/util/capture_stream.hpp"
+
 #include "fly/fly.hpp"
 #include "fly/traits/traits.hpp"
 #include "fly/types/string/string.hpp"
-#include "test/util/capture_stream.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <iostream>
 #include <sstream>

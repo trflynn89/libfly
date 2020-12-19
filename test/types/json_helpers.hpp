@@ -5,7 +5,7 @@
 #include "fly/types/json/json_exception.hpp"
 #include "fly/types/string/string.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <array>
 #include <deque>

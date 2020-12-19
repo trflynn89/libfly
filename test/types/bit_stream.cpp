@@ -3,7 +3,7 @@
 #include "fly/types/bit_stream/detail/bit_stream_constants.hpp"
 #include "fly/types/numeric/literals.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <limits>
 #include <sstream>

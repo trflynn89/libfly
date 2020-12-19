@@ -1,6 +1,6 @@
 #include "fly/traits/traits.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <sstream>
 #include <variant>

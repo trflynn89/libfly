@@ -1,7 +1,8 @@
-#include "fly/types/json/json.hpp"
 #include "test/types/json_helpers.hpp"
 
-#include <catch2/catch.hpp>
+#include "fly/types/json/json.hpp"
+
+#include "catch2/catch.hpp"
 
 CATCH_JSON_TEST_CASE("JsonModifiers")
 {

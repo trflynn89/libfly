@@ -1,12 +1,13 @@
 #include "bench/table.hpp"
+#include "test/util/path_util.hpp"
+
 #include "fly/coders/base64/base64_coder.hpp"
 #include "fly/coders/coder_config.hpp"
 #include "fly/coders/huffman/huffman_decoder.hpp"
 #include "fly/coders/huffman/huffman_encoder.hpp"
 #include "fly/fly.hpp"
-#include "test/util/path_util.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <iostream>
 

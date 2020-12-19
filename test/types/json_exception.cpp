@@ -2,7 +2,7 @@
 
 #include "fly/types/json/json.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <string>
 
