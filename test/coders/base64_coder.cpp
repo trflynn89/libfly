@@ -2,7 +2,7 @@
 
 #include "test/util/path_util.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <cctype>
 #include <filesystem>

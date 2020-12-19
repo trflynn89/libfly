@@ -1,16 +1,17 @@
 #include "fly/config/config_manager.hpp"
 
-#include "fly/config/config.hpp"
-#include "fly/path/path_config.hpp"
-#include "fly/task/task_manager.hpp"
-#include "fly/types/json/json.hpp"
-#include "fly/types/numeric/literals.hpp"
 #include "test/config/test_config.hpp"
 #include "test/util/path_util.hpp"
 #include "test/util/task_manager.hpp"
 #include "test/util/waitable_task_runner.hpp"
 
-#include <catch2/catch.hpp>
+#include "fly/config/config.hpp"
+#include "fly/path/path_config.hpp"
+#include "fly/task/task_manager.hpp"
+#include "fly/types/json/json.hpp"
+#include "fly/types/numeric/literals.hpp"
+
+#include "catch2/catch.hpp"
 
 #include <filesystem>
 #include <memory>

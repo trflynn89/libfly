@@ -4,7 +4,7 @@
 #include "fly/logger/styler.hpp"
 #include "fly/types/string/string.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 /**
  * A Catch2 test reporter for reporting colorful test and section names to console.

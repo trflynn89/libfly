@@ -1,5 +1,7 @@
 #include "fly/logger/logger.hpp"
 
+#include "test/util/task_manager.hpp"
+
 #include "fly/logger/log_sink.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/task/task_manager.hpp"
@@ -7,9 +9,8 @@
 #include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
-#include "test/util/task_manager.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <limits>
 #include <memory>

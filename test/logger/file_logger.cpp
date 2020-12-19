@@ -1,3 +1,5 @@
+#include "test/util/path_util.hpp"
+
 #include "fly/coders/coder_config.hpp"
 #include "fly/coders/huffman/huffman_decoder.hpp"
 #include "fly/fly.hpp"
@@ -5,13 +7,12 @@
 #include "fly/logger/logger_config.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
-#include "test/util/path_util.hpp"
 
 #if defined(FLY_LINUX)
 #    include "test/mock/mock_system.hpp"
 #endif
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <cstdint>
 #include <filesystem>

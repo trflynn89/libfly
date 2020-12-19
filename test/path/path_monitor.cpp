@@ -1,12 +1,13 @@
 #include "fly/path/path_monitor.hpp"
 
+#include "test/util/task_manager.hpp"
+
 #include "fly/path/path_config.hpp"
 #include "fly/task/task_manager.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/numeric/literals.hpp"
-#include "test/util/task_manager.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <filesystem>
 #include <functional>

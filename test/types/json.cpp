@@ -2,7 +2,7 @@
 
 #include "test/types/json_helpers.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <array>
 #include <deque>

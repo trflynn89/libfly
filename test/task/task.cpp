@@ -1,10 +1,11 @@
-#include "fly/task/task_manager.hpp"
-#include "fly/task/task_runner.hpp"
-#include "fly/types/concurrency/concurrent_queue.hpp"
 #include "test/util/task_manager.hpp"
 #include "test/util/waitable_task_runner.hpp"
 
-#include <catch2/catch.hpp>
+#include "fly/task/task_manager.hpp"
+#include "fly/task/task_runner.hpp"
+#include "fly/types/concurrency/concurrent_queue.hpp"
+
+#include "catch2/catch.hpp"
 
 #include <atomic>
 #include <chrono>

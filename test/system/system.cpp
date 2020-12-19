@@ -1,13 +1,14 @@
 #include "fly/system/system.hpp"
 
-#include "fly/fly.hpp"
 #include "test/util/capture_stream.hpp"
+
+#include "fly/fly.hpp"
 
 #if defined(FLY_LINUX)
 #    include "test/mock/mock_system.hpp"
 #endif
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <csignal>
 #include <string>

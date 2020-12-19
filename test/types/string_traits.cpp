@@ -3,7 +3,7 @@
 #include "fly/traits/traits.hpp"
 #include "fly/types/string/string_literal.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2/catch.hpp"
 
 #include <string>
 #include <type_traits>
