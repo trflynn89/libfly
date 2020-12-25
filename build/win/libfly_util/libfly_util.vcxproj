@@ -165,15 +165,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\bench\stream_util.cpp" />
+    <ClCompile Include="..\..\..\bench\util\stream_util.cpp" />
     <ClCompile Include="..\..\..\test\util\capture_stream.cpp" />
     <ClCompile Include="..\..\..\test\util\path_util.cpp" />
     <ClCompile Include="..\..\..\test\util\task_manager.cpp" />
     <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\bench\stream_util.hpp" />
-    <ClInclude Include="..\..\..\bench\table.hpp" />
+    <ClInclude Include="..\..\..\bench\util\stream_util.hpp" />
+    <ClInclude Include="..\..\..\bench\util\table.hpp" />
     <ClInclude Include="..\..\..\test\util\capture_stream.hpp" />
     <ClInclude Include="..\..\..\test\util\path_util.hpp" />
     <ClInclude Include="..\..\..\test\util\task_manager.hpp" />

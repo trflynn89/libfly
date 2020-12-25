@@ -10,6 +10,7 @@ SRC_DIRS_$(d) := \
     fly/types/bit_stream/detail \
     fly/types/json \
     fly/types/string \
+    bench/util \
     test/util
 
 # Include the directories containing the benchmark tests.
@@ -18,8 +19,7 @@ SRC_DIRS_$(d) += \
     bench/json
 
 SRC_$(d) := \
-    $(d)/main.cpp \
-    $(d)/stream_util.cpp
+    $(d)/main.cpp
 
 CXXFLAGS_$(d) += -I$(SOURCE_ROOT)/test/Catch2/single_include
 CXXFLAGS_$(d) += \

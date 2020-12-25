@@ -1,4 +1,4 @@
-#include "bench/stream_util.hpp"
+#include "bench/util/stream_util.hpp"
 
 namespace fly::benchmark {
 
