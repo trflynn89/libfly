@@ -1,4 +1,4 @@
-#include "bench/table.hpp"
+#include "bench/util/table.hpp"
 #include "test/util/path_util.hpp"
 
 #include "fly/coders/base64/base64_coder.hpp"

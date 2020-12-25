@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bench/stream_util.hpp"
+#include "bench/util/stream_util.hpp"
 
 #include "fly/logger/styler.hpp"
 #include "fly/types/numeric/literals.hpp"
