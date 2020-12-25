@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="coders">
+      <UniqueIdentifier>{1c950426-e61d-4c3d-bc00-05bb72f98dc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="json">
+      <UniqueIdentifier>{7218181a-1f6f-418e-9e43-8d00be882e22}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\bench\main.cpp" />
+    <ClCompile Include="..\..\..\bench\coders\benchmark_coders.cpp">
+      <Filter>coders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\bench\json\benchmark_json.cpp">
+      <Filter>json</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
