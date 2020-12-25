@@ -10,6 +10,7 @@
 #include <cmath>
 #include <iomanip>
 #include <locale>
+#include <numeric>
 #include <ostream>
 #include <tuple>
 #include <type_traits>

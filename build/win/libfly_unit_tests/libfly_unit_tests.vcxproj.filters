@@ -31,9 +31,6 @@
     <Filter Include="types">
       <UniqueIdentifier>{3120a3ba-5fe5-417c-9e5f-33d9537560d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="util">
-      <UniqueIdentifier>{fd334c96-5889-4f05-adac-3a0420db077e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\test\main.cpp" />
@@ -142,18 +139,6 @@
     <ClCompile Include="..\..\..\test\types\string_unicode.cpp">
       <Filter>types</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\util\capture_stream.cpp">
-      <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\util\path_util.cpp">
-      <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\util\task_manager.cpp">
-      <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp">
-      <Filter>util</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\config\test_config.hpp">
@@ -161,18 +146,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\test\types\json_helpers.hpp">
       <Filter>types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\test\util\capture_stream.hpp">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\test\util\path_util.hpp">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\test\util\task_manager.hpp">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\test\util\waitable_task_runner.hpp">
-      <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

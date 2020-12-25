@@ -199,6 +199,9 @@
     <ProjectReference Include="..\libfly\libfly.vcxproj">
       <Project>{448893a1-77da-46f1-b951-7eda72d49fe9}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\libfly_util\libfly_util.vcxproj">
+      <Project>{e18789f2-fef0-48bc-8f8d-aa9a7b6e6885}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\test\main.cpp" />
@@ -237,18 +240,10 @@
     <ClCompile Include="..\..\..\test\types\string_formatter.cpp" />
     <ClCompile Include="..\..\..\test\types\string_traits.cpp" />
     <ClCompile Include="..\..\..\test\types\string_unicode.cpp" />
-    <ClCompile Include="..\..\..\test\util\capture_stream.cpp" />
-    <ClCompile Include="..\..\..\test\util\path_util.cpp" />
-    <ClCompile Include="..\..\..\test\util\task_manager.cpp" />
-    <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\config\test_config.hpp" />
     <ClInclude Include="..\..\..\test\types\json_helpers.hpp" />
-    <ClInclude Include="..\..\..\test\util\capture_stream.hpp" />
-    <ClInclude Include="..\..\..\test\util\path_util.hpp" />
-    <ClInclude Include="..\..\..\test\util\task_manager.hpp" />
-    <ClInclude Include="..\..\..\test\util\waitable_task_runner.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
