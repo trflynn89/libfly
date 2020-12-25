@@ -370,7 +370,8 @@ auto Table<Args...>::column_widths_for_row(const Row &row) -> RowSizedArray<std:
             else
             {
                 const std::size_t negative = value < 0 ? 1 : 0;
-                const std::size_t digits = std::abs(std::log10(std::abs(value))) + 1;
+                const std::size_t digits = static_cast<std::size_t>(
+                    std::abs(static_cast<std::int64_t>(std::log10(std::abs(value)))) + 1);
                 const std::size_t commas = (digits - 1) / 3;
                 const std::size_t decimal = std::is_floating_point_v<T> ? s_precision + 1 : 0;
 
