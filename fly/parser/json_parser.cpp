@@ -3,8 +3,6 @@
 #include "fly/fly.hpp"
 #include "fly/logger/logger.hpp"
 
-#include <string_view>
-
 namespace fly {
 
 #define JLOG(...)                                                                                  \
@@ -263,6 +261,7 @@ std::optional<Json> JsonParser::parse_value()
             break;
     }
 
+    JLOG("Could not convert '%s' to a JSON value", value);
     return std::nullopt;
 }
 
@@ -420,22 +419,21 @@ JsonParser::ParseState JsonParser::consume_comment()
 //==================================================================================================
 JsonParser::NumberType JsonParser::validate_number(const JsonTraits::string_type &value) const
 {
-    const bool is_signed = value[0] == '-';
+    const JsonTraits::StringType::view_type value_view = value;
 
-    const auto signless =
-        std::basic_string_view<JsonTraits::char_type>(value).substr(is_signed ? 1 : 0);
+    const bool is_signed = !value_view.empty() && (value_view[0] == '-');
+    const auto signless = value_view.substr(is_signed ? 1 : 0);
+
+    if (signless.empty())
+    {
+        return NumberType::Invalid;
+    }
 
     const bool is_octal = (signless.size() > 1) && (signless[0] == '0') &&
         std::isdigit(static_cast<unsigned char>(signless[1]));
 
-    if (!std::isdigit(static_cast<unsigned char>(signless[0])))
+    if (!std::isdigit(static_cast<unsigned char>(signless[0])) || is_octal)
     {
-        JLOG("Could not convert '%s' to a number", value);
-        return NumberType::Invalid;
-    }
-    else if (is_octal)
-    {
-        JLOG("Octal value '%s' is not number", value);
         return NumberType::Invalid;
     }
 
@@ -454,7 +452,6 @@ JsonParser::NumberType JsonParser::validate_number(const JsonTraits::string_type
 
         if ((d + 1) >= end)
         {
-            JLOG("Float value '%s' is invalid", value);
             return NumberType::Invalid;
         }
 
