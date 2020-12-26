@@ -14,20 +14,10 @@ jobs:
       - task: VSBuild@1
         inputs:
           solution: 'build\win\libfly.sln'
+          msbuildArgs: /t:libfly_unit_tests
           configuration: ${{ parameters.mode }}
           platform: ${{ parameters.arch }}
           maximumCpuCount: true
-          msbuildArgs: /t:libfly
-        displayName: 'Build'
-
-    - ${{ if eq(parameters.mode, 'Release') }}:
-      - task: VSBuild@1
-        inputs:
-          solution: 'build\win\libfly.sln'
-          configuration: ${{ parameters.mode }}
-          platform: ${{ parameters.arch }}
-          maximumCpuCount: true
-          msbuildArgs: /t:libfly;libfly_unit_tests
         displayName: 'Build'
 
       - task: PowerShell@2
@@ -36,6 +26,16 @@ jobs:
           arguments: -mode ${{ parameters.mode }} -arch ${{ parameters.arch }}
           failOnStderr: false
         displayName: 'Test'
+
+    - ${{ if eq(parameters.mode, 'Release') }}:
+      - task: VSBuild@1
+        inputs:
+          solution: 'build\win\libfly.sln'
+          msbuildArgs: /t:libfly
+          configuration: ${{ parameters.mode }}
+          platform: ${{ parameters.arch }}
+          maximumCpuCount: true
+        displayName: 'Build'
 
       - task: PowerShell@2
         inputs:
