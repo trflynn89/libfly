@@ -120,7 +120,7 @@ CATCH_TEST_CASE("JsonReverseIterator", "[json]")
         CATCH_CHECK_THROWS_BAD_COMPARISON(it1 <= it2, json1, json2);
         CATCH_CHECK_THROWS_BAD_COMPARISON(it1 > it2, json1, json2);
         CATCH_CHECK_THROWS_BAD_COMPARISON(it1 >= it2, json2, json1);
-        CATCH_CHECK_NOTHROW(it1 - it2);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 - it2, json2, json1);
     }
 
     CATCH_SECTION("Check operations that are valid for JSON objects")
@@ -434,8 +434,8 @@ CATCH_TEST_CASE("JsonReverseIterator", "[json]")
         CATCH_CHECK(((json1.rbegin() + 2) - json1.rbegin()) == 2);
         CATCH_CHECK((json1.rbegin() - (json1.rbegin() + 2)) == -2);
 
-        CATCH_CHECK((json2.rbegin() - json1.rbegin()) != 0);
-        CATCH_CHECK((json1.rbegin() - json2.rbegin()) != 0);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(json2.rbegin() - json1.rbegin(), json1, json2);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(json1.rbegin() - json2.rbegin(), json2, json1);
     }
 
     CATCH_SECTION("Validate the JSON key accessor")

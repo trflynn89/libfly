@@ -396,6 +396,7 @@ public:
      * @return The distance between the two iterators.
      *
      * @throws JsonIteratorException If the Json instance is an object.
+     * @throws BadJsonComparisonException If the two iterators are not for the same Json instance.
      * @throws NullJsonException If either iterator is empty.
      */
     difference_type operator-(const JsonIterator &iterator) const;
@@ -794,8 +795,7 @@ auto JsonIterator<JsonType>::operator-(difference_type offset) const -> JsonIter
 template <typename JsonType>
 auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const -> difference_type
 {
-    validate_iterator();
-    iterator.validate_iterator();
+    validate_iterator(iterator);
 
     auto visitor = [this](const auto &it1, const auto &it2) -> difference_type
     {
