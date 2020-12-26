@@ -163,7 +163,7 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK_THROWS_BAD_COMPARISON(it1 <= it2, json2, json1);
         CATCH_CHECK_THROWS_BAD_COMPARISON(it1 > it2, json2, json1);
         CATCH_CHECK_THROWS_BAD_COMPARISON(it1 >= it2, json1, json2);
-        CATCH_CHECK_NOTHROW(it1 - it2);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 - it2, json1, json2);
     }
 
     CATCH_SECTION("Check operations that are valid for JSON objects")
@@ -489,8 +489,8 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK(((json1.begin() + 2) - json1.begin()) == 2);
         CATCH_CHECK((json1.begin() - (json1.begin() + 2)) == -2);
 
-        CATCH_CHECK((json2.begin() - json1.begin()) != 0);
-        CATCH_CHECK((json1.begin() - json2.begin()) != 0);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(json2.begin() - json1.begin(), json2, json1);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(json1.begin() - json2.begin(), json1, json2);
     }
 
     CATCH_SECTION("Validate the JSON key accessor")
