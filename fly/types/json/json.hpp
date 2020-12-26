@@ -314,12 +314,6 @@ public:
     Json(std::initializer_list<Json> initializer) noexcept;
 
     /**
-     * Destructor. Iteratively destroy nested Json instances to alleviate stack overflow on
-     * destruction of deeply-nested Json objects and arrays.
-     */
-    ~Json();
-
-    /**
      * Copy assignment operator. Intializes the Json instance with the type and value of another
      * Json instance, using the copy-and-swap idiom.
      *
