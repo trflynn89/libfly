@@ -55,52 +55,6 @@ Json::Json(std::initializer_list<Json> initializer) noexcept : m_value()
 }
 
 //==================================================================================================
-Json::~Json()
-{
-    std::vector<Json> stack;
-
-    auto maybe_add_to_stack = [&stack](Json &&json)
-    {
-        if (json.is_object() || json.is_array())
-        {
-            stack.push_back(std::move(json));
-        }
-    };
-
-    auto visitor = [&stack, &maybe_add_to_stack](auto &&storage) noexcept
-    {
-        using S = std::decay_t<decltype(storage)>;
-
-        if constexpr (any_same_v<S, JsonTraits::object_type, JsonTraits::array_type>)
-        {
-            stack.reserve(stack.size() + storage.size());
-
-            for (auto &&child : storage)
-            {
-                if constexpr (JsonTraits::is_object_v<S>)
-                {
-                    maybe_add_to_stack(std::move(child.second));
-                }
-                else
-                {
-                    maybe_add_to_stack(std::move(child));
-                }
-            }
-        }
-    };
-
-    std::visit(visitor, std::move(m_value));
-
-    while (!stack.empty())
-    {
-        Json json(std::move(stack.back()));
-        stack.pop_back();
-
-        std::visit(visitor, std::move(json.m_value));
-    }
-}
-
-//==================================================================================================
 Json::reference Json::operator=(Json json) noexcept
 {
     m_value = std::move(json.m_value);
