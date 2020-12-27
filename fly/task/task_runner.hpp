@@ -60,7 +60,7 @@ class TaskManager;
  *
  * Mismatching of task result types and reply parameter types is explicitly forbidden at compile
  * time. Tasks that return a non-void result must be paired with a reply which is invocable with
- * only that type. Tasks which return void must be paired with a task that is invocable without
+ * only that type. Tasks which return void must be paired with a reply that is invocable without
  * arguments.
  *
  * Reply tasks are not executed immediately after a task is complete. Rather, they are posted for
