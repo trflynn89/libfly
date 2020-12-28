@@ -795,18 +795,18 @@ StringType BasicString<StringType>::generate_random_string(size_type length)
     constexpr auto limit = static_cast<short_distribution::result_type>(s_alpha_num_length - 1);
     static_assert(limit > 0);
 
-    short_distribution distribution(0, limit);
+    static thread_local const auto now = std::chrono::system_clock::now().time_since_epoch();
+    static thread_local const auto seed = static_cast<std::mt19937::result_type>(now.count());
 
-    const auto now = std::chrono::system_clock::now().time_since_epoch();
-    const auto seed = static_cast<std::mt19937::result_type>(now.count());
-    std::mt19937 engine(seed);
+    static thread_local std::mt19937 engine(seed);
+    short_distribution distribution(0, limit);
 
     StringType result;
     result.reserve(length);
 
     while (length-- != 0)
     {
-        result += s_alpha_num[distribution(engine)];
+        result.push_back(s_alpha_num[distribution(engine)]);
     }
 
     return result;
