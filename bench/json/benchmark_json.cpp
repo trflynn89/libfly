@@ -81,7 +81,8 @@ CATCH_TEST_CASE("JSON", "[bench]")
     static std::vector<std::filesystem::path> s_test_files {
         root / "test" / "parser" / "json" / "unicode" / "all_unicode.json",
         here / "data" / "canada.json",
-        here / "data" / "gsoc-2018.json"};
+        here / "data" / "gsoc-2018.json",
+    };
 
     std::map<std::string, std::unique_ptr<JsonParserBase>> parsers;
     parsers.emplace("boost", std::make_unique<BoostJsonParser>());
