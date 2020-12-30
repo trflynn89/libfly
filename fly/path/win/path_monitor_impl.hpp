@@ -4,6 +4,7 @@
 
 #include <Windows.h>
 
+#include <array>
 #include <chrono>
 #include <filesystem>
 #include <memory>
@@ -14,8 +15,8 @@ class PathConfig;
 class SequencedTaskRunner;
 
 /**
- * Windows implementation of the PathMonitor interface. Uses an IOCP with the ReadDirectoryChangesW
- * API to detect path changes.
+ * Windows implementation of the PathMonitor interface. Uses the ReadDirectoryChangesW API to detect
+ * path changes.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 19, 2017
@@ -24,28 +25,20 @@ class PathMonitorImpl : public PathMonitor
 {
 public:
     /**
-     * Constructor. Create the path monitor's IOCP.
+     * Constructor.
      */
     PathMonitorImpl(
         const std::shared_ptr<SequencedTaskRunner> &task_runner,
         const std::shared_ptr<PathConfig> &config) noexcept;
 
-    /**
-     * Destructor. Close the path monitor's IOCP.
-     */
-    ~PathMonitorImpl() override;
-
 protected:
     /**
-     * Check if the path monitor's IOCP was successfully created.
-     *
-     * @return True if the IOCP is valid.
+     * @return True.
      */
     bool is_valid() const override;
 
     /**
-     * Check if the path monitor's IOCP has any posted completions, and handle any that have been
-     * posted.
+     * Check the overlapped result of all monitored paths and handle any that have been posted.
      *
      * @param timeout Max time allowed to wait for a completion to be posted.
      */
@@ -62,7 +55,7 @@ private:
      */
     struct PathInfoImpl : public PathMonitor::PathInfo
     {
-        PathInfoImpl(HANDLE iocp, const std::filesystem::path &path) noexcept;
+        explicit PathInfoImpl(const std::filesystem::path &path) noexcept;
         ~PathInfoImpl() override;
 
         /**
@@ -72,16 +65,16 @@ private:
 
         /**
          * Call the ReadDirectoryChangesW API for this path. Should be called after initialization
-         * and each time an IOCP completion occurs for this path.
+         * and each time an overlapped completion occurs for this path.
          *
          * @param path Name of the monitored path.
          */
         bool refresh(const std::filesystem::path &path);
 
-        bool m_valid;
-        HANDLE m_handle;
-        OVERLAPPED m_overlapped;
-        PFILE_NOTIFY_INFORMATION m_file_info;
+        bool m_valid {false};
+        HANDLE m_handle {INVALID_HANDLE_VALUE};
+        OVERLAPPED m_overlapped {};
+        std::array<FILE_NOTIFY_INFORMATION, 128> m_file_info;
     };
 
     /**
@@ -100,8 +93,6 @@ private:
      * @return A PathEvent that matches the given event.
      */
     PathMonitor::PathEvent convert_to_event(DWORD action) const;
-
-    HANDLE m_iocp;
 };
 
 } // namespace fly
