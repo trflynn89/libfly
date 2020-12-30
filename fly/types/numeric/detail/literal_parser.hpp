@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <limits>
 #include <type_traits>
 
@@ -20,7 +21,7 @@ struct Aggregator;
 template <typename T, T Base, char Digit, char... Literals>
 struct Aggregator<T, Base, Digit, Literals...>
 {
-    constexpr static T aggregate(T aggregated)
+    static constexpr T aggregate(T aggregated)
     {
         return Aggregator<T, Base, Literals...>::aggregate(
             aggregated * Base + parse_and_validate_literal());
@@ -33,7 +34,7 @@ private:
      *
      * @return The result of conversion.
      */
-    constexpr static T parse_and_validate_literal()
+    static constexpr T parse_and_validate_literal()
     {
         constexpr bool literal_is_valid_for_base =
             ((Base == 2) && ((Digit >= '0') && (Digit <= '1'))) ||
@@ -64,7 +65,7 @@ private:
 template <typename T, T Base, char... Literals>
 struct Aggregator<T, Base, '\'', Literals...>
 {
-    constexpr static T aggregate(T aggregated)
+    static constexpr T aggregate(T aggregated)
     {
         return Aggregator<T, Base, Literals...>::aggregate(aggregated);
     }
@@ -74,7 +75,7 @@ struct Aggregator<T, Base, '\'', Literals...>
 template <typename T, T Base>
 struct Aggregator<T, Base>
 {
-    constexpr static T aggregate(T aggregated)
+    static constexpr T aggregate(T aggregated)
     {
         return aggregated;
     }
@@ -164,16 +165,8 @@ constexpr To validate_and_convert()
 template <typename T, char... Literals>
 constexpr T literal()
 {
-    if constexpr (std::is_signed_v<T>)
-    {
-        constexpr auto value = Parser<long long, Literals...>::parse();
-        return validate_and_convert<decltype(value), T, value>();
-    }
-    else
-    {
-        constexpr auto value = Parser<unsigned long long, Literals...>::parse();
-        return validate_and_convert<decltype(value), T, value>();
-    }
+    using ValueType = std::conditional_t<std::is_signed_v<T>, std::intmax_t, std::uintmax_t>;
+    return validate_and_convert<ValueType, T, Parser<ValueType, Literals...>::parse()>();
 }
 
 } // namespace fly::detail
