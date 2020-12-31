@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/traits/traits.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/string_literal.hpp"
 
@@ -7,7 +8,6 @@
 #include <functional>
 #include <optional>
 #include <string>
-#include <type_traits>
 
 namespace fly::detail {
 
@@ -182,7 +182,7 @@ private:
     template <
         typename IteratorType,
         typename CharType = char_type,
-        std::enable_if_t<(sizeof(CharType) == 1), bool> = 0>
+        enable_if<size_of_type_is<CharType, 1>> = 0>
     static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
 
     /**
@@ -198,7 +198,7 @@ private:
     template <
         typename IteratorType,
         typename CharType = char_type,
-        std::enable_if_t<(sizeof(CharType) == 2), bool> = 0>
+        enable_if<size_of_type_is<CharType, 2>> = 0>
     static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
 
     /**
@@ -214,7 +214,7 @@ private:
     template <
         typename IteratorType,
         typename CharType = char_type,
-        std::enable_if_t<(sizeof(CharType) == 4), bool> = 0>
+        enable_if<size_of_type_is<CharType, 4>> = 0>
     static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
 
     /**
@@ -224,7 +224,7 @@ private:
      *
      * @return A string containing the encoded Unicode codepoint.
      */
-    template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 1), bool> = 0>
+    template <typename CharType = char_type, enable_if<size_of_type_is<CharType, 1>> = 0>
     static StringType codepoint_to_string(codepoint_type codepoint);
 
     /**
@@ -234,7 +234,7 @@ private:
      *
      * @return A string containing the encoded Unicode codepoint.
      */
-    template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 2), bool> = 0>
+    template <typename CharType = char_type, enable_if<size_of_type_is<CharType, 2>> = 0>
     static StringType codepoint_to_string(codepoint_type codepoint);
 
     /**
@@ -244,7 +244,7 @@ private:
      *
      * @return A string containing the encoded Unicode codepoint.
      */
-    template <typename CharType = char_type, std::enable_if_t<(sizeof(CharType) == 4), bool> = 0>
+    template <typename CharType = char_type, enable_if<size_of_type_is<CharType, 4>> = 0>
     static StringType codepoint_to_string(codepoint_type codepoint);
 
     /**
@@ -561,7 +561,7 @@ auto BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const 
 
 //==================================================================================================
 template <typename StringType>
-template <typename IteratorType, typename CharType, std::enable_if_t<(sizeof(CharType) == 1), bool>>
+template <typename IteratorType, typename CharType, enable_if<size_of_type_is<CharType, 1>>>
 auto BasicStringUnicode<StringType>::codepoint_from_string(
     IteratorType &it,
     const IteratorType &end) -> codepoint_type
@@ -615,7 +615,7 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(
 
 //==================================================================================================
 template <typename StringType>
-template <typename IteratorType, typename CharType, std::enable_if_t<(sizeof(CharType) == 2), bool>>
+template <typename IteratorType, typename CharType, enable_if<size_of_type_is<CharType, 2>>>
 auto BasicStringUnicode<StringType>::codepoint_from_string(
     IteratorType &it,
     const IteratorType &end) -> codepoint_type
@@ -630,7 +630,7 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(
 
 //==================================================================================================
 template <typename StringType>
-template <typename IteratorType, typename CharType, std::enable_if_t<(sizeof(CharType) == 4), bool>>
+template <typename IteratorType, typename CharType, enable_if<size_of_type_is<CharType, 4>>>
 auto BasicStringUnicode<StringType>::codepoint_from_string(
     IteratorType &it,
     const IteratorType &end) -> codepoint_type
@@ -640,7 +640,7 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(
 
 //==================================================================================================
 template <typename StringType>
-template <typename CharType, std::enable_if_t<(sizeof(CharType) == 1), bool>>
+template <typename CharType, enable_if<size_of_type_is<CharType, 1>>>
 StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type codepoint)
 {
     StringType result;
@@ -673,7 +673,7 @@ StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type co
 
 //==================================================================================================
 template <typename StringType>
-template <typename CharType, std::enable_if_t<(sizeof(CharType) == 2), bool>>
+template <typename CharType, enable_if<size_of_type_is<CharType, 2>>>
 StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type codepoint)
 {
     StringType result;
@@ -694,7 +694,7 @@ StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type co
 
 //==================================================================================================
 template <typename StringType>
-template <typename CharType, std::enable_if_t<(sizeof(CharType) == 4), bool>>
+template <typename CharType, enable_if<size_of_type_is<CharType, 4>>>
 StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type codepoint)
 {
     return StringType(1, static_cast<char_type>(codepoint));

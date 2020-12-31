@@ -77,7 +77,7 @@ private:
         typename T,
         typename RealStringType = detail::is_like_supported_string_t<T>,
         typename StreamedType = streamed_type,
-        enable_if_all<std::is_same<RealStringType, StreamedType>> = 0>
+        enable_if<std::is_same<RealStringType, StreamedType>> = 0>
     static void stream_string(ostream_type &ostream, const T &value);
 
     /**
@@ -96,7 +96,7 @@ private:
         typename T,
         typename RealStringType = detail::is_like_supported_string_t<T>,
         typename StreamedType = streamed_type,
-        enable_if_none<std::is_same<RealStringType, StreamedType>> = 0>
+        disable_if<std::is_same<RealStringType, StreamedType>> = 0>
     static void stream_string(ostream_type &ostream, const T &value);
 
     /**
@@ -147,7 +147,7 @@ template <
     typename T,
     typename RealStringType,
     typename StreamedType,
-    enable_if_all<std::is_same<RealStringType, StreamedType>>>
+    enable_if<std::is_same<RealStringType, StreamedType>>>
 void BasicStringStreamer<StringType>::stream_string(ostream_type &ostream, const T &value)
 {
     auto it = value.cbegin();
@@ -170,7 +170,7 @@ template <
     typename T,
     typename RealStringType,
     typename StreamedType,
-    enable_if_none<std::is_same<RealStringType, StreamedType>>>
+    disable_if<std::is_same<RealStringType, StreamedType>>>
 void BasicStringStreamer<StringType>::stream_string(ostream_type &ostream, const T &value)
 {
     auto it = value.cbegin();
