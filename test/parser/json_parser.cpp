@@ -72,11 +72,11 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             const auto file = it.path().filename();
             CATCH_CAPTURE(file);
 
-            if (fly::String::starts_with(file.string(), "pass"))
+            if (file.string().starts_with("pass"))
             {
                 CATCH_CHECK(parser.parse_file(it.path()).has_value());
             }
-            else if (fly::String::starts_with(file.string(), "fail"))
+            else if (file.string().starts_with("fail"))
             {
                 CATCH_CHECK_FALSE(parser.parse_file(it.path()).has_value());
             }
@@ -124,15 +124,15 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             const auto file = it.path().filename();
             CATCH_CAPTURE(file);
 
-            if (fly::String::starts_with(file.string(), 'y'))
+            if (file.string().starts_with('y'))
             {
                 CATCH_CHECK(type_parser.parse_file(it.path()).has_value());
             }
-            else if (fly::String::starts_with(file.string(), 'n'))
+            else if (file.string().starts_with('n'))
             {
                 CATCH_CHECK_FALSE(type_parser.parse_file(it.path()).has_value());
             }
-            else if (fly::String::starts_with(file.string(), 'i'))
+            else if (file.string().starts_with('i'))
             {
                 if (std::find(i_pass.begin(), i_pass.end(), file) != i_pass.end())
                 {

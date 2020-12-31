@@ -110,7 +110,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
     CATCH_SECTION("Valid logger file paths should be created after creating logger")
     {
         std::filesystem::path log_file = find_log_file(path);
-        CATCH_CHECK(fly::String::starts_with(log_file.string(), path().string()));
+        CATCH_CHECK(log_file.string().starts_with(path().string()));
 
         CATCH_REQUIRE(std::filesystem::exists(log_file));
     }

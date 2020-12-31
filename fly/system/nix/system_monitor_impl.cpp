@@ -42,7 +42,7 @@ void SystemMonitorImpl::update_system_cpu_count()
     {
         contents += line + "\\n";
 
-        if (String::starts_with(line, "cpu"))
+        if (line.starts_with("cpu"))
         {
             if ((line.size() > 3) && (line[3] != ' '))
             {
