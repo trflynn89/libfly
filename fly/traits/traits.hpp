@@ -107,6 +107,16 @@ template <typename T, typename A, typename... As>
 inline constexpr bool any_same_v = any_same<T, A, As...>::value;
 
 /**
+ * Trait for testing if the size of a given type is the provided size.
+ */
+template <typename T, std::size_t Size>
+using size_of_type_is = std::bool_constant<sizeof(T) == Size>;
+
+template <typename T, std::size_t Size>
+// NOLINTNEXTLINE(readability-identifier-naming)
+inline constexpr bool size_of_type_is_v = size_of_type_is<T, Size>::value;
+
+/**
  * Overloaded visitation pattern for std::visit. Allows providing a variadic list of lambdas for
  * overload resolution in a call to std::visit. Example:
  *
