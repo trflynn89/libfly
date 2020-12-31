@@ -128,14 +128,6 @@ struct BasicStringTraits
     inline static constexpr bool is_string_like_v = is_string_like<T>::value;
 
     /**
-     * Define a trait for testing if the STL has defined the std::stoi family of functions for
-     * StringType.
-     */
-    using has_stoi_family = any_same<StringType, std::string, std::wstring>;
-
-    inline static constexpr bool has_stoi_family_v = has_stoi_family::value;
-
-    /**
      * Define a trait for whether operator<< is defined for a type on the stream type used for
      * StringType.
      */

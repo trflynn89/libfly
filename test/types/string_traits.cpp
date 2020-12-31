@@ -87,23 +87,6 @@ constexpr bool is_string_like(const T &)
     return false;
 }
 
-template <
-    typename StringType,
-    fly::enable_if_all<typename fly::detail::BasicStringTraits<StringType>::has_stoi_family> = 0>
-constexpr int call_stoi(const StringType &str)
-{
-    return std::stoi(str);
-}
-
-template <
-    typename StringType,
-    fly::enable_if_not_all<typename fly::detail::BasicStringTraits<StringType>::has_stoi_family> =
-        0>
-constexpr int call_stoi(const StringType &)
-{
-    return -1;
-}
-
 } // namespace
 
 CATCH_TEMPLATE_TEST_CASE(
@@ -127,27 +110,6 @@ CATCH_TEMPLATE_TEST_CASE(
     constexpr bool is_string8 = std::is_same_v<StringType, std::u8string>;
     constexpr bool is_string16 = std::is_same_v<StringType, std::u16string>;
     constexpr bool is_string32 = std::is_same_v<StringType, std::u32string>;
-
-    CATCH_SECTION("Check whether the STL defines the std::stoi family of functions via traits")
-    {
-        CATCH_CHECK(traits::has_stoi_family_v == (is_string || is_wstring));
-    }
-
-    CATCH_SECTION(
-        "Check whether the STL defines the std::stoi family of functions via SFINAE overloads")
-    {
-        const StringType s = FLY_STR(char_type, "123");
-        const int i = call_stoi(s);
-
-        if constexpr (is_string || is_wstring)
-        {
-            CATCH_CHECK(i == 123);
-        }
-        else
-        {
-            CATCH_CHECK(i == -1);
-        }
-    }
 
     CATCH_SECTION("Check whether types are supported strings via traits")
     {

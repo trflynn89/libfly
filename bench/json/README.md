@@ -23,17 +23,17 @@ could use some work :)
 
 | Parser   | Duration (ms) | Speed (MB/s) |
 | :--      |           --: |          --: |
-| libfly   |        93.639 |       22.926 |
-| boost    |        11.822 |      181.592 |
-| nlohmann |        54.645 |       39.285 |
+| libfly   |        88.977 |       24.127 |
+| boost    |        11.938 |      179.822 |
+| nlohmann |        54.969 |       39.054 |
 
 ### [gsoc-2018.json](/bench/json/data/gsoc-2018.json)
 
 | Parser   | Duration (ms) | Speed (MB/s) |
 | :--      |           --: |          --: |
-| libfly   |        42.389 |       74.869 |
-| boost    |        14.014 |      226.463 |
-| nlohmann |        33.634 |       94.359 |
+| libfly   |        41.520 |       76.437 |
+| boost    |        14.111 |      224.903 |
+| nlohmann |        32.927 |       96.386 |
 
 ## Profile
 
