@@ -5,52 +5,62 @@
 namespace fly {
 
 /**
+ * Wrapper around std::enable_if for testing that a single conditions is true. Example:
+ *
+ *     template <typename T, fly::enable_if<std::is_class_v<T>> = 0>
+ *     void func(const T &) { }
+ */
+template <typename Condition>
+using enable_if = std::enable_if_t<Condition::value, bool>;
+
+/**
+ * Wrapper around std::enable_if for testing that a single conditions is false. Example:
+ *
+ *     template <typename T, fly::enable_if<std::is_class_v<T>> = 0>
+ *     void func(const T &) { }
+ */
+template <typename Condition>
+using disable_if = std::enable_if_t<std::negation_v<Condition>, bool>;
+
+/**
  * Wrapper around std::enable_if for testing that all conditions in a sequence of traits are true.
  * Example:
  *
- *     template <
- *         typename T,
- *         fly::enable_if_all<std::is_class<T>, std::is_empty<T>> = 0>
+ *     template <typename T, fly::enable_if_all<std::is_class<T>, std::is_empty<T>> = 0>
  *     void func(const T &) { }
  */
 template <typename... Conditions>
-using enable_if_all = std::enable_if_t<std::conjunction_v<Conditions...>, bool>;
+using enable_if_all = enable_if<std::conjunction<Conditions...>>;
 
 /**
  * Wrapper around std::enable_if for testing that any condition in a sequence of traits is true.
  * Example:
  *
- *     template <
- *         typename T,
- *         fly::enable_if_any<std::is_class<T>, std::is_empty<T>> = 0>
+ *     template <typename T, fly::enable_if_any<std::is_class<T>, std::is_empty<T>> = 0>
  *     void func(const T &) { }
  */
 template <typename... Conditions>
-using enable_if_any = std::enable_if_t<std::disjunction_v<Conditions...>, bool>;
+using enable_if_any = enable_if<std::disjunction<Conditions...>>;
 
 /**
  * Wrapper around std::enable_if for testing that all conditions in a sequence of traits are false.
  * Example:
  *
- *     template <
- *         typename T,
- *         fly::enable_if_none<std::is_class<T>, std::is_empty<T>> = 0>
+ *     template <typename T, fly::enable_if_none<std::is_class<T>, std::is_empty<T>> = 0>
  *     void func(const T &) { }
  */
 template <typename... Conditions>
-using enable_if_none = std::enable_if_t<std::negation_v<std::disjunction<Conditions...>>, bool>;
+using enable_if_none = enable_if<std::negation<std::disjunction<Conditions...>>>;
 
 /**
  * Wrapper around std::enable_if for testing that any condition in a sequence of traits is false.
  * Example:
  *
- *     template <
- *         typename T,
- *         fly::enable_if_not_all<std::is_class<T>, std::is_empty<T>> = 0>
+ *     template <typename T, fly::enable_if_not_all<std::is_class<T>, std::is_empty<T>> = 0>
  *     void func(const T &) { }
  */
 template <typename... Conditions>
-using enable_if_not_all = std::enable_if_t<std::negation_v<std::conjunction<Conditions...>>, bool>;
+using enable_if_not_all = enable_if<std::negation<std::conjunction<Conditions...>>>;
 
 /**
  * Wrapper around std::is_same for testing that all types in a sequence of types are the same as a
@@ -145,14 +155,10 @@ visitation(Ts...) -> visitation<Ts...>;
  * Which may be used as SFINAE tests to, e.g., define a function depending on whether or not Foo()
  * is declared for a type:
  *
- *     template <
- *         typename T,
- *         fly::enable_if_all<FooTraits::is_declared<T>> = 0>
+ *     template <typename T, fly::enable_if_all<FooTraits::is_declared<T>> = 0>
  *     void foo_wrapper(const T &arg) { arg.Foo(); }
  *
- *     template <
- *         typename T,
- *         fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
+ *     template <typename T, fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
  *     void foo_wrapper(const T &) { }
  *
  * Or in a constexpr-if expression:

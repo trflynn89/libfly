@@ -83,9 +83,22 @@ bool is_streamable(std::ostream &, const T &)
 }
 
 //==================================================================================================
+template <typename T, fly::enable_if<std::is_class<std::remove_pointer_t<T>>> = 0>
+bool is_class(const T &)
+{
+    return true;
+}
+
+template <typename T, fly::disable_if<std::is_class<std::remove_pointer_t<T>>> = 0>
+bool is_class(const T &)
+{
+    return false;
+}
+
+//==================================================================================================
 template <
     typename T,
-    fly::enable_if_all<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>>...>
+    fly::enable_if_all<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>> = 0>
 bool is_class_pointer(const T &)
 {
     return true;
@@ -93,7 +106,7 @@ bool is_class_pointer(const T &)
 
 template <
     typename T,
-    fly::enable_if_not_all<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>>...>
+    fly::enable_if_not_all<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>> = 0>
 bool is_class_pointer(const T &)
 {
     return false;
@@ -102,7 +115,7 @@ bool is_class_pointer(const T &)
 //==================================================================================================
 template <
     typename T,
-    fly::enable_if_any<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>>...>
+    fly::enable_if_any<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>> = 0>
 bool is_class_or_pointer(const T &)
 {
     return true;
@@ -110,7 +123,7 @@ bool is_class_or_pointer(const T &)
 
 template <
     typename T,
-    fly::enable_if_none<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>>...>
+    fly::enable_if_none<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>> = 0>
 bool is_class_or_pointer(const T &)
 {
     return false;
@@ -160,6 +173,28 @@ CATCH_TEST_CASE("Traits", "[traits]")
         CATCH_CHECK_FALSE(OstreamTraits::is_declared_v<FooClass>);
         CATCH_CHECK(stream.str() == std::string());
         stream.str(std::string());
+    }
+
+    CATCH_SECTION("Combination of traits for enable_if and disable_if")
+    {
+        const FooClass fc;
+        const std::string str("a");
+
+        int i = 0;
+        bool b = false;
+        float f = 3.14159f;
+
+        CATCH_CHECK(is_class(fc));
+        CATCH_CHECK(is_class(str));
+        CATCH_CHECK(is_class(&fc));
+        CATCH_CHECK(is_class(&str));
+
+        CATCH_CHECK_FALSE(is_class(i));
+        CATCH_CHECK_FALSE(is_class(b));
+        CATCH_CHECK_FALSE(is_class(f));
+        CATCH_CHECK_FALSE(is_class(&i));
+        CATCH_CHECK_FALSE(is_class(&b));
+        CATCH_CHECK_FALSE(is_class(&f));
     }
 
     CATCH_SECTION("Combination of traits for enable_if_all and enable_if_not_all")
