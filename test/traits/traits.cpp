@@ -241,7 +241,7 @@ CATCH_TEST_CASE("Traits", "[traits]")
         CATCH_CHECK(is_class_or_pointer(&f));
     }
 
-    CATCH_SECTION("Variadic all_same trait")
+    CATCH_SECTION("Trait: all_same")
     {
         CATCH_CHECK(fly::all_same_v<int, int>);
         CATCH_CHECK(fly::all_same_v<int, const int>);
@@ -279,7 +279,7 @@ CATCH_TEST_CASE("Traits", "[traits]")
         CATCH_CHECK_FALSE(fly::all_same_v<FooClass, FooClass, std::string>);
     }
 
-    CATCH_SECTION("Variadic any_same trait")
+    CATCH_SECTION("Trait: any_same")
     {
         CATCH_CHECK(fly::any_same_v<int, int>);
         CATCH_CHECK(fly::any_same_v<int, const int>);
@@ -318,6 +318,21 @@ CATCH_TEST_CASE("Traits", "[traits]")
         CATCH_CHECK_FALSE(fly::any_same_v<int *, int>);
         CATCH_CHECK_FALSE(fly::any_same_v<bool, char>);
         CATCH_CHECK_FALSE(fly::any_same_v<FooClass, std::string>);
+    }
+
+    CATCH_SECTION("Trait: size_of_type_is")
+    {
+        CATCH_CHECK(fly::size_of_type_is_v<int, sizeof(int)>);
+        CATCH_CHECK(fly::size_of_type_is_v<bool, sizeof(bool)>);
+        CATCH_CHECK(fly::size_of_type_is_v<FooClass, sizeof(FooClass)>);
+
+        CATCH_CHECK_FALSE(fly::size_of_type_is_v<int, sizeof(int) - 1>);
+        CATCH_CHECK_FALSE(fly::size_of_type_is_v<bool, sizeof(bool) - 1>);
+        CATCH_CHECK_FALSE(fly::size_of_type_is_v<FooClass, sizeof(FooClass) - 1>);
+
+        CATCH_CHECK_FALSE(fly::size_of_type_is_v<int, sizeof(int) + 1>);
+        CATCH_CHECK_FALSE(fly::size_of_type_is_v<bool, sizeof(bool) + 1>);
+        CATCH_CHECK_FALSE(fly::size_of_type_is_v<FooClass, sizeof(FooClass) + 1>);
     }
 
     CATCH_SECTION("Overloaded visitation pattern")
