@@ -136,46 +136,6 @@ public:
     static void remove_all(StringType &target, const StringType &search);
 
     /**
-     * Check if a string begins with a character.
-     *
-     * @param source The string to check.
-     * @param search The beginning to search for.
-     *
-     * @return True if the string begins with the search character.
-     */
-    static bool starts_with(const StringType &source, const char_type &search);
-
-    /**
-     * Check if a string begins with another string.
-     *
-     * @param source The string to check.
-     * @param search The beginning to search for.
-     *
-     * @return True if the string begins with the search string.
-     */
-    static bool starts_with(const StringType &source, const StringType &search);
-
-    /**
-     * Check if a string ends with a character.
-     *
-     * @param source The string to check.
-     * @param search The ending to search for.
-     *
-     * @return True if the string ends with the search character.
-     */
-    static bool ends_with(const StringType &source, const char_type &search);
-
-    /**
-     * Check if a string ends with another string.
-     *
-     * @param source The string to check.
-     * @param search The ending to search for.
-     *
-     * @return True if the string ends with the search string.
-     */
-    static bool ends_with(const StringType &source, const StringType &search);
-
-    /**
      * Check if a string matches another string with wildcard expansion.
      *
      * @param source The source string to match against.
@@ -568,70 +528,6 @@ void BasicString<StringType>::remove_all(StringType &target, const StringType &s
 
 //==================================================================================================
 template <typename StringType>
-bool BasicString<StringType>::starts_with(const StringType &source, const char_type &search)
-{
-    bool result = false;
-
-    if (!source.empty())
-    {
-        result = source[0] == search;
-    }
-
-    return result;
-}
-
-//==================================================================================================
-template <typename StringType>
-bool BasicString<StringType>::starts_with(const StringType &source, const StringType &search)
-{
-    bool result = false;
-
-    const size_type source_sz = source.size();
-    const size_type search_sz = search.size();
-
-    if (source_sz >= search_sz)
-    {
-        result = source.compare(0, search_sz, search) == 0;
-    }
-
-    return result;
-}
-
-//==================================================================================================
-template <typename StringType>
-bool BasicString<StringType>::ends_with(const StringType &source, const char_type &search)
-{
-    bool result = false;
-
-    const size_type source_sz = source.size();
-
-    if (source_sz > 0)
-    {
-        result = source[source_sz - 1] == search;
-    }
-
-    return result;
-}
-
-//==================================================================================================
-template <typename StringType>
-bool BasicString<StringType>::ends_with(const StringType &source, const StringType &search)
-{
-    bool result = false;
-
-    const size_type source_sz = source.size();
-    const size_type search_sz = search.size();
-
-    if (source_sz >= search_sz)
-    {
-        result = source.compare(source_sz - search_sz, search_sz, search) == 0;
-    }
-
-    return result;
-}
-
-//==================================================================================================
-template <typename StringType>
 bool BasicString<StringType>::wildcard_match(const StringType &source, const StringType &search)
 {
     static constexpr char_type s_wildcard = '*';
@@ -644,11 +540,11 @@ bool BasicString<StringType>::wildcard_match(const StringType &source, const Str
     {
         if (result && (search.front() != s_wildcard))
         {
-            result = starts_with(source, segments.front());
+            result = source.starts_with(segments.front());
         }
         if (result && (search.back() != s_wildcard))
         {
-            result = ends_with(source, segments.back());
+            result = source.ends_with(segments.back());
         }
 
         for (auto it = segments.begin(); result && (it != segments.end()); ++it)
@@ -795,10 +691,10 @@ StringType BasicString<StringType>::generate_random_string(size_type length)
     constexpr auto limit = static_cast<short_distribution::result_type>(s_alpha_num_length - 1);
     static_assert(limit > 0);
 
-    static thread_local const auto now = std::chrono::system_clock::now().time_since_epoch();
-    static thread_local const auto seed = static_cast<std::mt19937::result_type>(now.count());
+    static thread_local const auto s_now = std::chrono::system_clock::now().time_since_epoch();
+    static thread_local const auto s_seed = static_cast<std::mt19937::result_type>(s_now.count());
 
-    static thread_local std::mt19937 engine(seed);
+    static thread_local std::mt19937 s_engine(s_seed);
     short_distribution distribution(0, limit);
 
     StringType result;
@@ -806,7 +702,7 @@ StringType BasicString<StringType>::generate_random_string(size_type length)
 
     while (length-- != 0)
     {
-        result.push_back(s_alpha_num[distribution(engine)]);
+        result.push_back(s_alpha_num[distribution(s_engine)]);
     }
 
     return result;

@@ -118,7 +118,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_CHECK(log.m_index == i);
             CATCH_CHECK(log.m_level == expected_level);
             CATCH_CHECK(log.m_time >= last_time);
-            CATCH_CHECK(fly::String::starts_with(log.m_message, expected_messages[i]));
+            CATCH_CHECK(log.m_message.starts_with(expected_messages[i]));
 
             if (expected_function != nullptr)
             {

@@ -22,7 +22,7 @@ std::optional<Json> IniParser::parse_internal()
     {
         String::trim(data);
 
-        if (data.empty() || String::starts_with(data, ';'))
+        if (data.empty() || data.starts_with(';'))
         {
             // Ignore comments and blank lines.
             continue;
@@ -164,8 +164,8 @@ IniParser::TrimResult IniParser::trim_value(std::string &str, char ch) const
 //==================================================================================================
 IniParser::TrimResult IniParser::trim_value(std::string &str, char start, char end) const
 {
-    bool starts_with_char = String::starts_with(str, start);
-    bool ends_with_char = String::ends_with(str, end);
+    bool starts_with_char = str.starts_with(start);
+    bool ends_with_char = str.ends_with(end);
 
     if (starts_with_char && ends_with_char)
     {

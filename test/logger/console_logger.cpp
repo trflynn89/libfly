@@ -78,8 +78,8 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
             CATCH_REQUIRE_FALSE(contents.empty());
 
             const std::string styled = styled_contents(contents, "Debug Log");
-            CATCH_CHECK(fly::String::starts_with(styled, "\x1b[0m"));
-            CATCH_CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+            CATCH_CHECK(styled.starts_with("\x1b[0m"));
+            CATCH_CHECK(styled.ends_with("\x1b[0m"));
         }
 
         CATCH_SECTION("Validate style of informational console logs")
@@ -91,8 +91,8 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
             CATCH_REQUIRE_FALSE(contents.empty());
 
             const std::string styled = styled_contents(contents, "Info Log");
-            CATCH_CHECK(fly::String::starts_with(styled, "\x1b[0;32m"));
-            CATCH_CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+            CATCH_CHECK(styled.starts_with("\x1b[0;32m"));
+            CATCH_CHECK(styled.ends_with("\x1b[0m"));
         }
 
         CATCH_SECTION("Validate style of warning console logs")
@@ -104,8 +104,8 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
             CATCH_REQUIRE_FALSE(contents.empty());
 
             const std::string styled = styled_contents(contents, "Warning Log");
-            CATCH_CHECK(fly::String::starts_with(styled, "\x1b[0;33m"));
-            CATCH_CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+            CATCH_CHECK(styled.starts_with("\x1b[0;33m"));
+            CATCH_CHECK(styled.ends_with("\x1b[0m"));
         }
 
         CATCH_SECTION("Validate style of error console logs")
@@ -117,8 +117,8 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
             CATCH_REQUIRE_FALSE(contents.empty());
 
             const std::string styled = styled_contents(contents, "Error Log");
-            CATCH_CHECK(fly::String::starts_with(styled, "\x1b[1;31m"));
-            CATCH_CHECK(fly::String::ends_with(styled, "\x1b[0m"));
+            CATCH_CHECK(styled.starts_with("\x1b[1;31m"));
+            CATCH_CHECK(styled.ends_with("\x1b[0m"));
         }
     }
 #endif
