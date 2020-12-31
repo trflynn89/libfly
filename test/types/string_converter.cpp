@@ -1,3 +1,4 @@
+#include "fly/traits/traits.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -54,12 +55,8 @@ CATCH_TEMPLATE_TEST_CASE(
 {
     using StringType = TestType;
     using BasicString = fly::BasicString<StringType>;
-    using BasicStringTraits = fly::detail::BasicStringTraits<StringType>;
     using char_type = typename BasicString::char_type;
     using codepoint_type = typename BasicString::codepoint_type;
-    using streamed_type = typename BasicString::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
-    using ustreamed_char = std::make_unsigned_t<streamed_char>;
 
     auto out_of_range_codepoint = []() -> StringType
     {
@@ -185,64 +182,6 @@ CATCH_TEMPLATE_TEST_CASE(
         }
     }
 
-    CATCH_SECTION("Convert a string to a Boolean")
-    {
-        StringType s;
-
-        s = FLY_STR(char_type, "0");
-        CATCH_CHECK(BasicString::template convert<bool>(s) == false);
-
-        s = FLY_STR(char_type, "1");
-        CATCH_CHECK(BasicString::template convert<bool>(s) == true);
-
-        s = FLY_STR(char_type, "-1");
-        CATCH_CHECK_FALSE(BasicString::template convert<bool>(s));
-
-        s = FLY_STR(char_type, "2");
-        CATCH_CHECK_FALSE(BasicString::template convert<bool>(s));
-
-        s = FLY_STR(char_type, "abc");
-        CATCH_CHECK_FALSE(BasicString::template convert<bool>(s));
-
-        s = FLY_STR(char_type, "2a");
-        CATCH_CHECK_FALSE(BasicString::template convert<bool>(s));
-    }
-
-    CATCH_SECTION("Convert a string to a streamable character type")
-    {
-        StringType s;
-
-        s = FLY_STR(char_type, "0");
-        CATCH_CHECK(BasicString::template convert<streamed_char>(s) == '\0');
-        CATCH_CHECK(BasicString::template convert<ustreamed_char>(s) == '\0');
-
-        s = FLY_STR(char_type, "65");
-        CATCH_CHECK(BasicString::template convert<streamed_char>(s) == 'A');
-        CATCH_CHECK(
-            BasicString::template convert<ustreamed_char>(s) == static_cast<ustreamed_char>(65));
-
-        s = FLY_STR(char_type, "abc");
-        CATCH_CHECK_FALSE(BasicString::template convert<streamed_char>(s));
-        CATCH_CHECK_FALSE(BasicString::template convert<ustreamed_char>(s));
-
-        s = FLY_STR(char_type, "2a");
-        CATCH_CHECK_FALSE(BasicString::template convert<streamed_char>(s));
-        CATCH_CHECK_FALSE(BasicString::template convert<ustreamed_char>(s));
-
-        if constexpr (BasicStringTraits::has_stoi_family_v)
-        {
-            CATCH_CHECK_FALSE(
-                BasicString::template convert<streamed_char>(minstr<StringType, streamed_char>()));
-            CATCH_CHECK_FALSE(
-                BasicString::template convert<streamed_char>(maxstr<StringType, streamed_char>()));
-
-            CATCH_CHECK_FALSE(BasicString::template convert<ustreamed_char>(
-                minstr<StringType, ustreamed_char>()));
-            CATCH_CHECK_FALSE(BasicString::template convert<ustreamed_char>(
-                maxstr<StringType, ustreamed_char>()));
-        }
-    }
-
     CATCH_SECTION("Convert a string to an 8-bit integer")
     {
         StringType s;
@@ -267,7 +206,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(BasicString::template convert<std::int8_t>(s));
         CATCH_CHECK_FALSE(BasicString::template convert<std::uint8_t>(s));
 
-        if constexpr (BasicStringTraits::has_stoi_family_v)
+        if constexpr (fly::any_same_v<char_type, char, wchar_t>)
         {
             CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int8_t>(minstr<StringType, std::int8_t>()));
@@ -305,7 +244,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(BasicString::template convert<std::int16_t>(s));
         CATCH_CHECK_FALSE(BasicString::template convert<std::uint16_t>(s));
 
-        if constexpr (BasicStringTraits::has_stoi_family_v)
+        if constexpr (fly::any_same_v<char_type, char, wchar_t>)
         {
             CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int16_t>(minstr<StringType, std::int16_t>()));
@@ -343,7 +282,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(BasicString::template convert<std::int32_t>(s));
         CATCH_CHECK_FALSE(BasicString::template convert<std::uint32_t>(s));
 
-        if constexpr (BasicStringTraits::has_stoi_family_v)
+        if constexpr (fly::any_same_v<char_type, char, wchar_t>)
         {
             CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int32_t>(minstr<StringType, std::int32_t>()));

@@ -783,7 +783,7 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
 
         return std::nullopt;
     }
-    else if constexpr (traits::has_stoi_family_v)
+    else if constexpr (std::is_same_v<char_type, char>)
     {
         return detail::BasicStringConverter<StringType, T>::convert(value);
     }
@@ -792,9 +792,9 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
         auto it = value.cbegin();
         const auto end = value.cend();
 
-        if (auto result = unicode::template convert_encoding<streamed_type>(it, end); result)
+        if (auto result = unicode::template convert_encoding<std::string>(it, end); result)
         {
-            return detail::BasicStringConverter<streamed_type, T>::convert(*result);
+            return detail::BasicStringConverter<std::string, T>::convert(*result);
         }
 
         return std::nullopt;

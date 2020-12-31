@@ -1,23 +1,20 @@
 #pragma once
 
+#include <charconv>
 #include <cstdint>
-#include <limits>
 #include <optional>
-#include <stdexcept>
 #include <string>
-#include <type_traits>
 
 namespace fly::detail {
 
 /**
- * Helper struct to convert a std::basic_string type to a plain-old-data type, e.g. int or bool.
+ * Helper struct to convert a std::basic_string type to a plain-old-data type, e.g. int or float.
  *
- * Internally, the std::stoi family of functions is used to handle conversions, so only std::string
- * and std::wstring may be directly used. For std::u8string, std::u16string, and std::u32string,
- * first use BasicStringUnicode::convert_encoding to convert the string to std::string.
+ * Ideally, this entire helper can be removed when the STL supports floating point types with
+ * std::from_chars. However, only integral types are currently supported. Thus, integral types will
+ * use std::from_chars, and floating point types will use the std::stof family of functions.
  *
- * It is recommended that outside callers use BasicString::convert instead of using this struct
- * directly.
+ * https://en.cppreference.com/w/cpp/compiler_support
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 21, 2019
@@ -29,60 +26,20 @@ struct BasicStringConverter;
 template <typename StringType, typename T>
 struct BasicStringConverter
 {
-    template <typename V = T, std::enable_if_t<(sizeof(V) < 8), bool> = 0>
     static std::optional<T> convert(const StringType &value)
     {
-        static constexpr auto s_min = static_cast<long long>(std::numeric_limits<T>::min());
-        static constexpr auto s_max = static_cast<long long>(std::numeric_limits<T>::max());
+        const auto *begin = value.data();
+        const auto *end = begin + value.size();
 
-        std::size_t index = 0;
-        long long result = 0;
+        T converted {};
+        auto result = std::from_chars(begin, end, converted);
 
-        try
-        {
-            result = std::stoll(value, &index);
-        }
-        catch (...)
+        if ((result.ptr != end) || (result.ec != std::errc()))
         {
             return std::nullopt;
         }
 
-        if ((index != value.length()) || (result < s_min) || (result > s_max))
-        {
-            return std::nullopt;
-        }
-
-        return static_cast<T>(result);
-    }
-
-    template <typename V = T, std::enable_if_t<(sizeof(V) == 8), bool> = 0>
-    static std::optional<T> convert(const StringType &value)
-    {
-        std::size_t index = 0;
-        T result = 0;
-
-        try
-        {
-            if constexpr (std::is_signed_v<T>)
-            {
-                result = std::stoll(value, &index);
-            }
-            else
-            {
-                result = std::stoull(value, &index);
-            }
-        }
-        catch (...)
-        {
-            return std::nullopt;
-        }
-
-        if (index != value.length())
-        {
-            return std::nullopt;
-        }
-
-        return result;
+        return converted;
     }
 };
 
@@ -95,7 +52,7 @@ struct BasicStringConverter<StringType, float>
     static std::optional<value_type> convert(const StringType &value)
     {
         std::size_t index = 0;
-        value_type result = 0;
+        value_type result {};
 
         try
         {
@@ -124,7 +81,7 @@ struct BasicStringConverter<StringType, double>
     static std::optional<value_type> convert(const StringType &value)
     {
         std::size_t index = 0;
-        value_type result = 0;
+        value_type result {};
 
         try
         {
@@ -153,7 +110,7 @@ struct BasicStringConverter<StringType, long double>
     static std::optional<value_type> convert(const StringType &value)
     {
         std::size_t index = 0;
-        value_type result = 0;
+        value_type result {};
 
         try
         {
