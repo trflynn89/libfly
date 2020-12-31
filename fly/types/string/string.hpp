@@ -75,7 +75,7 @@ public:
      *
      * @return The length of the string-like value.
      */
-    template <typename T, enable_if_all<detail::is_like_supported_string<T>> = 0>
+    template <typename T, enable_if<detail::is_like_supported_string<T>> = 0>
     static size_type size(const T &value);
 
     /**
@@ -406,7 +406,7 @@ private:
 
 //==================================================================================================
 template <typename StringType>
-template <typename T, enable_if_all<detail::is_like_supported_string<T>>>
+template <typename T, enable_if<detail::is_like_supported_string<T>>>
 auto BasicString<StringType>::size(const T &value) -> size_type
 {
     using U = std::decay_t<T>;

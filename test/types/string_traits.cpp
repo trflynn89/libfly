@@ -25,37 +25,37 @@ struct NotStreamable
 {
 };
 
-template <typename T, fly::enable_if_any<fly::detail::is_supported_string<T>> = 0>
+template <typename T, fly::enable_if<fly::detail::is_supported_string<T>> = 0>
 constexpr bool is_supported_string(const T &)
 {
     return true;
 }
 
-template <typename T, fly::enable_if_none<fly::detail::is_supported_string<T>> = 0>
+template <typename T, fly::disable_if<fly::detail::is_supported_string<T>> = 0>
 constexpr bool is_supported_string(const T &)
 {
     return false;
 }
 
-template <typename T, fly::enable_if_any<fly::detail::is_supported_character<T>> = 0>
+template <typename T, fly::enable_if<fly::detail::is_supported_character<T>> = 0>
 constexpr bool is_supported_character(const T &)
 {
     return true;
 }
 
-template <typename T, fly::enable_if_none<fly::detail::is_supported_character<T>> = 0>
+template <typename T, fly::disable_if<fly::detail::is_supported_character<T>> = 0>
 constexpr bool is_supported_character(const T &)
 {
     return false;
 }
 
-template <typename T, fly::enable_if_any<fly::detail::is_like_supported_string<T>> = 0>
+template <typename T, fly::enable_if<fly::detail::is_like_supported_string<T>> = 0>
 constexpr bool is_like_supported_string(const T &)
 {
     return true;
 }
 
-template <typename T, fly::enable_if_none<fly::detail::is_like_supported_string<T>> = 0>
+template <typename T, fly::disable_if<fly::detail::is_like_supported_string<T>> = 0>
 constexpr bool is_like_supported_string(const T &)
 {
     return false;

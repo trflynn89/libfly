@@ -209,7 +209,7 @@ public:
      *
      * @throws JsonException If the string-like value is not valid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     Json(T &&value) noexcept(false);
 
     /**
@@ -223,7 +223,7 @@ public:
      *
      * @throws JsonException If an object key is not a valid string.
      */
-    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_object<T>> = 0>
     Json(T &&value) noexcept(false);
 
     /**
@@ -236,7 +236,7 @@ public:
      *
      * @throws JsonException If an string-like value in the array is not valid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_array<T>> = 0>
     Json(T &&value) noexcept(false);
 
     /**
@@ -248,7 +248,7 @@ public:
      *
      * @param value The boolean value.
      */
-    template <typename T, enable_if_all<JsonTraits::is_boolean<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_boolean<T>> = 0>
     Json(T value) noexcept;
 
     /**
@@ -260,7 +260,7 @@ public:
      *
      * @param value The signed value.
      */
-    template <typename T, enable_if_all<JsonTraits::is_signed_integer<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_signed_integer<T>> = 0>
     Json(T value) noexcept;
 
     /**
@@ -272,7 +272,7 @@ public:
      *
      * @param value The unsigned value.
      */
-    template <typename T, enable_if_all<JsonTraits::is_unsigned_integer<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_unsigned_integer<T>> = 0>
     Json(T value) noexcept;
 
     /**
@@ -284,7 +284,7 @@ public:
      *
      * @param value The floating point value.
      */
-    template <typename T, enable_if_all<JsonTraits::is_floating_point<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_floating_point<T>> = 0>
     Json(T value) noexcept;
 
     /**
@@ -398,7 +398,7 @@ public:
      *
      * @return The Json instance as a string.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string<T>> = 0>
     explicit operator T() const noexcept;
 
     /**
@@ -413,7 +413,7 @@ public:
      * @throws JsonException If the Json instance is not an object, or a stored element could not be
      *         converted to the target object's value type.
      */
-    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_object<T>> = 0>
     explicit operator T() const noexcept(false);
 
     /**
@@ -429,7 +429,7 @@ public:
      * @throws JsonException If the Json instance is not an array, or a stored element could not be
      *         converted to the target array's value type.
      */
-    template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_array<T>> = 0>
     explicit operator T() const noexcept(false);
 
     /**
@@ -458,7 +458,7 @@ public:
      *
      * @return The Json instance as a boolean.
      */
-    template <typename T, enable_if_all<JsonTraits::is_boolean<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_boolean<T>> = 0>
     explicit operator T() const noexcept;
 
     /**
@@ -474,7 +474,7 @@ public:
      * @throws JsonException If the Json instance is not numeric, or the stored value could not be
      *         converted to the target numeric type.
      */
-    template <typename T, enable_if_all<JsonTraits::is_number<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_number<T>> = 0>
     explicit operator T() const noexcept(false);
 
     //==============================================================================================
@@ -498,7 +498,7 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key value does not exist,
      *         or the key value is invalid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     reference at(T key);
 
     /**
@@ -516,7 +516,7 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key value does not exist,
      *         or the key value is invalid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     const_reference at(T key) const;
 
     /**
@@ -563,7 +563,7 @@ public:
      * @throws JsonException If the Json instance is neither an object nor null, or the key value is
      *         invalid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     reference operator[](T key);
 
     /**
@@ -579,7 +579,7 @@ public:
      * @throws JsonException If the Json instance is not an object, or the key value does not exist,
      *         or the key value is invalid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     const_reference operator[](T key) const;
 
     /**
@@ -887,7 +887,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
-    template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
+    template <typename Key, enable_if<JsonTraits::is_string_like<Key>> = 0>
     std::pair<iterator, bool> insert(Key key, const Json &value);
 
     /**
@@ -906,7 +906,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
-    template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
+    template <typename Key, enable_if<JsonTraits::is_string_like<Key>> = 0>
     std::pair<iterator, bool> insert(Key key, Json &&value);
 
     /**
@@ -1014,7 +1014,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
-    template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
+    template <typename Key, enable_if<JsonTraits::is_string_like<Key>> = 0>
     std::pair<iterator, bool> insert_or_assign(Key key, Json &&value);
 
     /**
@@ -1035,7 +1035,7 @@ public:
      *
      * @throws JsonException If the Json instance is neither an object nor null.
      */
-    template <typename Key, typename Value, enable_if_all<JsonTraits::is_string_like<Key>> = 0>
+    template <typename Key, typename Value, enable_if<JsonTraits::is_string_like<Key>> = 0>
     std::pair<iterator, bool> emplace(Key key, Value &&value);
 
     /**
@@ -1095,7 +1095,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     size_type erase(T key);
 
     /**
@@ -1160,7 +1160,7 @@ public:
      *
      * @throws JsonException If the Json instance is not a string.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string<T>> = 0>
     void swap(T &other);
 
     /**
@@ -1174,7 +1174,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an object.
      */
-    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_object<T>> = 0>
     void swap(T &other);
 
     /**
@@ -1188,7 +1188,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an array.
      */
-    template <typename T, enable_if_all<JsonTraits::is_array<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_array<T>> = 0>
     void swap(T &other);
 
     /**
@@ -1234,7 +1234,7 @@ public:
      *
      * @throws JsonException If this Json instance is neither an object nor null.
      */
-    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_object<T>> = 0>
     void merge(T &other);
 
     /**
@@ -1250,7 +1250,7 @@ public:
      *
      * @throws JsonException If this Json instance is neither an object nor null.
      */
-    template <typename T, enable_if_all<JsonTraits::is_object<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_object<T>> = 0>
     void merge(T &&other);
 
     //==============================================================================================
@@ -1272,7 +1272,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     size_type count(T key) const;
 
     /**
@@ -1289,7 +1289,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     iterator find(T key);
 
     /**
@@ -1306,7 +1306,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     const_iterator find(T key) const;
 
     /**
@@ -1322,7 +1322,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     bool contains(T key) const;
 
     //==============================================================================================
@@ -1385,7 +1385,7 @@ private:
      *
      * @throws JsonException If the string-like value is not valid.
      */
-    template <typename T, enable_if_all<JsonTraits::is_string_like<T>> = 0>
+    template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
     static JsonTraits::string_type convert_to_string(T value);
 
     /**
@@ -1523,7 +1523,7 @@ private:
 };
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 Json::Json(T &&value) noexcept(false)
 {
     if constexpr (std::is_lvalue_reference_v<T>)
@@ -1537,7 +1537,7 @@ Json::Json(T &&value) noexcept(false)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_object<T>>>
+template <typename T, enable_if<JsonTraits::is_object<T>>>
 Json::Json(T &&value) noexcept(false)
 {
     if constexpr (std::is_lvalue_reference_v<T>)
@@ -1556,7 +1556,7 @@ Json::Json(T &&value) noexcept(false)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_array<T>>>
+template <typename T, enable_if<JsonTraits::is_array<T>>>
 Json::Json(T &&value) noexcept(false) : m_value(JsonTraits::array_type())
 {
     reserve(JsonTraits::ArrayTraits::size(value));
@@ -1578,31 +1578,31 @@ Json::Json(T &&value) noexcept(false) : m_value(JsonTraits::array_type())
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
+template <typename T, enable_if<JsonTraits::is_boolean<T>>>
 Json::Json(T value) noexcept : m_value(static_cast<JsonTraits::boolean_type>(value))
 {
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_signed_integer<T>>>
+template <typename T, enable_if<JsonTraits::is_signed_integer<T>>>
 Json::Json(T value) noexcept : m_value(static_cast<JsonTraits::signed_type>(value))
 {
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_unsigned_integer<T>>>
+template <typename T, enable_if<JsonTraits::is_unsigned_integer<T>>>
 Json::Json(T value) noexcept : m_value(static_cast<JsonTraits::unsigned_type>(value))
 {
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_floating_point<T>>>
+template <typename T, enable_if<JsonTraits::is_floating_point<T>>>
 Json::Json(T value) noexcept : m_value(static_cast<JsonTraits::float_type>(value))
 {
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string<T>>>
+template <typename T, enable_if<JsonTraits::is_string<T>>>
 Json::operator T() const noexcept
 {
     JsonTraits::string_type value;
@@ -1624,7 +1624,7 @@ Json::operator T() const noexcept
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_object<T>>>
+template <typename T, enable_if<JsonTraits::is_object<T>>>
 Json::operator T() const noexcept(false)
 {
     const auto &storage = get<JsonTraits::object_type>("JSON type is not an object");
@@ -1641,7 +1641,7 @@ Json::operator T() const noexcept(false)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_array<T>>>
+template <typename T, enable_if<JsonTraits::is_array<T>>>
 Json::operator T() const noexcept(false)
 {
     const auto &storage = get<JsonTraits::array_type>("JSON type is not an array");
@@ -1672,7 +1672,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_boolean<T>>>
+template <typename T, enable_if<JsonTraits::is_boolean<T>>>
 Json::operator T() const noexcept
 {
     auto visitor = [](const auto &storage) noexcept -> T
@@ -1701,7 +1701,7 @@ Json::operator T() const noexcept
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_number<T>>>
+template <typename T, enable_if<JsonTraits::is_number<T>>>
 Json::operator T() const noexcept(false)
 {
     auto visitor = [this](const auto &storage) -> T
@@ -1727,7 +1727,7 @@ Json::operator T() const noexcept(false)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 Json::reference Json::at(T key)
 {
     auto &storage = get<JsonTraits::object_type>("JSON type invalid for operator[key]");
@@ -1742,7 +1742,7 @@ Json::reference Json::at(T key)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 Json::const_reference Json::at(T key) const
 {
     const auto &storage = get<JsonTraits::object_type>("JSON type invalid for operator[key]");
@@ -1757,7 +1757,7 @@ Json::const_reference Json::at(T key) const
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 Json::reference Json::operator[](T key)
 {
     auto &storage = get_or_promote<JsonTraits::object_type>("JSON type invalid for operator[key]");
@@ -1765,28 +1765,28 @@ Json::reference Json::operator[](T key)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 Json::const_reference Json::operator[](T key) const
 {
     return at(key);
 }
 
 //==================================================================================================
-template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
+template <typename Key, enable_if<JsonTraits::is_string_like<Key>>>
 std::pair<Json::iterator, bool> Json::insert(Key key, const Json &value)
 {
     return object_inserter(std::make_pair(convert_to_string(std::move(key)), value));
 }
 
 //==================================================================================================
-template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
+template <typename Key, enable_if<JsonTraits::is_string_like<Key>>>
 std::pair<Json::iterator, bool> Json::insert(Key key, Json &&value)
 {
     return object_inserter(std::make_pair(convert_to_string(std::move(key)), std::move(value)));
 }
 
 //==================================================================================================
-template <typename Key, enable_if_all<JsonTraits::is_string_like<Key>>>
+template <typename Key, enable_if<JsonTraits::is_string_like<Key>>>
 std::pair<Json::iterator, bool> Json::insert_or_assign(Key key, Json &&value)
 {
     auto result = insert(key, value);
@@ -1801,7 +1801,7 @@ std::pair<Json::iterator, bool> Json::insert_or_assign(Key key, Json &&value)
 }
 
 //==================================================================================================
-template <typename Key, typename Value, enable_if_all<JsonTraits::is_string_like<Key>>>
+template <typename Key, typename Value, enable_if<JsonTraits::is_string_like<Key>>>
 std::pair<Json::iterator, bool> Json::emplace(Key key, Value &&value)
 {
     auto &storage =
@@ -1824,7 +1824,7 @@ Json::reference Json::emplace_back(Args &&...args)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 Json::size_type Json::erase(T key)
 {
     auto &storage = get<JsonTraits::object_type>("JSON type invalid for erase(key)");
@@ -1832,7 +1832,7 @@ Json::size_type Json::erase(T key)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string<T>>>
+template <typename T, enable_if<JsonTraits::is_string<T>>>
 void Json::swap(T &other)
 {
     if (!is_string())
@@ -1847,7 +1847,7 @@ void Json::swap(T &other)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_object<T>>>
+template <typename T, enable_if<JsonTraits::is_object<T>>>
 void Json::swap(T &other)
 {
     if (!is_object())
@@ -1862,7 +1862,7 @@ void Json::swap(T &other)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_array<T>>>
+template <typename T, enable_if<JsonTraits::is_array<T>>>
 void Json::swap(T &other)
 {
     if (!is_array())
@@ -1877,7 +1877,7 @@ void Json::swap(T &other)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_object<T>>>
+template <typename T, enable_if<JsonTraits::is_object<T>>>
 void Json::merge(T &other)
 {
     get_or_promote<JsonTraits::object_type>("JSON type invalid for merging");
@@ -1898,7 +1898,7 @@ void Json::merge(T &other)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_object<T>>>
+template <typename T, enable_if<JsonTraits::is_object<T>>>
 void Json::merge(T &&other)
 {
     get_or_promote<JsonTraits::object_type>("JSON type invalid for merging");
@@ -1914,7 +1914,7 @@ void Json::merge(T &&other)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 Json::size_type Json::count(T key) const
 {
     const auto &storage = get<JsonTraits::object_type>("JSON type invalid for count(key)");
@@ -1922,7 +1922,7 @@ Json::size_type Json::count(T key) const
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 Json::iterator Json::find(T key)
 {
     auto &storage = get<JsonTraits::object_type>("JSON type invalid for find(key)");
@@ -1934,7 +1934,7 @@ Json::iterator Json::find(T key)
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 Json::const_iterator Json::find(T key) const
 {
     const auto &storage = get<JsonTraits::object_type>("JSON type invalid for find(key)");
@@ -1946,7 +1946,7 @@ Json::const_iterator Json::find(T key) const
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 bool Json::contains(T key) const
 {
     const auto &storage = get<JsonTraits::object_type>("JSON type invalid for contains(key)");
@@ -1954,7 +1954,7 @@ bool Json::contains(T key) const
 }
 
 //==================================================================================================
-template <typename T, enable_if_all<JsonTraits::is_string_like<T>>>
+template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 JsonTraits::string_type Json::convert_to_string(T value)
 {
     using StringType = BasicString<JsonTraits::is_string_like_t<T>>;

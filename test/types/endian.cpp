@@ -1,21 +1,22 @@
 #include "fly/types/numeric/endian.hpp"
 
+#include "fly/traits/traits.hpp"
+
 #include "catch2/catch.hpp"
 
 #include <bit>
 #include <cstdint>
 #include <limits>
-#include <type_traits>
 
 namespace {
 
-template <typename T, std::enable_if_t<sizeof(T) == 1, bool> = 0>
+template <typename T, fly::enable_if<fly::size_of_type_is<T, 1>> = 0>
 T swap(T x)
 {
     return x;
 }
 
-template <typename T, std::enable_if_t<sizeof(T) == 2, bool> = 0>
+template <typename T, fly::enable_if<fly::size_of_type_is<T, 2>> = 0>
 T swap(T x)
 {
     T result = 0;
@@ -26,7 +27,7 @@ T swap(T x)
     return result;
 }
 
-template <typename T, std::enable_if_t<sizeof(T) == 4, bool> = 0>
+template <typename T, fly::enable_if<fly::size_of_type_is<T, 4>> = 0>
 T swap(T x)
 {
     T result = 0;
@@ -39,7 +40,7 @@ T swap(T x)
     return result;
 }
 
-template <typename T, std::enable_if_t<sizeof(T) == 8, bool> = 0>
+template <typename T, fly::enable_if<fly::size_of_type_is<T, 8>> = 0>
 T swap(T x)
 {
     T result = 0;
