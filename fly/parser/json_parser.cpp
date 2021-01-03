@@ -430,9 +430,9 @@ JsonParser::NumberType JsonParser::validate_number(const JsonTraits::string_type
     }
 
     const bool is_octal = (signless.size() > 1) && (signless[0] == '0') &&
-        std::isdigit(static_cast<unsigned char>(signless[1]));
+        JsonTraits::StringType::is_digit(signless[1]);
 
-    if (!std::isdigit(static_cast<unsigned char>(signless[0])) || is_octal)
+    if (!JsonTraits::StringType::is_digit(signless[0]) || is_octal)
     {
         return NumberType::Invalid;
     }
