@@ -101,6 +101,7 @@ struct BasicStringTraits
     using size_type = typename StringType::size_type;
     using char_type = typename StringType::value_type;
     using view_type = std::basic_string_view<char_type>;
+    using int_type = typename std::char_traits<char_type>::int_type;
 
     using codepoint_type = std::uint32_t;
 
