@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/traits/traits.hpp"
+#include "fly/types/string/detail/string_classifier.hpp"
 #include "fly/types/string/detail/string_converter.hpp"
 #include "fly/types/string/detail/string_formatter.hpp"
 #include "fly/types/string/detail/string_streamer.hpp"
@@ -51,6 +52,7 @@ using String32Traits = detail::BasicStringTraits<std::u32string>;
 template <typename StringType>
 class BasicString
 {
+    using classifier = detail::BasicStringClassifier<StringType>;
     using formatter = detail::BasicStringFormatter<StringType>;
     using streamer = detail::BasicStringStreamer<StringType>;
     using traits = detail::BasicStringTraits<StringType>;
@@ -61,6 +63,7 @@ public:
     using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
+    using int_type = typename traits::int_type;
     using codepoint_type = typename traits::codepoint_type;
     using ostream_type = typename traits::ostream_type;
     using streamed_type = typename traits::streamed_type;
@@ -77,6 +80,33 @@ public:
      */
     template <typename T, enable_if<detail::is_like_supported_string<T>> = 0>
     static size_type size(const T &value);
+
+    /**
+     * Checks if the given character is an alphabetic character as classified by the default C
+     * locale.
+     *
+     * The STL's std::isalpha and std::iswalpha require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to classify.
+     *
+     * @return True if the character is an alphabetic character.
+     */
+    static bool is_alpha(char_type ch);
+
+    /**
+     * Checks if the given character is a decimal digit character.
+     *
+     * The STL's std::isdigit and std::iswdigit require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to classify.
+     *
+     * @return True if the character is a decimal digit character.
+     */
+    static bool is_digit(char_type ch);
 
     /**
      * Split a string into a vector of strings.
@@ -419,6 +449,20 @@ auto BasicString<StringType>::size(const T &value) -> size_type
     {
         return std::char_traits<char_type>::length(value);
     }
+}
+
+//==================================================================================================
+template <typename StringType>
+inline bool BasicString<StringType>::is_alpha(char_type ch)
+{
+    return classifier::is_alpha(ch);
+}
+
+//==================================================================================================
+template <typename StringType>
+inline bool BasicString<StringType>::is_digit(char_type ch)
+{
+    return classifier::is_digit(ch);
 }
 
 //==================================================================================================
