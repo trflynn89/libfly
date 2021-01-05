@@ -20,46 +20,120 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Check if a character is an alphabetic character")
     {
-        for (int i = 0; i < 0x80; ++i)
+        for (char_type ch = 0; (ch >= 0) && (ch < 0x80); ++ch)
         {
-            const auto ch = static_cast<char_type>(i);
-            CATCH_CHECK(BasicString::is_alpha(ch) == static_cast<bool>(std::isalpha(i)));
+            CATCH_CHECK(
+                BasicString::is_alpha(ch) ==
+                static_cast<bool>(std::isalpha(static_cast<unsigned char>(ch))));
         }
 
         if constexpr (sizeof(char_type) > 1)
         {
             // Spot check some values that incorrectly result in std::isalpha returning true when
             // cast to unsigned char (which is how the spec suggests to avoid undefined behavior).
-            for (int i = 0xaa41; i <= 0xaa5a; ++i)
+            for (char_type ch = 0xaa41; ch <= 0xaa5a; ++ch)
             {
-                CATCH_CHECK(std::isalpha(static_cast<unsigned char>(i)));
-                CATCH_CHECK_FALSE(BasicString::is_alpha(static_cast<char_type>(i)));
+                CATCH_CHECK(std::isalpha(static_cast<unsigned char>(ch)));
+                CATCH_CHECK_FALSE(BasicString::is_alpha(ch));
             }
-
-            for (int i = 0xaa61; i <= 0xaa7a; ++i)
+            for (char_type ch = 0xaa61; ch <= 0xaa7a; ++ch)
             {
-                CATCH_CHECK(std::isalpha(static_cast<unsigned char>(i)));
-                CATCH_CHECK_FALSE(BasicString::is_alpha(static_cast<char_type>(i)));
+                CATCH_CHECK(std::isalpha(static_cast<unsigned char>(ch)));
+                CATCH_CHECK_FALSE(BasicString::is_alpha(ch));
+            }
+        }
+    }
+
+    CATCH_SECTION("Check if a character is an upper-case alphabetic character")
+    {
+        for (char_type ch = 0; (ch >= 0) && (ch < 0x80); ++ch)
+        {
+            CATCH_CHECK(
+                BasicString::is_upper(ch) ==
+                static_cast<bool>(std::isupper(static_cast<unsigned char>(ch))));
+        }
+
+        if constexpr (sizeof(char_type) > 1)
+        {
+            // Spot check some values that incorrectly result in std::isupper returning true when
+            // cast to unsigned char (which is how the spec suggests to avoid undefined behavior).
+            for (char_type ch = 0xaa41; ch <= 0xaa5a; ++ch)
+            {
+                CATCH_CHECK(std::isupper(static_cast<unsigned char>(ch)));
+                CATCH_CHECK_FALSE(BasicString::is_upper(ch));
+            }
+        }
+    }
+
+    CATCH_SECTION("Check if a character is a lower-case alphabetic character")
+    {
+        for (char_type ch = 0; (ch >= 0) && (ch < 0x80); ++ch)
+        {
+            CATCH_CHECK(
+                BasicString::is_lower(ch) ==
+                static_cast<bool>(std::islower(static_cast<unsigned char>(ch))));
+        }
+
+        if constexpr (sizeof(char_type) > 1)
+        {
+            // Spot check some values that incorrectly result in std::islower returning true when
+            // cast to unsigned char (which is how the spec suggests to avoid undefined behavior).
+            for (char_type ch = 0xaa61; ch <= 0xaa7a; ++ch)
+            {
+                CATCH_CHECK(std::islower(static_cast<unsigned char>(ch)));
+                CATCH_CHECK_FALSE(BasicString::is_lower(ch));
             }
         }
     }
 
     CATCH_SECTION("Check if a character is a decimal digit character")
     {
-        for (int i = 0; i < 0x80; ++i)
+        for (char_type ch = 0; (ch >= 0) && (ch < 0x80); ++ch)
         {
-            const auto ch = static_cast<char_type>(i);
-            CATCH_CHECK(BasicString::is_digit(ch) == static_cast<bool>(std::isdigit(i)));
+            CATCH_CHECK(
+                BasicString::is_digit(ch) ==
+                static_cast<bool>(std::isdigit(static_cast<unsigned char>(ch))));
         }
 
         if constexpr (sizeof(char_type) > 1)
         {
             // Spot check some values that incorrectly result in std::isdigit returning true when
             // cast to unsigned char (which is how the spec suggests to avoid undefined behavior).
-            for (int i = 0xaa30; i <= 0xaa39; ++i)
+            for (char_type ch = 0xaa30; ch <= 0xaa39; ++ch)
             {
-                CATCH_CHECK(std::isdigit(static_cast<unsigned char>(i)));
-                CATCH_CHECK_FALSE(BasicString::is_digit(static_cast<char_type>(i)));
+                CATCH_CHECK(std::isdigit(static_cast<unsigned char>(ch)));
+                CATCH_CHECK_FALSE(BasicString::is_digit(ch));
+            }
+        }
+    }
+
+    CATCH_SECTION("Check if a character is a hexadecimal digit character")
+    {
+        for (char_type ch = 0; (ch >= 0) && (ch < 0x80); ++ch)
+        {
+            CATCH_CHECK(
+                BasicString::is_x_digit(ch) ==
+                static_cast<bool>(std::isxdigit(static_cast<unsigned char>(ch))));
+        }
+
+        if constexpr (sizeof(char_type) > 1)
+        {
+            // Spot check some values that incorrectly result in std::isxdigit returning true when
+            // cast to unsigned char (which is how the spec suggests to avoid undefined behavior).
+            for (char_type ch = 0xaa30; ch <= 0xaa39; ++ch)
+            {
+                CATCH_CHECK(std::isxdigit(static_cast<unsigned char>(ch)));
+                CATCH_CHECK_FALSE(BasicString::is_x_digit(ch));
+            }
+            for (char_type ch = 0xaa41; ch <= 0xaa46; ++ch)
+            {
+                CATCH_CHECK(std::isxdigit(static_cast<unsigned char>(ch)));
+                CATCH_CHECK_FALSE(BasicString::is_x_digit(ch));
+            }
+            for (char_type ch = 0xaa61; ch <= 0xaa66; ++ch)
+            {
+                CATCH_CHECK(std::isxdigit(static_cast<unsigned char>(ch)));
+                CATCH_CHECK_FALSE(BasicString::is_x_digit(ch));
             }
         }
     }
