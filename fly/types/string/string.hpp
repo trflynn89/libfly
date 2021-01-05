@@ -93,7 +93,35 @@ public:
      *
      * @return True if the character is an alphabetic character.
      */
-    static bool is_alpha(char_type ch);
+    static constexpr bool is_alpha(char_type ch);
+
+    /**
+     * Checks if the given character is an upper-case alphabetic character as classified by the
+     * default C locale.
+     *
+     * The STL's std::isupper and std::iswupper require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to classify.
+     *
+     * @return True if the character is an alphabetic character.
+     */
+    static constexpr bool is_upper(char_type ch);
+
+    /**
+     * Checks if the given character is a lower-case alphabetic character as classified by the
+     * default C locale.
+     *
+     * The STL's std::islower and std::iswlower require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to classify.
+     *
+     * @return True if the character is an alphabetic character.
+     */
+    static constexpr bool is_lower(char_type ch);
 
     /**
      * Checks if the given character is a decimal digit character.
@@ -106,7 +134,20 @@ public:
      *
      * @return True if the character is a decimal digit character.
      */
-    static bool is_digit(char_type ch);
+    static constexpr bool is_digit(char_type ch);
+
+    /**
+     * Checks if the given character is a hexadecimal digit character.
+     *
+     * The STL's std::isxdigit and std::iswxdigit require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to classify.
+     *
+     * @return True if the character is a hexadecimal digit character.
+     */
+    static constexpr bool is_x_digit(char_type ch);
 
     /**
      * Split a string into a vector of strings.
@@ -453,16 +494,37 @@ auto BasicString<StringType>::size(const T &value) -> size_type
 
 //==================================================================================================
 template <typename StringType>
-inline bool BasicString<StringType>::is_alpha(char_type ch)
+constexpr inline bool BasicString<StringType>::is_alpha(char_type ch)
 {
     return classifier::is_alpha(ch);
 }
 
 //==================================================================================================
 template <typename StringType>
-inline bool BasicString<StringType>::is_digit(char_type ch)
+constexpr inline bool BasicString<StringType>::is_upper(char_type ch)
+{
+    return classifier::is_upper(ch);
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr inline bool BasicString<StringType>::is_lower(char_type ch)
+{
+    return classifier::is_lower(ch);
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr inline bool BasicString<StringType>::is_digit(char_type ch)
 {
     return classifier::is_digit(ch);
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr inline bool BasicString<StringType>::is_x_digit(char_type ch)
+{
+    return classifier::is_x_digit(ch);
 }
 
 //==================================================================================================
