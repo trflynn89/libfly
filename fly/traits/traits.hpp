@@ -7,7 +7,7 @@ namespace fly {
 /**
  * Wrapper around std::enable_if for testing that a single conditions is true. Example:
  *
- *     template <typename T, fly::enable_if<std::is_class_v<T>> = 0>
+ *     template <typename T, fly::enable_if<std::is_class<T>> = 0>
  *     void func(const T &) { }
  */
 template <typename Condition>
@@ -16,7 +16,7 @@ using enable_if = std::enable_if_t<Condition::value, bool>;
 /**
  * Wrapper around std::enable_if for testing that a single conditions is false. Example:
  *
- *     template <typename T, fly::enable_if<std::is_class_v<T>> = 0>
+ *     template <typename T, fly::enable_if<std::is_class<T>> = 0>
  *     void func(const T &) { }
  */
 template <typename Condition>
@@ -200,8 +200,9 @@ private:
 
 public:
     template <typename T>
-    using is_declared =
-        std::negation<std::is_same<decltype(Test::template test<T>(nullptr)), std::false_type>>;
+    using is_declared = std::negation<std::is_same<
+        decltype(Test::template test<std::remove_cvref_t<T>>(nullptr)),
+        std::false_type>>;
 
     template <typename T>
     inline static constexpr bool is_declared_v = is_declared<T>::value;

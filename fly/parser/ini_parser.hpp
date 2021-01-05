@@ -21,7 +21,7 @@ protected:
     /**
      * Parse a stream and retrieve the parsed values.
      *
-     * @return If successful, the parsed values. Otherwise, an unitialized value.
+     * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
     std::optional<Json> parse_internal() override;
 
@@ -55,7 +55,7 @@ private:
      *
      * @param section Line containing the section.
      *
-     * @return If successful, the parsed section name. Otherwise, an unitialized value.
+     * @return If successful, the parsed section name. Otherwise, an uninitialized value.
      */
     std::optional<std::string> on_section(std::string &section);
 
@@ -65,7 +65,7 @@ private:
      * @param section Section containing the pair.
      * @param name_value Line containing the pair.
      *
-     * @return If successful, the parsed name/value pair. Otherwise, an unitialized value.
+     * @return If successful, the parsed name/value pair. Otherwise, an uninitialized value.
      */
     std::optional<std::pair<std::string, std::string>>
     on_name_value_pair(const std::string &name_value);

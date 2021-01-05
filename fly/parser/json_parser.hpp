@@ -58,7 +58,7 @@ protected:
     /**
      * Parse a single complete JSON value from the stream.
      *
-     * @return If successful, the parsed JSON value. Otherwise, an unitialized value.
+     * @return If successful, the parsed JSON value. Otherwise, an uninitialized value.
      */
     std::optional<Json> parse_internal() override;
 
@@ -115,21 +115,21 @@ private:
     /**
      * Parse a complete JSON value from the stream. May be called recursively for nested values.
      *
-     * @return If successful, the parsed JSON value. Otherwise, an unitialized value.
+     * @return If successful, the parsed JSON value. Otherwise, an uninitialized value.
      */
     std::optional<Json> parse_json();
 
     /**
      * Parse a JSON object from the stream.
      *
-     * @return If successful, the parsed JSON object. Otherwise, an unitialized value.
+     * @return If successful, the parsed JSON object. Otherwise, an uninitialized value.
      */
     std::optional<Json> parse_object();
 
     /**
      * Parse a JSON array from the stream.
      *
-     * @return If successful, the parsed JSON array. Otherwise, an unitialized value.
+     * @return If successful, the parsed JSON array. Otherwise, an uninitialized value.
      */
     std::optional<Json> parse_array();
 
@@ -149,14 +149,14 @@ private:
      * This returns an actual string rather than a JSON value because some callers prefer the string
      * type (e.g. to pass the string as the key of a JSON object).
      *
-     * @return If successful, the parsed JSON string. Otherwise, an unitialized value.
+     * @return If successful, the parsed JSON string. Otherwise, an uninitialized value.
      */
     std::optional<JsonTraits::string_type> parse_quoted_string();
 
     /**
      * Parse a JSON number, boolean, or null value from the stream.
      *
-     * @return If successful, the parsed JSON value. Otherwise, an unitialized value.
+     * @return If successful, the parsed JSON value. Otherwise, an uninitialized value.
      */
     std::optional<Json> parse_value();
 

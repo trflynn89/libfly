@@ -55,7 +55,7 @@ public:
      * @param end Pointer to the end of the encoded Unicode string.
      *
      * @return If successful, a copy of the source string with the desired encoding. Otherwise, an
-     *         unitialized value.
+     *         uninitialized value.
      */
     template <typename DesiredStringType, typename IteratorType>
     static std::optional<DesiredStringType>
@@ -71,7 +71,7 @@ public:
      * @param it Pointer to the beginning of the encoded Unicode codepoint.
      * @param end Pointer to the end of the encoded Unicode codepoint.
      *
-     * @return If successful, the decoded Unicode codepoint. Otherwise, an unitialized value.
+     * @return If successful, the decoded Unicode codepoint. Otherwise, an uninitialized value.
      */
     template <typename IteratorType>
     static std::optional<codepoint_type>
@@ -83,7 +83,7 @@ public:
      * @return The Unicode codepoint to encode.
      *
      * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
-     *         unitialized value.
+     *         uninitialized value.
      */
     static std::optional<StringType> encode_codepoint(codepoint_type codepoint);
 
@@ -113,7 +113,7 @@ public:
      * @param end Pointer to the end of the encoded Unicode codepoint.
      *
      * @return If successful, a string containing the escaped Unicode codepoint. Otherwise, an
-     *         unitialized value.
+     *         uninitialized value.
      */
     template <char UnicodePrefix = 'U', typename IteratorType>
     static std::optional<StringType> escape_codepoint(IteratorType &it, const IteratorType &end);
@@ -135,7 +135,7 @@ public:
      * @param end Pointer to the end of the escaped character sequence.
      *
      * @return If successful, a string containing the unescaped Unicode codepoint. Otherwise, an
-     *         unitialized value.
+     *         uninitialized value.
      */
     template <typename IteratorType>
     static std::optional<StringType> unescape_codepoint(IteratorType &it, const IteratorType &end);
@@ -149,7 +149,7 @@ private:
      * @param codepoint The codepoint to escape.
      *
      * @return If successful, a string containing the escaped Unicode codepoint. Otherwise, an
-     *         unitialized value.
+     *         uninitialized value.
      */
     template <char UnicodePrefix>
     static StringType escape_codepoint(codepoint_type codepoint);
