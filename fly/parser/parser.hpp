@@ -50,7 +50,7 @@ public:
      *
      * @param contents String contents to parse.
      *
-     * @return If successful, the parsed values. Otherwise, an unitialized value.
+     * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
     template <typename StringType>
     std::optional<Json> parse_string(const StringType &contents);
@@ -73,7 +73,7 @@ public:
      *
      * @param path Path to the file to parse.
      *
-     * @return If successful, the parsed values. Otherwise, an unitialized value.
+     * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
     std::optional<Json> parse_file(const std::filesystem::path &path);
 
@@ -82,7 +82,7 @@ protected:
      * Parse a UTF-8 encoded stream and retrieve the parsed values. Concrete parsers may read data
      * from the underlyins string through the peek(), get(), discard(), and eof() methods.
      *
-     * @return If successful, the parsed values. Otherwise, an unitialized value.
+     * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
     virtual std::optional<Json> parse_internal() = 0;
 
@@ -145,7 +145,7 @@ private:
      *
      * @param stream Stream holding the contents to parse.
      *
-     * @return If successful, the parsed values. Otherwise, an unitialized value.
+     * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
     std::optional<Json> parse_stream(std::istream &&stream);
 
@@ -157,7 +157,7 @@ private:
      *
      * @param stream Stream holding the contents to parse.
      *
-     * @return If successful, a copy of the stream with UTF-8 encoding. Otherwise, an unitialized
+     * @return If successful, a copy of the stream with UTF-8 encoding. Otherwise, an uninitialized
      *         value.
      */
     template <typename StringType, std::endian Endianness>
