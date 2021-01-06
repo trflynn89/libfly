@@ -11,6 +11,29 @@
 #    error Unsupported operating system. Only Linux, macOS, and Windows are supported.
 #endif
 
+// Detect compiler.
+#if defined(__clang__)
+#    define FLY_COMPILER_CLANG
+#elif defined(__GNUC__)
+#    define FLY_COMPILER_GCC
+#elif defined(_MSC_VER)
+#    define FLY_COMPILER_MSVC
+#else
+#    warning Unsupported compiler. Only Clang, GCC, and MSVC are supported.
+#endif
+
+// Detect language feature support. See: https://en.cppreference.com/w/cpp/compiler_support
+#if defined(FLY_COMPILER_DISABLE_CONSTEVAL)
+#    undef FLY_COMPILER_SUPPORTS_CONSTEVAL
+#    define FLY_CONSTEVAL constexpr
+#elif defined(FLY_COMPILER_GCC)
+#    define FLY_COMPILER_SUPPORTS_CONSTEVAL
+#    define FLY_CONSTEVAL consteval
+#else
+#    undef FLY_COMPILER_SUPPORTS_CONSTEVAL
+#    define FLY_CONSTEVAL constexpr
+#endif
+
 // Define macro to convert a macro parameter to a string.
 #define FLY_STRINGIZE(s) #s
 
@@ -71,6 +94,62 @@ inline constexpr bool is_macos()
 inline constexpr bool is_windows()
 {
 #if defined(FLY_WINDOWS)
+    return true;
+#else
+    return false;
+#endif
+}
+
+/**
+ * Compile-time helper function to determine if the compiler is Clang.
+ *
+ * @return True if the compiler is Clang.
+ */
+inline constexpr bool is_clang()
+{
+#if defined(FLY_COMPILER_CLANG)
+    return true;
+#else
+    return false;
+#endif
+}
+
+/**
+ * Compile-time helper function to determine if the compiler is GCC.
+ *
+ * @return True if the compiler is GCC.
+ */
+inline constexpr bool is_gcc()
+{
+#if defined(FLY_COMPILER_GCC)
+    return true;
+#else
+    return false;
+#endif
+}
+
+/**
+ * Compile-time helper function to determine if the compiler is MSVC.
+ *
+ * @return True if the compiler is Clang.
+ */
+inline constexpr bool is_msvc()
+{
+#if defined(FLY_COMPILER_MSVC)
+    return true;
+#else
+    return false;
+#endif
+}
+
+/**
+ * Compile-time helper function to determine if immediate functions (consteval) are supported.
+ *
+ * @return True if the compiler supports consteval.
+ */
+inline constexpr bool supports_consteval()
+{
+#if defined(FLY_COMPILER_SUPPORTS_CONSTEVAL)
     return true;
 #else
     return false;

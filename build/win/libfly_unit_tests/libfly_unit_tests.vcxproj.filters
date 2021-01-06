@@ -33,6 +33,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\test\fly.cpp" />
     <ClCompile Include="..\..\..\test\main.cpp" />
     <ClCompile Include="..\..\..\test\coders\base64_coder.cpp">
       <Filter>coders</Filter>
