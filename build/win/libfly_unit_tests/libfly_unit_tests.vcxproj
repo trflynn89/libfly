@@ -246,6 +246,7 @@
     <ClCompile Include="..\..\..\test\types\string_classifier.cpp" />
     <ClCompile Include="..\..\..\test\types\string_converter.cpp" />
     <ClCompile Include="..\..\..\test\types\string_formatter.cpp" />
+    <ClCompile Include="..\..\..\test\types\string_lexer.cpp" />
     <ClCompile Include="..\..\..\test\types\string_traits.cpp" />
     <ClCompile Include="..\..\..\test\types\string_unicode.cpp" />
   </ItemGroup>
