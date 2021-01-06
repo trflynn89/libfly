@@ -8,11 +8,8 @@ CATCH_TEST_CASE("Fly", "[fly]")
 {
     CATCH_SECTION("Stringize helper")
     {
-        const std::string s1 = FLY_STRINGIZE();
-        CATCH_CHECK(s1.empty());
-
-        const std::string s2 = FLY_STRINGIZE(libfly);
-        CATCH_CHECK(s2 == "libfly");
+        const std::string s = FLY_STRINGIZE(libfly);
+        CATCH_CHECK(s == "libfly");
     }
 
     CATCH_SECTION("Operating system-dependent headers")
@@ -50,6 +47,38 @@ CATCH_TEST_CASE("Fly", "[fly]")
         CATCH_CHECK(fly::is_windows());
 #else
         static_assert(false, "Unknown operating system");
+#endif
+    }
+
+    CATCH_SECTION("Compiler helpers")
+    {
+#if defined(__clang__)
+        CATCH_CHECK(fly::is_clang());
+        CATCH_CHECK_FALSE(fly::is_gcc());
+        CATCH_CHECK_FALSE(fly::is_msvc());
+#elif defined(__GNUC__)
+        CATCH_CHECK_FALSE(fly::is_clang());
+        CATCH_CHECK(fly::is_gcc());
+        CATCH_CHECK_FALSE(fly::is_msvc());
+#elif defined(_MSC_VER)
+        CATCH_CHECK_FALSE(fly::is_clang());
+        CATCH_CHECK_FALSE(fly::is_gcc());
+        CATCH_CHECK(fly::is_msvc());
+#else
+        static_assert(false, "Unknown compiler");
+#endif
+    }
+
+    CATCH_SECTION("Language feature helpers")
+    {
+#if defined(__clang__)
+        CATCH_CHECK_FALSE(fly::supports_consteval());
+#elif defined(__GNUC__)
+        CATCH_CHECK(fly::supports_consteval());
+#elif defined(_MSC_VER)
+        CATCH_CHECK_FALSE(fly::supports_consteval());
+#else
+        static_assert(false, "Unknown compiler");
 #endif
     }
 }
