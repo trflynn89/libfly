@@ -137,6 +137,9 @@
     <ClCompile Include="..\..\..\test\types\string_formatter.cpp">
       <Filter>types</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\types\string_formatter_types.cpp">
+      <Filter>types</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\types\string_lexer.cpp">
       <Filter>types</Filter>
     </ClCompile>
