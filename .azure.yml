@@ -60,28 +60,14 @@ jobs:
       mode: 'Release'
       arch: 'x64'
 
-  #### macOS Clang ####
+  #### macOS ####
 
   - template: build/ci/macos.yml
     parameters:
-      toolchain: 'clang'
       mode: 'Debug'
 
   - template: build/ci/macos.yml
     parameters:
-      toolchain: 'clang'
-      mode: 'Release'
-
-  #### macOS GCC ####
-
-  - template: build/ci/macos.yml
-    parameters:
-      toolchain: 'gcc'
-      mode: 'Debug'
-
-  - template: build/ci/macos.yml
-    parameters:
-      toolchain: 'gcc'
       mode: 'Release'
 
   #### Windows ####

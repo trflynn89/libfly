@@ -1,9 +1,8 @@
 parameters:
-  toolchain: 'clang'
   mode: 'Debug'
 
 jobs:
-  - job: 'macOS_${{ parameters.toolchain }}_${{ parameters.mode }}'
+  - job: 'macOS_${{ parameters.mode }}'
 
     pool:
       vmImage: macOS-10.15
@@ -13,7 +12,7 @@ jobs:
 
     - ${{ if eq(parameters.mode, 'Debug') }}:
       - script: |
-          echo "##vso[task.setvariable variable=config]mode=debug toolchain=${{ parameters.toolchain }}"
+          echo "##vso[task.setvariable variable=config]mode=debug"
         displayName: 'Configure'
 
       - script: |
@@ -22,17 +21,16 @@ jobs:
 
     - ${{ if eq(parameters.mode, 'Release') }}:
       - script: |
-          echo "##vso[task.setvariable variable=config]mode=release toolchain=${{ parameters.toolchain }}"
+          echo "##vso[task.setvariable variable=config]mode=release"
         displayName: 'Configure'
 
       - script: |
           make -j $(sysctl -n hw.ncpu) -C build/nix $(config) libfly
         displayName: 'Build'
 
-      - ${{ if eq(parameters.toolchain, 'clang') }}:
-        - template: package.yml
-          parameters:
-            contents: 'build/nix/release/${{ parameters.toolchain }}/x64/etc/libfly-*.tar.bz2'
+      - template: package.yml
+        parameters:
+          contents: 'build/nix/release/clang/x64/etc/libfly-*.tar.bz2'
 
     - script: |
         make -j -C build/nix $(config) install
