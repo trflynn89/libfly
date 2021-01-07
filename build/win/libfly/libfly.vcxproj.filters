@@ -277,6 +277,9 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter_types.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_lexer.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
