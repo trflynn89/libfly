@@ -82,8 +82,8 @@ CATCH_TEMPLATE_TEST_CASE(
         {
             CATCH_CHECK_THROWS_JSON(
                 fly::Json(string_type(1, static_cast<char_type>(ch))),
-                "Character '%c' must be escaped",
-                static_cast<char>(ch));
+                "Character {:#04x} must be escaped",
+                static_cast<char_type>(ch));
         }
 
         // Characters must be valid Unicode.
@@ -128,8 +128,8 @@ CATCH_TEMPLATE_TEST_CASE(
             map = {{string_type(1, static_cast<char_type>(ch)), 1}};
             CATCH_CHECK_THROWS_JSON(
                 fly::Json(map),
-                "Character '%c' must be escaped",
-                static_cast<char>(ch));
+                "Character {:#04x} must be escaped",
+                static_cast<char_type>(ch));
         }
 
         // Characters must be valid Unicode.
@@ -205,8 +205,8 @@ CATCH_TEMPLATE_TEST_CASE(
             vector = {string_type(1, static_cast<char_type>(ch))};
             CATCH_CHECK_THROWS_JSON(
                 fly::Json(vector),
-                "Character '%c' must be escaped",
-                static_cast<char>(ch));
+                "Character {:#04x} must be escaped",
+                static_cast<char_type>(ch));
         }
 
         // Characters must be valid Unicode.

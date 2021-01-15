@@ -137,7 +137,7 @@ std::shared_ptr<T> ConfigManager::create_config()
     }
     else
     {
-        LOGW("Could not create configuration for type %s", T::identifier);
+        LOGW("Could not create configuration for type {}", T::identifier);
     }
 
     return config;

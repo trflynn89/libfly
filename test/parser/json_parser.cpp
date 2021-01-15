@@ -1,5 +1,6 @@
 #include "fly/parser/json_parser.hpp"
 
+#include "fly/logger/logger.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -22,7 +23,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     auto validate_fail = [&](const std::string &test)
     {
-        validate_fail_raw(fly::String::format("{ \"a\" : %s }", test));
+        validate_fail_raw(fly::String::format("{{ \"a\" : {} }}", test));
     };
 
     auto validate_pass_raw =
@@ -53,7 +54,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     auto validate_pass = [&](const std::string &test, const fly::Json &expected)
     {
-        validate_pass_raw(fly::String::format("{ \"a\" : %s }", test), "a", expected);
+        validate_pass_raw(fly::String::format("{{ \"a\" : {} }}", test), "a", expected);
     };
 
     // https://www.json.org/JSON_checker/
@@ -71,6 +72,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         {
             const auto file = it.path().filename();
             CATCH_CAPTURE(file);
+            LOGI("{}", file);
 
             if (file.string().starts_with("pass"))
             {

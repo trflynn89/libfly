@@ -29,7 +29,7 @@ namespace {
             return info.st_ino;
         }
 
-        LOGS("Could not determine inode ID for %s", path);
+        LOGS("Could not determine inode ID for {}", path);
         return 0;
     }
 
@@ -42,7 +42,7 @@ PathMonitorImpl::PathMonitorImpl(
     PathMonitor(task_runner, config),
     m_context(std::make_unique<FSEventStreamContext>()),
     m_dispatch_queue(dispatch_queue_create(
-        fly::String::format("fly.PathMonitor.%p", this).c_str(),
+        fly::String::format("fly.PathMonitor.{:p}", this).c_str(),
         DISPATCH_QUEUE_SERIAL)),
     m_stream(nullptr)
 {
@@ -268,7 +268,7 @@ void PathMonitorImpl::handle_event(EventInfo &&event) const
         {
             auto path = std::filesystem::path(path_it->first) / event.path.filename();
 
-            LOGI("Handling event %s for %s", event.event, path);
+            LOGI("Handling event {} for {}", event.event, path);
             callback(path, event.event);
         }
     }
@@ -290,7 +290,7 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     }
     else
     {
-        LOGS("Could not add watcher for %s", path);
+        LOGS("Could not add watcher for {}", path);
     }
 }
 

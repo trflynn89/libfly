@@ -78,10 +78,10 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
             CATCH_CHECK(T3(json) == test3);
 
             json = {{"a", true}};
-            CATCH_CHECK_THROWS_JSON(T1(json), "JSON type is not numeric: (%s)", json["a"]);
+            CATCH_CHECK_THROWS_JSON(T1(json), "JSON type is not numeric: ({})", json["a"]);
 
             json = {{"a", J_STR("string")}};
-            CATCH_CHECK_THROWS_JSON(T1(json), "JSON type is not numeric: (%s)", json["a"]);
+            CATCH_CHECK_THROWS_JSON(T1(json), "JSON type is not numeric: ({})", json["a"]);
         };
 
         auto invalidate = [&json](auto *name, auto &test)
@@ -92,7 +92,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
             CATCH_CHECK_THROWS_JSON(
                 FLY_UNUSED((T(json))),
-                "JSON type is not an object: (%s)",
+                "JSON type is not an object: ({})",
                 json);
         };
 
@@ -124,13 +124,13 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
             json = {true};
             CATCH_CHECK_THROWS_JSON(
                 FLY_UNUSED((std::array<int, 1>(json))),
-                "JSON type is not numeric: (%s)",
+                "JSON type is not numeric: ({})",
                 json[0]);
 
             json = {J_STR("string")};
             CATCH_CHECK_THROWS_JSON(
                 FLY_UNUSED((std::array<int, 1>(json))),
-                "JSON type is not numeric: (%s)",
+                "JSON type is not numeric: ({})",
                 json[0]);
         };
 
@@ -156,7 +156,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
             using T = std::decay_t<decltype(test)>;
 
-            CATCH_CHECK_THROWS_JSON(FLY_UNUSED((T(json))), "JSON type is not an array: (%s)", json);
+            CATCH_CHECK_THROWS_JSON(FLY_UNUSED((T(json))), "JSON type is not an array: ({})", json);
         };
 
         fly::test::run_test_for_array_types<json_type, string_type>(
@@ -200,7 +200,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
         }
         else
         {
-            CATCH_CHECK_THROWS_JSON(int(json), "JSON type is not numeric: (%s)", json);
+            CATCH_CHECK_THROWS_JSON(int(json), "JSON type is not numeric: ({})", json);
 
             if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
             {
@@ -221,12 +221,12 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
         }
         else
         {
-            CATCH_CHECK_THROWS_JSON(unsigned(json), "JSON type is not numeric: (%s)", json);
+            CATCH_CHECK_THROWS_JSON(unsigned(json), "JSON type is not numeric: ({})", json);
 
             if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
             {
                 json = J_STR("-123");
-                CATCH_CHECK_THROWS_JSON(unsigned(json), "JSON type is not numeric: (%s)", json);
+                CATCH_CHECK_THROWS_JSON(unsigned(json), "JSON type is not numeric: ({})", json);
 
                 json = J_STR("123");
                 CATCH_CHECK(unsigned(json) == unsigned(123));
@@ -243,7 +243,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
         }
         else
         {
-            CATCH_CHECK_THROWS_JSON(int(json), "JSON type is not numeric: (%s)", json);
+            CATCH_CHECK_THROWS_JSON(int(json), "JSON type is not numeric: ({})", json);
 
             if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
             {
@@ -262,7 +262,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
         }
         else
         {
-            CATCH_CHECK_THROWS_JSON(std::nullptr_t(json), "JSON type is not null: (%s)", json);
+            CATCH_CHECK_THROWS_JSON(std::nullptr_t(json), "JSON type is not null: ({})", json);
         }
     }
 }

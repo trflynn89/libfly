@@ -27,7 +27,7 @@ namespace {
         const auto ratio = (static_cast<double>(decoded_size) - encoded_size) / decoded_size;
 
         LOGD(
-            "Encoded %u bytes to %u bytes (%f%%) in %f seconds",
+            "Encoded {} bytes to {} bytes ({:.2f}%) in {:.2f} seconds",
             decoded_size,
             encoded_size,
             ratio * 100.0,
@@ -43,7 +43,7 @@ namespace {
         const auto end = std::chrono::system_clock::now();
 
         LOGD(
-            "Decoded %u bytes to %u bytes in %f seconds",
+            "Decoded {} bytes to {} bytes in {:.2f} seconds",
             encoded_size,
             decoded_size,
             std::chrono::duration<double>(end - start).count());

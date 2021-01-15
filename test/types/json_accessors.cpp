@@ -19,23 +19,23 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
             CATCH_CHECK(json1.at(1) == 8);
             CATCH_CHECK(json1.at(2) == 9);
             CATCH_CHECK(json1.at(3) == 10);
-            CATCH_CHECK_THROWS_JSON(json1.at(4), "Given index (4) not found: (%s)", json1);
+            CATCH_CHECK_THROWS_JSON(json1.at(4), "Given index (4) not found: ({})", json1);
 
             CATCH_CHECK(json2.at(0) == '7');
             CATCH_CHECK(json2.at(1) == 8);
             CATCH_CHECK(json2.at(2) == 9);
             CATCH_CHECK(json2.at(3) == 10);
-            CATCH_CHECK_THROWS_JSON(json2.at(4), "Given index (4) not found: (%s)", json2);
+            CATCH_CHECK_THROWS_JSON(json2.at(4), "Given index (4) not found: ({})", json2);
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
                 json1.at(0),
-                "JSON type invalid for operator[index]: (%s)",
+                "JSON type invalid for operator[index]: ({})",
                 json1);
             CATCH_CHECK_THROWS_JSON(
                 json2.at(0),
-                "JSON type invalid for operator[index]: (%s)",
+                "JSON type invalid for operator[index]: ({})",
                 json2);
         }
     }
@@ -52,7 +52,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
 
                 CATCH_CHECK_THROWS_JSON(
                     json2[0],
-                    "JSON type invalid for operator[index]: (%s)",
+                    "JSON type invalid for operator[index]: ({})",
                     json2);
             }
             else
@@ -68,13 +68,13 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
                 CATCH_CHECK(json2[1] == 8);
                 CATCH_CHECK(json2[2] == 9);
                 CATCH_CHECK(json2[3] == 10);
-                CATCH_CHECK_THROWS_JSON(json2[4], "Given index (4) not found: (%s)", json2);
+                CATCH_CHECK_THROWS_JSON(json2[4], "Given index (4) not found: ({})", json2);
             }
         }
         else
         {
-            CATCH_CHECK_THROWS_JSON(json1[0], "JSON type invalid for operator[index]: (%s)", json1);
-            CATCH_CHECK_THROWS_JSON(json2[0], "JSON type invalid for operator[index]: (%s)", json2);
+            CATCH_CHECK_THROWS_JSON(json1[0], "JSON type invalid for operator[index]: ({})", json1);
+            CATCH_CHECK_THROWS_JSON(json2[0], "JSON type invalid for operator[index]: ({})", json2);
         }
     }
 
@@ -95,11 +95,11 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
         {
             CATCH_CHECK_THROWS_ITERATOR(
                 json1.front(),
-                "JSON type invalid for iteration: (%s)",
+                "JSON type invalid for iteration: ({})",
                 json1);
             CATCH_CHECK_THROWS_ITERATOR(
                 json2.front(),
-                "JSON type invalid for iteration: (%s)",
+                "JSON type invalid for iteration: ({})",
                 json2);
         }
     }
@@ -121,11 +121,11 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
         {
             CATCH_CHECK_THROWS_ITERATOR(
                 json1.back(),
-                "JSON type invalid for iteration: (%s)",
+                "JSON type invalid for iteration: ({})",
                 json1);
             CATCH_CHECK_THROWS_ITERATOR(
                 json2.back(),
-                "JSON type invalid for iteration: (%s)",
+                "JSON type invalid for iteration: ({})",
                 json2);
         }
     }
@@ -197,7 +197,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
         {
             CATCH_CHECK_THROWS_JSON(
                 json1.resize(1),
-                "JSON type invalid for capacity operations: (%s)",
+                "JSON type invalid for capacity operations: ({})",
                 json1);
         }
     }
@@ -250,7 +250,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
         {
             CATCH_CHECK_THROWS_JSON(
                 json1.reserve(1),
-                "JSON type invalid for capacity operations: (%s)",
+                "JSON type invalid for capacity operations: ({})",
                 json1);
         }
     }
@@ -271,21 +271,21 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
         {
             CATCH_CHECK(json1.at(J_STR("a")) == 1);
             CATCH_CHECK(json1.at(J_STR("b")) == 2);
-            CATCH_CHECK_THROWS_JSON(json1.at(J_STR("c")), "Given key (c) not found: (%s)", json1);
+            CATCH_CHECK_THROWS_JSON(json1.at(J_STR("c")), "Given key (c) not found: ({})", json1);
 
             CATCH_CHECK(json2.at(J_STR("a")) == 1);
             CATCH_CHECK(json2.at(J_STR("b")) == 2);
-            CATCH_CHECK_THROWS_JSON(json2.at(J_STR("c")), "Given key (c) not found: (%s)", json2);
+            CATCH_CHECK_THROWS_JSON(json2.at(J_STR("c")), "Given key (c) not found: ({})", json2);
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
                 json1.at(J_STR("a")),
-                "JSON type invalid for operator[key]: (%s)",
+                "JSON type invalid for operator[key]: ({})",
                 json1);
             CATCH_CHECK_THROWS_JSON(
                 json2.at(J_STR("a")),
-                "JSON type invalid for operator[key]: (%s)",
+                "JSON type invalid for operator[key]: ({})",
                 json2);
         }
     }
@@ -302,7 +302,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
 
                 CATCH_CHECK_THROWS_JSON(
                     json2[J_STR("a")],
-                    "JSON type invalid for operator[key]: (%s)",
+                    "JSON type invalid for operator[key]: ({})",
                     json2);
             }
             else
@@ -314,18 +314,18 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
 
                 CATCH_CHECK(json2[J_STR("a")] == 1);
                 CATCH_CHECK(json2[J_STR("b")] == 2);
-                CATCH_CHECK_THROWS_JSON(json2[J_STR("c")], "Given key (c) not found: (%s)", json2);
+                CATCH_CHECK_THROWS_JSON(json2[J_STR("c")], "Given key (c) not found: ({})", json2);
             }
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
                 json1[J_STR("a")],
-                "JSON type invalid for operator[key]: (%s)",
+                "JSON type invalid for operator[key]: ({})",
                 json1);
             CATCH_CHECK_THROWS_JSON(
                 json2[J_STR("a")],
-                "JSON type invalid for operator[key]: (%s)",
+                "JSON type invalid for operator[key]: ({})",
                 json2);
         }
     }
@@ -351,11 +351,11 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
         {
             CATCH_CHECK_THROWS_JSON(
                 json1.count(J_STR("a")),
-                "JSON type invalid for count(key): (%s)",
+                "JSON type invalid for count(key): ({})",
                 json1);
             CATCH_CHECK_THROWS_JSON(
                 json2.count(J_STR("a")),
-                "JSON type invalid for count(key): (%s)",
+                "JSON type invalid for count(key): ({})",
                 json2);
         }
     }
@@ -386,11 +386,11 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
         {
             CATCH_CHECK_THROWS_JSON(
                 json1.find(J_STR("a")),
-                "JSON type invalid for find(key): (%s)",
+                "JSON type invalid for find(key): ({})",
                 json1);
             CATCH_CHECK_THROWS_JSON(
                 json2.find(J_STR("a")),
-                "JSON type invalid for find(key): (%s)",
+                "JSON type invalid for find(key): ({})",
                 json2);
         }
     }
@@ -416,11 +416,11 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
         {
             CATCH_CHECK_THROWS_JSON(
                 json1.contains(J_STR("a")),
-                "JSON type invalid for contains(key): (%s)",
+                "JSON type invalid for contains(key): ({})",
                 json1);
             CATCH_CHECK_THROWS_JSON(
                 json2.contains(J_STR("a")),
-                "JSON type invalid for contains(key): (%s)",
+                "JSON type invalid for contains(key): ({})",
                 json2);
         }
     }

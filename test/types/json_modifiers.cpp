@@ -57,7 +57,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(array.begin(), value),
-                "JSON type invalid for array insertion: (%s)",
+                "JSON type invalid for array insertion: ({})",
                 json);
         }
     }
@@ -99,7 +99,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(array.begin(), value()),
-                "JSON type invalid for array insertion: (%s)",
+                "JSON type invalid for array insertion: ({})",
                 json);
         }
     }
@@ -148,7 +148,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(array.begin(), 1, value),
-                "JSON type invalid for array insertion: (%s)",
+                "JSON type invalid for array insertion: ({})",
                 json);
         }
     }
@@ -170,7 +170,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
             CATCH_CHECK_THROWS_JSON(
                 json.insert(json.begin(), json.begin(), json.end()),
-                "Provided iterators may not belong to this Json instance: (%s)",
+                "Provided iterators may not belong to this Json instance: ({})",
                 json);
 
             CATCH_CHECK_THROWS_JSON(
@@ -203,7 +203,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(array.begin(), array.begin(), array.end()),
-                "JSON type invalid for array insertion: (%s)",
+                "JSON type invalid for array insertion: ({})",
                 json);
         }
     }
@@ -244,7 +244,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(array.begin(), {1, 2, 3}),
-                "JSON type invalid for array insertion: (%s)",
+                "JSON type invalid for array insertion: ({})",
                 json);
         }
     }
@@ -266,7 +266,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.emplace_back(std::move(value)),
-                "JSON type invalid for array emplacement: (%s)",
+                "JSON type invalid for array emplacement: ({})",
                 json);
         }
     }
@@ -292,7 +292,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.push_back(value1),
-                "JSON type invalid for array insertion: (%s)",
+                "JSON type invalid for array insertion: ({})",
                 json);
         }
     }
@@ -318,7 +318,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.push_back(std::move(value1)),
-                "JSON type invalid for array insertion: (%s)",
+                "JSON type invalid for array insertion: ({})",
                 json);
         }
     }
@@ -339,13 +339,13 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             json.pop_back();
             CATCH_CHECK(json == json_type());
 
-            CATCH_CHECK_THROWS_JSON(json.erase(0), "Given index (0) not found: (%s)", json);
+            CATCH_CHECK_THROWS_JSON(json.erase(0), "Given index (0) not found: ({})", json);
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
                 json.pop_back(),
-                "JSON type invalid for erase(index): (%s)",
+                "JSON type invalid for erase(index): ({})",
                 json);
         }
     }
@@ -398,7 +398,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.erase(fly::Json::const_iterator()),
-                "JSON type invalid for erasure: (%s)",
+                "JSON type invalid for erasure: ({})",
                 json);
         }
     }
@@ -447,7 +447,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.erase(fly::Json::const_iterator(), fly::Json::const_iterator()),
-                "JSON type invalid for erasure: (%s)",
+                "JSON type invalid for erasure: ({})",
                 json);
         }
     }
@@ -456,7 +456,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
     {
         if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
         {
-            CATCH_CHECK_THROWS_JSON(json.erase(4), "Given index (4) not found: (%s)", json);
+            CATCH_CHECK_THROWS_JSON(json.erase(4), "Given index (4) not found: ({})", json);
 
             json.erase(0);
             CATCH_CHECK(json == fly::Json {8, 9, 10});
@@ -470,13 +470,13 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             json.erase(0);
             CATCH_CHECK(json == json_type());
 
-            CATCH_CHECK_THROWS_JSON(json.erase(0), "Given index (0) not found: (%s)", json);
+            CATCH_CHECK_THROWS_JSON(json.erase(0), "Given index (0) not found: ({})", json);
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
                 json.erase(0),
-                "JSON type invalid for erase(index): (%s)",
+                "JSON type invalid for erase(index): ({})",
                 json);
         }
     }
@@ -545,7 +545,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
             CATCH_CHECK_THROWS_JSON(
                 json.swap(test),
-                "JSON type invalid for swap(array): (%s)",
+                "JSON type invalid for swap(array): ({})",
                 json);
         };
 
@@ -568,11 +568,11 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.merge(int1),
-                "Other JSON type invalid for merging: (%s)",
+                "Other JSON type invalid for merging: ({})",
                 int1);
             CATCH_CHECK_THROWS_JSON(
                 json.merge(std::move(int2)),
-                "Other JSON type invalid for merging: (%s)",
+                "Other JSON type invalid for merging: ({})",
                 fly::test::create_json<fly::JsonTraits::signed_type>());
 
             CATCH_CHECK_NOTHROW(json.merge(object1));
@@ -605,11 +605,11 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.merge(object1),
-                "JSON type invalid for merging: (%s)",
+                "JSON type invalid for merging: ({})",
                 json);
             CATCH_CHECK_THROWS_JSON(
                 json.merge(std::move(object2)),
-                "JSON type invalid for merging: (%s)",
+                "JSON type invalid for merging: ({})",
                 json);
         }
     }
@@ -645,7 +645,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(key, value1),
-                "JSON type invalid for object insertion: (%s)",
+                "JSON type invalid for object insertion: ({})",
                 json);
         }
     }
@@ -671,7 +671,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(key, std::move(value1)),
-                "JSON type invalid for object insertion: (%s)",
+                "JSON type invalid for object insertion: ({})",
                 json);
         }
     }
@@ -697,7 +697,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(key, std::move(value1)),
-                "JSON type invalid for object insertion: (%s)",
+                "JSON type invalid for object insertion: ({})",
                 json);
         }
     }
@@ -732,7 +732,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(object.begin(), object.end()),
-                "JSON type invalid for object insertion: (%s)",
+                "JSON type invalid for object insertion: ({})",
                 json);
         }
     }
@@ -760,7 +760,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.emplace(key, std::move(value1)),
-                "JSON type invalid for object emplacement: (%s)",
+                "JSON type invalid for object emplacement: ({})",
                 json);
         }
     }
@@ -785,7 +785,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.erase(J_STR("a")),
-                "JSON type invalid for erase(key): (%s)",
+                "JSON type invalid for erase(key): ({})",
                 json);
         }
     }
@@ -804,7 +804,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         {
             CATCH_CHECK_THROWS_JSON(
                 json.swap(str),
-                "JSON type invalid for swap(string): (%s)",
+                "JSON type invalid for swap(string): ({})",
                 json);
         }
     }
@@ -847,7 +847,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
 
             CATCH_CHECK_THROWS_JSON(
                 json.swap(test),
-                "JSON type invalid for swap(object): (%s)",
+                "JSON type invalid for swap(object): ({})",
                 json);
         };
 
@@ -902,10 +902,10 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         {
             CATCH_CAPTURE(name);
 
-            CATCH_CHECK_THROWS_JSON(json.merge(test), "JSON type invalid for merging: (%s)", json);
+            CATCH_CHECK_THROWS_JSON(json.merge(test), "JSON type invalid for merging: ({})", json);
             CATCH_CHECK_THROWS_JSON(
                 json.merge(std::move(test)),
-                "JSON type invalid for merging: (%s)",
+                "JSON type invalid for merging: ({})",
                 json);
         };
 

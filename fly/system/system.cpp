@@ -40,7 +40,7 @@ std::string System::get_error_string()
 //==================================================================================================
 std::string System::get_error_string(int code)
 {
-    return fly::String::format("(%d) %s", code, std::system_category().message(code));
+    return fly::String::format("({}) {}", code, std::system_category().message(code));
 }
 
 //==================================================================================================

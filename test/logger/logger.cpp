@@ -232,7 +232,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("Without trace information")
             {
                 logger->debug("Debug Log");
-                logger->debug("Debug Log: %d", 123);
+                logger->debug("Debug Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Debug, nullptr, std::move(expectations));
             }
@@ -240,7 +240,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("With trace information")
             {
                 logger->debug({__FILE__, __FUNCTION__, 123_u32}, "Debug Log");
-                logger->debug({__FILE__, __FUNCTION__, 123_u32}, "Debug Log: %d", 123);
+                logger->debug({__FILE__, __FUNCTION__, 123_u32}, "Debug Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Debug, __FUNCTION__, std::move(expectations));
             }
@@ -248,7 +248,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("With macro invocation")
             {
                 LOGD("Debug Log");
-                LOGD("Debug Log: %d", 123);
+                LOGD("Debug Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Debug, __FUNCTION__, std::move(expectations));
             }
@@ -264,7 +264,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("Without trace information")
             {
                 logger->info("Info Log");
-                logger->info("Info Log: %d", 123);
+                logger->info("Info Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Info, nullptr, std::move(expectations));
             }
@@ -272,7 +272,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("With trace information")
             {
                 logger->info({__FILE__, __FUNCTION__, 123_u32}, "Info Log");
-                logger->info({__FILE__, __FUNCTION__, 123_u32}, "Info Log: %d", 123);
+                logger->info({__FILE__, __FUNCTION__, 123_u32}, "Info Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Info, __FUNCTION__, std::move(expectations));
             }
@@ -280,7 +280,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("With macro invocation")
             {
                 LOGI("Info Log");
-                LOGI("Info Log: %d", 123);
+                LOGI("Info Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Info, __FUNCTION__, std::move(expectations));
             }
@@ -296,7 +296,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("Without trace information")
             {
                 logger->warn("Warning Log");
-                logger->warn("Warning Log: %d", 123);
+                logger->warn("Warning Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Warn, nullptr, std::move(expectations));
             }
@@ -304,7 +304,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("With trace information")
             {
                 logger->warn({__FILE__, __FUNCTION__, 123_u32}, "Warning Log");
-                logger->warn({__FILE__, __FUNCTION__, 123_u32}, "Warning Log: %d", 123);
+                logger->warn({__FILE__, __FUNCTION__, 123_u32}, "Warning Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
             }
@@ -312,7 +312,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("With macro invocation")
             {
                 LOGW("Warning Log");
-                LOGW("Warning Log: %d", 123);
+                LOGW("Warning Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
             }
@@ -320,7 +320,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("With system macro invocation")
             {
                 LOGS("Warning Log");
-                LOGS("Warning Log: %d", 123);
+                LOGS("Warning Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Warn, __FUNCTION__, std::move(expectations));
             }
@@ -336,7 +336,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("Without trace information")
             {
                 logger->error("Error Log");
-                logger->error("Error Log: %d", 123);
+                logger->error("Error Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Error, nullptr, std::move(expectations));
             }
@@ -344,7 +344,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("With trace information")
             {
                 logger->error({__FILE__, __FUNCTION__, 123_u32}, "Error Log");
-                logger->error({__FILE__, __FUNCTION__, 123_u32}, "Error Log: %d", 123);
+                logger->error({__FILE__, __FUNCTION__, 123_u32}, "Error Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Error, __FUNCTION__, std::move(expectations));
             }
@@ -352,7 +352,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
             CATCH_SECTION("With macro invocation")
             {
                 LOGE("Error Log");
-                LOGE("Error Log: %d", 123);
+                LOGE("Error Log: {}", 123);
 
                 validate_log_points(fly::Log::Level::Error, __FUNCTION__, std::move(expectations));
             }

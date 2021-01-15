@@ -75,7 +75,7 @@ bool FileSink::create_log_file()
     fly::String::replace_all(time, ":", '-');
     fly::String::replace_all(time, " ", '_');
 
-    std::string file_name = fly::String::format("Log_%d_%s_%s.log", ++m_log_index, time, random);
+    std::string file_name = fly::String::format("Log_{}_{}_{}.log", ++m_log_index, time, random);
     m_log_file = m_log_directory / std::move(file_name);
 
     m_log_stream.open(m_log_file, std::ios::out);

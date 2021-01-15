@@ -54,7 +54,7 @@ bool SocketImpl::hostname_to_address(const std::string &hostname, address_type &
 
     if (ip_address == nullptr)
     {
-        LOGS("Error resolving %s", hostname);
+        LOGS("Error resolving {}", hostname);
         return false;
     }
 
@@ -65,7 +65,7 @@ bool SocketImpl::hostname_to_address(const std::string &hostname, address_type &
 
     address = ntohl(address);
 
-    LOGD("Converted hostname %s to %d", hostname, address);
+    LOGD("Converted hostname {} to {}", hostname, address);
     return true;
 }
 
@@ -156,7 +156,7 @@ bool SocketImpl::bind(address_type address, port_type port, BindOption option) c
 
     if (ret == SOCKET_ERROR)
     {
-        SLOGS(m_socket_handle, "Error binding to %d", port);
+        SLOGS(m_socket_handle, "Error binding to {}", port);
         return false;
     }
 
@@ -219,7 +219,7 @@ std::shared_ptr<Socket> SocketImpl::accept() const
     }
     else
     {
-        SLOGD(m_socket_handle, "Accepted new socket: %d (%d)", ret->get_socket_id(), skt);
+        SLOGD(m_socket_handle, "Accepted new socket: {} ({})", ret->get_socket_id(), skt);
 
         ret->m_socket_handle = skt;
         ret->m_client_ip = ntohl(socket_address.sin_addr.s_addr);

@@ -137,17 +137,17 @@ ConnectedState Socket::connect_async(address_type address, port_type port)
     {
         if (connect(address, port))
         {
-            SLOGD(m_socket_id, "Connected to %d:%d", address, port);
+            SLOGD(m_socket_id, "Connected to {}:{}", address, port);
             state = ConnectedState::Connected;
         }
         else if (is_connecting())
         {
-            SLOGD(m_socket_id, "Connect to %d:%d in progress", address, port);
+            SLOGD(m_socket_id, "Connect to {}:{} in progress", address, port);
             state = ConnectedState::Connecting;
         }
         else
         {
-            SLOGW(m_socket_id, "Could not connect to %d:%d, closing socket", address, port);
+            SLOGW(m_socket_id, "Could not connect to {}:{}, closing socket", address, port);
 
             close();
         }
@@ -311,14 +311,14 @@ void Socket::service_send_requests(AsyncRequest::RequestQueue &completed_sends)
 
             if (bytes_sent == message.length())
             {
-                SLOGD(m_socket_id, "Sent %u bytes", bytes_sent);
+                SLOGD(m_socket_id, "Sent {} bytes", bytes_sent);
                 completed_sends.push(std::move(request));
             }
             else if (would_block)
             {
                 SLOGI(
                     m_socket_id,
-                    "Send would block - sent %u of %u bytes, will finish later",
+                    "Send would block - sent {} of {} bytes, will finish later",
                     bytes_sent,
                     message.length());
 
@@ -359,7 +359,7 @@ void Socket::service_recv_requests(AsyncRequest::RequestQueue &completed_reads)
         {
             SLOGD(
                 m_socket_id,
-                "Received %u bytes, %u in buffer",
+                "Received {} bytes, {} in buffer",
                 received.length(),
                 m_receive_buffer.length());
 
@@ -367,7 +367,7 @@ void Socket::service_recv_requests(AsyncRequest::RequestQueue &completed_reads)
 
             if (is_complete)
             {
-                SLOGD(m_socket_id, "Completed message, %u bytes", m_receive_buffer.length());
+                SLOGD(m_socket_id, "Completed message, {} bytes", m_receive_buffer.length());
 
                 AsyncRequest request(m_socket_id, std::move(m_receive_buffer));
                 completed_reads.push(std::move(request));
@@ -378,7 +378,7 @@ void Socket::service_recv_requests(AsyncRequest::RequestQueue &completed_reads)
         {
             SLOGI(
                 m_socket_id,
-                "Receive would block - received %u bytes, will finish later",
+                "Receive would block - received {} bytes, will finish later",
                 m_receive_buffer.length());
         }
         else

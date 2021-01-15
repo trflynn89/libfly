@@ -28,21 +28,21 @@ SystemMonitorImpl::SystemMonitorImpl(
     PDH_STATUS status = ::PdhOpenQuery(nullptr, 0, &m_cpu_query);
     if (status != ERROR_SUCCESS)
     {
-        LOGS("Could not open CPU query (%x)", status);
+        LOGS("Could not open CPU query ({:#04x})", status);
         return;
     }
 
     status = ::PdhAddCounter(m_cpu_query, s_cpu_path, 0, &m_cpu_counter);
     if (status != ERROR_SUCCESS)
     {
-        LOGS("Could not add CPU counter (%x)", status);
+        LOGS("Could not add CPU counter ({:#04x})", status);
         return;
     }
 
     status = ::PdhCollectQueryData(m_cpu_query);
     if (status != ERROR_SUCCESS)
     {
-        LOGS("Could not poll CPU counter (%x)", status);
+        LOGS("Could not poll CPU counter ({:#04x})", status);
         return;
     }
 }
@@ -81,14 +81,14 @@ void SystemMonitorImpl::update_system_cpu_usage()
     PDH_STATUS status = ::PdhCollectQueryData(m_cpu_query);
     if (status != ERROR_SUCCESS)
     {
-        LOGS("Could not poll CPU counter (%x)", status);
+        LOGS("Could not poll CPU counter ({:#04x})", status);
         return;
     }
 
     status = ::PdhGetFormattedCounterValue(m_cpu_counter, PDH_FMT_DOUBLE, nullptr, &value);
     if (status != ERROR_SUCCESS)
     {
-        LOGS("Could not format CPU counter (%x)", status);
+        LOGS("Could not format CPU counter ({:#04x})", status);
         return;
     }
 

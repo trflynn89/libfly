@@ -7,7 +7,7 @@ namespace fly {
 
 #define JLOG(...)                                                                                  \
     LOGW(                                                                                          \
-        "[line %d, column %d]: " FLY_FORMAT_STRING(__VA_ARGS__),                                   \
+        "[line {}, column {}]: " FLY_FORMAT_STRING(__VA_ARGS__),                                   \
         line(),                                                                                    \
         column() FLY_FORMAT_ARGS(__VA_ARGS__));
 
@@ -40,7 +40,7 @@ std::optional<Json> JsonParser::parse_internal()
     }
     catch (const JsonException &ex)
     {
-        JLOG("%s", ex.what());
+        JLOG("{}", ex.what());
         return std::nullopt;
     }
 
@@ -52,7 +52,7 @@ std::optional<Json> JsonParser::parse_internal()
     {
         if (!eof())
         {
-            JLOG("Extraneous symbols found after JSON value: %x", peek());
+            JLOG("Extraneous symbols found after JSON value: {:#04x}", peek());
             return std::nullopt;
         }
         else if (!json->is_object() && !json->is_array() && !m_allow_any_type)
@@ -261,7 +261,7 @@ std::optional<Json> JsonParser::parse_value()
             break;
     }
 
-    JLOG("Could not convert '%s' to a JSON value", value);
+    JLOG("Could not convert '{}' to a JSON value", value);
     return std::nullopt;
 }
 
@@ -273,7 +273,7 @@ JsonParser::ParseState JsonParser::consume_token(Token token)
     if (const Token parsed = get<Token>(); parsed != token)
     {
         JLOG(
-            "Unexpected character '%c', was expecting '%c'",
+            "Unexpected character '{}', was expecting '{}'",
             static_cast<char>(parsed),
             static_cast<char>(token));
 
@@ -409,7 +409,7 @@ JsonParser::ParseState JsonParser::consume_comment()
         }
 
         default:
-            JLOG("Invalid start sequence for comments: '/%c'", static_cast<char>(token));
+            JLOG("Invalid start sequence for comments: '/{}'", static_cast<char>(token));
             return ParseState::Invalid;
     }
 
