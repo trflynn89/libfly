@@ -102,8 +102,7 @@ ifeq ($(toolchain), clang)
 else ifeq ($(toolchain), gcc)
     CF_ALL += \
         -Wnull-dereference \
-        -Wredundant-decls \
-        -Wsign-promo
+        -Wredundant-decls
 
     ifeq ($(SYSTEM), LINUX)
         CF_ALL += \

@@ -68,6 +68,10 @@ public:
     using ostream_type = typename traits::ostream_type;
     using streamed_type = typename traits::streamed_type;
 
+    template <typename... ParameterTypes>
+    using FormatString =
+        detail::BasicFormatString<StringType, std::type_identity_t<ParameterTypes>...>;
+
     /**
      * Determine the length of any string-like value. Accepts character arrays, std::basic_string
      * specializations, and std::basic_string_view specializations.
@@ -348,23 +352,6 @@ public:
     static std::optional<StringType> unescape_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
-     * Format an integer as a hexadecimal string.
-     *
-     * If the number of bytes required for the string exceeds the provided length, only the least-
-     * significant bytes will be written. If the number of bytes required for the string is less
-     * than the provided length, the string will be zero-padded.
-     *
-     * @tparam IntegerType The type of the integer to format.
-     *
-     * @param value The integer to format.
-     * @param length The length of the string to create.
-     *
-     * @return The created string with only hexacdemical digits.
-     */
-    template <typename IntegerType>
-    static StringType create_hex_string(IntegerType value, size_type length);
-
-    /**
      * Generate a random string of the given length.
      *
      * @param length The length of the string to generate.
@@ -374,52 +361,96 @@ public:
     static StringType generate_random_string(size_type length);
 
     /**
-     * Format a string with variadic template arguments, returning the formatted string.
+     * Format a string with a set of format parameters, returning the formatted string. Based
+     * strongly upon: https://en.cppreference.com/w/cpp/utility/format/format.
      *
-     * This is type safe in that argument types need not match the format specifier (i.e. there is
-     * no error if %s is given an integer). However, specifiers such as %x are still attempted to be
-     * handled. That is, if the matching argument for %x is numeric, then it will be converted to a
-     * hexadecimal representation.
+     * A format string consists of:
      *
-     * There is also no checking done on the number of format specifiers and the number of
-     * arguments. The format specifiers will be replaced one at a time until all arguments are
-     * exhausted, then the rest of the string is taken as-is. Any extra specifiers will be in the
-     * string. Any extra arguments are dropped.
+     *     1. Any character other than "{" or "}", which are copied unchanged to the output.
+     *     2. Escape sequences "{{" and "}}", which are replaced with "{" and "}" in the output.
+     *     3. Replacement fields.
      *
-     * @tparam Args Variadic template arguments.
+     * Replacement fields may be of the form:
+     *
+     *     1. An introductory "{" character.
+     *     2. An optional non-negative position.
+     *     3. An optional colon ":" following by formatting options.
+     *     4. A final "}" character.
+     *
+     * For a detailed description of replacement fields, and how this implementation differs from
+     * std::format, see fly::detail::BasicFormatSpecifier.
+     *
+     * The main difference is the means by which generic format parameters may be formatted into a
+     * string. In this implementation, any type for which an operator<< overload is defined will be
+     * formatted using that overload. Other types will result in an error.
+     *
+     * The format string type is implicitly constructed from a C-string literal. Callers should only
+     * invoke this method accordingly:
+     *
+     *     format("Format {:d}", 1);
+     *
+     * On compilers that support immediate functions (consteval), the format string is validated at
+     * compile time against the types of the format parameters. If the format string is invalid, a
+     * compile error with a diagnostic message will be raised. On other compilers, the error message
+     * will returned rather than a formatted string.
+     *
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param fmt The string to format.
-     * @param args The variadic list of arguments to be formatted.
+     * @param parameters The variadic list of format parameters to be formatted.
      *
-     * @return A string that has been formatted with the given arguments.
+     * @return A string that has been formatted with the given format parameters.
      */
-    template <typename... Args>
-    static streamed_type format(const char_type *fmt, const Args &...args);
+    template <typename... ParameterTypes>
+    static StringType format(FormatString<ParameterTypes...> &&fmt, ParameterTypes &&...parameters);
 
     /**
-     * Format a string with variadic template arguments, inserting the formatted string into a
-     * stream.
+     * Format a string with a set of format parameters, inserting the formatted string into a
+     * stream. Based strongly upon: https://en.cppreference.com/w/cpp/utility/format/format.
      *
-     * This is type safe in that argument types need not match the format specifier (i.e. there is
-     * no error if %s is given an integer). However, specifiers such as %x are still attempted to be
-     * handled. That is, if the matching argument for %x is numeric, then it will be converted to a
-     * hexadecimal representation.
+     * A format string consists of:
      *
-     * There is also no checking done on the number of format specifiers and the number of
-     * arguments. The format specifiers will be replaced one at a time until all arguments are
-     * exhausted, then the rest of the string is taken as-is. Any extra specifiers will be in the
-     * string. Any extra arguments are dropped.
+     *     1. Any character other than "{" or "}", which are copied unchanged to the output.
+     *     2. Escape sequences "{{" and "}}", which are replaced with "{" and "}" in the output.
+     *     3. Replacement fields.
      *
-     * @tparam Args Variadic template arguments.
+     * Replacement fields may be of the form:
      *
-     * @param ostream The stream to insert the formatted string into.
+     *     1. An introductory "{" character.
+     *     2. An optional non-negative position.
+     *     3. An optional colon ":" following by formatting options.
+     *     4. A final "}" character.
+     *
+     * For a detailed description of replacement fields, and how this implementation differs from
+     * std::format, see fly::detail::BasicFormatSpecifier.
+     *
+     * The main difference is the means by which generic format parameters may be formatted into a
+     * string. In this implementation, any type for which an operator<< overload is defined will be
+     * formatted using that overload. Other types will result in an error.
+     *
+     * The format string type is implicitly constructed from a C-string literal. Callers should only
+     * invoke this method accordingly:
+     *
+     *     format("Format {:d}", 1);
+     *
+     * On compilers that support immediate functions (consteval), the format string is validated at
+     * compile time against the types of the format parameters. If the format string is invalid, a
+     * compile error with a diagnostic message will be raised. On other compilers, the error message
+     * will returned rather than a formatted string.
+     *
+     * @tparam ParameterTypes Variadic format parameter types.
+     *
+     * @param stream The stream to insert the formatted string into.
      * @param fmt The string to format.
-     * @param args The variadic list of arguments to be formatted.
+     * @param parameters The variadic list of format parameters to be formatted.
      *
      * @return The same stream object.
      */
-    template <typename... Args>
-    static ostream_type &format(ostream_type &ostream, const char_type *fmt, const Args &...args);
+    template <typename... ParameterTypes>
+    static ostream_type &format(
+        ostream_type &stream,
+        FormatString<ParameterTypes...> &&fmt,
+        ParameterTypes &&...parameters);
 
     /**
      * Concatenate a list of objects with the given separator.
@@ -669,7 +700,7 @@ bool BasicString<StringType>::wildcard_match(const StringType &source, const Str
 
 //==================================================================================================
 template <typename StringType>
-bool BasicString<StringType>::validate(const StringType &value)
+inline bool BasicString<StringType>::validate(const StringType &value)
 {
     auto it = value.cbegin();
     const auto end = value.cend();
@@ -680,7 +711,7 @@ bool BasicString<StringType>::validate(const StringType &value)
 //==================================================================================================
 template <typename StringType>
 template <typename IteratorType>
-auto BasicString<StringType>::decode_codepoint(IteratorType &it, const IteratorType &end)
+inline auto BasicString<StringType>::decode_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<codepoint_type>
 {
     return unicode::decode_codepoint(it, end);
@@ -688,7 +719,7 @@ auto BasicString<StringType>::decode_codepoint(IteratorType &it, const IteratorT
 
 //==================================================================================================
 template <typename StringType>
-std::optional<StringType> BasicString<StringType>::encode_codepoint(codepoint_type codepoint)
+inline std::optional<StringType> BasicString<StringType>::encode_codepoint(codepoint_type codepoint)
 {
     return unicode::encode_codepoint(codepoint);
 }
@@ -721,7 +752,7 @@ std::optional<StringType> BasicString<StringType>::escape_all_codepoints(const S
 //==================================================================================================
 template <typename StringType>
 template <char UnicodePrefix, typename IteratorType>
-std::optional<StringType>
+inline std::optional<StringType>
 BasicString<StringType>::escape_codepoint(IteratorType &it, const IteratorType &end)
 {
     return unicode::template escape_codepoint<UnicodePrefix>(it, end);
@@ -774,18 +805,10 @@ std::optional<StringType> BasicString<StringType>::unescape_all_codepoints(const
 //==================================================================================================
 template <typename StringType>
 template <typename IteratorType>
-std::optional<StringType>
+inline std::optional<StringType>
 BasicString<StringType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
 {
     return unicode::unescape_codepoint(it, end);
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename IntegerType>
-StringType BasicString<StringType>::create_hex_string(IntegerType value, size_type length)
-{
-    return formatter::format_hex(value, length);
 }
 
 //==================================================================================================
@@ -816,27 +839,54 @@ StringType BasicString<StringType>::generate_random_string(size_type length)
 
 //==================================================================================================
 template <typename StringType>
-template <typename... Args>
-auto BasicString<StringType>::format(const char_type *fmt, const Args &...args) -> streamed_type
+template <typename... ParameterTypes>
+inline StringType BasicString<StringType>::format(
+    FormatString<ParameterTypes...> &&fmt,
+    ParameterTypes &&...parameters)
 {
-    return formatter::format(fmt, args...);
+    typename traits::ostringstream_type stream;
+
+    format(
+        stream,
+        std::forward<FormatString<ParameterTypes...>>(fmt),
+        std::forward<ParameterTypes>(parameters)...);
+
+    if constexpr (std::is_same_v<StringType, streamed_type>)
+    {
+        return stream.str();
+    }
+    else
+    {
+        using StreamedString = BasicString<streamed_type>;
+
+        if (auto result = StreamedString::template convert<StringType>(stream.str()); result)
+        {
+            return *std::move(result);
+        }
+
+        return StringType();
+    }
+}
+
+//==================================================================================================
+template <typename StringType>
+template <typename... ParameterTypes>
+inline auto BasicString<StringType>::format(
+    ostream_type &stream,
+    FormatString<ParameterTypes...> &&fmt,
+    ParameterTypes &&...parameters) -> ostream_type &
+{
+    return formatter::format(
+        stream,
+        std::forward<FormatString<ParameterTypes...>>(fmt),
+        std::forward<ParameterTypes>(parameters)...);
 }
 
 //==================================================================================================
 template <typename StringType>
 template <typename... Args>
-auto BasicString<StringType>::format(
-    ostream_type &ostream,
-    const char_type *fmt,
-    const Args &...args) -> ostream_type &
-{
-    return formatter::format(ostream, fmt, args...);
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename... Args>
-auto BasicString<StringType>::join(const char_type &separator, const Args &...args) -> streamed_type
+inline auto BasicString<StringType>::join(const char_type &separator, const Args &...args)
+    -> streamed_type
 {
     typename traits::ostringstream_type ostream;
     join_internal(ostream, separator, args...);
@@ -847,14 +897,14 @@ auto BasicString<StringType>::join(const char_type &separator, const Args &...ar
 //==================================================================================================
 template <typename StringType>
 template <typename T, typename... Args>
-void BasicString<StringType>::join_internal(
+inline void BasicString<StringType>::join_internal(
     ostream_type &ostream,
     const char_type &separator,
     const T &value,
     const Args &...args)
 {
-    streamer::stream(ostream, value);
-    streamer::stream(ostream, separator);
+    streamer::stream_value(ostream, value);
+    streamer::stream_value(ostream, separator);
 
     join_internal(ostream, separator, args...);
 }
@@ -862,12 +912,10 @@ void BasicString<StringType>::join_internal(
 //==================================================================================================
 template <typename StringType>
 template <typename T>
-void BasicString<StringType>::join_internal(
-    ostream_type &ostream,
-    const char_type &,
-    const T &value)
+inline void
+BasicString<StringType>::join_internal(ostream_type &ostream, const char_type &, const T &value)
 {
-    streamer::stream(ostream, value);
+    streamer::stream_value(ostream, value);
 }
 
 //==================================================================================================

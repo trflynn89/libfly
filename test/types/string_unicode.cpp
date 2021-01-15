@@ -33,6 +33,11 @@ CATCH_TEMPLATE_TEST_CASE(
         return result;
     };
 
+    auto make_escaped_unicode_string = [](auto value) -> StringType
+    {
+        return BasicString::format(FLY_ARR(char_type, "\\u{:04x}"), value);
+    };
+
     auto escape_should_fail = [](StringType &&test, int line)
     {
         CATCH_CAPTURE(test);
@@ -343,13 +348,11 @@ CATCH_TEMPLATE_TEST_CASE(
         {
             for (codepoint_type ch = 0; ch < 0x20; ++ch)
             {
-                StringType expected =
-                    FLY_STR(char_type, "\\u") + BasicString::create_hex_string(ch, 4);
+                StringType expected = make_escaped_unicode_string(ch);
                 encoded_to(ch, std::move(expected));
             }
 
-            StringType expected =
-                FLY_STR(char_type, "\\u") + BasicString::create_hex_string(0x7f, 4);
+            StringType expected = make_escaped_unicode_string(0x7f);
             encoded_to(0x7f, std::move(expected));
         }
     }
@@ -453,25 +456,20 @@ CATCH_TEMPLATE_TEST_CASE(
             // Low surrogate only.
             for (codepoint_type ch = 0xdc00; ch <= 0xdfff; ++ch)
             {
-                unescape_should_fail(
-                    FLY_STR(char_type, "\\u") + BasicString::create_hex_string(ch, 4),
-                    __LINE__);
+                unescape_should_fail(make_escaped_unicode_string(ch), __LINE__);
             }
 
             // High surrogate only.
             for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
             {
-                unescape_should_fail(
-                    FLY_STR(char_type, "\\u") + BasicString::create_hex_string(ch, 4),
-                    __LINE__);
+                unescape_should_fail(make_escaped_unicode_string(ch), __LINE__);
             }
 
             // High surrogate followed by non-surrogate.
             for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
             {
-                StringType high_surrogate(
-                    FLY_STR(char_type, "\\u") + BasicString::create_hex_string(ch, 4));
-                StringType low_surrogate(FLY_STR(char_type, "\\u0000"));
+                StringType high_surrogate(make_escaped_unicode_string(ch));
+                StringType low_surrogate(make_escaped_unicode_string(0));
 
                 unescape_should_fail(high_surrogate + low_surrogate, __LINE__);
             }
@@ -479,8 +477,7 @@ CATCH_TEMPLATE_TEST_CASE(
             // High surrogate followed by high surrogate.
             for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
             {
-                StringType high_surrogate(
-                    FLY_STR(char_type, "\\u") + BasicString::create_hex_string(ch, 4));
+                StringType high_surrogate(make_escaped_unicode_string(ch));
 
                 unescape_should_fail(high_surrogate + high_surrogate, __LINE__);
             }

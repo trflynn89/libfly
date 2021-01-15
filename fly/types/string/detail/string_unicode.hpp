@@ -466,8 +466,8 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
 {
     StringType result;
 
-    // TODO replace this with String::create_hex_string without actually including string.hpp or
-    // string_format.hpp.
+    // TODO: Replace this with BasicString::format without actually including string_formatter.hpp,
+    // because string_formatter.hpp depends on string_streamer.hpp, which depends on this file.
     auto to_hex = [&codepoint](std::size_t length) -> StringType
     {
         static const auto *s_digits = FLY_STR(char_type, "0123456789abcdef");

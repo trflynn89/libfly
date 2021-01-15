@@ -4,7 +4,6 @@
 
 #include "catch2/catch.hpp"
 
-#include <regex>
 #include <string>
 #include <vector>
 
@@ -342,9 +341,7 @@ CATCH_TEMPLATE_TEST_CASE(
             FLY_STR(streamed_char, "a:[hi beef]:c:d") ==
             BasicString::join(':', str, obj1, arr, chr));
         CATCH_CHECK(FLY_STR(streamed_char, "a:c:d") == BasicString::join(':', str, arr, chr));
-
-        std::basic_regex<streamed_char> test(
-            FLY_STR(streamed_char, "\\[(0x)?[0-9a-fA-F]+\\]:2:\\[hi beef\\]"));
-        CATCH_CHECK(std::regex_match(BasicString::join(':', obj2, 2, obj1), test));
+        CATCH_CHECK(
+            FLY_STR(streamed_char, ":2:[hi beef]") == BasicString::join(':', obj2, 2, obj1));
     }
 }
