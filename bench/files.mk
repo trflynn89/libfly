@@ -16,7 +16,8 @@ SRC_DIRS_$(d) := \
 # Include the directories containing the benchmark tests.
 SRC_DIRS_$(d) += \
     bench/coders \
-    bench/json
+    bench/json \
+    bench/string
 
 SRC_$(d) := \
     $(d)/main.cpp

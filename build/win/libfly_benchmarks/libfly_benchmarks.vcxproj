@@ -165,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\bench\coders\benchmark_coders.cpp" />
     <ClCompile Include="..\..\..\bench\json\benchmark_json.cpp" />
+    <ClCompile Include="..\..\..\bench\string\benchmark_string.cpp" />
     <ClCompile Include="..\..\..\bench\main.cpp" />
   </ItemGroup>
   <ItemGroup>
