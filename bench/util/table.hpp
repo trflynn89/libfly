@@ -230,9 +230,9 @@ void Table<Args...>::append_row(Args... args)
 template <class... Args>
 void Table<Args...>::print_table(std::ostream &stream) const
 {
-    ScopedStreamModifiers scoped_modifiers(stream);
+    fly::detail::BasicStreamModifiers<std::string> scoped_modifiers(stream);
     scoped_modifiers.locale<CommaPunctuation>();
-    scoped_modifiers.precision(s_precision);
+    scoped_modifiers.manip(std::setprecision(s_precision));
 
     // Compute the entire width of the table. There are 1 + the number of columns vertical
     // separators ('|'), plus the width of each column (with 2 padding spacers each).
@@ -296,7 +296,7 @@ void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
         using T = std::decay_t<decltype(val)>;
 
         print_column_separator(stream, index == 0 ? s_border_style : fly::Style::Default);
-        ScopedStreamModifiers scoped_modifiers(stream);
+        fly::detail::BasicStreamModifiers<std::string> scoped_modifiers(stream);
 
         if constexpr (std::is_arithmetic_v<T>)
         {

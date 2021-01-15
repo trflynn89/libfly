@@ -1,68 +1,12 @@
 #pragma once
 
+#include "fly/types/string/detail/string_streamer.hpp"
+
 #include <iomanip>
 #include <locale>
 #include <ostream>
 
 namespace fly::benchmark {
-
-/**
- * RAII helper class to make formatting modifications to a stream and ensure those modifications
- * are reset upon destruction.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version Decmber 12, 2020
- */
-class ScopedStreamModifiers
-{
-public:
-    /**
-     * Constructor. Store the stream's current state to be restored upon destruction.
-     *
-     * @param stream The stream to be modified.
-     */
-    explicit ScopedStreamModifiers(std::ostream &stream);
-
-    /**
-     * Destructor. Restore the stream's orginal state.
-     */
-    ~ScopedStreamModifiers();
-
-    /**
-     * Imbue a new locale onto the stream with a specific facet.
-     *
-     * @tparam Facet The type of facet to imbue.
-     */
-    template <typename Facet>
-    void locale();
-
-    /**
-     * Apply an IO manipulator to the stream. See: https://en.cppreference.com/w/cpp/io/manip
-     *
-     * @tparam Manipulator The type of manipulator to apply.
-     *
-     * @param manipulator The manipulator to apply.
-     */
-    template <typename Manipulator>
-    void manip(Manipulator &&manipulator);
-
-    /**
-     * Modify the number of digits generated for floating point numbers.
-     *
-     * @param precision The new precision setting.
-     */
-    void precision(std::streamsize precision);
-
-private:
-    ScopedStreamModifiers(const ScopedStreamModifiers &) = delete;
-    ScopedStreamModifiers &operator=(const ScopedStreamModifiers &) = delete;
-
-    std::ostream &m_stream;
-
-    const std::locale m_locale;
-    const std::ios_base::fmtflags m_flags;
-    const std::streamsize m_precision;
-};
 
 /**
  * Helper class to center text within a specified width within a steam.
@@ -129,20 +73,6 @@ protected:
 };
 
 //==================================================================================================
-template <typename Facet>
-void ScopedStreamModifiers::locale()
-{
-    m_stream.imbue({std::locale(), new Facet()});
-}
-
-//==================================================================================================
-template <typename Manipulator>
-void ScopedStreamModifiers::manip(Manipulator &&manipulator)
-{
-    m_stream << manipulator;
-}
-
-//==================================================================================================
 template <typename StringType>
 Center<StringType>::Center(std::size_t width, const StringType &value) :
     m_width(static_cast<std::streamsize>(width)),
@@ -160,7 +90,7 @@ void Center<StringType>::print(std::ostream &stream) const
     {
         const std::streamsize left = (m_width + length) / 2;
 
-        ScopedStreamModifiers scoped_modifiers(stream);
+        fly::detail::BasicStreamModifiers<std::string> scoped_modifiers(stream);
         scoped_modifiers.manip(std::right);
 
         stream << std::setw(left) << m_value;
