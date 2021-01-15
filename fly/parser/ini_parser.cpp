@@ -8,7 +8,7 @@
 namespace fly {
 
 #define ILOG(...)                                                                                  \
-    LOGW("[line %d]: " FLY_FORMAT_STRING(__VA_ARGS__), line() FLY_FORMAT_ARGS(__VA_ARGS__));
+    LOGW("[line {}]: " FLY_FORMAT_STRING(__VA_ARGS__), line() FLY_FORMAT_ARGS(__VA_ARGS__));
 
 //==================================================================================================
 std::optional<Json> IniParser::parse_internal()
@@ -44,7 +44,7 @@ std::optional<Json> IniParser::parse_internal()
                     }
                     catch (const JsonException &ex)
                     {
-                        ILOG("%s", ex.what());
+                        ILOG("{}", ex.what());
                         return std::nullopt;
                     }
                 }
@@ -71,7 +71,7 @@ std::optional<Json> IniParser::parse_internal()
                     }
                     catch (const JsonException &ex)
                     {
-                        ILOG("%s", ex.what());
+                        ILOG("{}", ex.what());
                         return std::nullopt;
                     }
                 }
@@ -174,7 +174,7 @@ IniParser::TrimResult IniParser::trim_value(std::string &str, char start, char e
     }
     else if (starts_with_char || ends_with_char)
     {
-        ILOG("Imbalanced characters: \"%c\" and \"%c\"", start, end);
+        ILOG("Imbalanced characters: \"{}\" and \"{}\"", start, end);
         return TrimResult::Imbalanced;
     }
 

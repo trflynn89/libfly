@@ -118,7 +118,7 @@ void PathMonitorImpl::handle_events(const PathInfoImpl *info, const std::filesys
             {
                 auto full = path / file;
 
-                LOGI("Handling event %s for %s", path_event, full);
+                LOGI("Handling event {} for {}", path_event, full);
                 callback(full, path_event);
             }
         }
@@ -177,7 +177,7 @@ PathMonitorImpl::PathInfoImpl::PathInfoImpl(const std::filesystem::path &path) n
 
     if (m_handle == INVALID_HANDLE_VALUE)
     {
-        LOGS("Could not create file for \"%s\"", path);
+        LOGS("Could not create file for \"{}\"", path);
         return;
     }
 
@@ -219,7 +219,7 @@ bool PathMonitorImpl::PathInfoImpl::refresh(const std::filesystem::path &path)
 
     if (success == FALSE)
     {
-        LOGS("Could not check events for \"%s\"", path);
+        LOGS("Could not check events for \"{}\"", path);
     }
 
     return success == TRUE;

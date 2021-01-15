@@ -41,7 +41,7 @@
         fly::BadJsonComparisonException,                                                           \
         Catch::Matchers::Exception::ExceptionMessageMatcher(fly::String::format(                   \
             "BadJsonComparisonException: Cannot compare iterators of different JSON instances: "   \
-            "(%s) (%s)",                                                                           \
+            "({}) ({})",                                                                           \
             json1,                                                                                 \
             json2)))
 
@@ -58,7 +58,7 @@
         expression,                                                                                \
         fly::NullJsonException,                                                                    \
         Catch::Matchers::Exception::ExceptionMessageMatcher(fly::String::format(                   \
-            "NullJsonException: Cannot dereference an empty or past-the-end iterator: (%s)",       \
+            "NullJsonException: Cannot dereference an empty or past-the-end iterator: ({})",       \
             json)))
 
 #define CATCH_CHECK_THROWS_OUT_OF_RANGE(expression, offset, json)                                  \
@@ -66,7 +66,7 @@
         expression,                                                                                \
         fly::OutOfRangeJsonException,                                                              \
         Catch::Matchers::Exception::ExceptionMessageMatcher(fly::String::format(                   \
-            "OutOfRangeJsonException: Offset %d is out-of-range: (%s)",                            \
+            "OutOfRangeJsonException: Offset {} is out-of-range: ({})",                            \
             offset,                                                                                \
             json)))
 

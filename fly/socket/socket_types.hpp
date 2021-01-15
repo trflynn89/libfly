@@ -13,15 +13,15 @@
  * Wrapper logging macros to format logs with socket handles in a consistent manner.
  */
 #define SLOGD(handle, ...)                                                                         \
-    LOGD("[%d] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
+    LOGD("[{}] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
 #define SLOGI(handle, ...)                                                                         \
-    LOGI("[%d] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
+    LOGI("[{}] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
 #define SLOGW(handle, ...)                                                                         \
-    LOGW("[%d] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
+    LOGW("[{}] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
 #define SLOGS(handle, ...)                                                                         \
-    LOGS("[%d] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
+    LOGS("[{}] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
 #define SLOGE(handle, ...)                                                                         \
-    LOGE("[%d] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
+    LOGE("[{}] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
 
 namespace fly {
 

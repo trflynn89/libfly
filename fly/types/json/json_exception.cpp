@@ -6,19 +6,19 @@ namespace fly {
 
 //==================================================================================================
 JsonException::JsonException(std::string &&message) noexcept :
-    m_message(String::format("JsonException: %s", message))
+    m_message(String::format("JsonException: {}", message))
 {
 }
 
 //==================================================================================================
 JsonException::JsonException(const Json &json, std::string &&message) noexcept :
-    m_message(String::format("JsonException: %s: (%s)", message, json))
+    m_message(String::format("JsonException: {}: ({})", message, json))
 {
 }
 
 //==================================================================================================
 JsonException::JsonException(const char *class_name, std::string &&message) noexcept :
-    m_message(String::format("%s: %s", class_name, message))
+    m_message(String::format("{}: {}", class_name, message))
 {
 }
 
@@ -30,7 +30,7 @@ const char *JsonException::what() const noexcept
 
 //==================================================================================================
 JsonIteratorException::JsonIteratorException(const Json &json, std::string &&message) noexcept :
-    JsonException("JsonIteratorException", String::format("%s: (%s)", message, json))
+    JsonException("JsonIteratorException", String::format("{}: ({})", message, json))
 {
 }
 
@@ -41,7 +41,7 @@ BadJsonComparisonException::BadJsonComparisonException(
     JsonException(
         "BadJsonComparisonException",
         String::format(
-            "Cannot compare iterators of different JSON instances: (%s) (%s)",
+            "Cannot compare iterators of different JSON instances: ({}) ({})",
             json1,
             json2))
 {
@@ -51,7 +51,7 @@ BadJsonComparisonException::BadJsonComparisonException(
 NullJsonException::NullJsonException(const Json &json) noexcept :
     JsonException(
         "NullJsonException",
-        String::format("Cannot dereference an empty or past-the-end iterator: (%s)", json))
+        String::format("Cannot dereference an empty or past-the-end iterator: ({})", json))
 {
 }
 
@@ -67,7 +67,7 @@ NullJsonException::NullJsonException() noexcept :
 OutOfRangeJsonException::OutOfRangeJsonException(const Json &json, std::ptrdiff_t offset) noexcept :
     JsonException(
         "OutOfRangeJsonException",
-        String::format("Offset %d is out-of-range: (%s)", offset, json)),
+        String::format("Offset {} is out-of-range: ({})", offset, json)),
     m_offset(offset)
 {
 }

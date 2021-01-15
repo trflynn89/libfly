@@ -38,13 +38,13 @@ public:
 
         // ConsoleReporter prints a second newline above, so go up one line before logging the time.
         stream << fly::Styler(fly::Cursor::Up, fly::Style::Bold, fly::Color::Cyan) << "Total time ";
-        stream << fly::String::format("%f seconds", duration.count()) << "\n\n";
+        stream << fly::String::format("{:.3f} seconds", duration.count()) << "\n\n";
     }
 
     void testCaseStarting(const Catch::TestCaseInfo &info) override
     {
         stream << fly::Styler(fly::Style::Bold, fly::Color::Green)
-               << fly::String::format("[==== Test Case: %s ====]", info.name) << '\n';
+               << fly::String::format("[==== Test Case: {} ====]", info.name) << '\n';
 
         Catch::ConsoleReporter::testCaseStarting(info);
 
@@ -57,7 +57,7 @@ public:
         if (info.name != m_current_test_case)
         {
             stream << fly::Styler(fly::Style::Italic, fly::Color::Cyan)
-                   << fly::String::format("[ %s ]", info.name) << '\n';
+                   << fly::String::format("[ {} ]", info.name) << '\n';
         }
 
         Catch::ConsoleReporter::sectionStarting(info);
@@ -72,17 +72,21 @@ public:
 
         if (stats.totals.assertions.allOk())
         {
-            stream
-                << fly::Styler(fly::Style::Bold, fly::Color::Green)
-                << fly::String::format("[==== PASSED %s (%f seconds) ====]", name, duration.count())
-                << "\n\n";
+            stream << fly::Styler(fly::Style::Bold, fly::Color::Green)
+                   << fly::String::format(
+                          "[==== PASSED {} ({:.3f} seconds) ====]",
+                          name,
+                          duration.count())
+                   << "\n\n";
         }
         else
         {
-            stream
-                << fly::Styler(fly::Style::Bold, fly::Color::Red)
-                << fly::String::format("[==== FAILED %s (%f seconds) ====]", name, duration.count())
-                << "\n\n";
+            stream << fly::Styler(fly::Style::Bold, fly::Color::Red)
+                   << fly::String::format(
+                          "[==== FAILED {} ({:.3f} seconds) ====]",
+                          name,
+                          duration.count())
+                   << "\n\n";
         }
 
         Catch::ConsoleReporter::testCaseEnded(stats);

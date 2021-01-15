@@ -36,11 +36,11 @@ bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback 
 
     if (callback == nullptr)
     {
-        LOGW("Ignoring null callback for %s", path);
+        LOGW("Ignoring null callback for {}", path);
     }
     else if (!std::filesystem::is_directory(path, error))
     {
-        LOGW("Ignoring non-directory %s: %s", path, error);
+        LOGW("Ignoring non-directory {}: {}", path, error);
     }
     else
     {
@@ -49,7 +49,7 @@ bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback 
 
         if (info != nullptr)
         {
-            LOGD("Monitoring all files in %s", path);
+            LOGD("Monitoring all files in {}", path);
             info->m_path_handler = callback;
 
             return true;
@@ -67,11 +67,11 @@ bool PathMonitor::remove_path(const std::filesystem::path &path)
 
     if (it == m_path_info.end())
     {
-        LOGW("Wasn't monitoring %s", path);
+        LOGW("Wasn't monitoring {}", path);
         return false;
     }
 
-    LOGI("Removed monitor for %s", path);
+    LOGI("Removed monitor for {}", path);
     m_path_info.erase(it);
 
     return true;
@@ -91,15 +91,15 @@ bool PathMonitor::add_file(const std::filesystem::path &file, PathEventCallback 
 
     if (callback == nullptr)
     {
-        LOGW("Ignoring null callback for %s", file);
+        LOGW("Ignoring null callback for {}", file);
     }
     else if (std::filesystem::is_directory(file, error))
     {
-        LOGW("Ignoring directory %s: %s", file, error);
+        LOGW("Ignoring directory {}: {}", file, error);
     }
     else if (!std::filesystem::is_directory(file.parent_path(), error))
     {
-        LOGW("Ignoring file under non-directory %s: %s", file, error);
+        LOGW("Ignoring file under non-directory {}: {}", file, error);
     }
     else
     {
@@ -108,7 +108,7 @@ bool PathMonitor::add_file(const std::filesystem::path &file, PathEventCallback 
 
         if (info != nullptr)
         {
-            LOGD("Monitoring file %s", file);
+            LOGD("Monitoring file {}", file);
             info->m_file_handlers[file.filename()] = callback;
 
             return true;
@@ -128,7 +128,7 @@ bool PathMonitor::remove_file(const std::filesystem::path &file)
 
         if (path_it == m_path_info.end())
         {
-            LOGW("Wasn't monitoring %s", file);
+            LOGW("Wasn't monitoring {}", file);
             return false;
         }
 
@@ -137,11 +137,11 @@ bool PathMonitor::remove_file(const std::filesystem::path &file)
 
         if (file_it == info->m_file_handlers.end())
         {
-            LOGW("Wasn't monitoring %s", file);
+            LOGW("Wasn't monitoring {}", file);
             return false;
         }
 
-        LOGD("Stopped monitoring %s", file);
+        LOGD("Stopped monitoring {}", file);
         info->m_file_handlers.erase(file_it);
 
         prune_path = info->m_file_handlers.empty() && !(info->m_path_handler);

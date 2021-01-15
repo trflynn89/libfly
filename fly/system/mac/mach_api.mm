@@ -10,7 +10,7 @@ namespace {
     {
         if (status != KERN_SUCCESS)
         {
-            LOGW("Kernel error gethering %s (%d): %s", caller, status, ::mach_error_string(status));
+            LOGW("Kernel error gethering {} ({}): {}", caller, status, ::mach_error_string(status));
             return false;
         }
 

@@ -19,7 +19,7 @@
  * format that string. For example:
  *
  *   LOGD("This is a message");
- *   LOGD("This is message number %d", 10);
+ *   LOGD("This is message number {:d}", 10);
  */
 #define LOGD(...)                                                                                  \
     do                                                                                             \
@@ -36,7 +36,7 @@
  * format that string. For example:
  *
  *   LOGI("This is a message");
- *   LOGI("This is message number %d", 10);
+ *   LOGI("This is message number {:d}", 10);
  */
 #define LOGI(...)                                                                                  \
     do                                                                                             \
@@ -53,7 +53,7 @@
  * format that string. For example:
  *
  *   LOGW("This is a message");
- *   LOGW("This is message number %d", 10);
+ *   LOGW("This is message number {:d}", 10);
  */
 #define LOGW(...)                                                                                  \
     do                                                                                             \
@@ -71,14 +71,14 @@
  * format that string. For example:
  *
  *   LOGS("This is a message");
- *   LOGS("This is message number %d", 10);
+ *   LOGS("This is message number {:d}", 10);
  */
 #define LOGS(...)                                                                                  \
     do                                                                                             \
     {                                                                                              \
         fly::Logger::get_default_logger()->warn(                                                   \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
-            FLY_FORMAT_STRING(__VA_ARGS__) ": %s" FLY_FORMAT_ARGS(__VA_ARGS__),                    \
+            FLY_FORMAT_STRING(__VA_ARGS__) ": {}" FLY_FORMAT_ARGS(__VA_ARGS__),                    \
             fly::System::get_error_string());                                                      \
     } while (0)
 
@@ -89,7 +89,7 @@
  * format that string. For example:
  *
  *   LOGE("This is a message");
- *   LOGE("This is message number %d", 10);
+ *   LOGE("This is message number {:d}", 10);
  */
 #define LOGE(...)                                                                                  \
     do                                                                                             \
@@ -276,10 +276,14 @@ public:
      * @param format The format string for the log point.
      * @param args The variadic list of arguments to augment the format string with.
      */
-    template <typename... Args>
-    void debug(const char *format, const Args &...args)
+    template <typename... ParameterTypes>
+    inline void
+    debug(String::FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
     {
-        log(Log::Level::Debug, {}, String::format(format, args...));
+        debug(
+            {},
+            std::forward<String::FormatString<ParameterTypes...>>(format),
+            std::forward<ParameterTypes>(parameters)...);
     }
 
     /**
@@ -291,10 +295,17 @@ public:
      * @param format The format string for the log point.
      * @param args The variadic list of arguments to augment the format string with.
      */
-    template <typename... Args>
-    void debug(Log::Trace &&trace, const char *format, const Args &...args)
+    template <typename... ParameterTypes>
+    inline void debug(
+        Log::Trace &&trace,
+        String::FormatString<ParameterTypes...> &&format,
+        ParameterTypes &&...parameters)
     {
-        log(Log::Level::Debug, std::move(trace), String::format(format, args...));
+        log(Log::Level::Debug,
+            std::move(trace),
+            String::format(
+                std::forward<String::FormatString<ParameterTypes...>>(format),
+                std::forward<ParameterTypes>(parameters)...));
     }
 
     /**
@@ -305,10 +316,14 @@ public:
      * @param format The format string for the log point.
      * @param args The variadic list of arguments to augment the format string with.
      */
-    template <typename... Args>
-    void info(const char *format, const Args &...args)
+    template <typename... ParameterTypes>
+    inline void
+    info(String::FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
     {
-        log(Log::Level::Info, {}, String::format(format, args...));
+        info(
+            {},
+            std::forward<String::FormatString<ParameterTypes...>>(format),
+            std::forward<ParameterTypes>(parameters)...);
     }
 
     /**
@@ -320,10 +335,17 @@ public:
      * @param format The format string for the log point.
      * @param args The variadic list of arguments to augment the format string with.
      */
-    template <typename... Args>
-    void info(Log::Trace &&trace, const char *format, const Args &...args)
+    template <typename... ParameterTypes>
+    inline void info(
+        Log::Trace &&trace,
+        String::FormatString<ParameterTypes...> &&format,
+        ParameterTypes &&...parameters)
     {
-        log(Log::Level::Info, std::move(trace), String::format(format, args...));
+        log(Log::Level::Info,
+            std::move(trace),
+            String::format(
+                std::forward<String::FormatString<ParameterTypes...>>(format),
+                std::forward<ParameterTypes>(parameters)...));
     }
 
     /**
@@ -334,10 +356,14 @@ public:
      * @param format The format string for the log point.
      * @param args The variadic list of arguments to augment the format string with.
      */
-    template <typename... Args>
-    void warn(const char *format, const Args &...args)
+    template <typename... ParameterTypes>
+    inline void
+    warn(String::FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
     {
-        log(Log::Level::Warn, {}, String::format(format, args...));
+        warn(
+            {},
+            std::forward<String::FormatString<ParameterTypes...>>(format),
+            std::forward<ParameterTypes>(parameters)...);
     }
 
     /**
@@ -349,10 +375,17 @@ public:
      * @param format The format string for the log point.
      * @param args The variadic list of arguments to augment the format string with.
      */
-    template <typename... Args>
-    void warn(Log::Trace &&trace, const char *format, const Args &...args)
+    template <typename... ParameterTypes>
+    inline void warn(
+        Log::Trace &&trace,
+        String::FormatString<ParameterTypes...> &&format,
+        ParameterTypes &&...parameters)
     {
-        log(Log::Level::Warn, std::move(trace), String::format(format, args...));
+        log(Log::Level::Warn,
+            std::move(trace),
+            String::format(
+                std::forward<String::FormatString<ParameterTypes...>>(format),
+                std::forward<ParameterTypes>(parameters)...));
     }
 
     /**
@@ -363,10 +396,14 @@ public:
      * @param format The format string for the log point.
      * @param args The variadic list of arguments to augment the format string with.
      */
-    template <typename... Args>
-    void error(const char *format, const Args &...args)
+    template <typename... ParameterTypes>
+    inline void
+    error(String::FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
     {
-        log(Log::Level::Error, {}, String::format(format, args...));
+        error(
+            {},
+            std::forward<String::FormatString<ParameterTypes...>>(format),
+            std::forward<ParameterTypes>(parameters)...);
     }
 
     /**
@@ -378,10 +415,17 @@ public:
      * @param format The format string for the log point.
      * @param args The variadic list of arguments to augment the format string with.
      */
-    template <typename... Args>
-    void error(Log::Trace &&trace, const char *format, const Args &...args)
+    template <typename... ParameterTypes>
+    inline void error(
+        Log::Trace &&trace,
+        String::FormatString<ParameterTypes...> &&format,
+        ParameterTypes &&...parameters)
     {
-        log(Log::Level::Error, std::move(trace), String::format(format, args...));
+        log(Log::Level::Error,
+            std::move(trace),
+            String::format(
+                std::forward<String::FormatString<ParameterTypes...>>(format),
+                std::forward<ParameterTypes>(parameters)...));
     }
 
 private:

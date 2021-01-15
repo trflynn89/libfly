@@ -1735,7 +1735,7 @@ Json::reference Json::at(T key)
 
     if (it == storage.end())
     {
-        throw JsonException(*this, String::format("Given key (%s) not found", key));
+        throw JsonException(*this, String::format("Given key ({}) not found", key));
     }
 
     return it->second;
@@ -1750,7 +1750,7 @@ Json::const_reference Json::at(T key) const
 
     if (it == storage.end())
     {
-        throw JsonException(*this, String::format("Given key (%s) not found", key));
+        throw JsonException(*this, String::format("Given key ({}) not found", key));
     }
 
     return it->second;

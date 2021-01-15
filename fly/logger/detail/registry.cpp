@@ -91,13 +91,12 @@ std::shared_ptr<fly::Logger> Registry::get_logger(const std::string &name)
 {
     std::lock_guard<std::mutex> lock(m_registry_mutex);
 
-    auto it = m_registry.find(name);
-    if (it == m_registry.end())
+    if (auto it = m_registry.find(name); it != m_registry.end())
     {
-        return nullptr;
+        return it->second.lock();
     }
 
-    return it->second.lock();
+    return nullptr;
 }
 
 } // namespace fly::detail

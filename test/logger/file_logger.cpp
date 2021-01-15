@@ -94,7 +94,7 @@ std::uintmax_t log_size(const std::string &message)
     log.m_level = fly::Log::Level::Debug;
     log.m_trace = {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)};
 
-    return fly::String::format("%d\t%s", 1, log).length();
+    return fly::String::format("{}\t{}", 1, log).length();
 }
 
 } // namespace
@@ -196,7 +196,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         // Create enough log points to fill the log file, plus some extra to start a second log.
         while (++count < ((max_log_file_size / expected_size) + 10))
         {
-            logger->debug("%s", random);
+            logger->debug("{}", random);
         }
 
         CATCH_CHECK(log_file != find_log_file(path));
@@ -231,7 +231,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         // Create enough log points to fill the log file, plus some extra to start a second log.
         while (++count < ((max_log_file_size / expected_size) + 10))
         {
-            logger->debug("%s", random);
+            logger->debug("{}", random);
         }
 
         CATCH_CHECK(log_file != find_log_file(path));
@@ -261,7 +261,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         // Create enough log points to fill the log file, plus some extra to start a second log.
         while (++count < ((max_log_file_size / expected_size) + 10))
         {
-            logger->debug("%s", random);
+            logger->debug("{}", random);
         }
 
         CATCH_CHECK(log_file != find_log_file(path));

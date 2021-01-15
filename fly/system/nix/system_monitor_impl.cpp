@@ -53,7 +53,7 @@ void SystemMonitorImpl::update_system_cpu_count()
 
     if (cpu_count == 0)
     {
-        LOGS("Could not poll system CPU count (%s)", contents);
+        LOGS("Could not poll system CPU count ({})", contents);
     }
     else
     {
@@ -83,7 +83,7 @@ void SystemMonitorImpl::update_system_cpu_usage()
 
     if (scanned != 4)
     {
-        LOGS("Could not poll system CPU (%s)", line);
+        LOGS("Could not poll system CPU ({})", line);
         return;
     }
 
@@ -166,7 +166,7 @@ void SystemMonitorImpl::update_process_memory_usage()
 
     if (process_memory_usage == 0)
     {
-        LOGS("Could not poll process memory (%s)", contents);
+        LOGS("Could not poll process memory ({})", contents);
     }
     else
     {

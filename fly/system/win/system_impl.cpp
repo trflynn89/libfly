@@ -1,5 +1,7 @@
 #include "fly/system/win/system_impl.hpp"
 
+#include "fly/types/string/string.hpp"
+
 #include <Windows.h>
 
 #include <chrono>

@@ -130,7 +130,7 @@ Json::reference Json::at(size_type index)
 
     if (index >= storage.size())
     {
-        throw JsonException(*this, String::format("Given index (%d) not found", index));
+        throw JsonException(*this, String::format("Given index ({}) not found", index));
     }
 
     return storage.at(index);
@@ -143,7 +143,7 @@ Json::const_reference Json::at(size_type index) const
 
     if (index >= storage.size())
     {
-        throw JsonException(*this, String::format("Given index (%d) not found", index));
+        throw JsonException(*this, String::format("Given index ({}) not found", index));
     }
 
     return storage.at(index);
@@ -600,7 +600,7 @@ void Json::erase(size_type index)
 
     if (index >= storage.size())
     {
-        throw JsonException(*this, String::format("Given index (%d) not found", index));
+        throw JsonException(*this, String::format("Given index ({}) not found", index));
     }
 
     storage.erase(storage.begin() + static_cast<difference_type>(index));
@@ -763,9 +763,13 @@ JsonTraits::string_type Json::validate_string(JsonTraits::string_type &&value)
         {
             read_escaped_character(value, it);
         }
-        else if (((ch >= s_null) && (ch < s_space)) || (ch == s_quote) || (ch == s_reverse_solidus))
+        else if ((ch >= s_null) && (ch < s_space))
         {
-            throw JsonException(String::format("Character '%c' must be escaped", ch));
+            throw JsonException(String::format("Character {:#04x} must be escaped", ch));
+        }
+        else if ((ch == s_quote) || (ch == s_reverse_solidus))
+        {
+            throw JsonException(String::format("Character '{}' must be escaped", ch));
         }
     }
 
@@ -833,7 +837,7 @@ void Json::read_escaped_character(
             break;
 
         default:
-            throw JsonException(String::format("Invalid escape character '%c'", *next));
+            throw JsonException(String::format("Invalid escape character '{}'", *next));
     }
 }
 
