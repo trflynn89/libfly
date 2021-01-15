@@ -1,3 +1,10 @@
+// By default, force FLY_CONSTEVAL to evaluate to 'constexpr' to cause BasicFormatString to store
+// errors for runtime analysis. To manually test with 'consteval' for compilers that support it,
+// comment out the following line (and note that parsing error tests will not be run).
+#define FLY_COMPILER_DISABLE_CONSTEVAL
+
+#include "fly/types/string/detail/string_formatter.hpp"
+
 #include "fly/fly.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
@@ -6,8 +13,35 @@
 #include "catch2/catch.hpp"
 
 #include <limits>
+#include <type_traits>
 
 using namespace fly::literals::numeric_literals;
+
+namespace {
+
+#define FMT(format) FLY_ARR(char_type, format)
+
+template <typename StringType, typename... ParameterTypes>
+using FormatString = fly::detail::BasicFormatString<
+    fly::detail::is_like_supported_string_t<StringType>,
+    std::type_identity_t<ParameterTypes>...>;
+
+template <typename StringType, typename... ParameterTypes>
+void test_format(
+    FormatString<StringType, ParameterTypes...> &&format,
+    StringType &&expected,
+    ParameterTypes &&...parameters)
+{
+    using BasicString = fly::BasicString<fly::detail::is_like_supported_string_t<StringType>>;
+
+    auto result = BasicString::format(
+        std::forward<FormatString<StringType, ParameterTypes...>>(format),
+        std::forward<ParameterTypes>(parameters)...);
+
+    CATCH_CHECK(result == expected);
+}
+
+} // namespace
 
 CATCH_TEMPLATE_TEST_CASE(
     "BasicStringFormatter",
@@ -21,266 +55,443 @@ CATCH_TEMPLATE_TEST_CASE(
     using StringType = TestType;
     using BasicString = fly::BasicString<StringType>;
     using char_type = typename BasicString::char_type;
-    using streamed_type = typename BasicString::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
+    using view_type = typename BasicString::view_type;
 
-    const char_type *format;
-
-    CATCH_SECTION("Format")
+    auto is_all_hex = [](view_type value)
     {
-        streamed_type expected;
-        StringType arg;
-
-        CATCH_CHECK(streamed_type() == BasicString::format(FLY_STR(char_type, "")));
-
-        expected = FLY_STR(streamed_char, "%");
-        format = FLY_STR(char_type, "%");
-        CATCH_CHECK(expected == BasicString::format(format));
-        CATCH_CHECK(expected == BasicString::format(format, 1));
-
-        expected = FLY_STR(streamed_char, "%");
-        format = FLY_STR(char_type, "%%");
-        CATCH_CHECK(expected == BasicString::format(format));
-
-        expected = FLY_STR(streamed_char, "2.100000% 1");
-        format = FLY_STR(char_type, "%f%% %d");
-        CATCH_CHECK(expected == BasicString::format(format, 2.1f, 1));
-
-        expected = FLY_STR(streamed_char, "This is a test");
-        format = FLY_STR(char_type, "This is a test");
-        CATCH_CHECK(expected == BasicString::format(format));
-
-        expected = FLY_STR(streamed_char, "there are no formatters");
-        format = FLY_STR(char_type, "there are no formatters");
-        CATCH_CHECK(expected == BasicString::format(format, 1, 2, 3, 4));
-
-        expected = FLY_STR(streamed_char, "test some string s");
-        format = FLY_STR(char_type, "test %s %c");
-        arg = FLY_STR(char_type, "some string");
-        CATCH_CHECK(expected == BasicString::format(format, arg, 's'));
-
-        expected = FLY_STR(streamed_char, "test 1 true 2.100000 false 1.230000e+02 0xff");
-        format = FLY_STR(char_type, "test %d %d %f %d %e %x");
-        CATCH_CHECK(expected == BasicString::format(format, 1, true, 2.1f, false, 123.0, 255));
-    }
-
-    CATCH_SECTION("Format as an integer (%d)")
-    {
-        format = FLY_STR(char_type, "%d");
-        CATCH_CHECK(FLY_STR(streamed_char, "%d") == BasicString::format(format));
-        CATCH_CHECK(FLY_STR(streamed_char, "1") == BasicString::format(format, 1));
-    }
-
-    CATCH_SECTION("Format as an integer (%i)")
-    {
-        format = FLY_STR(char_type, "%i");
-        CATCH_CHECK(FLY_STR(streamed_char, "%i") == BasicString::format(format));
-        CATCH_CHECK(FLY_STR(streamed_char, "1") == BasicString::format(format, 1));
-    }
-
-    CATCH_SECTION("Format as a character (%c)")
-    {
-        format = FLY_STR(char_type, "%c");
-        CATCH_CHECK(FLY_STR(streamed_char, "%c") == BasicString::format(format));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "a") == BasicString::format(format, FLY_CHR(char_type, 'a')));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "\\x0a") ==
-            BasicString::format(format, FLY_CHR(char_type, '\n')));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "[EOF]") ==
-            BasicString::format(
-                format,
-                static_cast<char_type>(std::char_traits<char_type>::eof())));
-
-        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::format(format, 'a'));
-        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::format(format, L'a'));
-        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::format(format, u8'a'));
-        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::format(format, u'a'));
-        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::format(format, U'a'));
-    }
-
-    CATCH_SECTION("Format as a string (%s)")
-    {
-        format = FLY_STR(char_type, "%s");
-        CATCH_CHECK(FLY_STR(streamed_char, "%s") == BasicString::format(format));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "\\u00f0\\u0178\\u008d\\u2022") ==
-            BasicString::format(format, FLY_STR(char_type, "\u00f0\u0178\u008d\u2022")));
-
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::string") ==
-            BasicString::format(format, std::string("std::string")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::wstring") ==
-            BasicString::format(format, std::wstring(L"std::wstring")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::u8string") ==
-            BasicString::format(format, std::u8string(u8"std::u8string")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::u16string") ==
-            BasicString::format(format, std::u16string(u"std::u16string")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::u32string") ==
-            BasicString::format(format, std::u32string(U"std::u32string")));
-
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::string_view") ==
-            BasicString::format(format, std::string_view("std::string_view")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::wstring_view") ==
-            BasicString::format(format, std::wstring_view(L"std::wstring_view")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::u8string_view") ==
-            BasicString::format(format, std::u8string_view(u8"std::u8string_view")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::u16string_view") ==
-            BasicString::format(format, std::u16string_view(u"std::u16string_view")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::u32string_view") ==
-            BasicString::format(format, std::u32string_view(U"std::u32string_view")));
-
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::string") == BasicString::format(format, "std::string"));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::wstring") == BasicString::format(format, L"std::wstring"));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::u8string") ==
-            BasicString::format(format, u8"std::u8string"));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::u16string") ==
-            BasicString::format(format, u"std::u16string"));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "std::u32string") ==
-            BasicString::format(format, U"std::u32string"));
-    }
-
-    CATCH_SECTION("Format as a hexadecimal integer (%x)")
-    {
-        format = FLY_STR(char_type, "%x");
-        CATCH_CHECK(FLY_STR(streamed_char, "%x") == BasicString::format(format));
-        CATCH_CHECK(FLY_STR(streamed_char, "0xff") == BasicString::format(format, 255));
-
-        format = FLY_STR(char_type, "%X");
-        CATCH_CHECK(FLY_STR(streamed_char, "%X") == BasicString::format(format));
-        CATCH_CHECK(FLY_STR(streamed_char, "0XFF") == BasicString::format(format, 255));
-    }
-
-    CATCH_SECTION("Format as an octal integer (%o)")
-    {
-        format = FLY_STR(char_type, "%o");
-        CATCH_CHECK(FLY_STR(streamed_char, "%o") == BasicString::format(format));
-        CATCH_CHECK(FLY_STR(streamed_char, "0377") == BasicString::format(format, 255));
-    }
-
-    CATCH_SECTION("Format as a hexadecimal floating point (%a)")
-    {
-        format = FLY_STR(char_type, "%a");
-        CATCH_CHECK(FLY_STR(streamed_char, "%a") == BasicString::format(format));
-#if defined(FLY_WINDOWS)
-        // MSVC will always 0-pad std::hexfloat formatted strings. Clang and GCC do not.
-        // https://github.com/microsoft/STL/blob/0b81475cc8087a7b615911d65b52b6a1fad87d7d/stl/inc/xlocnum#L1156
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "0x1.6000000000000p+2") == BasicString::format(format, 5.5));
-#else
-        CATCH_CHECK(FLY_STR(streamed_char, "0x1.6p+2") == BasicString::format(format, 5.5));
-#endif
-
-        format = FLY_STR(char_type, "%A");
-        CATCH_CHECK(FLY_STR(streamed_char, "%A") == BasicString::format(format));
-#if defined(FLY_WINDOWS)
-        // MSVC will always 0-pad std::hexfloat formatted strings. Clang and GCC do not.
-        // https://github.com/microsoft/STL/blob/0b81475cc8087a7b615911d65b52b6a1fad87d7d/stl/inc/xlocnum#L1156
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "0X1.6000000000000P+2") == BasicString::format(format, 5.5));
-#else
-        CATCH_CHECK(FLY_STR(streamed_char, "0X1.6P+2") == BasicString::format(format, 5.5));
-#endif
-    }
-
-    CATCH_SECTION("Format as a floating point (%f)")
-    {
-        format = FLY_STR(char_type, "%f");
-        CATCH_CHECK(FLY_STR(streamed_char, "%f") == BasicString::format(format));
-        CATCH_CHECK(FLY_STR(streamed_char, "nan") == BasicString::format(format, std::nan("")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "inf") ==
-            BasicString::format(format, std::numeric_limits<float>::infinity()));
-        CATCH_CHECK(FLY_STR(streamed_char, "2.100000") == BasicString::format(format, 2.1f));
-
-        format = FLY_STR(char_type, "%F");
-        CATCH_CHECK(FLY_STR(streamed_char, "%F") == BasicString::format(format));
-#if defined(FLY_MACOS)
-        // Only macOS seems to support std::uppercase with std::fixed :(
-        CATCH_CHECK(FLY_STR(streamed_char, "NAN") == BasicString::format(format, std::nan("")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "INF") ==
-            BasicString::format(format, std::numeric_limits<float>::infinity()));
-#else
-        CATCH_CHECK(FLY_STR(streamed_char, "nan") == BasicString::format(format, std::nan("")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "inf") ==
-            BasicString::format(format, std::numeric_limits<float>::infinity()));
-#endif
-        CATCH_CHECK(FLY_STR(streamed_char, "2.100000") == BasicString::format(format, 2.1f));
-    }
-
-    CATCH_SECTION("Format as scientific notation (%e)")
-    {
-        format = FLY_STR(char_type, "%e");
-        CATCH_CHECK(FLY_STR(streamed_char, "%e") == BasicString::format(format));
-        CATCH_CHECK(FLY_STR(streamed_char, "1.230000e+02") == BasicString::format(format, 123.0));
-
-        format = FLY_STR(char_type, "%E");
-        CATCH_CHECK(FLY_STR(streamed_char, "%E") == BasicString::format(format));
-        CATCH_CHECK(FLY_STR(streamed_char, "1.230000E+02") == BasicString::format(format, 123.0));
-    }
-
-    CATCH_SECTION("Format as a floating point or scientific notation (%g)")
-    {
-        format = FLY_STR(char_type, "%g");
-        CATCH_CHECK(FLY_STR(streamed_char, "%g") == BasicString::format(format));
-        CATCH_CHECK(FLY_STR(streamed_char, "nan") == BasicString::format(format, std::nan("")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "inf") ==
-            BasicString::format(format, std::numeric_limits<float>::infinity()));
-        CATCH_CHECK(FLY_STR(streamed_char, "2.1") == BasicString::format(format, 2.1f));
-
-        format = FLY_STR(char_type, "%G");
-        CATCH_CHECK(FLY_STR(streamed_char, "%G") == BasicString::format(format));
-        CATCH_CHECK(FLY_STR(streamed_char, "NAN") == BasicString::format(format, std::nan("")));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, "INF") ==
-            BasicString::format(format, std::numeric_limits<float>::infinity()));
-        CATCH_CHECK(FLY_STR(streamed_char, "2.1") == BasicString::format(format, 2.1f));
-    }
-
-    CATCH_SECTION("Format as a hexadecimal string")
-    {
-        for (char_type ch = 0; ch <= 0xf; ++ch)
+        if (value.starts_with(FLY_STR(char_type, "0x")))
         {
-            if ((ch >= 0) && (ch <= 9))
+            value = value.substr(2);
+        }
+
+        for (const auto &ch : value)
+        {
+            if (!BasicString::is_x_digit(ch))
             {
-                CATCH_CHECK(StringType(1, '0' + ch) == BasicString::create_hex_string(ch, 1));
-            }
-            else
-            {
-                CATCH_CHECK(StringType(1, 'a' + ch - 10) == BasicString::create_hex_string(ch, 1));
+                return false;
             }
         }
 
-        CATCH_CHECK(FLY_STR(char_type, "") == BasicString::create_hex_string(0x1234, 0));
-        CATCH_CHECK(FLY_STR(char_type, "4") == BasicString::create_hex_string(0x1234, 1));
-        CATCH_CHECK(FLY_STR(char_type, "34") == BasicString::create_hex_string(0x1234, 2));
-        CATCH_CHECK(FLY_STR(char_type, "234") == BasicString::create_hex_string(0x1234, 3));
-        CATCH_CHECK(FLY_STR(char_type, "1234") == BasicString::create_hex_string(0x1234, 4));
-        CATCH_CHECK(FLY_STR(char_type, "01234") == BasicString::create_hex_string(0x1234, 5));
-        CATCH_CHECK(FLY_STR(char_type, "001234") == BasicString::create_hex_string(0x1234, 6));
-        CATCH_CHECK(FLY_STR(char_type, "0001234") == BasicString::create_hex_string(0x1234, 7));
-        CATCH_CHECK(FLY_STR(char_type, "00001234") == BasicString::create_hex_string(0x1234, 8));
+        return !value.empty();
+    };
 
-        CATCH_CHECK(
-            FLY_STR(char_type, "0123456789abcdef") ==
-            BasicString::create_hex_string(0x0123456789abcdef_u64, 16));
+    CATCH_SECTION("Format string without replacement fields")
+    {
+        test_format(FMT(""), FMT(""));
+        test_format(FMT("ab"), FMT("ab"));
     }
+
+    CATCH_SECTION("Opening braces may be escaped and not parsed as a replacement field")
+    {
+        test_format(FMT("{{"), FMT("{"));
+        test_format(FMT("{{{{"), FMT("{{"));
+        test_format(FMT("{{ {{"), FMT("{ {"));
+    }
+
+    CATCH_SECTION("Closing braces may be escaped and not parsed as a replacement field")
+    {
+        test_format(FMT("}}"), FMT("}"));
+        test_format(FMT("}}}}"), FMT("}}"));
+        test_format(FMT("}} }}"), FMT("} }"));
+    }
+
+    CATCH_SECTION("Automatic positioning of format parameters formats in order")
+    {
+        test_format(FMT("{}"), FMT("1"), 1);
+        test_format(FMT("{} {}"), FMT("1 2"), 1, 2);
+        test_format(FMT("{} {} {}"), FMT("1 2 3"), 1, 2, 3);
+    }
+
+    CATCH_SECTION("Manual positioning of format parameters formats in order")
+    {
+        test_format(FMT("{0}"), FMT("1"), 1);
+        test_format(FMT("{0} {1}"), FMT("1 2"), 1, 2);
+        test_format(FMT("{1} {0}"), FMT("2 1"), 1, 2);
+        test_format(FMT("{0} {1} {2}"), FMT("1 2 3"), 1, 2, 3);
+        test_format(FMT("{2} {1} {0}"), FMT("3 2 1"), 1, 2, 3);
+        test_format(FMT("{0} {1} {0}"), FMT("1 2 1"), 1, 2, 3);
+    }
+
+    CATCH_SECTION("Fill character defaults to a space character")
+    {
+        test_format(FMT("{:6}"), FMT("     1"), 1);
+        test_format(FMT("{:4}_{:4}"), FMT("   1_ab  "), 1, FLY_STR(char_type, "ab"));
+    }
+
+    CATCH_SECTION("Fill character may be set")
+    {
+        test_format(FMT("{:*>6}"), FMT("*****1"), 1);
+        test_format(FMT("{:|>4} {:_>4}"), FMT("|||1 __ab"), 1, FLY_STR(char_type, "ab"));
+    }
+
+    CATCH_SECTION("Fill character is placed outside of sign and base indicators")
+    {
+        test_format(FMT("{:*<+6}"), FMT("+1****"), 1);
+        test_format(FMT("{:*< 6}"), FMT(" 1****"), 1);
+        test_format(FMT("{:*<#6b}"), FMT("0b11**"), 0b11);
+        test_format(FMT("{:*<#6B}"), FMT("0B11**"), 0b11);
+        test_format(FMT("{:*<#6x}"), FMT("0x41**"), 0x41);
+        test_format(FMT("{:*<#6X}"), FMT("0X41**"), 0x41);
+
+        test_format(FMT("{:*>+6}"), FMT("****+1"), 1);
+        test_format(FMT("{:*> 6}"), FMT("**** 1"), 1);
+        test_format(FMT("{:*>#6b}"), FMT("**0b11"), 0b11);
+        test_format(FMT("{:*>#6B}"), FMT("**0B11"), 0b11);
+        test_format(FMT("{:*>#6x}"), FMT("**0x41"), 0x41);
+        test_format(FMT("{:*>#6X}"), FMT("**0X41"), 0x41);
+
+        test_format(FMT("{:*^+6}"), FMT("****+1"), 1);
+        test_format(FMT("{:*^ 6}"), FMT("**** 1"), 1);
+        test_format(FMT("{:*^#6b}"), FMT("**0b11"), 0b11);
+        test_format(FMT("{:*^#6B}"), FMT("**0B11"), 0b11);
+        test_format(FMT("{:*^#6x}"), FMT("**0x41"), 0x41);
+        test_format(FMT("{:*^#6X}"), FMT("**0X41"), 0x41);
+    }
+
+    CATCH_SECTION("Alignment default is based on presentation type")
+    {
+        test_format(FMT("{:6}"), FMT("ab    "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:6}"), FMT("     1"), 1);
+        test_format(FMT("{:6b}"), FMT("    11"), 0b11);
+        test_format(FMT("{:6.2f}"), FMT("  3.14"), 3.14);
+    }
+
+    CATCH_SECTION("Alignment may be set to left-alignment")
+    {
+        test_format(FMT("{:<6}"), FMT("ab    "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:<6}"), FMT("1     "), 1);
+        test_format(FMT("{:<6b}"), FMT("11    "), 0b11);
+        test_format(FMT("{:<6.2f}"), FMT("3.14  "), 3.14);
+    }
+
+    CATCH_SECTION("Alignment may be set to right-alignment")
+    {
+        test_format(FMT("{:>6}"), FMT("    ab"), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:>6}"), FMT("     1"), 1);
+        test_format(FMT("{:>6b}"), FMT("    11"), 0b11);
+        test_format(FMT("{:>6.2f}"), FMT("  3.14"), 3.14);
+    }
+
+    CATCH_SECTION("Alignment affects sign and base indicators")
+    {
+        test_format(FMT("{:<+6}"), FMT("+1    "), 1);
+        test_format(FMT("{:< 6}"), FMT(" 1    "), 1);
+        test_format(FMT("{:<#6b}"), FMT("0b11  "), 0b11);
+        test_format(FMT("{:<#6B}"), FMT("0B11  "), 0b11);
+        test_format(FMT("{:<#6x}"), FMT("0x41  "), 0x41);
+        test_format(FMT("{:<#6X}"), FMT("0X41  "), 0x41);
+
+        test_format(FMT("{:>+6}"), FMT("    +1"), 1);
+        test_format(FMT("{:> 6}"), FMT("     1"), 1);
+        test_format(FMT("{:>#6b}"), FMT("  0b11"), 0b11);
+        test_format(FMT("{:>#6B}"), FMT("  0B11"), 0b11);
+        test_format(FMT("{:>#6x}"), FMT("  0x41"), 0x41);
+        test_format(FMT("{:>#6X}"), FMT("  0X41"), 0x41);
+
+        test_format(FMT("{:^+6}"), FMT("    +1"), 1);
+        test_format(FMT("{:^ 6}"), FMT("     1"), 1);
+        test_format(FMT("{:^#6b}"), FMT("  0b11"), 0b11);
+        test_format(FMT("{:^#6B}"), FMT("  0B11"), 0b11);
+        test_format(FMT("{:^#6x}"), FMT("  0x41"), 0x41);
+        test_format(FMT("{:^#6X}"), FMT("  0X41"), 0x41);
+    }
+
+    CATCH_SECTION("Alignment may be set to center-alignment (defaults to type-based alignment)")
+    {
+        test_format(FMT("{:^6}"), FMT("ab    "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:^6}"), FMT("     1"), 1);
+        test_format(FMT("{:^6b}"), FMT("    11"), 0b11);
+        test_format(FMT("{:^6.2f}"), FMT("  3.14"), 3.14);
+    }
+
+    CATCH_SECTION("Sign defaults to negative-only")
+    {
+        test_format(FMT("{}"), FMT("1"), 1);
+        test_format(FMT("{}"), FMT("-1"), -1);
+        test_format(FMT("{}"), FMT("3.14"), 3.14);
+        test_format(FMT("{}"), FMT("-3.14"), -3.14);
+    }
+
+    CATCH_SECTION("Sign may be set to always be used")
+    {
+        test_format(FMT("{:+}"), FMT("+1"), 1);
+        test_format(FMT("{:+}"), FMT("-1"), -1);
+        test_format(FMT("{:+}"), FMT("+3.14"), 3.14);
+        test_format(FMT("{:+}"), FMT("-3.14"), -3.14);
+    }
+
+    CATCH_SECTION("Sign may be set to use a space padding symbol")
+    {
+        test_format(FMT("{: }"), FMT(" 1"), 1);
+        test_format(FMT("{: }"), FMT("-1"), -1);
+        test_format(FMT("{: }"), FMT(" 3.14"), 3.14);
+        test_format(FMT("{: }"), FMT("-3.14"), -3.14);
+
+        // Ensure explicit padding does not change the postive padding.
+        test_format(FMT("{:*^ }"), FMT(" 1"), 1);
+    }
+
+    CATCH_SECTION("Alternate form is not used by default")
+    {
+        test_format(FMT("{:b}"), FMT("1"), 1);
+        test_format(FMT("{:B}"), FMT("1"), 1);
+        test_format(FMT("{:o}"), FMT("1"), 1);
+        test_format(FMT("{:x}"), FMT("1"), 1);
+        test_format(FMT("{:X}"), FMT("1"), 1);
+        test_format(FMT("{}"), FMT("1"), 1.0);
+        test_format(FMT("{}"), FMT("1.2"), 1.2);
+    }
+
+    CATCH_SECTION("Alternate form adds prefix for integral types")
+    {
+        test_format(FMT("{:#b}"), FMT("0b1"), 1);
+        test_format(FMT("{:#b}"), FMT("0b1"), 1U);
+        test_format(FMT("{:#B}"), FMT("0B1"), 1);
+        test_format(FMT("{:#B}"), FMT("0B1"), 1U);
+        test_format(FMT("{:#o}"), FMT("01"), 1);
+        test_format(FMT("{:#x}"), FMT("0x1"), 1);
+        test_format(FMT("{:#X}"), FMT("0X1"), 1);
+    }
+
+    CATCH_SECTION("Alternate form preserves decimal for floating point types")
+    {
+        test_format(FMT("{:#g}"), FMT("1.00000"), 1.0);
+        test_format(FMT("{:#g}"), FMT("1.20000"), 1.2);
+    }
+
+    CATCH_SECTION("Zero-padding is not used by default")
+    {
+        test_format(FMT("{:6b}"), FMT("    11"), 0b11);
+        test_format(FMT("{:#6b}"), FMT("  0b11"), 0b11);
+        test_format(FMT("{:6x}"), FMT("    41"), 0x41);
+        test_format(FMT("{:#6x}"), FMT("  0x41"), 0x41);
+        test_format(FMT("{:6}"), FMT("   -41"), -41);
+        test_format(FMT("{:+6}"), FMT("   +41"), 41);
+        test_format(FMT("{: 6}"), FMT("    41"), 41);
+    }
+
+    CATCH_SECTION("Zero-padding inserts zeros before sign and base indicators")
+    {
+        test_format(FMT("{:06b}"), FMT("000011"), 0b11);
+        test_format(FMT("{:#06b}"), FMT("0b0011"), 0b11);
+        test_format(FMT("{:06x}"), FMT("000041"), 0x41);
+        test_format(FMT("{:#06x}"), FMT("0x0041"), 0x41);
+        test_format(FMT("{:06}"), FMT("-00041"), -41);
+        test_format(FMT("{:+06}"), FMT("+00041"), 41);
+        test_format(FMT("{: 06}"), FMT(" 00041"), 41);
+    }
+
+    CATCH_SECTION("Zero-padding indicator ignored when alignment option is set")
+    {
+        test_format(FMT("{:>06b}"), FMT("    11"), 0b11);
+        test_format(FMT("{:>#06b}"), FMT("  0b11"), 0b11);
+        test_format(FMT("{:>06x}"), FMT("    41"), 0x41);
+        test_format(FMT("{:>#06x}"), FMT("  0x41"), 0x41);
+        test_format(FMT("{:>06}"), FMT("   -41"), -41);
+        test_format(FMT("{:>+06}"), FMT("   +41"), 41);
+        test_format(FMT("{:> 06}"), FMT("    41"), 41);
+    }
+
+    CATCH_SECTION("Width value may be set")
+    {
+        test_format(FMT("{:2}"), FMT("ab"), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:3}"), FMT("ab "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:4}"), FMT("ab  "), FLY_STR(char_type, "ab"));
+    }
+
+    CATCH_SECTION("Width value does not reduce values requiring larger width")
+    {
+        test_format(FMT("{:2}"), FMT("abcdef"), FLY_STR(char_type, "abcdef"));
+        test_format(FMT("{:3}"), FMT("123456"), 123456);
+    }
+
+    CATCH_SECTION("Precision sets floating point precision")
+    {
+        test_format(FMT("{:.3f}"), FMT("1.000"), 1.0);
+        test_format(FMT("{:.2f}"), FMT("3.14"), 3.14159);
+    }
+
+    CATCH_SECTION("Precision sets maximum string size")
+    {
+        test_format(FMT("{:.3s}"), FMT("ab"), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:.3s}"), FMT("abc"), FLY_STR(char_type, "abcdef"));
+    }
+
+    CATCH_SECTION("Presentation type may be set (character)")
+    {
+        test_format(FMT("{:c}"), FMT("a"), 'a');
+        test_format(FMT("{:c}"), FMT("a"), L'a');
+        test_format(FMT("{:c}"), FMT("a"), u8'a');
+        test_format(FMT("{:c}"), FMT("a"), u'a');
+        test_format(FMT("{:c}"), FMT("a"), U'a');
+        test_format(FMT("{:c}"), FMT("\n"), FLY_CHR(char_type, '\n'));
+        test_format(FMT("{:c}"), FMT("a"), 0x61);
+        test_format(FMT("{:c}"), StringType(1, static_cast<char_type>(true)), true);
+        test_format(FMT("{:c}"), StringType(1, static_cast<char_type>(false)), false);
+    }
+
+    CATCH_SECTION("Presentation type may be set (string)")
+    {
+        test_format(
+            FMT("{:s}"),
+            FLY_STR(char_type, "\u00f0\u0178\u008d\u2022"),
+            FLY_STR(char_type, "\u00f0\u0178\u008d\u2022"));
+
+        test_format(FMT("{:s}"), FMT("ab"), std::string("ab"));
+        test_format(FMT("{:s}"), FMT("ab"), std::wstring(L"ab"));
+        test_format(FMT("{:s}"), FMT("ab"), std::u8string(u8"ab"));
+        test_format(FMT("{:s}"), FMT("ab"), std::u16string(u"ab"));
+        test_format(FMT("{:s}"), FMT("ab"), std::u32string(U"ab"));
+
+        test_format(FMT("{:s}"), FMT("ab"), std::string_view("ab"));
+        test_format(FMT("{:s}"), FMT("ab"), std::wstring_view(L"ab"));
+        test_format(FMT("{:s}"), FMT("ab"), std::u8string_view(u8"ab"));
+        test_format(FMT("{:s}"), FMT("ab"), std::u16string_view(u"ab"));
+        test_format(FMT("{:s}"), FMT("ab"), std::u32string_view(U"ab"));
+
+        test_format(FMT("{:s}"), FMT("ab"), "ab");
+        test_format(FMT("{:s}"), FMT("ab"), L"ab");
+        test_format(FMT("{:s}"), FMT("ab"), u8"ab");
+        test_format(FMT("{:s}"), FMT("ab"), u"ab");
+        test_format(FMT("{:s}"), FMT("ab"), U"ab");
+
+        test_format(FMT("{:s}"), FMT("true"), true);
+        test_format(FMT("{:s}"), FMT("false"), false);
+    }
+
+    CATCH_SECTION("Presentation type may be set (pointer)")
+    {
+        test_format(FMT("{:p}"), FMT("nullptr"), nullptr);
+
+        int i = 0;
+        auto result = BasicString::format(FMT("{:p}"), &i);
+        CATCH_CHECK(is_all_hex(result));
+    }
+
+    CATCH_SECTION("Presentation type may be set (binary)")
+    {
+        test_format(FMT("{:b}"), FMT("1110111"), 0x77);
+        test_format(FMT("{:b}"), FMT("1011111011101111"), 0xbeef);
+        test_format(FMT("{:b}"), FMT("1"), true);
+        test_format(FMT("{:b}"), FMT("0"), false);
+        test_format(FMT("{:b}"), FMT("1000001"), char(0x41));
+        test_format(FMT("{:b}"), FMT("1000001"), char8_t(0x41));
+        test_format(FMT("{:b}"), FMT("1000001"), char16_t(0x41));
+        test_format(FMT("{:b}"), FMT("1000001"), char32_t(0x41));
+    }
+
+    CATCH_SECTION("Presentation type may be set (octal)")
+    {
+        test_format(FMT("{:o}"), FMT("167"), 0x77);
+        test_format(FMT("{:o}"), FMT("137357"), 0xbeef);
+        test_format(FMT("{:o}"), FMT("1"), true);
+        test_format(FMT("{:o}"), FMT("0"), false);
+        test_format(FMT("{:o}"), FMT("101"), char(0x41));
+        test_format(FMT("{:o}"), FMT("101"), char8_t(0x41));
+        test_format(FMT("{:o}"), FMT("101"), char16_t(0x41));
+        test_format(FMT("{:o}"), FMT("101"), char32_t(0x41));
+    }
+
+    CATCH_SECTION("Presentation type may be set (decimal)")
+    {
+        test_format(FMT("{:d}"), FMT("119"), 0x77);
+        test_format(FMT("{:d}"), FMT("48879"), 0xbeef);
+        test_format(FMT("{:d}"), FMT("1"), true);
+        test_format(FMT("{:d}"), FMT("0"), false);
+        test_format(FMT("{:d}"), FMT("65"), char(0x41));
+        test_format(FMT("{:d}"), FMT("65"), char8_t(0x41));
+        test_format(FMT("{:d}"), FMT("65"), char16_t(0x41));
+        test_format(FMT("{:d}"), FMT("65"), char32_t(0x41));
+    }
+
+    CATCH_SECTION("Presentation type may be set (hex)")
+    {
+        test_format(FMT("{:x}"), FMT("77"), 0x77);
+        test_format(FMT("{:x}"), FMT("beef"), 0xbeef);
+        test_format(FMT("{:x}"), FMT("1"), true);
+        test_format(FMT("{:x}"), FMT("0"), false);
+        test_format(FMT("{:x}"), FMT("41"), char(0x41));
+        test_format(FMT("{:x}"), FMT("41"), char8_t(0x41));
+        test_format(FMT("{:x}"), FMT("41"), char16_t(0x41));
+        test_format(FMT("{:x}"), FMT("41"), char32_t(0x41));
+
+        test_format(FMT("{:X}"), FMT("BEEF"), 0xbeef);
+    }
+
+    CATCH_SECTION("Presentation type may be set (hexfloat)")
+    {
+        test_format(FMT("{:a}"), FMT("nan"), std::nan(""));
+        test_format(FMT("{:a}"), FMT("inf"), std::numeric_limits<float>::infinity());
+        test_format(FMT("{:A}"), FMT("NAN"), std::nan(""));
+        test_format(FMT("{:A}"), FMT("INF"), std::numeric_limits<float>::infinity());
+
+        // MSVC will always 0-pad std::hexfloat formatted strings. Clang and GCC do not.
+        // https://github.com/microsoft/STL/blob/0b81475cc8087a7b615911d65b52b6a1fad87d7d/stl/inc/xlocnum#L1156
+        if constexpr (fly::is_windows())
+        {
+            test_format(FMT("{:a}"), FMT("0x1.6000000000000p+2"), 5.5);
+            test_format(FMT("{:A}"), FMT("0X1.6000000000000P+2"), 5.5);
+        }
+        else
+        {
+            test_format(FMT("{:a}"), FMT("0x1.6p+2"), 5.5);
+            test_format(FMT("{:A}"), FMT("0X1.6P+2"), 5.5);
+        }
+    }
+
+    CATCH_SECTION("Presentation type may be set (scientific)")
+    {
+        test_format(FMT("{:e}"), FMT("nan"), std::nan(""));
+        test_format(FMT("{:e}"), FMT("inf"), std::numeric_limits<float>::infinity());
+        test_format(FMT("{:e}"), FMT("1.230000e+02"), 123.0);
+
+        test_format(FMT("{:E}"), FMT("NAN"), std::nan(""));
+        test_format(FMT("{:E}"), FMT("INF"), std::numeric_limits<float>::infinity());
+        test_format(FMT("{:E}"), FMT("1.230000E+02"), 123.0);
+    }
+
+    CATCH_SECTION("Presentation type may be set (fixed)")
+    {
+        test_format(FMT("{:f}"), FMT("nan"), std::nan(""));
+        test_format(FMT("{:f}"), FMT("inf"), std::numeric_limits<float>::infinity());
+        test_format(FMT("{:f}"), FMT("2.100000"), 2.1f);
+
+        test_format(FMT("{:F}"), FMT("NAN"), std::nan(""));
+        test_format(FMT("{:F}"), FMT("INF"), std::numeric_limits<float>::infinity());
+        test_format(FMT("{:F}"), FMT("2.100000"), 2.1f);
+    }
+
+    CATCH_SECTION("Presentation type may be set (general)")
+    {
+        test_format(FMT("{:g}"), FMT("nan"), std::nan(""));
+        test_format(FMT("{:g}"), FMT("inf"), std::numeric_limits<float>::infinity());
+        test_format(FMT("{:g}"), FMT("2.1"), 2.1f);
+
+        test_format(FMT("{:G}"), FMT("NAN"), std::nan(""));
+        test_format(FMT("{:G}"), FMT("INF"), std::numeric_limits<float>::infinity());
+        test_format(FMT("{:G}"), FMT("2.1"), 2.1f);
+    }
+
+    if constexpr (!std::is_same_v<StringType, typename BasicString::streamed_type>)
+    {
+        CATCH_SECTION("Invalid Unicode cannot be converted to UTF-8")
+        {
+            static constexpr const char_type s_invalid_utf8_leading_byte[] {
+                static_cast<char_type>(0xff),
+            };
+
+            StringType result = BasicString::format(s_invalid_utf8_leading_byte);
+            CATCH_CHECK(result.empty());
+        }
+    }
+
+#if defined(FLY_COMPILER_DISABLE_CONSTEVAL)
+
+    CATCH_SECTION("Formatter reports formatting errors")
+    {
+        auto result = BasicString::format(FMT("{:}"));
+        CATCH_CHECK(result.starts_with(FMT("Ignored invalid formatter")));
+    }
+
+#endif
 }
