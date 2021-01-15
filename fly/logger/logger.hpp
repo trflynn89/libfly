@@ -271,10 +271,10 @@ public:
     /**
      * Add a debug log point to the logger.
      *
-     * @tparam Args Variadic template arguments.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param format The format string for the log point.
-     * @param args The variadic list of arguments to augment the format string with.
+     * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
     inline void
@@ -289,11 +289,11 @@ public:
     /**
      * Add a debug log point to the logger with trace information.
      *
-     * @tparam Args Variadic template arguments.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param trace The trace information for the log point.
      * @param format The format string for the log point.
-     * @param args The variadic list of arguments to augment the format string with.
+     * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
     inline void debug(
@@ -311,10 +311,10 @@ public:
     /**
      * Add an informational log point to the logger.
      *
-     * @tparam Args Variadic template arguments.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param format The format string for the log point.
-     * @param args The variadic list of arguments to augment the format string with.
+     * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
     inline void
@@ -329,11 +329,11 @@ public:
     /**
      * Add an informational log point to the logger with trace information.
      *
-     * @tparam Args Variadic template arguments.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param trace The trace information for the log point.
      * @param format The format string for the log point.
-     * @param args The variadic list of arguments to augment the format string with.
+     * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
     inline void info(
@@ -351,10 +351,10 @@ public:
     /**
      * Add a warning log point to the logger.
      *
-     * @tparam Args Variadic template arguments.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param format The format string for the log point.
-     * @param args The variadic list of arguments to augment the format string with.
+     * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
     inline void
@@ -369,11 +369,11 @@ public:
     /**
      * Add a warning log point to the logger with trace information.
      *
-     * @tparam Args Variadic template arguments.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param trace The trace information for the log point.
      * @param format The format string for the log point.
-     * @param args The variadic list of arguments to augment the format string with.
+     * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
     inline void warn(
@@ -391,10 +391,10 @@ public:
     /**
      * Add an error log point to the logger.
      *
-     * @tparam Args Variadic template arguments.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param format The format string for the log point.
-     * @param args The variadic list of arguments to augment the format string with.
+     * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
     inline void
@@ -409,11 +409,11 @@ public:
     /**
      * Add an error log point to the logger with trace information.
      *
-     * @tparam Args Variadic template arguments.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param trace The trace information for the log point.
      * @param format The format string for the log point.
-     * @param args The variadic list of arguments to augment the format string with.
+     * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
     inline void error(
