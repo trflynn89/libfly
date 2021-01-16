@@ -170,24 +170,6 @@ CATCH_TEMPLATE_TEST_CASE(
     constexpr const float f = 3.14f;
     constexpr const bool b = true;
 
-    CATCH_SECTION("Format string begin points at the first character in string")
-    {
-        auto format = make_format(FMT("ab"));
-        CATCH_CHECK_FALSE(format.has_error());
-
-        auto begin = format.begin();
-        CATCH_CHECK(*begin == FLY_CHR(char_type, 'a'));
-    }
-
-    CATCH_SECTION("Format string end points just past the last character in string")
-    {
-        auto format = make_format(FMT("ab"));
-        CATCH_CHECK_FALSE(format.has_error());
-
-        auto end = format.end() - 1;
-        CATCH_CHECK(*end == FLY_CHR(char_type, 'b'));
-    }
-
     CATCH_SECTION("No specifiers are parsed from empty string")
     {
         test_format(make_format(FMT("")));
@@ -229,8 +211,7 @@ CATCH_TEMPLATE_TEST_CASE(
             1);
         CATCH_CHECK_FALSE(format.has_error());
 
-        const auto length = static_cast<std::size_t>(std::distance(format.begin(), format.end()));
-        const std::size_t specifiers_created = length / 3;
+        const std::size_t specifiers_created = format.view().size() / 3;
         std::size_t specifiers_parsed = 0;
 
         while (format.next_specifier())
@@ -610,6 +591,26 @@ CATCH_TEMPLATE_TEST_CASE(
 
         specifier.m_locale_specific_form = false;
         test_format(make_format(FMT("{1:F}"), f, f), specifier);
+    }
+
+    CATCH_SECTION("Specifiers track their size in the format string")
+    {
+        auto format = make_format(FMT("ab {0} cd {1:d} ef {2:#0x}"), 1, 2, 3);
+        CATCH_CHECK_FALSE(format.has_error());
+
+        auto specifier1 = format.next_specifier();
+        CATCH_REQUIRE(specifier1);
+        CATCH_CHECK(specifier1->m_size == 3);
+
+        auto specifier2 = format.next_specifier();
+        CATCH_REQUIRE(specifier2);
+        CATCH_CHECK(specifier2->m_size == 5);
+
+        auto specifier3 = format.next_specifier();
+        CATCH_REQUIRE(specifier3);
+        CATCH_CHECK(specifier3->m_size == 7);
+
+        CATCH_CHECK_FALSE(format.next_specifier());
     }
 }
 
