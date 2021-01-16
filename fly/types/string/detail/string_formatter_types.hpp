@@ -174,19 +174,9 @@ struct BasicFormatSpecifier
     static constexpr std::optional<Type> type_of(CharType ch);
 
     /**
-     * @return True if the presentation type is a numeric (integral or floating point) type.
+     * @return True if the presentation type is a numeric type.
      */
     constexpr bool is_numeric() const;
-
-    /**
-     * @return True if the presentation type is an integral type.
-     */
-    constexpr bool is_integral() const;
-
-    /**
-     * @return True if the presentation type is a floating point type.
-     */
-    constexpr bool is_floating_point() const;
 
     /**
      * Compare two replacement field instances for equality.
@@ -566,36 +556,18 @@ constexpr auto BasicFormatSpecifier<CharType>::type_of(CharType ch) -> std::opti
 template <typename CharType>
 constexpr bool BasicFormatSpecifier<CharType>::is_numeric() const
 {
-    return is_integral() || is_floating_point();
-}
-
-//==================================================================================================
-template <typename CharType>
-constexpr bool BasicFormatSpecifier<CharType>::is_integral() const
-{
     switch (m_type)
     {
         case Type::Binary:
         case Type::Octal:
         case Type::Decimal:
         case Type::Hex:
-            return true;
-        default:
-            return false;
-    }
-}
-
-//==================================================================================================
-template <typename CharType>
-constexpr bool BasicFormatSpecifier<CharType>::is_floating_point() const
-{
-    switch (m_type)
-    {
         case Type::HexFloat:
         case Type::Scientific:
         case Type::Fixed:
         case Type::General:
             return true;
+
         default:
             return false;
     }
