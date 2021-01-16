@@ -200,7 +200,7 @@ struct BasicFormatSpecifier
 
     std::size_t m_position {0};
 
-    CharType m_fill {FLY_CHR(CharType, ' ')};
+    std::optional<CharType> m_fill {std::nullopt};
     Alignment m_alignment {Alignment::Default};
 
     Sign m_sign {Sign::Default};
@@ -933,11 +933,15 @@ constexpr bool BasicFormatString<StringType, ParameterTypes...>::validate_specif
     }
 
     // Validate the fill character.
-    else if ((specifier.m_fill == s_left_brace) || (specifier.m_fill == s_right_brace))
+    else if (
+        specifier.m_fill &&
+        ((specifier.m_fill == s_left_brace) || (specifier.m_fill == s_right_brace)))
     {
         on_error("Characters { and } are not allowed as fill characters");
     }
-    else if (static_cast<std::make_unsigned_t<char_type>>(specifier.m_fill) >= 0x80)
+    else if (
+        specifier.m_fill &&
+        (static_cast<std::make_unsigned_t<char_type>>(*specifier.m_fill) >= 0x80))
     {
         on_error("Non-ascii characters are not allowed as fill characters");
     }

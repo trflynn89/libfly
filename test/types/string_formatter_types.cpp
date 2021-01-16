@@ -586,7 +586,7 @@ CATCH_TEMPLATE_TEST_CASE(
         specifier.m_case = Specifier::Case::Upper;
         test_format(make_format(FMT("{1:_^+#01.2LF}"), f, f), specifier);
 
-        specifier.m_fill = FLY_CHR(char_type, ' ');
+        specifier.m_fill = std::nullopt;
         test_format(make_format(FMT("{1:^+#01.2LF}"), f, f), specifier);
 
         specifier.m_alignment = Specifier::Alignment::Default;
