@@ -329,7 +329,7 @@ private:
     using is_integer = std::conjunction<
         std::is_integral<T>,
         std::negation<is_supported_character<T>>,
-        std::negation<std::is_same<bool, T>>>;
+        std::negation<std::is_same<T, bool>>>;
 
     template <typename T>
     static inline constexpr bool is_integer_v = is_integer<T>::value;
