@@ -244,7 +244,7 @@ public:
      * thread while invoking a LOG* macro on another thread. The default logger should be set once
      * during initialization.
      *
-     * @param logger The logger instance.
+     * @param default_logger The logger instance.
      */
     static void set_default_logger(const std::shared_ptr<Logger> &default_logger);
 
