@@ -215,6 +215,8 @@ struct BasicFormatSpecifier
     Type m_type {Type::None};
     Case m_case {Case::Lower};
 
+    std::size_t m_size {0};
+
 private:
     static constexpr std::array<std::pair<CharType, Type>, 17> s_type_map {{
         {FLY_CHR(CharType, 'c'), Type::Character},
@@ -256,6 +258,7 @@ class BasicFormatString
     using classifier = BasicStringClassifier<StringType>;
     using lexer = BasicStringLexer<StringType>;
     using char_type = typename traits::char_type;
+    using view_type = typename traits::view_type;
 
     using FormatSpecifier = BasicFormatSpecifier<char_type>;
 
@@ -278,6 +281,11 @@ public:
     FLY_CONSTEVAL BasicFormatString(const char_type (&format)[N]) noexcept;
 
     /**
+     * @return A string view into the format string.
+     */
+    constexpr view_type view() const;
+
+    /**
      * If the compiler does not support immediate functions, returns whether an error was
      * encountered while parsing the format string.
      *
@@ -297,16 +305,6 @@ public:
      * @return If available, the next parsed replacement field. Otherwise, an uninitialized value.
      */
     std::optional<FormatSpecifier> next_specifier();
-
-    /**
-     * @return A pointer to the beginning of the C-string literal.
-     */
-    constexpr typename lexer::iterator begin() const;
-
-    /**
-     * @return A pointer to the end of the C-string literal.
-     */
-    constexpr typename lexer::iterator end() const;
 
 private:
     BasicFormatString(const BasicFormatString &) = delete;
@@ -666,6 +664,13 @@ FLY_CONSTEVAL BasicFormatString<StringType, ParameterTypes...>::BasicFormatStrin
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
+constexpr auto BasicFormatString<StringType, ParameterTypes...>::view() const -> view_type
+{
+    return m_lexer.view();
+}
+
+//==================================================================================================
+template <typename StringType, typename... ParameterTypes>
 constexpr bool BasicFormatString<StringType, ParameterTypes...>::has_error() const
 {
     return !m_error.empty();
@@ -693,25 +698,12 @@ auto BasicFormatString<StringType, ParameterTypes...>::next_specifier()
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-constexpr auto BasicFormatString<StringType, ParameterTypes...>::begin() const ->
-    typename lexer::iterator
-{
-    return m_lexer.begin();
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr auto BasicFormatString<StringType, ParameterTypes...>::end() const ->
-    typename lexer::iterator
-{
-    return m_lexer.end();
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
 constexpr auto BasicFormatString<StringType, ParameterTypes...>::parse_specifier()
     -> std::optional<FormatSpecifier>
 {
+    // The opening { will have already been consumed, so the starting position is one less.
+    const auto starting_position = m_lexer.position() - 1;
+
     FormatSpecifier specifier {};
     parse_position(specifier);
 
@@ -739,6 +731,7 @@ constexpr auto BasicFormatString<StringType, ParameterTypes...>::parse_specifier
         return std::nullopt;
     }
 
+    specifier.m_size = m_lexer.position() - starting_position;
     return specifier;
 }
 

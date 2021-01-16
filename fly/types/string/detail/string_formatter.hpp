@@ -155,32 +155,36 @@ void BasicStringFormatter<StringType>::format_internal(
         format_value(stream, std::move(specifier), value);
     };
 
-    for (auto it = fmt.begin(); it != fmt.end(); ++it)
+    const view_type view = fmt.view();
+
+    for (std::size_t pos = 0; pos < view.size();)
     {
-        if (*it == s_left_brace)
+        switch (const auto &ch = view[pos])
         {
-            if (*(it + 1) == s_left_brace)
-            {
-                streamer::stream_value(stream, *it++);
-                continue;
-            }
+            case s_left_brace:
+                if (view[pos + 1] == s_left_brace)
+                {
+                    streamer::stream_value(stream, ch);
+                    pos += 2;
+                }
+                else
+                {
+                    auto specifier = *std::move(fmt.next_specifier());
+                    pos += specifier.m_size;
 
-            while (*(++it) != s_right_brace)
-            {
-            }
+                    parameters.visit(std::move(specifier), formatter);
+                }
+                break;
 
-            if (auto specifier = fmt.next_specifier(); specifier)
-            {
-                parameters.visit(*std::move(specifier), formatter);
-            }
-        }
-        else if (*it == s_right_brace && (*(it + 1) == s_right_brace))
-        {
-            streamer::stream_value(stream, *it++);
-        }
-        else
-        {
-            streamer::stream_value(stream, *it);
+            case s_right_brace:
+                streamer::stream_value(stream, ch);
+                pos += 2;
+                break;
+
+            default:
+                streamer::stream_value(stream, ch);
+                ++pos;
+                break;
         }
     }
 }

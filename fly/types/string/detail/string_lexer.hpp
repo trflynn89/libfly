@@ -25,8 +25,6 @@ class BasicStringLexer
     using view_type = typename traits::view_type;
 
 public:
-    using iterator = typename view_type::const_iterator;
-
     /**
      * Constructor. Stores a view into a C-string literal. This class is not interested in the null
      * terminator, thus if provided, it is excluded from the view.
@@ -37,6 +35,16 @@ public:
      */
     template <std::size_t N>
     constexpr explicit BasicStringLexer(const char_type (&literals)[N]) noexcept;
+
+    /**
+     * @return A string view into the C-string literal.
+     */
+    constexpr view_type view() const;
+
+    /**
+     * @return The lexer's current position into the C-string literal.
+     */
+    constexpr std::size_t position() const;
 
     /**
      * If a character is available at the current position (or some offset from the current
@@ -78,16 +86,6 @@ public:
      */
     constexpr std::optional<std::size_t> consume_number();
 
-    /**
-     * @return A pointer to the beginning of the C-string literal.
-     */
-    constexpr iterator begin() const;
-
-    /**
-     * @return A pointer to the end of the C-string literal.
-     */
-    constexpr iterator end() const;
-
 private:
     /**
      * If a character is available at the current position in the C-string literal, and if that
@@ -118,6 +116,20 @@ constexpr BasicStringLexer<StringType>::BasicStringLexer(const char_type (&liter
     m_size(N - ((literals[N - 1] == s_null_terminator) ? 1 : 0)),
     m_view(literals, m_size)
 {
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr auto BasicStringLexer<StringType>::view() const -> view_type
+{
+    return m_view;
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr std::size_t BasicStringLexer<StringType>::position() const
+{
+    return m_index;
 }
 
 //==================================================================================================
@@ -187,20 +199,6 @@ constexpr std::optional<std::size_t> BasicStringLexer<StringType>::consume_numbe
     }
 
     return parsed_number ? std::optional<std::size_t>(number) : std::nullopt;
-}
-
-//==================================================================================================
-template <typename StringType>
-constexpr auto BasicStringLexer<StringType>::begin() const -> iterator
-{
-    return m_view.cbegin();
-}
-
-//==================================================================================================
-template <typename StringType>
-constexpr auto BasicStringLexer<StringType>::end() const -> iterator
-{
-    return m_view.cend();
 }
 
 } // namespace fly::detail
