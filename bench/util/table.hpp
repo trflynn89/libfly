@@ -232,7 +232,7 @@ void Table<Args...>::print_table(std::ostream &stream) const
 {
     fly::detail::BasicStreamModifiers<std::string> scoped_modifiers(stream);
     scoped_modifiers.locale<CommaPunctuation>();
-    scoped_modifiers.manip(std::setprecision(s_precision));
+    stream.precision(static_cast<int>(s_precision));
 
     // Compute the entire width of the table. There are 1 + the number of columns vertical
     // separators ('|'), plus the width of each column (with 2 padding spacers each).
@@ -300,16 +300,16 @@ void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
 
         if constexpr (std::is_arithmetic_v<T>)
         {
-            scoped_modifiers.manip(std::right);
+            stream << std::right;
 
             if constexpr (std::is_floating_point_v<T>)
             {
-                scoped_modifiers.manip(std::fixed);
+                stream << std::fixed;
             }
         }
         else
         {
-            scoped_modifiers.manip(std::left);
+            stream << std::left;
         }
 
         stream << fly::Styler(s_data_style, s_data_color) << ' '

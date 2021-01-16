@@ -196,53 +196,56 @@ void BasicStringFormatter<StringType>::format_value(
     using U = std::remove_cvref_t<T>;
 
     BasicStreamModifiers<StringType> modifiers(stream);
+    std::ios_base::fmtflags flags {};
 
-    modifiers.manip(std::setfill(static_cast<streamed_char_type>(specifier.m_fill)));
-    modifiers.manip(specifier.m_alternate_form ? std::showbase : std::noshowbase);
-    modifiers.manip(specifier.m_alternate_form ? std::showpoint : std::noshowpoint);
-    modifiers.manip(
-        (specifier.m_case == FormatSpecifier::Case::Upper) ? std::uppercase : std::nouppercase);
-    modifiers.manip(
-        (specifier.m_type == FormatSpecifier::Type::String) ? std::boolalpha : std::noboolalpha);
+    if (specifier.m_fill)
+    {
+        stream.fill(static_cast<streamed_char_type>(*specifier.m_fill));
+    }
 
     switch (specifier.m_alignment)
     {
         case FormatSpecifier::Alignment::Left:
-            modifiers.manip(std::left);
+            flags |= std::ios_base::left;
             break;
         case FormatSpecifier::Alignment::Right:
-            modifiers.manip(std::right);
+            flags |= std::ios_base::right;
             break;
         case FormatSpecifier::Alignment::Center: // TODO: Implement center-alignment.
         case FormatSpecifier::Alignment::Default:
-            modifiers.manip(specifier.is_numeric() ? std::right : std::left);
+            flags |= specifier.is_numeric() ? std::ios_base::right : std::ios_base::left;
             break;
     }
 
     switch (specifier.m_sign)
     {
         case FormatSpecifier::Sign::Always:
-            modifiers.manip(std::showpos);
-            break;
-        case FormatSpecifier::Sign::Default:
-        case FormatSpecifier::Sign::NegativeOnly:
-            modifiers.manip(std::noshowpos);
+            flags |= std::ios_base::showpos;
             break;
         case FormatSpecifier::Sign::NegativeOnlyWithPositivePadding:
             modifiers.template locale<PositivePaddingFacet<streamed_char_type>>();
-            modifiers.manip(std::showpos);
+            flags |= std::ios_base::showpos;
             break;
+        default:
+            break;
+    }
+
+    if (specifier.m_alternate_form)
+    {
+        flags |= std::ios_base::showbase;
+        flags |= std::ios_base::showpoint;
     }
 
     if (specifier.m_zero_padding)
     {
-        modifiers.manip(std::setfill(s_zero));
-        modifiers.manip(std::internal);
+        flags &= ~std::ios_base::adjustfield;
+        flags |= std::ios_base::internal;
+        stream.fill(s_zero);
     }
 
     if (specifier.m_width)
     {
-        modifiers.manip(std::setw(static_cast<int>(*specifier.m_width)));
+        stream.width(static_cast<int>(*specifier.m_width));
     }
 
     if (specifier.m_precision)
@@ -255,35 +258,44 @@ void BasicStringFormatter<StringType>::format_value(
             // string that are written to the stream. Instead, stream a substring view if needed.
             if (typename traits_type::view_type view(value); *specifier.m_precision < view.size())
             {
+                stream.flags(flags);
                 streamer::stream_value(stream, view.substr(0, *specifier.m_precision));
                 return;
             }
         }
         else
         {
-            modifiers.manip(std::setprecision(static_cast<int>(*specifier.m_precision)));
+            stream.precision(static_cast<int>(*specifier.m_precision));
         }
+    }
+
+    if (specifier.m_case == FormatSpecifier::Case::Upper)
+    {
+        flags |= std::ios_base::uppercase;
     }
 
     switch (specifier.m_type)
     {
+        case FormatSpecifier::Type::String:
+            if constexpr (std::is_same_v<U, bool>)
+            {
+                flags |= std::ios_base::boolalpha;
+            }
+            break;
         case FormatSpecifier::Type::Binary:
             modifiers.template locale<BinaryFacet<streamed_char_type>>();
             break;
         case FormatSpecifier::Type::Octal:
-            modifiers.manip(std::oct);
-            break;
-        case FormatSpecifier::Type::Decimal:
-            modifiers.manip(std::dec);
+            flags |= std::ios_base::oct;
             break;
         case FormatSpecifier::Type::Hex:
-            modifiers.manip(std::hex);
+            flags |= std::ios_base::hex;
             break;
         case FormatSpecifier::Type::HexFloat:
-            modifiers.manip(std::hexfloat);
+            flags |= std::ios_base::fixed | std::ios_base::scientific;
             break;
         case FormatSpecifier::Type::Scientific:
-            modifiers.manip(std::scientific);
+            flags |= std::ios_base::scientific;
             break;
         case FormatSpecifier::Type::Fixed:
             // Note: this branch will only ever be entered with floating point types, but the
@@ -294,13 +306,15 @@ void BasicStringFormatter<StringType>::format_value(
                 // ensure consistency, format these values as general types.
                 if (!std::isnan(value) && !std::isinf(value))
                 {
-                    modifiers.manip(std::fixed);
+                    flags |= std::ios_base::fixed;
                 }
             }
             break;
         default:
             break;
     }
+
+    stream.flags(flags);
 
     if (specifier.m_type == FormatSpecifier::Type::Character)
     {

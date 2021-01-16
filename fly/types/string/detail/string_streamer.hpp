@@ -107,16 +107,6 @@ public:
     template <typename Facet>
     void locale();
 
-    /**
-     * Apply an IO manipulator to the stream. See: https://en.cppreference.com/w/cpp/io/manip
-     *
-     * @tparam Manipulator The type of manipulator to apply.
-     *
-     * @param manipulator The manipulator to apply.
-     */
-    template <typename Manipulator>
-    void manip(Manipulator &&manipulator);
-
 private:
     BasicStreamModifiers(const BasicStreamModifiers &) = delete;
     BasicStreamModifiers &operator=(const BasicStreamModifiers &) = delete;
@@ -273,6 +263,7 @@ BasicStreamModifiers<StringType>::BasicStreamModifiers(ostream_type &stream) :
     m_locale(stream.getloc()),
     m_flags(stream.flags())
 {
+    stream.flags(std::ios_base::fmtflags());
 }
 
 //==================================================================================================
@@ -289,14 +280,6 @@ template <typename Facet>
 void BasicStreamModifiers<StringType>::locale()
 {
     m_stream.imbue({m_stream.getloc(), new Facet()});
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename Manipulator>
-void BasicStreamModifiers<StringType>::manip(Manipulator &&manipulator)
-{
-    m_stream << manipulator;
 }
 
 //==================================================================================================

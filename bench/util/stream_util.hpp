@@ -91,8 +91,7 @@ void Center<StringType>::print(std::ostream &stream) const
         const std::streamsize left = (m_width + length) / 2;
 
         fly::detail::BasicStreamModifiers<std::string> scoped_modifiers(stream);
-        scoped_modifiers.manip(std::right);
-
+        stream << std::right;
         stream << std::setw(left) << m_value;
         stream << std::setw(m_width - left) << "";
     }
