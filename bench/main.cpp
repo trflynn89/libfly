@@ -56,8 +56,8 @@ public:
 
     void testCaseStarting(const Catch::TestCaseInfo &info) override
     {
-        stream << fly::Styler(fly::Style::Bold, fly::Color::Cyan)
-               << fly::String::format("[============ {} ============]", info.name) << "\n\n";
+        const auto style = fly::Styler(fly::Style::Bold, fly::Color::Cyan);
+        fly::String::format(stream, "[{}{:=>13}{}{:=<13}]\n\n", style, ' ', info.name, ' ');
     }
 };
 
