@@ -82,9 +82,10 @@ private:
 template <typename StringType>
 class BasicStreamModifiers
 {
-    using traits = BasicStringTraits<StringType>;
+    using streamer = BasicStringStreamer<StringType>;
 
-    using ostream_type = typename traits::ostream_type;
+    using ostream_type = typename streamer::ostream_type;
+    using streamed_char_type = typename streamer::streamed_char_type;
 
 public:
     /**
@@ -115,6 +116,8 @@ private:
 
     const std::locale m_locale;
     const std::ios_base::fmtflags m_flags;
+    const streamed_char_type m_fill;
+    const std::streamsize m_precision;
 };
 
 /**
@@ -261,7 +264,9 @@ template <typename StringType>
 BasicStreamModifiers<StringType>::BasicStreamModifiers(ostream_type &stream) :
     m_stream(stream),
     m_locale(stream.getloc()),
-    m_flags(stream.flags())
+    m_flags(stream.flags()),
+    m_fill(stream.fill()),
+    m_precision(stream.precision())
 {
     stream.flags(std::ios_base::fmtflags());
 }
@@ -272,6 +277,8 @@ BasicStreamModifiers<StringType>::~BasicStreamModifiers()
 {
     m_stream.imbue(m_locale);
     m_stream.flags(m_flags);
+    m_stream.fill(m_fill);
+    m_stream.precision(m_precision);
 }
 
 //==================================================================================================
