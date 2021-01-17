@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/fly.hpp"
 #include "fly/logger/detail/styler_proxy.hpp"
 #include "fly/traits/traits.hpp"
 #include "fly/types/numeric/literals.hpp"
@@ -127,7 +128,7 @@ inline namespace literals {
          * @return The constructed Color.
          */
         template <char... Literals>
-        constexpr inline Color operator"" _c()
+        FLY_CONSTEVAL inline Color operator"" _c()
         {
             // Convert to std::uint8_t via numeric literal to ensure the provided color is valid.
             const std::uint8_t validated_color = operator"" _u8<Literals...>();
