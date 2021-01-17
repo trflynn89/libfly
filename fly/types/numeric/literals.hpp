@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/fly.hpp"
 #include "fly/types/numeric/detail/literal_parser.hpp"
 
 #include <cstddef>
@@ -43,55 +44,55 @@ inline namespace literals {
     inline namespace numeric_literals {
 
         template <char... Literals>
-        constexpr inline std::int8_t operator"" _i8()
+        FLY_CONSTEVAL inline std::int8_t operator"" _i8()
         {
             return fly::detail::literal<std::int8_t, Literals...>();
         }
 
         template <char... Literals>
-        constexpr inline std::int16_t operator"" _i16()
+        FLY_CONSTEVAL inline std::int16_t operator"" _i16()
         {
             return fly::detail::literal<std::int16_t, Literals...>();
         }
 
         template <char... Literals>
-        constexpr inline std::int32_t operator"" _i32()
+        FLY_CONSTEVAL inline std::int32_t operator"" _i32()
         {
             return fly::detail::literal<std::int32_t, Literals...>();
         }
 
         template <char... Literals>
-        constexpr inline std::int64_t operator"" _i64()
+        FLY_CONSTEVAL inline std::int64_t operator"" _i64()
         {
             return fly::detail::literal<std::int64_t, Literals...>();
         }
 
         template <char... Literals>
-        constexpr inline std::uint8_t operator"" _u8()
+        FLY_CONSTEVAL inline std::uint8_t operator"" _u8()
         {
             return fly::detail::literal<std::uint8_t, Literals...>();
         }
 
         template <char... Literals>
-        constexpr inline std::uint16_t operator"" _u16()
+        FLY_CONSTEVAL inline std::uint16_t operator"" _u16()
         {
             return fly::detail::literal<std::uint16_t, Literals...>();
         }
 
         template <char... Literals>
-        constexpr inline std::uint32_t operator"" _u32()
+        FLY_CONSTEVAL inline std::uint32_t operator"" _u32()
         {
             return fly::detail::literal<std::uint32_t, Literals...>();
         }
 
         template <char... Literals>
-        constexpr inline std::uint64_t operator"" _u64()
+        FLY_CONSTEVAL inline std::uint64_t operator"" _u64()
         {
             return fly::detail::literal<std::uint64_t, Literals...>();
         }
 
         template <char... Literals>
-        constexpr inline std::size_t operator"" _zu()
+        FLY_CONSTEVAL inline std::size_t operator"" _zu()
         {
             return fly::detail::literal<std::size_t, Literals...>();
         }
