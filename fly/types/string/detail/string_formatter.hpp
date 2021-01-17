@@ -19,6 +19,10 @@ template <typename T>
 using is_format_integral =
     std::conjunction<std::is_integral<T>, std::negation<std::is_same<T, bool>>>;
 
+template <typename T>
+// NOLINTNEXTLINE(readability-identifier-naming)
+static inline constexpr bool is_format_integral_v = is_format_integral<T>::value;
+
 /**
  * Helper class to format and stream generic values into a std::basic_string's output stream type.
  *
@@ -111,16 +115,25 @@ private:
         FormatParameters<ParameterTypes...> &&parameters);
 
     /**
-     * Format a single replacement field with the provided value.
+     * Format a single replacement field with the provided value. If the replacement field's width
+     * or precision options are nested replacement fields, the callback provide may be invoked to
+     * retrieve the value of the corresponding format parameter.
      *
      * @tparam T The type of the value to format.
+     * @tparam NestedSpecifierVisitorType The type of the callback to resolve nested replacement
+     *         fields.
      *
      * @param stream The stream to insert the formatted value into.
      * @param specifier The replacement field to format.
      * @param value The value to format.
+     * @param nested_specifier_visitor Callback to resolve nested replacement fields.
      */
-    template <typename T>
-    static void format_value(ostream_type &stream, FormatSpecifier &&specifier, const T &value);
+    template <typename T, typename NestedSpecifierVisitorType>
+    static void format_value(
+        ostream_type &stream,
+        FormatSpecifier &&specifier,
+        const T &value,
+        NestedSpecifierVisitorType &&nested_specifier_visitor);
 
     /**
      * Format a single replacement field with the provided boolean value.
@@ -227,9 +240,28 @@ void BasicStringFormatter<StringType>::format_internal(
     FormatString<ParameterTypes...> &&fmt,
     FormatParameters<ParameterTypes...> &&parameters)
 {
-    auto formatter = [&stream](auto &&specifier, const auto &value)
+    auto formatter = [&stream, &parameters](auto &&specifier, const auto &value)
     {
-        format_value(stream, std::move(specifier), value);
+        auto nested_specifier_visitor = [&parameters](std::size_t position) -> std::streamsize
+        {
+            std::streamsize result = -1;
+
+            parameters.visit(
+                FormatSpecifier {.m_position = position},
+                [&result](auto &&, const auto &nested_value)
+                {
+                    // Note: this will only ever be entered with integer types, but the compiler
+                    // will generate the below code for other types, so it must be protected.
+                    if constexpr (is_format_integral_v<std::remove_cvref_t<decltype(nested_value)>>)
+                    {
+                        result = static_cast<std::streamsize>(nested_value);
+                    }
+                });
+
+            return result;
+        };
+
+        format_value(stream, std::move(specifier), value, std::move(nested_specifier_visitor));
     };
 
     const view_type view = fmt.view();
@@ -268,11 +300,12 @@ void BasicStringFormatter<StringType>::format_internal(
 
 //==================================================================================================
 template <typename StringType>
-template <typename T>
+template <typename T, typename NestedSpecifierVisitorType>
 void BasicStringFormatter<StringType>::format_value(
     ostream_type &stream,
     FormatSpecifier &&specifier,
-    const T &value)
+    const T &value,
+    NestedSpecifierVisitorType &&nested_specifier_visitor)
 {
     using U = std::remove_cvref_t<T>;
 
@@ -328,26 +361,40 @@ void BasicStringFormatter<StringType>::format_value(
 
     if (specifier.m_width)
     {
-        stream.width(static_cast<int>(*specifier.m_width));
+        stream.width(static_cast<std::streamsize>(*specifier.m_width));
+    }
+    else if (specifier.m_width_position)
+    {
+        if (auto width = nested_specifier_visitor(*specifier.m_width_position); width > 0)
+        {
+            stream.width(width);
+        }
     }
 
-    if (specifier.m_precision)
+    const std::streamsize precision = specifier.m_precision ?
+        static_cast<std::streamsize>(*specifier.m_precision) :
+        (specifier.m_precision_position ?
+             nested_specifier_visitor(*specifier.m_precision_position) :
+             -1);
+
+    if (precision >= 0)
     {
         if constexpr (detail::is_like_supported_string_v<U>)
         {
             using traits_type = BasicStringTraits<detail::is_like_supported_string_t<U>>;
+            const auto sized_precision = static_cast<std::size_t>(precision);
 
             // Neither std::setw nor std::setprecision will limit the number of characters from the
             // string that are written to the stream. Instead, stream a substring view if needed.
-            if (typename traits_type::view_type view(value); *specifier.m_precision < view.size())
+            if (typename traits_type::view_type view(value); sized_precision < view.size())
             {
-                streamer::stream_value(stream, view.substr(0, *specifier.m_precision));
+                streamer::stream_value(stream, view.substr(0, sized_precision));
                 return;
             }
         }
         else
         {
-            stream.precision(static_cast<int>(*specifier.m_precision));
+            stream.precision(precision);
         }
     }
 
