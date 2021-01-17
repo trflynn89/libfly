@@ -232,7 +232,6 @@ void Table<Args...>::print_table(std::ostream &stream) const
 {
     fly::detail::BasicStreamModifiers<std::string> scoped_modifiers(stream);
     scoped_modifiers.locale<CommaPunctuation>();
-    stream.precision(static_cast<int>(s_precision));
 
     // Compute the entire width of the table. There are 1 + the number of columns vertical
     // separators ('|'), plus the width of each column (with 2 padding spacers each).
@@ -255,6 +254,8 @@ void Table<Args...>::print_table(std::ostream &stream) const
 template <class... Args>
 void Table<Args...>::print_title(std::ostream &stream, std::size_t table_width) const
 {
+    const auto style = fly::Styler(s_title_style, s_title_color);
+
     print_row_separator(stream, table_width, s_border_style);
     print_column_separator(stream, s_border_style);
 
@@ -263,7 +264,7 @@ void Table<Args...>::print_title(std::ostream &stream, std::size_t table_width) 
     const std::size_t title_width = table_width - 4;
 
     auto title = std::string_view(m_title).substr(0, title_width);
-    stream << fly::Styler(s_title_style, s_title_color) << ' ' << Center(title_width, title) << ' ';
+    fly::String::format(stream, "{} {} ", style, Center(title_width, title));
 
     print_column_separator(stream, s_border_style) << '\n';
     print_row_separator(stream, table_width);
@@ -277,8 +278,11 @@ void Table<Args...>::print_headers(std::ostream &stream, std::size_t table_width
     {
         print_column_separator(stream, index == 0 ? s_border_style : fly::Style::Default);
 
-        stream << fly::Styler(s_header_style, s_header_color) << ' '
-               << Center(m_column_widths[index], m_headers[index]) << ' ';
+        fly::String::format(
+            stream,
+            "{} {} ",
+            fly::Styler(s_header_style, s_header_color),
+            Center(m_column_widths[index], m_headers[index]));
     }
 
     print_column_separator(stream, s_border_style) << '\n';
@@ -291,29 +295,25 @@ void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
 {
     std::size_t index = 0;
 
-    auto print_value = [this, &stream, &index](const auto &val)
+    auto print_value = [this, &stream, &index](const auto &value)
     {
-        using T = std::decay_t<decltype(val)>;
-
         print_column_separator(stream, index == 0 ? s_border_style : fly::Style::Default);
-        fly::detail::BasicStreamModifiers<std::string> scoped_modifiers(stream);
+        const auto style = fly::Styler(s_data_style, s_data_color);
 
-        if constexpr (std::is_arithmetic_v<T>)
+        if constexpr (std::is_floating_point_v<std::remove_cvref_t<decltype(value)>>)
         {
-            stream << std::right;
-
-            if constexpr (std::is_floating_point_v<T>)
-            {
-                stream << std::fixed;
-            }
+            fly::String::format(
+                stream,
+                "{} {:{}.{}f} ",
+                style,
+                value,
+                m_column_widths[index],
+                s_precision);
         }
         else
         {
-            stream << std::left;
+            fly::String::format(stream, "{} {:{}} ", style, value, m_column_widths[index]);
         }
-
-        stream << fly::Styler(s_data_style, s_data_color) << ' '
-               << std::setw(m_column_widths[index]) << val << ' ';
 
         ++index;
     };
@@ -333,7 +333,7 @@ template <class... Args>
 std::ostream &
 Table<Args...>::print_row_separator(std::ostream &stream, std::size_t width, fly::Style style) const
 {
-    stream << fly::Styler(style, s_border_color) << std::string(width, '-') << '\n';
+    fly::String::format(stream, "{}{:->{}}\n", fly::Styler(style, s_border_color), '-', width);
     return stream;
 }
 
@@ -341,7 +341,7 @@ Table<Args...>::print_row_separator(std::ostream &stream, std::size_t width, fly
 template <class... Args>
 std::ostream &Table<Args...>::print_column_separator(std::ostream &stream, fly::Style style) const
 {
-    stream << fly::Styler(style, s_border_color) << '|';
+    fly::String::format(stream, "{}|", fly::Styler(style, s_border_color));
     return stream;
 }
 
@@ -405,20 +405,12 @@ bool Table<Args...>::is_zero(T value)
 
     if constexpr (std::is_floating_point_v<T>)
     {
-        if (std::abs(value) <= std::numeric_limits<T>::epsilon())
-        {
-            return true;
-        }
+        return std::abs(value) <= std::numeric_limits<T>::epsilon();
     }
     else
     {
-        if (value == static_cast<T>(0))
-        {
-            return true;
-        }
+        return value == static_cast<T>(0);
     }
-
-    return false;
 }
 
 } // namespace fly::benchmark
