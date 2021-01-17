@@ -63,12 +63,12 @@ namespace fly::detail {
  *     4. A zero-padding indicator (a literal "0" character). If present, the value is padded with
  *        leading zeros. This option is ignored if an alignment option is also specified.
  *
- *     5. A width value. A width is a positive decimal number, and specifies the minimum field
- *        width.
+ *     5. A width value. A width is either a positive decimal number or a nested replacement field
+ *        (*). If present, it specifies the minimum field width.
  *
  *     6. A precision value. A precision is a decimal (".") followed by a non-negative decimal
- *        number, and specifies the precision or maximum field size. It may only be used for the
- *        following value types:
+ *        number or a nested replacement field (*). If present, it specifies the precision or
+ *        maximum field size. It may only be used for the following value types:
  *
  *        String types - precision specifies the maxiumum number of characters to be used.
  *
@@ -107,10 +107,14 @@ namespace fly::detail {
  *
  *        For details on each presentation type, see the above links.
  *
+ *     (*) Nested replacement fields are a subset of the full replacement field, and may be of the
+ *         form "{}" or "{n}", where n is an optional non-negative position. The corresponding
+ *         format parameter must be an integral type. Its value has the same restrictions as the
+ *         formatting option it is used for.
+ *
  * The above includes some differences from the standardized formatting specificaton. Namely, there
  * is not a compatible implementation of the std::formatter specializations. Instead, the streaming
- * operator (operator<<) is used to format general types. Further, nested replacement fields for the
- * width and precision values are not yet supported.
+ * operator (operator<<) is used to format general types.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021
@@ -156,14 +160,6 @@ struct BasicFormatSpecifier
         Upper,
     };
 
-    BasicFormatSpecifier() = default;
-
-    BasicFormatSpecifier(const BasicFormatSpecifier &) = delete;
-    BasicFormatSpecifier &operator=(const BasicFormatSpecifier &) = delete;
-
-    BasicFormatSpecifier(BasicFormatSpecifier &&) = default;
-    BasicFormatSpecifier &operator=(BasicFormatSpecifier &&) = default;
-
     /**
      * Search for the presentation type which maps to a character, if any.
      *
@@ -198,7 +194,10 @@ struct BasicFormatSpecifier
     bool m_zero_padding {false};
 
     std::optional<std::size_t> m_width {std::nullopt};
+    std::optional<std::size_t> m_width_position {std::nullopt};
+
     std::optional<std::size_t> m_precision {std::nullopt};
+    std::optional<std::size_t> m_precision_position {std::nullopt};
 
     bool m_locale_specific_form {false};
 
@@ -261,6 +260,12 @@ class BasicFormatString
         Integral,
         FloatingPoint,
         Boolean,
+    };
+
+    enum class SpecifierType : std::uint8_t
+    {
+        Full,
+        Nested,
     };
 
 public:
@@ -326,11 +331,13 @@ private:
 
     /**
      * Upon parsing an un-escaped opening brace, parse a single replacement field in the format
-     * string. If valid, the lexer will advanced to the character after the closing brace.
+     * string. If valid, the lexer will be advanced to the character after the closing brace.
+     *
+     * @param type The type of replacement field to parse (either a full or nested field).
      *
      * @return The parsed specifier.
      */
-    constexpr std::optional<FormatSpecifier> parse_specifier();
+    constexpr std::optional<FormatSpecifier> parse_specifier(SpecifierType type);
 
     /**
      * Parse the optional position argument of the current replacement field. If a position was not
@@ -379,18 +386,26 @@ private:
     constexpr void parse_alternate_form_and_zero_padding(FormatSpecifier &specifier);
 
     /**
-     * Parse the width and precision arguments of the current replacement field.
+     * Parse the width argument of the current replacement field.
      *
-     * It is an error if the width is not a positive (non-zero) value.
+     * It is an error if the width is not a positive (non-zero) value or a nested replacement field.
+     *
+     * @param specifier The specifier instance to store the width and precision into.
+     */
+    constexpr void parse_width(FormatSpecifier &specifier);
+
+    /**
+     * Parse the precision argument of the current replacement field.
      *
      * It is an error the precision was specified, but the type of the corresponding format
      * parameter is not a string or floating point type.
      *
-     * It is an error if a decimal was parsed and was not followed by a non-negative precision.
+     * It is an error if a decimal was parsed and was not followed by a non-negative precision or a
+     * replacement field.
      *
      * @param specifier The specifier instance to store the width and precision into.
      */
-    constexpr void parse_width_and_precision(FormatSpecifier &specifier);
+    constexpr void parse_precision(FormatSpecifier &specifier);
 
     /**
      * Parse the optional locale-specific form of the current replacement field.
@@ -617,7 +632,7 @@ FLY_CONSTEVAL BasicFormatString<StringType, ParameterTypes...>::BasicFormatStrin
             {
                 on_error("Exceeded maximum allowed number of specifiers");
             }
-            else if (auto specifier = parse_specifier(); specifier)
+            else if (auto specifier = parse_specifier(SpecifierType::Full); specifier)
             {
                 m_specifiers[m_specifier_count++] = *std::move(specifier);
             }
@@ -670,7 +685,7 @@ auto BasicFormatString<StringType, ParameterTypes...>::next_specifier()
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-constexpr auto BasicFormatString<StringType, ParameterTypes...>::parse_specifier()
+constexpr auto BasicFormatString<StringType, ParameterTypes...>::parse_specifier(SpecifierType type)
     -> std::optional<FormatSpecifier>
 {
     // The opening { will have already been consumed, so the starting position is one less.
@@ -679,12 +694,13 @@ constexpr auto BasicFormatString<StringType, ParameterTypes...>::parse_specifier
     FormatSpecifier specifier {};
     parse_position(specifier);
 
-    if (m_lexer.consume_if(s_colon))
+    if ((type == SpecifierType::Full) && m_lexer.consume_if(s_colon))
     {
         parse_fill_and_alignment(specifier);
         parse_sign(specifier);
         parse_alternate_form_and_zero_padding(specifier);
-        parse_width_and_precision(specifier);
+        parse_width(specifier);
+        parse_precision(specifier);
         parse_locale_specific_form(specifier);
         parse_type(specifier);
     }
@@ -790,23 +806,43 @@ BasicFormatString<StringType, ParameterTypes...>::parse_alternate_form_and_zero_
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-constexpr void BasicFormatString<StringType, ParameterTypes...>::parse_width_and_precision(
-    FormatSpecifier &specifier)
+constexpr void
+BasicFormatString<StringType, ParameterTypes...>::parse_width(FormatSpecifier &specifier)
 {
     if (auto width = m_lexer.consume_number(); width)
     {
         specifier.m_width = width.value();
     }
+    else if (m_lexer.consume_if(s_left_brace))
+    {
+        if (auto nested_specifier = parse_specifier(SpecifierType::Nested); nested_specifier)
+        {
+            specifier.m_width_position = nested_specifier->m_position;
+        }
+    }
+}
 
+//==================================================================================================
+template <typename StringType, typename... ParameterTypes>
+constexpr void
+BasicFormatString<StringType, ParameterTypes...>::parse_precision(FormatSpecifier &specifier)
+{
     if (m_lexer.consume_if(s_decimal))
     {
         if (auto precision = m_lexer.consume_number(); precision)
         {
             specifier.m_precision = precision.value();
         }
+        else if (m_lexer.consume_if(s_left_brace))
+        {
+            if (auto nested_specifier = parse_specifier(SpecifierType::Nested); nested_specifier)
+            {
+                specifier.m_precision_position = nested_specifier->m_position;
+            }
+        }
         else
         {
-            on_error("Expected a non-negative precision value after decimal");
+            on_error("Expected a non-negative precision or nested replacement field after decimal");
         }
     }
 }
@@ -898,8 +934,7 @@ constexpr bool BasicFormatString<StringType, ParameterTypes...>::validate_specif
     }
 
     // Validate the fill character.
-    else if (
-        specifier.m_fill &&
+    if (specifier.m_fill &&
         ((specifier.m_fill == s_left_brace) || (specifier.m_fill == s_right_brace)))
     {
         on_error("Characters { and } are not allowed as fill characters");
@@ -912,42 +947,57 @@ constexpr bool BasicFormatString<StringType, ParameterTypes...>::validate_specif
     }
 
     // Validate the sign.
-    else if ((specifier.m_sign != FormatSpecifier::Sign::Default) && !specifier.is_numeric())
+    if ((specifier.m_sign != FormatSpecifier::Sign::Default) && !specifier.is_numeric())
     {
         on_error("Sign may only be used with numeric presentation types");
     }
 
     // Validate the alternate form.
-    else if (
-        specifier.m_alternate_form &&
+    if (specifier.m_alternate_form &&
         (!specifier.is_numeric() || (specifier.m_type == FormatSpecifier::Type::Decimal)))
     {
         on_error("Alternate form may only be used with non-decimal numeric presentation types");
     }
 
     // Validate the zero-padding option.
-    else if (specifier.m_zero_padding && !specifier.is_numeric())
+    if (specifier.m_zero_padding && !specifier.is_numeric())
     {
         on_error("Zero-padding may only be used with numeric presentation types");
     }
 
     // Validate the width value.
-    else if (specifier.m_width && (specifier.m_width.value() == 0))
+    if (specifier.m_width && (specifier.m_width.value() == 0))
     {
         on_error("Width must be a positive (non-zero) value");
     }
+    else if (specifier.m_width_position)
+    {
+        std::optional<ParameterType> nested_type = parameter_type(*specifier.m_width_position);
+
+        if (nested_type != ParameterType::Integral)
+        {
+            on_error("Position of width parameter must be an integral type");
+        }
+    }
 
     // Validate the precision value.
-    else if (
-        (specifier.m_precision) &&
+    if ((specifier.m_precision) &&
         ((type != ParameterType::String) && (type != ParameterType::FloatingPoint)))
     {
         on_error("Precision may only be used for string and floating point types");
     }
+    else if (specifier.m_precision_position)
+    {
+        std::optional<ParameterType> nested_type = parameter_type(*specifier.m_precision_position);
+
+        if (nested_type != ParameterType::Integral)
+        {
+            on_error("Position of precision parameter must be an integral type");
+        }
+    }
 
     // Validate the locale-specifc form.
-    else if (
-        specifier.m_locale_specific_form &&
+    if (specifier.m_locale_specific_form &&
         ((type != ParameterType::Integral) && (type != ParameterType::FloatingPoint) &&
          (type != ParameterType::Boolean)))
     {
@@ -955,10 +1005,7 @@ constexpr bool BasicFormatString<StringType, ParameterTypes...>::validate_specif
     }
 
     // Validate the presentation type.
-    else
-    {
-        validate_type(type.value(), specifier);
-    }
+    validate_type(*type, specifier);
 
     return !has_error();
 }
