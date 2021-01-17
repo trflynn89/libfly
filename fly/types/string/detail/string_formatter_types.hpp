@@ -499,7 +499,7 @@ private:
 
     lexer m_lexer;
 
-    std::array<FormatSpecifier, 256> m_specifiers;
+    std::array<FormatSpecifier, 64> m_specifiers;
     std::size_t m_specifier_count {0};
     std::size_t m_specifier_index {0};
 
