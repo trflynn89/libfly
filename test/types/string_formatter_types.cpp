@@ -92,10 +92,11 @@ void test_format(FormatStringType &&format, const SpecifierType &...specifiers)
     {
         auto actual_specifier = format.next_specifier();
         CATCH_REQUIRE(actual_specifier);
-        CATCH_CHECK(actual_specifier.value() == specifier);
+        CATCH_CHECK(actual_specifier == specifier);
     };
 
     CATCH_CHECK_FALSE(format.has_error());
+    CATCH_CAPTURE(format.error());
     (equals(specifiers), ...);
 
     CATCH_CHECK_FALSE(format.next_specifier());
@@ -129,9 +130,13 @@ constexpr const char *s_bad_alternate_form =
 constexpr const char *s_bad_zero_padding =
     "Zero-padding may only be used with numeric presentation types";
 constexpr const char *s_bad_width = "Width must be a positive (non-zero) value";
-constexpr const char *s_missing_precision = "Expected a non-negative precision value after decimal";
+constexpr const char *s_bad_width_position = "Position of width parameter must be an integral type";
+constexpr const char *s_missing_precision =
+    "Expected a non-negative precision or nested replacement field after decimal";
 constexpr const char *s_bad_precision =
     "Precision may only be used for string and floating point types";
+constexpr const char *s_bad_precision_position =
+    "Position of precision parameter must be an integral type";
 constexpr const char *s_bad_locale =
     "Locale-specific form may only be used for numeric and boolean types";
 constexpr const char *s_bad_generic = "Generic types must be formatted with {} or {:s}";
@@ -356,6 +361,22 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:123}"), 1), specifier);
     }
 
+    CATCH_SECTION("Width position may be set")
+    {
+        Specifier specifier {};
+        specifier.m_type = Specifier::Type::String;
+
+        specifier.m_width_position = 1;
+        test_format(make_format(FMT("{:{}}"), s, 1), specifier);
+
+        specifier.m_width_position = 1;
+        test_format(make_format(FMT("{0:{1}}"), s, 1), specifier);
+
+        specifier.m_position = 1;
+        specifier.m_width_position = 0;
+        test_format(make_format(FMT("{1:{0}}"), 1, s), specifier);
+    }
+
     CATCH_SECTION("Precision value may be set")
     {
         Specifier specifier {};
@@ -366,6 +387,22 @@ CATCH_TEMPLATE_TEST_CASE(
 
         specifier.m_type = Specifier::Type::General;
         test_format(make_format(FMT("{:.1}"), f), specifier);
+    }
+
+    CATCH_SECTION("Precision position may be set")
+    {
+        Specifier specifier {};
+        specifier.m_type = Specifier::Type::String;
+
+        specifier.m_precision_position = 1;
+        test_format(make_format(FMT("{:.{}}"), s, 1), specifier);
+
+        specifier.m_precision_position = 1;
+        test_format(make_format(FMT("{0:.{1}}"), s, 1), specifier);
+
+        specifier.m_position = 1;
+        specifier.m_precision_position = 0;
+        test_format(make_format(FMT("{1:.{0}}"), 1, s), specifier);
     }
 
     CATCH_SECTION("Locale-specific form indicator may be set")
@@ -766,6 +803,31 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:--1}"), 1), s_unclosed_string);
     }
 
+    CATCH_SECTION("Width position must be integral")
+    {
+        test_error(make_format(FMT("{:{}}"), 1, s), s_bad_width_position);
+        test_error(make_format(FMT("{0:{1}}"), 1, s), s_bad_width_position);
+    }
+
+    CATCH_SECTION("Width position value must be postive")
+    {
+        test_error(make_format(FMT("{0:{-1}}"), s, 1), s_unclosed_string);
+    }
+
+    CATCH_SECTION("Width position replacement field may only contain position field")
+    {
+        test_error(make_format(FMT("{0:{1:}}"), s, 1), s_unclosed_string);
+        test_error(make_format(FMT("{0:{1:^}}"), s, 1), s_unclosed_string);
+        test_error(make_format(FMT("{0:{1:+}}"), s, 1), s_unclosed_string);
+        test_error(make_format(FMT("{0:{1:d}}"), s, 1), s_unclosed_string);
+    }
+
+    CATCH_SECTION("Cannot specify both width value and width position")
+    {
+        test_error(make_format(FMT("{:1{}}"), s, 1), s_unclosed_string);
+        test_error(make_format(FMT("{:{}1}"), s, 1), s_unclosed_string);
+    }
+
     CATCH_SECTION("Precision value must follow decimal point")
     {
         test_error(make_format(FMT("{:.}"), 1), s_missing_precision);
@@ -779,6 +841,31 @@ CATCH_TEMPLATE_TEST_CASE(
     CATCH_SECTION("Precision value only valid for string and floating point types")
     {
         test_error(make_format(FMT("{:.1}"), 1), s_bad_precision);
+    }
+
+    CATCH_SECTION("Precision position must be integral")
+    {
+        test_error(make_format(FMT("{:.{}}"), 1, s), s_bad_precision_position);
+        test_error(make_format(FMT("{0:.{1}}"), 1, s), s_bad_precision_position);
+    }
+
+    CATCH_SECTION("Precision position value must be postive")
+    {
+        test_error(make_format(FMT("{0:.{-1}}"), s, 1), s_unclosed_string);
+    }
+
+    CATCH_SECTION("Precision position replacement field may only contain position field")
+    {
+        test_error(make_format(FMT("{0:.{1:}}"), s, 1), s_unclosed_string);
+        test_error(make_format(FMT("{0:.{1:^}}"), s, 1), s_unclosed_string);
+        test_error(make_format(FMT("{0:.{1:+}}"), s, 1), s_unclosed_string);
+        test_error(make_format(FMT("{0:.{1:d}}"), s, 1), s_unclosed_string);
+    }
+
+    CATCH_SECTION("Cannot specify both precision value and precision position")
+    {
+        test_error(make_format(FMT("{:.1{}}"), s, 1), s_unclosed_string);
+        test_error(make_format(FMT("{:.{}1}"), s, 1), s_unclosed_string);
     }
 
     CATCH_SECTION("Locale-specific form only valid for numeric and boolean types")
