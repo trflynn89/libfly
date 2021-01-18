@@ -20,15 +20,14 @@ define PUSH_DIR
 sp := $$(sp).x
 pd_$$(sp) := $$(d)
 
+p := $$(d)
 d := $(SOURCE_ROOT)/$$(strip $(1))
 
-_$$(d) := $$(strip $$(patsubst %/, %, $$(dir $$(d))))
-
-CFLAGS_$$(d) := $$(CFLAGS_$$(_$$(d)))
-CXXFLAGS_$$(d) := $$(CXXFLAGS_$$(_$$(d)))
-LDFLAGS_$$(d) := $$(LDFLAGS_$$(_$$(d)))
-LDLIBS_$$(d) := $$(LDLIBS_$$(_$$(d)))
-JFLAGS_$$(d) := $$(JFLAGS_$$(_$$(d)))
+CFLAGS_$$(d) := $$(CFLAGS_$$(p))
+CXXFLAGS_$$(d) := $$(CXXFLAGS_$$(p))
+LDFLAGS_$$(d) := $$(LDFLAGS_$$(p))
+LDLIBS_$$(d) := $$(LDLIBS_$$(p))
+JFLAGS_$$(d) := $$(JFLAGS_$$(p))
 
 endef
 
