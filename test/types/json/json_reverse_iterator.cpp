@@ -1,64 +1,20 @@
-#include "fly/types/json/detail/json_iterator.hpp"
+#include "fly/types/json/detail/json_reverse_iterator.hpp"
 
-#include "test/types/json_helpers.hpp"
+#include "test/types/json/json_helpers.hpp"
 
 #include "fly/types/json/json.hpp"
 
 #include "catch2/catch.hpp"
 
-CATCH_TEST_CASE("JsonIterator", "[json]")
+CATCH_TEST_CASE("JsonReverseIterator", "[json]")
 {
     using iterator = fly::Json::iterator;
-
-    CATCH_SECTION("Check JSON types that are allowed to provide iterators")
-    {
-        fly::Json null = nullptr;
-        CATCH_CHECK_THROWS_ITERATOR(
-            iterator(&null, iterator::Position::Begin),
-            "JSON type invalid for iteration: ({})",
-            null);
-
-        fly::Json string = "abc";
-        CATCH_CHECK_THROWS_ITERATOR(
-            iterator(&string, iterator::Position::Begin),
-            "JSON type invalid for iteration: ({})",
-            string);
-
-        fly::Json object = {{"a", 1}, {"b", 2}};
-        CATCH_CHECK_NOTHROW(iterator(&object, iterator::Position::Begin));
-
-        fly::Json array = {'7', 8};
-        CATCH_CHECK_NOTHROW(iterator(&array, iterator::Position::Begin));
-
-        fly::Json boolean = true;
-        CATCH_CHECK_THROWS_ITERATOR(
-            iterator(&boolean, iterator::Position::Begin),
-            "JSON type invalid for iteration: ({})",
-            boolean);
-
-        fly::Json sign = 1;
-        CATCH_CHECK_THROWS_ITERATOR(
-            iterator(&sign, iterator::Position::Begin),
-            "JSON type invalid for iteration: ({})",
-            sign);
-
-        fly::Json unsign = static_cast<unsigned int>(1);
-        CATCH_CHECK_THROWS_ITERATOR(
-            iterator(&unsign, iterator::Position::Begin),
-            "JSON type invalid for iteration: ({})",
-            unsign);
-
-        fly::Json floatt = 1.0f;
-        CATCH_CHECK_THROWS_ITERATOR(
-            iterator(&floatt, iterator::Position::Begin),
-            "JSON type invalid for iteration: ({})",
-            floatt);
-    }
+    using reverse_iterator = fly::Json::reverse_iterator;
 
     CATCH_SECTION("Must not be able to perform operations on null iterators")
     {
-        iterator it1;
-        iterator it2;
+        reverse_iterator it1;
+        reverse_iterator it2;
 
         CATCH_CHECK_THROWS_NULL(*it1);
         CATCH_CHECK_THROWS_NULL(it1->empty());
@@ -75,14 +31,15 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK_THROWS_NULL(it1.key());
         CATCH_CHECK_THROWS_NULL(it1.value());
 
-        CATCH_CHECK_NOTHROW(iterator(it1));
+        CATCH_CHECK_NOTHROW(reverse_iterator(it1));
         CATCH_CHECK_NOTHROW(it2 = it1);
     }
 
     CATCH_SECTION("Must not be able to perform operations on manually constructed null iterators")
     {
-        iterator it1(nullptr, iterator::Position::Begin);
-        iterator it2(nullptr, iterator::Position::Begin);
+        iterator null(nullptr, iterator::Position::Begin);
+        reverse_iterator it1(null);
+        reverse_iterator it2(null);
 
         CATCH_CHECK_THROWS_NULL(*it1);
         CATCH_CHECK_THROWS_NULL(it1->empty());
@@ -99,14 +56,14 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK_THROWS_NULL(it1.key());
         CATCH_CHECK_THROWS_NULL(it1.value());
 
-        CATCH_CHECK_NOTHROW(iterator(it1));
+        CATCH_CHECK_NOTHROW(reverse_iterator(it1));
         CATCH_CHECK_NOTHROW(it2 = it1);
     }
 
     CATCH_SECTION("Must not be able to compare null iterators")
     {
-        iterator it1;
-        iterator it2;
+        reverse_iterator it1;
+        reverse_iterator it2;
 
         CATCH_CHECK_THROWS_NULL(it1 == it2);
         CATCH_CHECK_THROWS_NULL(it1 != it2);
@@ -121,8 +78,8 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
     {
         fly::Json json {1, 2, 3};
 
-        iterator it1;
-        iterator it2 = json.begin();
+        reverse_iterator it1;
+        reverse_iterator it2(json.begin());
 
         CATCH_CHECK_THROWS_NULL(it1 == it2);
         CATCH_CHECK_THROWS_NULL(it1 != it2);
@@ -137,8 +94,8 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
     {
         fly::Json json {1, 2, 3};
 
-        iterator it1 = json.begin();
-        iterator it2;
+        reverse_iterator it1(json.begin());
+        reverse_iterator it2;
 
         CATCH_CHECK_THROWS_NULL(it1 == it2);
         CATCH_CHECK_THROWS_NULL(it1 != it2);
@@ -154,29 +111,29 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         fly::Json json1 {1, 2, 3};
         fly::Json json2 {4, 5, 6};
 
-        iterator it1 = json1.begin();
-        iterator it2 = json2.begin();
+        reverse_iterator it1(json1.begin());
+        reverse_iterator it2(json2.begin());
 
         CATCH_CHECK_THROWS_BAD_COMPARISON(it1 == it2, json1, json2);
         CATCH_CHECK_THROWS_BAD_COMPARISON(it1 != it2, json1, json2);
-        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 < it2, json1, json2);
-        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 <= it2, json2, json1);
-        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 > it2, json2, json1);
-        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 >= it2, json1, json2);
-        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 - it2, json1, json2);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 < it2, json2, json1);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 <= it2, json1, json2);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 > it2, json1, json2);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 >= it2, json2, json1);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(it1 - it2, json2, json1);
     }
 
     CATCH_SECTION("Check operations that are valid for JSON objects")
     {
         fly::Json json {{"a", 1}, {"b", 2}, {"c", 3}, {"d", 4}, {"e", 5}, {"f", 6}};
 
-        iterator it1 = json.begin();
-        iterator it2 = json.begin();
-        iterator it3 = json.end();
+        reverse_iterator it1(json.end());
+        reverse_iterator it2(json.end());
+        reverse_iterator it3(json.begin());
 
         CATCH_CHECK_NOTHROW(*it1);
         CATCH_CHECK_NOTHROW(it1->empty());
-        CATCH_CHECK_THROWS_ITERATOR(it1[0], "JSON type invalid for offset operator: ({})", json);
+        CATCH_CHECK_THROWS_ITERATOR(it1[0], "JSON type invalid for iterator offset: ({})", json);
         CATCH_CHECK_NOTHROW(it1 == it2);
         CATCH_CHECK_NOTHROW(it1 != it2);
         CATCH_CHECK_THROWS_ITERATOR(
@@ -216,9 +173,9 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
     {
         fly::Json json {1, 2, 3, 4, 5, 6};
 
-        iterator it1 = json.begin();
-        iterator it2 = json.begin();
-        iterator it3 = json.end();
+        reverse_iterator it1(json.end());
+        reverse_iterator it2(json.end());
+        reverse_iterator it3(json.begin());
 
         CATCH_CHECK_NOTHROW(*it1);
         CATCH_CHECK_NOTHROW(it1->empty());
@@ -243,30 +200,17 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK_NOTHROW(it1.value());
     }
 
-    CATCH_SECTION("Ensure non-const iterators may be promoted to const iterators")
-    {
-        fly::Json json {1, 2, 3};
-
-        iterator it1 = json.begin();
-        fly::Json::const_iterator it2 = it1;
-        fly::Json::const_iterator it3;
-        it3 = it1;
-
-        CATCH_CHECK(*it1 == *it2);
-        CATCH_CHECK(it2 == it3);
-    }
-
     CATCH_SECTION("Validate the JSON references stored by iterators")
     {
         fly::Json json {1, 2, 3};
-        fly::Json::size_type size = 0;
+        fly::Json::size_type size = json.size();
 
-        iterator it;
+        reverse_iterator it;
 
-        for (it = json.begin(); it != json.end(); ++it, ++size)
+        for (it = json.rbegin(); it != json.rend(); ++it, --size)
         {
-            CATCH_CHECK(*it == json[size]);
-            CATCH_CHECK(&(*it) == &json[size]);
+            CATCH_CHECK(*it == json[size - 1]);
+            CATCH_CHECK(&(*it) == &json[size - 1]);
         }
 
         CATCH_CHECK_THROWS_NULL_WITH(*it, json);
@@ -275,16 +219,16 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
     CATCH_SECTION("Validate the JSON pointers stored by iterators")
     {
         fly::Json json {1, 2, 3};
-        fly::Json::size_type size = 0;
+        fly::Json::size_type size = json.size();
 
-        iterator it;
+        reverse_iterator it;
 
-        for (it = json.begin(); it != json.end(); ++it, ++size)
+        for (it = json.rbegin(); it != json.rend(); ++it, --size)
         {
-            iterator::pointer pt = it.operator->();
+            fly::Json::pointer pt = it.operator->();
 
-            CATCH_CHECK(*pt == json[size]);
-            CATCH_CHECK(pt == &json[size]);
+            CATCH_CHECK(*pt == json[size - 1]);
+            CATCH_CHECK(pt == &json[size - 1]);
         }
 
         CATCH_CHECK_THROWS_NULL_WITH(it.operator->(), json);
@@ -293,28 +237,29 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
     CATCH_SECTION("Validate the iterator offset operator")
     {
         fly::Json json {1, 2, 3};
+        fly::Json::size_type size = json.size();
 
-        iterator it1 = json.begin();
-        iterator it2 = json.end();
+        reverse_iterator it1 = json.rbegin();
+        reverse_iterator it2 = json.rend();
 
-        for (fly::Json::size_type i = 0; i < json.size(); ++i)
+        for (fly::Json::size_type i = 0; i < size; ++i)
         {
-            auto offset = static_cast<iterator::difference_type>(i);
+            auto offset = static_cast<reverse_iterator::difference_type>(i);
 
-            CATCH_CHECK(it1[offset] == json[i]);
-            CATCH_CHECK(&it1[offset] == &json[i]);
+            CATCH_CHECK(it1[offset] == json[size - i - 1]);
+            CATCH_CHECK(&it1[offset] == &json[size - i - 1]);
         }
 
         for (fly::Json::size_type i = json.size() - 1; i < json.size(); --i)
         {
-            auto offset = static_cast<iterator::difference_type>(i - json.size());
+            auto offset = static_cast<reverse_iterator::difference_type>(i - json.size());
 
-            CATCH_CHECK(it2[offset] == json[i]);
-            CATCH_CHECK(&it2[offset] == &json[i]);
+            CATCH_CHECK(it2[offset] == json[size - i - 1]);
+            CATCH_CHECK(&it2[offset] == &json[size - i - 1]);
         }
 
         CATCH_CHECK_THROWS_NULL_WITH(it1[3], json);
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(it1[4], 4, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(it1[4], -4, json);
         CATCH_CHECK_THROWS_NULL_WITH(it2[0], json);
     }
 
@@ -322,8 +267,8 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
     {
         fly::Json json {1, 2, 3};
 
-        iterator it1 = json.begin();
-        iterator it2 = json.begin();
+        reverse_iterator it1 = json.rbegin();
+        reverse_iterator it2 = json.rbegin();
 
         CATCH_CHECK(it1 == it1);
         CATCH_CHECK(it2 == it2);
@@ -339,8 +284,8 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
     {
         fly::Json json {1, 2, 3};
 
-        iterator it1 = json.begin();
-        iterator it2 = json.begin();
+        reverse_iterator it1 = json.rbegin();
+        reverse_iterator it2 = json.rbegin();
 
         CATCH_CHECK(it1 <= it2);
         CATCH_CHECK(it1 <= (it2 + 1));
@@ -353,8 +298,8 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
     {
         fly::Json json {1, 2, 3};
 
-        iterator it1 = json.begin();
-        iterator it2 = json.begin();
+        reverse_iterator it1 = json.rbegin();
+        reverse_iterator it2 = json.rbegin();
 
         CATCH_CHECK(it1 >= it2);
         CATCH_CHECK((it1 + 1) >= it2);
@@ -367,8 +312,8 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
     {
         fly::Json json {1, 2, 3};
 
-        iterator it1 = json.begin();
-        iterator it2 = it1;
+        reverse_iterator it1 = json.rbegin();
+        reverse_iterator it2 = it1;
         CATCH_CHECK(++it1 == it1);
         CATCH_CHECK(it1 == it2 + 1);
 
@@ -376,17 +321,17 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK(it1++ == it2);
         CATCH_CHECK(it1 == it2 + 1);
 
-        it1 = json.end();
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(++it1, 1, json);
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(it1++, 1, json);
+        it1 = json.rend();
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(++it1, -1, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(it1++, -1, json);
     }
 
     CATCH_SECTION("Validate the iterator pre- and post-decrement operators")
     {
         fly::Json json {1, 2, 3};
 
-        iterator it1 = json.end();
-        iterator it2 = it1;
+        reverse_iterator it1 = json.rend();
+        reverse_iterator it2 = it1;
         CATCH_CHECK(--it1 == it1);
         CATCH_CHECK(it1 == it2 - 1);
 
@@ -394,18 +339,18 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK(it1-- == it2);
         CATCH_CHECK(it1 == it2 - 1);
 
-        it1 = json.begin();
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(--it1, -1, json);
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(it1--, -1, json);
+        it1 = json.rbegin();
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(--it1, 1, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(it1--, 1, json);
     }
 
     CATCH_SECTION("Validate the iterator addition operator")
     {
         fly::Json json {1, 2, 3};
 
-        iterator it1 = json.begin();
-        iterator it2 = it1;
-        iterator it3 = it1;
+        reverse_iterator it1 = json.rbegin();
+        reverse_iterator it2 = it1;
+        reverse_iterator it3 = it1;
         ++it2;
         ++it3;
         ++it3;
@@ -413,11 +358,11 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK((it1 += 1) == it2);
         CATCH_CHECK(it1 == it2);
 
-        it1 = json.begin();
+        it1 = json.rbegin();
         CATCH_CHECK((it1 += 2) == it3);
         CATCH_CHECK(it1 == it3);
 
-        it1 = json.begin();
+        it1 = json.rbegin();
         CATCH_CHECK((it1 + 1) == it2);
         CATCH_CHECK(it1 < it2);
 
@@ -430,26 +375,26 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK((2 + it1) == it3);
         CATCH_CHECK(it1 < it3);
 
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.begin() + 4, 4, json);
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.end() + 1, 1, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.rbegin() + 4, -4, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.rend() + 1, -1, json);
 
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.cbegin() + 4, 4, json);
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.cend() + 1, 1, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.crbegin() + 4, -4, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.crend() + 1, -1, json);
 
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(4 + json.begin(), 4, json);
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(1 + json.end(), 1, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(4 + json.rbegin(), -4, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(1 + json.rend(), -1, json);
 
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(4 + json.cbegin(), 4, json);
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(1 + json.cend(), 1, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(4 + json.crbegin(), -4, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(1 + json.crend(), -1, json);
     }
 
     CATCH_SECTION("Validate the iterator subtraction operator")
     {
         fly::Json json {1, 2, 3};
 
-        iterator it1 = json.end();
-        iterator it2 = it1;
-        iterator it3 = it1;
+        reverse_iterator it1 = json.rend();
+        reverse_iterator it2 = it1;
+        reverse_iterator it3 = it1;
         --it2;
         --it3;
         --it3;
@@ -457,22 +402,22 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         CATCH_CHECK((it1 -= 1) == it2);
         CATCH_CHECK(it1 == it2);
 
-        it1 = json.end();
+        it1 = json.rend();
         CATCH_CHECK((it1 -= 2) == it3);
         CATCH_CHECK(it1 == it3);
 
-        it1 = json.end();
+        it1 = json.rend();
         CATCH_CHECK((it1 - 1) == it2);
         CATCH_CHECK(it1 > it2);
 
         CATCH_CHECK((it1 - 2) == it3);
         CATCH_CHECK(it1 > it3);
 
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.begin() - 1, -1, json);
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.end() - 4, -4, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.rbegin() - 1, 1, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.rend() - 4, 4, json);
 
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.cbegin() - 1, -1, json);
-        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.cend() - 4, -4, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.crbegin() - 1, 1, json);
+        CATCH_CHECK_THROWS_OUT_OF_RANGE(json.crend() - 4, 4, json);
     }
 
     CATCH_SECTION("Validate the iterator difference operator")
@@ -480,31 +425,31 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         fly::Json json1 {1, 2, 3};
         fly::Json json2 {4, 5, 6};
 
-        CATCH_CHECK((json1.end() - json1.begin()) == 3);
-        CATCH_CHECK((json1.begin() - json1.end()) == -3);
+        CATCH_CHECK((json1.rend() - json1.rbegin()) == 3);
+        CATCH_CHECK((json1.rbegin() - json1.rend()) == -3);
 
-        CATCH_CHECK(((json1.begin() + 1) - json1.begin()) == 1);
-        CATCH_CHECK((json1.begin() - (json1.begin() + 1)) == -1);
+        CATCH_CHECK(((json1.rbegin() + 1) - json1.rbegin()) == 1);
+        CATCH_CHECK((json1.rbegin() - (json1.rbegin() + 1)) == -1);
 
-        CATCH_CHECK(((json1.begin() + 2) - json1.begin()) == 2);
-        CATCH_CHECK((json1.begin() - (json1.begin() + 2)) == -2);
+        CATCH_CHECK(((json1.rbegin() + 2) - json1.rbegin()) == 2);
+        CATCH_CHECK((json1.rbegin() - (json1.rbegin() + 2)) == -2);
 
-        CATCH_CHECK_THROWS_BAD_COMPARISON(json2.begin() - json1.begin(), json2, json1);
-        CATCH_CHECK_THROWS_BAD_COMPARISON(json1.begin() - json2.begin(), json1, json2);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(json2.rbegin() - json1.rbegin(), json1, json2);
+        CATCH_CHECK_THROWS_BAD_COMPARISON(json1.rbegin() - json2.rbegin(), json2, json1);
     }
 
     CATCH_SECTION("Validate the JSON key accessor")
     {
         fly::Json json {{"a", 1}, {"b", 2}};
 
-        iterator it2 = json.begin();
-        iterator it1 = it2++;
+        reverse_iterator it2 = json.rbegin();
+        reverse_iterator it1 = it2++;
 
-        CATCH_CHECK(it1.key() == FLY_JSON_STR("a"));
-        CATCH_CHECK(it2.key() == FLY_JSON_STR("b"));
+        CATCH_CHECK(it1.key() == FLY_JSON_STR("b"));
+        CATCH_CHECK(it2.key() == FLY_JSON_STR("a"));
 
-        CATCH_CHECK_THROWS_NULL_WITH(json.end().key(), json);
-        CATCH_CHECK_THROWS_NULL_WITH(json.cend().key(), json);
+        CATCH_CHECK_THROWS_NULL_WITH(json.rend().key(), json);
+        CATCH_CHECK_THROWS_NULL_WITH(json.crend().key(), json);
     }
 
     CATCH_SECTION("Validate the JSON value accessor")
@@ -512,24 +457,24 @@ CATCH_TEST_CASE("JsonIterator", "[json]")
         fly::Json json1 {{"a", 1}, {"b", 2}};
         fly::Json json2 {4, 5, 6};
 
-        iterator it2 = json1.begin();
-        iterator it1 = it2++;
+        reverse_iterator it2 = json1.rbegin();
+        reverse_iterator it1 = it2++;
 
-        iterator it3 = json2.begin();
-        iterator it4 = it3 + 1;
-        iterator it5 = it4 + 1;
+        reverse_iterator it3 = json2.rbegin();
+        reverse_iterator it4 = it3 + 1;
+        reverse_iterator it5 = it4 + 1;
 
-        CATCH_CHECK(it1.value() == 1);
-        CATCH_CHECK(it2.value() == 2);
+        CATCH_CHECK(it1.value() == 2);
+        CATCH_CHECK(it2.value() == 1);
 
-        CATCH_CHECK(it3.value() == 4);
+        CATCH_CHECK(it3.value() == 6);
         CATCH_CHECK(it4.value() == 5);
-        CATCH_CHECK(it5.value() == 6);
+        CATCH_CHECK(it5.value() == 4);
 
-        CATCH_CHECK_THROWS_NULL_WITH(json1.end().value(), json1);
-        CATCH_CHECK_THROWS_NULL_WITH(json2.end().value(), json2);
+        CATCH_CHECK_THROWS_NULL_WITH(json1.rend().value(), json1);
+        CATCH_CHECK_THROWS_NULL_WITH(json2.rend().value(), json2);
 
-        CATCH_CHECK_THROWS_NULL_WITH(json1.cend().value(), json1);
-        CATCH_CHECK_THROWS_NULL_WITH(json2.cend().value(), json2);
+        CATCH_CHECK_THROWS_NULL_WITH(json1.crend().value(), json1);
+        CATCH_CHECK_THROWS_NULL_WITH(json2.crend().value(), json2);
     }
 }

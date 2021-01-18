@@ -11,8 +11,7 @@ SRC_DIRS_$(d) := \
     fly/task \
     fly/types/bit_stream \
     fly/types/bit_stream/detail \
-    fly/types/json \
-    fly/types/string
+    fly/types/json
 
 # Add libfly.a and libfly.so to the archived release package.
 $(eval $(call ADD_REL_LIB))
