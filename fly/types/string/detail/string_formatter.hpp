@@ -196,7 +196,7 @@ private:
      * @param specifier The replacement field to format.
      * @param value The value to format.
      */
-    template <typename T, fly::enable_if_none<std::is_integral<T>, std::is_floating_point<T>> = 0>
+    template <typename T, fly::disable_if_any<std::is_integral<T>, std::is_floating_point<T>> = 0>
     static void format_value_for_type(
         ostream_type &stream,
         stream_modifiers &&modifiers,
@@ -525,7 +525,7 @@ void BasicStringFormatter<StringType>::format_value_for_type(
 
 //==================================================================================================
 template <typename StringType>
-template <typename T, fly::enable_if_none<std::is_integral<T>, std::is_floating_point<T>>>
+template <typename T, fly::disable_if_any<std::is_integral<T>, std::is_floating_point<T>>>
 inline void BasicStringFormatter<StringType>::format_value_for_type(
     ostream_type &stream,
     stream_modifiers &&,
