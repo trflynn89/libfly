@@ -76,7 +76,7 @@ constexpr bool is_string_like(const T &)
 
 template <
     typename T,
-    fly::enable_if_none<
+    fly::disable_if_any<
         fly::detail::BasicStringTraits<std::string>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
         fly::detail::BasicStringTraits<std::u8string>::is_string_like<T>,

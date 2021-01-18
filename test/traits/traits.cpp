@@ -62,7 +62,7 @@ bool call_foo(const T &arg)
     return arg.foo();
 }
 
-template <typename T, fly::enable_if_not_all<FooTraits::is_declared<T>> = 0>
+template <typename T, fly::disable_if_all<FooTraits::is_declared<T>> = 0>
 bool call_foo(const T &)
 {
     return false;
@@ -76,7 +76,7 @@ bool is_streamable(std::ostream &stream, const T &arg)
     return true;
 }
 
-template <typename T, fly::enable_if_not_all<OstreamTraits::is_declared<T>> = 0>
+template <typename T, fly::disable_if_all<OstreamTraits::is_declared<T>> = 0>
 bool is_streamable(std::ostream &, const T &)
 {
     return false;
@@ -106,7 +106,7 @@ bool is_class_pointer(const T &)
 
 template <
     typename T,
-    fly::enable_if_not_all<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>> = 0>
+    fly::disable_if_all<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>> = 0>
 bool is_class_pointer(const T &)
 {
     return false;
@@ -123,7 +123,7 @@ bool is_class_or_pointer(const T &)
 
 template <
     typename T,
-    fly::enable_if_none<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>> = 0>
+    fly::disable_if_any<std::is_pointer<T>, std::is_class<std::remove_pointer_t<T>>> = 0>
 bool is_class_or_pointer(const T &)
 {
     return false;
@@ -197,7 +197,7 @@ CATCH_TEST_CASE("Traits", "[traits]")
         CATCH_CHECK_FALSE(is_class(&f));
     }
 
-    CATCH_SECTION("Combination of traits for enable_if_all and enable_if_not_all")
+    CATCH_SECTION("Combination of traits for enable_if_all and disable_if_all")
     {
         const FooClass fc;
         const std::string str("a");
@@ -219,7 +219,7 @@ CATCH_TEST_CASE("Traits", "[traits]")
         CATCH_CHECK_FALSE(is_class_pointer(&f));
     }
 
-    CATCH_SECTION("Combination of traits for enable_if_any and enable_if_none")
+    CATCH_SECTION("Combination of traits for enable_if_any and disable_if_any")
     {
         const FooClass fc;
         const std::string str("a");

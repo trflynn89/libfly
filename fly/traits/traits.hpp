@@ -43,24 +43,24 @@ template <typename... Conditions>
 using enable_if_any = enable_if<std::disjunction<Conditions...>>;
 
 /**
- * Wrapper around std::enable_if for testing that all conditions in a sequence of traits are false.
- * Example:
- *
- *     template <typename T, fly::enable_if_none<std::is_class<T>, std::is_empty<T>> = 0>
- *     void func(const T &) { }
- */
-template <typename... Conditions>
-using enable_if_none = enable_if<std::negation<std::disjunction<Conditions...>>>;
-
-/**
  * Wrapper around std::enable_if for testing that any condition in a sequence of traits is false.
  * Example:
  *
- *     template <typename T, fly::enable_if_not_all<std::is_class<T>, std::is_empty<T>> = 0>
+ *     template <typename T, fly::disable_if_all<std::is_class<T>, std::is_empty<T>> = 0>
  *     void func(const T &) { }
  */
 template <typename... Conditions>
-using enable_if_not_all = enable_if<std::negation<std::conjunction<Conditions...>>>;
+using disable_if_all = disable_if<std::conjunction<Conditions...>>;
+
+/**
+ * Wrapper around std::enable_if for testing that all conditions in a sequence of traits are false.
+ * Example:
+ *
+ *     template <typename T, fly::disable_if_any<std::is_class<T>, std::is_empty<T>> = 0>
+ *     void func(const T &) { }
+ */
+template <typename... Conditions>
+using disable_if_any = disable_if<std::disjunction<Conditions...>>;
 
 /**
  * Wrapper around std::is_same for testing that all types in a sequence of types are the same as a
