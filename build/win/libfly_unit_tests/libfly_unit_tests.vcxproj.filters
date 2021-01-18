@@ -31,6 +31,21 @@
     <Filter Include="types">
       <UniqueIdentifier>{3120a3ba-5fe5-417c-9e5f-33d9537560d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="types\bit_stream">
+      <UniqueIdentifier>{fb10f36b-798f-414e-b829-9257492643ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="types\concurrency">
+      <UniqueIdentifier>{f8cf7c2d-1e7a-42fd-b61c-4679d31a9c82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="types\json">
+      <UniqueIdentifier>{d27b78a3-72ef-49b8-b49c-a29966792845}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="types\numeric">
+      <UniqueIdentifier>{c01a1855-d691-408f-80f7-1da7ef51137d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="types\string">
+      <UniqueIdentifier>{df20b82d-a725-4a50-a983-0bc7c6498f05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\test\fly.cpp" />
@@ -86,76 +101,76 @@
     <ClCompile Include="..\..\..\test\traits\traits.cpp">
       <Filter>traits</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\bit_stream.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\bit_stream\bit_stream.cpp">
+      <Filter>types\bit_stream</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\concurrent_container.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\concurrency\concurrent_container.cpp">
+      <Filter>types\concurrency</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\endian.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\json\json.cpp">
+      <Filter>types\json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\json\json_accessors.cpp">
+      <Filter>types\json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json_accessors.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\json\json_construction.cpp">
+      <Filter>types\json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json_construction.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\json\json_conversion.cpp">
+      <Filter>types\json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json_conversion.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\json\json_exception.cpp">
+      <Filter>types\json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json_exception.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\json\json_iterator.cpp">
+      <Filter>types\json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json_iterator.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\json\json_modifiers.cpp">
+      <Filter>types\json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json_modifiers.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\json\json_reverse_iterator.cpp">
+      <Filter>types\json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json_reverse_iterator.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\json\json_traits.cpp">
+      <Filter>types\json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json_traits.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\numeric\endian.cpp">
+      <Filter>types\numeric</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\literals.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\numeric\literals.cpp">
+      <Filter>types\numeric</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\string\string.cpp">
+      <Filter>types\string</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string_classifier.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\string\string_classifier.cpp">
+      <Filter>types\string</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string_converter.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\string\string_converter.cpp">
+      <Filter>types\string</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string_formatter.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\string\string_formatter.cpp">
+      <Filter>types\string</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string_formatter_types.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\string\string_formatter_types.cpp">
+      <Filter>types\string</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string_lexer.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\string\string_lexer.cpp">
+      <Filter>types\string</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string_traits.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\string\string_traits.cpp">
+      <Filter>types\string</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string_unicode.cpp">
-      <Filter>types</Filter>
+    <ClCompile Include="..\..\..\test\types\string\string_unicode.cpp">
+      <Filter>types\string</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\config\test_config.hpp">
       <Filter>config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\test\types\json_helpers.hpp">
-      <Filter>types</Filter>
+    <ClInclude Include="..\..\..\test\types\json\json_helpers.hpp">
+      <Filter>types\json</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

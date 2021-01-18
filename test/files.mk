@@ -12,7 +12,6 @@ SRC_DIRS_$(d) := \
     fly/types/bit_stream \
     fly/types/bit_stream/detail \
     fly/types/json \
-    fly/types/string \
     test/util
 
 ifeq ($(SYSTEM), LINUX)
@@ -31,7 +30,11 @@ SRC_DIRS_$(d) += \
     test/system \
     test/task \
     test/traits \
-    test/types
+    test/types/bit_stream \
+    test/types/concurrency \
+    test/types/json \
+    test/types/numeric \
+    test/types/string
 
 SRC_$(d) := \
     $(d)/fly.cpp \
