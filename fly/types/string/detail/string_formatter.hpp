@@ -48,8 +48,7 @@ class BasicStringFormatter
     using FormatString = BasicFormatString<StringType, std::type_identity_t<ParameterTypes>...>;
 
     template <typename... ParameterTypes>
-    using FormatParameters =
-        BasicFormatParameters<StringType, std::type_identity_t<ParameterTypes>...>;
+    using FormatParameters = BasicFormatParameters<StringType, ParameterTypes...>;
 
 public:
     /**
@@ -104,9 +103,11 @@ private:
     /**
      * Iterate over the format string and format each replacement field in the format string.
      *
+     * @tparam ParameterTypes Variadic format parameter types.
+     *
      * @param stream The stream to insert the formatted string into.
      * @param fmt The string to format.
-     * @param parameters The variadic list of format parameters to be formatted.
+     * @param parameters The packed list of format parameters to be formatted.
      */
     template <typename... ParameterTypes>
     static void format_internal(
@@ -115,93 +116,151 @@ private:
         FormatParameters<ParameterTypes...> &&parameters);
 
     /**
-     * Format a single replacement field with the provided value. If the replacement field's width
-     * or precision options are nested replacement fields, the callback provide may be invoked to
-     * retrieve the value of the corresponding format parameter.
+     * Format a single replacement field with the provided value.
      *
      * @tparam T The type of the value to format.
-     * @tparam NestedSpecifierVisitorType The type of the callback to resolve nested replacement
-     *         fields.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param stream The stream to insert the formatted value into.
      * @param specifier The replacement field to format.
      * @param value The value to format.
-     * @param nested_specifier_visitor Callback to resolve nested replacement fields.
+     * @param parameters The packed list of format parameters to be formatted.
      */
-    template <typename T, typename NestedSpecifierVisitorType>
+    template <typename T, typename... ParameterTypes>
     static void format_value(
         ostream_type &stream,
         FormatSpecifier &&specifier,
         const T &value,
-        NestedSpecifierVisitorType &&nested_specifier_visitor);
+        const FormatParameters<ParameterTypes...> &parameters);
 
     /**
      * Format a single replacement field with the provided boolean value.
      *
      * @tparam T The type of the value to format.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param stream The stream to insert the formatted value into.
      * @param modifiers The active stream manipulator container.
      * @param specifier The replacement field to format.
      * @param value The value to format.
+     * @param parameters The packed list of format parameters to be formatted.
      */
-    template <typename T, fly::enable_if<std::is_same<T, bool>> = 0>
+    template <typename T, fly::enable_if<std::is_same<T, bool>> = 0, typename... ParameterTypes>
     static void format_value_for_type(
         ostream_type &stream,
         stream_modifiers &&modifiers,
         FormatSpecifier &&specifier,
-        const T &value);
+        const T &value,
+        const FormatParameters<ParameterTypes...> &parameters);
 
     /**
      * Format a single replacement field with the provided non-boolean integral value.
      *
      * @tparam T The type of the value to format.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param stream The stream to insert the formatted value into.
      * @param modifiers The active stream manipulator container.
      * @param specifier The replacement field to format.
      * @param value The value to format.
+     * @param parameters The packed list of format parameters to be formatted.
      */
-    template <typename T, fly::enable_if<is_format_integral<T>> = 0>
+    template <typename T, fly::enable_if<is_format_integral<T>> = 0, typename... ParameterTypes>
     static void format_value_for_type(
         ostream_type &stream,
         stream_modifiers &&modifiers,
         FormatSpecifier &&specifier,
-        const T &value);
+        const T &value,
+        const FormatParameters<ParameterTypes...> &parameters);
 
     /**
      * Format a single replacement field with the provided floating point value.
      *
      * @tparam T The type of the value to format.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param stream The stream to insert the formatted value into.
      * @param modifiers The active stream manipulator container.
      * @param specifier The replacement field to format.
      * @param value The value to format.
+     * @param parameters The packed list of format parameters to be formatted.
      */
-    template <typename T, fly::enable_if<std::is_floating_point<T>> = 0>
+    template <typename T, fly::enable_if<std::is_floating_point<T>> = 0, typename... ParameterTypes>
     static void format_value_for_type(
         ostream_type &stream,
         stream_modifiers &&modifiers,
         FormatSpecifier &&specifier,
-        const T &value);
+        const T &value,
+        const FormatParameters<ParameterTypes...> &parameters);
+
+    /**
+     * Format a single replacement field with the provided string-like value.
+     *
+     * @tparam T The type of the value to format.
+     * @tparam ParameterTypes Variadic format parameter types.
+     *
+     * @param stream The stream to insert the formatted value into.
+     * @param modifiers The active stream manipulator container.
+     * @param specifier The replacement field to format.
+     * @param value The value to format.
+     * @param parameters The packed list of format parameters to be formatted.
+     */
+    template <
+        typename T,
+        fly::enable_if<detail::is_like_supported_string<T>> = 0,
+        typename... ParameterTypes>
+    static void format_value_for_type(
+        ostream_type &stream,
+        stream_modifiers &&modifiers,
+        FormatSpecifier &&specifier,
+        const T &value,
+        const FormatParameters<ParameterTypes...> &parameters);
 
     /**
      * Format a single replacement field with the provided generic value.
      *
      * @tparam T The type of the value to format.
+     * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param stream The stream to insert the formatted value into.
      * @param modifiers The active stream manipulator container.
      * @param specifier The replacement field to format.
      * @param value The value to format.
+     * @param parameters The packed list of format parameters to be formatted.
      */
-    template <typename T, fly::disable_if_any<std::is_integral<T>, std::is_floating_point<T>> = 0>
+    template <
+        typename T,
+        fly::disable_if_any<
+            std::is_integral<T>,
+            std::is_floating_point<T>,
+            detail::is_like_supported_string<T>> = 0,
+        typename... ParameterTypes>
     static void format_value_for_type(
         ostream_type &stream,
         stream_modifiers &&modifiers,
         FormatSpecifier &&specifier,
-        const T &value);
+        const T &value,
+        const FormatParameters<ParameterTypes...> &parameters);
+
+    /**
+     * The width and precision formatting options may either be a number or a nested replacement
+     * field. If a numeric value was specified, return that value. If a nested replacement field was
+     * specified, return the value of the format parameter at the position indicated by the nested
+     * replacement field.
+     *
+     * @tparam T The type to cast the returned value to.
+     * @tparam ParameterTypes Variadic format parameter types.
+     *
+     * @param parameters The packed list of format parameters to be formatted.
+     * @param size_or_position The numeric value or format parameter position.
+     *
+     * @return If either option was specified, and the corresponding value is non-negative, returns
+     *         that value. Otherwise, an uninitialized value.
+     */
+    template <typename T = std::streamsize, typename... ParameterTypes>
+    static std::optional<T> resolve_size(
+        const FormatParameters<ParameterTypes...> &parameters,
+        const std::optional<typename FormatSpecifier::SizeOrPosition> &size_or_position);
 
     static constexpr const auto s_left_brace = FLY_CHR(char_type, '{');
     static constexpr const auto s_right_brace = FLY_CHR(char_type, '}');
@@ -242,26 +301,7 @@ void BasicStringFormatter<StringType>::format_internal(
 {
     auto formatter = [&stream, &parameters](auto &&specifier, const auto &value)
     {
-        auto nested_specifier_visitor = [&parameters](std::size_t position) -> std::streamsize
-        {
-            std::streamsize result = -1;
-
-            parameters.visit(
-                FormatSpecifier {.m_position = position},
-                [&result](auto &&, const auto &nested_value)
-                {
-                    // Note: this will only ever be entered with integer types, but the compiler
-                    // will generate the below code for other types, so it must be protected.
-                    if constexpr (is_format_integral_v<std::remove_cvref_t<decltype(nested_value)>>)
-                    {
-                        result = static_cast<std::streamsize>(nested_value);
-                    }
-                });
-
-            return result;
-        };
-
-        format_value(stream, std::move(specifier), value, std::move(nested_specifier_visitor));
+        format_value(stream, std::move(specifier), value, parameters);
     };
 
     const view_type view = fmt.view();
@@ -300,15 +340,13 @@ void BasicStringFormatter<StringType>::format_internal(
 
 //==================================================================================================
 template <typename StringType>
-template <typename T, typename NestedSpecifierVisitorType>
+template <typename T, typename... ParameterTypes>
 void BasicStringFormatter<StringType>::format_value(
     ostream_type &stream,
     FormatSpecifier &&specifier,
     const T &value,
-    NestedSpecifierVisitorType &&nested_specifier_visitor)
+    const FormatParameters<ParameterTypes...> &parameters)
 {
-    using U = std::remove_cvref_t<T>;
-
     stream_modifiers modifiers(stream);
 
     if (specifier.m_fill)
@@ -359,43 +397,9 @@ void BasicStringFormatter<StringType>::format_value(
         stream.fill(s_zero);
     }
 
-    if (specifier.m_width)
+    if (const auto width = resolve_size(parameters, specifier.m_width); width && (*width > 0))
     {
-        stream.width(static_cast<std::streamsize>(*specifier.m_width));
-    }
-    else if (specifier.m_width_position)
-    {
-        if (auto width = nested_specifier_visitor(*specifier.m_width_position); width > 0)
-        {
-            stream.width(width);
-        }
-    }
-
-    const std::streamsize precision = specifier.m_precision ?
-        static_cast<std::streamsize>(*specifier.m_precision) :
-        (specifier.m_precision_position ?
-             nested_specifier_visitor(*specifier.m_precision_position) :
-             -1);
-
-    if (precision >= 0)
-    {
-        if constexpr (detail::is_like_supported_string_v<U>)
-        {
-            using traits_type = BasicStringTraits<detail::is_like_supported_string_t<U>>;
-            const auto sized_precision = static_cast<std::size_t>(precision);
-
-            // Neither std::setw nor std::setprecision will limit the number of characters from the
-            // string that are written to the stream. Instead, stream a substring view if needed.
-            if (typename traits_type::view_type view(value); sized_precision < view.size())
-            {
-                streamer::stream_value(stream, view.substr(0, sized_precision));
-                return;
-            }
-        }
-        else
-        {
-            stream.precision(precision);
-        }
+        stream.width(*width);
     }
 
     if (specifier.m_case == FormatSpecifier::Case::Upper)
@@ -403,17 +407,18 @@ void BasicStringFormatter<StringType>::format_value(
         stream.setf(std::ios_base::uppercase);
     }
 
-    format_value_for_type(stream, std::move(modifiers), std::move(specifier), value);
+    format_value_for_type(stream, std::move(modifiers), std::move(specifier), value, parameters);
 }
 
 //==================================================================================================
 template <typename StringType>
-template <typename T, fly::enable_if<std::is_same<T, bool>>>
+template <typename T, fly::enable_if<std::is_same<T, bool>>, typename... ParameterTypes>
 void BasicStringFormatter<StringType>::format_value_for_type(
     ostream_type &stream,
     stream_modifiers &&modifiers,
     FormatSpecifier &&specifier,
-    const T &value)
+    const T &value,
+    const FormatParameters<ParameterTypes...> &)
 {
     switch (specifier.m_type)
     {
@@ -450,12 +455,13 @@ void BasicStringFormatter<StringType>::format_value_for_type(
 
 //==================================================================================================
 template <typename StringType>
-template <typename T, fly::enable_if<is_format_integral<T>>>
+template <typename T, fly::enable_if<is_format_integral<T>>, typename... ParameterTypes>
 void BasicStringFormatter<StringType>::format_value_for_type(
     ostream_type &stream,
     stream_modifiers &&modifiers,
     FormatSpecifier &&specifier,
-    const T &value)
+    const T &value,
+    const FormatParameters<ParameterTypes...> &)
 {
     switch (specifier.m_type)
     {
@@ -490,13 +496,19 @@ void BasicStringFormatter<StringType>::format_value_for_type(
 
 //==================================================================================================
 template <typename StringType>
-template <typename T, fly::enable_if<std::is_floating_point<T>>>
+template <typename T, fly::enable_if<std::is_floating_point<T>>, typename... ParameterTypes>
 void BasicStringFormatter<StringType>::format_value_for_type(
     ostream_type &stream,
     stream_modifiers &&,
     FormatSpecifier &&specifier,
-    const T &value)
+    const T &value,
+    const FormatParameters<ParameterTypes...> &parameters)
 {
+    if (const auto precision = resolve_size(parameters, specifier.m_precision); precision)
+    {
+        stream.precision(*precision);
+    }
+
     switch (specifier.m_type)
     {
         case FormatSpecifier::Type::HexFloat:
@@ -525,14 +537,74 @@ void BasicStringFormatter<StringType>::format_value_for_type(
 
 //==================================================================================================
 template <typename StringType>
-template <typename T, fly::disable_if_any<std::is_integral<T>, std::is_floating_point<T>>>
-inline void BasicStringFormatter<StringType>::format_value_for_type(
+template <
+    typename T,
+    fly::enable_if<detail::is_like_supported_string<T>>,
+    typename... ParameterTypes>
+void BasicStringFormatter<StringType>::format_value_for_type(
+    ostream_type &stream,
+    stream_modifiers &&,
+    FormatSpecifier &&specifier,
+    const T &value,
+    const FormatParameters<ParameterTypes...> &parameters)
+{
+    // There isn't a standard manipulator to limit the number of characters from the string that are
+    // written to the stream. Instead, inform the streamer to limit the streamed length.
+    if (const auto max_string_length = resolve_size<std::size_t>(parameters, specifier.m_precision);
+        max_string_length)
+    {
+        streamer::stream_string(stream, value, *max_string_length);
+    }
+    else
+    {
+        streamer::stream_string(stream, value, std::nullopt);
+    }
+}
+
+//==================================================================================================
+template <typename StringType>
+template <
+    typename T,
+    fly::disable_if_any<
+        std::is_integral<T>,
+        std::is_floating_point<T>,
+        detail::is_like_supported_string<T>>,
+    typename... ParameterTypes>
+void BasicStringFormatter<StringType>::format_value_for_type(
     ostream_type &stream,
     stream_modifiers &&,
     FormatSpecifier &&,
-    const T &value)
+    const T &value,
+    const FormatParameters<ParameterTypes...> &)
 {
     streamer::stream_value(stream, value);
+}
+
+//==================================================================================================
+template <typename StringType>
+template <typename T, typename... ParameterTypes>
+inline std::optional<T> BasicStringFormatter<StringType>::resolve_size(
+    const FormatParameters<ParameterTypes...> &parameters,
+    const std::optional<typename FormatSpecifier::SizeOrPosition> &size_or_position)
+{
+    if (size_or_position)
+    {
+        if (size_or_position->is_size())
+        {
+            return static_cast<T>(size_or_position->value());
+        }
+        else
+        {
+            const auto value = parameters.template get<std::streamsize>(size_or_position->value());
+
+            if (value && (*value >= 0))
+            {
+                return static_cast<T>(*value);
+            }
+        }
+    }
+
+    return std::nullopt;
 }
 
 } // namespace fly::detail

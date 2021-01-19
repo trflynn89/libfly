@@ -122,6 +122,11 @@ namespace fly::detail {
 template <typename CharType>
 struct BasicFormatSpecifier
 {
+    BasicFormatSpecifier() = default;
+
+    BasicFormatSpecifier(BasicFormatSpecifier &&) = default;
+    BasicFormatSpecifier &operator=(BasicFormatSpecifier &&) = default;
+
     enum class Alignment : std::uint8_t
     {
         Default,
@@ -161,6 +166,63 @@ struct BasicFormatSpecifier
     };
 
     /**
+     * Helper class to store a value alongside whether that value represents a size or a format
+     * parameter position.
+     */
+    class SizeOrPosition
+    {
+    public:
+        enum class Type : std::uint8_t
+        {
+            Size,
+            Position,
+        };
+
+        /**
+         * Constructor.
+         *
+         * @param type The type to set the instance to.
+         * @param value The value to set the instance to.
+         */
+        constexpr SizeOrPosition(Type type, std::size_t value) noexcept;
+
+        SizeOrPosition(SizeOrPosition &&) = default;
+        SizeOrPosition &operator=(SizeOrPosition &&) = default;
+
+        /**
+         * @return True if the instance represents a size.
+         */
+        constexpr bool is_size() const;
+
+        /**
+         * @return True if the instance represents a format parameter position.
+         */
+        constexpr bool is_position() const;
+
+        /**
+         * @return The value of the instance.
+         */
+        constexpr std::size_t value() const;
+
+        /**
+         * Compare two size or format parameter position instances for equality.
+         *
+         * @return True if the two instances are equal.
+         */
+        friend bool operator==(const SizeOrPosition &value1, const SizeOrPosition &value2)
+        {
+            return (value1.m_type == value2.m_type) && (value1.m_value == value2.m_value);
+        }
+
+    private:
+        SizeOrPosition(const SizeOrPosition &) = delete;
+        SizeOrPosition &operator=(const SizeOrPosition &) = delete;
+
+        Type m_type;
+        std::size_t m_value;
+    };
+
+    /**
      * Search for the presentation type which maps to a character, if any.
      *
      * @param ch The character to search for.
@@ -173,6 +235,22 @@ struct BasicFormatSpecifier
      * @return True if the presentation type is a numeric type.
      */
     constexpr bool is_numeric() const;
+
+    /**
+     * Set the width to a size or format parameter position.
+     *
+     * @param type The type to set the width to.
+     * @param value The value to set the width to.
+     */
+    constexpr void set_width(typename SizeOrPosition::Type type, std::size_t value);
+
+    /**
+     * Set the precision to a size or format parameter position.
+     *
+     * @param type The type to set the precision to.
+     * @param value The value to set the precision to.
+     */
+    constexpr void set_precision(typename SizeOrPosition::Type type, std::size_t value);
 
     /**
      * Compare two replacement field instances for equality.
@@ -193,11 +271,8 @@ struct BasicFormatSpecifier
     bool m_alternate_form {false};
     bool m_zero_padding {false};
 
-    std::optional<std::size_t> m_width {std::nullopt};
-    std::optional<std::size_t> m_width_position {std::nullopt};
-
-    std::optional<std::size_t> m_precision {std::nullopt};
-    std::optional<std::size_t> m_precision_position {std::nullopt};
+    std::optional<SizeOrPosition> m_width {std::nullopt};
+    std::optional<SizeOrPosition> m_precision {std::nullopt};
 
     bool m_locale_specific_form {false};
 
@@ -207,6 +282,9 @@ struct BasicFormatSpecifier
     std::size_t m_size {0};
 
 private:
+    BasicFormatSpecifier(const BasicFormatSpecifier &) = delete;
+    BasicFormatSpecifier &operator=(const BasicFormatSpecifier &) = delete;
+
     static constexpr std::array<std::pair<CharType, Type>, 17> s_type_map {{
         {FLY_CHR(CharType, 'c'), Type::Character},
         {FLY_CHR(CharType, 's'), Type::String},
@@ -274,6 +352,9 @@ public:
      */
     template <std::size_t N>
     FLY_CONSTEVAL BasicFormatString(const char_type (&format)[N]) noexcept;
+
+    BasicFormatString(BasicFormatString &&) = delete;
+    BasicFormatString &operator=(BasicFormatString &&) = delete;
 
     /**
      * @return A string view into the format string.
@@ -528,7 +609,7 @@ public:
      *
      * @param parameters The format parameters to store.
      */
-    explicit BasicFormatParameters(ParameterTypes &&...parameters);
+    explicit BasicFormatParameters(ParameterTypes &&...parameters) noexcept;
 
     /**
      * Visitor to provide runtime access to the stored parameters based on a replacement field's
@@ -611,6 +692,24 @@ constexpr bool BasicFormatSpecifier<CharType>::is_numeric() const
 }
 
 //==================================================================================================
+template <typename CharType>
+constexpr void BasicFormatSpecifier<CharType>::set_width(
+    typename BasicFormatSpecifier::SizeOrPosition::Type type,
+    std::size_t value)
+{
+    m_width = std::make_optional<SizeOrPosition>(type, value);
+}
+
+//==================================================================================================
+template <typename CharType>
+constexpr void BasicFormatSpecifier<CharType>::set_precision(
+    typename BasicFormatSpecifier::SizeOrPosition::Type type,
+    std::size_t value)
+{
+    m_precision = std::make_optional<SizeOrPosition>(type, value);
+}
+
+//==================================================================================================
 template <typename T>
 bool operator==(
     const BasicFormatSpecifier<T> &specifier1,
@@ -626,6 +725,37 @@ bool operator==(
         (specifier1.m_precision == specifier2.m_precision) &&
         (specifier1.m_locale_specific_form == specifier2.m_locale_specific_form) &&
         (specifier1.m_type == specifier2.m_type) && (specifier1.m_case == specifier2.m_case);
+}
+
+//==================================================================================================
+template <typename CharType>
+constexpr BasicFormatSpecifier<CharType>::SizeOrPosition::SizeOrPosition(
+    Type type,
+    std::size_t value) noexcept :
+    m_type(type),
+    m_value(value)
+{
+}
+
+//==================================================================================================
+template <typename CharType>
+constexpr bool BasicFormatSpecifier<CharType>::SizeOrPosition::is_size() const
+{
+    return m_type == Type::Size;
+}
+
+//==================================================================================================
+template <typename CharType>
+constexpr bool BasicFormatSpecifier<CharType>::SizeOrPosition::is_position() const
+{
+    return m_type == Type::Position;
+}
+
+//==================================================================================================
+template <typename CharType>
+constexpr std::size_t BasicFormatSpecifier<CharType>::SizeOrPosition::value() const
+{
+    return m_value;
 }
 
 //==================================================================================================
@@ -833,13 +963,15 @@ BasicFormatString<StringType, ParameterTypes...>::parse_width(FormatSpecifier &s
 {
     if (auto width = m_lexer.consume_number(); width)
     {
-        specifier.m_width = width.value();
+        specifier.set_width(FormatSpecifier::SizeOrPosition::Type::Size, *width);
     }
     else if (m_lexer.consume_if(s_left_brace))
     {
         if (auto nested_specifier = parse_specifier(SpecifierType::Nested); nested_specifier)
         {
-            specifier.m_width_position = nested_specifier->m_position;
+            specifier.set_width(
+                FormatSpecifier::SizeOrPosition::Type::Position,
+                nested_specifier->m_position);
         }
     }
 }
@@ -853,13 +985,15 @@ BasicFormatString<StringType, ParameterTypes...>::parse_precision(FormatSpecifie
     {
         if (auto precision = m_lexer.consume_number(); precision)
         {
-            specifier.m_precision = precision.value();
+            specifier.set_precision(FormatSpecifier::SizeOrPosition::Type::Size, *precision);
         }
         else if (m_lexer.consume_if(s_left_brace))
         {
             if (auto nested_specifier = parse_specifier(SpecifierType::Nested); nested_specifier)
             {
-                specifier.m_precision_position = nested_specifier->m_position;
+                specifier.set_precision(
+                    FormatSpecifier::SizeOrPosition::Type::Position,
+                    nested_specifier->m_position);
             }
         }
         else
@@ -988,33 +1122,38 @@ constexpr bool BasicFormatString<StringType, ParameterTypes...>::validate_specif
     }
 
     // Validate the width value.
-    if (specifier.m_width && (specifier.m_width.value() == 0))
+    if (specifier.m_width)
     {
-        on_error("Width must be a positive (non-zero) value");
-    }
-    else if (specifier.m_width_position)
-    {
-        std::optional<ParameterType> nested_type = parameter_type(*specifier.m_width_position);
-
-        if (nested_type != ParameterType::Integral)
+        if (specifier.m_width->is_size() && (specifier.m_width->value() == 0))
         {
-            on_error("Position of width parameter must be an integral type");
+            on_error("Width must be a positive (non-zero) value");
+        }
+        else if (specifier.m_width->is_position())
+        {
+            const auto nested_type = parameter_type(specifier.m_width->value());
+
+            if (nested_type != ParameterType::Integral)
+            {
+                on_error("Position of width parameter must be an integral type");
+            }
         }
     }
 
     // Validate the precision value.
-    if ((specifier.m_precision) &&
-        ((type != ParameterType::String) && (type != ParameterType::FloatingPoint)))
+    if (specifier.m_precision)
     {
-        on_error("Precision may only be used for string and floating point types");
-    }
-    else if (specifier.m_precision_position)
-    {
-        std::optional<ParameterType> nested_type = parameter_type(*specifier.m_precision_position);
-
-        if (nested_type != ParameterType::Integral)
+        if ((type != ParameterType::String) && (type != ParameterType::FloatingPoint))
         {
-            on_error("Position of precision parameter must be an integral type");
+            on_error("Precision may only be used for string and floating point types");
+        }
+        else if (specifier.m_precision->is_position())
+        {
+            const auto nested_type = parameter_type(specifier.m_precision->value());
+
+            if (nested_type != ParameterType::Integral)
+            {
+                on_error("Position of precision parameter must be an integral type");
+            }
         }
     }
 
@@ -1177,7 +1316,7 @@ void BasicFormatString<StringType, ParameterTypes...>::on_error(const char *erro
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
 BasicFormatParameters<StringType, ParameterTypes...>::BasicFormatParameters(
-    ParameterTypes &&...parameters) :
+    ParameterTypes &&...parameters) noexcept :
     m_parameters {std::forward<ParameterTypes>(parameters)...}
 {
 }

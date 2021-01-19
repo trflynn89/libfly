@@ -350,10 +350,10 @@ CATCH_TEMPLATE_TEST_CASE(
         Specifier specifier {};
         specifier.m_type = Specifier::Type::Decimal;
 
-        specifier.m_width = 1;
+        specifier.set_width(Specifier::SizeOrPosition::Type::Size, 1);
         test_format(make_format(FMT("{:1}"), 1), specifier);
 
-        specifier.m_width = 123;
+        specifier.set_width(Specifier::SizeOrPosition::Type::Size, 123);
         test_format(make_format(FMT("{:123}"), 1), specifier);
     }
 
@@ -362,21 +362,21 @@ CATCH_TEMPLATE_TEST_CASE(
         Specifier specifier {};
         specifier.m_type = Specifier::Type::String;
 
-        specifier.m_width_position = 1;
+        specifier.set_width(Specifier::SizeOrPosition::Type::Position, 1);
         test_format(make_format(FMT("{:{}}"), s, 1), specifier);
 
-        specifier.m_width_position = 1;
+        specifier.set_width(Specifier::SizeOrPosition::Type::Position, 1);
         test_format(make_format(FMT("{0:{1}}"), s, 1), specifier);
 
         specifier.m_position = 1;
-        specifier.m_width_position = 0;
+        specifier.set_width(Specifier::SizeOrPosition::Type::Position, 0);
         test_format(make_format(FMT("{1:{0}}"), 1, s), specifier);
     }
 
     CATCH_SECTION("Precision value may be set")
     {
         Specifier specifier {};
-        specifier.m_precision = 1;
+        specifier.set_precision(Specifier::SizeOrPosition::Type::Size, 1);
 
         specifier.m_type = Specifier::Type::String;
         test_format(make_format(FMT("{:.1}"), s), specifier);
@@ -390,14 +390,14 @@ CATCH_TEMPLATE_TEST_CASE(
         Specifier specifier {};
         specifier.m_type = Specifier::Type::String;
 
-        specifier.m_precision_position = 1;
+        specifier.set_precision(Specifier::SizeOrPosition::Type::Position, 1);
         test_format(make_format(FMT("{:.{}}"), s, 1), specifier);
 
-        specifier.m_precision_position = 1;
+        specifier.set_precision(Specifier::SizeOrPosition::Type::Position, 1);
         test_format(make_format(FMT("{0:.{1}}"), s, 1), specifier);
 
         specifier.m_position = 1;
-        specifier.m_precision_position = 0;
+        specifier.set_precision(Specifier::SizeOrPosition::Type::Position, 0);
         test_format(make_format(FMT("{1:.{0}}"), 1, s), specifier);
     }
 
@@ -587,10 +587,10 @@ CATCH_TEMPLATE_TEST_CASE(
         specifier.m_zero_padding = false; // Zero-padding ignored due to alignment.
         test_format(make_format(FMT("{1:_^+#0}"), f, f), specifier);
 
-        specifier.m_width = 1;
+        specifier.set_width(Specifier::SizeOrPosition::Type::Size, 1);
         test_format(make_format(FMT("{1:_^+#01}"), f, f), specifier);
 
-        specifier.m_precision = 2;
+        specifier.set_precision(Specifier::SizeOrPosition::Type::Size, 2);
         test_format(make_format(FMT("{1:_^+#01.2}"), f, f), specifier);
 
         specifier.m_locale_specific_form = true;
@@ -834,8 +834,14 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision position must be integral")
     {
-        test_error(make_format(FMT("{:.{}}"), 1, s), s_bad_precision_position);
-        test_error(make_format(FMT("{0:.{1}}"), 1, s), s_bad_precision_position);
+        test_error(make_format(FMT("{:.{}}"), s, s), s_bad_precision_position);
+        test_error(make_format(FMT("{0:.{1}}"), s, s), s_bad_precision_position);
+    }
+
+    CATCH_SECTION("Precision position only valid for string and floating point types")
+    {
+        test_error(make_format(FMT("{:.{}}"), 1, 1), s_bad_precision);
+        test_error(make_format(FMT("{0:.{1}}"), 1, 1), s_bad_precision);
     }
 
     CATCH_SECTION("Precision position value must be postive")
