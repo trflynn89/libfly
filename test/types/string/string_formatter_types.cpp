@@ -5,12 +5,15 @@
 
 #include "fly/types/string/detail/string_formatter_types.hpp"
 
+#include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string_literal.hpp"
 
 #include "catch2/catch.hpp"
 
 #include <ostream>
 #include <string>
+
+using namespace fly::literals::numeric_literals;
 
 namespace {
 
@@ -1138,7 +1141,39 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK(visit_count == 1);
     }
 
-    CATCH_SECTION("Stored parameters are never copied or moved")
+    CATCH_SECTION("Parameters can be copied if of a compatible type")
+    {
+        fly::detail::BasicFormatParameters<StringType, int> parameters(1);
+
+        auto value1 = parameters.template get<int>(0);
+        CATCH_REQUIRE(value1);
+        CATCH_CHECK(value1 == 1);
+
+        auto value2 = parameters.template get<std::size_t>(0);
+        CATCH_REQUIRE(value2);
+        CATCH_CHECK(value2 == 1_zu);
+
+        auto value3 = parameters.template get<std::size_t>(1);
+        CATCH_CHECK_FALSE(value3);
+    }
+
+    CATCH_SECTION("Parameters cannot be copied if of a non-integral type")
+    {
+        fly::detail::BasicFormatParameters<StringType, std::string> parameters("ab");
+
+        auto value = parameters.template get<std::string>(0);
+        CATCH_CHECK_FALSE(value);
+    }
+
+    CATCH_SECTION("Parameters cannot be copied if of an incompatible type")
+    {
+        fly::detail::BasicFormatParameters<StringType, int> parameters(1);
+
+        auto value = parameters.template get<std::string>(0);
+        CATCH_CHECK_FALSE(value);
+    }
+
+    CATCH_SECTION("Stored parameters are not copied or moved")
     {
         ConstructorCounter c1;
         const ConstructorCounter c2;

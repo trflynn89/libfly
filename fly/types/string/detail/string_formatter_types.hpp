@@ -519,6 +519,7 @@ private:
 template <typename StringType, typename... ParameterTypes>
 class BasicFormatParameters
 {
+    using FormatParameters = std::tuple<std::type_identity_t<ParameterTypes>...>;
     using FormatSpecifier = BasicFormatSpecifier<typename StringType::value_type>;
 
 public:
@@ -534,17 +535,38 @@ public:
      * position. If the provided position is found, invokes the provided callback with the
      * replacement field and a reference to the found format parameter.
      *
+     * @tparam Callback Type of the callback to invoke.
+     *
      * @param specifier The replacement field corresponding to the parameter to search for.
      * @param callback The callback to invoke if the parameter is found.
      */
     template <typename Callback, size_t N = 0>
     void visit(FormatSpecifier &&specifier, Callback callback) const;
 
+    /**
+     * Visitor to provide runtime access to the stored parameter at the provided index. If the index
+     * is found, and is convertible to the desired type, returns a copy of the found format
+     * parameter.
+     *
+     * This is only allowed for integral format parameters. Attempting to copy other format types is
+     * forbidden.
+     *
+     * @tparam T Desired type of the format parameter.
+     *
+     * @param index The index of the parameter to search for.
+     *
+     * @return If successful, a copy of the format parameter. Otherwise, an uninitialized value.
+     */
+    template <typename T, size_t N = 0>
+    std::optional<T> get(std::size_t index) const;
+
 private:
     BasicFormatParameters(const BasicFormatParameters &) = delete;
     BasicFormatParameters &operator=(const BasicFormatParameters &) = delete;
 
-    const std::tuple<ParameterTypes...> m_parameters;
+    const FormatParameters m_parameters;
+
+    static constexpr const std::size_t s_parameter_count = sizeof...(ParameterTypes);
 };
 
 //==================================================================================================
@@ -1167,9 +1189,7 @@ void BasicFormatParameters<StringType, ParameterTypes...>::visit(
     FormatSpecifier &&specifier,
     Callback callback) const
 {
-    static constexpr const std::size_t s_tuple_size = std::tuple_size_v<decltype(m_parameters)>;
-
-    if constexpr (N < s_tuple_size)
+    if constexpr (N < s_parameter_count)
     {
         if (N == specifier.m_position)
         {
@@ -1178,6 +1198,31 @@ void BasicFormatParameters<StringType, ParameterTypes...>::visit(
         }
 
         visit<Callback, N + 1>(std::move(specifier), std::move(callback));
+    }
+}
+
+//==================================================================================================
+template <typename StringType, typename... ParameterTypes>
+template <typename T, size_t N>
+std::optional<T> BasicFormatParameters<StringType, ParameterTypes...>::get(std::size_t index) const
+{
+    if constexpr (N < s_parameter_count)
+    {
+        if (N == index)
+        {
+            using P = std::remove_cvref_t<std::tuple_element_t<N, FormatParameters>>;
+
+            if constexpr (std::is_integral_v<P> && std::is_convertible_v<P, T>)
+            {
+                return static_cast<T>(std::get<N>(m_parameters));
+            }
+        }
+
+        return get<T, N + 1>(index);
+    }
+    else
+    {
+        return std::nullopt;
     }
 }
 
