@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <ios>
 #include <locale>
+#include <optional>
 #include <type_traits>
 
 namespace fly::detail {
@@ -57,7 +58,6 @@ struct BasicStringStreamer
     template <typename T, typename PreferredPresentationType = T>
     static void stream_value(ostream_type &stream, T &&value);
 
-private:
     /**
      * Stream a string-like value into the given stream. If the type corresponds to the stream type,
      * then the string is streamed as-is. Other string-like types are converted to the Unicode
@@ -67,9 +67,11 @@ private:
      *
      * @param stream The stream to insert the value into.
      * @param value The string-like value to stream.
+     * @param max_string_length The maximum number of characters from the string to stream.
      */
     template <typename T>
-    static void stream_string(ostream_type &stream, T &&value);
+    static void
+    stream_string(ostream_type &stream, T &&value, std::optional<std::size_t> max_string_length);
 };
 
 /**
@@ -216,14 +218,9 @@ void BasicStringStreamer<StringType>::stream_value(ostream_type &stream, T &&val
             stream << static_cast<PreferredPresentationType>(std::forward<T>(value));
         }
     }
-    else if constexpr (detail::is_supported_string_v<U>)
-    {
-        stream_string(stream, std::forward<T>(value));
-    }
     else if constexpr (detail::is_like_supported_string_v<U>)
     {
-        using traits_type = BasicStringTraits<detail::is_like_supported_string_t<U>>;
-        stream_string(stream, typename traits_type::view_type(std::forward<T>(value)));
+        stream_string(stream, std::forward<T>(value), std::nullopt);
     }
     else if constexpr (detail::is_supported_character_v<T>)
     {
@@ -239,22 +236,38 @@ void BasicStringStreamer<StringType>::stream_value(ostream_type &stream, T &&val
 //==================================================================================================
 template <typename StringType>
 template <typename T>
-void BasicStringStreamer<StringType>::stream_string(ostream_type &stream, T &&value)
+void BasicStringStreamer<StringType>::stream_string(
+    ostream_type &stream,
+    T &&value,
+    std::optional<std::size_t> max_string_length)
 {
-    if constexpr (BasicStringTraits<streamed_type>::template is_string_like_v<T>)
+    using string_like_type = detail::is_like_supported_string_t<T>;
+    using string_like_traits = BasicStringTraits<string_like_type>;
+
+    typename string_like_traits::view_type view(std::forward<T>(value));
+
+    if constexpr (std::is_same_v<streamed_type, string_like_type>)
     {
-        stream << std::forward<T>(value);
+        if (max_string_length && (*max_string_length < view.size()))
+        {
+            stream << view.substr(0, *max_string_length);
+        }
+        else
+        {
+            stream << view;
+        }
     }
     else
     {
-        using unicode = BasicStringUnicode<detail::is_like_supported_string_t<T>>;
+        using unicode = BasicStringUnicode<string_like_type>;
+        using streamer = BasicStringStreamer<streamed_type>;
 
-        auto it = value.cbegin();
-        const auto end = value.cend();
+        auto it = view.cbegin();
+        const auto end = view.cend();
 
         if (auto converted = unicode::template convert_encoding<streamed_type>(it, end); converted)
         {
-            BasicStringStreamer<streamed_type>::stream_value(stream, *std::move(converted));
+            streamer::stream_string(stream, *std::move(converted), std::move(max_string_length));
         }
     }
 }
