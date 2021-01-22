@@ -12,9 +12,9 @@ could use some work :)
 
 | Formatter      | Duration (ns) |
 | :--            |           --: |
-| libfly         |         3.335 |
-| {fmt}          |         0.595 |
-| STL IO Streams |         1.833 |
+| libfly         |         3.227 |
+| {fmt}          |         0.605 |
+| STL IO Streams |         1.839 |
 
 ## Profile
 
