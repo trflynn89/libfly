@@ -35,11 +35,9 @@ class BasicStringFormatter
     using traits = BasicStringTraits<StringType>;
     using streamer = BasicStringStreamer<StringType>;
     using stream_modifiers = BasicStreamModifiers<StringType>;
-    using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
     using ostream_type = typename traits::ostream_type;
-    using streamed_type = typename traits::streamed_type;
     using streamed_char_type = typename streamer::streamed_char_type;
 
     using FormatSpecifier = BasicFormatSpecifier<char_type>;
