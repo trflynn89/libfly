@@ -101,9 +101,8 @@ namespace fly::detail {
  *
  *        Boolean types - Valid presentations: none, "c", s", b", "B", "o", "d", "x", "X".
  *
- *        Other (general) types - Valid presentations: none, "s". If an overload of operator<< is
- *        defined, the value is formatted using that operator. Otherwise, the memory location of the
- *        value is used.
+ *        Other (general) types - Valid presentations: none, "s". An overload of operator<< must be
+ *        defined for generic types.
  *
  *        For details on each presentation type, see the above links.
  *
@@ -353,8 +352,8 @@ public:
     template <std::size_t N>
     FLY_CONSTEVAL BasicFormatString(const char_type (&format)[N]) noexcept;
 
-    BasicFormatString(BasicFormatString &&) = delete;
-    BasicFormatString &operator=(BasicFormatString &&) = delete;
+    BasicFormatString(BasicFormatString &&) = default;
+    BasicFormatString &operator=(BasicFormatString &&) = default;
 
     /**
      * @return A string view into the format string.
@@ -645,9 +644,9 @@ private:
     BasicFormatParameters(const BasicFormatParameters &) = delete;
     BasicFormatParameters &operator=(const BasicFormatParameters &) = delete;
 
-    const FormatParameters m_parameters;
-
     static constexpr const std::size_t s_parameter_count = sizeof...(ParameterTypes);
+
+    const FormatParameters m_parameters;
 };
 
 //==================================================================================================

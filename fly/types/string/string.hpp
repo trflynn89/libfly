@@ -481,20 +481,20 @@ public:
 
 private:
     /**
-     * Recursively join one argument into the given ostream.
+     * Recursively join one argument into the given stream.
      */
     template <typename T, typename... Args>
     static void join_internal(
-        ostream_type &ostream,
+        ostream_type &stream,
         const char_type &separator,
         const T &value,
         const Args &...args);
 
     /**
-     * Terminator for the variadic template joiner. Join the last argument into the given ostream.
+     * Terminator for the variadic template joiner. Join the last argument into the given stream.
      */
     template <typename T>
-    static void join_internal(ostream_type &ostream, const char_type &separator, const T &value);
+    static void join_internal(ostream_type &stream, const char_type &separator, const T &value);
 
     /**
      * A list of alpha-numeric characters in the range [0-9A-Za-z].
@@ -888,34 +888,34 @@ template <typename... Args>
 inline auto BasicString<StringType>::join(const char_type &separator, const Args &...args)
     -> streamed_type
 {
-    typename traits::ostringstream_type ostream;
-    join_internal(ostream, separator, args...);
+    typename traits::ostringstream_type stream;
+    join_internal(stream, separator, args...);
 
-    return ostream.str();
+    return stream.str();
 }
 
 //==================================================================================================
 template <typename StringType>
 template <typename T, typename... Args>
 inline void BasicString<StringType>::join_internal(
-    ostream_type &ostream,
+    ostream_type &stream,
     const char_type &separator,
     const T &value,
     const Args &...args)
 {
-    streamer::stream_value(ostream, value);
-    streamer::stream_value(ostream, separator);
+    streamer::stream_value(stream, value);
+    streamer::stream_value(stream, separator);
 
-    join_internal(ostream, separator, args...);
+    join_internal(stream, separator, args...);
 }
 
 //==================================================================================================
 template <typename StringType>
 template <typename T>
 inline void
-BasicString<StringType>::join_internal(ostream_type &ostream, const char_type &, const T &value)
+BasicString<StringType>::join_internal(ostream_type &stream, const char_type &, const T &value)
 {
-    streamer::stream_value(ostream, value);
+    streamer::stream_value(stream, value);
 }
 
 //==================================================================================================
