@@ -7,7 +7,7 @@
 #include "fly/types/string/string_literal.hpp"
 
 #include <iomanip>
-#include <limits>
+#include <optional>
 #include <type_traits>
 
 namespace fly::detail {
@@ -401,7 +401,7 @@ void BasicStringFormatter<StringType, ParameterTypes...>::format_value_for_type(
     else
     {
         using integral_type =
-            std::conditional_t<std::numeric_limits<T>::is_signed, std::intmax_t, std::uintmax_t>;
+            std::conditional_t<std::is_signed_v<T>, std::intmax_t, std::uintmax_t>;
         streamer::template stream_value<decltype(value), integral_type>(m_stream, value);
     }
 }
@@ -462,7 +462,7 @@ void BasicStringFormatter<StringType, ParameterTypes...>::format_value_for_type(
     }
     else
     {
-        streamer::stream_string(m_stream, value, std::nullopt);
+        streamer::stream_string(m_stream, value, StringType::npos);
     }
 }
 

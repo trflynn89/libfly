@@ -328,8 +328,13 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision value sets maximum string size")
     {
+        test_format(FMT("{:.3s}"), FMT("a"), FLY_STR(char_type, "a"));
         test_format(FMT("{:.3s}"), FMT("ab"), FLY_STR(char_type, "ab"));
         test_format(FMT("{:.3s}"), FMT("abc"), FLY_STR(char_type, "abcdef"));
+
+        test_format(FMT("{:.0s}"), FMT(""), FLY_STR(char_type, "a"));
+        test_format(FMT("{:.0s}"), FMT(""), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:.0s}"), FMT(""), FLY_STR(char_type, "abcdef"));
     }
 
     CATCH_SECTION("Precision position sets floating point precision")
@@ -344,6 +349,10 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:.{}s}"), FMT("ab"), FLY_STR(char_type, "ab"), 3);
         test_format(FMT("{0:.{1}s}"), FMT("abc"), FLY_STR(char_type, "abcdef"), 3);
         test_format(FMT("{1:.{0}s}"), FMT("abc"), 3, FLY_STR(char_type, "abcdef"));
+
+        test_format(FMT("{:.{}s}"), FMT(""), FLY_STR(char_type, "ab"), 0);
+        test_format(FMT("{0:.{1}s}"), FMT(""), FLY_STR(char_type, "abcdef"), 0);
+        test_format(FMT("{1:.{0}s}"), FMT(""), 0, FLY_STR(char_type, "abcdef"));
     }
 
     CATCH_SECTION("Precision position is ignored if the position value is negative")

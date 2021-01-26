@@ -9,7 +9,6 @@
 #include <cstdint>
 #include <ios>
 #include <locale>
-#include <optional>
 #include <type_traits>
 
 namespace fly::detail {
@@ -70,8 +69,7 @@ struct BasicStringStreamer
      * @param max_string_length The maximum number of characters from the string to stream.
      */
     template <typename T>
-    static void
-    stream_string(ostream_type &stream, T &&value, std::optional<std::size_t> max_string_length);
+    static void stream_string(ostream_type &stream, T &&value, std::size_t max_string_length);
 };
 
 /**
@@ -220,7 +218,7 @@ void BasicStringStreamer<StringType>::stream_value(ostream_type &stream, T &&val
     }
     else if constexpr (detail::is_like_supported_string_v<U>)
     {
-        stream_string(stream, std::forward<T>(value), std::nullopt);
+        stream_string(stream, std::forward<T>(value), StringType::npos);
     }
     else if constexpr (detail::is_supported_character_v<T>)
     {
@@ -239,7 +237,7 @@ template <typename T>
 void BasicStringStreamer<StringType>::stream_string(
     ostream_type &stream,
     T &&value,
-    std::optional<std::size_t> max_string_length)
+    std::size_t max_string_length)
 {
     using string_like_type = detail::is_like_supported_string_t<T>;
     using string_like_traits = BasicStringTraits<string_like_type>;
@@ -248,14 +246,7 @@ void BasicStringStreamer<StringType>::stream_string(
 
     if constexpr (std::is_same_v<streamed_type, string_like_type>)
     {
-        if (max_string_length && (*max_string_length < view.size()))
-        {
-            stream << view.substr(0, *max_string_length);
-        }
-        else
-        {
-            stream << view;
-        }
+        stream << view.substr(0, max_string_length);
     }
     else
     {
@@ -267,7 +258,7 @@ void BasicStringStreamer<StringType>::stream_string(
 
         if (auto converted = unicode::template convert_encoding<streamed_type>(it, end); converted)
         {
-            streamer::stream_string(stream, *std::move(converted), std::move(max_string_length));
+            streamer::stream_string(stream, *std::move(converted), max_string_length);
         }
     }
 }
