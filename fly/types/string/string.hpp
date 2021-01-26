@@ -53,7 +53,6 @@ template <typename StringType>
 class BasicString
 {
     using classifier = detail::BasicStringClassifier<StringType>;
-    using formatter = detail::BasicStringFormatter<StringType>;
     using streamer = detail::BasicStringStreamer<StringType>;
     using traits = detail::BasicStringTraits<StringType>;
     using unicode = detail::BasicStringUnicode<StringType>;
@@ -876,10 +875,21 @@ inline auto BasicString<StringType>::format(
     FormatString<ParameterTypes...> &&fmt,
     ParameterTypes &&...parameters) -> ostream_type &
 {
-    return formatter::format(
-        stream,
-        std::forward<FormatString<ParameterTypes...>>(fmt),
-        std::forward<ParameterTypes>(parameters)...);
+    if (fmt.has_error())
+    {
+        streamer::stream_value(stream, "Ignored invalid formatter: ");
+        streamer::stream_value(stream, fmt.error());
+    }
+    else
+    {
+        detail::BasicStringFormatter<StringType, ParameterTypes...> formatter(
+            stream,
+            std::forward<ParameterTypes>(parameters)...);
+
+        formatter.format(std::forward<FormatString<ParameterTypes...>>(fmt));
+    }
+
+    return stream;
 }
 
 //==================================================================================================
