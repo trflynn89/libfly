@@ -137,7 +137,7 @@ else ifeq ($(mode), release)
     JFLAGS += -g:none
 else ifeq ($(mode), profile)
     ifeq ($(toolchain), gcc)
-        CF_ALL += -O2 -g -pg
+        CF_ALL += -O2 -DNDEBUG -g -pg -DFLY_PROFILE
         LDFLAGS += -pg
     else
         $(error Profiling not supported with toolchain $(toolchain), check flags.mk)
