@@ -71,8 +71,10 @@ CATCH_TEST_CASE("String", "[bench]")
     static constexpr std::size_t s_iterations = 1000001;
 
     std::map<std::string, std::unique_ptr<StringBase>> formatters;
+#if !defined(FLY_PROFILE)
     formatters.emplace("{fmt}", std::make_unique<FmtFormat>());
     formatters.emplace("STL IO Streams", std::make_unique<STLStreamFormat>());
+#endif
     formatters.emplace("libfly", std::make_unique<LibflyFormat>());
 
     StringTable table("String Formatting", {"Formatter", "Duration (ns)"});
