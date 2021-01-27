@@ -86,7 +86,7 @@ private:
      */
     template <
         typename T,
-        fly::disable_if_any<detail::is_like_supported_string<T>, std::is_arithmetic<T>> = 0>
+        fly::disable_if_any<detail::is_like_supported_string<T>, std::is_integral<T>> = 0>
     void format_value(FormatSpecifier &&specifier, const T &value);
 
     /**
@@ -101,46 +101,23 @@ private:
     void format_value(FormatSpecifier &&specifier, const T &value);
 
     /**
-     * Format a single replacement field with the provided non-boolean integral value.
+     * Format a single replacement field with the provided integral value.
      *
      * @tparam T The type of the value to format.
      *
      * @param specifier The replacement field to format.
      * @param value The value to format.
      */
-    template <
-        typename T,
-        fly::enable_if_all<std::is_integral<T>, std::negation<std::is_same<T, bool>>> = 0>
-    void format_value(FormatSpecifier &&specifier, const T &value);
-
-    /**
-     * Format a single replacement field with the provided floating point value.
-     *
-     * @tparam T The type of the value to format.
-     *
-     * @param specifier The replacement field to format.
-     * @param value The value to format.
-     */
-    template <typename T, fly::enable_if<std::is_floating_point<T>> = 0>
-    void format_value(FormatSpecifier &&specifier, const T &value);
-
-    /**
-     * Format a single replacement field with the provided boolean value.
-     *
-     * @tparam T The type of the value to format.
-     *
-     * @param specifier The replacement field to format.
-     * @param value The value to format.
-     */
-    template <typename T, fly::enable_if<std::is_same<T, bool>> = 0>
+    template <typename T, fly::enable_if<std::is_integral<T>> = 0>
     void format_value(FormatSpecifier &&specifier, const T &value);
 
     /**
      * Handle formatting options for generic format parameter types.
      *
+     * @param modifiers The active stream manipulator container.
      * @param specifier The replacement field to format.
      */
-    void set_generic_options(const FormatSpecifier &specifier);
+    void set_generic_options(stream_modifiers &modifiers, const FormatSpecifier &specifier) const;
 
     /**
      * Handle formatting options for numeric format parameter types.
@@ -151,11 +128,11 @@ private:
      * @param specifier The replacement field to format.
      * @param value The value to format.
      */
-    template <typename T>
+    template <typename T, fly::enable_if<std::is_arithmetic<T>> = 0>
     void set_numeric_options(
         stream_modifiers &modifiers,
         const FormatSpecifier &specifier,
-        const T &value);
+        const T &value) const;
 
     /**
      * The width and precision formatting options may either be a number or a nested replacement
@@ -199,7 +176,7 @@ void BasicStringFormatter<StringType, ParameterTypes...>::format(FormatString &&
     auto formatter = [this](auto &&specifier, const auto &value)
     {
         stream_modifiers modifiers(m_stream);
-        set_generic_options(specifier);
+        set_generic_options(modifiers, specifier);
 
         if constexpr (std::is_arithmetic_v<std::remove_cvref_t<decltype(value)>>)
         {
@@ -245,10 +222,8 @@ void BasicStringFormatter<StringType, ParameterTypes...>::format(FormatString &&
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <
-    typename T,
-    fly::disable_if_any<detail::is_like_supported_string<T>, std::is_arithmetic<T>>>
-void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
+template <typename T, fly::disable_if_any<detail::is_like_supported_string<T>, std::is_integral<T>>>
+inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&,
     const T &value)
 {
@@ -258,7 +233,7 @@ void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
 template <typename T, fly::enable_if<detail::is_like_supported_string<T>>>
-void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
+inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     const T &value)
 {
@@ -277,8 +252,8 @@ void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <typename T, fly::enable_if_all<std::is_integral<T>, std::negation<std::is_same<T, bool>>>>
-void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
+template <typename T, fly::enable_if<std::is_integral<T>>>
+inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     const T &value)
 {
@@ -289,99 +264,65 @@ void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     }
     else
     {
-        using integral_type =
-            std::conditional_t<std::is_signed_v<T>, std::intmax_t, std::uintmax_t>;
-        streamer::template stream_value<decltype(value), integral_type>(m_stream, value);
+        using preferred_type = std::conditional_t<
+            std::is_same_v<T, bool>,
+            bool,
+            std::conditional_t<std::is_signed_v<T>, std::intmax_t, std::uintmax_t>>;
+
+        streamer::template stream_value<decltype(value), preferred_type>(m_stream, value);
     }
 }
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <typename T, fly::enable_if<std::is_floating_point<T>>>
-void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
-    FormatSpecifier &&specifier,
-    const T &value)
-{
-    if (const auto precision = resolve_size(specifier.m_precision); precision)
-    {
-        m_stream.precision(*precision);
-    }
-
-    streamer::stream_value(m_stream, value);
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-template <typename T, fly::enable_if<std::is_same<T, bool>>>
-void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
-    FormatSpecifier &&specifier,
-    const T &value)
-{
-    if (specifier.m_type == FormatSpecifier::Type::Character)
-    {
-        // TODO: Validate the value fits into streamed_char_type / convert Unicode encoding.
-        streamer::template stream_value<decltype(value), streamed_char_type>(m_stream, value);
-    }
-    else
-    {
-        if (specifier.m_type == FormatSpecifier::Type::String)
-        {
-            m_stream.setf(std::ios_base::boolalpha);
-        }
-
-        streamer::stream_value(m_stream, value);
-    }
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-inline void BasicStringFormatter<StringType, ParameterTypes...>::set_generic_options(
-    const FormatSpecifier &specifier)
+void BasicStringFormatter<StringType, ParameterTypes...>::set_generic_options(
+    stream_modifiers &modifiers,
+    const FormatSpecifier &specifier) const
 {
     if (specifier.m_fill)
     {
-        m_stream.fill(static_cast<streamed_char_type>(*specifier.m_fill));
+        modifiers.fill(static_cast<streamed_char_type>(*specifier.m_fill));
     }
 
     switch (specifier.m_alignment)
     {
         case FormatSpecifier::Alignment::Left:
-            m_stream.setf(std::ios_base::left);
+            modifiers.setf(std::ios_base::left);
             break;
 
         case FormatSpecifier::Alignment::Right:
-            m_stream.setf(std::ios_base::right);
+            modifiers.setf(std::ios_base::right);
             break;
 
         case FormatSpecifier::Alignment::Center: // TODO: Implement center-alignment.
         case FormatSpecifier::Alignment::Default:
-            m_stream.setf(specifier.is_numeric() ? std::ios_base::right : std::ios_base::left);
+            modifiers.setf(specifier.is_numeric() ? std::ios_base::right : std::ios_base::left);
             break;
     }
 
     if (const auto width = resolve_size(specifier.m_width); width && (*width > 0))
     {
-        m_stream.width(*width);
+        modifiers.width(*width);
     }
 }
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <typename T>
-inline void BasicStringFormatter<StringType, ParameterTypes...>::set_numeric_options(
+template <typename T, fly::enable_if<std::is_arithmetic<T>>>
+void BasicStringFormatter<StringType, ParameterTypes...>::set_numeric_options(
     stream_modifiers &modifiers,
     const FormatSpecifier &specifier,
-    const T &value)
+    const T &value) const
 {
     switch (specifier.m_sign)
     {
         case FormatSpecifier::Sign::Always:
-            m_stream.setf(std::ios_base::showpos);
+            modifiers.setf(std::ios_base::showpos);
             break;
 
         case FormatSpecifier::Sign::NegativeOnlyWithPositivePadding:
             modifiers.template locale<PositivePaddingFacet<streamed_char_type>>();
-            m_stream.setf(std::ios_base::showpos);
+            modifiers.setf(std::ios_base::showpos);
             break;
 
         default:
@@ -392,34 +333,38 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::set_numeric_opt
     {
         if constexpr (std::is_integral_v<T>)
         {
-            m_stream.setf(std::ios_base::showbase);
+            modifiers.setf(std::ios_base::showbase);
         }
         else
         {
-            m_stream.setf(std::ios_base::showpoint);
+            modifiers.setf(std::ios_base::showpoint);
         }
     }
 
     if (specifier.m_zero_padding)
     {
-        m_stream.setf(std::ios_base::internal, std::ios_base::adjustfield);
-        m_stream.fill(s_zero);
+        modifiers.setf(std::ios_base::internal, std::ios_base::adjustfield);
+        modifiers.fill(s_zero);
     }
 
     if constexpr (std::is_integral_v<T>)
     {
         switch (specifier.m_type)
         {
+            case FormatSpecifier::Type::String:
+                modifiers.setf(std::ios_base::boolalpha);
+                break;
+
             case FormatSpecifier::Type::Binary:
                 modifiers.template locale<BinaryFacet<streamed_char_type>>();
                 break;
 
             case FormatSpecifier::Type::Octal:
-                m_stream.setf(std::ios_base::oct);
+                modifiers.setf(std::ios_base::oct, std::ios::basefield);
                 break;
 
             case FormatSpecifier::Type::Hex:
-                m_stream.setf(std::ios_base::hex);
+                modifiers.setf(std::ios_base::hex, std::ios::basefield);
                 break;
 
             default:
@@ -428,14 +373,19 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::set_numeric_opt
     }
     else
     {
+        if (const auto precision = resolve_size(specifier.m_precision); precision)
+        {
+            modifiers.precision(*precision);
+        }
+
         switch (specifier.m_type)
         {
             case FormatSpecifier::Type::HexFloat:
-                m_stream.setf(std::ios_base::fixed | std::ios_base::scientific);
+                modifiers.setf(std::ios_base::fixed | std::ios_base::scientific);
                 break;
 
             case FormatSpecifier::Type::Scientific:
-                m_stream.setf(std::ios_base::scientific);
+                modifiers.setf(std::ios_base::scientific, std::ios::floatfield);
                 break;
 
             case FormatSpecifier::Type::Fixed:
@@ -443,7 +393,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::set_numeric_opt
                 // ensure consistency, format these values as general types.
                 if (!std::isnan(value) && !std::isinf(value))
                 {
-                    m_stream.setf(std::ios_base::fixed);
+                    modifiers.setf(std::ios_base::fixed, std::ios::floatfield);
                 }
                 break;
 
@@ -454,7 +404,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::set_numeric_opt
 
     if (specifier.m_case == FormatSpecifier::Case::Upper)
     {
-        m_stream.setf(std::ios_base::uppercase);
+        modifiers.setf(std::ios_base::uppercase);
     }
 }
 
