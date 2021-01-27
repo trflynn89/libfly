@@ -85,8 +85,10 @@ CATCH_TEST_CASE("JSON", "[bench]")
     };
 
     std::map<std::string, std::unique_ptr<JsonParserBase>> parsers;
+#if !defined(FLY_PROFILE)
     parsers.emplace("boost", std::make_unique<BoostJsonParser>());
     parsers.emplace("nlohmann", std::make_unique<NLohmannJsonParser>());
+#endif
     parsers.emplace("libfly", std::make_unique<LibflyJsonParser>());
 
     for (const auto &file : s_test_files)
