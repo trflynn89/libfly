@@ -127,6 +127,34 @@ public:
     static constexpr bool is_lower(char_type ch);
 
     /**
+     * Converts the given character to an upper-case alphabetic character as classified by the
+     * default C locale.
+     *
+     * The STL's std:tosupper and std::towupper require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to convert.
+     *
+     * @return The converted character.
+     */
+    static constexpr char_type to_upper(char_type ch);
+
+    /**
+     * Converts the given character to a lower-case alphabetic character as classified by the
+     * default C locale.
+     *
+     * The STL's std:toslower and std::towlower require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to convert.
+     *
+     * @return The converted character.
+     */
+    static constexpr char_type to_lower(char_type ch);
+
+    /**
      * Checks if the given character is a decimal digit character.
      *
      * The STL's std::isdigit and std::iswdigit require that the provided character fits into an
@@ -548,6 +576,20 @@ template <typename StringType>
 constexpr inline bool BasicString<StringType>::is_digit(char_type ch)
 {
     return classifier::is_digit(ch);
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr inline auto BasicString<StringType>::to_upper(char_type ch) -> char_type
+{
+    return classifier::to_upper(ch);
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr inline auto BasicString<StringType>::to_lower(char_type ch) -> char_type
+{
+    return classifier::to_lower(ch);
 }
 
 //==================================================================================================
