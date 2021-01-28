@@ -86,6 +86,52 @@ CATCH_TEMPLATE_TEST_CASE(
         }
     }
 
+    CATCH_SECTION("Convert a character to an upper-case alphabetic character")
+    {
+        for (char_type ch = 0; (ch >= 0) && (ch < 0x80); ++ch)
+        {
+            CATCH_CHECK(
+                BasicString::to_upper(ch) ==
+                static_cast<char_type>(std::toupper(static_cast<unsigned char>(ch))));
+        }
+
+        if constexpr (sizeof(char_type) > 1)
+        {
+            // Spot check some values that incorrectly result in std::toupper returning an
+            // upper-case character when cast to unsigned char (which is how the spec suggests to
+            // avoid undefined behavior).
+            for (char_type ch = 0xaa41; ch <= 0xaa5a; ++ch)
+            {
+                CATCH_CHECK(
+                    ch != static_cast<char_type>(std::toupper(static_cast<unsigned char>(ch))));
+                CATCH_CHECK(ch == BasicString::to_upper(ch));
+            }
+        }
+    }
+
+    CATCH_SECTION("Convert a character to a lower-case alphabetic character")
+    {
+        for (char_type ch = 0; (ch >= 0) && (ch < 0x80); ++ch)
+        {
+            CATCH_CHECK(
+                BasicString::to_lower(ch) ==
+                static_cast<char_type>(std::tolower(static_cast<unsigned char>(ch))));
+        }
+
+        if constexpr (sizeof(char_type) > 1)
+        {
+            // Spot check some values that incorrectly result in std::toupper returning a lower-case
+            // character when cast to unsigned char (which is how the spec suggests to avoid
+            // undefined behavior).
+            for (char_type ch = 0xaa61; ch <= 0xaa7a; ++ch)
+            {
+                CATCH_CHECK(
+                    ch != static_cast<char_type>(std::tolower(static_cast<unsigned char>(ch))));
+                CATCH_CHECK(ch == BasicString::to_lower(ch));
+            }
+        }
+    }
+
     CATCH_SECTION("Check if a character is a decimal digit character")
     {
         for (char_type ch = 0; (ch >= 0) && (ch < 0x80); ++ch)

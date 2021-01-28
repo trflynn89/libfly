@@ -62,6 +62,34 @@ public:
     static constexpr bool is_lower(char_type ch);
 
     /**
+     * Converts the given character to an upper-case alphabetic character as classified by the
+     * default C locale.
+     *
+     * The STL's std:tosupper and std::towupper require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to convert.
+     *
+     * @return The converted character.
+     */
+    static constexpr char_type to_upper(char_type ch);
+
+    /**
+     * Converts the given character to a lower-case alphabetic character as classified by the
+     * default C locale.
+     *
+     * The STL's std:toslower and std::towlower require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to convert.
+     *
+     * @return The converted character.
+     */
+    static constexpr char_type to_lower(char_type ch);
+
+    /**
      * Checks if the given character is a decimal digit character.
      *
      * The STL's std::isdigit and std::iswdigit require that the provided character fits into an
@@ -105,7 +133,8 @@ private:
     static constexpr const char_type s_lower_a = FLY_CHR(char_type, 'a');
     static constexpr const char_type s_lower_z = FLY_CHR(char_type, 'z');
 
-    static constexpr const int_type s_case_mask = static_cast<int_type>(~0x20);
+    static constexpr const int_type s_case_bit = static_cast<int_type>(0x20);
+    static constexpr const int_type s_case_mask = static_cast<int_type>(~s_case_bit);
 };
 
 //==================================================================================================
@@ -127,6 +156,30 @@ template <typename StringType>
 constexpr inline bool BasicStringClassifier<StringType>::is_lower(char_type ch)
 {
     return (ch >= s_lower_a) && (ch <= s_lower_z);
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr inline auto BasicStringClassifier<StringType>::to_upper(char_type ch) -> char_type
+{
+    if (is_lower(ch))
+    {
+        ch = static_cast<char_type>(static_cast<int_type>(ch) & s_case_mask);
+    }
+
+    return ch;
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr inline auto BasicStringClassifier<StringType>::to_lower(char_type ch) -> char_type
+{
+    if (is_upper(ch))
+    {
+        ch = static_cast<char_type>(static_cast<int_type>(ch) | s_case_bit);
+    }
+
+    return ch;
 }
 
 //==================================================================================================
