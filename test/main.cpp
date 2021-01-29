@@ -44,7 +44,7 @@ public:
     void testCaseStarting(const Catch::TestCaseInfo &info) override
     {
         const auto style = fly::Styler(fly::Style::Bold, fly::Color::Green);
-        fly::String::format(stream, "[{}{:=>4}{} Test{:=<4}]\n", style, ' ', info.name, ' ');
+        stream << style << fly::String::format("[{:=>4}{} Test{:=<4}]\n", ' ', info.name, ' ');
 
         Catch::ConsoleReporter::testCaseStarting(info);
 
@@ -57,7 +57,7 @@ public:
         if (info.name != m_current_test_case)
         {
             const auto style = fly::Styler(fly::Style::Italic, fly::Color::Cyan);
-            fly::String::format(stream, "{}[ {} ]\n", style, info.name);
+            stream << style << fly::String::format("[ {} ]\n", info.name);
         }
 
         Catch::ConsoleReporter::sectionStarting(info);
@@ -72,19 +72,23 @@ public:
 
         if (stats.totals.assertions.allOk())
         {
+            const auto style = fly::Styler(fly::Style::Bold, fly::Color::Green);
+            stream << style;
+
             fly::String::format(
                 stream,
-                "{}[==== PASSED {} ({:.3f} seconds) ====]\n\n",
-                fly::Styler(fly::Style::Bold, fly::Color::Green),
+                "[==== PASSED {} ({:.3f} seconds) ====]\n\n",
                 name,
                 duration.count());
         }
         else
         {
+            const auto style = fly::Styler(fly::Style::Bold, fly::Color::Red);
+            stream << style;
+
             fly::String::format(
                 stream,
-                "{}[==== FAILED {} ({:.3f} seconds) ====]\n\n",
-                fly::Styler(fly::Style::Bold, fly::Color::Red),
+                "[==== FAILED {} ({:.3f} seconds) ====]\n\n",
                 name,
                 duration.count());
         }
