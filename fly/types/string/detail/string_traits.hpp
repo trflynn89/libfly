@@ -107,6 +107,7 @@ struct BasicStringTraits
 
     using streamer_traits = BasicStringStreamerTraits<StringType>;
     using streamed_type = typename streamer_traits::streamed_type;
+    using streamed_char_type = typename streamed_type::value_type;
 
     using istream_type = typename streamer_traits::istream_type;
     using ostream_type = typename streamer_traits::ostream_type;

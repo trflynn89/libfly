@@ -27,7 +27,7 @@ class BasicStringFormatter
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
     using ostream_type = typename traits::ostream_type;
-    using streamed_char_type = typename streamer::streamed_char_type;
+    using streamed_char_type = typename traits::streamed_char_type;
 
     using FormatSpecifier = BasicFormatSpecifier<char_type>;
     using FormatString = BasicFormatString<StringType, ParameterTypes...>;

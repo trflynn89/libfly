@@ -32,7 +32,7 @@ struct BasicStringStreamer
 
     using ostream_type = typename traits::ostream_type;
     using streamed_type = typename traits::streamed_type;
-    using streamed_char_type = typename streamed_type::value_type;
+    using streamed_char_type = typename traits::streamed_char_type;
 
     /**
      * Stream the given value into the given stream.
@@ -82,10 +82,10 @@ struct BasicStringStreamer
 template <typename StringType>
 class BasicStreamModifiers
 {
-    using streamer = BasicStringStreamer<StringType>;
+    using traits = BasicStringTraits<StringType>;
 
-    using ostream_type = typename streamer::ostream_type;
-    using streamed_char_type = typename streamer::streamed_char_type;
+    using ostream_type = typename traits::ostream_type;
+    using streamed_char_type = typename traits::streamed_char_type;
 
 public:
     /**
