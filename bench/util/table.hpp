@@ -264,7 +264,7 @@ void Table<Args...>::print_title(std::ostream &stream, std::size_t table_width) 
     const std::size_t title_width = table_width - 4;
 
     auto title = std::string_view(m_title).substr(0, title_width);
-    fly::String::format(stream, "{} {} ", style, Center(title_width, title));
+    stream << style << fly::String::format(" {} ", Center(title_width, title));
 
     print_column_separator(stream, s_border_style) << '\n';
     print_row_separator(stream, table_width);
@@ -278,11 +278,10 @@ void Table<Args...>::print_headers(std::ostream &stream, std::size_t table_width
     {
         print_column_separator(stream, index == 0 ? s_border_style : fly::Style::Default);
 
-        fly::String::format(
-            stream,
-            "{} {} ",
-            fly::Styler(s_header_style, s_header_color),
-            Center(m_column_widths[index], m_headers[index]));
+        const auto style = fly::Styler(s_header_style, s_header_color);
+        stream << style;
+
+        stream << fly::String::format(" {} ", Center(m_column_widths[index], m_headers[index]));
     }
 
     print_column_separator(stream, s_border_style) << '\n';
@@ -298,21 +297,17 @@ void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
     auto print_value = [this, &stream, &index](const auto &value)
     {
         print_column_separator(stream, index == 0 ? s_border_style : fly::Style::Default);
+
         const auto style = fly::Styler(s_data_style, s_data_color);
+        stream << style;
 
         if constexpr (std::is_floating_point_v<std::remove_cvref_t<decltype(value)>>)
         {
-            fly::String::format(
-                stream,
-                "{} {:{}.{}f} ",
-                style,
-                value,
-                m_column_widths[index],
-                s_precision);
+            fly::String::format(stream, " {:{}.{}f} ", value, m_column_widths[index], s_precision);
         }
         else
         {
-            fly::String::format(stream, "{} {:{}} ", style, value, m_column_widths[index]);
+            fly::String::format(stream, " {:{}} ", value, m_column_widths[index]);
         }
 
         ++index;
@@ -333,7 +328,7 @@ template <class... Args>
 std::ostream &
 Table<Args...>::print_row_separator(std::ostream &stream, std::size_t width, fly::Style style) const
 {
-    fly::String::format(stream, "{}{:->{}}\n", fly::Styler(style, s_border_color), '-', width);
+    stream << fly::Styler(style, s_border_color) << fly::String::format("{:->{}}\n", '-', width);
     return stream;
 }
 
@@ -341,7 +336,7 @@ Table<Args...>::print_row_separator(std::ostream &stream, std::size_t width, fly
 template <class... Args>
 std::ostream &Table<Args...>::print_column_separator(std::ostream &stream, fly::Style style) const
 {
-    fly::String::format(stream, "{}|", fly::Styler(style, s_border_color));
+    stream << fly::Styler(style, s_border_color) << '|';
     return stream;
 }
 
