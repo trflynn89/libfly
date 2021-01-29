@@ -17,6 +17,18 @@ CATCH_TEMPLATE_TEST_CASE(
     using StringType = TestType;
     using BasicString = fly::BasicString<StringType>;
     using char_type = typename BasicString::char_type;
+    using view_type = typename BasicString::view_type;
+
+    CATCH_SECTION("Get the size of a string-like type")
+    {
+        const char_type *cstr = FLY_STR(char_type, "ten chars!");
+        StringType str = cstr;
+        view_type view = str;
+
+        CATCH_CHECK(BasicString::size(cstr) == 10);
+        CATCH_CHECK(BasicString::size(str) == 10);
+        CATCH_CHECK(BasicString::size(view) == 10);
+    }
 
     CATCH_SECTION("Check if a character is an alphabetic character")
     {
