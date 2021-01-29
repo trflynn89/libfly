@@ -1,7 +1,10 @@
 #pragma once
 
+#include "fly/traits/traits.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/string_literal.hpp"
+
+#include <string>
 
 namespace fly::detail {
 
@@ -15,10 +18,25 @@ template <typename StringType>
 class BasicStringClassifier
 {
     using traits = detail::BasicStringTraits<StringType>;
+    using size_type = typename traits::size_type;
     using char_type = typename traits::char_type;
+    using view_type = typename traits::view_type;
     using int_type = typename traits::int_type;
 
 public:
+    /**
+     * Determine the length of any string-like value. Accepts character arrays, std::basic_string
+     * specializations, and std::basic_string_view specializations.
+     *
+     * @tparam T The string-like type.
+     *
+     * @param value The string-like value.
+     *
+     * @return The length of the string-like value.
+     */
+    template <typename T, enable_if<detail::is_like_supported_string<T>> = 0>
+    static size_type size(T &&value);
+
     /**
      * Checks if the given character is an alphabetic character as classified by the default C
      * locale.
@@ -136,6 +154,21 @@ private:
     static constexpr const int_type s_case_bit = static_cast<int_type>(0x20);
     static constexpr const int_type s_case_mask = static_cast<int_type>(~s_case_bit);
 };
+
+//==================================================================================================
+template <typename StringType>
+template <typename T, enable_if<detail::is_like_supported_string<T>>>
+auto BasicStringClassifier<StringType>::size(T &&value) -> size_type
+{
+    if constexpr (any_same_v<T, StringType, view_type>)
+    {
+        return value.size();
+    }
+    else
+    {
+        return std::char_traits<char_type>::length(std::forward<T>(value));
+    }
+}
 
 //==================================================================================================
 template <typename StringType>

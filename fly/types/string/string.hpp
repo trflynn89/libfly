@@ -1,6 +1,5 @@
 #pragma once
 
-#include "fly/traits/traits.hpp"
 #include "fly/types/string/detail/string_classifier.hpp"
 #include "fly/types/string/detail/string_converter.hpp"
 #include "fly/types/string/detail/string_formatter.hpp"
@@ -82,7 +81,7 @@ public:
      * @return The length of the string-like value.
      */
     template <typename T, enable_if<detail::is_like_supported_string<T>> = 0>
-    static size_type size(const T &value);
+    static size_type size(T &&value);
 
     /**
      * Checks if the given character is an alphabetic character as classified by the default C
@@ -536,18 +535,9 @@ private:
 //==================================================================================================
 template <typename StringType>
 template <typename T, enable_if<detail::is_like_supported_string<T>>>
-auto BasicString<StringType>::size(const T &value) -> size_type
+auto BasicString<StringType>::size(T &&value) -> size_type
 {
-    using U = std::decay_t<T>;
-
-    if constexpr (any_same_v<U, StringType, std::basic_string_view<char_type>>)
-    {
-        return value.size();
-    }
-    else
-    {
-        return std::char_traits<char_type>::length(value);
-    }
+    return classifier::size(std::forward<T>(value));
 }
 
 //==================================================================================================

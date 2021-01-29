@@ -61,20 +61,8 @@ CATCH_TEMPLATE_TEST_CASE(
     using BasicString = fly::BasicString<StringType>;
     using size_type = typename BasicString::size_type;
     using char_type = typename BasicString::char_type;
-    using view_type = typename BasicString::view_type;
     using streamed_type = typename BasicString::streamed_type;
     using streamed_char = typename streamed_type::value_type;
-
-    CATCH_SECTION("Get the size of a string-like type")
-    {
-        const char_type *cstr = FLY_STR(char_type, "ten chars!");
-        StringType str = cstr;
-        view_type view = str;
-
-        CATCH_CHECK(BasicString::size(cstr) == 10);
-        CATCH_CHECK(BasicString::size(str) == 10);
-        CATCH_CHECK(BasicString::size(view) == 10);
-    }
 
     CATCH_SECTION("Split a string by a character delimeter")
     {
