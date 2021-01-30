@@ -264,7 +264,7 @@ void Table<Args...>::print_title(std::ostream &stream, std::size_t table_width) 
     const std::size_t title_width = table_width - 4;
 
     auto title = std::string_view(m_title).substr(0, title_width);
-    stream << style << fly::String::format(" {} ", Center(title_width, title));
+    stream << style << fly::String::format(" {:^{}} ", title, title_width);
 
     print_column_separator(stream, s_border_style) << '\n';
     print_row_separator(stream, table_width);
@@ -281,7 +281,7 @@ void Table<Args...>::print_headers(std::ostream &stream, std::size_t table_width
         const auto style = fly::Styler(s_header_style, s_header_color);
         stream << style;
 
-        stream << fly::String::format(" {} ", Center(m_column_widths[index], m_headers[index]));
+        stream << fly::String::format(" {:^{}} ", m_headers[index], m_column_widths[index]);
     }
 
     print_column_separator(stream, s_border_style) << '\n';
