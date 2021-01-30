@@ -142,20 +142,22 @@ struct BasicFormatSpecifier
         NegativeOnlyWithPositivePadding,
     };
 
+    // For runtime convenience, this enumeration is valued such that binary, octal, decimal, and
+    // hexadecimal presentation types correspond to their base (2, 8, 10, and 16, respectively).
     enum class Type : std::uint8_t
     {
-        None,
-        Character,
-        String,
-        Pointer,
-        Binary,
-        Octal,
-        Decimal,
-        Hex,
-        HexFloat,
-        Scientific,
-        Fixed,
-        General,
+        None = 20,
+        Character = 21,
+        String = 22,
+        Pointer = 23,
+        Binary = 2,
+        Octal = 8,
+        Decimal = 10,
+        Hex = 16,
+        HexFloat = 24,
+        Scientific = 25,
+        Fixed = 26,
+        General = 27,
     };
 
     enum class Case : std::uint8_t
