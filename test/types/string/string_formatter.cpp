@@ -115,12 +115,14 @@ CATCH_TEMPLATE_TEST_CASE(
     CATCH_SECTION("Fill character defaults to a space character")
     {
         test_format(FMT("{:6}"), FMT("     1"), 1);
+        test_format(FMT("{:6}"), FMT("  3.14"), 3.14);
         test_format(FMT("{:4}_{:4}"), FMT("   1_ab  "), 1, FLY_STR(char_type, "ab"));
     }
 
     CATCH_SECTION("Fill character may be set")
     {
         test_format(FMT("{:*>6}"), FMT("*****1"), 1);
+        test_format(FMT("{:*>6}"), FMT("**3.14"), 3.14);
         test_format(FMT("{:|>4} {:_>4}"), FMT("|||1 __ab"), 1, FLY_STR(char_type, "ab"));
     }
 
@@ -128,6 +130,8 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_format(FMT("{:*<+6}"), FMT("+1****"), 1);
         test_format(FMT("{:*< 6}"), FMT(" 1****"), 1);
+        test_format(FMT("{:*<+6}"), FMT("+3.14*"), 3.14);
+        test_format(FMT("{:*< 6}"), FMT(" 3.14*"), 3.14);
         test_format(FMT("{:*<#6b}"), FMT("0b11**"), 0b11);
         test_format(FMT("{:*<#6B}"), FMT("0B11**"), 0b11);
         test_format(FMT("{:*<#6x}"), FMT("0x41**"), 0x41);
@@ -135,17 +139,21 @@ CATCH_TEMPLATE_TEST_CASE(
 
         test_format(FMT("{:*>+6}"), FMT("****+1"), 1);
         test_format(FMT("{:*> 6}"), FMT("**** 1"), 1);
+        test_format(FMT("{:*>+6}"), FMT("*+3.14"), 3.14);
+        test_format(FMT("{:*> 6}"), FMT("* 3.14"), 3.14);
         test_format(FMT("{:*>#6b}"), FMT("**0b11"), 0b11);
         test_format(FMT("{:*>#6B}"), FMT("**0B11"), 0b11);
         test_format(FMT("{:*>#6x}"), FMT("**0x41"), 0x41);
         test_format(FMT("{:*>#6X}"), FMT("**0X41"), 0x41);
 
-        test_format(FMT("{:*^+6}"), FMT("****+1"), 1);
-        test_format(FMT("{:*^ 6}"), FMT("**** 1"), 1);
-        test_format(FMT("{:*^#6b}"), FMT("**0b11"), 0b11);
-        test_format(FMT("{:*^#6B}"), FMT("**0B11"), 0b11);
-        test_format(FMT("{:*^#6x}"), FMT("**0x41"), 0x41);
-        test_format(FMT("{:*^#6X}"), FMT("**0X41"), 0x41);
+        test_format(FMT("{:*^+6}"), FMT("**+1**"), 1);
+        test_format(FMT("{:*^ 6}"), FMT("** 1**"), 1);
+        test_format(FMT("{:*>+6}"), FMT("*+3.14"), 3.14);
+        test_format(FMT("{:*> 6}"), FMT("* 3.14"), 3.14);
+        test_format(FMT("{:*^#6b}"), FMT("*0b11*"), 0b11);
+        test_format(FMT("{:*^#6B}"), FMT("*0B11*"), 0b11);
+        test_format(FMT("{:*^#6x}"), FMT("*0x41*"), 0x41);
+        test_format(FMT("{:*^#6X}"), FMT("*0X41*"), 0x41);
     }
 
     CATCH_SECTION("Alignment default is based on presentation type")
@@ -188,19 +196,19 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:>#6x}"), FMT("  0x41"), 0x41);
         test_format(FMT("{:>#6X}"), FMT("  0X41"), 0x41);
 
-        test_format(FMT("{:^+6}"), FMT("    +1"), 1);
-        test_format(FMT("{:^ 6}"), FMT("     1"), 1);
-        test_format(FMT("{:^#6b}"), FMT("  0b11"), 0b11);
-        test_format(FMT("{:^#6B}"), FMT("  0B11"), 0b11);
-        test_format(FMT("{:^#6x}"), FMT("  0x41"), 0x41);
-        test_format(FMT("{:^#6X}"), FMT("  0X41"), 0x41);
+        test_format(FMT("{:^+6}"), FMT("  +1  "), 1);
+        test_format(FMT("{:^ 6}"), FMT("   1  "), 1);
+        test_format(FMT("{:^#6b}"), FMT(" 0b11 "), 0b11);
+        test_format(FMT("{:^#6B}"), FMT(" 0B11 "), 0b11);
+        test_format(FMT("{:^#6x}"), FMT(" 0x41 "), 0x41);
+        test_format(FMT("{:^#6X}"), FMT(" 0X41 "), 0x41);
     }
 
-    CATCH_SECTION("Alignment may be set to center-alignment (defaults to type-based alignment)")
+    CATCH_SECTION("Alignment may be set to center-alignment (actual alignment depends on type)")
     {
-        test_format(FMT("{:^6}"), FMT("ab    "), FLY_STR(char_type, "ab"));
-        test_format(FMT("{:^6}"), FMT("     1"), 1);
-        test_format(FMT("{:^6b}"), FMT("    11"), 0b11);
+        test_format(FMT("{:^6}"), FMT("  ab  "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:^6}"), FMT("  1   "), 1);
+        test_format(FMT("{:^6b}"), FMT("  11  "), 0b11);
         test_format(FMT("{:^6.2f}"), FMT("  3.14"), 3.14);
     }
 
@@ -268,6 +276,9 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:6}"), FMT("   -41"), -41);
         test_format(FMT("{:+6}"), FMT("   +41"), 41);
         test_format(FMT("{: 6}"), FMT("    41"), 41);
+        test_format(FMT("{:6}"), FMT(" -3.14"), -3.14);
+        test_format(FMT("{:+6}"), FMT(" +3.14"), 3.14);
+        test_format(FMT("{: 6}"), FMT("  3.14"), 3.14);
     }
 
     CATCH_SECTION("Zero-padding inserts zeros before sign and base indicators")
@@ -279,6 +290,9 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:06}"), FMT("-00041"), -41);
         test_format(FMT("{:+06}"), FMT("+00041"), 41);
         test_format(FMT("{: 06}"), FMT(" 00041"), 41);
+        test_format(FMT("{:06}"), FMT("-03.14"), -3.14);
+        test_format(FMT("{:+06}"), FMT("+03.14"), 3.14);
+        test_format(FMT("{: 06}"), FMT(" 03.14"), 3.14);
     }
 
     CATCH_SECTION("Zero-padding indicator ignored when alignment option is set")
@@ -290,6 +304,9 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:>06}"), FMT("   -41"), -41);
         test_format(FMT("{:>+06}"), FMT("   +41"), 41);
         test_format(FMT("{:> 06}"), FMT("    41"), 41);
+        test_format(FMT("{:>06}"), FMT(" -3.14"), -3.14);
+        test_format(FMT("{:>+06}"), FMT(" +3.14"), 3.14);
+        test_format(FMT("{:> 06}"), FMT("  3.14"), 3.14);
     }
 
     CATCH_SECTION("Width value may be set")
@@ -423,6 +440,25 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:b}"), FMT("1000001"), char8_t(0x41));
         test_format(FMT("{:b}"), FMT("1000001"), char16_t(0x41));
         test_format(FMT("{:b}"), FMT("1000001"), char32_t(0x41));
+
+        test_format(FMT("{:b}"), FMT("11111111"), std::numeric_limits<std::uint8_t>::max());
+        test_format(FMT("{:b}"), FMT("0"), std::numeric_limits<std::uint8_t>::min());
+        test_format(FMT("{:b}"), FMT("1111111"), std::numeric_limits<std::int8_t>::max());
+        test_format(FMT("{:b}"), FMT("-10000000"), std::numeric_limits<std::int8_t>::min());
+
+        test_format(
+            FMT("{:b}"),
+            FMT("1111111111111111111111111111111111111111111111111111111111111111"),
+            std::numeric_limits<std::uint64_t>::max());
+        test_format(FMT("{:b}"), FMT("0"), std::numeric_limits<std::uint64_t>::min());
+        test_format(
+            FMT("{:b}"),
+            FMT("111111111111111111111111111111111111111111111111111111111111111"),
+            std::numeric_limits<std::int64_t>::max());
+        test_format(
+            FMT("{:b}"),
+            FMT("-1000000000000000000000000000000000000000000000000000000000000000"),
+            std::numeric_limits<std::int64_t>::min());
     }
 
     CATCH_SECTION("Presentation type may be set (octal)")
@@ -435,6 +471,25 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:o}"), FMT("101"), char8_t(0x41));
         test_format(FMT("{:o}"), FMT("101"), char16_t(0x41));
         test_format(FMT("{:o}"), FMT("101"), char32_t(0x41));
+
+        test_format(FMT("{:o}"), FMT("377"), std::numeric_limits<std::uint8_t>::max());
+        test_format(FMT("{:o}"), FMT("0"), std::numeric_limits<std::uint8_t>::min());
+        test_format(FMT("{:o}"), FMT("177"), std::numeric_limits<std::int8_t>::max());
+        test_format(FMT("{:o}"), FMT("-200"), std::numeric_limits<std::int8_t>::min());
+
+        test_format(
+            FMT("{:o}"),
+            FMT("1777777777777777777777"),
+            std::numeric_limits<std::uint64_t>::max());
+        test_format(FMT("{:o}"), FMT("0"), std::numeric_limits<std::uint64_t>::min());
+        test_format(
+            FMT("{:o}"),
+            FMT("777777777777777777777"),
+            std::numeric_limits<std::int64_t>::max());
+        test_format(
+            FMT("{:o}"),
+            FMT("-1000000000000000000000"),
+            std::numeric_limits<std::int64_t>::min());
     }
 
     CATCH_SECTION("Presentation type may be set (decimal)")
@@ -447,6 +502,25 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:d}"), FMT("65"), char8_t(0x41));
         test_format(FMT("{:d}"), FMT("65"), char16_t(0x41));
         test_format(FMT("{:d}"), FMT("65"), char32_t(0x41));
+
+        test_format(FMT("{:d}"), FMT("255"), std::numeric_limits<std::uint8_t>::max());
+        test_format(FMT("{:d}"), FMT("0"), std::numeric_limits<std::uint8_t>::min());
+        test_format(FMT("{:d}"), FMT("127"), std::numeric_limits<std::int8_t>::max());
+        test_format(FMT("{:d}"), FMT("-128"), std::numeric_limits<std::int8_t>::min());
+
+        test_format(
+            FMT("{:d}"),
+            FMT("18446744073709551615"),
+            std::numeric_limits<std::uint64_t>::max());
+        test_format(FMT("{:d}"), FMT("0"), std::numeric_limits<std::uint64_t>::min());
+        test_format(
+            FMT("{:d}"),
+            FMT("9223372036854775807"),
+            std::numeric_limits<std::int64_t>::max());
+        test_format(
+            FMT("{:d}"),
+            FMT("-9223372036854775808"),
+            std::numeric_limits<std::int64_t>::min());
     }
 
     CATCH_SECTION("Presentation type may be set (hex)")
@@ -461,6 +535,22 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:x}"), FMT("41"), char32_t(0x41));
 
         test_format(FMT("{:X}"), FMT("BEEF"), 0xbeef);
+
+        test_format(FMT("{:x}"), FMT("ff"), std::numeric_limits<std::uint8_t>::max());
+        test_format(FMT("{:x}"), FMT("0"), std::numeric_limits<std::uint8_t>::min());
+        test_format(FMT("{:x}"), FMT("7f"), std::numeric_limits<std::int8_t>::max());
+        test_format(FMT("{:x}"), FMT("-80"), std::numeric_limits<std::int8_t>::min());
+
+        test_format(
+            FMT("{:x}"),
+            FMT("ffffffffffffffff"),
+            std::numeric_limits<std::uint64_t>::max());
+        test_format(FMT("{:x}"), FMT("0"), std::numeric_limits<std::uint64_t>::min());
+        test_format(FMT("{:x}"), FMT("7fffffffffffffff"), std::numeric_limits<std::int64_t>::max());
+        test_format(
+            FMT("{:x}"),
+            FMT("-8000000000000000"),
+            std::numeric_limits<std::int64_t>::min());
     }
 
     CATCH_SECTION("Presentation type may be set (hexfloat)")
@@ -515,19 +605,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:G}"), FMT("NAN"), std::nan(""));
         test_format(FMT("{:G}"), FMT("INF"), std::numeric_limits<float>::infinity());
         test_format(FMT("{:G}"), FMT("2.1"), 2.1f);
-    }
-
-    if constexpr (!std::is_same_v<StringType, typename BasicString::streamed_type>)
-    {
-        CATCH_SECTION("Invalid Unicode cannot be converted to UTF-8")
-        {
-            static constexpr const char_type s_invalid_utf8_leading_byte[] {
-                static_cast<char_type>(0xff),
-            };
-
-            StringType result = BasicString::format(s_invalid_utf8_leading_byte);
-            CATCH_CHECK(result.empty());
-        }
     }
 
 #if defined(FLY_COMPILER_DISABLE_CONSTEVAL)

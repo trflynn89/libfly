@@ -875,28 +875,15 @@ inline StringType BasicString<StringType>::format(
     FormatString<ParameterTypes...> &&fmt,
     ParameterTypes &&...parameters)
 {
-    typename traits::ostringstream_type stream;
+    if (fmt.has_error())
+    {
+        return format(FLY_ARR(char_type, "Ignored invalid formatter: {}"), fmt.error());
+    }
 
-    format(
-        stream,
-        std::forward<FormatString<ParameterTypes...>>(fmt),
+    detail::BasicStringFormatter<StringType, ParameterTypes...> formatter(
         std::forward<ParameterTypes>(parameters)...);
 
-    if constexpr (std::is_same_v<StringType, streamed_type>)
-    {
-        return stream.str();
-    }
-    else
-    {
-        using StreamedString = BasicString<streamed_type>;
-
-        if (auto result = StreamedString::template convert<StringType>(stream.str()); result)
-        {
-            return *std::move(result);
-        }
-
-        return StringType();
-    }
+    return formatter.format(std::forward<FormatString<ParameterTypes...>>(fmt));
 }
 
 //==================================================================================================
@@ -907,20 +894,11 @@ inline auto BasicString<StringType>::format(
     FormatString<ParameterTypes...> &&fmt,
     ParameterTypes &&...parameters) -> ostream_type &
 {
-    if (fmt.has_error())
-    {
-        streamer::stream_value(stream, "Ignored invalid formatter: ");
-        streamer::stream_value(stream, fmt.error());
-    }
-    else
-    {
-        detail::BasicStringFormatter<StringType, ParameterTypes...> formatter(
-            stream,
-            std::forward<ParameterTypes>(parameters)...);
+    StringType result = format(
+        std::forward<FormatString<ParameterTypes...>>(fmt),
+        std::forward<ParameterTypes>(parameters)...);
 
-        formatter.format(std::forward<FormatString<ParameterTypes...>>(fmt));
-    }
-
+    streamer::stream_value(stream, std::move(result));
     return stream;
 }
 
