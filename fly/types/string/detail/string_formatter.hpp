@@ -12,6 +12,7 @@
 #include <charconv>
 #include <cmath>
 #include <iomanip>
+#include <iterator>
 #include <limits>
 #include <optional>
 #include <system_error>
@@ -599,11 +600,16 @@ void BasicStringFormatter<StringType, ParameterTypes...>::append_string(
     else
     {
         using unicode = BasicStringUnicode<string_like_type>;
+
+        const std::size_t original_size = m_buffer.size();
         view_like_type view(value);
 
-        if (auto converted = unicode::template convert_encoding<StringType>(view); converted)
+        if (unicode::template convert_encoding_into<StringType>(view, std::back_inserter(m_buffer)))
         {
-            m_buffer.append(*std::move(converted), 0, max_width);
+            if (const auto inserted = m_buffer.size() - original_size; inserted > max_width)
+            {
+                m_buffer.resize(original_size + max_width);
+            }
         }
     }
 }
@@ -633,10 +639,9 @@ std::size_t BasicStringFormatter<StringType, ParameterTypes...>::append_number(T
         char *end = begin + s_buffer.size();
 
         const auto result = std::to_chars(begin, end, value, base);
+        std::string_view view(begin, static_cast<std::size_t>(std::distance(begin, result.ptr)));
 
-        // TODO: Support something like "convert_encoding_into" to avoid a string copy.
-        auto converted = unicode::template convert_encoding<StringType>(begin, result.ptr);
-        m_buffer.append(*converted);
+        unicode::template convert_encoding_into<StringType>(view, std::back_inserter(m_buffer));
     }
 
     return digits;
