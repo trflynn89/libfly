@@ -497,25 +497,9 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 {
     stream_modifiers modifiers(s_stream);
 
-    if (specifier.m_fill)
+    if (specifier.m_alignment == FormatSpecifier::Alignment::Default)
     {
-        modifiers.fill(static_cast<streamed_char_type>(*specifier.m_fill));
-    }
-
-    switch (specifier.m_alignment)
-    {
-        case FormatSpecifier::Alignment::Left:
-            modifiers.setf(std::ios_base::left);
-            break;
-
-        case FormatSpecifier::Alignment::Right:
-            modifiers.setf(std::ios_base::right);
-            break;
-
-        case FormatSpecifier::Alignment::Center: // TODO: Implement center-alignment.
-        case FormatSpecifier::Alignment::Default:
-            modifiers.setf(specifier.is_numeric() ? std::ios_base::right : std::ios_base::left);
-            break;
+        specifier.m_alignment = FormatSpecifier::Alignment::Right;
     }
 
     switch (specifier.m_sign)
@@ -542,10 +526,11 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     {
         modifiers.setf(std::ios_base::internal, std::ios_base::adjustfield);
         modifiers.fill(static_cast<streamed_char_type>(s_zero));
+        modifiers.width(resolve_size<std::streamsize>(specifier.m_width));
     }
 
-    modifiers.width(resolve_size<std::streamsize>(specifier.m_width));
     modifiers.precision(resolve_size<std::streamsize>(specifier.m_precision, 6));
+    specifier.m_precision = std::nullopt;
 
     switch (specifier.m_type)
     {
@@ -576,7 +561,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     }
 
     s_stream << value;
-    append_string(s_stream.str());
+    format_value(std::move(specifier), s_stream.str());
     s_stream.str({});
 }
 

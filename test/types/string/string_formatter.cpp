@@ -180,6 +180,19 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:>6.2f}"), FMT("  3.14"), 3.14);
     }
 
+    CATCH_SECTION("Alignment may be set to center-alignment")
+    {
+        test_format(FMT("{:^6}"), FMT("  ab  "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:^6}"), FMT("  1   "), 1);
+        test_format(FMT("{:^6b}"), FMT("  11  "), 0b11);
+        test_format(FMT("{:^6.2f}"), FMT(" 3.14 "), 3.14);
+
+        test_format(FMT("{:^7}"), FMT("  ab   "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:^7}"), FMT("   1   "), 1);
+        test_format(FMT("{:^7b}"), FMT("  11   "), 0b11);
+        test_format(FMT("{:^7.2f}"), FMT(" 3.14  "), 3.14);
+    }
+
     CATCH_SECTION("Alignment affects sign and base indicators")
     {
         test_format(FMT("{:<+6}"), FMT("+1    "), 1);
@@ -188,6 +201,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:<#6B}"), FMT("0B11  "), 0b11);
         test_format(FMT("{:<#6x}"), FMT("0x41  "), 0x41);
         test_format(FMT("{:<#6X}"), FMT("0X41  "), 0x41);
+        test_format(FMT("{:<+6}"), FMT("+3.14 "), 3.14);
+        test_format(FMT("{:< 6}"), FMT(" 3.14 "), 3.14);
 
         test_format(FMT("{:>+6}"), FMT("    +1"), 1);
         test_format(FMT("{:> 6}"), FMT("     1"), 1);
@@ -195,6 +210,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:>#6B}"), FMT("  0B11"), 0b11);
         test_format(FMT("{:>#6x}"), FMT("  0x41"), 0x41);
         test_format(FMT("{:>#6X}"), FMT("  0X41"), 0x41);
+        test_format(FMT("{:>+6}"), FMT(" +3.14"), 3.14);
+        test_format(FMT("{:> 6}"), FMT("  3.14"), 3.14);
 
         test_format(FMT("{:^+6}"), FMT("  +1  "), 1);
         test_format(FMT("{:^ 6}"), FMT("   1  "), 1);
@@ -202,14 +219,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:^#6B}"), FMT(" 0B11 "), 0b11);
         test_format(FMT("{:^#6x}"), FMT(" 0x41 "), 0x41);
         test_format(FMT("{:^#6X}"), FMT(" 0X41 "), 0x41);
-    }
-
-    CATCH_SECTION("Alignment may be set to center-alignment (actual alignment depends on type)")
-    {
-        test_format(FMT("{:^6}"), FMT("  ab  "), FLY_STR(char_type, "ab"));
-        test_format(FMT("{:^6}"), FMT("  1   "), 1);
-        test_format(FMT("{:^6b}"), FMT("  11  "), 0b11);
-        test_format(FMT("{:^6.2f}"), FMT("  3.14"), 3.14);
+        test_format(FMT("{:^+8}"), FMT(" +3.14  "), 3.14);
+        test_format(FMT("{:^ 8}"), FMT("  3.14  "), 3.14);
     }
 
     CATCH_SECTION("Sign defaults to negative-only")
