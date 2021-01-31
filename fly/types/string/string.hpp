@@ -943,19 +943,9 @@ template <typename StringType>
 template <typename T>
 std::optional<T> BasicString<StringType>::convert(const StringType &value)
 {
-    using U = std::decay_t<T>;
-
-    if constexpr (detail::is_supported_string_v<U>)
+    if constexpr (detail::is_supported_string_v<T>)
     {
-        auto it = value.cbegin();
-        const auto end = value.cend();
-
-        if (auto result = unicode::template convert_encoding<U>(it, end); result)
-        {
-            return static_cast<T>(*result);
-        }
-
-        return std::nullopt;
+        return unicode::template convert_encoding<T>(value);
     }
     else if constexpr (std::is_same_v<char_type, char>)
     {
@@ -963,10 +953,7 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
     }
     else
     {
-        auto it = value.cbegin();
-        const auto end = value.cend();
-
-        if (auto result = unicode::template convert_encoding<std::string>(it, end); result)
+        if (auto result = unicode::template convert_encoding<std::string>(value); result)
         {
             return detail::BasicStringConverter<std::string, T>::convert(*result);
         }
