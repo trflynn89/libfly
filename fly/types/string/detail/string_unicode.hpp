@@ -49,6 +49,20 @@ public:
      * Convert the Unicode encoding of a string to another encoding.
      *
      * @tparam DesiredStringType The type of string to convert to.
+     * @tparam SourceStringType The type of string to convert.
+     *
+     * @param value The encoded Unicode string to convert.
+     *
+     * @return If successful, a copy of the source string with the desired encoding. Otherwise, an
+     *         uninitialized value.
+     */
+    template <typename DesiredStringType, typename SourceStringType = StringType>
+    static std::optional<DesiredStringType> convert_encoding(SourceStringType &&value);
+
+    /**
+     * Convert the Unicode encoding of a string to another encoding.
+     *
+     * @tparam DesiredStringType The type of string to convert to.
      * @tparam IteratorType The type of the encoded Unicode string's iterator.
      *
      * @param it Pointer to the beginning of the encoded Unicode string.
@@ -354,6 +368,16 @@ bool BasicStringUnicode<StringType>::validate_encoding(IteratorType &it, const I
 
 //==================================================================================================
 template <typename StringType>
+template <typename DesiredStringType, typename SourceStringType>
+inline std::optional<DesiredStringType>
+BasicStringUnicode<StringType>::convert_encoding(SourceStringType &&value)
+{
+    auto it = value.cbegin();
+    return convert_encoding<DesiredStringType>(it, value.cend());
+}
+
+//==================================================================================================
+template <typename StringType>
 template <typename DesiredStringType, typename IteratorType>
 std::optional<DesiredStringType>
 BasicStringUnicode<StringType>::convert_encoding(IteratorType &it, const IteratorType &end)
@@ -466,8 +490,7 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
 {
     StringType result;
 
-    // TODO: Replace this with BasicString::format without actually including string_formatter.hpp,
-    // because string_formatter.hpp depends on string_streamer.hpp, which depends on this file.
+    // TODO: Replace this with BasicString::format without actually including string_formatter.hpp.
     auto to_hex = [&codepoint](std::size_t length) -> StringType
     {
         static const auto *s_digits = FLY_STR(char_type, "0123456789abcdef");
