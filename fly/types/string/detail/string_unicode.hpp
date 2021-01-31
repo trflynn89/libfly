@@ -6,6 +6,7 @@
 
 #include <array>
 #include <functional>
+#include <iterator>
 #include <optional>
 #include <string>
 
@@ -74,6 +75,43 @@ public:
     template <typename DesiredStringType, typename IteratorType>
     static std::optional<DesiredStringType>
     convert_encoding(IteratorType &it, const IteratorType &end);
+
+    /**
+     * Convert the Unicode encoding of a string to another encoding, inserting the result into the
+     * provided output iterator.
+     *
+     * @tparam DesiredStringType The type of string to convert to.
+     * @tparam IteratorType The type of the encoded Unicode string's iterator.
+     * @tparam OutputIteratorType The type of the output iterator to insert the result into.
+     *
+     * @param it Pointer to the beginning of the encoded Unicode string.
+     * @param end Pointer to the end of the encoded Unicode string.
+     * @param out The output iterator to insert the result into.
+     *
+     * @return Whether the conversion was successful.
+     */
+    template <
+        typename DesiredStringType,
+        typename OutputIteratorType,
+        typename SourceStringType = StringType>
+    static bool convert_encoding_into(SourceStringType &&value, OutputIteratorType out);
+
+    /**
+     * Convert the Unicode encoding of a string to another encoding, inserting the result into the
+     * provided output iterator.
+     *
+     * @tparam DesiredStringType The type of string to convert to.
+     * @tparam OutputIteratorType The type of the output iterator to insert the result into.
+     * @tparam SourceStringType The type of string to convert.
+     *
+     * @param value The encoded Unicode string to convert.
+     * @param out The output iterator to insert the result into.
+     *
+     * @return Whether the conversion was successful.
+     */
+    template <typename DesiredStringType, typename IteratorType, typename OutputIteratorType>
+    static bool
+    convert_encoding_into(IteratorType &it, const IteratorType &end, OutputIteratorType out);
 
     /**
      * Decode a single Unicode codepoint, starting at the character pointed to by the provided
@@ -155,6 +193,12 @@ public:
     static std::optional<StringType> unescape_codepoint(IteratorType &it, const IteratorType &end);
 
 private:
+    friend BasicStringUnicode<std::string>;
+    friend BasicStringUnicode<std::wstring>;
+    friend BasicStringUnicode<std::u8string>;
+    friend BasicStringUnicode<std::u16string>;
+    friend BasicStringUnicode<std::u32string>;
+
     /**
      * Escape a single Unicode codepoint.
      *
@@ -234,32 +278,44 @@ private:
     /**
      * Encode a Unicode codepoint into a UTF-8 string.
      *
-     * @param codepoint The codepoint to encode.
+     * @tparam OutputIteratorType The type of the output iterator to insert the result into.
      *
-     * @return A string containing the encoded Unicode codepoint.
+     * @param codepoint The codepoint to encode.
+     * @param out The output iterator to insert the result into.
      */
-    template <typename CharType = char_type, enable_if<size_of_type_is<CharType, 1>> = 0>
-    static StringType codepoint_to_string(codepoint_type codepoint);
+    template <
+        typename OutputIteratorType,
+        typename CharType = char_type,
+        enable_if<size_of_type_is<CharType, 1>> = 0>
+    static void codepoint_to_string(codepoint_type codepoint, OutputIteratorType out);
 
     /**
      * Encode a Unicode codepoint into a UTF-16 string.
      *
-     * @param codepoint The codepoint to encode.
+     * @tparam OutputIteratorType The type of the output iterator to insert the result into.
      *
-     * @return A string containing the encoded Unicode codepoint.
+     * @param codepoint The codepoint to encode.
+     * @param out The output iterator to insert the result into.
      */
-    template <typename CharType = char_type, enable_if<size_of_type_is<CharType, 2>> = 0>
-    static StringType codepoint_to_string(codepoint_type codepoint);
+    template <
+        typename OutputIteratorType,
+        typename CharType = char_type,
+        enable_if<size_of_type_is<CharType, 2>> = 0>
+    static void codepoint_to_string(codepoint_type codepoint, OutputIteratorType out);
 
     /**
      * Encode a Unicode codepoint into a UTF-32 string.
      *
-     * @param codepoint The codepoint to encode.
+     * @tparam OutputIteratorType The type of the output iterator to insert the result into.
      *
-     * @return A string containing the encoded Unicode codepoint.
+     * @param codepoint The codepoint to encode.
+     * @param out The output iterator to insert the result into.
      */
-    template <typename CharType = char_type, enable_if<size_of_type_is<CharType, 4>> = 0>
-    static StringType codepoint_to_string(codepoint_type codepoint);
+    template <
+        typename OutputIteratorType,
+        typename CharType = char_type,
+        enable_if<size_of_type_is<CharType, 4>> = 0>
+    static void codepoint_to_string(codepoint_type codepoint, OutputIteratorType out);
 
     /**
      * Create a Unicode codepoint from either one complete codepoint or two surrogate halves. The
@@ -382,26 +438,50 @@ template <typename DesiredStringType, typename IteratorType>
 std::optional<DesiredStringType>
 BasicStringUnicode<StringType>::convert_encoding(IteratorType &it, const IteratorType &end)
 {
-    using DesiredUnicodeType = BasicStringUnicode<DesiredStringType>;
-
     DesiredStringType result;
     result.reserve(static_cast<typename StringType::size_type>(std::distance(it, end)));
+
+    if (convert_encoding_into<DesiredStringType>(it, end, std::back_inserter(result)))
+    {
+        return result;
+    }
+
+    return std::nullopt;
+}
+
+//==================================================================================================
+template <typename StringType>
+template <typename DesiredStringType, typename OutputIteratorType, typename SourceStringType>
+bool BasicStringUnicode<StringType>::convert_encoding_into(
+    SourceStringType &&value,
+    OutputIteratorType out)
+{
+    auto it = value.cbegin();
+    return convert_encoding_into<DesiredStringType>(it, value.cend(), out);
+}
+
+//==================================================================================================
+template <typename StringType>
+template <typename DesiredStringType, typename IteratorType, typename OutputIteratorType>
+bool BasicStringUnicode<StringType>::convert_encoding_into(
+    IteratorType &it,
+    const IteratorType &end,
+    OutputIteratorType out)
+{
+    using DesiredUnicodeType = BasicStringUnicode<DesiredStringType>;
 
     while (it != end)
     {
         if (auto codepoint = decode_codepoint(it, end); codepoint)
         {
-            if (auto encoded = DesiredUnicodeType::encode_codepoint(*codepoint); encoded)
-            {
-                result += *std::move(encoded);
-                continue;
-            }
+            DesiredUnicodeType::codepoint_to_string(*codepoint, out);
+            continue;
         }
 
-        return std::nullopt;
+        return false;
     }
 
-    return result;
+    return true;
 }
 
 //==================================================================================================
@@ -426,7 +506,10 @@ std::optional<StringType> BasicStringUnicode<StringType>::encode_codepoint(codep
 {
     if (validate_codepoint(codepoint))
     {
-        return codepoint_to_string(codepoint);
+        StringType result;
+        codepoint_to_string(codepoint, std::back_inserter(result));
+
+        return result;
     }
 
     return std::nullopt;
@@ -663,64 +746,62 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(
 
 //==================================================================================================
 template <typename StringType>
-template <typename CharType, enable_if<size_of_type_is<CharType, 1>>>
-StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type codepoint)
+template <typename OutputIteratorType, typename CharType, enable_if<size_of_type_is<CharType, 1>>>
+void BasicStringUnicode<StringType>::codepoint_to_string(
+    codepoint_type codepoint,
+    OutputIteratorType out)
 {
-    StringType result;
-
     if (codepoint < 0x80)
     {
-        result += static_cast<char_type>(codepoint);
+        *out++ = static_cast<char_type>(codepoint);
     }
     else if (codepoint < 0x800)
     {
-        result += static_cast<char_type>(0xc0 | (codepoint >> 6));
-        result += static_cast<char_type>(0x80 | (codepoint & 0x3f));
+        *out++ = static_cast<char_type>(0xc0 | (codepoint >> 6));
+        *out++ = static_cast<char_type>(0x80 | (codepoint & 0x3f));
     }
     else if (codepoint < 0x10000)
     {
-        result += static_cast<char_type>(0xe0 | (codepoint >> 12));
-        result += static_cast<char_type>(0x80 | ((codepoint >> 6) & 0x3f));
-        result += static_cast<char_type>(0x80 | (codepoint & 0x3f));
+        *out++ = static_cast<char_type>(0xe0 | (codepoint >> 12));
+        *out++ = static_cast<char_type>(0x80 | ((codepoint >> 6) & 0x3f));
+        *out++ = static_cast<char_type>(0x80 | (codepoint & 0x3f));
     }
     else
     {
-        result += static_cast<char_type>(0xf0 | (codepoint >> 18));
-        result += static_cast<char_type>(0x80 | ((codepoint >> 12) & 0x3f));
-        result += static_cast<char_type>(0x80 | ((codepoint >> 6) & 0x3f));
-        result += static_cast<char_type>(0x80 | (codepoint & 0x3f));
+        *out++ = static_cast<char_type>(0xf0 | (codepoint >> 18));
+        *out++ = static_cast<char_type>(0x80 | ((codepoint >> 12) & 0x3f));
+        *out++ = static_cast<char_type>(0x80 | ((codepoint >> 6) & 0x3f));
+        *out++ = static_cast<char_type>(0x80 | (codepoint & 0x3f));
     }
-
-    return result;
 }
 
 //==================================================================================================
 template <typename StringType>
-template <typename CharType, enable_if<size_of_type_is<CharType, 2>>>
-StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type codepoint)
+template <typename OutputIteratorType, typename CharType, enable_if<size_of_type_is<CharType, 2>>>
+void BasicStringUnicode<StringType>::codepoint_to_string(
+    codepoint_type codepoint,
+    OutputIteratorType out)
 {
-    StringType result;
-
     if (codepoint < 0x10000)
     {
-        result += static_cast<char_type>(codepoint);
+        *out++ = static_cast<char_type>(codepoint);
     }
     else
     {
         codepoint -= 0x10000;
-        result += static_cast<char_type>(s_high_surrogate_min | (codepoint >> 10));
-        result += static_cast<char_type>(s_low_surrogate_min | (codepoint & 0x3ff));
+        *out++ = static_cast<char_type>(s_high_surrogate_min | (codepoint >> 10));
+        *out++ = static_cast<char_type>(s_low_surrogate_min | (codepoint & 0x3ff));
     }
-
-    return result;
 }
 
 //==================================================================================================
 template <typename StringType>
-template <typename CharType, enable_if<size_of_type_is<CharType, 4>>>
-StringType BasicStringUnicode<StringType>::codepoint_to_string(codepoint_type codepoint)
+template <typename OutputIteratorType, typename CharType, enable_if<size_of_type_is<CharType, 4>>>
+void BasicStringUnicode<StringType>::codepoint_to_string(
+    codepoint_type codepoint,
+    OutputIteratorType out)
 {
-    return StringType(1, static_cast<char_type>(codepoint));
+    *out++ = static_cast<char_type>(codepoint);
 }
 
 //==================================================================================================
