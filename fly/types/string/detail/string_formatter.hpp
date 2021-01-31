@@ -601,10 +601,7 @@ void BasicStringFormatter<StringType, ParameterTypes...>::append_string(
         using unicode = BasicStringUnicode<string_like_type>;
         view_like_type view(value);
 
-        auto it = view.cbegin();
-        const auto end = view.cend();
-
-        if (auto converted = unicode::template convert_encoding<StringType>(it, end); converted)
+        if (auto converted = unicode::template convert_encoding<StringType>(view); converted)
         {
             m_buffer.append(*std::move(converted), 0, max_width);
         }

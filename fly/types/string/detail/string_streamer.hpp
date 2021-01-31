@@ -212,7 +212,6 @@ template <typename T>
 void BasicStringStreamer<StringType>::stream_string(ostream_type &stream, T &&value)
 {
     using string_like_type = detail::is_like_supported_string_t<T>;
-    using string_like_traits = BasicStringTraits<string_like_type>;
 
     if constexpr (std::is_same_v<streamed_type, string_like_type>)
     {
@@ -220,16 +219,15 @@ void BasicStringStreamer<StringType>::stream_string(ostream_type &stream, T &&va
     }
     else
     {
+        using string_like_traits = BasicStringTraits<string_like_type>;
+        using string_like_view = typename string_like_traits::view_type;
         using unicode = BasicStringUnicode<string_like_type>;
-        using streamer = BasicStringStreamer<streamed_type>;
 
-        typename string_like_traits::view_type view(std::forward<T>(value));
-        auto it = view.cbegin();
-        const auto end = view.cend();
+        string_like_view view(std::forward<T>(value));
 
-        if (auto converted = unicode::template convert_encoding<streamed_type>(it, end); converted)
+        if (auto converted = unicode::template convert_encoding<streamed_type>(view); converted)
         {
-            streamer::stream_value(stream, *std::move(converted));
+            stream << *std::move(converted);
         }
     }
 }
