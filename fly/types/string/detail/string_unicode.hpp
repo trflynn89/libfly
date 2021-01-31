@@ -61,22 +61,6 @@ public:
     static std::optional<DesiredStringType> convert_encoding(SourceStringType &&value);
 
     /**
-     * Convert the Unicode encoding of a string to another encoding.
-     *
-     * @tparam DesiredStringType The type of string to convert to.
-     * @tparam IteratorType The type of the encoded Unicode string's iterator.
-     *
-     * @param it Pointer to the beginning of the encoded Unicode string.
-     * @param end Pointer to the end of the encoded Unicode string.
-     *
-     * @return If successful, a copy of the source string with the desired encoding. Otherwise, an
-     *         uninitialized value.
-     */
-    template <typename DesiredStringType, typename IteratorType>
-    static std::optional<DesiredStringType>
-    convert_encoding(IteratorType &it, const IteratorType &end);
-
-    /**
      * Convert the Unicode encoding of a string to another encoding, inserting the result into the
      * provided output iterator.
      *
@@ -95,23 +79,6 @@ public:
         typename OutputIteratorType,
         typename SourceStringType = StringType>
     static bool convert_encoding_into(SourceStringType &&value, OutputIteratorType out);
-
-    /**
-     * Convert the Unicode encoding of a string to another encoding, inserting the result into the
-     * provided output iterator.
-     *
-     * @tparam DesiredStringType The type of string to convert to.
-     * @tparam OutputIteratorType The type of the output iterator to insert the result into.
-     * @tparam SourceStringType The type of string to convert.
-     *
-     * @param value The encoded Unicode string to convert.
-     * @param out The output iterator to insert the result into.
-     *
-     * @return Whether the conversion was successful.
-     */
-    template <typename DesiredStringType, typename IteratorType, typename OutputIteratorType>
-    static bool
-    convert_encoding_into(IteratorType &it, const IteratorType &end, OutputIteratorType out);
 
     /**
      * Decode a single Unicode codepoint, starting at the character pointed to by the provided
@@ -428,20 +395,12 @@ template <typename DesiredStringType, typename SourceStringType>
 inline std::optional<DesiredStringType>
 BasicStringUnicode<StringType>::convert_encoding(SourceStringType &&value)
 {
-    auto it = value.cbegin();
-    return convert_encoding<DesiredStringType>(it, value.cend());
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename DesiredStringType, typename IteratorType>
-std::optional<DesiredStringType>
-BasicStringUnicode<StringType>::convert_encoding(IteratorType &it, const IteratorType &end)
-{
     DesiredStringType result;
-    result.reserve(static_cast<typename StringType::size_type>(std::distance(it, end)));
+    result.reserve(static_cast<typename StringType::size_type>(value.size()));
 
-    if (convert_encoding_into<DesiredStringType>(it, end, std::back_inserter(result)))
+    if (convert_encoding_into<DesiredStringType>(
+            std::forward<SourceStringType>(value),
+            std::back_inserter(result)))
     {
         return result;
     }
@@ -456,19 +415,10 @@ bool BasicStringUnicode<StringType>::convert_encoding_into(
     SourceStringType &&value,
     OutputIteratorType out)
 {
-    auto it = value.cbegin();
-    return convert_encoding_into<DesiredStringType>(it, value.cend(), out);
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename DesiredStringType, typename IteratorType, typename OutputIteratorType>
-bool BasicStringUnicode<StringType>::convert_encoding_into(
-    IteratorType &it,
-    const IteratorType &end,
-    OutputIteratorType out)
-{
     using DesiredUnicodeType = BasicStringUnicode<DesiredStringType>;
+
+    auto it = value.cbegin();
+    const auto end = value.cend();
 
     while (it != end)
     {
