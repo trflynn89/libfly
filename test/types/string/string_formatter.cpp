@@ -356,9 +356,23 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision value sets maximum string size")
     {
-        test_format(FMT("{:.3s}"), FMT("a"), FLY_STR(char_type, "a"));
-        test_format(FMT("{:.3s}"), FMT("ab"), FLY_STR(char_type, "ab"));
-        test_format(FMT("{:.3s}"), FMT("abc"), FLY_STR(char_type, "abcdef"));
+        test_format(FMT("{:.3s}"), FMT("a"), "a");
+        test_format(FMT("{:.3s}"), FMT("a"), L"a");
+        test_format(FMT("{:.3s}"), FMT("a"), u8"a");
+        test_format(FMT("{:.3s}"), FMT("a"), u"a");
+        test_format(FMT("{:.3s}"), FMT("a"), U"a");
+
+        test_format(FMT("{:.3s}"), FMT("ab"), "ab");
+        test_format(FMT("{:.3s}"), FMT("ab"), L"ab");
+        test_format(FMT("{:.3s}"), FMT("ab"), u8"ab");
+        test_format(FMT("{:.3s}"), FMT("ab"), u"ab");
+        test_format(FMT("{:.3s}"), FMT("ab"), U"ab");
+
+        test_format(FMT("{:.3s}"), FMT("abc"), "abcdef");
+        test_format(FMT("{:.3s}"), FMT("abc"), L"abcdef");
+        test_format(FMT("{:.3s}"), FMT("abc"), u8"abcdef");
+        test_format(FMT("{:.3s}"), FMT("abc"), u"abcdef");
+        test_format(FMT("{:.3s}"), FMT("abc"), U"abcdef");
 
         test_format(FMT("{:.0s}"), FMT(""), FLY_STR(char_type, "a"));
         test_format(FMT("{:.0s}"), FMT(""), FLY_STR(char_type, "ab"));
