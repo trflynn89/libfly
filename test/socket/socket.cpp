@@ -601,50 +601,26 @@ CATCH_TEST_CASE("Socket", "[socket]")
 
         CATCH_SECTION("A synchronous server with a synchronous client")
         {
-            auto server = std::async(std::launch::async, server_thread, false);
-            auto client = std::async(std::launch::async, client_thread, false);
-
-            CATCH_CHECK(server.valid());
-            server.get();
-
-            CATCH_CHECK(client.valid());
-            client.get();
+            auto server = std::jthread(server_thread, false);
+            auto client = std::jthread(client_thread, false);
         }
 
         CATCH_SECTION("An asynchronous server with a synchronous client")
         {
-            auto server = std::async(std::launch::async, server_thread, true);
-            auto client = std::async(std::launch::async, client_thread, false);
-
-            CATCH_CHECK(server.valid());
-            server.get();
-
-            CATCH_CHECK(client.valid());
-            client.get();
+            auto server = std::jthread(server_thread, true);
+            auto client = std::jthread(client_thread, false);
         }
 
         CATCH_SECTION("A synchronous server with an asynchronous client")
         {
-            auto server = std::async(std::launch::async, server_thread, false);
-            auto client = std::async(std::launch::async, client_thread, true);
-
-            CATCH_CHECK(server.valid());
-            server.get();
-
-            CATCH_CHECK(client.valid());
-            client.get();
+            auto server = std::jthread(server_thread, false);
+            auto client = std::jthread(client_thread, true);
         }
 
         CATCH_SECTION("An asynchronous server with an asynchronous client")
         {
-            auto server = std::async(std::launch::async, server_thread, true);
-            auto client = std::async(std::launch::async, client_thread, true);
-
-            CATCH_CHECK(server.valid());
-            server.get();
-
-            CATCH_CHECK(client.valid());
-            client.get();
+            auto server = std::jthread(server_thread, true);
+            auto client = std::jthread(client_thread, true);
         }
     }
 
@@ -744,50 +720,26 @@ CATCH_TEST_CASE("Socket", "[socket]")
 
         CATCH_SECTION("A synchronous server with a synchronous client")
         {
-            auto server = std::async(std::launch::async, server_thread, false);
-            auto client = std::async(std::launch::async, client_thread, false);
-
-            CATCH_CHECK(server.valid());
-            server.get();
-
-            CATCH_CHECK(client.valid());
-            client.get();
+            auto server = std::jthread(server_thread, false);
+            auto client = std::jthread(client_thread, false);
         }
 
         CATCH_SECTION("An asynchronous server with a synchronous client")
         {
-            auto server = std::async(std::launch::async, server_thread, true);
-            auto client = std::async(std::launch::async, client_thread, false);
-
-            CATCH_CHECK(server.valid());
-            server.get();
-
-            CATCH_CHECK(client.valid());
-            client.get();
+            auto server = std::jthread(server_thread, true);
+            auto client = std::jthread(client_thread, false);
         }
 
         CATCH_SECTION("A synchronous server with an asynchronous client")
         {
-            auto server = std::async(std::launch::async, server_thread, false);
-            auto client = std::async(std::launch::async, client_thread, true);
-
-            CATCH_CHECK(server.valid());
-            server.get();
-
-            CATCH_CHECK(client.valid());
-            client.get();
+            auto server = std::jthread(server_thread, false);
+            auto client = std::jthread(client_thread, true);
         }
 
         CATCH_SECTION("An asynchronous server with an asynchronous client")
         {
-            auto server = std::async(std::launch::async, server_thread, true);
-            auto client = std::async(std::launch::async, client_thread, true);
-
-            CATCH_CHECK(server.valid());
-            server.get();
-
-            CATCH_CHECK(client.valid());
-            client.get();
+            auto server = std::jthread(server_thread, true);
+            auto client = std::jthread(client_thread, true);
         }
     }
 

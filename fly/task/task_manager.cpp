@@ -3,8 +3,6 @@
 #include "fly/logger/logger.hpp"
 #include "fly/task/task_runner.hpp"
 
-#include <thread>
-
 namespace fly {
 
 namespace {
@@ -16,7 +14,7 @@ namespace {
 //==================================================================================================
 TaskManager::TaskManager(std::uint32_t num_workers) noexcept :
     m_keep_running(false),
-    m_num_workers(num_workers)
+    m_thread_count(num_workers)
 {
 }
 
@@ -27,17 +25,12 @@ bool TaskManager::start()
 
     if (m_keep_running.compare_exchange_strong(expected, true))
     {
-        std::shared_ptr<TaskManager> task_manager = shared_from_this();
-
-        for (std::uint32_t i = 0; i < m_num_workers; ++i)
+        for (std::uint32_t i = 0; i < m_thread_count; ++i)
         {
-            m_futures.push_back(
-                std::async(std::launch::async, &TaskManager::worker_thread, task_manager));
+            m_threads.push_back(std::jthread(&TaskManager::worker_thread, this));
         }
 
-        m_futures.push_back(
-            std::async(std::launch::async, &TaskManager::timer_thread, task_manager));
-
+        m_threads.push_back(std::jthread(&TaskManager::timer_thread, this));
         return true;
     }
 
@@ -51,14 +44,7 @@ bool TaskManager::stop()
 
     if (m_keep_running.compare_exchange_strong(expected, false))
     {
-        for (auto &future : m_futures)
-        {
-            if (future.valid())
-            {
-                future.get();
-            }
-        }
-
+        m_threads.clear();
         return true;
     }
 

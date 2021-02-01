@@ -5,9 +5,9 @@
 
 #include <atomic>
 #include <chrono>
-#include <future>
 #include <memory>
 #include <mutex>
+#include <thread>
 #include <vector>
 
 namespace fly {
@@ -122,9 +122,8 @@ private:
 
     std::atomic_bool m_keep_running;
 
-    std::vector<std::future<void>> m_futures;
-
-    std::uint32_t m_num_workers;
+    std::vector<std::jthread> m_threads;
+    std::uint32_t m_thread_count;
 };
 
 //==================================================================================================
