@@ -25,8 +25,8 @@ class BasicStringClassifier
 
 public:
     /**
-     * Determine the length of any string-like value. Accepts character arrays, std::basic_string
-     * specializations, and std::basic_string_view specializations.
+     * Determine the length of any string-like value. Accepts std::basic_string and
+     * std::basic_string_view specializations.
      *
      * @tparam T The string-like type.
      *
@@ -35,7 +35,17 @@ public:
      * @return The length of the string-like value.
      */
     template <typename T, enable_if<detail::is_like_supported_string<T>> = 0>
-    static size_type size(T &&value);
+    static constexpr size_type size(T &&value);
+
+    /**
+     * Determine the length of a character array value, excluding the null terminator (if present).
+     *
+     * @param value The character array.
+     *
+     * @return The length of the character array.
+     */
+    template <std::size_t N>
+    static constexpr size_type size(const char_type (&value)[N]);
 
     /**
      * Checks if the given character is an alphabetic character as classified by the default C
@@ -144,21 +154,22 @@ private:
      */
     static constexpr char_type unify_az_characters(char_type ch);
 
-    static constexpr const char_type s_zero = FLY_CHR(char_type, '0');
-    static constexpr const char_type s_upper_a = FLY_CHR(char_type, 'A');
-    static constexpr const char_type s_upper_z = FLY_CHR(char_type, 'Z');
-    static constexpr const char_type s_upper_f = FLY_CHR(char_type, 'F');
-    static constexpr const char_type s_lower_a = FLY_CHR(char_type, 'a');
-    static constexpr const char_type s_lower_z = FLY_CHR(char_type, 'z');
+    static constexpr const auto s_null_terminator = FLY_CHR(char_type, '\0');
+    static constexpr const auto s_zero = FLY_CHR(char_type, '0');
+    static constexpr const auto s_upper_a = FLY_CHR(char_type, 'A');
+    static constexpr const auto s_upper_z = FLY_CHR(char_type, 'Z');
+    static constexpr const auto s_upper_f = FLY_CHR(char_type, 'F');
+    static constexpr const auto s_lower_a = FLY_CHR(char_type, 'a');
+    static constexpr const auto s_lower_z = FLY_CHR(char_type, 'z');
 
-    static constexpr const int_type s_case_bit = static_cast<int_type>(0x20);
-    static constexpr const int_type s_case_mask = static_cast<int_type>(~s_case_bit);
+    static constexpr const auto s_case_bit = static_cast<int_type>(0x20);
+    static constexpr const auto s_case_mask = static_cast<int_type>(~s_case_bit);
 };
 
 //==================================================================================================
 template <typename StringType>
 template <typename T, enable_if<detail::is_like_supported_string<T>>>
-auto BasicStringClassifier<StringType>::size(T &&value) -> size_type
+constexpr inline auto BasicStringClassifier<StringType>::size(T &&value) -> size_type
 {
     if constexpr (any_same_v<T, StringType, view_type>)
     {
@@ -168,6 +179,16 @@ auto BasicStringClassifier<StringType>::size(T &&value) -> size_type
     {
         return std::char_traits<char_type>::length(std::forward<T>(value));
     }
+}
+
+//==================================================================================================
+template <typename StringType>
+template <std::size_t N>
+constexpr inline auto BasicStringClassifier<StringType>::size(const char_type (&value)[N])
+    -> size_type
+{
+    static_assert(N > 0, "Character arrays must have non-zero size");
+    return N - ((value[N - 1] == s_null_terminator) ? 1 : 0);
 }
 
 //==================================================================================================

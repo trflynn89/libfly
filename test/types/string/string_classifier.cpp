@@ -24,10 +24,12 @@ CATCH_TEMPLATE_TEST_CASE(
         const char_type *cstr = FLY_STR(char_type, "ten chars!");
         StringType str = cstr;
         view_type view = str;
+        const char_type arr[] = {'t', 'e', 'n', ' ', 'c', 'h', 'a', 'r', 's', '!'};
 
         CATCH_CHECK(BasicString::size(cstr) == 10);
         CATCH_CHECK(BasicString::size(str) == 10);
         CATCH_CHECK(BasicString::size(view) == 10);
+        CATCH_CHECK(BasicString::size(arr) == 10);
     }
 
     CATCH_SECTION("Check if a character is an alphabetic character")
