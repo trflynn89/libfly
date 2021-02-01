@@ -169,7 +169,7 @@ private:
     void format_value(FormatSpecifier &&specifier, T value);
 
     /**
-     * Append a string-like value to the buffer, with an optional maximum string length.
+     * Append a string-like value to the buffer.
      *
      * If the string-like value's character type is the same as the format string, the value is
      * inserted directly. Otherwise, it is first transcoded to the appropriate Unicode encoding.
@@ -177,10 +177,10 @@ private:
      * @tparam T The type of the value to append.
      *
      * @param value The value to append.
-     * @param max_width The maximum number of characters from the value to append.
+     * @param value_size The size of the value to append.
      */
     template <typename T, fly::enable_if<detail::is_like_supported_string<T>> = 0>
-    void append_string(const T &value, std::size_t max_width = StringType::npos);
+    void append_string(const T &value, std::size_t value_size);
 
     /**
      * Append the string representation of a base-N integral value to the buffer, where N is the
@@ -341,13 +341,13 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     {
         case FormatSpecifier::Alignment::Left:
         case FormatSpecifier::Alignment::Default:
-            append_string(value, max_width);
+            append_string(value, value_size);
             m_buffer.append(padding_size, padding_char);
             break;
 
         case FormatSpecifier::Alignment::Right:
             m_buffer.append(padding_size, padding_char);
-            append_string(value, max_width);
+            append_string(value, value_size);
             break;
 
         case FormatSpecifier::Alignment::Center:
@@ -357,7 +357,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
                 (padding_size % 2 == 0) ? left_padding : left_padding + 1;
 
             m_buffer.append(left_padding, padding_char);
-            append_string(value, max_width);
+            append_string(value, value_size);
             m_buffer.append(right_padding, padding_char);
             break;
         }
@@ -588,29 +588,29 @@ template <typename StringType, typename... ParameterTypes>
 template <typename T, fly::enable_if<detail::is_like_supported_string<T>>>
 void BasicStringFormatter<StringType, ParameterTypes...>::append_string(
     const T &value,
-    std::size_t max_width)
+    std::size_t value_size)
 {
     using string_like_type = detail::is_like_supported_string_t<T>;
     using view_like_type = std::basic_string_view<typename string_like_type::value_type>;
+    view_like_type view;
+
+    if constexpr (std::is_array_v<T> || std::is_pointer_v<T>)
+    {
+        view = view_like_type(value, value_size);
+    }
+    else
+    {
+        view = view_like_type(value).substr(0, value_size);
+    }
 
     if constexpr (std::is_same_v<StringType, string_like_type>)
     {
-        m_buffer.append(value, 0, max_width);
+        m_buffer.append(view.data(), view.size());
     }
     else
     {
         using unicode = BasicStringUnicode<string_like_type>;
-
-        const std::size_t original_size = m_buffer.size();
-        view_like_type view(value);
-
-        if (unicode::template convert_encoding_into<StringType>(view, std::back_inserter(m_buffer)))
-        {
-            if (const auto inserted = m_buffer.size() - original_size; inserted > max_width)
-            {
-                m_buffer.resize(original_size + max_width);
-            }
-        }
+        unicode::template convert_encoding_into<StringType>(view, std::back_inserter(m_buffer));
     }
 }
 

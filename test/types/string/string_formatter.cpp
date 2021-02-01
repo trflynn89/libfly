@@ -368,11 +368,22 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:.3s}"), FMT("ab"), u"ab");
         test_format(FMT("{:.3s}"), FMT("ab"), U"ab");
 
-        test_format(FMT("{:.3s}"), FMT("abc"), "abcdef");
-        test_format(FMT("{:.3s}"), FMT("abc"), L"abcdef");
-        test_format(FMT("{:.3s}"), FMT("abc"), u8"abcdef");
-        test_format(FMT("{:.3s}"), FMT("abc"), u"abcdef");
-        test_format(FMT("{:.3s}"), FMT("abc"), U"abcdef");
+        test_format(FMT("{:.3s}"), FMT("abc"), FLY_STR(char, "abcdef"));
+        test_format(FMT("{:.3s}"), FMT("abc"), FLY_STR(wchar_t, "abcdef"));
+        test_format(FMT("{:.3s}"), FMT("abc"), FLY_STR(char8_t, "abcdef"));
+        test_format(FMT("{:.3s}"), FMT("abc"), FLY_STR(char16_t, "abcdef"));
+        test_format(FMT("{:.3s}"), FMT("abc"), FLY_STR(char32_t, "abcdef"));
+
+        const char arr[] = {'a', 'b', 'c', 'd'};
+        test_format(FMT("{:.3s}"), FMT("abc"), arr);
+        const wchar_t warr[] = {L'a', L'b', L'c', L'd'};
+        test_format(FMT("{:.3s}"), FMT("abc"), warr);
+        const char8_t arr8[] = {u8'a', u8'b', u8'c', u8'd'};
+        test_format(FMT("{:.3s}"), FMT("abc"), arr8);
+        const char16_t arr16[] = {u'a', u'b', u'c', u'd'};
+        test_format(FMT("{:.3s}"), FMT("abc"), arr16);
+        const char32_t arr32[] = {U'a', U'b', U'c', U'd'};
+        test_format(FMT("{:.3s}"), FMT("abc"), arr32);
 
         test_format(FMT("{:.0s}"), FMT(""), FLY_STR(char_type, "a"));
         test_format(FMT("{:.0s}"), FMT(""), FLY_STR(char_type, "ab"));
@@ -436,11 +447,22 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:s}"), FMT("ab"), std::u16string_view(u"ab"));
         test_format(FMT("{:s}"), FMT("ab"), std::u32string_view(U"ab"));
 
-        test_format(FMT("{:s}"), FMT("ab"), "ab");
-        test_format(FMT("{:s}"), FMT("ab"), L"ab");
-        test_format(FMT("{:s}"), FMT("ab"), u8"ab");
-        test_format(FMT("{:s}"), FMT("ab"), u"ab");
-        test_format(FMT("{:s}"), FMT("ab"), U"ab");
+        test_format(FMT("{:s}"), FMT("ab"), FLY_STR(char, "ab"));
+        test_format(FMT("{:s}"), FMT("ab"), FLY_STR(wchar_t, "ab"));
+        test_format(FMT("{:s}"), FMT("ab"), FLY_STR(char8_t, "ab"));
+        test_format(FMT("{:s}"), FMT("ab"), FLY_STR(char16_t, "ab"));
+        test_format(FMT("{:s}"), FMT("ab"), FLY_STR(char32_t, "ab"));
+
+        const char arr[] = {'a', 'b'};
+        test_format(FMT("{:s}"), FMT("ab"), arr);
+        const wchar_t warr[] = {L'a', L'b'};
+        test_format(FMT("{:s}"), FMT("ab"), warr);
+        const char8_t arr8[] = {u8'a', u8'b'};
+        test_format(FMT("{:s}"), FMT("ab"), arr8);
+        const char16_t arr16[] = {u'a', u'b'};
+        test_format(FMT("{:s}"), FMT("ab"), arr16);
+        const char32_t arr32[] = {U'a', U'b'};
+        test_format(FMT("{:s}"), FMT("ab"), arr32);
 
         test_format(FMT("{:s}"), FMT("true"), true);
         test_format(FMT("{:s}"), FMT("false"), false);
