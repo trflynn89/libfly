@@ -81,7 +81,7 @@ public:
      * @return The length of the string-like value.
      */
     template <typename T, enable_if<detail::is_like_supported_string<T>> = 0>
-    static size_type size(T &&value);
+    static constexpr size_type size(T &&value);
 
     /**
      * Checks if the given character is an alphabetic character as classified by the default C
@@ -535,7 +535,7 @@ private:
 //==================================================================================================
 template <typename StringType>
 template <typename T, enable_if<detail::is_like_supported_string<T>>>
-auto BasicString<StringType>::size(T &&value) -> size_type
+constexpr auto BasicString<StringType>::size(T &&value) -> size_type
 {
     return classifier::size(std::forward<T>(value));
 }
