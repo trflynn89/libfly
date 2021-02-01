@@ -172,7 +172,8 @@ private:
      * Append a string-like value to the buffer.
      *
      * If the string-like value's character type is the same as the format string, the value is
-     * inserted directly. Otherwise, it is first transcoded to the appropriate Unicode encoding.
+     * inserted directly. Otherwise, it is first transcoded to the appropriate Unicode encoding. If
+     * transcoding fails, the value is dropped.
      *
      * @tparam T The type of the value to append.
      *
@@ -403,9 +404,13 @@ void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 
     if (specifier.m_type == FormatSpecifier::Type::Character)
     {
-        // TODO: Validate the value fits into char_type / convert Unicode encoding.
-        m_buffer.push_back(static_cast<char_type>(value));
-        value_size = 1;
+        static constexpr T s_max = static_cast<T>(std::numeric_limits<char_type>::max());
+
+        if (!is_negative && (value <= s_max))
+        {
+            m_buffer.push_back(static_cast<char_type>(value));
+            value_size = 1;
+        }
     }
     else
     {
@@ -610,7 +615,14 @@ void BasicStringFormatter<StringType, ParameterTypes...>::append_string(
     else
     {
         using unicode = BasicStringUnicode<string_like_type>;
-        unicode::template convert_encoding_into<StringType>(view, std::back_inserter(m_buffer));
+
+        const std::size_t original_size = m_buffer.size();
+        auto out = std::back_inserter(m_buffer);
+
+        if (!unicode::template convert_encoding_into<StringType>(view, out))
+        {
+            m_buffer.resize(original_size);
+        }
     }
 }
 

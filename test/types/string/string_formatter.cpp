@@ -41,6 +41,27 @@ void test_format(
     CATCH_CHECK(result == expected);
 }
 
+template <typename StringType>
+StringType reserved_codepoint()
+{
+    static constexpr const std::uint32_t s_reserved = 0xd800;
+    using char_type = typename StringType::value_type;
+    StringType result;
+
+    if constexpr (sizeof(char_type) == 1)
+    {
+        result += static_cast<char_type>(0xe0 | (s_reserved >> 12));
+        result += static_cast<char_type>(0x80 | ((s_reserved >> 6) & 0x3f));
+        result += static_cast<char_type>(0x80 | (s_reserved & 0x3f));
+    }
+    else
+    {
+        result = StringType(1, static_cast<char_type>(s_reserved));
+    }
+
+    return result;
+}
+
 } // namespace
 
 CATCH_TEMPLATE_TEST_CASE(
@@ -652,6 +673,54 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:G}"), FMT("NAN"), std::nan(""));
         test_format(FMT("{:G}"), FMT("INF"), std::numeric_limits<float>::infinity());
         test_format(FMT("{:G}"), FMT("2.1"), 2.1f);
+    }
+
+    CATCH_SECTION("Invalid characters cannot be formatted")
+    {
+        test_format(FMT("{:c}"), FMT(""), std::numeric_limits<std::int64_t>::min());
+        test_format(FMT("{:c}"), FMT(""), std::numeric_limits<std::int64_t>::max());
+
+        test_format(FMT("ab {:c} ab"), FMT("ab  ab"), std::numeric_limits<std::int64_t>::min());
+        test_format(FMT("ab {:c} ab"), FMT("ab  ab"), std::numeric_limits<std::int64_t>::max());
+    }
+
+    CATCH_SECTION("Invalid Unicode string cannot be formatted")
+    {
+        if constexpr (!std::is_same_v<StringType, std::string>)
+        {
+            const auto reserved = reserved_codepoint<std::string>();
+            test_format(FMT("{}"), FMT(""), reserved);
+            test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
+            test_format(FMT("ab {} ab"), FMT("ab  ab"), "ab" + reserved);
+        }
+        if constexpr (!std::is_same_v<StringType, std::wstring>)
+        {
+            const auto reserved = reserved_codepoint<std::wstring>();
+            test_format(FMT("{}"), FMT(""), reserved);
+            test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
+            test_format(FMT("ab {} ab"), FMT("ab  ab"), L"ab" + reserved);
+        }
+        if constexpr (!std::is_same_v<StringType, std::u8string>)
+        {
+            const auto reserved = reserved_codepoint<std::u8string>();
+            test_format(FMT("{}"), FMT(""), reserved);
+            test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
+            test_format(FMT("ab {} ab"), FMT("ab  ab"), u8"ab" + reserved);
+        }
+        if constexpr (!std::is_same_v<StringType, std::u16string>)
+        {
+            const auto reserved = reserved_codepoint<std::u16string>();
+            test_format(FMT("{}"), FMT(""), reserved);
+            test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
+            test_format(FMT("ab {} ab"), FMT("ab  ab"), u"ab" + reserved);
+        }
+        if constexpr (!std::is_same_v<StringType, std::u32string>)
+        {
+            const auto reserved = reserved_codepoint<std::u32string>();
+            test_format(FMT("{}"), FMT(""), reserved);
+            test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
+            test_format(FMT("ab {} ab"), FMT("ab  ab"), U"ab" + reserved);
+        }
     }
 
 #if defined(FLY_COMPILER_DISABLE_CONSTEVAL)
