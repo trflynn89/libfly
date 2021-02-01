@@ -491,7 +491,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Presentation type may be set (pointer)")
     {
-        test_format(FMT("{:p}"), FMT("nullptr"), nullptr);
+        test_format(FMT("{:p}"), FMT("0x0"), nullptr);
 
         int i = 0;
         auto result = BasicString::format(FMT("{:p}"), &i);
