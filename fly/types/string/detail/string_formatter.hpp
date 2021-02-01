@@ -28,6 +28,14 @@ using is_format_integral =
     std::conjunction<std::is_integral<T>, std::negation<std::is_same<T, bool>>>;
 
 /**
+ * Helper trait to classify a type as a pointer (excluding C-string types).
+ */
+template <typename T>
+using is_format_pointer = std::conjunction<
+    std::disjunction<std::is_pointer<T>, std::is_null_pointer<T>>,
+    std::negation<detail::is_like_supported_string<T>>>;
+
+/**
  * Class to format parameters according to a provided format string.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
@@ -81,7 +89,10 @@ private:
      */
     template <
         typename T,
-        fly::disable_if_any<detail::is_like_supported_string<T>, std::is_arithmetic<T>> = 0>
+        fly::disable_if_any<
+            detail::is_like_supported_string<T>,
+            is_format_pointer<T>,
+            std::is_arithmetic<T>> = 0>
     void format_value(FormatSpecifier &&specifier, const T &value);
 
     /**
@@ -94,6 +105,17 @@ private:
      */
     template <typename T, fly::enable_if<detail::is_like_supported_string<T>> = 0>
     void format_value(FormatSpecifier &&specifier, const T &value);
+
+    /**
+     * Format a single replacement field with the provided pointer value.
+     *
+     * @tparam T The type of the value to format.
+     *
+     * @param specifier The replacement field to format.
+     * @param value The value to format.
+     */
+    template <typename T, fly::enable_if<is_format_pointer<T>> = 0>
+    void format_value(FormatSpecifier &&specifier, T value);
 
     /**
      * Format a single replacement field with the provided non-boolean integral value.
@@ -221,8 +243,6 @@ private:
     static constexpr const char_type *s_true = FLY_STR(char_type, "true");
     static constexpr const char_type *s_false = FLY_STR(char_type, "false");
 
-    static inline thread_local ostringstream_type s_stream;
-
     const FormatParameters m_parameters;
     StringType m_buffer;
 };
@@ -285,14 +305,34 @@ StringType BasicStringFormatter<StringType, ParameterTypes...>::format(FormatStr
 template <typename StringType, typename... ParameterTypes>
 template <
     typename T,
-    fly::disable_if_any<detail::is_like_supported_string<T>, std::is_arithmetic<T>>>
+    fly::disable_if_any<
+        detail::is_like_supported_string<T>,
+        is_format_pointer<T>,
+        std::is_arithmetic<T>>>
 inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     const T &value)
 {
+    static thread_local ostringstream_type s_stream;
+
     s_stream << value;
     format_value(std::move(specifier), s_stream.str());
     s_stream.str({});
+}
+
+//==================================================================================================
+template <typename StringType, typename... ParameterTypes>
+template <typename T, fly::enable_if<is_format_pointer<T>>>
+inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
+    FormatSpecifier &&specifier,
+    T value)
+{
+    specifier.m_alternate_form = true;
+    specifier.m_type = FormatSpecifier::Type::Hex;
+
+    format_value(
+        std::move(specifier),
+        reinterpret_cast<std::uintptr_t>(static_cast<const void *>(value)));
 }
 
 //==================================================================================================
@@ -476,6 +516,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     const T &value)
 {
+    static thread_local ostringstream_type s_stream;
     stream_modifiers modifiers(s_stream);
 
     if (specifier.m_alignment == FormatSpecifier::Alignment::Default)
