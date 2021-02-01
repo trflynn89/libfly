@@ -106,14 +106,10 @@ namespace fly::detail {
  *
  *        For details on each presentation type, see the above links.
  *
- *     (*) Nested replacement fields are a subset of the full replacement field, and may be of the
- *         form "{}" or "{n}", where n is an optional non-negative position. The corresponding
- *         format parameter must be an integral type. Its value has the same restrictions as the
- *         formatting option it is used for.
- *
- * The above includes some differences from the standardized formatting specificaton. Namely, there
- * is not a compatible implementation of the std::formatter specializations. Instead, the streaming
- * operator (operator<<) is used to format general types.
+ * (*) Nested replacement fields are a subset of the full replacement field, and may be of the
+ * form "{}" or "{n}", where n is an optional non-negative position. The corresponding format
+ * parameter must be an integral type. Its value has the same restrictions as the formatting option
+ * it is used for.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021

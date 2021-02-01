@@ -403,12 +403,24 @@ public:
      *     3. An optional colon ":" following by formatting options.
      *     4. A final "}" character.
      *
-     * For a detailed description of replacement fields, and how this implementation differs from
-     * std::format, see fly::detail::BasicFormatSpecifier.
+     * For a detailed description of replacement fields see fly::detail::BasicFormatSpecifier.
      *
-     * The main difference is the means by which generic format parameters may be formatted into a
-     * string. In this implementation, any type for which an operator<< overload is defined will be
-     * formatted using that overload. Other types will result in an error.
+     * This implementation differs from std::format in the following ways:
+     *
+     *    1. All standard string types are supported as format strings.
+     *
+     *    2. All standard string types are supported as format parameters, even if that type differs
+     *       from the format string type. If the type differs, the format parameter is transcoded to
+     *       the type of the format string.
+     *
+     *    3. Any general type for which an operator<< overload is defined will be converted to a
+     *       string using that overload. Formatting options will then be applied to that string.
+     *
+     *    4. This implementation is exceptionless. Any error encountered (such as failed transcoding
+     *       in (2) above) results in the format parameter that caused the error to be dropped.
+     *
+     *    5. Locale-specific form is not supported. If the option appears in the format string, it
+     *       will be parsed, but will be ignored.
      *
      * The format string type is implicitly constructed from a C-string literal. Callers should only
      * invoke this method accordingly:
@@ -418,7 +430,7 @@ public:
      * On compilers that support immediate functions (consteval), the format string is validated at
      * compile time against the types of the format parameters. If the format string is invalid, a
      * compile error with a diagnostic message will be raised. On other compilers, the error message
-     * will returned rather than a formatted string.
+     * will be returned rather than a formatted string.
      *
      * @tparam ParameterTypes Variadic format parameter types.
      *
@@ -447,12 +459,24 @@ public:
      *     3. An optional colon ":" following by formatting options.
      *     4. A final "}" character.
      *
-     * For a detailed description of replacement fields, and how this implementation differs from
-     * std::format, see fly::detail::BasicFormatSpecifier.
+     * For a detailed description of replacement fields see fly::detail::BasicFormatSpecifier.
      *
-     * The main difference is the means by which generic format parameters may be formatted into a
-     * string. In this implementation, any type for which an operator<< overload is defined will be
-     * formatted using that overload. Other types will result in an error.
+     * This implementation differs from std::format in the following ways:
+     *
+     *    1. All standard string types are supported as format strings.
+     *
+     *    2. All standard string types are supported as format parameters, even if that type differs
+     *       from the format string type. If the type differs, the format parameter is transcoded to
+     *       the type of the format string.
+     *
+     *    3. Any general type for which an operator<< overload is defined will be converted to a
+     *       string using that overload. Formatting options will then be applied to that string.
+     *
+     *    4. This implementation is exceptionless. Any error encountered (such as failed transcoding
+     *       in (2) above) results in the format parameter that caused the error to be dropped.
+     *
+     *    5. Locale-specific form is not supported. If the option appears in the format string, it
+     *       will be parsed, but will be ignored.
      *
      * The format string type is implicitly constructed from a C-string literal. Callers should only
      * invoke this method accordingly:
@@ -462,7 +486,7 @@ public:
      * On compilers that support immediate functions (consteval), the format string is validated at
      * compile time against the types of the format parameters. If the format string is invalid, a
      * compile error with a diagnostic message will be raised. On other compilers, the error message
-     * will returned rather than a formatted string.
+     * will be returned rather than a formatted string.
      *
      * @tparam ParameterTypes Variadic format parameter types.
      *

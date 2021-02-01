@@ -52,31 +52,6 @@ public:
     /**
      * Constructor. Create a string formatter for the provided format parameters.
      *
-     * A format string consists of:
-     *
-     *     1. Any character other than "{" or "}", which are copied unchanged to the output.
-     *     2. Escape sequences "{{" and "}}", which are replaced with "{" and "}" in the output.
-     *     3. Replacement fields.
-     *
-     * Replacement fields may be of the form:
-     *
-     *     1. An introductory "{" character.
-     *     2. An optional non-negative position.
-     *     3. An optional colon ":" following by formatting options.
-     *     4. A final "}" character.
-     *
-     * For a detailed description of replacement fields, and how this implementation differs from
-     * std::format, see fly::detail::BasicFormatSpecifier.
-     *
-     * The main difference is the means by which generic format parameters may be formatted into a
-     * string. In this implementation, any type for which an operator<< overload is defined will be
-     * formatted using that overload. Other types will result in an error.
-     *
-     * On compilers that support immediate functions (consteval), the format string is validated at
-     * compile time against the types of the format parameters. If the format string is invalid, a
-     * compile error with a diagnostic message will be raised. On other compilers, the error message
-     * will returned rather than a formatted string.
-     *
      * @param parameters The variadic list of format parameters to be formatted.
      */
     BasicStringFormatter(ParameterTypes &&...parameters) noexcept;
