@@ -101,8 +101,6 @@ private:
     template <typename Condition>
     constexpr std::optional<char_type> consume_if(Condition condition);
 
-    static constexpr const auto s_null_terminator = FLY_CHR(char_type, '\0');
-
     const std::size_t m_size;
     const view_type m_view;
 
@@ -113,7 +111,7 @@ private:
 template <typename StringType>
 template <std::size_t N>
 constexpr BasicStringLexer<StringType>::BasicStringLexer(const char_type (&literals)[N]) noexcept :
-    m_size(N - ((literals[N - 1] == s_null_terminator) ? 1 : 0)),
+    m_size(classifier::size(literals)),
     m_view(literals, m_size)
 {
 }
