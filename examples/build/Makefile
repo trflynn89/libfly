@@ -10,10 +10,12 @@ VERSION = 1.0.0
 include /usr/local/src/fly/api.mk
 
 # Main targets.
+$(eval $(call ADD_TARGET, libfly_c_example, c, BIN))
 $(eval $(call ADD_TARGET, libfly_cpp_example, cpp, BIN))
 $(eval $(call ADD_TARGET, libfly_jar_example, jar/src/main/java, JAR))
 
 # Test targets.
+$(eval $(call ADD_TARGET, libfly_c_example_tests, c/test, TEST))
 $(eval $(call ADD_TARGET, libfly_cpp_example_tests, cpp/test, TEST))
 
 # Import the build system.
