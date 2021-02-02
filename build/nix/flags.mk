@@ -49,6 +49,10 @@ endif
 CF_ALL := -MD -MP -fPIC
 CF_ALL += -I$(SOURCE_ROOT) -I$(INSTALL_INC_DIR)
 
+# C and C++ specific flags.
+CFLAGS := -std=c2x
+CXXFLAGS := -std=c++2a
+
 ifeq ($(SYSTEM), MACOS)
     CF_ALL += -isysroot $(XCODE)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 endif
@@ -69,15 +73,11 @@ CF_ALL += \
     \
     -Wcast-align \
     -Wcast-qual \
-    -Wctor-dtor-privacy \
     -Wdisabled-optimization \
     -Wfloat-equal \
     -Winvalid-pch \
     -Wmissing-declarations \
     -Wpointer-arith \
-    -Wnon-virtual-dtor \
-    -Wold-style-cast \
-    -Woverloaded-virtual \
     -Wredundant-decls \
     -Wshadow \
     -Wstrict-overflow=2 \
@@ -86,6 +86,12 @@ CF_ALL += \
     -Wunused \
     \
     -pedantic
+
+CXXFLAGS += \
+    -Wctor-dtor-privacy \
+    -Wnon-virtual-dtor \
+    -Wold-style-cast \
+    -Woverloaded-virtual \
 
 # Disabled due to LLVM bug: https://bugs.llvm.org/show_bug.cgi?id=44325
 #    -Wzero-as-null-pointer-constant \
@@ -101,19 +107,16 @@ ifeq ($(toolchain), clang)
         -Wsign-conversion
 else ifeq ($(toolchain), gcc)
     CF_ALL += \
+        -Wlogical-op \
         -Wnull-dereference \
         -Wredundant-decls
 
-    ifeq ($(SYSTEM), LINUX)
-        CF_ALL += \
-            -Wlogical-op \
-            -Wsuggest-override
+    CXXFLAGS += -Wsuggest-override
 
-        ifeq ($(mode), debug)
-            CF_ALL += \
-                -Wsuggest-final-methods \
-                -Wsuggest-final-types
-        endif
+    ifeq ($(mode), debug)
+        CXXFLAGS += \
+            -Wsuggest-final-methods \
+            -Wsuggest-final-types
     endif
 endif
 
@@ -144,14 +147,13 @@ else ifeq ($(mode), profile)
     endif
 endif
 
+CFLAGS += $(CF_ALL)
+CXXFLAGS += $(CF_ALL)
+
 # Enable verbose Java output.
 ifeq ($(verbose), 1)
     JFLAGS += -verbose
 endif
-
-# C and C++ specific flags.
-CFLAGS := -std=c2x $(CF_ALL)
-CXXFLAGS := -std=c++2a $(CF_ALL)
 
 # On Linux: Use LLD linker with clang toolchain. Use gold linker with gcc toolchain.
 ifeq ($(SYSTEM), LINUX)
