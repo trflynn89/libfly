@@ -33,6 +33,26 @@ struct GenericType
     return stream;
 }
 
+enum class DefaultFormattedEnum
+{
+    One = 1,
+};
+
+enum class UserFormattedEnum
+{
+    One = 1,
+};
+
+[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const UserFormattedEnum &)
+{
+    return stream;
+}
+
+[[maybe_unused]] std::wostream &operator<<(std::wostream &stream, const UserFormattedEnum &)
+{
+    return stream;
+}
+
 class ConstructorCounter
 {
 public:
@@ -144,10 +164,11 @@ constexpr const char *s_bad_locale =
     "Locale-specific form may only be used for numeric and boolean types";
 constexpr const char *s_bad_generic = "Generic types must be formatted with {} or {:s}";
 constexpr const char *s_bad_character = "Character types must be formatted with {} or {:cbBodxX}";
-constexpr const char *s_bad_string = "String types must be formatted with {} or {:s}";
+constexpr const char *s_bad_string =
+    "String types and user-formatted enums must be formatted with {} or {:s}";
 constexpr const char *s_bad_pointer = "Pointer types must be formatted with {} or {:p}";
 constexpr const char *s_bad_integer =
-    "Integral types must be formatted with {} or one of {:cbBodxX}";
+    "Integral types and default-formatted enums must be formatted with {} or one of {:cbBodxX}";
 constexpr const char *s_bad_float =
     "Floating point types must be formatted with {} or one of {:aAeEfFgG}";
 constexpr const char *s_bad_bool = "Boolean types must be formatted with {} or one of {:csbBodxX}";
@@ -177,6 +198,8 @@ CATCH_TEMPLATE_TEST_CASE(
     constexpr const int i = 1;
     constexpr const float f = 3.14f;
     constexpr const bool b = true;
+    constexpr const DefaultFormattedEnum d = DefaultFormattedEnum::One;
+    constexpr const UserFormattedEnum u = UserFormattedEnum::One;
 
     CATCH_SECTION("No specifiers are parsed from empty string")
     {
@@ -432,11 +455,17 @@ CATCH_TEMPLATE_TEST_CASE(
         specifier.m_type = Specifier::Type::String;
         test_format(make_format(FMT("{}"), a), specifier);
 
+        specifier.m_type = Specifier::Type::String;
+        test_format(make_format(FMT("{}"), u), specifier);
+
         specifier.m_type = Specifier::Type::Pointer;
         test_format(make_format(FMT("{}"), &i), specifier);
 
         specifier.m_type = Specifier::Type::Decimal;
         test_format(make_format(FMT("{}"), i), specifier);
+
+        specifier.m_type = Specifier::Type::Decimal;
+        test_format(make_format(FMT("{}"), d), specifier);
 
         specifier.m_type = Specifier::Type::General;
         test_format(make_format(FMT("{}"), f), specifier);
@@ -453,6 +482,7 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:c}"), c), specifier);
         test_format(make_format(FMT("{:c}"), i), specifier);
         test_format(make_format(FMT("{:c}"), b), specifier);
+        test_format(make_format(FMT("{:c}"), d), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (string)")
@@ -464,6 +494,7 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:s}"), s), specifier);
         test_format(make_format(FMT("{:s}"), a), specifier);
         test_format(make_format(FMT("{:s}"), b), specifier);
+        test_format(make_format(FMT("{:s}"), u), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (pointer)")
@@ -484,11 +515,13 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:b}"), c), specifier);
         test_format(make_format(FMT("{:b}"), i), specifier);
         test_format(make_format(FMT("{:b}"), b), specifier);
+        test_format(make_format(FMT("{:b}"), d), specifier);
 
         specifier.m_case = Specifier::Case::Upper;
         test_format(make_format(FMT("{:B}"), c), specifier);
         test_format(make_format(FMT("{:B}"), i), specifier);
         test_format(make_format(FMT("{:B}"), b), specifier);
+        test_format(make_format(FMT("{:B}"), d), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (octal)")
@@ -499,6 +532,7 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:o}"), c), specifier);
         test_format(make_format(FMT("{:o}"), i), specifier);
         test_format(make_format(FMT("{:o}"), b), specifier);
+        test_format(make_format(FMT("{:o}"), d), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (decimal)")
@@ -509,6 +543,7 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:d}"), c), specifier);
         test_format(make_format(FMT("{:d}"), i), specifier);
         test_format(make_format(FMT("{:d}"), b), specifier);
+        test_format(make_format(FMT("{:d}"), d), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (hex)")
@@ -519,11 +554,13 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:x}"), c), specifier);
         test_format(make_format(FMT("{:x}"), i), specifier);
         test_format(make_format(FMT("{:x}"), b), specifier);
+        test_format(make_format(FMT("{:x}"), d), specifier);
 
         specifier.m_case = Specifier::Case::Upper;
         test_format(make_format(FMT("{:X}"), c), specifier);
         test_format(make_format(FMT("{:X}"), i), specifier);
         test_format(make_format(FMT("{:X}"), b), specifier);
+        test_format(make_format(FMT("{:X}"), d), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (hexfloat)")
@@ -669,6 +706,8 @@ CATCH_TEMPLATE_TEST_CASE(
     constexpr const int i = 1;
     constexpr const float f = 3.14f;
     constexpr const bool b = true;
+    constexpr const DefaultFormattedEnum d = DefaultFormattedEnum::One;
+    constexpr const UserFormattedEnum u = UserFormattedEnum::One;
 
     CATCH_SECTION("Cannot format non-streamable types")
     {
@@ -872,6 +911,7 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_error(make_format(FMT("{:c}"), g), s_bad_generic);
         test_error(make_format(FMT("{:c}"), s), s_bad_string);
+        test_error(make_format(FMT("{:c}"), u), s_bad_string);
         test_error(make_format(FMT("{:c}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:c}"), f), s_bad_float);
     }
@@ -881,6 +921,7 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:s}"), c), s_bad_character);
         test_error(make_format(FMT("{:s}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:s}"), i), s_bad_integer);
+        test_error(make_format(FMT("{:s}"), d), s_bad_integer);
         test_error(make_format(FMT("{:s}"), f), s_bad_float);
     }
 
@@ -889,6 +930,7 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:p}"), g), s_bad_generic);
         test_error(make_format(FMT("{:p}"), c), s_bad_character);
         test_error(make_format(FMT("{:p}"), i), s_bad_integer);
+        test_error(make_format(FMT("{:p}"), d), s_bad_integer);
         test_error(make_format(FMT("{:p}"), f), s_bad_float);
         test_error(make_format(FMT("{:p}"), b), s_bad_bool);
     }
@@ -897,6 +939,7 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_error(make_format(FMT("{:b}"), g), s_bad_generic);
         test_error(make_format(FMT("{:b}"), s), s_bad_string);
+        test_error(make_format(FMT("{:b}"), u), s_bad_string);
         test_error(make_format(FMT("{:b}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:b}"), f), s_bad_float);
 
@@ -910,6 +953,7 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_error(make_format(FMT("{:o}"), g), s_bad_generic);
         test_error(make_format(FMT("{:o}"), s), s_bad_string);
+        test_error(make_format(FMT("{:o}"), u), s_bad_string);
         test_error(make_format(FMT("{:o}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:o}"), f), s_bad_float);
     }
@@ -918,6 +962,7 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_error(make_format(FMT("{:d}"), g), s_bad_generic);
         test_error(make_format(FMT("{:d}"), s), s_bad_string);
+        test_error(make_format(FMT("{:d}"), u), s_bad_string);
         test_error(make_format(FMT("{:d}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:d}"), f), s_bad_float);
     }
@@ -926,11 +971,13 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_error(make_format(FMT("{:x}"), g), s_bad_generic);
         test_error(make_format(FMT("{:x}"), s), s_bad_string);
+        test_error(make_format(FMT("{:x}"), u), s_bad_string);
         test_error(make_format(FMT("{:x}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:x}"), f), s_bad_float);
 
         test_error(make_format(FMT("{:X}"), g), s_bad_generic);
         test_error(make_format(FMT("{:X}"), s), s_bad_string);
+        test_error(make_format(FMT("{:X}"), u), s_bad_string);
         test_error(make_format(FMT("{:X}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:X}"), f), s_bad_float);
     }
@@ -940,15 +987,19 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:a}"), g), s_bad_generic);
         test_error(make_format(FMT("{:a}"), c), s_bad_character);
         test_error(make_format(FMT("{:a}"), s), s_bad_string);
+        test_error(make_format(FMT("{:a}"), u), s_bad_string);
         test_error(make_format(FMT("{:a}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:a}"), i), s_bad_integer);
+        test_error(make_format(FMT("{:a}"), d), s_bad_integer);
         test_error(make_format(FMT("{:a}"), b), s_bad_bool);
 
         test_error(make_format(FMT("{:A}"), g), s_bad_generic);
         test_error(make_format(FMT("{:A}"), c), s_bad_character);
         test_error(make_format(FMT("{:A}"), s), s_bad_string);
+        test_error(make_format(FMT("{:A}"), u), s_bad_string);
         test_error(make_format(FMT("{:A}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:A}"), i), s_bad_integer);
+        test_error(make_format(FMT("{:A}"), d), s_bad_integer);
         test_error(make_format(FMT("{:A}"), b), s_bad_bool);
     }
 
@@ -957,15 +1008,19 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:e}"), g), s_bad_generic);
         test_error(make_format(FMT("{:e}"), c), s_bad_character);
         test_error(make_format(FMT("{:e}"), s), s_bad_string);
+        test_error(make_format(FMT("{:e}"), u), s_bad_string);
         test_error(make_format(FMT("{:e}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:e}"), i), s_bad_integer);
+        test_error(make_format(FMT("{:e}"), d), s_bad_integer);
         test_error(make_format(FMT("{:e}"), b), s_bad_bool);
 
         test_error(make_format(FMT("{:E}"), g), s_bad_generic);
         test_error(make_format(FMT("{:E}"), c), s_bad_character);
         test_error(make_format(FMT("{:E}"), s), s_bad_string);
+        test_error(make_format(FMT("{:E}"), u), s_bad_string);
         test_error(make_format(FMT("{:E}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:E}"), i), s_bad_integer);
+        test_error(make_format(FMT("{:E}"), d), s_bad_integer);
         test_error(make_format(FMT("{:E}"), b), s_bad_bool);
     }
 
@@ -974,15 +1029,19 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:f}"), g), s_bad_generic);
         test_error(make_format(FMT("{:f}"), c), s_bad_character);
         test_error(make_format(FMT("{:f}"), s), s_bad_string);
+        test_error(make_format(FMT("{:f}"), u), s_bad_string);
         test_error(make_format(FMT("{:f}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:f}"), i), s_bad_integer);
+        test_error(make_format(FMT("{:f}"), d), s_bad_integer);
         test_error(make_format(FMT("{:f}"), b), s_bad_bool);
 
         test_error(make_format(FMT("{:F}"), g), s_bad_generic);
         test_error(make_format(FMT("{:F}"), c), s_bad_character);
         test_error(make_format(FMT("{:F}"), s), s_bad_string);
+        test_error(make_format(FMT("{:F}"), u), s_bad_string);
         test_error(make_format(FMT("{:F}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:F}"), i), s_bad_integer);
+        test_error(make_format(FMT("{:F}"), d), s_bad_integer);
         test_error(make_format(FMT("{:F}"), b), s_bad_bool);
     }
 
@@ -991,15 +1050,19 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:g}"), g), s_bad_generic);
         test_error(make_format(FMT("{:g}"), c), s_bad_character);
         test_error(make_format(FMT("{:g}"), s), s_bad_string);
+        test_error(make_format(FMT("{:g}"), u), s_bad_string);
         test_error(make_format(FMT("{:g}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:g}"), i), s_bad_integer);
+        test_error(make_format(FMT("{:g}"), d), s_bad_integer);
         test_error(make_format(FMT("{:g}"), b), s_bad_bool);
 
         test_error(make_format(FMT("{:G}"), g), s_bad_generic);
         test_error(make_format(FMT("{:G}"), c), s_bad_character);
         test_error(make_format(FMT("{:G}"), s), s_bad_string);
+        test_error(make_format(FMT("{:G}"), u), s_bad_string);
         test_error(make_format(FMT("{:G}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:G}"), i), s_bad_integer);
+        test_error(make_format(FMT("{:G}"), d), s_bad_integer);
         test_error(make_format(FMT("{:G}"), b), s_bad_bool);
     }
 
