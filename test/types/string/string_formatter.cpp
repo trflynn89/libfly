@@ -21,6 +21,46 @@ namespace {
 
 #define FMT(format) FLY_ARR(char_type, format)
 
+struct GenericType
+{
+};
+
+[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const GenericType &)
+{
+    stream << "GenericType";
+    return stream;
+}
+
+[[maybe_unused]] std::wostream &operator<<(std::wostream &stream, const GenericType &)
+{
+    stream << L"GenericType";
+    return stream;
+}
+
+enum class DefaultFormattedEnum
+{
+    One = 1,
+    Two = 2,
+};
+
+enum class UserFormattedEnum
+{
+    One = 1,
+    Two = 2,
+};
+
+[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const UserFormattedEnum &u)
+{
+    stream << (u == UserFormattedEnum::One ? "One" : "Two");
+    return stream;
+}
+
+[[maybe_unused]] std::wostream &operator<<(std::wostream &stream, const UserFormattedEnum &u)
+{
+    stream << (u == UserFormattedEnum::One ? L"One" : L"Two");
+    return stream;
+}
+
 template <typename StringType, typename... ParameterTypes>
 using FormatString = fly::detail::BasicFormatString<
     fly::detail::is_like_supported_string_t<StringType>,
@@ -60,30 +100,6 @@ StringType reserved_codepoint()
     }
 
     return result;
-}
-
-enum class DefaultFormattedEnum
-{
-    One = 1,
-    Two = 2,
-};
-
-enum class UserFormattedEnum
-{
-    One = 1,
-    Two = 2,
-};
-
-[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const UserFormattedEnum &u)
-{
-    stream << (u == UserFormattedEnum::One ? "One" : "Two");
-    return stream;
-}
-
-[[maybe_unused]] std::wostream &operator<<(std::wostream &stream, const UserFormattedEnum &u)
-{
-    stream << (u == UserFormattedEnum::One ? "One" : "Two");
-    return stream;
 }
 
 } // namespace
@@ -460,6 +476,14 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{1:.{0}s}"), FMT("abcdef"), -3, FLY_STR(char_type, "abcdef"));
     }
 
+    CATCH_SECTION("Generic types may be formatted without presentation type")
+    {
+        GenericType gt {};
+        test_format(FMT("{}"), FMT("GenericType"), gt);
+        test_format(FMT("{}"), FMT("One"), UserFormattedEnum::One);
+        test_format(FMT("{}"), FMT("Two"), UserFormattedEnum::Two);
+    }
+
     CATCH_SECTION("Presentation type may be set (character)")
     {
         test_format(FMT("{:c}"), FMT("a"), 'a');
@@ -515,9 +539,6 @@ CATCH_TEMPLATE_TEST_CASE(
 
         test_format(FMT("{:s}"), FMT("true"), true);
         test_format(FMT("{:s}"), FMT("false"), false);
-
-        test_format(FMT("{:s}"), FMT("One"), UserFormattedEnum::One);
-        test_format(FMT("{:s}"), FMT("Two"), UserFormattedEnum::Two);
     }
 
     CATCH_SECTION("Presentation type may be set (pointer)")

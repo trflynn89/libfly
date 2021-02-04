@@ -414,7 +414,7 @@ public:
      *       the type of the format string.
      *
      *    3. Any generic type for which an operator<< overload is defined will be converted to a
-     *       string using that overload. Formatting options will then be applied to that string.
+     *       string using that overload.
      *
      *    4. Formatting of strong enumeration types defaults to the format of the enumeration's
      *       underlying type. However, if an overload of operator<< is defined, the type is treated
@@ -474,7 +474,7 @@ public:
      *       the type of the format string.
      *
      *    3. Any generic type for which an operator<< overload is defined will be converted to a
-     *       string using that overload. Formatting options will then be applied to that string.
+     *       string using that overload.
      *
      *    4. Formatting of strong enumeration types defaults to the format of the enumeration's
      *       underlying type. However, if an overload of operator<< is defined, the type is treated
