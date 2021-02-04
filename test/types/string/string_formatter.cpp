@@ -62,6 +62,30 @@ StringType reserved_codepoint()
     return result;
 }
 
+enum class DefaultFormattedEnum
+{
+    One = 1,
+    Two = 2,
+};
+
+enum class UserFormattedEnum
+{
+    One = 1,
+    Two = 2,
+};
+
+[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const UserFormattedEnum &u)
+{
+    stream << (u == UserFormattedEnum::One ? "One" : "Two");
+    return stream;
+}
+
+[[maybe_unused]] std::wostream &operator<<(std::wostream &stream, const UserFormattedEnum &u)
+{
+    stream << (u == UserFormattedEnum::One ? "One" : "Two");
+    return stream;
+}
+
 } // namespace
 
 CATCH_TEMPLATE_TEST_CASE(
@@ -445,6 +469,10 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:c}"), FMT("a"), U'a');
         test_format(FMT("{:c}"), FMT("\n"), FLY_CHR(char_type, '\n'));
         test_format(FMT("{:c}"), FMT("a"), 0x61);
+        test_format(
+            FMT("{:c}"),
+            StringType(1, static_cast<char_type>(DefaultFormattedEnum::One)),
+            DefaultFormattedEnum::One);
         test_format(FMT("{:c}"), StringType(1, static_cast<char_type>(true)), true);
         test_format(FMT("{:c}"), StringType(1, static_cast<char_type>(false)), false);
     }
@@ -487,6 +515,9 @@ CATCH_TEMPLATE_TEST_CASE(
 
         test_format(FMT("{:s}"), FMT("true"), true);
         test_format(FMT("{:s}"), FMT("false"), false);
+
+        test_format(FMT("{:s}"), FMT("One"), UserFormattedEnum::One);
+        test_format(FMT("{:s}"), FMT("Two"), UserFormattedEnum::Two);
     }
 
     CATCH_SECTION("Presentation type may be set (pointer)")
@@ -508,6 +539,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:b}"), FMT("1000001"), char8_t(0x41));
         test_format(FMT("{:b}"), FMT("1000001"), char16_t(0x41));
         test_format(FMT("{:b}"), FMT("1000001"), char32_t(0x41));
+        test_format(FMT("{:b}"), FMT("1"), DefaultFormattedEnum::One);
+        test_format(FMT("{:b}"), FMT("10"), DefaultFormattedEnum::Two);
 
         test_format(FMT("{:b}"), FMT("11111111"), std::numeric_limits<std::uint8_t>::max());
         test_format(FMT("{:b}"), FMT("0"), std::numeric_limits<std::uint8_t>::min());
@@ -539,6 +572,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:o}"), FMT("101"), char8_t(0x41));
         test_format(FMT("{:o}"), FMT("101"), char16_t(0x41));
         test_format(FMT("{:o}"), FMT("101"), char32_t(0x41));
+        test_format(FMT("{:o}"), FMT("1"), DefaultFormattedEnum::One);
+        test_format(FMT("{:o}"), FMT("2"), DefaultFormattedEnum::Two);
 
         test_format(FMT("{:o}"), FMT("377"), std::numeric_limits<std::uint8_t>::max());
         test_format(FMT("{:o}"), FMT("0"), std::numeric_limits<std::uint8_t>::min());
@@ -570,6 +605,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:d}"), FMT("65"), char8_t(0x41));
         test_format(FMT("{:d}"), FMT("65"), char16_t(0x41));
         test_format(FMT("{:d}"), FMT("65"), char32_t(0x41));
+        test_format(FMT("{:d}"), FMT("1"), DefaultFormattedEnum::One);
+        test_format(FMT("{:d}"), FMT("2"), DefaultFormattedEnum::Two);
 
         test_format(FMT("{:d}"), FMT("255"), std::numeric_limits<std::uint8_t>::max());
         test_format(FMT("{:d}"), FMT("0"), std::numeric_limits<std::uint8_t>::min());
@@ -601,6 +638,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:x}"), FMT("41"), char8_t(0x41));
         test_format(FMT("{:x}"), FMT("41"), char16_t(0x41));
         test_format(FMT("{:x}"), FMT("41"), char32_t(0x41));
+        test_format(FMT("{:x}"), FMT("1"), DefaultFormattedEnum::One);
+        test_format(FMT("{:x}"), FMT("2"), DefaultFormattedEnum::Two);
 
         test_format(FMT("{:X}"), FMT("BEEF"), 0xbeef);
 

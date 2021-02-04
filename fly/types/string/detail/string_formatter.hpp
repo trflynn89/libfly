@@ -36,6 +36,15 @@ using is_format_pointer = std::conjunction<
     std::negation<detail::is_like_supported_string<T>>>;
 
 /**
+ * Helper trait to classify an enumeration type as default-formatted (i.e. the user has not defined
+ * a custom operator<< for this type).
+ */
+template <typename StringType, typename T>
+using is_default_formatted_enum = std::conjunction<
+    std::is_enum<T>,
+    std::negation<typename BasicStringTraits<StringType>::OstreamTraits::template is_declared<T>>>;
+
+/**
  * Class to format parameters according to a provided format string.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
@@ -92,7 +101,8 @@ private:
         fly::disable_if_any<
             detail::is_like_supported_string<T>,
             is_format_pointer<T>,
-            std::is_arithmetic<T>> = 0>
+            std::is_arithmetic<T>,
+            is_default_formatted_enum<StringType, T>> = 0>
     void format_value(FormatSpecifier &&specifier, const T &value);
 
     /**
@@ -163,6 +173,17 @@ private:
      * @param value The value to format.
      */
     template <typename T, fly::enable_if<std::is_same<T, bool>> = 0>
+    void format_value(FormatSpecifier &&specifier, T value);
+
+    /**
+     * Format a single replacement field with the provided enumeration.
+     *
+     * @tparam T The type of the value to format.
+     *
+     * @param specifier The replacement field to format.
+     * @param value The value to format.
+     */
+    template <typename T, fly::enable_if<is_default_formatted_enum<StringType, T>> = 0>
     void format_value(FormatSpecifier &&specifier, T value);
 
     /**
@@ -308,7 +329,8 @@ template <
     fly::disable_if_any<
         detail::is_like_supported_string<T>,
         is_format_pointer<T>,
-        std::is_arithmetic<T>>>
+        std::is_arithmetic<T>,
+        is_default_formatted_enum<StringType, T>>>
 inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     const T &value)
@@ -602,6 +624,16 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     {
         format_value(std::move(specifier), static_cast<unsigned>(value));
     }
+}
+
+//==================================================================================================
+template <typename StringType, typename... ParameterTypes>
+template <typename T, fly::enable_if<is_default_formatted_enum<StringType, T>>>
+inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
+    FormatSpecifier &&specifier,
+    T value)
+{
+    format_value(std::move(specifier), static_cast<std::underlying_type_t<T>>(value));
 }
 
 //==================================================================================================
