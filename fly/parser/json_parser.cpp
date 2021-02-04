@@ -272,11 +272,7 @@ JsonParser::ParseState JsonParser::consume_token(Token token)
 
     if (const Token parsed = get<Token>(); parsed != token)
     {
-        JLOG(
-            "Unexpected character '{}', was expecting '{}'",
-            static_cast<char>(parsed),
-            static_cast<char>(token));
-
+        JLOG("Unexpected character '{:c}', was expecting '{:c}'", parsed, token);
         return ParseState::Invalid;
     }
 
@@ -409,7 +405,7 @@ JsonParser::ParseState JsonParser::consume_comment()
         }
 
         default:
-            JLOG("Invalid start sequence for comments: '/{}'", static_cast<char>(token));
+            JLOG("Invalid start sequence for comments: '/{:c}'", token);
             return ParseState::Invalid;
     }
 

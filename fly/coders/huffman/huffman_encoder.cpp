@@ -31,9 +31,7 @@ bool HuffmanEncoder::encode_binary(std::istream &decoded, BitStreamWriter &encod
 {
     if (m_max_code_length >= std::numeric_limits<code_type>::digits)
     {
-        LOGW(
-            "Maximum Huffman code length {} is too large for code_type",
-            static_cast<std::uint32_t>(m_max_code_length));
+        LOGW("Maximum Huffman code length {} is too large for code_type", m_max_code_length);
         return false;
     }
 
