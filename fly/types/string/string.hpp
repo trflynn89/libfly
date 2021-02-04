@@ -413,13 +413,17 @@ public:
      *       from the format string type. If the type differs, the format parameter is transcoded to
      *       the type of the format string.
      *
-     *    3. Any general type for which an operator<< overload is defined will be converted to a
+     *    3. Any generic type for which an operator<< overload is defined will be converted to a
      *       string using that overload. Formatting options will then be applied to that string.
      *
-     *    4. This implementation is exceptionless. Any error encountered (such as failed transcoding
+     *    4. Formatting of strong enumeration types defaults to the format of the enumeration's
+     *       underlying type. However, if an overload of operator<< is defined, the type is treated
+     *       as a generic type according to (3) above.
+     *
+     *    5. This implementation is exceptionless. Any error encountered (such as failed transcoding
      *       in (2) above) results in the format parameter that caused the error to be dropped.
      *
-     *    5. Locale-specific form is not supported. If the option appears in the format string, it
+     *    6. Locale-specific form is not supported. If the option appears in the format string, it
      *       will be parsed, but will be ignored.
      *
      * The format string type is implicitly constructed from a C-string literal. Callers should only
@@ -469,13 +473,17 @@ public:
      *       from the format string type. If the type differs, the format parameter is transcoded to
      *       the type of the format string.
      *
-     *    3. Any general type for which an operator<< overload is defined will be converted to a
+     *    3. Any generic type for which an operator<< overload is defined will be converted to a
      *       string using that overload. Formatting options will then be applied to that string.
      *
-     *    4. This implementation is exceptionless. Any error encountered (such as failed transcoding
+     *    4. Formatting of strong enumeration types defaults to the format of the enumeration's
+     *       underlying type. However, if an overload of operator<< is defined, the type is treated
+     *       as a generic type according to (3) above.
+     *
+     *    5. This implementation is exceptionless. Any error encountered (such as failed transcoding
      *       in (2) above) results in the format parameter that caused the error to be dropped.
      *
-     *    5. Locale-specific form is not supported. If the option appears in the format string, it
+     *    6. Locale-specific form is not supported. If the option appears in the format string, it
      *       will be parsed, but will be ignored.
      *
      * The format string type is implicitly constructed from a C-string literal. Callers should only
