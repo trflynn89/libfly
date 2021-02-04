@@ -30,7 +30,7 @@ ConfigManager::ConfigManager(
             break;
 
         default:
-            LOGE("Unrecognized configuration type: {}", static_cast<int>(file_type));
+            LOGE("Unrecognized configuration type: {}", file_type);
             break;
     }
 }
