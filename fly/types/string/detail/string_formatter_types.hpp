@@ -104,7 +104,7 @@ namespace fly::detail {
  *        Strong enumeration types - If an overload of operator<< is defined, valid presentations
  *        are: none, "s". Else, valid presentations are: none, "c", b", "B", "o", "d", "x", "X".
  *
- *        Other (general) types - Valid presentations: none, "s". An overload of operator<< must be
+ *        Other (generic) types - Valid presentations: none. An overload of operator<< must be
  *        defined for generic types.
  *
  *        For details on each presentation type, see the above links.
@@ -390,37 +390,14 @@ private:
      * Helper trait to determine if a type is either streamable or string-like.
      */
     template <typename T>
-    using is_formatable_type = std::disjunction<
+    using is_formattable_type = std::disjunction<
         typename traits::OstreamTraits::template is_declared<T>,
         detail::is_like_supported_string<T>,
         detail::is_supported_character<T>,
         std::is_enum<std::remove_cvref_t<T>>>;
 
     template <typename T>
-    static inline constexpr bool is_formatable_type_v = is_formatable_type<T>::value;
-
-    /**
-     * Helper trait to classify an enumeration type as default-formatted (i.e. the user has not
-     * defined a custom operator<< for this type).
-     */
-    template <typename T>
-    using is_default_formatted_enum = std::conjunction<
-        std::is_enum<T>,
-        std::negation<typename traits::OstreamTraits::template is_declared<T>>>;
-
-    template <typename T>
-    static inline constexpr bool is_default_formatted_enum_v = is_default_formatted_enum<T>::value;
-
-    /**
-     * Helper trait to classify an enumeration type as user-formatted (i.e. the user has defined a
-     * custom operator<< for this type).
-     */
-    template <typename T>
-    using is_user_formatted_enum =
-        std::conjunction<std::is_enum<T>, typename traits::OstreamTraits::template is_declared<T>>;
-
-    template <typename T>
-    static inline constexpr bool is_user_formatted_enum_v = is_user_formatted_enum<T>::value;
+    static inline constexpr bool is_formattable_type_v = is_formattable_type<T>::value;
 
     /**
      * Helper trait to classify a type as an integer, excluding character and boolean types.
@@ -433,6 +410,18 @@ private:
 
     template <typename T>
     static inline constexpr bool is_integer_v = is_integer<T>::value;
+
+    /**
+     * Helper trait to classify an enumeration type as default-formatted (i.e. the user has not
+     * defined a custom operator<< for this type).
+     */
+    template <typename T>
+    using is_default_formatted_enum = std::conjunction<
+        std::is_enum<T>,
+        std::negation<typename traits::OstreamTraits::template is_declared<T>>>;
+
+    template <typename T>
+    static inline constexpr bool is_default_formatted_enum_v = is_default_formatted_enum<T>::value;
 
     /**
      * Upon parsing an un-escaped opening brace, parse a single replacement field in the format
@@ -563,12 +552,12 @@ private:
     constexpr void validate_type(ParameterType type, const FormatSpecifier &specifier);
 
     /**
-     * Determine the type of a format parameter. Returns ParameterType::Generic if the given index
-     * was not found, or if the type of the format parameter is unknown.
+     * Determine the type of a format parameter. Returns ParameterType::Generic if the type of the
+     * format parameter is unknown.
      *
      * @param index The index of the format parameter to inspect.
      *
-     * @return The type of the format parameter.
+     * @return If found, the type of the format parameter. Otherwise, an uninitialized value.
      */
     template <size_t N = 0>
     constexpr std::optional<ParameterType> parameter_type(size_t index);
@@ -791,7 +780,7 @@ FLY_CONSTEVAL BasicFormatString<StringType, ParameterTypes...>::BasicFormatStrin
 {
     std::optional<char_type> ch;
 
-    if constexpr (!(is_formatable_type_v<ParameterTypes> && ...))
+    if constexpr (!(is_formattable_type_v<ParameterTypes> && ...))
     {
         on_error("An overloaded operator<< must be defined for all format parameters");
     }
@@ -1204,10 +1193,9 @@ constexpr void BasicFormatString<StringType, ParameterTypes...>::validate_type(
     switch (type)
     {
         case ParameterType::Generic:
-            if ((specifier.m_type != FormatSpecifier::Type::None) &&
-                (specifier.m_type != FormatSpecifier::Type::String))
+            if (specifier.m_type != FormatSpecifier::Type::None)
             {
-                on_error("Generic types must be formatted with {} or {:s}");
+                on_error("Generic types must be formatted with {}");
             }
             break;
 
@@ -1227,7 +1215,7 @@ constexpr void BasicFormatString<StringType, ParameterTypes...>::validate_type(
             if ((specifier.m_type != FormatSpecifier::Type::None) &&
                 (specifier.m_type != FormatSpecifier::Type::String))
             {
-                on_error("String types and user-formatted enums must be formatted with {} or {:s}");
+                on_error("String types must be formatted with {} or {:s}");
             }
             break;
 
@@ -1247,9 +1235,7 @@ constexpr void BasicFormatString<StringType, ParameterTypes...>::validate_type(
                 (specifier.m_type != FormatSpecifier::Type::Decimal) &&
                 (specifier.m_type != FormatSpecifier::Type::Hex))
             {
-                on_error(
-                    "Integral types and default-formatted enums must be formatted with {} or one "
-                    "of {:cbBodxX}");
+                on_error("Integral types must be formatted with {} or one of {:cbBodxX}");
             }
             break;
 
@@ -1298,7 +1284,7 @@ constexpr auto BasicFormatString<StringType, ParameterTypes...>::parameter_type(
         {
             return ParameterType::Character;
         }
-        else if constexpr (is_like_supported_string_v<T> || is_user_formatted_enum_v<T>)
+        else if constexpr (is_like_supported_string_v<T>)
         {
             return ParameterType::String;
         }

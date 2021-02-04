@@ -332,14 +332,16 @@ template <
         std::is_arithmetic<T>,
         is_default_formatted_enum<StringType, T>>>
 inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
-    FormatSpecifier &&specifier,
+    FormatSpecifier &&,
     const T &value)
 {
     static thread_local ostringstream_type s_stream;
 
     s_stream << value;
-    format_value(std::move(specifier), s_stream.str());
+    const auto formatted = s_stream.str();
     s_stream.str({});
+
+    append_string(formatted, formatted.size());
 }
 
 //==================================================================================================
