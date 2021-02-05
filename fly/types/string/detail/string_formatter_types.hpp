@@ -1179,7 +1179,10 @@ constexpr bool BasicFormatString<StringType, ParameterTypes...>::validate_specif
     }
 
     // Validate the presentation type.
-    validate_type(*type, specifier);
+    if (specifier.m_type != FormatSpecifier::Type::None)
+    {
+        validate_type(*type, specifier);
+    }
 
     return !has_error();
 }
@@ -1193,15 +1196,11 @@ constexpr void BasicFormatString<StringType, ParameterTypes...>::validate_type(
     switch (type)
     {
         case ParameterType::Generic:
-            if (specifier.m_type != FormatSpecifier::Type::None)
-            {
-                on_error("Generic types must be formatted with {}");
-            }
+            on_error("Generic types must be formatted with {}");
             break;
 
         case ParameterType::Character:
-            if ((specifier.m_type != FormatSpecifier::Type::None) &&
-                (specifier.m_type != FormatSpecifier::Type::Character) &&
+            if ((specifier.m_type != FormatSpecifier::Type::Character) &&
                 (specifier.m_type != FormatSpecifier::Type::Binary) &&
                 (specifier.m_type != FormatSpecifier::Type::Octal) &&
                 (specifier.m_type != FormatSpecifier::Type::Decimal) &&
@@ -1212,24 +1211,21 @@ constexpr void BasicFormatString<StringType, ParameterTypes...>::validate_type(
             break;
 
         case ParameterType::String:
-            if ((specifier.m_type != FormatSpecifier::Type::None) &&
-                (specifier.m_type != FormatSpecifier::Type::String))
+            if (specifier.m_type != FormatSpecifier::Type::String)
             {
                 on_error("String types must be formatted with {} or {:s}");
             }
             break;
 
         case ParameterType::Pointer:
-            if ((specifier.m_type != FormatSpecifier::Type::None) &&
-                (specifier.m_type != FormatSpecifier::Type::Pointer))
+            if (specifier.m_type != FormatSpecifier::Type::Pointer)
             {
                 on_error("Pointer types must be formatted with {} or {:p}");
             }
             break;
 
         case ParameterType::Integral:
-            if ((specifier.m_type != FormatSpecifier::Type::None) &&
-                (specifier.m_type != FormatSpecifier::Type::Character) &&
+            if ((specifier.m_type != FormatSpecifier::Type::Character) &&
                 (specifier.m_type != FormatSpecifier::Type::Binary) &&
                 (specifier.m_type != FormatSpecifier::Type::Octal) &&
                 (specifier.m_type != FormatSpecifier::Type::Decimal) &&
@@ -1240,8 +1236,7 @@ constexpr void BasicFormatString<StringType, ParameterTypes...>::validate_type(
             break;
 
         case ParameterType::FloatingPoint:
-            if ((specifier.m_type != FormatSpecifier::Type::None) &&
-                (specifier.m_type != FormatSpecifier::Type::HexFloat) &&
+            if ((specifier.m_type != FormatSpecifier::Type::HexFloat) &&
                 (specifier.m_type != FormatSpecifier::Type::Scientific) &&
                 (specifier.m_type != FormatSpecifier::Type::Fixed) &&
                 (specifier.m_type != FormatSpecifier::Type::General))
@@ -1251,8 +1246,7 @@ constexpr void BasicFormatString<StringType, ParameterTypes...>::validate_type(
             break;
 
         case ParameterType::Boolean:
-            if ((specifier.m_type != FormatSpecifier::Type::None) &&
-                (specifier.m_type != FormatSpecifier::Type::Character) &&
+            if ((specifier.m_type != FormatSpecifier::Type::Character) &&
                 (specifier.m_type != FormatSpecifier::Type::String) &&
                 (specifier.m_type != FormatSpecifier::Type::Binary) &&
                 (specifier.m_type != FormatSpecifier::Type::Octal) &&
