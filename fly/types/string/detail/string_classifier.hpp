@@ -93,7 +93,7 @@ public:
      * Converts the given character to an upper-case alphabetic character as classified by the
      * default C locale.
      *
-     * The STL's std:tosupper and std::towupper require that the provided character fits into an
+     * The STL's std:toupper and std::towupper require that the provided character fits into an
      * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
      * This method has no such restriction.
      *
@@ -107,7 +107,7 @@ public:
      * Converts the given character to a lower-case alphabetic character as classified by the
      * default C locale.
      *
-     * The STL's std:toslower and std::towlower require that the provided character fits into an
+     * The STL's std:tolower and std::towlower require that the provided character fits into an
      * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
      * This method has no such restriction.
      *
