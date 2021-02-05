@@ -8,10 +8,12 @@
 #include <vector>
 
 namespace {
+
 template <typename StringType>
 class Streamable
 {
 public:
+    using char_type = typename fly::BasicString<StringType>::char_type;
     using ostream_type = typename fly::BasicString<StringType>::ostream_type;
 
     Streamable(const StringType &str, int num) noexcept : m_str(str), m_num(num)
@@ -30,20 +32,16 @@ public:
 
     friend ostream_type &operator<<(ostream_type &stream, const Streamable &obj)
     {
-        stream << '[';
-        stream << obj.str() << ' ' << std::hex << obj.num() << std::dec;
-        stream << ']';
-
-        return stream;
+        return fly::BasicString<StringType>::format(
+            stream,
+            FLY_ARR(char_type, "[{} {:x}]"),
+            obj.str(),
+            obj.num());
     }
 
 private:
     StringType m_str;
     int m_num;
-};
-
-struct NotStreamable
-{
 };
 
 } // namespace
@@ -61,8 +59,6 @@ CATCH_TEMPLATE_TEST_CASE(
     using BasicString = fly::BasicString<StringType>;
     using size_type = typename BasicString::size_type;
     using char_type = typename BasicString::char_type;
-    using streamed_type = typename BasicString::streamed_type;
-    using streamed_char = typename streamed_type::value_type;
 
     CATCH_SECTION("Split a string by a character delimeter")
     {
@@ -301,35 +297,31 @@ CATCH_TEMPLATE_TEST_CASE(
         const char_type arr[] = {'c', '\0'};
         const char_type chr = 'd';
 
-        const Streamable<streamed_type> obj1(FLY_STR(streamed_char, "hi"), 0xbeef);
-        const NotStreamable obj2;
+        const Streamable<StringType> obj(FLY_STR(char_type, "hi"), 0xbeef);
 
-        CATCH_CHECK(FLY_STR(streamed_char, "a") == BasicString::join('.', str));
-        CATCH_CHECK(FLY_STR(streamed_char, "b") == BasicString::join('.', ctr));
-        CATCH_CHECK(FLY_STR(streamed_char, "c") == BasicString::join('.', arr));
-        CATCH_CHECK(FLY_STR(streamed_char, "d") == BasicString::join('.', chr));
-        CATCH_CHECK(FLY_STR(streamed_char, "a,a") == BasicString::join(',', str, str));
-        CATCH_CHECK(FLY_STR(streamed_char, "a,b") == BasicString::join(',', str, ctr));
-        CATCH_CHECK(FLY_STR(streamed_char, "a,c") == BasicString::join(',', str, arr));
-        CATCH_CHECK(FLY_STR(streamed_char, "a,d") == BasicString::join(',', str, chr));
-        CATCH_CHECK(FLY_STR(streamed_char, "b,a") == BasicString::join(',', ctr, str));
-        CATCH_CHECK(FLY_STR(streamed_char, "b,b") == BasicString::join(',', ctr, ctr));
-        CATCH_CHECK(FLY_STR(streamed_char, "b,c") == BasicString::join(',', ctr, arr));
-        CATCH_CHECK(FLY_STR(streamed_char, "b,d") == BasicString::join(',', ctr, chr));
-        CATCH_CHECK(FLY_STR(streamed_char, "c,a") == BasicString::join(',', arr, str));
-        CATCH_CHECK(FLY_STR(streamed_char, "c,b") == BasicString::join(',', arr, ctr));
-        CATCH_CHECK(FLY_STR(streamed_char, "c,c") == BasicString::join(',', arr, arr));
-        CATCH_CHECK(FLY_STR(streamed_char, "c,d") == BasicString::join(',', arr, chr));
-        CATCH_CHECK(FLY_STR(streamed_char, "d,a") == BasicString::join(',', chr, str));
-        CATCH_CHECK(FLY_STR(streamed_char, "d,b") == BasicString::join(',', chr, ctr));
-        CATCH_CHECK(FLY_STR(streamed_char, "d,c") == BasicString::join(',', chr, arr));
-        CATCH_CHECK(FLY_STR(streamed_char, "d,d") == BasicString::join(',', chr, chr));
-        CATCH_CHECK(FLY_STR(streamed_char, "[hi beef]") == BasicString::join('.', obj1));
+        CATCH_CHECK(FLY_STR(char_type, "a") == BasicString::join('.', str));
+        CATCH_CHECK(FLY_STR(char_type, "b") == BasicString::join('.', ctr));
+        CATCH_CHECK(FLY_STR(char_type, "c") == BasicString::join('.', arr));
+        CATCH_CHECK(FLY_STR(char_type, "d") == BasicString::join('.', chr));
+        CATCH_CHECK(FLY_STR(char_type, "a,a") == BasicString::join(',', str, str));
+        CATCH_CHECK(FLY_STR(char_type, "a,b") == BasicString::join(',', str, ctr));
+        CATCH_CHECK(FLY_STR(char_type, "a,c") == BasicString::join(',', str, arr));
+        CATCH_CHECK(FLY_STR(char_type, "a,d") == BasicString::join(',', str, chr));
+        CATCH_CHECK(FLY_STR(char_type, "b,a") == BasicString::join(',', ctr, str));
+        CATCH_CHECK(FLY_STR(char_type, "b,b") == BasicString::join(',', ctr, ctr));
+        CATCH_CHECK(FLY_STR(char_type, "b,c") == BasicString::join(',', ctr, arr));
+        CATCH_CHECK(FLY_STR(char_type, "b,d") == BasicString::join(',', ctr, chr));
+        CATCH_CHECK(FLY_STR(char_type, "c,a") == BasicString::join(',', arr, str));
+        CATCH_CHECK(FLY_STR(char_type, "c,b") == BasicString::join(',', arr, ctr));
+        CATCH_CHECK(FLY_STR(char_type, "c,c") == BasicString::join(',', arr, arr));
+        CATCH_CHECK(FLY_STR(char_type, "c,d") == BasicString::join(',', arr, chr));
+        CATCH_CHECK(FLY_STR(char_type, "d,a") == BasicString::join(',', chr, str));
+        CATCH_CHECK(FLY_STR(char_type, "d,b") == BasicString::join(',', chr, ctr));
+        CATCH_CHECK(FLY_STR(char_type, "d,c") == BasicString::join(',', chr, arr));
+        CATCH_CHECK(FLY_STR(char_type, "d,d") == BasicString::join(',', chr, chr));
+        CATCH_CHECK(FLY_STR(char_type, "[hi beef]") == BasicString::join('.', obj));
         CATCH_CHECK(
-            FLY_STR(streamed_char, "a:[hi beef]:c:d") ==
-            BasicString::join(':', str, obj1, arr, chr));
-        CATCH_CHECK(FLY_STR(streamed_char, "a:c:d") == BasicString::join(':', str, arr, chr));
-        CATCH_CHECK(
-            FLY_STR(streamed_char, ":2:[hi beef]") == BasicString::join(':', obj2, 2, obj1));
+            FLY_STR(char_type, "a:[hi beef]:c:d") == BasicString::join(':', str, obj, arr, chr));
+        CATCH_CHECK(FLY_STR(char_type, "a:c:d") == BasicString::join(':', str, arr, chr));
     }
 }
