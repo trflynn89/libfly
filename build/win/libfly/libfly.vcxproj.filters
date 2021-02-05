@@ -286,9 +286,6 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer_traits.hpp">
-      <Filter>types\string\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>

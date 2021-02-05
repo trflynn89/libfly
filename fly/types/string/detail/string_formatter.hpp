@@ -59,7 +59,6 @@ class BasicStringFormatter
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
     using streamed_char_type = typename traits::streamed_char_type;
-    using ostringstream_type = typename traits::ostringstream_type;
 
     using FormatSpecifier = BasicFormatSpecifier<char_type>;
     using FormatString = BasicFormatString<StringType, ParameterTypes...>;
@@ -337,7 +336,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 {
     if constexpr (traits::OstreamTraits::template is_declared_v<T>)
     {
-        static thread_local ostringstream_type s_stream;
+        static thread_local std::basic_ostringstream<streamed_char_type> s_stream;
 
         s_stream << value;
         const auto formatted = s_stream.str();
@@ -543,7 +542,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     const T &value)
 {
-    static thread_local ostringstream_type s_stream;
+    static thread_local std::basic_ostringstream<streamed_char_type> s_stream;
     stream_modifiers modifiers(s_stream);
 
     if (specifier.m_alignment == FormatSpecifier::Alignment::Default)
