@@ -82,6 +82,14 @@ template <typename StringType>
 inline constexpr bool is_like_supported_string_v = is_like_supported_string<StringType>::value;
 
 /**
+ * Define a trait for whether operator<< is defined for a type.
+ */
+template <typename T>
+using OstreamDeclaration = decltype(std::declval<std::ostream &>() << std::declval<T>());
+
+using OstreamTraits = DeclarationTraits<OstreamDeclaration>;
+
+/**
  * Traits for basic properties of standard std::basic_string specializations.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
@@ -106,14 +114,6 @@ struct BasicStringTraits
     using codepoint_type = std::uint32_t;
 
     /**
-     * Aliases for streaming properties of standard std::basic_string specializations.
-     */
-    using streamed_type =
-        std::conditional_t<std::is_same_v<StringType, std::wstring>, std::wstring, std::string>;
-    using streamed_char_type = typename streamed_type::value_type;
-    using ostream_type = typename std::basic_ostream<streamed_char_type>;
-
-    /**
      * Define a trait for testing if type T is a string-like type analogous to StringType.
      */
     template <typename T>
@@ -121,15 +121,6 @@ struct BasicStringTraits
 
     template <typename T>
     inline static constexpr bool is_string_like_v = is_string_like<T>::value;
-
-    /**
-     * Define a trait for whether operator<< is defined for a type on the stream type used for
-     * StringType.
-     */
-    template <typename T>
-    using OstreamDeclaration = decltype(std::declval<ostream_type &>() << std::declval<T>());
-
-    using OstreamTraits = DeclarationTraits<OstreamDeclaration>;
 };
 
 } // namespace fly::detail

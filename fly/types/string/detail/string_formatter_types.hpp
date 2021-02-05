@@ -391,7 +391,7 @@ private:
      */
     template <typename T>
     using is_formattable_type = std::disjunction<
-        typename traits::OstreamTraits::template is_declared<T>,
+        OstreamTraits::is_declared<T>,
         detail::is_like_supported_string<T>,
         detail::is_supported_character<T>,
         std::is_enum<std::remove_cvref_t<T>>>;
@@ -416,9 +416,8 @@ private:
      * defined a custom operator<< for this type).
      */
     template <typename T>
-    using is_default_formatted_enum = std::conjunction<
-        std::is_enum<T>,
-        std::negation<typename traits::OstreamTraits::template is_declared<T>>>;
+    using is_default_formatted_enum =
+        std::conjunction<std::is_enum<T>, std::negation<OstreamTraits::is_declared<T>>>;
 
     template <typename T>
     static inline constexpr bool is_default_formatted_enum_v = is_default_formatted_enum<T>::value;

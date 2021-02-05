@@ -28,11 +28,6 @@ struct GenericType
     return stream;
 }
 
-[[maybe_unused]] std::wostream &operator<<(std::wostream &stream, const GenericType &)
-{
-    return stream;
-}
-
 enum class DefaultFormattedEnum
 {
     One = 1,
@@ -44,11 +39,6 @@ enum class UserFormattedEnum
 };
 
 [[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const UserFormattedEnum &)
-{
-    return stream;
-}
-
-[[maybe_unused]] std::wostream &operator<<(std::wostream &stream, const UserFormattedEnum &)
 {
     return stream;
 }

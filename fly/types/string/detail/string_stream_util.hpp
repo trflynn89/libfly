@@ -1,14 +1,11 @@
 #pragma once
 
-#include "fly/types/string/detail/string_traits.hpp"
-#include "fly/types/string/detail/string_unicode.hpp"
 #include "fly/types/string/string_literal.hpp"
 
 #include <cctype>
-#include <cstdint>
 #include <ios>
 #include <locale>
-#include <type_traits>
+#include <ostream>
 
 namespace fly::detail {
 
@@ -22,18 +19,13 @@ namespace fly::detail {
 template <typename StringType>
 class BasicStreamModifiers
 {
-    using traits = BasicStringTraits<StringType>;
-
-    using ostream_type = typename traits::ostream_type;
-    using streamed_char_type = typename traits::streamed_char_type;
-
 public:
     /**
      * Constructor. Store the stream's current state to be restored upon destruction.
      *
      * @param stream The stream to be modified.
      */
-    explicit BasicStreamModifiers(ostream_type &stream) noexcept;
+    explicit BasicStreamModifiers(std::ostream &stream) noexcept;
 
     /**
      * Destructor. Restore the stream's orginal state.
@@ -68,7 +60,7 @@ public:
      *
      * @param ch The new fill setting.
      */
-    void fill(streamed_char_type ch);
+    void fill(char ch);
 
     /**
      * Set the width of the stream.
@@ -88,7 +80,7 @@ private:
     BasicStreamModifiers(const BasicStreamModifiers &) = delete;
     BasicStreamModifiers &operator=(const BasicStreamModifiers &) = delete;
 
-    ostream_type &m_stream;
+    std::ostream &m_stream;
 
     const std::ios_base::fmtflags m_flags;
     bool m_changed_flags {false};
@@ -96,7 +88,7 @@ private:
     const std::locale m_locale;
     bool m_changed_locale {false};
 
-    const streamed_char_type m_fill;
+    const char m_fill;
     bool m_changed_fill {false};
 
     const std::streamsize m_width;
@@ -128,7 +120,7 @@ private:
 
 //==================================================================================================
 template <typename StringType>
-BasicStreamModifiers<StringType>::BasicStreamModifiers(ostream_type &stream) noexcept :
+BasicStreamModifiers<StringType>::BasicStreamModifiers(std::ostream &stream) noexcept :
     m_stream(stream),
     m_flags(stream.flags()),
     m_locale(stream.getloc()),
@@ -192,7 +184,7 @@ inline void BasicStreamModifiers<StringType>::locale()
 
 //==================================================================================================
 template <typename StringType>
-inline void BasicStreamModifiers<StringType>::fill(streamed_char_type ch)
+inline void BasicStreamModifiers<StringType>::fill(char ch)
 {
     m_stream.fill(ch);
     m_changed_fill = true;
