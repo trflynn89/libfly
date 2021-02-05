@@ -3,7 +3,6 @@
 #include "fly/types/string/detail/string_classifier.hpp"
 #include "fly/types/string/detail/string_converter.hpp"
 #include "fly/types/string/detail/string_formatter.hpp"
-#include "fly/types/string/detail/string_streamer.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/string_unicode.hpp"
 #include "fly/types/string/string_literal.hpp"
@@ -52,7 +51,6 @@ template <typename StringType>
 class BasicString
 {
     using classifier = detail::BasicStringClassifier<StringType>;
-    using streamer = detail::BasicStringStreamer<StringType>;
     using traits = detail::BasicStringTraits<StringType>;
     using unicode = detail::BasicStringUnicode<StringType>;
 
@@ -63,8 +61,6 @@ public:
     using view_type = typename traits::view_type;
     using int_type = typename traits::int_type;
     using codepoint_type = typename traits::codepoint_type;
-    using ostream_type = typename traits::ostream_type;
-    using streamed_type = typename traits::streamed_type;
 
     template <typename... ParameterTypes>
     using FormatString =
@@ -445,70 +441,6 @@ public:
      */
     template <typename... ParameterTypes>
     static StringType format(FormatString<ParameterTypes...> &&fmt, ParameterTypes &&...parameters);
-
-    /**
-     * Format a string with a set of format parameters, inserting the formatted string into a
-     * stream. Based strongly upon: https://en.cppreference.com/w/cpp/utility/format/format.
-     *
-     * A format string consists of:
-     *
-     *     1. Any character other than "{" or "}", which are copied unchanged to the output.
-     *     2. Escape sequences "{{" and "}}", which are replaced with "{" and "}" in the output.
-     *     3. Replacement fields.
-     *
-     * Replacement fields may be of the form:
-     *
-     *     1. An introductory "{" character.
-     *     2. An optional non-negative position.
-     *     3. An optional colon ":" following by formatting options.
-     *     4. A final "}" character.
-     *
-     * For a detailed description of replacement fields see fly::detail::BasicFormatSpecifier.
-     *
-     * This implementation differs from std::format in the following ways:
-     *
-     *    1. All standard string types are supported as format strings.
-     *
-     *    2. All standard string types are supported as format parameters, even if that type differs
-     *       from the format string type. If the type differs, the format parameter is transcoded to
-     *       the type of the format string.
-     *
-     *    3. Any generic type for which an operator<< overload is defined will be converted to a
-     *       string using that overload.
-     *
-     *    4. Formatting of strong enumeration types defaults to the format of the enumeration's
-     *       underlying type. However, if an overload of operator<< is defined, the type is treated
-     *       as a generic type according to (3) above.
-     *
-     *    5. This implementation is exceptionless. Any error encountered (such as failed transcoding
-     *       in (2) above) results in the format parameter that caused the error to be dropped.
-     *
-     *    6. Locale-specific form is not supported. If the option appears in the format string, it
-     *       will be parsed, but will be ignored.
-     *
-     * The format string type is implicitly constructed from a C-string literal. Callers should only
-     * invoke this method accordingly:
-     *
-     *     format("Format {:d}", 1);
-     *
-     * On compilers that support immediate functions (consteval), the format string is validated at
-     * compile time against the types of the format parameters. If the format string is invalid, a
-     * compile error with a diagnostic message will be raised. On other compilers, the error message
-     * will be returned rather than a formatted string.
-     *
-     * @tparam ParameterTypes Variadic format parameter types.
-     *
-     * @param stream The stream to insert the formatted string into.
-     * @param fmt The string to format.
-     * @param parameters The variadic list of format parameters to be formatted.
-     *
-     * @return The same stream object.
-     */
-    template <typename... ParameterTypes>
-    static ostream_type &format(
-        ostream_type &stream,
-        FormatString<ParameterTypes...> &&fmt,
-        ParameterTypes &&...parameters);
 
     /**
      * Concatenate a list of objects with the given separator.
@@ -912,22 +844,6 @@ inline StringType BasicString<StringType>::format(
         std::forward<ParameterTypes>(parameters)...);
 
     return formatter.format(std::forward<FormatString<ParameterTypes...>>(fmt));
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename... ParameterTypes>
-inline auto BasicString<StringType>::format(
-    ostream_type &stream,
-    FormatString<ParameterTypes...> &&fmt,
-    ParameterTypes &&...parameters) -> ostream_type &
-{
-    StringType result = format(
-        std::forward<FormatString<ParameterTypes...>>(fmt),
-        std::forward<ParameterTypes>(parameters)...);
-
-    streamer::stream_value(stream, std::move(result));
-    return stream;
 }
 
 //==================================================================================================

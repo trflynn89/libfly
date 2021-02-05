@@ -38,7 +38,7 @@ public:
 
         // ConsoleReporter prints a second newline above, so go up one line before logging the time.
         stream << fly::Styler(fly::Cursor::Up, fly::Style::Bold, fly::Color::Cyan) << "Total time ";
-        fly::String::format(stream, "{:.3f} seconds\n\n", duration.count());
+        stream << fly::String::format("{:.3f} seconds\n\n", duration.count());
     }
 
     void testCaseStarting(const Catch::TestCaseInfo &info) override
@@ -75,8 +75,7 @@ public:
             const auto style = fly::Styler(fly::Style::Bold, fly::Color::Green);
             stream << style;
 
-            fly::String::format(
-                stream,
+            stream << fly::String::format(
                 "[==== PASSED {} ({:.3f} seconds) ====]\n\n",
                 name,
                 duration.count());
@@ -86,8 +85,7 @@ public:
             const auto style = fly::Styler(fly::Style::Bold, fly::Color::Red);
             stream << style;
 
-            fly::String::format(
-                stream,
+            stream << fly::String::format(
                 "[==== FAILED {} ({:.3f} seconds) ====]\n\n",
                 name,
                 duration.count());

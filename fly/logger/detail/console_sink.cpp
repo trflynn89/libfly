@@ -47,9 +47,7 @@ bool ConsoleSink::stream(fly::Log &&log)
 
     {
         auto styler = color ? fly::Styler(std::move(style), *std::move(color)) : fly::Styler(style);
-        *stream << styler;
-
-        String::format(*stream, "{} {}", fly::System::local_time(), log.m_trace);
+        *stream << styler << String::format("{} {}", fly::System::local_time(), log.m_trace);
     }
 
     *stream << ": " << log.m_message << std::endl;

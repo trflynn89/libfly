@@ -13,9 +13,6 @@ template <typename StringType>
 class Streamable
 {
 public:
-    using char_type = typename fly::BasicString<StringType>::char_type;
-    using ostream_type = typename fly::BasicString<StringType>::ostream_type;
-
     Streamable(const StringType &str, int num) noexcept : m_str(str), m_num(num)
     {
     }
@@ -30,13 +27,10 @@ public:
         return m_num;
     };
 
-    friend ostream_type &operator<<(ostream_type &stream, const Streamable &obj)
+    friend std::ostream &operator<<(std::ostream &stream, const Streamable &obj)
     {
-        return fly::BasicString<StringType>::format(
-            stream,
-            FLY_ARR(char_type, "[{} {:x}]"),
-            obj.str(),
-            obj.num());
+        stream << fly::String::format("[{} {:x}]", obj.str(), obj.num());
+        return stream;
     }
 
 private:

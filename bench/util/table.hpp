@@ -303,11 +303,12 @@ void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
 
         if constexpr (std::is_floating_point_v<std::remove_cvref_t<decltype(value)>>)
         {
-            fly::String::format(stream, " {:{}.{}f} ", value, m_column_widths[index], s_precision);
+            stream
+                << fly::String::format(" {:{}.{}f} ", value, m_column_widths[index], s_precision);
         }
         else
         {
-            fly::String::format(stream, " {:{}} ", value, m_column_widths[index]);
+            stream << fly::String::format(" {:{}} ", value, m_column_widths[index]);
         }
 
         ++index;
