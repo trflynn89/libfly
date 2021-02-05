@@ -3,7 +3,7 @@
 #include "fly/traits/traits.hpp"
 #include "fly/types/string/detail/string_classifier.hpp"
 #include "fly/types/string/detail/string_formatter_types.hpp"
-#include "fly/types/string/detail/string_streamer.hpp"
+#include "fly/types/string/detail/string_stream_util.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/string_unicode.hpp"
 #include "fly/types/string/string_literal.hpp"
