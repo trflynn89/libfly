@@ -335,13 +335,16 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&,
     const T &value)
 {
-    static thread_local ostringstream_type s_stream;
+    if constexpr (traits::OstreamTraits::template is_declared_v<T>)
+    {
+        static thread_local ostringstream_type s_stream;
 
-    s_stream << value;
-    const auto formatted = s_stream.str();
-    s_stream.str({});
+        s_stream << value;
+        const auto formatted = s_stream.str();
+        s_stream.str({});
 
-    append_string(formatted, formatted.size());
+        append_string(formatted, formatted.size());
+    }
 }
 
 //==================================================================================================
