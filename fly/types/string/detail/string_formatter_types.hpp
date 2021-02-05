@@ -307,6 +307,68 @@ private:
 };
 
 /**
+ * Traits for basic properties of format parameters.
+ *
+ * @author Timothy Flynn (trflynn89@pm.me)
+ * @version February 5, 2021
+ */
+struct BasicFormatTraits
+{
+    /**
+     * Trait to determine if a type is either streamable or string-like.
+     */
+    template <typename T, typename U = std::remove_cvref_t<T>>
+    using is_formattable = std::disjunction<
+        OstreamTraits::is_declared<T>,
+        detail::is_like_supported_string<T>,
+        detail::is_supported_character<T>,
+        std::is_enum<U>>;
+
+    template <typename T>
+    static inline constexpr bool is_formattable_v = is_formattable<T>::value;
+
+    /**
+     * Trait to classify a type as an integer, excluding boolean types.
+     */
+    template <typename T, typename U = std::remove_cvref_t<T>>
+    using is_integral = std::conjunction<std::is_integral<U>, std::negation<std::is_same<U, bool>>>;
+
+    template <typename T>
+    static inline constexpr bool is_integral_v = is_integral<T>::value;
+
+    /**
+     * Trait to classify a type as an integer, excluding character and boolean types.
+     */
+    template <typename T>
+    using is_integer = std::conjunction<is_integral<T>, std::negation<is_supported_character<T>>>;
+
+    template <typename T>
+    static inline constexpr bool is_integer_v = is_integer<T>::value;
+
+    /**
+     * Trait to classify a type as a pointer (excluding C-string types).
+     */
+    template <typename T, typename U = std::remove_cvref_t<T>>
+    using is_pointer = std::conjunction<
+        std::disjunction<std::is_pointer<U>, std::is_null_pointer<U>>,
+        std::negation<detail::is_like_supported_string<T>>>;
+
+    template <typename T>
+    static inline constexpr bool is_pointer_v = is_pointer<T>::value;
+
+    /**
+     * Trait to classify an enumeration type as default-formatted (i.e. the user has not defined a
+     * custom operator<< for this type).
+     */
+    template <typename T, typename U = std::remove_cvref_t<T>>
+    using is_default_formatted_enum =
+        std::conjunction<std::is_enum<U>, std::negation<OstreamTraits::is_declared<T>>>;
+
+    template <typename T>
+    static inline constexpr bool is_default_formatted_enum_v = is_default_formatted_enum<T>::value;
+};
+
+/**
  * A container to hold and parse a format string at compile time.
  *
  * This class depends on C++20 immediate functions (consteval), which are not yet supported by all
@@ -385,42 +447,6 @@ public:
 private:
     BasicFormatString(const BasicFormatString &) = delete;
     BasicFormatString &operator=(const BasicFormatString &) = delete;
-
-    /**
-     * Helper trait to determine if a type is either streamable or string-like.
-     */
-    template <typename T>
-    using is_formattable_type = std::disjunction<
-        OstreamTraits::is_declared<T>,
-        detail::is_like_supported_string<T>,
-        detail::is_supported_character<T>,
-        std::is_enum<std::remove_cvref_t<T>>>;
-
-    template <typename T>
-    static inline constexpr bool is_formattable_type_v = is_formattable_type<T>::value;
-
-    /**
-     * Helper trait to classify a type as an integer, excluding character and boolean types.
-     */
-    template <typename T>
-    using is_integer = std::conjunction<
-        std::is_integral<T>,
-        std::negation<is_supported_character<T>>,
-        std::negation<std::is_same<T, bool>>>;
-
-    template <typename T>
-    static inline constexpr bool is_integer_v = is_integer<T>::value;
-
-    /**
-     * Helper trait to classify an enumeration type as default-formatted (i.e. the user has not
-     * defined a custom operator<< for this type).
-     */
-    template <typename T>
-    using is_default_formatted_enum =
-        std::conjunction<std::is_enum<T>, std::negation<OstreamTraits::is_declared<T>>>;
-
-    template <typename T>
-    static inline constexpr bool is_default_formatted_enum_v = is_default_formatted_enum<T>::value;
 
     /**
      * Upon parsing an un-escaped opening brace, parse a single replacement field in the format
@@ -779,7 +805,7 @@ FLY_CONSTEVAL BasicFormatString<StringType, ParameterTypes...>::BasicFormatStrin
 {
     std::optional<char_type> ch;
 
-    if constexpr (!(is_formattable_type_v<ParameterTypes> && ...))
+    if constexpr (!(BasicFormatTraits::is_formattable_v<ParameterTypes> && ...))
     {
         on_error("An overloaded operator<< must be defined for all format parameters");
     }
@@ -1285,7 +1311,8 @@ constexpr auto BasicFormatString<StringType, ParameterTypes...>::parameter_type(
         {
             return ParameterType::Pointer;
         }
-        else if constexpr (is_integer_v<T> || is_default_formatted_enum_v<T>)
+        else if constexpr (
+            BasicFormatTraits::is_integer_v<T> || BasicFormatTraits::is_default_formatted_enum_v<T>)
         {
             return ParameterType::Integral;
         }

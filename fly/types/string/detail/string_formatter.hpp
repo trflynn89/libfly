@@ -22,29 +22,6 @@
 namespace fly::detail {
 
 /**
- * Helper trait to classify a type as an integer, excluding boolean types.
- */
-template <typename T>
-using is_format_integral =
-    std::conjunction<std::is_integral<T>, std::negation<std::is_same<T, bool>>>;
-
-/**
- * Helper trait to classify a type as a pointer (excluding C-string types).
- */
-template <typename T>
-using is_format_pointer = std::conjunction<
-    std::disjunction<std::is_pointer<T>, std::is_null_pointer<T>>,
-    std::negation<detail::is_like_supported_string<T>>>;
-
-/**
- * Helper trait to classify an enumeration type as default-formatted (i.e. the user has not defined
- * a custom operator<< for this type).
- */
-template <typename StringType, typename T>
-using is_default_formatted_enum =
-    std::conjunction<std::is_enum<T>, std::negation<OstreamTraits::is_declared<T>>>;
-
-/**
  * Class to format parameters according to a provided format string.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
@@ -98,9 +75,9 @@ private:
         typename T,
         fly::disable_if_any<
             detail::is_like_supported_string<T>,
-            is_format_pointer<T>,
+            BasicFormatTraits::is_pointer<T>,
             std::is_arithmetic<T>,
-            is_default_formatted_enum<StringType, T>> = 0>
+            BasicFormatTraits::is_default_formatted_enum<T>> = 0>
     void format_value(FormatSpecifier &&specifier, const T &value);
 
     /**
@@ -122,7 +99,7 @@ private:
      * @param specifier The replacement field to format.
      * @param value The value to format.
      */
-    template <typename T, fly::enable_if<is_format_pointer<T>> = 0>
+    template <typename T, fly::enable_if<BasicFormatTraits::is_pointer<T>> = 0>
     void format_value(FormatSpecifier &&specifier, T value);
 
     /**
@@ -133,7 +110,7 @@ private:
      * @param specifier The replacement field to format.
      * @param value The value to format.
      */
-    template <typename T, fly::enable_if<is_format_integral<T>> = 0>
+    template <typename T, fly::enable_if<BasicFormatTraits::is_integral<T>> = 0>
     void format_value(FormatSpecifier &&specifier, T value);
 
     /**
@@ -145,7 +122,7 @@ private:
      * @param value The value to format.
      * @param is_negative Whether the original value was negative.
      */
-    template <typename T, fly::enable_if<is_format_integral<T>> = 0>
+    template <typename T, fly::enable_if<BasicFormatTraits::is_integral<T>> = 0>
     void format_value(FormatSpecifier &&specifier, T value, bool is_negative);
 
     /**
@@ -181,7 +158,7 @@ private:
      * @param specifier The replacement field to format.
      * @param value The value to format.
      */
-    template <typename T, fly::enable_if<is_default_formatted_enum<StringType, T>> = 0>
+    template <typename T, fly::enable_if<BasicFormatTraits::is_default_formatted_enum<T>> = 0>
     void format_value(FormatSpecifier &&specifier, T value);
 
     /**
@@ -216,7 +193,7 @@ private:
      *
      * @return The number of base-N digits converted.
      */
-    template <typename T, fly::enable_if<is_format_integral<T>> = 0>
+    template <typename T, fly::enable_if<BasicFormatTraits::is_integral<T>> = 0>
     std::size_t append_number(T value, int base);
 
     /**
@@ -245,7 +222,7 @@ private:
      *
      * @return The number of base-N digits in the value.
      */
-    template <typename T, fly::enable_if<is_format_integral<T>> = 0>
+    template <typename T, fly::enable_if<BasicFormatTraits::is_integral<T>> = 0>
     std::size_t count_digits(T value, int base);
 
     static constexpr const auto s_left_brace = FLY_CHR(char_type, '{');
@@ -326,9 +303,9 @@ template <
     typename T,
     fly::disable_if_any<
         detail::is_like_supported_string<T>,
-        is_format_pointer<T>,
+        BasicFormatTraits::is_pointer<T>,
         std::is_arithmetic<T>,
-        is_default_formatted_enum<StringType, T>>>
+        BasicFormatTraits::is_default_formatted_enum<T>>>
 inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&,
     const T &value)
@@ -347,7 +324,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <typename T, fly::enable_if<is_format_pointer<T>>>
+template <typename T, fly::enable_if<BasicFormatTraits::is_pointer<T>>>
 inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     T value)
@@ -407,7 +384,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <typename T, fly::enable_if<is_format_integral<T>>>
+template <typename T, fly::enable_if<BasicFormatTraits::is_integral<T>>>
 inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     T value)
@@ -432,7 +409,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <typename T, fly::enable_if<is_format_integral<T>>>
+template <typename T, fly::enable_if<BasicFormatTraits::is_integral<T>>>
 void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     T value,
@@ -631,7 +608,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <typename T, fly::enable_if<is_default_formatted_enum<StringType, T>>>
+template <typename T, fly::enable_if<BasicFormatTraits::is_default_formatted_enum<T>>>
 inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     T value)
@@ -679,7 +656,7 @@ void BasicStringFormatter<StringType, ParameterTypes...>::append_string(
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <typename T, fly::enable_if<is_format_integral<T>>>
+template <typename T, fly::enable_if<BasicFormatTraits::is_integral<T>>>
 std::size_t BasicStringFormatter<StringType, ParameterTypes...>::append_number(T value, int base)
 {
     const std::size_t digits = count_digits(value, base);
@@ -737,7 +714,7 @@ inline T BasicStringFormatter<StringType, ParameterTypes...>::resolve_size(
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <typename T, fly::enable_if<is_format_integral<T>>>
+template <typename T, fly::enable_if<BasicFormatTraits::is_integral<T>>>
 inline std::size_t
 BasicStringFormatter<StringType, ParameterTypes...>::count_digits(T value, int base)
 {
