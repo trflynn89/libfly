@@ -10,12 +10,9 @@
 
 namespace {
 
-template <typename StringType>
 struct Streamable
 {
-    using ostream_type = typename fly::detail::BasicStringTraits<StringType>::ostream_type;
-
-    friend ostream_type &operator<<(ostream_type &stream, const Streamable &)
+    [[maybe_unused]] friend std::ostream &operator<<(std::ostream &stream, const Streamable &)
     {
         return stream;
     }
@@ -102,7 +99,6 @@ CATCH_TEMPLATE_TEST_CASE(
     using traits = typename fly::detail::BasicStringTraits<StringType>;
     using char_type = typename traits::char_type;
     using char_pointer_type = typename std::add_pointer<char_type>::type;
-    using streamed_type = typename traits::streamed_type;
     using view_type = typename traits::view_type;
 
     constexpr bool is_string = std::is_same_v<StringType, std::string>;
@@ -484,14 +480,13 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Check whether types are streamable")
     {
-        const Streamable<streamed_type> obj1;
+        const Streamable obj1;
         const NotStreamable obj2;
 
-        CATCH_CHECK(traits::OstreamTraits::template is_declared_v<int>);
-        CATCH_CHECK(traits::OstreamTraits::template is_declared_v<bool>);
-        CATCH_CHECK(traits::OstreamTraits::template is_declared_v<streamed_type>);
-        CATCH_CHECK(traits::OstreamTraits::template is_declared_v<decltype(obj1)>);
+        CATCH_CHECK(fly::detail::OstreamTraits::is_declared_v<int>);
+        CATCH_CHECK(fly::detail::OstreamTraits::is_declared_v<bool>);
+        CATCH_CHECK(fly::detail::OstreamTraits::is_declared_v<decltype(obj1)>);
 
-        CATCH_CHECK_FALSE(traits::OstreamTraits::template is_declared_v<decltype(obj2)>);
+        CATCH_CHECK_FALSE(fly::detail::OstreamTraits::is_declared_v<decltype(obj2)>);
     }
 }

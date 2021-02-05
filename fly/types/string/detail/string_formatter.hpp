@@ -15,6 +15,7 @@
 #include <iterator>
 #include <limits>
 #include <optional>
+#include <sstream>
 #include <system_error>
 #include <type_traits>
 
@@ -40,9 +41,8 @@ using is_format_pointer = std::conjunction<
  * a custom operator<< for this type).
  */
 template <typename StringType, typename T>
-using is_default_formatted_enum = std::conjunction<
-    std::is_enum<T>,
-    std::negation<typename BasicStringTraits<StringType>::OstreamTraits::template is_declared<T>>>;
+using is_default_formatted_enum =
+    std::conjunction<std::is_enum<T>, std::negation<OstreamTraits::is_declared<T>>>;
 
 /**
  * Class to format parameters according to a provided format string.
@@ -58,7 +58,6 @@ class BasicStringFormatter
     using stream_modifiers = BasicStreamModifiers<StringType>;
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
-    using streamed_char_type = typename traits::streamed_char_type;
 
     using FormatSpecifier = BasicFormatSpecifier<char_type>;
     using FormatString = BasicFormatString<StringType, ParameterTypes...>;
@@ -334,9 +333,9 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&,
     const T &value)
 {
-    if constexpr (traits::OstreamTraits::template is_declared_v<T>)
+    if constexpr (OstreamTraits::is_declared_v<T>)
     {
-        static thread_local std::basic_ostringstream<streamed_char_type> s_stream;
+        static thread_local std::stringstream s_stream;
 
         s_stream << value;
         const auto formatted = s_stream.str();
@@ -542,7 +541,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     FormatSpecifier &&specifier,
     const T &value)
 {
-    static thread_local std::basic_ostringstream<streamed_char_type> s_stream;
+    static thread_local std::stringstream s_stream;
     stream_modifiers modifiers(s_stream);
 
     if (specifier.m_alignment == FormatSpecifier::Alignment::Default)
@@ -557,7 +556,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
             break;
 
         case FormatSpecifier::Sign::NegativeOnlyWithPositivePadding:
-            modifiers.template locale<PositivePaddingFacet<streamed_char_type>>();
+            modifiers.template locale<PositivePaddingFacet<char>>();
             modifiers.setf(std::ios_base::showpos);
             break;
 
@@ -573,7 +572,7 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     if (specifier.m_zero_padding)
     {
         modifiers.setf(std::ios_base::internal, std::ios_base::adjustfield);
-        modifiers.fill(static_cast<streamed_char_type>(s_zero));
+        modifiers.fill(static_cast<char>(s_zero));
         modifiers.width(resolve_size<std::streamsize>(specifier.m_width));
     }
 
