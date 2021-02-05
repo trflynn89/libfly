@@ -521,7 +521,7 @@ public:
      * @return The resulting join of the given arguments.
      */
     template <typename... Args>
-    static streamed_type join(const char_type &separator, const Args &...args);
+    static StringType join(char_type separator, Args &&...args);
 
     /**
      * Convert a string to another type. The other type may be a string with a different Unicode
@@ -539,20 +539,16 @@ public:
 
 private:
     /**
-     * Recursively join one argument into the given stream.
+     * Recursively join one argument into the given string.
      */
     template <typename T, typename... Args>
-    static void join_internal(
-        ostream_type &stream,
-        const char_type &separator,
-        const T &value,
-        const Args &...args);
+    static void join_internal(StringType &result, char_type separator, T &&value, Args &&...args);
 
     /**
-     * Terminator for the variadic template joiner. Join the last argument into the given stream.
+     * Terminator for the variadic template joiner. Join the last argument into the given string.
      */
     template <typename T>
-    static void join_internal(ostream_type &stream, const char_type &separator, const T &value);
+    static void join_internal(StringType &result, char_type separator, T &&value);
 
     /**
      * A list of alpha-numeric characters in the range [0-9A-Za-z].
@@ -937,37 +933,33 @@ inline auto BasicString<StringType>::format(
 //==================================================================================================
 template <typename StringType>
 template <typename... Args>
-inline auto BasicString<StringType>::join(const char_type &separator, const Args &...args)
-    -> streamed_type
+inline StringType BasicString<StringType>::join(char_type separator, Args &&...args)
 {
-    typename traits::ostringstream_type stream;
-    join_internal(stream, separator, args...);
+    StringType result;
+    join_internal(result, separator, std::forward<Args>(args)...);
 
-    return stream.str();
+    return result;
 }
 
 //==================================================================================================
 template <typename StringType>
 template <typename T, typename... Args>
 inline void BasicString<StringType>::join_internal(
-    ostream_type &stream,
-    const char_type &separator,
-    const T &value,
-    const Args &...args)
+    StringType &result,
+    char_type separator,
+    T &&value,
+    Args &&...args)
 {
-    streamer::stream_value(stream, value);
-    streamer::stream_value(stream, separator);
-
-    join_internal(stream, separator, args...);
+    result += format(FLY_ARR(char_type, "{}{}"), std::forward<T>(value), separator);
+    join_internal(result, separator, std::forward<Args>(args)...);
 }
 
 //==================================================================================================
 template <typename StringType>
 template <typename T>
-inline void
-BasicString<StringType>::join_internal(ostream_type &stream, const char_type &, const T &value)
+inline void BasicString<StringType>::join_internal(StringType &result, char_type, T &&value)
 {
-    streamer::stream_value(stream, value);
+    result += format(FLY_ARR(char_type, "{}"), std::forward<T>(value));
 }
 
 //==================================================================================================
