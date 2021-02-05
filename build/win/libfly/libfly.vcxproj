@@ -225,7 +225,6 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter_types.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_lexer.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer.hpp" />
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_streamer_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_unicode.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\string.hpp" />

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "fly/traits/traits.hpp"
-#include "fly/types/string/detail/string_streamer_traits.hpp"
 
 #include <cstdint>
+#include <ostream>
 #include <string>
 #include <type_traits>
 
@@ -105,20 +105,13 @@ struct BasicStringTraits
 
     using codepoint_type = std::uint32_t;
 
-    using streamer_traits = BasicStringStreamerTraits<StringType>;
-    using streamed_type = typename streamer_traits::streamed_type;
+    /**
+     * Aliases for streaming properties of standard std::basic_string specializations.
+     */
+    using streamed_type =
+        std::conditional_t<std::is_same_v<StringType, std::wstring>, std::wstring, std::string>;
     using streamed_char_type = typename streamed_type::value_type;
-
-    using istream_type = typename streamer_traits::istream_type;
-    using ostream_type = typename streamer_traits::ostream_type;
-
-    using fstream_type = typename streamer_traits::fstream_type;
-    using ifstream_type = typename streamer_traits::ifstream_type;
-    using ofstream_type = typename streamer_traits::ofstream_type;
-
-    using stringstream_type = typename streamer_traits::stringstream_type;
-    using istringstream_type = typename streamer_traits::istringstream_type;
-    using ostringstream_type = typename streamer_traits::ostringstream_type;
+    using ostream_type = typename std::basic_ostream<streamed_char_type>;
 
     /**
      * Define a trait for testing if type T is a string-like type analogous to StringType.

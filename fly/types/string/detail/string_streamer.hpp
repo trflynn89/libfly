@@ -13,64 +13,6 @@
 namespace fly::detail {
 
 /**
- * Helper struct to stream generic values into a std::basic_ostream.
- *
- * For std::string and std::wstring, the "normal" stream types are used (std::ostream and
- * std::wostream, and their children, respectively).
- *
- * For std::u8string, std::u16string, and std::u32string, the STL does not provide stream types. For
- * a general solution, std::ostream is used, and any string value is converted to UTF-8.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version March 21, 2019
- */
-template <typename StringType>
-struct BasicStringStreamer
-{
-    using traits = BasicStringTraits<StringType>;
-
-    using ostream_type = typename traits::ostream_type;
-    using streamed_type = typename traits::streamed_type;
-    using streamed_char_type = typename traits::streamed_char_type;
-
-    /**
-     * Stream the given value into the given stream.
-     *
-     * For all string-like types, if the type corresponds to the stream type, then the string is
-     * streamed as-is. Other string-like types are converted to the Unicode encoding used by the
-     * stream type.
-     *
-     * For all character types, the character is case to the character type used by the stream type.
-     *
-     * For any other type which has an operator<< overload defined, the value is streamed using that
-     * overload.
-     *
-     * All other types are dropped.
-     *
-     * @tparam T The type of the value to stream.
-     *
-     * @param stream The stream to insert the value into.
-     * @param value The value to stream.
-     */
-    template <typename T>
-    static void stream_value(ostream_type &stream, T &&value);
-
-private:
-    /**
-     * Stream a string-like value into the given stream. If the type corresponds to the stream type,
-     * then the string is streamed as-is. Other string-like types are converted to the Unicode
-     * encoding used by the stream type.
-     *
-     * @tparam T The type of the string-like value to stream.
-     *
-     * @param stream The stream to insert the value into.
-     * @param value The string-like value to stream.
-     */
-    template <typename T>
-    static void stream_string(ostream_type &stream, T &&value);
-};
-
-/**
  * RAII helper class to make formatting modifications to a stream and ensure those modifications
  * are reset upon destruction.
  *
@@ -183,54 +125,6 @@ private:
     static constexpr const auto s_plus_sign = FLY_CHR(char, '+');
     static constexpr const auto s_space = FLY_CHR(CharType, ' ');
 };
-
-//==================================================================================================
-template <typename StringType>
-template <typename T>
-void BasicStringStreamer<StringType>::stream_value(ostream_type &stream, T &&value)
-{
-    using U = std::remove_cvref_t<T>;
-
-    if constexpr (detail::is_like_supported_string_v<U>)
-    {
-        stream_string(stream, std::forward<T>(value));
-    }
-    else if constexpr (detail::is_supported_character_v<T>)
-    {
-        // TODO: Validate the value fits into streamed_char_type / convert Unicode encoding.
-        stream << static_cast<streamed_char_type>(std::forward<T>(value));
-    }
-    else if constexpr (traits::OstreamTraits::template is_declared_v<U>)
-    {
-        stream << std::forward<T>(value);
-    }
-}
-
-//==================================================================================================
-template <typename StringType>
-template <typename T>
-void BasicStringStreamer<StringType>::stream_string(ostream_type &stream, T &&value)
-{
-    using string_like_type = detail::is_like_supported_string_t<T>;
-
-    if constexpr (std::is_same_v<streamed_type, string_like_type>)
-    {
-        stream << value;
-    }
-    else
-    {
-        using string_like_traits = BasicStringTraits<string_like_type>;
-        using string_like_view = typename string_like_traits::view_type;
-        using unicode = BasicStringUnicode<string_like_type>;
-
-        string_like_view view(std::forward<T>(value));
-
-        if (auto converted = unicode::template convert_encoding<streamed_type>(view); converted)
-        {
-            stream << *std::move(converted);
-        }
-    }
-}
 
 //==================================================================================================
 template <typename StringType>
