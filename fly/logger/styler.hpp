@@ -74,13 +74,13 @@ struct Color
      * @param color The 256-color value to apply.
      * @param plane The plane (default foreground) that should be modified.
      */
-    constexpr Color(StandardColor color, Plane plane = Foreground) noexcept :
+    explicit constexpr Color(std::uint8_t color, Plane plane = Foreground) noexcept :
         m_color(color),
         m_plane(plane)
     {
     }
 
-    const StandardColor m_color;
+    const std::uint8_t m_color;
     const Plane m_plane;
 };
 
@@ -132,7 +132,7 @@ inline namespace literals {
         {
             // Convert to std::uint8_t via numeric literal to ensure the provided color is valid.
             const std::uint8_t validated_color = operator"" _u8<Literals...>();
-            return Color(static_cast<Color::StandardColor>(validated_color));
+            return Color(validated_color);
         }
 
     } // namespace styler_literals

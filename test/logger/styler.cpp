@@ -142,7 +142,7 @@ CATCH_TEST_CASE("Styler", "[logger]")
         {
             test_styler(
                 "\x1b[38;5;" + std::to_string(color) + "m",
-                static_cast<fly::Color::StandardColor>(color));
+                fly::Color(static_cast<std::uint8_t>(color)));
         }
     }
 
@@ -170,7 +170,7 @@ CATCH_TEST_CASE("Styler", "[logger]")
         {
             test_styler(
                 "\x1b[48;5;" + std::to_string(color) + "m",
-                fly::Color(static_cast<fly::Color::StandardColor>(color), fly::Color::Background));
+                fly::Color(static_cast<std::uint8_t>(color), fly::Color::Background));
         }
     }
 
