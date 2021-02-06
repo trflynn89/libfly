@@ -212,9 +212,12 @@ byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size)
         const DataType buffer = static_cast<DataType>(m_buffer);
         lshift = size - m_position;
 
-        // Fill the input bits with the remainder of byte buffer and refill the buffer from the
-        // stream.
-        bits = (buffer & bit_mask<DataType>(m_position)) << lshift;
+        // Fill the input bits with the remainder of byte buffer.
+        bits = buffer & bit_mask<DataType>(m_position);
+        bits <<= lshift - 1;
+        bits <<= 1;
+
+        // Refill the buffer from the stream.
         refill_buffer();
 
         // Then update the input to only peek any remaining bits next.
