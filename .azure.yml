@@ -13,25 +13,25 @@ jobs:
   - template: build/ci/linux.yml
     parameters:
       toolchain: 'clang'
-      mode: 'Debug'
+      mode: 'debug'
       arch: 'x86'
 
   - template: build/ci/linux.yml
     parameters:
       toolchain: 'clang'
-      mode: 'Debug'
+      mode: 'debug'
       arch: 'x64'
 
   - template: build/ci/linux.yml
     parameters:
       toolchain: 'clang'
-      mode: 'Release'
+      mode: 'release'
       arch: 'x86'
 
   - template: build/ci/linux.yml
     parameters:
       toolchain: 'clang'
-      mode: 'Release'
+      mode: 'release'
       arch: 'x64'
 
   #### Linux GCC ####
@@ -39,36 +39,36 @@ jobs:
   - template: build/ci/linux.yml
     parameters:
       toolchain: 'gcc'
-      mode: 'Debug'
+      mode: 'debug'
       arch: 'x86'
 
   - template: build/ci/linux.yml
     parameters:
       toolchain: 'gcc'
-      mode: 'Debug'
+      mode: 'debug'
       arch: 'x64'
 
   - template: build/ci/linux.yml
     parameters:
       toolchain: 'gcc'
-      mode: 'Release'
+      mode: 'release'
       arch: 'x86'
 
   - template: build/ci/linux.yml
     parameters:
       toolchain: 'gcc'
-      mode: 'Release'
+      mode: 'release'
       arch: 'x64'
 
   #### macOS ####
 
   - template: build/ci/macos.yml
     parameters:
-      mode: 'Debug'
+      mode: 'debug'
 
   - template: build/ci/macos.yml
     parameters:
-      mode: 'Release'
+      mode: 'release'
 
   #### Windows ####
 

@@ -5,7 +5,7 @@ SOURCE_ROOT := $(CURDIR)/../..
 VERSION := $(shell cat $(SOURCE_ROOT)/VERSION.md)
 
 # Import the build API.
-include api.mk
+include /usr/local/src/fly/api.mk
 
 # Main targets.
 $(eval $(call ADD_TARGET, libfly, fly, LIB))
@@ -28,4 +28,4 @@ $(eval $(call IGNORE_FOR_COVERAGE, fly/system/nix/system_impl.hpp))
 $(eval $(call IGNORE_FOR_COVERAGE, fly/types/numeric/detail/literal_parser.hpp))
 
 # Import the build system.
-include build.mk
+include /usr/local/src/fly/build.mk

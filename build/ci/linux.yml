@@ -1,6 +1,6 @@
 parameters:
   toolchain: 'clang'
-  mode: 'Debug'
+  mode: 'debug'
   arch: 'x64'
 
 jobs:
@@ -10,17 +10,18 @@ jobs:
       vmImage: ubuntu-20.04
 
     container:
-      image: trflynn89/libfly:ubuntu2010_clang11_gcc10_jdk15
+      image: trflynn89/libfly:ubuntu2010_clang11_gcc10
       options: --cap-add SYS_PTRACE
 
     steps:
+    - template: flymake.yml
     - template: setup.yml
 
-    - ${{ if eq(parameters.mode, 'Debug') }}:
-      - script: |
-          echo "##vso[task.setvariable variable=config]mode=debug toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }}"
-        displayName: 'Configure'
+    - script: |
+        echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }} toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }}"
+      displayName: 'Configure'
 
+    - ${{ if eq(parameters.mode, 'debug') }}:
       - script: |
           make -j $(nproc) -C build/nix $(config) tests
         displayName: 'Test'
@@ -31,11 +32,7 @@ jobs:
         condition: and(eq('${{ parameters.toolchain }}', 'clang'), eq('${{ parameters.arch }}', 'x64'))
         displayName: 'Coverage'
 
-    - ${{ if eq(parameters.mode, 'Release') }}:
-      - script: |
-          echo "##vso[task.setvariable variable=config]mode=release toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }}"
-        displayName: 'Configure'
-
+    - ${{ if eq(parameters.mode, 'release') }}:
       - script: |
           make -j $(nproc) -C build/nix $(config) libfly
         displayName: 'Build'
@@ -44,15 +41,3 @@ jobs:
         - template: package.yml
           parameters:
             contents: 'build/nix/release/${{ parameters.toolchain }}/${{ parameters.arch }}/etc/libfly-*.tar.bz2'
-
-    - script: |
-        make -j -C build/nix $(config) install
-        sudo ldconfig
-      displayName: 'Install'
-      failOnStderr: true
-
-    - script: |
-        make -j $(nproc) -C examples/build $(config)
-        make -j $(nproc) -C examples/build $(config) tests
-      displayName: 'Examples'
-      failOnStderr: true

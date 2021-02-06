@@ -1,5 +1,5 @@
 parameters:
-  mode: 'Debug'
+  mode: 'debug'
 
 jobs:
   - job: 'macOS_${{ parameters.mode }}'
@@ -8,22 +8,19 @@ jobs:
       vmImage: macOS-10.15
 
     steps:
+    - template: flymake.yml
     - template: setup.yml
 
-    - ${{ if eq(parameters.mode, 'Debug') }}:
-      - script: |
-          echo "##vso[task.setvariable variable=config]mode=debug"
-        displayName: 'Configure'
+    - script: |
+        echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }}"
+      displayName: 'Configure'
 
+    - ${{ if eq(parameters.mode, 'debug') }}:
       - script: |
           make -j $(sysctl -n hw.ncpu) -C build/nix $(config) tests
         displayName: 'Test'
 
-    - ${{ if eq(parameters.mode, 'Release') }}:
-      - script: |
-          echo "##vso[task.setvariable variable=config]mode=release"
-        displayName: 'Configure'
-
+    - ${{ if eq(parameters.mode, 'release') }}:
       - script: |
           make -j $(sysctl -n hw.ncpu) -C build/nix $(config) libfly
         displayName: 'Build'
@@ -31,14 +28,3 @@ jobs:
       - template: package.yml
         parameters:
           contents: 'build/nix/release/clang/x64/etc/libfly-*.tar.bz2'
-
-    - script: |
-        make -j -C build/nix $(config) install
-      displayName: 'Install'
-      failOnStderr: true
-
-    - script: |
-        make -j $(sysctl -n hw.ncpu) -C examples/build $(config)
-        make -j $(sysctl -n hw.ncpu) -C examples/build $(config) tests
-      displayName: 'Examples'
-      failOnStderr: true
