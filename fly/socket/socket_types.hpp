@@ -6,7 +6,7 @@
 #include <cstdint>
 
 #if defined(FLY_WINDOWS)
-#    include <WinSock.h>
+#    include <WinSock2.h>
 #endif
 
 /**

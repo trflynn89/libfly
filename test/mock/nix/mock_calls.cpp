@@ -160,18 +160,26 @@ int __wrap_fcntl(int fd, int cmd, int args)
 
 //==============================================================================================
 // NOLINTNEXTLINE(readability-identifier-naming)
-struct hostent *__real_gethostbyname(const char *name);
+int __real_getaddrinfo(
+    const char *node,
+    const char *service,
+    const struct addrinfo *hints,
+    struct addrinfo **res);
 
 // NOLINTNEXTLINE(readability-identifier-naming)
-struct hostent *__wrap_gethostbyname(const char *name)
+int __wrap_getaddrinfo(
+    const char *node,
+    const char *service,
+    const struct addrinfo *hints,
+    struct addrinfo **res)
 {
-    if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Gethostbyname))
+    if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Getaddrinfo))
     {
         errno = 0;
-        return nullptr;
+        return -1;
     }
 
-    return __real_gethostbyname(name);
+    return __real_getaddrinfo(node, service, hints, res);
 }
 
 //==============================================================================================

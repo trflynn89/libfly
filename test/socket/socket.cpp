@@ -110,9 +110,9 @@ CATCH_TEST_CASE("Socket", "[socket]")
             socket->bind(fly::Socket::in_addr_any(), port, fly::BindOption::AllowReuse));
     }
 
-    CATCH_SECTION("Socket binding fails due to ::gethostbyname() system call")
+    CATCH_SECTION("Socket binding fails due to ::getaddrinfo() system call")
     {
-        fly::test::MockSystem mock(fly::test::MockCall::Gethostbyname);
+        fly::test::MockSystem mock(fly::test::MockCall::Getaddrinfo);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CATCH_CHECK_FALSE(listen_socket->bind("0.0.0.0", port, fly::BindOption::AllowReuse));
@@ -140,9 +140,9 @@ CATCH_TEST_CASE("Socket", "[socket]")
         CATCH_CHECK_FALSE(client_socket->connect(host, port));
     }
 
-    CATCH_SECTION("Socket connecting fails due to ::gethostbyname() system call")
+    CATCH_SECTION("Socket connecting fails due to ::getaddrinfo() system call")
     {
-        fly::test::MockSystem mock(fly::test::MockCall::Gethostbyname);
+        fly::test::MockSystem mock(fly::test::MockCall::Getaddrinfo);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CATCH_CHECK(
@@ -153,9 +153,9 @@ CATCH_TEST_CASE("Socket", "[socket]")
         CATCH_CHECK_FALSE(client_socket->connect(host, port));
     }
 
-    CATCH_SECTION("Socket connecting fails due to ::gethostbyname() system call")
+    CATCH_SECTION("Socket connecting fails due to ::getaddrinfo() system call")
     {
-        fly::test::MockSystem mock(fly::test::MockCall::Gethostbyname);
+        fly::test::MockSystem mock(fly::test::MockCall::Getaddrinfo);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::TCP, true);
         CATCH_CHECK(
@@ -337,9 +337,9 @@ CATCH_TEST_CASE("Socket", "[socket]")
         CATCH_CHECK(client_socket->send_to(message, host, port) == 0U);
     }
 
-    CATCH_SECTION("Socket sending (UDP) fails due to ::gethostbyname() system call")
+    CATCH_SECTION("Socket sending (UDP) fails due to ::getaddrinfo() system call")
     {
-        fly::test::MockSystem mock(fly::test::MockCall::Gethostbyname);
+        fly::test::MockSystem mock(fly::test::MockCall::Getaddrinfo);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::UDP, true);
         CATCH_CHECK(
@@ -396,9 +396,9 @@ CATCH_TEST_CASE("Socket", "[socket]")
         CATCH_CHECK(request.get_socket_id() == client_socket->get_socket_id());
     }
 
-    CATCH_SECTION("Socket sending (UDP) fails due to ::gethostbyname() system call")
+    CATCH_SECTION("Socket sending (UDP) fails due to ::getaddrinfo() system call")
     {
-        fly::test::MockSystem mock(fly::test::MockCall::Gethostbyname);
+        fly::test::MockSystem mock(fly::test::MockCall::Getaddrinfo);
 
         auto listen_socket = create_socket(server_socket_manager, fly::Protocol::UDP, true);
         CATCH_CHECK(
