@@ -176,6 +176,20 @@ public:
     static constexpr bool is_x_digit(char_type ch);
 
     /**
+     * Checks if the given character is a whitespace character as classified by the default C
+     * locale.
+     *
+     * The STL's std::isspace and std::iswspace require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to classify.
+     *
+     * @return True if the character is a whitespace character.
+     */
+    static constexpr bool is_space(char_type ch);
+
+    /**
      * Split a string into a vector of strings.
      *
      * @param input The string to split.
@@ -549,6 +563,13 @@ constexpr inline bool BasicString<StringType>::is_x_digit(char_type ch)
 
 //==================================================================================================
 template <typename StringType>
+constexpr inline bool BasicString<StringType>::is_space(char_type ch)
+{
+    return classifier::is_space(ch);
+}
+
+//==================================================================================================
+template <typename StringType>
 std::vector<StringType> BasicString<StringType>::split(view_type input, char_type delimiter)
 {
     return split(input, delimiter, 0);
@@ -600,9 +621,9 @@ BasicString<StringType>::split(view_type input, char_type delimiter, size_type c
 template <typename StringType>
 void BasicString<StringType>::trim(StringType &target)
 {
-    auto is_non_space = [](int ch)
+    auto is_non_space = [](auto ch)
     {
-        return !std::isspace(ch);
+        return !is_space(ch);
     };
 
     // Remove leading whitespace.

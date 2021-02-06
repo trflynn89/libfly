@@ -143,6 +143,20 @@ public:
      */
     static constexpr bool is_x_digit(char_type ch);
 
+    /**
+     * Checks if the given character is a whitespace character as classified by the default C
+     * locale.
+     *
+     * The STL's std::isspace and std::iswspace require that the provided character fits into an
+     * unsigned char and unsigned wchar_t, respectively. Other values result in undefined behavior.
+     * This method has no such restriction.
+     *
+     * @param ch The character to classify.
+     *
+     * @return True if the character is a whitespace character.
+     */
+    static constexpr bool is_space(char_type ch);
+
 private:
     /**
      * Remove the 0x20 bit from the given character, effectively converting the a-z range of
@@ -161,6 +175,12 @@ private:
     static constexpr const auto s_upper_f = FLY_CHR(char_type, 'F');
     static constexpr const auto s_lower_a = FLY_CHR(char_type, 'a');
     static constexpr const auto s_lower_z = FLY_CHR(char_type, 'z');
+    static constexpr const auto s_space = FLY_CHR(char_type, ' ');
+    static constexpr const auto s_form_feed = FLY_CHR(char_type, '\f');
+    static constexpr const auto s_line_feed = FLY_CHR(char_type, '\n');
+    static constexpr const auto s_carriage_return = FLY_CHR(char_type, '\r');
+    static constexpr const auto s_horizontal_tab = FLY_CHR(char_type, '\t');
+    static constexpr const auto s_vertical_tab = FLY_CHR(char_type, '\v');
 
     static constexpr const auto s_case_bit = static_cast<int_type>(0x20);
     static constexpr const auto s_case_mask = static_cast<int_type>(~s_case_bit);
@@ -249,6 +269,14 @@ constexpr inline bool BasicStringClassifier<StringType>::is_x_digit(char_type ch
 {
     const auto alpha = unify_az_characters(ch);
     return is_digit(ch) || ((alpha >= s_upper_a) && (alpha <= s_upper_f));
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr inline bool BasicStringClassifier<StringType>::is_space(char_type ch)
+{
+    return (ch == s_space) || (ch == s_form_feed) || (ch == s_line_feed) ||
+        (ch == s_carriage_return) || (ch == s_horizontal_tab) || (ch == s_vertical_tab);
 }
 
 //==================================================================================================
