@@ -179,17 +179,17 @@ private:
     template <typename T>
     static bool is_zero(T value);
 
-    static constexpr const fly::Color s_border_color = fly::Color::Cyan;
-    static constexpr const fly::Style s_border_style = fly::Style::Bold;
+    static constexpr const fly::Color s_border_color {fly::Color::Cyan};
+    static constexpr const fly::Style s_border_style {fly::Style::Bold};
 
-    static constexpr const fly::Color s_title_color = fly::Color::Green;
-    static constexpr const fly::Style s_title_style = fly::Style::Bold;
+    static constexpr const fly::Color s_title_color {fly::Color::Green};
+    static constexpr const fly::Style s_title_style {fly::Style::Bold};
 
-    static constexpr const fly::Color s_header_color = fly::Color::Red;
-    static constexpr const fly::Style s_header_style = fly::Style::Italic;
+    static constexpr const fly::Color s_header_color {fly::Color::Red};
+    static constexpr const fly::Style s_header_style {fly::Style::Italic};
 
-    static constexpr const fly::Color s_data_color = fly::Color::Yellow;
-    static constexpr const fly::Style s_data_style = fly::Style::Default;
+    static constexpr const fly::Color s_data_color {fly::Color::Yellow};
+    static constexpr const fly::Style s_data_style {fly::Style::Default};
 
     static constexpr const std::size_t s_precision = 3;
 
