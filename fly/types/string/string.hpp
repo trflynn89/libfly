@@ -183,7 +183,7 @@ public:
      *
      * @return A vector containing the split strings.
      */
-    static std::vector<StringType> split(const StringType &input, char_type delimiter);
+    static std::vector<StringType> split(view_type input, char_type delimiter);
 
     /**
      * Split a string into a vector of strings, up to a maximum size. If the max size is reached,
@@ -195,8 +195,7 @@ public:
      *
      * @return A vector containing the split strings.
      */
-    static std::vector<StringType>
-    split(const StringType &input, char_type delimiter, size_type count);
+    static std::vector<StringType> split(view_type input, char_type delimiter, size_type count);
 
     /**
      * Remove leading and trailing whitespace from a string.
@@ -212,7 +211,7 @@ public:
      * @param search The string to search for and replace.
      * @param replace The replacement character.
      */
-    static void replace_all(StringType &target, const StringType &search, const char_type &replace);
+    static void replace_all(StringType &target, view_type search, char_type replace);
 
     /**
      * Replace all instances of a substring in a string with another string.
@@ -221,8 +220,7 @@ public:
      * @param search The string to search for and replace.
      * @param replace The replacement string.
      */
-    static void
-    replace_all(StringType &target, const StringType &search, const StringType &replace);
+    static void replace_all(StringType &target, view_type search, view_type replace);
 
     /**
      * Remove all instances of a substring in a string.
@@ -230,7 +228,7 @@ public:
      * @param target The string container which will be modified.
      * @param search The string to search for and remove.
      */
-    static void remove_all(StringType &target, const StringType &search);
+    static void remove_all(StringType &target, view_type search);
 
     /**
      * Check if a string matches another string with wildcard expansion.
@@ -240,7 +238,7 @@ public:
      *
      * @return True if the wildcard string matches the source string.
      */
-    static bool wildcard_match(const StringType &source, const StringType &search);
+    static bool wildcard_match(view_type source, view_type search);
 
     /**
      * Validate that a string is strictly Unicode compliant.
@@ -249,7 +247,7 @@ public:
      *
      * @return True if the string is Unicode compliant.
      */
-    static bool validate(const StringType &value);
+    static bool validate(view_type value);
 
     /**
      * Decode a single Unicode codepoint, starting at the character pointed to by the provided
@@ -302,7 +300,7 @@ public:
      *         Otherwise, an uninitialized value.
      */
     template <char UnicodePrefix = 'U'>
-    static std::optional<StringType> escape_all_codepoints(const StringType &value);
+    static std::optional<StringType> escape_all_codepoints(view_type value);
 
     /**
      * Escape a single Unicode codepoint, starting at the character pointed to by the provided
@@ -349,7 +347,7 @@ public:
      * @return If successful, a copy of the source string with all Unicode codepoints unescaped.
      *         Otherwise, an uninitialized value.
      */
-    static std::optional<StringType> unescape_all_codepoints(const StringType &value);
+    static std::optional<StringType> unescape_all_codepoints(view_type value);
 
     /**
      * Unescape a single Unicode codepoint, starting at the character pointed to by provided
@@ -551,7 +549,7 @@ constexpr inline bool BasicString<StringType>::is_x_digit(char_type ch)
 
 //==================================================================================================
 template <typename StringType>
-std::vector<StringType> BasicString<StringType>::split(const StringType &input, char_type delimiter)
+std::vector<StringType> BasicString<StringType>::split(view_type input, char_type delimiter)
 {
     return split(input, delimiter, 0);
 }
@@ -559,32 +557,31 @@ std::vector<StringType> BasicString<StringType>::split(const StringType &input, 
 //==================================================================================================
 template <typename StringType>
 std::vector<StringType>
-BasicString<StringType>::split(const StringType &input, char_type delimiter, size_type count)
+BasicString<StringType>::split(view_type input, char_type delimiter, size_type count)
 {
     std::vector<StringType> elements;
-    size_type num_items = 0;
     StringType item;
 
     size_type start = 0;
     size_type end = input.find(delimiter);
 
-    auto push_item = [&](const StringType &str)
+    auto push_item = [&elements, &count, &delimiter](view_type str)
     {
         if (!str.empty())
         {
-            if ((count > 0) && (++num_items > count))
+            if ((count > 0) && (elements.size() == count))
             {
                 elements.back() += delimiter;
                 elements.back() += str;
             }
             else
             {
-                elements.push_back(str);
+                elements.push_back(StringType(str));
             }
         }
     };
 
-    while (end != std::string::npos)
+    while (end != StringType::npos)
     {
         item = input.substr(start, end - start);
         push_item(item);
@@ -617,10 +614,7 @@ void BasicString<StringType>::trim(StringType &target)
 
 //==================================================================================================
 template <typename StringType>
-void BasicString<StringType>::replace_all(
-    StringType &target,
-    const StringType &search,
-    const char_type &replace)
+void BasicString<StringType>::replace_all(StringType &target, view_type search, char_type replace)
 {
     size_type index = target.find(search);
 
@@ -633,10 +627,7 @@ void BasicString<StringType>::replace_all(
 
 //==================================================================================================
 template <typename StringType>
-void BasicString<StringType>::replace_all(
-    StringType &target,
-    const StringType &search,
-    const StringType &replace)
+void BasicString<StringType>::replace_all(StringType &target, view_type search, view_type replace)
 {
     size_type index = target.find(search);
 
@@ -649,14 +640,14 @@ void BasicString<StringType>::replace_all(
 
 //==================================================================================================
 template <typename StringType>
-void BasicString<StringType>::remove_all(StringType &target, const StringType &search)
+void BasicString<StringType>::remove_all(StringType &target, view_type search)
 {
     replace_all(target, search, StringType());
 }
 
 //==================================================================================================
 template <typename StringType>
-bool BasicString<StringType>::wildcard_match(const StringType &source, const StringType &search)
+bool BasicString<StringType>::wildcard_match(view_type source, view_type search)
 {
     static constexpr char_type s_wildcard = '*';
     bool result = !search.empty();
@@ -691,7 +682,7 @@ bool BasicString<StringType>::wildcard_match(const StringType &source, const Str
 
 //==================================================================================================
 template <typename StringType>
-inline bool BasicString<StringType>::validate(const StringType &value)
+inline bool BasicString<StringType>::validate(view_type value)
 {
     auto it = value.cbegin();
     const auto end = value.cend();
@@ -718,7 +709,7 @@ inline std::optional<StringType> BasicString<StringType>::encode_codepoint(codep
 //==================================================================================================
 template <typename StringType>
 template <char UnicodePrefix>
-std::optional<StringType> BasicString<StringType>::escape_all_codepoints(const StringType &value)
+std::optional<StringType> BasicString<StringType>::escape_all_codepoints(view_type value)
 {
     StringType result;
     result.reserve(value.size());
@@ -751,7 +742,7 @@ BasicString<StringType>::escape_codepoint(IteratorType &it, const IteratorType &
 
 //==================================================================================================
 template <typename StringType>
-std::optional<StringType> BasicString<StringType>::unescape_all_codepoints(const StringType &value)
+std::optional<StringType> BasicString<StringType>::unescape_all_codepoints(view_type value)
 {
     StringType result;
     result.reserve(value.size());
