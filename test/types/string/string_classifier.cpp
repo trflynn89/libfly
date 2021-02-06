@@ -197,4 +197,28 @@ CATCH_TEMPLATE_TEST_CASE(
             }
         }
     }
+
+    CATCH_SECTION("Check if a character is a whitespace character")
+    {
+        for (char_type ch = 0; (ch >= 0) && (ch < 0x80); ++ch)
+        {
+            CATCH_CHECK(
+                BasicString::is_space(ch) ==
+                static_cast<bool>(std::isspace(static_cast<unsigned char>(ch))));
+        }
+
+        if constexpr (sizeof(char_type) > 1)
+        {
+            // Spot check some values that incorrectly result in std::isspace returning true when
+            // cast to unsigned char (which is how the spec suggests to avoid undefined behavior).
+            CATCH_CHECK(std::isspace(static_cast<unsigned char>(0xaa20)));
+            CATCH_CHECK_FALSE(BasicString::is_space(0xaa20));
+
+            CATCH_CHECK(std::isspace(static_cast<unsigned char>(0xaa0a)));
+            CATCH_CHECK_FALSE(BasicString::is_space(0xaa0a));
+
+            CATCH_CHECK(std::isspace(static_cast<unsigned char>(0xaa09)));
+            CATCH_CHECK_FALSE(BasicString::is_space(0xaa09));
+        }
+    }
 }
