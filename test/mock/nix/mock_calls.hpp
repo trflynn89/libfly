@@ -17,7 +17,7 @@ enum class MockCall : std::uint8_t
     Bind,
     Connect,
     Fcntl,
-    Gethostbyname,
+    Getaddrinfo,
     Getsockopt,
     InotifyAddWatch,
     InotifyInit1,

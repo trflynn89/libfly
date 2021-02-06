@@ -4,7 +4,8 @@
 #include "fly/socket/socket_config.hpp"
 #include "fly/system/system.hpp"
 
-#include <WinSock.h>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
 #include <socketapi.h>
 
 namespace fly {
@@ -50,20 +51,22 @@ SocketImpl::~SocketImpl()
 //==================================================================================================
 bool SocketImpl::hostname_to_address(const std::string &hostname, address_type &address)
 {
-    struct hostent *ip_address = ::gethostbyname(hostname.c_str());
+    struct addrinfo *results = nullptr;
 
-    if (ip_address == nullptr)
+    struct addrinfo hints = {};
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    if (int error = ::getaddrinfo(hostname.c_str(), nullptr, &hints, &results); error != 0)
     {
-        LOGS("Error resolving {}", hostname);
+        LOGS("Error resolving {}: ({}) {}", hostname, error, ::gai_strerror(error));
         return false;
     }
 
-    memcpy(
-        reinterpret_cast<void *>(&address),
-        reinterpret_cast<void *>(ip_address->h_addr_list[0]),
-        static_cast<std::size_t>(ip_address->h_length));
-
-    address = ntohl(address);
+    struct sockaddr_in *socket_address = reinterpret_cast<sockaddr_in *>(results->ai_addr);
+    address = ntohl(socket_address->sin_addr.s_addr);
+    ::freeaddrinfo(results);
 
     LOGD("Converted hostname {} to {}", hostname, address);
     return true;
