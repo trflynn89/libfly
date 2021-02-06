@@ -921,12 +921,12 @@ BasicFormatString<StringType, ParameterTypes...>::parse_position(FormatSpecifier
     if (auto position = m_lexer.consume_number(); position)
     {
         specifier.m_position = position.value();
-        m_expect_no_positions_specified = true;
+        m_expect_all_positions_specified = true;
     }
     else
     {
         specifier.m_position = m_next_position++;
-        m_expect_all_positions_specified = true;
+        m_expect_no_positions_specified = true;
     }
 }
 
