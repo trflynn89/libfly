@@ -124,11 +124,17 @@ JFLAGS += \
     -Werror \
     -Xlint
 
-# Add debug symbols & use address sanitizer for debug builds, optimize release builds, and add
-# profiling symbols for profile builds.
+# Add debug symbols & use sanitizers for debug builds, optimize release builds, and add profiling
+# symbols for profile builds.
 ifeq ($(mode), debug)
-    CF_ALL += -O0 -g -fsanitize=address -fno-omit-frame-pointer
+    CF_ALL += -O0 -g -fno-omit-frame-pointer
     JFLAGS += -g:lines,vars,source
+
+    ifeq ($(arch), x64)
+        CF_ALL += -fsanitize=address,undefined -fno-sanitize-recover=all
+    else
+        CF_ALL += -fsanitize=address
+    endif
 
     ifeq ($(toolchain), clang)
         CF_ALL += -fprofile-instr-generate -fcoverage-mapping
