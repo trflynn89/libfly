@@ -391,15 +391,14 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 {
     if constexpr (std::is_signed_v<T>)
     {
-        using unsigned_type = std::make_unsigned_t<std::remove_cvref_t<T>>;
+        using U = std::make_unsigned_t<std::remove_cvref_t<T>>;
 
         // Compute the absolute value of the integer. Benchmarks showed this is exactly as fast as
         // std::abs, but this also tracks whether the original value was negative without branches.
         const T sign = value >> std::numeric_limits<T>::digits;
-        value ^= sign;
-        value += sign & 1;
+        const U unsigned_value = static_cast<U>(static_cast<U>(value ^ sign) + (sign & 1));
 
-        format_value(std::move(specifier), static_cast<unsigned_type>(value), sign);
+        format_value(std::move(specifier), unsigned_value, static_cast<bool>(sign));
     }
     else
     {
@@ -415,6 +414,8 @@ void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     T value,
     bool is_negative)
 {
+    static_assert(std::is_unsigned_v<T>);
+
     const std::size_t original_size = m_buffer.size();
     std::size_t prefix_size = 0;
     std::size_t value_size = 0;
