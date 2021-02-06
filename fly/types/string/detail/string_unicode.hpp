@@ -30,6 +30,7 @@ class BasicStringUnicode
 {
     using traits = detail::BasicStringTraits<StringType>;
     using char_type = typename traits::char_type;
+    using view_type = typename traits::view_type;
     using codepoint_type = typename traits::codepoint_type;
 
 public:
@@ -50,22 +51,20 @@ public:
      * Convert the Unicode encoding of a string to another encoding.
      *
      * @tparam DesiredStringType The type of string to convert to.
-     * @tparam SourceStringType The type of string to convert.
      *
      * @param value The encoded Unicode string to convert.
      *
      * @return If successful, a copy of the source string with the desired encoding. Otherwise, an
      *         uninitialized value.
      */
-    template <typename DesiredStringType, typename SourceStringType = StringType>
-    static std::optional<DesiredStringType> convert_encoding(SourceStringType &&value);
+    template <typename DesiredStringType>
+    static std::optional<DesiredStringType> convert_encoding(view_type value);
 
     /**
      * Convert the Unicode encoding of a string to another encoding, inserting the result into the
      * provided output iterator.
      *
      * @tparam DesiredStringType The type of string to convert to.
-     * @tparam IteratorType The type of the encoded Unicode string's iterator.
      * @tparam OutputIteratorType The type of the output iterator to insert the result into.
      *
      * @param it Pointer to the beginning of the encoded Unicode string.
@@ -74,11 +73,8 @@ public:
      *
      * @return Whether the conversion was successful.
      */
-    template <
-        typename DesiredStringType,
-        typename OutputIteratorType,
-        typename SourceStringType = StringType>
-    static bool convert_encoding_into(SourceStringType &&value, OutputIteratorType out);
+    template <typename DesiredStringType, typename OutputIteratorType>
+    static bool convert_encoding_into(view_type value, OutputIteratorType out);
 
     /**
      * Decode a single Unicode codepoint, starting at the character pointed to by the provided
@@ -391,16 +387,14 @@ bool BasicStringUnicode<StringType>::validate_encoding(IteratorType &it, const I
 
 //==================================================================================================
 template <typename StringType>
-template <typename DesiredStringType, typename SourceStringType>
+template <typename DesiredStringType>
 inline std::optional<DesiredStringType>
-BasicStringUnicode<StringType>::convert_encoding(SourceStringType &&value)
+BasicStringUnicode<StringType>::convert_encoding(view_type value)
 {
     DesiredStringType result;
     result.reserve(static_cast<typename StringType::size_type>(value.size()));
 
-    if (convert_encoding_into<DesiredStringType>(
-            std::forward<SourceStringType>(value),
-            std::back_inserter(result)))
+    if (convert_encoding_into<DesiredStringType>(std::move(value), std::back_inserter(result)))
     {
         return result;
     }
@@ -410,10 +404,8 @@ BasicStringUnicode<StringType>::convert_encoding(SourceStringType &&value)
 
 //==================================================================================================
 template <typename StringType>
-template <typename DesiredStringType, typename OutputIteratorType, typename SourceStringType>
-bool BasicStringUnicode<StringType>::convert_encoding_into(
-    SourceStringType &&value,
-    OutputIteratorType out)
+template <typename DesiredStringType, typename OutputIteratorType>
+bool BasicStringUnicode<StringType>::convert_encoding_into(view_type value, OutputIteratorType out)
 {
     using DesiredUnicodeType = BasicStringUnicode<DesiredStringType>;
 
