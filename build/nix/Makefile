@@ -11,8 +11,8 @@ include /usr/local/src/fly/api.mk
 $(eval $(call ADD_TARGET, libfly, fly, LIB))
 
 # Test targets.
-$(eval $(call ADD_TARGET, libfly_unit_tests, test, TEST))
-$(eval $(call ADD_TARGET, libfly_benchmarks, bench, BIN))
+$(eval $(call ADD_TARGET, libfly_unit_tests, test, TEST, libfly))
+$(eval $(call ADD_TARGET, libfly_benchmarks, bench, BIN, libfly))
 
 # Paths to ignore during code coverage reporting.
 #
