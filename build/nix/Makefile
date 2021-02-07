@@ -1,5 +1,5 @@
 # Define the path to the source directory.
-SOURCE_ROOT := $(CURDIR)/../..
+SOURCE_ROOT := $(abspath $(CURDIR)/../..)
 
 # Define the project version.
 VERSION := $(shell cat $(SOURCE_ROOT)/VERSION.md)
