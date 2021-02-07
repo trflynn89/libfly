@@ -1,13 +1,18 @@
-#define CATCH_CONFIG_RUNNER
-#define CATCH_CONFIG_DEFAULT_REPORTER "silent"
-
 #include "fly/logger/log_sink.hpp"
 #include "fly/logger/logger.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/logger/styler.hpp"
 #include "fly/types/string/string.hpp"
 
-#include "catch2/catch.hpp"
+//clang-format off
+// Due to a missing #include in catch_reporter_registrars.hpp, this must be included first.
+#include "catch2/interfaces/catch_interfaces_reporter.hpp"
+//clang-format on
+
+#include "catch2/catch_reporter_registrars.hpp"
+#include "catch2/catch_session.hpp"
+#include "catch2/catch_test_case_info.hpp"
+#include "catch2/reporters/catch_reporter_streaming_base.hpp"
 
 #include <string>
 
@@ -31,7 +36,7 @@ public:
 /**
  * A Catch2 test reporter for printing nothing except a header before test cases.
  */
-class SilentReporter final : public Catch::StreamingReporterBase<SilentReporter>
+class SilentReporter final : public Catch::StreamingReporterBase
 {
 public:
     explicit SilentReporter(const Catch::ReporterConfig &config) : StreamingReporterBase(config)
@@ -61,7 +66,7 @@ public:
     }
 };
 
-CATCH_REGISTER_REPORTER("silent", SilentReporter)
+CATCH_REGISTER_REPORTER("libfly", SilentReporter)
 
 int main(int argc, char **argv)
 {

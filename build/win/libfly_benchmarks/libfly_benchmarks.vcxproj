@@ -74,25 +74,25 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\test\Catch2\single_include;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -169,6 +169,9 @@
     <ClCompile Include="..\..\..\bench\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\catch2\catch2.vcxproj">
+      <Project>{fdb4c725-54de-4eb8-ad9d-1a4a332babfd}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\libfly\libfly.vcxproj">
       <Project>{448893a1-77da-46f1-b951-7eda72d49fe9}</Project>
     </ProjectReference>
