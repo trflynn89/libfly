@@ -1,10 +1,15 @@
-#define CATCH_CONFIG_MAIN
-#define CATCH_CONFIG_DEFAULT_REPORTER "libfly"
-
 #include "fly/logger/styler.hpp"
 #include "fly/types/string/string.hpp"
 
-#include "catch2/catch.hpp"
+//clang-format off
+// Due to a missing #include in catch_reporter_registrars.hpp, this must be included first.
+#include "catch2/interfaces/catch_interfaces_reporter.hpp"
+//clang-format on
+
+#include "catch2/catch_reporter_registrars.hpp"
+#include "catch2/catch_session.hpp"
+#include "catch2/catch_test_case_info.hpp"
+#include "catch2/reporters/catch_reporter_console.hpp"
 
 /**
  * A Catch2 test reporter for reporting colorful test and section names to console.
@@ -68,7 +73,7 @@ public:
         const auto end = std::chrono::system_clock::now();
         const auto duration = std::chrono::duration<double>(end - m_current_test_case_start);
 
-        const std::string &name = stats.testInfo.name;
+        const std::string &name = stats.testInfo->name;
 
         if (stats.totals.assertions.allOk())
         {
@@ -103,3 +108,8 @@ private:
 };
 
 CATCH_REGISTER_REPORTER("libfly", FlyReporter)
+
+int main(int argc, char **argv)
+{
+    return Catch::Session().run(argc, argv);
+}

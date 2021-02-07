@@ -1,6 +1,7 @@
 #include "fly/types/json/json_traits.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_template_test_macros.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include <array>
 #include <deque>

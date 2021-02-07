@@ -4,7 +4,7 @@
 
 #include "fly/types/json/json.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 CATCH_TEST_CASE("JsonReverseIterator", "[json]")
 {

@@ -3,7 +3,8 @@
 #include "fly/fly.hpp"
 #include "fly/types/json/json.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_approx.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include <array>
 
@@ -238,8 +239,8 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
     {
         if constexpr (fly::JsonTraits::is_number_v<json_type>)
         {
-            CATCH_CHECK(float(json) == Approx(float(1)));
-            CATCH_CHECK(double(json) == Approx(double(1)));
+            CATCH_CHECK(float(json) == Catch::Approx(float(1)));
+            CATCH_CHECK(double(json) == Catch::Approx(double(1)));
         }
         else
         {
@@ -248,8 +249,8 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
             if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
             {
                 json = J_STR("123.5");
-                CATCH_CHECK(float(json) == Approx(123.5f));
-                CATCH_CHECK(double(json) == Approx(123.5f));
+                CATCH_CHECK(float(json) == Catch::Approx(123.5f));
+                CATCH_CHECK(double(json) == Catch::Approx(123.5f));
             }
         }
     }

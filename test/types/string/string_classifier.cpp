@@ -1,6 +1,7 @@
 #include "fly/types/string/string.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_template_test_macros.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include <cctype>
 #include <string>

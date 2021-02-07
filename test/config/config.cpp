@@ -4,7 +4,8 @@
 
 #include "fly/types/json/json.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_approx.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include <cstddef>
 
@@ -39,14 +40,14 @@ CATCH_TEST_CASE("Config", "[config]")
         CATCH_CHECK(config.get_value<std::string>("address", "") == "123");
         CATCH_CHECK(config.get_value<int>("address", 0) == 123);
         CATCH_CHECK(config.get_value<unsigned int>("address", 0) == 123);
-        CATCH_CHECK(config.get_value<float>("address", 0.0f) == Approx(123.0f));
-        CATCH_CHECK(config.get_value<double>("address", 0.0) == Approx(123.0));
+        CATCH_CHECK(config.get_value<float>("address", 0.0f) == Catch::Approx(123.0f));
+        CATCH_CHECK(config.get_value<double>("address", 0.0) == Catch::Approx(123.0));
 
         CATCH_CHECK(config.get_value<std::string>("age", "") == "26.2");
         CATCH_CHECK(config.get_value<int>("age", 0) == 0);
         CATCH_CHECK(config.get_value<unsigned int>("age", 0) == 0);
-        CATCH_CHECK(config.get_value<float>("age", 0.0f) == Approx(26.2f));
-        CATCH_CHECK(config.get_value<double>("age", 0.0) == Approx(26.2));
+        CATCH_CHECK(config.get_value<float>("age", 0.0f) == Catch::Approx(26.2f));
+        CATCH_CHECK(config.get_value<double>("age", 0.0) == Catch::Approx(26.2));
 
         CATCH_CHECK(config.get_value<std::string>("employed", "") == "1");
         CATCH_CHECK(config.get_value<bool>("employed", false) == true);

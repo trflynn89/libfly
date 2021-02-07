@@ -4,7 +4,8 @@
 #include "fly/types/json/json.hpp"
 #include "fly/types/string/string.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_approx.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include <filesystem>
 #include <memory>
@@ -36,7 +37,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
         if (expected.is_float())
         {
-            CATCH_CHECK(double(actual->at(key)) == Approx(double(expected)));
+            CATCH_CHECK(double(actual->at(key)) == Catch::Approx(double(expected)));
         }
         else
         {
@@ -1061,7 +1062,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
             fly::Json json = *std::move(parsed);
             CATCH_CHECK(json.is_float());
-            CATCH_CHECK(double(json) == Approx(123.89));
+            CATCH_CHECK(double(json) == Catch::Approx(123.89));
         }
     }
 

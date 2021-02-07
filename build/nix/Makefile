@@ -12,7 +12,7 @@ $(eval $(call ADD_TARGET, libfly, fly, LIB))
 
 # Test targets.
 $(eval $(call ADD_TARGET, catch2, extern/catchorg, LIB))
-$(eval $(call ADD_TARGET, libfly_unit_tests, test, TEST, libfly))
+$(eval $(call ADD_TARGET, libfly_unit_tests, test, TEST, catch2 libfly))
 $(eval $(call ADD_TARGET, libfly_benchmarks, bench, BIN, libfly))
 
 # Paths to ignore during code coverage reporting.
