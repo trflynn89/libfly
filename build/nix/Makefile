@@ -15,7 +15,7 @@ $(eval $(call ADD_TARGET, catch2, extern/catchorg, LIB))
 $(eval $(call ADD_TARGET, libfly_unit_tests, test, TEST, catch2 libfly))
 $(eval $(call ADD_TARGET, libfly_benchmarks, bench, BIN, catch2 libfly))
 
-# Paths to ignore during code coverage reporting.
+# Paths to exclude from code coverage reporting.
 #
 # 1. Ignore test files.
 # 2. Ignore benchmarking files.
@@ -24,11 +24,14 @@ $(eval $(call ADD_TARGET, libfly_benchmarks, bench, BIN, catch2 libfly))
 #    runtime, which llvm-cov doesn't seem to recognize.
 # 5. Ignore literal_parser.hpp - this file is entirely constexpr functions that do not execute at
 #    runtime, which llvm-cov doesn't seem to recognize.
-$(eval $(call IGNORE_FOR_COVERAGE, test/))
-$(eval $(call IGNORE_FOR_COVERAGE, bench/))
-$(eval $(call IGNORE_FOR_COVERAGE, extern/))
-$(eval $(call IGNORE_FOR_COVERAGE, fly/system/nix/system_impl.hpp))
-$(eval $(call IGNORE_FOR_COVERAGE, fly/types/numeric/detail/literal_parser.hpp))
+$(eval $(call EXCLUDE_FROM_COVERAGE, test/))
+$(eval $(call EXCLUDE_FROM_COVERAGE, bench/))
+$(eval $(call EXCLUDE_FROM_COVERAGE, extern/))
+$(eval $(call EXCLUDE_FROM_COVERAGE, fly/system/nix/system_impl.hpp))
+$(eval $(call EXCLUDE_FROM_COVERAGE, fly/types/numeric/detail/literal_parser.hpp))
+
+# Paths to exclude from generation of compilation database.
+$(eval $(call EXCLUDE_FROM_COMPILATION_DATABASE, extern/))
 
 # Import the build system.
 include /usr/local/src/fly/build.mk

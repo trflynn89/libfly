@@ -3,7 +3,7 @@ CXXFLAGS_$(d) += \
     -DCATCH_CONFIG_PREFIX_ALL \
     -DCATCH_CONFIG_FAST_COMPILE \
     -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER \
-    -DCATCH_CONFIG_DEFAULT_REPORTER="\"libfly\"" \
+    -DCATCH_CONFIG_DEFAULT_REPORTER=\"libfly\" \
     -Wno-ctor-dtor-privacy \
     -Wno-float-equal \
     -Wno-newline-eof \
