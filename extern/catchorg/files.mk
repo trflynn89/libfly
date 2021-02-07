@@ -1,3 +1,5 @@
+include $(SOURCE_ROOT)/extern/catchorg/flags.mk
+
 SRC_$(d) := \
     $(d)/Catch2/src/catch2/catch_approx.cpp \
     $(d)/Catch2/src/catch2/catch_assertion_result.cpp \
@@ -62,17 +64,3 @@ SRC_$(d) := \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_tap.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_teamcity.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_xml.cpp
-
-CXXFLAGS_$(d) += \
-    -I$(d)/Catch2/src \
-    -DCATCH_CONFIG_PREFIX_ALL \
-    -DCATCH_CONFIG_FAST_COMPILE \
-    -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER \
-    -DCATCH_CONFIG_DEFAULT_REPORTER="\"libfly\"" \
-    -Wno-ctor-dtor-privacy \
-    -Wno-float-equal \
-    -Wno-newline-eof \
-    -Wno-non-virtual-dtor \
-    -Wno-redundant-decls \
-    -Wno-sign-conversion
-

@@ -1,3 +1,5 @@
+include $(SOURCE_ROOT)/extern/catchorg/flags.mk
+
 SRC_DIRS_$(d) += \
     test/coders \
     test/config \
@@ -23,16 +25,6 @@ endif
 SRC_$(d) := \
     $(d)/fly.cpp \
     $(d)/main.cpp
-
-# All unit tests should have Catch2 on the include path.
-CXXFLAGS_$(d) += \
-    -I$(SOURCE_ROOT)/extern/catchorg/Catch2/src \
-    -DCATCH_CONFIG_PREFIX_ALL \
-    -DCATCH_CONFIG_FAST_COMPILE \
-    -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER \
-    -Wno-ctor-dtor-privacy \
-    -Wno-non-virtual-dtor \
-    -Wno-sign-conversion
 
 # On Linux, define the list of available mocked system calls.
 ifeq ($(SYSTEM), LINUX)
