@@ -2,5 +2,5 @@
 exclude_paths:
   - 'bench/**'
   - 'build/**'
-  - 'examples/**'
+  - 'extern/**'
   - 'test/**'
