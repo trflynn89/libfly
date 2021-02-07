@@ -14,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfly_benchmarks", "libfly
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfly_util", "libfly_util\libfly_util.vcxproj", "{E18789F2-FEF0-48BC-8F8D-AA9A7B6E6885}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "catch2", "catch2\catch2.vcxproj", "{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -54,6 +56,14 @@ Global
 		{E18789F2-FEF0-48BC-8F8D-AA9A7B6E6885}.Release|x64.Build.0 = Release|x64
 		{E18789F2-FEF0-48BC-8F8D-AA9A7B6E6885}.Release|x86.ActiveCfg = Release|Win32
 		{E18789F2-FEF0-48BC-8F8D-AA9A7B6E6885}.Release|x86.Build.0 = Release|Win32
+		{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}.Debug|x64.ActiveCfg = Debug|x64
+		{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}.Debug|x64.Build.0 = Debug|x64
+		{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}.Debug|x86.ActiveCfg = Debug|Win32
+		{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}.Debug|x86.Build.0 = Debug|Win32
+		{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}.Release|x64.ActiveCfg = Release|x64
+		{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}.Release|x64.Build.0 = Release|x64
+		{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}.Release|x86.ActiveCfg = Release|Win32
+		{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
