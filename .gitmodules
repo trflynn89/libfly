@@ -1,6 +1,3 @@
-[submodule "bench/json/extern/nlohmann"]
-	path = bench/json/extern/nlohmann
-	url = https://github.com/nlohmann/json.git
 [submodule "bench/string/extern/fmt"]
 	path = bench/string/extern/fmt
 	url = https://github.com/fmtlib/fmt.git
@@ -10,3 +7,6 @@
 [submodule "extern/catchorg/Catch2"]
 	path = extern/catchorg/Catch2
 	url = https://github.com/catchorg/Catch2.git
+[submodule "extern/nlohmann/json"]
+	path = extern/nlohmann/json
+	url = https://github.com/nlohmann/json.git
