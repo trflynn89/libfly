@@ -3,7 +3,8 @@
 #include "fly/traits/traits.hpp"
 #include "fly/types/string/string_literal.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_template_test_macros.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include <string>
 #include <type_traits>

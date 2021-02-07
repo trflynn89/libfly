@@ -3,7 +3,7 @@
 #include "fly/fly.hpp"
 #include "fly/task/task_manager.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include <cstdint>
 #include <thread>

@@ -8,7 +8,8 @@
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string_literal.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_template_test_macros.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include <ostream>
 #include <string>

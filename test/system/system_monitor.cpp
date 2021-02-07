@@ -6,7 +6,8 @@
 #include "fly/task/task_manager.hpp"
 #include "fly/types/numeric/literals.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_approx.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include <functional>
 #include <future>
@@ -119,7 +120,7 @@ CATCH_TEST_CASE("SystemMonitor", "[system]")
         CATCH_REQUIRE(result.valid());
         result.get();
 
-        CATCH_CHECK(system_before == Approx(system_after));
+        CATCH_CHECK(system_before == Catch::Approx(system_after));
     }
 
     CATCH_SECTION("Cannot update process CPU when ::times() fails")
@@ -144,7 +145,7 @@ CATCH_TEST_CASE("SystemMonitor", "[system]")
         CATCH_REQUIRE(result.valid());
         result.get();
 
-        CATCH_CHECK(process_before == Approx(process_after));
+        CATCH_CHECK(process_before == Catch::Approx(process_after));
     }
 
 #endif
