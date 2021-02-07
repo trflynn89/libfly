@@ -1,25 +1,3 @@
-SRC_DIRS_$(d) := \
-    fly/coders \
-    fly/coders/base64 \
-    fly/coders/huffman \
-    fly/config \
-    fly/logger \
-    fly/parser \
-    fly/path \
-    fly/socket \
-    fly/system \
-    fly/task \
-    fly/types/bit_stream \
-    fly/types/bit_stream/detail \
-    fly/types/json \
-    test/util
-
-ifeq ($(SYSTEM), LINUX)
-    SRC_DIRS_$(d) += \
-        test/mock
-endif
-
-# Include the directories containing the unit tests.
 SRC_DIRS_$(d) += \
     test/coders \
     test/config \
@@ -34,15 +12,21 @@ SRC_DIRS_$(d) += \
     test/types/concurrency \
     test/types/json \
     test/types/numeric \
-    test/types/string
+    test/types/string \
+    test/util
+
+ifeq ($(SYSTEM), LINUX)
+    SRC_DIRS_$(d) += \
+        test/mock
+endif
 
 SRC_$(d) := \
     $(d)/fly.cpp \
     $(d)/main.cpp
 
 # All unit tests should have Catch2 on the include path.
-CXXFLAGS_$(d) += -I$(SOURCE_ROOT)/test/Catch2/single_include
 CXXFLAGS_$(d) += \
+    -I$(SOURCE_ROOT)/test/Catch2/single_include \
     -DCATCH_CONFIG_PREFIX_ALL \
     -DCATCH_CONFIG_FAST_COMPILE \
     -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER
