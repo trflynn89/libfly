@@ -7,7 +7,7 @@
 #include "fly/coders/huffman/huffman_encoder.hpp"
 #include "fly/fly.hpp"
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include <iostream>
 
