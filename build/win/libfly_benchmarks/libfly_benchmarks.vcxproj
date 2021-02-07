@@ -74,25 +74,25 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\extern\boostorg\json\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\extern\boostorg\json\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\extern\boostorg\json\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\bench\json\extern\boost\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..\extern\boostorg\json\include;$(SolutionDir)..\..\bench\json\extern\nlohmann\single_include;$(SolutionDir)..\..\bench\string\extern\fmt\include;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
