@@ -5,5 +5,4 @@ SRC_$(d) := \
     $(d)/waitable_task_runner.cpp
 
 # Always optimize test utility methods.
-CFLAGS_$(d) += -O2 -Wno-inline
 CXXFLAGS_$(d) += -O2 -Wno-inline
