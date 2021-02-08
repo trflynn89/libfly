@@ -1,10 +1,6 @@
-# Define the path to the source directory.
 SOURCE_ROOT := $(abspath $(CURDIR)/../..)
-
-# Define the project version.
 VERSION := $(shell cat $(SOURCE_ROOT)/VERSION.md)
 
-# Import the build API.
 include /usr/local/src/fly/api.mk
 
 # Main targets.
@@ -14,6 +10,9 @@ $(eval $(call ADD_TARGET, libfly, fly, LIB))
 $(eval $(call ADD_TARGET, catch2, extern/catchorg, LIB))
 $(eval $(call ADD_TARGET, libfly_unit_tests, test, TEST, catch2 libfly))
 $(eval $(call ADD_TARGET, libfly_benchmarks, bench, BIN, catch2 libfly))
+
+# Paths to exclude from style enforcement.
+$(eval $(call EXCLUDE_FROM_STYLE_ENFORCEMENT, extern/))
 
 # Paths to exclude from code coverage reporting.
 #
@@ -33,5 +32,4 @@ $(eval $(call EXCLUDE_FROM_COVERAGE, fly/types/numeric/detail/literal_parser.hpp
 # Paths to exclude from generation of compilation database.
 $(eval $(call EXCLUDE_FROM_COMPILATION_DATABASE, extern/))
 
-# Import the build system.
 include /usr/local/src/fly/build.mk
