@@ -1,17 +1,13 @@
 SRC_DIRS_$(d) := \
-    fly/coders \
-    fly/coders/base64 \
-    fly/coders/huffman \
-    fly/config \
-    fly/logger \
-    fly/parser \
-    fly/path \
-    fly/socket \
-    fly/system \
-    fly/task \
-    fly/types/bit_stream \
-    fly/types/bit_stream/detail \
-    fly/types/json
+    $(d)/coders \
+    $(d)/config \
+    $(d)/logger \
+    $(d)/parser \
+    $(d)/path \
+    $(d)/socket \
+    $(d)/system \
+    $(d)/task \
+    $(d)/types
 
 # Add libfly.a and libfly.so to the archived release package.
 $(eval $(call ADD_REL_LIB))

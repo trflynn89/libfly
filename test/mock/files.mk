@@ -1,5 +1,7 @@
+SRC_DIRS_$(d) := \
+    $(d)/nix
+
 SRC_$(d) := \
-    $(d)/mock_system.cpp \
-    $(d)/nix/mock_calls.cpp
+    $(d)/mock_system.cpp
 
 CXXFLAGS_$(d) += -Wno-missing-declarations

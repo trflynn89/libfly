@@ -1,11 +1,9 @@
-SRC_$(d) := \
-    $(d)/path_config.cpp \
-    $(d)/path_monitor.cpp
-
 ifeq ($(SYSTEM), LINUX)
-    SRC_$(d) += \
-        $(d)/nix/path_monitor_impl.cpp
+    SRC_DIRS_$(d) := \
+        $(d)/nix
 else ifeq ($(SYSTEM), MACOS)
-    SRC_$(d) += \
-        $(d)/mac/path_monitor_impl.mm
+    SRC_DIRS_$(d) := \
+        $(d)/mac
 endif
+
+$(eval $(call WILDCARD_SOURCES, CPP))
