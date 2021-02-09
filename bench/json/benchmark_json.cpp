@@ -104,9 +104,9 @@ CATCH_TEST_CASE("JSON", "[bench]")
 
             for (std::size_t i = 0; i < s_iterations; ++i)
             {
-                const auto start = std::chrono::system_clock::now();
+                const auto start = std::chrono::steady_clock::now();
                 parser.second->parse(file);
-                const auto end = std::chrono::system_clock::now();
+                const auto end = std::chrono::steady_clock::now();
 
                 const auto duration = std::chrono::duration<double>(end - start);
                 results.push_back(duration.count());

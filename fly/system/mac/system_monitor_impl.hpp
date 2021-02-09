@@ -43,7 +43,7 @@ private:
 
     std::uint64_t m_prev_process_user_time {0};
     std::uint64_t m_prev_process_system_time {0};
-    std::chrono::high_resolution_clock::time_point m_prev_time;
+    std::chrono::steady_clock::time_point m_prev_time;
 };
 
 } // namespace fly

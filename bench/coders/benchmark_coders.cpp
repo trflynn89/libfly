@@ -84,7 +84,7 @@ void run_enwik8_impl(
             std::filesystem::remove(output);
         }
 
-        const auto start = std::chrono::system_clock::now();
+        const auto start = std::chrono::steady_clock::now();
 
         if constexpr (std::is_same_v<Encode, std::true_type>)
         {
@@ -95,7 +95,7 @@ void run_enwik8_impl(
             coder.decode(input, output);
         }
 
-        const auto end = std::chrono::system_clock::now();
+        const auto end = std::chrono::steady_clock::now();
 
         const auto duration = std::chrono::duration<double>(end - start);
         results.push_back(duration.count());
