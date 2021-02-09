@@ -85,14 +85,14 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout)
 
     while (time_remaining != std::chrono::milliseconds::zero())
     {
-        const auto start = std::chrono::high_resolution_clock::now();
+        const auto start = std::chrono::steady_clock::now();
 
         if (m_event_queue.pop(event, time_remaining))
         {
             handle_event(std::move(event));
         }
 
-        const auto end = std::chrono::high_resolution_clock::now();
+        const auto end = std::chrono::steady_clock::now();
         const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
         if (duration >= time_remaining)

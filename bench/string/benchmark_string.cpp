@@ -111,7 +111,7 @@ void run_format_test(std::string &&name)
 
         for (std::size_t i = 0; i < s_iterations; ++i)
         {
-            const auto start = std::chrono::system_clock::now();
+            const auto start = std::chrono::steady_clock::now();
 
             if constexpr (std::is_same_v<WithFloats, std::true_type>)
             {
@@ -122,7 +122,7 @@ void run_format_test(std::string &&name)
                 formatter.second->format_without_floats();
             }
 
-            const auto end = std::chrono::system_clock::now();
+            const auto end = std::chrono::steady_clock::now();
 
             const auto duration = std::chrono::duration<double>(end - start);
             results.push_back(duration.count());

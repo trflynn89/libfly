@@ -477,7 +477,7 @@ private:
         Log::Level level,
         Log::Trace &&trace,
         std::string &&message,
-        std::chrono::high_resolution_clock::time_point time);
+        std::chrono::steady_clock::time_point time);
 
     const std::string m_name;
 
@@ -487,7 +487,7 @@ private:
     std::shared_ptr<SequencedTaskRunner> m_task_runner;
     std::atomic_bool m_last_task_failed {true};
 
-    const std::chrono::high_resolution_clock::time_point m_start_time;
+    const std::chrono::steady_clock::time_point m_start_time;
     std::uintmax_t m_index {0};
 };
 

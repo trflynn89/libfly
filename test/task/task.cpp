@@ -96,7 +96,7 @@ private:
 class TimerTask : public fly::Task
 {
 public:
-    TimerTask() noexcept : m_start_time(std::chrono::high_resolution_clock::now())
+    TimerTask() noexcept : m_start_time(std::chrono::steady_clock::now())
     {
     }
 
@@ -107,12 +107,12 @@ public:
 
     void run()
     {
-        m_stop_time = std::chrono::high_resolution_clock::now();
+        m_stop_time = std::chrono::steady_clock::now();
     }
 
 private:
-    std::chrono::high_resolution_clock::time_point m_start_time;
-    std::chrono::high_resolution_clock::time_point m_stop_time;
+    std::chrono::steady_clock::time_point m_start_time;
+    std::chrono::steady_clock::time_point m_stop_time;
 };
 
 } // namespace

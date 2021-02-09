@@ -31,14 +31,14 @@ public:
     void testRunStarting(const Catch::TestRunInfo &info) override
     {
         Catch::ConsoleReporter::testRunStarting(info);
-        m_test_start = std::chrono::system_clock::now();
+        m_test_start = std::chrono::steady_clock::now();
     }
 
     void testRunEnded(const Catch::TestRunStats &stats) override
     {
         Catch::ConsoleReporter::testRunEnded(stats);
 
-        const auto end = std::chrono::system_clock::now();
+        const auto end = std::chrono::steady_clock::now();
         const auto duration = std::chrono::duration<double>(end - m_test_start);
 
         // ConsoleReporter prints a second newline above, so go up one line before logging the time.
@@ -53,7 +53,7 @@ public:
 
         Catch::ConsoleReporter::testCaseStarting(info);
 
-        m_current_test_case_start = std::chrono::system_clock::now();
+        m_current_test_case_start = std::chrono::steady_clock::now();
         m_current_test_case = info.name;
     }
 
@@ -70,7 +70,7 @@ public:
 
     void testCaseEnded(const Catch::TestCaseStats &stats) override
     {
-        const auto end = std::chrono::system_clock::now();
+        const auto end = std::chrono::steady_clock::now();
         const auto duration = std::chrono::duration<double>(end - m_current_test_case_start);
 
         const std::string &name = stats.testInfo->name;
@@ -101,9 +101,9 @@ public:
     }
 
 private:
-    std::chrono::system_clock::time_point m_test_start;
+    std::chrono::steady_clock::time_point m_test_start;
 
-    std::chrono::system_clock::time_point m_current_test_case_start;
+    std::chrono::steady_clock::time_point m_current_test_case_start;
     std::string m_current_test_case;
 };
 

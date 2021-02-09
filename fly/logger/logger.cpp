@@ -21,7 +21,7 @@ Logger::Logger(
     m_config(config),
     m_sink(std::move(sink)),
     m_task_runner(task_runner),
-    m_start_time(std::chrono::high_resolution_clock::now())
+    m_start_time(std::chrono::steady_clock::now())
 {
 }
 
@@ -142,7 +142,7 @@ void Logger::log(Log::Level level, Log::Trace &&trace, std::string &&message)
         return;
     }
 
-    const auto now = std::chrono::high_resolution_clock::now();
+    const auto now = std::chrono::steady_clock::now();
 
     if (m_task_runner)
     {
@@ -169,7 +169,7 @@ void Logger::log_to_sink(
     Log::Level level,
     Log::Trace &&trace,
     std::string &&message,
-    std::chrono::high_resolution_clock::time_point time)
+    std::chrono::steady_clock::time_point time)
 {
     const std::chrono::duration<double, std::milli> elapsed = time - m_start_time;
 

@@ -72,7 +72,7 @@ void SystemMonitorImpl::update_process_cpu_usage()
         return;
     }
 
-    const auto now = std::chrono::high_resolution_clock::now();
+    const auto now = std::chrono::steady_clock::now();
     const auto user = time_value_to_microseconds(thread_times.user_time);
     const auto system = time_value_to_microseconds(thread_times.system_time);
 
