@@ -1,4 +1,5 @@
 SRC_DIRS_$(d) := \
-    $(d)/nix
+    $(d)/base64 \
+    $(d)/huffman
 
 $(eval $(call WILDCARD_SOURCES, CPP))

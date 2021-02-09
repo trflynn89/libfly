@@ -1,25 +1,21 @@
 include $(SOURCE_ROOT)/extern/catchorg/flags.mk
 
 SRC_DIRS_$(d) += \
-    test/coders \
-    test/config \
-    test/logger \
-    test/parser \
-    test/path \
-    test/socket \
-    test/system \
-    test/task \
-    test/traits \
-    test/types/bit_stream \
-    test/types/concurrency \
-    test/types/json \
-    test/types/numeric \
-    test/types/string \
-    test/util
+    $(d)/coders \
+    $(d)/config \
+    $(d)/logger \
+    $(d)/parser \
+    $(d)/path \
+    $(d)/socket \
+    $(d)/system \
+    $(d)/task \
+    $(d)/traits \
+    $(d)/types \
+    $(d)/util
 
 ifeq ($(SYSTEM), LINUX)
     SRC_DIRS_$(d) += \
-        test/mock
+        $(d)/mock
 endif
 
 SRC_$(d) := \
