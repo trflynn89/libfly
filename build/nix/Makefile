@@ -1,4 +1,4 @@
-SOURCE_ROOT := $(abspath $(CURDIR)/../..)
+SOURCE_ROOT := $(CURDIR)/../..
 VERSION := $(shell cat $(SOURCE_ROOT)/VERSION.md)
 
 include /usr/local/src/fly/api.mk
