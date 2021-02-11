@@ -5,13 +5,10 @@
 .PHONY: push
 .PHONY: run
 
-# Set the path to the build system.
-BUILD_ROOT := $(CURDIR)/../src
-
 # Import the build system.
-include $(BUILD_ROOT)/system.mk
-include $(BUILD_ROOT)/config.mk
-include $(BUILD_ROOT)/flags.mk
+include /usr/local/src/fly/system.mk
+include /usr/local/src/fly/config.mk
+include /usr/local/src/fly/flags.mk
 
 # Docker settings.
 USER := trflynn89
