@@ -64,3 +64,7 @@ SRC_$(d) := \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_tap.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_teamcity.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_xml.cpp
+
+CXXFLAGS_$(d) += \
+    -Wno-float-equal \
+    -Wno-sign-conversion
