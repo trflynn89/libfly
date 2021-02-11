@@ -1,3 +1,7 @@
 steps:
   - checkout: self
-    submodules: true
+    persistCredentials: true
+
+  - script: |
+      git submodule update --init -- extern/catchorg/Catch2
+    displayName: 'Submodules'
