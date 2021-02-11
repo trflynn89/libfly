@@ -17,6 +17,11 @@ jobs:
     - template: flymake.yml
     - template: setup.yml
 
+    - ${{ if eq(parameters.mode, 'release') }}:
+      - script: |
+          make -C build/nix style check=1
+        displayName: 'Style'
+
     - script: |
         echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }} toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }}"
       displayName: 'Configure'
