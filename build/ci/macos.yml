@@ -8,7 +8,6 @@ jobs:
       vmImage: macOS-10.15
 
     steps:
-    - template: flymake.yml
     - template: setup.yml
 
     - script: |

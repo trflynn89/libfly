@@ -4,4 +4,5 @@ steps:
 
   - script: |
       git submodule update --init -- extern/catchorg/Catch2
+      git submodule update --init -- extern/trflynn89/flymake
     displayName: 'Submodules'
