@@ -34,11 +34,12 @@ RUN apt-get install -y \
 # Install clang
 RUN apt-get install -y \
         clang-$CLANG_VERSION \
+        clang-format-$CLANG_VERSION \
         lld-$CLANG_VERSION \
         llvm-$CLANG_VERSION \
     && \
     \
-    for tool in clang clang++ lld llvm-ar llvm-cov llvm-profdata llvm-strip; \
+    for tool in clang clang++ clang-format lld llvm-ar llvm-cov llvm-profdata llvm-strip; \
     do \
         update-alternatives --install \
             /usr/bin/$tool $tool /usr/bin/$tool-$CLANG_VERSION 1; \
