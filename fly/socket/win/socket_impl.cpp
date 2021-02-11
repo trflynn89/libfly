@@ -4,8 +4,12 @@
 #include "fly/socket/socket_config.hpp"
 #include "fly/system/system.hpp"
 
+// WinSock2.h must be included before WS2tcpip.h to avoid compile errors.
+// clang-format off
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+// clang-format on
+
 #include <socketapi.h>
 
 namespace fly {
