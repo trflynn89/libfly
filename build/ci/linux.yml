@@ -14,7 +14,6 @@ jobs:
       options: --cap-add SYS_PTRACE
 
     steps:
-    - template: flymake.yml
     - template: setup.yml
 
     - ${{ if eq(parameters.mode, 'release') }}:
