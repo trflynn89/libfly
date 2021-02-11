@@ -1,12 +1,6 @@
 CXXFLAGS_$(d) += \
-    -I$(SOURCE_ROOT)/extern/catchorg/Catch2/src \
+    -isystem $(SOURCE_ROOT)/extern/catchorg/Catch2/src \
     -DCATCH_CONFIG_PREFIX_ALL \
     -DCATCH_CONFIG_FAST_COMPILE \
     -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER \
-    -DCATCH_CONFIG_DEFAULT_REPORTER=\"libfly\" \
-    -Wno-ctor-dtor-privacy \
-    -Wno-float-equal \
-    -Wno-newline-eof \
-    -Wno-non-virtual-dtor \
-    -Wno-redundant-decls \
-    -Wno-sign-conversion
+    -DCATCH_CONFIG_DEFAULT_REPORTER=\"libfly\"
