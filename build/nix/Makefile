@@ -1,7 +1,7 @@
 SOURCE_ROOT := $(CURDIR)/../..
 VERSION := $(shell cat $(SOURCE_ROOT)/VERSION.md)
 
-include /usr/local/src/fly/api.mk
+include $(SOURCE_ROOT)/extern/trflynn89/flymake/src/api.mk
 
 # Main targets.
 $(eval $(call ADD_TARGET, libfly, fly, LIB))
@@ -32,4 +32,4 @@ $(eval $(call EXCLUDE_FROM_COVERAGE, fly/types/numeric/detail/literal_parser.hpp
 # Paths to exclude from generation of compilation database.
 $(eval $(call EXCLUDE_FROM_COMPILATION_DATABASE, extern/))
 
-include /usr/local/src/fly/build.mk
+include $(SOURCE_ROOT)/extern/trflynn89/flymake/src/build.mk

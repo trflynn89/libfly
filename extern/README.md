@@ -1,14 +1,18 @@
-# External Libraries
+# External Projects
 
-This directory contains all third-party libraries used by libfly for testing purposes only. The core
-libfly library does not have any depedencies (except for the STL). The libraries here are only for
-unit testing and benchmarking comparisons.
+This directory contains all third-party projects used by libfly. Most are for benchmarking and
+testing purposes only.
 
-Libraries used for unit testing:
+The only dependency required by libfly is its build system (for Linux and macOS), flymake, which was
+originally part of libfly itself:
+
+* [flymake](https://github.com/trflynn89/flymake)
+
+For unit testing, libfly uses the Catch2 framework:
 
 * [Catch2](https://github.com/catchorg/Catch2)
 
-Libraries used for benchmarking:
+All other submodules are only for benchmark comparisons:
 
 * [{fmt}](https://github.com/fmtlib/fmt)
 * [Boost.JSON](https://github.com/boostorg/json)

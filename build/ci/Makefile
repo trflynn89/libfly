@@ -5,10 +5,12 @@
 .PHONY: push
 .PHONY: run
 
+SOURCE_ROOT := $(CURDIR)/../..
+
 # Import the build system.
-include /usr/local/src/fly/system.mk
-include /usr/local/src/fly/config.mk
-include /usr/local/src/fly/flags.mk
+include $(SOURCE_ROOT)/extern/trflynn89/flymake/src/system.mk
+include $(SOURCE_ROOT)/extern/trflynn89/flymake/src/config.mk
+include $(SOURCE_ROOT)/extern/trflynn89/flymake/src/flags.mk
 
 # Docker settings.
 USER := trflynn89
