@@ -10,6 +10,7 @@ ARG JDK_VERSION
 RUN apt-get update && \
     apt-get install -y \
         curl \
+        git \
         lcov \
         make \
         sudo \
