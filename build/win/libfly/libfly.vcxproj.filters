@@ -265,6 +265,9 @@
     <ClInclude Include="..\..\..\fly\types\string\string.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\string_lexer.hpp">
+      <Filter>types\string</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\string_literal.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
@@ -278,9 +281,6 @@
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter_types.hpp">
-      <Filter>types\string\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_lexer.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_stream_util.hpp">

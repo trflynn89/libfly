@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <optional>
 
-namespace fly::detail {
+namespace fly {
 
 /**
  * Helper class to perform lexical analysis of a C-string literal. All methods are constant
@@ -19,15 +19,14 @@ namespace fly::detail {
 template <typename StringType>
 class BasicStringLexer
 {
-    using traits = BasicStringTraits<StringType>;
-    using classifier = BasicStringClassifier<StringType>;
+    using traits = detail::BasicStringTraits<StringType>;
+    using classifier = detail::BasicStringClassifier<StringType>;
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
 
 public:
     /**
-     * Constructor. Stores a view into a C-string literal. This class is not interested in the null
-     * terminator, thus if provided, it is excluded from the view.
+     * Constructor. Stores a view into a C-string literal.
      *
      * @tparam N The size of the C-string literal.
      *
@@ -35,6 +34,13 @@ public:
      */
     template <std::size_t N>
     constexpr explicit BasicStringLexer(const char_type (&literals)[N]) noexcept;
+
+    /**
+     * Constructor. Stores an existing view into a string.
+     *
+     * @param view The existing view into the string.
+     */
+    constexpr explicit BasicStringLexer(view_type view) noexcept;
 
     /**
      * @return A string view into the C-string literal.
@@ -113,6 +119,14 @@ template <std::size_t N>
 constexpr BasicStringLexer<StringType>::BasicStringLexer(const char_type (&literals)[N]) noexcept :
     m_size(classifier::size(literals)),
     m_view(literals, m_size)
+{
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr BasicStringLexer<StringType>::BasicStringLexer(view_type view) noexcept :
+    m_size(view.size()),
+    m_view(std::move(view))
 {
 }
 
@@ -199,4 +213,4 @@ constexpr std::optional<std::size_t> BasicStringLexer<StringType>::consume_numbe
     return parsed_number ? std::optional<std::size_t>(number) : std::nullopt;
 }
 
-} // namespace fly::detail
+} // namespace fly
