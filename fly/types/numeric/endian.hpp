@@ -12,23 +12,51 @@
 #elif defined(FLY_MACOS)
 #    include <libkern/OSByteOrder.h>
 #elif defined(FLY_WINDOWS)
-#    include <cstdlib>
+#    include "fly/types/numeric/literals.hpp"
 #else
 #    error Unknown byte swapping includes.
 #endif
 
 #if defined(FLY_LINUX)
-#    define byte_swap_16(b) bswap_16(b)
-#    define byte_swap_32(b) bswap_32(b)
-#    define byte_swap_64(b) bswap_64(b)
+#    define byte_swap_16(b) __builtin_bswap16(b)
+#    define byte_swap_32(b) __builtin_bswap32(b)
+#    define byte_swap_64(b) __builtin_bswap64(b)
 #elif defined(FLY_MACOS)
 #    define byte_swap_16(b) OSSwapInt16(b)
 #    define byte_swap_32(b) OSSwapInt32(b)
 #    define byte_swap_64(b) OSSwapInt64(b)
 #elif defined(FLY_WINDOWS)
-#    define byte_swap_16(b) _byteswap_ushort(b)
-#    define byte_swap_32(b) _byteswap_ulong(b)
-#    define byte_swap_64(b) _byteswap_uint64(b)
+
+// Windows has _byteswap_ushort, _byteswap_ulong, and _byteswap_uint64, but they are non-constexpr.
+// So to allow endian swapping to be used at compile time, use custom byte swapping methods.
+
+constexpr inline std::uint16_t byte_swap_16(std::uint16_t value)
+{
+    using namespace fly::literals::numeric_literals;
+
+    return ((value & 0xff00_u16) >> 8) | ((value & 0x00ff_u16) << 8);
+}
+
+constexpr inline std::uint32_t byte_swap_32(std::uint32_t value)
+{
+    using namespace fly::literals::numeric_literals;
+
+    return (
+        ((value & 0xff00'0000_u32) >> 24) | ((value & 0x00ff'0000_u32) >> 8) |
+        ((value & 0x0000'ff00_u32) << 8) | ((value & 0x0000'00ff_u32) << 24));
+}
+
+constexpr inline std::uint64_t byte_swap_64(std::uint64_t value)
+{
+    using namespace fly::literals::numeric_literals;
+
+    return (
+        ((value & 0xff00'0000'0000'0000_u64) >> 56) | ((value & 0x00ff'0000'0000'0000_u64) >> 40) |
+        ((value & 0x0000'ff00'0000'0000_u64) >> 24) | ((value & 0x0000'00ff'0000'0000_u64) >> 8) |
+        ((value & 0x0000'0000'ff00'0000_u64) << 8) | ((value & 0x0000'0000'00ff'0000_u64) << 24) |
+        ((value & 0x0000'0000'0000'ff00_u64) << 40) | ((value & 0x0000'0000'0000'00ff_u64) << 56));
+}
+
 #else
 #    error Unknown byte swapping methods.
 #endif
@@ -45,7 +73,7 @@ namespace fly {
  * @return The swapped value.
  */
 template <typename T>
-inline T endian_swap(T value)
+constexpr inline T endian_swap(T value)
 {
     static_assert(
         detail::EndianTraits::is_supported_integer_v<T>,
@@ -81,7 +109,7 @@ inline T endian_swap(T value)
  * @return The swapped value.
  */
 template <std::endian Endianness, typename T>
-inline T endian_swap_if_non_native(T value)
+constexpr inline T endian_swap_if_non_native(T value)
 {
     if constexpr (Endianness == std::endian::native)
     {
