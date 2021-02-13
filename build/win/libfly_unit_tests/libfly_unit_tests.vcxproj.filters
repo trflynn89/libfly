@@ -10,6 +10,9 @@
     <Filter Include="logger">
       <UniqueIdentifier>{7ecf1fbd-e9f8-430f-aa13-4ddb9e46dbd8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="net">
+      <UniqueIdentifier>{55d9c271-cf93-407f-ae69-03717f0c64f0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="parser">
       <UniqueIdentifier>{c4c87e06-0ba0-4d4f-902e-35c28da6e07e}</UniqueIdentifier>
     </Filter>
@@ -73,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\test\logger\styler.cpp">
       <Filter>logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\net\ipv4_address.cpp">
+      <Filter>net</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp">
       <Filter>parser</Filter>

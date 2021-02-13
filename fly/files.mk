@@ -2,6 +2,7 @@ SRC_DIRS_$(d) := \
     $(d)/coders \
     $(d)/config \
     $(d)/logger \
+    $(d)/net \
     $(d)/parser \
     $(d)/path \
     $(d)/socket \
