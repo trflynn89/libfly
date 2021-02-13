@@ -2,8 +2,8 @@
 
 #include "fly/fly.hpp"
 #include "fly/types/string/detail/string_classifier.hpp"
-#include "fly/types/string/detail/string_lexer.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/string_lexer.hpp"
 #include "fly/types/string/string_literal.hpp"
 
 #include <array>
@@ -385,7 +385,7 @@ class BasicFormatString
 {
     using traits = BasicStringTraits<StringType>;
     using classifier = BasicStringClassifier<StringType>;
-    using lexer = BasicStringLexer<StringType>;
+    using lexer = fly::BasicStringLexer<StringType>;
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
 

@@ -223,11 +223,11 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter_types.hpp" />
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_lexer.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_stream_util.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_unicode.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\string.hpp" />
+    <ClInclude Include="..\..\..\fly\types\string\string_lexer.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\string_literal.hpp" />
   </ItemGroup>
   <ItemGroup>

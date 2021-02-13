@@ -1,4 +1,4 @@
-#include "fly/types/string/detail/string_lexer.hpp"
+#include "fly/types/string/string_lexer.hpp"
 
 #include "fly/types/string/string_literal.hpp"
 
@@ -18,7 +18,7 @@ CATCH_TEMPLATE_TEST_CASE(
 {
     using StringType = TestType;
     using char_type = typename StringType::value_type;
-    using Lexer = fly::detail::BasicStringLexer<StringType>;
+    using Lexer = fly::BasicStringLexer<StringType>;
 
     CATCH_SECTION("Cannot consume from empty lexer")
     {
@@ -49,6 +49,19 @@ CATCH_TEMPLATE_TEST_CASE(
         };
 
         Lexer lexer(str);
+        CATCH_CHECK(lexer.view() == FLY_ARR(char_type, "ab"));
+
+        CATCH_CHECK(lexer.consume_if(FLY_CHR(char_type, 'a')));
+        CATCH_CHECK(lexer.consume_if(FLY_CHR(char_type, 'b')));
+        CATCH_CHECK_FALSE(lexer.consume());
+    }
+
+    CATCH_SECTION("Lexer accepts an already-existing string view")
+    {
+        const char_type *str = FLY_STR(char_type, "ab");
+        auto view = std::basic_string_view<char_type>(str);
+
+        Lexer lexer(view);
         CATCH_CHECK(lexer.view() == FLY_ARR(char_type, "ab"));
 
         CATCH_CHECK(lexer.consume_if(FLY_CHR(char_type, 'a')));
