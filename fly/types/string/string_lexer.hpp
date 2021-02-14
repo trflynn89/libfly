@@ -83,14 +83,22 @@ public:
     constexpr bool consume_if(char_type ch);
 
     /**
-     * Beginning with the current position, retrieve characters from the current position in the
-     * C-string literal and advance the current position to the next character until a character is
-     * either not available or not a decimal digit. Convert the retrieved characters to an unsigned
-     * number.
+     * Beginning with the current position, retrieve characters from the C-string literal and
+     * advance the current position to the next character until a character is either not available
+     * or not a decimal digit. Convert the retrieved characters to an unsigned number.
      *
-     * @return If consumed, the parsed unsigned number. Otherwise, an uninitialized value.
+     * @return If consumed, the parsed decimal number. Otherwise, an uninitialized value.
      */
-    constexpr std::optional<std::size_t> consume_number();
+    constexpr std::optional<std::uintmax_t> consume_number();
+
+    /**
+     * Beginning with the current position, retrieve characters from the C-string literal and
+     * advance the current position to the next character until a character is either not available
+     * or not a hexadecimal digit. Convert the retrieved characters to an unsigned number.
+     *
+     * @return If consumed, the parsed hexadecimal number. Otherwise, an uninitialized value.
+     */
+    constexpr std::optional<std::uintmax_t> consume_hex_number();
 
 private:
     /**
@@ -106,6 +114,12 @@ private:
      */
     template <typename Condition>
     constexpr std::optional<char_type> consume_if(Condition condition);
+
+    static constexpr const auto s_zero = FLY_CHR(char_type, '0');
+    static constexpr const auto s_upper_a = FLY_CHR(char_type, 'A');
+    static constexpr const auto s_upper_f = FLY_CHR(char_type, 'F');
+    static constexpr const auto s_lower_a = FLY_CHR(char_type, 'a');
+    static constexpr const auto s_lower_f = FLY_CHR(char_type, 'f');
 
     const std::size_t m_size;
     const view_type m_view;
@@ -183,6 +197,53 @@ constexpr bool BasicStringLexer<StringType>::consume_if(char_type ch)
 
 //==================================================================================================
 template <typename StringType>
+constexpr std::optional<std::uintmax_t> BasicStringLexer<StringType>::consume_number()
+{
+    bool parsed_number = false;
+    std::uintmax_t number = 0;
+
+    while (auto ch = consume_if(classifier::is_digit))
+    {
+        parsed_number = true;
+
+        number *= 10;
+        number += static_cast<std::uintmax_t>(ch.value() - s_zero);
+    }
+
+    return parsed_number ? std::optional<std::uintmax_t>(number) : std::nullopt;
+}
+
+//==================================================================================================
+template <typename StringType>
+constexpr std::optional<std::uintmax_t> BasicStringLexer<StringType>::consume_hex_number()
+{
+    bool parsed_number = false;
+    std::uintmax_t number = 0;
+
+    while (auto ch = consume_if(classifier::is_x_digit))
+    {
+        parsed_number = true;
+        number *= 16;
+
+        if ((ch.value() >= s_upper_a) && (ch.value() <= s_upper_f))
+        {
+            number += static_cast<std::uintmax_t>(ch.value()) - s_upper_a + 0xA;
+        }
+        else if ((ch.value() >= s_lower_a) && (ch.value() <= s_lower_f))
+        {
+            number += static_cast<std::uintmax_t>(ch.value()) - s_lower_a + 0xa;
+        }
+        else
+        {
+            number += static_cast<std::uintmax_t>(ch.value()) - s_zero;
+        }
+    }
+
+    return parsed_number ? std::optional<std::uintmax_t>(number) : std::nullopt;
+}
+
+//==================================================================================================
+template <typename StringType>
 template <typename Condition>
 constexpr auto BasicStringLexer<StringType>::consume_if(Condition condition)
     -> std::optional<char_type>
@@ -193,24 +254,6 @@ constexpr auto BasicStringLexer<StringType>::consume_if(Condition condition)
     }
 
     return std::nullopt;
-}
-
-//==================================================================================================
-template <typename StringType>
-constexpr std::optional<std::size_t> BasicStringLexer<StringType>::consume_number()
-{
-    bool parsed_number = false;
-    std::size_t number = 0;
-
-    while (auto ch = consume_if(classifier::is_digit))
-    {
-        parsed_number = true;
-
-        number *= 10;
-        number += static_cast<std::size_t>(ch.value() - FLY_CHR(char_type, '0'));
-    }
-
-    return parsed_number ? std::optional<std::size_t>(number) : std::nullopt;
 }
 
 } // namespace fly

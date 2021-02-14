@@ -28,6 +28,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(lexer.consume());
         CATCH_CHECK_FALSE(lexer.consume_if(FLY_CHR(char_type, '\0')));
         CATCH_CHECK_FALSE(lexer.consume_number());
+        CATCH_CHECK_FALSE(lexer.consume_hex_number());
         CATCH_CHECK(lexer.position() == 0);
     }
 
@@ -196,7 +197,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK(lexer.position() == 2);
     }
 
-    CATCH_SECTION("Cannot consume number if no number exists")
+    CATCH_SECTION("Cannot consume decimal number if no number exists")
     {
         Lexer lexer(FLY_ARR(char_type, "ab"));
         CATCH_CHECK(lexer.position() == 0);
@@ -205,7 +206,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK(lexer.position() == 0);
     }
 
-    CATCH_SECTION("Cannot consume number past end of lexer")
+    CATCH_SECTION("Cannot consume decimal number past end of lexer")
     {
         Lexer lexer(FLY_ARR(char_type, "1"));
         CATCH_CHECK(lexer.position() == 0);
@@ -219,7 +220,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK(lexer.position() == 1);
     }
 
-    CATCH_SECTION("Cannot consume number if number exists past internal pointer")
+    CATCH_SECTION("Cannot consume decimal number if number exists past internal pointer")
     {
         Lexer lexer(FLY_ARR(char_type, "ab1"));
         CATCH_CHECK(lexer.position() == 0);
@@ -228,7 +229,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK(lexer.position() == 0);
     }
 
-    CATCH_SECTION("Number consumption stops at first non-digit character")
+    CATCH_SECTION("Decimal number consumption stops at first non-digit character")
     {
         Lexer lexer(FLY_ARR(char_type, "1ab"));
         CATCH_CHECK(lexer.position() == 0);
@@ -244,7 +245,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK(lexer.position() == 1);
     }
 
-    CATCH_SECTION("Number consumption stops at end of lexer")
+    CATCH_SECTION("Decimal number consumption stops at end of lexer")
     {
         Lexer lexer(FLY_ARR(char_type, "1"));
         CATCH_CHECK(lexer.position() == 0);
@@ -257,7 +258,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(lexer.peek());
     }
 
-    CATCH_SECTION("Number consumption consumes all digits in a row")
+    CATCH_SECTION("Decimal number consumption consumes all digits in a row")
     {
         Lexer lexer(FLY_ARR(char_type, "123"));
         CATCH_CHECK(lexer.position() == 0);
@@ -270,7 +271,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(lexer.peek());
     }
 
-    CATCH_SECTION("Number consumption can succeed multiple times per lexer if separated")
+    CATCH_SECTION("Decimal number consumption can succeed multiple times per lexer if separated")
     {
         Lexer lexer(FLY_ARR(char_type, "123a456"));
         CATCH_CHECK(lexer.position() == 0);
@@ -287,5 +288,98 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_REQUIRE(n2.has_value());
         CATCH_CHECK(n2.value() == 456);
         CATCH_CHECK(lexer.position() == 7);
+    }
+
+    CATCH_SECTION("Cannot consume hex number if no number exists")
+    {
+        Lexer lexer(FLY_ARR(char_type, "xy"));
+        CATCH_CHECK(lexer.position() == 0);
+
+        CATCH_CHECK_FALSE(lexer.consume_hex_number());
+        CATCH_CHECK(lexer.position() == 0);
+    }
+
+    CATCH_SECTION("Cannot consume hex number past end of lexer")
+    {
+        Lexer lexer(FLY_ARR(char_type, "1"));
+        CATCH_CHECK(lexer.position() == 0);
+
+        auto n1 = lexer.consume_hex_number();
+        CATCH_REQUIRE(n1.has_value());
+        CATCH_CHECK(n1.value() == 1);
+        CATCH_CHECK(lexer.position() == 1);
+
+        CATCH_CHECK_FALSE(lexer.consume_hex_number());
+        CATCH_CHECK(lexer.position() == 1);
+    }
+
+    CATCH_SECTION("Cannot consume hex number if number exists past internal pointer")
+    {
+        Lexer lexer(FLY_ARR(char_type, "xy1"));
+        CATCH_CHECK(lexer.position() == 0);
+
+        CATCH_CHECK_FALSE(lexer.consume_hex_number());
+        CATCH_CHECK(lexer.position() == 0);
+    }
+
+    CATCH_SECTION("Hex number consumption stops at first non-digit character")
+    {
+        Lexer lexer(FLY_ARR(char_type, "1ax"));
+        CATCH_CHECK(lexer.position() == 0);
+
+        auto n1 = lexer.consume_hex_number();
+        CATCH_REQUIRE(n1.has_value());
+        CATCH_CHECK(n1.value() == 0x1a);
+        CATCH_CHECK(lexer.position() == 2);
+
+        auto p1 = lexer.peek();
+        CATCH_REQUIRE(p1.has_value());
+        CATCH_CHECK(p1.value() == FLY_CHR(char_type, 'x'));
+        CATCH_CHECK(lexer.position() == 2);
+    }
+
+    CATCH_SECTION("Hex number consumption stops at end of lexer")
+    {
+        Lexer lexer(FLY_ARR(char_type, "1a"));
+        CATCH_CHECK(lexer.position() == 0);
+
+        auto n1 = lexer.consume_hex_number();
+        CATCH_REQUIRE(n1.has_value());
+        CATCH_CHECK(n1.value() == 0x1a);
+        CATCH_CHECK(lexer.position() == 2);
+
+        CATCH_CHECK_FALSE(lexer.peek());
+    }
+
+    CATCH_SECTION("Hex number consumption consumes all digits in a row")
+    {
+        Lexer lexer(FLY_ARR(char_type, "123a"));
+        CATCH_CHECK(lexer.position() == 0);
+
+        auto n1 = lexer.consume_hex_number();
+        CATCH_REQUIRE(n1.has_value());
+        CATCH_CHECK(n1.value() == 0x123a);
+        CATCH_CHECK(lexer.position() == 4);
+
+        CATCH_CHECK_FALSE(lexer.peek());
+    }
+
+    CATCH_SECTION("Hex number consumption can succeed multiple times per lexer if separated")
+    {
+        Lexer lexer(FLY_ARR(char_type, "123ax456B"));
+        CATCH_CHECK(lexer.position() == 0);
+
+        auto n1 = lexer.consume_hex_number();
+        CATCH_REQUIRE(n1.has_value());
+        CATCH_CHECK(n1.value() == 0x123a);
+        CATCH_CHECK(lexer.position() == 4);
+
+        CATCH_CHECK(lexer.consume_if(FLY_CHR(char_type, 'x')));
+        CATCH_CHECK(lexer.position() == 5);
+
+        auto n2 = lexer.consume_hex_number();
+        CATCH_REQUIRE(n2.has_value());
+        CATCH_CHECK(n2.value() == 0x456b);
+        CATCH_CHECK(lexer.position() == 9);
     }
 }

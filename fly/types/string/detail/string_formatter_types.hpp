@@ -920,7 +920,7 @@ BasicFormatString<StringType, ParameterTypes...>::parse_position(FormatSpecifier
 {
     if (auto position = m_lexer.consume_number(); position)
     {
-        specifier.m_position = position.value();
+        specifier.m_position = static_cast<std::size_t>(position.value());
         m_expect_all_positions_specified = true;
     }
     else
@@ -1001,7 +1001,9 @@ BasicFormatString<StringType, ParameterTypes...>::parse_width(FormatSpecifier &s
 {
     if (auto width = m_lexer.consume_number(); width)
     {
-        specifier.set_width(FormatSpecifier::SizeOrPosition::Type::Size, *width);
+        specifier.set_width(
+            FormatSpecifier::SizeOrPosition::Type::Size,
+            static_cast<std::size_t>(*width));
     }
     else if (m_lexer.consume_if(s_left_brace))
     {
@@ -1023,7 +1025,9 @@ BasicFormatString<StringType, ParameterTypes...>::parse_precision(FormatSpecifie
     {
         if (auto precision = m_lexer.consume_number(); precision)
         {
-            specifier.set_precision(FormatSpecifier::SizeOrPosition::Type::Size, *precision);
+            specifier.set_precision(
+                FormatSpecifier::SizeOrPosition::Type::Size,
+                static_cast<std::size_t>(*precision));
         }
         else if (m_lexer.consume_if(s_left_brace))
         {
