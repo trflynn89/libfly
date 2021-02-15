@@ -224,6 +224,7 @@
     <ClCompile Include="..\..\..\test\logger\logger.cpp" />
     <ClCompile Include="..\..\..\test\logger\styler.cpp" />
     <ClCompile Include="..\..\..\test\net\ipv4_address.cpp" />
+    <ClCompile Include="..\..\..\test\net\ipv6_address.cpp" />
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\test\parser\json_parser.cpp" />
     <ClCompile Include="..\..\..\test\parser\parser.cpp" />

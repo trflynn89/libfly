@@ -80,6 +80,9 @@
     <ClCompile Include="..\..\..\test\net\ipv4_address.cpp">
       <Filter>net</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\net\ipv6_address.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp">
       <Filter>parser</Filter>
     </ClCompile>
