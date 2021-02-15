@@ -148,6 +148,9 @@
     <ClInclude Include="..\..\..\fly\net\ipv4_address.hpp">
       <Filter>net</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\net\ipv6_address.hpp">
+      <Filter>net</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp">
       <Filter>parser</Filter>
     </ClInclude>
@@ -352,6 +355,9 @@
       <Filter>logger\detail\win</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\net\ipv4_address.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\net\ipv6_address.cpp">
       <Filter>net</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp">
