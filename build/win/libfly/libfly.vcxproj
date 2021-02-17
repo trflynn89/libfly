@@ -179,6 +179,7 @@
     <ClInclude Include="..\..\..\fly\logger\logger.hpp" />
     <ClInclude Include="..\..\..\fly\logger\logger_config.hpp" />
     <ClInclude Include="..\..\..\fly\logger\styler.hpp" />
+    <ClInclude Include="..\..\..\fly\net\endpoint.hpp" />
     <ClInclude Include="..\..\..\fly\net\ipv4_address.hpp" />
     <ClInclude Include="..\..\..\fly\net\ipv6_address.hpp" />
     <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp" />
@@ -250,6 +251,7 @@
     <ClCompile Include="..\..\..\fly\logger\logger.cpp" />
     <ClCompile Include="..\..\..\fly\logger\logger_config.cpp" />
     <ClCompile Include="..\..\..\fly\logger\styler.cpp" />
+    <ClCompile Include="..\..\..\fly\net\endpoint.cpp" />
     <ClCompile Include="..\..\..\fly\net\ipv4_address.cpp" />
     <ClCompile Include="..\..\..\fly\net\ipv6_address.cpp" />
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp" />
