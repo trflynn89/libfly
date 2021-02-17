@@ -77,6 +77,9 @@
     <ClCompile Include="..\..\..\test\logger\styler.cpp">
       <Filter>logger</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\net\endpoint.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\net\ipv4_address.cpp">
       <Filter>net</Filter>
     </ClCompile>
