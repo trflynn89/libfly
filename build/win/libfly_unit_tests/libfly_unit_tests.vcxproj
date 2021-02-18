@@ -226,6 +226,7 @@
     <ClCompile Include="..\..\..\test\net\endpoint.cpp" />
     <ClCompile Include="..\..\..\test\net\ipv4_address.cpp" />
     <ClCompile Include="..\..\..\test\net\ipv6_address.cpp" />
+    <ClCompile Include="..\..\..\test\net\listen_socket.cpp" />
     <ClCompile Include="..\..\..\test\net\tcp_socket.cpp" />
     <ClCompile Include="..\..\..\test\net\udp_socket.cpp" />
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp" />
