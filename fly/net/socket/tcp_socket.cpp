@@ -32,8 +32,7 @@ TcpSocket<EndpointType>::TcpSocket(socket_type handle, fly::net::IOMode mode) no
 template <typename EndpointType>
 TcpSocket<EndpointType>::TcpSocket(TcpSocket &&socket) noexcept :
     BaseSocket(std::move(socket)),
-    m_connected_state(socket.m_connected_state.exchange(ConnectedState::Disconnected)),
-    m_is_listening(socket.m_is_listening)
+    m_connected_state(socket.m_connected_state.exchange(ConnectedState::Disconnected))
 {
 }
 
@@ -41,7 +40,6 @@ TcpSocket<EndpointType>::TcpSocket(TcpSocket &&socket) noexcept :
 template <typename EndpointType>
 TcpSocket<EndpointType> &TcpSocket<EndpointType>::operator=(TcpSocket &&socket) noexcept
 {
-    m_is_listening = socket.m_is_listening;
     m_connected_state = socket.m_connected_state.exchange(ConnectedState::Disconnected);
 
     return static_cast<TcpSocket &>(BaseSocket::operator=(std::move(socket)));
@@ -52,35 +50,6 @@ template <typename EndpointType>
 std::optional<EndpointType> TcpSocket<EndpointType>::remote_endpoint() const
 {
     return fly::net::detail::remote_endpoint<EndpointType>(handle());
-}
-
-//==================================================================================================
-template <typename EndpointType>
-bool TcpSocket<EndpointType>::listen()
-{
-    m_is_listening = fly::net::detail::listen(handle());
-    return is_listening();
-}
-
-//==================================================================================================
-template <typename EndpointType>
-bool TcpSocket<EndpointType>::is_listening() const
-{
-    return m_is_listening;
-}
-
-//==================================================================================================
-template <typename EndpointType>
-std::optional<TcpSocket<EndpointType>> TcpSocket<EndpointType>::accept() const
-{
-    EndpointType client_endpoint;
-
-    if (auto client = fly::net::detail::accept(handle(), client_endpoint); client)
-    {
-        return TcpSocket(*client, io_mode());
-    }
-
-    return std::nullopt;
 }
 
 //==================================================================================================

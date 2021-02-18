@@ -86,6 +86,9 @@
     <ClCompile Include="..\..\..\test\net\ipv6_address.cpp">
       <Filter>net</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\net\listen_socket.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\net\tcp_socket.cpp">
       <Filter>net</Filter>
     </ClCompile>

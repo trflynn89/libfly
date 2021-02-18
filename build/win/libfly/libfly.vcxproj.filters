@@ -166,6 +166,9 @@
     <ClInclude Include="..\..\..\fly\net\socket\socket_types.hpp">
       <Filter>net\socket</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\net\socket\listen_socket.hpp">
+      <Filter>net\socket</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\net\socket\tcp_socket.hpp">
       <Filter>net\socket</Filter>
     </ClInclude>
@@ -389,6 +392,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\net\ipv6_address.cpp">
       <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\net\socket\listen_socket.cpp">
+      <Filter>net\socket</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\net\socket\tcp_socket.cpp">
       <Filter>net\socket</Filter>

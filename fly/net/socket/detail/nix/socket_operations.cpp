@@ -107,7 +107,7 @@ std::optional<EndpointType> hostname_to_endpoint(std::string_view hostname)
     // Copying to a string is required because the hostname might not be null terminated.
     const std::string hostname_copy(hostname.data(), hostname.size());
 
-    if (int error = ::getaddrinfo(hostname_copy.c_str(), "http", &hints, &results); error != 0)
+    if (int error = ::getaddrinfo(hostname_copy.c_str(), nullptr, &hints, &results); error != 0)
     {
         LOGS("Error resolving {}: ({}) {}", hostname, error, ::gai_strerror(error));
         return std::nullopt;
@@ -117,7 +117,6 @@ std::optional<EndpointType> hostname_to_endpoint(std::string_view hostname)
     const auto endpoint = address_to_endpoint(*address);
     ::freeaddrinfo(results);
 
-    LOGD("Resolved hostname {} to {}", hostname, endpoint);
     return endpoint;
 }
 
@@ -279,30 +278,32 @@ bool listen(fly::net::socket_type handle)
 
 //==================================================================================================
 template <typename EndpointType>
-std::optional<fly::net::socket_type> accept(fly::net::socket_type handle, EndpointType &endpoint)
+std::optional<fly::net::socket_type>
+accept(fly::net::socket_type handle, EndpointType &endpoint, bool &would_block)
 {
     socket_address_type<EndpointType> address;
     socklen_t address_size = sizeof(address);
 
     const fly::net::socket_type client = ::accept(handle, base(address), &address_size);
+    would_block = false;
 
     if (client == invalid_socket())
     {
+        would_block = fly::System::get_error_code() == EWOULDBLOCK;
         SLOGS(handle, "Error accepting");
+
         return std::nullopt;
     }
 
     endpoint = address_to_endpoint(address);
-    SLOGD(handle, "Accepted new socket {}", endpoint);
-
     return client;
 }
 
 template std::optional<fly::net::socket_type>
-accept(fly::net::socket_type handle, IPv4Endpoint &endpoint);
+accept(fly::net::socket_type handle, IPv4Endpoint &endpoint, bool &would_block);
 
 template std::optional<fly::net::socket_type>
-accept(fly::net::socket_type handle, IPv6Endpoint &endpoint);
+accept(fly::net::socket_type handle, IPv6Endpoint &endpoint, bool &would_block);
 
 //==================================================================================================
 template <typename EndpointType>

@@ -62,7 +62,14 @@ template <typename EndpointType>
 std::optional<EndpointType>
 BaseSocket<EndpointType>::hostname_to_endpoint(std::string_view hostname)
 {
-    return fly::net::detail::hostname_to_endpoint<EndpointType>(std::move(hostname));
+    auto endpoint = fly::net::detail::hostname_to_endpoint<EndpointType>(std::move(hostname));
+
+    if (endpoint)
+    {
+        LOGD("Resolved hostname {} to {}", hostname, endpoint->address());
+    }
+
+    return endpoint;
 }
 
 //==================================================================================================

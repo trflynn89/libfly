@@ -9,6 +9,9 @@
 
 namespace fly::net {
 
+template <typename EndpointType>
+class ListenSocket;
+
 /**
  * Class to represent a connection-oriented streaming network socket.
  *
@@ -55,25 +58,6 @@ public:
      * @return If successful, the connected endpoint. Otherwise, an uninitialized value.
      */
     std::optional<EndpointType> remote_endpoint() const;
-
-    /**
-     * Configure this socket to be used to accept incoming connections.
-     *
-     * @return True if the operation was successful.
-     */
-    bool listen();
-
-    /**
-     * @return True if this socket is listening for incoming connections.
-     */
-    bool is_listening() const;
-
-    /**
-     * Accept an incoming connection on this listening socket.
-     *
-     * @return If successful, the accepted socket. Otherwise, an uninitialized value.
-     */
-    std::optional<TcpSocket> accept() const;
 
     /**
      * Connect to a remote socket. If this socket was opened in an asynchronous IO processing mode,
@@ -135,10 +119,11 @@ public:
     using BaseSocket::close;
     using BaseSocket::handle;
     using BaseSocket::hostname_to_endpoint;
-    using BaseSocket::io_mode;
     using BaseSocket::is_valid;
 
 private:
+    friend ListenSocket<EndpointType>;
+
     /**
      * Constructor. Create a socket with an already-opened socket handle and the provided IO
      * processing mode.
@@ -154,7 +139,6 @@ private:
     using BaseSocket::m_packet_size;
 
     std::atomic<ConnectedState> m_connected_state {ConnectedState::Disconnected};
-    bool m_is_listening {false};
 };
 
 } // namespace fly::net

@@ -106,11 +106,13 @@ bool listen(fly::net::socket_type handle);
  *
  * @param handle The listening socket handle.
  * @param endpoint Location to store the connected remote endpoint.
+ * @param would_block Location to store if the operation would have blocked.
  *
  * @return If successful, the accepted socket handle. Otherwise, an uninitialized value.
  */
 template <typename EndpointType>
-std::optional<fly::net::socket_type> accept(fly::net::socket_type handle, EndpointType &endpoint);
+std::optional<fly::net::socket_type>
+accept(fly::net::socket_type handle, EndpointType &endpoint, bool &would_block);
 
 /**
  * Connect to a remote socket. If this socket was opened in an asynchronous IO processing mode,
