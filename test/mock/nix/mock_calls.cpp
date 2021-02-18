@@ -17,13 +17,13 @@
 namespace {
 
 // This is a hack to be able to test fcntl() being called multiple times in
-// socket/nix/socket_impl.cpp::SetAsync().
+// fly::net::detail::set_asynchronous.
 //
-// The socket_test unit test will test SetAsync() twice. In the first test, fcntl() will fail on its
-// first invocation. In the second test, fcntl() will behave normally on its first invocation, and
-// fail on the second.
+// The socket_test unit test will test set_asynchronous() twice. In the first test, fcntl() will
+// fail on its first invocation. In the second test, fcntl() will behave normally on its first
+// invocation, and fail on the second.
 int s_fcntl_call_count = 0;
-int s_fcntl_next_call = 1;
+int s_fcntl_fail_call = 1;
 
 // This is a hack to be able to test send() being called multiple times in
 // SocketTest::Send_Async_MockSendBlock.
@@ -140,10 +140,10 @@ int __wrap_fcntl(int fd, int cmd, int args)
 {
     if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Fcntl))
     {
-        if (++s_fcntl_call_count == s_fcntl_next_call)
+        if (++s_fcntl_call_count == s_fcntl_fail_call)
         {
             s_fcntl_call_count = 0;
-            ++s_fcntl_next_call;
+            s_fcntl_fail_call = s_fcntl_fail_call == 2 ? 1 : 2;
 
             errno = 0;
             return -1;
@@ -152,7 +152,7 @@ int __wrap_fcntl(int fd, int cmd, int args)
     else
     {
         s_fcntl_call_count = 0;
-        s_fcntl_next_call = 1;
+        s_fcntl_fail_call = 1;
     }
 
     return __real_fcntl(fd, cmd, args);
@@ -180,6 +180,38 @@ int __wrap_getaddrinfo(
     }
 
     return __real_getaddrinfo(node, service, hints, res);
+}
+
+//==============================================================================================
+// NOLINTNEXTLINE(readability-identifier-naming)
+int __real_getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+// NOLINTNEXTLINE(readability-identifier-naming)
+int __wrap_getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+{
+    if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Getpeername))
+    {
+        errno = 0;
+        return -1;
+    }
+
+    return __real_getpeername(sockfd, addr, addrlen);
+}
+
+//==============================================================================================
+// NOLINTNEXTLINE(readability-identifier-naming)
+int __real_getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+// NOLINTNEXTLINE(readability-identifier-naming)
+int __wrap_getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+{
+    if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Getsockname))
+    {
+        errno = 0;
+        return -1;
+    }
+
+    return __real_getsockname(sockfd, addr, addrlen);
 }
 
 //==============================================================================================

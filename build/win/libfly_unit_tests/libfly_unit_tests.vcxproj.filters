@@ -86,6 +86,12 @@
     <ClCompile Include="..\..\..\test\net\ipv6_address.cpp">
       <Filter>net</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\net\tcp_socket.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\net\udp_socket.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp">
       <Filter>parser</Filter>
     </ClCompile>
@@ -180,6 +186,9 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\test\config\test_config.hpp">
       <Filter>config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\test\net\socket_util.hpp">
+      <Filter>net</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\test\types\json\json_helpers.hpp">
       <Filter>types\json</Filter>

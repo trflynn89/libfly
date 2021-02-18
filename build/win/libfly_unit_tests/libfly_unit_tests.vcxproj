@@ -226,6 +226,8 @@
     <ClCompile Include="..\..\..\test\net\endpoint.cpp" />
     <ClCompile Include="..\..\..\test\net\ipv4_address.cpp" />
     <ClCompile Include="..\..\..\test\net\ipv6_address.cpp" />
+    <ClCompile Include="..\..\..\test\net\tcp_socket.cpp" />
+    <ClCompile Include="..\..\..\test\net\udp_socket.cpp" />
     <ClCompile Include="..\..\..\test\parser\ini_parser.cpp" />
     <ClCompile Include="..\..\..\test\parser\json_parser.cpp" />
     <ClCompile Include="..\..\..\test\parser\parser.cpp" />
@@ -259,6 +261,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\config\test_config.hpp" />
+    <ClInclude Include="..\..\..\test\net\socket_util.hpp" />
     <ClInclude Include="..\..\..\test\types\json\json_helpers.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
