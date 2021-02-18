@@ -18,6 +18,8 @@ enum class MockCall : std::uint8_t
     Connect,
     Fcntl,
     Getaddrinfo,
+    Getpeername,
+    Getsockname,
     Getsockopt,
     InotifyAddWatch,
     InotifyInit1,

@@ -25,6 +25,15 @@
     <Filter Include="net">
       <UniqueIdentifier>{03e02b28-3bca-4b51-ac6e-e59c2879f83e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="net\socket">
+      <UniqueIdentifier>{77b83860-8825-4814-bad0-4336194640de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\socket\detail">
+      <UniqueIdentifier>{f1d89e19-7d3c-4402-9ffd-c1f27b0c1eea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\socket\detail\win">
+      <UniqueIdentifier>{9346d71b-4ecf-47e6-8b56-21e4886520f2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="parser">
       <UniqueIdentifier>{e39571b7-e6c1-48ea-917e-08c233c64755}</UniqueIdentifier>
     </Filter>
@@ -153,6 +162,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\net\ipv6_address.hpp">
       <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\net\socket\socket_types.hpp">
+      <Filter>net\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\net\socket\tcp_socket.hpp">
+      <Filter>net\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\net\socket\udp_socket.hpp">
+      <Filter>net\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\net\socket\detail\base_socket.hpp">
+      <Filter>net\socket\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\net\socket\detail\socket_operations.hpp">
+      <Filter>net\socket\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp">
       <Filter>parser</Filter>
@@ -365,6 +389,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\net\ipv6_address.cpp">
       <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\net\socket\tcp_socket.cpp">
+      <Filter>net\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\net\socket\udp_socket.cpp">
+      <Filter>net\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\net\socket\detail\base_socket.cpp">
+      <Filter>net\socket\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fly\net\socket\detail\win\socket_operations.cpp">
+      <Filter>net\socket\detail\win</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\parser\ini_parser.cpp">
       <Filter>parser</Filter>
