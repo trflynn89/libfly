@@ -30,6 +30,13 @@ SocketService::SocketService(const std::shared_ptr<fly::SequencedTaskRunner> &ta
     :
     m_task_runner(task_runner)
 {
+    fly::net::detail::initialize();
+}
+
+//==================================================================================================
+SocketService::~SocketService() noexcept
+{
+    fly::net::detail::deinitialize();
 }
 
 //==================================================================================================

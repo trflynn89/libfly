@@ -33,9 +33,7 @@ CATCH_TEMPLATE_TEST_CASE("ListenSocket", "[net]", fly::net::IPv4Address, fly::ne
     using EndpointType = fly::net::Endpoint<IPAddressType>;
     using ListenSocket = fly::net::ListenSocket<EndpointType>;
 
-#if defined(FLY_WINDOWS)
-    fly::test::ScopedWindowsSocketAPI::create();
-#endif
+    fly::test::ScopedSocketServiceSetup::create();
 
     constexpr const auto in_addr_any = IPAddressType::in_addr_any();
     constexpr const auto in_addr_loopback = IPAddressType::in_addr_loopback();
@@ -298,10 +296,6 @@ CATCH_TEMPLATE_TEST_CASE("AsyncListenSocket", "[net]", fly::net::IPv4Address, fl
     using EndpointType = fly::net::Endpoint<IPAddressType>;
     using ListenSocket = fly::net::ListenSocket<EndpointType>;
     using TcpSocket = fly::net::TcpSocket<EndpointType>;
-
-#if defined(FLY_WINDOWS)
-    fly::test::ScopedWindowsSocketAPI::create();
-#endif
 
     auto task_runner = fly::test::task_manager()->create_task_runner<fly::SequencedTaskRunner>();
     auto socket_service = fly::net::SocketService::create(task_runner);

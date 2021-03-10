@@ -23,6 +23,11 @@ class SocketService : public std::enable_shared_from_this<SocketService>
 {
 public:
     /**
+     * Destructor. Deinitialize the socket service.
+     */
+    ~SocketService() noexcept;
+
+    /**
      * Create a socket service.
      *
      * @param task_runner Task runner for posting socket service tasks onto.

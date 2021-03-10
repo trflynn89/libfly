@@ -37,9 +37,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
     using ListenSocket = fly::net::ListenSocket<EndpointType>;
     using TcpSocket = fly::net::TcpSocket<EndpointType>;
 
-#if defined(FLY_WINDOWS)
-    fly::test::ScopedWindowsSocketAPI::create();
-#endif
+    fly::test::ScopedSocketServiceSetup::create();
 
     const std::string message(fly::String::generate_random_string(1 << 10));
     constexpr const auto in_addr_loopback = IPAddressType::in_addr_loopback();
@@ -322,10 +320,6 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
     using EndpointType = fly::net::Endpoint<IPAddressType>;
     using ListenSocket = fly::net::ListenSocket<EndpointType>;
     using TcpSocket = fly::net::TcpSocket<EndpointType>;
-
-#if defined(FLY_WINDOWS)
-    fly::test::ScopedWindowsSocketAPI::create();
-#endif
 
     auto task_runner = fly::test::task_manager()->create_task_runner<fly::SequencedTaskRunner>();
     auto socket_service = fly::net::SocketService::create(task_runner);

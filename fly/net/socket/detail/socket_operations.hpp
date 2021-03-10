@@ -10,6 +10,16 @@
 namespace fly::net::detail {
 
 /**
+ * Perform any platform-specific actions needed to initialize network services.
+ */
+void initialize();
+
+/**
+ * Perform any platform-specific actions needed to deinitialize network services.
+ */
+void deinitialize();
+
+/**
  * @return Invalid socket handle for the target system.
  */
 fly::net::socket_type invalid_socket();
