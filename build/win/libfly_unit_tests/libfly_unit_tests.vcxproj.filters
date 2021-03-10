@@ -19,9 +19,6 @@
     <Filter Include="path">
       <UniqueIdentifier>{3387ecc5-ca3c-4b0c-83b8-1c62c1b9556b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="socket">
-      <UniqueIdentifier>{3df267bc-741a-4dc2-bf16-21deb3af15a9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="system">
       <UniqueIdentifier>{824ceb0d-1c4e-40bf-9bbc-68494ebe321e}</UniqueIdentifier>
     </Filter>
@@ -109,9 +106,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\test\path\path_monitor.cpp">
       <Filter>path</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\socket\socket.cpp">
-      <Filter>socket</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\system\system.cpp">
       <Filter>system</Filter>

@@ -43,12 +43,6 @@
     <Filter Include="path\win">
       <UniqueIdentifier>{2acbf296-ac30-40d1-a973-8fa44f8ee6c7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="socket">
-      <UniqueIdentifier>{c64c6e9a-2b73-4e4c-af81-bebf6171d91c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="socket\win">
-      <UniqueIdentifier>{56d585bc-1634-443f-af16-495a33bcc3fb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="system">
       <UniqueIdentifier>{43fcbaca-3ea1-4886-bc2e-699655d936a6}</UniqueIdentifier>
     </Filter>
@@ -201,27 +195,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.hpp">
       <Filter>path\win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\async_request.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket_config.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket_manager.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\socket_types.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\win\socket_impl.hpp">
-      <Filter>socket\win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\socket\win\socket_manager_impl.hpp">
-      <Filter>socket\win</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\system\system.hpp">
       <Filter>system</Filter>
@@ -431,24 +404,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\fly\path\win\path_monitor_impl.cpp">
       <Filter>path\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\socket\async_request.cpp">
-      <Filter>socket</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\socket\socket.cpp">
-      <Filter>socket</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\socket\socket_config.cpp">
-      <Filter>socket</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\socket\socket_manager.cpp">
-      <Filter>socket</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\socket\win\socket_impl.cpp">
-      <Filter>socket\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\socket\win\socket_manager_impl.cpp">
-      <Filter>socket\win</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\system\system.cpp">
       <Filter>system</Filter>
