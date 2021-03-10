@@ -194,11 +194,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
         // Run all of the log point tests with both synchronous and asynchronous loggers.
         const bool synchronous_logger = GENERATE(true, false);
 
-        auto task_manager = std::make_shared<fly::TaskManager>(1);
-        CATCH_REQUIRE(task_manager->start());
-
-        auto task_runner =
-            fly::test::task_manager()->create_task_runner<fly::SequencedTaskRunner>();
+        auto task_runner = fly::SequencedTaskRunner::create(fly::test::task_manager());
         auto sink = std::make_unique<QueueSink>(received_logs);
 
         auto logger = synchronous_logger ?

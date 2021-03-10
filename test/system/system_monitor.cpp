@@ -43,8 +43,7 @@ public:
 
 CATCH_TEST_CASE("SystemMonitor", "[system]")
 {
-    auto task_runner =
-        fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+    auto task_runner = fly::test::WaitableSequencedTaskRunner::create(fly::test::task_manager());
 
     auto monitor =
         std::make_shared<fly::SystemMonitorImpl>(task_runner, std::make_shared<TestSystemConfig>());

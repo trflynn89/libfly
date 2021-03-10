@@ -48,8 +48,7 @@ public:
 
 CATCH_TEST_CASE("ConfigManager", "[config]")
 {
-    auto task_runner =
-        fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+    auto task_runner = fly::test::WaitableSequencedTaskRunner::create(fly::test::task_manager());
 
     fly::test::PathUtil::ScopedTempDirectory config_path;
     std::filesystem::path config_file = config_path.file();

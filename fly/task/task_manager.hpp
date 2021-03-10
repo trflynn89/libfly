@@ -32,11 +32,13 @@ class TaskManager : public std::enable_shared_from_this<TaskManager>
 
 public:
     /**
-     * Constructor.
+     * Create and start a task manager.
      *
-     * @param num_workers Number of worker threads to create.
+     * @param thread_count Size of the thread pool for the task manager to own.
+     *
+     * @return The created task manager.
      */
-    explicit TaskManager(std::uint32_t num_workers) noexcept;
+    static std::shared_ptr<TaskManager> create(std::uint32_t thread_count);
 
     /**
      * Create the worker threads and timer thread.
@@ -58,16 +60,6 @@ public:
      */
     bool stop();
 
-    /**
-     * Create a task runner, holding a weak reference to this task manager.
-     *
-     * @tparam TaskRunnerType The type of task runner to create.
-     *
-     * @return The created task runner.
-     */
-    template <typename TaskRunnerType>
-    std::shared_ptr<TaskRunnerType> create_task_runner();
-
 private:
     /**
      * Wrapper structure to associate a task with its task runner and the point in time that the
@@ -80,6 +72,13 @@ private:
         std::weak_ptr<TaskRunner> m_weak_task_runner;
         std::chrono::steady_clock::time_point m_schedule;
     };
+
+    /**
+     * Constructor.
+     *
+     * @param thread_count Size of the thread pool for the task manager to own.
+     */
+    explicit TaskManager(std::uint32_t thread_count) noexcept;
 
     /**
      * Post a task to be executed as soon as a worker thread is available.
@@ -124,17 +123,7 @@ private:
 
     std::vector<std::future<void>> m_futures;
 
-    std::uint32_t m_num_workers;
+    std::uint32_t m_thread_count;
 };
-
-//==================================================================================================
-template <typename TaskRunnerType>
-std::shared_ptr<TaskRunnerType> TaskManager::create_task_runner()
-{
-    static_assert(std::is_base_of_v<TaskRunner, TaskRunnerType>);
-
-    const std::shared_ptr<TaskManager> task_manager = shared_from_this();
-    return std::shared_ptr<TaskRunnerType>(new TaskRunnerType(task_manager));
-}
 
 } // namespace fly

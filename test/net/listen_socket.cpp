@@ -297,7 +297,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncListenSocket", "[net]", fly::net::IPv4Address, fl
     using ListenSocket = fly::net::ListenSocket<EndpointType>;
     using TcpSocket = fly::net::TcpSocket<EndpointType>;
 
-    auto task_runner = fly::test::task_manager()->create_task_runner<fly::SequencedTaskRunner>();
+    auto task_runner = fly::SequencedTaskRunner::create(fly::test::task_manager());
     auto socket_service = fly::net::SocketService::create(task_runner);
     fly::test::Signal signal;
 

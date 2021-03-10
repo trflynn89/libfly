@@ -58,10 +58,19 @@ private:
  */
 class WaitableParallelTaskRunner : public fly::ParallelTaskRunner, public WaitableTaskRunner
 {
-    friend class fly::TaskManager;
+public:
+    /**
+     * Create a waitable, parallel task runner.
+     *
+     * @param task_manager The task manager this runner should interface with.
+     *
+     * @return The created task runner.
+     */
+    static std::shared_ptr<WaitableParallelTaskRunner>
+    create(const std::shared_ptr<TaskManager> &task_manager);
 
 protected:
-    WaitableParallelTaskRunner(std::weak_ptr<TaskManager> task_manager) noexcept;
+    WaitableParallelTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept;
 
     /**
      * When a task is complete, perform the same operations as this runner's parents.
@@ -80,10 +89,19 @@ protected:
  */
 class WaitableSequencedTaskRunner : public fly::SequencedTaskRunner, public WaitableTaskRunner
 {
-    friend class fly::TaskManager;
+public:
+    /**
+     * Create a waitable, sequenced task runner.
+     *
+     * @param task_manager The task manager this runner should interface with.
+     *
+     * @return The created task runner.
+     */
+    static std::shared_ptr<WaitableSequencedTaskRunner>
+    create(const std::shared_ptr<TaskManager> &task_manager);
 
 protected:
-    WaitableSequencedTaskRunner(std::weak_ptr<TaskManager> task_manager) noexcept;
+    WaitableSequencedTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept;
 
     /**
      * When a task is complete, perform the same operations as this runner's parents.
