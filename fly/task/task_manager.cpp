@@ -14,9 +14,25 @@ namespace {
 } // namespace
 
 //==================================================================================================
-TaskManager::TaskManager(std::uint32_t num_workers) noexcept :
+std::shared_ptr<TaskManager> TaskManager::create(std::uint32_t thread_count)
+{
+    // TaskManager has a private constructor, thus cannot be used with std::make_shared. This class
+    // is used to expose the private constructor locally.
+    struct TaskManagerImpl final : public TaskManager
+    {
+        explicit TaskManagerImpl(std::uint32_t thread_count) noexcept : TaskManager(thread_count)
+        {
+        }
+    };
+
+    auto task_manager = std::make_shared<TaskManagerImpl>(thread_count);
+    return task_manager->start() ? task_manager : nullptr;
+}
+
+//==================================================================================================
+TaskManager::TaskManager(std::uint32_t thread_count) noexcept :
     m_keep_running(false),
-    m_num_workers(num_workers)
+    m_thread_count(thread_count)
 {
 }
 
@@ -29,7 +45,7 @@ bool TaskManager::start()
     {
         std::shared_ptr<TaskManager> task_manager = shared_from_this();
 
-        for (std::uint32_t i = 0; i < m_num_workers; ++i)
+        for (std::uint32_t i = 0; i < m_thread_count; ++i)
         {
             m_futures.push_back(
                 std::async(std::launch::async, &TaskManager::worker_thread, task_manager));

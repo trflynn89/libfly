@@ -15,6 +15,6 @@ namespace fly::test {
  *
  * @return A pointer to the single task manager instance.
  */
-fly::TaskManager *task_manager();
+std::shared_ptr<fly::TaskManager> task_manager();
 
 } // namespace fly::test

@@ -22,8 +22,26 @@ void WaitableTaskRunner::wait_for_task_to_complete(const std::string &location)
 }
 
 //==================================================================================================
+std::shared_ptr<WaitableParallelTaskRunner>
+WaitableParallelTaskRunner::create(const std::shared_ptr<TaskManager> &task_manager)
+{
+    // WaitableParallelTaskRunner has a private constructor, thus cannot be used with
+    // std::make_shared. This class is used to expose the private constructor locally.
+    struct WaitableParallelTaskRunnerImpl final : public WaitableParallelTaskRunner
+    {
+        explicit WaitableParallelTaskRunnerImpl(
+            const std::shared_ptr<TaskManager> &task_manager) noexcept :
+            WaitableParallelTaskRunner(task_manager)
+        {
+        }
+    };
+
+    return std::make_shared<WaitableParallelTaskRunnerImpl>(task_manager);
+}
+
+//==================================================================================================
 WaitableParallelTaskRunner::WaitableParallelTaskRunner(
-    std::weak_ptr<TaskManager> task_manager) noexcept :
+    const std::shared_ptr<TaskManager> &task_manager) noexcept :
     fly::ParallelTaskRunner(task_manager)
 {
 }
@@ -37,8 +55,26 @@ void WaitableParallelTaskRunner::task_complete(fly::TaskLocation &&location)
 }
 
 //==================================================================================================
+std::shared_ptr<WaitableSequencedTaskRunner>
+WaitableSequencedTaskRunner::create(const std::shared_ptr<TaskManager> &task_manager)
+{
+    // WaitableSequencedTaskRunner has a private constructor, thus cannot be used with
+    // std::make_shared. This class is used to expose the private constructor locally.
+    struct WaitableSequencedTaskRunnerImpl final : public WaitableSequencedTaskRunner
+    {
+        explicit WaitableSequencedTaskRunnerImpl(
+            const std::shared_ptr<TaskManager> &task_manager) noexcept :
+            WaitableSequencedTaskRunner(task_manager)
+        {
+        }
+    };
+
+    return std::make_shared<WaitableSequencedTaskRunnerImpl>(task_manager);
+}
+
+//==================================================================================================
 WaitableSequencedTaskRunner::WaitableSequencedTaskRunner(
-    std::weak_ptr<TaskManager> task_manager) noexcept :
+    const std::shared_ptr<TaskManager> &task_manager) noexcept :
     fly::SequencedTaskRunner(task_manager)
 {
 }

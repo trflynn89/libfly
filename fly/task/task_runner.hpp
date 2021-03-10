@@ -296,9 +296,9 @@ protected:
     /**
      * Private constructor. Task runners may only be created by the task manager.
      *
-     * @param weak_task_manager The task manager.
+     * @param task_manager The task manager.
      */
-    TaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept;
+    TaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept;
 
     /**
      * Post a task for execution in accordance with the concrete task runner's policy.
@@ -440,10 +440,19 @@ private:
  */
 class ParallelTaskRunner : public TaskRunner
 {
-    friend class TaskManager;
+public:
+    /**
+     * Create a parallel task runner.
+     *
+     * @param task_manager The task manager this runner should interface with.
+     *
+     * @return The created task runner.
+     */
+    static std::shared_ptr<ParallelTaskRunner>
+    create(const std::shared_ptr<TaskManager> &task_manager);
 
 protected:
-    explicit ParallelTaskRunner(std::weak_ptr<TaskManager>) noexcept;
+    explicit ParallelTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept;
 
     /**
      * Post a task for execution immediately.
@@ -477,10 +486,19 @@ protected:
  */
 class SequencedTaskRunner : public TaskRunner
 {
-    friend class TaskManager;
+public:
+    /**
+     * Create a sequenced task runner.
+     *
+     * @param task_manager The task manager this runner should interface with.
+     *
+     * @return The created task runner.
+     */
+    static std::shared_ptr<SequencedTaskRunner>
+    create(const std::shared_ptr<TaskManager> &task_manager);
 
 protected:
-    explicit SequencedTaskRunner(std::weak_ptr<TaskManager>) noexcept;
+    explicit SequencedTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept;
 
     /**
      * Post a task for execution within this sequence. If a task is not already running, the task is

@@ -46,8 +46,7 @@ public:
 
 CATCH_TEST_CASE("PathMonitor", "[path]")
 {
-    auto task_runner =
-        fly::test::task_manager()->create_task_runner<fly::test::WaitableSequencedTaskRunner>();
+    auto task_runner = fly::test::WaitableSequencedTaskRunner::create(fly::test::task_manager());
 
     auto monitor =
         std::make_shared<fly::PathMonitorImpl>(task_runner, std::make_shared<TestPathConfig>());

@@ -5,8 +5,8 @@
 namespace fly {
 
 //==================================================================================================
-TaskRunner::TaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
-    m_weak_task_manager(std::move(weak_task_manager))
+TaskRunner::TaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept :
+    m_weak_task_manager(task_manager)
 {
 }
 
@@ -46,8 +46,25 @@ void TaskRunner::execute(TaskLocation &&location, Task &&task)
 }
 
 //==================================================================================================
-ParallelTaskRunner::ParallelTaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
-    TaskRunner(std::move(weak_task_manager))
+std::shared_ptr<ParallelTaskRunner>
+ParallelTaskRunner::create(const std::shared_ptr<TaskManager> &task_manager)
+{
+    // ParallelTaskRunner has a private constructor, thus cannot be used with std::make_shared. This
+    // class is used to expose the private constructor locally.
+    struct ParallelTaskRunnerImpl final : public ParallelTaskRunner
+    {
+        explicit ParallelTaskRunnerImpl(const std::shared_ptr<TaskManager> &task_manager) noexcept :
+            ParallelTaskRunner(task_manager)
+        {
+        }
+    };
+
+    return std::make_shared<ParallelTaskRunnerImpl>(task_manager);
+}
+
+//==================================================================================================
+ParallelTaskRunner::ParallelTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept :
+    TaskRunner(task_manager)
 {
 }
 
@@ -63,8 +80,27 @@ void ParallelTaskRunner::task_complete(TaskLocation &&)
 }
 
 //==================================================================================================
-SequencedTaskRunner::SequencedTaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
-    TaskRunner(std::move(weak_task_manager))
+std::shared_ptr<SequencedTaskRunner>
+SequencedTaskRunner::create(const std::shared_ptr<TaskManager> &task_manager)
+{
+    // SequencedTaskRunner has a private constructor, thus cannot be used with std::make_shared.
+    // This class is used to expose the private constructor locally.
+    struct SequencedTaskRunnerImpl final : public SequencedTaskRunner
+    {
+        explicit SequencedTaskRunnerImpl(const std::shared_ptr<TaskManager> &task_manager) noexcept
+            :
+            SequencedTaskRunner(task_manager)
+        {
+        }
+    };
+
+    return std::make_shared<SequencedTaskRunnerImpl>(task_manager);
+}
+
+//==================================================================================================
+SequencedTaskRunner::SequencedTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept
+    :
+    TaskRunner(task_manager)
 {
 }
 
