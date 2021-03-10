@@ -13,16 +13,13 @@ TaskRunner::TaskRunner(std::weak_ptr<TaskManager> weak_task_manager) noexcept :
 //==================================================================================================
 bool TaskRunner::post_task_to_task_manager(TaskLocation &&location, Task &&task)
 {
-    std::shared_ptr<TaskManager> task_manager = m_weak_task_manager.lock();
-    if (!task_manager)
+    if (std::shared_ptr<TaskManager> task_manager = m_weak_task_manager.lock(); task_manager)
     {
-        return false;
+        task_manager->post_task(std::move(location), std::move(task), shared_from_this());
+        return true;
     }
 
-    std::weak_ptr<TaskRunner> task_runner = shared_from_this();
-    task_manager->post_task(std::move(location), std::move(task), std::move(task_runner));
-
-    return true;
+    return false;
 }
 
 //==================================================================================================
@@ -31,23 +28,20 @@ bool TaskRunner::post_task_to_task_manager_with_delay(
     Task &&task,
     std::chrono::milliseconds delay)
 {
-    std::shared_ptr<TaskManager> task_manager = m_weak_task_manager.lock();
-    if (!task_manager)
+    if (std::shared_ptr<TaskManager> task_manager = m_weak_task_manager.lock(); task_manager)
     {
-        return false;
+        task_manager
+            ->post_task_with_delay(std::move(location), std::move(task), shared_from_this(), delay);
+        return true;
     }
 
-    std::weak_ptr<TaskRunner> task_runner = shared_from_this();
-    task_manager
-        ->post_task_with_delay(std::move(location), std::move(task), std::move(task_runner), delay);
-
-    return true;
+    return false;
 }
 
 //==================================================================================================
 void TaskRunner::execute(TaskLocation &&location, Task &&task)
 {
-    std::move(task)(this, location);
+    std::invoke(std::move(task), this, location);
     task_complete(std::move(location));
 }
 
