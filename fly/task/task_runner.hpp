@@ -345,6 +345,15 @@ protected:
 
 private:
     /**
+     * Container to wrap around a generic callable type to allow perfect forwarding into lambdas.
+     */
+    template <typename TaskType>
+    struct TaskHolder
+    {
+        TaskType m_task;
+    };
+
+    /**
      * Wrap a task in a generic lambda to be agnostic to the return type of the task.
      *
      * @tparam TaskType Callable type of the task.
@@ -523,7 +532,7 @@ private:
 template <typename TaskType>
 bool TaskRunner::post_task(TaskLocation &&location, TaskType &&task)
 {
-    return post_task_internal(std::move(location), wrap_task(std::move(task)));
+    return post_task_internal(std::move(location), wrap_task(std::forward<TaskType>(task)));
 }
 
 //==================================================================================================
@@ -535,14 +544,16 @@ bool TaskRunner::post_task(
 {
     return post_task_internal(
         std::move(location),
-        wrap_task(std::move(task), std::move(weak_owner)));
+        wrap_task(std::forward<TaskType>(task), std::move(weak_owner)));
 }
 
 //==================================================================================================
 template <typename TaskType, typename ReplyType>
 bool TaskRunner::post_task_with_reply(TaskLocation &&location, TaskType &&task, ReplyType reply)
 {
-    return post_task_internal(std::move(location), wrap_task(std::move(task), std::move(reply)));
+    return post_task_internal(
+        std::move(location),
+        wrap_task(std::forward<TaskType>(task), std::move(reply)));
 }
 
 //==================================================================================================
@@ -555,7 +566,7 @@ bool TaskRunner::post_task_with_reply(
 {
     return post_task_internal(
         std::move(location),
-        wrap_task(std::move(task), std::move(reply), std::move(weak_owner)));
+        wrap_task(std::forward<TaskType>(task), std::move(reply), std::move(weak_owner)));
 }
 
 //==================================================================================================
@@ -567,7 +578,7 @@ bool TaskRunner::post_task_with_delay(
 {
     return post_task_to_task_manager_with_delay(
         std::move(location),
-        wrap_task(std::move(task)),
+        wrap_task(std::forward<TaskType>(task)),
         delay);
 }
 
@@ -581,7 +592,7 @@ bool TaskRunner::post_task_with_delay(
 {
     return post_task_to_task_manager_with_delay(
         std::move(location),
-        wrap_task(std::move(task), std::move(weak_owner)),
+        wrap_task(std::forward<TaskType>(task), std::move(weak_owner)),
         delay);
 }
 
@@ -595,7 +606,7 @@ bool TaskRunner::post_task_with_delay_and_reply(
 {
     return post_task_to_task_manager_with_delay(
         std::move(location),
-        wrap_task(std::move(task), std::move(reply)),
+        wrap_task(std::forward<TaskType>(task), std::move(reply)),
         delay);
 }
 
@@ -610,7 +621,7 @@ bool TaskRunner::post_task_with_delay_and_reply(
 {
     return post_task_to_task_manager_with_delay(
         std::move(location),
-        wrap_task(std::move(task), std::move(reply), std::move(weak_owner)),
+        wrap_task(std::forward<TaskType>(task), std::move(reply), std::move(weak_owner)),
         delay);
 }
 
@@ -620,9 +631,11 @@ Task TaskRunner::wrap_task(TaskType &&task)
 {
     static_assert(std::is_invocable_v<TaskType>, "Task must be invocable without any arguments");
 
-    return [task = std::move(task)](TaskRunner *, TaskLocation) mutable
+    TaskHolder<TaskType> holder {std::forward<TaskType>(task)};
+
+    return [holder = std::move(holder)](TaskRunner *, TaskLocation) mutable
     {
-        FLY_UNUSED(std::move(task)());
+        FLY_UNUSED(std::invoke(std::move(holder.m_task)));
     };
 }
 
@@ -636,14 +649,14 @@ Task TaskRunner::wrap_task(TaskType &&task, std::weak_ptr<OwnerType> weak_owner)
         std::is_invocable_v<TaskType, StrongOwnerType>,
         "Task must be invocable with only a strong pointer to its owner");
 
-    return [task = std::move(task),
+    TaskHolder<TaskType> holder {std::forward<TaskType>(task)};
+
+    return [holder = std::move(holder),
             weak_owner = std::move(weak_owner)](TaskRunner *, TaskLocation) mutable
     {
-        StrongOwnerType owner = weak_owner.lock();
-
-        if (owner)
+        if (StrongOwnerType owner = weak_owner.lock(); owner)
         {
-            FLY_UNUSED(std::move(task)(std::move(owner)));
+            FLY_UNUSED(std::invoke(std::move(holder.m_task), std::move(owner)));
         }
     };
 }
@@ -664,18 +677,25 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply)
         "that type, or the task must return void and the reply must be invocable without any "
         "arguments");
 
-    return [task = std::move(task),
-            reply = std::move(reply)](TaskRunner *runner, TaskLocation location) mutable
+    TaskHolder<TaskType> task_holder {std::forward<TaskType>(task)};
+    TaskHolder<ReplyType> reply_holder {std::forward<ReplyType>(reply)};
+
+    return
+        [task_holder = std::move(task_holder),
+         reply_holder = std::move(reply_holder)](TaskRunner *runner, TaskLocation location) mutable
     {
         if constexpr (s_result_is_void)
         {
-            std::move(task)();
-            runner->post_task(std::move(location), std::move(reply));
+            std::invoke(std::move(task_holder.m_task));
+            runner->post_task(std::move(location), std::move(reply_holder.m_task));
         }
         else
         {
-            auto result = std::move(task)();
-            runner->post_task(std::move(location), std::bind(std::move(reply), std::move(result)));
+            auto result = std::invoke(std::move(task_holder.m_task));
+
+            runner->post_task(
+                std::move(location),
+                std::bind(std::move(reply_holder.m_task), std::move(result)));
         }
     };
 }
@@ -700,29 +720,36 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<Own
         "type and a strong pointer to its owner, or the task must return void and the reply must "
         "be invocable with only a strong pointer to its owner");
 
-    return [task = std::move(task),
-            reply = std::move(reply),
+    TaskHolder<TaskType> task_holder {std::forward<TaskType>(task)};
+    TaskHolder<ReplyType> reply_holder {std::forward<ReplyType>(reply)};
+
+    return [task_holder = std::move(task_holder),
+            reply_holder = std::move(reply_holder),
             weak_owner = std::move(weak_owner)](TaskRunner *runner, TaskLocation location) mutable
     {
-        StrongOwnerType owner = weak_owner.lock();
-        if (!owner)
+        if (StrongOwnerType owner = weak_owner.lock(); owner)
         {
-            return;
-        }
+            if constexpr (s_result_is_void)
+            {
+                std::invoke(std::move(task_holder.m_task), std::move(owner));
 
-        if constexpr (s_result_is_void)
-        {
-            std::move(task)(std::move(owner));
-            runner->post_task(std::move(location), std::move(reply), std::move(weak_owner));
-        }
-        else
-        {
-            auto result = std::move(task)(std::move(owner));
+                runner->post_task(
+                    std::move(location),
+                    std::move(reply_holder.m_task),
+                    std::move(weak_owner));
+            }
+            else
+            {
+                auto result = std::invoke(std::move(task_holder.m_task), std::move(owner));
 
-            runner->post_task(
-                std::move(location),
-                std::bind(std::move(reply), std::move(result), std::placeholders::_1),
-                std::move(weak_owner));
+                runner->post_task(
+                    std::move(location),
+                    std::bind(
+                        std::move(reply_holder.m_task),
+                        std::move(result),
+                        std::placeholders::_1),
+                    std::move(weak_owner));
+            }
         }
     };
 }
