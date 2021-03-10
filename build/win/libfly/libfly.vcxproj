@@ -195,13 +195,6 @@
     <ClInclude Include="..\..\..\fly\path\path_config.hpp" />
     <ClInclude Include="..\..\..\fly\path\path_monitor.hpp" />
     <ClInclude Include="..\..\..\fly\path\win\path_monitor_impl.hpp" />
-    <ClInclude Include="..\..\..\fly\socket\async_request.hpp" />
-    <ClInclude Include="..\..\..\fly\socket\socket.hpp" />
-    <ClInclude Include="..\..\..\fly\socket\socket_config.hpp" />
-    <ClInclude Include="..\..\..\fly\socket\socket_manager.hpp" />
-    <ClInclude Include="..\..\..\fly\socket\socket_types.hpp" />
-    <ClInclude Include="..\..\..\fly\socket\win\socket_impl.hpp" />
-    <ClInclude Include="..\..\..\fly\socket\win\socket_manager_impl.hpp" />
     <ClInclude Include="..\..\..\fly\system\system.hpp" />
     <ClInclude Include="..\..\..\fly\system\system_config.hpp" />
     <ClInclude Include="..\..\..\fly\system\system_monitor.hpp" />
@@ -273,12 +266,6 @@
     <ClCompile Include="..\..\..\fly\path\path_config.cpp" />
     <ClCompile Include="..\..\..\fly\path\path_monitor.cpp" />
     <ClCompile Include="..\..\..\fly\path\win\path_monitor_impl.cpp" />
-    <ClCompile Include="..\..\..\fly\socket\async_request.cpp" />
-    <ClCompile Include="..\..\..\fly\socket\socket.cpp" />
-    <ClCompile Include="..\..\..\fly\socket\socket_config.cpp" />
-    <ClCompile Include="..\..\..\fly\socket\socket_manager.cpp" />
-    <ClCompile Include="..\..\..\fly\socket\win\socket_impl.cpp" />
-    <ClCompile Include="..\..\..\fly\socket\win\socket_manager_impl.cpp" />
     <ClCompile Include="..\..\..\fly\system\system.cpp" />
     <ClCompile Include="..\..\..\fly\system\system_config.cpp" />
     <ClCompile Include="..\..\..\fly\system\system_monitor.cpp" />
