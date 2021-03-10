@@ -4,6 +4,7 @@
 #include "fly/traits/traits.hpp"
 
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <string_view>
 #include <type_traits>
@@ -15,6 +16,8 @@ class IPv6Address;
 
 template <typename IPAddressType>
 class Endpoint;
+
+class SocketService;
 
 } // namespace fly::net
 
@@ -131,6 +134,17 @@ protected:
     BaseSocket(socket_type handle, fly::net::IOMode mode) noexcept;
 
     /**
+     * Constructor. Initialize the socket in an asynchronous IO processing mode armed with the
+     * provided socket service for performing IO operations.
+     *
+     * @param handle Native socket handle opened by the concrete socket type.
+     * @param socket_service The socket service for performing IO operations.
+     */
+    BaseSocket(
+        socket_type handle,
+        const std::shared_ptr<fly::net::SocketService> &socket_service) noexcept;
+
+    /**
      * Move constructor. The provided socket is left in an invalid state.
      *
      * @param socket The socket instance to move.
@@ -151,11 +165,18 @@ protected:
      */
     BaseSocket &operator=(BaseSocket &&socket) noexcept;
 
+    /**
+     * @return A strong (possibly null) pointer to the socket service.
+     */
+    std::shared_ptr<fly::net::SocketService> socket_service() const;
+
     std::size_t m_packet_size {4096};
 
 private:
     BaseSocket(const BaseSocket &) = delete;
     BaseSocket &operator=(const BaseSocket &) = delete;
+
+    std::weak_ptr<fly::net::SocketService> m_weak_socket_service;
 
     socket_type m_socket_handle;
     std::uint64_t m_socket_id;

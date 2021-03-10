@@ -12,6 +12,7 @@ namespace fly::test {
 enum class MockCall : std::uint8_t
 {
     Accept,
+    AcceptBlocking,
     Backtrace,
     BacktraceSymbols,
     Bind,
@@ -29,7 +30,10 @@ enum class MockCall : std::uint8_t
     Poll,
     Read,
     Recv,
+    RecvBlocking,
     Recvfrom,
+    RecvfromBlocking,
+    Select,
     Send,
     SendBlocking,
     Sendto,

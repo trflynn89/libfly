@@ -1,12 +1,16 @@
 #include "fly/net/socket/udp_socket.hpp"
 
 #include "test/net/socket_util.hpp"
+#include "test/util/task_manager.hpp"
 
 #include "fly/fly.hpp"
 #include "fly/net/endpoint.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/net/socket/socket_service.hpp"
 #include "fly/net/socket/socket_types.hpp"
+#include "fly/task/task_manager.hpp"
+#include "fly/task/task_runner.hpp"
 #include "fly/types/string/string.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"
@@ -211,58 +215,338 @@ CATCH_TEMPLATE_TEST_CASE("UdpSocket", "[net]", fly::net::IPv4Address, fly::net::
     {
         fly::test::MockSystem mock(fly::test::MockCall::Getaddrinfo);
 
-        auto listen_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
-        CATCH_REQUIRE(listen_socket);
+        auto socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+        CATCH_REQUIRE(socket);
 
-        CATCH_CHECK_FALSE(listen_socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
-    }
-
-    CATCH_SECTION("Socket sending fails due to ::sendto() system call")
-    {
-        fly::test::MockSystem mock(fly::test::MockCall::Sendto);
-
-        auto listen_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Asynchronous);
-        CATCH_REQUIRE(listen_socket);
-
-        CATCH_CHECK(
-            listen_socket->bind(EndpointType(in_addr_any, s_port), fly::net::BindMode::AllowReuse));
-
-        auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
-        CATCH_REQUIRE(client_socket);
-
-        CATCH_CHECK(client_socket->send(s_localhost, s_port, message) == 0U);
+        CATCH_CHECK_FALSE(socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
     }
 
     CATCH_SECTION("Socket sending fails due to ::getaddrinfo() system call")
     {
         fly::test::MockSystem mock(fly::test::MockCall::Getaddrinfo);
 
-        auto listen_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Asynchronous);
-        CATCH_REQUIRE(listen_socket);
+        auto socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+        CATCH_REQUIRE(socket);
 
-        CATCH_CHECK(
-            listen_socket->bind(EndpointType(in_addr_any, s_port), fly::net::BindMode::AllowReuse));
+        CATCH_CHECK(socket->send(s_localhost, s_port, message) == 0);
+    }
 
-        auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
-        CATCH_REQUIRE(client_socket);
+    CATCH_SECTION("Socket sending fails due to ::sendto() system call")
+    {
+        fly::test::MockSystem mock(fly::test::MockCall::Sendto);
 
-        CATCH_CHECK(client_socket->send(s_localhost, s_port, message) == 0U);
+        auto socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+        CATCH_REQUIRE(socket);
+
+        CATCH_CHECK(socket->send(s_localhost, s_port, message) == 0);
     }
 
     CATCH_SECTION("Socket receiving fails due to ::recvfrom() system call")
     {
         fly::test::MockSystem mock(fly::test::MockCall::Recvfrom);
 
-        auto listen_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Asynchronous);
-        CATCH_REQUIRE(listen_socket);
+        auto socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+        CATCH_REQUIRE(socket);
 
-        CATCH_CHECK(
-            listen_socket->bind(EndpointType(in_addr_any, s_port), fly::net::BindMode::AllowReuse));
-
-        auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
-        CATCH_REQUIRE(client_socket);
-
-        CATCH_CHECK(client_socket->receive().empty());
+        CATCH_CHECK(socket->receive().empty());
     }
+#endif
+}
+
+CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::net::IPv6Address)
+{
+    using IPAddressType = TestType;
+    using EndpointType = fly::net::Endpoint<IPAddressType>;
+    using UdpSocket = fly::net::UdpSocket<EndpointType>;
+
+#if defined(FLY_WINDOWS)
+    fly::test::ScopedWindowsSocketAPI::create();
+#endif
+
+    auto task_runner = fly::test::task_manager()->create_task_runner<fly::SequencedTaskRunner>();
+    auto socket_service = fly::net::SocketService::create(task_runner);
+
+    const std::string message(fly::String::generate_random_string(1 << 10));
+    fly::test::Signal signal;
+
+    CATCH_SECTION("Sockets created without socket service may not send asynchronously")
+    {
+        auto socket1 = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+        CATCH_REQUIRE(socket1);
+        CATCH_CHECK_FALSE(socket1->send_async(s_localhost, s_port, message, [](auto) {}));
+
+        auto socket2 = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Asynchronous);
+        CATCH_REQUIRE(socket2);
+        CATCH_CHECK_FALSE(socket2->send_async(s_localhost, s_port, message, [](auto) {}));
+    }
+
+    CATCH_SECTION("Sockets created without socket service may not receive asynchronously")
+    {
+        auto socket1 = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+        CATCH_REQUIRE(socket1);
+        CATCH_CHECK_FALSE(socket1->receive_async([](auto) {}));
+
+        auto socket2 = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Asynchronous);
+        CATCH_REQUIRE(socket2);
+        CATCH_CHECK_FALSE(socket2->receive_async([](auto) {}));
+    }
+
+    CATCH_SECTION("Callbacks provided for asynchronously sending must be valid")
+    {
+        auto socket = socket_service->create_socket<UdpSocket>();
+        CATCH_REQUIRE(socket);
+        CATCH_CHECK_FALSE(socket->send_async(s_localhost, s_port, message, nullptr));
+    }
+
+    CATCH_SECTION("Callbacks provided for asynchronously receiving must be valid")
+    {
+        auto socket = socket_service->create_socket<UdpSocket>();
+        CATCH_REQUIRE(socket);
+        CATCH_CHECK_FALSE(socket->receive_async(nullptr));
+    }
+
+    CATCH_SECTION("Sockets may send asynchronously")
+    {
+        auto server_thread = [&signal, &message]()
+        {
+            auto server_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+            CATCH_REQUIRE(server_socket);
+
+            CATCH_CHECK(server_socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
+            signal.notify();
+
+            std::string received;
+
+            while (server_socket->is_valid() && (received.size() != message.size()))
+            {
+                received += server_socket->receive();
+            }
+
+            CATCH_CHECK(received == message);
+        };
+
+        auto client_thread = [&socket_service, &signal, &message]()
+        {
+            fly::test::Signal client_signal;
+
+            auto client_socket = socket_service->create_socket<UdpSocket>();
+            CATCH_REQUIRE(client_socket);
+            signal.wait();
+
+            CATCH_CHECK(client_socket->send_async(
+                s_localhost,
+                s_port,
+                message,
+                [&client_signal, &message](std::size_t bytes_sent)
+                {
+                    CATCH_CHECK(bytes_sent == message.size());
+                    client_signal.notify();
+                }));
+
+            client_signal.wait();
+        };
+
+        fly::test::invoke(std::move(server_thread), std::move(client_thread));
+    }
+
+    CATCH_SECTION("Sockets may receive asynchronously")
+    {
+        auto server_thread = [&socket_service, &signal, &message]()
+        {
+            fly::test::Signal server_signal;
+
+            auto server_socket = socket_service->create_socket<UdpSocket>();
+            CATCH_REQUIRE(server_socket);
+
+            CATCH_CHECK(server_socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
+            signal.notify();
+
+            std::string received;
+
+            while (server_socket->is_valid() && (received.size() != message.size()))
+            {
+                CATCH_CHECK(server_socket->receive_async(
+                    [&server_signal, &received](std::string fragment)
+                    {
+                        received.append(fragment);
+                        server_signal.notify();
+                    }));
+
+                server_signal.wait();
+                CATCH_REQUIRE(server_socket->is_valid());
+            }
+
+            CATCH_CHECK(received == message);
+        };
+
+        auto client_thread = [&signal, &message]()
+        {
+            auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+            CATCH_REQUIRE(client_socket);
+            signal.wait();
+
+            CATCH_CHECK(client_socket->send(s_localhost, s_port, message) == message.size());
+        };
+
+        fly::test::invoke(std::move(server_thread), std::move(client_thread));
+    }
+
+#if defined(FLY_LINUX)
+
+    CATCH_SECTION("Socket sending fails due to ::getaddrinfo() system call")
+    {
+        fly::test::MockSystem mock(fly::test::MockCall::Getaddrinfo);
+
+        auto socket = socket_service->create_socket<UdpSocket>();
+        CATCH_REQUIRE(socket);
+
+        CATCH_CHECK(socket->send_async(s_localhost, s_port, message, [](auto) {}) == 0);
+    }
+
+    CATCH_SECTION("Socket sending fails due to ::sendto() system call")
+    {
+        fly::test::MockSystem mock(fly::test::MockCall::Sendto);
+
+        auto socket = socket_service->create_socket<UdpSocket>();
+        CATCH_REQUIRE(socket);
+
+        CATCH_CHECK(socket->send_async(
+            s_localhost,
+            s_port,
+            message,
+            [&signal](std::size_t bytes_sent)
+            {
+                CATCH_CHECK(bytes_sent == 0);
+                signal.notify();
+            }));
+
+        signal.wait();
+        CATCH_CHECK_FALSE(socket->is_valid());
+    }
+
+    CATCH_SECTION("Socket sending blocks due to ::sendto() system call")
+    {
+        auto server_thread = [&signal, &message]()
+        {
+            auto server_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+            CATCH_REQUIRE(server_socket);
+
+            CATCH_CHECK(server_socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
+            signal.notify();
+
+            std::string received;
+
+            while (server_socket->is_valid() && (received.size() != message.size()))
+            {
+                received += server_socket->receive();
+            }
+
+            CATCH_CHECK(received == message);
+        };
+
+        auto client_thread = [&socket_service, &signal, &message]()
+        {
+            fly::test::MockSystem mock(fly::test::MockCall::SendtoBlocking);
+            fly::test::Signal client_signal;
+
+            auto client_socket = socket_service->create_socket<UdpSocket>();
+            CATCH_REQUIRE(client_socket);
+            signal.wait();
+
+            CATCH_CHECK(client_socket->send_async(
+                s_localhost,
+                s_port,
+                message,
+                [&client_signal, &message](std::size_t bytes_sent)
+                {
+                    CATCH_CHECK(bytes_sent == message.size());
+                    client_signal.notify();
+                }));
+
+            client_signal.wait();
+        };
+
+        fly::test::invoke(std::move(server_thread), std::move(client_thread));
+    }
+
+    CATCH_SECTION("Socket receiving fails due to ::recvfrom() system call")
+    {
+        auto server_thread = [&socket_service, &signal]()
+        {
+            fly::test::MockSystem mock(fly::test::MockCall::Recvfrom);
+            fly::test::Signal server_signal;
+
+            auto server_socket = socket_service->create_socket<UdpSocket>();
+            CATCH_REQUIRE(server_socket);
+
+            CATCH_CHECK(server_socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
+            signal.notify();
+
+            CATCH_CHECK(server_socket->receive_async(
+                [&server_signal](std::string received)
+                {
+                    CATCH_CHECK(received.empty());
+                    server_signal.notify();
+                }));
+
+            server_signal.wait();
+            CATCH_CHECK_FALSE(server_socket->is_valid());
+        };
+
+        auto client_thread = [&signal, &message]()
+        {
+            auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+            CATCH_REQUIRE(client_socket);
+            signal.wait();
+
+            CATCH_CHECK(client_socket->send(s_localhost, s_port, message) == message.size());
+        };
+
+        fly::test::invoke(std::move(server_thread), std::move(client_thread));
+    }
+
+    CATCH_SECTION("Socket receiving blocks due to ::recvfrom() system call")
+    {
+        auto server_thread = [&socket_service, &signal, &message]()
+        {
+            fly::test::MockSystem mock(fly::test::MockCall::RecvfromBlocking);
+            fly::test::Signal server_signal;
+
+            auto server_socket = socket_service->create_socket<UdpSocket>();
+            CATCH_REQUIRE(server_socket);
+
+            CATCH_CHECK(server_socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
+            signal.notify();
+
+            std::string received;
+
+            while (server_socket->is_valid() && (received.size() != message.size()))
+            {
+                CATCH_CHECK(server_socket->receive_async(
+                    [&server_signal, &received](std::string fragment)
+                    {
+                        received.append(fragment);
+                        server_signal.notify();
+                    }));
+
+                server_signal.wait();
+                CATCH_REQUIRE(server_socket->is_valid());
+            }
+
+            CATCH_CHECK(received == message);
+        };
+
+        auto client_thread = [&signal, &message]()
+        {
+            auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
+            CATCH_REQUIRE(client_socket);
+            signal.wait();
+
+            CATCH_CHECK(client_socket->send(s_localhost, s_port, message) == message.size());
+        };
+
+        fly::test::invoke(std::move(server_thread), std::move(client_thread));
+    }
+
 #endif
 }

@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <optional>
+#include <set>
 #include <string>
 
 namespace fly::net::detail {
@@ -183,5 +184,16 @@ std::string recv_from(
     EndpointType &endpoint,
     std::size_t packet_size,
     bool &would_block);
+
+/**
+ * Monitor a set of socket handles for IO readiness. The provided sets are modified to only contain
+ * the socket handles that are ready for IO.
+ *
+ * @param writing_handles The maxiumum message size to receive.
+ * @param reading_handles Location to store if the operation would have blocked.
+ */
+void select(
+    std::set<fly::net::socket_type> &writing_handles,
+    std::set<fly::net::socket_type> &reading_handles);
 
 } // namespace fly::net::detail
