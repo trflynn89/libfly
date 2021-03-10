@@ -25,21 +25,37 @@ namespace {
 int s_fcntl_call_count = 0;
 int s_fcntl_fail_call = 1;
 
-// This is a hack to be able to test send() being called multiple times in
-// SocketTest::Send_Async_MockSendBlock.
+// This is a hack to be able to test send() being called multiple times in net tests.
+//
+// On the first call to accept() when mocked blocking is enabled, set errno to EWOULDBLOCK to make
+// ListenSocket try to accept again. On the second call, allow the operation to complete.
+int s_accept_call_count = 0;
+
+// This is a hack to be able to test recv() being called multiple times in net tests.
+//
+// On the first call to recv() when mocked blocking is enabled, set errno to EWOULDBLOCK to make
+// TcpSocket try to receive again. On the second call, allow the operation to complete.
+int s_recv_call_count = 0;
+
+// This is a hack to be able to test recvfrom() being called multiple times in net tests.
+//
+// On the first call to recvfrom() when mocked blocking is enabled, set errno to EWOULDBLOCK to make
+// UdpSocket try to receive again. On the second call, allow the operation to complete.
+int s_recvfrom_call_count = 0;
+
+// This is a hack to be able to test send() being called multiple times in net tests.
 //
 // On the first call to send() when mocked blocking is enabled, send half of the bytes, simulating
 // packet fragmentation.  On the second call, send 0 bytes and set errno to EWOULDBLOCK to make
-// SocketImpl break out of its send loop after the packet fragmentation. On the third call, send the
+// TcpSocket break out of its send loop after the packet fragmentation. On the third call, send the
 // remaining bytes, completing the send.
 int s_send_call_count = 0;
 
-// This is a hack to be able to test sendto() being called multiple times in
-// SocketTest::Send_Async_MockSendtoBlock.
+// This is a hack to be able to test sendto() being called multiple times in net tests.
 //
 // On the first call to sendto() when mocked blocking is enabled, send half of the bytes, simulating
 // packet fragmentation.  On the second call, send 0 bytes and set errno to EWOULDBLOCK to make
-// SocketImpl break out of its send loop after the packet fragmentation. On the third call, send the
+// UdpSocket break out of its send loop after the packet fragmentation. On the third call, send the
 // remaining bytes, completing the send.
 int s_sendto_call_count = 0;
 
@@ -60,6 +76,19 @@ int __wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     {
         errno = 0;
         return -1;
+    }
+    else if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::AcceptBlocking))
+    {
+        switch (s_accept_call_count++)
+        {
+            case 0:
+                errno = EWOULDBLOCK;
+                return -1;
+
+            case 1:
+                s_accept_call_count = 0;
+                break;
+        }
     }
 
     return __real_accept(sockfd, addr, addrlen);
@@ -357,6 +386,19 @@ ssize_t __wrap_recv(int sockfd, void *buf, size_t len, int flags)
         errno = 0;
         return -1;
     }
+    else if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::RecvBlocking))
+    {
+        switch (s_recv_call_count++)
+        {
+            case 0:
+                errno = EWOULDBLOCK;
+                return -1;
+
+            case 1:
+                s_recv_call_count = 0;
+                break;
+        }
+    }
 
     return __real_recv(sockfd, buf, len, flags);
 }
@@ -385,8 +427,49 @@ ssize_t __wrap_recvfrom(
         errno = 0;
         return -1;
     }
+    else if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::RecvfromBlocking))
+    {
+        switch (s_recvfrom_call_count++)
+        {
+            case 0:
+                errno = EWOULDBLOCK;
+                return -1;
+
+            case 1:
+                s_recvfrom_call_count = 0;
+                break;
+        }
+    }
 
     return __real_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
+}
+
+//==============================================================================================
+// NOLINTNEXTLINE(readability-identifier-naming)
+int __real_select(
+    int nfds,
+    fd_set *readfds,
+    fd_set *writefds,
+    fd_set *exceptfds,
+    struct timeval *timeout);
+
+// NOLINTNEXTLINE(readability-identifier-naming)
+int __wrap_select(
+    int nfds,
+    fd_set *readfds,
+    fd_set *writefds,
+    fd_set *exceptfds,
+    struct timeval *timeout)
+{
+    bool fail;
+
+    if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Select, fail))
+    {
+        errno = 0;
+        return fail ? -1 : 0;
+    }
+
+    return __real_select(nfds, readfds, writefds, exceptfds, timeout);
 }
 
 //==============================================================================================

@@ -89,6 +89,9 @@
     <ClCompile Include="..\..\..\test\net\listen_socket.cpp">
       <Filter>net</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\net\socket_service.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\net\tcp_socket.cpp">
       <Filter>net</Filter>
     </ClCompile>

@@ -4,6 +4,7 @@
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
 #include "fly/net/socket/detail/socket_operations.hpp"
+#include "fly/net/socket/socket_service.hpp"
 
 #include <atomic>
 
@@ -27,8 +28,19 @@ BaseSocket<EndpointType>::BaseSocket(socket_type handle, fly::net::IOMode mode) 
 
 //==================================================================================================
 template <typename EndpointType>
+BaseSocket<EndpointType>::BaseSocket(
+    socket_type handle,
+    const std::shared_ptr<fly::net::SocketService> &socket_service) noexcept :
+    BaseSocket(handle, fly::net::IOMode::Asynchronous)
+{
+    m_weak_socket_service = socket_service;
+}
+
+//==================================================================================================
+template <typename EndpointType>
 BaseSocket<EndpointType>::BaseSocket(BaseSocket &&socket) noexcept :
     m_packet_size(socket.m_packet_size),
+    m_weak_socket_service(std::move(socket.m_weak_socket_service)),
     m_socket_handle(socket.m_socket_handle),
     m_socket_id(socket.m_socket_id),
     m_mode(socket.m_mode)
@@ -48,6 +60,7 @@ template <typename EndpointType>
 BaseSocket<EndpointType> &BaseSocket<EndpointType>::operator=(BaseSocket &&socket) noexcept
 {
     m_packet_size = socket.m_packet_size;
+    m_weak_socket_service = std::move(socket.m_weak_socket_service);
     m_socket_handle = socket.m_socket_handle;
     m_socket_id = socket.m_socket_id;
     m_mode = socket.m_mode;
@@ -129,6 +142,11 @@ void BaseSocket<EndpointType>::close()
 {
     if (is_valid())
     {
+        if (auto service = socket_service(); service)
+        {
+            service->remove_socket(m_socket_handle);
+        }
+
         fly::net::detail::close(m_socket_handle);
         m_socket_handle = fly::net::detail::invalid_socket();
     }
@@ -153,6 +171,13 @@ bool BaseSocket<EndpointType>::bind(std::string_view hostname, port_type port, B
     }
 
     return false;
+}
+
+//==================================================================================================
+template <typename EndpointType>
+std::shared_ptr<fly::net::SocketService> BaseSocket<EndpointType>::socket_service() const
+{
+    return m_weak_socket_service.lock();
 }
 
 //==================================================================================================

@@ -4,9 +4,13 @@
 #include "fly/net/socket/socket_types.hpp"
 
 #include <cstddef>
+#include <functional>
+#include <memory>
 #include <string>
 
 namespace fly::net {
+
+class SocketService;
 
 /**
  * Class to represent a connectionless datagram network socket.
@@ -15,9 +19,14 @@ namespace fly::net {
  * @version February 13, 2021
  */
 template <typename EndpointType>
-class UdpSocket : public fly::net::detail::BaseSocket<EndpointType>
+class UdpSocket :
+    public fly::net::detail::BaseSocket<EndpointType>,
+    public std::enable_shared_from_this<UdpSocket<EndpointType>>
 {
     using BaseSocket = fly::net::detail::BaseSocket<EndpointType>;
+
+    using SendCompletion = std::function<void(std::size_t)>;
+    using ReceiveCompletion = std::function<void(std::string)>;
 
 public:
     /**
@@ -70,18 +79,127 @@ public:
     std::size_t send(std::string_view hostname, port_type port, std::string_view message) const;
 
     /**
+     * Asynchronously transmit a message to a specific remote endpoint. May only be used if this
+     * socket was created through a socket service.
+     *
+     * Upon completion, the provided callback will be invoked with the number of bytes that were
+     * transmitted. If an error occurs on the socket, the callback will still be invoked with the
+     * number of bytes successfully transmitted, but the socket will also be closed before the
+     * invocation.
+     *
+     * @param endpoint The remote endpoint to transmit to.
+     * @param message The message to transmit.
+     * @param callback The callback to invoke when the operation has completed.
+     *
+     * @return True if the socket service and the provided callback are valid.
+     */
+    bool
+    send_async(const EndpointType &endpoint, std::string_view message, SendCompletion &&callback);
+
+    /**
+     * Asynchronously transmit a message to a specific remote endpoint. May only be used if this
+     * socket was created through a socket service.
+     *
+     * Upon completion, the provided callback will be invoked with the number of bytes that were
+     * transmitted. If an error occurs on the socket, the callback will still be invoked with the
+     * number of bytes successfully transmitted, but the socket will also be closed before the
+     * invocation.
+     *
+     * @param hostname The hostname or IP address string to transmit to.
+     * @param port The port to transmit to.
+     * @param message The message to transmit.
+     * @param callback The callback to invoke when the operation has completed.
+     *
+     * @return True if the socket service and the provided callback are valid.
+     */
+    bool send_async(
+        std::string_view hostname,
+        port_type port,
+        std::string_view message,
+        SendCompletion &&callback);
+
+    /**
      * Receive a message from an unspecified remote endpoint.
      *
      * @return The message received.
      */
     std::string receive() const;
 
+    /**
+     * Asynchronously receive a message from an unspecified remote endpoint. May only be used if
+     * this socket was created through a socket service.
+     *
+     * Upon completion, the provided callback will be invoked with the message received. If an error
+     * occurs on the socket, the callback will still be invoked with any message partially received,
+     * but the socket will also be closed before the invocation.
+     *
+     * @param callback The callback to invoke when the operation has completed.
+     *
+     * @return True if the socket service and the provided callback are valid.
+     */
+    bool receive_async(ReceiveCompletion &&callback);
+
+    using BaseSocket::close;
     using BaseSocket::handle;
     using BaseSocket::hostname_to_endpoint;
 
 private:
+    friend SocketService;
+
+    /**
+     * Create an asynchronous socket armed with a socket service for performing IO operations.
+     *
+     * @param socket_service The socket service for performing IO operations.
+     *
+     * @return The created socket.
+     */
+    static std::shared_ptr<UdpSocket>
+    create_socket(const std::shared_ptr<SocketService> &socket_service);
+
+    /**
+     * Constructor. Open the socket in an asynchronous IO processing mode armed with the provided
+     * socket service for performing IO operations.
+     *
+     * @param socket_service The socket service for performing IO operations.
+     */
+    explicit UdpSocket(const std::shared_ptr<SocketService> &socket_service) noexcept;
+
+    /**
+     * When the socket service indicates the socket is available for writing, attempt to transmit
+     * the provided message to the specified remote endpoint. If successful, the provided callback
+     * will be invoked with the number of bytes transmitted. If unsuccessful because the operation
+     * would still block, queue another attempt. Otherwise, the socket will be closed and the
+     * callback will be invoked with the number of bytes successfully transmitted.
+     *
+     * @param endpoint The remote endpoint to transmit to.
+     * @param message The message to transmit.
+     * @param callback The callback to invoke when the operation has completed.
+     * @param bytes_sent The number of bytes successfully transmitted so far.
+     * @param total_bytes The total number of bytes expected to be transmitted.
+     */
+    void ready_to_send(
+        const EndpointType &endpoint,
+        std::string_view message,
+        SendCompletion &&callback,
+        std::size_t bytes_sent,
+        std::size_t total_bytes);
+
+    /**
+     * When the socket service indicates the socket is available for reading, attempt to receive
+     * a message from an unspecified remote endpoint. If successful, the provided callback will be
+     * invoked with the received message. If unsuccessful because the operation would still block,
+     * queue another attempt. Otherwise, the socket will be closed and the callback will be invoked
+     * with any message partially received.
+     *
+     * @param callback The callback to invoke when the operation has completed.
+     * @param message The message successfully received so far.
+     */
+    void ready_to_receive(ReceiveCompletion &&callback, std::string received);
+
     UdpSocket(const UdpSocket &) = delete;
     UdpSocket &operator=(const UdpSocket &) = delete;
+
+    using BaseSocket::socket_service;
 
     using BaseSocket::m_packet_size;
 };

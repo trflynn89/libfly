@@ -2,12 +2,16 @@
 
 #include "fly/net/socket/detail/base_socket.hpp"
 
+#include <functional>
+#include <memory>
 #include <optional>
 
 namespace fly::net {
 
 template <typename EndpointType>
 class TcpSocket;
+
+class SocketService;
 
 /**
  * Class to represent a listening socket for accepting incoming network connection requests from
@@ -17,9 +21,13 @@ class TcpSocket;
  * @version February 13, 2021
  */
 template <typename EndpointType>
-class ListenSocket : public fly::net::detail::BaseSocket<EndpointType>
+class ListenSocket :
+    public fly::net::detail::BaseSocket<EndpointType>,
+    public std::enable_shared_from_this<ListenSocket<EndpointType>>
 {
     using BaseSocket = fly::net::detail::BaseSocket<EndpointType>;
+
+    using AcceptCompletion = std::function<void(std::shared_ptr<TcpSocket<EndpointType>>)>;
 
 public:
     /**
@@ -69,10 +77,56 @@ public:
      */
     std::optional<TcpSocket<EndpointType>> accept() const;
 
+    /**
+     * Asynchronously accept an incoming connection on this listening socket. May only be used if
+     * this socket was created through a socket service.
+     *
+     * If successful, the provided callback will be invoked with the accepted socket upon
+     * completion. Otherwise, the provided callback will be invoked with a null socket.
+     *
+     * @param callback The callback to invoke when the operation has completed.
+     *
+     * @return True if the socket service and the provided callback are valid.
+     */
+    bool accept_async(AcceptCompletion &&callback);
+
+    using BaseSocket::close;
     using BaseSocket::handle;
     using BaseSocket::io_mode;
 
 private:
+    friend SocketService;
+
+    /**
+     * Create an asynchronous socket armed with a socket service for performing IO operations.
+     *
+     * @param socket_service The socket service for performing IO operations.
+     *
+     * @return The created socket.
+     */
+    static std::shared_ptr<ListenSocket>
+    create_socket(const std::shared_ptr<SocketService> &socket_service);
+
+    /**
+     * Constructor. Open the socket in an asynchronous IO processing mode armed with the provided
+     * socket service for performing IO operations.
+     *
+     * @param socket_service The socket service for performing IO operations.
+     */
+    explicit ListenSocket(const std::shared_ptr<SocketService> &socket_service) noexcept;
+
+    /**
+     * When the socket service indicates the socket is available for reading, attempt to accept an
+     * incoming connection. If successful, the provided callback will be invoked with the accepted
+     * socket. If unsuccessful because the operation would still block, queue another attempt.
+     * Otherwise, the callback will be invoked with a null socket.
+     *
+     * @param callback The callback to invoke when the operation has completed.
+     */
+    void ready_to_accept(AcceptCompletion &&callback);
+
+    using BaseSocket::socket_service;
+
     bool m_is_listening {false};
 };
 

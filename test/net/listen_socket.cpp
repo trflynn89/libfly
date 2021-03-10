@@ -1,13 +1,17 @@
 #include "fly/net/socket/listen_socket.hpp"
 
 #include "test/net/socket_util.hpp"
+#include "test/util/task_manager.hpp"
 
 #include "fly/fly.hpp"
 #include "fly/net/endpoint.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/net/socket/socket_service.hpp"
 #include "fly/net/socket/socket_types.hpp"
 #include "fly/net/socket/tcp_socket.hpp"
+#include "fly/task/task_manager.hpp"
+#include "fly/task/task_runner.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"
@@ -283,6 +287,166 @@ CATCH_TEMPLATE_TEST_CASE("ListenSocket", "[net]", fly::net::IPv4Address, fly::ne
         CATCH_CHECK(socket->listen());
 
         CATCH_CHECK_FALSE(socket->accept());
+    }
+
+#endif
+}
+
+CATCH_TEMPLATE_TEST_CASE("AsyncListenSocket", "[net]", fly::net::IPv4Address, fly::net::IPv6Address)
+{
+    using IPAddressType = TestType;
+    using EndpointType = fly::net::Endpoint<IPAddressType>;
+    using ListenSocket = fly::net::ListenSocket<EndpointType>;
+    using TcpSocket = fly::net::TcpSocket<EndpointType>;
+
+#if defined(FLY_WINDOWS)
+    fly::test::ScopedWindowsSocketAPI::create();
+#endif
+
+    auto task_runner = fly::test::task_manager()->create_task_runner<fly::SequencedTaskRunner>();
+    auto socket_service = fly::net::SocketService::create(task_runner);
+    fly::test::Signal signal;
+
+    CATCH_SECTION("Sockets created without socket service may not accept asynchronously")
+    {
+        auto socket1 = fly::test::create_socket<ListenSocket>(fly::net::IOMode::Synchronous);
+        CATCH_REQUIRE(socket1);
+        CATCH_CHECK_FALSE(socket1->accept_async([](auto) {}));
+
+        auto socket2 = fly::test::create_socket<ListenSocket>(fly::net::IOMode::Asynchronous);
+        CATCH_REQUIRE(socket2);
+        CATCH_CHECK_FALSE(socket2->accept_async([](auto) {}));
+    }
+
+    CATCH_SECTION("Callbacks provided for asynchronously accepting must be valid")
+    {
+        auto socket = socket_service->create_socket<ListenSocket>();
+        CATCH_REQUIRE(socket);
+        CATCH_CHECK_FALSE(socket->accept_async(nullptr));
+    }
+
+    CATCH_SECTION("Clients may be accepted asynchronously")
+    {
+        auto server_thread = [socket_service, &signal]()
+        {
+            fly::test::Signal server_signal;
+
+            auto listen_socket = socket_service->create_socket<ListenSocket>();
+            CATCH_REQUIRE(listen_socket);
+
+            CATCH_CHECK(listen_socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
+            CATCH_CHECK(listen_socket->listen());
+
+            std::shared_ptr<TcpSocket> connected_socket;
+
+            CATCH_CHECK(listen_socket->accept_async(
+                [&server_signal, &connected_socket](std::shared_ptr<TcpSocket> client)
+                {
+                    connected_socket = std::move(client);
+                    server_signal.notify();
+                }));
+
+            signal.notify();
+            server_signal.wait();
+
+            CATCH_REQUIRE(connected_socket);
+            CATCH_REQUIRE(connected_socket->is_valid());
+        };
+
+        auto client_thread = [socket_service, &signal]()
+        {
+            auto client_socket = fly::test::create_socket<TcpSocket>(fly::net::IOMode::Synchronous);
+            CATCH_REQUIRE(client_socket);
+            signal.wait();
+
+            fly::net::ConnectedState state = client_socket->connect(s_localhost, s_port);
+            CATCH_CHECK(state == fly::net::ConnectedState::Connected);
+        };
+
+        fly::test::invoke(std::move(server_thread), std::move(client_thread));
+    }
+
+#if defined(FLY_LINUX)
+
+    CATCH_SECTION("Socket accepting fails due to ::accept() system call")
+    {
+        auto server_thread = [socket_service, &signal]()
+        {
+            fly::test::MockSystem mock(fly::test::MockCall::Accept);
+            fly::test::Signal server_signal;
+
+            auto listen_socket = socket_service->create_socket<ListenSocket>();
+            CATCH_REQUIRE(listen_socket);
+
+            CATCH_CHECK(listen_socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
+            CATCH_CHECK(listen_socket->listen());
+
+            CATCH_CHECK(listen_socket->accept_async(
+                [&server_signal](std::shared_ptr<TcpSocket> client)
+                {
+                    CATCH_CHECK_FALSE(client);
+                    server_signal.notify();
+                }));
+
+            signal.notify();
+            server_signal.wait();
+
+            CATCH_CHECK_FALSE(listen_socket->is_valid());
+        };
+
+        auto client_thread = [socket_service, &signal]()
+        {
+            auto client_socket = fly::test::create_socket<TcpSocket>(fly::net::IOMode::Synchronous);
+            CATCH_REQUIRE(client_socket);
+            signal.wait();
+
+            fly::net::ConnectedState state = client_socket->connect(s_localhost, s_port);
+            CATCH_CHECK(state == fly::net::ConnectedState::Connected);
+        };
+
+        fly::test::invoke(std::move(server_thread), std::move(client_thread));
+    }
+
+    CATCH_SECTION("Socket accepting blocks due to ::accept() system call")
+    {
+        auto server_thread = [socket_service, &signal]()
+        {
+            fly::test::MockSystem mock(fly::test::MockCall::AcceptBlocking);
+            fly::test::Signal server_signal;
+
+            auto listen_socket = socket_service->create_socket<ListenSocket>();
+            CATCH_REQUIRE(listen_socket);
+
+            CATCH_CHECK(listen_socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
+            CATCH_CHECK(listen_socket->listen());
+
+            std::shared_ptr<TcpSocket> connected_socket;
+
+            CATCH_CHECK(listen_socket->accept_async(
+                [&server_signal, &connected_socket](std::shared_ptr<TcpSocket> client)
+                {
+                    connected_socket = std::move(client);
+                    server_signal.notify();
+                }));
+
+            signal.notify();
+            server_signal.wait();
+
+            CATCH_REQUIRE(connected_socket);
+            CATCH_REQUIRE(connected_socket->is_valid());
+        };
+
+        auto client_thread = [socket_service, &signal]()
+        {
+            auto client_socket = fly::test::create_socket<TcpSocket>(fly::net::IOMode::Synchronous);
+            CATCH_REQUIRE(client_socket);
+            signal.wait();
+
+            fly::net::ConnectedState state = client_socket->connect(s_localhost, s_port);
+            CATCH_CHECK(state == fly::net::ConnectedState::Connected);
+        };
+
+        fly::test::invoke(std::move(server_thread), std::move(client_thread));
     }
 
 #endif

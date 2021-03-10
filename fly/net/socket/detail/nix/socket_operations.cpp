@@ -8,9 +8,11 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <type_traits>
 
 namespace fly::net {
@@ -500,5 +502,57 @@ template std::string recv_from(
     IPv6Endpoint &endpoint,
     std::size_t packet_size,
     bool &would_block);
+
+//==================================================================================================
+void select(
+    std::set<fly::net::socket_type> &writing_handles,
+    std::set<fly::net::socket_type> &reading_handles)
+{
+    fd_set write_set, read_set;
+    FD_ZERO(&write_set);
+    FD_ZERO(&read_set);
+
+    for (fly::net::socket_type handle : writing_handles)
+    {
+        FD_SET(handle, &write_set);
+    }
+    for (fly::net::socket_type handle : reading_handles)
+    {
+        FD_SET(handle, &read_set);
+    }
+
+    const socket_type max_handle = std::max(
+        writing_handles.empty() ? invalid_socket() : *writing_handles.rbegin(),
+        reading_handles.empty() ? invalid_socket() : *reading_handles.rbegin());
+
+    const suseconds_t usec = static_cast<suseconds_t>(10'000);
+    timeval tv {0, usec};
+
+    const int status = ::select(max_handle + 1, &read_set, &write_set, nullptr, &tv);
+
+    if (status > 0)
+    {
+        auto is_not_set = [](fd_set *set, socket_type handle)
+        {
+            return !FD_ISSET(handle, set);
+        };
+
+        std::erase_if(writing_handles, std::bind(is_not_set, &write_set, std::placeholders::_1));
+        std::erase_if(reading_handles, std::bind(is_not_set, &read_set, std::placeholders::_1));
+    }
+    else
+    {
+        if (status == -1)
+        {
+            LOGS(
+                "Error polling {} writing, {} reading sockets",
+                writing_handles.size(),
+                reading_handles.size());
+        }
+
+        writing_handles.clear();
+        reading_handles.clear();
+    }
+}
 
 } // namespace fly::net::detail
