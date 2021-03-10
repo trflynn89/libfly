@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/fly.hpp"
+#include "fly/net/socket/detail/socket_operations.hpp"
 #include "fly/net/socket/socket_types.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 
@@ -8,10 +9,6 @@
 
 #include <chrono>
 #include <future>
-
-#if defined(FLY_WINDOWS)
-#    include <Windows.h>
-#endif
 
 namespace fly::test {
 
@@ -68,39 +65,29 @@ private:
     fly::ConcurrentQueue<int> m_signal;
 };
 
-#if defined(FLY_WINDOWS)
-
 /**
- * On Windows, WSAStartup must be invoked before any sockets may be created. Until a new socket
- * service is created in fly::net to ensure that, this class may be used by unit tests.
+ * Perform platform-specific socket service initialization for tests that do not need to use the
+ * socket service itself.
  */
-class ScopedWindowsSocketAPI
+class ScopedSocketServiceSetup
 {
 public:
     static inline void create()
     {
-        static ScopedWindowsSocketAPI s_instance;
+        static ScopedSocketServiceSetup s_instance;
         FLY_UNUSED(s_instance);
     }
 
 private:
-    inline ScopedWindowsSocketAPI()
+    inline ScopedSocketServiceSetup()
     {
-        WORD version = MAKEWORD(2, 2);
-        WSADATA wsadata;
-
-        if (WSAStartup(version, &wsadata) != 0)
-        {
-            WSACleanup();
-        }
+        fly::net::detail::initialize();
     }
 
-    inline ~ScopedWindowsSocketAPI()
+    inline ~ScopedSocketServiceSetup()
     {
-        WSACleanup();
+        fly::net::detail::deinitialize();
     }
 };
-
-#endif
 
 } // namespace fly::test

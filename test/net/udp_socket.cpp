@@ -35,9 +35,7 @@ CATCH_TEMPLATE_TEST_CASE("UdpSocket", "[net]", fly::net::IPv4Address, fly::net::
     using EndpointType = fly::net::Endpoint<IPAddressType>;
     using UdpSocket = fly::net::UdpSocket<EndpointType>;
 
-#if defined(FLY_WINDOWS)
-    fly::test::ScopedWindowsSocketAPI::create();
-#endif
+    fly::test::ScopedSocketServiceSetup::create();
 
     const std::string message(fly::String::generate_random_string(1 << 10));
     constexpr const auto in_addr_any = IPAddressType::in_addr_any();
@@ -258,10 +256,6 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
     using IPAddressType = TestType;
     using EndpointType = fly::net::Endpoint<IPAddressType>;
     using UdpSocket = fly::net::UdpSocket<EndpointType>;
-
-#if defined(FLY_WINDOWS)
-    fly::test::ScopedWindowsSocketAPI::create();
-#endif
 
     auto task_runner = fly::test::task_manager()->create_task_runner<fly::SequencedTaskRunner>();
     auto socket_service = fly::net::SocketService::create(task_runner);

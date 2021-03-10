@@ -12,6 +12,7 @@
 #include <ws2ipdef.h>
 // clang-format on
 
+#include <atomic>
 #include <limits>
 #include <type_traits>
 
@@ -87,7 +88,33 @@ namespace {
         return reinterpret_cast<const sockaddr *>(&address);
     }
 
+    std::atomic_uint64_t s_initialized_services_count {0};
+
 } // namespace
+
+//==================================================================================================
+void initialize()
+{
+    if (s_initialized_services_count.fetch_add(1) == 0)
+    {
+        WORD version = MAKEWORD(2, 2);
+        WSADATA wsadata;
+
+        if (WSAStartup(version, &wsadata) != 0)
+        {
+            deinitialize();
+        }
+    }
+}
+
+//==================================================================================================
+void deinitialize()
+{
+    if (s_initialized_services_count.fetch_sub(1) == 1)
+    {
+        WSACleanup();
+    }
+}
 
 //==================================================================================================
 fly::net::socket_type invalid_socket()

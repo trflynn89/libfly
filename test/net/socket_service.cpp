@@ -35,10 +35,6 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
     using EndpointType = fly::net::Endpoint<IPAddressType>;
     using UdpSocket = fly::net::UdpSocket<EndpointType>;
 
-#if defined(FLY_WINDOWS)
-    fly::test::ScopedWindowsSocketAPI::create();
-#endif
-
     auto task_runner = fly::test::task_manager()->create_task_runner<fly::SequencedTaskRunner>();
     auto socket_service = fly::net::SocketService::create(task_runner);
     fly::test::Signal signal;
