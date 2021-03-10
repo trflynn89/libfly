@@ -59,6 +59,7 @@ run: build
 	$(Q)docker run -it \
 		--name $(REPO) \
 		--cap-add SYS_PTRACE \
+		--sysctl net.ipv6.conf.all.disable_ipv6=0 \
 		$(USER)/$(REPO):$(TAG)
 
 clean:
