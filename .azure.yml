@@ -21,6 +21,7 @@ jobs:
       toolchain: 'clang'
       mode: 'debug'
       arch: 'x64'
+      coverage: '1'
 
   - template: build/ci/linux.yml
     parameters:
