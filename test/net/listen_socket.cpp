@@ -396,8 +396,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncListenSocket", "[net]", fly::net::IPv4Address, fl
             CATCH_REQUIRE(client_socket);
             signal.wait();
 
-            fly::net::ConnectedState state = client_socket->connect(s_localhost, s_port);
-            CATCH_CHECK(state == fly::net::ConnectedState::Connected);
+            FLY_UNUSED(client_socket->connect(s_localhost, s_port));
         };
 
         fly::test::invoke(std::move(server_thread), std::move(client_thread));
