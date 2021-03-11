@@ -2,6 +2,7 @@ parameters:
   toolchain: 'clang'
   mode: 'debug'
   arch: 'x64'
+  coverage: '0'
 
 jobs:
   - job: 'Linux_${{ parameters.toolchain }}_${{ parameters.mode }}_${{ parameters.arch }}'
@@ -22,19 +23,13 @@ jobs:
         displayName: 'Style'
 
     - script: |
-        echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }} toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }}"
+        echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }} toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }} coverage=${{ parameters.coverage }}"
       displayName: 'Configure'
 
     - ${{ if eq(parameters.mode, 'debug') }}:
       - script: |
           make -j $(nproc) -C build/nix $(config) tests
         displayName: 'Test'
-
-      - script: |
-          make -C build/nix $(config) coverage report=/tmp/coverage
-          bash <(curl -s https://codecov.io/bash) -f /tmp/coverage
-        condition: and(eq('${{ parameters.toolchain }}', 'clang'), eq('${{ parameters.arch }}', 'x64'))
-        displayName: 'Coverage'
 
     - ${{ if eq(parameters.mode, 'release') }}:
       - script: |
@@ -45,3 +40,9 @@ jobs:
         - template: package.yml
           parameters:
             contents: 'build/nix/release/${{ parameters.toolchain }}/${{ parameters.arch }}/etc/libfly-*.tar.bz2'
+
+    - ${{ if eq(parameters.coverage, '1') }}:
+      - script: |
+          make -C build/nix $(config) coverage report=/tmp/coverage
+          bash <(curl -s https://codecov.io/bash) -f /tmp/coverage
+        displayName: 'Coverage'
