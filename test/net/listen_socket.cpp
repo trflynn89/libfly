@@ -41,16 +41,16 @@ CATCH_TEMPLATE_TEST_CASE("ListenSocket", "[net]", fly::net::IPv4Address, fly::ne
     CATCH_SECTION("Moving a socket marks the moved-from socket as invalid")
     {
         ListenSocket socket1;
-        CATCH_CHECK(socket1.is_valid());
+        CATCH_CHECK(socket1.is_open());
 
         ListenSocket socket2(std::move(socket1));
-        CATCH_CHECK_FALSE(socket1.is_valid());
-        CATCH_CHECK(socket2.is_valid());
+        CATCH_CHECK_FALSE(socket1.is_open());
+        CATCH_CHECK(socket2.is_open());
 
         ListenSocket socket3;
         socket3 = std::move(socket2);
-        CATCH_CHECK_FALSE(socket2.is_valid());
-        CATCH_CHECK(socket3.is_valid());
+        CATCH_CHECK_FALSE(socket2.is_open());
+        CATCH_CHECK(socket3.is_open());
     }
 
     CATCH_SECTION("Sockets may change their IO processing mode")
@@ -169,7 +169,7 @@ CATCH_TEMPLATE_TEST_CASE("ListenSocket", "[net]", fly::net::IPv4Address, fly::ne
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK_FALSE(socket->accept());
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
 #if defined(FLY_LINUX)
@@ -286,7 +286,7 @@ CATCH_TEMPLATE_TEST_CASE("ListenSocket", "[net]", fly::net::IPv4Address, fly::ne
         CATCH_CHECK(socket->listen());
 
         CATCH_CHECK_FALSE(socket->accept());
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
 #endif
@@ -346,7 +346,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncListenSocket", "[net]", fly::net::IPv4Address, fl
             server_signal.wait();
 
             CATCH_REQUIRE(connected_socket);
-            CATCH_REQUIRE(connected_socket->is_valid());
+            CATCH_REQUIRE(connected_socket->is_open());
         };
 
         auto client_thread = [socket_service, &signal]()
@@ -387,7 +387,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncListenSocket", "[net]", fly::net::IPv4Address, fl
             signal.notify();
             server_signal.wait();
 
-            CATCH_CHECK_FALSE(listen_socket->is_valid());
+            CATCH_CHECK_FALSE(listen_socket->is_open());
         };
 
         auto client_thread = [socket_service, &signal]()
@@ -428,7 +428,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncListenSocket", "[net]", fly::net::IPv4Address, fl
             server_signal.wait();
 
             CATCH_REQUIRE(connected_socket);
-            CATCH_REQUIRE(connected_socket->is_valid());
+            CATCH_REQUIRE(connected_socket->is_open());
         };
 
         auto client_thread = [socket_service, &signal]()

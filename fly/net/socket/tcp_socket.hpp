@@ -199,7 +199,7 @@ public:
     using BaseSocket::close;
     using BaseSocket::handle;
     using BaseSocket::hostname_to_endpoint;
-    using BaseSocket::is_valid;
+    using BaseSocket::is_open;
 
 private:
     friend ListenSocket<EndpointType>;

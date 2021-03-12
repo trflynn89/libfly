@@ -23,7 +23,7 @@ std::optional<SocketType> create_socket(fly::net::IOMode mode)
     CATCH_CHECK(socket.io_mode() == mode);
     CATCH_CHECK(socket.is_ipv4() != socket.is_ipv6());
 
-    return socket.is_valid() ? std::optional<SocketType>(std::move(socket)) : std::nullopt;
+    return socket.is_open() ? std::optional<SocketType>(std::move(socket)) : std::nullopt;
 }
 
 /**

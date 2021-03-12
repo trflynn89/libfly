@@ -43,16 +43,16 @@ CATCH_TEMPLATE_TEST_CASE("UdpSocket", "[net]", fly::net::IPv4Address, fly::net::
     CATCH_SECTION("Moving a socket marks the moved-from socket as invalid")
     {
         UdpSocket socket1;
-        CATCH_CHECK(socket1.is_valid());
+        CATCH_CHECK(socket1.is_open());
 
         UdpSocket socket2(std::move(socket1));
-        CATCH_CHECK_FALSE(socket1.is_valid());
-        CATCH_CHECK(socket2.is_valid());
+        CATCH_CHECK_FALSE(socket1.is_open());
+        CATCH_CHECK(socket2.is_open());
 
         UdpSocket socket3;
         socket3 = std::move(socket2);
-        CATCH_CHECK_FALSE(socket2.is_valid());
-        CATCH_CHECK(socket3.is_valid());
+        CATCH_CHECK_FALSE(socket2.is_open());
+        CATCH_CHECK(socket3.is_open());
     }
 
     CATCH_SECTION("Sockets may change their IO processing mode")
@@ -237,7 +237,7 @@ CATCH_TEMPLATE_TEST_CASE("UdpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->send(s_localhost, s_port, message) == 0);
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Socket receiving fails due to ::recvfrom() system call")
@@ -248,7 +248,7 @@ CATCH_TEMPLATE_TEST_CASE("UdpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->receive().empty());
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 #endif
 }
@@ -313,7 +313,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
             std::string received;
 
-            while (server_socket->is_valid() && (received.size() != message.size()))
+            while (server_socket->is_open() && (received.size() != message.size()))
             {
                 received += server_socket->receive();
             }
@@ -359,7 +359,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
             std::string received;
 
-            while (server_socket->is_valid() && (received.size() != message.size()))
+            while (server_socket->is_open() && (received.size() != message.size()))
             {
                 CATCH_CHECK(server_socket->receive_async(
                     [&server_signal, &received](std::string fragment)
@@ -369,7 +369,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
                     }));
 
                 server_signal.wait();
-                CATCH_REQUIRE(server_socket->is_valid());
+                CATCH_REQUIRE(server_socket->is_open());
             }
 
             CATCH_CHECK(received == message);
@@ -417,7 +417,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
             }));
 
         signal.wait();
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Socket sending blocks due to ::sendto() system call")
@@ -432,7 +432,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
             std::string received;
 
-            while (server_socket->is_valid() && (received.size() != message.size()))
+            while (server_socket->is_open() && (received.size() != message.size()))
             {
                 received += server_socket->receive();
             }
@@ -486,7 +486,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
                 }));
 
             server_signal.wait();
-            CATCH_CHECK_FALSE(server_socket->is_valid());
+            CATCH_CHECK_FALSE(server_socket->is_open());
         };
 
         auto client_thread = [&signal, &message]()
@@ -516,7 +516,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
             std::string received;
 
-            while (server_socket->is_valid() && (received.size() != message.size()))
+            while (server_socket->is_open() && (received.size() != message.size()))
             {
                 CATCH_CHECK(server_socket->receive_async(
                     [&server_signal, &received](std::string fragment)
@@ -526,7 +526,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
                     }));
 
                 server_signal.wait();
-                CATCH_REQUIRE(server_socket->is_valid());
+                CATCH_REQUIRE(server_socket->is_open());
             }
 
             CATCH_CHECK(received == message);

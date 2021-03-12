@@ -61,6 +61,11 @@ public:
     static std::optional<EndpointType> hostname_to_endpoint(std::string_view hostname);
 
     /**
+     * @return True if the socket handle is opened.
+     */
+    bool is_open() const;
+
+    /**
      * @return This socket's native handle.
      */
     socket_type handle() const;
@@ -83,13 +88,6 @@ public:
      * @return This socket's IO processing mode.
      */
     fly::net::IOMode io_mode() const;
-
-    /**
-     * A socket is valid if it's handle has been properly set and has not been closed.
-     *
-     * @return True if this is a valid socket.
-     */
-    bool is_valid() const;
 
     /**
      * Retrieve the local endpoint to which this socket is bound.
