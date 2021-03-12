@@ -169,6 +169,7 @@ CATCH_TEMPLATE_TEST_CASE("ListenSocket", "[net]", fly::net::IPv4Address, fly::ne
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK_FALSE(socket->accept());
+        CATCH_CHECK_FALSE(socket->is_valid());
     }
 
 #if defined(FLY_LINUX)
@@ -285,6 +286,7 @@ CATCH_TEMPLATE_TEST_CASE("ListenSocket", "[net]", fly::net::IPv4Address, fly::ne
         CATCH_CHECK(socket->listen());
 
         CATCH_CHECK_FALSE(socket->accept());
+        CATCH_CHECK_FALSE(socket->is_valid());
     }
 
 #endif

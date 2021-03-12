@@ -71,18 +71,20 @@ public:
     bool is_listening() const;
 
     /**
-     * Accept an incoming connection on this listening socket.
+     * Accept an incoming connection on this listening socket. If an error occurs on the socket, the
+     * socket will be closed.
      *
      * @return If successful, the accepted socket. Otherwise, an uninitialized value.
      */
-    std::optional<TcpSocket<EndpointType>> accept() const;
+    std::optional<TcpSocket<EndpointType>> accept();
 
     /**
      * Asynchronously accept an incoming connection on this listening socket. May only be used if
      * this socket was created through a socket service.
      *
      * If successful, the provided callback will be invoked with the accepted socket upon
-     * completion. Otherwise, the provided callback will be invoked with a null socket.
+     * completion. Otherwise, the provided callback will be invoked with an uninitialized value, and
+     * the socket will be closed before the invocation.
      *
      * @param callback The callback to invoke when the operation has completed.
      *
@@ -119,7 +121,8 @@ private:
      * When the socket service indicates the socket is available for reading, attempt to accept an
      * incoming connection. If successful, the provided callback will be invoked with the accepted
      * socket. If unsuccessful because the operation would still block, queue another attempt.
-     * Otherwise, the callback will be invoked with a null socket.
+     * Otherwise, the socket will be closed and the callback will be invoked with an uninitialized
+     * value.
      *
      * @param callback The callback to invoke when the operation has completed.
      */

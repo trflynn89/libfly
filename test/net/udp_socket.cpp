@@ -237,6 +237,7 @@ CATCH_TEMPLATE_TEST_CASE("UdpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->send(s_localhost, s_port, message) == 0);
+        CATCH_CHECK_FALSE(socket->is_valid());
     }
 
     CATCH_SECTION("Socket receiving fails due to ::recvfrom() system call")
@@ -247,6 +248,7 @@ CATCH_TEMPLATE_TEST_CASE("UdpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->receive().empty());
+        CATCH_CHECK_FALSE(socket->is_valid());
     }
 #endif
 }

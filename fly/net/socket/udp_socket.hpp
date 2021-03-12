@@ -58,17 +58,19 @@ public:
     UdpSocket &operator=(UdpSocket &&socket) noexcept;
 
     /**
-     * Transmit a message to a specific remote endpoint.
+     * Transmit a message to a specific remote endpoint. If an error occurs on the socket, the
+     * socket will be closed.
      *
      * @param endpoint The remote endpoint to transmit to.
      * @param message The message to transmit.
      *
      * @return The number of bytes transmitted.
      */
-    std::size_t send(const EndpointType &endpoint, std::string_view message) const;
+    std::size_t send(const EndpointType &endpoint, std::string_view message);
 
     /**
-     * Transmit a message to a specific remote endpoint.
+     * Transmit a message to a specific remote endpoint. If an error occurs on the socket, the
+     * socket will be closed.
      *
      * @param hostname The hostname or IP address string to transmit to.
      * @param port The port to transmit to.
@@ -76,7 +78,7 @@ public:
      *
      * @return The number of bytes transmitted.
      */
-    std::size_t send(std::string_view hostname, port_type port, std::string_view message) const;
+    std::size_t send(std::string_view hostname, port_type port, std::string_view message);
 
     /**
      * Asynchronously transmit a message to a specific remote endpoint. May only be used if this
@@ -119,11 +121,12 @@ public:
         SendCompletion &&callback);
 
     /**
-     * Receive a message from an unspecified remote endpoint.
+     * Receive a message from an unspecified remote endpoint. If an error occurs on the socket, the
+     * socket will be closed.
      *
      * @return The message received.
      */
-    std::string receive() const;
+    std::string receive();
 
     /**
      * Asynchronously receive a message from an unspecified remote endpoint. May only be used if

@@ -150,6 +150,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->send(message) == 0);
+        CATCH_CHECK_FALSE(socket->is_valid());
     }
 
     CATCH_SECTION("Disconnected sockets may not receive messages")
@@ -158,6 +159,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->receive().empty());
+        CATCH_CHECK_FALSE(socket->is_valid());
     }
 
     CATCH_SECTION("Connected sockets may send and receive messages")
@@ -299,6 +301,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->send(message) == 0);
+        CATCH_CHECK_FALSE(socket->is_valid());
     }
 
     CATCH_SECTION("Socket receiving fails due to ::recv() system call")
@@ -309,6 +312,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->receive().empty());
+        CATCH_CHECK_FALSE(socket->is_valid());
     }
 
 #endif
