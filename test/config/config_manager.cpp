@@ -53,37 +53,37 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     fly::test::PathUtil::ScopedTempDirectory config_path;
     std::filesystem::path config_file = config_path.file();
 
-    auto config_manager = std::make_shared<fly::ConfigManager>(
+    auto config_manager = fly::ConfigManager::create(
         task_runner,
         fly::ConfigManager::ConfigFileType::Json,
         config_file);
-    auto path_config = config_manager->create_config<TestPathConfig>();
-    CATCH_REQUIRE(config_manager->start());
+    CATCH_REQUIRE(config_manager);
 
+    auto path_config = config_manager->create_config<TestPathConfig>();
     auto initial_size = config_manager->prune();
 
     CATCH_SECTION("Config managers can be started for all file types")
     {
-        config_manager = std::make_shared<fly::ConfigManager>(
+        config_manager = fly::ConfigManager::create(
             task_runner,
             fly::ConfigManager::ConfigFileType::Ini,
             config_file);
-        CATCH_CHECK(config_manager->start());
+        CATCH_CHECK(config_manager);
 
-        config_manager = std::make_shared<fly::ConfigManager>(
+        config_manager = fly::ConfigManager::create(
             task_runner,
             fly::ConfigManager::ConfigFileType::Json,
             config_file);
-        CATCH_CHECK(config_manager->start());
+        CATCH_CHECK(config_manager);
     }
 
     CATCH_SECTION("Cannot start a config manager of an unsupported file type")
     {
-        config_manager = std::make_shared<fly::ConfigManager>(
+        config_manager = fly::ConfigManager::create(
             task_runner,
             static_cast<fly::ConfigManager::ConfigFileType>(-1),
             config_file);
-        CATCH_CHECK_FALSE(config_manager->start());
+        CATCH_CHECK_FALSE(config_manager);
     }
 
     CATCH_SECTION("Cannot create a config with a duplicated identifier")

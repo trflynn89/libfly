@@ -12,13 +12,39 @@
 namespace fly {
 
 //==================================================================================================
-ConfigManager::ConfigManager(
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
+std::shared_ptr<ConfigManager> ConfigManager::create(
+    std::shared_ptr<SequencedTaskRunner> task_runner,
     ConfigFileType file_type,
-    const std::filesystem::path &path) noexcept :
-    m_path(path),
-    m_task_runner(task_runner)
+    std::filesystem::path path)
 {
+    // ConfigManager has a private constructor, thus cannot be used with std::make_shared. This
+    // class is used to expose the private constructor locally.
+    struct ConfigManagerImpl final : public ConfigManager
+    {
+        ConfigManagerImpl(
+            std::shared_ptr<SequencedTaskRunner> task_runner,
+            ConfigFileType file_type,
+            std::filesystem::path path) noexcept :
+            ConfigManager(std::move(task_runner), file_type, std::move(path))
+        {
+        }
+    };
+
+    auto config_manager =
+        std::make_shared<ConfigManagerImpl>(std::move(task_runner), file_type, std::move(path));
+    return config_manager->start() ? config_manager : nullptr;
+}
+
+//==================================================================================================
+ConfigManager::ConfigManager(
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    ConfigFileType file_type,
+    std::filesystem::path path) noexcept :
+    m_task_runner(std::move(task_runner)),
+    m_path(std::move(path))
+{
+    m_monitor = std::make_shared<PathMonitorImpl>(m_task_runner, create_config<PathConfig>());
+
     switch (file_type)
     {
         case ConfigFileType::Ini:
@@ -47,35 +73,27 @@ ConfigManager::~ConfigManager()
 //==================================================================================================
 bool ConfigManager::start()
 {
-    if (m_parser)
+    if (!m_parser || !m_monitor)
     {
-        m_monitor = std::make_shared<PathMonitorImpl>(m_task_runner, create_config<PathConfig>());
-
-        if (m_monitor->start())
-        {
-            std::weak_ptr<ConfigManager> weak_self = shared_from_this();
-
-            auto callback = [weak_self](const std::filesystem::path &, PathMonitor::PathEvent)
-            {
-                if (auto self = weak_self.lock(); self)
-                {
-                    auto task = [](std::shared_ptr<ConfigManager> nested_self)
-                    {
-                        nested_self->update_config();
-                    };
-
-                    self->m_task_runner->post_task(
-                        FROM_HERE,
-                        std::move(task),
-                        std::move(weak_self));
-                }
-            };
-
-            return m_monitor->add_file(m_path, callback);
-        }
+        return false;
     }
 
-    return false;
+    std::weak_ptr<ConfigManager> weak_self = shared_from_this();
+
+    auto callback = [weak_self](std::filesystem::path, PathMonitor::PathEvent)
+    {
+        if (auto self = weak_self.lock(); self)
+        {
+            auto task = [](std::shared_ptr<ConfigManager> nested_self)
+            {
+                nested_self->update_config();
+            };
+
+            self->m_task_runner->post_task(FROM_HERE, std::move(task), std::move(weak_self));
+        }
+    };
+
+    return m_monitor->add_file(m_path, callback);
 }
 
 //==================================================================================================

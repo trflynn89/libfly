@@ -42,28 +42,23 @@ public:
     };
 
     /**
-     * Constructor.
+     * Create and start a configuration manager.
      *
      * @param task_runner Task runner for posting config-related tasks onto.
      * @param file_type File format of the configuration file.
      * @param path Path to the configuration file.
+     *
+     * @return The created configuration manager.
      */
-    ConfigManager(
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
+    static std::shared_ptr<ConfigManager> create(
+        std::shared_ptr<SequencedTaskRunner> task_runner,
         ConfigFileType file_type,
-        const std::filesystem::path &path) noexcept;
+        std::filesystem::path path);
 
     /**
      * Destructor. Stop the configuration manager and underlying objects.
      */
     ~ConfigManager();
-
-    /**
-     * Start the configuration manager and underlying objects.
-     *
-     * @return True if the manager could be started.
-     */
-    bool start();
 
     /**
      * Create a configuration object, or if one with the given type's name exists, fetch it.
@@ -84,17 +79,36 @@ public:
 
 private:
     /**
+     * Constructor.
+     *
+     * @param task_runner Task runner for posting config-related tasks onto.
+     * @param file_type File format of the configuration file.
+     * @param path Path to the configuration file.
+     */
+    ConfigManager(
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        ConfigFileType file_type,
+        std::filesystem::path path) noexcept;
+
+    /**
+     * Start the configuration manager and underlying objects.
+     *
+     * @return True if the manager could be started.
+     */
+    bool start();
+
+    /**
      * Parse the configuration file and store the parsed values in memory.
      */
     void update_config();
+
+    std::shared_ptr<SequencedTaskRunner> m_task_runner;
 
     std::shared_ptr<PathMonitor> m_monitor;
     std::unique_ptr<Parser> m_parser;
     Json m_values;
 
     const std::filesystem::path m_path;
-
-    std::shared_ptr<SequencedTaskRunner> m_task_runner;
 
     mutable std::mutex m_configs_mutex;
     ConfigMap m_configs;
