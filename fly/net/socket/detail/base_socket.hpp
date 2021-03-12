@@ -13,11 +13,11 @@ namespace fly::net {
 
 class IPv4Address;
 class IPv6Address;
+class NetworkConfig;
+class SocketService;
 
 template <typename IPAddressType>
 class Endpoint;
-
-class SocketService;
 
 } // namespace fly::net
 
@@ -126,21 +126,27 @@ protected:
     /**
      * Constructor. Initialize the socket in the provided IO processing mode.
      *
+     * @param config Reference to network configuration.
      * @param handle Native socket handle opened by the concrete socket type.
      * @param mode IO processing mode to apply to the socket.
      */
-    BaseSocket(socket_type handle, fly::net::IOMode mode) noexcept;
+    BaseSocket(
+        std::shared_ptr<fly::net::NetworkConfig> config,
+        socket_type handle,
+        fly::net::IOMode mode) noexcept;
 
     /**
      * Constructor. Initialize the socket in an asynchronous IO processing mode armed with the
      * provided socket service for performing IO operations.
      *
+     * @param service The socket service for performing IO operations.
+     * @param config Reference to network configuration.
      * @param handle Native socket handle opened by the concrete socket type.
-     * @param socket_service The socket service for performing IO operations.
      */
     BaseSocket(
-        socket_type handle,
-        const std::shared_ptr<fly::net::SocketService> &socket_service) noexcept;
+        const std::shared_ptr<fly::net::SocketService> &service,
+        std::shared_ptr<fly::net::NetworkConfig> config,
+        socket_type handle) noexcept;
 
     /**
      * Move constructor. The provided socket is left in an invalid state.
@@ -168,7 +174,15 @@ protected:
      */
     std::shared_ptr<fly::net::SocketService> socket_service() const;
 
-    std::size_t m_packet_size {4096};
+    /**
+     * @return A strong pointer to the network configuration.
+     */
+    std::shared_ptr<fly::net::NetworkConfig> network_config() const;
+
+    /**
+     * @return Size of packet to use for IO operations.
+     */
+    std::size_t packet_size() const;
 
 private:
     BaseSocket(const BaseSocket &) = delete;
@@ -176,9 +190,10 @@ private:
 
     std::weak_ptr<fly::net::SocketService> m_weak_socket_service;
 
+    std::shared_ptr<fly::net::NetworkConfig> m_config;
+
     socket_type m_socket_handle;
     std::uint64_t m_socket_id;
-
     fly::net::IOMode m_mode;
 };
 

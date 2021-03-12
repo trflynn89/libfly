@@ -3,6 +3,7 @@
 #include "fly/net/endpoint.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/net/network_config.hpp"
 #include "fly/net/socket/detail/socket_operations.hpp"
 #include "fly/net/socket/socket_service.hpp"
 
@@ -10,21 +11,32 @@ namespace fly::net {
 
 //==================================================================================================
 template <typename EndpointType>
-UdpSocket<EndpointType>::UdpSocket() noexcept : UdpSocket(fly::net::IOMode::Synchronous)
+UdpSocket<EndpointType>::UdpSocket(std::shared_ptr<NetworkConfig> config) noexcept :
+    UdpSocket(std::move(config), fly::net::IOMode::Synchronous)
 {
 }
 
 //==================================================================================================
 template <typename EndpointType>
-UdpSocket<EndpointType>::UdpSocket(fly::net::IOMode mode) noexcept :
-    BaseSocket(fly::net::detail::socket<EndpointType, UdpSocket<EndpointType>>(), mode)
+UdpSocket<EndpointType>::UdpSocket(
+    std::shared_ptr<NetworkConfig> config,
+    fly::net::IOMode mode) noexcept :
+    BaseSocket(
+        std::move(config),
+        fly::net::detail::socket<EndpointType, UdpSocket<EndpointType>>(),
+        mode)
 {
 }
 
 //==================================================================================================
 template <typename EndpointType>
-UdpSocket<EndpointType>::UdpSocket(const std::shared_ptr<SocketService> &service) noexcept :
-    BaseSocket(fly::net::detail::socket<EndpointType, UdpSocket<EndpointType>>(), service)
+UdpSocket<EndpointType>::UdpSocket(
+    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<NetworkConfig> config) noexcept :
+    BaseSocket(
+        service,
+        std::move(config),
+        fly::net::detail::socket<EndpointType, UdpSocket<EndpointType>>())
 {
 }
 
@@ -36,20 +48,23 @@ UdpSocket<EndpointType>::UdpSocket(UdpSocket &&socket) noexcept : BaseSocket(std
 
 //==================================================================================================
 template <typename EndpointType>
-auto UdpSocket<EndpointType>::create_socket(const std::shared_ptr<SocketService> &service)
-    -> std::shared_ptr<UdpSocket>
+auto UdpSocket<EndpointType>::create_socket(
+    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<NetworkConfig> config) -> std::shared_ptr<UdpSocket>
 {
     // UdpSocket's constructor for socket-service-based sockets is private, thus cannot be used with
     // std::make_shared. This class is used to expose the private constructor locally.
     struct UdpSocketImpl final : public UdpSocket
     {
-        explicit UdpSocketImpl(const std::shared_ptr<SocketService> &service) noexcept :
-            UdpSocket(service)
+        UdpSocketImpl(
+            const std::shared_ptr<SocketService> &service,
+            std::shared_ptr<NetworkConfig> config) noexcept :
+            UdpSocket(service, std::move(config))
         {
         }
     };
 
-    return std::make_shared<UdpSocketImpl>(service);
+    return std::make_shared<UdpSocketImpl>(service, std::move(config));
 }
 
 //==================================================================================================
@@ -69,7 +84,7 @@ size_t UdpSocket<EndpointType>::send(const EndpointType &endpoint, std::string_v
         handle(),
         endpoint,
         std::move(message),
-        m_packet_size,
+        packet_size(),
         would_block);
 
     if (bytes_sent == 0)
@@ -148,7 +163,7 @@ std::string UdpSocket<EndpointType>::receive()
     bool would_block = false;
 
     const std::string received =
-        fly::net::detail::recv_from(handle(), endpoint, m_packet_size, would_block);
+        fly::net::detail::recv_from(handle(), endpoint, packet_size(), would_block);
 
     if (received.size() == 0)
     {
@@ -194,7 +209,7 @@ void UdpSocket<EndpointType>::ready_to_send(
     bool would_block = false;
 
     const std::size_t current_sent =
-        fly::net::detail::send_to(handle(), endpoint, message, m_packet_size, would_block);
+        fly::net::detail::send_to(handle(), endpoint, message, packet_size(), would_block);
     bytes_sent += current_sent;
 
     if (current_sent == message.size())
@@ -237,7 +252,7 @@ void UdpSocket<EndpointType>::ready_to_receive(ReceiveCompletion &&callback, std
     bool would_block = false;
 
     const std::string current_received =
-        fly::net::detail::recv_from(handle(), endpoint, m_packet_size, would_block);
+        fly::net::detail::recv_from(handle(), endpoint, packet_size(), would_block);
     received += current_received;
 
     if (!current_received.empty())

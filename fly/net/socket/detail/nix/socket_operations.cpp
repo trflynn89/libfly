@@ -515,6 +515,7 @@ template std::string recv_from(
 
 //==================================================================================================
 void select(
+    std::chrono::microseconds timeout,
     std::set<fly::net::socket_type> &writing_handles,
     std::set<fly::net::socket_type> &reading_handles)
 {
@@ -535,7 +536,7 @@ void select(
         writing_handles.empty() ? invalid_socket() : *writing_handles.rbegin(),
         reading_handles.empty() ? invalid_socket() : *reading_handles.rbegin());
 
-    const suseconds_t usec = static_cast<suseconds_t>(10'000);
+    const suseconds_t usec = static_cast<suseconds_t>(timeout.count());
     timeval tv {0, usec};
 
     const int status = ::select(max_handle + 1, &read_set, &write_set, nullptr, &tv);

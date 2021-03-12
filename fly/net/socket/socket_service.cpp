@@ -1,5 +1,6 @@
 #include "fly/net/socket/socket_service.hpp"
 
+#include "fly/net/network_config.hpp"
 #include "fly/net/socket/detail/socket_operations.hpp"
 #include "fly/task/task_runner.hpp"
 
@@ -8,27 +9,31 @@
 namespace fly::net {
 
 //==================================================================================================
-std::shared_ptr<SocketService>
-SocketService::create(const std::shared_ptr<fly::SequencedTaskRunner> &task_runner)
+std::shared_ptr<SocketService> SocketService::create(
+    std::shared_ptr<fly::SequencedTaskRunner> task_runner,
+    std::shared_ptr<NetworkConfig> config)
 {
     // SocketService has a private constructor, thus cannot be used with std::make_shared. This
     // class is used to expose the private constructor locally.
     struct SocketServiceImpl final : public SocketService
     {
-        explicit SocketServiceImpl(
-            const std::shared_ptr<fly::SequencedTaskRunner> &task_runner) noexcept :
-            SocketService(task_runner)
+        SocketServiceImpl(
+            std::shared_ptr<fly::SequencedTaskRunner> task_runner,
+            std::shared_ptr<NetworkConfig> config) noexcept :
+            SocketService(std::move(task_runner), std::move(config))
         {
         }
     };
 
-    return std::make_shared<SocketServiceImpl>(task_runner);
+    return std::make_shared<SocketServiceImpl>(std::move(task_runner), std::move(config));
 }
 
 //==================================================================================================
-SocketService::SocketService(const std::shared_ptr<fly::SequencedTaskRunner> &task_runner) noexcept
-    :
-    m_task_runner(task_runner)
+SocketService::SocketService(
+    std::shared_ptr<fly::SequencedTaskRunner> task_runner,
+    std::shared_ptr<NetworkConfig> config) noexcept :
+    m_task_runner(std::move(task_runner)),
+    m_config(std::move(config))
 {
     fly::net::detail::initialize();
 }
@@ -108,7 +113,7 @@ void SocketService::poll()
         readable.insert(request.m_handle);
     }
 
-    fly::net::detail::select(writable, readable);
+    fly::net::detail::select(m_config->socket_io_wait_time(), writable, readable);
 
     auto invoke = [](const std::set<socket_type> &ready, std::vector<Request> &pending)
     {

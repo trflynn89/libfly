@@ -7,6 +7,7 @@
 #include "fly/net/endpoint.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/net/network_config.hpp"
 #include "fly/net/socket/listen_socket.hpp"
 #include "fly/net/socket/socket_service.hpp"
 #include "fly/net/socket/socket_types.hpp"
@@ -17,6 +18,7 @@
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"
 
+#include <memory>
 #include <string>
 
 #if defined(FLY_LINUX)
@@ -44,14 +46,16 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
 
     CATCH_SECTION("Moving a socket marks the moved-from socket as invalid")
     {
-        TcpSocket socket1;
+        auto config = std::make_shared<fly::net::NetworkConfig>();
+
+        TcpSocket socket1(config);
         CATCH_CHECK(socket1.is_open());
 
         TcpSocket socket2(std::move(socket1));
         CATCH_CHECK_FALSE(socket1.is_open());
         CATCH_CHECK(socket2.is_open());
 
-        TcpSocket socket3;
+        TcpSocket socket3(config);
         socket3 = std::move(socket2);
         CATCH_CHECK_FALSE(socket2.is_open());
         CATCH_CHECK(socket3.is_open());
@@ -325,8 +329,9 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
     using ListenSocket = fly::net::ListenSocket<EndpointType>;
     using TcpSocket = fly::net::TcpSocket<EndpointType>;
 
-    auto task_runner = fly::SequencedTaskRunner::create(fly::test::task_manager());
-    auto socket_service = fly::net::SocketService::create(task_runner);
+    auto socket_service = fly::net::SocketService::create(
+        fly::SequencedTaskRunner::create(fly::test::task_manager()),
+        std::make_shared<fly::net::NetworkConfig>());
 
     const std::string message(fly::String::generate_random_string(1 << 10));
     fly::test::Signal signal;

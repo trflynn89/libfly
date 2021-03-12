@@ -7,6 +7,7 @@
 #include "fly/net/endpoint.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/net/network_config.hpp"
 #include "fly/net/socket/socket_service.hpp"
 #include "fly/net/socket/socket_types.hpp"
 #include "fly/task/task_manager.hpp"
@@ -16,6 +17,7 @@
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"
 
+#include <memory>
 #include <string>
 
 #if defined(FLY_LINUX)
@@ -42,14 +44,16 @@ CATCH_TEMPLATE_TEST_CASE("UdpSocket", "[net]", fly::net::IPv4Address, fly::net::
 
     CATCH_SECTION("Moving a socket marks the moved-from socket as invalid")
     {
-        UdpSocket socket1;
+        auto config = std::make_shared<fly::net::NetworkConfig>();
+
+        UdpSocket socket1(config);
         CATCH_CHECK(socket1.is_open());
 
         UdpSocket socket2(std::move(socket1));
         CATCH_CHECK_FALSE(socket1.is_open());
         CATCH_CHECK(socket2.is_open());
 
-        UdpSocket socket3;
+        UdpSocket socket3(config);
         socket3 = std::move(socket2);
         CATCH_CHECK_FALSE(socket2.is_open());
         CATCH_CHECK(socket3.is_open());
@@ -259,8 +263,9 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
     using EndpointType = fly::net::Endpoint<IPAddressType>;
     using UdpSocket = fly::net::UdpSocket<EndpointType>;
 
-    auto task_runner = fly::SequencedTaskRunner::create(fly::test::task_manager());
-    auto socket_service = fly::net::SocketService::create(task_runner);
+    auto socket_service = fly::net::SocketService::create(
+        fly::SequencedTaskRunner::create(fly::test::task_manager()),
+        std::make_shared<fly::net::NetworkConfig>());
 
     const std::string message(fly::String::generate_random_string(1 << 10));
     fly::test::Signal signal;

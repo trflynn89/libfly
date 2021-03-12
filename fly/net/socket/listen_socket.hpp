@@ -8,10 +8,11 @@
 
 namespace fly::net {
 
+class NetworkConfig;
+class SocketService;
+
 template <typename EndpointType>
 class TcpSocket;
-
-class SocketService;
 
 /**
  * Class to represent a listening socket for accepting incoming network connection requests from
@@ -32,15 +33,18 @@ class ListenSocket :
 public:
     /**
      * Constructor. Open the socket in a synchronous IO processing mode.
+     *
+     * @param config Reference to network configuration.
      */
-    ListenSocket() noexcept;
+    explicit ListenSocket(std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**
      * Constructor. Open the socket in the provided IO processing mode.
      *
+     * @param config Reference to network configuration.
      * @param mode IO processing mode to apply to the socket.
      */
-    explicit ListenSocket(fly::net::IOMode mode) noexcept;
+    ListenSocket(std::shared_ptr<NetworkConfig> config, fly::net::IOMode mode) noexcept;
 
     /**
      * Move constructor. The provided socket is left in a non-listening, invalid state.
@@ -102,20 +106,25 @@ private:
     /**
      * Create an asynchronous socket armed with a socket service for performing IO operations.
      *
-     * @param socket_service The socket service for performing IO operations.
+     * @param service The socket service for performing IO operations.
+     * @param config Reference to network configuration.
      *
      * @return The created socket.
      */
-    static std::shared_ptr<ListenSocket>
-    create_socket(const std::shared_ptr<SocketService> &socket_service);
+    static std::shared_ptr<ListenSocket> create_socket(
+        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<NetworkConfig> config);
 
     /**
      * Constructor. Open the socket in an asynchronous IO processing mode armed with the provided
      * socket service for performing IO operations.
      *
-     * @param socket_service The socket service for performing IO operations.
+     * @param service The socket service for performing IO operations.
+     * @param config Reference to network configuration.
      */
-    explicit ListenSocket(const std::shared_ptr<SocketService> &socket_service) noexcept;
+    ListenSocket(
+        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**
      * When the socket service indicates the socket is available for reading, attempt to accept an
@@ -128,6 +137,7 @@ private:
      */
     void ready_to_accept(AcceptCompletion &&callback);
 
+    using BaseSocket::network_config;
     using BaseSocket::socket_service;
 
     bool m_is_listening {false};

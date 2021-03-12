@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/fly.hpp"
+#include "fly/net/network_config.hpp"
 #include "fly/net/socket/detail/socket_operations.hpp"
 #include "fly/net/socket/socket_types.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
@@ -9,6 +10,7 @@
 
 #include <chrono>
 #include <future>
+#include <memory>
 
 namespace fly::test {
 
@@ -18,7 +20,7 @@ namespace fly::test {
 template <typename SocketType>
 std::optional<SocketType> create_socket(fly::net::IOMode mode)
 {
-    SocketType socket(mode);
+    SocketType socket(std::make_shared<fly::net::NetworkConfig>(), mode);
     CATCH_CHECK(socket.socket_id() >= 0);
     CATCH_CHECK(socket.io_mode() == mode);
     CATCH_CHECK(socket.is_ipv4() != socket.is_ipv6());

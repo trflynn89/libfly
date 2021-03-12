@@ -2,6 +2,7 @@
 
 #include "fly/net/socket/socket_types.hpp"
 
+#include <chrono>
 #include <cstddef>
 #include <optional>
 #include <set>
@@ -199,10 +200,12 @@ std::string recv_from(
  * Monitor a set of socket handles for IO readiness. The provided sets are modified to only contain
  * the socket handles that are ready for IO.
  *
+ * @param timeout Maximum time allowed for a socket to be ready for IO.
  * @param writing_handles The maxiumum message size to receive.
  * @param reading_handles Location to store if the operation would have blocked.
  */
 void select(
+    std::chrono::microseconds timeout,
     std::set<fly::net::socket_type> &writing_handles,
     std::set<fly::net::socket_type> &reading_handles);
 

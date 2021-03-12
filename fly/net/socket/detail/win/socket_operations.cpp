@@ -533,6 +533,7 @@ template std::string recv_from(
 
 //==================================================================================================
 void select(
+    std::chrono::microseconds timeout,
     std::set<fly::net::socket_type> &writing_handles,
     std::set<fly::net::socket_type> &reading_handles)
 {
@@ -549,7 +550,7 @@ void select(
         FD_SET(handle, &read_set);
     }
 
-    const long usec = static_cast<long>(10'000);
+    const long usec = static_cast<long>(timeout.count());
     timeval tv {0, usec};
 
     // First argument of ::select() is ignored on Windows.

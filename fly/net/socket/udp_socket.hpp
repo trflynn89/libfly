@@ -10,6 +10,7 @@
 
 namespace fly::net {
 
+class NetworkConfig;
 class SocketService;
 
 /**
@@ -31,15 +32,18 @@ class UdpSocket :
 public:
     /**
      * Constructor. Open the socket in a synchronous IO processing mode.
+     *
+     * @param config Reference to network configuration.
      */
-    UdpSocket() noexcept;
+    explicit UdpSocket(std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**
      * Constructor. Open the socket in the provided IO processing mode.
      *
+     * @param config Reference to network configuration.
      * @param mode IO processing mode to apply to the socket.
      */
-    explicit UdpSocket(fly::net::IOMode mode) noexcept;
+    UdpSocket(std::shared_ptr<NetworkConfig> config, fly::net::IOMode mode) noexcept;
 
     /**
      * Move constructor. The provided socket is left in an invalid state.
@@ -152,20 +156,25 @@ private:
     /**
      * Create an asynchronous socket armed with a socket service for performing IO operations.
      *
-     * @param socket_service The socket service for performing IO operations.
+     * @param service The socket service for performing IO operations.
+     * @param config Reference to network configuration.
      *
      * @return The created socket.
      */
-    static std::shared_ptr<UdpSocket>
-    create_socket(const std::shared_ptr<SocketService> &socket_service);
+    static std::shared_ptr<UdpSocket> create_socket(
+        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<NetworkConfig> config);
 
     /**
      * Constructor. Open the socket in an asynchronous IO processing mode armed with the provided
      * socket service for performing IO operations.
      *
-     * @param socket_service The socket service for performing IO operations.
+     * @param service The socket service for performing IO operations.
+     * @param config Reference to network configuration.
      */
-    explicit UdpSocket(const std::shared_ptr<SocketService> &socket_service) noexcept;
+    UdpSocket(
+        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**
      * When the socket service indicates the socket is available for writing, attempt to transmit
@@ -202,9 +211,8 @@ private:
     UdpSocket(const UdpSocket &) = delete;
     UdpSocket &operator=(const UdpSocket &) = delete;
 
+    using BaseSocket::packet_size;
     using BaseSocket::socket_service;
-
-    using BaseSocket::m_packet_size;
 };
 
 } // namespace fly::net

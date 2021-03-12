@@ -3,6 +3,7 @@
 #include "fly/net/endpoint.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/net/network_config.hpp"
 #include "fly/net/socket/detail/socket_operations.hpp"
 #include "fly/net/socket/socket_service.hpp"
 
@@ -18,7 +19,11 @@ namespace {
 
 //==================================================================================================
 template <typename EndpointType>
-BaseSocket<EndpointType>::BaseSocket(socket_type handle, fly::net::IOMode mode) noexcept :
+BaseSocket<EndpointType>::BaseSocket(
+    std::shared_ptr<fly::net::NetworkConfig> config,
+    socket_type handle,
+    fly::net::IOMode mode) noexcept :
+    m_config(std::move(config)),
     m_socket_handle(handle),
     m_socket_id(s_num_sockets.fetch_add(1)),
     m_mode(mode)
@@ -29,18 +34,19 @@ BaseSocket<EndpointType>::BaseSocket(socket_type handle, fly::net::IOMode mode) 
 //==================================================================================================
 template <typename EndpointType>
 BaseSocket<EndpointType>::BaseSocket(
-    socket_type handle,
-    const std::shared_ptr<fly::net::SocketService> &socket_service) noexcept :
-    BaseSocket(handle, fly::net::IOMode::Asynchronous)
+    const std::shared_ptr<fly::net::SocketService> &service,
+    std::shared_ptr<fly::net::NetworkConfig> config,
+    socket_type handle) noexcept :
+    BaseSocket(std::move(config), handle, fly::net::IOMode::Asynchronous)
 {
-    m_weak_socket_service = socket_service;
+    m_weak_socket_service = service;
 }
 
 //==================================================================================================
 template <typename EndpointType>
 BaseSocket<EndpointType>::BaseSocket(BaseSocket &&socket) noexcept :
-    m_packet_size(socket.m_packet_size),
     m_weak_socket_service(std::move(socket.m_weak_socket_service)),
+    m_config(std::move(socket.m_config)),
     m_socket_handle(socket.m_socket_handle),
     m_socket_id(socket.m_socket_id),
     m_mode(socket.m_mode)
@@ -59,8 +65,8 @@ BaseSocket<EndpointType>::~BaseSocket() noexcept
 template <typename EndpointType>
 BaseSocket<EndpointType> &BaseSocket<EndpointType>::operator=(BaseSocket &&socket) noexcept
 {
-    m_packet_size = socket.m_packet_size;
     m_weak_socket_service = std::move(socket.m_weak_socket_service);
+    m_config = std::move(socket.m_config);
     m_socket_handle = socket.m_socket_handle;
     m_socket_id = socket.m_socket_id;
     m_mode = socket.m_mode;
@@ -178,6 +184,20 @@ template <typename EndpointType>
 std::shared_ptr<fly::net::SocketService> BaseSocket<EndpointType>::socket_service() const
 {
     return m_weak_socket_service.lock();
+}
+
+//==================================================================================================
+template <typename EndpointType>
+std::shared_ptr<fly::net::NetworkConfig> BaseSocket<EndpointType>::network_config() const
+{
+    return m_config;
+}
+
+//==================================================================================================
+template <typename EndpointType>
+std::size_t BaseSocket<EndpointType>::packet_size() const
+{
+    return m_config->packet_size();
 }
 
 //==================================================================================================

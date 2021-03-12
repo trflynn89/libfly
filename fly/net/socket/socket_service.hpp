@@ -12,6 +12,8 @@ class SequencedTaskRunner;
 
 namespace fly::net {
 
+class NetworkConfig;
+
 /**
  * Class to monitor asynchronous socket handles for IO readiness. Sockets handles are monitored on a
  * per-IO basis.
@@ -31,11 +33,13 @@ public:
      * Create a socket service.
      *
      * @param task_runner Task runner for posting socket service tasks onto.
+     * @param config Reference to network configuration.
      *
      * @return The created socket service.
      */
-    static std::shared_ptr<SocketService>
-    create(const std::shared_ptr<fly::SequencedTaskRunner> &task_runner);
+    static std::shared_ptr<SocketService> create(
+        std::shared_ptr<fly::SequencedTaskRunner> task_runner,
+        std::shared_ptr<NetworkConfig> config);
 
     /**
      * Create an asynchronous socket armed with this socket service for performing IO operations.
@@ -112,7 +116,9 @@ private:
      *
      * @param task_runner Task runner for posting socket service tasks onto.
      */
-    explicit SocketService(const std::shared_ptr<fly::SequencedTaskRunner> &task_runner) noexcept;
+    SocketService(
+        std::shared_ptr<fly::SequencedTaskRunner> task_runner,
+        std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**
      * Monitor a socket handle for readiness to be written to. Once queued, if the polling task is
@@ -162,6 +168,8 @@ private:
 
     std::shared_ptr<fly::SequencedTaskRunner> m_task_runner;
 
+    std::shared_ptr<NetworkConfig> m_config;
+
     std::vector<Request> m_write_requests;
     std::vector<Request> m_read_requests;
 };
@@ -170,7 +178,7 @@ private:
 template <typename SocketType>
 std::shared_ptr<SocketType> SocketService::create_socket()
 {
-    return SocketType::create_socket(shared_from_this());
+    return SocketType::create_socket(shared_from_this(), m_config);
 }
 
 //==================================================================================================
