@@ -42,11 +42,11 @@ Registry &Registry::instance()
 }
 
 //==================================================================================================
-void Registry::set_default_logger(const std::shared_ptr<fly::Logger> &default_logger)
+void Registry::set_default_logger(std::shared_ptr<fly::Logger> default_logger)
 {
     if (default_logger)
     {
-        m_default_logger = default_logger;
+        m_default_logger = std::move(default_logger);
     }
     else
     {
@@ -61,7 +61,7 @@ fly::Logger *Registry::get_default_logger() const
 }
 
 //==================================================================================================
-bool Registry::register_logger(const std::shared_ptr<fly::Logger> &logger)
+bool Registry::register_logger(std::shared_ptr<fly::Logger> logger)
 {
     std::lock_guard<std::mutex> lock(m_registry_mutex);
 
@@ -70,7 +70,7 @@ bool Registry::register_logger(const std::shared_ptr<fly::Logger> &logger)
         return false;
     }
 
-    m_registry[logger->name()] = logger;
+    m_registry[logger->name()] = std::move(logger);
     return true;
 }
 

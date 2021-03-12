@@ -33,9 +33,9 @@ public:
      * @param logger_directory Path to store the log files.
      */
     FileSink(
-        const std::shared_ptr<fly::LoggerConfig> &logger_config,
-        const std::shared_ptr<fly::CoderConfig> &coder_config,
-        const std::filesystem::path &logger_directory);
+        std::shared_ptr<fly::LoggerConfig> logger_config,
+        std::shared_ptr<fly::CoderConfig> coder_config,
+        std::filesystem::path logger_directory);
 
     /**
      * Create the initial log file.

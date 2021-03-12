@@ -154,8 +154,8 @@ public:
      * @return The created logger, or null if the logger could not be initialized.
      */
     static std::shared_ptr<Logger> create_logger(
-        const std::string &name,
-        const std::shared_ptr<LoggerConfig> &logger_config,
+        std::string name,
+        std::shared_ptr<LoggerConfig> logger_config,
         std::unique_ptr<LogSink> &&sink);
 
     /**
@@ -169,9 +169,9 @@ public:
      * @return The created logger, or null if the logger could not be initialized.
      */
     static std::shared_ptr<Logger> create_logger(
-        const std::string &name,
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
-        const std::shared_ptr<LoggerConfig> &logger_config,
+        std::string name,
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<LoggerConfig> logger_config,
         std::unique_ptr<LogSink> &&sink);
 
     /**
@@ -185,10 +185,10 @@ public:
      * @return The created logger, or null if the logger could not be initialized.
      */
     static std::shared_ptr<Logger> create_file_logger(
-        const std::string &name,
-        const std::shared_ptr<LoggerConfig> &logger_config,
-        const std::shared_ptr<CoderConfig> &coder_config,
-        const std::filesystem::path &logger_directory);
+        std::string name,
+        std::shared_ptr<LoggerConfig> logger_config,
+        std::shared_ptr<CoderConfig> coder_config,
+        std::filesystem::path logger_directory);
 
     /**
      * Create an asynchronous file logger.
@@ -202,11 +202,11 @@ public:
      * @return The created logger, or null if the logger could not be initialized.
      */
     static std::shared_ptr<Logger> create_file_logger(
-        const std::string &name,
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
-        const std::shared_ptr<LoggerConfig> &logger_config,
-        const std::shared_ptr<CoderConfig> &coder_config,
-        const std::filesystem::path &logger_directory);
+        std::string name,
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<LoggerConfig> logger_config,
+        std::shared_ptr<CoderConfig> coder_config,
+        std::filesystem::path logger_directory);
 
     /**
      * Create a synchronous console logger.
@@ -216,9 +216,8 @@ public:
      *
      * @return The created logger, or null if the logger could not be initialized.
      */
-    static std::shared_ptr<Logger> create_console_logger(
-        const std::string &name,
-        const std::shared_ptr<LoggerConfig> &logger_config);
+    static std::shared_ptr<Logger>
+    create_console_logger(std::string name, std::shared_ptr<LoggerConfig> logger_config);
 
     /**
      * Create an asynchronous console logger.
@@ -230,9 +229,9 @@ public:
      * @return The created logger, or null if the logger could not be initialized.
      */
     static std::shared_ptr<Logger> create_console_logger(
-        const std::string &name,
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
-        const std::shared_ptr<LoggerConfig> &logger_config);
+        std::string name,
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<LoggerConfig> logger_config);
 
     /**
      * Set the default logger instance for the LOG* macro functions. If the provided logger is null,
@@ -246,7 +245,7 @@ public:
      *
      * @param default_logger The logger instance.
      */
-    static void set_default_logger(const std::shared_ptr<Logger> &default_logger);
+    static void set_default_logger(std::shared_ptr<Logger> default_logger);
 
     /**
      * @return The default logger instance for the LOG* macro functions.
@@ -441,9 +440,9 @@ private:
      * @param sink The log sink to receive log points for streaming.
      */
     Logger(
-        const std::string &name,
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
-        const std::shared_ptr<LoggerConfig> &config,
+        std::string name,
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<LoggerConfig> config,
         std::unique_ptr<LogSink> &&sink) noexcept;
 
     /**

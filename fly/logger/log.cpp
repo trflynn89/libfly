@@ -1,5 +1,7 @@
 #include "fly/logger/log.hpp"
 
+#include "fly/types/string/string.hpp"
+
 namespace fly {
 
 namespace {
@@ -60,11 +62,9 @@ std::ostream &operator<<(std::ostream &stream, const Log::Level &level)
 //==================================================================================================
 std::ostream &operator<<(std::ostream &stream, const Log::Trace &trace)
 {
-    if ((trace.m_file != nullptr) && (trace.m_function != nullptr))
+    if (!trace.m_file.empty() && !trace.m_function.empty())
     {
-        stream << trace.m_file << ':';
-        stream << trace.m_function << ':';
-        stream << trace.m_line;
+        stream << String::format("{}:{}:{}", trace.m_file, trace.m_function, trace.m_line);
     }
 
     return stream;

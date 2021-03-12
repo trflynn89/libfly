@@ -32,7 +32,7 @@ public:
      *
      * @param logger The logger instance.
      */
-    void set_default_logger(const std::shared_ptr<fly::Logger> &default_logger);
+    void set_default_logger(std::shared_ptr<fly::Logger> default_logger);
 
     /**
      * @return The default logger instance for the LOG* macro functions.
@@ -47,7 +47,7 @@ public:
      *
      * @return True if the logger could be registered.
      */
-    bool register_logger(const std::shared_ptr<fly::Logger> &logger);
+    bool register_logger(std::shared_ptr<fly::Logger> logger);
 
     /**
      * Remove a logger instance from the registry.
