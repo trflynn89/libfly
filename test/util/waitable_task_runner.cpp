@@ -7,7 +7,7 @@ namespace fly::test {
 //==================================================================================================
 void WaitableTaskRunner::task_complete(fly::TaskLocation &&location)
 {
-    m_completed_tasks.push(location.m_file);
+    m_completed_tasks.push(std::string(location.m_file.data(), location.m_file.size()));
 }
 
 //==================================================================================================

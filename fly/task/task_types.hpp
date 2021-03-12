@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <string_view>
 
 namespace fly {
 
@@ -12,8 +13,8 @@ class TaskRunner;
  */
 struct TaskLocation
 {
-    const char *m_file {nullptr};
-    const char *m_function {nullptr};
+    std::string_view m_file;
+    std::string_view m_function;
     std::uint32_t m_line {0};
 };
 
