@@ -83,7 +83,7 @@ bool ListenSocket<EndpointType>::is_listening() const
 
 //==================================================================================================
 template <typename EndpointType>
-std::optional<TcpSocket<EndpointType>> ListenSocket<EndpointType>::accept() const
+std::optional<TcpSocket<EndpointType>> ListenSocket<EndpointType>::accept()
 {
     EndpointType client_endpoint;
     bool would_block = false;
@@ -93,6 +93,9 @@ std::optional<TcpSocket<EndpointType>> ListenSocket<EndpointType>::accept() cons
         SLOGD(handle(), "Accepted new socket {}", client_endpoint);
         return TcpSocket<EndpointType>(*client, io_mode());
     }
+
+    SLOGW(handle(), "Could not accept new socket, closing");
+    close();
 
     return std::nullopt;
 }

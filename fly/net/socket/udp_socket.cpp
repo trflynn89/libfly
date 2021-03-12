@@ -61,23 +61,35 @@ UdpSocket<EndpointType> &UdpSocket<EndpointType>::operator=(UdpSocket &&socket) 
 
 //==================================================================================================
 template <typename EndpointType>
-size_t UdpSocket<EndpointType>::send(const EndpointType &endpoint, std::string_view message) const
+size_t UdpSocket<EndpointType>::send(const EndpointType &endpoint, std::string_view message)
 {
     bool would_block = false;
 
-    return fly::net::detail::send_to(
+    std::size_t bytes_sent = fly::net::detail::send_to(
         handle(),
         endpoint,
         std::move(message),
         m_packet_size,
         would_block);
+
+    if (bytes_sent == 0)
+    {
+        SLOGW(handle(), "Error sending to {}, closing", endpoint);
+        close();
+    }
+    else
+    {
+        SLOGD(handle(), "Sent {} bytes to {}", bytes_sent, endpoint);
+    }
+
+    return bytes_sent;
 }
 
 //==================================================================================================
 template <typename EndpointType>
 size_t
 UdpSocket<EndpointType>::send(std::string_view hostname, port_type port, std::string_view message)
-    const
+
 {
     if (auto endpoint = hostname_to_endpoint(std::move(hostname)); endpoint)
     {
@@ -130,12 +142,25 @@ bool UdpSocket<EndpointType>::send_async(
 
 //==================================================================================================
 template <typename EndpointType>
-std::string UdpSocket<EndpointType>::receive() const
+std::string UdpSocket<EndpointType>::receive()
 {
     EndpointType endpoint;
     bool would_block = false;
 
-    return fly::net::detail::recv_from(handle(), endpoint, m_packet_size, would_block);
+    const std::string received =
+        fly::net::detail::recv_from(handle(), endpoint, m_packet_size, would_block);
+
+    if (received.size() == 0)
+    {
+        SLOGW(handle(), "Error receiving, closing");
+        close();
+    }
+    else
+    {
+        SLOGD(handle(), "Received {} bytes from {}", received.size(), endpoint);
+    }
+
+    return received;
 }
 
 //==================================================================================================

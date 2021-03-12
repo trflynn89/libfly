@@ -226,10 +226,22 @@ bool TcpSocket<EndpointType>::is_connected() const
 
 //==================================================================================================
 template <typename EndpointType>
-std::size_t TcpSocket<EndpointType>::send(std::string_view message) const
+std::size_t TcpSocket<EndpointType>::send(std::string_view message)
 {
     bool would_block = false;
-    return fly::net::detail::send(handle(), std::move(message), would_block);
+    std::size_t bytes_sent = fly::net::detail::send(handle(), std::move(message), would_block);
+
+    if (bytes_sent == 0)
+    {
+        SLOGW(handle(), "Error sending, closing");
+        close();
+    }
+    else
+    {
+        SLOGD(handle(), "Sent {} bytes", bytes_sent);
+    }
+
+    return bytes_sent;
 }
 
 //==================================================================================================
@@ -253,10 +265,22 @@ bool TcpSocket<EndpointType>::send_async(std::string_view message, SendCompletio
 
 //==================================================================================================
 template <typename EndpointType>
-std::string TcpSocket<EndpointType>::receive() const
+std::string TcpSocket<EndpointType>::receive()
 {
     bool would_block = false;
-    return fly::net::detail::recv(handle(), m_packet_size, would_block);
+    const std::string received = fly::net::detail::recv(handle(), m_packet_size, would_block);
+
+    if (received.size() == 0)
+    {
+        SLOGW(handle(), "Error receiving, closing");
+        close();
+    }
+    else
+    {
+        SLOGD(handle(), "Received {} bytes", received.size());
+    }
+
+    return received;
 }
 
 //==================================================================================================

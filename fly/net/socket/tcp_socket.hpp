@@ -149,13 +149,14 @@ public:
     bool is_connected() const;
 
     /**
-     * Transmit a message to the connected remote socket.
+     * Transmit a message to the connected remote socket. If an error occurs on the socket, the
+     * socket will be closed.
      *
      * @param message The message to transmit.
      *
      * @return The number of bytes transmitted.
      */
-    std::size_t send(std::string_view message) const;
+    std::size_t send(std::string_view message);
 
     /**
      * Asynchronously transmit a message to the connected remote socket. May only be used if this
@@ -174,11 +175,12 @@ public:
     bool send_async(std::string_view message, SendCompletion &&callback);
 
     /**
-     * Receive a message from the connected remote socket.
+     * Receive a message from the connected remote socket. If an error occurs on the socket, the
+     * socket will be closed.
      *
      * @return The message received.
      */
-    std::string receive() const;
+    std::string receive();
 
     /**
      * Asynchronously receive a message from the connected remote socket. May only be used if this
