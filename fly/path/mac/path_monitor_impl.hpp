@@ -32,8 +32,8 @@ public:
      * Constructor. Creates the dispatch queue used to handle path events.
      */
     PathMonitorImpl(
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
-        const std::shared_ptr<PathConfig> &config) noexcept;
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<PathConfig> config) noexcept;
 
     /**
      * Destructor. Destroys the dispatch queue and any open FSEvents stream.
@@ -53,7 +53,7 @@ protected:
      *
      * @param timeout Max time allowed to wait for an event to occur.
      */
-    void poll(const std::chrono::milliseconds &timeout) override;
+    void poll(std::chrono::milliseconds timeout) override;
 
     std::unique_ptr<PathMonitor::PathInfo>
     create_path_info(const std::filesystem::path &path) const override;

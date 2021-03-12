@@ -37,9 +37,9 @@ namespace {
 
 //==================================================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<PathConfig> &config) noexcept :
-    PathMonitor(task_runner, config),
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<PathConfig> config) noexcept :
+    PathMonitor(std::move(task_runner), std::move(config)),
     m_context(std::make_unique<FSEventStreamContext>()),
     m_dispatch_queue(dispatch_queue_create(
         fly::String::format("fly.PathMonitor.{:p}", this).c_str(),
@@ -78,7 +78,7 @@ bool PathMonitorImpl::is_valid() const
 }
 
 //==================================================================================================
-void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout)
+void PathMonitorImpl::poll(std::chrono::milliseconds timeout)
 {
     std::chrono::milliseconds time_remaining = timeout;
     EventInfo event;
@@ -110,14 +110,7 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout)
 std::unique_ptr<PathMonitor::PathInfo>
 PathMonitorImpl::create_path_info(const std::filesystem::path &path) const
 {
-    std::unique_ptr<PathMonitor::PathInfo> info;
-
-    if (is_valid())
-    {
-        info = std::make_unique<PathInfoImpl>(this, path);
-    }
-
-    return info;
+    return std::make_unique<PathInfoImpl>(this, path);
 }
 
 //==================================================================================================
@@ -269,7 +262,7 @@ void PathMonitorImpl::handle_event(EventInfo &&event) const
             auto path = std::filesystem::path(path_it->first) / event.path.filename();
 
             LOGI("Handling event {} for {}", event.event, path);
-            callback(path, event.event);
+            std::invoke(std::move(callback), std::move(path), event.event);
         }
     }
 }

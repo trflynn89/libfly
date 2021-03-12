@@ -1,7 +1,5 @@
 #pragma once
 
-#include "fly/fly.hpp"
-
 #include <cstdint>
 #include <filesystem>
 #include <functional>
@@ -40,29 +38,23 @@ public:
     /**
      * Callback definition for function to be triggered on a path change.
      */
-    using PathEventCallback = std::function<void(const std::filesystem::path &, PathEvent)>;
+    using PathEventCallback = std::function<void(std::filesystem::path, PathEvent)>;
 
     /**
-     * Constructor.
+     * Create and start a path monitor.
      *
      * @param task_runner Task runner for posting path-related tasks onto.
      * @param config Reference to path configuration.
+     *
+     * @return The created path monitor.
      */
-    PathMonitor(
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
-        const std::shared_ptr<PathConfig> &config) noexcept;
+    static std::shared_ptr<PathMonitor>
+    create(std::shared_ptr<SequencedTaskRunner> task_runner, std::shared_ptr<PathConfig> config);
 
     /**
      * Destructor. Remove all paths from the path monitor.
      */
     virtual ~PathMonitor();
-
-    /**
-     * Queue a task to poll monitored paths.
-     *
-     * @return True if the path monitor is in a valid state.
-     */
-    bool start();
 
     /**
      * Monitor for changes to all files under a directory. Callbacks registered with AddFile take
@@ -140,6 +132,16 @@ protected:
     using PathInfoMap = std::map<std::filesystem::path, std::unique_ptr<PathInfo>>;
 
     /**
+     * Constructor.
+     *
+     * @param task_runner Task runner for posting path-related tasks onto.
+     * @param config Reference to path configuration.
+     */
+    PathMonitor(
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<PathConfig> config) noexcept;
+
+    /**
      * Create an instance of the OS dependent PathInfo struct.
      *
      * @param path The path to be monitored.
@@ -160,12 +162,19 @@ protected:
      *
      * @param timeout Max time allow for an event to be occur.
      */
-    virtual void poll(const std::chrono::milliseconds &timeout) = 0;
+    virtual void poll(std::chrono::milliseconds timeout) = 0;
 
     mutable std::mutex m_mutex;
     PathInfoMap m_path_info;
 
 private:
+    /**
+     * Queue a task to poll monitored paths.
+     *
+     * @return True if the path monitor is in a valid state.
+     */
+    bool start();
+
     /**
      * Search for a path to be monitored in the PathInfo map. If the map does not contain the path,
      * create an entry.
@@ -194,5 +203,3 @@ private:
 };
 
 } // namespace fly
-
-#include FLY_OS_IMPL_PATH(path, path_monitor)

@@ -48,9 +48,8 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 {
     auto task_runner = fly::test::WaitableSequencedTaskRunner::create(fly::test::task_manager());
 
-    auto monitor =
-        std::make_shared<fly::PathMonitorImpl>(task_runner, std::make_shared<TestPathConfig>());
-    CATCH_REQUIRE(monitor->start());
+    auto monitor = fly::PathMonitor::create(task_runner, std::make_shared<TestPathConfig>());
+    CATCH_REQUIRE(monitor);
 
     fly::test::PathUtil::ScopedTempDirectory path0;
     fly::test::PathUtil::ScopedTempDirectory path1;
@@ -67,7 +66,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
     std::map<std::filesystem::path, unsigned int> deleted_files;
     std::map<std::filesystem::path, unsigned int> changed_files;
 
-    auto handle_event = [&](const std::filesystem::path &path, fly::PathMonitor::PathEvent event)
+    auto handle_event = [&](std::filesystem::path path, fly::PathMonitor::PathEvent event)
     {
         switch (event)
         {
@@ -152,14 +151,8 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
     {
         fly::test::MockSystem mock(fly::test::MockCall::InotifyInit1);
 
-        monitor = std::make_shared<fly::PathMonitorImpl>(
-            task_runner,
-            std::make_shared<fly::PathConfig>());
-
-        CATCH_CHECK_FALSE(monitor->start());
-
-        CATCH_CHECK_FALSE(monitor->add_path(path0(), handle_event));
-        CATCH_CHECK_FALSE(monitor->add_file(file1, handle_event));
+        monitor = fly::PathMonitor::create(task_runner, std::make_shared<fly::PathConfig>());
+        CATCH_CHECK_FALSE(monitor);
     }
 
     CATCH_SECTION("Cannot monitor paths when ::inotify_add_watch() fails")
@@ -389,5 +382,8 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
         CATCH_CHECK_FALSE(monitor->remove_path(path2()));
     }
 
-    monitor->remove_all_paths();
+    if (monitor)
+    {
+        monitor->remove_all_paths();
+    }
 }
