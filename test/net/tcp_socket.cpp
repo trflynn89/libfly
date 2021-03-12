@@ -45,16 +45,16 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
     CATCH_SECTION("Moving a socket marks the moved-from socket as invalid")
     {
         TcpSocket socket1;
-        CATCH_CHECK(socket1.is_valid());
+        CATCH_CHECK(socket1.is_open());
 
         TcpSocket socket2(std::move(socket1));
-        CATCH_CHECK_FALSE(socket1.is_valid());
-        CATCH_CHECK(socket2.is_valid());
+        CATCH_CHECK_FALSE(socket1.is_open());
+        CATCH_CHECK(socket2.is_open());
 
         TcpSocket socket3;
         socket3 = std::move(socket2);
-        CATCH_CHECK_FALSE(socket2.is_valid());
-        CATCH_CHECK(socket3.is_valid());
+        CATCH_CHECK_FALSE(socket2.is_open());
+        CATCH_CHECK(socket3.is_open());
     }
 
     CATCH_SECTION("Sockets may change their IO processing mode")
@@ -97,7 +97,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_CHECK(state == fly::net::ConnectedState::Disconnected);
         CATCH_CHECK_FALSE(socket->remote_endpoint());
 
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Sockets may connect to an endpoint that is listened on")
@@ -116,7 +116,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
 
             auto connected_socket = listen_socket->accept();
             CATCH_REQUIRE(connected_socket);
-            CATCH_REQUIRE(connected_socket->is_valid());
+            CATCH_REQUIRE(connected_socket->is_open());
 
             auto endpoint = connected_socket->remote_endpoint();
             CATCH_REQUIRE(endpoint);
@@ -150,7 +150,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->send(message) == 0);
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Disconnected sockets may not receive messages")
@@ -159,7 +159,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->receive().empty());
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Connected sockets may send and receive messages")
@@ -178,7 +178,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
 
             auto connected_socket = listen_socket->accept();
             CATCH_REQUIRE(connected_socket);
-            CATCH_REQUIRE(connected_socket->is_valid());
+            CATCH_REQUIRE(connected_socket->is_open());
 
             CATCH_CHECK(connected_socket->receive() == message);
             CATCH_CHECK(connected_socket->send(message) == message.size());
@@ -290,7 +290,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
 
         CATCH_CHECK(socket->finish_connect() == fly::net::ConnectedState::Disconnected);
         CATCH_CHECK_FALSE(socket->is_connected());
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Socket sending fails due to ::send() system call")
@@ -301,7 +301,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->send(message) == 0);
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Socket receiving fails due to ::recv() system call")
@@ -312,7 +312,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
         CATCH_REQUIRE(socket);
 
         CATCH_CHECK(socket->receive().empty());
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
 #endif
@@ -450,7 +450,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_REQUIRE(connected_socket);
             std::string received;
 
-            while (connected_socket->is_valid() && (received.size() != message.size()))
+            while (connected_socket->is_open() && (received.size() != message.size()))
             {
                 received += connected_socket->receive();
             }
@@ -522,7 +522,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_REQUIRE(connected_socket);
             std::string received;
 
-            while (connected_socket->is_valid() && (received.size() != message.size()))
+            while (connected_socket->is_open() && (received.size() != message.size()))
             {
                 CATCH_CHECK(connected_socket->receive_async(
                     [&server_signal, &received](std::string fragment)
@@ -532,7 +532,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
                     }));
 
                 server_signal.wait();
-                CATCH_REQUIRE(connected_socket->is_valid());
+                CATCH_REQUIRE(connected_socket->is_open());
             }
 
             CATCH_CHECK(received == message);
@@ -565,7 +565,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
         fly::net::ConnectedState state = socket->connect_async(s_localhost, s_port, [](auto) {});
         CATCH_CHECK(state == fly::net::ConnectedState::Disconnected);
 
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Socket connecting fails due to ::getaddrinfo() system call")
@@ -609,7 +609,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
         CATCH_CHECK(state != fly::net::ConnectedState::Disconnected);
         signal.wait();
 
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Socket sending fails due to ::send() system call")
@@ -628,7 +628,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             }));
 
         signal.wait();
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Socket sending blocks due to ::send() system call")
@@ -647,7 +647,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_REQUIRE(connected_socket);
             std::string received;
 
-            while (connected_socket->is_valid() && (received.size() != message.size()))
+            while (connected_socket->is_open() && (received.size() != message.size()))
             {
                 received += connected_socket->receive();
             }
@@ -708,7 +708,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             }));
 
         signal.wait();
-        CATCH_CHECK_FALSE(socket->is_valid());
+        CATCH_CHECK_FALSE(socket->is_open());
     }
 
     CATCH_SECTION("Socket receiving blocks due to ::recv() system call")
@@ -739,7 +739,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_REQUIRE(connected_socket);
             std::string received;
 
-            while (connected_socket->is_valid() && (received.size() != message.size()))
+            while (connected_socket->is_open() && (received.size() != message.size()))
             {
                 CATCH_CHECK(connected_socket->receive_async(
                     [&server_signal, &received](std::string fragment)
@@ -749,7 +749,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
                     }));
 
                 server_signal.wait();
-                CATCH_REQUIRE(connected_socket->is_valid());
+                CATCH_REQUIRE(connected_socket->is_open());
             }
 
             CATCH_CHECK(received == message);

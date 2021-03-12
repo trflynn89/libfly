@@ -195,7 +195,7 @@ ConnectedState TcpSocket<EndpointType>::finish_connect()
 {
     ConnectedState state = ConnectedState::Disconnected;
 
-    if (is_valid() & is_connecting() && fly::net::detail::is_error_free(handle()))
+    if (is_open() & is_connecting() && fly::net::detail::is_error_free(handle()))
     {
         SLOGD(handle(), "Connection complete");
         state = ConnectedState::Connected;

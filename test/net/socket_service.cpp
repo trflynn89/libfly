@@ -49,7 +49,7 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
         auto socket = socket_service->create_socket<UdpSocket>();
         CATCH_REQUIRE(socket);
 
-        CATCH_CHECK(socket->is_valid());
+        CATCH_CHECK(socket->is_open());
         CATCH_CHECK(socket->io_mode() == fly::net::IOMode::Asynchronous);
     }
 

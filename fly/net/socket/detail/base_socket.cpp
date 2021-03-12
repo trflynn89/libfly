@@ -87,6 +87,13 @@ BaseSocket<EndpointType>::hostname_to_endpoint(std::string_view hostname)
 
 //==================================================================================================
 template <typename EndpointType>
+bool BaseSocket<EndpointType>::is_open() const
+{
+    return m_socket_handle != fly::net::detail::invalid_socket();
+}
+
+//==================================================================================================
+template <typename EndpointType>
 socket_type BaseSocket<EndpointType>::handle() const
 {
     return m_socket_handle;
@@ -112,7 +119,7 @@ bool BaseSocket<EndpointType>::set_io_mode(fly::net::IOMode mode)
         close();
     }
 
-    return is_valid();
+    return is_open();
 }
 
 //==================================================================================================
@@ -120,13 +127,6 @@ template <typename EndpointType>
 fly::net::IOMode BaseSocket<EndpointType>::io_mode() const
 {
     return m_mode;
-}
-
-//==================================================================================================
-template <typename EndpointType>
-bool BaseSocket<EndpointType>::is_valid() const
-{
-    return m_socket_handle != fly::net::detail::invalid_socket();
 }
 
 //==================================================================================================
@@ -140,7 +140,7 @@ std::optional<EndpointType> BaseSocket<EndpointType>::local_endpoint() const
 template <typename EndpointType>
 void BaseSocket<EndpointType>::close()
 {
-    if (is_valid())
+    if (is_open())
     {
         if (auto service = socket_service(); service)
         {
