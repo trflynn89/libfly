@@ -1,7 +1,5 @@
 #pragma once
 
-#include "fly/fly.hpp"
-
 #include <atomic>
 #include <cstdint>
 #include <memory>
@@ -22,26 +20,20 @@ class SystemMonitor : public std::enable_shared_from_this<SystemMonitor>
 {
 public:
     /**
-     * Constructor.
+     * Create and start a system monitor.
      *
      * @param task_runner Task runner for posting monitor-related tasks onto.
-     * @param config Reference to system configuration.
+     * @param config Reference to system system monitor
+     *
+     * @return The created system monitor.
      */
-    SystemMonitor(
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
-        const std::shared_ptr<SystemConfig> &config) noexcept;
+    static std::shared_ptr<SystemMonitor>
+    create(std::shared_ptr<SequencedTaskRunner> task_runner, std::shared_ptr<SystemConfig> config);
 
     /**
      * Destructor.
      */
     virtual ~SystemMonitor() = default;
-
-    /**
-     * Queue a task to poll system-level resources.
-     *
-     * @return True if the system monitor is in a valid state.
-     */
-    bool start();
 
     /**
      * Get the system's CPU count.
@@ -87,6 +79,16 @@ public:
 
 protected:
     /**
+     * Constructor.
+     *
+     * @param task_runner Task runner for posting monitor-related tasks onto.
+     * @param config Reference to system configuration.
+     */
+    SystemMonitor(
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<SystemConfig> config) noexcept;
+
+    /**
      * Update the system's current CPU count.
      */
     virtual void update_system_cpu_count() = 0;
@@ -121,6 +123,13 @@ protected:
 
 private:
     /**
+     * Queue a task to poll system-level resources.
+     *
+     * @return True if the system monitor is in a valid state.
+     */
+    bool start();
+
+    /**
      * Check if the system CPU count was successfully set.
      *
      * @return True if the CPU count is valid.
@@ -140,5 +149,3 @@ private:
 };
 
 } // namespace fly
-
-#include FLY_OS_IMPL_PATH(system, system_monitor)

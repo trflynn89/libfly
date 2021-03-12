@@ -20,9 +20,9 @@ namespace {
 
 //==================================================================================================
 SystemMonitorImpl::SystemMonitorImpl(
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<SystemConfig> &config) noexcept :
-    SystemMonitor(task_runner, config)
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<SystemConfig> config) noexcept :
+    SystemMonitor(std::move(task_runner), std::move(config))
 {
 }
 

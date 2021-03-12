@@ -1,17 +1,30 @@
 #include "fly/system/system_monitor.hpp"
 
+#include "fly/fly.hpp"
 #include "fly/system/system_config.hpp"
 #include "fly/task/task_runner.hpp"
 
 #include <chrono>
 #include <thread>
 
+#include FLY_OS_IMPL_PATH(system, system_monitor)
+
 namespace fly {
 
 //==================================================================================================
+std::shared_ptr<SystemMonitor> SystemMonitor::create(
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<SystemConfig> config)
+{
+    auto system_monitor =
+        std::make_shared<SystemMonitorImpl>(std::move(task_runner), std::move(config));
+    return system_monitor->start() ? system_monitor : nullptr;
+}
+
+//==================================================================================================
 SystemMonitor::SystemMonitor(
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<SystemConfig> &config) noexcept :
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<SystemConfig> config) noexcept :
     m_task_runner(task_runner),
     m_config(config)
 {

@@ -24,8 +24,8 @@ public:
      * Constructor.
      */
     SystemMonitorImpl(
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
-        const std::shared_ptr<SystemConfig> &config) noexcept;
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<SystemConfig> config) noexcept;
 
 protected:
     void update_system_cpu_count() override;
