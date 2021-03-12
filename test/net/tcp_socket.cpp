@@ -393,9 +393,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Sockets may connect asynchronously")
     {
-        fly::test::Signal server_signal;
-
-        auto server_thread = [&signal, &server_signal]()
+        auto server_thread = [&signal]()
         {
             auto listen_socket =
                 fly::test::create_socket<ListenSocket>(fly::net::IOMode::Synchronous);
@@ -407,12 +405,9 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
 
             auto connected_socket = listen_socket->accept();
             CATCH_REQUIRE(connected_socket);
-
-            // Don't let the server exit until the client has verified connectivity.
-            server_signal.wait();
         };
 
-        auto client_thread = [&socket_service, &signal, &server_signal]()
+        auto client_thread = [&socket_service, &signal]()
         {
             fly::test::Signal client_signal;
 
@@ -423,19 +418,17 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             fly::net::ConnectedState state = client_socket->connect_async(
                 s_localhost,
                 s_port,
-                [&client_signal, &state](fly::net::ConnectedState new_state)
+                [&client_signal](fly::net::ConnectedState new_state)
                 {
-                    state = new_state;
+                    CATCH_CHECK(new_state == fly::net::ConnectedState::Connected);
                     client_signal.notify();
                 });
 
+            CATCH_CHECK(state != fly::net::ConnectedState::Disconnected);
             if (state == fly::net::ConnectedState::Connecting)
             {
                 client_signal.wait();
             }
-
-            CATCH_CHECK(state == fly::net::ConnectedState::Connected);
-            server_signal.notify();
         };
 
         fly::test::invoke(std::move(server_thread), std::move(client_thread));
@@ -476,18 +469,17 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             fly::net::ConnectedState state = client_socket->connect_async(
                 s_localhost,
                 s_port,
-                [&client_signal, &state](fly::net::ConnectedState new_state)
+                [&client_signal](fly::net::ConnectedState new_state)
                 {
-                    state = new_state;
+                    CATCH_CHECK(new_state == fly::net::ConnectedState::Connected);
                     client_signal.notify();
                 });
 
+            CATCH_CHECK(state != fly::net::ConnectedState::Disconnected);
             if (state == fly::net::ConnectedState::Connecting)
             {
                 client_signal.wait();
             }
-
-            CATCH_CHECK(state == fly::net::ConnectedState::Connected);
 
             CATCH_CHECK(client_socket->send_async(
                 message,
@@ -675,18 +667,17 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             fly::net::ConnectedState state = client_socket->connect_async(
                 s_localhost,
                 s_port,
-                [&client_signal, &state](fly::net::ConnectedState new_state)
+                [&client_signal](fly::net::ConnectedState new_state)
                 {
-                    state = new_state;
+                    CATCH_CHECK(new_state == fly::net::ConnectedState::Connected);
                     client_signal.notify();
                 });
 
+            CATCH_CHECK(state != fly::net::ConnectedState::Disconnected);
             if (state == fly::net::ConnectedState::Connecting)
             {
                 client_signal.wait();
             }
-
-            CATCH_CHECK(state == fly::net::ConnectedState::Connected);
 
             CATCH_CHECK(client_socket->send_async(
                 message,
