@@ -25,9 +25,9 @@ namespace {
 
 //==================================================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<PathConfig> &config) noexcept :
-    PathMonitor(task_runner, config)
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<PathConfig> config) noexcept :
+    PathMonitor(std::move(task_runner), std::move(config))
 {
 }
 
@@ -38,7 +38,7 @@ bool PathMonitorImpl::is_valid() const
 }
 
 //==================================================================================================
-void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout)
+void PathMonitorImpl::poll(std::chrono::milliseconds timeout)
 {
     // Hold onto the paths to be removed until the mutex is released.
     std::vector<std::filesystem::path> paths_to_remove;
@@ -74,14 +74,7 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout)
 std::unique_ptr<PathMonitor::PathInfo>
 PathMonitorImpl::create_path_info(const std::filesystem::path &path) const
 {
-    std::unique_ptr<PathMonitor::PathInfo> info;
-
-    if (is_valid())
-    {
-        info = std::make_unique<PathInfoImpl>(path);
-    }
-
-    return info;
+    return std::make_unique<PathInfoImpl>(path);
 }
 
 //==================================================================================================
@@ -116,10 +109,10 @@ void PathMonitorImpl::handle_events(const PathInfoImpl *info, const std::filesys
 
             if (callback != nullptr)
             {
-                auto full = path / file;
+                auto full_path = path / file;
 
-                LOGI("Handling event {} for {}", path_event, full);
-                callback(full, path_event);
+                LOGI("Handling event {} for {}", path_event, full_path);
+                std::invoke(std::move(callback), std::move(full_path), path_event);
             }
         }
 

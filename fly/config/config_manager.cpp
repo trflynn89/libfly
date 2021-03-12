@@ -43,7 +43,7 @@ ConfigManager::ConfigManager(
     m_task_runner(std::move(task_runner)),
     m_path(std::move(path))
 {
-    m_monitor = std::make_shared<PathMonitorImpl>(m_task_runner, create_config<PathConfig>());
+    m_monitor = PathMonitor::create(m_task_runner, create_config<PathConfig>());
 
     switch (file_type)
     {

@@ -28,8 +28,8 @@ public:
      * Constructor.
      */
     PathMonitorImpl(
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
-        const std::shared_ptr<PathConfig> &config) noexcept;
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<PathConfig> config) noexcept;
 
 protected:
     /**
@@ -42,7 +42,7 @@ protected:
      *
      * @param timeout Max time allowed to wait for a completion to be posted.
      */
-    void poll(const std::chrono::milliseconds &timeout) override;
+    void poll(std::chrono::milliseconds timeout) override;
 
     std::unique_ptr<PathMonitor::PathInfo>
     create_path_info(const std::filesystem::path &path) const override;

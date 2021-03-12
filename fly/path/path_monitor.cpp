@@ -1,19 +1,32 @@
 #include "fly/path/path_monitor.hpp"
 
+#include "fly/fly.hpp"
 #include "fly/logger/logger.hpp"
 #include "fly/path/path_config.hpp"
 #include "fly/task/task_runner.hpp"
 
 #include <system_error>
 
+#include FLY_OS_IMPL_PATH(path, path_monitor)
+
 namespace fly {
 
 //==================================================================================================
+std::shared_ptr<PathMonitor> PathMonitor::create(
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<PathConfig> config)
+{
+    auto path_monitor =
+        std::make_shared<PathMonitorImpl>(std::move(task_runner), std::move(config));
+    return path_monitor->start() ? path_monitor : nullptr;
+}
+
+//==================================================================================================
 PathMonitor::PathMonitor(
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<PathConfig> &config) noexcept :
-    m_task_runner(task_runner),
-    m_config(config)
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<PathConfig> config) noexcept :
+    m_task_runner(std::move(task_runner)),
+    m_config(std::move(config))
 {
 }
 
@@ -45,9 +58,8 @@ bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback 
     else
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        PathInfo *info = get_or_create_path_info(path);
 
-        if (info != nullptr)
+        if (PathInfo *info = get_or_create_path_info(path); info != nullptr)
         {
             LOGD("Monitoring all files in {}", path);
             info->m_path_handler = callback;
@@ -63,18 +75,17 @@ bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback 
 bool PathMonitor::remove_path(const std::filesystem::path &path)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_path_info.find(path);
 
-    if (it == m_path_info.end())
+    if (auto it = m_path_info.find(path); it != m_path_info.end())
     {
-        LOGW("Wasn't monitoring {}", path);
-        return false;
+        LOGI("Removed monitor for {}", path);
+        m_path_info.erase(it);
+
+        return true;
     }
 
-    LOGI("Removed monitor for {}", path);
-    m_path_info.erase(it);
-
-    return true;
+    LOGW("Wasn't monitoring {}", path);
+    return false;
 }
 
 //==================================================================================================
@@ -104,9 +115,8 @@ bool PathMonitor::add_file(const std::filesystem::path &file, PathEventCallback 
     else
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        PathInfo *info = get_or_create_path_info(file.parent_path());
 
-        if (info != nullptr)
+        if (PathInfo *info = get_or_create_path_info(file.parent_path()); info != nullptr)
         {
             LOGD("Monitoring file {}", file);
             info->m_file_handlers[file.filename()] = callback;
@@ -155,9 +165,11 @@ PathMonitor::PathInfo *PathMonitor::get_or_create_path_info(const std::filesyste
 {
     PathInfo *info = nullptr;
 
-    auto it = m_path_info.find(path);
-
-    if (it == m_path_info.end())
+    if (auto it = m_path_info.find(path); it != m_path_info.end())
+    {
+        info = it->second.get();
+    }
+    else
     {
         std::unique_ptr<PathInfo> created_info = create_path_info(path);
 
@@ -166,10 +178,6 @@ PathMonitor::PathInfo *PathMonitor::get_or_create_path_info(const std::filesyste
             info = created_info.get();
             m_path_info[path] = std::move(created_info);
         }
-    }
-    else
-    {
-        info = it->second.get();
     }
 
     return info;

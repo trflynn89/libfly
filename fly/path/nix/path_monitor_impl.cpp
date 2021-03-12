@@ -22,9 +22,9 @@ namespace {
 
 //==================================================================================================
 PathMonitorImpl::PathMonitorImpl(
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<PathConfig> &config) noexcept :
-    PathMonitor(task_runner, config),
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<PathConfig> config) noexcept :
+    PathMonitor(std::move(task_runner), std::move(config)),
     m_monitor_descriptor(::inotify_init1(s_init_flags))
 {
     if (m_monitor_descriptor == -1)
@@ -50,7 +50,7 @@ bool PathMonitorImpl::is_valid() const
 }
 
 //==================================================================================================
-void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout)
+void PathMonitorImpl::poll(std::chrono::milliseconds timeout)
 {
     pollfd poll_fd;
 
@@ -77,14 +77,7 @@ void PathMonitorImpl::poll(const std::chrono::milliseconds &timeout)
 std::unique_ptr<PathMonitor::PathInfo>
 PathMonitorImpl::create_path_info(const std::filesystem::path &path) const
 {
-    std::unique_ptr<PathMonitor::PathInfo> info;
-
-    if (is_valid())
-    {
-        info = std::make_unique<PathInfoImpl>(m_monitor_descriptor, path);
-    }
-
-    return info;
+    return std::make_unique<PathInfoImpl>(m_monitor_descriptor, path);
 }
 
 //==================================================================================================
@@ -157,7 +150,7 @@ void PathMonitorImpl::handle_event(const inotify_event *event) const
                 auto path = std::filesystem::path(path_it->first) / file;
 
                 LOGI("Handling event {} for {}", path_event, path);
-                callback(path, path_event);
+                std::invoke(std::move(callback), std::move(path), path_event);
             }
         }
     }
