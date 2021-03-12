@@ -44,10 +44,8 @@ public:
 CATCH_TEST_CASE("SystemMonitor", "[system]")
 {
     auto task_runner = fly::test::WaitableSequencedTaskRunner::create(fly::test::task_manager());
-
-    auto monitor =
-        std::make_shared<fly::SystemMonitorImpl>(task_runner, std::make_shared<TestSystemConfig>());
-    CATCH_REQUIRE(monitor->start());
+    auto monitor = fly::SystemMonitor::create(task_runner, std::make_shared<TestSystemConfig>());
+    CATCH_REQUIRE(monitor);
 
     // Wait for one poll to complete before proceeding.
     task_runner->wait_for_task_to_complete(s_system_monitor_file);
@@ -89,21 +87,15 @@ CATCH_TEST_CASE("SystemMonitor", "[system]")
     {
         fly::test::MockSystem mock(fly::test::MockCall::Read);
 
-        monitor = std::make_shared<fly::SystemMonitorImpl>(
-            task_runner,
-            std::make_shared<fly::SystemConfig>());
-
-        CATCH_CHECK_FALSE(monitor->start());
-        CATCH_CHECK(monitor->get_system_cpu_count() == 0);
+        monitor = fly::SystemMonitor::create(task_runner, std::make_shared<fly::SystemConfig>());
+        CATCH_CHECK_FALSE(monitor);
     }
 
     CATCH_SECTION("Cannot update system CPU when ::read() fails")
     {
-        monitor = std::make_shared<fly::SystemMonitorImpl>(
-            task_runner,
-            std::make_shared<fly::SystemConfig>());
+        monitor = fly::SystemMonitor::create(task_runner, std::make_shared<fly::SystemConfig>());
+        CATCH_REQUIRE(monitor);
 
-        CATCH_CHECK(monitor->start());
         task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         fly::test::MockSystem mock(fly::test::MockCall::Read);
@@ -124,11 +116,9 @@ CATCH_TEST_CASE("SystemMonitor", "[system]")
 
     CATCH_SECTION("Cannot update process CPU when ::times() fails")
     {
-        monitor = std::make_shared<fly::SystemMonitorImpl>(
-            task_runner,
-            std::make_shared<fly::SystemConfig>());
+        monitor = fly::SystemMonitor::create(task_runner, std::make_shared<fly::SystemConfig>());
+        CATCH_REQUIRE(monitor);
 
-        CATCH_CHECK(monitor->start());
         task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         fly::test::MockSystem mock(fly::test::MockCall::Times);

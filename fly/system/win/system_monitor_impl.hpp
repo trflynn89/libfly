@@ -24,8 +24,8 @@ public:
      * Constructor. Open the system monitor's CPU query.
      */
     SystemMonitorImpl(
-        const std::shared_ptr<SequencedTaskRunner> &task_runner,
-        const std::shared_ptr<SystemConfig> &config) noexcept;
+        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<SystemConfig> config) noexcept;
 
     /**
      * Destructor. Close the system monitor's CPU query.
