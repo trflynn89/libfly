@@ -14,12 +14,12 @@ namespace fly::detail {
 
 //==================================================================================================
 FileSink::FileSink(
-    const std::shared_ptr<fly::LoggerConfig> &logger_config,
-    const std::shared_ptr<fly::CoderConfig> &coder_config,
-    const std::filesystem::path &logger_directory) :
-    m_logger_config(logger_config),
-    m_coder_config(coder_config),
-    m_log_directory(logger_directory)
+    std::shared_ptr<fly::LoggerConfig> logger_config,
+    std::shared_ptr<fly::CoderConfig> coder_config,
+    std::filesystem::path logger_directory) :
+    m_logger_config(std::move(logger_config)),
+    m_coder_config(std::move(coder_config)),
+    m_log_directory(std::move(logger_directory))
 {
 }
 

@@ -13,14 +13,14 @@ namespace fly {
 
 //==================================================================================================
 Logger::Logger(
-    const std::string &name,
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<LoggerConfig> &config,
+    std::string name,
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<LoggerConfig> config,
     std::unique_ptr<LogSink> &&sink) noexcept :
-    m_name(name),
-    m_config(config),
+    m_name(std::move(name)),
+    m_config(std::move(config)),
     m_sink(std::move(sink)),
-    m_task_runner(task_runner),
+    m_task_runner(std::move(task_runner)),
     m_start_time(std::chrono::steady_clock::now())
 {
 }
@@ -33,22 +33,43 @@ Logger::~Logger()
 
 //==================================================================================================
 std::shared_ptr<Logger> Logger::create_logger(
-    const std::string &name,
-    const std::shared_ptr<LoggerConfig> &logger_config,
+    std::string name,
+    std::shared_ptr<LoggerConfig> logger_config,
     std::unique_ptr<LogSink> &&sink)
 {
-    return create_logger(name, nullptr, logger_config, std::move(sink));
+    return create_logger(std::move(name), nullptr, std::move(logger_config), std::move(sink));
 }
 
 //==================================================================================================
 std::shared_ptr<Logger> Logger::create_logger(
-    const std::string &name,
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<LoggerConfig> &logger_config,
+    std::string name,
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<LoggerConfig> logger_config,
     std::unique_ptr<LogSink> &&sink)
 {
-    auto logger =
-        std::shared_ptr<Logger>(new Logger(name, task_runner, logger_config, std::move(sink)));
+    // Logger has a private constructor, thus cannot be used with std::make_shared. This class is
+    // used to expose the private constructor locally.
+    struct LoggerImpl final : public Logger
+    {
+        LoggerImpl(
+            std::string &&name,
+            std::shared_ptr<SequencedTaskRunner> &&task_runner,
+            std::shared_ptr<LoggerConfig> &&logger_config,
+            std::unique_ptr<LogSink> &&sink) noexcept :
+            Logger(
+                std::move(name),
+                std::move(task_runner),
+                std::move(logger_config),
+                std::move(sink))
+        {
+        }
+    };
+
+    auto logger = std::make_shared<LoggerImpl>(
+        std::move(name),
+        std::move(task_runner),
+        std::move(logger_config),
+        std::move(sink));
 
     if (detail::Registry::instance().register_logger(logger) && logger->initialize())
     {
@@ -60,48 +81,65 @@ std::shared_ptr<Logger> Logger::create_logger(
 
 //==================================================================================================
 std::shared_ptr<Logger> Logger::create_file_logger(
-    const std::string &name,
-    const std::shared_ptr<LoggerConfig> &logger_config,
-    const std::shared_ptr<CoderConfig> &coder_config,
-    const std::filesystem::path &logger_directory)
+    std::string name,
+    std::shared_ptr<LoggerConfig> logger_config,
+    std::shared_ptr<CoderConfig> coder_config,
+    std::filesystem::path logger_directory)
 {
-    return create_file_logger(name, nullptr, logger_config, coder_config, logger_directory);
+    return create_file_logger(
+        std::move(name),
+        nullptr,
+        std::move(logger_config),
+        std::move(coder_config),
+        std::move(logger_directory));
 }
 
 //==================================================================================================
 std::shared_ptr<Logger> Logger::create_file_logger(
-    const std::string &name,
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<LoggerConfig> &logger_config,
-    const std::shared_ptr<CoderConfig> &coder_config,
-    const std::filesystem::path &logger_directory)
+    std::string name,
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<LoggerConfig> logger_config,
+    std::shared_ptr<CoderConfig> coder_config,
+    std::filesystem::path logger_directory)
 {
-    auto sink = std::make_unique<detail::FileSink>(logger_config, coder_config, logger_directory);
-    return create_logger(name, task_runner, logger_config, std::move(sink));
+    auto sink = std::make_unique<detail::FileSink>(
+        logger_config,
+        std::move(coder_config),
+        std::move(logger_directory));
+
+    return create_logger(
+        std::move(name),
+        std::move(task_runner),
+        std::move(logger_config),
+        std::move(sink));
+}
+
+//==================================================================================================
+std::shared_ptr<Logger>
+Logger::create_console_logger(std::string name, std::shared_ptr<LoggerConfig> logger_config)
+{
+    return create_console_logger(std::move(name), nullptr, logger_config);
 }
 
 //==================================================================================================
 std::shared_ptr<Logger> Logger::create_console_logger(
-    const std::string &name,
-    const std::shared_ptr<LoggerConfig> &logger_config)
-{
-    return create_console_logger(name, nullptr, logger_config);
-}
-
-//==================================================================================================
-std::shared_ptr<Logger> Logger::create_console_logger(
-    const std::string &name,
-    const std::shared_ptr<SequencedTaskRunner> &task_runner,
-    const std::shared_ptr<LoggerConfig> &logger_config)
+    std::string name,
+    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<LoggerConfig> logger_config)
 {
     auto sink = std::make_unique<detail::ConsoleSink>();
-    return create_logger(name, task_runner, logger_config, std::move(sink));
+
+    return create_logger(
+        std::move(name),
+        std::move(task_runner),
+        std::move(logger_config),
+        std::move(sink));
 }
 
 //==================================================================================================
-void Logger::set_default_logger(const std::shared_ptr<Logger> &default_logger)
+void Logger::set_default_logger(std::shared_ptr<Logger> default_logger)
 {
-    detail::Registry::instance().set_default_logger(default_logger);
+    detail::Registry::instance().set_default_logger(std::move(default_logger));
 }
 
 //==================================================================================================
