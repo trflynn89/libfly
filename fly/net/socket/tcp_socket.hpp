@@ -11,10 +11,11 @@
 
 namespace fly::net {
 
+class NetworkConfig;
+class SocketService;
+
 template <typename EndpointType>
 class ListenSocket;
-
-class SocketService;
 
 /**
  * Class to represent a connection-oriented streaming network socket.
@@ -36,15 +37,18 @@ class TcpSocket :
 public:
     /**
      * Constructor. Open the socket in a synchronous IO processing mode.
+     *
+     * @param config Reference to network configuration.
      */
-    TcpSocket() noexcept;
+    explicit TcpSocket(std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**
      * Constructor. Open the socket in the provided IO processing mode.
      *
+     * @param config Reference to network configuration.
      * @param mode IO processing mode to apply to the socket.
      */
-    explicit TcpSocket(fly::net::IOMode mode) noexcept;
+    TcpSocket(std::shared_ptr<NetworkConfig> config, fly::net::IOMode mode) noexcept;
 
     /**
      * Move constructor. The provided socket is left in a disconnected, invalid state.
@@ -208,51 +212,66 @@ private:
     /**
      * Create an asynchronous socket armed with a socket service for performing IO operations.
      *
-     * @param socket_service The socket service for performing IO operations.
+     * @param service The socket service for performing IO operations.
+     * @param config Reference to network configuration.
      *
      * @return The created socket.
      */
-    static std::shared_ptr<TcpSocket>
-    create_socket(const std::shared_ptr<SocketService> &socket_service);
+    static std::shared_ptr<TcpSocket> create_socket(
+        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<NetworkConfig> config);
 
     /**
      * Create an asynchronous socket with an already-opened socket handle armed with a socket
      * service for performing IO operations.
      *
+     * @param service The socket service for performing IO operations.
+     * @param config Reference to network configuration.
      * @param handle Native socket handle opened by the calling listening socket.
-     * @param socket_service The socket service for performing IO operations.
      *
      * @return The created socket.
      */
-    static std::shared_ptr<TcpSocket> create_accepted_socket(
-        socket_type handle,
-        const std::shared_ptr<SocketService> &socket_service);
+    static std::shared_ptr<TcpSocket> create_socket(
+        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<NetworkConfig> config,
+        socket_type handle);
 
     /**
      * Constructor. Open the socket in an asynchronous IO processing mode armed with the provided
      * socket service for performing IO operations.
      *
-     * @param socket_service The socket service for performing IO operations.
+     * @param service The socket service for performing IO operations.
+     * @param config Reference to network configuration.
      */
-    explicit TcpSocket(const std::shared_ptr<SocketService> &socket_service) noexcept;
+    TcpSocket(
+        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**
      * Constructor. Create a socket with an already-opened socket handle and the provided IO
      * processing mode.
      *
+     * @param config Reference to network configuration.
      * @param handle Native socket handle opened by the calling listening socket.
      * @param mode IO processing mode to apply to the socket.
      */
-    TcpSocket(socket_type handle, fly::net::IOMode mode) noexcept;
+    TcpSocket(
+        std::shared_ptr<NetworkConfig> config,
+        socket_type handle,
+        fly::net::IOMode mode) noexcept;
 
     /**
      * Constructor. Create an asynchronous socket with an already-opened socket handle armed with a
      * socket service for performing IO operations.
      *
+     * @param service The socket service for performing IO operations.
+     * @param config Reference to network configuration.
      * @param handle Native socket handle opened by the calling listening socket.
-     * @param socket_service The socket service for performing IO operations.
      */
-    TcpSocket(socket_type handle, const std::shared_ptr<SocketService> &socket_service) noexcept;
+    TcpSocket(
+        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<NetworkConfig> config,
+        socket_type handle) noexcept;
 
     TcpSocket(const TcpSocket &) = delete;
     TcpSocket &operator=(const TcpSocket &) = delete;
@@ -287,7 +306,7 @@ private:
      */
     void ready_to_receive(ReceiveCompletion &&callback, std::string received);
 
-    using BaseSocket::m_packet_size;
+    using BaseSocket::packet_size;
     using BaseSocket::socket_service;
 
     std::atomic<ConnectedState> m_connected_state {ConnectedState::Disconnected};

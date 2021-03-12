@@ -3,6 +3,7 @@
 #include "fly/net/endpoint.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/net/network_config.hpp"
 #include "fly/net/socket/detail/socket_operations.hpp"
 #include "fly/net/socket/socket_service.hpp"
 
@@ -10,28 +11,42 @@ namespace fly::net {
 
 //==================================================================================================
 template <typename EndpointType>
-TcpSocket<EndpointType>::TcpSocket() noexcept : TcpSocket(fly::net::IOMode::Synchronous)
+TcpSocket<EndpointType>::TcpSocket(std::shared_ptr<NetworkConfig> config) noexcept :
+    TcpSocket(std::move(config), fly::net::IOMode::Synchronous)
 {
 }
 
 //==================================================================================================
 template <typename EndpointType>
-TcpSocket<EndpointType>::TcpSocket(fly::net::IOMode mode) noexcept :
-    BaseSocket(fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>(), mode)
+TcpSocket<EndpointType>::TcpSocket(
+    std::shared_ptr<NetworkConfig> config,
+    fly::net::IOMode mode) noexcept :
+    BaseSocket(
+        std::move(config),
+        fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>(),
+        mode)
 {
 }
 
 //==================================================================================================
 template <typename EndpointType>
-TcpSocket<EndpointType>::TcpSocket(const std::shared_ptr<SocketService> &service) noexcept :
-    BaseSocket(fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>(), service)
+TcpSocket<EndpointType>::TcpSocket(
+    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<NetworkConfig> config) noexcept :
+    BaseSocket(
+        service,
+        std::move(config),
+        fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>())
 {
 }
 
 //==================================================================================================
 template <typename EndpointType>
-TcpSocket<EndpointType>::TcpSocket(socket_type socket_handle, fly::net::IOMode mode) noexcept :
-    BaseSocket(socket_handle, mode),
+TcpSocket<EndpointType>::TcpSocket(
+    std::shared_ptr<NetworkConfig> config,
+    socket_type socket_handle,
+    fly::net::IOMode mode) noexcept :
+    BaseSocket(std::move(config), socket_handle, mode),
     m_connected_state(ConnectedState::Connected)
 {
 }
@@ -39,9 +54,10 @@ TcpSocket<EndpointType>::TcpSocket(socket_type socket_handle, fly::net::IOMode m
 //==================================================================================================
 template <typename EndpointType>
 TcpSocket<EndpointType>::TcpSocket(
-    socket_type socket_handle,
-    const std::shared_ptr<SocketService> &service) noexcept :
-    BaseSocket(socket_handle, service),
+    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<NetworkConfig> config,
+    socket_type socket_handle) noexcept :
+    BaseSocket(service, std::move(config), socket_handle),
     m_connected_state(ConnectedState::Connected)
 {
 }
@@ -56,41 +72,46 @@ TcpSocket<EndpointType>::TcpSocket(TcpSocket &&socket) noexcept :
 
 //==================================================================================================
 template <typename EndpointType>
-auto TcpSocket<EndpointType>::create_socket(const std::shared_ptr<SocketService> &service)
-    -> std::shared_ptr<TcpSocket>
+auto TcpSocket<EndpointType>::create_socket(
+    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<NetworkConfig> config) -> std::shared_ptr<TcpSocket>
 {
     // TcpSocket's constructor for socket-service-based sockets is private, thus cannot be used with
     // std::make_shared. This class is used to expose the private constructor locally.
     struct TcpSocketImpl final : public TcpSocket
     {
-        explicit TcpSocketImpl(const std::shared_ptr<SocketService> &service) noexcept :
-            TcpSocket(service)
+        TcpSocketImpl(
+            const std::shared_ptr<SocketService> &service,
+            std::shared_ptr<NetworkConfig> config) noexcept :
+            TcpSocket(service, std::move(config))
         {
         }
     };
 
-    return std::make_shared<TcpSocketImpl>(service);
+    return std::make_shared<TcpSocketImpl>(service, std::move(config));
 }
 
 //==================================================================================================
 template <typename EndpointType>
-auto TcpSocket<EndpointType>::create_accepted_socket(
-    socket_type socket_handle,
-    const std::shared_ptr<SocketService> &service) -> std::shared_ptr<TcpSocket>
+auto TcpSocket<EndpointType>::create_socket(
+    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<NetworkConfig> config,
+    socket_type socket_handle) -> std::shared_ptr<TcpSocket>
 {
     // TcpSocket's constructors for accepted sockets are private, thus cannot be used with
     // std::make_shared. This class is used to expose the private constructors locally.
     struct TcpSocketImpl final : public TcpSocket
     {
         TcpSocketImpl(
-            socket_type socket_handle,
-            const std::shared_ptr<SocketService> &service) noexcept :
-            TcpSocket(socket_handle, service)
+            const std::shared_ptr<SocketService> &service,
+            std::shared_ptr<NetworkConfig> config,
+            socket_type socket_handle) noexcept :
+            TcpSocket(service, std::move(config), socket_handle)
         {
         }
     };
 
-    return std::make_shared<TcpSocketImpl>(socket_handle, service);
+    return std::make_shared<TcpSocketImpl>(service, std::move(config), socket_handle);
 }
 
 //==================================================================================================
@@ -268,7 +289,7 @@ template <typename EndpointType>
 std::string TcpSocket<EndpointType>::receive()
 {
     bool would_block = false;
-    const std::string received = fly::net::detail::recv(handle(), m_packet_size, would_block);
+    const std::string received = fly::net::detail::recv(handle(), packet_size(), would_block);
 
     if (received.size() == 0)
     {
@@ -349,7 +370,7 @@ void TcpSocket<EndpointType>::ready_to_receive(ReceiveCompletion &&callback, std
     bool would_block = false;
 
     const std::string current_received =
-        fly::net::detail::recv(handle(), m_packet_size, would_block);
+        fly::net::detail::recv(handle(), packet_size(), would_block);
     received += current_received;
 
     if (!current_received.empty())

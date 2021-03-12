@@ -3,6 +3,7 @@
 #include "fly/net/endpoint.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/net/network_config.hpp"
 #include "fly/net/socket/detail/socket_operations.hpp"
 #include "fly/net/socket/socket_service.hpp"
 #include "fly/net/socket/tcp_socket.hpp"
@@ -11,21 +12,32 @@ namespace fly::net {
 
 //==================================================================================================
 template <typename EndpointType>
-ListenSocket<EndpointType>::ListenSocket() noexcept : ListenSocket(fly::net::IOMode::Synchronous)
+ListenSocket<EndpointType>::ListenSocket(std::shared_ptr<NetworkConfig> config) noexcept :
+    ListenSocket(std::move(config), fly::net::IOMode::Synchronous)
 {
 }
 
 //==================================================================================================
 template <typename EndpointType>
-ListenSocket<EndpointType>::ListenSocket(fly::net::IOMode mode) noexcept :
-    BaseSocket(fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>(), mode)
+ListenSocket<EndpointType>::ListenSocket(
+    std::shared_ptr<NetworkConfig> config,
+    fly::net::IOMode mode) noexcept :
+    BaseSocket(
+        std::move(config),
+        fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>(),
+        mode)
 {
 }
 
 //==================================================================================================
 template <typename EndpointType>
-ListenSocket<EndpointType>::ListenSocket(const std::shared_ptr<SocketService> &service) noexcept :
-    BaseSocket(fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>(), service)
+ListenSocket<EndpointType>::ListenSocket(
+    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<NetworkConfig> config) noexcept :
+    BaseSocket(
+        service,
+        std::move(config),
+        fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>())
 {
 }
 
@@ -40,20 +52,23 @@ ListenSocket<EndpointType>::ListenSocket(ListenSocket &&socket) noexcept :
 
 //==================================================================================================
 template <typename EndpointType>
-auto ListenSocket<EndpointType>::create_socket(const std::shared_ptr<SocketService> &service)
-    -> std::shared_ptr<ListenSocket>
+auto ListenSocket<EndpointType>::create_socket(
+    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<NetworkConfig> config) -> std::shared_ptr<ListenSocket>
 {
     // ListenSocket's constructor for socket-service-based sockets is private, thus cannot be used
     // with std::make_shared. This class is used to expose the private constructor locally.
     struct ListenSocketImpl final : public ListenSocket
     {
-        explicit ListenSocketImpl(const std::shared_ptr<SocketService> &service) noexcept :
-            ListenSocket(service)
+        ListenSocketImpl(
+            const std::shared_ptr<SocketService> &service,
+            std::shared_ptr<NetworkConfig> config) noexcept :
+            ListenSocket(service, std::move(config))
         {
         }
     };
 
-    return std::make_shared<ListenSocketImpl>(service);
+    return std::make_shared<ListenSocketImpl>(service, std::move(config));
 }
 
 //==================================================================================================
@@ -91,7 +106,7 @@ std::optional<TcpSocket<EndpointType>> ListenSocket<EndpointType>::accept()
     if (auto client = fly::net::detail::accept(handle(), client_endpoint, would_block); client)
     {
         SLOGD(handle(), "Accepted new socket {}", client_endpoint);
-        return TcpSocket<EndpointType>(*client, io_mode());
+        return TcpSocket<EndpointType>(network_config(), *client, io_mode());
     }
 
     SLOGW(handle(), "Could not accept new socket, closing");
@@ -130,7 +145,8 @@ void ListenSocket<EndpointType>::ready_to_accept(AcceptCompletion &&callback)
     {
         SLOGD(handle(), "Accepted new socket {}", client_endpoint);
 
-        auto socket = TcpSocket<EndpointType>::create_accepted_socket(*client, socket_service());
+        auto socket =
+            TcpSocket<EndpointType>::create_socket(socket_service(), network_config(), *client);
         std::invoke(std::move(callback), std::move(socket));
     }
     else if (would_block)

@@ -7,6 +7,7 @@
 #include "fly/net/endpoint.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/net/network_config.hpp"
 #include "fly/net/socket/udp_socket.hpp"
 #include "fly/task/task_manager.hpp"
 #include "fly/task/task_runner.hpp"
@@ -16,6 +17,7 @@
 #include "catch2/catch_test_macros.hpp"
 
 #include <chrono>
+#include <memory>
 #include <thread>
 
 #if defined(FLY_LINUX)
@@ -36,7 +38,9 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
     using UdpSocket = fly::net::UdpSocket<EndpointType>;
 
     auto task_runner = fly::SequencedTaskRunner::create(fly::test::task_manager());
-    auto socket_service = fly::net::SocketService::create(task_runner);
+    auto socket_service =
+        fly::net::SocketService::create(task_runner, std::make_shared<fly::net::NetworkConfig>());
+
     fly::test::Signal signal;
 
     auto notify = [&signal](auto)
