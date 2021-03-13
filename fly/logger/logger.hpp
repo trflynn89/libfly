@@ -109,12 +109,72 @@ class SequencedTaskRunner;
 
 namespace fly::logger {
 
+class Logger;
 class LoggerConfig;
 class Sink;
 
 namespace detail {
     class Registry;
 } // namespace detail
+
+/**
+ * Create a synchronous file logger.
+ *
+ * @param name Name of the logger to create.
+ * @param logger_config Reference to the logger configuration.
+ * @param coder_config Reference to the coder configuration.
+ * @param logger_directory Path to store log files.
+ *
+ * @return The created logger, or null if the logger could not be initialized.
+ */
+std::shared_ptr<Logger> create_file_logger(
+    std::string name,
+    std::shared_ptr<LoggerConfig> logger_config,
+    std::shared_ptr<fly::coders::CoderConfig> coder_config,
+    std::filesystem::path logger_directory);
+
+/**
+ * Create an asynchronous file logger.
+ *
+ * @param name Name of the logger to create.
+ * @param task_runner The sequence on which logs are streamed.
+ * @param logger_config Reference to the logger configuration.
+ * @param coder_config Reference to the coder configuration.
+ * @param logger_directory Path to store log files.
+ *
+ * @return The created logger, or null if the logger could not be initialized.
+ */
+std::shared_ptr<Logger> create_file_logger(
+    std::string name,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
+    std::shared_ptr<LoggerConfig> logger_config,
+    std::shared_ptr<fly::coders::CoderConfig> coder_config,
+    std::filesystem::path logger_directory);
+
+/**
+ * Create a synchronous console logger.
+ *
+ * @param name Name of the logger to create.
+ * @param logger_config Reference to the logger configuration.
+ *
+ * @return The created logger, or null if the logger could not be initialized.
+ */
+std::shared_ptr<Logger>
+create_console_logger(std::string name, std::shared_ptr<LoggerConfig> logger_config);
+
+/**
+ * Create an asynchronous console logger.
+ *
+ * @param name Name of the logger to create.
+ * @param task_runner The sequence on which logs are streamed.
+ * @param logger_config Reference to the logger configuration.
+ *
+ * @return The created logger, or null if the logger could not be initialized.
+ */
+std::shared_ptr<Logger> create_console_logger(
+    std::string name,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
+    std::shared_ptr<LoggerConfig> logger_config);
 
 /**
  * Logging class to provide configurable instrumentation. There are 4 levels of instrumentation:
@@ -159,7 +219,7 @@ public:
      *
      * @return The created logger, or null if the logger could not be initialized.
      */
-    static std::shared_ptr<Logger> create_logger(
+    static std::shared_ptr<Logger> create(
         std::string name,
         std::shared_ptr<LoggerConfig> logger_config,
         std::unique_ptr<Sink> &&sink);
@@ -174,70 +234,11 @@ public:
      *
      * @return The created logger, or null if the logger could not be initialized.
      */
-    static std::shared_ptr<Logger> create_logger(
+    static std::shared_ptr<Logger> create(
         std::string name,
         std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<LoggerConfig> logger_config,
         std::unique_ptr<Sink> &&sink);
-
-    /**
-     * Create a synchronous file logger.
-     *
-     * @param name Name of the logger to create.
-     * @param logger_config Reference to the logger configuration.
-     * @param coder_config Reference to the coder configuration.
-     * @param logger_directory Path to store log files.
-     *
-     * @return The created logger, or null if the logger could not be initialized.
-     */
-    static std::shared_ptr<Logger> create_file_logger(
-        std::string name,
-        std::shared_ptr<LoggerConfig> logger_config,
-        std::shared_ptr<fly::coders::CoderConfig> coder_config,
-        std::filesystem::path logger_directory);
-
-    /**
-     * Create an asynchronous file logger.
-     *
-     * @param name Name of the logger to create.
-     * @param task_runner The sequence on which logs are streamed.
-     * @param logger_config Reference to the logger configuration.
-     * @param coder_config Reference to the coder configuration.
-     * @param logger_directory Path to store log files.
-     *
-     * @return The created logger, or null if the logger could not be initialized.
-     */
-    static std::shared_ptr<Logger> create_file_logger(
-        std::string name,
-        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
-        std::shared_ptr<LoggerConfig> logger_config,
-        std::shared_ptr<fly::coders::CoderConfig> coder_config,
-        std::filesystem::path logger_directory);
-
-    /**
-     * Create a synchronous console logger.
-     *
-     * @param name Name of the logger to create.
-     * @param logger_config Reference to the logger configuration.
-     *
-     * @return The created logger, or null if the logger could not be initialized.
-     */
-    static std::shared_ptr<Logger>
-    create_console_logger(std::string name, std::shared_ptr<LoggerConfig> logger_config);
-
-    /**
-     * Create an asynchronous console logger.
-     *
-     * @param name Name of the logger to create.
-     * @param task_runner The sequence on which logs are streamed.
-     * @param logger_config Reference to the logger configuration.
-     *
-     * @return The created logger, or null if the logger could not be initialized.
-     */
-    static std::shared_ptr<Logger> create_console_logger(
-        std::string name,
-        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
-        std::shared_ptr<LoggerConfig> logger_config);
 
     /**
      * Set the default logger instance for the LOG* macro functions. If the provided logger is null,

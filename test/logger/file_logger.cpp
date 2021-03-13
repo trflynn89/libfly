@@ -106,8 +106,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
     auto coder_config = std::make_shared<MutableCoderConfig>();
     fly::test::PathUtil::ScopedTempDirectory path;
 
-    auto logger =
-        fly::logger::Logger::create_file_logger("test", logger_config, coder_config, path());
+    auto logger = fly::logger::create_file_logger("test", logger_config, coder_config, path());
 
     CATCH_SECTION("Valid logger file paths should be created after creating logger")
     {
@@ -119,8 +118,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
 
     CATCH_SECTION("Cannot start logger with a bad file path")
     {
-        logger =
-            fly::logger::Logger::create_file_logger("test", logger_config, coder_config, __FILE__);
+        logger = fly::logger::create_file_logger("test", logger_config, coder_config, __FILE__);
         CATCH_CHECK(logger == nullptr);
     }
 

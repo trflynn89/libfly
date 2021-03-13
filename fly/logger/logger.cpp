@@ -12,6 +12,63 @@
 namespace fly::logger {
 
 //==================================================================================================
+std::shared_ptr<Logger> create_file_logger(
+    std::string name,
+    std::shared_ptr<LoggerConfig> logger_config,
+    std::shared_ptr<fly::coders::CoderConfig> coder_config,
+    std::filesystem::path logger_directory)
+{
+    return create_file_logger(
+        std::move(name),
+        nullptr,
+        std::move(logger_config),
+        std::move(coder_config),
+        std::move(logger_directory));
+}
+
+//==================================================================================================
+std::shared_ptr<Logger> create_file_logger(
+    std::string name,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
+    std::shared_ptr<LoggerConfig> logger_config,
+    std::shared_ptr<fly::coders::CoderConfig> coder_config,
+    std::filesystem::path logger_directory)
+{
+    auto sink = std::make_unique<detail::FileSink>(
+        logger_config,
+        std::move(coder_config),
+        std::move(logger_directory));
+
+    return Logger::create(
+        std::move(name),
+        std::move(task_runner),
+        std::move(logger_config),
+        std::move(sink));
+}
+
+//==================================================================================================
+std::shared_ptr<Logger>
+create_console_logger(std::string name, std::shared_ptr<LoggerConfig> logger_config)
+{
+    return create_console_logger(std::move(name), nullptr, logger_config);
+}
+
+//==================================================================================================
+std::shared_ptr<Logger> create_console_logger(
+    std::string name,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
+    std::shared_ptr<LoggerConfig> logger_config)
+{
+    auto sink = std::make_unique<detail::ConsoleSink>();
+
+    return Logger::create(
+        std::move(name),
+        std::move(task_runner),
+        std::move(logger_config),
+        std::move(sink));
+}
+
+//==================================================================================================
 Logger::Logger(
     std::string name,
     std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
@@ -32,16 +89,16 @@ Logger::~Logger()
 }
 
 //==================================================================================================
-std::shared_ptr<Logger> Logger::create_logger(
+std::shared_ptr<Logger> Logger::create(
     std::string name,
     std::shared_ptr<LoggerConfig> logger_config,
     std::unique_ptr<Sink> &&sink)
 {
-    return create_logger(std::move(name), nullptr, std::move(logger_config), std::move(sink));
+    return create(std::move(name), nullptr, std::move(logger_config), std::move(sink));
 }
 
 //==================================================================================================
-std::shared_ptr<Logger> Logger::create_logger(
+std::shared_ptr<Logger> Logger::create(
     std::string name,
     std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<LoggerConfig> logger_config,
@@ -77,63 +134,6 @@ std::shared_ptr<Logger> Logger::create_logger(
     }
 
     return nullptr;
-}
-
-//==================================================================================================
-std::shared_ptr<Logger> Logger::create_file_logger(
-    std::string name,
-    std::shared_ptr<LoggerConfig> logger_config,
-    std::shared_ptr<fly::coders::CoderConfig> coder_config,
-    std::filesystem::path logger_directory)
-{
-    return create_file_logger(
-        std::move(name),
-        nullptr,
-        std::move(logger_config),
-        std::move(coder_config),
-        std::move(logger_directory));
-}
-
-//==================================================================================================
-std::shared_ptr<Logger> Logger::create_file_logger(
-    std::string name,
-    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
-    std::shared_ptr<LoggerConfig> logger_config,
-    std::shared_ptr<fly::coders::CoderConfig> coder_config,
-    std::filesystem::path logger_directory)
-{
-    auto sink = std::make_unique<detail::FileSink>(
-        logger_config,
-        std::move(coder_config),
-        std::move(logger_directory));
-
-    return create_logger(
-        std::move(name),
-        std::move(task_runner),
-        std::move(logger_config),
-        std::move(sink));
-}
-
-//==================================================================================================
-std::shared_ptr<Logger>
-Logger::create_console_logger(std::string name, std::shared_ptr<LoggerConfig> logger_config)
-{
-    return create_console_logger(std::move(name), nullptr, logger_config);
-}
-
-//==================================================================================================
-std::shared_ptr<Logger> Logger::create_console_logger(
-    std::string name,
-    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
-    std::shared_ptr<LoggerConfig> logger_config)
-{
-    auto sink = std::make_unique<detail::ConsoleSink>();
-
-    return create_logger(
-        std::move(name),
-        std::move(task_runner),
-        std::move(logger_config),
-        std::move(sink));
 }
 
 //==================================================================================================
