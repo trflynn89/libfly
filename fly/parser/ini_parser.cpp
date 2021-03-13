@@ -5,22 +5,22 @@
 
 #include <vector>
 
-namespace fly {
+namespace fly::parser {
 
 #define ILOG(...)                                                                                  \
     LOGW("[line {}]: " FLY_FORMAT_STRING(__VA_ARGS__), line() FLY_FORMAT_ARGS(__VA_ARGS__));
 
 //==================================================================================================
-std::optional<Json> IniParser::parse_internal()
+std::optional<fly::Json> IniParser::parse_internal()
 {
-    Json values = JsonTraits::object_type();
-    Json::iterator current;
+    fly::Json values = JsonTraits::object_type();
+    fly::Json::iterator current;
 
     std::string data;
 
     while (getline(data))
     {
-        String::trim(data);
+        fly::String::trim(data);
 
         if (data.empty() || data.starts_with(';'))
         {
@@ -84,7 +84,7 @@ std::optional<Json> IniParser::parse_internal()
         }
     }
 
-    return values.empty() ? std::nullopt : std::optional<Json>(std::move(values));
+    return values.empty() ? std::nullopt : std::optional<fly::Json>(std::move(values));
 }
 
 //==================================================================================================
@@ -106,7 +106,7 @@ bool IniParser::getline(std::string &result)
 //==================================================================================================
 std::optional<std::string> IniParser::on_section(std::string &section)
 {
-    String::trim(section);
+    fly::String::trim(section);
 
     if ((trim_value(section, '\'') != TrimResult::Untrimmed) ||
         (trim_value(section, '\"') != TrimResult::Untrimmed))
@@ -124,14 +124,14 @@ IniParser::on_name_value_pair(const std::string &name_value)
 {
     static constexpr std::uint32_t s_size = 2;
 
-    std::vector<std::string> pair = String::split(name_value, '=', s_size);
+    std::vector<std::string> pair = fly::String::split(name_value, '=', s_size);
 
     if (pair.size() == s_size)
     {
         std::string name(std::move(pair[0])), value(std::move(pair[1]));
 
-        String::trim(name);
-        String::trim(value);
+        fly::String::trim(name);
+        fly::String::trim(value);
 
         if ((trim_value(name, '\'') != TrimResult::Untrimmed) ||
             (trim_value(name, '\"') != TrimResult::Untrimmed))
@@ -181,4 +181,4 @@ IniParser::TrimResult IniParser::trim_value(std::string &str, char start, char e
     return TrimResult::Untrimmed;
 }
 
-} // namespace fly
+} // namespace fly::parser

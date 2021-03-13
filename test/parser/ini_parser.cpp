@@ -6,7 +6,7 @@
 
 CATCH_TEST_CASE("IniParser", "[parser]")
 {
-    fly::IniParser parser;
+    fly::parser::IniParser parser;
 
     CATCH_SECTION("Non-existing directory cannot be parsed")
     {

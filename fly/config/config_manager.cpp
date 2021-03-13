@@ -49,11 +49,11 @@ ConfigManager::ConfigManager(
     switch (file_type)
     {
         case ConfigFileType::Ini:
-            m_parser = std::make_unique<fly::IniParser>();
+            m_parser = std::make_unique<fly::parser::IniParser>();
             break;
 
         case ConfigFileType::Json:
-            m_parser = std::make_unique<fly::JsonParser>();
+            m_parser = std::make_unique<fly::parser::JsonParser>();
             break;
 
         default:

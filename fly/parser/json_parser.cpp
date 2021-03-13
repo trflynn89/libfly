@@ -3,7 +3,7 @@
 #include "fly/fly.hpp"
 #include "fly/logger/logger.hpp"
 
-namespace fly {
+namespace fly::parser {
 
 #define JLOG(...)                                                                                  \
     LOGW(                                                                                          \
@@ -13,7 +13,10 @@ namespace fly {
 
 namespace {
 
-    bool is_feature_enabled(JsonParser::Features enabled_features, JsonParser::Features feature)
+    using JsonString = fly::JsonTraits::StringType;
+
+    inline bool
+    is_feature_enabled(JsonParser::Features enabled_features, JsonParser::Features feature)
     {
         return (enabled_features & feature) != JsonParser::Features::Strict;
     }
@@ -30,9 +33,9 @@ JsonParser::JsonParser(const Features features) noexcept :
 }
 
 //==================================================================================================
-std::optional<Json> JsonParser::parse_internal()
+std::optional<fly::Json> JsonParser::parse_internal()
 {
-    std::optional<Json> json;
+    std::optional<fly::Json> json;
 
     try
     {
@@ -66,7 +69,7 @@ std::optional<Json> JsonParser::parse_internal()
 }
 
 //==================================================================================================
-std::optional<Json> JsonParser::parse_json()
+std::optional<fly::Json> JsonParser::parse_json()
 {
     if (consume_whitespace_and_comments() == ParseState::Invalid)
     {
@@ -95,11 +98,11 @@ std::optional<Json> JsonParser::parse_json()
 }
 
 //==================================================================================================
-std::optional<Json> JsonParser::parse_object()
+std::optional<fly::Json> JsonParser::parse_object()
 {
     static constexpr const Token s_end_token = Token::CloseBrace;
 
-    Json object = JsonTraits::object_type();
+    fly::Json object = fly::JsonTraits::object_type();
     ParseState state;
 
     // Discard the opening brace, which has already been peeked.
@@ -112,13 +115,13 @@ std::optional<Json> JsonParser::parse_object()
             break;
         }
 
-        std::optional<JsonTraits::string_type> key = parse_quoted_string();
+        std::optional<fly::JsonTraits::string_type> key = parse_quoted_string();
 
         if (!key || (consume_token(Token::Colon) == ParseState::Invalid))
         {
             return std::nullopt;
         }
-        else if (std::optional<Json> value = parse_json(); value)
+        else if (std::optional<fly::Json> value = parse_json(); value)
         {
             object.insert_or_assign(*std::move(key), *std::move(value));
         }
@@ -128,15 +131,16 @@ std::optional<Json> JsonParser::parse_object()
         }
     }
 
-    return (state == ParseState::Invalid) ? std::nullopt : std::optional<Json>(std::move(object));
+    return (state == ParseState::Invalid) ? std::nullopt :
+                                            std::optional<fly::Json>(std::move(object));
 }
 
 //==================================================================================================
-std::optional<Json> JsonParser::parse_array()
+std::optional<fly::Json> JsonParser::parse_array()
 {
     static constexpr const Token s_end_token = Token::CloseBracket;
 
-    Json array = JsonTraits::array_type();
+    fly::Json array = fly::JsonTraits::array_type();
     ParseState state;
 
     // Discard the opening bracket, which has already been peeked.
@@ -149,7 +153,7 @@ std::optional<Json> JsonParser::parse_array()
             break;
         }
 
-        if (std::optional<Json> value = parse_json(); value)
+        if (std::optional<fly::Json> value = parse_json(); value)
         {
             array.push_back(*std::move(value));
         }
@@ -159,7 +163,8 @@ std::optional<Json> JsonParser::parse_array()
         }
     }
 
-    return (state == ParseState::Invalid) ? std::nullopt : std::optional<Json>(std::move(array));
+    return (state == ParseState::Invalid) ? std::nullopt :
+                                            std::optional<fly::Json>(std::move(array));
 }
 
 //==================================================================================================
@@ -186,9 +191,9 @@ JsonParser::ParseState JsonParser::state_for_object_or_array(Token end_token)
 }
 
 //==================================================================================================
-std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
+std::optional<fly::JsonTraits::string_type> JsonParser::parse_quoted_string()
 {
-    JsonTraits::string_type value;
+    fly::JsonTraits::string_type value;
     Token token;
 
     if (consume_token(Token::Quote) == ParseState::Invalid)
@@ -198,14 +203,14 @@ std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
 
     while ((token = get<Token>()) != Token::Quote)
     {
-        value.push_back(static_cast<JsonTraits::char_type>(token));
+        value.push_back(static_cast<fly::JsonTraits::char_type>(token));
 
         if (token == Token::ReverseSolidus)
         {
-            // Blindly ignore escaped symbols, the Json class will check whether they are valid.
-            // Just read at least one more symbol to prevent breaking out of the loop too early if
-            // the next symbol is a quote.
-            value.push_back(get<JsonTraits::char_type>());
+            // Blindly ignore escaped symbols, the fly::Json class will check whether they are
+            // valid. Just read at least one more symbol to prevent breaking out of the loop too
+            // early if the next symbol is a quote.
+            value.push_back(get<fly::JsonTraits::char_type>());
         }
         else if (token == Token::EndOfFile)
         {
@@ -217,9 +222,9 @@ std::optional<JsonTraits::string_type> JsonParser::parse_quoted_string()
 }
 
 //==================================================================================================
-std::optional<Json> JsonParser::parse_value()
+std::optional<fly::Json> JsonParser::parse_value()
 {
-    const JsonTraits::string_type value = consume_value();
+    const fly::JsonTraits::string_type value = consume_value();
 
     if (value == FLY_JSON_STR("true"))
     {
@@ -237,21 +242,21 @@ std::optional<Json> JsonParser::parse_value()
     switch (validate_number(value))
     {
         case NumberType::SignedInteger:
-            if (auto num = JsonTraits::StringType::convert<JsonTraits::signed_type>(value); num)
+            if (auto num = JsonString::convert<fly::JsonTraits::signed_type>(value); num)
             {
                 return *num;
             }
             break;
 
         case NumberType::UnsignedInteger:
-            if (auto num = JsonTraits::StringType::convert<JsonTraits::unsigned_type>(value); num)
+            if (auto num = JsonString::convert<fly::JsonTraits::unsigned_type>(value); num)
             {
                 return *num;
             }
             break;
 
         case NumberType::FloatingPoint:
-            if (auto num = JsonTraits::StringType::convert<JsonTraits::float_type>(value); num)
+            if (auto num = JsonString::convert<fly::JsonTraits::float_type>(value); num)
             {
                 return *num;
             }
@@ -301,9 +306,9 @@ JsonParser::ParseState JsonParser::consume_comma(Token end_token)
 }
 
 //==================================================================================================
-JsonTraits::string_type JsonParser::consume_value()
+fly::JsonTraits::string_type JsonParser::consume_value()
 {
-    JsonTraits::string_type value;
+    fly::JsonTraits::string_type value;
 
     auto keep_parsing = [this](Token token) -> bool
     {
@@ -323,7 +328,7 @@ JsonTraits::string_type JsonParser::consume_value()
 
     while (keep_parsing(peek<Token>()))
     {
-        value.push_back(get<JsonTraits::char_type>());
+        value.push_back(get<fly::JsonTraits::char_type>());
     }
 
     return value;
@@ -413,9 +418,9 @@ JsonParser::ParseState JsonParser::consume_comment()
 }
 
 //==================================================================================================
-JsonParser::NumberType JsonParser::validate_number(const JsonTraits::string_type &value) const
+JsonParser::NumberType JsonParser::validate_number(const fly::JsonTraits::string_type &value) const
 {
-    const JsonTraits::StringType::view_type value_view = value;
+    const JsonString::view_type value_view = value;
 
     const bool is_signed = !value_view.empty() && (value_view[0] == '-');
     const auto signless = value_view.substr(is_signed ? 1 : 0);
@@ -425,23 +430,24 @@ JsonParser::NumberType JsonParser::validate_number(const JsonTraits::string_type
         return NumberType::Invalid;
     }
 
-    const bool is_octal = (signless.size() > 1) && (signless[0] == '0') &&
-        JsonTraits::StringType::is_digit(signless[1]);
+    const bool is_octal =
+        (signless.size() > 1) && (signless[0] == '0') && JsonString::is_digit(signless[1]);
 
-    if (!JsonTraits::StringType::is_digit(signless[0]) || is_octal)
+    if (!JsonString::is_digit(signless[0]) || is_octal)
     {
         return NumberType::Invalid;
     }
 
-    const JsonTraits::string_type::size_type d = signless.find('.');
-    const JsonTraits::string_type::size_type e1 = signless.find('e');
-    const JsonTraits::string_type::size_type e2 = signless.find('E');
+    const fly::JsonTraits::string_type::size_type d = signless.find('.');
+    const fly::JsonTraits::string_type::size_type e1 = signless.find('e');
+    const fly::JsonTraits::string_type::size_type e2 = signless.find('E');
 
-    if (d != JsonTraits::string_type::npos)
+    if (d != fly::JsonTraits::string_type::npos)
     {
-        JsonTraits::string_type::size_type end = signless.size();
+        fly::JsonTraits::string_type::size_type end = signless.size();
 
-        if ((e1 != JsonTraits::string_type::npos) || (e2 != JsonTraits::string_type::npos))
+        if ((e1 != fly::JsonTraits::string_type::npos) ||
+            (e2 != fly::JsonTraits::string_type::npos))
         {
             end = std::min(e1, e2);
         }
@@ -453,7 +459,8 @@ JsonParser::NumberType JsonParser::validate_number(const JsonTraits::string_type
 
         return NumberType::FloatingPoint;
     }
-    else if ((e1 != JsonTraits::string_type::npos) || (e2 != JsonTraits::string_type::npos))
+    else if (
+        (e1 != fly::JsonTraits::string_type::npos) || (e2 != fly::JsonTraits::string_type::npos))
     {
         return NumberType::FloatingPoint;
     }
@@ -494,4 +501,4 @@ JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b)
         static_cast<std::underlying_type_t<JsonParser::Features>>(b));
 }
 
-} // namespace fly
+} // namespace fly::parser

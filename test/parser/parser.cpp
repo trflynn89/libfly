@@ -14,7 +14,7 @@
 
 namespace {
 
-class EofParser : public fly::Parser
+class EofParser : public fly::parser::Parser
 {
 public:
     void compare(std::vector<int> &&chars) const
