@@ -9,7 +9,7 @@
 #include <filesystem>
 #include <functional>
 
-namespace fly {
+namespace fly::config {
 
 //==================================================================================================
 std::shared_ptr<ConfigManager> ConfigManager::create(
@@ -49,11 +49,11 @@ ConfigManager::ConfigManager(
     switch (file_type)
     {
         case ConfigFileType::Ini:
-            m_parser = std::make_unique<IniParser>();
+            m_parser = std::make_unique<fly::IniParser>();
             break;
 
         case ConfigFileType::Json:
-            m_parser = std::make_unique<JsonParser>();
+            m_parser = std::make_unique<fly::JsonParser>();
             break;
 
         default:
@@ -158,4 +158,4 @@ void ConfigManager::update_config()
     }
 }
 
-} // namespace fly
+} // namespace fly::config

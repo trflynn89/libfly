@@ -14,7 +14,7 @@ namespace fly {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 7, 2019
  */
-class CoderConfig : public Config
+class CoderConfig : public fly::config::Config
 {
 public:
     static constexpr const char *identifier = "coder";

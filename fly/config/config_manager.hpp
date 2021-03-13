@@ -12,6 +12,10 @@
 #include <string>
 #include <type_traits>
 
+namespace fly {
+class Parser;
+} // namespace fly
+
 namespace fly::path {
 class PathMonitor;
 } // namespace fly::path
@@ -20,9 +24,7 @@ namespace fly::task {
 class SequencedTaskRunner;
 } // namespace fly::task
 
-namespace fly {
-
-class Parser;
+namespace fly::config {
 
 /**
  * Class to create and manage a set of configurations.
@@ -69,7 +71,7 @@ public:
     /**
      * Create a configuration object, or if one with the given type's name exists, fetch it.
      *
-     * @tparam T Config type (must derive from or be fly::Config).
+     * @tparam T Config type (must derive from or be fly::config::Config).
      *
      * @return A reference to the created/found configuration.
      */
@@ -111,8 +113,8 @@ private:
     std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
 
     std::shared_ptr<fly::path::PathMonitor> m_monitor;
-    std::unique_ptr<Parser> m_parser;
-    Json m_values;
+    std::unique_ptr<fly::Parser> m_parser;
+    fly::Json m_values;
 
     const std::filesystem::path m_path;
 
@@ -163,4 +165,4 @@ std::shared_ptr<T> ConfigManager::create_config()
     return config;
 }
 
-} // namespace fly
+} // namespace fly::config

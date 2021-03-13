@@ -13,7 +13,7 @@ namespace fly {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 18, 2016
  */
-class LoggerConfig : public Config
+class LoggerConfig : public fly::config::Config
 {
 public:
     static constexpr const char *identifier = "logger";

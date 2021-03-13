@@ -38,7 +38,7 @@ public:
 /**
  * Badly written config class which uses the same identifier as fly::test::TestConfig.
  */
-class BadConfig : public fly::Config
+class BadConfig : public fly::config::Config
 {
 public:
     static constexpr const char *identifier = fly::test::TestConfig::identifier;
@@ -53,9 +53,9 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     fly::test::PathUtil::ScopedTempDirectory config_path;
     std::filesystem::path config_file = config_path.file();
 
-    auto config_manager = fly::ConfigManager::create(
+    auto config_manager = fly::config::ConfigManager::create(
         task_runner,
-        fly::ConfigManager::ConfigFileType::Json,
+        fly::config::ConfigManager::ConfigFileType::Json,
         config_file);
     CATCH_REQUIRE(config_manager);
 
@@ -64,24 +64,24 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
 
     CATCH_SECTION("Config managers can be started for all file types")
     {
-        config_manager = fly::ConfigManager::create(
+        config_manager = fly::config::ConfigManager::create(
             task_runner,
-            fly::ConfigManager::ConfigFileType::Ini,
+            fly::config::ConfigManager::ConfigFileType::Ini,
             config_file);
         CATCH_CHECK(config_manager);
 
-        config_manager = fly::ConfigManager::create(
+        config_manager = fly::config::ConfigManager::create(
             task_runner,
-            fly::ConfigManager::ConfigFileType::Json,
+            fly::config::ConfigManager::ConfigFileType::Json,
             config_file);
         CATCH_CHECK(config_manager);
     }
 
     CATCH_SECTION("Cannot start a config manager of an unsupported file type")
     {
-        config_manager = fly::ConfigManager::create(
+        config_manager = fly::config::ConfigManager::create(
             task_runner,
-            static_cast<fly::ConfigManager::ConfigFileType>(-1),
+            static_cast<fly::config::ConfigManager::ConfigFileType>(-1),
             config_file);
         CATCH_CHECK_FALSE(config_manager);
     }

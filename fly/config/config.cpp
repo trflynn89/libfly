@@ -1,6 +1,6 @@
 #include "fly/config/config.hpp"
 
-namespace fly {
+namespace fly::config {
 
 //==================================================================================================
 void Config::update(const Json &values)
@@ -9,4 +9,4 @@ void Config::update(const Json &values)
     m_values = values;
 }
 
-} // namespace fly
+} // namespace fly::config
