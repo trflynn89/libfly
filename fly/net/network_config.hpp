@@ -13,7 +13,7 @@ namespace fly::net {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 6, 2021
  */
-class NetworkConfig : public fly::Config
+class NetworkConfig : public fly::config::Config
 {
 public:
     static constexpr const char *identifier = "network";

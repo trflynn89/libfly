@@ -5,7 +5,7 @@
 #include <shared_mutex>
 #include <string>
 
-namespace fly {
+namespace fly::config {
 
 /**
  * Class to hold a set of related configuration values.
@@ -68,4 +68,4 @@ T Config::get_value(const std::string &name, T def) const
     return def;
 }
 
-} // namespace fly
+} // namespace fly::config

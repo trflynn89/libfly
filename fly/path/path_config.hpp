@@ -12,7 +12,7 @@ namespace fly::path {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
-class PathConfig : public Config
+class PathConfig : public fly::config::Config
 {
 public:
     static constexpr const char *identifier = "path";

@@ -12,7 +12,7 @@ namespace fly::system {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
-class SystemConfig : public Config
+class SystemConfig : public fly::config::Config
 {
 public:
     static constexpr const char *identifier = "system";
