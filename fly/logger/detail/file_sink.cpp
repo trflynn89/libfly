@@ -15,7 +15,7 @@ namespace fly::detail {
 //==================================================================================================
 FileSink::FileSink(
     std::shared_ptr<fly::LoggerConfig> logger_config,
-    std::shared_ptr<fly::CoderConfig> coder_config,
+    std::shared_ptr<fly::coders::CoderConfig> coder_config,
     std::filesystem::path logger_directory) :
     m_logger_config(std::move(logger_config)),
     m_coder_config(std::move(coder_config)),
@@ -60,7 +60,7 @@ bool FileSink::create_log_file()
             std::filesystem::path compressed_log_file = m_log_file;
             compressed_log_file.replace_extension(".log.enc");
 
-            fly::HuffmanEncoder encoder(m_coder_config);
+            fly::coders::HuffmanEncoder encoder(m_coder_config);
 
             if (encoder.encode_file(m_log_file, compressed_log_file))
             {

@@ -99,6 +99,10 @@
             FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
     } while (0)
 
+namespace fly::coders {
+class CoderConfig;
+} // namespace fly::coders
+
 namespace fly::detail {
 class Registry;
 } // namespace fly::detail
@@ -109,7 +113,6 @@ class SequencedTaskRunner;
 
 namespace fly {
 
-class CoderConfig;
 class LoggerConfig;
 class LogSink;
 
@@ -190,7 +193,7 @@ public:
     static std::shared_ptr<Logger> create_file_logger(
         std::string name,
         std::shared_ptr<LoggerConfig> logger_config,
-        std::shared_ptr<CoderConfig> coder_config,
+        std::shared_ptr<fly::coders::CoderConfig> coder_config,
         std::filesystem::path logger_directory);
 
     /**
@@ -208,7 +211,7 @@ public:
         std::string name,
         std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<LoggerConfig> logger_config,
-        std::shared_ptr<CoderConfig> coder_config,
+        std::shared_ptr<fly::coders::CoderConfig> coder_config,
         std::filesystem::path logger_directory);
 
     /**

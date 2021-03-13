@@ -6,7 +6,7 @@
 #include <chrono>
 #include <cstdint>
 
-namespace fly {
+namespace fly::coders {
 
 /**
  * Class to hold configuration values related to the coder implementations.
@@ -34,4 +34,4 @@ protected:
     length_type m_default_huffman_encoder_max_code_length {11};
 };
 
-} // namespace fly
+} // namespace fly::coders

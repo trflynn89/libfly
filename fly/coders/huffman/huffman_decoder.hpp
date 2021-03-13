@@ -8,8 +8,10 @@
 #include <ostream>
 
 namespace fly {
-
 class BitStreamReader;
+} // namespace fly
+
+namespace fly::coders {
 
 /**
  * Implementation of the Decoder interface for Huffman coding.
@@ -61,7 +63,7 @@ protected:
      *
      * @return True if the input stream was successfully decoded.
      */
-    bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) override;
+    bool decode_binary(fly::BitStreamReader &encoded, std::ostream &decoded) override;
 
 private:
     /**
@@ -73,7 +75,7 @@ private:
      *
      * @return True if the header was successfully decoded.
      */
-    bool decode_header(BitStreamReader &encoded, std::uint32_t &chunk_size);
+    bool decode_header(fly::BitStreamReader &encoded, std::uint32_t &chunk_size);
 
     /**
      * Decode version 1 of the header. Extract the maximum chunk length and the global maximum
@@ -84,7 +86,7 @@ private:
      *
      * @return True if the header was successfully encoded.
      */
-    bool decode_header_version1(BitStreamReader &encoded, std::uint32_t &chunk_size);
+    bool decode_header_version1(fly::BitStreamReader &encoded, std::uint32_t &chunk_size);
 
     /**
      * Decode Huffman codes from an encoded input stream. The list of codes will be stored as a
@@ -95,7 +97,7 @@ private:
      *
      * @return True if the Huffman codes were successfully decoded.
      */
-    bool decode_codes(BitStreamReader &encoded, length_type &max_code_length);
+    bool decode_codes(fly::BitStreamReader &encoded, length_type &max_code_length);
 
     /**
      * Convert the decoded list of Huffman codes into a prefix table.
@@ -117,7 +119,7 @@ private:
      * @return True if the input stream was successfully decoded.
      */
     bool decode_symbols(
-        BitStreamReader &encoded,
+        fly::BitStreamReader &encoded,
         length_type max_code_length,
         std::uint32_t chunk_size,
         std::ostream &decoded) const;
@@ -134,4 +136,4 @@ private:
     std::unique_ptr<HuffmanCode[]> m_prefix_table;
 };
 
-} // namespace fly
+} // namespace fly::coders

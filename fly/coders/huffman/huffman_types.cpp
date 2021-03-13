@@ -1,6 +1,6 @@
 #include "fly/coders/huffman/huffman_types.hpp"
 
-namespace fly {
+namespace fly::coders {
 
 //==================================================================================================
 HuffmanNode::HuffmanNode() noexcept : m_symbol(0), m_frequency(0), m_left(nullptr), m_right(nullptr)
@@ -10,10 +10,13 @@ HuffmanNode::HuffmanNode() noexcept : m_symbol(0), m_frequency(0), m_left(nullpt
 //==================================================================================================
 HuffmanNode &HuffmanNode::operator=(HuffmanNode &&node) noexcept
 {
-    m_symbol = std::move(node.m_symbol);
-    m_frequency = std::move(node.m_frequency);
+    m_symbol = node.m_symbol;
+    m_frequency = node.m_frequency;
     m_left = node.m_left;
     m_right = node.m_right;
+
+    node.m_left = nullptr;
+    node.m_right = nullptr;
 
     return *this;
 }
@@ -57,18 +60,18 @@ HuffmanCode::HuffmanCode(symbol_type symbol, code_type code, length_type length)
 
 //==================================================================================================
 HuffmanCode::HuffmanCode(HuffmanCode &&code) noexcept :
-    m_symbol(std::move(code.m_symbol)),
-    m_code(std::move(code.m_code)),
-    m_length(std::move(code.m_length))
+    m_symbol(code.m_symbol),
+    m_code(code.m_code),
+    m_length(code.m_length)
 {
 }
 
 //==================================================================================================
 HuffmanCode &HuffmanCode::operator=(HuffmanCode &&code) noexcept
 {
-    m_symbol = std::move(code.m_symbol);
-    m_code = std::move(code.m_code);
-    m_length = std::move(code.m_length);
+    m_symbol = code.m_symbol;
+    m_code = code.m_code;
+    m_length = code.m_length;
 
     return *this;
 }
@@ -84,4 +87,4 @@ bool operator<(const HuffmanCode &left, const HuffmanCode &right)
     return left.m_length < right.m_length;
 }
 
-} // namespace fly
+} // namespace fly::coders

@@ -83,7 +83,7 @@ std::shared_ptr<Logger> Logger::create_logger(
 std::shared_ptr<Logger> Logger::create_file_logger(
     std::string name,
     std::shared_ptr<LoggerConfig> logger_config,
-    std::shared_ptr<CoderConfig> coder_config,
+    std::shared_ptr<fly::coders::CoderConfig> coder_config,
     std::filesystem::path logger_directory)
 {
     return create_file_logger(
@@ -99,7 +99,7 @@ std::shared_ptr<Logger> Logger::create_file_logger(
     std::string name,
     std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<LoggerConfig> logger_config,
-    std::shared_ptr<CoderConfig> coder_config,
+    std::shared_ptr<fly::coders::CoderConfig> coder_config,
     std::filesystem::path logger_directory)
 {
     auto sink = std::make_unique<detail::FileSink>(

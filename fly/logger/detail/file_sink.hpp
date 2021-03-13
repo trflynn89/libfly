@@ -8,10 +8,13 @@
 #include <memory>
 
 namespace fly {
-class CoderConfig;
 class LoggerConfig;
 struct Log;
 } // namespace fly
+
+namespace fly::coders {
+class CoderConfig;
+} // namespace fly::coders
 
 namespace fly::detail {
 
@@ -34,7 +37,7 @@ public:
      */
     FileSink(
         std::shared_ptr<fly::LoggerConfig> logger_config,
-        std::shared_ptr<fly::CoderConfig> coder_config,
+        std::shared_ptr<fly::coders::CoderConfig> coder_config,
         std::filesystem::path logger_directory);
 
     /**
@@ -63,7 +66,7 @@ private:
     bool create_log_file();
 
     std::shared_ptr<fly::LoggerConfig> m_logger_config;
-    std::shared_ptr<fly::CoderConfig> m_coder_config;
+    std::shared_ptr<fly::coders::CoderConfig> m_coder_config;
 
     const std::filesystem::path m_log_directory;
     std::filesystem::path m_log_file;

@@ -6,7 +6,7 @@
 #include <istream>
 #include <ostream>
 
-namespace fly {
+namespace fly::coders {
 
 /**
  * A Base64 encoder and decoder.
@@ -45,4 +45,4 @@ private:
     std::array<std::ios::char_type, (64 * s_encoded_chunk_size) << 10> m_encoded;
 };
 
-} // namespace fly
+} // namespace fly::coders

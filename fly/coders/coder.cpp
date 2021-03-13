@@ -8,7 +8,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace fly {
+namespace fly::coders {
 
 namespace {
 
@@ -105,7 +105,7 @@ bool Encoder::encode_file(
 //==================================================================================================
 bool BinaryEncoder::encode_internal(std::istream &decoded, std::ostream &encoded)
 {
-    BitStreamWriter stream(encoded);
+    fly::BitStreamWriter stream(encoded);
     return encode_binary(decoded, stream);
 }
 
@@ -163,8 +163,8 @@ bool Decoder::decode_file(
 //==================================================================================================
 bool BinaryDecoder::decode_internal(std::istream &encoded, std::ostream &decoded)
 {
-    BitStreamReader stream(encoded);
+    fly::BitStreamReader stream(encoded);
     return decode_binary(stream, decoded);
 }
 
-} // namespace fly
+} // namespace fly::coders
