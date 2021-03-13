@@ -6,7 +6,9 @@
 
 #include <string>
 
-namespace fly {
+using namespace fly::literals::numeric_literals;
+
+namespace fly::path {
 
 namespace {
 
@@ -218,4 +220,4 @@ bool PathMonitorImpl::PathInfoImpl::refresh(const std::filesystem::path &path)
     return success == TRUE;
 }
 
-} // namespace fly
+} // namespace fly::path

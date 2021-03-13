@@ -4,7 +4,7 @@
 
 #include <chrono>
 
-namespace fly {
+namespace fly::path {
 
 /**
  * Class to hold configuration values related to paths.
@@ -26,4 +26,4 @@ protected:
     std::chrono::milliseconds::rep m_default_poll_interval {1000};
 };
 
-} // namespace fly
+} // namespace fly::path

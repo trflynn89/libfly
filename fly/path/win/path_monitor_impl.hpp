@@ -13,7 +13,7 @@ namespace fly::task {
 class SequencedTaskRunner;
 } // namespace fly::task
 
-namespace fly {
+namespace fly::path {
 
 class PathConfig;
 
@@ -98,4 +98,4 @@ private:
     PathMonitor::PathEvent convert_to_event(DWORD action) const;
 };
 
-} // namespace fly
+} // namespace fly::path

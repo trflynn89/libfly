@@ -15,7 +15,7 @@ namespace fly::task {
 class SequencedTaskRunner;
 } // namespace fly::task
 
-namespace fly {
+namespace fly::path {
 
 class PathConfig;
 
@@ -146,8 +146,8 @@ private:
     dispatch_queue_t m_dispatch_queue;
     FSEventStreamRef m_stream;
 
-    ConcurrentQueue<EventInfo> m_event_queue;
+    fly::ConcurrentQueue<EventInfo> m_event_queue;
     std::vector<CFStringRef> m_paths;
 };
 
-} // namespace fly
+} // namespace fly::path

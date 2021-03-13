@@ -14,7 +14,7 @@ namespace fly::task {
 class SequencedTaskRunner;
 } // namespace fly::task
 
-namespace fly {
+namespace fly::path {
 
 class PathConfig;
 
@@ -111,4 +111,4 @@ private:
     int m_monitor_descriptor;
 };
 
-} // namespace fly
+} // namespace fly::path

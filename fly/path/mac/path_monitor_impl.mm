@@ -8,7 +8,7 @@
 
 #include <algorithm>
 
-namespace fly {
+namespace fly::path {
 
 namespace {
 
