@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/logger/log_sink.hpp"
+#include "fly/logger/sink.hpp"
 
 #include <cstdint>
 #include <filesystem>
@@ -25,7 +25,7 @@ namespace fly::logger::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version October 11, 2020
  */
-class FileSink : public fly::logger::LogSink
+class FileSink : public fly::logger::Sink
 {
 public:
     /**

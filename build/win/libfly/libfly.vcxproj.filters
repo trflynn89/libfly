@@ -124,7 +124,7 @@
     <ClInclude Include="..\..\..\fly\logger\logger_config.hpp">
       <Filter>logger</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\logger\log_sink.hpp">
+    <ClInclude Include="..\..\..\fly\logger\sink.hpp">
       <Filter>logger</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\logger\styler.hpp">

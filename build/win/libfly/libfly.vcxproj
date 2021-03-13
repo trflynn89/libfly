@@ -175,9 +175,9 @@
     <ClInclude Include="..\..\..\fly\logger\detail\styler_proxy.hpp" />
     <ClInclude Include="..\..\..\fly\logger\detail\win\styler_proxy_impl.hpp" />
     <ClInclude Include="..\..\..\fly\logger\log.hpp" />
-    <ClInclude Include="..\..\..\fly\logger\log_sink.hpp" />
     <ClInclude Include="..\..\..\fly\logger\logger.hpp" />
     <ClInclude Include="..\..\..\fly\logger\logger_config.hpp" />
+    <ClInclude Include="..\..\..\fly\logger\sink.hpp" />
     <ClInclude Include="..\..\..\fly\logger\styler.hpp" />
     <ClInclude Include="..\..\..\fly\net\endpoint.hpp" />
     <ClInclude Include="..\..\..\fly\net\ipv4_address.hpp" />

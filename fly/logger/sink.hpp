@@ -13,10 +13,10 @@ struct Log;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version October 11, 2020
  */
-class LogSink
+class Sink
 {
 public:
-    virtual ~LogSink() = default;
+    virtual ~Sink() = default;
 
     /**
      * Initialize the sink. If initialization fails, the logger will not be started and will not

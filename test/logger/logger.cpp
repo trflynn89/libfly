@@ -2,8 +2,8 @@
 
 #include "test/util/task_manager.hpp"
 
-#include "fly/logger/log_sink.hpp"
 #include "fly/logger/logger_config.hpp"
+#include "fly/logger/sink.hpp"
 #include "fly/task/task_manager.hpp"
 #include "fly/task/task_runner.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
@@ -25,7 +25,7 @@ namespace {
 /**
  * Test log sink to store received logs in a queue for verification.
  */
-class QueueSink : public fly::logger::LogSink
+class QueueSink : public fly::logger::Sink
 {
 public:
     QueueSink(fly::ConcurrentQueue<fly::logger::Log> &logs) : m_logs(logs)
@@ -50,7 +50,7 @@ private:
 /**
  * Test log sink to drop all received logs.
  */
-class DropSink : public fly::logger::LogSink
+class DropSink : public fly::logger::Sink
 {
 public:
     bool initialize() override
@@ -67,7 +67,7 @@ public:
 /**
  * Test log sink to purposefully fail initialiation.
  */
-class FailInitSink : public fly::logger::LogSink
+class FailInitSink : public fly::logger::Sink
 {
 public:
     bool initialize() override
