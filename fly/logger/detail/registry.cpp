@@ -4,7 +4,7 @@
 #include "fly/logger/logger.hpp"
 #include "fly/logger/logger_config.hpp"
 
-namespace fly::detail {
+namespace fly::logger::detail {
 
 namespace {
 
@@ -14,11 +14,11 @@ namespace {
 
 //==================================================================================================
 Registry::Registry() :
-    m_initial_default_logger(std::shared_ptr<Logger>(new Logger(
+    m_initial_default_logger(std::shared_ptr<fly::logger::Logger>(new fly::logger::Logger(
         s_default_logger_name,
         nullptr,
-        std::make_shared<fly::LoggerConfig>(),
-        std::make_unique<detail::ConsoleSink>())))
+        std::make_shared<fly::logger::LoggerConfig>(),
+        std::make_unique<ConsoleSink>())))
 {
     m_initial_default_logger->initialize(); // Synchronous console initialization cannot fail.
     set_default_logger(m_initial_default_logger);
@@ -42,7 +42,7 @@ Registry &Registry::instance()
 }
 
 //==================================================================================================
-void Registry::set_default_logger(std::shared_ptr<fly::Logger> default_logger)
+void Registry::set_default_logger(std::shared_ptr<fly::logger::Logger> default_logger)
 {
     if (default_logger)
     {
@@ -55,13 +55,13 @@ void Registry::set_default_logger(std::shared_ptr<fly::Logger> default_logger)
 }
 
 //==================================================================================================
-fly::Logger *Registry::get_default_logger() const
+fly::logger::Logger *Registry::get_default_logger() const
 {
     return m_default_logger.get();
 }
 
 //==================================================================================================
-bool Registry::register_logger(std::shared_ptr<fly::Logger> logger)
+bool Registry::register_logger(std::shared_ptr<fly::logger::Logger> logger)
 {
     std::lock_guard<std::mutex> lock(m_registry_mutex);
 
@@ -87,7 +87,7 @@ void Registry::unregister_logger(const std::string &name)
 }
 
 //==================================================================================================
-std::shared_ptr<fly::Logger> Registry::get_logger(const std::string &name)
+std::shared_ptr<fly::logger::Logger> Registry::get_logger(const std::string &name)
 {
     std::lock_guard<std::mutex> lock(m_registry_mutex);
 
@@ -99,4 +99,4 @@ std::shared_ptr<fly::Logger> Registry::get_logger(const std::string &name)
     return nullptr;
 }
 
-} // namespace fly::detail
+} // namespace fly::logger::detail

@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-namespace fly {
+namespace fly::logger {
 
 /**
  * Class to hold configuration values related to the logger.
@@ -39,4 +39,4 @@ protected:
     std::uint32_t m_default_max_message_size {256};
 };
 
-} // namespace fly
+} // namespace fly::logger

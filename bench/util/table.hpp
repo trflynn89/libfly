@@ -141,7 +141,7 @@ private:
     std::ostream &print_row_separator(
         std::ostream &stream,
         std::size_t width,
-        fly::Style style = fly::Style::Default) const;
+        fly::logger::Style style = fly::logger::Style::Default) const;
 
     /**
      * Print a vertical column separator with the given style onto a stream.
@@ -151,8 +151,9 @@ private:
      *
      * @return The same stream object.
      */
-    std::ostream &
-    print_column_separator(std::ostream &stream, fly::Style style = fly::Style::Default) const;
+    std::ostream &print_column_separator(
+        std::ostream &stream,
+        fly::logger::Style style = fly::logger::Style::Default) const;
 
     /**
      * Compute the widths required to print each value in row of data.
@@ -179,17 +180,17 @@ private:
     template <typename T>
     static bool is_zero(T value);
 
-    static constexpr const fly::Color s_border_color {fly::Color::Cyan};
-    static constexpr const fly::Style s_border_style {fly::Style::Bold};
+    static constexpr const fly::logger::Color s_border_color {fly::logger::Color::Cyan};
+    static constexpr const fly::logger::Style s_border_style {fly::logger::Style::Bold};
 
-    static constexpr const fly::Color s_title_color {fly::Color::Green};
-    static constexpr const fly::Style s_title_style {fly::Style::Bold};
+    static constexpr const fly::logger::Color s_title_color {fly::logger::Color::Green};
+    static constexpr const fly::logger::Style s_title_style {fly::logger::Style::Bold};
 
-    static constexpr const fly::Color s_header_color {fly::Color::Red};
-    static constexpr const fly::Style s_header_style {fly::Style::Italic};
+    static constexpr const fly::logger::Color s_header_color {fly::logger::Color::Red};
+    static constexpr const fly::logger::Style s_header_style {fly::logger::Style::Italic};
 
-    static constexpr const fly::Color s_data_color {fly::Color::Yellow};
-    static constexpr const fly::Style s_data_style {fly::Style::Default};
+    static constexpr const fly::logger::Color s_data_color {fly::logger::Color::Yellow};
+    static constexpr const fly::logger::Style s_data_style {fly::logger::Style::Default};
 
     static constexpr const std::size_t s_precision = 3;
 
@@ -254,7 +255,7 @@ void Table<Args...>::print_table(std::ostream &stream) const
 template <class... Args>
 void Table<Args...>::print_title(std::ostream &stream, std::size_t table_width) const
 {
-    const auto style = fly::Styler(s_title_style, s_title_color);
+    const auto style = fly::logger::Styler(s_title_style, s_title_color);
 
     print_row_separator(stream, table_width, s_border_style);
     print_column_separator(stream, s_border_style);
@@ -276,9 +277,9 @@ void Table<Args...>::print_headers(std::ostream &stream, std::size_t table_width
 {
     for (std::size_t index = 0; index < m_headers.size(); ++index)
     {
-        print_column_separator(stream, index == 0 ? s_border_style : fly::Style::Default);
+        print_column_separator(stream, index == 0 ? s_border_style : fly::logger::Style::Default);
 
-        const auto style = fly::Styler(s_header_style, s_header_color);
+        const auto style = fly::logger::Styler(s_header_style, s_header_color);
         stream << style;
 
         stream << fly::String::format(" {:^{}} ", m_headers[index], m_column_widths[index]);
@@ -296,9 +297,9 @@ void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
 
     auto print_value = [this, &stream, &index](const auto &value)
     {
-        print_column_separator(stream, index == 0 ? s_border_style : fly::Style::Default);
+        print_column_separator(stream, index == 0 ? s_border_style : fly::logger::Style::Default);
 
-        const auto style = fly::Styler(s_data_style, s_data_color);
+        const auto style = fly::logger::Styler(s_data_style, s_data_color);
         stream << style;
 
         if constexpr (std::is_floating_point_v<std::remove_cvref_t<decltype(value)>>)
@@ -326,18 +327,22 @@ void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
 
 //==================================================================================================
 template <class... Args>
-std::ostream &
-Table<Args...>::print_row_separator(std::ostream &stream, std::size_t width, fly::Style style) const
+std::ostream &Table<Args...>::print_row_separator(
+    std::ostream &stream,
+    std::size_t width,
+    fly::logger::Style style) const
 {
-    stream << fly::Styler(style, s_border_color) << fly::String::format("{:->{}}\n", '-', width);
+    stream << fly::logger::Styler(style, s_border_color)
+           << fly::String::format("{:->{}}\n", '-', width);
     return stream;
 }
 
 //==================================================================================================
 template <class... Args>
-std::ostream &Table<Args...>::print_column_separator(std::ostream &stream, fly::Style style) const
+std::ostream &
+Table<Args...>::print_column_separator(std::ostream &stream, fly::logger::Style style) const
 {
-    stream << fly::Styler(style, s_border_color) << '|';
+    stream << fly::logger::Styler(style, s_border_color) << '|';
     return stream;
 }
 

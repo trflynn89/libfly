@@ -10,11 +10,11 @@
 #include <string>
 #include <system_error>
 
-namespace fly::detail {
+namespace fly::logger::detail {
 
 //==================================================================================================
 FileSink::FileSink(
-    std::shared_ptr<fly::LoggerConfig> logger_config,
+    std::shared_ptr<fly::logger::LoggerConfig> logger_config,
     std::shared_ptr<fly::coders::CoderConfig> coder_config,
     std::filesystem::path logger_directory) :
     m_logger_config(std::move(logger_config)),
@@ -30,7 +30,7 @@ bool FileSink::initialize()
 }
 
 //==================================================================================================
-bool FileSink::stream(fly::Log &&log)
+bool FileSink::stream(fly::logger::Log &&log)
 {
     if (m_log_stream.good())
     {
@@ -82,4 +82,4 @@ bool FileSink::create_log_file()
     return m_log_stream.good();
 }
 
-} // namespace fly::detail
+} // namespace fly::logger::detail

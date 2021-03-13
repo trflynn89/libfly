@@ -9,7 +9,7 @@
 #include "fly/logger/logger_config.hpp"
 #include "fly/task/task_runner.hpp"
 
-namespace fly {
+namespace fly::logger {
 
 //==================================================================================================
 Logger::Logger(
@@ -173,9 +173,9 @@ bool Logger::initialize()
 }
 
 //==================================================================================================
-void Logger::log(Log::Level level, Log::Trace &&trace, std::string &&message)
+void Logger::log(Level level, Trace &&trace, std::string &&message)
 {
-    if (m_last_task_failed || (level < Log::Level::Debug) || (level >= Log::Level::NumLevels))
+    if (m_last_task_failed || (level < Level::Debug) || (level >= Level::NumLevels))
     {
         return;
     }
@@ -204,8 +204,8 @@ void Logger::log(Log::Level level, Log::Trace &&trace, std::string &&message)
 
 //==================================================================================================
 void Logger::log_to_sink(
-    Log::Level level,
-    Log::Trace &&trace,
+    Level level,
+    Trace &&trace,
     std::string &&message,
     std::chrono::steady_clock::time_point time)
 {
@@ -220,4 +220,4 @@ void Logger::log_to_sink(
     m_last_task_failed.store(!accepted);
 }
 
-} // namespace fly
+} // namespace fly::logger

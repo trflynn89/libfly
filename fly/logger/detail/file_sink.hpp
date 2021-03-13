@@ -7,16 +7,16 @@
 #include <fstream>
 #include <memory>
 
-namespace fly {
-class LoggerConfig;
-struct Log;
-} // namespace fly
-
 namespace fly::coders {
 class CoderConfig;
 } // namespace fly::coders
 
-namespace fly::detail {
+namespace fly::logger {
+class LoggerConfig;
+struct Log;
+} // namespace fly::logger
+
+namespace fly::logger::detail {
 
 /**
  * A log sink for streaming log points to a file. Log files are size-limted, rotated, and optionally
@@ -25,7 +25,7 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version October 11, 2020
  */
-class FileSink : public fly::LogSink
+class FileSink : public fly::logger::LogSink
 {
 public:
     /**
@@ -36,7 +36,7 @@ public:
      * @param logger_directory Path to store the log files.
      */
     FileSink(
-        std::shared_ptr<fly::LoggerConfig> logger_config,
+        std::shared_ptr<fly::logger::LoggerConfig> logger_config,
         std::shared_ptr<fly::coders::CoderConfig> coder_config,
         std::filesystem::path logger_directory);
 
@@ -55,7 +55,7 @@ public:
      *
      * @return True if the log file is healthy, and if needed, a new log file could be created.
      */
-    bool stream(fly::Log &&log) override;
+    bool stream(fly::logger::Log &&log) override;
 
 private:
     /**
@@ -65,7 +65,7 @@ private:
      */
     bool create_log_file();
 
-    std::shared_ptr<fly::LoggerConfig> m_logger_config;
+    std::shared_ptr<fly::logger::LoggerConfig> m_logger_config;
     std::shared_ptr<fly::coders::CoderConfig> m_coder_config;
 
     const std::filesystem::path m_log_directory;
@@ -74,4 +74,4 @@ private:
     std::uint32_t m_log_index {0};
 };
 
-} // namespace fly::detail
+} // namespace fly::logger::detail

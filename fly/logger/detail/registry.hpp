@@ -5,11 +5,11 @@
 #include <mutex>
 #include <string>
 
-namespace fly {
+namespace fly::logger {
 class Logger;
-} // namespace fly
+} // namespace fly::logger
 
-namespace fly::detail {
+namespace fly::logger::detail {
 
 /**
  * Singleton class to register and store created loggers. Upon creation, sets the default logger to
@@ -32,12 +32,12 @@ public:
      *
      * @param logger The logger instance.
      */
-    void set_default_logger(std::shared_ptr<fly::Logger> default_logger);
+    void set_default_logger(std::shared_ptr<fly::logger::Logger> default_logger);
 
     /**
      * @return The default logger instance for the LOG* macro functions.
      */
-    fly::Logger *get_default_logger() const;
+    fly::logger::Logger *get_default_logger() const;
 
     /**
      * Register a logger instance. If the given logger's name is already registered, this
@@ -47,7 +47,7 @@ public:
      *
      * @return True if the logger could be registered.
      */
-    bool register_logger(std::shared_ptr<fly::Logger> logger);
+    bool register_logger(std::shared_ptr<fly::logger::Logger> logger);
 
     /**
      * Remove a logger instance from the registry.
@@ -64,7 +64,7 @@ public:
      *
      * @return The logger instance, or null.
      */
-    std::shared_ptr<fly::Logger> get_logger(const std::string &name);
+    std::shared_ptr<fly::logger::Logger> get_logger(const std::string &name);
 
 private:
     /**
@@ -77,11 +77,11 @@ private:
      */
     ~Registry();
 
-    std::shared_ptr<fly::Logger> m_initial_default_logger;
-    std::shared_ptr<fly::Logger> m_default_logger;
+    std::shared_ptr<fly::logger::Logger> m_initial_default_logger;
+    std::shared_ptr<fly::logger::Logger> m_default_logger;
 
     std::mutex m_registry_mutex;
-    std::map<std::string, std::weak_ptr<fly::Logger>> m_registry;
+    std::map<std::string, std::weak_ptr<fly::logger::Logger>> m_registry;
 };
 
-} // namespace fly::detail
+} // namespace fly::logger::detail

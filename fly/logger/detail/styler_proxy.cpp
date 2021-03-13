@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace fly::detail {
+namespace fly::logger::detail {
 
 //==================================================================================================
 StylerProxy::StylerProxy(std::ostream &stream) noexcept :
@@ -12,4 +12,4 @@ StylerProxy::StylerProxy(std::ostream &stream) noexcept :
 {
 }
 
-} // namespace fly::detail
+} // namespace fly::logger::detail

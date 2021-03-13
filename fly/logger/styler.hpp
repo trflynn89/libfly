@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace fly {
+namespace fly::logger {
 
 /**
  * Constants to modify the style of a std::ostream.
@@ -115,28 +115,6 @@ struct Cursor
     const Direction m_direction;
     const std::uint8_t m_distance;
 };
-
-inline namespace literals {
-    inline namespace styler_literals {
-
-        /**
-         * Type-safe integer literal suffix to construct a Color as a foreground color. The integer
-         * literal must be in the range [0, 255].
-         *
-         * @tparam Literals The numeric literals from which to construct a 256-color value.
-         *
-         * @return The constructed Color.
-         */
-        template <char... Literals>
-        FLY_CONSTEVAL inline Color operator"" _c()
-        {
-            // Convert to std::uint8_t via numeric literal to ensure the provided color is valid.
-            const std::uint8_t validated_color = operator"" _u8<Literals...>();
-            return Color(validated_color);
-        }
-
-    } // namespace styler_literals
-} // namespace literals
 
 /**
  * IO manipulator to stylize a std::ostream with style and color. This manipulator allows for
@@ -273,4 +251,28 @@ private:
     std::unique_ptr<detail::StylerProxy> m_proxy;
 };
 
+} // namespace fly::logger
+
+namespace fly {
+inline namespace literals {
+    inline namespace styler_literals {
+
+        /**
+         * Type-safe integer literal suffix to construct a Color as a foreground color. The integer
+         * literal must be in the range [0, 255].
+         *
+         * @tparam Literals The numeric literals from which to construct a 256-color value.
+         *
+         * @return The constructed Color.
+         */
+        template <char... Literals>
+        FLY_CONSTEVAL inline fly::logger::Color operator"" _c()
+        {
+            // Convert to std::uint8_t via numeric literal to ensure the provided color is valid.
+            const std::uint8_t validated_color = operator"" _u8<Literals...>();
+            return fly::logger::Color(validated_color);
+        }
+
+    } // namespace styler_literals
+} // namespace literals
 } // namespace fly

@@ -11,7 +11,9 @@
 
 CATCH_TEST_CASE("ConsoleLogger", "[logger]")
 {
-    auto logger = fly::Logger::create_console_logger("test", std::make_shared<fly::LoggerConfig>());
+    auto logger = fly::logger::Logger::create_console_logger(
+        "test",
+        std::make_shared<fly::logger::LoggerConfig>());
 
     CATCH_SECTION("Debug log points")
     {

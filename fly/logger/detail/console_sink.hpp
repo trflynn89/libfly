@@ -2,11 +2,11 @@
 
 #include "fly/logger/log_sink.hpp"
 
-namespace fly {
+namespace fly::logger {
 struct Log;
-} // namespace fly
+} // namespace fly::logger
 
-namespace fly::detail {
+namespace fly::logger::detail {
 
 /**
  * A log sink for streaming log points to the console. Logs are formated with style and color
@@ -15,7 +15,7 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version October 11, 2020
  */
-class ConsoleSink : public fly::LogSink
+class ConsoleSink : public fly::logger::LogSink
 {
 public:
     /**
@@ -31,7 +31,7 @@ public:
      *
      * @return True.
      */
-    bool stream(fly::Log &&log) override;
+    bool stream(fly::logger::Log &&log) override;
 };
 
-} // namespace fly::detail
+} // namespace fly::logger::detail
