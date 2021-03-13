@@ -22,10 +22,10 @@ namespace {
 /**
  * Subclass of the coder config to contain invalid values.
  */
-class BadCoderConfig : public fly::CoderConfig
+class BadCoderConfig : public fly::coders::CoderConfig
 {
 public:
-    BadCoderConfig() noexcept : fly::CoderConfig()
+    BadCoderConfig() noexcept : fly::coders::CoderConfig()
     {
         m_default_huffman_encoder_max_code_length =
             std::numeric_limits<decltype(m_default_huffman_encoder_max_code_length)>::max();
@@ -35,10 +35,10 @@ public:
 /**
  * Subclass of the Huffman coder config to reduce Huffman code lengths.
  */
-class SmallCodeLengthConfig : public fly::CoderConfig
+class SmallCodeLengthConfig : public fly::coders::CoderConfig
 {
 public:
-    SmallCodeLengthConfig() noexcept : fly::CoderConfig()
+    SmallCodeLengthConfig() noexcept : fly::coders::CoderConfig()
     {
         m_default_huffman_encoder_max_code_length = 3;
     }
@@ -78,10 +78,10 @@ std::string create_stream(std::vector<fly::byte_type> bytes)
 
 CATCH_TEST_CASE("Huffman", "[coders]")
 {
-    auto config = std::make_shared<fly::CoderConfig>();
+    auto config = std::make_shared<fly::coders::CoderConfig>();
 
-    fly::HuffmanEncoder encoder(config);
-    fly::HuffmanDecoder decoder;
+    fly::coders::HuffmanEncoder encoder(config);
+    fly::coders::HuffmanDecoder decoder;
 
     CATCH_SECTION("Cannot encode stream using an invalid configuration")
     {
@@ -89,7 +89,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
         std::string enc;
 
         config = std::make_shared<BadCoderConfig>();
-        fly::HuffmanEncoder bad_encoder(config);
+        fly::coders::HuffmanEncoder bad_encoder(config);
 
         CATCH_CHECK_FALSE(bad_encoder.encode_string(raw, enc));
     }
@@ -394,7 +394,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
         std::string enc, dec;
 
         config = std::make_shared<SmallCodeLengthConfig>();
-        fly::HuffmanEncoder limted_encoder(config);
+        fly::coders::HuffmanEncoder limted_encoder(config);
 
         CATCH_REQUIRE(limted_encoder.encode_string(raw, enc));
         CATCH_REQUIRE(decoder.decode_string(enc, dec));

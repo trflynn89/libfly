@@ -43,12 +43,13 @@ public:
 /**
  * Subclass of the coder config to contain invalid values.
  */
-class MutableCoderConfig : public fly::CoderConfig
+class MutableCoderConfig : public fly::coders::CoderConfig
 {
 public:
     void invalidate_max_code_length()
     {
-        m_default_huffman_encoder_max_code_length = std::numeric_limits<fly::code_type>::digits;
+        m_default_huffman_encoder_max_code_length =
+            std::numeric_limits<fly::coders::code_type>::digits;
     }
 };
 
@@ -207,7 +208,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         CATCH_REQUIRE_FALSE(std::filesystem::exists(log_file));
         CATCH_REQUIRE(std::filesystem::exists(compressed_path));
 
-        fly::HuffmanDecoder decoder;
+        fly::coders::HuffmanDecoder decoder;
         CATCH_REQUIRE(decoder.decode_file(compressed_path, log_file));
 
         std::uintmax_t actual_size = std::filesystem::file_size(log_file);
@@ -237,7 +238,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         CATCH_CHECK(log_file != find_log_file(path));
         CATCH_REQUIRE(std::filesystem::exists(log_file));
 
-        fly::HuffmanDecoder decoder;
+        fly::coders::HuffmanDecoder decoder;
         CATCH_CHECK_FALSE(decoder.decode_file(log_file, path.file()));
 
         std::uintmax_t actual_size = std::filesystem::file_size(log_file);
@@ -267,7 +268,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         CATCH_CHECK(log_file != find_log_file(path));
         CATCH_REQUIRE(std::filesystem::exists(log_file));
 
-        fly::HuffmanDecoder decoder;
+        fly::coders::HuffmanDecoder decoder;
         CATCH_CHECK_FALSE(decoder.decode_file(log_file, path.file()));
 
         std::uintmax_t actual_size = std::filesystem::file_size(log_file);

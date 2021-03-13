@@ -10,7 +10,9 @@
 #include <stack>
 #include <vector>
 
-namespace fly {
+using namespace fly::literals::numeric_literals;
+
+namespace fly::coders {
 
 namespace {
 
@@ -27,7 +29,7 @@ HuffmanEncoder::HuffmanEncoder(const std::shared_ptr<CoderConfig> &config) noexc
 }
 
 //==================================================================================================
-bool HuffmanEncoder::encode_binary(std::istream &decoded, BitStreamWriter &encoded)
+bool HuffmanEncoder::encode_binary(std::istream &decoded, fly::BitStreamWriter &encoded)
 {
     if (m_max_code_length >= std::numeric_limits<code_type>::digits)
     {
@@ -252,7 +254,7 @@ void HuffmanEncoder::convert_to_canonical_form()
 }
 
 //==================================================================================================
-void HuffmanEncoder::encode_header(BitStreamWriter &encoded) const
+void HuffmanEncoder::encode_header(fly::BitStreamWriter &encoded) const
 {
     // Encode the Huffman coder version.
     encoded.write_byte(static_cast<byte_type>(s_huffman_version));
@@ -265,7 +267,7 @@ void HuffmanEncoder::encode_header(BitStreamWriter &encoded) const
 }
 
 //==================================================================================================
-void HuffmanEncoder::encode_codes(BitStreamWriter &encoded) const
+void HuffmanEncoder::encode_codes(fly::BitStreamWriter &encoded) const
 {
     // At the least, encode that there were zero Huffman codes of length zero.
     std::vector<std::uint16_t> counts(1);
@@ -300,7 +302,7 @@ void HuffmanEncoder::encode_codes(BitStreamWriter &encoded) const
 }
 
 //==================================================================================================
-void HuffmanEncoder::encode_symbols(std::uint32_t chunk_size, BitStreamWriter &encoded)
+void HuffmanEncoder::encode_symbols(std::uint32_t chunk_size, fly::BitStreamWriter &encoded)
 {
     decltype(m_huffman_codes) symbols;
 
@@ -319,4 +321,4 @@ void HuffmanEncoder::encode_symbols(std::uint32_t chunk_size, BitStreamWriter &e
     }
 }
 
-} // namespace fly
+} // namespace fly::coders

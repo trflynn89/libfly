@@ -8,8 +8,11 @@
 #include <memory>
 
 namespace fly {
-
 class BitStreamWriter;
+} // namespace fly
+
+namespace fly::coders {
+
 class CoderConfig;
 
 /**
@@ -86,7 +89,7 @@ protected:
      *
      * @return True if the input stream was successfully encoded.
      */
-    bool encode_binary(std::istream &decoded, BitStreamWriter &encoded) override;
+    bool encode_binary(std::istream &decoded, fly::BitStreamWriter &encoded) override;
 
 private:
     /**
@@ -138,14 +141,14 @@ private:
      *
      * @param encoded Stream to store the encoded header.
      */
-    void encode_header(BitStreamWriter &encoded) const;
+    void encode_header(fly::BitStreamWriter &encoded) const;
 
     /**
      * Encode the generated Huffman codes to the output stream.
      *
      * @param encoded Stream to store the encoded codes.
      */
-    void encode_codes(BitStreamWriter &encoded) const;
+    void encode_codes(fly::BitStreamWriter &encoded) const;
 
     /**
      * Encode symbols from the current chunk buffer with the generated list of Huffman codes. The
@@ -154,7 +157,7 @@ private:
      * @param chunk_size The number of bytes the chunk buffer holds.
      * @param encoded Stream to store the encoded symbols.
      */
-    void encode_symbols(std::uint32_t chunk_size, BitStreamWriter &encoded);
+    void encode_symbols(std::uint32_t chunk_size, fly::BitStreamWriter &encoded);
 
     // Configuration.
     const std::uint32_t m_chunk_size;
@@ -171,4 +174,4 @@ private:
     std::array<HuffmanNode, 1 << 9> m_huffman_tree;
 };
 
-} // namespace fly
+} // namespace fly::coders

@@ -1,6 +1,6 @@
 #include "fly/coders/coder_config.hpp"
 
-namespace fly {
+namespace fly::coders {
 
 //==================================================================================================
 std::uint32_t CoderConfig::huffman_encoder_chunk_size() const
@@ -19,4 +19,4 @@ length_type CoderConfig::huffman_encoder_max_code_length() const
         m_default_huffman_encoder_max_code_length);
 }
 
-} // namespace fly
+} // namespace fly::coders

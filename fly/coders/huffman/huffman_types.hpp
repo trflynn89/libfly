@@ -4,7 +4,7 @@
 #include <queue>
 #include <vector>
 
-namespace fly {
+namespace fly::coders {
 
 using symbol_type = std::uint8_t;
 using frequency_type = std::uint64_t;
@@ -32,16 +32,6 @@ struct HuffmanNode
      * Default constructor. Set all fields to zero/null.
      */
     HuffmanNode() noexcept;
-
-    /**
-     * Deleted copy constructor.
-     */
-    HuffmanNode(const HuffmanNode &) = delete;
-
-    /**
-     * Deleted assignment operator.
-     */
-    HuffmanNode &operator=(const HuffmanNode &) = delete;
 
     /**
      * Move assignment operator. Move all member variables from the given HuffmanNode instance into
@@ -73,6 +63,10 @@ struct HuffmanNode
 
     HuffmanNode *m_left;
     HuffmanNode *m_right;
+
+private:
+    HuffmanNode(const HuffmanNode &) = delete;
+    HuffmanNode &operator=(const HuffmanNode &) = delete;
 };
 
 /**
@@ -110,22 +104,12 @@ struct HuffmanCode
     HuffmanCode(symbol_type symbol, code_type code, length_type length) noexcept;
 
     /**
-     * Deleted copy constructor.
-     */
-    HuffmanCode(const HuffmanCode &) = delete;
-
-    /**
      * Move constructor. Move all member variables from the given HuffmanCode instance into this
      * instance.
      *
      * @param code The HuffmanCode instance to move.
      */
     HuffmanCode(HuffmanCode &&code) noexcept;
-
-    /**
-     * Deleted assignment operator.
-     */
-    HuffmanCode &operator=(const HuffmanCode &) = delete;
 
     /**
      * Move assignment operator. Move all member variables from the given HuffmanCode instance into
@@ -148,6 +132,10 @@ struct HuffmanCode
     symbol_type m_symbol;
     code_type m_code;
     length_type m_length;
+
+private:
+    HuffmanCode(const HuffmanCode &) = delete;
+    HuffmanCode &operator=(const HuffmanCode &) = delete;
 };
 
-} // namespace fly
+} // namespace fly::coders

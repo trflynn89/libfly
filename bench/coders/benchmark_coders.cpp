@@ -30,7 +30,7 @@ public:
 class Huffman final : public Coder
 {
 public:
-    Huffman() : m_encoder(std::make_shared<fly::CoderConfig>())
+    Huffman() : m_encoder(std::make_shared<fly::coders::CoderConfig>())
     {
     }
 
@@ -45,8 +45,8 @@ public:
     }
 
 private:
-    fly::HuffmanEncoder m_encoder;
-    fly::HuffmanDecoder m_decoder;
+    fly::coders::HuffmanEncoder m_encoder;
+    fly::coders::HuffmanDecoder m_decoder;
 };
 
 class Base64 final : public Coder
@@ -63,7 +63,7 @@ public:
     }
 
 private:
-    fly::Base64Coder m_coder;
+    fly::coders::Base64Coder m_coder;
 };
 
 template <typename CoderType, typename Encode>

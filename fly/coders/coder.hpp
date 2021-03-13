@@ -6,9 +6,11 @@
 #include <string>
 
 namespace fly {
-
 class BitStreamReader;
 class BitStreamWriter;
+} // namespace fly
+
+namespace fly::coders {
 
 /**
  * Virtual interface to encode a string or file with a plaintext encoder. Coders for specific
@@ -78,7 +80,7 @@ protected:
      *
      * @return True if the input stream was successfully encoded.
      */
-    virtual bool encode_binary(std::istream &decoded, BitStreamWriter &encoded) = 0;
+    virtual bool encode_binary(std::istream &decoded, fly::BitStreamWriter &encoded) = 0;
 };
 
 /**
@@ -148,7 +150,7 @@ protected:
      *
      * @return True if the input stream was successfully decoded.
      */
-    virtual bool decode_binary(BitStreamReader &encoded, std::ostream &decoded) = 0;
+    virtual bool decode_binary(fly::BitStreamReader &encoded, std::ostream &decoded) = 0;
 };
 
-} // namespace fly
+} // namespace fly::coders

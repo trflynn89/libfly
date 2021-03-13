@@ -6,7 +6,9 @@
 
 #include <vector>
 
-namespace fly {
+using namespace fly::literals::numeric_literals;
+
+namespace fly::coders {
 
 //==================================================================================================
 HuffmanDecoder::HuffmanDecoder() noexcept : m_huffman_codes_size(0), m_max_code_length(0)
@@ -27,7 +29,7 @@ code_type HuffmanDecoder::compute_kraft_mcmillan_constant() const
 }
 
 //==================================================================================================
-bool HuffmanDecoder::decode_binary(BitStreamReader &encoded, std::ostream &decoded)
+bool HuffmanDecoder::decode_binary(fly::BitStreamReader &encoded, std::ostream &decoded)
 {
     std::uint32_t chunk_size;
 
@@ -63,7 +65,7 @@ bool HuffmanDecoder::decode_binary(BitStreamReader &encoded, std::ostream &decod
 }
 
 //==================================================================================================
-bool HuffmanDecoder::decode_header(BitStreamReader &encoded, std::uint32_t &chunk_size)
+bool HuffmanDecoder::decode_header(fly::BitStreamReader &encoded, std::uint32_t &chunk_size)
 {
     // Decode the Huffman coder version.
     byte_type huffman_version;
@@ -88,7 +90,9 @@ bool HuffmanDecoder::decode_header(BitStreamReader &encoded, std::uint32_t &chun
 }
 
 //==================================================================================================
-bool HuffmanDecoder::decode_header_version1(BitStreamReader &encoded, std::uint32_t &chunk_size)
+bool HuffmanDecoder::decode_header_version1(
+    fly::BitStreamReader &encoded,
+    std::uint32_t &chunk_size)
 {
     // Decode the chunk size.
     word_type encoded_chunk_size_kb;
@@ -127,7 +131,7 @@ bool HuffmanDecoder::decode_header_version1(BitStreamReader &encoded, std::uint3
 }
 
 //==================================================================================================
-bool HuffmanDecoder::decode_codes(BitStreamReader &encoded, length_type &max_code_length)
+bool HuffmanDecoder::decode_codes(fly::BitStreamReader &encoded, length_type &max_code_length)
 {
     m_huffman_codes_size = 0;
 
@@ -221,7 +225,7 @@ void HuffmanDecoder::convert_to_prefix_table(length_type max_code_length)
 
 //==================================================================================================
 bool HuffmanDecoder::decode_symbols(
-    BitStreamReader &encoded,
+    fly::BitStreamReader &encoded,
     length_type max_code_length,
     std::uint32_t chunk_size,
     std::ostream &decoded) const
@@ -247,4 +251,4 @@ bool HuffmanDecoder::decode_symbols(
     return (bytes == chunk_size) || encoded.fully_consumed();
 }
 
-} // namespace fly
+} // namespace fly::coders

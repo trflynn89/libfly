@@ -9,14 +9,14 @@
 
 namespace {
 
-// This must match the size of fly::Base64Coder::m_encoded
+// This must match the size of fly::coders::Base64Coder::m_encoded
 constexpr const std::size_t s_large_string_size = 256 << 10;
 
 } // namespace
 
 CATCH_TEST_CASE("Base64", "[coders]")
 {
-    fly::Base64Coder coder;
+    fly::coders::Base64Coder coder;
 
     CATCH_SECTION("Encode and decode empty stream")
     {

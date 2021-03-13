@@ -1,11 +1,9 @@
 #include "fly/coders/base64/base64_coder.hpp"
 
-#include "fly/types/numeric/literals.hpp"
-
 #include <cstdint>
 #include <cstring>
 
-namespace fly {
+namespace fly::coders {
 
 namespace {
 
@@ -217,4 +215,4 @@ bool Base64Coder::decode_internal(std::istream &encoded, std::ostream &decoded)
     return encoded.eof() && decoded.good();
 }
 
-} // namespace fly
+} // namespace fly::coders
