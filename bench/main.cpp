@@ -1,6 +1,6 @@
-#include "fly/logger/log_sink.hpp"
 #include "fly/logger/logger.hpp"
 #include "fly/logger/logger_config.hpp"
+#include "fly/logger/sink.hpp"
 #include "fly/logger/styler.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -19,7 +19,7 @@
 /**
  * Log sink to drop all received logs.
  */
-class DropSink : public fly::logger::LogSink
+class DropSink : public fly::logger::Sink
 {
 public:
     bool initialize() override

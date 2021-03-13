@@ -5,8 +5,8 @@
 #include "fly/logger/detail/file_sink.hpp"
 #include "fly/logger/detail/registry.hpp"
 #include "fly/logger/log.hpp"
-#include "fly/logger/log_sink.hpp"
 #include "fly/logger/logger_config.hpp"
+#include "fly/logger/sink.hpp"
 #include "fly/task/task_runner.hpp"
 
 namespace fly::logger {
@@ -16,7 +16,7 @@ Logger::Logger(
     std::string name,
     std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<LoggerConfig> config,
-    std::unique_ptr<LogSink> &&sink) noexcept :
+    std::unique_ptr<Sink> &&sink) noexcept :
     m_name(std::move(name)),
     m_config(std::move(config)),
     m_sink(std::move(sink)),
@@ -35,7 +35,7 @@ Logger::~Logger()
 std::shared_ptr<Logger> Logger::create_logger(
     std::string name,
     std::shared_ptr<LoggerConfig> logger_config,
-    std::unique_ptr<LogSink> &&sink)
+    std::unique_ptr<Sink> &&sink)
 {
     return create_logger(std::move(name), nullptr, std::move(logger_config), std::move(sink));
 }
@@ -45,7 +45,7 @@ std::shared_ptr<Logger> Logger::create_logger(
     std::string name,
     std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<LoggerConfig> logger_config,
-    std::unique_ptr<LogSink> &&sink)
+    std::unique_ptr<Sink> &&sink)
 {
     // Logger has a private constructor, thus cannot be used with std::make_shared. This class is
     // used to expose the private constructor locally.
@@ -55,7 +55,7 @@ std::shared_ptr<Logger> Logger::create_logger(
             std::string &&name,
             std::shared_ptr<fly::task::SequencedTaskRunner> &&task_runner,
             std::shared_ptr<LoggerConfig> &&logger_config,
-            std::unique_ptr<LogSink> &&sink) noexcept :
+            std::unique_ptr<Sink> &&sink) noexcept :
             Logger(
                 std::move(name),
                 std::move(task_runner),

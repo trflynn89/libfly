@@ -110,7 +110,7 @@ class SequencedTaskRunner;
 namespace fly::logger {
 
 class LoggerConfig;
-class LogSink;
+class Sink;
 
 namespace detail {
     class Registry;
@@ -162,7 +162,7 @@ public:
     static std::shared_ptr<Logger> create_logger(
         std::string name,
         std::shared_ptr<LoggerConfig> logger_config,
-        std::unique_ptr<LogSink> &&sink);
+        std::unique_ptr<Sink> &&sink);
 
     /**
      * Create an asynchronous logger with the provided log sink.
@@ -178,7 +178,7 @@ public:
         std::string name,
         std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<LoggerConfig> logger_config,
-        std::unique_ptr<LogSink> &&sink);
+        std::unique_ptr<Sink> &&sink);
 
     /**
      * Create a synchronous file logger.
@@ -449,7 +449,7 @@ private:
         std::string name,
         std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<LoggerConfig> config,
-        std::unique_ptr<LogSink> &&sink) noexcept;
+        std::unique_ptr<Sink> &&sink) noexcept;
 
     /**
      * Initialize the log sink.
@@ -487,7 +487,7 @@ private:
     const std::string m_name;
 
     std::shared_ptr<LoggerConfig> m_config;
-    std::unique_ptr<LogSink> m_sink;
+    std::unique_ptr<Sink> m_sink;
 
     std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
     std::atomic_bool m_last_task_failed {true};

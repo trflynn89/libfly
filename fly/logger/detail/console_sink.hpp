@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/logger/log_sink.hpp"
+#include "fly/logger/sink.hpp"
 
 namespace fly::logger {
 struct Log;
@@ -15,7 +15,7 @@ namespace fly::logger::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version October 11, 2020
  */
-class ConsoleSink : public fly::logger::LogSink
+class ConsoleSink : public fly::logger::Sink
 {
 public:
     /**
