@@ -14,9 +14,10 @@
 /**
  * Helper macro to create a TaskLocation from the current location.
  */
-#define FROM_HERE fly::TaskLocation({__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)})
+#define FROM_HERE                                                                                  \
+    fly::task::TaskLocation({__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)})
 
-namespace fly {
+namespace fly::task {
 
 class TaskManager;
 
@@ -298,7 +299,7 @@ protected:
      *
      * @param task_manager The task manager.
      */
-    TaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept;
+    TaskRunner(std::shared_ptr<TaskManager> task_manager) noexcept;
 
     /**
      * Post a task for execution in accordance with the concrete task runner's policy.
@@ -448,11 +449,10 @@ public:
      *
      * @return The created task runner.
      */
-    static std::shared_ptr<ParallelTaskRunner>
-    create(const std::shared_ptr<TaskManager> &task_manager);
+    static std::shared_ptr<ParallelTaskRunner> create(std::shared_ptr<TaskManager> task_manager);
 
 protected:
-    explicit ParallelTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept;
+    explicit ParallelTaskRunner(std::shared_ptr<TaskManager> task_manager) noexcept;
 
     /**
      * Post a task for execution immediately.
@@ -494,11 +494,10 @@ public:
      *
      * @return The created task runner.
      */
-    static std::shared_ptr<SequencedTaskRunner>
-    create(const std::shared_ptr<TaskManager> &task_manager);
+    static std::shared_ptr<SequencedTaskRunner> create(std::shared_ptr<TaskManager> task_manager);
 
 protected:
-    explicit SequencedTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept;
+    explicit SequencedTaskRunner(std::shared_ptr<TaskManager> task_manager) noexcept;
 
     /**
      * Post a task for execution within this sequence. If a task is not already running, the task is
@@ -772,4 +771,4 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<Own
     };
 }
 
-} // namespace fly
+} // namespace fly::task

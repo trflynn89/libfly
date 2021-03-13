@@ -10,7 +10,7 @@ namespace fly::net {
 
 //==================================================================================================
 std::shared_ptr<SocketService> SocketService::create(
-    std::shared_ptr<fly::SequencedTaskRunner> task_runner,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<NetworkConfig> config)
 {
     // SocketService has a private constructor, thus cannot be used with std::make_shared. This
@@ -18,7 +18,7 @@ std::shared_ptr<SocketService> SocketService::create(
     struct SocketServiceImpl final : public SocketService
     {
         SocketServiceImpl(
-            std::shared_ptr<fly::SequencedTaskRunner> task_runner,
+            std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
             std::shared_ptr<NetworkConfig> config) noexcept :
             SocketService(std::move(task_runner), std::move(config))
         {
@@ -30,7 +30,7 @@ std::shared_ptr<SocketService> SocketService::create(
 
 //==================================================================================================
 SocketService::SocketService(
-    std::shared_ptr<fly::SequencedTaskRunner> task_runner,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<NetworkConfig> config) noexcept :
     m_task_runner(std::move(task_runner)),
     m_config(std::move(config))

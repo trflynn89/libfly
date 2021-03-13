@@ -264,7 +264,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
     using UdpSocket = fly::net::UdpSocket<EndpointType>;
 
     auto socket_service = fly::net::SocketService::create(
-        fly::SequencedTaskRunner::create(fly::test::task_manager()),
+        fly::task::SequencedTaskRunner::create(fly::test::task_manager()),
         std::make_shared<fly::net::NetworkConfig>());
 
     const std::string message(fly::String::generate_random_string(1 << 10));

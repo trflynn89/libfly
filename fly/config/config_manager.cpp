@@ -13,7 +13,7 @@ namespace fly {
 
 //==================================================================================================
 std::shared_ptr<ConfigManager> ConfigManager::create(
-    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     ConfigFileType file_type,
     std::filesystem::path path)
 {
@@ -22,7 +22,7 @@ std::shared_ptr<ConfigManager> ConfigManager::create(
     struct ConfigManagerImpl final : public ConfigManager
     {
         ConfigManagerImpl(
-            std::shared_ptr<SequencedTaskRunner> task_runner,
+            std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
             ConfigFileType file_type,
             std::filesystem::path path) noexcept :
             ConfigManager(std::move(task_runner), file_type, std::move(path))
@@ -37,7 +37,7 @@ std::shared_ptr<ConfigManager> ConfigManager::create(
 
 //==================================================================================================
 ConfigManager::ConfigManager(
-    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     ConfigFileType file_type,
     std::filesystem::path path) noexcept :
     m_task_runner(std::move(task_runner)),

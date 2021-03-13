@@ -4,12 +4,14 @@
 #include <functional>
 #include <string_view>
 
-namespace fly {
+namespace fly::task {
 
 class TaskRunner;
 
 /**
  * Structure to store basic information about from where a task was posted.
+ *
+ * N.B. This may be replaced by std::source_location when generally available.
  */
 struct TaskLocation
 {
@@ -23,4 +25,4 @@ struct TaskLocation
  */
 using Task = std::function<void(TaskRunner *, TaskLocation)>;
 
-} // namespace fly
+} // namespace fly::task

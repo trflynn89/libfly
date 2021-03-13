@@ -5,7 +5,7 @@
 namespace fly::test {
 
 //==================================================================================================
-void WaitableTaskRunner::task_complete(fly::TaskLocation &&location)
+void WaitableTaskRunner::task_complete(fly::task::TaskLocation &&location)
 {
     m_completed_tasks.push(std::string(location.m_file.data(), location.m_file.size()));
 }
@@ -23,66 +23,66 @@ void WaitableTaskRunner::wait_for_task_to_complete(const std::string &location)
 
 //==================================================================================================
 std::shared_ptr<WaitableParallelTaskRunner>
-WaitableParallelTaskRunner::create(const std::shared_ptr<TaskManager> &task_manager)
+WaitableParallelTaskRunner::create(std::shared_ptr<fly::task::TaskManager> task_manager)
 {
     // WaitableParallelTaskRunner has a private constructor, thus cannot be used with
     // std::make_shared. This class is used to expose the private constructor locally.
     struct WaitableParallelTaskRunnerImpl final : public WaitableParallelTaskRunner
     {
         explicit WaitableParallelTaskRunnerImpl(
-            const std::shared_ptr<TaskManager> &task_manager) noexcept :
-            WaitableParallelTaskRunner(task_manager)
+            std::shared_ptr<fly::task::TaskManager> task_manager) noexcept :
+            WaitableParallelTaskRunner(std::move(task_manager))
         {
         }
     };
 
-    return std::make_shared<WaitableParallelTaskRunnerImpl>(task_manager);
+    return std::make_shared<WaitableParallelTaskRunnerImpl>(std::move(task_manager));
 }
 
 //==================================================================================================
 WaitableParallelTaskRunner::WaitableParallelTaskRunner(
-    const std::shared_ptr<TaskManager> &task_manager) noexcept :
-    fly::ParallelTaskRunner(task_manager)
+    std::shared_ptr<fly::task::TaskManager> task_manager) noexcept :
+    fly::task::ParallelTaskRunner(std::move(task_manager))
 {
 }
 
 //==================================================================================================
-void WaitableParallelTaskRunner::task_complete(fly::TaskLocation &&location)
+void WaitableParallelTaskRunner::task_complete(fly::task::TaskLocation &&location)
 {
-    fly::TaskLocation copy = location;
+    fly::task::TaskLocation copy = location;
     ParallelTaskRunner::task_complete(std::move(location));
     WaitableTaskRunner::task_complete(std::move(copy));
 }
 
 //==================================================================================================
 std::shared_ptr<WaitableSequencedTaskRunner>
-WaitableSequencedTaskRunner::create(const std::shared_ptr<TaskManager> &task_manager)
+WaitableSequencedTaskRunner::create(std::shared_ptr<fly::task::TaskManager> task_manager)
 {
     // WaitableSequencedTaskRunner has a private constructor, thus cannot be used with
     // std::make_shared. This class is used to expose the private constructor locally.
     struct WaitableSequencedTaskRunnerImpl final : public WaitableSequencedTaskRunner
     {
         explicit WaitableSequencedTaskRunnerImpl(
-            const std::shared_ptr<TaskManager> &task_manager) noexcept :
-            WaitableSequencedTaskRunner(task_manager)
+            std::shared_ptr<fly::task::TaskManager> task_manager) noexcept :
+            WaitableSequencedTaskRunner(std::move(task_manager))
         {
         }
     };
 
-    return std::make_shared<WaitableSequencedTaskRunnerImpl>(task_manager);
+    return std::make_shared<WaitableSequencedTaskRunnerImpl>(std::move(task_manager));
 }
 
 //==================================================================================================
 WaitableSequencedTaskRunner::WaitableSequencedTaskRunner(
-    const std::shared_ptr<TaskManager> &task_manager) noexcept :
-    fly::SequencedTaskRunner(task_manager)
+    std::shared_ptr<fly::task::TaskManager> task_manager) noexcept :
+    fly::task::SequencedTaskRunner(std::move(task_manager))
 {
 }
 
 //==================================================================================================
-void WaitableSequencedTaskRunner::task_complete(fly::TaskLocation &&location)
+void WaitableSequencedTaskRunner::task_complete(fly::task::TaskLocation &&location)
 {
-    fly::TaskLocation copy = location;
+    fly::task::TaskLocation copy = location;
     SequencedTaskRunner::task_complete(std::move(location));
     WaitableTaskRunner::task_complete(std::move(copy));
 }

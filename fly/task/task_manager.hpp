@@ -10,7 +10,7 @@
 #include <mutex>
 #include <vector>
 
-namespace fly {
+namespace fly::task {
 
 class TaskRunner;
 
@@ -114,7 +114,7 @@ private:
      */
     void timer_thread();
 
-    ConcurrentQueue<TaskHolder> m_tasks;
+    fly::ConcurrentQueue<TaskHolder> m_tasks;
 
     std::mutex m_delayed_tasks_mutex;
     std::vector<TaskHolder> m_delayed_tasks;
@@ -126,4 +126,4 @@ private:
     std::uint32_t m_thread_count;
 };
 
-} // namespace fly
+} // namespace fly::task

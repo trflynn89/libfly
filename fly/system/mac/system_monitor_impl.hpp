@@ -5,9 +5,12 @@
 #include <chrono>
 #include <cstdint>
 
+namespace fly::task {
+class SequencedTaskRunner;
+} // namespace fly::task
+
 namespace fly {
 
-class SequencedTaskRunner;
 class SystemConfig;
 
 /**
@@ -24,7 +27,7 @@ public:
      * Constructor.
      */
     SystemMonitorImpl(
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<SystemConfig> config) noexcept;
 
 protected:

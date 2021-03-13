@@ -2,11 +2,11 @@
 
 #include "fly/task/task_manager.hpp"
 
-namespace fly {
+namespace fly::task {
 
 //==================================================================================================
-TaskRunner::TaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept :
-    m_weak_task_manager(task_manager)
+TaskRunner::TaskRunner(std::shared_ptr<TaskManager> task_manager) noexcept :
+    m_weak_task_manager(std::move(task_manager))
 {
 }
 
@@ -47,24 +47,24 @@ void TaskRunner::execute(TaskLocation &&location, Task &&task)
 
 //==================================================================================================
 std::shared_ptr<ParallelTaskRunner>
-ParallelTaskRunner::create(const std::shared_ptr<TaskManager> &task_manager)
+ParallelTaskRunner::create(std::shared_ptr<TaskManager> task_manager)
 {
     // ParallelTaskRunner has a private constructor, thus cannot be used with std::make_shared. This
     // class is used to expose the private constructor locally.
     struct ParallelTaskRunnerImpl final : public ParallelTaskRunner
     {
-        explicit ParallelTaskRunnerImpl(const std::shared_ptr<TaskManager> &task_manager) noexcept :
-            ParallelTaskRunner(task_manager)
+        explicit ParallelTaskRunnerImpl(std::shared_ptr<TaskManager> task_manager) noexcept :
+            ParallelTaskRunner(std::move(task_manager))
         {
         }
     };
 
-    return std::make_shared<ParallelTaskRunnerImpl>(task_manager);
+    return std::make_shared<ParallelTaskRunnerImpl>(std::move(task_manager));
 }
 
 //==================================================================================================
-ParallelTaskRunner::ParallelTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept :
-    TaskRunner(task_manager)
+ParallelTaskRunner::ParallelTaskRunner(std::shared_ptr<TaskManager> task_manager) noexcept :
+    TaskRunner(std::move(task_manager))
 {
 }
 
@@ -81,26 +81,24 @@ void ParallelTaskRunner::task_complete(TaskLocation &&)
 
 //==================================================================================================
 std::shared_ptr<SequencedTaskRunner>
-SequencedTaskRunner::create(const std::shared_ptr<TaskManager> &task_manager)
+SequencedTaskRunner::create(std::shared_ptr<TaskManager> task_manager)
 {
     // SequencedTaskRunner has a private constructor, thus cannot be used with std::make_shared.
     // This class is used to expose the private constructor locally.
     struct SequencedTaskRunnerImpl final : public SequencedTaskRunner
     {
-        explicit SequencedTaskRunnerImpl(const std::shared_ptr<TaskManager> &task_manager) noexcept
-            :
-            SequencedTaskRunner(task_manager)
+        explicit SequencedTaskRunnerImpl(std::shared_ptr<TaskManager> task_manager) noexcept :
+            SequencedTaskRunner(std::move(task_manager))
         {
         }
     };
 
-    return std::make_shared<SequencedTaskRunnerImpl>(task_manager);
+    return std::make_shared<SequencedTaskRunnerImpl>(std::move(task_manager));
 }
 
 //==================================================================================================
-SequencedTaskRunner::SequencedTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept
-    :
-    TaskRunner(task_manager)
+SequencedTaskRunner::SequencedTaskRunner(std::shared_ptr<TaskManager> task_manager) noexcept :
+    TaskRunner(std::move(task_manager))
 {
 }
 
@@ -152,4 +150,4 @@ bool SequencedTaskRunner::maybe_post_task(TaskLocation &&location, Task &&task)
     return posted_or_queued;
 }
 
-} // namespace fly
+} // namespace fly::task

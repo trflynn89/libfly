@@ -93,7 +93,7 @@ private:
 /**
  * A task to track its start and end time.
  */
-class TimerTask : public fly::Task
+class TimerTask
 {
 public:
     TimerTask() noexcept : m_start_time(std::chrono::steady_clock::now())
@@ -800,7 +800,7 @@ CATCH_TEST_CASE("Task", "[task]")
 
 CATCH_TEST_CASE("TaskManager", "[task]")
 {
-    auto task_manager = fly::TaskManager::create(1);
+    auto task_manager = fly::task::TaskManager::create(1);
     CATCH_REQUIRE(task_manager);
 
     CATCH_SECTION("Cannot start the task manager multiple times")
@@ -817,7 +817,7 @@ CATCH_TEST_CASE("TaskManager", "[task]")
 
     CATCH_SECTION("Parallel tasks cannot be posted after the task manager is deleted")
     {
-        auto task_runner = fly::ParallelTaskRunner::create(task_manager);
+        auto task_runner = fly::task::ParallelTaskRunner::create(task_manager);
 
         CATCH_REQUIRE(task_manager->stop());
         task_manager.reset();
@@ -831,7 +831,7 @@ CATCH_TEST_CASE("TaskManager", "[task]")
 
     CATCH_SECTION("Sequenced tasks cannot be posted after the task manager is deleted")
     {
-        auto task_runner = fly::SequencedTaskRunner::create(task_manager);
+        auto task_runner = fly::task::SequencedTaskRunner::create(task_manager);
 
         CATCH_REQUIRE(task_manager->stop());
         task_manager.reset();

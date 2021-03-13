@@ -1,11 +1,10 @@
 #include "fly/task/task_manager.hpp"
 
-#include "fly/logger/logger.hpp"
 #include "fly/task/task_runner.hpp"
 
 #include <thread>
 
-namespace fly {
+namespace fly::task {
 
 namespace {
 
@@ -167,4 +166,4 @@ void TaskManager::timer_thread()
     }
 }
 
-} // namespace fly
+} // namespace fly::task
