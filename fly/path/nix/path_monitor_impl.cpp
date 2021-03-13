@@ -87,7 +87,7 @@ bool PathMonitorImpl::read_events()
 
     if (size <= 0)
     {
-        if ((size == -1) && (System::get_error_code() != EAGAIN))
+        if ((size == -1) && (fly::system::get_error_code() != EAGAIN))
         {
             LOGS("Could not read polled event");
         }

@@ -8,7 +8,7 @@
 
 #include <cstring>
 
-namespace fly {
+namespace fly::system {
 
 namespace {
 
@@ -157,4 +157,4 @@ void SystemMonitorImpl::update_process_memory_usage()
     }
 }
 
-} // namespace fly
+} // namespace fly::system

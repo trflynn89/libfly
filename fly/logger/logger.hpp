@@ -79,7 +79,7 @@
         fly::Logger::get_default_logger()->warn(                                                   \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
             FLY_FORMAT_STRING(__VA_ARGS__) ": {}" FLY_FORMAT_ARGS(__VA_ARGS__),                    \
-            fly::System::get_error_string());                                                      \
+            fly::system::get_error_string());                                                      \
     } while (0)
 
 /**

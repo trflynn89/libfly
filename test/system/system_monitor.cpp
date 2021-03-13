@@ -30,10 +30,10 @@ constexpr const char *s_system_monitor_file = "system_monitor.cpp";
 /**
  * Subclass of the system config to decrease the poll interval for faster testing.
  */
-class TestSystemConfig : public fly::SystemConfig
+class TestSystemConfig : public fly::system::SystemConfig
 {
 public:
-    TestSystemConfig() noexcept : fly::SystemConfig()
+    TestSystemConfig() noexcept : fly::system::SystemConfig()
     {
         m_default_poll_interval = 100_i64;
     }
@@ -43,8 +43,9 @@ public:
 
 CATCH_TEST_CASE("SystemMonitor", "[system]")
 {
+    auto config = std::make_shared<TestSystemConfig>();
     auto task_runner = fly::test::WaitableSequencedTaskRunner::create(fly::test::task_manager());
-    auto monitor = fly::SystemMonitor::create(task_runner, std::make_shared<TestSystemConfig>());
+    auto monitor = fly::system::SystemMonitor::create(task_runner, config);
     CATCH_REQUIRE(monitor);
 
     // Wait for one poll to complete before proceeding.
@@ -87,13 +88,13 @@ CATCH_TEST_CASE("SystemMonitor", "[system]")
     {
         fly::test::MockSystem mock(fly::test::MockCall::Read);
 
-        monitor = fly::SystemMonitor::create(task_runner, std::make_shared<fly::SystemConfig>());
+        monitor = fly::system::SystemMonitor::create(task_runner, config);
         CATCH_CHECK_FALSE(monitor);
     }
 
     CATCH_SECTION("Cannot update system CPU when ::read() fails")
     {
-        monitor = fly::SystemMonitor::create(task_runner, std::make_shared<fly::SystemConfig>());
+        monitor = fly::system::SystemMonitor::create(task_runner, config);
         CATCH_REQUIRE(monitor);
 
         task_runner->wait_for_task_to_complete(s_system_monitor_file);
@@ -116,7 +117,7 @@ CATCH_TEST_CASE("SystemMonitor", "[system]")
 
     CATCH_SECTION("Cannot update process CPU when ::times() fails")
     {
-        monitor = fly::SystemMonitor::create(task_runner, std::make_shared<fly::SystemConfig>());
+        monitor = fly::system::SystemMonitor::create(task_runner, config);
         CATCH_REQUIRE(monitor);
 
         task_runner->wait_for_task_to_complete(s_system_monitor_file);

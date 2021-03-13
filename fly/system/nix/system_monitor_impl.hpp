@@ -9,7 +9,7 @@ namespace fly::task {
 class SequencedTaskRunner;
 } // namespace fly::task
 
-namespace fly {
+namespace fly::system {
 
 class SystemConfig;
 
@@ -49,4 +49,4 @@ private:
     clock_t m_prev_time {0};
 };
 
-} // namespace fly
+} // namespace fly::system

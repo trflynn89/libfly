@@ -2,7 +2,7 @@
 
 #include "fly/logger/logger.hpp"
 
-namespace fly::detail {
+namespace fly::system::detail {
 
 namespace {
 

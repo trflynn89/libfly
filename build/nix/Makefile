@@ -19,14 +19,11 @@ $(eval $(call EXCLUDE_FROM_STYLE_ENFORCEMENT, extern/))
 # 1. Ignore test files.
 # 2. Ignore benchmarking files.
 # 3. Ignore external third-party files.
-# 4. Ignore system_impl.hpp - this file is entirely constexpr functions that do not execute at
-#    runtime, which llvm-cov doesn't seem to recognize.
-# 5. Ignore literal_parser.hpp - this file is entirely constexpr functions that do not execute at
+# 4. Ignore literal_parser.hpp - this file is entirely constexpr functions that do not execute at
 #    runtime, which llvm-cov doesn't seem to recognize.
 $(eval $(call EXCLUDE_FROM_COVERAGE, test/))
 $(eval $(call EXCLUDE_FROM_COVERAGE, bench/))
 $(eval $(call EXCLUDE_FROM_COVERAGE, extern/))
-$(eval $(call EXCLUDE_FROM_COVERAGE, fly/system/nix/system_impl.hpp))
 $(eval $(call EXCLUDE_FROM_COVERAGE, fly/types/numeric/detail/literal_parser.hpp))
 
 # Paths to exclude from generation of compilation database.

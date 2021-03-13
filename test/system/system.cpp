@@ -28,12 +28,12 @@ public:
     ScopedSignalHandler()
     {
         auto handler = std::bind(&ScopedSignalHandler::handle_signal, this, std::placeholders::_1);
-        fly::System::set_signal_handler(std::move(handler));
+        fly::system::set_signal_handler(std::move(handler));
     }
 
     ~ScopedSignalHandler()
     {
-        fly::System::set_signal_handler(nullptr);
+        fly::system::set_signal_handler(nullptr);
     }
 
     int operator()() const
@@ -70,7 +70,7 @@ CATCH_TEST_CASE("System", "[system]")
     CATCH_SECTION("Print a backtrace to stderr")
     {
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
-        fly::System::print_backtrace();
+        fly::system::print_backtrace();
 
         std::string output = capture();
         CATCH_CHECK_FALSE(output.empty());
@@ -83,7 +83,7 @@ CATCH_TEST_CASE("System", "[system]")
         fly::test::MockSystem mock(fly::test::MockCall::Backtrace);
 
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
-        fly::System::print_backtrace();
+        fly::system::print_backtrace();
 
         std::string output = capture();
         CATCH_CHECK(output.empty());
@@ -94,7 +94,7 @@ CATCH_TEST_CASE("System", "[system]")
         fly::test::MockSystem mock(fly::test::MockCall::BacktraceSymbols);
 
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
-        fly::System::print_backtrace();
+        fly::system::print_backtrace();
 
         std::string output = capture();
         CATCH_CHECK(output.empty());
@@ -104,7 +104,7 @@ CATCH_TEST_CASE("System", "[system]")
 
     CATCH_SECTION("Capture the system's local time")
     {
-        std::string time = fly::System::local_time();
+        std::string time = fly::system::local_time();
         CATCH_CHECK_FALSE(time.empty());
     }
 
@@ -114,7 +114,7 @@ CATCH_TEST_CASE("System", "[system]")
     {
         fly::test::MockSystem mock(fly::test::MockCall::LocalTime);
 
-        std::string time = fly::System::local_time();
+        std::string time = fly::system::local_time();
         CATCH_CHECK(time.empty());
     }
 
@@ -122,10 +122,10 @@ CATCH_TEST_CASE("System", "[system]")
 
     CATCH_SECTION("Capture the system's last error code as an integer and string")
     {
-        int code = fly::System::get_error_code();
+        int code = fly::system::get_error_code();
 
-        std::string error1 = fly::System::get_error_string();
-        std::string error2 = fly::System::get_error_string(code);
+        std::string error1 = fly::system::get_error_string();
+        std::string error2 = fly::system::get_error_string(code);
 
         CATCH_CHECK_FALSE(error1.empty());
         CATCH_CHECK_FALSE(error2.empty());
@@ -134,8 +134,8 @@ CATCH_TEST_CASE("System", "[system]")
 
     CATCH_SECTION("Setup a custom signal handler with global method")
     {
-        fly::System::SignalHandler handler(&handle_signal);
-        fly::System::set_signal_handler(std::move(handler));
+        fly::system::SignalHandler handler(&handle_signal);
+        fly::system::set_signal_handler(std::move(handler));
 
         std::raise(SIGINT);
         CATCH_CHECK(s_last_signal == SIGINT);
@@ -143,7 +143,7 @@ CATCH_TEST_CASE("System", "[system]")
         std::raise(SIGSEGV);
         CATCH_CHECK(s_last_signal == SIGSEGV);
 
-        fly::System::set_signal_handler(nullptr);
+        fly::system::set_signal_handler(nullptr);
     }
 
     CATCH_SECTION("Setup a custom signal handler with instance class method")
@@ -160,7 +160,7 @@ CATCH_TEST_CASE("System", "[system]")
     CATCH_SECTION("Setup a custom signal handler with static class method")
     {
         auto handler = std::bind(&StaticSignalHandler::handle_signal, std::placeholders::_1);
-        fly::System::set_signal_handler(std::move(handler));
+        fly::system::set_signal_handler(std::move(handler));
 
         std::raise(SIGINT);
         CATCH_CHECK(StaticSignalHandler::s_last_signal == SIGINT);
@@ -168,13 +168,13 @@ CATCH_TEST_CASE("System", "[system]")
         std::raise(SIGSEGV);
         CATCH_CHECK(StaticSignalHandler::s_last_signal == SIGSEGV);
 
-        fly::System::set_signal_handler(nullptr);
+        fly::system::set_signal_handler(nullptr);
     }
 
     CATCH_SECTION("Setup a custom signal handler with lambda")
     {
         int last_signal = 0;
-        fly::System::set_signal_handler(
+        fly::system::set_signal_handler(
             [&last_signal](int signal)
             {
                 last_signal = signal;
@@ -186,6 +186,6 @@ CATCH_TEST_CASE("System", "[system]")
         std::raise(SIGSEGV);
         CATCH_CHECK(last_signal == SIGSEGV);
 
-        fly::System::set_signal_handler(nullptr);
+        fly::system::set_signal_handler(nullptr);
     }
 }

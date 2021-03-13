@@ -8,7 +8,7 @@ namespace fly::task {
 class SequencedTaskRunner;
 } // namespace fly::task
 
-namespace fly {
+namespace fly::system {
 
 class SystemConfig;
 
@@ -152,4 +152,4 @@ private:
     std::shared_ptr<SystemConfig> m_config;
 };
 
-} // namespace fly
+} // namespace fly::system

@@ -2,7 +2,7 @@
 
 #include <mach/mach.h>
 
-namespace fly::detail {
+namespace fly::system::detail {
 
 /**
  * Fetch basic information about this macOS host. Uses the following structures and methods:
@@ -110,4 +110,4 @@ bool task_basic_info(task_basic_info_64_data_t &task_info);
  */
 bool task_thread_times(task_thread_times_info_data_t &thread_times);
 
-} // namespace fly::detail
+} // namespace fly::system::detail
