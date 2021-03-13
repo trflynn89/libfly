@@ -305,7 +305,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncListenSocket", "[net]", fly::net::IPv4Address, fl
     using TcpSocket = fly::net::TcpSocket<EndpointType>;
 
     auto socket_service = fly::net::SocketService::create(
-        fly::SequencedTaskRunner::create(fly::test::task_manager()),
+        fly::task::SequencedTaskRunner::create(fly::test::task_manager()),
         std::make_shared<fly::net::NetworkConfig>());
 
     fly::test::Signal signal;

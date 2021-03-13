@@ -25,14 +25,14 @@ namespace {
     class ScopedTaskManager
     {
     public:
-        static std::shared_ptr<fly::TaskManager> instance()
+        static std::shared_ptr<fly::task::TaskManager> instance()
         {
             static ScopedTaskManager s_task_manager;
             return s_task_manager.m_task_manager;
         }
 
     private:
-        ScopedTaskManager() : m_task_manager(fly::TaskManager::create(s_num_workers))
+        ScopedTaskManager() : m_task_manager(fly::task::TaskManager::create(s_num_workers))
         {
             CATCH_REQUIRE(m_task_manager);
         }
@@ -49,13 +49,13 @@ namespace {
 #endif
         }
 
-        std::shared_ptr<fly::TaskManager> m_task_manager;
+        std::shared_ptr<fly::task::TaskManager> m_task_manager;
     };
 
 } // namespace
 
 //==================================================================================================
-std::shared_ptr<fly::TaskManager> task_manager()
+std::shared_ptr<fly::task::TaskManager> task_manager()
 {
     return ScopedTaskManager::instance();
 }

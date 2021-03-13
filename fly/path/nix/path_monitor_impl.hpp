@@ -10,10 +10,13 @@
 #include <filesystem>
 #include <memory>
 
+namespace fly::task {
+class SequencedTaskRunner;
+} // namespace fly::task
+
 namespace fly {
 
 class PathConfig;
-class SequencedTaskRunner;
 
 /**
  * Linux implementation of the PathMonitor interface. Uses the inotify API to detect path changes.
@@ -28,7 +31,7 @@ public:
      * Constructor. Create the path monitor's inotify handle.
      */
     PathMonitorImpl(
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<PathConfig> config) noexcept;
 
     /**

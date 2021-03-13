@@ -4,9 +4,12 @@
 #include <cstdint>
 #include <memory>
 
+namespace fly::task {
+class SequencedTaskRunner;
+} // namespace fly::task
+
 namespace fly {
 
-class SequencedTaskRunner;
 class SystemConfig;
 
 /**
@@ -27,8 +30,9 @@ public:
      *
      * @return The created system monitor.
      */
-    static std::shared_ptr<SystemMonitor>
-    create(std::shared_ptr<SequencedTaskRunner> task_runner, std::shared_ptr<SystemConfig> config);
+    static std::shared_ptr<SystemMonitor> create(
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
+        std::shared_ptr<SystemConfig> config);
 
     /**
      * Destructor.
@@ -85,7 +89,7 @@ protected:
      * @param config Reference to system configuration.
      */
     SystemMonitor(
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<SystemConfig> config) noexcept;
 
     /**
@@ -144,7 +148,7 @@ private:
      */
     bool poll_system_later();
 
-    std::shared_ptr<SequencedTaskRunner> m_task_runner;
+    std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
     std::shared_ptr<SystemConfig> m_config;
 };
 

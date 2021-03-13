@@ -103,11 +103,14 @@ namespace fly::detail {
 class Registry;
 } // namespace fly::detail
 
+namespace fly::task {
+class SequencedTaskRunner;
+} // namespace fly::task
+
 namespace fly {
 
 class CoderConfig;
 class LoggerConfig;
-class SequencedTaskRunner;
 class LogSink;
 
 /**
@@ -170,7 +173,7 @@ public:
      */
     static std::shared_ptr<Logger> create_logger(
         std::string name,
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<LoggerConfig> logger_config,
         std::unique_ptr<LogSink> &&sink);
 
@@ -203,7 +206,7 @@ public:
      */
     static std::shared_ptr<Logger> create_file_logger(
         std::string name,
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<LoggerConfig> logger_config,
         std::shared_ptr<CoderConfig> coder_config,
         std::filesystem::path logger_directory);
@@ -230,7 +233,7 @@ public:
      */
     static std::shared_ptr<Logger> create_console_logger(
         std::string name,
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<LoggerConfig> logger_config);
 
     /**
@@ -441,7 +444,7 @@ private:
      */
     Logger(
         std::string name,
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<LoggerConfig> config,
         std::unique_ptr<LogSink> &&sink) noexcept;
 
@@ -483,7 +486,7 @@ private:
     std::shared_ptr<LoggerConfig> m_config;
     std::unique_ptr<LogSink> m_sink;
 
-    std::shared_ptr<SequencedTaskRunner> m_task_runner;
+    std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
     std::atomic_bool m_last_task_failed {true};
 
     const std::chrono::steady_clock::time_point m_start_time;

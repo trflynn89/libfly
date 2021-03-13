@@ -13,7 +13,7 @@ namespace fly {
 
 //==================================================================================================
 std::shared_ptr<SystemMonitor> SystemMonitor::create(
-    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<SystemConfig> config)
 {
     auto system_monitor =
@@ -23,7 +23,7 @@ std::shared_ptr<SystemMonitor> SystemMonitor::create(
 
 //==================================================================================================
 SystemMonitor::SystemMonitor(
-    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<SystemConfig> config) noexcept :
     m_task_runner(task_runner),
     m_config(config)

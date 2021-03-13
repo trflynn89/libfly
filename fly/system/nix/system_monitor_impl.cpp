@@ -24,7 +24,7 @@ namespace {
 
 //==================================================================================================
 SystemMonitorImpl::SystemMonitorImpl(
-    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<SystemConfig> config) noexcept :
     SystemMonitor(std::move(task_runner), std::move(config))
 {

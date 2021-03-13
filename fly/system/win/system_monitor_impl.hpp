@@ -5,9 +5,12 @@
 #include <Pdh.h>
 #include <Windows.h>
 
+namespace fly::task {
+class SequencedTaskRunner;
+} // namespace fly::task
+
 namespace fly {
 
-class SequencedTaskRunner;
 class SystemConfig;
 
 /**
@@ -24,7 +27,7 @@ public:
      * Constructor. Open the system monitor's CPU query.
      */
     SystemMonitorImpl(
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<SystemConfig> config) noexcept;
 
     /**

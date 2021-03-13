@@ -12,11 +12,14 @@
 #include <string>
 #include <type_traits>
 
+namespace fly::task {
+class SequencedTaskRunner;
+} // namespace fly::task
+
 namespace fly {
 
 class Parser;
 class PathMonitor;
-class SequencedTaskRunner;
 
 /**
  * Class to create and manage a set of configurations.
@@ -51,7 +54,7 @@ public:
      * @return The created configuration manager.
      */
     static std::shared_ptr<ConfigManager> create(
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         ConfigFileType file_type,
         std::filesystem::path path);
 
@@ -86,7 +89,7 @@ private:
      * @param path Path to the configuration file.
      */
     ConfigManager(
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         ConfigFileType file_type,
         std::filesystem::path path) noexcept;
 
@@ -102,7 +105,7 @@ private:
      */
     void update_config();
 
-    std::shared_ptr<SequencedTaskRunner> m_task_runner;
+    std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
 
     std::shared_ptr<PathMonitor> m_monitor;
     std::unique_ptr<Parser> m_parser;

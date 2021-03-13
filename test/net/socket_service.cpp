@@ -37,7 +37,7 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
     using EndpointType = fly::net::Endpoint<IPAddressType>;
     using UdpSocket = fly::net::UdpSocket<EndpointType>;
 
-    auto task_runner = fly::SequencedTaskRunner::create(fly::test::task_manager());
+    auto task_runner = fly::task::SequencedTaskRunner::create(fly::test::task_manager());
     auto socket_service =
         fly::net::SocketService::create(task_runner, std::make_shared<fly::net::NetworkConfig>());
 

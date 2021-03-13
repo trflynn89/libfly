@@ -8,9 +8,9 @@
 #include <string>
 #include <typeinfo>
 
-namespace fly {
+namespace fly::task {
 class TaskManager;
-} // namespace fly
+} // namespace fly::task
 
 namespace fly::test {
 
@@ -43,7 +43,7 @@ protected:
      *
      * @param location The location from which the task was posted.
      */
-    virtual void task_complete(fly::TaskLocation &&location) = 0;
+    virtual void task_complete(fly::task::TaskLocation &&location) = 0;
 
 private:
     fly::ConcurrentQueue<std::string> m_completed_tasks;
@@ -56,7 +56,7 @@ private:
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
-class WaitableParallelTaskRunner : public fly::ParallelTaskRunner, public WaitableTaskRunner
+class WaitableParallelTaskRunner : public fly::task::ParallelTaskRunner, public WaitableTaskRunner
 {
 public:
     /**
@@ -67,17 +67,17 @@ public:
      * @return The created task runner.
      */
     static std::shared_ptr<WaitableParallelTaskRunner>
-    create(const std::shared_ptr<TaskManager> &task_manager);
+    create(std::shared_ptr<fly::task::TaskManager> task_manager);
 
 protected:
-    WaitableParallelTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept;
+    WaitableParallelTaskRunner(std::shared_ptr<fly::task::TaskManager> task_manager) noexcept;
 
     /**
      * When a task is complete, perform the same operations as this runner's parents.
      *
      * @param location The location to wait upon.
      */
-    void task_complete(fly::TaskLocation &&location) override;
+    void task_complete(fly::task::TaskLocation &&location) override;
 };
 
 /**
@@ -87,7 +87,7 @@ protected:
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version August 12, 2018
  */
-class WaitableSequencedTaskRunner : public fly::SequencedTaskRunner, public WaitableTaskRunner
+class WaitableSequencedTaskRunner : public fly::task::SequencedTaskRunner, public WaitableTaskRunner
 {
 public:
     /**
@@ -98,17 +98,17 @@ public:
      * @return The created task runner.
      */
     static std::shared_ptr<WaitableSequencedTaskRunner>
-    create(const std::shared_ptr<TaskManager> &task_manager);
+    create(std::shared_ptr<fly::task::TaskManager> task_manager);
 
 protected:
-    WaitableSequencedTaskRunner(const std::shared_ptr<TaskManager> &task_manager) noexcept;
+    WaitableSequencedTaskRunner(std::shared_ptr<fly::task::TaskManager> task_manager) noexcept;
 
     /**
      * When a task is complete, perform the same operations as this runner's parents.
      *
      * @param location The location to wait upon.
      */
-    void task_complete(fly::TaskLocation &&location) override;
+    void task_complete(fly::task::TaskLocation &&location) override;
 };
 
 } // namespace fly::test

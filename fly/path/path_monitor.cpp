@@ -13,7 +13,7 @@ namespace fly {
 
 //==================================================================================================
 std::shared_ptr<PathMonitor> PathMonitor::create(
-    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<PathConfig> config)
 {
     auto path_monitor =
@@ -23,7 +23,7 @@ std::shared_ptr<PathMonitor> PathMonitor::create(
 
 //==================================================================================================
 PathMonitor::PathMonitor(
-    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<PathConfig> config) noexcept :
     m_task_runner(std::move(task_runner)),
     m_config(std::move(config))

@@ -7,11 +7,14 @@
 #include <memory>
 #include <mutex>
 
+namespace fly::task {
+class SequencedTaskRunner;
+} // namespace fly::task
+
 namespace fly {
 
 class PathConfig;
 class PathMonitorTask;
-class SequencedTaskRunner;
 
 /**
  * Virtual interface to monitor a local path. Provides monitoring of either all files or
@@ -48,8 +51,9 @@ public:
      *
      * @return The created path monitor.
      */
-    static std::shared_ptr<PathMonitor>
-    create(std::shared_ptr<SequencedTaskRunner> task_runner, std::shared_ptr<PathConfig> config);
+    static std::shared_ptr<PathMonitor> create(
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
+        std::shared_ptr<PathConfig> config);
 
     /**
      * Destructor. Remove all paths from the path monitor.
@@ -138,7 +142,7 @@ protected:
      * @param config Reference to path configuration.
      */
     PathMonitor(
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<PathConfig> config) noexcept;
 
     /**
@@ -198,7 +202,7 @@ private:
      */
     friend std::ostream &operator<<(std::ostream &stream, PathEvent event);
 
-    std::shared_ptr<SequencedTaskRunner> m_task_runner;
+    std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
     std::shared_ptr<PathConfig> m_config;
 };
 

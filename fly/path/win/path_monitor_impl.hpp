@@ -9,10 +9,13 @@
 #include <filesystem>
 #include <memory>
 
+namespace fly::task {
+class SequencedTaskRunner;
+} // namespace fly::task
+
 namespace fly {
 
 class PathConfig;
-class SequencedTaskRunner;
 
 /**
  * Windows implementation of the PathMonitor interface. Uses the ReadDirectoryChangesW API to detect
@@ -28,7 +31,7 @@ public:
      * Constructor.
      */
     PathMonitorImpl(
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<PathConfig> config) noexcept;
 
 protected:

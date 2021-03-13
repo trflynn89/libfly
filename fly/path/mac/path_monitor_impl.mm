@@ -37,7 +37,7 @@ namespace {
 
 //==================================================================================================
 PathMonitorImpl::PathMonitorImpl(
-    std::shared_ptr<SequencedTaskRunner> task_runner,
+    std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
     std::shared_ptr<PathConfig> config) noexcept :
     PathMonitor(std::move(task_runner), std::move(config)),
     m_context(std::make_unique<FSEventStreamContext>()),

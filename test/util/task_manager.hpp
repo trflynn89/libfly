@@ -2,9 +2,9 @@
 
 #include <memory>
 
-namespace fly {
+namespace fly::task {
 class TaskManager;
-} // namespace fly
+} // namespace fly::task
 
 namespace fly::test {
 
@@ -15,6 +15,6 @@ namespace fly::test {
  *
  * @return A pointer to the single task manager instance.
  */
-std::shared_ptr<fly::TaskManager> task_manager();
+std::shared_ptr<fly::task::TaskManager> task_manager();
 
 } // namespace fly::test

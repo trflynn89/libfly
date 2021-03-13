@@ -6,9 +6,9 @@
 #include <memory>
 #include <vector>
 
-namespace fly {
+namespace fly::task {
 class SequencedTaskRunner;
-} // namespace fly
+} // namespace fly::task
 
 namespace fly::net {
 
@@ -38,7 +38,7 @@ public:
      * @return The created socket service.
      */
     static std::shared_ptr<SocketService> create(
-        std::shared_ptr<fly::SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<NetworkConfig> config);
 
     /**
@@ -117,7 +117,7 @@ private:
      * @param task_runner Task runner for posting socket service tasks onto.
      */
     SocketService(
-        std::shared_ptr<fly::SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**
@@ -166,7 +166,7 @@ private:
      */
     void poll();
 
-    std::shared_ptr<fly::SequencedTaskRunner> m_task_runner;
+    std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
 
     std::shared_ptr<NetworkConfig> m_config;
 

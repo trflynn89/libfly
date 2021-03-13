@@ -11,10 +11,13 @@
 #include <memory>
 #include <vector>
 
+namespace fly::task {
+class SequencedTaskRunner;
+} // namespace fly::task
+
 namespace fly {
 
 class PathConfig;
-class SequencedTaskRunner;
 
 /**
  * macOS implementation of the PathMonitor interface. Uses the Apple File System Events API to
@@ -32,7 +35,7 @@ public:
      * Constructor. Creates the dispatch queue used to handle path events.
      */
     PathMonitorImpl(
-        std::shared_ptr<SequencedTaskRunner> task_runner,
+        std::shared_ptr<fly::task::SequencedTaskRunner> task_runner,
         std::shared_ptr<PathConfig> config) noexcept;
 
     /**
