@@ -7,7 +7,7 @@
 #include <optional>
 #include <string>
 
-namespace fly {
+namespace fly::parser {
 
 /**
  * Implementation of the Parser interface for the .ini format.
@@ -23,7 +23,7 @@ protected:
      *
      * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
-    std::optional<Json> parse_internal() override;
+    std::optional<fly::Json> parse_internal() override;
 
 private:
     /**
@@ -94,4 +94,4 @@ private:
     TrimResult trim_value(std::string &str, char start, char end) const;
 };
 
-} // namespace fly
+} // namespace fly::parser

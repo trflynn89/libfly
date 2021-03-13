@@ -15,7 +15,7 @@
 #include <string>
 #include <type_traits>
 
-namespace fly {
+namespace fly::parser {
 
 /**
  * Virtual interface to parse a file or string. Parsers for specific formats should inherit from
@@ -53,7 +53,7 @@ public:
      * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
     template <typename StringType>
-    std::optional<Json> parse_string(const StringType &contents);
+    std::optional<fly::Json> parse_string(const StringType &contents);
 
     /**
      * Parse a file and retrieve the parsed values.
@@ -75,7 +75,7 @@ public:
      *
      * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
-    std::optional<Json> parse_file(const std::filesystem::path &path);
+    std::optional<fly::Json> parse_file(const std::filesystem::path &path);
 
 protected:
     /**
@@ -84,7 +84,7 @@ protected:
      *
      * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
-    virtual std::optional<Json> parse_internal() = 0;
+    virtual std::optional<fly::Json> parse_internal() = 0;
 
     /**
      * Read the next symbol from the stream without extracting it.
@@ -147,7 +147,7 @@ private:
      *
      * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
-    std::optional<Json> parse_stream(std::istream &&stream);
+    std::optional<fly::Json> parse_stream(std::istream &&stream);
 
     /**
      * Parse a non-UTF-8 encoded stream and convert the result to a UTF-8 encoded string.
@@ -181,7 +181,7 @@ private:
 
 //==================================================================================================
 template <typename StringType>
-std::optional<Json> Parser::parse_string(const StringType &contents)
+std::optional<fly::Json> Parser::parse_string(const StringType &contents)
 {
     using CharType = typename StringType::value_type;
 
@@ -192,7 +192,7 @@ std::optional<Json> Parser::parse_string(const StringType &contents)
     }
     else
     {
-        auto utf8_contents = BasicString<StringType>::template convert<std::string>(contents);
+        auto utf8_contents = fly::BasicString<StringType>::template convert<std::string>(contents);
         return utf8_contents ? parse_string(*utf8_contents) : std::nullopt;
     }
 }
@@ -227,7 +227,7 @@ std::optional<std::string> Parser::ensure_utf8(std::istream &stream) const
         }
     }
 
-    return BasicString<StringType>::template convert<std::string>(contents);
+    return fly::BasicString<StringType>::template convert<std::string>(contents);
 }
 
 //==================================================================================================
@@ -270,4 +270,4 @@ inline bool Parser::eof()
     return peek() == std::char_traits<std::ios::char_type>::eof();
 }
 
-} // namespace fly
+} // namespace fly::parser

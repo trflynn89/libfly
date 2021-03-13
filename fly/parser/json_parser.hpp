@@ -10,7 +10,7 @@
 #include <optional>
 #include <string>
 
-namespace fly {
+namespace fly::parser {
 
 /**
  * Implementation of the Parser interface for the .json format.
@@ -60,15 +60,15 @@ protected:
      *
      * @return If successful, the parsed JSON value. Otherwise, an uninitialized value.
      */
-    std::optional<Json> parse_internal() override;
+    std::optional<fly::Json> parse_internal() override;
 
 private:
     /**
      * ASCII codes for special JSON tokens.
      */
-    enum class Token : std::char_traits<JsonTraits::char_type>::int_type
+    enum class Token : std::char_traits<fly::JsonTraits::char_type>::int_type
     {
-        EndOfFile = std::char_traits<JsonTraits::char_type>::eof(),
+        EndOfFile = std::char_traits<fly::JsonTraits::char_type>::eof(),
 
         Tab = 0x09, // \t
         NewLine = 0x0a, // \n
@@ -117,21 +117,21 @@ private:
      *
      * @return If successful, the parsed JSON value. Otherwise, an uninitialized value.
      */
-    std::optional<Json> parse_json();
+    std::optional<fly::Json> parse_json();
 
     /**
      * Parse a JSON object from the stream.
      *
      * @return If successful, the parsed JSON object. Otherwise, an uninitialized value.
      */
-    std::optional<Json> parse_object();
+    std::optional<fly::Json> parse_object();
 
     /**
      * Parse a JSON array from the stream.
      *
      * @return If successful, the parsed JSON array. Otherwise, an uninitialized value.
      */
-    std::optional<Json> parse_array();
+    std::optional<fly::Json> parse_array();
 
     /**
      * Determine whether parsing a JSON object or array is complete.
@@ -151,14 +151,14 @@ private:
      *
      * @return If successful, the parsed JSON string. Otherwise, an uninitialized value.
      */
-    std::optional<JsonTraits::string_type> parse_quoted_string();
+    std::optional<fly::JsonTraits::string_type> parse_quoted_string();
 
     /**
      * Parse a JSON number, boolean, or null value from the stream.
      *
      * @return If successful, the parsed JSON value. Otherwise, an uninitialized value.
      */
-    std::optional<Json> parse_value();
+    std::optional<fly::Json> parse_value();
 
     /**
      * Extract a single symbol from the stream. Ensure that symbol is equal to an expected token.
@@ -182,7 +182,7 @@ private:
      *
      * @return The JSON value that was parsed as a string.
      */
-    JsonTraits::string_type consume_value();
+    fly::JsonTraits::string_type consume_value();
 
     /**
      * Extract all consecutive whitespace symbols and comments (if enabled in the feature set) from
@@ -212,7 +212,7 @@ private:
      *
      * @return The interpreted JSON value type.
      */
-    NumberType validate_number(const JsonTraits::string_type &value) const;
+    NumberType validate_number(const fly::JsonTraits::string_type &value) const;
 
     /**
      * Check if a symbol is a whitespace symbol.
@@ -238,4 +238,4 @@ JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b);
  */
 JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b);
 
-} // namespace fly
+} // namespace fly::parser

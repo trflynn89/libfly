@@ -12,9 +12,9 @@
 #include <string>
 #include <type_traits>
 
-namespace fly {
+namespace fly::parser {
 class Parser;
-} // namespace fly
+} // namespace fly::parser
 
 namespace fly::path {
 class PathMonitor;
@@ -113,7 +113,7 @@ private:
     std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
 
     std::shared_ptr<fly::path::PathMonitor> m_monitor;
-    std::unique_ptr<fly::Parser> m_parser;
+    std::unique_ptr<fly::parser::Parser> m_parser;
     fly::Json m_values;
 
     const std::filesystem::path m_path;

@@ -14,7 +14,7 @@
 
 CATCH_TEST_CASE("JsonParser", "[parser]")
 {
-    fly::JsonParser parser;
+    fly::parser::JsonParser parser;
 
     auto validate_fail_raw = [&](const std::string &test)
     {
@@ -73,7 +73,6 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         {
             const auto file = it.path().filename();
             CATCH_CAPTURE(file);
-            LOGI("{}", file);
 
             if (file.string().starts_with("pass"))
             {
@@ -115,7 +114,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         };
 
         // JSONTestSuite contains test files that aren't only objects or arrays.
-        fly::JsonParser type_parser(fly::JsonParser::Features::AllowAnyType);
+        fly::parser::JsonParser type_parser(fly::parser::JsonParser::Features::AllowAnyType);
 
         // Get the path to the JSONTestSuite directory.
         const auto here = std::filesystem::path(__FILE__);
@@ -588,7 +587,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Single-line comments are ignored only when enabled")
     {
-        fly::JsonParser comment_parser(fly::JsonParser::Features::AllowComments);
+        fly::parser::JsonParser comment_parser(fly::parser::JsonParser::Features::AllowComments);
         {
             std::string str = R"(
         // here is a comment1
@@ -705,7 +704,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Multi-line comments are ignored only when enabled")
     {
-        fly::JsonParser comment_parser(fly::JsonParser::Features::AllowComments);
+        fly::parser::JsonParser comment_parser(fly::parser::JsonParser::Features::AllowComments);
         {
             std::string str = R"(
         /* here is a comment1 */
@@ -848,7 +847,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Badly formed comments cannot be parsed")
     {
-        fly::JsonParser comment_parser(fly::JsonParser::Features::AllowComments);
+        fly::parser::JsonParser comment_parser(fly::parser::JsonParser::Features::AllowComments);
         {
             std::string str = R"(/* here is a bad comment
         {
@@ -899,7 +898,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Trailing commas in objects are ignored only when enabled")
     {
-        fly::JsonParser comma_parser(fly::JsonParser::Features::AllowTrailingComma);
+        fly::parser::JsonParser comma_parser(fly::parser::JsonParser::Features::AllowTrailingComma);
         {
             std::string str = R"({
             "a" : 12,
@@ -938,7 +937,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Trailing commas in arrays are ignored only when enabled")
     {
-        fly::JsonParser comma_parser(fly::JsonParser::Features::AllowTrailingComma);
+        fly::parser::JsonParser comma_parser(fly::parser::JsonParser::Features::AllowTrailingComma);
         {
             std::string str = R"({
             "a" : 12,
@@ -980,7 +979,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Parsing of any JSON type is valid only when enabled")
     {
-        fly::JsonParser type_parser(fly::JsonParser::Features::AllowAnyType);
+        fly::parser::JsonParser type_parser(fly::parser::JsonParser::Features::AllowAnyType);
         {
             std::string str = "this is a string without quotes";
 
@@ -1068,128 +1067,76 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Parser features may be treated as a bitmask")
     {
+        using Features = fly::parser::JsonParser::Features;
+
         // Strict
         {
-            auto features = fly::JsonParser::Features::Strict;
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowComments) ==
-                fly::JsonParser::Features::Strict);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowTrailingComma) ==
-                fly::JsonParser::Features::Strict);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowAnyType) ==
-                fly::JsonParser::Features::Strict);
+            auto features = Features::Strict;
+            CATCH_CHECK((features & Features::AllowComments) == Features::Strict);
+            CATCH_CHECK((features & Features::AllowTrailingComma) == Features::Strict);
+            CATCH_CHECK((features & Features::AllowAnyType) == Features::Strict);
         }
 
         // AllowComments
         {
-            auto features = fly::JsonParser::Features::AllowComments;
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowComments) ==
-                fly::JsonParser::Features::AllowComments);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowTrailingComma) ==
-                fly::JsonParser::Features::Strict);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowAnyType) ==
-                fly::JsonParser::Features::Strict);
+            auto features = Features::AllowComments;
+            CATCH_CHECK((features & Features::AllowComments) == Features::AllowComments);
+            CATCH_CHECK((features & Features::AllowTrailingComma) == Features::Strict);
+            CATCH_CHECK((features & Features::AllowAnyType) == Features::Strict);
         }
         {
-            auto features = fly::JsonParser::Features::Strict;
-            features = features | fly::JsonParser::Features::AllowComments;
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowComments) ==
-                fly::JsonParser::Features::AllowComments);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowTrailingComma) ==
-                fly::JsonParser::Features::Strict);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowAnyType) ==
-                fly::JsonParser::Features::Strict);
+            auto features = Features::Strict;
+            features = features | Features::AllowComments;
+            CATCH_CHECK((features & Features::AllowComments) == Features::AllowComments);
+            CATCH_CHECK((features & Features::AllowTrailingComma) == Features::Strict);
+            CATCH_CHECK((features & Features::AllowAnyType) == Features::Strict);
         }
 
         // AllowTrailingComma
         {
-            auto features = fly::JsonParser::Features::AllowTrailingComma;
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowComments) ==
-                fly::JsonParser::Features::Strict);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowTrailingComma) ==
-                fly::JsonParser::Features::AllowTrailingComma);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowAnyType) ==
-                fly::JsonParser::Features::Strict);
+            auto features = Features::AllowTrailingComma;
+            CATCH_CHECK((features & Features::AllowComments) == Features::Strict);
+            CATCH_CHECK((features & Features::AllowTrailingComma) == Features::AllowTrailingComma);
+            CATCH_CHECK((features & Features::AllowAnyType) == Features::Strict);
         }
         {
-            auto features = fly::JsonParser::Features::Strict;
-            features = features | fly::JsonParser::Features::AllowTrailingComma;
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowComments) ==
-                fly::JsonParser::Features::Strict);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowTrailingComma) ==
-                fly::JsonParser::Features::AllowTrailingComma);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowAnyType) ==
-                fly::JsonParser::Features::Strict);
+            auto features = Features::Strict;
+            features = features | Features::AllowTrailingComma;
+            CATCH_CHECK((features & Features::AllowComments) == Features::Strict);
+            CATCH_CHECK((features & Features::AllowTrailingComma) == Features::AllowTrailingComma);
+            CATCH_CHECK((features & Features::AllowAnyType) == Features::Strict);
         }
 
         // AllowAnyType
         {
-            auto features = fly::JsonParser::Features::AllowAnyType;
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowComments) ==
-                fly::JsonParser::Features::Strict);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowTrailingComma) ==
-                fly::JsonParser::Features::Strict);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowAnyType) ==
-                fly::JsonParser::Features::AllowAnyType);
+            auto features = Features::AllowAnyType;
+            CATCH_CHECK((features & Features::AllowComments) == Features::Strict);
+            CATCH_CHECK((features & Features::AllowTrailingComma) == Features::Strict);
+            CATCH_CHECK((features & Features::AllowAnyType) == Features::AllowAnyType);
         }
         {
-            auto features = fly::JsonParser::Features::Strict;
-            features = features | fly::JsonParser::Features::AllowAnyType;
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowComments) ==
-                fly::JsonParser::Features::Strict);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowTrailingComma) ==
-                fly::JsonParser::Features::Strict);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowAnyType) ==
-                fly::JsonParser::Features::AllowAnyType);
+            auto features = Features::Strict;
+            features = features | Features::AllowAnyType;
+            CATCH_CHECK((features & Features::AllowComments) == Features::Strict);
+            CATCH_CHECK((features & Features::AllowTrailingComma) == Features::Strict);
+            CATCH_CHECK((features & Features::AllowAnyType) == Features::AllowAnyType);
         }
 
         // AllFeatures
         {
-            auto features = fly::JsonParser::Features::AllFeatures;
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowComments) ==
-                fly::JsonParser::Features::AllowComments);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowTrailingComma) ==
-                fly::JsonParser::Features::AllowTrailingComma);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowAnyType) ==
-                fly::JsonParser::Features::AllowAnyType);
+            auto features = Features::AllFeatures;
+            CATCH_CHECK((features & Features::AllowComments) == Features::AllowComments);
+            CATCH_CHECK((features & Features::AllowTrailingComma) == Features::AllowTrailingComma);
+            CATCH_CHECK((features & Features::AllowAnyType) == Features::AllowAnyType);
         }
         {
-            auto features = fly::JsonParser::Features::Strict;
-            features = features | fly::JsonParser::Features::AllowComments;
-            features = features | fly::JsonParser::Features::AllowTrailingComma;
-            features = features | fly::JsonParser::Features::AllowAnyType;
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowComments) ==
-                fly::JsonParser::Features::AllowComments);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowTrailingComma) ==
-                fly::JsonParser::Features::AllowTrailingComma);
-            CATCH_CHECK(
-                (features & fly::JsonParser::Features::AllowAnyType) ==
-                fly::JsonParser::Features::AllowAnyType);
+            auto features = Features::Strict;
+            features = features | Features::AllowComments;
+            features = features | Features::AllowTrailingComma;
+            features = features | Features::AllowAnyType;
+            CATCH_CHECK((features & Features::AllowComments) == Features::AllowComments);
+            CATCH_CHECK((features & Features::AllowTrailingComma) == Features::AllowTrailingComma);
+            CATCH_CHECK((features & Features::AllowAnyType) == Features::AllowAnyType);
         }
     }
 }

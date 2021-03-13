@@ -36,7 +36,7 @@ public:
     }
 
 private:
-    fly::JsonParser m_parser;
+    fly::parser::JsonParser m_parser;
 };
 
 // Boost.JSON - https://github.com/boostorg/json

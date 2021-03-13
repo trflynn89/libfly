@@ -3,7 +3,7 @@
 #include <cstring>
 #include <fstream>
 
-namespace fly {
+namespace fly::parser {
 
 namespace {
 
@@ -45,7 +45,7 @@ namespace {
 } // namespace
 
 //==================================================================================================
-std::optional<Json> Parser::parse_file(const std::filesystem::path &path)
+std::optional<fly::Json> Parser::parse_file(const std::filesystem::path &path)
 {
     std::ifstream stream(path);
 
@@ -88,7 +88,7 @@ std::optional<Json> Parser::parse_file(const std::filesystem::path &path)
 }
 
 //==================================================================================================
-std::optional<Json> Parser::parse_stream(std::istream &&stream)
+std::optional<fly::Json> Parser::parse_stream(std::istream &&stream)
 {
     m_line = 1;
     m_column = 0;
@@ -141,4 +141,4 @@ std::uint32_t Parser::column() const
     return m_column;
 }
 
-} // namespace fly
+} // namespace fly::parser
