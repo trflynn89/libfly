@@ -25,10 +25,10 @@ class ListenSocket;
  */
 template <typename EndpointType>
 class TcpSocket :
-    public fly::net::detail::BaseSocket<EndpointType>,
+    public detail::BaseSocket<EndpointType>,
     public std::enable_shared_from_this<TcpSocket<EndpointType>>
 {
-    using BaseSocket = fly::net::detail::BaseSocket<EndpointType>;
+    using BaseSocket = detail::BaseSocket<EndpointType>;
 
     using ConnectCompletion = std::function<void(ConnectedState)>;
     using SendCompletion = std::function<void(std::size_t)>;
@@ -48,7 +48,7 @@ public:
      * @param config Reference to network configuration.
      * @param mode IO processing mode to apply to the socket.
      */
-    TcpSocket(std::shared_ptr<NetworkConfig> config, fly::net::IOMode mode) noexcept;
+    TcpSocket(std::shared_ptr<NetworkConfig> config, IOMode mode) noexcept;
 
     /**
      * Move constructor. The provided socket is left in a disconnected, invalid state.
@@ -255,10 +255,7 @@ private:
      * @param handle Native socket handle opened by the calling listening socket.
      * @param mode IO processing mode to apply to the socket.
      */
-    TcpSocket(
-        std::shared_ptr<NetworkConfig> config,
-        socket_type handle,
-        fly::net::IOMode mode) noexcept;
+    TcpSocket(std::shared_ptr<NetworkConfig> config, socket_type handle, IOMode mode) noexcept;
 
     /**
      * Constructor. Create an asynchronous socket with an already-opened socket handle armed with a

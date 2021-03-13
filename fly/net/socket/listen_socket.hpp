@@ -23,10 +23,10 @@ class TcpSocket;
  */
 template <typename EndpointType>
 class ListenSocket :
-    public fly::net::detail::BaseSocket<EndpointType>,
+    public detail::BaseSocket<EndpointType>,
     public std::enable_shared_from_this<ListenSocket<EndpointType>>
 {
-    using BaseSocket = fly::net::detail::BaseSocket<EndpointType>;
+    using BaseSocket = detail::BaseSocket<EndpointType>;
 
     using AcceptCompletion = std::function<void(std::shared_ptr<TcpSocket<EndpointType>>)>;
 
@@ -44,7 +44,7 @@ public:
      * @param config Reference to network configuration.
      * @param mode IO processing mode to apply to the socket.
      */
-    ListenSocket(std::shared_ptr<NetworkConfig> config, fly::net::IOMode mode) noexcept;
+    ListenSocket(std::shared_ptr<NetworkConfig> config, IOMode mode) noexcept;
 
     /**
      * Move constructor. The provided socket is left in a non-listening, invalid state.

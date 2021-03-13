@@ -13,7 +13,7 @@ namespace fly::net {
 //==================================================================================================
 template <typename EndpointType>
 ListenSocket<EndpointType>::ListenSocket(std::shared_ptr<NetworkConfig> config) noexcept :
-    ListenSocket(std::move(config), fly::net::IOMode::Synchronous)
+    ListenSocket(std::move(config), IOMode::Synchronous)
 {
 }
 
@@ -21,11 +21,8 @@ ListenSocket<EndpointType>::ListenSocket(std::shared_ptr<NetworkConfig> config) 
 template <typename EndpointType>
 ListenSocket<EndpointType>::ListenSocket(
     std::shared_ptr<NetworkConfig> config,
-    fly::net::IOMode mode) noexcept :
-    BaseSocket(
-        std::move(config),
-        fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>(),
-        mode)
+    IOMode mode) noexcept :
+    BaseSocket(std::move(config), detail::socket<EndpointType, TcpSocket<EndpointType>>(), mode)
 {
 }
 
@@ -34,10 +31,7 @@ template <typename EndpointType>
 ListenSocket<EndpointType>::ListenSocket(
     const std::shared_ptr<SocketService> &service,
     std::shared_ptr<NetworkConfig> config) noexcept :
-    BaseSocket(
-        service,
-        std::move(config),
-        fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>())
+    BaseSocket(service, std::move(config), detail::socket<EndpointType, TcpSocket<EndpointType>>())
 {
 }
 
@@ -85,7 +79,7 @@ ListenSocket<EndpointType> &ListenSocket<EndpointType>::operator=(ListenSocket &
 template <typename EndpointType>
 bool ListenSocket<EndpointType>::listen()
 {
-    m_is_listening = fly::net::detail::listen(handle());
+    m_is_listening = detail::listen(handle());
     return is_listening();
 }
 
@@ -103,7 +97,7 @@ std::optional<TcpSocket<EndpointType>> ListenSocket<EndpointType>::accept()
     EndpointType client_endpoint;
     bool would_block = false;
 
-    if (auto client = fly::net::detail::accept(handle(), client_endpoint, would_block); client)
+    if (auto client = detail::accept(handle(), client_endpoint, would_block); client)
     {
         SLOGD(handle(), "Accepted new socket {}", client_endpoint);
         return TcpSocket<EndpointType>(network_config(), *client, io_mode());
@@ -141,7 +135,7 @@ void ListenSocket<EndpointType>::ready_to_accept(AcceptCompletion &&callback)
     EndpointType client_endpoint;
     bool would_block = false;
 
-    if (auto client = fly::net::detail::accept(handle(), client_endpoint, would_block); client)
+    if (auto client = detail::accept(handle(), client_endpoint, would_block); client)
     {
         SLOGD(handle(), "Accepted new socket {}", client_endpoint);
 

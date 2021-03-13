@@ -21,10 +21,10 @@ class SocketService;
  */
 template <typename EndpointType>
 class UdpSocket :
-    public fly::net::detail::BaseSocket<EndpointType>,
+    public detail::BaseSocket<EndpointType>,
     public std::enable_shared_from_this<UdpSocket<EndpointType>>
 {
-    using BaseSocket = fly::net::detail::BaseSocket<EndpointType>;
+    using BaseSocket = detail::BaseSocket<EndpointType>;
 
     using SendCompletion = std::function<void(std::size_t)>;
     using ReceiveCompletion = std::function<void(std::string)>;
@@ -43,7 +43,7 @@ public:
      * @param config Reference to network configuration.
      * @param mode IO processing mode to apply to the socket.
      */
-    UdpSocket(std::shared_ptr<NetworkConfig> config, fly::net::IOMode mode) noexcept;
+    UdpSocket(std::shared_ptr<NetworkConfig> config, IOMode mode) noexcept;
 
     /**
      * Move constructor. The provided socket is left in an invalid state.

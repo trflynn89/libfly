@@ -38,7 +38,7 @@ public:
      * @param address The IP address to initialize the endpoint with.
      * @param port The port to initialize the endpoint with.
      */
-    constexpr Endpoint(const IPAddressType &address, fly::net::port_type port) noexcept;
+    constexpr Endpoint(const IPAddressType &address, port_type port) noexcept;
 
     /**
      * Constructor. Create an endpoint from an IP address and port.
@@ -46,7 +46,7 @@ public:
      * @param address The IP address to initialize the endpoint with.
      * @param port The port to initialize the endpoint with.
      */
-    constexpr Endpoint(IPAddressType &&address, fly::net::port_type port) noexcept;
+    constexpr Endpoint(IPAddressType &&address, port_type port) noexcept;
 
     Endpoint(const Endpoint &) = default;
     Endpoint(Endpoint &&) = default;
@@ -105,12 +105,12 @@ public:
      *
      * @param port The endoint's new port.
      */
-    void set_port(fly::net::port_type port);
+    void set_port(port_type port);
 
     /**
      * @return The endoint's IP port.
      */
-    constexpr fly::net::port_type port() const;
+    constexpr port_type port() const;
 
 #if defined(FLY_LINUX)
     /**
@@ -149,14 +149,12 @@ private:
     static_assert(is_ipv4() || is_ipv6(), "Endpoints may only be used with IP address types");
 
     IPAddressType m_address {};
-    fly::net::port_type m_port {0};
+    port_type m_port {0};
 };
 
 //==================================================================================================
 template <typename IPAddressType>
-constexpr Endpoint<IPAddressType>::Endpoint(
-    const IPAddressType &address,
-    fly::net::port_type port) noexcept :
+constexpr Endpoint<IPAddressType>::Endpoint(const IPAddressType &address, port_type port) noexcept :
     m_address(address),
     m_port(port)
 {
@@ -164,9 +162,7 @@ constexpr Endpoint<IPAddressType>::Endpoint(
 
 //==================================================================================================
 template <typename IPAddressType>
-constexpr Endpoint<IPAddressType>::Endpoint(
-    IPAddressType &&address,
-    fly::net::port_type port) noexcept :
+constexpr Endpoint<IPAddressType>::Endpoint(IPAddressType &&address, port_type port) noexcept :
     m_address(address),
     m_port(port)
 {
@@ -176,14 +172,14 @@ constexpr Endpoint<IPAddressType>::Endpoint(
 template <typename IPAddressType>
 constexpr bool Endpoint<IPAddressType>::is_ipv4()
 {
-    return std::is_same_v<IPAddressType, fly::net::IPv4Address>;
+    return std::is_same_v<IPAddressType, IPv4Address>;
 }
 
 //==================================================================================================
 template <typename IPAddressType>
 constexpr bool Endpoint<IPAddressType>::is_ipv6()
 {
-    return std::is_same_v<IPAddressType, fly::net::IPv6Address>;
+    return std::is_same_v<IPAddressType, IPv6Address>;
 }
 
 //==================================================================================================
@@ -230,7 +226,7 @@ Endpoint<IPAddressType>::from_string(std::string_view endpoint)
         return std::nullopt;
     }
 
-    return Endpoint(*std::move(address), static_cast<fly::net::port_type>(*port));
+    return Endpoint(*std::move(address), static_cast<port_type>(*port));
 }
 
 //==================================================================================================
@@ -256,14 +252,14 @@ constexpr const IPAddressType &Endpoint<IPAddressType>::address() const
 
 //==================================================================================================
 template <typename IPAddressType>
-constexpr fly::net::port_type Endpoint<IPAddressType>::port() const
+constexpr port_type Endpoint<IPAddressType>::port() const
 {
     return m_port;
 }
 
 //==================================================================================================
 template <typename IPAddressType>
-void Endpoint<IPAddressType>::set_port(fly::net::port_type port)
+void Endpoint<IPAddressType>::set_port(port_type port)
 {
     m_port = port;
 }

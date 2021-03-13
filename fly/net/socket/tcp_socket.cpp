@@ -12,19 +12,14 @@ namespace fly::net {
 //==================================================================================================
 template <typename EndpointType>
 TcpSocket<EndpointType>::TcpSocket(std::shared_ptr<NetworkConfig> config) noexcept :
-    TcpSocket(std::move(config), fly::net::IOMode::Synchronous)
+    TcpSocket(std::move(config), IOMode::Synchronous)
 {
 }
 
 //==================================================================================================
 template <typename EndpointType>
-TcpSocket<EndpointType>::TcpSocket(
-    std::shared_ptr<NetworkConfig> config,
-    fly::net::IOMode mode) noexcept :
-    BaseSocket(
-        std::move(config),
-        fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>(),
-        mode)
+TcpSocket<EndpointType>::TcpSocket(std::shared_ptr<NetworkConfig> config, IOMode mode) noexcept :
+    BaseSocket(std::move(config), detail::socket<EndpointType, TcpSocket<EndpointType>>(), mode)
 {
 }
 
@@ -33,10 +28,7 @@ template <typename EndpointType>
 TcpSocket<EndpointType>::TcpSocket(
     const std::shared_ptr<SocketService> &service,
     std::shared_ptr<NetworkConfig> config) noexcept :
-    BaseSocket(
-        service,
-        std::move(config),
-        fly::net::detail::socket<EndpointType, TcpSocket<EndpointType>>())
+    BaseSocket(service, std::move(config), detail::socket<EndpointType, TcpSocket<EndpointType>>())
 {
 }
 
@@ -45,7 +37,7 @@ template <typename EndpointType>
 TcpSocket<EndpointType>::TcpSocket(
     std::shared_ptr<NetworkConfig> config,
     socket_type socket_handle,
-    fly::net::IOMode mode) noexcept :
+    IOMode mode) noexcept :
     BaseSocket(std::move(config), socket_handle, mode),
     m_connected_state(ConnectedState::Connected)
 {
@@ -127,14 +119,14 @@ TcpSocket<EndpointType> &TcpSocket<EndpointType>::operator=(TcpSocket &&socket) 
 template <typename EndpointType>
 std::optional<EndpointType> TcpSocket<EndpointType>::remote_endpoint() const
 {
-    return fly::net::detail::remote_endpoint<EndpointType>(handle());
+    return detail::remote_endpoint<EndpointType>(handle());
 }
 
 //==================================================================================================
 template <typename EndpointType>
 ConnectedState TcpSocket<EndpointType>::connect(const EndpointType &endpoint)
 {
-    const auto state = fly::net::detail::connect(handle(), endpoint);
+    const auto state = detail::connect(handle(), endpoint);
 
     switch (state)
     {
@@ -216,7 +208,7 @@ ConnectedState TcpSocket<EndpointType>::finish_connect()
 {
     ConnectedState state = ConnectedState::Disconnected;
 
-    if (is_open() & is_connecting() && fly::net::detail::is_error_free(handle()))
+    if (is_open() & is_connecting() && detail::is_error_free(handle()))
     {
         SLOGD(handle(), "Connection complete");
         state = ConnectedState::Connected;
@@ -250,7 +242,7 @@ template <typename EndpointType>
 std::size_t TcpSocket<EndpointType>::send(std::string_view message)
 {
     bool would_block = false;
-    std::size_t bytes_sent = fly::net::detail::send(handle(), std::move(message), would_block);
+    std::size_t bytes_sent = detail::send(handle(), std::move(message), would_block);
 
     if (bytes_sent == 0)
     {
@@ -289,7 +281,7 @@ template <typename EndpointType>
 std::string TcpSocket<EndpointType>::receive()
 {
     bool would_block = false;
-    const std::string received = fly::net::detail::recv(handle(), packet_size(), would_block);
+    const std::string received = detail::recv(handle(), packet_size(), would_block);
 
     if (received.size() == 0)
     {
@@ -333,7 +325,7 @@ void TcpSocket<EndpointType>::ready_to_send(
 {
     bool would_block = false;
 
-    const std::size_t current_sent = fly::net::detail::send(handle(), message, would_block);
+    const std::size_t current_sent = detail::send(handle(), message, would_block);
     bytes_sent += current_sent;
 
     if (current_sent == message.size())
@@ -369,8 +361,7 @@ void TcpSocket<EndpointType>::ready_to_receive(ReceiveCompletion &&callback, std
 {
     bool would_block = false;
 
-    const std::string current_received =
-        fly::net::detail::recv(handle(), packet_size(), would_block);
+    const std::string current_received = detail::recv(handle(), packet_size(), would_block);
     received += current_received;
 
     if (!current_received.empty())
