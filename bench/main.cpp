@@ -70,7 +70,7 @@ CATCH_REGISTER_REPORTER("libfly", SilentReporter)
 
 int main(int argc, char **argv)
 {
-    fly::logger::Logger::set_default_logger(fly::logger::Logger::create_logger(
+    fly::logger::Logger::set_default_logger(fly::logger::Logger::create(
         "silent",
         std::make_shared<fly::logger::LoggerConfig>(),
         std::make_unique<DropSink>()));

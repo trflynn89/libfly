@@ -136,27 +136,25 @@ CATCH_TEST_CASE("Logger", "[logger]")
 
     CATCH_SECTION("Cannot create logger with null sink")
     {
-        auto logger = fly::logger::Logger::create_logger("test", logger_config, nullptr);
+        auto logger = fly::logger::Logger::create("test", logger_config, nullptr);
         CATCH_CHECK_FALSE(logger);
     }
 
     CATCH_SECTION("Cannot create logger with sink that fails initialization")
     {
-        auto logger = fly::logger::Logger::create_logger(
-            "test",
-            logger_config,
-            std::make_unique<FailInitSink>());
+        auto logger =
+            fly::logger::Logger::create("test", logger_config, std::make_unique<FailInitSink>());
         CATCH_CHECK_FALSE(logger);
     }
 
     CATCH_SECTION("Cannot create logger with duplicate name")
     {
         auto logger1 =
-            fly::logger::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
+            fly::logger::Logger::create("test", logger_config, std::make_unique<DropSink>());
         CATCH_CHECK(logger1 != nullptr);
 
         auto logger2 =
-            fly::logger::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
+            fly::logger::Logger::create("test", logger_config, std::make_unique<DropSink>());
         CATCH_CHECK_FALSE(logger2);
     }
 
@@ -168,10 +166,8 @@ CATCH_TEST_CASE("Logger", "[logger]")
     CATCH_SECTION("Logger automatically deregisters itself on destruction")
     {
         {
-            auto logger = fly::logger::Logger::create_logger(
-                "test",
-                logger_config,
-                std::make_unique<DropSink>());
+            auto logger =
+                fly::logger::Logger::create("test", logger_config, std::make_unique<DropSink>());
             CATCH_CHECK(fly::logger::Logger::get("test"));
         }
 
@@ -183,7 +179,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
         fly::logger::Logger *default_logger = fly::logger::Logger::get_default_logger();
 
         auto logger =
-            fly::logger::Logger::create_logger("test", logger_config, std::make_unique<DropSink>());
+            fly::logger::Logger::create("test", logger_config, std::make_unique<DropSink>());
         CATCH_REQUIRE(logger);
 
         fly::logger::Logger::set_default_logger(logger);
@@ -202,8 +198,8 @@ CATCH_TEST_CASE("Logger", "[logger]")
         auto sink = std::make_unique<QueueSink>(received_logs);
 
         auto logger = synchronous_logger ?
-            fly::logger::Logger::create_logger("test", logger_config, std::move(sink)) :
-            fly::logger::Logger::create_logger("test", task_runner, logger_config, std::move(sink));
+            fly::logger::Logger::create("test", logger_config, std::move(sink)) :
+            fly::logger::Logger::create("test", task_runner, logger_config, std::move(sink));
         CATCH_REQUIRE(logger);
 
         fly::logger::Logger::set_default_logger(logger);
@@ -214,12 +210,8 @@ CATCH_TEST_CASE("Logger", "[logger]")
             auto fsink = std::make_unique<FailStreamSink>(received_logs);
 
             logger = synchronous_logger ?
-                fly::logger::Logger::create_logger("fail", logger_config, std::move(fsink)) :
-                fly::logger::Logger::create_logger(
-                    "fail",
-                    task_runner,
-                    logger_config,
-                    std::move(fsink));
+                fly::logger::Logger::create("fail", logger_config, std::move(fsink)) :
+                fly::logger::Logger::create("fail", task_runner, logger_config, std::move(fsink));
 
             logger->debug("This log will be received");
             logger->debug("This log will be rejected");
@@ -398,7 +390,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
     CATCH_SECTION("Not resetting default logger is safe")
     {
         auto logger =
-            fly::logger::Logger::create_logger("def", logger_config, std::make_unique<DropSink>());
+            fly::logger::Logger::create("def", logger_config, std::make_unique<DropSink>());
         CATCH_REQUIRE(logger);
 
         fly::logger::Logger::set_default_logger(logger);
