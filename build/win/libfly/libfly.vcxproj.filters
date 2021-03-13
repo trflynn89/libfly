@@ -208,9 +208,6 @@
     <ClInclude Include="..\..\..\fly\system\system_monitor.hpp">
       <Filter>system</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\system\win\system_impl.hpp">
-      <Filter>system\win</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.hpp">
       <Filter>system\win</Filter>
     </ClInclude>

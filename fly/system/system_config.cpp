@@ -1,6 +1,6 @@
 #include "fly/system/system_config.hpp"
 
-namespace fly {
+namespace fly::system {
 
 //==================================================================================================
 std::chrono::milliseconds SystemConfig::poll_interval() const
@@ -9,4 +9,4 @@ std::chrono::milliseconds SystemConfig::poll_interval() const
         get_value<std::chrono::milliseconds::rep>("poll_interval", m_default_poll_interval));
 }
 
-} // namespace fly
+} // namespace fly::system

@@ -311,7 +311,7 @@ accept(fly::net::socket_type handle, EndpointType &endpoint, bool &would_block)
 
     if (client == invalid_socket())
     {
-        const int error = fly::System::get_error_code();
+        const int error = fly::system::get_error_code();
 
         would_block = (error == WSAEWOULDBLOCK) || (error == WSAEINPROGRESS);
         SLOGS(handle, "Error accepting");
@@ -337,7 +337,7 @@ fly::net::ConnectedState connect(fly::net::socket_type handle, const EndpointTyp
 
     if (::connect(handle, base(address), sizeof(address)) == SOCKET_ERROR)
     {
-        const int error = fly::System::get_error_code();
+        const int error = fly::system::get_error_code();
         SLOGS(handle, "Error connecting");
 
         if ((error == WSAEWOULDBLOCK) || (error == WSAEINPROGRESS))
@@ -388,7 +388,7 @@ std::size_t send(fly::net::socket_type handle, std::string_view message, bool &w
 
             if (status == SOCKET_ERROR)
             {
-                would_block = fly::System::get_error_code() == WSAEWOULDBLOCK;
+                would_block = fly::system::get_error_code() == WSAEWOULDBLOCK;
                 SLOGS(handle, "Error sending");
             }
         }
@@ -433,7 +433,7 @@ std::size_t send_to(
 
             if (status == SOCKET_ERROR)
             {
-                would_block = fly::System::get_error_code() == WSAEWOULDBLOCK;
+                would_block = fly::system::get_error_code() == WSAEWOULDBLOCK;
                 SLOGS(handle, "Error sending");
             }
         }
@@ -473,7 +473,7 @@ std::string recv(fly::net::socket_type handle, std::size_t packet_size, bool &wo
     {
         if (status == SOCKET_ERROR)
         {
-            would_block = fly::System::get_error_code() == WSAEWOULDBLOCK;
+            would_block = fly::system::get_error_code() == WSAEWOULDBLOCK;
             SLOGS(handle, "Error receiving");
         }
 
@@ -509,7 +509,7 @@ std::string recv_from(
     {
         if (status == SOCKET_ERROR)
         {
-            would_block = fly::System::get_error_code() == WSAEWOULDBLOCK;
+            would_block = fly::system::get_error_code() == WSAEWOULDBLOCK;
             SLOGS(handle, "Error receiving");
         }
 

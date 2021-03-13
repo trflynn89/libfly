@@ -7,60 +7,49 @@
 #include <csignal>
 #include <system_error>
 
-#include FLY_OS_IMPL_PATH(system, system)
+namespace fly::system {
 
-namespace fly {
+namespace {
 
-System::SignalHandler System::s_signal_handler;
+    SignalHandler s_signal_handler = nullptr;
 
-//==================================================================================================
-void System::print_backtrace()
-{
-    SystemImpl::print_backtrace();
-}
+    void handle_signal(int signal)
+    {
+        std::invoke(s_signal_handler, signal);
+    }
 
-//==================================================================================================
-std::string System::local_time()
-{
-    return SystemImpl::local_time("%m-%d-%Y %H:%M:%S");
-}
+} // namespace
 
 //==================================================================================================
-int System::get_error_code()
-{
-    return SystemImpl::get_error_code();
-}
-
-//==================================================================================================
-std::string System::get_error_string()
+std::string get_error_string()
 {
     return get_error_string(get_error_code());
 }
 
 //==================================================================================================
-std::string System::get_error_string(int code)
+std::string get_error_string(int code)
 {
     return fly::String::format("({}) {}", code, std::system_category().message(code));
 }
 
 //==================================================================================================
-void System::set_signal_handler(SignalHandler handler)
+void set_signal_handler(SignalHandler handler)
 {
-    static constexpr const auto s_signals = SystemImpl::fatal_signals();
+#if defined(FLY_WINDOWS)
+    static constexpr const std::array<int, 6>
+        s_signals {SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV};
+#else
+    static constexpr const std::array<int, 8>
+        s_signals {SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV, SIGSYS, SIGBUS};
+#endif
 
-    auto handler_or_default = handler ? System::handle_signal : SIG_DFL;
+    auto handler_or_default = handler ? handle_signal : SIG_DFL;
     s_signal_handler = std::move(handler);
 
-    for (auto it = s_signals.begin(); it != s_signals.end(); ++it)
+    for (int signal : s_signals)
     {
-        std::signal(*it, handler_or_default);
+        std::signal(signal, handler_or_default);
     }
 }
 
-//==================================================================================================
-void System::handle_signal(int signal)
-{
-    s_signal_handler(signal);
-}
-
-} // namespace fly
+} // namespace fly::system

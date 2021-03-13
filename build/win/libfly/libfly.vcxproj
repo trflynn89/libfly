@@ -199,7 +199,6 @@
     <ClInclude Include="..\..\..\fly\system\system.hpp" />
     <ClInclude Include="..\..\..\fly\system\system_config.hpp" />
     <ClInclude Include="..\..\..\fly\system\system_monitor.hpp" />
-    <ClInclude Include="..\..\..\fly\system\win\system_impl.hpp" />
     <ClInclude Include="..\..\..\fly\system\win\system_monitor_impl.hpp" />
     <ClInclude Include="..\..\..\fly\task\task_manager.hpp" />
     <ClInclude Include="..\..\..\fly\task\task_runner.hpp" />

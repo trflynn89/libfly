@@ -1,4 +1,4 @@
-#include "fly/system/nix/system_impl.hpp"
+#include "fly/system/system.hpp"
 
 #include <execinfo.h>
 #include <unistd.h>
@@ -7,10 +7,10 @@
 #include <chrono>
 #include <cstring>
 
-namespace fly {
+namespace fly::system {
 
 //==================================================================================================
-void SystemImpl::print_backtrace()
+void print_backtrace()
 {
     void *trace[10];
     int trace_size = ::backtrace(trace, 10);
@@ -22,7 +22,7 @@ void SystemImpl::print_backtrace()
 }
 
 //==================================================================================================
-std::string SystemImpl::local_time(const char *fmt)
+std::string local_time()
 {
     auto sys = std::chrono::system_clock::now();
     time_t now = std::chrono::system_clock::to_time_t(sys);
@@ -34,7 +34,7 @@ std::string SystemImpl::local_time(const char *fmt)
     {
         char time_str[32];
 
-        if (::strftime(time_str, sizeof(time_str), fmt, &time_val) != 0)
+        if (::strftime(time_str, sizeof(time_str), "%m-%d-%Y %H:%M:%S", &time_val) != 0)
         {
             result = std::string(time_str);
         }
@@ -44,9 +44,9 @@ std::string SystemImpl::local_time(const char *fmt)
 }
 
 //==================================================================================================
-int SystemImpl::get_error_code()
+int get_error_code()
 {
     return errno;
 }
 
-} // namespace fly
+} // namespace fly::system

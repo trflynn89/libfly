@@ -3,7 +3,6 @@
 #include "fly/logger/logger.hpp"
 #include "fly/system/system_config.hpp"
 #include "fly/task/task_runner.hpp"
-#include "fly/types/string/string.hpp"
 
 #include <sys/sysinfo.h>
 #include <sys/times.h>
@@ -13,7 +12,7 @@
 #include <fstream>
 #include <string>
 
-namespace fly {
+namespace fly::system {
 
 namespace {
 
@@ -175,4 +174,4 @@ void SystemMonitorImpl::update_process_memory_usage()
     }
 }
 
-} // namespace fly
+} // namespace fly::system

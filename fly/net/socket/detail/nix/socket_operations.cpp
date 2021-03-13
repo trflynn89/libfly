@@ -301,7 +301,7 @@ accept(fly::net::socket_type handle, EndpointType &endpoint, bool &would_block)
 
     if (client == invalid_socket())
     {
-        would_block = fly::System::get_error_code() == EWOULDBLOCK;
+        would_block = fly::system::get_error_code() == EWOULDBLOCK;
         SLOGS(handle, "Error accepting");
 
         return std::nullopt;
@@ -325,7 +325,7 @@ fly::net::ConnectedState connect(fly::net::socket_type handle, const EndpointTyp
 
     if (::connect(handle, base(address), sizeof(address)) == -1)
     {
-        const int error = fly::System::get_error_code();
+        const int error = fly::system::get_error_code();
         SLOGS(handle, "Error connecting");
 
         if ((error == EINTR) || (error == EINPROGRESS))
@@ -371,7 +371,7 @@ std::size_t send(fly::net::socket_type handle, std::string_view message, bool &w
 
             if (status == -1)
             {
-                would_block = fly::System::get_error_code() == EWOULDBLOCK;
+                would_block = fly::system::get_error_code() == EWOULDBLOCK;
                 SLOGS(handle, "Error sending");
             }
         }
@@ -416,7 +416,7 @@ std::size_t send_to(
 
             if (status == -1)
             {
-                would_block = fly::System::get_error_code() == EWOULDBLOCK;
+                would_block = fly::system::get_error_code() == EWOULDBLOCK;
                 SLOGS(handle, "Error sending");
             }
         }
@@ -455,7 +455,7 @@ std::string recv(fly::net::socket_type handle, std::size_t packet_size, bool &wo
     {
         if (status == -1)
         {
-            would_block = fly::System::get_error_code() == EWOULDBLOCK;
+            would_block = fly::system::get_error_code() == EWOULDBLOCK;
             SLOGS(handle, "Error receiving");
         }
 
@@ -491,7 +491,7 @@ std::string recv_from(
     {
         if (status == -1)
         {
-            would_block = fly::System::get_error_code() == EWOULDBLOCK;
+            would_block = fly::system::get_error_code() == EWOULDBLOCK;
             SLOGS(handle, "Error receiving");
         }
 

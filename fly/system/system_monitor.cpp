@@ -9,7 +9,7 @@
 
 #include FLY_OS_IMPL_PATH(system, system_monitor)
 
-namespace fly {
+namespace fly::system {
 
 //==================================================================================================
 std::shared_ptr<SystemMonitor> SystemMonitor::create(
@@ -100,6 +100,7 @@ bool SystemMonitor::poll_system_later()
     };
 
     std::weak_ptr<SystemMonitor> weak_self = shared_from_this();
+
     return m_task_runner->post_task_with_delay(
         FROM_HERE,
         std::move(task),
@@ -107,4 +108,4 @@ bool SystemMonitor::poll_system_later()
         m_config->poll_interval());
 }
 
-} // namespace fly
+} // namespace fly::system
