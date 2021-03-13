@@ -5,7 +5,30 @@
 #include <memory>
 #include <string>
 
-namespace fly {
+namespace fly::logger {
+
+/**
+ * Enumeration to define the level of a log.
+ */
+enum class Level : std::uint8_t
+{
+    Debug,
+    Info,
+    Warn,
+    Error,
+
+    NumLevels
+};
+
+/**
+ * Structure to store trace information about a log point.
+ */
+struct Trace
+{
+    std::string_view m_file;
+    std::string_view m_function;
+    std::uint32_t m_line {0};
+};
 
 /**
  * Struct to store data about single log. A log contains:
@@ -21,29 +44,6 @@ namespace fly {
  */
 struct Log
 {
-    /**
-     * Enumeration to define the level of a log.
-     */
-    enum class Level : std::uint8_t
-    {
-        Debug,
-        Info,
-        Warn,
-        Error,
-
-        NumLevels
-    };
-
-    /**
-     * Structure to store trace information about a log point.
-     */
-    struct Trace
-    {
-        std::string_view m_file;
-        std::string_view m_function;
-        std::uint32_t m_line {0};
-    };
-
     /**
      * Default constructor.
      */
@@ -76,7 +76,7 @@ struct Log
 };
 
 std::ostream &operator<<(std::ostream &stream, const Log &log);
-std::ostream &operator<<(std::ostream &stream, const Log::Level &level);
-std::ostream &operator<<(std::ostream &stream, const Log::Trace &trace);
+std::ostream &operator<<(std::ostream &stream, const Level &level);
+std::ostream &operator<<(std::ostream &stream, const Trace &trace);
 
-} // namespace fly
+} // namespace fly::logger

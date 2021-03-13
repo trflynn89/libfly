@@ -2,7 +2,7 @@
 
 #include <ostream>
 
-namespace fly::detail {
+namespace fly::logger::detail {
 
 /**
  * IO manipulator proxy responsible for performing the underlying stream manipulations.
@@ -50,4 +50,4 @@ protected:
     const bool m_stream_is_stderr;
 };
 
-} // namespace fly::detail
+} // namespace fly::logger::detail

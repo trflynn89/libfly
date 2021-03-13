@@ -1,6 +1,6 @@
 #include "fly/logger/logger_config.hpp"
 
-namespace fly {
+namespace fly::logger {
 
 //==================================================================================================
 bool LoggerConfig::compress_log_files() const
@@ -20,4 +20,4 @@ std::uint32_t LoggerConfig::max_message_size() const
     return get_value<std::uint32_t>("max_message_size", m_default_max_message_size);
 }
 
-} // namespace fly
+} // namespace fly::logger

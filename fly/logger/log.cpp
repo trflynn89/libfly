@@ -2,7 +2,7 @@
 
 #include "fly/types/string/string.hpp"
 
-namespace fly {
+namespace fly::logger {
 
 namespace {
 
@@ -53,21 +53,21 @@ std::ostream &operator<<(std::ostream &stream, const Log &log)
 }
 
 //==================================================================================================
-std::ostream &operator<<(std::ostream &stream, const Log::Level &level)
+std::ostream &operator<<(std::ostream &stream, const Level &level)
 {
     stream << static_cast<int>(level);
     return stream;
 }
 
 //==================================================================================================
-std::ostream &operator<<(std::ostream &stream, const Log::Trace &trace)
+std::ostream &operator<<(std::ostream &stream, const Trace &trace)
 {
     if (!trace.m_file.empty() && !trace.m_function.empty())
     {
-        stream << String::format("{}:{}:{}", trace.m_file, trace.m_function, trace.m_line);
+        stream << fly::String::format("{}:{}:{}", trace.m_file, trace.m_function, trace.m_line);
     }
 
     return stream;
 }
 
-} // namespace fly
+} // namespace fly::logger

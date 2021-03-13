@@ -6,7 +6,7 @@
 #include <ostream>
 #include <stack>
 
-namespace fly::detail {
+namespace fly::logger::detail {
 
 /**
  * Linux implementation of the StylerProxy interface. This implementation streams ANSI escape
@@ -29,9 +29,9 @@ public:
      */
     StylerProxyImpl(
         std::ostream &stream,
-        std::stack<Style> &&styles,
-        std::stack<Color> &&colors,
-        std::stack<Cursor> &&cursors) noexcept;
+        std::stack<fly::logger::Style> &&styles,
+        std::stack<fly::logger::Color> &&colors,
+        std::stack<fly::logger::Cursor> &&cursors) noexcept;
 
     /**
      * Destructor. Reset the stream's style and color to its original state.
@@ -55,16 +55,18 @@ private:
      * @param styles The list of styles to apply to the stream.
      * @param colors The list of colors to apply to the stream.
      */
-    void apply_styles_and_colors(std::stack<Style> &&styles, std::stack<Color> &&colors);
+    void apply_styles_and_colors(
+        std::stack<fly::logger::Style> &&styles,
+        std::stack<fly::logger::Color> &&colors);
 
     /**
      * Manipulate the stream with ANSI escape sequences of the provided cursor positions.
      *
      * @param cursors The list of cursor positions to apply to the stream.
      */
-    void apply_cursors(std::stack<Cursor> &&cursors);
+    void apply_cursors(std::stack<fly::logger::Cursor> &&cursors);
 
     bool m_did_apply_style_or_color {false};
 };
 
-} // namespace fly::detail
+} // namespace fly::logger::detail

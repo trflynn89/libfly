@@ -26,10 +26,10 @@ namespace {
 /**
  * Subclass of the logger config to decrease the default log file size for faster testing.
  */
-class MutableLoggerConfig : public fly::LoggerConfig
+class MutableLoggerConfig : public fly::logger::LoggerConfig
 {
 public:
-    MutableLoggerConfig() noexcept : fly::LoggerConfig()
+    MutableLoggerConfig() noexcept : fly::logger::LoggerConfig()
     {
         m_default_max_log_file_size = 1 << 10;
     }
@@ -89,10 +89,10 @@ std::filesystem::path find_log_file(const fly::test::PathUtil::ScopedTempDirecto
  */
 std::uintmax_t log_size(const std::string &message)
 {
-    fly::Log log;
+    fly::logger::Log log;
 
     log.m_message = message;
-    log.m_level = fly::Log::Level::Debug;
+    log.m_level = fly::logger::Level::Debug;
     log.m_trace = {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)};
 
     return fly::String::format("{}\t{}", 1, log).length();
@@ -106,7 +106,8 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
     auto coder_config = std::make_shared<MutableCoderConfig>();
     fly::test::PathUtil::ScopedTempDirectory path;
 
-    auto logger = fly::Logger::create_file_logger("test", logger_config, coder_config, path());
+    auto logger =
+        fly::logger::Logger::create_file_logger("test", logger_config, coder_config, path());
 
     CATCH_SECTION("Valid logger file paths should be created after creating logger")
     {
@@ -118,7 +119,8 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
 
     CATCH_SECTION("Cannot start logger with a bad file path")
     {
-        logger = fly::Logger::create_file_logger("test", logger_config, coder_config, __FILE__);
+        logger =
+            fly::logger::Logger::create_file_logger("test", logger_config, coder_config, __FILE__);
         CATCH_CHECK(logger == nullptr);
     }
 

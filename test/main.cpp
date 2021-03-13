@@ -42,13 +42,17 @@ public:
         const auto duration = std::chrono::duration<double>(end - m_test_start);
 
         // ConsoleReporter prints a second newline above, so go up one line before logging the time.
-        stream << fly::Styler(fly::Cursor::Up, fly::Style::Bold, fly::Color::Cyan) << "Total time ";
+        stream << fly::logger::Styler(
+                      fly::logger::Cursor::Up,
+                      fly::logger::Style::Bold,
+                      fly::logger::Color::Cyan)
+               << "Total time ";
         stream << fly::String::format("{:.3f} seconds\n\n", duration.count());
     }
 
     void testCaseStarting(const Catch::TestCaseInfo &info) override
     {
-        const auto style = fly::Styler(fly::Style::Bold, fly::Color::Green);
+        const auto style = fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Green);
         stream << style << fly::String::format("[{:=>4}{} Test{:=<4}]\n", ' ', info.name, ' ');
 
         Catch::ConsoleReporter::testCaseStarting(info);
@@ -61,7 +65,8 @@ public:
     {
         if (info.name != m_current_test_case)
         {
-            const auto style = fly::Styler(fly::Style::Italic, fly::Color::Cyan);
+            const auto style =
+                fly::logger::Styler(fly::logger::Style::Italic, fly::logger::Color::Cyan);
             stream << style << fly::String::format("[ {} ]\n", info.name);
         }
 
@@ -77,7 +82,8 @@ public:
 
         if (stats.totals.assertions.allOk())
         {
-            const auto style = fly::Styler(fly::Style::Bold, fly::Color::Green);
+            const auto style =
+                fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Green);
             stream << style;
 
             stream << fly::String::format(
@@ -87,7 +93,8 @@ public:
         }
         else
         {
-            const auto style = fly::Styler(fly::Style::Bold, fly::Color::Red);
+            const auto style =
+                fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Red);
             stream << style;
 
             stream << fly::String::format(

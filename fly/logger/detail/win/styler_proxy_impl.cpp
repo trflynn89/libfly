@@ -1,13 +1,13 @@
 #include "fly/logger/detail/win/styler_proxy_impl.hpp"
 
-namespace fly::detail {
+namespace fly::logger::detail {
 
 //==================================================================================================
 StylerProxyImpl::StylerProxyImpl(
     std::ostream &stream,
-    std::stack<Style> &&styles,
-    std::stack<Color> &&colors,
-    std::stack<Cursor> &&cursors) noexcept :
+    std::stack<fly::logger::Style> &&styles,
+    std::stack<fly::logger::Color> &&colors,
+    std::stack<fly::logger::Cursor> &&cursors) noexcept :
     StylerProxy(stream)
 {
     if (m_stream_is_stdout)
@@ -53,15 +53,17 @@ StylerProxyImpl::~StylerProxyImpl()
 
 //==================================================================================================
 template <>
-void StylerProxyImpl::apply_value<WORD, Style>(WORD &attributes, const Style &modifier)
+void StylerProxyImpl::apply_value<WORD, fly::logger::Style>(
+    WORD &attributes,
+    const fly::logger::Style &modifier)
 {
     // https://docs.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes
     switch (modifier)
     {
-        case Style::Bold:
+        case fly::logger::Style::Bold:
             attributes |= FOREGROUND_INTENSITY;
             break;
-        case Style::Underline:
+        case fly::logger::Style::Underline:
             attributes |= COMMON_LVB_UNDERSCORE;
             break;
         default:
@@ -71,12 +73,14 @@ void StylerProxyImpl::apply_value<WORD, Style>(WORD &attributes, const Style &mo
 
 //==================================================================================================
 template <>
-void StylerProxyImpl::apply_value<WORD, Color>(WORD &attributes, const Color &modifier)
+void StylerProxyImpl::apply_value<WORD, fly::logger::Color>(
+    WORD &attributes,
+    const fly::logger::Color &modifier)
 {
     // https://docs.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes
     auto apply_color = [&attributes, &modifier](bool red, bool green, bool blue)
     {
-        if (modifier.m_plane == Color::Foreground)
+        if (modifier.m_plane == fly::logger::Color::Foreground)
         {
             attributes = red ? (attributes | FOREGROUND_RED) : (attributes & ~FOREGROUND_RED);
             attributes = green ? (attributes | FOREGROUND_GREEN) : (attributes & ~FOREGROUND_GREEN);
@@ -92,28 +96,28 @@ void StylerProxyImpl::apply_value<WORD, Color>(WORD &attributes, const Color &mo
 
     switch (modifier.m_color)
     {
-        case Color::Black:
+        case fly::logger::Color::Black:
             apply_color(false, false, false);
             break;
-        case Color::Red:
+        case fly::logger::Color::Red:
             apply_color(true, false, false);
             break;
-        case Color::Green:
+        case fly::logger::Color::Green:
             apply_color(false, true, false);
             break;
-        case Color::Blue:
+        case fly::logger::Color::Blue:
             apply_color(false, false, true);
             break;
-        case Color::Yellow:
+        case fly::logger::Color::Yellow:
             apply_color(true, true, false);
             break;
-        case Color::Magenta:
+        case fly::logger::Color::Magenta:
             apply_color(true, false, true);
             break;
-        case Color::Cyan:
+        case fly::logger::Color::Cyan:
             apply_color(false, true, true);
             break;
-        case Color::White:
+        case fly::logger::Color::White:
             apply_color(true, true, true);
             break;
     }
@@ -121,22 +125,24 @@ void StylerProxyImpl::apply_value<WORD, Color>(WORD &attributes, const Color &mo
 
 //==================================================================================================
 template <>
-void StylerProxyImpl::apply_value<COORD, Cursor>(COORD &attributes, const Cursor &modifier)
+void StylerProxyImpl::apply_value<COORD, fly::logger::Cursor>(
+    COORD &attributes,
+    const fly::logger::Cursor &modifier)
 {
     const std::uint8_t &distance = modifier.m_distance;
 
     switch (modifier.m_direction)
     {
-        case Cursor::Up:
+        case fly::logger::Cursor::Up:
             attributes.Y = (attributes.Y > distance) ? (attributes.Y - distance) : 0;
             break;
-        case Cursor::Down:
+        case fly::logger::Cursor::Down:
             attributes.Y += distance;
             break;
-        case Cursor::Forward:
+        case fly::logger::Cursor::Forward:
             attributes.X += distance;
             break;
-        case Cursor::Backward:
+        case fly::logger::Cursor::Backward:
             attributes.X = (attributes.X > distance) ? (attributes.X - distance) : 0;
             break;
     }
@@ -145,8 +151,8 @@ void StylerProxyImpl::apply_value<COORD, Cursor>(COORD &attributes, const Cursor
 //==================================================================================================
 void StylerProxyImpl::apply_styles_and_colors(
     const CONSOLE_SCREEN_BUFFER_INFO &console_info,
-    std::stack<Style> &&styles,
-    std::stack<Color> &&colors)
+    std::stack<fly::logger::Style> &&styles,
+    std::stack<fly::logger::Color> &&colors)
 {
     m_original_attributes = console_info.wAttributes;
     WORD attributes = m_original_attributes;
@@ -167,7 +173,7 @@ void StylerProxyImpl::apply_styles_and_colors(
 //==================================================================================================
 void StylerProxyImpl::apply_cursors(
     const CONSOLE_SCREEN_BUFFER_INFO &console_info,
-    std::stack<Cursor> &&cursors)
+    std::stack<fly::logger::Cursor> &&cursors)
 {
     COORD cursor_position = console_info.dwCursorPosition;
 
@@ -179,4 +185,4 @@ void StylerProxyImpl::apply_cursors(
     ::SetConsoleCursorPosition(m_handle, cursor_position);
 }
 
-} // namespace fly::detail
+} // namespace fly::logger::detail

@@ -8,7 +8,7 @@
 #include <ostream>
 #include <stack>
 
-namespace fly::detail {
+namespace fly::logger::detail {
 
 /**
  * Windows implementation of the StylerProxy interface. This implementation uses the Windows Console
@@ -31,9 +31,9 @@ public:
      */
     StylerProxyImpl(
         std::ostream &stream,
-        std::stack<Style> &&styles,
-        std::stack<Color> &&colors,
-        std::stack<Cursor> &&cursors) noexcept;
+        std::stack<fly::logger::Style> &&styles,
+        std::stack<fly::logger::Color> &&colors,
+        std::stack<fly::logger::Cursor> &&cursors) noexcept;
 
     /**
      * Destructor. Reset the stream's style and color to its original state.
@@ -62,8 +62,8 @@ private:
      */
     void apply_styles_and_colors(
         const CONSOLE_SCREEN_BUFFER_INFO &console_info,
-        std::stack<Style> &&styles,
-        std::stack<Color> &&colors);
+        std::stack<fly::logger::Style> &&styles,
+        std::stack<fly::logger::Color> &&colors);
 
     /**
      * Apply the provided cursor positions to the stream.
@@ -71,8 +71,9 @@ private:
      * @param console_info Structure holding the current information about the console screen.
      * @param cursors The list of cursor positions to apply to the stream.
      */
-    void
-    apply_cursors(const CONSOLE_SCREEN_BUFFER_INFO &console_info, std::stack<Cursor> &&cursors);
+    void apply_cursors(
+        const CONSOLE_SCREEN_BUFFER_INFO &console_info,
+        std::stack<fly::logger::Cursor> &&cursors);
 
     HANDLE m_handle {INVALID_HANDLE_VALUE};
     WORD m_original_attributes {0};
@@ -80,4 +81,4 @@ private:
     bool m_did_apply_style_or_color {false};
 };
 
-} // namespace fly::detail
+} // namespace fly::logger::detail

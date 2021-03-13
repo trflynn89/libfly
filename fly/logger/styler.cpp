@@ -7,7 +7,7 @@
 #include FLY_OS_IMPL_PATH(logger/detail, styler_proxy)
 // clang-format on
 
-namespace fly {
+namespace fly::logger {
 
 //==================================================================================================
 detail::StylerProxy &operator<<(std::ostream &stream, const Styler &styler)
@@ -25,4 +25,4 @@ detail::StylerProxy &operator<<(std::ostream &stream, const Styler &styler)
     return *(styler.m_proxy);
 }
 
-} // namespace fly
+} // namespace fly::logger

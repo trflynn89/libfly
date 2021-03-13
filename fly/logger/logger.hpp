@@ -24,7 +24,7 @@
 #define LOGD(...)                                                                                  \
     do                                                                                             \
     {                                                                                              \
-        fly::Logger::get_default_logger()->debug(                                                  \
+        fly::logger::Logger::get_default_logger()->debug(                                          \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
             FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
     } while (0)
@@ -41,7 +41,7 @@
 #define LOGI(...)                                                                                  \
     do                                                                                             \
     {                                                                                              \
-        fly::Logger::get_default_logger()->info(                                                   \
+        fly::logger::Logger::get_default_logger()->info(                                           \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
             FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
     } while (0)
@@ -58,7 +58,7 @@
 #define LOGW(...)                                                                                  \
     do                                                                                             \
     {                                                                                              \
-        fly::Logger::get_default_logger()->warn(                                                   \
+        fly::logger::Logger::get_default_logger()->warn(                                           \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
             FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
     } while (0)
@@ -76,7 +76,7 @@
 #define LOGS(...)                                                                                  \
     do                                                                                             \
     {                                                                                              \
-        fly::Logger::get_default_logger()->warn(                                                   \
+        fly::logger::Logger::get_default_logger()->warn(                                           \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
             FLY_FORMAT_STRING(__VA_ARGS__) ": {}" FLY_FORMAT_ARGS(__VA_ARGS__),                    \
             fly::system::get_error_string());                                                      \
@@ -94,7 +94,7 @@
 #define LOGE(...)                                                                                  \
     do                                                                                             \
     {                                                                                              \
-        fly::Logger::get_default_logger()->error(                                                  \
+        fly::logger::Logger::get_default_logger()->error(                                          \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
             FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
     } while (0)
@@ -103,18 +103,18 @@ namespace fly::coders {
 class CoderConfig;
 } // namespace fly::coders
 
-namespace fly::detail {
-class Registry;
-} // namespace fly::detail
-
 namespace fly::task {
 class SequencedTaskRunner;
 } // namespace fly::task
 
-namespace fly {
+namespace fly::logger {
 
 class LoggerConfig;
 class LogSink;
+
+namespace detail {
+    class Registry;
+} // namespace detail
 
 /**
  * Logging class to provide configurable instrumentation. There are 4 levels of instrumentation:
@@ -302,11 +302,11 @@ public:
      */
     template <typename... ParameterTypes>
     inline void debug(
-        Log::Trace &&trace,
+        Trace &&trace,
         String::FormatString<ParameterTypes...> &&format,
         ParameterTypes &&...parameters)
     {
-        log(Log::Level::Debug,
+        log(Level::Debug,
             std::move(trace),
             String::format(
                 std::forward<String::FormatString<ParameterTypes...>>(format),
@@ -342,11 +342,11 @@ public:
      */
     template <typename... ParameterTypes>
     inline void info(
-        Log::Trace &&trace,
+        Trace &&trace,
         String::FormatString<ParameterTypes...> &&format,
         ParameterTypes &&...parameters)
     {
-        log(Log::Level::Info,
+        log(Level::Info,
             std::move(trace),
             String::format(
                 std::forward<String::FormatString<ParameterTypes...>>(format),
@@ -382,11 +382,11 @@ public:
      */
     template <typename... ParameterTypes>
     inline void warn(
-        Log::Trace &&trace,
+        Trace &&trace,
         String::FormatString<ParameterTypes...> &&format,
         ParameterTypes &&...parameters)
     {
-        log(Log::Level::Warn,
+        log(Level::Warn,
             std::move(trace),
             String::format(
                 std::forward<String::FormatString<ParameterTypes...>>(format),
@@ -422,11 +422,11 @@ public:
      */
     template <typename... ParameterTypes>
     inline void error(
-        Log::Trace &&trace,
+        Trace &&trace,
         String::FormatString<ParameterTypes...> &&format,
         ParameterTypes &&...parameters)
     {
-        log(Log::Level::Error,
+        log(Level::Error,
             std::move(trace),
             String::format(
                 std::forward<String::FormatString<ParameterTypes...>>(format),
@@ -468,7 +468,7 @@ private:
      * @param trace The trace information for the log point.
      * @param message The message to log.
      */
-    void log(Log::Level level, Log::Trace &&trace, std::string &&message);
+    void log(Level level, Trace &&trace, std::string &&message);
 
     /**
      * Forward a log point to the log sink.
@@ -479,8 +479,8 @@ private:
      * @param time The time the log point was made.
      */
     void log_to_sink(
-        Log::Level level,
-        Log::Trace &&trace,
+        Level level,
+        Trace &&trace,
         std::string &&message,
         std::chrono::steady_clock::time_point time);
 
@@ -496,4 +496,4 @@ private:
     std::uintmax_t m_index {0};
 };
 
-} // namespace fly
+} // namespace fly::logger

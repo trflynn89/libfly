@@ -9,7 +9,7 @@
 #include <optional>
 #include <string>
 
-namespace fly::detail {
+namespace fly::logger::detail {
 
 //==================================================================================================
 bool ConsoleSink::initialize()
@@ -18,27 +18,27 @@ bool ConsoleSink::initialize()
 }
 
 //==================================================================================================
-bool ConsoleSink::stream(fly::Log &&log)
+bool ConsoleSink::stream(fly::logger::Log &&log)
 {
     std::ostream *stream = &std::cout;
-    fly::Style style = fly::Style::Default;
-    std::optional<fly::Color> color;
+    fly::logger::Style style = fly::logger::Style::Default;
+    std::optional<fly::logger::Color> color;
 
     switch (log.m_level)
     {
-        case Log::Level::Info:
-            color.emplace(fly::Color::Green);
+        case fly::logger::Level::Info:
+            color.emplace(fly::logger::Color::Green);
             break;
 
-        case Log::Level::Warn:
+        case fly::logger::Level::Warn:
             stream = &std::cerr;
-            color.emplace(fly::Color::Yellow);
+            color.emplace(fly::logger::Color::Yellow);
             break;
 
-        case Log::Level::Error:
+        case fly::logger::Level::Error:
             stream = &std::cerr;
-            style = fly::Style::Bold;
-            color.emplace(fly::Color::Red);
+            style = fly::logger::Style::Bold;
+            color.emplace(fly::logger::Color::Red);
             break;
 
         default:
@@ -46,7 +46,8 @@ bool ConsoleSink::stream(fly::Log &&log)
     }
 
     {
-        auto styler = color ? fly::Styler(std::move(style), *std::move(color)) : fly::Styler(style);
+        auto styler = color ? fly::logger::Styler(std::move(style), *std::move(color)) :
+                              fly::logger::Styler(std::move(style));
         *stream << styler << String::format("{} {}", fly::system::local_time(), log.m_trace);
     }
 
@@ -54,4 +55,4 @@ bool ConsoleSink::stream(fly::Log &&log)
     return true;
 }
 
-} // namespace fly::detail
+} // namespace fly::logger::detail

@@ -19,7 +19,7 @@
 /**
  * Log sink to drop all received logs.
  */
-class DropSink : public fly::LogSink
+class DropSink : public fly::logger::LogSink
 {
 public:
     bool initialize() override
@@ -27,7 +27,7 @@ public:
         return true;
     }
 
-    bool stream(fly::Log &&) override
+    bool stream(fly::logger::Log &&) override
     {
         return true;
     }
@@ -61,7 +61,7 @@ public:
 
     void testCaseStarting(const Catch::TestCaseInfo &info) override
     {
-        const auto style = fly::Styler(fly::Style::Bold, fly::Color::Cyan);
+        const auto style = fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Cyan);
         stream << style << fly::String::format("[{:=>13}{}{:=<13}]\n\n", ' ', info.name, ' ');
     }
 };
@@ -70,9 +70,9 @@ CATCH_REGISTER_REPORTER("libfly", SilentReporter)
 
 int main(int argc, char **argv)
 {
-    fly::Logger::set_default_logger(fly::Logger::create_logger(
+    fly::logger::Logger::set_default_logger(fly::logger::Logger::create_logger(
         "silent",
-        std::make_shared<fly::LoggerConfig>(),
+        std::make_shared<fly::logger::LoggerConfig>(),
         std::make_unique<DropSink>()));
 
     return Catch::Session().run(argc, argv);

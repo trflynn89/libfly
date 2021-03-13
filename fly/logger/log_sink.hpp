@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fly {
+namespace fly::logger {
 
 struct Log;
 
@@ -37,4 +37,4 @@ public:
     virtual bool stream(Log &&log) = 0;
 };
 
-} // namespace fly
+} // namespace fly::logger
