@@ -43,7 +43,8 @@ ConfigManager::ConfigManager(
     m_task_runner(std::move(task_runner)),
     m_path(std::move(path))
 {
-    m_monitor = PathMonitor::create(m_task_runner, create_config<PathConfig>());
+    m_monitor =
+        fly::path::PathMonitor::create(m_task_runner, create_config<fly::path::PathConfig>());
 
     switch (file_type)
     {
@@ -80,7 +81,7 @@ bool ConfigManager::start()
 
     std::weak_ptr<ConfigManager> weak_self = shared_from_this();
 
-    auto callback = [weak_self](std::filesystem::path, PathMonitor::PathEvent)
+    auto callback = [weak_self](std::filesystem::path, fly::path::PathMonitor::PathEvent)
     {
         if (auto self = weak_self.lock(); self)
         {

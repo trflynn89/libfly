@@ -10,7 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 
-namespace fly {
+namespace fly::path {
 
 namespace {
 
@@ -210,4 +210,4 @@ bool PathMonitorImpl::PathInfoImpl::is_valid() const
     return m_watch_descriptor != -1;
 }
 
-} // namespace fly
+} // namespace fly::path

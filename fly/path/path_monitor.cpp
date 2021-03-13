@@ -9,7 +9,7 @@
 
 #include FLY_OS_IMPL_PATH(path, path_monitor)
 
-namespace fly {
+namespace fly::path {
 
 //==================================================================================================
 std::shared_ptr<PathMonitor> PathMonitor::create(
@@ -226,4 +226,4 @@ std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event)
     return stream;
 }
 
-} // namespace fly
+} // namespace fly::path

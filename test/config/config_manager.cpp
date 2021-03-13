@@ -26,10 +26,10 @@ constexpr const char *s_config_manager_file = "config_manager.cpp";
 /**
  * Subclass of the path config to decrease the poll interval for faster testing.
  */
-class TestPathConfig : public fly::PathConfig
+class TestPathConfig : public fly::path::PathConfig
 {
 public:
-    TestPathConfig() noexcept : fly::PathConfig()
+    TestPathConfig() noexcept : fly::path::PathConfig()
     {
         m_default_poll_interval = 10_u64;
     }

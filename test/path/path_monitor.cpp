@@ -33,10 +33,10 @@ const std::chrono::seconds s_wait_time(5);
 /**
  * Subclass of the path config to decrease the poll interval for faster testing.
  */
-class TestPathConfig : public fly::PathConfig
+class TestPathConfig : public fly::path::PathConfig
 {
 public:
-    TestPathConfig() noexcept : fly::PathConfig()
+    TestPathConfig() noexcept : fly::path::PathConfig()
     {
         m_default_poll_interval = 10_i64;
     }
@@ -48,7 +48,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 {
     auto task_runner = fly::test::WaitableSequencedTaskRunner::create(fly::test::task_manager());
 
-    auto monitor = fly::PathMonitor::create(task_runner, std::make_shared<TestPathConfig>());
+    auto monitor = fly::path::PathMonitor::create(task_runner, std::make_shared<TestPathConfig>());
     CATCH_REQUIRE(monitor);
 
     fly::test::PathUtil::ScopedTempDirectory path0;
@@ -60,25 +60,25 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
     std::filesystem::path file2 = path1.file();
     std::filesystem::path file3 = path2.file();
 
-    fly::ConcurrentQueue<fly::PathMonitor::PathEvent> event_queue;
+    fly::ConcurrentQueue<fly::path::PathMonitor::PathEvent> event_queue;
 
     std::map<std::filesystem::path, unsigned int> created_files;
     std::map<std::filesystem::path, unsigned int> deleted_files;
     std::map<std::filesystem::path, unsigned int> changed_files;
 
-    auto handle_event = [&](std::filesystem::path path, fly::PathMonitor::PathEvent event)
+    auto handle_event = [&](std::filesystem::path path, fly::path::PathMonitor::PathEvent event)
     {
         switch (event)
         {
-            case fly::PathMonitor::PathEvent::Created:
+            case fly::path::PathMonitor::PathEvent::Created:
                 ++created_files[path];
                 break;
 
-            case fly::PathMonitor::PathEvent::Deleted:
+            case fly::path::PathMonitor::PathEvent::Deleted:
                 ++deleted_files[path];
                 break;
 
-            case fly::PathMonitor::PathEvent::Changed:
+            case fly::path::PathMonitor::PathEvent::Changed:
                 ++changed_files[path];
                 break;
 
@@ -102,27 +102,27 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
     {
         {
             std::stringstream stream;
-            stream << static_cast<fly::PathMonitor::PathEvent>(-1);
+            stream << static_cast<fly::path::PathMonitor::PathEvent>(-1);
             CATCH_CHECK(stream.str().empty());
         }
         {
             std::stringstream stream;
-            stream << fly::PathMonitor::PathEvent::None;
+            stream << fly::path::PathMonitor::PathEvent::None;
             CATCH_CHECK(stream.str() == "None");
         }
         {
             std::stringstream stream;
-            stream << fly::PathMonitor::PathEvent::Created;
+            stream << fly::path::PathMonitor::PathEvent::Created;
             CATCH_CHECK(stream.str() == "Created");
         }
         {
             std::stringstream stream;
-            stream << fly::PathMonitor::PathEvent::Deleted;
+            stream << fly::path::PathMonitor::PathEvent::Deleted;
             CATCH_CHECK(stream.str() == "Deleted");
         }
         {
             std::stringstream stream;
-            stream << fly::PathMonitor::PathEvent::Changed;
+            stream << fly::path::PathMonitor::PathEvent::Changed;
             CATCH_CHECK(stream.str() == "Changed");
         }
     }
@@ -151,7 +151,8 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
     {
         fly::test::MockSystem mock(fly::test::MockCall::InotifyInit1);
 
-        monitor = fly::PathMonitor::create(task_runner, std::make_shared<fly::PathConfig>());
+        monitor =
+            fly::path::PathMonitor::create(task_runner, std::make_shared<fly::path::PathConfig>());
         CATCH_CHECK_FALSE(monitor);
     }
 
@@ -178,7 +179,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 
     CATCH_SECTION("Creating a file issues a PathEvent::Created event")
     {
-        fly::PathMonitor::PathEvent event;
+        fly::path::PathMonitor::PathEvent event;
 
         CATCH_CHECK(created_files[file0] == 0);
         CATCH_CHECK(deleted_files[file0] == 0);
@@ -194,7 +195,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 
     CATCH_SECTION("Deleting a file issues a PathEvent::Deleted event")
     {
-        fly::PathMonitor::PathEvent event;
+        fly::path::PathMonitor::PathEvent event;
 
         CATCH_CHECK(created_files[file0] == 0);
         CATCH_CHECK(deleted_files[file0] == 0);
@@ -212,7 +213,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 
     CATCH_SECTION("Changing a file issues a PathEvent::Changed event")
     {
-        fly::PathMonitor::PathEvent event;
+        fly::path::PathMonitor::PathEvent event;
 
         CATCH_CHECK(created_files[file0] == 0);
         CATCH_CHECK(deleted_files[file0] == 0);
@@ -292,7 +293,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 
     CATCH_SECTION("Monitor can handle many events")
     {
-        fly::PathMonitor::PathEvent event;
+        fly::path::PathMonitor::PathEvent event;
 
         CATCH_CHECK(created_files[file1] == 0);
         CATCH_CHECK(deleted_files[file1] == 0);

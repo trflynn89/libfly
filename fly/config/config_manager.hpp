@@ -12,6 +12,10 @@
 #include <string>
 #include <type_traits>
 
+namespace fly::path {
+class PathMonitor;
+} // namespace fly::path
+
 namespace fly::task {
 class SequencedTaskRunner;
 } // namespace fly::task
@@ -19,7 +23,6 @@ class SequencedTaskRunner;
 namespace fly {
 
 class Parser;
-class PathMonitor;
 
 /**
  * Class to create and manage a set of configurations.
@@ -107,7 +110,7 @@ private:
 
     std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
 
-    std::shared_ptr<PathMonitor> m_monitor;
+    std::shared_ptr<fly::path::PathMonitor> m_monitor;
     std::unique_ptr<Parser> m_parser;
     Json m_values;
 
