@@ -8,14 +8,14 @@ namespace fly::net {
 
 //==================================================================================================
 template <>
-std::string Endpoint<fly::net::IPv4Address>::to_string() const
+std::string Endpoint<IPv4Address>::to_string() const
 {
     return fly::String::format("{}:{}", m_address, m_port);
 }
 
 //==================================================================================================
 template <>
-std::string Endpoint<fly::net::IPv6Address>::to_string() const
+std::string Endpoint<IPv6Address>::to_string() const
 {
     return fly::String::format("[{}]:{}", m_address, m_port);
 }

@@ -35,13 +35,13 @@ SocketService::SocketService(
     m_task_runner(std::move(task_runner)),
     m_config(std::move(config))
 {
-    fly::net::detail::initialize();
+    detail::initialize();
 }
 
 //==================================================================================================
 SocketService::~SocketService() noexcept
 {
-    fly::net::detail::deinitialize();
+    detail::deinitialize();
 }
 
 //==================================================================================================
@@ -113,11 +113,11 @@ void SocketService::poll()
         readable.insert(request.m_handle);
     }
 
-    fly::net::detail::select(m_config->socket_io_wait_time(), writable, readable);
+    detail::select(m_config->socket_io_wait_time(), writable, readable);
 
     auto invoke = [](const std::set<socket_type> &ready, std::vector<Request> &pending)
     {
-        for (fly::net::socket_type handle : ready)
+        for (socket_type handle : ready)
         {
             auto it = std::find_if(
                 pending.begin(),
