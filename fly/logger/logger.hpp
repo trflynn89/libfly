@@ -204,6 +204,9 @@ std::shared_ptr<Logger> create_console_logger(
  */
 class Logger : public std::enable_shared_from_this<Logger>
 {
+    template <typename... ParameterTypes>
+    using FormatString = fly::String::FormatString<ParameterTypes...>;
+
 public:
     /**
      * Destructor.
@@ -283,14 +286,7 @@ public:
      * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
-    inline void
-    debug(String::FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
-    {
-        debug(
-            {},
-            std::forward<String::FormatString<ParameterTypes...>>(format),
-            std::forward<ParameterTypes>(parameters)...);
-    }
+    void debug(FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters);
 
     /**
      * Add a debug log point to the logger with trace information.
@@ -302,17 +298,8 @@ public:
      * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
-    inline void debug(
-        Trace &&trace,
-        String::FormatString<ParameterTypes...> &&format,
-        ParameterTypes &&...parameters)
-    {
-        log(Level::Debug,
-            std::move(trace),
-            String::format(
-                std::forward<String::FormatString<ParameterTypes...>>(format),
-                std::forward<ParameterTypes>(parameters)...));
-    }
+    void
+    debug(Trace &&trace, FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters);
 
     /**
      * Add an informational log point to the logger.
@@ -323,14 +310,7 @@ public:
      * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
-    inline void
-    info(String::FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
-    {
-        info(
-            {},
-            std::forward<String::FormatString<ParameterTypes...>>(format),
-            std::forward<ParameterTypes>(parameters)...);
-    }
+    void info(FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters);
 
     /**
      * Add an informational log point to the logger with trace information.
@@ -342,17 +322,8 @@ public:
      * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
-    inline void info(
-        Trace &&trace,
-        String::FormatString<ParameterTypes...> &&format,
-        ParameterTypes &&...parameters)
-    {
-        log(Level::Info,
-            std::move(trace),
-            String::format(
-                std::forward<String::FormatString<ParameterTypes...>>(format),
-                std::forward<ParameterTypes>(parameters)...));
-    }
+    void
+    info(Trace &&trace, FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters);
 
     /**
      * Add a warning log point to the logger.
@@ -363,14 +334,7 @@ public:
      * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
-    inline void
-    warn(String::FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
-    {
-        warn(
-            {},
-            std::forward<String::FormatString<ParameterTypes...>>(format),
-            std::forward<ParameterTypes>(parameters)...);
-    }
+    void warn(FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters);
 
     /**
      * Add a warning log point to the logger with trace information.
@@ -382,17 +346,8 @@ public:
      * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
-    inline void warn(
-        Trace &&trace,
-        String::FormatString<ParameterTypes...> &&format,
-        ParameterTypes &&...parameters)
-    {
-        log(Level::Warn,
-            std::move(trace),
-            String::format(
-                std::forward<String::FormatString<ParameterTypes...>>(format),
-                std::forward<ParameterTypes>(parameters)...));
-    }
+    void
+    warn(Trace &&trace, FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters);
 
     /**
      * Add an error log point to the logger.
@@ -403,14 +358,7 @@ public:
      * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
-    inline void
-    error(String::FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
-    {
-        error(
-            {},
-            std::forward<String::FormatString<ParameterTypes...>>(format),
-            std::forward<ParameterTypes>(parameters)...);
-    }
+    void error(FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters);
 
     /**
      * Add an error log point to the logger with trace information.
@@ -422,17 +370,8 @@ public:
      * @param parameters The variadic list of arguments to augment the format string with.
      */
     template <typename... ParameterTypes>
-    inline void error(
-        Trace &&trace,
-        String::FormatString<ParameterTypes...> &&format,
-        ParameterTypes &&...parameters)
-    {
-        log(Level::Error,
-            std::move(trace),
-            String::format(
-                std::forward<String::FormatString<ParameterTypes...>>(format),
-                std::forward<ParameterTypes>(parameters)...));
-    }
+    void
+    error(Trace &&trace, FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters);
 
 private:
     friend class detail::Registry;
@@ -496,5 +435,81 @@ private:
     const std::chrono::steady_clock::time_point m_start_time;
     std::uintmax_t m_index {0};
 };
+
+//==================================================================================================
+template <typename... ParameterTypes>
+inline void Logger::debug(FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
+{
+    debug({}, std::move(format), std::forward<ParameterTypes>(parameters)...);
+}
+
+//==================================================================================================
+template <typename... ParameterTypes>
+inline void Logger::debug(
+    Trace &&trace,
+    FormatString<ParameterTypes...> &&format,
+    ParameterTypes &&...parameters)
+{
+    log(Level::Debug,
+        std::move(trace),
+        fly::String::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
+}
+
+//==================================================================================================
+template <typename... ParameterTypes>
+inline void Logger::info(FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
+{
+    info({}, std::move(format), std::forward<ParameterTypes>(parameters)...);
+}
+
+//==================================================================================================
+template <typename... ParameterTypes>
+inline void Logger::info(
+    Trace &&trace,
+    FormatString<ParameterTypes...> &&format,
+    ParameterTypes &&...parameters)
+{
+    log(Level::Info,
+        std::move(trace),
+        fly::String::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
+}
+
+//==================================================================================================
+template <typename... ParameterTypes>
+inline void Logger::warn(FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
+{
+    warn({}, std::move(format), std::forward<ParameterTypes>(parameters)...);
+}
+
+//==================================================================================================
+template <typename... ParameterTypes>
+inline void Logger::warn(
+    Trace &&trace,
+    FormatString<ParameterTypes...> &&format,
+    ParameterTypes &&...parameters)
+{
+    log(Level::Warn,
+        std::move(trace),
+        fly::String::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
+}
+
+//==================================================================================================
+template <typename... ParameterTypes>
+inline void Logger::error(FormatString<ParameterTypes...> &&format, ParameterTypes &&...parameters)
+{
+    error({}, std::move(format), std::forward<ParameterTypes>(parameters)...);
+}
+
+//==================================================================================================
+template <typename... ParameterTypes>
+inline void Logger::error(
+    Trace &&trace,
+    FormatString<ParameterTypes...> &&format,
+    ParameterTypes &&...parameters)
+{
+    log(Level::Error,
+        std::move(trace),
+        fly::String::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
+}
 
 } // namespace fly::logger
