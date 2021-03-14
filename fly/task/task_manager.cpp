@@ -83,14 +83,14 @@ bool TaskManager::stop()
 //==================================================================================================
 void TaskManager::post_task(
     TaskLocation &&location,
-    Task &&task,
-    std::weak_ptr<TaskRunner> weak_task_runner)
+    std::weak_ptr<TaskRunner> weak_task_runner,
+    Task &&task)
 {
     TaskHolder wrapped_task {
         std::move(location),
-        std::move(task),
         std::move(weak_task_runner),
-        std::chrono::steady_clock::now()};
+        std::chrono::steady_clock::now(),
+        std::move(task)};
 
     m_tasks.push(std::move(wrapped_task));
 }
@@ -98,15 +98,15 @@ void TaskManager::post_task(
 //==================================================================================================
 void TaskManager::post_task_with_delay(
     TaskLocation &&location,
-    Task &&task,
     std::weak_ptr<TaskRunner> weak_task_runner,
-    std::chrono::milliseconds delay)
+    std::chrono::milliseconds delay,
+    Task &&task)
 {
     TaskHolder wrapped_task {
         std::move(location),
-        std::move(task),
         std::move(weak_task_runner),
-        std::chrono::steady_clock::now() + delay};
+        std::chrono::steady_clock::now() + delay,
+        std::move(task)};
 
     std::unique_lock<std::mutex> lock(m_delayed_tasks_mutex);
     m_delayed_tasks.push_back(std::move(wrapped_task));

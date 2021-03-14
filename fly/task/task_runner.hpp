@@ -80,7 +80,7 @@ class TaskManager;
  *       };
  *
  *       std::weak_ptr<MyClass> weak_self = shared_from_this();
- *       task_runner->post_task(FROM_HERE, std::move(task), weak_self);
+ *       task_runner->post_task(FROM_HERE, weak_self, std::move(task));
  *
  *    Reply tasks may be cancelled in the same manner. The reply task must then accept the result of
  *    the task and the shared pointer obtained from the weak pointer. If the task was dropped due to
@@ -101,7 +101,7 @@ class TaskManager;
  *       };
  *
  *       std::weak_ptr<MyClass> weak_self = shared_from_this();
- *       task_runner->post_task_with_reply(FROM_HERE, std::move(task), std::move(reply), weak_self);
+ *       task_runner->post_task_with_reply(FROM_HERE, weak_self, std::move(task), std::move(reply));
  *
  * 2. Deleting the task runner onto which the task was posted. This will only cancel the task if the
  *    task manager has not yet instructed the task runner to execute the task.
@@ -142,13 +142,13 @@ public:
      * @tparam OwnerType Type of the owner of the task.
      *
      * @param location The location from which the task was posted (use FROM_HERE).
-     * @param task The task to be executed.
      * @param weak_owner A weak pointer to the owner of the task.
+     * @param task The task to be executed.
      *
      * @return True if the task was posted for execution.
      */
-    template <typename TaskType, typename OwnerType>
-    bool post_task(TaskLocation &&location, TaskType &&task, std::weak_ptr<OwnerType> weak_owner);
+    template <typename OwnerType, typename TaskType>
+    bool post_task(TaskLocation &&location, std::weak_ptr<OwnerType> weak_owner, TaskType &&task);
 
     /**
      * Post a task for execution. The task may be any callable type.
@@ -167,7 +167,7 @@ public:
      * @return True if the task was posted for execution.
      */
     template <typename TaskType, typename ReplyType>
-    bool post_task_with_reply(TaskLocation &&location, TaskType &&task, ReplyType reply);
+    bool post_task_with_reply(TaskLocation &&location, TaskType &&task, ReplyType &&reply);
 
     /**
      * Post a task for execution with protection by the provided weak pointer. The task may be any
@@ -186,18 +186,18 @@ public:
      * @tparam OwnerType Type of the owner of the task.
      *
      * @param location The location from which the task was posted (use FROM_HERE).
+     * @param weak_owner A weak pointer to the owner of the task.
      * @param task The task to be executed.
      * @param reply The reply to be executed with the result of the task.
-     * @param weak_owner A weak pointer to the owner of the task.
      *
      * @return True if the task was posted for execution.
      */
-    template <typename TaskType, typename ReplyType, typename OwnerType>
+    template <typename OwnerType, typename TaskType, typename ReplyType>
     bool post_task_with_reply(
         TaskLocation &&location,
+        std::weak_ptr<OwnerType> weak_owner,
         TaskType &&task,
-        ReplyType reply,
-        std::weak_ptr<OwnerType> weak_owner);
+        ReplyType &&reply);
 
     /**
      * Schedule a task to be posted after a delay. The task may be any callable type.
@@ -205,14 +205,14 @@ public:
      * @tparam TaskType Callable type of the task.
      *
      * @param location The location from which the task was posted (use FROM_HERE).
-     * @param task The task to be executed.
      * @param delay Delay before posting the task.
+     * @param task The task to be executed.
      *
      * @return True if the task was posted for delayed execution.
      */
     template <typename TaskType>
     bool
-    post_task_with_delay(TaskLocation &&location, TaskType &&task, std::chrono::milliseconds delay);
+    post_task_with_delay(TaskLocation &&location, std::chrono::milliseconds delay, TaskType &&task);
 
     /**
      * Schedule a task to be posted after a delay with protection by the provided weak pointer. The
@@ -224,18 +224,18 @@ public:
      * @tparam OwnerType Type of the owner of the task.
      *
      * @param location The location from which the task was posted (use FROM_HERE).
-     * @param task The task to be executed.
      * @param weak_owner A weak pointer to the owner of the task.
      * @param delay Delay before posting the task.
+     * @param task The task to be executed.
      *
      * @return True if the task was posted for delayed execution.
      */
-    template <typename TaskType, typename OwnerType>
+    template <typename OwnerType, typename TaskType>
     bool post_task_with_delay(
         TaskLocation &&location,
-        TaskType &&task,
         std::weak_ptr<OwnerType> weak_owner,
-        std::chrono::milliseconds delay);
+        std::chrono::milliseconds delay,
+        TaskType &&task);
 
     /**
      * Schedule a task to be posted after a delay. The task may be any callable type.
@@ -248,18 +248,18 @@ public:
      * @tparam ReplyType Callable type of the reply.
      *
      * @param location The location from which the task was posted (use FROM_HERE).
+     * @param delay Delay before posting the task.
      * @param task The task to be executed.
      * @param reply The reply to be executed with the result of the task.
-     * @param delay Delay before posting the task.
      *
      * @return True if the task was posted for execution.
      */
     template <typename TaskType, typename ReplyType>
     bool post_task_with_delay_and_reply(
         TaskLocation &&location,
+        std::chrono::milliseconds delay,
         TaskType &&task,
-        ReplyType &&reply,
-        std::chrono::milliseconds delay);
+        ReplyType &&reply);
 
     /**
      * Schedule a task to be posted after a delay with protection by the provided weak pointer. The
@@ -278,20 +278,20 @@ public:
      * @tparam OwnerType Type of the owner of the task.
      *
      * @param location The location from which the task was posted (use FROM_HERE).
-     * @param task The task to be executed.
-     * @param reply The reply to be executed with the result of the task.
      * @param weak_owner A weak pointer to the owner of the task.
      * @param delay Delay before posting the task.
+     * @param task The task to be executed.
+     * @param reply The reply to be executed with the result of the task.
      *
      * @return True if the task was posted for execution.
      */
-    template <typename TaskType, typename ReplyType, typename OwnerType>
+    template <typename OwnerType, typename TaskType, typename ReplyType>
     bool post_task_with_delay_and_reply(
         TaskLocation &&location,
-        TaskType &&task,
-        ReplyType &&reply,
         std::weak_ptr<OwnerType> weak_owner,
-        std::chrono::milliseconds delay);
+        std::chrono::milliseconds delay,
+        TaskType &&task,
+        ReplyType &&reply);
 
 protected:
     /**
@@ -334,15 +334,15 @@ protected:
      * be handed back to the task runner to govern when the task will be posted from there.
      *
      * @param location The location from which the task was posted.
-     * @param task The task to be executed.
      * @param delay Delay before posting the task.
+     * @param task The task to be executed.
      *
      * @return True if the task was posted for delayed execution.
      */
     bool post_task_to_task_manager_with_delay(
         TaskLocation &&location,
-        Task &&task,
-        std::chrono::milliseconds delay);
+        std::chrono::milliseconds delay,
+        Task &&task);
 
 private:
     /**
@@ -374,13 +374,13 @@ private:
      * @tparam TaskType Callable type of the task.
      * @tparam OwnerType Type of the owner of the task.
      *
-     * @param task The task to be executed.
      * @param weak_owner A weak pointer to the owner of the task.
+     * @param task The task to be executed.
      *
      * @return The wrapped task.
      */
-    template <typename TaskType, typename OwnerType>
-    Task wrap_task(TaskType &&task, std::weak_ptr<OwnerType> weak_owner);
+    template <typename OwnerType, typename TaskType>
+    Task wrap_task(std::weak_ptr<OwnerType> weak_owner, TaskType &&task);
 
     /**
      * Wrap a task in a generic lambda to be agnostic to the return type of the task.
@@ -412,14 +412,14 @@ private:
      * @tparam ReplyType Callable type of the reply.
      * @tparam OwnerType Type of the owner of the task.
      *
+     * @param weak_owner A weak pointer to the owner of the task.
      * @param task The task to be executed.
      * @param reply The reply to be executed with the result of the task.
-     * @param weak_owner A weak pointer to the owner of the task.
      *
      * @return The wrapped task.
      */
-    template <typename TaskType, typename ReplyType, typename OwnerType>
-    Task wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<OwnerType> weak_owner);
+    template <typename OwnerType, typename TaskType, typename ReplyType>
+    Task wrap_task(std::weak_ptr<OwnerType> weak_owner, TaskType &&task, ReplyType &&reply);
 
     /**
      * Execute a task.
@@ -553,93 +553,96 @@ bool TaskRunner::post_task(TaskLocation &&location, TaskType &&task)
 }
 
 //==================================================================================================
-template <typename TaskType, typename OwnerType>
+template <typename OwnerType, typename TaskType>
 bool TaskRunner::post_task(
     TaskLocation &&location,
-    TaskType &&task,
-    std::weak_ptr<OwnerType> weak_owner)
+    std::weak_ptr<OwnerType> weak_owner,
+    TaskType &&task)
 {
     return post_task_internal(
         std::move(location),
-        wrap_task(std::forward<TaskType>(task), std::move(weak_owner)));
+        wrap_task(std::move(weak_owner), std::forward<TaskType>(task)));
 }
 
 //==================================================================================================
 template <typename TaskType, typename ReplyType>
-bool TaskRunner::post_task_with_reply(TaskLocation &&location, TaskType &&task, ReplyType reply)
+bool TaskRunner::post_task_with_reply(TaskLocation &&location, TaskType &&task, ReplyType &&reply)
 {
     return post_task_internal(
         std::move(location),
-        wrap_task(std::forward<TaskType>(task), std::move(reply)));
+        wrap_task(std::forward<TaskType>(task), std::forward<ReplyType>(reply)));
 }
 
 //==================================================================================================
-template <typename TaskType, typename ReplyType, typename OwnerType>
+template <typename OwnerType, typename TaskType, typename ReplyType>
 bool TaskRunner::post_task_with_reply(
     TaskLocation &&location,
+    std::weak_ptr<OwnerType> weak_owner,
     TaskType &&task,
-    ReplyType reply,
-    std::weak_ptr<OwnerType> weak_owner)
+    ReplyType &&reply)
 {
     return post_task_internal(
         std::move(location),
-        wrap_task(std::forward<TaskType>(task), std::move(reply), std::move(weak_owner)));
+        wrap_task(
+            std::move(weak_owner),
+            std::forward<TaskType>(task),
+            std::forward<ReplyType>(reply)));
 }
 
 //==================================================================================================
 template <typename TaskType>
 bool TaskRunner::post_task_with_delay(
     TaskLocation &&location,
-    TaskType &&task,
-    std::chrono::milliseconds delay)
+    std::chrono::milliseconds delay,
+    TaskType &&task)
 {
     return post_task_to_task_manager_with_delay(
         std::move(location),
-        wrap_task(std::forward<TaskType>(task)),
-        delay);
+        std::move(delay),
+        wrap_task(std::forward<TaskType>(task)));
 }
 
 //==================================================================================================
-template <typename TaskType, typename OwnerType>
+template <typename OwnerType, typename TaskType>
 bool TaskRunner::post_task_with_delay(
     TaskLocation &&location,
-    TaskType &&task,
     std::weak_ptr<OwnerType> weak_owner,
-    std::chrono::milliseconds delay)
+    std::chrono::milliseconds delay,
+    TaskType &&task)
 {
     return post_task_to_task_manager_with_delay(
         std::move(location),
-        wrap_task(std::forward<TaskType>(task), std::move(weak_owner)),
-        delay);
+        std::move(delay),
+        wrap_task(std::move(weak_owner), std::forward<TaskType>(task)));
 }
 
 //==================================================================================================
 template <typename TaskType, typename ReplyType>
 bool TaskRunner::post_task_with_delay_and_reply(
     TaskLocation &&location,
+    std::chrono::milliseconds delay,
     TaskType &&task,
-    ReplyType &&reply,
-    std::chrono::milliseconds delay)
+    ReplyType &&reply)
 {
     return post_task_to_task_manager_with_delay(
         std::move(location),
-        wrap_task(std::forward<TaskType>(task), std::move(reply)),
-        delay);
+        std::move(delay),
+        wrap_task(std::forward<TaskType>(task), std::forward<ReplyType>(reply)));
 }
 
 //==================================================================================================
-template <typename TaskType, typename ReplyType, typename OwnerType>
+template <typename OwnerType, typename TaskType, typename ReplyType>
 bool TaskRunner::post_task_with_delay_and_reply(
     TaskLocation &&location,
-    TaskType &&task,
-    ReplyType &&reply,
     std::weak_ptr<OwnerType> weak_owner,
-    std::chrono::milliseconds delay)
+    std::chrono::milliseconds delay,
+    TaskType &&task,
+    ReplyType &&reply)
 {
     return post_task_to_task_manager_with_delay(
         std::move(location),
-        wrap_task(std::forward<TaskType>(task), std::move(reply), std::move(weak_owner)),
-        delay);
+        std::move(delay),
+        wrap_task(std::move(weak_owner), std::forward<TaskType>(task), std::move(reply)));
 }
 
 //==================================================================================================
@@ -657,8 +660,8 @@ Task TaskRunner::wrap_task(TaskType &&task)
 }
 
 //==================================================================================================
-template <typename TaskType, typename OwnerType>
-Task TaskRunner::wrap_task(TaskType &&task, std::weak_ptr<OwnerType> weak_owner)
+template <typename OwnerType, typename TaskType>
+Task TaskRunner::wrap_task(std::weak_ptr<OwnerType> weak_owner, TaskType &&task)
 {
     using StrongOwnerType = std::shared_ptr<OwnerType>;
 
@@ -668,8 +671,8 @@ Task TaskRunner::wrap_task(TaskType &&task, std::weak_ptr<OwnerType> weak_owner)
 
     TaskHolder<TaskType> holder {std::forward<TaskType>(task)};
 
-    return [holder = std::move(holder),
-            weak_owner = std::move(weak_owner)](TaskRunner *, TaskLocation) mutable
+    return [weak_owner = std::move(weak_owner),
+            holder = std::move(holder)](TaskRunner *, TaskLocation) mutable
     {
         if (StrongOwnerType owner = weak_owner.lock(); owner)
         {
@@ -718,8 +721,8 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply)
 }
 
 //==================================================================================================
-template <typename TaskType, typename ReplyType, typename OwnerType>
-Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<OwnerType> weak_owner)
+template <typename OwnerType, typename TaskType, typename ReplyType>
+Task TaskRunner::wrap_task(std::weak_ptr<OwnerType> weak_owner, TaskType &&task, ReplyType &&reply)
 {
     using StrongOwnerType = std::shared_ptr<OwnerType>;
 
@@ -740,9 +743,10 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<Own
     TaskHolder<TaskType> task_holder {std::forward<TaskType>(task)};
     TaskHolder<ReplyType> reply_holder {std::forward<ReplyType>(reply)};
 
-    return [task_holder = std::move(task_holder),
-            reply_holder = std::move(reply_holder),
-            weak_owner = std::move(weak_owner)](TaskRunner *runner, TaskLocation location) mutable
+    return
+        [weak_owner = std::move(weak_owner),
+         task_holder = std::move(task_holder),
+         reply_holder = std::move(reply_holder)](TaskRunner *runner, TaskLocation location) mutable
     {
         if (StrongOwnerType owner = weak_owner.lock(); owner)
         {
@@ -752,8 +756,8 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<Own
 
                 runner->post_task(
                     std::move(location),
-                    std::move(reply_holder.m_task),
-                    std::move(weak_owner));
+                    std::move(weak_owner),
+                    std::move(reply_holder.m_task));
             }
             else
             {
@@ -761,11 +765,11 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply, std::weak_ptr<Own
 
                 runner->post_task(
                     std::move(location),
+                    std::move(weak_owner),
                     std::bind(
                         std::move(reply_holder.m_task),
                         std::move(result),
-                        std::placeholders::_1),
-                    std::move(weak_owner));
+                        std::placeholders::_1));
             }
         }
     };

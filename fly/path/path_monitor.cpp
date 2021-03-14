@@ -198,7 +198,7 @@ bool PathMonitor::poll_paths_later()
     };
 
     std::weak_ptr<PathMonitor> weak_self = shared_from_this();
-    return m_task_runner->post_task(FROM_HERE, std::move(task), std::move(weak_self));
+    return m_task_runner->post_task(FROM_HERE, std::move(weak_self), std::move(task));
 }
 
 //==================================================================================================

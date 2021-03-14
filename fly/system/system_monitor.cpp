@@ -103,9 +103,9 @@ bool SystemMonitor::poll_system_later()
 
     return m_task_runner->post_task_with_delay(
         FROM_HERE,
-        std::move(task),
         std::move(weak_self),
-        m_config->poll_interval());
+        m_config->poll_interval(),
+        std::move(task));
 }
 
 } // namespace fly::system

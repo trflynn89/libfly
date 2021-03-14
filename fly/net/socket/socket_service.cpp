@@ -59,7 +59,7 @@ void SocketService::remove_socket(socket_type handle)
     };
 
     std::weak_ptr<SocketService> weak_self = shared_from_this();
-    m_task_runner->post_task(FROM_HERE, std::move(task), weak_self);
+    m_task_runner->post_task(FROM_HERE, weak_self, std::move(task));
 }
 
 //==================================================================================================
@@ -77,7 +77,7 @@ void SocketService::notify_when_writable(socket_type handle, Notification &&call
     };
 
     std::weak_ptr<SocketService> weak_self = shared_from_this();
-    m_task_runner->post_task(FROM_HERE, std::move(task), weak_self);
+    m_task_runner->post_task(FROM_HERE, weak_self, std::move(task));
 }
 
 //==================================================================================================
@@ -95,7 +95,7 @@ void SocketService::notify_when_readable(socket_type handle, Notification &&call
     };
 
     std::weak_ptr<SocketService> weak_self = shared_from_this();
-    m_task_runner->post_task(FROM_HERE, std::move(task), weak_self);
+    m_task_runner->post_task(FROM_HERE, weak_self, std::move(task));
 }
 
 //==================================================================================================
@@ -143,7 +143,7 @@ void SocketService::poll()
         };
 
         std::weak_ptr<SocketService> weak_self = shared_from_this();
-        m_task_runner->post_task(FROM_HERE, std::move(task), std::move(weak_self));
+        m_task_runner->post_task(FROM_HERE, std::move(weak_self), std::move(task));
     }
 }
 
