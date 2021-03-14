@@ -855,7 +855,7 @@ inline StringType BasicString<StringType>::format(
     detail::BasicStringFormatter<StringType, ParameterTypes...> formatter(
         std::forward<ParameterTypes>(parameters)...);
 
-    return formatter.format(std::forward<FormatString<ParameterTypes...>>(fmt));
+    return formatter.format(std::move(fmt));
 }
 
 //==================================================================================================
