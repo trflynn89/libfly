@@ -257,7 +257,7 @@ CATCH_TEST_CASE("Task", "[task]")
         const std::chrono::milliseconds delay(10);
 
         CATCH_REQUIRE(
-            task_runner->post_task_with_delay(FROM_HERE, std::bind(&TimerTask::run, &task), delay));
+            task_runner->post_task_with_delay(FROM_HERE, delay, std::bind(&TimerTask::run, &task)));
         task_runner->wait_for_task_to_complete(__FILE__);
 
         CATCH_CHECK(task.time() >= delay);
@@ -273,8 +273,8 @@ CATCH_TEST_CASE("Task", "[task]")
 
         CATCH_REQUIRE(task_runner->post_task_with_delay(
             FROM_HERE,
-            std::bind(&MarkerTask::run, &task, 1),
-            10ms));
+            10ms,
+            std::bind(&MarkerTask::run, &task, 1)));
         CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 2)));
         CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::bind(&MarkerTask::run, &task, 3)));
 
@@ -313,9 +313,9 @@ CATCH_TEST_CASE("Task", "[task]")
 
         CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
             FROM_HERE,
+            10ms,
             std::move(task),
-            std::move(reply),
-            10ms));
+            std::move(reply)));
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
 
@@ -342,9 +342,9 @@ CATCH_TEST_CASE("Task", "[task]")
 
         CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
             FROM_HERE,
+            10ms,
             std::move(task),
-            std::move(reply),
-            10ms));
+            std::move(reply)));
         task_runner->wait_for_task_to_complete(__FILE__);
         task_runner->wait_for_task_to_complete(__FILE__);
 
@@ -368,7 +368,7 @@ CATCH_TEST_CASE("Task", "[task]")
             };
 
             std::weak_ptr<TaskClass> weak_task_class = task_class;
-            CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task), weak_task_class));
+            CATCH_REQUIRE(task_runner->post_task(FROM_HERE, weak_task_class, std::move(task)));
             task_runner->wait_for_task_to_complete(__FILE__);
 
             CATCH_CHECK(task_was_called);
@@ -390,7 +390,7 @@ CATCH_TEST_CASE("Task", "[task]")
             std::weak_ptr<TaskClass> weak_task_class = task_class;
             task_class.reset();
 
-            CATCH_REQUIRE(task_runner->post_task(FROM_HERE, std::move(task), weak_task_class));
+            CATCH_REQUIRE(task_runner->post_task(FROM_HERE, weak_task_class, std::move(task)));
             task_runner->wait_for_task_to_complete(__FILE__);
 
             CATCH_CHECK_FALSE(task_was_called);
@@ -420,9 +420,9 @@ CATCH_TEST_CASE("Task", "[task]")
 
             CATCH_REQUIRE(task_runner->post_task_with_reply(
                 FROM_HERE,
+                weak_task_class,
                 std::move(task),
-                std::move(reply),
-                weak_task_class));
+                std::move(reply)));
             task_runner->wait_for_task_to_complete(__FILE__);
 
             CATCH_CHECK_FALSE(task_was_called);
@@ -454,9 +454,9 @@ CATCH_TEST_CASE("Task", "[task]")
 
             CATCH_REQUIRE(task_runner->post_task_with_reply(
                 FROM_HERE,
+                weak_task_class,
                 std::move(task),
-                std::move(reply),
-                weak_task_class));
+                std::move(reply)));
             task_runner->wait_for_task_to_complete(__FILE__);
             task_runner->wait_for_task_to_complete(__FILE__);
 
@@ -487,9 +487,9 @@ CATCH_TEST_CASE("Task", "[task]")
 
             CATCH_REQUIRE(task_runner->post_task_with_reply(
                 FROM_HERE,
+                weak_task_class,
                 std::move(task),
-                std::move(reply),
-                weak_task_class));
+                std::move(reply)));
             task_runner->wait_for_task_to_complete(__FILE__);
 
             CATCH_CHECK_FALSE(task_was_called);
@@ -520,9 +520,9 @@ CATCH_TEST_CASE("Task", "[task]")
 
             CATCH_REQUIRE(task_runner->post_task_with_reply(
                 FROM_HERE,
+                weak_task_class,
                 std::move(task),
-                std::move(reply),
-                weak_task_class));
+                std::move(reply)));
             task_runner->wait_for_task_to_complete(__FILE__);
             task_runner->wait_for_task_to_complete(__FILE__);
 
@@ -546,7 +546,7 @@ CATCH_TEST_CASE("Task", "[task]")
             std::weak_ptr<TaskClass> weak_task_class = task_class;
             CATCH_REQUIRE(
                 task_runner
-                    ->post_task_with_delay(FROM_HERE, std::move(task), weak_task_class, 10ms));
+                    ->post_task_with_delay(FROM_HERE, weak_task_class, 10ms, std::move(task)));
             task_runner->wait_for_task_to_complete(__FILE__);
 
             CATCH_CHECK(task_was_called);
@@ -570,7 +570,7 @@ CATCH_TEST_CASE("Task", "[task]")
 
             CATCH_REQUIRE(
                 task_runner
-                    ->post_task_with_delay(FROM_HERE, std::move(task), weak_task_class, 10ms));
+                    ->post_task_with_delay(FROM_HERE, weak_task_class, 10ms, std::move(task)));
             task_runner->wait_for_task_to_complete(__FILE__);
 
             CATCH_CHECK_FALSE(task_was_called);
@@ -600,10 +600,10 @@ CATCH_TEST_CASE("Task", "[task]")
 
             CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
                 FROM_HERE,
-                std::move(task),
-                std::move(reply),
                 weak_task_class,
-                10ms));
+                10ms,
+                std::move(task),
+                std::move(reply)));
             task_runner->wait_for_task_to_complete(__FILE__);
 
             CATCH_CHECK_FALSE(task_was_called);
@@ -635,10 +635,10 @@ CATCH_TEST_CASE("Task", "[task]")
 
             CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
                 FROM_HERE,
-                std::move(task),
-                std::move(reply),
                 weak_task_class,
-                10ms));
+                10ms,
+                std::move(task),
+                std::move(reply)));
             task_runner->wait_for_task_to_complete(__FILE__);
             task_runner->wait_for_task_to_complete(__FILE__);
 
@@ -669,10 +669,10 @@ CATCH_TEST_CASE("Task", "[task]")
 
             CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
                 FROM_HERE,
-                std::move(task),
-                std::move(reply),
                 weak_task_class,
-                10ms));
+                10ms,
+                std::move(task),
+                std::move(reply)));
             task_runner->wait_for_task_to_complete(__FILE__);
 
             CATCH_CHECK_FALSE(task_was_called);
@@ -703,10 +703,10 @@ CATCH_TEST_CASE("Task", "[task]")
 
             CATCH_REQUIRE(task_runner->post_task_with_delay_and_reply(
                 FROM_HERE,
-                std::move(task),
-                std::move(reply),
                 weak_task_class,
-                10ms));
+                10ms,
+                std::move(task),
+                std::move(reply)));
             task_runner->wait_for_task_to_complete(__FILE__);
             task_runner->wait_for_task_to_complete(__FILE__);
 
@@ -823,10 +823,7 @@ CATCH_TEST_CASE("TaskManager", "[task]")
         task_manager.reset();
 
         CATCH_CHECK_FALSE(task_runner->post_task(FROM_HERE, []() {}));
-        CATCH_CHECK_FALSE(task_runner->post_task_with_delay(
-            FROM_HERE,
-            []() {},
-            0ms));
+        CATCH_CHECK_FALSE(task_runner->post_task_with_delay(FROM_HERE, 0ms, []() {}));
     }
 
     CATCH_SECTION("Sequenced tasks cannot be posted after the task manager is deleted")
@@ -837,9 +834,6 @@ CATCH_TEST_CASE("TaskManager", "[task]")
         task_manager.reset();
 
         CATCH_CHECK_FALSE(task_runner->post_task(FROM_HERE, []() {}));
-        CATCH_CHECK_FALSE(task_runner->post_task_with_delay(
-            FROM_HERE,
-            []() {},
-            0ms));
+        CATCH_CHECK_FALSE(task_runner->post_task_with_delay(FROM_HERE, 0ms, []() {}));
     }
 }

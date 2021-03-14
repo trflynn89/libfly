@@ -194,7 +194,7 @@ void Logger::log(Level level, Trace &&trace, std::string &&message)
         };
 
         std::weak_ptr<Logger> weak_self = shared_from_this();
-        m_task_runner->post_task(FROM_HERE, std::move(task), std::move(weak_self));
+        m_task_runner->post_task(FROM_HERE, std::move(weak_self), std::move(task));
     }
     else
     {

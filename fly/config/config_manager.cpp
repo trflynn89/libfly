@@ -90,7 +90,7 @@ bool ConfigManager::start()
                 nested_self->update_config();
             };
 
-            self->m_task_runner->post_task(FROM_HERE, std::move(task), std::move(weak_self));
+            self->m_task_runner->post_task(FROM_HERE, std::move(weak_self), std::move(task));
         }
     };
 

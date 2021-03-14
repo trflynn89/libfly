@@ -15,7 +15,7 @@ bool TaskRunner::post_task_to_task_manager(TaskLocation &&location, Task &&task)
 {
     if (std::shared_ptr<TaskManager> task_manager = m_weak_task_manager.lock(); task_manager)
     {
-        task_manager->post_task(std::move(location), std::move(task), shared_from_this());
+        task_manager->post_task(std::move(location), shared_from_this(), std::move(task));
         return true;
     }
 
@@ -25,13 +25,17 @@ bool TaskRunner::post_task_to_task_manager(TaskLocation &&location, Task &&task)
 //==================================================================================================
 bool TaskRunner::post_task_to_task_manager_with_delay(
     TaskLocation &&location,
-    Task &&task,
-    std::chrono::milliseconds delay)
+    std::chrono::milliseconds delay,
+    Task &&task)
 {
     if (std::shared_ptr<TaskManager> task_manager = m_weak_task_manager.lock(); task_manager)
     {
-        task_manager
-            ->post_task_with_delay(std::move(location), std::move(task), shared_from_this(), delay);
+        task_manager->post_task_with_delay(
+            std::move(location),
+            shared_from_this(),
+            std::move(delay),
+            std::move(task));
+
         return true;
     }
 

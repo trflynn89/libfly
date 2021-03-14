@@ -68,9 +68,9 @@ private:
     struct TaskHolder
     {
         TaskLocation m_location;
-        Task m_task;
         std::weak_ptr<TaskRunner> m_weak_task_runner;
         std::chrono::steady_clock::time_point m_schedule;
+        Task m_task;
     };
 
     /**
@@ -84,25 +84,25 @@ private:
      * Post a task to be executed as soon as a worker thread is available.
      *
      * @param location The location from which the task was posted.
-     * @param task The task to be executed.
      * @param weak_task_runner The task runner posting the task.
+     * @param task The task to be executed.
      */
     void
-    post_task(TaskLocation &&location, Task &&task, std::weak_ptr<TaskRunner> weak_task_runner);
+    post_task(TaskLocation &&location, std::weak_ptr<TaskRunner> weak_task_runner, Task &&task);
 
     /**
      * Schedule a task to be posted for execution after some delay.
      *
      * @param location The location from which the task was posted.
-     * @param task The task to be executed.
      * @param weak_task_runner The task runner posting the task.
      * @param delay Delay before posting the task.
+     * @param task The task to be executed.
      */
     void post_task_with_delay(
         TaskLocation &&location,
-        Task &&task,
         std::weak_ptr<TaskRunner> weak_task_runner,
-        std::chrono::milliseconds delay);
+        std::chrono::milliseconds delay,
+        Task &&task);
 
     /**
      * Worker thread for executing tasks.
