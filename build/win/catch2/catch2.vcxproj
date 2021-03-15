@@ -31,6 +31,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>true</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -44,6 +45,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>true</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -71,7 +73,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)d.$(PlatformTarget)</TargetName>
@@ -85,7 +87,7 @@
     <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)d.$(PlatformTarget)</TargetName>
@@ -101,11 +103,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_DEFAULT_REPORTER="libfly";NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_DEFAULT_REPORTER="libfly";CATCH_CONFIG_NO_WINDOWS_SEH;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -117,7 +120,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_DEFAULT_REPORTER="libfly";NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_DEFAULT_REPORTER="libfly";CATCH_CONFIG_NO_WINDOWS_SEH;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -133,11 +136,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_DEFAULT_REPORTER="libfly";NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_DEFAULT_REPORTER="libfly";CATCH_CONFIG_NO_WINDOWS_SEH;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,7 +153,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_DEFAULT_REPORTER="libfly";NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_DEFAULT_REPORTER="libfly";CATCH_CONFIG_NO_WINDOWS_SEH;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
