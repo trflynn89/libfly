@@ -41,7 +41,7 @@ public:
 class BadConfig : public fly::config::Config
 {
 public:
-    static constexpr const char *identifier = fly::test::TestConfig::identifier;
+    [[maybe_unused]] static constexpr const char *identifier = fly::test::TestConfig::identifier;
 };
 
 } // namespace
@@ -59,7 +59,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
         config_file);
     CATCH_REQUIRE(config_manager);
 
-    auto path_config = config_manager->create_config<TestPathConfig>();
+    [[maybe_unused]] auto path_config = config_manager->create_config<TestPathConfig>();
     auto initial_size = config_manager->prune();
 
     CATCH_SECTION("Config managers can be started for all file types")

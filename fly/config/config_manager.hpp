@@ -38,7 +38,7 @@ public:
     /**
      * Map of configuration group names to configuration objects.
      */
-    using ConfigMap = std::map<const char *, std::weak_ptr<Config>>;
+    using ConfigMap = std::map<std::string, std::weak_ptr<Config>>;
 
     /**
      * Enumerated list of supported configuration file formats.
