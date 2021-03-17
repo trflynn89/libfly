@@ -8,7 +8,7 @@ function Run-Libfly-Test($mode, $arch)
 {
     Write-Output "Running $arch tests"
 
-    $full_path = $PSScriptRoot + "\" + $mode + "\msvc\" + $arch
+    $full_path = $PSScriptRoot + "\..\" + $mode + "\msvc\" + $arch
     $tests_passed = 0
     $tests_failed = 0
 

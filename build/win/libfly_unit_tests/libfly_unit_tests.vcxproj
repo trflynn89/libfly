@@ -79,33 +79,33 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetExt>.exe</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetExt>.exe</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetExt>.exe</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\extern\catchorg\Catch2\src;$(SolutionDir)..\..;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetExt>.exe</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>

@@ -13,7 +13,7 @@ jobs:
     - ${{ if eq(parameters.mode, 'Debug') }}:
       - task: VSBuild@1
         inputs:
-          solution: 'build\win\libfly.sln'
+          solution: 'libfly.sln'
           msbuildArgs: /t:libfly_unit_tests
           configuration: ${{ parameters.mode }}
           platform: ${{ parameters.arch }}
@@ -30,7 +30,7 @@ jobs:
     - ${{ if eq(parameters.mode, 'Release') }}:
       - task: VSBuild@1
         inputs:
-          solution: 'build\win\libfly.sln'
+          solution: 'libfly.sln'
           msbuildArgs: /t:libfly
           configuration: ${{ parameters.mode }}
           platform: ${{ parameters.arch }}
@@ -45,4 +45,4 @@ jobs:
 
       - template: package.yml
         parameters:
-          contents: 'build\win\Release\msvc\libfly-*.zip'
+          contents: 'build\Release\msvc\libfly-*.zip'
