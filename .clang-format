@@ -121,9 +121,4 @@ ObjCBreakBeforeNestedBlockParam: true
 ObjCSpaceAfterProperty: true
 ObjCSpaceBeforeProtocolList: true
 
----
-Language: Java
-BreakAfterJavaFieldAnnotations: true
-JavaImportGroups: ['com', 'org', 'javax', java]
-
 ...
