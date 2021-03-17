@@ -69,8 +69,8 @@ and [build configurations](https://github.com/trflynn89/flymake/blob/main/README
 
 ### Windows
 
-On Windows, libfly is compiled with Visual Studio. A [solution file](build/win/libfly.sln) is
-provided with the following projects:
+On Windows, libfly is compiled with Visual Studio. A [solution file](libfly.sln) is provided with
+the following projects:
 
 * [libfly](build/win/libfly/libfly.vcxproj) - Compiles libfly library to static library files.
 * [libfly_unit_tests](build/win/libfly_unit_tests/libfly_unit_tests.vcxproj) - Compiles libfly unit
@@ -81,7 +81,7 @@ provided with the following projects:
 ## Directory structure
 
 * [fly](fly) - Contains the primary source and header files for libfly.
-* [build](build) - Contains the build files for all platforms and the CI configuration.
+* [build](build) - Contains build output, platform-specific build files, and the CI configuration.
 * [test](test) - Contains the libfly unit tests.
 * [bench](bench) - Contains performance benchmarks of various libfly components.
 * [extern](extern) - Contains all third-party projects used by libfly.

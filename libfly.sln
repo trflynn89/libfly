@@ -1,20 +1,16 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29021.104
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfly", "libfly\libfly.vcxproj", "{448893A1-77DA-46F1-B951-7EDA72D49FE9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfly", "build\win\libfly\libfly.vcxproj", "{448893A1-77DA-46F1-B951-7EDA72D49FE9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfly_unit_tests", "libfly_unit_tests\libfly_unit_tests.vcxproj", "{7F902250-DC0E-4327-BEB1-E745DB84109C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfly_unit_tests", "build\win\libfly_unit_tests\libfly_unit_tests.vcxproj", "{7F902250-DC0E-4327-BEB1-E745DB84109C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfly_benchmarks", "libfly_benchmarks\libfly_benchmarks.vcxproj", "{9627DDCB-0A4E-416F-B623-9602D02DD152}"
-	ProjectSection(ProjectDependencies) = postProject
-		{448893A1-77DA-46F1-B951-7EDA72D49FE9} = {448893A1-77DA-46F1-B951-7EDA72D49FE9}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfly_benchmarks", "build\win\libfly_benchmarks\libfly_benchmarks.vcxproj", "{9627DDCB-0A4E-416F-B623-9602D02DD152}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfly_util", "libfly_util\libfly_util.vcxproj", "{E18789F2-FEF0-48BC-8F8D-AA9A7B6E6885}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfly_util", "build\win\libfly_util\libfly_util.vcxproj", "{E18789F2-FEF0-48BC-8F8D-AA9A7B6E6885}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "catch2", "catch2\catch2.vcxproj", "{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "catch2", "build\win\catch2\catch2.vcxproj", "{FDB4C725-54DE-4EB8-AD9D-1A4A332BABFD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
