@@ -19,7 +19,7 @@ jobs:
 
     - ${{ if eq(parameters.mode, 'release') }}:
       - script: |
-          make -C build/nix style check=1
+          make style check=1
         displayName: 'Style'
 
     - script: |
@@ -28,21 +28,21 @@ jobs:
 
     - ${{ if eq(parameters.mode, 'debug') }}:
       - script: |
-          make -j $(nproc) -C build/nix $(config) tests
+          make -j $(nproc) $(config) tests
         displayName: 'Test'
 
     - ${{ if eq(parameters.mode, 'release') }}:
       - script: |
-          make -j $(nproc) -C build/nix $(config) libfly
+          make -j $(nproc) $(config) libfly
         displayName: 'Build'
 
       - ${{ if eq(parameters.toolchain, 'clang') }}:
         - template: package.yml
           parameters:
-            contents: 'build/nix/release/${{ parameters.toolchain }}/${{ parameters.arch }}/etc/libfly-*.tar.bz2'
+            contents: 'build/release/${{ parameters.toolchain }}/${{ parameters.arch }}/etc/libfly-*.tar.bz2'
 
     - ${{ if eq(parameters.coverage, '1') }}:
       - script: |
-          make -C build/nix $(config) coverage report=/tmp/coverage
+          make $(config) coverage report=/tmp/coverage
           bash <(curl -s https://codecov.io/bash) -f /tmp/coverage
         displayName: 'Coverage'

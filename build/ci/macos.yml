@@ -16,14 +16,14 @@ jobs:
 
     - ${{ if eq(parameters.mode, 'debug') }}:
       - script: |
-          make -j $(sysctl -n hw.ncpu) -C build/nix $(config) tests
+          make -j $(sysctl -n hw.ncpu) $(config) tests
         displayName: 'Test'
 
     - ${{ if eq(parameters.mode, 'release') }}:
       - script: |
-          make -j $(sysctl -n hw.ncpu) -C build/nix $(config) libfly
+          make -j $(sysctl -n hw.ncpu) $(config) libfly
         displayName: 'Build'
 
       - template: package.yml
         parameters:
-          contents: 'build/nix/release/clang/x64/etc/libfly-*.tar.bz2'
+          contents: 'build/release/clang/x64/etc/libfly-*.tar.bz2'

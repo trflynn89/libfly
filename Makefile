@@ -1,4 +1,4 @@
-SOURCE_ROOT := $(CURDIR)/../..
+SOURCE_ROOT := $(CURDIR)
 VERSION := $(shell cat $(SOURCE_ROOT)/VERSION.md)
 
 include $(SOURCE_ROOT)/extern/trflynn89/flymake/src/api.mk
@@ -28,5 +28,8 @@ $(eval $(call EXCLUDE_FROM_COVERAGE, fly/types/numeric/detail/literal_parser.hpp
 
 # Paths to exclude from generation of compilation database.
 $(eval $(call EXCLUDE_FROM_COMPILATION_DATABASE, extern/))
+
+# Override default flymake configuration.
+output ?= $(SOURCE_ROOT)/build
 
 include $(SOURCE_ROOT)/extern/trflynn89/flymake/src/build.mk
