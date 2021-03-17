@@ -56,11 +56,7 @@ libfly itself.
 
 On Linux and macOS, libfly is compiled using the [flymake](https://github.com/trflynn89/flymake)
 build system, which is a GNU Makefile system. To build all libfly targets with the default
-configuration:
-
-```bash
-make -C libfly/build/nix
-```
+configuration, just run `make`.
 
 The following individual Make targets are defined:
 
