@@ -10,9 +10,6 @@
 [submodule "extern/nlohmann/json"]
 	path = extern/nlohmann/json
 	url = https://github.com/nlohmann/json.git
-[submodule "extern/flymake"]
-	path = extern/flymake
-	url = https://github.com/trflynn89/flymake.git
 [submodule "extern/trflynn89/flymake"]
 	path = extern/trflynn89/flymake
 	url = https://github.com/trflynn89/flymake.git
