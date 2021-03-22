@@ -12,6 +12,11 @@ For unit testing, libfly uses the Catch2 framework:
 
 * [Catch2](https://github.com/catchorg/Catch2)
 
+For documentation, libfly uses Doxygen with the Doxygen Awesome theme:
+
+* [Doxygen](https://github.com/doxygen/doxygen)
+* [Doxygen Awesome](https://github.com/jothepro/doxygen-awesome-css)
+
 All other submodules are only for benchmark comparisons:
 
 * [{fmt}](https://github.com/fmtlib/fmt)
