@@ -7,6 +7,9 @@
 [submodule "extern/fmtlib/fmt"]
 	path = extern/fmtlib/fmt
 	url = https://github.com/fmtlib/fmt.git
+[submodule "extern/jothepro/doxygen-awesome-css"]
+	path = extern/jothepro/doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git
 [submodule "extern/nlohmann/json"]
 	path = extern/nlohmann/json
 	url = https://github.com/nlohmann/json.git
