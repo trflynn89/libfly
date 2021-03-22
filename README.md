@@ -83,5 +83,6 @@ the following projects:
 * [fly](fly) - Contains the primary source and header files for libfly.
 * [build](build) - Contains build output, platform-specific build files, and the CI configuration.
 * [test](test) - Contains the libfly unit tests.
+* [docs](docs) - Contains generated source code documentation.
 * [bench](bench) - Contains performance benchmarks of various libfly components.
 * [extern](extern) - Contains all third-party projects used by libfly.
