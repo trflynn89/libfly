@@ -1,0 +1,28 @@
+var structfly_1_1JsonTraits =
+[
+    [ "ArrayTraits", "structfly_1_1JsonTraits_1_1ArrayTraits.html", "structfly_1_1JsonTraits_1_1ArrayTraits" ],
+    [ "ObjectTraits", "structfly_1_1JsonTraits_1_1ObjectTraits.html", "structfly_1_1JsonTraits_1_1ObjectTraits" ],
+    [ "array_type", "structfly_1_1JsonTraits.html#a9ca20dbbe9558629566375c5d9b22744", null ],
+    [ "boolean_type", "structfly_1_1JsonTraits.html#a0de78595d3aaefb2daeec0f2ae74355b", null ],
+    [ "char_type", "structfly_1_1JsonTraits.html#a90c9cf947c480896d07d004e06bfab33", null ],
+    [ "float_type", "structfly_1_1JsonTraits.html#aa9f008ef35505bb5fcd248d15a80d9d3", null ],
+    [ "is_array", "structfly_1_1JsonTraits.html#ab627e8a34a450521f663ff8b73de67fe", null ],
+    [ "is_boolean", "structfly_1_1JsonTraits.html#a071c7b375e20eb141a2ddef4df9673b5", null ],
+    [ "is_container", "structfly_1_1JsonTraits.html#a5d11752263b43d192ef94216bd7aebda", null ],
+    [ "is_floating_point", "structfly_1_1JsonTraits.html#a0306f6d4343ba85caa5aa5d537d1f76e", null ],
+    [ "is_iterable", "structfly_1_1JsonTraits.html#a4876550318641bb0cef8d970bd38e5b7", null ],
+    [ "is_null", "structfly_1_1JsonTraits.html#af000e6a4c85de437bb01a360cdfd512e", null ],
+    [ "is_number", "structfly_1_1JsonTraits.html#a24988c89681f200920d71ecfc23ac108", null ],
+    [ "is_object", "structfly_1_1JsonTraits.html#ad47fcd4f00593abc0ffe130fca5993a3", null ],
+    [ "is_signed_integer", "structfly_1_1JsonTraits.html#a94d884934f135306d5435b16a5bd4461", null ],
+    [ "is_string", "structfly_1_1JsonTraits.html#a8cdb1d6c6beda1e027e20f85887b4890", null ],
+    [ "is_string_like", "structfly_1_1JsonTraits.html#ab093617708f2ec12837afe33e2c9f13b", null ],
+    [ "is_string_like_t", "structfly_1_1JsonTraits.html#a9713e9e51724d7a5be66cddd5667560d", null ],
+    [ "is_unsigned_integer", "structfly_1_1JsonTraits.html#a20336fd4d55d8c3f1dd5c36e86fd036a", null ],
+    [ "null_type", "structfly_1_1JsonTraits.html#ab36e9e5454c8173083e03ed4bd1aad1b", null ],
+    [ "object_type", "structfly_1_1JsonTraits.html#a926266d07ef920a97d7ff1e613cf5322", null ],
+    [ "signed_type", "structfly_1_1JsonTraits.html#a81e05c6f0a060244a15b6c9a03cb76d3", null ],
+    [ "string_type", "structfly_1_1JsonTraits.html#a8778271483b046d6e079cf493a09df2a", null ],
+    [ "StringType", "structfly_1_1JsonTraits.html#aa470da6e11ee97d68d945388300c97dd", null ],
+    [ "unsigned_type", "structfly_1_1JsonTraits.html#aff5b6e02e0a2929cb1ab1b6e8d0b5d2e", null ]
+];
