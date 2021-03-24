@@ -1,6 +1,8 @@
 # libfly
 
-[![Build Status](https://dev.azure.com/trflynn89/libfly/_apis/build/status/trflynn89.libfly?branchName=main)](https://dev.azure.com/trflynn89/libfly/_build/latest?definitionId=5&branchName=main) [![codecov](https://codecov.io/gh/trflynn89/libfly/branch/main/graph/badge.svg)](https://codecov.io/gh/trflynn89/libfly)  [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9de3533a8aef4358895a018f91e90bd4)](https://www.codacy.com/manual/trflynn89/libfly?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=trflynn89/libfly&amp;utm_campaign=Badge_Grade)
+[![Azure DevOps](https://img.shields.io/azure-devops/build/trflynn89/eb3b4226-f8b0-4c71-ae96-3f03b0def035/5/main?style=for-the-badge)](https://dev.azure.com/trflynn89/libfly/_build?definitionId=5)
+[![Codecov](https://img.shields.io/codecov/c/github/trflynn89/libfly?style=for-the-badge)](https://codecov.io/gh/trflynn89/libfly)
+[![Codacy](https://img.shields.io/codacy/grade/9de3533a8aef4358895a018f91e90bd4/main?style=for-the-badge)](https://app.codacy.com/gh/trflynn89/libfly/dashboard)
 
 libfly is a C++20 utility library for Linux, macOS, and Windows. It primarily serves as a playground
 for learning new C++ standards and exploring interests.
