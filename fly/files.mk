@@ -5,7 +5,6 @@ SRC_DIRS_$(d) := \
     $(d)/net \
     $(d)/parser \
     $(d)/path \
-    $(d)/socket \
     $(d)/system \
     $(d)/task \
     $(d)/types
