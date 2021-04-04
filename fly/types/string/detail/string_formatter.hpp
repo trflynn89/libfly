@@ -198,21 +198,15 @@ private:
 
     /**
      * The width and precision formatting options may either be a number or a nested replacement
-     * field. If a numeric value was specified, return that value. If a nested replacement field was
-     * specified, return the value of the format parameter at the position indicated by the nested
-     * replacement field.
+     * field. When a nested replacement field is specified, return the value of the format parameter
+     * at the position indicated by the nested replacement field.
      *
-     * @tparam T The type to cast the returned value to.
+     * @param position The format parameter position.
      *
-     * @param size_or_position The numeric value or format parameter position.
-     *
-     * @return If either option was specified, and the corresponding value is non-negative, returns
-     *         that value. Otherwise, an uninitialized value.
+     * @return If the corresponding value is non-negative, returns that value. Otherwise, an
+     *         uninitialized value.
      */
-    template <typename T = std::size_t>
-    T resolve_size(
-        const std::optional<typename FormatSpecifier::SizeOrPosition> &size_or_position,
-        T fallback = 0) const;
+    std::optional<std::size_t> resolve_position(std::size_t position) const;
 
     /**
      * Count the number of base-N digits in a value, where N is the provided integer base.
@@ -257,6 +251,15 @@ StringType BasicStringFormatter<StringType, ParameterTypes...>::format(FormatStr
 {
     auto formatter = [this](auto &&specifier, const auto &value)
     {
+        if (specifier.m_width_position)
+        {
+            specifier.m_width = resolve_position(*specifier.m_width_position);
+        }
+        if (specifier.m_precision_position)
+        {
+            specifier.m_precision = resolve_position(*specifier.m_precision_position);
+        }
+
         this->format_value(std::move(specifier), value);
     };
 
@@ -346,8 +349,8 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
 {
     using string_like_type = detail::is_like_supported_string_t<T>;
 
-    const std::size_t min_width = resolve_size(specifier.m_width);
-    const std::size_t max_width = resolve_size(specifier.m_precision, StringType::npos);
+    const std::size_t min_width = specifier.m_width.value_or(0);
+    const std::size_t max_width = specifier.m_precision.value_or(StringType::npos);
 
     const std::size_t actual_size = BasicStringClassifier<string_like_type>::size(value);
     const std::size_t value_size = std::min(max_width, actual_size);
@@ -474,7 +477,7 @@ void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
         }
     }
 
-    const std::size_t width = resolve_size(specifier.m_width);
+    const std::size_t width = specifier.m_width.value_or(0);
     const std::size_t padding_size = std::max(value_size, width) - value_size;
     const char_type padding_char = specifier.m_fill ? *specifier.m_fill : s_space;
 
@@ -551,10 +554,10 @@ inline void BasicStringFormatter<StringType, ParameterTypes...>::format_value(
     {
         modifiers.setf(std::ios_base::internal, std::ios_base::adjustfield);
         modifiers.fill(static_cast<char>(s_zero));
-        modifiers.width(resolve_size<std::streamsize>(specifier.m_width));
+        modifiers.width(static_cast<std::streamsize>(specifier.m_width.value_or(0)));
     }
 
-    modifiers.precision(resolve_size<std::streamsize>(specifier.m_precision, 6));
+    modifiers.precision(static_cast<std::streamsize>(specifier.m_precision.value_or(6)));
     specifier.m_precision = std::nullopt;
 
     switch (specifier.m_type)
@@ -690,27 +693,15 @@ std::size_t BasicStringFormatter<StringType, ParameterTypes...>::append_number(T
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-template <typename T>
-inline T BasicStringFormatter<StringType, ParameterTypes...>::resolve_size(
-    const std::optional<typename FormatSpecifier::SizeOrPosition> &size_or_position,
-    T fallback) const
+inline std::optional<std::size_t>
+BasicStringFormatter<StringType, ParameterTypes...>::resolve_position(std::size_t position) const
 {
-    if (size_or_position)
+    if (auto value = m_parameters.template get<std::streamsize>(position); value && (*value >= 0))
     {
-        if (size_or_position->is_size())
-        {
-            return static_cast<T>(size_or_position->value());
-        }
-
-        const auto value = m_parameters.template get<std::streamsize>(size_or_position->value());
-
-        if (value && (*value >= 0))
-        {
-            return static_cast<T>(*value);
-        }
+        return static_cast<std::size_t>(*value);
     }
 
-    return fallback;
+    return std::nullopt;
 }
 
 //==================================================================================================
