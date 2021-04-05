@@ -258,6 +258,17 @@ struct BasicFormatTraits
     static inline constexpr bool is_formattable_v = is_formattable<T>::value;
 
     /**
+     * Trait to classify a type as a pointer (excluding C-string types).
+     */
+    template <typename T, typename U = std::remove_cvref_t<T>>
+    using is_pointer = std::conjunction<
+        std::disjunction<std::is_pointer<U>, std::is_null_pointer<U>>,
+        std::negation<detail::is_like_supported_string<T>>>;
+
+    template <typename T>
+    static inline constexpr bool is_pointer_v = is_pointer<T>::value;
+
+    /**
      * Trait to classify a type as an integer, excluding boolean types.
      */
     template <typename T, typename U = std::remove_cvref_t<T>>
@@ -276,17 +287,6 @@ struct BasicFormatTraits
     static inline constexpr bool is_integer_v = is_integer<T>::value;
 
     /**
-     * Trait to classify a type as a pointer (excluding C-string types).
-     */
-    template <typename T, typename U = std::remove_cvref_t<T>>
-    using is_pointer = std::conjunction<
-        std::disjunction<std::is_pointer<U>, std::is_null_pointer<U>>,
-        std::negation<detail::is_like_supported_string<T>>>;
-
-    template <typename T>
-    static inline constexpr bool is_pointer_v = is_pointer<T>::value;
-
-    /**
      * Trait to classify an enumeration type as default-formatted (i.e. the user has not defined a
      * custom operator<< for this type).
      */
@@ -296,6 +296,21 @@ struct BasicFormatTraits
 
     template <typename T>
     static inline constexpr bool is_default_formatted_enum_v = is_default_formatted_enum<T>::value;
+
+    /**
+     * Trait to classify a type as a generic type.
+     */
+    template <typename T, typename U = std::remove_cvref_t<T>>
+    using is_generic = std::negation<std::disjunction<
+        detail::is_like_supported_string<T>,
+        is_pointer<T>,
+        is_integral<T>,
+        std::is_floating_point<T>,
+        std::is_same<T, bool>,
+        is_default_formatted_enum<T>>>;
+
+    template <typename T>
+    static inline constexpr bool is_generic_v = is_generic<T>::value;
 };
 
 /**
