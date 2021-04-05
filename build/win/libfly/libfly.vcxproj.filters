@@ -280,6 +280,9 @@
     <ClInclude Include="..\..\..\fly\types\string\string.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\string_formatters.hpp">
+      <Filter>types\string</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\string_lexer.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
@@ -290,9 +293,6 @@
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.hpp">
-      <Filter>types\string\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter_types.hpp">

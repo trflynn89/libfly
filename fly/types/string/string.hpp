@@ -2,9 +2,10 @@
 
 #include "fly/types/string/detail/string_classifier.hpp"
 #include "fly/types/string/detail/string_converter.hpp"
-#include "fly/types/string/detail/string_formatter.hpp"
+#include "fly/types/string/detail/string_formatter_types.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/string_unicode.hpp"
+#include "fly/types/string/string_formatters.hpp"
 #include "fly/types/string/string_literal.hpp"
 
 #include <algorithm>
@@ -15,6 +16,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <ios>
+#include <iterator>
 #include <optional>
 #include <random>
 #include <string>
@@ -65,6 +67,10 @@ public:
     template <typename... ParameterTypes>
     using FormatString =
         detail::BasicFormatString<StringType, std::type_identity_t<ParameterTypes>...>;
+
+    template <typename... ParameterTypes>
+    using FormatParameters =
+        detail::BasicFormatParameters<StringType, std::type_identity_t<ParameterTypes>...>;
 
     /**
      * Determine the length of any string-like value. Accepts character arrays, std::basic_string
@@ -502,6 +508,9 @@ private:
 
     static constexpr size_type s_alpha_num_length =
         std::char_traits<char_type>::length(s_alpha_num);
+
+    static constexpr const auto s_left_brace = FLY_CHR(char_type, '{');
+    static constexpr const auto s_right_brace = FLY_CHR(char_type, '}');
 };
 
 //==================================================================================================
@@ -843,7 +852,7 @@ StringType BasicString<StringType>::generate_random_string(size_type length)
 //==================================================================================================
 template <typename StringType>
 template <typename... ParameterTypes>
-inline StringType BasicString<StringType>::format(
+StringType BasicString<StringType>::format(
     FormatString<ParameterTypes...> &&fmt,
     ParameterTypes &&...parameters)
 {
@@ -852,10 +861,71 @@ inline StringType BasicString<StringType>::format(
         return format(FLY_ARR(char_type, "Ignored invalid formatter: {}"), fmt.error());
     }
 
-    detail::BasicStringFormatter<StringType, ParameterTypes...> formatter(
-        std::forward<ParameterTypes>(parameters)...);
+    const FormatParameters<ParameterTypes...> params {std::forward<ParameterTypes>(parameters)...};
+    const view_type view = fmt.view();
 
-    return formatter.format(std::move(fmt));
+    StringType formatted;
+    formatted.reserve(view.size() * 2);
+    auto output = std::back_inserter(formatted);
+
+    auto resolve_position = [&params](std::size_t position) -> std::optional<std::size_t>
+    {
+        if (auto value = params.template get<std::streamsize>(position); value && (*value >= 0))
+        {
+            return static_cast<std::size_t>(*value);
+        }
+
+        return std::nullopt;
+    };
+
+    auto format_value = [&resolve_position, &output](auto &&specifier, const auto &value)
+    {
+        using T = std::remove_cvref_t<decltype(value)>;
+
+        if (specifier.m_width_position)
+        {
+            specifier.m_width = resolve_position(*specifier.m_width_position);
+        }
+        if (specifier.m_precision_position)
+        {
+            specifier.m_precision = resolve_position(*specifier.m_precision_position);
+        }
+
+        Formatter<T, char_type>().format(std::move(specifier), value, output);
+    };
+
+    for (std::size_t pos = 0; pos < view.size();)
+    {
+        switch (const auto &ch = view[pos])
+        {
+            case s_left_brace:
+                if (view[pos + 1] == s_left_brace)
+                {
+                    *output++ = ch;
+                    pos += 2;
+                }
+                else
+                {
+                    auto specifier = *std::move(fmt.next_specifier());
+                    pos += specifier.m_size;
+
+                    params.visit(std::move(specifier), format_value);
+                }
+                break;
+
+            case s_right_brace:
+                *output++ = ch;
+                pos += 2;
+                break;
+
+            default:
+                *output++ = ch;
+                ++pos;
+                break;
+        }
+    }
+
+    return formatted;
 }
 
 //==================================================================================================
