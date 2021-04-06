@@ -142,6 +142,22 @@ private:
     void format(U value, bool is_negative, FormatContext &context);
 
     /**
+     * Format a single replacement field as a character with the provided unsigned, non-boolean
+     * integral value.
+     *
+     * If the value does not fit into the bounds of CharType, it is dropped.
+     *
+     * @tparam U The type of the value to format.
+     * @tparam FormatParameter The type of the formatting context.
+     *
+     * @param value The value to format.
+     * @param is_negative Whether the original value was negative.
+     * @param context The context holding the formatting state.
+     */
+    template <typename U, typename FormatContext>
+    void format_as_character(U value, bool is_negative, FormatContext &context);
+
+    /**
      * Append the string representation of a base-N integral value to the buffer, where N is the
      * provided integer base.
      *
@@ -201,7 +217,7 @@ struct Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>
      * @param context The context holding the formatting state.
      */
     template <typename FormatContext>
-    void format(T value, FormatContext &context);
+    void format(const T &value, FormatContext &context);
 
 private:
     using string_type = std::basic_string<CharType>;
@@ -287,11 +303,11 @@ void Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>
     const std::size_t padding_size = std::max(value_size, min_width) - value_size;
     const auto padding_char = context.spec().m_fill.value_or(s_space);
 
-    auto append_padding = [out = context.out(), padding_char](std::size_t count) mutable
+    auto append_padding = [&context, padding_char](std::size_t count) mutable
     {
         for (std::size_t i = 0; i < count; ++i)
         {
-            *out++ = padding_char;
+            *context.out()++ = padding_char;
         }
     };
 
@@ -390,9 +406,8 @@ Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integral<T>>
     {
         using U = std::make_unsigned_t<std::remove_cvref_t<T>>;
 
-        // Compute the absolute value of the integer. Benchmarks showed this is exactly as fast
-        // as std::abs, but this also tracks whether the original value was negative without
-        // branches.
+        // Compute the absolute value of the integer. Benchmarks showed this is exactly as fast as
+        // std::abs, but this also tracks whether the original value was negative without branches.
         const T sign = value >> std::numeric_limits<T>::digits;
         const U unsigned_value = static_cast<U>(static_cast<U>(value ^ sign) + (sign & 1));
 
@@ -414,36 +429,32 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
 {
     static_assert(std::is_unsigned_v<U>);
 
-    std::size_t prefix_size = 0;
-    std::size_t value_size = 0;
-
     if (context.spec().m_type == specifier::Type::Character)
     {
-        static constexpr U s_max = static_cast<U>(std::numeric_limits<CharType>::max());
-        value_size = is_negative || (value > s_max) ? 0 : 1;
+        format_as_character(value, is_negative, context);
+        return;
     }
-    else
+
+    std::size_t prefix_size = 0;
+
+    if (is_negative || (context.spec().m_sign == specifier::Sign::Always) ||
+        (context.spec().m_sign == specifier::Sign::NegativeOnlyWithPositivePadding))
     {
-        if (is_negative || (context.spec().m_sign == specifier::Sign::Always) ||
-            (context.spec().m_sign == specifier::Sign::NegativeOnlyWithPositivePadding))
-        {
-            ++prefix_size;
-        }
-
-        if (context.spec().m_alternate_form)
-        {
-            ++prefix_size;
-
-            if ((context.spec().m_type == specifier::Type::Binary) ||
-                (context.spec().m_type == specifier::Type::Hex))
-            {
-                ++prefix_size;
-            }
-        }
-
-        const int base = static_cast<int>(context.spec().m_type);
-        value_size = count_digits(value, base) + prefix_size;
+        ++prefix_size;
     }
+    if (context.spec().m_alternate_form)
+    {
+        ++prefix_size;
+
+        if ((context.spec().m_type == specifier::Type::Binary) ||
+            (context.spec().m_type == specifier::Type::Hex))
+        {
+            ++prefix_size;
+        }
+    }
+
+    const int base = static_cast<int>(context.spec().m_type);
+    const std::size_t value_size = count_digits(value, base) + prefix_size;
 
     const std::size_t width = context.spec().m_width.value_or(0);
     const std::size_t padding_size = std::max(value_size, width) - value_size;
@@ -451,11 +462,6 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
 
     auto append_prefix = [is_negative, &context]()
     {
-        if (context.spec().m_type == specifier::Type::Character)
-        {
-            return;
-        }
-
         if (is_negative)
         {
             *context.out()++ = s_minus_sign;
@@ -485,27 +491,11 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
         }
     };
 
-    auto append_value = [this, value, value_size, &context]()
-    {
-        if (context.spec().m_type == specifier::Type::Character)
-        {
-            if (value_size != 0)
-            {
-                *context.out()++ = static_cast<CharType>(value);
-            }
-        }
-        else
-        {
-            const int base = static_cast<int>(context.spec().m_type);
-            append_number(value, base, context);
-        }
-    };
-
-    auto append_padding = [out = context.out()](std::size_t count, CharType pad) mutable
+    auto append_padding = [&context](std::size_t count, CharType pad) mutable
     {
         for (std::size_t i = 0; i < count; ++i)
         {
-            *out++ = pad;
+            *context.out()++ = pad;
         }
     };
 
@@ -513,14 +503,14 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
     {
         case specifier::Alignment::Left:
             append_prefix();
-            append_value();
+            append_number(value, base, context);
             append_padding(padding_size, padding_char);
             break;
 
         case specifier::Alignment::Right:
             append_padding(padding_size, padding_char);
             append_prefix();
-            append_value();
+            append_number(value, base, context);
             break;
 
         case specifier::Alignment::Center:
@@ -531,7 +521,7 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
 
             append_padding(left_padding, padding_char);
             append_prefix();
-            append_value();
+            append_number(value, base, context);
             append_padding(right_padding, padding_char);
             break;
         }
@@ -541,14 +531,70 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
             {
                 append_prefix();
                 append_padding(padding_size, s_zero);
-                append_value();
+                append_number(value, base, context);
             }
             else
             {
                 append_padding(padding_size, padding_char);
                 append_prefix();
-                append_value();
+                append_number(value, base, context);
             }
+            break;
+    }
+}
+
+//==================================================================================================
+template <typename T, typename CharType>
+template <typename U, typename FormatContext>
+void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integral<T>>>::
+    format_as_character(U value, bool is_negative, FormatContext &context)
+{
+    static_assert(std::is_unsigned_v<U>);
+
+    if (is_negative || (value > static_cast<U>(std::numeric_limits<CharType>::max())))
+    {
+        return;
+    }
+
+    const std::size_t width = context.spec().m_width.value_or(0);
+    const std::size_t padding_size = width > 1 ? width - 1 : 0;
+    const auto padding_char = context.spec().m_fill.value_or(s_space);
+
+    auto append_padding = [&context, padding_char](std::size_t count) mutable
+    {
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            *context.out()++ = padding_char;
+        }
+    };
+
+    switch (context.spec().m_alignment)
+    {
+        case specifier::Alignment::Left:
+            *context.out()++ = static_cast<CharType>(value);
+            append_padding(padding_size);
+            break;
+
+        case specifier::Alignment::Right:
+            append_padding(padding_size);
+            *context.out()++ = static_cast<CharType>(value);
+            break;
+
+        case specifier::Alignment::Center:
+        {
+            const std::size_t left_padding = padding_size / 2;
+            const std::size_t right_padding =
+                (padding_size % 2 == 0) ? left_padding : left_padding + 1;
+
+            append_padding(left_padding);
+            *context.out()++ = static_cast<CharType>(value);
+            append_padding(right_padding);
+            break;
+        }
+
+        case specifier::Alignment::Default:
+            append_padding(padding_size);
+            *context.out()++ = static_cast<CharType>(value);
             break;
     }
 }
@@ -613,7 +659,7 @@ Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integral<T>>
 template <typename T, typename CharType>
 template <typename FormatContext>
 void Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>::format(
-    T value,
+    const T &value,
     FormatContext &context)
 {
     static thread_local std::stringstream s_stream;

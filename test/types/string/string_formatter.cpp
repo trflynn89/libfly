@@ -231,11 +231,13 @@ CATCH_TEMPLATE_TEST_CASE(
     CATCH_SECTION("Alignment may be set to center-alignment")
     {
         test_format(FMT("{:^6}"), FMT("  ab  "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:^6}"), FMT("  a   "), FLY_CHR(char_type, 'a'));
         test_format(FMT("{:^6}"), FMT("  1   "), 1);
         test_format(FMT("{:^6b}"), FMT("  11  "), 0b11);
         test_format(FMT("{:^6.2f}"), FMT(" 3.14 "), 3.14);
 
         test_format(FMT("{:^7}"), FMT("  ab   "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:^7}"), FMT("   a   "), FLY_CHR(char_type, 'a'));
         test_format(FMT("{:^7}"), FMT("   1   "), 1);
         test_format(FMT("{:^7b}"), FMT("  11   "), 0b11);
         test_format(FMT("{:^7.2f}"), FMT(" 3.14  "), 3.14);
