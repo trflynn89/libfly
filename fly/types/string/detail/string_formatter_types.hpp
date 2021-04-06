@@ -587,11 +587,11 @@ private:
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021
  */
-template <typename StringType, typename... ParameterTypes>
+template <typename CharType, typename... ParameterTypes>
 class BasicFormatParameters
 {
     using FormatParameters = std::tuple<std::type_identity_t<ParameterTypes>...>;
-    using FormatSpecifier = BasicFormatSpecifier<typename StringType::value_type>;
+    using FormatSpecifier = BasicFormatSpecifier<CharType>;
 
 public:
     /**
@@ -1287,17 +1287,17 @@ void BasicFormatString<StringType, ParameterTypes...>::on_error(const char *erro
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-BasicFormatParameters<StringType, ParameterTypes...>::BasicFormatParameters(
+template <typename CharType, typename... ParameterTypes>
+BasicFormatParameters<CharType, ParameterTypes...>::BasicFormatParameters(
     ParameterTypes &&...parameters) noexcept :
     m_parameters {std::forward<ParameterTypes>(parameters)...}
 {
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
+template <typename CharType, typename... ParameterTypes>
 template <typename Callback, size_t N>
-void BasicFormatParameters<StringType, ParameterTypes...>::visit(
+void BasicFormatParameters<CharType, ParameterTypes...>::visit(
     FormatSpecifier &&specifier,
     Callback callback) const
 {
@@ -1314,9 +1314,9 @@ void BasicFormatParameters<StringType, ParameterTypes...>::visit(
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
+template <typename CharType, typename... ParameterTypes>
 template <typename T, size_t N>
-std::optional<T> BasicFormatParameters<StringType, ParameterTypes...>::get(std::size_t index) const
+std::optional<T> BasicFormatParameters<CharType, ParameterTypes...>::get(std::size_t index) const
 {
     if constexpr (N < s_parameter_count)
     {

@@ -855,7 +855,7 @@ StringType BasicString<StringType>::format(
     using FormatContext =
         detail::BasicFormatContext<std::back_insert_iterator<StringType>, char_type>;
     using FormatParameters =
-        detail::BasicFormatParameters<StringType, std::type_identity_t<ParameterTypes>...>;
+        detail::BasicFormatParameters<char_type, std::type_identity_t<ParameterTypes>...>;
 
     if (fmt.has_error())
     {

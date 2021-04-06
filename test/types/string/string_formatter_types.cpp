@@ -1184,7 +1184,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Empty parameters do not cause an error")
     {
-        fly::detail::BasicFormatParameters<StringType> parameters;
+        fly::detail::BasicFormatParameters<char_type> parameters;
 
         parameters.visit(make_specifier(0), visitor);
         CATCH_CHECK(visit_count == 0);
@@ -1192,7 +1192,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("A single parameter can be visited, but no others")
     {
-        fly::detail::BasicFormatParameters<StringType, int> parameters(1);
+        fly::detail::BasicFormatParameters<char_type, int> parameters(1);
 
         parameters.visit(make_specifier(0), visitor);
         CATCH_CHECK(visit_count == 1);
@@ -1203,7 +1203,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Parameters can be copied if of a compatible type")
     {
-        fly::detail::BasicFormatParameters<StringType, int> parameters(1);
+        fly::detail::BasicFormatParameters<char_type, int> parameters(1);
 
         auto value1 = parameters.template get<int>(0);
         CATCH_REQUIRE(value1);
@@ -1219,7 +1219,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Parameters cannot be copied if of a non-integral type")
     {
-        fly::detail::BasicFormatParameters<StringType, std::string> parameters("ab");
+        fly::detail::BasicFormatParameters<char_type, std::string> parameters("ab");
 
         auto value = parameters.template get<std::string>(0);
         CATCH_CHECK_FALSE(value);
@@ -1227,7 +1227,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Parameters cannot be copied if of an incompatible type")
     {
-        fly::detail::BasicFormatParameters<StringType, int> parameters(1);
+        fly::detail::BasicFormatParameters<char_type, int> parameters(1);
 
         auto value = parameters.template get<std::string>(0);
         CATCH_CHECK_FALSE(value);
@@ -1241,7 +1241,7 @@ CATCH_TEMPLATE_TEST_CASE(
         using T1 = std::add_lvalue_reference_t<decltype(c1)>;
         using T2 = std::add_lvalue_reference_t<decltype(c2)>;
 
-        fly::detail::BasicFormatParameters<StringType, T1, T2> parameters(c1, c2);
+        fly::detail::BasicFormatParameters<char_type, T1, T2> parameters(c1, c2);
 
         parameters.visit(make_specifier(0), visitor);
         CATCH_CHECK(visit_count == 1);
