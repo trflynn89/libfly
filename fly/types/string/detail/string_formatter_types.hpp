@@ -14,6 +14,13 @@
 #include <tuple>
 #include <type_traits>
 
+namespace fly {
+
+template <typename StringType>
+class BasicString;
+
+} // namespace fly
+
 namespace fly::detail {
 
 /**
@@ -631,6 +638,49 @@ private:
     static constexpr const std::size_t s_parameter_count = sizeof...(ParameterTypes);
 
     const FormatParameters m_parameters;
+};
+
+/**
+ * Provides access to the formatting state consisting of the formatting replacement fields and the
+ * output iterator.
+ *
+ * @author Timothy Flynn (trflynn89@pm.me)
+ * @version April 4, 2021
+ */
+template <typename OutputIterator, typename CharType>
+class BasicFormatContext
+{
+    using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+public:
+    /**
+     * Constructor.
+     *
+     * @param out The output iterator into which the formatted value should be written.
+     */
+    BasicFormatContext(OutputIterator out) noexcept;
+
+    BasicFormatContext(BasicFormatContext &&) = default;
+    BasicFormatContext &operator=(BasicFormatContext &&) = default;
+
+    /**
+     * @return The formatting replacement field currently being used for formatting.
+     */
+    FormatSpecifier &spec();
+
+    /**
+     * @return The output iterator into which the formatted value should be written.
+     */
+    OutputIterator &out();
+
+private:
+    friend fly::BasicString<std::basic_string<CharType>>;
+
+    BasicFormatContext(const BasicFormatContext &) = delete;
+    BasicFormatContext &operator=(const BasicFormatContext &) = delete;
+
+    FormatSpecifier m_specifier {};
+    OutputIterator m_output;
 };
 
 //==================================================================================================
@@ -1286,6 +1336,27 @@ std::optional<T> BasicFormatParameters<StringType, ParameterTypes...>::get(std::
     {
         return std::nullopt;
     }
+}
+
+//==================================================================================================
+template <typename OutputIterator, typename CharType>
+BasicFormatContext<OutputIterator, CharType>::BasicFormatContext(OutputIterator out) noexcept :
+    m_output(std::move(out))
+{
+}
+
+//==================================================================================================
+template <typename OutputIterator, typename CharType>
+inline auto BasicFormatContext<OutputIterator, CharType>::spec() -> FormatSpecifier &
+{
+    return m_specifier;
+}
+
+//==================================================================================================
+template <typename OutputIterator, typename CharType>
+inline OutputIterator &BasicFormatContext<OutputIterator, CharType>::out()
+{
+    return m_output;
 }
 
 } // namespace fly::detail

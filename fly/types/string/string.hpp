@@ -68,10 +68,6 @@ public:
     using FormatString =
         detail::BasicFormatString<StringType, std::type_identity_t<ParameterTypes>...>;
 
-    template <typename... ParameterTypes>
-    using FormatParameters =
-        detail::BasicFormatParameters<StringType, std::type_identity_t<ParameterTypes>...>;
-
     /**
      * Determine the length of any string-like value. Accepts character arrays, std::basic_string
      * specializations, and std::basic_string_view specializations.
@@ -856,17 +852,21 @@ StringType BasicString<StringType>::format(
     FormatString<ParameterTypes...> &&fmt,
     ParameterTypes &&...parameters)
 {
+    using FormatContext =
+        detail::BasicFormatContext<std::back_insert_iterator<StringType>, char_type>;
+    using FormatParameters =
+        detail::BasicFormatParameters<StringType, std::type_identity_t<ParameterTypes>...>;
+
     if (fmt.has_error())
     {
         return format(FLY_ARR(char_type, "Ignored invalid formatter: {}"), fmt.error());
     }
 
-    const FormatParameters<ParameterTypes...> params {std::forward<ParameterTypes>(parameters)...};
+    const FormatParameters params {std::forward<ParameterTypes>(parameters)...};
     const view_type view = fmt.view();
 
     StringType formatted;
     formatted.reserve(view.size() * 2);
-    auto output = std::back_inserter(formatted);
 
     auto resolve_position = [&params](std::size_t position) -> std::optional<std::size_t>
     {
@@ -878,7 +878,9 @@ StringType BasicString<StringType>::format(
         return std::nullopt;
     };
 
-    auto format_value = [&resolve_position, &output](auto &&specifier, const auto &value)
+    FormatContext context(std::back_inserter(formatted));
+
+    auto format_value = [&resolve_position, &context](auto &&specifier, const auto &value)
     {
         using T = std::remove_cvref_t<decltype(value)>;
 
@@ -891,7 +893,8 @@ StringType BasicString<StringType>::format(
             specifier.m_precision = resolve_position(*specifier.m_precision_position);
         }
 
-        Formatter<T, char_type>().format(std::move(specifier), value, output);
+        context.m_specifier = std::move(specifier);
+        Formatter<T, char_type>().format(value, context);
     };
 
     for (std::size_t pos = 0; pos < view.size();)
@@ -901,7 +904,7 @@ StringType BasicString<StringType>::format(
             case s_left_brace:
                 if (view[pos + 1] == s_left_brace)
                 {
-                    *output++ = ch;
+                    *context.out()++ = ch;
                     pos += 2;
                 }
                 else
@@ -914,12 +917,12 @@ StringType BasicString<StringType>::format(
                 break;
 
             case s_right_brace:
-                *output++ = ch;
+                *context.out()++ = ch;
                 pos += 2;
                 break;
 
             default:
-                *output++ = ch;
+                *context.out()++ = ch;
                 ++pos;
                 break;
         }
