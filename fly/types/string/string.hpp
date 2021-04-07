@@ -2,6 +2,7 @@
 
 #include "fly/types/string/detail/string_classifier.hpp"
 #include "fly/types/string/detail/string_converter.hpp"
+#include "fly/types/string/detail/string_format_parameters.hpp"
 #include "fly/types/string/detail/string_formatter_types.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/string_unicode.hpp"
@@ -854,47 +855,61 @@ StringType BasicString<StringType>::format(
 {
     using FormatContext =
         detail::BasicFormatContext<std::back_insert_iterator<StringType>, char_type>;
-    using FormatParameters =
-        detail::BasicFormatParameters<char_type, std::type_identity_t<ParameterTypes>...>;
 
     if (fmt.has_error())
     {
         return format(FLY_ARR(char_type, "Ignored invalid formatter: {}"), fmt.error());
     }
 
-    const FormatParameters params {std::forward<ParameterTypes>(parameters)...};
     const view_type view = fmt.view();
 
     StringType formatted;
     formatted.reserve(view.size() * 2);
 
-    auto resolve_position = [&params](std::size_t position) -> std::optional<std::size_t>
-    {
-        if (auto value = params.template get<std::streamsize>(position); value && (*value >= 0))
-        {
-            return static_cast<std::size_t>(*value);
-        }
+    auto params =
+        detail::make_format_parameters<FormatContext>(std::forward<ParameterTypes>(parameters)...);
+    FormatContext context(std::back_inserter(formatted), params);
 
-        return std::nullopt;
+    auto resolve = [&context](std::size_t position) -> std::optional<std::size_t>
+    {
+        return context.arg(position).visit(
+            [](auto value) -> std::optional<std::size_t>
+            {
+                using T = std::remove_cvref_t<decltype(value)>;
+                std::optional<std::size_t> resolved;
+
+                if constexpr (std::is_unsigned_v<T>)
+                {
+                    resolved = static_cast<std::size_t>(value);
+                }
+                else if constexpr (std::is_integral_v<T>)
+                {
+                    if (value >= 0)
+                    {
+                        resolved = static_cast<std::size_t>(value);
+                    }
+                }
+
+                return resolved;
+            });
     };
 
-    FormatContext context(std::back_inserter(formatted));
-
-    auto format_value = [&resolve_position, &context](auto &&specifier, const auto &value)
+    auto format_value = [&context](auto value)
     {
         using T = std::remove_cvref_t<decltype(value)>;
 
-        if (specifier.m_width_position)
+        if constexpr (std::is_same_v<T, detail::UserDefinedValue<FormatContext>>)
         {
-            specifier.m_width = resolve_position(*specifier.m_width_position);
+            value.m_format(value.m_value, context);
         }
-        if (specifier.m_precision_position)
+        else if constexpr (std::is_same_v<T, detail::StringValue<FormatContext>>)
         {
-            specifier.m_precision = resolve_position(*specifier.m_precision_position);
+            value.m_format(value.m_value, value.m_size, context);
         }
-
-        context.m_specifier = std::move(specifier);
-        Formatter<T, char_type>().format(value, context);
+        else
+        {
+            Formatter<T, char_type>().format(value, context);
+        }
     };
 
     for (std::size_t pos = 0; pos < view.size();)
@@ -906,14 +921,22 @@ StringType BasicString<StringType>::format(
                 {
                     *context.out()++ = ch;
                     pos += 2;
+                    break;
                 }
-                else
-                {
-                    auto specifier = *std::move(fmt.next_specifier());
-                    pos += specifier.m_size;
 
-                    params.visit(std::move(specifier), format_value);
+                context.spec() = *std::move(fmt.next_specifier());
+
+                if (context.spec().m_width_position)
+                {
+                    context.spec().m_width = resolve(*context.spec().m_width_position);
                 }
+                if (context.spec().m_precision_position)
+                {
+                    context.spec().m_precision = resolve(*context.spec().m_precision_position);
+                }
+
+                context.arg(context.spec().m_position).visit(format_value);
+                pos += context.spec().m_size;
                 break;
 
             case s_right_brace:

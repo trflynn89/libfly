@@ -249,24 +249,6 @@ private:
     static constexpr const CharType *s_false = FLY_STR(CharType, "false");
 };
 
-template <typename T, typename CharType>
-struct Formatter<
-    T,
-    CharType,
-    fly::enable_if<detail::BasicFormatTraits::is_default_formatted_enum<T>>>
-{
-    /**
-     * Format a single replacement field with the provided enumeration.
-     *
-     * @tparam FormatParameter The type of the formatting context.
-     *
-     * @param value The value to format.
-     * @param context The context holding the formatting state.
-     */
-    template <typename FormatContext>
-    void format(T value, FormatContext &context);
-};
-
 //==================================================================================================
 template <typename T, typename CharType>
 template <typename FormatContext>
@@ -748,18 +730,6 @@ inline void Formatter<T, CharType, fly::enable_if<std::is_same<T, bool>>>::forma
     {
         Formatter<unsigned, CharType>().format(static_cast<unsigned>(value), context);
     }
-}
-
-//==================================================================================================
-template <typename T, typename CharType>
-template <typename FormatContext>
-inline void
-Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_default_formatted_enum<T>>>::
-    format(T value, FormatContext &context)
-{
-    Formatter<std::underlying_type_t<T>, CharType>().format(
-        static_cast<std::underlying_type_t<T>>(value),
-        context);
 }
 
 } // namespace fly

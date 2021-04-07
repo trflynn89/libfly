@@ -8,7 +8,6 @@
 
 #include <array>
 #include <cstdint>
-#include <functional>
 #include <optional>
 #include <string>
 #include <tuple>
@@ -579,108 +578,6 @@ private:
     bool m_expect_all_positions_specified {false};
 
     std::string_view m_error;
-};
-
-/**
- * A container to hold references to variadic format parameters without copying any of them.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version January 3, 2021
- */
-template <typename CharType, typename... ParameterTypes>
-class BasicFormatParameters
-{
-    using FormatParameters = std::tuple<std::type_identity_t<ParameterTypes>...>;
-    using FormatSpecifier = BasicFormatSpecifier<CharType>;
-
-public:
-    /**
-     * Constructor. Forward references to the provided format parameters to a tuple.
-     *
-     * @param parameters The format parameters to store.
-     */
-    explicit BasicFormatParameters(ParameterTypes &&...parameters) noexcept;
-
-    /**
-     * Visitor to provide runtime access to the stored parameters based on a replacement field's
-     * position. If the provided position is found, invokes the provided callback with the
-     * replacement field and a reference to the found format parameter.
-     *
-     * @tparam Callback Type of the callback to invoke.
-     *
-     * @param specifier The replacement field corresponding to the parameter to search for.
-     * @param callback The callback to invoke if the parameter is found.
-     */
-    template <typename Callback, size_t N = 0>
-    void visit(FormatSpecifier &&specifier, Callback callback) const;
-
-    /**
-     * Visitor to provide runtime access to the stored parameter at the provided index. If the index
-     * is found, and is convertible to the desired type, returns a copy of the found format
-     * parameter.
-     *
-     * This is only allowed for integral format parameters. Attempting to copy other format types is
-     * forbidden.
-     *
-     * @tparam T Desired type of the format parameter.
-     *
-     * @param index The index of the parameter to search for.
-     *
-     * @return If successful, a copy of the format parameter. Otherwise, an uninitialized value.
-     */
-    template <typename T, size_t N = 0>
-    std::optional<T> get(std::size_t index) const;
-
-private:
-    BasicFormatParameters(const BasicFormatParameters &) = delete;
-    BasicFormatParameters &operator=(const BasicFormatParameters &) = delete;
-
-    static constexpr const std::size_t s_parameter_count = sizeof...(ParameterTypes);
-
-    const FormatParameters m_parameters;
-};
-
-/**
- * Provides access to the formatting state consisting of the formatting replacement fields and the
- * output iterator.
- *
- * @author Timothy Flynn (trflynn89@pm.me)
- * @version April 4, 2021
- */
-template <typename OutputIterator, typename CharType>
-class BasicFormatContext
-{
-    using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
-
-public:
-    /**
-     * Constructor.
-     *
-     * @param out The output iterator into which the formatted value should be written.
-     */
-    BasicFormatContext(OutputIterator out) noexcept;
-
-    BasicFormatContext(BasicFormatContext &&) = default;
-    BasicFormatContext &operator=(BasicFormatContext &&) = default;
-
-    /**
-     * @return The formatting replacement field currently being used for formatting.
-     */
-    FormatSpecifier &spec();
-
-    /**
-     * @return The output iterator into which the formatted value should be written.
-     */
-    OutputIterator &out();
-
-private:
-    friend fly::BasicString<std::basic_string<CharType>>;
-
-    BasicFormatContext(const BasicFormatContext &) = delete;
-    BasicFormatContext &operator=(const BasicFormatContext &) = delete;
-
-    FormatSpecifier m_specifier {};
-    OutputIterator m_output;
 };
 
 //==================================================================================================
@@ -1284,79 +1181,6 @@ void BasicFormatString<StringType, ParameterTypes...>::on_error(const char *erro
     {
         m_error = error;
     }
-}
-
-//==================================================================================================
-template <typename CharType, typename... ParameterTypes>
-BasicFormatParameters<CharType, ParameterTypes...>::BasicFormatParameters(
-    ParameterTypes &&...parameters) noexcept :
-    m_parameters {std::forward<ParameterTypes>(parameters)...}
-{
-}
-
-//==================================================================================================
-template <typename CharType, typename... ParameterTypes>
-template <typename Callback, size_t N>
-void BasicFormatParameters<CharType, ParameterTypes...>::visit(
-    FormatSpecifier &&specifier,
-    Callback callback) const
-{
-    if constexpr (N < s_parameter_count)
-    {
-        if (N == specifier.m_position)
-        {
-            std::invoke(std::move(callback), std::move(specifier), std::get<N>(m_parameters));
-            return;
-        }
-
-        visit<Callback, N + 1>(std::move(specifier), std::move(callback));
-    }
-}
-
-//==================================================================================================
-template <typename CharType, typename... ParameterTypes>
-template <typename T, size_t N>
-std::optional<T> BasicFormatParameters<CharType, ParameterTypes...>::get(std::size_t index) const
-{
-    if constexpr (N < s_parameter_count)
-    {
-        if (N == index)
-        {
-            using P = std::remove_cvref_t<std::tuple_element_t<N, FormatParameters>>;
-
-            if constexpr (std::is_integral_v<P> && std::is_convertible_v<P, T>)
-            {
-                return static_cast<T>(std::get<N>(m_parameters));
-            }
-        }
-
-        return get<T, N + 1>(index);
-    }
-    else
-    {
-        return std::nullopt;
-    }
-}
-
-//==================================================================================================
-template <typename OutputIterator, typename CharType>
-BasicFormatContext<OutputIterator, CharType>::BasicFormatContext(OutputIterator out) noexcept :
-    m_output(std::move(out))
-{
-}
-
-//==================================================================================================
-template <typename OutputIterator, typename CharType>
-inline auto BasicFormatContext<OutputIterator, CharType>::spec() -> FormatSpecifier &
-{
-    return m_specifier;
-}
-
-//==================================================================================================
-template <typename OutputIterator, typename CharType>
-inline OutputIterator &BasicFormatContext<OutputIterator, CharType>::out()
-{
-    return m_output;
 }
 
 } // namespace fly::detail

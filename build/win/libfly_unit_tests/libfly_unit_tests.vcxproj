@@ -258,6 +258,7 @@
     <ClCompile Include="..\..\..\test\types\string\string.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_classifier.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_converter.cpp" />
+    <ClCompile Include="..\..\..\test\types\string\string_format_parameters.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_formatter.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_formatter_types.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_lexer.cpp" />
