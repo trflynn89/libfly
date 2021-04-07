@@ -3,7 +3,7 @@
 // comment out the following line (and note that parsing error tests will not be run).
 #define FLY_COMPILER_DISABLE_CONSTEVAL
 
-#include "fly/types/string/detail/string_formatter_types.hpp"
+#include "fly/types/string/detail/string_format_specifier.hpp"
 
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string_literal.hpp"

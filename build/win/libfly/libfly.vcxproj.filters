@@ -298,7 +298,7 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\string_format_parameters.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter_types.hpp">
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_format_specifier.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_stream_util.hpp">
