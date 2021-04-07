@@ -276,8 +276,8 @@ void Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>
     const T &value,
     FormatContext &context)
 {
-    const std::size_t min_width = context.spec().m_width.value_or(0);
-    const std::size_t max_width = context.spec().m_precision.value_or(string_type::npos);
+    const std::size_t min_width = context.spec().width(context, 0);
+    const std::size_t max_width = context.spec().precision(context, string_type::npos);
 
     const std::size_t actual_size = detail::BasicStringClassifier<string_like_type>::size(value);
     const std::size_t value_size = std::min(max_width, actual_size);
@@ -438,7 +438,7 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
     const int base = static_cast<int>(context.spec().m_type);
     const std::size_t value_size = count_digits(value, base) + prefix_size;
 
-    const std::size_t width = context.spec().m_width.value_or(0);
+    const std::size_t width = context.spec().width(context, 0);
     const std::size_t padding_size = std::max(value_size, width) - value_size;
     const auto padding_char = context.spec().m_fill.value_or(s_space);
 
@@ -538,7 +538,7 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
         return;
     }
 
-    const std::size_t width = context.spec().m_width.value_or(0);
+    const std::size_t width = context.spec().width(context, 0);
     const std::size_t padding_size = width > 1 ? width - 1 : 0;
     const auto padding_char = context.spec().m_fill.value_or(s_space);
 
@@ -676,11 +676,12 @@ void Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>::format(
     {
         modifiers.setf(std::ios_base::internal, std::ios_base::adjustfield);
         modifiers.fill(static_cast<char>(s_zero));
-        modifiers.width(static_cast<std::streamsize>(context.spec().m_width.value_or(0)));
+        modifiers.width(static_cast<std::streamsize>(context.spec().width(context, 0)));
     }
 
-    modifiers.precision(static_cast<std::streamsize>(context.spec().m_precision.value_or(6)));
+    modifiers.precision(static_cast<std::streamsize>(context.spec().precision(context, 6)));
     context.spec().m_precision = std::nullopt;
+    context.spec().m_precision_position = std::nullopt;
 
     switch (context.spec().m_type)
     {

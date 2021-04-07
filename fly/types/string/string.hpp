@@ -870,30 +870,6 @@ StringType BasicString<StringType>::format(
         detail::make_format_parameters<FormatContext>(std::forward<ParameterTypes>(parameters)...);
     FormatContext context(std::back_inserter(formatted), params);
 
-    auto resolve = [&context](std::size_t position) -> std::optional<std::size_t>
-    {
-        return context.arg(position).visit(
-            [](auto value) -> std::optional<std::size_t>
-            {
-                using T = std::remove_cvref_t<decltype(value)>;
-                std::optional<std::size_t> resolved;
-
-                if constexpr (std::is_unsigned_v<T>)
-                {
-                    resolved = static_cast<std::size_t>(value);
-                }
-                else if constexpr (std::is_integral_v<T>)
-                {
-                    if (value >= 0)
-                    {
-                        resolved = static_cast<std::size_t>(value);
-                    }
-                }
-
-                return resolved;
-            });
-    };
-
     auto format_value = [&context](auto value)
     {
         using T = std::remove_cvref_t<decltype(value)>;
@@ -925,17 +901,8 @@ StringType BasicString<StringType>::format(
                 }
 
                 context.spec() = *std::move(fmt.next_specifier());
-
-                if (context.spec().m_width_position)
-                {
-                    context.spec().m_width = resolve(*context.spec().m_width_position);
-                }
-                if (context.spec().m_precision_position)
-                {
-                    context.spec().m_precision = resolve(*context.spec().m_precision_position);
-                }
-
                 context.arg(context.spec().m_position).visit(format_value);
+
                 pos += context.spec().m_size;
                 break;
 

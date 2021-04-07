@@ -186,6 +186,38 @@ struct BasicFormatSpecifier
     constexpr bool is_numeric() const;
 
     /**
+     * The width formatting option may either be a number or a nested replacement field. If a
+     * numeric value was specified, return that value. If a nested replacement field was specified,
+     * return the value of the format parameter at the position indicated by the nested replacement
+     * field.
+     *
+     * @tparam FormatContext The formatting context type.
+     *
+     * @param context The context holding the formatting state.
+     * @param fallback The value to return if neither a number or replacement field was specified.
+     *
+     * @return The replacement field's resolved width.
+     */
+    template <typename FormatContext>
+    std::size_t width(FormatContext &context, std::size_t fallback) const;
+
+    /**
+     * The precision formatting option may either be a number or a nested replacement field. If a
+     * numeric value was specified, return that value. If a nested replacement field was specified,
+     * return the value of the format parameter at the position indicated by the nested replacement
+     * field.
+     *
+     * @tparam FormatContext The formatting context type.
+     *
+     * @param context The context holding the formatting state.
+     * @param fallback The value to return if neither a number or replacement field was specified.
+     *
+     * @return The replacement field's resolved precision.
+     */
+    template <typename FormatContext>
+    std::size_t precision(FormatContext &context, std::size_t fallback) const;
+
+    /**
      * Compare two replacement field instances for equality.
      *
      * @return True if the two instances are equal.
@@ -220,6 +252,20 @@ struct BasicFormatSpecifier
 private:
     BasicFormatSpecifier(const BasicFormatSpecifier &) = delete;
     BasicFormatSpecifier &operator=(const BasicFormatSpecifier &) = delete;
+
+    /**
+     * Retrieve the value of a format parameter at the specified position if its type is applicable
+     * to either the width or precision formatting options.
+     *
+     * @tparam FormatContext The formatting context type.
+     *
+     * @param context The context holding the formatting state.
+     * @param position The format parameter position to resolve.
+     *
+     * @return The resolved value.
+     */
+    template <typename FormatContext>
+    static std::optional<std::size_t> resolve(FormatContext &context, std::size_t position);
 
     static constexpr std::array<std::pair<CharType, Type>, 17> s_type_map {{
         {FLY_CHR(CharType, 'c'), Type::Character},
@@ -521,6 +567,62 @@ constexpr auto BasicFormatSpecifier<CharType>::type_of(CharType ch) -> std::opti
     }
 
     return it->second;
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatContext>
+inline std::size_t
+BasicFormatSpecifier<CharType>::width(FormatContext &context, std::size_t fallback) const
+{
+    if (m_width_position)
+    {
+        return resolve(context, *m_width_position).value_or(fallback);
+    }
+
+    return m_width.value_or(fallback);
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatContext>
+inline std::size_t
+BasicFormatSpecifier<CharType>::precision(FormatContext &context, std::size_t fallback) const
+{
+    if (m_precision_position)
+    {
+        return resolve(context, *m_precision_position).value_or(fallback);
+    }
+
+    return m_precision.value_or(fallback);
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatContext>
+inline std::optional<std::size_t>
+BasicFormatSpecifier<CharType>::resolve(FormatContext &context, std::size_t position)
+{
+    return context.arg(position).visit(
+        [](auto value) -> std::optional<std::size_t>
+        {
+            using T = std::remove_cvref_t<decltype(value)>;
+            std::optional<std::size_t> resolved;
+
+            if constexpr (std::is_unsigned_v<T>)
+            {
+                resolved = static_cast<std::size_t>(value);
+            }
+            else if constexpr (std::is_integral_v<T>)
+            {
+                if (value >= 0)
+                {
+                    resolved = static_cast<std::size_t>(value);
+                }
+            }
+
+            return resolved;
+        });
 }
 
 //==================================================================================================
