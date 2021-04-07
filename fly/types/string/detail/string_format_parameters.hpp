@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/types/string/detail/string_classifier.hpp"
-#include "fly/types/string/detail/string_formatter_types.hpp"
+#include "fly/types/string/detail/string_format_specifier.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/string_formatters.hpp"
 

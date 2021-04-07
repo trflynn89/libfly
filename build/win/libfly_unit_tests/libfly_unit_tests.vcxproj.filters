@@ -167,13 +167,13 @@
     <ClCompile Include="..\..\..\test\types\string\string_converter.cpp">
       <Filter>types\string</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\types\string\string_format.cpp">
+      <Filter>types\string</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\types\string\string_format_parameters.cpp">
       <Filter>types\string</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string\string_formatter.cpp">
-      <Filter>types\string</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string\string_formatter_types.cpp">
+    <ClCompile Include="..\..\..\test\types\string\string_format_specifier.cpp">
       <Filter>types\string</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\string\string_lexer.cpp">

@@ -231,7 +231,7 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\string_classifier.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_format_parameters.hpp" />
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_formatter_types.hpp" />
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_format_specifier.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_stream_util.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_unicode.hpp" />
