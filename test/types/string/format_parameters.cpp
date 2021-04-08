@@ -57,6 +57,8 @@ CATCH_TEMPLATE_TEST_CASE(
             {
                 CATCH_CHECK(std::is_same_v<decltype(value), fly::detail::MonoState>);
             });
+
+        parameter.format(context);
     }
 
     CATCH_SECTION("A single parameter can be visited, but no others")
@@ -135,6 +137,34 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(context.arg(3));
     }
 
+    CATCH_SECTION("Pointers are coerced to the appropriate type")
+    {
+        int i = 0;
+
+        std::nullptr_t p1 = nullptr;
+        void *p2 = &i;
+        const void *p3 = &i;
+
+        auto params = fly::detail::make_format_parameters<FormatContext>(p1, p2, p3);
+        FormatContext context(out, params);
+
+        auto verify = [](auto expected_value, auto actual_value)
+        {
+            CATCH_CHECK(std::is_same_v<decltype(actual_value), const void *>);
+
+            if constexpr (std::is_same_v<decltype(actual_value), const void *>)
+            {
+                CATCH_CHECK(static_cast<const void *>(expected_value) == actual_value);
+            }
+        };
+
+        context.arg(0).visit(std::bind(verify, p1, std::placeholders::_1));
+        context.arg(1).visit(std::bind(verify, p2, std::placeholders::_1));
+        context.arg(2).visit(std::bind(verify, p3, std::placeholders::_1));
+
+        CATCH_CHECK_FALSE(context.arg(3));
+    }
+
     CATCH_SECTION("Floating-point values are coerced to the appropriate type")
     {
         float f = 3.14f;
@@ -200,7 +230,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
             if constexpr (std::is_same_v<decltype(actual_value), std::int64_t>)
             {
-                CATCH_CHECK(static_cast<decltype(expected_value)>(actual_value) == actual_value);
+                CATCH_CHECK(static_cast<decltype(expected_value)>(actual_value) == expected_value);
             }
         };
 
@@ -228,7 +258,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
             if constexpr (std::is_same_v<decltype(actual_value), std::uint64_t>)
             {
-                CATCH_CHECK(static_cast<decltype(expected_value)>(actual_value) == actual_value);
+                CATCH_CHECK(static_cast<decltype(expected_value)>(actual_value) == expected_value);
             }
         };
 
@@ -254,7 +284,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
             if constexpr (std::is_same_v<decltype(actual_value), bool>)
             {
-                CATCH_CHECK(static_cast<decltype(expected_value)>(actual_value) == actual_value);
+                CATCH_CHECK(static_cast<decltype(expected_value)>(actual_value) == expected_value);
             }
         };
 
