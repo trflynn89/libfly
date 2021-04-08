@@ -1,8 +1,0 @@
-<map id="fly::JsonException" name="fly::JsonException">
-<area shape="rect" id="node1" title=" " alt="" coords="168,81,304,108"/>
-<area shape="rect" id="node3" href="$classfly_1_1BadJsonComparisonException.html" title=" " alt="" coords="352,5,591,32"/>
-<area shape="rect" id="node4" href="$classfly_1_1JsonIteratorException.html" title=" " alt="" coords="379,56,563,83"/>
-<area shape="rect" id="node5" href="$classfly_1_1NullJsonException.html" title=" " alt="" coords="390,107,553,133"/>
-<area shape="rect" id="node6" href="$classfly_1_1OutOfRangeJsonException.html" title=" " alt="" coords="364,157,579,184"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,81,120,108"/>
-</map>

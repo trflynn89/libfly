@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['objecttraits_543',['ObjectTraits',['../structfly_1_1JsonTraits_1_1ObjectTraits.html',1,'fly::JsonTraits']]],
-  ['outofrangejsonexception_544',['OutOfRangeJsonException',['../classfly_1_1OutOfRangeJsonException.html',1,'fly']]]
+  ['networkconfig_561',['NetworkConfig',['../classfly_1_1net_1_1_network_config.html',1,'fly::net']]],
+  ['nulljsonexception_562',['NullJsonException',['../classfly_1_1_null_json_exception.html',1,'fly']]]
 ];

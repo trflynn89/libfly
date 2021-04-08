@@ -1,6 +1,0 @@
-<map id="fly::coders::Encoder" name="fly::coders::Encoder">
-<area shape="rect" id="node1" title=" " alt="" coords="128,5,276,32"/>
-<area shape="rect" id="node2" href="$classfly_1_1coders_1_1Base64Coder.html" title=" " alt="" coords="5,80,188,107"/>
-<area shape="rect" id="node3" href="$classfly_1_1coders_1_1BinaryEncoder.html" title=" " alt="" coords="212,80,403,107"/>
-<area shape="rect" id="node4" href="$classfly_1_1coders_1_1HuffmanEncoder.html" title=" " alt="" coords="205,155,409,181"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="fly::task::TaskRunner" name="fly::task::TaskRunner">
-<area shape="rect" id="node1" title=" " alt="" coords="137,95,293,121"/>
-<area shape="rect" id="node3" href="$classfly_1_1task_1_1ParallelTaskRunner.html" title=" " alt="" coords="5,177,209,203"/>
-<area shape="rect" id="node4" href="$classfly_1_1task_1_1SequencedTaskRunner.html" title=" " alt="" coords="234,169,415,211"/>
-<area shape="rect" id="node2" title=" " alt="" coords="117,5,313,47"/>
-</map>

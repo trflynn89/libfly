@@ -1,0 +1,4 @@
+var structfly_1_1_formatter_3_01_t_00_01_char_type_00_01fly_1_1enable__if_3_01std_1_1is__same_3_01_t_00_01bool_01_4_01_4_01_4 =
+[
+    [ "format", "structfly_1_1_formatter_3_01_t_00_01_char_type_00_01fly_1_1enable__if_3_01std_1_1is__same_3_01_t_00_01bool_01_4_01_4_01_4.html#af4dc329c897fa84f8a14173b9464b464", null ]
+];

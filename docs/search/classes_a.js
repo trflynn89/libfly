@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['networkconfig_541',['NetworkConfig',['../classfly_1_1net_1_1NetworkConfig.html',1,'fly::net']]],
-  ['nulljsonexception_542',['NullJsonException',['../classfly_1_1NullJsonException.html',1,'fly']]]
+  ['monostate_560',['MonoState',['../structfly_1_1detail_1_1_mono_state.html',1,'fly::detail']]]
 ];
