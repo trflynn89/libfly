@@ -43,6 +43,26 @@ struct StringValue
 };
 
 /**
+ * Structure to store a type-erased standard value.
+ */
+template <typename FormatContext>
+struct StandardValue
+{
+    union
+    {
+        const void *m_pointer;
+        std::int64_t m_signed_int;
+        std::uint64_t m_unsigned_int;
+        float m_float;
+        double m_double;
+        long double m_long_double;
+        bool m_bool;
+    };
+
+    void (*m_format)(StandardValue value, FormatContext &context);
+};
+
+/**
  * Re-form a type-erased user-defined value and format that value.
  *
  * @tparam FormatContext The formatting context type.
@@ -66,6 +86,18 @@ void format_user_defined_value(const void *value, FormatContext &context);
  */
 template <typename FormatContext, typename T>
 void format_string_value(const void *value, std::size_t size, FormatContext &context);
+
+/**
+ * Re-form a type-erased standard value and format that value.
+ *
+ * @tparam FormatContext The formatting context type.
+ * @tparam T The standrd type.
+ *
+ * @param value The container holding the type-erased value.
+ * @param context The context holding the formatting state.
+ */
+template <typename FormatContext, typename T>
+void format_standard_value(StandardValue<FormatContext> value, FormatContext &context);
 
 /**
  * A container to hold a single type-erased format parameter.
@@ -140,6 +172,13 @@ public:
     explicit constexpr BasicFormatParameter(T value) noexcept;
 
     /**
+     * Apply the type-erased formatting function to the stored format parameter.
+     *
+     * @param context The context holding the formatting state.
+     */
+    constexpr void format(FormatContext &context) const;
+
+    /**
      * Apply the provided visitor to the stored format parameter.
      *
      * @tparam Visitor Type of the visitor to invoke.
@@ -174,13 +213,7 @@ private:
         MonoState m_monostate;
         UserDefinedValue<FormatContext> m_generic;
         StringValue<FormatContext> m_string;
-        const void *m_pointer;
-        std::int64_t m_signed_int;
-        std::uint64_t m_unsigned_int;
-        float m_float;
-        double m_double;
-        long double m_long_double;
-        bool m_bool;
+        StandardValue<FormatContext> m_standard;
     };
 
     Type m_type;
@@ -247,6 +280,53 @@ inline void format_string_value(const void *value, std::size_t size, FormatConte
 }
 
 //==================================================================================================
+template <typename FormatContext, typename T>
+inline void format_standard_value(StandardValue<FormatContext> value, FormatContext &context)
+{
+    Formatter<T, typename FormatContext::char_type> formatter {};
+
+    if constexpr (BasicFormatTraits::is_pointer_v<T>)
+    {
+        if constexpr (std::is_null_pointer_v<T>)
+        {
+            formatter.format(nullptr, context);
+        }
+        else if constexpr (std::is_const_v<T>)
+        {
+            formatter.format(static_cast<T>(value.m_pointer), context);
+        }
+        else
+        {
+            formatter.format(static_cast<T>(const_cast<void *>(value.m_pointer)), context);
+        }
+    }
+    else if constexpr (std::is_same_v<T, float>)
+    {
+        formatter.format(value.m_float, context);
+    }
+    else if constexpr (std::is_same_v<T, double>)
+    {
+        formatter.format(value.m_double, context);
+    }
+    else if constexpr (std::is_same_v<T, long double>)
+    {
+        formatter.format(value.m_long_double, context);
+    }
+    else if constexpr (std::is_same_v<T, bool>)
+    {
+        formatter.format(value.m_bool, context);
+    }
+    else if constexpr (std::is_signed_v<T>)
+    {
+        formatter.format(static_cast<T>(value.m_signed_int), context);
+    }
+    else
+    {
+        formatter.format(static_cast<T>(value.m_unsigned_int), context);
+    }
+}
+
+//==================================================================================================
 template <typename FormatContext>
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter() noexcept :
     m_type(Type::Invalid),
@@ -305,7 +385,7 @@ template <typename FormatContext>
 template <typename T, fly::enable_if<BasicFormatTraits::is_pointer<T>>>
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept :
     m_type(Type::Pointer),
-    m_value {.m_pointer {value}}
+    m_value {.m_standard {.m_pointer {value}, .m_format {format_standard_value<FormatContext, T>}}}
 {
 }
 
@@ -314,38 +394,37 @@ template <typename FormatContext>
 template <typename T, fly::enable_if<std::is_arithmetic<T>>>
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept
 {
-    if constexpr (std::is_floating_point_v<T>)
+    m_value.m_standard.m_format = format_standard_value<FormatContext, T>;
+
+    if constexpr (std::is_same_v<T, float>)
     {
-        if constexpr (std::is_same_v<T, float>)
-        {
-            m_type = Type::Float;
-            m_value.m_float = value;
-        }
-        else if constexpr (std::is_same_v<T, double>)
-        {
-            m_type = Type::Double;
-            m_value.m_double = value;
-        }
-        else if constexpr (std::is_same_v<T, long double>)
-        {
-            m_type = Type::LongDouble;
-            m_value.m_long_double = value;
-        }
+        m_type = Type::Float;
+        m_value.m_standard.m_float = value;
+    }
+    else if constexpr (std::is_same_v<T, double>)
+    {
+        m_type = Type::Double;
+        m_value.m_standard.m_double = value;
+    }
+    else if constexpr (std::is_same_v<T, long double>)
+    {
+        m_type = Type::LongDouble;
+        m_value.m_standard.m_long_double = value;
     }
     else if constexpr (std::is_same_v<T, bool>)
     {
         m_type = Type::Bool;
-        m_value.m_bool = value;
+        m_value.m_standard.m_bool = value;
     }
     else if constexpr (std::is_signed_v<T>)
     {
         m_type = Type::SignedInt;
-        m_value.m_signed_int = value;
+        m_value.m_standard.m_signed_int = value;
     }
     else
     {
         m_type = Type::UnsignedInt;
-        m_value.m_unsigned_int = value;
+        m_value.m_standard.m_unsigned_int = value;
     }
 }
 
@@ -355,6 +434,32 @@ template <typename T, fly::enable_if<BasicFormatTraits::is_default_formatted_enu
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept :
     BasicFormatParameter(static_cast<std::underlying_type_t<T>>(value))
 {
+}
+
+//==================================================================================================
+template <typename FormatContext>
+constexpr inline void BasicFormatParameter<FormatContext>::format(FormatContext &context) const
+{
+    switch (m_type)
+    {
+        case Type::Generic:
+            m_value.m_generic.m_format(m_value.m_generic.m_value, context);
+            break;
+        case Type::String:
+            m_value.m_string.m_format(m_value.m_string.m_value, m_value.m_string.m_size, context);
+            break;
+        case Type::Pointer:
+        case Type::SignedInt:
+        case Type::UnsignedInt:
+        case Type::Float:
+        case Type::Double:
+        case Type::LongDouble:
+        case Type::Bool:
+            m_value.m_standard.m_format(m_value.m_standard, context);
+            break;
+        default:
+            break;
+    }
 }
 
 //==================================================================================================
@@ -369,19 +474,19 @@ constexpr inline auto BasicFormatParameter<FormatContext>::visit(Visitor &&visit
         case Type::String:
             return visitor(m_value.m_string);
         case Type::Pointer:
-            return visitor(m_value.m_pointer);
+            return visitor(m_value.m_standard.m_pointer);
         case Type::SignedInt:
-            return visitor(m_value.m_signed_int);
+            return visitor(m_value.m_standard.m_signed_int);
         case Type::UnsignedInt:
-            return visitor(m_value.m_unsigned_int);
+            return visitor(m_value.m_standard.m_unsigned_int);
         case Type::Float:
-            return visitor(m_value.m_float);
+            return visitor(m_value.m_standard.m_float);
         case Type::Double:
-            return visitor(m_value.m_double);
+            return visitor(m_value.m_standard.m_double);
         case Type::LongDouble:
-            return visitor(m_value.m_long_double);
+            return visitor(m_value.m_standard.m_long_double);
         case Type::Bool:
-            return visitor(m_value.m_bool);
+            return visitor(m_value.m_standard.m_bool);
         default:
             return visitor(m_value.m_monostate);
     }

@@ -535,7 +535,13 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:p}"), FMT("0x0"), nullptr);
 
         int i = 0;
-        auto result = BasicString::format(FMT("{:p}"), &i);
+        void *p1 = &i;
+        const void *p2 = &i;
+
+        auto result = BasicString::format(FMT("{:p}"), p1);
+        CATCH_CHECK(is_all_hex(result));
+
+        result = BasicString::format(FMT("{:p}"), p2);
         CATCH_CHECK(is_all_hex(result));
     }
 
@@ -696,10 +702,14 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:e}"), FMT("nan"), std::nan(""));
         test_format(FMT("{:e}"), FMT("inf"), std::numeric_limits<float>::infinity());
         test_format(FMT("{:e}"), FMT("1.230000e+02"), 123.0);
+        test_format(FMT("{:e}"), FMT("1.230000e+02"), static_cast<double>(123.0));
+        test_format(FMT("{:e}"), FMT("1.230000e+02"), static_cast<long double>(123.0));
 
         test_format(FMT("{:E}"), FMT("NAN"), std::nan(""));
         test_format(FMT("{:E}"), FMT("INF"), std::numeric_limits<float>::infinity());
         test_format(FMT("{:E}"), FMT("1.230000E+02"), 123.0);
+        test_format(FMT("{:E}"), FMT("1.230000E+02"), static_cast<double>(123.0));
+        test_format(FMT("{:E}"), FMT("1.230000E+02"), static_cast<long double>(123.0));
     }
 
     CATCH_SECTION("Presentation type may be set (fixed)")
@@ -707,10 +717,14 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:f}"), FMT("nan"), std::nan(""));
         test_format(FMT("{:f}"), FMT("inf"), std::numeric_limits<float>::infinity());
         test_format(FMT("{:f}"), FMT("2.100000"), 2.1f);
+        test_format(FMT("{:f}"), FMT("2.100000"), static_cast<double>(2.1));
+        test_format(FMT("{:f}"), FMT("2.100000"), static_cast<long double>(2.1));
 
         test_format(FMT("{:F}"), FMT("NAN"), std::nan(""));
         test_format(FMT("{:F}"), FMT("INF"), std::numeric_limits<float>::infinity());
         test_format(FMT("{:F}"), FMT("2.100000"), 2.1f);
+        test_format(FMT("{:F}"), FMT("2.100000"), static_cast<double>(2.1));
+        test_format(FMT("{:F}"), FMT("2.100000"), static_cast<long double>(2.1));
     }
 
     CATCH_SECTION("Presentation type may be set (general)")
@@ -718,10 +732,14 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:g}"), FMT("nan"), std::nan(""));
         test_format(FMT("{:g}"), FMT("inf"), std::numeric_limits<float>::infinity());
         test_format(FMT("{:g}"), FMT("2.1"), 2.1f);
+        test_format(FMT("{:g}"), FMT("2.1"), static_cast<double>(2.1));
+        test_format(FMT("{:g}"), FMT("2.1"), static_cast<long double>(2.1));
 
         test_format(FMT("{:G}"), FMT("NAN"), std::nan(""));
         test_format(FMT("{:G}"), FMT("INF"), std::numeric_limits<float>::infinity());
         test_format(FMT("{:G}"), FMT("2.1"), 2.1f);
+        test_format(FMT("{:G}"), FMT("2.1"), static_cast<double>(2.1));
+        test_format(FMT("{:G}"), FMT("2.1"), static_cast<long double>(2.1));
     }
 
     CATCH_SECTION("Invalid characters cannot be formatted")

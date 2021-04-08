@@ -872,24 +872,6 @@ StringType BasicString<StringType>::format(
         detail::make_format_parameters<FormatContext>(std::forward<ParameterTypes>(parameters)...);
     FormatContext context(std::back_inserter(formatted), params);
 
-    auto format_value = [&context](auto value)
-    {
-        using T = std::remove_cvref_t<decltype(value)>;
-
-        if constexpr (std::is_same_v<T, detail::UserDefinedValue<FormatContext>>)
-        {
-            value.m_format(value.m_value, context);
-        }
-        else if constexpr (std::is_same_v<T, detail::StringValue<FormatContext>>)
-        {
-            value.m_format(value.m_value, value.m_size, context);
-        }
-        else
-        {
-            Formatter<T, char_type>().format(value, context);
-        }
-    };
-
     for (std::size_t pos = 0; pos < view.size();)
     {
         switch (const auto &ch = view[pos])
@@ -899,13 +881,15 @@ StringType BasicString<StringType>::format(
                 {
                     *context.out()++ = ch;
                     pos += 2;
-                    break;
                 }
+                else
+                {
+                    context.spec() = *std::move(fmt.next_specifier());
+                    pos += context.spec().m_size;
 
-                context.spec() = *std::move(fmt.next_specifier());
-                context.arg(context.spec().m_position).visit(format_value);
-
-                pos += context.spec().m_size;
+                    const auto parameter = context.arg(context.spec().m_position);
+                    parameter.format(context);
+                }
                 break;
 
             case s_right_brace:
