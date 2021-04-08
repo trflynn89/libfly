@@ -172,18 +172,32 @@ struct BasicFormatSpecifier
     };
 
     /**
-     * Search for the presentation type which maps to a character, if any.
+     * Parse the formatting options for a standard replacement field.
      *
-     * @param ch The character to search for.
+     * @tparam FormatString The type of the format string containing the replacement field.
      *
-     * @return If found, the mapped presentation type. Otherwise, an uninitialized value.
+     * @param format The format string containing the replacement field.
+     * @param parameter_type The type of format parameter corresponding to the replacement field.
+     *
+     * @return The parsed specifier.
      */
-    static constexpr std::optional<Type> type_of(CharType ch);
+    template <typename FormatString>
+    constexpr void parse(FormatString &format, typename FormatString::ParameterType parameter_type);
 
     /**
-     * @return True if the presentation type is a numeric type.
+     * Infer a presentation type for a replacement field based on the corresponding format
+     * parameter's type.
+     *
+     * TODO: This should be private. Once the standard fly::Formatters are updated to inherit from
+     * this structure, they may infer their presentation type.
+     *
+     * @tparam FormatString The type of the format string containing the replacement field.
+     *
+     * @param format The format string containing the replacement field.
+     * @param parameter_type The type of format parameter corresponding to the replacement field.
      */
-    constexpr bool is_numeric() const;
+    template <typename FormatString>
+    constexpr void infer_type(typename FormatString::ParameterType parameter_type);
 
     /**
      * The width formatting option may either be a number or a nested replacement field. If a
@@ -254,6 +268,131 @@ private:
     BasicFormatSpecifier &operator=(const BasicFormatSpecifier &) = delete;
 
     /**
+     * Parse the optional fill and alignment arguments of the replacement field.
+     *
+     * It is an error if the fill character is an opening brace, a closing brace, or any non-ASCII
+     * symbol.
+     *
+     * @tparam FormatString The type of the format string containing the replacement field.
+     *
+     * @param format The format string containing the replacement field.
+     */
+    template <typename FormatString>
+    constexpr void parse_fill_and_alignment(FormatString &format);
+
+    /**
+     * Parse the optional sign argument of the replacement field.
+     *
+     * @tparam FormatString The type of the format string containing the replacement field.
+     *
+     * @param format The format string containing the replacement field.
+     */
+    template <typename FormatString>
+    constexpr void parse_sign(FormatString &format);
+
+    /**
+     * Parse the optional alternate form and zero-padding arguments of the replacement field.
+     *
+     * If the zero-padding argument is specified, and an alignment argument was previously
+     * specified, the zero-padding argument is dropped.
+     *
+     * It is an error if alternate form was specified, but the presentation type is not a
+     * non-decimal numeric type.
+     *
+     * It is an error if zero-padding was specified, but the presentation type is not a numeric
+     * type.
+     *
+     * @tparam FormatString The type of the format string containing the replacement field.
+     *
+     * @param format The format string containing the replacement field.
+     */
+    template <typename FormatString>
+    constexpr void parse_alternate_form_and_zero_padding(FormatString &format);
+
+    /**
+     * Parse the width argument of the replacement field.
+     *
+     * It is an error if the width is not a positive (non-zero) value or a nested replacement field.
+     *
+     * @tparam FormatString The type of the format string containing the replacement field.
+     *
+     * @param format The format string containing the replacement field.
+     */
+    template <typename FormatString>
+    constexpr void parse_width(FormatString &format);
+
+    /**
+     * Parse the precision argument of the replacement field.
+     *
+     * It is an error the precision was specified, but the type of the corresponding format
+     * parameter is not a string or floating point type.
+     *
+     * It is an error if a decimal was parsed and was not followed by a non-negative precision or a
+     * replacement field.
+     *
+     * @tparam FormatString The type of the format string containing the replacement field.
+     *
+     * @param format The format string containing the replacement field.
+     */
+    template <typename FormatString>
+    constexpr void parse_precision(FormatString &format);
+
+    /**
+     * Parse the optional locale-specific form of the replacement field.
+     *
+     * It is an error the locale-specific form was specified, but the type of the corresponding
+     * format parameter is not an integral, floating point, or boolean type.
+     *
+     * @tparam FormatString The type of the format string containing the replacement field.
+     *
+     * @param format The format string containing the replacement field.
+     */
+    template <typename FormatString>
+    constexpr void parse_locale_specific_form(FormatString &format);
+
+    /**
+     * Parse the optional presentation type argument of the replacement field. If not specified,
+     * infer a default type based on the corresponding format parameter's type.
+     *
+     * It is an error if the presentation type is not allowed for the corresponding format parameter
+     * type.
+     *
+     * @tparam FormatString The type of the format string containing the replacement field.
+     *
+     * @param format The format string containing the replacement field.
+     * @param parameter_type The type of format parameter corresponding to the replacement field.
+     */
+    template <typename FormatString>
+    constexpr void
+    parse_type(FormatString &format, typename FormatString::ParameterType parameter_type);
+
+    /**
+     * After parsing a single replacement field, validate all options that were parsed. Raise an
+     * error if the field is invalid.
+     *
+     * @tparam FormatString The type of the format string containing the replacement field.
+     *
+     * @param format The format string containing the replacement field.
+     * @param parameter_type The type of format parameter corresponding to the replacement field.
+     */
+    template <typename FormatString>
+    constexpr void
+    validate(FormatString &format, typename FormatString::ParameterType parameter_type);
+
+    /**
+     * Helper to validate the presentation type of a single replacement field. Raise an error if the
+     * type is invalid.
+     *
+     * @tparam FormatString The type of the format string containing the replacement field.
+     *
+     * @param format The format string containing the replacement field.
+     * @param parameter_type The type of format parameter corresponding to the replacement field.
+     */
+    template <typename FormatString>
+    constexpr void
+    validate_type(FormatString &format, typename FormatString::ParameterType parameter_type);
+
+    /**
      * Retrieve the value of a format parameter at the specified position if its type is applicable
      * to either the width or precision formatting options.
      *
@@ -266,6 +405,20 @@ private:
      */
     template <typename FormatContext>
     static std::optional<std::size_t> resolve(FormatContext &context, std::size_t position);
+
+    /**
+     * Search for the presentation type which maps to a character, if any.
+     *
+     * @param ch The character to search for.
+     *
+     * @return If found, the mapped presentation type. Otherwise, an uninitialized value.
+     */
+    static constexpr std::optional<Type> type_of(CharType ch);
+
+    /**
+     * @return True if the presentation type is a numeric type.
+     */
+    constexpr bool is_numeric() const;
 
     static constexpr std::array<std::pair<CharType, Type>, 17> s_type_map {{
         {FLY_CHR(CharType, 'c'), Type::Character},
@@ -286,6 +439,19 @@ private:
         {FLY_CHR(CharType, 'g'), Type::General},
         {FLY_CHR(CharType, 'G'), Type::General},
     }};
+
+    static constexpr const auto s_left_brace = FLY_CHR(CharType, '{');
+    static constexpr const auto s_right_brace = FLY_CHR(CharType, '}');
+    static constexpr const auto s_less_than_sign = FLY_CHR(CharType, '<');
+    static constexpr const auto s_greater_than_sign = FLY_CHR(CharType, '>');
+    static constexpr const auto s_caret = FLY_CHR(CharType, '^');
+    static constexpr const auto s_plus_sign = FLY_CHR(CharType, '+');
+    static constexpr const auto s_minus_sign = FLY_CHR(CharType, '-');
+    static constexpr const auto s_space = FLY_CHR(CharType, ' ');
+    static constexpr const auto s_number_sign = FLY_CHR(CharType, '#');
+    static constexpr const auto s_zero = FLY_CHR(CharType, '0');
+    static constexpr const auto s_letter_l = FLY_CHR(CharType, 'L');
+    static constexpr const auto s_decimal = FLY_CHR(CharType, '.');
 };
 
 /**
@@ -304,7 +470,6 @@ template <typename StringType, typename... ParameterTypes>
 class BasicFormatString
 {
     using traits = BasicStringTraits<StringType>;
-    using classifier = BasicStringClassifier<StringType>;
     using lexer = fly::BasicStringLexer<StringType>;
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
@@ -365,6 +530,8 @@ public:
     std::optional<FormatSpecifier> next_specifier();
 
 private:
+    friend BasicFormatSpecifier<char_type>;
+
     BasicFormatString(const BasicFormatString &) = delete;
     BasicFormatString &operator=(const BasicFormatString &) = delete;
 
@@ -372,11 +539,11 @@ private:
      * Upon parsing an un-escaped opening brace, parse a single replacement field in the format
      * string. If valid, the lexer will be advanced to the character after the closing brace.
      *
-     * @param type The type of replacement field to parse (either a full or nested field).
+     * @param specifier_type The type of replacement field to parse (either a full or nested field).
      *
-     * @return The parsed specifier.
+     * @return If successful, the parsed specifier. Otherwise, an uninitialized value.
      */
-    constexpr std::optional<FormatSpecifier> parse_specifier(SpecifierType type);
+    constexpr std::optional<FormatSpecifier> parse_specifier(SpecifierType specifier_type);
 
     /**
      * Parse the optional position argument of the current replacement field. If a position was not
@@ -384,117 +551,9 @@ private:
      *
      * It is an error if the format string has a mix of manual and automatic positioning.
      *
-     * @param specifier The specifier instance to store the position into.
+     * @return The parsed or observed format parameter position.
      */
-    constexpr void parse_position(FormatSpecifier &specifier);
-
-    /**
-     * Parse the optional fill and alignment arguments of the current replacement field.
-     *
-     * It is an error if the fill character is an opening brace, a closing brace, or any non-ASCII
-     * symbol.
-     *
-     * @param specifier The specifier instance to store the fill and alignment into.
-     */
-    constexpr void parse_fill_and_alignment(FormatSpecifier &specifier);
-
-    /**
-     * Parse the optional sign argument of the current replacement field.
-     *
-     * It is an error if a sign was specified, but the presentation type is not a numeric type.
-     *
-     * @param specifier The specifier instance to store the sign into.
-     */
-    constexpr void parse_sign(FormatSpecifier &specifier);
-
-    /**
-     * Parse the optional alternate form and zero-padding arguments of the current replacement
-     * field.
-     *
-     * If the zero-padding argument is specified, and an alignment argument was previously
-     * specified, the zero-padding argument is dropped.
-     *
-     * It is an error if alternate form was specified, but the presentation type is not a
-     * non-decimal numeric type.
-     *
-     * It is an error if zero-padding was specified, but the presentation type is not a numeric
-     * type.
-     *
-     * @param specifier The specifier instance to store the alternate form and padding into.
-     */
-    constexpr void parse_alternate_form_and_zero_padding(FormatSpecifier &specifier);
-
-    /**
-     * Parse the width argument of the current replacement field.
-     *
-     * It is an error if the width is not a positive (non-zero) value or a nested replacement field.
-     *
-     * @param specifier The specifier instance to store the width and precision into.
-     */
-    constexpr void parse_width(FormatSpecifier &specifier);
-
-    /**
-     * Parse the precision argument of the current replacement field.
-     *
-     * It is an error the precision was specified, but the type of the corresponding format
-     * parameter is not a string or floating point type.
-     *
-     * It is an error if a decimal was parsed and was not followed by a non-negative precision or a
-     * replacement field.
-     *
-     * @param specifier The specifier instance to store the width and precision into.
-     */
-    constexpr void parse_precision(FormatSpecifier &specifier);
-
-    /**
-     * Parse the optional locale-specific form of the current replacement field.
-     *
-     * It is an error the locale-specific form was specified, but the type of the corresponding
-     * format parameter is not an integral, floating point, or boolean type.
-     *
-     * @param specifier The specifier instance to store the locale-specific form.
-     */
-    constexpr void parse_locale_specific_form(FormatSpecifier &specifier);
-
-    /**
-     * Parse the optional presentation type argument of the current replacement field. If not
-     * specified, infer a default type based on the corresponding format parameter's type.
-     *
-     * It is an error if the presentation type is not allowed for the corresponding format parameter
-     * type.
-     *
-     * @param specifier The specifier instance to store the presentation type into.
-     */
-    constexpr void parse_type(FormatSpecifier &specifier);
-
-    /**
-     * Infer a presentation type for a replacement field based on the corresponding format
-     * parameter's type.
-     *
-     * @param specifier The specifier instance to store the presentation type into.
-     */
-    constexpr void infer_type(FormatSpecifier &specifier);
-
-    /**
-     * After parsing a single replacement field, validate all options that were parsed. Raise an
-     * error if the field is invalid.
-     *
-     * @param specifier The specifier instance to validate.
-     *
-     * @return True if the specifier instance is valid.
-     */
-    constexpr bool validate_specifier(const FormatSpecifier &specifier);
-
-    /**
-     * Helper to validate the presentation type of a single replacement field. Raise an error if the
-     * type is invalid.
-     *
-     * @param type Type of the format parameter corresponding to the provided specifier.
-     * @param specifier The specifier instance to validate.
-     *
-     * @return True if the presentation type is valid.
-     */
-    constexpr void validate_type(ParameterType type, const FormatSpecifier &specifier);
+    constexpr std::size_t parse_position();
 
     /**
      * Determine the type of a format parameter. Returns ParameterType::Generic if the type of the
@@ -525,16 +584,6 @@ private:
     static constexpr const auto s_left_brace = FLY_CHR(char_type, '{');
     static constexpr const auto s_right_brace = FLY_CHR(char_type, '}');
     static constexpr const auto s_colon = FLY_CHR(char_type, ':');
-    static constexpr const auto s_less_than_sign = FLY_CHR(char_type, '<');
-    static constexpr const auto s_greater_than_sign = FLY_CHR(char_type, '>');
-    static constexpr const auto s_caret = FLY_CHR(char_type, '^');
-    static constexpr const auto s_plus_sign = FLY_CHR(char_type, '+');
-    static constexpr const auto s_minus_sign = FLY_CHR(char_type, '-');
-    static constexpr const auto s_space = FLY_CHR(char_type, ' ');
-    static constexpr const auto s_number_sign = FLY_CHR(char_type, '#');
-    static constexpr const auto s_zero = FLY_CHR(char_type, '0');
-    static constexpr const auto s_letter_l = FLY_CHR(char_type, 'L');
-    static constexpr const auto s_decimal = FLY_CHR(char_type, '.');
 
     lexer m_lexer;
 
@@ -551,22 +600,340 @@ private:
 
 //==================================================================================================
 template <typename CharType>
-constexpr auto BasicFormatSpecifier<CharType>::type_of(CharType ch) -> std::optional<Type>
+template <typename FormatString>
+constexpr void BasicFormatSpecifier<CharType>::parse(
+    FormatString &format,
+    typename FormatString::ParameterType parameter_type)
 {
-    auto it = std::find_if(
-        s_type_map.begin(),
-        s_type_map.end(),
-        [&ch](const auto &item)
-        {
-            return item.first == ch;
-        });
+    parse_fill_and_alignment(format);
+    parse_sign(format);
+    parse_alternate_form_and_zero_padding(format);
+    parse_width(format);
+    parse_precision(format);
+    parse_locale_specific_form(format);
+    parse_type(format, parameter_type);
 
-    if (it == s_type_map.end())
+    validate(format, parameter_type);
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatString>
+constexpr void BasicFormatSpecifier<CharType>::parse_fill_and_alignment(FormatString &format)
+{
+    if (auto next = format.m_lexer.peek(1); next)
     {
-        return std::nullopt;
+        if ((*next == s_less_than_sign) || (*next == s_greater_than_sign) || (*next == s_caret))
+        {
+            m_fill = format.m_lexer.consume().value();
+        }
     }
 
-    return it->second;
+    if (format.m_lexer.consume_if(s_less_than_sign))
+    {
+        m_alignment = Alignment::Left;
+    }
+    else if (format.m_lexer.consume_if(s_greater_than_sign))
+    {
+        m_alignment = Alignment::Right;
+    }
+    else if (format.m_lexer.consume_if(s_caret))
+    {
+        m_alignment = Alignment::Center;
+    }
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatString>
+constexpr void BasicFormatSpecifier<CharType>::parse_sign(FormatString &format)
+{
+    if (format.m_lexer.consume_if(s_plus_sign))
+    {
+        m_sign = Sign::Always;
+    }
+    else if (format.m_lexer.consume_if(s_minus_sign))
+    {
+        m_sign = Sign::NegativeOnly;
+    }
+    else if (format.m_lexer.consume_if(s_space))
+    {
+        m_sign = Sign::NegativeOnlyWithPositivePadding;
+    }
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatString>
+constexpr void
+BasicFormatSpecifier<CharType>::parse_alternate_form_and_zero_padding(FormatString &format)
+{
+    if (format.m_lexer.consume_if(s_number_sign))
+    {
+        m_alternate_form = true;
+    }
+
+    if (format.m_lexer.consume_if(s_zero) && (m_alignment == Alignment::Default))
+    {
+        m_zero_padding = true;
+    }
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatString>
+constexpr void BasicFormatSpecifier<CharType>::parse_width(FormatString &format)
+{
+    if (auto width = format.m_lexer.consume_number(); width)
+    {
+        m_width = static_cast<std::size_t>(*width);
+    }
+    else if (format.m_lexer.consume_if(s_left_brace))
+    {
+        if (auto nested = format.parse_specifier(FormatString::SpecifierType::Nested); nested)
+        {
+            m_width_position = nested->m_position;
+        }
+    }
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatString>
+constexpr void BasicFormatSpecifier<CharType>::parse_precision(FormatString &format)
+{
+    if (format.m_lexer.consume_if(s_decimal))
+    {
+        if (auto precision = format.m_lexer.consume_number(); precision)
+        {
+            m_precision = static_cast<std::size_t>(*precision);
+        }
+        else if (format.m_lexer.consume_if(s_left_brace))
+        {
+            if (auto nested = format.parse_specifier(FormatString::SpecifierType::Nested); nested)
+            {
+                m_precision_position = nested->m_position;
+            }
+        }
+        else
+        {
+            format.on_error(
+                "Expected a non-negative precision or nested replacement field after decimal");
+        }
+    }
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatString>
+constexpr void BasicFormatSpecifier<CharType>::parse_locale_specific_form(FormatString &format)
+{
+    if (format.m_lexer.consume_if(s_letter_l))
+    {
+        m_locale_specific_form = true;
+    }
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatString>
+constexpr void BasicFormatSpecifier<CharType>::parse_type(
+    FormatString &format,
+    typename FormatString::ParameterType parameter_type)
+{
+    using classifier = BasicStringClassifier<std::basic_string<CharType>>;
+
+    if (auto ch = format.m_lexer.peek(); ch)
+    {
+        if (auto type = type_of(ch.value()); type)
+        {
+            m_type = type.value();
+            format.m_lexer.consume();
+
+            if (classifier::is_upper(ch.value()))
+            {
+                m_case = Case::Upper;
+            }
+        }
+    }
+
+    if (m_type == Type::None)
+    {
+        infer_type<FormatString>(parameter_type);
+    }
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatString>
+constexpr void
+BasicFormatSpecifier<CharType>::infer_type(typename FormatString::ParameterType parameter_type)
+{
+    if (parameter_type == FormatString::ParameterType::Character)
+    {
+        m_type = Type::Character;
+    }
+    else if (parameter_type == FormatString::ParameterType::String)
+    {
+        m_type = Type::String;
+    }
+    else if (parameter_type == FormatString::ParameterType::Pointer)
+    {
+        m_type = Type::Pointer;
+    }
+    else if (parameter_type == FormatString::ParameterType::Integral)
+    {
+        m_type = Type::Decimal;
+    }
+    else if (parameter_type == FormatString::ParameterType::FloatingPoint)
+    {
+        m_type = Type::General;
+    }
+    else if (parameter_type == FormatString::ParameterType::Boolean)
+    {
+        m_type = Type::String;
+    }
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatString>
+constexpr void BasicFormatSpecifier<CharType>::validate(
+    FormatString &format,
+    typename FormatString::ParameterType parameter_type)
+{
+    // Validate the fill character.
+    if (m_fill && ((m_fill == s_left_brace) || (m_fill == s_right_brace)))
+    {
+        format.on_error("Characters { and } are not allowed as fill characters");
+    }
+    else if (m_fill && (static_cast<std::make_unsigned_t<CharType>>(*m_fill) >= 0x80))
+    {
+        format.on_error("Non-ascii characters are not allowed as fill characters");
+    }
+
+    // Validate the sign.
+    if ((m_sign != Sign::Default) && !is_numeric())
+    {
+        format.on_error("Sign may only be used with numeric presentation types");
+    }
+
+    // Validate the alternate form.
+    if (m_alternate_form && (!is_numeric() || (m_type == Type::Decimal)))
+    {
+        format.on_error(
+            "Alternate form may only be used with non-decimal numeric presentation types");
+    }
+
+    // Validate the zero-padding option.
+    if (m_zero_padding && !is_numeric())
+    {
+        format.on_error("Zero-padding may only be used with numeric presentation types");
+    }
+
+    // Validate the width value.
+    if (m_width && (*m_width == 0))
+    {
+        format.on_error("Width must be a positive (non-zero) value");
+    }
+    else if (m_width_position)
+    {
+        const auto nested_type = format.parameter_type(*m_width_position);
+
+        if (nested_type != FormatString::ParameterType::Integral)
+        {
+            format.on_error("Position of width parameter must be an integral type");
+        }
+    }
+
+    // Validate the precision value.
+    if (m_precision || m_precision_position)
+    {
+        if ((parameter_type != FormatString::ParameterType::String) &&
+            (parameter_type != FormatString::ParameterType::FloatingPoint))
+        {
+            format.on_error("Precision may only be used for string and floating point types");
+        }
+        else if (m_precision_position)
+        {
+            const auto nested_type = format.parameter_type(*m_precision_position);
+
+            if (nested_type != FormatString::ParameterType::Integral)
+            {
+                format.on_error("Position of precision parameter must be an integral type");
+            }
+        }
+    }
+
+    // Validate the locale-specifc form.
+    if (m_locale_specific_form &&
+        ((parameter_type != FormatString::ParameterType::Integral) &&
+         (parameter_type != FormatString::ParameterType::FloatingPoint) &&
+         (parameter_type != FormatString::ParameterType::Boolean)))
+    {
+        format.on_error("Locale-specific form may only be used for numeric and boolean types");
+    }
+
+    // Validate the presentation type.
+    if (m_type != Type::None)
+    {
+        validate_type(format, parameter_type);
+    }
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename FormatString>
+constexpr void BasicFormatSpecifier<CharType>::validate_type(
+    FormatString &format,
+    typename FormatString::ParameterType parameter_type)
+{
+    if (parameter_type == FormatString::ParameterType::Character)
+    {
+        if ((m_type != Type::Character) && (m_type != Type::Binary) && (m_type != Type::Octal) &&
+            (m_type != Type::Decimal) && (m_type != Type::Hex))
+        {
+            format.on_error("Character types must be formatted with {} or {:cbBodxX}");
+        }
+    }
+    else if (parameter_type == FormatString::ParameterType::String)
+    {
+        if (m_type != Type::String)
+        {
+            format.on_error("String types must be formatted with {} or {:s}");
+        }
+    }
+    else if (parameter_type == FormatString::ParameterType::Pointer)
+    {
+        if (m_type != Type::Pointer)
+        {
+            format.on_error("Pointer types must be formatted with {} or {:p}");
+        }
+    }
+    else if (parameter_type == FormatString::ParameterType::Integral)
+    {
+        if ((m_type != Type::Character) && (m_type != Type::Binary) && (m_type != Type::Octal) &&
+            (m_type != Type::Decimal) && (m_type != Type::Hex))
+        {
+            format.on_error("Integral types must be formatted with {} or one of {:cbBodxX}");
+        }
+    }
+    else if (parameter_type == FormatString::ParameterType::FloatingPoint)
+    {
+        if ((m_type != Type::HexFloat) && (m_type != Type::Scientific) && (m_type != Type::Fixed) &&
+            (m_type != Type::General))
+        {
+            format.on_error("Floating point types must be formatted with {} or one of {:aAeEfFgG}");
+        }
+    }
+    else if (parameter_type == FormatString::ParameterType::Boolean)
+    {
+        if ((m_type != Type::Character) && (m_type != Type::String) && (m_type != Type::Binary) &&
+            (m_type != Type::Octal) && (m_type != Type::Decimal) && (m_type != Type::Hex))
+        {
+            format.on_error("Boolean types must be formatted with {} or one of {:csbBodxX}");
+        }
+    }
 }
 
 //==================================================================================================
@@ -623,6 +990,26 @@ BasicFormatSpecifier<CharType>::resolve(FormatContext &context, std::size_t posi
 
             return resolved;
         });
+}
+
+//==================================================================================================
+template <typename CharType>
+constexpr auto BasicFormatSpecifier<CharType>::type_of(CharType ch) -> std::optional<Type>
+{
+    auto it = std::find_if(
+        s_type_map.begin(),
+        s_type_map.end(),
+        [&ch](const auto &item)
+        {
+            return item.first == ch;
+        });
+
+    if (it == s_type_map.end())
+    {
+        return std::nullopt;
+    }
+
+    return it->second;
 }
 
 //==================================================================================================
@@ -745,38 +1132,60 @@ auto BasicFormatString<StringType, ParameterTypes...>::next_specifier()
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-constexpr auto BasicFormatString<StringType, ParameterTypes...>::parse_specifier(SpecifierType type)
+constexpr auto
+BasicFormatString<StringType, ParameterTypes...>::parse_specifier(SpecifierType specifier_type)
     -> std::optional<FormatSpecifier>
 {
     // The opening { will have already been consumed, so the starting position is one less.
     const auto starting_position = m_lexer.position() - 1;
 
     FormatSpecifier specifier {};
-    parse_position(specifier);
+    specifier.m_position = parse_position();
 
-    if ((type == SpecifierType::Full) && m_lexer.consume_if(s_colon))
+    auto param_type = parameter_type(specifier.m_position);
+
+    if (param_type == ParameterType::Generic)
     {
-        parse_fill_and_alignment(specifier);
-        parse_sign(specifier);
-        parse_alternate_form_and_zero_padding(specifier);
-        parse_width(specifier);
-        parse_precision(specifier);
-        parse_locale_specific_form(specifier);
-        parse_type(specifier);
+        // TODO: For now, generic format parameters must be formatted with "{}".
+        if (!m_lexer.consume_if(s_right_brace))
+        {
+            on_error("Generic types must be formatted with {}");
+            return std::nullopt;
+        }
     }
     else
     {
-        infer_type(specifier);
+        if (param_type)
+        {
+            if ((specifier_type == SpecifierType::Full) && m_lexer.consume_if(s_colon))
+            {
+                specifier.parse(*this, *param_type);
+
+                if (has_error())
+                {
+                    return std::nullopt;
+                }
+            }
+            else
+            {
+                specifier.template infer_type<BasicFormatString>(*param_type);
+            }
+        }
+
+        if (!m_lexer.consume_if(s_right_brace))
+        {
+            on_error("Detected unclosed format string - must end with }");
+            return std::nullopt;
+        }
     }
 
-    if (!m_lexer.consume_if(s_right_brace))
+    if (m_expect_no_positions_specified && m_expect_all_positions_specified)
     {
-        on_error("Detected unclosed format string - must end with }");
-        return std::nullopt;
+        on_error("Argument position must be provided on all or not on any specifier");
     }
-    else if (!validate_specifier(specifier))
+    else if (!param_type)
     {
-        return std::nullopt;
+        on_error("Argument position exceeds number of provided arguments");
     }
 
     specifier.m_size = m_lexer.position() - starting_position;
@@ -785,365 +1194,17 @@ constexpr auto BasicFormatString<StringType, ParameterTypes...>::parse_specifier
 
 //==================================================================================================
 template <typename StringType, typename... ParameterTypes>
-constexpr void
-BasicFormatString<StringType, ParameterTypes...>::parse_position(FormatSpecifier &specifier)
+constexpr std::size_t BasicFormatString<StringType, ParameterTypes...>::parse_position()
 {
     if (auto position = m_lexer.consume_number(); position)
     {
-        specifier.m_position = static_cast<std::size_t>(position.value());
         m_expect_all_positions_specified = true;
+        return static_cast<std::size_t>(position.value());
     }
     else
     {
-        specifier.m_position = m_next_position++;
         m_expect_no_positions_specified = true;
-    }
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr void BasicFormatString<StringType, ParameterTypes...>::parse_fill_and_alignment(
-    FormatSpecifier &specifier)
-{
-    if (auto next = m_lexer.peek(1); next)
-    {
-        if ((*next == s_less_than_sign) || (*next == s_greater_than_sign) || (*next == s_caret))
-        {
-            specifier.m_fill = m_lexer.consume().value();
-        }
-    }
-
-    if (m_lexer.consume_if(s_less_than_sign))
-    {
-        specifier.m_alignment = FormatSpecifier::Alignment::Left;
-    }
-    else if (m_lexer.consume_if(s_greater_than_sign))
-    {
-        specifier.m_alignment = FormatSpecifier::Alignment::Right;
-    }
-    else if (m_lexer.consume_if(s_caret))
-    {
-        specifier.m_alignment = FormatSpecifier::Alignment::Center;
-    }
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr void
-BasicFormatString<StringType, ParameterTypes...>::parse_sign(FormatSpecifier &specifier)
-{
-    if (m_lexer.consume_if(s_plus_sign))
-    {
-        specifier.m_sign = FormatSpecifier::Sign::Always;
-    }
-    else if (m_lexer.consume_if(s_minus_sign))
-    {
-        specifier.m_sign = FormatSpecifier::Sign::NegativeOnly;
-    }
-    else if (m_lexer.consume_if(s_space))
-    {
-        specifier.m_sign = FormatSpecifier::Sign::NegativeOnlyWithPositivePadding;
-    }
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr void
-BasicFormatString<StringType, ParameterTypes...>::parse_alternate_form_and_zero_padding(
-    FormatSpecifier &specifier)
-{
-    if (m_lexer.consume_if(s_number_sign))
-    {
-        specifier.m_alternate_form = true;
-    }
-
-    if (m_lexer.consume_if(s_zero) &&
-        (specifier.m_alignment == FormatSpecifier::Alignment::Default))
-    {
-        specifier.m_zero_padding = true;
-    }
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr void
-BasicFormatString<StringType, ParameterTypes...>::parse_width(FormatSpecifier &specifier)
-{
-    if (auto width = m_lexer.consume_number(); width)
-    {
-        specifier.m_width = static_cast<std::size_t>(*width);
-    }
-    else if (m_lexer.consume_if(s_left_brace))
-    {
-        if (auto nested_specifier = parse_specifier(SpecifierType::Nested); nested_specifier)
-        {
-            specifier.m_width_position = nested_specifier->m_position;
-        }
-    }
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr void
-BasicFormatString<StringType, ParameterTypes...>::parse_precision(FormatSpecifier &specifier)
-{
-    if (m_lexer.consume_if(s_decimal))
-    {
-        if (auto precision = m_lexer.consume_number(); precision)
-        {
-            specifier.m_precision = static_cast<std::size_t>(*precision);
-        }
-        else if (m_lexer.consume_if(s_left_brace))
-        {
-            if (auto nested_specifier = parse_specifier(SpecifierType::Nested); nested_specifier)
-            {
-                specifier.m_precision_position = nested_specifier->m_position;
-            }
-        }
-        else
-        {
-            on_error("Expected a non-negative precision or nested replacement field after decimal");
-        }
-    }
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr void BasicFormatString<StringType, ParameterTypes...>::parse_locale_specific_form(
-    FormatSpecifier &specifier)
-{
-    if (m_lexer.consume_if(s_letter_l))
-    {
-        specifier.m_locale_specific_form = true;
-    }
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr void
-BasicFormatString<StringType, ParameterTypes...>::parse_type(FormatSpecifier &specifier)
-{
-    if (auto ch = m_lexer.peek(); ch)
-    {
-        if (auto type = FormatSpecifier::type_of(ch.value()); type)
-        {
-            specifier.m_type = type.value();
-            m_lexer.consume();
-
-            if (classifier::is_upper(ch.value()))
-            {
-                specifier.m_case = FormatSpecifier::Case::Upper;
-            }
-        }
-    }
-
-    if (specifier.m_type == FormatSpecifier::Type::None)
-    {
-        infer_type(specifier);
-    }
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr void
-BasicFormatString<StringType, ParameterTypes...>::infer_type(FormatSpecifier &specifier)
-{
-    if (auto type = parameter_type(specifier.m_position); type)
-    {
-        switch (type.value())
-        {
-            case ParameterType::Generic:
-                break;
-            case ParameterType::Character:
-                specifier.m_type = FormatSpecifier::Type::Character;
-                break;
-            case ParameterType::String:
-                specifier.m_type = FormatSpecifier::Type::String;
-                break;
-            case ParameterType::Pointer:
-                specifier.m_type = FormatSpecifier::Type::Pointer;
-                break;
-            case ParameterType::Integral:
-                specifier.m_type = FormatSpecifier::Type::Decimal;
-                break;
-            case ParameterType::FloatingPoint:
-                specifier.m_type = FormatSpecifier::Type::General;
-                break;
-            case ParameterType::Boolean:
-                specifier.m_type = FormatSpecifier::Type::String;
-                break;
-        }
-    }
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr bool BasicFormatString<StringType, ParameterTypes...>::validate_specifier(
-    const FormatSpecifier &specifier)
-{
-    std::optional<ParameterType> type = parameter_type(specifier.m_position);
-
-    // Validate the position option.
-    if (m_expect_no_positions_specified && m_expect_all_positions_specified)
-    {
-        on_error("Argument position must be provided on all or not on any specifier");
-    }
-    else if (!type)
-    {
-        on_error("Argument position exceeds number of provided arguments");
-    }
-
-    // Validate the fill character.
-    if (specifier.m_fill &&
-        ((specifier.m_fill == s_left_brace) || (specifier.m_fill == s_right_brace)))
-    {
-        on_error("Characters { and } are not allowed as fill characters");
-    }
-    else if (
-        specifier.m_fill &&
-        (static_cast<std::make_unsigned_t<char_type>>(*specifier.m_fill) >= 0x80))
-    {
-        on_error("Non-ascii characters are not allowed as fill characters");
-    }
-
-    // Validate the sign.
-    if ((specifier.m_sign != FormatSpecifier::Sign::Default) && !specifier.is_numeric())
-    {
-        on_error("Sign may only be used with numeric presentation types");
-    }
-
-    // Validate the alternate form.
-    if (specifier.m_alternate_form &&
-        (!specifier.is_numeric() || (specifier.m_type == FormatSpecifier::Type::Decimal)))
-    {
-        on_error("Alternate form may only be used with non-decimal numeric presentation types");
-    }
-
-    // Validate the zero-padding option.
-    if (specifier.m_zero_padding && !specifier.is_numeric())
-    {
-        on_error("Zero-padding may only be used with numeric presentation types");
-    }
-
-    // Validate the width value.
-    if (specifier.m_width && (*specifier.m_width == 0))
-    {
-        on_error("Width must be a positive (non-zero) value");
-    }
-    else if (specifier.m_width_position)
-    {
-        const auto nested_type = parameter_type(*specifier.m_width_position);
-
-        if (nested_type != ParameterType::Integral)
-        {
-            on_error("Position of width parameter must be an integral type");
-        }
-    }
-
-    // Validate the precision value.
-    if (specifier.m_precision || specifier.m_precision_position)
-    {
-        if ((type != ParameterType::String) && (type != ParameterType::FloatingPoint))
-        {
-            on_error("Precision may only be used for string and floating point types");
-        }
-        else if (specifier.m_precision_position)
-        {
-            const auto nested_type = parameter_type(*specifier.m_precision_position);
-
-            if (nested_type != ParameterType::Integral)
-            {
-                on_error("Position of precision parameter must be an integral type");
-            }
-        }
-    }
-
-    // Validate the locale-specifc form.
-    if (specifier.m_locale_specific_form &&
-        ((type != ParameterType::Integral) && (type != ParameterType::FloatingPoint) &&
-         (type != ParameterType::Boolean)))
-    {
-        on_error("Locale-specific form may only be used for numeric and boolean types");
-    }
-
-    // Validate the presentation type.
-    if (specifier.m_type != FormatSpecifier::Type::None)
-    {
-        validate_type(*type, specifier);
-    }
-
-    return !has_error();
-}
-
-//==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr void BasicFormatString<StringType, ParameterTypes...>::validate_type(
-    ParameterType type,
-    const FormatSpecifier &specifier)
-{
-    switch (type)
-    {
-        case ParameterType::Generic:
-            on_error("Generic types must be formatted with {}");
-            break;
-
-        case ParameterType::Character:
-            if ((specifier.m_type != FormatSpecifier::Type::Character) &&
-                (specifier.m_type != FormatSpecifier::Type::Binary) &&
-                (specifier.m_type != FormatSpecifier::Type::Octal) &&
-                (specifier.m_type != FormatSpecifier::Type::Decimal) &&
-                (specifier.m_type != FormatSpecifier::Type::Hex))
-            {
-                on_error("Character types must be formatted with {} or {:cbBodxX}");
-            }
-            break;
-
-        case ParameterType::String:
-            if (specifier.m_type != FormatSpecifier::Type::String)
-            {
-                on_error("String types must be formatted with {} or {:s}");
-            }
-            break;
-
-        case ParameterType::Pointer:
-            if (specifier.m_type != FormatSpecifier::Type::Pointer)
-            {
-                on_error("Pointer types must be formatted with {} or {:p}");
-            }
-            break;
-
-        case ParameterType::Integral:
-            if ((specifier.m_type != FormatSpecifier::Type::Character) &&
-                (specifier.m_type != FormatSpecifier::Type::Binary) &&
-                (specifier.m_type != FormatSpecifier::Type::Octal) &&
-                (specifier.m_type != FormatSpecifier::Type::Decimal) &&
-                (specifier.m_type != FormatSpecifier::Type::Hex))
-            {
-                on_error("Integral types must be formatted with {} or one of {:cbBodxX}");
-            }
-            break;
-
-        case ParameterType::FloatingPoint:
-            if ((specifier.m_type != FormatSpecifier::Type::HexFloat) &&
-                (specifier.m_type != FormatSpecifier::Type::Scientific) &&
-                (specifier.m_type != FormatSpecifier::Type::Fixed) &&
-                (specifier.m_type != FormatSpecifier::Type::General))
-            {
-                on_error("Floating point types must be formatted with {} or one of {:aAeEfFgG}");
-            }
-            break;
-
-        case ParameterType::Boolean:
-            if ((specifier.m_type != FormatSpecifier::Type::Character) &&
-                (specifier.m_type != FormatSpecifier::Type::String) &&
-                (specifier.m_type != FormatSpecifier::Type::Binary) &&
-                (specifier.m_type != FormatSpecifier::Type::Octal) &&
-                (specifier.m_type != FormatSpecifier::Type::Decimal) &&
-                (specifier.m_type != FormatSpecifier::Type::Hex))
-            {
-                on_error("Boolean types must be formatted with {} or one of {:csbBodxX}");
-            }
-            break;
+        return m_next_position++;
     }
 }
 
