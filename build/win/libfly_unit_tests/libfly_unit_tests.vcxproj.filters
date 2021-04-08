@@ -158,6 +158,12 @@
     <ClCompile Include="..\..\..\test\types\numeric\literals.cpp">
       <Filter>types\numeric</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\types\string\format_parameters.cpp">
+      <Filter>types\string</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\types\string\format_string.cpp">
+      <Filter>types\string</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\types\string\string.cpp">
       <Filter>types\string</Filter>
     </ClCompile>
@@ -168,12 +174,6 @@
       <Filter>types\string</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\string\string_format.cpp">
-      <Filter>types\string</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string\string_format_parameters.cpp">
-      <Filter>types\string</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string\string_format_specifier.cpp">
       <Filter>types\string</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\string\string_lexer.cpp">

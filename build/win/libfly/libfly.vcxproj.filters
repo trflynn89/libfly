@@ -289,19 +289,25 @@
     <ClInclude Include="..\..\..\fly\types\string\string_literal.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\format_context.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\format_parameters.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\format_specifier.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\format_string.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\stream_util.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_classifier.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.hpp">
-      <Filter>types\string\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_format_parameters.hpp">
-      <Filter>types\string\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_format_specifier.hpp">
-      <Filter>types\string\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_stream_util.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp">
