@@ -802,7 +802,7 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_error(make_format(FMT("{:#d}"), i), s_bad_alternate_form);
         test_error(make_format(FMT("{:#}"), s), s_bad_alternate_form);
-        test_error(make_format(FMT("{:#}"), g), s_bad_alternate_form);
+        test_error(make_format(FMT("{:#}"), g), s_bad_generic);
     }
 
     CATCH_SECTION("Zero-padding only valid for numeric types")
