@@ -1,4 +1,4 @@
-FROM ubuntu:20.10
+FROM ubuntu:21.04
 
 MAINTAINER Timothy Flynn <trflynn89@pm.me>
 
@@ -8,7 +8,7 @@ ARG JDK_VERSION
 
 # Install base tools
 RUN apt-get update && \
-    apt-get install -y \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
         curl \
         git \
         lcov \
@@ -19,7 +19,7 @@ RUN apt-get update && \
     echo "Set disable_coredump false" >> /etc/sudo.conf
 
 # Install gcc
-RUN apt-get install -y \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
         gcc-$GCC_VERSION \
         gcc-$GCC_VERSION-multilib \
         g++-$GCC_VERSION \
@@ -33,7 +33,7 @@ RUN apt-get install -y \
     done
 
 # Install clang
-RUN apt-get install -y \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
         clang-$CLANG_VERSION \
         clang-format-$CLANG_VERSION \
         lld-$CLANG_VERSION \
