@@ -1,5 +1,7 @@
 #include "fly/config/config.hpp"
 
+#include <mutex>
+
 namespace fly::config {
 
 //==================================================================================================
