@@ -1433,8 +1433,8 @@ private:
      */
     template <typename... Args>
     using object_insertion_result = std::conditional_t<
-        std::is_void_v<decltype(
-            std::declval<JsonTraits::object_type>().insert(std::declval<Args>()...))>,
+        std::is_void_v<decltype(std::declval<JsonTraits::object_type>().insert(
+            std::declval<Args>()...))>,
         void,
         std::pair<iterator, bool>>;
 
