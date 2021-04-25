@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/string/detail/string_classifier.hpp"
+#include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/literals.hpp"
 
@@ -31,7 +31,7 @@ class BasicLexer
     using string_type = std::basic_string<CharType>;
 
     using traits = detail::BasicStringTraits<string_type>;
-    using classifier = detail::BasicStringClassifier<string_type>;
+    using classifier = detail::BasicClassifier<CharType>;
     using view_type = typename traits::view_type;
 
 public:

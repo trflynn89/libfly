@@ -1,9 +1,9 @@
 #pragma once
 
 #include "fly/traits/traits.hpp"
+#include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/stream_util.hpp"
-#include "fly/types/string/detail/string_classifier.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/string_unicode.hpp"
 
@@ -85,8 +85,6 @@ struct Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>
 
 private:
     using string_type = std::basic_string<CharType>;
-    using string_like_type = detail::is_like_supported_string_t<T>;
-    using view_like_type = std::basic_string_view<typename string_like_type::value_type>;
     using specifier = detail::BasicFormatSpecifier<CharType>;
 
     static constexpr const auto s_space = FLY_CHR(CharType, ' ');
@@ -279,7 +277,7 @@ void Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>
     const std::size_t min_width = context.spec().width(context, 0);
     const std::size_t max_width = context.spec().precision(context, string_type::npos);
 
-    const std::size_t actual_size = detail::BasicStringClassifier<string_like_type>::size(value);
+    const std::size_t actual_size = detail::BasicClassifier<CharType>::size(value);
     const std::size_t value_size = std::min(max_width, actual_size);
 
     const std::size_t padding_size = std::max(value_size, min_width) - value_size;
@@ -328,6 +326,9 @@ void Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>
     std::size_t value_size,
     FormatContext &context)
 {
+    using string_like_type = detail::is_like_supported_string_t<T>;
+    using view_like_type = std::basic_string_view<typename string_like_type::value_type>;
+
     view_like_type view;
 
     if constexpr (std::is_array_v<T> || std::is_pointer_v<T>)
@@ -599,7 +600,7 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
     {
         for (char *it = begin; it != result.ptr; ++it)
         {
-            *it = detail::BasicStringClassifier<std::string>::to_upper(*it);
+            *it = detail::BasicClassifier<char>::to_upper(*it);
         }
     }
 

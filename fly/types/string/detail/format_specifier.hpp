@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/string/detail/string_classifier.hpp"
+#include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/lexer.hpp"
 #include "fly/types/string/literals.hpp"
 
@@ -587,8 +587,6 @@ constexpr void BasicFormatSpecifier<CharType>::parse_type(
     FormatString &format,
     typename FormatString::ParameterType parameter_type)
 {
-    using classifier = BasicStringClassifier<std::basic_string<CharType>>;
-
     if (auto ch = format.m_lexer.peek(); ch)
     {
         if (auto type = type_of(ch.value()); type)
@@ -596,7 +594,7 @@ constexpr void BasicFormatSpecifier<CharType>::parse_type(
             m_type = type.value();
             format.m_lexer.consume();
 
-            if (classifier::is_upper(ch.value()))
+            if (BasicClassifier<CharType>::is_upper(ch.value()))
             {
                 m_case = Case::Upper;
             }

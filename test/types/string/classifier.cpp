@@ -7,7 +7,7 @@
 #include <string>
 
 CATCH_TEMPLATE_TEST_CASE(
-    "BasicStringClassifier",
+    "BasicClassifier",
     "[string]",
     std::string,
     std::wstring,

@@ -1,10 +1,10 @@
 #pragma once
 
+#include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_context.hpp"
 #include "fly/types/string/detail/format_parameters.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/format_string.hpp"
-#include "fly/types/string/detail/string_classifier.hpp"
 #include "fly/types/string/detail/string_converter.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/string_unicode.hpp"
@@ -55,7 +55,6 @@ using String32Traits = detail::BasicStringTraits<std::u32string>;
 template <typename StringType>
 class BasicString
 {
-    using classifier = detail::BasicStringClassifier<StringType>;
     using traits = detail::BasicStringTraits<StringType>;
     using unicode = detail::BasicStringUnicode<StringType>;
 
@@ -517,63 +516,63 @@ template <typename StringType>
 template <typename T, enable_if<detail::is_like_supported_string<T>>>
 constexpr inline auto BasicString<StringType>::size(T &&value) -> size_type
 {
-    return classifier::size(std::forward<T>(value));
+    return detail::BasicClassifier<char_type>::size(std::forward<T>(value));
 }
 
 //==================================================================================================
 template <typename StringType>
 constexpr inline bool BasicString<StringType>::is_alpha(char_type ch)
 {
-    return classifier::is_alpha(ch);
+    return detail::BasicClassifier<char_type>::is_alpha(ch);
 }
 
 //==================================================================================================
 template <typename StringType>
 constexpr inline bool BasicString<StringType>::is_upper(char_type ch)
 {
-    return classifier::is_upper(ch);
+    return detail::BasicClassifier<char_type>::is_upper(ch);
 }
 
 //==================================================================================================
 template <typename StringType>
 constexpr inline bool BasicString<StringType>::is_lower(char_type ch)
 {
-    return classifier::is_lower(ch);
+    return detail::BasicClassifier<char_type>::is_lower(ch);
 }
 
 //==================================================================================================
 template <typename StringType>
 constexpr inline bool BasicString<StringType>::is_digit(char_type ch)
 {
-    return classifier::is_digit(ch);
+    return detail::BasicClassifier<char_type>::is_digit(ch);
 }
 
 //==================================================================================================
 template <typename StringType>
 constexpr inline auto BasicString<StringType>::to_upper(char_type ch) -> char_type
 {
-    return classifier::to_upper(ch);
+    return detail::BasicClassifier<char_type>::to_upper(ch);
 }
 
 //==================================================================================================
 template <typename StringType>
 constexpr inline auto BasicString<StringType>::to_lower(char_type ch) -> char_type
 {
-    return classifier::to_lower(ch);
+    return detail::BasicClassifier<char_type>::to_lower(ch);
 }
 
 //==================================================================================================
 template <typename StringType>
 constexpr inline bool BasicString<StringType>::is_x_digit(char_type ch)
 {
-    return classifier::is_x_digit(ch);
+    return detail::BasicClassifier<char_type>::is_x_digit(ch);
 }
 
 //==================================================================================================
 template <typename StringType>
 constexpr inline bool BasicString<StringType>::is_space(char_type ch)
 {
-    return classifier::is_space(ch);
+    return detail::BasicClassifier<char_type>::is_space(ch);
 }
 
 //==================================================================================================
