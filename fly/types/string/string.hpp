@@ -68,7 +68,7 @@ public:
 
     template <typename... ParameterTypes>
     using FormatString =
-        detail::BasicFormatString<StringType, std::type_identity_t<ParameterTypes>...>;
+        detail::BasicFormatString<char_type, std::type_identity_t<ParameterTypes>...>;
 
     /**
      * Determine the length of any string-like value. Accepts character arrays, std::basic_string

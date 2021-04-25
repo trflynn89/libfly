@@ -48,42 +48,41 @@ enum class UserFormattedEnum
     return stream;
 }
 
-template <typename StringType, typename... ParameterTypes>
-using FormatString = fly::detail::BasicFormatString<
-    fly::detail::is_like_supported_string_t<StringType>,
-    std::type_identity_t<ParameterTypes>...>;
+template <typename CharType, typename... ParameterTypes>
+using FormatString =
+    fly::detail::BasicFormatString<CharType, std::type_identity_t<ParameterTypes>...>;
 
 template <typename StringType, typename... ParameterTypes>
 void test_format(
-    FormatString<StringType, ParameterTypes...> &&format,
+    FormatString<
+        typename fly::detail::is_like_supported_string_t<StringType>::value_type,
+        ParameterTypes...> format,
     StringType &&expected,
     ParameterTypes &&...parameters)
 {
     using BasicString = fly::BasicString<fly::detail::is_like_supported_string_t<StringType>>;
 
-    auto result = BasicString::format(
-        std::forward<FormatString<StringType, ParameterTypes...>>(format),
-        std::forward<ParameterTypes>(parameters)...);
+    auto result =
+        BasicString::format(std::move(format), std::forward<ParameterTypes>(parameters)...);
 
     CATCH_CHECK(result == expected);
 }
 
-template <typename StringType>
-StringType reserved_codepoint()
+template <typename CharType>
+std::basic_string<CharType> reserved_codepoint()
 {
     static constexpr const std::uint32_t s_reserved = 0xd800;
-    using char_type = typename StringType::value_type;
-    StringType result;
+    std::basic_string<CharType> result;
 
-    if constexpr (sizeof(char_type) == 1)
+    if constexpr (sizeof(CharType) == 1)
     {
-        result += static_cast<char_type>(0xe0 | (s_reserved >> 12));
-        result += static_cast<char_type>(0x80 | ((s_reserved >> 6) & 0x3f));
-        result += static_cast<char_type>(0x80 | (s_reserved & 0x3f));
+        result += static_cast<CharType>(0xe0 | (s_reserved >> 12));
+        result += static_cast<CharType>(0x80 | ((s_reserved >> 6) & 0x3f));
+        result += static_cast<CharType>(0x80 | (s_reserved & 0x3f));
     }
     else
     {
-        result = StringType(1, static_cast<char_type>(s_reserved));
+        result = std::basic_string<CharType>(1, static_cast<CharType>(s_reserved));
     }
 
     return result;
@@ -94,15 +93,15 @@ StringType reserved_codepoint()
 CATCH_TEMPLATE_TEST_CASE(
     "BasicStringFormatter",
     "[string]",
-    std::string,
-    std::wstring,
-    std::u8string,
-    std::u16string,
-    std::u32string)
+    char,
+    wchar_t,
+    char8_t,
+    char16_t,
+    char32_t)
 {
-    using StringType = TestType;
-    using BasicString = fly::BasicString<StringType>;
-    using char_type = typename BasicString::char_type;
+    using char_type = TestType;
+    using string_type = std::basic_string<char_type>;
+    using BasicString = fly::BasicString<string_type>;
     using view_type = typename BasicString::view_type;
 
     auto is_all_hex = [](view_type value)
@@ -484,10 +483,10 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:c}"), FMT("a"), 0x61);
         test_format(
             FMT("{:c}"),
-            StringType(1, static_cast<char_type>(DefaultFormattedEnum::One)),
+            string_type(1, static_cast<char_type>(DefaultFormattedEnum::One)),
             DefaultFormattedEnum::One);
-        test_format(FMT("{:c}"), StringType(1, static_cast<char_type>(true)), true);
-        test_format(FMT("{:c}"), StringType(1, static_cast<char_type>(false)), false);
+        test_format(FMT("{:c}"), string_type(1, static_cast<char_type>(true)), true);
+        test_format(FMT("{:c}"), string_type(1, static_cast<char_type>(false)), false);
     }
 
     CATCH_SECTION("Presentation type may be set (string)")
@@ -753,37 +752,37 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Invalid Unicode string cannot be formatted")
     {
-        if constexpr (!std::is_same_v<StringType, std::string>)
+        if constexpr (!std::is_same_v<char_type, char>)
         {
-            const auto reserved = reserved_codepoint<std::string>();
+            const auto reserved = reserved_codepoint<char>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), "ab" + reserved);
         }
-        if constexpr (!std::is_same_v<StringType, std::wstring>)
+        if constexpr (!std::is_same_v<char_type, wchar_t>)
         {
-            const auto reserved = reserved_codepoint<std::wstring>();
+            const auto reserved = reserved_codepoint<wchar_t>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), L"ab" + reserved);
         }
-        if constexpr (!std::is_same_v<StringType, std::u8string>)
+        if constexpr (!std::is_same_v<char_type, char8_t>)
         {
-            const auto reserved = reserved_codepoint<std::u8string>();
+            const auto reserved = reserved_codepoint<char8_t>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), u8"ab" + reserved);
         }
-        if constexpr (!std::is_same_v<StringType, std::u16string>)
+        if constexpr (!std::is_same_v<char_type, char16_t>)
         {
-            const auto reserved = reserved_codepoint<std::u16string>();
+            const auto reserved = reserved_codepoint<char16_t>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), u"ab" + reserved);
         }
-        if constexpr (!std::is_same_v<StringType, std::u32string>)
+        if constexpr (!std::is_same_v<char_type, char32_t>)
         {
-            const auto reserved = reserved_codepoint<std::u32string>();
+            const auto reserved = reserved_codepoint<char32_t>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), U"ab" + reserved);

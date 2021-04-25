@@ -93,9 +93,7 @@ private:
 template <typename CharType, std::size_t N, typename... Types>
 FLY_CONSTEVAL auto make_format(const CharType (&format)[N], Types &&...)
 {
-    using StringType = std::basic_string<CharType>;
-    using FormatString = fly::detail::BasicFormatString<StringType, std::type_identity_t<Types>...>;
-
+    using FormatString = fly::detail::BasicFormatString<CharType, std::type_identity_t<Types>...>;
     return FormatString(format);
 }
 
@@ -170,15 +168,13 @@ constexpr const char *s_bad_bool = "Boolean types must be formatted with {} or o
 CATCH_TEMPLATE_TEST_CASE(
     "BasicFormatString",
     "[string]",
-    std::string,
-    std::wstring,
-    std::u8string,
-    std::u16string,
-    std::u32string)
+    char,
+    wchar_t,
+    char8_t,
+    char16_t,
+    char32_t)
 {
-    using StringType = TestType;
-
-    using char_type = typename StringType::value_type;
+    using char_type = TestType;
     using Specifier = fly::detail::BasicFormatSpecifier<char_type>;
 
     constexpr const GenericType g {};
@@ -679,15 +675,13 @@ CATCH_TEMPLATE_TEST_CASE(
 CATCH_TEMPLATE_TEST_CASE(
     "BasicFormatStringErrors",
     "[string]",
-    std::string,
-    std::wstring,
-    std::u8string,
-    std::u16string,
-    std::u32string)
+    char,
+    wchar_t,
+    char8_t,
+    char16_t,
+    char32_t)
 {
-    using StringType = TestType;
-
-    using char_type = typename StringType::value_type;
+    using char_type = TestType;
 
     constexpr const GenericType g {};
     constexpr const auto c = FLY_CHR(char_type, 'a');
