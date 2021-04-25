@@ -9,9 +9,10 @@
 
 CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, char16_t, char32_t)
 {
-    using char_type = TestType;
-    using string_type = std::basic_string<char_type>;
-    using BasicString = fly::BasicString<string_type>;
+    using BasicString = fly::BasicString<TestType>;
+
+    using string_type = typename BasicString::string_type;
+    using char_type = typename BasicString::char_type;
     using codepoint_type = typename BasicString::codepoint_type;
 
     auto make_string = [](std::vector<codepoint_type> &&bytes) -> string_type

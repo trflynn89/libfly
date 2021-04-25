@@ -1957,7 +1957,7 @@ bool Json::contains(T key) const
 template <typename T, enable_if<JsonTraits::is_string_like<T>>>
 JsonTraits::string_type Json::convert_to_string(T value)
 {
-    using StringType = BasicString<JsonTraits::is_string_like_t<T>>;
+    using StringType = BasicString<typename JsonTraits::is_string_like_t<T>::value_type>;
 
     if constexpr (std::is_same_v<typename StringType::string_type, JsonTraits::string_type>)
     {

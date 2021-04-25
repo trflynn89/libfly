@@ -1,6 +1,7 @@
 #include "fly/types/string/detail/format_parameters.hpp"
 
 #include "fly/types/string/detail/format_context.hpp"
+#include "fly/types/string/detail/string_traits.hpp"
 
 #include "catch2/catch_approx.hpp"
 #include "catch2/catch_template_test_macros.hpp"
@@ -32,9 +33,11 @@ CATCH_TEMPLATE_TEST_CASE(
     char16_t,
     char32_t)
 {
-    using char_type = TestType;
-    using string_type = std::basic_string<char_type>;
-    using view_type = std::basic_string_view<char_type>;
+    using traits = fly::detail::BasicStringTraits<TestType>;
+
+    using string_type = typename traits::string_type;
+    using char_type = typename traits::char_type;
+    using view_type = typename traits::view_type;
 
     using FormatContext =
         fly::detail::BasicFormatContext<std::back_insert_iterator<string_type>, char_type>;

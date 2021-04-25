@@ -28,17 +28,14 @@
 
 namespace fly {
 
-/**
- * Forward declarations of the supported BasicString specializations.
- */
-template <typename StringType>
+template <typename CharType>
 class BasicString;
 
-using String = BasicString<std::string>;
-using WString = BasicString<std::wstring>;
-using String8 = BasicString<std::u8string>;
-using String16 = BasicString<std::u16string>;
-using String32 = BasicString<std::u32string>;
+using String = BasicString<char>;
+using WString = BasicString<wchar_t>;
+using String8 = BasicString<char8_t>;
+using String16 = BasicString<char16_t>;
+using String32 = BasicString<char32_t>;
 
 using StringTraits = detail::BasicStringTraits<char>;
 using WStringTraits = detail::BasicStringTraits<wchar_t>;
@@ -52,11 +49,11 @@ using String32Traits = detail::BasicStringTraits<char32_t>;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 21, 2019
  */
-template <typename StringType>
+template <typename CharType>
 class BasicString
 {
-    using traits = detail::BasicStringTraits<typename StringType::value_type>;
-    using unicode = detail::BasicUnicode<typename StringType::value_type>;
+    using traits = detail::BasicStringTraits<CharType>;
+    using unicode = detail::BasicUnicode<CharType>;
 
 public:
     using string_type = typename traits::string_type;
@@ -201,7 +198,7 @@ public:
      *
      * @return A vector containing the split strings.
      */
-    static std::vector<StringType> split(view_type input, char_type delimiter);
+    static std::vector<string_type> split(view_type input, char_type delimiter);
 
     /**
      * Split a string into a vector of strings, up to a maximum size. If the max size is reached,
@@ -213,14 +210,14 @@ public:
      *
      * @return A vector containing the split strings.
      */
-    static std::vector<StringType> split(view_type input, char_type delimiter, size_type count);
+    static std::vector<string_type> split(view_type input, char_type delimiter, size_type count);
 
     /**
      * Remove leading and trailing whitespace from a string.
      *
      * @param target The string to trim.
      */
-    static void trim(StringType &target);
+    static void trim(string_type &target);
 
     /**
      * Replace all instances of a substring in a string with a character.
@@ -229,7 +226,7 @@ public:
      * @param search The string to search for and replace.
      * @param replace The replacement character.
      */
-    static void replace_all(StringType &target, view_type search, char_type replace);
+    static void replace_all(string_type &target, view_type search, char_type replace);
 
     /**
      * Replace all instances of a substring in a string with another string.
@@ -238,7 +235,7 @@ public:
      * @param search The string to search for and replace.
      * @param replace The replacement string.
      */
-    static void replace_all(StringType &target, view_type search, view_type replace);
+    static void replace_all(string_type &target, view_type search, view_type replace);
 
     /**
      * Remove all instances of a substring in a string.
@@ -246,7 +243,7 @@ public:
      * @param target The string container which will be modified.
      * @param search The string to search for and remove.
      */
-    static void remove_all(StringType &target, view_type search);
+    static void remove_all(string_type &target, view_type search);
 
     /**
      * Check if a string matches another string with wildcard expansion.
@@ -291,7 +288,7 @@ public:
      * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
      *         uninitialized value.
      */
-    static std::optional<StringType> encode_codepoint(codepoint_type codepoint);
+    static std::optional<string_type> encode_codepoint(codepoint_type codepoint);
 
     /**
      * Escape all Unicode codepoints in a string.
@@ -318,7 +315,7 @@ public:
      *         Otherwise, an uninitialized value.
      */
     template <char UnicodePrefix = 'U'>
-    static std::optional<StringType> escape_all_codepoints(view_type value);
+    static std::optional<string_type> escape_all_codepoints(view_type value);
 
     /**
      * Escape a single Unicode codepoint, starting at the character pointed to by the provided
@@ -349,7 +346,7 @@ public:
      *         uninitialized value.
      */
     template <char UnicodePrefix = 'U', typename IteratorType>
-    static std::optional<StringType> escape_codepoint(IteratorType &it, const IteratorType &end);
+    static std::optional<string_type> escape_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
      * Unescape all Unicode codepoints in a string.
@@ -365,7 +362,7 @@ public:
      * @return If successful, a copy of the source string with all Unicode codepoints unescaped.
      *         Otherwise, an uninitialized value.
      */
-    static std::optional<StringType> unescape_all_codepoints(view_type value);
+    static std::optional<string_type> unescape_all_codepoints(view_type value);
 
     /**
      * Unescape a single Unicode codepoint, starting at the character pointed to by provided
@@ -387,7 +384,7 @@ public:
      *         uninitialized value.
      */
     template <typename IteratorType>
-    static std::optional<StringType> unescape_codepoint(IteratorType &it, const IteratorType &end);
+    static std::optional<string_type> unescape_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
      * Generate a random string of the given length.
@@ -396,7 +393,7 @@ public:
      *
      * @return The generated string.
      */
-    static StringType generate_random_string(size_type length);
+    static string_type generate_random_string(size_type length);
 
     /**
      * Format a string with a set of format parameters, returning the formatted string. Based
@@ -456,7 +453,8 @@ public:
      * @return A string that has been formatted with the given format parameters.
      */
     template <typename... ParameterTypes>
-    static StringType format(FormatString<ParameterTypes...> &&fmt, ParameterTypes &&...parameters);
+    static string_type
+    format(FormatString<ParameterTypes...> &&fmt, ParameterTypes &&...parameters);
 
     /**
      * Concatenate a list of objects with the given separator.
@@ -469,7 +467,7 @@ public:
      * @return The resulting join of the given arguments.
      */
     template <typename... Args>
-    static StringType join(char_type separator, Args &&...args);
+    static string_type join(char_type separator, Args &&...args);
 
     /**
      * Convert a string to another type. The other type may be a string with a different Unicode
@@ -483,20 +481,20 @@ public:
      *         value.
      */
     template <typename T>
-    static std::optional<T> convert(const StringType &value);
+    static std::optional<T> convert(const string_type &value);
 
 private:
     /**
      * Recursively join one argument into the given string.
      */
     template <typename T, typename... Args>
-    static void join_internal(StringType &result, char_type separator, T &&value, Args &&...args);
+    static void join_internal(string_type &result, char_type separator, T &&value, Args &&...args);
 
     /**
      * Terminator for the variadic template joiner. Join the last argument into the given string.
      */
     template <typename T>
-    static void join_internal(StringType &result, char_type separator, T &&value);
+    static void join_internal(string_type &result, char_type separator, T &&value);
 
     /**
      * A list of alpha-numeric characters in the range [0-9A-Za-z].
@@ -512,83 +510,83 @@ private:
 };
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename T, enable_if<detail::is_like_supported_string<T>>>
-constexpr inline auto BasicString<StringType>::size(T &&value) -> size_type
+constexpr inline auto BasicString<CharType>::size(T &&value) -> size_type
 {
     return detail::BasicClassifier<char_type>::size(std::forward<T>(value));
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr inline bool BasicString<StringType>::is_alpha(char_type ch)
+template <typename CharType>
+constexpr inline bool BasicString<CharType>::is_alpha(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_alpha(ch);
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr inline bool BasicString<StringType>::is_upper(char_type ch)
+template <typename CharType>
+constexpr inline bool BasicString<CharType>::is_upper(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_upper(ch);
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr inline bool BasicString<StringType>::is_lower(char_type ch)
+template <typename CharType>
+constexpr inline bool BasicString<CharType>::is_lower(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_lower(ch);
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr inline bool BasicString<StringType>::is_digit(char_type ch)
+template <typename CharType>
+constexpr inline bool BasicString<CharType>::is_digit(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_digit(ch);
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr inline auto BasicString<StringType>::to_upper(char_type ch) -> char_type
+template <typename CharType>
+constexpr inline auto BasicString<CharType>::to_upper(char_type ch) -> char_type
 {
     return detail::BasicClassifier<char_type>::to_upper(ch);
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr inline auto BasicString<StringType>::to_lower(char_type ch) -> char_type
+template <typename CharType>
+constexpr inline auto BasicString<CharType>::to_lower(char_type ch) -> char_type
 {
     return detail::BasicClassifier<char_type>::to_lower(ch);
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr inline bool BasicString<StringType>::is_x_digit(char_type ch)
+template <typename CharType>
+constexpr inline bool BasicString<CharType>::is_x_digit(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_x_digit(ch);
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr inline bool BasicString<StringType>::is_space(char_type ch)
+template <typename CharType>
+constexpr inline bool BasicString<CharType>::is_space(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_space(ch);
 }
 
 //==================================================================================================
-template <typename StringType>
-std::vector<StringType> BasicString<StringType>::split(view_type input, char_type delimiter)
+template <typename CharType>
+auto BasicString<CharType>::split(view_type input, char_type delimiter) -> std::vector<string_type>
 {
     return split(input, delimiter, 0);
 }
 
 //==================================================================================================
-template <typename StringType>
-std::vector<StringType>
-BasicString<StringType>::split(view_type input, char_type delimiter, size_type count)
+template <typename CharType>
+auto BasicString<CharType>::split(view_type input, char_type delimiter, size_type count)
+    -> std::vector<string_type>
 {
-    std::vector<StringType> elements;
-    StringType item;
+    std::vector<string_type> elements;
+    string_type item;
 
     size_type start = 0;
     size_type end = input.find(delimiter);
@@ -604,12 +602,12 @@ BasicString<StringType>::split(view_type input, char_type delimiter, size_type c
             }
             else
             {
-                elements.push_back(StringType(str));
+                elements.push_back(string_type(str));
             }
         }
     };
 
-    while (end != StringType::npos)
+    while (end != string_type::npos)
     {
         item = input.substr(start, end - start);
         push_item(item);
@@ -625,8 +623,8 @@ BasicString<StringType>::split(view_type input, char_type delimiter, size_type c
 }
 
 //==================================================================================================
-template <typename StringType>
-void BasicString<StringType>::trim(StringType &target)
+template <typename CharType>
+void BasicString<CharType>::trim(string_type &target)
 {
     auto is_non_space = [](auto ch)
     {
@@ -641,12 +639,12 @@ void BasicString<StringType>::trim(StringType &target)
 }
 
 //==================================================================================================
-template <typename StringType>
-void BasicString<StringType>::replace_all(StringType &target, view_type search, char_type replace)
+template <typename CharType>
+void BasicString<CharType>::replace_all(string_type &target, view_type search, char_type replace)
 {
     size_type index = target.find(search);
 
-    while (!search.empty() && (index != StringType::npos))
+    while (!search.empty() && (index != string_type::npos))
     {
         target.replace(index, search.size(), 1, replace);
         index = target.find(search);
@@ -654,12 +652,12 @@ void BasicString<StringType>::replace_all(StringType &target, view_type search, 
 }
 
 //==================================================================================================
-template <typename StringType>
-void BasicString<StringType>::replace_all(StringType &target, view_type search, view_type replace)
+template <typename CharType>
+void BasicString<CharType>::replace_all(string_type &target, view_type search, view_type replace)
 {
     size_type index = target.find(search);
 
-    while (!search.empty() && (index != StringType::npos))
+    while (!search.empty() && (index != string_type::npos))
     {
         target.replace(index, search.size(), replace);
         index = target.find(search);
@@ -667,20 +665,20 @@ void BasicString<StringType>::replace_all(StringType &target, view_type search, 
 }
 
 //==================================================================================================
-template <typename StringType>
-void BasicString<StringType>::remove_all(StringType &target, view_type search)
+template <typename CharType>
+void BasicString<CharType>::remove_all(string_type &target, view_type search)
 {
-    replace_all(target, search, StringType());
+    replace_all(target, search, view_type {});
 }
 
 //==================================================================================================
-template <typename StringType>
-bool BasicString<StringType>::wildcard_match(view_type source, view_type search)
+template <typename CharType>
+bool BasicString<CharType>::wildcard_match(view_type source, view_type search)
 {
     static constexpr char_type s_wildcard = '*';
     bool result = !search.empty();
 
-    const std::vector<StringType> segments = split(search, s_wildcard);
+    const std::vector<string_type> segments = split(search, s_wildcard);
     size_type index = 0;
 
     if (!segments.empty())
@@ -698,7 +696,7 @@ bool BasicString<StringType>::wildcard_match(view_type source, view_type search)
         {
             index = source.find(*it, index);
 
-            if (index == StringType::npos)
+            if (index == string_type::npos)
             {
                 result = false;
             }
@@ -709,8 +707,8 @@ bool BasicString<StringType>::wildcard_match(view_type source, view_type search)
 }
 
 //==================================================================================================
-template <typename StringType>
-inline bool BasicString<StringType>::validate(view_type value)
+template <typename CharType>
+inline bool BasicString<CharType>::validate(view_type value)
 {
     auto it = value.cbegin();
     const auto end = value.cend();
@@ -719,27 +717,28 @@ inline bool BasicString<StringType>::validate(view_type value)
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename IteratorType>
-inline auto BasicString<StringType>::decode_codepoint(IteratorType &it, const IteratorType &end)
+inline auto BasicString<CharType>::decode_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<codepoint_type>
 {
     return unicode::decode_codepoint(it, end);
 }
 
 //==================================================================================================
-template <typename StringType>
-inline std::optional<StringType> BasicString<StringType>::encode_codepoint(codepoint_type codepoint)
+template <typename CharType>
+inline auto BasicString<CharType>::encode_codepoint(codepoint_type codepoint)
+    -> std::optional<string_type>
 {
     return unicode::encode_codepoint(codepoint);
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <char UnicodePrefix>
-std::optional<StringType> BasicString<StringType>::escape_all_codepoints(view_type value)
+auto BasicString<CharType>::escape_all_codepoints(view_type value) -> std::optional<string_type>
 {
-    StringType result;
+    string_type result;
     result.reserve(value.size());
 
     const auto end = value.cend();
@@ -760,19 +759,19 @@ std::optional<StringType> BasicString<StringType>::escape_all_codepoints(view_ty
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <char UnicodePrefix, typename IteratorType>
-inline std::optional<StringType>
-BasicString<StringType>::escape_codepoint(IteratorType &it, const IteratorType &end)
+inline auto BasicString<CharType>::escape_codepoint(IteratorType &it, const IteratorType &end)
+    -> std::optional<string_type>
 {
     return unicode::template escape_codepoint<UnicodePrefix>(it, end);
 }
 
 //==================================================================================================
-template <typename StringType>
-std::optional<StringType> BasicString<StringType>::unescape_all_codepoints(view_type value)
+template <typename CharType>
+auto BasicString<CharType>::unescape_all_codepoints(view_type value) -> std::optional<string_type>
 {
-    StringType result;
+    string_type result;
     result.reserve(value.size());
 
     const auto end = value.cend();
@@ -813,17 +812,17 @@ std::optional<StringType> BasicString<StringType>::unescape_all_codepoints(view_
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename IteratorType>
-inline std::optional<StringType>
-BasicString<StringType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
+inline auto BasicString<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
+    -> std::optional<string_type>
 {
     return unicode::unescape_codepoint(it, end);
 }
 
 //==================================================================================================
-template <typename StringType>
-StringType BasicString<StringType>::generate_random_string(size_type length)
+template <typename CharType>
+auto BasicString<CharType>::generate_random_string(size_type length) -> string_type
 {
     using short_distribution = std::uniform_int_distribution<short>;
 
@@ -836,7 +835,7 @@ StringType BasicString<StringType>::generate_random_string(size_type length)
     static thread_local std::mt19937 s_engine(s_seed);
     short_distribution distribution(0, limit);
 
-    StringType result;
+    string_type result;
     result.reserve(length);
 
     while (length-- != 0)
@@ -848,14 +847,14 @@ StringType BasicString<StringType>::generate_random_string(size_type length)
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename... ParameterTypes>
-StringType BasicString<StringType>::format(
+auto BasicString<CharType>::format(
     FormatString<ParameterTypes...> &&fmt,
-    ParameterTypes &&...parameters)
+    ParameterTypes &&...parameters) -> string_type
 {
     using FormatContext =
-        detail::BasicFormatContext<std::back_insert_iterator<StringType>, char_type>;
+        detail::BasicFormatContext<std::back_insert_iterator<string_type>, char_type>;
 
     if (fmt.has_error())
     {
@@ -864,7 +863,7 @@ StringType BasicString<StringType>::format(
 
     const view_type view = fmt.view();
 
-    StringType formatted;
+    string_type formatted;
     formatted.reserve(view.size() * 2);
 
     auto params =
@@ -907,21 +906,21 @@ StringType BasicString<StringType>::format(
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename... Args>
-inline StringType BasicString<StringType>::join(char_type separator, Args &&...args)
+inline auto BasicString<CharType>::join(char_type separator, Args &&...args) -> string_type
 {
-    StringType result;
+    string_type result;
     join_internal(result, separator, std::forward<Args>(args)...);
 
     return result;
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename T, typename... Args>
-inline void BasicString<StringType>::join_internal(
-    StringType &result,
+inline void BasicString<CharType>::join_internal(
+    string_type &result,
     char_type separator,
     T &&value,
     Args &&...args)
@@ -931,17 +930,17 @@ inline void BasicString<StringType>::join_internal(
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename T>
-inline void BasicString<StringType>::join_internal(StringType &result, char_type, T &&value)
+inline void BasicString<CharType>::join_internal(string_type &result, char_type, T &&value)
 {
     result += format(FLY_ARR(char_type, "{}"), std::forward<T>(value));
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename T>
-std::optional<T> BasicString<StringType>::convert(const StringType &value)
+std::optional<T> BasicString<CharType>::convert(const string_type &value)
 {
     if constexpr (detail::is_supported_string_v<T>)
     {
