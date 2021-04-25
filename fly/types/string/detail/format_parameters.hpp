@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/string/detail/string_classifier.hpp"
+#include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/string_formatters.hpp"
 
@@ -367,7 +367,7 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(const
 
     if constexpr (std::is_array_v<U> || std::is_pointer_v<U>)
     {
-        view = view_type(value, fly::detail::BasicStringClassifier<string_type>::size(value));
+        view = view_type(value, BasicClassifier<char_type>::size(value));
     }
     else
     {

@@ -289,6 +289,9 @@
     <ClInclude Include="..\..\..\fly\types\string\string_formatters.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\classifier.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\format_context.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
@@ -302,9 +305,6 @@
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\stream_util.hpp">
-      <Filter>types\string\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_classifier.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_converter.hpp">
