@@ -182,7 +182,7 @@
     <ClCompile Include="..\..\..\test\types\string\string_traits.cpp">
       <Filter>types\string</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string\string_unicode.cpp">
+    <ClCompile Include="..\..\..\test\types\string\unicode.cpp">
       <Filter>types\string</Filter>
     </ClCompile>
   </ItemGroup>

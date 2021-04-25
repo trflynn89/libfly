@@ -14,22 +14,22 @@ namespace fly::detail {
 
 /**
  * Helper class for decoding and encoding Unicode codepoints in a std::basic_string. The assumed
- * Unicode encoding depends on the template type StringType:
+ * Unicode encoding depends on the template type character type:
  *
- *     1. std::string - UTF-8
- *     2. std::wstring - UTF-16 on Windows, UTF-32 on Linux and macOS
- *     3. std::u8string - UTF-8
- *     4. std::u16string - UTF-16
- *     5. std::u32string - UTF-32
+ *     1. char - UTF-8
+ *     2. wchar_t - UTF-16 on Windows, UTF-32 on Linux and macOS
+ *     3. char8_t - UTF-8
+ *     4. char16_t - UTF-16
+ *     5. char32_t - UTF-32
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version June 6, 2020
  */
-template <typename StringType>
-class BasicStringUnicode
+template <typename CharType>
+class BasicUnicode
 {
-    using traits = detail::BasicStringTraits<StringType>;
-    using char_type = typename traits::char_type;
+    using string_type = std::basic_string<CharType>;
+    using traits = detail::BasicStringTraits<string_type>;
     using view_type = typename traits::view_type;
     using codepoint_type = typename traits::codepoint_type;
 
@@ -100,7 +100,7 @@ public:
      * @return If successful, a string containing the encoded Unicode codepoint. Otherwise, an
      *         uninitialized value.
      */
-    static std::optional<StringType> encode_codepoint(codepoint_type codepoint);
+    static std::optional<string_type> encode_codepoint(codepoint_type codepoint);
 
     /**
      * Escape a single Unicode codepoint, starting at the character pointed to by the provided
@@ -131,7 +131,7 @@ public:
      *         uninitialized value.
      */
     template <char UnicodePrefix = 'U', typename IteratorType>
-    static std::optional<StringType> escape_codepoint(IteratorType &it, const IteratorType &end);
+    static std::optional<string_type> escape_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
      * Unescape a single Unicode codepoint, starting at the character pointed to by provided
@@ -153,14 +153,14 @@ public:
      *         uninitialized value.
      */
     template <typename IteratorType>
-    static std::optional<StringType> unescape_codepoint(IteratorType &it, const IteratorType &end);
+    static std::optional<string_type> unescape_codepoint(IteratorType &it, const IteratorType &end);
 
 private:
-    friend BasicStringUnicode<std::string>;
-    friend BasicStringUnicode<std::wstring>;
-    friend BasicStringUnicode<std::u8string>;
-    friend BasicStringUnicode<std::u16string>;
-    friend BasicStringUnicode<std::u32string>;
+    friend BasicUnicode<char>;
+    friend BasicUnicode<wchar_t>;
+    friend BasicUnicode<char8_t>;
+    friend BasicUnicode<char16_t>;
+    friend BasicUnicode<char32_t>;
 
     /**
      * Escape a single Unicode codepoint.
@@ -173,7 +173,7 @@ private:
      *         uninitialized value.
      */
     template <char UnicodePrefix>
-    static StringType escape_codepoint(codepoint_type codepoint);
+    static string_type escape_codepoint(codepoint_type codepoint);
 
     /**
      * Unescape a sequence of characters to form a single Unicode codepoint.
@@ -202,8 +202,8 @@ private:
      */
     template <
         typename IteratorType,
-        typename CharType = char_type,
-        enable_if<size_of_type_is<CharType, 1>> = 0>
+        typename CharT = CharType,
+        enable_if<size_of_type_is<CharT, 1>> = 0>
     static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
 
     /**
@@ -218,8 +218,8 @@ private:
      */
     template <
         typename IteratorType,
-        typename CharType = char_type,
-        enable_if<size_of_type_is<CharType, 2>> = 0>
+        typename CharT = CharType,
+        enable_if<size_of_type_is<CharT, 2>> = 0>
     static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
 
     /**
@@ -234,8 +234,8 @@ private:
      */
     template <
         typename IteratorType,
-        typename CharType = char_type,
-        enable_if<size_of_type_is<CharType, 4>> = 0>
+        typename CharT = CharType,
+        enable_if<size_of_type_is<CharT, 4>> = 0>
     static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
 
     /**
@@ -248,8 +248,8 @@ private:
      */
     template <
         typename OutputIteratorType,
-        typename CharType = char_type,
-        enable_if<size_of_type_is<CharType, 1>> = 0>
+        typename CharT = CharType,
+        enable_if<size_of_type_is<CharT, 1>> = 0>
     static void codepoint_to_string(codepoint_type codepoint, OutputIteratorType out);
 
     /**
@@ -262,8 +262,8 @@ private:
      */
     template <
         typename OutputIteratorType,
-        typename CharType = char_type,
-        enable_if<size_of_type_is<CharType, 2>> = 0>
+        typename CharT = CharType,
+        enable_if<size_of_type_is<CharT, 2>> = 0>
     static void codepoint_to_string(codepoint_type codepoint, OutputIteratorType out);
 
     /**
@@ -276,8 +276,8 @@ private:
      */
     template <
         typename OutputIteratorType,
-        typename CharType = char_type,
-        enable_if<size_of_type_is<CharType, 4>> = 0>
+        typename CharT = CharType,
+        enable_if<size_of_type_is<CharT, 4>> = 0>
     static void codepoint_to_string(codepoint_type codepoint, OutputIteratorType out);
 
     /**
@@ -359,20 +359,20 @@ private:
     static constexpr const codepoint_type s_max_codepoint = 0x10ffff;
     static constexpr const codepoint_type s_invalid_codepoint = 0xffffffff;
 
-    static constexpr const char_type s_zero = FLY_CHR(char_type, '0');
-    static constexpr const char_type s_nine = FLY_CHR(char_type, '9');
-    static constexpr const char_type s_lower_a = FLY_CHR(char_type, 'a');
-    static constexpr const char_type s_upper_a = FLY_CHR(char_type, 'A');
-    static constexpr const char_type s_lower_f = FLY_CHR(char_type, 'f');
-    static constexpr const char_type s_upper_f = FLY_CHR(char_type, 'F');
-    static constexpr const char_type s_lower_u = FLY_CHR(char_type, 'u');
-    static constexpr const char_type s_upper_u = FLY_CHR(char_type, 'U');
+    static constexpr const auto s_zero = FLY_CHR(CharType, '0');
+    static constexpr const auto s_nine = FLY_CHR(CharType, '9');
+    static constexpr const auto s_lower_a = FLY_CHR(CharType, 'a');
+    static constexpr const auto s_upper_a = FLY_CHR(CharType, 'A');
+    static constexpr const auto s_lower_f = FLY_CHR(CharType, 'f');
+    static constexpr const auto s_upper_f = FLY_CHR(CharType, 'F');
+    static constexpr const auto s_lower_u = FLY_CHR(CharType, 'u');
+    static constexpr const auto s_upper_u = FLY_CHR(CharType, 'U');
 };
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename IteratorType>
-bool BasicStringUnicode<StringType>::validate_encoding(IteratorType &it, const IteratorType &end)
+bool BasicUnicode<CharType>::validate_encoding(IteratorType &it, const IteratorType &end)
 {
     while (it != end)
     {
@@ -386,13 +386,12 @@ bool BasicStringUnicode<StringType>::validate_encoding(IteratorType &it, const I
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename DesiredStringType>
-inline std::optional<DesiredStringType>
-BasicStringUnicode<StringType>::convert_encoding(view_type value)
+inline std::optional<DesiredStringType> BasicUnicode<CharType>::convert_encoding(view_type value)
 {
     DesiredStringType result;
-    result.reserve(static_cast<typename StringType::size_type>(value.size()));
+    result.reserve(static_cast<typename DesiredStringType::size_type>(value.size()));
 
     if (convert_encoding_into<DesiredStringType>(std::move(value), std::back_inserter(result)))
     {
@@ -403,11 +402,11 @@ BasicStringUnicode<StringType>::convert_encoding(view_type value)
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename DesiredStringType, typename OutputIteratorType>
-bool BasicStringUnicode<StringType>::convert_encoding_into(view_type value, OutputIteratorType out)
+bool BasicUnicode<CharType>::convert_encoding_into(view_type value, OutputIteratorType out)
 {
-    using DesiredUnicodeType = BasicStringUnicode<DesiredStringType>;
+    using DesiredUnicodeType = BasicUnicode<typename DesiredStringType::value_type>;
 
     auto it = value.cbegin();
     const auto end = value.cend();
@@ -427,9 +426,9 @@ bool BasicStringUnicode<StringType>::convert_encoding_into(view_type value, Outp
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename IteratorType>
-auto BasicStringUnicode<StringType>::decode_codepoint(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::decode_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<codepoint_type>
 {
     const codepoint_type codepoint = codepoint_from_string(it, end);
@@ -443,12 +442,13 @@ auto BasicStringUnicode<StringType>::decode_codepoint(IteratorType &it, const It
 }
 
 //==================================================================================================
-template <typename StringType>
-std::optional<StringType> BasicStringUnicode<StringType>::encode_codepoint(codepoint_type codepoint)
+template <typename CharType>
+auto BasicUnicode<CharType>::encode_codepoint(codepoint_type codepoint)
+    -> std::optional<string_type>
 {
     if (validate_codepoint(codepoint))
     {
-        StringType result;
+        string_type result;
         codepoint_to_string(codepoint, std::back_inserter(result));
 
         return result;
@@ -458,10 +458,10 @@ std::optional<StringType> BasicStringUnicode<StringType>::encode_codepoint(codep
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <char UnicodePrefix, typename IteratorType>
-std::optional<StringType>
-BasicStringUnicode<StringType>::escape_codepoint(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::escape_codepoint(IteratorType &it, const IteratorType &end)
+    -> std::optional<string_type>
 {
     static_assert((UnicodePrefix == 'u') || (UnicodePrefix == 'U'));
 
@@ -474,12 +474,12 @@ BasicStringUnicode<StringType>::escape_codepoint(IteratorType &it, const Iterato
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename IteratorType>
-std::optional<StringType>
-BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
+    -> std::optional<string_type>
 {
-    auto escaped_with = [&it, &end](const char_type ch) -> bool
+    auto escaped_with = [&it, &end](const CharType ch) -> bool
     {
         if ((it == end) || ((it + 1) == end))
         {
@@ -509,17 +509,17 @@ BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const Itera
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <char UnicodePrefix>
-StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codepoint)
+auto BasicUnicode<CharType>::escape_codepoint(codepoint_type codepoint) -> string_type
 {
-    StringType result;
+    string_type result;
 
-    // TODO: Replace this with BasicString::format without actually including string_formatter.hpp.
-    auto to_hex = [&codepoint](std::size_t length) -> StringType
+    // TODO: Replace this with BasicString::format without actually including string_formatters.hpp.
+    auto to_hex = [&codepoint](std::size_t length) -> string_type
     {
-        static const auto *s_digits = FLY_STR(char_type, "0123456789abcdef");
-        StringType hex(length, FLY_CHR(char_type, '0'));
+        static const auto *s_digits = FLY_STR(CharType, "0123456789abcdef");
+        string_type hex(length, FLY_CHR(CharType, '0'));
 
         for (std::size_t i = 0, j = (length - 1) * 4; i < length; ++i, j -= 4)
         {
@@ -533,7 +533,7 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
     {
         if (codepoint <= 0xffff)
         {
-            result += FLY_CHR(char_type, '\\');
+            result += FLY_CHR(CharType, '\\');
             result += s_lower_u;
             result += to_hex(4);
         }
@@ -549,7 +549,7 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
             }
             else
             {
-                result += FLY_CHR(char_type, '\\');
+                result += FLY_CHR(CharType, '\\');
                 result += s_upper_u;
                 result += to_hex(8);
             }
@@ -557,16 +557,16 @@ StringType BasicStringUnicode<StringType>::escape_codepoint(codepoint_type codep
     }
     else
     {
-        result += static_cast<char_type>(codepoint);
+        result += static_cast<CharType>(codepoint);
     }
 
     return result;
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <char UnicodePrefix, typename IteratorType>
-auto BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
     -> codepoint_type
 {
     static_assert((UnicodePrefix == 'u') || (UnicodePrefix == 'U'));
@@ -608,11 +608,10 @@ auto BasicStringUnicode<StringType>::unescape_codepoint(IteratorType &it, const 
 }
 
 //==================================================================================================
-template <typename StringType>
-template <typename IteratorType, typename CharType, enable_if<size_of_type_is<CharType, 1>>>
-auto BasicStringUnicode<StringType>::codepoint_from_string(
-    IteratorType &it,
-    const IteratorType &end) -> codepoint_type
+template <typename CharType>
+template <typename IteratorType, typename CharT, enable_if<size_of_type_is<CharT, 1>>>
+auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
+    -> codepoint_type
 {
     const codepoint_type leading_byte = next_encoded_byte(it, end);
 
@@ -662,11 +661,10 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(
 }
 
 //==================================================================================================
-template <typename StringType>
-template <typename IteratorType, typename CharType, enable_if<size_of_type_is<CharType, 2>>>
-auto BasicStringUnicode<StringType>::codepoint_from_string(
-    IteratorType &it,
-    const IteratorType &end) -> codepoint_type
+template <typename CharType>
+template <typename IteratorType, typename CharT, enable_if<size_of_type_is<CharT, 2>>>
+auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
+    -> codepoint_type
 {
     auto next_codepoint = [&it, &end]() -> codepoint_type
     {
@@ -677,78 +675,71 @@ auto BasicStringUnicode<StringType>::codepoint_from_string(
 }
 
 //==================================================================================================
-template <typename StringType>
-template <typename IteratorType, typename CharType, enable_if<size_of_type_is<CharType, 4>>>
-auto BasicStringUnicode<StringType>::codepoint_from_string(
-    IteratorType &it,
-    const IteratorType &end) -> codepoint_type
+template <typename CharType>
+template <typename IteratorType, typename CharT, enable_if<size_of_type_is<CharT, 4>>>
+auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
+    -> codepoint_type
 {
     return next_encoded_byte(it, end);
 }
 
 //==================================================================================================
-template <typename StringType>
-template <typename OutputIteratorType, typename CharType, enable_if<size_of_type_is<CharType, 1>>>
-void BasicStringUnicode<StringType>::codepoint_to_string(
-    codepoint_type codepoint,
-    OutputIteratorType out)
+template <typename CharType>
+template <typename OutputIteratorType, typename CharT, enable_if<size_of_type_is<CharT, 1>>>
+void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, OutputIteratorType out)
 {
     if (codepoint < 0x80)
     {
-        *out++ = static_cast<char_type>(codepoint);
+        *out++ = static_cast<CharType>(codepoint);
     }
     else if (codepoint < 0x800)
     {
-        *out++ = static_cast<char_type>(0xc0 | (codepoint >> 6));
-        *out++ = static_cast<char_type>(0x80 | (codepoint & 0x3f));
+        *out++ = static_cast<CharType>(0xc0 | (codepoint >> 6));
+        *out++ = static_cast<CharType>(0x80 | (codepoint & 0x3f));
     }
     else if (codepoint < 0x10000)
     {
-        *out++ = static_cast<char_type>(0xe0 | (codepoint >> 12));
-        *out++ = static_cast<char_type>(0x80 | ((codepoint >> 6) & 0x3f));
-        *out++ = static_cast<char_type>(0x80 | (codepoint & 0x3f));
+        *out++ = static_cast<CharType>(0xe0 | (codepoint >> 12));
+        *out++ = static_cast<CharType>(0x80 | ((codepoint >> 6) & 0x3f));
+        *out++ = static_cast<CharType>(0x80 | (codepoint & 0x3f));
     }
     else
     {
-        *out++ = static_cast<char_type>(0xf0 | (codepoint >> 18));
-        *out++ = static_cast<char_type>(0x80 | ((codepoint >> 12) & 0x3f));
-        *out++ = static_cast<char_type>(0x80 | ((codepoint >> 6) & 0x3f));
-        *out++ = static_cast<char_type>(0x80 | (codepoint & 0x3f));
+        *out++ = static_cast<CharType>(0xf0 | (codepoint >> 18));
+        *out++ = static_cast<CharType>(0x80 | ((codepoint >> 12) & 0x3f));
+        *out++ = static_cast<CharType>(0x80 | ((codepoint >> 6) & 0x3f));
+        *out++ = static_cast<CharType>(0x80 | (codepoint & 0x3f));
     }
 }
 
 //==================================================================================================
-template <typename StringType>
-template <typename OutputIteratorType, typename CharType, enable_if<size_of_type_is<CharType, 2>>>
-void BasicStringUnicode<StringType>::codepoint_to_string(
-    codepoint_type codepoint,
-    OutputIteratorType out)
+template <typename CharType>
+template <typename OutputIteratorType, typename CharT, enable_if<size_of_type_is<CharT, 2>>>
+void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, OutputIteratorType out)
 {
     if (codepoint < 0x10000)
     {
-        *out++ = static_cast<char_type>(codepoint);
+        *out++ = static_cast<CharType>(codepoint);
     }
     else
     {
         codepoint -= 0x10000;
-        *out++ = static_cast<char_type>(s_high_surrogate_min | (codepoint >> 10));
-        *out++ = static_cast<char_type>(s_low_surrogate_min | (codepoint & 0x3ff));
+        *out++ = static_cast<CharType>(s_high_surrogate_min | (codepoint >> 10));
+        *out++ = static_cast<CharType>(s_low_surrogate_min | (codepoint & 0x3ff));
     }
 }
 
 //==================================================================================================
-template <typename StringType>
-template <typename OutputIteratorType, typename CharType, enable_if<size_of_type_is<CharType, 4>>>
-void BasicStringUnicode<StringType>::codepoint_to_string(
-    codepoint_type codepoint,
-    OutputIteratorType out)
+template <typename CharType>
+template <typename OutputIteratorType, typename CharT, enable_if<size_of_type_is<CharT, 4>>>
+void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, OutputIteratorType out)
 {
-    *out++ = static_cast<char_type>(codepoint);
+    *out++ = static_cast<CharType>(codepoint);
 }
 
 //==================================================================================================
-template <typename StringType>
-auto BasicStringUnicode<StringType>::create_codepoint_from_surrogates(
+template <typename CharType>
+auto BasicUnicode<CharType>::create_codepoint_from_surrogates(
     std::function<codepoint_type()> next_codepoint) -> codepoint_type
 {
     auto is_high_surrogate = [](codepoint_type c) -> bool
@@ -789,8 +780,8 @@ auto BasicStringUnicode<StringType>::create_codepoint_from_surrogates(
 }
 
 //==================================================================================================
-template <typename StringType>
-bool BasicStringUnicode<StringType>::validate_codepoint(codepoint_type codepoint)
+template <typename CharType>
+bool BasicUnicode<CharType>::validate_codepoint(codepoint_type codepoint)
 {
     if ((codepoint >= s_high_surrogate_min) && (codepoint <= s_low_surrogate_max))
     {
@@ -807,10 +798,9 @@ bool BasicStringUnicode<StringType>::validate_codepoint(codepoint_type codepoint
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename IteratorType>
-inline auto
-BasicStringUnicode<StringType>::next_encoded_byte(IteratorType &it, const IteratorType &end)
+inline auto BasicUnicode<CharType>::next_encoded_byte(IteratorType &it, const IteratorType &end)
     -> codepoint_type
 {
     return (it == end) ? s_invalid_codepoint : static_cast<codepoint_type>(*(it++));

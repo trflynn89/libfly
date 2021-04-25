@@ -7,23 +7,16 @@
 #include <optional>
 #include <vector>
 
-CATCH_TEMPLATE_TEST_CASE(
-    "BasicStringUnicode",
-    "[string]",
-    std::string,
-    std::wstring,
-    std::u8string,
-    std::u16string,
-    std::u32string)
+CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, char16_t, char32_t)
 {
-    using StringType = TestType;
-    using BasicString = fly::BasicString<StringType>;
-    using char_type = typename BasicString::char_type;
+    using char_type = TestType;
+    using string_type = std::basic_string<char_type>;
+    using BasicString = fly::BasicString<string_type>;
     using codepoint_type = typename BasicString::codepoint_type;
 
-    auto make_string = [](std::vector<codepoint_type> &&bytes) -> StringType
+    auto make_string = [](std::vector<codepoint_type> &&bytes) -> string_type
     {
-        StringType result;
+        string_type result;
         result.reserve(bytes.size());
 
         for (codepoint_type ch : bytes)
@@ -34,12 +27,12 @@ CATCH_TEMPLATE_TEST_CASE(
         return result;
     };
 
-    auto make_escaped_unicode_string = [](auto value) -> StringType
+    auto make_escaped_unicode_string = [](auto value) -> string_type
     {
         return BasicString::format(FLY_ARR(char_type, "\\u{:04x}"), value);
     };
 
-    auto escape_should_fail = [](StringType &&test, int line)
+    auto escape_should_fail = [](string_type &&test, int line)
     {
         CATCH_CAPTURE(test);
         CATCH_CAPTURE(line);
@@ -52,13 +45,13 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(BasicString::escape_all_codepoints(test));
     };
 
-    auto encode_should_fail = [&](StringType &&test, codepoint_type codepoint, int line)
+    auto encode_should_fail = [&](string_type &&test, codepoint_type codepoint, int line)
     {
         escape_should_fail(std::move(test), line);
         CATCH_CHECK_FALSE(BasicString::encode_codepoint(codepoint));
     };
 
-    auto unescape_should_fail = [](StringType &&test, int line, bool whole_string = true)
+    auto unescape_should_fail = [](string_type &&test, int line, bool whole_string = true)
     {
         CATCH_CAPTURE(test);
         CATCH_CAPTURE(line);
@@ -76,8 +69,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Empty strings as input")
     {
-        StringType test;
-        std::optional<StringType> actual;
+        string_type test;
+        std::optional<string_type> actual;
 
         auto begin = test.cbegin();
         const auto end = test.cend();
@@ -100,7 +93,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Past-the-end iterators as input")
     {
-        StringType test;
+        string_type test;
 
         auto begin = test.cend();
         const auto end = test.cend();
@@ -131,7 +124,7 @@ CATCH_TEMPLATE_TEST_CASE(
         else if constexpr (sizeof(char_type) == 4)
         {
             // UTF-32 encoding really only fails if there is no data.
-            StringType test;
+            string_type test;
             auto begin = test.cend();
             const auto end = test.cend();
 
@@ -167,7 +160,7 @@ CATCH_TEMPLATE_TEST_CASE(
         {
             CATCH_SECTION("Invalid leading byte")
             {
-                StringType test = make_string({0xff});
+                string_type test = make_string({0xff});
 
                 auto begin = test.cbegin();
                 const auto end = test.cend();
@@ -224,8 +217,8 @@ CATCH_TEMPLATE_TEST_CASE(
                 // High surrogate followed by non-surrogate.
                 for (char_type ch = 0xd800; ch <= 0xdbff; ++ch)
                 {
-                    StringType high_surrogate = make_string({ch});
-                    StringType low_surrogate = make_string({0});
+                    string_type high_surrogate = make_string({ch});
+                    string_type low_surrogate = make_string({0});
 
                     escape_should_fail(high_surrogate + low_surrogate, __LINE__);
                 }
@@ -233,7 +226,7 @@ CATCH_TEMPLATE_TEST_CASE(
                 // High surrogate followed by high surrogate.
                 for (char_type ch = 0xd800; ch <= 0xdbff; ++ch)
                 {
-                    StringType high_surrogate = make_string({ch});
+                    string_type high_surrogate = make_string({ch});
 
                     escape_should_fail(high_surrogate + high_surrogate, __LINE__);
                 }
@@ -249,7 +242,7 @@ CATCH_TEMPLATE_TEST_CASE(
             {
                 if constexpr (sizeof(char_type) == 1)
                 {
-                    StringType test = make_string({
+                    string_type test = make_string({
                         0xe0 | (ch >> 12),
                         0x80 | ((ch >> 6) & 0x3f),
                         0x80 | (ch & 0x3f),
@@ -273,7 +266,7 @@ CATCH_TEMPLATE_TEST_CASE(
             {
                 if constexpr (sizeof(char_type) == 1)
                 {
-                    StringType test = make_string({
+                    string_type test = make_string({
                         0xf0 | (ch >> 18),
                         0x80 | ((ch >> 12) & 0x3f),
                         0x80 | ((ch >> 6) & 0x3f),
@@ -286,7 +279,7 @@ CATCH_TEMPLATE_TEST_CASE(
                 {
                     // Note: UTF-16 doesn't actually hit the out-of-range error because the
                     // out-of-range codepoints are invalid surrogates, and thus fail earlier.
-                    StringType test = make_string({
+                    string_type test = make_string({
                         0xd800 | ((ch - 0x10000) >> 10),
                         0xdc00 | ((ch - 0x10000) & 0x3ff),
                     });
@@ -303,12 +296,12 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("ASCII")
     {
-        auto encoded_to = [&](codepoint_type ch, StringType &&expected)
+        auto encoded_to = [&](codepoint_type ch, string_type &&expected)
         {
             CATCH_CAPTURE(ch);
 
-            const StringType test = make_string({ch});
-            std::optional<StringType> actual;
+            const string_type test = make_string({ch});
+            std::optional<string_type> actual;
 
             CATCH_CHECK(BasicString::validate(test));
 
@@ -349,11 +342,11 @@ CATCH_TEMPLATE_TEST_CASE(
         {
             for (codepoint_type ch = 0; ch < 0x20; ++ch)
             {
-                StringType expected = make_escaped_unicode_string(ch);
+                string_type expected = make_escaped_unicode_string(ch);
                 encoded_to(ch, std::move(expected));
             }
 
-            StringType expected = make_escaped_unicode_string(0x7f);
+            string_type expected = make_escaped_unicode_string(0x7f);
             encoded_to(0x7f, std::move(expected));
         }
     }
@@ -361,7 +354,7 @@ CATCH_TEMPLATE_TEST_CASE(
     CATCH_SECTION("Non-ASCII")
     {
         auto escaped_to =
-            [](StringType &&test, StringType &&expected, auto prefix, bool one_char = true)
+            [](string_type &&test, string_type &&expected, auto prefix, bool one_char = true)
         {
             CATCH_CAPTURE(test);
 
@@ -372,7 +365,7 @@ CATCH_TEMPLATE_TEST_CASE(
             const auto end = test.cend();
             CATCH_CAPTURE(std::distance(begin, end));
 
-            std::optional<StringType> actual;
+            std::optional<string_type> actual;
 
             if (one_char)
             {
@@ -469,8 +462,8 @@ CATCH_TEMPLATE_TEST_CASE(
             // High surrogate followed by non-surrogate.
             for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
             {
-                StringType high_surrogate(make_escaped_unicode_string(ch));
-                StringType low_surrogate(make_escaped_unicode_string(0));
+                string_type high_surrogate(make_escaped_unicode_string(ch));
+                string_type low_surrogate(make_escaped_unicode_string(0));
 
                 unescape_should_fail(high_surrogate + low_surrogate, __LINE__);
             }
@@ -478,7 +471,7 @@ CATCH_TEMPLATE_TEST_CASE(
             // High surrogate followed by high surrogate.
             for (codepoint_type ch = 0xd800; ch <= 0xdbff; ++ch)
             {
-                StringType high_surrogate(make_escaped_unicode_string(ch));
+                string_type high_surrogate(make_escaped_unicode_string(ch));
 
                 unescape_should_fail(high_surrogate + high_surrogate, __LINE__);
             }
@@ -487,7 +480,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Valid escape sequences")
     {
-        auto unescaped_to = [](StringType &&test, StringType &&expected, bool one_char = true)
+        auto unescaped_to = [](string_type &&test, string_type &&expected, bool one_char = true)
         {
             CATCH_CAPTURE(test);
 
@@ -497,7 +490,7 @@ CATCH_TEMPLATE_TEST_CASE(
             auto begin = test.cbegin();
             const auto end = test.cend();
 
-            std::optional<StringType> actual;
+            std::optional<string_type> actual;
 
             if (one_char)
             {
@@ -571,7 +564,7 @@ CATCH_TEMPLATE_TEST_CASE(
             auto validate_pass =
                 [&](std::vector<codepoint_type> &&bytes, codepoint_type expected, int line)
             {
-                StringType test = make_string(std::move(bytes));
+                string_type test = make_string(std::move(bytes));
 
                 CATCH_CAPTURE(test);
                 CATCH_CAPTURE(line);
@@ -586,7 +579,7 @@ CATCH_TEMPLATE_TEST_CASE(
             };
 
             auto validate_pass_all =
-                [](StringType &&test, std::vector<codepoint_type> expected, int line)
+                [](string_type &&test, std::vector<codepoint_type> expected, int line)
             {
                 CATCH_CAPTURE(test);
                 CATCH_CAPTURE(line);
@@ -608,7 +601,7 @@ CATCH_TEMPLATE_TEST_CASE(
                 CATCH_CHECK(it == end);
             };
 
-            auto validate_fail_str = [](StringType &&test, std::size_t expected_failures, int line)
+            auto validate_fail_str = [](string_type &&test, std::size_t expected_failures, int line)
             {
                 CATCH_CAPTURE(test);
                 CATCH_CAPTURE(line);
@@ -723,7 +716,7 @@ CATCH_TEMPLATE_TEST_CASE(
                     validate_fail({0x80, 0xbf, 0x80, 0xbf, 0x80, 0xbf, 0x80}, 7, __LINE__);
 
                     // 3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf)
-                    StringType test_3_1_9;
+                    string_type test_3_1_9;
 
                     for (codepoint_type ch = 0x80; ch <= 0xbf; ++ch)
                     {
@@ -739,7 +732,7 @@ CATCH_TEMPLATE_TEST_CASE(
                     auto validate_fail_sequence =
                         [&](codepoint_type begin, codepoint_type end, int line)
                     {
-                        StringType test_3_2;
+                        string_type test_3_2;
 
                         for (codepoint_type ch = begin; ch <= end; ++ch)
                         {

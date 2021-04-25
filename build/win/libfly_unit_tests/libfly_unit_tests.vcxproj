@@ -263,7 +263,7 @@
     <ClCompile Include="..\..\..\test\types\string\string.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_format.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_traits.cpp" />
-    <ClCompile Include="..\..\..\test\types\string\string_unicode.cpp" />
+    <ClCompile Include="..\..\..\test\types\string\unicode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\config\test_config.hpp" />

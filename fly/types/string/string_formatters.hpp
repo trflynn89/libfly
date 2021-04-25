@@ -5,7 +5,7 @@
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/stream_util.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
-#include "fly/types/string/detail/string_unicode.hpp"
+#include "fly/types/string/detail/unicode.hpp"
 
 #include <array>
 #include <charconv>
@@ -348,7 +348,7 @@ void Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>
     }
     else
     {
-        using unicode = detail::BasicStringUnicode<string_like_type>;
+        using unicode = detail::BasicUnicode<typename string_like_type::value_type>;
 
         if (auto converted = unicode::template convert_encoding<string_type>(view); converted)
         {
@@ -612,7 +612,7 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
     }
     else
     {
-        using unicode = detail::BasicStringUnicode<std::string>;
+        using unicode = detail::BasicUnicode<char>;
         std::string_view view(begin, static_cast<std::size_t>(std::distance(begin, result.ptr)));
 
         unicode::template convert_encoding_into<string_type>(view, context.out());
