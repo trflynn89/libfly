@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/types/string/detail/string_classifier.hpp"
-#include "fly/types/string/string_lexer.hpp"
+#include "fly/types/string/lexer.hpp"
 #include "fly/types/string/string_literal.hpp"
 
 #include <array>

@@ -257,11 +257,11 @@
     <ClCompile Include="..\..\..\test\types\numeric\literals.cpp" />
     <ClCompile Include="..\..\..\test\types\string\format_parameters.cpp" />
     <ClCompile Include="..\..\..\test\types\string\format_string.cpp" />
+    <ClCompile Include="..\..\..\test\types\string\lexer.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_classifier.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_converter.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_format.cpp" />
-    <ClCompile Include="..\..\..\test\types\string\string_lexer.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_traits.cpp" />
     <ClCompile Include="..\..\..\test\types\string\string_unicode.cpp" />
   </ItemGroup>

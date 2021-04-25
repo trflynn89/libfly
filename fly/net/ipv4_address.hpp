@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/types/numeric/endian.hpp"
-#include "fly/types/string/string_lexer.hpp"
+#include "fly/types/string/lexer.hpp"
 
 #include <array>
 #include <compare>
@@ -156,7 +156,7 @@ constexpr std::optional<IPv4Address> IPv4Address::from_string(std::string_view a
     constexpr const auto s_max32 = static_cast<std::uint64_t>(std::numeric_limits<int_type>::max());
     constexpr const auto s_decimal = '.';
 
-    fly::BasicStringLexer<std::string> lexer(std::move(address));
+    fly::Lexer lexer(std::move(address));
 
     std::array<int_type, 4> parts {};
     std::size_t index = 0;
