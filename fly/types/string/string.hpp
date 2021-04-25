@@ -6,6 +6,7 @@
 #include "fly/types/string/detail/format_parameters.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/format_string.hpp"
+#include "fly/types/string/detail/string_concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/unicode.hpp"
 #include "fly/types/string/literals.hpp"
@@ -77,7 +78,7 @@ public:
      *
      * @return The length of the string-like value.
      */
-    template <typename T, enable_if<detail::is_like_supported_string<T>> = 0>
+    template <detail::IsLikeSupportedString T>
     static constexpr size_type size(T &&value);
 
     /**
@@ -511,7 +512,7 @@ private:
 
 //==================================================================================================
 template <typename CharType>
-template <typename T, enable_if<detail::is_like_supported_string<T>>>
+template <detail::IsLikeSupportedString T>
 constexpr inline auto BasicString<CharType>::size(T &&value) -> size_type
 {
     return detail::BasicClassifier<char_type>::size(std::forward<T>(value));

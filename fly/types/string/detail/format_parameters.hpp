@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/types/string/detail/classifier.hpp"
+#include "fly/types/string/detail/string_concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/string_formatters.hpp"
 
@@ -121,13 +122,7 @@ public:
      *
      * @param value The user-defined value.
      */
-    template <
-        typename T,
-        fly::disable_if_any<
-            detail::is_like_supported_string<T>,
-            BasicFormatTraits::is_pointer<T>,
-            std::is_arithmetic<T>,
-            BasicFormatTraits::is_default_formatted_enum<T>> = 0>
+    template <IsFormatUserDefined T>
     explicit constexpr BasicFormatParameter(const T &value) noexcept;
 
     /**
@@ -138,7 +133,7 @@ public:
      *
      * @param value The string-like value.
      */
-    template <typename T, fly::enable_if<fly::detail::is_like_supported_string<T>> = 0>
+    template <IsLikeSupportedString T>
     explicit constexpr BasicFormatParameter(const T &value) noexcept;
 
     /**
@@ -148,17 +143,37 @@ public:
      *
      * @param value The pointer value.
      */
-    template <typename T, fly::enable_if<BasicFormatTraits::is_pointer<T>> = 0>
+    template <IsFormatPointer T>
     explicit constexpr BasicFormatParameter(T value) noexcept;
 
     /**
-     * Constructor. Initialize the format parameter to store an arithmetic value.
+     * Constructor. Initialize the format parameter to store an integral value.
      *
-     * @tparam T The arithmetic type.
+     * @tparam T The integral type.
      *
-     * @param value The arithmetic value.
+     * @param value The integral value.
      */
-    template <typename T, fly::enable_if<std::is_arithmetic<T>> = 0>
+    template <IsFormatIntegral T>
+    explicit constexpr BasicFormatParameter(T value) noexcept;
+
+    /**
+     * Constructor. Initialize the format parameter to store a floating point value.
+     *
+     * @tparam T The floating point type.
+     *
+     * @param value The floating point value.
+     */
+    template <IsFormatFloat T>
+    explicit constexpr BasicFormatParameter(T value) noexcept;
+
+    /**
+     * Constructor. Initialize the format parameter to store a boolean value.
+     *
+     * @tparam T The boolean type.
+     *
+     * @param value The boolean value.
+     */
+    template <IsFormatBoolean T>
     explicit constexpr BasicFormatParameter(T value) noexcept;
 
     /**
@@ -168,7 +183,7 @@ public:
      *
      * @param value The default-formatted enumeration value.
      */
-    template <typename T, fly::enable_if<BasicFormatTraits::is_default_formatted_enum<T>> = 0>
+    template <IsFormatEnum T>
     explicit constexpr BasicFormatParameter(T value) noexcept;
 
     /**
@@ -336,13 +351,7 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter() noe
 
 //==================================================================================================
 template <typename FormatContext>
-template <
-    typename T,
-    fly::disable_if_any<
-        detail::is_like_supported_string<T>,
-        BasicFormatTraits::is_pointer<T>,
-        std::is_arithmetic<T>,
-        BasicFormatTraits::is_default_formatted_enum<T>>>
+template <IsFormatUserDefined T>
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &value) noexcept
     :
     m_type(Type::Generic),
@@ -352,7 +361,7 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(const
 
 //==================================================================================================
 template <typename FormatContext>
-template <typename T, fly::enable_if<fly::detail::is_like_supported_string<T>>>
+template <IsLikeSupportedString T>
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &value) noexcept
     :
     m_type(Type::String)
@@ -382,7 +391,7 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(const
 
 //==================================================================================================
 template <typename FormatContext>
-template <typename T, fly::enable_if<BasicFormatTraits::is_pointer<T>>>
+template <IsFormatPointer T>
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept :
     m_type(Type::Pointer),
     m_value {.m_standard {.m_pointer {value}, .m_format {format_standard_value<FormatContext, T>}}}
@@ -391,7 +400,26 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T val
 
 //==================================================================================================
 template <typename FormatContext>
-template <typename T, fly::enable_if<std::is_arithmetic<T>>>
+template <IsFormatIntegral T>
+constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept
+{
+    m_value.m_standard.m_format = format_standard_value<FormatContext, T>;
+
+    if constexpr (std::is_signed_v<T>)
+    {
+        m_type = Type::SignedInt;
+        m_value.m_standard.m_signed_int = value;
+    }
+    else
+    {
+        m_type = Type::UnsignedInt;
+        m_value.m_standard.m_unsigned_int = value;
+    }
+}
+
+//==================================================================================================
+template <typename FormatContext>
+template <IsFormatFloat T>
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept
 {
     m_value.m_standard.m_format = format_standard_value<FormatContext, T>;
@@ -406,31 +434,25 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T val
         m_type = Type::Double;
         m_value.m_standard.m_double = value;
     }
-    else if constexpr (std::is_same_v<T, long double>)
+    else
     {
         m_type = Type::LongDouble;
         m_value.m_standard.m_long_double = value;
-    }
-    else if constexpr (std::is_same_v<T, bool>)
-    {
-        m_type = Type::Bool;
-        m_value.m_standard.m_bool = value;
-    }
-    else if constexpr (std::is_signed_v<T>)
-    {
-        m_type = Type::SignedInt;
-        m_value.m_standard.m_signed_int = value;
-    }
-    else
-    {
-        m_type = Type::UnsignedInt;
-        m_value.m_standard.m_unsigned_int = value;
     }
 }
 
 //==================================================================================================
 template <typename FormatContext>
-template <typename T, fly::enable_if<BasicFormatTraits::is_default_formatted_enum<T>>>
+template <IsFormatBoolean T>
+constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept :
+    m_type(Type::Bool),
+    m_value {.m_standard {.m_bool {value}, .m_format {format_standard_value<FormatContext, T>}}}
+{
+}
+
+//==================================================================================================
+template <typename FormatContext>
+template <IsFormatEnum T>
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept :
     BasicFormatParameter(static_cast<std::underlying_type_t<T>>(value))
 {
