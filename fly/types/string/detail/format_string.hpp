@@ -30,8 +30,7 @@ namespace fly::detail {
 template <typename CharType, typename... ParameterTypes>
 class BasicFormatString
 {
-    using string_type = std::basic_string<CharType>;
-    using traits = BasicStringTraits<string_type>;
+    using traits = BasicStringTraits<CharType>;
     using lexer = fly::BasicLexer<CharType>;
     using view_type = typename traits::view_type;
 

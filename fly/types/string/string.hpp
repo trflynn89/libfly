@@ -40,11 +40,11 @@ using String8 = BasicString<std::u8string>;
 using String16 = BasicString<std::u16string>;
 using String32 = BasicString<std::u32string>;
 
-using StringTraits = detail::BasicStringTraits<std::string>;
-using WStringTraits = detail::BasicStringTraits<std::wstring>;
-using String8Traits = detail::BasicStringTraits<std::u8string>;
-using String16Traits = detail::BasicStringTraits<std::u16string>;
-using String32Traits = detail::BasicStringTraits<std::u32string>;
+using StringTraits = detail::BasicStringTraits<char>;
+using WStringTraits = detail::BasicStringTraits<wchar_t>;
+using String8Traits = detail::BasicStringTraits<char8_t>;
+using String16Traits = detail::BasicStringTraits<char16_t>;
+using String32Traits = detail::BasicStringTraits<char32_t>;
 
 /**
  * Static class to provide string utilities not provided by the STL.
@@ -55,8 +55,8 @@ using String32Traits = detail::BasicStringTraits<std::u32string>;
 template <typename StringType>
 class BasicString
 {
-    using traits = detail::BasicStringTraits<StringType>;
-    using unicode = detail::BasicUnicode<typename traits::char_type>;
+    using traits = detail::BasicStringTraits<typename StringType::value_type>;
+    using unicode = detail::BasicUnicode<typename StringType::value_type>;
 
 public:
     using string_type = typename traits::string_type;

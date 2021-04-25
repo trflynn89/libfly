@@ -17,9 +17,7 @@ namespace fly::detail {
 template <typename CharType>
 class BasicClassifier
 {
-    using string_type = std::basic_string<CharType>;
-
-    using traits = detail::BasicStringTraits<string_type>;
+    using traits = detail::BasicStringTraits<CharType>;
     using size_type = typename traits::size_type;
     using view_type = typename traits::view_type;
     using int_type = typename traits::int_type;

@@ -360,8 +360,8 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(const
     using U = std::remove_cvref_t<T>;
 
     using string_type = fly::detail::is_like_supported_string_t<T>;
-    using char_type = typename fly::detail::BasicStringTraits<string_type>::char_type;
-    using view_type = typename fly::detail::BasicStringTraits<string_type>::view_type;
+    using char_type = typename string_type::value_type;
+    using view_type = typename fly::detail::BasicStringTraits<char_type>::view_type;
 
     view_type view;
 

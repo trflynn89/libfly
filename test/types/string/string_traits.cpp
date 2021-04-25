@@ -62,11 +62,11 @@ constexpr bool is_like_supported_string(const T &)
 template <
     typename T,
     fly::enable_if_any<
-        fly::detail::BasicStringTraits<std::string>::is_string_like<T>,
-        fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
-        fly::detail::BasicStringTraits<std::u8string>::is_string_like<T>,
-        fly::detail::BasicStringTraits<std::u16string>::is_string_like<T>,
-        fly::detail::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
+        fly::detail::BasicStringTraits<char>::is_string_like<T>,
+        fly::detail::BasicStringTraits<wchar_t>::is_string_like<T>,
+        fly::detail::BasicStringTraits<char8_t>::is_string_like<T>,
+        fly::detail::BasicStringTraits<char16_t>::is_string_like<T>,
+        fly::detail::BasicStringTraits<char32_t>::is_string_like<T>> = 0>
 constexpr bool is_string_like(const T &)
 {
     return true;
@@ -75,11 +75,11 @@ constexpr bool is_string_like(const T &)
 template <
     typename T,
     fly::disable_if_any<
-        fly::detail::BasicStringTraits<std::string>::is_string_like<T>,
-        fly::detail::BasicStringTraits<std::wstring>::is_string_like<T>,
-        fly::detail::BasicStringTraits<std::u8string>::is_string_like<T>,
-        fly::detail::BasicStringTraits<std::u16string>::is_string_like<T>,
-        fly::detail::BasicStringTraits<std::u32string>::is_string_like<T>> = 0>
+        fly::detail::BasicStringTraits<char>::is_string_like<T>,
+        fly::detail::BasicStringTraits<wchar_t>::is_string_like<T>,
+        fly::detail::BasicStringTraits<char8_t>::is_string_like<T>,
+        fly::detail::BasicStringTraits<char16_t>::is_string_like<T>,
+        fly::detail::BasicStringTraits<char32_t>::is_string_like<T>> = 0>
 constexpr bool is_string_like(const T &)
 {
     return false;
@@ -90,23 +90,25 @@ constexpr bool is_string_like(const T &)
 CATCH_TEMPLATE_TEST_CASE(
     "BasicStringTraits",
     "[string]",
-    std::string,
-    std::wstring,
-    std::u8string,
-    std::u16string,
-    std::u32string)
+    char,
+    wchar_t,
+    char8_t,
+    char16_t,
+    char32_t)
 {
-    using StringType = TestType;
-    using traits = typename fly::detail::BasicStringTraits<StringType>;
+    using char_type = TestType;
+    using traits = typename fly::detail::BasicStringTraits<char_type>;
+
+    using string_type = typename traits::string_type;
     using char_type = typename traits::char_type;
     using char_pointer_type = typename std::add_pointer<char_type>::type;
     using view_type = typename traits::view_type;
 
-    constexpr bool is_string = std::is_same_v<StringType, std::string>;
-    constexpr bool is_wstring = std::is_same_v<StringType, std::wstring>;
-    constexpr bool is_string8 = std::is_same_v<StringType, std::u8string>;
-    constexpr bool is_string16 = std::is_same_v<StringType, std::u16string>;
-    constexpr bool is_string32 = std::is_same_v<StringType, std::u32string>;
+    constexpr bool is_string = std::is_same_v<string_type, std::string>;
+    constexpr bool is_wstring = std::is_same_v<string_type, std::wstring>;
+    constexpr bool is_string8 = std::is_same_v<string_type, std::u8string>;
+    constexpr bool is_string16 = std::is_same_v<string_type, std::u16string>;
+    constexpr bool is_string32 = std::is_same_v<string_type, std::u32string>;
 
     CATCH_SECTION("Check whether types are supported strings via traits")
     {
@@ -134,9 +136,9 @@ CATCH_TEMPLATE_TEST_CASE(
 
         CATCH_SECTION("C++-string types")
         {
-            CATCH_CHECK(fly::detail::is_supported_string_v<StringType>);
-            CATCH_CHECK(fly::detail::is_supported_string_v<const StringType>);
-            CATCH_CHECK(fly::detail::is_supported_string_v<StringType const>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<string_type>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const string_type>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<string_type const>);
 
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type>);
@@ -145,9 +147,9 @@ CATCH_TEMPLATE_TEST_CASE(
 
         CATCH_SECTION("C++-string type references")
         {
-            CATCH_CHECK(fly::detail::is_supported_string_v<StringType &>);
-            CATCH_CHECK(fly::detail::is_supported_string_v<const StringType &>);
-            CATCH_CHECK(fly::detail::is_supported_string_v<StringType const &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<string_type &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<const string_type &>);
+            CATCH_CHECK(fly::detail::is_supported_string_v<string_type const &>);
 
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type &>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type &>);
@@ -156,9 +158,9 @@ CATCH_TEMPLATE_TEST_CASE(
 
         CATCH_SECTION("C++-string type pointers")
         {
-            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<StringType *>);
-            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const StringType *>);
-            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<StringType const *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<string_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const string_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<string_type const *>);
 
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type *>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type *>);
@@ -192,9 +194,9 @@ CATCH_TEMPLATE_TEST_CASE(
 
         CATCH_SECTION("C++-string types")
         {
-            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType>);
-            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const StringType>);
-            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType const>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<string_type>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const string_type>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<string_type const>);
 
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type>);
@@ -203,9 +205,9 @@ CATCH_TEMPLATE_TEST_CASE(
 
         CATCH_SECTION("C++-string type references")
         {
-            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType &>);
-            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const StringType &>);
-            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType const &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<string_type &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const string_type &>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<string_type const &>);
 
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type &>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type &>);
@@ -214,9 +216,9 @@ CATCH_TEMPLATE_TEST_CASE(
 
         CATCH_SECTION("C++-string type pointers")
         {
-            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType *>);
-            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const StringType *>);
-            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<StringType const *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<string_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<const string_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_supported_character_v<string_type const *>);
 
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<view_type *>);
             CATCH_CHECK_FALSE(fly::detail::is_supported_string_v<const view_type *>);
@@ -248,29 +250,29 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(fly::detail::is_like_supported_string_v<char_type const *>);
 
             CATCH_CHECK(
-                std::is_same_v<fly::detail::is_like_supported_string_t<char_type *>, StringType>);
+                std::is_same_v<fly::detail::is_like_supported_string_t<char_type *>, string_type>);
             CATCH_CHECK(std::is_same_v<
                         fly::detail::is_like_supported_string_t<const char_type *>,
-                        StringType>);
+                        string_type>);
             CATCH_CHECK(std::is_same_v<
                         fly::detail::is_like_supported_string_t<char_type const *>,
-                        StringType>);
+                        string_type>);
         }
 
         CATCH_SECTION("C++-string types")
         {
-            CATCH_CHECK(fly::detail::is_like_supported_string_v<StringType>);
-            CATCH_CHECK(fly::detail::is_like_supported_string_v<const StringType>);
-            CATCH_CHECK(fly::detail::is_like_supported_string_v<StringType const>);
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<string_type>);
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<const string_type>);
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<string_type const>);
 
             CATCH_CHECK(
-                std::is_same_v<fly::detail::is_like_supported_string_t<StringType>, StringType>);
+                std::is_same_v<fly::detail::is_like_supported_string_t<string_type>, string_type>);
             CATCH_CHECK(std::is_same_v<
-                        fly::detail::is_like_supported_string_t<const StringType>,
-                        StringType>);
+                        fly::detail::is_like_supported_string_t<const string_type>,
+                        string_type>);
             CATCH_CHECK(std::is_same_v<
-                        fly::detail::is_like_supported_string_t<StringType const>,
-                        StringType>);
+                        fly::detail::is_like_supported_string_t<string_type const>,
+                        string_type>);
 
             CATCH_CHECK(fly::detail::is_like_supported_string_v<view_type>);
             CATCH_CHECK(fly::detail::is_like_supported_string_v<const view_type>);
@@ -279,18 +281,19 @@ CATCH_TEMPLATE_TEST_CASE(
 
         CATCH_SECTION("C++-string type references")
         {
-            CATCH_CHECK(fly::detail::is_like_supported_string_v<StringType &>);
-            CATCH_CHECK(fly::detail::is_like_supported_string_v<const StringType &>);
-            CATCH_CHECK(fly::detail::is_like_supported_string_v<StringType const &>);
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<string_type &>);
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<const string_type &>);
+            CATCH_CHECK(fly::detail::is_like_supported_string_v<string_type const &>);
 
             CATCH_CHECK(
-                std::is_same_v<fly::detail::is_like_supported_string_t<StringType &>, StringType>);
+                std::
+                    is_same_v<fly::detail::is_like_supported_string_t<string_type &>, string_type>);
             CATCH_CHECK(std::is_same_v<
-                        fly::detail::is_like_supported_string_t<const StringType &>,
-                        StringType>);
+                        fly::detail::is_like_supported_string_t<const string_type &>,
+                        string_type>);
             CATCH_CHECK(std::is_same_v<
-                        fly::detail::is_like_supported_string_t<StringType const &>,
-                        StringType>);
+                        fly::detail::is_like_supported_string_t<string_type const &>,
+                        string_type>);
 
             CATCH_CHECK(fly::detail::is_like_supported_string_v<view_type &>);
             CATCH_CHECK(fly::detail::is_like_supported_string_v<const view_type &>);
@@ -299,9 +302,9 @@ CATCH_TEMPLATE_TEST_CASE(
 
         CATCH_SECTION("C++-string type pointers")
         {
-            CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<StringType *>);
-            CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<const StringType *>);
-            CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<StringType const *>);
+            CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<string_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<const string_type *>);
+            CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<string_type const *>);
 
             CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<view_type *>);
             CATCH_CHECK_FALSE(fly::detail::is_like_supported_string_v<const view_type *>);
@@ -445,7 +448,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Check whether types are supported strings via SFINAE overloads")
     {
-        CATCH_CHECK(is_supported_string(StringType()));
+        CATCH_CHECK(is_supported_string(string_type()));
 
         CATCH_CHECK_FALSE(is_supported_string(int()));
         CATCH_CHECK_FALSE(is_supported_string(char_type()));
@@ -456,14 +459,14 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         CATCH_CHECK(is_supported_character(char_type()));
 
-        CATCH_CHECK_FALSE(is_supported_character(StringType()));
+        CATCH_CHECK_FALSE(is_supported_character(string_type()));
         CATCH_CHECK_FALSE(is_supported_character(int()));
         CATCH_CHECK_FALSE(is_supported_character(char_pointer_type()));
     }
 
     CATCH_SECTION("Check whether types are like supported strings via SFINAE overloads")
     {
-        CATCH_CHECK(is_like_supported_string(StringType()));
+        CATCH_CHECK(is_like_supported_string(string_type()));
         CATCH_CHECK(is_like_supported_string(char_pointer_type()));
 
         CATCH_CHECK_FALSE(is_like_supported_string(int()));
@@ -472,7 +475,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Check whether types are string-like via SFINAE overloads")
     {
-        CATCH_CHECK(is_string_like(StringType()));
+        CATCH_CHECK(is_string_like(string_type()));
         CATCH_CHECK(is_string_like(char_pointer_type()));
 
         CATCH_CHECK_FALSE(is_string_like(int()));
