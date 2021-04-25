@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/string/string_literal.hpp"
+#include "fly/types/string/literals.hpp"
 
 #include <cctype>
 #include <ios>

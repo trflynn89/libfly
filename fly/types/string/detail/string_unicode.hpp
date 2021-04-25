@@ -2,7 +2,7 @@
 
 #include "fly/traits/traits.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
-#include "fly/types/string/string_literal.hpp"
+#include "fly/types/string/literals.hpp"
 
 #include <array>
 #include <functional>
