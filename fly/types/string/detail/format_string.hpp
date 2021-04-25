@@ -27,15 +27,15 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021
  */
-template <typename StringType, typename... ParameterTypes>
+template <typename CharType, typename... ParameterTypes>
 class BasicFormatString
 {
-    using traits = BasicStringTraits<StringType>;
-    using char_type = typename traits::char_type;
-    using lexer = fly::BasicLexer<char_type>;
+    using string_type = std::basic_string<CharType>;
+    using traits = BasicStringTraits<string_type>;
+    using lexer = fly::BasicLexer<CharType>;
     using view_type = typename traits::view_type;
 
-    using FormatSpecifier = BasicFormatSpecifier<char_type>;
+    using FormatSpecifier = BasicFormatSpecifier<CharType>;
 
     enum class ParameterType : std::uint8_t
     {
@@ -59,7 +59,7 @@ public:
      * Constructor. Parse and validate a C-string literal as a format string.
      */
     template <std::size_t N>
-    FLY_CONSTEVAL BasicFormatString(const char_type (&format)[N]) noexcept;
+    FLY_CONSTEVAL BasicFormatString(const CharType (&format)[N]) noexcept;
 
     BasicFormatString(BasicFormatString &&) = default;
     BasicFormatString &operator=(BasicFormatString &&) = default;
@@ -91,7 +91,7 @@ public:
     std::optional<FormatSpecifier> next_specifier();
 
 private:
-    friend BasicFormatSpecifier<char_type>;
+    friend BasicFormatSpecifier<CharType>;
 
     BasicFormatString(const BasicFormatString &) = delete;
     BasicFormatString &operator=(const BasicFormatString &) = delete;
@@ -142,9 +142,9 @@ private:
      */
     void on_error(const char *error);
 
-    static constexpr const auto s_left_brace = FLY_CHR(char_type, '{');
-    static constexpr const auto s_right_brace = FLY_CHR(char_type, '}');
-    static constexpr const auto s_colon = FLY_CHR(char_type, ':');
+    static constexpr const auto s_left_brace = FLY_CHR(CharType, '{');
+    static constexpr const auto s_right_brace = FLY_CHR(CharType, '}');
+    static constexpr const auto s_colon = FLY_CHR(CharType, ':');
 
     lexer m_lexer;
 
@@ -160,13 +160,13 @@ private:
 };
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
+template <typename CharType, typename... ParameterTypes>
 template <std::size_t N>
-FLY_CONSTEVAL BasicFormatString<StringType, ParameterTypes...>::BasicFormatString(
-    const char_type (&format)[N]) noexcept :
+FLY_CONSTEVAL BasicFormatString<CharType, ParameterTypes...>::BasicFormatString(
+    const CharType (&format)[N]) noexcept :
     m_lexer(format)
 {
-    std::optional<char_type> ch;
+    std::optional<CharType> ch;
 
     if constexpr (!(BasicFormatTraits::is_formattable_v<ParameterTypes> && ...))
     {
@@ -203,29 +203,29 @@ FLY_CONSTEVAL BasicFormatString<StringType, ParameterTypes...>::BasicFormatStrin
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr auto BasicFormatString<StringType, ParameterTypes...>::view() const -> view_type
+template <typename CharType, typename... ParameterTypes>
+constexpr auto BasicFormatString<CharType, ParameterTypes...>::view() const -> view_type
 {
     return m_lexer.view();
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr bool BasicFormatString<StringType, ParameterTypes...>::has_error() const
+template <typename CharType, typename... ParameterTypes>
+constexpr bool BasicFormatString<CharType, ParameterTypes...>::has_error() const
 {
     return !m_error.empty();
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-std::string BasicFormatString<StringType, ParameterTypes...>::error() const
+template <typename CharType, typename... ParameterTypes>
+std::string BasicFormatString<CharType, ParameterTypes...>::error() const
 {
     return std::string(m_error);
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-auto BasicFormatString<StringType, ParameterTypes...>::next_specifier()
+template <typename CharType, typename... ParameterTypes>
+auto BasicFormatString<CharType, ParameterTypes...>::next_specifier()
     -> std::optional<FormatSpecifier>
 {
     if (m_specifier_index >= m_specifier_count)
@@ -237,9 +237,9 @@ auto BasicFormatString<StringType, ParameterTypes...>::next_specifier()
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
+template <typename CharType, typename... ParameterTypes>
 constexpr auto
-BasicFormatString<StringType, ParameterTypes...>::parse_specifier(SpecifierType specifier_type)
+BasicFormatString<CharType, ParameterTypes...>::parse_specifier(SpecifierType specifier_type)
     -> std::optional<FormatSpecifier>
 {
     // The opening { will have already been consumed, so the starting position is one less.
@@ -299,8 +299,8 @@ BasicFormatString<StringType, ParameterTypes...>::parse_specifier(SpecifierType 
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-constexpr std::size_t BasicFormatString<StringType, ParameterTypes...>::parse_position()
+template <typename CharType, typename... ParameterTypes>
+constexpr std::size_t BasicFormatString<CharType, ParameterTypes...>::parse_position()
 {
     if (auto position = m_lexer.consume_number(); position)
     {
@@ -315,9 +315,9 @@ constexpr std::size_t BasicFormatString<StringType, ParameterTypes...>::parse_po
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
+template <typename CharType, typename... ParameterTypes>
 template <size_t N>
-constexpr auto BasicFormatString<StringType, ParameterTypes...>::parameter_type(size_t index)
+constexpr auto BasicFormatString<CharType, ParameterTypes...>::parameter_type(size_t index)
     -> std::optional<ParameterType>
 {
     if constexpr (N < sizeof...(ParameterTypes))
@@ -366,8 +366,8 @@ constexpr auto BasicFormatString<StringType, ParameterTypes...>::parameter_type(
 }
 
 //==================================================================================================
-template <typename StringType, typename... ParameterTypes>
-void BasicFormatString<StringType, ParameterTypes...>::on_error(const char *error)
+template <typename CharType, typename... ParameterTypes>
+void BasicFormatString<CharType, ParameterTypes...>::on_error(const char *error)
 {
     if (!has_error())
     {
