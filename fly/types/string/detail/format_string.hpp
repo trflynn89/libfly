@@ -3,7 +3,7 @@
 #include "fly/fly.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
-#include "fly/types/string/string_lexer.hpp"
+#include "fly/types/string/lexer.hpp"
 #include "fly/types/string/string_literal.hpp"
 
 #include <array>
@@ -31,8 +31,8 @@ template <typename StringType, typename... ParameterTypes>
 class BasicFormatString
 {
     using traits = BasicStringTraits<StringType>;
-    using lexer = fly::BasicStringLexer<StringType>;
     using char_type = typename traits::char_type;
+    using lexer = fly::BasicLexer<char_type>;
     using view_type = typename traits::view_type;
 
     using FormatSpecifier = BasicFormatSpecifier<char_type>;

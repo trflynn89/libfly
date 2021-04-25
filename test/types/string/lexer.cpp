@@ -1,4 +1,4 @@
-#include "fly/types/string/string_lexer.hpp"
+#include "fly/types/string/lexer.hpp"
 
 #include "fly/types/string/string_literal.hpp"
 
@@ -7,18 +7,10 @@
 
 #include <string>
 
-CATCH_TEMPLATE_TEST_CASE(
-    "BasicStringLexer",
-    "[string]",
-    std::string,
-    std::wstring,
-    std::u8string,
-    std::u16string,
-    std::u32string)
+CATCH_TEMPLATE_TEST_CASE("BasicLexer", "[string]", char, wchar_t, char8_t, char16_t, char32_t)
 {
-    using StringType = TestType;
-    using char_type = typename StringType::value_type;
-    using Lexer = fly::BasicStringLexer<StringType>;
+    using char_type = TestType;
+    using Lexer = fly::BasicLexer<char_type>;
 
     CATCH_SECTION("Cannot consume from empty lexer")
     {

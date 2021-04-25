@@ -2,7 +2,7 @@
 
 #include "fly/fly.hpp"
 #include "fly/net/socket/socket_types.hpp"
-#include "fly/types/string/string_lexer.hpp"
+#include "fly/types/string/lexer.hpp"
 
 #include <compare>
 #include <limits>
@@ -216,7 +216,7 @@ Endpoint<IPAddressType>::from_string(std::string_view endpoint)
         }
     }
 
-    fly::BasicStringLexer<std::string> lexer(std::move(port_view));
+    fly::Lexer lexer(std::move(port_view));
 
     auto address = IPAddressType::from_string(std::move(address_view));
     auto port = lexer.consume_number();

@@ -9,6 +9,15 @@
 
 namespace fly {
 
+template <typename CharType>
+class BasicLexer;
+
+using Lexer = BasicLexer<char>;
+using WLexer = BasicLexer<wchar_t>;
+using Lexer8 = BasicLexer<char8_t>;
+using Lexer16 = BasicLexer<char16_t>;
+using Lexer32 = BasicLexer<char32_t>;
+
 /**
  * Helper class to perform lexical analysis of a C-string literal. All methods are constant
  * expressions, allowing for string analysis at compile time.
@@ -16,12 +25,13 @@ namespace fly {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021
  */
-template <typename StringType>
-class BasicStringLexer
+template <typename CharType>
+class BasicLexer
 {
-    using traits = detail::BasicStringTraits<StringType>;
-    using classifier = detail::BasicStringClassifier<StringType>;
-    using char_type = typename traits::char_type;
+    using string_type = std::basic_string<CharType>;
+
+    using traits = detail::BasicStringTraits<string_type>;
+    using classifier = detail::BasicStringClassifier<string_type>;
     using view_type = typename traits::view_type;
 
 public:
@@ -33,14 +43,14 @@ public:
      * @param literals Reference to a C-string literal of size N.
      */
     template <std::size_t N>
-    constexpr explicit BasicStringLexer(const char_type (&literals)[N]) noexcept;
+    constexpr explicit BasicLexer(const CharType (&literals)[N]) noexcept;
 
     /**
      * Constructor. Stores an existing view into a string.
      *
      * @param view The existing view into the string.
      */
-    constexpr explicit BasicStringLexer(view_type view) noexcept;
+    constexpr explicit BasicLexer(view_type view) noexcept;
 
     /**
      * @return A string view into the C-string literal.
@@ -61,7 +71,7 @@ public:
      * @return If available, the character at the provided offset. Otherwise, an uninitialized
      *         value.
      */
-    constexpr std::optional<char_type> peek(std::size_t offset = 0);
+    constexpr std::optional<CharType> peek(std::size_t offset = 0);
 
     /**
      * If a character is available at the current position in the C-string literal, return that
@@ -69,7 +79,7 @@ public:
      *
      * @return If available, the current character. Otherwise, an uninitialized value.
      */
-    constexpr std::optional<char_type> consume();
+    constexpr std::optional<CharType> consume();
 
     /**
      * If a character is available at the current position in the C-string literal, and if that
@@ -80,7 +90,7 @@ public:
      *
      * @return Whether the current character was available and matched the provided character.
      */
-    constexpr bool consume_if(char_type ch);
+    constexpr bool consume_if(CharType ch);
 
     /**
      * Beginning with the current position, retrieve characters from the C-string literal and
@@ -113,13 +123,13 @@ private:
      * @return Whether the current character was available and satisfied the provided condition.
      */
     template <typename Condition>
-    constexpr std::optional<char_type> consume_if(Condition condition);
+    constexpr std::optional<CharType> consume_if(Condition condition);
 
-    static constexpr const auto s_zero = FLY_CHR(char_type, '0');
-    static constexpr const auto s_upper_a = FLY_CHR(char_type, 'A');
-    static constexpr const auto s_upper_f = FLY_CHR(char_type, 'F');
-    static constexpr const auto s_lower_a = FLY_CHR(char_type, 'a');
-    static constexpr const auto s_lower_f = FLY_CHR(char_type, 'f');
+    static constexpr const auto s_zero = FLY_CHR(CharType, '0');
+    static constexpr const auto s_upper_a = FLY_CHR(CharType, 'A');
+    static constexpr const auto s_upper_f = FLY_CHR(CharType, 'F');
+    static constexpr const auto s_lower_a = FLY_CHR(CharType, 'a');
+    static constexpr const auto s_lower_f = FLY_CHR(CharType, 'f');
 
     const std::size_t m_size;
     const view_type m_view;
@@ -128,39 +138,39 @@ private:
 };
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <std::size_t N>
-constexpr BasicStringLexer<StringType>::BasicStringLexer(const char_type (&literals)[N]) noexcept :
+constexpr BasicLexer<CharType>::BasicLexer(const CharType (&literals)[N]) noexcept :
     m_size(classifier::size(literals)),
     m_view(literals, m_size)
 {
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr BasicStringLexer<StringType>::BasicStringLexer(view_type view) noexcept :
+template <typename CharType>
+constexpr BasicLexer<CharType>::BasicLexer(view_type view) noexcept :
     m_size(view.size()),
     m_view(std::move(view))
 {
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr auto BasicStringLexer<StringType>::view() const -> view_type
+template <typename CharType>
+constexpr auto BasicLexer<CharType>::view() const -> view_type
 {
     return m_view;
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr std::size_t BasicStringLexer<StringType>::position() const
+template <typename CharType>
+constexpr std::size_t BasicLexer<CharType>::position() const
 {
     return m_index;
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr auto BasicStringLexer<StringType>::peek(std::size_t offset) -> std::optional<char_type>
+template <typename CharType>
+constexpr std::optional<CharType> BasicLexer<CharType>::peek(std::size_t offset)
 {
     if ((m_index + offset) >= m_size)
     {
@@ -171,8 +181,8 @@ constexpr auto BasicStringLexer<StringType>::peek(std::size_t offset) -> std::op
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr auto BasicStringLexer<StringType>::consume() -> std::optional<char_type>
+template <typename CharType>
+constexpr std::optional<CharType> BasicLexer<CharType>::consume()
 {
     if (m_index >= m_size)
     {
@@ -183,8 +193,8 @@ constexpr auto BasicStringLexer<StringType>::consume() -> std::optional<char_typ
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr bool BasicStringLexer<StringType>::consume_if(char_type ch)
+template <typename CharType>
+constexpr bool BasicLexer<CharType>::consume_if(CharType ch)
 {
     if (auto next = peek(); next && (next.value() == ch))
     {
@@ -196,8 +206,8 @@ constexpr bool BasicStringLexer<StringType>::consume_if(char_type ch)
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr std::optional<std::uintmax_t> BasicStringLexer<StringType>::consume_number()
+template <typename CharType>
+constexpr std::optional<std::uintmax_t> BasicLexer<CharType>::consume_number()
 {
     bool parsed_number = false;
     std::uintmax_t number = 0;
@@ -214,8 +224,8 @@ constexpr std::optional<std::uintmax_t> BasicStringLexer<StringType>::consume_nu
 }
 
 //==================================================================================================
-template <typename StringType>
-constexpr std::optional<std::uintmax_t> BasicStringLexer<StringType>::consume_hex_number()
+template <typename CharType>
+constexpr std::optional<std::uintmax_t> BasicLexer<CharType>::consume_hex_number()
 {
     bool parsed_number = false;
     std::uintmax_t number = 0;
@@ -243,10 +253,9 @@ constexpr std::optional<std::uintmax_t> BasicStringLexer<StringType>::consume_he
 }
 
 //==================================================================================================
-template <typename StringType>
+template <typename CharType>
 template <typename Condition>
-constexpr auto BasicStringLexer<StringType>::consume_if(Condition condition)
-    -> std::optional<char_type>
+constexpr std::optional<CharType> BasicLexer<CharType>::consume_if(Condition condition)
 {
     if (auto next = peek(); next && condition(next.value()))
     {

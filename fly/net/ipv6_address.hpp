@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/fly.hpp"
-#include "fly/types/string/string_lexer.hpp"
+#include "fly/types/string/lexer.hpp"
 
 #include <algorithm>
 #include <array>
@@ -172,7 +172,7 @@ constexpr std::optional<IPv6Address> IPv6Address::from_string(std::string_view a
         static_cast<std::uint64_t>(std::numeric_limits<std::uint16_t>::max());
     constexpr const auto s_colon = ':';
 
-    fly::BasicStringLexer<std::string> lexer(std::move(address));
+    fly::Lexer lexer(std::move(address));
     address_type parts {};
 
     std::optional<std::size_t> index_after_short_form;
