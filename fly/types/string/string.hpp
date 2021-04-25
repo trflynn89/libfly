@@ -1,11 +1,11 @@
 #pragma once
 
 #include "fly/types/string/detail/classifier.hpp"
+#include "fly/types/string/detail/converter.hpp"
 #include "fly/types/string/detail/format_context.hpp"
 #include "fly/types/string/detail/format_parameters.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/format_string.hpp"
-#include "fly/types/string/detail/string_converter.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/string_unicode.hpp"
 #include "fly/types/string/literals.hpp"
@@ -949,13 +949,13 @@ std::optional<T> BasicString<StringType>::convert(const StringType &value)
     }
     else if constexpr (std::is_same_v<char_type, char>)
     {
-        return detail::BasicStringConverter<StringType, T>::convert(value);
+        return detail::Converter<T>::convert(value);
     }
     else
     {
         if (auto result = unicode::template convert_encoding<std::string>(value); result)
         {
-            return detail::BasicStringConverter<std::string, T>::convert(*result);
+            return detail::Converter<T>::convert(*result);
         }
 
         return std::nullopt;

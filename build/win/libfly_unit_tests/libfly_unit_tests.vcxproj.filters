@@ -161,6 +161,9 @@
     <ClCompile Include="..\..\..\test\types\string\classifier.cpp">
       <Filter>types\string</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\types\string\converter.cpp">
+      <Filter>types\string</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\types\string\format_parameters.cpp">
       <Filter>types\string</Filter>
     </ClCompile>
@@ -171,9 +174,6 @@
       <Filter>types\string</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\string\string.cpp">
-      <Filter>types\string</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\types\string\string_converter.cpp">
       <Filter>types\string</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\string\string_format.cpp">
