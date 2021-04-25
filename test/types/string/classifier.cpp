@@ -6,24 +6,18 @@
 #include <cctype>
 #include <string>
 
-CATCH_TEMPLATE_TEST_CASE(
-    "BasicClassifier",
-    "[string]",
-    std::string,
-    std::wstring,
-    std::u8string,
-    std::u16string,
-    std::u32string)
+CATCH_TEMPLATE_TEST_CASE("BasicClassifier", "[string]", char, wchar_t, char8_t, char16_t, char32_t)
 {
-    using StringType = TestType;
-    using BasicString = fly::BasicString<StringType>;
+    using BasicString = fly::BasicString<TestType>;
+
+    using string_type = typename BasicString::string_type;
     using char_type = typename BasicString::char_type;
     using view_type = typename BasicString::view_type;
 
     CATCH_SECTION("Get the size of a string-like type")
     {
         const char_type *cstr = FLY_STR(char_type, "ten chars!");
-        StringType str = cstr;
+        string_type str = cstr;
         view_type view = str;
         const char_type arr[] = {'t', 'e', 'n', ' ', 'c', 'h', 'a', 'r', 's', '!'};
 

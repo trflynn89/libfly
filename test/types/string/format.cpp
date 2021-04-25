@@ -60,29 +60,32 @@ void test_format(
     StringType &&expected,
     ParameterTypes &&...parameters)
 {
-    using BasicString = fly::BasicString<fly::detail::is_like_supported_string_t<StringType>>;
+    using char_type = typename fly::detail::is_like_supported_string_t<StringType>::value_type;
 
-    auto result =
-        BasicString::format(std::move(format), std::forward<ParameterTypes>(parameters)...);
+    auto result = fly::BasicString<char_type>::format(
+        std::move(format),
+        std::forward<ParameterTypes>(parameters)...);
 
     CATCH_CHECK(result == expected);
 }
 
-template <typename CharType>
-std::basic_string<CharType> reserved_codepoint()
+template <typename StringType>
+StringType reserved_codepoint()
 {
-    static constexpr const std::uint32_t s_reserved = 0xd800;
-    std::basic_string<CharType> result;
+    using char_type = typename StringType::value_type;
 
-    if constexpr (sizeof(CharType) == 1)
+    static constexpr const std::uint32_t s_reserved = 0xd800;
+    StringType result;
+
+    if constexpr (sizeof(char_type) == 1)
     {
-        result += static_cast<CharType>(0xe0 | (s_reserved >> 12));
-        result += static_cast<CharType>(0x80 | ((s_reserved >> 6) & 0x3f));
-        result += static_cast<CharType>(0x80 | (s_reserved & 0x3f));
+        result += static_cast<char_type>(0xe0 | (s_reserved >> 12));
+        result += static_cast<char_type>(0x80 | ((s_reserved >> 6) & 0x3f));
+        result += static_cast<char_type>(0x80 | (s_reserved & 0x3f));
     }
     else
     {
-        result = std::basic_string<CharType>(1, static_cast<CharType>(s_reserved));
+        result = StringType(1, static_cast<char_type>(s_reserved));
     }
 
     return result;
@@ -90,37 +93,11 @@ std::basic_string<CharType> reserved_codepoint()
 
 } // namespace
 
-CATCH_TEMPLATE_TEST_CASE(
-    "BasicStringFormatter",
-    "[string]",
-    char,
-    wchar_t,
-    char8_t,
-    char16_t,
-    char32_t)
+CATCH_TEMPLATE_TEST_CASE("Format", "[string]", char, wchar_t, char8_t, char16_t, char32_t)
 {
-    using char_type = TestType;
-    using string_type = std::basic_string<char_type>;
-    using BasicString = fly::BasicString<string_type>;
-    using view_type = typename BasicString::view_type;
+    using BasicString = fly::BasicString<TestType>;
 
-    auto is_all_hex = [](view_type value)
-    {
-        if (value.starts_with(FLY_STR(char_type, "0x")))
-        {
-            value = value.substr(2);
-        }
-
-        for (const auto &ch : value)
-        {
-            if (!BasicString::is_x_digit(ch))
-            {
-                return false;
-            }
-        }
-
-        return !value.empty();
-    };
+    using char_type = typename BasicString::char_type;
 
     CATCH_SECTION("Format string without replacement fields")
     {
@@ -463,6 +440,34 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{0:.{1}f}"), FMT("3.141590"), 3.14159, -2);
         test_format(FMT("{1:.{0}s}"), FMT("abcdef"), -3, FLY_STR(char_type, "abcdef"));
     }
+}
+
+// This test is broken up because otherwise it is too large for Windows and a stack overflow occurs.
+CATCH_TEMPLATE_TEST_CASE("FormatTypes", "[string]", char, wchar_t, char8_t, char16_t, char32_t)
+{
+    using BasicString = fly::BasicString<TestType>;
+
+    using string_type = typename BasicString::string_type;
+    using char_type = typename BasicString::char_type;
+    using view_type = typename BasicString::view_type;
+
+    auto is_all_hex = [](view_type value)
+    {
+        if (value.starts_with(FLY_STR(char_type, "0x")))
+        {
+            value = value.substr(2);
+        }
+
+        for (const auto &ch : value)
+        {
+            if (!BasicString::is_x_digit(ch))
+            {
+                return false;
+            }
+        }
+
+        return !value.empty();
+    };
 
     CATCH_SECTION("Generic types may be formatted without presentation type")
     {
@@ -740,6 +745,16 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:G}"), FMT("2.1"), static_cast<double>(2.1));
         test_format(FMT("{:G}"), FMT("2.1"), static_cast<long double>(2.1));
     }
+}
+
+#if defined(FLY_COMPILER_DISABLE_CONSTEVAL)
+
+// This test is broken up because otherwise it is too large for Windows and a stack overflow occurs.
+CATCH_TEMPLATE_TEST_CASE("FormatErrors", "[string]", char, wchar_t, char8_t, char16_t, char32_t)
+{
+    using BasicString = fly::BasicString<TestType>;
+
+    using char_type = typename BasicString::char_type;
 
     CATCH_SECTION("Invalid characters cannot be formatted")
     {
@@ -754,48 +769,46 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         if constexpr (!std::is_same_v<char_type, char>)
         {
-            const auto reserved = reserved_codepoint<char>();
+            const auto reserved = reserved_codepoint<std::string>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), "ab" + reserved);
         }
         if constexpr (!std::is_same_v<char_type, wchar_t>)
         {
-            const auto reserved = reserved_codepoint<wchar_t>();
+            const auto reserved = reserved_codepoint<std::wstring>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), L"ab" + reserved);
         }
         if constexpr (!std::is_same_v<char_type, char8_t>)
         {
-            const auto reserved = reserved_codepoint<char8_t>();
+            const auto reserved = reserved_codepoint<std::u8string>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), u8"ab" + reserved);
         }
         if constexpr (!std::is_same_v<char_type, char16_t>)
         {
-            const auto reserved = reserved_codepoint<char16_t>();
+            const auto reserved = reserved_codepoint<std::u16string>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), u"ab" + reserved);
         }
         if constexpr (!std::is_same_v<char_type, char32_t>)
         {
-            const auto reserved = reserved_codepoint<char32_t>();
+            const auto reserved = reserved_codepoint<std::u32string>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), U"ab" + reserved);
         }
     }
 
-#if defined(FLY_COMPILER_DISABLE_CONSTEVAL)
-
     CATCH_SECTION("Formatter reports formatting errors")
     {
         auto result = BasicString::format(FMT("{:}"));
         CATCH_CHECK(result.starts_with(FMT("Ignored invalid formatter")));
     }
+}
 
 #endif
-}

@@ -96,8 +96,7 @@ CATCH_TEMPLATE_TEST_CASE(
     char16_t,
     char32_t)
 {
-    using char_type = TestType;
-    using traits = typename fly::detail::BasicStringTraits<char_type>;
+    using traits = typename fly::detail::BasicStringTraits<TestType>;
 
     using string_type = typename traits::string_type;
     using char_type = typename traits::char_type;

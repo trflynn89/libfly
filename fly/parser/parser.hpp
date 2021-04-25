@@ -183,16 +183,16 @@ private:
 template <typename StringType>
 std::optional<fly::Json> Parser::parse_string(const StringType &contents)
 {
-    using CharType = typename StringType::value_type;
+    using char_type = typename StringType::value_type;
 
-    if constexpr (std::is_same_v<CharType, std::ios::char_type>)
+    if constexpr (std::is_same_v<char_type, std::ios::char_type>)
     {
-        std::basic_istringstream<CharType> stream(contents);
+        std::basic_istringstream<char_type> stream(contents);
         return parse_stream(std::move(stream));
     }
     else
     {
-        auto utf8_contents = fly::BasicString<StringType>::template convert<std::string>(contents);
+        auto utf8_contents = fly::BasicString<char_type>::template convert<std::string>(contents);
         return utf8_contents ? parse_string(*utf8_contents) : std::nullopt;
     }
 }
@@ -201,19 +201,19 @@ std::optional<fly::Json> Parser::parse_string(const StringType &contents)
 template <typename StringType, std::endian Endianness>
 std::optional<std::string> Parser::ensure_utf8(std::istream &stream) const
 {
-    using CharType = typename StringType::value_type;
+    using char_type = typename StringType::value_type;
 
-    static constexpr const std::uint8_t s_char_size = sizeof(CharType);
+    static constexpr const std::uint8_t s_char_size = sizeof(char_type);
     StringType contents;
 
     while (stream)
     {
-        CharType character = 0;
+        char_type character = 0;
 
         for (std::uint8_t i = 0; stream && (i < s_char_size); ++i)
         {
             const std::uint8_t shift = 8 * (s_char_size - i - 1);
-            character |= static_cast<CharType>(stream.get() & 0xff) << shift;
+            character |= static_cast<char_type>(stream.get() & 0xff) << shift;
         }
 
         if (stream)
@@ -227,7 +227,7 @@ std::optional<std::string> Parser::ensure_utf8(std::istream &stream) const
         }
     }
 
-    return fly::BasicString<StringType>::template convert<std::string>(contents);
+    return fly::BasicString<char_type>::template convert<std::string>(contents);
 }
 
 //==================================================================================================
