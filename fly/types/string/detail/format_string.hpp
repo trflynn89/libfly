@@ -4,7 +4,7 @@
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/lexer.hpp"
-#include "fly/types/string/string_literal.hpp"
+#include "fly/types/string/literals.hpp"
 
 #include <array>
 #include <cstdint>

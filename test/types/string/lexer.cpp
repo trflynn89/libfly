@@ -1,6 +1,6 @@
 #include "fly/types/string/lexer.hpp"
 
-#include "fly/types/string/string_literal.hpp"
+#include "fly/types/string/literals.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"

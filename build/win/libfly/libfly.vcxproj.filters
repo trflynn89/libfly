@@ -280,13 +280,13 @@
     <ClInclude Include="..\..\..\fly\types\string\lexer.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\literals.hpp">
+      <Filter>types\string</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\string.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\string_formatters.hpp">
-      <Filter>types\string</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\string_literal.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\format_context.hpp">
