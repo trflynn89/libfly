@@ -313,7 +313,7 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_unicode.hpp">
+    <ClInclude Include="..\..\..\fly\types\string\detail\unicode.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
   </ItemGroup>
