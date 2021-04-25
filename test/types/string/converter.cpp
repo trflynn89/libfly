@@ -46,7 +46,7 @@ StringType maxstr()
 } // namespace
 
 CATCH_TEMPLATE_TEST_CASE(
-    "BasicStringConverter",
+    "Converter",
     "[string]",
     std::string,
     std::wstring,

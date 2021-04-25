@@ -8,7 +8,7 @@
 namespace fly::detail {
 
 /**
- * Helper struct to convert a std::basic_string type to a plain-old-data type, e.g. int or float.
+ * Helper struct to convert a std::string to a plain-old-data type, e.g. int or float.
  *
  * Ideally, this entire helper can be removed when the STL supports floating point types with
  * std::from_chars. However, only integral types are currently supported. Thus, integral types will
@@ -19,14 +19,10 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 21, 2019
  */
-template <typename StringType, typename T>
-struct BasicStringConverter;
-
-//==================================================================================================
-template <typename StringType, typename T>
-struct BasicStringConverter
+template <typename T>
+struct Converter
 {
-    static std::optional<T> convert(const StringType &value)
+    static std::optional<T> convert(const std::string &value)
     {
         const auto *begin = value.data();
         const auto *end = begin + value.size();
@@ -44,15 +40,13 @@ struct BasicStringConverter
 };
 
 //==================================================================================================
-template <typename StringType>
-struct BasicStringConverter<StringType, float>
+template <>
+struct Converter<float>
 {
-    using value_type = float;
-
-    static std::optional<value_type> convert(const StringType &value)
+    static std::optional<float> convert(const std::string &value)
     {
         std::size_t index = 0;
-        value_type result {};
+        float result {};
 
         try
         {
@@ -73,15 +67,13 @@ struct BasicStringConverter<StringType, float>
 };
 
 //==================================================================================================
-template <typename StringType>
-struct BasicStringConverter<StringType, double>
+template <>
+struct Converter<double>
 {
-    using value_type = double;
-
-    static std::optional<value_type> convert(const StringType &value)
+    static std::optional<double> convert(const std::string &value)
     {
         std::size_t index = 0;
-        value_type result {};
+        double result {};
 
         try
         {
@@ -102,15 +94,13 @@ struct BasicStringConverter<StringType, double>
 };
 
 //==================================================================================================
-template <typename StringType>
-struct BasicStringConverter<StringType, long double>
+template <>
+struct Converter<long double>
 {
-    using value_type = long double;
-
-    static std::optional<value_type> convert(const StringType &value)
+    static std::optional<long double> convert(const std::string &value)
     {
         std::size_t index = 0;
-        value_type result {};
+        long double result {};
 
         try
         {
