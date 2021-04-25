@@ -28,9 +28,7 @@ using Lexer32 = BasicLexer<char32_t>;
 template <typename CharType>
 class BasicLexer
 {
-    using string_type = std::basic_string<CharType>;
-
-    using traits = detail::BasicStringTraits<string_type>;
+    using traits = detail::BasicStringTraits<CharType>;
     using classifier = detail::BasicClassifier<CharType>;
     using view_type = typename traits::view_type;
 

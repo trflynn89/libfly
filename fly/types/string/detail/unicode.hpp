@@ -28,8 +28,8 @@ namespace fly::detail {
 template <typename CharType>
 class BasicUnicode
 {
-    using string_type = std::basic_string<CharType>;
-    using traits = detail::BasicStringTraits<string_type>;
+    using traits = detail::BasicStringTraits<CharType>;
+    using string_type = typename traits::string_type;
     using view_type = typename traits::view_type;
     using codepoint_type = typename traits::codepoint_type;
 

@@ -33,8 +33,8 @@ inline constexpr bool is_supported_character_v = is_supported_character<CharType
 
 /**
  * Define a trait for testing if StringType is like a supported std::basic_string specialization. A
- * type is "like" a std::basic_string specialization if it is that specialization itself or a
- * C-string equalivent.
+ * type is "like" a std::basic_string specialization if it is that specialization itself, a C-string
+ * equalivent, or a std::basic_string_view specialization.
  *
  * For types that are like a supported std::basic_string specialization, this trait also defines a
  * type alias to that specialization. Other types are aliased to void and should not be used.
@@ -95,29 +95,23 @@ using OstreamTraits = DeclarationTraits<OstreamDeclaration>;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 23, 2019
  */
-template <typename StringType>
+template <typename CharType>
 struct BasicStringTraits
 {
-    static_assert(
-        is_supported_string_v<StringType>,
-        "StringType must be a standard std::basic_string specialization");
+    static_assert(is_supported_character_v<CharType>, "CharType must be a standard character type");
 
-    /**
-     * Aliases for STL types that use std::basic_string specializations as a template type.
-     */
-    using string_type = StringType;
-    using size_type = typename StringType::size_type;
-    using char_type = typename StringType::value_type;
+    using string_type = std::basic_string<CharType>;
+    using size_type = typename string_type::size_type;
+    using char_type = CharType;
     using view_type = std::basic_string_view<char_type>;
     using int_type = typename std::char_traits<char_type>::int_type;
-
     using codepoint_type = std::uint32_t;
 
     /**
-     * Define a trait for testing if type T is a string-like type analogous to StringType.
+     * Define a trait for testing if type T is a string-like type analogous to string_type.
      */
     template <typename T>
-    using is_string_like = std::is_same<is_like_supported_string_t<T>, StringType>;
+    using is_string_like = std::is_same<is_like_supported_string_t<T>, string_type>;
 
     template <typename T>
     inline static constexpr bool is_string_like_v = is_string_like<T>::value;
