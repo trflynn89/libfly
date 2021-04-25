@@ -16,8 +16,7 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021
  */
-template <typename StringType>
-class BasicStreamModifiers
+class ScopedStreamModifiers
 {
 public:
     /**
@@ -25,12 +24,12 @@ public:
      *
      * @param stream The stream to be modified.
      */
-    explicit BasicStreamModifiers(std::ostream &stream) noexcept;
+    explicit ScopedStreamModifiers(std::ostream &stream) noexcept;
 
     /**
      * Destructor. Restore the stream's orginal state.
      */
-    ~BasicStreamModifiers();
+    ~ScopedStreamModifiers();
 
     /**
      * Sets a formatting flag on the stream.
@@ -77,8 +76,8 @@ public:
     void precision(std::streamsize size);
 
 private:
-    BasicStreamModifiers(const BasicStreamModifiers &) = delete;
-    BasicStreamModifiers &operator=(const BasicStreamModifiers &) = delete;
+    ScopedStreamModifiers(const ScopedStreamModifiers &) = delete;
+    ScopedStreamModifiers &operator=(const ScopedStreamModifiers &) = delete;
 
     std::ostream &m_stream;
 
@@ -119,8 +118,7 @@ private:
 };
 
 //==================================================================================================
-template <typename StringType>
-BasicStreamModifiers<StringType>::BasicStreamModifiers(std::ostream &stream) noexcept :
+inline ScopedStreamModifiers::ScopedStreamModifiers(std::ostream &stream) noexcept :
     m_stream(stream),
     m_flags(stream.flags()),
     m_locale(stream.getloc()),
@@ -131,8 +129,7 @@ BasicStreamModifiers<StringType>::BasicStreamModifiers(std::ostream &stream) noe
 }
 
 //==================================================================================================
-template <typename StringType>
-BasicStreamModifiers<StringType>::~BasicStreamModifiers()
+inline ScopedStreamModifiers::~ScopedStreamModifiers()
 {
     if (m_changed_flags)
     {
@@ -157,50 +154,43 @@ BasicStreamModifiers<StringType>::~BasicStreamModifiers()
 }
 
 //==================================================================================================
-template <typename StringType>
-inline void BasicStreamModifiers<StringType>::setf(std::ios_base::fmtflags flag)
+inline void ScopedStreamModifiers::setf(std::ios_base::fmtflags flag)
 {
     m_stream.setf(flag);
     m_changed_flags = true;
 }
 
 //==================================================================================================
-template <typename StringType>
-inline void
-BasicStreamModifiers<StringType>::setf(std::ios_base::fmtflags flag, std::ios_base::fmtflags mask)
+inline void ScopedStreamModifiers::setf(std::ios_base::fmtflags flag, std::ios_base::fmtflags mask)
 {
     m_stream.setf(flag, mask);
     m_changed_flags = true;
 }
 
 //==================================================================================================
-template <typename StringType>
 template <typename Facet>
-inline void BasicStreamModifiers<StringType>::locale()
+inline void ScopedStreamModifiers::locale()
 {
     m_stream.imbue({m_stream.getloc(), new Facet()});
     m_changed_locale = true;
 }
 
 //==================================================================================================
-template <typename StringType>
-inline void BasicStreamModifiers<StringType>::fill(char ch)
+inline void ScopedStreamModifiers::fill(char ch)
 {
     m_stream.fill(ch);
     m_changed_fill = true;
 }
 
 //==================================================================================================
-template <typename StringType>
-inline void BasicStreamModifiers<StringType>::width(std::streamsize size)
+inline void ScopedStreamModifiers::width(std::streamsize size)
 {
     m_stream.width(size);
     m_changed_width = true;
 }
 
 //==================================================================================================
-template <typename StringType>
-inline void BasicStreamModifiers<StringType>::precision(std::streamsize size)
+inline void ScopedStreamModifiers::precision(std::streamsize size)
 {
     m_stream.precision(size);
     m_changed_precision = true;

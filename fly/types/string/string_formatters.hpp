@@ -219,7 +219,6 @@ struct Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>
 
 private:
     using string_type = std::basic_string<CharType>;
-    using stream_modifiers = detail::BasicStreamModifiers<string_type>;
     using specifier = detail::BasicFormatSpecifier<CharType>;
 
     static constexpr const auto s_zero = FLY_CHR(CharType, '0');
@@ -646,7 +645,7 @@ void Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>::format(
     FormatContext &context)
 {
     static thread_local std::stringstream s_stream;
-    stream_modifiers modifiers(s_stream);
+    detail::ScopedStreamModifiers modifiers(s_stream);
 
     if (context.spec().m_alignment == specifier::Alignment::Default)
     {
