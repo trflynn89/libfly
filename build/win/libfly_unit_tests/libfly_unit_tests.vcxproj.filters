@@ -116,6 +116,9 @@
     <ClCompile Include="..\..\..\test\task\task.cpp">
       <Filter>task</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\traits\concepts.cpp">
+      <Filter>traits</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\traits\traits.cpp">
       <Filter>traits</Filter>
     </ClCompile>
