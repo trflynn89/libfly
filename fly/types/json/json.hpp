@@ -210,7 +210,7 @@ public:
      * @throws JsonException If the string-like value is not valid.
      */
     template <typename T, enable_if<JsonTraits::is_string_like<T>> = 0>
-    Json(T &&value) noexcept(false);
+    Json(T value) noexcept(false);
 
     /**
      * Object constructor. Intializes the Json instance to an object's values. The SFINAE
@@ -224,7 +224,7 @@ public:
      * @throws JsonException If an object key is not a valid string.
      */
     template <typename T, enable_if<JsonTraits::is_object<T>> = 0>
-    Json(T &&value) noexcept(false);
+    Json(T value) noexcept(false);
 
     /**
      * Array constructor. Intializes the Json instance to an array's values. The SFINAE declaration
@@ -237,7 +237,7 @@ public:
      * @throws JsonException If an string-like value in the array is not valid.
      */
     template <typename T, enable_if<JsonTraits::is_array<T>> = 0>
-    Json(T &&value) noexcept(false);
+    Json(T value) noexcept(false);
 
     /**
      * Boolean constructor. Intializes the Json instance to a boolean value. The SFINAE declaration
@@ -1524,56 +1524,26 @@ private:
 
 //==================================================================================================
 template <typename T, enable_if<JsonTraits::is_string_like<T>>>
-Json::Json(T &&value) noexcept(false)
+Json::Json(T value) noexcept(false) : m_value(convert_to_string(std::move(value)))
 {
-    if constexpr (std::is_lvalue_reference_v<T>)
-    {
-        m_value = convert_to_string(value);
-    }
-    else
-    {
-        m_value = convert_to_string(std::forward<T>(value));
-    }
 }
 
 //==================================================================================================
 template <typename T, enable_if<JsonTraits::is_object<T>>>
-Json::Json(T &&value) noexcept(false)
+Json::Json(T value) noexcept(false)
 {
-    if constexpr (std::is_lvalue_reference_v<T>)
-    {
-        m_value.emplace<JsonTraits::object_type>();
-
-        for (const auto &it : value)
-        {
-            insert(it.first, it.second);
-        }
-    }
-    else
-    {
-        merge(std::forward<T>(value));
-    }
+    merge(std::move(value));
 }
 
 //==================================================================================================
 template <typename T, enable_if<JsonTraits::is_array<T>>>
-Json::Json(T &&value) noexcept(false) : m_value(JsonTraits::array_type())
+Json::Json(T value) noexcept(false) : m_value(JsonTraits::array_type())
 {
     reserve(JsonTraits::ArrayTraits::size(value));
 
-    if constexpr (std::is_lvalue_reference_v<T>)
+    for (auto &it : value)
     {
-        for (const auto &it : value)
-        {
-            push_back(it);
-        }
-    }
-    else
-    {
-        for (auto &it : value)
-        {
-            push_back(std::move(it));
-        }
+        push_back(std::move(it));
     }
 }
 
