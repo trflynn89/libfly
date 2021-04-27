@@ -856,12 +856,12 @@ auto BasicString<CharType>::format(
     using FormatContext =
         detail::BasicFormatContext<std::back_insert_iterator<string_type>, char_type>;
 
-    if (fmt.has_error())
+    if (fmt.context().has_error())
     {
-        return format(FLY_ARR(char_type, "Ignored invalid formatter: {}"), fmt.error());
+        return format(FLY_ARR(char_type, "Ignored invalid formatter: {}"), fmt.context().error());
     }
 
-    const view_type view = fmt.view();
+    const view_type view = fmt.context().view();
 
     string_type formatted;
     formatted.reserve(view.size() * 2);

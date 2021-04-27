@@ -107,8 +107,8 @@ void test_format(FormatStringType &&format, const SpecifierType &...specifiers)
         CATCH_CHECK(actual_specifier == specifier);
     };
 
-    CATCH_CHECK_FALSE(format.has_error());
-    CATCH_CAPTURE(format.error());
+    CATCH_CHECK_FALSE(format.context().has_error());
+    CATCH_CAPTURE(format.context().error());
     (equals(specifiers), ...);
 
     CATCH_CHECK_FALSE(format.next_specifier());
@@ -119,8 +119,8 @@ void test_format(FormatStringType &&format, const SpecifierType &...specifiers)
 template <typename FormatStringType>
 void test_error(FormatStringType &&format, std::string &&error)
 {
-    CATCH_CHECK(format.has_error());
-    CATCH_CHECK(format.error() == error);
+    CATCH_CHECK(format.context().has_error());
+    CATCH_CHECK(format.context().error() == error);
 }
 
 // Copies of all of the error messages that BasicFormatString might raise. Ideally, these could be
@@ -151,7 +151,7 @@ constexpr const char *s_bad_precision_position =
     "Position of precision parameter must be an integral type";
 constexpr const char *s_bad_locale =
     "Locale-specific form may only be used for numeric and boolean types";
-constexpr const char *s_bad_generic = "Generic types must be formatted with {}";
+constexpr const char *s_bad_generic = s_unclosed_string;
 constexpr const char *s_bad_character = "Character types must be formatted with {} or {:cbBodxX}";
 constexpr const char *s_bad_string = "String types must be formatted with {} or {:s}";
 constexpr const char *s_bad_pointer = "Pointer types must be formatted with {} or {:p}";
@@ -219,9 +219,9 @@ CATCH_TEMPLATE_TEST_CASE(
                 "{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}"
                 "{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}{0}"),
             1);
-        CATCH_CHECK_FALSE(format.has_error());
+        CATCH_CHECK_FALSE(format.context().has_error());
 
-        const std::size_t specifiers_created = format.view().size() / 3;
+        const std::size_t specifiers_created = format.context().view().size() / 3;
         std::size_t specifiers_parsed = 0;
 
         while (format.next_specifier())
@@ -651,7 +651,7 @@ CATCH_TEMPLATE_TEST_CASE(
     CATCH_SECTION("Specifiers track their size in the format string")
     {
         auto format = make_format(FMT("ab {0} cd {1:d} ef {2:#0x}"), 1, 2, 3);
-        CATCH_CHECK_FALSE(format.has_error());
+        CATCH_CHECK_FALSE(format.context().has_error());
 
         auto specifier1 = format.next_specifier();
         CATCH_REQUIRE(specifier1);

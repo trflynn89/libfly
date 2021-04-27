@@ -1,6 +1,8 @@
 #pragma once
 
 #include "fly/fly.hpp"
+#include "fly/types/string/detail/format_parameter_type.hpp"
+#include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/lexer.hpp"
@@ -9,8 +11,6 @@
 #include <array>
 #include <cstdint>
 #include <optional>
-#include <string>
-#include <tuple>
 #include <type_traits>
 
 namespace fly::detail {
@@ -30,28 +30,8 @@ namespace fly::detail {
 template <typename CharType, typename... ParameterTypes>
 class BasicFormatString
 {
-    using traits = BasicStringTraits<CharType>;
-    using lexer = fly::BasicLexer<CharType>;
-    using view_type = typename traits::view_type;
-
+    using FormatParseContext = BasicFormatParseContext<CharType>;
     using FormatSpecifier = BasicFormatSpecifier<CharType>;
-
-    enum class ParameterType : std::uint8_t
-    {
-        Generic,
-        Character,
-        String,
-        Pointer,
-        Integral,
-        FloatingPoint,
-        Boolean,
-    };
-
-    enum class SpecifierType : std::uint8_t
-    {
-        Full,
-        Nested,
-    };
 
 public:
     /**
@@ -64,25 +44,9 @@ public:
     BasicFormatString &operator=(BasicFormatString &&) = default;
 
     /**
-     * @return A string view into the format string.
+     * @return A reference to the format parsing context.
      */
-    constexpr view_type view() const;
-
-    /**
-     * If the compiler does not support immediate functions, returns whether an error was
-     * encountered while parsing the format string.
-     *
-     * @return True if an error was encountered while parsing.
-     */
-    constexpr bool has_error() const;
-
-    /**
-     * If the compiler does not support immediate functions, returns any error that was encountered
-     * while parsing the format string.
-     *
-     * @return The error (if any) that was encountered while parsing the format string.
-     */
-    std::string error() const;
+    constexpr const FormatParseContext &context();
 
     /**
      * @return If available, the next parsed replacement field. Otherwise, an uninitialized value.
@@ -90,72 +54,30 @@ public:
     std::optional<FormatSpecifier> next_specifier();
 
 private:
-    friend BasicFormatSpecifier<CharType>;
-
     BasicFormatString(const BasicFormatString &) = delete;
     BasicFormatString &operator=(const BasicFormatString &) = delete;
 
     /**
      * Upon parsing an un-escaped opening brace, parse a single replacement field in the format
-     * string. If valid, the lexer will be advanced to the character after the closing brace.
+     * string. If valid, the format parsing context will be advanced to the character after the
+     * closing brace.
      *
-     * @param specifier_type The type of replacement field to parse (either a full or nested field).
-     *
-     * @return If successful, the parsed specifier. Otherwise, an uninitialized value.
+     * @return If successful, the parsed replacement field. Otherwise, an uninitialized value.
      */
-    constexpr std::optional<FormatSpecifier> parse_specifier(SpecifierType specifier_type);
-
-    /**
-     * Parse the optional position argument of the current replacement field. If a position was not
-     * found, the position is observed to be the next format parameter in order.
-     *
-     * It is an error if the format string has a mix of manual and automatic positioning.
-     *
-     * @return The parsed or observed format parameter position.
-     */
-    constexpr std::size_t parse_position();
-
-    /**
-     * Determine the type of a format parameter. Returns ParameterType::Generic if the type of the
-     * format parameter is unknown.
-     *
-     * @param index The index of the format parameter to inspect.
-     *
-     * @return If found, the type of the format parameter. Otherwise, an uninitialized value.
-     */
-    template <size_t N = 0>
-    constexpr std::optional<ParameterType> parameter_type(size_t index);
-
-    /**
-     * Record an error that was encountered while parsing the format string.
-     *
-     * If the compiler supports immediate functions, this will raise a compilation error because
-     * this method is purposefully non-constexpr. This results in an attempt to invoke a
-     * non-constant expression from a constant context, which is erroneous. The error message from
-     * the caller should be displayed in the terminal.
-     *
-     * If the compiler does not support immediate functions, this will store the error message. Only
-     * the first error encountered will be stored.
-     *
-     * @param error A message describing the error that was encountered.
-     */
-    void on_error(const char *error);
+    constexpr std::optional<FormatSpecifier> parse_specifier();
 
     static constexpr const auto s_left_brace = FLY_CHR(CharType, '{');
     static constexpr const auto s_right_brace = FLY_CHR(CharType, '}');
     static constexpr const auto s_colon = FLY_CHR(CharType, ':');
 
-    lexer m_lexer;
+    static constexpr std::array<ParameterType, sizeof...(ParameterTypes)> s_parameters {
+        infer_parameter_type<ParameterTypes>()...};
+
+    FormatParseContext m_context;
 
     std::array<FormatSpecifier, 64> m_specifiers;
     std::size_t m_specifier_count {0};
     std::size_t m_specifier_index {0};
-
-    std::size_t m_next_position {0};
-    bool m_expect_no_positions_specified {false};
-    bool m_expect_all_positions_specified {false};
-
-    std::string_view m_error;
 };
 
 //==================================================================================================
@@ -163,63 +85,50 @@ template <typename CharType, typename... ParameterTypes>
 template <std::size_t N>
 FLY_CONSTEVAL BasicFormatString<CharType, ParameterTypes...>::BasicFormatString(
     const CharType (&format)[N]) noexcept :
-    m_lexer(format)
+    m_context(format, s_parameters.data(), s_parameters.size())
 {
     std::optional<CharType> ch;
 
     if constexpr (!(BasicFormatTraits::is_formattable_v<ParameterTypes> && ...))
     {
-        on_error("An overloaded operator<< must be defined for all format parameters");
+        m_context.on_error("An overloaded operator<< must be defined for all format parameters");
     }
 
-    while (!has_error() && (ch = m_lexer.consume()))
+    while (!m_context.has_error() && (ch = m_context.lexer().consume()))
     {
         if (ch == s_left_brace)
         {
-            if (m_lexer.consume_if(s_left_brace))
+            if (m_context.lexer().consume_if(s_left_brace))
             {
                 continue;
             }
             else if (m_specifier_count >= m_specifiers.size())
             {
-                on_error("Exceeded maximum allowed number of specifiers");
+                m_context.on_error("Exceeded maximum allowed number of specifiers");
             }
-            else if (auto specifier = parse_specifier(SpecifierType::Full); specifier)
+            else if (auto specifier = parse_specifier(); specifier)
             {
                 m_specifiers[m_specifier_count++] = *std::move(specifier);
             }
         }
         else if (ch == s_right_brace)
         {
-            if (m_lexer.consume_if(s_right_brace))
+            if (m_context.lexer().consume_if(s_right_brace))
             {
                 continue;
             }
 
-            on_error("Closing brace } must be esacped");
+            m_context.on_error("Closing brace } must be esacped");
         }
     }
 }
 
 //==================================================================================================
 template <typename CharType, typename... ParameterTypes>
-constexpr auto BasicFormatString<CharType, ParameterTypes...>::view() const -> view_type
+constexpr const BasicFormatParseContext<CharType> &
+BasicFormatString<CharType, ParameterTypes...>::context()
 {
-    return m_lexer.view();
-}
-
-//==================================================================================================
-template <typename CharType, typename... ParameterTypes>
-constexpr bool BasicFormatString<CharType, ParameterTypes...>::has_error() const
-{
-    return !m_error.empty();
-}
-
-//==================================================================================================
-template <typename CharType, typename... ParameterTypes>
-std::string BasicFormatString<CharType, ParameterTypes...>::error() const
-{
-    return std::string(m_error);
+    return m_context;
 }
 
 //==================================================================================================
@@ -237,141 +146,42 @@ auto BasicFormatString<CharType, ParameterTypes...>::next_specifier()
 
 //==================================================================================================
 template <typename CharType, typename... ParameterTypes>
-constexpr auto
-BasicFormatString<CharType, ParameterTypes...>::parse_specifier(SpecifierType specifier_type)
+constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
     -> std::optional<FormatSpecifier>
 {
     // The opening { will have already been consumed, so the starting position is one less.
-    const auto starting_position = m_lexer.position() - 1;
+    const auto starting_position = m_context.lexer().position() - 1;
 
     FormatSpecifier specifier {};
-    specifier.m_position = parse_position();
+    specifier.m_position = m_context.next_position();
 
-    auto param_type = parameter_type(specifier.m_position);
+    // TODO: For now, generic format parameters must be formatted with "{}".
+    if (auto parameter_type = m_context.parameter_type(specifier.m_position);
+        parameter_type && parameter_type != ParameterType::Generic)
+    {
+        if (m_context.lexer().consume_if(s_colon))
+        {
+            specifier.parse(m_context, *parameter_type);
 
-    if (param_type == ParameterType::Generic)
-    {
-        // TODO: For now, generic format parameters must be formatted with "{}".
-        if (!m_lexer.consume_if(s_right_brace))
-        {
-            on_error("Generic types must be formatted with {}");
-            return std::nullopt;
-        }
-    }
-    else
-    {
-        if (param_type)
-        {
-            if ((specifier_type == SpecifierType::Full) && m_lexer.consume_if(s_colon))
+            if (m_context.has_error())
             {
-                specifier.parse(*this, *param_type);
-
-                if (has_error())
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
-            else
-            {
-                specifier.template infer_type<BasicFormatString>(*param_type);
-            }
-        }
-
-        if (!m_lexer.consume_if(s_right_brace))
-        {
-            on_error("Detected unclosed format string - must end with }");
-            return std::nullopt;
-        }
-    }
-
-    if (m_expect_no_positions_specified && m_expect_all_positions_specified)
-    {
-        on_error("Argument position must be provided on all or not on any specifier");
-    }
-    else if (!param_type)
-    {
-        on_error("Argument position exceeds number of provided arguments");
-    }
-
-    specifier.m_size = m_lexer.position() - starting_position;
-    return specifier;
-}
-
-//==================================================================================================
-template <typename CharType, typename... ParameterTypes>
-constexpr std::size_t BasicFormatString<CharType, ParameterTypes...>::parse_position()
-{
-    if (auto position = m_lexer.consume_number(); position)
-    {
-        m_expect_all_positions_specified = true;
-        return static_cast<std::size_t>(position.value());
-    }
-    else
-    {
-        m_expect_no_positions_specified = true;
-        return m_next_position++;
-    }
-}
-
-//==================================================================================================
-template <typename CharType, typename... ParameterTypes>
-template <size_t N>
-constexpr auto BasicFormatString<CharType, ParameterTypes...>::parameter_type(size_t index)
-    -> std::optional<ParameterType>
-{
-    if constexpr (N < sizeof...(ParameterTypes))
-    {
-        if (N != index)
-        {
-            return parameter_type<N + 1>(index);
-        }
-
-        using T = std::decay_t<std::tuple_element_t<N, std::tuple<ParameterTypes...>>>;
-
-        if constexpr (is_supported_character_v<T>)
-        {
-            return ParameterType::Character;
-        }
-        else if constexpr (is_like_supported_string_v<T>)
-        {
-            return ParameterType::String;
-        }
-        else if constexpr (std::is_pointer_v<T> || std::is_null_pointer_v<T>)
-        {
-            return ParameterType::Pointer;
-        }
-        else if constexpr (
-            BasicFormatTraits::is_integer_v<T> || BasicFormatTraits::is_default_formatted_enum_v<T>)
-        {
-            return ParameterType::Integral;
-        }
-        else if constexpr (std::is_floating_point_v<T>)
-        {
-            return ParameterType::FloatingPoint;
-        }
-        else if constexpr (std::is_same_v<T, bool>)
-        {
-            return ParameterType::Boolean;
         }
         else
         {
-            return ParameterType::Generic;
+            specifier.infer_type(*parameter_type);
         }
     }
-    else
+
+    if (!m_context.lexer().consume_if(s_right_brace))
     {
+        m_context.on_error("Detected unclosed format string - must end with }");
         return std::nullopt;
     }
-}
 
-//==================================================================================================
-template <typename CharType, typename... ParameterTypes>
-void BasicFormatString<CharType, ParameterTypes...>::on_error(const char *error)
-{
-    if (!has_error())
-    {
-        m_error = error;
-    }
+    specifier.m_size = m_context.lexer().position() - starting_position;
+    return specifier;
 }
 
 } // namespace fly::detail
