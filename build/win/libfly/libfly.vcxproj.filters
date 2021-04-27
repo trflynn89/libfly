@@ -298,7 +298,13 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\format_context.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\format_parameter_type.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\format_parameters.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\format_parse_context.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\format_specifier.hpp">
