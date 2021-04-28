@@ -705,8 +705,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Cannot parse single opening brace")
     {
-        test_error(make_format(FMT("{")), s_unclosed_string);
-        test_error(make_format(FMT("{:")), s_unclosed_string);
+        test_error(make_format(FMT("{"), 1), s_unclosed_string);
+        test_error(make_format(FMT("{:"), 1), s_unclosed_string);
     }
 
     CATCH_SECTION("Cannot parse single closing brace")

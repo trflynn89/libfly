@@ -66,6 +66,18 @@ private:
      */
     constexpr std::optional<FormatSpecifier> parse_specifier();
 
+    /**
+     * Parse a replacement field for a user-defined type.
+     */
+    constexpr void parse_user_defined_specifier();
+
+    /**
+     * Parse a replacement field for a standard type.
+     *
+     * @param specifier The replacement field being parsed.
+     */
+    constexpr void parse_standard_specifier(FormatSpecifier &specifier);
+
     static constexpr const auto s_left_brace = FLY_CHR(CharType, '{');
     static constexpr const auto s_right_brace = FLY_CHR(CharType, '}');
     static constexpr const auto s_colon = FLY_CHR(CharType, ':');
@@ -155,33 +167,48 @@ constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
     FormatSpecifier specifier {};
     specifier.m_position = m_context.next_position();
 
-    // TODO: For now, user-defined format parameters must be formatted with "{}".
-    if (auto parameter_type = m_context.parameter_type(specifier.m_position);
-        parameter_type && parameter_type != ParameterType::UserDefined)
+    if (m_context.parameter_type(specifier.m_position) == ParameterType::UserDefined)
     {
-        if (m_context.lexer().consume_if(s_colon))
-        {
-            specifier.parse(m_context, *parameter_type);
-
-            if (m_context.has_error())
-            {
-                return std::nullopt;
-            }
-        }
-        else
-        {
-            specifier.infer_type(*parameter_type);
-        }
+        parse_user_defined_specifier();
     }
-
-    if (!m_context.lexer().consume_if(s_right_brace))
+    else
     {
-        m_context.on_error("Detected unclosed replacement field - must end with }");
-        return std::nullopt;
+        parse_standard_specifier(specifier);
     }
 
     specifier.m_size = m_context.lexer().position() - starting_position;
     return specifier;
+}
+
+//==================================================================================================
+template <typename CharType, typename... ParameterTypes>
+constexpr void BasicFormatString<CharType, ParameterTypes...>::parse_user_defined_specifier()
+{
+    // TODO: For now, user-defined format parameters must be formatted with "{}".
+    if (!m_context.lexer().consume_if(s_right_brace))
+    {
+        m_context.on_error("Detected unclosed replacement field - must end with }");
+    }
+}
+
+//==================================================================================================
+template <typename CharType, typename... ParameterTypes>
+constexpr void
+BasicFormatString<CharType, ParameterTypes...>::parse_standard_specifier(FormatSpecifier &specifier)
+{
+    if (m_context.lexer().consume_if(s_colon))
+    {
+        specifier.parse(m_context);
+    }
+    else
+    {
+        specifier.infer_type(m_context);
+    }
+
+    if (!m_context.has_error() && !m_context.lexer().consume_if(s_right_brace))
+    {
+        m_context.on_error("Detected unclosed replacement field - must end with }");
+    }
 }
 
 } // namespace fly::detail
