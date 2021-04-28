@@ -2066,3 +2066,25 @@ inline const T &Json::get(const char *error_message) const
 }
 
 } // namespace fly
+
+//==================================================================================================
+template <typename CharType>
+struct fly::Formatter<fly::Json, CharType> :
+    public fly::Formatter<std::basic_string_view<CharType>, CharType>
+{
+    /**
+     * Format a JSON value.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param json The JSON value to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(const fly::Json &json, FormatContext &context)
+    {
+        // TODO: Implement this without IO streams.
+        const fly::JsonTraits::string_type json_string(json);
+        fly::Formatter<std::basic_string_view<CharType>, CharType>::format(json_string, context);
+    }
+};

@@ -3,6 +3,7 @@
 #include "fly/parser/parser.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/json/json_traits.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <cstdint>
 #include <istream>
@@ -43,27 +44,6 @@ public:
     };
 
     /**
-     * Constructor. Create a parser with strict compliance.
-     */
-    JsonParser() = default;
-
-    /**
-     * Constructor. Create a parser with the specified features.
-     *
-     * @param features The extra features to allow.
-     */
-    explicit JsonParser(const Features features) noexcept;
-
-protected:
-    /**
-     * Parse a single complete JSON value from the stream.
-     *
-     * @return If successful, the parsed JSON value. Otherwise, an uninitialized value.
-     */
-    std::optional<fly::Json> parse_internal() override;
-
-private:
-    /**
      * ASCII codes for special JSON tokens.
      */
     enum class Token : std::char_traits<fly::JsonTraits::char_type>::int_type
@@ -91,6 +71,27 @@ private:
         CloseBrace = 0x7d, // }
     };
 
+    /**
+     * Constructor. Create a parser with strict compliance.
+     */
+    JsonParser() = default;
+
+    /**
+     * Constructor. Create a parser with the specified features.
+     *
+     * @param features The extra features to allow.
+     */
+    explicit JsonParser(const Features features) noexcept;
+
+protected:
+    /**
+     * Parse a single complete JSON value from the stream.
+     *
+     * @return If successful, the parsed JSON value. Otherwise, an uninitialized value.
+     */
+    std::optional<fly::Json> parse_internal() override;
+
+private:
     /**
      * Enumeration to indicate the type of a JSON number to parse.
      */
@@ -239,3 +240,33 @@ JsonParser::Features operator&(JsonParser::Features a, JsonParser::Features b);
 JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b);
 
 } // namespace fly::parser
+
+//==================================================================================================
+template <>
+struct fly::Formatter<fly::parser::JsonParser::Token>
+{
+    /**
+     * Format a JSON parser token.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param token The JSON parser token to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(fly::parser::JsonParser::Token token, FormatContext &context)
+    {
+        if (token == fly::parser::JsonParser::Token::EndOfFile)
+        {
+            context.out()++ = 'E';
+            context.out()++ = 'O';
+            context.out()++ = 'F';
+        }
+        else
+        {
+            context.out()++ = '\'';
+            context.out()++ = static_cast<char>(token);
+            context.out()++ = '\'';
+        }
+    }
+};

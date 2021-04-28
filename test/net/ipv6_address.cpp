@@ -4,8 +4,6 @@
 
 #include "catch2/catch_test_macros.hpp"
 
-#include <sstream>
-
 #if defined(FLY_LINUX) || defined(FLY_MACOS)
 #    include <netinet/in.h>
 #elif defined(FLY_WINDOWS)
@@ -115,7 +113,8 @@ CATCH_TEST_CASE("IPv6Address", "[net]")
             0xb6,
         });
 
-        CATCH_CHECK(address1.to_string() == "a1a2:a3a4:a5a6:a7a8:a9b0:b1b2:b3b4:b5b6");
+        CATCH_CHECK(
+            fly::String::format("{}", address1) == "a1a2:a3a4:a5a6:a7a8:a9b0:b1b2:b3b4:b5b6");
     }
 
     CATCH_SECTION("IPv6 addresses may be copied to an array")
@@ -131,42 +130,28 @@ CATCH_TEST_CASE("IPv6Address", "[net]")
     CATCH_SECTION("IPv6 addresses may be converted to a string with leading zeros removed")
     {
         const fly::net::IPv6Address address1({1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6});
-        CATCH_CHECK(address1.to_string() == "102:304:506:708:900:102:304:506");
+        CATCH_CHECK(fly::String::format("{}", address1) == "102:304:506:708:900:102:304:506");
     }
 
     CATCH_SECTION("IPv6 addresses may be converted to a string with consecutive zeros removed once")
     {
         const fly::net::IPv6Address address1({1, 2, 0, 0, 0, 0, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6});
-        CATCH_CHECK(address1.to_string() == "102::708:900:102:304:506");
+        CATCH_CHECK(fly::String::format("{}", address1) == "102::708:900:102:304:506");
 
         const fly::net::IPv6Address address2({1, 2, 0, 0, 0, 0, 7, 8, 0, 0, 0, 0, 3, 4, 5, 6});
-        CATCH_CHECK(address2.to_string() == "102::708:0:0:304:506");
+        CATCH_CHECK(fly::String::format("{}", address2) == "102::708:0:0:304:506");
 
         const fly::net::IPv6Address address3({1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 0, 0});
-        CATCH_CHECK(address3.to_string() == "102:304:506:708:900:102:304::");
+        CATCH_CHECK(fly::String::format("{}", address3) == "102:304:506:708:900:102:304::");
 
         const fly::net::IPv6Address address4({0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-        CATCH_CHECK(address4.to_string() == "1::");
+        CATCH_CHECK(fly::String::format("{}", address4) == "1::");
 
         const fly::net::IPv6Address address5({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1});
-        CATCH_CHECK(address5.to_string() == "::1");
+        CATCH_CHECK(fly::String::format("{}", address5) == "::1");
 
         const fly::net::IPv6Address address6({0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1});
-        CATCH_CHECK(address6.to_string() == "1::1");
-    }
-
-    CATCH_SECTION("IPv6 addresses may be streamed as a string")
-    {
-        {
-            std::stringstream stream;
-            stream << fly::net::IPv6Address::in_addr_any();
-            CATCH_CHECK(stream.str() == "::");
-        }
-        {
-            std::stringstream stream;
-            stream << fly::net::IPv6Address::in_addr_loopback();
-            CATCH_CHECK(stream.str() == "::1");
-        }
+        CATCH_CHECK(fly::String::format("{}", address6) == "1::1");
     }
 
     CATCH_SECTION("IPv6 addresses may be created from full form strings")

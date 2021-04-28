@@ -55,7 +55,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
 
     auto config_manager = fly::config::ConfigManager::create(
         task_runner,
-        fly::config::ConfigManager::ConfigFileType::Json,
+        fly::config::ConfigFileType::Json,
         config_file);
     CATCH_REQUIRE(config_manager);
 
@@ -66,13 +66,13 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     {
         config_manager = fly::config::ConfigManager::create(
             task_runner,
-            fly::config::ConfigManager::ConfigFileType::Ini,
+            fly::config::ConfigFileType::Ini,
             config_file);
         CATCH_CHECK(config_manager);
 
         config_manager = fly::config::ConfigManager::create(
             task_runner,
-            fly::config::ConfigManager::ConfigFileType::Json,
+            fly::config::ConfigFileType::Json,
             config_file);
         CATCH_CHECK(config_manager);
     }
@@ -81,7 +81,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     {
         config_manager = fly::config::ConfigManager::create(
             task_runner,
-            static_cast<fly::config::ConfigManager::ConfigFileType>(-1),
+            static_cast<fly::config::ConfigFileType>(-1),
             config_file);
         CATCH_CHECK_FALSE(config_manager);
     }
@@ -217,8 +217,8 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
         CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents2));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
-        // Multiple fly::PathMonitor::PathEvent::Changed events may be triggered even though the
-        // above write happens as a single call. If needed, wait for a second event.
+        // Multiple fly::PathEvent::Changed events may be triggered even though the above write
+        // happens as a single call. If needed, wait for a second event.
         if (config->get_value<std::string>("name", "").empty())
         {
             task_runner->wait_for_task_to_complete(s_config_manager_file);

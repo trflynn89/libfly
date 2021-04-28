@@ -13,7 +13,6 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <sstream>
 #include <string>
 
 #if defined(FLY_LINUX)
@@ -60,30 +59,30 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
     std::filesystem::path file2 = path1.file();
     std::filesystem::path file3 = path2.file();
 
-    fly::ConcurrentQueue<fly::path::PathMonitor::PathEvent> event_queue;
+    fly::ConcurrentQueue<fly::path::PathEvent> event_queue;
 
     std::map<std::filesystem::path, unsigned int> created_files;
     std::map<std::filesystem::path, unsigned int> deleted_files;
     std::map<std::filesystem::path, unsigned int> changed_files;
 
-    auto handle_event = [&](std::filesystem::path path, fly::path::PathMonitor::PathEvent event)
+    auto handle_event = [&](std::filesystem::path path, fly::path::PathEvent event)
     {
         switch (event)
         {
-            case fly::path::PathMonitor::PathEvent::Created:
+            case fly::path::PathEvent::Created:
                 ++created_files[path];
                 break;
 
-            case fly::path::PathMonitor::PathEvent::Deleted:
+            case fly::path::PathEvent::Deleted:
                 ++deleted_files[path];
                 break;
 
-            case fly::path::PathMonitor::PathEvent::Changed:
+            case fly::path::PathEvent::Changed:
                 ++changed_files[path];
                 break;
 
             default:
-                CATCH_FAIL("Unrecognized PathEvent: " << event);
+                CATCH_FAIL("Unrecognized PathEvent: " << fly::String::format("{}", event));
                 break;
         }
 
@@ -98,33 +97,13 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
     CATCH_REQUIRE(monitor->add_file(file2, handle_event));
     CATCH_REQUIRE(monitor->add_file(file3, handle_event));
 
-    CATCH_SECTION("Verify streaming of path events")
+    CATCH_SECTION("Verify formatting of path events")
     {
-        {
-            std::stringstream stream;
-            stream << static_cast<fly::path::PathMonitor::PathEvent>(-1);
-            CATCH_CHECK(stream.str().empty());
-        }
-        {
-            std::stringstream stream;
-            stream << fly::path::PathMonitor::PathEvent::None;
-            CATCH_CHECK(stream.str() == "None");
-        }
-        {
-            std::stringstream stream;
-            stream << fly::path::PathMonitor::PathEvent::Created;
-            CATCH_CHECK(stream.str() == "Created");
-        }
-        {
-            std::stringstream stream;
-            stream << fly::path::PathMonitor::PathEvent::Deleted;
-            CATCH_CHECK(stream.str() == "Deleted");
-        }
-        {
-            std::stringstream stream;
-            stream << fly::path::PathMonitor::PathEvent::Changed;
-            CATCH_CHECK(stream.str() == "Changed");
-        }
+        CATCH_CHECK(fly::String::format("{}", static_cast<fly::path::PathEvent>(-1)).empty());
+        CATCH_CHECK(fly::String::format("{}", fly::path::PathEvent::None) == "None");
+        CATCH_CHECK(fly::String::format("{}", fly::path::PathEvent::Created) == "Created");
+        CATCH_CHECK(fly::String::format("{}", fly::path::PathEvent::Deleted) == "Deleted");
+        CATCH_CHECK(fly::String::format("{}", fly::path::PathEvent::Changed) == "Changed");
     }
 
     CATCH_SECTION("Cannot monitor paths that do not exist")
@@ -179,7 +158,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 
     CATCH_SECTION("Creating a file issues a PathEvent::Created event")
     {
-        fly::path::PathMonitor::PathEvent event;
+        fly::path::PathEvent event;
 
         CATCH_CHECK(created_files[file0] == 0);
         CATCH_CHECK(deleted_files[file0] == 0);
@@ -195,7 +174,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 
     CATCH_SECTION("Deleting a file issues a PathEvent::Deleted event")
     {
-        fly::path::PathMonitor::PathEvent event;
+        fly::path::PathEvent event;
 
         CATCH_CHECK(created_files[file0] == 0);
         CATCH_CHECK(deleted_files[file0] == 0);
@@ -213,7 +192,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 
     CATCH_SECTION("Changing a file issues a PathEvent::Changed event")
     {
-        fly::path::PathMonitor::PathEvent event;
+        fly::path::PathEvent event;
 
         CATCH_CHECK(created_files[file0] == 0);
         CATCH_CHECK(deleted_files[file0] == 0);
@@ -293,7 +272,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 
     CATCH_SECTION("Monitor can handle many events")
     {
-        fly::path::PathMonitor::PathEvent event;
+        fly::path::PathEvent event;
 
         CATCH_CHECK(created_files[file1] == 0);
         CATCH_CHECK(deleted_files[file1] == 0);

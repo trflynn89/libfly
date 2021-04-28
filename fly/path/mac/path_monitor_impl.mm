@@ -205,22 +205,21 @@ void PathMonitorImpl::event_callback(
 }
 
 //==================================================================================================
-std::vector<PathMonitor::PathEvent>
-PathMonitorImpl::convert_to_events(const FSEventStreamEventFlags &flags)
+std::vector<PathEvent> PathMonitorImpl::convert_to_events(const FSEventStreamEventFlags &flags)
 {
-    std::vector<PathMonitor::PathEvent> path_events;
+    std::vector<PathEvent> path_events;
 
     if ((flags & kFSEventStreamEventFlagItemCreated) != 0)
     {
-        path_events.push_back(PathMonitor::PathEvent::Created);
+        path_events.push_back(PathEvent::Created);
     }
     if ((flags & kFSEventStreamEventFlagItemModified) != 0)
     {
-        path_events.push_back(PathMonitor::PathEvent::Changed);
+        path_events.push_back(PathEvent::Changed);
     }
     if ((flags & kFSEventStreamEventFlagItemRemoved) != 0)
     {
-        path_events.push_back(PathMonitor::PathEvent::Deleted);
+        path_events.push_back(PathEvent::Deleted);
     }
 
     return path_events;

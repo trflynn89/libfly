@@ -2,6 +2,7 @@
 
 #include "fly/fly.hpp"
 #include "fly/types/string/lexer.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <algorithm>
 #include <array>
@@ -9,7 +10,6 @@
 #include <cstdint>
 #include <limits>
 #include <optional>
-#include <ostream>
 #include <string>
 
 namespace fly::net {
@@ -87,18 +87,11 @@ public:
     static constexpr std::optional<IPv6Address> from_string(std::string_view address);
 
     /**
-     * Convert the IPv6 address to a string in shorthand form.
-     *
-     * @return The IPv6 address as a string.
-     */
-    std::string to_string() const;
-
-    /**
      * Copy the IPv6 address into a 16-part array.
      *
      * @param address The 16-part array of octets to copy the IPv6 address into.
      */
-    void copy(address_type::value_type (&address)[16]) const;
+    constexpr void copy(address_type::value_type (&address)[16]) const;
 
 #if defined(FLY_LINUX)
     /**
@@ -117,16 +110,6 @@ public:
     constexpr bool operator>(const IPv6Address &address) const;
     constexpr bool operator>=(const IPv6Address &address) const;
 #endif
-
-    /**
-     * Stream an IPv6 address as a string in shorthand form.
-     *
-     * @param stream A reference to the output stream.
-     * @param address The IPv6 address to stream.
-     *
-     * @return A reference to the output stream.
-     */
-    friend std::ostream &operator<<(std::ostream &stream, const IPv6Address &address);
 
 private:
     static constexpr std::size_t s_address_size = std::tuple_size_v<address_type>;
@@ -218,6 +201,12 @@ constexpr std::optional<IPv6Address> IPv6Address::from_string(std::string_view a
     return IPv6Address(std::move(parts));
 }
 
+//==================================================================================================
+constexpr void IPv6Address::copy(address_type::value_type (&address)[16]) const
+{
+    std::copy(m_address.begin(), m_address.end(), std::begin(address));
+}
+
 #if !defined(FLY_LINUX)
 
 //==================================================================================================
@@ -259,3 +248,54 @@ constexpr bool IPv6Address::operator>=(const IPv6Address &address) const
 #endif
 
 } // namespace fly::net
+
+//==================================================================================================
+template <>
+struct fly::Formatter<fly::net::IPv6Address>
+{
+    /**
+     * Format an IPv6 address as a string in shorthand form.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param address The IPv6 address to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(const fly::net::IPv6Address &address, FormatContext &context)
+    {
+        static constexpr std::size_t s_address_size =
+            std::tuple_size_v<fly::net::IPv6Address::address_type>;
+
+        fly::net::IPv6Address::address_type::value_type parts[s_address_size] {};
+        address.copy(parts);
+
+        auto join_segments = [&parts](std::size_t index) -> std::uint16_t
+        {
+            return (parts[index] << 8) | parts[index + 1];
+        };
+
+        bool used_short_form = false;
+
+        for (std::size_t i = 0; i < s_address_size;)
+        {
+            const std::uint16_t segment = join_segments(i);
+
+            if ((segment == 0) && !used_short_form)
+            {
+                do
+                {
+                    i += 2;
+                } while ((i < s_address_size) && (join_segments(i) == 0));
+
+                fly::String::format_to(context.out(), "{}", (i < s_address_size) ? ":" : "::");
+                used_short_form = true;
+            }
+            else
+            {
+                fly::String::format_to(context.out(), "{:.{}}{:x}", ":", (i > 0) ? 1 : 0, segment);
+                i += 2;
+            }
+        }
+    }
+};

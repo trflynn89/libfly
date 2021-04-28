@@ -34,29 +34,13 @@ namespace fly {
 template <typename T, typename CharType = char, typename SFINAE = bool>
 struct Formatter;
 
-template <typename T, typename CharType>
-struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_user_defined<T>>>
-{
-    /**
-     * Format a single replacement field with the provided user-defined value.
-     *
-     * Currently, rather than supporting a set of std::formatter specializations, the user-defined
-     * value will be converted to a string via the streaming operator. The resulting string will
-     * then be formatted using the string formatting overload.
-     *
-     * @tparam FormatParameter The type of the formatting context.
-     *
-     * @param value The value to format.
-     * @param context The context holding the formatting state.
-     */
-    template <typename FormatContext>
-    void format(const T &value, FormatContext &context);
-};
-
+//==================================================================================================
 template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>
 {
     using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+    Formatter() = default;
 
     /**
      * Constructor.
@@ -68,7 +52,7 @@ struct Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>
     /**
      * Format a single replacement field with the provided string-like value.
      *
-     * @tparam FormatParameter The type of the formatting context.
+     * @tparam FormatContext The type of the formatting context.
      *
      * @param value The value to format.
      * @param context The context holding the formatting state.
@@ -83,7 +67,7 @@ struct Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>
      * inserted directly. Otherwise, it is first transcoded to the appropriate Unicode encoding. If
      * transcoding fails, the value is dropped.
      *
-     * @tparam FormatParameter The type of the formatting context.
+     * @tparam FormatContext The type of the formatting context.
      *
      * @param value The value to append.
      * @param value_size The size of the value to append.
@@ -97,13 +81,16 @@ private:
 
     static constexpr const auto s_space = FLY_CHR(CharType, ' ');
 
-    FormatSpecifier m_specifier;
+    FormatSpecifier m_specifier {};
 };
 
+//==================================================================================================
 template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_pointer<T>>>
 {
     using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+    Formatter() = default;
 
     /**
      * Constructor.
@@ -115,7 +102,7 @@ struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_point
     /**
      * Format a single replacement field with the provided pointer value.
      *
-     * @tparam FormatParameter The type of the formatting context.
+     * @tparam FormatContext The type of the formatting context.
      *
      * @param value The value to format.
      * @param context The context holding the formatting state.
@@ -124,13 +111,16 @@ struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_point
     void format(T value, FormatContext &context);
 
 private:
-    FormatSpecifier m_specifier;
+    FormatSpecifier m_specifier {};
 };
 
+//==================================================================================================
 template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integral<T>>>
 {
     using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+    Formatter() = default;
 
     /**
      * Constructor.
@@ -142,7 +132,7 @@ struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integ
     /**
      * Format a single replacement field with the provided non-boolean integral value.
      *
-     * @tparam FormatParameter The type of the formatting context.
+     * @tparam FormatContext The type of the formatting context.
      *
      * @param value The value to format.
      * @param context The context holding the formatting state.
@@ -157,7 +147,7 @@ private:
      * Format a single replacement field with the provided unsigned, non-boolean integral value.
      *
      * @tparam U The type of the value to format.
-     * @tparam FormatParameter The type of the formatting context.
+     * @tparam FormatContext The type of the formatting context.
      *
      * @param value The value to format.
      * @param is_negative Whether the original value was negative.
@@ -173,7 +163,7 @@ private:
      * If the value does not fit into the bounds of CharType, it is dropped.
      *
      * @tparam U The type of the value to format.
-     * @tparam FormatParameter The type of the formatting context.
+     * @tparam FormatContext The type of the formatting context.
      *
      * @param value The value to format.
      * @param is_negative Whether the original value was negative.
@@ -193,7 +183,7 @@ private:
      * transcoded to the appropriate Unicode encoding, incurring extra string copying.
      *
      * @tparam U The type of the value to append.
-     * @tparam FormatParameter The type of the formatting context.
+     * @tparam FormatContext The type of the formatting context.
      *
      * @param value The value to append.
      * @param base The base of the value.
@@ -226,13 +216,16 @@ private:
     static constexpr const auto s_lower_x = FLY_CHR(CharType, 'x');
     static constexpr const auto s_upper_x = FLY_CHR(CharType, 'X');
 
-    FormatSpecifier m_specifier;
+    FormatSpecifier m_specifier {};
 };
 
+//==================================================================================================
 template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>
 {
     using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+    Formatter() = default;
 
     /**
      * Constructor.
@@ -247,7 +240,7 @@ struct Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>
      * Currently, major compilers do not support std::to_chars for floating point values. Until they
      * do, this implementation uses an IO stream to format the value.
      *
-     * @tparam FormatParameter The type of the formatting context.
+     * @tparam FormatContext The type of the formatting context.
      *
      * @param value The value to format.
      * @param context The context holding the formatting state.
@@ -258,13 +251,16 @@ struct Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>
 private:
     static constexpr const auto s_zero = FLY_CHR(CharType, '0');
 
-    FormatSpecifier m_specifier;
+    FormatSpecifier m_specifier {};
 };
 
+//==================================================================================================
 template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<std::is_same<T, bool>>>
 {
     using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+    Formatter() = default;
 
     /**
      * Constructor.
@@ -276,7 +272,7 @@ struct Formatter<T, CharType, fly::enable_if<std::is_same<T, bool>>>
     /**
      * Format a single replacement field with the provided boolean value.
      *
-     * @tparam FormatParameter The type of the formatting context.
+     * @tparam FormatContext The type of the formatting context.
      *
      * @param value The value to format.
      * @param context The context holding the formatting state.
@@ -288,28 +284,8 @@ private:
     static constexpr const CharType *s_true = FLY_STR(CharType, "true");
     static constexpr const CharType *s_false = FLY_STR(CharType, "false");
 
-    FormatSpecifier m_specifier;
+    FormatSpecifier m_specifier {};
 };
-
-//==================================================================================================
-template <typename T, typename CharType>
-template <typename FormatContext>
-inline void
-Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_user_defined<T>>>::format(
-    const T &value,
-    FormatContext &context)
-{
-    if constexpr (detail::OstreamTraits::is_declared_v<T>)
-    {
-        static thread_local std::stringstream s_stream;
-
-        s_stream << value;
-        const auto formatted = s_stream.str();
-        s_stream.str({});
-
-        Formatter<std::string, CharType>::append_string(formatted, formatted.size(), context);
-    }
-}
 
 //==================================================================================================
 template <typename T, typename CharType>

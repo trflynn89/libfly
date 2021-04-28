@@ -1,8 +1,11 @@
 #pragma once
 
+#include "fly/types/string/literals.hpp"
+#include "fly/types/string/string.hpp"
+
 #include <cstdint>
-#include <iostream>
 #include <memory>
+#include <ostream>
 #include <string>
 
 namespace fly::logger {
@@ -68,6 +71,8 @@ struct Log
      */
     Log &operator=(Log &&log) noexcept;
 
+    friend std::ostream &operator<<(std::ostream &stream, const Log &log);
+
     std::uintmax_t m_index {0};
     Level m_level {Level::NumLevels};
     Trace m_trace {};
@@ -75,8 +80,31 @@ struct Log
     std::string m_message;
 };
 
-std::ostream &operator<<(std::ostream &stream, const Log &log);
-std::ostream &operator<<(std::ostream &stream, const Level &level);
-std::ostream &operator<<(std::ostream &stream, const Trace &trace);
-
 } // namespace fly::logger
+
+//==================================================================================================
+template <>
+struct fly::Formatter<fly::logger::Trace>
+{
+    /**
+     * Format a log trace.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param trace The log trace to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(fly::logger::Trace trace, FormatContext &context)
+    {
+        if (!trace.m_file.empty() && !trace.m_function.empty())
+        {
+            fly::String::format_to(
+                context.out(),
+                "{}:{}:{}",
+                trace.m_file,
+                trace.m_function,
+                trace.m_line);
+        }
+    }
+};

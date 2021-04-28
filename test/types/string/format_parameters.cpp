@@ -13,16 +13,20 @@
 
 namespace {
 
-struct GenericType
+struct UserDefinedType
 {
-};
-
-enum class DefaultFormattedEnum : std::uint8_t
-{
-    One = 1,
 };
 
 } // namespace
+
+template <typename CharType>
+struct fly::Formatter<UserDefinedType, CharType>
+{
+    template <typename FormatContext>
+    void format(const UserDefinedType &, FormatContext &)
+    {
+    }
+};
 
 CATCH_TEMPLATE_TEST_CASE(
     "BasicFormatParameters",
@@ -92,20 +96,20 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("User-defined values are type-erased")
     {
-        GenericType generic {};
+        UserDefinedType user_defined {};
 
-        auto verify = [&generic](auto value)
+        auto verify = [&user_defined](auto value)
         {
             CATCH_CHECK(std::is_same_v<decltype(value), UserDefinedValue>);
 
             if constexpr (std::is_same_v<decltype(value), UserDefinedValue>)
             {
-                CATCH_CHECK(value.m_value == &generic);
+                CATCH_CHECK(value.m_value == &user_defined);
                 CATCH_CHECK(value.m_format != nullptr);
             }
         };
 
-        auto params = fly::detail::make_format_parameters<FormatContext>(generic);
+        auto params = fly::detail::make_format_parameters<FormatContext>(user_defined);
         FormatContext context(out, params);
 
         context.arg(0).visit(verify);
@@ -295,26 +299,5 @@ CATCH_TEMPLATE_TEST_CASE(
         context.arg(1).visit(std::bind(verify, b2, std::placeholders::_1));
 
         CATCH_CHECK_FALSE(context.arg(2));
-    }
-
-    CATCH_SECTION("Default-formatted enumerations are coerced to the appropriate type")
-    {
-        DefaultFormattedEnum e = DefaultFormattedEnum::One;
-
-        auto params = fly::detail::make_format_parameters<FormatContext>(e);
-        FormatContext context(out, params);
-
-        context.arg(0).visit(
-            [e](auto value)
-            {
-                CATCH_CHECK(std::is_same_v<decltype(value), std::uint64_t>);
-
-                if constexpr (std::is_same_v<decltype(value), std::uint64_t>)
-                {
-                    CATCH_CHECK(static_cast<DefaultFormattedEnum>(value) == e);
-                }
-            });
-
-        CATCH_CHECK_FALSE(context.arg(1));
     }
 }

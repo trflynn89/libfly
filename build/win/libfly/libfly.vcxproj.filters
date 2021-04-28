@@ -375,15 +375,6 @@
     <ClCompile Include="..\..\..\fly\logger\detail\win\styler_proxy_impl.cpp">
       <Filter>logger\detail\win</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\net\endpoint.cpp">
-      <Filter>net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\net\ipv4_address.cpp">
-      <Filter>net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\fly\net\ipv6_address.cpp">
-      <Filter>net</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\fly\net\network_config.cpp">
       <Filter>net</Filter>
     </ClCompile>

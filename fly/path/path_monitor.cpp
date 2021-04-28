@@ -53,7 +53,7 @@ bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback 
     }
     else if (!std::filesystem::is_directory(path, error))
     {
-        LOGW("Ignoring non-directory {}: {}", path, error);
+        LOGW("Ignoring non-directory {}: {}", path, error.message());
     }
     else
     {
@@ -106,11 +106,11 @@ bool PathMonitor::add_file(const std::filesystem::path &file, PathEventCallback 
     }
     else if (std::filesystem::is_directory(file, error))
     {
-        LOGW("Ignoring directory {}: {}", file, error);
+        LOGW("Ignoring directory {}: {}", file, error.message());
     }
     else if (!std::filesystem::is_directory(file.parent_path(), error))
     {
-        LOGW("Ignoring file under non-directory {}: {}", file, error);
+        LOGW("Ignoring file under non-directory {}: {}", file, error.message());
     }
     else
     {
@@ -199,31 +199,6 @@ bool PathMonitor::poll_paths_later()
 
     std::weak_ptr<PathMonitor> weak_self = shared_from_this();
     return m_task_runner->post_task(FROM_HERE, std::move(weak_self), std::move(task));
-}
-
-//==================================================================================================
-std::ostream &operator<<(std::ostream &stream, PathMonitor::PathEvent event)
-{
-    switch (event)
-    {
-        case PathMonitor::PathEvent::None:
-            stream << "None";
-            break;
-
-        case PathMonitor::PathEvent::Created:
-            stream << "Created";
-            break;
-
-        case PathMonitor::PathEvent::Deleted:
-            stream << "Deleted";
-            break;
-
-        case PathMonitor::PathEvent::Changed:
-            stream << "Changed";
-            break;
-    }
-
-    return stream;
 }
 
 } // namespace fly::path

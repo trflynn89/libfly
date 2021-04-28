@@ -2,6 +2,7 @@
 
 #include "fly/fly.hpp"
 #include "fly/logger/logger.hpp"
+#include "fly/types/string/string_formatters.hpp"
 
 #include <cstdint>
 
@@ -64,3 +65,22 @@ enum class ConnectedState : std::uint8_t
 };
 
 } // namespace fly::net
+
+//==================================================================================================
+template <>
+struct fly::Formatter<fly::net::IOMode> : public fly::Formatter<std::uint8_t>
+{
+    /**
+     * Format an IO processing mode.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param mode The IO processing mode to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(fly::net::IOMode mode, FormatContext &context)
+    {
+        fly::Formatter<std::uint8_t>::format(static_cast<std::uint8_t>(mode), context);
+    }
+};

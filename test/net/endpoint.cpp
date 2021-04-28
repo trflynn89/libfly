@@ -6,7 +6,6 @@
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"
 
-#include <sstream>
 #include <type_traits>
 
 CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::IPv6Address)
@@ -119,17 +118,7 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
         CATCH_SECTION("Endpoints may be converted to a string")
         {
             const auto endpoint = EndpointType(IPAddressType::in_addr_loopback(), 1);
-            CATCH_CHECK(endpoint.to_string() == "127.0.0.1:1");
-        }
-
-        CATCH_SECTION("Endpoints may be streamed as a string")
-        {
-            const auto endpoint = EndpointType(IPAddressType::in_addr_loopback(), 2);
-
-            std::stringstream stream;
-            stream << endpoint;
-
-            CATCH_CHECK(stream.str() == "127.0.0.1:2");
+            CATCH_CHECK(fly::String::format("{}", endpoint) == "127.0.0.1:1");
         }
 
         CATCH_SECTION("Endpoints may be created from a string")
@@ -179,17 +168,7 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
         CATCH_SECTION("Endpoints may be converted to a string")
         {
             const auto endpoint = EndpointType(IPAddressType::in_addr_loopback(), 1);
-            CATCH_CHECK(endpoint.to_string() == "[::1]:1");
-        }
-
-        CATCH_SECTION("Endpoints may be streamed as a string")
-        {
-            const auto endpoint = EndpointType(IPAddressType::in_addr_loopback(), 2);
-
-            std::stringstream stream;
-            stream << endpoint;
-
-            CATCH_CHECK(stream.str() == "[::1]:2");
+            CATCH_CHECK(fly::String::format("{}", endpoint) == "[::1]:1");
         }
 
         CATCH_SECTION("Endpoints may be created from a string")

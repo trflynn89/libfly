@@ -81,7 +81,7 @@ bool ConfigManager::start()
 
     std::weak_ptr<ConfigManager> weak_self = shared_from_this();
 
-    auto callback = [weak_self](std::filesystem::path, fly::path::PathMonitor::PathEvent)
+    auto callback = [weak_self](std::filesystem::path, fly::path::PathEvent)
     {
         if (auto self = weak_self.lock(); self)
         {

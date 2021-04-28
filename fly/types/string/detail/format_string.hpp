@@ -101,11 +101,6 @@ FLY_CONSTEVAL BasicFormatString<CharType, ParameterTypes...>::BasicFormatString(
 {
     std::optional<CharType> ch;
 
-    if constexpr (!(BasicFormatTraits::is_formattable_v<ParameterTypes> && ...))
-    {
-        m_context.on_error("An overloaded operator<< must be defined for all format parameters");
-    }
-
     while (!m_context.has_error() && (ch = m_context.lexer().consume()))
     {
         if (ch == s_left_brace)

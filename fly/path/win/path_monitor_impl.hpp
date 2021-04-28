@@ -95,7 +95,7 @@ private:
      *
      * @return A PathEvent that matches the given event.
      */
-    PathMonitor::PathEvent convert_to_event(DWORD action) const;
+    PathEvent convert_to_event(DWORD action) const;
 };
 
 } // namespace fly::path

@@ -262,9 +262,6 @@
     <ClCompile Include="..\..\..\fly\logger\logger.cpp" />
     <ClCompile Include="..\..\..\fly\logger\logger_config.cpp" />
     <ClCompile Include="..\..\..\fly\logger\styler.cpp" />
-    <ClCompile Include="..\..\..\fly\net\endpoint.cpp" />
-    <ClCompile Include="..\..\..\fly\net\ipv4_address.cpp" />
-    <ClCompile Include="..\..\..\fly\net\ipv6_address.cpp" />
     <ClCompile Include="..\..\..\fly\net\network_config.cpp" />
     <ClCompile Include="..\..\..\fly\net\socket\detail\base_socket.cpp" />
     <ClCompile Include="..\..\..\fly\net\socket\detail\win\socket_operations.cpp" />

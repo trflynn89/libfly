@@ -99,11 +99,31 @@ namespace fly::detail {
  *
  *        Boolean types - Valid presentations: none, "c", s", b", "B", "o", "d", "x", "X".
  *
- *        Strong enumeration types - If an overload of operator<< is defined, valid presentations
- *        are: none, "s". Else, valid presentations are: none, "c", b", "B", "o", "d", "x", "X".
+ *        Other user-defined types - Valid presentations: none. To format a user-defined type, a
+ *        fly::Formatter specialization must be defined analagous to std::formatter. The
+ *        specialization may extend a standard fly::Formatter, for example:
  *
- *        Other user-defined types - Valid presentations: none. An overload of operator<< must be
- *        defined for generic types.
+ *            template <typename CharType>
+ *            struct fly::Formatter<MyType, CharType> : public fly::Formatter<int, CharType>
+ *            {
+ *                template <typename FormatContext>
+ *                void format(const MyType &value, FormatContext &context)
+ *                {
+ *                    fly::Formatter<int, CharType>::format(value.as_int(), context);
+ *                }
+ *            };
+ *
+ *        Or be defined without inheritence:
+ *
+ *            template <typename CharType>
+ *            struct fly::Formatter<MyType, CharType>
+ *            {
+ *                template <typename FormatContext>
+ *                void format(const MyType &value, FormatContext &context)
+ *                {
+ *                    fly::BasicString<CharType>::format_to(context.out(), "{}", value.as_int());
+ *                }
+ *            };
  *
  *        For details on each presentation type, see the above links.
  *

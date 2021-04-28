@@ -3,7 +3,6 @@
 #include "fly/traits/traits.hpp"
 
 #include <cstdint>
-#include <ostream>
 #include <string>
 #include <type_traits>
 
@@ -82,14 +81,6 @@ template <typename StringType>
 inline constexpr bool is_like_supported_string_v = is_like_supported_string<StringType>::value;
 
 /**
- * Define a trait for whether operator<< is defined for a type.
- */
-template <typename T>
-using OstreamDeclaration = decltype(std::declval<std::ostream &>() << std::declval<T>());
-
-using OstreamTraits = DeclarationTraits<OstreamDeclaration>;
-
-/**
  * Traits for basic properties of standard std::basic_string specializations.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
@@ -126,17 +117,20 @@ struct BasicStringTraits
 struct BasicFormatTraits
 {
     /**
-     * Trait to determine if a type is either streamable or string-like.
+     * Trait to determine if a specialization of fly::Formatter<T, CharType> is defined for a type,
+     * and implements a format(T, FormatContext) method.
      */
-    template <typename T, typename U = std::remove_cvref_t<T>>
-    using is_formattable = std::disjunction<
-        OstreamTraits::is_declared<T>,
-        detail::is_like_supported_string<T>,
-        detail::is_supported_character<T>,
-        std::is_enum<U>>;
+    template <typename FormatContext, typename T>
+    using formatter =
+        decltype(std::declval<typename FormatContext::template formatter_type<T>>().format(
+            std::declval<T>(),
+            std::declval<FormatContext>));
 
-    template <typename T>
-    static inline constexpr bool is_formattable_v = is_formattable<T>::value;
+    template <typename FormatContext, typename T>
+    using has_formatter = fly::is_declared<formatter, FormatContext, T>;
+
+    template <typename FormatContext, typename T>
+    static inline constexpr bool has_formatter_v = has_formatter<FormatContext, T>::value;
 
     /**
      * Trait to classify a type as a pointer (excluding C-string types).
@@ -168,17 +162,6 @@ struct BasicFormatTraits
     static inline constexpr bool is_integer_v = is_integer<T>::value;
 
     /**
-     * Trait to classify an enumeration type as default-formatted (i.e. the user has not defined a
-     * custom operator<< for this type).
-     */
-    template <typename T, typename U = std::remove_cvref_t<T>>
-    using is_default_formatted_enum =
-        std::conjunction<std::is_enum<U>, std::negation<OstreamTraits::is_declared<T>>>;
-
-    template <typename T>
-    static inline constexpr bool is_default_formatted_enum_v = is_default_formatted_enum<T>::value;
-
-    /**
      * Trait to classify a type as a user-defined type.
      */
     template <typename T, typename U = std::remove_cvref_t<T>>
@@ -187,8 +170,7 @@ struct BasicFormatTraits
         is_pointer<T>,
         is_integral<T>,
         std::is_floating_point<T>,
-        std::is_same<T, bool>,
-        is_default_formatted_enum<T>>>;
+        std::is_same<T, bool>>>;
 
     template <typename T>
     static inline constexpr bool is_user_defined_v = is_user_defined<T>::value;

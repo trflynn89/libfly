@@ -87,9 +87,9 @@ void PathMonitorImpl::handle_events(const PathInfoImpl *info, const std::filesys
 
     while (file_info != nullptr)
     {
-        PathMonitor::PathEvent path_event = convert_to_event(file_info->Action);
+        PathEvent path_event = convert_to_event(file_info->Action);
 
-        if (path_event != PathMonitor::PathEvent::None)
+        if (path_event != PathEvent::None)
         {
             const std::wstring wide_file(
                 file_info->FileName,
@@ -131,24 +131,24 @@ void PathMonitorImpl::handle_events(const PathInfoImpl *info, const std::filesys
 }
 
 //==================================================================================================
-PathMonitor::PathEvent PathMonitorImpl::convert_to_event(DWORD action) const
+PathEvent PathMonitorImpl::convert_to_event(DWORD action) const
 {
-    PathMonitor::PathEvent path_event = PathMonitor::PathEvent::None;
+    PathEvent path_event = PathEvent::None;
 
     switch (action)
     {
         case FILE_ACTION_ADDED:
         case FILE_ACTION_RENAMED_NEW_NAME:
-            path_event = PathMonitor::PathEvent::Created;
+            path_event = PathEvent::Created;
             break;
 
         case FILE_ACTION_REMOVED:
         case FILE_ACTION_RENAMED_OLD_NAME:
-            path_event = PathMonitor::PathEvent::Deleted;
+            path_event = PathEvent::Deleted;
             break;
 
         case FILE_ACTION_MODIFIED:
-            path_event = PathMonitor::PathEvent::Changed;
+            path_event = PathEvent::Changed;
             break;
 
         default:

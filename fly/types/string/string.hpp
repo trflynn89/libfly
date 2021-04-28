@@ -422,23 +422,16 @@ public:
      *       from the format string type. If the type differs, the format parameter is transcoded to
      *       the type of the format string.
      *
-     *    3. Any user-defined type for which an operator<< overload is defined will be converted to
-     *       a string using that overload.
-     *
-     *    4. Formatting of strong enumeration types defaults to the format of the enumeration's
-     *       underlying type. However, if an overload of operator<< is defined, the type is treated
-     *       as a user-defined type according to (3) above.
-     *
-     *    5. This implementation is exceptionless. Any error encountered (such as failed transcoding
+     *    3. This implementation is exceptionless. Any error encountered (such as failed transcoding
      *       in (2) above) results in the format parameter that caused the error to be dropped.
      *
-     *    6. Locale-specific form is not supported. If the option appears in the format string, it
+     *    4. Locale-specific form is not supported. If the option appears in the format string, it
      *       will be parsed, but will be ignored.
      *
      * The format string type is implicitly constructed from a C-string literal. Callers should only
      * invoke this method accordingly:
      *
-     *     format("Format {:d}", 1);
+     *     fly::String::format("Format {:d}", 1);
      *
      * On compilers that support immediate functions (consteval), the format string is validated at
      * compile time against the types of the format parameters. If the format string is invalid, a

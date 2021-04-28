@@ -1,7 +1,5 @@
 #include "fly/logger/log.hpp"
 
-#include "fly/types/string/string.hpp"
-
 namespace fly::logger {
 
 namespace {
@@ -44,28 +42,10 @@ Log &Log::operator=(Log &&log) noexcept
 std::ostream &operator<<(std::ostream &stream, const Log &log)
 {
     stream << log.m_index << s_unit_separator;
-    stream << log.m_level << s_unit_separator;
+    stream << static_cast<std::uint8_t>(log.m_level) << s_unit_separator;
     stream << log.m_time << s_unit_separator;
-    stream << log.m_trace << s_unit_separator;
+    stream << fly::String::format("{}", log.m_trace) << s_unit_separator;
     stream << log.m_message << s_record_separator;
-
-    return stream;
-}
-
-//==================================================================================================
-std::ostream &operator<<(std::ostream &stream, const Level &level)
-{
-    stream << static_cast<int>(level);
-    return stream;
-}
-
-//==================================================================================================
-std::ostream &operator<<(std::ostream &stream, const Trace &trace)
-{
-    if (!trace.m_file.empty() && !trace.m_function.empty())
-    {
-        stream << fly::String::format("{}:{}:{}", trace.m_file, trace.m_function, trace.m_line);
-    }
 
     return stream;
 }

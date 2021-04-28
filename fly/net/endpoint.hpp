@@ -1,20 +1,19 @@
 #pragma once
 
 #include "fly/fly.hpp"
+#include "fly/net/ipv4_address.hpp"
+#include "fly/net/ipv6_address.hpp"
 #include "fly/net/socket/socket_types.hpp"
 #include "fly/types/string/lexer.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <compare>
 #include <limits>
 #include <optional>
-#include <ostream>
 #include <string>
 #include <type_traits>
 
 namespace fly::net {
-
-class IPv4Address;
-class IPv6Address;
 
 /**
  * Class to store a version-independent IP address and port, and to provide convenient access to its
@@ -77,11 +76,6 @@ public:
     static constexpr std::optional<Endpoint> from_string(std::string_view endpoint);
 
     /**
-     * @return The endpoint converted to a string.
-     */
-    std::string to_string() const;
-
-    /**
      * Set the endpoint's IP address.
      *
      * @param address The endoint's new IP address.
@@ -130,20 +124,6 @@ public:
     constexpr bool operator>(const Endpoint &endpoint) const;
     constexpr bool operator>=(const Endpoint &endpoint) const;
 #endif
-
-    /**
-     * Stream an endpoint as a string.
-     *
-     * @param stream A reference to the output stream.
-     * @param endpoint The endpoint to stream.
-     *
-     * @return A reference to the output stream.
-     */
-    friend std::ostream &operator<<(std::ostream &stream, const Endpoint &endpoint)
-    {
-        stream << endpoint.to_string();
-        return stream;
-    }
 
 private:
     static_assert(is_ipv4() || is_ipv6(), "Endpoints may only be used with IP address types");
@@ -316,3 +296,41 @@ constexpr bool Endpoint<IPAddressType>::operator>=(const Endpoint<IPAddressType>
 #endif
 
 } // namespace fly::net
+
+//==================================================================================================
+template <>
+struct fly::Formatter<fly::net::Endpoint<fly::net::IPv4Address>>
+{
+    /**
+     * Format an IPv4 endpoint.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param endpoint The IPv4 endpoint to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(const fly::net::Endpoint<fly::net::IPv4Address> &endpoint, FormatContext &context)
+    {
+        fly::String::format_to(context.out(), "{}:{}", endpoint.address(), endpoint.port());
+    }
+};
+
+//==================================================================================================
+template <>
+struct fly::Formatter<fly::net::Endpoint<fly::net::IPv6Address>>
+{
+    /**
+     * Format an IPv6 endpoint.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param endpoint The IPv6 endpoint to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(const fly::net::Endpoint<fly::net::IPv6Address> &endpoint, FormatContext &context)
+    {
+        fly::String::format_to(context.out(), "[{}]:{}", endpoint.address(), endpoint.port());
+    }
+};

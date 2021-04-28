@@ -1,5 +1,7 @@
 #pragma once
 
+#include "fly/types/string/string_formatters.hpp"
+
 #include <cstdint>
 #include <filesystem>
 #include <functional>
@@ -17,6 +19,17 @@ class PathConfig;
 class PathMonitorTask;
 
 /**
+ * Enumerated list of path events.
+ */
+enum class PathEvent : std::uint8_t
+{
+    None,
+    Created,
+    Deleted,
+    Changed
+};
+
+/**
  * Virtual interface to monitor a local path. Provides monitoring of either all files or
  * user-specified files under a path for addition, deletion, or change. This interface is platform
  * independent - OS dependent implementations should inherit from this class.
@@ -27,17 +40,6 @@ class PathMonitorTask;
 class PathMonitor : public std::enable_shared_from_this<PathMonitor>
 {
 public:
-    /**
-     * Enumerated list of path events.
-     */
-    enum class PathEvent : std::uint8_t
-    {
-        None,
-        Created,
-        Deleted,
-        Changed
-    };
-
     /**
      * Callback definition for function to be triggered on a path change.
      */
@@ -197,13 +199,71 @@ private:
      */
     bool poll_paths_later();
 
-    /**
-     * Stream the name of a PathEvent instance.
-     */
-    friend std::ostream &operator<<(std::ostream &stream, PathEvent event);
-
     std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
     std::shared_ptr<PathConfig> m_config;
 };
 
 } // namespace fly::path
+
+//==================================================================================================
+template <>
+struct fly::Formatter<fly::path::PathEvent>
+{
+    /**
+     * Format a path event.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param event The path event to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(fly::path::PathEvent event, FormatContext &context)
+    {
+        auto append = [&context](std::string_view value)
+        {
+            for (auto ch : value)
+            {
+                context.out()++ = ch;
+            }
+        };
+
+        switch (event)
+        {
+            case fly::path::PathEvent::None:
+                append("None");
+                break;
+
+            case fly::path::PathEvent::Created:
+                append("Created");
+                break;
+
+            case fly::path::PathEvent::Deleted:
+                append("Deleted");
+                break;
+
+            case fly::path::PathEvent::Changed:
+                append("Changed");
+                break;
+        }
+    }
+};
+
+//==================================================================================================
+template <>
+struct fly::Formatter<std::filesystem::path> : public fly::Formatter<std::string>
+{
+    /**
+     * Format a filesystem path.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param path The filesystem path to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(const std::filesystem::path &path, FormatContext &context)
+    {
+        fly::Formatter<std::string>::format(path.string(), context);
+    }
+};
