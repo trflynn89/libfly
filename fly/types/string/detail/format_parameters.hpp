@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/types/string/detail/classifier.hpp"
+#include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/string_formatters.hpp"
 
@@ -39,7 +40,11 @@ struct StringValue
     const void *m_value;
     std::size_t m_size;
 
-    void (*m_format)(const void *value, std::size_t size, FormatContext &context);
+    void (*m_format)(
+        const void *value,
+        std::size_t size,
+        FormatContext &context,
+        BasicFormatSpecifier<typename FormatContext::char_type> &&specifier);
 };
 
 /**
@@ -59,7 +64,10 @@ struct StandardValue
         bool m_bool;
     };
 
-    void (*m_format)(StandardValue value, FormatContext &context);
+    void (*m_format)(
+        StandardValue value,
+        FormatContext &context,
+        BasicFormatSpecifier<typename FormatContext::char_type> &&specifier);
 };
 
 /**
@@ -83,9 +91,14 @@ void format_user_defined_value(const void *value, FormatContext &context);
  * @param value A pointer to the type-erased string to format.
  * @param size The size of the string to format.
  * @param context The context holding the formatting state.
+ * @param specifier The replacement field to be replaced.
  */
 template <typename FormatContext, typename T>
-void format_string_value(const void *value, std::size_t size, FormatContext &context);
+void format_string_value(
+    const void *value,
+    std::size_t size,
+    FormatContext &context,
+    BasicFormatSpecifier<typename FormatContext::char_type> &&specifier);
 
 /**
  * Re-form a type-erased standard value and format that value.
@@ -95,9 +108,13 @@ void format_string_value(const void *value, std::size_t size, FormatContext &con
  *
  * @param value The container holding the type-erased value.
  * @param context The context holding the formatting state.
+ * @param specifier The replacement field to be replaced.
  */
 template <typename FormatContext, typename T>
-void format_standard_value(StandardValue<FormatContext> value, FormatContext &context);
+void format_standard_value(
+    StandardValue<FormatContext> value,
+    FormatContext &context,
+    BasicFormatSpecifier<typename FormatContext::char_type> &&specifier);
 
 /**
  * A container to hold a single type-erased format parameter.
@@ -108,6 +125,8 @@ void format_standard_value(StandardValue<FormatContext> value, FormatContext &co
 template <typename FormatContext>
 class BasicFormatParameter
 {
+    using char_type = typename FormatContext::char_type;
+
 public:
     /**
      * Constructor. Initialize the format parameter to an invalid state.
@@ -169,8 +188,10 @@ public:
      * Apply the type-erased formatting function to the stored format parameter.
      *
      * @param context The context holding the formatting state.
+     * @param specifier The replacement field to be replaced.
      */
-    constexpr void format(FormatContext &context) const;
+    constexpr void
+    format(FormatContext &context, BasicFormatSpecifier<char_type> &&specifier) const;
 
     /**
      * Apply the provided visitor to the stored format parameter.
@@ -265,19 +286,28 @@ inline void format_user_defined_value(const void *value, FormatContext &context)
 
 //==================================================================================================
 template <typename FormatContext, typename T>
-inline void format_string_value(const void *value, std::size_t size, FormatContext &context)
+inline void format_string_value(
+    const void *value,
+    std::size_t size,
+    FormatContext &context,
+    BasicFormatSpecifier<typename FormatContext::char_type> &&specifier)
 {
-    static_assert(detail::is_supported_character_v<T>);
+    using view_type = std::basic_string_view<T>;
 
-    std::basic_string_view<T> view(static_cast<const T *>(value), size);
-    Formatter<decltype(view), typename FormatContext::char_type>().format(view, context);
+    Formatter<view_type, typename FormatContext::char_type> formatter(std::move(specifier));
+
+    view_type view(static_cast<const T *>(value), size);
+    formatter.format(view, context);
 }
 
 //==================================================================================================
 template <typename FormatContext, typename T>
-inline void format_standard_value(StandardValue<FormatContext> value, FormatContext &context)
+inline void format_standard_value(
+    StandardValue<FormatContext> value,
+    FormatContext &context,
+    BasicFormatSpecifier<typename FormatContext::char_type> &&specifier)
 {
-    Formatter<T, typename FormatContext::char_type> formatter {};
+    Formatter<T, typename FormatContext::char_type> formatter(std::move(specifier));
 
     if constexpr (BasicFormatTraits::is_pointer_v<T>)
     {
@@ -347,25 +377,25 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(const
 {
     using U = std::remove_cvref_t<T>;
 
-    using string_type = fly::detail::is_like_supported_string_t<T>;
-    using char_type = typename string_type::value_type;
-    using view_type = typename fly::detail::BasicStringTraits<char_type>::view_type;
+    using string_like_type = fly::detail::is_like_supported_string_t<T>;
+    using char_like_type = typename string_like_type::value_type;
+    using view_like_type = typename fly::detail::BasicStringTraits<char_like_type>::view_type;
 
-    view_type view;
+    view_like_type view;
 
     if constexpr (std::is_array_v<U> || std::is_pointer_v<U>)
     {
-        view = view_type(value, BasicClassifier<char_type>::size(value));
+        view = view_like_type(value, BasicClassifier<char_like_type>::size(value));
     }
     else
     {
-        view = view_type(value);
+        view = view_like_type(value);
     }
 
     m_value.m_string = {
         static_cast<const void *>(view.data()),
         view.size(),
-        format_string_value<FormatContext, char_type>};
+        format_string_value<FormatContext, char_like_type>};
 }
 
 //==================================================================================================
@@ -426,7 +456,9 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T val
 
 //==================================================================================================
 template <typename FormatContext>
-constexpr inline void BasicFormatParameter<FormatContext>::format(FormatContext &context) const
+constexpr inline void BasicFormatParameter<FormatContext>::format(
+    FormatContext &context,
+    BasicFormatSpecifier<char_type> &&specifier) const
 {
     switch (m_type)
     {
@@ -434,7 +466,11 @@ constexpr inline void BasicFormatParameter<FormatContext>::format(FormatContext 
             m_value.m_user_defined.m_format(m_value.m_user_defined.m_value, context);
             break;
         case Type::String:
-            m_value.m_string.m_format(m_value.m_string.m_value, m_value.m_string.m_size, context);
+            m_value.m_string.m_format(
+                m_value.m_string.m_value,
+                m_value.m_string.m_size,
+                context,
+                std::move(specifier));
             break;
         case Type::Pointer:
         case Type::SignedInt:
@@ -443,7 +479,7 @@ constexpr inline void BasicFormatParameter<FormatContext>::format(FormatContext 
         case Type::Double:
         case Type::LongDouble:
         case Type::Bool:
-            m_value.m_standard.m_format(m_value.m_standard, context);
+            m_value.m_standard.m_format(m_value.m_standard, context, std::move(specifier));
             break;
         default:
             break;

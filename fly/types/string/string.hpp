@@ -882,11 +882,11 @@ auto BasicString<CharType>::format(
                 }
                 else
                 {
-                    context.spec() = *std::move(fmt.next_specifier());
-                    pos += context.spec().m_size;
+                    auto specifier = *std::move(fmt.next_specifier());
+                    pos += specifier.m_size;
 
-                    const auto parameter = context.arg(context.spec().m_position);
-                    parameter.format(context);
+                    const auto parameter = context.arg(specifier.m_position);
+                    parameter.format(context, std::move(specifier));
                 }
                 break;
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fly/types/string/detail/format_parameters.hpp"
-#include "fly/types/string/detail/format_specifier.hpp"
 
 #include <cstddef>
 
@@ -18,7 +17,6 @@ template <typename OutputIterator, typename CharType>
 class BasicFormatContext
 {
     using FormatParameter = BasicFormatParameter<BasicFormatContext>;
-    using FormatSpecifier = BasicFormatSpecifier<CharType>;
 
 public:
     using char_type = CharType;
@@ -49,11 +47,6 @@ public:
      */
     OutputIterator &out();
 
-    /**
-     * @return The formatting replacement field currently being used for formatting.
-     */
-    FormatSpecifier &spec();
-
 private:
     BasicFormatContext(const BasicFormatContext &) = delete;
     BasicFormatContext &operator=(const BasicFormatContext &) = delete;
@@ -62,8 +55,6 @@ private:
 
     const FormatParameter *m_parameters;
     const std::size_t m_parameters_size;
-
-    FormatSpecifier m_specifier {};
 };
 
 //==================================================================================================
@@ -96,13 +87,6 @@ template <typename OutputIterator, typename CharType>
 inline OutputIterator &BasicFormatContext<OutputIterator, CharType>::out()
 {
     return m_out;
-}
-
-//==================================================================================================
-template <typename OutputIterator, typename CharType>
-inline auto BasicFormatContext<OutputIterator, CharType>::spec() -> FormatSpecifier &
-{
-    return m_specifier;
 }
 
 } // namespace fly::detail

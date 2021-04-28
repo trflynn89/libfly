@@ -56,6 +56,15 @@ struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_user_
 template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>
 {
+    using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+    /**
+     * Constructor.
+     *
+     * @param specifier The replacement field to be replaced.
+     */
+    explicit Formatter(FormatSpecifier &&specifier) noexcept;
+
     /**
      * Format a single replacement field with the provided string-like value.
      *
@@ -81,18 +90,28 @@ struct Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>
      * @param context The context holding the formatting state.
      */
     template <typename FormatContext>
-    void append_string(const T &value, std::size_t value_size, FormatContext &context);
+    static void append_string(const T &value, std::size_t value_size, FormatContext &context);
 
 private:
     using string_type = std::basic_string<CharType>;
-    using specifier = detail::BasicFormatSpecifier<CharType>;
 
     static constexpr const auto s_space = FLY_CHR(CharType, ' ');
+
+    FormatSpecifier m_specifier;
 };
 
 template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_pointer<T>>>
 {
+    using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+    /**
+     * Constructor.
+     *
+     * @param specifier The replacement field to be replaced.
+     */
+    explicit Formatter(FormatSpecifier &&specifier) noexcept;
+
     /**
      * Format a single replacement field with the provided pointer value.
      *
@@ -105,12 +124,21 @@ struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_point
     void format(T value, FormatContext &context);
 
 private:
-    using specifier = detail::BasicFormatSpecifier<CharType>;
+    FormatSpecifier m_specifier;
 };
 
 template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integral<T>>>
 {
+    using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+    /**
+     * Constructor.
+     *
+     * @param specifier The replacement field to be replaced.
+     */
+    explicit Formatter(FormatSpecifier &&specifier) noexcept;
+
     /**
      * Format a single replacement field with the provided non-boolean integral value.
      *
@@ -124,7 +152,6 @@ struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integ
 
 private:
     using string_type = std::basic_string<CharType>;
-    using specifier = detail::BasicFormatSpecifier<CharType>;
 
     /**
      * Format a single replacement field with the provided unsigned, non-boolean integral value.
@@ -198,11 +225,22 @@ private:
     static constexpr const auto s_upper_b = FLY_CHR(CharType, 'B');
     static constexpr const auto s_lower_x = FLY_CHR(CharType, 'x');
     static constexpr const auto s_upper_x = FLY_CHR(CharType, 'X');
+
+    FormatSpecifier m_specifier;
 };
 
 template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>
 {
+    using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+    /**
+     * Constructor.
+     *
+     * @param specifier The replacement field to be replaced.
+     */
+    explicit Formatter(FormatSpecifier &&specifier) noexcept;
+
     /**
      * Format a single replacement field with the provided floating point value.
      *
@@ -218,15 +256,23 @@ struct Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>
     void format(const T &value, FormatContext &context);
 
 private:
-    using string_type = std::basic_string<CharType>;
-    using specifier = detail::BasicFormatSpecifier<CharType>;
-
     static constexpr const auto s_zero = FLY_CHR(CharType, '0');
+
+    FormatSpecifier m_specifier;
 };
 
 template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<std::is_same<T, bool>>>
 {
+    using FormatSpecifier = detail::BasicFormatSpecifier<CharType>;
+
+    /**
+     * Constructor.
+     *
+     * @param specifier The replacement field to be replaced.
+     */
+    explicit Formatter(FormatSpecifier &&specifier) noexcept;
+
     /**
      * Format a single replacement field with the provided boolean value.
      *
@@ -239,11 +285,10 @@ struct Formatter<T, CharType, fly::enable_if<std::is_same<T, bool>>>
     void format(T value, FormatContext &context);
 
 private:
-    using string_type = std::basic_string<CharType>;
-    using specifier = detail::BasicFormatSpecifier<CharType>;
-
     static constexpr const CharType *s_true = FLY_STR(CharType, "true");
     static constexpr const CharType *s_false = FLY_STR(CharType, "false");
+
+    FormatSpecifier m_specifier;
 };
 
 //==================================================================================================
@@ -262,8 +307,16 @@ Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_user_defined
         const auto formatted = s_stream.str();
         s_stream.str({});
 
-        Formatter<std::string, CharType>().append_string(formatted, formatted.size(), context);
+        Formatter<std::string, CharType>::append_string(formatted, formatted.size(), context);
     }
+}
+
+//==================================================================================================
+template <typename T, typename CharType>
+Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>::Formatter(
+    FormatSpecifier &&specifier) noexcept :
+    m_specifier(std::move(specifier))
+{
 }
 
 //==================================================================================================
@@ -273,14 +326,14 @@ void Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>
     const T &value,
     FormatContext &context)
 {
-    const std::size_t min_width = context.spec().width(context, 0);
-    const std::size_t max_width = context.spec().precision(context, string_type::npos);
+    const std::size_t min_width = m_specifier.width(context, 0);
+    const std::size_t max_width = m_specifier.precision(context, string_type::npos);
 
     const std::size_t actual_size = detail::BasicClassifier<CharType>::size(value);
     const std::size_t value_size = std::min(max_width, actual_size);
 
     const std::size_t padding_size = std::max(value_size, min_width) - value_size;
-    const auto padding_char = context.spec().m_fill.value_or(s_space);
+    const auto padding_char = m_specifier.m_fill.value_or(s_space);
 
     auto append_padding = [&context, padding_char](std::size_t count) mutable
     {
@@ -290,20 +343,20 @@ void Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>
         }
     };
 
-    switch (context.spec().m_alignment)
+    switch (m_specifier.m_alignment)
     {
-        case specifier::Alignment::Left:
-        case specifier::Alignment::Default:
+        case FormatSpecifier::Alignment::Left:
+        case FormatSpecifier::Alignment::Default:
             append_string(value, value_size, context);
             append_padding(padding_size);
             break;
 
-        case specifier::Alignment::Right:
+        case FormatSpecifier::Alignment::Right:
             append_padding(padding_size);
             append_string(value, value_size, context);
             break;
 
-        case specifier::Alignment::Center:
+        case FormatSpecifier::Alignment::Center:
         {
             const std::size_t left_padding = padding_size / 2;
             const std::size_t right_padding =
@@ -362,18 +415,33 @@ void Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>>
 
 //==================================================================================================
 template <typename T, typename CharType>
+Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_pointer<T>>>::Formatter(
+    FormatSpecifier &&specifier) noexcept :
+    m_specifier(std::move(specifier))
+{
+}
+
+//==================================================================================================
+template <typename T, typename CharType>
 template <typename FormatContext>
 inline void
 Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_pointer<T>>>::format(
     T value,
     FormatContext &context)
 {
-    context.spec().m_alternate_form = true;
-    context.spec().m_type = specifier::Type::Hex;
+    m_specifier.m_alternate_form = true;
+    m_specifier.m_type = FormatSpecifier::Type::Hex;
 
-    Formatter<std::uintptr_t, CharType>().format(
-        reinterpret_cast<std::uintptr_t>(static_cast<const void *>(value)),
-        context);
+    Formatter<std::uintptr_t, CharType> formatter(std::move(m_specifier));
+    formatter.format(reinterpret_cast<std::uintptr_t>(static_cast<const void *>(value)), context);
+}
+
+//==================================================================================================
+template <typename T, typename CharType>
+Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integral<T>>>::Formatter(
+    FormatSpecifier &&specifier) noexcept :
+    m_specifier(std::move(specifier))
+{
 }
 
 //==================================================================================================
@@ -411,7 +479,7 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
 {
     static_assert(std::is_unsigned_v<U>);
 
-    if (context.spec().m_type == specifier::Type::Character)
+    if (m_specifier.m_type == FormatSpecifier::Type::Character)
     {
         format_as_character(value, is_negative, context);
         return;
@@ -419,54 +487,54 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
 
     std::size_t prefix_size = 0;
 
-    if (is_negative || (context.spec().m_sign == specifier::Sign::Always) ||
-        (context.spec().m_sign == specifier::Sign::NegativeOnlyWithPositivePadding))
+    if (is_negative || (m_specifier.m_sign == FormatSpecifier::Sign::Always) ||
+        (m_specifier.m_sign == FormatSpecifier::Sign::NegativeOnlyWithPositivePadding))
     {
         ++prefix_size;
     }
-    if (context.spec().m_alternate_form)
+    if (m_specifier.m_alternate_form)
     {
         ++prefix_size;
 
-        if ((context.spec().m_type == specifier::Type::Binary) ||
-            (context.spec().m_type == specifier::Type::Hex))
+        if ((m_specifier.m_type == FormatSpecifier::Type::Binary) ||
+            (m_specifier.m_type == FormatSpecifier::Type::Hex))
         {
             ++prefix_size;
         }
     }
 
-    const int base = static_cast<int>(context.spec().m_type);
+    const int base = static_cast<int>(m_specifier.m_type);
     const std::size_t value_size = count_digits(value, base) + prefix_size;
 
-    const std::size_t width = context.spec().width(context, 0);
+    const std::size_t width = m_specifier.width(context, 0);
     const std::size_t padding_size = std::max(value_size, width) - value_size;
-    const auto padding_char = context.spec().m_fill.value_or(s_space);
+    const auto padding_char = m_specifier.m_fill.value_or(s_space);
 
-    auto append_prefix = [is_negative, &context]()
+    auto append_prefix = [this, is_negative, &context]()
     {
         if (is_negative)
         {
             *context.out()++ = s_minus_sign;
         }
-        else if (context.spec().m_sign == specifier::Sign::Always)
+        else if (m_specifier.m_sign == FormatSpecifier::Sign::Always)
         {
             *context.out()++ = s_plus_sign;
         }
-        else if (context.spec().m_sign == specifier::Sign::NegativeOnlyWithPositivePadding)
+        else if (m_specifier.m_sign == FormatSpecifier::Sign::NegativeOnlyWithPositivePadding)
         {
             *context.out()++ = s_space;
         }
 
-        if (context.spec().m_alternate_form)
+        if (m_specifier.m_alternate_form)
         {
-            const bool is_upper_case = context.spec().m_case == specifier::Case::Upper;
+            const bool is_upper_case = m_specifier.m_case == FormatSpecifier::Case::Upper;
             *context.out()++ = s_zero;
 
-            if (context.spec().m_type == specifier::Type::Binary)
+            if (m_specifier.m_type == FormatSpecifier::Type::Binary)
             {
                 *context.out()++ = is_upper_case ? s_upper_b : s_lower_b;
             }
-            else if (context.spec().m_type == specifier::Type::Hex)
+            else if (m_specifier.m_type == FormatSpecifier::Type::Hex)
             {
                 *context.out()++ = is_upper_case ? s_upper_x : s_lower_x;
             }
@@ -481,21 +549,21 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
         }
     };
 
-    switch (context.spec().m_alignment)
+    switch (m_specifier.m_alignment)
     {
-        case specifier::Alignment::Left:
+        case FormatSpecifier::Alignment::Left:
             append_prefix();
             append_number(value, base, context);
             append_padding(padding_size, padding_char);
             break;
 
-        case specifier::Alignment::Right:
+        case FormatSpecifier::Alignment::Right:
             append_padding(padding_size, padding_char);
             append_prefix();
             append_number(value, base, context);
             break;
 
-        case specifier::Alignment::Center:
+        case FormatSpecifier::Alignment::Center:
         {
             const std::size_t left_padding = padding_size / 2;
             const std::size_t right_padding =
@@ -508,8 +576,8 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
             break;
         }
 
-        case specifier::Alignment::Default:
-            if (context.spec().m_zero_padding)
+        case FormatSpecifier::Alignment::Default:
+            if (m_specifier.m_zero_padding)
             {
                 append_prefix();
                 append_padding(padding_size, s_zero);
@@ -538,9 +606,9 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
         return;
     }
 
-    const std::size_t width = context.spec().width(context, 0);
+    const std::size_t width = m_specifier.width(context, 0);
     const std::size_t padding_size = width > 1 ? width - 1 : 0;
-    const auto padding_char = context.spec().m_fill.value_or(s_space);
+    const auto padding_char = m_specifier.m_fill.value_or(s_space);
 
     auto append_padding = [&context, padding_char](std::size_t count) mutable
     {
@@ -550,19 +618,19 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
         }
     };
 
-    switch (context.spec().m_alignment)
+    switch (m_specifier.m_alignment)
     {
-        case specifier::Alignment::Left:
+        case FormatSpecifier::Alignment::Left:
             *context.out()++ = static_cast<CharType>(value);
             append_padding(padding_size);
             break;
 
-        case specifier::Alignment::Right:
+        case FormatSpecifier::Alignment::Right:
             append_padding(padding_size);
             *context.out()++ = static_cast<CharType>(value);
             break;
 
-        case specifier::Alignment::Center:
+        case FormatSpecifier::Alignment::Center:
         {
             const std::size_t left_padding = padding_size / 2;
             const std::size_t right_padding =
@@ -574,7 +642,7 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
             break;
         }
 
-        case specifier::Alignment::Default:
+        case FormatSpecifier::Alignment::Default:
             append_padding(padding_size);
             *context.out()++ = static_cast<CharType>(value);
             break;
@@ -594,8 +662,8 @@ void Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integra
 
     const auto result = std::to_chars(begin, end, value, base);
 
-    if ((context.spec().m_type == specifier::Type::Hex) &&
-        (context.spec().m_case == specifier::Case::Upper))
+    if ((m_specifier.m_type == FormatSpecifier::Type::Hex) &&
+        (m_specifier.m_case == FormatSpecifier::Case::Upper))
     {
         for (char *it = begin; it != result.ptr; ++it)
         {
@@ -639,6 +707,14 @@ Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integral<T>>
 
 //==================================================================================================
 template <typename T, typename CharType>
+Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>::Formatter(
+    FormatSpecifier &&specifier) noexcept :
+    m_specifier(std::move(specifier))
+{
+}
+
+//==================================================================================================
+template <typename T, typename CharType>
 template <typename FormatContext>
 void Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>::format(
     const T &value,
@@ -647,18 +723,18 @@ void Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>::format(
     static thread_local std::stringstream s_stream;
     detail::ScopedStreamModifiers modifiers(s_stream);
 
-    if (context.spec().m_alignment == specifier::Alignment::Default)
+    if (m_specifier.m_alignment == FormatSpecifier::Alignment::Default)
     {
-        context.spec().m_alignment = specifier::Alignment::Right;
+        m_specifier.m_alignment = FormatSpecifier::Alignment::Right;
     }
 
-    switch (context.spec().m_sign)
+    switch (m_specifier.m_sign)
     {
-        case specifier::Sign::Always:
+        case FormatSpecifier::Sign::Always:
             modifiers.setf(std::ios_base::showpos);
             break;
 
-        case specifier::Sign::NegativeOnlyWithPositivePadding:
+        case FormatSpecifier::Sign::NegativeOnlyWithPositivePadding:
             modifiers.template locale<detail::PositivePaddingFacet<char>>();
             modifiers.setf(std::ios_base::showpos);
             break;
@@ -667,33 +743,33 @@ void Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>::format(
             break;
     }
 
-    if (context.spec().m_alternate_form)
+    if (m_specifier.m_alternate_form)
     {
         modifiers.setf(std::ios_base::showpoint);
     }
 
-    if (context.spec().m_zero_padding)
+    if (m_specifier.m_zero_padding)
     {
         modifiers.setf(std::ios_base::internal, std::ios_base::adjustfield);
         modifiers.fill(static_cast<char>(s_zero));
-        modifiers.width(static_cast<std::streamsize>(context.spec().width(context, 0)));
+        modifiers.width(static_cast<std::streamsize>(m_specifier.width(context, 0)));
     }
 
-    modifiers.precision(static_cast<std::streamsize>(context.spec().precision(context, 6)));
-    context.spec().m_precision = std::nullopt;
-    context.spec().m_precision_position = std::nullopt;
+    modifiers.precision(static_cast<std::streamsize>(m_specifier.precision(context, 6)));
+    m_specifier.m_precision = std::nullopt;
+    m_specifier.m_precision_position = std::nullopt;
 
-    switch (context.spec().m_type)
+    switch (m_specifier.m_type)
     {
-        case specifier::Type::HexFloat:
+        case FormatSpecifier::Type::HexFloat:
             modifiers.setf(std::ios_base::fixed | std::ios_base::scientific);
             break;
 
-        case specifier::Type::Scientific:
+        case FormatSpecifier::Type::Scientific:
             modifiers.setf(std::ios_base::scientific, std::ios::floatfield);
             break;
 
-        case specifier::Type::Fixed:
+        case FormatSpecifier::Type::Fixed:
             // Only Apple's Clang seems to respect std::uppercase with std::fixed values. To
             // ensure consistency, format these values as general types.
             if (!std::isnan(value) && !std::isinf(value))
@@ -706,14 +782,25 @@ void Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>::format(
             break;
     }
 
-    if (context.spec().m_case == specifier::Case::Upper)
+    if (m_specifier.m_case == FormatSpecifier::Case::Upper)
     {
         modifiers.setf(std::ios_base::uppercase);
     }
 
     s_stream << value;
-    Formatter<std::string, CharType>().format(s_stream.str(), context);
+
+    Formatter<std::string_view, CharType> formatter(std::move(m_specifier));
+    formatter.format(s_stream.str(), context);
+
     s_stream.str({});
+}
+
+//==================================================================================================
+template <typename T, typename CharType>
+Formatter<T, CharType, fly::enable_if<std::is_same<T, bool>>>::Formatter(
+    FormatSpecifier &&specifier) noexcept :
+    m_specifier(std::move(specifier))
+{
 }
 
 //==================================================================================================
@@ -723,13 +810,15 @@ inline void Formatter<T, CharType, fly::enable_if<std::is_same<T, bool>>>::forma
     T value,
     FormatContext &context)
 {
-    if (context.spec().m_type == specifier::Type::String)
+    if (m_specifier.m_type == FormatSpecifier::Type::String)
     {
-        Formatter<string_type, CharType>().format(value ? s_true : s_false, context);
+        Formatter<std::basic_string_view<CharType>, CharType> formatter(std::move(m_specifier));
+        formatter.format(value ? s_true : s_false, context);
     }
     else
     {
-        Formatter<unsigned, CharType>().format(static_cast<unsigned>(value), context);
+        Formatter<unsigned, CharType> formatter(std::move(m_specifier));
+        formatter.format(static_cast<unsigned>(value), context);
     }
 }
 
