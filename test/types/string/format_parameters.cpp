@@ -61,7 +61,7 @@ CATCH_TEMPLATE_TEST_CASE(
                 CATCH_CHECK(std::is_same_v<decltype(value), fly::detail::MonoState>);
             });
 
-        parameter.format(context);
+        parameter.format(context, {});
     }
 
     CATCH_SECTION("A single parameter can be visited, but no others")
