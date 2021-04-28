@@ -197,7 +197,7 @@ private:
     enum class Type : std::uint8_t
     {
         Invalid,
-        Generic,
+        UserDefined,
         String,
         Pointer,
         SignedInt,
@@ -211,7 +211,7 @@ private:
     union Value
     {
         MonoState m_monostate;
-        UserDefinedValue<FormatContext> m_generic;
+        UserDefinedValue<FormatContext> m_user_defined;
         StringValue<FormatContext> m_string;
         StandardValue<FormatContext> m_standard;
     };
@@ -345,8 +345,8 @@ template <
         BasicFormatTraits::is_default_formatted_enum<T>>>
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &value) noexcept
     :
-    m_type(Type::Generic),
-    m_value {.m_generic {&value, format_user_defined_value<FormatContext, T>}}
+    m_type(Type::UserDefined),
+    m_value {.m_user_defined {&value, format_user_defined_value<FormatContext, T>}}
 {
 }
 
@@ -442,8 +442,8 @@ constexpr inline void BasicFormatParameter<FormatContext>::format(FormatContext 
 {
     switch (m_type)
     {
-        case Type::Generic:
-            m_value.m_generic.m_format(m_value.m_generic.m_value, context);
+        case Type::UserDefined:
+            m_value.m_user_defined.m_format(m_value.m_user_defined.m_value, context);
             break;
         case Type::String:
             m_value.m_string.m_format(m_value.m_string.m_value, m_value.m_string.m_size, context);
@@ -469,8 +469,8 @@ constexpr inline auto BasicFormatParameter<FormatContext>::visit(Visitor &&visit
 {
     switch (m_type)
     {
-        case Type::Generic:
-            return visitor(m_value.m_generic);
+        case Type::UserDefined:
+            return visitor(m_value.m_user_defined);
         case Type::String:
             return visitor(m_value.m_string);
         case Type::Pointer:

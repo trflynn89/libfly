@@ -155,9 +155,9 @@ constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
     FormatSpecifier specifier {};
     specifier.m_position = m_context.next_position();
 
-    // TODO: For now, generic format parameters must be formatted with "{}".
+    // TODO: For now, user-defined format parameters must be formatted with "{}".
     if (auto parameter_type = m_context.parameter_type(specifier.m_position);
-        parameter_type && parameter_type != ParameterType::Generic)
+        parameter_type && parameter_type != ParameterType::UserDefined)
     {
         if (m_context.lexer().consume_if(s_colon))
         {

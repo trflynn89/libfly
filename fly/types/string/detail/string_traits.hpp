@@ -179,10 +179,10 @@ struct BasicFormatTraits
     static inline constexpr bool is_default_formatted_enum_v = is_default_formatted_enum<T>::value;
 
     /**
-     * Trait to classify a type as a generic type.
+     * Trait to classify a type as a user-defined type.
      */
     template <typename T, typename U = std::remove_cvref_t<T>>
-    using is_generic = std::negation<std::disjunction<
+    using is_user_defined = std::negation<std::disjunction<
         detail::is_like_supported_string<T>,
         is_pointer<T>,
         is_integral<T>,
@@ -191,7 +191,7 @@ struct BasicFormatTraits
         is_default_formatted_enum<T>>>;
 
     template <typename T>
-    static inline constexpr bool is_generic_v = is_generic<T>::value;
+    static inline constexpr bool is_user_defined_v = is_user_defined<T>::value;
 };
 
 } // namespace fly::detail

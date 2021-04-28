@@ -20,13 +20,13 @@ namespace {
 
 #define FMT(format) FLY_ARR(char_type, format)
 
-struct GenericType
+struct UserDefinedType
 {
 };
 
-[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const GenericType &)
+[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const UserDefinedType &)
 {
-    stream << "GenericType";
+    stream << "UserDefinedType";
     return stream;
 }
 
@@ -469,10 +469,10 @@ CATCH_TEMPLATE_TEST_CASE("FormatTypes", "[string]", char, wchar_t, char8_t, char
         return !value.empty();
     };
 
-    CATCH_SECTION("Generic types may be formatted without presentation type")
+    CATCH_SECTION("User-defined types may be formatted without presentation type")
     {
-        GenericType gt {};
-        test_format(FMT("{}"), FMT("GenericType"), gt);
+        UserDefinedType gt {};
+        test_format(FMT("{}"), FMT("UserDefinedType"), gt);
         test_format(FMT("{}"), FMT("One"), UserFormattedEnum::One);
         test_format(FMT("{}"), FMT("Two"), UserFormattedEnum::Two);
     }
