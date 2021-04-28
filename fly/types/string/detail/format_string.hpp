@@ -164,8 +164,7 @@ constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
     // The opening { will have already been consumed, so the starting position is one less.
     const auto starting_position = m_context.lexer().position() - 1;
 
-    FormatSpecifier specifier {};
-    specifier.m_position = m_context.next_position();
+    FormatSpecifier specifier(m_context);
 
     if (m_context.parameter_type(specifier.m_position) == ParameterType::UserDefined)
     {
@@ -199,10 +198,6 @@ BasicFormatString<CharType, ParameterTypes...>::parse_standard_specifier(FormatS
     if (m_context.lexer().consume_if(s_colon))
     {
         specifier.parse(m_context);
-    }
-    else
-    {
-        specifier.infer_type(m_context);
     }
 
     if (!m_context.has_error() && !m_context.lexer().consume_if(s_right_brace))

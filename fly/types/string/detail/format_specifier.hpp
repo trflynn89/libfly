@@ -122,6 +122,14 @@ struct BasicFormatSpecifier
 
     BasicFormatSpecifier() = default;
 
+    /**
+     * Constructor. Initializes the replacement field's format parameter position and infers its
+     * presentation type.
+     *
+     * @param context The context holding the format string parsing state.
+     */
+    explicit constexpr BasicFormatSpecifier(FormatParseContext &context);
+
     BasicFormatSpecifier(BasicFormatSpecifier &&) = default;
     BasicFormatSpecifier &operator=(BasicFormatSpecifier &&) = default;
 
@@ -173,17 +181,6 @@ struct BasicFormatSpecifier
      * @return The parsed specifier.
      */
     constexpr void parse(FormatParseContext &context);
-
-    /**
-     * Infer a presentation type for a replacement field based on the corresponding format
-     * parameter's type.
-     *
-     * TODO: This should be private. Once the standard fly::Formatters are updated to inherit from
-     * this structure, they may infer their presentation type.
-     *
-     * @param context The context holding the format string parsing state.
-     */
-    constexpr void infer_type(FormatParseContext &context);
 
     /**
      * The width formatting option may either be a number or a nested replacement field. If a
@@ -338,6 +335,14 @@ private:
     constexpr void parse_type(FormatParseContext &context);
 
     /**
+     * Infer a presentation type for a replacement field based on the corresponding format
+     * parameter's type.
+     *
+     * @param context The context holding the format string parsing state.
+     */
+    constexpr void infer_type(FormatParseContext &context);
+
+    /**
      * After parsing a single replacement field, validate all options that were parsed. Raise an
      * error if the field is invalid.
      *
@@ -415,6 +420,14 @@ private:
     static constexpr const auto s_letter_l = FLY_CHR(CharType, 'L');
     static constexpr const auto s_decimal = FLY_CHR(CharType, '.');
 };
+
+//==================================================================================================
+template <typename CharType>
+constexpr BasicFormatSpecifier<CharType>::BasicFormatSpecifier(FormatParseContext &context) :
+    m_position(context.next_position())
+{
+    infer_type(context);
+}
 
 //==================================================================================================
 template <typename CharType>
@@ -586,11 +599,6 @@ constexpr void BasicFormatSpecifier<CharType>::parse_type(FormatParseContext &co
                 m_case = Case::Upper;
             }
         }
-    }
-
-    if (m_type == Type::None)
-    {
-        infer_type(context);
     }
 }
 
