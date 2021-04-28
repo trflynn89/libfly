@@ -169,11 +169,10 @@ struct BasicFormatSpecifier
      * Parse the formatting options for a standard replacement field.
      *
      * @param context The context holding the format string parsing state.
-     * @param parameter_type The type of format parameter corresponding to the replacement field.
      *
      * @return The parsed specifier.
      */
-    constexpr void parse(FormatParseContext &context, ParameterType parameter_type);
+    constexpr void parse(FormatParseContext &context);
 
     /**
      * Infer a presentation type for a replacement field based on the corresponding format
@@ -182,9 +181,9 @@ struct BasicFormatSpecifier
      * TODO: This should be private. Once the standard fly::Formatters are updated to inherit from
      * this structure, they may infer their presentation type.
      *
-     * @param parameter_type The type of format parameter corresponding to the replacement field.
+     * @param context The context holding the format string parsing state.
      */
-    constexpr void infer_type(ParameterType parameter_type);
+    constexpr void infer_type(FormatParseContext &context);
 
     /**
      * The width formatting option may either be a number or a nested replacement field. If a
@@ -335,18 +334,16 @@ private:
      * type.
      *
      * @param context The context holding the format string parsing state.
-     * @param parameter_type The type of format parameter corresponding to the replacement field.
      */
-    constexpr void parse_type(FormatParseContext &context, ParameterType parameter_type);
+    constexpr void parse_type(FormatParseContext &context);
 
     /**
      * After parsing a single replacement field, validate all options that were parsed. Raise an
      * error if the field is invalid.
      *
      * @param context The context holding the format string parsing state.
-     * @param parameter_type The type of format parameter corresponding to the replacement field.
      */
-    constexpr void validate(FormatParseContext &context, ParameterType parameter_type);
+    constexpr void validate(FormatParseContext &context);
 
     /**
      * Helper to validate the presentation type of a single replacement field. Raise an error if the
@@ -421,8 +418,7 @@ private:
 
 //==================================================================================================
 template <typename CharType>
-constexpr void
-BasicFormatSpecifier<CharType>::parse(FormatParseContext &context, ParameterType parameter_type)
+constexpr void BasicFormatSpecifier<CharType>::parse(FormatParseContext &context)
 {
     parse_fill_and_alignment(context);
     parse_sign(context);
@@ -430,9 +426,9 @@ BasicFormatSpecifier<CharType>::parse(FormatParseContext &context, ParameterType
     parse_width(context);
     parse_precision(context);
     parse_locale_specific_form(context);
-    parse_type(context, parameter_type);
+    parse_type(context);
 
-    validate(context, parameter_type);
+    validate(context);
 }
 
 //==================================================================================================
@@ -550,7 +546,7 @@ constexpr auto BasicFormatSpecifier<CharType>::parse_nested_specifier(FormatPars
 
     if (auto parameter_type = context.parameter_type(specifier.m_position); parameter_type)
     {
-        specifier.infer_type(*parameter_type);
+        specifier.infer_type(context);
     }
 
     if (!context.lexer().consume_if(s_right_brace))
@@ -576,9 +572,7 @@ BasicFormatSpecifier<CharType>::parse_locale_specific_form(FormatParseContext &c
 
 //==================================================================================================
 template <typename CharType>
-constexpr void BasicFormatSpecifier<CharType>::parse_type(
-    FormatParseContext &context,
-    ParameterType parameter_type)
+constexpr void BasicFormatSpecifier<CharType>::parse_type(FormatParseContext &context)
 {
     if (auto ch = context.lexer().peek(); ch)
     {
@@ -596,14 +590,16 @@ constexpr void BasicFormatSpecifier<CharType>::parse_type(
 
     if (m_type == Type::None)
     {
-        infer_type(parameter_type);
+        infer_type(context);
     }
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr void BasicFormatSpecifier<CharType>::infer_type(ParameterType parameter_type)
+constexpr void BasicFormatSpecifier<CharType>::infer_type(FormatParseContext &context)
 {
+    auto parameter_type = context.parameter_type(m_position);
+
     if (parameter_type == ParameterType::Character)
     {
         m_type = Type::Character;
@@ -632,9 +628,10 @@ constexpr void BasicFormatSpecifier<CharType>::infer_type(ParameterType paramete
 
 //==================================================================================================
 template <typename CharType>
-constexpr void
-BasicFormatSpecifier<CharType>::validate(FormatParseContext &context, ParameterType parameter_type)
+constexpr void BasicFormatSpecifier<CharType>::validate(FormatParseContext &context)
 {
+    auto parameter_type = context.parameter_type(m_position);
+
     // Validate the fill character.
     if (m_fill && ((m_fill == s_left_brace) || (m_fill == s_right_brace)))
     {
@@ -704,9 +701,9 @@ BasicFormatSpecifier<CharType>::validate(FormatParseContext &context, ParameterT
     }
 
     // Validate the presentation type.
-    if (m_type != Type::None)
+    if (parameter_type && (m_type != Type::None))
     {
-        validate_type(context, parameter_type);
+        validate_type(context, *parameter_type);
     }
 }
 
