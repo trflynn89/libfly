@@ -62,9 +62,9 @@ private:
      * string. If valid, the format parsing context will be advanced to the character after the
      * closing brace.
      *
-     * @return If successful, the parsed replacement field. Otherwise, an uninitialized value.
+     * @return The parsed replacement field.
      */
-    constexpr std::optional<FormatSpecifier> parse_specifier();
+    constexpr FormatSpecifier parse_specifier();
 
     /**
      * Parse a replacement field for a user-defined type.
@@ -118,9 +118,9 @@ FLY_CONSTEVAL BasicFormatString<CharType, ParameterTypes...>::BasicFormatString(
             {
                 m_context.on_error("Exceeded maximum allowed number of specifiers");
             }
-            else if (auto specifier = parse_specifier(); specifier)
+            else
             {
-                m_specifiers[m_specifier_count++] = *std::move(specifier);
+                m_specifiers[m_specifier_count++] = parse_specifier();
             }
         }
         else if (ch == s_right_brace)
@@ -158,8 +158,7 @@ auto BasicFormatString<CharType, ParameterTypes...>::next_specifier()
 
 //==================================================================================================
 template <typename CharType, typename... ParameterTypes>
-constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
-    -> std::optional<FormatSpecifier>
+constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier() -> FormatSpecifier
 {
     // The opening { will have already been consumed, so the starting position is one less.
     const auto starting_position = m_context.lexer().position() - 1;
