@@ -412,7 +412,7 @@ public:
      *     3. An optional colon ":" following by formatting options.
      *     4. A final "}" character.
      *
-     * For a detailed description of replacement fields see fly::detail::BasicFormatSpecifier.
+     * For a detailed description of replacement fields, see fly::detail::BasicFormatSpecifier.
      *
      * This implementation differs from std::format in the following ways:
      *
@@ -455,6 +455,27 @@ public:
     template <typename... ParameterTypes>
     static string_type
     format(FormatString<ParameterTypes...> &&fmt, ParameterTypes &&...parameters);
+
+    /**
+     * Format a string with a set of format parameters to an existing output iterator. Based
+     * strongly upon: https://en.cppreference.com/w/cpp/utility/format/format.
+     *
+     * For a detailed description of string formatting, see fly::BasicString::format.
+     *
+     * @tparam OutputIterator The type of the output iterator.
+     * @tparam ParameterTypes Variadic format parameter types.
+     *
+     * @param output The output iterator to write to.
+     * @param fmt The string to format.
+     * @param parameters The variadic list of format parameters to be formatted.
+     *
+     * @return A string that has been formatted with the given format parameters.
+     */
+    template <typename OutputIterator, typename... ParameterTypes>
+    static void format_to(
+        OutputIterator output,
+        FormatString<ParameterTypes...> &&fmt,
+        ParameterTypes &&...parameters);
 
     /**
      * Concatenate a list of objects with the given separator.
@@ -849,26 +870,44 @@ auto BasicString<CharType>::generate_random_string(size_type length) -> string_t
 //==================================================================================================
 template <typename CharType>
 template <typename... ParameterTypes>
-auto BasicString<CharType>::format(
-    FormatString<ParameterTypes...> &&fmt,
-    ParameterTypes &&...parameters) -> string_type
+inline auto
+BasicString<CharType>::format(FormatString<ParameterTypes...> &&fmt, ParameterTypes &&...parameters)
+    -> string_type
 {
-    using FormatContext =
-        detail::BasicFormatContext<std::back_insert_iterator<string_type>, char_type>;
+    string_type formatted;
+    formatted.reserve(fmt.context().view().size() * 2);
+
+    format_to(
+        std::back_inserter(formatted),
+        std::move(fmt),
+        std::forward<ParameterTypes>(parameters)...);
+
+    return formatted;
+}
+
+//==================================================================================================
+template <typename CharType>
+template <typename OutputIterator, typename... ParameterTypes>
+void BasicString<CharType>::format_to(
+    OutputIterator output,
+    FormatString<ParameterTypes...> &&fmt,
+    ParameterTypes &&...parameters)
+{
+    using FormatContext = detail::BasicFormatContext<OutputIterator, char_type>;
 
     if (fmt.context().has_error())
     {
-        return format(FLY_ARR(char_type, "Ignored invalid formatter: {}"), fmt.context().error());
+        format_to(
+            output,
+            FLY_ARR(char_type, "Ignored invalid formatter: {}"),
+            fmt.context().error());
     }
 
     const view_type view = fmt.context().view();
 
-    string_type formatted;
-    formatted.reserve(view.size() * 2);
-
     auto params =
         detail::make_format_parameters<FormatContext>(std::forward<ParameterTypes>(parameters)...);
-    FormatContext context(std::back_inserter(formatted), params);
+    FormatContext context(output, params);
 
     for (std::size_t pos = 0; pos < view.size();)
     {
@@ -901,8 +940,6 @@ auto BasicString<CharType>::format(
                 break;
         }
     }
-
-    return formatted;
 }
 
 //==================================================================================================
