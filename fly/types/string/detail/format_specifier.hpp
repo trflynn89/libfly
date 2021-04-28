@@ -555,7 +555,7 @@ constexpr auto BasicFormatSpecifier<CharType>::parse_nested_specifier(FormatPars
 
     if (!context.lexer().consume_if(s_right_brace))
     {
-        context.on_error("Detected unclosed format string - must end with }");
+        context.on_error("Detected unclosed replacement field - must end with }");
         return std::nullopt;
     }
 
