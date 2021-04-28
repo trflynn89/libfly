@@ -11,7 +11,7 @@ namespace fly::detail {
  */
 enum class ParameterType : std::uint8_t
 {
-    Generic,
+    UserDefined,
     Character,
     String,
     Pointer,
@@ -59,7 +59,7 @@ constexpr ParameterType infer_parameter_type()
     }
     else
     {
-        return ParameterType::Generic;
+        return ParameterType::UserDefined;
     }
 }
 

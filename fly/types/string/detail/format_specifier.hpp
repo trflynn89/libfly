@@ -102,7 +102,7 @@ namespace fly::detail {
  *        Strong enumeration types - If an overload of operator<< is defined, valid presentations
  *        are: none, "s". Else, valid presentations are: none, "c", b", "B", "o", "d", "x", "X".
  *
- *        Other (generic) types - Valid presentations: none. An overload of operator<< must be
+ *        Other user-defined types - Valid presentations: none. An overload of operator<< must be
  *        defined for generic types.
  *
  *        For details on each presentation type, see the above links.

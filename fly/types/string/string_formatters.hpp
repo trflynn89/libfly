@@ -35,14 +35,14 @@ template <typename T, typename CharType = char, typename SFINAE = bool>
 struct Formatter;
 
 template <typename T, typename CharType>
-struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_generic<T>>>
+struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_user_defined<T>>>
 {
     /**
-     * Format a single replacement field with the provided generic value.
+     * Format a single replacement field with the provided user-defined value.
      *
-     * Currently, rather than supporting a set of std::formatter specializations, the generic value
-     * will be converted to a string via the streaming operator. The resulting string will then be
-     * formatted using the string formatting overload.
+     * Currently, rather than supporting a set of std::formatter specializations, the user-defined
+     * value will be converted to a string via the streaming operator. The resulting string will
+     * then be formatted using the string formatting overload.
      *
      * @tparam FormatParameter The type of the formatting context.
      *
@@ -250,7 +250,7 @@ private:
 template <typename T, typename CharType>
 template <typename FormatContext>
 inline void
-Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_generic<T>>>::format(
+Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_user_defined<T>>>::format(
     const T &value,
     FormatContext &context)
 {

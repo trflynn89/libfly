@@ -20,11 +20,11 @@ namespace {
 
 #define FMT(format) FLY_ARR(char_type, format)
 
-struct GenericType
+struct UserDefinedType
 {
 };
 
-[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const GenericType &)
+[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const UserDefinedType &)
 {
     return stream;
 }
@@ -151,7 +151,7 @@ constexpr const char *s_bad_precision_position =
     "Position of precision parameter must be an integral type";
 constexpr const char *s_bad_locale =
     "Locale-specific form may only be used for numeric and boolean types";
-constexpr const char *s_bad_generic = s_unclosed_string;
+constexpr const char *s_bad_user_defined = s_unclosed_string;
 constexpr const char *s_bad_character = "Character types must be formatted with {} or {:cbBodxX}";
 constexpr const char *s_bad_string = "String types must be formatted with {} or {:s}";
 constexpr const char *s_bad_pointer = "Pointer types must be formatted with {} or {:p}";
@@ -177,7 +177,7 @@ CATCH_TEMPLATE_TEST_CASE(
     using char_type = TestType;
     using Specifier = fly::detail::BasicFormatSpecifier<char_type>;
 
-    constexpr const GenericType g {};
+    constexpr const UserDefinedType g {};
     constexpr const auto c = FLY_CHR(char_type, 'a');
     constexpr const auto s = FLY_STR(char_type, "a");
     constexpr const auto &a = FLY_ARR(char_type, "a");
@@ -454,7 +454,7 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{}"), b), specifier);
     }
 
-    CATCH_SECTION("Generic types may be formatted without presentation type")
+    CATCH_SECTION("User-defined types may be formatted without presentation type")
     {
         Specifier specifier {};
         test_format(make_format(FMT("{}"), g), specifier);
@@ -683,7 +683,7 @@ CATCH_TEMPLATE_TEST_CASE(
 {
     using char_type = TestType;
 
-    constexpr const GenericType g {};
+    constexpr const UserDefinedType g {};
     constexpr const auto c = FLY_CHR(char_type, 'a');
     constexpr const auto s = FLY_STR(char_type, "a");
     constexpr const int i = 1;
@@ -796,7 +796,7 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_error(make_format(FMT("{:#d}"), i), s_bad_alternate_form);
         test_error(make_format(FMT("{:#}"), s), s_bad_alternate_form);
-        test_error(make_format(FMT("{:#}"), g), s_bad_generic);
+        test_error(make_format(FMT("{:#}"), g), s_bad_user_defined);
     }
 
     CATCH_SECTION("Zero-padding only valid for numeric types")
@@ -892,8 +892,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (character)")
     {
-        test_error(make_format(FMT("{:c}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:c}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:c}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:c}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:c}"), s), s_bad_string);
         test_error(make_format(FMT("{:c}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:c}"), f), s_bad_float);
@@ -901,8 +901,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (string)")
     {
-        test_error(make_format(FMT("{:c}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:c}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:c}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:c}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:s}"), c), s_bad_character);
         test_error(make_format(FMT("{:s}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:s}"), i), s_bad_integer);
@@ -912,7 +912,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (pointer)")
     {
-        test_error(make_format(FMT("{:p}"), g), s_bad_generic);
+        test_error(make_format(FMT("{:p}"), g), s_bad_user_defined);
         test_error(make_format(FMT("{:p}"), c), s_bad_character);
         test_error(make_format(FMT("{:p}"), i), s_bad_integer);
         test_error(make_format(FMT("{:p}"), d), s_bad_integer);
@@ -922,13 +922,13 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (binary)")
     {
-        test_error(make_format(FMT("{:b}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:b}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:b}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:b}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:b}"), s), s_bad_string);
         test_error(make_format(FMT("{:b}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:b}"), f), s_bad_float);
 
-        test_error(make_format(FMT("{:B}"), g), s_bad_generic);
+        test_error(make_format(FMT("{:B}"), g), s_bad_user_defined);
         test_error(make_format(FMT("{:B}"), s), s_bad_string);
         test_error(make_format(FMT("{:B}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:B}"), f), s_bad_float);
@@ -936,8 +936,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (octal)")
     {
-        test_error(make_format(FMT("{:o}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:o}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:o}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:o}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:o}"), s), s_bad_string);
         test_error(make_format(FMT("{:o}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:o}"), f), s_bad_float);
@@ -945,8 +945,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (decimal)")
     {
-        test_error(make_format(FMT("{:d}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:d}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:d}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:d}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:d}"), s), s_bad_string);
         test_error(make_format(FMT("{:d}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:d}"), f), s_bad_float);
@@ -954,14 +954,14 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (hex)")
     {
-        test_error(make_format(FMT("{:x}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:x}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:x}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:x}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:x}"), s), s_bad_string);
         test_error(make_format(FMT("{:x}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:x}"), f), s_bad_float);
 
-        test_error(make_format(FMT("{:X}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:X}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:X}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:X}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:X}"), s), s_bad_string);
         test_error(make_format(FMT("{:X}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:X}"), f), s_bad_float);
@@ -969,8 +969,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (hexfloat)")
     {
-        test_error(make_format(FMT("{:a}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:a}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:a}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:a}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:a}"), c), s_bad_character);
         test_error(make_format(FMT("{:a}"), s), s_bad_string);
         test_error(make_format(FMT("{:a}"), &g), s_bad_pointer);
@@ -978,8 +978,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:a}"), d), s_bad_integer);
         test_error(make_format(FMT("{:a}"), b), s_bad_bool);
 
-        test_error(make_format(FMT("{:A}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:A}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:A}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:A}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:A}"), c), s_bad_character);
         test_error(make_format(FMT("{:A}"), s), s_bad_string);
         test_error(make_format(FMT("{:A}"), &g), s_bad_pointer);
@@ -990,8 +990,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (scientific)")
     {
-        test_error(make_format(FMT("{:e}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:e}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:e}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:e}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:e}"), c), s_bad_character);
         test_error(make_format(FMT("{:e}"), s), s_bad_string);
         test_error(make_format(FMT("{:e}"), &g), s_bad_pointer);
@@ -999,8 +999,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:e}"), d), s_bad_integer);
         test_error(make_format(FMT("{:e}"), b), s_bad_bool);
 
-        test_error(make_format(FMT("{:E}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:E}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:E}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:E}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:E}"), c), s_bad_character);
         test_error(make_format(FMT("{:E}"), s), s_bad_string);
         test_error(make_format(FMT("{:E}"), &g), s_bad_pointer);
@@ -1011,8 +1011,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (fixed)")
     {
-        test_error(make_format(FMT("{:f}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:f}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:f}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:f}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:f}"), c), s_bad_character);
         test_error(make_format(FMT("{:f}"), s), s_bad_string);
         test_error(make_format(FMT("{:f}"), &g), s_bad_pointer);
@@ -1020,8 +1020,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:f}"), d), s_bad_integer);
         test_error(make_format(FMT("{:f}"), b), s_bad_bool);
 
-        test_error(make_format(FMT("{:F}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:F}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:F}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:F}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:F}"), c), s_bad_character);
         test_error(make_format(FMT("{:F}"), s), s_bad_string);
         test_error(make_format(FMT("{:F}"), &g), s_bad_pointer);
@@ -1032,8 +1032,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (general)")
     {
-        test_error(make_format(FMT("{:g}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:g}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:g}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:g}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:g}"), c), s_bad_character);
         test_error(make_format(FMT("{:g}"), s), s_bad_string);
         test_error(make_format(FMT("{:g}"), &g), s_bad_pointer);
@@ -1041,8 +1041,8 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:g}"), d), s_bad_integer);
         test_error(make_format(FMT("{:g}"), b), s_bad_bool);
 
-        test_error(make_format(FMT("{:G}"), g), s_bad_generic);
-        test_error(make_format(FMT("{:G}"), u), s_bad_generic);
+        test_error(make_format(FMT("{:G}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:G}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:G}"), c), s_bad_character);
         test_error(make_format(FMT("{:G}"), s), s_bad_string);
         test_error(make_format(FMT("{:G}"), &g), s_bad_pointer);
