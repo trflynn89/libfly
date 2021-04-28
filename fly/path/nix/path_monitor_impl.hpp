@@ -99,7 +99,7 @@ private:
      *
      * @return A PathEvent that matches the event mask.
      */
-    PathMonitor::PathEvent convert_to_event(std::uint32_t mask) const;
+    PathEvent convert_to_event(std::uint32_t mask) const;
 
     // Notes from INOTIFY(7) man page:
     //

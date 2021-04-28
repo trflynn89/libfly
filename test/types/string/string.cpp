@@ -10,15 +10,15 @@
 
 namespace {
 
-template <typename StringType>
-class Streamable
+template <typename CharType>
+class UserDefinedType
 {
 public:
-    Streamable(const StringType &str, int num) noexcept : m_str(str), m_num(num)
+    UserDefinedType(std::basic_string_view<CharType> str, int num) noexcept : m_str(str), m_num(num)
     {
     }
 
-    StringType str() const
+    std::basic_string_view<CharType> str() const
     {
         return m_str;
     };
@@ -28,18 +28,26 @@ public:
         return m_num;
     };
 
-    friend std::ostream &operator<<(std::ostream &stream, const Streamable &obj)
-    {
-        stream << fly::String::format("[{} {:x}]", obj.str(), obj.num());
-        return stream;
-    }
-
 private:
-    StringType m_str;
+    std::basic_string_view<CharType> m_str;
     int m_num;
 };
 
 } // namespace
+
+template <typename CharType>
+struct fly::Formatter<UserDefinedType<CharType>, CharType>
+{
+    template <typename FormatContext>
+    void format(const UserDefinedType<CharType> &value, FormatContext &context)
+    {
+        fly::BasicString<CharType>::format_to(
+            context.out(),
+            FLY_ARR(CharType, "[{} {:x}]"),
+            value.str(),
+            value.num());
+    }
+};
 
 CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char16_t, char32_t)
 {
@@ -286,7 +294,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char
         const char_type arr[] = {'c', '\0'};
         const char_type chr = 'd';
 
-        const Streamable<string_type> obj(FLY_STR(char_type, "hi"), 0xbeef);
+        const UserDefinedType<char_type> obj(FLY_STR(char_type, "hi"), 0xbeef);
 
         CATCH_CHECK(FLY_STR(char_type, "a") == BasicString::join('.', str));
         CATCH_CHECK(FLY_STR(char_type, "b") == BasicString::join('.', ctr));

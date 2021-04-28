@@ -11,18 +11,6 @@
 
 namespace {
 
-struct Streamable
-{
-    [[maybe_unused]] friend std::ostream &operator<<(std::ostream &stream, const Streamable &)
-    {
-        return stream;
-    }
-};
-
-struct NotStreamable
-{
-};
-
 template <typename T, fly::enable_if<fly::detail::is_supported_string<T>> = 0>
 constexpr bool is_supported_string(const T &)
 {
@@ -479,17 +467,5 @@ CATCH_TEMPLATE_TEST_CASE(
 
         CATCH_CHECK_FALSE(is_string_like(int()));
         CATCH_CHECK_FALSE(is_string_like(char_type()));
-    }
-
-    CATCH_SECTION("Check whether types are streamable")
-    {
-        const Streamable obj1;
-        const NotStreamable obj2;
-
-        CATCH_CHECK(fly::detail::OstreamTraits::is_declared_v<int>);
-        CATCH_CHECK(fly::detail::OstreamTraits::is_declared_v<bool>);
-        CATCH_CHECK(fly::detail::OstreamTraits::is_declared_v<decltype(obj1)>);
-
-        CATCH_CHECK_FALSE(fly::detail::OstreamTraits::is_declared_v<decltype(obj2)>);
     }
 }

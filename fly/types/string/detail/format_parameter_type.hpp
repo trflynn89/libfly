@@ -44,8 +44,7 @@ constexpr ParameterType infer_parameter_type()
     {
         return ParameterType::Pointer;
     }
-    else if constexpr (
-        BasicFormatTraits::is_integer_v<U> || BasicFormatTraits::is_default_formatted_enum_v<U>)
+    else if constexpr (BasicFormatTraits::is_integer_v<U>)
     {
         return ParameterType::Integral;
     }

@@ -2,13 +2,13 @@
 
 #include "fly/types/numeric/endian.hpp"
 #include "fly/types/string/lexer.hpp"
+#include "fly/types/string/string.hpp"
 
 #include <array>
 #include <compare>
 #include <cstdint>
 #include <limits>
 #include <optional>
-#include <ostream>
 #include <string>
 
 namespace fly::net {
@@ -82,13 +82,6 @@ public:
     static constexpr std::optional<IPv4Address> from_string(std::string_view address);
 
     /**
-     * Convert the IPv4 address to a four octet string in dot-decimal notation.
-     *
-     * @return The IPv4 address in dot-decimal notation.
-     */
-    std::string to_string() const;
-
-    /**
      * @return The IPv4 address as an integer in network order.
      */
     constexpr int_type network_order() const;
@@ -103,16 +96,6 @@ public:
      * address.
      */
     auto operator<=>(const IPv4Address &) const = default;
-
-    /**
-     * Stream an IPv4 address as a four octet string in dot-decimal notation.
-     *
-     * @param stream A reference to the output stream.
-     * @param address The IPv4 address to stream.
-     *
-     * @return A reference to the output stream.
-     */
-    friend std::ostream &operator<<(std::ostream &stream, const IPv4Address &address);
 
 private:
     int_type m_address {0};
@@ -222,3 +205,30 @@ constexpr auto IPv4Address::host_order() const -> int_type
 }
 
 } // namespace fly::net
+
+//==================================================================================================
+template <>
+struct fly::Formatter<fly::net::IPv4Address>
+{
+    /**
+     * Format an IPv4 address as a four octet string in dot-decimal notation.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param address The IPv4 address to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(const fly::net::IPv4Address &address, FormatContext &context)
+    {
+        const auto network_order = address.network_order();
+
+        fly::String::format_to(
+            context.out(),
+            "{}.{}.{}.{}",
+            network_order & 0xff,
+            (network_order >> 8) & 0xff,
+            (network_order >> 16) & 0xff,
+            (network_order >> 24) & 0xff);
+    }
+};

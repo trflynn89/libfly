@@ -7,11 +7,11 @@
 
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/literals.hpp"
+#include "fly/types/string/string_formatters.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"
 
-#include <ostream>
 #include <string>
 
 using namespace fly::literals::numeric_literals;
@@ -24,25 +24,10 @@ struct UserDefinedType
 {
 };
 
-[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const UserDefinedType &)
-{
-    return stream;
-}
-
-enum class DefaultFormattedEnum
-{
-    One = 1,
-};
-
 enum class UserFormattedEnum
 {
     One = 1,
 };
-
-[[maybe_unused]] std::ostream &operator<<(std::ostream &stream, const UserFormattedEnum &)
-{
-    return stream;
-}
 
 class ConstructorCounter
 {
@@ -126,8 +111,6 @@ void test_error(FormatStringType &&format, std::string &&error)
 // Copies of all of the error messages that BasicFormatString might raise. Ideally, these could be
 // defined in a common header, but when FLY_CONSTEVAL evaluates to 'consteval', the error message
 // raised would not display in the compile error (the variable name or macro name would display).
-constexpr const char *s_non_streamable_parameter =
-    "An overloaded operator<< must be defined for all format parameters";
 constexpr const char *s_unclosed_string = "Detected unclosed replacement field - must end with }";
 constexpr const char *s_unescaped_close = "Closing brace } must be esacped";
 constexpr const char *s_too_many_specifiers = "Exceeded maximum allowed number of specifiers";
@@ -165,6 +148,32 @@ constexpr const char *s_bad_bool = "Boolean types must be formatted with {} or o
 
 } // namespace
 
+template <typename CharType>
+struct fly::Formatter<UserDefinedType, CharType> :
+    public fly::Formatter<std::basic_string_view<CharType>, CharType>
+{
+    template <typename FormatContext>
+    void format(const UserDefinedType &, FormatContext &context)
+    {
+        fly::Formatter<std::basic_string_view<CharType>, CharType>::format(
+            FLY_STR(CharType, "UserDefinedType"),
+            context);
+    }
+};
+
+template <typename CharType>
+struct fly::Formatter<UserFormattedEnum, CharType> :
+    public fly::Formatter<std::basic_string_view<CharType>, CharType>
+{
+    template <typename FormatContext>
+    void format(UserFormattedEnum value, FormatContext &context)
+    {
+        fly::Formatter<std::basic_string_view<CharType>, CharType>::format(
+            value == UserFormattedEnum::One ? FLY_STR(CharType, "One") : FLY_STR(CharType, "Two"),
+            context);
+    }
+};
+
 CATCH_TEMPLATE_TEST_CASE(
     "BasicFormatString",
     "[string]",
@@ -184,7 +193,6 @@ CATCH_TEMPLATE_TEST_CASE(
     constexpr const int i = 1;
     constexpr const float f = 3.14f;
     constexpr const bool b = true;
-    constexpr const DefaultFormattedEnum d = DefaultFormattedEnum::One;
     constexpr const UserFormattedEnum u = UserFormattedEnum::One;
 
     CATCH_SECTION("No specifiers are parsed from empty string")
@@ -445,7 +453,6 @@ CATCH_TEMPLATE_TEST_CASE(
 
         specifier.m_type = Specifier::Type::Decimal;
         test_format(make_format(FMT("{}"), i), specifier);
-        test_format(make_format(FMT("{}"), d), specifier);
 
         specifier.m_type = Specifier::Type::General;
         test_format(make_format(FMT("{}"), f), specifier);
@@ -469,7 +476,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:c}"), c), specifier);
         test_format(make_format(FMT("{:c}"), i), specifier);
         test_format(make_format(FMT("{:c}"), b), specifier);
-        test_format(make_format(FMT("{:c}"), d), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (string)")
@@ -500,13 +506,11 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:b}"), c), specifier);
         test_format(make_format(FMT("{:b}"), i), specifier);
         test_format(make_format(FMT("{:b}"), b), specifier);
-        test_format(make_format(FMT("{:b}"), d), specifier);
 
         specifier.m_case = Specifier::Case::Upper;
         test_format(make_format(FMT("{:B}"), c), specifier);
         test_format(make_format(FMT("{:B}"), i), specifier);
         test_format(make_format(FMT("{:B}"), b), specifier);
-        test_format(make_format(FMT("{:B}"), d), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (octal)")
@@ -517,7 +521,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:o}"), c), specifier);
         test_format(make_format(FMT("{:o}"), i), specifier);
         test_format(make_format(FMT("{:o}"), b), specifier);
-        test_format(make_format(FMT("{:o}"), d), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (decimal)")
@@ -528,7 +531,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:d}"), c), specifier);
         test_format(make_format(FMT("{:d}"), i), specifier);
         test_format(make_format(FMT("{:d}"), b), specifier);
-        test_format(make_format(FMT("{:d}"), d), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (hex)")
@@ -539,13 +541,11 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{:x}"), c), specifier);
         test_format(make_format(FMT("{:x}"), i), specifier);
         test_format(make_format(FMT("{:x}"), b), specifier);
-        test_format(make_format(FMT("{:x}"), d), specifier);
 
         specifier.m_case = Specifier::Case::Upper;
         test_format(make_format(FMT("{:X}"), c), specifier);
         test_format(make_format(FMT("{:X}"), i), specifier);
         test_format(make_format(FMT("{:X}"), b), specifier);
-        test_format(make_format(FMT("{:X}"), d), specifier);
     }
 
     CATCH_SECTION("Presentation type may be set (hexfloat)")
@@ -689,19 +689,7 @@ CATCH_TEMPLATE_TEST_CASE(
     constexpr const int i = 1;
     constexpr const float f = 3.14f;
     constexpr const bool b = true;
-    constexpr const DefaultFormattedEnum d = DefaultFormattedEnum::One;
     constexpr const UserFormattedEnum u = UserFormattedEnum::One;
-
-    CATCH_SECTION("Cannot format non-streamable types")
-    {
-        struct Unstreamable
-        {
-        };
-
-        test_error(make_format(FMT("{}"), Unstreamable {}), s_non_streamable_parameter);
-        test_error(make_format(FMT("{} {}"), 1, Unstreamable {}), s_non_streamable_parameter);
-        test_error(make_format(FMT("{} {}"), Unstreamable {}, 1), s_non_streamable_parameter);
-    }
 
     CATCH_SECTION("Cannot parse single opening brace")
     {
@@ -906,7 +894,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:s}"), c), s_bad_character);
         test_error(make_format(FMT("{:s}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:s}"), i), s_bad_integer);
-        test_error(make_format(FMT("{:s}"), d), s_bad_integer);
         test_error(make_format(FMT("{:s}"), f), s_bad_float);
     }
 
@@ -915,7 +902,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:p}"), g), s_bad_user_defined);
         test_error(make_format(FMT("{:p}"), c), s_bad_character);
         test_error(make_format(FMT("{:p}"), i), s_bad_integer);
-        test_error(make_format(FMT("{:p}"), d), s_bad_integer);
         test_error(make_format(FMT("{:p}"), f), s_bad_float);
         test_error(make_format(FMT("{:p}"), b), s_bad_bool);
     }
@@ -975,7 +961,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:a}"), s), s_bad_string);
         test_error(make_format(FMT("{:a}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:a}"), i), s_bad_integer);
-        test_error(make_format(FMT("{:a}"), d), s_bad_integer);
         test_error(make_format(FMT("{:a}"), b), s_bad_bool);
 
         test_error(make_format(FMT("{:A}"), g), s_bad_user_defined);
@@ -984,7 +969,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:A}"), s), s_bad_string);
         test_error(make_format(FMT("{:A}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:A}"), i), s_bad_integer);
-        test_error(make_format(FMT("{:A}"), d), s_bad_integer);
         test_error(make_format(FMT("{:A}"), b), s_bad_bool);
     }
 
@@ -996,7 +980,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:e}"), s), s_bad_string);
         test_error(make_format(FMT("{:e}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:e}"), i), s_bad_integer);
-        test_error(make_format(FMT("{:e}"), d), s_bad_integer);
         test_error(make_format(FMT("{:e}"), b), s_bad_bool);
 
         test_error(make_format(FMT("{:E}"), g), s_bad_user_defined);
@@ -1005,7 +988,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:E}"), s), s_bad_string);
         test_error(make_format(FMT("{:E}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:E}"), i), s_bad_integer);
-        test_error(make_format(FMT("{:E}"), d), s_bad_integer);
         test_error(make_format(FMT("{:E}"), b), s_bad_bool);
     }
 
@@ -1017,7 +999,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:f}"), s), s_bad_string);
         test_error(make_format(FMT("{:f}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:f}"), i), s_bad_integer);
-        test_error(make_format(FMT("{:f}"), d), s_bad_integer);
         test_error(make_format(FMT("{:f}"), b), s_bad_bool);
 
         test_error(make_format(FMT("{:F}"), g), s_bad_user_defined);
@@ -1026,7 +1007,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:F}"), s), s_bad_string);
         test_error(make_format(FMT("{:F}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:F}"), i), s_bad_integer);
-        test_error(make_format(FMT("{:F}"), d), s_bad_integer);
         test_error(make_format(FMT("{:F}"), b), s_bad_bool);
     }
 
@@ -1038,7 +1018,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:g}"), s), s_bad_string);
         test_error(make_format(FMT("{:g}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:g}"), i), s_bad_integer);
-        test_error(make_format(FMT("{:g}"), d), s_bad_integer);
         test_error(make_format(FMT("{:g}"), b), s_bad_bool);
 
         test_error(make_format(FMT("{:G}"), g), s_bad_user_defined);
@@ -1047,7 +1026,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:G}"), s), s_bad_string);
         test_error(make_format(FMT("{:G}"), &g), s_bad_pointer);
         test_error(make_format(FMT("{:G}"), i), s_bad_integer);
-        test_error(make_format(FMT("{:G}"), d), s_bad_integer);
         test_error(make_format(FMT("{:G}"), b), s_bad_bool);
     }
 

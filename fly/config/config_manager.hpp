@@ -3,6 +3,7 @@
 #include "fly/config/config.hpp"
 #include "fly/logger/logger.hpp"
 #include "fly/types/json/json.hpp"
+#include "fly/types/string/string_formatters.hpp"
 
 #include <cstdint>
 #include <filesystem>
@@ -27,6 +28,15 @@ class SequencedTaskRunner;
 namespace fly::config {
 
 /**
+ * Enumerated list of supported configuration file formats.
+ */
+enum class ConfigFileType : std::uint8_t
+{
+    Ini,
+    Json,
+};
+
+/**
  * Class to create and manage a set of configurations.
  *
  * @author Timothy Flynn (trflynn89@pm.me)
@@ -39,15 +49,6 @@ public:
      * Map of configuration group names to configuration objects.
      */
     using ConfigMap = std::map<std::string, std::weak_ptr<Config>>;
-
-    /**
-     * Enumerated list of supported configuration file formats.
-     */
-    enum class ConfigFileType : std::uint8_t
-    {
-        Ini,
-        Json,
-    };
 
     /**
      * Create and start a configuration manager.
@@ -166,3 +167,22 @@ std::shared_ptr<T> ConfigManager::create_config()
 }
 
 } // namespace fly::config
+
+//==================================================================================================
+template <>
+struct fly::Formatter<fly::config::ConfigFileType> : public fly::Formatter<std::uint8_t>
+{
+    /**
+     * Format a configuration file type.
+     *
+     * @tparam FormatContext The type of the formatting context.
+     *
+     * @param file_type The configuration file type to format.
+     * @param context The context holding the formatting state.
+     */
+    template <typename FormatContext>
+    void format(fly::config::ConfigFileType file_type, FormatContext &context)
+    {
+        fly::Formatter<std::uint8_t>::format(static_cast<std::uint8_t>(file_type), context);
+    }
+};

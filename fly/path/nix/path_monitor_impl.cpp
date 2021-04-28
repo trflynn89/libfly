@@ -127,9 +127,9 @@ void PathMonitorImpl::handle_event(const inotify_event *event) const
     if (path_it != m_path_info.end())
     {
         const auto *info = static_cast<PathInfoImpl *>(path_it->second.get());
-        PathMonitor::PathEvent path_event = convert_to_event(event->mask);
+        PathEvent path_event = convert_to_event(event->mask);
 
-        if (path_event != PathMonitor::PathEvent::None)
+        if (path_event != PathEvent::None)
         {
             const std::filesystem::path file(event->name);
 
@@ -157,21 +157,21 @@ void PathMonitorImpl::handle_event(const inotify_event *event) const
 }
 
 //==================================================================================================
-PathMonitor::PathEvent PathMonitorImpl::convert_to_event(std::uint32_t mask) const
+PathEvent PathMonitorImpl::convert_to_event(std::uint32_t mask) const
 {
-    PathMonitor::PathEvent path_event = PathMonitor::PathEvent::None;
+    PathEvent path_event = PathEvent::None;
 
     if ((mask & IN_CREATE) || (mask & IN_MOVED_TO))
     {
-        path_event = PathMonitor::PathEvent::Created;
+        path_event = PathEvent::Created;
     }
     else if ((mask & IN_DELETE) || (mask & IN_MOVED_FROM))
     {
-        path_event = PathMonitor::PathEvent::Deleted;
+        path_event = PathEvent::Deleted;
     }
     else if (mask & IN_MODIFY)
     {
-        path_event = PathMonitor::PathEvent::Changed;
+        path_event = PathEvent::Changed;
     }
 
     return path_event;

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "fly/types/string/detail/format_parameters.hpp"
+#include "fly/types/string/string_formatters.hpp"
 
 #include <cstddef>
+#include <type_traits>
 
 namespace fly::detail {
 
@@ -20,6 +22,9 @@ class BasicFormatContext
 
 public:
     using char_type = CharType;
+
+    template <typename T>
+    using formatter_type = fly::Formatter<std::remove_cvref_t<T>, CharType>;
 
     /**
      * Constructor.

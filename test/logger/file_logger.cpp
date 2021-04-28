@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <memory>
+#include <sstream>
 #include <vector>
 
 using namespace fly::literals::numeric_literals;
@@ -95,7 +96,10 @@ std::uintmax_t log_size(const std::string &message)
     log.m_level = fly::logger::Level::Debug;
     log.m_trace = {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)};
 
-    return fly::String::format("{}\t{}", 1, log).length();
+    std::stringstream stream;
+    stream << log;
+
+    return stream.str().size();
 }
 
 } // namespace

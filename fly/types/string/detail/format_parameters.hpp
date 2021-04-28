@@ -1,9 +1,9 @@
 #pragma once
 
+#include "fly/traits/traits.hpp"
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
-#include "fly/types/string/string_formatters.hpp"
 
 #include <array>
 #include <cstdint>
@@ -175,16 +175,6 @@ public:
     explicit constexpr BasicFormatParameter(T value) noexcept;
 
     /**
-     * Constructor. Initialize the format parameter to store a default-formatted enumeration value.
-     *
-     * @tparam T The default-formatted enumeration type.
-     *
-     * @param value The default-formatted enumeration value.
-     */
-    template <typename T, fly::enable_if<BasicFormatTraits::is_default_formatted_enum<T>> = 0>
-    explicit constexpr BasicFormatParameter(T value) noexcept;
-
-    /**
      * Apply the type-erased formatting function to the stored format parameter.
      *
      * @param context The context holding the formatting state.
@@ -241,7 +231,7 @@ private:
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version April 4, 2021
  */
-template <typename FormatContext, typename... Parameters>
+template <typename FormatContext, typename... ParameterTypes>
 class BasicFormatParameters
 {
     using FormatParameter = BasicFormatParameter<FormatContext>;
@@ -252,12 +242,12 @@ public:
      *
      * @param parameters The format parameters to store.
      */
-    constexpr BasicFormatParameters(Parameters &&...parameters) noexcept;
+    constexpr BasicFormatParameters(ParameterTypes &&...parameters) noexcept;
 
 private:
     friend FormatContext;
 
-    const std::array<FormatParameter, sizeof...(Parameters)> m_parameters;
+    const std::array<FormatParameter, sizeof...(ParameterTypes)> m_parameters;
 };
 
 /**
@@ -268,18 +258,22 @@ private:
  *
  * @param parameters The format parameters to store.
  */
-template <typename FormatContext, typename... Parameters>
-constexpr inline auto make_format_parameters(Parameters &&...parameters)
+template <typename FormatContext, typename... ParameterTypes>
+constexpr inline auto make_format_parameters(ParameterTypes &&...parameters)
 {
-    return BasicFormatParameters<FormatContext, Parameters...> {
-        std::forward<Parameters>(parameters)...};
+    static_assert(
+        (BasicFormatTraits::has_formatter_v<FormatContext, ParameterTypes> && ...),
+        "A specialization of fly::Formatter<T, CharType> is required for all format parameters");
+
+    return BasicFormatParameters<FormatContext, ParameterTypes...> {
+        std::forward<ParameterTypes>(parameters)...};
 }
 
 //==================================================================================================
 template <typename FormatContext, typename T>
 inline void format_user_defined_value(const void *value, FormatContext &context)
 {
-    Formatter<T, typename FormatContext::char_type>().format(
+    typename FormatContext::template formatter_type<T>().format(
         *static_cast<const T *>(value),
         context);
 }
@@ -294,7 +288,7 @@ inline void format_string_value(
 {
     using view_type = std::basic_string_view<T>;
 
-    Formatter<view_type, typename FormatContext::char_type> formatter(std::move(specifier));
+    typename FormatContext::template formatter_type<view_type> formatter(std::move(specifier));
 
     view_type view(static_cast<const T *>(value), size);
     formatter.format(view, context);
@@ -307,7 +301,7 @@ inline void format_standard_value(
     FormatContext &context,
     BasicFormatSpecifier<typename FormatContext::char_type> &&specifier)
 {
-    Formatter<T, typename FormatContext::char_type> formatter(std::move(specifier));
+    typename FormatContext::template formatter_type<T> formatter(std::move(specifier));
 
     if constexpr (BasicFormatTraits::is_pointer_v<T>)
     {
@@ -448,14 +442,6 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T val
 
 //==================================================================================================
 template <typename FormatContext>
-template <typename T, fly::enable_if<BasicFormatTraits::is_default_formatted_enum<T>>>
-constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept :
-    BasicFormatParameter(static_cast<std::underlying_type_t<T>>(value))
-{
-}
-
-//==================================================================================================
-template <typename FormatContext>
 constexpr inline void BasicFormatParameter<FormatContext>::format(
     FormatContext &context,
     BasicFormatSpecifier<char_type> &&specifier) const
@@ -524,10 +510,10 @@ inline BasicFormatParameter<FormatContext>::operator bool() const noexcept
 }
 
 //==================================================================================================
-template <typename FormatContext, typename... Parameters>
-constexpr inline BasicFormatParameters<FormatContext, Parameters...>::BasicFormatParameters(
-    Parameters &&...parameters) noexcept :
-    m_parameters {FormatParameter {std::forward<Parameters>(parameters)}...}
+template <typename FormatContext, typename... ParameterTypes>
+constexpr inline BasicFormatParameters<FormatContext, ParameterTypes...>::BasicFormatParameters(
+    ParameterTypes &&...parameters) noexcept :
+    m_parameters {FormatParameter {std::forward<ParameterTypes>(parameters)}...}
 {
 }
 

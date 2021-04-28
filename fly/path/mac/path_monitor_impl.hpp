@@ -89,7 +89,7 @@ private:
     struct EventInfo
     {
         std::filesystem::path path;
-        PathMonitor::PathEvent event;
+        PathEvent event;
     };
 
     /**
@@ -130,8 +130,7 @@ private:
      *
      * @return A PathEvent list that matches the FSEventStreamEventFlags mask.
      */
-    static std::vector<PathMonitor::PathEvent>
-    convert_to_events(const FSEventStreamEventFlags &flags);
+    static std::vector<PathEvent> convert_to_events(const FSEventStreamEventFlags &flags);
 
     /**
      * Handle a single path event received in the FSEventStreamCallback. Find a monitored path that
