@@ -176,7 +176,7 @@ constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
 
     if (!m_context.lexer().consume_if(s_right_brace))
     {
-        m_context.on_error("Detected unclosed format string - must end with }");
+        m_context.on_error("Detected unclosed replacement field - must end with }");
         return std::nullopt;
     }
 
