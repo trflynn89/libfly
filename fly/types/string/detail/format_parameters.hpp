@@ -121,13 +121,7 @@ public:
      *
      * @param value The user-defined value.
      */
-    template <
-        typename T,
-        fly::disable_if_any<
-            detail::is_like_supported_string<T>,
-            BasicFormatTraits::is_pointer<T>,
-            std::is_arithmetic<T>,
-            BasicFormatTraits::is_default_formatted_enum<T>> = 0>
+    template <typename T, fly::enable_if<BasicFormatTraits::is_user_defined<T>> = 0>
     explicit constexpr BasicFormatParameter(const T &value) noexcept;
 
     /**
@@ -336,13 +330,7 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter() noe
 
 //==================================================================================================
 template <typename FormatContext>
-template <
-    typename T,
-    fly::disable_if_any<
-        detail::is_like_supported_string<T>,
-        BasicFormatTraits::is_pointer<T>,
-        std::is_arithmetic<T>,
-        BasicFormatTraits::is_default_formatted_enum<T>>>
+template <typename T, fly::enable_if<BasicFormatTraits::is_user_defined<T>>>
 constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &value) noexcept
     :
     m_type(Type::UserDefined),
