@@ -9,15 +9,24 @@ namespace {
 
 //==================================================================================================
 template <typename T>
-using OstreamDeclaration = decltype(std::declval<std::ostream &>() << std::declval<T>());
+using ostream_type = decltype(std::declval<std::ostream &>() << std::declval<T>());
 
-using OstreamTraits = fly::DeclarationTraits<OstreamDeclaration>;
+template <typename T>
+using has_ostream = fly::is_declared<ostream_type, T>;
 
 //==================================================================================================
 template <typename T>
-using FooDeclaration = decltype(std::declval<T>().foo());
+using foo_type = decltype(std::declval<T>().foo());
 
-using FooTraits = fly::DeclarationTraits<FooDeclaration>;
+template <typename T>
+using has_foo = fly::is_declared<foo_type, T>;
+
+//==================================================================================================
+template <typename T, typename P1, typename P2>
+using bar_type = decltype(std::declval<T>().bar(std::declval<P1>(), std::declval<P2>()));
+
+template <typename T, typename P1, typename P2>
+using has_bar = fly::is_declared<bar_type, T, P1, P2>;
 
 //==================================================================================================
 class FooClass
@@ -41,6 +50,11 @@ public:
     {
     }
 
+    bool bar(int, std::string) const
+    {
+        return true;
+    }
+
     std::string operator()() const
     {
         return "BarClass";
@@ -56,27 +70,40 @@ std::ostream &operator<<(std::ostream &stream, const BarClass &bar)
 }
 
 //==================================================================================================
-template <typename T, fly::enable_if_all<FooTraits::is_declared<T>> = 0>
-bool call_foo(const T &arg)
+template <typename T, fly::enable_if<has_foo<T>> = 0>
+bool call_foo(const T &obj)
 {
-    return arg.foo();
+    return obj.foo();
 }
 
-template <typename T, fly::disable_if_all<FooTraits::is_declared<T>> = 0>
+template <typename T, fly::disable_if<has_foo<T>> = 0>
 bool call_foo(const T &)
 {
     return false;
 }
 
 //==================================================================================================
-template <typename T, fly::enable_if_all<OstreamTraits::is_declared<T>> = 0>
-bool is_streamable(std::ostream &stream, const T &arg)
+template <typename T, typename P1, typename P2, fly::enable_if<has_bar<T, P1, P2>> = 0>
+bool call_bar(const T &obj, P1 arg1, P2 arg2)
 {
-    stream << arg;
+    return obj.bar(arg1, arg2);
+}
+
+template <typename T, typename P1, typename P2, fly::disable_if<has_bar<T, P1, P2>> = 0>
+bool call_bar(const T &, P1, P2)
+{
+    return false;
+}
+
+//==================================================================================================
+template <typename T, fly::enable_if<has_ostream<T>> = 0>
+bool is_streamable(std::ostream &stream, const T &obj)
+{
+    stream << obj;
     return true;
 }
 
-template <typename T, fly::disable_if_all<OstreamTraits::is_declared<T>> = 0>
+template <typename T, fly::disable_if<has_ostream<T>> = 0>
 bool is_streamable(std::ostream &, const T &)
 {
     return false;
@@ -139,10 +166,24 @@ CATCH_TEST_CASE("Traits", "[traits]")
         const BarClass bc;
 
         CATCH_CHECK(call_foo(fc));
-        CATCH_CHECK(FooTraits::is_declared_v<FooClass>);
+        CATCH_CHECK(has_foo<FooClass>::value);
 
         CATCH_CHECK_FALSE(call_foo(bc));
-        CATCH_CHECK_FALSE(FooTraits::is_declared_v<BarClass>);
+        CATCH_CHECK_FALSE(has_foo<BarClass>::value);
+    }
+
+    CATCH_SECTION("DeclarationTraits for whether a class defines a method bar(type1, type2)")
+    {
+        const FooClass fc;
+        const BarClass bc;
+
+        CATCH_CHECK(call_bar(bc, 1, "str"));
+        CATCH_CHECK(has_bar<BarClass, int, std::string>::value);
+        CATCH_CHECK_FALSE(has_bar<BarClass, std::string, int>::value);
+        CATCH_CHECK_FALSE(has_bar<BarClass, FooClass, std::string>::value);
+
+        CATCH_CHECK_FALSE(call_bar(fc, 1, "str"));
+        CATCH_CHECK_FALSE(has_bar<FooClass, int, std::string>::value);
     }
 
     CATCH_SECTION("DeclarationTraits for whether a class defines operator<<")
@@ -155,22 +196,22 @@ CATCH_TEST_CASE("Traits", "[traits]")
         const std::string str("a");
 
         CATCH_CHECK(is_streamable(stream, bc));
-        CATCH_CHECK(OstreamTraits::is_declared_v<BarClass>);
+        CATCH_CHECK(has_ostream<BarClass>::value);
         CATCH_CHECK(stream.str() == bc());
         stream.str(std::string());
 
         CATCH_CHECK(is_streamable(stream, str));
-        CATCH_CHECK(OstreamTraits::is_declared_v<std::string>);
+        CATCH_CHECK(has_ostream<std::string>::value);
         CATCH_CHECK(stream.str() == str);
         stream.str(std::string());
 
         CATCH_CHECK(is_streamable(stream, 1));
-        CATCH_CHECK(OstreamTraits::is_declared_v<int>);
+        CATCH_CHECK(has_ostream<int>::value);
         CATCH_CHECK(stream.str() == "1");
         stream.str(std::string());
 
         CATCH_CHECK_FALSE(is_streamable(stream, fc));
-        CATCH_CHECK_FALSE(OstreamTraits::is_declared_v<FooClass>);
+        CATCH_CHECK_FALSE(has_ostream<FooClass>::value);
         CATCH_CHECK(stream.str() == std::string());
         stream.str(std::string());
     }
