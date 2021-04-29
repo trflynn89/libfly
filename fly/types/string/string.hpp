@@ -8,8 +8,8 @@
 #include "fly/types/string/detail/format_string.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/unicode.hpp"
+#include "fly/types/string/formatters.hpp"
 #include "fly/types/string/literals.hpp"
-#include "fly/types/string/string_formatters.hpp"
 
 #include <algorithm>
 #include <array>

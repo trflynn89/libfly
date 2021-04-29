@@ -515,7 +515,7 @@ auto BasicUnicode<CharType>::escape_codepoint(codepoint_type codepoint) -> strin
 {
     string_type result;
 
-    // TODO: Replace this with BasicString::format without actually including string_formatters.hpp.
+    // TODO: Replace this with BasicString::format without actually including formatters.hpp.
     auto to_hex = [&codepoint](std::size_t length) -> string_type
     {
         static const auto *s_digits = FLY_STR(CharType, "0123456789abcdef");
