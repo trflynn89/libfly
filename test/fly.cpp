@@ -73,10 +73,13 @@ CATCH_TEST_CASE("Fly", "[fly]")
     {
 #if defined(__clang__)
         CATCH_CHECK_FALSE(fly::supports_consteval());
+        CATCH_CHECK_FALSE(fly::supports_floating_point_charconv());
 #elif defined(__GNUC__)
         CATCH_CHECK(fly::supports_consteval());
+        CATCH_CHECK(fly::supports_floating_point_charconv());
 #elif defined(_MSC_VER)
         CATCH_CHECK_FALSE(fly::supports_consteval());
+        CATCH_CHECK(fly::supports_floating_point_charconv());
 #else
         static_assert(false, "Unknown compiler");
 #endif
