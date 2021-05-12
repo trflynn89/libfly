@@ -34,6 +34,12 @@
 #    define FLY_CONSTEVAL constexpr
 #endif
 
+#if defined(FLY_COMPILER_GCC) || defined(FLY_COMPILER_MSVC)
+#    define FLY_COMPILER_SUPPORTS_FP_CHARCONV
+#else
+#    undef FLY_COMPILER_SUPPORTS_CONSTEVAL
+#endif
+
 // Define macro to convert a macro parameter to a string.
 #define FLY_STRINGIZE(s) #s
 
@@ -150,6 +156,21 @@ inline constexpr bool is_msvc()
 inline constexpr bool supports_consteval()
 {
 #if defined(FLY_COMPILER_SUPPORTS_CONSTEVAL)
+    return true;
+#else
+    return false;
+#endif
+}
+
+/**
+ * Compile-time helper function to determine if floating point charconv operations (std::from_chars,
+ * std::to_chars) are supported.
+ *
+ * @return True if the compiler supports floating point charconv operations.
+ */
+inline constexpr bool supports_floating_point_charconv()
+{
+#if defined(FLY_COMPILER_SUPPORTS_FP_CHARCONV)
     return true;
 #else
     return false;
