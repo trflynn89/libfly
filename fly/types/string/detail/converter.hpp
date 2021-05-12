@@ -1,5 +1,7 @@
 #pragma once
 
+#include "fly/fly.hpp"
+
 #include <charconv>
 #include <cstdint>
 #include <optional>
@@ -24,13 +26,13 @@ struct Converter
 {
     static std::optional<T> convert(const std::string &value)
     {
-        const auto *begin = value.data();
-        const auto *end = begin + value.size();
+        const char *begin = value.data();
+        const char *end = begin + value.size();
 
         T converted {};
         auto result = std::from_chars(begin, end, converted);
 
-        if ((result.ptr != end) || (result.ec != std::errc()))
+        if ((result.ptr != end) || (result.ec != std::errc {}))
         {
             return std::nullopt;
         }
@@ -38,6 +40,8 @@ struct Converter
         return converted;
     }
 };
+
+#if !defined(FLY_COMPILER_SUPPORTS_FP_CHARCONV)
 
 //==================================================================================================
 template <>
@@ -119,5 +123,7 @@ struct Converter<long double>
         return result;
     }
 };
+
+#endif
 
 } // namespace fly::detail
