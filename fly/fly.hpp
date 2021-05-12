@@ -69,7 +69,7 @@ namespace fly {
  *
  * @return True if the operating system is Linux.
  */
-inline constexpr bool is_linux()
+constexpr bool is_linux()
 {
 #if defined(FLY_LINUX)
     return true;
@@ -83,7 +83,7 @@ inline constexpr bool is_linux()
  *
  * @return True if the operating system is macOS.
  */
-inline constexpr bool is_macos()
+constexpr bool is_macos()
 {
 #if defined(FLY_MACOS)
     return true;
@@ -97,7 +97,7 @@ inline constexpr bool is_macos()
  *
  * @return True if the operating system is Windows.
  */
-inline constexpr bool is_windows()
+constexpr bool is_windows()
 {
 #if defined(FLY_WINDOWS)
     return true;
@@ -111,7 +111,7 @@ inline constexpr bool is_windows()
  *
  * @return True if the compiler is Clang.
  */
-inline constexpr bool is_clang()
+constexpr bool is_clang()
 {
 #if defined(FLY_COMPILER_CLANG)
     return true;
@@ -125,7 +125,7 @@ inline constexpr bool is_clang()
  *
  * @return True if the compiler is GCC.
  */
-inline constexpr bool is_gcc()
+constexpr bool is_gcc()
 {
 #if defined(FLY_COMPILER_GCC)
     return true;
@@ -139,7 +139,7 @@ inline constexpr bool is_gcc()
  *
  * @return True if the compiler is Clang.
  */
-inline constexpr bool is_msvc()
+constexpr bool is_msvc()
 {
 #if defined(FLY_COMPILER_MSVC)
     return true;
@@ -153,7 +153,7 @@ inline constexpr bool is_msvc()
  *
  * @return True if the compiler supports consteval.
  */
-inline constexpr bool supports_consteval()
+constexpr bool supports_consteval()
 {
 #if defined(FLY_COMPILER_SUPPORTS_CONSTEVAL)
     return true;
@@ -168,7 +168,7 @@ inline constexpr bool supports_consteval()
  *
  * @return True if the compiler supports floating point charconv operations.
  */
-inline constexpr bool supports_floating_point_charconv()
+constexpr bool supports_floating_point_charconv()
 {
 #if defined(FLY_COMPILER_SUPPORTS_FP_CHARCONV)
     return true;
