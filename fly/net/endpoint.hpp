@@ -78,30 +78,9 @@ public:
     static constexpr std::optional<Endpoint> from_string(std::string_view endpoint);
 
     /**
-     * Set the endpoint's IP address.
-     *
-     * @param address The endoint's new IP address.
-     */
-    void set_address(const IPAddressType &address);
-
-    /**
-     * Set the endpoint's IP address.
-     *
-     * @param address The endoint's new IP address.
-     */
-    void set_address(IPAddressType &&address);
-
-    /**
      * @return The endoint's IP address.
      */
     constexpr const IPAddressType &address() const;
-
-    /**
-     * Set the endpoint's port.
-     *
-     * @param port The endoint's new port.
-     */
-    void set_port(port_type port);
 
     /**
      * @return The endoint's IP port.
@@ -213,20 +192,6 @@ Endpoint<IPAddressType>::from_string(std::string_view endpoint)
 
 //==================================================================================================
 template <typename IPAddressType>
-void Endpoint<IPAddressType>::set_address(const IPAddressType &address)
-{
-    m_address = address;
-}
-
-//==================================================================================================
-template <typename IPAddressType>
-void Endpoint<IPAddressType>::set_address(IPAddressType &&address)
-{
-    m_address = std::move(address);
-}
-
-//==================================================================================================
-template <typename IPAddressType>
 constexpr const IPAddressType &Endpoint<IPAddressType>::address() const
 {
     return m_address;
@@ -237,13 +202,6 @@ template <typename IPAddressType>
 constexpr port_type Endpoint<IPAddressType>::port() const
 {
     return m_port;
-}
-
-//==================================================================================================
-template <typename IPAddressType>
-void Endpoint<IPAddressType>::set_port(port_type port)
-{
-    m_port = port;
 }
 
 #if !defined(FLY_LINUX)
