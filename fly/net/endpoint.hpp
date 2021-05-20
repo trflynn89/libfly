@@ -26,6 +26,8 @@ template <typename IPAddressType>
 class Endpoint
 {
 public:
+    using address_type = IPAddressType;
+
     /**
      * Default constructor.
      */

@@ -41,6 +41,9 @@ class BaseSocket
         "Sockets may only be created with IPv4 or IPv6 endpoints");
 
 public:
+    using endpoint_type = EndpointType;
+    using address_type = typename EndpointType::address_type;
+
     /**
      * @return True if this is an IPv4 socket.
      */
