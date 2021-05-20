@@ -88,31 +88,6 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
         static_assert(endpoint2 < endpoint3);
     }
 
-    CATCH_SECTION("Endpoints may be updated")
-    {
-        auto endpoint = EndpointType(IPAddressType::in_addr_any(), 1);
-
-        CATCH_CHECK(endpoint.address() == IPAddressType::in_addr_any());
-        CATCH_CHECK(endpoint.port() == 1);
-
-        const auto address1 = IPAddressType::in_addr_loopback();
-        endpoint.set_address(address1);
-
-        CATCH_CHECK(endpoint.address() == address1);
-        CATCH_CHECK(endpoint.port() == 1);
-
-        auto address2 = IPAddressType::in_addr_loopback();
-        endpoint.set_address(std::move(address2));
-
-        CATCH_CHECK(endpoint.address() == address1);
-        CATCH_CHECK(endpoint.port() == 1);
-
-        endpoint.set_port(2);
-
-        CATCH_CHECK(endpoint.address() == address1);
-        CATCH_CHECK(endpoint.port() == 2);
-    }
-
     if constexpr (EndpointType::is_ipv4())
     {
         CATCH_SECTION("Endpoints may be converted to a string")
