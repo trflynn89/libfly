@@ -152,10 +152,9 @@ ConnectedState TcpSocket<EndpointType>::connect(const EndpointType &endpoint)
 template <typename EndpointType>
 ConnectedState TcpSocket<EndpointType>::connect(std::string_view hostname, port_type port)
 {
-    if (auto endpoint = hostname_to_endpoint(std::move(hostname)); endpoint)
+    if (auto address = hostname_to_address(std::move(hostname)); address)
     {
-        endpoint->set_port(port);
-        return connect(*endpoint);
+        return connect(EndpointType(std::move(*address), port));
     }
 
     return ConnectedState::Disconnected;
@@ -193,10 +192,9 @@ ConnectedState TcpSocket<EndpointType>::connect_async(
     port_type port,
     ConnectCompletion &&callback)
 {
-    if (auto endpoint = hostname_to_endpoint(std::move(hostname)); endpoint)
+    if (auto address = hostname_to_address(std::move(hostname)); address)
     {
-        endpoint->set_port(port);
-        return connect_async(*endpoint, std::move(callback));
+        return connect_async(EndpointType(std::move(*address), port), std::move(callback));
     }
 
     return ConnectedState::Disconnected;
