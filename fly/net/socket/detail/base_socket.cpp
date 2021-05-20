@@ -78,17 +78,16 @@ BaseSocket<EndpointType> &BaseSocket<EndpointType>::operator=(BaseSocket &&socke
 
 //==================================================================================================
 template <typename EndpointType>
-std::optional<EndpointType>
-BaseSocket<EndpointType>::hostname_to_endpoint(std::string_view hostname)
+auto BaseSocket<EndpointType>::hostname_to_address(std::string_view hostname)
+    -> std::optional<address_type>
 {
-    auto endpoint = fly::net::detail::hostname_to_endpoint<EndpointType>(std::move(hostname));
-
-    if (endpoint)
+    if (auto address = detail::hostname_to_address<address_type>(std::move(hostname)); address)
     {
-        LOGD("Resolved hostname {} to {}", hostname, endpoint->address());
+        LOGD("Resolved hostname {} to {}", hostname, *address);
+        return address;
     }
 
-    return endpoint;
+    return std::nullopt;
 }
 
 //==================================================================================================
@@ -170,10 +169,9 @@ template <typename EndpointType>
 bool BaseSocket<EndpointType>::bind(std::string_view hostname, port_type port, BindMode option)
     const
 {
-    if (auto endpoint = hostname_to_endpoint(std::move(hostname)); endpoint)
+    if (auto address = hostname_to_address(std::move(hostname)); address)
     {
-        endpoint->set_port(port);
-        return bind(*endpoint, option);
+        return bind(EndpointType(std::move(*address), port), option);
     }
 
     return false;

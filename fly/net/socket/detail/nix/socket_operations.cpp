@@ -36,6 +36,16 @@ namespace {
     using IPv4Endpoint = fly::net::Endpoint<fly::net::IPv4Address>;
     using IPv6Endpoint = fly::net::Endpoint<fly::net::IPv6Address>;
 
+    fly::net::IPv4Address create_address(const sockaddr_in &socket_address)
+    {
+        return fly::net::IPv4Address(socket_address.sin_addr.s_addr);
+    }
+
+    fly::net::IPv6Address create_address(const sockaddr_in6 &socket_address)
+    {
+        return fly::net::IPv6Address(socket_address.sin6_addr.s6_addr);
+    }
+
     sockaddr_in endpoint_to_address(const fly::net::Endpoint<fly::net::IPv4Address> &endpoint)
     {
         sockaddr_in socket_address {};
@@ -60,7 +70,7 @@ namespace {
 
     fly::net::Endpoint<fly::net::IPv4Address> address_to_endpoint(const sockaddr_in &socket_address)
     {
-        fly::net::IPv4Address address(socket_address.sin_addr.s_addr);
+        fly::net::IPv4Address address = create_address(socket_address);
         fly::net::port_type port = ntohs(socket_address.sin_port);
 
         return fly::net::Endpoint(std::move(address), port);
@@ -69,7 +79,7 @@ namespace {
     fly::net::Endpoint<fly::net::IPv6Address>
     address_to_endpoint(const sockaddr_in6 &socket_address)
     {
-        fly::net::IPv6Address address(socket_address.sin6_addr.s6_addr);
+        fly::net::IPv6Address address = create_address(socket_address);
         fly::net::port_type port = ntohs(socket_address.sin6_port);
 
         return fly::net::Endpoint(std::move(address), port);
@@ -106,9 +116,11 @@ fly::net::socket_type invalid_socket()
 }
 
 //==================================================================================================
-template <typename EndpointType>
-std::optional<EndpointType> hostname_to_endpoint(std::string_view hostname)
+template <typename IPAddressType>
+std::optional<IPAddressType> hostname_to_address(std::string_view hostname)
 {
+    using EndpointType = fly::net::Endpoint<IPAddressType>;
+
     addrinfo *results = nullptr;
 
     addrinfo hints = {};
@@ -126,14 +138,14 @@ std::optional<EndpointType> hostname_to_endpoint(std::string_view hostname)
     }
 
     auto *address = reinterpret_cast<socket_address_type<EndpointType> *>(results->ai_addr);
-    const auto endpoint = address_to_endpoint(*address);
+    const auto ip_address = create_address(*address);
     ::freeaddrinfo(results);
 
-    return endpoint;
+    return ip_address;
 }
 
-template std::optional<IPv4Endpoint> hostname_to_endpoint(std::string_view hostname);
-template std::optional<IPv6Endpoint> hostname_to_endpoint(std::string_view hostname);
+template std::optional<fly::net::IPv4Address> hostname_to_address(std::string_view hostname);
+template std::optional<fly::net::IPv6Address> hostname_to_address(std::string_view hostname);
 
 //==================================================================================================
 template <>

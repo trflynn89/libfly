@@ -202,7 +202,7 @@ public:
 
     using BaseSocket::close;
     using BaseSocket::handle;
-    using BaseSocket::hostname_to_endpoint;
+    using BaseSocket::hostname_to_address;
     using BaseSocket::is_open;
 
 private:

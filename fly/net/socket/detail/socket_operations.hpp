@@ -26,14 +26,16 @@ void deinitialize();
 fly::net::socket_type invalid_socket();
 
 /**
- * Convert a hostname or IP address string to an endpoint.
+ * Convert a hostname or IP address string to an IP address.
+ *
+ * @tparam IPAddressType The IP address type to create.
  *
  * @param hostname The hostname or IP address string to convert.
  *
- * @return If successful, the converted endpoint. Otherwise, an uninitialized value.
+ * @return If successful, the created address. Otherwise, an uninitialized value.
  */
-template <typename EndpointType>
-std::optional<EndpointType> hostname_to_endpoint(std::string_view hostname);
+template <typename IPAddressType>
+std::optional<IPAddressType> hostname_to_address(std::string_view hostname);
 
 /**
  * Open a socket with the appropriate flags for the endpoint and socket types.

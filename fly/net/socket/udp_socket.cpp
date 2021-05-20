@@ -94,10 +94,9 @@ size_t
 UdpSocket<EndpointType>::send(std::string_view hostname, port_type port, std::string_view message)
 
 {
-    if (auto endpoint = hostname_to_endpoint(std::move(hostname)); endpoint)
+    if (auto address = hostname_to_address(std::move(hostname)); address)
     {
-        endpoint->set_port(port);
-        return send(*endpoint, std::move(message));
+        return send(EndpointType(std::move(*address), port), std::move(message));
     }
 
     return 0;
@@ -134,10 +133,12 @@ bool UdpSocket<EndpointType>::send_async(
     std::string_view message,
     SendCompletion &&callback)
 {
-    if (auto endpoint = hostname_to_endpoint(std::move(hostname)); endpoint)
+    if (auto address = hostname_to_address(std::move(hostname)); address)
     {
-        endpoint->set_port(port);
-        return send_async(*endpoint, std::move(message), std::move(callback));
+        return send_async(
+            EndpointType(std::move(*address), port),
+            std::move(message),
+            std::move(callback));
     }
 
     return false;

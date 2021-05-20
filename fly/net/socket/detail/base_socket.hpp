@@ -55,13 +55,13 @@ public:
     static constexpr bool is_ipv6();
 
     /**
-     * Convert a hostname or IP address string to an endpoint.
+     * Convert a hostname or IP address string to an IP address.
      *
      * @param hostname The hostname or IP address string to convert.
      *
-     * @return If successful, the converted endpoint. Otherwise, an uninitialized value.
+     * @return If successful, the created IP address. Otherwise, an uninitialized value.
      */
-    static std::optional<EndpointType> hostname_to_endpoint(std::string_view hostname);
+    static std::optional<address_type> hostname_to_address(std::string_view hostname);
 
     /**
      * @return True if the socket handle is opened.
