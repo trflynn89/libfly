@@ -10,6 +10,10 @@
 #include <sstream>
 #include <string>
 
+#if __has_include(<format>)
+#    include <format>
+#endif
+
 namespace {
 
 using StringTable = fly::benchmark::Table<std::string, double>;
@@ -69,8 +73,29 @@ public:
     }
 };
 
+#if __has_include(<format>)
+
+// std::format
+class StdFormat : public StringBase
+{
+public:
+    void format_with_floats() override
+    {
+        FLY_UNUSED(
+            std::format("{:.10f}:{:04}:{:+}:{}:{}:{}:%\n", 1.234, 42, 3.13, "str", nullptr, 'X'));
+    }
+
+    void format_without_floats() override
+    {
+        FLY_UNUSED(
+            std::format("{:10}:{:04}:{:+}:{}:{}:{}:%\n", 1234, 42, 313, "str", nullptr, 'X'));
+    }
+};
+
+#endif
+
 // STL IO Streams
-class STLStreamFormat : public StringBase
+class StreamFormat : public StringBase
 {
 public:
     void format_with_floats() override
@@ -99,7 +124,10 @@ void run_format_test(std::string &&name)
     std::map<std::string, std::unique_ptr<StringBase>> formatters;
 #if !defined(FLY_PROFILE)
     formatters.emplace("{fmt}", std::make_unique<FmtFormat>());
-    formatters.emplace("STL IO Streams", std::make_unique<STLStreamFormat>());
+    formatters.emplace("std::stringstream", std::make_unique<StreamFormat>());
+#    if __has_include(<format>)
+    formatters.emplace("std::format", std::make_unique<StdFormat>());
+#    endif
 #endif
     formatters.emplace("libfly", std::make_unique<LibflyFormat>());
 

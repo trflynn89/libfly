@@ -1,6 +1,6 @@
-# JSON Parser
+# String formatting
 
-Benchmark of the libfly JSON parser against the popular {fmt} library and the STL:
+Benchmark of the libfly string formatter against the popular {fmt} library and the STL:
 
 * [libfly](/fly/types/string/string.hpp)
 * [{fmt}](https://github.com/fmtlib/fmt)
@@ -11,19 +11,19 @@ All results below are the median of 1000001 iterations of creating a formatted s
 
 ### Formatting with floats
 
-| Formatter      | Duration (ns) |
-| :--            |           --: |
-| libfly         |         1.093 |
-| {fmt}          |         0.609 |
-| STL IO Streams |         1.812 |
+| Formatter         | Duration (ns) |
+| :--               |           --: |
+| libfly            |         1.093 |
+| {fmt}             |         0.609 |
+| std::stringstream |         1.812 |
 
 ### Formatting without floats
 
-| Formatter      | Duration (ns) |
-| :--            |           --: |
-| libfly         |         0.665 |
-| {fmt}          |         0.411 |
-| STL IO Streams |         1.011 |
+| Formatter         | Duration (ns) |
+| :--               |           --: |
+| libfly            |         0.665 |
+| {fmt}             |         0.411 |
+| std::stringstream |         1.011 |
 
 ## Profiles
 
