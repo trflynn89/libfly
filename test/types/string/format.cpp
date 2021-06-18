@@ -308,6 +308,11 @@ CATCH_TEMPLATE_TEST_CASE("Format", "[string]", char, wchar_t, char8_t, char16_t,
 
     CATCH_SECTION("Alternate form preserves decimal for floating point types")
     {
+        test_format(FMT("{:#.0g}"), FMT("1."), 1.0);
+    }
+
+    CATCH_SECTION("Alternate form appends trailing zeros for general presentation type")
+    {
         test_format(FMT("{:#g}"), FMT("1.00000"), 1.0);
         test_format(FMT("{:#g}"), FMT("1.20000"), 1.2);
     }
@@ -683,12 +688,12 @@ CATCH_TEMPLATE_TEST_CASE("FormatTypes", "[string]", char, wchar_t, char8_t, char
         test_format(FMT("{:A}"), FMT("NAN"), std::nan(""));
         test_format(FMT("{:A}"), FMT("INF"), std::numeric_limits<float>::infinity());
 
-        // MSVC will always 0-pad std::hexfloat formatted strings. Clang and GCC do not.
-        // https://github.com/microsoft/STL/blob/0b81475cc8087a7b615911d65b52b6a1fad87d7d/stl/inc/xlocnum#L1156
-        if constexpr (fly::is_windows())
+        // The result of formatting floating-point values as hexfloat depends on whether
+        // std::to_chars or IO streams were used for formatting.
+        if constexpr (fly::supports_floating_point_charconv())
         {
-            test_format(FMT("{:a}"), FMT("0x1.6000000000000p+2"), 5.5);
-            test_format(FMT("{:A}"), FMT("0X1.6000000000000P+2"), 5.5);
+            test_format(FMT("{:a}"), FMT("1.600000p+2"), 5.5);
+            test_format(FMT("{:A}"), FMT("1.600000P+2"), 5.5);
         }
         else
         {
