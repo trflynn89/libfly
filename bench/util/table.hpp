@@ -169,7 +169,7 @@ private:
 
     /**
      * Helper to determine if a numeric value is zero (if integral), or close enough to zero (if
-     * floating point).
+     * floating-point).
      *
      * @tparam T The numeric type of the value to test.
      *

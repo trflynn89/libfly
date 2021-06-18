@@ -55,7 +55,7 @@ namespace fly::detail {
  *        Integral types - If binary, octal, or hexadecimal presentation types are used, the
  *        alternate form inserts 0b, 0, or 0x prefixes, respectively, before the value.
  *
- *        Floating point types - A decimal point character will always be inserted even if no digits
+ *        Floating-point types - A decimal point character will always be inserted even if no digits
  *        follow it.
  *
  *     4. A zero-padding indicator (a literal "0" character). If present, the value is padded with
@@ -70,7 +70,7 @@ namespace fly::detail {
  *
  *        String types - precision specifies the maxiumum number of characters to be used.
  *
- *        Floating point types - precision specifies the formatting precision.
+ *        Floating-point types - precision specifies the formatting precision.
  *
  *     7. A locale-specific form indicator (a literal "L" character). It may only be used for the
  *        following value types:
@@ -78,7 +78,7 @@ namespace fly::detail {
  *        Integral types - locale-specific form inserts appropriate digit group separator
  *        characters.
  *
- *        Floating point types - locale-specific form inserts appropriate digit group and radix
+ *        Floating-point types - locale-specific form inserts appropriate digit group and radix
  *        separator characters.
  *
  *        Boolean types - locale-specific form uses the appropriate string for textual
@@ -95,7 +95,7 @@ namespace fly::detail {
  *
  *        Integral types - Valid presentations: none, "c", b", "B", "o", "d", "x", "X".
  *
- *        Floating point types - Valid presentations: none, "a", A", "e", "E", "f", "F", "g", "G".
+ *        Floating-point types - Valid presentations: none, "a", A", "e", "E", "f", "F", "g", "G".
  *
  *        Boolean types - Valid presentations: none, "c", s", b", "B", "o", "d", "x", "X".
  *
@@ -316,7 +316,7 @@ private:
      * Parse the precision argument of the replacement field.
      *
      * It is an error the precision was specified, but the type of the corresponding format
-     * parameter is not a string or floating point type.
+     * parameter is not a string or floating-point type.
      *
      * It is an error if a decimal was parsed and was not followed by a non-negative precision or a
      * replacement field.
@@ -337,7 +337,7 @@ private:
      * Parse the optional locale-specific form of the replacement field.
      *
      * It is an error the locale-specific form was specified, but the type of the corresponding
-     * format parameter is not an integral, floating point, or boolean type.
+     * format parameter is not an integral, floating-point, or boolean type.
      *
      * @param context The context holding the format string parsing state.
      */
@@ -708,7 +708,7 @@ constexpr void BasicFormatSpecifier<CharType>::validate(FormatParseContext &cont
         if ((parameter_type != ParameterType::String) &&
             (parameter_type != ParameterType::FloatingPoint))
         {
-            context.on_error("Precision may only be used for string and floating point types");
+            context.on_error("Precision may only be used for string and floating-point types");
         }
         else if (m_precision_position)
         {
@@ -777,7 +777,7 @@ constexpr void BasicFormatSpecifier<CharType>::validate_type(
             (m_type != Type::General))
         {
             context.on_error(
-                "Floating point types must be formatted with {} or one of {:aAeEfFgG}");
+                "Floating-point types must be formatted with {} or one of {:aAeEfFgG}");
         }
     }
     else if (parameter_type == ParameterType::Boolean)

@@ -163,10 +163,10 @@ constexpr bool supports_consteval()
 }
 
 /**
- * Compile-time helper function to determine if floating point charconv operations (std::from_chars,
+ * Compile-time helper function to determine if floating-point charconv operations (std::from_chars,
  * std::to_chars) are supported.
  *
- * @return True if the compiler supports floating point charconv operations.
+ * @return True if the compiler supports floating-point charconv operations.
  */
 constexpr bool supports_floating_point_charconv()
 {

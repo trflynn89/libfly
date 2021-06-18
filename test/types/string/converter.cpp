@@ -315,7 +315,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
         CATCH_CHECK_FALSE(BasicString::template convert<std::uint64_t>(s));
     }
 
-    CATCH_SECTION("Convert a string to a floating point decimal")
+    CATCH_SECTION("Convert a string to a floating-point decimal")
     {
         string_type s;
 

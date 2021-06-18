@@ -234,9 +234,9 @@ struct Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>>
     explicit Formatter(FormatSpecifier &&specifier) noexcept;
 
     /**
-     * Format a single replacement field with the provided floating point value.
+     * Format a single replacement field with the provided floating-point value.
      *
-     * Currently, not all major compilers support std::to_chars for floating point values. If it is
+     * Currently, not all major compilers support std::to_chars for floating-point values. If it is
      * supported by the compiler, then std::to_chars is used for the conversion, and the result is
      * further formatted according to the replacement field specification. If it is not supported,
      * an IO stream is used to format the value.
@@ -255,7 +255,7 @@ private:
 #if defined(FLY_COMPILER_SUPPORTS_FP_CHARCONV)
 
     /**
-     * Structure to hold the information needed to fully format a floating point value as a string.
+     * Structure to hold the information needed to fully format a floating-point value as a string.
      */
     struct FloatConversionResult
     {
@@ -266,15 +266,15 @@ private:
     };
 
     /**
-     * Convert a floating point value to a string.
+     * Convert a floating-point value to a string.
      *
-     * Internally, std::to_chars is used for the conversion, which does not handle all floating
-     * point formatting options, such as alternate form. So rather than creating a fully-formatted
-     * string, this method returns a structure holding the information needed to format the value as
-     * a string.
+     * Internally, std::to_chars is used for the conversion, which does not handle all
+     * floating-point formatting options, such as alternate form. So rather than creating a
+     * fully-formatted string, this method returns a structure holding the information needed to
+     * format the value as a string.
      *
      * @param value The value to convert.
-     * @param precision The floating point precision to use.
+     * @param precision The floating-point precision to use.
      *
      * @return A structure holding the information needed to fully format the value as a string.
      */

@@ -129,7 +129,7 @@ constexpr const char *s_bad_width_position = "Position of width parameter must b
 constexpr const char *s_missing_precision =
     "Expected a non-negative precision or nested replacement field after decimal";
 constexpr const char *s_bad_precision =
-    "Precision may only be used for string and floating point types";
+    "Precision may only be used for string and floating-point types";
 constexpr const char *s_bad_precision_position =
     "Position of precision parameter must be an integral type";
 constexpr const char *s_bad_locale =
@@ -141,7 +141,7 @@ constexpr const char *s_bad_pointer = "Pointer types must be formatted with {} o
 constexpr const char *s_bad_integer =
     "Integral types must be formatted with {} or one of {:cbBodxX}";
 constexpr const char *s_bad_float =
-    "Floating point types must be formatted with {} or one of {:aAeEfFgG}";
+    "Floating-point types must be formatted with {} or one of {:aAeEfFgG}";
 constexpr const char *s_bad_bool = "Boolean types must be formatted with {} or one of {:csbBodxX}";
 
 #endif
@@ -837,7 +837,7 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:.-1}"), 1), s_missing_precision);
     }
 
-    CATCH_SECTION("Precision value only valid for string and floating point types")
+    CATCH_SECTION("Precision value only valid for string and floating-point types")
     {
         test_error(make_format(FMT("{:.1}"), 1), s_bad_precision);
     }
@@ -848,7 +848,7 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{0:.{1}}"), s, s), s_bad_precision_position);
     }
 
-    CATCH_SECTION("Precision position only valid for string and floating point types")
+    CATCH_SECTION("Precision position only valid for string and floating-point types")
     {
         test_error(make_format(FMT("{:.{}}"), 1, 1), s_bad_precision);
         test_error(make_format(FMT("{0:.{1}}"), 1, 1), s_bad_precision);
