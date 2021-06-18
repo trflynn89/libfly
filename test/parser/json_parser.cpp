@@ -9,7 +9,6 @@
 
 #include <filesystem>
 #include <memory>
-#include <sstream>
 #include <vector>
 
 CATCH_TEST_CASE("JsonParser", "[parser]")
@@ -44,10 +43,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             CATCH_CHECK(actual->at(key) == expected);
         }
 
-        std::stringstream ss;
-        ss << *actual;
-
-        std::optional<fly::Json> repeat = parser.parse_string(ss.str());
+        std::optional<fly::Json> repeat = parser.parse_string(actual->serialize());
         CATCH_REQUIRE(repeat.has_value());
 
         CATCH_CHECK(*actual == *repeat);
