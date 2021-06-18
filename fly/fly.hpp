@@ -37,7 +37,7 @@
 #if defined(FLY_COMPILER_GCC) || defined(FLY_COMPILER_MSVC)
 #    define FLY_COMPILER_SUPPORTS_FP_CHARCONV
 #else
-#    undef FLY_COMPILER_SUPPORTS_CONSTEVAL
+#    undef FLY_COMPILER_SUPPORTS_FP_CHARCONV
 #endif
 
 // Define macro to convert a macro parameter to a string.
