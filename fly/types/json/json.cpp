@@ -62,6 +62,85 @@ Json::reference Json::operator=(Json json) noexcept
 }
 
 //==================================================================================================
+JsonTraits::string_type Json::serialize() const
+{
+    JsonTraits::string_type serialized;
+
+    auto serialize_string = [&serialized](const JsonTraits::string_type &value)
+    {
+        const auto end = value.cend();
+        serialized += FLY_JSON_CHR('"');
+
+        for (auto it = value.cbegin(); it != end;)
+        {
+            write_escaped_character(serialized, it, end);
+        }
+
+        serialized += FLY_JSON_CHR('"');
+    };
+
+    auto visitor = [&serialized, &serialize_string](const auto &storage)
+    {
+        using S = std::decay_t<decltype(storage)>;
+
+        if constexpr (JsonTraits::is_null_v<S>)
+        {
+            serialized += FLY_JSON_STR("null");
+        }
+        else if constexpr (JsonTraits::is_string_v<S>)
+        {
+            serialize_string(storage);
+        }
+        else if constexpr (JsonTraits::is_object_v<S>)
+        {
+            serialized += FLY_JSON_CHR('{');
+
+            for (auto it = storage.begin(); it != storage.end();)
+            {
+                serialize_string(it->first);
+                serialized += FLY_JSON_CHR(':');
+                serialized += it->second.serialize();
+
+                if (++it != storage.end())
+                {
+                    serialized += FLY_JSON_CHR(',');
+                }
+            }
+
+            serialized += FLY_JSON_CHR('}');
+        }
+        else if constexpr (JsonTraits::is_array_v<S>)
+        {
+            serialized += FLY_JSON_CHR('[');
+
+            for (auto it = storage.begin(); it != storage.end();)
+            {
+                serialized += it->serialize();
+
+                if (++it != storage.end())
+                {
+                    serialized += FLY_JSON_CHR(',');
+                }
+            }
+
+            serialized += FLY_JSON_CHR(']');
+        }
+        else if constexpr (JsonTraits::is_boolean_v<S>)
+        {
+            serialized += JsonTraits::StringType::format(FLY_JSON_ARR("{:s}"), storage);
+        }
+        else
+        {
+            serialized += JsonTraits::StringType::format(FLY_JSON_ARR("{}"), storage);
+        }
+    };
+
+    std::visit(std::move(visitor), m_value);
+
+    return serialized;
+}
+
+//==================================================================================================
 bool Json::is_null() const
 {
     return std::holds_alternative<JsonTraits::null_type>(m_value);
@@ -673,81 +752,6 @@ bool operator!=(Json::const_reference json1, Json::const_reference json2)
 }
 
 //==================================================================================================
-std::ostream &operator<<(std::ostream &stream, Json::const_reference json)
-{
-    auto serialize_string = [&stream](const JsonTraits::string_type &value)
-    {
-        const auto end = value.cend();
-        stream << '"';
-
-        for (auto it = value.cbegin(); it != end;)
-        {
-            Json::write_escaped_charater(stream, it, end);
-        }
-
-        stream << '"';
-    };
-
-    auto visitor = [&stream, &serialize_string](const auto &storage)
-    {
-        using S = std::decay_t<decltype(storage)>;
-
-        if constexpr (JsonTraits::is_null_v<S>)
-        {
-            stream << "null";
-        }
-        else if constexpr (JsonTraits::is_string_v<S>)
-        {
-            serialize_string(storage);
-        }
-        else if constexpr (JsonTraits::is_object_v<S>)
-        {
-            stream << '{';
-
-            for (auto it = storage.begin(); it != storage.end();)
-            {
-                serialize_string(it->first);
-                stream << ':' << it->second;
-
-                if (++it != storage.end())
-                {
-                    stream << ',';
-                }
-            }
-
-            stream << '}';
-        }
-        else if constexpr (JsonTraits::is_array_v<S>)
-        {
-            stream << '[';
-
-            for (auto it = storage.begin(); it != storage.end();)
-            {
-                stream << *it;
-
-                if (++it != storage.end())
-                {
-                    stream << ',';
-                }
-            }
-
-            stream << ']';
-        }
-        else if constexpr (JsonTraits::is_boolean_v<S>)
-        {
-            stream << (storage ? "true" : "false");
-        }
-        else
-        {
-            stream << storage;
-        }
-    };
-
-    std::visit(std::move(visitor), json.m_value);
-    return stream;
-}
-
-//==================================================================================================
 JsonTraits::string_type Json::validate_string(JsonTraits::string_type &&value)
 {
     static constexpr const auto s_null = FLY_JSON_CHR('\0');
@@ -842,43 +846,43 @@ void Json::read_escaped_character(
 }
 
 //==================================================================================================
-void Json::write_escaped_charater(
-    std::ostream &stream,
+void Json::write_escaped_character(
+    JsonTraits::string_type &output,
     JsonTraits::string_type::const_iterator &it,
     const JsonTraits::string_type::const_iterator &end)
 {
     switch (*it)
     {
-        case '\"':
-            stream << "\\\"";
+        case FLY_JSON_CHR('\"'):
+            output += FLY_JSON_STR("\\\"");
             break;
 
-        case '\\':
-            stream << "\\\\";
+        case FLY_JSON_CHR('\\'):
+            output += FLY_JSON_STR("\\\\");
             break;
 
-        case '\b':
-            stream << "\\b";
+        case FLY_JSON_CHR('\b'):
+            output += FLY_JSON_STR("\\b");
             break;
 
-        case '\f':
-            stream << "\\f";
+        case FLY_JSON_CHR('\f'):
+            output += FLY_JSON_STR("\\f");
             break;
 
-        case '\n':
-            stream << "\\n";
+        case FLY_JSON_CHR('\n'):
+            output += FLY_JSON_STR("\\n");
             break;
 
-        case '\r':
-            stream << "\\r";
+        case FLY_JSON_CHR('\r'):
+            output += FLY_JSON_STR("\\r");
             break;
 
-        case '\t':
-            stream << "\\t";
+        case FLY_JSON_CHR('\t'):
+            output += FLY_JSON_STR("\\t");
             break;
 
         default:
-            stream << *(JsonTraits::StringType::escape_codepoint<'u'>(it, end));
+            output += *(JsonTraits::StringType::escape_codepoint<'u'>(it, end));
             return;
     }
 

@@ -511,15 +511,26 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             using T2 = std::decay_t<decltype(test2)>;
 
             test1 = T1 {10, 20, 30, 40};
-            test2 = T2 {"50", "60", "70", "80"};
+            test2 =
+                T2 {FLY_JSON_STR("50"), FLY_JSON_STR("60"), FLY_JSON_STR("70"), FLY_JSON_STR("80")};
 
             CATCH_CHECK_NOTHROW(json.swap(test1));
             CATCH_CHECK(json == T1 {10, 20, 30, 40});
             CATCH_CHECK(test1 == T1 {1, 2});
 
             CATCH_CHECK_NOTHROW(json.swap(test2));
-            CATCH_CHECK(json == T2 {"50", "60", "70", "80"});
-            CATCH_CHECK(test2 == T2 {"10", "20", "30", "40"});
+            CATCH_CHECK(
+                json ==
+                T2 {FLY_JSON_STR("50"),
+                    FLY_JSON_STR("60"),
+                    FLY_JSON_STR("70"),
+                    FLY_JSON_STR("80")});
+            CATCH_CHECK(
+                test2 ==
+                T2 {FLY_JSON_STR("10"),
+                    FLY_JSON_STR("20"),
+                    FLY_JSON_STR("30"),
+                    FLY_JSON_STR("40")});
 
             CATCH_CHECK_NOTHROW(json.swap(test1));
             CATCH_CHECK(json == T1 {1, 2});

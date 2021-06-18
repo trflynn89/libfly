@@ -10,7 +10,6 @@
 #include <list>
 #include <map>
 #include <set>
-#include <sstream>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -359,10 +358,8 @@ CATCH_TEST_CASE("Json", "[json]")
         CATCH_CHECK(float1 != unsigned3);
     }
 
-    CATCH_SECTION("Stream a JSON instance")
+    CATCH_SECTION("Serialize a JSON instance")
     {
-        std::stringstream stream;
-
         fly::Json string = "abc";
         fly::Json object = {{"a", 1}, {"b", 2}};
         fly::Json array = {'7', 8};
@@ -372,121 +369,80 @@ CATCH_TEST_CASE("Json", "[json]")
         fly::Json floating = 1.0f;
         fly::Json null = nullptr;
 
-        stream << string;
-        CATCH_CHECK(stream.str() == "\"abc\"");
-        stream.str(std::string());
-
-        stream << object;
-        CATCH_CHECK(stream.str() == "{\"a\":1,\"b\":2}");
-        stream.str(std::string());
-
-        stream << array;
-        CATCH_CHECK(stream.str() == "[55,8]");
-        stream.str(std::string());
-
-        stream << boolean;
-        CATCH_CHECK(stream.str() == "true");
-        stream.str(std::string());
-
-        stream << sign;
-        CATCH_CHECK(stream.str() == "1");
-        stream.str(std::string());
-
-        stream << unsign;
-        CATCH_CHECK(stream.str() == "1");
-        stream.str(std::string());
-
-        stream << floating;
-        CATCH_CHECK(stream.str() == "1");
-        stream.str(std::string());
-
-        stream << null;
-        CATCH_CHECK(stream.str() == "null");
-        stream.str(std::string());
+        CATCH_CHECK(string.serialize() == FLY_JSON_STR("\"abc\""));
+        CATCH_CHECK(object.serialize() == FLY_JSON_STR("{\"a\":1,\"b\":2}"));
+        CATCH_CHECK(array.serialize() == FLY_JSON_STR("[55,8]"));
+        CATCH_CHECK(boolean.serialize() == FLY_JSON_STR("true"));
+        CATCH_CHECK(sign.serialize() == FLY_JSON_STR("1"));
+        CATCH_CHECK(unsign.serialize() == FLY_JSON_STR("1"));
+        CATCH_CHECK(floating.serialize() == FLY_JSON_STR("1"));
+        CATCH_CHECK(null.serialize() == FLY_JSON_STR("null"));
     }
 
-    CATCH_SECTION("Stream a JSON instance, expecting special symbols to be escaped")
+    CATCH_SECTION("Serialize a JSON instance, expecting special symbols to be escaped")
     {
         {
             fly::Json json = "abc\\\"def";
-
-            std::stringstream stream;
-            stream << json;
-
-            const std::string str = stream.str();
-            CATCH_CHECK(str == "\"abc\\\"def\"");
+            CATCH_CHECK(json.serialize() == FLY_JSON_STR("\"abc\\\"def\""));
         }
         {
             fly::Json json = "abc\\\\def";
-
-            std::stringstream stream;
-            stream << json;
-
-            const std::string str = stream.str();
-            CATCH_CHECK(str == "\"abc\\\\def\"");
+            CATCH_CHECK(json.serialize() == FLY_JSON_STR("\"abc\\\\def\""));
         }
         {
             fly::Json json = "abc\\bdef";
-
-            std::stringstream stream;
-            stream << json;
-
-            const std::string str = stream.str();
-            CATCH_CHECK(str == "\"abc\\bdef\"");
+            CATCH_CHECK(json.serialize() == FLY_JSON_STR("\"abc\\bdef\""));
         }
         {
             fly::Json json = "abc\\fdef";
-
-            std::stringstream stream;
-            stream << json;
-
-            const std::string str = stream.str();
-            CATCH_CHECK(str == "\"abc\\fdef\"");
+            CATCH_CHECK(json.serialize() == FLY_JSON_STR("\"abc\\fdef\""));
         }
         {
             fly::Json json = "abc\\ndef";
-
-            std::stringstream stream;
-            stream << json;
-
-            const std::string str = stream.str();
-            CATCH_CHECK(str == "\"abc\\ndef\"");
+            CATCH_CHECK(json.serialize() == FLY_JSON_STR("\"abc\\ndef\""));
         }
         {
             fly::Json json = "abc\\rdef";
-
-            std::stringstream stream;
-            stream << json;
-
-            const std::string str = stream.str();
-            CATCH_CHECK(str == "\"abc\\rdef\"");
+            CATCH_CHECK(json.serialize() == FLY_JSON_STR("\"abc\\rdef\""));
         }
         {
             fly::Json json = "abc\\tdef";
-
-            std::stringstream stream;
-            stream << json;
-
-            const std::string str = stream.str();
-            CATCH_CHECK(str == "\"abc\\tdef\"");
+            CATCH_CHECK(json.serialize() == FLY_JSON_STR("\"abc\\tdef\""));
         }
         {
             fly::Json json = "abc\xce\xa9zef";
-
-            std::stringstream stream;
-            stream << json;
-
-            const std::string str = stream.str();
-            CATCH_CHECK(str == "\"abc\\u03a9zef\"");
+            CATCH_CHECK(json.serialize() == FLY_JSON_STR("\"abc\\u03a9zef\""));
         }
         {
             fly::Json json = "abc\xf0\x9f\x8d\x95zef";
-
-            std::stringstream stream;
-            stream << json;
-
-            const std::string str = stream.str();
-            CATCH_CHECK(str == "\"abc\\ud83c\\udf55zef\"");
+            CATCH_CHECK(json.serialize() == FLY_JSON_STR("\"abc\\ud83c\\udf55zef\""));
         }
+    }
+}
+
+CATCH_TEMPLATE_TEST_CASE("JsonFormat", "[json]", char, wchar_t, char8_t, char16_t, char32_t)
+{
+    using BasicString = fly::BasicString<TestType>;
+    using char_type = typename BasicString::char_type;
+
+    CATCH_SECTION("Format a JSON instance")
+    {
+        fly::Json string = "abc";
+        fly::Json object = {{"a", 1}, {"b", 2}};
+        fly::Json array = {'7', 8};
+        fly::Json boolean = true;
+        fly::Json sign = 1;
+        fly::Json unsign = static_cast<unsigned int>(1);
+        fly::Json floating = 1.0f;
+        fly::Json null = nullptr;
+
+        CATCH_CHECK(BasicString::format(J_ARR("{}"), string) == J_STR("\"abc\""));
+        CATCH_CHECK(BasicString::format(J_ARR("{}"), object) == J_STR("{\"a\":1,\"b\":2}"));
+        CATCH_CHECK(BasicString::format(J_ARR("{}"), array) == J_STR("[55,8]"));
+        CATCH_CHECK(BasicString::format(J_ARR("{}"), boolean) == J_STR("true"));
+        CATCH_CHECK(BasicString::format(J_ARR("{}"), sign) == J_STR("1"));
+        CATCH_CHECK(BasicString::format(J_ARR("{}"), unsign) == J_STR("1"));
+        CATCH_CHECK(BasicString::format(J_ARR("{}"), floating) == J_STR("1"));
+        CATCH_CHECK(BasicString::format(J_ARR("{}"), null) == J_STR("null"));
     }
 }

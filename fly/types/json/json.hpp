@@ -13,8 +13,6 @@
 #include <initializer_list>
 #include <map>
 #include <optional>
-#include <ostream>
-#include <sstream>
 #include <string>
 #include <type_traits>
 #include <variant>
@@ -23,6 +21,7 @@
 // Helper macros to choose the correct string literal prefix to use for JSON string types.
 #define FLY_JSON_CHR(ch) FLY_CHR(fly::JsonTraits::char_type, ch)
 #define FLY_JSON_STR(str) FLY_STR(fly::JsonTraits::char_type, str)
+#define FLY_JSON_ARR(arr) FLY_ARR(fly::JsonTraits::char_type, arr)
 
 namespace fly {
 
@@ -322,6 +321,13 @@ public:
      * @return A reference to this Json instance.
      */
     reference operator=(Json json) noexcept;
+
+    /**
+     * Serialize the Json instance to a string.
+     *
+     * @return The serialized Json instance.
+     */
+    JsonTraits::string_type serialize() const;
 
     /**
      * @return True if the Json instance is null.
@@ -1355,21 +1361,6 @@ public:
      */
     friend bool operator!=(const_reference json1, const_reference json2);
 
-    /**
-     * Stream operator. Stream the Json instance into an output stream.
-     *
-     * TODO This should be templated based on the std::basic_ostream character type. However, the
-     * C++ standard does not require std::basic_ostream specializations for character types other
-     * than char and wchar_t. It was empirically determined that e.g. char8_t doesn't work under
-     * both GCC and Clang. See: https://stackoverflow.com/a/57454958
-     *
-     * @param stream A reference to the output stream.
-     * @param json A reference to the Json instance to stream.
-     *
-     * @return A reference to the output stream.
-     */
-    friend std::ostream &operator<<(std::ostream &stream, const_reference json);
-
 private:
     friend iterator;
     friend const_iterator;
@@ -1415,15 +1406,15 @@ private:
     read_escaped_character(JsonTraits::string_type &value, JsonTraits::string_type::iterator &it);
 
     /**
-     * Write a character to a stream, handling any value that should be escaped. For those
+     * Write a character to an output string, handling any value that should be escaped. For those
      * characters, an extra reverse solidus is inserted.
      *
-     * @param stream Stream to pipe the escaped character into.
+     * @param output The output string to write to.
      * @param it Pointer to the character to escape.
      * @param end Pointer to the end of the original string value.
      */
-    static void write_escaped_charater(
-        std::ostream &stream,
+    static void write_escaped_character(
+        JsonTraits::string_type &output,
         JsonTraits::string_type::const_iterator &it,
         const JsonTraits::string_type::const_iterator &end);
 
@@ -1613,10 +1604,7 @@ Json::operator T() const noexcept
     }
     else
     {
-        std::basic_stringstream<JsonTraits::char_type> stream;
-        stream << *this;
-
-        value = stream.str();
+        value = serialize();
     }
 
     // The JSON string will have been validated for Unicode compliance during construction.
@@ -2070,8 +2058,10 @@ inline const T &Json::get(const char *error_message) const
 //==================================================================================================
 template <typename CharType>
 struct fly::Formatter<fly::Json, CharType> :
-    public fly::Formatter<std::basic_string_view<CharType>, CharType>
+    public fly::Formatter<std::basic_string<CharType>, CharType>
 {
+    using string_type = std::basic_string<CharType>;
+
     /**
      * Format a JSON value.
      *
@@ -2083,8 +2073,16 @@ struct fly::Formatter<fly::Json, CharType> :
     template <typename FormatContext>
     void format(const fly::Json &json, FormatContext &context)
     {
-        // TODO: Implement this without IO streams.
-        const fly::JsonTraits::string_type json_string(json);
-        fly::Formatter<std::basic_string_view<CharType>, CharType>::format(json_string, context);
+        if constexpr (std::is_same_v<CharType, fly::JsonTraits::char_type>)
+        {
+            fly::Formatter<string_type, CharType>::format(json.serialize(), context);
+        }
+        else
+        {
+            auto serialized = JsonTraits::StringType::convert<string_type>(json.serialize());
+
+            // The JSON string will have been validated for Unicode compliance during construction.
+            fly::Formatter<string_type, CharType>::format(*serialized, context);
+        }
     }
 };

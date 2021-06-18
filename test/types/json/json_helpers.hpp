@@ -16,7 +16,6 @@
 #include <list>
 #include <map>
 #include <set>
-#include <sstream>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -76,6 +75,7 @@
 // These macros depend on the test defining a type named char_type for the string literals.
 #define J_CHR(ch) FLY_CHR(char_type, ch)
 #define J_STR(str) FLY_STR(char_type, str)
+#define J_ARR(arr) FLY_ARR(char_type, arr)
 
 #define CATCH_JSON_TEST_CASE(name)                                                                 \
     CATCH_TEMPLATE_TEST_CASE(                                                                      \
