@@ -12,9 +12,9 @@ namespace fly::detail {
 /**
  * Helper struct to convert a std::string to a plain-old-data type, e.g. int or float.
  *
- * Ideally, this entire helper can be removed when the STL supports floating point types with
+ * Ideally, this entire helper can be removed when the STL supports floating-point types with
  * std::from_chars. However, only integral types are currently supported. Thus, integral types will
- * use std::from_chars, and floating point types will use the std::stof family of functions.
+ * use std::from_chars, and floating-point types will use the std::stof family of functions.
  *
  * https://en.cppreference.com/w/cpp/compiler_support
  *

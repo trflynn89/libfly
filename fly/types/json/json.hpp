@@ -78,7 +78,7 @@ namespace fly {
  *
  *     A JSON boolean, number, or null value may be created from analogous C++ plain-old-data types.
  *     Internally, 64-bit integers are used for storing integer numbers and long doubles for
- *     floating point numbers. The signedness of the 64-bit integer is the same as the integer from
+ *     floating-point numbers. The signedness of the 64-bit integer is the same as the integer from
  *     which the JSON value is created. For example:
  *
  *         fly::Json json = true;
@@ -145,7 +145,7 @@ namespace fly {
  *         convert based on whether the value is empty. JSON numbers will convert based on whether
  *         the value is non-zero. Null JSON values always convert to false.
  *
- *         JSON numbers may be converted to any numeric type. For example, a floating point JSON
+ *         JSON numbers may be converted to any numeric type. For example, a floating-point JSON
  *         value may be converted to an integer.
  *
  * Lastly, this class defines the canonical interfaces of STL container types. This includes element
@@ -276,13 +276,13 @@ public:
     Json(T value) noexcept;
 
     /**
-     * Floating point constructor. Intializes the Json instance to a floating point value. The
-     * SFINAE declaration allows construction of a floating point value from any floating point type
+     * Floating-point constructor. Intializes the Json instance to a floating-point value. The
+     * SFINAE declaration allows construction of a floating-point value from any floating-point type
      * (e.g. float, double).
      *
-     * @tparam T The floating point type.
+     * @tparam T The floating-point type.
      *
-     * @param value The floating point value.
+     * @param value The floating-point value.
      */
     template <typename T, enable_if<JsonTraits::is_floating_point<T>> = 0>
     Json(T value) noexcept;
@@ -1335,9 +1335,9 @@ public:
      * Equality operator. Compares two Json instances for equality. They are equal if one of the
      * following is true:
      *
-     * 1. One of the two JSON types are floating point, the other is a numeric type (signed,
+     * 1. One of the two JSON types are floating-point, the other is a numeric type (signed,
      *    unsigned, or float) and have approximately the same value after converting both types to
-     *    floating point. Approximation is determined by comparing the difference between the two
+     *    floating-point. Approximation is determined by comparing the difference between the two
      *    values to the machine epsilon.
      * 2. The two Json instances are an integer type (signed or unsigned) and have the same value
      *    after converting the second Json value to the same type as the first Json value.

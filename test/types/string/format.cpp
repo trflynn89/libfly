@@ -306,7 +306,7 @@ CATCH_TEMPLATE_TEST_CASE("Format", "[string]", char, wchar_t, char8_t, char16_t,
         test_format(FMT("{:#X}"), FMT("0X1"), 1);
     }
 
-    CATCH_SECTION("Alternate form preserves decimal for floating point types")
+    CATCH_SECTION("Alternate form preserves decimal for floating-point types")
     {
         test_format(FMT("{:#.0g}"), FMT("1."), 1.0);
     }
@@ -387,7 +387,7 @@ CATCH_TEMPLATE_TEST_CASE("Format", "[string]", char, wchar_t, char8_t, char16_t,
         test_format(FMT("{:3}"), FMT("123456"), 123456);
     }
 
-    CATCH_SECTION("Precision value sets floating point precision")
+    CATCH_SECTION("Precision value sets floating-point precision")
     {
         test_format(FMT("{:.3f}"), FMT("1.000"), 1.0);
         test_format(FMT("{:.2f}"), FMT("3.14"), 3.14159);
@@ -429,7 +429,7 @@ CATCH_TEMPLATE_TEST_CASE("Format", "[string]", char, wchar_t, char8_t, char16_t,
         test_format(FMT("{:.0s}"), FMT(""), FLY_STR(char_type, "abcdef"));
     }
 
-    CATCH_SECTION("Precision position sets floating point precision")
+    CATCH_SECTION("Precision position sets floating-point precision")
     {
         test_format(FMT("{:.{}f}"), FMT("1.000"), 1.0, 3);
         test_format(FMT("{0:.{1}f}"), FMT("3.14"), 3.14159, 2);
