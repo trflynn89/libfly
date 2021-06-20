@@ -142,9 +142,8 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
 
         const fly::Json json {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
-        const std::string contents(json);
 
-        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json.serialize()));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
@@ -156,7 +155,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
             CATCH_CHECK(config->get_value<std::string>("address", "") == "MA");
         }
 
-        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents + "\n"));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json.serialize() + "\n"));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         CATCH_CHECK(config_manager->prune() == initial_size);
@@ -166,9 +165,8 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     {
         const fly::Json json {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
-        const std::string contents(json);
 
-        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json.serialize()));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
@@ -184,9 +182,8 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
 
         const fly::Json json {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
-        const std::string contents(json);
 
-        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json.serialize()));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
@@ -200,9 +197,8 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
 
         const fly::Json json1 {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
-        const std::string contents1(json1);
 
-        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents1));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json1.serialize()));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
@@ -212,9 +208,8 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
 
         const fly::Json json2 {
             {fly::test::TestConfig::identifier, {{"name", "Jane Doe"}, {"age", 27}}}};
-        const std::string contents2(json2);
 
-        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents2));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json2.serialize()));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 
         // Multiple fly::PathEvent::Changed events may be triggered even though the above write
@@ -235,9 +230,8 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
 
         const fly::Json json {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
-        const std::string contents(json);
 
-        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
+        CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json.serialize()));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
         task_runner->wait_for_task_to_complete(s_config_manager_file);
 

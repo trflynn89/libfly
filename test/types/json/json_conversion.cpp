@@ -19,35 +19,19 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to string-like types")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::null_type>)
-        {
-            CATCH_CHECK(string_type(json) == J_STR("null"));
-            CATCH_CHECK(string_type(empty) == J_STR("null"));
-        }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
+        if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
         {
             CATCH_CHECK(string_type(json) == J_STR("abcdef"));
             CATCH_CHECK(string_type(empty) == J_STR(""));
         }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
-        {
-            CATCH_CHECK(string_type(json) == J_STR("{\"a\":1,\"b\":2}"));
-            CATCH_CHECK(string_type(empty) == J_STR("{}"));
-        }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
-        {
-            CATCH_CHECK(string_type(json) == J_STR("[55,8,9,10]"));
-            CATCH_CHECK(string_type(empty) == J_STR("[]"));
-        }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::boolean_type>)
-        {
-            CATCH_CHECK(string_type(json) == J_STR("true"));
-            CATCH_CHECK(string_type(empty) == J_STR("false"));
-        }
-        else
+        else if constexpr (fly::JsonTraits::is_number_v<json_type>)
         {
             CATCH_CHECK(string_type(json) == J_STR("1"));
             CATCH_CHECK(string_type(empty) == J_STR("0"));
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(string_type(json), "JSON type is not a string: ({})", json);
         }
     }
 

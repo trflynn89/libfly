@@ -137,8 +137,7 @@ namespace fly {
  *         JSON strings may be converted to numeric values if the string represents a number. For
  *         example, the string "12389" may be converted to an integer. The string "abc" may not.
  *
- *         All JSON types may be converted to a string type. Non-string JSON values will be
- *         serialized to a string.
+ *         Numeric JSON types may be converted to a string type.
  *
  *         All JSON types may be converted to a boolean. String, object, and array JSON values will
  *         convert based on whether the value is empty. JSON numbers will convert based on whether
@@ -395,7 +394,8 @@ public:
 
     /**
      * String conversion operator. Converts the Json instance to a string. The SFINAE declaration
-     * allows conversion to any string type (e.g. std::string, std::u8string).
+     * allows conversion to any string type (e.g. std::string, std::u8string). Also allows for
+     * converting from a numeric type (e.g. 12389) to a string type.
      *
      * Note that although a Json instance can be constructed from a character array, it is not
      * allowed to directly convert a Json instance into a character array.
@@ -403,9 +403,12 @@ public:
      * @tparam T The string type.
      *
      * @return The Json instance as a string.
+     *
+     * @throws JsonException If the Json instance is not a string, or the stored value could not be
+     *         converted to the target string type.
      */
     template <typename T, enable_if<JsonTraits::is_string<T>> = 0>
-    explicit operator T() const noexcept;
+    explicit operator T() const noexcept(false);
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The SFINAE declaration
@@ -471,7 +474,8 @@ public:
      * Numeric conversion operator. Converts the Json instance to a numeric type. The SFINAE
      * declaration allows conversion to any numeric type type (e.g. char, uint64_t, float) from
      * the Json instance. Allows for converting between signed integers, unsigned integers, and
-     * floats. Also allows for converting from a numeric-like string (e.g. "123") to a numeric type.
+     * floats. Also allows for converting from a numeric-like string (e.g. "12389") to a numeric
+     * type.
      *
      * @tparam T The numeric type.
      *
@@ -1594,21 +1598,37 @@ Json::Json(T value) noexcept : m_value(static_cast<JsonTraits::float_type>(value
 
 //==================================================================================================
 template <typename T, enable_if<JsonTraits::is_string<T>>>
-Json::operator T() const noexcept
+Json::operator T() const noexcept(false)
 {
-    JsonTraits::string_type value;
-
-    if (is_string())
+    auto visitor = [this](const auto &storage) -> T
     {
-        value = std::get<JsonTraits::string_type>(m_value);
-    }
-    else
-    {
-        value = serialize();
-    }
+        using S = std::decay_t<decltype(storage)>;
 
-    // The JSON string will have been validated for Unicode compliance during construction.
-    return *(JsonTraits::StringType::convert<T>(value));
+        if constexpr (JsonTraits::is_string_v<S>)
+        {
+            if constexpr (std::is_same_v<T, JsonTraits::string_type>)
+            {
+                return storage;
+            }
+            else
+            {
+                // The JSON string will have been validated for Unicode compliance during
+                // construction.
+                return *(JsonTraits::StringType::convert<T>(storage));
+            }
+        }
+        else if constexpr (JsonTraits::is_number_v<S>)
+        {
+            using char_type = typename T::value_type;
+            return BasicString<char_type>::format(FLY_ARR(char_type, "{}"), storage);
+        }
+        else
+        {
+            throw JsonException(*this, "JSON type is not a string");
+        }
+    };
+
+    return std::visit(std::move(visitor), m_value);
 }
 
 //==================================================================================================
