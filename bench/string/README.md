@@ -22,7 +22,7 @@ All results below are the median of 1000001 iterations of creating a formatted s
 | Formatter         | Duration (ns) |
 | :--               |           --: |
 | libfly            |         0.665 |
-| {fmt}             |         0.411 |
+| {fmt}             |         0.386 |
 | std::stringstream |         1.011 |
 
 ## Profiles
