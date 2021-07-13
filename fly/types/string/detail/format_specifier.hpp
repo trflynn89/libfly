@@ -150,7 +150,10 @@ struct BasicFormatSpecifier
      */
     explicit constexpr BasicFormatSpecifier(FormatParseContext &context);
 
+    BasicFormatSpecifier(const BasicFormatSpecifier &) = default;
     BasicFormatSpecifier(BasicFormatSpecifier &&) = default;
+
+    BasicFormatSpecifier &operator=(const BasicFormatSpecifier &) = default;
     BasicFormatSpecifier &operator=(BasicFormatSpecifier &&) = default;
 
     enum class Alignment : std::uint8_t
@@ -267,9 +270,6 @@ struct BasicFormatSpecifier
     std::size_t m_size {0};
 
 private:
-    BasicFormatSpecifier(const BasicFormatSpecifier &) = delete;
-    BasicFormatSpecifier &operator=(const BasicFormatSpecifier &) = delete;
-
     /**
      * Parse the optional fill and alignment arguments of the replacement field.
      *
@@ -440,6 +440,38 @@ private:
     static constexpr const auto s_letter_l = FLY_CHR(CharType, 'L');
     static constexpr const auto s_decimal = FLY_CHR(CharType, '.');
 };
+
+/**
+ * Because BasicFormatSpecifier is templated, structures which inherit from BasicFormatSpecifier
+ * must fully qualify inherited members (either with |this| or |using| directives). For convenience,
+ * this macro will fully qualify all members, and define the constructors needed to inheirt from
+ * BasicFormatSpecifier.
+ */
+#define FLY_DEFINE_FORMATTER(CharType)                                                             \
+                                                                                                   \
+protected:                                                                                         \
+    using FormatSpecifier = fly::detail::BasicFormatSpecifier<CharType>;                           \
+    using FormatSpecifier::m_position;                                                             \
+    using FormatSpecifier::m_fill;                                                                 \
+    using FormatSpecifier::m_alignment;                                                            \
+    using FormatSpecifier::m_sign;                                                                 \
+    using FormatSpecifier::m_alternate_form;                                                       \
+    using FormatSpecifier::m_zero_padding;                                                         \
+    using FormatSpecifier::m_width;                                                                \
+    using FormatSpecifier::m_width_position;                                                       \
+    using FormatSpecifier::m_precision;                                                            \
+    using FormatSpecifier::m_precision_position;                                                   \
+    using FormatSpecifier::m_locale_specific_form;                                                 \
+    using FormatSpecifier::m_type;                                                                 \
+    using FormatSpecifier::m_case;                                                                 \
+    using FormatSpecifier::m_parameter_type;                                                       \
+                                                                                                   \
+public:                                                                                            \
+    Formatter() = default;                                                                         \
+                                                                                                   \
+    explicit Formatter(FormatSpecifier specifier) noexcept : FormatSpecifier(std::move(specifier)) \
+    {                                                                                              \
+    }
 
 //==================================================================================================
 template <typename CharType>
