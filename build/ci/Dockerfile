@@ -9,6 +9,7 @@ ARG JDK_VERSION
 # Install base tools
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        ccache \
         curl \
         git \
         lcov \
