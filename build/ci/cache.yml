@@ -1,0 +1,18 @@
+parameters:
+  toolchain: 'clang'
+  mode: 'debug'
+  arch: 'x64'
+
+steps:
+  - task: Cache@2
+    inputs:
+      key: 'ccache | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}"'
+      restoreKeys: |
+        ccache | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}"
+      path: $(CCACHE_DIR)
+    displayName: 'Compiler Cache'
+
+  - script: |
+      ccache -M 5G
+      ccache -s
+    displayName: 'Configure Compiler Cache'
