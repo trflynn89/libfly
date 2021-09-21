@@ -4,11 +4,15 @@ parameters:
   arch: 'x64'
 
 steps:
+  - script: |
+      echo "##vso[task.setvariable variable=timestamp]$(date -u +"%Y%m%d%H%M_%S")"
+    displayName: 'Stamp'
+
   - task: Cache@2
     inputs:
-      key: 'ccache | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}"'
+      key: '"ccache" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}" | "$(timestamp)"'
       restoreKeys: |
-        ccache | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}"
+        "ccache" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}"
       path: $(CCACHE_DIR)
     displayName: 'Compiler Cache'
 
