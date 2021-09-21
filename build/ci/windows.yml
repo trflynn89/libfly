@@ -7,7 +7,7 @@ jobs:
     displayName: 'Windows (${{ parameters.mode }} ${{ parameters.arch }})'
 
     pool:
-      vmImage: windows-2019
+      vmImage: windows-2022
 
     steps:
     - template: setup.yml
