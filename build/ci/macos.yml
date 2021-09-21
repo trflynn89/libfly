@@ -8,6 +8,10 @@ jobs:
       vmImage: macOS-10.15
 
     steps:
+    - script: |
+        brew install ccache
+      displayName: 'Dependencies'
+
     - template: setup.yml
 
     - script: |
