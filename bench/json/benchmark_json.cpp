@@ -66,7 +66,8 @@ public:
     void parse(const std::filesystem::path &path) override
     {
         std::ifstream stream(path);
-        FLY_UNUSED(nlohmann::json::parse(stream));
+        auto ignored = nlohmann::json::parse(stream);
+        FLY_UNUSED(ignored);
     }
 };
 
