@@ -251,3 +251,74 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
         }
     }
 }
+
+CATCH_JSON_TEST_CASE("JsonMoveConversion")
+{
+    using json_type = TestType;
+
+    fly::Json json = fly::test::create_json<json_type>();
+    fly::Json empty = json_type();
+
+    CATCH_SECTION("Transfer a JSON instance to a string")
+    {
+        if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
+        {
+            auto json_value = fly::JsonTraits::string_type(std::move(json));
+            CATCH_CHECK(json_value == "abcdef");
+            CATCH_CHECK(json.is_null());
+
+            auto empty_value = fly::JsonTraits::string_type(std::move(empty));
+            CATCH_CHECK(empty_value == "");
+            CATCH_CHECK(empty.is_null());
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                fly::JsonTraits::string_type(std::move(json)),
+                "JSON type is not a string: ({})",
+                json);
+        }
+    }
+
+    CATCH_SECTION("Transfer a JSON instance to an object")
+    {
+        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        {
+            auto json_value = fly::JsonTraits::object_type(std::move(json));
+            CATCH_CHECK(json_value == fly::JsonTraits::object_type {{"a", 1}, {"b", 2}});
+            CATCH_CHECK(json.is_null());
+
+            auto empty_value = fly::JsonTraits::object_type(std::move(empty));
+            CATCH_CHECK(empty_value == fly::JsonTraits::object_type {});
+            CATCH_CHECK(empty.is_null());
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                fly::JsonTraits::object_type(std::move(json)),
+                "JSON type is not an object: ({})",
+                json);
+        }
+    }
+
+    CATCH_SECTION("Transfer a JSON instance to an array")
+    {
+        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        {
+            auto json_value = fly::JsonTraits::array_type(std::move(json));
+            CATCH_CHECK(json_value == fly::JsonTraits::array_type {'7', 8, 9, 10});
+            CATCH_CHECK(json.is_null());
+
+            auto empty_value = fly::JsonTraits::array_type(std::move(empty));
+            CATCH_CHECK(empty_value == fly::JsonTraits::array_type {});
+            CATCH_CHECK(empty.is_null());
+        }
+        else
+        {
+            CATCH_CHECK_THROWS_JSON(
+                fly::JsonTraits::array_type(std::move(json)),
+                "JSON type is not an array: ({})",
+                json);
+        }
+    }
+}

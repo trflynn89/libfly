@@ -408,12 +408,21 @@ public:
      *         converted to the target string type.
      */
     template <typename T, enable_if<JsonTraits::is_string<T>> = 0>
-    explicit operator T() const noexcept(false);
+    explicit operator T() const &noexcept(false);
+
+    /**
+     * String move-conversion operator. If the Json instance is a string, transfers ownership of
+     * the stored value to the caller. The Json instance is set to a null value.
+     *
+     * @return The Json instance's stored string value.
+     *
+     * @throws JsonException If the Json instance is not a string.
+     */
+    explicit operator JsonTraits::string_type() &&noexcept(false);
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The SFINAE declaration
-     * allows conversion to any object-like type (e.g. std::map, std::multimap) from the Json
-     * instance.
+     * allows conversion to any object-like type (e.g. std::map, std::multimap).
      *
      * @tparam T The object-like type.
      *
@@ -423,13 +432,22 @@ public:
      *         converted to the target object's value type.
      */
     template <typename T, enable_if<JsonTraits::is_object<T>> = 0>
-    explicit operator T() const noexcept(false);
+    explicit operator T() const &noexcept(false);
+
+    /**
+     * Object move-conversion operator. If the Json instance is an object, transfers ownership of
+     * the stored value to the caller. The Json instance is set to a null value.
+     *
+     * @return The Json instance's stored object value.
+     *
+     * @throws JsonException If the Json instance is not an object.
+     */
+    explicit operator JsonTraits::object_type() &&noexcept(false);
 
     /**
      * Array conversion operator. Converts the Json instance to an array. The SFINAE declaration
-     * allows conversion to any array-like type (e.g. std::list, std::vector) from the Json
-     * instance. This excludes std::array, which due to being an aggregate type, has its own
-     * explicit conversion operator.
+     * allows conversion to any array-like type (e.g. std::list, std::vector). This excludes
+     * std::array, which due to being an aggregate type, has its own explicit conversion operator.
      *
      * @tparam T The array-like type.
      *
@@ -439,7 +457,17 @@ public:
      *         converted to the target array's value type.
      */
     template <typename T, enable_if<JsonTraits::is_array<T>> = 0>
-    explicit operator T() const noexcept(false);
+    explicit operator T() const &noexcept(false);
+
+    /**
+     * Array move-conversion operator. If the Json instance is an array, transfers ownership of
+     * the stored value to the caller. The Json instance is set to a null value.
+     *
+     * @return The Json instance's stored array value.
+     *
+     * @throws JsonException If the Json instance is not an array.
+     */
+    explicit operator JsonTraits::array_type() &&noexcept(false);
 
     /**
      * Array conversion operator. Converts the Json instance to a std::array. If the Json instance
@@ -1598,7 +1626,7 @@ Json::Json(T value) noexcept : m_value(static_cast<JsonTraits::float_type>(value
 
 //==================================================================================================
 template <typename T, enable_if<JsonTraits::is_string<T>>>
-Json::operator T() const noexcept(false)
+Json::operator T() const &noexcept(false)
 {
     auto visitor = [this](const auto &storage) -> T
     {
@@ -1633,7 +1661,7 @@ Json::operator T() const noexcept(false)
 
 //==================================================================================================
 template <typename T, enable_if<JsonTraits::is_object<T>>>
-Json::operator T() const noexcept(false)
+Json::operator T() const &noexcept(false)
 {
     const auto &storage = get<JsonTraits::object_type>("JSON type is not an object");
     T result;
@@ -1650,7 +1678,7 @@ Json::operator T() const noexcept(false)
 
 //==================================================================================================
 template <typename T, enable_if<JsonTraits::is_array<T>>>
-Json::operator T() const noexcept(false)
+Json::operator T() const &noexcept(false)
 {
     const auto &storage = get<JsonTraits::array_type>("JSON type is not an array");
     T result {};
