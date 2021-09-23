@@ -203,6 +203,33 @@ Json::operator JsonTraits::null_type() const noexcept(false)
 }
 
 //==================================================================================================
+Json::operator JsonTraits::string_type() &&noexcept(false)
+{
+    auto storage = std::move(get<JsonTraits::string_type>("JSON type is not a string"));
+    m_value = nullptr;
+
+    return storage;
+}
+
+//==================================================================================================
+Json::operator JsonTraits::object_type() &&noexcept(false)
+{
+    auto storage = std::move(get<JsonTraits::object_type>("JSON type is not an object"));
+    m_value = nullptr;
+
+    return storage;
+}
+
+//==================================================================================================
+Json::operator JsonTraits::array_type() &&noexcept(false)
+{
+    auto storage = std::move(get<JsonTraits::array_type>("JSON type is not an array"));
+    m_value = nullptr;
+
+    return storage;
+}
+
+//==================================================================================================
 Json::reference Json::at(size_type index)
 {
     auto &storage = get<JsonTraits::array_type>("JSON type invalid for operator[index]");
