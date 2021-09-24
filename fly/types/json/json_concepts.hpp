@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/traits/concepts.hpp"
-#include "fly/types/json/json_traits.hpp"
+#include "fly/types/json/json_types.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 
 #include <array>
@@ -52,7 +52,7 @@ namespace detail {
  * Concept that is satisfied when the given type is a JSON null type.
  */
 template <typename T>
-concept JsonNull = std::same_as<std::remove_cvref_t<T>, JsonTraits::null_type>;
+concept JsonNull = std::same_as<std::remove_cvref_t<T>, json_null_type>;
 
 /**
  * Concept that is satisfied when the given type is a supported JSON string type.
@@ -115,7 +115,7 @@ concept JsonContainer = JsonString<T> || JsonObject<T> || JsonArray<T>;
  * Concept that is satisfied when the given type is a JSON Boolean type.
  */
 template <typename T>
-concept JsonBoolean = std::same_as<std::remove_cvref_t<T>, JsonTraits::boolean_type>;
+concept JsonBoolean = std::same_as<std::remove_cvref_t<T>, json_boolean_type>;
 
 /**
  * Concept that is satisfied when the given type is a signed JSON number type.

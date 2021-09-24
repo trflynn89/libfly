@@ -81,110 +81,106 @@
     CATCH_TEMPLATE_TEST_CASE(                                                                      \
         name,                                                                                      \
         "[json]",                                                                                  \
-        fly::JsonTraits::null_type,                                                                \
-        fly::JsonTraits::string_type,                                                              \
-        fly::JsonTraits::object_type,                                                              \
-        fly::JsonTraits::array_type,                                                               \
-        fly::JsonTraits::boolean_type,                                                             \
-        fly::JsonTraits::signed_type,                                                              \
-        fly::JsonTraits::unsigned_type,                                                            \
-        fly::JsonTraits::float_type)
+        fly::json_null_type,                                                                       \
+        fly::json_string_type,                                                                     \
+        fly::json_object_type,                                                                     \
+        fly::json_array_type,                                                                      \
+        fly::json_boolean_type,                                                                    \
+        fly::json_signed_integer_type,                                                             \
+        fly::json_unsigned_integer_type,                                                           \
+        fly::json_floating_point_type)
 
 #define CATCH_JSON_STRING_TEST_CASE(name)                                                          \
     CATCH_TEMPLATE_PRODUCT_TEST_CASE(                                                              \
         name,                                                                                      \
         "[json]",                                                                                  \
         std::pair,                                                                                 \
-        ((fly::JsonTraits::null_type, std::string),                                                \
-         (fly::JsonTraits::null_type, std::wstring),                                               \
-         (fly::JsonTraits::null_type, std::u8string),                                              \
-         (fly::JsonTraits::null_type, std::u16string),                                             \
-         (fly::JsonTraits::null_type, std::u32string),                                             \
-         (fly::JsonTraits::string_type, std::string),                                              \
-         (fly::JsonTraits::string_type, std::wstring),                                             \
-         (fly::JsonTraits::string_type, std::u8string),                                            \
-         (fly::JsonTraits::string_type, std::u16string),                                           \
-         (fly::JsonTraits::string_type, std::u32string),                                           \
-         (fly::JsonTraits::object_type, std::string),                                              \
-         (fly::JsonTraits::object_type, std::wstring),                                             \
-         (fly::JsonTraits::object_type, std::u8string),                                            \
-         (fly::JsonTraits::object_type, std::u16string),                                           \
-         (fly::JsonTraits::object_type, std::u32string),                                           \
-         (fly::JsonTraits::array_type, std::string),                                               \
-         (fly::JsonTraits::array_type, std::wstring),                                              \
-         (fly::JsonTraits::array_type, std::u8string),                                             \
-         (fly::JsonTraits::array_type, std::u16string),                                            \
-         (fly::JsonTraits::array_type, std::u32string),                                            \
-         (fly::JsonTraits::boolean_type, std::string),                                             \
-         (fly::JsonTraits::boolean_type, std::wstring),                                            \
-         (fly::JsonTraits::boolean_type, std::u8string),                                           \
-         (fly::JsonTraits::boolean_type, std::u16string),                                          \
-         (fly::JsonTraits::boolean_type, std::u32string),                                          \
-         (fly::JsonTraits::signed_type, std::string),                                              \
-         (fly::JsonTraits::signed_type, std::wstring),                                             \
-         (fly::JsonTraits::signed_type, std::u8string),                                            \
-         (fly::JsonTraits::signed_type, std::u16string),                                           \
-         (fly::JsonTraits::signed_type, std::u32string),                                           \
-         (fly::JsonTraits::unsigned_type, std::string),                                            \
-         (fly::JsonTraits::unsigned_type, std::wstring),                                           \
-         (fly::JsonTraits::unsigned_type, std::u8string),                                          \
-         (fly::JsonTraits::unsigned_type, std::u16string),                                         \
-         (fly::JsonTraits::unsigned_type, std::u32string),                                         \
-         (fly::JsonTraits::float_type, std::string),                                               \
-         (fly::JsonTraits::float_type, std::wstring),                                              \
-         (fly::JsonTraits::float_type, std::u8string),                                             \
-         (fly::JsonTraits::float_type, std::u16string),                                            \
-         (fly::JsonTraits::float_type, std::u32string)))
+        ((fly::json_null_type, std::string),                                                       \
+         (fly::json_null_type, std::wstring),                                                      \
+         (fly::json_null_type, std::u8string),                                                     \
+         (fly::json_null_type, std::u16string),                                                    \
+         (fly::json_null_type, std::u32string),                                                    \
+         (fly::json_string_type, std::string),                                                     \
+         (fly::json_string_type, std::wstring),                                                    \
+         (fly::json_string_type, std::u8string),                                                   \
+         (fly::json_string_type, std::u16string),                                                  \
+         (fly::json_string_type, std::u32string),                                                  \
+         (fly::json_object_type, std::string),                                                     \
+         (fly::json_object_type, std::wstring),                                                    \
+         (fly::json_object_type, std::u8string),                                                   \
+         (fly::json_object_type, std::u16string),                                                  \
+         (fly::json_object_type, std::u32string),                                                  \
+         (fly::json_array_type, std::string),                                                      \
+         (fly::json_array_type, std::wstring),                                                     \
+         (fly::json_array_type, std::u8string),                                                    \
+         (fly::json_array_type, std::u16string),                                                   \
+         (fly::json_array_type, std::u32string),                                                   \
+         (fly::json_boolean_type, std::string),                                                    \
+         (fly::json_boolean_type, std::wstring),                                                   \
+         (fly::json_boolean_type, std::u8string),                                                  \
+         (fly::json_boolean_type, std::u16string),                                                 \
+         (fly::json_boolean_type, std::u32string),                                                 \
+         (fly::json_signed_integer_type, std::string),                                             \
+         (fly::json_signed_integer_type, std::wstring),                                            \
+         (fly::json_signed_integer_type, std::u8string),                                           \
+         (fly::json_signed_integer_type, std::u16string),                                          \
+         (fly::json_signed_integer_type, std::u32string),                                          \
+         (fly::json_unsigned_integer_type, std::string),                                           \
+         (fly::json_unsigned_integer_type, std::wstring),                                          \
+         (fly::json_unsigned_integer_type, std::u8string),                                         \
+         (fly::json_unsigned_integer_type, std::u16string),                                        \
+         (fly::json_unsigned_integer_type, std::u32string),                                        \
+         (fly::json_floating_point_type, std::string),                                             \
+         (fly::json_floating_point_type, std::wstring),                                            \
+         (fly::json_floating_point_type, std::u8string),                                           \
+         (fly::json_floating_point_type, std::u16string),                                          \
+         (fly::json_floating_point_type, std::u32string)))
 
 namespace fly::test {
 
 template <typename T>
 // NOLINTNEXTLINE(readability-identifier-naming)
-inline constexpr bool is_object_or_array_or_string_v = fly::any_same_v<
-    T,
-    fly::JsonTraits::string_type,
-    fly::JsonTraits::object_type,
-    fly::JsonTraits::array_type>;
+inline constexpr bool is_object_or_array_or_string_v =
+    fly::any_same_v<T, fly::json_string_type, fly::json_object_type, fly::json_array_type>;
 
 template <typename T, typename Other>
 // NOLINTNEXTLINE(readability-identifier-naming)
-inline constexpr bool is_null_or_other_type_v =
-    fly::any_same_v<T, fly::JsonTraits::null_type, Other>;
+inline constexpr bool is_null_or_other_type_v = fly::any_same_v<T, fly::json_null_type, Other>;
 
-template <typename T, typename StringType = fly::JsonTraits::string_type>
+template <typename T, typename StringType = fly::json_string_type>
 fly::Json create_json()
 {
     using char_type = typename StringType::value_type;
 
-    if constexpr (std::is_same_v<T, fly::JsonTraits::null_type>)
+    if constexpr (std::is_same_v<T, fly::json_null_type>)
     {
         return nullptr;
     }
-    else if constexpr (std::is_same_v<T, fly::JsonTraits::string_type>)
+    else if constexpr (std::is_same_v<T, fly::json_string_type>)
     {
         return J_STR("abcdef");
     }
-    else if constexpr (std::is_same_v<T, fly::JsonTraits::object_type>)
+    else if constexpr (std::is_same_v<T, fly::json_object_type>)
     {
         return {{J_STR("a"), 1}, {J_STR("b"), 2}};
     }
-    else if constexpr (std::is_same_v<T, fly::JsonTraits::array_type>)
+    else if constexpr (std::is_same_v<T, fly::json_array_type>)
     {
         return {'7', 8, 9, 10};
     }
-    else if constexpr (std::is_same_v<T, fly::JsonTraits::boolean_type>)
+    else if constexpr (std::is_same_v<T, fly::json_boolean_type>)
     {
         return true;
     }
-    else if constexpr (std::is_same_v<T, fly::JsonTraits::signed_type>)
+    else if constexpr (std::is_same_v<T, fly::json_signed_integer_type>)
     {
         return 1;
     }
-    else if constexpr (std::is_same_v<T, fly::JsonTraits::unsigned_type>)
+    else if constexpr (std::is_same_v<T, fly::json_unsigned_integer_type>)
     {
         return 1U;
     }
-    else if constexpr (std::is_same_v<T, fly::JsonTraits::float_type>)
+    else if constexpr (std::is_same_v<T, fly::json_floating_point_type>)
     {
         return 1.0f;
     }
@@ -195,7 +191,7 @@ template <
     typename StringType,
     typename Validator,
     typename Invalidator,
-    bool AllowForType = std::is_same_v<JsonType, fly::JsonTraits::object_type>>
+    bool AllowForType = std::is_same_v<JsonType, fly::json_object_type>>
 void run_test_for_object_types(Validator validate, Invalidator invalidate)
 {
     if constexpr (AllowForType)
@@ -246,7 +242,7 @@ template <
     typename Validator2,
     typename Validator3,
     typename Invalidator,
-    bool AllowForType = std::is_same_v<JsonType, fly::JsonTraits::array_type>>
+    bool AllowForType = std::is_same_v<JsonType, fly::json_array_type>>
 void run_test_for_array_types(Validator2 validate2, Validator3 validate3, Invalidator invalidate)
 {
     if constexpr (AllowForType)

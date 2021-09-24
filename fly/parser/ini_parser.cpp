@@ -13,7 +13,7 @@ namespace fly::parser {
 //==================================================================================================
 std::optional<fly::Json> IniParser::parse_internal()
 {
-    fly::Json values = JsonTraits::object_type();
+    fly::Json values = json_object_type();
     fly::Json::iterator current;
 
     std::string data;
@@ -38,8 +38,7 @@ std::optional<fly::Json> IniParser::parse_internal()
                 {
                     try
                     {
-                        auto it =
-                            values.insert_or_assign(*std::move(section), JsonTraits::object_type());
+                        auto it = values.insert_or_assign(*std::move(section), json_object_type());
                         current = it.first;
                     }
                     catch (const JsonException &ex)

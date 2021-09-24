@@ -10,7 +10,7 @@
 namespace fly {
 
 //==================================================================================================
-Json::Json(JsonTraits::null_type value) noexcept : m_value(value)
+Json::Json(json_null_type value) noexcept : m_value(value)
 {
 }
 
@@ -35,17 +35,17 @@ Json::Json(std::initializer_list<Json> initializer) noexcept : m_value()
 
     if (std::all_of(initializer.begin(), initializer.end(), object_test))
     {
-        auto &storage = m_value.emplace<JsonTraits::object_type>();
+        auto &storage = m_value.emplace<json_object_type>();
 
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
         {
-            auto key = std::move(std::get<JsonTraits::string_type>((*it)[0].m_value));
+            auto key = std::move(std::get<json_string_type>((*it)[0].m_value));
             storage.emplace(std::move(key), std::move((*it)[1]));
         }
     }
     else
     {
-        auto &storage = m_value.emplace<JsonTraits::array_type>();
+        auto &storage = m_value.emplace<json_array_type>();
 
         for (auto it = initializer.begin(); it != initializer.end(); ++it)
         {
@@ -62,11 +62,11 @@ Json::reference Json::operator=(Json json) noexcept
 }
 
 //==================================================================================================
-JsonTraits::string_type Json::serialize() const
+json_string_type Json::serialize() const
 {
-    JsonTraits::string_type serialized;
+    json_string_type serialized;
 
-    auto serialize_string = [&serialized](const JsonTraits::string_type &value)
+    auto serialize_string = [&serialized](const json_string_type &value)
     {
         const auto end = value.cend();
         serialized += FLY_JSON_CHR('"');
@@ -127,11 +127,11 @@ JsonTraits::string_type Json::serialize() const
         }
         else if constexpr (JsonBoolean<S>)
         {
-            serialized += JsonTraits::StringType::format(FLY_JSON_ARR("{:s}"), storage);
+            serialized += JsonStringType::format(FLY_JSON_ARR("{:s}"), storage);
         }
         else
         {
-            serialized += JsonTraits::StringType::format(FLY_JSON_ARR("{}"), storage);
+            serialized += JsonStringType::format(FLY_JSON_ARR("{}"), storage);
         }
     };
 
@@ -143,25 +143,25 @@ JsonTraits::string_type Json::serialize() const
 //==================================================================================================
 bool Json::is_null() const
 {
-    return std::holds_alternative<JsonTraits::null_type>(m_value);
+    return std::holds_alternative<json_null_type>(m_value);
 }
 
 //==================================================================================================
 bool Json::is_string() const
 {
-    return std::holds_alternative<JsonTraits::string_type>(m_value);
+    return std::holds_alternative<json_string_type>(m_value);
 }
 
 //==================================================================================================
 bool Json::is_object() const
 {
-    return std::holds_alternative<JsonTraits::object_type>(m_value);
+    return std::holds_alternative<json_object_type>(m_value);
 }
 
 //==================================================================================================
 bool Json::is_object_like() const
 {
-    const auto *storage = std::get_if<JsonTraits::array_type>(&m_value);
+    const auto *storage = std::get_if<json_array_type>(&m_value);
 
     return (storage != nullptr) && (storage->size() == 2) && storage->at(0).is_string();
 }
@@ -169,61 +169,61 @@ bool Json::is_object_like() const
 //==================================================================================================
 bool Json::is_array() const
 {
-    return std::holds_alternative<JsonTraits::array_type>(m_value);
+    return std::holds_alternative<json_array_type>(m_value);
 }
 
 //==================================================================================================
 bool Json::is_boolean() const
 {
-    return std::holds_alternative<JsonTraits::boolean_type>(m_value);
+    return std::holds_alternative<json_boolean_type>(m_value);
 }
 
 //==================================================================================================
 bool Json::is_signed_integer() const
 {
-    return std::holds_alternative<JsonTraits::signed_type>(m_value);
+    return std::holds_alternative<json_signed_integer_type>(m_value);
 }
 
 //==================================================================================================
 bool Json::is_unsigned_integer() const
 {
-    return std::holds_alternative<JsonTraits::unsigned_type>(m_value);
+    return std::holds_alternative<json_unsigned_integer_type>(m_value);
 }
 
 //==================================================================================================
 bool Json::is_float() const
 {
-    return std::holds_alternative<JsonTraits::float_type>(m_value);
+    return std::holds_alternative<json_floating_point_type>(m_value);
 }
 
 //==================================================================================================
-Json::operator JsonTraits::null_type() const noexcept(false)
+Json::operator json_null_type() const noexcept(false)
 {
-    return get<JsonTraits::null_type>("JSON type is not null");
+    return get<json_null_type>("JSON type is not null");
 }
 
 //==================================================================================================
-Json::operator JsonTraits::string_type() &&noexcept(false)
+Json::operator json_string_type() &&noexcept(false)
 {
-    auto storage = std::move(get<JsonTraits::string_type>("JSON type is not a string"));
+    auto storage = std::move(get<json_string_type>("JSON type is not a string"));
     m_value = nullptr;
 
     return storage;
 }
 
 //==================================================================================================
-Json::operator JsonTraits::object_type() &&noexcept(false)
+Json::operator json_object_type() &&noexcept(false)
 {
-    auto storage = std::move(get<JsonTraits::object_type>("JSON type is not an object"));
+    auto storage = std::move(get<json_object_type>("JSON type is not an object"));
     m_value = nullptr;
 
     return storage;
 }
 
 //==================================================================================================
-Json::operator JsonTraits::array_type() &&noexcept(false)
+Json::operator json_array_type() &&noexcept(false)
 {
-    auto storage = std::move(get<JsonTraits::array_type>("JSON type is not an array"));
+    auto storage = std::move(get<json_array_type>("JSON type is not an array"));
     m_value = nullptr;
 
     return storage;
@@ -232,7 +232,7 @@ Json::operator JsonTraits::array_type() &&noexcept(false)
 //==================================================================================================
 Json::reference Json::at(size_type index)
 {
-    auto &storage = get<JsonTraits::array_type>("JSON type invalid for operator[index]");
+    auto &storage = get<json_array_type>("JSON type invalid for operator[index]");
 
     if (index >= storage.size())
     {
@@ -245,7 +245,7 @@ Json::reference Json::at(size_type index)
 //==================================================================================================
 Json::const_reference Json::at(size_type index) const
 {
-    auto &storage = get<JsonTraits::array_type>("JSON type invalid for operator[index]");
+    auto &storage = get<json_array_type>("JSON type invalid for operator[index]");
 
     if (index >= storage.size())
     {
@@ -258,7 +258,7 @@ Json::const_reference Json::at(size_type index) const
 //==================================================================================================
 Json::reference Json::operator[](size_type index)
 {
-    auto &storage = get_or_promote<JsonTraits::array_type>("JSON type invalid for operator[index]");
+    auto &storage = get_or_promote<json_array_type>("JSON type invalid for operator[index]");
 
     if (index >= storage.size())
     {
@@ -443,7 +443,7 @@ void Json::resize(size_type size)
     {
         using S = decltype(storage);
 
-        if constexpr (fly::SameAsAny<S, JsonTraits::string_type, JsonTraits::array_type>)
+        if constexpr (fly::SameAsAny<S, json_string_type, json_array_type>)
         {
             storage.resize(size);
         }
@@ -467,7 +467,7 @@ Json::size_type Json::capacity() const
         {
             return 0;
         }
-        else if constexpr (fly::SameAsAny<S, JsonTraits::string_type, JsonTraits::array_type>)
+        else if constexpr (fly::SameAsAny<S, json_string_type, json_array_type>)
         {
             return storage.capacity();
         }
@@ -491,7 +491,7 @@ void Json::reserve(size_type capacity)
     {
         using S = decltype(storage);
 
-        if constexpr (fly::SameAsAny<S, JsonTraits::string_type, JsonTraits::array_type>)
+        if constexpr (fly::SameAsAny<S, json_string_type, json_array_type>)
         {
             // As of C++20, invoking std::string::reserve() with a value less than the current
             // capacity should not reduce the capacity of the string. Not all compilers seem to have
@@ -607,14 +607,14 @@ Json::iterator Json::insert(const_iterator position, std::initializer_list<Json>
 //==================================================================================================
 void Json::push_back(const Json &value)
 {
-    auto &storage = get_or_promote<JsonTraits::array_type>("JSON type invalid for array insertion");
+    auto &storage = get_or_promote<json_array_type>("JSON type invalid for array insertion");
     storage.push_back(value);
 }
 
 //==================================================================================================
 void Json::push_back(Json &&value)
 {
-    auto &storage = get_or_promote<JsonTraits::array_type>("JSON type invalid for array insertion");
+    auto &storage = get_or_promote<json_array_type>("JSON type invalid for array insertion");
     storage.push_back(std::move(value));
 }
 
@@ -631,7 +631,7 @@ Json::iterator Json::erase(const_iterator position)
     {
         using S = decltype(storage);
 
-        if constexpr (fly::SameAsAny<S, JsonTraits::object_type, JsonTraits::array_type>)
+        if constexpr (fly::SameAsAny<S, json_object_type, json_array_type>)
         {
             using iterator_type = std::conditional_t<
                 JsonObject<S>,
@@ -670,7 +670,7 @@ Json::iterator Json::erase(const_iterator first, const_iterator last)
     {
         using S = decltype(storage);
 
-        if constexpr (fly::SameAsAny<S, JsonTraits::object_type, JsonTraits::array_type>)
+        if constexpr (fly::SameAsAny<S, json_object_type, json_array_type>)
         {
             using iterator_type = std::conditional_t<
                 JsonObject<S>,
@@ -702,7 +702,7 @@ Json::iterator Json::erase(const_iterator first, const_iterator last)
 //==================================================================================================
 void Json::erase(size_type index)
 {
-    auto &storage = get<JsonTraits::array_type>("JSON type invalid for erase(index)");
+    auto &storage = get<json_array_type>("JSON type invalid for erase(index)");
 
     if (index >= storage.size())
     {
@@ -721,8 +721,8 @@ void Json::swap(reference json)
 //==================================================================================================
 void Json::merge(fly::Json &other)
 {
-    auto &this_storage = get_or_promote<JsonTraits::object_type>("JSON type invalid for merging");
-    auto &other_storage = other.get<JsonTraits::object_type>("Other JSON type invalid for merging");
+    auto &this_storage = get_or_promote<json_object_type>("JSON type invalid for merging");
+    auto &other_storage = other.get<json_object_type>("Other JSON type invalid for merging");
 
     this_storage.merge(other_storage);
 }
@@ -730,8 +730,8 @@ void Json::merge(fly::Json &other)
 //==================================================================================================
 void Json::merge(fly::Json &&other)
 {
-    auto &this_storage = get_or_promote<JsonTraits::object_type>("JSON type invalid for merging");
-    auto &other_storage = other.get<JsonTraits::object_type>("Other JSON type invalid for merging");
+    auto &this_storage = get_or_promote<json_object_type>("JSON type invalid for merging");
+    auto &other_storage = other.get<json_object_type>("Other JSON type invalid for merging");
 
     this_storage.merge(std::move(other_storage));
 }
@@ -747,10 +747,10 @@ bool operator==(Json::const_reference json1, Json::const_reference json2)
         if constexpr (
             (JsonFloatingPoint<S1> && JsonNumber<S2>) || (JsonFloatingPoint<S2> && JsonNumber<S1>))
         {
-            constexpr auto epsilon = std::numeric_limits<JsonTraits::float_type>::epsilon();
+            constexpr auto epsilon = std::numeric_limits<json_floating_point_type>::epsilon();
 
-            const auto fvalue1 = static_cast<JsonTraits::float_type>(value1);
-            const auto fvalue2 = static_cast<JsonTraits::float_type>(value2);
+            const auto fvalue1 = static_cast<json_floating_point_type>(value1);
+            const auto fvalue2 = static_cast<json_floating_point_type>(value2);
 
             return std::abs(fvalue1 - fvalue2) <= epsilon;
         }
@@ -778,7 +778,7 @@ bool operator!=(Json::const_reference json1, Json::const_reference json2)
 }
 
 //==================================================================================================
-JsonTraits::string_type Json::validate_string(JsonTraits::string_type &&value)
+json_string_type Json::validate_string(json_string_type &&value)
 {
     static constexpr const auto s_null = FLY_JSON_CHR('\0');
     static constexpr const auto s_space = FLY_JSON_CHR(' ');
@@ -807,9 +807,7 @@ JsonTraits::string_type Json::validate_string(JsonTraits::string_type &&value)
 }
 
 //==================================================================================================
-void Json::read_escaped_character(
-    JsonTraits::string_type &value,
-    JsonTraits::string_type::iterator &it)
+void Json::read_escaped_character(json_string_type &value, json_string_type::iterator &it)
 {
     const auto next = it + 1;
 
@@ -852,7 +850,7 @@ void Json::read_escaped_character(
             break;
 
         case 'u':
-            if (auto result = JsonTraits::StringType::unescape_codepoint(it, value.end()); result)
+            if (auto result = JsonStringType::unescape_codepoint(it, value.end()); result)
             {
                 const auto distance = std::distance(it, value.end());
 
@@ -873,9 +871,9 @@ void Json::read_escaped_character(
 
 //==================================================================================================
 void Json::write_escaped_character(
-    JsonTraits::string_type &output,
-    JsonTraits::string_type::const_iterator &it,
-    const JsonTraits::string_type::const_iterator &end)
+    json_string_type &output,
+    json_string_type::const_iterator &it,
+    const json_string_type::const_iterator &end)
 {
     switch (*it)
     {
@@ -908,7 +906,7 @@ void Json::write_escaped_character(
             break;
 
         default:
-            output += *(JsonTraits::StringType::escape_codepoint<'u'>(it, end));
+            output += *(JsonStringType::escape_codepoint<'u'>(it, end));
             return;
     }
 

@@ -271,6 +271,9 @@
     <ClInclude Include="..\..\..\fly\types\json\json_traits.hpp">
       <Filter>types\json</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\json\json_types.hpp">
+      <Filter>types\json</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\numeric\endian.hpp">
       <Filter>types\numeric</Filter>
     </ClInclude>

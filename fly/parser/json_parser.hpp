@@ -2,7 +2,6 @@
 
 #include "fly/parser/parser.hpp"
 #include "fly/types/json/json.hpp"
-#include "fly/types/json/json_traits.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <cstdint>
@@ -46,9 +45,9 @@ public:
     /**
      * ASCII codes for special JSON tokens.
      */
-    enum class Token : std::char_traits<fly::JsonTraits::char_type>::int_type
+    enum class Token : std::char_traits<fly::json_char_type>::int_type
     {
-        EndOfFile = std::char_traits<fly::JsonTraits::char_type>::eof(),
+        EndOfFile = std::char_traits<fly::json_char_type>::eof(),
 
         Tab = 0x09, // \t
         NewLine = 0x0a, // \n
@@ -152,7 +151,7 @@ private:
      *
      * @return If successful, the parsed JSON string. Otherwise, an uninitialized value.
      */
-    std::optional<fly::JsonTraits::string_type> parse_quoted_string();
+    std::optional<fly::json_string_type> parse_quoted_string();
 
     /**
      * Parse a JSON number, boolean, or null value from the stream.
@@ -183,7 +182,7 @@ private:
      *
      * @return The JSON value that was parsed as a string.
      */
-    fly::JsonTraits::string_type consume_value();
+    fly::json_string_type consume_value();
 
     /**
      * Extract all consecutive whitespace symbols and comments (if enabled in the feature set) from
@@ -213,7 +212,7 @@ private:
      *
      * @return The interpreted JSON value type.
      */
-    NumberType validate_number(const fly::JsonTraits::string_type &value) const;
+    NumberType validate_number(const fly::json_string_type &value) const;
 
     /**
      * Check if a symbol is a whitespace symbol.
