@@ -81,17 +81,17 @@ JsonTraits::string_type Json::serialize() const
 
     auto visitor = [&serialized, &serialize_string](const auto &storage)
     {
-        using S = std::decay_t<decltype(storage)>;
+        using S = decltype(storage);
 
-        if constexpr (JsonTraits::is_null_v<S>)
+        if constexpr (JsonNull<S>)
         {
             serialized += FLY_JSON_STR("null");
         }
-        else if constexpr (JsonTraits::is_string_v<S>)
+        else if constexpr (JsonString<S>)
         {
             serialize_string(storage);
         }
-        else if constexpr (JsonTraits::is_object_v<S>)
+        else if constexpr (JsonObject<S>)
         {
             serialized += FLY_JSON_CHR('{');
 
@@ -109,7 +109,7 @@ JsonTraits::string_type Json::serialize() const
 
             serialized += FLY_JSON_CHR('}');
         }
-        else if constexpr (JsonTraits::is_array_v<S>)
+        else if constexpr (JsonArray<S>)
         {
             serialized += FLY_JSON_CHR('[');
 
@@ -125,7 +125,7 @@ JsonTraits::string_type Json::serialize() const
 
             serialized += FLY_JSON_CHR(']');
         }
-        else if constexpr (JsonTraits::is_boolean_v<S>)
+        else if constexpr (JsonBoolean<S>)
         {
             serialized += JsonTraits::StringType::format(FLY_JSON_ARR("{:s}"), storage);
         }
@@ -393,13 +393,13 @@ bool Json::empty() const
 {
     auto visitor = [](const auto &storage) -> bool
     {
-        using S = std::decay_t<decltype(storage)>;
+        using S = decltype(storage);
 
-        if constexpr (JsonTraits::is_null_v<S>)
+        if constexpr (JsonNull<S>)
         {
             return true;
         }
-        else if constexpr (JsonTraits::is_container_v<S>)
+        else if constexpr (JsonContainer<S>)
         {
             return storage.empty();
         }
@@ -417,13 +417,13 @@ Json::size_type Json::size() const
 {
     auto visitor = [](const auto &storage) -> size_type
     {
-        using S = std::decay_t<decltype(storage)>;
+        using S = decltype(storage);
 
-        if constexpr (JsonTraits::is_null_v<S>)
+        if constexpr (JsonNull<S>)
         {
             return 0;
         }
-        else if constexpr (JsonTraits::is_container_v<S>)
+        else if constexpr (JsonContainer<S>)
         {
             return storage.size();
         }
@@ -441,9 +441,9 @@ void Json::resize(size_type size)
 {
     auto visitor = [this, &size](auto &storage)
     {
-        using S = std::decay_t<decltype(storage)>;
+        using S = decltype(storage);
 
-        if constexpr (any_same_v<S, JsonTraits::string_type, JsonTraits::array_type>)
+        if constexpr (fly::SameAsAny<S, JsonTraits::string_type, JsonTraits::array_type>)
         {
             storage.resize(size);
         }
@@ -461,17 +461,17 @@ Json::size_type Json::capacity() const
 {
     auto visitor = [](const auto &storage) -> size_type
     {
-        using S = std::decay_t<decltype(storage)>;
+        using S = decltype(storage);
 
-        if constexpr (JsonTraits::is_null_v<S>)
+        if constexpr (JsonNull<S>)
         {
             return 0;
         }
-        else if constexpr (any_same_v<S, JsonTraits::string_type, JsonTraits::array_type>)
+        else if constexpr (fly::SameAsAny<S, JsonTraits::string_type, JsonTraits::array_type>)
         {
             return storage.capacity();
         }
-        else if constexpr (JsonTraits::is_object_v<S>)
+        else if constexpr (JsonObject<S>)
         {
             return storage.size();
         }
@@ -489,9 +489,9 @@ void Json::reserve(size_type capacity)
 {
     auto visitor = [this, &capacity](auto &storage)
     {
-        using S = std::decay_t<decltype(storage)>;
+        using S = decltype(storage);
 
-        if constexpr (any_same_v<S, JsonTraits::string_type, JsonTraits::array_type>)
+        if constexpr (fly::SameAsAny<S, JsonTraits::string_type, JsonTraits::array_type>)
         {
             // As of C++20, invoking std::string::reserve() with a value less than the current
             // capacity should not reduce the capacity of the string. Not all compilers seem to have
@@ -517,19 +517,19 @@ void Json::clear()
 {
     auto visitor = [](auto &storage)
     {
-        using S = std::decay_t<decltype(storage)>;
+        using S = decltype(storage);
 
-        if constexpr (JsonTraits::is_container_v<S>)
+        if constexpr (JsonContainer<S>)
         {
             storage.clear();
         }
-        else if constexpr (JsonTraits::is_boolean_v<S>)
+        else if constexpr (JsonBoolean<S>)
         {
             storage = false;
         }
-        else if constexpr (JsonTraits::is_number_v<S>)
+        else if constexpr (JsonNumber<S>)
         {
-            storage = static_cast<S>(0);
+            storage = static_cast<std::remove_cvref_t<S>>(0);
         }
     };
 
@@ -629,12 +629,12 @@ Json::iterator Json::erase(const_iterator position)
 {
     auto visitor = [this, &position](auto &storage) -> iterator
     {
-        using S = std::decay_t<decltype(storage)>;
+        using S = decltype(storage);
 
-        if constexpr (any_same_v<S, JsonTraits::object_type, JsonTraits::array_type>)
+        if constexpr (fly::SameAsAny<S, JsonTraits::object_type, JsonTraits::array_type>)
         {
             using iterator_type = std::conditional_t<
-                JsonTraits::is_object_v<S>,
+                JsonObject<S>,
                 typename const_iterator::object_iterator_type,
                 typename const_iterator::array_iterator_type>;
 
@@ -668,12 +668,12 @@ Json::iterator Json::erase(const_iterator first, const_iterator last)
 {
     auto visitor = [this, &first, &last](auto &storage) -> iterator
     {
-        using S = std::decay_t<decltype(storage)>;
+        using S = decltype(storage);
 
-        if constexpr (any_same_v<S, JsonTraits::object_type, JsonTraits::array_type>)
+        if constexpr (fly::SameAsAny<S, JsonTraits::object_type, JsonTraits::array_type>)
         {
             using iterator_type = std::conditional_t<
-                JsonTraits::is_object_v<S>,
+                JsonObject<S>,
                 typename const_iterator::object_iterator_type,
                 typename const_iterator::array_iterator_type>;
 
@@ -741,12 +741,11 @@ bool operator==(Json::const_reference json1, Json::const_reference json2)
 {
     auto visitor = [](const auto &value1, const auto &value2) -> bool
     {
-        using S1 = std::decay_t<decltype(value1)>;
-        using S2 = std::decay_t<decltype(value2)>;
+        using S1 = decltype(value1);
+        using S2 = decltype(value2);
 
         if constexpr (
-            (JsonTraits::is_floating_point_v<S1> && JsonTraits::is_number_v<S2>) ||
-            (JsonTraits::is_floating_point_v<S2> && JsonTraits::is_number_v<S1>))
+            (JsonFloatingPoint<S1> && JsonNumber<S2>) || (JsonFloatingPoint<S2> && JsonNumber<S1>))
         {
             constexpr auto epsilon = std::numeric_limits<JsonTraits::float_type>::epsilon();
 
@@ -755,11 +754,11 @@ bool operator==(Json::const_reference json1, Json::const_reference json2)
 
             return std::abs(fvalue1 - fvalue2) <= epsilon;
         }
-        else if constexpr (JsonTraits::is_number_v<S1> && JsonTraits::is_number_v<S2>)
+        else if constexpr (JsonNumber<S1> && JsonNumber<S2>)
         {
             return value1 == static_cast<S1>(value2);
         }
-        else if constexpr (std::is_same_v<S1, S2>)
+        else if constexpr (fly::SameAsAny<S1, S2>)
         {
             return value1 == value2;
         }

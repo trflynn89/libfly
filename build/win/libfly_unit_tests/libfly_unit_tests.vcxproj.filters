@@ -134,6 +134,9 @@
     <ClCompile Include="..\..\..\test\types\json\json_accessors.cpp">
       <Filter>types\json</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\types\json\json_concepts.cpp">
+      <Filter>types\json</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\test\types\json\json_construction.cpp">
       <Filter>types\json</Filter>
     </ClCompile>

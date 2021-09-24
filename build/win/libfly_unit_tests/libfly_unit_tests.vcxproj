@@ -247,6 +247,7 @@
     <ClCompile Include="..\..\..\test\types\concurrency\concurrent_container.cpp" />
     <ClCompile Include="..\..\..\test\types\json\json.cpp" />
     <ClCompile Include="..\..\..\test\types\json\json_accessors.cpp" />
+    <ClCompile Include="..\..\..\test\types\json\json_concepts.cpp" />
     <ClCompile Include="..\..\..\test\types\json\json_construction.cpp" />
     <ClCompile Include="..\..\..\test\types\json\json_conversion.cpp" />
     <ClCompile Include="..\..\..\test\types\json\json_exception.cpp" />
