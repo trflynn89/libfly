@@ -3,7 +3,6 @@
 #include "fly/traits/traits.hpp"
 #include "fly/types/json/json_concepts.hpp"
 #include "fly/types/json/json_exception.hpp"
-#include "fly/types/json/json_traits.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <cmath>
@@ -68,16 +67,16 @@ class JsonIterator
      */
     using object_iterator_type = std::conditional_t<
         is_const_iterator,
-        JsonTraits::object_type::const_iterator,
-        JsonTraits::object_type::iterator>;
+        json_object_type::const_iterator,
+        json_object_type::iterator>;
 
     /**
      * Alias for an array iterator, depending on the Json type's constness.
      */
     using array_iterator_type = std::conditional_t<
         is_const_iterator,
-        JsonTraits::array_type::const_iterator,
-        JsonTraits::array_type::iterator>;
+        json_array_type::const_iterator,
+        json_array_type::iterator>;
 
     /**
      * Alias for the std::variant holding the iterator.
@@ -411,7 +410,7 @@ public:
      * @throws JsonIteratorException If the Json instance is not an object.
      * @throws NullJsonException If the iterator is empty or past-the-end.
      */
-    const typename JsonTraits::object_type::key_type &key() const;
+    const typename json_object_type::key_type &key() const;
 
     /**
      * Retrieve a reference to the Json instance pointed to by this iterator.
@@ -814,11 +813,11 @@ auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const -> di
 
 //==================================================================================================
 template <typename JsonType>
-const typename JsonTraits::object_type::key_type &JsonIterator<JsonType>::key() const
+const typename json_object_type::key_type &JsonIterator<JsonType>::key() const
 {
     validate_iterator();
 
-    auto visitor = [this](const auto &it) -> const typename JsonTraits::object_type::key_type &
+    auto visitor = [this](const auto &it) -> const typename json_object_type::key_type &
     {
         if constexpr (is_object_iterator<decltype(it)>)
         {

@@ -13,7 +13,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
 
     CATCH_SECTION("Access a JSON array's values via the accessor 'at'")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
             CATCH_CHECK(json1.at(0) == '7');
             CATCH_CHECK(json1.at(1) == 8);
@@ -42,9 +42,9 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
 
     CATCH_SECTION("Access a JSON array's values via the access operator")
     {
-        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::json_array_type>)
         {
-            if constexpr (std::is_same_v<json_type, fly::JsonTraits::null_type>)
+            if constexpr (std::is_same_v<json_type, fly::json_null_type>)
             {
                 CATCH_CHECK_NOTHROW(json1[0]);
                 CATCH_CHECK(json1.is_array());
@@ -80,7 +80,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
 
     CATCH_SECTION("Access a JSON instance's front element")
     {
-        if constexpr (fly::JsonTraits::is_iterable_v<json_type>)
+        if constexpr (fly::JsonIterable<json_type>)
         {
             auto &front1 = json1.front();
             CATCH_CHECK(front1 == *(json1.begin()));
@@ -106,7 +106,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
 
     CATCH_SECTION("Access a JSON instance's back element")
     {
-        if constexpr (fly::JsonTraits::is_iterable_v<json_type>)
+        if constexpr (fly::JsonIterable<json_type>)
         {
             auto &back1 = json1.back();
             CATCH_CHECK(back1 == *(--(json1.end())));
@@ -132,7 +132,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
 
     CATCH_SECTION("Check a JSON instance for emptiness")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::null_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_null_type>)
         {
             CATCH_CHECK(json1.empty());
             CATCH_CHECK(json2.empty());
@@ -151,22 +151,22 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
 
     CATCH_SECTION("Check the size of a JSON instance")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::null_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_null_type>)
         {
             CATCH_CHECK(json1.size() == 0);
             CATCH_CHECK(json2.size() == 0);
         }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
+        else if constexpr (std::is_same_v<json_type, fly::json_string_type>)
         {
             CATCH_CHECK(json1.size() == 6);
             CATCH_CHECK(json2.size() == 6);
         }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        else if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
             CATCH_CHECK(json1.size() == 2);
             CATCH_CHECK(json2.size() == 2);
         }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        else if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
             CATCH_CHECK(json1.size() == 4);
             CATCH_CHECK(json2.size() == 4);
@@ -181,7 +181,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
     CATCH_SECTION("Change the size of a JSON instance")
     {
         constexpr bool is_string_or_array =
-            fly::any_same_v<json_type, fly::JsonTraits::string_type, fly::JsonTraits::array_type>;
+            fly::any_same_v<json_type, fly::json_string_type, fly::json_array_type>;
 
         if constexpr (is_string_or_array)
         {
@@ -205,9 +205,9 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
     CATCH_SECTION("Check the capacity of a JSON instance")
     {
         constexpr bool is_string_or_array =
-            fly::any_same_v<json_type, fly::JsonTraits::string_type, fly::JsonTraits::array_type>;
+            fly::any_same_v<json_type, fly::json_string_type, fly::json_array_type>;
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::null_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_null_type>)
         {
             CATCH_CHECK(json1.capacity() == 0);
             CATCH_CHECK(json2.capacity() == 0);
@@ -219,7 +219,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
             CATCH_CHECK(capacity1 == capacity2);
             CATCH_CHECK(capacity1 > 0);
         }
-        else if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        else if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
             CATCH_CHECK(json1.capacity() == 2);
             CATCH_CHECK(json2.capacity() == 2);
@@ -234,7 +234,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
     CATCH_SECTION("Change the capacity of a JSON instance")
     {
         constexpr bool is_string_or_array =
-            fly::any_same_v<json_type, fly::JsonTraits::string_type, fly::JsonTraits::array_type>;
+            fly::any_same_v<json_type, fly::json_string_type, fly::json_array_type>;
 
         if constexpr (is_string_or_array)
         {
@@ -267,7 +267,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
 
     CATCH_SECTION("Access a JSON object's values via the accessor 'at'")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
             CATCH_CHECK(json1.at(J_STR("a")) == 1);
             CATCH_CHECK(json1.at(J_STR("b")) == 2);
@@ -292,9 +292,9 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
 
     CATCH_SECTION("Access a JSON object's values via the access operator")
     {
-        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::json_object_type>)
         {
-            if constexpr (std::is_same_v<json_type, fly::JsonTraits::null_type>)
+            if constexpr (std::is_same_v<json_type, fly::json_null_type>)
             {
                 CATCH_CHECK_NOTHROW(json1[J_STR("a")]);
                 CATCH_CHECK(json1.is_object());
@@ -332,9 +332,9 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
 
     CATCH_SECTION("Count the number of values with a key in a JSON object")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
-            const fly::Json empty = fly::JsonTraits::object_type();
+            const fly::Json empty = fly::json_object_type();
             CATCH_CHECK(empty.count(J_STR("a")) == 0);
             CATCH_CHECK(empty.count(J_STR("b")) == 0);
             CATCH_CHECK(empty.count(J_STR("c")) == 0);
@@ -362,7 +362,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
 
     CATCH_SECTION("Find a value with a key in a JSON object")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
             auto it1a = json1.find(J_STR("a"));
             auto it1b = json1.find(J_STR("b"));
@@ -397,9 +397,9 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
 
     CATCH_SECTION("Check for the existence of a key in a JSON object")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
-            const fly::Json empty = fly::JsonTraits::object_type();
+            const fly::Json empty = fly::json_object_type();
             CATCH_CHECK_FALSE(empty.contains(J_STR("a")));
             CATCH_CHECK_FALSE(empty.contains(J_STR("b")));
             CATCH_CHECK_FALSE(empty.contains(J_STR("c")));

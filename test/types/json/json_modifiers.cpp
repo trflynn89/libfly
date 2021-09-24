@@ -29,7 +29,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         const fly::Json array = {1, 2, 3, 4};
         const fly::Json value = 1;
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(array.begin(), value),
@@ -71,7 +71,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             return fly::Json(1);
         };
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(array.begin(), value()),
@@ -109,7 +109,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         const fly::Json array = {1, 2, 3};
         const fly::Json value = 1;
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(array.begin(), value),
@@ -158,7 +158,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         const fly::Json object = {{"c", 3}, {"d", 4}};
         const fly::Json array = {1, 2, 3};
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(json.begin(), json.begin(), array.end()),
@@ -212,7 +212,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
     {
         const fly::Json array = {1, 2, 3};
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
             CATCH_CHECK_THROWS_JSON(
                 json.insert(array.begin(), {1, 2, 3}),
@@ -253,7 +253,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
     {
         fly::Json value = 3;
 
-        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::json_array_type>)
         {
             const auto size_before = json.size();
             auto &result = json.emplace_back(std::move(value));
@@ -276,7 +276,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         const fly::Json value1 = 3;
         const fly::Json value2 = 4;
 
-        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::json_array_type>)
         {
             const auto starting_size = json.size();
 
@@ -302,7 +302,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         fly::Json value1 = 3;
         fly::Json value2 = 4;
 
-        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::json_array_type>)
         {
             const auto starting_size = json.size();
 
@@ -325,7 +325,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Pop a value from a JSON array")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
             json.pop_back();
             CATCH_CHECK(json == fly::Json {'7', 8, 9});
@@ -352,7 +352,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Erase a value from a JSON instance")
     {
-        if constexpr (fly::JsonTraits::is_iterable_v<json_type>)
+        if constexpr (fly::JsonIterable<json_type>)
         {
             CATCH_CHECK_THROWS_JSON(
                 json.erase(fly::Json::const_iterator()),
@@ -364,7 +364,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
                 "Provided iterator must not be past-the-end",
                 json);
 
-            if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+            if constexpr (std::is_same_v<json_type, fly::json_object_type>)
             {
                 auto result = json.erase(json.begin());
                 CATCH_CHECK(json == fly::Json {{"b", 2}});
@@ -405,7 +405,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Erase a range of values from a JSON instance")
     {
-        if constexpr (fly::JsonTraits::is_iterable_v<json_type>)
+        if constexpr (fly::JsonIterable<json_type>)
         {
             CATCH_CHECK_THROWS_JSON(
                 json.erase(fly::Json::const_iterator(), fly::Json::const_iterator()),
@@ -418,7 +418,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
             json = fly::test::create_json<json_type>();
 
-            if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+            if constexpr (std::is_same_v<json_type, fly::json_object_type>)
             {
                 result = json.erase(json.begin(), json.find("b"));
                 CATCH_CHECK(json == fly::Json {{"b", 2}});
@@ -454,7 +454,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Erase a value from a JSON array")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
             CATCH_CHECK_THROWS_JSON(json.erase(4), "Given index (4) not found: ({})", json);
 
@@ -560,7 +560,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
                 json);
         };
 
-        fly::test::run_test_for_array_types<json_type, fly::JsonTraits::string_type>(
+        fly::test::run_test_for_array_types<json_type, fly::json_string_type>(
             std::move(validate2),
             std::move(validate3),
             std::move(invalidate));
@@ -572,10 +572,10 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         fly::Json object2 = {{"d", 5}, {"e", 6}};
         fly::Json object3 = {{"f", 7}, {"g", 8}};
 
-        fly::Json int1 = fly::test::create_json<fly::JsonTraits::signed_type>();
-        fly::Json int2 = fly::test::create_json<fly::JsonTraits::signed_type>();
+        fly::Json int1 = fly::test::create_json<fly::json_signed_integer_type>();
+        fly::Json int2 = fly::test::create_json<fly::json_signed_integer_type>();
 
-        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::json_object_type>)
         {
             CATCH_CHECK_THROWS_JSON(
                 json.merge(int1),
@@ -584,7 +584,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             CATCH_CHECK_THROWS_JSON(
                 json.merge(std::move(int2)),
                 "Other JSON type invalid for merging: ({})",
-                fly::test::create_json<fly::JsonTraits::signed_type>());
+                fly::test::create_json<fly::json_signed_integer_type>());
 
             CATCH_CHECK_NOTHROW(json.merge(object1));
             CATCH_REQUIRE(json.contains("c"));
@@ -640,7 +640,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         const fly::Json value1 = 3;
         const fly::Json value2 = 4;
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
             auto result = json.insert(key, value1);
             CATCH_CHECK(result.second);
@@ -666,7 +666,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         fly::Json value1 = 3;
         fly::Json value2 = 4;
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
             auto result = json.insert(key, std::move(value1));
             CATCH_CHECK(result.second);
@@ -692,7 +692,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         fly::Json value1 = 3;
         fly::Json value2 = 4;
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
             auto result = json.insert_or_assign(key, std::move(value1));
             CATCH_CHECK(result.second);
@@ -717,7 +717,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
     {
         const fly::Json object = {{J_STR("c"), fly::Json(3)}, {J_STR("d"), fly::Json(4)}};
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
             const fly::Json array = {J_STR("c"), J_STR("d")};
 
@@ -753,7 +753,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
         fly::Json value1 = 3;
         fly::Json value2 = 4;
 
-        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::json_object_type>)
         {
             auto result = json.emplace(key, std::move(value1));
             CATCH_CHECK(result.second);
@@ -778,7 +778,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
 
     CATCH_SECTION("Erase a value from a JSON object")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
             auto result = json.erase(J_STR("a"));
             CATCH_CHECK(json == fly::Json {{"b", 2}});
@@ -805,7 +805,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
     {
         string_type str = J_STR("ghijkl");
 
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_string_type>)
         {
             CATCH_CHECK_NOTHROW(json.swap(str));
             CATCH_CHECK(json == "ghijkl");
@@ -925,7 +925,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
             string_type,
             decltype(validate),
             decltype(invalidate),
-            fly::test::is_null_or_other_type_v<json_type, fly::JsonTraits::object_type>>(
+            fly::test::is_null_or_other_type_v<json_type, fly::json_object_type>>(
             std::move(validate),
             std::move(invalidate));
     }

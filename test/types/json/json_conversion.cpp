@@ -19,12 +19,12 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to string-like types")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_string_type>)
         {
             CATCH_CHECK(string_type(json) == J_STR("abcdef"));
             CATCH_CHECK(string_type(empty) == J_STR(""));
         }
-        else if constexpr (fly::JsonTraits::is_number_v<json_type>)
+        else if constexpr (fly::JsonNumber<json_type>)
         {
             CATCH_CHECK(string_type(json) == J_STR("1"));
             CATCH_CHECK(string_type(empty) == J_STR("0"));
@@ -150,7 +150,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
             std::move(invalidate));
 
         // Extra test to ensure std::array lengths are accounted for.
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
             std::array<int, 1> array1 = {7};
             std::array<int, 2> array2 = {7, 8};
@@ -165,7 +165,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to Boolean-like types")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::null_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_null_type>)
         {
             CATCH_CHECK_FALSE(bool(json));
             CATCH_CHECK_FALSE(bool(empty));
@@ -179,7 +179,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to signed-integer-like types")
     {
-        if constexpr (fly::JsonTraits::is_number_v<json_type>)
+        if constexpr (fly::JsonNumber<json_type>)
         {
             CATCH_CHECK(int(json) == 1);
         }
@@ -187,7 +187,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
         {
             CATCH_CHECK_THROWS_JSON(int(json), "JSON type is not numeric: ({})", json);
 
-            if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
+            if constexpr (std::is_same_v<json_type, fly::json_string_type>)
             {
                 json = J_STR("-123");
                 CATCH_CHECK(int(json) == int(-123));
@@ -200,7 +200,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to unsigned-integer-like types")
     {
-        if constexpr (fly::JsonTraits::is_number_v<json_type>)
+        if constexpr (fly::JsonNumber<json_type>)
         {
             CATCH_CHECK(unsigned(json) == unsigned(1));
         }
@@ -208,7 +208,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
         {
             CATCH_CHECK_THROWS_JSON(unsigned(json), "JSON type is not numeric: ({})", json);
 
-            if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
+            if constexpr (std::is_same_v<json_type, fly::json_string_type>)
             {
                 json = J_STR("-123");
                 CATCH_CHECK_THROWS_JSON(unsigned(json), "JSON type is not numeric: ({})", json);
@@ -221,7 +221,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to floating-point-like types")
     {
-        if constexpr (fly::JsonTraits::is_number_v<json_type>)
+        if constexpr (fly::JsonNumber<json_type>)
         {
             CATCH_CHECK(float(json) == Catch::Approx(float(1)));
             CATCH_CHECK(double(json) == Catch::Approx(double(1)));
@@ -230,7 +230,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
         {
             CATCH_CHECK_THROWS_JSON(int(json), "JSON type is not numeric: ({})", json);
 
-            if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
+            if constexpr (std::is_same_v<json_type, fly::json_string_type>)
             {
                 json = J_STR("123.5");
                 CATCH_CHECK(float(json) == Catch::Approx(123.5f));
@@ -241,7 +241,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to null-like types")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::null_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_null_type>)
         {
             CATCH_CHECK(std::nullptr_t(json) == nullptr);
         }
@@ -261,20 +261,20 @@ CATCH_JSON_TEST_CASE("JsonMoveConversion")
 
     CATCH_SECTION("Transfer a JSON instance to a string")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::string_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_string_type>)
         {
-            auto json_value = fly::JsonTraits::string_type(std::move(json));
+            auto json_value = fly::json_string_type(std::move(json));
             CATCH_CHECK(json_value == "abcdef");
             CATCH_CHECK(json.is_null());
 
-            auto empty_value = fly::JsonTraits::string_type(std::move(empty));
+            auto empty_value = fly::json_string_type(std::move(empty));
             CATCH_CHECK(empty_value == "");
             CATCH_CHECK(empty.is_null());
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
-                fly::JsonTraits::string_type(std::move(json)),
+                fly::json_string_type(std::move(json)),
                 "JSON type is not a string: ({})",
                 json);
         }
@@ -282,20 +282,20 @@ CATCH_JSON_TEST_CASE("JsonMoveConversion")
 
     CATCH_SECTION("Transfer a JSON instance to an object")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::object_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
-            auto json_value = fly::JsonTraits::object_type(std::move(json));
-            CATCH_CHECK(json_value == fly::JsonTraits::object_type {{"a", 1}, {"b", 2}});
+            auto json_value = fly::json_object_type(std::move(json));
+            CATCH_CHECK(json_value == fly::json_object_type {{"a", 1}, {"b", 2}});
             CATCH_CHECK(json.is_null());
 
-            auto empty_value = fly::JsonTraits::object_type(std::move(empty));
-            CATCH_CHECK(empty_value == fly::JsonTraits::object_type {});
+            auto empty_value = fly::json_object_type(std::move(empty));
+            CATCH_CHECK(empty_value == fly::json_object_type {});
             CATCH_CHECK(empty.is_null());
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
-                fly::JsonTraits::object_type(std::move(json)),
+                fly::json_object_type(std::move(json)),
                 "JSON type is not an object: ({})",
                 json);
         }
@@ -303,20 +303,20 @@ CATCH_JSON_TEST_CASE("JsonMoveConversion")
 
     CATCH_SECTION("Transfer a JSON instance to an array")
     {
-        if constexpr (std::is_same_v<json_type, fly::JsonTraits::array_type>)
+        if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
-            auto json_value = fly::JsonTraits::array_type(std::move(json));
-            CATCH_CHECK(json_value == fly::JsonTraits::array_type {'7', 8, 9, 10});
+            auto json_value = fly::json_array_type(std::move(json));
+            CATCH_CHECK(json_value == fly::json_array_type {'7', 8, 9, 10});
             CATCH_CHECK(json.is_null());
 
-            auto empty_value = fly::JsonTraits::array_type(std::move(empty));
-            CATCH_CHECK(empty_value == fly::JsonTraits::array_type {});
+            auto empty_value = fly::json_array_type(std::move(empty));
+            CATCH_CHECK(empty_value == fly::json_array_type {});
             CATCH_CHECK(empty.is_null());
         }
         else
         {
             CATCH_CHECK_THROWS_JSON(
-                fly::JsonTraits::array_type(std::move(json)),
+                fly::json_array_type(std::move(json)),
                 "JSON type is not an array: ({})",
                 json);
         }

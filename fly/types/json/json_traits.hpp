@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/fly.hpp"
-#include "fly/types/string/string.hpp"
+#include "fly/types/json/json_types.hpp"
 
 #include <array>
 #include <deque>
@@ -9,7 +9,6 @@
 #include <list>
 #include <map>
 #include <set>
-#include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
@@ -29,35 +28,10 @@ class Json;
 struct JsonTraits
 {
     /**
-     * Aliases for JSON types. These could be specified as template parameters to the JsonTraits
-     * class to allow callers to override the types. But these are reasonable default types for now,
-     * and the Json class constructors allow for type flexibility.
-     */
-    using null_type = std::nullptr_t;
-    using string_type = std::string;
-    using boolean_type = bool;
-    using signed_type = std::int64_t;
-    using unsigned_type = std::uint64_t;
-    using float_type = long double;
-    using object_type = std::map<string_type, Json>;
-    using array_type = std::vector<Json>;
-
-    /**
-     * Alias for the JSON string character type. Though it is not a valid JSON type itself, knowing
-     * its type is often useful.
-     */
-    using char_type = typename string_type::value_type;
-
-    /**
-     * Alias for the fly::BasicString specialization for the JSON string type.
-     */
-    using StringType = BasicString<char_type>;
-
-    /**
      * Define a trait for testing if type T is a JSON null type.
      */
     template <typename T>
-    using is_null = std::is_same<null_type, std::decay_t<T>>;
+    using is_null = std::is_same<json_null_type, std::decay_t<T>>;
 
     template <typename T>
     inline static constexpr bool is_null_v = is_null<T>::value;
@@ -87,7 +61,7 @@ struct JsonTraits
      * Define a trait for testing if type T is a JSON boolean.
      */
     template <typename T>
-    using is_boolean = std::is_same<boolean_type, std::decay_t<T>>;
+    using is_boolean = std::is_same<json_boolean_type, std::decay_t<T>>;
 
     template <typename T>
     inline static constexpr bool is_boolean_v = is_boolean<T>::value;
@@ -99,7 +73,7 @@ struct JsonTraits
     using is_signed_integer = std::conjunction<
         std::is_integral<std::decay_t<T>>,
         std::is_signed<std::decay_t<T>>,
-        std::negation<std::is_same<boolean_type, std::decay_t<T>>>>;
+        std::negation<std::is_same<json_boolean_type, std::decay_t<T>>>>;
 
     template <typename T>
     inline static constexpr bool is_signed_integer_v = is_signed_integer<T>::value;
@@ -111,7 +85,7 @@ struct JsonTraits
     using is_unsigned_integer = std::conjunction<
         std::is_integral<std::decay_t<T>>,
         std::is_unsigned<std::decay_t<T>>,
-        std::negation<std::is_same<boolean_type, std::decay_t<T>>>>;
+        std::negation<std::is_same<json_boolean_type, std::decay_t<T>>>>;
 
     template <typename T>
     inline static constexpr bool is_unsigned_integer_v = is_unsigned_integer<T>::value;

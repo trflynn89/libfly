@@ -6,6 +6,7 @@
 #include "fly/types/json/json_concepts.hpp"
 #include "fly/types/json/json_exception.hpp"
 #include "fly/types/json/json_traits.hpp"
+#include "fly/types/json/json_types.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <concepts>
@@ -21,9 +22,9 @@
 #include <vector>
 
 // Helper macros to choose the correct string literal prefix to use for JSON string types.
-#define FLY_JSON_CHR(ch) FLY_CHR(fly::JsonTraits::char_type, ch)
-#define FLY_JSON_STR(str) FLY_STR(fly::JsonTraits::char_type, str)
-#define FLY_JSON_ARR(arr) FLY_ARR(fly::JsonTraits::char_type, arr)
+#define FLY_JSON_CHR(ch) FLY_CHR(fly::json_char_type, ch)
+#define FLY_JSON_STR(str) FLY_STR(fly::json_char_type, str)
+#define FLY_JSON_ARR(arr) FLY_ARR(fly::json_char_type, arr)
 
 namespace fly {
 
@@ -160,14 +161,14 @@ class Json
      * Alias for the std::variant holding the JSON types.
      */
     using json_type = std::variant<
-        JsonTraits::null_type,
-        JsonTraits::string_type,
-        JsonTraits::object_type,
-        JsonTraits::array_type,
-        JsonTraits::boolean_type,
-        JsonTraits::signed_type,
-        JsonTraits::unsigned_type,
-        JsonTraits::float_type>;
+        json_null_type,
+        json_string_type,
+        json_object_type,
+        json_array_type,
+        json_boolean_type,
+        json_signed_integer_type,
+        json_unsigned_integer_type,
+        json_floating_point_type>;
 
 public:
     /**
@@ -196,7 +197,7 @@ public:
      *
      * @param value The null value.
      */
-    Json(JsonTraits::null_type value) noexcept;
+    Json(json_null_type value) noexcept;
 
     /**
      * String constructor. Intializes the Json instance to a string value. The SFINAE declaration
@@ -328,7 +329,7 @@ public:
      *
      * @return The serialized Json instance.
      */
-    JsonTraits::string_type serialize() const;
+    json_string_type serialize() const;
 
     /**
      * @return True if the Json instance is null.
@@ -392,7 +393,7 @@ public:
      *
      * @throws JsonException If the Json instance is not null.
      */
-    explicit operator JsonTraits::null_type() const noexcept(false);
+    explicit operator json_null_type() const noexcept(false);
 
     /**
      * String conversion operator. Converts the Json instance to a string. The SFINAE declaration
@@ -420,7 +421,7 @@ public:
      *
      * @throws JsonException If the Json instance is not a string.
      */
-    explicit operator JsonTraits::string_type() &&noexcept(false);
+    explicit operator json_string_type() &&noexcept(false);
 
     /**
      * Object conversion operator. Converts the Json instance to an object. The SFINAE declaration
@@ -444,7 +445,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an object.
      */
-    explicit operator JsonTraits::object_type() &&noexcept(false);
+    explicit operator json_object_type() &&noexcept(false);
 
     /**
      * Array conversion operator. Converts the Json instance to an array. The SFINAE declaration
@@ -469,7 +470,7 @@ public:
      *
      * @throws JsonException If the Json instance is not an array.
      */
-    explicit operator JsonTraits::array_type() &&noexcept(false);
+    explicit operator json_array_type() &&noexcept(false);
 
     /**
      * Array conversion operator. Converts the Json instance to a std::array. If the Json instance
@@ -1411,7 +1412,7 @@ private:
      * @throws JsonException If the string-like value is not valid.
      */
     template <JsonStringLike T>
-    static JsonTraits::string_type convert_to_string(T value);
+    static json_string_type convert_to_string(T value);
 
     /**
      * Validate the string for compliance according to https://www.json.org. Validation includes
@@ -1423,7 +1424,7 @@ private:
      *
      * @throws JsonException If the string value is not valid.
      */
-    static JsonTraits::string_type validate_string(JsonTraits::string_type &&value);
+    static json_string_type validate_string(json_string_type &&value);
 
     /**
      * After reading a reverse solidus character, read the escaped character(s) that follow. Replace
@@ -1436,8 +1437,7 @@ private:
      * @throws JsonException If the interpreted escaped character is not valid or there weren't
      *         enough available bytes.
      */
-    static void
-    read_escaped_character(JsonTraits::string_type &value, JsonTraits::string_type::iterator &it);
+    static void read_escaped_character(json_string_type &value, json_string_type::iterator &it);
 
     /**
      * Write a character to an output string, handling any value that should be escaped. For those
@@ -1448,9 +1448,9 @@ private:
      * @param end Pointer to the end of the original string value.
      */
     static void write_escaped_character(
-        JsonTraits::string_type &output,
-        JsonTraits::string_type::const_iterator &it,
-        const JsonTraits::string_type::const_iterator &end);
+        json_string_type &output,
+        json_string_type::const_iterator &it,
+        const json_string_type::const_iterator &end);
 
     /**
      * Helper trait to determine the return type of an object insertion method. If that method
@@ -1458,8 +1458,7 @@ private:
      */
     template <typename... Args>
     using object_insertion_result = std::conditional_t<
-        std::is_void_v<decltype(std::declval<JsonTraits::object_type>().insert(
-            std::declval<Args>()...))>,
+        std::is_void_v<decltype(std::declval<json_object_type>().insert(std::declval<Args>()...))>,
         void,
         std::pair<iterator, bool>>;
 
@@ -1567,7 +1566,7 @@ Json::Json(T &&value) noexcept(false)
 {
     if constexpr (std::is_lvalue_reference_v<T>)
     {
-        m_value.emplace<JsonTraits::object_type>();
+        m_value.emplace<json_object_type>();
 
         for (const auto &it : value)
         {
@@ -1582,7 +1581,7 @@ Json::Json(T &&value) noexcept(false)
 
 //==================================================================================================
 template <JsonArray T>
-Json::Json(T &&value) noexcept(false) : m_value(JsonTraits::array_type())
+Json::Json(T &&value) noexcept(false) : m_value(json_array_type())
 {
     reserve(JsonTraits::ArrayTraits::size(value));
 
@@ -1604,25 +1603,25 @@ Json::Json(T &&value) noexcept(false) : m_value(JsonTraits::array_type())
 
 //==================================================================================================
 template <JsonBoolean T>
-Json::Json(T value) noexcept : m_value(static_cast<JsonTraits::boolean_type>(value))
+Json::Json(T value) noexcept : m_value(static_cast<json_boolean_type>(value))
 {
 }
 
 //==================================================================================================
 template <JsonSignedInteger T>
-Json::Json(T value) noexcept : m_value(static_cast<JsonTraits::signed_type>(value))
+Json::Json(T value) noexcept : m_value(static_cast<json_signed_integer_type>(value))
 {
 }
 
 //==================================================================================================
 template <JsonUnsignedInteger T>
-Json::Json(T value) noexcept : m_value(static_cast<JsonTraits::unsigned_type>(value))
+Json::Json(T value) noexcept : m_value(static_cast<json_unsigned_integer_type>(value))
 {
 }
 
 //==================================================================================================
 template <JsonFloatingPoint T>
-Json::Json(T value) noexcept : m_value(static_cast<JsonTraits::float_type>(value))
+Json::Json(T value) noexcept : m_value(static_cast<json_floating_point_type>(value))
 {
 }
 
@@ -1636,7 +1635,7 @@ Json::operator T() const &noexcept(false)
 
         if constexpr (JsonString<S>)
         {
-            if constexpr (fly::SameAsAny<T, JsonTraits::string_type>)
+            if constexpr (fly::SameAsAny<T, json_string_type>)
             {
                 return storage;
             }
@@ -1644,7 +1643,7 @@ Json::operator T() const &noexcept(false)
             {
                 // The JSON string will have been validated for Unicode compliance during
                 // construction.
-                return *(JsonTraits::StringType::convert<T>(storage));
+                return *(JsonStringType::convert<T>(storage));
             }
         }
         else if constexpr (JsonNumber<S>)
@@ -1665,13 +1664,13 @@ Json::operator T() const &noexcept(false)
 template <JsonObject T>
 Json::operator T() const &noexcept(false)
 {
-    const auto &storage = get<JsonTraits::object_type>("JSON type is not an object");
+    const auto &storage = get<json_object_type>("JSON type is not an object");
     T result;
 
     for (const auto &it : storage)
     {
         // The JSON string will have been validated for Unicode compliance during construction.
-        auto key = *std::move(JsonTraits::StringType::convert<typename T::key_type>(it.first));
+        auto key = *std::move(JsonStringType::convert<typename T::key_type>(it.first));
         result.emplace(std::move(key), it.second);
     }
 
@@ -1682,7 +1681,7 @@ Json::operator T() const &noexcept(false)
 template <JsonArray T>
 Json::operator T() const &noexcept(false)
 {
-    const auto &storage = get<JsonTraits::array_type>("JSON type is not an array");
+    const auto &storage = get<json_array_type>("JSON type is not an array");
     T result {};
 
     for (const auto &it : storage)
@@ -1698,7 +1697,7 @@ Json::operator T() const &noexcept(false)
 template <typename T, std::size_t N>
 Json::operator std::array<T, N>() const noexcept(false)
 {
-    const auto &storage = get<JsonTraits::array_type>("JSON type is not an array");
+    const auto &storage = get<json_array_type>("JSON type is not an array");
     std::array<T, N> result {};
 
     for (std::size_t i = 0; i < std::min(N, storage.size()); ++i)
@@ -1748,7 +1747,7 @@ Json::operator T() const noexcept(false)
 
         if constexpr (JsonString<S>)
         {
-            if (auto converted = JsonTraits::StringType::convert<T>(storage); converted)
+            if (auto converted = JsonStringType::convert<T>(storage); converted)
             {
                 return *std::move(converted);
             }
@@ -1768,7 +1767,7 @@ Json::operator T() const noexcept(false)
 template <JsonStringLike T>
 Json::reference Json::at(T key)
 {
-    auto &storage = get<JsonTraits::object_type>("JSON type invalid for operator[key]");
+    auto &storage = get<json_object_type>("JSON type invalid for operator[key]");
     auto it = storage.find(convert_to_string(std::move(key)));
 
     if (it == storage.end())
@@ -1783,7 +1782,7 @@ Json::reference Json::at(T key)
 template <JsonStringLike T>
 Json::const_reference Json::at(T key) const
 {
-    const auto &storage = get<JsonTraits::object_type>("JSON type invalid for operator[key]");
+    const auto &storage = get<json_object_type>("JSON type invalid for operator[key]");
     const auto it = storage.find(convert_to_string(std::move(key)));
 
     if (it == storage.end())
@@ -1798,7 +1797,7 @@ Json::const_reference Json::at(T key) const
 template <JsonStringLike T>
 Json::reference Json::operator[](T key)
 {
-    auto &storage = get_or_promote<JsonTraits::object_type>("JSON type invalid for operator[key]");
+    auto &storage = get_or_promote<json_object_type>("JSON type invalid for operator[key]");
     return storage[convert_to_string(std::move(key))];
 }
 
@@ -1842,8 +1841,7 @@ std::pair<Json::iterator, bool> Json::insert_or_assign(Key key, Json &&value)
 template <JsonStringLike Key, typename Value>
 std::pair<Json::iterator, bool> Json::emplace(Key key, Value &&value)
 {
-    auto &storage =
-        get_or_promote<JsonTraits::object_type>("JSON type invalid for object emplacement");
+    auto &storage = get_or_promote<json_object_type>("JSON type invalid for object emplacement");
     auto result = storage.emplace(convert_to_string(std::move(key)), std::forward<Value>(value));
 
     auto it = end();
@@ -1856,8 +1854,7 @@ std::pair<Json::iterator, bool> Json::emplace(Key key, Value &&value)
 template <typename... Args>
 Json::reference Json::emplace_back(Args &&...args)
 {
-    auto &storage =
-        get_or_promote<JsonTraits::array_type>("JSON type invalid for array emplacement");
+    auto &storage = get_or_promote<json_array_type>("JSON type invalid for array emplacement");
     return storage.emplace_back(std::forward<Args>(args)...);
 }
 
@@ -1865,7 +1862,7 @@ Json::reference Json::emplace_back(Args &&...args)
 template <JsonStringLike T>
 Json::size_type Json::erase(T key)
 {
-    auto &storage = get<JsonTraits::object_type>("JSON type invalid for erase(key)");
+    auto &storage = get<json_object_type>("JSON type invalid for erase(key)");
     return storage.erase(convert_to_string(std::move(key)));
 }
 
@@ -1918,9 +1915,9 @@ void Json::swap(T &other)
 template <JsonObject T>
 void Json::merge(T &other)
 {
-    get_or_promote<JsonTraits::object_type>("JSON type invalid for merging");
+    get_or_promote<json_object_type>("JSON type invalid for merging");
 
-    // Manual implementation of fly::JsonTraits::object_type::merge(&) to allow unordered maps.
+    // Manual implementation of fly::json_object_type::merge(&) to allow unordered maps.
     for (auto it = other.begin(); it != other.end();)
     {
         if (contains(it->first))
@@ -1939,9 +1936,9 @@ void Json::merge(T &other)
 template <JsonObject T>
 void Json::merge(T &&other)
 {
-    get_or_promote<JsonTraits::object_type>("JSON type invalid for merging");
+    get_or_promote<json_object_type>("JSON type invalid for merging");
 
-    // Manual implementation of fly::JsonTraits::object_type::merge(&&) to allow unordered maps.
+    // Manual implementation of fly::json_object_type::merge(&&) to allow unordered maps.
     for (auto &&it : other)
     {
         if (!contains(it.first))
@@ -1955,7 +1952,7 @@ void Json::merge(T &&other)
 template <JsonStringLike T>
 Json::size_type Json::count(T key) const
 {
-    const auto &storage = get<JsonTraits::object_type>("JSON type invalid for count(key)");
+    const auto &storage = get<json_object_type>("JSON type invalid for count(key)");
     return storage.count(convert_to_string(std::move(key)));
 }
 
@@ -1963,7 +1960,7 @@ Json::size_type Json::count(T key) const
 template <JsonStringLike T>
 Json::iterator Json::find(T key)
 {
-    auto &storage = get<JsonTraits::object_type>("JSON type invalid for find(key)");
+    auto &storage = get<json_object_type>("JSON type invalid for find(key)");
 
     auto it = end();
     it.m_iterator = storage.find(convert_to_string(std::move(key)));
@@ -1975,7 +1972,7 @@ Json::iterator Json::find(T key)
 template <JsonStringLike T>
 Json::const_iterator Json::find(T key) const
 {
-    const auto &storage = get<JsonTraits::object_type>("JSON type invalid for find(key)");
+    const auto &storage = get<json_object_type>("JSON type invalid for find(key)");
 
     auto it = cend();
     it.m_iterator = storage.find(convert_to_string(std::move(key)));
@@ -1987,17 +1984,17 @@ Json::const_iterator Json::find(T key) const
 template <JsonStringLike T>
 bool Json::contains(T key) const
 {
-    const auto &storage = get<JsonTraits::object_type>("JSON type invalid for contains(key)");
+    const auto &storage = get<json_object_type>("JSON type invalid for contains(key)");
     return storage.contains(convert_to_string(std::move(key)));
 }
 
 //==================================================================================================
 template <JsonStringLike T>
-JsonTraits::string_type Json::convert_to_string(T value)
+json_string_type Json::convert_to_string(T value)
 {
     using StringType = BasicString<typename detail::is_like_supported_string_t<T>::value_type>;
 
-    if constexpr (fly::SameAsAny<typename StringType::string_type, JsonTraits::string_type>)
+    if constexpr (fly::SameAsAny<typename StringType::string_type, json_string_type>)
     {
         if (StringType::validate(value))
         {
@@ -2006,7 +2003,7 @@ JsonTraits::string_type Json::convert_to_string(T value)
     }
     else
     {
-        if (auto result = StringType::template convert<JsonTraits::string_type>(value); result)
+        if (auto result = StringType::template convert<json_string_type>(value); result)
         {
             return validate_string(*std::move(result));
         }
@@ -2019,7 +2016,7 @@ JsonTraits::string_type Json::convert_to_string(T value)
 template <typename... Args>
 Json::object_insertion_result<Args...> Json::object_inserter(Args &&...args)
 {
-    auto &storage = get<JsonTraits::object_type>("JSON type invalid for object insertion");
+    auto &storage = get<json_object_type>("JSON type invalid for object insertion");
 
     if constexpr (std::is_void_v<object_insertion_result<Args...>>)
     {
@@ -2040,7 +2037,7 @@ Json::object_insertion_result<Args...> Json::object_inserter(Args &&...args)
 template <typename... Args>
 Json::iterator Json::array_inserter(const_iterator position, Args &&...args)
 {
-    auto &storage = get<JsonTraits::array_type>("JSON type invalid for array insertion");
+    auto &storage = get<json_array_type>("JSON type invalid for array insertion");
 
     if (position.m_json != this)
     {
@@ -2123,13 +2120,13 @@ struct fly::Formatter<fly::Json, CharType> :
     template <typename FormatContext>
     void format(const fly::Json &json, FormatContext &context)
     {
-        if constexpr (fly::SameAsAny<CharType, fly::JsonTraits::char_type>)
+        if constexpr (fly::SameAsAny<CharType, fly::json_char_type>)
         {
             fly::Formatter<string_type, CharType>::format(json.serialize(), context);
         }
         else
         {
-            auto serialized = JsonTraits::StringType::convert<string_type>(json.serialize());
+            auto serialized = JsonStringType::convert<string_type>(json.serialize());
 
             // The JSON string will have been validated for Unicode compliance during construction.
             fly::Formatter<string_type, CharType>::format(*serialized, context);
