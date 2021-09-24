@@ -254,7 +254,6 @@
     <ClCompile Include="..\..\..\test\types\json\json_iterator.cpp" />
     <ClCompile Include="..\..\..\test\types\json\json_modifiers.cpp" />
     <ClCompile Include="..\..\..\test\types\json\json_reverse_iterator.cpp" />
-    <ClCompile Include="..\..\..\test\types\json\json_traits.cpp" />
     <ClCompile Include="..\..\..\test\types\numeric\endian.cpp" />
     <ClCompile Include="..\..\..\test\types\numeric\literals.cpp" />
     <ClCompile Include="..\..\..\test\types\string\classifier.cpp" />

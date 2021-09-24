@@ -155,9 +155,6 @@
     <ClCompile Include="..\..\..\test\types\json\json_reverse_iterator.cpp">
       <Filter>types\json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\types\json\json_traits.cpp">
-      <Filter>types\json</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\test\types\numeric\endian.cpp">
       <Filter>types\numeric</Filter>
     </ClCompile>
