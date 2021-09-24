@@ -515,12 +515,12 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
                 T2 {FLY_JSON_STR("50"), FLY_JSON_STR("60"), FLY_JSON_STR("70"), FLY_JSON_STR("80")};
 
             CATCH_CHECK_NOTHROW(json.swap(test1));
-            CATCH_CHECK(json == T1 {10, 20, 30, 40});
+            CATCH_CHECK(T1(json) == T1 {10, 20, 30, 40});
             CATCH_CHECK(test1 == T1 {1, 2});
 
             CATCH_CHECK_NOTHROW(json.swap(test2));
             CATCH_CHECK(
-                json ==
+                T2(json) ==
                 T2 {FLY_JSON_STR("50"),
                     FLY_JSON_STR("60"),
                     FLY_JSON_STR("70"),
@@ -533,7 +533,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
                     FLY_JSON_STR("40")});
 
             CATCH_CHECK_NOTHROW(json.swap(test1));
-            CATCH_CHECK(json == T1 {1, 2});
+            CATCH_CHECK(T1(json) == T1 {1, 2});
             CATCH_CHECK(test1 == T1 {50, 60, 70, 80});
         };
 
