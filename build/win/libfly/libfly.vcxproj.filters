@@ -253,6 +253,9 @@
     <ClInclude Include="..\..\..\fly\types\concurrency\detail\concurrent_container.hpp">
       <Filter>types\concurrency\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\json\detail\array_util.hpp">
+      <Filter>types\json\detail</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\json\detail\json_iterator.hpp">
       <Filter>types\json\detail</Filter>
     </ClInclude>
@@ -266,9 +269,6 @@
       <Filter>types\json</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\json\json_exception.hpp">
-      <Filter>types\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\json\json_traits.hpp">
       <Filter>types\json</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\json\json_types.hpp">

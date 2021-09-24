@@ -1,11 +1,11 @@
 #pragma once
 
 #include "fly/traits/concepts.hpp"
+#include "fly/types/json/detail/array_util.hpp"
 #include "fly/types/json/detail/json_iterator.hpp"
 #include "fly/types/json/detail/json_reverse_iterator.hpp"
 #include "fly/types/json/json_concepts.hpp"
 #include "fly/types/json/json_exception.hpp"
-#include "fly/types/json/json_traits.hpp"
 #include "fly/types/json/json_types.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -1583,7 +1583,7 @@ Json::Json(T &&value) noexcept(false)
 template <JsonArray T>
 Json::Json(T &&value) noexcept(false) : m_value(json_array_type())
 {
-    reserve(JsonTraits::ArrayTraits::size(value));
+    reserve(detail::json_array_size(value));
 
     if constexpr (std::is_lvalue_reference_v<T>)
     {
@@ -1687,7 +1687,7 @@ Json::operator T() const &noexcept(false)
     for (const auto &it : storage)
     {
         auto copy = static_cast<typename T::value_type>(it);
-        JsonTraits::ArrayTraits::append(result, std::move(copy));
+        detail::json_array_append(result, std::move(copy));
     }
 
     return result;
