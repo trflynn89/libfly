@@ -220,12 +220,12 @@
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_stack.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\detail\concurrent_container.hpp" />
+    <ClInclude Include="..\..\..\fly\types\json\detail\array_util.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\detail\json_iterator.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\detail\json_reverse_iterator.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\json.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\json_concepts.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\json_exception.hpp" />
-    <ClInclude Include="..\..\..\fly\types\json\json_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\json_types.hpp" />
     <ClInclude Include="..\..\..\fly\types\numeric\detail\endian_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\numeric\detail\literal_parser.hpp" />
