@@ -209,6 +209,7 @@
     <ClInclude Include="..\..\..\fly\task\task_manager.hpp" />
     <ClInclude Include="..\..\..\fly\task\task_runner.hpp" />
     <ClInclude Include="..\..\..\fly\task\task_types.hpp" />
+    <ClInclude Include="..\..\..\fly\traits\concepts.hpp" />
     <ClInclude Include="..\..\..\fly\traits\traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.hpp" />
