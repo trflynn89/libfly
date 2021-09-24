@@ -262,6 +262,9 @@
     <ClInclude Include="..\..\..\fly\types\json\json.hpp">
       <Filter>types\json</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\json\json_concepts.hpp">
+      <Filter>types\json</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\json\json_exception.hpp">
       <Filter>types\json</Filter>
     </ClInclude>

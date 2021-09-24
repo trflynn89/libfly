@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/traits/traits.hpp"
+#include "fly/types/json/json_concepts.hpp"
 #include "fly/types/json/json_exception.hpp"
 #include "fly/types/json/json_traits.hpp"
 #include "fly/types/string/string.hpp"
@@ -490,10 +491,9 @@ private:
 template <typename JsonType>
 JsonIterator<JsonType>::JsonIterator(pointer json, Position position) noexcept(false) : m_json(json)
 {
-    auto visitor =
-        [this, &position](auto &value) noexcept(JsonTraits::is_iterable_v<decltype(value)>)
+    auto visitor = [this, &position](auto &value) noexcept(JsonIterable<decltype(value)>)
     {
-        if constexpr (JsonTraits::is_iterable_v<decltype(value)>)
+        if constexpr (JsonIterable<decltype(value)>)
         {
             switch (position)
             {
