@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/traits/traits.hpp"
+#include "fly/traits/concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/literals.hpp"
 
@@ -200,10 +200,8 @@ private:
      *
      * @return If successful, the decoded Unicode codepoint. Otherwise, an invalid codepoint.
      */
-    template <
-        typename IteratorType,
-        typename CharT = CharType,
-        enable_if<size_of_type_is<CharT, 1>> = 0>
+    template <typename IteratorType>
+    requires fly::SizeOfTypeIs<CharType, 1>
     static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
 
     /**
@@ -216,10 +214,8 @@ private:
      *
      * @return If successful, the decoded Unicode codepoint. Otherwise, an invalid codepoint.
      */
-    template <
-        typename IteratorType,
-        typename CharT = CharType,
-        enable_if<size_of_type_is<CharT, 2>> = 0>
+    template <typename IteratorType>
+    requires fly::SizeOfTypeIs<CharType, 2>
     static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
 
     /**
@@ -232,10 +228,8 @@ private:
      *
      * @return If successful, the decoded Unicode codepoint. Otherwise, an invalid codepoint.
      */
-    template <
-        typename IteratorType,
-        typename CharT = CharType,
-        enable_if<size_of_type_is<CharT, 4>> = 0>
+    template <typename IteratorType>
+    requires fly::SizeOfTypeIs<CharType, 4>
     static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
 
     /**
@@ -246,10 +240,8 @@ private:
      * @param codepoint The codepoint to encode.
      * @param out The output iterator to insert the result into.
      */
-    template <
-        typename OutputIteratorType,
-        typename CharT = CharType,
-        enable_if<size_of_type_is<CharT, 1>> = 0>
+    template <typename OutputIteratorType>
+    requires fly::SizeOfTypeIs<CharType, 1>
     static void codepoint_to_string(codepoint_type codepoint, OutputIteratorType out);
 
     /**
@@ -260,10 +252,8 @@ private:
      * @param codepoint The codepoint to encode.
      * @param out The output iterator to insert the result into.
      */
-    template <
-        typename OutputIteratorType,
-        typename CharT = CharType,
-        enable_if<size_of_type_is<CharT, 2>> = 0>
+    template <typename OutputIteratorType>
+    requires fly::SizeOfTypeIs<CharType, 2>
     static void codepoint_to_string(codepoint_type codepoint, OutputIteratorType out);
 
     /**
@@ -274,10 +264,8 @@ private:
      * @param codepoint The codepoint to encode.
      * @param out The output iterator to insert the result into.
      */
-    template <
-        typename OutputIteratorType,
-        typename CharT = CharType,
-        enable_if<size_of_type_is<CharT, 4>> = 0>
+    template <typename OutputIteratorType>
+    requires fly::SizeOfTypeIs<CharType, 4>
     static void codepoint_to_string(codepoint_type codepoint, OutputIteratorType out);
 
     /**
@@ -609,7 +597,8 @@ auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const Iterator
 
 //==================================================================================================
 template <typename CharType>
-template <typename IteratorType, typename CharT, enable_if<size_of_type_is<CharT, 1>>>
+template <typename IteratorType>
+requires fly::SizeOfTypeIs<CharType, 1>
 auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
     -> codepoint_type
 {
@@ -662,7 +651,8 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
 
 //==================================================================================================
 template <typename CharType>
-template <typename IteratorType, typename CharT, enable_if<size_of_type_is<CharT, 2>>>
+template <typename IteratorType>
+requires fly::SizeOfTypeIs<CharType, 2>
 auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
     -> codepoint_type
 {
@@ -676,7 +666,8 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
 
 //==================================================================================================
 template <typename CharType>
-template <typename IteratorType, typename CharT, enable_if<size_of_type_is<CharT, 4>>>
+template <typename IteratorType>
+requires fly::SizeOfTypeIs<CharType, 4>
 auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
     -> codepoint_type
 {
@@ -685,7 +676,8 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
 
 //==================================================================================================
 template <typename CharType>
-template <typename OutputIteratorType, typename CharT, enable_if<size_of_type_is<CharT, 1>>>
+template <typename OutputIteratorType>
+requires fly::SizeOfTypeIs<CharType, 1>
 void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, OutputIteratorType out)
 {
     if (codepoint < 0x80)
@@ -714,7 +706,8 @@ void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, Outpu
 
 //==================================================================================================
 template <typename CharType>
-template <typename OutputIteratorType, typename CharT, enable_if<size_of_type_is<CharT, 2>>>
+template <typename OutputIteratorType>
+requires fly::SizeOfTypeIs<CharType, 2>
 void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, OutputIteratorType out)
 {
     if (codepoint < 0x10000)
@@ -731,7 +724,8 @@ void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, Outpu
 
 //==================================================================================================
 template <typename CharType>
-template <typename OutputIteratorType, typename CharT, enable_if<size_of_type_is<CharT, 4>>>
+template <typename OutputIteratorType>
+requires fly::SizeOfTypeIs<CharType, 4>
 void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, OutputIteratorType out)
 {
     *out++ = static_cast<CharType>(codepoint);
