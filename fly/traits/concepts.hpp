@@ -1,5 +1,7 @@
 #pragma once
 
+#include "fly/traits/traits.hpp"
+
 #include <concepts>
 #include <type_traits>
 
@@ -28,6 +30,12 @@ concept SameAsAny = (std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<Ts
  */
 template <typename T, typename... Ts>
 concept SameAsAll = (std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<Ts>> && ...);
+
+/**
+ * Concept that is satisified if the given type is the provided size.
+ */
+template <typename T, std::size_t Size>
+concept SizeOfTypeIs = fly::size_of_type_is_v<T, Size>;
 
 /**
  * Concept that is satisified if the given type is a signed integral type.
