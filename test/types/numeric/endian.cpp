@@ -1,6 +1,6 @@
 #include "fly/types/numeric/endian.hpp"
 
-#include "fly/traits/traits.hpp"
+#include "fly/traits/concepts.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"
@@ -11,13 +11,13 @@
 
 namespace {
 
-template <typename T, fly::enable_if<fly::size_of_type_is<T, 1>> = 0>
+template <fly::SizeOfTypeIs<1> T>
 T swap(T x)
 {
     return x;
 }
 
-template <typename T, fly::enable_if<fly::size_of_type_is<T, 2>> = 0>
+template <fly::SizeOfTypeIs<2> T>
 T swap(T x)
 {
     T result = 0;
@@ -28,7 +28,7 @@ T swap(T x)
     return result;
 }
 
-template <typename T, fly::enable_if<fly::size_of_type_is<T, 4>> = 0>
+template <fly::SizeOfTypeIs<4> T>
 T swap(T x)
 {
     T result = 0;
@@ -41,7 +41,7 @@ T swap(T x)
     return result;
 }
 
-template <typename T, fly::enable_if<fly::size_of_type_is<T, 8>> = 0>
+template <fly::SizeOfTypeIs<8> T>
 T swap(T x)
 {
     T result = 0;
