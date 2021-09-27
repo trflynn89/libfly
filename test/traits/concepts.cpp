@@ -137,4 +137,19 @@ CATCH_TEST_CASE("Concepts", "[traits]")
         CATCH_CHECK_FALSE(fly::FloatingPoint<std::string>);
         CATCH_CHECK_FALSE(fly::FloatingPoint<FooClass>);
     }
+
+    CATCH_SECTION("Concept: SizeOfTypeIs")
+    {
+        CATCH_CHECK(fly::SizeOfTypeIs<int, sizeof(int)>);
+        CATCH_CHECK(fly::SizeOfTypeIs<bool, sizeof(bool)>);
+        CATCH_CHECK(fly::SizeOfTypeIs<FooClass, sizeof(FooClass)>);
+
+        CATCH_CHECK_FALSE(fly::SizeOfTypeIs<int, sizeof(int) - 1>);
+        CATCH_CHECK_FALSE(fly::SizeOfTypeIs<bool, sizeof(bool) - 1>);
+        CATCH_CHECK_FALSE(fly::SizeOfTypeIs<FooClass, sizeof(FooClass) - 1>);
+
+        CATCH_CHECK_FALSE(fly::SizeOfTypeIs<int, sizeof(int) + 1>);
+        CATCH_CHECK_FALSE(fly::SizeOfTypeIs<bool, sizeof(bool) + 1>);
+        CATCH_CHECK_FALSE(fly::SizeOfTypeIs<FooClass, sizeof(FooClass) + 1>);
+    }
 }
