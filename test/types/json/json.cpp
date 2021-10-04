@@ -359,6 +359,421 @@ CATCH_TEST_CASE("Json", "[json]")
         CATCH_CHECK(float1 != unsigned3);
     }
 
+    CATCH_SECTION("Compare JSON instances with relativity operators")
+    {
+        fly::Json string1 = "abc";
+        fly::Json string2 = "def";
+
+        fly::Json object1 = {{"a", 1}, {"b", 2}};
+        fly::Json object2 = {{"c", 1}, {"d", 2}};
+
+        fly::Json array1 = {'7', 8};
+        fly::Json array2 = {'9', 0};
+
+        fly::Json boolean1 = false;
+        fly::Json boolean2 = true;
+
+        fly::Json sign1 = 1;
+        fly::Json sign2 = 2;
+
+        fly::Json unsign1 = static_cast<unsigned int>(1);
+        fly::Json unsign2 = static_cast<unsigned int>(2);
+
+        fly::Json floating1 = 1.0f;
+        fly::Json floating2 = 2.0f;
+
+        fly::Json null1 = nullptr;
+        fly::Json null2;
+
+        CATCH_SECTION("Compare JSON instances with less-than relativity")
+        {
+            CATCH_CHECK_FALSE(null1 < null1);
+            CATCH_CHECK_FALSE(null1 < null2);
+            CATCH_CHECK_FALSE(null2 < null1);
+            CATCH_CHECK(null1 < string1);
+            CATCH_CHECK(null1 < object1);
+            CATCH_CHECK(null1 < array1);
+            CATCH_CHECK(null1 < boolean1);
+            CATCH_CHECK(null1 < sign1);
+            CATCH_CHECK(null1 < unsign1);
+            CATCH_CHECK(null1 < floating1);
+
+            CATCH_CHECK_FALSE(string1 < string1);
+            CATCH_CHECK(string1 < string2);
+            CATCH_CHECK_FALSE(string2 < string1);
+            CATCH_CHECK_FALSE(string1 < null1);
+            CATCH_CHECK(string1 < object1);
+            CATCH_CHECK(string1 < array1);
+            CATCH_CHECK(string1 < boolean1);
+            CATCH_CHECK(string1 < sign1);
+            CATCH_CHECK(string1 < unsign1);
+            CATCH_CHECK(string1 < floating1);
+
+            CATCH_CHECK_FALSE(object1 < object1);
+            CATCH_CHECK(object1 < object2);
+            CATCH_CHECK_FALSE(object2 < object1);
+            CATCH_CHECK_FALSE(object1 < null1);
+            CATCH_CHECK_FALSE(object1 < string1);
+            CATCH_CHECK(object1 < array1);
+            CATCH_CHECK(object1 < boolean1);
+            CATCH_CHECK(object1 < sign1);
+            CATCH_CHECK(object1 < unsign1);
+            CATCH_CHECK(object1 < floating1);
+
+            CATCH_CHECK_FALSE(array1 < array1);
+            CATCH_CHECK(array1 < array2);
+            CATCH_CHECK_FALSE(array2 < array1);
+            CATCH_CHECK_FALSE(array1 < null1);
+            CATCH_CHECK_FALSE(array1 < string1);
+            CATCH_CHECK_FALSE(array1 < object1);
+            CATCH_CHECK(array1 < boolean1);
+            CATCH_CHECK(array1 < sign1);
+            CATCH_CHECK(array1 < unsign1);
+            CATCH_CHECK(array1 < floating1);
+
+            CATCH_CHECK_FALSE(boolean1 < boolean1);
+            CATCH_CHECK(boolean1 < boolean2);
+            CATCH_CHECK_FALSE(boolean2 < boolean1);
+            CATCH_CHECK_FALSE(boolean1 < null1);
+            CATCH_CHECK_FALSE(boolean1 < string1);
+            CATCH_CHECK_FALSE(boolean1 < object1);
+            CATCH_CHECK_FALSE(boolean1 < array1);
+            CATCH_CHECK(boolean1 < sign1);
+            CATCH_CHECK(boolean1 < unsign1);
+            CATCH_CHECK(boolean1 < floating1);
+
+            CATCH_CHECK_FALSE(sign1 < sign1);
+            CATCH_CHECK(sign1 < sign2);
+            CATCH_CHECK_FALSE(sign2 < sign1);
+            CATCH_CHECK_FALSE(sign1 < null1);
+            CATCH_CHECK_FALSE(sign1 < string1);
+            CATCH_CHECK_FALSE(sign1 < object1);
+            CATCH_CHECK_FALSE(sign1 < array1);
+            CATCH_CHECK_FALSE(sign1 < boolean1);
+            CATCH_CHECK_FALSE(sign1 < unsign1);
+            CATCH_CHECK(sign1 < unsign2);
+            CATCH_CHECK_FALSE(sign1 < floating1);
+            CATCH_CHECK(sign1 < floating2);
+
+            CATCH_CHECK_FALSE(unsign1 < unsign1);
+            CATCH_CHECK(unsign1 < unsign2);
+            CATCH_CHECK_FALSE(unsign2 < unsign1);
+            CATCH_CHECK_FALSE(unsign1 < null1);
+            CATCH_CHECK_FALSE(unsign1 < string1);
+            CATCH_CHECK_FALSE(unsign1 < object1);
+            CATCH_CHECK_FALSE(unsign1 < array1);
+            CATCH_CHECK_FALSE(unsign1 < boolean1);
+            CATCH_CHECK_FALSE(unsign1 < sign1);
+            CATCH_CHECK(unsign1 < sign2);
+            CATCH_CHECK_FALSE(unsign1 < floating1);
+            CATCH_CHECK(unsign1 < floating2);
+
+            CATCH_CHECK_FALSE(floating1 < floating1);
+            CATCH_CHECK(floating1 < floating2);
+            CATCH_CHECK_FALSE(floating2 < floating1);
+            CATCH_CHECK_FALSE(floating1 < null1);
+            CATCH_CHECK_FALSE(floating1 < string1);
+            CATCH_CHECK_FALSE(floating1 < object1);
+            CATCH_CHECK_FALSE(floating1 < array1);
+            CATCH_CHECK_FALSE(floating1 < boolean1);
+            CATCH_CHECK_FALSE(floating1 < sign1);
+            CATCH_CHECK(floating1 < sign2);
+            CATCH_CHECK_FALSE(floating1 < unsign1);
+            CATCH_CHECK(floating1 < unsign2);
+        }
+
+        CATCH_SECTION("Compare JSON instances with less-than-or-equal relativity")
+        {
+            CATCH_CHECK(null1 <= null1);
+            CATCH_CHECK(null1 <= null2);
+            CATCH_CHECK(null2 <= null1);
+            CATCH_CHECK(null1 <= string1);
+            CATCH_CHECK(null1 <= object1);
+            CATCH_CHECK(null1 <= array1);
+            CATCH_CHECK(null1 <= boolean1);
+            CATCH_CHECK(null1 <= sign1);
+            CATCH_CHECK(null1 <= unsign1);
+            CATCH_CHECK(null1 <= floating1);
+
+            CATCH_CHECK(string1 <= string1);
+            CATCH_CHECK(string1 <= string2);
+            CATCH_CHECK_FALSE(string2 <= string1);
+            CATCH_CHECK_FALSE(string1 <= null1);
+            CATCH_CHECK(string1 <= object1);
+            CATCH_CHECK(string1 <= array1);
+            CATCH_CHECK(string1 <= boolean1);
+            CATCH_CHECK(string1 <= sign1);
+            CATCH_CHECK(string1 <= unsign1);
+            CATCH_CHECK(string1 <= floating1);
+
+            CATCH_CHECK(object1 <= object1);
+            CATCH_CHECK(object1 <= object2);
+            CATCH_CHECK_FALSE(object2 <= object1);
+            CATCH_CHECK_FALSE(object1 <= null1);
+            CATCH_CHECK_FALSE(object1 <= string1);
+            CATCH_CHECK(object1 <= array1);
+            CATCH_CHECK(object1 <= boolean1);
+            CATCH_CHECK(object1 <= sign1);
+            CATCH_CHECK(object1 <= unsign1);
+            CATCH_CHECK(object1 <= floating1);
+
+            CATCH_CHECK(array1 <= array1);
+            CATCH_CHECK(array1 <= array2);
+            CATCH_CHECK_FALSE(array2 <= array1);
+            CATCH_CHECK_FALSE(array1 <= null1);
+            CATCH_CHECK_FALSE(array1 <= string1);
+            CATCH_CHECK_FALSE(array1 <= object1);
+            CATCH_CHECK(array1 <= boolean1);
+            CATCH_CHECK(array1 <= sign1);
+            CATCH_CHECK(array1 <= unsign1);
+            CATCH_CHECK(array1 <= floating1);
+
+            CATCH_CHECK(boolean1 <= boolean1);
+            CATCH_CHECK(boolean1 <= boolean2);
+            CATCH_CHECK_FALSE(boolean2 <= boolean1);
+            CATCH_CHECK_FALSE(boolean1 <= null1);
+            CATCH_CHECK_FALSE(boolean1 <= string1);
+            CATCH_CHECK_FALSE(boolean1 <= object1);
+            CATCH_CHECK_FALSE(boolean1 <= array1);
+            CATCH_CHECK(boolean1 <= sign1);
+            CATCH_CHECK(boolean1 <= unsign1);
+            CATCH_CHECK(boolean1 <= floating1);
+
+            CATCH_CHECK(sign1 <= sign1);
+            CATCH_CHECK(sign1 <= sign2);
+            CATCH_CHECK_FALSE(sign2 <= sign1);
+            CATCH_CHECK_FALSE(sign1 <= null1);
+            CATCH_CHECK_FALSE(sign1 <= string1);
+            CATCH_CHECK_FALSE(sign1 <= object1);
+            CATCH_CHECK_FALSE(sign1 <= array1);
+            CATCH_CHECK_FALSE(sign1 <= boolean1);
+            CATCH_CHECK(sign1 <= unsign1);
+            CATCH_CHECK(sign1 <= unsign2);
+            CATCH_CHECK(sign1 <= floating1);
+            CATCH_CHECK(sign1 <= floating2);
+
+            CATCH_CHECK(unsign1 <= unsign1);
+            CATCH_CHECK(unsign1 <= unsign2);
+            CATCH_CHECK_FALSE(unsign2 <= unsign1);
+            CATCH_CHECK_FALSE(unsign1 <= null1);
+            CATCH_CHECK_FALSE(unsign1 <= string1);
+            CATCH_CHECK_FALSE(unsign1 <= object1);
+            CATCH_CHECK_FALSE(unsign1 <= array1);
+            CATCH_CHECK_FALSE(unsign1 <= boolean1);
+            CATCH_CHECK(unsign1 <= sign1);
+            CATCH_CHECK(unsign1 <= sign2);
+            CATCH_CHECK(unsign1 <= floating1);
+            CATCH_CHECK(unsign1 <= floating2);
+
+            CATCH_CHECK(floating1 <= floating1);
+            CATCH_CHECK(floating1 <= floating2);
+            CATCH_CHECK_FALSE(floating2 <= floating1);
+            CATCH_CHECK_FALSE(floating1 <= null1);
+            CATCH_CHECK_FALSE(floating1 <= string1);
+            CATCH_CHECK_FALSE(floating1 <= object1);
+            CATCH_CHECK_FALSE(floating1 <= array1);
+            CATCH_CHECK_FALSE(floating1 <= boolean1);
+            CATCH_CHECK(floating1 <= sign1);
+            CATCH_CHECK(floating1 <= sign2);
+            CATCH_CHECK(floating1 <= unsign1);
+            CATCH_CHECK(floating1 <= unsign2);
+        }
+
+        CATCH_SECTION("Compare JSON instances with greater-than relativity")
+        {
+            CATCH_CHECK_FALSE(null1 > null1);
+            CATCH_CHECK_FALSE(null1 > null2);
+            CATCH_CHECK_FALSE(null2 > null1);
+            CATCH_CHECK_FALSE(null1 > string1);
+            CATCH_CHECK_FALSE(null1 > object1);
+            CATCH_CHECK_FALSE(null1 > array1);
+            CATCH_CHECK_FALSE(null1 > boolean1);
+            CATCH_CHECK_FALSE(null1 > sign1);
+            CATCH_CHECK_FALSE(null1 > unsign1);
+            CATCH_CHECK_FALSE(null1 > floating1);
+
+            CATCH_CHECK_FALSE(string1 > string1);
+            CATCH_CHECK_FALSE(string1 > string2);
+            CATCH_CHECK(string2 > string1);
+            CATCH_CHECK(string1 > null1);
+            CATCH_CHECK_FALSE(string1 > object1);
+            CATCH_CHECK_FALSE(string1 > array1);
+            CATCH_CHECK_FALSE(string1 > boolean1);
+            CATCH_CHECK_FALSE(string1 > sign1);
+            CATCH_CHECK_FALSE(string1 > unsign1);
+            CATCH_CHECK_FALSE(string1 > floating1);
+
+            CATCH_CHECK_FALSE(object1 > object1);
+            CATCH_CHECK_FALSE(object1 > object2);
+            CATCH_CHECK(object2 > object1);
+            CATCH_CHECK(object1 > null1);
+            CATCH_CHECK(object1 > string1);
+            CATCH_CHECK_FALSE(object1 > array1);
+            CATCH_CHECK_FALSE(object1 > boolean1);
+            CATCH_CHECK_FALSE(object1 > sign1);
+            CATCH_CHECK_FALSE(object1 > unsign1);
+            CATCH_CHECK_FALSE(object1 > floating1);
+
+            CATCH_CHECK_FALSE(array1 > array1);
+            CATCH_CHECK_FALSE(array1 > array2);
+            CATCH_CHECK(array2 > array1);
+            CATCH_CHECK(array1 > null1);
+            CATCH_CHECK(array1 > string1);
+            CATCH_CHECK(array1 > object1);
+            CATCH_CHECK_FALSE(array1 > boolean1);
+            CATCH_CHECK_FALSE(array1 > sign1);
+            CATCH_CHECK_FALSE(array1 > unsign1);
+            CATCH_CHECK_FALSE(array1 > floating1);
+
+            CATCH_CHECK_FALSE(boolean1 > boolean1);
+            CATCH_CHECK_FALSE(boolean1 > boolean2);
+            CATCH_CHECK(boolean2 > boolean1);
+            CATCH_CHECK(boolean1 > null1);
+            CATCH_CHECK(boolean1 > string1);
+            CATCH_CHECK(boolean1 > object1);
+            CATCH_CHECK(boolean1 > array1);
+            CATCH_CHECK_FALSE(boolean1 > sign1);
+            CATCH_CHECK_FALSE(boolean1 > unsign1);
+            CATCH_CHECK_FALSE(boolean1 > floating1);
+
+            CATCH_CHECK_FALSE(sign1 > sign1);
+            CATCH_CHECK_FALSE(sign1 > sign2);
+            CATCH_CHECK(sign2 > sign1);
+            CATCH_CHECK(sign1 > null1);
+            CATCH_CHECK(sign1 > string1);
+            CATCH_CHECK(sign1 > object1);
+            CATCH_CHECK(sign1 > array1);
+            CATCH_CHECK(sign1 > boolean1);
+            CATCH_CHECK_FALSE(sign1 > unsign1);
+            CATCH_CHECK_FALSE(sign1 > unsign2);
+            CATCH_CHECK_FALSE(sign1 > floating1);
+            CATCH_CHECK_FALSE(sign1 > floating2);
+
+            CATCH_CHECK_FALSE(unsign1 > unsign1);
+            CATCH_CHECK_FALSE(unsign1 > unsign2);
+            CATCH_CHECK(unsign2 > unsign1);
+            CATCH_CHECK(unsign1 > null1);
+            CATCH_CHECK(unsign1 > string1);
+            CATCH_CHECK(unsign1 > object1);
+            CATCH_CHECK(unsign1 > array1);
+            CATCH_CHECK(unsign1 > boolean1);
+            CATCH_CHECK_FALSE(unsign1 > sign1);
+            CATCH_CHECK_FALSE(unsign1 > sign2);
+            CATCH_CHECK_FALSE(unsign1 > floating1);
+            CATCH_CHECK_FALSE(unsign1 > floating2);
+
+            CATCH_CHECK_FALSE(floating1 > floating1);
+            CATCH_CHECK_FALSE(floating1 > floating2);
+            CATCH_CHECK(floating2 > floating1);
+            CATCH_CHECK(floating1 > null1);
+            CATCH_CHECK(floating1 > string1);
+            CATCH_CHECK(floating1 > object1);
+            CATCH_CHECK(floating1 > array1);
+            CATCH_CHECK(floating1 > boolean1);
+            CATCH_CHECK_FALSE(floating1 > sign1);
+            CATCH_CHECK_FALSE(floating1 > sign2);
+            CATCH_CHECK_FALSE(floating1 > unsign1);
+            CATCH_CHECK_FALSE(floating1 > unsign2);
+        }
+
+        CATCH_SECTION("Compare JSON instances with greater-than-or-equal relativity")
+        {
+            CATCH_CHECK(null1 >= null1);
+            CATCH_CHECK(null1 >= null2);
+            CATCH_CHECK(null2 >= null1);
+            CATCH_CHECK_FALSE(null1 >= string1);
+            CATCH_CHECK_FALSE(null1 >= object1);
+            CATCH_CHECK_FALSE(null1 >= array1);
+            CATCH_CHECK_FALSE(null1 >= boolean1);
+            CATCH_CHECK_FALSE(null1 >= sign1);
+            CATCH_CHECK_FALSE(null1 >= unsign1);
+            CATCH_CHECK_FALSE(null1 >= floating1);
+
+            CATCH_CHECK(string1 >= string1);
+            CATCH_CHECK_FALSE(string1 >= string2);
+            CATCH_CHECK(string2 >= string1);
+            CATCH_CHECK(string1 >= null1);
+            CATCH_CHECK_FALSE(string1 >= object1);
+            CATCH_CHECK_FALSE(string1 >= array1);
+            CATCH_CHECK_FALSE(string1 >= boolean1);
+            CATCH_CHECK_FALSE(string1 >= sign1);
+            CATCH_CHECK_FALSE(string1 >= unsign1);
+            CATCH_CHECK_FALSE(string1 >= floating1);
+
+            CATCH_CHECK(object1 >= object1);
+            CATCH_CHECK_FALSE(object1 >= object2);
+            CATCH_CHECK(object2 >= object1);
+            CATCH_CHECK(object1 >= null1);
+            CATCH_CHECK(object1 >= string1);
+            CATCH_CHECK_FALSE(object1 >= array1);
+            CATCH_CHECK_FALSE(object1 >= boolean1);
+            CATCH_CHECK_FALSE(object1 >= sign1);
+            CATCH_CHECK_FALSE(object1 >= unsign1);
+            CATCH_CHECK_FALSE(object1 >= floating1);
+
+            CATCH_CHECK(array1 >= array1);
+            CATCH_CHECK_FALSE(array1 >= array2);
+            CATCH_CHECK(array2 >= array1);
+            CATCH_CHECK(array1 >= null1);
+            CATCH_CHECK(array1 >= string1);
+            CATCH_CHECK(array1 >= object1);
+            CATCH_CHECK_FALSE(array1 >= boolean1);
+            CATCH_CHECK_FALSE(array1 >= sign1);
+            CATCH_CHECK_FALSE(array1 >= unsign1);
+            CATCH_CHECK_FALSE(array1 >= floating1);
+
+            CATCH_CHECK(boolean1 >= boolean1);
+            CATCH_CHECK_FALSE(boolean1 >= boolean2);
+            CATCH_CHECK(boolean2 >= boolean1);
+            CATCH_CHECK(boolean1 >= null1);
+            CATCH_CHECK(boolean1 >= string1);
+            CATCH_CHECK(boolean1 >= object1);
+            CATCH_CHECK(boolean1 >= array1);
+            CATCH_CHECK_FALSE(boolean1 >= sign1);
+            CATCH_CHECK_FALSE(boolean1 >= unsign1);
+            CATCH_CHECK_FALSE(boolean1 >= floating1);
+
+            CATCH_CHECK(sign1 >= sign1);
+            CATCH_CHECK_FALSE(sign1 >= sign2);
+            CATCH_CHECK(sign2 >= sign1);
+            CATCH_CHECK(sign1 >= null1);
+            CATCH_CHECK(sign1 >= string1);
+            CATCH_CHECK(sign1 >= object1);
+            CATCH_CHECK(sign1 >= array1);
+            CATCH_CHECK(sign1 >= boolean1);
+            CATCH_CHECK(sign1 >= unsign1);
+            CATCH_CHECK_FALSE(sign1 >= unsign2);
+            CATCH_CHECK(sign1 >= floating1);
+            CATCH_CHECK_FALSE(sign1 >= floating2);
+
+            CATCH_CHECK(unsign1 >= unsign1);
+            CATCH_CHECK_FALSE(unsign1 >= unsign2);
+            CATCH_CHECK(unsign2 >= unsign1);
+            CATCH_CHECK(unsign1 >= null1);
+            CATCH_CHECK(unsign1 >= string1);
+            CATCH_CHECK(unsign1 >= object1);
+            CATCH_CHECK(unsign1 >= array1);
+            CATCH_CHECK(unsign1 >= boolean1);
+            CATCH_CHECK(unsign1 >= sign1);
+            CATCH_CHECK_FALSE(unsign1 >= sign2);
+            CATCH_CHECK(unsign1 >= floating1);
+            CATCH_CHECK_FALSE(unsign1 >= floating2);
+
+            CATCH_CHECK(floating1 >= floating1);
+            CATCH_CHECK_FALSE(floating1 >= floating2);
+            CATCH_CHECK(floating2 >= floating1);
+            CATCH_CHECK(floating1 >= null1);
+            CATCH_CHECK(floating1 >= string1);
+            CATCH_CHECK(floating1 >= object1);
+            CATCH_CHECK(floating1 >= array1);
+            CATCH_CHECK(floating1 >= boolean1);
+            CATCH_CHECK(floating1 >= sign1);
+            CATCH_CHECK_FALSE(floating1 >= sign2);
+            CATCH_CHECK(floating1 >= unsign1);
+            CATCH_CHECK_FALSE(floating1 >= unsign2);
+        }
+    }
+
     CATCH_SECTION("Serialize a JSON instance")
     {
         fly::Json string = "abc";

@@ -1385,6 +1385,51 @@ public:
      */
     friend bool operator!=(const_reference json1, const_reference json2);
 
+    /**
+     * Less-than operator. The first Json instance is less-than the second Json instance if one of
+     * the following is true:
+     *
+     * 1. One of the two JSON types are floating-point, the other is a numeric type (signed,
+     *    unsigned, or float) and the default less-than operator returns true after converting both
+     *    types to floating-point.
+     * 2. The two Json instances are an integer type (signed or unsigned) and have the default
+     *    less-than operator returns true after converting the second Json value to the same type as
+     *    the first Json value.
+     * 3. The two Json instances are of the same type and the default less-than operator returns
+     *    true.
+     * 4. The two Json instances are of incompatible types and the type of the first Json instance
+     *    is considered less-than the type of the second Json instance. The ordering is determined
+     *    by the order of the types listed in the fly::json_type alias.
+     *
+     * @return True if the first Json instance is less-than the second Json instance.
+     */
+    friend bool operator<(const_reference json1, const_reference json2);
+
+    /**
+     * Less-than-or-equal-to operator. The first Json instance is less-than-or-equal-to the second
+     * Json instance if any of the conditions of the equality or less-than operators are met.
+     *
+     * @return True if the first Json instance is less-than-or-equal-to the second Json instance.
+     */
+    friend bool operator<=(const_reference json1, const_reference json2);
+
+    /**
+     * Greater-than operator. The first Json instance is greater-than the second Json instance if
+     * none of the conditions of the less-than-or-equal-to operator are met.
+     *
+     * @return True if the first Json instance is greater-than the second Json instance.
+     */
+    friend bool operator>(const_reference json1, const_reference json2);
+
+    /**
+     * Greater-than-or-equal-to operator. The first Json instance is greater-than-or-equal-to the
+     * second Json instance if any of the conditions of the equality or greater-than operators are
+     * met.
+     *
+     * @return True if the first Json instance is greater-than-or-equal-to the second Json instance.
+     */
+    friend bool operator>=(const_reference json1, const_reference json2);
+
 private:
     friend iterator;
     friend const_iterator;
