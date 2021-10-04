@@ -7,12 +7,14 @@
 #include "fly/types/json/json_concepts.hpp"
 #include "fly/types/json/json_exception.hpp"
 #include "fly/types/json/json_types.hpp"
+#include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <functional>
 #include <initializer_list>
 #include <map>
 #include <optional>
@@ -1386,6 +1388,7 @@ public:
 private:
     friend iterator;
     friend const_iterator;
+    friend struct std::hash<Json>;
 
     /**
      * Convert any string-like type to a JSON string and validate that string for compliance.
@@ -2091,5 +2094,82 @@ struct fly::Formatter<fly::Json, CharType> :
             // The JSON string will have been validated for Unicode compliance during construction.
             fly::Formatter<string_type, CharType>::format(*serialized, context);
         }
+    }
+};
+
+//==================================================================================================
+template <>
+struct std::hash<fly::Json>
+{
+    /**
+     * Hash a JSON value using std::hash specializations for the underlying JSON types.
+     *
+     * @param json The JSON value to hash.
+     *
+     * @return The hashed JSON value.
+     */
+    std::size_t operator()(const fly::Json &json) const
+    {
+        std::size_t type = json.m_value.index();
+
+        auto visitor = [type](const auto &storage) -> std::size_t
+        {
+            using S = decltype(storage);
+
+            if constexpr (fly::JsonNull<S>)
+            {
+                return hash_combine(type, 0);
+            }
+            else if constexpr (fly::JsonObject<S>)
+            {
+                std::hash<typename fly::json_object_type::key_type> key_hasher {};
+                std::hash<typename fly::json_object_type::mapped_type> value_hasher {};
+                std::size_t result = hash_combine(type, storage.size());
+
+                for (const auto &value : storage)
+                {
+                    result = hash_combine(result, key_hasher(value.first));
+                    result = hash_combine(result, value_hasher(value.second));
+                }
+
+                return result;
+            }
+            else if constexpr (fly::JsonArray<S>)
+            {
+                std::hash<typename fly::json_array_type::value_type> hasher {};
+                std::size_t result = hash_combine(type, storage.size());
+
+                for (const auto &value : storage)
+                {
+                    result = hash_combine(result, hasher(value));
+                }
+
+                return result;
+            }
+            else
+            {
+                std::hash<std::remove_cvref_t<S>> hasher {};
+                return hash_combine(type, hasher(storage));
+            }
+        };
+
+        return std::visit(std::move(visitor), json.m_value);
+    }
+
+private:
+    /**
+     * Combine two hashed values into a single hash.
+     *
+     * @param value1 The first hash value to combine.
+     * @param value2 The second hash value to combine.
+     *
+     * @return The combined hash value.
+     */
+    static constexpr std::size_t hash_combine(std::size_t value1, std::size_t value2)
+    {
+        using namespace fly::literals::numeric_literals;
+
+        value1 ^= value2 + 0x9e3779b9_zu + (value1 << 6_zu) + (value1 >> 2_zu);
+        return value1;
     }
 };
