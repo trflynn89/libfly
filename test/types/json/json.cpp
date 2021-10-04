@@ -7,6 +7,7 @@
 #include <array>
 #include <deque>
 #include <forward_list>
+#include <functional>
 #include <list>
 #include <map>
 #include <set>
@@ -417,6 +418,67 @@ CATCH_TEST_CASE("Json", "[json]")
             fly::Json json = "abc\xf0\x9f\x8d\x95zef";
             CATCH_CHECK(json.serialize() == FLY_JSON_STR("\"abc\\ud83c\\udf55zef\""));
         }
+    }
+
+    CATCH_SECTION("Hash a JSON instance")
+    {
+        fly::Json string1 = "abc";
+        fly::Json string2 = "def";
+
+        fly::Json object1 = {{"a", 1}, {"b", 2}};
+        fly::Json object2 = {{"c", 1}, {"d", 2}};
+
+        fly::Json array1 = {'7', 8};
+        fly::Json array2 = {'9', 0};
+
+        fly::Json boolean1 = true;
+        fly::Json boolean2 = false;
+
+        fly::Json sign1 = 1;
+        fly::Json sign2 = 2;
+
+        fly::Json unsign1 = static_cast<unsigned int>(1);
+        fly::Json unsign2 = static_cast<unsigned int>(2);
+
+        fly::Json floating1 = 1.0f;
+        fly::Json floating2 = 2.0f;
+
+        fly::Json null1 = nullptr;
+        fly::Json null2;
+
+        std::hash<fly::Json> hasher {};
+
+        CATCH_CHECK(hasher(string1) != 0);
+        CATCH_CHECK(hasher(string1) == hasher(string1));
+        CATCH_CHECK(hasher(string1) != hasher(string2));
+
+        CATCH_CHECK(hasher(object1) != 0);
+        CATCH_CHECK(hasher(object1) == hasher(object1));
+        CATCH_CHECK(hasher(object1) != hasher(object2));
+
+        CATCH_CHECK(hasher(array1) != 0);
+        CATCH_CHECK(hasher(array1) == hasher(array1));
+        CATCH_CHECK(hasher(array1) != hasher(array2));
+
+        CATCH_CHECK(hasher(boolean1) != 0);
+        CATCH_CHECK(hasher(boolean1) == hasher(boolean1));
+        CATCH_CHECK(hasher(boolean1) != hasher(boolean2));
+
+        CATCH_CHECK(hasher(sign1) != 0);
+        CATCH_CHECK(hasher(sign1) == hasher(sign1));
+        CATCH_CHECK(hasher(sign1) != hasher(sign2));
+
+        CATCH_CHECK(hasher(unsign1) != 0);
+        CATCH_CHECK(hasher(unsign1) == hasher(unsign1));
+        CATCH_CHECK(hasher(unsign1) != hasher(unsign2));
+
+        CATCH_CHECK(hasher(floating1) != 0);
+        CATCH_CHECK(hasher(floating1) == hasher(floating1));
+        CATCH_CHECK(hasher(floating1) != hasher(floating2));
+
+        CATCH_CHECK(hasher(null1) != 0);
+        CATCH_CHECK(hasher(null1) == hasher(null1));
+        CATCH_CHECK(hasher(null1) == hasher(null2));
     }
 }
 
