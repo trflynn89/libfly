@@ -87,16 +87,10 @@ public:
      */
     constexpr port_type port() const;
 
-#if defined(FLY_LINUX)
+#if defined(FLY_MACOS)
     /**
-     * Three-way-comparison operator. Defaulted to perform the comparison on the underlying IP
-     * address and port.
-     */
-    auto operator<=>(const Endpoint &) const = default;
-#else
-    /**
-     * Comparison operators. Only Clang and GCC fully support the three-way comparison operator, so
-     * these must be manually defined on other platforms.
+     * Comparison operators. Apple's Clang does not fully support the three-way comparison operator,
+     * so these must be manually defined.
      */
     constexpr bool operator==(const Endpoint &endpoint) const;
     constexpr bool operator!=(const Endpoint &endpoint) const;
@@ -104,6 +98,12 @@ public:
     constexpr bool operator<=(const Endpoint &endpoint) const;
     constexpr bool operator>(const Endpoint &endpoint) const;
     constexpr bool operator>=(const Endpoint &endpoint) const;
+#else
+    /**
+     * Three-way-comparison operator. Defaulted to perform the comparison on the underlying IP
+     * address and port.
+     */
+    auto operator<=>(const Endpoint &) const = default;
 #endif
 
 private:
@@ -204,7 +204,7 @@ constexpr port_type Endpoint<IPAddressType>::port() const
     return m_port;
 }
 
-#if !defined(FLY_LINUX)
+#if defined(FLY_MACOS)
 
 //==================================================================================================
 template <typename IPAddressType>

@@ -93,15 +93,10 @@ public:
      */
     constexpr void copy(address_type::value_type (&address)[16]) const;
 
-#if defined(FLY_LINUX)
+#if defined(FLY_MACOS)
     /**
-     * Three-way-comparison operator. Defaulted to perform the comparison on the IPv6 array data.
-     */
-    auto operator<=>(const IPv6Address &) const = default;
-#else
-    /**
-     * Comparison operators. Only Clang and GCC fully support the three-way comparison operator, so
-     * these must be manually defined on other platforms.
+     * Comparison operators. Apple's Clang does not fully support the three-way comparison operator,
+     * so these must be manually defined.
      */
     constexpr bool operator==(const IPv6Address &address) const;
     constexpr bool operator!=(const IPv6Address &address) const;
@@ -109,6 +104,11 @@ public:
     constexpr bool operator<=(const IPv6Address &address) const;
     constexpr bool operator>(const IPv6Address &address) const;
     constexpr bool operator>=(const IPv6Address &address) const;
+#else
+    /**
+     * Three-way-comparison operator. Defaulted to perform the comparison on the IPv6 array data.
+     */
+    auto operator<=>(const IPv6Address &) const = default;
 #endif
 
 private:
@@ -207,7 +207,7 @@ constexpr void IPv6Address::copy(address_type::value_type (&address)[16]) const
     std::copy(m_address.begin(), m_address.end(), std::begin(address));
 }
 
-#if !defined(FLY_LINUX)
+#if defined(FLY_MACOS)
 
 //==================================================================================================
 constexpr bool IPv6Address::operator==(const IPv6Address &address) const
