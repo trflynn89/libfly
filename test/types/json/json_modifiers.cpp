@@ -502,17 +502,15 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Swap a JSON instance with an array-like type")
     {
-        auto validate2 = [&json](auto *name, auto &test1, auto &test2)
+        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name)
         {
             CATCH_CAPTURE(name);
             json = {1, 2};
 
-            using T1 = std::decay_t<decltype(test1)>;
-            using T2 = std::decay_t<decltype(test2)>;
-
-            test1 = T1 {10, 20, 30, 40};
-            test2 =
+            auto test1 = T1 {10, 20, 30, 40};
+            auto test2 =
                 T2 {FLY_JSON_STR("50"), FLY_JSON_STR("60"), FLY_JSON_STR("70"), FLY_JSON_STR("80")};
+            auto test3 = T3 {"a", 90, "b", 100};
 
             CATCH_CHECK_NOTHROW(json.swap(test1));
             CATCH_CHECK(T1(json) == T1 {10, 20, 30, 40});
@@ -535,24 +533,17 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             CATCH_CHECK_NOTHROW(json.swap(test1));
             CATCH_CHECK(T1(json) == T1 {1, 2});
             CATCH_CHECK(test1 == T1 {50, 60, 70, 80});
-        };
 
-        auto validate3 = [&json, &validate2](auto *name, auto &test1, auto &test2, auto &test3)
-        {
-            validate2(name, test1, test2);
             json = {nullptr, true};
-
-            using T3 = std::decay_t<decltype(test3)>;
-            test3 = T3 {"a", 90, "b", 100};
-
             CATCH_CHECK_NOTHROW(json.swap(test3));
-            CATCH_CHECK(json == T3 {"a", 90, "b", 100});
+            CATCH_CHECK(T3(json) == T3 {"a", 90, "b", 100});
             CATCH_CHECK(test3 == T3 {nullptr, true});
         };
 
-        auto invalidate = [&json](const char *name, auto &test)
+        auto invalidate = [&json]<typename T>(const char *name)
         {
             CATCH_CAPTURE(name);
+            T test {};
 
             CATCH_CHECK_THROWS_JSON(
                 json.swap(test),
@@ -561,8 +552,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
         };
 
         fly::test::run_test_for_array_types<json_type, fly::json_string_type>(
-            std::move(validate2),
-            std::move(validate3),
+            std::move(validate),
             std::move(invalidate));
     }
 
@@ -822,18 +812,14 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
 
     CATCH_SECTION("Swap a JSON instance with an object-like type")
     {
-        auto validate = [&json](auto *name, auto &test1, auto &test2, auto &test3)
+        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name)
         {
-            json = {{J_STR("c"), 100}, {J_STR("d"), 200}};
             CATCH_CAPTURE(name);
+            json = {{J_STR("c"), 100}, {J_STR("d"), 200}};
 
-            using T1 = std::decay_t<decltype(test1)>;
-            using T2 = std::decay_t<decltype(test2)>;
-            using T3 = std::decay_t<decltype(test3)>;
-
-            test1 = T1 {{J_STR("a"), 2}, {J_STR("b"), 4}};
-            test2 = T2 {{J_STR("a"), "2"}, {J_STR("b"), "4"}};
-            test3 = T3 {{J_STR("a"), 5}, {J_STR("b"), "6"}};
+            auto test1 = T1 {{J_STR("a"), 2}, {J_STR("b"), 4}};
+            auto test2 = T2 {{J_STR("a"), "2"}, {J_STR("b"), "4"}};
+            auto test3 = T3 {{J_STR("a"), 5}, {J_STR("b"), "6"}};
 
             CATCH_CHECK_NOTHROW(json.swap(test1));
             CATCH_CHECK(json == T1 {{J_STR("a"), 2}, {J_STR("b"), 4}});
@@ -852,9 +838,10 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
             CATCH_CHECK(test1 == T1 {{J_STR("a"), 5}, {J_STR("b"), 6}});
         };
 
-        auto invalidate = [&json](auto *name, auto &test)
+        auto invalidate = [&json]<typename T>(const char *name)
         {
             CATCH_CAPTURE(name);
+            T test {};
 
             CATCH_CHECK_THROWS_JSON(
                 json.swap(test),
@@ -869,18 +856,14 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
 
     CATCH_SECTION("Merge an object-like type into a JSON instance")
     {
-        auto validate = [&json](auto *name, auto &test1, auto &test2, auto &test3)
+        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name)
         {
             json = fly::test::create_json<json_type, string_type>();
             CATCH_CAPTURE(name);
 
-            using T1 = std::decay_t<decltype(test1)>;
-            using T2 = std::decay_t<decltype(test2)>;
-            using T3 = std::decay_t<decltype(test3)>;
-
-            test1 = T1 {{J_STR("c"), 3}, {J_STR("d"), 4}};
-            test2 = T2 {{J_STR("d"), "5"}, {J_STR("e"), "6"}};
-            test3 = T3 {{J_STR("f"), 7}, {J_STR("g"), "8"}};
+            auto test1 = T1 {{J_STR("c"), 3}, {J_STR("d"), 4}};
+            auto test2 = T2 {{J_STR("d"), "5"}, {J_STR("e"), "6"}};
+            auto test3 = T3 {{J_STR("f"), 7}, {J_STR("g"), "8"}};
 
             CATCH_CHECK_NOTHROW(json.merge(test1));
             CATCH_REQUIRE(json.contains(J_STR("c")));
@@ -909,9 +892,10 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
             CATCH_CHECK(json[J_STR("g")] == "8");
         };
 
-        auto invalidate = [&json](auto *name, auto &test)
+        auto invalidate = [&json]<typename T>(const char *name)
         {
             CATCH_CAPTURE(name);
+            T test {};
 
             CATCH_CHECK_THROWS_JSON(json.merge(test), "JSON type invalid for merging: ({})", json);
             CATCH_CHECK_THROWS_JSON(

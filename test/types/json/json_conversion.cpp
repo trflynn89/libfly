@@ -37,17 +37,13 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to object-like types")
     {
-        auto validate = [&json](auto *name, auto &test1, auto &test2, auto &test3)
+        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name)
         {
             CATCH_CAPTURE(name);
 
-            using T1 = std::decay_t<decltype(test1)>;
-            using T2 = std::decay_t<decltype(test2)>;
-            using T3 = std::decay_t<decltype(test3)>;
-
-            test1 = T1 {{J_STR("a"), 2}, {J_STR("b"), 4}};
-            test2 = T2 {{J_STR("a"), "2"}, {J_STR("b"), "4"}};
-            test3 = T3 {{J_STR("a"), 2}, {J_STR("b"), "4"}};
+            auto test1 = T1 {{J_STR("a"), 2}, {J_STR("b"), 4}};
+            auto test2 = T2 {{J_STR("a"), "2"}, {J_STR("b"), "4"}};
+            auto test3 = T3 {{J_STR("a"), 2}, {J_STR("b"), "4"}};
 
             json = test1;
             CATCH_CHECK(T1(json) == test1);
@@ -69,11 +65,9 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
             CATCH_CHECK_THROWS_JSON(T1(json), "JSON type is not numeric: ({})", json["a"]);
         };
 
-        auto invalidate = [&json](auto *name, auto &test)
+        auto invalidate = [&json]<typename T>(const char *name)
         {
             CATCH_CAPTURE(name);
-
-            using T = std::decay_t<decltype(test)>;
 
             CATCH_CHECK_THROWS_JSON(
                 FLY_UNUSED((T(json))),
@@ -88,15 +82,13 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to array-like types")
     {
-        auto validate2 = [&json](auto *name, auto &test1, auto &test2)
+        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name)
         {
             CATCH_CAPTURE(name);
 
-            using T1 = std::decay_t<decltype(test1)>;
-            using T2 = std::decay_t<decltype(test2)>;
-
-            test1 = T1 {50, 60, 70, 80};
-            test2 = T2 {J_STR("50"), J_STR("60"), J_STR("70"), J_STR("80")};
+            auto test1 = T1 {50, 60, 70, 80};
+            auto test2 = T2 {J_STR("50"), J_STR("60"), J_STR("70"), J_STR("80")};
+            auto test3 = T3 {50, J_STR("60"), 70, J_STR("80")};
 
             json = test1;
             CATCH_CHECK(T1(json) == test1);
@@ -105,6 +97,11 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
             json = test2;
             CATCH_CHECK(T1(json) == test1);
             CATCH_CHECK(T2(json) == test2);
+
+            json = test3;
+            CATCH_CHECK(T1(json) == test1);
+            CATCH_CHECK(T2(json) == test2);
+            CATCH_CHECK(T3(json) == test3);
 
             json = {true};
             CATCH_CHECK_THROWS_JSON(
@@ -119,34 +116,15 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
                 json[0]);
         };
 
-        auto validate3 = [&json, &validate2](auto *name, auto &test1, auto &test2, auto &test3)
-        {
-            validate2(name, test1, test2);
-
-            using T1 = std::decay_t<decltype(test1)>;
-            using T2 = std::decay_t<decltype(test2)>;
-            using T3 = std::decay_t<decltype(test3)>;
-
-            test3 = T3 {50, J_STR("60"), 70, J_STR("80")};
-
-            json = test3;
-            CATCH_CHECK(T1(json) == test1);
-            CATCH_CHECK(T2(json) == test2);
-            CATCH_CHECK(T3(json) == test3);
-        };
-
-        auto invalidate = [&json](auto *name, auto &test)
+        auto invalidate = [&json]<typename T>(const char *name)
         {
             CATCH_CAPTURE(name);
-
-            using T = std::decay_t<decltype(test)>;
 
             CATCH_CHECK_THROWS_JSON(FLY_UNUSED((T(json))), "JSON type is not an array: ({})", json);
         };
 
         fly::test::run_test_for_array_types<json_type, string_type>(
-            std::move(validate2),
-            std::move(validate3),
+            std::move(validate),
             std::move(invalidate));
 
         // Extra test to ensure std::array lengths are accounted for.
