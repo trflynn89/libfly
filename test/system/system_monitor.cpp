@@ -146,9 +146,7 @@ CATCH_TEST_CASE("SystemMonitor", "[system]")
         std::uint64_t system_before = monitor->get_system_memory_usage();
         std::uint64_t process_before = monitor->get_process_memory_usage();
 
-        auto size = static_cast<std::string::size_type>((total_before - system_before) / 10);
-
-        std::string consumed(size, '\0');
+        std::string consumed(4 << 20, '\0');
         task_runner->wait_for_task_to_complete(s_system_monitor_file);
 
         std::uint64_t total_after = monitor->get_total_system_memory();
