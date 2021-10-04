@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <map>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace fly {
@@ -33,5 +34,18 @@ using json_char_type = typename json_string_type::value_type;
  * Alias for the fly::BasicString specialization for the JSON string type.
  */
 using JsonStringType = fly::BasicString<json_char_type>;
+
+/**
+ * Alias for the std::variant holding the JSON types.
+ */
+using json_type = std::variant<
+    json_null_type,
+    json_string_type,
+    json_object_type,
+    json_array_type,
+    json_boolean_type,
+    json_signed_integer_type,
+    json_unsigned_integer_type,
+    json_floating_point_type>;
 
 } // namespace fly

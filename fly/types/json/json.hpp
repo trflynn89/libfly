@@ -157,19 +157,6 @@ namespace fly {
  */
 class Json
 {
-    /**
-     * Alias for the std::variant holding the JSON types.
-     */
-    using json_type = std::variant<
-        json_null_type,
-        json_string_type,
-        json_object_type,
-        json_array_type,
-        json_boolean_type,
-        json_signed_integer_type,
-        json_unsigned_integer_type,
-        json_floating_point_type>;
-
 public:
     /**
      * Aliases for canonical STL container member types.
