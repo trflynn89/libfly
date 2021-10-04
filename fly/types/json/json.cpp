@@ -778,6 +778,61 @@ bool operator!=(Json::const_reference json1, Json::const_reference json2)
 }
 
 //==================================================================================================
+bool operator<(Json::const_reference json1, Json::const_reference json2)
+{
+    auto visitor = [&json1, &json2](const auto &value1, const auto &value2) -> bool
+    {
+        using S1 = decltype(value1);
+        using S2 = decltype(value2);
+
+        if constexpr (JsonNull<S1> && JsonNull<S2>)
+        {
+            return false;
+        }
+        else if constexpr (
+            (JsonFloatingPoint<S1> && JsonNumber<S2>) || (JsonFloatingPoint<S2> && JsonNumber<S1>))
+        {
+            const auto fvalue1 = static_cast<json_floating_point_type>(value1);
+            const auto fvalue2 = static_cast<json_floating_point_type>(value2);
+
+            return fvalue1 < fvalue2;
+        }
+        else if constexpr (JsonNumber<S1> && JsonNumber<S2>)
+        {
+            return value1 < static_cast<S1>(value2);
+        }
+        else if constexpr (fly::SameAsAny<S1, S2>)
+        {
+            return value1 < value2;
+        }
+        else
+        {
+            return json1.m_value.index() < json2.m_value.index();
+        }
+    };
+
+    return std::visit(std::move(visitor), json1.m_value, json2.m_value);
+}
+
+//==================================================================================================
+bool operator<=(Json::const_reference json1, Json::const_reference json2)
+{
+    return !(json2 < json1);
+}
+
+//==================================================================================================
+bool operator>(Json::const_reference json1, Json::const_reference json2)
+{
+    return !(json1 <= json2);
+}
+
+//==================================================================================================
+bool operator>=(Json::const_reference json1, Json::const_reference json2)
+{
+    return !(json1 < json2);
+}
+
+//==================================================================================================
 json_string_type Json::validate_string(json_string_type &&value)
 {
     static constexpr const auto s_null = FLY_JSON_CHR('\0');
