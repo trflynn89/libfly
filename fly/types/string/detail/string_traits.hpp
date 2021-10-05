@@ -17,7 +17,7 @@ using is_supported_string =
 
 template <typename StringType>
 // NOLINTNEXTLINE(readability-identifier-naming)
-inline constexpr bool is_supported_string_v = is_supported_string<StringType>::value;
+constexpr inline bool is_supported_string_v = is_supported_string<StringType>::value;
 
 /**
  * Define a trait for testing if CharType is a supported std::basic_string specialization's
@@ -28,7 +28,7 @@ using is_supported_character = any_same<CharType, char, wchar_t, char8_t, char16
 
 template <typename CharType>
 // NOLINTNEXTLINE(readability-identifier-naming)
-inline constexpr bool is_supported_character_v = is_supported_character<CharType>::value;
+constexpr inline bool is_supported_character_v = is_supported_character<CharType>::value;
 
 /**
  * Define a trait for testing if StringType is like a supported std::basic_string specialization. A
@@ -78,7 +78,7 @@ using is_like_supported_string_t = typename is_like_supported_string<StringType>
 
 template <typename StringType>
 // NOLINTNEXTLINE(readability-identifier-naming)
-inline constexpr bool is_like_supported_string_v = is_like_supported_string<StringType>::value;
+constexpr inline bool is_like_supported_string_v = is_like_supported_string<StringType>::value;
 
 /**
  * Traits for basic properties of standard std::basic_string specializations.

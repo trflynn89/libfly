@@ -140,12 +140,12 @@ namespace fly::test {
 
 template <typename T>
 // NOLINTNEXTLINE(readability-identifier-naming)
-inline constexpr bool is_object_or_array_or_string_v =
+constexpr inline bool is_object_or_array_or_string_v =
     fly::any_same_v<T, fly::json_string_type, fly::json_object_type, fly::json_array_type>;
 
 template <typename T, typename Other>
 // NOLINTNEXTLINE(readability-identifier-naming)
-inline constexpr bool is_null_or_other_type_v = fly::any_same_v<T, fly::json_null_type, Other>;
+constexpr inline bool is_null_or_other_type_v = fly::any_same_v<T, fly::json_null_type, Other>;
 
 template <typename T, typename StringType = fly::json_string_type>
 fly::Json create_json()

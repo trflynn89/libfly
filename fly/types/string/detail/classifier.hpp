@@ -188,7 +188,7 @@ private:
 //==================================================================================================
 template <typename CharType>
 template <StringLike T>
-constexpr inline auto BasicClassifier<CharType>::size(T &&value) -> size_type
+constexpr auto BasicClassifier<CharType>::size(T &&value) -> size_type
 {
     using U = std::remove_cvref_t<T>;
 
@@ -205,7 +205,7 @@ constexpr inline auto BasicClassifier<CharType>::size(T &&value) -> size_type
 //==================================================================================================
 template <typename CharType>
 template <std::size_t N>
-constexpr inline auto BasicClassifier<CharType>::size(const CharType (&value)[N]) -> size_type
+constexpr auto BasicClassifier<CharType>::size(const CharType (&value)[N]) -> size_type
 {
     static_assert(N > 0, "Character arrays must have non-zero size");
     return N - ((value[N - 1] == s_null_terminator) ? 1 : 0);
@@ -213,28 +213,28 @@ constexpr inline auto BasicClassifier<CharType>::size(const CharType (&value)[N]
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicClassifier<CharType>::is_alpha(CharType ch)
+constexpr bool BasicClassifier<CharType>::is_alpha(CharType ch)
 {
     return is_upper(unify_az_characters(ch));
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicClassifier<CharType>::is_upper(CharType ch)
+constexpr bool BasicClassifier<CharType>::is_upper(CharType ch)
 {
     return (ch >= s_upper_a) && (ch <= s_upper_z);
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicClassifier<CharType>::is_lower(CharType ch)
+constexpr bool BasicClassifier<CharType>::is_lower(CharType ch)
 {
     return (ch >= s_lower_a) && (ch <= s_lower_z);
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline CharType BasicClassifier<CharType>::to_upper(CharType ch)
+constexpr CharType BasicClassifier<CharType>::to_upper(CharType ch)
 {
     if (is_lower(ch))
     {
@@ -246,7 +246,7 @@ constexpr inline CharType BasicClassifier<CharType>::to_upper(CharType ch)
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline CharType BasicClassifier<CharType>::to_lower(CharType ch)
+constexpr CharType BasicClassifier<CharType>::to_lower(CharType ch)
 {
     if (is_upper(ch))
     {
@@ -258,14 +258,14 @@ constexpr inline CharType BasicClassifier<CharType>::to_lower(CharType ch)
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicClassifier<CharType>::is_digit(CharType ch)
+constexpr bool BasicClassifier<CharType>::is_digit(CharType ch)
 {
     return (ch ^ s_zero) < 10;
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicClassifier<CharType>::is_x_digit(CharType ch)
+constexpr bool BasicClassifier<CharType>::is_x_digit(CharType ch)
 {
     const auto alpha = unify_az_characters(ch);
     return is_digit(ch) || ((alpha >= s_upper_a) && (alpha <= s_upper_f));
@@ -273,7 +273,7 @@ constexpr inline bool BasicClassifier<CharType>::is_x_digit(CharType ch)
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicClassifier<CharType>::is_space(CharType ch)
+constexpr bool BasicClassifier<CharType>::is_space(CharType ch)
 {
     return (ch == s_space) || (ch == s_form_feed) || (ch == s_line_feed) ||
         (ch == s_carriage_return) || (ch == s_horizontal_tab) || (ch == s_vertical_tab);
@@ -281,7 +281,7 @@ constexpr inline bool BasicClassifier<CharType>::is_space(CharType ch)
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline CharType BasicClassifier<CharType>::unify_az_characters(CharType ch)
+constexpr CharType BasicClassifier<CharType>::unify_az_characters(CharType ch)
 {
     return static_cast<CharType>(static_cast<int_type>(ch) & s_case_mask);
 }

@@ -578,63 +578,63 @@ private:
 //==================================================================================================
 template <typename CharType>
 template <detail::StringLike T>
-constexpr inline auto BasicString<CharType>::size(T &&value) -> size_type
+constexpr auto BasicString<CharType>::size(T &&value) -> size_type
 {
     return detail::BasicClassifier<char_type>::size(std::forward<T>(value));
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicString<CharType>::is_alpha(char_type ch)
+constexpr bool BasicString<CharType>::is_alpha(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_alpha(ch);
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicString<CharType>::is_upper(char_type ch)
+constexpr bool BasicString<CharType>::is_upper(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_upper(ch);
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicString<CharType>::is_lower(char_type ch)
+constexpr bool BasicString<CharType>::is_lower(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_lower(ch);
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicString<CharType>::is_digit(char_type ch)
+constexpr bool BasicString<CharType>::is_digit(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_digit(ch);
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline auto BasicString<CharType>::to_upper(char_type ch) -> char_type
+constexpr auto BasicString<CharType>::to_upper(char_type ch) -> char_type
 {
     return detail::BasicClassifier<char_type>::to_upper(ch);
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline auto BasicString<CharType>::to_lower(char_type ch) -> char_type
+constexpr auto BasicString<CharType>::to_lower(char_type ch) -> char_type
 {
     return detail::BasicClassifier<char_type>::to_lower(ch);
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicString<CharType>::is_x_digit(char_type ch)
+constexpr bool BasicString<CharType>::is_x_digit(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_x_digit(ch);
 }
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline bool BasicString<CharType>::is_space(char_type ch)
+constexpr bool BasicString<CharType>::is_space(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_space(ch);
 }

@@ -82,7 +82,7 @@ struct all_same :
 
 template <typename T, typename A, typename... As>
 // NOLINTNEXTLINE(readability-identifier-naming)
-inline constexpr bool all_same_v = all_same<T, A, As...>::value;
+constexpr inline bool all_same_v = all_same<T, A, As...>::value;
 
 /**
  * Wrapper around std::is_same for testing that any type in a sequence of types are the same as a
@@ -104,7 +104,7 @@ struct any_same :
 
 template <typename T, typename A, typename... As>
 // NOLINTNEXTLINE(readability-identifier-naming)
-inline constexpr bool any_same_v = any_same<T, A, As...>::value;
+constexpr inline bool any_same_v = any_same<T, A, As...>::value;
 
 /**
  * Trait for testing if the size of a given type is the provided size.
@@ -114,7 +114,7 @@ using size_of_type_is = std::bool_constant<sizeof(T) == Size>;
 
 template <typename T, std::size_t Size>
 // NOLINTNEXTLINE(readability-identifier-naming)
-inline constexpr bool size_of_type_is_v = size_of_type_is<T, Size>::value;
+constexpr inline bool size_of_type_is_v = size_of_type_is<T, Size>::value;
 
 /**
  * Overloaded visitation pattern for std::visit. Allows providing a variadic list of lambdas for
