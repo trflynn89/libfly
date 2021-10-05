@@ -2,8 +2,11 @@
 
 #include "fly/traits/traits.hpp"
 #include "fly/types/string/detail/classifier.hpp"
+#include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
+#include "fly/types/string/detail/string_concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/formatters.hpp"
 
 #include <array>
 #include <cstdint>
@@ -27,7 +30,11 @@ struct UserDefinedValue
 {
     const void *m_value;
 
-    void (*m_format)(const void *value, FormatContext &context);
+    void (*m_format)(
+        const void *value,
+        BasicFormatParseContext<typename FormatContext::char_type> &,
+        FormatContext &context,
+        BasicFormatSpecifier<typename FormatContext::char_type> &&specifier);
 };
 
 /**
@@ -77,10 +84,16 @@ struct StandardValue
  * @tparam T The user-defined type.
  *
  * @param value A pointer to the type-erased user-defined value to format.
+ * @param parse_context The context holding the format parsing state.
  * @param context The context holding the formatting state.
+ * @param specifier The replacement field to be replaced.
  */
 template <typename FormatContext, typename T>
-void format_user_defined_value(const void *value, FormatContext &context);
+void format_user_defined_value(
+    const void *value,
+    BasicFormatParseContext<typename FormatContext::char_type> &parse_context,
+    FormatContext &context,
+    BasicFormatSpecifier<typename FormatContext::char_type> &&specifier);
 
 /**
  * Re-form a type-erased string value and format that value.
@@ -177,11 +190,14 @@ public:
     /**
      * Apply the type-erased formatting function to the stored format parameter.
      *
+     * @param parse_context The context holding the format parsing state.
      * @param context The context holding the formatting state.
      * @param specifier The replacement field to be replaced.
      */
-    constexpr void
-    format(FormatContext &context, BasicFormatSpecifier<char_type> &&specifier) const;
+    constexpr void format(
+        BasicFormatParseContext<typename FormatContext::char_type> &parse_context,
+        FormatContext &context,
+        BasicFormatSpecifier<char_type> &&specifier) const;
 
     /**
      * Apply the provided visitor to the stored format parameter.
@@ -271,11 +287,34 @@ constexpr inline auto make_format_parameters(ParameterTypes &&...parameters)
 
 //==================================================================================================
 template <typename FormatContext, typename T>
-inline void format_user_defined_value(const void *value, FormatContext &context)
+inline void format_user_defined_value(
+    const void *value,
+    BasicFormatParseContext<typename FormatContext::char_type> &parse_context,
+    FormatContext &context,
+    BasicFormatSpecifier<typename FormatContext::char_type> &&specifier)
 {
-    typename FormatContext::template formatter_type<T>().format(
-        *static_cast<const T *>(value),
-        context);
+    using Formatter = typename FormatContext::template formatter_type<T>;
+
+    Formatter formatter;
+    parse_context.lexer().set_position(specifier.m_parse_index);
+
+    if constexpr (FormatterWithParsing<decltype(parse_context), Formatter>)
+    {
+        formatter.parse(parse_context);
+    }
+    else
+    {
+        if (!parse_context.lexer().consume_if(FLY_CHR(typename FormatContext::char_type, '}')))
+        {
+            parse_context.on_error(
+                "User-defined formatter without a parse method may not have formatting options");
+        }
+    }
+
+    if (!parse_context.has_error())
+    {
+        formatter.format(*static_cast<const T *>(value), context);
+    }
 }
 
 //==================================================================================================
@@ -443,13 +482,18 @@ constexpr inline BasicFormatParameter<FormatContext>::BasicFormatParameter(T val
 //==================================================================================================
 template <typename FormatContext>
 constexpr inline void BasicFormatParameter<FormatContext>::format(
+    BasicFormatParseContext<typename FormatContext::char_type> &parse_context,
     FormatContext &context,
     BasicFormatSpecifier<char_type> &&specifier) const
 {
     switch (m_type)
     {
         case Type::UserDefined:
-            m_value.m_user_defined.m_format(m_value.m_user_defined.m_value, context);
+            m_value.m_user_defined.m_format(
+                m_value.m_user_defined.m_value,
+                parse_context,
+                context,
+                std::move(specifier));
             break;
         case Type::String:
             m_value.m_string.m_format(

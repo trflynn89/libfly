@@ -439,6 +439,55 @@ public:
      * compile error with a diagnostic message will be raised. On other compilers, the error message
      * will be returned rather than a formatted string.
      *
+     * Replacement fields for user-defined types are parsed at runtime. To format a user-defined
+     * type, a fly::Formatter specialization must be defined, analagous to std::formatter. The
+     * specialization may extend a standard fly::Formatter, for example:
+     *
+     *     template <typename CharType>
+     *     struct fly::Formatter<MyType, CharType> : public fly::Formatter<int, CharType>
+     *     {
+     *         template <typename FormatContext>
+     *         void format(const MyType &value, FormatContext &context)
+     *         {
+     *             fly::Formatter<int, CharType>::format(value.as_int(), context);
+     *         }
+     *     };
+     *
+     * Or, the formatter may be defined without without inheritence:
+     *
+     *     template <typename CharType>
+     *     struct fly::Formatter<MyType, CharType>
+     *     {
+     *         bool m_option {false};
+     *
+     *         template <typename FormatParseContext>
+     *         constexpr void parse(FormatParseContext &context)
+     *         {
+     *             if (context.lexer().consume_if(FLY_CHR(CharType, 'o')))
+     *             {
+     *                 m_option = true;
+     *             }
+     *             if (!context.lexer().consume_if(FLY_CHR(CharType, '}')))
+     *             {
+     *                 context.on_error("UserDefinedTypeWithParser error!");
+     *             }
+     *         }
+     *
+     *         template <typename FormatContext>
+     *         void format(const MyType &value, FormatContext &context)
+     *         {
+     *             fly::BasicString<CharType>::format_to(context.out(), "{}", value.as_int());
+     *         }
+     *     };
+     *
+     * The |parse| method is optional. If defined, it is provided a BasicFormatParseContext which
+     * contains a lexer that may be used to parse the format string. The lexer is positioned such
+     * that it is pointed at the first character after the ":" in the replacement field (if there is
+     * one), or after the opening "{" character. The |parse| method is expected to consume up to and
+     * including the closing "}" character. It may indicate any parsing errors through the parsing
+     * context; if an error occurs, the error is written to the formatted string, and formatting
+     * will halt.
+     *
      * @tparam ParameterTypes Variadic format parameter types.
      *
      * @param fmt The string to format.
@@ -923,7 +972,13 @@ void BasicString<CharType>::format_to(
                     pos += specifier.m_size;
 
                     const auto parameter = context.arg(specifier.m_position);
-                    parameter.format(context, std::move(specifier));
+                    parameter.format(parse_context, context, std::move(specifier));
+
+                    if (parse_context.has_error())
+                    {
+                        format_to(output, FLY_ARR(char_type, "{}"), parse_context.error());
+                        return;
+                    }
                 }
                 break;
 

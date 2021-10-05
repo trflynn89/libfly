@@ -24,6 +24,10 @@ struct UserDefinedType
 {
 };
 
+struct UserDefinedTypeWithParser
+{
+};
+
 enum class UserFormattedEnum
 {
     One = 1,
@@ -76,15 +80,40 @@ StringType reserved_codepoint()
 } // namespace
 
 template <typename CharType>
-struct fly::Formatter<UserDefinedType, CharType> :
-    public fly::Formatter<std::basic_string_view<CharType>, CharType>
+struct fly::Formatter<UserDefinedType, CharType>
 {
     template <typename FormatContext>
-    void format(const UserDefinedType &, FormatContext &context)
+    void format(UserDefinedType, FormatContext &context)
     {
-        fly::Formatter<std::basic_string_view<CharType>, CharType>::format(
-            FLY_STR(CharType, "UserDefinedType"),
-            context);
+        fly::BasicString<CharType>::format_to(
+            context.out(),
+            FLY_ARR(CharType, "{}"),
+            FLY_STR(CharType, "UserDefinedType"));
+    }
+};
+
+template <typename CharType>
+struct fly::Formatter<UserDefinedTypeWithParser, CharType>
+{
+    bool m_option {false};
+
+    template <typename FormatParseContext>
+    constexpr void parse(FormatParseContext &context)
+    {
+        if (context.lexer().consume_if(FLY_CHR(CharType, 'o')))
+        {
+            m_option = true;
+        }
+        if (!context.lexer().consume_if(FLY_CHR(CharType, '}')))
+        {
+            context.on_error("UserDefinedTypeWithParser error!");
+        }
+    }
+
+    template <typename FormatContext>
+    void format(UserDefinedTypeWithParser, FormatContext &context)
+    {
+        fly::BasicString<CharType>::format_to(context.out(), FLY_ARR(CharType, "{}"), m_option);
     }
 };
 
@@ -482,14 +511,6 @@ CATCH_TEMPLATE_TEST_CASE("FormatTypes", "[string]", char, wchar_t, char8_t, char
         return !value.empty();
     };
 
-    CATCH_SECTION("User-defined types may be formatted without presentation type")
-    {
-        UserDefinedType gt {};
-        test_format(FMT("{}"), FMT("UserDefinedType"), gt);
-        test_format(FMT("{}"), FMT("One"), UserFormattedEnum::One);
-        test_format(FMT("{}"), FMT("Two"), UserFormattedEnum::Two);
-    }
-
     CATCH_SECTION("Presentation type may be set (character)")
     {
         test_format(FMT("{:c}"), FMT("a"), 'a');
@@ -745,6 +766,61 @@ CATCH_TEMPLATE_TEST_CASE("FormatTypes", "[string]", char, wchar_t, char8_t, char
         test_format(FMT("{:G}"), FMT("2.1"), 2.1f);
         test_format(FMT("{:G}"), FMT("2.1"), static_cast<double>(2.1));
         test_format(FMT("{:G}"), FMT("2.1"), static_cast<long double>(2.1));
+    }
+}
+
+// This test is broken up because otherwise it is too large for Windows and a stack overflow occurs.
+CATCH_TEMPLATE_TEST_CASE(
+    "FormatUserDefinedTypes",
+    "[string]",
+    char,
+    wchar_t,
+    char8_t,
+    char16_t,
+    char32_t)
+{
+    using BasicString = fly::BasicString<TestType>;
+
+    using char_type = typename BasicString::char_type;
+
+    UserDefinedType u {};
+    UserDefinedTypeWithParser p {};
+
+    CATCH_SECTION("User-defined types inherit parent's parse method")
+    {
+        test_format(FMT("{:.1s}"), FMT("O"), UserFormattedEnum::One);
+        test_format(FMT("{:.2s}"), FMT("On"), UserFormattedEnum::One);
+        test_format(FMT("{:.3s}"), FMT("One"), UserFormattedEnum::One);
+    }
+
+    CATCH_SECTION("User-defined types may define a parse method")
+    {
+        test_format(FMT("{}"), FMT("false"), p);
+        test_format(FMT("{:o}"), FMT("true"), p);
+    }
+
+    CATCH_SECTION("User-defined types with a parse method may report errors")
+    {
+        test_format(FMT("{:x}"), FMT("UserDefinedTypeWithParser error!"), p);
+    }
+
+    CATCH_SECTION("User-defined types do not need to define a parse method")
+    {
+        test_format(FMT("{}"), FMT("UserDefinedType"), u);
+        test_format(FMT("{0}"), FMT("UserDefinedType"), u);
+        test_format(FMT("{:}"), FMT("UserDefinedType"), u);
+    }
+
+    CATCH_SECTION("User-defined formatter without a parse method may not have formatting options")
+    {
+        test_format(
+            FMT("{:s}"),
+            FMT("User-defined formatter without a parse method may not have formatting options"),
+            u);
+        test_format(
+            FMT("{:.3}"),
+            FMT("User-defined formatter without a parse method may not have formatting options"),
+            u);
     }
 }
 
