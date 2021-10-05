@@ -46,7 +46,7 @@ public:
     /**
      * @return A reference to the format parsing context.
      */
-    constexpr const FormatParseContext &context();
+    constexpr FormatParseContext &context();
 
     /**
      * @return If available, the next parsed replacement field. Otherwise, an uninitialized value.
@@ -132,7 +132,7 @@ FLY_CONSTEVAL BasicFormatString<CharType, ParameterTypes...>::BasicFormatString(
 
 //==================================================================================================
 template <typename CharType, typename... ParameterTypes>
-constexpr const BasicFormatParseContext<CharType> &
+constexpr BasicFormatParseContext<CharType> &
 BasicFormatString<CharType, ParameterTypes...>::context()
 {
     return m_context;
