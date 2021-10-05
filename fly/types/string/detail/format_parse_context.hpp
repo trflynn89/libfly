@@ -168,7 +168,7 @@ BasicFormatParseContext<CharType>::parameter_type(std::size_t position)
 
 //==================================================================================================
 template <typename CharType>
-constexpr inline fly::BasicLexer<CharType> &BasicFormatParseContext<CharType>::lexer()
+constexpr fly::BasicLexer<CharType> &BasicFormatParseContext<CharType>::lexer()
 {
     return m_lexer;
 }

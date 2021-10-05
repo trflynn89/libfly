@@ -65,7 +65,7 @@ private:
 //==================================================================================================
 template <typename OutputIterator, typename CharType>
 template <typename... Parameters>
-constexpr inline BasicFormatContext<OutputIterator, CharType>::BasicFormatContext(
+constexpr BasicFormatContext<OutputIterator, CharType>::BasicFormatContext(
     OutputIterator out,
     const BasicFormatParameters<BasicFormatContext, Parameters...> &parameters) noexcept :
     m_out(std::move(out)),

@@ -30,14 +30,14 @@
 // Windows has _byteswap_ushort, _byteswap_ulong, and _byteswap_uint64, but they are non-constexpr.
 // So to allow endian swapping to be used at compile time, use custom byte swapping methods.
 
-constexpr inline std::uint16_t byte_swap_16(std::uint16_t value)
+constexpr std::uint16_t byte_swap_16(std::uint16_t value)
 {
     using namespace fly::literals::numeric_literals;
 
     return ((value & 0xff00_u16) >> 8) | ((value & 0x00ff_u16) << 8);
 }
 
-constexpr inline std::uint32_t byte_swap_32(std::uint32_t value)
+constexpr std::uint32_t byte_swap_32(std::uint32_t value)
 {
     using namespace fly::literals::numeric_literals;
 
@@ -46,7 +46,7 @@ constexpr inline std::uint32_t byte_swap_32(std::uint32_t value)
         ((value & 0x0000'ff00_u32) << 8) | ((value & 0x0000'00ff_u32) << 24));
 }
 
-constexpr inline std::uint64_t byte_swap_64(std::uint64_t value)
+constexpr std::uint64_t byte_swap_64(std::uint64_t value)
 {
     using namespace fly::literals::numeric_literals;
 
@@ -73,7 +73,7 @@ namespace fly {
  * @return The swapped value.
  */
 template <typename T>
-constexpr inline T endian_swap(T value)
+constexpr T endian_swap(T value)
 {
     static_assert(
         detail::EndianTraits::is_supported_integer_v<T>,
@@ -109,7 +109,7 @@ constexpr inline T endian_swap(T value)
  * @return The swapped value.
  */
 template <std::endian Endianness, typename T>
-constexpr inline T endian_swap_if_non_native(T value)
+constexpr T endian_swap_if_non_native(T value)
 {
     if constexpr (Endianness == std::endian::native)
     {
