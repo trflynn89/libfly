@@ -1,6 +1,7 @@
 #include "fly/types/string/detail/format_parameters.hpp"
 
 #include "fly/types/string/detail/format_context.hpp"
+#include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 
 #include "catch2/catch_approx.hpp"
@@ -43,6 +44,7 @@ CATCH_TEMPLATE_TEST_CASE(
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
 
+    using FormatParseContext = fly::detail::BasicFormatParseContext<char_type>;
     using FormatContext =
         fly::detail::BasicFormatContext<std::back_insert_iterator<string_type>, char_type>;
     using UserDefinedValue = fly::detail::UserDefinedValue<FormatContext>;
@@ -54,6 +56,7 @@ CATCH_TEMPLATE_TEST_CASE(
     CATCH_SECTION("Empty parameters result in monostate status")
     {
         auto params = fly::detail::make_format_parameters<FormatContext>();
+        FormatParseContext parse_context(FLY_ARR(char_type, ""), nullptr, 0);
         FormatContext context(out, params);
 
         auto parameter = context.arg(0);
@@ -65,7 +68,7 @@ CATCH_TEMPLATE_TEST_CASE(
                 CATCH_CHECK(std::is_same_v<decltype(value), fly::detail::MonoState>);
             });
 
-        parameter.format(context, {});
+        parameter.format(parse_context, context, {});
     }
 
     CATCH_SECTION("A single parameter can be visited, but no others")
