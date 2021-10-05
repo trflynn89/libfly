@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/traits/concepts.hpp"
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_parameter_type.hpp"
 #include "fly/types/string/detail/format_parse_context.hpp"
@@ -852,11 +853,11 @@ BasicFormatSpecifier<CharType>::resolve(FormatContext &context, std::size_t posi
             using T = std::remove_cvref_t<decltype(value)>;
             std::optional<std::size_t> resolved;
 
-            if constexpr (std::is_unsigned_v<T>)
+            if constexpr (fly::UnsignedIntegral<T>)
             {
                 resolved = static_cast<std::size_t>(value);
             }
-            else if constexpr (std::is_integral_v<T>)
+            else if constexpr (fly::SignedIntegral<T>)
             {
                 if (value >= 0)
                 {

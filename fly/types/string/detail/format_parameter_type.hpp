@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/types/string/detail/string_concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 
 #include <cstdint>
@@ -30,29 +31,27 @@ enum class ParameterType : std::uint8_t
 template <typename T>
 constexpr ParameterType infer_parameter_type()
 {
-    using U = std::remove_cvref_t<T>;
-
-    if constexpr (is_supported_character_v<U>)
+    if constexpr (is_supported_character_v<T>)
     {
         return ParameterType::Character;
     }
-    else if constexpr (is_like_supported_string_v<U>)
+    else if constexpr (FormattableString<T>)
     {
         return ParameterType::String;
     }
-    else if constexpr (std::is_pointer_v<U> || std::is_null_pointer_v<U>)
+    else if constexpr (FormattablePointer<T>)
     {
         return ParameterType::Pointer;
     }
-    else if constexpr (BasicFormatTraits::is_integer_v<U>)
+    else if constexpr (FormattableIntegral<T>)
     {
         return ParameterType::Integral;
     }
-    else if constexpr (std::is_floating_point_v<U>)
+    else if constexpr (FormattableFloatingPoint<T>)
     {
         return ParameterType::FloatingPoint;
     }
-    else if constexpr (std::is_same_v<U, bool>)
+    else if constexpr (FormattableBoolean<T>)
     {
         return ParameterType::Boolean;
     }

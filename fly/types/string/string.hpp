@@ -7,6 +7,7 @@
 #include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/format_string.hpp"
+#include "fly/types/string/detail/string_concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/unicode.hpp"
 #include "fly/types/string/formatters.hpp"
@@ -17,6 +18,7 @@
 #include <cctype>
 #include <chrono>
 #include <cmath>
+#include <concepts>
 #include <cstdint>
 #include <cstdlib>
 #include <ios>
@@ -78,7 +80,7 @@ public:
      *
      * @return The length of the string-like value.
      */
-    template <typename T, enable_if<detail::is_like_supported_string<T>> = 0>
+    template <detail::StringLike T>
     static constexpr size_type size(T &&value);
 
     /**
@@ -575,7 +577,7 @@ private:
 
 //==================================================================================================
 template <typename CharType>
-template <typename T, enable_if<detail::is_like_supported_string<T>>>
+template <detail::StringLike T>
 constexpr inline auto BasicString<CharType>::size(T &&value) -> size_type
 {
     return detail::BasicClassifier<char_type>::size(std::forward<T>(value));
@@ -1036,7 +1038,7 @@ std::optional<T> BasicString<CharType>::convert(const string_type &value)
     {
         return unicode::template convert_encoding<T>(value);
     }
-    else if constexpr (std::is_same_v<char_type, char>)
+    else if constexpr (std::same_as<char_type, char>)
     {
         return detail::Converter<T>::convert(value);
     }
