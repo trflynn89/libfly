@@ -4,6 +4,7 @@
 #include "fly/types/string/detail/converter.hpp"
 #include "fly/types/string/detail/format_context.hpp"
 #include "fly/types/string/detail/format_parameters.hpp"
+#include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/format_string.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
@@ -887,16 +888,20 @@ void BasicString<CharType>::format_to(
     ParameterTypes &&...parameters)
 {
     using FormatContext = detail::BasicFormatContext<OutputIterator, char_type>;
+    using FormatParseContext = detail::BasicFormatParseContext<char_type>;
 
-    if (fmt.context().has_error())
+    FormatParseContext &parse_context = fmt.context();
+    const view_type view = parse_context.view();
+
+    if (parse_context.has_error())
     {
         format_to(
             output,
             FLY_ARR(char_type, "Ignored invalid formatter: {}"),
-            fmt.context().error());
-    }
+            parse_context.error());
 
-    const view_type view = fmt.context().view();
+        return;
+    }
 
     auto params =
         detail::make_format_parameters<FormatContext>(std::forward<ParameterTypes>(parameters)...);
