@@ -159,6 +159,7 @@ constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
     const auto starting_position = m_context.lexer().position() - 1;
 
     FormatSpecifier specifier(m_context);
+    specifier.m_parse_index = m_context.lexer().position();
 
     if (m_context.parameter_type(specifier.m_position) == ParameterType::UserDefined)
     {
@@ -191,6 +192,7 @@ BasicFormatString<CharType, ParameterTypes...>::parse_standard_specifier(FormatS
 {
     if (m_context.lexer().consume_if(s_colon))
     {
+        specifier.m_parse_index = m_context.lexer().position();
         specifier.parse(m_context);
     }
 

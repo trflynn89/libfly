@@ -667,6 +667,46 @@ CATCH_TEMPLATE_TEST_CASE(
 
         CATCH_CHECK_FALSE(format.next_specifier());
     }
+
+    CATCH_SECTION("Specifiers track their parsing index in the format string")
+    {
+        {
+            auto format = make_format(FMT("ab {0} cd {1:d} ef {002:#0x}"), 1, 2, 3);
+            CATCH_CHECK_FALSE(format.context().has_error());
+
+            auto specifier1 = format.next_specifier();
+            CATCH_REQUIRE(specifier1);
+            CATCH_CHECK(specifier1->m_parse_index == 5);
+
+            auto specifier2 = format.next_specifier();
+            CATCH_REQUIRE(specifier2);
+            CATCH_CHECK(specifier2->m_parse_index == 13);
+
+            auto specifier3 = format.next_specifier();
+            CATCH_REQUIRE(specifier3);
+            CATCH_CHECK(specifier3->m_parse_index == 24);
+
+            CATCH_CHECK_FALSE(format.next_specifier());
+        }
+        {
+            auto format = make_format(FMT("ab {} cd {:d} ef {:#0x}"), 1, 2, 3);
+            CATCH_CHECK_FALSE(format.context().has_error());
+
+            auto specifier1 = format.next_specifier();
+            CATCH_REQUIRE(specifier1);
+            CATCH_CHECK(specifier1->m_parse_index == 4);
+
+            auto specifier2 = format.next_specifier();
+            CATCH_REQUIRE(specifier2);
+            CATCH_CHECK(specifier2->m_parse_index == 11);
+
+            auto specifier3 = format.next_specifier();
+            CATCH_REQUIRE(specifier3);
+            CATCH_CHECK(specifier3->m_parse_index == 19);
+
+            CATCH_CHECK_FALSE(format.next_specifier());
+        }
+    }
 }
 
 #if defined(FLY_COMPILER_DISABLE_CONSTEVAL)
