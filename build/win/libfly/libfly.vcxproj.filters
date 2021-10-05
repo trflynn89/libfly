@@ -238,6 +238,9 @@
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_concepts.hpp">
+      <Filter>types\bit_stream\detail</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/types/bit_stream/bit_stream_types.hpp"
-#include "fly/types/bit_stream/detail/bit_stream_traits.hpp"
+#include "fly/types/bit_stream/detail/bit_stream_concepts.hpp"
 
 #include <limits>
 #include <streambuf>
@@ -57,7 +57,7 @@ protected:
      *
      * @return The created mask.
      */
-    template <typename DataType>
+    template <detail::BitStreamInteger DataType>
     DataType bit_mask(const DataType bits);
 
     std::streambuf *m_stream_buffer;
@@ -67,13 +67,9 @@ protected:
 };
 
 //==================================================================================================
-template <typename DataType>
+template <detail::BitStreamInteger DataType>
 inline DataType BitStream::bit_mask(const DataType bits)
 {
-    static_assert(
-        BitStreamTraits::is_unsigned_integer_v<DataType>,
-        "DataType must be an unsigned integer type");
-
     static constexpr auto s_filled = std::numeric_limits<DataType>::max();
     static constexpr auto s_digits = std::numeric_limits<DataType>::digits;
 

@@ -2,7 +2,7 @@
 
 #include "fly/types/bit_stream/bit_stream_types.hpp"
 #include "fly/types/bit_stream/detail/bit_stream.hpp"
-#include "fly/types/bit_stream/detail/bit_stream_traits.hpp"
+#include "fly/types/bit_stream/detail/bit_stream_concepts.hpp"
 #include "fly/types/numeric/endian.hpp"
 
 #include <algorithm>
@@ -77,7 +77,7 @@ public:
      *
      * @return The number of bits successfully read.
      */
-    template <typename DataType>
+    template <detail::BitStreamInteger DataType>
     byte_type read_bits(DataType &bits, byte_type size);
 
     /**
@@ -95,7 +95,7 @@ public:
      *
      * @return The number of bits successfully peeked.
      */
-    template <typename DataType>
+    template <detail::BitStreamInteger DataType>
     byte_type peek_bits(DataType &bits, byte_type size);
 
     /**
@@ -134,7 +134,7 @@ private:
      *
      * @return The number of bytes actually read.
      */
-    template <typename DataType>
+    template <detail::BitStreamInteger DataType>
     byte_type fill(DataType &buffer, byte_type bytes);
 
     std::istream &m_stream;
@@ -144,14 +144,10 @@ private:
 };
 
 //==================================================================================================
-template <typename DataType>
+template <detail::BitStreamInteger DataType>
 byte_type BitStreamReader::read_bits(DataType &bits, byte_type size)
 {
-    static_assert(
-        detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
-        "DataType must be an unsigned integer type");
-
-    if constexpr (detail::BitStreamTraits::is_buffer_type_v<DataType>)
+    if constexpr (detail::BitStreamBuffer<DataType>)
     {
         // See peek_bits for why buffer_type reads must be split.
         const byte_type size_high = size / 2;
@@ -177,13 +173,9 @@ byte_type BitStreamReader::read_bits(DataType &bits, byte_type size)
 }
 
 //==================================================================================================
-template <typename DataType>
+template <detail::BitStreamInteger DataType>
 byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size)
 {
-    static_assert(
-        detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
-        "DataType must be an unsigned integer type");
-
     // Peek operations the site of the byte buffer are not supported because the byte buffer could
     // be in a state where it cannot be refilled.
     //
@@ -197,7 +189,7 @@ byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size)
     // than 6 bits, which invalidates the whole peek_bits/discard_bits semantic. BitStreamReader
     // would need to support putting bits back onto the stream.
     static_assert(
-        !detail::BitStreamTraits::is_buffer_type_v<DataType>,
+        !detail::BitStreamBuffer<DataType>,
         "peek_bits only supports types smaller than buffer_type");
 
     byte_type peeked = 0, lshift = 0;
@@ -241,13 +233,9 @@ inline void BitStreamReader::discard_bits(byte_type size)
 }
 
 //==================================================================================================
-template <typename DataType>
+template <detail::BitStreamInteger DataType>
 byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes)
 {
-    static_assert(
-        detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
-        "DataType must be an unsigned integer type");
-
     if (m_stream)
     {
         const std::streamsize bytes_read = m_stream_buffer->sgetn(

@@ -2,7 +2,7 @@
 
 #include "fly/types/bit_stream/bit_stream_types.hpp"
 #include "fly/types/bit_stream/detail/bit_stream.hpp"
-#include "fly/types/bit_stream/detail/bit_stream_traits.hpp"
+#include "fly/types/bit_stream/detail/bit_stream_concepts.hpp"
 #include "fly/types/numeric/endian.hpp"
 
 #include <bit>
@@ -59,7 +59,7 @@ public:
      * @param bits The bits to write.
      * @param size The number of bits to write.
      */
-    template <typename DataType>
+    template <detail::BitStreamInteger DataType>
     void write_bits(DataType bits, byte_type size);
 
     /**
@@ -90,20 +90,16 @@ private:
      * @param buffer The byte buffer to flush.
      * @param bytes The number of bytes to flush.
      */
-    template <typename DataType>
+    template <detail::BitStreamInteger DataType>
     void flush(const DataType &buffer, byte_type bytes);
 
     std::ostream &m_stream;
 };
 
 //==================================================================================================
-template <typename DataType>
+template <detail::BitStreamInteger DataType>
 void BitStreamWriter::write_bits(DataType bits, byte_type size)
 {
-    static_assert(
-        detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
-        "DataType must be an unsigned integer type");
-
     // If there are more bits to write than are available in the byte buffer, break the bits into
     // two chunks.
     if (size > m_position)
@@ -127,13 +123,9 @@ void BitStreamWriter::write_bits(DataType bits, byte_type size)
 }
 
 //==================================================================================================
-template <typename DataType>
+template <detail::BitStreamInteger DataType>
 void BitStreamWriter::flush(const DataType &buffer, byte_type bytes)
 {
-    static_assert(
-        detail::BitStreamTraits::is_unsigned_integer_v<DataType>,
-        "DataType must be an unsigned integer type");
-
     if (m_stream)
     {
         const DataType data = endian_swap_if_non_native<std::endian::big>(buffer);
