@@ -65,13 +65,13 @@ concept FormattableBoolean = std::same_as<bool, std::remove_cvref_t<T>>;
  * types.
  */
 template <typename T>
-concept FormattableIntegral = std::is_integral_v<std::remove_cvref_t<T>> && !FormattableBoolean<T>;
+concept FormattableIntegral = fly::Integral<T>;
 
 /**
  * Concept that is satisfied when the given type is a formattable floating-point type.
  */
 template <typename T>
-concept FormattableFloatingPoint = std::is_floating_point_v<std::remove_cvref_t<T>>;
+concept FormattableFloatingPoint = fly::FloatingPoint<T>;
 
 /**
  * Concept that is satisfied when the given type is a formattable user-defined type.
