@@ -244,9 +244,6 @@
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_traits.hpp">
-      <Filter>types\bit_stream\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.hpp">
       <Filter>types\concurrency</Filter>
     </ClInclude>
