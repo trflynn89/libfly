@@ -8,7 +8,13 @@
 namespace fly {
 
 /**
- * Concept that is satisfied when any type in a sequence of types are the same as a specific type.
+ * Concept that is satisfied if the provided types are the same types, after removing cv-qualifiers.
+ */
+template <typename T, typename U>
+concept SameAs = std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
+
+/**
+ * Concept that is satisfied if any type in a sequence of types are the same as a specific type.
  * Examples:
  *
  *     fly::SameAsAny<int, int, int> // Satisfied.
@@ -16,11 +22,11 @@ namespace fly {
  *     fly::SameAsAny<int, int, bool> // Satisfied.
  *     fly::SameAsAny<int, bool, bool> // Unsatisfied.
  */
-template <typename T, typename... Ts>
-concept SameAsAny = (std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<Ts>> || ...);
+template <typename T, typename... Us>
+concept SameAsAny = (fly::SameAs<T, Us> || ...);
 
 /**
- * Concept that is satisfied when all types in a sequence of types are the same as a specific type.
+ * Concept that is satisfied if all types in a sequence of types are the same as a specific type.
  * Examples:
  *
  *     fly::SameAsAll<int, int, int> // Satisfied.
@@ -28,20 +34,20 @@ concept SameAsAny = (std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<Ts
  *     fly::SameAsAll<int, int, bool> // Unsatisfied.
  *     fly::SameAsAll<int, bool, bool> // Unsatisfied.
  */
-template <typename T, typename... Ts>
-concept SameAsAll = (std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<Ts>> && ...);
+template <typename T, typename... Us>
+concept SameAsAll = (fly::SameAs<T, Us> && ...);
 
 /**
  * Concept that is satisified if the given type is the provided size.
  */
 template <typename T, std::size_t Size>
-concept SizeOfTypeIs = fly::size_of_type_is_v<T, Size>;
+concept SizeOfTypeIs = (sizeof(T) == Size);
 
 /**
  * Concept that is satisified if the given type is an integral, non-boolean type.
  */
 template <typename T>
-concept Integral = std::is_integral_v<std::remove_cvref_t<T>> && !fly::SameAsAny<T, bool>;
+concept Integral = std::is_integral_v<std::remove_cvref_t<T>> && !fly::SameAs<T, bool>;
 
 /**
  * Concept that is satisified if the given type is a signed integral, non-boolean type.
