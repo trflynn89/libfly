@@ -1643,7 +1643,7 @@ Json::operator T() const &noexcept(false)
 
         if constexpr (JsonString<S>)
         {
-            if constexpr (fly::SameAsAny<T, json_string_type>)
+            if constexpr (fly::SameAs<T, json_string_type>)
             {
                 return storage;
             }
@@ -2002,7 +2002,7 @@ json_string_type Json::convert_to_string(T value)
 {
     using StringType = BasicString<typename detail::is_like_supported_string_t<T>::value_type>;
 
-    if constexpr (fly::SameAsAny<typename StringType::string_type, json_string_type>)
+    if constexpr (fly::SameAs<typename StringType::string_type, json_string_type>)
     {
         if (StringType::validate(value))
         {
@@ -2128,7 +2128,7 @@ struct fly::Formatter<fly::Json, CharType> :
     template <typename FormatContext>
     void format(const fly::Json &json, FormatContext &context)
     {
-        if constexpr (fly::SameAsAny<CharType, fly::json_char_type>)
+        if constexpr (fly::SameAs<CharType, fly::json_char_type>)
         {
             fly::Formatter<string_type, CharType>::format(json.serialize(), context);
         }

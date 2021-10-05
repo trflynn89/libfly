@@ -758,7 +758,7 @@ bool operator==(Json::const_reference json1, Json::const_reference json2)
         {
             return value1 == static_cast<S1>(value2);
         }
-        else if constexpr (fly::SameAsAny<S1, S2>)
+        else if constexpr (fly::SameAs<S1, S2>)
         {
             return value1 == value2;
         }
@@ -801,7 +801,7 @@ bool operator<(Json::const_reference json1, Json::const_reference json2)
         {
             return value1 < static_cast<S1>(value2);
         }
-        else if constexpr (fly::SameAsAny<S1, S2>)
+        else if constexpr (fly::SameAs<S1, S2>)
         {
             return value1 < value2;
         }

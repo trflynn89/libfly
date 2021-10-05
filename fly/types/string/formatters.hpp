@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/fly.hpp"
+#include "fly/traits/concepts.hpp"
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/stream_util.hpp"
@@ -11,7 +12,6 @@
 #include <array>
 #include <charconv>
 #include <cmath>
-#include <concepts>
 #include <iomanip>
 #include <limits>
 #include <sstream>
@@ -127,7 +127,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
             view = view_like_type(value).substr(0, value_size);
         }
 
-        if constexpr (std::same_as<string_type, string_like_type>)
+        if constexpr (fly::SameAs<string_type, string_like_type>)
         {
             for (const auto &ch : view)
             {
@@ -448,7 +448,7 @@ private:
             }
         }
 
-        if constexpr (std::same_as<string_type, std::string>)
+        if constexpr (fly::SameAs<string_type, std::string>)
         {
             for (const char *it = begin; it != result.ptr; ++it)
             {
@@ -564,7 +564,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 
         auto append_number = [this, &context, &result]()
         {
-            if constexpr (std::same_as<string_type, std::string>)
+            if constexpr (fly::SameAs<string_type, std::string>)
             {
                 for (auto ch : result.m_digits)
                 {
