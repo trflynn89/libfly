@@ -1,11 +1,11 @@
 #pragma once
 
 #include "fly/fly.hpp"
-#include "fly/types/numeric/detail/endian_traits.hpp"
+#include "fly/traits/concepts.hpp"
+#include "fly/types/numeric/detail/endian_concepts.hpp"
 
 #include <bit>
 #include <cstdint>
-#include <type_traits>
 
 #if defined(FLY_LINUX)
 #    include <byteswap.h>
@@ -72,26 +72,22 @@ namespace fly {
  *
  * @return The swapped value.
  */
-template <typename T>
+template <detail::EndianInteger T>
 constexpr T endian_swap(T value)
 {
-    static_assert(
-        detail::EndianTraits::is_supported_integer_v<T>,
-        "Value must be an integer type of size 1, 2, 4, or 8 bytes");
-
-    if constexpr (sizeof(T) == 1)
+    if constexpr (fly::SizeOfTypeIs<T, 1>)
     {
         return value;
     }
-    else if constexpr (sizeof(T) == 2)
+    else if constexpr (fly::SizeOfTypeIs<T, 2>)
     {
         return static_cast<T>(byte_swap_16(static_cast<std::uint16_t>(value)));
     }
-    else if constexpr (sizeof(T) == 4)
+    else if constexpr (fly::SizeOfTypeIs<T, 4>)
     {
         return static_cast<T>(byte_swap_32(static_cast<std::uint32_t>(value)));
     }
-    else if constexpr (sizeof(T) == 8)
+    else if constexpr (fly::SizeOfTypeIs<T, 8>)
     {
         return static_cast<T>(byte_swap_64(static_cast<std::uint64_t>(value)));
     }
@@ -108,7 +104,7 @@ constexpr T endian_swap(T value)
  *
  * @return The swapped value.
  */
-template <std::endian Endianness, typename T>
+template <std::endian Endianness, detail::EndianInteger T>
 constexpr T endian_swap_if_non_native(T value)
 {
     if constexpr (Endianness == std::endian::native)
