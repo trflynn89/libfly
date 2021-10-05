@@ -134,7 +134,8 @@ constexpr const char *s_bad_precision_position =
     "Position of precision parameter must be an integral type";
 constexpr const char *s_bad_locale =
     "Locale-specific form may only be used for numeric and boolean types";
-constexpr const char *s_bad_user_defined = s_unclosed_string;
+constexpr const char *s_bad_user_defined =
+    "Nested replacement fields are not allowed in user-defined formatters";
 constexpr const char *s_bad_character = "Character types must be formatted with {} or {:cbBodxX}";
 constexpr const char *s_bad_string = "String types must be formatted with {} or {:s}";
 constexpr const char *s_bad_pointer = "Pointer types must be formatted with {} or {:p}";
@@ -461,13 +462,6 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{}"), b), specifier);
     }
 
-    CATCH_SECTION("User-defined types may be formatted without presentation type")
-    {
-        Specifier specifier {};
-        test_format(make_format(FMT("{}"), g), specifier);
-        test_format(make_format(FMT("{}"), u), specifier);
-    }
-
     CATCH_SECTION("Presentation type may be set (character)")
     {
         Specifier specifier {};
@@ -648,9 +642,17 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{1:F}"), f, f), specifier);
     }
 
+    CATCH_SECTION("User-defined types may have any formatting options")
+    {
+        Specifier specifier {};
+        test_format(make_format(FMT("{}"), g), specifier);
+        test_format(make_format(FMT("{:g}"), g), specifier);
+        test_format(make_format(FMT("{:abcdefghijklmnop}"), g), specifier);
+    }
+
     CATCH_SECTION("Specifiers track their size in the format string")
     {
-        auto format = make_format(FMT("ab {0} cd {1:d} ef {2:#0x}"), 1, 2, 3);
+        auto format = make_format(FMT("ab {0} cd {1:d} ef {2:abcdefghijklmnop}"), 1, 2, u);
         CATCH_CHECK_FALSE(format.context().has_error());
 
         auto specifier1 = format.next_specifier();
@@ -663,7 +665,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
         auto specifier3 = format.next_specifier();
         CATCH_REQUIRE(specifier3);
-        CATCH_CHECK(specifier3->m_size == 7);
+        CATCH_CHECK(specifier3->m_size == 20);
 
         CATCH_CHECK_FALSE(format.next_specifier());
     }
@@ -671,7 +673,7 @@ CATCH_TEMPLATE_TEST_CASE(
     CATCH_SECTION("Specifiers track their parsing index in the format string")
     {
         {
-            auto format = make_format(FMT("ab {0} cd {1:d} ef {002:#0x}"), 1, 2, 3);
+            auto format = make_format(FMT("ab {0} cd {1:d} ef {002:abcdefghijklmnop}"), 1, 2, u);
             CATCH_CHECK_FALSE(format.context().has_error());
 
             auto specifier1 = format.next_specifier();
@@ -689,7 +691,7 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(format.next_specifier());
         }
         {
-            auto format = make_format(FMT("ab {} cd {:d} ef {:#0x}"), 1, 2, 3);
+            auto format = make_format(FMT("ab {} cd {:abcdefghijklmnop} ef {:d}"), 1, u, 2);
             CATCH_CHECK_FALSE(format.context().has_error());
 
             auto specifier1 = format.next_specifier();
@@ -702,7 +704,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
             auto specifier3 = format.next_specifier();
             CATCH_REQUIRE(specifier3);
-            CATCH_CHECK(specifier3->m_parse_index == 19);
+            CATCH_CHECK(specifier3->m_parse_index == 34);
 
             CATCH_CHECK_FALSE(format.next_specifier());
         }
@@ -729,12 +731,13 @@ CATCH_TEMPLATE_TEST_CASE(
     constexpr const int i = 1;
     constexpr const float f = 3.14f;
     constexpr const bool b = true;
-    constexpr const UserFormattedEnum u = UserFormattedEnum::One;
 
     CATCH_SECTION("Cannot parse single opening brace")
     {
         test_error(make_format(FMT("{"), 1), s_unclosed_string);
         test_error(make_format(FMT("{:"), 1), s_unclosed_string);
+        test_error(make_format(FMT("{"), g), s_unclosed_string);
+        test_error(make_format(FMT("{:"), g), s_unclosed_string);
     }
 
     CATCH_SECTION("Cannot parse single closing brace")
@@ -824,7 +827,6 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_error(make_format(FMT("{:#d}"), i), s_bad_alternate_form);
         test_error(make_format(FMT("{:#}"), s), s_bad_alternate_form);
-        test_error(make_format(FMT("{:#}"), g), s_bad_user_defined);
     }
 
     CATCH_SECTION("Zero-padding only valid for numeric types")
@@ -920,26 +922,21 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (character)")
     {
-        test_error(make_format(FMT("{:c}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:c}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:c}"), s), s_bad_string);
-        test_error(make_format(FMT("{:c}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:c}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:c}"), f), s_bad_float);
     }
 
     CATCH_SECTION("Precision type mismatch (string)")
     {
-        test_error(make_format(FMT("{:c}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:c}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:s}"), c), s_bad_character);
-        test_error(make_format(FMT("{:s}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:s}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:s}"), i), s_bad_integer);
         test_error(make_format(FMT("{:s}"), f), s_bad_float);
     }
 
     CATCH_SECTION("Precision type mismatch (pointer)")
     {
-        test_error(make_format(FMT("{:p}"), g), s_bad_user_defined);
         test_error(make_format(FMT("{:p}"), c), s_bad_character);
         test_error(make_format(FMT("{:p}"), i), s_bad_integer);
         test_error(make_format(FMT("{:p}"), f), s_bad_float);
@@ -948,123 +945,96 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Precision type mismatch (binary)")
     {
-        test_error(make_format(FMT("{:b}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:b}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:b}"), s), s_bad_string);
-        test_error(make_format(FMT("{:b}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:b}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:b}"), f), s_bad_float);
 
-        test_error(make_format(FMT("{:B}"), g), s_bad_user_defined);
         test_error(make_format(FMT("{:B}"), s), s_bad_string);
-        test_error(make_format(FMT("{:B}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:B}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:B}"), f), s_bad_float);
     }
 
     CATCH_SECTION("Precision type mismatch (octal)")
     {
-        test_error(make_format(FMT("{:o}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:o}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:o}"), s), s_bad_string);
-        test_error(make_format(FMT("{:o}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:o}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:o}"), f), s_bad_float);
     }
 
     CATCH_SECTION("Precision type mismatch (decimal)")
     {
-        test_error(make_format(FMT("{:d}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:d}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:d}"), s), s_bad_string);
-        test_error(make_format(FMT("{:d}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:d}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:d}"), f), s_bad_float);
     }
 
     CATCH_SECTION("Precision type mismatch (hex)")
     {
-        test_error(make_format(FMT("{:x}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:x}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:x}"), s), s_bad_string);
-        test_error(make_format(FMT("{:x}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:x}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:x}"), f), s_bad_float);
 
-        test_error(make_format(FMT("{:X}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:X}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:X}"), s), s_bad_string);
-        test_error(make_format(FMT("{:X}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:X}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:X}"), f), s_bad_float);
     }
 
     CATCH_SECTION("Precision type mismatch (hexfloat)")
     {
-        test_error(make_format(FMT("{:a}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:a}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:a}"), c), s_bad_character);
         test_error(make_format(FMT("{:a}"), s), s_bad_string);
-        test_error(make_format(FMT("{:a}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:a}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:a}"), i), s_bad_integer);
         test_error(make_format(FMT("{:a}"), b), s_bad_bool);
 
-        test_error(make_format(FMT("{:A}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:A}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:A}"), c), s_bad_character);
         test_error(make_format(FMT("{:A}"), s), s_bad_string);
-        test_error(make_format(FMT("{:A}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:A}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:A}"), i), s_bad_integer);
         test_error(make_format(FMT("{:A}"), b), s_bad_bool);
     }
 
     CATCH_SECTION("Precision type mismatch (scientific)")
     {
-        test_error(make_format(FMT("{:e}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:e}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:e}"), c), s_bad_character);
         test_error(make_format(FMT("{:e}"), s), s_bad_string);
-        test_error(make_format(FMT("{:e}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:e}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:e}"), i), s_bad_integer);
         test_error(make_format(FMT("{:e}"), b), s_bad_bool);
 
-        test_error(make_format(FMT("{:E}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:E}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:E}"), c), s_bad_character);
         test_error(make_format(FMT("{:E}"), s), s_bad_string);
-        test_error(make_format(FMT("{:E}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:E}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:E}"), i), s_bad_integer);
         test_error(make_format(FMT("{:E}"), b), s_bad_bool);
     }
 
     CATCH_SECTION("Precision type mismatch (fixed)")
     {
-        test_error(make_format(FMT("{:f}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:f}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:f}"), c), s_bad_character);
         test_error(make_format(FMT("{:f}"), s), s_bad_string);
-        test_error(make_format(FMT("{:f}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:f}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:f}"), i), s_bad_integer);
         test_error(make_format(FMT("{:f}"), b), s_bad_bool);
 
-        test_error(make_format(FMT("{:F}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:F}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:F}"), c), s_bad_character);
         test_error(make_format(FMT("{:F}"), s), s_bad_string);
-        test_error(make_format(FMT("{:F}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:F}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:F}"), i), s_bad_integer);
         test_error(make_format(FMT("{:F}"), b), s_bad_bool);
     }
 
     CATCH_SECTION("Precision type mismatch (general)")
     {
-        test_error(make_format(FMT("{:g}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:g}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:g}"), c), s_bad_character);
         test_error(make_format(FMT("{:g}"), s), s_bad_string);
-        test_error(make_format(FMT("{:g}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:g}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:g}"), i), s_bad_integer);
         test_error(make_format(FMT("{:g}"), b), s_bad_bool);
 
-        test_error(make_format(FMT("{:G}"), g), s_bad_user_defined);
-        test_error(make_format(FMT("{:G}"), u), s_bad_user_defined);
         test_error(make_format(FMT("{:G}"), c), s_bad_character);
         test_error(make_format(FMT("{:G}"), s), s_bad_string);
-        test_error(make_format(FMT("{:G}"), &g), s_bad_pointer);
+        test_error(make_format(FMT("{:G}"), &i), s_bad_pointer);
         test_error(make_format(FMT("{:G}"), i), s_bad_integer);
         test_error(make_format(FMT("{:G}"), b), s_bad_bool);
     }
@@ -1073,7 +1043,7 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_error(make_format(FMT("{:cs}"), c), s_unclosed_string);
         test_error(make_format(FMT("{:ss}"), s), s_unclosed_string);
-        test_error(make_format(FMT("{:ps}"), &g), s_unclosed_string);
+        test_error(make_format(FMT("{:ps}"), &i), s_unclosed_string);
         test_error(make_format(FMT("{:bs}"), i), s_unclosed_string);
         test_error(make_format(FMT("{:Bs}"), i), s_unclosed_string);
         test_error(make_format(FMT("{:os}"), i), s_unclosed_string);
@@ -1128,6 +1098,11 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:W}"), i), s_unclosed_string);
         test_error(make_format(FMT("{:Y}"), i), s_unclosed_string);
         test_error(make_format(FMT("{:Z}"), i), s_unclosed_string);
+    }
+
+    CATCH_SECTION("User-defined types may not have nested replacement fields")
+    {
+        test_error(make_format(FMT("{:{}}"), g), s_bad_user_defined);
     }
 
     CATCH_SECTION("Cannot parse erroneous whitespace")

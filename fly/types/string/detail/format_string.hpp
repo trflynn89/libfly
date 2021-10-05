@@ -68,8 +68,10 @@ private:
 
     /**
      * Parse a replacement field for a user-defined type.
+     *
+     * @param specifier The replacement field being parsed.
      */
-    constexpr void parse_user_defined_specifier();
+    constexpr void parse_user_defined_specifier(FormatSpecifier &specifier);
 
     /**
      * Parse a replacement field for a standard type.
@@ -163,7 +165,7 @@ constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
 
     if (m_context.parameter_type(specifier.m_position) == ParameterType::UserDefined)
     {
-        parse_user_defined_specifier();
+        parse_user_defined_specifier(specifier);
     }
     else
     {
@@ -176,12 +178,44 @@ constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
 
 //==================================================================================================
 template <typename CharType, typename... ParameterTypes>
-constexpr void BasicFormatString<CharType, ParameterTypes...>::parse_user_defined_specifier()
+constexpr void BasicFormatString<CharType, ParameterTypes...>::parse_user_defined_specifier(
+    FormatSpecifier &specifier)
 {
-    // TODO: For now, user-defined format parameters must be formatted with "{}".
-    if (!m_context.lexer().consume_if(s_right_brace))
+    // Replacement fields for user-defined types are parsed at runtime.
+    //
+    // TODO: Formatters that inherit from standard formatters might be parsed at compile time.
+    // TODO: Allow nested format specifiers.
+    std::size_t expected_close_brace_count = 1;
+    std::size_t nested_specifier_count = 0;
+
+    while (expected_close_brace_count != 0)
     {
-        m_context.on_error("Detected unclosed replacement field - must end with }");
+        if (auto ch = m_context.lexer().consume(); ch)
+        {
+            if (ch == s_right_brace)
+            {
+                --expected_close_brace_count;
+            }
+            else if (ch == s_left_brace)
+            {
+                ++expected_close_brace_count;
+                ++nested_specifier_count;
+            }
+            else if (ch == s_colon)
+            {
+                specifier.m_parse_index = m_context.lexer().position();
+            }
+        }
+        else
+        {
+            m_context.on_error("Detected unclosed replacement field - must end with }");
+            expected_close_brace_count = 0;
+        }
+    }
+
+    if (nested_specifier_count != 0)
+    {
+        m_context.on_error("Nested replacement fields are not allowed in user-defined formatters");
     }
 }
 
