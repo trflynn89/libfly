@@ -267,6 +267,7 @@ struct BasicFormatSpecifier
     Type m_type {Type::None};
     Case m_case {Case::Lower};
 
+    std::size_t m_parse_index {0};
     std::size_t m_size {0};
 
 private:
