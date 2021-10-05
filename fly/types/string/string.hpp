@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/traits/concepts.hpp"
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/converter.hpp"
 #include "fly/types/string/detail/format_context.hpp"
@@ -18,7 +19,6 @@
 #include <cctype>
 #include <chrono>
 #include <cmath>
-#include <concepts>
 #include <cstdint>
 #include <cstdlib>
 #include <ios>
@@ -1038,7 +1038,7 @@ std::optional<T> BasicString<CharType>::convert(const string_type &value)
     {
         return unicode::template convert_encoding<T>(value);
     }
-    else if constexpr (std::same_as<char_type, char>)
+    else if constexpr (fly::SameAs<char_type, char>)
     {
         return detail::Converter<T>::convert(value);
     }

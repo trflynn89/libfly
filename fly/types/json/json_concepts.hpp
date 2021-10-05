@@ -5,7 +5,6 @@
 #include "fly/types/string/detail/string_traits.hpp"
 
 #include <array>
-#include <concepts>
 #include <deque>
 #include <forward_list>
 #include <list>
@@ -52,7 +51,7 @@ namespace detail {
  * Concept that is satisfied when the given type is a JSON null type.
  */
 template <typename T>
-concept JsonNull = std::same_as<std::remove_cvref_t<T>, json_null_type>;
+concept JsonNull = fly::SameAs<T, json_null_type>;
 
 /**
  * Concept that is satisfied when the given type is a supported JSON string type.
@@ -115,7 +114,7 @@ concept JsonContainer = JsonString<T> || JsonObject<T> || JsonArray<T>;
  * Concept that is satisfied when the given type is a JSON Boolean type.
  */
 template <typename T>
-concept JsonBoolean = std::same_as<std::remove_cvref_t<T>, json_boolean_type>;
+concept JsonBoolean = fly::SameAs<T, json_boolean_type>;
 
 /**
  * Concept that is satisfied when the given type is a signed JSON number type.

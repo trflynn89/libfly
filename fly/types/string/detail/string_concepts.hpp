@@ -3,7 +3,6 @@
 #include "fly/traits/concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 
-#include <concepts>
 #include <type_traits>
 
 namespace fly::detail {
@@ -58,7 +57,7 @@ concept FormattablePointer = requires
  * Concept that is satisfied when the given type is a formattable boolean type.
  */
 template <typename T>
-concept FormattableBoolean = std::same_as<bool, std::remove_cvref_t<T>>;
+concept FormattableBoolean = fly::SameAs<T, bool>;
 
 /**
  * Concept that is satisfied when the given type is a formattable integral type, excluding boolean

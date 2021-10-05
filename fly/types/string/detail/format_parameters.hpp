@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/traits/concepts.hpp"
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
@@ -8,7 +9,6 @@
 #include "fly/types/string/formatters.hpp"
 
 #include <array>
-#include <concepts>
 #include <cstdint>
 #include <string_view>
 #include <type_traits>
@@ -373,19 +373,19 @@ inline void format_standard_value(
             formatter.format(static_cast<T>(const_cast<void *>(value.m_pointer)), context);
         }
     }
-    else if constexpr (std::same_as<T, float>)
+    else if constexpr (fly::SameAs<T, float>)
     {
         formatter.format(value.m_float, context);
     }
-    else if constexpr (std::same_as<T, double>)
+    else if constexpr (fly::SameAs<T, double>)
     {
         formatter.format(value.m_double, context);
     }
-    else if constexpr (std::same_as<T, long double>)
+    else if constexpr (fly::SameAs<T, long double>)
     {
         formatter.format(value.m_long_double, context);
     }
-    else if constexpr (std::same_as<T, bool>)
+    else if constexpr (fly::SameAs<T, bool>)
     {
         formatter.format(value.m_bool, context);
     }
