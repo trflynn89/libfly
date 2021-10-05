@@ -62,6 +62,30 @@ CATCH_TEMPLATE_TEST_CASE("BasicLexer", "[string]", char, wchar_t, char8_t, char1
         CATCH_CHECK_FALSE(lexer.consume());
     }
 
+    CATCH_SECTION("Setting the lexer's position mutates internal pointer")
+    {
+        Lexer lexer(FLY_ARR(char_type, "ab"));
+        CATCH_CHECK(lexer.position() == 0);
+
+        lexer.set_position(1);
+        CATCH_CHECK(lexer.position() == 1);
+
+        auto p1 = lexer.peek();
+        CATCH_REQUIRE(p1.has_value());
+        CATCH_CHECK(p1.value() == FLY_CHR(char_type, 'b'));
+
+        lexer.set_position(0);
+        CATCH_CHECK(lexer.position() == 0);
+
+        auto p2 = lexer.peek();
+        CATCH_REQUIRE(p2.has_value());
+        CATCH_CHECK(p2.value() == FLY_CHR(char_type, 'a'));
+
+        lexer.set_position(2);
+        CATCH_CHECK(lexer.position() == 2);
+        CATCH_CHECK_FALSE(lexer.peek());
+    }
+
     CATCH_SECTION("Peeking does not advance internal pointer")
     {
         Lexer lexer(FLY_ARR(char_type, "ab"));

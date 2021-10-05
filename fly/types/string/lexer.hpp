@@ -61,6 +61,17 @@ public:
     constexpr std::size_t position() const;
 
     /**
+     * Set the lexer's current position into the C-string literal.
+     *
+     * The provided position is not checked for validity. If the position is past-the-end of the
+     * C-string literal, further operations will fail (i.e. |peek| and |consume| will return
+     * std::nullopt).
+     *
+     * @param position The lexer's new position.
+     */
+    constexpr void set_position(std::size_t position);
+
+    /**
      * If a character is available at the current position (or some offset from the current
      * position) in the C-string literal, return that character.
      *
@@ -164,6 +175,13 @@ template <typename CharType>
 constexpr std::size_t BasicLexer<CharType>::position() const
 {
     return m_index;
+}
+
+//==================================================================================================
+template <typename CharType>
+constexpr void BasicLexer<CharType>::set_position(std::size_t position)
+{
+    m_index = position;
 }
 
 //==================================================================================================
