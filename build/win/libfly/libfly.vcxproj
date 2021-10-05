@@ -215,6 +215,7 @@
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_writer.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream.hpp" />
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_concepts.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.hpp" />
