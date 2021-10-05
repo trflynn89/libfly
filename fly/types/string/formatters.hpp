@@ -40,7 +40,7 @@ template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<detail::is_like_supported_string<T>>> :
     public detail::BasicFormatSpecifier<CharType>
 {
-    FLY_DEFINE_FORMATTER(CharType)
+    FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::String)
 
     /**
      * Format a single replacement field with the provided string-like value.
@@ -80,7 +80,7 @@ template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_pointer<T>>> :
     public detail::BasicFormatSpecifier<CharType>
 {
-    FLY_DEFINE_FORMATTER(CharType)
+    FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::Pointer)
 
     /**
      * Format a single replacement field with the provided pointer value.
@@ -99,7 +99,7 @@ template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<detail::BasicFormatTraits::is_integral<T>>> :
     public detail::BasicFormatSpecifier<CharType>
 {
-    FLY_DEFINE_FORMATTER(CharType)
+    FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::Integral)
 
     /**
      * Format a single replacement field with the provided non-boolean integral value.
@@ -192,7 +192,7 @@ template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<std::is_floating_point<T>>> :
     public detail::BasicFormatSpecifier<CharType>
 {
-    FLY_DEFINE_FORMATTER(CharType)
+    FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::FloatingPoint)
 
     /**
      * Format a single replacement field with the provided floating-point value.
@@ -254,7 +254,7 @@ template <typename T, typename CharType>
 struct Formatter<T, CharType, fly::enable_if<std::is_same<T, bool>>> :
     public detail::BasicFormatSpecifier<CharType>
 {
-    FLY_DEFINE_FORMATTER(CharType)
+    FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::Boolean)
 
     /**
      * Format a single replacement field with the provided boolean value.

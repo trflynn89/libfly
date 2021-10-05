@@ -267,6 +267,8 @@ struct BasicFormatSpecifier
     Type m_type {Type::None};
     Case m_case {Case::Lower};
 
+    std::optional<ParameterType> m_parameter_type {std::nullopt};
+
     std::size_t m_parse_index {0};
     std::size_t m_size {0};
 
@@ -395,6 +397,16 @@ private:
     static std::optional<std::size_t> resolve(FormatContext &context, std::size_t position);
 
     /**
+     * Resolve the active parameter type for a replacement field. For standard formatters, the
+     * active parameter type will match the actual type of the corresponding parameter. For
+     * user-defined types, the active parameter type will be the formatter type which the
+     * user-defined formatter inherits from.
+     *
+     * @param context The context holding the format string parsing state.
+     */
+    constexpr std::optional<ParameterType> resolve_parameter_type(FormatParseContext &context);
+
+    /**
      * Search for the presentation type which maps to a character, if any.
      *
      * @param ch The character to search for.
@@ -448,7 +460,7 @@ private:
  * this macro will fully qualify all members, and define the constructors needed to inheirt from
  * BasicFormatSpecifier.
  */
-#define FLY_DEFINE_FORMATTER(CharType)                                                             \
+#define FLY_DEFINE_FORMATTER(CharType, parameter_type)                                             \
                                                                                                    \
 protected:                                                                                         \
     using FormatSpecifier = fly::detail::BasicFormatSpecifier<CharType>;                           \
@@ -468,7 +480,10 @@ protected:                                                                      
     using FormatSpecifier::m_parameter_type;                                                       \
                                                                                                    \
 public:                                                                                            \
-    Formatter() = default;                                                                         \
+    Formatter()                                                                                    \
+    {                                                                                              \
+        m_parameter_type = parameter_type;                                                         \
+    }                                                                                              \
                                                                                                    \
     explicit Formatter(FormatSpecifier specifier) noexcept : FormatSpecifier(std::move(specifier)) \
     {                                                                                              \
@@ -659,7 +674,7 @@ constexpr void BasicFormatSpecifier<CharType>::parse_type(FormatParseContext &co
 template <typename CharType>
 constexpr void BasicFormatSpecifier<CharType>::infer_type(FormatParseContext &context)
 {
-    auto parameter_type = context.parameter_type(m_position);
+    auto parameter_type = resolve_parameter_type(context);
 
     if (parameter_type == ParameterType::Character)
     {
@@ -691,7 +706,7 @@ constexpr void BasicFormatSpecifier<CharType>::infer_type(FormatParseContext &co
 template <typename CharType>
 constexpr void BasicFormatSpecifier<CharType>::validate(FormatParseContext &context)
 {
-    auto parameter_type = context.parameter_type(m_position);
+    auto parameter_type = resolve_parameter_type(context);
 
     // Validate the fill character.
     if (m_fill && ((m_fill == s_left_brace) || (m_fill == s_right_brace)))
@@ -877,6 +892,19 @@ BasicFormatSpecifier<CharType>::resolve(FormatContext &context, std::size_t posi
 
             return resolved;
         });
+}
+
+//==================================================================================================
+template <typename CharType>
+constexpr std::optional<ParameterType>
+BasicFormatSpecifier<CharType>::resolve_parameter_type(FormatParseContext &context)
+{
+    if (m_parameter_type)
+    {
+        return *m_parameter_type;
+    }
+
+    return context.parameter_type(m_position);
 }
 
 //==================================================================================================
