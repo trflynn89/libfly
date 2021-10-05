@@ -14,6 +14,29 @@ class FooClass
 
 CATCH_TEST_CASE("Concepts", "[traits]")
 {
+    CATCH_SECTION("Concept: SameAs")
+    {
+        CATCH_CHECK(fly::SameAs<int, int>);
+        CATCH_CHECK(fly::SameAs<int, const int>);
+        CATCH_CHECK(fly::SameAs<const int, int>);
+        CATCH_CHECK(fly::SameAs<const int, const int>);
+
+        CATCH_CHECK(fly::SameAs<int, int>);
+        CATCH_CHECK(fly::SameAs<int, int &>);
+        CATCH_CHECK(fly::SameAs<int &, int>);
+        CATCH_CHECK(fly::SameAs<int &, int &>);
+
+        CATCH_CHECK(fly::SameAs<int, int>);
+        CATCH_CHECK(fly::SameAs<int, const int &>);
+        CATCH_CHECK(fly::SameAs<const int &, int>);
+        CATCH_CHECK(fly::SameAs<const int &, const int &>);
+
+        CATCH_CHECK_FALSE(fly::SameAs<int, char>);
+        CATCH_CHECK_FALSE(fly::SameAs<int *, int>);
+        CATCH_CHECK_FALSE(fly::SameAs<bool, char>);
+        CATCH_CHECK_FALSE(fly::SameAs<FooClass, std::string>);
+    }
+
     CATCH_SECTION("Concept: SameAsAny")
     {
         CATCH_CHECK(fly::SameAsAny<int, int>);
