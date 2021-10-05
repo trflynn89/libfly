@@ -121,19 +121,19 @@ concept JsonBoolean = std::same_as<std::remove_cvref_t<T>, json_boolean_type>;
  * Concept that is satisfied when the given type is a signed JSON number type.
  */
 template <typename T>
-concept JsonSignedInteger = fly::SignedIntegral<std::remove_cvref_t<T>> && !JsonBoolean<T>;
+concept JsonSignedInteger = fly::SignedIntegral<T>;
 
 /**
  * Concept that is satisfied when the given type is an unsigned JSON number type.
  */
 template <typename T>
-concept JsonUnsignedInteger = fly::UnsignedIntegral<std::remove_cvref_t<T>> && !JsonBoolean<T>;
+concept JsonUnsignedInteger = fly::UnsignedIntegral<T>;
 
 /**
  * Concept that is satisfied when the given type is a JSON floating-point number type.
  */
 template <typename T>
-concept JsonFloatingPoint = fly::FloatingPoint<std::remove_cvref_t<T>>;
+concept JsonFloatingPoint = fly::FloatingPoint<T>;
 
 /**
  * Concept that is satisfied when the given type is a JSON number type.

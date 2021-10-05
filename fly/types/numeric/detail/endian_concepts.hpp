@@ -14,9 +14,7 @@ namespace fly::detail {
 template <typename T>
 concept EndianInteger = requires
 {
-    requires std::is_integral_v<std::remove_cvref_t<T>>;
-
-    requires !std::same_as<std::remove_cvref_t<T>, bool>;
+    requires fly::Integral<T>;
 
     requires fly::SizeOfTypeIs<T, 1> || fly::SizeOfTypeIs<T, 2> || fly::SizeOfTypeIs<T, 4> ||
         fly::SizeOfTypeIs<T, 8>;

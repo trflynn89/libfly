@@ -12,8 +12,7 @@ namespace fly::detail {
  * Concept that is satisfied if the given type is an unsigned integral type.
  */
 template <typename T>
-concept BitStreamInteger =
-    fly::UnsignedIntegral<std::remove_cvref_t<T>> && !std::same_as<std::remove_cvref_t<T>, bool>;
+concept BitStreamInteger = fly::UnsignedIntegral<T>;
 
 /**
  * Concept that is satisfied if the given type is the bit stream buffer type.
