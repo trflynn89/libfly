@@ -38,27 +38,27 @@ template <typename T, std::size_t Size>
 concept SizeOfTypeIs = fly::size_of_type_is_v<T, Size>;
 
 /**
- * Concept that is satisified if the given type is a signed integral type.
- *
- * This concept will be removed once Apple's Clang supports std::signed_integral.
+ * Concept that is satisified if the given type is an integral, non-boolean type.
  */
 template <typename T>
-concept SignedIntegral = std::is_integral_v<T> && std::is_signed_v<T>;
+concept Integral = std::is_integral_v<std::remove_cvref_t<T>> && !fly::SameAsAny<T, bool>;
 
 /**
- * Concept that is satisified if the given type is an unsigned integral type.
- *
- * This concept will be removed once Apple's Clang supports std::unsigned_integral.
+ * Concept that is satisified if the given type is a signed integral, non-boolean type.
  */
 template <typename T>
-concept UnsignedIntegral = std::is_integral_v<T> && std::is_unsigned_v<T>;
+concept SignedIntegral = fly::Integral<T> && std::is_signed_v<std::remove_cvref_t<T>>;
+
+/**
+ * Concept that is satisified if the given type is an unsigned integral, non-boolean type.
+ */
+template <typename T>
+concept UnsignedIntegral = fly::Integral<T> && std::is_unsigned_v<std::remove_cvref_t<T>>;
 
 /**
  * Concept that is satisified if the given type is a floating-point type.
- *
- * This concept will be removed once Apple's Clang supports std::floating_point.
  */
 template <typename T>
-concept FloatingPoint = std::is_floating_point_v<T>;
+concept FloatingPoint = std::is_floating_point_v<std::remove_cvref_t<T>>;
 
 } // namespace fly

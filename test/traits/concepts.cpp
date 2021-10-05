@@ -93,6 +93,21 @@ CATCH_TEST_CASE("Concepts", "[traits]")
         CATCH_CHECK_FALSE(fly::SameAsAll<FooClass, FooClass, std::string>);
     }
 
+    CATCH_SECTION("Concept: Integral")
+    {
+        CATCH_CHECK(fly::Integral<char>);
+        CATCH_CHECK(fly::Integral<int>);
+        CATCH_CHECK(fly::Integral<unsigned char>);
+        CATCH_CHECK(fly::Integral<unsigned int>);
+
+        CATCH_CHECK_FALSE(fly::Integral<bool>);
+        CATCH_CHECK_FALSE(fly::Integral<float>);
+        CATCH_CHECK_FALSE(fly::Integral<double>);
+        CATCH_CHECK_FALSE(fly::Integral<long double>);
+        CATCH_CHECK_FALSE(fly::Integral<std::string>);
+        CATCH_CHECK_FALSE(fly::Integral<FooClass>);
+    }
+
     CATCH_SECTION("Concept: SignedIntegral")
     {
         CATCH_CHECK(fly::SignedIntegral<char>);
@@ -110,10 +125,10 @@ CATCH_TEST_CASE("Concepts", "[traits]")
 
     CATCH_SECTION("Concept: UnsignedIntegral")
     {
-        CATCH_CHECK(fly::UnsignedIntegral<bool>);
         CATCH_CHECK(fly::UnsignedIntegral<unsigned char>);
         CATCH_CHECK(fly::UnsignedIntegral<unsigned int>);
 
+        CATCH_CHECK_FALSE(fly::UnsignedIntegral<bool>);
         CATCH_CHECK_FALSE(fly::UnsignedIntegral<char>);
         CATCH_CHECK_FALSE(fly::UnsignedIntegral<int>);
         CATCH_CHECK_FALSE(fly::UnsignedIntegral<float>);
