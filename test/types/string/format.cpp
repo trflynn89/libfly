@@ -807,8 +807,10 @@ CATCH_TEMPLATE_TEST_CASE("FormatErrors", "[string]", char, wchar_t, char8_t, cha
 
     CATCH_SECTION("Formatter reports formatting errors")
     {
-        auto result = BasicString::format(FMT("{:}"));
-        CATCH_CHECK(result.starts_with(FMT("Ignored invalid formatter")));
+        test_format(
+            FMT("{:}"),
+            FMT("Ignored invalid formatter: Argument position exceeds number of provided "
+                "arguments"));
     }
 }
 
