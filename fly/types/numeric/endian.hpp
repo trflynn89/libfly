@@ -1,7 +1,7 @@
 #pragma once
 
+#include "fly/concepts/concepts.hpp"
 #include "fly/fly.hpp"
-#include "fly/traits/concepts.hpp"
 #include "fly/types/numeric/detail/endian_concepts.hpp"
 
 #include <bit>

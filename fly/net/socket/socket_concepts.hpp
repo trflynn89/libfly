@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/traits/concepts.hpp"
+#include "fly/concepts/concepts.hpp"
 
 namespace fly::net {
 

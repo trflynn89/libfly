@@ -2,8 +2,8 @@
 
 #include "test/util/capture_stream.hpp"
 
+#include "fly/concepts/concepts.hpp"
 #include "fly/fly.hpp"
-#include "fly/traits/concepts.hpp"
 #include "fly/types/string/string.hpp"
 
 #include "catch2/catch_test_macros.hpp"

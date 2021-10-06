@@ -1,6 +1,6 @@
 #include "fly/types/numeric/endian.hpp"
 
-#include "fly/traits/concepts.hpp"
+#include "fly/concepts/concepts.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"

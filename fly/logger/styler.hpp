@@ -1,8 +1,8 @@
 #pragma once
 
+#include "fly/concepts/concepts.hpp"
 #include "fly/fly.hpp"
 #include "fly/logger/detail/styler_proxy.hpp"
-#include "fly/traits/concepts.hpp"
 #include "fly/types/numeric/literals.hpp"
 
 #include <cstdint>

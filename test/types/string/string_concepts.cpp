@@ -1,6 +1,6 @@
 #include "fly/types/string/detail/string_concepts.hpp"
 
-#include "fly/traits/concepts.hpp"
+#include "fly/concepts/concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"

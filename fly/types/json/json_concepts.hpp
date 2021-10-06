@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/traits/concepts.hpp"
+#include "fly/concepts/concepts.hpp"
 #include "fly/types/json/json_types.hpp"
 #include "fly/types/string/detail/string_concepts.hpp"
 

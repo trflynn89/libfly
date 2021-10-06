@@ -7,6 +7,9 @@
     <Filter Include="config">
       <UniqueIdentifier>{ee0c6b14-fa2b-4f87-a3b0-ccbf7c4c13c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="concepts">
+      <UniqueIdentifier>{1716af47-ff79-4f7f-b910-fefa3c97bfe0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="logger">
       <UniqueIdentifier>{7ecf1fbd-e9f8-430f-aa13-4ddb9e46dbd8}</UniqueIdentifier>
     </Filter>
@@ -24,9 +27,6 @@
     </Filter>
     <Filter Include="task">
       <UniqueIdentifier>{efd06495-eee3-4270-a39c-2d065f559bc6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="traits">
-      <UniqueIdentifier>{1716af47-ff79-4f7f-b910-fefa3c97bfe0}</UniqueIdentifier>
     </Filter>
     <Filter Include="types">
       <UniqueIdentifier>{3120a3ba-5fe5-417c-9e5f-33d9537560d1}</UniqueIdentifier>
@@ -55,6 +55,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\test\coders\huffman_coder.cpp">
       <Filter>coders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\concepts\concepts.cpp">
+      <Filter>concepts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\config\config.cpp">
       <Filter>config</Filter>
@@ -115,9 +118,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\test\task\task.cpp">
       <Filter>task</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\traits\concepts.cpp">
-      <Filter>concepts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\types\bit_stream\bit_stream.cpp">
       <Filter>types\bit_stream</Filter>
