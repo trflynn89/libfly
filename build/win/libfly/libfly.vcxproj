@@ -192,11 +192,11 @@
     <ClInclude Include="..\..\..\fly\net\network_config.hpp" />
     <ClInclude Include="..\..\..\fly\net\socket\detail\base_socket.hpp" />
     <ClInclude Include="..\..\..\fly\net\socket\detail\socket_operations.hpp" />
+    <ClInclude Include="..\..\..\fly\net\socket\concepts.hpp" />
     <ClInclude Include="..\..\..\fly\net\socket\listen_socket.hpp" />
-    <ClInclude Include="..\..\..\fly\net\socket\socket_concepts.hpp" />
     <ClInclude Include="..\..\..\fly\net\socket\socket_service.hpp" />
-    <ClInclude Include="..\..\..\fly\net\socket\socket_types.hpp" />
     <ClInclude Include="..\..\..\fly\net\socket\tcp_socket.hpp" />
+    <ClInclude Include="..\..\..\fly\net\socket\types.hpp" />
     <ClInclude Include="..\..\..\fly\net\socket\udp_socket.hpp" />
     <ClInclude Include="..\..\..\fly\parser\ini_parser.hpp" />
     <ClInclude Include="..\..\..\fly\parser\json_parser.hpp" />

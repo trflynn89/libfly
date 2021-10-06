@@ -1,8 +1,8 @@
 #pragma once
 
+#include "fly/net/socket/concepts.hpp"
 #include "fly/net/socket/detail/base_socket.hpp"
-#include "fly/net/socket/socket_concepts.hpp"
-#include "fly/net/socket/socket_types.hpp"
+#include "fly/net/socket/types.hpp"
 
 #include <cstddef>
 #include <functional>

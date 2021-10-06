@@ -3,8 +3,8 @@
 #include "fly/fly.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
-#include "fly/net/socket/socket_concepts.hpp"
-#include "fly/net/socket/socket_types.hpp"
+#include "fly/net/socket/concepts.hpp"
+#include "fly/net/socket/types.hpp"
 #include "fly/types/string/lexer.hpp"
 #include "fly/types/string/string.hpp"
 
