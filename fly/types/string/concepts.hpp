@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/concepts/concepts.hpp"
-#include "fly/types/string/detail/string_concepts_helpers.hpp"
+#include "fly/types/string/detail/concepts.hpp"
 
 #include <string>
 #include <type_traits>

@@ -2,7 +2,7 @@
 
 #include "fly/types/string/detail/format_context.hpp"
 #include "fly/types/string/detail/format_parse_context.hpp"
-#include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/detail/traits.hpp"
 
 #include "catch2/catch_approx.hpp"
 #include "catch2/catch_template_test_macros.hpp"

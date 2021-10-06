@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/concepts/concepts.hpp"
+#include "fly/types/string/concepts.hpp"
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/converter.hpp"
 #include "fly/types/string/detail/format_context.hpp"
@@ -8,11 +9,10 @@
 #include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/format_string.hpp"
-#include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/detail/traits.hpp"
 #include "fly/types/string/detail/unicode.hpp"
 #include "fly/types/string/formatters.hpp"
 #include "fly/types/string/literals.hpp"
-#include "fly/types/string/string_concepts.hpp"
 
 #include <algorithm>
 #include <array>

@@ -4,8 +4,8 @@
 
 #include "fly/logger/styler.hpp"
 #include "fly/types/numeric/literals.hpp"
+#include "fly/types/string/concepts.hpp"
 #include "fly/types/string/string.hpp"
-#include "fly/types/string/string_concepts.hpp"
 
 #include <array>
 #include <cmath>

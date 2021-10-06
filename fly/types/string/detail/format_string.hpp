@@ -1,13 +1,13 @@
 #pragma once
 
 #include "fly/fly.hpp"
+#include "fly/types/string/concepts.hpp"
 #include "fly/types/string/detail/format_parameter_type.hpp"
 #include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
-#include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/detail/traits.hpp"
 #include "fly/types/string/lexer.hpp"
 #include "fly/types/string/literals.hpp"
-#include "fly/types/string/string_concepts.hpp"
 
 #include <array>
 #include <cstdint>

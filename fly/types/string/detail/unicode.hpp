@@ -1,9 +1,9 @@
 #pragma once
 
 #include "fly/concepts/concepts.hpp"
-#include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/concepts.hpp"
+#include "fly/types/string/detail/traits.hpp"
 #include "fly/types/string/literals.hpp"
-#include "fly/types/string/string_concepts.hpp"
 
 #include <array>
 #include <functional>
