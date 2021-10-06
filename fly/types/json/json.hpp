@@ -2000,7 +2000,7 @@ bool Json::contains(T key) const
 template <JsonStringLike T>
 json_string_type Json::convert_to_string(T value)
 {
-    using StringType = BasicString<typename detail::is_like_supported_string_t<T>::value_type>;
+    using StringType = BasicString<detail::StandardCharacterType<T>>;
 
     if constexpr (fly::SameAs<typename StringType::string_type, json_string_type>)
     {

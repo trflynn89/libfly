@@ -1,4 +1,4 @@
-#include "fly/traits/traits.hpp"
+#include "fly/traits/concepts.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -201,7 +201,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
         CATCH_CHECK_FALSE(BasicString::template convert<std::int8_t>(s));
         CATCH_CHECK_FALSE(BasicString::template convert<std::uint8_t>(s));
 
-        if constexpr (fly::any_same_v<char_type, char, wchar_t>)
+        if constexpr (fly::SameAsAny<char_type, char, wchar_t>)
         {
             CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int8_t>(minstr<string_type, std::int8_t>()));
@@ -239,7 +239,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
         CATCH_CHECK_FALSE(BasicString::template convert<std::int16_t>(s));
         CATCH_CHECK_FALSE(BasicString::template convert<std::uint16_t>(s));
 
-        if constexpr (fly::any_same_v<char_type, char, wchar_t>)
+        if constexpr (fly::SameAsAny<char_type, char, wchar_t>)
         {
             CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int16_t>(minstr<string_type, std::int16_t>()));
@@ -277,7 +277,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
         CATCH_CHECK_FALSE(BasicString::template convert<std::int32_t>(s));
         CATCH_CHECK_FALSE(BasicString::template convert<std::uint32_t>(s));
 
-        if constexpr (fly::any_same_v<char_type, char, wchar_t>)
+        if constexpr (fly::SameAsAny<char_type, char, wchar_t>)
         {
             CATCH_CHECK_FALSE(
                 BasicString::template convert<std::int32_t>(minstr<string_type, std::int32_t>()));

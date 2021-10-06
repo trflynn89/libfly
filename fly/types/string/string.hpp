@@ -40,12 +40,6 @@ using String8 = BasicString<char8_t>;
 using String16 = BasicString<char16_t>;
 using String32 = BasicString<char32_t>;
 
-using StringTraits = detail::BasicStringTraits<char>;
-using WStringTraits = detail::BasicStringTraits<wchar_t>;
-using String8Traits = detail::BasicStringTraits<char8_t>;
-using String16Traits = detail::BasicStringTraits<char16_t>;
-using String32Traits = detail::BasicStringTraits<char32_t>;
-
 /**
  * Static class to provide string utilities not provided by the STL.
  *
@@ -80,7 +74,7 @@ public:
      *
      * @return The length of the string-like value.
      */
-    template <detail::StringLike T>
+    template <detail::StandardStringLike T>
     static constexpr size_type size(T &&value);
 
     /**
@@ -577,7 +571,7 @@ private:
 
 //==================================================================================================
 template <typename CharType>
-template <detail::StringLike T>
+template <detail::StandardStringLike T>
 constexpr auto BasicString<CharType>::size(T &&value) -> size_type
 {
     return detail::BasicClassifier<char_type>::size(std::forward<T>(value));
@@ -1034,7 +1028,7 @@ template <typename CharType>
 template <typename T>
 std::optional<T> BasicString<CharType>::convert(const string_type &value)
 {
-    if constexpr (detail::is_supported_string_v<T>)
+    if constexpr (detail::StandardString<T>)
     {
         return unicode::template convert_encoding<T>(value);
     }

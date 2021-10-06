@@ -6,7 +6,6 @@
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/stream_util.hpp"
 #include "fly/types/string/detail/string_concepts.hpp"
-#include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/unicode.hpp"
 
 #include <array>
@@ -113,21 +112,21 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
     template <typename FormatContext>
     static void append_string(const T &value, std::size_t value_size, FormatContext &context)
     {
-        using string_like_type = detail::is_like_supported_string_t<T>;
-        using view_like_type = std::basic_string_view<typename string_like_type::value_type>;
+        using standard_character_type = detail::StandardCharacterType<T>;
+        using standard_view_type = std::basic_string_view<standard_character_type>;
 
-        view_like_type view;
+        standard_view_type view;
 
         if constexpr (std::is_array_v<T> || std::is_pointer_v<T>)
         {
-            view = view_like_type(value, value_size);
+            view = standard_view_type(value, value_size);
         }
         else
         {
-            view = view_like_type(value).substr(0, value_size);
+            view = standard_view_type(value).substr(0, value_size);
         }
 
-        if constexpr (fly::SameAs<string_type, string_like_type>)
+        if constexpr (fly::SameAs<CharType, standard_character_type>)
         {
             for (const auto &ch : view)
             {
@@ -136,7 +135,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
         }
         else
         {
-            using unicode = detail::BasicUnicode<typename string_like_type::value_type>;
+            using unicode = detail::BasicUnicode<standard_character_type>;
 
             if (auto converted = unicode::template convert_encoding<string_type>(view); converted)
             {

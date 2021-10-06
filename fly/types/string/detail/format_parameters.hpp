@@ -5,7 +5,6 @@
 #include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/string_concepts.hpp"
-#include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/formatters.hpp"
 
 #include <array>
@@ -424,25 +423,24 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &val
 {
     using U = std::remove_cvref_t<T>;
 
-    using string_like_type = fly::detail::is_like_supported_string_t<T>;
-    using char_like_type = typename string_like_type::value_type;
-    using view_like_type = typename fly::detail::BasicStringTraits<char_like_type>::view_type;
+    using standard_character_type = detail::StandardCharacterType<T>;
+    using standard_view_type = std::basic_string_view<standard_character_type>;
 
-    view_like_type view;
+    standard_view_type view;
 
     if constexpr (std::is_array_v<U> || std::is_pointer_v<U>)
     {
-        view = view_like_type(value, BasicClassifier<char_like_type>::size(value));
+        view = standard_view_type(value, BasicClassifier<standard_character_type>::size(value));
     }
     else
     {
-        view = view_like_type(value);
+        view = standard_view_type(value);
     }
 
     m_value.m_string = {
         static_cast<const void *>(view.data()),
         view.size(),
-        format_string_value<FormatContext, char_like_type>};
+        format_string_value<FormatContext, standard_character_type>};
 }
 
 //==================================================================================================
