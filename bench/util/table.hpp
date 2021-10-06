@@ -357,7 +357,7 @@ auto Table<Args...>::column_widths_for_row(const Row &row) -> RowSizedArray<std:
     {
         using T = std::decay_t<decltype(value)>;
 
-        if constexpr (fly::StringTraits::is_string_like_v<T>)
+        if constexpr (fly::detail::StandardStringLike<T>)
         {
             widths[index] = fly::String::size(value);
         }

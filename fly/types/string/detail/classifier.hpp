@@ -33,7 +33,7 @@ public:
      *
      * @return The length of the string-like value.
      */
-    template <StringLike T>
+    template <StandardStringLike T>
     static constexpr size_type size(T &&value);
 
     /**
@@ -187,7 +187,7 @@ private:
 
 //==================================================================================================
 template <typename CharType>
-template <StringLike T>
+template <StandardStringLike T>
 constexpr auto BasicClassifier<CharType>::size(T &&value) -> size_type
 {
     using U = std::remove_cvref_t<T>;

@@ -2,7 +2,7 @@
 
 #include "fly/traits/concepts.hpp"
 #include "fly/types/json/json_types.hpp"
-#include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/detail/string_concepts.hpp"
 
 #include <array>
 #include <deque>
@@ -57,13 +57,13 @@ concept JsonNull = fly::SameAs<T, json_null_type>;
  * Concept that is satisfied when the given type is a supported JSON string type.
  */
 template <typename T>
-concept JsonString = fly::detail::is_supported_string_v<T>;
+concept JsonString = fly::detail::StandardString<T>;
 
 /**
  * Concept that is satisfied when the given type is a supported JSON string type.
  */
 template <typename T>
-concept JsonStringLike = fly::detail::is_like_supported_string_v<T>;
+concept JsonStringLike = fly::detail::StandardStringLike<T>;
 
 /**
  * Concept that is satisfied when the given type is a supported JSON object type.

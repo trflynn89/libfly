@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fly/types/string/detail/string_concepts.hpp"
-#include "fly/types/string/detail/string_traits.hpp"
 
 #include <cstdint>
 
@@ -31,7 +30,7 @@ enum class ParameterType : std::uint8_t
 template <typename T>
 constexpr ParameterType infer_parameter_type()
 {
-    if constexpr (is_supported_character_v<T>)
+    if constexpr (StandardCharacter<T>)
     {
         return ParameterType::Character;
     }

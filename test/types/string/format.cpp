@@ -40,15 +40,11 @@ using FormatString =
 
 template <typename StringType, typename... ParameterTypes>
 void test_format(
-    FormatString<
-        typename fly::detail::is_like_supported_string_t<StringType>::value_type,
-        ParameterTypes...> format,
+    FormatString<fly::detail::StandardCharacterType<StringType>, ParameterTypes...> format,
     StringType &&expected,
     ParameterTypes &&...parameters)
 {
-    using char_type = typename fly::detail::is_like_supported_string_t<StringType>::value_type;
-
-    auto result = fly::BasicString<char_type>::format(
+    auto result = fly::BasicString<fly::detail::StandardCharacterType<StringType>>::format(
         std::move(format),
         std::forward<ParameterTypes>(parameters)...);
 
