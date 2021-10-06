@@ -112,7 +112,7 @@ void test_error(FormatStringType &&format, std::string &&error)
 // defined in a common header, but when FLY_CONSTEVAL evaluates to 'consteval', the error message
 // raised would not display in the compile error (the variable name or macro name would display).
 constexpr const char *s_unclosed_string = "Detected unclosed replacement field - must end with }";
-constexpr const char *s_unescaped_close = "Closing brace } must be esacped";
+constexpr const char *s_unescaped_close = "Closing brace } must be escaped";
 constexpr const char *s_too_many_specifiers = "Exceeded maximum allowed number of specifiers";
 constexpr const char *s_bad_position = "Argument position exceeds number of provided arguments";
 constexpr const char *s_position_mismatch =
