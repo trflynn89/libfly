@@ -240,13 +240,14 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\format_specifier.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\format_string.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\stream_util.hpp" />
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_concepts.hpp" />
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_concepts_helpers.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\detail\unicode.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\formatters.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\lexer.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\literals.hpp" />
     <ClInclude Include="..\..\..\fly\types\string\string.hpp" />
+    <ClInclude Include="..\..\..\fly\types\string\string_concepts.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\fly\coders\base64\base64_coder.cpp" />

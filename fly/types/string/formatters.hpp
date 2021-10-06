@@ -5,8 +5,8 @@
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/stream_util.hpp"
-#include "fly/types/string/detail/string_concepts.hpp"
 #include "fly/types/string/detail/unicode.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <array>
 #include <charconv>
@@ -36,7 +36,7 @@ template <typename T, typename CharType = char>
 struct Formatter;
 
 //==================================================================================================
-template <detail::FormattableString T, typename CharType>
+template <FormattableString T, typename CharType>
 struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 {
     FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::String)
@@ -112,7 +112,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
     template <typename FormatContext>
     static void append_string(const T &value, std::size_t value_size, FormatContext &context)
     {
-        using standard_character_type = detail::StandardCharacterType<T>;
+        using standard_character_type = StandardCharacterType<T>;
         using standard_view_type = std::basic_string_view<standard_character_type>;
 
         standard_view_type view;
@@ -154,7 +154,7 @@ private:
 };
 
 //==================================================================================================
-template <detail::FormattablePointer T, typename CharType>
+template <FormattablePointer T, typename CharType>
 struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 {
     FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::Pointer)
@@ -181,7 +181,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 };
 
 //==================================================================================================
-template <detail::FormattableIntegral T, typename CharType>
+template <FormattableIntegral T, typename CharType>
 struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 {
     FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::Integral)
@@ -500,7 +500,7 @@ private:
 };
 
 //==================================================================================================
-template <detail::FormattableFloatingPoint T, typename CharType>
+template <FormattableFloatingPoint T, typename CharType>
 struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 {
     FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::FloatingPoint)
@@ -861,7 +861,7 @@ private:
 };
 
 //==================================================================================================
-template <detail::FormattableBoolean T, typename CharType>
+template <FormattableBoolean T, typename CharType>
 struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 {
     FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::Boolean)

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "fly/types/string/detail/string_concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/literals.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <string>
 
@@ -33,7 +33,7 @@ public:
      *
      * @return The length of the string-like value.
      */
-    template <StandardStringLike T>
+    template <fly::StandardStringLike T>
     static constexpr size_type size(T &&value);
 
     /**
@@ -187,7 +187,7 @@ private:
 
 //==================================================================================================
 template <typename CharType>
-template <StandardStringLike T>
+template <fly::StandardStringLike T>
 constexpr auto BasicClassifier<CharType>::size(T &&value) -> size_type
 {
     using U = std::remove_cvref_t<T>;

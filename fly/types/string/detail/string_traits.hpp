@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/string/detail/string_concepts.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <cstdint>
 #include <string>
@@ -13,7 +13,7 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 23, 2019
  */
-template <StandardCharacter CharType>
+template <fly::StandardCharacter CharType>
 struct BasicStringTraits
 {
     using string_type = std::basic_string<CharType>;

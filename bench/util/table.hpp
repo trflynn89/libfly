@@ -5,6 +5,7 @@
 #include "fly/logger/styler.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <array>
 #include <cmath>
@@ -357,7 +358,7 @@ auto Table<Args...>::column_widths_for_row(const Row &row) -> RowSizedArray<std:
     {
         using T = std::decay_t<decltype(value)>;
 
-        if constexpr (fly::detail::StandardStringLike<T>)
+        if constexpr (fly::StandardStringLike<T>)
         {
             widths[index] = fly::String::size(value);
         }

@@ -8,11 +8,11 @@
 #include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/format_string.hpp"
-#include "fly/types/string/detail/string_concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/detail/unicode.hpp"
 #include "fly/types/string/formatters.hpp"
 #include "fly/types/string/literals.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <algorithm>
 #include <array>
@@ -74,7 +74,7 @@ public:
      *
      * @return The length of the string-like value.
      */
-    template <detail::StandardStringLike T>
+    template <StandardStringLike T>
     static constexpr size_type size(T &&value);
 
     /**
@@ -571,7 +571,7 @@ private:
 
 //==================================================================================================
 template <typename CharType>
-template <detail::StandardStringLike T>
+template <StandardStringLike T>
 constexpr auto BasicString<CharType>::size(T &&value) -> size_type
 {
     return detail::BasicClassifier<char_type>::size(std::forward<T>(value));
@@ -1028,7 +1028,7 @@ template <typename CharType>
 template <typename T>
 std::optional<T> BasicString<CharType>::convert(const string_type &value)
 {
-    if constexpr (detail::StandardString<T>)
+    if constexpr (StandardString<T>)
     {
         return unicode::template convert_encoding<T>(value);
     }

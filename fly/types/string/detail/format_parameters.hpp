@@ -4,8 +4,8 @@
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
-#include "fly/types/string/detail/string_concepts.hpp"
 #include "fly/types/string/formatters.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <array>
 #include <cstdint>
@@ -152,7 +152,7 @@ public:
      *
      * @param value The user-defined value.
      */
-    template <FormattableUserDefined T>
+    template <fly::FormattableUserDefined T>
     explicit constexpr BasicFormatParameter(const T &value) noexcept;
 
     /**
@@ -163,7 +163,7 @@ public:
      *
      * @param value The string-like value.
      */
-    template <FormattableString T>
+    template <fly::FormattableString T>
     explicit constexpr BasicFormatParameter(const T &value) noexcept;
 
     /**
@@ -173,7 +173,7 @@ public:
      *
      * @param value The pointer value.
      */
-    template <FormattablePointer T>
+    template <fly::FormattablePointer T>
     explicit constexpr BasicFormatParameter(T value) noexcept;
 
     /**
@@ -183,7 +183,7 @@ public:
      *
      * @param value The integral value.
      */
-    template <FormattableIntegral T>
+    template <fly::FormattableIntegral T>
     explicit constexpr BasicFormatParameter(T value) noexcept;
 
     /**
@@ -193,7 +193,7 @@ public:
      *
      * @param value The floating-point value.
      */
-    template <FormattableFloatingPoint T>
+    template <fly::FormattableFloatingPoint T>
     explicit constexpr BasicFormatParameter(T value) noexcept;
 
     /**
@@ -203,7 +203,7 @@ public:
      *
      * @param value The boolean value.
      */
-    template <FormattableBoolean T>
+    template <fly::FormattableBoolean T>
     explicit constexpr BasicFormatParameter(T value) noexcept;
 
     /**
@@ -408,7 +408,7 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter() noexcept :
 
 //==================================================================================================
 template <typename FormatContext>
-template <FormattableUserDefined T>
+template <fly::FormattableUserDefined T>
 constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &value) noexcept :
     m_type(Type::UserDefined),
     m_value {.m_user_defined {&value, format_user_defined_value<FormatContext, T>}}
@@ -417,13 +417,13 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &val
 
 //==================================================================================================
 template <typename FormatContext>
-template <FormattableString T>
+template <fly::FormattableString T>
 constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &value) noexcept :
     m_type(Type::String)
 {
     using U = std::remove_cvref_t<T>;
 
-    using standard_character_type = detail::StandardCharacterType<T>;
+    using standard_character_type = fly::StandardCharacterType<T>;
     using standard_view_type = std::basic_string_view<standard_character_type>;
 
     standard_view_type view;
@@ -445,7 +445,7 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &val
 
 //==================================================================================================
 template <typename FormatContext>
-template <FormattablePointer T>
+template <fly::FormattablePointer T>
 constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept :
     m_type(Type::Pointer),
     m_value {.m_standard {.m_pointer {value}, .m_format {format_standard_value<FormatContext, T>}}}
@@ -454,7 +454,7 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noe
 
 //==================================================================================================
 template <typename FormatContext>
-template <FormattableIntegral T>
+template <fly::FormattableIntegral T>
 constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept
 {
     m_value.m_standard.m_format = format_standard_value<FormatContext, T>;
@@ -473,7 +473,7 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noe
 
 //==================================================================================================
 template <typename FormatContext>
-template <FormattableFloatingPoint T>
+template <fly::FormattableFloatingPoint T>
 constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept
 {
     m_value.m_standard.m_format = format_standard_value<FormatContext, T>;
@@ -497,7 +497,7 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noe
 
 //==================================================================================================
 template <typename FormatContext>
-template <FormattableBoolean T>
+template <fly::FormattableBoolean T>
 constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept :
     m_type(Type::Bool),
     m_value {.m_standard {.m_bool {value}, .m_format {format_standard_value<FormatContext, T>}}}

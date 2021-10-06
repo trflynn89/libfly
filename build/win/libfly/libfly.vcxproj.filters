@@ -298,6 +298,9 @@
     <ClInclude Include="..\..\..\fly\types\string\string.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\string_concepts.hpp">
+      <Filter>types\string</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\classifier.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
@@ -325,7 +328,7 @@
     <ClInclude Include="..\..\..\fly\types\string\detail\stream_util.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\string\detail\string_concepts.hpp">
+    <ClInclude Include="..\..\..\fly\types\string\detail\string_concepts_helpers.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\string_traits.hpp">
