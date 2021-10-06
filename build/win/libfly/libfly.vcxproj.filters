@@ -226,9 +226,6 @@
     <ClInclude Include="..\..\..\fly\traits\concepts.hpp">
       <Filter>concepts</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\traits\traits.hpp">
-      <Filter>traits</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.hpp">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
