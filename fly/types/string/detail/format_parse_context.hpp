@@ -3,6 +3,7 @@
 #include "fly/types/string/detail/format_parameter_type.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/lexer.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <cstddef>
 #include <string_view>
@@ -16,7 +17,7 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version April 25, 2021
  */
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 class BasicFormatParseContext
 {
     using traits = BasicStringTraits<CharType>;
@@ -115,7 +116,7 @@ private:
 };
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <std::size_t N>
 constexpr BasicFormatParseContext<CharType>::BasicFormatParseContext(
     const CharType (&format)[N],
@@ -128,7 +129,7 @@ constexpr BasicFormatParseContext<CharType>::BasicFormatParseContext(
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr std::size_t BasicFormatParseContext<CharType>::next_position()
 {
     std::size_t position = 0;
@@ -153,7 +154,7 @@ constexpr std::size_t BasicFormatParseContext<CharType>::next_position()
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr std::optional<ParameterType>
 BasicFormatParseContext<CharType>::parameter_type(std::size_t position)
 {
@@ -167,35 +168,35 @@ BasicFormatParseContext<CharType>::parameter_type(std::size_t position)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr fly::BasicLexer<CharType> &BasicFormatParseContext<CharType>::lexer()
 {
     return m_lexer;
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr auto BasicFormatParseContext<CharType>::view() const -> view_type
 {
     return m_lexer.view();
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 void BasicFormatParseContext<CharType>::on_error(const char *error)
 {
     m_error = error;
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr bool BasicFormatParseContext<CharType>::has_error() const
 {
     return !m_error.empty();
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 std::string BasicFormatParseContext<CharType>::error() const
 {
     return std::string(m_error.data(), m_error.size());

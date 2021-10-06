@@ -31,7 +31,7 @@
 
 namespace fly {
 
-template <typename CharType>
+template <StandardCharacter CharType>
 class BasicString;
 
 using String = BasicString<char>;
@@ -46,7 +46,7 @@ using String32 = BasicString<char32_t>;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version March 21, 2019
  */
-template <typename CharType>
+template <StandardCharacter CharType>
 class BasicString
 {
     using traits = detail::BasicStringTraits<CharType>;
@@ -570,7 +570,7 @@ private:
 };
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <StandardStringLike T>
 constexpr auto BasicString<CharType>::size(T &&value) -> size_type
 {
@@ -578,70 +578,70 @@ constexpr auto BasicString<CharType>::size(T &&value) -> size_type
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr bool BasicString<CharType>::is_alpha(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_alpha(ch);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr bool BasicString<CharType>::is_upper(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_upper(ch);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr bool BasicString<CharType>::is_lower(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_lower(ch);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr bool BasicString<CharType>::is_digit(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_digit(ch);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr auto BasicString<CharType>::to_upper(char_type ch) -> char_type
 {
     return detail::BasicClassifier<char_type>::to_upper(ch);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr auto BasicString<CharType>::to_lower(char_type ch) -> char_type
 {
     return detail::BasicClassifier<char_type>::to_lower(ch);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr bool BasicString<CharType>::is_x_digit(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_x_digit(ch);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr bool BasicString<CharType>::is_space(char_type ch)
 {
     return detail::BasicClassifier<char_type>::is_space(ch);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 auto BasicString<CharType>::split(view_type input, char_type delimiter) -> std::vector<string_type>
 {
     return split(input, delimiter, 0);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 auto BasicString<CharType>::split(view_type input, char_type delimiter, size_type count)
     -> std::vector<string_type>
 {
@@ -683,7 +683,7 @@ auto BasicString<CharType>::split(view_type input, char_type delimiter, size_typ
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 void BasicString<CharType>::trim(string_type &target)
 {
     auto is_non_space = [](auto ch)
@@ -699,7 +699,7 @@ void BasicString<CharType>::trim(string_type &target)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 void BasicString<CharType>::replace_all(string_type &target, view_type search, char_type replace)
 {
     size_type index = target.find(search);
@@ -712,7 +712,7 @@ void BasicString<CharType>::replace_all(string_type &target, view_type search, c
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 void BasicString<CharType>::replace_all(string_type &target, view_type search, view_type replace)
 {
     size_type index = target.find(search);
@@ -725,14 +725,14 @@ void BasicString<CharType>::replace_all(string_type &target, view_type search, v
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 void BasicString<CharType>::remove_all(string_type &target, view_type search)
 {
     replace_all(target, search, view_type {});
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 bool BasicString<CharType>::wildcard_match(view_type source, view_type search)
 {
     static constexpr char_type s_wildcard = '*';
@@ -767,7 +767,7 @@ bool BasicString<CharType>::wildcard_match(view_type source, view_type search)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 inline bool BasicString<CharType>::validate(view_type value)
 {
     auto it = value.cbegin();
@@ -777,7 +777,7 @@ inline bool BasicString<CharType>::validate(view_type value)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <typename IteratorType>
 inline auto BasicString<CharType>::decode_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<codepoint_type>
@@ -786,7 +786,7 @@ inline auto BasicString<CharType>::decode_codepoint(IteratorType &it, const Iter
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 inline auto BasicString<CharType>::encode_codepoint(codepoint_type codepoint)
     -> std::optional<string_type>
 {
@@ -794,7 +794,7 @@ inline auto BasicString<CharType>::encode_codepoint(codepoint_type codepoint)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <char UnicodePrefix>
 auto BasicString<CharType>::escape_all_codepoints(view_type value) -> std::optional<string_type>
 {
@@ -819,7 +819,7 @@ auto BasicString<CharType>::escape_all_codepoints(view_type value) -> std::optio
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <char UnicodePrefix, typename IteratorType>
 inline auto BasicString<CharType>::escape_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<string_type>
@@ -828,7 +828,7 @@ inline auto BasicString<CharType>::escape_codepoint(IteratorType &it, const Iter
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 auto BasicString<CharType>::unescape_all_codepoints(view_type value) -> std::optional<string_type>
 {
     string_type result;
@@ -872,7 +872,7 @@ auto BasicString<CharType>::unescape_all_codepoints(view_type value) -> std::opt
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <typename IteratorType>
 inline auto BasicString<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<string_type>
@@ -881,7 +881,7 @@ inline auto BasicString<CharType>::unescape_codepoint(IteratorType &it, const It
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 auto BasicString<CharType>::generate_random_string(size_type length) -> string_type
 {
     using short_distribution = std::uniform_int_distribution<short>;
@@ -907,7 +907,7 @@ auto BasicString<CharType>::generate_random_string(size_type length) -> string_t
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <typename... ParameterTypes>
 inline auto
 BasicString<CharType>::format(FormatString<ParameterTypes...> &&fmt, ParameterTypes &&...parameters)
@@ -925,7 +925,7 @@ BasicString<CharType>::format(FormatString<ParameterTypes...> &&fmt, ParameterTy
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <typename OutputIterator, typename... ParameterTypes>
 void BasicString<CharType>::format_to(
     OutputIterator output,
@@ -992,7 +992,7 @@ void BasicString<CharType>::format_to(
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <typename... Args>
 inline auto BasicString<CharType>::join(char_type separator, Args &&...args) -> string_type
 {
@@ -1003,7 +1003,7 @@ inline auto BasicString<CharType>::join(char_type separator, Args &&...args) -> 
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <typename T, typename... Args>
 inline void BasicString<CharType>::join_internal(
     string_type &result,
@@ -1016,7 +1016,7 @@ inline void BasicString<CharType>::join_internal(
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <typename T>
 inline void BasicString<CharType>::join_internal(string_type &result, char_type, T &&value)
 {
@@ -1024,7 +1024,7 @@ inline void BasicString<CharType>::join_internal(string_type &result, char_type,
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <typename T>
 std::optional<T> BasicString<CharType>::convert(const string_type &value)
 {

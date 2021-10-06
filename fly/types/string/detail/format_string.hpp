@@ -7,6 +7,7 @@
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/lexer.hpp"
 #include "fly/types/string/literals.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <array>
 #include <cstdint>
@@ -27,7 +28,7 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021
  */
-template <typename CharType, typename... ParameterTypes>
+template <fly::StandardCharacter CharType, typename... ParameterTypes>
 class BasicFormatString
 {
     using FormatParseContext = BasicFormatParseContext<CharType>;
@@ -95,7 +96,7 @@ private:
 };
 
 //==================================================================================================
-template <typename CharType, typename... ParameterTypes>
+template <fly::StandardCharacter CharType, typename... ParameterTypes>
 template <std::size_t N>
 FLY_CONSTEVAL BasicFormatString<CharType, ParameterTypes...>::BasicFormatString(
     const CharType (&format)[N]) noexcept :
@@ -133,7 +134,7 @@ FLY_CONSTEVAL BasicFormatString<CharType, ParameterTypes...>::BasicFormatString(
 }
 
 //==================================================================================================
-template <typename CharType, typename... ParameterTypes>
+template <fly::StandardCharacter CharType, typename... ParameterTypes>
 constexpr BasicFormatParseContext<CharType> &
 BasicFormatString<CharType, ParameterTypes...>::context()
 {
@@ -141,7 +142,7 @@ BasicFormatString<CharType, ParameterTypes...>::context()
 }
 
 //==================================================================================================
-template <typename CharType, typename... ParameterTypes>
+template <fly::StandardCharacter CharType, typename... ParameterTypes>
 auto BasicFormatString<CharType, ParameterTypes...>::next_specifier()
     -> std::optional<FormatSpecifier>
 {
@@ -154,7 +155,7 @@ auto BasicFormatString<CharType, ParameterTypes...>::next_specifier()
 }
 
 //==================================================================================================
-template <typename CharType, typename... ParameterTypes>
+template <fly::StandardCharacter CharType, typename... ParameterTypes>
 constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier() -> FormatSpecifier
 {
     // The opening { will have already been consumed, so the starting position is one less.
@@ -177,7 +178,7 @@ constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
 }
 
 //==================================================================================================
-template <typename CharType, typename... ParameterTypes>
+template <fly::StandardCharacter CharType, typename... ParameterTypes>
 constexpr void BasicFormatString<CharType, ParameterTypes...>::parse_user_defined_specifier(
     FormatSpecifier &specifier)
 {
@@ -220,7 +221,7 @@ constexpr void BasicFormatString<CharType, ParameterTypes...>::parse_user_define
 }
 
 //==================================================================================================
-template <typename CharType, typename... ParameterTypes>
+template <fly::StandardCharacter CharType, typename... ParameterTypes>
 constexpr void
 BasicFormatString<CharType, ParameterTypes...>::parse_standard_specifier(FormatSpecifier &specifier)
 {

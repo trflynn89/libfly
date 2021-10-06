@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/types/string/literals.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <cctype>
 #include <ios>
@@ -104,7 +105,7 @@ private:
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021
  */
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 class PositivePaddingFacet : public std::ctype<CharType>
 {
 protected:
@@ -197,14 +198,14 @@ inline void ScopedStreamModifiers::precision(std::streamsize size)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 CharType PositivePaddingFacet<CharType>::do_widen(char ch) const
 {
     return (ch == s_plus_sign) ? s_space : static_cast<CharType>(ch);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 const char *
 PositivePaddingFacet<CharType>::do_widen(const char *begin, const char *end, CharType *dest) const
 {
