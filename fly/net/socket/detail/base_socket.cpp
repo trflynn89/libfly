@@ -18,7 +18,7 @@ namespace {
 } // namespace
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 BaseSocket<EndpointType>::BaseSocket(
     std::shared_ptr<fly::net::NetworkConfig> config,
     socket_type handle,
@@ -32,7 +32,7 @@ BaseSocket<EndpointType>::BaseSocket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 BaseSocket<EndpointType>::BaseSocket(
     const std::shared_ptr<fly::net::SocketService> &service,
     std::shared_ptr<fly::net::NetworkConfig> config,
@@ -43,7 +43,7 @@ BaseSocket<EndpointType>::BaseSocket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 BaseSocket<EndpointType>::BaseSocket(BaseSocket &&socket) noexcept :
     m_weak_socket_service(std::move(socket.m_weak_socket_service)),
     m_config(std::move(socket.m_config)),
@@ -55,14 +55,14 @@ BaseSocket<EndpointType>::BaseSocket(BaseSocket &&socket) noexcept :
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 BaseSocket<EndpointType>::~BaseSocket() noexcept
 {
     close();
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 BaseSocket<EndpointType> &BaseSocket<EndpointType>::operator=(BaseSocket &&socket) noexcept
 {
     m_weak_socket_service = std::move(socket.m_weak_socket_service);
@@ -77,7 +77,7 @@ BaseSocket<EndpointType> &BaseSocket<EndpointType>::operator=(BaseSocket &&socke
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 auto BaseSocket<EndpointType>::hostname_to_address(std::string_view hostname)
     -> std::optional<address_type>
 {
@@ -91,28 +91,28 @@ auto BaseSocket<EndpointType>::hostname_to_address(std::string_view hostname)
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 bool BaseSocket<EndpointType>::is_open() const
 {
     return m_socket_handle != fly::net::detail::invalid_socket();
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 socket_type BaseSocket<EndpointType>::handle() const
 {
     return m_socket_handle;
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::uint64_t BaseSocket<EndpointType>::socket_id() const
 {
     return m_socket_id;
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 bool BaseSocket<EndpointType>::set_io_mode(fly::net::IOMode mode)
 {
     if (fly::net::detail::set_io_mode(m_socket_handle, mode))
@@ -128,21 +128,21 @@ bool BaseSocket<EndpointType>::set_io_mode(fly::net::IOMode mode)
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 fly::net::IOMode BaseSocket<EndpointType>::io_mode() const
 {
     return m_mode;
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::optional<EndpointType> BaseSocket<EndpointType>::local_endpoint() const
 {
     return fly::net::detail::local_endpoint<EndpointType>(m_socket_handle);
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 void BaseSocket<EndpointType>::close()
 {
     if (is_open())
@@ -158,14 +158,14 @@ void BaseSocket<EndpointType>::close()
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 bool BaseSocket<EndpointType>::bind(const EndpointType &endpoint, BindMode option) const
 {
     return fly::net::detail::bind(m_socket_handle, endpoint, option);
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 bool BaseSocket<EndpointType>::bind(std::string_view hostname, port_type port, BindMode option)
     const
 {
@@ -178,21 +178,21 @@ bool BaseSocket<EndpointType>::bind(std::string_view hostname, port_type port, B
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::shared_ptr<fly::net::SocketService> BaseSocket<EndpointType>::socket_service() const
 {
     return m_weak_socket_service.lock();
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::shared_ptr<fly::net::NetworkConfig> BaseSocket<EndpointType>::network_config() const
 {
     return m_config;
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::size_t BaseSocket<EndpointType>::packet_size() const
 {
     return m_config->packet_size();

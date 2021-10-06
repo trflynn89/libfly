@@ -3,6 +3,7 @@
 #include "fly/fly.hpp"
 #include "fly/net/network_config.hpp"
 #include "fly/net/socket/detail/socket_operations.hpp"
+#include "fly/net/socket/socket_concepts.hpp"
 #include "fly/net/socket/socket_types.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 
@@ -17,7 +18,7 @@ namespace fly::test {
 /**
  * Open a socket of the given type in the provided IO processing mode.
  */
-template <typename SocketType>
+template <fly::net::Socket SocketType>
 std::optional<SocketType> create_socket(fly::net::IOMode mode)
 {
     SocketType socket(std::make_shared<fly::net::NetworkConfig>(), mode);

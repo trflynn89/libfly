@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/net/socket/socket_concepts.hpp"
 #include "fly/net/socket/socket_types.hpp"
 
 #include <chrono>
@@ -34,7 +35,7 @@ fly::net::socket_type invalid_socket();
  *
  * @return If successful, the created address. Otherwise, an uninitialized value.
  */
-template <typename IPAddressType>
+template <fly::net::IPAddress IPAddressType>
 std::optional<IPAddressType> hostname_to_address(std::string_view hostname);
 
 /**
@@ -45,7 +46,7 @@ std::optional<IPAddressType> hostname_to_address(std::string_view hostname);
  *
  * @return If successful, the opened socket handle. Otherwise, an invalid socket handle.
  */
-template <typename EndpointType, typename SocketType>
+template <fly::net::IPEndpoint EndpointType, fly::net::Socket SocketType>
 fly::net::socket_type socket();
 
 /**
@@ -81,7 +82,7 @@ bool set_io_mode(fly::net::socket_type handle, fly::net::IOMode mode);
  *
  * @return If successful, the bound endpoint. Otherwise, an uninitialized value.
  */
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::optional<EndpointType> local_endpoint(fly::net::socket_type handle);
 
 /**
@@ -91,7 +92,7 @@ std::optional<EndpointType> local_endpoint(fly::net::socket_type handle);
  *
  * @return If successful, the connected endpoint. Otherwise, an uninitialized value.
  */
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::optional<EndpointType> remote_endpoint(fly::net::socket_type handle);
 
 /**
@@ -103,7 +104,7 @@ std::optional<EndpointType> remote_endpoint(fly::net::socket_type handle);
  *
  * @return True if the operation was successful.
  */
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 bool bind(fly::net::socket_type handle, const EndpointType &endpoint, fly::net::BindMode mode);
 
 /**
@@ -124,7 +125,7 @@ bool listen(fly::net::socket_type handle);
  *
  * @return If successful, the accepted socket handle. Otherwise, an uninitialized value.
  */
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::optional<fly::net::socket_type>
 accept(fly::net::socket_type handle, EndpointType &endpoint, bool &would_block);
 
@@ -137,7 +138,7 @@ accept(fly::net::socket_type handle, EndpointType &endpoint, bool &would_block);
  *
  * @return The connection state (disconnected, connecting, or connected).
  */
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 fly::net::ConnectedState connect(fly::net::socket_type handle, const EndpointType &endpoint);
 
 /**
@@ -162,7 +163,7 @@ std::size_t send(fly::net::socket_type handle, std::string_view message, bool &w
  *
  * @return The number of bytes transmitted.
  */
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::size_t send_to(
     fly::net::socket_type handle,
     const EndpointType &endpoint,
@@ -191,7 +192,7 @@ std::string recv(fly::net::socket_type handle, std::size_t packet_size, bool &wo
  *
  * @return The message received.
  */
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::string recv_from(
     fly::net::socket_type handle,
     EndpointType &endpoint,

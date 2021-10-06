@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/net/socket/detail/base_socket.hpp"
+#include "fly/net/socket/socket_concepts.hpp"
 #include "fly/net/socket/socket_types.hpp"
 
 #include <cstddef>
@@ -14,7 +15,7 @@ namespace fly::net {
 class NetworkConfig;
 class SocketService;
 
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 class ListenSocket;
 
 /**
@@ -23,7 +24,7 @@ class ListenSocket;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version February 13, 2021
  */
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 class TcpSocket :
     public detail::BaseSocket<EndpointType>,
     public std::enable_shared_from_this<TcpSocket<EndpointType>>

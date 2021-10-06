@@ -10,21 +10,21 @@
 namespace fly::net {
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 TcpSocket<EndpointType>::TcpSocket(std::shared_ptr<NetworkConfig> config) noexcept :
     TcpSocket(std::move(config), IOMode::Synchronous)
 {
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 TcpSocket<EndpointType>::TcpSocket(std::shared_ptr<NetworkConfig> config, IOMode mode) noexcept :
     BaseSocket(std::move(config), detail::socket<EndpointType, TcpSocket<EndpointType>>(), mode)
 {
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 TcpSocket<EndpointType>::TcpSocket(
     const std::shared_ptr<SocketService> &service,
     std::shared_ptr<NetworkConfig> config) noexcept :
@@ -33,7 +33,7 @@ TcpSocket<EndpointType>::TcpSocket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 TcpSocket<EndpointType>::TcpSocket(
     std::shared_ptr<NetworkConfig> config,
     socket_type socket_handle,
@@ -44,7 +44,7 @@ TcpSocket<EndpointType>::TcpSocket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 TcpSocket<EndpointType>::TcpSocket(
     const std::shared_ptr<SocketService> &service,
     std::shared_ptr<NetworkConfig> config,
@@ -55,7 +55,7 @@ TcpSocket<EndpointType>::TcpSocket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 TcpSocket<EndpointType>::TcpSocket(TcpSocket &&socket) noexcept :
     BaseSocket(std::move(socket)),
     m_connected_state(socket.m_connected_state.exchange(ConnectedState::Disconnected))
@@ -63,7 +63,7 @@ TcpSocket<EndpointType>::TcpSocket(TcpSocket &&socket) noexcept :
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 auto TcpSocket<EndpointType>::create_socket(
     const std::shared_ptr<SocketService> &service,
     std::shared_ptr<NetworkConfig> config) -> std::shared_ptr<TcpSocket>
@@ -84,7 +84,7 @@ auto TcpSocket<EndpointType>::create_socket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 auto TcpSocket<EndpointType>::create_socket(
     const std::shared_ptr<SocketService> &service,
     std::shared_ptr<NetworkConfig> config,
@@ -107,7 +107,7 @@ auto TcpSocket<EndpointType>::create_socket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 TcpSocket<EndpointType> &TcpSocket<EndpointType>::operator=(TcpSocket &&socket) noexcept
 {
     m_connected_state = socket.m_connected_state.exchange(ConnectedState::Disconnected);
@@ -116,14 +116,14 @@ TcpSocket<EndpointType> &TcpSocket<EndpointType>::operator=(TcpSocket &&socket) 
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 std::optional<EndpointType> TcpSocket<EndpointType>::remote_endpoint() const
 {
     return detail::remote_endpoint<EndpointType>(handle());
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 ConnectedState TcpSocket<EndpointType>::connect(const EndpointType &endpoint)
 {
     const auto state = detail::connect(handle(), endpoint);
@@ -149,7 +149,7 @@ ConnectedState TcpSocket<EndpointType>::connect(const EndpointType &endpoint)
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 ConnectedState TcpSocket<EndpointType>::connect(std::string_view hostname, port_type port)
 {
     if (auto address = hostname_to_address(std::move(hostname)); address)
@@ -161,7 +161,7 @@ ConnectedState TcpSocket<EndpointType>::connect(std::string_view hostname, port_
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 ConnectedState
 TcpSocket<EndpointType>::connect_async(const EndpointType &endpoint, ConnectCompletion &&callback)
 {
@@ -186,7 +186,7 @@ TcpSocket<EndpointType>::connect_async(const EndpointType &endpoint, ConnectComp
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 ConnectedState TcpSocket<EndpointType>::connect_async(
     std::string_view hostname,
     port_type port,
@@ -201,7 +201,7 @@ ConnectedState TcpSocket<EndpointType>::connect_async(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 ConnectedState TcpSocket<EndpointType>::finish_connect()
 {
     ConnectedState state = ConnectedState::Disconnected;
@@ -222,21 +222,21 @@ ConnectedState TcpSocket<EndpointType>::finish_connect()
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 bool TcpSocket<EndpointType>::is_connecting() const
 {
     return m_connected_state.load() == ConnectedState::Connecting;
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 bool TcpSocket<EndpointType>::is_connected() const
 {
     return m_connected_state.load() == ConnectedState::Connected;
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 std::size_t TcpSocket<EndpointType>::send(std::string_view message)
 {
     bool would_block = false;
@@ -256,7 +256,7 @@ std::size_t TcpSocket<EndpointType>::send(std::string_view message)
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 bool TcpSocket<EndpointType>::send_async(std::string_view message, SendCompletion &&callback)
 {
     if (auto service = socket_service(); service && callback)
@@ -275,7 +275,7 @@ bool TcpSocket<EndpointType>::send_async(std::string_view message, SendCompletio
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 std::string TcpSocket<EndpointType>::receive()
 {
     bool would_block = false;
@@ -295,7 +295,7 @@ std::string TcpSocket<EndpointType>::receive()
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 bool TcpSocket<EndpointType>::receive_async(ReceiveCompletion &&callback)
 {
     if (auto service = socket_service(); service && callback)
@@ -314,7 +314,7 @@ bool TcpSocket<EndpointType>::receive_async(ReceiveCompletion &&callback)
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 void TcpSocket<EndpointType>::ready_to_send(
     std::string_view message,
     SendCompletion &&callback,
@@ -354,7 +354,7 @@ void TcpSocket<EndpointType>::ready_to_send(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 void TcpSocket<EndpointType>::ready_to_receive(ReceiveCompletion &&callback, std::string received)
 {
     bool would_block = false;

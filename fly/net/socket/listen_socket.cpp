@@ -11,14 +11,14 @@
 namespace fly::net {
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 ListenSocket<EndpointType>::ListenSocket(std::shared_ptr<NetworkConfig> config) noexcept :
     ListenSocket(std::move(config), IOMode::Synchronous)
 {
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 ListenSocket<EndpointType>::ListenSocket(
     std::shared_ptr<NetworkConfig> config,
     IOMode mode) noexcept :
@@ -27,7 +27,7 @@ ListenSocket<EndpointType>::ListenSocket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 ListenSocket<EndpointType>::ListenSocket(
     const std::shared_ptr<SocketService> &service,
     std::shared_ptr<NetworkConfig> config) noexcept :
@@ -36,7 +36,7 @@ ListenSocket<EndpointType>::ListenSocket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 ListenSocket<EndpointType>::ListenSocket(ListenSocket &&socket) noexcept :
     BaseSocket(std::move(socket)),
     m_is_listening(socket.m_is_listening)
@@ -45,7 +45,7 @@ ListenSocket<EndpointType>::ListenSocket(ListenSocket &&socket) noexcept :
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 auto ListenSocket<EndpointType>::create_socket(
     const std::shared_ptr<SocketService> &service,
     std::shared_ptr<NetworkConfig> config) -> std::shared_ptr<ListenSocket>
@@ -66,7 +66,7 @@ auto ListenSocket<EndpointType>::create_socket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 ListenSocket<EndpointType> &ListenSocket<EndpointType>::operator=(ListenSocket &&socket) noexcept
 {
     m_is_listening = socket.m_is_listening;
@@ -76,7 +76,7 @@ ListenSocket<EndpointType> &ListenSocket<EndpointType>::operator=(ListenSocket &
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 bool ListenSocket<EndpointType>::listen()
 {
     m_is_listening = detail::listen(handle());
@@ -84,14 +84,14 @@ bool ListenSocket<EndpointType>::listen()
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 bool ListenSocket<EndpointType>::is_listening() const
 {
     return m_is_listening;
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 std::optional<TcpSocket<EndpointType>> ListenSocket<EndpointType>::accept()
 {
     EndpointType client_endpoint;
@@ -110,7 +110,7 @@ std::optional<TcpSocket<EndpointType>> ListenSocket<EndpointType>::accept()
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 bool ListenSocket<EndpointType>::accept_async(AcceptCompletion &&callback)
 {
     if (auto service = socket_service(); service && callback)
@@ -129,7 +129,7 @@ bool ListenSocket<EndpointType>::accept_async(AcceptCompletion &&callback)
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 void ListenSocket<EndpointType>::ready_to_accept(AcceptCompletion &&callback)
 {
     EndpointType client_endpoint;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/net/socket/socket_concepts.hpp"
 #include "fly/net/socket/socket_types.hpp"
 
 #include <functional>
@@ -46,7 +47,7 @@ public:
      *
      * @return The created socket.
      */
-    template <typename SocketType>
+    template <Socket SocketType>
     std::shared_ptr<SocketType> create_socket();
 
     /**
@@ -76,7 +77,7 @@ public:
      * @param socket The socket to monitor.
      * @param callback The callback to invoke when the socket is ready for writing.
      */
-    template <typename SocketType, typename Callback>
+    template <Socket SocketType, typename Callback>
     void notify_when_writable(const std::shared_ptr<SocketType> &socket, Callback &&callback);
 
     /**
@@ -97,7 +98,7 @@ public:
      * @param socket The socket to monitor.
      * @param callback The callback to invoke when the socket is ready for reading.
      */
-    template <typename SocketType, typename Callback>
+    template <Socket SocketType, typename Callback>
     void notify_when_readable(const std::shared_ptr<SocketType> &socket, Callback &&callback);
 
 private:
@@ -157,7 +158,7 @@ private:
      *
      * @return The wrapped callback.
      */
-    template <typename SocketType, typename Callback>
+    template <Socket SocketType, typename Callback>
     Notification wrap_callback(const std::shared_ptr<SocketType> &socket, Callback &&callback);
 
     /**
@@ -175,14 +176,14 @@ private:
 };
 
 //==================================================================================================
-template <typename SocketType>
+template <Socket SocketType>
 std::shared_ptr<SocketType> SocketService::create_socket()
 {
     return SocketType::create_socket(shared_from_this(), m_config);
 }
 
 //==================================================================================================
-template <typename SocketType, typename Callback>
+template <Socket SocketType, typename Callback>
 void SocketService::notify_when_writable(
     const std::shared_ptr<SocketType> &socket,
     Callback &&callback)
@@ -191,7 +192,7 @@ void SocketService::notify_when_writable(
 }
 
 //==================================================================================================
-template <typename SocketType, typename Callback>
+template <Socket SocketType, typename Callback>
 void SocketService::notify_when_readable(
     const std::shared_ptr<SocketType> &socket,
     Callback &&callback)
@@ -200,7 +201,7 @@ void SocketService::notify_when_readable(
 }
 
 //==================================================================================================
-template <typename SocketType, typename Callback>
+template <Socket SocketType, typename Callback>
 auto SocketService::wrap_callback(const std::shared_ptr<SocketType> &socket, Callback &&callback)
     -> Notification
 {
