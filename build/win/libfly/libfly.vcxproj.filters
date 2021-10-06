@@ -223,7 +223,7 @@
     <ClInclude Include="..\..\..\fly\task\task_runner.hpp">
       <Filter>task</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\task\task_types.hpp">
+    <ClInclude Include="..\..\..\fly\task\types.hpp">
       <Filter>task</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.hpp">

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/fly.hpp"
-#include "fly/task/task_types.hpp"
+#include "fly/task/types.hpp"
 
 #include <chrono>
 #include <cstdint>

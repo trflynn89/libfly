@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/task/task_types.hpp"
+#include "fly/task/types.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 
 #include <atomic>
