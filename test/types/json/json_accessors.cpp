@@ -1,6 +1,6 @@
 #include "test/types/json/json_helpers.hpp"
 
-#include "fly/traits/concepts.hpp"
+#include "fly/concepts/concepts.hpp"
 #include "fly/types/json/json.hpp"
 
 #include "catch2/catch_test_macros.hpp"

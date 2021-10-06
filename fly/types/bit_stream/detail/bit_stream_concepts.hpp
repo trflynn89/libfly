@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/traits/concepts.hpp"
+#include "fly/concepts/concepts.hpp"
 #include "fly/types/bit_stream/bit_stream_types.hpp"
 
 namespace fly::detail {

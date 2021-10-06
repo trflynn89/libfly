@@ -10,6 +10,9 @@
     <Filter Include="coders\huffman">
       <UniqueIdentifier>{c8372ac9-d455-4467-9414-627cb49690f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="concepts">
+      <UniqueIdentifier>{f5cf0d32-8583-4428-9fd7-a6c9852235c2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="config">
       <UniqueIdentifier>{7bfc9b93-2ef1-48fd-9eb8-ccb630757af9}</UniqueIdentifier>
     </Filter>
@@ -51,9 +54,6 @@
     </Filter>
     <Filter Include="task">
       <UniqueIdentifier>{b3dd9d0d-ca98-41db-a85b-5754423eb2eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="traits">
-      <UniqueIdentifier>{f5cf0d32-8583-4428-9fd7-a6c9852235c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="types">
       <UniqueIdentifier>{2fe9b6ce-cbdc-485c-bd1c-37fe9ef648d9}</UniqueIdentifier>
@@ -108,6 +108,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.hpp">
       <Filter>coders\huffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\concepts\concepts.hpp">
+      <Filter>concepts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\config\config.hpp">
       <Filter>config</Filter>
@@ -222,9 +225,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\fly\task\task_types.hpp">
       <Filter>task</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\fly\traits\concepts.hpp">
-      <Filter>concepts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.hpp">
       <Filter>types\bit_stream</Filter>

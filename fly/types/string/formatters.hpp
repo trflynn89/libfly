@@ -1,7 +1,7 @@
 #pragma once
 
+#include "fly/concepts/concepts.hpp"
 #include "fly/fly.hpp"
-#include "fly/traits/concepts.hpp"
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/stream_util.hpp"

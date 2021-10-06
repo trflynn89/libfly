@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/traits/concepts.hpp"
+#include "fly/concepts/concepts.hpp"
 #include "fly/types/json/detail/array_util.hpp"
 #include "fly/types/json/detail/json_iterator.hpp"
 #include "fly/types/json/detail/json_reverse_iterator.hpp"

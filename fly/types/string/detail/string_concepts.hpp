@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/traits/concepts.hpp"
+#include "fly/concepts/concepts.hpp"
 
 #include <string>
 #include <type_traits>
