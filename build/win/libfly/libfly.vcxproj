@@ -171,7 +171,7 @@
     <ClInclude Include="..\..\..\fly\coders\coder_config.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_decoder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.hpp" />
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.hpp" />
+    <ClInclude Include="..\..\..\fly\coders\huffman\types.hpp" />
     <ClInclude Include="..\..\..\fly\concepts\concepts.hpp" />
     <ClInclude Include="..\..\..\fly\config\config.hpp" />
     <ClInclude Include="..\..\..\fly\config\config_manager.hpp" />
@@ -256,7 +256,7 @@
     <ClCompile Include="..\..\..\fly\coders\coder_config.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_decoder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_encoder.cpp" />
-    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_types.cpp" />
+    <ClCompile Include="..\..\..\fly\coders\huffman\types.cpp" />
     <ClCompile Include="..\..\..\fly\config\config.cpp" />
     <ClCompile Include="..\..\..\fly\config\config_manager.cpp" />
     <ClCompile Include="..\..\..\fly\logger\detail\console_sink.cpp" />

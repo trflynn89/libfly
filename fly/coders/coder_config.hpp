@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/coders/huffman/huffman_types.hpp"
+#include "fly/coders/huffman/types.hpp"
 #include "fly/config/config.hpp"
 
 #include <chrono>
