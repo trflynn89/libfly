@@ -7,6 +7,7 @@
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/literals.hpp"
 #include "fly/types/string/string.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"
@@ -40,11 +41,11 @@ using FormatString =
 
 template <typename StringType, typename... ParameterTypes>
 void test_format(
-    FormatString<fly::detail::StandardCharacterType<StringType>, ParameterTypes...> format,
+    FormatString<fly::StandardCharacterType<StringType>, ParameterTypes...> format,
     StringType &&expected,
     ParameterTypes &&...parameters)
 {
-    auto result = fly::BasicString<fly::detail::StandardCharacterType<StringType>>::format(
+    auto result = fly::BasicString<fly::StandardCharacterType<StringType>>::format(
         std::move(format),
         std::forward<ParameterTypes>(parameters)...);
 

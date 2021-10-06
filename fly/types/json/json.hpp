@@ -9,6 +9,7 @@
 #include "fly/types/json/json_types.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/string.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <concepts>
 #include <cstddef>
@@ -2000,7 +2001,7 @@ bool Json::contains(T key) const
 template <JsonStringLike T>
 json_string_type Json::convert_to_string(T value)
 {
-    using StringType = BasicString<detail::StandardCharacterType<T>>;
+    using StringType = BasicString<fly::StandardCharacterType<T>>;
 
     if constexpr (fly::SameAs<typename StringType::string_type, json_string_type>)
     {

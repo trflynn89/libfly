@@ -1,45 +1,12 @@
 #pragma once
 
 #include "fly/concepts/concepts.hpp"
+#include "fly/types/string/detail/string_concepts_helpers.hpp"
 
 #include <string>
 #include <type_traits>
 
-namespace fly::detail {
-
-template <typename T, typename CharType>
-concept IsLikeStandardString = fly::SameAsAny<
-    std::decay_t<T>, // Decay to perform array-to-pointer conversion (e.g. char[] to char*).
-    CharType *,
-    CharType const *,
-    std::basic_string<CharType>,
-    std::basic_string_view<CharType>>;
-
-template <typename T>
-struct StandardStringTypeImpl
-{
-    using string_type = std::conditional_t<
-        IsLikeStandardString<T, char>,
-        std::string,
-        std::conditional_t<
-            IsLikeStandardString<T, wchar_t>,
-            std::wstring,
-            std::conditional_t<
-                IsLikeStandardString<T, char8_t>,
-                std::u8string,
-                std::conditional_t<
-                    IsLikeStandardString<T, char16_t>,
-                    std::u16string,
-                    std::conditional_t<
-                        IsLikeStandardString<T, char32_t>,
-                        std::u32string,
-                        std::false_type>>>>>;
-
-    using char_type = std::conditional_t<
-        fly::SameAs<string_type, std::false_type>,
-        std::false_type,
-        typename string_type::value_type>;
-};
+namespace fly {
 
 /**
  * Alias to map a string-like type to its analogous std::basic_string specialization. A type is
@@ -48,7 +15,7 @@ struct StandardStringTypeImpl
  * this alias becomes std::false_type.
  */
 template <typename T>
-using StandardStringType = typename StandardStringTypeImpl<T>::string_type;
+using StandardStringType = typename detail::StandardStringType<T>::string_type;
 
 /**
  * Alias to map a string-like type to its analogous std::basic_string specialization's character
@@ -57,7 +24,7 @@ using StandardStringType = typename StandardStringTypeImpl<T>::string_type;
  * string-like, this alias becomes std::false_type.
  */
 template <typename T>
-using StandardCharacterType = typename StandardStringTypeImpl<T>::char_type;
+using StandardCharacterType = typename detail::StandardStringType<T>::char_type;
 
 /**
  * Concept that is satisfied when the given type is a supported std::basic_string specialization.
@@ -150,4 +117,4 @@ concept FormattableUserDefined = requires
     requires !FormattableBoolean<T>;
 };
 
-} // namespace fly::detail
+} // namespace fly
