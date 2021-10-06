@@ -38,7 +38,7 @@ for learning new C++ standards and exploring interests.
 * [INI](fly/parser/ini_parser.hpp) and [JSON](fly/parser/json_parser.hpp) file parsers
 * [System resource monitor](fly/system/system_monitor.hpp)
 * Thread-safe [queue](fly/types/concurrency/concurrent_queue.hpp) and [stack](fly/types/concurrency/concurrent_stack.hpp)
-* [Type traits](fly/traits/traits.hpp) to extend the STL's `<type_traits>`
+* [Concepts](fly/concepts/concepts.hpp) to extend the STL's `<concepts>`
 * Type-safe, fixed-width [integer literal suffixes](fly/types/numeric/literals.hpp)
 
 ## Building
