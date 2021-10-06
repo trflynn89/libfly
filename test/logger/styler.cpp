@@ -3,7 +3,7 @@
 #include "test/util/capture_stream.hpp"
 
 #include "fly/fly.hpp"
-#include "fly/traits/traits.hpp"
+#include "fly/traits/concepts.hpp"
 #include "fly/types/string/string.hpp"
 
 #include "catch2/catch_test_macros.hpp"
@@ -19,9 +19,9 @@ using namespace fly::literals::styler_literals;
 template <typename... Modifiers>
 void test_styler(std::string &&expected_escape, Modifiers &&...modifiers)
 {
-    constexpr bool style_or_color = fly::any_same_v<fly::logger::Style, Modifiers...> ||
-        fly::any_same_v<fly::logger::Color, Modifiers...> ||
-        fly::any_same_v<fly::logger::Color::StandardColor, Modifiers...>;
+    constexpr bool style_or_color = fly::SameAsAny<fly::logger::Style, Modifiers...> ||
+        fly::SameAsAny<fly::logger::Color, Modifiers...> ||
+        fly::SameAsAny<fly::logger::Color::StandardColor, Modifiers...>;
 
     {
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);

@@ -1,5 +1,6 @@
 #include "test/types/json/json_helpers.hpp"
 
+#include "fly/traits/concepts.hpp"
 #include "fly/types/json/json.hpp"
 
 #include "catch2/catch_test_macros.hpp"
@@ -181,7 +182,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
     CATCH_SECTION("Change the size of a JSON instance")
     {
         constexpr bool is_string_or_array =
-            fly::any_same_v<json_type, fly::json_string_type, fly::json_array_type>;
+            fly::SameAsAny<json_type, fly::json_string_type, fly::json_array_type>;
 
         if constexpr (is_string_or_array)
         {
@@ -205,7 +206,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
     CATCH_SECTION("Check the capacity of a JSON instance")
     {
         constexpr bool is_string_or_array =
-            fly::any_same_v<json_type, fly::json_string_type, fly::json_array_type>;
+            fly::SameAsAny<json_type, fly::json_string_type, fly::json_array_type>;
 
         if constexpr (std::is_same_v<json_type, fly::json_null_type>)
         {
@@ -234,7 +235,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
     CATCH_SECTION("Change the capacity of a JSON instance")
     {
         constexpr bool is_string_or_array =
-            fly::any_same_v<json_type, fly::json_string_type, fly::json_array_type>;
+            fly::SameAsAny<json_type, fly::json_string_type, fly::json_array_type>;
 
         if constexpr (is_string_or_array)
         {
