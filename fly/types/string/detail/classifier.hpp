@@ -14,7 +14,7 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021
  */
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 class BasicClassifier
 {
     using traits = detail::BasicStringTraits<CharType>;
@@ -186,7 +186,7 @@ private:
 };
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <fly::StandardStringLike T>
 constexpr auto BasicClassifier<CharType>::size(T &&value) -> size_type
 {
@@ -203,7 +203,7 @@ constexpr auto BasicClassifier<CharType>::size(T &&value) -> size_type
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <std::size_t N>
 constexpr auto BasicClassifier<CharType>::size(const CharType (&value)[N]) -> size_type
 {
@@ -212,28 +212,28 @@ constexpr auto BasicClassifier<CharType>::size(const CharType (&value)[N]) -> si
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr bool BasicClassifier<CharType>::is_alpha(CharType ch)
 {
     return is_upper(unify_az_characters(ch));
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr bool BasicClassifier<CharType>::is_upper(CharType ch)
 {
     return (ch >= s_upper_a) && (ch <= s_upper_z);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr bool BasicClassifier<CharType>::is_lower(CharType ch)
 {
     return (ch >= s_lower_a) && (ch <= s_lower_z);
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr CharType BasicClassifier<CharType>::to_upper(CharType ch)
 {
     if (is_lower(ch))
@@ -245,7 +245,7 @@ constexpr CharType BasicClassifier<CharType>::to_upper(CharType ch)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr CharType BasicClassifier<CharType>::to_lower(CharType ch)
 {
     if (is_upper(ch))
@@ -257,14 +257,14 @@ constexpr CharType BasicClassifier<CharType>::to_lower(CharType ch)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr bool BasicClassifier<CharType>::is_digit(CharType ch)
 {
     return (ch ^ s_zero) < 10;
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr bool BasicClassifier<CharType>::is_x_digit(CharType ch)
 {
     const auto alpha = unify_az_characters(ch);
@@ -272,7 +272,7 @@ constexpr bool BasicClassifier<CharType>::is_x_digit(CharType ch)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr bool BasicClassifier<CharType>::is_space(CharType ch)
 {
     return (ch == s_space) || (ch == s_form_feed) || (ch == s_line_feed) ||
@@ -280,7 +280,7 @@ constexpr bool BasicClassifier<CharType>::is_space(CharType ch)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr CharType BasicClassifier<CharType>::unify_az_characters(CharType ch)
 {
     return static_cast<CharType>(static_cast<int_type>(ch) & s_case_mask);

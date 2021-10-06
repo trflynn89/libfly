@@ -32,11 +32,11 @@ namespace fly {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version April 4, 2021
  */
-template <typename T, typename CharType = char>
+template <typename T, StandardCharacter CharType = char>
 struct Formatter;
 
 //==================================================================================================
-template <FormattableString T, typename CharType>
+template <FormattableString T, StandardCharacter CharType>
 struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 {
     FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::String)
@@ -154,7 +154,7 @@ private:
 };
 
 //==================================================================================================
-template <FormattablePointer T, typename CharType>
+template <FormattablePointer T, StandardCharacter CharType>
 struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 {
     FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::Pointer)
@@ -181,7 +181,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 };
 
 //==================================================================================================
-template <FormattableIntegral T, typename CharType>
+template <FormattableIntegral T, StandardCharacter CharType>
 struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 {
     FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::Integral)
@@ -500,7 +500,7 @@ private:
 };
 
 //==================================================================================================
-template <FormattableFloatingPoint T, typename CharType>
+template <FormattableFloatingPoint T, StandardCharacter CharType>
 struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 {
     FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::FloatingPoint)
@@ -861,7 +861,7 @@ private:
 };
 
 //==================================================================================================
-template <FormattableBoolean T, typename CharType>
+template <FormattableBoolean T, StandardCharacter CharType>
 struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 {
     FLY_DEFINE_FORMATTER(CharType, detail::ParameterType::Boolean)

@@ -3,13 +3,14 @@
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/literals.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <cstdint>
 #include <optional>
 
 namespace fly {
 
-template <typename CharType>
+template <StandardCharacter CharType>
 class BasicLexer;
 
 using Lexer = BasicLexer<char>;
@@ -25,7 +26,7 @@ using Lexer32 = BasicLexer<char32_t>;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021
  */
-template <typename CharType>
+template <StandardCharacter CharType>
 class BasicLexer
 {
     using traits = detail::BasicStringTraits<CharType>;
@@ -147,7 +148,7 @@ private:
 };
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <std::size_t N>
 constexpr BasicLexer<CharType>::BasicLexer(const CharType (&literals)[N]) noexcept :
     m_size(classifier::size(literals)),
@@ -156,7 +157,7 @@ constexpr BasicLexer<CharType>::BasicLexer(const CharType (&literals)[N]) noexce
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr BasicLexer<CharType>::BasicLexer(view_type view) noexcept :
     m_size(view.size()),
     m_view(std::move(view))
@@ -164,28 +165,28 @@ constexpr BasicLexer<CharType>::BasicLexer(view_type view) noexcept :
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr auto BasicLexer<CharType>::view() const -> view_type
 {
     return m_view;
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr std::size_t BasicLexer<CharType>::position() const
 {
     return m_index;
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr void BasicLexer<CharType>::set_position(std::size_t position)
 {
     m_index = position;
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr std::optional<CharType> BasicLexer<CharType>::peek(std::size_t offset)
 {
     if ((m_index + offset) >= m_size)
@@ -197,7 +198,7 @@ constexpr std::optional<CharType> BasicLexer<CharType>::peek(std::size_t offset)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr std::optional<CharType> BasicLexer<CharType>::consume()
 {
     if (m_index >= m_size)
@@ -209,7 +210,7 @@ constexpr std::optional<CharType> BasicLexer<CharType>::consume()
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr bool BasicLexer<CharType>::consume_if(CharType ch)
 {
     if (auto next = peek(); next && (next.value() == ch))
@@ -222,7 +223,7 @@ constexpr bool BasicLexer<CharType>::consume_if(CharType ch)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr std::optional<std::uintmax_t> BasicLexer<CharType>::consume_number()
 {
     bool parsed_number = false;
@@ -240,7 +241,7 @@ constexpr std::optional<std::uintmax_t> BasicLexer<CharType>::consume_number()
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 constexpr std::optional<std::uintmax_t> BasicLexer<CharType>::consume_hex_number()
 {
     bool parsed_number = false;
@@ -269,7 +270,7 @@ constexpr std::optional<std::uintmax_t> BasicLexer<CharType>::consume_hex_number
 }
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 template <typename Condition>
 constexpr std::optional<CharType> BasicLexer<CharType>::consume_if(Condition condition)
 {

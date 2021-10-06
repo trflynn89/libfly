@@ -1,5 +1,7 @@
 #pragma once
 
+#include "fly/types/string/string_concepts.hpp"
+
 #include <filesystem>
 
 /**
@@ -23,13 +25,13 @@
 namespace fly::detail {
 
 //==================================================================================================
-template <typename CharType>
+template <StandardCharacter CharType>
 struct BasicCharacterLiteral;
 
-template <typename CharType>
+template <StandardCharacter CharType>
 struct BasicStringLiteral;
 
-template <typename CharType>
+template <StandardCharacter CharType>
 struct BasicStringArray;
 
 //==================================================================================================

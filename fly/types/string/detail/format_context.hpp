@@ -2,6 +2,7 @@
 
 #include "fly/types/string/detail/format_parameters.hpp"
 #include "fly/types/string/formatters.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <cstddef>
 #include <type_traits>
@@ -15,7 +16,7 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version April 4, 2021
  */
-template <typename OutputIterator, typename CharType>
+template <typename OutputIterator, fly::StandardCharacter CharType>
 class BasicFormatContext
 {
     using FormatParameter = BasicFormatParameter<BasicFormatContext>;
@@ -63,7 +64,7 @@ private:
 };
 
 //==================================================================================================
-template <typename OutputIterator, typename CharType>
+template <typename OutputIterator, fly::StandardCharacter CharType>
 template <typename... Parameters>
 constexpr BasicFormatContext<OutputIterator, CharType>::BasicFormatContext(
     OutputIterator out,
@@ -75,7 +76,7 @@ constexpr BasicFormatContext<OutputIterator, CharType>::BasicFormatContext(
 }
 
 //==================================================================================================
-template <typename OutputIterator, typename CharType>
+template <typename OutputIterator, fly::StandardCharacter CharType>
 inline auto BasicFormatContext<OutputIterator, CharType>::arg(std::size_t index) const
     -> FormatParameter
 {
@@ -88,7 +89,7 @@ inline auto BasicFormatContext<OutputIterator, CharType>::arg(std::size_t index)
 }
 
 //==================================================================================================
-template <typename OutputIterator, typename CharType>
+template <typename OutputIterator, fly::StandardCharacter CharType>
 inline OutputIterator &BasicFormatContext<OutputIterator, CharType>::out()
 {
     return m_out;

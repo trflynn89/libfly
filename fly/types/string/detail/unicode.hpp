@@ -3,6 +3,7 @@
 #include "fly/concepts/concepts.hpp"
 #include "fly/types/string/detail/string_traits.hpp"
 #include "fly/types/string/literals.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <array>
 #include <functional>
@@ -25,7 +26,7 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version June 6, 2020
  */
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 class BasicUnicode
 {
     using traits = detail::BasicStringTraits<CharType>;
@@ -358,7 +359,7 @@ private:
 };
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename IteratorType>
 bool BasicUnicode<CharType>::validate_encoding(IteratorType &it, const IteratorType &end)
 {
@@ -374,7 +375,7 @@ bool BasicUnicode<CharType>::validate_encoding(IteratorType &it, const IteratorT
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename DesiredStringType>
 inline std::optional<DesiredStringType> BasicUnicode<CharType>::convert_encoding(view_type value)
 {
@@ -390,7 +391,7 @@ inline std::optional<DesiredStringType> BasicUnicode<CharType>::convert_encoding
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename DesiredStringType, typename OutputIteratorType>
 bool BasicUnicode<CharType>::convert_encoding_into(view_type value, OutputIteratorType out)
 {
@@ -414,7 +415,7 @@ bool BasicUnicode<CharType>::convert_encoding_into(view_type value, OutputIterat
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename IteratorType>
 auto BasicUnicode<CharType>::decode_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<codepoint_type>
@@ -430,7 +431,7 @@ auto BasicUnicode<CharType>::decode_codepoint(IteratorType &it, const IteratorTy
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 auto BasicUnicode<CharType>::encode_codepoint(codepoint_type codepoint)
     -> std::optional<string_type>
 {
@@ -446,7 +447,7 @@ auto BasicUnicode<CharType>::encode_codepoint(codepoint_type codepoint)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <char UnicodePrefix, typename IteratorType>
 auto BasicUnicode<CharType>::escape_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<string_type>
@@ -462,7 +463,7 @@ auto BasicUnicode<CharType>::escape_codepoint(IteratorType &it, const IteratorTy
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename IteratorType>
 auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<string_type>
@@ -497,7 +498,7 @@ auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const Iterator
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <char UnicodePrefix>
 auto BasicUnicode<CharType>::escape_codepoint(codepoint_type codepoint) -> string_type
 {
@@ -552,7 +553,7 @@ auto BasicUnicode<CharType>::escape_codepoint(codepoint_type codepoint) -> strin
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <char UnicodePrefix, typename IteratorType>
 auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
     -> codepoint_type
@@ -596,7 +597,7 @@ auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const Iterator
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename IteratorType>
 requires fly::SizeOfTypeIs<CharType, 1>
 auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
@@ -650,7 +651,7 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename IteratorType>
 requires fly::SizeOfTypeIs<CharType, 2>
 auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
@@ -665,7 +666,7 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename IteratorType>
 requires fly::SizeOfTypeIs<CharType, 4>
 auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
@@ -675,7 +676,7 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename OutputIteratorType>
 requires fly::SizeOfTypeIs<CharType, 1>
 void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, OutputIteratorType out)
@@ -705,7 +706,7 @@ void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, Outpu
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename OutputIteratorType>
 requires fly::SizeOfTypeIs<CharType, 2>
 void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, OutputIteratorType out)
@@ -723,7 +724,7 @@ void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, Outpu
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename OutputIteratorType>
 requires fly::SizeOfTypeIs<CharType, 4>
 void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, OutputIteratorType out)
@@ -732,7 +733,7 @@ void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, Outpu
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 auto BasicUnicode<CharType>::create_codepoint_from_surrogates(
     std::function<codepoint_type()> next_codepoint) -> codepoint_type
 {
@@ -774,7 +775,7 @@ auto BasicUnicode<CharType>::create_codepoint_from_surrogates(
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 bool BasicUnicode<CharType>::validate_codepoint(codepoint_type codepoint)
 {
     if ((codepoint >= s_high_surrogate_min) && (codepoint <= s_low_surrogate_max))
@@ -792,7 +793,7 @@ bool BasicUnicode<CharType>::validate_codepoint(codepoint_type codepoint)
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename IteratorType>
 inline auto BasicUnicode<CharType>::next_encoded_byte(IteratorType &it, const IteratorType &end)
     -> codepoint_type

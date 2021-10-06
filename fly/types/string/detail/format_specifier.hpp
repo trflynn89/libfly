@@ -6,6 +6,7 @@
 #include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/lexer.hpp"
 #include "fly/types/string/literals.hpp"
+#include "fly/types/string/string_concepts.hpp"
 
 #include <array>
 #include <cstddef>
@@ -110,7 +111,7 @@ namespace fly::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version January 3, 2021
  */
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 struct BasicFormatSpecifier
 {
     using FormatParseContext = BasicFormatParseContext<CharType>;
@@ -465,7 +466,7 @@ public:                                                                         
     }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr BasicFormatSpecifier<CharType>::BasicFormatSpecifier(FormatParseContext &context) :
     m_position(context.next_position())
 {
@@ -473,7 +474,7 @@ constexpr BasicFormatSpecifier<CharType>::BasicFormatSpecifier(FormatParseContex
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void BasicFormatSpecifier<CharType>::parse(FormatParseContext &context)
 {
     parse_fill_and_alignment(context);
@@ -488,7 +489,7 @@ constexpr void BasicFormatSpecifier<CharType>::parse(FormatParseContext &context
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void BasicFormatSpecifier<CharType>::parse_fill_and_alignment(FormatParseContext &context)
 {
     if (auto next = context.lexer().peek(1); next)
@@ -514,7 +515,7 @@ constexpr void BasicFormatSpecifier<CharType>::parse_fill_and_alignment(FormatPa
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void BasicFormatSpecifier<CharType>::parse_sign(FormatParseContext &context)
 {
     if (context.lexer().consume_if(s_plus_sign))
@@ -532,7 +533,7 @@ constexpr void BasicFormatSpecifier<CharType>::parse_sign(FormatParseContext &co
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void
 BasicFormatSpecifier<CharType>::parse_alternate_form_and_zero_padding(FormatParseContext &context)
 {
@@ -548,7 +549,7 @@ BasicFormatSpecifier<CharType>::parse_alternate_form_and_zero_padding(FormatPars
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void BasicFormatSpecifier<CharType>::parse_width(FormatParseContext &context)
 {
     if (auto width = context.lexer().consume_number(); width)
@@ -565,7 +566,7 @@ constexpr void BasicFormatSpecifier<CharType>::parse_width(FormatParseContext &c
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void BasicFormatSpecifier<CharType>::parse_precision(FormatParseContext &context)
 {
     if (context.lexer().consume_if(s_decimal))
@@ -590,7 +591,7 @@ constexpr void BasicFormatSpecifier<CharType>::parse_precision(FormatParseContex
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr auto BasicFormatSpecifier<CharType>::parse_nested_specifier(FormatParseContext &context)
     -> std::optional<BasicFormatSpecifier>
 {
@@ -616,7 +617,7 @@ constexpr auto BasicFormatSpecifier<CharType>::parse_nested_specifier(FormatPars
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void
 BasicFormatSpecifier<CharType>::parse_locale_specific_form(FormatParseContext &context)
 {
@@ -627,7 +628,7 @@ BasicFormatSpecifier<CharType>::parse_locale_specific_form(FormatParseContext &c
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void BasicFormatSpecifier<CharType>::parse_type(FormatParseContext &context)
 {
     if (auto ch = context.lexer().peek(); ch)
@@ -646,7 +647,7 @@ constexpr void BasicFormatSpecifier<CharType>::parse_type(FormatParseContext &co
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void BasicFormatSpecifier<CharType>::infer_type(FormatParseContext &context)
 {
     auto parameter_type = resolve_parameter_type(context);
@@ -678,7 +679,7 @@ constexpr void BasicFormatSpecifier<CharType>::infer_type(FormatParseContext &co
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void BasicFormatSpecifier<CharType>::validate(FormatParseContext &context)
 {
     auto parameter_type = resolve_parameter_type(context);
@@ -759,7 +760,7 @@ constexpr void BasicFormatSpecifier<CharType>::validate(FormatParseContext &cont
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr void BasicFormatSpecifier<CharType>::validate_type(
     FormatParseContext &context,
     ParameterType parameter_type)
@@ -814,7 +815,7 @@ constexpr void BasicFormatSpecifier<CharType>::validate_type(
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename FormatContext>
 inline std::size_t
 BasicFormatSpecifier<CharType>::width(FormatContext &context, std::size_t fallback) const
@@ -828,7 +829,7 @@ BasicFormatSpecifier<CharType>::width(FormatContext &context, std::size_t fallba
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename FormatContext>
 inline std::size_t
 BasicFormatSpecifier<CharType>::precision(FormatContext &context, std::size_t fallback) const
@@ -842,7 +843,7 @@ BasicFormatSpecifier<CharType>::precision(FormatContext &context, std::size_t fa
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 template <typename FormatContext>
 inline std::optional<std::size_t>
 BasicFormatSpecifier<CharType>::resolve(FormatContext &context, std::size_t position)
@@ -870,7 +871,7 @@ BasicFormatSpecifier<CharType>::resolve(FormatContext &context, std::size_t posi
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr std::optional<ParameterType>
 BasicFormatSpecifier<CharType>::resolve_parameter_type(FormatParseContext &context)
 {
@@ -883,7 +884,7 @@ BasicFormatSpecifier<CharType>::resolve_parameter_type(FormatParseContext &conte
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr auto BasicFormatSpecifier<CharType>::type_of(CharType ch) -> std::optional<Type>
 {
     auto it = std::find_if(
@@ -903,7 +904,7 @@ constexpr auto BasicFormatSpecifier<CharType>::type_of(CharType ch) -> std::opti
 }
 
 //==================================================================================================
-template <typename CharType>
+template <fly::StandardCharacter CharType>
 constexpr bool BasicFormatSpecifier<CharType>::is_numeric() const
 {
     switch (m_type)
