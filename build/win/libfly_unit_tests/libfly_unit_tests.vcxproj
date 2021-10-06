@@ -242,7 +242,6 @@
     <ClCompile Include="..\..\..\test\system\system_monitor.cpp" />
     <ClCompile Include="..\..\..\test\task\task.cpp" />
     <ClCompile Include="..\..\..\test\traits\concepts.cpp" />
-    <ClCompile Include="..\..\..\test\traits\traits.cpp" />
     <ClCompile Include="..\..\..\test\types\bit_stream\bit_stream.cpp" />
     <ClCompile Include="..\..\..\test\types\concurrency\concurrent_container.cpp" />
     <ClCompile Include="..\..\..\test\types\json\json.cpp" />
