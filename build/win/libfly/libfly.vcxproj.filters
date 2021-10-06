@@ -229,19 +229,19 @@
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.hpp">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.hpp">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_writer.hpp">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_writer.hpp">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\types.hpp">
       <Filter>types\bit_stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_concepts.hpp">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\concepts.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.hpp">
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\constants.hpp">
       <Filter>types\bit_stream\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.hpp">

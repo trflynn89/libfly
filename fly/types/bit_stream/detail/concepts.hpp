@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/concepts/concepts.hpp"
-#include "fly/types/bit_stream/bit_stream_types.hpp"
+#include "fly/types/bit_stream/types.hpp"
 
 namespace fly::detail {
 

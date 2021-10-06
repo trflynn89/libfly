@@ -1,6 +1,6 @@
 #include "fly/types/bit_stream/bit_stream_reader.hpp"
 #include "fly/types/bit_stream/bit_stream_writer.hpp"
-#include "fly/types/bit_stream/detail/bit_stream_constants.hpp"
+#include "fly/types/bit_stream/detail/constants.hpp"
 #include "fly/types/numeric/literals.hpp"
 
 #include "catch2/catch_test_macros.hpp"
