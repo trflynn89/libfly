@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/concepts/concepts.hpp"
-#include "fly/types/json/json_types.hpp"
+#include "fly/types/json/types.hpp"
 #include "fly/types/string/concepts.hpp"
 
 #include <array>

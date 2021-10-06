@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/json/json_concepts.hpp"
+#include "fly/types/json/concepts.hpp"
 #include "fly/types/json/json_exception.hpp"
 
 #include <cstddef>
