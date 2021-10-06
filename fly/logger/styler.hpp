@@ -2,14 +2,13 @@
 
 #include "fly/fly.hpp"
 #include "fly/logger/detail/styler_proxy.hpp"
-#include "fly/traits/traits.hpp"
+#include "fly/traits/concepts.hpp"
 #include "fly/types/numeric/literals.hpp"
 
 #include <cstdint>
 #include <memory>
 #include <ostream>
 #include <stack>
-#include <type_traits>
 #include <utility>
 
 namespace fly::logger {
@@ -117,6 +116,12 @@ struct Cursor
 };
 
 /**
+ * Concept that is satisfied if the provided type is a valid stream modifier.
+ */
+template <typename T>
+concept Modifier = fly::SameAsAny<T, Style, Color, Color::StandardColor, Cursor, Cursor::Direction>;
+
+/**
  * IO manipulator to stylize a std::ostream with style and color. This manipulator allows for
  * applying any number of styles (e.g. bold, italic), a foreground color, and background color to
  * the std::ostream. It also allows for modifying the cursor position within the stream.
@@ -159,12 +164,12 @@ public:
      * Color, Color::StandardColor, Cursor, Cursor::Direction]. The enumeration [Style are coverted
      * to their parent structure types.
      *
-     * @tparam Modifier The type of the modifier to apply to the std::ostream.
+     * @tparam ModifierType The type of the modifier to apply to the std::ostream.
      *
      * @param modifier The modifier to apply to the std::ostream.
      */
-    template <typename Modifier>
-    explicit Styler(Modifier &&modifier) noexcept
+    template <Modifier ModifierType>
+    explicit Styler(ModifierType &&modifier) noexcept
     {
         set_modifier(modifier);
     }
@@ -178,15 +183,15 @@ public:
      * one foreground and one background Color instance may be used; if more than one of each is
      * provided, only the last instance provided will take effect.
      *
-     * @tparam Modifier The type of the modifier to apply to the std::ostream.
-     * @tparam Modifiers Variadic types of the remaining modifiers to apply to the std::ostream.
+     * @tparam ModifierType The type of the modifier to apply to the std::ostream.
+     * @tparam ModifierTypes Variadic types of the remaining modifiers to apply to the std::ostream.
      *
      * @param modifier The modifier to apply to the std::ostream.
      * @param modifiers The remaining modifiers to apply to the std::ostream.
      */
-    template <typename Modifier, typename... Modifiers>
-    Styler(Modifier &&modifier, Modifiers &&...modifiers) noexcept :
-        Styler(std::forward<Modifiers>(modifiers)...)
+    template <Modifier ModifierType, Modifier... ModifierTypes>
+    Styler(ModifierType &&modifier, ModifierTypes &&...modifiers) noexcept :
+        Styler(std::forward<ModifierTypes>(modifiers)...)
     {
         set_modifier(modifier);
     }
@@ -209,34 +214,22 @@ private:
      * be one of [Style, Color, Color::StandardColor, Cursor, Cursor::Direction]. The enumeration
      * types are coverted to their parent structure types.
      *
-     * @tparam Modifier The type of the modifier to apply to the std::ostream.
+     * @tparam ModifierType The type of the modifier to apply to the std::ostream.
      *
      * @param modifier The modifier to apply to the std::ostream.
      */
-    template <typename Modifier>
-    void set_modifier(Modifier &&modifier)
+    template <Modifier ModifierType>
+    void set_modifier(ModifierType &&modifier)
     {
-        using DecayedModifier = std::decay_t<Modifier>;
-
-        static_assert(
-            any_same_v<
-                DecayedModifier,
-                Style,
-                Color,
-                Color::StandardColor,
-                Cursor,
-                Cursor::Direction>,
-            "Styler can only be constructed with a valid modifier type");
-
-        if constexpr (std::is_same_v<DecayedModifier, Style>)
+        if constexpr (fly::SameAs<ModifierType, Style>)
         {
             m_styles.emplace(std::move(modifier));
         }
-        else if constexpr (any_same_v<DecayedModifier, Color, Color::StandardColor>)
+        else if constexpr (fly::SameAsAny<ModifierType, Color, Color::StandardColor>)
         {
             m_colors.emplace(std::move(modifier));
         }
-        else if constexpr (any_same_v<DecayedModifier, Cursor, Cursor::Direction>)
+        else if constexpr (fly::SameAsAny<ModifierType, Cursor, Cursor::Direction>)
         {
             m_cursors.emplace(std::move(modifier));
         }
