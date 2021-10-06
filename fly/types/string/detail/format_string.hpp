@@ -128,7 +128,7 @@ FLY_CONSTEVAL BasicFormatString<CharType, ParameterTypes...>::BasicFormatString(
                 continue;
             }
 
-            m_context.on_error("Closing brace } must be esacped");
+            m_context.on_error("Closing brace } must be escaped");
         }
     }
 }
