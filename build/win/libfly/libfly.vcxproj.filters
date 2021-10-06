@@ -262,16 +262,16 @@
     <ClInclude Include="..\..\..\fly\types\json\detail\json_reverse_iterator.hpp">
       <Filter>types\json\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\json\json.hpp">
+    <ClInclude Include="..\..\..\fly\types\json\concepts.hpp">
       <Filter>types\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\json\json_concepts.hpp">
+    <ClInclude Include="..\..\..\fly\types\json\json.hpp">
       <Filter>types\json</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\json\json_exception.hpp">
       <Filter>types\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\types\json\json_types.hpp">
+    <ClInclude Include="..\..\..\fly\types\json\types.hpp">
       <Filter>types\json</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\numeric\endian.hpp">
