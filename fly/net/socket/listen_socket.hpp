@@ -1,7 +1,7 @@
 #pragma once
 
+#include "fly/net/socket/concepts.hpp"
 #include "fly/net/socket/detail/base_socket.hpp"
-#include "fly/net/socket/socket_concepts.hpp"
 
 #include <functional>
 #include <memory>

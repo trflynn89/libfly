@@ -2,9 +2,9 @@
 
 #include "fly/fly.hpp"
 #include "fly/net/network_config.hpp"
+#include "fly/net/socket/concepts.hpp"
 #include "fly/net/socket/detail/socket_operations.hpp"
-#include "fly/net/socket/socket_concepts.hpp"
-#include "fly/net/socket/socket_types.hpp"
+#include "fly/net/socket/types.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 
 #include "catch2/catch_test_macros.hpp"

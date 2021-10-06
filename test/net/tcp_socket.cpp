@@ -10,7 +10,7 @@
 #include "fly/net/network_config.hpp"
 #include "fly/net/socket/listen_socket.hpp"
 #include "fly/net/socket/socket_service.hpp"
-#include "fly/net/socket/socket_types.hpp"
+#include "fly/net/socket/types.hpp"
 #include "fly/task/task_manager.hpp"
 #include "fly/task/task_runner.hpp"
 #include "fly/types/string/string.hpp"

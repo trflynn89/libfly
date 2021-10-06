@@ -163,19 +163,19 @@
     <ClInclude Include="..\..\..\fly\net\network_config.hpp">
       <Filter>net</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\net\socket\listen_socket.hpp">
+    <ClInclude Include="..\..\..\fly\net\socket\concepts.hpp">
       <Filter>net\socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\net\socket\socket_concepts.hpp">
+    <ClInclude Include="..\..\..\fly\net\socket\listen_socket.hpp">
       <Filter>net\socket</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\net\socket\socket_service.hpp">
       <Filter>net\socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\net\socket\socket_types.hpp">
+    <ClInclude Include="..\..\..\fly\net\socket\tcp_socket.hpp">
       <Filter>net\socket</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\net\socket\tcp_socket.hpp">
+    <ClInclude Include="..\..\..\fly\net\socket\types.hpp">
       <Filter>net\socket</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\net\socket\udp_socket.hpp">
