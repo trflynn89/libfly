@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/traits/traits.hpp"
+#include "fly/traits/concepts.hpp"
 #include "fly/types/json/json_concepts.hpp"
 #include "fly/types/json/json_exception.hpp"
 #include "fly/types/string/string.hpp"
@@ -57,7 +57,7 @@ template <typename JsonType>
 class JsonIterator
 {
     static_assert(
-        std::is_same_v<Json, typename std::remove_const_t<JsonType>>,
+        fly::SameAs<Json, JsonType>,
         "JsonIterator must only be declared for a Json type");
 
     static constexpr bool is_const_iterator = std::is_const_v<JsonType>;
@@ -430,13 +430,13 @@ private:
      * A trait for testing if all types Ts are object iterators.
      */
     template <typename... Ts>
-    inline static constexpr bool is_object_iterator = all_same_v<object_iterator_type, Ts...>;
+    static constexpr inline bool is_object_iterator = fly::SameAsAll<object_iterator_type, Ts...>;
 
     /**
      * A trait for testing if all types Ts are array iterators.
      */
     template <typename... Ts>
-    inline static constexpr bool is_array_iterator = all_same_v<array_iterator_type, Ts...>;
+    static constexpr inline bool is_array_iterator = fly::SameAsAll<array_iterator_type, Ts...>;
 
     /**
      * Verify that this iterator is not empty.
