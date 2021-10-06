@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fly/types/bit_stream/bit_stream_types.hpp"
+#include "fly/types/bit_stream/types.hpp"
 
 #include <limits>
 

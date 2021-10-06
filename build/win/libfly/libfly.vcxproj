@@ -212,11 +212,11 @@
     <ClInclude Include="..\..\..\fly\task\task_runner.hpp" />
     <ClInclude Include="..\..\..\fly\task\task_types.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_reader.hpp" />
-    <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_types.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\bit_stream_writer.hpp" />
+    <ClInclude Include="..\..\..\fly\types\bit_stream\types.hpp" />
     <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream.hpp" />
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_concepts.hpp" />
-    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\bit_stream_constants.hpp" />
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\concepts.hpp" />
+    <ClInclude Include="..\..\..\fly\types\bit_stream\detail\constants.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_queue.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\concurrent_stack.hpp" />
     <ClInclude Include="..\..\..\fly\types\concurrency\detail\concurrent_container.hpp" />

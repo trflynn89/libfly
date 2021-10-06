@@ -1,6 +1,6 @@
 #include "fly/types/bit_stream/bit_stream_writer.hpp"
 
-#include "fly/types/bit_stream/detail/bit_stream_constants.hpp"
+#include "fly/types/bit_stream/detail/constants.hpp"
 #include "fly/types/numeric/literals.hpp"
 
 namespace fly {

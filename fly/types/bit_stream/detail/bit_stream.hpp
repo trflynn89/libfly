@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fly/types/bit_stream/bit_stream_types.hpp"
-#include "fly/types/bit_stream/detail/bit_stream_concepts.hpp"
+#include "fly/types/bit_stream/detail/concepts.hpp"
+#include "fly/types/bit_stream/types.hpp"
 
 #include <limits>
 #include <streambuf>
