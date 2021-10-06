@@ -18,10 +18,10 @@
 
 namespace fly::net {
 
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 class TcpSocket;
 
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 class UdpSocket;
 
 } // namespace fly::net
@@ -30,7 +30,7 @@ namespace fly::net::detail {
 
 namespace {
 
-    template <typename EndpointType>
+    template <fly::net::IPEndpoint EndpointType>
     using socket_address_type =
         std::conditional_t<EndpointType::is_ipv4(), sockaddr_in, sockaddr_in6>;
 
@@ -133,7 +133,7 @@ fly::net::socket_type invalid_socket()
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <fly::net::IPAddress IPAddressType>
 std::optional<IPAddressType> hostname_to_address(std::string_view hostname)
 {
     using EndpointType = fly::net::Endpoint<IPAddressType>;
@@ -227,7 +227,7 @@ bool set_io_mode(fly::net::socket_type handle, fly::net::IOMode mode)
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::optional<EndpointType> local_endpoint(fly::net::socket_type handle)
 {
     socket_address_type<EndpointType> address;
@@ -246,7 +246,7 @@ template std::optional<IPv4Endpoint> local_endpoint(fly::net::socket_type handle
 template std::optional<IPv6Endpoint> local_endpoint(fly::net::socket_type handle);
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::optional<EndpointType> remote_endpoint(fly::net::socket_type handle)
 {
     socket_address_type<EndpointType> address;
@@ -265,7 +265,7 @@ template std::optional<IPv4Endpoint> remote_endpoint(fly::net::socket_type handl
 template std::optional<IPv6Endpoint> remote_endpoint(fly::net::socket_type handle);
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 bool bind(fly::net::socket_type handle, const EndpointType &endpoint, fly::net::BindMode mode)
 {
     static constexpr const char s_bind_reuse = 1;
@@ -311,7 +311,7 @@ bool listen(fly::net::socket_type handle)
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::optional<fly::net::socket_type>
 accept(fly::net::socket_type handle, EndpointType &endpoint, bool &would_block)
 {
@@ -342,7 +342,7 @@ template std::optional<fly::net::socket_type>
 accept(fly::net::socket_type handle, IPv6Endpoint &endpoint, bool &would_block);
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 fly::net::ConnectedState connect(fly::net::socket_type handle, const EndpointType &endpoint)
 {
     const auto address = endpoint_to_address(endpoint);
@@ -410,7 +410,7 @@ std::size_t send(fly::net::socket_type handle, std::string_view message, bool &w
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::size_t send_to(
     fly::net::socket_type handle,
     const EndpointType &endpoint,
@@ -496,7 +496,7 @@ std::string recv(fly::net::socket_type handle, std::size_t packet_size, bool &wo
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 std::string recv_from(
     fly::net::socket_type handle,
     EndpointType &endpoint,

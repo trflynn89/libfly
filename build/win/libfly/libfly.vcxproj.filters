@@ -163,6 +163,9 @@
     <ClInclude Include="..\..\..\fly\net\socket\listen_socket.hpp">
       <Filter>net\socket</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\net\socket\socket_concepts.hpp">
+      <Filter>net\socket</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\net\socket\socket_service.hpp">
       <Filter>net\socket</Filter>
     </ClInclude>

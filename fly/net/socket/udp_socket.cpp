@@ -10,21 +10,21 @@
 namespace fly::net {
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 UdpSocket<EndpointType>::UdpSocket(std::shared_ptr<NetworkConfig> config) noexcept :
     UdpSocket(std::move(config), IOMode::Synchronous)
 {
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 UdpSocket<EndpointType>::UdpSocket(std::shared_ptr<NetworkConfig> config, IOMode mode) noexcept :
     BaseSocket(std::move(config), detail::socket<EndpointType, UdpSocket<EndpointType>>(), mode)
 {
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 UdpSocket<EndpointType>::UdpSocket(
     const std::shared_ptr<SocketService> &service,
     std::shared_ptr<NetworkConfig> config) noexcept :
@@ -33,13 +33,13 @@ UdpSocket<EndpointType>::UdpSocket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 UdpSocket<EndpointType>::UdpSocket(UdpSocket &&socket) noexcept : BaseSocket(std::move(socket))
 {
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 auto UdpSocket<EndpointType>::create_socket(
     const std::shared_ptr<SocketService> &service,
     std::shared_ptr<NetworkConfig> config) -> std::shared_ptr<UdpSocket>
@@ -60,14 +60,14 @@ auto UdpSocket<EndpointType>::create_socket(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 UdpSocket<EndpointType> &UdpSocket<EndpointType>::operator=(UdpSocket &&socket) noexcept
 {
     return static_cast<UdpSocket &>(BaseSocket::operator=(std::move(socket)));
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 size_t UdpSocket<EndpointType>::send(const EndpointType &endpoint, std::string_view message)
 {
     bool would_block = false;
@@ -89,7 +89,7 @@ size_t UdpSocket<EndpointType>::send(const EndpointType &endpoint, std::string_v
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 size_t
 UdpSocket<EndpointType>::send(std::string_view hostname, port_type port, std::string_view message)
 
@@ -103,7 +103,7 @@ UdpSocket<EndpointType>::send(std::string_view hostname, port_type port, std::st
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 bool UdpSocket<EndpointType>::send_async(
     const EndpointType &endpoint,
     std::string_view message,
@@ -126,7 +126,7 @@ bool UdpSocket<EndpointType>::send_async(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 bool UdpSocket<EndpointType>::send_async(
     std::string_view hostname,
     port_type port,
@@ -145,7 +145,7 @@ bool UdpSocket<EndpointType>::send_async(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 std::string UdpSocket<EndpointType>::receive()
 {
     EndpointType endpoint;
@@ -167,7 +167,7 @@ std::string UdpSocket<EndpointType>::receive()
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 bool UdpSocket<EndpointType>::receive_async(ReceiveCompletion &&callback)
 {
     if (auto service = socket_service(); service && callback)
@@ -186,7 +186,7 @@ bool UdpSocket<EndpointType>::receive_async(ReceiveCompletion &&callback)
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 void UdpSocket<EndpointType>::ready_to_send(
     const EndpointType &endpoint,
     std::string_view message,
@@ -233,7 +233,7 @@ void UdpSocket<EndpointType>::ready_to_send(
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 void UdpSocket<EndpointType>::ready_to_receive(ReceiveCompletion &&callback, std::string received)
 {
     EndpointType endpoint;

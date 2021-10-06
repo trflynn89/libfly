@@ -3,6 +3,7 @@
 #include "fly/fly.hpp"
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/net/socket/socket_concepts.hpp"
 #include "fly/net/socket/socket_types.hpp"
 #include "fly/types/string/lexer.hpp"
 #include "fly/types/string/string.hpp"
@@ -22,7 +23,7 @@ namespace fly::net {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version February 13, 2021
  */
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 class Endpoint
 {
 public:
@@ -107,14 +108,12 @@ public:
 #endif
 
 private:
-    static_assert(is_ipv4() || is_ipv6(), "Endpoints may only be used with IP address types");
-
     IPAddressType m_address {};
     port_type m_port {0};
 };
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr Endpoint<IPAddressType>::Endpoint(const IPAddressType &address, port_type port) noexcept :
     m_address(address),
     m_port(port)
@@ -122,7 +121,7 @@ constexpr Endpoint<IPAddressType>::Endpoint(const IPAddressType &address, port_t
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr Endpoint<IPAddressType>::Endpoint(IPAddressType &&address, port_type port) noexcept :
     m_address(address),
     m_port(port)
@@ -130,21 +129,21 @@ constexpr Endpoint<IPAddressType>::Endpoint(IPAddressType &&address, port_type p
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr bool Endpoint<IPAddressType>::is_ipv4()
 {
     return std::is_same_v<IPAddressType, IPv4Address>;
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr bool Endpoint<IPAddressType>::is_ipv6()
 {
     return std::is_same_v<IPAddressType, IPv6Address>;
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr std::optional<Endpoint<IPAddressType>>
 Endpoint<IPAddressType>::from_string(std::string_view endpoint)
 {
@@ -191,14 +190,14 @@ Endpoint<IPAddressType>::from_string(std::string_view endpoint)
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr const IPAddressType &Endpoint<IPAddressType>::address() const
 {
     return m_address;
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr port_type Endpoint<IPAddressType>::port() const
 {
     return m_port;
@@ -207,21 +206,21 @@ constexpr port_type Endpoint<IPAddressType>::port() const
 #if defined(FLY_MACOS)
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr bool Endpoint<IPAddressType>::operator==(const Endpoint<IPAddressType> &endpoint) const
 {
     return (m_address == endpoint.m_address) && (m_port == endpoint.m_port);
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr bool Endpoint<IPAddressType>::operator!=(const Endpoint<IPAddressType> &endpoint) const
 {
     return !(*this == endpoint);
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr bool Endpoint<IPAddressType>::operator<(const Endpoint<IPAddressType> &endpoint) const
 {
     if (m_address < endpoint.m_address)
@@ -233,21 +232,21 @@ constexpr bool Endpoint<IPAddressType>::operator<(const Endpoint<IPAddressType> 
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr bool Endpoint<IPAddressType>::operator<=(const Endpoint<IPAddressType> &endpoint) const
 {
     return !(endpoint < *this);
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr bool Endpoint<IPAddressType>::operator>(const Endpoint<IPAddressType> &endpoint) const
 {
     return !(*this <= endpoint);
 }
 
 //==================================================================================================
-template <typename IPAddressType>
+template <IPAddress IPAddressType>
 constexpr bool Endpoint<IPAddressType>::operator>=(const Endpoint<IPAddressType> &endpoint) const
 {
     return !(*this < endpoint);

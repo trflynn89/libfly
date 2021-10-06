@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fly/net/socket/detail/base_socket.hpp"
+#include "fly/net/socket/socket_concepts.hpp"
 #include "fly/net/socket/socket_types.hpp"
 
 #include <cstddef>
@@ -19,7 +20,7 @@ class SocketService;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version February 13, 2021
  */
-template <typename EndpointType>
+template <IPEndpoint EndpointType>
 class UdpSocket :
     public detail::BaseSocket<EndpointType>,
     public std::enable_shared_from_this<UdpSocket<EndpointType>>

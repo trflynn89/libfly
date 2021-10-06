@@ -1,23 +1,17 @@
 #pragma once
 
+#include "fly/net/socket/socket_concepts.hpp"
 #include "fly/net/socket/socket_types.hpp"
-#include "fly/traits/traits.hpp"
 
 #include <cstdint>
 #include <memory>
 #include <optional>
 #include <string_view>
-#include <type_traits>
 
 namespace fly::net {
 
-class IPv4Address;
-class IPv6Address;
 class NetworkConfig;
 class SocketService;
-
-template <typename IPAddressType>
-class Endpoint;
 
 } // namespace fly::net
 
@@ -30,16 +24,9 @@ namespace fly::net::detail {
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version February 13, 2021
  */
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 class BaseSocket
 {
-    static_assert(
-        fly::any_same_v<
-            EndpointType,
-            fly::net::Endpoint<fly::net::IPv4Address>,
-            fly::net::Endpoint<fly::net::IPv6Address>>,
-        "Sockets may only be created with IPv4 or IPv6 endpoints");
-
 public:
     using endpoint_type = EndpointType;
     using address_type = typename EndpointType::address_type;
@@ -201,14 +188,14 @@ private:
 };
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 constexpr bool BaseSocket<EndpointType>::is_ipv4()
 {
     return EndpointType::is_ipv4();
 }
 
 //==================================================================================================
-template <typename EndpointType>
+template <fly::net::IPEndpoint EndpointType>
 constexpr bool BaseSocket<EndpointType>::is_ipv6()
 {
     return EndpointType::is_ipv6();
